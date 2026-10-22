@@ -753,6 +753,7 @@ const TUNE={wbLodRt:0/* r17s far-LOD cell range cap in m (0 = by quality tier); 
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.12,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45,drSnap:14,drMax:.7,drExitT:.4,drExitG:12};
 const OD_CHANGELOG=[
+{v:'v90m-beta.157',date:'22 Oct 2026',items:[{t:'FIXED',s:'On foot you can no longer walk out of the world: you slow down and TURN BACK shows, like in the car.'},{t:'FIXED',s:'Only one TAP chip shows at a time, and the flight chip shows its plane icon once.'}]},
 {v:'v90m-beta.156',date:'22 Oct 2026',items:[{t:'FIXED',s:'On phones, traffic cars are no longer re-placed where you can see them.'},{t:'CHANGED',s:'Removed unfinished test options (hill climb, Athens bowl).'}]},
 {v:'v90m-beta.155',date:'22 Oct 2026',items:[{t:'CHANGED',s:'Stopping at a garage, flight or event marker no longer opens its card: tap the chip to open it.'},{t:'CHANGED',s:'Smoother on phones: the game does about 30% less work every frame (the HUD no longer forces a full restyle).'}]},
 {v:'v90m-beta.154',date:'22 Oct 2026',items:[{t:'NEW',s:'Frankfurt: smashing props now throws a wide fan of bricks and gold studs that arc over your car.'},{t:'CHANGED',s:'No more pop-up cards while you drive: level-ups and results are small notes, and events start only when you tap TAP TO START.'}]},
@@ -1620,7 +1621,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"0010b0d8","99c8_bot":"6011c7fe","99c9_collide":"e73c847d","99ctf_traffic_go":"e0a2d197","99ctl_traffic_law":"f777939b","99c_checklist":"f24e3c31","99c2_slowspots":"4b1f6cf1","99c3_rv3c":"ef8ab955","10c_qtc_blob":"e3242764","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"ceb4f4e7","99c6_rv4a":"03b1e523","99c7_rev5fix":"ef12ca5f","99cb_athbudget":"eda24edc","99cc_reveal_desktop":"a556777d","98b2_builder2":"562449e3","99cs_solid":"48ec4137","99fj_framejs":"7e74f6be"}/*end*/,XC={q:{},apply:{},post:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"0010b0d8","99c8_bot":"6011c7fe","99c9_collide":"e73c847d","99ctf_traffic_go":"e0a2d197","99ctl_traffic_law":"f777939b","99c_checklist":"f24e3c31","99c2_slowspots":"4b1f6cf1","99c3_rv3c":"ef8ab955","10c_qtc_blob":"e3242764","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"ceb4f4e7","99c6_rv4a":"03b1e523","99c7_rev5fix":"ef12ca5f","99cb_athbudget":"eda24edc","99cc_reveal_desktop":"a556777d","98b2_builder2":"562449e3","99cs_solid":"48ec4137","99fj_framejs":"7e74f6be","99oe_edge":"c4e179ca"}/*end*/,XC={q:{},apply:{},post:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -7714,7 +7715,8 @@ function OG_hud(){const e=OG.ev,el=OG_el('ogHud');if(!e){el.hidden=true;return}c
 function OG_prog(e){const k=e.kind;return k==='gate'?`${e.n}/${e.objs.length} gates`:k==='ring'?`${e.n}/${e.objs.length} rings`:k==='rush'?`${e.n} studs`:k==='smash'?`${e.n} smashed`:k==='drift'?`${Math.round(e.n)} pts`:k==='ghost'?`${Math.round(e.d)} m · ghost ${Math.round(e.gd)} m`:k==='stunt'?(e.land!=null?`${e.land.toFixed(1)} m off`:'hit the ramp'):e.land!=null?`${Math.round(e.land)} m`:'hit the ramp'}
 const OG_mat={};const OG_m=(c,e=1.6)=>OG_mat[c+e]||(OG_mat[c+e]=neonMat(c,e));
 function OG_obj(e,m,x,y,z){m.position.set(x,y,z);RO.grp.add(m);e.meshes.push(m);return m}
-function OG_ask(sp){if(OG.ask||(OG.noAsk&&OG.noAsk[sp.id]>performance.now()))return;const T=OG_T[sp.t],el=OG_el('ogAsk');el.innerHTML=`${T.ic} ${T.n.toUpperCase()} · TAP TO START`;el.onclick=e=>{e.stopPropagation();OG_askGo()};el.ontouchstart=ev=>{ev.preventDefault();ev.stopPropagation();OG_askGo()};el.hidden=false;OG.ask={sp,t:7,x:RO.x,z:RO.z,h:RO.h,y:RO.y};try{OG_snd('pick')}catch(e){}}
+function OG_ask(sp){if(OG.ask||(OG.noAsk&&OG.noAsk[sp.id]>performance.now()))return;if(typeof RQ_hide==='function'&&RQ.a)RQ_hide(true);   // one chip at a time: the event ask is newest, the marker chip steps aside
+  const T=OG_T[sp.t],el=OG_el('ogAsk');el.innerHTML=`${T.ic} ${T.n.toUpperCase()} · TAP TO START`;el.onclick=e=>{e.stopPropagation();OG_askGo()};el.ontouchstart=ev=>{ev.preventDefault();ev.stopPropagation();OG_askGo()};el.hidden=false;OG.ask={sp,t:7,x:RO.x,z:RO.z,h:RO.h,y:RO.y};try{OG_snd('pick')}catch(e){}}
 function OG_askHide(){const a=OG.ask;OG.ask=null;OG_el('ogAsk').hidden=true;if(a){(OG.noAsk||(OG.noAsk={}))[a.sp.id]=performance.now()+25000}}
 function OG_askStep(dt){const a=OG.ask;a.t-=dt;if(a.t<=0||OG.ev||RO.ch||RO.sp||RO.card||RO.mapOpen)OG_askHide()}   // full 7 s, even at 126 km/h: the tap puts the car back at the start (like RETRY)
 function OG_askGo(){const a=OG.ask;if(!a)return false;OG_askHide();if(OG.ev||state!=='roam')return false;if((a.x-RO.x)**2+(a.z-RO.z)**2>10*10){RO.x=a.x;RO.z=a.z;RO.h=RO.vh=a.h;RO.y=groundAt(a.x,a.z,a.y+2);RO.v=Math.min(Math.abs(RO.v),14);RO.vy=0;RO.dDir=0;RO.takeoff=null;RO.lastRamp=null;camSnap=true}OG_start(a.sp);return true}
@@ -13282,6 +13284,8 @@ function OF_walk(dt){const I=OF_input(),il=Math.hypot(I.fx,I.fy),ia=Math.atan2(I
   let why='';if(g1>OF.y+OF_STEP||(CID==='fra'&&inRiver(nx,nz)&&g1<=HWY+.3)){nx=OF.x;nz=OF.z;why=g1>OF.y+OF_STEP?'step'+(g1-OF.y).toFixed(2):'river'}
   [nx,nz]=OF_collide(nx,nz,OF.y);if(roamHit(nx,nz,OF_R*.6,OF.y+1)){nx=OF.x;nz=OF.z}
   const moved=Math.hypot(nx-OF.x,nz-OF.z);if(m>.3&&moved<tv*dt*.25){OF.n.stuckF++;if((OF.stk||(OF.stk=[])).length<12&&OF.n.stuckF%10===1)OF.stk.push([Math.round(OF.x),Math.round(OF.z),why||(roamHit(OF.x,OF.z,OF_R+.1,OF.y+1)?'bld':'car/prop')])}if(m>.3)OF.n.walkF++;
+  {const sp=Math.hypot(OF.vx,OF.vz);if(sp>.01){RO.v=sp;RO.vh=Math.atan2(OF.vx,OF.vz);edgeStep(dt);const k=Math.max(0,RO.v)/sp;OF.vx*=k;OF.vz*=k;nx=OF.x+OF.vx*dt;nz=OF.z+OF.vz*dt;RO.v=0}
+   const cx=clamp(nx,WX0+10,WX1-10),cz=clamp(nz,WZS+10,WZN-10);if(cx!==nx){OF.vx=0;nx=cx}if(cz!==nz){OF.vz=0;nz=cz}}
   OF.x=nx;OF.z=nz;const g=groundAt(OF.x,OF.z,OF.y+OF_STEP+.05);
   if(OF.air||OF.y>g+.05){OF.vy-=OF_G*dt;OF.y+=OF.vy*dt;if(OF.y<=g){OF.y=g;OF.vy=0;OF.air=false}else OF.air=true}else{OF.y=g;OF.vy=0}
   if(Math.hypot(OF.vx,OF.vz)>0)OF.spd=moved/Math.max(dt,1e-4)}
@@ -13446,6 +13450,16 @@ function OF_pave(far){const N=HUB.nodes;if(!N)return null;const L=[];for(let i=0
       if(ok)return{x,z,y,h:Math.atan2(dx,dz),rx,rz,cx:mx-dz*sd*W/4,cz:mz+dx*sd*W/4}}}}return null}
 function OF_spawn(P,fx,fz,fh){if(!roamWarp(P.cx,P.cz,P.h,true))return false;OF_poseCar(RO.x,RO.z,RO.y,RO.h);OF.idle=1;OF_exit();const T=OF.tw;RO.foot='walk';OF.tw=null;OF.x=fx??P.x;OF.z=fz??P.z;OF.y=groundAt(OF.x,OF.z,RO.y+2);OF.h=fh??P.h;
   OF.vx=OF.vz=OF.vy=0;OF.spd=0;OF.air=false;OF.cy=OF.cyIn=OF.h;OF.cp=0;OF.camT=9;OF.camB=4.5;OF.inA=null;OF.recen=false;OF.hPrev=null;RO.x=OF.x;RO.z=OF.z;RO.y=OF.y;RO.h=RO.vh=OF.h;OF_btns();return true}
+function OF_edgeGo(){const r=OF_go('jump');if(RO.foot!=='walk')return r;const sv={x:OF.x,z:OF.z},cx=(WX0+WX1)/2,cz=(WZS+WZN)/2,I=60,HIT=[[7995,3033],[-5150,-5195]],T=[['N',cx,WZN-I,0],['S',cx,WZS+I,Math.PI],['E',WX1-I,cz,Math.PI/2],['W',WX0+I,cz,-Math.PI/2]];
+  for(const[x,z]of HIT){const px=clamp(x,WX0+30,WX1-30),pz=clamp(z,WZS+30,WZN-30),e=[[px-WX0,-Math.PI/2],[WX1-px,Math.PI/2],[pz-WZS,Math.PI],[WZN-pz,0]].sort((a,b)=>a[0]-b[0])[0];T.push(['spot'+Math.round(x),px,pz,e[1]])}
+  const bad=[],kk={KeyW:K.KeyW,ShiftLeft:K.ShiftLeft};let worst=1e9;
+  try{K.KeyW=true;K.ShiftLeft=true;for(const[n,x,z,yaw]of T){OF.x=x;OF.z=z;OF.y=groundAt(x,z,999);OF.vx=OF.vz=OF.vy=0;OF.air=false;OF.cy=OF.cyIn=OF.h=yaw;OF.inA=0;OF.camT=9;
+    let px=OF.x,pz=OF.z,why='';for(let i=0;i<600&&!why;i++){OF.cy=OF.cyIn=yaw;OF.inA=0;OF_step(1/30);const g=groundAt(OF.x,OF.z,OF.y+2);
+      if(!isFinite(OF.x+OF.y+OF.z))why='NaN';else if(OF.x<WX0+9||OF.x>WX1-9||OF.z<WZS+9||OF.z>WZN-9)why='outside the world box';else if(OF.y<g-.3)why='below the ground '+(g-OF.y).toFixed(1);else if(Math.hypot(OF.x-px,OF.z-pz)>1)why='teleport '+Math.hypot(OF.x-px,OF.z-pz).toFixed(1)+' m';
+      worst=Math.min(worst,OF.x-WX0,WX1-OF.x,OF.z-WZS,WZN-OF.z);px=OF.x;pz=OF.z}
+    if(why)bad.push(n+' '+why+' @'+Math.round(OF.x)+','+Math.round(OF.z))}}
+  finally{K.KeyW=kk.KeyW;K.ShiftLeft=kk.ShiftLeft;OF.x=sv.x;OF.z=sv.z}
+  return'📍 ON-FOOT EDGE · '+T.length+' runs of 20 s · closest to the edge '+worst.toFixed(1)+' m'+(bad.length?' ❌ '+bad.join(' | '):' ✅')}
 function OF_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}if(RO.card){RO.card=null;$('#roamCard').hidden=true}
   OF_reset();OF_actEnd&&OF_actEnd();
   if(kind==='bench'||kind==='mission'){const T=[];
@@ -17849,7 +17863,7 @@ const RQ={a:null,no:new Map()};
 function RQ_el(){return OG_el('rqAsk')}
 function RQ_hide(cool){const a=RQ.a;RQ.a=null;RQ_el().hidden=true;if(a&&cool)RQ.no.set(a.m,performance.now()+25000)}
 function RQ_offer(m){if(RQ.a||RO.card||OG.ask||(RQ.no.get(m)||0)>performance.now())return;const el=RQ_el();
- el.innerHTML=`${m.kind==='garage'?'🔧':m.kind==='flight'?'✈':'📍'} ${markTitle(m).toUpperCase()} · TAP TO OPEN`;
+ el.innerHTML=`${m.kind==='garage'?'🔧':m.kind==='flight'?'✈':'📍'} ${markTitle(m).replace(/^[✈🔧📍]\s*/u,'').toUpperCase()} · TAP TO OPEN`;
  el.onclick=e=>{e.stopPropagation();RQ_go()};el.ontouchstart=ev=>{ev.preventDefault();ev.stopPropagation();RQ_go()};el.hidden=false;RQ.a={m,t:7};try{OG_snd('pick')}catch(e){}}
 function RQ_go(){const a=RQ.a;if(!a)return false;RQ_hide(true);if(state!=='roam'||RO.card||RO.ch||(RO.sp&&!RO.sp.done))return false;roamOpen(a.m);RO.cardPin=1;return true}
 function RQ_step(dt){const a=RQ.a;if(!a)return;a.t-=dt;if(a.t<=0||RO.card||RO.ch||RO.sp||RO.mapOpen||state!=='roam'||Math.hypot(a.m.x-RO.x,a.m.z-RO.z)>40)RQ_hide(true)}
@@ -17862,7 +17876,7 @@ body:has(#rqAsk:not([hidden])):has(#r3Up.mini:not([hidden])) #ogRes.tst{top:calc
 @media (orientation:portrait){#rqAsk{left:140px;right:calc(12px + env(safe-area-inset-right,0px));width:auto;transform:none;top:calc(8px + env(safe-area-inset-top,0px));white-space:normal;padding:4px 12px}
  body:has(#rqAsk:not([hidden])) #r3Up.mini,body:has(#rqAsk:not([hidden])) #ogRes.tst{top:calc(66px + env(safe-area-inset-top,0px))}
  body:has(#rqAsk:not([hidden])):has(#r3Up.mini:not([hidden])) #ogRes.tst{top:calc(130px + env(safe-area-inset-top,0px))}}`;document.head.appendChild(st)}
-window.__rqStage=()=>{const m=(RO.marks||[]).find(q=>q.kind==='garage'&&!markLocked(q));if(!m)return'no garage';RO.x=m.x;RO.z=m.z+6;RO.y=m.g.position.y;RO.v=0;RO.cool=0;camSnap=true;for(let i=0;i<150;i++){roamStep(1/30);RO.v=0}return{chip:!RQ_el().hidden,txt:RQ_el().textContent,card:!$('#roamCard').hidden}};   // shot helper (screenshots / manual checks)
+window.__rqStage=(ev)=>{const m=(RO.marks||[]).find(q=>q.kind==='garage'&&!markLocked(q));if(!m)return'no garage';RO.x=m.x;RO.z=m.z+6;RO.y=m.g.position.y;RO.v=0;RO.cool=0;camSnap=true;for(let i=0;i<150;i++){roamStep(1/30);RO.v=0}if(ev){const sp=OG.S&&OG.S.find(q=>q.k==='ev'&&!OG_blocked(q));OG.noAsk={};if(sp)OG_ask(sp)}return{chip:!RQ_el().hidden,ev:!OG_el('ogAsk').hidden,txt:RQ_el().textContent,card:!$('#roamCard').hidden}};   // shot helper (screenshots / manual checks)
 async function RQ_go_test(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none';
  if(state!=='roam'||!RO.on)return'';
  const sv={x:RO.x,z:RO.z,h:RO.h,v:RO.v,ch:RO.ch,card:RO.card,sp:RO.sp,cool:RO.cool};
@@ -17871,7 +17885,16 @@ async function RQ_go_test(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),vis
   let cardAt=-1,chipAt=-1;for(let i=0;i<150;i++){roamStep(1/30);RO.v=0;if(cardAt<0&&(RO.card||vis($('#roamCard'))))cardAt=i;if(chipAt<0&&vis(RQ_el()))chipAt=i}
   ck(kind+' marker, stopped 5 s: no card (seen at '+cardAt+'), chip "'+RQ_el().textContent.trim().slice(0,32)+'" shown at '+chipAt,cardAt<0&&chipAt>=0&&vis(RQ_el())||cardAt<0&&chipAt>=0);
   const tap=RQ_go();ck(kind+': tap on the chip opens the card ('+tap+', card '+!!RO.card+', chip hidden '+!vis(RQ_el())+')',tap&&!!RO.card&&vis($('#roamCard'))&&!vis(RQ_el()));
-  RO.card=null;$('#roamCard').hidden=true}}
+  RO.card=null;$('#roamCard').hidden=true}
+ {const fm=typeof flightMark==='function'?flightMark():null;RO.ch=null;RO.sp=null;RO.card=null;RQ_hide(false);RQ.no.clear();
+  if(!fm)ck('flight chip: no flight marker in this city (skipped)',true);
+  else{RQ_offer(fm);const t=RQ_el().textContent.trim();ck('flight chip "'+t+'" has exactly one ✈ ('+(t.split('✈').length-1)+')',vis(RQ_el())&&t.split('✈').length-1===1);RQ_hide(false)}
+  const m=(RO.marks||[]).find(q=>q.kind==='garage'&&!markLocked(q)),sp=OG.S&&OG.S.find(q=>q.k==='ev'&&!OG_blocked(q));
+  if(!m||!sp)ck('chip overlap: no garage or event spot (skipped)',true);
+  else{OG.ask&&OG_askHide();OG.noAsk={};RQ.no.clear();RQ_offer(m);const up=vis(RQ_el());OG_ask(sp);const n=[RQ_el(),OG_el('ogAsk')].filter(vis).length;
+   ck('event ask while the marker chip is up: exactly one chip visible ('+n+', marker chip was up '+up+', event chip '+vis(OG_el('ogAsk'))+')',up&&n===1&&vis(OG_el('ogAsk')));
+   OG_askHide();OG.noAsk={};RQ_offer(m);OG_ask(sp);const n2=[RQ_el(),OG_el('ogAsk')].filter(vis).length;ck('marker chip offered while the event chip is up: still one chip ('+n2+')',n2===1);
+   OG_askHide();OG.noAsk={};RQ_hide(false);RQ.no.clear()}}}
  catch(e){R.push('✗ rq threw '+e)}
  finally{RO.x=sv.x;RO.z=sv.z;RO.h=RO.vh=sv.h;RO.v=0;RO.ch=sv.ch;RO.card=sv.card;RO.sp=sv.sp;RO.cool=sv.cool;RO.y=groundAt(RO.x,RO.z,99);camSnap=true;RQ_hide(false);RQ.no.clear();if(!sv.card)$('#roamCard').hidden=true}
  return R.join(' · ')}
