@@ -1,6 +1,6 @@
 // framejs.js <outdir/ver> : per-frame JS cost of the game step (render stubbed, rAF stubbed 60 Hz), ?test=CITY, hold ArrowUp for TICKS frames at THROTTLE x CPU.
 // Prints one JSON line {city,jsMed,jsP95,dist}; PROF=1 adds a CDP profile: top self-time functions and inclusive time of the frame subsystems.
-// env: CITY=fra|ath TICKS=3600 THROTTLE=6 PROF=0
+// env: CITY=fra|ath TICKS=3600 THROTTLE=6 PROF=0 DESK=1 (desktop UA; default is the phone profile: iPhone UA, 852x393 touch, CLAUDE.md rule 12)
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const http=require('http'),fs=require('fs'),path=require('path');
 const DIR=path.resolve(process.argv[2]),CITY=process.env.CITY||'fra',TICKS=+(process.env.TICKS||3600),THR=+(process.env.THROTTLE||6),PROF=!!+process.env.PROF;
 const mime={'.html':'text/html','.js':'application/javascript','.json':'application/json','.mp3':'audio/mpeg'};
@@ -8,8 +8,8 @@ const INIT=`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){}}}return t};window.__auto=true;setInterval(()=>{if(window.__auto)window.__tick(1)},16)})();`;
 const srv=http.createServer((q,r)=>{const f=path.join(DIR,decodeURIComponent(q.url.split('?')[0]));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end()}if(f.endsWith('index.html'))d=Buffer.from(d.toString().replace('const composer=new EffectComposer(renderer,rt);','const composer=new EffectComposer(renderer,rt);window.__R=renderer;window.__C=composer;'));r.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream'});r.end(d)})}).listen(0,async()=>{
  const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(3600000);await p.addInitScript(INIT);if(process.env.INIT2)await p.addInitScript(fs.readFileSync(process.env.INIT2,'utf8'));
- const row={city:CITY};
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:process.env.DESK?undefined:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});const p=await ctx.newPage();p.setDefaultTimeout(3600000);await p.addInitScript(INIT);if(process.env.INIT2)await p.addInitScript(fs.readFileSync(process.env.INIT2,'utf8'));
+ const row={city:CITY};p.on('pageerror',e=>row.pageErr=(row.pageErr||0)+1);
  try{await p.goto(`http://127.0.0.1:${srv.address().port}/index.html?test=${CITY}`);
   await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__R,null,{polling:500});
   await p.evaluate(()=>{window.__auto=false;__C.render=()=>{}});
@@ -18,7 +18,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(DIR,decodeURIComponent(q.u
   if(PROF){await cdp.send('Profiler.enable');await cdp.send('Profiler.setSamplingInterval',{interval:500});await cdp.send('Profiler.start')}
   Object.assign(row,await p.evaluate(async N=>{const ms=[],RO=__mho.RO,x0=RO.x,z0=RO.z;let d=0,px=x0,pz=z0;
    for(let i=0;i<N;i++){const t=performance.now();__tick(1);ms.push(performance.now()-t);d+=Math.min(50,Math.hypot(RO.x-px,RO.z-pz));px=RO.x;pz=RO.z;if(i%60===0)await new Promise(r=>setTimeout(r,0))}
-   ms.sort((a,b)=>a-b);return{jsMed:+ms[ms.length>>1].toFixed(1),jsP95:+ms[Math.floor(ms.length*.95)].toFixed(1),jsMax:+ms[ms.length-1].toFixed(0),dist:Math.round(d)}},TICKS));
+   ms.sort((a,b)=>a-b);return{tier:window.SET&&SET.q||(typeof SET!=='undefined'?SET.q:''),jsMed:+ms[ms.length>>1].toFixed(1),jsP95:+ms[Math.floor(ms.length*.95)].toFixed(1),jsMax:+ms[ms.length-1].toFixed(0),dist:Math.round(d)}},TICKS));
   if(PROF){const {profile}=await cdp.send('Profiler.stop');const byId={};for(const n of profile.nodes)byId[n.id]=n;const cnt={};profile.samples.forEach((s,i)=>{cnt[s]=(cnt[s]||0)+(profile.timeDeltas[i]||0)});
    const key=n=>(n.callFrame.functionName||'(anon)')+':'+n.callFrame.lineNumber+':'+n.callFrame.url.split('/').pop().slice(0,12);
    const par={};for(const n of profile.nodes)for(const c of n.children||[])par[c]=n.id;
