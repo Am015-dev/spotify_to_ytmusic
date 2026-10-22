@@ -17,7 +17,7 @@ const FA={POSES,WHO,POSES_BOSS:POSES.concat(['attack2','enrage']),MACHINES:['dro
 window.FA=FA;
 /* ---- real pictures: ready.json lists the painted files; each is loaded once (a failed load is remembered and silently ignored) ---- */
 FA._base=()=>FA.base||(typeof ART!=='undefined'&&ART.base)||'media/';
-FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
+FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{if(typeof AFX!=='undefined')AFX.fixFoot(f,r);r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
 FA.ready=a=>{if(!Array.isArray(a))return;for(const f of a)if(typeof f==='string'&&f.indexOf('foot/')===0){FA._rd.add(f);FA._load(f);}};
 FA.init=()=>{if(FA._init)return;FA._init=true;if(typeof fetch==='function')fetch(FA._base()+'ready.json').then(r=>r.json()).then(FA.ready).catch(()=>{});};
 FA._pic=f=>{FA.init();const r=FA._im[f];return r&&r.ok?r.im:null;};

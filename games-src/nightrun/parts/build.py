@@ -29,6 +29,7 @@ PARTS_EXTRA.append('puremusic.js')
 PARTS_EXTRA.append('soundlab.js')
 PARTS_EXTRA.append('cleanlook.js')
 PARTS_EXTRA.append('steadysong.js')
+PARTS_EXTRA.append('artfix.js')
 out=out[:out.rindex(rd('c.js'))]+''.join(rd(p)+"\n" for p in PARTS_EXTRA)+rd('c.js')
 OUT=os.environ.get('NR_OUT','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path
 import hashlib,datetime
