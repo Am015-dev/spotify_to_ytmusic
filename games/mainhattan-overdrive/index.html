@@ -751,6 +751,7 @@ const TUNE={wbLodRt:0/* r17s far-LOD cell range cap in m (0 = by quality tier); 
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.12,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45,drSnap:14,drMax:.7,drExitT:.4,drExitG:12};
 const OD_CHANGELOG=[
+{v:'v90m-beta.152',date:'22 Oct 2026',items:[{t:'FIXED',s:'Traffic cars no longer jump, slide sideways or pop up while you can see them; cars that must respawn now do it behind you.'},{t:'FIXED',s:'Ground loads before the city appears on phones.'}]},
 {v:'v90m-beta.151',date:'22 Oct 2026',items:[{t:'NEW',s:'Speed feel: speed lines at the screen edges above 90 km/h, a wider view at speed, and a whoosh, flash and blue jets when you boost.'},{t:'FIXED',s:'Traffic cars stay the same when you turn the camera, and stuck or overlapping cars now clear away out of your sight.'},{t:'FIXED',s:'Less stutter on phones right after the city appears.'}]},
 {v:'v90m-beta.150',date:'22 Oct 2026',items:[{t:'FIXED',s:'No more invisible traffic cars on phones, and cars no longer change when you turn the camera away and back.'},{t:'FIXED',s:'You can no longer drive through a traffic car while it waits or turns at a junction.'},{t:'CHANGED',s:'PLAY now starts quiet in both cities: no story card in Athens, no prompts while you drive fast, and your car is never swapped for a buggy on dirt.'}]},
 {v:'v90m-beta.149',date:'22 Oct 2026',items:[{t:'FIXED',s:'More buildings are solid: a Frankfurt block and a tower you could drive into now stop you.'},{t:'FIXED',s:'Long LEGO fences now smash when you hit them, instead of letting you pass through.'}]},
@@ -4299,7 +4300,8 @@ function hubWinEm(kind){const W=256,H=256,[c,g]=cv(W,H),r=mul(kind.length*131);g
   const t=tex(c);KEEP_TEX.add(t);return t}
 function signTex(word,col){const[c,g]=cv(64,256);g.fillStyle='#05030c';g.fillRect(0,0,64,256);g.strokeStyle=col;g.lineWidth=4;g.strokeRect(4,4,56,248);g.fillStyle=col;g.shadowColor=col;g.shadowBlur=10;g.font='bold 30px sans-serif';g.textAlign='center';g.textBaseline='middle';const L=[...word];L.forEach((ch,i)=>g.fillText(ch,32,128+(i-(L.length-1)/2)*Math.min(34,220/L.length)));const t=tex(c,false);KEEP_TEX.add(t);return t}
 function adTex(b){const[c,g]=cv(512,256);const gr=g.createLinearGradient(0,0,512,256);gr.addColorStop(0,'#0a0420');gr.addColorStop(1,'#180a30');g.fillStyle=gr;g.fillRect(0,0,512,256);g.strokeStyle=b[2];g.lineWidth=8;g.strokeRect(8,8,496,240);g.fillStyle=b[2];g.font='bold 64px sans-serif';g.textAlign='center';g.fillText(b[0],256,120);g.fillStyle=b[3];g.font='bold 28px sans-serif';g.fillText(b[1],256,190);const t=tex(c,false);KEEP_TEX.add(t);return t}
-function groundTex(kind){const Z=256,[c,g]=cv(Z,Z),r=mul(kind.length*13);
+const GTEX_C={};function groundTex(kind){return GTEX_C[kind]||(GTEX_C[kind]=groundTex0(kind))}
+function groundTex0(kind){const Z=256,[c,g]=cv(Z,Z),r=mul(kind.length*13);
   if(kind==='road'){g.fillStyle='#14161f';g.fillRect(0,0,Z,Z);for(let i=0;i<1400;i++){g.fillStyle=`rgba(${r()<.5?0:255},${r()<.5?0:255},${r()<.5?0:255},.05)`;g.fillRect(r()*Z,r()*Z,2,2)}g.fillStyle='#cfe8ff';for(let y=0;y<Z;y+=64)g.fillRect(Z/2-3,y,6,34);g.fillStyle='#ff2d95';g.fillRect(6,0,4,Z);g.fillStyle='#22e4ff';g.fillRect(Z-10,0,4,Z)}
   else if(kind==='walk'){g.fillStyle='#4a4858';g.fillRect(0,0,Z,Z);g.strokeStyle='rgba(0,0,0,.18)';g.lineWidth=2;for(let x=0;x<=Z;x+=32){g.beginPath();g.moveTo(x,0);g.lineTo(x,Z);g.stroke();g.beginPath();g.moveTo(0,x);g.lineTo(Z,x);g.stroke()}}
   else if(kind==='cobble'){g.fillStyle='#8e8478';g.fillRect(0,0,Z,Z);for(let y=0;y<Z;y+=12)for(let x=(y/12%2)*6;x<Z;x+=12){g.fillStyle=`rgb(${120+r()*50|0},${112+r()*45|0},${100+r()*40|0})`;g.beginPath();g.arc(x+6,y+6,5,0,7);g.fill()}}
@@ -12495,32 +12497,27 @@ GB_piece=(f=>function(t,c,M,L){const P=GB_PC[t];if(!P||!G13_NEW[t])return f(t,c,
 {const S=$('#gbBkPc');if(S)for(const k in G13_NEW){const P=GB_PC[k];if(S.querySelector(`.gbPc[data-p="${k}"]`))continue;const b=document.createElement('button');b.className='gbPc';b.dataset.p=k;b.dataset.ct=P.cat;b.dataset.n=P.n;b.innerHTML=`<i>${P.ic}</i>${P.n}`;b.style.display=GB_.ct===P.cat?'':'none';
   const last=[...S.querySelectorAll(`.gbPc[data-ct="${P.cat}"]`)].pop();if(last)last.after(b);else S.appendChild(b)}}
 window.__g13={pc:()=>Object.entries(GB_PC).map(([k,v])=>k+':'+v.n+':'+v.w+'x'+v.d+'x'+v.h+':'+(v.cat||'')).join('|'),turn:G13_turn,ori:t=>G13_ori(t),def:k=>GB_PC[k],search:G13_search,tray:()=>G13_tGet(),tAdd:G13_tAdd,join:G13_join,comps:S=>G13_comps(S).length,st:()=>({held:!!GS.held,sel:SL.sel.length,tool:GB_.tool,n:GB_list().length,q:G13.q,tray:G13.tray,pad:G13.pad,pc:GB_.pc,rot:GB_.rot,giz:!!(G13.giz&&G13.giz.visible)})};
-const GL={P:{dim:.6,hb:.3,hk:1.3,sun:30,bw:90,bh:34,by:18,bk:4,rw:110,rh:12,rk:2.8,ei:1.4},on:/[?&]gloss=1/.test(location.search),tex:null,id:'',n:0,ms:0,mats:new Set()};
-function GL_env(){const id=MOOD.id;if(GL.tex&&GL.id===id)return GL.tex;const t0=performance.now(),M=MOOD,sc=new THREE.Scene(),Q=GL.P,dim=Q.dim;
-  const g=new THREE.SphereGeometry(50,32,16),P=g.attributes.position,C=new Float32Array(P.count*3),top=M.top||[.05,.08,.2],hor=M.hor||[.6,.7,.8];
-  for(let i=0;i<P.count;i++){const y=P.getY(i)/50;let c;if(y<-.02)c=[.035,.035,.04];else{const a=Math.pow(Math.max(0,y),.5);c=[0,1,2].map(j=>(hor[j]*(1-a)+top[j]*a)*dim);if(y<Q.hb)c=c.map((v,j)=>Math.max(v,hor[j]*Q.hk))}C[i*3]=c[0];C[i*3+1]=c[1];C[i*3+2]=c[2]}
-  g.setAttribute('color',new THREE.BufferAttribute(C,3));const B=o=>Object.assign(new THREE.MeshBasicMaterial(o),{toneMapped:false,fog:false});
-  sc.add(new THREE.Mesh(g,B({vertexColors:true,side:THREE.BackSide})));
-  const k=moonL.intensity/4.2,sd=moonL.position.clone().normalize(),sun=new THREE.Mesh(new THREE.SphereGeometry(2.2,12,8),B({color:moonL.color.clone().multiplyScalar(Q.sun*Math.min(1.2,k))}));
-  sun.position.copy(sd).multiplyScalar(40);sc.add(sun);
-  const box=new THREE.Mesh(new THREE.PlaneGeometry(Q.bw,Q.bh),B({color:new THREE.Color(1,1,1.05).multiplyScalar(Q.bk*Math.max(.25,Math.min(1,k))),side:THREE.DoubleSide}));
-  box.position.set(sd.x*8,Q.by,sd.z*8);box.rotation.x=Math.PI/2;box.rotation.z=Math.atan2(sd.x,sd.z)+Math.PI/2;sc.add(box);
-  const rim=new THREE.Mesh(new THREE.PlaneGeometry(Q.rw,Q.rh),B({color:new THREE.Color(.9,.95,1.1).multiplyScalar(Q.rk),side:THREE.DoubleSide}));
-  rim.position.set(-sd.x*40,Q.rh*.6,-sd.z*40);rim.lookAt(0,Q.rh*.6,0);sc.add(rim);
-  const pm=new THREE.PMREMGenerator(renderer),t=pm.fromScene(sc,0).texture;pm.dispose();sc.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose()}});
-  if(GL.tex)GL.tex.dispose();GL.tex=t;GL.id=id;GL.n++;GL.ms=performance.now()-t0;return t}
+const GL={P:{sun:24,sr:1.6,re:28,rw:2.5,rk:16,ek:.5},on:/[?&]gloss=1/.test(location.search),tex:null,id:'',C:new Map(),n:0,ms:0,mats:new Set()};
+function GL_key(){const d=moonL.position.clone().normalize();return MOOD.id+'|'+moonL.color.getHexString()+'|'+Math.round(moonL.intensity)+'|'+[d.x,d.y,d.z].map(v=>Math.round(v*3)).join(',')+'|'+(lowGfx?1:0)}
+function GL_env(){const id=GL_key();if(GL.tex&&GL.id===id)return GL.tex;const hit=GL.C.get(id);if(hit){GL.tex=hit;GL.id=id;return hit}const t0=performance.now(),Q=GL.P,add=[];
+  const B=o=>Object.assign(new THREE.MeshBasicMaterial(o),{toneMapped:false,fog:false}),k=moonL.intensity/4.2,kk=Math.max(.15,Math.min(1,k)),sd=moonL.position.clone().normalize();
+  const sun=new THREE.Mesh(new THREE.SphereGeometry(Q.sr,12,8),B({color:moonL.color.clone().multiplyScalar(Q.sun*Math.min(1.2,k))}));sun.position.copy(sd).multiplyScalar(40);add.push(sun);
+  const R=60,e=Q.re*Math.PI/180,w=Q.rw*Math.PI/180,y0=R*Math.tan(e-w/2),y1=R*Math.tan(e+w/2);
+  const ring=new THREE.Mesh(new THREE.CylinderGeometry(R,R,y1-y0,48,1,true),B({color:new THREE.Color(1,1,1.04).multiplyScalar(Q.rk*kk),side:THREE.DoubleSide}));ring.position.y=(y0+y1)/2;add.push(ring);
+  for(const o of add)ENVSC.add(o);let t;try{const pm=new THREE.PMREMGenerator(renderer);t=pm.fromScene(ENVSC,0).texture;pm.dispose()}finally{for(const o of add){ENVSC.remove(o);o.geometry.dispose();o.material.dispose()}}
+  GL.C.set(id,t);if(GL.C.size>4){const[k0,t0]=GL.C.entries().next().value;GL.C.delete(k0);if(t0!==GL.tex)t0.dispose()}GL.tex=t;GL.id=id;GL.n++;GL.ms=performance.now()-t0;return t}
 function GL_paint(m){return m&&m.isMeshStandardMaterial&&!m.transparent&&m.envMap&&(m.isMeshPhysicalMaterial||m.envMapIntensity>1||m.userData.a10e!==undefined)}
 function GL_set(m,ei){if(!GL_paint(m))return;if(m.userData.gl0===undefined)m.userData.gl0=[m.envMapIntensity,m.clearcoatRoughness];
-  if(m.envMap!==GL.tex)m.envMap=GL.tex;const gls=m.roughness<.1;m.envMapIntensity=gls?1.5:ei;if(m.isMeshPhysicalMaterial){if(m.clearcoat<.8)m.clearcoat=1;m.clearcoatRoughness=gls?.03:.05}GL.mats.add(m)}
-function GL_apply(){if(!GL.on||!scene.environment)return;if(!GL.tex||GL.id!==MOOD.id)GL_env();const ei=GL.P.ei;
+  if(m.envMap!==GL.tex)m.envMap=GL.tex;const gls=m.roughness<.1;m.envMapIntensity=gls?1.5:m.userData.gl0[0]*ei;if(m.isMeshPhysicalMaterial){if(m.clearcoat<.8)m.clearcoat=1;m.clearcoatRoughness=gls?.03:.05}GL.mats.add(m)}
+function GL_apply(){if(!GL.on||!scene.environment)return;if(!GL.tex||GL.id!==GL_key())GL_env();const ei=GL.P.ek;
   if(HUB&&HUB.cim)for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const m of[].concat(im.material))GL_set(m,ei)}
   if(typeof pl!=='undefined'&&pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))GL_set(m,ei)})}
 function GL_off(){for(const m of GL.mats){const o=m.userData.gl0;m.envMap=scene.environment;if(o){m.envMapIntensity=o[0];if(o[1]!=null)m.clearcoatRoughness=o[1]}}GL.mats.clear()}
 ART10_cars=(f=>function(){const r=f.apply(this,arguments);try{GL_apply()}catch(e){}return r})(ART10_cars);
 function GL_go(say){if(state!=='roam'||!RO.on)return'📍 Start free roam to run this';
   const cnt=()=>{const S=new Set();if(pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(m=>S.add(m))});for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const x of[im,im.userData.w,im.userData.g])if(x)[].concat(x.material).forEach(m=>S.add(m))}return S.size};
-  const chk=()=>{let p=0,pg=0,t=0,tg=0;pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))if(GL_paint(m)&&m.roughness>=.1){p++;if(m.envMap===GL.tex&&m.envMapIntensity>=1&&(!m.isMeshPhysicalMaterial||m.clearcoat>=.8))pg++}});
-   for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const m of[].concat(im.material))if(m.isMeshStandardMaterial){t++;if(m.envMap===GL.tex&&m.envMapIntensity>=1)tg++}}return{p,pg,t,tg}};
+  const chk=()=>{let p=0,pg=0,t=0,tg=0;pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))if(GL_paint(m)&&m.roughness>=.1){p++;if(m.envMap===GL.tex&&m.envMapIntensity>0&&(!m.isMeshPhysicalMaterial||m.clearcoat>=.8))pg++}});
+   for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const m of[].concat(im.material))if(m.isMeshStandardMaterial){t++;if(m.envMap===GL.tex)tg++}}return{p,pg,t,tg}};
   const gl=renderer.getContext(),px=new Uint8Array(4),blk=n=>{const t0=performance.now();for(let i=0;i<n;i++){renderer.render(scene,camera);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px)}return(performance.now()-t0)/n};
   const med=a=>{a=a.slice().sort((x,y)=>x-y);return a[a.length>>1]};
   (async()=>{const wasOn=GL.on;GL.on=true;GL_apply();const ML=[...GL.mats],pg=()=>{const M=new Map();for(const m of ML){const q=renderer.properties.get(m);M.set(m,q&&q.currentProgram)}return M},dc=()=>{const ar=renderer.info.autoReset;renderer.info.autoReset=true;renderer.render(scene,camera);renderer.info.autoReset=ar;return renderer.info.render.calls};
@@ -12533,7 +12530,7 @@ function GL_go(say){if(state!=='roam'||!RO.on)return'📍 Start free roam to run
    say(`📍 why/glossy · player paint with studio env + clearcoat ${c.pg}/${c.p} · traffic paint ${c.tg}/${c.t} · materials ${m0}→${m1} (±2) · programs ${p0}→${p1} (+≤2) · same compiled program off/on ${same}/${nm} · draw calls ${d0}→${d1} (=) · render ${thr?'6x CPU':'1x (no CDP)'} median off ${a.toFixed(2)} ms → on ${b.toFixed(2)} ms (${d>=0?'+':''}${d.toFixed(1)}%, info only: off-vs-off control ${z>=0?'+':''}${z.toFixed(1)}%) · env build ${GL.ms.toFixed(1)} ms, ${GL.n} built → ${ok?'✅ PASS':'❌ FAIL'}`)})();
   return'📍 why/glossy · measuring…'}
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
- __chk.items.unshift({ver:'why',id:'glossy',area:'world',text:'glossy-cars-r22e5: player and traffic cars read as shiny ABS plastic: a crisp sun highlight and softbox streak on the clearcoat, a thin horizon rim on the flanks, colours stay saturated (car-only studio env, no extra pass). 📍 GO checks paint materials on the player and every traffic model carry it, material/program counts unchanged (±2) and same compiled programs and draw calls off/on (so no frame-time cost); 6x CPU render time printed for info.'});
+ __chk.items.unshift({ver:'why',id:'glossy',area:'world',text:'glossy-cars-r22e10 (?gloss=1): player and traffic paint reflect the world sky plus a hot sun disc and one thin bright band, so the clearcoat shows a crisp line on spoiler/roof edges while body hue, saturation and brightness stay within 5 % of gloss off. 📍 GO checks paint materials on the player and every traffic model carry it, material/program counts unchanged (±2) and same compiled programs and draw calls off/on (so no frame-time cost); 6x CPU render time printed for info.'});
  __chk.GO['why/glossy']=['fra','ath'].map(c=>({c,n:'glossy cars '+(c==='fra'?'Frankfurt':'Athens'),secs:60,fn:()=>GL_go(__chk.goSay)}))},500)}
 window.__gl={GL,apply:GL_apply,off:GL_off,env:GL_env};
 const TX={pad:0};
@@ -17454,15 +17451,16 @@ async function QS_go(){const home=[RO.x,RO.z,RO.h],R=[],ck=(n,b)=>R.push((b?'✓
  }catch(e){R.push('✗ threw '+e)}
  finally{K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;try{roamWarp(home[0],home[1],home[2])}catch(e){}RO.v=0;QS_clean();store.set('mho_story',sv.story);store.set('mho_flags',sv.flags);store.set('mho_m1',sv.m1);roamStore(sv.ro);RO.ch=sv.ch;RO.card=sv.card;RO.wp=sv.wp;RO.v=sv.v;RO.vsel=sv.vsel;M1.auto=sv.auto;M1.init=sv.init;M1.isInit=sv.isInit;M1.s=sv.s}
  const ok=R.every(r=>r[0]==='✓'||r[0]==='·');return'📍 why/quiet-start · '+R.join(' · ')+(bad.length?' · EVENTS '+bad.slice(0,14).join(' ; '):'')+' → '+(ok?'✅ PASS':'❌ FAIL')}
-async function QS_goDirt(){const home=[RO.x,RO.z,RO.h],ro0=Object.assign({},roamSave()),R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),rnd0=Math.random,off0=QS.off,sv={v:RO.v,wp:RO.wp};
+const QS_LEG=8;
+async function QS_goDirt(){const LEG=QS_LEG,home=[RO.x,RO.z,RO.h],ro0=Object.assign({},roamSave()),R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),rnd0=Math.random,off0=QS.off,sv={v:RO.v,wp:RO.wp};
  const run=async off=>{QS.off=off;let sd=4242;Math.random=()=>(sd=(sd*16807)%2147483647)/2147483647;let sum=0,n=0,slow=0,forms={};const sp=(window.__xf&&__xf.grass&&__xf.grass(true))||[];
-  for(const g of sp.slice(0,3)){try{roamWarp(g.x,g.z,g.h)}catch(e){}RO.v=8;RO.cool=0;for(let k=0;k<30*20&&state==='roam';k++){K.KeyW=K.ArrowUp=true;roamStep(1/30);if(k>60){const v=Math.abs(RO.v)*3.6;sum+=v;n++;if(v<3)slow++;forms[pl.vmode]=1}if(k%30===0)await 0}}
+  for(const g of sp.slice(0,3)){try{roamWarp(g.x,g.z,g.h)}catch(e){}RO.v=8;RO.cool=0;for(let k=0;k<30*LEG&&state==='roam';k++){K.KeyW=K.ArrowUp=true;roamStep(1/30);if(k>60){const v=Math.abs(RO.v)*3.6;sum+=v;n++;if(v<3)slow++;forms[pl.vmode]=1}if(k%30===0)await 0}}
   K.KeyW=K.ArrowUp=false;return{avg:sum/Math.max(n,1),slow,n,forms:Object.keys(forms).join('/'),spots:Math.min(sp.length,3)}};
- try{const a=await run(true),b=await run(false);
+ let cars0=null;try{cars0=(typeof HUB!=='undefined'&&HUB.cars)?HUB.cars.splice(0):null;const a=await run(true),b=await run(false);
   ck('park spots driven '+b.spots,b.spots>0);
   ck('old auto-form avg '+a.avg.toFixed(0)+' km/h (form '+a.forms+') vs street car avg '+b.avg.toFixed(0)+' km/h (form '+b.forms+'): within 10%',b.avg>=.9*a.avg);
   ck('street car frames < 3 km/h '+b.slow+' of '+b.n+' (<= 20, or no worse than the old form: '+a.slow+')',b.slow<=20||b.slow<=a.slow)}
- catch(e){R.push('✗ threw '+e)}finally{Math.random=rnd0;QS.off=off0;QS_clean();try{roamWarp(home[0],home[1],home[2])}catch(e){}RO.v=0;roamStore(ro0);FD.hint.hidden=true;FD.mT=0;FD.p0=[RO.x,RO.z];K.KeyW=K.ArrowUp=false;RO.v=sv.v;RO.wp=sv.wp}
+ catch(e){R.push('✗ threw '+e)}finally{if(cars0)HUB.cars.push(...cars0);Math.random=rnd0;QS.off=off0;QS_clean();try{roamWarp(home[0],home[1],home[2])}catch(e){}RO.v=0;roamStore(ro0);FD.hint.hidden=true;FD.mT=0;FD.p0=[RO.x,RO.z];K.KeyW=K.ArrowUp=false;RO.v=sv.v;RO.wp=sv.wp}
  const ok=R.every(r=>r[0]==='✓');return'📍 why/quiet-dirt · '+R.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
   __chk.items.unshift({ver:'why',id:'quiet-start',area:'ui',text:'quiet-start-r22e3 (Alex: "lots of pop ups, annoying quests"): a fresh PLAY in Frankfurt AND Athens = drive at once. 180 s of stepped driving (road, dirt, past a garage at speed): 0 modal/story/chapter cards, 0 vehicle swaps, 0 auto-started or auto-routed modes, <=1 hint visible, none above 20 km/h. ?intro=1 / ?qs=0 restore the old path. 📍 GO.'});
@@ -17631,6 +17629,39 @@ function SC_go(){if(state!=='roam'||!RO.on)return'📍 Start free roam to run th
  __chk.items.unshift({ver:'why',id:'solid-cars',area:'world',text:'solid-cars-r22e1: no invisible cars. Every traffic car that stops or hits you is drawn on screen, and every car you see is solid (buses and trucks too). 📍 GO drives a bot 60 s through busy traffic (play spawn + 2 busiest streets) with the phone draw path; pass line: 0 contacts with an undrawn car, 0 drawn cars passed through (overlap > 0.1 m with no contact within 3 frames, from the 3rd frame after each warp), 0 frames with a car within 40 m in view not drawn (or drawn in the colour of another car), 0 of the cars on screen within 120 m changed after the camera looks away for 2 s and back.'});
  __chk.GO['why/solid-cars']=['fra','ath'].map(c=>({c,n:'solid cars '+(c==='fra'?'Frankfurt':'Athens'),secs:180,fn:()=>SC_go()}))},500)}
 window.__sc={SC,go:SC_go,drawn:SC_drawn};
+const IV={on:!/[?&]iv=0/.test(location.search),r:70/* 60 m around the player + the chase-camera offset */,sl:.5,so:1.5,lat:2.5,tp:20,n:{cl:0,hide:0,snap:0},wT:-1,lt:null,lx:0,lz:0},_ivM=new THREE.Matrix4(),_ivZ=new THREE.Matrix4().makeScale(0,0,0);
+function IV_zone(x,z,y){const C=camera.position,d2=(x-C.x)**2+(z-C.z)**2;if(d2<IV.r*IV.r)return true;if(d2>62500)return false;const P=HT_POP;if(!P.f||P.fr<0)return false;HT_PS.center.set(x,(y||0)+1,z);return P.f.intersectsSphere(HT_PS)}
+function IV_each(im,fn){if(!im)return;fn(im);if(im.userData.w)fn(im.userData.w);if(im.userData.g)fn(im.userData.g)}
+function IV_hide(c,im){IV_each(im,m=>m.setMatrixAt(c.j,_ivZ));c.dead=.3;c.ivx=null;IV.n.hide++;return 1}
+function IV_guard(c,A,B,gA,im){const x=c.x,z=c.z,ox=c.ivx,oz=c.ivz;let el=T-c.ivT;
+ if(ox==null||IV.wT>=c.ivT)return;/* first pose, or the player warped since: nothing drawn to slide from */const gx=x-ox,gz=z-oz,g=Math.hypot(gx,gz);
+ if(!(el<.6&&el>-1e-6)){if(g>IV.tp&&!HT_canPop(x,z,c.y))return IV_hide(c,im);return}/* after a gap (pose skipped while far: c.x went stale) a car may not reappear in sight */el=Math.max(el,1/60);
+ const v=Math.abs(c.cv||0);let sl=Math.min(IV.sl,Math.max(1.5,.5*v)*el),lm=IV.lat*el;if(g<.02)return;let hx=c.hdx,hz=c.hdz;const hm=Math.hypot(hx||0,hz||0);if(!(hm>.5)){hx=gx/g;hz=gz/g}else{hx/=hm;hz/=hm}
+ const a0=gx*hx+gz*hz,l0=gz*hx-gx*hz;if(g<=IV.tp&&a0>=-sl&&a0<=v*el+sl&&Math.abs(l0)<=lm)return;/* already inside the rule */
+ if((x-RO.x)**2+(z-RO.z)**2<64||c.hitT>0||c.crW)return;/* a shove from the player is physics */
+ const vis=IV_zone(x,z,c.y)||IV_zone(ox,oz,c.y);if(g>IV.tp){if(vis&&!HT_canPop(x,z,c.y))return IV_hide(c,im);IV.n.snap++;return}/* a recycle out of sight snaps */
+ if(!vis){sl=Math.max(sl,IV.so);lm=Math.max(lm,IV.so)}/* out of sight it still closes, 1.5 m a step: a lag snapped as the camera turned away was a 7-13 m step when it turned back (why/solid-cars d) */
+ const a=Math.max(-sl,Math.min(v*el+sl,a0)),l=Math.max(-lm,Math.min(lm,l0)),nx=ox+a*hx-l*hz,nz=oz+a*hz+l*hx,sx=nx-x,sz=nz-z;
+ const y=A.ab||gA?groundAt(nx,nz,(c.y||0)+4):groundY(nx,nz),sy=isFinite(y)&&Math.abs(y-c.y)<3?y-c.y:0;
+ IV_each(im,m=>{m.getMatrixAt(c.j,_ivM);const e=_ivM.elements;e[12]+=sx;e[13]+=sy;e[14]+=sz;m.setMatrixAt(c.j,_ivM)});c.x=nx;c.z=nz;c.y+=sy;IV.n.cl++}
+HT_pose=(f=>function(c,A,B,dx,dz,gA,W,dt,im){const r=f.apply(this,arguments);if(T!==IV.lt&&typeof camera!=='undefined'){const P=camera.position;if(IV.lt!=null&&Math.hypot(P.x-IV.lx,P.z-IV.lz)>50)IV.wT=T;/* fast travel / warp: every car is new to the eye */IV.lt=T;IV.lx=P.x;IV.lz=P.z}if(IV.on&&!c.pk&&!c.tr&&im&&typeof camera!=='undefined'){let h=0;try{h=IV_guard(c,A,B,gA,im)}catch(e){}if(h)return r}c.ivx=c.x;c.ivz=c.z;c.ivT=T;return r})(HT_pose);
+function IV_go(){const R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),dt=1/30,N=HUB.nodes;const step=()=>{T+=dt;HT_popF();HT_cars(N,dt)};
+ const fx=Math.sin(RO.h),fz=Math.cos(RO.h);let c=null;for(let w=0;w<20&&!c;w++){let bd=1e9;if(w)for(let k=0;k<30;k++)step();else HT_popF();const C=camera.position;for(const o of HUB.cars){if(o.dead>0||o.pk||o.tr||o.route||!N[o.a]||!N[o.b])continue;const d=Math.hypot(o.x-C.x,o.z-C.z);if(d<10||d>55||Math.hypot(o.x-RO.x,o.z-RO.z)<10)continue;if(d<bd){bd=d;c=o}}}
+ if(!c)return'📍 why/traffic-inview · ✗ no live car 10-55 m from the camera in 20 s → ❌ FAIL';
+ const im=HUB.cim[c.k],pos=()=>{im.getMatrixAt(c.j,_ivM);return[_ivM.elements[12],_ivM.elements[14],_ivM.elements[0]**2+_ivM.elements[1]**2+_ivM.elements[2]**2]};
+ const hold=c.hold,cv0=c.cv,v0=c.v;c.v=c.cv=Math.max(4,Math.min(8,c.cv||0));step();
+ let A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,p=pos();c.t=Math.min(.98,c.t+9/L);step();let q=pos(),m=Math.hypot(q[0]-p[0],q[1]-p[1]);ck('9 m lane jump drawn as '+m.toFixed(2)+' m (<= v·dt + 0.5 = '+(c.cv*dt+.5).toFixed(2)+')',m<=c.cv*dt+.5+.02);
+ for(let k=0;k<90;k++)step();
+ if(!(c.dead>0)){p=pos();const hx=c.hdx,hz=c.hdz,yo=c.yo;c.yo=(c.yo||0)+3;step();step();step();q=pos();const l=Math.abs((q[0]-p[0])*hz-(q[1]-p[1])*hx)/(3*dt);ck('3 m sideways jump drawn at '+l.toFixed(1)+' m/s over 3 steps (<= 3)',l<=3.05);c.yo=yo}else ck('car alive for the sideways case',false);
+ for(let k=0;k<60;k++)step();
+ let tn=-1,tb=1e9;for(let i=0;i<N.ng;i++){const n=N[i];if(!n||!n.nb||!n.nb.length||n.ab)continue;const rx=n.x-RO.x,rz=n.z-RO.z,al=rx*fx+rz*fz,d=Math.hypot(rx,rz);if(al<.8*d||d<20||d>45||Math.hypot(n.x-c.x,n.z-c.z)<IV.tp+5||HT_canPop(n.x,n.z,n.y))continue;const e=Math.abs(d-30);if(e<tb){tb=e;tn=i}}
+ if(tn<0)ck('a visible node 20-45 m ahead for the teleport case',false);else if(!(c.dead>0)){c.a=tn;c.b=N[tn].nb[0];c.t=0;c.route=null;step();q=pos();ck('teleport into view hidden (dead '+(c.dead>0)+', drawn scale '+q[2].toFixed(2)+')',c.dead>0&&q[2]<1e-6)}
+ c.hold=hold;c.v=v0;if(!(c.dead>0))c.cv=cv0;
+ ck('counters cl '+IV.n.cl+' hide '+IV.n.hide+' snap '+IV.n.snap,IV.n.cl>0&&IV.n.hide>0);
+ const ok=R.every(r=>r[0]==='✓');return'📍 why/traffic-inview · '+R.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
+{const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
+ __chk.items.unshift({ver:'why',id:'traffic-inview',area:'traffic',text:'traffic-in-view-r22e15 (bughunt §4.3): a car in view is forced through a 9 m lane jump, a 3 m sideways jump and a teleport onto a visible spot: drawn step <= v·dt + 0.5 m, sideways <= 3 m/s, the teleport is hidden (respawns out of sight). 📍 GO.'});
+ __chk.GO['why/traffic-inview']=['fra','ath'].map(c=>({c,n:'traffic in view '+(c==='fra'?'Frankfurt':'Athens'),secs:30,fn:()=>IV_go()}))},500)}
 const CL=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
  return{box:[-1100,470,-720,800],spawn:[-120,100],out:+((/[?&]clout=([\d.]+)/.exec(location.search)||[])[1]??.6),car:+((/[?&]clcar=([\d.]+)/.exec(location.search)||[])[1]||.08),carNear:+((/[?&]clnear=(\d+)/.exec(location.search)||[])[1]??3),
   core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||!!T.smash)&&!ks.includes('off'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,T:[],cars:0,peds:0,sp:0}})();
