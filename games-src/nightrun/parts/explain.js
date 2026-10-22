@@ -170,9 +170,10 @@ if(window.ZH){const zs=ZH.start;ZH.start=function(k,x,y,r,col){const d=this.done
 {const fl=floater;floater=function(x,y,txt,c){if(!EX10.on||!running||!G||typeof txt!=='string'||!/^\+\d+$/.test(txt))return fl.apply(this,arguments);
   for(const f of G.fl)if(f._sp&&f.l>.25&&(G.t-f._sp<.3&&Math.hypot(f.x-x,f.y-y)<90||Math.abs(f.x-x)<(f.txt.length+txt.length)*5+8&&Math.abs(f.y-y)<22)){f.txt='+'+((+f.txt.slice(1)||0)+(+txt.slice(1)||0));f.l=Math.max(f.l,.8);return;}
   const n=G.fl.length;fl.apply(this,arguments);if(G.fl.length>n)G.fl[G.fl.length-1]._sp=G.t;};}
+if(RET.nolist===undefined)RET.nolist=!/[?&]nolist=0/.test(location.search);   // owner 22 Oct: pause-screen text list removed (unreadable wall of text)
 /* pause screen: WHAT'S ON SCREEN, every caption of this run (shown or waiting) in plain words */
 {const pm=document.getElementById('pausem');if(pm){const put=()=>{if(pm.hidden)return;let d=document.getElementById('expList');const L=EX10.on?EX10.list.filter(k=>EXP.TXT[k]):[];
-    if(!L.length){if(d)d.hidden=true;return;}const inn=pm.querySelector('.in')||pm;
+    if(!L.length||RET.nolist!==false){if(d)d.hidden=true;return;}const inn=pm.querySelector('.in')||pm;
     if(!d){d=document.createElement('div');d.id='expList';d.style.cssText='max-width:min(92vw,420px);margin:8px auto;text-align:left;font:600 13px/1.35 sans-serif;color:#e9e6ff;background:#05030cf2;border:1px solid #19e3ff66;border-radius:10px;padding:8px 12px;max-height:38vh;overflow:auto;overflow-wrap:anywhere';inn.appendChild(d);}
     d.hidden=false;d.innerHTML='';const h=document.createElement('div');h.textContent="WHAT'S ON SCREEN";h.style.cssText='font-weight:800;letter-spacing:.06em;color:#19e3ff;margin-bottom:4px';d.appendChild(h);
     for(const k of L){const r=document.createElement('div');r.textContent=EXP.TXT[k].replace('%SIDE%','SIDE');r.style.margin='3px 0';d.appendChild(r);}};

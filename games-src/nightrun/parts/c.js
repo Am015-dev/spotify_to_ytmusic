@@ -227,7 +227,7 @@ $('setBtn').addEventListener('click',()=>openSettings('title'));
 $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
 buildSettings();if(window.RET&&RET.assistBuild)RET.assistBuild();if(window.RET&&RET.stampX)RET.stampX.build();
 function setPause(on){if(!running||on===paused)return;if(!on&&window.NRF&&NRF.holdResume())return;paused=on;pauseEl.hidden=!on;
-  if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'')+` · Perks ${v.perks} · Upgrades ${v.upg}`;}   // the counters the phone HUD hides while you play
+  if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'');}   // the counters the phone HUD hides while you play (owner 22 Oct: perks/upgrades jargon dropped)
   if(on){if(!(window.NRF&&NRF.keepOn()))AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
   if(window.NRF)NRF.pauseChanged(on);syncUI();if(on)$('resumeBtn').focus();}
 function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
