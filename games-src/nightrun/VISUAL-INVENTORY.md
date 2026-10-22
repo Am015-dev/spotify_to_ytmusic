@@ -44,6 +44,7 @@ A new visual must get a row (and a verdict) here before it ships.
 | `bossplay.js:BPL.draw` | boss gates, blackout lanes | go to the lit lane | often 2/6 | S |
 | `bossplay.js:BPL.tri` | boss gate triangles | shoot them | often 1/6 | S |
 | `bossvis.js:BV.over` | boss phase overlay | nothing | often 3/6 | S |
+| `bossvis.js:BV.tag` | word label on a boss rule shape (SAFE LANE, FIREWALL) | fly the named way | rare 1/6 | S |
 | `bossvis.js:beam` | boss laser beam | stay out | rare 2/6 | S |
 | `bossvis.js:drawBoss` | boss body tint | shoot | some stages 1/6 | S |
 | `calm.js:draw` | small rule card in the top band (RULE · name · one line), max 2.5 s | read | rare 1/6 | W |

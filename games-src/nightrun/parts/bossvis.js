@@ -61,6 +61,20 @@ BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=
     ctx.beginPath();ctx.moveTo(-w*.5,h*.5);ctx.lineTo(-w*.35,-h*.5);ctx.lineTo(w*.5,-h*.4);ctx.lineTo(w*.4,h*.5);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
   ctx.restore();};
 {const db2=drawBoss;drawBoss=function(e,t,fl){db2(e,t,fl);if(BV.on&&e&&e.ph)BV.over(e,t);};}
+/* review 9 #9: no wave text while a boss is up (READY / NEXT WAVE is hidden), and the teal shapes say what they are */
+BV.tag=function(txt,x,y,col){const tf=ctx.getTransform(),u=Math.max(.05,Math.hypot(tf.a,tf.b)*(ctx.canvas.getBoundingClientRect().width/ctx.canvas.width||1)),fs=12/u;   // 12 css px on screen, upright on a rotated field
+  ctx.save();ctx.translate(x,y);if(rotMode)ctx.rotate(Math.PI/2);ctx.font='700 '+fs.toFixed(1)+'px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=.95;
+  const w=ctx.measureText(txt).width+fs;ctx.fillStyle='#05030cc0';ctx.fillRect(-w/2,-fs*.8,w,fs*1.6);ctx.fillStyle=col;ctx.fillText(txt,0,0);ctx.restore();};
+{const rd=window.LEAK&&LEAK.rdy;if(rd)LEAK.rdy=function(on){return rd.call(this,on&&!(RET.calm&&G&&G.boss&&G.boss.x<W));};
+  NR.on('tick',()=>{const el=document.getElementById('retReady');if(el&&RET.calm&&G&&G.boss&&G.boss.x<W&&el.style.display!=='none')el.style.display='none';});
+  const lateWrap=()=>{   // bossplay.js / bossmoves.js define their draw after this file: wrap on the first tick
+  if(window.BPL&&BPL.draw&&!BPL.draw.bv){const pd=BPL.draw;BPL.draw=function(){const r=pd.apply(this,arguments);   // the teal outlined lane = the open lane of the blackout
+    try{const e=G.boss,b=e&&e.bp;if(RET.calm&&b&&b.ar==='blackout'&&b.arS&&b.arS.lane!=null&&e.x<W+40){const lh=H/3,x1=e.x-e.r-10;BV.tag('SAFE LANE',Math.max(60,x1/2),b.arS.lane*lh+lh/2,'#19e3ff');}}catch(x){}
+    return r;};BPL.draw.bv=1;}
+  if(window.BMV&&BMV.draw&&!BMV.draw.bv){const bd=BMV.draw;BMV.draw=function(tm){const r=bd.apply(this,arguments);
+    try{const e=G.boss,z=RET.calm&&e&&e.bm&&BMV.hz.find(q=>q.fw&&q.s==='wall'&&q.x>40&&q.x<W-40);if(z)BV.tag('FIREWALL: FLY THROUGH THE GAP',Math.max(120,Math.min(W-120,z.x)),H*.62,'#19e3ff');}catch(x){}
+    return r;};BMV.draw.bv=1;}};
+  NR.on('tick',lateWrap);}
 /* the phase change: the broken plate, sparks, and the new attack's name for one bar */
 NR.on('bossPhase',d=>{const e=G&&G.boss;if(!BV.on||!e||!d)return;const ph=d.ph||e.ph,id=Math.max(0,Math.min(2,ph-2));e.bv={t:1,id};
   const s=BV.SLOTS[id],hw=(e._dw||e.r*3)/2,hh=(e._dh||e.r*3)/2;
