@@ -3,8 +3,8 @@
 // and the clearcoat had nothing crisp to catch. Now car paint gets its own small "product studio" env: a dim dome in the mood's sky colours,
 // one hot sun disc on the key light, an overhead softbox strip (the long roof/bonnet streak) and a thin bright horizon (a rim on every flank).
 // Mostly dark = no colour wash, so the clearcoat can run at full strength. Generated once per mood with the same PMREM size as buildEnv
-// (256), so car programs keep their defines: no new shaders, no new materials, no extra pass. ?gloss=0 restores the old look.
-const GL={P:{dim:.6,hb:.3,hk:1.3,sun:30,bw:90,bh:34,by:18,bk:4,rw:110,rh:12,rk:2.8,ei:1.4},on:!/[?&]gloss=0/.test(location.search),tex:null,id:'',n:0,ms:0,mats:new Set()};
+// (256), so car programs keep their defines: no new shaders, no new materials, no extra pass. Default OFF since r22e10: ?gloss=1 turns it on (review #38).
+const GL={P:{dim:.6,hb:.3,hk:1.3,sun:30,bw:90,bh:34,by:18,bk:4,rw:110,rh:12,rk:2.8,ei:1.4},on:/[?&]gloss=1/.test(location.search),tex:null,id:'',n:0,ms:0,mats:new Set()};
 function GL_env(){const id=MOOD.id;if(GL.tex&&GL.id===id)return GL.tex;const t0=performance.now(),M=MOOD,sc=new THREE.Scene(),Q=GL.P,dim=Q.dim;
   const g=new THREE.SphereGeometry(50,32,16),P=g.attributes.position,C=new Float32Array(P.count*3),top=M.top||[.05,.08,.2],hor=M.hor||[.6,.7,.8];
   for(let i=0;i<P.count;i++){const y=P.getY(i)/50;let c;if(y<-.02)c=[.035,.035,.04];else{const a=Math.pow(Math.max(0,y),.5);c=[0,1,2].map(j=>(hor[j]*(1-a)+top[j]*a)*dim);if(y<Q.hb)c=c.map((v,j)=>Math.max(v,hor[j]*Q.hk))}C[i*3]=c[0];C[i*3+1]=c[1];C[i*3+2]=c[2]}
@@ -38,7 +38,7 @@ function GL_go(say){if(state!=='roam'||!RO.on)return'📍 Start free roam to run
    for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const m of[].concat(im.material))if(m.isMeshStandardMaterial){t++;if(m.envMap===GL.tex&&m.envMapIntensity>=1)tg++}}return{p,pg,t,tg}};
   const gl=renderer.getContext(),px=new Uint8Array(4),blk=n=>{const t0=performance.now();for(let i=0;i<n;i++){renderer.render(scene,camera);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px)}return(performance.now()-t0)/n};
   const med=a=>{a=a.slice().sort((x,y)=>x-y);return a[a.length>>1]};
-  (async()=>{const wasOn=GL.on;GL_apply();const ML=[...GL.mats],pg=()=>{const M=new Map();for(const m of ML){const q=renderer.properties.get(m);M.set(m,q&&q.currentProgram)}return M},dc=()=>{const ar=renderer.info.autoReset;renderer.info.autoReset=true;renderer.render(scene,camera);renderer.info.autoReset=ar;return renderer.info.render.calls};
+  (async()=>{const wasOn=GL.on;GL.on=true;GL_apply();const ML=[...GL.mats],pg=()=>{const M=new Map();for(const m of ML){const q=renderer.properties.get(m);M.set(m,q&&q.currentProgram)}return M},dc=()=>{const ar=renderer.info.autoReset;renderer.info.autoReset=true;renderer.render(scene,camera);renderer.info.autoReset=ar;return renderer.info.render.calls};
    GL.on=false;GL_off();renderer.render(scene,camera);const m0=cnt(),p0=renderer.info.programs.length,d0=dc(),g0=pg();
    GL.on=true;GL_apply();renderer.render(scene,camera);const m1=cnt(),p1=renderer.info.programs.length,c=chk(),d1=dc(),g1=pg();let same=0,nm=0;for(const[m,q]of g1){nm++;if(q&&g0.get(m)===q)same++}
    const thr=typeof window.__cdp==='function';if(thr)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:6});
