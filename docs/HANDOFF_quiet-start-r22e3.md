@@ -3,3 +3,8 @@
 - GO `why/quiet-start` (fra + ath, secs 90): fresh save, 180 s stepped driving (road, a park, past the nearest garage at speed): 0 modal cards, 0 vehicle swaps, 0 auto modes/routes, <=1 hint, none >20 km/h. Before (?qs=0): fra FAIL swaps 18, hints 203 samples >20 km/h; ath FAIL 360 modal samples + 8 swaps. After: PASS both. Shots: docs/shots/quietstart/{fra,ath}_60s.jpg.
 - The xf1/* and life1/popup GOs assert the auto-form / pop-pad features: the module runs them in legacy mode (QS.off) via a __chk.go wrapper. xf1/grass stays a known red.
 - Left: auto boat swap on water; the garage prompt/objective cycling were already hidden by drive-first (body.fdq); the old Hot Drop story still needs a map marker lane.
+
+## Review #27 fix (same lane)
+- Dirt: the street car keeps its look (vehMode wrapper: no 4x4 rebuild, no brick burst) while the off-road physics apply silently. The xf1 / life1/popup bypass is DROPPED: xf1 GOs now accept the street form on dirt (XF_dirtForm), life1/popup asserts the pad does NOT start a challenge. GO why/quiet-dirt (fra+ath): same seeded park drives, old auto-form vs street car: fra 111 vs 144 km/h, ath 79 vs 85 km/h (run-to-run noise 52 vs 66), frames <3 km/h 0 / 10 of 1617.
+- LEVEL UP in free roam is a <= 2 s non-blocking top toast (pointer-events none); queued in races, modal only in menus.
+- Gate on the built page, no bypass: fra 39/39, ath 27/27 (TAG=why,life1,xf1,terrain); unit 0 FAIL. xf1/water sits at the 90 % speed edge (88 -> 79 km/h) because the street car now enters the river faster; watch it.

@@ -68,7 +68,7 @@ function R3_up(l0,l1,mini){const U=$('#r3Up');R3U.cur=[l0,l1];let rw=[['📈','S
   ${mini?'':`<div class="r3UBt">${rw.some(r=>/PERK/.test(r[1]))?'<button class="r3Go alt" data-r3u="perks">⚡ PERKS</button>':''}<button class="r3Go" data-r3u="ok">CONTINUE ▶</button></div>`}</div>`;
  U.hidden=false;try{AU.sfx('finish')}catch(e){}
  requestAnimationFrame(()=>U.querySelectorAll('.r3UB .r3B i[data-from]').forEach(i=>{const h=i.style.height;i.style.transition='none';i.style.height=i.dataset.from+'%';i.offsetHeight;i.style.transition='height 1.1s cubic-bezier(.2,.9,.3,1.2) .25s';i.style.height=h}));
- clearTimeout(R3U.t);if(mini)R3U.t=setTimeout(()=>{U.hidden=true},5200)}
+ clearTimeout(R3U.t);if(mini)R3U.t=setTimeout(()=>{U.hidden=true},window.__qs&&__qs.act()?2000:5200)}   // quiet-start: a top toast of <= 2 s in free roam (queued in races, modal only in menus)
 {const U=document.createElement('div');U.id='r3Up';U.hidden=true;document.body.appendChild(U);
  U.addEventListener('click',e=>{const b=e.target.closest('[data-r3u]');if(!b)return;U.hidden=true;try{AU.sfx('pick')}catch(_){}
   if(b.dataset.r3u==='perks'&&state!=='roam'){try{gbOpen();setTimeout(()=>{try{R2_go('perks')}catch(_){}},60)}catch(_){}}setTimeout(R3_upPump,300)})}

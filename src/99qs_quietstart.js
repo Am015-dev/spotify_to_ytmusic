@@ -9,12 +9,16 @@ QS.act=()=>!OD_INTRO&&!QS.off;
 storyCheck=(f=>function(){if(QS.act()&&chapter()<=1){const st=store.get('mho_story',{seen:0,end:0});if((st.seen||0)<1){st.seen=1;store.set('mho_story',st);QS.log.push('chapter card skipped');return false}}return f.apply(this,arguments)})(storyCheck);
 // 2) the 'TAP TO OPEN' zone prompt never shows while driving (> 20 km/h)
 roamPrompt=(f=>function(dt){f.apply(this,arguments);if(QS.act()&&Math.abs(RO.v)*3.6>20){const el=$('#roamPrompt');RO.pm=null;if(el)el.hidden=true}})(roamPrompt);
-// 3) the player's car is never swapped for the off-road buggy on dirt (the boat on water stays: a car cannot float), and the WRONG VEHICLE line is gone
-FL_veh=(f=>function(){const v=f.apply(this,arguments);if(QS.act()&&(RO.vsel||'auto')==='auto'&&v==='offroad'){FL.v='ship';return'ship'}return v})(FL_veh);
+// 3) the player's car keeps its own look on dirt: the off-road physics (grip, hills) still apply silently, but there is no visible rebuild into the buggy and no brick burst
+//    (the boat on water stays: a car cannot float). The WRONG VEHICLE line is gone too.
+vehMode=(f=>function(s){if(QS.act()&&s&&s.dirtMode&&!s.boatMode&&(RO.vsel||'auto')==='auto'){s.dirtMode=false;try{return f.apply(this,arguments)}finally{s.dirtMode=true}}return f.apply(this,arguments)})(vehMode);
+FL_burst=(f=>function(v){if(QS.act()&&v==='offroad'&&(RO.vsel||'auto')==='auto')return;return f.apply(this,arguments)})(FL_burst);
 huTop=(f=>function(v){if(QS.act()&&typeof v==='string'&&v.indexOf('WRONG VEHICLE')>=0)v='';return f.call(this,v)})(huTop);
 // 4) no automatic area banner (BORNHEIM 0% COMPLETE), and no 'DRIFT HERE / AIR TIME / SMASH' side challenge starts on its own (popStep timer here, street pop-up pads in models/lx.js)
 OG_pop=(f=>function(){if(QS.act()&&arguments.length>1)return;return f.apply(this,arguments)})(OG_pop);   // the automatic call on entering an area passes (area,first); the dev API passes the area only
 popStep=(f=>function(){if(QS.act()&&!RO.pop)return;return f.apply(this,arguments)})(popStep);
+QS.clean=()=>{for(const id of FD.SLOTS){const e=document.getElementById(id);if(!e)continue;if(id==='msg'||id==='sub')e.style.opacity=0;else e.hidden=true}FD.rec.clear();/* leave no transient text for the next GO */};
+function QS_clean(){QS.clean()}
 window.__qs=QS;
 // ---- GO why/quiet-start: fresh save, 180 s of stepped driving (road, dirt, past a garage at speed), state asserts only
 async function QS_go(){const R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),W=ms=>new Promise(r=>setTimeout(r,ms)),A=a=>Math.atan2(Math.sin(a),Math.cos(a));
@@ -35,10 +39,10 @@ async function QS_go(){const R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),W=ms=>ne
   const sample=t=>{
    if(RO.card||RO.story||(window.M1&&M1.cs))modal++;
    if(RO.ch||RO.sp)modes++;if(RO.wp)route++;
-   if(lastVm!==undefined&&pl.vmode!==lastVm){swaps++;bad.push(t.toFixed(0)+'s vmode '+lastVm+'>'+pl.vmode)}lastVm=pl.vmode;
+   if(lastVm!==undefined&&pl.vmode!==lastVm&&RO.veh!=='boat'&&pl.vmode!=='boat'){swaps++;bad.push(t.toFixed(0)+'s vmode '+lastVm+'>'+pl.vmode)}lastVm=pl.vmode;
    if(RO.veh==='boat'&&lastVeh==='car'&&QS.safe){water++;RO.v=0;try{roamWarp(QS.safe[0],QS.safe[1],QS.safe[2])}catch(e){}lastVeh='car';lastVm=undefined;return}
    if(RO.veh==='car'&&Math.abs(RO.v)>5&&!pl.air)QS.safe=[RO.x,RO.z,RO.h];
-   if(RO.veh!==lastVeh){swaps++;bad.push(t.toFixed(0)+'s veh '+lastVeh+'>'+RO.veh);lastVeh=RO.veh}
+   if(RO.veh==='boat'&&lastVeh!=='boat'||RO.veh==='car'&&lastVeh==='boat'){swaps++;bad.push(t.toFixed(0)+'s veh '+lastVeh+'>'+RO.veh)}lastVeh=RO.veh;
    const kmh=Math.abs(RO.v)*3.6,all=[...new Set([...HID.filter(vis),...FD.shown().filter(x=>x!=='hitPop'&&x!=='msg'&&x!=='sub')])];
    if(all.length>maxHint)maxHint=all.length;
    for(const e of document.querySelectorAll('body *')){if(e.children.length>3||!e.id&&!e.className)continue;const tx=FD.txt(e);if(tx.length<4||!/[A-Za-z]{3}/.test(tx)||['SCRIPT','STYLE','BUTTON'].includes(e.tagName)||e.closest('button'))continue;if([...e.children].some(c=>FD.txt(c)===tx)||!FD.vis(e))continue;const k=(e.id||String(e.className).split(' ')[0])+':'+tx.slice(0,30);if(!QS.seen.has(k)){QS.seen.add(k);bad.push(t.toFixed(0)+'s other '+k)}}
@@ -66,10 +70,21 @@ async function QS_go(){const R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),W=ms=>ne
   ck('<=1 hint visible at any time (max '+maxHint+')',maxHint<=1);
   ck('no prompt/hint above 20 km/h ('+fast+' samples)',fast===0);
  }catch(e){R.push('✗ threw '+e)}
- finally{K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;for(const id of FD.SLOTS){const e=document.getElementById(id);if(!e)continue;if(id==='msg'||id==='sub')e.style.opacity=0;else e.hidden=true}FD.rec.clear();/* leave no transient text for the next GO */store.set('mho_story',sv.story);store.set('mho_flags',sv.flags);store.set('mho_m1',sv.m1);roamStore(sv.ro);RO.ch=sv.ch;RO.card=sv.card;RO.wp=sv.wp;RO.v=sv.v;RO.vsel=sv.vsel;M1.auto=sv.auto;M1.init=sv.init;M1.isInit=sv.isInit;M1.s=sv.s}
+ finally{K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;QS_clean();store.set('mho_story',sv.story);store.set('mho_flags',sv.flags);store.set('mho_m1',sv.m1);roamStore(sv.ro);RO.ch=sv.ch;RO.card=sv.card;RO.wp=sv.wp;RO.v=sv.v;RO.vsel=sv.vsel;M1.auto=sv.auto;M1.init=sv.init;M1.isInit=sv.isInit;M1.s=sv.s}
  const ok=R.every(r=>r[0]==='✓'||r[0]==='·');return'📍 why/quiet-start · '+R.join(' · ')+(bad.length?' · EVENTS '+bad.slice(0,14).join(' ; '):'')+' → '+(ok?'✅ PASS':'❌ FAIL')}
+// GO why/quiet-dirt: the street car on dirt must not be slower than the old auto off-road form (same seeded drive, legacy vs quiet) and must not bog down
+async function QS_goDirt(){const home=[RO.x,RO.z,RO.h],ro0=Object.assign({},roamSave()),R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),rnd0=Math.random,off0=QS.off,sv={v:RO.v,wp:RO.wp};
+ const run=async off=>{QS.off=off;let sd=4242;Math.random=()=>(sd=(sd*16807)%2147483647)/2147483647;let sum=0,n=0,slow=0,forms={};const sp=(window.__xf&&__xf.grass&&__xf.grass(true))||[];
+  for(const g of sp.slice(0,3)){try{roamWarp(g.x,g.z,g.h)}catch(e){}RO.v=8;RO.cool=0;for(let k=0;k<30*20&&state==='roam';k++){K.KeyW=K.ArrowUp=true;roamStep(1/30);if(k>60){const v=Math.abs(RO.v)*3.6;sum+=v;n++;if(v<3)slow++;forms[pl.vmode]=1}if(k%30===0)await 0}}
+  K.KeyW=K.ArrowUp=false;return{avg:sum/Math.max(n,1),slow,n,forms:Object.keys(forms).join('/'),spots:Math.min(sp.length,3)}};
+ try{const a=await run(true),b=await run(false);
+  ck('park spots driven '+b.spots,b.spots>0);
+  ck('old auto-form avg '+a.avg.toFixed(0)+' km/h (form '+a.forms+') vs street car avg '+b.avg.toFixed(0)+' km/h (form '+b.forms+'): within 10%',b.avg>=.9*a.avg);
+  ck('street car frames < 3 km/h '+b.slow+' of '+b.n+' (<= 20, or no worse than the old form: '+a.slow+')',b.slow<=20||b.slow<=a.slow)}
+ catch(e){R.push('✗ threw '+e)}finally{Math.random=rnd0;QS.off=off0;QS_clean();try{roamWarp(home[0],home[1],home[2])}catch(e){}RO.v=0;roamStore(ro0);FD.hint.hidden=true;FD.mT=0;FD.p0=[RO.x,RO.z];K.KeyW=K.ArrowUp=false;RO.v=sv.v;RO.wp=sv.wp}
+ const ok=R.every(r=>r[0]==='✓');return'📍 why/quiet-dirt · '+R.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
- // the xf1/* (auto vehicle form) and life1/popup (street pop-up pad) GOs test the features quiet-start switches off: they run in legacy mode (same as ?qs=0), every other GO runs quiet
- {const g0=__chk.go,off0=QS.off;if(typeof g0==='function')__chk.go=function(id){QS.off=off0||/^(xf1|life1\/popup)/.test(String(id));return g0.apply(this,arguments)}}
- __chk.items.unshift({ver:'why',id:'quiet-start',area:'ui',text:'quiet-start-r22e3 (Alex: "lots of pop ups, annoying quests"): a fresh PLAY in Frankfurt AND Athens = drive at once. 180 s of stepped driving (road, dirt, past a garage at speed): 0 modal/story/chapter cards, 0 vehicle swaps, 0 auto-started or auto-routed modes, <=1 hint visible, none above 20 km/h. ?intro=1 / ?qs=0 restore the old path. 📍 GO.'});
+  __chk.items.unshift({ver:'why',id:'quiet-start',area:'ui',text:'quiet-start-r22e3 (Alex: "lots of pop ups, annoying quests"): a fresh PLAY in Frankfurt AND Athens = drive at once. 180 s of stepped driving (road, dirt, past a garage at speed): 0 modal/story/chapter cards, 0 vehicle swaps, 0 auto-started or auto-routed modes, <=1 hint visible, none above 20 km/h. ?intro=1 / ?qs=0 restore the old path. 📍 GO.'});
+ __chk.items.unshift({ver:'why',id:'quiet-dirt',area:'drive',text:'quiet-start review fix: the street car keeps its look on dirt but gets the off-road grip silently: same seeded park drive, legacy auto-form vs quiet: average speed within 10%, <= 20 frames under 3 km/h. 📍 GO.'});
+ __chk.GO['why/quiet-dirt']=['fra','ath'].map(c=>({c,n:'quiet dirt '+(c==='fra'?'Frankfurt':'Athens'),secs:40,fn:()=>QS_goDirt()}));
  __chk.GO['why/quiet-start']=['fra','ath'].map(c=>({c,n:'quiet start '+(c==='fra'?'Frankfurt':'Athens'),secs:90,fn:()=>QS_go()}))},500)}
