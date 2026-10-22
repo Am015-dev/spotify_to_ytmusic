@@ -12,8 +12,8 @@ async function FJ_go(){const R=[],ok=(c,m)=>R.push((c?'✓ ':'✗ ')+m);
   try{await tick();const a=S.classList.contains('paHas')===want();P.forEach(e=>e.style.display='none');await tick();const b=!S.classList.contains('paHas');if(P[0])P[0].style.display='';await tick();const c=!P[0]||S.classList.contains('paHas');
    ok(a&&b&&c,`tray hint class in step (now ${a}, all hidden ${b}, one shown ${c})`)}finally{P.forEach((e,i)=>e.style.display=sv[i])}}
  // 3) huT keeps the text node (data edit), same text as textContent would give, '' still empties
- const sp=document.createElement('span');huT(sp,'12');const n0=sp.firstChild;huT(sp,'13');const n1=sp.firstChild;huT(sp,7);const t7=sp.textContent;sp.innerHTML='<b>x</b>';huT(sp,'y');const tY=sp.innerHTML;huT(sp,'');
- ok(n0&&n0===n1&&n1.data==='13'&&t7==='7'&&tY==='y'&&sp.childNodes.length===0,'huT edits the text node in place');
+ const sp=document.createElement('span');huT(sp,'12');const n0=sp.firstChild;huT(sp,'13');const n1=sp.firstChild,d1=n1&&n1.data;huT(sp,7);const t7=sp.textContent;sp.innerHTML='<b>x</b>';huT(sp,'y');const tY=sp.innerHTML;huT(sp,'');
+ ok(n0&&n0===n1&&d1==='13'&&t7==='7'&&tY==='y'&&sp.childNodes.length===0,'huT edits the text node in place');
  // 4) a same-value hidden write is skipped (no attribute record), a real change still lands
  {const e=document.createElement('div');document.body.appendChild(e);e.hidden=true;const mo=new MutationObserver(()=>{});mo.observe(e,{attributes:true});e.hidden=true;e.hidden=true;const n1=mo.takeRecords().length;e.hidden=false;const n2=mo.takeRecords().length;e.hidden=false;const n3=mo.takeRecords().length;mo.disconnect();e.remove();
   ok(n1===0&&n2===1&&n3===0&&!e.hasAttribute('hidden'),`no-op hidden writes skipped (${n1}/${n2}/${n3})`)}
