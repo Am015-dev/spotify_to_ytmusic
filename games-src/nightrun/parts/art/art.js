@@ -132,6 +132,9 @@ setInterval(()=>{if(document.hidden||!G||(running&&!calmNow()))return;ART.frame(
    RET.sprites (default on; ?sprites=0 = the stills exactly as before). ART.anim / ART.aframe / ART.drawAnim are the loader (HANDOFF-SPRITES.md section 1; "aframe" because ART.frame is the per-frame tick);
    SPR.* wires the bosses and the player ships. Every path returns false/null until its sheet is decoded or when it is missing, so the old drawing runs. Step 2 (weapon fx, explosions, pickups, enemy ships, on-foot, props) hooks in here with ART.drawAnim. ---------- */
 ART.ANIM=__ANIM__;
+/* BODYSCALE (owner, 22 Oct 2026; ASSET-WIRING.md section 4): a character is drawn at gameHeight / body (m[6], px of its standing height in the sheet json), ONE scale for every state, feet on the
+   bottom edge of the cell; no per-state or per-content correction (crouch, dash, land and jump cells carry their own pose). Sheets without body keep cell height = game height. ?bodyscale=0 = the old rule (RET.bodyscale is set in streetfeel.js: RET does not exist yet here) */
+ART.bsc=(m,h)=>h/(RET.bodyscale&&m[6]?m[6]:m[3]);
 ART.as={};ART.aDone=false;ART.aP=0;ART.aT=0;                // aDone / aP / aT: set by ART.aframe (a one-shot reached its end; progress 0..1 and seconds inside the frame)
 ART.LOOPA=new Set(['idle','run','flame','glow','loop','spin','hover']);   // every other act is a one-shot: it stops on its last frame
 ART.VS={};ART.VB={};     // tinted copies of enemy-ship sheets (foeart.js): meta and strip, kept out of ART.ANIM.s / ART.rd so the listed-sheet counts stay the real files
@@ -169,7 +172,7 @@ SPR.boss=(e,nm,wd,by,tl,fl)=>{const cb=ART.ANIM.c['boss-'+nm],st=ART.bm['spr-bos
   else if(e._sa==='hit'&&T-e._s0<ART.aS(base+'hit').tot)want='hit';
   else if(fl&&T>=(e._hc||0)&&ART.anim(base+'hit'))want='hit';
   if(want!==e._sa){e._sa=want;e._s0=T;if(want==='hit')e._hc=T+ART.aS(base+'hit').tot+.6;}
-  const key=base+want,k=wd/cb.bw,y=by+wd*st.height/st.width/2+cb.gap*k,tt=T-e._s0,sm=ART.ANIM.sm;
+  const key=base+want,k=wd/cb.bw,y=RET.bodyscale&&!rotMode&&A&&A.move==='ground'&&e._dh?by+e._dh/2:by+wd*st.height/st.width/2+cb.gap*k,tt=T-e._s0,sm=ART.ANIM.sm;
   if(A){let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(ART.artK(e)===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;}
   if(!rotMode&&A&&A.move==='ground')e.y=UIK.groundY()-(e._dh||130)/2;   // a walker stands on the road line this very frame (bossMove sets the same value on the next step): the road moves when the LAB panel opens or the window changes
   const i=ART.aframe(key,tt);let sy=1;const sq=sm.squash.frames[want];if(sq&&sq.indexOf(i)>=0&&ART.aT<sm.squash.ms/1000)sy=1-sm.squash.amount*(1-ART.aT/(sm.squash.ms/1000));
@@ -207,7 +210,7 @@ ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=A
   if(!b&&RET.streetlook){for(const a of (ART.FB[pose]||[]).concat(ART.FB._any,mp._all)){const k2=who+'/'+a;if(ART.ANIM.s[k2]&&ART.anim(k2)){sub=a!==act;act=a;key=k2;b=ART.anim(k2);break;}}}   // streetlook: a pose without its own sheet borrows the nearest act, never the old still
   if(!b)return false;const o=ART.aS(key),m=o.m,fall=pose==='fall'&&act==='jump',kp=key+(fall?'F':'');
   if(e._fa!==kp){e._fa=kp;e._f0=t;}let tt=ART.fE?t-e._f0:t;if(act==='jump'){tt=fall?o.cum[1]+tt:Math.min(tt,o.cum[1]-.001);}
-  const cr=false,sc=h/m[3],sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;
+  const cr=false,sc=ART.bsc(m,h),sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;
   const dead=act==='die'&&who!=='kai',fade=dead?1-.85*Math.min(1,Math.max(0,tt-.4)/.8):1,ga=c.globalAlpha;
   c.save();c.translate(x,y);if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
   if(act==='run'||act==='runshoot'||act==='walk')c.rotate(sm.lean.run_deg*Math.PI/180*(flip?-1:1));

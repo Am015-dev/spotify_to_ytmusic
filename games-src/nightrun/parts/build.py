@@ -6,7 +6,7 @@ def rep(s,a,b,cnt=1):
     assert s.count(a)>=1,('missing',a[:60])
     return s.replace(a,b) if cnt==0 else s.replace(a,b,cnt)
 bg=rd('bg.js'); dr=rd('draw.js'); b=rd('b.js')   # (the old string patches are baked into bg.js and draw.js)
-# ART.ANIM (parts/art.js): every strip sheet in media/anim as [frames,fps,w,h,anchorX,anchorY] (bosses and on-foot actors keep the bottom-centre anchor, everything else is centred), smoothing.json, and sprite-calib.json (make-sprite-calib.py)
+# ART.ANIM (parts/art.js): every strip sheet in media/anim as [frames,fps,w,h,anchorX,anchorY,body] (bosses and on-foot actors keep the bottom-centre anchor, everything else is centred), smoothing.json, and sprite-calib.json (make-sprite-calib.py)
 FOOTWHO=set('kai grunt gunman shield bruiser knife sniper drone turret mech warden jetpack hound flamer ninja medic'.split())   # on-foot actors keep the bottom-centre anchor (feet)
 def _anim():
     import json
@@ -15,7 +15,7 @@ def _anim():
         for f in sorted(os.listdir(md+who)):
             if not f.endswith('-strip.webp'):continue
             j=json.load(open(sd+who+'/'+f[:-5]+'.json',encoding='utf8'));ax,ay=j['anchor'] if who.startswith('boss-') or who in FOOTWHO else (j['w']/2,j['h']/2)
-            s[who+'/'+f[:-11]]=[j['frames'],j['fps'],j['w'],j['h'],ax,ay]
+            s[who+'/'+f[:-11]]=[j['frames'],j['fps'],j['w'],j['h'],ax,ay,j.get('body') or 0]   # [6] body: px of the standing height (sheets json), 0 = none
     sm=json.load(open(sd+'smoothing.json',encoding='utf8'));sm.pop('_note',None)
     return json.dumps({'s':s,'sm':sm,'c':json.load(open(R+'games-src/nightrun/sprite-calib.json',encoding='utf8'))},separators=(',',':'))
 ANIM=_anim()
@@ -44,6 +44,7 @@ PARTS_EXTRA.append('street3.js')
 PARTS_EXTRA.append('hangar3.js')
 PARTS_EXTRA.append('footview.js')
 PARTS_EXTRA.append('lab2.js')
+PARTS_EXTRA.append('lab3.js')
 out=out[:out.rindex(rd('c.js'))]+''.join(rd(p)+"\n" for p in PARTS_EXTRA)+rd('c.js')
 OUT=os.environ.get('NR_OUT','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path
 import hashlib,datetime

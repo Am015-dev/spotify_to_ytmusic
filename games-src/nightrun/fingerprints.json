@@ -18,13 +18,13 @@
   "end": null
  },
  "street": {
-  "state": "e757943a26b4f221",
+  "state": "f1c2f2fbe691e704",
   "draw": "c8c417b287a0b1b9",
   "frames": 7200,
   "samples": 120,
-  "rng": 5808,
+  "rng": 5622,
   "dcalls": 172,
-  "end": "section 0 x 6723 foes 6"
+  "end": "section 0 x 6725 foes 5"
  },
  "fly6": {
   "state": "e2f0e31c38f9d627",
@@ -46,7 +46,7 @@
  },
  "fly14": {
   "state": "bbf9d285546fe78f",
-  "draw": "4508d6a9f8e6393f",
+  "draw": "8f9d3a6ee5b1b251",
   "frames": 1800,
   "samples": 30,
   "rng": 3804,

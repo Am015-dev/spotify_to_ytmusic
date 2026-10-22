@@ -6,6 +6,7 @@
    ?feel=0 = the street exactly as before. Tables below are measured from the strip sheets (alpha > 60): BODY = tallest visible body / frame height, MZ = gun muzzle per
    frame in sheet px from the feet anchor (facing right), ST = foot spread at contact (one step) in sheet px. Slots for missing art: ART-SLOTS-STREET.md. ---------- */
 if(RET.feel===undefined)RET.feel=!/[?&]feel=0/.test(location.search);
+if(RET.bodyscale===undefined)RET.bodyscale=!/[?&]bodyscale=0/.test(location.search);   // art.js ART.bsc: one scale per character from its json body (owner, 22 Oct 2026)
 (function(){
 if(!window.FOOT||!FOOT._in||typeof ART==='undefined'||!ART.footDraw)return;
 const F=window.FOOT,IN=F._in,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
@@ -16,6 +17,7 @@ const FEEL=F.FEEL={
   MZ:{"kai/aimdiag":[[62,-223],[61,-223],[53,-254]],"kai/aimup":[[34,-224],[41,-254],[36,-234]],"kai/crouchshoot":[[116,-203],[137,-206],[115,-198]],
     "kai/runshoot":[[120,-208],[102,-207],[72,-206],[93,-206],[83,-207],[98,-206]],"kai/shoot":[[76,-211],[61,-211],[54,-211]],
     "knife/shoot":[[73,-193],[28,-90],[66,-192]],"gunman/shoot":[[75,-208],[31,-208],[74,-208]],"bruiser/shoot":[[99,-193],[82,-205],[97,-210]]},
+  MZB:{"kai/crouchshoot":[[80,-138],[94,-140],[79,-135]]},   // bodyscale: muzzles that moved on the 22 Oct sheets (the kneeling cell is no longer cut to fill its cell); the rest keep MZ (same 256 px body, feet on the cell bottom)
   ST:{"kai/run":146,"knife/run":162,"gunman/run":156,"bruiser/run":173,"kai/runshoot":185},
   H:{kai:64,rusher:64,gunner:64,heavy:80,bigheavy:90},   // one body height per kind: heavy = 1.25 x Kai
   log:{dust:0,skid:0,shots:0,mzErr:[]}};
@@ -38,9 +40,9 @@ ART.footDraw=function(c,who,pose,x,y,h,flip,t){const e=ART.fE,S=F.S;if(!RET.feel
   track(e,x,t);
   const act=actOf(who,pose,e),key=act&&who+'/'+act,m=key&&ART.ANIM.s[key];
   // scale: the visible body, not the frame, is h tall (standing acts)
-  const base=who.indexOf('kai')===0?'kai':who,bk=FEEL.BODY[base+'/'+act],ref=FEEL.BODY[base+'/idle'];if(bk&&ref&&!/crouch|die|jump|land|dash/.test(act))h*=ref/bk;
+  const base=who.indexOf('kai')===0?'kai':who,bk=FEEL.BODY[base+'/'+act],ref=FEEL.BODY[base+'/idle'];if(!RET.bodyscale&&bk&&ref&&!/crouch|die|jump|land|dash/.test(act))h*=ref/bk;   // bodyscale: one scale from the json body instead
   let tt=t,bob=0;
-  if(m&&RUNA[act]&&abs(e._lv)>5){const o=ART.aS(key),n=m[0],sc=h/m[3],step=(FEEL.ST[base+'/'+act]||FEEL.ST[base+'/run']||m[2]*.8)*sc,cyc=2*step;
+  if(m&&RUNA[act]&&abs(e._lv)>5){const o=ART.aS(key),n=m[0],sc=ART.bsc(m,h),step=(FEEL.ST[base+'/'+act]||FEEL.ST[base+'/run']||m[2]*.8)*sc,cyc=2*step;
     const ph=(e._fd/cyc)%1,fi=Math.floor(ph*n),fr=ph*n-fi,a0=fi?o.cum[fi-1]:0;tt=a0+(o.cum[fi]-a0)*fr;   // frame = distance / stride: the planted foot moves with the road
     if(e._fa!==key){e._fa=key;}e._f0=0;bob=-abs(Math.sin(ph*2*Math.PI))*h*.025;
     const half=Math.floor(ph*2);if(e._hc!==half){e._hc=half;if(e._hc!=null&&(e===S.P?e.onGround:!e.fly)&&window.AH&&S.fx.length<200){AH.ftPush(S.fx,'fx-ft-dust',x-(flip?-1:1)*h*.12,y-3,h*.42,.28);FEEL.log.dust++;}}}
@@ -48,8 +50,8 @@ ART.footDraw=function(c,who,pose,x,y,h,flip,t){const e=ART.fE,S=F.S;if(!RET.feel
   const ln=e._ln||0;c.save();c.translate(x,y+bob);if(ln)c.rotate(ln);   // lean into a start, back on a stop
   const r=fd0.call(this,c,who,pose,0,0,h,flip,tt);c.restore();
   // remember where this frame's gun is (bullets and the flash come from it)
-  const kk=e._fa;if(r&&kk){const[kw,ka]=sheetOf(kk),mz=FEEL.MZ[(kw.indexOf('kai')===0?'kai':kw)+'/'+ka],mm=ART.ANIM.s[kk];
-    if(mz&&mm){const i=Math.min(mz.length-1,ART.aframe(kk,tt-(e._f0||0))),sc=h/mm[3];const q=rot([mz[i][0]*sc*(flip?-1:1),mz[i][1]*sc],ka,flip,e._ln);e._mzd=[q[0],q[1]+bob,kk,i,S.time];}else e._mzd=null;}
+  const kk=e._fa;if(r&&kk){const[kw,ka]=sheetOf(kk),mz=(RET.bodyscale&&FEEL.MZB[(kw.indexOf('kai')===0?'kai':kw)+'/'+ka]||FEEL.MZ[(kw.indexOf('kai')===0?'kai':kw)+'/'+ka]),mm=ART.ANIM.s[kk];
+    if(mz&&mm){const i=Math.min(mz.length-1,ART.aframe(kk,tt-(e._f0||0))),sc=ART.bsc(mm,h);const q=rot([mz[i][0]*sc*(flip?-1:1),mz[i][1]*sc],ka,flip,e._ln);e._mzd=[q[0],q[1]+bob,kk,i,S.time];}else e._mzd=null;}
   return r;};
 /* muzzle in world units: the drawn offset under streetlook's K (actors are drawn K x about their feet, bullets are placed through SL.my) */
 const rot=(d,act,flip,ln)=>{const sm=ART.ANIM.sm,th=(RUNA[act]&&sm&&sm.lean?sm.lean.run_deg*Math.PI/180*(flip?-1:1):0)+(ln||0);if(!th)return d;const c=Math.cos(th),s=Math.sin(th);return [d[0]*c-d[1]*s,d[0]*s+d[1]*c];};   // art.js leans run acts about the feet; ours adds start/stop lean
@@ -57,12 +59,12 @@ const inv=(Y)=>{const L=F.look;if(!L||!L.my)return Y;let lo=-400,hi=FL;if(Y>=FL)
 const toWorld=(x,y,dx,dy)=>{const L=F.look,K=RET.streetlook&&L?L.k:1;const sy=L&&L.my&&RET.streetlook?L.my(y):y;return [x+dx*K,RET.streetlook&&L&&L.my?inv(sy+dy*K):y+dy];};
 /* the act Kai's shot will show (kaiX / ppose rules), for the first frame of a burst before it is drawn */
 function kaiShotAct(P,a){if(P.crouch)return 'crouchshoot';if(!P.onGround)return '';const el=abs(Math.sin(a||0));return el>.8?'aimup':el>.3?'aimdiag':abs(P.vx)>5?'runshoot':'shoot';}
-function localMz(e,act,h,flip){const mz=FEEL.MZ[act],mm=ART.ANIM.s[act];if(!mz||!mm)return null;const a2=act.slice(act.indexOf('/')+1),base=act.slice(0,act.indexOf('/'));
-  const bk=FEEL.BODY[act],ref=FEEL.BODY[base+'/idle'];if(bk&&ref&&!/crouch/.test(a2))h*=ref/bk;const sc=h/mm[3];let i=0;
+function localMz(e,act,h,flip){const mz=RET.bodyscale&&FEEL.MZB[act]||FEEL.MZ[act],mm=ART.ANIM.s[act];if(!mz||!mm)return null;const a2=act.slice(act.indexOf('/')+1),base=act.slice(0,act.indexOf('/'));
+  const bk=FEEL.BODY[act],ref=FEEL.BODY[base+'/idle'];if(!RET.bodyscale&&bk&&ref&&!/crouch/.test(a2))h*=ref/bk;const sc=ART.bsc(mm,h);let i=0;
   if(RUNA[a2]&&e._fd!=null){const cyc=2*(FEEL.ST[act]||FEEL.ST[base+'/run'])*sc,ph=((e._fd+abs(e.x-e._fx))/cyc)%1;i=Math.floor(ph*mm[0]);}   // the frame the next draw will show
   else if(e._fa&&e._fa.slice(e._fa.indexOf('/')+1)===a2&&e._mzd&&F.S.time-e._mzd[4]<.2)i=ART.aframe(e._fa,F.S.time-(e._f0||0));   // the act is already showing: its frame at this time
   i=Math.min(mz.length-1,i);return rot([mz[i][0]*sc*(flip?-1:1),mz[i][1]*sc],a2,flip,e._ln);}
-F.mz=(P,a)=>{if(!RET.feel)return null;const act=kaiShotAct(P,a),h=P.crouch?44:P.h,fl=P.facing<0;let d=act&&localMz(P,'kai/'+act,act==='crouchshoot'?h:FEEL.H.kai,fl);
+F.mz=(P,a)=>{if(!RET.feel)return null;const act=kaiShotAct(P,a),h=P.crouch?44:P.h,fl=P.facing<0;let d=act&&localMz(P,'kai/'+act,act==='crouchshoot'&&!RET.bodyscale?h:FEEL.H.kai,fl);
   if(!d)d=[(fl?-1:1)*h*.32,-h*.62];   // no shot sheet for this pose (in the air): hand height on the facing side
   const w=toWorld(P.x,P.y,d[0],d[1]);P._mzw=[w[0],w[1],a,F.S.time];FEEL.log.shots++;return w;};
 /* the gun sits higher than the old shot line (shoulder height in the art): with no foe in the aim cone, a shot along the ground dips onto the crate or barrel ahead */
