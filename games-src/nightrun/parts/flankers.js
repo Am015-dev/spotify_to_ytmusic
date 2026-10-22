@@ -69,5 +69,5 @@ NR.on('runStart',()=>{FLK.reset();FLK.n=0;});
 NR.on('stageClear',()=>{FLK.tells=[];});
 NR.on('tick',dt=>{try{if(G)FLK.tick(dt);}catch(err){}});
 NR.on('kill',d=>{const e=d&&d.e;if(!e||!e.fk)return;FLK.stat.kill++;if(GX()<.7)G.pk.push({t:'shard',x:e.x,y:e.y,vx:rnd(-40,20),vy:rnd(-60,60),bob:rnd(0,7)});});
-{const de=drawEnemy;drawEnemy=function(e,t){if(e.fk&&FLK.K[e.fk]){FLK.draw(e,t);return;}de(e,t);};}
+HOOK.drawEnemy(de=>function(e,t){if(e.fk&&FLK.K[e.fk]){FLK.draw(e,t);return;}de(e,t);});
 DRAW.extra.push(function(t){try{if(FLK.on)FLK.drawTells(t);}catch(err){}});

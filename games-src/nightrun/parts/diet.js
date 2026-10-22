@@ -52,10 +52,10 @@ if(DIET.on){
   for(const [o,k] of [[window.AC,'draw'],[window.FLK,'drawTells']])if(o&&o[k]){const f=o[k];o[k]=function(){const L=this.tells;if(!L||!L.length)return f.apply(this,arguments);
       this.tells=L.filter(q=>q.t<=DIET.CHEV);try{return this.tells.length?f.apply(this,arguments):undefined;}finally{this.tells=L;}};}
   /* ---- 6. enemies: >= 32 css px, light rim; backdrop: rooftop tile off, a further dim ---- */
-  {const de=drawEnemy;drawEnemy=function(e,t){if(!running||!G||e===G.boss||e.type==='boss'||e.hp<=0)return de.apply(this,arguments);
+  HOOK.drawEnemy(de=>function(e,t){if(!running||!G||e===G.boss||e.type==='boss'||e.hp<=0)return de.apply(this,arguments);
     const f=DIET.scale(e),css=DIET.size(e)*f*DIET.k();if(e.x>-20&&e.x<W+20&&e.y>-20&&e.y<H+20){DIET.st.ens++;if(css<DIET.st.minCss)DIET.st.minCss=css;}
     ctx.save();if(f>1){ctx.translate(e.x,e.y);ctx.scale(f,f);ctx.translate(-e.x,-e.y);}ctx.shadowColor=DIET.RIM;ctx.shadowBlur=DIET.RIMB;
-    try{return de.apply(this,arguments);}finally{ctx.restore();}};}
+    try{return de.apply(this,arguments);}finally{ctx.restore();}});
   {const bp=drawBGP;drawBGP=function(bg){if(!running)return bp.apply(this,arguments);const i=DISTRICTS.indexOf(bg.D),k='ly-phone-'+ART.dn[i],lb=ART.bm[k];if(lb)ART.bm[k]=undefined;
     try{bp.apply(this,arguments);}finally{if(lb)ART.bm[k]=lb;}ctx.save();ctx.globalAlpha=DIET.DIM;ctx.fillStyle='#000';ctx.fillRect(-40,-40,PW_+80,PH_+80);ctx.restore();};}
   {const bl=drawBG;drawBG=function(){bl.apply(this,arguments);if(!running)return;ctx.save();ctx.globalAlpha=DIET.DIM;ctx.fillStyle='#000';ctx.fillRect(-40,-40,W+80,H+80);ctx.restore();};}

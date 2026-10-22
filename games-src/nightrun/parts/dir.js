@@ -159,7 +159,7 @@ pat('convoy',['elite','hazard'],2.2,.8,5,()=>{const y=FY(170,H-230);en('gunship'
 pat('mines',['hazard','swarm'],1.2,.9,4,()=>{const g=gr(140,H-200);for(let i=0;i<4;i++){const y=(g+i*120)%(H-90)+45;en('mine',{x:W+30+i*70,y,by:y,ph:i});}return 4;},{free:1});
 pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;i++)en('drone',{x:W+30+i*48,y,amp:55,ph:i*.9});return 3.4;},{free:1});
 /* ---------- looks of the new enemy kinds (the rest is in draw.js) ---------- */
-{const de=drawEnemy;drawEnemy=function(e,t){
+{HOOK.drawEnemy(de=>function(e,t){
   if(e.type!=='flank'&&e.type!=='swarm'&&e.type!=='mine'){de(e,t);return;}
   const D=DISTRICTS[G.di],fl=e.flash>0;ctx.save();ctx.translate(e.x,e.y);
   if(e.arm){const k=PHF;ctx.save();ctx.globalCompositeOperation='lighter';G_(0,0,e.r*(1.7+1.3*k),'#ff3050',.22+.55*k);ctx.restore();
@@ -177,6 +177,6 @@ pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;
   else{const p=.5+.5*Math.sin(t*5+e.ph);ctx.fillStyle=fl?'#fff':'#1a1208';ctx.strokeStyle='#ffa02d';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<8;i++){const q=i*Math.PI/4,rr=i%2?e.r*.6:e.r;ctx.lineTo(Math.cos(q)*rr,Math.sin(q)*rr);}ctx.closePath();ctx.fill();ctx.stroke();
     ctx.globalCompositeOperation='lighter';G_(0,0,e.r*(1.1+.5*p),'#ffa02d',.4+.3*p);ctx.globalCompositeOperation='source-over';
     hpBar(-14,-e.r-9,28,e.hp/e.max);}
-  ctx.restore();};
+  ctx.restore();});
  DRAW.extra.push(function(t){DIR.drawWarn(t);});}
 NR.on('runStart',()=>{upsCalc();});

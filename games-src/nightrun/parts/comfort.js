@@ -81,9 +81,9 @@ if(RET.comfort){for(const k of['glow','scan','txt','cbp','calmm'])if(SET[k]===un
   if(!SET.cv){SET.cv=1;SET.shake=Math.min(SET.shake,1);}
   if(SET.rm===undefined)SET.rm=RM;deriveSet();}
 COM.fontHook();
-{const de=drawEnemy;drawEnemy=function(e,t){   // every ordinary enemy sits on a soft light halo (the existing glow sprite, pale, 30% before the glow setting): a dark hull stays readable on the dark city
+HOOK.drawEnemy(de=>function(e,t){   // every ordinary enemy sits on a soft light halo (the existing glow sprite, pale, 30% before the glow setting): a dark hull stays readable on the dark city
     if(RET.comfort&&e!==G.boss&&!e.dead&&e.hp>0&&e.r<40){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*1.45,'#cfd8ff',.3);ctx.restore();}
-    return de.call(this,e,t);};}
+    return de.call(this,e,t);});
 {const h1=drawHUDP,h2=drawHUD,w=(f)=>function(t){COM.hud=1;try{return f.call(this,t);}finally{COM.hud=0;}};drawHUDP=w(h1);drawHUD=w(h2);   // HUD text has the higher floor
   if(window.PW&&PW.hud){const h3=PW.hud;PW.hud=function(t){COM.hud=1;try{return h3.call(this,t);}finally{COM.hud=0;}};}}
 /* blinks: a warning blink never runs faster than 6 Hz (3 flashes a second) */

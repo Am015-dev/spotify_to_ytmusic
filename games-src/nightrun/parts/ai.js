@@ -27,7 +27,7 @@ NR.on('beat',()=>{if(!G.live||G.dead||ST.over)return;
     else if(++e.lc>=4){e.lc=0;e.lArm=true;}}});
 NR.on('kill',({e})=>{if(!e||!e.ldr)return;if(!G.over&&!ST.over)G.score+=e.score;floater(e.x,e.y-30,'LEADER DOWN','#ffd23d');
   for(const f of G.en){if(f.lk===e&&f.hp>0){f.rg=1;f.shl=false;f.bf=Math.min(f.bf,2);}}});
-{const de=drawEnemy;drawEnemy=function(e,t){de(e,t);if(e.type==='boss'||e.hp<=0)return;
+HOOK.drawEnemy(de=>function(e,t){de(e,t);if(e.type==='boss'||e.hp<=0)return;
   if(e.ldr){ctx.save();ctx.translate(e.x,e.y);if(!ART.have('spr-en-leader')&&e._fa!==FOEART.fr){const g=ART.sil('spr-en-drone',e.r*2.9,'#ffd23d');if(g)ART.put(g,0,0,0,.3);}   // a gold sheen on the drone body until the leader sprite exists
     ctx.strokeStyle='#ffd23d';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(0,0,e.r+7,0,7);ctx.stroke();ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,e.r+12,0,7);ctx.stroke();
     const cy=-e.r-14;if(ART.have('fx-crown')){const o=ART.sp('fx-crown',22);ctx.globalCompositeOperation='lighter';ART.put(o,0,cy+4);ctx.globalCompositeOperation='source-over';}
@@ -36,7 +36,7 @@ NR.on('kill',({e})=>{if(!e||!e.ldr)return;if(!G.over&&!ST.over)G.score+=e.score;
     hpBar(-18,-e.r-26,36,e.hp/e.max);ctx.restore();}
   else if(e.shl&&e.lk){ctx.save();ctx.strokeStyle='#19e3ff';ctx.globalAlpha=.7;ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(e.x,e.y,e.r+5,0,7);if(!ART.have('fx-shield-link')){ctx.moveTo(e.x,e.y);ctx.lineTo(e.lk.x,e.lk.y);}ctx.stroke();ctx.restore();
     const sl=ART.bm['fx-shield-link'];if(sl){const dx=e.lk.x-e.x,dy=e.lk.y-e.y,d=Math.hypot(dx,dy);ctx.save();ctx.translate(e.x,e.y);ctx.rotate(Math.atan2(dy,dx));ctx.globalCompositeOperation='lighter';ctx.globalAlpha=window.CALM&&CALM.on?.55:.75;const th=window.CALM&&CALM.on?Math.min(14,CALM.BEAM/CALM.css()):14;ctx.drawImage(sl,0,-th/2,d,th);ctx.restore();}}   // shield link to the leader (calm: at most 12 css px thick)
-  else if(e.rg){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*2,'#ff3050',.4);ctx.restore();}};}
+  else if(e.rg){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*2,'#ff3050',.4);ctx.restore();}});
 {const fb=FXV.bullets;FXV.bullets=function(){fb.call(this);let any=false;for(const b of G.eb)if(b.hm>0){if(ART.have('fx-orb-homing')){const o=ART.bm['fx-orb-homing'],w=b.r*3.6;ctx.save();ctx.globalCompositeOperation='lighter';ctx.drawImage(o,b.x-w/2,b.y-w/2,w,w);ctx.restore();continue;}if(!any){ctx.save();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.6;ctx.globalAlpha=.85;ctx.beginPath();any=true;}ctx.moveTo(b.x+b.r+3.5,b.y);ctx.arc(b.x,b.y,b.r+3.5,0,7);}if(any){ctx.stroke();ctx.restore();}};}
 /* low hull: the song keeps its tempo; the screen edges pulse red on the beat and a soft heartbeat thumps under the music */
 NR.on('beat',()=>{if(!G.live||G.dead||ST.over||!P||P.hp>1||!AU.a||AU.a.state!=='running')return;try{AU.osc(AU.a.currentTime+.02,'sine',58,.2,.5,AU.musv,38);}catch(e){}});

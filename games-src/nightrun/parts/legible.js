@@ -35,7 +35,7 @@ const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.3
     if(!g||this._gk!==key){g=this._g=P?ctx.createLinearGradient(0,0,w,0):ctx.createLinearGradient(0,0,0,h);this._gk=key;const k='rgba(0,0,0,'+this.BAND+')',z='rgba(0,0,0,0)';
       g.addColorStop(0,z);g.addColorStop(E*.5,z);g.addColorStop(E*1.6,k);g.addColorStop(1-E*1.6,k);g.addColorStop(1-E*.5,z);g.addColorStop(1,z);}
     ctx.save();ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.fillStyle=g;ctx.fillRect(-40,-40,w+80,h+80);ctx.restore();this.stat.band++;}};
-{const de=drawEnemy;drawEnemy=function(e,t){if(!RET.legible)return de(e,t);LGB.enemy(de,e,t);};}
+HOOK.drawEnemy(de=>function(e,t){if(!RET.legible)return de(e,t);LGB.enemy(de,e,t);});
 {const d0=READ.dim;READ.dim=function(w,h){d0.call(this,w,h);if(RET.legible&&RET.read&&running)LGB.band(w,h);if(LGB.grab)LGB.grab(ctx);};}   // grab: legible-test.js reads the backdrop alone here
 /* 1c. ships drawn from their own sheet (gunship, kamikaze, the four fleet ships: SPR.foe, no recoloured strip to brighten) get the same lift as one added copy at alpha BR-1 (one drawImage per ship, no filter) */
 {const f0=SPR.foe;SPR.foe=function(e,id,t,x,y,w,rot,fl){const ok=f0.call(this,e,id,t,x,y,w,rot,fl);if(!ok||fl||!RET.legible||!running||LGB.BR<=1||!e||e.type==='boss')return ok;

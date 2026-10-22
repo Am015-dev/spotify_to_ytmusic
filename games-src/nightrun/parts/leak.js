@@ -109,7 +109,7 @@ const LEAK=window.LEAK={
     ctx.restore();},
   init(){if(this.inited)return;this.inited=true;
     Object.assign(DMG.ml,{gtank:this.GT.gtank.ml,gturret:this.GT.gturret.ml,gwalker:this.GT.gwalker.ml});
-    { const de=drawEnemy;drawEnemy=function(e,t){if(e.gnd&&RET.leak){LEAK.art(e,t);return;}de(e,t);}; }
+    HOOK.drawEnemy(de=>function(e,t){if(e.gnd&&RET.leak){LEAK.art(e,t);return;}de(e,t);});
     { const dp=DMG.pass;DMG.pass=function(dt){dp.call(this,dt);LEAK.tick(dt);}; }
     { const fg=RET.fvGain;RET.fvGain=function(v){if(RET.leak&&LEAK.noFev)return false;return fg.call(this,v);}; }
     { const so=DIR.spawnOne;DIR.spawnOne=function(fill){

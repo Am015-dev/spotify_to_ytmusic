@@ -44,7 +44,7 @@ const CALM=window.CALM={get on(){return running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,
   FXW.aim=function(e,left){if(!CALM.on)return ai.apply(this,arguments);if(!fxBeam('eb-aim-line',e.x,e.y,e.ang,1500,left<=.3?Math.min(6,CALM.BEAM/CALM.css()):5,left<=.3?.5:.4))return false;FXW.stat.aim++;return true;};}
 /* ---- 3. rings: at most 2 per enemy ---- */
 {const bump=f=>function(){CALM.fr++;CALM.pp=CALM.pk;CALM.pk=new Map();return f.apply(this,arguments);};drawBGP=bump(drawBGP);drawBG=bump(drawBG);
-  const de=drawEnemy;drawEnemy=function(e){if(!CALM.on||e===G.boss||e.type==='boss')return de.apply(this,arguments);const p=CALM.cur;CALM.cur=e;try{return de.apply(this,arguments);}finally{CALM.cur=p;}};
+  HOOK.drawEnemy(de=>function(e){if(!CALM.on||e===G.boss||e.type==='boss')return de.apply(this,arguments);const p=CALM.cur;CALM.cur=e;try{return de.apply(this,arguments);}finally{CALM.cur=p;}});
   const P=CanvasRenderingContext2D.prototype,ar=P.arc,bp=P.beginPath,st=P.stroke;
   P.beginPath=function(){CALM.a=null;return bp.apply(this,arguments);};
   P.arc=function(x,y,r,s,e2){CALM.a=(CALM.on&&r>=8&&r<=90&&Math.abs((e2||0)-(s||0))>=6)?[x,y,r]:null;return ar.apply(this,arguments);};

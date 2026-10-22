@@ -123,6 +123,7 @@ function drawBossBody(e,t,fl,c){
   const a=aim(e);ctx.fillStyle='#fff';ctx.globalCompositeOperation='lighter';G_(Math.cos(a)*e.r*.3,Math.sin(a)*e.r*.3,e.r*(.6+.3*PUL),e.ph===3?'#ff3040':c,.95);ctx.globalCompositeOperation='source-over';
   ctx.font='700 11px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffffffcc';wtxt(e.lbl||(e.k===2?'€':e.k===0?'ADLER':e.k===1?'':'K'),0,e.k===0?-e.r-6:4);}
 
+hookable('drawEnemy',()=>drawEnemy,f=>drawEnemy=f);   // layers (build order): dir, ai, flankers, novelty, fleet, legible, comfort, diet, calm, then leak and zoo at their first runStart (outermost)
 // drawPickups = the world-overlay layer: DRAW.pre hooks (polish governor), the pickups, then DRAW.extra hooks in registration order
 // (build order of the parts; zoo registers at its first runStart, so it runs last). Layers register with one DRAW.extra.push(function(t){..}).
 const DRAW={pre:[],extra:[]};

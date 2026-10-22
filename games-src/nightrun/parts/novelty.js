@@ -87,4 +87,4 @@ NR.on('kill',x=>{const e=x&&x.e;if(!RET.novelty||!e||x.boss||!window.SH||!(e.nvx
   NOV.na=(NOV.na||0)+(tw.indexOf('armored')>=0?.5:0)+(e.nvl?1:0)+(tw.indexOf('gilded')>=0?.25:0);while(NOV.na>=1){NOV.na--;try{SH.award(e,1);}catch(err){}}});
 NR.on('beat',()=>{if(RET.novelty)try{NOV.tick();}catch(err){}});
 NR.on('runStart',()=>{NOV.lt=0;NOV.buf.length=0;NOV.pend.length=0;});
-{const de=drawEnemy;drawEnemy=function(e,t){de(e,t);try{NOV.mark(e);}catch(err){}};NOV.drawE=(e,t)=>drawEnemy(e,t);}   // (drawE: the test draws through the real hook)
+{HOOK.drawEnemy(de=>function(e,t){de(e,t);try{NOV.mark(e);}catch(err){}});NOV.drawE=(e,t)=>drawEnemy(e,t);}   // (drawE: the test draws through the real hook)
