@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.157',date:'22 Oct 2026',items:[{t:'FIXED',s:'On foot you can no longer walk out of the world: you slow down and TURN BACK shows, like in the car.'},{t:'FIXED',s:'Only one TAP chip shows at a time, and the flight chip shows its plane icon once.'}]},
 {v:'v90m-beta.156',date:'22 Oct 2026',items:[{t:'FIXED',s:'On phones, traffic cars are no longer re-placed where you can see them.'},{t:'CHANGED',s:'Removed unfinished test options (hill climb, Athens bowl).'}]},
 {v:'v90m-beta.155',date:'22 Oct 2026',items:[{t:'CHANGED',s:'Stopping at a garage, flight or event marker no longer opens its card: tap the chip to open it.'},{t:'CHANGED',s:'Smoother on phones: the game does about 30% less work every frame (the HUD no longer forces a full restyle).'}]},
 {v:'v90m-beta.154',date:'22 Oct 2026',items:[{t:'NEW',s:'Frankfurt: smashing props now throws a wide fan of bricks and gold studs that arc over your car.'},{t:'CHANGED',s:'No more pop-up cards while you drive: level-ups and results are small notes, and events start only when you tap TAP TO START.'}]},
