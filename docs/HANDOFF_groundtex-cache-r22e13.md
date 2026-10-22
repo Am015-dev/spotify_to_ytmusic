@@ -1,0 +1,6 @@
+# HANDOFF groundtex-cache-r22e13
+1. groundTex(kind) now caches one texture per kind (GTEX_C, src/53_terrain_roads.js); WARM_gtwin, worldGroundGen, tauMat and gm() share it, so the gk ground tile uploads under the curtain. athGrassTex already cached. No caller mutates repeat/offset on these maps and they are in KEEP_TEX (no dispose), so sharing is safe.
+2. tIosReveal fra CPU=6 prewarm=1 on the BUILT page: post-reveal texture uploads 1 in 6/6 runs before, 0 in 5/5 after (6th run lost to a killed job). Stall gate (gap >2.5x median or >1.5 s): 6/6 ok before, 5/5 ok after; the 0.7-2.8 s stall did not show in either set on this box (max gap 437-749 ms before, 418-725 after), so the stall fix is NOT proven, only the upload is gone.
+3. Athens reveal x3 each: 2/3 ok before and after (one stall of 1.2 s / 1.75 s each, noise). Unit 0 FAIL. TAG=life1,xf1,terrain,why: 70/72, fails are why/* (quiet-start, solid-cars, speedfeel, tr9-chunk) that move between runs and also fail on the old build (28/30 twice).
+4. fra ground shot 852x393 before/after: grass, road and walk look identical.
+5. Left: if the stall still appears on a real iPhone, do the trace bisect from r22e12 plan (b) (hide the gk tile and HUD canvases after reveal).
