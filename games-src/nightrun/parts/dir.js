@@ -134,6 +134,7 @@ const DIR={
     else{const dy=w.side<0?1:-1,y=w.side<0?8:H-8;ctx.beginPath();ctx.moveTo(w.x-14,y);ctx.lineTo(w.x,y+dy*(18+8*k));ctx.lineTo(w.x+14,y);ctx.closePath();ctx.fill();ctx.stroke();}}
     ctx.restore();}
 };
+hookable('DIR.spawnOne',()=>DIR.spawnOne,f=>DIR.spawnOne=f);   // layers (build order): stagescripts, pacing, fleet, waves, then leak and zoo at their first runStart (outermost)
 /* ---------- the pattern library: id, themes it belongs to, the tier it opens at, weight, size ---------- */
 const FY=(a,b)=>gr(a,Math.max(a+1,b));
 const PATS={};

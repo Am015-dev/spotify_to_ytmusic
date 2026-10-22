@@ -171,7 +171,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
       ctx.fillStyle=ctx.strokeStyle;ctx.font='700 18px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillText(String(o.n),o.x,o.y+6);ctx.globalAlpha=1;}
     ctx.restore();}};
 /* ---- hooks (all inert with the flag off) ---- */
-{const so=DIR.spawnOne;DIR.spawnOne=function(fill){if(VARY.active()&&!(VARY.hard()&&GR()<VARY.oldK()))return VARY.spawn(fill);return so.call(this,fill);};}   // innermost: zoo.js and leak.js wrap it later (caps, READY gaps)
+HOOK['DIR.spawnOne'](so=>function(fill){if(VARY.active()&&!(VARY.hard()&&GR()<VARY.oldK()))return VARY.spawn(fill);return so.call(this,fill);});   // innermost: zoo.js and leak.js wrap it later (caps, READY gaps)
 {const en0=DIR.energy;DIR.energy=function(bar){const e=en0.call(this,bar);return RET.vary2&&VARY.active()?e*VARY.pace(bar):e;};}   // a pace curve per stage (calm / surge / breather), mean 1: Normal is not harder overall
 {const db=drawBG;drawBG=function(bg,t,dt,scroll){db(bg,t,dt,scroll);if(!RET.vary2||!ST.on||G.lab||G.tut)return;ctx.save();ctx.globalAlpha=.13;ctx.fillStyle='hsl('+((ST.n*137)%360)+',70%,45%)';ctx.fillRect(0,0,W,H);ctx.restore();};}   // the five backdrops get a different tint on every stage
 {const pt=DIR.pickTheme;DIR.pickTheme=function(bar){pt.call(this,bar);VARY.theme();};}

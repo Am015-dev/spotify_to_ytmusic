@@ -55,10 +55,10 @@ if(RET.pacing){
       return t[k];}}); }
   for(const s of STAGES)if(!s.ch&&s.goal.k==='score')s.goal.v=Math.round(s.goal.v*PAC.scK/500)*500;
   { const sl=ST.setLevel;ST.setLevel=function(n){const r=sl.apply(this,arguments);if(RET.pacing)this.dk*=PAC.dk;return r;}; }
-  { const so=DIR.spawnOne;DIR.spawnOne=function(fill,k){
+  HOOK['DIR.spawnOne'](so=>function(fill,k){
       if(PAC.on()&&PAC.soft()&&!G.boss&&!ST.over&&PAC.alive()>=PAC.cap()&&!(window.ZOO&&ZOO.count()>=ZOO.CAP())){   // a screen that zoo.js already calls busy is zoo.js's to defer
         if((k|0)>=4){PAC.stat.dropped++;return;}PAC.stat.deferred++;DIR.later(2,()=>{if(!G.dead&&!ST.over)DIR.spawnOne(fill,(k|0)+1);});return;}
-      return so.call(this,fill);}; }
+      return so.call(this,fill);});
   { const es=LEAK.es;LEAK.es=function(e){const v=es.call(this,e);return v*PAC.f(e);}; }
   NR.on('tick',dt=>PAC.tick(dt));
   NR.on('spawn',e=>PAC.trim(e));

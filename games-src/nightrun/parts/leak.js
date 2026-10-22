@@ -112,13 +112,13 @@ const LEAK=window.LEAK={
     HOOK.drawEnemy(de=>function(e,t){if(e.gnd&&RET.leak){LEAK.art(e,t);return;}de(e,t);});
     { const dp=DMG.pass;DMG.pass=function(dt){dp.call(this,dt);LEAK.tick(dt);}; }
     { const fg=RET.fvGain;RET.fvGain=function(v){if(RET.leak&&LEAK.noFev)return false;return fg.call(this,v);}; }
-    { const so=DIR.spawnOne;DIR.spawnOne=function(fill){
+    HOOK['DIR.spawnOne'](so=>function(fill){
         if(!RET.leak||G.lab||G.tut)return so.call(this,fill);
         if(LEAK.gapOn()){this.acc=Math.min(this.acc+1,1.4);return;}                         // the breathing bar: nothing new enters
         LEAK.waves++;
         if(LEAK.gndOK()&&!fill){LEAK.okWaves++;if(GR()<LEAK.pg){LEAK.gwave();if(LEAK.gapOK()&&LEAK.waves%3===0&&!LEAK.gap)LEAK.gap=1;return;}}
         so.call(this,fill);
-        if(LEAK.gapOK()&&LEAK.waves%3===0&&!LEAK.gap)LEAK.gap=1;}; }
+        if(LEAK.gapOK()&&LEAK.waves%3===0&&!LEAK.gap)LEAK.gap=1;});
     { const md=DIR.miniDown;DIR.miniDown=function(){md.call(this);if(RET.leak&&!LEAK.heat()&&SET.diff!=='legend'&&!LEAK.gap)LEAK.gap=1;}; }
     { const st=HUDX.strip;HUDX.strip=function(c,x,y,k){st.call(this,c,x,y,k);try{LEAK.draw(c,x,y+46*k,k);}catch(err){}}; }
     if(typeof hudMin==='function'){const hm=hudMin;hudMin=function(c,k,x,y,t){hm(c,k,x,y,t);try{LEAK.draw(c,x+312*k,y+66*k,k,true);}catch(err){}};}   // desktop plate: the BREACH meter sits right-aligned on the weapon row under the plate (it used to draw over the HULL label at y+22k)

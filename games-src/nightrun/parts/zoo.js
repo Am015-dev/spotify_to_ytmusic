@@ -242,12 +242,12 @@ const ZOO=window.ZOO={
     if(window.LEAK)for(const id in this.T)if(this.T[id].w)LEAK.W[id]=this.T[id].w;
     HOOK.drawEnemy(de=>function(e,t){if(RET.zoo&&e.zt&&ZOO.T[e.type]){ZOO.art(e,t);return;}de(e,t);});
     DRAW.extra.push(function(t){try{ZOO.over(t);}catch(err){}});
-    { const so=DIR.spawnOne;DIR.spawnOne=function(fill){
+    HOOK['DIR.spawnOne'](so=>function(fill){
         if(!RET.zoo||G.lab||G.tut)return so.call(this,fill);
         if(window.LEAK&&LEAK.gapOn())return so.call(this,fill);
         if(!G.boss&&ZOO.count()>=ZOO.CAP()&&!ST.over){ZOO.stat.spawnsDeferred++;DIR.later(2,()=>{if(!G.dead)DIR.spawnOne(fill);});return;}   // too many on screen: this wave comes later
         if(!fill&&ZOO.waveOK()&&GR()<ZOO.pz&&ZOO.wave())return;
-        return so.call(this,fill);}; }
+        return so.call(this,fill);});
     if(typeof labBuildFoes==='function'){const lb=labBuildFoes;labBuildFoes=function(body){lb(body);const r=lsec(body,'NEW ENEMIES (the zoo)');
       for(const id of ZOO.ID)lchip(r,id.toUpperCase(),labFoe(y=>{ZOO.bombs=[];ZOO.mines=[];ZOO.mk(id,{x:W-110,y});}));
       lchip(r,'HOVER DRONE',labFoe(y=>{const e=en('drone',{x:W-60,y,amp:0});e.zs={x:W*.6,y};e.zph=0;e.zst=0;e.hv0=0;ZOO.lab=1;}));};}

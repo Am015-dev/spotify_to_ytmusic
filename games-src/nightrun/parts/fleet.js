@@ -207,10 +207,10 @@ if(RET.fleetArr===undefined)RET.fleetArr=/[?&]fleetarr=1/.test(location.search);
     return r;}; }
 HOOK.drawEnemy(de=>function(e,t){if(RET.fleet&&e.fl&&FLEET.K[e.type]){FLEET.draw(e,t);return;}de(e,t);});
 DRAW.extra.push(function(t){try{FLEET.over(t);}catch(err){}});
-{ const so=DIR.spawnOne;DIR.spawnOne=function(fill,k){   // outermost: a fleet wave replaces the wave; a busy screen goes to the zoo / pacing deferral inside
+HOOK['DIR.spawnOne'](so=>function(fill,k){   // outermost: a fleet wave replaces the wave; a busy screen goes to the zoo / pacing deferral inside
     if(!RET.fleet||fill||k||!FLEET.ok()||FLEET.busy())return so.apply(this,arguments);
     const n=FLEET.n(),p=FLEET.p(n);if(p<=0||GR()>=p)return so.apply(this,arguments);
-    if(FLEET.wave(n))return;return so.apply(this,arguments);}; }
+    if(FLEET.wave(n))return;return so.apply(this,arguments);});
 HOOK['DMG.hit'](h0=>function(d,b,e){if(RET.fleet&&e&&e.fsh&&!(G.empT>0))return 0;return h0.apply(this,arguments);});   // the carrier shield: no damage while its drones live (EMP still cuts through)
 { const bl=ZOO.block;ZOO.block=function(b,e){if(RET.fleet&&e&&e.fsh&&!(G.empT>0)){FLEET.stat.absorbed++;if(FLEET.fx.length<40)FLEET.fx.push({x:b.x,y:b.y,l:.2,m:.2,c:'#4ad1ff',k:'ring',r:12});return true;}return bl.apply(this,arguments);}; }
 NR.on('runStart',()=>{if(!RET.fleet)return;FLEET.init();FLEET.reset();});

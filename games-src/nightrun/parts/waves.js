@@ -113,7 +113,7 @@ const WV=window.WV={
       if(G.boss||G.bossDone||SH.active)return;
       if(window.DENS&&WV.st.phase==='wave')DENS.beat();
       WV.beat(i);}; }
-  { const so=DIR.spawnOne;DIR.spawnOne=function(){if(WV.on()&&!WV.own)return;return so.apply(this,arguments);}; }   // outermost: the director, zoo, fleet and set pieces are muted on wave stages
+  HOOK['DIR.spawnOne'](so=>function(){if(WV.on()&&!WV.own)return;return so.apply(this,arguments);});   // outermost: the director, zoo, fleet and set pieces are muted on wave stages
   { const es=LEAK.es;LEAK.es=function(e){if(e.wv&&WV.on())return 0;return es.call(this,e);}; }   // wave foes are moved by WV.tick only
   if(window.PAC){const el=PAC.eligible;PAC.eligible=function(e){return!e.wv&&el.call(this,e);};}
   { const sl=ST.setLevel;ST.setLevel=function(n){const r=sl.apply(this,arguments);try{WV.goal();}catch(e){}return r;}; }
