@@ -34,7 +34,7 @@ HOOK.spawnBoss(sb=>function(o){const b=sb(o);if(!B2X.on||!b||!b.minBar)return b;
   if(e.ph!==ph){e.pc=-5;e.lasers=[];B2X.st.calm++;B2X.st.ph.push({ph:e.ph,bt:e.bt,t:+G.t.toFixed(2),hp:+(e.hp/e.max).toFixed(3)});
     if(e.ph===3){try{AU.intense(true);}catch(x){}}}};}
 /* A + C: the cap, the phase floors and the weak-ship help, booked where DMG.pass books the frame's hull loss (b.js update: next is the boss floor and the kill check) */
-{const p0=DMG.pass;DMG.pass=function(dt){const r=p0.call(this,dt);const e=G.boss;if(!B2X.on||!e||e.dead||!e.b2)return r;const s=e.b2;
+HOOK['DMG.pass'](p0=>function(dt){const r=p0.call(this,dt);const e=G.boss;if(!B2X.on||!e||e.dead||!e.b2)return r;const s=e.b2;
   if(e.gw){s.gt=(s.gt||0)+dt;if(s.gt>B2X.SHT){s.gt=0;for(const c of e.cores)c.hp=c.hq=0;floater(e.x,e.y-e.r-30,'SHIELD OVERLOAD','#ffe14d');}}else s.gt=0;   // a shield the cores keep up longer than SHT s overloads: the cap, not the shield, sets the length
   if(e.gi===1)e.gi=2;                                            // fair.js: the 66% shield only; phase 3 has its own verb
   const raw=Math.max(0,s.ref-e.hp);
@@ -57,7 +57,7 @@ HOOK.spawnBoss(sb=>function(o){const b=sb(o);if(!B2X.on||!b||!b.minBar)return b;
   if(raw<=0&&take<=0)hp=Math.min(e.hp,s.ref+cap*B2X.REP*dt);      // a repair (hard.js, campers only) runs at most REP of the cap, so a ship that hits keeps gaining
   e.hp=hp;e.hq=hp;s.ref=hp;
   if(e.ph===3&&!s.lsd&&e.hp<=e.max*.12){s.lsd=1;s.ls=B2X.LS;B2X.st.ls++;floater(e.x,e.y-e.r-34,'EXPOSED!','#ffe14d');G.flash=Math.max(G.flash,.2*FX());shake(8);}
-  if(s.sh>0)s.sh-=dt;e.b2s=s.sh>0?1:0;return r;};}
+  if(s.sh>0)s.sh-=dt;e.b2s=s.sh>0?1:0;return r;});
 /* phase 3: a lane beam aimed at the ship's row on every 2nd bar (warned for 1 beat on the hard tiers, 2 on Normal / Easy), never in the last stand */
 NR.on('bar',()=>{if(!B2X.on||!G.live||G.dead)return;const e=G.boss;if(!e||!e.b2||e.ph!==3||e.b2.ls>0||e.x>bossX())return;e.b2.hb=(e.b2.hb|0)+1;if(e.b2.hb%(window.BPL&&BPL.on&&BPL.easy()?4:2))return;   // bossplay on, Easy/Normal early stages: every 4th bar
   const sb=60/BT.bpm,w=HARDS.includes(SET.diff)?1:2;B2X.hz.push({y:clamp(P.y,40,H-40),h:44,t0:G.t,on:G.t+w*sb,off:G.t+w*sb+.35,hit:0});B2X.st.hz++;AU.sfx('warn');});

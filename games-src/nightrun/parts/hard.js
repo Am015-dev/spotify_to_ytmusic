@@ -39,12 +39,12 @@ HOOK['SH.volley'](vol=>function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,p
  const hu=WP.hurtE;WP.hurtE=function(e,dm){if(S3.ctx){S3.au+=dm;if(e.type==='boss')S3.st.bau+=dm;if(S3.act())dm*=e.type==='boss'?Math.min(S3.ka,S3.bA):S3.ka;}else{S3.man+=dm;if(e.type==='boss'){S3.st.bman+=dm;e.s3a=G.t;}}return hu.call(this,e,dm);};
  for(const f of['arcZap','leap']){const o=WP[f];WP[f]=function(...a){S3.ctx++;try{return o.apply(this,a);}finally{S3.ctx--;}};}}
 /* A. the damage ceiling on ordinary enemies, applied where DMG.pass books each frame's hull loss */
-{const p0=DMG.pass;DMG.pass=function(dt){if(this.on){let raw=0;const L=[];
+HOOK['DMG.pass'](p0=>function(dt){if(this.on){let raw=0;const L=[];
     for(const e of G.en){if(e.dead||e.type==='boss'||e.gr||e.rk||e.hq==null||e.x>W-40)continue;const l=Math.min(e.hq-e.hp,Math.max(0,e.hq));if(l>0){raw+=l;L.push(e,l);}}
     S3.st.all+=raw;S3.st.t+=dt;
     if(S3.act()){const c=S3.cap();S3.bud=Math.min(c,S3.bud+c*dt);
       if(raw>S3.bud){const k=S3.bud/raw;for(let i=0;i<L.length;i+=2)L[i].hp=L[i].hq-L[i+1]*k;S3.st.cut+=raw-S3.bud;S3.bud=0;}else S3.bud-=raw;}}
-  return p0.call(this,dt);};}
+  return p0.call(this,dt);});
 NR.on('tick',dt=>{const a=Math.min(1,dt/3),au=S3.au,man=S3.man;S3.st.au+=au;S3.st.man+=man;S3.au=S3.man=0;
   S3.eA=(S3.eA||0)+(au/Math.max(dt,1e-3)-(S3.eA||0))*a;S3.eM=(S3.eM||0)+(man/Math.max(dt,1e-3)-(S3.eM||0))*a;
   S3.ka=S3.eA>1?clamp(S3.SH/(1-S3.SH)*S3.eM/S3.eA,.08,1):1;     // auto-aimed damage after the cut is at most SH of the total

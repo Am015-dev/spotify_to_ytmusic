@@ -63,11 +63,11 @@ window.addEventListener('pagehide',()=>{if(ENDR.eff){ENDR.restore();try{saveSet(
 /* BOSS LENGTH (review 10 F07): in endless every boss lives <= SOFT.t0 + SOFT.len s after it takes position (28 s, ~33 s from its spawn) and may fall from bar SOFT.mb instead of bar 32 (the 32-bar floor alone held a district boss for 61 s), so wave 10 comes by ~250 s with the 3 bosses on the way; armour.js caps / hull / phase lines are untouched */
 HOOK.spawnBoss(sb=>function(o){const b=sb(o);if(b&&b.b2&&ENDR.on()&&ENDR.o.soft)b.minBar=Math.min(b.minBar,ENDR.SOFT.mb);return b;});
 /* BOSS DEADLINE: runs after armour.js's pass (this part loads later), so the schedule only pulls HP down to the next phase floor; the phases still start on their bar lines */
-{const dp=DMG.pass;DMG.pass=function(dt){const r=dp.call(this,dt);const e=G.boss;if(!ENDR.on()||!ENDR.o.soft||!e||e.dead||!e.b2||e.x>bossX())return r;
+HOOK['DMG.pass'](dp=>function(dt){const r=dp.call(this,dt);const e=G.boss;if(!ENDR.on()||!ENDR.o.soft||!e||e.dead||!e.b2||e.x>bossX())return r;
   const s=e.b2,S=ENDR.SOFT;s.soft=(s.soft||0)+dt;if(s.soft<S.t0)return r;
   if(e.bmG&&window.BMV)BMV.unguard(e,0);                      // a boss move that holds the HP (flank shield, overload ...) cannot outlast the deadline: bossmoves.js restored the HP every frame (Legend boss stayed 61 s)
   const want=e.max*Math.max(0,1-(s.soft-S.t0)/S.len),pf=e.ph===1?e.max*.64:e.ph===2?e.max*.31:0,hp=Math.max(pf,Math.min(e.hp,want));
   if(e.floor>hp)e.floor=hp;                                  // b.js lifts the HP back to e.floor every frame (a guard / min-bar floor left over from a verb held a Legend boss at 66% for 8 s)
   if(hp<e.hp-1e-6){e.hp=e.hq=s.ref=hp;s.sh=0;e.b2s=0;
     if(!s.softMsg){s.softMsg=1;floater(e.x,BOSSFY(e.y-e.r-34),'ARMOUR CRACKS','#ffe14d');if(!ENDR.softSeen){ENDR.softSeen=1;G.note={t:3.6,txt:'The boss armour is cracking: keep shooting'};}}}
-  return r;};}
+  return r;});
