@@ -13,9 +13,10 @@
    7. PACE  bullets slower and fewer than the old Legend (DIFFS.legend <- LEG.DF) so every threat stays readable: telegraphs >= .5 s, pattern count per second up.
    Bots (legend-test.js, mid build, st 10/20 pooled, n=16, W107 21 Oct): old Legend human 0 / oracle 0-6%; this layer (Hard-level tables + the rules above, hull <= Normal, bullets slower so ~16 on screen vs Normal 10): human 13-19%, oracle 19-25%, no-oracle 13%, beat 94%, no-dash / camper / random 0%.
    Final gate RUNS=12 (n=24): human 8%, oracle 29% (target 35-65, inside the noise band), no-oracle 8%, beat 100%, no-dash 29%, camper / random 0%, endless median wave 4. The bots carry no meta progress, the owner does: hull plating (+5), revives, shield regen.
+   W130 (22 Oct): walls that need the right answer + CROSSFIRE + wall hit 2 hull + leaks 1 hull per LEG.LK (see 3. and 4b.). legend-test RUNS=8 x3: human 19/19/0, oracle 25/38/31, beat 94-100, camp 0, random 0 (was 13-19).
    Not touched: armour.js hull / caps, hard.js DPS ceiling, stage length (pacing), boss length cap (bossfit). ---------- */
 if(RET.legend===undefined)RET.legend=!/[?&]legend=0/.test(location.search);
-const LEG=window.LEG={WIN:.85,PK:.5,PKK:.55,HULL:0,EV:6,GAP:110,GOFF:120,WV:260,GV:45,CD2:.9,CR:46,CT:2.2,LX:130,LT:2,LCD:2,LSP:300,TELL:.6,FAN:3,CD:2.2,PT:50,FBW:6,FILL:.5,HOV:5,POOL:8,RGN:.5,
+const LEG=window.LEG={WIN:.85,PK:.5,PKK:.55,HULL:0,EV:6,GAP:110,GOFF:120,WV:260,GV:45,CD2:.9,CR:46,CT:2.2,LK:3,WD:2,LX:130,LT:2,LCD:2,LSP:300,TELL:.6,FAN:3,CD:2.2,PT:50,FBW:6,FILL:.5,HOV:5,POOL:8,RGN:.5,
   DF:{d:3.6,fr:5.6,bs:1.7,dn:1.45,sd:1.15,sbs:.85,sfr:.85,fan:3,el:1.1,aq:3,heal:.35},HPK:1,DM:{lv:.3,hp:1.1},SC:{lv:.5,hp:1.2},HK:9,WK:1.3,DK:1.15,RK:1.15,FS:2,
   stat:{lane:0,pun:0,pk:0,hp:0,verb:0,gap:0,rev:0},cz:null,
   act(){return!!RET.legend&&typeof SET==='object'&&SET.diff==='legend'&&!(typeof G==='object'&&G&&(G.lab||G.tut));}};
@@ -23,7 +24,7 @@ if(RET.legend){
   Object.assign(DIFFS.legend,LEG.DF);TUNE.dm.legend=LEG.DM;if(window.SC&&SC.hard)SC.hard.legend=LEG.SC;if(window.CTR){CTR.HK.legend=LEG.HK;CTR.WK.legend=LEG.WK;}if(window.ZOO)ZOO.cap.legend=ZOO.cap.hard;if(window.BMV)BMV.DK.legend=LEG.DK;
   if(window.SC&&SC.firstShot){const f0=SC.firstShot;SC.firstShot=()=>LEG.act()?LEG.FS:f0();}
   if(window.ABIL){ABIL.FILL.legend=LEG.FILL;ABIL.RK.legend=LEG.RK;}
-  if(window.CTR)CTR.EV.legend=LEG.EV;
+  if(window.CTR)CTR.EV.legend=LEG.EV;if(window.LEAK)LEAK.grp.legend=LEG.LK;
   if(window.ZOO)ZOO.hov.legend=LEG.HOV;
   if(window.BPL){BPL.AM=BPL.AM||{};BPL.AM.legend=0;BPL.PT.legend=LEG.PT;BPL.FIT.PT.legend=LEG.PT;BPL.FIT.FBWD.legend=LEG.FBW;}
   /* 1. timing: a narrower window, no assist; a narrower PERFECT share */
@@ -31,14 +32,16 @@ if(RET.legend){
   if(window.TIM){const pk=TIM.PK;Object.defineProperty(TIM,'PK',{get(){return LEG.act()?LEG.PK:pk;},set(){},configurable:true});}
   /* 3. walls that need the right answer (W130). Old Legend gave every wall a gap and kept the Hard curtain (second layer .45 s behind): reading did not pay
      (bots st10/20: the oracle was hit by 57% of the gap walls and 93% of the curtain layers, the random-button bot by about the same), so they were dice rolls.
-     a. LASER WALL = a DASH check: no gap while you hold a dash charge (Hard's rule; with no charge it opens a LEG.GAP px gap, so there is always an answer).
+     a. LASER WALL = a DASH check: no gap while you hold a dash charge (Hard's rule; with no charge it opens a LEG.GAP px gap LEG.GOFF px away from the ship, so there is always an answer).
         Mashing DASH does not pass it: an off-beat press with no bullet near empties the charges (timing.js PANIC), so the wall finds you empty.
      b. the curtain slot sends a GAP WALL instead: the gap is chosen when the warning starts, LEG.GOFF px away from the ship (standing still or wandering
         is a hit), drawn on the warning line (white bracket + GAP), and drifts LEG.GV px/s while the wall sweeps at LEG.WV px/s: follow it, or dash it. */
   if(window.CTR){const t0=CTR.tick;CTR.tick=function(dt){if(LEG.act()&&this.walls)for(const w of this.walls){
       if(w.mv&&!w.lg){w.lg=1;w.v=LEG.WV;const s=P.y>H/2?-1:1;w.gap={y:clamp(P.y+s*LEG.GOFF*(1+.5*GR()),70,H-70),h:LEG.GAP};w.gv=(GR()<.5?-1:1)*LEG.GV;w.lgap=w.gap;LEG.stat.gap++;}
       if(w.mv&&w.gap&&w.warn<=0&&!w.hit){w.gap.y+=w.gv*dt;if(w.gap.y<70||w.gap.y>H-70){w.gv=-w.gv;w.gap.y=clamp(w.gap.y,70,H-70);}}}
-    t0.apply(this,arguments);if(LEG.act())for(const w of this.walls){if(w.lgap&&w.gap!==w.lgap)w.gap=w.lgap;if(w.gap&&!w.cur)w.gap.h=Math.min(w.gap.h,LEG.GAP);}};   // counter.js re-rolls a gap at the warning's end
+    LEG.wt=LEG.act();try{t0.apply(this,arguments);}finally{LEG.wt=0;}if(LEG.act())for(const w of this.walls){if(w.lgap&&w.gap!==w.lgap)w.gap=w.lgap;
+      if(!w.cur&&w.gap&&!w.lgap){const s=P.y>H/2?-1:1;w.gap.y=clamp(P.y+s*LEG.GOFF*(1+.5*GR()),70,H-70);w.lgap=w.gap;}   /* the no-charge gap opens away from the ship too: an empty dash means read and move */if(w.gap&&!w.cur)w.gap.h=Math.min(w.gap.h,LEG.GAP);}};   // counter.js re-rolls a gap at the warning's end
+    {const h0=hurt;hurt=function(n){return h0.call(this,LEG.wt?Math.max(n||1,LEG.WD):n);};}   // c. a laser wall hit costs LEG.WD hull on Legend (2: the shell's heavy hit)
     const s0=CTR.start;CTR.start=function(k){if(LEG.act()&&k==='curt'){this.wall();const w=this.walls[this.walls.length-1];if(w)w.mv=1;return;}return s0.apply(this,arguments);};}
   /* 5. bosses: one more verb per phase */
   if(window.BMV){const i0=BMV.init;BMV.init=function(e){i0.apply(this,arguments);if(!LEG.act()||!e.bm||!e.lists)return;const T=e.bm.T;
