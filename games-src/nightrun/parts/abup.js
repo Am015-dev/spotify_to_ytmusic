@@ -141,14 +141,14 @@ if(ABUP.on){
   /* Garage tab ABILITY */
   {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='abil';b.type='button';b.textContent='ABILITY';tb.appendChild(b);b.addEventListener('click',()=>{GA.tab='abil';gaDraw();});}
   {const gd=gaDraw;gaDraw=function(){if(GA.tab!=='abil')return gd.apply(this,arguments);if(garageEl.hidden&&window.labEl&&!labEl.hidden)return gd.apply(this,arguments);
-    $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const t of garageEl.querySelectorAll('.tabs button'))t.classList.toggle('on',t.dataset.t==='abil');
+    $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+window.fmtN(GA.bank)+'</b>';for(const t of garageEl.querySelectorAll('.tabs button'))t.classList.toggle('on',t.dataset.t==='abil');
     const gp=$('gaPic');if(gp)gp.style.display='none';const box=$('gaCards');box.innerHTML='';box.classList.remove('fgbox','wpt');box.classList.add('tune');
     for(const u of ABUP.U){const own=ABUP.own[u.id]===1,c=document.createElement('button');c.type='button';c.className='card'+(own?' max':GA.bank<u.p?' no':'');c.style.setProperty('--c',own?'#8c86b8':u.c);c.dataset.id='ab_'+u.id;c.dataset.kind='abup';
       const pic=window.ART&&ART.rd&&ART.rd.has('abup-'+u.id+'.webp')?`<img class="abI" src="${ART.base}abup-${u.id}.webp" alt="" decoding="async">`:svgI(u.ic,u.c);
-      c.innerHTML=pic+`<div class="tx"><div class="n">${u.n}</div><div class="t">${u.t}</div></div><div class="pr">${own?'OWNED':neonI+' '+u.p}</div>`;
+      c.innerHTML=pic+`<div class="tx"><div class="n">${u.n}</div><div class="t">${u.t}</div></div><div class="pr">${own?'OWNED':neonI+' '+window.fmtN(u.p)}</div>`;
       c.addEventListener('click',()=>{if(own){gaMsg(u.n+' is yours');return;}if(GA.bank<u.p){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');gaMsg('Need '+(u.p-GA.bank)+' more Neon');return;}
         if(ABUP.buy(u.id)){AU.sfx('up');gaMsg(u.n+' unlocked');gaDraw();}});box.appendChild(c);}
-    try{$('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+window.fmtN(GA.bank);}catch(e){}};}
+    try{$('gaBtn').innerHTML='GARAGE '+neonI+' '+window.fmtN(GA.bank);}catch(e){}};}
 }
 ABUP.T={get GA(){return GA;},gsave:()=>gsave(),open:f=>openGarage(f),close:()=>closeGarage(),emit:(n,d)=>NR.emit(n,d)};   // test handle
 window.__abup=ABUP;

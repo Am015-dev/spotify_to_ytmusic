@@ -136,7 +136,7 @@ FG2.draw=function(box){const s=FG.st(),lo=s.lo,U=FGU,F=this,own=WP_IDS.filter(id
   const st=el('div','f2-st');box.appendChild(st);
   const hint=this.tab==='p'?'SAVE keeps your ship slots and mods; LOAD puts them back':INV.sel?U.name(INV.sel)+': tap a ship slot, or tap again for info':!U.a&&!U.b?'Tap 2 weapon cards: they fill A and B':why||'Ready: press MERGE';
   st.appendChild(el('div','f2-msg',fgEsc(INV.msg||hint),{id:'fgMsg',role:'status','aria-live':'polite'}));
-  st.appendChild(el('div','f2-wal',neonI+' <b>'+GA.bank+'</b><br><b id="fuScrap">'+s.scrap+'</b> scrap'));
+  st.appendChild(el('div','f2-wal',neonI+' <b>'+window.fmtN(GA.bank)+'</b><br><b id="fuScrap">'+s.scrap+'</b> scrap'));
   // ---- bench
   const Z=el('section','f2-p f2-bench',null,{'data-lesson':'forge-zone',id:'fuForge','aria-label':'Forge bench'});box.appendChild(Z);
   const row=el('div','f2-row');Z.appendChild(row);

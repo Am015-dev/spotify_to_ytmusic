@@ -19,6 +19,8 @@ if(RET.hub)setTimeout(()=>{
 .hub #title #titleRow2{display:none}
 #hubStat{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:center;width:100%;box-sizing:border-box;background:#05030ce6;border:1px solid #3a2b5c;border-radius:8px;padding:6px 10px;font:600 14px/1.3 var(--mono);color:#d6d2f5}
 #hubStat b{color:#fff;font-weight:700}#hubStat .ok{color:#6cf59a}#hubStat .nI{width:1em;height:1em;vertical-align:-.12em}
+#playBtn small{display:block;white-space:nowrap;max-width:100%;font-size:12px;letter-spacing:.02em}
+#hubStat #hubHint{flex:0 0 100%;background:none;padding:0;border:0}
 #hubHint{width:100%;box-sizing:border-box;text-align:center;font:600 14px/1.3 var(--mono);color:#ffe14d;background:#05030ce6;border-radius:8px;padding:5px 10px}
 #hubHint:empty,#hubStory:empty{display:none}
 #hubStory:has(>button){background:none;border:0;padding:0}
@@ -70,7 +72,7 @@ if(RET.hub)setTimeout(()=>{
   const grid=document.createElement('div');grid.id='hubGrid';
   const TILES=[['missions','MISSIONS','go alt'],['hangar','HANGAR','go'],['training','TRAINING','go dim'],['profile','PROFILE','go dim']],tile={};
   for(const [k,l,c] of TILES){const b=B(c,l+'<small></small><i class="hubDot" hidden></i>',()=>k==='hangar'?openHangar():openSec(k),'hub_'+k);tile[k]=b;grid.append(b);}
-  $('playBtn').after(stat,hint,story,grid);
+  $('playBtn').after(stat,story,grid);
   const sgIn=()=>{const t=$('sgTile');if(t&&t.parentNode!==story)story.append(t);};sgIn();setTimeout(sgIn,120);setTimeout(sgIn,1500);   // saga.js puts its STORY tile after #ttMain when it runs first
   /* ---- section sheets (inside #title, like the old MENU sheet) ---- */
   const SECS={
@@ -160,7 +162,7 @@ if(RET.hub)setTimeout(()=>{
     stat.innerHTML='<span>Stage <b>'+n+'</b>/'+STAGES.length+'</span><span>'+neon()+'</span>'+(d?'<span>Daily '+(d.claimed?'<span class="ok">✓ streak '+d.streak+'</span>':'<b>+'+d.reward+'</b>')+'</span>':'')+(w?'<span>Weekly '+(w.cleared?'<span class="ok">✓</span>':'<b>open</b>')+'</span>':'');
     const tut=!load_('mnr_tut'),fresh=!Object.keys(sSave.stars).some(k=>(sSave.stars[k]|0)>0);
     hint.textContent=tut&&fresh?'Next: learn the controls in TRAINING':aff?'Next: buy '+(aff>1?'an upgrade':'the upgrade')+' in HANGAR ('+aff+' ready)':d&&!d.claimed&&!fresh?'Next: fly the DAILY RUN in MISSIONS for +'+d.reward+' Neon':'';
-    const td=$('taleDot');
+    stat.append(hint);hint.hidden=!hint.textContent;const td=$('taleDot');
     const dots={missions:!!(d&&!d.claimed&&!fresh),hangar:aff>0,training:tut,profile:!!(td&&!td.hidden)};
     const sub={missions:'map · daily',hangar:aff?aff+' to buy':'ship · weapons',training:'school · lab',profile:'stats · settings'};
     for(const k in tile){tile[k].querySelector('.hubDot').hidden=!dots[k];tile[k].querySelector('small').textContent=sub[k];}
@@ -229,14 +231,14 @@ if(GF.on){
 `;document.head.appendChild(st);}
 garageEl.classList.add('gfx');
 const box0=()=>$('gaCards');
-const nnum=s=>{const m=/(\d+)\s*$/.exec((s||'').trim());return m?+m[1]:0;};
+const nnum=s=>{const m=/([\d.]+)\s*$/.exec((s||'').trim());return m?+m[1].replace(/\./g,''):0;};
 const gfSecOf=c=>{const id=c.dataset.id||'';return c.dataset.kind==='tune'?pathOf(id.replace(/^tp_/,'')):c.dataset.kind==='crew'?pathOf(id.replace(/^up_|^pu_/,'')):null;};
 const SECORD=()=>Object.keys(PATHS).concat(['_']);
 /* one card: a BUY pill with the price (or the reason you cannot buy), once per node */
 function gfCard(c){if(c.dataset.gf)return;c.dataset.gf=1;const pr=c.querySelector('.pr');if(!pr||!/^(tune|ship|crew|theme|abil|market)/.test(c.dataset.kind||''))return;
   const t=pr.textContent.trim(),price=pr.querySelector('.nI')?nnum(t):0;c._raw=c.outerHTML;
   if(c.classList.contains('sold')||c.classList.contains('max')||!price)return;
-  if(GA.bank<price){pr.innerHTML='Need '+(price-GA.bank)+' more '+neonI;c.setAttribute('aria-disabled','true');c.title='Not enough Neon: need '+(price-GA.bank)+' more';}
+  if(GA.bank<price){pr.innerHTML='Need '+window.fmtN(price-GA.bank)+' more '+neonI;c.setAttribute('aria-disabled','true');c.title='Not enough Neon: need '+(price-GA.bank)+' more';}
   else pr.innerHTML='BUY '+pr.innerHTML;}
 function gfRecWho(box){if(GA.tab==='tune'){let r=null;try{r=recTune();}catch(e){}const d=r&&TP_DEF.find(x=>x.id===r);if(d){const pr=tuneNext(d);return pr?{id:'tp_'+d.id,n:d.n,lv:TP.raw(d.id)+1,p:pr}:null;}return null;}
   let best=null;for(const c of box.querySelectorAll('.card'))if(!c.classList.contains('no')&&!c.classList.contains('sold')&&!c.classList.contains('max')&&c.querySelector('.pr .nI')){const p=nnum(c.querySelector('.pr').textContent);if(p&&(!best||p<best.p))best={id:c.dataset.id,n:(c.querySelector('.n')||c).textContent.replace(/\d+\/\d+$/,'').trim(),lv:0,p};}
@@ -250,7 +252,7 @@ function gfBar(box){let bar=box.querySelector('.gfBar');const cards=[...box.quer
     +secs.map(k=>`<button type="button" class="gfChip sec" data-k="${k}" style="--c:${k==='_'?'#8c86b8':PATHS[k].c}">${k==='_'?'OTHER':PATHS[k].n.toUpperCase()}</button>`).join('');}
 function gfRec(box){let r=box.querySelector('.gfRec');const w=gfRecWho(box);if(!w){if(r)r.remove();return;}
   if(!r){r=document.createElement('button');r.type='button';r.className='gfRec';box.querySelector('.gfBar').after(r);}
-  r.dataset.for=w.id;r.innerHTML='<span class="rt">RECOMMENDED NEXT</span><span class="rn">'+w.n+(w.lv?' · Lv '+w.lv:'')+'</span><span class="gfBuy">BUY '+neonI+' '+w.p+'</span>';}
+  r.dataset.for=w.id;r.innerHTML='<span class="rt">RECOMMENDED NEXT</span><span class="rn">'+w.n+(w.lv?' · Lv '+w.lv:'')+'</span><span class="gfBuy">BUY '+neonI+' '+window.fmtN(w.p)+'</span>';}
 function gfFilter(box){const cards=[...box.querySelectorAll('.card')];
   for(const c of cards){const off=GF.aff&&(c.classList.contains('no')||c.classList.contains('sold')||c.classList.contains('max'))&&c.dataset.id!==GF.keep;c.classList.toggle('gfhide',off);}
   for(const h of box.querySelectorAll('.gfSec')){let n=h.nextElementSibling,any=false;while(n&&!n.classList.contains('gfSec')){if(n.classList.contains('card')&&!n.classList.contains('gfhide'))any=true;n=n.nextElementSibling;}h.classList.toggle('gfhide',!any);}}
@@ -271,7 +273,7 @@ let g0=gaDraw,inp=null;
 {gaDraw=function(){const box=box0(),hidden=garageEl.hidden;if(!hidden&&GF.last===GA.tab)GF.mem[GA.tab]=box.scrollTop;
   const patch=inp&&GA.tab==='tune'&&!hidden&&box.querySelector('.card[data-kind=tune]')&&box.classList.contains('gfg');
   if(patch){const top=box.scrollTop;GF.busy++;GF.keep=inp;
-    $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
+    $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+window.fmtN(GA.bank)+'</b>';
     const tmp=document.createElement('div');tuneDraw(tmp);
     for(const c of box.querySelectorAll('.card'))if(c._raw===undefined&&c.dataset.gf)c._raw=c.outerHTML;
     // a purchase can change the price text of every card (the "Need N more" reason): compare the raw markup of the fresh card with the live card before decoration
