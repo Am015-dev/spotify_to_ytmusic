@@ -57,7 +57,7 @@ Object.defineProperty(CHO,'wellPull',{get(){return this.on&&this.hard()?130:240;
 /* back-line drag (hard tiers): a ship whose mean x is behind BACK+20 (full at BACK-30) loses up to BK x its power over the stage's expectation, on its hits and on its share of
    hard.js's ceiling (S3.cap is only ever lowered here, never raised). A fresh ship (SC.f 0) and a ship up front lose nothing. */
 CHO.BK=.9;CHO.backK=function(){if(!this.on||!this.hard()||!G||!G.live||this.ax==null)return 1;const bk=clamp((this.BACK+20-this.ax)/50,0,1);return 1-this.BK*bk*(window.SC?SC.f():0);};
-{const h=DMG.hit;DMG.hit=function(d,b,e){const v=h.call(this,d,b,e);if(!CHO.on||!G||!G.live)return v;return v*(1+CHO.dk)*CHO.backK();};}
+HOOK['DMG.hit'](h=>function(d,b,e){const v=h.call(this,d,b,e);if(!CHO.on||!G||!G.live)return v;return v*(1+CHO.dk)*CHO.backK();});
 if(window.S3){const c0=S3.cap;S3.cap=function(){return c0.apply(this,arguments)*Math.min(1,CHO.backK());};}
 CHO.note=function(k,id){const r={k,id,t:+G.t.toFixed(1),st:ST.on?ST.n:0};this.log.push(r);this.stat.n++;NR.emit('choice',r);};
 CHO.hint=function(){if(this.hinted)return;this.hinted=1;try{if(localStorage.getItem('mnr_chohint'))return;localStorage.setItem('mnr_chohint','1');}catch(e){}

@@ -211,7 +211,7 @@ DRAW.extra.push(function(t){try{FLEET.over(t);}catch(err){}});
     if(!RET.fleet||fill||k||!FLEET.ok()||FLEET.busy())return so.apply(this,arguments);
     const n=FLEET.n(),p=FLEET.p(n);if(p<=0||GR()>=p)return so.apply(this,arguments);
     if(FLEET.wave(n))return;return so.apply(this,arguments);}; }
-{ const h0=DMG.hit;DMG.hit=function(d,b,e){if(RET.fleet&&e&&e.fsh&&!(G.empT>0))return 0;return h0.apply(this,arguments);}; }   // the carrier shield: no damage while its drones live (EMP still cuts through)
+HOOK['DMG.hit'](h0=>function(d,b,e){if(RET.fleet&&e&&e.fsh&&!(G.empT>0))return 0;return h0.apply(this,arguments);});   // the carrier shield: no damage while its drones live (EMP still cuts through)
 { const bl=ZOO.block;ZOO.block=function(b,e){if(RET.fleet&&e&&e.fsh&&!(G.empT>0)){FLEET.stat.absorbed++;if(FLEET.fx.length<40)FLEET.fx.push({x:b.x,y:b.y,l:.2,m:.2,c:'#4ad1ff',k:'ring',r:12});return true;}return bl.apply(this,arguments);}; }
 NR.on('runStart',()=>{if(!RET.fleet)return;FLEET.init();FLEET.reset();});
 NR.on('runEnd',()=>{FLEET.bombs=[];FLEET.fx=[];});

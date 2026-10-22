@@ -121,7 +121,7 @@ RX.shut=function(e,b){if(!this.on||!e||!e.rx)return false;
   const c=e.rx.cov;if(c&&this.ok(c)&&b){const x1=b.x,y1=b.y,dx=e.x-x1,dy=e.y-y1,L2=dx*dx+dy*dy||1,u=clamp(((c.x-x1)*dx+(c.y-y1)*dy)/L2,0,1);
     if(Math.hypot(x1+u*dx-c.x,y1+u*dy-c.y)<c.r+14){this.stat.block++;return true;}}
   return false;};
-{const h0=DMG.hit;DMG.hit=function(dm,b,e){const v=h0.apply(this,arguments);if(e&&RX.shut(e,b)){if(G.t-(e.rxB||0)>.6){e.rxB=G.t;floater(e.x,e.y-e.r-12,e.rxA?'WAIT FOR IT':'FLANK IT','#19e3ff');}return 0;}return v;};}
+HOOK['DMG.hit'](h0=>function(dm,b,e){const v=h0.apply(this,arguments);if(e&&RX.shut(e,b)){if(G.t-(e.rxB||0)>.6){e.rxB=G.t;floater(e.x,e.y-e.r-12,e.rxA?'WAIT FOR IT':'FLANK IT','#19e3ff');}return 0;}return v;});
 /* tells and marks, drawn over the enemies */
 RX.over=function(t){if(!RX.on||!running)return;const mo=RET.motion?RET.motion():!(SET.rm||RM);ctx.save();ctx.lineWidth=2;
   for(const e of G.en){const r=e.rx;if(!r||e.dead||e.hp<=0)continue;

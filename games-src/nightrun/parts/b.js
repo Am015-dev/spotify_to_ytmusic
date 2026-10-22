@@ -135,6 +135,7 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
       e.hq=e.hp;}
     const a=Math.min(1,dt/2);this.dps+=(raw/Math.max(dt,1e-3)-this.dps)*a;
     const m=this.dps/this.ref;this.k=m<=1?1:Math.min((1+(m-1)*this.half)/m,this.ceil/m);}};
+hookable('DMG.hit',()=>DMG.hit,f=>DMG.hit=f);   // layers (build order): hard, react, reward, choices, grit, anticamp, pacing, fleet, arsenal; arsenal runs first (outermost)
 window.__dmg=DMG;
 NR.on('runStart',()=>{DMG.dps=0;DMG.k=1;});
 /* ---------- spawning ---------- */

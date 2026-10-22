@@ -75,6 +75,6 @@ NR.on('kill',d=>{const e=d&&d.e;if(!AC.on||!G||!G.live||G.dead||!e||d.boss||e.ty
   AC.fk=(AC.fk||0)+1;if(AC.fk<10||G.t-(AC.fkT||-99)<25||P.hp>=P.max)return;AC.fk=0;AC.fkT=G.t;AC.stat.rep=(AC.stat.rep||0)+1;
   G.pk.push({t:'hp',x:Math.min(e.x,W-80),y:e.y,vx:-60,vy:0,bob:0});floater(e.x,e.y-30,'FORWARD REPAIR','#7dff7a');});
 if(window.MM){const w0=MM.win;MM.win=function(){const w=w0.call(this);return AC.on&&AC.soft()&&AC.lv<=.5?Math.max(w,6):w;};}   // Easy/Normal: the strike is a last resort after 6 s still
-{const h=DMG.hit;DMG.hit=function(d,b,e){const v=h.apply(this,arguments);if(!AC.on||!G||!G.live)return v;return v*AC.reachK(b,e);};}
+HOOK['DMG.hit'](h=>function(d,b,e){const v=h.apply(this,arguments);if(!AC.on||!G||!G.live)return v;return v*AC.reachK(b,e);});
 if(window.ABIL){const g0=ABIL.gain;ABIL.gain=function(v){return g0.call(this,AC.on?v*AC.payK():v);};}
 DRAW.extra.push(function(t){try{AC.draw(t);}catch(err){}});

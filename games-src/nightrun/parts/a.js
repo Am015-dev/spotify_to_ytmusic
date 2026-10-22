@@ -3,6 +3,11 @@
 "use strict";
 const W=960,H=540,PR=1.5;
 const $=id=>document.getElementById(id);
+// HOOK (consolidation step 3): a function that later parts extend has ONE definition in its owner part, which calls hookable(name,get,set).
+// Each layer registers with one line, HOOK[name](prev=>function(..){..prev..}); HOOKS[name] lists the layers in registration order
+// (build order of the parts, runtime inits last); the last registered runs outermost. WHERE.md lists each function's home and layers.
+const HOOK={},HOOKS={};
+function hookable(n,get,set){HOOKS[n]=[];HOOK[n]=w=>{HOOKS[n].push(w);set(w(get()));};}
 const cv=$('game'),frame=$('frame'),stage=$('stage');
 let ctx=cv.getContext('2d',{alpha:false});                              // the context everything draws on right now
 const vctx=ctx;                                         // the visible canvas

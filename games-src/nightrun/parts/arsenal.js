@@ -92,8 +92,8 @@ if(PWX.on){
   {const ab=SH.absorb;SH.absorb=function(){const S=G&&G.px;if(S&&S.chg&&S.chg.k==='bubble'&&!G.dead){S.chg=null;P.inv=Math.max(P.inv,1.2);shake(6);burst(P.x,P.y,PWX.K.bubble.c,24,300,.45);floater(P.x,P.y-24,'BUBBLE POP',PWX.K.bubble.c);AU.sfx('hurt');PWX.stat.bubble++;return true;}
     return ab.call(this);};}
   /* ----- GLASS CANNON: shot value x2 before the per-shot cap; i-frames halved after a real hit ----- */
-  {const h0=DMG.hit;DMG.hit=function(d,b,e){if(b&&b.pl&&e){if(e.shl)e.shl=0;if(e.sh)e.sh=0;}
-    if(G&&G.live&&PW.on('glass')){PWX.stat.glass++;return h0.call(this,d*2,b,e);}return h0.call(this,d,b,e);};}
+  HOOK['DMG.hit'](h0=>function(d,b,e){if(b&&b.pl&&e){if(e.shl)e.shl=0;if(e.sh)e.sh=0;}
+    if(G&&G.live&&PW.on('glass')){PWX.stat.glass++;return h0.call(this,d*2,b,e);}return h0.call(this,d,b,e);});
   NR.on('hurt',()=>{if(G&&G.live&&PW.on('glass'))P.inv*=.5;});
   /* ----- LANCE BURST: breaks a shielder's front shield instead of being blocked ----- */
   if(window.ZOO&&ZOO.block){const bl=ZOO.block;ZOO.block=function(b,e){if(b&&b.pl&&e&&e.shN>0){e.shN=0;e.shF=.12;PWX.stat.pop++;burst(e.x,e.y,'#4ad1ff',14,220,.4);floater(e.x,e.y-e.r-18,'SHIELD DOWN','#4ad1ff');return false;}return bl.call(this,b,e);};}

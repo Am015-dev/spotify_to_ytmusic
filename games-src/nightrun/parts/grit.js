@@ -73,7 +73,7 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
   const d0=ABIL.draw;ABIL.draw=function(t){d0.call(this,t);GRIT.draw();};}
 /* hooks: the damage that reaches the hull, the weapon level curve, the hull factor on Normal, the spawn tag */
 {const l0=VIS.life;VIS.life=function(e){const b=l0.call(this,e);return GRIT.norm()&&b>0?b*GRIT.fk(e):b;};
-  const h0=DMG.hit;DMG.hit=function(d,b,e){const r=h0.call(this,d,b,e);return GRIT.on?GRIT.hit(r,b,e):r;};
+  HOOK['DMG.hit'](h0=>function(d,b,e){const r=h0.call(this,d,b,e);return GRIT.on?GRIT.hit(r,b,e):r;});
   Object.defineProperty(SC,'lvTop',{get(){return GRIT.norm()?GRIT.lvTop:.8;},set(){},configurable:true});
   const k0=SC.hpK.bind(SC);SC.hpK=()=>{const v=k0();return GRIT.norm()&&v!=null?v*(1+(GRIT.norm()?GRIT.hkN:GRIT.hk0)+GRIT.hkS*SC.f()):v;};
   const e0=en;en=function(type,o){const e=e0(type,o||{});try{GRIT.tag(e);}catch(x){}return e;};}

@@ -45,7 +45,7 @@ const PAC=window.PAC={
     if(!this.on()||!this.soft()||e.type==='boss'||e.mini||e.type==='swarm'||e.type==='gate')return;
     const n=ST.on?ST.n:20,big=this.BIG.includes(e.type),k=big?this.hitsBig:e.el?this.hitsEl:this.hits+(n>15?1:0),cap=Math.max(1,Math.ceil(k*this.dph*UPS.hp));   // power-aware like the hulls it trims
     if(e.hp>cap){e.hp=cap;e.max=cap;this.stat.trims++;}}};
-{ const h0=DMG.hit;DMG.hit=function(d,b,e){const v=h0.apply(this,arguments);if(e&&b&&v>0&&e.type!=='boss'&&!(G.empT>0)){e.phc=(e.phc||0)+1;PAC.dph+=(v-PAC.dph)*.02;}return v;}; }   // e.phc: hits a foe has taken (read by the tests); PAC.dph: what one hit of the ship takes off (running average, before the on-screen floor)
+HOOK['DMG.hit'](h0=>function(d,b,e){const v=h0.apply(this,arguments);if(e&&b&&v>0&&e.type!=='boss'&&!(G.empT>0)){e.phc=(e.phc||0)+1;PAC.dph+=(v-PAC.dph)*.02;}return v;});   // e.phc: hits a foe has taken (read by the tests); PAC.dph: what one hit of the ship takes off (running average, before the on-screen floor)
 if(RET.pacing){
   { const ab=ARC.bars;ARC.bars=function(s,full){const b=ab.call(this,s,full);
       if(!RET.pacing||s.ch||!this.active()||s.goal.k==='boss'||s.goal.k==='mini')return b;

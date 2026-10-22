@@ -32,10 +32,10 @@ const S3auto=b=>b&&b.au&&(b.tu||0)>.2;                           // a shot that 
   const tk=dt*2.2*k*.75,dv=clamp(want,-tk,tk),a=cur+dv;b.tu=(b.tu||0)+Math.abs(dv);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;};}
 {const vol=SH.volley;SH.volley=function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);const k=typeof PW2!=='undefined'&&PW2.cresK?PW2.cresK():1;if(k>1)for(let i=n0;i<G.pb.length;i++)G.pb[i].ck=k;};}
 /* every bullet hit (b.js passes the bullet and the enemy) and every weapon hit (WP.hurtE) is counted; arc and leap chains are auto-aim */
-{const h0=DMG.hit;DMG.hit=function(d,b,e){let v=h0.call(this,d);S3.cur=null;const au=S3auto(b),boss=e&&e.type==='boss';
+{HOOK['DMG.hit'](h0=>function(d,b,e){let v=h0.call(this,d);S3.cur=null;const au=S3auto(b),boss=e&&e.type==='boss';
   if(au)S3.au+=v;else S3.man+=v;
   if(boss){if(au)S3.st.bau+=v;else{S3.st.bman+=v;e.s3a=G.t;}}
-  if(S3.act()&&au)v*=boss?Math.min(S3.ka,S3.bA):S3.ka;if(au)S3.st.aup+=v;return v;};
+  if(S3.act()&&au)v*=boss?Math.min(S3.ka,S3.bA):S3.ka;if(au)S3.st.aup+=v;return v;});
  const hu=WP.hurtE;WP.hurtE=function(e,dm){if(S3.ctx){S3.au+=dm;if(e.type==='boss')S3.st.bau+=dm;if(S3.act())dm*=e.type==='boss'?Math.min(S3.ka,S3.bA):S3.ka;}else{S3.man+=dm;if(e.type==='boss'){S3.st.bman+=dm;e.s3a=G.t;}}return hu.call(this,e,dm);};
  for(const f of['arcZap','leap']){const o=WP[f];WP[f]=function(...a){S3.ctx++;try{return o.apply(this,a);}finally{S3.ctx--;}};}}
 /* A. the damage ceiling on ordinary enemies, applied where DMG.pass books each frame's hull loss */

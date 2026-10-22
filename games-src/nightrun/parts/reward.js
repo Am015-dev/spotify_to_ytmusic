@@ -47,7 +47,7 @@ const RWD=window.RWD={get on(){return!!RET.reward;},
       else{ctx.translate(P.x+40,P.y);ctx.rotate(Math.PI/2);ctx.strokeText(txt,0,0);ctx.fillStyle=col;ctx.fillText(txt,0,0);}}
     ctx.restore();}};
 /* damage: inside the DMG.hit chain (after hard.js's auto/manual split), so every later cap still sees the final number */
-{const h=DMG.hit;DMG.hit=function(d,b,e){const v=h.call(this,d,b,e);if(!RWD.on||!G||!G.live||!b)return v;return v*RWD.dmK(b,e);};}
+HOOK['DMG.hit'](h=>function(d,b,e){const v=h.call(this,d,b,e);if(!RWD.on||!G||!G.live||!b)return v;return v*RWD.dmK(b,e);});
 NR.on('graze',d=>{if(RWD.on&&G&&G.live&&!G.dead)RWD.graze(!!(d&&d.pf));});
 NR.on('hurt',()=>{if(RWD.on&&G)RWD.hurt();});
 NR.on('tick',dt=>{if(RWD.on&&G&&G.live&&!G.dead)RWD.tick(dt);});
