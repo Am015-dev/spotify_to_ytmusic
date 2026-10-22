@@ -41,7 +41,7 @@ BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=
   // aura ring: phase 1 thin cyan, 2 amber double, 3 red thick and pulsing; a ground boss gets the upper arc only
   const R=BV.RING[ph-1],rr=Math.max(hw,hh)*.5*R[1]+e.r*.35,pu=red?0:Math.sin(t*(3+ph*2))*(ph-1)*2;
   ctx.globalCompositeOperation='lighter';ctx.strokeStyle=R[0];ctx.lineWidth=R[2];ctx.globalAlpha=.3+.1*ph;
-  for(let i=0;i<(ph===2?2:1);i++){ctx.beginPath();const r=rr+i*8+pu;if(ground)ctx.ellipse(0,hh*.3,r*1.25,r,0,Math.PI,Math.PI*2);else ctx.arc(0,by,r,0,7);ctx.stroke();}
+  for(let i=0;i<(ph===2?2:1);i++){ctx.beginPath();const r=Math.min(rr+i*8+pu,56/k30/Math.max(.05,BV.rect.s*(ctx.canvas.getBoundingClientRect().width/ctx.canvas.width||1)));if(ground)ctx.ellipse(0,hh*.3,r*1.25,r,0,Math.PI,Math.PI*2);else ctx.arc(0,by,r,0,7);ctx.stroke();}
   ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
   // armour plates: slot s is gone in phase s+2 and later (phase 2 loses one, phase 3 two); intact plates are steel chips, gone ones a dark scar with cracks
   const lost=ph-1,v=e.bv;

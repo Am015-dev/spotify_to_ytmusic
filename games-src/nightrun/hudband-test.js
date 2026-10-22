@@ -24,7 +24,7 @@ const SHIP_MIN = +process.env.SHIP_MIN || 80, SECS = +process.env.SECS || 45, [S
     const m = window.__mnr, G = m.G, P = m.P; m.god = true; m.simOn(true); m.RET.shipBlink = !!old;
     let n = 0; while (G.t < 0.1 && n++ < 20) m.step(1 / 60);
     const cv = document.getElementById('game'), g = cv.getContext('2d'), k = cv.width / 540, half = Math.round(28 * k), px = () => Math.round(P.y * k), py = () => Math.round((960 - P.x) * cv.height / 960);
-    const grab = () => g.getImageData(Math.max(0, px() - half), Math.max(0, py() - half), 2 * half, 2 * half).data, cnt = [];
+    const bx = px(), by = py(), grab = () => g.getImageData(Math.max(0, bx - half), Math.max(0, by - half), 2 * half, 2 * half).data, cnt = [];   // the box stays where the ship was: moving P also moved a live box onto the moved ship and the test then compared two hulls (it only passed on backdrop differences)
     for (let i = 0; i < 12; i++) { const t = G.t + i * 0.083; m.render(t, 0); const a = grab(); P.x += 420; m.render(t, 0); const b = grab(); P.x -= 420;
       let c = 0; for (let j = 0; j < a.length; j += 4) if (Math.abs(a[j] - b[j]) + Math.abs(a[j + 1] - b[j + 1]) + Math.abs(a[j + 2] - b[j + 2]) > 60) c++; cnt.push(c); }
     m.RET.shipBlink = false; return { gt: +G.t.toFixed(2), min: Math.min(...cnt), max: Math.max(...cnt), px: 4 * half * half, cnt: cnt.join(' ') };
