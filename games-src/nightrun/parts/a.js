@@ -47,6 +47,7 @@ if(!SET.v3){SET.v3=1;if(SET.guide===false)SET.cue='off';if(SET.reduce){SET.rm=tr
 SET.mute=load('mnr_mute',false);
 function deriveSet(){SET.calm=SET.part<2;SET.reduce=!!SET.rm||SET.flash<2;}deriveSet();   // calm = fewer sparks; reduce = no strobing blinks
 const saveSet=()=>{deriveSet();save('mnr_set',SET);save('mnr_mute',SET.mute);};
+if(!SET.afv){SET.afv=1;SET.auto=true;saveSet();}   // auto-fire is ON for every save once (22 Oct: a phone with an old 'off' save never fired); only the visible Settings toggle turns it off from here on
 const SIM=/[?&]sim=1/.test(location.search);            // test switch: no audio context at all, the page is stepped by hand (__mnr.step)
 const NOMUSIC=SIM||/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
 try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}   // iOS: Web Audio ignores the silent switch only in the 'playback' session

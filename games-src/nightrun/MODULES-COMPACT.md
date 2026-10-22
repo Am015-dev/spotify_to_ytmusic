@@ -43,7 +43,7 @@ variants|12|one enemy, many looks (size, reversed)|variants,variants
 scale|3|power-aware enemy scale, round 1|scale,scale
 powerups|12|six music-tied timed power-ups + drum burst|pw2,pw2
 flow|6|the song never stops or stutters|flow,flow
-musicpack|15|polish music cues played by context|musicpack,musicpack
+musicpack|16|polish music cues played by context|musicpack,musicpack
 storydata|20|every line of the campaign story (data only; saga.js plays i|story,story
 tale|21|story cast, beats, dialogue card, STORY LOG|tale,tale
 stats|21|counters, achievements, completion %|stats,stats
@@ -59,7 +59,7 @@ g|62|G: owner test checklist, first-tap buttons, power-up levels,|-
 wpx|21|4b. WEAPON LEVELS BOUGHT IN THE GARAGE + EIGHT MORE WEAPONS |-
 fair|13|scale round 2, must-move column strike, strike follow-up|scale2,scale2,mustmove+
 hard|6|scale round 3: power-aware enemy hull|scale3,scale3
-react|15|enemies react to the ship, not fixed paths|react,react
+react|14|enemies react to the ship, not fixed paths|react,react
 armour|8|boss HP phases, damage cap, last stand|boss2,boss2
 reward|6|risk pays: graze chain multiplier|reward,reward
 choices|9|build pressure and real choices (default OFF)|build2,build2
@@ -75,7 +75,7 @@ counter|12|threats that make DASH and EMP the answer|counter,counter
 timing|12|DASH/EMP as beat-and-window decisions|timing,timing
 visible|3|enemies live long enough to be seen and fought|vis,vis
 grit|10|slower EMP meter, tougher varied enemies|grit,grit,gritBoss
-density|5|per-stage budget of enemy bullets on screen|density,density
+density|6|per-stage budget of enemy bullets on screen|density,density
 bossplay|32|boss encounter mechanics (gates, ignoring a boss costs)|bossplay,bossplay
 rules|21|new-mechanic cadence, returns with a twist|rules,rules
 novelty|12|late-run escalation layer|novelty,novelty
@@ -99,7 +99,7 @@ cp|10|checkpoints with grace on long stages|cp,cp
 fs|5|phone full screen on first tap|fs,fs
 readable|11|bullets and threats readable at a glance|read,read
 bulletart|1|real bullet pictures (converted approved previews) for enemy|bulletart,bulletart
-legible|5|enemies, enemy bullets and pickups readable on every stage b|legible,legible
+legible|7|enemies, enemy bullets and pickups readable on every stage b|legible,legible
 arsenal|17|12 extra power-ups and the context-aware drop picker|powers,powers
 abup|20|DASH/EMP upgrades and power-up interaction|abup,abup
 zonehint|3|one-line caption on the first purple ring (gravity well) of |zonehint,zonehint
@@ -117,7 +117,7 @@ school|15|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,sc
 schoolfull|13|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
 menufix|4|HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 p|menufix,menufix
-explain|15|every fly-stage visual is explained: first-appearance captio|explain,explain
+explain|26|every fly-stage visual is explained: first-appearance captio|explain,explain
 calm|6|a calm playfield: rule banners small in the top band, thin s|calm,calm
 c|35|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

@@ -21,7 +21,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | scale | scale SC 8-24 | footart |  | scale | BALANCE |
 | pw2 | powerups PW2 15-107 |  |  | ret-pw2 |  |
 | flow | flow NRF.sync 27-44 |  |  | ret-flow |  |
-| musicpack | musicpack mpBand 62-62 |  |  | musicpack |  |
+| musicpack | musicpack mpBand 69-69 |  |  | musicpack |  |
 | story | storydata STORY_LINES 29-240 |  |  | story |  |
 | tale | tale TALE_BEATS 21-203 |  |  | tale |  |
 | stats | stats open 178-217 |  |  | stats | POLISH |
@@ -38,7 +38,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | bossmoves | bossmoves vd 98-178 |  |  | bossmoves |  |
 | bossvis,first30 | bossvis BV.tag 65-103 |  |  | bossvis |  |
 | pw3 | powlevels PW3 36-188 | power,a |  | ret-pw3 |  |
-| abil | abilities ABIL 24-101 | a,art |  | abil |  |
+| abil | abilities ABIL 24-101 | a,art | explain | abil |  |
 | forge | forge FG 65-183 |  |  | forge |  |
 | forge | inventory INV.draw 54-112 |  |  | forge |  |
 | forgeui | forgeui FGU 20-117 |  |  | forgeui | ASSETS-NEEDED-3 |
@@ -68,7 +68,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | fs | fs save 16-19 |  |  | fs |  |
 | read | readable READ 16-69 | fxwave |  | readable |  |
 | bulletart | bulletart BA 9-11 |  |  | bulletart |  |
-| legible | legible LGB 14-45 |  |  | legible | INDUSTRY-PLAYBOOK |
+| legible | legible LGB 14-51 |  |  | legible | INDUSTRY-PLAYBOOK |
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
 | abup,pwrclear | abup ABUP 25-97 |  |  | abup | ASSETS-NEEDED-3 |
 | zonehint | zonehint ZH 9-26 |  |  | pwrstar |  |
@@ -86,8 +86,8 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | schoolfull | schoolfull sfGapWall 61-79 |  |  | school-full |  |
 | tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
 | menufix | menufix mfDraw 35-41 |  |  | menufix |  |
-| explain | explain EXP 11-65 |  |  | explain | WORKER-RULES |
-| calm | calm CALM 10-37 | footen,fxwave |  | calm |  |
+| explain,exp10 | explain EXP 11-65 | abilities |  | explain | WORKER-RULES |
+| calm | calm CALM 10-38 | footen,fxwave |  | calm |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 

@@ -11,7 +11,8 @@
       the city as it was, so the district stays recognisable.
    4. Colour grammar (INDUSTRY-PLAYBOOK.md 'Colour grammar'): enemy fire warm (pink / red / orange), player shots cool (readable.js), pickups green, music coins leaf green (gold is the elite ring and sits next to orange shells). ---------- */
 if(RET.legible===undefined)RET.legible=!/[?&]legible=0/.test(location.search);
-const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.55,EDGE:.12,
+const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.3,DIM:.35,DIMHC:.45,EDGE:.12,PX:{base:.35,roof:1.1},   // PX: phone backdrop scroll factors (base picture, rooftops; were .1 / .5: the city crawled ~8 px/s and sat under a .55 + .45 black veil, 22 Oct owner on a real phone)
+  
   PK:{shard:'#5dff8a',hp:'#5dff8a',up:'#5dff8a',emp:'#5dff8a'},COIN:'#7dff5d',
   /* under-glow alpha per district (G.di); tuned with legible-test.js */
   st:[1,1,1,1,1,1,1,1,1,1,1,1],ga(){const a=this.st[G.di];return a==null?1:a;},
@@ -28,7 +29,7 @@ const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.5
     ctx.globalAlpha=this.RL*(window.COM?COM.g():1);ctx.strokeStyle=this.GLOW;ctx.lineWidth=1.6;ctx.stroke();ctx.globalAlpha=1;},
   /* 2. the dark halo under the enemy bullets */
   halo(){const L=G.eb;if(!L.length)return;const bg=(RET.asBigOn()?1.35:1)*1.2;ctx.save();ctx.globalCompositeOperation='source-over';ctx.fillStyle=this.HALO;ctx.beginPath();
-    for(const b of L){const r=b.r*(b.k==='n'?2.6:b.k==='r'?2.4:2.1)*bg+1.5;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();ctx.restore();this.stat.halo++;},
+    for(const b of L){const r=b.r*(this.HK[b.k||'']||2.1)*bg+1.5;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();ctx.restore();this.stat.halo++;},
   /* 3. the play band: w,h = the backdrop's own units (landscape W,H; portrait PW_,PH_); the band runs across the short side */
   band(w,h){const P=w<h,E=this.EDGE,key=w+'x'+h+'@'+this.BAND;let g=this._g;
     if(!g||this._gk!==key){g=this._g=P?ctx.createLinearGradient(0,0,w,0):ctx.createLinearGradient(0,0,0,h);this._gk=key;const k='rgba(0,0,0,'+this.BAND+')',z='rgba(0,0,0,0)';
@@ -39,7 +40,12 @@ const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.5
 /* 1c. ships drawn from their own sheet (gunship, kamikaze, the four fleet ships: SPR.foe, no recoloured strip to brighten) get the same lift as one added copy at alpha BR-1 (one drawImage per ship, no filter) */
 {const f0=SPR.foe;SPR.foe=function(e,id,t,x,y,w,rot,fl){const ok=f0.call(this,e,id,t,x,y,w,rot,fl);if(!ok||fl||!RET.legible||!running||LGB.BR<=1||!e||e.type==='boss')return ok;
   ctx.save();if(rot){ctx.translate(x,y);ctx.rotate(rot);x=0;y=0;}ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,'ship-'+id+'/'+e._ea,t-e._es,x,y,e._fs,false,LGB.BR-1);ctx.restore();return ok;};}
-{const b0=READ.bullets;READ.bullets=function(){if(RET.legible)LGB.halo();return b0.call(this);};}
+/* 2b. size floor (22 Oct owner: "I can not see the bullets"): an enemy bullet is DRAWN at least MINR css px in radius (about 10 css px across with its dark halo); the hit circle (b.r in update) is never touched:
+   the radius is swapped for the draw call and put back at once */
+LGB.MINR=4.3;LGB.HK={n:2.6,r:2.4,'':2.1,s:2.1};LGB.vis=function(on){const L=G.eb;if(!L.length)return;const m=this.MINR/READ.ppu();for(const b of L){if(on){if(b.r<m){b._r0=b.r;b.r=m;}}else if(b._r0!==undefined){b.r=b._r0;delete b._r0;}}};
+{const b0=READ.bullets;READ.bullets=function(){if(!RET.legible)return b0.call(this);LGB.vis(true);try{LGB.halo();return b0.call(this);}finally{LGB.vis(false);}};}
+/* 3b. a lighter veil: readable.js darkens the whole backdrop by DIM, the band adds BAND on top (DIM .35 + BAND .3; was .45 + .55: a 75 % black veil, the scrolling city was invisible; only with legible on, ?legible=0 keeps the old numbers) */
+{const d1=READ.dim;READ.dim=function(w,h){if(!RET.legible)return d1.call(this,w,h);const a=this.DIM,b=this.DIMHC;this.DIM=LGB.DIM;this.DIMHC=LGB.DIMHC;try{d1.call(this,w,h);}finally{this.DIM=a;this.DIMHC=b;}};}
 /* 4. pickups: shards / hull / upgrade / EMP glow green, music coins leaf green (gold is the elite ring and sits next to orange shells) (power.js PW.pickup) */
 if(RET.legible&&RET.read)READ.UP=LGB.PK.up;
 {const pk=PW.pickup;PW.pickup=function(p,y,t){const K=PWK[p.k];if(!RET.legible||!K)return pk.call(this,p,y,t);const c=K.c;K.c=LGB.COIN;try{return pk.call(this,p,y,t);}finally{K.c=c;}};}
