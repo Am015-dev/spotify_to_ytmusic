@@ -4,7 +4,7 @@
 // Gates: (a) foot slip while running < 1 device px per frame  (b) bullets leave the drawn gun: muzzle error < 4 world units  (c) Kai, rusher, gunner same body height (+-3%), heavy 1.2-1.3 x
 //        (d) taxi 150-170 units long (4.5 m at 35.6 units per metre)  (e) 0 page errors
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
-const GAME = process.env.GAME_DIR || path.resolve(__dirname, '../../../games/mainhattan-nightrun'), Q = process.env.Q || '', GATE = process.env.GATE !== '0' && !/feel=0/.test(Q);
+const GAME = process.env.GAME_DIR || path.resolve(__dirname, '../../../games/mainhattan-nightrun'), Q = process.env.Q || '&street3=0', GATE = process.env.GATE !== '0' && !/feel=0/.test(Q);
 const [VW, VH] = (process.env.VP || '390x763').split('x').map(Number);
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
