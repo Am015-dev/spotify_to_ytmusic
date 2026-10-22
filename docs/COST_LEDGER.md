@@ -108,3 +108,6 @@ Model and status come from the session list. Cost is blank: the session list doe
 | chip-fix-r22e30 | beta.157 | Sonnet | one TAP chip at a time, single flight icon | #60 PASS, shipped |
 | onfoot-edge-r22e31 | beta.157 | Sonnet | on-foot world edge (edgeStep + clamp) | #61 PASS, shipped |
 | reviews 56-61 | beta.155-157 | Opus | 6 reviews | done |
+| flag-rulings-r22e33 | beta.158 | Sonnet | gloss ON, takedown deleted | #63 PASS, shipped |
+| flake-quietdirt-r22e34 | — | Sonnet | stopped (no repro); Alex's bug took the slot | docs only |
+| deploy beta.158 | beta.158 | coord | Beta now gets all per-car model files (were missing) | shipped v324 |

@@ -32,7 +32,10 @@ Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-in
 - Match LEGO 2K Drive (deep blue sky, brick clouds, glossy LEGO cars on the road, lively streets, fun varied tracks). Fun beats metrics: green tests ≠ playable.
 - Phone first: iPhone landscape + portrait, no HUD over controls, 12 px minimum text.
 - Keep `ALL_OPEN=true`, the credits "Made with ❤ by Alex" and "3D models by Alex", English UI, gas default on touch. No model names in files or commits.
-- Every deploy prepends an `OD_CHANGELOG` entry (version, date, 2-4 plain lines). Never deploy an unsplit build (3.6 MB cap). The coordinator deploys with `deploy.sh`, then republishes the Beta artifact with all chunks (km.js, models.js, tune.json, models/{lx,as,xf,qa}.js, xc/*.js).
+- Every deploy prepends an `OD_CHANGELOG` entry (version, date, 2-4 plain lines). Never deploy an unsplit build (3.6 MB cap). The coordinator deploys with `deploy.sh`, then republishes the Beta artifact with ALL chunks: km.js, models.js, tune.json, EVERY models/*.js (about 150 per-car files; missing them broke most garage cars until beta.158) and every xc/*.js.
+
+## Cost (Alex, 22 Oct: "very expensive compared to the deliverables, most were fixing your own bugs")
+- Only player-visible work from Alex's words. No test-only or flake lanes unless a release check blocks a deploy. One worker at a time unless Alex asks for more.
 
 ## Branches (Alex, 2026-10-20: never let branches pile up again)
 - Only these live on origin: `main`, trunk `alex/od-int2`, live `alex/brave-carson-rbpmlk` (deploy.sh target), plus the current coordinator session's own branch.
