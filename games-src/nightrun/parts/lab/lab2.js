@@ -187,7 +187,7 @@ function src(s){if(s.src==='strip'){const m=AM(s.key),im=img(SU(s.key));if(!m)re
   if(s.src==='still'){const im=img(s.url);return{im,sx:0,sy:0,sw:im.naturalWidth||1,sh:im.naturalHeight||1,n:1,i:0,fps:0,name:s.url.replace('media/','')};}
   return null;}
 const tc=document.createElement('canvas');
-function vDraw(){const it=VL.it,s=it&&it.states[L2.state],c=VL.c,g=c.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.max(2,Math.round(c.clientWidth*dpr)),h=Math.max(2,Math.round(c.clientHeight*dpr));
+function vDraw(){const it=VL.it,s=it&&it.states[L2.state],c=VL.c,g=c.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1,Math.sqrt(2.2e6/Math.max(1,c.clientWidth*c.clientHeight))),w=Math.max(2,Math.round(c.clientWidth*dpr)),h=Math.max(2,Math.round(c.clientHeight*dpr));
   if(c.width!==w||c.height!==h){c.width=w;c.height=h;}g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);
   const bg=img('media/bg-'+((ART.dn&&ART.dn[L2.di])||'bankenviertel')+'.webp');
   if(ok(bg)){const k=Math.max(w/bg.naturalWidth,h/bg.naturalHeight);g.drawImage(bg,(w-bg.naturalWidth*k)/2,(h-bg.naturalHeight*k)/2,bg.naturalWidth*k,bg.naturalHeight*k);g.fillStyle='rgba(7,4,15,.45)';g.fillRect(0,0,w,h);}
@@ -223,7 +223,7 @@ function pattern(g,p,x,y,k,dpr){const t=(L2.pt||0)%1.6,d=30*dpr+t/1.6*Math.max(0
   else if(p==='laser'){g.save();g.strokeStyle='#ff4fa3';g.globalAlpha=.75;g.lineWidth=10*dpr;g.beginPath();g.moveTo(x,y);g.lineTo(x-2000,y+Math.sin(t*2)*120*dpr);g.stroke();g.restore();}
   else if(p==='summon'){for(let i=0;i<3;i++)dots.push([x-d*.6,y+(i-1)*60*dpr]);}
   g.save();g.fillStyle='#ffd23d';g.shadowColor='#ffd23d';g.shadowBlur=8*dpr;for(const [a,b] of dots){g.beginPath();g.arc(a,b,(p==='summon'?10:6)*dpr,0,7);g.fill();}g.restore();}
-function vTick(now){L2.raf=0;if(L2.page!=='viewer'||view.hidden)return;const dt=Math.min(.1,(now-(L2.last||now))/1000);L2.last=now;
+function vTick(now){L2.raf=0;if(L2.page!=='viewer'||view.hidden)return;if(document.hidden||(L2.last&&now-L2.last<32)){L2.raf=requestAnimationFrame(vTick);return;}const dt=Math.min(.1,(now-(L2.last||now))/1000);L2.last=now;
   const s=VL&&VL.it&&VL.it.states[L2.state],m=s&&s.src==='strip'&&s.hold==null&&AM(s.key);if(L2.play&&m)L2.fi+=dt*m[1]*L2.speed;if(L2.play)L2.pt=(L2.pt||0)+dt*L2.speed;
   if(VL)vDraw();L2.raf=requestAnimationFrame(vTick);}
 function vStart(){if(!VL||!view.firstChild)vBuild();if(!L2.raf){L2.last=0;L2.raf=requestAnimationFrame(vTick);}}

@@ -14665,7 +14665,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='0510f351c4 2026-10-22 20:40 UTC';
+const NR_STAMP='6e123275e9 2026-10-22 21:11 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16582,7 +16582,7 @@ if(RET.lazyart){const raw=ART.bm;
    ~60 effect pictures). lagfix.js only knew the in-run screens. Outside a run: when the centre of the screen is not the play canvas, draw at most 2 frames a second. */
 if(RET.lazyart){const lc0=lagCovered;let chk=0,cov=false,lastDraw=0;
   lagCovered=function(now){if(running)return lc0(now);
-    if(now-chk>300){chk=now;const e=document.elementFromPoint(innerWidth/2,innerHeight/2);cov=!!e&&e!==cv&&!(typeof wcv!=='undefined'&&e===wcv)&&e.tagName!=='CANVAS';}
+    if(now-chk>300){chk=now;const e=document.elementFromPoint(innerWidth/2,innerHeight/2);cov=(window.FOOTVIEW&&FOOTVIEW.on)||(!!e&&e!==cv&&!(typeof wcv!=='undefined'&&e===wcv));}
     if(!cov)return lc0(now);if(now-lastDraw<500)return true;lastDraw=now;return false;};}
 
 // PURPOSE: wiring fixes for painted art: flat backgrounds keyed out at load (sprites), white gaps keyed out of the street layers, the street sky drawn at its own aspect
@@ -17659,10 +17659,12 @@ function drawOne(g,sh,act,i,x,y,h,o){const k=sh+'/'+act,m=ART.ANIM.s[k],b=m&&ART
   g.restore();return {s,m,fr,i};}
 /* ----- the stage, the zoom box and the info line ----- */
 let el=null,cv=null,zc=null,txt=null,raf=0,last=0,chips=[],stList=null,chList=null;
-function size(c){const r=c.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1),w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}return d;}
+function size(c){const r=c.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1,Math.sqrt(2.2e6/Math.max(1,r.width*r.height))),   // at most ~2.2 megapixels (a 4K screen at 2x was 15 MP redrawn 30 times a second)
+  w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}return d;}
 function hOf(sh,H){return STILL[sh]||/^(prop|pk)-/.test(sh)?.225*H*(PH[sh]||64)/64:.225*H*(HT[sh]||64)/64;}
+/* the road line is drawn as rectangles: a dashed stroke() across a 5000 px canvas cost ~120 ms a frame (owner 22 Oct: the viewer crawled on a fast PC) */
 function paint(){if(!cv)return;const d=size(cv),g=cv.getContext('2d'),W=cv.width,H=cv.height,road=Math.round(H*470/540);g.setTransform(1,0,0,1,0,0);street(g,W,H,road);
-  if(V.road){g.strokeStyle='#ffe14d';g.setLineDash([10*d,6*d]);g.lineWidth=1.5*d;g.beginPath();g.moveTo(0,road);g.lineTo(W,road);g.stroke();g.setLineDash([]);g.fillStyle='#ffe14d';g.font='bold '+Math.round(11*d)+'px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText('ROAD LINE (feet stand here)',6*d,road-3*d);}
+  if(V.road){g.fillStyle='#ffe14d';{const dl=10*d,gp=6*d,lw=Math.max(1,Math.round(1.5*d)),y=Math.round(road-lw/2);for(let x=0;x<W;x+=dl+gp)g.fillRect(x,y,dl,lw);}g.fillStyle='#ffe14d';g.font='bold '+Math.round(11*d)+'px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText('ROAD LINE (feet stand here)',6*d,road-3*d);}
   const k=key(),has=STILL[V.sheet]||ART.ANIM.s[k],i=has?(STILL[V.sheet]?0:frameAt(k)):0;let r=null;
   if(V.cmp.length){const list=V.cmp.indexOf(V.who)<0?V.cmp.concat([V.who]):V.cmp,n=list.length;list.forEach((w,j)=>{const sh=w==='bigheavy'?'bruiser':w,a=ART.ANIM.s[sh+'/'+V.act]?V.act:STILL[sh]?'still':'idle',kk=sh+'/'+a,
       fi=STILL[sh]?0:ART.ANIM.s[kk]?(V.play?ART.aframe(kk,V.t%(ART.aS(kk).tot+(ART.aS(kk).loop?0:.4))):Math.min(V.frame,ART.ANIM.s[kk][0]-1)):0,x=W*(j+.5)/n;
@@ -17678,7 +17680,7 @@ function paint(){if(!cv)return;const d=size(cv),g=cv.getContext('2d'),W=cv.width
     else if(!has)s=(NAME[V.who]||V.who)+' · '+V.act+' · no art yet';
     else{const m=ART.ANIM.s[k],o=ART.aS(k),fr=r&&r.fr;s=(NAME[V.who]||V.who)+' · '+V.act+' · frame '+(i+1)+' of '+m[0]+' · '+m[1]+' frames per second'+(o&&o.loop?' (loops)':' (plays once, shown on a loop)')+' · frame '+m[2]+'x'+m[3]+' px · sheet anim/'+k+'-strip.webp'+(fr&&fr.cut.length?' · CUT at the '+fr.cut.join(' and ')+' edge (red)':'');}
     if(txt.textContent!==s)txt.textContent=s;}}
-function loop(now){raf=requestAnimationFrame(loop);const dt=last?Math.min(.1,(now-last)/1000):0;last=now;if(V.play)V.t+=dt*V.speed;try{paint();}catch(e){console.error(e);}if(++V._n%10===0)sync();}
+function loop(now){raf=requestAnimationFrame(loop);if(document.hidden||(last&&now-last<32))return;const dt=last?Math.min(.1,(now-last)/1000):0;last=now;if(V.play)V.t+=dt*V.speed;try{paint();}catch(e){console.error(e);}if(++V._n%10===0)sync();}   // 30 draws a second at most (owner 22 Oct: the viewer made a fast PC crawl)
 /* ----- the panel ----- */
 const css=`#fvP{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;background:#05030c;color:var(--ink,#e8e4ff);font-family:var(--mono,monospace)}
 #fvP .vbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;padding:4px 8px;flex:0 0 auto;border-bottom:1px solid #3a2b5c}#fvP .vbar b{font-size:12px;letter-spacing:.1em;color:var(--cyan,#19e3ff);flex:1 1 160px;min-width:0}
@@ -17924,7 +17926,7 @@ function src(s){if(s.src==='strip'){const m=AM(s.key),im=img(SU(s.key));if(!m)re
   if(s.src==='still'){const im=img(s.url);return{im,sx:0,sy:0,sw:im.naturalWidth||1,sh:im.naturalHeight||1,n:1,i:0,fps:0,name:s.url.replace('media/','')};}
   return null;}
 const tc=document.createElement('canvas');
-function vDraw(){const it=VL.it,s=it&&it.states[L2.state],c=VL.c,g=c.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.max(2,Math.round(c.clientWidth*dpr)),h=Math.max(2,Math.round(c.clientHeight*dpr));
+function vDraw(){const it=VL.it,s=it&&it.states[L2.state],c=VL.c,g=c.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1,Math.sqrt(2.2e6/Math.max(1,c.clientWidth*c.clientHeight))),w=Math.max(2,Math.round(c.clientWidth*dpr)),h=Math.max(2,Math.round(c.clientHeight*dpr));
   if(c.width!==w||c.height!==h){c.width=w;c.height=h;}g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);
   const bg=img('media/bg-'+((ART.dn&&ART.dn[L2.di])||'bankenviertel')+'.webp');
   if(ok(bg)){const k=Math.max(w/bg.naturalWidth,h/bg.naturalHeight);g.drawImage(bg,(w-bg.naturalWidth*k)/2,(h-bg.naturalHeight*k)/2,bg.naturalWidth*k,bg.naturalHeight*k);g.fillStyle='rgba(7,4,15,.45)';g.fillRect(0,0,w,h);}
@@ -17960,7 +17962,7 @@ function pattern(g,p,x,y,k,dpr){const t=(L2.pt||0)%1.6,d=30*dpr+t/1.6*Math.max(0
   else if(p==='laser'){g.save();g.strokeStyle='#ff4fa3';g.globalAlpha=.75;g.lineWidth=10*dpr;g.beginPath();g.moveTo(x,y);g.lineTo(x-2000,y+Math.sin(t*2)*120*dpr);g.stroke();g.restore();}
   else if(p==='summon'){for(let i=0;i<3;i++)dots.push([x-d*.6,y+(i-1)*60*dpr]);}
   g.save();g.fillStyle='#ffd23d';g.shadowColor='#ffd23d';g.shadowBlur=8*dpr;for(const [a,b] of dots){g.beginPath();g.arc(a,b,(p==='summon'?10:6)*dpr,0,7);g.fill();}g.restore();}
-function vTick(now){L2.raf=0;if(L2.page!=='viewer'||view.hidden)return;const dt=Math.min(.1,(now-(L2.last||now))/1000);L2.last=now;
+function vTick(now){L2.raf=0;if(L2.page!=='viewer'||view.hidden)return;if(document.hidden||(L2.last&&now-L2.last<32)){L2.raf=requestAnimationFrame(vTick);return;}const dt=Math.min(.1,(now-(L2.last||now))/1000);L2.last=now;
   const s=VL&&VL.it&&VL.it.states[L2.state],m=s&&s.src==='strip'&&s.hold==null&&AM(s.key);if(L2.play&&m)L2.fi+=dt*m[1]*L2.speed;if(L2.play)L2.pt=(L2.pt||0)+dt*L2.speed;
   if(VL)vDraw();L2.raf=requestAnimationFrame(vTick);}
 function vStart(){if(!VL||!view.firstChild)vBuild();if(!L2.raf){L2.last=0;L2.raf=requestAnimationFrame(vTick);}}

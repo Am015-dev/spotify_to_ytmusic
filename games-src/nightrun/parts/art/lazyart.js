@@ -13,5 +13,5 @@ if(RET.lazyart){const raw=ART.bm;
    ~60 effect pictures). lagfix.js only knew the in-run screens. Outside a run: when the centre of the screen is not the play canvas, draw at most 2 frames a second. */
 if(RET.lazyart){const lc0=lagCovered;let chk=0,cov=false,lastDraw=0;
   lagCovered=function(now){if(running)return lc0(now);
-    if(now-chk>300){chk=now;const e=document.elementFromPoint(innerWidth/2,innerHeight/2);cov=!!e&&e!==cv&&!(typeof wcv!=='undefined'&&e===wcv)&&e.tagName!=='CANVAS';}
+    if(now-chk>300){chk=now;const e=document.elementFromPoint(innerWidth/2,innerHeight/2);cov=(window.FOOTVIEW&&FOOTVIEW.on)||(!!e&&e!==cv&&!(typeof wcv!=='undefined'&&e===wcv));}
     if(!cov)return lc0(now);if(now-lastDraw<500)return true;lastDraw=now;return false;};}

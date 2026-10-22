@@ -67,10 +67,12 @@ function drawOne(g,sh,act,i,x,y,h,o){const k=sh+'/'+act,m=ART.ANIM.s[k],b=m&&ART
   g.restore();return {s,m,fr,i};}
 /* ----- the stage, the zoom box and the info line ----- */
 let el=null,cv=null,zc=null,txt=null,raf=0,last=0,chips=[],stList=null,chList=null;
-function size(c){const r=c.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1),w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}return d;}
+function size(c){const r=c.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1,Math.sqrt(2.2e6/Math.max(1,r.width*r.height))),   // at most ~2.2 megapixels (a 4K screen at 2x was 15 MP redrawn 30 times a second)
+  w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}return d;}
 function hOf(sh,H){return STILL[sh]||/^(prop|pk)-/.test(sh)?.225*H*(PH[sh]||64)/64:.225*H*(HT[sh]||64)/64;}
+/* the road line is drawn as rectangles: a dashed stroke() across a 5000 px canvas cost ~120 ms a frame (owner 22 Oct: the viewer crawled on a fast PC) */
 function paint(){if(!cv)return;const d=size(cv),g=cv.getContext('2d'),W=cv.width,H=cv.height,road=Math.round(H*470/540);g.setTransform(1,0,0,1,0,0);street(g,W,H,road);
-  if(V.road){g.strokeStyle='#ffe14d';g.setLineDash([10*d,6*d]);g.lineWidth=1.5*d;g.beginPath();g.moveTo(0,road);g.lineTo(W,road);g.stroke();g.setLineDash([]);g.fillStyle='#ffe14d';g.font='bold '+Math.round(11*d)+'px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText('ROAD LINE (feet stand here)',6*d,road-3*d);}
+  if(V.road){g.fillStyle='#ffe14d';{const dl=10*d,gp=6*d,lw=Math.max(1,Math.round(1.5*d)),y=Math.round(road-lw/2);for(let x=0;x<W;x+=dl+gp)g.fillRect(x,y,dl,lw);}g.fillStyle='#ffe14d';g.font='bold '+Math.round(11*d)+'px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText('ROAD LINE (feet stand here)',6*d,road-3*d);}
   const k=key(),has=STILL[V.sheet]||ART.ANIM.s[k],i=has?(STILL[V.sheet]?0:frameAt(k)):0;let r=null;
   if(V.cmp.length){const list=V.cmp.indexOf(V.who)<0?V.cmp.concat([V.who]):V.cmp,n=list.length;list.forEach((w,j)=>{const sh=w==='bigheavy'?'bruiser':w,a=ART.ANIM.s[sh+'/'+V.act]?V.act:STILL[sh]?'still':'idle',kk=sh+'/'+a,
       fi=STILL[sh]?0:ART.ANIM.s[kk]?(V.play?ART.aframe(kk,V.t%(ART.aS(kk).tot+(ART.aS(kk).loop?0:.4))):Math.min(V.frame,ART.ANIM.s[kk][0]-1)):0,x=W*(j+.5)/n;
@@ -86,7 +88,7 @@ function paint(){if(!cv)return;const d=size(cv),g=cv.getContext('2d'),W=cv.width
     else if(!has)s=(NAME[V.who]||V.who)+' · '+V.act+' · no art yet';
     else{const m=ART.ANIM.s[k],o=ART.aS(k),fr=r&&r.fr;s=(NAME[V.who]||V.who)+' · '+V.act+' · frame '+(i+1)+' of '+m[0]+' · '+m[1]+' frames per second'+(o&&o.loop?' (loops)':' (plays once, shown on a loop)')+' · frame '+m[2]+'x'+m[3]+' px · sheet anim/'+k+'-strip.webp'+(fr&&fr.cut.length?' · CUT at the '+fr.cut.join(' and ')+' edge (red)':'');}
     if(txt.textContent!==s)txt.textContent=s;}}
-function loop(now){raf=requestAnimationFrame(loop);const dt=last?Math.min(.1,(now-last)/1000):0;last=now;if(V.play)V.t+=dt*V.speed;try{paint();}catch(e){console.error(e);}if(++V._n%10===0)sync();}
+function loop(now){raf=requestAnimationFrame(loop);if(document.hidden||(last&&now-last<32))return;const dt=last?Math.min(.1,(now-last)/1000):0;last=now;if(V.play)V.t+=dt*V.speed;try{paint();}catch(e){console.error(e);}if(++V._n%10===0)sync();}   // 30 draws a second at most (owner 22 Oct: the viewer made a fast PC crawl)
 /* ----- the panel ----- */
 const css=`#fvP{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;background:#05030c;color:var(--ink,#e8e4ff);font-family:var(--mono,monospace)}
 #fvP .vbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;padding:4px 8px;flex:0 0 auto;border-bottom:1px solid #3a2b5c}#fvP .vbar b{font-size:12px;letter-spacing:.1em;color:var(--cyan,#19e3ff);flex:1 1 160px;min-width:0}
