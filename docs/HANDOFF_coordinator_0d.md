@@ -20,3 +20,6 @@ Branch cleanup blocked by permission classifier (needs Alex's allow).
 - Running (OPUS): solid-cars-r22e1 session_0158LpbxvfQUnNUMvKzX6iu9 (incl. camera-turn identity, phone compaction PC.L slot reuse, fra -553,591), solid-buildings-r22e2 session_01Ke7GnTrGY5pjbfQyY6g4MB (fra sheds list, white 11.5 m mesh at -530,630). Paused: L2 smash, chk-headroom (uncommitted, see their handoffs).
 - NEXT lane when a slot frees (SONNET, Alex priority): quiet-start r22e3: Athens CHAPTER 1 modal story card blocks 120 s (drive-first only covered fra) -> behind ?intro=1 like fra; garage 'TAP TO OPEN' at speed -> hide >20 km/h; no forced vehicle swap ('WRONG VEHICLE FOR DIRT' auto buggy) ; no auto-routing to Garage; STUD RUSH banner only when asked. GO: first 120 s fresh PLAY both cities = 0 modal/cards, <=1 hint.
 - Then: BENCH_2K gaps (docs/BENCH_2K.md): boost VFX, speed feel, empty first frame, matte cars, street life.
+
+## 00:15 beta.148 live (210147b): A2 roadside buildings solid (#25 fix PASS; acceptance list partly open)
+- NEXT building lane (OPUS when a slot frees): shrink-wrap HUB.bld colliders to drawn footprints (fra sheds -1463,800 / -1223,800 / -983,850 / -217,1120 corners; -263,1080; tower -563,394; check 12x12 -56,173 ghost) + identify/solidify the white 11.5x2.4x3.9 m mesh at fra -530,630 / -516,660 (no collider, not A2).
