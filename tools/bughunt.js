@@ -5,7 +5,7 @@
 //   node tools/bughunt.js --hours 2 --city fra            gate: one PASS/FAIL line per detector (wall budget --budget 270 s incl. boot; sim time achieved is printed)
 //   node tools/bughunt.js --hours 6 --city both --budget 2400 --json docs/shots/bughunt/fra_ath.json --shots 10   long hunt + 393x852 shots of the worst cells
 //   --build out/<ver>  use an existing build (default: tools/build.sh bughunt once, reused while src/ is older)   --dt 0.05 (frame clamp = 20 fps phone; 0.0333 = 30 fps)
-//   --seed0 K  offset the seeds (more samples from repeat runs)   --seeds N  episodes per city (default: one per 10 sim-min)   --pages N  parallel pages per city (default 1)   --notap  skip the touch-tap check
+//   --q "t9e=1&bx=1"  extra URL query on every page (flag A/B)   --seed0 K  offset the seeds (more samples from repeat runs)   --seeds N  episodes per city (default: one per 10 sim-min)   --pages N  parallel pages per city (default 1)   --notap  skip the touch-tap check
 // Speed note: the game's own frame (streets step ~11 ms + roamStep ~6 ms + cam ~4 ms on this 4-core container) caps one page at ~2-3x real time, not x1000;
 // --hours is the TARGET, --budget the wall cap: the result is scaled to per hour and the line says how many sim-minutes it really covered.
 const {chromium}=(()=>{try{return require('playwright')}catch(e){return require('/opt/node22/lib/node_modules/playwright')}})();
@@ -132,7 +132,7 @@ async function taps(p){const out=[];const T=async(sel)=>{const b=await p.$(sel);
 
 async function cityRun(b,base,city,simTarget,wallEnd,pageNo){const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await ctx.newPage();const errs=[];p.setDefaultTimeout(180000);
  await p.addInitScript(()=>{window.__dbg=1});p.on('pageerror',e=>errs.push(String(e).slice(0,160)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,160))});
- const tb=Date.now();await p.goto(base+'?test='+city+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:420000});const boot=(Date.now()-tb)/1000;
+ const tb=Date.now();await p.goto(base+'?test='+city+'&draw=0'+(arg('q','')?'&'+arg('q'):''));await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:420000});const boot=(Date.now()-tb)/1000;
  const ev=s=>p.evaluate(c=>__oc.ev(c),s);if(await ev('1')!==1)throw new Error('__oc.ev disabled (needs window.__dbg)');
  await ev(HUNTER);await p.waitForTimeout(400);   // let the pending real rAF land in the captured queue
  const epLen=Math.max(120,+arg('ep',600));let ep=0,sim=0,steps=0,tapRes=[];const seed0=1+pageNo*1000+(city==='ath'?500:0)+(+arg('seed0',0)||0);
@@ -143,7 +143,7 @@ async function cityRun(b,base,city,simTarget,wallEnd,pageNo){const ctx=await b.n
 
 async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const ctx=await b.newContext({viewport:{width:393,height:852},deviceScaleFactor:1,isMobile:true,hasTouch:true});const out=[];
  const by={};for(const c of cells)(by[c.city]=by[c.city]||[]).push(c);
- for(const city in by){const p=await ctx.newPage();await p.addInitScript(()=>{window.__dbg=1});await p.goto(base+'?test='+city+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:240000});
+ for(const city in by){const p=await ctx.newPage();await p.addInitScript(()=>{window.__dbg=1});await p.goto(base+'?test='+city+'&draw=0'+(arg('q','')?'&'+arg('q'):''));await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:240000});
   await p.evaluate(()=>__tq.draw()).catch(()=>{});
   for(const c of by[city]){const f=path.join(dir,`${city}_${c.det}_${Math.round(c.x)}_${Math.round(c.z)}.jpg`);
    await p.evaluate(s=>__oc.ev(s),`try{__tq.reset()}catch(e){}roamWarp(${c.x},${c.z},${c.h});RO.v=0;0`);await p.waitForTimeout(2500);await p.evaluate(()=>__tq.draw()).catch(()=>{});await p.waitForTimeout(300);await p.evaluate(()=>__tq.draw()).catch(()=>{});
