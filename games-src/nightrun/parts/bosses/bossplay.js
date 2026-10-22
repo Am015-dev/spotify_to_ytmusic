@@ -206,13 +206,13 @@ BPL.AM={hard:.9};   // share of arena hits absorbed per difficulty (hull restore
 BPL.hit=()=>{const h=P.hp,s=BPL.stat();hurt(1);if(P.hp<h){s.hits++;const am=BPL.AM[SET.diff]||0;if(am&&h>1&&!G.dead){s.am=(s.am||0)+am;if(s.am>=1){s.am-=1;P.hp=h;P.inv=Math.max(P.inv||0,.6);s.absorbed=(s.absorbed|0)+1;}}}};
 /* ---- placeholder shapes (circles / triangles / squares); drawn after the boss hazards ---- */
 BPL.draw=()=>{const e=G.boss;if(!BPL.on||!e||!e.bp||e.x>W+40)return;const b=e.bp,g=b.g,t=G.t,rm=!!SET.reduce,pul=rm?.5:.5+.5*Math.sin(t*8);ctx.save();
-  const S=b.arS||{},x1=e.x-e.r-10,m=b.ar;
-  if(m==='blackout'){const lh=H/3;ctx.globalAlpha=rm?.55:.72;ctx.fillStyle='#02030a';for(let i=0;i<3;i++)if(i!==S.lane&&!ART.pic('bp-blackout',x1,x1/2,i*lh+lh/2))ctx.fillRect(0,i*lh,x1,lh);
-    ctx.globalAlpha=.35;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.strokeRect(2,S.lane*lh+2,x1-4,lh-4);}
-  if(m==='slab'&&S.t0!=null&&t<S.off){const live=t>=S.on,y0=S.top?0:H-S.h;ctx.globalAlpha=live?.8:.18+.15*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';if(!ART.pic('bp-slab',x1,x1/2,y0+S.h/2))ctx.fillRect(0,y0,x1,S.h);
+  const S=b.arS||{},x1=e.x-e.r-10,m=b.ar,xv=RET.bossfix===false?x1:Math.max(0,Math.min(x1,e.x-(e._dw||0)/2));   // xv: bossfix keeps the strips off the boss's wings (they were drawn over its art, so the boss looked see-through)
+  if(m==='blackout'){const lh=H/3;ctx.globalAlpha=rm?.55:.72;ctx.fillStyle='#02030a';for(let i=0;i<3;i++)if(i!==S.lane&&!BPL.band('bp-blackout',0,i*lh,xv,lh))ctx.fillRect(0,i*lh,x1,lh);
+    ctx.globalAlpha=.35;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.strokeRect(2,S.lane*lh+2,xv-4,lh-4);}
+  if(m==='slab'&&S.t0!=null&&t<S.off){const live=t>=S.on,y0=S.top?0:H-S.h;ctx.globalAlpha=live?.8:.18+.15*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';if(!BPL.band('bp-slab',0,y0,xv,S.h))ctx.fillRect(0,y0,x1,S.h);
     if(!live){ctx.globalAlpha=.9;ctx.fillStyle='#ffe14d';for(let x=40;x<x1;x+=90)BPL.tri(x,S.top?S.h+12:H-S.h-12,9,S.top?Math.PI/2:-Math.PI/2);}}
-  if(m==='conveyor'){ctx.globalAlpha=.22;ctx.fillStyle='#ffb020';const o=(t*110)%60;if(!ART.pic('bp-conveyor',x1,x1/2,H*.25)){for(let x=-60+o;x<x1;x+=60){BPL.tri(x,H*.25,10,0);}}ctx.fillStyle='#19e3ff';for(let x=x1-(t*70)%60;x>0;x-=60)BPL.tri(x,H*.75,10,Math.PI);}
-  if(m==='gravity'){ctx.globalAlpha=.2;for(let k=0;k<3;k++){const dir=(k+Math.floor(t/((BT.spb||.5)*8)))%2?1:-1;ctx.fillStyle=dir>0?'#ff7ad9':'#7ad9ff';if(!ART.pic('fx-w34-bp-gravity',x1,x1/2,(k+.5)*H/3,dir>0?0:Math.PI)){for(let x=50;x<x1;x+=110)BPL.tri(x,(k+.5)*H/3,11,dir*Math.PI/2);}}}
+  if(m==='conveyor'){ctx.globalAlpha=.22;ctx.fillStyle='#ffb020';const o=(t*110)%60;if(!BPL.band('bp-conveyor',0,H*.25-22,xv,44,0,-t*110)){for(let x=-60+o;x<x1;x+=60){BPL.tri(x,H*.25,10,0);}}ctx.fillStyle='#19e3ff';for(let x=x1-(t*70)%60;x>0;x-=60)BPL.tri(x,H*.75,10,Math.PI);}
+  if(m==='gravity'){ctx.globalAlpha=.2;for(let k=0;k<3;k++){const dir=(k+Math.floor(t/((BT.spb||.5)*8)))%2?1:-1;ctx.fillStyle=dir>0?'#ff7ad9':'#7ad9ff';if(!BPL.band('fx-w34-bp-gravity',0,k*H/3,xv,H/3,dir>0?0:Math.PI,dir*t*60)){for(let x=50;x<x1;x+=110)BPL.tri(x,(k+.5)*H/3,11,dir*Math.PI/2);}}}
   if(m==='grid'&&S.c&&t<S.off){const live=t>=S.on;for(const x of S.c){ctx.globalAlpha=live?(RET.first30?F30.A:.85):.2+.2*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';if(!ART.pic('fx-w34-bp-grid',live?18:4,x,H/2))ctx.fillRect(x-(live?9:2),0,live?18:4,H);}}
   if(m==='ghost'&&S.gx!=null){ctx.globalAlpha=.55;ctx.strokeStyle='#c78cff';ctx.lineWidth=3;if(!ART.pic('bp-ghost',36,S.gx,S.gy)){ctx.beginPath();ctx.moveTo(S.gx+16,S.gy);ctx.lineTo(S.gx-12,S.gy-12);ctx.lineTo(S.gx-12,S.gy+12);ctx.closePath();ctx.stroke();}}
   if(m==='zone'&&S.r){ctx.globalAlpha=.6;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.setLineDash([14,10]);if(!ART.pic('fx-w34-bp-zone',S.r*2,S.cx,S.cy)){ctx.beginPath();ctx.arc(S.cx,S.cy,S.r,0,7);ctx.stroke();}ctx.setLineDash([]);}

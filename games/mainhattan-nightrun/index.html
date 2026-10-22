@@ -991,7 +991,7 @@ function update(dt){
     else if(touch){const sk=SENS[SET.sens-1]||1.5,tx=touch.px+(touch.x-touch.sx)*sk,ty=touch.py+(touch.y-touch.sy)*sk;const ddx=tx-P.x,ddy=ty-P.y,l=Math.hypot(ddx,ddy);
       if(l>3){P.dx=ddx/l;P.dy=ddy/l;P.mvT=G.t;}const s=Math.min(l,520*pdt);if(l>0){P.x+=ddx/l*s;P.y+=ddy/l*s;}}
     else{const l=Math.hypot(mx,my)||1;P.x+=mx/l*300*pdt;P.y+=my/l*300*pdt;}
-    const cx=clamp(P.x,rotMode?64:24,W-60),cy=clamp(P.y,36,H-54);   // portrait keeps the ship above the tier meter
+    const cx=clamp(P.x,rotMode?64:(RET.bossfix!==false?44:24),W-60),cy=clamp(P.y,36,H-54);   // portrait keeps the ship above the tier meter
     if(touch){if(cx!==P.x||P.dashT>0){touch.sx=touch.x;touch.px=cx;}if(cy!==P.y||P.dashT>0){touch.sy=touch.y;touch.py=cy;}}   // finger past the edge: re-anchor, no dead zone
     P.x=cx;P.y=cy;
     P.tilt+=(clamp((P.y-py0)/(pdt*300||1),-1,1)*.25-P.tilt)*Math.min(1,dt*10);
@@ -5047,7 +5047,7 @@ function drawHud(c,vw,fs){const P=S.P,u=1/L.sc,m=10*u,hb=[],box=(x,y,w,h)=>hb.pu
   L.hud={hud:hb,hint,vw};
   ghost();}
 function hintOn(){return S&&!SV.hint&&S.hintT<20&&(S.moved<250||S.shots<1);}
-function hintText(){if(S.moved<250)return L&&L.touch?'Push the stick right':'D or → to run';return L&&L.touch?(autoOn()?'Face an enemy: you shoot':'Hold FIRE to shoot'):'Hold J to shoot';}
+function hintText(){if(S.moved<250)return L&&L.touch?'Push the stick right':'D or → to run';return L&&L.touch?(autoOn()?'Face an enemy: you shoot':(RET.bossfix!==false?'Tap or hold FIRE to shoot':'Hold FIRE to shoot')):'Hold J to shoot';}
 function ghost(){const g=L.ghost;if(!L.touch||!hintOn()||S.note.t>0||(L.menu&&!L.menu.hidden)||(autoOn()&&S.moved>=250)){g.hidden=true;return;}g.hidden=false;
   const tgt=S.moved<250?L.stick:L.btn.fire,r=tgt.getBoundingClientRect(),ph=(S.time%1.2)/1.2;
   g.style.left=(r.left+r.width/2+(S.moved<250?r.width*.3*ph:0))+'px';g.style.top=(r.top+r.height/2)+'px';}
@@ -9994,7 +9994,7 @@ BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=
       else if(red){ctx.globalCompositeOperation='lighter';G_(x,y,10,'#ffd23d',.5);ctx.globalCompositeOperation='source-over';}
     }else{
       ctx.fillStyle=RET.first30?R[0]+'73':'#7a84a8aa';ctx.strokeStyle=RET.first30?'#0a0612':'#dfe6ff';ctx.lineWidth=1.5;ctx.beginPath();   // first30: a tinted marker in the phase colour, not a white plate
-      ctx.moveTo(x-w*.5,y+h*.5);ctx.lineTo(x-w*.35,y-h*.5);ctx.lineTo(x+w*.5,y-h*.4);ctx.lineTo(x+w*.4,y+h*.5);ctx.closePath();ctx.fill();ctx.stroke();if(BV.pl)BV.pl.push(ctx.fillStyle);
+      if(RET.bossfix!==false){if(BV.pl)BV.pl.push(ctx.fillStyle);}else{ctx.moveTo(x-w*.5,y+h*.5);ctx.lineTo(x-w*.35,y-h*.5);ctx.lineTo(x+w*.5,y-h*.4);ctx.lineTo(x+w*.4,y+h*.5);ctx.closePath();ctx.fill();ctx.stroke();if(BV.pl)BV.pl.push(ctx.fillStyle);}   // bossfix: the boss's own painted armour is the plate; no flat quad on top of it (a lost plate still shows its scar)
     }}
   // the plate that just broke falls off the boss (ground bosses: it drops to the road line and stops there)
   if(v&&v.t>0&&v.id!=null){const s=BV.SLOTS[v.id],p=1-v.t,w=s[2]*hw,h=s[3]*hh,x=s[0]*hw+(v.id===2?1:-1)*p*50,fall=Math.min(p*p*260,ground?Math.max(0,hh-(s[1]*hh)-4):260);
@@ -11715,13 +11715,13 @@ BPL.AM={hard:.9};   // share of arena hits absorbed per difficulty (hull restore
 BPL.hit=()=>{const h=P.hp,s=BPL.stat();hurt(1);if(P.hp<h){s.hits++;const am=BPL.AM[SET.diff]||0;if(am&&h>1&&!G.dead){s.am=(s.am||0)+am;if(s.am>=1){s.am-=1;P.hp=h;P.inv=Math.max(P.inv||0,.6);s.absorbed=(s.absorbed|0)+1;}}}};
 /* ---- placeholder shapes (circles / triangles / squares); drawn after the boss hazards ---- */
 BPL.draw=()=>{const e=G.boss;if(!BPL.on||!e||!e.bp||e.x>W+40)return;const b=e.bp,g=b.g,t=G.t,rm=!!SET.reduce,pul=rm?.5:.5+.5*Math.sin(t*8);ctx.save();
-  const S=b.arS||{},x1=e.x-e.r-10,m=b.ar;
-  if(m==='blackout'){const lh=H/3;ctx.globalAlpha=rm?.55:.72;ctx.fillStyle='#02030a';for(let i=0;i<3;i++)if(i!==S.lane&&!ART.pic('bp-blackout',x1,x1/2,i*lh+lh/2))ctx.fillRect(0,i*lh,x1,lh);
-    ctx.globalAlpha=.35;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.strokeRect(2,S.lane*lh+2,x1-4,lh-4);}
-  if(m==='slab'&&S.t0!=null&&t<S.off){const live=t>=S.on,y0=S.top?0:H-S.h;ctx.globalAlpha=live?.8:.18+.15*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';if(!ART.pic('bp-slab',x1,x1/2,y0+S.h/2))ctx.fillRect(0,y0,x1,S.h);
+  const S=b.arS||{},x1=e.x-e.r-10,m=b.ar,xv=RET.bossfix===false?x1:Math.max(0,Math.min(x1,e.x-(e._dw||0)/2));   // xv: bossfix keeps the strips off the boss's wings (they were drawn over its art, so the boss looked see-through)
+  if(m==='blackout'){const lh=H/3;ctx.globalAlpha=rm?.55:.72;ctx.fillStyle='#02030a';for(let i=0;i<3;i++)if(i!==S.lane&&!BPL.band('bp-blackout',0,i*lh,xv,lh))ctx.fillRect(0,i*lh,x1,lh);
+    ctx.globalAlpha=.35;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.strokeRect(2,S.lane*lh+2,xv-4,lh-4);}
+  if(m==='slab'&&S.t0!=null&&t<S.off){const live=t>=S.on,y0=S.top?0:H-S.h;ctx.globalAlpha=live?.8:.18+.15*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';if(!BPL.band('bp-slab',0,y0,xv,S.h))ctx.fillRect(0,y0,x1,S.h);
     if(!live){ctx.globalAlpha=.9;ctx.fillStyle='#ffe14d';for(let x=40;x<x1;x+=90)BPL.tri(x,S.top?S.h+12:H-S.h-12,9,S.top?Math.PI/2:-Math.PI/2);}}
-  if(m==='conveyor'){ctx.globalAlpha=.22;ctx.fillStyle='#ffb020';const o=(t*110)%60;if(!ART.pic('bp-conveyor',x1,x1/2,H*.25)){for(let x=-60+o;x<x1;x+=60){BPL.tri(x,H*.25,10,0);}}ctx.fillStyle='#19e3ff';for(let x=x1-(t*70)%60;x>0;x-=60)BPL.tri(x,H*.75,10,Math.PI);}
-  if(m==='gravity'){ctx.globalAlpha=.2;for(let k=0;k<3;k++){const dir=(k+Math.floor(t/((BT.spb||.5)*8)))%2?1:-1;ctx.fillStyle=dir>0?'#ff7ad9':'#7ad9ff';if(!ART.pic('fx-w34-bp-gravity',x1,x1/2,(k+.5)*H/3,dir>0?0:Math.PI)){for(let x=50;x<x1;x+=110)BPL.tri(x,(k+.5)*H/3,11,dir*Math.PI/2);}}}
+  if(m==='conveyor'){ctx.globalAlpha=.22;ctx.fillStyle='#ffb020';const o=(t*110)%60;if(!BPL.band('bp-conveyor',0,H*.25-22,xv,44,0,-t*110)){for(let x=-60+o;x<x1;x+=60){BPL.tri(x,H*.25,10,0);}}ctx.fillStyle='#19e3ff';for(let x=x1-(t*70)%60;x>0;x-=60)BPL.tri(x,H*.75,10,Math.PI);}
+  if(m==='gravity'){ctx.globalAlpha=.2;for(let k=0;k<3;k++){const dir=(k+Math.floor(t/((BT.spb||.5)*8)))%2?1:-1;ctx.fillStyle=dir>0?'#ff7ad9':'#7ad9ff';if(!BPL.band('fx-w34-bp-gravity',0,k*H/3,xv,H/3,dir>0?0:Math.PI,dir*t*60)){for(let x=50;x<x1;x+=110)BPL.tri(x,(k+.5)*H/3,11,dir*Math.PI/2);}}}
   if(m==='grid'&&S.c&&t<S.off){const live=t>=S.on;for(const x of S.c){ctx.globalAlpha=live?(RET.first30?F30.A:.85):.2+.2*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';if(!ART.pic('fx-w34-bp-grid',live?18:4,x,H/2))ctx.fillRect(x-(live?9:2),0,live?18:4,H);}}
   if(m==='ghost'&&S.gx!=null){ctx.globalAlpha=.55;ctx.strokeStyle='#c78cff';ctx.lineWidth=3;if(!ART.pic('bp-ghost',36,S.gx,S.gy)){ctx.beginPath();ctx.moveTo(S.gx+16,S.gy);ctx.lineTo(S.gx-12,S.gy-12);ctx.lineTo(S.gx-12,S.gy+12);ctx.closePath();ctx.stroke();}}
   if(m==='zone'&&S.r){ctx.globalAlpha=.6;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.setLineDash([14,10]);if(!ART.pic('fx-w34-bp-zone',S.r*2,S.cx,S.cy)){ctx.beginPath();ctx.arc(S.cx,S.cy,S.r,0,7);ctx.stroke();}ctx.setLineDash([]);}
@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='775f7400ac 2026-10-22 17:42 UTC';
+const NR_STAMP='ce43dfe876 2026-10-22 17:49 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16661,6 +16661,28 @@ html.ui2 .tdBar button{border-radius:var(--u2r)!important}
    a turret (r 20, k 3.1 = 62 px). With ui2 every mapped enemy uses the same k, so picture size follows hit size: drone 59 < turret 84 < heavies,
    all below the player ship; leaders stay a quarter larger. Bosses and the native sheets (gunship, kamikaze, fleet) are untouched. Art only. */
 if(RET.ui2&&window.ENEMY_ART)for(const id in ENEMY_ART){const a=ENEMY_ART[id];if(!a||a.native||typeof a.k!=='number')continue;a.k=4.2;if(a.L&&typeof a.L.k==='number')a.L.k=5.25;}
+
+// PURPOSE: boss arena textures tiled at native size (not one 128 px picture stretched over 3/4 of the screen), no placeholder boxes on boss art, boss opaque, ship kept on screen, phone street fills the height
+// FLAG: bossfix (?bossfix=0 = the old drawing)
+// TEST: qa/assetaudit.js (BLUR flags), qa/loadgate.js, street2-test.js
+/* ---------- BOSSFIX (owner, 22 Oct 2026, Lab > BOSS > ADLER at 2000x1240: "horrible assets not sized; why these boxes on the sprites of the boss? why is the boss transparent?").
+   BPL.band(id,x0,y0,w,h,rot,off)  a boss-arena strip (blackout / slab / conveyor / gravity) drawn as TILES of the picture at its own aspect inside the rect, never one square
+                                   picture as wide as the rect (that was a 128 px texture drawn 1480 px wide at alpha .72). false = the picture is not ready: the caller draws its code shape.
+   Visuals only: no hitbox, timing or random number is touched. ---------- */
+if(RET.bossfix===undefined)RET.bossfix=!/[?&]bossfix=0/.test(location.search);
+BPL.band=function(id,x0,y0,w,h,rot,off){
+  if(RET.bossfix===false)return ART.pic(id,w,x0+w/2,y0+h/2,rot);   // old: one square picture, w wide
+  const b=ART.img(id);if(!b||w<=0||h<=0)return false;
+  const asp=(b.naturalWidth||b.width)/(b.naturalHeight||b.height)||1,rows=Math.max(1,Math.ceil(h/140)),th=h/rows,tw=Math.max(8,Math.round(th*asp)),o=ART.sp(id,tw);if(!o)return false;
+  const add=id.startsWith('fx-');ctx.save();if(add)ctx.globalCompositeOperation='lighter';
+  ctx.translate(x0+w/2,y0+h/2);ctx.beginPath();ctx.rect(-w/2,-h/2,w,h);ctx.clip();if(rot)ctx.rotate(rot);
+  const sh=((off||0)%o.w+o.w)%o.w;
+  for(let r=0;r<rows;r++)for(let x=-w/2-sh;x<w/2;x+=o.w)ctx.drawImage(o.c,x,-h/2+r*th,o.w,th);
+  ctx.restore();return true;};
+/* the street in a narrow portrait window (a phone, or a browser window the shape of one) without touch events was the desktop letterbox: a small field with black bars above and below and a keyboard hint.
+   Such a window now gets the phone layout (field fills the height above the pad, pad on screen, 'Tap or hold FIRE'). Pointer events drive the pad, so a mouse works too. */
+if(window.FOOT&&!('_bfT' in FOOT)){let ft=false;FOOT._bfT=1;
+  Object.defineProperty(FOOT,'forceTouch',{configurable:true,get(){return ft||(RET.bossfix!==false&&innerWidth<=600&&innerHeight>innerWidth*1.05);},set(v){ft=!!v;}});}
 
 // PURPOSE: Street feel: feet that grip the road (run frames tied to ground speed, bob, dust, lean, skid), one body scale, bullets from the gun's muzzle, a Kai sprite set per weapon
 // FLAG: feel (?feel=0)
