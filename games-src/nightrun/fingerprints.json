@@ -18,13 +18,13 @@
   "end": null
  },
  "street": {
-  "state": "f3f2951677a06b06",
-  "draw": "2c80d7c8a51c256f",
-  "frames": 7200,
-  "samples": 120,
-  "rng": 12800,
-  "dcalls": 176,
-  "end": "section 3 x 7864 lock D foes 1"
+  "state": "1a91e0c899532018",
+  "draw": "cdedcd82cf63d928",
+  "frames": 6707,
+  "samples": 111,
+  "rng": 7640,
+  "dcalls": 157,
+  "end": "cleared at section 1"
  },
  "fly6": {
   "state": "58bbb354414ca9a0",
