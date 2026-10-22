@@ -35,12 +35,13 @@ const TAPS = () => {
   const tap = (name, node) => { if (!node) return; const sp = a.createScriptProcessor(1024, 1, 1), z = a.createGain(); z.gain.value = 0; const T = window.__tap[name] = { pk: 0, clip: 0, blocks: [] };
     sp.onaudioprocess = e => { const d = e.inputBuffer.getChannelData(0); let pk = 0, ss = 0, cl = 0; for (let i = 0; i < d.length; i++) { const v = Math.abs(d[i]); if (v > pk) pk = v; ss += v * v; if (v >= .99) cl++; } T.pk = Math.max(T.pk, pk); T.clip += cl; T.blocks.push([e.playbackTime, pk, Math.sqrt(ss / d.length)]); };
     oc.call(node, sp); oc.call(sp, z); oc.call(z, a.destination); window.__sp.push(sp); };
+  window.__gr = { lim: 0, sfx: 0 }; setInterval(() => { try { window.__gr.lim = Math.min(window.__gr.lim, AU.lim ? AU.lim.reduction : 0); window.__gr.sfx = Math.min(window.__gr.sfx, AU.sfxc ? AU.sfxc.reduction : 0); } catch (e) { } }, 25);
   tap('pre', AU.m); tap('out', AU.lim || AU.m); tap('mus', AU.duck); tap('sfx', AU.sfxv);
 };
 const SUMMARY = () => {
   const m = window.__mnr, AU = m.AU, edges = window.__edges, bus = { sfx: AU.sfxv, mus: AU.duck };
   const reach = n => { const seen = new Set([n]), q = [n]; while (q.length) { const x = q.pop(); if (x === bus.sfx) return 'sfx'; if (x === bus.mus) return 'mus'; for (const y of (edges.get(x) || [])) if (!seen.has(y)) { seen.add(y); q.push(y); } } return 'other'; };
-  const out = { src: window.__src.map(r => ({ k: reach(r.n), t: r.t, e: r.end == null ? r.t + 1 : r.end, id: r.id, at: r.at })), trig: window.__trig, tap: window.__tap, t: AU.a.currentTime };
+  const out = { gr: window.__gr, src: window.__src.map(r => ({ k: reach(r.n), t: r.t, e: r.end == null ? r.t + 1 : r.end, id: r.id, at: r.at })), trig: window.__trig, tap: window.__tap, t: AU.a.currentTime };
   return out;
 };
 
@@ -90,6 +91,7 @@ const SUMMARY = () => {
     const rms = (arr) => Math.sqrt(arr.reduce((s, b) => s + b[2] * b[2], 0) / Math.max(1, arr.length));
     A.outRmsDb = db(rms(out)); A.musRmsDb = db(rms(T.mus.blocks.filter(inw))); A.sfxRmsDb = db(rms(T.sfx.blocks.filter(inw)));
     A.musVsSfxDb = +(A.musRmsDb - A.sfxRmsDb).toFixed(1); A.sfxPeakDb = db(Math.max(0, ...T.sfx.blocks.filter(inw).map(b => b[1]))); A.musPeakDb = db(Math.max(0, ...T.mus.blocks.filter(inw).map(b => b[1])));
+    A.grLim = +S.gr.lim.toFixed(2); A.grSfx = +S.gr.sfx.toFixed(2);
     return A;
   };
 
@@ -106,7 +108,7 @@ const SUMMARY = () => {
     await ctx.close();
   }
   if (MEASURE || process.env.JSON) {
-    for (const scn in runs) { const A = runs[scn]; console.log(`== ${scn} (${A.secs}s): sfx ${A.sfxPerSec}/s, voice starts ${A.voicesPerSec}/s, max voices ${A.maxVoices}, pre-limiter peak ${A.prePeakDb} dBFS (over 1.0: ${A.preOver} blocks), out peak ${A.outPeakDb} dBFS, clipped out blocks ${A.outClip}, out RMS ${A.outRmsDb}, music RMS ${A.musRmsDb} vs sfx RMS ${A.sfxRmsDb} (music-sfx ${A.musVsSfxDb} dB), music peak ${A.musPeakDb} / sfx peak ${A.sfxPeakDb} dBFS, voices at peak ${JSON.stringify(A.peakIds)}, repeats<120ms ${A.rep120}, <60ms ${A.rep60}, ids>6/s ${A.idsOver6} (worst ${A.maxPerSec}/s)`);
+    for (const scn in runs) { const A = runs[scn]; console.log(`== ${scn} (${A.secs}s): sfx ${A.sfxPerSec}/s, voice starts ${A.voicesPerSec}/s, max voices ${A.maxVoices}, pre-limiter peak ${A.prePeakDb} dBFS (over 1.0: ${A.preOver} blocks), out peak ${A.outPeakDb} dBFS, clipped out blocks ${A.outClip}, out RMS ${A.outRmsDb}, music RMS ${A.musRmsDb} vs sfx RMS ${A.sfxRmsDb} (music-sfx ${A.musVsSfxDb} dB), music peak ${A.musPeakDb} / sfx peak ${A.sfxPeakDb} dBFS, voices at peak ${JSON.stringify(A.peakIds)}, limiter GR ${A.grLim} dB, fx-bus GR ${A.grSfx} dB, repeats<120ms ${A.rep120}, <60ms ${A.rep60}, ids>6/s ${A.idsOver6} (worst ${A.maxPerSec}/s)`);
       console.log('   ' + Object.entries(A.ids).sort((a, b) => b[1].played - a[1].played).map(([k, v]) => `${k} ${v.perSec}/s(max${v.max1s} r120:${v.r120} r60:${v.r60})`).join('  ')); }
     if (process.env.JSON) fs.writeFileSync(process.env.JSON, JSON.stringify(runs, null, 1));
   }
@@ -114,6 +116,7 @@ const SUMMARY = () => {
     const all = Object.entries(runs);
     ok('0 every scenario ran with a live audio context (' + all.map(e => e[0]).join(',') + ')', all.length === SCN.length);
     ok('1 no clipping on the master: output peak < -0.5 dBFS, no output block at full scale, signal into the limiter <= 0 dBFS', all.every(([, A]) => A.outClip === 0 && A.outPeakDb < -.5 && A.prePeakDb <= 0), all.map(([k, A]) => [k, A.outPeakDb, A.prePeakDb, A.outClip]));
+    ok('1b master limiter gain reduction never beyond 2 dB (music and effects together)', all.every(([, A]) => A.grLim >= -2), all.map(([k, A]) => [k, A.grLim, A.grSfx]));
     ok(`2 effect voices alive at once <= ${CAP}`, all.every(([, A]) => A.maxVoices <= CAP), all.map(([k, A]) => [k, A.maxVoices]));
     ok('3 no sound id more than 6 times in a second, none twice within 60 ms', all.every(([, A]) => A.idsOver6 === 0 && A.rep60 === 0), all.map(([k, A]) => [k, A.maxPerSec, A.rep60]));
     ok('4 music at least 3 dB louder than the effects bus', all.every(([, A]) => A.musVsSfxDb >= 3), all.map(([k, A]) => [k, A.musVsSfxDb]));
