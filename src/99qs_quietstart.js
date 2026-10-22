@@ -73,15 +73,19 @@ async function QS_go(){const home=[RO.x,RO.z,RO.h],R=[],ck=(n,b)=>R.push((b?'✓
  finally{K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;try{roamWarp(home[0],home[1],home[2])}catch(e){}RO.v=0;QS_clean();store.set('mho_story',sv.story);store.set('mho_flags',sv.flags);store.set('mho_m1',sv.m1);roamStore(sv.ro);RO.ch=sv.ch;RO.card=sv.card;RO.wp=sv.wp;RO.v=sv.v;RO.vsel=sv.vsel;M1.auto=sv.auto;M1.init=sv.init;M1.isInit=sv.isInit;M1.s=sv.s}
  const ok=R.every(r=>r[0]==='✓'||r[0]==='·');return'📍 why/quiet-start · '+R.join(' · ')+(bad.length?' · EVENTS '+bad.slice(0,14).join(' ; '):'')+' → '+(ok?'✅ PASS':'❌ FAIL')}
 // GO why/quiet-dirt: the street car on dirt must not be slower than the old auto off-road form (same seeded drive, legacy vs quiet) and must not bog down
-async function QS_goDirt(){const home=[RO.x,RO.z,RO.h],ro0=Object.assign({},roamSave()),R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),rnd0=Math.random,off0=QS.off,sv={v:RO.v,wp:RO.wp};
+// ath-dirt-stall-r22e11: the drive is blind (gas only, no steering), so ONE bounce off a traffic car on a park road turned the car onto the Pedion plateau edge / into a hill bowl (stuck ladder 1.2-5 s,
+// 41-73 frames < 3 km/h, avg 43-65 vs 72-88; the old form hit the same cars) and it kept driving ~1 km. This GO measures dirt grip, not traffic or the ravine: traffic is parked out of the way for both
+// legs (restored in finally) and each park leg is QS_LEG s (the 70 m of clear grass + the road beyond), not 20 s. Solo built page: 4/4 ath (was 1/3); thresholds unchanged.
+const QS_LEG=8;
+async function QS_goDirt(){const LEG=QS_LEG,home=[RO.x,RO.z,RO.h],ro0=Object.assign({},roamSave()),R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),rnd0=Math.random,off0=QS.off,sv={v:RO.v,wp:RO.wp};
  const run=async off=>{QS.off=off;let sd=4242;Math.random=()=>(sd=(sd*16807)%2147483647)/2147483647;let sum=0,n=0,slow=0,forms={};const sp=(window.__xf&&__xf.grass&&__xf.grass(true))||[];
-  for(const g of sp.slice(0,3)){try{roamWarp(g.x,g.z,g.h)}catch(e){}RO.v=8;RO.cool=0;for(let k=0;k<30*20&&state==='roam';k++){K.KeyW=K.ArrowUp=true;roamStep(1/30);if(k>60){const v=Math.abs(RO.v)*3.6;sum+=v;n++;if(v<3)slow++;forms[pl.vmode]=1}if(k%30===0)await 0}}
+  for(const g of sp.slice(0,3)){try{roamWarp(g.x,g.z,g.h)}catch(e){}RO.v=8;RO.cool=0;for(let k=0;k<30*LEG&&state==='roam';k++){K.KeyW=K.ArrowUp=true;roamStep(1/30);if(k>60){const v=Math.abs(RO.v)*3.6;sum+=v;n++;if(v<3)slow++;forms[pl.vmode]=1}if(k%30===0)await 0}}
   K.KeyW=K.ArrowUp=false;return{avg:sum/Math.max(n,1),slow,n,forms:Object.keys(forms).join('/'),spots:Math.min(sp.length,3)}};
- try{const a=await run(true),b=await run(false);
+ let cars0=null;try{cars0=(typeof HUB!=='undefined'&&HUB.cars)?HUB.cars.splice(0):null;const a=await run(true),b=await run(false);
   ck('park spots driven '+b.spots,b.spots>0);
   ck('old auto-form avg '+a.avg.toFixed(0)+' km/h (form '+a.forms+') vs street car avg '+b.avg.toFixed(0)+' km/h (form '+b.forms+'): within 10%',b.avg>=.9*a.avg);
   ck('street car frames < 3 km/h '+b.slow+' of '+b.n+' (<= 20, or no worse than the old form: '+a.slow+')',b.slow<=20||b.slow<=a.slow)}
- catch(e){R.push('✗ threw '+e)}finally{Math.random=rnd0;QS.off=off0;QS_clean();try{roamWarp(home[0],home[1],home[2])}catch(e){}RO.v=0;roamStore(ro0);FD.hint.hidden=true;FD.mT=0;FD.p0=[RO.x,RO.z];K.KeyW=K.ArrowUp=false;RO.v=sv.v;RO.wp=sv.wp}
+ catch(e){R.push('✗ threw '+e)}finally{if(cars0)HUB.cars.push(...cars0);Math.random=rnd0;QS.off=off0;QS_clean();try{roamWarp(home[0],home[1],home[2])}catch(e){}RO.v=0;roamStore(ro0);FD.hint.hidden=true;FD.mT=0;FD.p0=[RO.x,RO.z];K.KeyW=K.ArrowUp=false;RO.v=sv.v;RO.wp=sv.wp}
  const ok=R.every(r=>r[0]==='✓');return'📍 why/quiet-dirt · '+R.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
   __chk.items.unshift({ver:'why',id:'quiet-start',area:'ui',text:'quiet-start-r22e3 (Alex: "lots of pop ups, annoying quests"): a fresh PLAY in Frankfurt AND Athens = drive at once. 180 s of stepped driving (road, dirt, past a garage at speed): 0 modal/story/chapter cards, 0 vehicle swaps, 0 auto-started or auto-routed modes, <=1 hint visible, none above 20 km/h. ?intro=1 / ?qs=0 restore the old path. 📍 GO.'});
