@@ -5,7 +5,7 @@
 //   node tools/bughunt.js --hours 2 --city fra            gate: one PASS/FAIL line per detector (wall budget --budget 270 s incl. boot; sim time achieved is printed)
 //   node tools/bughunt.js --hours 6 --city both --budget 2400 --json docs/shots/bughunt/fra_ath.json --shots 10   long hunt + 393x852 shots of the worst cells
 //   --build out/<ver>  use an existing build (default: tools/build.sh bughunt once, reused while src/ is older)   --dt 0.05 (frame clamp = 20 fps phone; 0.0333 = 30 fps)
-//   --seeds N  episodes per city (default: one per 10 sim-min)   --pages N  parallel pages per city (default 1)   --notap  skip the touch-tap check
+//   --seed0 K  offset the seeds (more samples from repeat runs)   --seeds N  episodes per city (default: one per 10 sim-min)   --pages N  parallel pages per city (default 1)   --notap  skip the touch-tap check
 // Speed note: the game's own frame (streets step ~11 ms + roamStep ~6 ms + cam ~4 ms on this 4-core container) caps one page at ~2-3x real time, not x1000;
 // --hours is the TARGET, --budget the wall cap: the result is scaled to per hour and the line says how many sim-minutes it really covered.
 const {chromium}=(()=>{try{return require('playwright')}catch(e){return require('/opt/node22/lib/node_modules/playwright')}})();
@@ -80,15 +80,20 @@ const detect=dt=>{const x=RO.x,y=RO.y,z=RO.z,foot=RO.foot&&RO.foot!=='car',busy=
   if(!warp&&dv>6&&!K.ArrowDown){const c=nearCar(8),fx=Math.sin(RO.h),fz=Math.cos(RO.h);
    if(c){BH.hits.npc++}else{let b=null;for(const r of[1.5,2.5,3.5]){try{b=roamHit(x+fx*r,z+fz*r,1.4,y)}catch(e){}if(b)break}
     if(b){BH.hits.world++}else{const g2=groundY(x+fx*3,z+fz*3);if(g2-y<.6){BH.hits.invisible++;add('invisible','stopped by nothing: -'+(dv*3.6).toFixed(0)+' km/h in one step, no NPC, no collider, no slope ahead')}}}}}
+ const NDG=(c,p)=>{const f=v=>typeof v==='number'?+v.toFixed(2):v;return{dg:{a:c.a,b:c.b,t:f(c.t),cv:f(c.cv),hh:f(c.hh),yo:f(c.yo),lr:[f(c.lrx),f(c.lrz)],route:!!c.route,tr:!!c.tr,hitT:f(c.hitT),deS:c.deS,hold:f(c.hold),fdt:f(c.fdt),dx:p?f(c.x-p.x):null,dz:p?f(c.z-p.z):null,p:p?{a:p.a,b:p.b,t:f(p.t),cv:f(p.cv),hh:f(p.hh),yo:f(p.yo),lr:[f(p.lrx),f(p.lrz)],mx:f(p.mx),mz:f(p.mz),dead:f(p.dead)}:null,act:BH.act}}};
  // NPC cars
  const cf=(()=>{try{const d=new THREE.Vector3();camera.getWorldDirection(d);return[camera.position.x,camera.position.z,d.x,d.z]}catch(e){return[x,z,Math.sin(RO.h),Math.cos(RO.h)]}})();
  for(const c of HUB.cars){if(!isFinite(c.x+c.z)){add('nan','NPC car NaN',x,z,y);continue}const dd=Math.hypot(c.x-x,c.z-z);const p=CP.get(c),alive=!(c.dead>0)&&!c.pk;
   if(alive&&dd<60&&!warp){const vx=c.x-cf[0],vz=c.z-cf[1],vd=Math.hypot(vx,vz)||1,view=(vx*cf[2]+vz*cf[3])/vd>.64&&vd>6;
-   if(view&&(!p||!p.alive||Math.hypot(c.x-p.x,c.z-p.z)>6))add('npcPop',p&&p.alive?'NPC jumped '+Math.hypot(c.x-p.x,c.z-p.z).toFixed(0)+' m in one step, '+dd.toFixed(0)+' m away in view':'NPC appeared '+dd.toFixed(0)+' m away in view',c.x,c.z,c.y);
-   if(p&&p.alive&&dd<30){const h=typeof c.hh==='number'?c.hh:Math.atan2(c.hdx||0,c.hdz||1),mx=c.x-p.x,mz=c.z-p.z,m=Math.hypot(mx,mz);if(m<6){const lat=Math.abs(mx*Math.cos(h)-mz*Math.sin(h))/dt;if(lat>3){if((p.lat=(p.lat||0)+1)===2)add('npcLateral','NPC slides sideways '+lat.toFixed(1)+' m/s, '+dd.toFixed(0)+' m from the player',c.x,c.z,c.y)}else p.lat=0}}}
+   if(view&&(!p||!p.alive||Math.hypot(c.x-p.x,c.z-p.z)>6))add('npcPop',p&&p.alive?'NPC jumped '+Math.hypot(c.x-p.x,c.z-p.z).toFixed(0)+' m in one step, '+dd.toFixed(0)+' m away in view':'NPC appeared '+dd.toFixed(0)+' m away in view',c.x,c.z,c.y,NDG(c,p));
+   // traffic-in-view-r22e15: sideways = the step measured against the car's last step of motion (velocity direction, else its lane edge A->B) AND its pose heading; c.hh is the DRAWN heading
+   // (93_cars_lego CR_susp, drawn cars only, set after the pose), so on junction curves and for undrawn/LOD cars it lagged the motion and read as a slide
+   if(p&&p.alive&&dd<30){const mx=c.x-p.x,mz=c.z-p.z,m=Math.hypot(mx,mz);if(m<6){let hx=p.mx,hz=p.mz,hm=Math.hypot(hx||0,hz||0);if(!(hm>.02)){const N=HUB.nodes,A=N&&N[c.a],B=N&&N[c.b];hx=A&&B?B.x-A.x:Math.sin(c.hh||0);hz=A&&B?B.z-A.z:Math.cos(c.hh||0);hm=Math.hypot(hx,hz)||1}
+    {const h=typeof c.hh==='number'?c.hh:Math.atan2(c.hdx||0,c.hdz||1),l0=Math.abs(mx*Math.cos(h)-mz*Math.sin(h))/dt;if(l0>3){if((p.l0=(p.l0||0)+1)===2)BH.cnt.npcLatHH=(BH.cnt.npcLatHH||0)+1}else p.l0=0}/* the old c.hh reading, counted only (INFO) */
+    const l1=Math.abs(mx*hz-mz*hx)/hm/dt,dm=Math.hypot(c.hdx||0,c.hdz||0),lat=dm>.5?Math.min(l1,Math.abs(mx*c.hdz-mz*c.hdx)/dm/dt):l1;/* both references must call it sideways: a car pivoting at a node points where it now moves (its pose heading c.hdx/hdz, set on every pose, drawn or not) */if(lat>3){if((p.lat=(p.lat||0)+1)===2)add('npcLateral','NPC slides sideways '+lat.toFixed(1)+' m/s, '+dd.toFixed(0)+' m from the player',c.x,c.z,c.y,NDG(c,p))}else p.lat=0}}}
   if(alive&&dd<9&&!foot&&Math.abs((c.y||y)-y)<2){let M=null;try{const[w,l]=OB_cdim(c.k);M=NC_mtv(x,z,RO.h,OB_HW,OB_HL,c.x,c.z,typeof c.hh==='number'?c.hh:Math.atan2(c.hdx||0,c.hdz||1),w,l)}catch(e){}
    const o=ovl.get(c)||0;if(M&&M[2]>.25){ovl.set(c,o+1);if(o+1===3)add('npcOverlap','player box inside an NPC car '+M[2].toFixed(2)+' m for 3 frames at '+Math.round(Math.abs(RO.v)*3.6)+' km/h (mode '+BH.mode+')')}else ovl.delete(c)}
-  CP.set(c,{x:c.x,z:c.z,alive,lat:p&&p.lat})}
+  CP.set(c,{x:c.x,z:c.z,alive,lat:p&&p.lat,l0:p&&p.l0,mx:p&&p.alive?c.x-p.x:0,mz:p&&p.alive?c.z-p.z:0,a:c.a,b:c.b,t:c.t,cv:c.cv,hh:c.hh,yo:c.yo,lrx:c.lrx,lrz:c.lrz,dead:c.dead,pk:c.pk})}
  P.x=x;P.y=y;P.z=z;P.v=RO.v};
 // ---------- stepping ----------
 BH.episode=(seed,dt)=>{BH.seed=seed;BH.s=seed*7919+13;BH.dt=dt;Math.random=rnd;try{__tq.reset()}catch(e){}
@@ -122,7 +127,7 @@ async function cityRun(b,base,city,simTarget,wallEnd,pageNo){const ctx=await b.n
  const tb=Date.now();await p.goto(base+'?test='+city+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:420000});const boot=(Date.now()-tb)/1000;
  const ev=s=>p.evaluate(c=>__oc.ev(c),s);if(await ev('1')!==1)throw new Error('__oc.ev disabled (needs window.__dbg)');
  await ev(HUNTER);await p.waitForTimeout(400);   // let the pending real rAF land in the captured queue
- const epLen=Math.max(120,+arg('ep',600));let ep=0,sim=0,steps=0,tapRes=[];const seed0=1+pageNo*1000+(city==='ath'?500:0);
+ const epLen=Math.max(120,+arg('ep',600));let ep=0,sim=0,steps=0,tapRes=[];const seed0=1+pageNo*1000+(city==='ath'?500:0)+(+arg('seed0',0)||0);
  if(!NOTAP&&pageNo===0){try{tapRes=await taps(p)}catch(e){tapRes=[['touch taps ran',false,String(e).slice(0,80)]]}}
  while(sim<simTarget&&Date.now()<wallEnd){await ev(`__BH.episode(${seed0+ep},${DT});0`);ep++;let e=0;
   while(e<epLen&&sim<simTarget&&Date.now()<wallEnd){const n=await ev('__BH.run(1500,'+Math.ceil(Math.min(epLen-e,simTarget-sim)/DT)+')');steps+=n;e+=n*DT;sim+=n*DT;if(!n){await ev('__BH.release();0');await p.waitForTimeout(500);await ev('__BH.capture();0');await p.waitForTimeout(50)}else await p.waitForTimeout(5)}}   // 5 ms gaps: lazy chunks, timers and promises get to run
@@ -150,7 +155,7 @@ async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const 
  for(const city in res){const C=res[city],h=Math.max(C.t,1)/3600;C.cnt.jsErr=(C.cnt.jsErr||0)+C.nErr+C.xcErr.length;C.cnt.deadButton=C.taps.filter(t=>!t[1]).length;C.frustration=C.gasT?100*C.slowT/C.gasT:0;C.perH={};
   for(const d in LIMIT){const n=d==='frustration'?C.frustration:(C.cnt[d]||0),ph=d==='frustration'?n:n/h,abs=['nan','bounds','jsErr','belowGround','yJump','launch','deadButton'].includes(d);C.perH[d]=+ph.toFixed(2);
    const ok=abs?n<=LIMIT[d]:ph<=LIMIT[d];if(!ok)fails++;lines.push(`${ok?'PASS':'FAIL'} ${d} ${city} ${d==='frustration'?n.toFixed(1)+' % of gas time under 10 km/h':n+' hits = '+ph.toFixed(1)+'/h'} (limit ${LIMIT[d]}${d==='frustration'?' %':abs?' total':'/h'})`)}
-  lines.push(`INFO ${city} sim ${(C.t/60).toFixed(1)} min (${(C.t/3600).toFixed(2)} of ${HOURS} h target) · ${C.km.toFixed(1)} km · ${C.steps} steps @ dt ${DT} · ${C.episodes} seeds · contacts/km npc ${(C.hits.npc/Math.max(C.km,.1)).toFixed(2)} world ${(C.hits.world/Math.max(C.km,.1)).toFixed(2)} invisible ${(C.hits.invisible/Math.max(C.km,.1)).toFixed(2)} · boot ${C.boot.map(x=>x.toFixed(0)).join('/')} s`);
+  lines.push(`INFO ${city} npc sideways by the old c.hh reading ${C.cnt.npcLatHH||0} vs step-velocity ${C.cnt.npcLateral||0}`);lines.push(`INFO ${city} sim ${(C.t/60).toFixed(1)} min (${(C.t/3600).toFixed(2)} of ${HOURS} h target) · ${C.km.toFixed(1)} km · ${C.steps} steps @ dt ${DT} · ${C.episodes} seeds · contacts/km npc ${(C.hits.npc/Math.max(C.km,.1)).toFixed(2)} world ${(C.hits.world/Math.max(C.km,.1)).toFixed(2)} invisible ${(C.hits.invisible/Math.max(C.km,.1)).toFixed(2)} · boot ${C.boot.map(x=>x.toFixed(0)).join('/')} s`);
   for(const t of C.taps)if(!t[1])lines.push(`  dead button ${city}: ${t[0]} · ${t[2]}`)}
  let shotList=[];
  if(SHOTS){const all=Object.values(res).flatMap(C=>C.cells).filter(c=>!['jsErr','nan'].includes(c.det)).sort((a,b)=>b.n-a.n),pick=[],seen=new Set();for(const c of all){const k=c.city+Math.floor(c.x/60)+','+Math.floor(c.z/60);if(seen.has(k))continue;seen.add(k);pick.push(c);if(pick.length>=SHOTS)break}

@@ -1,0 +1,44 @@
+// traffic-in-view-r22e15 (2026-10-22, BUGHUNT_x1000 §4.3, rows #4 #6 #11 #14): traffic never slides sideways or teleports while the player can see it.
+// One rule on the DRAWN pose. HT_pose is the only place a traffic car is drawn, whoever moved its a/b/t or x/z in between (junction hand-offs, CV routes,
+// recycle, RD_unstack, yield dodges). Within IV.r m of the camera (60 m around the player), or in the view frustum, a car moves at most v·dt + IV.sl m along its heading and IV.lat m/s
+// sideways in one step; it closes the rest towards its pose at that rate. A gap it cannot close (> IV.tp m: recycle, respawn, a re-route back to a node) on a spot
+// the player can see (HT_canPop false) is hidden in that frame and the car respawns out of sight (c.dead → HT_dead → HT_place), so a recycle shows only behind the camera.
+// Cars touching the player (< 8 m, hitT, tumble) keep their physical shove. ?iv=0 = off. GO: why/traffic-inview (fra + ath).
+const IV={on:!/[?&]iv=0/.test(location.search),r:70/* 60 m around the player + the chase-camera offset */,sl:.5,so:1.5,lat:2.5,tp:20,n:{cl:0,hide:0,snap:0},wT:-1,lt:null,lx:0,lz:0},_ivM=new THREE.Matrix4(),_ivZ=new THREE.Matrix4().makeScale(0,0,0);
+function IV_zone(x,z,y){const C=camera.position,d2=(x-C.x)**2+(z-C.z)**2;if(d2<IV.r*IV.r)return true;if(d2>62500)return false;const P=HT_POP;if(!P.f||P.fr<0)return false;HT_PS.center.set(x,(y||0)+1,z);return P.f.intersectsSphere(HT_PS)}
+function IV_each(im,fn){if(!im)return;fn(im);if(im.userData.w)fn(im.userData.w);if(im.userData.g)fn(im.userData.g)}
+function IV_hide(c,im){IV_each(im,m=>m.setMatrixAt(c.j,_ivZ));c.dead=.3;c.ivx=null;IV.n.hide++;return 1}
+function IV_guard(c,A,B,gA,im){const x=c.x,z=c.z,ox=c.ivx,oz=c.ivz;let el=T-c.ivT;
+ if(ox==null||IV.wT>=c.ivT)return;/* first pose, or the player warped since: nothing drawn to slide from */const gx=x-ox,gz=z-oz,g=Math.hypot(gx,gz);
+ if(!(el<.6&&el>-1e-6)){if(g>IV.tp&&!HT_canPop(x,z,c.y))return IV_hide(c,im);return}/* after a gap (pose skipped while far: c.x went stale) a car may not reappear in sight */el=Math.max(el,1/60);
+ const v=Math.abs(c.cv||0);let sl=Math.min(IV.sl,Math.max(1.5,.5*v)*el),lm=IV.lat*el;if(g<.02)return;let hx=c.hdx,hz=c.hdz;const hm=Math.hypot(hx||0,hz||0);if(!(hm>.5)){hx=gx/g;hz=gz/g}else{hx/=hm;hz/=hm}
+ const a0=gx*hx+gz*hz,l0=gz*hx-gx*hz;if(g<=IV.tp&&a0>=-sl&&a0<=v*el+sl&&Math.abs(l0)<=lm)return;/* already inside the rule */
+ if((x-RO.x)**2+(z-RO.z)**2<64||c.hitT>0||c.crW)return;/* a shove from the player is physics */
+ const vis=IV_zone(x,z,c.y)||IV_zone(ox,oz,c.y);if(g>IV.tp){if(vis&&!HT_canPop(x,z,c.y))return IV_hide(c,im);IV.n.snap++;return}/* a recycle out of sight snaps */
+ if(!vis){sl=Math.max(sl,IV.so);lm=Math.max(lm,IV.so)}/* out of sight it still closes, 1.5 m a step: a lag snapped as the camera turned away was a 7-13 m step when it turned back (why/solid-cars d) */
+ const a=Math.max(-sl,Math.min(v*el+sl,a0)),l=Math.max(-lm,Math.min(lm,l0)),nx=ox+a*hx-l*hz,nz=oz+a*hz+l*hx,sx=nx-x,sz=nz-z;
+ const y=A.ab||gA?groundAt(nx,nz,(c.y||0)+4):groundY(nx,nz),sy=isFinite(y)&&Math.abs(y-c.y)<3?y-c.y:0;
+ IV_each(im,m=>{m.getMatrixAt(c.j,_ivM);const e=_ivM.elements;e[12]+=sx;e[13]+=sy;e[14]+=sz;m.setMatrixAt(c.j,_ivM)});c.x=nx;c.z=nz;c.y+=sy;IV.n.cl++}
+HT_pose=(f=>function(c,A,B,dx,dz,gA,W,dt,im){const r=f.apply(this,arguments);if(T!==IV.lt&&typeof camera!=='undefined'){const P=camera.position;if(IV.lt!=null&&Math.hypot(P.x-IV.lx,P.z-IV.lz)>50)IV.wT=T;/* fast travel / warp: every car is new to the eye */IV.lt=T;IV.lx=P.x;IV.lz=P.z}if(IV.on&&!c.pk&&!c.tr&&im&&typeof camera!=='undefined'){let h=0;try{h=IV_guard(c,A,B,gA,im)}catch(e){}if(h)return r}c.ivx=c.x;c.ivz=c.z;c.ivT=T;return r})(HT_pose);
+// GO why/traffic-inview: a live car in front of the camera is forced through the three bughunt cases in one step each and must obey the rule while drawn:
+// a 9 m jump along its lane (fra start-junction hand-off), a 3 m sideways jump (Athens slide), a teleport onto a visible spot 30 m ahead (recycle into view).
+function IV_go(){const R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),dt=1/30,N=HUB.nodes;const step=()=>{T+=dt;HT_popF();HT_cars(N,dt)};
+ const fx=Math.sin(RO.h),fz=Math.cos(RO.h);let c=null;for(let w=0;w<20&&!c;w++){let bd=1e9;if(w)for(let k=0;k<30;k++)step();else HT_popF();const C=camera.position;for(const o of HUB.cars){if(o.dead>0||o.pk||o.tr||o.route||!N[o.a]||!N[o.b])continue;const d=Math.hypot(o.x-C.x,o.z-C.z);if(d<10||d>55||Math.hypot(o.x-RO.x,o.z-RO.z)<10)continue;if(d<bd){bd=d;c=o}}}
+ if(!c)return'📍 why/traffic-inview · ✗ no live car 10-55 m from the camera in 20 s → ❌ FAIL';
+ const im=HUB.cim[c.k],pos=()=>{im.getMatrixAt(c.j,_ivM);return[_ivM.elements[12],_ivM.elements[14],_ivM.elements[0]**2+_ivM.elements[1]**2+_ivM.elements[2]**2]};
+ const hold=c.hold,cv0=c.cv,v0=c.v;c.v=c.cv=Math.max(4,Math.min(8,c.cv||0));step();
+ // 1) along: +9 m on its edge
+ let A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,p=pos();c.t=Math.min(.98,c.t+9/L);step();let q=pos(),m=Math.hypot(q[0]-p[0],q[1]-p[1]);ck('9 m lane jump drawn as '+m.toFixed(2)+' m (<= v·dt + 0.5 = '+(c.cv*dt+.5).toFixed(2)+')',m<=c.cv*dt+.5+.02);
+ for(let k=0;k<90;k++)step();
+ // 2) sideways: a 3 m yield offset in one step
+ if(!(c.dead>0)){p=pos();const hx=c.hdx,hz=c.hdz,yo=c.yo;c.yo=(c.yo||0)+3;step();step();step();q=pos();const l=Math.abs((q[0]-p[0])*hz-(q[1]-p[1])*hx)/(3*dt);ck('3 m sideways jump drawn at '+l.toFixed(1)+' m/s over 3 steps (<= 3)',l<=3.05);c.yo=yo}else ck('car alive for the sideways case',false);
+ for(let k=0;k<60;k++)step();
+ // 3) teleport: onto the node in view nearest 30 m ahead of the player
+ let tn=-1,tb=1e9;for(let i=0;i<N.ng;i++){const n=N[i];if(!n||!n.nb||!n.nb.length||n.ab)continue;const rx=n.x-RO.x,rz=n.z-RO.z,al=rx*fx+rz*fz,d=Math.hypot(rx,rz);if(al<.8*d||d<20||d>45||Math.hypot(n.x-c.x,n.z-c.z)<IV.tp+5||HT_canPop(n.x,n.z,n.y))continue;const e=Math.abs(d-30);if(e<tb){tb=e;tn=i}}
+ if(tn<0)ck('a visible node 20-45 m ahead for the teleport case',false);else if(!(c.dead>0)){c.a=tn;c.b=N[tn].nb[0];c.t=0;c.route=null;step();q=pos();ck('teleport into view hidden (dead '+(c.dead>0)+', drawn scale '+q[2].toFixed(2)+')',c.dead>0&&q[2]<1e-6)}
+ c.hold=hold;c.v=v0;if(!(c.dead>0))c.cv=cv0;
+ ck('counters cl '+IV.n.cl+' hide '+IV.n.hide+' snap '+IV.n.snap,IV.n.cl>0&&IV.n.hide>0);
+ const ok=R.every(r=>r[0]==='✓');return'📍 why/traffic-inview · '+R.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
+{const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
+ __chk.items.unshift({ver:'why',id:'traffic-inview',area:'traffic',text:'traffic-in-view-r22e15 (bughunt §4.3): a car in view is forced through a 9 m lane jump, a 3 m sideways jump and a teleport onto a visible spot: drawn step <= v·dt + 0.5 m, sideways <= 3 m/s, the teleport is hidden (respawns out of sight). 📍 GO.'});
+ __chk.GO['why/traffic-inview']=['fra','ath'].map(c=>({c,n:'traffic in view '+(c==='fra'?'Frankfurt':'Athens'),secs:30,fn:()=>IV_go()}))},500)}
