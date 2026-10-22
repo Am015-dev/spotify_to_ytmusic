@@ -39,7 +39,7 @@ function facts(key){if(info[key])return info[key];const m=ART.ANIM.s[key],b=ART.
     if(run(m[2],x=>a(x0+x,0))>2)e.push('top');if(run(H,y=>a(x0,y))>2)e.push('left');if(run(H,y=>a(x0+m[2]-1,y))>2)e.push('right');if(!feet&&run(m[2],x=>a(x0+x,H-1))>2)e.push('bottom');
     fr.push({l,r,t,b:bt,cut:e});}
   return info[key]={fr,W,H};}
-V.facts=facts;V.ready=k=>!!ART.anim(k);V.has=k=>!!ART.ANIM.s[k];   // for the tests (ART is not on window)
+V.facts=facts;V.info=info;V.ready=k=>!!ART.anim(k);V.has=k=>!!ART.ANIM.s[k];   // for the tests (ART is not on window)
 /* ----- painted street (the five street layers, no actors, no waves) ----- */
 const BG={};for(const n of ['sky','far','mid','near','floor']){const im=new Image();im.src='media/foot/bg-'+n+'.webp';BG[n]=im;}
 const still={};
@@ -66,12 +66,12 @@ function drawOne(g,sh,act,i,x,y,h,o){const k=sh+'/'+act,m=ART.ANIM.s[k],b=m&&ART
     const mz=FE&&FE.MZ[(sh.indexOf('kai')===0?'kai':sh)+'/'+act];if(V.mz&&mz&&fe){const q=mz[Math.min(mz.length-1,i)];g.fillStyle='#ffe14d';g.beginPath();g.arc(q[0]*s,q[1]*s,4,0,6.283);g.fill();g.strokeStyle='#000';g.lineWidth=1;g.stroke();}}
   g.restore();return {s,m,fr,i};}
 /* ----- the stage, the zoom box and the info line ----- */
-let el=null,cv=null,zc=null,txt=null,raf=0,last=0,chips=[],stList=null,chList=null;
+let el=null,cv=null,zc=null,txt=null,raf=0,last=0,chips=[],stList=null,chList=null;let bgK='';const bgC=document.createElement('canvas');
 function size(c){const r=c.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1,Math.sqrt(2.2e6/Math.max(1,r.width*r.height))),   // at most ~2.2 megapixels (a 4K screen at 2x was 15 MP redrawn 30 times a second)
   w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}return d;}
 function hOf(sh,H){return STILL[sh]||/^(prop|pk)-/.test(sh)?.225*H*(PH[sh]||64)/64:.225*H*(HT[sh]||64)/64;}
 /* the road line is drawn as rectangles: a dashed stroke() across a 5000 px canvas cost ~120 ms a frame (owner 22 Oct: the viewer crawled on a fast PC) */
-function paint(){if(!cv)return;const d=size(cv),g=cv.getContext('2d'),W=cv.width,H=cv.height,road=Math.round(H*470/540);g.setTransform(1,0,0,1,0,0);street(g,W,H,road);
+function paint(){if(!cv)return;const d=size(cv),g=cv.getContext('2d'),W=cv.width,H=cv.height,road=Math.round(H*470/540);g.setTransform(1,0,0,1,0,0);{const ld=Object.values(BG).filter(im=>im.complete&&im.naturalWidth).length,bk=W+'x'+H+'|'+ld;if(bk!==bgK){bgK=bk;bgC.width=W;bgC.height=H;street(bgC.getContext('2d'),W,H,road);}g.drawImage(bgC,0,0);}   // the street is painted once per size, then copied
   if(V.road){g.fillStyle='#ffe14d';{const dl=10*d,gp=6*d,lw=Math.max(1,Math.round(1.5*d)),y=Math.round(road-lw/2);for(let x=0;x<W;x+=dl+gp)g.fillRect(x,y,dl,lw);}g.fillStyle='#ffe14d';g.font='bold '+Math.round(11*d)+'px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText('ROAD LINE (feet stand here)',6*d,road-3*d);}
   const k=key(),has=STILL[V.sheet]||ART.ANIM.s[k],i=has?(STILL[V.sheet]?0:frameAt(k)):0;let r=null;
   if(V.cmp.length){const list=V.cmp.indexOf(V.who)<0?V.cmp.concat([V.who]):V.cmp,n=list.length;list.forEach((w,j)=>{const sh=w==='bigheavy'?'bruiser':w,a=ART.ANIM.s[sh+'/'+V.act]?V.act:STILL[sh]?'still':'idle',kk=sh+'/'+a,
@@ -129,7 +129,7 @@ function build(){if(el)return;const st=document.createElement('style');st.id='fv
   const k=document.createElement('div');k.className='vkey';k.textContent='Dashed white box = the frame cell the game cuts from the sheet. Cyan box = the visible body. Red edge = the art touches the cell edge (cut off). Yellow dot = where shots leave the gun.';side.append(k);
   main.append(left,side);el.append(bar,main);document.body.append(el);}
 V.open=function(w){if(V.on){if(w)V.pick(w);return true;}if(FLAB.on)FLAB.exit();V.on=true;V.log.open++;build();V.pick(w||V.who);V.t=0;last=0;V._n=0;if(!raf)raf=requestAnimationFrame(loop);sync();return true;};
-V.close=function(){if(!V.on)return;V.on=false;if(raf){cancelAnimationFrame(raf);raf=0;}if(el){el.remove();el=null;}const s=document.getElementById('fvCss');if(s)s.remove();cv=zc=txt=stList=chList=null;chips=[];};
+V.close=function(){if(!V.on)return;V.on=false;bgK='';bgC.width=bgC.height=1;if(raf){cancelAnimationFrame(raf);raf=0;}if(el){el.remove();el=null;}const s=document.getElementById('fvCss');if(s)s.remove();cv=zc=txt=stList=chList=null;chips=[];};
 V.playTest=function(){V.close();return FLAB.start();};
 /* the sandbox panel gets a VIEWER button back (a toggle both ways) */
 {const st0=FLAB.start;FLAB.start=function(){const r=st0.apply(this,arguments);const add=()=>{const bar=document.querySelector('#flP .fbar');if(!bar||document.getElementById('flView2'))return;const b=document.createElement('button');b.type='button';b.className='fc';b.id='flView2';b.textContent='VIEWER';b.setAttribute('aria-label','Leave the play test and open the calm viewer');

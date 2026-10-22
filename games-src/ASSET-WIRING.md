@@ -60,3 +60,11 @@ Read this before any asset work. It applies to every game; Mainhattan Nightrun i
   - Body-height acts (run, idle, shoot, ...) keep every frame at the strip's median height, with a 4% bob allowed (`same_size`).
   - Gates: `sprite_size.py` and `sprite_cross.py` on the laptop.
   - The game must therefore draw every act of a character at the same entity height. The sheet cell already carries the pose difference: do not rescale crouch or jump cells in code.
+
+## 5. Checking a new sprite sheet before wiring it (Nightrun Lab > SHEET TESTER, 22 Oct 2026)
+How the game sizes a frame: ON FOOT the whole CELL is scaled so its height = the character's street height (Kai 64, heavy 80) and the cell
+bottom sits on the road; only kai/knife/gunman/bruiser get a body-box correction (streetfeel FEEL.BODY). FLIGHT sheets are drawn at cell size
+times one factor per character. So extra headroom in one state's cells makes the character shrink in that state. Before wiring a sheet, open
+the Lab viewer > SHEET TESTER, drop the PNG/WebP (frames are guessed), compare it with the current art at game scale and read the
+CONSISTENCY REPORT (body > 8% off idle, feet > 3 px above the road, edge-touching frames, frame/cell mismatch). USE puts it in the viewer and
+PLAY TEST for that tab only; nothing is saved. Link: `?footlab=1&who=ninja&act=slash&l3=one`.
