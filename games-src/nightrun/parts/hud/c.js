@@ -241,7 +241,7 @@ function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false
   else if(G.weekly)eye=RET.weeklyEnd(G.score);
   else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
-  $('overEyebrow').textContent=eye;
+  $('overEyebrow').textContent=eye;overEl.classList.toggle('evnr',/^New (best|daily)/.test(eye)&&ART.isReal('event-new-record'));   // record splash
   $('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
   $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${window.fmtN(dailyBest.score)}</strong>`:`Best <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`;
   overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);showBest();
