@@ -14364,7 +14364,7 @@ if(RET.comfort){for(const k of['glow','scan','txt','cbp','calmm'])if(SET[k]===un
   if(SET.rm===undefined)SET.rm=RM;deriveSet();}
 COM.fontHook();
 HOOK.drawEnemy(de=>function(e,t){   // every ordinary enemy sits on a soft light halo (the existing glow sprite, pale, 30% before the glow setting): a dark hull stays readable on the dark city
-    if(RET.comfort&&e!==G.boss&&!e.dead&&e.hp>0&&e.r<40){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*1.45,'#cfd8ff',.3);ctx.restore();}
+    if(RET.comfort&&!RET.clean&&e!==G.boss&&!e.dead&&e.hp>0&&e.r<40){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*1.45,'#cfd8ff',.3);ctx.restore();}
     return de.call(this,e,t);});
 {const h1=drawHUDP,h2=drawHUD,w=(f)=>function(t){COM.hud=1;try{return f.call(this,t);}finally{COM.hud=0;}};drawHUDP=w(h1);drawHUD=w(h2);   // HUD text has the higher floor
   }
@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='5159a5a71e 2026-10-22 15:45 UTC';
+const NR_STAMP='bf039257e2 2026-10-22 16:09 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16260,6 +16260,48 @@ const SL=window.SL={
   NR.on('runStart',()=>SL.reset());
   NR.on('tick',dt=>SL.tick(dt));
 }
+
+// PURPOSE: the song plays clean, nothing filters, ducks, cuts or covers it; only a few quiet game sounds are left
+// FLAG: pure (?pure=0 = the old mix)
+// TEST: qa/puremusic-test.js
+/* ---------- PURE: owner, 22 Oct 2026: "keep the music not distorted by any power up, no perfect sound effects or anything that makes the game experience bad".
+   The song goes straight from its volume to the master (no combo low-pass, no duck, no Drop cut, no SLOW low-pass, no pause-screen filter).
+   Game sounds: only 'hurt' (you were hit), 'pick' (you took something) and 'boom' (an enemy died) are left, quieter; every other effect, every
+   music sting and every power-up sound is silent. Menu sounds (outside a run) stay. ---------- */
+if(RET.pure===undefined)RET.pure=!/[?&]pure=0/.test(location.search);
+const PURE=window.PURE={KEEP:{hurt:1,pick:1,boom:1},GAIN:.22,blocked:0,played:0,
+  wire(){const a=AU.a;if(!a||this.done||!AU.musv||!AU.m)return;this.done=1;
+    try{AU.musv.disconnect();}catch(e){}AU.musv.connect(AU.m);                 // song: volume -> master, nothing in between
+    this.ok=a.createGain();this.ok.gain.value=this.GAIN;this.ok.connect(AU.sfxv);   // the few sounds that stay
+    try{AU.fx.gain.value=0;}catch(e){}}};                                    // power-up and effect sounds wired straight to AU.fx: silent
+if(RET.pure){
+  {const i0=AU.init;AU.init=function(){const r=i0.apply(this,arguments);PURE.wire();return r;};}
+  AU.duckMusic=function(){};AU.slowColour=function(){};
+  {const s0=AU.sfx;AU.sfx=function(n){PURE.wire();
+    if(running&&!PURE.KEEP[n]){PURE.blocked++;return;}
+    const F0=this.fx;if(PURE.ok)this.fx=PURE.ok;PURE.played++;try{return s0.apply(this,arguments);}finally{this.fx=F0;}};}
+  {const g0=AU.sting;AU.sting=function(){if(running){PURE.blocked++;return false;}return g0.apply(this,arguments);};}}
+
+// PURPOSE: the picture looks painted, not pasted: no light discs behind enemies, a much lighter black veil over the city
+// FLAG: clean (?clean=0 = the old look)
+// TEST: qa/loadgate.js (no page errors); look checked on 390x763 and 1440x860 screenshots
+/* ---------- CLEAN: owner, 22 Oct 2026: "assets are not smoothly aligned to the background, everything seems so fake".
+   The readability layers stacked three effects on every enemy (two glow sprites + a pale disc from legible.js, a light halo from comfort.js):
+   each ship sat on a grey coin. They are off; the hull brightening of the recoloured sheets stays. The black veil over the backdrop drops from
+   .35 to .12 so the painted city is visible. Enemy bullets keep their dark edge (legible.js halo), so shots stay readable. ---------- */
+if(RET.clean===undefined)RET.clean=!/[?&]clean=0/.test(location.search);
+if(RET.clean){LGB.enemy=function(de,e,t){return de(e,t);};LGB.DIM=.12;LGB.DIMHC=.2;}
+/* the painted backdrop was baked with a 50 % black fill (art.js ART.bgOf dim .5/.52) on top of the veil: the city read as a black wall. With clean it is 15 %. */
+if(RET.clean){const b0=ART.bgOf;ART.bgOf=function(di,port,u,w,h,dim){return b0.call(this,di,port,u,w,h,Math.min(dim==null?0:dim,.15));};}
+/* phone: the portrait backdrop is a street-level skyline; scrolling it down the screen with every second copy flipped drew the towers upside down
+   at the top. With clean it stands still and whole (no flip), and the top-down rooftop strip (a different viewpoint over a street-level picture) is not drawn. */
+if(RET.clean){ART.paintP=function(bg,scroll){const di=DISTRICTS.indexOf(bg.D);if(!ART.bm['bg-'+ART.dn[di]+'-phone'])ART.warm(di);const o=ART.bgOf(di,true,VS,PW_,PH_,.5);if(!o)return false;
+    ctx.drawImage(o.c,0,0,PW_,PH_);return true;};
+  {const d0=drawBGP;drawBGP=function(bg,t,dt,scroll){const k='ly-phone-'+ART.dn[DISTRICTS.indexOf(bg.D)],b=ART.bm[k];if(b)delete ART.bm[k];try{return d0.call(this,bg,t,dt,scroll);}finally{if(b)ART.bm[k]=b;}};}}
+/* enemy bullets: the dark halo was 2.1-2.6x the bullet (black holes on a lit city); with clean it is a thin dark edge (1.35x) */
+if(RET.clean)LGB.HK={n:1.35,r:1.35,'':1.35,s:1.35};
+/* no word pop-ups in play: PERFECT, ON BEAT, CHAIN n, GRAZE, OVERHEAT are dropped (score numbers stay) */
+if(RET.clean){const fl=floater;floater=function(x,y,txt){if(running&&typeof txt==='string'&&/PERFECT|ON BEAT|CHAIN|GRAZE|OVERHEAT|COMBO|NICE|GREAT/i.test(txt))return;return fl.apply(this,arguments);};}
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;
