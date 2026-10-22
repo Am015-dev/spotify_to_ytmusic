@@ -11,6 +11,7 @@
       (EXPOSED: the boss stops firing for 8 beats) at 12%.
    C. power scale: the hull is set high (x HK), and a ship whose honest damage cannot finish inside ~1.2 T gets its boss damage raised (at most x AMP); hard.js's repair is held to REP x the cap,
       so a fresh ship is not stuck: its fight ends near 1.2 T; the cap still holds the floor. */
+const BOSSFY=window.BOSSFY=y=>typeof wcv!=='undefined'&&wcv===cv?Math.max(y,150):y;   // boss floaters stay below the hint line at the top of a landscape screen
 if(RET.boss2===undefined)RET.boss2=!/[?&]boss2=0/.test(location.search);
 const B2X=window.B2X={get on(){return!!RET.boss2;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.2,BK:5,SHT:14,
   T:{mini:{easy:42,normal:50,hard:60,vhard:65,legend:70},dist:{easy:66,normal:80,hard:95,vhard:102,legend:110},fin:{easy:100,normal:120,hard:145,vhard:158,legend:170}},   // the shortest fight in seconds
@@ -50,7 +51,7 @@ NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,l
   if(left>.01){s.sh=.35;
     if(now-s.sp>.12){s.sp=now;burst(e.x-e.r*.7,e.y+rnd(-e.r*.5,e.r*.5),'#cfe8ff',5,190,.25);}
     if(now-s.cl>.3){s.cl=now;AU.sfx('hit');}
-    if(now-s.fl>5){s.fl=now;floater(e.x,e.y-e.r-34,'ARMOUR HOLDS','#cfe8ff');}}
+    if(now-s.fl>5){s.fl=now;floater(e.x,BOSSFY(e.y-e.r-34)+22,'ARMOUR HOLDS','#cfe8ff');}}
   if(take>0)s.w.push([now,take]);
   let hp=s.ref-take;const pf=e.ph===1?e.max*.64:e.ph===2?e.max*.31:0;   // hold the HP at the next phase line until that phase starts on the bar
   if(hp<pf)hp=Math.min(s.ref,pf);

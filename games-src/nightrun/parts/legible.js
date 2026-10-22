@@ -11,16 +11,16 @@
       the city as it was, so the district stays recognisable.
    4. Colour grammar (INDUSTRY-PLAYBOOK.md 'Colour grammar'): enemy fire warm (pink / red / orange), player shots cool (readable.js), pickups green, music coins leaf green (gold is the elite ring and sits next to orange shells). ---------- */
 if(RET.legible===undefined)RET.legible=!/[?&]legible=0/.test(location.search);
-const LGB=window.LGB={GLOW:'#e9e2ff',HALO:'rgba(6,2,14,.88)',BAND:.55,EDGE:.12,
+const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.55,EDGE:.12,
   PK:{shard:'#5dff8a',hp:'#5dff8a',up:'#5dff8a',emp:'#5dff8a'},COIN:'#7dff5d',
   /* under-glow alpha per district (G.di); tuned with legible-test.js */
-  st:[.8,.8,.8,.8,.8,.8,.8,.8,.8,.8,.8,.8],ga(){const a=this.st[G.di];return a==null?.8:a;},
+  st:[1,1,1,1,1,1,1,1,1,1,1,1],ga(){const a=this.st[G.di];return a==null?1:a;},
   stat:{en:0,halo:0,band:0},
   /* 1. one enemy */
-  enemy(de,e,t){if(e.type==='boss'||!running)return de(e,t);const r=e.r||12;ctx.save();ctx.globalCompositeOperation='source-over';G_(e.x,e.y,r*2.3,this.GLOW,this.ga());ctx.restore();
+  enemy(de,e,t){if(e.type==='boss'||!running)return de(e,t);const r=e.r||12;ctx.save();ctx.globalCompositeOperation='source-over';G_(e.x,e.y,r*this.GR,this.GLOW,this.ga());G_(e.x,e.y,r*this.GC,this.GLOW,this.ga());ctx.restore();
     de(e,t);this.stat.en++;},
   /* 2. the dark halo under the enemy bullets */
-  halo(){const L=G.eb;if(!L.length)return;const bg=RET.asBigOn()?1.35:1;ctx.save();ctx.globalCompositeOperation='source-over';ctx.fillStyle=this.HALO;ctx.beginPath();
+  halo(){const L=G.eb;if(!L.length)return;const bg=(RET.asBigOn()?1.35:1)*1.2;ctx.save();ctx.globalCompositeOperation='source-over';ctx.fillStyle=this.HALO;ctx.beginPath();
     for(const b of L){const r=b.r*(b.k==='n'?2.6:b.k==='r'?2.4:2.1)*bg+1.5;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();ctx.restore();this.stat.halo++;},
   /* 3. the play band: w,h = the backdrop's own units (landscape W,H; portrait PW_,PH_); the band runs across the short side */
   band(w,h){const P=w<h,E=this.EDGE,key=w+'x'+h+'@'+this.BAND;let g=this._g;

@@ -31,7 +31,7 @@ const EXP=window.EXP={get on(){return!!RET.explain;},ZT:4,shown:{},q:[],cap:null
     ctx.font='700 '+fs.toFixed(1)+'px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
     const maxW=Math.min((rot?H:W)-16,190/Math.max(.05,u))-fs*1.6,lines=[];let ln='';for(const wd of String(txt).split(' ')){const t=ln?ln+' '+wd:wd;if(ln&&ctx.measureText(t).width>maxW){lines.push(ln);ln=wd;}else ln=t;}if(ln)lines.push(ln);   // wrap, never squeeze
     const lh=fs*1.25,bh=lines.length*lh+fs*.7,w=Math.min((rot?H:W)-16,Math.max(...lines.map(l=>ctx.measureText(l).width))+fs*1.6);
-    const m=80/Math.max(.05,u),x=rot?clamp(ax+40,bh/2+m,W-bh/2-m):clamp(ax,w/2+8,W-w/2-8),y=rot?clamp(ay,w/2+m,H-w/2-m):clamp(ay-40,bh/2+m,H-bh/2-m);   // keep clear of the HUD bands on every side
+    const m=(rot?80:104)/Math.max(.05,u),x=rot?clamp(ax+40,bh/2+m,W-bh/2-m):clamp(ax,w/2+8,W-w/2-8),y=rot?clamp(ay,w/2+m,H-w/2-m):clamp(ay-40,bh/2+m,H-bh/2-m);   // keep clear of the HUD bands on every side
     ctx.translate(x,y);if(rot)ctx.rotate(Math.PI/2);
     ctx.fillStyle='#05030ccc';ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(-w/2,-bh/2,w,bh,Math.min(13,bh/2));else ctx.rect(-w/2,-bh/2,w,bh);ctx.fill();ctx.stroke();
     ctx.fillStyle='#fff';lines.forEach((l,i)=>ctx.fillText(l,0,(i-(lines.length-1)/2)*lh+1));ctx.restore();},

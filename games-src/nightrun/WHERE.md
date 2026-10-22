@@ -32,7 +32,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | scale2,mustmove,strike2 | fair MM 71-103 |  |  | scale2 | BALANCE |
 | scale3 | hard S3auto 21-57 |  |  | scale3 | BALANCE |
 | react | react fan0 75-118 |  |  | react | BALANCE |
-| boss2 | armour B2X 15-69 |  |  | boss2 | BALANCE |
+| boss2 | armour B2X 16-70 |  |  | boss2 | BALANCE |
 | reward | reward RWD 14-54 |  |  | reward |  |
 | build2! | choices CHO.tick 28-61 |  |  | choices | BALANCE |
 | bossmoves | bossmoves vd 98-178 |  |  | bossmoves |  |
@@ -43,7 +43,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | forge | inventory INV.draw 54-112 |  |  | forge |  |
 | forgeui | forgeui FGU 20-117 |  |  | forgeui | ASSETS-NEEDED-3 |
 | forge2 | forgeone FG2 12-118 |  |  | forge2 |  |
-| counter | counter CTR 18-100 |  |  | counter |  |
+| counter | counter CTR 18-101 |  |  | counter |  |
 | timing | timing TIM 19-101 | draw |  | timing |  |
 | vis | visible VIS 12-21 |  |  | visible | BALANCE |
 | grit,gritBoss | grit GRIT 15-71 |  |  | grit | BALANCE |

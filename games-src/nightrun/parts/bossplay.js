@@ -131,7 +131,7 @@ BPL.add=(e,o)=>{const t=en('mine',{x:e.x,y:e.y,wpt:1,bpRole:o.role});t.hp=t.max=
 BPL.resolve=(e,how)=>{const b=e.bp,g=b&&b.g;if(!g||!g.up)return;const s=BPL.stat(),k=g.m+':'+how;s.how[k]=(s.how[k]||0)+1;if(how!=='fb'&&how!=='ls'&&how!=='auto')s.res[g.m]=(s.res[g.m]||0)+1;if(how==='fb')s.fb++;else s.open++;
   for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}g.up=0;
   const real=how!=='fb'&&how!=='ls';if(real){b.ch=(b.ch|0)+1;b.rg=0;b.rt=0;}
-  if(real&&b.ch<BPL.chain()&&!(e.b2&&e.b2.ls>0)){floater(e.x,e.y-e.r-34,'BREAK '+b.ch+'/'+BPL.chain(),'#19e3ff');AU.sfx('tier');BPL.gate(e,G.t);return;}   // W40: chained gates, the next one rises at once
+  if(real&&b.ch<BPL.chain()&&!(e.b2&&e.b2.ls>0)){floater(e.x,BOSSFY(e.y-e.r-34),'BREAK '+b.ch+'/'+BPL.chain(),'#19e3ff');AU.sfx('tier');BPL.gate(e,G.t);return;}   // W40: chained gates, the next one rises at once
   const q=real&&BPL.tier()>0&&(b.rg||0)<BPL.QK&&!(b.rt>0);if(real){b.rg=0;b.rt=0;}if(q)BPL.stat().quick=(BPL.stat().quick|0)+1;
   b.ch=0;g.fbw=how==='fb';g.open=G.t+(how==='fb'?(BPL.fit?BPL.FIT.FBWD[SET.diff]||BPL.FIT.FBW:BPL.FBW):BPL.opn()+(q?BPL.OPENQ:0));   // an overload only flickers FBW s; a real break opens the window, and the boss stays silent for all of it (playing the mechanic is the safe way)
   if(real&&e.bm){e.bmS=Math.max(e.bmS|0,e.bt+Math.max(BPL.BREATH,Math.ceil(BPL.opn()/(BT.spb||.5))));BMV.q=BMV.q.filter(q=>q.e!==e);BMV.tq=[];BMV.hz=BMV.hz.filter(z=>z.mk||G.t>=z.on);}   // a gate that is really resolved: the boss is silent for BREATH beats (pending shots and unlit warnings go)
