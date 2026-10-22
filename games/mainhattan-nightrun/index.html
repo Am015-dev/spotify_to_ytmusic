@@ -217,7 +217,7 @@ let best=load('mnr_best',{score:0,dist:''});
 const todayN=()=>{const d=(window.RET&&RET.daily&&RET.clock)?new Date(RET.clock()):new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 window.CMF_ON=!/[?&]comfort=0/.test(location.search);   // comfort.js: the eye-strain pass (?comfort=0 = the old look)
-window.fmtN=n=>Math.round(+n||0).toLocaleString('de-DE');   // the one number format (thousands dot): every score, Neon and count goes through it
+window.fmtN=n=>String(Math.round(+n||0));   // the one number format (review 10 #14): plain digits, 2400 not 2.400; every score, Neon and count goes through it
 window.phText=()=>/[?&]placeholders=1/.test(location.search)||!!(typeof G==='object'&&G&&G.lab);   // placeholder labels (asset ids drawn as text): LAB or ?placeholders=1 only
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
@@ -7669,11 +7669,11 @@ RET.st=(function(on){
   const Q=[];let showing=false;
   function toast(a){Q.push(a);if(!showing)next();}
   /* the toast waits (queued) while the pit stop, the clear screen or the chest reveal is open: it used to cover their titles */
-  const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';});
+  const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';})||!!(G&&G.banner&&G.banner.warn&&G.banner.t>0);   // review 10 #12: no toast during a boss intro
   /* menufix: the toast sits in the first slot (top, then bottom) where no button, tab, card or input lies under it; if none is clear it waits (queued) */
   const HIT='button,a[href],input,select,textarea,label,[role=button],[onclick],.go,.card,.tabs,.seg';
   function mfFree(e){const r=e.getBoundingClientRect();if(!r.width)return false;for(let i=0;i<=6;i++)for(let j=0;j<=2;j++){const x=r.left+r.width*i/6,y=r.top+r.height*j/2,t=document.elementFromPoint(Math.min(innerWidth-1,Math.max(0,x)),Math.min(innerHeight-1,Math.max(0,y)));if(t&&t!==e&&t.closest(HIT))return false;}return true;}
-  function mfSlot(e){e.style.transition='none';let ok=false;for(const s of['mfTop','mfBot']){e.classList.remove('mfTop','mfBot');e.classList.add(s,'show');if(mfFree(e)){ok=true;break;}}
+  function mfSlot(e){e.style.transition='none';let ok=false;/* review 10 #12: bottom only, the top holds the score strip and the boss bar */for(const s of['mfBot']){e.classList.remove('mfTop','mfBot');e.classList.add(s,'show');if(mfFree(e)){ok=true;break;}}
     e.classList.remove('show');if(!ok)e.classList.remove('mfTop','mfBot');void e.offsetWidth;e.style.transition='';return ok;}
   function next(){if(!Q.length){showing=false;return;}showing=true;if(blocked()){setTimeout(next,400);return;}const a=Q.shift();
     let e=document.getElementById('achToast');
@@ -11299,7 +11299,7 @@ FG2.draw=function(box){const s=FG.st(),lo=s.lo,U=FGU,F=this,own=WP_IDS.filter(id
   const sel=INV.sel,sty=sel&&U.ty(sel);
   for(const sl of[0,1,'core','pas']){const q=INV.slotHtml(sl),fits=sel&&((sl===0||sl===1)?/[whm]/.test(sty):sl==='core'?sty==='k':sty==='p');
     const d=el('div','fgslot f2-ls'+(q.it?'':' no')+(fits?' hot':'')+(U.arm===sl?' arm':''),null,{'data-slot':String(sl),'data-lesson':'loadout-slot'});
-    const short=sl===0?'SLOT 1':sl===1?'SLOT 2':sl==='core'?'CORE':'PASSIVE',nm=q.it?(U.ty(q.it)==='w'?WPD[U.id(q.it)].s:q.n):(sl==='core'||sl==='pas')?'NO '+short:short;   // an empty core / passive says so; tap opens its pick list
+    const short=sl===0?'SLOT 1':sl===1?'SLOT 2':sl==='core'?'CORE':'PASSIVE',nm=q.it?(U.ty(q.it)==='w'?WPD[U.id(q.it)].s:q.n):'EMPTY';   // review 10 #14: an empty cell says EMPTY (no NO label); tap opens its pick list
     const mods=(sl===0||sl===1)?(lo.m[sl]||[]).filter(Boolean).length:0;
     const b=btn(F.fl==='s'+sl?'pop':'',cv(32)+'<span title="'+fgEsc(q.n)+'">'+fgEsc(nm)+(mods?' +'+mods:'')+'</span>',()=>{const x=INV.sel;
       if(x)return act(()=>{const m=U.put(sl,x);if(!/^Only|^Craft/.test(m||''))INV.sel=null;return m;},'s'+sl);
@@ -14879,7 +14879,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='6ebd5bfab6 2026-10-22 04:36 UTC';
+const NR_STAMP='d007b4b0fd 2026-10-22 05:12 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16080,7 +16080,7 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2
   /* css px per world unit under the current transform */
   css(){const t=ctx.getTransform(),c=ctx.canvas;return Math.hypot(t.a,t.b)*(c.clientWidth/c.width||1)||1;},
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
-  small(bn){return!!bn&&this.on&&!bn.warn&&(bn.sm||!!bn.ev);},
+  small(bn){return!!bn&&this.on&&(!!bn.sm||(!bn.warn&&!!bn.ev));},
   /* top-band strip: one line, under the score bar, off the middle of the field */
   draw(bn,w,h,k){const kk=bn.t,a=Math.max(0,Math.min(1,kk*3,(bn.m-kk)*6)),D=DISTRICTS[G.di],y=(G.boss&&G.boss.x<W?52:38)*k,hh=24*k;
     ctx.save();ctx.globalAlpha=a*.9;ctx.fillStyle='#05030cd0';ctx.fillRect(0,y,w,hh);ctx.fillStyle=D.a;ctx.fillRect(0,y,3*k,hh);ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='alphabetic';
@@ -16100,7 +16100,8 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2
 /* ---- 1. banners: the rule card is small and short ---- */
 {const bn0=banner;banner=function(a,b,warn,t){const r=bn0.apply(this,arguments);
   if(RET.calm&&running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
-  else if(RET.calm&&G&&G.banner&&!warn&&!G.banner.ev){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
+  else if(RET.calm&&G&&G.banner&&(!warn||a==='WARNUNG')&&!G.banner.ev){   // review 10 #4: the boss intro is the same chip (name + sub on one line)
+    G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
   return r;};}
 /* ---- 2. beams: thin and soft ---- */
 {const bb=FXW.bullet;FXW.bullet=function(b){if(!CALM.on||!b.wid)return bb.apply(this,arguments);const k='w-'+b.wid+'-bullet';if(!FXW.pic(k))return false;
