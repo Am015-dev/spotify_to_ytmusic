@@ -142,13 +142,16 @@ function PREW_sc(on){const R=renderer,rt=[composer.renderTarget1,composer.render
  if(on){PREW.sv=rt.map(t=>[t,t.scissorTest,t.scissor.clone()]);for(const t of rt){t.scissorTest=true;t.scissor.set(0,0,1,1)}PREW.ss=[R.getScissorTest(),new THREE.Vector4()];R.getScissor(PREW.ss[1]);R.setScissorTest(true);R.setScissor(0,0,1,1)}
  else{for(const[t,f,v]of PREW.sv){t.scissorTest=f;t.scissor.copy(v)}PREW.sv=[];if(PREW.ss){R.setScissor(PREW.ss[1]);R.setScissorTest(PREW.ss[0]);PREW.ss=null}}}
 function PREW_run(){const t0=performance.now(),R=renderer,P=R.info.programs;PREW.p0=P.length;PREW.ran=1;const seen=new Set(),all=[],keep=[];
+ /* coin-prewarm-r22e6: ?cl=core,studs builds its stud InstancedMeshes (own gold/blue materials) after the first compile, so they have no program yet and were never drawn here (a link after reveal).
+    Compile them now and draw them FIRST, so the cap can never abort before the coin. */
+ const CLI=[];try{if(window.__cls&&__cls.keep){for(const s of __cls.keep)if(s.im&&!CLI.includes(s.im))CLI.push(s.im);for(const o of CLI){let q=o,hid=[];while(q&&q!==scene){if(q.visible===false){q.visible=true;hid.push(q)}q=q.parent}try{R.compile(o,camera,scene)}catch(e){}for(const x of hid)x.visible=false;const pr=R.properties.get(o.material).currentProgram;if(pr)try{pr.getUniforms()}catch(e){}}}}catch(e){console.warn('PREW cl',e)}
  scene.traverse(o=>{if(!(o.isMesh||o.isPoints||o.isLine||o.isSprite))return;all.push(o);const m=Array.isArray(o.material)?o.material:[o.material];if(!o.layers.test(camera.layers))return;let add=false;for(const q of m){if(!q)continue;const pr=R.properties.get(q).currentProgram;if(!pr)continue;const k=pr.cacheKey||q.type+q.id;if(!seen.has(k)){seen.add(k);add=true}}if(add)keep.push(o)});
  const sv=[],T=typeof TQ!=='undefined'&&TQ,d0=T?T.draw:0,l0=LD.on,b0=LD.busy,k0=LKG.arm,r0=TWG.run;let drawn=0;
  for(const o of all)sv.push([o,o.visible,o.frustumCulled]);
  try{for(const o of all)o.visible=false;
   LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;TWG.run=0;PREW_sc(1);const gl=R.getContext(),px=new Uint8Array(4);
   /* batches of 4 representatives: each ends in a 1-px read, which blocks until the GPU has finished, so the wall clock between batches is real and the cap can bite */
-  for(let i=0;i<keep.length;i+=4){const b=keep.slice(i,i+4);for(const o of b){o.visible=true;o.frustumCulled=false}composer.render();gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);for(const o of b)o.visible=false;drawn+=b.length;
+  if(CLI.length)keep.sort((x,y)=>CLI.includes(y)-CLI.includes(x));for(let i=0;i<keep.length;i+=4){const b=keep.slice(i,i+4);for(const o of b){o.visible=true;o.frustumCulled=false}composer.render();gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);for(const o of b)o.visible=false;drawn+=b.length;
    const dt=performance.now()-t0;if(dt>PREW.cap&&i+4<keep.length){PREW.ab=Math.round(dt);break}}}
  finally{PREW_sc(0);for(const[o,v,f]of sv){o.visible=v;o.frustumCulled=f}LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0;TWG.run=r0;PREW.n=drawn;PREW.prog=seen.size;PREW.p1=P.length;PREW.ms=Math.round(performance.now()-t0)}}
 /* ios-r20f: a player page evaluated the lazy code chunks (99c_checklist 212 KB, the city chunks; direct eval, 0.3-1.6 s on a slow CPU) 1.5 s AFTER the curtain lifted (10z_lazy.js),
