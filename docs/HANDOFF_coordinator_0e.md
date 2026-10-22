@@ -1,6 +1,6 @@
 # Coordinator handoff (OD 0e), 2026-10-22 ~07:40 UTC
 Coordinator session_01L97MfPJRbeb3t9g3h8vcM3. Read CLAUDE.md, then this. Deploy recipe: docs/HANDOFF_coordinator_0c.md (worked for beta.151; Artifact publish needs read of live page + models/lx.js, xf.js first).
-LIVE NOW: beta.152 (43e3bac, Beta v318) from 2a9f51c: traffic-in-view + groundTex cache + quiet-dirt GO + bughunt tool. Running: ath-trap-r2 session_01Sgb9bwj8R8xAdrB38JQ8y7 (SONNET), let-cars-climb session_01SJBmnf6haoRifTajUe1LZj (OPUS). Reveal stall parked (2 lanes, needs design plan or real iPhone reports).
+LIVE NOW: beta.153 (73396b8, Beta v319) from a4ef2a5: Athens fill-block colliders fixed; ?clb, ?t9e, ?bx OFF. Running: invisible-stops session_01LmiB33A1y4EvdhddXPxpz7 (SONNET), no-card-without-tap session_01PNsoXLZRDXhmLxKj2cT2ri (SONNET). Parked (2 lanes, need design plan): reveal stall, glossy, Athens trap slopes (t9e not proven: QTC re-dump), hill climb (crest stall + yJump), core,studs.
 ## Live
 beta.151 (ce32c02, Beta v317), built from 7394743: speed feel, solid-cars r3 (camera turn), ground-tile + coin prewarm, core reveal, xf1/water. gloss and ?cl=core,studs default OFF.
 ## Reviewed since (on trunk, not live)

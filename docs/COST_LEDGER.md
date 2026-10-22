@@ -90,3 +90,7 @@ Model and status come from the session list. Cost is blank: the session list doe
 | bughunt-x1000-r23a | beta.152 | Opus | tools/bughunt.js gate + strict report 11/100 | shipped #44 |
 | traffic-in-view-r22e15 | beta.152 | Opus | no slide/teleport in view (npcPop fra 21 -> 2.7/h) | shipped #46 |
 | ath-trap-r22e14 | — | Opus | Athens trap fixes behind flags (?t9e, ?bx) | #47 PASS flag-off; measuring in r2 |
+| ath-trap-r2-r22e16 | beta.153 | Sonnet | fill-block colliders get roof height (no endless walls); t9e/bx stay OFF (not proven) | shipped #49; target parked |
+| let-cars-climb-r22e17 | beta.153 (flag OFF) | Opus | climb window behind ?clb=1 | #48 PASS flag-off |
+| climb-r2-r22e18 | — | Sonnet | clb A/B: not clean, stays OFF | docs only; target parked |
+| reviews 41-49 | beta.152/153 | Opus | 9 reviews | done |
