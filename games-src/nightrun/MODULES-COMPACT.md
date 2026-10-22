@@ -113,11 +113,12 @@ diet|14|visual diet: fewer own effects, readable enemies, a lean 6-i|diet,diet
 mix|11|the music stays on top of the effects: separate buses, an ef|mix,mix
 hub|34|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
 layout|7|phone layout pass: centred one-colour section pills, centred|layout,layout
-school|15|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
+school|16|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
 schoolfull|13|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
 menufix|4|HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 p|menufix,menufix
 explain|26|every fly-stage visual is explained: first-appearance captio|explain,explain
 calm|6|a calm playfield: rule banners small in the top band, thin s|calm,calm
+nocaps|9|no caption, hint bubble or info box while a stage is played;|nocaps,nocaps
 c|35|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

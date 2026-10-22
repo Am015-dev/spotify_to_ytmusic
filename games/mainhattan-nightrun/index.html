@@ -14926,7 +14926,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='b940be60d2 2026-10-22 05:51 UTC';
+const NR_STAMP='1e5b2e1a71 2026-10-22 05:54 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -15663,6 +15663,8 @@ const SCH_S={
   beat(i){if(i%2||this.f>=8)return;this.f++;const x=W-60,y=H*.5;if(this.f%2){const a=Math.atan2(P.y-y,P.x-x);for(let k=-2;k<=2;k++)tutEb(x,y,a+k*.22,150);}
     else for(let k=0;k<14;k++)tutEb(x,y,k/14*6.283,110);AU.sfx('warn');},
   tick(dt){if(this.f>=8){this.tl+=dt;if(!G.eb.some(b=>b.tut)||this.tl>4)return true;}return false;}},'Boss pattern: weave the fan, slip the ring')};
+SCH_S.graze=step(Object.assign({},SCH_S.fan,{id:'graze'}),'Slip close past the shots without a hit: that builds your CHAIN');   // nocaps.js pre-stage drills reuse the fan code
+SCH_S.well=step(Object.assign({},SCH_S.fan,{id:'well'}),'A purple ring is a gravity well: it bends shots, no damage. Weave the volleys');
 const byId=id=>TUT_S.find(s=>s.id===id);
 const GRP=[['BASICS','move, shoot, dash, EMP'],['LOADOUT','weapons, forge, slots, ships'],['COUNTERS','one tactic per enemy'],['BOSS AND GATES','patterns and laser gates'],['ON FOOT','street run basics']];
 const DR=[
@@ -15687,6 +15689,8 @@ const DR=[
  [2,'l-counter','EMP COUNTERS','mini stage: shields and walls','lesson:counter'],
  [3,'gate','LASER GATE','fly through the gap',()=>SCH_S.gate],
  [3,'fan','BOSS PATTERN','fan and ring volleys',()=>SCH_S.fan],
+ [3,'graze','CHAIN','slip close past shots',()=>SCH_S.graze],
+ [3,'well','GRAVITY WELL','purple ring bends shots',()=>SCH_S.well],
  [4,'foot','ON FOOT','run, shoot 3 foes','foot']].map(([g,id,n,sub,k])=>({g,id,n,sub,k}));
 SCH.list=DR;
 const lsId=d=>typeof d.k==='string'&&d.k.startsWith('lesson:')?d.k.slice(7):null;
@@ -15738,7 +15742,8 @@ function card(d,pass,why){const nx=nextD();SCH.res={id:d.id,pass};
   btns.push(['schCardAgain',pass?'AGAIN':'TRY AGAIN',pass?'dim':'',()=>{tutC.hidden=true;run(d);}],['schCardList','LIST','dim',()=>{tutC.hidden=true;open();}]);
   tutCard('<b>'+(pass?'DRILL CLEAR':'NOT YET')+'</b><span>'+d.n+'</span><span>'+(why||(pass?'':'Try again, or skip ahead'))+'</span>',btns);}
 function run(d){if(!d)return;if(live_())stopDrill();if(running||TUT.on)return;SCH.cur=d;SCH.res=null;el.hidden=true;SCH.onList=false;tutC.hidden=true;const ls=lsId(d);
-  if(ls){lsShow(ls,()=>{if(T.hidden)return;open();});return;}
+  SCH.fired=0;
+  if(ls){lsShow(ls,()=>{if(SCH.after){const f=SCH.after;SCH.after=null;setTimeout(f,60);return;}if(T.hidden)return;open();});return;}
   if(d.k==='foot'){return runFoot(d);}
   let s=d.k();if(!s)return;if(SCH.wrap)s=SCH.wrap(s,d);TUT.D=[s];SCH.t0=performance.now();startTut();tutB.classList.add('drl');}
 function runFoot(d){const bank=GA.bank,rt=RET.tale;RET.tale=false;let ok=false;window.__schFoot=true;try{ok=FOOT.start('street1');}catch(e){}RET.tale=rt;
@@ -15749,15 +15754,17 @@ SCH.footEndNow=footEnd;SCH.was=id=>{const d=DR.find(x=>x.id===id||lsId(x)===id);
 NR.on('footKill',()=>{const f=SCH.foot;if(f&&!f.end&&f.F&&SCH.sf){SCH.sf.footKill(f,footEnd);return;}if(f&&!f.end&&++f.kills>=3)setTimeout(()=>footEnd(true),400);});
 NR.on('footEnd',e=>{const f=SCH.foot;if(f&&!f.end&&!(e&&e.quit)&&SCH.sf&&SCH.sf.footDown(f))return;if(f&&!f.end&&!(f.F&&f.F.restart))setTimeout(()=>footEnd(false),0);});
 {const f0=tutFinish;tutFinish=function(){if(!TUT.D)return f0.apply(this,arguments);const d=SCH.cur,l=TUT.log[TUT.log.length-1],pass=!!(l&&l.ok);
-  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?(SCH.wrap&&l&&l.t>0?Math.round(l.t)+' s · 3/3 rounds':''):"Time's up");};}
-{const r0=tutRestore;tutRestore=function(){const was=TUT.on&&TUT.D;r0.apply(this,arguments);if(was){tutB.classList.remove('drl');TUT.D=null;if(!SCH.noList&&!SCH.again)setTimeout(()=>{if(!running&&!TUT.on)open();},60);}};}
+  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;if(SCH.fired){SCH.fired=0;mark(d,pass,l&&l.t);return;}   // nocaps.js pre-stage drill: no result card, the stage starts
+  T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?(SCH.wrap&&l&&l.t>0?Math.round(l.t)+' s · 3/3 rounds':''):"Time's up");};}
+{const r0=tutRestore;tutRestore=function(){const was=TUT.on&&TUT.D;r0.apply(this,arguments);if(was){tutB.classList.remove('drl');TUT.D=null;if(SCH.after&&!SCH.again&&(TUT.ending||!SCH.noList)){const f=SCH.after;SCH.after=null;SCH.fired=1;setTimeout(f,60);}else if(!SCH.noList&&!SCH.again)setTimeout(()=>{if(!running&&!TUT.on)open();},60);}};}
 {const b=document.createElement('button');b.type='button';b.className='schRe';b.id='schRe';b.textContent='AGAIN';tutB.insertBefore(b,$('tutSkip'));
   for(const ev of['touchstart','touchend','pointerdown','mousedown'])b.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
   b.addEventListener('click',e=>{e.stopPropagation();const d=SCH.cur;if(!TUT.on||!d)return;SCH.again=1;tutSkip();SCH.again=0;run(d);});}
 /* a drill is a step of the engine: starting one from the list must not look like the first-launch tutorial */
 window.__school={get ids(){return rows().map(d=>d.id);},get all(){return DR.map(d=>d.id);},open,shut,run:id=>run(DR.find(d=>d.id===id)),get open_(){return !el.hidden;},
   get cur(){return SCH.cur&&SCH.cur.id;},get res(){return SCH.res||null;},done:()=>rows().filter(done).map(d=>d.id),next:()=>{const n=nextD();return n&&n.id;},
-  pass(){const s=TUT.cur();if(!s)return;const t=s.tick;s.tick=function(){s.tick=t;return true;};},late(){TUT.t=TUT_MAX+1;},kinds:()=>Object.fromEntries(DR.map(d=>[d.id,lsId(d)?'lesson':d.k==='foot'?'foot':'tut'])),get foot(){return SCH.foot;}};
+  pass(){const s=TUT.cur();if(!s)return;const t=s.tick;s.tick=function(){s.tick=t;return true;};},late(){TUT.t=TUT_MAX+1;},kinds:()=>Object.fromEntries(DR.map(d=>[d.id,lsId(d)?'lesson':d.k==='foot'?'foot':'tut'])),get foot(){return SCH.foot;},get tutOn(){return !!TUT.on;},
+  runThen(id,fn){const d=DR.find(x=>x.id===id);if(!d||!avail(d)){fn();return false;}SCH.after=fn;run(d);if(!(TUT.on||(typeof LS!=='undefined'&&LS.m))){SCH.after=null;fn();return false;}return true;}};
 },0);
 
 // PURPOSE: every Flight School drill and lesson mini stage is a real lesson: demo, three escalating rounds, 3 in a row, round counter, time on the clear card
@@ -16256,6 +16263,67 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.
   P.stroke=function(){const a=CALM.a;if(a&&arguments.length===0&&CALM.on){CALM.a=null;const c=this.setLineDash&&this.getLineDash().length?2:CALM.cls(this.strokeStyle),xy=CALM.spot(a[0],a[1],c);
     if(xy&&!CALM.allow(xy,c))return;}
     return st.apply(this,arguments);};}
+
+// PURPOSE: no caption, hint bubble or info box while a stage is played; a new thing is taught by ONE pre-stage card that offers its Flight School drill
+// FLAG: nocaps (?nocaps=0)
+// TEST: nocaps-test.js
+/* ---------- NC (flag RET.nocaps, default ON; ?nocaps=0 = captions in the stage as before). Owner, 22 Oct 2026: "While playing the game many distracting info
+   boxes: these should go to the drills as scenarios and not in the game; the drill should appear only the first time to explain to the user but never
+   inside the stage; very distracting and annoying."
+   1 in a stage (story, endless, weekly, Legend; not a drill, not the Lab) nothing is drawn that explains: explain.js captions, zonehint.js ring caption,
+     HINT bubbles (rule cards, "NEW ATTACK", "CHOOSE", ability tips), the old speech bubble, the power-up chip "TAP: use X now", the "KEEP MOVING" floater,
+     rule banners and the first30 story cards. Button word labels, the stage title banner, score pops and grade letters stay (they are labels, not boxes).
+     Every suppressed id is still recorded (NC.sup) and goes to the pause screen list WHAT'S ON SCREEN (explain.js), which stays as the reference.
+   2 before a stage starts: if it brings a thing this profile was never offered (NC.TAB[stage] = ids measured by nocaps-test.js MEASURE=1; NC.THING = words + drill),
+     ONE card "NEW: <thing>. Try the 30 s drill?" with PLAY DRILL / SKIP. Shown on the first visit of a stage only, one thing per thing per profile
+     (localStorage mnr_nocaps). PLAY DRILL runs that Flight School drill (school.js __school.runThen) and the stage starts when it ends or is skipped.
+     Automation (webdriver) gets no card unless ?nocapscard=1. ---------- */
+if(RET.nocaps===undefined)RET.nocaps=!/[?&]nocaps=0/.test(location.search);
+const NC=window.NC={get on(){return!!RET.nocaps;},sup:{},card:null,last:null,
+  auto:!navigator.webdriver||/[?&]nocapscard=1/.test(location.search),
+  THING:{beat:['the beat rings on your ship','dash'],hull:['your hull squares','dodge'],btn:['the charge numbers on the buttons','emp'],chain:['the CHAIN bonus','graze'],
+    grade:['the grade letter','shoot'],edge:['the red screen edges','dodge'],lane:['red laser lanes','gate'],supply:['supply drops','pick'],gaterun:['yellow gate rings','gate'],
+    leak:['enemies that get past you','shoot'],warn:['danger marks at the screen edge','dodge'],tell:['pink attack rings','charger'],counter:['red threat rings','l-counter'],
+    fence:['the laser fence','gate'],hpbar:['enemy health bars','shoot'],tough:['tougher enemies','shoot'],flank:['flank arrows','charger'],still:['the standing still warning','move'],
+    secret:['gold secrets','shoot'],shield:['shielded enemies','shield'],bill:['falling signs','dodge'],hail:['meteor lanes','dodge'],rescue:['rescue capsules','pick'],
+    gust:['wind gusts','move'],blackout:['blackouts','dodge'],zh_rule:['the gravity well','well'],zh_boss:['the gravity well','well'],power:['music power-ups','pick']},
+  TAB:{"s1":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","fence"],"s2":["beat","hull","btn","grade","leak","tough","hpbar","tell","bill","blackout","zh_rule","rule:well"],"s3":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","secret","blackout","zh_rule","rule:well"],"s4":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","secret","gaterun","zh_rule","rule:well"],"s5":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","rescue","rule:lane"],"s6":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","shield","secret","gust","rule:lane"],"s7":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","secret","blackout","zh_rule","rule:lane"],"s8":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","secret","blackout","rule:echo"],"s9":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","secret","gaterun","rule:echo"],"s10":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","shield","secret","supply","lane","bill","rule:echo"],"s11":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","shield","secret","gaterun","blackout","rule:gold"],"s12":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","counter","shield","secret","hail","rule:gold"],"endless":["beat","hull","btn","chain","grade","leak","tough","hpbar","tell","warn","zh_rule","rule:well"]},   // stage key ('s1'..'s12', 'endless') -> thing ids in the order they first appear (filled by nocaps-test.js MEASURE=1)
+  in(){return!!RET.nocaps&&running&&!!G&&!G.dead&&!G.tut&&!G.lab&&!(window.TUT&&TUT.on)&&!(window.LS&&LS.m);},
+  rec(k){this.sup[k]=(this.sup[k]||0)+1;},
+  profile(){const o=load('mnr_nocaps',null)||{};o.off=o.off||{};o.vis=o.vis||{};return o;},
+  thing(k){if(this.THING[k])return this.THING[k];const m=/^rule:(.+)$/.exec(k);if(m&&window.RU&&RU.T&&RU.T[m[1]]){const D=RU.T[m[1]];return[(D.n||m[1]).toLowerCase(),m[1]==='well'?'well':'dodge'];}return null;},
+  /* the card to show before stage `key`, or null: first visit of the stage only, the first thing not yet offered */
+  pick(key){const o=this.profile();if(o.vis[key])return null;o.vis[key]=1;let pick=null;
+    for(const k of this.TAB[key]||[]){const t=this.thing(k);if(!t||o.off[t[1]+':'+t[0]]||o.off[k])continue;pick={k,name:t[0],drill:t[1]};o.off[k]=1;o.off[t[1]+':'+t[0]]=1;break;}
+    save('mnr_nocaps',o);return pick;},
+  hide(){if(this.card)this.card.hidden=true;},
+  ask(pk,go){if(!this.card){const c=this.card=document.createElement('div');c.id='ncCard';c.setAttribute('role','dialog');c.setAttribute('aria-label','New in this stage');
+    c.style.cssText='position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:#05030cd9;padding:16px';
+    c.innerHTML='<div style="max-width:min(92vw,360px);background:#0d0720;border:2px solid #19e3ff;border-radius:14px;padding:18px 16px;text-align:center;color:#fff;font:700 17px/1.35 var(--display,sans-serif)">'
+      +'<div id="ncT" style="margin-bottom:14px"></div><div style="display:flex;gap:10px;justify-content:center"><button type="button" class="go" id="ncPlay" style="min-height:48px;flex:1">PLAY DRILL</button>'
+      +'<button type="button" class="go alt dim" id="ncSkip" style="min-height:48px;flex:1">SKIP</button></div></div>';document.body.appendChild(c);}
+    const c=this.card;c.querySelector('#ncT').textContent='NEW: '+pk.name+'. Try the 30 s drill?';c.hidden=false;this.last={k:pk.k,drill:pk.drill,name:pk.name,done:false};
+    const fin=()=>{if(this.last.done)return;this.last.done=true;c.hidden=true;go();};
+    c.querySelector('#ncSkip').onclick=fin;
+    c.querySelector('#ncPlay').onclick=()=>{if(this.last.done)return;c.hidden=true;this.last.played=true;const S=window.__school;if(S&&S.runThen){S.runThen(pk.drill,()=>{if(!this.last.done){this.last.done=true;go();}});}else fin();};}};
+NR.on('runStart',()=>{NC.sup={};});
+/* 1: nothing explains in a stage */
+if(window.EXP){const sh=EXP.show;EXP.show=function(k){if(NC.in()){NC.rec(k);if(window.EX10&&EX10.later&&this.TXT[k])EX10.later(k);return false;}return sh.apply(this,arguments);};
+  const dr=EXP.draw;EXP.draw=function(){if(NC.in()){this.cap=null;this.cbox=null;return;}return dr.apply(this,arguments);};}
+if(window.ZH){const zs=ZH.start;ZH.start=function(k){if(NC.in()){NC.rec('zh_'+k);if(window.EX10&&EX10.later)EX10.later('zh_'+k);return;}return zs.apply(this,arguments);};
+  const zd=ZH.draw;ZH.draw=function(){if(NC.in()){this.cap=null;return;}return zd.apply(this,arguments);};}
+if(window.HINT){const hs=HINT.show;HINT.show=function(txt){if(NC.in()){NC.rec('hint');return false;}return hs.apply(this,arguments);};
+  const hd=HINT.draw;HINT.draw=function(){if(NC.in()){this.box=null;return;}return hd.apply(this,arguments);};}
+{const fl=floater;floater=function(x,y,txt){if(NC.in()&&txt==='KEEP MOVING'){NC.rec('still');return;}return fl.apply(this,arguments);};}
+if(typeof banner==='function'&&window.CALM&&CALM.isRule){const bn=banner;banner=function(a,b,warn,t){if(NC.in()&&!warn&&CALM.isRule(a)){NC.rec('rulebanner');return;}return bn.apply(this,arguments);};}
+NR.on('tick',()=>{const on=NC.in();document.documentElement.classList.toggle('nc',on);
+  if(on){if(G.hint)G.hint.t=0;if(window.HINT){HINT.cur=null;HINT.q.length=0;}if(window.EXP){EXP.cap=null;EXP.q.length=0;}if(window.ZH)ZH.cap=null;}});
+{const st=document.createElement('style');st.textContent='html.nc #bPwr .cp,html.nc #sgCard.live{display:none!important}';document.head.appendChild(st);}
+/* 2: the pre-stage card (story stage n, endless, weekly: every way a stage starts goes through startStory or start) */
+{const ss=startStory;startStory=function(n){if(running||!NC.on||!NC.auto||NC.card&&!NC.card.hidden)return ss.apply(this,arguments);const a=arguments,pk=NC.pick('s'+n);
+  if(!pk)return ss.apply(this,a);NC.ask(pk,()=>{if(!running)ss.apply(this,a);});};
+  const s0=start;start=function(){if(running||!NC.on||!NC.auto||NC.card&&!NC.card.hidden||(typeof ST!=='undefined'&&ST.on))return s0.apply(this,arguments);const a=arguments,pk=NC.pick('endless');
+    if(!pk)return s0.apply(this,a);NC.ask(pk,()=>{if(!running)s0.apply(this,a);});};}
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;
