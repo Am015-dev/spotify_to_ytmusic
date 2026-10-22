@@ -39,7 +39,7 @@ HOOK.drawEnemy(de=>function(e,t){de(e,t);if(e.type==='boss'||e.hp<=0)return;
   else if(e.rg){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*2,'#ff3050',.4);ctx.restore();}});
 {const fb=FXV.bullets;FXV.bullets=function(){fb.call(this);let any=false;for(const b of G.eb)if(b.hm>0){if(ART.have('fx-orb-homing')){const o=ART.bm['fx-orb-homing'],w=b.r*3.6;ctx.save();ctx.globalCompositeOperation='lighter';ctx.drawImage(o,b.x-w/2,b.y-w/2,w,w);ctx.restore();continue;}if(!any){ctx.save();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.6;ctx.globalAlpha=.85;ctx.beginPath();any=true;}ctx.moveTo(b.x+b.r+3.5,b.y);ctx.arc(b.x,b.y,b.r+3.5,0,7);}if(any){ctx.stroke();ctx.restore();}};}
 /* low hull: the song keeps its tempo; the screen edges pulse red on the beat and a soft heartbeat thumps under the music */
-NR.on('beat',()=>{if(!G.live||G.dead||ST.over||!P||P.hp>1||!AU.a||AU.a.state!=='running')return;try{AU.osc(AU.a.currentTime+.02,'sine',58,.2,.5,AU.musv,38);}catch(e){}});
+NR.on('beat',()=>{if(!G.live||G.dead||ST.over||!P||P.hp>1||!AU.a||AU.a.state!=='running')return;if(sndOn('heart'))try{AU.osc(AU.a.currentTime+.02,'sine',58,.2,.5,AU.musv,38);}catch(e){}});
 
 /* ---------- bullet kinds: size, speed, look and impact differ now ----------
    orb    r5  lime, 1 hull (the default: turret fans, gunship rings)
