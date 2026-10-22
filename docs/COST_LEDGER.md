@@ -101,3 +101,7 @@ Model and status come from the session list. Cost is blank: the session list doe
 | roamcard-quiet-r22e23 | beta.155 | Sonnet | marker chips instead of auto cards | #55 PASS, shipped (follow-ups: OG_ask vs RQ overlap, doubled flight icon) |
 | bughunt-phone-r22e24 | beta.155 (tool) | Sonnet | bughunt phone profile + --gate | #56 pending |
 | reviews 50-55 | beta.154/155 | Opus | 6 reviews | done |
+| phone-path-bugs-r22e26 | beta.156 | Sonnet | no traffic recycled into view on phones (HT_inView veto) | #57 PASS, shipped |
+| flake-kill-r22e25 | beta.156 (tests) | Sonnet | 13 GOs hardened, tools/gate.sh | #58: 3 loosenings to undo, r2 needs fresh worker |
+| preview-flags-r22e28 | beta.156 | Sonnet | --preview build, FLAGS.md, dead flags deleted | #59 PASS, shipped; first Beta-preview published |
+| shot-library-r22e27 | — (docs) | Sonnet | docs/shots/library, 60 views + INDEX + tools/shot.js | done |
