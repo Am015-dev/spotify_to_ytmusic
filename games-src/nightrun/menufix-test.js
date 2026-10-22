@@ -27,13 +27,13 @@ const SIZES = [[375, 553], [390, 763]], GLYPH = /[◆◇♦✦✸⌛∞]/;
     let p = await open(w, h);
     await tap(p, '#hub_hangar');
     const t = await p.evaluate(`(()=>{const S=${shown};const bs=[...document.querySelectorAll('#garage .tabs button')].filter(S);return bs.map(b=>{const r=b.getBoundingClientRect();return{t:b.textContent.trim(),fit:b.scrollWidth<=b.clientWidth+1,in:r.left>=0&&r.right<=innerWidth,h:r.height,lines:b.getClientRects().length};});})()`);
-    ok('HANGAR: 5 tabs + MORE' + tag, t.map(x => x.t).join() === 'SHIP,WEAPONS,FORGE,PILOT,UPGRADES,MORE', JSON.stringify(t.map(x => x.t)));
+    ok('HANGAR: 5 tabs + MORE' + tag, t.map(x => x.t).join() === 'SHIP,WEAPONS,PILOT,UPGRADES,MORE'   /* hangar2: FORGE moved into the MORE sheet */, JSON.stringify(t.map(x => x.t)));
     ok('HANGAR: every tab label fits, on screen, >= 44 px tall' + tag, t.every(x => x.fit && x.in && x.h >= 43.5 && x.lines === 1), JSON.stringify(t));
-    const lay = await p.evaluate(`(()=>{const tb=document.querySelector('#garage .tabs').getBoundingClientRect(),c=document.getElementById('gaCards').getBoundingClientRect(),g=document.getElementById('garage').getBoundingClientRect();return{gap:c.top-tb.bottom,tbBottom:tb.bottom,H:innerHeight,wide:document.documentElement.scrollWidth>innerWidth};})()`);
+    const lay = await p.evaluate(`(()=>{const by=document.getElementById('h2Bay'),tb=(by&&by.offsetParent?by:document.querySelector('#garage .tabs')).getBoundingClientRect(),c=document.getElementById('gaCards').getBoundingClientRect(),g=document.getElementById('garage').getBoundingClientRect();return{gap:c.top-tb.bottom,tbBottom:tb.bottom,H:innerHeight,wide:document.documentElement.scrollWidth>innerWidth};})()`);
     ok('HANGAR: list starts right under the tabs, no sideways scroll' + tag, lay.gap >= -1 && lay.gap < 110 && !lay.wide, JSON.stringify(lay));
     await tap(p, '#mfMore');
     const sh = await p.evaluate(`(()=>{const S=${shown},s=document.getElementById('mfSheet');return{open:S(s),items:[...s.querySelectorAll('button')].map(b=>b.textContent.trim()),fit:[...s.querySelectorAll('button')].every(b=>b.scrollWidth<=b.clientWidth+1&&b.getBoundingClientRect().right<=innerWidth&&b.getBoundingClientRect().bottom<=innerHeight)};})()`);
-    ok('MORE sheet lists ABILITY CREW LOOKS LOAD SHOP PICK WEAPONS and fits' + tag, sh.open && sh.items.join() === 'ABILITY,CREW,LOOKS,LOAD,SHOP,PICK WEAPONS,CLOSE' && sh.fit, JSON.stringify(sh));
+    ok('MORE sheet lists ABILITY CREW LOOKS LOAD SHOP PICK WEAPONS and fits' + tag, sh.open && sh.items.join() === 'ABILITY,CREW,LOOKS,LOAD,SHOP,PICK WEAPONS,FORGE,CLOSE' && sh.fit, JSON.stringify(sh));
     for (const [id, want] of [['mfI_mkt', 'mkt'], ['mfI_abil', 'abil'], ['mfI_crew', 'crew'], ['mfI_looks', 'looks'], ['mfI_load', 'load']]) {
       await tap(p, '#mfMore'); await tap(p, '#' + id);
       const r = await p.evaluate(`({tab:(document.querySelector('#garage .tabs button.on[data-t]')||{dataset:{}}).dataset.t,sheet:${shown}(document.getElementById('mfSheet')),on:document.getElementById('mfMore').classList.contains('on')})`);

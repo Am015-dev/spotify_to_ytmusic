@@ -21,7 +21,7 @@ const F = [
   ['difficulty', '#hub_missions', '[data-door="#diffBtn"]', '!/NORMAL/.test(document.getElementById("diffBtn").textContent)'],
   ['hangar: ship', '#hub_hangar', '#garage .tabs [data-t=ships]', 'VIS("#garage")&&__hubTab()==="ships"'],
   ['hangar: weapons', '#hub_hangar', '#garage .tabs [data-t=weapons]', '__hubTab()==="weapons"'],
-  ['hangar: forge', '#hub_hangar', '#garage .tabs [data-t=forge]', '__hubTab()==="forge"'],
+  ['hangar: forge', '#hub_hangar', '#mfMore|#mfI_forge', '__hubTab()==="forge"'],
   ['hangar: pilot class', '#hub_hangar', '#garage .tabs [data-t=pilot]', '__hubTab()==="pilot"'],
   ['hangar: upgrades', '#hub_hangar', '#garage .tabs [data-t=tune]', '__hubTab()==="tune"'],
   ['hangar: ability', '#hub_hangar', '#mfMore|#mfI_abil', '__hubTab()==="abil"'],
