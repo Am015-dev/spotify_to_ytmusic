@@ -30,7 +30,8 @@ const SIZES = [[390, 763], [375, 553]];
       }).filter(Boolean));
       const need = lab.filter(q => q.id !== 'bPwr');
       ok(`${tag} #7 DASH and EMP are on screen with a word label`, need.length === 2, JSON.stringify(lab));
-      ok(`${tag} #7 each in-stage label is "WORD number" and sits under its button`, lab.every(q => /^(DASH|EMP|[A-Z ]+) \d+$/.test(q.text) && q.below && q.inView), JSON.stringify(lab));
+      // orchestrator review 22 Oct: labels moved ABOVE the buttons (below them they were cut off by the screen edge on 390x763); the gate is "word + number, fully in view"
+      ok(`${tag} #7 each in-stage label is "WORD number" and fully in view`, lab.every(q => /^(DASH|EMP|[A-Z ]+) \d+$/.test(q.text) && q.inView), JSON.stringify(lab));
 
       // #12 drill bar: AGAIN and SKIP only, no SKIP DEMO pad, no district banner
       const bar = await p.evaluate(() => ({ btns: [...document.querySelectorAll('#tutB button')].filter(b => !b.hidden && getComputedStyle(b).display !== 'none').map(b => b.textContent.trim()), pad: !!document.getElementById('sfDemo'), banner: __mnr.G.banner.t > 0 && /BANKEN|SEKTOR|SCHICHT/.test(__mnr.G.banner.a + __mnr.G.banner.b), bt: __mnr.G.banner.a + ' | ' + __mnr.G.banner.b + ' ' + __mnr.G.banner.t }));
