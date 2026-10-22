@@ -63,7 +63,7 @@ RET.st=(function(on){
     {id:'neon5000',n:'Neon Saver',d:'Earn 5000 Neon',g:'◆',t:'s',f:()=>S().neon>=5000},
     {id:'kills1000',n:'Demolition',d:'Destroy 1000 enemies',g:'✸',t:'s',f:()=>S().kills>=1000},
     {id:'arcade',n:'Short and Sweet',d:'Clear a stage in Arcade',g:'⚡',t:'b',f:()=>S().arcClears>=1}];
-  if(RET.menufix)for(const a of A)if(/[◆◇♦✦✸⌛∞]/.test(a.g))a.g='';   // menufix: no text diamonds or odd glyphs; the tier-coloured badge and its words carry the meaning
+  for(const a of A)if(/[◆◇♦✦✸⌛∞]/.test(a.g))a.g='';   // menufix: no text diamonds or odd glyphs; the tier-coloured badge and its words carry the meaning
   const BY=Object.fromEntries(A.map(a=>[a.id,a]));
   const TC={b:'#d08a4a',s:'#c9d2e0',g:'#ffd23d'},TN={b:'BRONZE',s:'SILVER',g:'GOLD'};
   /* ---- toast queue: one at a time, each shown 2 s, non-blocking ---- */
@@ -80,7 +80,7 @@ RET.st=(function(on){
     let e=document.getElementById('achToast');
     if(!e){e=document.createElement('div');e.id='achToast';e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e);}
     e.className='';e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
-    if(RET.menufix&&!mfSlot(e)){Q.unshift(a);setTimeout(next,500);return;}
+    if(!mfSlot(e)){Q.unshift(a);setTimeout(next,500);return;}
     e.classList.add('show');try{if(window.AU&&AU.sting)AU.sting('clear');}catch(x){}
     setTimeout(()=>{e.classList.remove('show');setTimeout(next,0);},2000);}
   /* ---- unlocks ---- */

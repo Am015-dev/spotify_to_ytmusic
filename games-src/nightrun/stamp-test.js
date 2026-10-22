@@ -61,11 +61,6 @@ const STAMP = /^build [0-9a-f]{10} · \d{4}-\d\d-\d\d \d\d:\d\d UTC$/;
     await p.waitForFunction(() => window.__mark !== 1, null, { timeout: 8000 }).then(() => ok('worker change reloads the page once the title screen is back', true)).catch(() => ok('worker change reloads the page once the title screen is back', false));
     await ctx.close();
 
-    // 4. flag off
-    const o = await mk(null, '?stamp=0');
-    const off = await o.p.evaluate(() => ({ t: (document.getElementById('stampT') || {}).textContent, row: !!document.getElementById('stampRow'), css: !!document.getElementById('stampCss') }));
-    ok('?stamp=0 hides everything', !off.t && !off.row && !off.css, JSON.stringify(off));
-    await o.ctx.close();
     ok('no page errors', errs.length === 0, errs.slice(0, 3).join(' | '));
   } catch (e) { ok('test ran', false, String(e && e.stack || e)); }
   await br.close(); srv.kill(); fs.rmSync(tmp, { recursive: true, force: true });

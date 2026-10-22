@@ -14,8 +14,8 @@ const pass = [], fail = [], ok = (c, m) => (c ? pass : fail).push(m), med = a =>
 const PRE = 'window.__recOut=m=>JSON.parse(JSON.stringify({log:window.WV?WV.log:null,kv:m.ST.kv,sv:m.ST.sv,kills:m.G.kills}))';
 const run = (tag, q, stages, runs) => { const out = path.join(os.tmpdir(), 'wv-' + tag + '.json'); const r = cp.spawnSync('node', [path.join(__dirname, 'humanbot.js')], { env: Object.assign({}, process.env, { BOTS: 'human', BUILDS: 'fresh', STAGES: stages, RUNS: runs, PAR: '4', Q: q, PRE, JSON: out }), encoding: 'utf8', timeout: 900000 });
   return { res: JSON.parse(fs.readFileSync(out, 'utf8')), log: r.stdout || '' }; };
-const nw = run('new', '', STAGES, RUNS), old = run('old', '&waves=0', '1,6', '2');
-for (const l of (nw.log + old.log).split('\n')) if (/FAIL page error|RUN ERROR/.test(l)) fail.push('(h) ' + l.trim());
+const nw = run('new', '', STAGES, RUNS);
+for (const l of nw.log.split('\n')) if (/FAIL page error|RUN ERROR/.test(l)) fail.push('(h) ' + l.trim());
 let clr = 0, tot = 0;
 for (const n of STAGES.split(',').map(Number)) {
   const a = nw.res.filter(r => r.n === n && r.px && r.px.log); if (!a.length) { fail.push(`stage ${n}: no runs`); continue; }
@@ -35,6 +35,5 @@ for (const n of STAGES.split(',').map(Number)) {
 }
 const pct = 100 * clr / Math.max(1, tot);
 ok(pct >= 60 && pct <= 80, `(f) human-model clear rate on Normal, stages ${STAGES} pooled ${clr}/${tot} = ${pct.toFixed(0)}% (60-80%)`);
-ok(old.res.every(r => !r.px || !r.px.log || r.px.log.waves.length === 0), `(g) ?waves=0: no wave played (${old.res.length} runs)`);
 for (const m of pass) console.log('PASS ' + m); for (const m of fail) console.log('FAIL ' + m);
 console.log(fail.length ? 'FAIL waves-test' : 'PASS waves-test'); process.exit(fail.length ? 1 : 0);

@@ -1,5 +1,5 @@
 // PURPOSE: boss HP phases, damage cap, last stand
-// FLAG: boss2 (?boss2=0)
+// FLAG: none (always on)
 // TEST: boss2-test.js
 /* ---------- boss fights that last = parts/armour.js (flag RET.boss2; ?boss2=0 = the fights before it). BALANCE.md "Boss fights, round 4". ----------
    Owner, 17 Oct 2026: "Legend is still easy ... boss fights are still short", "even boss I can beat in seconds".
@@ -12,8 +12,7 @@
    C. power scale: the hull is set high (x HK), and a ship whose honest damage cannot finish inside ~1.2 T gets its boss damage raised (at most x AMP); hard.js's repair is held to REP x the cap,
       so a fresh ship is not stuck: its fight ends near 1.2 T; the cap still holds the floor. */
 const BOSSFY=window.BOSSFY=y=>typeof wcv!=='undefined'&&wcv===cv?Math.max(y,150):y;   // boss floaters stay below the hint line at the top of a landscape screen
-if(RET.boss2===undefined)RET.boss2=!/[?&]boss2=0/.test(location.search);
-const B2X=window.B2X={get on(){return!!RET.boss2;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.2,BK:5,SHT:14,
+const B2X=window.B2X={get on(){return true;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.2,BK:5,SHT:14,
   T:{mini:{easy:42,normal:50,hard:60,vhard:65,legend:70},dist:{easy:66,normal:80,hard:95,vhard:102,legend:110},fin:{easy:100,normal:120,hard:145,vhard:158,legend:170}},   // the shortest fight in seconds
   kind(e){return e.mini?'mini':(e.k===3||ST.on&&ST.n>=40||!ST.on&&G.pos>=4)?'fin':'dist';},
   tf(e){const t=this.T[this.kind(e)];return t[SET.diff]||t.normal;},

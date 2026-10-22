@@ -1,5 +1,5 @@
 // PURPOSE: scale round 2, must-move column strike, strike follow-up
-// FLAG: scale2 (?scale2=0), mustmove (?mustmove=0), strike2 (?strike2=0)
+// FLAG: mustmove (?mustmove=0)
 // TEST: scale2-test.js
 /* ---------- scale, round 2 = parts/fair.js (flag RET.scale2; ?scale2=0 = the state after round 1). BALANCE.md "Power scale, round 2". ----------
    Owner, 17 Oct 2026: on Legend a maxed ship parks, its missiles kill everything, it hops between two spots when bullets come, and bosses are trivial.
@@ -10,8 +10,7 @@
       its cores are shot (cores are never auto-aimed).
    C. pattern pressure (hard tiers, stage 11 on): an aimed shot at the ship's current position (a little lead) on the beat and, from stage 15, a bullet wall
       every 4 bars whose gap moves; every gap is >= S2.GAP px. Normal with a strong ship gets a sparse aimed shot. Kill-goal stages keep the old hull. */
-if(RET.scale2===undefined)RET.scale2=!/[?&]scale2=0/.test(location.search);
-const S2=window.S2={get on(){return!!RET.scale2;},GAP:120,
+const S2=window.S2={get on(){return true;},GAP:120,
   hard(){return HARDS.includes(SET.diff);},
   stg(){return ST.on?ST.n:6*(G.pos+5*G.loop)+2;},
   ak(){return{easy:1,normal:.8,hard:.62,vhard:.56,legend:.5}[SET.diff]||1;},     // damage of an auto-aimed (locked) shot
@@ -67,9 +66,8 @@ if(RET.mustmove===undefined)RET.mustmove=!/[?&]mustmove=0/.test(location.search)
    Normal stages). Now: a faint dotted line shows at 65% of the still-timer (the first one of a stage also hints MOVE, once per profile); the lock-on pulses on the beat for 3 beats (hard tiers 2) and
    the strike lands on a beat. Normal stages <= 8: the first strike of a stage only scorches (-250 score). Damage: Easy 1; Normal 1, 2 from the third in a row; Hard/Very hard 2 from the second (a camper must still die); Legend 3 from the
    third. A repeat strike needs half the still-time and follows after .9 s. The timer is x range < 70 px for win() s (Normal 5 s in stages 3-5, then 3.5 s); it pauses while a pickup is within 70 px (collecting). */
-if(RET.strike2===undefined)RET.strike2=!/[?&]strike2=0/.test(location.search);
 const MM=window.MM={get on(){return!!RET.mustmove;},COL:24,buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,sn:0,stk:null,still:0,anc:null,pre:null,scorch:[],
-  s2(){return!!RET.strike2;},
+  s2(){return true;},
   win(){const w={easy:5,normal:3.5,hard:3.2,vhard:3,legend:2.8}[SET.diff]||4;return this.s2()&&SET.diff==='normal'&&ST.on&&ST.n<=5?5:w;},
   rate(){for(const k of G.pk)if(Math.hypot(k.x-P.x,k.y-P.y)<70)return 0;return 1;},   // a ship that is collecting is not camping (a foe lined up ahead does NOT slow it: the tracker bot does exactly that)
   dmg(){const d=SET.diff;if(!this.s2())return this.n>=2&&d!=='easy'?2:1;if(d==='normal'&&ST.on&&ST.n<=8&&this.sn===1)return 0;if(d==='easy')return 1;if(d==='normal')return this.n>=3?2:1;return d==='legend'&&this.n>=3?3:this.n>=2?2:1;},

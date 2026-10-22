@@ -1,11 +1,10 @@
 // PURPOSE: build stamp and update check
-// FLAG: stamp (?stamp=0)
+// FLAG: none (always on)
 // TEST: stamp-test.js
 /* ---------- build stamp + update check (owner, 21 Oct 2026: "the game has not changed" = an old shell on the phone). Flag RET.stamp (off with ?stamp=0): off = no stamp, no button, no toast, no auto reload.
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
 const NR_STAMP='__STAMP__';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
@@ -31,11 +30,10 @@ RET.stampX=(function(){
       st.textContent=live?'Up to date':'Could not read the live version';
     }catch(e){st.textContent='Could not check (offline?)';}
     btn.disabled=false;};
-  X.build=function(){const body=$('setBody');if(!RET.stamp||!body||$('stampRow'))return;
+  X.build=function(){const body=$('setBody');if(!body||$('stampRow'))return;
     const row=document.createElement('div');row.id='stampRow';
     row.innerHTML='<h3>BUILD</h3><div id="stampS"></div><div id="stampF"></div><button type="button" class="go dim" id="stampBtn">CHECK FOR UPDATE</button><div id="stampSt" role="status"></div>';
     body.appendChild(row);$('stampBtn').addEventListener('click',e=>{e.stopPropagation();X.check();});X.paint();};
-  if(!RET.stamp)return X;
   if(!document.getElementById('stampCss')){const st=document.createElement('style');st.id='stampCss';st.textContent='#stampT{margin:8px 0 0;font:14px var(--mono);color:var(--dim);text-align:center;opacity:.8}#stampRow{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0;text-align:center;font:14px var(--mono);color:var(--dim)}#stampRow h3{align-self:stretch;text-align:left}#stampBtn{min-height:44px}#stampSt:empty{display:none}';document.head.appendChild(st);}
   X.paint();
   try{const seen=localStorage.getItem('nrStampSeen');if(seen&&seen!==X.hash&&!SIM)setTimeout(()=>X.toast('Updated to '+X.hash),800);localStorage.setItem('nrStampSeen',X.hash);}catch(e){}

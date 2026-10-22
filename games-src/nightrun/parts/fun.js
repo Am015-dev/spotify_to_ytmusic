@@ -1,5 +1,5 @@
 // PURPOSE: set pieces, deck replaces the fixed metronome, rosters
-// FLAG: deck (?deck=0), roster (?roster=0), songspread (?songspread=0)
+// FLAG: deck (?deck=0), songspread (?songspread=0)
 // TEST: fun-test.js
 /* ---------- FUN pass: something new every ~8-10 s ----------
    SET PIECES   every 6 bars (~12 s) a signature formation per district that moves on the beat (WEAVE) or a LASER FENCE across the screen on the bar line;
@@ -9,7 +9,6 @@
    MINI-BOSS    about every 26 bars (~50 s, see dir.js)
    Never touches the music: only game logic, light and a clean effect sound. */
 if(RET.deck===undefined)RET.deck=!/[?&]deck=0/.test(location.search);
-if(RET.roster===undefined)RET.roster=!/[?&]roster=0/.test(location.search);   // dir.js ROSTER (V3)
 if(RET.songspread===undefined)RET.songspread=!/[?&]songspread=0/.test(location.search);   // story.js SONGSEL (V10)
 const FUN={n:0,sets:[],fence:null,dw:null,ev:null,deck:[],nextAt:22,lastK:'',dropAt:-1,lastDash:-9,pdash:0,shower:0,stat:{sets:0,fences:0,drops:0,dropsHit:0,rewards:0},
   reset(){this.ev=null;this.deck=[];this.nextAt=20+gr(0,6);this.lastK='';this.n=0;this.sets=[];this.fence=null;this.dw=null;this.dropAt=-1;this.lastDash=-9;this.pdash=0;this.shower=0;},

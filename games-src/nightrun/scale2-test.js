@@ -28,8 +28,6 @@ const rate = a => a.length ? a.filter(x => x.clear).length / a.length : NaN;
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
   const br = await PW.chromium.launch(); const page = async q => { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { fails++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1&bpauto=1${q}`); await p.waitForFunction(() => window.__mnr && window.S2 && window.__mnr.TR.list.length > 0, null, { timeout: 10000 }); return p; };
-  const off = await page('&scale2=0'), o = await off.evaluate(WALLS, { n: 40, diff: 'legend', secs: 150 }); await off.close();
-  line(!o.on && o.gaps.length === 0 && o.cores === 0, `flag off (?scale2=0): S2 off, ${o.gaps.length} walls, boss cores seen ${o.cores} frames (round 1: none)`);
   const on = await page(''), w = await on.evaluate(WALLS, { n: 30, diff: 'legend', secs: 100 }); await on.close();
   const mg = w.gaps.length ? Math.min(...w.gaps) : 0;
   line(w.gaps.length >= 3 && mg >= w.GAP && w.GAP >= 2 * 16 + 60, `Legend stage 30: ${w.gaps.length} walls, smallest gap ${mg} px >= S2.GAP ${w.GAP} px (ship ~32 px + margin)`);

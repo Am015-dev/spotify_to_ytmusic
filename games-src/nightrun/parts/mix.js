@@ -1,5 +1,5 @@
 // PURPOSE: the music stays on top of the effects: separate buses, an effect compressor, a voice cap, no repeated ticks, a little variation
-// FLAG: mix (?mix=0)
+// FLAG: none (always on)
 // TEST: mix-test.js, audio-gates-test.js
 /* ---------- MIX: owner 21 Oct 2026: "the music is distorted by annoying repetitive sound effects" (flag RET.mix, default ON; ?mix=0 = the old graph and the old sound calls, nothing is wrapped).
    MEASURED before (mix-test.js, 90 s bot runs, stages 2/10/20, boss, endless wave 15): up to 16 effect voices (53 in endless), 25 explosions in one second, 'hit' 13/s, 'pick' 2 in the same frame, the master
@@ -13,9 +13,8 @@
    RATE    quiet effects (priority < 5) at most 4 per rolling second in all; shot and hit at most 2 per second each; pick / boom bursts two per 250 ms. Defaults music 70 / effects 50.
    BEAT    the PERFECT / ON BEAT sound is one soft sine instead of three layers and its stinger has half the level; when they happen is unchanged (timing windows, BT, stinger grid are not touched).
    NOT     timing windows, hitboxes, armour.js, hard.js, the beat clock and the stinger scheduling. ---------- */
-if(RET.mix===undefined)RET.mix=!/[?&]mix=0/.test(location.search);
 DEFS.mixr=true;if(SET.mixr===undefined)SET.mixr=true;
-if(RET.mix&&SET.music===.45&&SET.sfx===.8){SET.music=.7;SET.sfx=.5;}   // review 8 fix 3: the old defaults (music 45 / effects 80) become music 70 / effects 50; a changed slider stays
+if(SET.music===.45&&SET.sfx===.8){SET.music=.7;SET.sfx=.5;}   // review 8 fix 3: the old defaults (music 45 / effects 80) become music 70 / effects 50; a changed slider stays
 DEFS.music=.7;DEFS.sfx=.5;
 const MIX=window.MIX={K:{mus:1.4,sfx:.5},CAP:6,TOT:4,
   // id: [minimum gap s, most per rolling second, priority, voices it makes, level, length]
@@ -23,8 +22,8 @@ const MIX=window.MIX={K:{mus:1.4,sfx:.5},CAP:6,TOT:4,
      perfect:[.14,4,4,1,.7,1],warn:[.5,2,5,6,.8,1],boom:[.07,5,5,2,.6,.75],hurt:[.3,3,6,2,.85,1],emp:[.5,2,6,2,.85,1],big:[.5,2,7,2,.8,1],phase:[.5,2,7,5,.85,1]},
   PP:[1,1.04,.97,1.02,.985],DB:[0,1.2,-1.1,.6,-.7],SEQ:[0,3,1,4,2],
   log:{},rr:{},vox:[],cur:null,lastDuck:-9,stat:{drop:0,steal:0,play:0},
-  on(){return!!RET.mix;},red(){return!!RET.mix&&SET.mixr!==false;}};
-if(RET.mix){
+  on(){return true;},red(){return SET.mixr!==false;}};
+{
   const M=MIX,isFx=d=>d===AU.fx||d===AU.stb||d===AU.stbq,dbv=x=>Math.pow(10,x/20);
   const oInit=AU.init,oOsc=AU.osc,oNoise=AU.noise,oSfx=AU.sfx,oSting=AU.sting,oDuck=AU.duckMusic,oVol=AU.vol;
   AU.init=function(){const had=this.a;oInit.apply(this,arguments);if(!had&&this.a&&!this.sfxc)M.graph();};

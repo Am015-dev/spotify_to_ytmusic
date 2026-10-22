@@ -1,11 +1,11 @@
 // PURPOSE: HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 px phone); the other menu defects of review 8 live in stats.js (toast slot, achievement glyphs), map.js and ret.js (glyphs)
-// FLAG: menufix (?menufix=0)
+// FLAG: none (always on)
 // TEST: menufix-test.js
 /* ---------- MENUFIX (flag RET.menufix, default ON; ?menufix=0 = the old HANGAR with ten tabs). Review 8, fix list 13: the HANGAR tab row had ten tabs and a PICK button in a scroller,
    labels were cut at 375 px. Now the row holds SHIP, WEAPONS, FORGE, PILOT, UPGRADES and one MORE button; MORE opens a sheet titled "MORE IN HANGAR" with ABILITY, CREW, LOOKS, LOAD, SHOP
    and PICK WEAPONS (each button clicks the original tab, so every id and hook keeps working). The original buttons stay in the row, hidden. ---------- */
 (function(){
-if(!RET.menufix||!RET.hub||typeof garageEl==='undefined')return;
+if(!RET.hub||typeof garageEl==='undefined')return;
 document.documentElement.classList.add('mfx');
 const st=document.createElement('style');st.textContent=`
 html.mfx #garage.gfx .tabs{overflow:visible!important;gap:4px!important;flex-wrap:nowrap!important;-webkit-mask-image:none!important;mask-image:none!important}

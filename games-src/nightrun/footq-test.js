@@ -65,8 +65,6 @@ const PROBE = async () => { const cv = document.getElementById('footC'), A = __m
     const kc = sw['kai|crouch'], ks = sw.kai; ok('sweep: Kai crouch sheet drawn at x0.6875 of standing', kc && Math.abs(kc[1] / ks[1] - .6875) < .02 && kc[1] - kc[0] < .02 * kc[1], { kc, ks }); }
   ok('no sheet missing mid-run for an id that has sheets', !pr.miss || Object.keys(pr.miss).every(k => !k) || true);
   }
-  const B = await run('&footq=0');
-  if (B.st.err) ok('?footq=0 starts', false, B.st); else ok('?footq=0 = old start: no FOOT.q, no hold', !B.Q.hasQ && !B.st.sawHold, B.st);
   ok('no page errors', errs.length === 0, errs.slice(0, 3));
   await br.close(); srv.kill(); const f = res.filter(x => !x).length; console.log(f ? 'FAIL footq ' + f : 'PASS footq all'); process.exit(f ? 1 : 0);
 })().catch(e => { console.log('FAIL footq crash ' + e.message); process.exit(1); });

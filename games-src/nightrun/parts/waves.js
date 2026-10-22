@@ -1,5 +1,5 @@
 // PURPOSE: stages 1-6 play named waves with one idea each, a breather between, a rising curve to the finale
-// FLAG: waves (?waves=0)
+// FLAG: none (always on)
 // TEST: waves-test.js
 /* ---------- waves.js (W151, owner 22 Oct 2026 on a phone: "stages extremely boring, a swarm of enemies, no logic"). Flag RET.waves, default ON; ?waves=0 = the director as before.
    Story stages 1-6 (the first impression) no longer stream the director's shuffled patterns. Each stage plays the wave table WV.T (design: nightrun/WAVES.md):
@@ -11,7 +11,6 @@
    - a kill stage's goal is WV.KG of the foes in the table (the bot clears it), the waves loop from wave 2 ("ENCORE") until the stage ends.
    Other spawners (director, zoo, fleet, set pieces) are muted on these stages; bosses, mini-boss summons and their children are never touched.
    Stats for the test: WV.log. ---------- */
-if(RET.waves===undefined)RET.waves=!/[?&]waves=0/.test(location.search);
 const WV=window.WV={
   REST:3.5,SCK:650,TMAX:22,CAP:8,KG:.72,ENTER:300,
   /* the wave table: stage -> waves; a wave = [name, what to do, foes, opts]; a foe = [type, slot x (share of W), slot y (share of H), move, side]
@@ -49,7 +48,7 @@ const WV=window.WV={
        ['KONVOI','the squad leader: kill it first, the escort flees',[['gunship',.74,.5,'hold'],['drone',.62,.3,'hold'],['drone',.62,.7,'hold'],['turret',.72,.15,'sit','t'],['turret',.72,.85,'sit','b'],['charger',.66,.5,'dash']],{lead:0}]]},
   st:{i:-1,nx:0,phase:'off',t:0,rest:0,foes:[],q:[],loop:0,lead:null,n:0},
   log:{waves:[],maxOn:0,culled:0,ann:[]},
-  on(){return!!RET.waves&&ST.on&&ST.n>=1&&ST.n<=6&&!ST.ch&&!G.lab&&!G.tut&&!!this.T[ST.n];},
+  on(){return ST.on&&ST.n>=1&&ST.n<=6&&!ST.ch&&!G.lab&&!G.tut&&!!this.T[ST.n];},
   total(n){let k=0;for(const w of this.T[n]||[])k+=w[2].length*(w[3]&&w[3].rep||(w[3]&&w[3].lead!=null?1:n===5?3:2));return k;},
   bossy(){const k=ST.def.goal.k;return(k==='mini'||k==='boss')&&(ST.spawned||G.dbar>=ST.lead-1.5);},
   reset(){this.st={i:-1,nx:0,phase:'rest',t:0,rest:2,foes:[],q:[],loop:0,lead:null,n:this.on()?ST.n:0};this.log={waves:[],maxOn:0,culled:0,ann:[]};this.own=0;try{this.goal();}catch(e){}},
@@ -107,7 +106,7 @@ const WV=window.WV={
   /* ---- the beat: a wave starts on a bar downbeat after its breather ---- */
   beat(i){const S=this.st;if(S.phase==='rest'&&S.rest<=0&&((i%4)+4)%4===0&&!ST.over&&!this.bossy())this.start();},
   goal(){if(!this.on())return;const g=ST.def.goal;if(g.k==='kill')ST.kv=Math.max(8,Math.round(this.KG*this.total(ST.n)));if(g.k==='score')ST.sv=Math.round(this.KG*this.total(ST.n)*this.SCK/500)*500;}};
-if(RET.waves){
+{
   { const b0=DIR.beat;DIR.beat=function(i){
       if(!WV.on()||(G.boss&&G.boss.mini))return b0.call(this,i);
       for(let k=this.q.length-1;k>=0;k--){const x=this.q[k];if(G.bc>=x.b){this.q.splice(k,1);try{x.f();}catch(e){}}}

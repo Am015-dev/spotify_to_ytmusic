@@ -1,12 +1,11 @@
 // PURPOSE: one-line caption on the first purple ring (gravity well) of each stage: what the ring is
-// FLAG: zonehint (?zonehint=0)
+// FLAG: none (always on)
 // TEST: pwrstar-test.js
 /* ---------- ZH: zone legend (flag RET.zonehint, default ON; ?zonehint=0 = no caption). Owner, 21 Oct 2026: "what are the large purple dashed circles?"
    They are the GRAVITY WELL: rules.js (stage mechanic, #b06bff, dashed while it telegraphs; it bends shots, never takes hull) and the boss verbs
    gravity_well / vacuum in bossmoves.js (#c08aff, pulls the SHIP). The first time either shows in a stage a short caption is drawn on the ring for ZT s
    (own canvas text, so the hint diet of two shows per profile does not hide it). Nothing here changes play. ---------- */
-if(RET.zonehint===undefined)RET.zonehint=!/[?&]zonehint=0/.test(location.search);
-const ZH=window.ZH={get on(){return!!RET.zonehint;},ZT:4.5,done:{rule:0,boss:0},cap:null,
+const ZH=window.ZH={get on(){return true;},ZT:4.5,done:{rule:0,boss:0},cap:null,
   TXT:{rule:'PURPLE RING = gravity well: bends shots, no damage',boss:'PURPLE RING = gravity well: it pulls your ship, thrust away'},
   reset(){this.done={rule:0,boss:0};this.cap=null;},
   start(k,x,y,r,col){if(this.done[k])return;this.done[k]=1;this.cap={k,x,y,r,col,t:this.ZT};},

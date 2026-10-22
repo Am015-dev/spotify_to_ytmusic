@@ -70,13 +70,6 @@ const SIZES = [[375, 553], [390, 763]], GLYPH = /[◆◇♦✦✸⌛∞]/;
     ok('home chips show no text diamonds' + tag, !chip.length, chip.join('|'));
     await p.context().close();
   }
-  // ---- ?menufix=0 = the old hangar ----
-  {
-    const p = await open(390, 763, '&menufix=0'); await tap(p, '#hub_hangar');
-    const o = await p.evaluate(() => ({ more: !!document.getElementById('mfMore'), mfx: document.documentElement.classList.contains('mfx'), sec: document.querySelectorAll('#garage .tabs button.hubSec').length, glyph: RET.st.A.filter(a => /[◆◇♦✦✸⌛∞]/.test(a.g)).length }));
-    ok('?menufix=0: old hangar (no MORE button, tabs as before, old glyphs)', !o.more && !o.mfx && o.sec >= 5 && o.glyph > 0, JSON.stringify(o));
-    await p.context().close();
-  }
   ok('no page errors', errs.length === 0, errs.slice(0, 3).join(' | '));
   await br.close(); srv.kill();
   const bad = res.filter(x => !x).length; console.log(bad ? `\n${bad} FAILED of ${res.length}` : `\nall ${res.length} passed`); process.exit(bad ? 1 : 0);

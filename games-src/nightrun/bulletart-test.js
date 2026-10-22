@@ -22,7 +22,7 @@ const RUN = (o) => {
   for (const k in A.sc) { const o2 = A.sc[k]; if (!o2) continue; const n = k.replace(/^h\|/, '').split('@')[0]; add(o2.c || o2, n); }
   const AL = {}, MA = window.__ba || new Map(), alp = (s, id) => { const a = MA.get(s); if (a != null) AL[id] = (AL[id] || 0) + a; }; for (const k in A.bm) { if (A.bm[k]) alp(A.bm[k], k); } for (const k in A.sc) { const o2 = A.sc[k]; if (o2) alp(o2.c || o2, k.replace(/^h\|/, '').split('@')[0]); }
   const BAR = {}; for (const k in ids) if (/^fx-bullet-(needle|rocket|shell|enemy)$/.test(k) || /^fx-w-[a-z]+-bullet$/.test(k)) BAR[k] = ids[k];
-  return { AL: AL['fx-bullet-enemy'] || 0, BAR, ebMax, pbMax, objs, flag: !!m.RET.bulletart, st: window.FXW ? FXW.stat.bullet : -1 };
+  return { AL: AL['fx-bullet-enemy'] || 0, BAR, ebMax, pbMax, objs, st: window.FXW ? FXW.stat.bullet : -1 };
 };
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' }); await sleep(800);
@@ -34,13 +34,11 @@ const RUN = (o) => {
   const STAGES = (process.env.STAGES || '6,10').split(',').map(Number), T = +(process.env.T || 40), sum = o => Object.values(o).reduce((a, b) => a + b, 0);
   const pct = (a, q) => { const x = [...a].sort((p, r) => p - r); return x.length ? x[Math.min(x.length - 1, Math.floor(x.length * q))] : 0; };
   for (const s of STAGES) {
-    const on = await run('', { story: s, t: T, seed: 7 }), off = await run('&bulletart=0', { story: s, t: T, seed: 7 });
+    const on = await run('', { story: s, t: T, seed: 7 });
     const en = k => Object.entries(k).filter(([n]) => /^fx-bullet-/.test(n)), pl = k => Object.entries(k).filter(([n]) => /^fx-w-/.test(n));
-    console.log(`  st ${s}: ON ${JSON.stringify(on.BAR)} | OFF ${JSON.stringify(off.BAR)} | eb max ${on.ebMax}/${off.ebMax} pb max ${on.pbMax}/${off.pbMax} | objs p95 ${pct(on.objs, .95)} (off ${pct(off.objs, .95)})`);
-    ok(`st ${s}: flag on by default, off with ?bulletart=0`, on.flag && !off.flag);
-    ok(`st ${s}: enemy bullets draw their picture (orb full strength; needle / shell / rocket when they appear)`, on.ebMax > 0 && sum(Object.fromEntries(en(on.BAR))) > 0 && on.AL >= .9 * on.BAR['fx-bullet-enemy'] && off.AL < .5 * off.BAR['fx-bullet-enemy'], `orb full-alpha draws ${on.AL}/${on.BAR['fx-bullet-enemy']} (off ${off.AL}/${off.BAR['fx-bullet-enemy']}) ${JSON.stringify(Object.fromEntries(en(on.BAR)))}`);
+    console.log(`  st ${s}: ON ${JSON.stringify(on.BAR)} | eb max ${on.ebMax} pb max ${on.pbMax} | objs p95 ${pct(on.objs, .95)}`);
+    ok(`st ${s}: enemy bullets draw their picture (orb full strength; needle / shell / rocket when they appear)`, on.ebMax > 0 && sum(Object.fromEntries(en(on.BAR))) > 0 && on.AL >= .9 * on.BAR['fx-bullet-enemy'] , `orb full-alpha draws ${on.AL}/${on.BAR['fx-bullet-enemy']} ${JSON.stringify(Object.fromEntries(en(on.BAR)))}`);
     ok(`st ${s}: player shots draw the weapon picture (FXW.bullet)`, on.pbMax > 0 && sum(Object.fromEntries(pl(on.BAR))) > 0, JSON.stringify(Object.fromEntries(pl(on.BAR))));
-    ok(`st ${s}: ?bulletart=0 draws no needle / shell / rocket / weapon picture`, !Object.keys(off.BAR).some(n => /needle|rocket|shell|^fx-w-/.test(n)), JSON.stringify(off.BAR));
     ok(`st ${s}: objects per frame p95 <= 64 (diet limit)`, pct(on.objs, .95) <= 64, `p95 ${pct(on.objs, .95)}`);
   }
   ok('no page errors', !errs.length, errs.slice(0, 3).join(' | '));

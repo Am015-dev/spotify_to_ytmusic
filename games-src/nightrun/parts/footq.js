@@ -1,5 +1,5 @@
 // PURPOSE: on-foot quality: sprites preloaded before the run starts, no old mock graphics, one fixed size per character, sharp at device pixel ratio
-// FLAG: footq (?footq=0)
+// FLAG: none (always on)
 // TEST: footq-test.js
 /* ---------- FOOTQ (owner, 21 Oct 2026: "on foot I can see the old graphics before the sprites, they change size, the quality resolution is very bad").
    Flag RET.footq (default ON; ?footq=0 = the old behaviour exactly). Causes found and fixed:
@@ -10,9 +10,8 @@
       cell is drawn 0.6875 x to keep the head the same size); the landing squash is off on foot; a crouch without its own sheet borrows crouchshoot (not a squashed idle).
    3. Sharpness: art.js drawAnim measured the pre-scaled copy with the FLY canvas scale (S), so on foot a 64 px copy was blown up 3-4x; it now reads the real canvas transform of #footC. The canvas takes the
       full device pixel ratio (up to 3, was 2) and imageSmoothingQuality is high each frame. The sheets are 256 px tall: a character is never drawn from a smaller copy than its device size. ---------- */
-if(RET.footq===undefined)RET.footq=!/[?&]footq=0/.test(location.search);
 (function(){
-if(!RET.footq||!window.FOOT||!window.FA||typeof ART==='undefined')return;   // FA.draw, FA.bg and footstage's F.drawX call FOOT.q.draw when it exists
+if(!window.FOOT||!window.FA||typeof ART==='undefined')return;   // FA.draw, FA.bg and footstage's F.drawX call FOOT.q.draw when it exists
 const F=FOOT,FQ=F.q={on:true,CR:.6875,hold:null,miss:{},held:0,calls:0,keys:[]};
 F.dprMax=3;
 /* ----- the sheets this stage can draw ----- */

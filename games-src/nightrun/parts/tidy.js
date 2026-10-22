@@ -1,5 +1,5 @@
 // PURPOSE: tidy Settings (<= 20 controls on the main page, one Assist page, the rest under More) + a street run that keeps Kai in the left third and drones off the HUD
-// FLAG: tidy (?tidy=0)
+// FLAG: none (always on)
 // TEST: tidy-test.js
 /* ---------- TIDY (flag RET.tidy, default ON; ?tidy=0 = Settings and the street run exactly as before). Owner, 21 Oct 2026: "messy, unorganized, the game is shit on foot".
    Review 8: Settings had 41 controls (hc and rm twice, Music twice, DATA tab clipped). Now the main page has 19: Gameplay (HUD, Difficulty, Auto-fire, Aim assist, ASSIST >),
@@ -10,11 +10,10 @@
    Street run (phones, portrait): during an arena lock or the boss arena the camera is parked, so Kai used to run to the right edge and fight clipped (median 82% of the view);
    now he may not pass 37% of the view while the camera is parked (F.post, after every step), the camera still keeps him at 25% otherwise (streetlook camK) and the walk-back rule
    (<= 35% back, W90) is untouched. Flyers (drones) are kept below the HUD band: their drawn top is never above the HUD band (SL.hudFull = panel + score + the hint line). The HUD panel uses the fly HUD's own plate (streetlook.js slHud). ---------- */
-if(RET.tidy===undefined)RET.tidy=!/[?&]tidy=0/.test(location.search);
 
 /* ===== street run: player cap + flyers under the HUD ===== */
 (function(){
-if(!RET.tidy||!window.FOOT||!FOOT._in)return;
+if(!window.FOOT||!FOOT._in)return;
 const F=FOOT,IN=F._in,FL=470,CAP=.37;
 F.post=(S,dt)=>{const SL=F.look;if(!SL||!S||S.end)return;const L=IN.L&&IN.L();if(!L||!L.vw)return;const P=S.P,vw=L.vw;
   if(SL.port&&(S.lock||S.bossOn)){const hi=S.camX+vw*CAP;if(P.x>hi){P.x=hi;if(P.vx>0)P.vx=0;}}
@@ -25,7 +24,7 @@ F.post=(S,dt)=>{const SL=F.look;if(!SL||!S||S.end)return;const L=IN.L&&IN.L();if
 })();
 
 /* ===== Settings ===== */
-if(RET.tidy&&RET.hub)setTimeout(()=>{
+if(RET.hub)setTimeout(()=>{
   const sb=document.getElementById('setBody'),setm=document.getElementById('setm');if(!sb||!setm)return;
   document.documentElement.classList.add('td');
   const MAIN='hud diff auto aim part q pal flash shake txt master music sfx mus layout sens dsize'.split(' ');

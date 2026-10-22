@@ -55,8 +55,6 @@ const RUN = new Function('o', `
       ok(tag + ': pictured beams <= 12 css px thick, alpha <= .8 (' + r.beams + ' seen, max ' + r.beamMax.toFixed(1) + ')', r.beamMax <= 12.5 && r.alphaMax <= .8, r);
       ok(tag + ': at most 2 rings per enemy (max ' + r.ringMax + ')', r.ringMax <= 2, r.ringMax);
     }
-    if (!old) { const p2 = await ctx.newPage(); await p2.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p2.goto('http://127.0.0.1:' + port + '/index.html?sim=1&all=1&calm=0'); await p2.waitForFunction(() => window.__mnr && document.getElementById('startBtn'));
-      ok('?calm=0 switches the flag off', await p2.evaluate(() => !RET.calm)); }
     ok('no page errors', errs.length === 0, errs.slice(0, 2));
   } finally { await browser.close(); srv.kill(); }
   process.exit(fails ? 1 : 0);

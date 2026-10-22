@@ -104,7 +104,7 @@ const SUMMARY = () => {
     await p.evaluate(TAPS); const t0 = await p.evaluate(() => __mnr.AU.a.currentTime);
     await play(p, SECS);
     const S = await p.evaluate(SUMMARY); runs[scn] = analyse(S, t0 + 1, S.t);
-    const g = await p.evaluate(() => ({ graph: !!(__mnr.AU.sfxc), mix: __mnr.RET.mix })); runs[scn].g = g;
+    const g = await p.evaluate(() => ({ graph: !!(__mnr.AU.sfxc), mix: true })); runs[scn].g = g;
     await ctx.close();
   }
   if (MEASURE || process.env.JSON) {

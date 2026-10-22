@@ -1,5 +1,5 @@
 // PURPOSE: visual diet: fewer own effects, readable enemies, a lean 6-item HUD
-// FLAG: diet (?diet=0)
+// FLAG: none (always on)
 // TEST: diet-test.js
 /* ---------- diet.js: review 8 fix list 5-7 (owner, 21 Oct 2026: "unprofessional, ugly, messy, eye strain"). Flag RET.diet, default ON; ?diet=0 = the game as it was
    (nothing below is installed). Presentation only: no hitbox, damage, spawn rule or telegraph time is touched; armour.js and hard.js are not read.
@@ -11,8 +11,7 @@
                     sprite draw, no new art); the backdrop gets a further dim under play and the phone rooftop tile (the "circuit board") is not drawn under play.
    7. HUD           Settings > HUD Minimal (the default) = 6 items: score, hull, boss bar, DASH, EMP, pause. Full = the old HUD with HEAT, LINE, multiplier, combo,
                     progress, chips. The EMP refill label ("~52s") is hidden in the lean HUD. ---------- */
-if(RET.diet===undefined)RET.diet=!/[?&]diet=0/.test(location.search);
-const DIET=window.DIET={on:!!RET.diet,PA:.5,PBMAX:16,PT:12,FX:6,FL:4,RING:120,CHEV:.6,MINCSS:32,FMAX:2.4,RIM:'rgba(226,236,255,.95)',RIMB:4,DIM:.22,
+const DIET=window.DIET={on:true,PA:.5,PBMAX:16,PT:12,FX:6,FL:4,RING:120,CHEV:.6,MINCSS:32,FMAX:2.4,RIM:'rgba(226,236,255,.95)',RIMB:4,DIM:.22,
   kc:1,kT:-9,seq:0,cap:0,cfs:{},inPB:0,st:{fr:0,pb:0,pt:0,minCss:1e9,ens:0,big:0},
   lean(){return this.on&&SET.hud!=='full';},
   /* css px per world unit (portrait: the 540-unit side spans the canvas width) */

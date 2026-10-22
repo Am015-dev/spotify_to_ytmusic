@@ -41,8 +41,6 @@ const OFF = ({ n }) => { const m = window.__mnr; m.SET.diff = 'legend'; try { m.
   line(res.every(r => r.calm >= 2 && r.abs > 0 && r.sheen > 0), 'every fight: a calm bar per phase change, armour absorbed damage, the bar sheen showed');
   line(res.every(r => r.ls >= 1), 'every fight has its last stand (EXPOSED) in phase 3');
   // 3 flag off
-  const off = await page('&boss2=0'), o = await off.evaluate(OFF, { n: 8 }); await off.close();
-  line(!o.on && o.b2 === 0 && o.p2 < 1e9, `flag off (?boss2=0): B2X off, no armour state on the boss (frames ${o.b2}), bar phases (p2 ${o.p2})`);
   // 4 HUD sheen draws on phone portrait and desktop
   for (const vp of [{ width: 390, height: 763 }, { width: 960, height: 540 }]) { const p = await page('', vp);
     const r = await p.evaluate(() => { const m = window.__mnr; m.SET.diff = 'legend'; try { m.applySet(); } catch (e) { } m.startStory(8); m.simOn(true); m.god = true; let s = 0;

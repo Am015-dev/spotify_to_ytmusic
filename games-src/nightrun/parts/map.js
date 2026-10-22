@@ -47,7 +47,7 @@ function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=b
     b.dataset.n=s.n;b.dataset.id='s'+s.n;b.dataset.nd=!ok?'locked':k>0?'done':boss||mini?'boss':'open';b.style.cssText=`left:${nd.x}px;top:${nd.y}px;--c:${D.a}`;
     b.setAttribute('aria-label',`Stage ${s.n} ${s.name}${ok?'':' locked'}`);
     const side=L.land||s.ch||STAGES.some(x=>x.from===s.n)?'v':(nd.x<L.W/2?'r':'l');b.classList.add('s'+side);   // r / l: the label sits beside the medallion, v: under it
-    b.innerHTML=`<span class="md"><i class="ring"></i><span class="no">${s.ch&&!(window.RET&&RET.menufix)?'◆':s.n}</span></span><span class="meta">${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm">${s.name}</span></span>`;
+    b.innerHTML=`<span class="md"><i class="ring"></i><span class="no">${s.n}</span></span><span class="meta">${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm">${s.name}</span></span>`;
     b.addEventListener('click',()=>mapPick(s.n));root.append(b);}
   box.append(root);
   if(!box._edge){box._edge=1;let q=0;box.addEventListener('scroll',()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;mapEdge();});},{passive:true});}

@@ -1,13 +1,12 @@
 // PURPOSE: a calm playfield: rule banners small in the top band, thin soft player/enemy beams, at most 2 rings per enemy
-// FLAG: calm (?calm=0)
+// FLAG: none (always on)
 // TEST: calm-test.js, review9-test.js
 /* ---------- CALM (flag RET.calm, default ON; ?calm=0 = as before). Owner look, Legend stage 10 on a phone (22 Oct 2026):
    - a rule announcement ("RULE · CURVED SHOTS") covered the middle of the field while enemies attacked: now a small strip in the top band (under the score bar), at most 2.5 s;
    - bright beams ~25 css px wide: pictured player shots are at most 6 css px thick (alpha <= .5), enemy aim / sniper beams <= 6 css px (alpha <= .5); lane edges dashed and dim;
    - enemies wore 3-4 rings at once: at most 2 per enemy, priority attack tell (pink / red) > elite (gold) > the rest (1 frame of memory decides).
    Nothing here changes damage or timing. ---------- */
-if(RET.calm===undefined)RET.calm=!/[?&]calm=0/.test(location.search);
-const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
+const CALM=window.CALM={get on(){return running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
   /* css px per world unit under the current transform */
   css(){const t=ctx.getTransform(),c=ctx.canvas;return Math.hypot(t.a,t.b)*(c.clientWidth/c.width||1)||1;},
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
@@ -30,8 +29,8 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.
     m.cm|=1<<c;if(n>=this.RMAX||m.n>=this.RMAX){this.stat.cut++;return false;}m.n++;this.stat.rings++;return true;}};
 /* ---- 1. banners: the rule card is small and short ---- */
 {const bn0=banner;banner=function(a,b,warn,t){const r=bn0.apply(this,arguments);
-  if(RET.calm&&running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
-  else if(RET.calm&&G&&G.banner&&(!warn||a==='WARNUNG')&&!G.banner.ev){   // review 10 #4: the boss intro is the same chip (name + sub on one line)
+  if(running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
+  else if(G&&G.banner&&(!warn||a==='WARNUNG')&&!G.banner.ev){   // review 10 #4: the boss intro is the same chip (name + sub on one line)
     G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
   return r;};}
 /* ---- 2. beams: thin and soft ---- */

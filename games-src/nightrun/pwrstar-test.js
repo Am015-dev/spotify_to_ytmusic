@@ -54,8 +54,6 @@ let fails = 0; const ok = (n, p, i) => { if (!p) fails++; console.log((p ? 'PASS
       for (let i = 0; i < 60 * 3; i++) m.step(1 / 60); const c1 = ZH.cap && ZH.cap.k, d1 = ZH.done.rule; for (let i = 0; i < 60 * 6; i++) m.step(1 / 60); const gone = !ZH.cap; ZH.reset(); ZH.done.rule = 0;
       for (let i = 0; i < 20; i++) m.step(1 / 60); m.render(1); return { has: true, on: ZH.on, c1, d1, gone, again: !!ZH.cap }; });
     ok('zone hint ON, shows on first purple ring, then goes', z.has && z.on && z.c1 === 'rule' && z.d1 === 1 && z.gone, z);
-    const off = await browser.newContext({ viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true }), q = await off.newPage();
-    await q.goto(base + '/index.html?zonehint=0'); await q.waitForFunction(() => window.__mnr); ok('?zonehint=0 turns it off', await q.evaluate(() => !window.ZH || !ZH.on));
     ok('no page errors', errs.length === 0, errs.slice(0, 3));
   } catch (e) { fails++; console.log('FAIL crash :: ' + e.message); }
   await browser.close(); srv.kill(); process.exit(fails ? 1 : 0);

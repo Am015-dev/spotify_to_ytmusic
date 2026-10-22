@@ -10,7 +10,7 @@
       and does not keep a CRESCENDO bonus; damage from shots that really curved (and arc/leap chains) is held at <= S3.SH of the total.
    C. bosses: auto-aimed damage on a boss counts x S3.bA; with no aimed hit on it for 2.5 s the boss repairs itself (up to its phase top). */
 if(RET.scale3===undefined)RET.scale3=!/[?&]scale3=0/.test(location.search);
-const S3=window.S3={get on(){return!!(RET.scale3&&RET.scale2);},RT:1,SH:.35,bA:.35,bK:.55,bT:.55,
+const S3=window.S3={get on(){return!!RET.scale3;},RT:1,SH:.35,bA:.35,bK:.55,bT:.55,
   st:{aup:0,all:0,au:0,man:0,cut:0,bau:0,bman:0,reg:0,t:0},   // damage counters (counted with the flag off too: the probe reads them)
   au:0,man:0,ka:1,bud:0,cur:null,ctx:0,
   hard(){return S2.hard();},
