@@ -118,7 +118,7 @@ async function HC_goHud(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),W=ms=
  try{RO.ch=null;RO.wp=null;RO.v=0;pl.bm=100;
   for(const [w,h] of sizes){if(typeof window.__vp==='function'){await window.__vp(w,h);await W(500)}
    const o=innerWidth+'x'+innerHeight,short=Math.min(innerWidth,innerHeight);if(innerWidth!==w&&innerHeight!==h&&typeof window.__vp==='function')ck(o+' viewport',false);
-   RO.v=0;await W(400);                                                                   // standing: nothing boost-ish
+   RO.v=0;await W(400);for(let k=0;k<40;k++){const q=FD.hud();if(!q.includes('tN')&&!q.includes('b2kM'))break;RO.v=0;await W(150)}   // standing: nothing boost-ish (flake-kill: the boost button + bar fade out on the frame clock, and a leftover boost / a slow batch page needs more than 400 ms: wait until they are gone, 6 s at most; the always-on count below still fails if they never go)
    const ids=FD.hud(),groups=ids.filter(i=>i!=='tR');
    ck(o+' always-on '+groups.length+' (steer pair = 1) ['+ids.join(' ')+'] <= 6',groups.length<=6&&!ids.includes('tN')&&!ids.includes('b2kM'));
    const mm=document.getElementById('roamMini'),mr=mm.getBoundingClientRect();

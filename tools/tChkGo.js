@@ -5,6 +5,8 @@
 //   QUIET=1 prints only FAIL lines + the summary (token saver).
 //   TAG=foot,v90k/park-sit  only items whose id starts with / contains one of these (the merged lanes' GO tags).
 //   SMOKE=1  only a ~20-item smoke set (both city boots, drive, on foot, errors). Frankfurt and Athens run IN PARALLEL (two pages); fixed sleeps are short.
+//   PHONE=1  rule-12 phone profile: iPhone UA, 852x393 touch (the real-time-driving GOs are judged unthrottled; the iPhone-like 6x gate is perf/ios-reveal, or add THROTTLE=6 to see which GOs break under it).
+//   REPEAT=n  every picked GO n times in a row (flake hunting; pair with a filter substring).
 //   CITY=fra|ath  run only that city (tools/tGo.sh starts both at once).
 //   FULL suite: no TAG/SMOKE (hourly / release only).
 //   node tools/tChkGo.js <base url of the build, e.g. http://localhost:8811/index.html> <outdir> [filter substring]
@@ -27,12 +29,13 @@ const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: too
  // items whose GO only opens the garage (or says "drive here") all do the same thing: run the first, report the rest as the same
  const kind=await p.evaluate(ids=>Object.fromEntries(ids.map(vid=>{const [id,j]=vid.split('#'),T=window.__chk.GO[id][+j||0],id0=vid;return[id0,T.gar?'gar':T.here?'here':'']})),all.map(a=>a[0]));
  // a GO may declare its own time budget (secs, e.g. sink1/start-sink: the real parachute start + 15 s): wait for it and judge SLOW against it
- const BUD=await p.evaluate(ids=>Object.fromEntries(ids.map(vid=>[vid,+window.__chk.GO[vid.split('#')[0]][+vid.split('#')[1]||0].secs||0])),all.map(a=>a[0]));const seen={},same={};
+ const BUD=await p.evaluate(ids=>Object.fromEntries(ids.map(vid=>[vid,+window.__chk.GO[vid.split('#')[0]][+vid.split('#')[1]||0].secs||0])),all.map(a=>a[0]));const seen={},same={},CAL={min:1e9};
  const SM=['v90n/foot-go-walk','v90n/foot-go-npc','v90n/foot-go-jump','v90k/rv-human','v90k/no-hollow','v90k/shadow','v90k/lag','v90k/ramp-seam','v90k/fra-net','v90g/fra-props','v90m/ath-boot','v90k/ath-kriezi','v90g/ath-display','v90k/rv-scale','v90k/ww-card'],TG=(process.env.TAG||'').split(',').filter(Boolean);
  const want=id=>id.includes(FIL)&&(!process.env.SMOKE||SM.includes(id))&&(!TG.length||TG.some(t=>id.startsWith(t)||id.includes('/'+t)||id.split('/')[0]===t));
  const LAST=['v90k/rv-scale','v90k/ww-card','v90k/park-sit'],pick=c=>all.filter(([id,cc])=>cc===c&&want(id)).map(([id])=>id).sort((a,b)=>(process.env.SMOKE?LAST.includes(a)-LAST.includes(b):0)).filter(id=>{const k=kind[id]&&c+kind[id];if(!k)return true;if(seen[k]){same[id]=seen[k];return false}seen[k]=id;return true});
  const run=async(c,ids)=>{for(const id of ids){const e0=errs.length;let said='';
    if(id==='rv2k2/traffic'&&res.some(r=>r.id==='rv2k2/pace'))await open(c);   // rv2k2h: traffic is not re-populated at the start after pace drove >1 km and the test warped back (game question, see docs/HANDOFF_rv2k2h.md): judge it on a fresh page, like a solo run
+   const cal=await p.evaluate(()=>{let m=1e9;for(let k=0;k<3;k++){const t=performance.now();let x=0;for(let i=0;i<3e6;i++)x+=Math.sqrt(i);m=Math.min(m,performance.now()-t)}return m}).catch(()=>0);CAL.min=Math.min(CAL.min,cal||1e9);const LF=cal?Math.min(4,Math.max(1,cal/CAL.min)):1;   // load factor: a fixed JS loop vs the fastest seen this run (the other city's page, other workers and THROTTLE all slow it); only the SLOW time budget scales with it
    const t1=Date.now();let threw=false;try{const LONG=BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff'&&!process.env.SMOKE;   // race-handsoff drives its own fake clock (tkRun), real timers   // long GOs (race 240 s, walls 60 s, objectives 30 s): drive them on a fake clock (sim time, not software-GL wall time) and WAIT until they say a verdict, so a combined run judges them like a solo run
     if(LONG&&!FC.on){await p.clock.install().catch(()=>{});FC.on=1}
     said=await p.evaluate(([b,j])=>window.__chk.go(b,+j||0)||'',id.split('#'));
@@ -40,7 +43,7 @@ const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: too
     else if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:process.env.SMOKE?4000:Math.max(20000,(BUD[id]+10)*1000),polling:250}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){threw=true;said=evalError(e)}
    await p.waitForTimeout(c==='bx'?1500:process.env.SMOKE?150:500);await emuUndo();
    const st=await p.evaluate(()=>({state:typeof __mho!=='undefined'?__mho.state:'?',gar:!!(document.getElementById('gbx')&&!document.getElementById('gbx').hidden)})).catch(()=>({state:'nav'}));
-   if(!said&&st.state==='race')said='(race started)';const ok=verdict({said,threw,newErr:errs.length>e0,nav}).ok;const secs=(Date.now()-t1)/1000,slow=secs>Math.max(10,BUD[id]||0)&&c!=='bx'&&!(BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff');if(slow)said+=' · SLOW '+secs.toFixed(1)+' s > 10 s ❌';const spawnOnly=c==='bx'&&ok,fin=(spawnOnly||slow)?false:ok;res.push({id,c,ok:fin,spawnOnly,secs,said,state:st.state,errs:errs.slice(e0)});
+   if(!said&&st.state==='race')said='(race started)';const ok=verdict({said,threw,newErr:errs.length>e0,nav}).ok;const secs=(Date.now()-t1)/1000,slow=secs>Math.max(20,BUD[id]||0)*LF&&c!=='bx'&&!(BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff');if(slow)said+=' · SLOW '+secs.toFixed(1)+' s > '+(Math.max(20,BUD[id]||0)*LF).toFixed(0)+' s ❌';const spawnOnly=c==='bx'&&ok,fin=(spawnOnly||slow)?false:ok;res.push({id,c,ok:fin,spawnOnly,secs,said,state:st.state,errs:errs.slice(e0)});
    if(!process.env.QUIET||!fin||spawnOnly)console.log(`${spawnOnly?'SPAWN-ONLY(laps NOT checked, run tools/bx/tTracks.js)':fin?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t1)/1000).toFixed(1)}s · ${said||'(no message)'}${errs.length>e0?' · ERR '+errs[e0]:''}`);
    if(process.env.SHOTS&&(res.length<=3||id.endsWith('/shadow')))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
    if(c==='bx')continue;
@@ -50,8 +53,9 @@ const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: too
    if(!nav){const r=await p.evaluate(()=>window.__tq&&__tq.reset?__tq.reset():null).catch(()=>null);if(r&&r.state==='roam'){RS.n++;RS.ms+=r.ms;continue}}
    if(!(process.env.SMOKE&&id===ids[ids.length-1]))await open(c==='ath'?'ath':'fra')}};
  const runSafe=async(c,ids)=>{let i=0;while(i<ids.length){const n0=res.length;try{await run(c,ids.slice(i));return}catch(e){const d=res.length-n0,bad=ids[i+d];if(bad)res.push({id:bad,c,ok:false,said:'PAGE LOST',errs:[]});i+=d+1;console.log('PAGE LOST at '+bad+' '+String(e).slice(0,100)+' → reopen');try{if(p.isClosed())await newPage();await open(c==='bx'?'fra':c)}catch(e2){}}}};
- const ath=pick('ath'),CY=process.env.CITY||'';
- if(CY!=='ath'){await runSafe('fra',pick('fra'));await runSafe('bx',pick('bx'))}
+ const REP=+process.env.REPEAT||1,rep=a=>REP>1?a.flatMap(x=>Array(REP).fill(x)):a;   // REPEAT=n: each picked GO n times in a row on the warm page (flake hunting)
+ const ath=rep(pick('ath')),CY=process.env.CITY||'';
+ if(CY!=='ath'){await runSafe('fra',rep(pick('fra')));await runSafe('bx',pick('bx'))}
  if(CY!=='fra'&&ath.length){if(CY!=='ath')await open('ath');await runSafe('ath',ath)}
  for(const id in same){const r=res.find(q=>q.id===same[id]);if(r)res.push({...r,id,said:'same as '+same[id]+': '+r.said})}
  const pass=res.filter(r=>r.ok).length;

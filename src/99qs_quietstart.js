@@ -78,7 +78,7 @@ async function QS_go(){const home=[RO.x,RO.z,RO.h],R=[],ck=(n,b)=>R.push((b?'✓
 // legs (restored in finally) and each park leg is QS_LEG s (the 70 m of clear grass + the road beyond), not 20 s. Solo built page: 4/4 ath (was 1/3); thresholds unchanged.
 const QS_LEG=8;
 async function QS_goDirt(){const LEG=QS_LEG,home=[RO.x,RO.z,RO.h],ro0=Object.assign({},roamSave()),R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),rnd0=Math.random,off0=QS.off,sv={v:RO.v,wp:RO.wp};
- const run=async off=>{QS.off=off;let sd=4242;Math.random=()=>(sd=(sd*16807)%2147483647)/2147483647;let sum=0,n=0,slow=0,forms={};const sp=(window.__xf&&__xf.grass&&__xf.grass(true))||[];
+ const run=async off=>{QS.off=off;RO.turbo=0;RO.vy=0;if(pl)pl.nitro=false;/* flake-kill: a boost left by an earlier GO (speedfeel, xf1) decays during the FIRST leg only and read as a faster old form */let sd=4242;Math.random=()=>(sd=(sd*16807)%2147483647)/2147483647;let sum=0,n=0,slow=0,forms={};const sp=(window.__xf&&__xf.grass&&__xf.grass(true))||[];
   for(const g of sp.slice(0,3)){try{roamWarp(g.x,g.z,g.h)}catch(e){}RO.v=8;RO.cool=0;for(let k=0;k<30*LEG&&state==='roam';k++){K.KeyW=K.ArrowUp=true;roamStep(1/30);if(k>60){const v=Math.abs(RO.v)*3.6;sum+=v;n++;if(v<3)slow++;forms[pl.vmode]=1}if(k%30===0)await 0}}
   K.KeyW=K.ArrowUp=false;return{avg:sum/Math.max(n,1),slow,n,forms:Object.keys(forms).join('/'),spots:Math.min(sp.length,3)}};
  let cars0=null;try{cars0=(typeof HUB!=='undefined'&&HUB.cars)?HUB.cars.splice(0):null;const a=await run(true),b=await run(false);

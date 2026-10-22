@@ -105,6 +105,7 @@ async function CL_smashGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);
  try{
   RO.turbo=0;pl.nitro=false;const q=rfSnap(CL.spawn[0],CL.spawn[1],120);if(!q)throw'no road';RO.x=q[0];RO.z=q[1];RO.h=RO.vh=Math.PI/2;RO.y=groundAt(RO.x,RO.z,99);OF_reset&&OF_reset();
   ck('car in the core',CL_in(RO.x,RO.z));
+  if(DEB&&DEB.list.length){for(const o of DEB.list){_m.makeScale(0,0,0);DEB.im.setMatrixAt(o.i,_m)}DEB.list.length=0;DEB.dirty=true}   // flake-kill: CL_burst adds no bricks while the debris pool is > 85 % busy, and an earlier GO's debris is still flying in a batch run: start from an empty pool
   const hit=(t,kmh)=>{const d=HUB.ptypes[t],p=HUB.props.find(x=>x.t===t&&x.im&&x.i!=null);if(!p)return null;const sv={x:p.x,z:p.z,y:p.y,alive:p.alive},a=RO.h;RO.vh=RO.h=Math.PI/2;
    const D=Math.min(OB_HL+d.r*.6,d.r+2);p.x=RO.x+Math.sin(a)*D;p.z=RO.z+Math.cos(a)*D;p.y=RO.y;p.alive=true;p.sm2T=0;
    const kx=Math.floor(p.x/16)*10000+Math.floor(p.z/16),L=HUB.pgrid.get(kx)||(HUB.pgrid.set(kx,[]),HUB.pgrid.get(kx)),add=!L.includes(p);if(add)L.push(p);
