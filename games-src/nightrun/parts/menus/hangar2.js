@@ -45,7 +45,7 @@ html.h2 #garage.h2x #h2Bay,html.h2 #garage.h2x #h2Pane{display:none!important}
  html.h2 #garage:not(.h2x) #gaCards .card .t,html.h2 #garage:not(.h2x) #gaCards .card .n small{font-size:14px!important}
 }
 @media (min-width:1024px) and (min-height:600px){
- html.h2 #garage.pg:not(.h2x){display:grid!important;grid-template-columns:minmax(340px,30%) minmax(0,1fr) minmax(300px,25%);grid-template-rows:auto auto minmax(0,1fr) auto;
+ html.h2 #garage.pg:not(.h2x):not([hidden]){display:grid!important;grid-template-columns:minmax(340px,30%) minmax(0,1fr) minmax(300px,25%);grid-template-rows:auto auto minmax(0,1fr) auto;
    grid-template-areas:"top top top" "tabs tabs tabs" "bay cards pane" "bay msg pane";gap:14px 18px!important;padding:18px 28px!important}
  html.h2 #garage .top{grid-area:top}html.h2 #garage .tabs{grid-area:tabs}html.h2 #garage #gaMsg{grid-area:msg}
  html.h2 #garage:not(.h2x) #gaCards{grid-area:cards;overflow-y:auto!important;min-height:0}
