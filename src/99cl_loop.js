@@ -6,7 +6,7 @@
 // GO why/core (state asserts).
 const CL=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
  return{box:[-1100,470,-720,800],spawn:[-120,100],out:+((/[?&]clout=([\d.]+)/.exec(location.search)||[])[1]??.6),car:+((/[?&]clcar=([\d.]+)/.exec(location.search)||[])[1]||.08),carNear:+((/[?&]clnear=(\d+)/.exec(location.search)||[])[1]??3),
-  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||!!T.smash)&&!ks.includes('off'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,T:[],cars:0,peds:0,sp:0}})();
+  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||T.smash!==false)&&!ks.includes('off')&&!ks.includes('nosmash'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,T:[],cars:0,peds:0,sp:0}})();
 const CL_CORE=CL.core&&CID==='fra';
 const CL_SMASH=CL.smash&&CID==='fra';
 const CL_in=(x,z)=>x>=CL.box[0]&&x<=CL.box[1]&&z>=CL.box[2]&&z<=CL.box[3];
@@ -73,21 +73,34 @@ async function CL_go(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m),W=ms=>
  }catch(e){R2.push('✗ threw '+e)}
  finally{RO.spawn0=sv.sp;RO.x=p0[0];RO.z=p0[1];RO.h=RO.vh=p0[2];RO.v=sv.v;RO.y=groundAt(RO.x,RO.z,99);camSnap=true}
  const ok=R2.every(r=>r[0]==='✓');return'📍 why/core · '+R2.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
-// ---- L2 smash-everything (CL.smash, ?cl=smash): inside the core props smash at any real driving speed (small >= 15 km/h, big/stalls >= 30; traffic keeps SM2's 45 until the traffic brain lands).
+// ---- L2 smash-everything (CL.smash; default ON in Frankfurt since smash-look-r22e22, works without ?cl=core,studs; ?cl=nosmash or ?cl=off = old SM2 gates): inside the core props smash at any real driving speed (small >= 15 km/h, big/stalls >= 30; traffic keeps SM2's 45 until the traffic brain lands).
 // Each smash there tops the burst up to >= 20 bricks and >= 3 studs and adds a 50 ms hit-stop; the speed loss stays smashCheck's own (<= 8 %). Outside the core / flag off = SM2 untouched.
 const CL_sm=()=>CL_SMASH&&state==='roam'&&RO.on&&CL_in(RO.x,RO.z);
 SM2_smash=(f=>function(kind,imp,quiet){if(!CL_sm()||kind==='car')return f.apply(this,arguments);const a=TUNE.sm2Small,b=TUNE.sm2Big;TUNE.sm2Small=CL.sm.small;TUNE.sm2Big=CL.sm.big;try{return f.apply(this,arguments)}finally{TUNE.sm2Small=a;TUNE.sm2Big=b}})(SM2_smash);
 const CL_cols=['#ffd12c','#e4002b','#0055bf','#ffffff','#2e9b3a'].map(c=>new THREE.Color(c));
-// top-up burst: small bricks thrown in the hit direction (forward + up, fanned sideways), gold studs popping higher; pooled pieces only, none added while the debris pool is > 85 % busy (smash chains)
-function CL_burst(x,y,z,def,sp){const base=def&&def.st>5?18:9,at=V3(x,y+1.2,z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh)),busy=DEB&&DEB.list.length>DEB.n*.85,n=busy?0:Math.max(0,CL.sm.bricks-base)+2,v=sp*.5+3;
- if(n)debris(at.addScaledVector(fw,.8),fw.clone().multiplyScalar(v).add(V3(0,13,0)),n,CL_cols,.55,y);at.set(x,y+1.4,z);
- const ns=Math.max(CL.sm.studs,6)-((def&&def.st)|0);for(let k=Math.max(0,ns);k>0;k--)studBurst(at,fw,sp*1.4+8);
+// top-up burst (smash-look-r22e22, 2K look): a wide sideways fan of small bricks thrown forward and out to both sides (further and longer-lived than SM2's own),
+// and every stud of the hit bright gold, popped high x1.6 size, so they arc over the car before the magnet takes them (hold 0.9 s). Pooled pieces only (DEB, studWarm), none added while the debris pool is > 85 % busy
+const _clSd=V3(),_clV=V3();
+function CL_burst(x,y,z,def,sp){const base=def&&def.st>5?18:9,at=V3(x,y+1.2,z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh)),busy=DEB&&DEB.list.length>DEB.n*.85,n=busy?0:Math.max(0,CL.sm.bricks+6-base)+2,v=sp*.5+3;
+ if(n){debris(at.addScaledVector(fw,.8),fw.clone().multiplyScalar(v).add(V3(0,13,0)),n,CL_cols,.55,y);_clSd.set(fw.z,0,-fw.x);const L=DEB.list,w=12+sp*.4;
+  for(let k=Math.max(0,L.length-n),m=0;k<L.length;k++,m++){const o=L[k],a=(n>1?m/(n-1)*2-1:0)+rr(-.12,.12);o.v.copy(fw).multiplyScalar(sp*.8+4+rr(0,3)).addScaledVector(_clSd,a*w);o.v.y=rr(6,11);o.s.multiplyScalar(.72);o.life=rr(1.7,2.3)}}
+ at.set(x,y+1.4,z);const ns=Math.max(CL.sm.studs,6)-((def&&def.st)|0);
+ for(let k=Math.max(0,ns);k>0;k--){_clV.copy(fw).multiplyScalar(sp*.3+rr(-1,1)).addScaledVector(_clSd.set(fw.z,0,-fw.x),rr(-2.5,2.5));_clV.y=rr(13,16);studBurst(at,fw,sp,{gold:1,vel:_clV,hold:.9,sc:1.6})}
  SM2.n.bricks+=base+n;HIT_stop(CL.sm.stop);CL.sn++;CL.lastB=base+n;CL.lastS=Math.max((def&&def.st)|0,6)}
+// the smash studs exist before the first smash on every boot path (the loader warm links them; the fast test start skips that warm)
+// and one dry burst far below the map runs the burst code once (JIT, pool paths) before the first real smash; its pieces, studs and counters are undone at once
+function CL_dry(){const b=SM2.n.bricks,sn=CL.sn,lb=CL.lastB,ls=CL.lastS,hd=hitDip,L=DEB&&DEB.list,l0=L?L.length:0,nx=DEB&&DEB.next;CL_burst(RO.x,-900,RO.z,null,10);
+ if(L){for(let k=L.length-1;k>=l0;k--){_m.makeScale(0,0,0);DEB.im.setMatrixAt(L[k].i,_m);L.splice(k,1)}DEB.next=nx;DEB.dirty=true}for(const s of HUB.studFX)if(s.alive&&s.m.position.y<-800){s.alive=false;s.m.visible=false}
+ SM2.n.bricks=b;CL.sn=sn;CL.lastB=lb;CL.lastS=ls;hitDip=hd}
+if(CL_SMASH)roamPost=(f=>function(){const r=f.apply(this,arguments);try{studWarm();CL_dry()}catch(e){}return r})(roamPost);
+// every stud this hit spawned (SM2's / smashCheck's own come after CL_burst) joins the bright gold arc: x1.6, popped high, magnet after 0.9 s (look only: their value stays)
+function CL_gold(){const fw=_clV.set(Math.sin(RO.vh),0,Math.cos(RO.vh)),sp=Math.abs(RO.v);_clSd.set(fw.z,0,-fw.x);for(const s of HUB.studFX)if(s.alive&&s.t===0&&s.hold!==.9){s.m.material=STUDM[2];s.m.scale.setScalar(1.6);s.hold=.9;s.vel.copy(fw).multiplyScalar(sp*.3+rr(-1,1)).addScaledVector(_clSd,rr(-2.5,2.5));s.vel.y=rr(13,16)}}
+if(CL_SMASH)smashCheck=(f=>function(dt){const n=CL.sn,r=f.apply(this,arguments);if(CL.sn!==n)try{CL_gold()}catch(e){}return r})(smashCheck);
 SM2_prop=(f=>function(p,def,sp){const r=f.apply(this,arguments);if(!r&&CL_sm()&&!(RO.rcT>0&&sp<3))try{CL_burst(p.x,p.y,p.z,def,sp)}catch(e){}return r})(SM2_prop);
 // ---- GO why/smash: a scripted 30 km/h hit on a bin and a big prop in the core smashes both with >= 20 bricks, studs and a hit-stop, loss <= 30 %; 20 km/h on a bin smashes, 10 km/h bumps
 async function CL_smashGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);
  if(CID!=='fra')return'📍 why/smash · Frankfurt only (Athens parked) → ✅ PASS';if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
- if(!CL_SMASH)return'📍 why/smash · ?cl=smash is OFF (default) → ✅ PASS (flag off)';
+ if(!CL_SMASH)return'📍 why/smash · smash is OFF (?cl=nosmash / ?cl=off) → ✅ PASS (flag off)';
  const p0=[RO.x,RO.z,RO.h,RO.v],tb=RO.turbo,ni=pl.nitro;
  try{
   RO.turbo=0;pl.nitro=false;const q=rfSnap(CL.spawn[0],CL.spawn[1],120);if(!q)throw'no road';RO.x=q[0];RO.z=q[1];RO.h=RO.vh=Math.PI/2;RO.y=groundAt(RO.x,RO.z,99);OF_reset&&OF_reset();
@@ -108,5 +121,5 @@ async function CL_smashGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
  __chk.items.unshift({ver:'why',id:'core',area:'drive',text:'core-loop L1 (PLAN_CORE_LOOP): ?cl=core: fresh PLAY spawns at Paulsplatz inside the 1.57 x 1.52 km core on a road heading east; smashable props per 100 m of street inside >= 2x outside; >= 6 cars within 150 m of the spawn; draw calls unchanged. Flag default OFF. 📍 GO.'});
  __chk.GO['why/core']=[{c:'fra',n:'core zone Frankfurt',secs:60,fn:()=>CL_go()}];
- __chk.items.unshift({ver:'why',id:'smash',area:'drive',text:'core-loop L2 (PLAN_CORE_LOOP): ?cl=smash: inside the core props smash at 15 km/h (small) / 30 km/h (big), >= 20 bricks, >= 3 studs, 50 ms hit-stop, loss <= 30 %; 10 km/h bumps. Flag default OFF. 📍 GO.'});
+ __chk.items.unshift({ver:'why',id:'smash',area:'drive',text:'core-loop L2 (PLAN_CORE_LOOP): ?cl=smash: inside the core props smash at 15 km/h (small) / 30 km/h (big), >= 20 bricks, >= 3 studs, 50 ms hit-stop, loss <= 30 %; 10 km/h bumps. Default ON in Frankfurt (?cl=nosmash = off). 📍 GO.'});
  __chk.GO['why/smash']=[{c:'fra',n:'smash core Frankfurt',secs:30,fn:()=>CL_smashGo()}]},500)}

@@ -62,6 +62,8 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
   let gm=null;try{if(typeof worldGroundGen==='function'){gm=WARM_gtwin();sc.add(gm)}}catch(e){console.warn('warmall ground',e)}
   // boot-4: the transform burst (pooled material, 30_race xfWarm) linked its program on the first swap
   let bm=null;try{if(typeof xfWarm==='function'){bm=xfWarm();sc.add(bm)}}catch(e){console.warn('warmall burst',e)}
+  // smash-look-r22e22: the pooled smash studs (60_city_build6 studWarm) are hidden meshes in HUB.grp, so the traverse below links their program now, not on the first smash
+  try{if(typeof studWarm==='function'&&typeof HUB!=='undefined')studWarm()}catch(e){console.warn('warmall studs',e)}
   // perf-r11c: LF_warm links the fill materials right after the hub props, but Athens still linked the instanced fill program (instance colour + vertex colours + env map)
   // at f59 of driving (~65-85 ms): the lights / environment were not final then. Link a twin here, in the loader's last compile.
   let lf=null;try{if(typeof LF!=='undefined'&&LF.on&&typeof LF_mats==='function'){const M=LF_mats(),g=new THREE.BoxGeometry(.1,.1,.1);g.setAttribute('color',new THREE.Float32BufferAttribute(new Array(g.attributes.position.count*3).fill(1),3));lf=new THREE.Group();
