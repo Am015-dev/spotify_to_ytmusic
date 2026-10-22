@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// MENUFIX (parts/menus/menufix.js + stats.js + map.js + ret.js, flag RET.menufix, ?menufix=0 = old): HANGAR = 5 tabs + MORE sheet with every label fitting, the achievement toast never over a
+// (runs with ?hangar3=0: the MORE pop-up sheet it tests is the flag-off path; hangar3 is gated by qa/hangar2-test.js) MENUFIX (parts/menus/menufix.js + stats.js + map.js + ret.js, flag RET.menufix, ?menufix=0 = old): HANGAR = 5 tabs + MORE sheet with every label fitting, the achievement toast never over a
 // control (elementFromPoint), no decoration glyphs in menus. Chromium through a CDP session on both phone sizes; prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/menufix-test.js     env: GAME_DIR=...
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
@@ -17,7 +17,7 @@ const SIZES = [[375, 553], [390, 763]], GLYPH = /[◆◇♦✦✸⌛∞]/;
     await ctx.addInitScript(() => { try { if (!sessionStorage.getItem('__ini')) { sessionStorage.setItem('__ini', '1'); localStorage.setItem('mnr_tut', '1'); localStorage.setItem('mnr_bank', '900'); } } catch (e) { } });
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(w + 'x' + h + ' ' + e.message));
     const cdp = await ctx.newCDPSession(p); await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
-    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&school=0${q}`); await p.waitForFunction(() => window.__mnr && window.RET && document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }); await sleep(300);
+    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&school=0&hangar3=0${q}`); await p.waitForFunction(() => window.__mnr && window.RET && document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }); await sleep(300);
     return p;
   };
   const tap = async (p, sel) => { const l = p.locator(sel).first(); const b = await l.boundingBox(); if (!b) throw new Error('not on screen: ' + sel); await p.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); await sleep(350); };
