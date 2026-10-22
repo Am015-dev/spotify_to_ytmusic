@@ -38,6 +38,7 @@ PARTS_EXTRA.append('streetfeel.js')
 PARTS_EXTRA.append('alive.js')
 PARTS_EXTRA.append('lit.js')
 PARTS_EXTRA.append('hangar2.js')
+PARTS_EXTRA.append('footlab.js')
 PARTS_EXTRA.append('street3.js')
 out=out[:out.rindex(rd('c.js'))]+''.join(rd(p)+"\n" for p in PARTS_EXTRA)+rd('c.js')
 OUT=os.environ.get('NR_OUT','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path

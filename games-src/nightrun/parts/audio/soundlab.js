@@ -28,9 +28,10 @@ if(window.SND&&window.LABX){
     riser:()=>{const T=now()+.02;AU.osc(T,'sawtooth',110,2,.1,AU.fx,1400,2500);AU.noise(T,2,.12,3000,AU.fx);},
     dropboom:()=>{const T=now()+.02;AU.noise(T,.9,.9,300,AU.fx,'lowpass');AU.osc(T,'sine',150,.7,1,AU.fx,28);AU.noise(T,.25,.5,5000,AU.fx);},
     reward:()=>{const T=now()+.02;AU.noise(T,.7,.35,300,AU.fx,'lowpass');AU.osc(T,'sine',140,.5,.6,AU.fx,30);}};
+  const FT_={f_shot:'shot',f_hit:'hit',f_pick:'pick',f_big:'big',f_hurt:'hurt',f_dash:'dash',f_graze:'graze',f_warn:'warn',f_up:'up',f_fever:'tier'};   // ON FOOT rows -> the AU.sfx sound they gate (the four song rows have no preview: they would change the music)
   SND.play=function(id){AU.unlock();if(!AU.a||AU.a.state!=='running')return false;const r=SND.T.find(x=>x[0]===id);if(!r)return false;
     if(r[1]==='mu'){this.pv[id]=performance.now()+PV_MS;this.apply();later(()=>this.apply(),PV_MS+80);MU[id]();return true;}
-    this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
+    this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='ft'){if(FT_[id])AU.sfx(FT_[id]);}else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
     return true;};
   // 'tier' is forced to 3 for a moment so the drum layer and the hats / kick / bass can be heard; the game writes AU.tier as before
   {let tv=AU.tier;Object.defineProperty(AU,'tier',{get(){return SND.pv.tierForce>performance.now()?Math.max(3,tv|0):tv;},set(v){tv=v;},configurable:true});
