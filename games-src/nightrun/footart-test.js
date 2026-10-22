@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// FA (parts/footart.js) test: every who x pose draws on a headless canvas without error and leaves pixels, bg layers draw, a real picture dropped into a temp media copy is detected (FA.has) and drawn,
+// FA (parts/street/footart.js) test: every who x pose draws on a headless canvas without error and leaves pixels, bg layers draw, a real picture dropped into a temp media copy is detected (FA.has) and drawn,
 // a picture NOT listed in ready.json is ignored (the hatched placeholder never shows), and the built game's shooter is unchanged when FA is present (no page error, FA inert).
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/footart-test.js        (SHEET=<png> also writes a contact sheet)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), fs = require('fs'), os = require('os'), http = require('http');
-const SRC = fs.readFileSync(path.join(__dirname, 'parts/footart.js'), 'utf8');
+const SRC = fs.readFileSync(path.join(__dirname, 'parts/street/footart.js'), 'utf8');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fa-')); fs.mkdirSync(path.join(tmp, 'foot'));
 fs.writeFileSync(path.join(tmp, 'index.html'), '<!doctype html><canvas id=c width=400 height=400></canvas>');
 const srv = http.createServer((q, r) => { const u = q.url.split('?')[0], f = path.join(tmp, u === '/' ? 'index.html' : u); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); r.end(); } else { r.writeHead(200, { 'content-type': f.endsWith('.json') ? 'application/json' : f.endsWith('.webp') ? 'image/webp' : 'text/html' }); r.end(b); } }); });

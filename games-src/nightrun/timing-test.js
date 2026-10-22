@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// TIMING gate (parts/timing.js, flag RET.timing, default off: this test opens ?timing=1; ?timing=0 = old). Prints PASS/FAIL lines only.
+// TIMING gate (parts/powers/timing.js, flag RET.timing, default off: this test opens ?timing=1; ?timing=0 = old). Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/timing-test.js     env: RUNS=8 STAGES=3,10,20 PAR=4 HARD=1
 // No ?all=1 here: the real beat window decides. Unit: beat dash parries + refunds, off-beat costs 2 and locks, late x2 breaks the chain,
 // EMP spends all charges with tiers 1/2/3, empty screen wastes, ?timing=0 = one charge per EMP and the old dash.

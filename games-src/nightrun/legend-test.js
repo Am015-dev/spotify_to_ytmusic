@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// LEGEND gate (parts/legend.js, flag RET.legend, default ON: the bots run with ?legend=1, Q='&legend=0' measures the old Legend). Prints PASS/FAIL lines; REPORT=1 prints the bot table.
+// LEGEND gate (parts/difficulty/legend.js, flag RET.legend, default ON: the bots run with ?legend=1, Q='&legend=0' measures the old Legend). Prints PASS/FAIL lines; REPORT=1 prints the bot table.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/legend-test.js
 //   env: DIFFS=legend STAGES=10,20 MODES=human,dodger,noor,beat,nodash,camp,rand RUNS=8 PAR=4 Q='&legend=0' ENDLESS=1 (endless: median wave reached) GATE=0 (table only)
 // BUILD=mid|late|owner (default mid). Bots ( story stages, headless ?sim=1): human = humanbot.js human model (late view, misses, lapses, aim error); dodger = the oracle (balance-test cost grid,

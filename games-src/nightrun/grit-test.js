@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// GRIT gate (parts/grit.js, flag RET.grit, default on; ?grit=0 = old). Prints PASS/FAIL lines.
+// GRIT gate (parts/enemies/grit.js, flag RET.grit, default on; ?grit=0 = old). Prints PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/grit-test.js     env: OLD=1 (measure the old build via ?grit=0) RUNS=2 STAGES=8,20 SECS=120 TTKSt=8
 // 1 EMP rate: the balance-test dodger on Normal (mid build): charges earned per minute <= 1.5, EMP uses per minute <= 1.5 (target .3-1.5, printed)
 // 2 TTK table: the owner's build (PULSE 3 + SWARM 10) alone against one foe of each kind on Normal at TTKSt: median seconds of focused fire (printed; normal-class 3-5 s, gunship 8-15 s judged when GRIT is on)

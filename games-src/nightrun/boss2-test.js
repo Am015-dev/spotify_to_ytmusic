@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Boss fights that last (BALANCE.md "Boss fights, round 4"; code parts/armour.js, flag RET.boss2, ?boss2=0 = before). Prints PASS/FAIL lines.
+// Boss fights that last (BALANCE.md "Boss fights, round 4"; code parts/bosses/armour.js, flag RET.boss2, ?boss2=0 = before). Prints PASS/FAIL lines.
 // bossplay.js: the pages run with ?bpauto=1 (each boss gate is resolved 1.5 s after it rises, like a player who plays the mechanic); the length bands are for that player.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/boss2-test.js      env: GAME_DIR, STAGES=5,8,13,16,21,24,29,32,37,40
 // 1 god-damage stress: every frame the boss loses 1e6 HP (any source goes through the same e.hp): the fight still lasts >= its floor (B2X.T; / the bossplay surge with RET.bossfit, W87), every boss, Normal + Legend

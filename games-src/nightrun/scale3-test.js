@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Scale round 3 gate (BALANCE.md "Power scale, round 3"; code parts/hard.js, flag RET.scale3, ?scale3=0 = round 2). Prints PASS/FAIL lines.
+// Scale round 3 gate (BALANCE.md "Power scale, round 3"; code parts/enemies/hard.js, flag RET.scale3, ?scale3=0 = round 2). Prints PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/scale3-test.js      env: RUNS=3
 // 1 flag off: no damage cut, round 2's steer
 // 2 build matrix, Legend stage 20, god mode: every strong build's applied dps <= the ceiling (+10%), a fresh ship is not cut, moving builds' auto-aim share <= 35% (+5)

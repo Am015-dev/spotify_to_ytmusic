@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Forge screen test (flag RET.forgeui, parts/forgeui.js). Prints pass/fail lines only.
+// Forge screen test (flag RET.forgeui, parts/weapons/forgeui.js). Prints pass/fail lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/forgeui-test.js        env: GAME_DIR=...
 // 1 layout at 390x763, 375x553, 844x390, 1280x800: three zones, lesson hooks, targets >= 44 px, text >= 12 px, no side scroll, cards and slots do not overlap
 // 2 select: tap a card then slot A / B, and tap a slot then a card; the preview shows the hybrid, recipe, deltas (red damage, green effects), good-against line

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PILOT CLASSES test (parts/classes.js, flag RET.classes). Prints pass/fail lines only.
+// PILOT CLASSES test (parts/hangar/classes.js, flag RET.classes). Prints pass/fail lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/classes-test.js
 //   env: RUNS=24 (balance runs per stage, bot and class) STAGES=5,10,20 CLS=none,none2,gunner (configs; none* = ?classes=0) BAL=0 (skip the balance part) PAR=4
 // 1. pick, unlock, persist (reload), row locks, XP; 2. caps: every knob inside CLS.KC with the whole tree, damage <= x1.15 with any streak;

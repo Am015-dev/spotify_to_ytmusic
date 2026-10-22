@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// COUNTER threats gate (parts/counter.js, flag RET.counter). Prints PASS/FAIL lines.
+// COUNTER threats gate (parts/enemies/counter.js, flag RET.counter). Prints PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/counter-test.js
 // a for each threat: the dodging bot WITHOUT the answer loses clearly more hull (or time) than the same bot WITH the timed answer
 // c a bot that presses DASH / EMP at random (same number of presses) loses more than the one that times them

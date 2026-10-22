@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Complete Lab (parts/labfull.js, flag RET.labfull) through the real page (prints pass/fail only):
+// Complete Lab (parts/lab/labfull.js, flag RET.labfull) through the real page (prints pass/fail only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/labfull-test.js      env: GAME_DIR=<dir with index.html>, REF_DIR=<dir with the build before labfull> (optional, ?labfull=0 DOM must match), V=1
 //  (a) COVERAGE: every enemy / fleet / flanker / foot enemy / boss / ship / hybrid / mod / weapon / power-up / dash upgrade / EMP signature / class / skill node / rule / twist /
 //      event / formation / lesson / tutorial step / sprite strip that the game's own tables define has a registry entry (the ids are read from the tables, not from labfull.js)

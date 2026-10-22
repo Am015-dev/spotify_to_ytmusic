@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// New-mechanic cadence gate (parts/rules.js, flag RET.rules). Real page, ?sim=1 stepping. Prints PASS/FAIL lines, exit 1 on any FAIL.
+// New-mechanic cadence gate (parts/waves/rules.js, flag RET.rules). Real page, ?sim=1 stepping. Prints PASS/FAIL lines, exit 1 on any FAIL.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/rules-test.js      env: GAME_DIR=<dir with index.html>
 // (a) every mechanic (plain + twist) spawns, ticks and draws without errors, phone 390x763 and landscape 1280x720; DASH and EMP hooks run; no NaN
 // (b) caps: enemy bullets <= ebCap, player shots <= 64, pickups <= 40, mechanic objects bounded; the ship keeps a free band >= 96 px

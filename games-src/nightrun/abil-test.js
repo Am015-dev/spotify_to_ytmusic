@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// DASH + EMP abilities gate (parts/abilities.js, flag RET.abil). Prints PASS/FAIL lines.
+// DASH + EMP abilities gate (parts/powers/abilities.js, flag RET.abil). Prints PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/abil-test.js      env: RUNS=3 (stationary bot runs per stage)
 // 1 a stationary bot that spams DASH (and comes back) and EMP clears no more stages than with ?abil=0 (+10 points), stages 3/8/20 Normal mid build
 // 2 the dodging bot / Legend bands are balance-test and scale/scale2-test (run them next to this one)

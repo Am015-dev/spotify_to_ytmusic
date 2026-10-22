@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // PURPOSE: menufix3 gates for review 9 fixes 8, 11 and 14 (E12 first death, E14 currency, E17/E19 menu leftovers)
-// FLAG: menufix (RET.menufix, default ON; the three fixes are part of it: parts/ret.js retShow, hub.js HOME + nnum, tidy.js DATA row)
+// FLAG: menufix (RET.menufix, default ON; the three fixes are part of it: parts/profile/ret.js retShow, hub.js HOME + nnum, tidy.js DATA row)
 // TEST: menufix3-test.js
 // Headless Chromium, 390x763 and 375x553, touch. Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/menufix3-test.js     env: GAME_DIR=...

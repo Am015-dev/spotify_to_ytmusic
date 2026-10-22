@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Enemies that react (parts/react.js, flag RET.react). NODE_PATH=$(npm root -g) node games-src/nightrun/react-test.js   env: RUNS=6 (bot runs per stage) STAGES=3,7,12
+// Enemies that react (parts/enemies/react.js, flag RET.react). NODE_PATH=$(npm root -g) node games-src/nightrun/react-test.js   env: RUNS=6 (bot runs per stage) STAGES=3,7,12
 // (a) predictability: the same stage 5 times (5 dice seeds, a fixed ship path): spread of enemy positions and fire times, ?react=0 vs on
 // (b) every state acts in a scenario (?rxs=<state>), squads (pin/exit, leader, bearer) form
 // (c) caps: bullets <= ebCap, speed <= BCAP, every tell >= 0.6 s, a free gap >= 96 px in front of the ship
@@ -49,9 +49,9 @@ const BOT = (o) => {
   const r = { clear: cleared }; m.abort(); return r;
 };
 (async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rx-')), html = fs.readFileSync(path.join(GAME_DIR, 'index.html'), 'utf8'), rx = fs.readFileSync(path.join(__dirname, 'parts/react.js'), 'utf8');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rx-')), html = fs.readFileSync(path.join(GAME_DIR, 'index.html'), 'utf8'), rx = fs.readFileSync(path.join(__dirname, 'parts/enemies/react.js'), 'utf8');
   fs.symlinkSync(path.join(GAME_DIR, 'media'), path.join(tmp, 'media')); try { fs.symlinkSync(path.join(GAME_DIR, 'music'), path.join(tmp, 'music')); } catch (e) { }
-  ok(html.includes(rx), 'built page carries parts/react.js'); fs.writeFileSync(path.join(tmp, 'index.html'), html.replace(rx, ''));
+  ok(html.includes(rx), 'built page carries parts/enemies/react.js'); fs.writeFileSync(path.join(tmp, 'index.html'), html.replace(rx, ''));
   const port = await freePort(), port2 = await freePort();
   const srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' }), srv2 = cp.spawn('python3', ['-m', 'http.server', String(port2), '--bind', '127.0.0.1', '--directory', tmp], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 900)); const br = await PW.chromium.launch(), errs = [];

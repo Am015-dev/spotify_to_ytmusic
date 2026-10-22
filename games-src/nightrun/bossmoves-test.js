@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Boss movesets (parts/bossmoves.js, flag RET.bossmoves). Prints PASS/FAIL lines.
+// Boss movesets (parts/bosses/bossmoves.js, flag RET.bossmoves). Prints PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/bossmoves-test.js
 // 1 library >= 30 verbs; every boss >= 8 verbs, its own signature + counter, pairwise overlap <= 2 (the table)
 // 2 every boss fight, phone portrait 390x763 (Legend) and desktop 960x540 (Normal): its verbs run, telegraph >= 0.5 s, a free disc >= 64 px stays while

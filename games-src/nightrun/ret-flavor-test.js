@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Run-and-gun flavour (parts/flavor.js, flag RET.flavor) through the real page (prints pass/fail only):
+// Run-and-gun flavour (parts/waves/flavor.js, flag RET.flavor) through the real page (prints pass/fail only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/ret-flavor-test.js      env: GAME_DIR=<dir with index.html>, SECS=70, SHOT=<dir for screenshots>
 //  (a) captive: spawns on a bar line, shots pass through the cage, 6-8 hits free it -> free wingmate for 2 bars (or +1000 and a pickup when a power already runs);
 //      leaving unrescued is neutral (no leak, no hull); none in the first minute of stages 1-2; none during a boss

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// OVERLAY gate (review 9 fixes #2 and #5, parts/explain.js): 60 s each of story stages 1, 3, 6, 10 on a 390x763 phone, bot flies + fires, god mode, seeded.
+// OVERLAY gate (review 9 fixes #2 and #5, parts/hud/explain.js): 60 s each of story stages 1, 3, 6, 10 on a 390x763 phone, bot flies + fires, god mode, seeded.
 //   overlay inventory  every overlay kind drawn (beams, lanes, rings, chevrons, bars, ticks, marks: known families + any draw spanning > 45% of the field)
 //                      has a caption id in EXP.OVL with a caption text, and that caption showed in the run where the overlay was drawn
 //   white beam         max run of near-white columns (>= half the field height) <= 4 css px in every probed frame
@@ -12,7 +12,7 @@ const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/ma
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let fails = 0; const ok = (n, p, i) => { if (!p) fails++; console.log((p ? 'PASS ' : 'FAIL ') + n + (p || i == null ? '' : ' :: ' + JSON.stringify(i).slice(0, 600))); };
-const lineMap = () => { const m = new Map(); for (const f of fs.readdirSync(PARTS)) if (f.endsWith('.js')) fs.readFileSync(path.join(PARTS, f), 'utf8').split('\n').forEach((l, i) => { if (l.trim().length > 12 && !m.has(l)) m.set(l, f + ':' + (i + 1)); }); return m; };
+const lineMap = () => { const m = new Map(); for (const f of require('./parts-index.js').list()) if (f.endsWith('.js')) fs.readFileSync(path.join(PARTS, f), 'utf8').split('\n').forEach((l, i) => { if (l.trim().length > 12 && !m.has(l)) m.set(l, f + ':' + (i + 1)); }); return m; };
 const PROBE = () => {
   Error.stackTraceLimit = 40; window.__probe = 0; window.__sites = {}; const P = CanvasRenderingContext2D.prototype;
   const add = (c, x, y) => { const t = c.getTransform(), X = t.a * x + t.c * y + t.e, Y = t.b * x + t.d * y + t.f, b = c.__bb || (c.__bb = [1e9, 1e9, -1e9, -1e9]); b[0] = Math.min(b[0], X); b[1] = Math.min(b[1], Y); b[2] = Math.max(b[2], X); b[3] = Math.max(b[3], Y); };

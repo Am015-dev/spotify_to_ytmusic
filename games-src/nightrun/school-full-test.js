@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Nightrun SCHOOL FULL test (flag RET.schoolfull, parts/schoolfull.js): every Flight School drill (22: tut steps, counter foes, gate, fan, the 6 lesson mini
+// Nightrun SCHOOL FULL test (flag RET.schoolfull, parts/drills/schoolfull.js): every Flight School drill (22: tut steps, counter foes, gate, fan, the 6 lesson mini
 // stages, on foot) is a real lesson. An oracle bot drives each one headless (?sim=1 stepped by hand; lessons stepped through lsTick; on foot via FOOT.sim) with
 // human-model pacing (one success per HUMAN s of game time after each rep starts) and asserts: an 8 s demo first, the first success alone never clears,
 // exactly 3 rounds passed, duration >= 45 s and <= 180 s, the clear card / line shows the time; a hit in round 2 repeats that round; ?schoolfull=0 = old

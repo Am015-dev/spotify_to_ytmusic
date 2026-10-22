@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Novelty gate (parts/novelty.js, flag RET.novelty). PASS/FAIL lines, exit 1 on any FAIL.   NODE_PATH=$(npm root -g) node games-src/nightrun/novelty-test.js   env: GAME_DIR
+// Novelty gate (parts/difficulty/novelty.js, flag RET.novelty). PASS/FAIL lines, exit 1 on any FAIL.   NODE_PATH=$(npm root -g) node games-src/nightrun/novelty-test.js   env: GAME_DIR
 // (a) the default page (flag off) spawns exactly what the page without novelty.js spawns   (b) a wave repeated inside 5 min gets a twist, the codex prefers an unseen twist, epochs / unlocks / events fire on the session clock
 // (c) every event and every twist spawns and draws in landscape and portrait, ambush leaves a gap >= 96 px   (d) enemy bullets <= 50 with events on Hard stage 20, no page error
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs'), os = require('os');
@@ -30,7 +30,7 @@ const CAP = () => { const m = window.__mnr, N = window.NOV; if (m.running) m.abo
 (async () => {
   const fails = [], pass = [], errs = [];
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'novelty-')); for (const f of fs.readdirSync(GAME)) if (f !== 'index.html') fs.symlinkSync(path.join(GAME, f), path.join(tmp, f));
-  const src = fs.readFileSync(path.resolve(__dirname, 'parts/novelty.js'), 'utf8'), html = fs.readFileSync(path.join(GAME, 'index.html'), 'utf8');
+  const src = fs.readFileSync(path.resolve(__dirname, 'parts/difficulty/novelty.js'), 'utf8'), html = fs.readFileSync(path.join(GAME, 'index.html'), 'utf8');
   if (!html.includes(src)) fails.push('built page is not built from the current novelty.js (rebuild)');
   fs.writeFileSync(path.join(tmp, 'index.html'), html.replace(src, ''));
   const port = await fp(), port2 = await fp();

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Nightrun POWER-UP LEVELS + five new shooter powers (flag RET.pw3, parts/powlevels.js). Real page in sim mode (?sim=1, stepped by hand), headless.
+// Nightrun POWER-UP LEVELS + five new shooter powers (flag RET.pw3, parts/powers/powlevels.js). Real page in sim mode (?sim=1, stepped by hand), headless.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/ret-pw3-test.js     env: GAME_DIR=...
 // 1 level rules: +1 per pickup while running or within 4 bars of its end, max 5, timer restarts at 8 bars, a real hit -1 (min 1), an absorbed hit costs nothing
 // 2 each power's level effects measured (ECHO, NOVA, MAGNET, WINGMATES, CRESCENDO, CHORD SHIELD, DRUM BURST, BOMB STOCK, HEAVY CRATE, RICOCHET, TIME SLICE, LIFE LEECH)

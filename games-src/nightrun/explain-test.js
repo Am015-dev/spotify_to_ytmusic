@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// EXPLAIN gate (parts/explain.js, rule 8 of WORKER-RULES): every canvas draw call site seen in fly stages 1/4/8/12, a boss and endless wave 10 on a 390x763
+// EXPLAIN gate (parts/hud/explain.js, rule 8 of WORKER-RULES): every canvas draw call site seen in fly stages 1/4/8/12, a boss and endless wave 10 on a 390x763
 // phone must be listed (backticked key) in VISUAL-INVENTORY.md; captions show once each; ?explain=0 restores. PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/explain-test.js        INV=1 also writes /tmp inventory json (path printed)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
@@ -8,7 +8,7 @@ const freePort = () => new Promise(r => { const s = net.createServer(); s.listen
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let fails = 0; const ok = (n, p, i) => { if (!p) fails++; console.log((p ? 'PASS ' : 'FAIL ') + n + (p || i == null ? '' : ' :: ' + JSON.stringify(i))); };
 // built line -> part file (the build concatenates parts, so a long line is unique)
-const lineMap = () => { const m = new Map(); for (const f of fs.readdirSync(PARTS)) if (f.endsWith('.js')) fs.readFileSync(path.join(PARTS, f), 'utf8').split('\n').forEach((l, i) => { if (l.trim().length > 12 && !m.has(l)) m.set(l, f + ':' + (i + 1)); }); return m; };
+const lineMap = () => { const m = new Map(); for (const f of require('./parts-index.js').list()) if (f.endsWith('.js')) fs.readFileSync(path.join(PARTS, f), 'utf8').split('\n').forEach((l, i) => { if (l.trim().length > 12 && !m.has(l)) m.set(l, f + ':' + (i + 1)); }); return m; };
 const PROBE = () => {   // runs in the page before any game code
   Error.stackTraceLimit = 40; window.__probe = 0; window.__sites = {};
   const P = CanvasRenderingContext2D.prototype, a0 = P.arc;

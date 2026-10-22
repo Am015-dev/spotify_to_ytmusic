@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Weapon Forge test (flag RET.forge, parts/forge.js + parts/inventory.js). Prints pass/fail lines only (REPORT=1 adds the tables).
+// Weapon Forge test (flag RET.forge, parts/weapons/forge.js + parts/weapons/inventory.js). Prints pass/fail lines only (REPORT=1 adds the tables).
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/forge-test.js        env: HARD=0 skips the Hard stage-30 bot runs, RUNS=2, PAR=4
 // 1 recipes: every recipe forges its hybrid (scrap and Neon paid, parents stay), equips, fires 5 s with its traits, draws; no page error, bullet cap kept
 // 2 power: dummy DPS of each hybrid at LV5 (+ HEAVY mod) <= 1.35x its parent weapon alone at the same level; on Hard stage 30 the dealt DPS <= hard.js's ceiling x1.1

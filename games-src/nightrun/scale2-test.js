@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Scale round 2 gate (BALANCE.md "Power scale, round 2"; code parts/fair.js, flag RET.scale2, ?scale2=0 = round 1). Prints PASS/FAIL lines.
+// Scale round 2 gate (BALANCE.md "Power scale, round 2"; code parts/enemies/fair.js, flag RET.scale2, ?scale2=0 = round 1). Prints PASS/FAIL lines.
 // bossplay.js: the pages run with ?bpauto=1 (each boss gate is resolved 1.5 s after it rises, like a player who plays the mechanic); the length bands are for that player.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/scale2-test.js      env: RUNS=3
 // 1 flag off: no boss shield cores, no wall bullets, the old homing (S2 off)

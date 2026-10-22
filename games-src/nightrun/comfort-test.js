@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Comfort / eye-strain gates (parts/comfort.js, flag RET.comfort, default ON; ?comfort=0 = the old look and feel).
+// Comfort / eye-strain gates (parts/render/comfort.js, flag RET.comfort, default ON; ?comfort=0 = the old look and feel).
 //   NR_OUT=/tmp/nr.html python3 games-src/nightrun/parts/build.py && NODE_PATH=$(npm root -g) node games-src/nightrun/comfort-test.js [/tmp/nr.html]
 //   env: MEASURE=1 only prints the numbers (no gates, with ?comfort=0 as well as default: the before / after table)   SECS=60   ONLY=<scenario substring>
 // Bot runs (390x763 phone, 60 s of simulated game each, stages 2 6 10 14, boss, endless wave 20, + a 20 s stress run that asks for a flash 10 times a second) record every frame: mean luminance, a 16x32 luminance grid, red area,

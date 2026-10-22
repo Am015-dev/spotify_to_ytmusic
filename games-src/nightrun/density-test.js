@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Density budget test (parts/density.js): the curve rises with the stage, caps hold, curtain columns keep a free gap, ?density=0 sends no curtain and is repeatable.
+// Density budget test (parts/difficulty/density.js): the curve rises with the stage, caps hold, curtain columns keep a free gap, ?density=0 sends no curtain and is repeatable.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/density-test.js     (pass/fail lines only)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), cp = require('child_process');
 const DIR = path.resolve(__dirname, '../../games/mainhattan-nightrun'), port = 8790 + (process.pid % 100);

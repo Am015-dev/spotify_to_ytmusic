@@ -9,6 +9,7 @@
 """
 import json, os, re, sys, collections
 HERE = os.path.dirname(os.path.abspath(__file__)); P = os.path.join(HERE, 'parts')
+pp = lambda n: next(os.path.join(r, n) for r, _, fs in os.walk(P) if n in fs)   # parts/<module>/<file>
 order = re.findall(r"rd\(['\"]([a-z0-9]+\.js)['\"]\)", open(os.path.join(P, 'build.py'), encoding='utf8').read())
 order = [o for o in dict.fromkeys(order) if o != 'sw.js']
 FUN = re.compile(r"^\s*(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(", re.M)
@@ -17,10 +18,10 @@ SAVE = re.compile(r"(?:const|let|var|,)\s*[\w$]+\s*=\s*((?:window\.)?[A-Za-z_$][
 IIFE = re.compile(r"\}\)\(((?:window\.)?[A-Za-z_$][\w$]*\.[\w$]+)\)")                                # X.y=(o=>...)(X.y)
 FLAG = re.compile(r"RET\.([\w$]+)\s*=\s*(!?)\s*/\[\?&\]\w+=([01])/")
 defs = {}; rows = []
-ALL = {f: open(os.path.join(P, f), encoding='utf8').read() for f in order}
+ALL = {f: open(pp(f), encoding='utf8').read() for f in order}
 GLOB = set(n for t in ALL.values() for n in FUN.findall(t)) | set(re.findall(r"(?:window\.|const |let )([A-Z][A-Z0-9_]+)\s*=", ''.join(ALL.values())))   # top-level functions + UPPERCASE objects
 for f in order:
-    s = open(os.path.join(P, f), encoding='utf8').read()
+    s = open(pp(f), encoding='utf8').read()
     fl = sorted({m[0] + ('' if m[1] == '!' or m[2] == '0' else '!') for m in FLAG.findall(s)})   # !/[?&]x=0/ = default ON; /[?&]x=1/ = default OFF (marked !)
     over = sorted({n for n in FUN.findall(s) if n in defs and defs[n] != f})
     for n in FUN.findall(s): defs.setdefault(n, f)
@@ -38,7 +39,7 @@ if len(sys.argv) > 1:
     src = max((e['source'] for e in cov if e.get('source')), key=len)
     spans = []
     for f in order:
-        s = open(os.path.join(P, f), encoding='utf8').read(); i = src.find(s)
+        s = open(pp(f), encoding='utf8').read(); i = src.find(s)
         if i < 0: i = src.find(s[:400])
         if i >= 0: spans.append((i, i + len(s), f))
     spans.sort()

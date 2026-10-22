@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// DIET (parts/diet.js, RET.diet): review 8 fix list 5-7. MACHINE gates only (no screenshots are opened):
+// DIET (parts/render/diet.js, RET.diet): review 8 fix list 5-7. MACHINE gates only (no screenshots are opened):
 //   objects drawn per frame (p95 <= 64 per stage, median >= 30% under ?diet=0) over 60 s bot runs on stages 2/6/10/14/20 (enemies + enemy bullets + own shots drawn + particles + rings + explosion pictures + floaters),
 //   enemy drawn size >= 32 css px (390x763 and 375x553), lean HUD <= 6 items (canvas texts / bar groups / icons + touch buttons and their labels),
 //   no cosmetic ring or explosion picture wider than 120 css px, flank tells drawn only in their last 0.6 s, ?diet=0 = the build without the part.

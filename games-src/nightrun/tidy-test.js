@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// TIDY (parts/tidy.js, flag RET.tidy, default ON; ?tidy=0 = the old Settings and street run). Headless, no screenshots, prints PASS/FAIL lines only.
+// TIDY (parts/menus/tidy.js, flag RET.tidy, default ON; ?tidy=0 = the old Settings and street run). Headless, no screenshots, prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/tidy-test.js      env: GAME_DIR=...   SECS=60 (street bot run, real time)   ONLY=settings|street
 // Settings (390x763 and 375x553): <= 20 visible controls on the main page in the 5 groups Gameplay / Display + Comfort / Audio / Controls / Data; hc, rm and Music are not shown twice;
 //   no clipped text on any page (scrollWidth > clientWidth scan + nothing past the card edge); every setting of ?tidy=0 is reachable (main, ASSIST or MORE) and changes SET when tapped.

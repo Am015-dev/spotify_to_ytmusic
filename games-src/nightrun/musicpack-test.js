@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Nightrun music pack (parts/musicpack.js, flag RET.musicpack, ?musicpack=0 = the old music). Real page, real mp3 files, headless, no screenshots.
+// Nightrun music pack (parts/music/musicpack.js, flag RET.musicpack, ?musicpack=0 = the old music). Real page, real mp3 files, headless, no screenshots.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/musicpack-test.js     env: GAME_DIR=...
 // 0 Music setting (Mix default / Classic only / New only), the old songs ADD to the pack: pools hold both families, >= 40% each over 12 stages, no repeats of the last 2, bosses alternate families, endless trio rotates
 // 1 every cue listed in media/ready.json is registered as a track (bpm / offset from the table); stage picks: pack cues first per district, Athens gets athA/athB

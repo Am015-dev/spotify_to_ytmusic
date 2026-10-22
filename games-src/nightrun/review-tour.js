@@ -198,7 +198,7 @@ async function doMeasure() {
   }
   // 4. source facts
   const read = f => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
-  const parts = fs.readdirSync(PARTS).filter(f => /\.(js|html)$/.test(f)); const grep = (re) => { const hits = []; for (const f of parts) { const t = read(path.join(PARTS, f)); const m = t.match(re); if (m) hits.push(f + ' x' + m.length); } return hits; };
+  const parts = require('./parts-index.js').list().filter(f => /\.(js|html)$/.test(f)); const grep = (re) => { const hits = []; for (const f of parts) { const t = read(path.join(PARTS, f)); const m = t.match(re); if (m) hits.push(f + ' x' + m.length); } return hits; };
   const idxT = read(path.join(GAME_DIR, 'index.html')), manifest = fs.existsSync(path.join(GAME_DIR, 'manifest.webmanifest')), swFile = fs.existsSync(path.join(GAME_DIR, 'sw.js'));
   measure.sourceFacts = { reducedMotion: { matchMediaReduce: grep(/prefers-reduced-motion/g), reduceWord: grep(/reduce/gi), note: 'plus an in-game FLASHING setting (OFF / REDUCED / FULL)' },
     pwa: { manifestFile: manifest, manifestLinked: /rel=["']manifest["']/.test(idxT), swFile, swRegistered: /serviceWorker\.register/.test(idxT) },

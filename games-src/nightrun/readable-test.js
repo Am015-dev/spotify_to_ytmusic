@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// F5 readability (parts/readable.js, RET.read): enemy bullets against the backdrop, before (?read=0) vs after, at 390x763 (touch) and 1280x720. PASS/FAIL lines + numbers.
+// F5 readability (parts/render/readable.js, RET.read): enemy bullets against the backdrop, before (?read=0) vs after, at 390x763 (touch) and 1280x720. PASS/FAIL lines + numbers.
 // The same frozen frame is drawn twice (with and without the enemy bullets); pixels that change are the bullets, the other frame is their local backdrop.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/readable-test.js        SHOTS=<dir> also saves the measured frames (keep them out of git)
 const PW = require('playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');

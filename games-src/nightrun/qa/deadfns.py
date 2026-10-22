@@ -9,7 +9,7 @@ R=os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'../..
 SKIP={'lab.js','labassets.js','labfull.js','choices.js','fleet.js','layout.js','sw.js'}   # Lab menus stay; default-OFF flags build2 / fleetArr / layoutStrip
 order=[o for o in dict.fromkeys(re.findall(r"rd\(['\"]([A-Za-z0-9]+\.js)['\"]\)",open(P+'build.py').read())) if o!='sw.js']+['bg.js','draw.js','b.js']
 order=list(dict.fromkeys(order))
-parts={f:open(P+f,encoding='utf8').read() for f in os.listdir(P) if f.endswith('.js')}
+parts={f:open(os.path.join(r,f),encoding='utf8').read() for r,_,fs in os.walk(P) for f in fs if f.endswith('.js')}
 # merged coverage
 acc=collections.defaultdict(lambda:collections.defaultdict(int)); 
 for f in glob.glob(sys.argv[2]):
@@ -103,7 +103,7 @@ if os.environ.get('CLS'):
             pos=base[f]+m.start()
             if c[1]<=m.start()<c[1]+len(c[3]): continue
             i=inner(pos); sites.append((i[2]==0,i[3],pos))
-        other=sum(cnt(n,t) for p,t in corp.items() if not p.endswith('/parts/'+f))
+        other=sum(cnt(n,t) for p,t in corp.items() if os.path.basename(p)!=f or '/parts/' not in p)
         rep.append((n,f,len(c[3]),other,sites))
     dead_only=[r for r in rep if os.environ.get('ALL') or (r[3]==0 and r[4] and all(s[0] for s in r[4]))]
     print('candidates',len(rep),'only referenced in same part from dead-site',len(dead_only),'bytes',sum(r[2] for r in dead_only))

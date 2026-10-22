@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// One-screen forge test (flag RET.forge2, parts/forgeone.js). Prints pass/fail lines only.
+// One-screen forge test (flag RET.forge2, parts/weapons/forgeone.js). Prints pass/fail lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/forge2-test.js        env: GAME_DIR=...
 // 1 fit at 390x763, 375x553, 844x390 in 9 states (empty, one slot, two + preview, post-merge, equip, many items, mods, presets, info sheet):
 //   document and forge box never taller than the viewport, the page never scrolls, MERGE inside the viewport, the strip is the only scroller,

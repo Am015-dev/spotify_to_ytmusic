@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Boss moveset audit (parts/bossmoves.js, flag RET.bossmoves). Prints numbers and PASS/FAIL lines.
+// Boss moveset audit (parts/bosses/bossmoves.js, flag RET.bossmoves). Prints numbers and PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/bossmoves-audit.js      env: PARTS=table,stress,idle,bot  DIFFS=normal,legend  RUNS=2 (bot)
 // table : per boss the verbs it uses, the pairwise verb overlap matrix, unique verbs, its signature and counter, ground rules, library size
 // stress: every boss fight in the real page (god ship weaving, 1e6 damage per frame: the armour cap sets the length): verbs used, shortest telegraph,

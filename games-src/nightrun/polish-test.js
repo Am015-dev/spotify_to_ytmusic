@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// POLISH (parts/polish.js, RET.polish): a calm, readable playfield. MACHINE gates only (no screenshots are opened):
+// POLISH (parts/render/polish.js, RET.polish): a calm, readable playfield. MACHINE gates only (no screenshots are opened):
 //   big translucent markers cover <= 15% of the playfield on average over a 60 s run, <= 3 big markers at once, the player ship
 //   drawn last at alpha 1, enemy bullets >= 3:1 against their local backdrop, no page errors, ?polish=0 = the build without the part.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/polish-test.js      PROBE=1 prints who draws the big markers; CASES=s2:60,e20 picks the runs

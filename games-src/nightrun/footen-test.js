@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Headless test of parts/footen.js (on-foot enemies + Warden boss) in a fake env: node games-src/nightrun/footen-test.js   (V=1 verbose)
+// Headless test of parts/street/footen.js (on-foot enemies + Warden boss) in a fake env: node games-src/nightrun/footen-test.js   (V=1 verbose)
 // Checks per enemy: schema, telegraph timings, ranges, shield/turret/mech hit rules, token cap, fair spawns, death timing, and the boss phases + damage cap.
 global.window = global;
-require('./parts/footen.js');
+require('./parts/street/footen.js');
 const FE = window.FOOT_ENEMIES, WA = window.FOOT_BOSS.warden;
 const POSES = ['idle', 'run-a', 'run-b', 'jump', 'fall', 'shoot', 'melee', 'hit', 'die', 'crouch', 'crouch-shoot', 'attack2', 'enrage'];
 const PICKS = ['weapon-hmg', 'weapon-shotgun', 'weapon-flame', 'weapon-rocket', 'weapon-arc', 'shield', 'speed', 'damage', 'magnet', 'heal', 'bomb', 'slow'];
@@ -208,7 +208,7 @@ for (const id of Object.keys(FE).concat(['warden'])) {
   const env = mkEnv({ px: 100 }), e = spawn('warden', 700); e.hp = e.maxHp = 800; e.age = 5; step(env, [e], 1 / 60); let tot = 0; for (let i = 0; i < 120; i++) { env.G.time += 1 / 60; const b = e.hp; hitEngine(e, env, 5, { x: 100 }); tot += b - e.hp; } ok(tot <= 16 + 1e-6 && tot > 15, 'cap scales with scaled hp (800 hp => 8 per second, got ' + tot.toFixed(2) + ' in 2 s)'); }
 
 // ---- foot.js engine, if it is on the branch ----
-try { const fs = require('fs'); if (fs.existsSync(__dirname + '/parts/foot.js')) { console.log('note: parts/foot.js present; run its stage in the browser sweep (not part of this headless test)'); } } catch (_) {}
+try { const fs = require('fs'); if (fs.existsSync(__dirname + '/parts/street/foot.js')) { console.log('note: parts/street/foot.js present; run its stage in the browser sweep (not part of this headless test)'); } } catch (_) {}
 
 console.log(fails ? ('FOOTEN TEST FAILED: ' + fails + ' failed, ' + passes + ' passed') : ('footen-test: all ' + passes + ' checks passed'));
 process.exit(fails ? 1 : 0);

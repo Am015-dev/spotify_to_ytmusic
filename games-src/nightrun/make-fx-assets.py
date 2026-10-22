@@ -5,8 +5,8 @@
   - games-src/next-wave/flow-2d/mainhattan-nightrun/prompts-fx.json ({"cards": {name: prompt}}).
   python3 games-src/nightrun/make-fx-assets.py
 Background rule (written into every prompt): light and glow effects are painted on a pure solid BLACK square (media/ loader keys the black to
-transparency at load, parts/art.js); solid objects (bomb, mine, grenade, blades, debris) on a plain flat WHITE background (ingest-assets.py keys it).
-The game keeps its own look until a file is REAL art and listed in media/ready.json (parts/fxwave.js: FXW.pic)."""
+transparency at load, parts/art/art.js); solid objects (bomb, mine, grenade, blades, debris) on a plain flat WHITE background (ingest-assets.py keys it).
+The game keeps its own look until a file is REAL art and listed in media/ready.json (parts/art/fxwave.js: FXW.pic)."""
 import json, os
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 GROUP = 'Effects (wave 8)'
@@ -46,7 +46,7 @@ W = [  # id, colour, name, bullet, muzzle, hit, bullet bg, bullet shape
  ('storm', '#fff06a', 'Storm Cell', 'a crackling yellow electric storm ball with small lightning arcs around it', 'a yellow spark burst', 'a yellow lightning burst with arcs', 'black', 'orb'),
 ]
 for (i, col, name, b, m, h, bg, sh) in W:
-    add('fx-w-%s-bullet.webp' % i, 256, 256, 'PLACEHOLDER', 'Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a %s shot flies' % name, '%s: the shot, facing right, centred. Painted colour matches the weapon colour %s.' % (name, col),
+    add('fx-w-%s-bullet.webp' % i, 256, 256, 'PLACEHOLDER', 'Hooked: FXW.bullet in the player-shot draw (parts/hud/c.js shotDraw) when a %s shot flies' % name, '%s: the shot, facing right, centred. Painted colour matches the weapon colour %s.' % (name, col),
         'a game projectile for the weapon %s: %s, facing right, centred' % (name, b), bg, col, sh, 'right', 'Weapons: ' + name)
     add('fx-w-%s-muzzle.webp' % i, 256, 256, 'PLACEHOLDER', 'Hooked: FXW.muzzle on every volley of the equipped %s (replaces the shared fx-muzzle)' % name, '%s muzzle flash at the gun, pointing right, base at the left-centre edge.' % name,
         'a muzzle flash for the weapon %s: %s, the flash starting at the left-centre edge and pointing right' % (name, m), 'black', col, 'burst', 'right', 'Weapons: ' + name)
@@ -66,7 +66,7 @@ add('fx-boom-boss-b.webp', 512, 512, 'PLACEHOLDER', 'Hooked: FXW.boom (boss deat
 add('fx-boom-ground-dust.webp', 512, 512, 'PLACEHOLDER', 'No hook yet (for ground enemies in a later wave)', 'Soft dust and smoke puff for ground explosions, lit from within.', 'a soft puff of grey-orange dust and smoke lit by a fiery glow, centred, rising slightly', 'black', '#c8a070', 'burst', 'centre', 'Explosions')
 add('fx-boom-debris.webp', 512, 512, 'PLACEHOLDER', 'No hook yet (debris pieces flying out of big kills)', 'A cluster of 6 metal debris pieces (plates, bolts) with a hot orange edge, scattered, as a sprite sheet-free single picture.', 'a scatter of six torn metal fragments and plates with glowing orange edges, in a ring around the centre', 'white', '#a0a8b8', 'debris', 'centre', 'Explosions')
 
-# ---------------------------------------------------------------- 3. enemy fire (the new enemies from parts/zoo.js)
+# ---------------------------------------------------------------- 3. enemy fire (the new enemies from parts/enemies/zoo.js)
 add('fx-eb-sniper-beam.webp', 256, 64, 'PLACEHOLDER', 'Hooked: FXW.sniper (the sniper aim line in ZOO.over, stretched along the aim)', 'Tileable red-lime laser line, bright core, soft glow, horizontal, stretched to the player.', 'a thin horizontal sniper laser line, a bright red-white core and a soft red glow, tileable left to right', 'black', '#ff3050', 'line', 'tile', 'Enemy fire')
 add('fx-eb-bomb.webp', 256, 256, 'PLACEHOLDER', 'Hooked: FXW.bomb (the bomber\'s bomb, in ZOO.over)', 'A round black bomb with a glowing orange fuse spark, seen from the side.', 'a round black cyberpunk bomb with an orange glowing band and a sparking fuse, seen from the side', 'white', '#ffa02d', 'mine', 'centre', 'Enemy fire')
 add('fx-eb-mine.webp', 256, 256, 'PLACEHOLDER', 'Hooked: FXW.mine (the minelayer\'s mine, in ZOO.over; armed mines glow, unarmed are dimmed)', 'A spiked lime-green mine with a red blinking light.', 'a round spiked proximity mine in dark metal with lime-green glowing lights and a small red blinking light, seen from above', 'white', '#d8ff3d', 'mine', 'centre', 'Enemy fire')
@@ -78,7 +78,7 @@ add('fx-eb-shockwave-ring.webp', 512, 512, 'PLACEHOLDER', 'No hook yet (boss and
 add('fx-eb-heal-ring.webp', 512, 512, 'PLACEHOLDER', 'Hooked: FXW.healRing (the healer\'s dashed ring in ZOO.over)', 'A green healing ring with small plus signs drifting around it, soft glow.', 'a soft green healing aura ring with tiny glowing plus shapes around it, circular, centred, filling the square', 'black', '#3dffb0', 'ring', 'centre', 'Enemy fire')
 add('fx-eb-aim-line.webp', 256, 32, 'PLACEHOLDER', 'Hooked: FXW.aim (the kamikaze\'s dive line in ZOO.over)', 'A dashed red warning line, tileable.', 'a thin red warning aim line made of glowing dashes, horizontal, tileable left to right', 'black', '#ff3050', 'line', 'tile', 'Enemy fire')
 
-# ---------------------------------------------------------------- 4. power-up and meter effects (parts/powerups.js, power.js, powlevels.js)
+# ---------------------------------------------------------------- 4. power-up and meter effects (parts/powers/powerups.js, power.js, powlevels.js)
 add('fx-pw-nova-ring.webp', 512, 512, 'PLACEHOLDER', 'Hooked: FXW.nova (the downbeat nova ring in powerups.js, scaled with its radius)', 'A magenta energy ring, thick and bright, empty centre, soft outer glow.', 'a thick glowing magenta-pink energy ring with a white inner edge, circular, empty centre, soft outer glow, filling the square', 'black', '#ff5fd2', 'ring', 'centre', 'Power-ups')
 add('fx-pw-echo-ghost.webp', 256, 256, 'PLACEHOLDER', 'Hooked: FXW.echo (the ghost shot of the echo power)', 'A cyan ghost of a small ship shot with a trailing echo, facing right.', 'a translucent cyan ghost bolt with two fading echo copies behind it, facing right, centred', 'black', '#7df9ff', 'streak', 'right', 'Power-ups')
 add('fx-pw-magnet-field.webp', 512, 512, 'PLACEHOLDER', 'Hooked: FXW.magnet (the magnet bass pulse ring)', 'A blue-violet pulse ring with inward-curving field lines.', 'a blue-violet magnetic pulse: a glowing ring with curved field lines flowing inwards, circular, centred', 'black', '#7a8cff', 'ring', 'centre', 'Power-ups')
@@ -98,7 +98,7 @@ FT = [('pistol', '#ffe08a', 'pistol', 'a small yellow-white tracer bullet with a
       ('rocket', '#ff9a4a', 'rocket launcher', 'a small rocket glowing white-orange with a bright exhaust flame, side view', 'a fiery backblast cone and smoke glow', 'a bright orange explosion burst with a ring'),
       ('arc', '#58e6ff', 'arc gun', 'a short jagged cyan lightning bolt with a white core', 'a cyan electric crackle', 'a cyan electric burst with branching arcs')]
 for (i, col, nm, b, m, h) in FT:
-    add('fx-ft-%s.webp' % ({'pistol': 'pistol-bullet', 'mg': 'mg-bullet', 'shotgun': 'shotgun-pellet'}.get(i, i)), 256, 256, 'PLACEHOLDER', 'On-foot stage (parts/foot.js): the %s shot. No hook yet' % nm, 'On-foot %s projectile, facing right, centred.' % nm,
+    add('fx-ft-%s.webp' % ({'pistol': 'pistol-bullet', 'mg': 'mg-bullet', 'shotgun': 'shotgun-pellet'}.get(i, i)), 256, 256, 'PLACEHOLDER', 'On-foot stage (parts/street/foot.js): the %s shot. No hook yet' % nm, 'On-foot %s projectile, facing right, centred.' % nm,
         'an on-foot %s projectile: %s, facing right, centred' % (nm, b), 'black', col, 'streak', 'right', 'On-foot stage')
     add('fx-ft-%s-muzzle.webp' % i, 256, 256, 'PLACEHOLDER', 'On-foot stage: %s muzzle flash. No hook yet' % nm, 'On-foot %s muzzle flash pointing right, base at the left-centre edge.' % nm,
         'a muzzle flash for the on-foot %s: %s, starting at the left-centre edge and pointing right' % (nm, m), 'black', col, 'burst', 'right', 'On-foot stage')
@@ -141,7 +141,7 @@ json.dump({'cards': cards, 'style': STYLE, 'notes': 'Effects asset wave 8. Light
           open(pj, 'w', encoding='utf-8'), indent=1, ensure_ascii=False); open(pj, 'a').write('\n')
 new = [e for e in E if e['status'] == 'PLACEHOLDER']; core = [e for e in E if e['section'] == 'Existing core effects']
 out = ['# Effects asset wave 8: prompts for the picture tool', '',
-       'Generated by `make-fx-assets.py` (rerun it after changing a design). **%d new files** (+ %d existing core effects listed for the whole picture, 3 of them still missing). The game runs unchanged with its own effects; each real picture replaces the matching effect automatically (`parts/fxwave.js`).' % (len(new), len(core)), '',
+       'Generated by `make-fx-assets.py` (rerun it after changing a design). **%d new files** (+ %d existing core effects listed for the whole picture, 3 of them still missing). The game runs unchanged with its own effects; each real picture replaces the matching effect automatically (`parts/art/fxwave.js`).' % (len(new), len(core)), '',
        '## How', '', '1. Paste the **style block** first (or put it in front of every prompt; the json already has it in front).',
        '2. **Light and glow effects** are painted on a **pure solid black** square: the game turns the black into transparency when it loads the picture. No grey vignette, no border, keep the corners pure black.',
        '3. **Solid objects** (bomb, mine, grenade, blades, discs, shells, debris) are painted on a **plain flat white** background: the ingest script cuts the white out.',

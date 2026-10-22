@@ -1,6 +1,7 @@
 import re,sys,os
 P='/home/user/spotify_to_ytmusic/games-src/nightrun/parts/'
-rd=lambda n:open(P+n,encoding='utf8').read()
+IDX={f:r for r,_,fs in os.walk(P) for f in fs}   # basename -> folder (parts/<module>/<file>); names are unique across folders, build order below is unchanged
+rd=lambda n:open(os.path.join(IDX[n],n),encoding='utf8').read()
 def rep(s,a,b,cnt=1):
     assert s.count(a)>=1,('missing',a[:60])
     return s.replace(a,b) if cnt==0 else s.replace(a,b,cnt)

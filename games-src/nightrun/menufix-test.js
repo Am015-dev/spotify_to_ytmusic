@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// MENUFIX (parts/menufix.js + stats.js + map.js + ret.js, flag RET.menufix, ?menufix=0 = old): HANGAR = 5 tabs + MORE sheet with every label fitting, the achievement toast never over a
+// MENUFIX (parts/menus/menufix.js + stats.js + map.js + ret.js, flag RET.menufix, ?menufix=0 = old): HANGAR = 5 tabs + MORE sheet with every label fitting, the achievement toast never over a
 // control (elementFromPoint), no decoration glyphs in menus. Chromium through a CDP session on both phone sizes; prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/menufix-test.js     env: GAME_DIR=...
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');

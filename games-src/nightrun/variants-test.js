@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Enemy variants gate (parts/variants.js, flag RET.variants). Real page, ?sim=1 stepping. Prints PASS/FAIL lines, exit 1 on any FAIL.
+// Enemy variants gate (parts/enemies/variants.js, flag RET.variants). Real page, ?sim=1 stepping. Prints PASS/FAIL lines, exit 1 on any FAIL.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/variants-test.js      env: GAME_DIR=<dir with index.html>, SECS=70 (sim seconds per stage)
 // (a) every class x orientation x tint spawns and draws without errors, phone 390x763 and landscape 1280x720
 // (b) hitbox follows the class (mini r >= 7, large 1.5x, giant 2.2x), hull follows the class

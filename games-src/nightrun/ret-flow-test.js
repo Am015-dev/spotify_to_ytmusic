@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Nightrun FLOW checks (parts/flow.js): the song never stops or stutters. Real page, real songs, headless, no screenshots. PASS/FAIL lines.
+// Nightrun FLOW checks (parts/music/flow.js): the song never stops or stutters. Real page, real songs, headless, no screenshots. PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/ret-flow-test.js     env: GAME_DIR=...
 // per viewport (390x763 phone, 1280x720 desktop):
 // 1 pit stop / chest / stage result / story card: the song keeps playing (context running, stream playing, grid within 40 ms of the song), it is ducked + low-passed with the drum gate shut,

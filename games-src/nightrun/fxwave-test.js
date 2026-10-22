@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Effects asset wave 8 (parts/fxwave.js): PASS/FAIL lines.
+// Effects asset wave 8 (parts/art/fxwave.js): PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/fxwave-test.js      env: GAME_DIR=<dir with index.html>
 //  (a) the manifest group 'Effects (wave 8)': every file has a placeholder of the listed size (except the 3 'noph' ones), none of the NEW (PLACEHOLDER) files is listed in media/ready.json,
 //      the older real effects are untouched (placeholders.json never lists them), every new file has a prompt in prompts-fx.json with the background rule, names follow the scheme

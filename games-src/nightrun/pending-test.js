@@ -18,7 +18,7 @@ for (const l of md.split('\n')) {
 const ready = new Set(JSON.parse(fs.readFileSync(path.join(MEDIA, 'ready.json'), 'utf8')));
 const RE = /\bART\.(?:pic|sp|img|isReal|artK)\(\s*['"]([a-z0-9_.-]+)['"](\s*\+)?|\bFXW\.pic\(\s*['"]([a-z0-9_.-]+)['"]/g;
 const hooks = new Map();
-for (const f of fs.readdirSync(path.join(NR, 'parts')).filter(f => f.endsWith('.js'))) {
+for (const f of require('./parts-index.js').list().filter(f => f.endsWith('.js'))) {
   const t = fs.readFileSync(path.join(NR, 'parts', f), 'utf8'); let m;
   while ((m = RE.exec(t))) {
     const id = m[3] ? 'fx-' + m[3] : m[1];

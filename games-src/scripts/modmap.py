@@ -208,8 +208,9 @@ def build_order(slug):
     build_text = rd(build_dir / "build.py")
     order, generated = [], []          # order: [(path, name)], generated: [str]
     if slug == "mainhattan-nightrun":
+        by_name = {p.name: p for p in build_dir.rglob("*.js")}   # parts/<module>/<file>.js; names are unique across the module folders
         for n in re.findall(r"""rd\(['"]([\w.\-]+\.js)['"]\)""", build_text):
-            if (build_dir / n).exists() and (build_dir / n) not in [p for p, _ in order]: order.append((build_dir / n, n))
+            if n in by_name and by_name[n] not in [p for p, _ in order]: order.append((by_name[n], n))
         return order, generated, build_dir, family, title
     body = find_body(build_dir, build_text)
     names = re.findall(r'<script src="([^"]+)"></script>', rd(body)) if body else []
@@ -409,7 +410,7 @@ def render_shell():
 def render_compact(a):
     """One line per Nightrun part file (all parts/*.js, build order first): name KB purpose flag. <= 8 KB, one cheap read."""
     parts = SRC / "nightrun" / "parts"
-    texts = {p.name: rd(p) for p in sorted(parts.glob("*.js"))}
+    texts = {p.name: rd(p) for p in sorted(parts.rglob("*.js"), key=lambda p: p.name)}
     ft = flag_table(texts)
     order = [f["name"] for f in a["files"]] + sorted(n for n in texts if n not in {f["name"] for f in a["files"]})
     L = ["# MODULES-COMPACT: Mainhattan Nightrun parts (one line each)", "",
@@ -419,7 +420,7 @@ def render_compact(a):
         h = header_info(t)
         pur = h["purpose"]
         if not pur:
-            defs, _d = parse_defs(t, parts / n)
+            defs, _d = parse_defs(t, next(parts.rglob(n)))
             pur = purpose_of(t, defs)
             pur = re.sub(r"^[=\-\s]*([\w.]+\.js\s*[:=-]\s*)?", "", pur)
             pur = re.sub(r"^=?\s*parts/\w+\.js\s*\(?", "", pur)

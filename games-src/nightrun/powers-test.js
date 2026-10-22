@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Nightrun ARSENAL: twelve more power-ups + the context picker (flag RET.powers, parts/arsenal.js). Real page in sim mode (?sim=1, stepped by hand), headless.
+// Nightrun ARSENAL: twelve more power-ups + the context picker (flag RET.powers, parts/powers/arsenal.js). Real page in sim mode (?sim=1, stepped by hand), headless.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/powers-test.js     env: GAME_DIR=...
 // 1 every new id is registered, drops as a pickup, is collected and applies its effect
 // 2 picker: no power twice within 4 drops (stages 1-40), rare ones only from their stage, LANCE favoured when shielded foes are on screen

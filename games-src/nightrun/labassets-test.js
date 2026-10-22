@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Lab ASSETS tab (parts/labassets.js, flag RET.labassets) through the real page (prints pass/fail only):
+// Lab ASSETS tab (parts/lab/labassets.js, flag RET.labassets) through the real page (prints pass/fail only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/labassets-test.js      env: GAME_DIR=<dir with index.html>, V=1 (verbose)
 //  (a0) placeholder_guard.py: no placeholder picture listed in ready.json (any media/*.webp)
 //  (a) the ASSETS tab opens in the Lab; sections and their real/placeholder/missing counts match assets-manifest.json + ready.json + placeholders.json;

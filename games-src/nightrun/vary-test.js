@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// VARIETY A gate (parts/formations.js, parts/stagescripts.js, flag RET.vary). Real page, ?sim=1 stepping. Prints PASS/FAIL lines, exit 1 on any FAIL.
+// VARIETY A gate (parts/waves/formations.js, parts/waves/stagescripts.js, flag RET.vary). Real page, ?sim=1 stepping. Prints PASS/FAIL lines, exit 1 on any FAIL.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/vary-test.js      env: GAME_DIR=<dir with index.html>, SECS=60
 // (a) library: >= 40 formations, each with tags, t, cost, tele, gap, kinds; every kind is a real enemy kind
 // (b) scripts: 45 stages, 10-14 moments, one '*' set piece + one '~' breather each, every id in the library, set pieces unique, a mutator on every 2nd story stage
@@ -86,7 +86,7 @@ const SPAWNS = (o) => {   // (f)
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'vary-'));
   for (const f of fs.readdirSync(GAME)) if (f !== 'index.html') fs.symlinkSync(path.join(GAME, f), path.join(tmp, f));
   const P = path.resolve(__dirname, 'parts'), html = fs.readFileSync(path.join(GAME, 'index.html'), 'utf8');
-  let cut = html; for (const f of ['formations.js', 'stagescripts.js']) { const src = fs.readFileSync(path.join(P, f), 'utf8'); if (!cut.includes(src)) fails.push('built page is not built from the current ' + f + ' (rebuild)'); cut = cut.replace(src, ''); }
+  let cut = html; for (const f of ['formations.js', 'stagescripts.js']) { const src = fs.readFileSync(path.join(P, require('./parts-index.js').find(f)), 'utf8'); if (!cut.includes(src)) fails.push('built page is not built from the current ' + f + ' (rebuild)'); cut = cut.replace(src, ''); }
   fs.writeFileSync(path.join(tmp, 'index.html'), cut);
   const port = await fp(), port2 = await fp();
   const srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME], { stdio: 'ignore' });

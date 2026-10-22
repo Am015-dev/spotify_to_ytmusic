@@ -19,11 +19,11 @@ const W = read(where), C = read(compact);
 ok('WHERE.md <= 8 KB', Buffer.byteLength(W) <= 8192, Buffer.byteLength(W));
 ok('MODULES-COMPACT.md <= 8 KB', Buffer.byteLength(C) <= 8192, Buffer.byteLength(C));
 
-const parts = fs.readdirSync(PARTS).filter(f => f.endsWith('.js'));
+const parts = require('./parts-index.js').list().filter(f => f.endsWith('.js')).map(f => path.basename(f));
 const noLine = parts.filter(f => !new RegExp('^' + f.slice(0, -3).replace(/[.]/g, '\\.') + '\\|', 'm').test(C));
 ok('MODULES-COMPACT.md has a line for every part file (' + parts.length + ')', noLine.length === 0, noLine.join(' '));
 
-const flagged = parts.filter(f => /if\(RET\.\w+===undefined\)RET\.\w+=/.test(read(path.join(PARTS, f))));
+const flagged = parts.filter(f => /if\(RET\.\w+===undefined\)RET\.\w+=/.test(read(path.join(PARTS, require('./parts-index.js').find(f)))));
 const miss = flagged.filter(f => { const stem = f.slice(0, -3); return !W.split('\n').some(l => l.startsWith('|') && (l.split('|')[2] || '').trim().split(' ')[0] === stem); });
 ok('every part file with a RET flag has a row in WHERE.md (' + flagged.length + ')', miss.length === 0, miss.join(' '));
 

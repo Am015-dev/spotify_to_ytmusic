@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FOOTQ (parts/footq.js): machine gate for on-foot art quality on a phone (390x763, dpr 3, touch). Headless, no screenshots. Prints PASS/FAIL lines only.
+// FOOTQ (parts/street/footq.js): machine gate for on-foot art quality on a phone (390x763, dpr 3, touch). Headless, no screenshots. Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/footq-test.js      env: GAME_DIR=...
 // Gates: (1) no old vector/mock draw call on the foot canvas between the tap on STREET RUN and the last frame of a 12 s run, the loading hold shows, sprites are ready when the run starts;
 //   (2) per entity drawn height (cell height in device px) varies <= 2% across all frames and acts (Kai's crouch is exactly x0.6875); (3) the canvas is dpr wide, smoothing is high, no sprite blit is upscaled > 1.5x

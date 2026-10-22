@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Station-and-hover + the eight new enemy kinds (parts/zoo.js, flag RET.zoo) through the real page (prints pass/fail only):
+// Station-and-hover + the eight new enemy kinds (parts/enemies/zoo.js, flag RET.zoo) through the real page (prints pass/fail only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/zoo-test.js      env: GAME_DIR=<dir with index.html>, SECS=70 (sim seconds per difficulty), V=1 (verbose)
 //  (a) every difficulty, an unarmed bot in story stage 3: each drone / flanker hovers exactly N beats on the beat clock (Easy 6, Normal 5, Hard 4, Very hard 3, Legend 3),
 //      on a station in the right 60% (x >= 0.4 W), hovering enemies never overlap, enemy bullets stay under ebCap and BCAP

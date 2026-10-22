@@ -75,7 +75,7 @@ def doc_for(text):
 def analyse():
     a = mm.analyse("mainhattan-nightrun")
     files = a["files"]
-    texts = {f["name"]: mm.rd(PARTS / f["name"]) for f in files}
+    texts = {f["name"]: mm.rd(SRC / f["path"]) for f in files}
     ft = mm.flag_table(texts)
     idx = {f["name"]: f["idx"] for f in files}
     # namespaces (DP, ART, ABIL...) created in a file; later files assigning NS.fn = function are patches of it
@@ -132,16 +132,16 @@ def cell_list(d, cap):
 
 
 RECIPES = [
-    ("Change an enemy's HP", "base table: `en()` in b.js (line `const base={drone:{r:14,hp:2..}`); the 8 later kinds: `hp:` in zoo.js; scaling: grit.js (hp factor), scale.js/fair.js/hard.js (power-aware hull). Edit the owner, never a wrapper."),
-    ("Add a power-up", "timed music powers: `PWK` table in power.js (name, tip, bars, colour) + its effect in powerups.js (`PW2`) and levels/tips in powlevels.js (`PW3L`, `PW3NEW`); defensive/offensive/utility extras: arsenal.js (`PWX`). Add the id to the picker there, then a case in powers-test.js."),
-    ("Add a boss verb", "`vd('id','any'|boss,'what',(e,c,X,p)=>{..})` in bossmoves.js (see tri_burst, spokes); give it a telegraph with `bmMark`+`bmTelBul`, then list it in the boss's moveset `BMT` (top of bossmoves.js). Phases/HP: armour.js. Looks per phase: bossvis.js."),
-    ("Add a lesson", "`LSN` list (id, n, ph:[{id,say,chips,want,init}]) in lessons.js; helper foes `lsFoe`, `lsWave`; clear logic `lsClear`. Test: lessons-test.js (`?lessons=1` forces it in automation)."),
-    ("Add an asset hook", "id in `assets-manifest.json` (nightrun/); picture only when listed in media/ready.json: `ART.img(id)` / `ART.anim(key)` in art.js, code shapes while missing in shapes.js; effects in fxwave.js; on-foot in footart.js. Policy: ASSET-POLICY.md."),
-    ("Change a price", "pit-stop shop: `SHOP.price(u)` + `UPG` in shop.js; permanent perks: `tpPrice` in upgrades.js; forge costs: forge.js; economy fit (hours to finish): econfit.js. 14 extra pit-stop upgrades: up2.js."),
-    ("Add a feature flag", "`if(RET.x===undefined)RET.x=!/[?&]x=0/.test(location.search);` in ret.js (or the layer's own first lines), new part file + one `rd('x.js')` in parts/build.py, header (below), a row appears here after `where.py`. Ship ON, measured; unfinished = default OFF."),
-    ("Change a formation / stage script", "formation library: formations.js (`vary`); per-stage scripts: stagescripts.js; remixed cut per run: remix.js; budget of bullets: density.js; pacing/length: pacing.js; director/songs: dir.js."),
-    ("Change an on-foot enemy or section", "enemy library footen.js, engine foot.js, the finished stage `zeil` footstage.js, art footart.js. Test: foot-test.js, footstage-test.js."),
-    ("Add a test", "copy the nearest `<name>-test.js` (react-test.js for a flag, bossmoves-test.js for bosses): Playwright, `?scn=`/flag URL, prints PASS/FAIL lines only; one at a time: `NODE_PATH=$(npm root -g) node games-src/nightrun/<name>-test.js`. Name it after the part (`x.js` -> `x-test.js`) so this table finds it; log in TEST-LEDGER.md."),
+    ("Change an enemy's HP", "base table `en()` in b.js; the 8 later kinds `hp:` in zoo.js; scaling grit.js, scale.js/fair.js/hard.js. Edit the owner, never a wrapper."),
+    ("Add a power-up", "`PWK` in power.js, effect in powerups.js (`PW2`), levels in powlevels.js (`PW3L`); extras `PWX` in arsenal.js (picker there). Case in powers-test.js."),
+    ("Add a boss verb", "`vd('id','any'|boss,'what',(e,c,X,p)=>{..})` in bossmoves.js (see tri_burst); telegraph `bmMark`+`bmTelBul`; list it in the moveset `BMT`. HP phases armour.js, looks bossvis.js."),
+    ("Add a lesson", "`LSN` list in lessons.js (helpers `lsFoe`, `lsWave`, `lsClear`). Test lessons-test.js (`?lessons=1`)."),
+    ("Add an asset hook", "id in `assets-manifest.json`; picture only when in media/ready.json: `ART.img(id)` / `ART.anim(key)` (art.js), stand-in shapes.js, effects fxwave.js, on-foot footart.js. ASSET-POLICY.md."),
+    ("Change a price", "pit-stop `SHOP.price(u)` + `UPG` in shop.js; perks `tpPrice` in upgrades.js; forge.js; econfit.js; up2.js."),
+    ("Add a feature flag", "`if(RET.x===undefined)RET.x=!/[?&]x=0/.test(location.search);` in ret.js or the layer's first lines, new part + one `rd('x.js')` in parts/build.py, header (below). Ship ON; unfinished = OFF."),
+    ("Change a formation / stage script", "formations.js (`vary`), stagescripts.js, remix.js, density.js, pacing.js, dir.js."),
+    ("Change an on-foot enemy or section", "footen.js (enemies), foot.js (engine), footstage.js (stage `zeil`), footart.js. Tests foot-test.js, footstage-test.js."),
+    ("Add a test", "copy the nearest `<name>-test.js` (react-test.js flag, bossmoves-test.js boss): Playwright, `?scn=` URL, PASS/FAIL lines; one at a time: `NODE_PATH=$(npm root -g) node games-src/nightrun/<name>-test.js`. Name it `x-test.js` for `x.js`; log in TEST-LEDGER.md."),
 ]
 
 
@@ -153,7 +153,7 @@ def hook_lines(a):
     """Hooked functions (consolidation step 3): the one home (hookable / DRAW owner) and its layers in registration (build) order."""
     home, lay = {"drawPickups": None}, {}
     for f in a["files"]:
-        n = f["name"]; t = mm.rd(PARTS / n)
+        n = f["name"]; t = mm.rd(next(PARTS.rglob(n)))
         for m in HOOKDEF.finditer(t): home[m.group(1)] = "%s:%d" % (short(n), t[:m.start()].count("\n") + 1)
         if "const DRAW={" in t: home["drawPickups"] = "%s:%d" % (short(n), t[:t.index("const DRAW={")].count("\n") + 1)
         for m in HOOKUSE.finditer(t):
@@ -172,20 +172,20 @@ def render():
     L = ["# WHERE: Mainhattan Nightrun, which file owns what", "",
          "Generated by `games-src/scripts/where.py` (do not edit; `where-test.js` fails when stale). Later definition wins: `parts/build.py` order; so a behaviour can be split over its owner and the wrappers. Read the owner's line range, then the wrappers' only if needed.", "",
          "Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` = code only (`RET.x=false`). Key = function and its line range. `>` = old files this layer overrides or patches; `<` = later files that wrap it.", "",
-         "| flag | key (file name L1-L2) | > wraps | < wrapped by | test | doc |", "|---|---|---|---|---|---|"]
+         "| flag | key (file name L1-L2) | > wraps | < wrapped by | test |", "|---|---|---|---|---|"]
     for n, t, flags, f in rows(a, texts, ft, wraps, wrapped_by):
         key = "" if len(flags) > 4 else "%s %s" % (short(n), key_fn(n, t, flags, f["defs"]))
         if len(flags) > 4: key = "ret (one `RET.x` line per flag, top of the file)"
-        L.append("| %s | %s | %s | %s | %s | %s |" % (fmt_flags(flags, ft), key.strip(), cell_list(wraps.get(n, {}), 3), cell_list(wrapped_by.get(n, {}), 3),
-                                                      test_for(n, t, flags), doc_for(t)))
+        L.append("| %s | %s | %s | %s | %s |" % (fmt_flags(flags, ft), key.strip(), cell_list(wraps.get(n, {}), 3), cell_list(wrapped_by.get(n, {}), 3),
+                                                      test_for(n, t, flags)))
     L += hook_lines(a)
-    L += ["", "Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.", "",
+    L += ["", "Files live in `parts/<folder>/<file>.js` (" + ", ".join(sorted({p.parent.name for p in PARTS.rglob("*.js")})) + "); each folder has a README.md (what it owns, its hook lists). Unflagged = core, data, art.", "",
           "## How to find X (named file, then the function)", ""]
     for i, (q, ans) in enumerate(RECIPES, 1): L.append("%d. **%s**: %s" % (i, q, ans))
     L += ["", "## Do not read", "",
           "- Built `games/mainhattan-nightrun/index.html`, `sw.js`, `x.js`, the joined `ui.js`: generated.",
           "- `nightrun/MODULES.md` (36 KB, git-ignored): only for exact line numbers of one file; use `MODULES-COMPACT.md` first, or `games-src/scripts/find.sh <symbol> nightrun`.",
-          "- `analysis/`, `REVIEW-*.md`, `ASSETS-NEEDED*.md`, g.js / foot.js / ret.js / a.js / b.js whole: read a line range only.",
+          "- `analysis/`, `REVIEW-*.md`, `ASSETS-NEEDED*.md`, g, foot, ret, a, b whole: read a line range only.",
           "", "Header standard for every new part: first lines `// PURPOSE: <one line>`, `// FLAG: <name (?name=0)|none>`, `// TEST: <x-test.js|none>` (guard.py errors on a new part without it, warns on old ones).", ""]
     return "\n".join(L)
 

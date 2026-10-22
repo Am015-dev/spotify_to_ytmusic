@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Enemy art from the approved ship sheets (parts/foeart.js, flag RET.foeart) through the real page (prints pass/fail lines only):
+// Enemy art from the approved ship sheets (parts/art/foeart.js, flag RET.foeart) through the real page (prints pass/fail lines only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/foeart-test.js      env: GAME_DIR=<dir with index.html>, BOT=1 (adds the 90 s bot-run share, 5 stages), V=1 (verbose)
 //  (a) coverage: every enemy id the game can spawn (FOEART.ids(): ZOO.T, FLEET.K, FLK.K, DMG.ml, LEAK.GT + the director's kinds) has an ENEMY_ART entry or is listed in FOEART_NEEDS;
 //      every entry names a real ship sheet and a sane width; no id is in both lists

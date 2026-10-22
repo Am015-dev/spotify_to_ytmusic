@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// SAGA (parts/storydata.js + parts/saga.js): the campaign through-line. Headless, no screenshots. Prints PASS/FAIL lines only.
+// SAGA (parts/story/storydata.js + parts/story/saga.js): the campaign through-line. Headless, no screenshots. Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/story-test.js     env: GAME_DIR=...
 // Checks: data (every trigger has its line, speakers exist, <= 2 lines x 140 chars per card), opening + briefing + SKIP, each chapter end fires once,
 // comms lines never overlap the ship or the HUD (390x763, 375x553), saves record seen scenes, ?story=0 = the game as before, no page errors.
@@ -34,7 +34,7 @@ const res = [], ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' : 'FAI
       ok('data: every trigger has its line (' + d.n + ' lines, ' + d.nch + ' chapters)', !d.miss.length && !d.unknown.length, JSON.stringify(d.miss.concat(d.unknown)));
       ok('data: cards <= 2 lines x 140 chars, speakers exist, ids unique, comms 1 line', !d.bad.length, JSON.stringify(d.bad));
       ok('data: 10 chapters cover stages 1-40 without gaps', d.chs && d.nch === 10);
-      const src = fs.readFileSync(path.join(__dirname, 'parts/storydata.js'), 'utf8');
+      const src = fs.readFileSync(path.join(__dirname, 'parts/story/storydata.js'), 'utf8');
       ok('data: no AI or franchise names in the text', !/\b(claude|anthropic|openai|gpt)\b/i.test(src));
       // ---- opening, briefing, comms on the first start
       await p.click('#playBtn'); await sleep(300);

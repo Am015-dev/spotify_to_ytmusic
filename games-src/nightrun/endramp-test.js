@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Endless ramp test (parts/endramp.js): effective difficulty climbs by wave to the Legend values, pattern sets change from wave to wave, ?endramp=0 and the story are as before, bot numbers.
+// Endless ramp test (parts/difficulty/endramp.js): effective difficulty climbs by wave to the Legend values, pattern sets change from wave to wave, ?endramp=0 and the story are as before, bot numbers.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/endramp-test.js     (pass/fail lines only)
 //   env: BOTS=0 skips the bot measurement; RUNS=10 (bot runs per cell); WAVES=30 (waves the live run plays)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), cp = require('child_process'), fs = require('fs'), os = require('os');

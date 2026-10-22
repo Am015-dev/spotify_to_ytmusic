@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FIRST30 (first30 block of parts/bossvis.js + saga.js / draw.js / bossvis.js / bossmoves.js hooks): the first 30 seconds, boss size / lane / aim, laser alpha, logo.
+// FIRST30 (first30 block of parts/bosses/bossvis.js + saga.js / draw.js / bossvis.js / bossmoves.js hooks): the first 30 seconds, boss size / lane / aim, laser alpha, logo.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/first30-test.js      env: GAME_DIR=...   Prints PASS / FAIL lines only.
 // 390x763 and 375x553 phones: opening = <= 2 cards, <= 8 s, appears AFTER play has started (G.t > 0, enemies out), tap = next, SKIP = off, briefing = one banner line;
 // boss css size >= 140, centre lane, armour plates are not white, shots bend toward the boss on Normal (not on Hard), boss laser alpha <= 0.6; logo has no shadow offset;

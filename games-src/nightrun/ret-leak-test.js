@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Ground enemies, calmer pacing and the BREACH meter (parts/leak.js, flag RET.leak) through the real page (prints pass/fail only):
+// Ground enemies, calmer pacing and the BREACH meter (parts/waves/leak.js, flag RET.leak) through the real page (prints pass/fail only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/ret-leak-test.js      env: GAME_DIR=<dir with index.html>, SECS=70 (sim seconds per stage)
 //  (a) landscape 1366x768 and 1280x720, the 3rd stage of every city: the three ground types appear (all three over the run), stand on the road line
 //      (bottom within 1.5 px of UIK.groundY for their whole life), never above it, are reachable by a level shot (a hit lowers hp), stages 1-2 and the ferry stage have none

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// BULLETART (parts/bulletart.js, RET.bulletart): enemy bullets draw their picture (orb / needle / shell / rocket) and player shots draw the weapon's picture; ?bulletart=0 = the old dots (no such picture drawn).
+// BULLETART (parts/art/bulletart.js, RET.bulletart): enemy bullets draw their picture (orb / needle / shell / rocket) and player shots draw the weapon's picture; ?bulletart=0 = the old dots (no such picture drawn).
 // Counts drawImage calls by source picture (ids resolved from ART.bm / ART.sc after the run), 390x763 phone viewport. PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/bulletart-test.js        STAGES=6,10 T=40 picks the runs; GAME_DIR=<built folder>
 const PW = require('playwright'), path = require('path'), net = require('net'), cp = require('child_process');

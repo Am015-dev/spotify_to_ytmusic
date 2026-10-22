@@ -5,7 +5,7 @@
   - games-src/next-wave/flow-2d/mainhattan-nightrun/prompts-foot.json ({"cards": {name: prompt}}).
   python3 games-src/nightrun/make-foot-assets.py
 Names: media/foot/<who>-<pose>.webp (1024x1024 transparent, facing right), foot/bg-<layer>.webp (2048x1024), foot/pk-<id>.webp (128), foot/sc-<id>.webp (256).
-The game draws a coloured shape in code (parts/footart.js) until the file is real art and listed in media/ready.json."""
+The game draws a coloured shape in code (parts/street/footart.js) until the file is real art and listed in media/ready.json."""
 import json, os
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 GROUP = 'On-foot street stage'
@@ -88,7 +88,7 @@ for k in CH:
     for p in poses_of(k):
         who = 'Kai (hero)' if k == 'kai' else ('boss ' + t.split(',')[0] if kind == 'b' else 'enemy ' + t.split(',')[0])
         add('foot-%s-%s' % (k, p), 'foot/%s-%s.webp' % (k, p), 1024, 1024, 'sprite',
-            'On-foot street stage (parts/footart.js FA.draw): %s, pose %s (a coloured placeholder figure with initials until this exists)' % (who, p),
+            'On-foot street stage (parts/street/footart.js FA.draw): %s, pose %s (a coloured placeholder figure with initials until this exists)' % (who, p),
             'Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as %s, pose: %s.' % (t, BOSS_EXTRA[p][0] if p in BOSS_EXTRA else POSE_TX[p]),
             pose_prompt(k, p), t)
 for L, (tr, tx) in BG.items():

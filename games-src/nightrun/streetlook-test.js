@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// STREETLOOK (parts/streetlook.js): machine gate for the on-foot street on phones. Headless, no screenshots: it wraps the draw calls (ART.drawAnim, fillText, drawImage, arc, fillRect)
+// STREETLOOK (parts/street/streetlook.js): machine gate for the on-foot street on phones. Headless, no screenshots: it wraps the draw calls (ART.drawAnim, fillText, drawImage, arc, fillRect)
 // on the foot canvas and measures what lands on screen. Sizes 390x763, 375x553, 430x932 (portrait touch) and 844x390 (landscape touch). Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/streetlook-test.js      env: GAME_DIR=...  BEFORE=1 (also print the same numbers for ?streetlook=0)
 // Rules: standing character >= 22% of the field height; props <= 1.3 characters; grounded feet / prop bottoms within 3 px of the road line; every text and visible pickup inside the screen,

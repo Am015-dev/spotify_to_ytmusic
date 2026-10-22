@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// CALM gate (parts/calm.js, flag RET.calm, default ON, ?calm=0 = before): on a 390x763 phone, Legend stage 10 and Normal stage 6:
+// CALM gate (parts/render/calm.js, flag RET.calm, default ON, ?calm=0 = before): on a 390x763 phone, Legend stage 10 and Normal stage 6:
 // the rule banner never touches the middle 60% of the field and lasts <= 2.5 s; pictured beams are <= 12 css px thick (alpha <= .8); no enemy wears more than 2 rings. PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/calm-test.js        env: STEPS=4200 Q='&calm=0' (measure the old look, gates are skipped)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');

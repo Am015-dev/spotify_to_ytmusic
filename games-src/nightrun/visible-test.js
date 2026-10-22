@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// VISIBLE gate (parts/visible.js, flag RET.vis, default on; ?vis=0 = old). Prints PASS/FAIL lines (and the table with TABLE=1).
+// VISIBLE gate (parts/enemies/visible.js, flag RET.vis, default on; ?vis=0 = old). Prints PASS/FAIL lines (and the table with TABLE=1).
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/visible-test.js     env: VIS=0 (measure the old rules) SECS=60 STAGES=3,10,20 ALL=1 (all 16 weapons)
 // For every kill: seconds on screen (first frame at x < W-20 inside the playfield, to death) and 'killed before visible' (died at x >= W-20 or off-screen).
 // Gate on Normal with the owner's build (PULSE 3 + SWARM 10) at stages 3/10/20: killed-before-visible = 0, median life per kind:

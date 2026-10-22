@@ -99,7 +99,7 @@ for n in list(ready):
     why = placeholder_guard.is_placeholder(os.path.join(MEDIA, n), _man, sig)
     if why: ready.remove(n); sig[n] = md5(os.path.join(MEDIA, n)); refused.append((n, why))
 for n, why in refused: print('REFUSED (placeholder picture, not listed in ready.json):', n, '-', why)
-ready += sorted(f for f in os.listdir(MEDIA) if f.startswith('mp-') and f.endswith('.mp3'))   # the music pack (parts/musicpack.js) is listed here too, never dropped
+ready += sorted(f for f in os.listdir(MEDIA) if f.startswith('mp-') and f.endswith('.mp3'))   # the music pack (parts/music/musicpack.js) is listed here too, never dropped
 json.dump(sig, open(SIG, 'w'), indent=0); json.dump(ready, open(os.path.join(MEDIA, 'ready.json'), 'w'))
 print('real art found for', len(ready), 'files:', ready)
 # ----- the document -----

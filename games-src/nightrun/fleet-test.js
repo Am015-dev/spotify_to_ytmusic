@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Enemy ships in the fly stages (parts/fleet.js, flag RET.fleet) through the real page (prints pass/fail lines only):
+// Enemy ships in the fly stages (parts/enemies/fleet.js, flag RET.fleet) through the real page (prints pass/fail lines only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/fleet-test.js      env: GAME_DIR=<dir with index.html>, V=1 (verbose)
 //  (a) each kind is locked one stage before its first stage and spawns from it (interceptor 6, bomber 10, carrier 16, cruiser 22), cruiser never on a boss stage / with a boss
 //  (b) ramp: single -> pair -> mixed group by stage, Easy smaller, Hard bigger; wave share .07 at 6 rising to .24

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Nightrun ONE HINT STYLE test (parts/uikit.js HINT, flag RET.hint, ?hint=0 = the old bubble). Real page, sim clock. Prints PASS / FAIL lines; exit 1 on any FAIL.
+// Nightrun ONE HINT STYLE test (parts/hud/uikit.js HINT, flag RET.hint, ?hint=0 = the old bubble). Real page, sim clock. Prints PASS / FAIL lines; exit 1 on any FAIL.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/hint-test.js      env: GAME_DIR=<dir with index.html>, SHOT=<dir for screenshots>
 // (a) every hint string in the sources is <= 8 words (zoo hints, power-up tips, level toasts, fixed hints)
 // (b) per viewport (390x763, 375x553, 763x390, 1280x720): the pill is >= 14 px, inside the top third, under the HUD, >= 120 px from the ship, text intact
@@ -18,14 +18,14 @@ const out = [], ok = (name, pass, info) => { out.push(pass); console.log((pass ?
 function audit(names) {
   const bad = [], add = (where, t) => { if (wc(t) > 8) bad.push(where + ': "' + t + '" (' + wc(t) + ')'); };
   const read = f => fs.readFileSync(path.join(PARTS, f), 'utf8');
-  for (const f of fs.readdirSync(PARTS).filter(f => f.endsWith('.js'))) {
+  for (const f of require('./parts-index.js').list().filter(f => f.endsWith('.js'))) {
     const s = read(f);
     for (const m of s.matchAll(/hintShow\(say\('((?:[^'\\]|\\.)*)'\)/g)) add(f, m[1]);
     for (const m of s.matchAll(/hintShow\(say\('((?:[^'\\]|\\.)*)'\)/g)) void m;
     for (const m of s.matchAll(/\btip:'((?:[^'\\]|\\.)*)'/g)) add(f + ' tip', m[1]);
     for (const m of s.matchAll(/\bhint:'((?:[^'\\]|\\.)*)'/g)) add(f + ' hint', m[1]);
   }
-  const pl = read('powlevels.js');
+  const pl = read('powers/powlevels.js');
   for (const m of pl.matchAll(/^\s*(\w+):\{tx:\[((?:'[^']*',?)+)\]/gm)) {
     const n = names[m[1]] || m[1].toUpperCase(); const txs = [...m[2].matchAll(/'([^']*)'/g)].map(x => x[1]);
     txs.forEach((t, i) => { if (t) add('powlevels ' + m[1] + ' LV' + (i + 1), n + ' LV' + (i + 1) + ': ' + t); });

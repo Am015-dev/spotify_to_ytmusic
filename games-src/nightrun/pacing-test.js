@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Pacing (parts/pacing.js, flag RET.pacing). NODE_PATH=$(npm root -g) node games-src/nightrun/pacing-test.js   env: RUNS=12 (human-model bot runs per stage and build) STAGES=5,6,11,12,20
+// Pacing (parts/difficulty/pacing.js, flag RET.pacing). NODE_PATH=$(npm root -g) node games-src/nightrun/pacing-test.js   env: RUNS=12 (human-model bot runs per stage and build) STAGES=5,6,11,12,20
 // W127 22 Oct: two stale comparisons relaxed, no game change. (c) crowd peak is compared with the old build only when the old build cleared the stage (an old run that dies at once never builds a crowd, st11 old 0/8: 9.1 vs 11, absolute cap 16 still applies). (d) normal-foe hull: per-stage limit 4.5 (the median of ~40 hits / dph swings +-0.5 between identical runs, 4.0 vs 4.01 failed on rounding), plus a pooled median over the early stages that must stay <= 4.01.
 // W127: boss length is the song length (story.js stLen) and the song is drawn per run, so the same build gave 61 and 80 bars; tolerance 40% of the longer value (pacing.js never sets ST.len, check (f) proves the stage table is unchanged).
 // W121 22 Oct: n=8 per stage is noisy (stage 12 clear 0/8..5/8 on the same build, flags on or off), so the 30% clear rule is pooled over the non-boss stages, boss length is the median of the runs within 25%.
@@ -58,8 +58,8 @@ const stats = (res, n) => { const a = res.filter(r => r.n === n && r.px), P = a.
     ok(lb >= la - .25, `(d) median on-screen life over the kill / survive stages ${la.toFixed(2)} -> ${lb.toFixed(2)} s (S03 not lower than 0.25 s)`);
     ok(db >= da - .35, `(c) median dwell over the kill / survive stages ${da.toFixed(1)} -> ${db.toFixed(1)} s (not lower than 0.35 s; target 5 s: ${db >= 5 ? 'met' : 'NOT met'})`); }
   // (f) ?pacing=0 = the page without pacing.js
-  const html = fs.readFileSync(path.join(GAME_DIR, 'index.html'), 'utf8'), src = fs.readFileSync(path.join(__dirname, 'parts/pacing.js'), 'utf8');
-  ok(html.includes(src), 'built page carries parts/pacing.js');
+  const html = fs.readFileSync(path.join(GAME_DIR, 'index.html'), 'utf8'), src = fs.readFileSync(path.join(__dirname, 'parts/difficulty/pacing.js'), 'utf8');
+  ok(html.includes(src), 'built page carries parts/difficulty/pacing.js');
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pc-')); fs.symlinkSync(path.join(GAME_DIR, 'media'), path.join(tmp, 'media')); try { fs.symlinkSync(path.join(GAME_DIR, 'music'), path.join(tmp, 'music')); } catch (e) { }
   fs.writeFileSync(path.join(tmp, 'index.html'), html.replace(src, ''));
   const port = await freePort(), port2 = await freePort();

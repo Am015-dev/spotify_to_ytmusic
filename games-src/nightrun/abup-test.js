@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// ABUP gate (parts/abup.js, flag RET.abup): DASH / EMP upgrades + power-up interaction. Prints PASS/FAIL lines.
+// ABUP gate (parts/powers/abup.js, flag RET.abup): DASH / EMP upgrades + power-up interaction. Prints PASS/FAIL lines.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/abup-test.js
 // 1 each upgrade buys (Garage ABILITY tab click + ABUP.buy), costs its Neon, persists over a reload
 // 2 each upgrade applies: double hop after a beat dash only, trail after a beat dash, refund on PERFECT only (not GOOD, not off-beat), EMP reserve, wide EMP radii, salvage

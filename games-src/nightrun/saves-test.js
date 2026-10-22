@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Nightrun explicit saving (parts/saves.js, flag RET.saves, ?saves=0 = old). Headless, no screenshots. PASS/FAIL lines, exit 1 on any FAIL.
+// Nightrun explicit saving (parts/core/saves.js, flag RET.saves, ?saves=0 = old). Headless, no screenshots. PASS/FAIL lines, exit 1 on any FAIL.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/saves-test.js     env: GAME_DIR=...
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');

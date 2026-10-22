@@ -6,7 +6,7 @@
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const STAGES = (process.env.STAGES || '1,6,10').split(',').map(Number), SECS = +process.env.SECS || 150;
-const SONGM = new Function(require('fs').readFileSync(path.resolve(__dirname, 'parts/songs.js'), 'utf8') + ';return SONGM;')();
+const SONGM = new Function(require('fs').readFileSync(path.resolve(__dirname, 'parts/music/songs.js'), 'utf8') + ';return SONGM;')();
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const RUN = ({ n, secs }) => {
   const m = window.__mnr; m.god = true; m.startStory(n); m.simOn(true); const dt = 1 / 120, seen = new WeakSet(), seenE = new WeakSet(), vol = [], spawn = [];

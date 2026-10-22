@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// TALE (parts/tale.js): cast, story beats, dialogue card, STORY LOG timeline. Runs with ?story=0 (saga.js replaces the tale when RET.story is on). Headless, no screenshots. Prints PASS/FAIL lines only.
+// TALE (parts/story/tale.js): cast, story beats, dialogue card, STORY LOG timeline. Runs with ?story=0 (saga.js replaces the tale when RET.story is on). Headless, no screenshots. Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/tale-test.js     env: GAME_DIR=...
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
@@ -25,7 +25,7 @@ const AUDIT = root => { const R = document.querySelector(root); if (!R) return {
   const vis = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); if (!e) return false; for (let x = e; x && x !== document.body; x = x.parentElement) if (x.hidden || getComputedStyle(x).display === 'none') return false; return true; }, sel);
   try {
     // ---- data table
-    const src = fs.readFileSync(path.join(__dirname, 'parts/tale.js'), 'utf8'), man = JSON.parse(fs.readFileSync(path.join(__dirname, 'assets-manifest.json'), 'utf8'));
+    const src = fs.readFileSync(path.join(__dirname, 'parts/story/tale.js'), 'utf8'), man = JSON.parse(fs.readFileSync(path.join(__dirname, 'assets-manifest.json'), 'utf8'));
     {
       const p = await open(390, 763);
       const d = await p.evaluate(() => { const T = window.TALE; const bad = []; let maxLine = 0; const ids = new Set();

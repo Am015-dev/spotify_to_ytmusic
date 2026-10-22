@@ -188,7 +188,8 @@ for m in flow.get('models', []):
     if 'night' in m['game']: model_n[m['stage']] = model_n.get(m['stage'], 0) + 1
 
 # 5 --- hooks in code
-PARTS = sorted(glob.glob(os.path.join(NR, 'parts', '*.js')))
+PARTS = sorted(glob.glob(os.path.join(NR, 'parts', '*', '*.js')))
+PARTBY = {os.path.basename(p): p for p in PARTS}
 ptext = {os.path.basename(p): open(p, errors='ignore').read() for p in PARTS}
 HOOK_RE = re.compile(r"""\bART\.(?:pic|sp|img|isReal|artK)\(\s*['"]([a-z0-9_.-]+)['"](\s*\+)?|\bFXW\.pic\(\s*['"]([a-z0-9_.-]+)['"]""")
 hooks = {}      # id -> [part files]
@@ -282,7 +283,7 @@ for i, fl in sorted(hooks.items()):
     if i + '.webp' in ready or i in ready: continue
     e = ent(i); add(e['src'], 'code hook')
     hook_missing.append(i)
-    for f in fl: add(e['where'], 'parts/' + f)
+    for f in fl: add(e['where'], 'parts/' + os.path.basename(os.path.dirname(PARTBY[f])) + '/' + f)
     if not e['kind']:
         e['kind'] = kind_of(i); e['fstate'] = file_state(i + '.webp'); e['status'] = 'not delivered'; e['pri'] = pri_of(e)
         k, txt = covered(i)
@@ -297,10 +298,10 @@ def code_files(i):
     return [fn for fn, t in ptext.items() if pat.search(t)]
 for i, e in E.items():
     if e['status'] == 'delivered': continue
-    for f in code_files(i): add(e['where'], 'parts/' + f)
+    for f in code_files(i): add(e['where'], 'parts/' + os.path.basename(os.path.dirname(PARTBY[f])) + '/' + f)
     for pre, fl in dyn.items():
         if i.startswith(pre) and len(pre) >= 3:
-            for f in fl: add(e['where'], "parts/%s (built name '%s'+)" % (f, pre))
+            for f in fl: add(e['where'], "parts/%s/%s (built name '%s'+)" % (os.path.basename(os.path.dirname(PARTBY[f])), f, pre))
     e['where'] = [w for w in e['where'] if w]
 
 # ---------------------------------------------------------------- text helpers

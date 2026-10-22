@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// VARIETY A audit (parts/formations.js + parts/stagescripts.js, flag RET.vary): how repetitive are the stages? Headless, ?sim=1 stepping, real page.
+// VARIETY A audit (parts/waves/formations.js + parts/waves/stagescripts.js, flag RET.vary): how repetitive are the stages? Headless, ?sim=1 stepping, real page.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/vary-audit.js      env: GAME_DIR=<dir with index.html>, MODES=old,new, STAGES=1-45, DIFF=normal, JSON=out.json, V=1
 // Plays every story stage (and the 5 challenges) with an invincible (no BREACH either), dodging, auto-firing bot until it clears, the boss comes, or the stage's song is over,
 // and records every spawn: its formation id (old: the pattern / zoo wave / ground wave; new: the scripted formation or the stage's set piece), the enemy kinds, the mutator.

@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Regenerates the ship-art entries of assets-manifest.json from the game source (run again after merging new weapons or ships):
-  wpmount-<weaponId>.webp   256x128  one attachment per weapon in WPD (parts/g.js), drawn on the ship at slot 1 or 2
+  wpmount-<weaponId>.webp   256x128  one attachment per weapon in WPD (parts/qa-hooks/g.js), drawn on the ship at slot 1 or 2
   ship-<shipId>-armed.webp  512x256  optional full composite per ship (both slots filled), replaces the mounts in the previews when present
 Never touches other entries (the wp-*.webp icons and everything else stay). Then run make-placeholders.py and games-src/scripts/next-wave.py."""
 import json, os, re, glob
 HERE = os.path.dirname(os.path.abspath(__file__)); P = os.path.join(HERE, 'parts'); MEDIA = os.path.normpath(os.path.join(HERE, '..', '..', 'games', 'mainhattan-nightrun', 'media'))
-g = open(os.path.join(P, 'g.js'), encoding='utf8').read()
+pp = lambda n: next(os.path.join(r, n) for r, _, fs in os.walk(P) if n in fs)   # parts/<module>/<file>
+g = open(pp('g.js'), encoding='utf8').read()
 blk = g[g.index('const WPD={'):]; blk = blk[:blk.index('};') + 2]
-blk += open(os.path.join(P, 'wpx.js'), encoding='utf8').read()   # the 8 later weapons are added by Object.assign(WPD,...) in wpx.js
+blk += open(pp('wpx.js'), encoding='utf8').read()   # the 8 later weapons are added by Object.assign(WPD,...) in wpx.js
 weapons = re.findall(r"(\w+):\{n:'([^']+)',s:'[^']*',c:'(#[0-9a-fA-F]{3,6})'", blk)
-src = ''.join(open(os.path.join(P, f), encoding='utf8').read() for f in ('garage.js', 'shapes.js', 'up2.js'))
+src = ''.join(open(pp(f), encoding='utf8').read() for f in ('garage.js', 'shapes.js', 'up2.js'))
 real = {os.path.basename(f)[5:-5] for f in glob.glob(os.path.join(MEDIA, 'ship-*.webp')) if not f.endswith('-armed.webp')}
 ships = [(i, n) for i, n in re.findall(r"id:'(\w+)',\s*n:'([^']+)'", src) if i in real]
 seen = set(); ships = [s for s in ships if not (s[0] in seen or seen.add(s[0]))]

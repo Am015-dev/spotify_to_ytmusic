@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Boss encounter mechanics (parts/bossplay.js, flag RET.bossplay). Prints PASS/FAIL lines and one table.
+// Boss encounter mechanics (parts/bosses/bossplay.js, flag RET.bossplay). Prints PASS/FAIL lines and one table.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/bossplay-test.js      env: GAME_DIR, DIFF (default easy: the shortest fights)
 // 1 every boss: its mechanics trigger and are resolved by the real action (shoot nodes / kill medic or dash the link / EMP / parry / flank), arena rule seen
 // 2 a bot that ignores the mechanic (weaves and shoots the bar) takes >= 1.1x time (Easy god mode, one seed: sanity only; W127 22 Oct: the stage 8 floor 1.35x is gone: easy2 changes the Easy knobs, so the ignoring bot's stray shots hit a node (nodes:shot 2) and the ratio read 1.17x with easy2, 1.59x with ?legend=0&easy2=0. The Normal payoff gate in section 6 (24 runs, 1.55x) is the real gate. The test was not a hang: it takes ~6 min on 4 pages) of a bot that plays it (same 1e6 HP/frame: the cap sets the pace)

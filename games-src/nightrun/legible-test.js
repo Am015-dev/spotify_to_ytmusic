@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Legibility gates (parts/legible.js, flag RET.legible, default ON; ?legible=0 = the old look). INDUSTRY-PLAYBOOK.md fixes 1-3: PB02, PB01, PB06, PB04.
+// Legibility gates (parts/render/legible.js, flag RET.legible, default ON; ?legible=0 = the old look). INDUSTRY-PLAYBOOK.md fixes 1-3: PB02, PB01, PB06, PB04.
 //   NR_OUT=/tmp/nr.html python3 games-src/nightrun/parts/build.py && NODE_PATH=$(npm root -g) node games-src/nightrun/legible-test.js [/tmp/nr.html]
 //   env: ONLY=<scene substring>  SHOTS=<dir> saves one phone frame per scene (keep them out of git)
 // Phone 390x763 DPR 2, Normal, god mode, hand-stepped sim; stages 2 6 10 14 20, a boss, endless wave 10; each scene measured on 3 frozen frames, both ?legible=0 and default.

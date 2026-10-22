@@ -23,9 +23,9 @@ function literals(src) {   // [{s, line}] of every '...' "..." `...` literal, sk
 }
 const DEV = new Set(['labassets.js']);   // the Lab ASSETS tab is the owner's asset workbench: it lists file names on purpose (what to paint, save-as name)
 let hits = 0;
-for (const f of fs.readdirSync(PARTS).filter(f => f.endsWith('.js'))) {
+for (const f of require('./parts-index.js').list().filter(f => f.endsWith('.js'))) {
   for (const l of literals(fs.readFileSync(path.join(PARTS, f), 'utf8'))) {
-    if (!RX.test(l.s) || DEV.has(f)) continue;
+    if (!RX.test(l.s) || DEV.has(path.basename(f))) continue;
     if (/\bsrc=|url\(|\{[^}]*:[^}]*\}/.test(l.s)) continue;                                                     // markup / CSS: an image path, not text
     if (/^(\.\/|\/|https?:|[\w\/.-]*\/)/.test(l.s) && !/\s/.test(l.s)) continue;                        // a path or URL (a fetch / src), not text
     if (!/\s|\(/.test(l.s) && /^[\w-]+\.(js|json|webp|html|css)$/.test(l.s)) continue;                 // a bare file name used as a key (ART.rd.has('x.webp'))

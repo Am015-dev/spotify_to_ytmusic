@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Nightrun LESSONS test (parts/lessons.js: mini stages; real page, ?nomusic=1&lessons=1). Prints only PASS / FAIL lines; exit code 1 on any FAIL.
+// Nightrun LESSONS test (parts/drills/lessons.js: mini stages; real page, ?nomusic=1&lessons=1). Prints only PASS / FAIL lines; exit code 1 on any FAIL.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/lessons-test.js     env: GAME_DIR=...  VP=390x763 (one size)
 // Runs with ?schoolfull=0 (one pass of the phases); the full demo + 3 rounds version is tested by school-full-test.js.
 // At 390x763 and 375x553 (touch): (a) each lesson's mini stage opens the first time its feature appears (WEAPONS sheet, Garage FORGE twice, SHIPS,

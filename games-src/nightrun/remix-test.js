@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Remix gate (parts/remix.js, flag RET.remix). PASS/FAIL lines, exit 1 on any FAIL.   NODE_PATH=$(npm root -g) node games-src/nightrun/remix-test.js   env: GAME_DIR, SECS=90
+// Remix gate (parts/waves/remix.js, flag RET.remix). PASS/FAIL lines, exit 1 on any FAIL.   NODE_PATH=$(npm root -g) node games-src/nightrun/remix-test.js   env: GAME_DIR, SECS=90
 // (a) one seed twice = identical formation log   (b) 5 seeds: spawn-schedule Jaccard (id@3-bar bucket) <= 0.35 on stages 3, 10, 20   (c) hull of the remixed script within +-5% of the written one, stages 1-40 x 6 seeds,
 // first-moments / breathers / set piece anchored   (d) ?remix=0 spawns exactly what the page without remix.js spawns   (e) enemy bullets <= 50 on Hard stage 20, no page error
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs'), os = require('os');
@@ -22,7 +22,7 @@ const PLAN = (o) => {
 (async () => {
   const fails = [], pass = [], errs = [];
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'remix-')); for (const f of fs.readdirSync(GAME)) if (f !== 'index.html') fs.symlinkSync(path.join(GAME, f), path.join(tmp, f));
-  const src = fs.readFileSync(path.resolve(__dirname, 'parts/remix.js'), 'utf8'), html = fs.readFileSync(path.join(GAME, 'index.html'), 'utf8');
+  const src = fs.readFileSync(path.resolve(__dirname, 'parts/waves/remix.js'), 'utf8'), html = fs.readFileSync(path.join(GAME, 'index.html'), 'utf8');
   if (!html.includes(src)) fails.push('built page is not built from the current remix.js (rebuild)');
   fs.writeFileSync(path.join(tmp, 'index.html'), html.replace(src, ''));
   const port = await fp(), port2 = await fp();

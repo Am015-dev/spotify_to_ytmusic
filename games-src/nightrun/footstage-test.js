@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FOOTSTAGE (parts/footstage.js): the finished on-foot stage 'zeil'. Headless, no screenshots. Prints PASS/FAIL lines only.
+// FOOTSTAGE (parts/street/footstage.js): the finished on-foot stage 'zeil'. Headless, no screenshots. Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/footstage-test.js     env: GAME_DIR=...  RUNS=n (bot runs, default 12)  REF_DIR=<older build> (optional: ?footstage=0 vs it)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun'), RUNS = +process.env.RUNS || 12;

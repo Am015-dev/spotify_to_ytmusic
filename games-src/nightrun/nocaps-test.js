@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// NOCAPS gate (parts/nocaps.js): stages 1, 3, 10 and endless play 60 s each with 0 caption / hint / chip / card text drawn; the pre-stage card shows on the first visit
+// NOCAPS gate (parts/hud/nocaps.js): stages 1, 3, 10 and endless play 60 s each with 0 caption / hint / chip / card text drawn; the pre-stage card shows on the first visit
 // of a stage with a new thing and never on the second; PLAY DRILL runs the right drill and then the stage starts. MEASURE=1 prints NC.TAB (what each stage brings). PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/nocaps-test.js
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');

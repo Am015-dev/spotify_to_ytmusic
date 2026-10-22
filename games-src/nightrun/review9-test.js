@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// review 9 #1 + #9 gate (parts/calm.js stage-title chip, parts/bossvis.js boss text), flag RET.calm (?calm=0 = before). 390x763 phone. PASS/FAIL lines only.
+// review 9 #1 + #9 gate (parts/render/calm.js stage-title chip, parts/bosses/bossvis.js boss text), flag RET.calm (?calm=0 = before). 390x763 phone. PASS/FAIL lines only.
 //   #1: while enemies are alive, no banner band touches the middle 60% of the field, the title chip is <= 28 css px tall and lasts <= 2 s (stages 1, 6, 10)
 //   #4 (review 10): the boss intro is the same small chip (<= 2 s, <= 28 px, not in the middle 60%)
 //   #9: while a boss is up, no wave text (READY / NEXT WAVE) is visible and no text except the boss's own (name, ARMOUR, SAFE LANE, FIREWALL) is drawn over the boss rectangle

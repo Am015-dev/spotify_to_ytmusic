@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PWRSTAR gate (parts/abup.js power-up button, flag pwrclear): on a 390x763 phone a real CDP touch tap USES the held power-up (icon + name shown, caption first 3 times), a 0.6 s hold swaps it for dash, ?pwrclear=0 = old trade; zone hint. PASS/FAIL lines only.
+// PWRSTAR gate (parts/powers/abup.js power-up button, flag pwrclear): on a 390x763 phone a real CDP touch tap USES the held power-up (icon + name shown, caption first 3 times), a 0.6 s hold swaps it for dash, ?pwrclear=0 = old trade; zone hint. PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/pwrstar-test.js
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');

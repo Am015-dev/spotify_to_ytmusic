@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Hold the line (parts/holdline.js, flag RET.holdline) through the real page (prints pass/fail only):
+// Hold the line (parts/difficulty/holdline.js, flag RET.holdline) through the real page (prints pass/fail only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/holdline-test.js      env: GAME_DIR=<dir with index.html>
 //  (a) a leak drains the line (LEAK.M up by the weight), counts, costs score and multiplier; an elite costs one weight more in score only
 //  (b) an empty line costs one hull and refills to the warning level (no hull on the last hull, Normal)

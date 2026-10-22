@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RETENTION test: checkpoints with grace (parts/cp.js, flag RET.cp, ?cp=0 = off). Headless, no screenshots. Prints PASS/FAIL, exit 1 on any FAIL.
+// RETENTION test: checkpoints with grace (parts/difficulty/cp.js, flag RET.cp, ?cp=0 = off). Headless, no screenshots. Prints PASS/FAIL, exit 1 on any FAIL.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/ret-cp-test.js     env: GAME_DIR=...
 // Checks: checkpoints only on long (>= 150 s) non-arcade stages, never in a boss fight or the last 15 s, bar-aligned; passing one snapshots the run; a death after one offers RESUME;
 // a resume restores score / kills / perks, half hull (>= 2), 3 s grace, the stage clock and the beat grid (within 40 ms); the run is marked (assist-style: no records, Neon x0.75, no hull-lost star);

@@ -156,7 +156,7 @@ const RUNFN = `(async (o) => { (${SETUP.toString()})(o); const BOT = ${BOTSRC};
     }
   }));
   // draw sites from every page -> part:function key, compared with the approved list
-  const lm = new Map(); for (const f of fs.readdirSync(PARTS)) if (f.endsWith('.js')) fs.readFileSync(path.join(PARTS, f), 'utf8').split('\n').forEach((l, i) => { if (l.trim().length > 12 && !lm.has(l)) lm.set(l, f + ':' + (i + 1)); });
+  const lm = new Map(); for (const f of require('../parts-index.js').list()) if (f.endsWith('.js')) fs.readFileSync(path.join(PARTS, f), 'utf8').split('\n').forEach((l, i) => { if (l.trim().length > 12 && !lm.has(l)) lm.set(l, f + ':' + (i + 1)); });
   const lines = fs.readFileSync(path.join(GAME_DIR, 'index.html'), 'utf8').split('\n');
   const PLUMB = /^(c|ctx|Object\.c|Object\.ctx)\.\w+$|^(Object\.)?(ART\.(sp|tint|hue|sil|put|paintP|drawAnim|dflash|portrait|pic|span|have)|glow|G_|wtxt|sheet|tintOf|cf|size|scale|P\.\w+|CanvasRenderingContext2D\.\w+|RU\.(ring|tri))$|^\?$/;
   const keyOf = s => { const fr = s.split('<').map(f => { const [fn, ln] = f.split('@'); const loc = lm.get(lines[+ln - 1]) || 'built:' + ln; return { fn, part: loc.split(':')[0] }; }); const h = fr.find(f => !PLUMB.test(f.fn)) || fr[0]; return h ? h.part + ':' + (h.fn === '?' ? 'anon' : h.fn.replace(/^Object\./, '')) : '?'; };

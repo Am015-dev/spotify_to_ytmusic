@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Waves (parts/waves.js, flag RET.waves). NODE_PATH=$(npm root -g) node games-src/nightrun/waves-test.js   env: RUNS=8 (human-model bot runs per stage) STAGES=1,2,3,4,5,6
+// Waves (parts/waves/waves.js, flag RET.waves). NODE_PATH=$(npm root -g) node games-src/nightrun/waves-test.js   env: RUNS=8 (human-model bot runs per stage) STAGES=1,2,3,4,5,6
 // Gates (owner 22 Oct 2026: "stages extremely boring, a swarm of enemies, no logic"), measured with humanbot.js (Normal, fresh build, sim steps, not wall clock):
 //  (a) max enemies on screen <= 8 in every run (all non-boss foes alive, swarm and mines count 1)
 //  (b) every wave is announced by name in the top chip (banner.sm) the moment it starts

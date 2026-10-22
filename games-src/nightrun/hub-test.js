@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// HUB (parts/hub.js, flag RET.hub): every feature within 2 taps of HOME, <= 6 main actions per screen (the labelled MORE row aside),
+// HUB (parts/menus/hub.js, flag RET.hub): every feature within 2 taps of HOME, <= 6 main actions per screen (the labelled MORE row aside),
 // (runs with ?school=0 = the old TRAINING sheet; the school list has its own school-test.js)
 // one header everywhere (back arrow, title, Neon), nothing overlapping, no page errors, ?hub=0 = the old title + MENU sheet. Headless, no screenshots.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/hub-test.js     env: GAME_DIR=...

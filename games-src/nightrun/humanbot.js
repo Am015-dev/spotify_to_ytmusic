@@ -118,7 +118,7 @@ const BOT = (o) => {
     console.log(`${bot}/${build} clear% ` + STAGES.map(n => n + ':' + pct(cell(bot, build, n))).join(' ') + ' | hits med ' + STAGES.map(n => n + ':' + med(cell(bot, build, n).map(r => r.hits))).join(' ') + ' | life med s ' + lifes + ` | all-kill med ${med([].concat(...a.map(r => r.life.map(l => l[1])))).toFixed(2)} (n=${a.length})`);
   }
   for (const bot of BOTS) for (const build of BUILDS) for (const n of STAGES) { const a = cell(bot, build, n); if (!a.length) continue; const sp = a.reduce((x, r) => x + r.sp, 0), lk = a.reduce((x, r) => x + r.lk, 0), mins = a.reduce((x, r) => x + r.t, 0) / 60; console.log(`leaks ${bot}/${build} stage ${n}: ${(lk / Math.max(mins, .01)).toFixed(1)}/min, share ${(100 * lk / Math.max(sp, 1)).toFixed(1)}% of ${sp} spawns, clear ${pct(a)}%`); }
-  // calibration gate: the human bot clears Normal stage 3 about 95% on the fresh/mid/late builds; with parts/bite.js (default ON, Q='&bite=0' = off) the target is 60-85%
+  // calibration gate: the human bot clears Normal stage 3 about 95% on the fresh/mid/late builds; with parts/difficulty/bite.js (default ON, Q='&bite=0' = off) the target is 60-85%
   const BITE0 = /[?&]bite=0/.test(process.env.Q || '') || DIFF !== 'normal';
   if (BOTS.includes('human') && STAGES.includes(3)) for (const build of BUILDS) if (build !== 'owner') { const c = pct(cell('human', build, 3)); line(BITE0 ? c >= 85 : c >= 45 && c <= 95, BITE0 ? `human ${build} Normal stage 3 clear ${c}% (calibration target ~95%, gate >= 85% at small RUNS)` : `human ${build} Normal stage 3 clear ${c}% (bite: target 60-85%, gate 45-95% at small RUNS)`); }
   console.log(fails ? `FAIL humanbot-test: ${fails} check(s)` : 'PASS humanbot-test'); process.exit(fails ? 1 : 0);

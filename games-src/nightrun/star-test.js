@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// STAR chip gate (parts/abup.js, #bPwr): (old behaviour, ?pwrclear=0; the new one is pwrstar-test.js) a tap on the star power-up chip trades the held power-up on touch and mouse, the hit box is >= 44 px, no page errors.
+// STAR chip gate (parts/powers/abup.js, #bPwr): (old behaviour, ?pwrclear=0; the new one is pwrstar-test.js) a tap on the star power-up chip trades the held power-up on touch and mouse, the hit box is >= 44 px, no page errors.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/star-test.js
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');

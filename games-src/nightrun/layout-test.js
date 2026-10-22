@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// LAYOUT (parts/layout.js, flag RET.layout): strict review 8 fixes 20-23 and 25. Headless, no screenshots. Prints PASS/FAIL lines only.
+// LAYOUT (parts/menus/layout.js, flag RET.layout): strict review 8 fixes 20-23 and 25. Headless, no screenshots. Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/layout-test.js     env: GAME_DIR=...
 // Gates (390x763 and 375x553): section pills centred within 4 px, one colour, no clipping, buttons pairwise non-overlapping (MISSIONS / TRAINING / PROFILE, result, pause);
 // controls below the field at 375x553 (?strip=1, default OFF: hud-cover 21.0% > 20% until the HUD diet lands); the stage card sits beside its node, the bottom sheet <= half the screen, ARCADE shows m:ss;
