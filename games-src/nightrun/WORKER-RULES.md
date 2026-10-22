@@ -26,3 +26,12 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
    is anchored to the real players' score (10-12/100). Score what a player experiences (fun, clarity, fairness, tension, looks, sound),
    never whether a fix landed. Each category starts at the players' level and moves only with concrete before/after evidence
    from play; a 'fixed' defect that still feels bad scores as not fixed. State the headline as 'player-equivalent score'.
+11. SIMHUNT IS THE DEFAULT GATE (22 Oct): before you report, run `node games-src/nightrun/qa/simhunt.js` (2-3 min, all stages at
+   sim speed) and paste its summary; a new NaN, stuck stage, escape spike or overlap you caused is a FAIL. Real-time bot runs only
+   when the task is about feel/timing and the brief says so.
+12. DO NOT COMMIT GENERATED FILES: never commit games/mainhattan-nightrun/index.html, sw.js, WHERE.md or MODULES-COMPACT.md on
+   your nr/ branch (the orchestrator rebuilds once after merging). Add a new part to build.py only by appending ONE line
+   `PARTS_EXTRA.append('<file>.js')` if present, never by editing the long `out=` line.
+13. CHANGE WHAT THE PLAYER DOES, NOT ONLY WHAT THEY SEE: a design task must name the player decision it creates or sharpens
+   (e.g. 'EMP now or save it', 'graze for score or stay safe') and a measure of it; polish tasks say so in the title.
+14. FUN SKILL: any design/feel task loads the `fun-game-design` skill first and follows it.
