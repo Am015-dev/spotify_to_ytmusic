@@ -75,3 +75,12 @@ Model and status come from the session list. Cost is blank: the session list doe
 | tr9-chunk-r22d6 | — | Sonnet | Chunk TR9 slope cap at boot (fra 244 -> 14 ms steps) | in review #22 |
 | cl-L2-smash | — | Sonnet | Core loop L2: smash props at any speed | working at log time |
 | cl-L3-studs | — | Sonnet | Core loop L3: stud flow | working at log time |
+| speed-boost-feel-r22e4 | beta.151 | Opus | Speed streaks, FOV, boost jets/flash (99sf) | shipped (#35 PASS after prewarm) |
+| solid-cars r2+r3 (r22e1, r22e8) | beta.151 | Opus | Same cars on camera turn; stuck/overlap cars clear out of view | r2 FAIL #34, r3 PASS #40, shipped |
+| coin-prewarm-r22e6 | beta.151 | Sonnet | Stud coin in prewarm (flag OFF) | shipped #36 |
+| core-reveal-r22e7 | beta.151 | Opus | Core spawn view drawn under curtain (flag OFF) | shipped #37; core,studs flip dropped (non-link stall) |
+| gk-tile-reveal-r22e9 | beta.151 | Sonnet | Outer-land ground tile prewarm: fra 6x late links 1 -> 0 | shipped #39 |
+| glossy-cars-r22e5 | — | Opus | Studio env on car paint | FAIL #38 (phone washout), default OFF in beta.151 |
+| glossy-cars-r22e10 | — | Opus | Glossy r2 (last lane on target) | pushed 68b2d6f, needs review |
+| ath-dirt-stall-r22e11 | — | Sonnet | Street car stalls on Athens dirt | working at log time |
+| reviews 34-40 | beta.151 | Opus | 7 reviews | done |
