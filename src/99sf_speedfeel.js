@@ -5,7 +5,7 @@
 //   with a flash on boost start, the existing whoosh cue, and the HUD boost bar pulsing while boosting.
 // The Points/Sprite programs are created before the loader's warm-up (ldPrewarm) so nothing links on the first boost. GO why/speedfeel (state asserts).
 const SF_Q=new URLSearchParams(location.search),SF={on:SF_Q.get('sf')!=='0',jit:SF_Q.get('sfj')==='1',/* per-frame shimmer transform: off (re-composites the layer every other frame; ?sfj=1 on) */vgOn:SF_Q.get('sfv')!=='0',op:0,vg:0,fl:0,bE:0,kmh:0,b:false,wasB:false,t:0,ms:0,msN:0,force:null,el:null,vgEl:null,P:null,glow:[],nAlive:0,pull:0,lastPos:[null,null],starts:0};
-const SF_N=72;
+const SF_N=40;
 function SF_glowTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);
   r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.25,'rgba(200,245,255,.9)');r.addColorStop(.6,'rgba(60,170,255,.35)');r.addColorStop(1,'rgba(0,60,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)}
 function SF_dom(){if(SF.el)return;const st=document.createElement('style');st.textContent=`#sfL,#sfV{position:fixed;inset:-4%;width:108%;height:108%;pointer-events:none;z-index:3;opacity:0;will-change:opacity,transform;display:block}
@@ -18,7 +18,7 @@ function SF_dom(){if(SF.el)return;const st=document.createElement('style');st.te
   const v=document.createElement('div');v.id='sfV';document.body.appendChild(c);document.body.appendChild(v);SF.el=c;SF.vgEl=v}
 function SF_init(){if(!SF.on||SF.P||typeof THREE==='undefined'||typeof scene==='undefined')return;SF_dom();const tex=SF_glowTex(),g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(SF_N*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(SF_N*3),3));g.setDrawRange(0,0);
-  const m=new THREE.Points(g,new THREE.PointsMaterial({size:.4,map:tex,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true,toneMapped:false}));
+  const m=new THREE.Points(g,new THREE.PointsMaterial({size:.32,map:tex,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true,toneMapped:false}));
   m.frustumCulled=false;m.name='sfJet';m.userData.gbG=1;m.renderOrder=5;SF.P={m,g,p:[]};for(let i=0;i<SF_N;i++)SF.P.p.push({l:0,L:1,x:0,y:0,z:0,vx:0,vy:0,vz:0});
   const sm=new THREE.SpriteMaterial({map:tex,color:new THREE.Color(.55,.9,1.3),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false});
   for(let i=0;i<2;i++){const sp=new THREE.Sprite(sm);sp.scale.setScalar(.001);sp.frustumCulled=false;sp.userData.gbG=1;sp.renderOrder=5;SF.glow.push(sp)}scene.add(m,...SF.glow)}
@@ -56,7 +56,7 @@ function SF_jets(s,on,dt){const t0=performance.now();if(!SF.P){SF_init();if(!SF.
   const em=on&&k>.3&&mesh&&bx&&s.mesh.visible&&!(SF.force&&SF.force.off);let n=0;const pos=P.g.attributes.position.array,col=P.g.attributes.color.array,pt=new THREE.Vector3(),bk=new THREE.Vector3();
   if(em){mesh.updateMatrixWorld();const fz=bx.hl/2.2,rs=B2K_rear(mesh),tz=bx.cz+rs*(bx.hl+SF_ext()+.24*fz+.3*k*fz),ty=bx.y0+Math.min(bx.hh*.4,.5*fz);bk.set(0,0,rs).transformDirection(mesh.matrixWorld);
     const rate=(B2K.bash?150:110)*(1+SF.fl),inv=new THREE.Matrix4().copy(par.matrixWorld).invert();
-    for(let u=0;u<2;u++){const sd=u?1:-1;pt.set(sd*bx.hw*.4,ty,tz).applyMatrix4(mesh.matrixWorld).applyMatrix4(inv);const g=SF.glow[u];g.position.copy(pt);g.scale.setScalar((1.3+.8*SF.fl+(B2K.bash?.4:0))*k*fz*(.9+.2*Math.random()));
+    for(let u=0;u<2;u++){const sd=u?1:-1;pt.set(sd*bx.hw*.4,ty,tz).applyMatrix4(mesh.matrixWorld).applyMatrix4(inv);const g=SF.glow[u];g.position.copy(pt);g.scale.setScalar((1+.6*SF.fl+(B2K.bash?.4:0))*k*fz*(.9+.2*Math.random()));
       const lp=SF.lastPos[u];let cnt=rate*dt+Math.random();for(const q of P.p){if(cnt<1)break;if(q.l>0)continue;cnt--;const f=Math.random();q.L=.12+Math.random()*.1;q.l=q.L;
         q.x=lp?lp.x+(pt.x-lp.x)*f:pt.x;q.y=lp?lp.y+(pt.y-lp.y)*f:pt.y;q.z=lp?lp.z+(pt.z-lp.z)*f:pt.z;const sp=4+Math.random()*4;q.vx=bk.x*sp+(Math.random()-.5);q.vy=bk.y*sp+Math.random()*.6;q.vz=bk.z*sp+(Math.random()-.5)}
       SF.lastPos[u]=(lp||new THREE.Vector3()).copy(pt);g.visible=true}}
