@@ -1,11 +1,11 @@
 {
  "fly2": {
-  "state": "9a8d39b91d7d6778",
-  "draw": "f3481a38cda091c0",
+  "state": "72bb31546e77a628",
+  "draw": "23e78a0821bca8c4",
   "frames": 1800,
   "samples": 30,
-  "rng": 1176,
-  "dcalls": 313,
+  "rng": 1033,
+  "dcalls": 290,
   "end": null
  },
  "endless10": {
