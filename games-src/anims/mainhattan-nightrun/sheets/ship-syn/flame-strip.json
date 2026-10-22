@@ -1,11 +1,11 @@
 {
  "frames": 4,
  "fps": 12,
- "w": 520,
- "h": 167,
+ "w": 522,
+ "h": 168,
  "anchor": [
-  260,
-  167
+  261,
+  168
  ],
  "order": [
   "strip-ship-syn-flame#1",

@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 365,
+ "anchor": [
+  260,
+  365
+ ],
+ "order": [
+  "strip-ship-ebait-death#1",
+  "strip-ship-ebait-death#2",
+  "strip-ship-ebait-death#3",
+  "strip-ship-ebait-death#4",
+  "strip-ship-ebait-death#5"
+ ]
+}

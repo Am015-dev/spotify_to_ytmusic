@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 520,
+ "h": 236,
+ "anchor": [
+  260,
+  236
+ ],
+ "order": [
+  "strip-ship-egturret-volley#1",
+  "strip-ship-egturret-volley#2",
+  "strip-ship-egturret-volley#3",
+  "strip-ship-egturret-volley#4"
+ ]
+}

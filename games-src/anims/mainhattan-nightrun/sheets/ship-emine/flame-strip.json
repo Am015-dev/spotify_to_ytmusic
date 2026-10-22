@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 522,
+ "h": 305,
+ "anchor": [
+  261,
+  305
+ ],
+ "order": [
+  "strip-ship-emine-flame#1",
+  "strip-ship-emine-flame#2",
+  "strip-ship-emine-flame#3",
+  "strip-ship-emine-flame#4"
+ ]
+}

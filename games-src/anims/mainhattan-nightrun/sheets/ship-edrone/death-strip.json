@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 308,
+ "anchor": [
+  260,
+  308
+ ],
+ "order": [
+  "strip-ship-edrone-death#1",
+  "strip-ship-edrone-death#2",
+  "strip-ship-edrone-death#3",
+  "strip-ship-edrone-death#4",
+  "strip-ship-edrone-death#5"
+ ]
+}

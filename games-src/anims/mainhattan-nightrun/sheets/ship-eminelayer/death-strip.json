@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 208,
+ "anchor": [
+  260,
+  208
+ ],
+ "order": [
+  "strip-ship-eminelayer-death#1",
+  "strip-ship-eminelayer-death#2",
+  "strip-ship-eminelayer-death#3",
+  "strip-ship-eminelayer-death#4",
+  "strip-ship-eminelayer-death#5"
+ ]
+}

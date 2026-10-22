@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 278,
+ "anchor": [
+  260,
+  278
+ ],
+ "order": [
+  "strip-ship-emine-death#1",
+  "strip-ship-emine-death#2",
+  "strip-ship-emine-death#3",
+  "strip-ship-emine-death#4",
+  "strip-ship-emine-death#5"
+ ]
+}

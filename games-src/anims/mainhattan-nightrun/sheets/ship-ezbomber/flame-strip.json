@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 522,
+ "h": 192,
+ "anchor": [
+  261,
+  192
+ ],
+ "order": [
+  "strip-ship-ezbomber-flame#1",
+  "strip-ship-ezbomber-flame#2",
+  "strip-ship-ezbomber-flame#3",
+  "strip-ship-ezbomber-flame#4"
+ ]
+}

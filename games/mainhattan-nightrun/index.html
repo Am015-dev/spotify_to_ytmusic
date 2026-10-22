@@ -2743,7 +2743,7 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
 ART.pend=0;ART.lowN=0;ART.q=[];
 ART.pump=()=>{while(ART.q.length&&ART.lowN<2&&ART.pend===0){const n=ART.q.shift();if(n in ART.bm)continue;ART.lowN++;ART.load(n,1);}};
 ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();if(!q)ART.pend++;let fin=false;const end=()=>{if(fin)return;fin=true;if(q)ART.lowN--;else ART.pend--;ART.pump();};
-  im.onload=()=>{const done=b=>{ART.bm[n]=b;end();};
+  im.onload=()=>{const done=b=>{ART.bm[n]=ART.fix?ART.fix(n,b):b;end();};
     /* effects made as light on a solid black square (no alpha): turn the black into transparency once, colours un-premultiplied, so they look right with normal blending and identical when drawn additively */
     if((n.startsWith('fx-')&&!n.startsWith('fx-fuse'))||n.startsWith('nv-ev-')){try{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
@@ -4001,7 +4001,7 @@ const FA={POSES,WHO,POSES_BOSS:POSES.concat(['attack2','enrage']),MACHINES:['dro
 window.FA=FA;
 /* ---- real pictures: ready.json lists the painted files; each is loaded once (a failed load is remembered and silently ignored) ---- */
 FA._base=()=>FA.base||(typeof ART!=='undefined'&&ART.base)||'media/';
-FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
+FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{if(typeof AFX!=='undefined')AFX.fixFoot(f,r);r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
 FA.ready=a=>{if(!Array.isArray(a))return;for(const f of a)if(typeof f==='string'&&f.indexOf('foot/')===0){FA._rd.add(f);FA._load(f);}};
 FA.init=()=>{if(FA._init)return;FA._init=true;if(typeof fetch==='function')fetch(FA._base()+'ready.json').then(r=>r.json()).then(FA.ready).catch(()=>{});};
 FA._pic=f=>{FA.init();const r=FA._im[f];return r&&r.ok?r.im:null;};
@@ -4666,7 +4666,7 @@ const env={get P(){return S.P;},get G(){return S.G||envG();},get D(){return S.D;
   spawn(t,x,y,o){if(!S||S.E.filter(e=>!e.dead).length>=16)return null;const e=spawn(t,x,y);e.lock=S.lock&&S.lock.id;return e;},
   shoot(e,a,spd,dmg,o){if(!S||S.dead)return;if(e.x<S.camX-10||e.x>S.camX+viewW()+10)return;   // never from off-screen
     if(e.ext){if(S.eb.length>=EBMAX||e.grace>0)return;o=o||{};const sp=(spd||300)*S.D.bs*((RET.asB&&RET.asB())||1),r=o.w||o.h?Math.max(4,Math.min(16,Math.max(o.w||0,o.h||0)/2)):6;
-      const sx=o.ox!=null?o.ox:e.x+e.facing*e.w*.45,sy=o.ground?FL-8:(o.oy!=null?o.oy:e.y-e.h*.62);
+      const mz=F.emz&&!o.ground&&F.emz(e,a),sx=mz?mz[0]:o.ox!=null?o.ox:e.x+e.facing*e.w*.45,sy=o.ground?FL-8:mz?mz[1]:(o.oy!=null?o.oy:e.y-e.h*.62);
       S.eb.push({x:sx,y:sy,vx:o.vx!=null?o.vx:Math.cos(a)*sp,vy:o.ground?0:Math.sin(a)*sp,r,dmg:dmg||1,life:o.life||4,grav:!!o.grav,src:e.id,c:o.kind==='sniper'?'#e8ff40':o.kind==='shock'||o.kind==='shockline'?'#7df9ff':'#ff4a6a',ground:!!o.ground});return;}
     if(S.q.length>=Math.round(QMAX*S.D.fr)&&!(o&&o.must))return;
     const t=Math.max(TELE,(o&&o.tele)||0)+Math.max(0,e.grace||0);e.tele=Math.max(e.tele,t);
@@ -4707,7 +4707,7 @@ function autoTarget(P){const up=I.u||I.y<-.5,vw=viewW(),fc=P.facing;
   for(const e of S.E){if(e.dead||!e.seen||!hittable(e))continue;const dx=(e.x-P.x)*fc;if(Math.abs(e.x-P.x)>vw)continue;if(dx>-20||(up&&Math.abs(e.x-P.x)<260&&e.y-e.h/2<P.y-70))return true;}
   for(const p of S.pr){if(p.hp<=0)continue;const dx=(p.x-P.x)*fc;if(dx>10&&dx<300&&p.x>S.camX&&p.x<S.camX+vw&&(p.y>=FL-1||up))return true;}
   return false;}
-function fire(P){const s=wstat(P.w,P.lv),w=s.w,lv=P.lv,a0=aimAngle(P),a=P.aim=aimAssist(P,a0,P.x,P.y-(P.crouch?26:44)),ox=P.x+Math.cos(a)*18,oy=P.y-(P.crouch?26:44)+Math.sin(a)*14;
+function fire(P){const s=wstat(P.w,P.lv),w=s.w,lv=P.lv,a0=aimAngle(P),a1=aimAssist(P,a0,P.x,P.y-(P.crouch?26:44)),a=P.aim=F.aimX?F.aimX(P,a1,a0):a1,ox0=P.x+Math.cos(a)*18,oy0=P.y-(P.crouch?26:44)+Math.sin(a)*14,mz=F.mz&&F.mz(P,a),ox=mz?mz[0]:ox0,oy=mz?mz[1]:oy0;   // streetfeel.js: from the drawn gun's muzzle
   S.shots++;P.shotT=.12;const pr=(t)=>({x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
   if(w.kind==='bul'){const sp=(w.spr||0)*(1-.12*(lv-1)),n=(P.w==='hmg'&&lv>=5)?2:(P.w==='pistol'&&lv>=3?2:1);
     for(let i=0;i<n;i++){const aa=a+ftRnd(-sp,sp)+(n>1?(i-.5)*.08:0);S.pb.push(pr({vx:Math.cos(aa)*w.spd,vy:Math.sin(aa)*w.spd,pierce:(P.w==='hmg'&&lv>=3)?1:0}));}}
@@ -5399,7 +5399,7 @@ const PLY=['sky','far','mid','near','floor'],PSP={sky:.02,far:.12,mid:.4,near:.7
 SL.paint=0;
 function slPainted(c,x0,w,cam,t0){const P={};for(const l of PLY){const q=slPic('bg-'+l);if(!q||!q.width)return false;P[l]=q;}
   const DH=(FL-t0)/.8,TW=2*DH,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;for(;x<x0+w;x+=TW)c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
-  const H=P.sky.height;tile('sky',t0-4,FL-t0+8,0,H);for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
+  const H=P.sky.height;tile('sky',t0-4,FL-t0+8,0,RET.artfix?Math.min(H,Math.round(H*(FL-t0+8)/DH)):H);/* artfix: the sky keeps its own aspect (only the rows above the street line, not the whole picture squeezed into them) */for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
   const DF=Math.max(DH,(VH+2-FL)/.2),fy=FL-.8*DF,r0=.69;tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
   SL.paint=1;return true;}
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
@@ -5444,7 +5444,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
     if(P.pw.shield){c.strokeStyle='#5ad1ff';c.lineWidth=2+P.pw.shield.lv;c.beginPath();c.arc(P.x,P.y-34,44,0,6.283);c.stroke();}
     if(P.dashIF>0){c.fillStyle='#19e3ff33';c.fillRect(P.x-24-P.facing*20,P.y-60,48,58);}
     P._xa=IN.kaiX(P);ART.fE=P;IN.drawWho(c,'kai',IN.ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);ART.fE=null;
-    if(P.shotT>0){const a=P.aim,mx=P.x+Math.cos(a)*28,mY=P.y-(P.crouch?26:44)+Math.sin(a)*20;if(!(window.AH&&AH.ftMuz(c,P.w,mx,mY,a))&&F.WEAPONS[P.w].kind!=='arc'){c.fillStyle='#fff';c.beginPath();c.arc(mx,mY,5,0,6.283);c.fill();}}c.restore();}
+    if(P.shotT>0){const a=P.aim,mq=F.mzAt&&F.mzAt(P),mx=mq?mq[0]:P.x+Math.cos(a)*28,mY=mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20;if(!(window.AH&&AH.ftMuz(c,P.w,mx,mY,a))&&F.WEAPONS[P.w].kind!=='arc'){c.fillStyle='#fff';c.beginPath();c.arc(mx,mY,5,0,6.283);c.fill();}}c.restore();}
   for(const b of S.pb){at(c,b.x,b.y,K);if(window.AH&&AH.ftBul(c,b)){c.restore();continue;}c.fillStyle=b.c;if(b.kind==='fire'){c.globalAlpha=Math.max(0,b.life*2);c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.globalAlpha=1;}else if(b.kind==='rkt'){c.fillRect(b.x-8,b.y-3,16,6);}else{c.fillRect(b.x-6,b.y-2,12,4);}c.restore();}
   for(const g of S.bombsL){at(c,g.x,g.y,K);if(window.AH&&AH.ftDraw(c,'fx-ft-grenade',g.x,g.y,22,S.time*7)){c.restore();continue;}c.fillStyle='#ffb020';c.beginPath();c.arc(g.x,g.y,7,0,6.283);c.fill();c.restore();}
   for(const b of S.eb){at(c,b.x,b.y,K);if(RET.read&&window.READ)READ.footEb(c,b);else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(b.x,b.y,b.r*.45,0,6.283);c.fill();}c.restore();}
@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='f4a40c3d7b 2026-10-22 16:50 UTC';
+const NR_STAMP='298a96a7f3 2026-10-22 17:26 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16320,7 +16320,7 @@ if(RET.pure){
     return r;};}
   {const y0=AU.lyDrum;AU.lyDrum=function(){return SND.on('m_drum')?y0.apply(this,arguments):0;};}
   {const t0=AU.tlsched;AU.tlsched=function(){return SND.on('m_tier')?t0.apply(this,arguments):undefined;};}
-  {const g0=AU.sting;AU.sting=function(n){if(running){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}}return g0.apply(this,arguments);};}
+  {const g0=AU.sting;AU.sting=function(n){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}return g0.apply(this,arguments);};}   // owner 22 Oct: jingles distort the music: off everywhere (menus and result screens too) unless switched on in the Lab
   {const s0=AU.sfx;AU.sfx=function(n){PURE.wire();
     if(running&&!SND.on(n)){PURE.blocked++;return;}
     const F0=this.fx;if(PURE.ok)this.fx=PURE.ok;PURE.played++;try{return s0.apply(this,arguments);}finally{this.fx=F0;}};}
@@ -16423,7 +16423,7 @@ const PIC={scrate:'sc-crate',gold:'sc-crate',barrel:'sc-barrel',kiosk:'sc-vendin
 const pic=n=>{const fa=window.FA;const q=fa&&fa._pic?fa._pic('foot/'+n+'.webp'):null;return q&&q.width?q:null;};
 function propDraw(p){return function(c,K,at){at(c,p.x,p.y,K);const fl=p.fl>0;let ok=false;
   if(p.k==='gold'){c.fillStyle='#ffd23a';c.globalAlpha=.22+.12*Math.sin(F.S.time*5);c.beginPath();c.ellipse(p.x,p.y-p.w*.45,p.w*.85,p.w*.7,0,0,6.283);c.fill();c.globalAlpha=1;}
-  if(p.k==='car'&&typeof ART!=='undefined'&&ART.ANIM&&ART.ANIM.s){const k='prop-car/loop',m=ART.ANIM.s[k];if(m&&ART.anim(k)){const h=p.w*m[3]/m[2];ART.drawAnim(c,k,0,p.x,p.y-h/2,h/m[3],false,1);ok=true;}}
+  if(p.k==='car'&&typeof ART!=='undefined'&&ART.ANIM&&ART.ANIM.s){const k='prop-car/loop',m=ART.ANIM.s[k];if(m&&ART.anim(k)){const h=p.w*m[3]/m[2];ART.drawAnim(c,k,0,p.x,p.y-h/2+(RET.feel?h*.09:0),h/m[3],false,1);ok=true;}}
   else{const q=pic(PIC[p.k]);if(q){const h=p.k==='barrel'?p.h:p.k==='kiosk'?p.h*1.05:p.k==='post'?p.h:p.w,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,p.y-h,w,h);ok=true;}}
   if(!ok){c.fillStyle=p.c;c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);}
   if(p.k==='barrel'){c.fillStyle='#ff3040';c.globalAlpha=.25+.2*Math.sin(F.S.time*8);c.beginPath();c.arc(p.x,p.y-p.h*.5,p.w*.8,0,6.283);c.fill();c.globalAlpha=1;}
@@ -16542,6 +16542,52 @@ if(RET.steady){
     return s0.apply(this,arguments);};}
   {const m0=AU.menuMusic;AU.menuMusic=function(){if(BT.stage&&BT.stage!=='menu'&&this.cur)return;return m0.apply(this,arguments);};}}
 
+// PURPOSE: your shots fly fast: every player bullet leaves at 1.8x speed with a longer streak
+// FLAG: snappy (?snappy=0 = the old 900 px/s shots)
+// TEST: fingerprint-test (state changes: shots hit sooner), qa/loadgate.js
+/* ---------- SNAPPY: owner, 22 Oct 2026: "the bullets are so slow fired". Player shots left at 520-1150 units/s (most at 900: 1.4 s to cross the field).
+   Each new player bullet is sped up once by K (homing ones by KH so they still turn), and its drawn streak is 1.5x longer. ---------- */
+if(RET.snappy===undefined)RET.snappy=!/[?&]snappy=0/.test(location.search);
+const SNAP=window.SNAP={K:1.8,KH:1.35,n:0,
+  tick(){if(!RET.snappy||!G||!G.pb)return;for(const b of G.pb){if(b._sn)continue;b._sn=1;const k=b.hk?this.KH:this.K;b.vx*=k;b.vy*=k;if(b.len)b.len*=1.5;this.n++;}}};
+NR.on('tick',()=>SNAP.tick());
+
+// PURPOSE: wiring fixes for painted art: flat backgrounds keyed out at load (sprites), white gaps keyed out of the street layers, the street sky drawn at its own aspect
+// FLAG: artfix (?artfix=0 = the old wiring)
+// TEST: qa/assetaudit.js (BLUR / DIST / OPAQUE / WHITE flags before and after); qa/loadgate.js
+/* ---------- ARTFIX (owner, 22 Oct 2026: "lots of assets not wired correctly: blurred, distorted, without the background removal").
+   ART.fix(n,b)   called by ART.load for every picture: a SPRITE (en-, spr-, pk-, fl-, char-) whose four corners are one flat opaque colour gets that colour flooded away from the
+                  edges with a soft 1-pixel edge. Scenes (corners differ), pictures that already have transparent corners, and a flood that would eat < 8% or > 92% are left alone.
+   AFX.fixFoot    called by footart.js when a media/foot/ picture has loaded: the street layers far/mid/near lose their enclosed WHITE gaps (the white key of the generator only
+                  reached the edges); an on-foot pose with a flat background is keyed like a sprite. The keyed copy is made once, at load, and cached by the loader. ---------- */
+if(RET.artfix===undefined)RET.artfix=!/[?&]artfix=0/.test(location.search);
+const AFX={log:{},KEY:/^(en|spr|pk|fl|char)-/,LAYER:/^foot\/bg-(far|mid|near)$/,POSE:/^foot\/(?!bg-)/};
+AFX.px=b=>{const w=b.naturalWidth||b.width,h=b.naturalHeight||b.height;if(!w||!h)return null;const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(b,0,0);
+  try{const id=g.getImageData(0,0,w,h);return{c,g,id,d:id.data,w,h};}catch(e){return null;}};
+/* flat colour at the four corners -> flood from the whole border, soft edge; returns the removed fraction (0 = untouched) */
+AFX.flat=o=>{const{d,w,h}=o,N=w*h,cs=[0,w-1,(h-1)*w,N-1].map(p=>[d[p*4],d[p*4+1],d[p*4+2],d[p*4+3]]);if(cs.some(c=>c[3]<250))return 0;
+  const m=[0,1,2].map(k=>(cs[0][k]+cs[1][k]+cs[2][k]+cs[3][k])/4);if(cs.some(c=>Math.abs(c[0]-m[0])+Math.abs(c[1]-m[1])+Math.abs(c[2]-m[2])>60))return 0;
+  const T=30,S=80,dist=p=>Math.abs(d[p*4]-m[0])+Math.abs(d[p*4+1]-m[1])+Math.abs(d[p*4+2]-m[2]),seen=new Uint8Array(N),st=new Int32Array(N);let sp=0,n=0;
+  const push=p=>{if(!seen[p]&&dist(p)<=T){seen[p]=1;st[sp++]=p;}};
+  for(let x=0;x<w;x++){push(x);push((h-1)*w+x);}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1);}
+  while(sp){const p=st[--sp],x=p%w;n++;if(x>0)push(p-1);if(x<w-1)push(p+1);if(p>=w)push(p-w);if(p<N-w)push(p+w);}
+  if(n<N*.08||n>N*.92)return 0;
+  for(let p=0;p<N;p++)if(seen[p])d[p*4+3]=0;
+  for(let p=0;p<N;p++){if(seen[p])continue;const x=p%w;if(!((x>0&&seen[p-1])||(x<w-1&&seen[p+1])||(p>=w&&seen[p-w])||(p<N-w&&seen[p+w])))continue;const q=dist(p);if(q<S)d[p*4+3]=Math.round(d[p*4+3]*Math.max(0,q-T)/(S-T));}
+  return n/N;};
+/* enclosed near-white gaps (a lit sky seen through the buildings) -> transparent; small white specks (highlights) stay; returns the removed fraction */
+AFX.white=o=>{const{d,w,h}=o,N=w*h,lo=p=>Math.min(d[p*4],d[p*4+1],d[p*4+2]),isW=p=>lo(p)>228&&d[p*4+3]>200,seen=new Uint8Array(N),rem=new Uint8Array(N),st=new Int32Array(N),cm=Math.max(120,N*.00006);let tot=0;
+  for(let s=0;s<N;s++){if(seen[s]||!isW(s))continue;let sp=0,n=0;const from=[];seen[s]=1;st[sp++]=s;while(sp){const p=st[--sp],x=p%w;n++;from.push(p);const nb=[x>0?p-1:-1,x<w-1?p+1:-1,p>=w?p-w:-1,p<N-w?p+w:-1];for(const q of nb)if(q>=0&&!seen[q]&&isW(q)){seen[q]=1;st[sp++]=q;}}
+    if(n>=cm){for(const p of from)rem[p]=1;tot+=n;}}
+  if(!tot)return 0;for(let p=0;p<N;p++)if(rem[p])d[p*4+3]=0;
+  for(let p=0;p<N;p++){if(rem[p]||d[p*4+3]===0)continue;const x=p%w;if(!((x>0&&rem[p-1])||(x<w-1&&rem[p+1])||(p>=w&&rem[p-w])||(p<N-w&&rem[p+w])))continue;const l=lo(p);if(l>170)d[p*4+3]=Math.round(d[p*4+3]*Math.max(0,Math.min(1,(250-l)/80)));}
+  return tot/N;};
+AFX.run=(id,b,fn)=>{try{const o=AFX.px(b);if(!o)return null;const k=fn(o);if(!k)return null;o.g.putImageData(o.id,0,0);AFX.log[id]=+k.toFixed(3);return o.c;}catch(e){return null;}};
+ART.fix=(n,b)=>{if(!RET.artfix||!b||!AFX.KEY.test(n)||n.indexOf('anim/')===0)return b;return AFX.run(n,b,AFX.flat)||b;};
+AFX.fixFoot=(f,r)=>{if(!RET.artfix||!r||!r.im)return;const id=f.replace(/\.webp$/,'');let c=null;
+  if(AFX.LAYER.test(id))c=AFX.run(id,r.im,AFX.white);else if(AFX.POSE.test(id))c=AFX.run(id,r.im,AFX.flat);
+  if(c)r.im=c;};
+
 // PURPOSE: one menu style: one plate shape (rounded rectangle), one font family, one solid selected/focus ring, no dashed lines,
 //          a desktop title that uses the screen, and one size ladder for ships, pickups and bullets in play
 // FLAG: ui2 (?ui2=0 = the old painted skewed plates and sizes)
@@ -16615,6 +16661,92 @@ html.ui2 .tdBar button{border-radius:var(--u2r)!important}
    a turret (r 20, k 3.1 = 62 px). With ui2 every mapped enemy uses the same k, so picture size follows hit size: drone 59 < turret 84 < heavies,
    all below the player ship; leaders stay a quarter larger. Bosses and the native sheets (gunship, kamikaze, fleet) are untouched. Art only. */
 if(RET.ui2&&window.ENEMY_ART)for(const id in ENEMY_ART){const a=ENEMY_ART[id];if(!a||a.native||typeof a.k!=='number')continue;a.k=4.2;if(a.L&&typeof a.L.k==='number')a.L.k=5.25;}
+
+// PURPOSE: Street feel: feet that grip the road (run frames tied to ground speed, bob, dust, lean, skid), one body scale, bullets from the gun's muzzle, a Kai sprite set per weapon
+// FLAG: feel (?feel=0)
+// TEST: qa/streetfeel-test.js
+/* ---------- STREETFEEL. Owner, 22 Oct 2026: "the art is completely fine as a sprite; the issue is it does not look like it is running; the hero is significantly smaller
+   than the rest; the taxi is like a toy; ... it shoots but bullets fly not from the gun; gun variation should select the correct sprite; running sprites look like they slide".
+   ?feel=0 = the street exactly as before. Tables below are measured from the strip sheets (alpha > 60): BODY = tallest visible body / frame height, MZ = gun muzzle per
+   frame in sheet px from the feet anchor (facing right), ST = foot spread at contact (one step) in sheet px. Slots for missing art: ART-SLOTS-STREET.md. ---------- */
+if(RET.feel===undefined)RET.feel=!/[?&]feel=0/.test(location.search);
+(function(){
+if(!window.FOOT||!FOOT._in||typeof ART==='undefined'||!ART.footDraw)return;
+const F=window.FOOT,IN=F._in,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const FEEL=F.FEEL={
+  BODY:{"kai/aimdiag":0.988,"kai/aimup":0.992,"kai/crouchshoot":0.992,"kai/hurt":1.0,"kai/idle":1.0,"kai/melee":0.992,"kai/run":0.996,"kai/runshoot":0.992,"kai/shoot":0.996,"kai/victory":1.0,
+    "knife/idle":0.988,"knife/melee":0.984,"knife/run":0.984,"knife/shoot":0.914,"gunman/idle":0.988,"gunman/melee":0.996,"gunman/run":0.988,"gunman/shoot":0.988,
+    "bruiser/idle":0.992,"bruiser/melee":0.996,"bruiser/run":0.992,"bruiser/shoot":0.996},
+  MZ:{"kai/aimdiag":[[62,-223],[61,-223],[53,-254]],"kai/aimup":[[34,-224],[41,-254],[36,-234]],"kai/crouchshoot":[[116,-203],[137,-206],[115,-198]],
+    "kai/runshoot":[[120,-208],[102,-207],[72,-206],[93,-206],[83,-207],[98,-206]],"kai/shoot":[[76,-211],[61,-211],[54,-211]],
+    "knife/shoot":[[73,-193],[28,-90],[66,-192]],"gunman/shoot":[[75,-208],[31,-208],[74,-208]],"bruiser/shoot":[[99,-193],[82,-205],[97,-210]]},
+  ST:{"kai/run":146,"knife/run":162,"gunman/run":156,"bruiser/run":173,"kai/runshoot":185},
+  H:{kai:64,rusher:64,gunner:64,heavy:80,bigheavy:90},   // one body height per kind: heavy = 1.25 x Kai
+  log:{dust:0,skid:0,shots:0,mzErr:[]}};
+if(!RET.feel)return;
+const RUNA={run:1,runshoot:1,walk:1};
+const sheetOf=k=>{const i=k.indexOf('/');return [k.slice(0,i),k.slice(i+1)];};
+/* weapon sets: kai-<weapon>/<act> sheets (ART-SLOTS-STREET.md) replace kai/<act> act by act the moment they are listed in ready.json */
+const wset=(P)=>{const ws='kai-'+P.w;if(!ART.ANIM.s[ws+'/idle']&&!ART.ANIM.s[ws+'/shoot']&&!ART.ANIM.s[ws+'/run'])return 'kai';
+  if(!ART.FM[ws]){const o=Object.assign({},ART.FM.kai);o._all=ART.FM.kai._all.filter(a=>ART.ANIM.s[ws+'/'+a]);o._w=0;ART.FM[ws]=o;}return ws;};
+/* the act footDraw will pick (same rule as art.js) */
+const actOf=(who,pose,e)=>{const mp=ART.FM[who];if(!mp)return '';let a=e._xa||mp[pose];if(a&&!ART.ANIM.s[who+'/'+a]&&RET.streetlook)for(const b of (ART.FB[pose]||[]))if(ART.ANIM.s[who+'/'+b]){a=b;break;}return a||'';};
+/* per entity: ground distance, speed, lean, contact dust */
+function track(e,x,t){const S=F.S;const now=S?S.time:t;if(e._fx==null){e._fx=x;e._ft=now;e._fd=0;e._lv=0;e._ln=0;}
+  const dt=now-e._ft;if(dt>0){let dx=x-e._fx;if(abs(dx)>60)dx=0;e._fd+=abs(dx);const v=dx/dt;const acc=(v-e._lv)/Math.max(dt,1/240);e._lv=v;e._ft=now;
+    const want=clamp(acc/9000,-.12,.12)*(abs(v)>20||abs(acc)>400?1:0);e._ln+=(want-e._ln)*Math.min(1,dt*10);}
+  e._fx=x;}
+const fd0=ART.footDraw;
+ART.footDraw=function(c,who,pose,x,y,h,flip,t){const e=ART.fE,S=F.S;if(!RET.feel||!e||!S)return fd0.apply(this,arguments);
+  if(who==='kai'&&e===S.P){const ws=wset(e);if(ws!=='kai'&&ART.ANIM.s[ws+'/'+actOf(ws,pose,e)])who=ws;}
+  track(e,x,t);
+  const act=actOf(who,pose,e),key=act&&who+'/'+act,m=key&&ART.ANIM.s[key];
+  // scale: the visible body, not the frame, is h tall (standing acts)
+  const base=who.indexOf('kai')===0?'kai':who,bk=FEEL.BODY[base+'/'+act],ref=FEEL.BODY[base+'/idle'];if(bk&&ref&&!/crouch|die|jump|land|dash/.test(act))h*=ref/bk;
+  let tt=t,bob=0;
+  if(m&&RUNA[act]&&abs(e._lv)>5){const o=ART.aS(key),n=m[0],sc=h/m[3],step=(FEEL.ST[base+'/'+act]||FEEL.ST[base+'/run']||m[2]*.8)*sc,cyc=2*step;
+    const ph=(e._fd/cyc)%1,fi=Math.floor(ph*n),fr=ph*n-fi,a0=fi?o.cum[fi-1]:0;tt=a0+(o.cum[fi]-a0)*fr;   // frame = distance / stride: the planted foot moves with the road
+    if(e._fa!==key){e._fa=key;}e._f0=0;bob=-abs(Math.sin(ph*2*Math.PI))*h*.025;
+    const half=Math.floor(ph*2);if(e._hc!==half){e._hc=half;if(e._hc!=null&&(e===S.P?e.onGround:!e.fly)&&window.AH&&S.fx.length<200){AH.ftPush(S.fx,'fx-ft-dust',x-(flip?-1:1)*h*.12,y-3,h*.42,.28);FEEL.log.dust++;}}}
+  else e._hc=null;
+  const ln=e._ln||0;c.save();c.translate(x,y+bob);if(ln)c.rotate(ln);   // lean into a start, back on a stop
+  const r=fd0.call(this,c,who,pose,0,0,h,flip,tt);c.restore();
+  // remember where this frame's gun is (bullets and the flash come from it)
+  const kk=e._fa;if(r&&kk){const[kw,ka]=sheetOf(kk),mz=FEEL.MZ[(kw.indexOf('kai')===0?'kai':kw)+'/'+ka],mm=ART.ANIM.s[kk];
+    if(mz&&mm){const i=Math.min(mz.length-1,ART.aframe(kk,tt-(e._f0||0))),sc=h/mm[3];const q=rot([mz[i][0]*sc*(flip?-1:1),mz[i][1]*sc],ka,flip,e._ln);e._mzd=[q[0],q[1]+bob,kk,i,S.time];}else e._mzd=null;}
+  return r;};
+/* muzzle in world units: the drawn offset under streetlook's K (actors are drawn K x about their feet, bullets are placed through SL.my) */
+const rot=(d,act,flip,ln)=>{const sm=ART.ANIM.sm,th=(RUNA[act]&&sm&&sm.lean?sm.lean.run_deg*Math.PI/180*(flip?-1:1):0)+(ln||0);if(!th)return d;const c=Math.cos(th),s=Math.sin(th);return [d[0]*c-d[1]*s,d[0]*s+d[1]*c];};   // art.js leans run acts about the feet; ours adds start/stop lean
+const inv=(Y)=>{const L=F.look;if(!L||!L.my)return Y;let lo=-400,hi=FL;if(Y>=FL)return Y;for(let i=0;i<30;i++){const md=(lo+hi)/2;if(L.my(md)<Y)lo=md;else hi=md;}return (lo+hi)/2;};
+const toWorld=(x,y,dx,dy)=>{const L=F.look,K=RET.streetlook&&L?L.k:1;const sy=L&&L.my&&RET.streetlook?L.my(y):y;return [x+dx*K,RET.streetlook&&L&&L.my?inv(sy+dy*K):y+dy];};
+/* the act Kai's shot will show (kaiX / ppose rules), for the first frame of a burst before it is drawn */
+function kaiShotAct(P,a){if(P.crouch)return 'crouchshoot';if(!P.onGround)return '';const el=abs(Math.sin(a||0));return el>.8?'aimup':el>.3?'aimdiag':abs(P.vx)>5?'runshoot':'shoot';}
+function localMz(e,act,h,flip){const mz=FEEL.MZ[act],mm=ART.ANIM.s[act];if(!mz||!mm)return null;const a2=act.slice(act.indexOf('/')+1),base=act.slice(0,act.indexOf('/'));
+  const bk=FEEL.BODY[act],ref=FEEL.BODY[base+'/idle'];if(bk&&ref&&!/crouch/.test(a2))h*=ref/bk;const sc=h/mm[3];let i=0;
+  if(RUNA[a2]&&e._fd!=null){const cyc=2*(FEEL.ST[act]||FEEL.ST[base+'/run'])*sc,ph=((e._fd+abs(e.x-e._fx))/cyc)%1;i=Math.floor(ph*mm[0]);}   // the frame the next draw will show
+  else if(e._fa&&e._fa.slice(e._fa.indexOf('/')+1)===a2&&e._mzd&&F.S.time-e._mzd[4]<.2)i=ART.aframe(e._fa,F.S.time-(e._f0||0));   // the act is already showing: its frame at this time
+  i=Math.min(mz.length-1,i);return rot([mz[i][0]*sc*(flip?-1:1),mz[i][1]*sc],a2,flip,e._ln);}
+F.mz=(P,a)=>{if(!RET.feel)return null;const act=kaiShotAct(P,a),h=P.crouch?44:P.h,fl=P.facing<0;let d=act&&localMz(P,'kai/'+act,act==='crouchshoot'?h:FEEL.H.kai,fl);
+  if(!d)d=[(fl?-1:1)*h*.32,-h*.62];   // no shot sheet for this pose (in the air): hand height on the facing side
+  const w=toWorld(P.x,P.y,d[0],d[1]);P._mzw=[w[0],w[1],a,F.S.time];FEEL.log.shots++;return w;};
+/* the gun sits higher than the old shot line (shoulder height in the art): with no foe in the aim cone, a shot along the ground dips onto the crate or barrel ahead */
+F.aimX=(P,a,a0)=>{if(!RET.feel||a!==a0||!P.onGround||P.crouch||abs(Math.sin(a))>.2)return a;const S=F.S,fc=P.facing,act=kaiShotAct(P,a);
+  const d=(act&&localMz(P,'kai/'+act,FEEL.H.kai,fc<0))||[fc*P.h*.32,-P.h*.62],w=toWorld(P.x,P.y,d[0],d[1]);let best=null,bd=340;
+  for(const p of S.pr){if(p.hp<=0||p.gone||p.pass)continue;const dx=(p.x-w[0])*fc;if(dx>20&&dx<bd&&p.y-p.h>w[1]-4){bd=dx;best=p;}}
+  if(!best)return a;const b=Math.atan2(best.y-best.h*.55-w[1],best.x-w[0]);return abs(Math.sin(b))<.28?b:a;};   // never steep enough to switch Kai to the diagonal aim pose
+F.emz=(e,a)=>{if(!RET.feel||!e||!e.ext)return null;const sh={rusher:'knife',gunner:'gunman',heavy:'bruiser',bigheavy:'bruiser'}[e.id];if(!sh)return null;
+  const d=localMz(e,sh+'/shoot',e.h,e.facing<0)||[e.facing*e.h*.32,-e.h*.62];const w=toWorld(e.x,e.y,d[0],d[1]);e._mzw=[w[0],w[1],a,F.S.time];return w;};
+F.mzAt=P=>RET.feel&&P._mzw&&F.S&&F.S.time-P._mzw[3]<.15?P._mzw:null;
+/* skid: a hard turn at speed shows the landing crouch for a moment, with dust */
+const kx0=IN.kaiX;IN.kaiX=function(P){const S=F.S,r=kx0.apply(this,arguments);if(!RET.feel||!S)return r;
+  const v=P.vx||0,pv=P._pvx||0;P._pvx=v;if(P.onGround&&abs(pv)>150&&(Math.sign(v)!==Math.sign(pv)||abs(v)<20)&&!P._skT){P._skT=.14;FEEL.log.skid++;if(window.AH)AH.ftPush(S.fx,'fx-ft-dust',P.x,P.y-4,40,.3);}
+  if(P._skT>0){P._skT-=1/60;if(P._skT<=0)P._skT=0;if(!r&&P.onGround&&!(P.shotT>0)&&!P.crouch&&ART.ANIM.s['kai/land'])return 'land';}return r;};
+/* body heights (STREET2.md scale line): Kai = rusher = gunner, heavy 1.25 x */
+const FE=window.FOOT_ENEMIES||{};for(const id of ['rusher','gunner','heavy','bigheavy'])if(FE[id]&&FEEL.H[id])FE[id].h=FEEL.H[id];
+/* props at real size vs a 1.8 m Kai (64 units = 1.8 m, 35.6 units per metre): taxi 4.5 x 1.5 m, kiosk 2.4 m, barrel 0.9 m */
+const PD=IN.PROPD;if(PD.car){PD.car.w=160;PD.car.h=54;}if(PD.kiosk)PD.kiosk.h=86;if(PD.barrel){PD.barrel.h=34;PD.barrel.w=24;}
+if(ART.PROPS)for(const p of ART.PROPS){if(p[0]==='car')p[1]=120;else if(p[0]==='police')p[1]=124;}   // the parked cars on the far kerb (0.7 parallax): 3/4 of a near taxi
+})();
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;
