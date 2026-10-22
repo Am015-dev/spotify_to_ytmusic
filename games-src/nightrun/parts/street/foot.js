@@ -163,7 +163,7 @@ function aimAngle(P){const up=I.u||I.y<-.5,dn=I.d||I.y>.5,mx=I.r?1:I.l?-1:(Math.
   if(up)return mx?(mx>0?-Math.PI/4:-Math.PI*3/4):-Math.PI/2;
   if(dn&&!P.onGround)return mx?(mx>0?Math.PI/4:Math.PI*3/4):Math.PI/2;
   return P.facing>0?0:Math.PI;}
-function aimAssist(P,a,ox,oy){let best=a,bd=.3;for(const e of S.E){if(e.dead||!e.seen)continue;const dx=e.x-ox,dy=e.y-e.h/2-oy;if(dx*dx+dy*dy>640*640)continue;let d=Math.atan2(dy,dx)-a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;if(Math.abs(d)<bd){bd=Math.abs(d);best=a+d;}}return best;}   // 8-way aim + a small cone (0.3 rad) toward the closest enemy in it
+function aimAssist(P,a,ox,oy){let best=a,bd=S.st.aimCone||.3;for(const e of S.E){if(e.dead||!e.seen)continue;const dx=e.x-ox,dy=e.y-e.h/2-oy;if(dx*dx+dy*dy>640*640)continue;let d=Math.atan2(dy,dx)-a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;if(Math.abs(d)<bd){bd=Math.abs(d);best=a+d;}}return best;}   // 8-way aim + a small cone (0.3 rad) toward the closest enemy in it
 /* auto-fire (touch default): shoot while an enemy (or a floor prop) is on screen on the side you face, or above you when the stick aims up */
 function autoTarget(P){const up=I.u||I.y<-.5,vw=viewW(),fc=P.facing;
   for(const e of S.E){if(e.dead||!e.seen||!hittable(e))continue;const dx=(e.x-P.x)*fc;if(Math.abs(e.x-P.x)>vw)continue;if(dx>-20||(up&&Math.abs(e.x-P.x)<260&&e.y-e.h/2<P.y-70))return true;}
@@ -206,7 +206,7 @@ function boom(x,y,rad,dmg){AH.ftPush(S.fx,'fx-ft-rocket-hit',x,y,rad*2.4,.35);if
   for(const e of S.E)if(!e.dead&&circHit(x,y,rad,ebox(e)))dmgE(e,dmg,{pierce:1});
   for(const p of S.pr)if(p.hp>0&&circHit(x,y,rad,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h}))hitProp(p,dmg);
   for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(Math.hypot(b.x-x,b.y-y)<rad)S.eb.splice(i,1);}}
-function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x,p.y-p.h/2,p.c,14);S.score+=50;pop(p.x,p.y-p.h,'+50','#ccc');const D=PROPD[p.k].dr;drop(D[p.i%D.length],p.x,p.y-p.h/2);sfx('hit');}}
+function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x,p.y-p.h/2,p.c,14);S.score+=50;pop(p.x,p.y-p.h,'+50','#ccc');const D=p.dr||PROPD[p.k].dr;if(D.length)drop(D[p.i%D.length],p.x,p.y-p.h/2);if(p.onBreak)p.onBreak(p);sfx('hit');}}   // street2: p.dr = own rewards ([] = none), p.onBreak = debris / blast
 
 function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.min(FL,P.y+P.vy*dt);return;}
   const mx=I.r?1:I.l?-1:(Math.abs(I.x)>.25?clamp(I.x*1.4,-1,1):0),spdLv=P.pw.speed?P.pw.speed.lv:0,spd=230*(1+.15*spdLv);
@@ -295,7 +295,7 @@ function stepShots(dt){const P=S.P,slow=P.pw.slow?.45:1;
       if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.life=0;b.bo=1;break;}
       b.hit.push(e);const dd=b.kind==='fire'?b.dmg:b.dmg;dmgE(e,dd,b);if(b.burn)e.burn=2;if(b.kb&&!e.boss)e.vx+=Math.sign(b.vx)*b.kb;
       AH.ftHit(S.fx,b.wid,b.x,b.y);ftBurst(b.x,b.y,b.c,2,140);if(b.pierce>0){b.pierce--;}else{b.life=0;break;}}
-    if(b.life>0)for(const p of S.pr){if(p.hp<=0)continue;if(circHit(b.x,b.y,b.r,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h})){if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.bo=1;}else hitProp(p,b.kind==='fire'?b.dmg*.5:1);b.life=0;break;}}
+    if(b.life>0)for(const p of S.pr){if(p.hp<=0||p.pass)continue;if(circHit(b.x,b.y,b.r,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h})){if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.bo=1;}else hitProp(p,b.kind==='fire'?b.dmg*.5:1);b.life=0;break;}}
     if(b.x<S.camX-60||b.x>S.camX+viewW()+60||b.y<-80)b.life=0;}
   S.pb=S.pb.filter(b=>b.life>0);if(S.pb.length>160)S.pb.splice(0,S.pb.length-160);
   const pb_=pbox(P);
@@ -555,5 +555,5 @@ if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');F.ui=1;start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
-F._in={L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
+F._in={boom,hitProp,ftHurt,ftBurst,dmgE,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
 return F;})();

@@ -100,7 +100,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
   c.translate(-S.camX,0);const lo=S.camX-exl,hi=S.camX+vw+exr;
   for(const [px,py,pw] of S.st.plats){const y=my(py);c.fillStyle='#3a2a52';c.fillRect(px,y,pw,10);c.fillStyle='#19e3ff';c.fillRect(px,y,pw,2);}
   if(S.cp==null&&S.st.cp){c.fillStyle='#19e3ff55';c.fillRect(S.st.cp-2,FL-1.2*CH*K,4,1.2*CH*K);c.fillStyle='#19e3ff';c.fillRect(S.st.cp-2,FL-1.2*CH*K,22,12);}
-  for(const p of S.pr){if(p.hp<=0&&!p.fl)continue;const hd=Math.min(p.h,1.25*CH),up=p.y<FL-1;
+  for(const p of S.pr){if(p.hp<=0&&!p.fl)continue;if(p.draw){try{if(p.draw(c,K,at))continue;}catch(x){}}const hd=Math.min(p.h,1.25*CH),up=p.y<FL-1;   // street2: props with their own picture
     if(up){const y=my(p.y);c.fillStyle='#1d1834';c.fillRect(p.x-3*K,y,6*K,FL-y);c.fillRect(p.x-12*K,FL-4*K,24*K,4*K);}   // a sign stands on its pole
     at(c,p.x,p.y,K);SL.tag='bprop';c.fillStyle=p.fl>0?'#fff':p.c;c.fillRect(p.x-p.w/2,p.y-hd,p.w,hd);SL.tag='';c.strokeStyle='#ffffff55';c.lineWidth=2;c.strokeRect(p.x-p.w/2+2,p.y-hd+2,p.w-4,hd-4);c.restore();}
   const PK=F.PICKUPS;

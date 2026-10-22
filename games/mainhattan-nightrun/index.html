@@ -4701,7 +4701,7 @@ function aimAngle(P){const up=I.u||I.y<-.5,dn=I.d||I.y>.5,mx=I.r?1:I.l?-1:(Math.
   if(up)return mx?(mx>0?-Math.PI/4:-Math.PI*3/4):-Math.PI/2;
   if(dn&&!P.onGround)return mx?(mx>0?Math.PI/4:Math.PI*3/4):Math.PI/2;
   return P.facing>0?0:Math.PI;}
-function aimAssist(P,a,ox,oy){let best=a,bd=.3;for(const e of S.E){if(e.dead||!e.seen)continue;const dx=e.x-ox,dy=e.y-e.h/2-oy;if(dx*dx+dy*dy>640*640)continue;let d=Math.atan2(dy,dx)-a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;if(Math.abs(d)<bd){bd=Math.abs(d);best=a+d;}}return best;}   // 8-way aim + a small cone (0.3 rad) toward the closest enemy in it
+function aimAssist(P,a,ox,oy){let best=a,bd=S.st.aimCone||.3;for(const e of S.E){if(e.dead||!e.seen)continue;const dx=e.x-ox,dy=e.y-e.h/2-oy;if(dx*dx+dy*dy>640*640)continue;let d=Math.atan2(dy,dx)-a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;if(Math.abs(d)<bd){bd=Math.abs(d);best=a+d;}}return best;}   // 8-way aim + a small cone (0.3 rad) toward the closest enemy in it
 /* auto-fire (touch default): shoot while an enemy (or a floor prop) is on screen on the side you face, or above you when the stick aims up */
 function autoTarget(P){const up=I.u||I.y<-.5,vw=viewW(),fc=P.facing;
   for(const e of S.E){if(e.dead||!e.seen||!hittable(e))continue;const dx=(e.x-P.x)*fc;if(Math.abs(e.x-P.x)>vw)continue;if(dx>-20||(up&&Math.abs(e.x-P.x)<260&&e.y-e.h/2<P.y-70))return true;}
@@ -4744,7 +4744,7 @@ function boom(x,y,rad,dmg){AH.ftPush(S.fx,'fx-ft-rocket-hit',x,y,rad*2.4,.35);if
   for(const e of S.E)if(!e.dead&&circHit(x,y,rad,ebox(e)))dmgE(e,dmg,{pierce:1});
   for(const p of S.pr)if(p.hp>0&&circHit(x,y,rad,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h}))hitProp(p,dmg);
   for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(Math.hypot(b.x-x,b.y-y)<rad)S.eb.splice(i,1);}}
-function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x,p.y-p.h/2,p.c,14);S.score+=50;pop(p.x,p.y-p.h,'+50','#ccc');const D=PROPD[p.k].dr;drop(D[p.i%D.length],p.x,p.y-p.h/2);sfx('hit');}}
+function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x,p.y-p.h/2,p.c,14);S.score+=50;pop(p.x,p.y-p.h,'+50','#ccc');const D=p.dr||PROPD[p.k].dr;if(D.length)drop(D[p.i%D.length],p.x,p.y-p.h/2);if(p.onBreak)p.onBreak(p);sfx('hit');}}   // street2: p.dr = own rewards ([] = none), p.onBreak = debris / blast
 
 function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.min(FL,P.y+P.vy*dt);return;}
   const mx=I.r?1:I.l?-1:(Math.abs(I.x)>.25?clamp(I.x*1.4,-1,1):0),spdLv=P.pw.speed?P.pw.speed.lv:0,spd=230*(1+.15*spdLv);
@@ -4833,7 +4833,7 @@ function stepShots(dt){const P=S.P,slow=P.pw.slow?.45:1;
       if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.life=0;b.bo=1;break;}
       b.hit.push(e);const dd=b.kind==='fire'?b.dmg:b.dmg;dmgE(e,dd,b);if(b.burn)e.burn=2;if(b.kb&&!e.boss)e.vx+=Math.sign(b.vx)*b.kb;
       AH.ftHit(S.fx,b.wid,b.x,b.y);ftBurst(b.x,b.y,b.c,2,140);if(b.pierce>0){b.pierce--;}else{b.life=0;break;}}
-    if(b.life>0)for(const p of S.pr){if(p.hp<=0)continue;if(circHit(b.x,b.y,b.r,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h})){if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.bo=1;}else hitProp(p,b.kind==='fire'?b.dmg*.5:1);b.life=0;break;}}
+    if(b.life>0)for(const p of S.pr){if(p.hp<=0||p.pass)continue;if(circHit(b.x,b.y,b.r,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h})){if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.bo=1;}else hitProp(p,b.kind==='fire'?b.dmg*.5:1);b.life=0;break;}}
     if(b.x<S.camX-60||b.x>S.camX+viewW()+60||b.y<-80)b.life=0;}
   S.pb=S.pb.filter(b=>b.life>0);if(S.pb.length>160)S.pb.splice(0,S.pb.length-160);
   const pb_=pbox(P);
@@ -5093,7 +5093,7 @@ if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');F.ui=1;start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
-F._in={L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
+F._in={boom,hitProp,ftHurt,ftBurst,dmgE,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
 return F;})();
 
 // PURPOSE: the finished on-foot stage (7 sections, Warden gate)
@@ -5420,7 +5420,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
   c.translate(-S.camX,0);const lo=S.camX-exl,hi=S.camX+vw+exr;
   for(const [px,py,pw] of S.st.plats){const y=my(py);c.fillStyle='#3a2a52';c.fillRect(px,y,pw,10);c.fillStyle='#19e3ff';c.fillRect(px,y,pw,2);}
   if(S.cp==null&&S.st.cp){c.fillStyle='#19e3ff55';c.fillRect(S.st.cp-2,FL-1.2*CH*K,4,1.2*CH*K);c.fillStyle='#19e3ff';c.fillRect(S.st.cp-2,FL-1.2*CH*K,22,12);}
-  for(const p of S.pr){if(p.hp<=0&&!p.fl)continue;const hd=Math.min(p.h,1.25*CH),up=p.y<FL-1;
+  for(const p of S.pr){if(p.hp<=0&&!p.fl)continue;if(p.draw){try{if(p.draw(c,K,at))continue;}catch(x){}}const hd=Math.min(p.h,1.25*CH),up=p.y<FL-1;   // street2: props with their own picture
     if(up){const y=my(p.y);c.fillStyle='#1d1834';c.fillRect(p.x-3*K,y,6*K,FL-y);c.fillRect(p.x-12*K,FL-4*K,24*K,4*K);}   // a sign stands on its pole
     at(c,p.x,p.y,K);SL.tag='bprop';c.fillStyle=p.fl>0?'#fff':p.c;c.fillRect(p.x-p.w/2,p.y-hd,p.w,hd);SL.tag='';c.strokeStyle='#ffffff55';c.lineWidth=2;c.strokeRect(p.x-p.w/2+2,p.y-hd+2,p.w-4,hd-4);c.restore();}
   const PK=F.PICKUPS;
@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='16e4ba7368 2026-10-22 16:34 UTC';
+const NR_STAMP='8ba96d99fa 2026-10-22 16:58 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16320,7 +16320,7 @@ if(RET.pure){
     return r;};}
   {const y0=AU.lyDrum;AU.lyDrum=function(){return SND.on('m_drum')?y0.apply(this,arguments):0;};}
   {const t0=AU.tlsched;AU.tlsched=function(){return SND.on('m_tier')?t0.apply(this,arguments):undefined;};}
-  {const g0=AU.sting;AU.sting=function(n){if(running){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}}return g0.apply(this,arguments);};}
+  {const g0=AU.sting;AU.sting=function(n){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}return g0.apply(this,arguments);};}   // owner 22 Oct: jingles distort the music: off everywhere (menus and result screens too) unless switched on in the Lab
   {const s0=AU.sfx;AU.sfx=function(n){PURE.wire();
     if(running&&!SND.on(n)){PURE.blocked++;return;}
     const F0=this.fx;if(PURE.ok)this.fx=PURE.ok;PURE.played++;try{return s0.apply(this,arguments);}finally{this.fx=F0;}};}
@@ -16402,6 +16402,128 @@ if(RET.clean)LGB.HK={n:1.35,r:1.35,'':1.35,s:1.35};
 /* no word pop-ups in play: PERFECT, ON BEAT, CHAIN n, GRAZE, OVERHEAT are dropped (score numbers stay) */
 if(RET.clean){const fl=floater;floater=function(x,y,txt){if(running&&typeof txt==='string'&&/PERFECT|ON BEAT|CHAIN|GRAZE|OVERHEAT|COMBO|NICE|GREAT/i.test(txt))return;return fl.apply(this,arguments);};}
 
+// PURPOSE: Street 2: the Zeil street run rebuilt as a 90 s arc with breakable cover, 3 foe behaviours and a choice every ~15 s
+// FLAG: street2 (?street2=0)
+// TEST: qa/street2-test.js
+/* ---------- STREET2 (design: games-src/nightrun/STREET2.md). Owner, 22 Oct 2026 (2/100): "on foot is extremely boring, very repetitive, not strategic,
+   no variety, maybe destructible items, size of the assets is not correct". Replaces FOOT.STAGES.zeil when RET.street2 is on (?street2=0 = footstage.js's
+   7-section stage exactly). 6 rooms of ~15 s: rushers, a gunner behind a car (high path / low path), a heavy baited into a red barrel, a gold crate under
+   fire, two gunners, the big heavy. Cover stops bullets from both sides and breaks (debris, some hold a reward). No captions during play.
+   Engine hooks used (foot.js): p.dr / p.onBreak / p.pass on props, F._in.boom/hitProp/ftHurt/dmgE; streetlook.js: p.draw(c,K,at) draws a prop's picture. ---------- */
+if(RET.street2===undefined)RET.street2=!/[?&]street2=0/.test(location.search);
+(function(){
+if(!RET.street2||!RET.foot||!window.FOOT||!FOOT._in||!FOOT.STAGES)return;
+const F=window.FOOT,IN=F._in,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1,clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const FE=window.FOOT_ENEMIES=window.FOOT_ENEMIES||{},FBS=window.FOOT_BOSS=window.FOOT_BOSS||{};
+const S2=F.S2={log:null};
+/* ----- props: own kinds (only this stage places them), pictures from the existing sc-* sheets and the car strip ----- */
+Object.assign(IN.PROPD,{car:{hp:9,w:104,h:52,c:'#3a4a66',dr:[]},barrel:{hp:1,w:28,h:40,c:'#d0303a',dr:[]},kiosk:{hp:7,w:56,h:78,c:'#2a8ad0',dr:[]},
+  scrate:{hp:4,w:44,h:42,c:'#7a5a30',dr:[]},gold:{hp:4,w:44,h:42,c:'#ffd23a',dr:[]},post:{hp:5,w:54,h:62,c:'#ff2d95',dr:[]}});
+const PIC={scrate:'sc-crate',gold:'sc-crate',barrel:'sc-barrel',kiosk:'sc-vending',post:'sc-neon-sign'};
+const pic=n=>{const fa=window.FA;const q=fa&&fa._pic?fa._pic('foot/'+n+'.webp'):null;return q&&q.width?q:null;};
+function propDraw(p){return function(c,K,at){at(c,p.x,p.y,K);const fl=p.fl>0;let ok=false;
+  if(p.k==='gold'){c.fillStyle='#ffd23a';c.globalAlpha=.22+.12*Math.sin(F.S.time*5);c.beginPath();c.ellipse(p.x,p.y-p.w*.45,p.w*.85,p.w*.7,0,0,6.283);c.fill();c.globalAlpha=1;}
+  if(p.k==='car'&&typeof ART!=='undefined'&&ART.ANIM&&ART.ANIM.s){const k='prop-car/loop',m=ART.ANIM.s[k];if(m&&ART.anim(k)){const h=p.w*m[3]/m[2];ART.drawAnim(c,k,0,p.x,p.y-h/2,h/m[3],false,1);ok=true;}}
+  else{const q=pic(PIC[p.k]);if(q){const h=p.k==='barrel'?p.h:p.k==='kiosk'?p.h*1.05:p.k==='post'?p.h:p.w,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,p.y-h,w,h);ok=true;}}
+  if(!ok){c.fillStyle=p.c;c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);}
+  if(p.k==='barrel'){c.fillStyle='#ff3040';c.globalAlpha=.25+.2*Math.sin(F.S.time*8);c.beginPath();c.arc(p.x,p.y-p.h*.5,p.w*.8,0,6.283);c.fill();c.globalAlpha=1;}
+  const dmg=1-p.hp/p.mhp;if(dmg>.3&&p.k!=='barrel'){c.strokeStyle='#05030c';c.lineWidth=2;c.beginPath();c.moveTo(p.x-p.w*.3,p.y-p.h*.8);c.lineTo(p.x,p.y-p.h*.5);c.lineTo(p.x-p.w*.1,p.y-p.h*.2);if(dmg>.6){c.moveTo(p.x+p.w*.3,p.y-p.h*.9);c.lineTo(p.x+p.w*.05,p.y-p.h*.45);}c.stroke();}
+  if(fl){c.globalAlpha=.5;c.fillStyle='#fff';c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);c.globalAlpha=1;}
+  c.restore();return true;};}
+function debris(S,p){for(let i=0;i<10;i++)S.fx.push({x:p.x+(Math.random()-.5)*p.w,y:p.y-p.h*Math.random(),vx:(Math.random()-.5)*420,vy:-160-Math.random()*320,l:.7,c:p.k==='gold'?'#ffd23a':p.c,r:3+Math.random()*3});}
+function barrelBlast(S,p){IN.boom(p.x,FL-24,95,7);const P=S.P;if(abs(P.x-p.x)<70&&P.y>FL-100)IN.ftHurt(1,p.x,'blast');
+  for(const e of S.E)if(!e.dead&&e.heavy&&abs(e.x-p.x)<120){e.stun=2.4;e.state='stun';e.sT=0;IN.dmgE(e,e.max*.3,{pierce:1,blast:1});}}
+/* ----- foes: rusher (knife sheet), gunner (gunman sheet), heavy (bruiser sheet). They move themselves (ext), feet on the road. ----- */
+F.drawX=F.drawX||{};for(const [id,sh] of [['rusher','knife'],['gunner','gunman'],['heavy','bruiser'],['bigheavy','bruiser']])F.drawX[id]=(c,pose,x,y,h,flip,t,col)=>{IN.drawWho(c,sh,pose,x,y,h,flip,t,col);};
+function wrap(def,fn){def.touch=0;def.ai=function(e,dt,env){if(!e._i){e._i=1;e.sT=0;e.state='in';e.y=FL;e.facing=sgn(env.P.x-e.x);e.born=env.G.time;}
+    e.sT+=dt;e.y=FL;if(e.state==='dead'){e.vx=0;e.tele=0;e.wind=0;if(e.sT>.5)e.remove=true;return;}fn(e,dt,env);};
+  def.onDeath=function(e){e.state='dead';e.sT=0;e.tele=0;e.wind=0;const L=def.drops||[];e.dropList=L.length&&Math.random()<(def.dropP||0)?[L[Math.floor(Math.random()*L.length)]]:[];};return def;}
+function go(e,s){e.state=s;e.sT=0;}
+function walk(e,env,v,dt){const G=env.G,lo=G.camX+e.w/2,hi=G.camX+G.viewW-e.w/2,nx=e.x+v*dt;if(!e.seen||(nx>=lo&&nx<=hi))e.x=nx;e.vx=v;}
+const age=(e,env)=>e.seenAt2==null?0:env.G.time-e.seenAt2;
+FE.rusher=wrap({hp:3,w:28,h:62,score:120,c:'#ff4a9a',drops:['heal','bomb'],dropP:.12,
+  pose:e=>e.state==='dead'?'die':e.flash>0?'hit':e.state==='crouch'?'crouch':e.state==='lunge'?'melee':abs(e.vx)>5?(Math.floor(e.t*8)%2?'run-a':'run-b'):'idle'},
+  (e,dt,env)=>{const P=env.P,dx=P.x-e.x;
+    if(e.state==='in'||e.state==='run'){e.facing=sgn(dx);walk(e,env,e.facing*300,dt);if(e.state==='in')go(e,'run');if(abs(dx)<120&&e.grace<=0&&abs(P.y-e.y)<120)go(e,'crouch');}
+    else if(e.state==='crouch'){e.vx=0;e.tele=.4-e.sT;if(e.sT>=.4){go(e,'lunge');e.tele=0;}}
+    else if(e.state==='lunge'){walk(e,env,e.facing*860,dt);env.melee(e,{x:e.x-20,y:e.y-50,w:40,h:50},1);if(e.sT>=.3)go(e,'rest');}
+    else if(e.state==='rest'){e.vx=0;if(e.sT>=.5)go(e,'back');}
+    else if(e.state==='back'){e.facing=sgn(dx);walk(e,env,-e.facing*240,dt);if(e.sT>=.55||abs(dx)>220)go(e,'run');}});   // backs off after a lunge: a clear shot
+FE.gunner=wrap({hp:3,w:30,h:64,score:200,c:'#e07a2a',drops:['w_hmg','w_shot','heal'],dropP:.25,
+  canHit:e=>!e.hid,
+  pose:e=>e.state==='dead'?'die':e.flash>0?'hit':e.hid?'crouch':e.tele>0||e.state==='pop'?'shoot':abs(e.vx)>5?(Math.floor(e.t*7)%2?'run-a':'run-b'):'idle'},
+  (e,dt,env)=>{const P=env.P,S=F.S,dx=P.x-e.x;e.facing=sgn(dx);
+    const cov=e.cov&&e.cov.hp>0&&!e.cov.gone?e.cov:null;
+    if(!cov&&e.state!=='charge'){let best=null,bd=1e9;for(const p of S.pr)if(p.hp>0&&!p.gone&&p.cover&&!(p.claim&&p.claim!==e&&!p.claim.dead)&&p.x>P.x+90&&p.x<env.G.camX+env.G.viewW-20&&abs(p.x-e.x)<bd){bd=abs(p.x-e.x);best=p;}
+      e.cov=best;if(best)best.claim=e;if(!best&&e.state!=='open')go(e,'open');}
+    if(age(e,env)>14&&e.state!=='charge'){go(e,'charge');e.hid=false;}
+    if(e.state==='charge'){walk(e,env,abs(dx)>120?e.facing*170:abs(dx)<90?-e.facing*120:0,dt);e.hid=false;e.cd=(e.cd||1)-dt;if(e.cd<=0&&abs(dx)<400){e.cd=1.8;env.shoot(e,Math.atan2(P.y-40-(e.y-40),dx),330,1);}return;}
+    const c2=e.cov&&e.cov.hp>0?e.cov:null;
+    if(c2){const side=sgn(c2.x-P.x)||1,tx=c2.x+side*(c2.w/2+16);if(abs(tx-e.x)>6){walk(e,env,sgn(tx-e.x)*150,dt);e.hid=false;return;}e.vx=0;
+      const flank=sgn(e.x-c2.x)!==sgn(P.x-c2.x)?false:true,above=P.y<FL-70&&abs(dx)<300;
+      e.cd=(e.cd==null?1.4:e.cd)-dt;
+      if(e.state!=='pop'){e.hid=!(flank||above);if(e.cd<=0){go(e,'pop');e.hid=false;e.tele=.5;}}
+      else{e.hid=false;if(e.sT>=.5&&(e.fired|0)<2&&e.sT>=.5+.2*(e.fired|0)){e.fired=(e.fired|0)+1;const sy=e.y-44;env.shoot(e,Math.atan2(P.y-40-sy,dx),360,1,{oy:sy});}if(e.sT>=1){e.fired=0;go(e,'hide');e.cd=1.7+Math.random()*.6;}}
+      if(flank||above)e.hid=false;return;}
+    // no cover left: in the open, keeps range and fires
+    e.hid=false;const want=230;walk(e,env,abs(dx)>want+30?e.facing*150:abs(dx)<want-60?-e.facing*110:0,dt);
+    e.cd=(e.cd==null?1:e.cd)-dt;if(e.cd<=0&&e.tele<=0&&!e.tw){e.tele=.5;e.tw=1;}if(e.tw&&e.tele<=0){e.tw=0;e.cd=2.2;env.shoot(e,Math.atan2(P.y-40-(e.y-44),dx),360,1,{oy:e.y-44});}});
+function heavyDef(hp,h,w,score,boss){return wrap({hp,w,h,score,c:'#a03050',heavyK:1,drops:['heal','w_rocket'],dropP:boss?0:.6,
+  onHit(e,d,env,hit){if(e.state==='dead')return;const front=hit&&!hit.melee&&hit.x!=null&&sgn(hit.x-e.x)===e.facing&&e.state!=='stun';if(front)e.hp+=d*.7;else if(e.state==='stun')e.hp-=d;},
+  pose:e=>e.state==='dead'?'die':e.state==='stun'?'hit':e.flash>0?'hit':e.state==='wind'?'crouch':e.state==='charge'?'melee':abs(e.vx)>5?(Math.floor(e.t*5)%2?'run-a':'run-b'):'idle'},
+  (e,dt,env)=>{const P=env.P,S=F.S,dx=P.x-e.x;e.heavy=1;e.label=e.state==='stun'?'OPEN':'';
+    if(e.state==='in'||e.state==='walk'){e.facing=sgn(dx);walk(e,env,abs(dx)>140?e.facing*70:0,dt);if(e.state==='in')go(e,'walk');e.cd=(e.cd==null?1.6:e.cd)-dt;if(e.cd<=0&&e.grace<=0&&e.seen)go(e,'wind');}
+    else if(e.state==='wind'){e.vx=0;e.tele=.8-e.sT;if(e.sT>=.8){e.tele=0;go(e,'charge');e.chX=e.x;}}
+    else if(e.state==='charge'){walk(e,env,e.facing*(boss?560:520),dt);env.melee(e,{x:e.x-e.w/2,y:e.y-e.h,w:e.w,h:e.h},boss?2:1);
+      for(const p of S.pr)if(p.hp>0&&!p.gone&&abs(p.x-e.x)<p.w/2+e.w/2){if(p.k==='barrel'){IN.hitProp(p,5);}else IN.hitProp(p,99);}
+      const G=env.G,wall=e.x<=G.camX+e.w/2+2||e.x>=G.camX+G.viewW-e.w/2-2;if(e.state==='charge'&&(e.sT>=1.1||wall)){const tired=age(e,env)>15;go(e,wall||tired?'stun':'walk');if(wall||tired)e.stun=tired?2:1;e.cd=boss?1.3:2.6;}}
+    else if(e.state==='stun'){e.vx=0;if(e.sT>=(e.stun||2.2)){go(e,'walk');e.cd=boss?1.6:2.2;}}});}
+FE.heavy=heavyDef(22,84,46,500,false);
+FBS.bigheavy=FE.bigheavy=heavyDef(120,96,54,3000,true);   // ext bosses get x0.3 hp in the engine: 120 -> 36
+/* ----- the stage ----- */
+const ROOMS=[{n:'THE STREET',x:0},{n:'BEHIND THE CAR',x:1450},{n:'THE HEAVY',x:2450},{n:'KIOSK ROW',x:3450},{n:'TWO WAYS',x:4450},{n:'CLIMAX',x:5450}];
+const w=(x,enemy,count,gap,o)=>Object.assign({x,enemy,count,gap},o||{}),k=(lock,enemy,count,gap,delay,o)=>Object.assign({lock,enemy,count,gap,delay},o||{});
+const ST={n:'ZEIL UNDERPASS',len:6500,song:'stage2',cp:3450,cps:[3450],fs:1,s2:1,aimCone:.8,   // aimCone: wide aim help so the high path can shoot down behind cover
+
+  plats:[[1780,372,190],[4790,362,200]],
+  props:[[520,'scrate',{dr:['w_shot']}],[760,'scrate'],[980,'gold',{dr:['w_hmg']}],[1150,'scrate'],
+    [1800,'scrate',{cover:1}],[1990,'car',{cover:1}],[2200,'post'],
+    [2790,'scrate',{cover:1}],[2880,'barrel'],[3120,'scrate'],
+    [3800,'scrate',{cover:1}],[3880,'gold',{dr:['heal']}],[3990,'kiosk',{cover:1}],[4200,'scrate'],
+    [4790,'scrate',{cover:1}],[4960,'scrate',{cover:1}],[5040,'kiosk',{cover:1}],[5250,'post'],
+    [5800,'scrate',{cover:1}],[5900,'barrel'],[6110,'barrel'],[6200,'kiosk',{cover:1}]],
+  pk:[[2400,'ammo'],[4400,'heal'],[5600,'ammo']],
+  waves:[w(420,'rusher',2,1.4),k('A','rusher',4,1.2,0),k('A','rusher',1,1,4,{side:'l'}),
+    w(1500,'rusher',1,1),k('B','gunner',1,1,0),k('B','rusher',2,2.5,4),
+    k('C','heavy',1,1,0),k('C','rusher',1,1,7,{side:'l'}),
+    w(3300,'rusher',2,1.2),k('D','gunner',1,1,0),k('D','rusher',4,1.6,2.5),
+    k('E','gunner',1,1,0),k('E','gunner',1,1,3.5),k('E','rusher',2,2,5,{side:'l'})],
+  locks:[{id:'A',x:900},{id:'B',x:1950},{id:'C',x:2900},{id:'D',x:3900},{id:'E',x:4950}],
+  boss:{x:6000,id:'bigheavy'},
+  tale:F.STAGES.zeil&&F.STAGES.zeil.tale};
+const roomOf=S=>{let r=0;for(let i=0;i<ROOMS.length;i++)if(S.P.maxX>=ROOMS[i].x-200)r=i;return r;};
+ST.hook={
+  step(S,dt,env){const P=S.P;if(!S.s2){S.s2={broke:0,life:[],adds:0,addT:0,rooms:[]};S2.log=S.s2;
+      for(const p of S.pr){const o=(ST.props[p.i]||[])[2]||{},d=IN.PROPD[p.k];p.mhp=p.hp;p.cover=!!o.cover;p.dr=o.dr||(p.k==='scrate'&&p.i%3===0?[['heal','bomb','w_shot','w_rocket'][p.i%4]]:[]);p.draw=propDraw(p);
+        p.onBreak=q=>{S.s2.broke++;debris(S,q);if(q.k==='barrel')barrelBlast(S,q);};}}
+    const f=S.s2;S.note.t=0;   // no captions or chips during play
+    const r=roomOf(S);if(f.rooms[f.rooms.length-1]!==r){f.rooms.push(r);}
+    for(const p of S.pr)p.pass=p.hp>0&&p.cover&&abs(p.x-P.x)<p.w/2+70;   // the cover Kai stands at: his shots go over it
+    for(const e of S.E)if(!e.dead&&!e.seen&&!e._sd&&!e.boss){e._sd=1;const G=env.G;if(abs(e.x-P.x)<260&&!e.fly){const other=e.x>P.x?G.camX-40:G.camX+G.viewW+40;if(abs(other-P.x)>=260)e.x=other;}}   // never spawn on top of Kai: come in from the far side
+    for(const e of S.E){if(e.seen&&e.seenAt2==null)e.seenAt2=S.time;if(e.dead&&!e._s2){e._s2=1;if(e.seenAt2!=null){f.life.push(+(S.time-e.seenAt2).toFixed(1));if(e.boss)f.bossLife=+(S.time-e.seenAt2).toFixed(1);}}}
+    // enemy bullets: cover stops them and wears down
+    for(const b of S.eb){if(b.life<=0)continue;for(const p of S.pr){if(p.hp<=0||p.gone||p.k==='barrel')continue;if(b.x>p.x-p.w/2-b.r&&b.x<p.x+p.w/2+b.r&&b.y>p.y-p.h-b.r&&b.y<p.y+4){b.life=0;IN.hitProp(p,.5);break;}}}
+    // climax: rushers keep coming while the big heavy stands (max 3 at once)
+    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<3){F.env.spawn('rusher',f.adds++%2?S.camX-40:S.camX+env.G.viewW+40,null);}}},
+  draw(c,S){},
+  hud(c,vw,u,box,fs,S){const x0=vw*.18,bw=vw*.64,y=540-14*u,h=6*u,pr=clamp(S.P.maxX/ST.boss.x,0,1);
+    c.fillStyle='#ffffff22';c.fillRect(x0,y,bw,h);c.fillStyle='#19e3ff';c.fillRect(x0,y,bw*pr,h);
+    for(const s of ROOMS.slice(1)){const sx=x0+bw*s.x/ST.boss.x;c.fillStyle=S.P.maxX>=s.x?'#ffd23a':'#ffffff88';c.fillRect(sx-1.5*u,y-3*u,3*u,h+6*u);}
+    box(x0,y-8*u,bw,h+16*u);},
+  rows(S,rows){rows.splice(3,0,['BROKEN',String(S.s2?S.s2.broke:0)]);}};
+F.STAGES.zeil=ST;F.SEC=ROOMS;
+})();
+
 // PURPOSE: the song changes only when the district changes, and keeps playing (no restart) between stages and through the menus
 // FLAG: steady (?steady=0 = a new song every stage, menu song between stages)
 // TEST: qa/loadgate.js (no page errors); fingerprint-test (sim: no audio)
@@ -16419,6 +16541,80 @@ if(RET.steady){
     if(stage!=='menu'&&c&&c.stage===stage&&BT.stage===stage&&BT.mode==='file'){this.want=null;this.wantT=0;return;}   // same song: keep it running
     return s0.apply(this,arguments);};}
   {const m0=AU.menuMusic;AU.menuMusic=function(){if(BT.stage&&BT.stage!=='menu'&&this.cur)return;return m0.apply(this,arguments);};}}
+
+// PURPOSE: one menu style: one plate shape (rounded rectangle), one font family, one solid selected/focus ring, no dashed lines,
+//          a desktop title that uses the screen, and one size ladder for ships, pickups and bullets in play
+// FLAG: ui2 (?ui2=0 = the old painted skewed plates and sizes)
+// TEST: qa/loadgate.js (no page errors), fingerprint-test.js (state hashes); looks reviewed in UI2-REVIEW.md (1440x860, 1280x720, 390x763)
+/* ---------- UI2: owner, 22 Oct 2026: "the game on PC is ugly, the menus are ugly, the selections look like sloppy dashes",
+   "size of the assets is not correct". The painted plates (ui-btn-*.webp) are skewed parallelograms whose bevels eat the label, they sat next
+   to rectangular info boxes, and sub-labels used a monospace face. With ui2 every button is the same flat rounded plate (role by colour:
+   pink = primary, cyan / violet = secondary), all text is the display face, selected = filled plate + solid ring, keyboard focus = solid
+   cyan ring, and every dashed border or outline in the menus is drawn solid. ---------- */
+if(RET.ui2===undefined)RET.ui2=!/[?&]ui2=0/.test(location.search);
+if(RET.ui2){
+  document.documentElement.classList.add('ui2');
+  const st=document.createElement('style');st.id='ui2css';
+  st.textContent=`
+html.ui2{--mono:var(--display);--u2r:10px;--u2line:#4a3b7a;--u2fill:linear-gradient(180deg,#22184a,#150e30);--u2ring:#49e6ff}
+html.ui2 button.go,html.ui2 .pg button.go,html.ui2 #setm .sfoot button.go,html.ui2 button.go.alt,html.ui2 button.go.dim{
+  background:var(--u2fill)!important;border:1.5px solid var(--u2line)!important;border-radius:var(--u2r)!important;clip-path:none!important;
+  color:var(--ink)!important;text-shadow:none!important;box-shadow:inset 0 1px 0 #ffffff14,0 2px 10px #0008;padding:.5em 1.1em!important;
+  font-family:var(--display)!important;letter-spacing:.08em;line-height:1.15;filter:none!important;transition:border-color .12s,background .12s,transform .12s;overflow:visible}
+html.ui2 button.go small{font-family:var(--display)!important;font-weight:500!important;letter-spacing:.02em!important;text-transform:none;opacity:.78;color:var(--ink)}
+html.ui2 button.go:hover{border-color:#fff!important;background:linear-gradient(180deg,#2d2160,#1b1240)!important;transform:translateY(-1px)}
+html.ui2 button.go:focus-visible,html.ui2 button:focus-visible,html.ui2 [tabindex]:focus-visible{outline:none!important;box-shadow:0 0 0 2px #05030c,0 0 0 4px var(--u2ring)!important}
+html.ui2 button.go.on,html.ui2 button.go[aria-selected=true],html.ui2 button.go[aria-pressed=true]{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.ui2 #playBtn,html.ui2 #resumeBtn,html.ui2 #srNext,html.ui2 #againBtn{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important;letter-spacing:.14em}
+html.ui2 #playBtn small{opacity:.92}
+html.ui2 #playBtn:hover,html.ui2 #resumeBtn:hover,html.ui2 #srNext:hover,html.ui2 #againBtn:hover{background:linear-gradient(180deg,#ff78c4,#d4368d)!important}
+html.ui2 .row>button.go{white-space:nowrap;align-self:stretch}
+html.ui2 .hubDot{top:-6px!important;right:-6px!important;width:14px;height:14px}
+html.ui2 #hubStat,html.ui2 #sgTile,html.ui2 .hub-story{border-radius:var(--u2r)!important;border:1.5px solid var(--u2line)!important;background:#0b0720e6!important;font-family:var(--display)!important}
+html.ui2 #sgTile{border-left:4px solid #ffb547!important;width:100%!important;max-width:none!important;margin:0!important;box-sizing:border-box}
+html.ui2 #hubStory{padding:0!important;margin:0!important;width:100%}
+html.ui2 .eyebrow{letter-spacing:.18em}
+html.ui2 .keys kbd,html.ui2 .keys span:nth-child(odd){border-radius:6px}
+html.ui2 .gfChip{border-radius:var(--u2r)!important;border-style:solid!important}
+html.ui2 #gaCards .card .pp{display:flex;gap:2px;max-width:220px}
+html.ui2 #gaCards .card .pp i{flex:1 1 0;height:6px!important;border-radius:3px}
+html.ui2 #setm .card{border:1.5px solid var(--u2line)!important;border-image:none!important;border-radius:14px!important;background:#0a061cf2!important}
+html.ui2 #setm .card h2{background:none!important;font-style:normal!important;border-bottom:1.5px solid var(--u2line);text-shadow:none!important}
+html.ui2 #setm .seg,html.ui2 #setm .sl{background:#140d2ee6!important;border:1.5px solid var(--u2line);border-radius:var(--u2r);padding:10px 16px!important;margin-bottom:8px}
+html.ui2 #setm,html.ui2 #setm *{font-style:normal!important}
+html.ui2 #setm .seg button{border-radius:8px!important;border:1.5px solid var(--u2line)!important;background:var(--u2fill)!important;color:var(--ink)!important}
+html.ui2 #setm .seg button[aria-pressed="true"]{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.ui2 #garage .tabs{gap:6px}
+html.ui2 #garage .tabs button.go{padding:.4em .5em!important;letter-spacing:.03em;font-size:clamp(12px,3.3vw,16px)!important;min-width:0}
+html.ui2 #hubJump{padding:8px 12px 8px!important;gap:8px!important}
+html.ui2 #hubJump button{border-radius:8px!important;border:1.5px solid var(--u2line)!important;background:var(--u2fill)!important;color:var(--ink)!important}
+html.ui2 .tdBar button{border-radius:var(--u2r)!important}
+@media (min-width:1024px) and (min-height:640px){
+  html.ui2 #title .in{left:0;right:0;padding-left:max(6vw,48px)!important;box-sizing:border-box}
+  html.ui2 #title h1{font-size:clamp(64px,min(7vw,13vh),112px)!important}
+  html.ui2 #title .lede{font-size:clamp(17px,1.5vw,22px)!important;max-width:40ch}
+  html.ui2 #title .eyebrow{font-size:clamp(13px,1.05vw,16px)!important}
+  html.ui2 #ttMain{max-width:none!important;width:clamp(460px,36vw,600px)!important;gap:14px!important}
+  html.ui2 #playBtn{min-height:clamp(76px,10vh,96px)!important;font-size:clamp(22px,1.9vw,30px)!important}
+  html.ui2 #playBtn small{font-size:clamp(14px,1.05vw,17px)!important}
+  html.ui2 #hubGrid{gap:14px!important}
+  html.ui2 #hubGrid .go{min-height:clamp(60px,8vh,76px)!important;font-size:clamp(16px,1.3vw,20px)!important}
+  html.ui2 #hubGrid .go small{font-size:clamp(13px,.95vw,15px)!important}
+  html.ui2 #hubStat,html.ui2 #sgTile{font-size:clamp(15px,1.1vw,17px)!important;padding:10px 16px!important}
+}`;
+  document.head.appendChild(st);
+  /* every dashed line in the menu CSS (parts inject their own <style> at load and later) is drawn solid */
+  const solid=()=>{for(const sh of document.styleSheets){let rs;try{rs=sh.cssRules;}catch(e){continue;}
+    const fix=list=>{for(const r of list){if(r.cssRules)fix(r.cssRules);const s=r.style;if(!s)continue;
+      for(const p of ['border-style','border-top-style','border-right-style','border-bottom-style','border-left-style','outline-style'])if(s.getPropertyValue(p)==='dashed'||s.getPropertyValue(p)==='dotted')s.setProperty(p,'solid',s.getPropertyPriority(p));}};
+    fix(rs);}};
+  solid();addEventListener('load',solid);setTimeout(solid,1500);
+  new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(n=>n.tagName==='STYLE')))solid();}).observe(document.head,{childList:true});
+}
+/* in play: one size ladder. foeart drew each enemy at k x its hit radius with k from 2.3 to 5.1, so a weak drone (r 14, k 5.1 = 71 px) out-sized
+   a turret (r 20, k 3.1 = 62 px). With ui2 every mapped enemy uses the same k, so picture size follows hit size: drone 59 < turret 84 < heavies,
+   all below the player ship; leaders stay a quarter larger. Bosses and the native sheets (gunship, kamikaze, fleet) are untouched. Art only. */
+if(RET.ui2&&window.ENEMY_ART)for(const id in ENEMY_ART){const a=ENEMY_ART[id];if(!a||a.native||typeof a.k!=='number')continue;a.k=4.2;if(a.L&&typeof a.L.k==='number')a.L.k=5.25;}
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;
