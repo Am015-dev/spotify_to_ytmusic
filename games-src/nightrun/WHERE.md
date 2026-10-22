@@ -14,7 +14,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | footq | footq fix 34-40 | flavor |  | footq | ASSET-POLICY |
 | leak | leak LEAK 14-136 |  | holdline | ret-leak |  |
 | zoo | zoo ZOO 14-254 |  |  | zoo |  |
-| vary,vary2 | formations fmSide 74-256 |  |  | vary |  |
+| vary,vary2,hudband | formations fmSide 74-256 |  |  | vary |  |
 | vary | stagescripts VARY 82-191 |  |  | vary |  |
 | remix | remix RMX 14-48 |  |  | remix |  |
 | variants | variants VAR.apply 49-66 |  |  | variants |  |

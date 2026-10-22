@@ -1,6 +1,6 @@
 // PURPOSE: formation library (VARIETY A)
-// FLAG: vary (?vary=0), vary2 (?vary2=0)
-// TEST: vary-test.js
+// FLAG: vary (?vary=0), vary2 (?vary2=0), hudband (?hudband=0)
+// TEST: vary-test.js, hudband-test.js
 /* ---------- formations.js: the formation library (VARIETY A, owner 18 Oct 2026: "Game is extremely repetitive"). Flag RET.vary; ?vary=0 = the old waves exactly.
    A formation is a SPATIAL idea, not a recolour of one row: pincers from top and bottom, an X that converges, a snake on a path, a spiral, a wall whose gap moves...
    Every entry declares
@@ -290,3 +290,10 @@ FM.swN=.3;
 {const aw=SH.award;SH.award=function(e,keep){if(!RET.vary||!e||!e.fid||e.type!=='swarm')return aw.call(this,e,keep);const k=this.nx;this.nx=k*FM.swN;try{return aw.call(this,e,keep);}finally{this.nx=k;}};}
 NR.on('beat',()=>{if(RET.vary)FM.tickTel();});
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{FM.draw(t);}catch(err){}};}
+/* review 9 fix 3 (E04): on a phone the world is turned upright, so world x near W is the top of the screen, under the score strip, chips and boss bar (92 HUD units,
+   HK scaled). Hovering enemies rest in zoo slots up to x = W-62, and pacing.js (STAY AND FIGHT) creeps a flyer at 0.3 speed from x = W-110 for 4 s; both now start no higher than band + radius. Flying in through the band is untouched. ?hudband=0 = as before. */
+if(RET.hudband===undefined)RET.hudband=!/[?&]hudband=0/.test(location.search);
+const HB=window.HB={band(){return 92*HK;},maxX(r){return W-this.band()-(r||16)-4;},on(){return !!RET.hudband&&!!rotMode;}};
+{const sl=ZOO.slot;ZOO.slot=function(e,x0,x1){if(!HB.on())return sl.call(this,e,x0,x1);const m=HB.maxX(e&&e.r),b=Math.min(x1==null?W-90:x1,m),a=Math.min(x0==null?W*.42:x0,b-20);return sl.call(this,e,a,b);};}
+NR.on('tick',()=>{if(!HB.on()||!G.live||G.dead)return;for(const e of G.en){if(e.zst!==1||e.type==='boss'||e.hp<=0)continue;const m=HB.maxX(e.r);if(e.x>m){e.x=m;if(e.zs)e.zs.x=Math.min(e.zs.x,m);}}});
+NR.on('runStart',()=>{if(HB.pw||!window.PAC)return;HB.pw=1;const f=PAC.f;PAC.f=function(e){if(!HB.on())return f.call(this,e);const z=this.zone;this.zone=Math.min(z,HB.maxX(e.r));try{return f.call(this,e);}finally{this.zone=z;}};});   // pacing.js loads later: wrapped on the first run

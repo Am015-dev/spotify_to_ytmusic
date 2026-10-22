@@ -21,7 +21,7 @@ up2|13|more to buy: 14 new pit-stop upgrades (8 in the pool from th|-
 perks2|2|fifteen more garage perks: STARTING KITS. An equipped kit gi|-
 strategy|19|STRATEGY: build paths, synergies, a heat budget, slot limits|-
 athens2|11|ATHINA must be Athens in every orientation|-
-art|31|painted art loading, ART.img/anim, sprite strips|sprites,sprites
+art|32|painted art loading, ART.img/anim, sprite strips|sprites,sprites
 ai|11|smarter enemies (the answer to "too easy with all the perks"|-
 meta|11|meta game: LOADOUT (equip / unequip / sell perks, limited sl|-
 ret|53|retention flags: arcade, daily, heat, grade, assist...|sprites,title,type+
@@ -36,7 +36,7 @@ streetlook|19|on-foot street look on phones: one world scale, portrait lay|stree
 footq|6|on-foot quality: sprites preloaded before the run starts, no|footq,footq
 leak|14|ground enemies, calmer pacing, escape penalty|leak,leak
 zoo|26|time to kill + eight new enemy kinds|zoo,zoo
-formations|34|formation library (VARIETY A)|vary,vary,vary2+
+formations|35|formation library (VARIETY A)|vary,vary,vary2+
 stagescripts|24|every story stage plays its own script|vary,vary
 remix|5|each run plays a different seeded cut of the script|remix,remix
 variants|12|one enemy, many looks (size, reversed)|variants,variants
