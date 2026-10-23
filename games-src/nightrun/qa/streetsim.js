@@ -27,16 +27,20 @@ const CODE = { nearest: RUN, gfirst: RUNG, dodge: RUND };
 
 // ---- in the page: telemetry wrapped round FOOT.ctl (called once per update step, before the step), then the bot / idle run
 const TEL = () => {
-  const T = window.__T = { steps: 0, nan: 0, nanEx: '', still: 0, stuckAt: -1, sig: '', sigT: 0, thr: [], thrT: -1, duck: 0, hits: [], hurtAt: [], ttk: {}, lingerMax: 0, linger: 0, left: 0, seen: new Map(), prevX: null, bl: new Map(), lastHurts: 0, hpMin: 99, hpPrev: null, hpLost: 0, tEnd: 0 };
+  const T = window.__T = { steps: 0, nan: 0, nanEx: '', still: 0, stuckAt: -1, sig: '', sigT: 0, thr: [], thrT: -1, duck: 0, hits: [], hurtAt: [], ttk: {}, lingerMax: 0, linger: 0, left: 0, seen: new Map(), prevX: null, bl: new Map(), mel: [], lastHurts: 0, hpMin: 99, hpPrev: null, hpLost: 0, tEnd: 0 };
   const W = { rusher: 1, gunner: 2, heavy: 4 }, num = v => typeof v === 'number' && isFinite(v), FE = window.FOOT_ENEMIES;
   for (const id of ['rusher', 'gunner', 'heavy']) { const d = FE[id]; if (d.__tk) continue; d.__tk = 1; const od = d.onDeath; d.onDeath = function (e) { const S = FOOT.S, T = window.__T; if (T && !e._tk) { e._tk = 1; const t0 = e.seenAt2 != null ? e.seenAt2 : e.born; if (S.P.w === 'pistol' && num(t0)) (T.ttk[id] = T.ttk[id] || []).push(+(S.time - t0).toFixed(2)); } return od ? od.apply(this, arguments) : undefined; }; }
   let inner = null;
   const obs = (S) => {
+    if (window.__dbgObs) window.__dbgObs(S);
     const P = S.P, T = window.__T, t = S.time, vw = (FOOT._in.L() || {}).vw || 960; T.steps++;
     if (!num(P.x) || !num(P.y) || !num(P.hp) || S.E.some(e => !num(e.x) || !num(e.y) || (e.hp !== undefined && !num(e.hp))) || S.eb.some(b => !num(b.x) || !num(b.y))) { T.nan++; if (!T.nanEx) T.nanEx = `t=${t.toFixed(1)} P(${P.x},${P.y},${P.hp})`; }
     if (T.prevX != null && Math.abs(P.x - T.prevX) < .01 && P.hp > 0) T.still += 1 / 60; T.prevX = P.x;
     const sig = [Math.round(P.maxX / 5), S.kills, S.score, S.hurts].join('|'); if (sig !== T.sig) { T.sig = sig; T.sigT = t; } else if (t - T.sigT > 25 && T.stuckAt < 0 && !S.end && P.hp > 0 && !window.__idle) T.stuckAt = +t.toFixed(1);
     T.hpMin = Math.min(T.hpMin, P.hp); if (T.hpPrev != null && P.hp < T.hpPrev) T.hpLost += T.hpPrev - P.hp; T.hpPrev = P.hp;
+    for (const e of S.E) if (e._o === undefined && !e.dead) e._o = e.x < S.camX ? 'L' : 'R';   // W161: which side a foe was born on
+    if (S.hurts > T.lastHurts) { const src = (S.hlog || [])[S.hurts - 1] || '', m = /^(mel|touch):(.*)$/.exec(src);
+      if (m) { let b = null; for (const e of S.E) if (e.id === m[2] && (!b || Math.abs(e.x - P.x) < Math.abs(b.x - P.x))) b = e; if (b && !b.boss) T.mel.push([b.seenT == null ? -1 : +(t - b.seenT).toFixed(2), b._o || '?', m[2]]); } }
     if (S.hurts > T.lastHurts) { T.hurtAt.push([+t.toFixed(2), (S.hlog || [])[S.hurts - 1] || '?']); T.lastHurts = S.hurts; }
     // threat: weight of the live foes on the street, sampled each second; lingering foes (alive > 25 s after seen) and foes left behind
     let w = 0; for (const e of S.E) { if (e.dead) continue; const inView = e.x > S.camX - 5 && e.x < S.camX + vw + 5; if (inView && e.id !== 'bigheavy') w += W[e.id] || 1;   // the boss is its own phase, not part of the wave curve
@@ -57,8 +61,8 @@ const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); w
     RET.tale = false; FOOT.start('zeil'); let S = FOOT.S; for (let j = 0; j < 200 && S && !S.end; j++) S = FOOT.sim(1, 1 / 60); S = FOOT.S; r = { clear: !!(S.end && S.end.cleared), time: +S.time.toFixed(1), hp: S.P.hp, hurts: S.hurts, kills: S.kills }; }
   else { window.__gf = ${bot !== 'nearest'}; r = (${codeFn})(${seed}); }
   const ms = performance.now() - w0, S = FOOT.S, T = window.__T, sh = S.sh || {}, s3 = S.s3 || {};
-  const tu = {}; r.end = !!S.end; r.ms = ms; r.tEnd = +S.time.toFixed(1);
-  r.tel = { steps: T.steps, nan: T.nan, nanEx: T.nanEx, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
+  const tu = {}; r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
+  r.tel = { mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
     called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' ') };
   try { FOOT.stop(); } catch (e) {} un(); return r; })()`;
 const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story', JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 })); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } catch (e) {} };
@@ -70,7 +74,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   const t0 = Date.now(), port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME], { stdio: 'ignore' });
   for (let i = 0; i < 60; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/index.html`)).ok) break; } catch (e) { } await sleep(100); }
   const br = await PW.chromium.launch(), errs = [];
-  const open = async () => { const ctx = await br.newContext({ viewport: { width: 1440, height: 860 } }); await ctx.addInitScript(SEED); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
+  const open = async () => { const ctx = await br.newContext({ viewport: { width: 1440, height: 860 } }); await ctx.addInitScript(SEED); if (process.env.DBG) await ctx.addInitScript(fs.readFileSync(process.env.DBG, 'utf8')); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.FOOT && FOOT.S3, null, { timeout: 20000 }); await sleep(300); return { ctx, p }; };
   const jobs = []; for (const bot of BOTS) for (let i = 0; i < RUNS; i++) jobs.push({ bot, i, seed: seedOf(i) });
   const only = process.env.ONLY && process.env.ONLY.split(':'), list = only ? jobs.filter(j => j.bot === only[0] && j.seed === +only[1]) : jobs, out = [];
@@ -81,6 +85,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   // ---- aggregate per bot
   const ok0 = out.filter(o => !o.r.err), simSecs = ok0.reduce((a, o) => a + (o.r.tEnd || 0), 0), simMs = ok0.reduce((a, o) => a + o.r.ms, 0);
   const clearT = out.filter(o => o.r.clear).map(o => o.r.tEnd), Lref = clearT.length ? med(clearT) : Math.max(1, ...ok0.map(o => o.r.tEnd));
+  if (process.env.LIST) for (const o of out) if (o.r.tel && o.r.tel.stuckAt >= 0) console.log('STUCK', o.j.bot, o.j.seed, 'at', o.r.tel.stuckAt, 'end', o.r.tEnd, (o.r.alive || '').slice(0, 300));
   const rows = {};
   for (const bot of BOTS) { const rs = out.filter(o => o.j.bot === bot).map(o => o.r), good = rs.filter(r => !r.err), cl = good.filter(r => r.clear), dead = good.filter(r => !r.clear && r.end), tl = good.map(r => r.tel);
     const hs = {}; for (const r of good) for (const h of (r.tel.hlog || '').split(' ').filter(Boolean)) hs[h] = (hs[h] || 0) + 1;
@@ -92,6 +97,9 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
       peakMed: pk.length ? med(pk) : null, peakN: pk.length, planPk, thrMax: med(thrMax), still: mean(tl.map(t => t.still)), nan: tl.reduce((a, t) => a + t.nan, 0), stuck: tl.filter(t => t.stuckAt >= 0).length, linger: tl.reduce((a, t) => a + t.linger, 0), lingerMax: Math.max(0, ...tl.map(t => t.lingerMax)), left: tl.reduce((a, t) => a + t.left, 0),
       ex: good.filter(r => r.tel.nan || r.tel.stuckAt >= 0 || r.tel.linger).slice(0, 2).map(r => r.tel.nanEx || ('stuck at ' + r.tel.stuckAt)), speed: good.length ? good.reduce((a, r) => a + r.tEnd, 0) / Math.max(1e-9, good.reduce((a, r) => a + r.ms, 0) / 1000) : 0 };
   }
+  { const all = ok0.filter(o => o.r && o.r.tel).flatMap(o => o.r.tel.mel || []), under = all.filter(m => m[0] < 1.2), beh = all.filter(m => m[1] === 'L');
+    rows.__mel = { tot: ok0.reduce((a, o) => a + ((o.r && o.r.hurts) || 0), 0), n: all.length, under: under.length, beh: beh.length, min: all.length ? Math.min(...all.map(m => m[0])) : null };
+    console.log(`INFO melee hits ${all.length}: on screen >= 1.2 s before the hit ${all.length - under.length}/${all.length} (min ${rows.__mel.min} s), from foes born behind ${beh.length} (${all.length ? (100 * beh.length / all.length).toFixed(0) : 0}% of melee hits, ${(100 * beh.length / Math.max(1, rows.__mel.tot)).toFixed(0)}% of all ${rows.__mel.tot} hits)`); }
   const rps = ok0.length / (simMs / 1000), factor = simSecs / (simMs / 1000);
   console.log(`INFO ${ok0.length} runs, ${simSecs.toFixed(0)} s of game time stepped in ${(simMs / 1000).toFixed(1)} s page time (${suiteSecs.toFixed(1)} s suite): ${rps.toFixed(2)} runs/s, x${factor.toFixed(0)} real time`);
   for (const bot of BOTS) { const r = rows[bot]; console.log(`INFO ${bot}: clear ${r.clear}/${r.n} (${r.clearPct.toFixed(0)}%) died ${r.dead} at median ${r.deathT} s, hearts lost ${r.hearts.toFixed(1)}/run in ${r.hits.toFixed(1)} hits [${Object.entries(r.hs).map(([k, v]) => k + ' ' + v).join(', ')}], ttk r/g/h ${r.ttk.rusher}/${r.ttk.gunner}/${r.ttk.heavy} s, calls ${r.called.toFixed(1)} blocks ${r.blocked.toFixed(1)} ducked ${r.duck.toFixed(1)}, peak ${r.peakMed}% (n${r.peakN}), still ${r.still.toFixed(1)} s, nan ${r.nan} stuck ${r.stuck} linger ${r.linger}`); }
@@ -125,8 +133,13 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   const nanTot = BOTS.reduce((a, b) => a + rows[b].nan + rows[b].stuck + rows[b].err, 0);
   L(nanTot === 0 && errs.length === 0, `no NaN / stuck / harness error / page error (NaN ${BOTS.reduce((a, b) => a + rows[b].nan, 0)}, stuck ${BOTS.reduce((a, b) => a + rows[b].stuck, 0)}, errors ${BOTS.reduce((a, b) => a + rows[b].err, 0)}, page errors ${errs.length}${errs[0] ? ' ' + errs[0].slice(0, 80) : ''})`);
   if (idleR) L(idleR.clear === 0 && idleR.dead === idleR.n, `idle bot dies (died ${idleR.dead}/${idleR.n}, median ${fmt(idleR.deathT)} s, cleared ${idleR.clear})`);
-  if (best) L(best.clearPct >= 50 && best.clearPct <= 80, `best bot (${bestName}) clears 50-80% (${best.clearPct.toFixed(0)}%; ${BOTS.filter(b => b !== 'idle').map(b => b + ' ' + rows[b].clearPct.toFixed(0) + '%').join(', ')})`);
-  L(peaks.length && peaks.every(x => x >= 80 && x <= 90), `threat peak 80-90% as the median over runs (${BOTS.filter(b => b !== 'idle').map(b => b + ' ' + fmt(rows[b].peakMed) + '%').join(', ')})`);
+  if (best) L(best.clearPct >= 60 && best.clearPct <= 80, `best bot (${bestName}) clears 60-80% (${best.clearPct.toFixed(0)}%; ${BOTS.filter(b => b !== 'idle').map(b => b + ' ' + rows[b].clearPct.toFixed(0) + '%').join(', ')})`);
+  if (rows.nearest) L(rows.nearest.clearPct >= 25 && rows.nearest.clearPct <= 40, `nearest-first (a casual player) clears 25-40% (${rows.nearest.clearPct.toFixed(0)}%)`);
+  L(peaks.length && peaks.every(x => x >= 82 && x <= 88), `threat peak 82-88% as the median over runs (${BOTS.filter(b => b !== 'idle').map(b => b + ' ' + fmt(rows[b].peakMed) + '%').join(', ')})`);
+  if (rows.nearest && rows.gfirst) L(rows.gfirst.clearPct - rows.nearest.clearPct >= 15, `kill order matters: gunner-first clears >= 15 points more than nearest-first (${rows.gfirst.clearPct.toFixed(0)}% vs ${rows.nearest.clearPct.toFixed(0)}%)`);
+  if (rows.dodge) { L(rows.dodge.duck >= 3, `ducking prevents >= 3 hits per run for the dodge bot (${rows.dodge.duck.toFixed(1)})`); L(rows.dodge.blocked >= 3, `cover prevents >= 3 hits per run for the dodge bot (${rows.dodge.blocked.toFixed(1)})`); }
+  L(rows.__mel.under === 0, `every melee hit comes from a foe on screen >= 1.2 s before it (${rows.__mel.n} hits, ${rows.__mel.under} under 1.2 s, min ${rows.__mel.min} s)`);
+  L(rows.__mel.beh / Math.max(1, rows.__mel.tot) < .2, `< 20% of hearts lost to foes that entered from behind (${rows.__mel.beh} of ${rows.__mel.tot} hits)`);
   L(suiteSecs < 180, `whole suite < 3 min (${suiteSecs.toFixed(0)} s)`);
   L(factor >= 100, `speed >= x100 real time (x${factor.toFixed(0)}, ${rps.toFixed(2)} runs/s; slowest single run x${Math.min(...ok0.map(o => (o.r.tEnd || 0) / (o.r.ms / 1000))).toFixed(0)})`);
   if (rt) { L(rt.rep, `determinism: the same seed twice gives the same hurts and end time`); L(rt.same, `one seed equals a real-time run (idle, seed ${seedOf(0)}: stepped hurts [${rt.stepped}] vs real-time [${rt.real}] over the first ${rt.lim} s, tolerance 1 s)`); }

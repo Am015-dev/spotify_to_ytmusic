@@ -4014,7 +4014,7 @@ window.FA=FA;
 FA._base=()=>FA.base||(typeof ART!=='undefined'&&ART.base)||'media/';
 FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{if(typeof AFX!=='undefined')AFX.fixFoot(f,r);r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
 FA.ready=a=>{if(!Array.isArray(a))return;for(const f of a)if(typeof f==='string'&&f.indexOf('foot/')===0){FA._rd.add(f);FA._load(f);}};
-FA.init=()=>{if(FA._init)return;FA._init=true;if(typeof fetch==='function')fetch(FA._base()+'ready.json').then(r=>r.json()).then(FA.ready).catch(()=>{});};
+FA.init=()=>{if(FA._init)return;FA._init=true;if(typeof fetch==='function')fetch(FA._base()+'ready.json').then(r=>r.json()).then(FA.ready).catch(()=>{}).then(()=>{FA._rdDone=true;});else FA._rdDone=true;};
 FA._pic=f=>{FA.init();const r=FA._im[f];return r&&r.ok?r.im:null;};
 FA.has=(who,pose)=>!!FA._pic('foot/'+who+'-'+pose+'.webp');
 /* ---- helpers ---- */
@@ -4685,7 +4685,7 @@ const env={get P(){return S.P;},get G(){return S.G||envG();},get D(){return S.D;
     if(S.q.length>=Math.round(QMAX*S.D.fr)&&!(o&&o.must))return;
     const t=Math.max(TELE,(o&&o.tele)||0)+Math.max(0,e.grace||0);e.tele=Math.max(e.tele,t);
     S.q.push({e,a,spd:(spd||340)*S.D.bs*((RET.asB&&RET.asB())||1),dmg:dmg||1,o:o||{},at:S.time+t});},
-  melee(e,r,dmg,o){if(e.grace>0||e.dead)return false;const P=S.P,b=pbox(P);let hit=false;if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y)hit=ftHurt(dmg||1,e.x,'mel:'+e.id);
+  melee(e,r,dmg,o){if(e.grace>0||e.dead)return false;if(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2))return false;/* W161: a foe hits only after 1.2 s on screen */const P=S.P,b=pbox(P);let hit=false;if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y)hit=ftHurt(dmg||1,e.x,'mel:'+e.id);
     if(!e._mfx||S.time-e._mfx>.12){e._mfx=S.time;S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:Math.min(r.w,200),l:.15,c:o&&o.beam?'#ff2050':'#ff4a6a'});}return hit;}};
 F.env=env;
 function pbox(P){const h=P.crouch?40:P.h,bw=S.st.fs?28:P.w;return{x:P.x-bw/2,y:P.y-h,w:bw,h};}   // P.w is the weapon id (the street1 mock keeps its NaN box; footstage stages use the 28 px body)
@@ -4807,25 +4807,26 @@ function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
     if(S.time<w.next)continue;
     if(S.E.filter(e=>!e.dead).length>=14){w.next=S.time+.5;continue;}
     const side=w.side||'r';let x,y=null;
+    if(side==='l'&&RET.fairstreet){if(!w.wa){w.wa=S.time+1;S.behind={until:w.wa};}if(S.time<w.wa)continue;w.wa=0;}   // W161: 1 s BEHIND warning before every spawn from the left
     if(side==='l')x=S.camX-40;else if(side==='at')x=w.at+(w.count-w.left)*90;else if(side==='top'){x=S.camX+ftRnd(.35,.95)*vw;y=-30;}else x=edge+40;
     const e=spawn(w.enemy,x,y,{lock:w.lock});if(side==='top'){e.fly=true;e.y=-30;}
     w.left--;w.next=S.time+(w.gap||1);if(w.left<=0)w.done=true;}
   // idle pressure: standing still never wins. After 7 s without progress, gangs walk in from both sides and keep coming faster.
   if(!S.lock&&!S.bossOn&&P.idle>7&&S.time>=S.idleSpawn&&S.E.filter(e=>!e.dead).length<(P.idle>20?10:3)){S.idleSpawn=S.time+Math.max(1.4,4-P.idle*.06);
-    spawn('grunt',Math.random()<.5?S.camX-40:edge+40,null,{fb:1});if(P.idle>16)spawn('gunman',edge+40,null,{fb:1});}}   // built-in walkers: they always come to you
+    spawn('grunt',Math.random()<.5&&!RET.fairstreet?S.camX-40:edge+40,null,{fb:1});if(P.idle>16)spawn('gunman',edge+40,null,{fb:1});}}   // built-in walkers: they always come to you
 function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&&RET.asW())||1)*(S.st.hook&&S.st.hook.agg?S.st.hook.agg(S):1);
   envG();
   for(const e of S.E){if(e.dead){if(e.ext&&!e.remove){e.dt_=(e.dt_||0)+edt;try{e.def.ai(e,edt,env);}catch(x){e.remove=true;}if(e.dt_>1.2)e.remove=true;}continue;}e.t+=edt;if(e.flash>0)e.flash-=dt;if(e.grace>0)e.grace-=edt;if(e.tele>0)e.tele-=edt;
     try{e.def.ai(e,edt,env);}catch(x){if(!e._err){e._err=1;console.warn('foot ai',e.id,x);}e.def=fbDef(e.id);}
     if(!e.ext){if(!e.fly)e.vy+=GRAV*edt;e.x+=e.vx*edt;e.y+=e.vy*edt;}   // W3's ai moves its enemies itself
     if(!e.fly&&e.y>=FL){e.y=FL;e.vy=0;e.onGround=true;}
-    const vw=viewW();if(!e.seen&&e.x>S.camX+e.w/2&&e.x<S.camX+vw-e.w/2)e.seen=1;   // once on screen, an enemy stays on screen (no shooting from the dark)
+    const vw=viewW();if(!e.seen&&e.x>S.camX+e.w/2&&e.x<S.camX+vw-e.w/2){e.seen=1;e.seenT=S.time;}   // once on screen, an enemy stays on screen (no shooting from the dark)
     if(e.seen||e.boss)e.x=clamp(e.x,S.camX+e.w/2,S.camX+vw-e.w/2);
     else if(e.t>.3){const lo=S.camX+e.w/2,hi=S.camX+vw-e.w/2;if(e.x>hi)e.x-=90*edt;else if(e.x<lo)e.x+=90*edt;}   // walk in even if the ai wants to stand back
     if(e.fly&&!e.ext&&e.y>FL-20){e.y=FL-20;}
     if(e.burn>0){e.burn-=dt;e.bt=(e.bt||0)-dt;if(e.bt<=0){e.bt=.25;dmgE(e,.4,{pierce:1});}}
     if(!e.boss&&(e.x<S.camX-400||e.x>S.camX+viewW()+600))e.dead=true,e.gone=1;
-    if(!e.dead){const b=ebox(e),pb_=pbox(P);if(e.def.touch!==0&&!e.fly&&b.x<pb_.x+pb_.w&&b.x+b.w>pb_.x&&b.y<pb_.y+pb_.h&&b.y+b.h>pb_.y&&e.grace<=0&&e.w>40)ftHurt(1,e.x,'touch:'+e.id);}}
+    if(!e.dead){const b=ebox(e),pb_=pbox(P);if(e.def.touch!==0&&!e.fly&&b.x<pb_.x+pb_.w&&b.x+b.w>pb_.x&&b.y<pb_.y+pb_.h&&b.y+b.h>pb_.y&&e.grace<=0&&e.w>40&&!(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2)))ftHurt(1,e.x,'touch:'+e.id);}}
   S.E=S.E.filter(e=>!e.dead||e===S.boss||(e.ext&&!e.remove&&!e.gone));
   // queued enemy shots: released on the next half beat once their telegraph is over
   const hb=Math.floor(beatPos()*2);if(S.lhb===null)S.lhb=hb;
@@ -5349,6 +5350,7 @@ F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{
    Backdrop (no new art, ASSET-POLICY.md): placeholder flat layers labelled bg-street-sky / far (x0.12) / mid (x0.4) / road, prop sheets on the road (x1); real files replace them (ASSETS-NEEDED-STREET.md).
    Kai may walk back (camera eases back <= 35% of the view, not behind the section checkpoint); auto-fire turns Kai to a target behind. Poses without a sheet borrow the nearest act (art.js ART.FB).
    HUD: hearts / weapon / ammo / bombs / power-ups / fever in one panel top-left (14 px+ text), score + time left of the pause button, the hint under both. ---------- */
+if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;
@@ -5398,6 +5400,7 @@ function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2
   let x=0,i=0;while(x<TW-30){const bw=Math.min(TW-x,(kind==='far'?60:150)+60*hs(i*7+3)),bh=Hh*(L_[3]+L_[4]*hs(i*13+5));g.fillRect(x,Hh-bh,bw-4,bh);x+=bw;i++;}
   g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';if(window.phText())g.fillText(L_[1]+' (placeholder)',8,Hh-6);
   return tiles[key]={cv,TW,Hh};}
+const pkPic=k=>'pk-'+(k==='dbl'?'damage':k.startsWith('w_')?'weapon-'+k.slice(2):k);
 function slPic(id){const fa=window.FA;return fa&&fa._pic?fa._pic('foot/'+id+'.webp'):null;}
 function slBlit(c,kind,k,cam,x0,w,t0,res){const pic=slPic(BGL[kind][1]),Hh=FL+2-t0;let src,TW;
   if(pic){TW=Hh*pic.width/pic.height;src=pic;}else{const o=slTile(kind,Hh,res);src=o.cv;TW=o.TW;}
@@ -5446,6 +5449,8 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
     const y=p.y+bob,Y=Math.max(my(y),t0+4+r);   // never above the top edge
     const ga=(p.t>13?.5+.5*Math.sin(p.t*20):1)*fa;c.save();c.translate(p.x,Y);c.scale(K,K);c.translate(-p.x,-y);c.globalAlpha=ga;SL.tag='pk';
     if(p.k==='ammo'&&RET.sprites&&typeof ART!=='undefined'&&ART.ANIM.c['pk-ammo/spin']&&ART.anim('pk-ammo/spin'))ART.drawAnim(c,'pk-ammo/spin',p.t,p.x,y,32/ART.ANIM.c['pk-ammo/spin'].bw,false);
+    else if(RET.fairstreet&&(()=>{const q=slPic(pkPic(p.k));if(!q||!q.width)return false;const h=40,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,y-h/2-4,w,h);return true;})()){c.fillStyle=d.c;c.font='bold 11px monospace';c.textAlign='center';c.textBaseline='top';c.fillText(d.n,p.x,y+18);}   // owner 23 Oct 2026: a sheet picture with its name under it, no flat disc
+    else if(RET.fairstreet){c.fillStyle=d.c;c.font='bold 13px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(d.n,p.x,y);}   // picture not loaded yet: the name alone
     else{c.fillStyle=d.c;c.beginPath();c.arc(p.x,y,15,0,6.283);c.fill();c.fillStyle='#05030c';c.font='bold 15px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(d.ic,p.x,y+1);}
     SL.tag='';c.globalAlpha=1;c.restore();}
   for(const e of S.E){if(e.dead&&!(e.ext&&!e.remove))continue;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)continue;   // fully off screen: nothing to draw (a shape fallback's label would hang past the edge)
@@ -5500,6 +5505,8 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText('WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
   if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u;}
+  if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=(SL.t0+VH)/2,a=.55+.45*Math.sin(S.time*14);c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';c.fillStyle='#ffb020';
+    c.font='bold '+fs(34)+'px monospace';c.fillText('◀',6*u,fy);c.font='bold '+fs(14)+'px monospace';c.fillText('BEHIND',6*u+30*u,fy-8*u);c.fillText('foe arriving from the left',6*u+30*u,fy+9*u);c.globalAlpha=1;}   // W161: 1 s warning at the edge a foe comes from
   SL.tag='';if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};IN.ghost();}
 })();
@@ -5523,11 +5530,15 @@ F.dprMax=3;
 /* ----- the sheets this stage can draw ----- */
 FQ.list=()=>{const k=[];for(const w in ART.FM)for(const a of ART.FM[w]._all)k.push(w+'/'+a);
   for(const p of ['car/loop','police/loop','holo/loop','beacon/loop','steam/glow'])k.push('prop-'+p);k.push('pk-ammo/spin');return k.filter(x=>ART.ANIM.s[x]);};
+/* the still pictures the street draws over props and pickups (foot/sc-*, foot/pk-*): W162 found they were never waited for, so every crate, barrel and pick-up showed its code-drawn box or name until the first draw had started the download (the whole run in a stepped test) */
+FQ.pics=()=>{const a=[];for(const f of FA._rd)if(/^foot\/(sc|pk)-/.test(f))a.push(f);return a;};
+FQ.picOk=f=>{const r=FA._im[f];return !r||r.ok||r.bad;};
+FQ.picsReady=()=>{FA.init();return !!FA._rdDone&&FQ.pics().every(FQ.picOk);};
 FQ.state=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return 'none';if(ART.err&&ART.err[n])return 'bad';return ART.anim(k)?'ok':'wait';};   // ART.anim also starts the load
 /* the songs the run plays (the stage's own, then the one-song cut of street3.js) are part of the wait (23 Oct 2026: "game music is not playing"); a song that failed its 3 tries does not block; asking also starts the load */
 FQ.songs=()=>RET.preload&&!NOMUSIC&&!/[?&]sim=1/.test(location.search)?(RET.streetsong?['street1']:['stage2','street1']).filter(s=>TR.by[s]):[];
 FQ.songOk=s=>{const i=TR.by[s];if(!i||TR.bufs[i.file]||(TR.bad[i.file]&&((TR.tries&&TR.tries[i.file])||0)>3))return true;if(AU.a)loadTrack(s);return !AU.a;};
-FQ.ready=()=>{if(!RET.sprites)return FQ.songs().every(FQ.songOk);if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return FQ.songs().map(FQ.songOk).every(Boolean)&&ok;};
+FQ.ready=()=>{if(!FQ.picsReady())return false;if(!RET.sprites)return FQ.songs().every(FQ.songOk);if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return FQ.songs().map(FQ.songOk).every(Boolean)&&ok;};
 FQ.pending=()=>FQ.list().filter(k=>FQ.state(k)==='wait');
 FQ.pct=()=>{const l=FQ.list(),m=FQ.songs();const n=l.length+3*m.length;return n?Math.round(100*(l.filter(k=>FQ.state(k)!=='wait').length+3*m.filter(FQ.songOk).length)/n):100;};
 /* ----- loading hold: returns true when it took over the start (cb runs when the sheets are ready or after 8 s) ----- */
@@ -14689,7 +14700,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='dc5df83745 2026-10-23 08:33 UTC';
+const NR_STAMP='2daf6a4524 2026-10-23 08:55 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16538,13 +16549,13 @@ Object.assign(IN.PROPD,{car:{hp:9,w:104,h:52,c:'#3a4a66',dr:[]},barrel:{hp:1,w:2
 const PIC={scrate:'sc-crate',gold:'sc-crate',barrel:'sc-barrel',kiosk:'sc-vending',post:'sc-neon-sign'};
 const pic=n=>{const fa=window.FA;const q=fa&&fa._pic?fa._pic('foot/'+n+'.webp'):null;return q&&q.width?q:null;};
 function propDraw(p){return function(c,K,at){at(c,p.x,p.y,K);const fl=p.fl>0;let ok=false;
-  if(p.k==='gold'){c.fillStyle='#ffd23a';c.globalAlpha=.22+.12*Math.sin(F.S.time*5);c.beginPath();c.ellipse(p.x,p.y-p.w*.45,p.w*.85,p.w*.7,0,0,6.283);c.fill();c.globalAlpha=1;}
+  if(p.k==='gold'&&!RET.fairstreet){c.fillStyle='#ffd23a';c.globalAlpha=.22+.12*Math.sin(F.S.time*5);c.beginPath();c.ellipse(p.x,p.y-p.w*.45,p.w*.85,p.w*.7,0,0,6.283);c.fill();c.globalAlpha=1;}
   if(p.k==='car'&&typeof ART!=='undefined'&&ART.ANIM&&ART.ANIM.s){const k='prop-car/loop',m=ART.ANIM.s[k];if(m&&ART.anim(k)){const h=p.w*m[3]/m[2];ART.drawAnim(c,k,0,p.x,p.y-h/2+(RET.feel?h*.09:0),h/m[3],false,1);ok=true;}}
   else{const q=pic(PIC[p.k]);if(q){const h=p.k==='barrel'?p.h:p.k==='kiosk'?p.h*1.05:p.k==='post'?p.h:p.w,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,p.y-h,w,h);ok=true;}}
   if(!ok){c.fillStyle=p.c;c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);}
-  if(p.k==='barrel'){c.fillStyle='#ff3040';c.globalAlpha=.25+.2*Math.sin(F.S.time*8);c.beginPath();c.arc(p.x,p.y-p.h*.5,p.w*.8,0,6.283);c.fill();c.globalAlpha=1;}
-  const dmg=1-p.hp/p.mhp;if(dmg>.3&&p.k!=='barrel'){c.strokeStyle='#05030c';c.lineWidth=2;c.beginPath();c.moveTo(p.x-p.w*.3,p.y-p.h*.8);c.lineTo(p.x,p.y-p.h*.5);c.lineTo(p.x-p.w*.1,p.y-p.h*.2);if(dmg>.6){c.moveTo(p.x+p.w*.3,p.y-p.h*.9);c.lineTo(p.x+p.w*.05,p.y-p.h*.45);}c.stroke();}
-  if(fl){c.globalAlpha=.5;c.fillStyle='#fff';c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);c.globalAlpha=1;}
+  if(p.k==='barrel'&&!RET.fairstreet){c.fillStyle='#ff3040';c.globalAlpha=.25+.2*Math.sin(F.S.time*8);c.beginPath();c.arc(p.x,p.y-p.h*.5,p.w*.8,0,6.283);c.fill();c.globalAlpha=1;}
+  const dmg=1-p.hp/p.mhp;if(dmg>.3&&p.k!=='barrel'&&!RET.fairstreet){c.strokeStyle='#05030c';c.lineWidth=2;c.beginPath();c.moveTo(p.x-p.w*.3,p.y-p.h*.8);c.lineTo(p.x,p.y-p.h*.5);c.lineTo(p.x-p.w*.1,p.y-p.h*.2);if(dmg>.6){c.moveTo(p.x+p.w*.3,p.y-p.h*.9);c.lineTo(p.x+p.w*.05,p.y-p.h*.45);}c.stroke();}
+  if(fl&&!RET.fairstreet){c.globalAlpha=.5;c.fillStyle='#fff';c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);c.globalAlpha=1;}
   c.restore();return true;};}
 function debris(S,p){for(let i=0;i<10;i++)S.fx.push({x:p.x+(Math.random()-.5)*p.w,y:p.y-p.h*Math.random(),vx:(Math.random()-.5)*420,vy:-160-Math.random()*320,l:.7,c:p.k==='gold'?'#ffd23a':p.c,r:3+Math.random()*3});}
 function barrelBlast(S,p){IN.boom(p.x,FL-24,95,7);const P=S.P;if(abs(P.x-p.x)<70&&P.y>FL-100)IN.ftHurt(1,p.x,'blast');
@@ -16630,7 +16641,7 @@ ST.hook={
     // enemy bullets: cover stops them and wears down
     for(const b of S.eb){if(b.life<=0)continue;for(const p of S.pr){if(p.hp<=0||p.gone||p.k==='barrel')continue;if(b.x>p.x-p.w/2-b.r&&b.x<p.x+p.w/2+b.r&&b.y>p.y-p.h-b.r&&b.y<p.y+4){b.life=0;IN.hitProp(p,.5);break;}}}
     // climax: rushers keep coming while the big heavy stands (max 3 at once)
-    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<3){F.env.spawn('rusher',f.adds++%2?S.camX-40:S.camX+env.G.viewW+40,null);}}},
+    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<3){F.env.spawn('rusher',f.adds++%2&&!RET.fairstreet?S.camX-40:S.camX+env.G.viewW+40,null);}}},
   draw(c,S){},
   hud(c,vw,u,box,fs,S){const x0=vw*.18,bw=vw*.64,y=540-14*u,h=6*u,pr=clamp(S.P.maxX/ST.boss.x,0,1);
     c.fillStyle='#ffffff22';c.fillRect(x0,y,bw,h);c.fillStyle='#19e3ff';c.fillRect(x0,y,bw*pr,h);
@@ -17470,12 +17481,14 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy
   if(S.time>20&&S.time-(f.lastHeal||0)>12&&P.hp>0&&P.hp<=P.max-2&&!S.pk.some(q=>q.k==='heal')){f.lastHeal=S.time;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // two hearts down: a heal drops beside Kai (at most one every 12 s)
   for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits
-    const id=w.left.shift(),fromL=id==='rusher'&&w.i>=3&&(w.spawned%3===2),x=fromL?S.camX-40:S.camX+vw+40;
+    const fromL=w.left[0]==='rusher'&&w.i>=3&&(w.spawned%(RET.fairstreet?5:3)===(RET.fairstreet?4:2));
+    if(fromL&&RET.fairstreet){if(!w.wa){w.wa=S.time+1;S.behind={until:w.wa};}if(S.time<w.wa)continue;w.wa=0;}   // W161: 1 s BEHIND warning (arrow + caption at the left edge) before a rusher walks in from the left
+    const id=w.left.shift(),x=fromL?S.camX-40:S.camX+vw+40;
     const e=F.env.spawn(id,x,null);if(e){w.spawned++;f.spawnLog.push([+S.time.toFixed(1),id,w.i]);}w.next=S.time+(id==='heavy'?1.6:.9);break;}
   if(f.hp0!==P.hp){(f.hpLog||(f.hpLog=[])).push(Math.round(S.time)+':'+P.hp);f.hp0=P.hp;}
   f.live.push(alive);if(f.live.length>600)f.live.shift();};
 /* contact shadow under a prop, on the road */
-function propShadow(c,p){if(p.hp<=0)return;const w=p.w*.62;c.save();c.globalAlpha=.42;const g=c.createRadialGradient(p.x,FL,0,p.x,FL,w);g.addColorStop(0,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,0)');
+function propShadow(c,p){if(p.hp<=0||RET.fairstreet)return;const w=p.w*.62;c.save();c.globalAlpha=.42;const g=c.createRadialGradient(p.x,FL,0,p.x,FL,w);g.addColorStop(0,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,0)');
   c.fillStyle=g;c.translate(p.x,FL);c.scale(1,.16);c.translate(-p.x,-FL);c.beginPath();c.arc(p.x,FL,w,0,6.283);c.fill();c.restore();}
 /* static props: picture corners on whole device pixels (no shimmer / half-pixel blur while the camera is still) */
 function snap(c,fn){const di=c.drawImage;c.drawImage=function(im){if(arguments.length===5||arguments.length===9){const a=[...arguments],o=a.length===5?1:5,m=c.getTransform();
@@ -18344,9 +18357,11 @@ if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.s
 (function(){
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
-const SH=F.SH={HPK:{rusher:1.8,gunner:2.8,heavy:.6},FRONT:.25,CHEST:50,CROUCH:.6,CALL:10,CALL0:3,KEEP:0,CAPX:0,GMAX:1,HEART:1,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
+const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
-S3.T.peakT=136;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=6.6;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
+S3.T.peakT=124;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=8.2;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
+/* 4c: more cover to choose from (the street had one cover prop per ~750 px: a gunner shot almost never met one): a covered crate every COVERGAP px, clear of the props already there */
+if(SH.COVERGAP){const xs=ST.props.map(p=>p[0]);for(let x=700;x<ST.boss.x-900;x+=SH.COVERGAP)if(!xs.some(q=>abs(q-x)<130)){ST.props.push([x,'scrate',{cover:1,dr:[]}]);xs.push(x);}}
 /* 1: tougher foes, and the time-to-kill log (seen -> dead, game seconds) */
 const sp0=F.env.spawn;
 F.env.spawn=function(id,x,y,o){const e=sp0.apply(this,arguments);if(e&&on()&&SH.HPK[id]&&!e.boss){e.hp*=SH.HPK[id];e.max=e.maxHp=e.mhp=e.hp;}return e;};
@@ -18359,11 +18374,12 @@ for(const id of ['rusher','gunner','heavy']){const d=FE[id];if(!d||d._sh)continu
   const a0=d.ai;d.ai=function(e,dt,env){
     if(on()&&id==='rusher'&&e.state==='crouch')e.sT-=dt*(1-.4/SH.CROUCH);   // 2: a longer, readable crouch before the lunge
     a0.apply(this,arguments);
-    if(on()&&id==='gunner'&&e.state!=='dead'&&e.seen)call(e,env);};}
+    if(on()&&id==='gunner'&&e.state!=='dead'&&e.seen){call(e,env);
+      if(e.state!=='pop')e._th=0;else if(SH.BURST>2&&!e._th&&e.sT>=.9){e._th=1;const sy=e.y-44;env.shoot(e,Math.atan2(env.P.y-40-sy,env.P.x-e.x),360,1,{oy:sy});}}};}   // 3rd slug of a pop, a ducker holds the crouch
 /* 3: the gunner calls help */
 function call(e,env){const S=F.S;if(e.callT==null)e.callT=S.time+SH.CALL0;
   if(e.callT-S.time<1){if(!e.callW){e.callW=1;IN.pop(e.x,e.y-e.h-26,'CALLING HELP','#ffb020');}e.hid=false;e.vx=0;e.tele=Math.max(e.tele||0,.05);}   // 1 s whistle: caption, red flash, stands up in the open (a window to shoot it)
-  if(S.time<e.callT)return;e.callT=S.time+SH.CALL;e.callW=0;
+  if(S.time<e.callT||S.time<SH.CALLT||S.time>SH.CALLEND)return;e.callT=S.time+SH.CALL;e.callW=0;
   if(S.E.filter(q=>!q.dead).length>=S3.T.cap+SH.CAPX)return;
   const vw=env.G.viewW||960,fromL=Math.random()<.5,n=F.env.spawn('rusher',fromL?S.camX-40:S.camX+vw+40,null);   // one more rusher, on top of the plan
   if(n){SH.log.called++;S.fx.push({ring:1,x:e.x,y:e.y-e.h*.6,r:60,l:.5,m:.5,c:'#ffb020'});IN.sfx&&IN.sfx('warn');}}
@@ -18373,9 +18389,9 @@ ST.hook.step=function(S,dt,env){
   if(RET.streethard&&S.s3&&!S.sh){S.sh=SH.log={ttk:{},called:0,blocked:0,coverBroke:0,gunDead:[],rushDead:[]};S.P.max+=SH.HEART;S.P.hp+=SH.HEART;}
   if(on()){
     if(S.E.filter(e=>!e.dead&&e.id==='gunner').length>=SH.GMAX)for(const w of S.s3.waves)if(w.left[0]==='gunner'&&w.next<S.time+.4)w.next=S.time+.4;   // at most GMAX gunners at once: the next waits
-    for(const b of S.eb){if(b.life<=0||b.src!=='gunner')continue;if(b._x0==null){b._x0=b.x;if(abs(S.P.y-470)<10&&b.y>400&&b.y<440){b.y=470-SH.CHEST;b.vx=Math.sign(b.vx)*Math.hypot(b.vx,b.vy);b.vy=0;}}   // a level shot at chest height: ducking (or a jump) dodges it
-      for(const p of S.pr){if(p.hp<=0||p.gone||!(p.cover||SH.COVER[p.k])||abs(p.x-b._x0)<p.w/2+40&&abs(S.P.x-p.x)>p.w/2+30)continue;   // the gunner's own cover blocks only when Kai hugs the other side of it   // never the gunner's own cover
-        if(b.x>p.x-p.w/2&&b.x<p.x+p.w/2&&b.y>p.y-Math.max(p.h,56)&&b.y<p.y+4){b.life=0;SH.log.blocked++;const h0=p.hp;IN.hitProp(p,SH.CHIP);if(h0>0&&p.hp<=0)SH.log.coverBroke++;break;}}}}
+    for(const b of S.eb){if(b.life<=0||b.src!=='gunner')continue;if(b._x0==null){b._x0=b.x;if(abs(S.P.y-470)<10&&b.y>400&&b.y<440){b.y=470-SH.CHEST;b.r=SH.SLUGR;b.slug=1;b.vx=Math.sign(b.vx)*Math.hypot(b.vx,b.vy);b.vy=0;}}   // a level shot at chest height: ducking (or a jump) dodges it
+      for(const p of S.pr){if(p.hp<=0||p.gone||!(p.cover||SH.COVER[p.k])||abs(p.x-b._x0)<p.w/2+40&&abs(S.P.x-p.x)>p.w/2+SH.HUG)continue;   // the gunner's own cover blocks only when Kai hugs the other side of it   // never the gunner's own cover
+        if(b.x>p.x-p.w/2&&b.x<p.x+p.w/2&&b.y+(b.slug?b.r:0)>p.y-Math.max(p.h,56)&&b.y<p.y+4){b.life=0;SH.log.blocked++;const h0=p.hp;IN.hitProp(p,SH.CHIP);if(h0>0&&p.hp<=0)SH.log.coverBroke++;break;}}}}
   const r=st0.apply(this,arguments);
   if(on()&&SH.KEEP)for(const p of S.pr)if(p.hp>0&&(SH.KEEP>1?p.cover:SH.COVER[p.k])&&!(p.dr&&p.dr.length))p.pass=true;   // Kai's shots fly over crates, the car and kiosks with nothing inside (only gunner fire wears them down)
   return r;};

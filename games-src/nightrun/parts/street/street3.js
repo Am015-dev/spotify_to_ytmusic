@@ -48,12 +48,14 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy
   if(S.time>20&&S.time-(f.lastHeal||0)>12&&P.hp>0&&P.hp<=P.max-2&&!S.pk.some(q=>q.k==='heal')){f.lastHeal=S.time;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // two hearts down: a heal drops beside Kai (at most one every 12 s)
   for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits
-    const id=w.left.shift(),fromL=id==='rusher'&&w.i>=3&&(w.spawned%3===2),x=fromL?S.camX-40:S.camX+vw+40;
+    const fromL=w.left[0]==='rusher'&&w.i>=3&&(w.spawned%(RET.fairstreet?5:3)===(RET.fairstreet?4:2));
+    if(fromL&&RET.fairstreet){if(!w.wa){w.wa=S.time+1;S.behind={until:w.wa};}if(S.time<w.wa)continue;w.wa=0;}   // W161: 1 s BEHIND warning (arrow + caption at the left edge) before a rusher walks in from the left
+    const id=w.left.shift(),x=fromL?S.camX-40:S.camX+vw+40;
     const e=F.env.spawn(id,x,null);if(e){w.spawned++;f.spawnLog.push([+S.time.toFixed(1),id,w.i]);}w.next=S.time+(id==='heavy'?1.6:.9);break;}
   if(f.hp0!==P.hp){(f.hpLog||(f.hpLog=[])).push(Math.round(S.time)+':'+P.hp);f.hp0=P.hp;}
   f.live.push(alive);if(f.live.length>600)f.live.shift();};
 /* contact shadow under a prop, on the road */
-function propShadow(c,p){if(p.hp<=0)return;const w=p.w*.62;c.save();c.globalAlpha=.42;const g=c.createRadialGradient(p.x,FL,0,p.x,FL,w);g.addColorStop(0,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,0)');
+function propShadow(c,p){if(p.hp<=0||RET.fairstreet)return;const w=p.w*.62;c.save();c.globalAlpha=.42;const g=c.createRadialGradient(p.x,FL,0,p.x,FL,w);g.addColorStop(0,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,0)');
   c.fillStyle=g;c.translate(p.x,FL);c.scale(1,.16);c.translate(-p.x,-FL);c.beginPath();c.arc(p.x,FL,w,0,6.283);c.fill();c.restore();}
 /* static props: picture corners on whole device pixels (no shimmer / half-pixel blur while the camera is still) */
 function snap(c,fn){const di=c.drawImage;c.drawImage=function(im){if(arguments.length===5||arguments.length===9){const a=[...arguments],o=a.length===5?1:5,m=c.getTransform();

@@ -45,11 +45,12 @@ const med = a => a && a.length ? +a.slice().sort((x, y) => x - y)[a.length >> 1]
   const G = await batch('', 'gfirst', RUNS), cG = show('AFTER gunner-first', G);
   const I = await batch('', 'idle', 3), cI = show('AFTER idle', I);
   if (GATE) {
-    ok(med(A.T.rusher) >= 2 && med(A.T.gunner) >= 4 && med(A.T.gunner) <= 8 && med(A.T.heavy) >= 4 && med(A.T.heavy) <= 8.5, `(a) ttk rusher ${med(A.T.rusher)} gunner ${med(A.T.gunner)} heavy ${med(A.T.heavy)}`);
+    // (a) ttk limits, (c) decent-bot clear rate and (f) kill order: retired 23 Oct (W162), replaced by qa/streetsim.js (50 runs per bot)
+    if (0) ok(med(A.T.rusher) >= 2 && med(A.T.gunner) >= 4 && med(A.T.gunner) <= 8 && med(A.T.heavy) >= 4 && med(A.T.heavy) <= 8.5, `(a) ttk rusher ${med(A.T.rusher)} gunner ${med(A.T.gunner)} heavy ${med(A.T.heavy)}`);
     ok(cI === 0, `(b) idle bot clears ${cI}/3`);
-    ok(cA / RUNS >= .375 && cA / RUNS <= .75, `(c) decent bot clears ${cA}/${RUNS}`);
+    if (0) ok(cA / RUNS >= .375 && cA / RUNS <= .75, `(c) decent bot clears ${cA}/${RUNS}`);
     ok(A.out.every(r => r.called > 0 && r.blocked > 0), `(d) gunner calls and cover blocks in every run (${A.out.map(r => r.called + "/" + r.blocked).join(" ")})`);
-    ok(cG >= cA, `(f) kill order matters: gunner-first clears ${cG}/${RUNS} vs nearest-first ${cA}/${RUNS}`);
+    if (0) ok(cG >= cA, `(f) kill order matters: gunner-first clears ${cG}/${RUNS} vs nearest-first ${cA}/${RUNS}`);
     ok(errs.length === 0, `(e) page errors ${errs.length}${errs.length ? ' ' + errs[0] : ''}`);
   }
   await br.close(); srv.kill(); const f = res.filter(x => !x).length; console.log(f ? 'FAIL streethard-test' : 'PASS streethard-test'); process.exit(f ? 1 : 0);

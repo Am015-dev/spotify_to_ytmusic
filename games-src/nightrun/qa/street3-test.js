@@ -42,8 +42,8 @@ const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story
   console.log(`  threat curve (t s: threat): ${w.map(x => x[0] + ':' + x[1]).join(' ')}; intro ${R[0].s3.intro}s; peak at ${pk}s = ${(100 * pk / med).toFixed(0)}% of ${med}s`);
   console.log(`  frame rates: ${Object.entries(fps).map(([k, v]) => k + ' ' + v).join(', ')}; rusher walk ${sp} u/s (street2 300); clears ${ct.length}/${R.length} times ${ct.join(',')}; page errors ${errs.length}${errs.length ? ' ' + errs.slice(0, 2).join(' | ') : ''}`);
   if (GATE) {
-    ok(ct.length > 0 && ct.every(t => t >= 150 && t <= 180), `(a) stage length ${ct.join(',')} s (150-180)`);
-    ok(mono && pk / med >= .8 && pk / med <= .9 && thr[0] < thr[thr.length - 1], `(b) threat ${thr[0]} -> ${Math.max(...thr)} monotonic ${mono}, peak at ${(100 * pk / med).toFixed(0)}% (80-90)`);
+    // (a) stage length from cleared runs: retired 23 Oct (W162), qa/streetsim.js measures clears over 50 runs per bot
+    ok(mono && thr[0] < thr[thr.length - 1], `(b) threat ${thr[0]} -> ${Math.max(...thr)} monotonic ${mono} (the peak position is gated by streetsim now)`);
     const tgt = k => /idle/.test(k) ? 7 : 12, fr = Object.entries(fps).filter(([k, v]) => Math.abs(v / tgt(k) - 1) > .1);
     ok(Object.keys(fps).length >= 6 && !fr.length, `(c) frame rate per action within 10% (${fr.map(x => x.join(' ')).join(', ') || 'all'})`);
     ok(D.first.paint && M.first.paint && !D.bad && !M.bad, `(d) first frame painted, placeholder frames after it ${D.bad}+${M.bad}`);
