@@ -17,7 +17,7 @@ if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.s
 (function(){
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
-const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
+const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,SLUGD:.5,BINV:1.6,POPT:.6,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
 S3.T.peakT=124;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=8.2;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
 /* 4c: more cover to choose from (the street had one cover prop per ~750 px: a gunner shot almost never met one): a covered crate every COVERGAP px, clear of the props already there */
@@ -33,6 +33,7 @@ for(const id of ['rusher','gunner','heavy']){const d=FE[id];if(!d||d._sh)continu
       if(id==='gunner')SH.log.gunDead.push(+S.time.toFixed(1));if(id==='rusher')SH.log.rushDead.push(+S.time.toFixed(1));}return od?od.apply(this,arguments):undefined;};
   const a0=d.ai;d.ai=function(e,dt,env){
     if(on()&&id==='rusher'&&e.state==='crouch')e.sT-=dt*(1-.4/SH.CROUCH);   // 2: a longer, readable crouch before the lunge
+    if(on()&&id==='gunner'&&SH.POPT>.5){const k=1-.5/SH.POPT;if(e.state==='pop'&&e.sT<SH.POPT)e.sT-=dt*k;else if(e.tw&&e.tele>0)e.tele+=dt*k;}   // 2c: the slug is announced POPT s (was .5): a duck pays a little more
     a0.apply(this,arguments);
     if(on()&&id==='gunner'&&e.state!=='dead'&&e.seen){call(e,env);
       if(e.state!=='pop')e._th=0;else if(SH.BURST>2&&!e._th&&e.sT>=.9){e._th=1;const sy=e.y-44;env.shoot(e,Math.atan2(env.P.y-40-sy,env.P.x-e.x),360,1,{oy:sy});}}};}   // 3rd slug of a pop, a ducker holds the crouch
@@ -53,6 +54,9 @@ ST.hook.step=function(S,dt,env){
       for(const p of S.pr){if(p.hp<=0||p.gone||!(p.cover||SH.COVER[p.k])||abs(p.x-b._x0)<p.w/2+40&&abs(S.P.x-p.x)>p.w/2+SH.HUG)continue;   // the gunner's own cover blocks only when Kai hugs the other side of it   // never the gunner's own cover
         if(b.x>p.x-p.w/2&&b.x<p.x+p.w/2&&b.y+(b.slug?b.r:0)>p.y-Math.max(p.h,56)&&b.y<p.y+4){b.life=0;SH.log.blocked++;const h0=p.hp;IN.hitProp(p,SH.CHIP);if(h0>0&&p.hp<=0)SH.log.coverBroke++;break;}}}}
   const r=st0.apply(this,arguments);
+  if(on()){if(S.hurts>(S._hs|0)&&S.P.hp>0&&/^bul:gunner/.test((S.hlog||[])[S.hurts-1]||'')){S.P.inv=SH.BINV;
+    if(SH.SLUGD<1){S.sb=(S.sb||0)+SH.SLUGD;if(S.sb<1){S.P.hp+=1;IN.pop(S.P.x,S.P.y-96,'GLANCING HIT: NO HEART LOST','#ffb020');}else S.sb-=1;}}   // 5c: a slug costs SLUGD of a heart: the heart goes when the part-hits add up to 1
+    S._hs=S.hurts;}   // 5b: a gunner slug leaves Kai invulnerable BINV s (the engine's 1.3): the one smooth knob for the casual player
   if(on()&&SH.KEEP)for(const p of S.pr)if(p.hp>0&&(SH.KEEP>1?p.cover:SH.COVER[p.k])&&!(p.dr&&p.dr.length))p.pass=true;   // Kai's shots fly over crates, the car and kiosks with nothing inside (only gunner fire wears them down)
   return r;};
 })();
