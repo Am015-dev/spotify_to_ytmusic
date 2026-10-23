@@ -34,3 +34,21 @@ Code: `parts/waves/slice.js` (rides on waves.js: same chip, same foe movement, o
 Hull hits per stage (human bot) 0-3; the stage-3 hits before were counter.js red seekers (no foe in sight), now muted here.
 Fire rate, bullet speed x1.6, wider fans and 2x hull on shooters did not move the human bot (hits 0-4): it dodges telegraphed aimed fire.
 Fingerprint: `?slice=0` 8/8 identical; slice on: only fly2 changes. Simhunt: 0 page errors, no finding on stages 1-3 (2 before).
+
+## W160 stage 1 FUN (23 Oct 2026, flag `RET.stage1fun`, ON; `?stage1fun=0` = the S1 script above). Code: `parts/waves/stage1fun.js`
+Owner: "all game is very boring", "the enemies are sleeping", "the test bot clears stages 1-3 at 100%". Stage 1 is now waves (bars 1-46) + a mini-boss (bar 47, ~28 s fight):
+a charger in the first group, varied shapes (V, wall, pincer, column, cross-fire), breathers at bars 15-16 and 30, live-foe cap 4 -> 8, bullet speed x1.1 -> x1.32
+and fire cooldown x.4 -> x.19 rising by bar to the PEAK (bars 37-46, announced FINAL PUSH), then the boss (its own fan + ring only: no borrowed verbs, arena rules
+or zone strikes). Hull 4 (was 7). The script runs on the stage beat count G.bc (the song beat index could fall behind it and stall the script 30 s).
+Decisions: BOUNTY (bar 18: gold courier between two guns, +1000 and a repair, or stay safe); SWARM (bar 31: three guns at once; the ship starts with 1 EMP: now or keep it for the peak).
+
+| simhunt stage 1, 50 runs per bot | before (?stage1fun=0) | after |
+|---|---|---|
+| human bot clear | 100% (hull left 7/7) | 72% (deaths at bars 32-48: the peak) |
+| parked bot | dies at 19 s | dies at 16 s |
+| stage length (clear) | 93 s, no boss | 150 s (boss from ~123 s, fight 28 s) |
+| median gap between dangerous moments (threat < 40 px) | 7.6 s | 3.7 s |
+| danger per minute, bars 0-35 / peak 36-43 | 5-10 / - | 8-14 / 15-23 |
+Bot behaviour on the decisions: it shoots the courier on its way 50/50 runs (a human must fly into the fans for it); it spends its EMP before the SWARM in 50/50 runs
+(fires it at the first crowd), so the bot does not prove the EMP decision; a human player's choice is not measured.
+Measure: `STAGES=1-1 SEEDS=50 ENDLESS=0 PAR=6 JSON=x.json node qa/simhunt.js` (+ `URLX=&stage1fun=0` for before); simhunt now records danger moments (`dg`) and `s1f` stats.
