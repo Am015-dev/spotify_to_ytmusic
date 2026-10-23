@@ -33,11 +33,20 @@ const RUND = RUNG.replace(REACT, 'S.time + .1, go: true')
     "  if (/^sb_throw/.test(e.state)) { I.l = dx > 0 ? 1 : 0; I.r = dx < 0 ? 1 : 0; }\n" +
     "  if (/^sb_leap/.test(e.state)) { const m = e.tx - P.x; if (Math.abs(m) < 110) { I.l = m > 0 ? 1 : 0; I.r = m < 0 ? 1 : 0; if (e.state === 'sb_leap' && e.sT > .45) I.dashP = 1; } } }\n" +
     "for (const b of S.eb) if (b.ground && b.src === 'bigheavy') { const t = (P.x - b.x) / (b.vx || 1e-6); if (t > 0 && t < .25 && P.onGround) { I.d = 0; I.jumpP = 1; I.jump = 1; } }\n" + DUCK);
-const CODE = { nearest: RUN, gfirst: RUNG, dodge: RUND };
+// W173 belt (Q=&belt=1): every bot lines up with its target's depth (stick up/down); the dodge bot steps 0.35 of the band out of line on every telegraph and every shot in its lane
+const BEND = 'I.l = p.x < P.x; } };';
+if (!RUN.includes(BEND)) { console.log('FAIL streetsim: street2-test bot changed, missing: ' + BEND); process.exit(2); }
+const BELT = "I.l = p.x < P.x; }\n    if (RET.belt && P.z != null) { I.u = I.d = 0; const gt = window.__gf && live.find(e => e.id === 'gunner' && !e.hid), nb = live.filter(e => !(e._sk > S.time)).sort((a, b) => Math.abs(a.x - P.x) - Math.abs(b.x - P.x))[0], tg = gt || nb || near; if (tg) { if (S._tg !== tg || S._tgH !== tg.hp) { S._tg = tg; S._tgH = tg.hp; S._tgT = S.time; } else if (S.time - S._tgT > 2.5) { tg._sk = S.time + 3; S._tg = null; } } let tz = tg && tg.z != null ? tg.z : P.z;" +
+  " if (!live.length) { const pk = S.pk.find(p => Math.abs(p.x - P.x) < 220 && p.z != null); if (pk) tz = pk.z; }" +
+  " if (__DZ__) { const th = live.find(e => e.z != null && Math.abs(e.z - P.z) < .22 && Math.abs(e.x - P.x) < 420 && (e.tele > 0 || e.wind > 0 || /wind|charge|lunge|crouch/.test(e.state || '')))," +
+  " bl = S.eb.find(b => { const t = (P.x - b.x) / (b.vx || 1e-6); return b.z != null && Math.abs(b.z - P.z) < .22 && t > 0 && t < .5; }), src = th || bl;" +
+  " if (src) { S._dzT = S.time + .35; S._dzTo = src.z > .5 ? Math.max(0, src.z - .4) : Math.min(1, src.z + .4); } }" +
+  " if (S._dzT > S.time) tz = S._dzTo; if (tz > P.z + .04) I.d = 1; else if (tz < P.z - .04) I.u = 1; } };";
+const CODE = { nearest: RUN.replace(BEND, BELT.replace('__DZ__', 'false')), gfirst: RUNG.replace(BEND, BELT.replace('__DZ__', 'false')), dodge: RUND.replace(BEND, BELT.replace('__DZ__', 'true')) };
 
 // ---- in the page: telemetry wrapped round FOOT.ctl (called once per update step, before the step), then the bot / idle run
 const TEL = () => {
-  const T = window.__T = { steps: 0, nan: 0, nanEx: '', still: 0, stuckAt: -1, sig: '', sigT: 0, thr: [], thrT: -1, duck: 0, hits: [], hurtAt: [], ttk: {}, lingerMax: 0, linger: 0, left: 0, seen: new Map(), prevX: null, bl: new Map(), mel: [], lastHurts: 0, hpMin: 99, hpPrev: null, hpLost: 0, tEnd: 0 };
+  const T = window.__T = { steps: 0, nan: 0, nanEx: '', still: 0, stuckAt: -1, sig: '', sigT: 0, thr: [], thrT: -1, duck: 0, hits: [], hurtAt: [], ttk: {}, lingerMax: 0, linger: 0, left: 0, seen: new Map(), prevX: null, bl: new Map(), mel: [], lastHurts: 0, hpMin: 99, hpPrev: null, hpLost: 0, tEnd: 0, zb: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], zs: [] };
   const W = { rusher: 1, gunner: 2, heavy: 4, guard: 2 }, num = v => typeof v === 'number' && isFinite(v), FE = window.FOOT_ENEMIES;
   for (const id of ['rusher', 'gunner', 'heavy', 'guard']) { const d = FE[id]; if (!d || d.__tk) continue; d.__tk = 1; const od = d.onDeath; d.onDeath = function (e) { const S = FOOT.S, T = window.__T; if (T && !e._tk) { e._tk = 1; const t0 = e.seenAt2 != null ? e.seenAt2 : e.born; if (S.P.w === 'pistol' && num(t0)) (T.ttk[id] = T.ttk[id] || []).push(+(S.time - t0).toFixed(2)); } return od ? od.apply(this, arguments) : undefined; }; }
   let inner = null;
@@ -56,7 +65,9 @@ const TEL = () => {
     let w = 0; for (const e of S.E) { if (e.dead) continue; const inView = e.x > S.camX - 5 && e.x < S.camX + vw + 5; if (inView && e.id !== 'bigheavy') w += W[e.id] || 1;   // the boss is its own phase, not part of the wave curve
       if (e.seen) { const r = T.seen.get(e) || (T.seen.set(e, t), t); if (t - r > 25) { T.lingerMax = Math.max(T.lingerMax, t - r); if (!e._lg) { e._lg = 1; T.linger++; } } }
       if (!e.fly && e.x < S.camX - 250 && !e._lf) { e._lf = 1; T.left++; } }
-    if (Math.floor(t) !== T.thrT) { T.thrT = Math.floor(t); T.thr.push(w); }
+    if (Math.floor(t) !== T.thrT) { T.thrT = Math.floor(t); T.thr.push(w);
+      if (P.z != null) { const a = S.E.filter(e => !e.dead && !e.boss && e.z != null && Math.abs(e.x - P.x) < 500).map(e => e.z); if (a.length >= 2) T.zs.push(Math.max(...a) - Math.min(...a)); } }   // W173 D3: depth spread of the foes near Kai
+    if (P.z != null) { T.zb[Math.min(9, Math.floor(P.z * 10))]++; for (const e of S.E) if (!e.dead && e.z != null && e.x > S.camX && e.x < S.camX + vw) T.zb[Math.min(9, Math.floor(e.z * 10))]++; }   // W173 D1: depth use
     // level shots passing Kai while he ducks (crouch) and does not get hit = ducked shots
     for (const b of S.eb) { const side = Math.sign(b.x - P.x), pr = T.bl.get(b); if (pr && pr.side !== side && P.crouch && Math.abs(b.y - (P.y - 40)) < 60 && S.hurts === pr.h) T.duck++; T.bl.set(b, { side, h: S.hurts }); }
     if (T.bl.size > 400) T.bl.clear();
@@ -71,8 +82,8 @@ const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); w
     RET.tale = false; FOOT.start('zeil'); let S = FOOT.S; for (let j = 0; j < 200 && S && !S.end; j++) S = FOOT.sim(1, 1 / 60); S = FOOT.S; r = { clear: !!(S.end && S.end.cleared), time: +S.time.toFixed(1), hp: S.P.hp, hurts: S.hurts, kills: S.kills }; }
   else { window.__gf = ${bot !== 'nearest'}; r = (${codeFn})(${seed}); }
   const ms = performance.now() - w0, S = FOOT.S, T = window.__T, sh = S.sh || {}, s3 = S.s3 || {};
-  const tu = {}; r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
-  r.tel = { mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
+  const tu = {}; r.zmiss = S.zmiss | 0; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
+  r.tel = { mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
     called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' ') };
   try { FOOT.stop(); } catch (e) {} un(); return r; })()`;
 const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story', JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 })); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } catch (e) {} };
@@ -155,6 +166,11 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   if (rows.dodge) { L(rows.dodge.duck >= 3, `ducking prevents >= 3 hits per run for the dodge bot (${rows.dodge.duck.toFixed(1)})`); L(rows.dodge.blocked >= 3, `cover prevents >= 3 hits per run for the dodge bot (${rows.dodge.blocked.toFixed(1)})`); }
   L(rows.__mel.under === 0, `every melee hit comes from a foe on screen >= 1.2 s before it (${rows.__mel.n} hits, ${rows.__mel.under} under 1.2 s, min ${rows.__mel.min} s)`);
   L(rows.__mel.beh / Math.max(1, rows.__mel.tot) < .2, `< 20% of hearts lost to foes that entered from behind (${rows.__mel.beh} of ${rows.__mel.tot} hits)`);
+  if (/belt=1/.test(process.env.Q || '')) { const G = ok0.filter(o => o.j.bot !== 'idle'), zb = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; for (const o of G) o.r.tel.zb.forEach((v, i) => zb[i] += v); const zt = zb.reduce((a, b) => a + b, 0), used = zb.filter(v => v >= .02 * zt).length;
+    const band = med(ok0.map(o => o.r.band)), dg = ok0.filter(o => o.j.bot === 'dodge'), zm = dg.reduce((a, o) => a + o.r.zmiss, 0), zh = dg.reduce((a, o) => a + (o.r.hurts || 0), 0), sp = med(G.flatMap(o => o.r.tel.zs));
+    L(band >= .25 && used >= 6, `W173 D1 floor band >= 25% of the view (${(100 * band).toFixed(0)}%) and actors use >= 60% of it (${used * 10}% of depth slices hold >= 2% of actor time)`);
+    L(zh + zm > 0 && zm / (zm + zh) >= .3, `W173 D2 the dodge bot avoids >= 30% of attacks by depth (${zm} out-of-depth misses vs ${zh} hits = ${(100 * zm / Math.max(1, zm + zh)).toFixed(0)}%)`);
+    L(sp != null && sp >= .3, `W173 D3 median depth spread of foes near Kai >= 30% of the band (${sp == null ? '-' : (100 * sp).toFixed(0) + '%'})`); }
   L(suiteSecs < 180, `whole suite < 3 min (${suiteSecs.toFixed(0)} s)`);
   L(factor >= 100, `speed >= x100 real time (x${factor.toFixed(0)}, ${rps.toFixed(2)} runs/s; slowest single run x${Math.min(...ok0.map(o => (o.r.tEnd || 0) / (o.r.ms / 1000))).toFixed(0)})`);
   if (rt) { L(rt.rep, `determinism: the same seed twice gives the same hurts and end time`); L(rt.same, `one seed equals a real-time run (idle, seed ${seedOf(0)}: stepped hurts [${rt.stepped}] vs real-time [${rt.real}] over the first ${rt.lim} s, tolerance 1 s)`); }
