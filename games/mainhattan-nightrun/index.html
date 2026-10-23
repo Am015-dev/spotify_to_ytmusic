@@ -8259,8 +8259,12 @@ if(RET.labfull&&RET.labassets!==undefined&&window.LABX){const LA_=window.LABX;co
 /* ---------- vector SHAPES for every item that still waits for painted art (see ASSETS-NEEDED.md). Each draws a simple shape now and switches to the painted file as soon as it is
    listed in media/ready.json (make-placeholders.py writes that list when it finds real art). Nothing here ever shows the placeholder pictures. ---------- */
 ART.rd=new Set();ART.isReal=n=>ART.rd.has(n+'.webp');
-fetch(ART.base+'ready.json').then(r=>r.json()).then(a=>{if(!Array.isArray(a))return;ART.rd=new Set(a);for(const f of a)if(!f.startsWith('anim/')&&!/\.mp3$/.test(f))ART.q.push(f.replace(/\.webp$/,''));ART.pump();   // (anim/ strips load on demand: ART.anim)
-  if(ART.uiIcons)ART.uiIcons();if(typeof garageEl!=='undefined'&&!garageEl.hidden)gaDraw();}).catch(()=>{});
+/* owner 23 Oct 2026 (iPhone screenshot: white placeholder enemies, no backdrop, stage started at once): this list was fetched ONCE; a 503 or a dropped phone
+   connection left ART.rd empty for the whole session = no art anywhere. Now: tried up to 6 times (0.8 s, 1.6 s ... apart, past the caches from the 2nd try);
+   ART.rdOk when it arrived, ART.rdFail when every try failed (art/preload.js waits for one of the two) */
+const rdGet=k=>fetch(ART.base+'ready.json'+(k?'?r='+Date.now():''),k?{cache:'no-store'}:undefined).then(r=>{if(!r.ok)throw r.status;return r.json();}).then(a=>{if(!Array.isArray(a))throw 'bad';ART.rd=new Set(a);ART.rdOk=1;for(const f of a)if(!f.startsWith('anim/')&&!/\.mp3$/.test(f))ART.q.push(f.replace(/\.webp$/,''));ART.pump();   // (anim/ strips load on demand: ART.anim)
+  if(ART.uiIcons)ART.uiIcons();if(typeof garageEl!=='undefined'&&!garageEl.hidden)gaDraw();}).catch(()=>{if(k<5)setTimeout(()=>rdGet(k+1),800*(k+1));else ART.rdFail=1;});
+rdGet(0);
 const SVGW=(inner,vb)=>`<svg viewBox="0 0 ${vb||24} ${vb||24}" aria-hidden="true">${inner}</svg>`;
 /* ----- difficulty badges ----- */
 const DIFFC={easy:'#8c86b8',normal:'#19e3ff',hard:'#ffb020',vhard:'#ff5a3d',legend:'#ff2d95'};
@@ -14685,7 +14689,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='bf3db0256f 2026-10-23 07:36 UTC';
+const NR_STAMP='480f4d2c6a 2026-10-23 07:54 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -18391,6 +18395,7 @@ const picOk=n=>{if(!ART.rd||!ART.rd.has(n+'.webp')||ART.err[n])return true;retur
 const animOk=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp')||ART.err[n])return true;return !!ART.anim(k);};
 const KIND={droneLine:'drone',droneV:'drone',droneSine:'drone',chargers:'charger',turret:'turret',gate:'gate',gunship:'gunship'};
 PL.needs=n=>{const d=STAGES[n-1],o=[];if(!d)return o;
+  if(RET.sprites)o.push({w:2,ok:()=>!!(ART.rdOk||ART.rdFail)});   // the art list itself (render/shapes.js): without it every picture below would count as 'nothing to load'
   if(ART.rd&&RET.sprites){
     const id=shipDef().id;o.push({w:2,ok:()=>animOk('ship-'+id+'/flame')&&animOk('ship-'+id+'/death')&&picOk('spr-ship-'+id)});
     const kinds=new Set(['drone']);for(const w of (d.waves||[]).slice(0,3))if(KIND[w])kinds.add(KIND[w]);

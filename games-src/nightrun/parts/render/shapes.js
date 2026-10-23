@@ -1,8 +1,12 @@
 /* ---------- vector SHAPES for every item that still waits for painted art (see ASSETS-NEEDED.md). Each draws a simple shape now and switches to the painted file as soon as it is
    listed in media/ready.json (make-placeholders.py writes that list when it finds real art). Nothing here ever shows the placeholder pictures. ---------- */
 ART.rd=new Set();ART.isReal=n=>ART.rd.has(n+'.webp');
-fetch(ART.base+'ready.json').then(r=>r.json()).then(a=>{if(!Array.isArray(a))return;ART.rd=new Set(a);for(const f of a)if(!f.startsWith('anim/')&&!/\.mp3$/.test(f))ART.q.push(f.replace(/\.webp$/,''));ART.pump();   // (anim/ strips load on demand: ART.anim)
-  if(ART.uiIcons)ART.uiIcons();if(typeof garageEl!=='undefined'&&!garageEl.hidden)gaDraw();}).catch(()=>{});
+/* owner 23 Oct 2026 (iPhone screenshot: white placeholder enemies, no backdrop, stage started at once): this list was fetched ONCE; a 503 or a dropped phone
+   connection left ART.rd empty for the whole session = no art anywhere. Now: tried up to 6 times (0.8 s, 1.6 s ... apart, past the caches from the 2nd try);
+   ART.rdOk when it arrived, ART.rdFail when every try failed (art/preload.js waits for one of the two) */
+const rdGet=k=>fetch(ART.base+'ready.json'+(k?'?r='+Date.now():''),k?{cache:'no-store'}:undefined).then(r=>{if(!r.ok)throw r.status;return r.json();}).then(a=>{if(!Array.isArray(a))throw 'bad';ART.rd=new Set(a);ART.rdOk=1;for(const f of a)if(!f.startsWith('anim/')&&!/\.mp3$/.test(f))ART.q.push(f.replace(/\.webp$/,''));ART.pump();   // (anim/ strips load on demand: ART.anim)
+  if(ART.uiIcons)ART.uiIcons();if(typeof garageEl!=='undefined'&&!garageEl.hidden)gaDraw();}).catch(()=>{if(k<5)setTimeout(()=>rdGet(k+1),800*(k+1));else ART.rdFail=1;});
+rdGet(0);
 const SVGW=(inner,vb)=>`<svg viewBox="0 0 ${vb||24} ${vb||24}" aria-hidden="true">${inner}</svg>`;
 /* ----- difficulty badges ----- */
 const DIFFC={easy:'#8c86b8',normal:'#19e3ff',hard:'#ffb020',vhard:'#ff5a3d',legend:'#ff2d95'};
