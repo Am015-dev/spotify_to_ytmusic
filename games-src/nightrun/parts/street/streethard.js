@@ -17,7 +17,7 @@ if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.s
 (function(){
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
-const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
+const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,LUNGE:120,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
 if(RET.slots===undefined)RET.slots=!/[?&]slots=0/.test(location.search);   // W170 (off by default): gunner charge shots telegraph 0.5 s; at most 2 foes in a wind-up or attack
 const ATK={rusher:['crouch','lunge'],heavy:['wind','charge'],bigheavy:['wind','charge'],gunner:['pop']},atk=q=>(q.tele||0)>0||(ATK[q.id]||[]).includes(q.state);
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
@@ -34,6 +34,7 @@ for(const id of ['rusher','gunner','heavy']){const d=FE[id];if(!d||d._sh)continu
   const od=d.onDeath;d.onDeath=function(e){if(on()&&!e._ttk){e._ttk=1;const S=F.S,t0=e.seenAt2!=null?e.seenAt2:e.born;(SH.log.ttk[id]||(SH.log.ttk[id]=[])).push(+(S.time-t0).toFixed(2));
       if(id==='gunner')SH.log.gunDead.push(+S.time.toFixed(1));if(id==='rusher')SH.log.rushDead.push(+S.time.toFixed(1));}return od?od.apply(this,arguments):undefined;};
   const a0=d.ai;d.ai=function(e,dt,env){
+    if(on()&&id==='rusher'&&e.state==='run'&&SH.LUNGE>120&&abs(env.P.x-e.x)<SH.LUNGE&&e.grace<=0&&abs(env.P.y-e.y)<120){e.state='crouch';e.sT=0;}   // W181 cam2: the lunge starts from further out (the view is wider, foes are seen earlier)
     if(on()&&id==='rusher'&&e.state==='crouch')e.sT-=dt*(1-.4/SH.CROUCH);   // 2: a longer, readable crouch before the lunge
     const s0=e.state,t0=e.sT,h0=e.hid,was=atk(e);
     a0.apply(this,arguments);
