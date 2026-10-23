@@ -12,6 +12,7 @@
    Kai may walk back (camera eases back <= 35% of the view, not behind the section checkpoint); auto-fire turns Kai to a target behind. Poses without a sheet borrow the nearest act (art.js ART.FB).
    HUD: hearts / weapon / ammo / bombs / power-ups / fever in one panel top-left (14 px+ text), score + time left of the pause button, the hint under both. ---------- */
 if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
+if(RET.cam2===undefined)RET.cam2=!/[?&]cam2=0/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;
@@ -69,10 +70,20 @@ function slBlit(c,kind,k,cam,x0,w,t0,res){const pic=slPic(BGL[kind][1]),Hh=FL+2-
 
 /* ----- near layer (x1, on the road): the approved prop sheets only, each <= 1.25 characters tall, bottom on the road ----- */
 const PROPS=[['car',.62],['police',.72],['holo',1.15],['beacon',.95],['steam',.9]];   // [sheet, height in characters]
+/* W164 (RET.cam2): steam rises from fixed street vents, one per 1100 units on the road line (every vent is always drawn while on screen, so nothing pops), 1.7 characters tall;
+   only the sheet frames holding >= 60% of the fullest frame's pixels are used (ping-pong), so the plume never fades to almost nothing. */
+const PROPS4=PROPS.filter(q=>q[0]!=='steam'),STEAM='prop-steam/glow',SV={cell:1100,h:1.7};let steamSeq=null;
+function steamFrames(){if(steamSeq)return steamSeq;const o=ART.aS&&ART.aS(STEAM),im=o&&ART.anim(STEAM);if(!o||!im||!im.width)return null;const n=o.m[0],w=o.m[2],h=o.m[3],cv=document.createElement('canvas');cv.width=im.width;cv.height=h;const g=cv.getContext('2d');g.drawImage(im,0,0);
+  const cov=[];for(let i=0;i<n;i++){const d=g.getImageData(i*w,0,w,h).data;let k=0;for(let j=3;j<d.length;j+=4)if(d[j]>16)k++;cov.push(k);}
+  const mx=Math.max(...cov),ok=[];for(let i=0;i<n;i++)if(cov[i]>=.6*mx)ok.push(i);const seq=ok.slice();for(let i=ok.length-2;i>0;i--)seq.push(ok[i]);   // up, then back down
+  return steamSeq={seq,cov,t:seq.map(i=>i?o.cum[i-1]:0),fps:o.m[1]};}
+SL.steam=(c,cam,x0,w,fl,t)=>{const C=CH*SL.k,m=ART.ANIM.s[STEAM],sf=steamFrames();if(!m||!sf)return;const h=SV.h*C,i0=Math.floor((cam+x0)/SV.cell)-1,i1=Math.ceil((cam+x0+w)/SV.cell)+1,fi=Math.floor(t*sf.fps)%sf.seq.length;
+  for(let i=i0;i<=i1;i++){const px=i*SV.cell-cam+SV.cell*(.3+.4*hs(i*5+11)),k=(fi+i+4*sf.seq.length)%sf.seq.length;SL.tag='prop';SL.steamLast={x:px,frame:sf.seq[k],cov:sf.cov[sf.seq[k]],vent:i};ART.drawAnim(c,STEAM,sf.t[k],px,fl-h*.5+.03*h,h/m[3],false,.95);SL.tag='';}};
 if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART.drawAnim)return;const C=CH*SL.k,x0=SL.x0||0,cell=400,i0=Math.floor((cam+x0)/cell)-1,i1=Math.ceil((cam+x0+w)/cell)+1;
   for(let i=i0;i<=i1;i++){const r=hs(i*41+7),px=i*cell-cam+cell*(.2+.6*hs(i*5+1));if(r>.58)continue;
-    const q=PROPS[Math.floor(hs(i*97+3)*PROPS.length)],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),m=ART.ANIM.s[k];if(!m||!ART.anim(k))continue;
-    const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
+    const PL=RET.cam2?PROPS4:PROPS,q=PL[Math.floor(hs(i*97+3)*PL.length)],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),m=ART.ANIM.s[k];if(!m||!ART.anim(k))continue;
+    const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}
+  if(RET.cam2)SL.steam(c,cam,x0,w,fl,t);};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
 
 /* ----- painted street (22 Oct 2026): foot/bg-sky|far|mid|near|floor, 2048x1024 each, used only when all five are loaded (else the placeholders below). Same convention as footart.js FA.bg: the picture's street line is 80% down,
    scaled so that line lands on the road line FL (top of the picture at the top of the visible sky), tiles are 2:1 and repeat sideways. Sky is opaque and almost fixed, the others scroll slower the further away they are,

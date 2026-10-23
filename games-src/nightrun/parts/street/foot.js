@@ -241,11 +241,11 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
 
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
 function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
-  let want=Math.max(S.camX,P.x-vw*(F.camK||.38));if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);
+  let want=Math.max(S.camX,P.x-vw*(RET.cam2?.3:(F.camK||.38)));/* W164 cam2: Kai sits at 30-37% while running right */if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);
   if(!S.lock)for(const l of st.locks)if(!S.lockDone[l.id]&&want>=l.x-vw/2){S.lock={id:l.id,cam:l.x-vw/2};note('ARENA LOCK',1.6);sfx('warn');for(const w of S.waves)if(w.lock===l.id)w.started=true,w.next=S.time+(w.delay||0);break;}
   const bc=Math.min(st.boss.x-vw/2,st.len-vw);if(!S.lock&&!S.bossOn&&want>=bc-1){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.6;note('WARNING: WARDEN',1.8);sfx('warn');S.eb.length=0;}
   if(S.lock)want=Math.min(want,S.lock.cam);
-  S.camX+=(want-S.camX)*Math.min(1,dt*8);if(Math.abs(want-S.camX)<.5)S.camX=want;
+  S.camX+=(want-S.camX)*Math.min(1,dt*(RET.cam2?14:8));if(Math.abs(want-S.camX)<.5)S.camX=want;
   if(S.lock&&S.lock.id!=='boss'){const left=S.E.some(e=>!e.dead&&e.lock===S.lock.id)||S.waves.some(w=>w.lock===S.lock.id&&!w.done);
     if(!left){S.lockDone[S.lock.id]=1;S.lock=null;note('GO  ▶',1.5);sfx('up');}}
   if(S.bossOn&&!S.boss&&S.time>=S.bossAt){const b=spawn(st.boss.id,S.camX+vw-70,FL,{boss:true});b.grace=1.2;}
