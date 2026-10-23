@@ -15,7 +15,7 @@ const res = [], ok = (p, n) => { res.push(!!p); console.log((p ? 'PASS ' : 'FAIL
 const seedOf = i => 4321 + i * 7919;
 
 // ---- the bots: taken from the street tests themselves (one source of truth)
-const src = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN = src.slice(src.indexOf('const RUN = ') + 12, src.indexOf('\n(async () =>')).trim().replace(/;$/, '');
+const src = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN = src.slice(src.indexOf('const RUN = ') + 12, src.indexOf('\n(async () =>')).trim().replace(/;$/, '').replace('i < 200', 'i < 300');   // W168: a 45-90 s boss fight ends after 200 s game time
 const NEAR = 'if (near) P.facing = near.x > P.x ? 1 : -1;', DUCK = '// bullets: hop low ones', REACT = 'S.time + .2 + rnd() * .15, go: rnd() > .25';
 for (const k of [NEAR, DUCK, REACT, "for (const p of S.pk) if ("]) if (!RUN.includes(k)) { console.log('FAIL streetsim: street2-test bot changed, missing: ' + k); process.exit(2); }
 const RUNG = RUN.replace(NEAR, "{ const ga = window.__gf && live.find(e => e.id === 'gunner'), gf = ga && !ga.hid ? ga : null, tg = gf || near; if (tg) P.facing = tg.x > P.x ? 1 : -1;" +

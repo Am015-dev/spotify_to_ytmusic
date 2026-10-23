@@ -16,7 +16,7 @@ if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;
 const IN=F._in,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1;
 const PH=[null,{n:'THE CHARGE',at:['charge','throw']},{n:'GROUND POUND',at:['pound']},{n:'LEAP',at:['leap']}],LINE=[0,1,.66,.33];
 const CAP={charge:'CHARGE · JUMP OR DASH',throw:'BARREL · STEP BACK',pound:'GROUND POUND · JUMP THE WAVE',leap:'LEAP · DASH OUT'};
-const WIND={throw:.7,pound:.8,leap:.6},OPEN=1.0,ROAR=1.2,LEAPT=.7,HPK=+((location.search.match(/[?&]sbhp=([\d.]+)/)||[])[1]||1);   // boss hp x HPK; ?sbhp= to tune (W168: x5 gives a 32 s dodge-bot fight, x8 47 s, but the rushers that join every 3.5 s then kill the bots)
+const WIND={throw:.7,pound:.8,leap:.6},OPEN=1.0,ROAR=1.2,LEAPT=.7,HPK=+((location.search.match(/[?&]sbhp=([\d.]+)/)||[])[1]||8);   // boss hp x HPK (W168: default 8 = a 45-90 s fight; ?sbhp= to tune) (W168: x5 gives a 32 s dodge-bot fight, x8 47 s, but the rushers that join every 3.5 s then kill the bots)
 const SB=F.SB={log:[]};   // per fight: {ph:[[phase,t]], at:[[attack,t]]} for the probe
 const name=e=>'BIG HEAVY · PHASE '+e.ph+': '+PH[e.ph].n;
 function go(e,s){e.state=s;e.sT=0;}

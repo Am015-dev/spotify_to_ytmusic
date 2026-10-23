@@ -110,8 +110,8 @@ ST.hook={
     for(const e of S.E){if(e.seen&&e.seenAt2==null)e.seenAt2=S.time;if(e.dead&&!e._s2){e._s2=1;if(e.seenAt2!=null){f.life.push(+(S.time-e.seenAt2).toFixed(1));if(e.boss)f.bossLife=+(S.time-e.seenAt2).toFixed(1);}}}
     // enemy bullets: cover stops them and wears down
     for(const b of S.eb){if(b.life<=0)continue;for(const p of S.pr){if(p.hp<=0||p.gone||p.k==='barrel')continue;if(b.x>p.x-p.w/2-b.r&&b.x<p.x+p.w/2+b.r&&b.y>p.y-p.h-b.r&&b.y<p.y+4){b.life=0;IN.hitProp(p,.5);break;}}}
-    // climax: rushers keep coming while the big heavy stands (max 3 at once)
-    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<3){F.env.spawn('rusher',f.adds++%2&&!RET.fairstreet?S.camX-40:S.camX+env.G.viewW+40,null);}}},
+    // climax: rushers keep coming while the big heavy stands (max 3 at once; with the phased boss none, W168)
+    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<(RET.sboss?0:3)){F.env.spawn('rusher',f.adds++%2&&!RET.fairstreet?S.camX-40:S.camX+env.G.viewW+40,null);}}},
   draw(c,S){},
   hud(c,vw,u,box,fs,S){const x0=vw*.18,bw=vw*.64,y=540-14*u,h=6*u,pr=clamp(S.P.maxX/ST.boss.x,0,1);
     c.fillStyle='#ffffff22';c.fillRect(x0,y,bw,h);c.fillStyle='#19e3ff';c.fillRect(x0,y,bw*pr,h);
