@@ -18,9 +18,9 @@ const GCAR_ids=()=>GAR_SETS.filter(S=>G9C_forms(S).includes('car')).map(S=>S.id)
 async function GCAR_all(ids){const L=ids||GCAR_ids(),out=[],run=GCAR_all.run=(GCAR_all.run||0)+1;for(const id of L){if(GCAR_all.run!==run)break;out.push(await GCAR_one(id))}return out}
 window.__gcar={one:GCAR_one,all:GCAR_all};
 (function GCAR_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='garage'&&q.id==='all-cars'))C.items.push({ver:'garage',id:'all-cars',area:'garage',text:'garage-cars · Every street ride in the garage works (Alex 22 Oct: "most of the cars do not work from the garage"). 📍 GO taps each card, SAVE & DRIVE, holds gas and steers. Pass line: every ride owned (ALL_OPEN), model loaded and visible, > 30 km/h, turns, no page error, in Frankfurt and Athens.'});
-  C.GO['garage/all-cars']=['fra','ath'].flatMap(c=>[0,1,2,3,4,5,6,7].map(k=>({c,n:(c==='fra'?'Frankfurt':'Athens')+' free roam, rides part '+(k+1)+'/8',secs:480,fn:()=>{const L=GCAR_ids(),q=Math.ceil(L.length/8),ids=L.slice(k*q,(k+1)*q);if(typeof ALL_OPEN!=='undefined'&&!ALL_OPEN)return'📍 ALL_OPEN is off ❌';const sel0=GAR_get().sel;
+  C.GO['garage/all-cars']=['fra','ath'].flatMap(c=>[...Array(12).keys()].map(k=>({c,n:(c==='fra'?'Frankfurt':'Athens')+' free roam, rides part '+(k+1)+'/12',secs:480,fn:()=>{const L=GCAR_ids(),q=Math.ceil(L.length/12),ids=L.slice(k*q,(k+1)*q);if(typeof ALL_OPEN!=='undefined'&&!ALL_OPEN)return'📍 ALL_OPEN is off ❌';const sel0=GAR_get().sel;
   GCAR_all(ids).then(R=>{const bad=R.filter(r=>r.fail.length);try{if(GAR_get().sel!==sel0){gbOpen();GAR_select(sel0);gbClose(true)}}catch(e){}
-   C.goSay('📍 GARAGE · '+R.length+'/'+L.length+' street rides (part '+(k+1)+'/8) tapped in the garage and driven ('+(CID==='fra'?'Frankfurt':'Athens')+'): '+(R.length-bad.length)+' work, '+bad.length+' fail'+(bad.length?': '+bad.slice(0,12).map(r=>r.id+' ('+r.fail.join(', ')+')').join(' · ')+' ❌':' ✅'))},e=>C.goSay('📍 GARAGE · threw '+e+' ❌'));
-  return'📍 GARAGE · tapping and driving rides part '+(k+1)+'/8…'}})));
+   C.goSay('📍 GARAGE · '+R.length+'/'+L.length+' street rides (part '+(k+1)+'/12) tapped in the garage and driven ('+(CID==='fra'?'Frankfurt':'Athens')+'): '+(R.length-bad.length)+' work, '+bad.length+' fail'+(bad.length?': '+bad.slice(0,12).map(r=>r.id+' ('+r.fail.join(', ')+')').join(' · ')+' ❌':' ✅'))},e=>C.goSay('📍 GARAGE · threw '+e+' ❌'));
+  return'📍 GARAGE · tapping and driving rides part '+(k+1)+'/12…'}})));
   return}
  if(i<600)setTimeout(()=>GCAR_reg(i+1),100)})(0);
