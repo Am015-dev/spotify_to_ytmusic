@@ -15,7 +15,7 @@ const L2=window.L2={page:'home',starting:false,busy:false,kind:'boss',item:0,sta
 const PAGES=[['viewer','FLIGHT VIEWER','Look at every boss, enemy ship, player ship, pickup and shot, one state at a time. Nothing moves or fires unless you press play.'],
   ['play','FLIGHT PLAY TEST','The live flight stage with test controls: spawn a boss, lock its phase, force an attack, spawn foes and items, cheats.'],
   ['foot','ON FOOT','The street stage in a sandbox: rooms, spawns, god mode, slow motion, hit boxes.'],
-  ['sound','SOUND','Hear every sound effect and switch each one on or off.'],
+  ['sound','SOUND','Hear every song, pick which song plays where, switch every sound and jingle on or off, and export the settings.'],
   ['assets','ASSETS','Browse every picture in the game.']];
 const TITLE={home:'LAB',viewer:'FLIGHT VIEWER',play:'FLIGHT PLAY TEST',foot:'ON FOOT',sound:'SOUND',assets:'ASSETS'};
 const has=t=>t==='home'||t==='play'||t==='viewer'||!!(window.LABX&&LABX.build&&LABX.build[t]);

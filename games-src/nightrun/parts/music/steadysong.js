@@ -1,5 +1,5 @@
-// PURPOSE: the song changes only when the district changes, and keeps playing (no restart) between stages and through the menus
-// FLAG: steady (?steady=0 = a new song every stage, menu song between stages)
+// PURPOSE: the song changes only when the district changes, and keeps playing (no restart) between stages and through the menus; the owner's music picks (Lab SOUND page) replace a song per place
+// FLAG: steady (?steady=0 = a new song every stage, menu song between stages); musiclab (?musiclab=0 = the picks are ignored)
 // TEST: qa/loadgate.js (no page errors); fingerprint-test (sim: no audio)
 /* ---------- STEADY: owner, 22 Oct 2026: "the song changes too often between stages".
    Before: each story stage had its own song (stage1/stage2/stage3 in turn, a shuffled pool from stage 5), the menu between two stages switched to the
@@ -15,3 +15,12 @@ if(RET.steady){
     if(stage!=='menu'&&c&&c.stage===stage&&BT.stage===stage&&BT.mode==='file'){this.want=null;this.wantT=0;return;}   // same song: keep it running
     return s0.apply(this,arguments);};}
   {const m0=AU.menuMusic;AU.menuMusic=function(){if(BT.stage&&BT.stage!=='menu'&&this.cur)return;return m0.apply(this,arguments);};}}
+
+/* ---------- MUSICLAB: owner, 23 Oct 2026: the Lab SOUND page picks the song of the title, the street stage, each flight district and each boss (SND.cfg.music, saved in 'nr_snd').
+   The picks are applied here, outside the steady block, so they also work with ?steady=0. A song that is already playing is never restarted. ---------- */
+if(RET.musiclab===undefined)RET.musiclab=!/[?&]musiclab=0/.test(location.search);
+if(RET.musiclab&&window.SND){
+  {const s0=AU.startStage;AU.startStage=function(stage,at){const t=SND.songFor(stage);
+    if(stage==='menu'&&t!=='menu'&&!at&&this.cur&&this.cur.stage===t&&BT.stage===t&&BT.mode==='file'){this.want=null;this.wantT=0;return;}   // the picked title song is already playing: keep it running
+    return s0.call(this,t,at);};}
+  {const w0=AU.switchTo;AU.switchTo=function(stage){return w0.call(this,SND.songFor(stage));};}}
