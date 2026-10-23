@@ -60,7 +60,7 @@ const { boot, open, sleep, ok, done } = require('./lib.js');
     const pv = await p.evaluate(() => { const row = document.querySelector('#labP .snr[data-song]'), b = row.querySelector('button'); b.click(); const on = SND.pvSong === row.dataset.song; const t1 = b.textContent; b.click(); return { on, t1, off: SND.pvSong, t2: b.textContent }; });
     ok('PLAY starts the song and the button turns into STOP; STOP ends the preview', pv.on === true && pv.t1 === 'STOP' && pv.off === null && pv.t2 === 'PLAY', JSON.stringify(pv));
     const pk = await p.evaluate(() => { const AU = SND.AU, o = {}; const st = (k) => { AU.startStage(k); return SND.BT.stage; };
-      SND.cfg.music = {}; o.def = [st('menu'), st('stage2'), st('boss')].join();
+      SND.cfg.music = {}; o.def = [__mnr.RET.focus ? 'menu' : st('menu'), st('stage2'), st('boss')].join();   // focus mode: the title is silent without a pick (focus-test.js), so the default title song is only checked with ?focus=0
       SND.setMusic('title', 'boss2'); o.title = st('menu'); SND.setMusic('title', '');
       SND.setMusic('street', 'stage3'); FOOT.on = true; o.street = st('stage2'); FOOT.on = false; SND.setMusic('street', '');
       const R = __mnr.RET, G = __mnr.G, di0 = G.di; G.di = 1; const dp = R.DP && R.DP.pool ? R.DP.pool(1)[0] : 'stage2'; SND.setMusic('d1', dp === 'endless2' ? 'endless' : 'endless2'); o.d1 = st(dp); o.d1want = SND.cfg.music.d1; G.di = di0; SND.lastOut = null;
