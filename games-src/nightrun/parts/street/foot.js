@@ -145,7 +145,7 @@ const hittable=e=>!e.dead&&!(e.def.canHit&&e.def.canHit(e)===false);
 function circHit(x,y,r,b){const cx=clamp(x,b.x,b.x+b.w),cy=clamp(y,b.y,b.y+b.h);return (x-cx)*(x-cx)+(y-cy)*(y-cy)<=r*r;}
 function dmgE(e,d,src){if(!hittable(e))return;const k=(S.P.pw.dbl?[1,2,2.4,2.8][S.P.pw.dbl.lv]:1)*(S.feverT>0?1.25:1);d*=k;
   if(e.def.front&&src&&Math.sign(src.vx||0)===-e.facing&&!src.pierce&&e.def.fb){d*=.4;}   // fallback shield: front blocks most
-  e.hp-=d;e.flash=.08;try{e.def.onHit&&e.def.onHit(e,d,env,{x:src&&src.x!=null?src.x-(src.vx||0)*.01:S.P.x,melee:!!(src&&src.melee)});}catch(x){}
+  e.hp-=d;e.flash=.08;if(F.hitFeel)F.hitFeel(e,d,src);try{e.def.onHit&&e.def.onHit(e,d,env,{x:src&&src.x!=null?src.x-(src.vx||0)*.01:S.P.x,melee:!!(src&&src.melee)});}catch(x){}
   if(e.ext&&e.boss&&e.phase!==e._lp){if(e._lp!=null){hitstop(60);ftShake(10);note('PHASE '+e.phase,1.4);NR.emit('footPhase',{id:e.id,phase:e.phase});}e._lp=e.phase;}
   if(!e.ext&&e.boss&&e.def.phases){const fr=e.hp/e.max;while(e.phase<e.def.phases.length&&fr<=e.def.phases[e.phase].hp){e.phase++;hitstop(60);ftShake(10);note('PHASE '+(e.phase+1),1.4);NR.emit('footPhase',{id:e.id,phase:e.phase});}}
   if(e.hp<=0)ftKill(e);}
@@ -176,7 +176,7 @@ function fire(P){const s=wstat(P.w,P.lv),w=s.w,lv=P.lv,a0=aimAngle(P),a1=aimAssi
   S.shots++;P.shotT=.12;const pr=(t)=>({x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
   if(w.kind==='bul'){const sp=(w.spr||0)*(1-.12*(lv-1)),n=(P.w==='hmg'&&lv>=5)?2:(P.w==='pistol'&&lv>=3?2:1);
     for(let i=0;i<n;i++){const aa=a+ftRnd(-sp,sp)+(n>1?(i-.5)*.08:0);S.pb.push(pr({vx:Math.cos(aa)*w.spd,vy:Math.sin(aa)*w.spd,pierce:(P.w==='hmg'&&lv>=3)?1:0}));}}
-  else if(w.kind==='pel'){const n=w.pel+(lv>=3?2:0);for(let i=0;i<n;i++){const aa=a+(i-(n-1)/2)*(w.spr/n)*2+ftRnd(-.03,.03),v=w.spd*ftRnd(.85,1.1);S.pb.push(pr({vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,r:4,pierce:lv>=5?1:0,kb:lv>=5?220:60}));}ftShake(2);}
+  else if(w.kind==='pel'){const n=w.pel+(lv>=3?2:0);for(let i=0;i<n;i++){const aa=a+(i-(n-1)/2)*(w.spr/n)*2+ftRnd(-.03,.03),v=w.spd*ftRnd(.85,1.1);S.pb.push(pr({vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,r:4,pierce:lv>=5?1:0,kb:lv>=5?220:60}));}if(!RET.hitfeel)ftShake(2);}
   else if(w.kind==='fire'){const v=w.spd*(lv>=3?1.4:1)*ftRnd(.9,1.1),aa=a+ftRnd(-.12,.12);S.pb.push(pr({vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,r:7,pierce:9,life:w.life*(lv>=3?1.3:1),burn:lv>=5}));}
   else if(w.kind==='rkt'){S.pb.push(pr({vx:Math.cos(a)*w.spd,vy:Math.sin(a)*w.spd,r:6,rad:w.rad*(lv>=3?1.45:1),hom:lv>=5,life:2}));sfx('shot');}
   else if(w.kind==='arc'){arcShot(P,ox,oy,a,s.dmg,lv);}
@@ -199,14 +199,15 @@ function collect(p){const P=S.P,d=PICKUPS[p.k];sfx('pick');let lv=1;
   NR.emit('footPick',{id:p.k,lv});}
 function ftHurt(n,fromX,src){const P=S.P;if(P.inv>0||P.dashIF>0||S.win||P.hp<=0)return false;
   if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');sfx('graze');return false;}
-  P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*240;
+  P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*(RET.hitfeel?170:240);
   sfx('hurt');ftShake(8);hitstop(40);ftBurst(P.x,P.y-40,'#ff4060',10);
   if(P.w!=='pistol'){const nl=P.lv-1;if(nl<1){pop(P.x,P.y-96,WEAPONS[P.w].n+' LOST','#ff4060');setW(P,'pistol',1,Infinity,false);}else{setW(P,P.w,nl,P.ammo,false);pop(P.x,P.y-96,WEAPONS[P.w].n+' LV'+nl,'#ff4060');}}
   if(P.hp<=0){P.hp=0;S.dead=1.4;note('DOWN',2);NR.emit('footDown',{stage:S.id});}
   return true;}
 function bomb(P){if(P.bombs<=0)return;P.bombs--;S.bombsL.push({x:P.x+P.facing*10,y:P.y-50,vx:P.facing*380+P.vx*.4,vy:-420,t:0});}
-function boom(x,y,rad,dmg){AH.ftPush(S.fx,'fx-ft-rocket-hit',x,y,rad*2.4,.35);if(y>=FL-30)AH.ftPush(S.fx,'fx-boom-ground-dust',x,y-10,rad*2,.5);ftBurst(x,y,'#ffb020',24,380);ftBurst(x,y,'#fff',8,200);ftShake(9);sfx('boom');S.fx.push({ring:1,x,y,r:rad,l:.3,m:.3,c:'#ffb020'});
-  for(const e of S.E)if(!e.dead&&circHit(x,y,rad,ebox(e)))dmgE(e,dmg,{pierce:1});
+function boom(x,y,rad,dmg){AH.ftPush(S.fx,'fx-ft-rocket-hit',x,y,rad*2.4,.35);if(y>=FL-30)AH.ftPush(S.fx,'fx-boom-ground-dust',x,y-10,rad*2,.5);ftBurst(x,y,'#ffb020',24,380);ftBurst(x,y,'#fff',8,200);if(!RET.hitfeel)ftShake(9);sfx('boom');S.fx.push({ring:1,x,y,r:rad,l:.3,m:.3,c:'#ffb020'});
+  let nh=0;for(const e of S.E)if(!e.dead&&circHit(x,y,rad,ebox(e))){dmgE(e,dmg,{pierce:1});nh++;}
+  if(RET.hitfeel&&nh)ftShake(9);   // hitfeel: a blast that hits nothing does not shake
   for(const p of S.pr)if(p.hp>0&&circHit(x,y,rad,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h}))hitProp(p,dmg);
   for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(Math.hypot(b.x-x,b.y-y)<rad)S.eb.splice(i,1);}}
 function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x,p.y-p.h/2,p.c,14);S.score+=50;pop(p.x,p.y-p.h,'+50','#ccc');const D=p.dr||PROPD[p.k].dr;if(D.length)drop(D[p.i%D.length],p.x,p.y-p.h/2);if(p.onBreak)p.onBreak(p);sfx('hit');}}   // street2: p.dr = own rewards ([] = none), p.onBreak = debris / blast
@@ -324,7 +325,7 @@ function stepPickups(dt){const P=S.P,mg=P.pw.magnet?[0,140,220,320][P.pw.magnet.
   S.fx=S.fx.filter(f=>f.l>0);for(const p of S.pop){p.l-=dt;p.y-=40*dt;}S.pop=S.pop.filter(p=>p.l>0);
   for(const p of S.pr)if(p.fl>0)p.fl-=dt;S.pr=S.pr.filter(p=>!p.gone||p.fl>0);}
 function ftUpdate(rdt){if(!S||S.paused||S.end)return;
-  let dt=Math.min(rdt,.05);if(S.hs>0){S.hs-=rdt;dt*=.05;}
+  let dt=Math.min(rdt,.05);if(S.hf>0)S.hf-=rdt;if(S.hs>0){S.hs-=rdt;dt*=.05;}
   if(F.ctl)try{F.ctl(S,I);}catch(e){}
   S.time+=dt;if(S.note.t>0)S.note.t-=rdt;if(S.shake>0)S.shake=Math.max(0,S.shake-rdt*30);if(S.feverT>0)S.feverT-=dt;S.hintT+=rdt;
   stepPlayer(dt);stepStage(dt);if(S.st.hook&&S.st.hook.step)S.st.hook.step(S,dt,env);stepEnemies(dt);stepShots(dt);stepPickups(dt);if(F.post)F.post(S,dt);   // tidy.js: arena player cap + flyers kept under the HUD
@@ -554,7 +555,7 @@ function start(id){id=id||'street1';if(!RET.foot||!STAGES[id])return false;if(ty
   begin(id);return true;}
 function stop(){if(S&&!S.end)finish(false,true);if(!F.lab&&S&&S.hintT>8&&S.moved>250&&S.shots>0&&!SV.hint){SV.hint=1;svSave();}F.on=false;if(raf)cancelAnimationFrame(raf);raf=0;if(L){L.root.hidden=true;hideMenu();}
   for(const k in I)I[k]=0;try{if(typeof AU!=='undefined'&&AU.menuMusic&&sndF('f_mmenu')&&!(typeof running!=='undefined'&&running))AU.menuMusic();}catch(e){}}
-function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);while(n-->0&&S&&!S.end)ftUpdate(dt);return S;}   // headless fast-forward for tests
+function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);if(S)S.sim=1;while(n-->0&&S&&!S.end)ftUpdate(dt);return S;}   // headless fast-forward for tests
 
 /* ===== MENU button: STREET RUN (unlocked after story stage 3) ===== */
 if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)return false;if(document.getElementById('footBtn'))return true;
@@ -563,5 +564,5 @@ if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');F.ui=1;start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
-F._in={boom,hitProp,ftHurt,ftBurst,dmgE,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
+F._in={boom,hitProp,ftHurt,ftBurst,dmgE,hitstop,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
 return F;})();
