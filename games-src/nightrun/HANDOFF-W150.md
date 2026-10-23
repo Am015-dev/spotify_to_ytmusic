@@ -1,23 +1,26 @@
 # HANDOFF W150: street stage "very easy and not strategic" (parts/street/streethard.js, flag RET.streethard, default on, ?streethard=0 = old)
 
-Measured with stepped time, RUNS=8 (`qa/streethard-test.js`, `qa/street3-test.js`).
+Round 2 (23 Oct, 07:00-07:15 UTC). Stepped time, RUNS=8, seeds fixed (`qa/streethard-test.js`, `qa/street3-test.js`).
 
-| | before (?streethard=0) | after |
+| | before (?streethard=0) | round 2 |
 |---|---|---|
-| time-to-kill, pistol, median (rusher / gunner / heavy) | 0.77 / 0.93 / 16.0 s | 1.93 / 4.07 / 7.7 s |
-| decent bot clears (street2-test bot + ducks level shots) | 7/8 | 4/8 |
-| street3-test bot clears | 7/8 | 7/8 |
-| idle bot | dies at ~17 s | dies at ~19 s |
-| threat peak (street3-test (b)) | 79% | 85% (PASS) |
+| time-to-kill, pistol, median (rusher / gunner / heavy) | 0.77 / 0.93 / 16.0 s | 2.87 / 5.45 / 5.35 s |
+| nearest-first bot clears ('decent') | 7/8 | 3/8 |
+| gunner-first bot clears | - | 6/8 |
+| idle bot | dies ~17 s | dies ~21 s |
+| threat peak (street3-test (b)) | 79% | 89% (PASS, at 136 s on a 153.6 s median clear) |
 
-Decisions created:
-1. Kill order: a gunner left alive shows "CALLING HELP" and 1 s later pulls a rusher from a later wave (every 10 s). 1-2 calls a run.
-   Not proven yet: the gunner-first bot clears no more than the nearest-first bot (3/8 vs 4/8), because the gunner hides behind cover most of the time.
-2. Cover or push: gunner bullets stop on cover props (height 56 at least) and chip them (2 hp). Bots rarely stand behind cover between them and a gunner
-   (0-0.8 blocks a run), so this is not measured well yet.
-Readable attacks: rusher crouch 0.6 s (was 0.4), gunner shots fly level at chest height so ducking dodges them (they used to hit the crouch line).
-Heavy front plate takes 55% (was 30%).
+streethard-test: (a)(b)(c)(e)(f) PASS, (d) FAIL: gunner calls happen in every run (4-6), cover blocks only in 1 of 8 runs.
+street3-test PASS twice, footlab-test PASS, guard ok.
 
-Left (streethard-test fails narrowly): (a) rusher ttk 1.93 < 2.0 -> HPK.rusher 1.7; (d) cover blocks 0 on some seeds; (f) kill order has no measured value.
-Next: make the gunner pop out more often when unhurt (so gunner-first pays), and a bot that picks cover between itself and the gunner.
-Sensitive: small changes to peakT moved gunner ttk 4 -> 15 s (more gunners alive at once). Tune with SH='{"SH":{...},"T":{...}}' on the test.
+Round 2 changes: rusher hp x1.8; a gunner calls 3 s after it is seen and every 10 s after, adding one rusher (while fewer than 4 foes are up), and stands
+up in the open during its 1 s whistle; at most 1 gunner on the street at once; one more heart; gunner shots also stop on any crate/car/kiosk,
+including the gunner's own crate when Kai hugs the other side of it (street2 marks that crate `pass`, which round 1 skipped by mistake).
+
+Why (d) still fails: gunners take cover ahead of Kai and the bot's cover logic needs an intact cover prop left of the gunner; most runs have none on screen
+(Kai's fire breaks crates, and covers are 1 per ~600 px). Tried: keeping all cover unbreakable for Kai's shots (cover blocks ~1 a run in 6/8 runs, but the
+nearest-first bot then stalls behind cover and dies at ~90 s, 0-1/8 clears); gunners preferring a crate with another crate in front (no effect: pairs rarely on screen).
+Next idea: give each gunner wave a cover piece on Kai's side (needs a caption: rule 8), or make crates that hold no drops unbreakable by Kai only while a gunner is up.
+
+Warning: results swing with tiny changes on 8 seeds (peak 133 vs 136 s moved the nearest-first bot from 3/8 to 1/8 and the street3 peak from 89% to 81%).
+Gate on 16+ seeds before trusting a 1-2 clear difference.

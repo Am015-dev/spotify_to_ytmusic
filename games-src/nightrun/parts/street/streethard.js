@@ -5,20 +5,21 @@
    1. TOUGHER: foe hp x HPK (pistol 4.4 shots/s: rusher ~2 s, gunner ~4-5 s because it is only hittable while it pops up, heavy 4-8 s from behind / when stunned).
    2. READABLE: the rusher's crouch before its lunge lasts 0.6 s (was 0.4; red flash + CROUCH pose), gunner pop 0.5 s, heavy wind-up 0.8 s. All dodgeable: jump the lunge, duck or
       hide from the shots, jump or dash through the charge.
-   3. DECISION 1, KILL ORDER: a gunner left alive WHISTLES every CALL s ("CALLING HELP" over its head + a ring): the next foe of a later wave comes now. Rushers hurt you now,
-      the gunner costs you later. S.sh.called = foes it pulled in.
+   3. DECISION 1, KILL ORDER: a gunner left alive WHISTLES CALL0 s after it is seen and every CALL s after ("CALLING HELP" over its head + a ring): one more rusher joins.
+      During the 1 s whistle it stands up in the open (hittable). Rushers hurt you now, the gunner costs you later. S.sh.called = rushers it called in.
    2b. A gunner's shot at Kai on the road flies level at chest height (CHEST px up), so ducking under it works like jumping it (it used to aim at the crouch line).
-   4. DECISION 2, COVER OR PUSH: foe bullets stop on cover props (crates, car, kiosk) and chip them (CHIP hp a hit), so hiding works, but the cover wears out and the gunner never
+   4. DECISION 2, COVER OR PUSH: gunner bullets stop on any crate, car or kiosk (at least 56 px of cover) and chip it (CHIP hp a hit), also the cover Kai stands at (street2 lets his own shots fly over it), so hiding works, but the cover wears out and the gunner never
       dies while you hide. S.sh.blocked / S.sh.coverBroke.
+   4b. At most GMAX gunners on the street at once (tougher gunners would pile up).
    5. KAI CAN LOSE: with foes that live and act, an idle Kai dies in ~20 s and a careless one before the big heavy (heals as street3).
-   6. Fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 at once; threat peak at 140 s (was 136; the run is now ~155-170 s): 80-90% of the run (street3-test (b)). ---------- */
+   6. Fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 at once; threat peak at 136 s: 82-89% of a 153-165 s clear: 80-90% of the run (street3-test (b)). ---------- */
 if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.search);
 (function(){
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
-const SH=F.SH={HPK:{rusher:1.6,gunner:2.8,heavy:.6},FRONT:.25,CHEST:50,CROUCH:.6,CALL:10,CHIP:2,log:null};
+const SH=F.SH={HPK:{rusher:1.8,gunner:2.8,heavy:.6},FRONT:.25,CHEST:50,CROUCH:.6,CALL:10,CALL0:3,KEEP:0,CAPX:0,GMAX:1,HEART:1,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
-S3.T.peakT=140;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=6.6;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
+S3.T.peakT=136;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=6.6;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
 /* 1: tougher foes, and the time-to-kill log (seen -> dead, game seconds) */
 const sp0=F.env.spawn;
 F.env.spawn=function(id,x,y,o){const e=sp0.apply(this,arguments);if(e&&on()&&SH.HPK[id]&&!e.boss){e.hp*=SH.HPK[id];e.max=e.maxHp=e.mhp=e.hp;}return e;};
@@ -33,21 +34,22 @@ for(const id of ['rusher','gunner','heavy']){const d=FE[id];if(!d||d._sh)continu
     a0.apply(this,arguments);
     if(on()&&id==='gunner'&&e.state!=='dead'&&e.seen)call(e,env);};}
 /* 3: the gunner calls help */
-function call(e,env){const S=F.S,f=S.s3;if(e.callT==null)e.callT=S.time+SH.CALL*.6;
-  if(e.callT-S.time<1&&!e.callW){e.callW=1;IN.pop(e.x,e.y-e.h-26,'CALLING HELP','#ffb020');}   // 1 s warning: the caption, then the whistle
+function call(e,env){const S=F.S;if(e.callT==null)e.callT=S.time+SH.CALL0;
+  if(e.callT-S.time<1){if(!e.callW){e.callW=1;IN.pop(e.x,e.y-e.h-26,'CALLING HELP','#ffb020');}e.hid=false;e.vx=0;e.tele=Math.max(e.tele||0,.05);}   // 1 s whistle: caption, red flash, stands up in the open (a window to shoot it)
   if(S.time<e.callT)return;e.callT=S.time+SH.CALL;e.callW=0;
-  const w=f.waves.find(q=>q.left.length&&q.next>S.time+1);
-  if(!w||S.E.filter(q=>!q.dead).length>=S3.T.cap+1)return;
-  const id=w.left.shift()==='heavy'?(w.left.unshift('heavy'),'rusher'):'rusher';   // pulls a rusher (never the heavy) forward
-  const vw=env.G.viewW||960,fromL=Math.random()<.5,n=F.env.spawn(id,fromL?S.camX-40:S.camX+vw+40,null);
+  if(S.E.filter(q=>!q.dead).length>=S3.T.cap+SH.CAPX)return;
+  const vw=env.G.viewW||960,fromL=Math.random()<.5,n=F.env.spawn('rusher',fromL?S.camX-40:S.camX+vw+40,null);   // one more rusher, on top of the plan
   if(n){SH.log.called++;S.fx.push({ring:1,x:e.x,y:e.y-e.h*.6,r:60,l:.5,m:.5,c:'#ffb020'});IN.sfx&&IN.sfx('warn');}}
 /* 2b: level shots; 4: foe bullets stop on cover props and chip them */
 const st0=ST.hook.step;
 ST.hook.step=function(S,dt,env){
-  if(RET.streethard&&S.s3&&!S.sh){S.sh=SH.log={ttk:{},called:0,blocked:0,coverBroke:0,gunDead:[],rushDead:[]};}
+  if(RET.streethard&&S.s3&&!S.sh){S.sh=SH.log={ttk:{},called:0,blocked:0,coverBroke:0,gunDead:[],rushDead:[]};S.P.max+=SH.HEART;S.P.hp+=SH.HEART;}
   if(on()){
+    if(S.E.filter(e=>!e.dead&&e.id==='gunner').length>=SH.GMAX)for(const w of S.s3.waves)if(w.left[0]==='gunner'&&w.next<S.time+.4)w.next=S.time+.4;   // at most GMAX gunners at once: the next waits
     for(const b of S.eb){if(b.life<=0||b.src!=='gunner')continue;if(b._x0==null){b._x0=b.x;if(abs(S.P.y-470)<10&&b.y>400&&b.y<440){b.y=470-SH.CHEST;b.vx=Math.sign(b.vx)*Math.hypot(b.vx,b.vy);b.vy=0;}}   // a level shot at chest height: ducking (or a jump) dodges it
-      for(const p of S.pr){if(p.hp<=0||p.gone||!p.cover||abs(p.x-b._x0)<p.w/2+40)continue;   // never the gunner's own cover
+      for(const p of S.pr){if(p.hp<=0||p.gone||!(p.cover||SH.COVER[p.k])||abs(p.x-b._x0)<p.w/2+40&&abs(S.P.x-p.x)>p.w/2+30)continue;   // the gunner's own cover blocks only when Kai hugs the other side of it   // never the gunner's own cover
         if(b.x>p.x-p.w/2&&b.x<p.x+p.w/2&&b.y>p.y-Math.max(p.h,56)&&b.y<p.y+4){b.life=0;SH.log.blocked++;const h0=p.hp;IN.hitProp(p,SH.CHIP);if(h0>0&&p.hp<=0)SH.log.coverBroke++;break;}}}}
-  return st0.apply(this,arguments);};
+  const r=st0.apply(this,arguments);
+  if(on()&&SH.KEEP)for(const p of S.pr)if(p.hp>0&&(SH.KEEP>1?p.cover:SH.COVER[p.k])&&!(p.dr&&p.dr.length))p.pass=true;   // Kai's shots fly over crates, the car and kiosks with nothing inside (only gunner fire wears them down)
+  return r;};
 })();
