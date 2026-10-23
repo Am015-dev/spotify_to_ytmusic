@@ -24,7 +24,7 @@ const FEEL=F.FEEL={
 /* HITFEEL (?hitfeel=1, off by default; STREET-BAR F1-F4, W169): every landed hit freezes the game 2-3 frames (6 for a kill or a heavy blow) and shoves the foe back in
    proportion to its damage. Street foes move themselves (ext), so the shove is a direct step on x. Burn ticks and flamer streams are not hits. A whiff never shakes
    (foot.js fire) and Kai's hurt shove is 170 u/s x 0.35 s = 60 units. */
-if(RET.hitfeel===undefined)RET.hitfeel=/[?&]hitfeel=1/.test(location.search);
+if(RET.hitfeel===undefined)RET.hitfeel=!/[?&]hitfeel=0/.test(location.search);
 F.hitFeel=function(e,d,src){if(!RET.hitfeel||!src||src.kind==='fire'||(!src.kind&&!src.melee&&d<1))return;
   const heavy=e.hp<=0||d>=2;const ms=heavy?100:d<1?33:50;if(!F.S.sim)IN.hitstop(ms);F.S.hf=Math.max(F.S.hf||0,ms/1000);   // headless sim() only records the freeze (S.hf): applying it would change how often a bot samples, not the game
   if(e.boss||e.hp<=0||src.kb||/^(wind|charge|crouch|lunge|pop|stun)$/.test(e.state))return;   // committed attacks and stuns do not rock back
