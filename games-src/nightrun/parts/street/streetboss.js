@@ -9,7 +9,7 @@
    Each phase starts with a 1.2 s roar (no damage, its name over the boss and on the bar) and then the phase's new attack, so every fight that reaches 33% sees all of them.
    The player decision: read which attack is coming and pick its answer (jump / step back / dash), then punish the 1 s opening (OPEN, full damage) after every attack.
    Damage cannot skip a phase: hp stops at the phase line until the roar is over (an opening in progress is finished first). ---------- */
-if(RET.sboss===undefined)RET.sboss=/[?&]sboss=1/.test(location.search);
+if(RET.sboss===undefined)RET.sboss=!/[?&]sboss=0/.test(location.search);
 (function(){
 const F=window.FOOT,FBS=window.FOOT_BOSS||{},d=FBS.bigheavy;
 if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;
