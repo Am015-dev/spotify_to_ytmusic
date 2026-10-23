@@ -407,7 +407,7 @@ function build(){if(L)return L;const st=document.createElement('style');st.textC
   return L;}
 function isTouch(){return ('ontouchstart' in window)||navigator.maxTouchPoints>0||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}
 const autoOn=()=>!!(L&&L.touch&&(SV.auto===undefined||SV.auto));   // touch: auto-fire is on unless the player turned it off in the pause menu
-function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv.width:innerWidth),H=Math.round(vv?vv.height:innerHeight),dpr=Math.min(F.dprMax||2,window.devicePixelRatio||1);
+function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv.width:innerWidth),H=Math.round(vv?vv.height:innerHeight),dpr=Math.min(F.dprMax||2,window.devicePixelRatio||1,RET.footcap===false||/[?&]footcap=0/.test(location.search)?9:Math.max(1,Math.sqrt(2.2e6/Math.max(1,W*H))));   /* owner 23 Oct 2026 "the game makes my super fast PC unresponsive on foot": a 4K 2x screen drew a 3040x2160 street canvas (6.6 MP, several full-screen passes a frame); capped at ~2.2 MP like the Lab viewers (?footcap=0 = old) */
   const T=L.touch=isTouch()||F.forceTouch;if(F.look&&F.look.layout&&F.look.layout(L,W,H,dpr,T))return;let cx=0,cy=0,cw=W,ch=H,mode='full',minVw=480,sw=0;
   if(T&&H>W*1.05){mode='port';minVw=420;ch=H-clamp(Math.round(H*.37),190,290);}   // portrait: the field takes about 63% of the height, the pad lives below it
   else if(T){mode='land';minVw=420;sw=clamp(Math.round(W*.22),160,220);cx=sw;cw=W-2*sw;}   // landscape: the field is the whole screen, the pad sits over the side bands
