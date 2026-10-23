@@ -18,13 +18,13 @@ Object.assign(IN.PROPD,{car:{hp:9,w:104,h:52,c:'#3a4a66',dr:[]},barrel:{hp:1,w:2
 const PIC={scrate:'sc-crate',gold:'sc-crate',barrel:'sc-barrel',kiosk:'sc-vending',post:'sc-neon-sign'};
 const pic=n=>{const fa=window.FA;const q=fa&&fa._pic?fa._pic('foot/'+n+'.webp'):null;return q&&q.width?q:null;};
 function propDraw(p){return function(c,K,at){at(c,p.x,p.y,K);const fl=p.fl>0;let ok=false;
-  if(p.k==='gold'){c.fillStyle='#ffd23a';c.globalAlpha=.22+.12*Math.sin(F.S.time*5);c.beginPath();c.ellipse(p.x,p.y-p.w*.45,p.w*.85,p.w*.7,0,0,6.283);c.fill();c.globalAlpha=1;}
+  if(p.k==='gold'&&!RET.fairstreet){c.fillStyle='#ffd23a';c.globalAlpha=.22+.12*Math.sin(F.S.time*5);c.beginPath();c.ellipse(p.x,p.y-p.w*.45,p.w*.85,p.w*.7,0,0,6.283);c.fill();c.globalAlpha=1;}
   if(p.k==='car'&&typeof ART!=='undefined'&&ART.ANIM&&ART.ANIM.s){const k='prop-car/loop',m=ART.ANIM.s[k];if(m&&ART.anim(k)){const h=p.w*m[3]/m[2];ART.drawAnim(c,k,0,p.x,p.y-h/2+(RET.feel?h*.09:0),h/m[3],false,1);ok=true;}}
   else{const q=pic(PIC[p.k]);if(q){const h=p.k==='barrel'?p.h:p.k==='kiosk'?p.h*1.05:p.k==='post'?p.h:p.w,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,p.y-h,w,h);ok=true;}}
   if(!ok){c.fillStyle=p.c;c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);}
-  if(p.k==='barrel'){c.fillStyle='#ff3040';c.globalAlpha=.25+.2*Math.sin(F.S.time*8);c.beginPath();c.arc(p.x,p.y-p.h*.5,p.w*.8,0,6.283);c.fill();c.globalAlpha=1;}
-  const dmg=1-p.hp/p.mhp;if(dmg>.3&&p.k!=='barrel'){c.strokeStyle='#05030c';c.lineWidth=2;c.beginPath();c.moveTo(p.x-p.w*.3,p.y-p.h*.8);c.lineTo(p.x,p.y-p.h*.5);c.lineTo(p.x-p.w*.1,p.y-p.h*.2);if(dmg>.6){c.moveTo(p.x+p.w*.3,p.y-p.h*.9);c.lineTo(p.x+p.w*.05,p.y-p.h*.45);}c.stroke();}
-  if(fl){c.globalAlpha=.5;c.fillStyle='#fff';c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);c.globalAlpha=1;}
+  if(p.k==='barrel'&&!RET.fairstreet){c.fillStyle='#ff3040';c.globalAlpha=.25+.2*Math.sin(F.S.time*8);c.beginPath();c.arc(p.x,p.y-p.h*.5,p.w*.8,0,6.283);c.fill();c.globalAlpha=1;}
+  const dmg=1-p.hp/p.mhp;if(dmg>.3&&p.k!=='barrel'&&!RET.fairstreet){c.strokeStyle='#05030c';c.lineWidth=2;c.beginPath();c.moveTo(p.x-p.w*.3,p.y-p.h*.8);c.lineTo(p.x,p.y-p.h*.5);c.lineTo(p.x-p.w*.1,p.y-p.h*.2);if(dmg>.6){c.moveTo(p.x+p.w*.3,p.y-p.h*.9);c.lineTo(p.x+p.w*.05,p.y-p.h*.45);}c.stroke();}
+  if(fl&&!RET.fairstreet){c.globalAlpha=.5;c.fillStyle='#fff';c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);c.globalAlpha=1;}
   c.restore();return true;};}
 function debris(S,p){for(let i=0;i<10;i++)S.fx.push({x:p.x+(Math.random()-.5)*p.w,y:p.y-p.h*Math.random(),vx:(Math.random()-.5)*420,vy:-160-Math.random()*320,l:.7,c:p.k==='gold'?'#ffd23a':p.c,r:3+Math.random()*3});}
 function barrelBlast(S,p){IN.boom(p.x,FL-24,95,7);const P=S.P;if(abs(P.x-p.x)<70&&P.y>FL-100)IN.ftHurt(1,p.x,'blast');
@@ -110,7 +110,7 @@ ST.hook={
     // enemy bullets: cover stops them and wears down
     for(const b of S.eb){if(b.life<=0)continue;for(const p of S.pr){if(p.hp<=0||p.gone||p.k==='barrel')continue;if(b.x>p.x-p.w/2-b.r&&b.x<p.x+p.w/2+b.r&&b.y>p.y-p.h-b.r&&b.y<p.y+4){b.life=0;IN.hitProp(p,.5);break;}}}
     // climax: rushers keep coming while the big heavy stands (max 3 at once)
-    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<3){F.env.spawn('rusher',f.adds++%2?S.camX-40:S.camX+env.G.viewW+40,null);}}},
+    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<3){F.env.spawn('rusher',f.adds++%2&&!RET.fairstreet?S.camX-40:S.camX+env.G.viewW+40,null);}}},
   draw(c,S){},
   hud(c,vw,u,box,fs,S){const x0=vw*.18,bw=vw*.64,y=540-14*u,h=6*u,pr=clamp(S.P.maxX/ST.boss.x,0,1);
     c.fillStyle='#ffffff22';c.fillRect(x0,y,bw,h);c.fillStyle='#19e3ff';c.fillRect(x0,y,bw*pr,h);

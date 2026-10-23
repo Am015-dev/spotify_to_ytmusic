@@ -11,6 +11,7 @@
    Backdrop (no new art, ASSET-POLICY.md): placeholder flat layers labelled bg-street-sky / far (x0.12) / mid (x0.4) / road, prop sheets on the road (x1); real files replace them (ASSETS-NEEDED-STREET.md).
    Kai may walk back (camera eases back <= 35% of the view, not behind the section checkpoint); auto-fire turns Kai to a target behind. Poses without a sheet borrow the nearest act (art.js ART.FB).
    HUD: hearts / weapon / ammo / bombs / power-ups / fever in one panel top-left (14 px+ text), score + time left of the pause button, the hint under both. ---------- */
+if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;
@@ -60,6 +61,7 @@ function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2
   let x=0,i=0;while(x<TW-30){const bw=Math.min(TW-x,(kind==='far'?60:150)+60*hs(i*7+3)),bh=Hh*(L_[3]+L_[4]*hs(i*13+5));g.fillRect(x,Hh-bh,bw-4,bh);x+=bw;i++;}
   g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';if(window.phText())g.fillText(L_[1]+' (placeholder)',8,Hh-6);
   return tiles[key]={cv,TW,Hh};}
+const pkPic=k=>'pk-'+(k==='dbl'?'damage':k.startsWith('w_')?'weapon-'+k.slice(2):k);
 function slPic(id){const fa=window.FA;return fa&&fa._pic?fa._pic('foot/'+id+'.webp'):null;}
 function slBlit(c,kind,k,cam,x0,w,t0,res){const pic=slPic(BGL[kind][1]),Hh=FL+2-t0;let src,TW;
   if(pic){TW=Hh*pic.width/pic.height;src=pic;}else{const o=slTile(kind,Hh,res);src=o.cv;TW=o.TW;}
@@ -108,6 +110,8 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
     const y=p.y+bob,Y=Math.max(my(y),t0+4+r);   // never above the top edge
     const ga=(p.t>13?.5+.5*Math.sin(p.t*20):1)*fa;c.save();c.translate(p.x,Y);c.scale(K,K);c.translate(-p.x,-y);c.globalAlpha=ga;SL.tag='pk';
     if(p.k==='ammo'&&RET.sprites&&typeof ART!=='undefined'&&ART.ANIM.c['pk-ammo/spin']&&ART.anim('pk-ammo/spin'))ART.drawAnim(c,'pk-ammo/spin',p.t,p.x,y,32/ART.ANIM.c['pk-ammo/spin'].bw,false);
+    else if(RET.fairstreet&&(()=>{const q=slPic(pkPic(p.k));if(!q||!q.width)return false;const h=40,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,y-h/2-4,w,h);return true;})()){c.fillStyle=d.c;c.font='bold 11px monospace';c.textAlign='center';c.textBaseline='top';c.fillText(d.n,p.x,y+18);}   // owner 23 Oct 2026: a sheet picture with its name under it, no flat disc
+    else if(RET.fairstreet){c.fillStyle=d.c;c.font='bold 13px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(d.n,p.x,y);}   // picture not loaded yet: the name alone
     else{c.fillStyle=d.c;c.beginPath();c.arc(p.x,y,15,0,6.283);c.fill();c.fillStyle='#05030c';c.font='bold 15px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(d.ic,p.x,y+1);}
     SL.tag='';c.globalAlpha=1;c.restore();}
   for(const e of S.E){if(e.dead&&!(e.ext&&!e.remove))continue;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)continue;   // fully off screen: nothing to draw (a shape fallback's label would hang past the edge)
@@ -162,6 +166,8 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText('WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
   if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u;}
+  if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=(SL.t0+VH)/2,a=.55+.45*Math.sin(S.time*14);c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';c.fillStyle='#ffb020';
+    c.font='bold '+fs(34)+'px monospace';c.fillText('◀',6*u,fy);c.font='bold '+fs(14)+'px monospace';c.fillText('BEHIND',6*u+30*u,fy-8*u);c.fillText('foe arriving from the left',6*u+30*u,fy+9*u);c.globalAlpha=1;}   // W161: 1 s warning at the edge a foe comes from
   SL.tag='';if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};IN.ghost();}
 })();
