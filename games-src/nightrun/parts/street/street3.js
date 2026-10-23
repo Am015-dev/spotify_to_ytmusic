@@ -63,7 +63,25 @@ function snap(c,fn){const di=c.drawImage;c.drawImage=function(im){if(arguments.l
 /* ----- one song: musicpack's lock / boss / clear switches stay off on this stage; the run plays street1 (192 s, steady) from the first beat ----- */
 const MP=RET.MP;
 if(MP&&MP.has){const h0=MP.has;MP.has=function(k){if(on()&&/^street1-/.test(k))return false;return h0.apply(this,arguments);};}
-if(window.NR&&NR.on)NR.on('footStart',d=>{if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
+/* ----- STREETSONG (owner, 23 Oct 2026: "music not on beat, one song one stage this lasts less than 20 seconds, music is distorted by jingles").
+   Measured (qa/streetsong-test.js): a run started stage2, then street1 in the same frame, then street1 again on a bar line once the file had loaded (3 song starts in the first 0.5 s, the first
+   seconds on the synth fallback); a RETRY started stage2 (170 s, other tempo) and kept the street1 title. Now: the stage song is street1 from the first call (ST.song), the STREET RUN hold waits for the
+   file (<= 8 s), and while Kai is on foot nothing else may start, switch, sting or duck the music (S3.snd counts what was refused). ?streetsong=0 = the old behaviour. ----- */
+if(RET.streetsong===undefined)RET.streetsong=!/[?&]streetsong=0/.test(location.search);
+const SSNG='street1',ssOn=()=>RET.streetsong&&RET.street3&&!!MP&&!!MP.has&&MP.on&&MP.on()&&MP.has(SSNG);
+S3.snd={starts:[],blocked:[]};
+if(RET.streetsong){
+  Object.defineProperty(ST,'song',{get(){return ssOn()?SSNG:'stage2';},set(v){},configurable:true});
+  const ssFoot=()=>RET.streetsong&&F.on&&F.S&&F.S.st===ST&&ssOn();
+  const blk=(n,a)=>{S3.snd.blocked.push(n+':'+[].join.call(a,','));return false;};
+  {const o=AU.startStage;AU.startStage=function(st){if(ssFoot()){if(st!==SSNG)return blk('startStage',arguments);S3.snd.starts.push(+(F.S.time).toFixed(2));}return o.apply(this,arguments);};}
+  for(const f of ['switchTo','sting','duckMusic']){const o=AU[f];if(o)AU[f]=function(){return ssFoot()?blk(f,arguments):o.apply(this,arguments);};}
+  {const f0=MP.foot;if(f0)MP.foot=function(){return ssFoot()?undefined:f0.apply(this,arguments);};}
+  /* the hold also waits for the song file (an unloaded file played the synth first, then swapped on a bar line) */
+  {const FQ=F.q,r0=FQ&&FQ.ready,p0=FQ&&FQ.pct;
+   const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return !!(TR.bufs[i.file]||TR.bad[i.file]);};
+   if(r0)FQ.ready=()=>r0()&&fileOk();if(p0)FQ.pct=()=>{const a=p0();return fileOk()?a:Math.min(a,99);};}}
+if(window.NR&&NR.on)NR.on('footStart',d=>{if(RET.streetsong&&ssOn()){S3.song=SSNG;MP.fbase=SSNG;MP.fk=SSNG;return;}if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
 /* ----- loading: the hold also waits for the painted street and the prop pictures (no placeholder backdrop, then a swap) ----- */
 const FQ=F.q;
 const pics=()=>{const fa=window.FA;if(!fa||!fa._rd)return [];return [...fa._rd].filter(f=>/^foot\/(bg-|sc-)/.test(f));};

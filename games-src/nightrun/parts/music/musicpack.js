@@ -100,7 +100,7 @@ MP.foot=function(){const F=window.FOOT;if(!MP.on()||!F||!F.on||!F.S||!sndOn('f_m
   let k=S.end&&S.end.cleared?'street1-clear':S.bossOn||S.boss?'street1-boss':S.lock?'street1-lock':MP.fbase||'street1';
   if(k==='street1-boss'&&MP.fb)k='street1-boss~b';
   if(!(k==='stage2'?TR.by.stage2:MP.has(k))||MP.fk===k)return;MP.fk=k;loadTrack(k);AU.startStage(k);};
-NR.on('footStart',d=>{MP.fk=null;MP.fb=0;if(!MP.on()||!MP.has('street1')||!sndOn('f_mcue'))return;
+NR.on('footStart',d=>{MP.fk=null;MP.fb=0;if(RET.streetsong&&window.FOOT&&FOOT.S&&FOOT.S.st&&FOOT.S.st.s3)return;if(!MP.on()||!MP.has('street1')||!sndOn('f_mcue'))return;
   if(!(d&&d.cp)||!MP.fbase){const nw=MP.mode()==='new'||(MP.lastFoot===null?MP.R()<.5:!MP.lastFoot);MP.lastFoot=nw;MP.fbase=nw?'street1':'stage2';}
   MP.fk=MP.fbase;if(MP.fbase==='street1')AU.startStage('street1');});   // stage2 is what the stage already started
 NR.on('footPhase',()=>{MP.fb=MP.fb?0:1;MP.fk=null;});
