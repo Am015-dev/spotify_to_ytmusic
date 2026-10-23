@@ -1,5 +1,5 @@
 // PURPOSE: Street feel: feet that grip the road (run frames tied to ground speed, bob, dust, lean, skid), one body scale, bullets from the gun's muzzle, a Kai sprite set per weapon
-// FLAG: feel (?feel=0)
+// FLAG: feel (?feel=0), hitfeel (?hitfeel=1, off by default)
 // TEST: qa/streetfeel-test.js
 /* ---------- STREETFEEL. Owner, 22 Oct 2026: "the art is completely fine as a sprite; the issue is it does not look like it is running; the hero is significantly smaller
    than the rest; the taxi is like a toy; ... it shoots but bullets fly not from the gun; gun variation should select the correct sprite; running sprites look like they slide".
@@ -20,7 +20,15 @@ const FEEL=F.FEEL={
   MZB:{"kai/crouchshoot":[[80,-138],[94,-140],[79,-135]]},   // bodyscale: muzzles that moved on the 22 Oct sheets (the kneeling cell is no longer cut to fill its cell); the rest keep MZ (same 256 px body, feet on the cell bottom)
   ST:{"kai/run":146,"knife/run":162,"gunman/run":156,"bruiser/run":173,"kai/runshoot":185},
   H:{kai:64,rusher:64,gunner:64,heavy:80,bigheavy:90},   // one body height per kind: heavy = 1.25 x Kai
-  log:{dust:0,skid:0,shots:0,mzErr:[]}};
+  log:{dust:0,skid:0,shots:0,kb:0,mzErr:[]}};
+/* HITFEEL (?hitfeel=1, off by default; STREET-BAR F1-F4, W169): every landed hit freezes the game 2-3 frames (6 for a kill or a heavy blow) and shoves the foe back in
+   proportion to its damage. Street foes move themselves (ext), so the shove is a direct step on x. Burn ticks and flamer streams are not hits. A whiff never shakes
+   (foot.js fire) and Kai's hurt shove is 170 u/s x 0.35 s = 60 units. */
+if(RET.hitfeel===undefined)RET.hitfeel=/[?&]hitfeel=1/.test(location.search);
+F.hitFeel=function(e,d,src){if(!RET.hitfeel||!src||src.kind==='fire'||(!src.kind&&!src.melee&&d<1))return;
+  const heavy=e.hp<=0||d>=2;const ms=heavy?100:d<1?33:50;if(!F.S.sim)IN.hitstop(ms);F.S.hf=Math.max(F.S.hf||0,ms/1000);   // headless sim() only records the freeze (S.hf): applying it would change how often a bot samples, not the game
+  if(e.boss||e.hp<=0||src.kb||/^(wind|charge|crouch|lunge|pop|stun)$/.test(e.state))return;   // committed attacks and stuns do not rock back
+  e._kbd=(src.melee?Math.sign(e.x-src.x)||1:Math.sign(src.vx)||1)*clamp(10*d,4,16);e._kbt=F.S.time;F.FEEL.log.kb++;};   // a drawn recoil that eases back in 0.14 s: a real shove made the dodge bot clear 100% (was 86%), see HANDOFF-W169.md
 if(!RET.feel)return;
 const RUNA={run:1,runshoot:1,walk:1};
 const sheetOf=k=>{const i=k.indexOf('/');return [k.slice(0,i),k.slice(i+1)];};
@@ -38,6 +46,7 @@ const fd0=ART.footDraw;
 ART.footDraw=function(c,who,pose,x,y,h,flip,t){const e=ART.fE,S=F.S;if(!RET.feel||!e||!S)return fd0.apply(this,arguments);
   if(who==='kai'&&e===S.P){const ws=wset(e);if(ws!=='kai'&&ART.ANIM.s[ws+'/'+actOf(ws,pose,e)])who=ws;}
   track(e,x,t);
+  if(e._kbd){const k=(S.time-e._kbt)/.14;if(k>=1||k<0)e._kbd=0;else x+=e._kbd*(1-k)*h/64;}   // hitfeel recoil
   const act=actOf(who,pose,e),key=act&&who+'/'+act,m=key&&ART.ANIM.s[key];
   // scale: the visible body, not the frame, is h tall (standing acts)
   const base=who.indexOf('kai')===0?'kai':who,bk=FEEL.BODY[base+'/'+act],ref=FEEL.BODY[base+'/idle'];if(!RET.bodyscale&&bk&&ref&&!/crouch|die|jump|land|dash/.test(act))h*=ref/bk;   // bodyscale: one scale from the json body instead

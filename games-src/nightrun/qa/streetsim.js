@@ -95,6 +95,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   // ---- aggregate per bot
   const ok0 = out.filter(o => !o.r.err), simSecs = ok0.reduce((a, o) => a + (o.r.tEnd || 0), 0), simMs = ok0.reduce((a, o) => a + o.r.ms, 0);
   const clearT = out.filter(o => o.r.clear).map(o => o.r.tEnd), Lref = clearT.length ? med(clearT) : Math.max(1, ...ok0.map(o => o.r.tEnd));
+  if (process.env.DUMP) fs.writeFileSync(process.env.DUMP, JSON.stringify(out.map(o => ({ bot: o.j.bot, seed: o.j.seed, clear: !!o.r.clear, tEnd: o.r.tEnd, dbg: o.r.dbg }))));   // DUMP=<json>: every run's probe record (W169)
   if (process.env.LIST) for (const o of out) if (o.r.tel && o.r.tel.stuckAt >= 0) console.log('STUCK', o.j.bot, o.j.seed, 'at', o.r.tel.stuckAt, 'end', o.r.tEnd, (o.r.alive || '').slice(0, 300));
   const rows = {};
   for (const bot of BOTS) { const rs = out.filter(o => o.j.bot === bot).map(o => o.r), good = rs.filter(r => !r.err), cl = good.filter(r => r.clear), dead = good.filter(r => !r.clear && r.end), tl = good.map(r => r.tel);
