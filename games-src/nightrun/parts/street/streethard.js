@@ -18,6 +18,8 @@ if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.s
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
 const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
+if(RET.slots===undefined)RET.slots=/[?&]slots=1/.test(location.search);   // W170 (off by default): gunner charge shots telegraph 0.5 s; at most 2 foes in a wind-up or attack
+const ATK={rusher:['crouch','lunge'],heavy:['wind','charge'],bigheavy:['wind','charge'],gunner:['pop']},atk=q=>(q.tele||0)>0||(ATK[q.id]||[]).includes(q.state);
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
 S3.T.peakT=124;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=8.2;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
 /* 4c: more cover to choose from (the street had one cover prop per ~750 px: a gunner shot almost never met one): a covered crate every COVERGAP px, clear of the props already there */
@@ -33,12 +35,14 @@ for(const id of ['rusher','gunner','heavy']){const d=FE[id];if(!d||d._sh)continu
       if(id==='gunner')SH.log.gunDead.push(+S.time.toFixed(1));if(id==='rusher')SH.log.rushDead.push(+S.time.toFixed(1));}return od?od.apply(this,arguments):undefined;};
   const a0=d.ai;d.ai=function(e,dt,env){
     if(on()&&id==='rusher'&&e.state==='crouch')e.sT-=dt*(1-.4/SH.CROUCH);   // 2: a longer, readable crouch before the lunge
+    const s0=e.state,t0=e.sT,h0=e.hid,was=atk(e);
     a0.apply(this,arguments);
+    if(RET.slots&&on()&&!was&&atk(e)&&F.S.E.filter(q=>q!==e&&!q.dead&&atk(q)).length>=2){e.state=s0;e.sT=t0;e.hid=h0;e.tele=0;e.tw=0;e.cd=.3;}   // W170 slots: a third attacker holds its wind-up until a slot frees
     if(on()&&id==='gunner'&&e.state!=='dead'&&e.seen){call(e,env);
       if(e.state!=='pop')e._th=0;else if(SH.BURST>2&&!e._th&&e.sT>=.9){e._th=1;const sy=e.y-44;env.shoot(e,Math.atan2(env.P.y-40-sy,env.P.x-e.x),360,1,{oy:sy});}}};}   // 3rd slug of a pop, a ducker holds the crouch
 /* 3: the gunner calls help */
 function call(e,env){const S=F.S;if(e.callT==null)e.callT=S.time+SH.CALL0;
-  if(e.callT-S.time<1){if(!e.callW){e.callW=1;IN.pop(e.x,e.y-e.h-26,'CALLING HELP','#ffb020');}e.hid=false;e.vx=0;e.tele=Math.max(e.tele||0,.05);}   // 1 s whistle: caption, red flash, stands up in the open (a window to shoot it)
+  if(e.callT-S.time<1&&!(RET.slots&&S.E.filter(q=>q!==e&&!q.dead&&atk(q)).length>=2)){if(!e.callW){e.callW=1;IN.pop(e.x,e.y-e.h-26,'CALLING HELP','#ffb020');}e.hid=false;e.vx=0;e.tele=Math.max(e.tele||0,.05);}   // 1 s whistle: caption, red flash, stands up in the open (a window to shoot it)
   if(S.time<e.callT||S.time<SH.CALLT||S.time>SH.CALLEND)return;e.callT=S.time+SH.CALL;e.callW=0;
   if(S.E.filter(q=>!q.dead).length>=S3.T.cap+SH.CAPX)return;
   const vw=env.G.viewW||960,fromL=Math.random()<.5,n=F.env.spawn('rusher',fromL?S.camX-40:S.camX+vw+40,null);   // one more rusher, on top of the plan
