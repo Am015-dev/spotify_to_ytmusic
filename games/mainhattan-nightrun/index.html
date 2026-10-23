@@ -4681,7 +4681,7 @@ const env={get P(){return S.P;},get G(){return S.G||envG();},get D(){return S.D;
   shoot(e,a,spd,dmg,o){if(!S||S.dead)return;if(e.x<S.camX-10||e.x>S.camX+viewW()+10)return;   // never from off-screen
     if(e.ext){if(S.eb.length>=EBMAX||e.grace>0)return;o=o||{};const sp=(spd||300)*S.D.bs*((RET.asB&&RET.asB())||1),r=o.w||o.h?Math.max(4,Math.min(16,Math.max(o.w||0,o.h||0)/2)):6;
       const mz=F.emz&&!o.ground&&F.emz(e,a),sx=mz?mz[0]:o.ox!=null?o.ox:e.x+e.facing*e.w*.45,sy=o.ground?FL-8:mz?mz[1]:(o.oy!=null?o.oy:e.y-e.h*.62);
-      S.eb.push({x:sx,y:sy,vx:o.vx!=null?o.vx:Math.cos(a)*sp,vy:o.ground?0:Math.sin(a)*sp,r,dmg:dmg||1,life:o.life||4,grav:!!o.grav,src:e.id,c:o.kind==='sniper'?'#e8ff40':o.kind==='shock'||o.kind==='shockline'?'#7df9ff':'#ff4a6a',ground:!!o.ground});return;}
+      const xb={x:sx,y:sy,vx:o.vx!=null?o.vx:Math.cos(a)*sp,vy:o.ground?0:Math.sin(a)*sp,r,dmg:dmg||1,life:o.life||4,grav:!!o.grav,src:e.id,c:o.kind==='sniper'?'#e8ff40':o.kind==='shock'||o.kind==='shockline'?'#7df9ff':'#ff4a6a',ground:!!o.ground,qt:S.time};if(RET.beatshots&&S.st&&S.st.s3)(S.xq||(S.xq=[])).push(xb);else S.eb.push(xb);return;}   // streetsong: the bullet leaves on the next half beat of the song (like the queued shots below)
     if(S.q.length>=Math.round(QMAX*S.D.fr)&&!(o&&o.must))return;
     const t=Math.max(TELE,(o&&o.tele)||0)+Math.max(0,e.grace||0);e.tele=Math.max(e.tele,t);
     S.q.push({e,a,spd:(spd||340)*S.D.bs*((RET.asB&&RET.asB())||1),dmg:dmg||1,o:o||{},at:S.time+t});},
@@ -4829,6 +4829,8 @@ function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&
   S.E=S.E.filter(e=>!e.dead||e===S.boss||(e.ext&&!e.remove&&!e.gone));
   // queued enemy shots: released on the next half beat once their telegraph is over
   const hb=Math.floor(beatPos()*2);if(S.lhb===null)S.lhb=hb;
+  if(S.xq&&S.xq.length&&(hb!==S.lhb||S.time-S.xq[0].qt>.45)){   // .45 s: never later than a half beat at 66 bpm (stepped tests run the game faster than the song clock)
+  for(const b of S.xq)if(S.eb.length<EBMAX)S.eb.push(b);S.xq=[];}
   if(hb!==S.lhb||S.q.some(s=>S.time-s.at>.6)){S.lhb=hb;const keep=[];
     for(const s of S.q){if(s.e.dead){continue;}if(S.time<s.at&&!(S.time-s.at>.6)){keep.push(s);continue;}
       if(S.eb.length>=EBMAX)continue;const e=s.e,sy=s.o.y!=null?s.o.y:e.y-e.h*.62,sx=e.x+e.facing*e.w*.4;
@@ -6920,7 +6922,7 @@ MP.foot=function(){const F=window.FOOT;if(!MP.on()||!F||!F.on||!F.S||!sndOn('f_m
   let k=S.end&&S.end.cleared?'street1-clear':S.bossOn||S.boss?'street1-boss':S.lock?'street1-lock':MP.fbase||'street1';
   if(k==='street1-boss'&&MP.fb)k='street1-boss~b';
   if(!(k==='stage2'?TR.by.stage2:MP.has(k))||MP.fk===k)return;MP.fk=k;loadTrack(k);AU.startStage(k);};
-NR.on('footStart',d=>{MP.fk=null;MP.fb=0;if(!MP.on()||!MP.has('street1')||!sndOn('f_mcue'))return;
+NR.on('footStart',d=>{MP.fk=null;MP.fb=0;if(RET.streetsong&&window.FOOT&&FOOT.S&&FOOT.S.st&&FOOT.S.st.s3)return;if(!MP.on()||!MP.has('street1')||!sndOn('f_mcue'))return;
   if(!(d&&d.cp)||!MP.fbase){const nw=MP.mode()==='new'||(MP.lastFoot===null?MP.R()<.5:!MP.lastFoot);MP.lastFoot=nw;MP.fbase=nw?'street1':'stage2';}
   MP.fk=MP.fbase;if(MP.fbase==='street1')AU.startStage('street1');});   // stage2 is what the stage already started
 NR.on('footPhase',()=>{MP.fb=MP.fb?0:1;MP.fk=null;});
@@ -14680,7 +14682,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='2a86fb55ac 2026-10-23 06:59 UTC';
+const NR_STAMP='45c1b86be3 2026-10-23 07:16 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -17476,7 +17478,26 @@ function snap(c,fn){const di=c.drawImage;c.drawImage=function(im){if(arguments.l
 /* ----- one song: musicpack's lock / boss / clear switches stay off on this stage; the run plays street1 (192 s, steady) from the first beat ----- */
 const MP=RET.MP;
 if(MP&&MP.has){const h0=MP.has;MP.has=function(k){if(on()&&/^street1-/.test(k))return false;return h0.apply(this,arguments);};}
-if(window.NR&&NR.on)NR.on('footStart',d=>{if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
+/* ----- STREETSONG (owner, 23 Oct 2026: "music not on beat, one song one stage this lasts less than 20 seconds, music is distorted by jingles").
+   Measured (qa/streetsong-test.js): a run started stage2, then street1 in the same frame, then street1 again on a bar line once the file had loaded (3 song starts in the first 0.5 s, the first
+   seconds on the synth fallback); a RETRY started stage2 (170 s, other tempo) and kept the street1 title. Now: the stage song is street1 from the first call (ST.song), the STREET RUN hold waits for the
+   file (<= 8 s), and while Kai is on foot nothing else may start, switch, sting or duck the music (S3.snd counts what was refused). ?streetsong=0 = the old behaviour. ----- */
+if(RET.streetsong===undefined)RET.streetsong=!/[?&]streetsong=0/.test(location.search);
+if(RET.beatshots===undefined)RET.beatshots=/[?&]beatshots=1/.test(location.search);   // enemy bullets leave on the half beat (foot.js S.xq): OFF until its timing check passes (orchestrator review 23 Oct: max 139 ms vs 30)
+const SSNG='street1',ssOn=()=>RET.streetsong&&RET.street3&&!!MP&&!!MP.has&&MP.on&&MP.on()&&MP.has(SSNG);
+S3.snd={starts:[],blocked:[]};
+if(RET.streetsong){
+  Object.defineProperty(ST,'song',{get(){return ssOn()?SSNG:'stage2';},set(v){},configurable:true});
+  const ssFoot=()=>RET.streetsong&&F.on&&F.S&&F.S.st===ST&&ssOn();
+  const blk=(n,a)=>{S3.snd.blocked.push(n+':'+[].join.call(a,','));return false;};
+  {const o=AU.startStage;AU.startStage=function(st){if(ssFoot()){if(st!==SSNG)return blk('startStage',arguments);S3.snd.starts.push(+(F.S.time).toFixed(2));}return o.apply(this,arguments);};}
+  for(const f of ['switchTo','sting','duckMusic']){const o=AU[f];if(o)AU[f]=function(){return ssFoot()?blk(f,arguments):o.apply(this,arguments);};}
+  {const f0=MP.foot;if(f0)MP.foot=function(){return ssFoot()?undefined:f0.apply(this,arguments);};}
+  /* the hold also waits for the song file (an unloaded file played the synth first, then swapped on a bar line) */
+  {const FQ=F.q,r0=FQ&&FQ.ready,p0=FQ&&FQ.pct;
+   const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return !!(TR.bufs[i.file]||TR.bad[i.file]);};
+   if(r0)FQ.ready=()=>r0()&&fileOk();if(p0)FQ.pct=()=>{const a=p0();return fileOk()?a:Math.min(a,99);};}}
+if(window.NR&&NR.on)NR.on('footStart',d=>{if(RET.streetsong&&ssOn()){S3.song=SSNG;MP.fbase=SSNG;MP.fk=SSNG;return;}if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
 /* ----- loading: the hold also waits for the painted street and the prop pictures (no placeholder backdrop, then a swap) ----- */
 const FQ=F.q;
 const pics=()=>{const fa=window.FA;if(!fa||!fa._rd)return [];return [...fa._rd].filter(f=>/^foot\/(bg-|sc-)/.test(f));};
