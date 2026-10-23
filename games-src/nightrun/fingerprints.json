@@ -18,13 +18,13 @@
   "end": null
  },
  "street": {
-  "state": "f1c2f2fbe691e704",
+  "state": "a8b3f8513f811917",
   "draw": "c8c417b287a0b1b9",
   "frames": 7200,
   "samples": 120,
-  "rng": 5622,
+  "rng": 5692,
   "dcalls": 172,
-  "end": "section 0 x 6725 foes 5"
+  "end": "section 0 x 6713 foes 4"
  },
  "fly6": {
   "state": "e2f0e31c38f9d627",

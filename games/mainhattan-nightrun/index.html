@@ -5524,9 +5524,12 @@ F.dprMax=3;
 FQ.list=()=>{const k=[];for(const w in ART.FM)for(const a of ART.FM[w]._all)k.push(w+'/'+a);
   for(const p of ['car/loop','police/loop','holo/loop','beacon/loop','steam/glow'])k.push('prop-'+p);k.push('pk-ammo/spin');return k.filter(x=>ART.ANIM.s[x]);};
 FQ.state=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return 'none';if(ART.err&&ART.err[n])return 'bad';return ART.anim(k)?'ok':'wait';};   // ART.anim also starts the load
-FQ.ready=()=>{if(!RET.sprites)return true;if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return ok;};
+/* the songs the run plays (the stage's own, then the one-song cut of street3.js) are part of the wait (23 Oct 2026: "game music is not playing"); a song that failed its 3 tries does not block; asking also starts the load */
+FQ.songs=()=>RET.preload&&!NOMUSIC&&!/[?&]sim=1/.test(location.search)?(RET.streetsong?['street1']:['stage2','street1']).filter(s=>TR.by[s]):[];
+FQ.songOk=s=>{const i=TR.by[s];if(!i||TR.bufs[i.file]||(TR.bad[i.file]&&((TR.tries&&TR.tries[i.file])||0)>3))return true;if(AU.a)loadTrack(s);return !AU.a;};
+FQ.ready=()=>{if(!RET.sprites)return FQ.songs().every(FQ.songOk);if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return FQ.songs().map(FQ.songOk).every(Boolean)&&ok;};
 FQ.pending=()=>FQ.list().filter(k=>FQ.state(k)==='wait');
-FQ.pct=()=>{const l=FQ.list();return l.length?Math.round(100*l.filter(k=>FQ.state(k)!=='wait').length/l.length):100;};
+FQ.pct=()=>{const l=FQ.list(),m=FQ.songs();const n=l.length+3*m.length;return n?Math.round(100*(l.filter(k=>FQ.state(k)!=='wait').length+3*m.filter(FQ.songOk).length)/n):100;};
 /* ----- loading hold: returns true when it took over the start (cb runs when the sheets are ready or after 8 s) ----- */
 /* only the STREET RUN button asks for it (F.ui, foot.js): FOOT.start() from code (tests, tools) still starts at once and just draws nothing for a sheet that is not decoded yet */
 F.hold=cb=>{if(FQ.ready())return false;if(FQ.hold)return true;FA.init&&FA.init();
@@ -14682,7 +14685,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='2654e806a4 2026-10-23 07:18 UTC';
+const NR_STAMP='bf3db0256f 2026-10-23 07:36 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -18373,6 +18376,45 @@ ST.hook.step=function(S,dt,env){
   if(on()&&SH.KEEP)for(const p of S.pr)if(p.hp>0&&(SH.KEEP>1?p.cover:SH.COVER[p.k])&&!(p.dr&&p.dr.length))p.pass=true;   // Kai's shots fly over crates, the car and kiosks with nothing inside (only gunner fire wears them down)
   return r;};
 })();
+
+// PURPOSE: a flight stage does not start until its ship sheets, backdrop and song are ready (one short loading veil, 8 s at most)
+// FLAG: preload (?preload=0 = the old behaviour: the stage starts at once and pictures and the song arrive while you fly)
+// TEST: qa/preload-test.js
+/* ---------- PRELOAD (owner, 23 Oct 2026: "stages play without loading assets, game music is not playing, some assets are not shown").
+   startStory(n) is held back until what the first ~20 s need is decoded: the player's ship sheets, the enemy sheets of the stage's first waves, the district backdrop layers (bg / ly-*),
+   the shot / explosion pictures and the stage song (TR.bufs). The loads start on the tap. One veil in the look of the street's (footq.js F.hold) shows a percentage. The stage starts
+   (and its song from the top, AU.startStage) when everything is ready or after 8 s at most; it then keeps loading as before. A file that failed its 3 tries (ART.err, TR.tries) does not block.
+   Not used in ?sim=1 (no pictures, no audio) or with ?nomusic=1 for the song. Bosses are not waited for: they arrive late in a stage and SPR.warmBoss starts them when the district begins. ---------- */
+if(RET.preload===undefined)RET.preload=!/[?&]preload=0/.test(location.search);
+const PL=window.PRELOAD={on:RET.preload&&!SIM,held:0,waited:0,veil:null,last:null,limit:8000};
+const picOk=n=>{if(!ART.rd||!ART.rd.has(n+'.webp')||ART.err[n])return true;return !!ART.bm[n];};         // reading ART.bm starts the load (lazyart Proxy)
+const animOk=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp')||ART.err[n])return true;return !!ART.anim(k);};
+const KIND={droneLine:'drone',droneV:'drone',droneSine:'drone',chargers:'charger',turret:'turret',gate:'gate',gunship:'gunship'};
+PL.needs=n=>{const d=STAGES[n-1],o=[];if(!d)return o;
+  if(ART.rd&&RET.sprites){
+    const id=shipDef().id;o.push({w:2,ok:()=>animOk('ship-'+id+'/flame')&&animOk('ship-'+id+'/death')&&picOk('spr-ship-'+id)});
+    const kinds=new Set(['drone']);for(const w of (d.waves||[]).slice(0,3))if(KIND[w])kinds.add(KIND[w]);
+    for(const k of kinds){const m=window.ENEMY_ART&&ENEMY_ART[k],s='ship-'+((m&&m.s)||'e'+k);o.push({w:1,ok:()=>animOk(s+'/flame')&&animOk(s+'/volley')&&animOk(s+'/death')});}
+    o.push({w:2,ok:()=>['fx-shot-std','fx-muzzle','fx-hit-spark','fx-explosion-small','fx-bullet-enemy'].map(picOk).every(Boolean)});
+    const nm=ART.dn[d.di];if(nm){const nr=DISTRICTS[d.di].near,port=wcv!==cv;
+      o.push({w:3,ok:()=>{ART.warm(d.di);return ['bg-'+nm,'ly-far-'+nm,'ly-mid-'+nm,'ly-near-'+nr].concat(port?['bg-'+nm+'-phone','ly-phone-'+nm]:[]).map(picOk).every(Boolean);}});}}
+  const info=TR.by[d.song];
+  if(info&&!NOMUSIC)o.push({w:3,ok:()=>{if(TR.bufs[info.file])return true;if(TR.bad[info.file]&&(TR.tries&&TR.tries[info.file]||0)>3)return true;if(AU.a)loadTrack(d.song);return false;}});
+  return o;};
+PL.pct=L=>{let t=0,g=0;for(const x of L){t+=x.w;if(x.done)g+=x.w;}return t?Math.round(100*g/t):100;};
+PL.ready=L=>{let ok=true;for(const x of L){if(!x.done)x.done=!!x.ok();if(!x.done)ok=false;}return ok;};
+{const ss=startStory;startStory=function(n){
+  if(running||!PL.on||STAGES[n-1]==null)return ss.apply(this,arguments);
+  if(PL.veil)return;                                                  // a second tap while the veil is up
+  const a=arguments,self=this;AU.unlock();const L=PL.needs(n);
+  const song=STAGES[n-1].song,inf=TR.by[song];if(inf&&NR.lag){(NR.lag.hold||(NR.lag.hold=new Set())).add(inf.file);}   // keep the song buffered until the stage has taken it
+  const go=()=>{if(!running)ss.apply(self,a);};
+  if(PL.ready(L)){PL.last={n,wait:0,pct:100};return go();}
+  const d=document.createElement('div');d.id='stageQ';d.setAttribute('role','status');d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#05030c;color:#c9c3e6;font:700 16px "Share Tech Mono",monospace;letter-spacing:.12em';
+  d.textContent='LOADING STAGE '+n+' 0%';document.body.appendChild(d);PL.veil=d;PL.held++;const t0=performance.now();
+  const tick=()=>{const r=PL.ready(L),w=performance.now()-t0;d.textContent='LOADING STAGE '+n+' '+PL.pct(L)+'%';
+    if(r||w>PL.limit){d.remove();PL.veil=null;PL.waited=w;PL.last={n,wait:w,pct:PL.pct(L),timeout:!r};go();}else setTimeout(tick,50);};
+  setTimeout(tick,0);};}
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;

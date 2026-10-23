@@ -18,9 +18,12 @@ F.dprMax=3;
 FQ.list=()=>{const k=[];for(const w in ART.FM)for(const a of ART.FM[w]._all)k.push(w+'/'+a);
   for(const p of ['car/loop','police/loop','holo/loop','beacon/loop','steam/glow'])k.push('prop-'+p);k.push('pk-ammo/spin');return k.filter(x=>ART.ANIM.s[x]);};
 FQ.state=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return 'none';if(ART.err&&ART.err[n])return 'bad';return ART.anim(k)?'ok':'wait';};   // ART.anim also starts the load
-FQ.ready=()=>{if(!RET.sprites)return true;if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return ok;};
+/* the songs the run plays (the stage's own, then the one-song cut of street3.js) are part of the wait (23 Oct 2026: "game music is not playing"); a song that failed its 3 tries does not block; asking also starts the load */
+FQ.songs=()=>RET.preload&&!NOMUSIC&&!/[?&]sim=1/.test(location.search)?(RET.streetsong?['street1']:['stage2','street1']).filter(s=>TR.by[s]):[];
+FQ.songOk=s=>{const i=TR.by[s];if(!i||TR.bufs[i.file]||(TR.bad[i.file]&&((TR.tries&&TR.tries[i.file])||0)>3))return true;if(AU.a)loadTrack(s);return !AU.a;};
+FQ.ready=()=>{if(!RET.sprites)return FQ.songs().every(FQ.songOk);if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return FQ.songs().map(FQ.songOk).every(Boolean)&&ok;};
 FQ.pending=()=>FQ.list().filter(k=>FQ.state(k)==='wait');
-FQ.pct=()=>{const l=FQ.list();return l.length?Math.round(100*l.filter(k=>FQ.state(k)!=='wait').length/l.length):100;};
+FQ.pct=()=>{const l=FQ.list(),m=FQ.songs();const n=l.length+3*m.length;return n?Math.round(100*(l.filter(k=>FQ.state(k)!=='wait').length+3*m.filter(FQ.songOk).length)/n):100;};
 /* ----- loading hold: returns true when it took over the start (cb runs when the sheets are ready or after 8 s) ----- */
 /* only the STREET RUN button asks for it (F.ui, foot.js): FOOT.start() from code (tests, tools) still starts at once and just draws nothing for a sheet that is not decoded yet */
 F.hold=cb=>{if(FQ.ready())return false;if(FQ.hold)return true;FA.init&&FA.init();
