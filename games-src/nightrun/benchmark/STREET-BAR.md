@@ -29,6 +29,15 @@ a row passes only on a measured number (stepped probe or qa/streetsim.js), never
 | B4 | Fight length 45-90 s for a decent player; the boss never feels like a damage sponge | median 45-90 s, dodge bot |
 | B5 | A boss is bigger than foes and shows its health bar with its name | bar + name always on screen |
 
+## Depth: the belt floor (owner, 23 Oct 2026: "the game is boring because the character moves left and right and you are not using the [benchmark's] environment logic")
+| # | Rule | Gate |
+|---|---|---|
+| D1 | Kai and every foe walk on a floor band in depth (up/down = into / out of the street), not on one line; jumps are a separate height | floor band >= 25% of the screen height; Kai and foes use >= 60% of it |
+| D2 | Hits land only on actors at about the same depth; stepping up/down dodges an attack | attacks out of depth miss; the dodge bot avoids >= 30% of hits by changing depth |
+| D3 | Foes spread in depth and flank: they come from both sides and different depths, not in a queue | median depth spread of attackers >= 30% of the band |
+| D4 | Actors are drawn back to front with a floor shadow, and slightly smaller further back | depth sort every frame; shadow under every actor |
+| D5 | The environment plays: props you can break, hazards that hurt foes too, and things to knock foes into | >= 3 interactive prop kinds on the street |
+
 ## Presentation
 | # | Rule | Gate |
 |---|---|---|

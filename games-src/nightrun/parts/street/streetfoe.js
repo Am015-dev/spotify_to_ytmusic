@@ -14,7 +14,7 @@ if(RET.shieldfoe===undefined)RET.shieldfoe=/[?&]shieldfoe=1/.test(location.searc
 if(!window.FOOT||!FOOT._in||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1;
 const FE=window.FOOT_ENEMIES=window.FOOT_ENEMIES||{};
-const G=F.GD={TURN:1,TIRED:10,SPD:60,REACH:100,CROUCH:.6,BASH:.25,REST:.8,CD:3.2,WAVES:[4,8],log:null};
+const G=F.GD={TURN:1,TIRED:4,SPD:60,REACH:100,CROUCH:.8,BASH:.25,REST:.8,CD:8,WAVES:[4,8],log:null};
 const age=(e,env)=>e.seenAt2==null?0:env.G.time-e.seenAt2;
 function go(e,s){e.state=s;e.sT=0;}
 function walk(e,env,v,dt){const g=env.G,lo=g.camX+e.w/2,hi=g.camX+g.viewW-e.w/2,nx=e.x+v*dt;if(!e.seen||(nx>=lo&&nx<=hi))e.x=nx;e.vx=v;}

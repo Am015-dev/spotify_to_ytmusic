@@ -15,7 +15,7 @@ const res = [], ok = (p, n) => { res.push(!!p); console.log((p ? 'PASS ' : 'FAIL
 const seedOf = i => 4321 + i * 7919;
 
 // ---- the bots: taken from the street tests themselves (one source of truth)
-const src = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN = src.slice(src.indexOf('const RUN = ') + 12, src.indexOf('\n(async () =>')).trim().replace(/;$/, '');
+const src = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN = src.slice(src.indexOf('const RUN = ') + 12, src.indexOf('\n(async () =>')).trim().replace(/;$/, '').replace('i < 200', 'i < 300');   // W168: a 45-90 s boss fight ends after 200 s game time
 const NEAR = 'if (near) P.facing = near.x > P.x ? 1 : -1;', DUCK = '// bullets: hop low ones', REACT = 'S.time + .2 + rnd() * .15, go: rnd() > .25';
 for (const k of [NEAR, DUCK, REACT, "for (const p of S.pk) if ("]) if (!RUN.includes(k)) { console.log('FAIL streetsim: street2-test bot changed, missing: ' + k); process.exit(2); }
 const RUNG = RUN.replace(NEAR, "{ const ga = window.__gf && live.find(e => e.id === 'gunner'), gf = ga && !ga.hid ? ga : null, tg = gf || near; if (tg) P.facing = tg.x > P.x ? 1 : -1;" +
@@ -46,7 +46,7 @@ const TEL = () => {
     const P = S.P, T = window.__T, t = S.time, vw = (FOOT._in.L() || {}).vw || 960; T.steps++;
     if (!num(P.x) || !num(P.y) || !num(P.hp) || S.E.some(e => !num(e.x) || !num(e.y) || (e.hp !== undefined && !num(e.hp))) || S.eb.some(b => !num(b.x) || !num(b.y))) { T.nan++; if (!T.nanEx) T.nanEx = `t=${t.toFixed(1)} P(${P.x},${P.y},${P.hp})`; }
     if (T.prevX != null && Math.abs(P.x - T.prevX) < .01 && P.hp > 0) T.still += 1 / 60; T.prevX = P.x;
-    const sig = [Math.round(P.maxX / 5), S.kills, S.score, S.hurts].join('|'); if (sig !== T.sig) { T.sig = sig; T.sigT = t; } else if (t - T.sigT > 25 && T.stuckAt < 0 && !S.end && P.hp > 0 && !window.__idle) T.stuckAt = +t.toFixed(1);
+    const sig = [Math.round(P.maxX / 5), S.kills, S.score, S.hurts, S.boss ? Math.round(S.boss.hp) : 0].join('|'); if (sig !== T.sig) { T.sig = sig; T.sigT = t; } else if (t - T.sigT > 25 && T.stuckAt < 0 && !S.end && P.hp > 0 && !window.__idle) T.stuckAt = +t.toFixed(1);
     T.hpMin = Math.min(T.hpMin, P.hp); if (T.hpPrev != null && P.hp < T.hpPrev) T.hpLost += T.hpPrev - P.hp; T.hpPrev = P.hp;
     for (const e of S.E) if (e._o === undefined && !e.dead) e._o = e.x < S.camX ? 'L' : 'R';   // W161: which side a foe was born on
     if (S.hurts > T.lastHurts) { const src = (S.hlog || [])[S.hurts - 1] || '', m = /^(mel|touch):(.*)$/.exec(src);
