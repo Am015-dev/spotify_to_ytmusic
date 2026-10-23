@@ -47,6 +47,7 @@ PARTS_EXTRA.append('lab2.js')
 PARTS_EXTRA.append('lab3.js')
 PARTS_EXTRA.append('streethard.js')
 PARTS_EXTRA.append('preload.js')
+PARTS_EXTRA.append('focus.js')
 out=out[:out.rindex(rd('c.js'))]+''.join(rd(p)+"\n" for p in PARTS_EXTRA)+rd('c.js')
 OUT=os.environ.get('NR_OUT','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path
 import hashlib,datetime
