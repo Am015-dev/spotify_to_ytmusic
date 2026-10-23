@@ -17,7 +17,7 @@ if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.s
 (function(){
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
-const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,LUNGE:120,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
+const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.75,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:2,LUNGE:210,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
 if(RET.slots===undefined)RET.slots=!/[?&]slots=0/.test(location.search);   // W170 (off by default): gunner charge shots telegraph 0.5 s; at most 2 foes in a wind-up or attack
 const ATK={rusher:['crouch','lunge'],heavy:['wind','charge'],bigheavy:['wind','charge'],gunner:['pop']},atk=q=>(q.tele||0)>0||(ATK[q.id]||[]).includes(q.state);
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
