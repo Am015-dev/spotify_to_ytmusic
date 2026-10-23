@@ -115,7 +115,8 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
     at(c,e.x,ey,K);
     if(e.tele>0){c.fillStyle='#ff304a';c.globalAlpha=.35+.35*Math.sin(S.time*30);c.beginPath();c.arc(e.x+e.facing*e.w*.4,e.y-e.h*.62,10+e.w*.1,0,6.283);c.fill();c.globalAlpha=1;}
     if(e.wind>0){c.strokeStyle='#ff304a';c.lineWidth=3;c.strokeRect(e.x-e.w/2-4,e.y-e.h-4,e.w+8,e.h+8);}
-    c.globalAlpha=e.grace>0?.65:1;ART.fE=e;SL.tag='actor';IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;SL.tag='';c.globalAlpha=1;
+    c.globalAlpha=1;   /* owner 23 Oct 2026 "all enemies are transparent": foes died inside their 0.9 s grace and were only ever drawn at .65; always solid now */
+    ART.fE=e;SL.tag='actor';IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;SL.tag='';c.globalAlpha=1;
     if(e.def.front&&e.def.fb){c.fillStyle='#a0c0ff';c.fillRect(e.x+e.facing*e.w*.5-3,e.y-e.h*.9,6,e.h*.8);}c.restore();}
   if(S.st.hook&&S.st.hook.draw){const sw=[];for(const e of S.E)if(e.lane&&!e.dead){const y0=e.lane.y;sw.push([e.lane,y0]);e.lane.y=FL-(FL-my(y0+30))/K-30;}   // lanes: drawn under a plain K stretch, so pre-map their height
     const ft=c.fillText;c.fillText=function(s_,x,y,mw){c.save();c.translate(x,y);c.scale(1,1/K);ft.call(c,s_,0,0,mw);c.restore();};   // no stretched letters
