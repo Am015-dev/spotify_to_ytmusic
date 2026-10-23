@@ -1,4 +1,4 @@
-// PURPOSE: the Lab SOUND page: one row per sound and music effect, PLAY over the song, ON/OFF saved (gate = puremusic.js SND)
+// PURPOSE: the Lab SOUND page: songs to preview and pick per place, one row per sound and music effect, PLAY over the song, ON/OFF saved, export / import as JSON (gate = puremusic.js SND)
 // FLAG: none (needs the Lab and RET.pure; ?pure=0 shows the page but every row plays and nothing is gated)
 // TEST: qa/soundlab-test.js
 /* ---------- SOUNDLAB: owner, 22 Oct 2026: "the effects are distorting the music, extremely annoying; I need to spot which ones; include them in the Lab so I can select".
@@ -33,13 +33,44 @@ if(window.SND&&window.LABX){
     if(r[1]==='mu'){this.pv[id]=performance.now()+PV_MS;this.apply();later(()=>this.apply(),PV_MS+80);MU[id]();return true;}
     this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='ft'){if(FT_[id])AU.sfx(FT_[id]);}else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
     return true;};
+  // a song preview: the song starts at once (not mapped through the picks); STOP puts back what was playing
+  SND.pvSong=null;
+  SND.playSong=function(k){AU.unlock();if(this.pvSong===null)this.pvPrev=BT.stage||'menu';this.raw=true;try{AU.startStage(k);}finally{this.raw=false;}this.pvSong=k;return true;};
+  SND.stopSong=function(){const b=this.pvPrev;this.pvSong=null;this.raw=true;try{AU.startStage(b||'menu');}finally{this.raw=false;}return true;};
   // 'tier' is forced to 3 for a moment so the drum layer and the hats / kick / bass can be heard; the game writes AU.tier as before
   {let tv=AU.tier;Object.defineProperty(AU,'tier',{get(){return SND.pv.tierForce>performance.now()?Math.max(3,tv|0):tv;},set(v){tv=v;},configurable:true});
 }
-  const st=document.createElement('style');st.textContent=`#labP .snr{display:flex;align-items:center;gap:6px;width:100%;margin:2px 0}#labP .snr .sn{flex:1 1 auto;font-size:13px;line-height:1.25;min-width:0}
-#labP .snr .lc{flex:0 0 auto;min-width:64px;min-height:36px}#labP .snv{display:flex;align-items:center;gap:8px;width:100%;font-size:13px}#labP .snv input{flex:1 1 auto;min-height:36px}`;document.head.appendChild(st);
+  const st=document.createElement('style');st.textContent=`#labP .snr{display:flex;align-items:center;gap:8px;width:100%;margin:3px 0}#labP .snr .sn{flex:1 1 auto;font-size:16px;line-height:1.3;min-width:0}
+#labP .snr .lc{flex:0 0 auto;min-width:64px;min-height:44px}#labP .snv{display:flex;align-items:center;gap:8px;width:100%;font-size:16px}#labP .snv input{flex:1 1 auto;min-height:44px}
+#labP .snr .sl{flex:0 0 auto;font-size:16px;color:var(--dim)}#labP .snr[data-place]{flex-wrap:wrap}#labP .snr[data-place] .sn{flex:1 1 100%}#labP .snr[data-place] select{flex:1 1 100%;width:100%;min-width:0;min-height:44px;font:16px var(--mono);color:var(--ink);background:#140c26;border:1px solid #3a2b5c;border-radius:8px;padding:0 8px}
+#labP .snx{width:100%;box-sizing:border-box;min-height:96px;font:16px var(--mono);color:var(--ink);background:#07040f;border:1px solid #3a2b5c;border-radius:8px;padding:8px}#labP .snm{width:100%;font-size:16px;line-height:1.35;color:var(--amber);min-height:22px}`;document.head.appendChild(st);
   const build=body=>{
-    const top=lsec(body,'SOUND LAB: PLAY hears one over the song, ON/OFF is saved');
+    const msg=lel('div','snm','');let msgT=0;const say=t=>{msg.textContent=t;clearTimeout(msgT);msgT=setTimeout(()=>{msg.textContent='';},6000);};
+    const ex=lsec(body,'SAVE AND SHARE: every sound, jingle, music effect and song pick');
+    lchip(ex,'EXPORT',()=>{const txt=SND.exportJson();let copied=false;
+        try{const b=new Blob([txt],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='nightrun-sound-settings.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);}catch(e){}
+        const box=$('sndJson');if(box)box.value=txt;
+        const done=ok=>say(ok?'Copied to the clipboard and saved as nightrun-sound-settings.json. Send me that file.':'Saved as nightrun-sound-settings.json. Copying did not work here: select the text below and copy it.');
+        try{navigator.clipboard.writeText(txt).then(()=>done(true),()=>done(false));}catch(e){done(false);}},{aria:'Export all sound settings as a JSON file and copy them'});
+    lchip(ex,'IMPORT',()=>{const box=$('sndJson'),r=SND.importJson(box?box.value:'');if(r.ok){say('Imported and applied.');sync();}else say('Not imported: '+r.error);},{aria:'Import the settings text below'});
+    const pick=lel('input');pick.type='file';pick.accept='.json,application/json';pick.hidden=true;pick.addEventListener('change',()=>{const f=pick.files&&pick.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{const box=$('sndJson');if(box)box.value=String(fr.result);const r=SND.importJson(fr.result);if(r.ok){say('Imported and applied.');sync();}else say('Not imported: '+r.error);pick.value='';};fr.readAsText(f);});
+    lchip(ex,'IMPORT FILE',()=>pick.click(),{aria:'Choose a settings file to import'});ex.append(pick);
+    const ta=lel('textarea','snx');ta.id='sndJson';ta.placeholder='Export fills this box. To import, paste settings text here and press IMPORT.';ta.setAttribute('aria-label','Settings text');
+    ex.parentNode.append(ta,msg);
+    const sync=()=>{sl.value=Math.round(SND.cfg.vol*100);show();for(const s of body.querySelectorAll('.snr[data-place] select'))s.value=SND.cfg.music[s.parentNode.dataset.place]||'';labSync();};
+    if(RET.musiclab){
+      const ms=lsec(body,'MUSIC: press PLAY to hear a song, STOP to go back'),tl=(TR.list.length?TR.list:SND.songs().map(k=>({stage:k,title:'',bpm:DEF_BPM[k]}))).slice();for(const t of tl)t.nm=SND.nice(t.stage,t.title);
+      const len=k=>{const m=SONGM[k];if(!m||!m.dur)return '';const s=Math.round(m.dur);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+      for(const t of tl){const row=lel('div','snr'),nm=lel('span','sn',t.nm+(len(t.stage)?'  ('+len(t.stage)+' long)':''));row.dataset.song=t.stage;row.append(nm);ms.append(row);
+        lchip(row,'PLAY',()=>{if(SND.pvSong===t.stage)SND.stopSong();else SND.playSong(t.stage);},{on:()=>SND.pvSong===t.stage,text:on=>on?'STOP':'PLAY',aria:'Preview song: '+t.nm});}
+      const ps=lsec(body,'WHICH SONG PLAYS WHERE (saved at once, the game uses it)');
+      for(const pl of SND.places()){const row=lel('div','snr'),nm=lel('span','sn',pl.label),sel=lel('select');row.dataset.place=pl.id;sel.setAttribute('aria-label','Song for: '+pl.label);
+        const o0=lel('option','',pl.def?'Game default: '+SND.nice(pl.def,TR.by[pl.def]&&TR.by[pl.def].title):'Game default (changes each visit)');o0.value='';sel.append(o0);
+        for(const t of tl){const o=lel('option','',t.nm+(len(t.stage)?' ('+len(t.stage)+')':''));o.value=t.stage;sel.append(o);}
+        sel.value=SND.cfg.music[pl.id]||'';sel.addEventListener('change',()=>{SND.setMusic(pl.id,sel.value);say('Saved: '+pl.label+' plays '+(sel.selectedOptions[0].textContent)+' from the next time it starts.');});
+        row.append(nm,sel);ps.append(row);}
+    }
+    const top=lsec(body,'SOUND LAB: PLAY hears one sound over the song, ON or OFF is saved');
     const v=lel('div','snv'),lab=lel('span','',''),sl=lel('input');sl.type='range';sl.min=0;sl.max=200;sl.step=5;sl.id='sndVol';sl.setAttribute('aria-label','Effects volume');
     const show=()=>{lab.textContent='Effects volume '+Math.round(SND.cfg.vol*100)+'%';};sl.value=Math.round(SND.cfg.vol*100);show();
     sl.addEventListener('input',()=>{SND.setVol(sl.value/100);show();});v.append(lab,sl);top.append(v);
