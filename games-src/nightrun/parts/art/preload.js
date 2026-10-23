@@ -12,6 +12,7 @@ const picOk=n=>{if(!ART.rd||!ART.rd.has(n+'.webp')||ART.err[n])return true;retur
 const animOk=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp')||ART.err[n])return true;return !!ART.anim(k);};
 const KIND={droneLine:'drone',droneV:'drone',droneSine:'drone',chargers:'charger',turret:'turret',gate:'gate',gunship:'gunship'};
 PL.needs=n=>{const d=STAGES[n-1],o=[];if(!d)return o;
+  if(RET.sprites)o.push({w:2,ok:()=>!!(ART.rdOk||ART.rdFail)});   // the art list itself (render/shapes.js): without it every picture below would count as 'nothing to load'
   if(ART.rd&&RET.sprites){
     const id=shipDef().id;o.push({w:2,ok:()=>animOk('ship-'+id+'/flame')&&animOk('ship-'+id+'/death')&&picOk('spr-ship-'+id)});
     const kinds=new Set(['drone']);for(const w of (d.waves||[]).slice(0,3))if(KIND[w])kinds.add(KIND[w]);
