@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // CAM2 (RET.cam2, W164): stepped probe (FOOT.sim 1/60 + streetlook draw every 2nd step, 100 s of game time, no screenshots, no wall-clock play) of the street camera and the steam prop.
-//   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/cam2-test.js     env: Q='&cam2=0' (old camera and steam)  VP=390x763 (phone) or 1440x860 (PC)  GATE=0 (numbers only)  SECS=100
+//   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/cam2-test.js     env: Q='&cam2=1' (new camera and steam; default off until retuned)  VP=390x763 (phone) or 1440x860 (PC)  GATE=0 (numbers only)  SECS=100
 // Camera: Kai runs right the whole time (right + fire held, hearts topped up). A running step = right held, Kai moving right, no arena lock, camera not yet at the boss screen.
 //   Gate: Kai in the right 30% of the view (P.x - camX > 0.7 view) in < 10% of running steps; the camera follows at a catch-up <= 0.3 s (95% of a step change) and does not jitter (no step moves it backwards).
 // Steam: every steam draw is recorded (frame, on screen or not). Gate: the smallest drawn frame holds >= 60% of the pixels of the largest sheet frame; a vent never vanishes while it is on screen (pop);

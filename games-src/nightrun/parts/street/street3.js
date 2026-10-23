@@ -32,7 +32,7 @@ function plan(intro){const T=S3.T,N=T.waves,out=[];for(let i=0;i<N;i++){const t=
 S3.plan=plan;
 const gate=(S,vw)=>{const bc=Math.min(ST.boss.x-vw/2,ST.len-vw);return clamp(bc*S.time/S3.T.boss,0,bc);};
 /* the camera never runs ahead of the clock */
-if(F.look&&F.look.back){const b0=F.look.back;F.look.back=function(S,P,vw,want){const w=b0.apply(this,arguments);return S.s3&&S.st===ST?(RET.cam2?Math.min(w,Math.min(ST.boss.x-vw/2,ST.len-vw)-2):Math.min(w,Math.max(S.s3.gate,S.camX))):w;};}   // cam2: the camera follows Kai; only the boss arena waits for the clock (the boss trigger below uses the gate)   // holds the camera, never pulls it back
+if(F.look&&F.look.back){const b0=F.look.back;F.look.back=function(S,P,vw,want){const w=b0.apply(this,arguments);return S.s3&&S.st===ST?(RET.cam2?Math.min(w,Math.max(S.camX,Math.min(ST.boss.x-vw/2,ST.len-vw)-2)):Math.min(w,Math.max(S.s3.gate,S.camX))):w;};}   // cam2: the camera follows Kai; only the boss arena waits for the clock (the boss trigger below uses the gate)   // holds the camera, never pulls it back
 const s2step=ST.hook.step;
 ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)return;const vw=env.G.viewW||960,P=S.P;
   if(!S.s3){const bpm=(typeof BT!=='undefined'&&BT.bpm>40?BT.bpm:120),intro=+(S3.T.beats*60/bpm).toFixed(2);
