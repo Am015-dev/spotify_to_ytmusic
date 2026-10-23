@@ -323,7 +323,9 @@ async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.f
   try{await new Promise((ok,no)=>{const t0=performance.now(),el=s.el,iv=setInterval(()=>{if(s.file!==info.file){clearInterval(iv);no('evicted');}else if(s.err||el.error){clearInterval(iv);no('error');}
       else if(slotReady(s)){clearInterval(iv);ok();}else if(performance.now()-t0>60000){clearInterval(iv);no('timeout');}},80);});
     TR.bufs[info.file]=s;AU.trackReady(stage);}
-  catch(e){if(e!=='evicted'){TR.bad[info.file]=1;AU.freeSlot(s);}}
+  catch(e){if(e!=='evicted'){TR.bad[info.file]=1;AU.freeSlot(s);
+    /* owner 23 Oct 2026 "game music is not playing": the server sometimes answers 503; a failed song was never asked for again (silent stage). Try again up to 3 times (1.5 s, 3 s, 4.5 s) */
+    const T=TR.tries||(TR.tries={}),n=T[info.file]=(T[info.file]||0)+1;if(n<=3)setTimeout(()=>{delete TR.bad[info.file];loadTrack(stage);},1500*n);}}
   TR.busy[info.file]=0;}
 
 /* ---------- latency test (settings): clicks on the audio clock, the player taps, the median lateness becomes the Audio sync ---------- */
@@ -2755,7 +2757,7 @@ ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();if(!q
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
       if(solid&&dark>=3){for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]);if(m<3){d[i+3]=0;continue;}d[i+3]=m;const k=255/m;d[i]=Math.min(255,d[i]*k);d[i+1]=Math.min(255,d[i+1]*k);d[i+2]=Math.min(255,d[i+2]*k);}g.putImageData(id,0,0);done(c);return;}}catch(e){}}
     if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
-  im.onerror=()=>{ART.err[n]=1;end();};im.src=ART.base+n+'.webp';};
+  im.onerror=()=>{const k=im.__e=(im.__e||0)+1;if(k<=3){setTimeout(()=>{im.src=ART.base+n+'.webp?r='+Date.now();},1200*k);return;}ART.err[n]=1;end();};/* owner 23 Oct 2026 "some assets are not shown": a 503 from the server was final; try again up to 3 times */im.src=ART.base+n+'.webp';};
 ART.have=n=>!!ART.bm[n];
 ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
@@ -6800,14 +6802,16 @@ NRF.pauseChanged=function(on){
   else{this.why.pause=false;this.sync();}};
 /* resume request: true = a count-in is running (setPause waits for it) */
 NRF.holdResume=function(){if(this.go){this.go=0;return false;}
-  if(!RET.flow||!this.why.pause||AU.hold||!AU.a||BT.mode==='none'||this.cnt)return !!this.cnt;
-  const spb=BT.spb,B=this.barAt(3*spb),t0=B-3*spb;this.cnt={B,t0,n:4};pauseEl.hidden=true;
-  this.apply(false,B);           // the song comes back to full exactly on the bar line
-  const iv=setInterval(()=>{const now=mnow();
+  if(!RET.flow||!this.why.pause||AU.hold||!AU.a||AU.a.state!=='running'||BT.mode==='none'||this.cnt)return !!this.cnt;   // no running sound (owner 23 Oct: "if I pause the game freezes"): no count-in, resume at once
+  /* owner 23 Oct 2026 "if I pause the game freezes if I want to come back": the old count-in waited 3 beats AND the next bar line (up to 7 beats, 4.5 s measured)
+     and ran on the music clock, which stands still when the phone's sound is not running. Now 3-2-1 over at most 1.5 s of real time (3 beats if shorter) */
+  const spb=BT.spb,D=Math.min(1.5,3*spb)*1000,w0=performance.now();this.cnt={n:-1};pauseEl.hidden=true;
+  this.apply(false,mnow()+D/1000);
+  const iv=setInterval(()=>{const e=performance.now()-w0;
     if(!paused||!this.cnt){clearInterval(iv);this.cnt=null;cntEl.hidden=true;return;}
-    const k=Math.floor((now-t0)/spb);                          // 0,1,2 = 3,2,1
-    if(k>=0&&k<3&&this.cnt.n!==k){this.cnt.n=k;cntEl.hidden=false;cntEl.innerHTML='<b>'+(3-k)+'</b>';}
-    if(now>=B-.012){clearInterval(iv);this.cnt=null;cntEl.hidden=true;this.go=1;setPause(false);}},15);
+    const k=Math.min(2,Math.floor(e/(D/3)));                    // 0,1,2 = 3,2,1
+    if(this.cnt.n!==k){this.cnt.n=k;cntEl.hidden=false;cntEl.innerHTML='<b>'+(3-k)+'</b>';}
+    if(e>=D){clearInterval(iv);this.cnt=null;cntEl.hidden=true;this.go=1;setPause(false);}},15);
   return true;};
 /* a hidden tab always stops the song (as before); coming back resumes the context and the paused game keeps its place */
 document.addEventListener('visibilitychange',()=>{if(!RET.flow)return;
@@ -14676,7 +14680,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='646fda9157 2026-10-23 06:28 UTC';
+const NR_STAMP='f242874d0b 2026-10-23 06:42 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;

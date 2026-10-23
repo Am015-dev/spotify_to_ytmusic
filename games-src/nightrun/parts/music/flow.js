@@ -51,14 +51,16 @@ NRF.pauseChanged=function(on){
   else{this.why.pause=false;this.sync();}};
 /* resume request: true = a count-in is running (setPause waits for it) */
 NRF.holdResume=function(){if(this.go){this.go=0;return false;}
-  if(!RET.flow||!this.why.pause||AU.hold||!AU.a||BT.mode==='none'||this.cnt)return !!this.cnt;
-  const spb=BT.spb,B=this.barAt(3*spb),t0=B-3*spb;this.cnt={B,t0,n:4};pauseEl.hidden=true;
-  this.apply(false,B);           // the song comes back to full exactly on the bar line
-  const iv=setInterval(()=>{const now=mnow();
+  if(!RET.flow||!this.why.pause||AU.hold||!AU.a||AU.a.state!=='running'||BT.mode==='none'||this.cnt)return !!this.cnt;   // no running sound (owner 23 Oct: "if I pause the game freezes"): no count-in, resume at once
+  /* owner 23 Oct 2026 "if I pause the game freezes if I want to come back": the old count-in waited 3 beats AND the next bar line (up to 7 beats, 4.5 s measured)
+     and ran on the music clock, which stands still when the phone's sound is not running. Now 3-2-1 over at most 1.5 s of real time (3 beats if shorter) */
+  const spb=BT.spb,D=Math.min(1.5,3*spb)*1000,w0=performance.now();this.cnt={n:-1};pauseEl.hidden=true;
+  this.apply(false,mnow()+D/1000);
+  const iv=setInterval(()=>{const e=performance.now()-w0;
     if(!paused||!this.cnt){clearInterval(iv);this.cnt=null;cntEl.hidden=true;return;}
-    const k=Math.floor((now-t0)/spb);                          // 0,1,2 = 3,2,1
-    if(k>=0&&k<3&&this.cnt.n!==k){this.cnt.n=k;cntEl.hidden=false;cntEl.innerHTML='<b>'+(3-k)+'</b>';}
-    if(now>=B-.012){clearInterval(iv);this.cnt=null;cntEl.hidden=true;this.go=1;setPause(false);}},15);
+    const k=Math.min(2,Math.floor(e/(D/3)));                    // 0,1,2 = 3,2,1
+    if(this.cnt.n!==k){this.cnt.n=k;cntEl.hidden=false;cntEl.innerHTML='<b>'+(3-k)+'</b>';}
+    if(e>=D){clearInterval(iv);this.cnt=null;cntEl.hidden=true;this.go=1;setPause(false);}},15);
   return true;};
 /* a hidden tab always stops the song (as before); coming back resumes the context and the paused game keeps its place */
 document.addEventListener('visibilitychange',()=>{if(!RET.flow)return;
