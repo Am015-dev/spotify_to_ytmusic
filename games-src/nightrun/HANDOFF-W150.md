@@ -1,48 +1,23 @@
-# W150: music clean, song per stage, enemy beat lock (22 Oct 2026)
+# HANDOFF W150: street stage "very easy and not strategic" (parts/street/streethard.js, flag RET.streethard, default on, ?streethard=0 = old)
 
-Owner (phone, 22 Oct 05:25): "music is distorted by effects, you mixed up the selections very badly, not beat and tension of enemies".
-Branch `nr/W150` (not merged to the live branch). W144 does not exist on origin (`nr/W144` was not found), so nothing was read from it.
+Measured with stepped time, RUNS=8 (`qa/streethard-test.js`, `qa/street3-test.js`).
 
-## 1. Music clean: measured, no defect found in the graph
-`mix-test.js` now also records gain reduction (`AU.lim.reduction`, `AU.sfxc.reduction`, sampled every 25 ms) and gates it (check 1b: master limiter never beyond -2 dB).
-Real-time bot runs, 30 s each, real songs, `MEASURE=1`:
+| | before (?streethard=0) | after |
+|---|---|---|
+| time-to-kill, pistol, median (rusher / gunner / heavy) | 0.77 / 0.93 / 16.0 s | 1.93 / 4.07 / 7.7 s |
+| decent bot clears (street2-test bot + ducks level shots) | 7/8 | 4/8 |
+| street3-test bot clears | 7/8 | 7/8 |
+| idle bot | dies at ~17 s | dies at ~19 s |
+| threat peak (street3-test (b)) | 79% | 85% (PASS) |
 
-| scenario | pre-limiter peak | out peak | clipped blocks | master limiter GR | effects-bus GR | music vs effects RMS |
-|---|---|---|---|---|---|---|
-| stage 1 | -11.3 dBFS | -9.6 | 0 | 0 dB | -0.55 | +29 dB |
-| stage 6 | -14.9 | -13.1 | 0 | 0 dB | small | +32 |
-| stage 10 | -10.2 | -8.4 | 0 | 0 dB | small | +34 |
-| boss | -12.0 | -10.2 | 0 | 0 dB | small | +28 |
-| endless wave 15 | -11.0 | -9.2 | 0 | 0 dB | small | +14 |
+Decisions created:
+1. Kill order: a gunner left alive shows "CALLING HELP" and 1 s later pulls a rusher from a later wave (every 10 s). 1-2 calls a run.
+   Not proven yet: the gunner-first bot clears no more than the nearest-first bot (3/8 vs 4/8), because the gunner hides behind cover most of the time.
+2. Cover or push: gunner bullets stop on cover props (height 56 at least) and chip them (2 hp). Bots rarely stand behind cover between them and a gunner
+   (0-0.8 blocks a run), so this is not measured well yet.
+Readable attacks: rusher crouch 0.6 s (was 0.4), gunner shots fly level at chest height so ducking dodges them (they used to hit the crouch line).
+Heavy front plate takes 55% (was 30%).
 
-No clipping, master limiter never engages (gate <= 2 dB: 0 dB), no pumping from effects. No audio code was changed.
-Not measured: pack mp3 loudness against the old songs, and what a phone speaker does to the file masters. If the owner still hears distortion, the next suspect is the mp3 masters (peak/loudness per file in `media/mp-*.mp3`), not the effects.
-
-## 2. Song per stage: this was the real bug
-Cause: `ret.js` replaced each story stage's song with a rotating pick (`DP.stage`), and `musicpack.js` made that pick a seeded shuffle with a RANDOM seed per page load, recomputed whenever a pack file registered. So stage N played a different song on every load, and Classic was not the original either.
-
-Fix (`musicpack.js` wrapper of `DP.stage`, `ret.js` keeps `s.song0` = the original song):
-- Classic: every stage plays its original song.
-- Mix: a stage plays its own original song until it is cleared; a replay of a cleared stage takes a new pack song of its district (fixed per stage, never the stage's own, same on every load).
-- New only: pack pool, fixed seed, same on every load.
-
-Table (stages 1-32, same on every load; stages 33-37 are challenge stages and keep their own songs; s1/s2/s3 = stage1/2/3):
-
-| mode | stages 1-32 |
-|---|---|
-| BEFORE, any mode (random per load, example) | rotating pool, differs each load; Classic not original |
-| AFTER Classic = original = Mix before clears | s1 s2 s1 s2 s3 s2 endless endless2 s3 s1 endless s3 endless2 s1 s2 s3 s1 endless s2 endless2 s3 endless s1 endless2 s2 s1 endless2 endless s3 s2 endless s1 |
-| AFTER Classic / Mix, Athens (stages 33-40 in the list) | athina athina2 x4 |
-| AFTER New only | d1a d1b x4 (Bank), d2b d2a x4, d3a d3b x4, d4a d4b x4, athB athA x4 |
-
-Endless, bosses, fever, pit and street cues are unchanged (their own alternation in `musicpack.js`).
-`musicpack-test.js` updated: the old shuffle checks now call `DP.pick` directly (the endless/free-run picker is unchanged); two new checks: Classic = original and stable, New changes the picks.
-
-## 3. Enemy beat lock and tension
-New `beatlock-test.js` (stepped sim, no wall clock; `STAGES=1,6,10 SECS=150`):
-- share of enemy volleys within 60 ms of a beat: stage 1 98.8%, stage 6 91.0%, stage 10 97.3% (gate >= 80%: PASS, median offset 4-5 ms). No fix needed in the sim: volleys are counted in beats (`e.bf`) by design.
-- enemies spawned per bar: loud bars vs quiet bars of the song: stage 6 1.25 -> 2.08 (x1.66), stage 10 0 -> 2.14, stage 1 not enough quiet bars in the window to compare. The director (`dir.js barLine`) scales spawns by song energy `(.42+1.15E)`; shot density per bar lags the song because enemies stay on screen (pacing.js), which is why the first version of the gate (volleys per bar) read x1.1 on stage 1.
-- NOT measured: real-audio drift (`?sim=1` ties the beat clock to game time). If the owner feels real offbeat on a phone, the next check is `AU.lat` / `SET.sync` on a real device (`audio-test.js`), not the enemy code.
-
-## Left for the orchestrator
-Gates: musicpack-test ALL PASS, beatlock-test PASS (stages 1/6/10), guard.py ok. Review and merge `nr/W150`.
+Left (streethard-test fails narrowly): (a) rusher ttk 1.93 < 2.0 -> HPK.rusher 1.7; (d) cover blocks 0 on some seeds; (f) kill order has no measured value.
+Next: make the gunner pop out more often when unhurt (so gunner-first pays), and a bot that picks cover between itself and the gunner.
+Sensitive: small changes to peakT moved gunner ttk 4 -> 15 s (more gunners alive at once). Tune with SH='{"SH":{...},"T":{...}}' on the test.
