@@ -39,3 +39,16 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
 13. CHANGE WHAT THE PLAYER DOES, NOT ONLY WHAT THEY SEE: a design task must name the player decision it creates or sharpens
    (e.g. 'EMP now or save it', 'graze for score or stay safe') and a measure of it; polish tasks say so in the title.
 14. FUN SKILL: any design/feel task loads the `fun-game-design` skill first and follows it.
+15. CODING DISCIPLINE (owner, 23 Oct 2026: "look up the karpathy skill"; from the public "Karpathy guidelines" CLAUDE.md, paraphrased):
+   (a) Think before coding: write down your assumptions; if the brief can be read two ways, pick the one the owner's words support and say so.
+   (b) Simplicity first: the least code that solves the ask; no unrequested features, one-use abstractions or speculative options.
+   (c) Surgical changes: touch only what the task needs, match the surrounding style, leave unrelated code alone (mention it, don't delete it);
+       every changed line traces back to the ask. Never let a // comment swallow code on a one-line part (it broke the build twice on 23 Oct).
+   (d) Goal-driven: turn the ask into a check first (a qa test that fails), then make it pass; loop until it does.
+16. TOKEN DISCIPLINE (owner, 23 Oct 2026: "projects don't spend extreme number of tokens"; from public Claude Code and game-dev advice):
+   (a) Tool output is the biggest cost: grep for the lines you need, read line ranges, never cat whole files or built html; print PASS/FAIL only.
+   (b) One bounded task per session with a clean HANDOFF note; no marathon sessions.
+   (c) Cheapest model that can do it (CLAUDE.md tiers); effort low for chores.
+   (d) Screenshots: compare with games-src/nightrun/benchmark/ instead of retaking; retake only the screen you changed.
+   (e) Automated tests catch crashes and regressions; feel and balance need the owner's play. Ask for it instead of looping bots past the point
+       where numbers stop moving (23 Oct: four balance rounds moved the casual-bot clear rate 44 -> 4 -> 18 -> 20%).
