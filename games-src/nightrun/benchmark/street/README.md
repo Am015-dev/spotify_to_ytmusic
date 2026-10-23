@@ -5,6 +5,7 @@ for every review. Retake one only when that screen really changed, and replace t
 
 | File | Build | What it shows |
 |---|---|---|
+| (see ../STREET-BAR.md for the bar these are judged against) | | |
 | 4-street-start-{phone,pc}.webp | beta.169 live | street right after the loading veil, nobody steering |
 | 5-street-20s-{phone,pc}.webp | beta.169 live | 20 s later, nobody steering (Kai was hit 4 times on PC) |
 | street-running-{phone,pc}-camera-old.webp | beta.171 | after 7 s holding RIGHT, old camera: Kai pinned near the right edge (312 / 739 units from the left) |
