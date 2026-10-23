@@ -14680,7 +14680,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='f242874d0b 2026-10-23 06:42 UTC';
+const NR_STAMP='2a86fb55ac 2026-10-23 06:59 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16316,8 +16316,8 @@ const SNDT=[
   ['pwthump','pw','Power-up thump (nova, magnet)',0],['riser','pw','DROP power-up riser',0],['dropboom','pw','DROP power-up blast',0],['reward','pw','Reward shower boom',0]];
 const SNDGRP={fx:'GAME SOUNDS',st:'JINGLES ON THE BEAT',mu:'MUSIC EFFECTS',pw:'POWER-UP AND WAVE SOUNDS',ft:'ON FOOT'};
 const SNDLS={get:Storage.prototype.getItem,set:Storage.prototype.setItem};   // the Lab keeps game saves in a shadow copy while it runs: the sound choice is written to the real storage
-const SND=window.SND={T:SNDT,G:SNDGRP,cfg:{on:{},vol:1,off:false},pv:{},force:null,
-  load(){try{const j=JSON.parse(SNDLS.get.call(localStorage,'nr_snd')||'null');if(j&&typeof j==='object'){this.cfg.on=j.on&&typeof j.on==='object'?j.on:{};this.cfg.vol=typeof j.vol==='number'?Math.max(0,Math.min(2,j.vol)):1;this.cfg.off=!!j.off;}}catch(e){}},
+const SND=window.SND={T:SNDT,G:SNDGRP,cfg:{on:{},vol:1,off:false,music:{}},pv:{},force:null,
+  load(){try{const j=JSON.parse(SNDLS.get.call(localStorage,'nr_snd')||'null');if(j&&typeof j==='object'){this.cfg.on=j.on&&typeof j.on==='object'?j.on:{};this.cfg.vol=typeof j.vol==='number'?Math.max(0,Math.min(2,j.vol)):1;this.cfg.off=!!j.off;this.cfg.music=this.cleanMusic(j.music);}}catch(e){}},
   save(){try{SNDLS.set.call(localStorage,'nr_snd',JSON.stringify(this.cfg));}catch(e){}},
   def(id){const r=SNDT.find(x=>x[0]===id);return r?!!r[3]:false;},
   on(id){if(!RET.pure)return true;if(this.force===id)return true;const t=performance.now();if(this.pv[id]&&this.pv[id]>t)return true;
@@ -16325,12 +16325,58 @@ const SND=window.SND={T:SNDT,G:SNDGRP,cfg:{on:{},vol:1,off:false},pv:{},force:nu
   set(id,v){this.cfg.on[id]=!!v;this.save();this.apply();},
   setOff(v){this.cfg.off=!!v;this.save();this.apply();},
   setVol(v){this.cfg.vol=Math.max(0,Math.min(2,+v||0));this.save();this.apply();},
+
+  /* ---------- music picks + export / import (owner, 23 Oct 2026: "music is distorted by jingles, include music on the Lab, I will select create export to json so I can give you these settings") ----------
+     SETTINGS FILE FORMAT (also in games-src/nightrun/SOUND-SETTINGS.md), one JSON object:
+       {"format":"nightrun-sound-settings","version":1,
+        "on":{"<sound id>":true|false, ...},      every row of the Lab SOUND page (ids = first column of SNDT above), true = plays
+        "vol":1,                                  effects volume, 0 to 2
+        "off":false,                              true = all effects off
+        "music":{"<place>":"<song>", ...}}        place = title | street | d0, d1, ... (flight district number) | b_boss, b_boss2, b_boss3; song = a track name (menu, stage1, ..., boss3).
+                                                  A place that is missing plays the game's own song. */
+  MUSIC_FORMAT:'nightrun-sound-settings',
+  songs(){const o=Object.keys(DEF_BPM);for(const t of TR.list)if(!o.includes(t.stage))o.push(t.stage);return o;},
+  cleanMusic(m){const o={};if(m&&typeof m==='object'){const ok=this.songs(),pl=this.places().map(x=>x.id);for(const k of Object.keys(m))if(pl.includes(k)&&ok.includes(m[k]))o[k]=m[k];}return o;},
+  /* every place that has its own song: the title / menus, the street stage (on foot), each flight district (the game rotates a pool of songs there), each boss */
+  places(){const out=[{id:'title',label:'Title screen and menus',def:'menu'},{id:'street',label:'Street stage (on foot)',def:'stage2'}];
+    for(let i=0;i<DISTRICTS.length;i++)out.push({id:'d'+i,label:'Flight: '+DISTRICTS[i].name,def:null});
+    for(const k of [0,1,2,3,6]){const d=DISTRICTS.find(x=>x.boss===k);let def='boss';try{def=bossStage(k)||'boss';}catch(e){}out.push({id:'b'+k,label:'Boss fight: '+(d?d.bossName:'last boss'),def});}
+    return out;},
+  nice(k,t){if(t)return t;let m;if((m=/^d(\d)([ab])$/.exec(k)))return 'District '+m[1]+' song '+m[2].toUpperCase();if((m=/^boss-d(\d)(~b)?$/.exec(k)))return 'Boss of district '+m[1]+(m[2]?' (second part)':'');
+    if((m=/^fever-(\d+)$/.exec(k)))return 'Fever song, '+m[1]+' beats per minute';if((m=/^ath([AB])$/.exec(k)))return 'Athens song '+m[1];if(k==='pit')return 'Pit stop song';if(k==='endless3')return 'Endless song 3';
+    if(k==='street1')return 'Street stage song';if((m=/^street1-(\w+?)(~b)?$/.exec(k)))return 'Street stage '+m[1]+(m[2]?' (second part)':'')+' song';return k;},
+  placeOf(s){if(s==='menu')return 'title';if(window.FOOT&&FOOT.on)return 'street';if(!s||/^(fever|pit|street)/.test(s))return null;
+    try{const base=s.replace(/~b$/,'');if(/^boss/.test(base)){for(const k of [0,1,2,3,6])if(bossStage(k)===base)return 'b'+k;return null;}
+      if(typeof ST!=='undefined'&&ST.on&&ST.def&&ST.def.di>=0)return 'd'+(ST.def.di%DISTRICTS.length);
+      const nx=nextDi(G.di).di,c=G.bossDone?[nx,G.di]:[G.di,nx];   // right after a boss falls the game asks for the NEXT district's song while G.di is still the old one
+      for(let i=0;i<DISTRICTS.length;i++)c.push(i);
+      for(const i of c){if(i==null||!DISTRICTS[i])continue;const pool=RET.dpool&&RET.DP&&RET.DP.pool?RET.DP.pool(i):[];if(pool.includes(s)||DISTRICTS[i].song===s)return 'd'+i;}}catch(e){}
+    return null;},
+  songFor(s){if(!RET.musiclab||this.raw)return s;if(s===this.lastOut&&s!==this.lastIn&&performance.now()-this.lastT<8000)return s;   // AU.sched asks again with the name we already gave: do not map it twice
+    const p=this.placeOf(s),m=p&&this.cfg.music[p],r=m&&this.songs().includes(m)?m:s;this.lastIn=s;this.lastOut=r;this.lastT=performance.now();return r;},
+  setMusic(place,song){if(song&&this.songs().includes(song))this.cfg.music[place]=song;else delete this.cfg.music[place];this.save();},
+  exportData(){const on={};for(const r of SNDT)on[r[0]]=!!this.on0(r[0]);return{format:this.MUSIC_FORMAT,version:1,on,vol:this.cfg.vol,off:!!this.cfg.off,music:Object.assign({},this.cfg.music)};},
+  on0(id){const v=this.cfg.on[id];return v===undefined?this.def(id):!!v;},
+  exportJson(){return JSON.stringify(this.exportData(),null,1);},
+  /* returns {ok:true} after applying, or {ok:false,error:'plain words'} and changes nothing */
+  importJson(text){let j;try{j=JSON.parse(String(text).trim());}catch(e){return{ok:false,error:'This is not valid JSON text.'};}
+    if(!j||typeof j!=='object'||Array.isArray(j)||j.format!==this.MUSIC_FORMAT)return{ok:false,error:'This is not a Nightrun sound settings file (the "format" line is missing).'};
+    if(j.version!==1)return{ok:false,error:'Unknown settings version '+j.version+'.'};
+    const ids=new Set(SNDT.map(r=>r[0])),on={};
+    if(j.on!==undefined){if(!j.on||typeof j.on!=='object')return{ok:false,error:'"on" must list sound names with true or false.'};
+      for(const k of Object.keys(j.on)){if(!ids.has(k))return{ok:false,error:'Unknown sound name "'+k+'".'};if(typeof j.on[k]!=='boolean')return{ok:false,error:'Sound "'+k+'" must be true or false.'};on[k]=j.on[k];}}
+    if(j.vol!==undefined&&(typeof j.vol!=='number'||!(j.vol>=0&&j.vol<=2)))return{ok:false,error:'"vol" must be a number from 0 to 2.'};
+    if(j.off!==undefined&&typeof j.off!=='boolean')return{ok:false,error:'"off" must be true or false.'};
+    const pl=this.places().map(x=>x.id),mu={};
+    if(j.music!==undefined){if(!j.music||typeof j.music!=='object')return{ok:false,error:'"music" must list places with a song name.'};
+      for(const k of Object.keys(j.music)){if(!pl.includes(k))return{ok:false,error:'Unknown music place "'+k+'".'};if(!this.songs().includes(j.music[k]))return{ok:false,error:'Unknown song "'+j.music[k]+'" for "'+k+'".'};mu[k]=j.music[k];}}
+    this.cfg.on=on;this.cfg.vol=j.vol===undefined?1:j.vol;this.cfg.off=!!j.off;this.cfg.music=mu;this.save();this.apply();return{ok:true};},
   musicFx(){return SNDT.some(r=>r[1]==='mu'&&this.on(r[0]));},
   apply(){PURE.route();if(PURE.ok)try{PURE.ok.gain.value=PURE.GAIN*this.cfg.vol;AU.fx.gain.value=PURE.ok.gain.value;}catch(e){}}};
-SND.AU=AU;                                                         // test hook: qa/soundlab-test.js spies on AU.sfx / AU.startStage
+SND.AU=AU;SND.BT=BT;                                                         // test hook: qa/soundlab-test.js spies on AU.sfx / AU.startStage
 window.sndOn=id=>!window.SND||SND.on(id);                        // call sites outside the audio parts: if(sndOn('heart'))AU.osc(...)
 SND.load();
-const PURE=window.PURE={GAIN:.22,blocked:0,played:0,
+const PURE=window.PURE={GAIN:.22,blocked:0,played:0,stung:0,
   get KEEP(){const o={};for(const r of SNDT)if(r[1]==='fx'&&SND.on(r[0]))o[r[0]]=1;return o;},
   wire(){const a=AU.a;if(!a||this.done||!AU.musv||!AU.m)return;this.done=1;
     this.ok=a.createGain();this.ok.gain.value=this.GAIN*SND.cfg.vol;this.ok.connect(AU.sfxv);try{AU.fx.gain.value=this.ok.gain.value;}catch(e){}   // the game sounds that stay; AU.fx (power-up and wave sounds, now gated one by one) sits at the same level
@@ -16349,13 +16395,13 @@ if(RET.pure){
     return r;};}
   {const y0=AU.lyDrum;AU.lyDrum=function(){return SND.on('m_drum')?y0.apply(this,arguments):0;};}
   {const t0=AU.tlsched;AU.tlsched=function(){return SND.on('m_tier')?t0.apply(this,arguments):undefined;};}
-  {const g0=AU.sting;AU.sting=function(n){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}return g0.apply(this,arguments);};}   // owner 22 Oct: jingles distort the music: off everywhere (menus and result screens too) unless switched on in the Lab
+  {const g0=AU.sting;AU.sting=function(n){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}PURE.stung++;return g0.apply(this,arguments);};}   // owner 22 Oct: jingles distort the music: off everywhere (menus and result screens too) unless switched on in the Lab
   {const s0=AU.sfx;AU.sfx=function(n){PURE.wire();
     if(running&&!SND.on(n)){PURE.blocked++;return;}
     const F0=this.fx;if(PURE.ok)this.fx=PURE.ok;PURE.played++;try{return s0.apply(this,arguments);}finally{this.fx=F0;}};}
   {const a0=window.NRF&&NRF.apply;if(a0)NRF.apply=function(duck,at){const w=duck;a0.call(this,duck&&SND.on('m_pause'),at);this.ducked=w;};}}
 
-// PURPOSE: the Lab SOUND page: one row per sound and music effect, PLAY over the song, ON/OFF saved (gate = puremusic.js SND)
+// PURPOSE: the Lab SOUND page: songs to preview and pick per place, one row per sound and music effect, PLAY over the song, ON/OFF saved, export / import as JSON (gate = puremusic.js SND)
 // FLAG: none (needs the Lab and RET.pure; ?pure=0 shows the page but every row plays and nothing is gated)
 // TEST: qa/soundlab-test.js
 /* ---------- SOUNDLAB: owner, 22 Oct 2026: "the effects are distorting the music, extremely annoying; I need to spot which ones; include them in the Lab so I can select".
@@ -16390,13 +16436,44 @@ if(window.SND&&window.LABX){
     if(r[1]==='mu'){this.pv[id]=performance.now()+PV_MS;this.apply();later(()=>this.apply(),PV_MS+80);MU[id]();return true;}
     this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='ft'){if(FT_[id])AU.sfx(FT_[id]);}else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
     return true;};
+  // a song preview: the song starts at once (not mapped through the picks); STOP puts back what was playing
+  SND.pvSong=null;
+  SND.playSong=function(k){AU.unlock();if(this.pvSong===null)this.pvPrev=BT.stage||'menu';this.raw=true;try{AU.startStage(k);}finally{this.raw=false;}this.pvSong=k;return true;};
+  SND.stopSong=function(){const b=this.pvPrev;this.pvSong=null;this.raw=true;try{AU.startStage(b||'menu');}finally{this.raw=false;}return true;};
   // 'tier' is forced to 3 for a moment so the drum layer and the hats / kick / bass can be heard; the game writes AU.tier as before
   {let tv=AU.tier;Object.defineProperty(AU,'tier',{get(){return SND.pv.tierForce>performance.now()?Math.max(3,tv|0):tv;},set(v){tv=v;},configurable:true});
 }
-  const st=document.createElement('style');st.textContent=`#labP .snr{display:flex;align-items:center;gap:6px;width:100%;margin:2px 0}#labP .snr .sn{flex:1 1 auto;font-size:13px;line-height:1.25;min-width:0}
-#labP .snr .lc{flex:0 0 auto;min-width:64px;min-height:36px}#labP .snv{display:flex;align-items:center;gap:8px;width:100%;font-size:13px}#labP .snv input{flex:1 1 auto;min-height:36px}`;document.head.appendChild(st);
+  const st=document.createElement('style');st.textContent=`#labP .snr{display:flex;align-items:center;gap:8px;width:100%;margin:3px 0}#labP .snr .sn{flex:1 1 auto;font-size:16px;line-height:1.3;min-width:0}
+#labP .snr .lc{flex:0 0 auto;min-width:64px;min-height:44px}#labP .snv{display:flex;align-items:center;gap:8px;width:100%;font-size:16px}#labP .snv input{flex:1 1 auto;min-height:44px}
+#labP .snr .sl{flex:0 0 auto;font-size:16px;color:var(--dim)}#labP .snr[data-place]{flex-wrap:wrap}#labP .snr[data-place] .sn{flex:1 1 100%}#labP .snr[data-place] select{flex:1 1 100%;width:100%;min-width:0;min-height:44px;font:16px var(--mono);color:var(--ink);background:#140c26;border:1px solid #3a2b5c;border-radius:8px;padding:0 8px}
+#labP .snx{width:100%;box-sizing:border-box;min-height:96px;font:16px var(--mono);color:var(--ink);background:#07040f;border:1px solid #3a2b5c;border-radius:8px;padding:8px}#labP .snm{width:100%;font-size:16px;line-height:1.35;color:var(--amber);min-height:22px}`;document.head.appendChild(st);
   const build=body=>{
-    const top=lsec(body,'SOUND LAB: PLAY hears one over the song, ON/OFF is saved');
+    const msg=lel('div','snm','');let msgT=0;const say=t=>{msg.textContent=t;clearTimeout(msgT);msgT=setTimeout(()=>{msg.textContent='';},6000);};
+    const ex=lsec(body,'SAVE AND SHARE: every sound, jingle, music effect and song pick');
+    lchip(ex,'EXPORT',()=>{const txt=SND.exportJson();let copied=false;
+        try{const b=new Blob([txt],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='nightrun-sound-settings.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);}catch(e){}
+        const box=$('sndJson');if(box)box.value=txt;
+        const done=ok=>say(ok?'Copied to the clipboard and saved as nightrun-sound-settings.json. Send me that file.':'Saved as nightrun-sound-settings.json. Copying did not work here: select the text below and copy it.');
+        try{navigator.clipboard.writeText(txt).then(()=>done(true),()=>done(false));}catch(e){done(false);}},{aria:'Export all sound settings as a JSON file and copy them'});
+    lchip(ex,'IMPORT',()=>{const box=$('sndJson'),r=SND.importJson(box?box.value:'');if(r.ok){say('Imported and applied.');sync();}else say('Not imported: '+r.error);},{aria:'Import the settings text below'});
+    const pick=lel('input');pick.type='file';pick.accept='.json,application/json';pick.hidden=true;pick.addEventListener('change',()=>{const f=pick.files&&pick.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{const box=$('sndJson');if(box)box.value=String(fr.result);const r=SND.importJson(fr.result);if(r.ok){say('Imported and applied.');sync();}else say('Not imported: '+r.error);pick.value='';};fr.readAsText(f);});
+    lchip(ex,'IMPORT FILE',()=>pick.click(),{aria:'Choose a settings file to import'});ex.append(pick);
+    const ta=lel('textarea','snx');ta.id='sndJson';ta.placeholder='Export fills this box. To import, paste settings text here and press IMPORT.';ta.setAttribute('aria-label','Settings text');
+    ex.parentNode.append(ta,msg);
+    const sync=()=>{sl.value=Math.round(SND.cfg.vol*100);show();for(const s of body.querySelectorAll('.snr[data-place] select'))s.value=SND.cfg.music[s.parentNode.dataset.place]||'';labSync();};
+    if(RET.musiclab){
+      const ms=lsec(body,'MUSIC: press PLAY to hear a song, STOP to go back'),tl=(TR.list.length?TR.list:SND.songs().map(k=>({stage:k,title:'',bpm:DEF_BPM[k]}))).slice();for(const t of tl)t.nm=SND.nice(t.stage,t.title);
+      const len=k=>{const m=SONGM[k];if(!m||!m.dur)return '';const s=Math.round(m.dur);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+      for(const t of tl){const row=lel('div','snr'),nm=lel('span','sn',t.nm+(len(t.stage)?'  ('+len(t.stage)+' long)':''));row.dataset.song=t.stage;row.append(nm);ms.append(row);
+        lchip(row,'PLAY',()=>{if(SND.pvSong===t.stage)SND.stopSong();else SND.playSong(t.stage);},{on:()=>SND.pvSong===t.stage,text:on=>on?'STOP':'PLAY',aria:'Preview song: '+t.nm});}
+      const ps=lsec(body,'WHICH SONG PLAYS WHERE (saved at once, the game uses it)');
+      for(const pl of SND.places()){const row=lel('div','snr'),nm=lel('span','sn',pl.label),sel=lel('select');row.dataset.place=pl.id;sel.setAttribute('aria-label','Song for: '+pl.label);
+        const o0=lel('option','',pl.def?'Game default: '+SND.nice(pl.def,TR.by[pl.def]&&TR.by[pl.def].title):'Game default (changes each visit)');o0.value='';sel.append(o0);
+        for(const t of tl){const o=lel('option','',t.nm+(len(t.stage)?' ('+len(t.stage)+')':''));o.value=t.stage;sel.append(o);}
+        sel.value=SND.cfg.music[pl.id]||'';sel.addEventListener('change',()=>{SND.setMusic(pl.id,sel.value);say('Saved: '+pl.label+' plays '+(sel.selectedOptions[0].textContent)+' from the next time it starts.');});
+        row.append(nm,sel);ps.append(row);}
+    }
+    const top=lsec(body,'SOUND LAB: PLAY hears one sound over the song, ON or OFF is saved');
     const v=lel('div','snv'),lab=lel('span','',''),sl=lel('input');sl.type='range';sl.min=0;sl.max=200;sl.step=5;sl.id='sndVol';sl.setAttribute('aria-label','Effects volume');
     const show=()=>{lab.textContent='Effects volume '+Math.round(SND.cfg.vol*100)+'%';};sl.value=Math.round(SND.cfg.vol*100);show();
     sl.addEventListener('input',()=>{SND.setVol(sl.value/100);show();});v.append(lab,sl);top.append(v);
@@ -16554,8 +16631,8 @@ ST.hook={
 F.STAGES.zeil=ST;F.SEC=ROOMS;
 })();
 
-// PURPOSE: the song changes only when the district changes, and keeps playing (no restart) between stages and through the menus
-// FLAG: steady (?steady=0 = a new song every stage, menu song between stages)
+// PURPOSE: the song changes only when the district changes, and keeps playing (no restart) between stages and through the menus; the owner's music picks (Lab SOUND page) replace a song per place
+// FLAG: steady (?steady=0 = a new song every stage, menu song between stages); musiclab (?musiclab=0 = the picks are ignored)
 // TEST: qa/loadgate.js (no page errors); fingerprint-test (sim: no audio)
 /* ---------- STEADY: owner, 22 Oct 2026: "the song changes too often between stages".
    Before: each story stage had its own song (stage1/stage2/stage3 in turn, a shuffled pool from stage 5), the menu between two stages switched to the
@@ -16571,6 +16648,15 @@ if(RET.steady){
     if(stage!=='menu'&&c&&c.stage===stage&&BT.stage===stage&&BT.mode==='file'){this.want=null;this.wantT=0;return;}   // same song: keep it running
     return s0.apply(this,arguments);};}
   {const m0=AU.menuMusic;AU.menuMusic=function(){if(BT.stage&&BT.stage!=='menu'&&this.cur)return;return m0.apply(this,arguments);};}}
+
+/* ---------- MUSICLAB: owner, 23 Oct 2026: the Lab SOUND page picks the song of the title, the street stage, each flight district and each boss (SND.cfg.music, saved in 'nr_snd').
+   The picks are applied here, outside the steady block, so they also work with ?steady=0. A song that is already playing is never restarted. ---------- */
+if(RET.musiclab===undefined)RET.musiclab=!/[?&]musiclab=0/.test(location.search);
+if(RET.musiclab&&window.SND){
+  {const s0=AU.startStage;AU.startStage=function(stage,at){const t=SND.songFor(stage);
+    if(stage==='menu'&&t!=='menu'&&!at&&this.cur&&this.cur.stage===t&&BT.stage===t&&BT.mode==='file'){this.want=null;this.wantT=0;return;}   // the picked title song is already playing: keep it running
+    return s0.call(this,t,at);};}
+  {const w0=AU.switchTo;AU.switchTo=function(stage){return w0.call(this,SND.songFor(stage));};}}
 
 // PURPOSE: your shots fly fast: every player bullet leaves at 1.8x speed with a longer streak
 // FLAG: snappy (?snappy=0 = the old 900 px/s shots)
@@ -17771,7 +17857,7 @@ const L2=window.L2={page:'home',starting:false,busy:false,kind:'boss',item:0,sta
 const PAGES=[['viewer','FLIGHT VIEWER','Look at every boss, enemy ship, player ship, pickup and shot, one state at a time. Nothing moves or fires unless you press play.'],
   ['play','FLIGHT PLAY TEST','The live flight stage with test controls: spawn a boss, lock its phase, force an attack, spawn foes and items, cheats.'],
   ['foot','ON FOOT','The street stage in a sandbox: rooms, spawns, god mode, slow motion, hit boxes.'],
-  ['sound','SOUND','Hear every sound effect and switch each one on or off.'],
+  ['sound','SOUND','Hear every song, pick which song plays where, switch every sound and jingle on or off, and export the settings.'],
   ['assets','ASSETS','Browse every picture in the game.']];
 const TITLE={home:'LAB',viewer:'FLIGHT VIEWER',play:'FLIGHT PLAY TEST',foot:'ON FOOT',sound:'SOUND',assets:'ASSETS'};
 const has=t=>t==='home'||t==='play'||t==='viewer'||!!(window.LABX&&LABX.build&&LABX.build[t]);
