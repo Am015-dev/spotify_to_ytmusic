@@ -13,6 +13,7 @@
    HUD: hearts / weapon / ammo / bombs / power-ups / fever in one panel top-left (14 px+ text), score + time left of the pause button, the hint under both. ---------- */
 if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
 if(RET.cam2===undefined)RET.cam2=!/[?&]cam2=0/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents. W181: ON by default; ?cam2=0 = old
+if(RET.occl===undefined)RET.occl=!/[?&]occl=0/.test(location.search);   // W182: a prop drawn in front of Kai (or a foe next to him) fades to 40% so he is never lost behind it; ?occl=0 = old
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;
@@ -53,6 +54,10 @@ SL.my=my;
 const at=(c,x,y,k)=>{c.save();const z=SL.z;if(z!=null){k*=.9+.1*z;c.translate(x,my(y)-(1-z)*SL.band);}else c.translate(x,my(y));c.scale(k,k);c.translate(-x,-y);};   // belt: SL.z = depth of what is drawn (higher and up to 10% smaller further back)
 const slSh=(c,o,K)=>{const z=o.z,s=(.9+.1*z)*K,air=o.fly?.5:clamp(1-(FL-o.y)/320,.45,1),w=clamp((o.w||28)*.7,16,70)*s*air;c.fillStyle='rgba(0,0,0,.38)';c.beginPath();c.ellipse(o.x,FL-(1-z)*SL.band,w,w*.26,0,0,6.283);c.fill();};   // belt: a floor shadow under every actor   // run the old drawing code for a body at (x,y): mapped and K times bigger about that spot
 
+/* W182: the fade for a prop (1 = solid): 40% at once while Kai or a foe near him stands behind it on screen, easing back to solid after */
+const slOcc=(p,AC,K)=>{const pk=K*(.9+.1*p.z),pb=my(p.y)-(1-p.z)*SL.band,pt=pb-p.h*pk;let hid=false;
+  for(const a of AC){if(a.z>=p.z)continue;const ak=K*(.9+.1*a.z),yb=my(a.y)-(1-a.z)*SL.band;if(Math.abs(a.x-p.x)<(p.w*pk+(a.w>0?a.w:28)*ak)/2&&yb>pt&&yb-a.h*ak<pb){hid=true;break;}}
+  p._oa=hid?.4:Math.min(1,(p._oa==null?1:p._oa)+.08);return p._oa;};
 /* ----- backdrop tiles (built once per size): far skyline and mid buildings, drawn in world units, blitted with parallax ----- */
 /* ----- backdrop: NO new art (ASSET-POLICY.md). Until the owner delivers the street layers (ASSETS-NEEDED-STREET.md) each layer is a PLACEHOLDER: plain flat rectangles in one tint
    with its asset id as the label. A real file foot/bg-street-<layer>.webp listed in ready.json replaces its placeholder (tiled, parallax kept). The old media/foot/bg-*.webp are mock placeholders: not used. ----- */
@@ -144,7 +149,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
     if(P.dashIF>0){c.fillStyle='#19e3ff33';c.fillRect(P.x-24-P.facing*20,P.y-60,48,58);}
     P._xa=IN.kaiX(P);ART.fE=P;IN.drawWho(c,'kai',IN.ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);ART.fE=null;
     if(P.shotT>0){const a=P.aim,mq=F.mzAt&&F.mzAt(P),mx=mq?mq[0]:P.x+Math.cos(a)*28,mY=mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20;if(!(window.AH&&AH.ftMuz(c,P.w,mx,mY,a))&&F.WEAPONS[P.w].kind!=='arc'){c.fillStyle='#fff';c.beginPath();c.arc(mx,mY,5,0,6.283);c.fill();}}c.restore();SL.z=null;}};
-  if(SL.band){const A=S.E.filter(e=>e.z!=null&&!(e.dead&&!(e.ext&&!e.remove)));A.push(P);const PS=new Set();for(const p of S.pr)if(p.z!=null){A.push(p);PS.add(p);}A.sort((a,b)=>a.z-b.z);for(const a of A){if(PS.has(a)){dP(a);SL.z=null;continue;}if(!a.dead&&a.x>lo-80&&a.x<hi+80)slSh(c,a,K);a===P?dK():dE(a);}}   // belt: back to front every frame, shadow first
+  if(SL.band){const A=S.E.filter(e=>e.z!=null&&!(e.dead&&!(e.ext&&!e.remove)));A.push(P);const PS=new Set();for(const p of S.pr)if(p.z!=null){A.push(p);PS.add(p);}A.sort((a,b)=>a.z-b.z);const AC=RET.occl?A.filter(a=>a===P||(!PS.has(a)&&Math.abs(a.x-P.x)<300)):[];for(const a of A){if(PS.has(a)){c.globalAlpha=slOcc(a,AC,K);dP(a);c.globalAlpha=1;SL.z=null;continue;}if(!a.dead&&a.x>lo-80&&a.x<hi+80)slSh(c,a,K);a===P?dK():dE(a);}}   // belt: back to front every frame, shadow first
   else dK();
   for(const b of S.pb){SL.z=b.z;at(c,b.x,b.y,K);if(window.AH&&AH.ftBul(c,b)){c.restore();continue;}c.fillStyle=b.c;if(b.kind==='fire'){c.globalAlpha=Math.max(0,b.life*2);c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.globalAlpha=1;}else if(b.kind==='rkt'){c.fillRect(b.x-8,b.y-3,16,6);}else{c.fillRect(b.x-6,b.y-2,12,4);}c.restore();}
   for(const g of S.bombsL){SL.z=g.z;at(c,g.x,g.y,K);if(window.AH&&AH.ftDraw(c,'fx-ft-grenade',g.x,g.y,22,S.time*7)){c.restore();continue;}c.fillStyle='#ffb020';c.beginPath();c.arc(g.x,g.y,7,0,6.283);c.fill();c.restore();}
