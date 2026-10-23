@@ -17,9 +17,11 @@ if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.s
 (function(){
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
-const SH=F.SH={HPK:{rusher:1.8,gunner:2.8,heavy:.6},FRONT:.25,CHEST:50,CROUCH:.6,CALL:10,CALL0:3,KEEP:0,CAPX:0,GMAX:1,HEART:1,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
+const SH=F.SH={HPK:{rusher:1.7,gunner:2.2,heavy:.6},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
-S3.T.peakT=136;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=6.6;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
+S3.T.peakT=130;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=7.4;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
+/* 4c: more cover to choose from (the street had one cover prop per ~750 px: a gunner shot almost never met one): a covered crate every COVERGAP px, clear of the props already there */
+if(SH.COVERGAP){const xs=ST.props.map(p=>p[0]);for(let x=700;x<ST.boss.x-900;x+=SH.COVERGAP)if(!xs.some(q=>abs(q-x)<130)){ST.props.push([x,'scrate',{cover:1,dr:[]}]);xs.push(x);}}
 /* 1: tougher foes, and the time-to-kill log (seen -> dead, game seconds) */
 const sp0=F.env.spawn;
 F.env.spawn=function(id,x,y,o){const e=sp0.apply(this,arguments);if(e&&on()&&SH.HPK[id]&&!e.boss){e.hp*=SH.HPK[id];e.max=e.maxHp=e.mhp=e.hp;}return e;};
@@ -32,11 +34,12 @@ for(const id of ['rusher','gunner','heavy']){const d=FE[id];if(!d||d._sh)continu
   const a0=d.ai;d.ai=function(e,dt,env){
     if(on()&&id==='rusher'&&e.state==='crouch')e.sT-=dt*(1-.4/SH.CROUCH);   // 2: a longer, readable crouch before the lunge
     a0.apply(this,arguments);
-    if(on()&&id==='gunner'&&e.state!=='dead'&&e.seen)call(e,env);};}
+    if(on()&&id==='gunner'&&e.state!=='dead'&&e.seen){call(e,env);
+      if(e.state!=='pop')e._th=0;else if(SH.BURST>2&&!e._th&&e.sT>=.9){e._th=1;const sy=e.y-44;env.shoot(e,Math.atan2(env.P.y-40-sy,env.P.x-e.x),360,1,{oy:sy});}}};}   // 3rd slug of a pop, a ducker holds the crouch
 /* 3: the gunner calls help */
 function call(e,env){const S=F.S;if(e.callT==null)e.callT=S.time+SH.CALL0;
   if(e.callT-S.time<1){if(!e.callW){e.callW=1;IN.pop(e.x,e.y-e.h-26,'CALLING HELP','#ffb020');}e.hid=false;e.vx=0;e.tele=Math.max(e.tele||0,.05);}   // 1 s whistle: caption, red flash, stands up in the open (a window to shoot it)
-  if(S.time<e.callT)return;e.callT=S.time+SH.CALL;e.callW=0;
+  if(S.time<e.callT||S.time<SH.CALLT||S.time>SH.CALLEND)return;e.callT=S.time+SH.CALL;e.callW=0;
   if(S.E.filter(q=>!q.dead).length>=S3.T.cap+SH.CAPX)return;
   const vw=env.G.viewW||960,fromL=Math.random()<.5,n=F.env.spawn('rusher',fromL?S.camX-40:S.camX+vw+40,null);   // one more rusher, on top of the plan
   if(n){SH.log.called++;S.fx.push({ring:1,x:e.x,y:e.y-e.h*.6,r:60,l:.5,m:.5,c:'#ffb020'});IN.sfx&&IN.sfx('warn');}}
@@ -46,9 +49,9 @@ ST.hook.step=function(S,dt,env){
   if(RET.streethard&&S.s3&&!S.sh){S.sh=SH.log={ttk:{},called:0,blocked:0,coverBroke:0,gunDead:[],rushDead:[]};S.P.max+=SH.HEART;S.P.hp+=SH.HEART;}
   if(on()){
     if(S.E.filter(e=>!e.dead&&e.id==='gunner').length>=SH.GMAX)for(const w of S.s3.waves)if(w.left[0]==='gunner'&&w.next<S.time+.4)w.next=S.time+.4;   // at most GMAX gunners at once: the next waits
-    for(const b of S.eb){if(b.life<=0||b.src!=='gunner')continue;if(b._x0==null){b._x0=b.x;if(abs(S.P.y-470)<10&&b.y>400&&b.y<440){b.y=470-SH.CHEST;b.vx=Math.sign(b.vx)*Math.hypot(b.vx,b.vy);b.vy=0;}}   // a level shot at chest height: ducking (or a jump) dodges it
-      for(const p of S.pr){if(p.hp<=0||p.gone||!(p.cover||SH.COVER[p.k])||abs(p.x-b._x0)<p.w/2+40&&abs(S.P.x-p.x)>p.w/2+30)continue;   // the gunner's own cover blocks only when Kai hugs the other side of it   // never the gunner's own cover
-        if(b.x>p.x-p.w/2&&b.x<p.x+p.w/2&&b.y>p.y-Math.max(p.h,56)&&b.y<p.y+4){b.life=0;SH.log.blocked++;const h0=p.hp;IN.hitProp(p,SH.CHIP);if(h0>0&&p.hp<=0)SH.log.coverBroke++;break;}}}}
+    for(const b of S.eb){if(b.life<=0||b.src!=='gunner')continue;if(b._x0==null){b._x0=b.x;if(abs(S.P.y-470)<10&&b.y>400&&b.y<440){b.y=470-SH.CHEST;b.r=SH.SLUGR;b.slug=1;b.vx=Math.sign(b.vx)*Math.hypot(b.vx,b.vy);b.vy=0;}}   // a level shot at chest height: ducking (or a jump) dodges it
+      for(const p of S.pr){if(p.hp<=0||p.gone||!(p.cover||SH.COVER[p.k])||abs(p.x-b._x0)<p.w/2+40&&abs(S.P.x-p.x)>p.w/2+SH.HUG)continue;   // the gunner's own cover blocks only when Kai hugs the other side of it   // never the gunner's own cover
+        if(b.x>p.x-p.w/2&&b.x<p.x+p.w/2&&b.y+(b.slug?b.r:0)>p.y-Math.max(p.h,56)&&b.y<p.y+4){b.life=0;SH.log.blocked++;const h0=p.hp;IN.hitProp(p,SH.CHIP);if(h0>0&&p.hp<=0)SH.log.coverBroke++;break;}}}}
   const r=st0.apply(this,arguments);
   if(on()&&SH.KEEP)for(const p of S.pr)if(p.hp>0&&(SH.KEEP>1?p.cover:SH.COVER[p.k])&&!(p.dr&&p.dr.length))p.pass=true;   // Kai's shots fly over crates, the car and kiosks with nothing inside (only gunner fire wears them down)
   return r;};
