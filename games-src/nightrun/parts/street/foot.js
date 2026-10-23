@@ -250,7 +250,7 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
 const ZL=[.15,.85,.5,.3,.7];
 F.beltZ=e=>{if(e.boss)return e.hz=.5;S.zi=(S.zi||0)+1;return e.hz=clamp(ZL[S.zi%5]+ftRnd(-.05,.05),0,1);};
 function beltE(dt){const P=S.P;let c1=null,cd=300;for(const e of S.E)if(!e.dead&&e.z!=null&&Math.abs(e.x-P.x)<cd){cd=Math.abs(e.x-P.x);c1=e;}   // the closest foe (and the boss, and any foe winding up a shot) steps into Kai's line; the rest hold lanes beside him
-  for(const e of S.E){if(e.dead||e.z==null)continue;const near=Math.abs(e.x-P.x)<300,tz=!near?e.hz:e===c1||e.boss||e.tele>0?P.z:clamp(P.z+(e.hz-.5)*.75,0,1),v=(e.boss?.32:.42)*dt;e.z+=clamp(tz-e.z,-v,v);}}
+  for(const e of S.E){if(e.dead||e.z==null)continue;const near=Math.abs(e.x-P.x)<300,tz=!near?e.hz:e===c1||e.boss||e.tele>0?P.z:clamp(P.z+(e.hz-.5)*.95,0,1),v=(e.boss?.32:.42)*dt;e.z+=clamp(tz-e.z,-v,v);}}
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
 function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
   let want=Math.max(S.camX,P.x-vw*(RET.cam2?.3:(F.camK||.38)));/* W164 cam2: Kai sits at 30-37% while running right */if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);

@@ -16,7 +16,7 @@ if(RET.street3===undefined)RET.street3=!/[?&]street3=0/.test(location.search);
 (function(){
 if(!RET.street3||!RET.street2||!window.FOOT||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2||!FOOT._in)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
-const S3=F.S3={GCD:1.4,ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
+const S3=F.S3={GCD:1.9,ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
   T:{beats:8,boss:145,waves:12,peakT:136,t0:2,thr0:2,thrPeak:8,cap:5},
   TH:{rusher:1,gunner:2,heavy:4,bigheavy:8}};
 const on=()=>RET.street3&&F.S&&F.S.st===ST;

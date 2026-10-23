@@ -4799,7 +4799,7 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
 const ZL=[.15,.85,.5,.3,.7];
 F.beltZ=e=>{if(e.boss)return e.hz=.5;S.zi=(S.zi||0)+1;return e.hz=clamp(ZL[S.zi%5]+ftRnd(-.05,.05),0,1);};
 function beltE(dt){const P=S.P;let c1=null,cd=300;for(const e of S.E)if(!e.dead&&e.z!=null&&Math.abs(e.x-P.x)<cd){cd=Math.abs(e.x-P.x);c1=e;}   // the closest foe (and the boss, and any foe winding up a shot) steps into Kai's line; the rest hold lanes beside him
-  for(const e of S.E){if(e.dead||e.z==null)continue;const near=Math.abs(e.x-P.x)<300,tz=!near?e.hz:e===c1||e.boss||e.tele>0?P.z:clamp(P.z+(e.hz-.5)*.75,0,1),v=(e.boss?.32:.42)*dt;e.z+=clamp(tz-e.z,-v,v);}}
+  for(const e of S.E){if(e.dead||e.z==null)continue;const near=Math.abs(e.x-P.x)<300,tz=!near?e.hz:e===c1||e.boss||e.tele>0?P.z:clamp(P.z+(e.hz-.5)*.95,0,1),v=(e.boss?.32:.42)*dt;e.z+=clamp(tz-e.z,-v,v);}}
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
 function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
   let want=Math.max(S.camX,P.x-vw*(RET.cam2?.3:(F.camK||.38)));/* W164 cam2: Kai sits at 30-37% while running right */if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);
@@ -5365,7 +5365,7 @@ F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{
    Kai may walk back (camera eases back <= 35% of the view, not behind the section checkpoint); auto-fire turns Kai to a target behind. Poses without a sheet borrow the nearest act (art.js ART.FB).
    HUD: hearts / weapon / ammo / bombs / power-ups / fever in one panel top-left (14 px+ text), score + time left of the pause button, the hint under both. ---------- */
 if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
-if(RET.cam2===undefined)RET.cam2=/[?&]cam2=1/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents. OFF by default until streetsim is retuned (HANDOFF-W164.md); ?cam2=1 = on
+if(RET.cam2===undefined)RET.cam2=!/[?&]cam2=0/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents. W181: ON by default; ?cam2=0 = old
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;
@@ -14730,7 +14730,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='3b626e2912 2026-10-23 15:27 UTC';
+const NR_STAMP='2c8c618fb9 2026-10-23 16:15 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -17489,7 +17489,7 @@ if(RET.street3===undefined)RET.street3=!/[?&]street3=0/.test(location.search);
 (function(){
 if(!RET.street3||!RET.street2||!window.FOOT||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2||!FOOT._in)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
-const S3=F.S3={GCD:1.4,ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
+const S3=F.S3={GCD:1.9,ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
   T:{beats:8,boss:145,waves:12,peakT:136,t0:2,thr0:2,thrPeak:8,cap:5},
   TH:{rusher:1,gunner:2,heavy:4,bigheavy:8}};
 const on=()=>RET.street3&&F.S&&F.S.st===ST;
@@ -18397,7 +18397,7 @@ if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.s
 (function(){
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
-const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
+const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.75,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:2,LUNGE:210,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
 if(RET.slots===undefined)RET.slots=!/[?&]slots=0/.test(location.search);   // W170 (off by default): gunner charge shots telegraph 0.5 s; at most 2 foes in a wind-up or attack
 const ATK={rusher:['crouch','lunge'],heavy:['wind','charge'],bigheavy:['wind','charge'],gunner:['pop']},atk=q=>(q.tele||0)>0||(ATK[q.id]||[]).includes(q.state);
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
@@ -18414,6 +18414,7 @@ for(const id of ['rusher','gunner','heavy']){const d=FE[id];if(!d||d._sh)continu
   const od=d.onDeath;d.onDeath=function(e){if(on()&&!e._ttk){e._ttk=1;const S=F.S,t0=e.seenAt2!=null?e.seenAt2:e.born;(SH.log.ttk[id]||(SH.log.ttk[id]=[])).push(+(S.time-t0).toFixed(2));
       if(id==='gunner')SH.log.gunDead.push(+S.time.toFixed(1));if(id==='rusher')SH.log.rushDead.push(+S.time.toFixed(1));}return od?od.apply(this,arguments):undefined;};
   const a0=d.ai;d.ai=function(e,dt,env){
+    if(on()&&id==='rusher'&&e.state==='run'&&SH.LUNGE>120&&abs(env.P.x-e.x)<SH.LUNGE&&e.grace<=0&&abs(env.P.y-e.y)<120){e.state='crouch';e.sT=0;}   // W181 cam2: the lunge starts from further out (the view is wider, foes are seen earlier)
     if(on()&&id==='rusher'&&e.state==='crouch')e.sT-=dt*(1-.4/SH.CROUCH);   // 2: a longer, readable crouch before the lunge
     const s0=e.state,t0=e.sT,h0=e.hid,was=atk(e);
     a0.apply(this,arguments);
