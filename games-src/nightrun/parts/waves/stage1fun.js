@@ -34,6 +34,12 @@ const S1F=window.S1F={
        [40,[['S',.76,.25],['S',.76,.75],['C',.7,.4],['C',.7,.6],['P',.6,.5]]],
        [42,[['C',.72,.2],['C',.72,.8],['P',.6,.4],['P',.6,.6]]],
        [43,[['T',.76,.6],['S',.76,.2],['C',.7,.8],['P',.6,.35],['P',.6,.5]]]]},
+  /* W177 s1bounty / W179 s1gaps (both OFF unless ?s1bounty=1 / ?s1gaps=1; with both off table() is T itself, so nothing changes) */
+  table(){const B=RET.s1bounty,Gp=RET.s1gaps;if(!B&&!Gp)return this.T;const g=this.T.g.map(r=>r.slice()),row=b=>g.find(r=>r[0]===b);
+    if(B){row(7)[1]=row(7)[1].concat([['S',.78,.8,'b']]);row(17)[1]=[['C',.72,.35],['P',.62,.65]];   // bar 7: a second gun from the bottom; bar 17: a charger
+      row(18)[1]=[['S',.74,.4],['B',.66,.63,'t'],['S',.76,.86]];row(18)[2]={dec:'bounty',ann:['BOUNTY','shoot the gold courier, then grab the gold it drops within 3 s: two guns cover it']};}
+    if(Gp)g.push([15,[['P',.62,.35],['P',.62,.65]]],[29,[['P',.6,.3],['P',.6,.7]]],[45,[['P',.6,.35],['P',.6,.65]]]);   // light groups in the 5 s+ gaps after the tank (13), the cross-fire (27) and the final push (43)
+    g.sort((a,b)=>a[0]-b[0]);return{g};},
   old:null,log:{emp:[],gz:0},
   want(n){return!!RET.stage1fun&&n===1&&SET.diff==='normal'&&!STAGES[0].ch&&!!window.SL&&!!RET.slice;},
   on(){return ST.on&&this.want(ST.n);},
@@ -55,9 +61,20 @@ const S1F=window.S1F={
   { const sb=spawnBoss;spawnBoss=function(o){const b=sb.apply(this,arguments);if(b&&b.mini&&S1F.on()&&b.minBar)b.minBar=S1F.MINBAR;return b;}; }   // b.js holds a mini-boss at an HP floor for 14 bars (~37 s at 92 BPM)
   { const bh=ST.bossHp;ST.bossHp=function(){const v=bh.apply(this,arguments);return S1F.on()?S1F.BHP:v;}; }
   { const b=SL.beat;SL.beat=function(i){if(S1F.on())i=Math.max(0,(G.bc|0)-1);return b.call(this,i);}; }   // the script runs on the stage's own beat count (G.bc, like the boss bar): the song's beat index can fall behind it and stall the script for 30 s
-  NR.on('runStart',()=>{if(S1F.on()){SL.T[1]=S1F.T;S1F.apply();P.emp=Math.max(P.emp|0,1);}else S1F.restore();S1F.log={emp:[],gz:0};S1F.e0=P.emp|0;});
+  NR.on('runStart',()=>{if(S1F.on()){SL.T[1]=S1F.table();S1F.apply();P.emp=Math.max(P.emp|0,1);}else S1F.restore();S1F.log={emp:[],gz:0};S1F.e0=P.emp|0;S1F.gold=null;S1F.warned=0;});
   NR.on('graze',()=>{if(S1F.on())S1F.log.gz++;});
-  NR.on('tick',()=>{if(!S1F.on())return;S1F.apply();const e=P.emp|0;if(e<S1F.e0)S1F.log.emp.push(+G.dbar.toFixed(1));S1F.e0=e;});
+  NR.on('tick',dt=>{if(!S1F.on())return;S1F.apply();const e=P.emp|0;if(e<S1F.e0)S1F.log.emp.push(+G.dbar.toFixed(1));S1F.e0=e;
+    const p=S1F.gold;if(p&&!G.dead){if(p.dead){S1F.gold=null;if(!p.exp){S1F.log.paid=(S1F.log.paid|0)+1;G.score+=1000;floater(P.x,P.y-44,'BOUNTY +1000','#ffd23d');const d=SL.log.dec[SL.log.dec.length-1];if(d)d.got=1;}}   // collected by touch (b.js adds the repair)
+      else{p.age+=dt;p.vx=0;p.vy=0;if(p.age>3){p.dead=1;p.exp=1;}}}
+    if(RET.s1gaps&&!S1F.warned&&S1F.bar()>=S1F.LEAD-1){S1F.warned=1;S1F.log.warn=+G.t.toFixed(1);banner('WARNUNG','something huge is closing in',true,2.6);AU.sfx('warn');}});
+  NR.on('bossIn',()=>{if(S1F.on())S1F.log.bossIn=+G.t.toFixed(1);});
+  /* W177 BOUNTY WITH TEETH (RET.s1bounty): the courier pays nothing when shot (slice.js would pay 1000 at once); it drops a gold repair that waits 3 s where it died, between the two guns, and +1000 is paid when the ship touches it */
+  if(RET.s1bounty===undefined)RET.s1bounty=!/[?&]s1bounty=0/.test(location.search);
+  if(RET.s1gaps===undefined)RET.s1gaps=!/[?&]s1gaps=0/.test(location.search);
+  { const sp=SL.spawn;SL.spawn=function(f){const r=sp.apply(this,arguments);if(RET.s1bounty&&S1F.on()&&f[0]==='B'){const e=WV.st.foes[WV.st.foes.length-1];if(e&&e.bty){e.bty=0;e.bounty=1;}}return r;}; }
+  NR.on('kill',o=>{const e=o&&o.e;if(!e||!e.bounty||!RET.s1bounty||!S1F.on())return;const p={t:'hp',x:e.x,y:e.y,vx:0,vy:0,bob:0,bty:1,age:0};G.pk.push(p);S1F.gold=p;S1F.log.gold=(S1F.log.gold|0)+1;floater(e.x,e.y-22,'GRAB THE GOLD','#ffd23d');});
+  DRAW.extra.push(function(){const p=S1F.gold;if(!p||p.dead||!S1F.on())return;ctx.save();ctx.translate(p.x,p.y);ctx.strokeStyle='#ffd23d';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,12+16*Math.max(0,1-p.age/3),0,7);ctx.stroke();   // the ring shrinks as the 3 s run out
+    ctx.fillStyle='#ffd23d';ctx.font='700 12px "Chakra Petch",sans-serif';ctx.textAlign='center';if(wcv===cv)wtxt('BOUNTY +1000',0,-34);else wtxt('BOUNTY +1000',36,0);ctx.restore();});
 }
 /* ---------- W176 CARRIER (23 Oct 2026, owner: "the flights are boring ... make the stages fun"; flight bar P2 + W2). Flag s1carrier, default OFF (?s1carrier=1).
    A mid-stage set piece replaces the bar 21-27 groups: a big carrier glides in and holds the right side; three gun plates, each with its own fire:

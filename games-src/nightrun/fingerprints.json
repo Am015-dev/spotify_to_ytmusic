@@ -1,11 +1,11 @@
 {
  "fly2": {
   "state": "7b42e867bce26814",
-  "draw": "ea0ead00f4c49749",
+  "draw": "cb3568fa41ec8fe8",
   "frames": 1800,
   "samples": 30,
   "rng": 1034,
-  "dcalls": 317,
+  "dcalls": 296,
   "end": null
  },
  "endless10": {
@@ -18,13 +18,13 @@
   "end": null
  },
  "street": {
-  "state": "b715d4f6a1a144cb",
+  "state": "cb95268d0e06e563",
   "draw": "c8c417b287a0b1b9",
   "frames": 7200,
   "samples": 120,
-  "rng": 5433,
+  "rng": 5125,
   "dcalls": 172,
-  "end": "section 0 x 6373 foes 4"
+  "end": "section 0 x 6331 foes 4"
  },
  "fly6": {
   "state": "e2f0e31c38f9d627",
@@ -55,11 +55,11 @@
  },
  "boss": {
   "state": "40cca42010da3149",
-  "draw": "2bb3c3dffcc5ea7c",
+  "draw": "5783c528fd98d42a",
   "frames": 1800,
   "samples": 30,
   "rng": 3072,
-  "dcalls": 310,
+  "dcalls": 308,
   "end": "boss on screen 1680 frames"
  },
  "legend10": {
