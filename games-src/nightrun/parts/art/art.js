@@ -28,7 +28,7 @@ ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();if(!q
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
       if(solid&&dark>=3){for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]);if(m<3){d[i+3]=0;continue;}d[i+3]=m;const k=255/m;d[i]=Math.min(255,d[i]*k);d[i+1]=Math.min(255,d[i+1]*k);d[i+2]=Math.min(255,d[i+2]*k);}g.putImageData(id,0,0);done(c);return;}}catch(e){}}
     if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
-  im.onerror=()=>{ART.err[n]=1;end();};im.src=ART.base+n+'.webp';};
+  im.onerror=()=>{const k=im.__e=(im.__e||0)+1;if(k<=3){setTimeout(()=>{im.src=ART.base+n+'.webp?r='+Date.now();},1200*k);return;}ART.err[n]=1;end();};/* owner 23 Oct 2026 "some assets are not shown": a 503 from the server was final; try again up to 3 times */im.src=ART.base+n+'.webp';};
 ART.have=n=>!!ART.bm[n];
 ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
