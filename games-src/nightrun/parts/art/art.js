@@ -16,7 +16,13 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
 ART.pend=0;ART.lowN=0;ART.q=[];
 ART.pump=()=>{while(ART.q.length&&ART.lowN<2&&ART.pend===0){const n=ART.q.shift();if(n in ART.bm)continue;ART.lowN++;ART.load(n,1);}};
 ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();if(!q)ART.pend++;let fin=false;const end=()=>{if(fin)return;fin=true;if(q)ART.lowN--;else ART.pend--;ART.pump();};
-  im.onload=()=>{const done=b=>{ART.bm[n]=ART.fix?ART.fix(n,b):b;end();};
+  im.onload=()=>{
+    /* STALE STRIP (owner, 23 Oct 2026: "the on foot sprites are invisible" right after the 287 re-delivered strips went live): on the first load after a deploy the OLD service worker still answers
+       from its old cache, so the new page sliced an old strip with the new cell sizes and drew empty cells. A strip must be frames x cell wide and one cell high (ART.ANIM.s): if not, drop it from
+       every cache and fetch it once more past the caches (?r= is not in any cache and not in the browser's HTTP cache) */
+    if(n.startsWith('anim/')&&!im.__r){const m=ART.ANIM&&ART.ANIM.s[n.slice(5,-6)];if(m&&(im.naturalWidth!==m[0]*m[2]||im.naturalHeight!==m[3])){im.__r=1;ART.stale=(ART.stale||0)+1;const u=im.src.split('?')[0],go=()=>{im.src=u+'?r='+Date.now();};
+      (self.caches?caches.keys().then(ks=>Promise.all(ks.map(k=>caches.open(k).then(c=>c.delete(u,{ignoreSearch:true}))))):Promise.resolve()).then(go,go);return;}}
+    const done=b=>{ART.bm[n]=ART.fix?ART.fix(n,b):b;end();};
     /* effects made as light on a solid black square (no alpha): turn the black into transparency once, colours un-premultiplied, so they look right with normal blending and identical when drawn additively */
     if((n.startsWith('fx-')&&!n.startsWith('fx-fuse'))||n.startsWith('nv-ev-')){try{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
