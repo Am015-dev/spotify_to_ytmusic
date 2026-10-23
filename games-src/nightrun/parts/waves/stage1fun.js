@@ -61,11 +61,11 @@ const S1F=window.S1F={
 }
 /* ---------- W175 RISK MEDALS (23 Oct 2026; flag s1risk, OFF by default: ?s1risk=1 turns it on). Player decision: "fly into the fire for the medal or stay safe",
    and "EMP on the swarm or keep it for the final push". Stage 1 only (S1F.on):
-   - a medal picked up within HOT s of the kill that dropped it pays x3 (2 extra shares, shown as "FIRE MEDAL x3"); later it pays x1 as before;
+   - a medal picked up within HOT s of the kill that dropped it pays xK (K=5; shown as "FIRE MEDAL x5"); later it pays x1 as before;
    - the EMP meter and EMP pickups do not refill: the one charge of the stage is all there is. ---------- */
 {
   if(RET.s1risk===undefined)RET.s1risk=/[?&]s1risk=1/.test(location.search);
-  const R=window.S1R={HOT:1.5,seen:new Map(),hint:0,left:1,last:1,on(){return!!RET.s1risk&&S1F.on();}};
+  const R=window.S1R={HOT:1.5,K:5,seen:new Map(),hint:0,left:1,last:1,on(){return!!RET.s1risk&&S1F.on();}};
   if(window.ABIL){const g=ABIL.gain;ABIL.gain=function(){if(R.on())return;return g.apply(this,arguments);};}
   NR.on('runStart',()=>{R.seen.clear();R.hint=0;R.left=Math.max(P.emp|0,1);R.last=R.left;});
   NR.on('tick',()=>{if(!R.on())return;
@@ -74,6 +74,6 @@ const S1F=window.S1F={
     for(const p of G.pk)if(p.t==='shard'&&!R.seen.has(p))R.seen.set(p,G.t);
     for(const[p,t0]of R.seen){if(G.pk.includes(p))continue;R.seen.delete(p);
       if(!p.dead||p.x<-30||G.dead)continue;   // it left the screen (p.x<-30) instead of being picked up
-      if(G.t-t0<=R.HOT){G.score+=2*Math.round(50*G.mult*(SH.smk||1));floater(P.x,P.y-24,'FIRE MEDAL x3','#ffd24a');}}
-    if(!R.hint&&R.seen.size){R.hint=1;hintShow('Medals picked up right after a kill pay triple',4);}});
+      if(G.t-t0<=R.HOT){G.score+=(R.K-1)*Math.round(50*G.mult*(SH.smk||1));floater(P.x,P.y-24,'FIRE MEDAL x'+R.K,'#ffd24a');}}
+    if(!R.hint&&R.seen.size){R.hint=1;hintShow('Medals picked up right after a kill pay x5',4);}});
 }
