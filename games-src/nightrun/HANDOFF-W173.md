@@ -25,7 +25,9 @@ attacks the dodge bot avoids by depth).
   New FAILs with the flag on: ducking gate (no crouch on the belt: expected, replace it with D2 when belt goes default),
   4 STUCK runs (gfirst 35997/43916, dodge 12240/20159) in the boss lock: the bot stops damaging the boss for > 25 s
   (its depth targeting during the boss fight; the dodge runs still clear). Next worker: fix the bot or the boss depth chase first.
-- Other tests: see the DONE report (run with the built file switched to belt on).
+- Built file switched to belt ON: footvis-test, streetdraw-test, streetsong-test, focus-test, footlab-test all PASS; guard.py ok.
+- Phone 390x763 screenshot (belt on, not committed): the road band reads clearly; nit: props are drawn before all actors, so Kai
+  standing behind a wall-side crate (z < .12) is drawn over it. Fix: put props into the depth sort.
 
 ## Left / ideas
 - D5 (later worker): props are at z .12 by the wall; make crates/barrels at mixed depths, barrel blasts hurt foes at any depth in
