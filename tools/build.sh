@@ -50,4 +50,14 @@ if [ $LOCAL = 1 ]; then   # dev pages: the deploy page + test-only modules (src/
   ( cd src && for f in $XC_ORDER; do [ "$f" = 99_api.js ] && cat test/*.js 2>/dev/null; cat "$f"; done ) | XCV="$XCV" python3 tools/lazy/inject.py > overdrive.html
   rm -rf xc; [ -d "$OUT/xc" ] && cp -r "$OUT/xc" xc
   cp "$OUT/km.js" km.js;cp "$OUT/models.js" models.js;rm -rf models;cp -r "$OUT/models" models;[ -f "$OUT/tune.json" ] && cp "$OUT/tune.json" tune.json;[ -d "$OUT/music" ] && mkdir -p music && cp "$OUT"/music/*.mp3 music/; python3 -c "exec(open('P.py' if __import__('os').path.exists('P.py') else 'attic/P.py').read());save()"; node --check chk.mjs || { echo "BUILD FAIL: local syntax"; exit 1; }; fi
+# garage-cars (22 Oct): every file the Beta artifact must carry, one path per line (the coordinator publishes from this list; a missing models/<car>.js = a dead garage car).
+# Checks that every chunk models.js / the page can request exists in $OUT.
+python3 - "$OUT" <<'PY' || { echo "BUILD FAIL: PUBLISH_FILES"; exit 1; }
+import os,re,sys
+o=sys.argv[1];F=sorted(os.path.relpath(os.path.join(d,f),o) for d,_,fs in os.walk(o) for f in fs if f not in('overdrive.html','PUBLISH_FILES.txt'))
+need=set(re.findall(r'"(models/[\w.-]+\.js)\?',open(os.path.join(o,'models.js'),encoding='utf8').read()))|{'models/%s.js'%k for k in('as','lx','xf','qa')}|{'km.js','models.js','index.html'}
+miss=sorted(n for n in need if n not in F)
+if miss:print('PUBLISH_FILES missing: '+' '.join(miss));sys.exit(1)
+open(os.path.join(o,'PUBLISH_FILES.txt'),'w').write('\n'.join(F)+'\n');print('PUBLISH_FILES_OK %d files (%d model chunks)'%(len(F),sum(f.startswith('models/') for f in F)))
+PY
 echo "BUILD_OK $OUT  page $(wc -c <"$OUT/overdrive.html") B  km.js $(wc -c <"$OUT/km.js") B  models.js $(wc -c <"$OUT/models.js") B  models/ $(cat "$OUT"/models/*.js | wc -c) B  xc/ $(cat "$OUT"/xc/*.js 2>/dev/null | wc -c) B  index.html $(wc -c <"$OUT/index.html") B"

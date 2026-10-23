@@ -12,6 +12,7 @@
 98tk_go.js:tkBot,tkStaticFeel,tkFeel,tkGoWater,tkGoQuick
 99c4_mem.js:MEM1_go
 99c4_fair2.js
+99cg_garage_cars.js
 98dest_go.js:DEST_wander,DEST_go
 99c5_athroads.js:ATHR_go
 99c6_rv4a.js:RV4A_go,RV4A_drive,RV4A_home

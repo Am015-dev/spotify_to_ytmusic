@@ -1,0 +1,4 @@
+# garage-cars-r22e35 (Alex 22 Oct: "most of the cars do not work from the garage")
+1. Root cause: the Beta artifact carried only models/{as,lx,xf,qa}.js, not the ~150 per-car chunks; without them every LDraw ride (e.g. t_rally, t_turbo) built as a bare 2-mesh shell. Repro: serve out/<ver> with only those 4 chunks, GO garage/all-cars FAILs; with all files 156/156 work. Coordinator republished Beta with all files.
+2. Fixed: build.sh writes out/<ver>/PUBLISH_FILES.txt (every file the artifact needs; BUILD FAIL if a chunk models.js references is missing); a chunk that 404s now keeps the current ride + toast "Could not load X · still driving Y" (src/98ld_run.js), never a dead car.
+3. New GO garage/all-cars (src/99cg_garage_cars.js, fra+ath, ~6 min/city): taps every street card, SAVE & DRIVE, asserts owned, model loaded + visible, >30 km/h, steers, no page error. Not run under 6x CPU (156 rides would take ~40 min); left: off-road/boat forms are not covered.
