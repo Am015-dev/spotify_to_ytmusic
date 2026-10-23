@@ -22,6 +22,10 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
 9. TEST TIME BUDGET (owner, 22 Oct 05:05: "who told you to spend so much time running the game, is it efficient?"): run ONLY the
    test that proves your fix plus `guard.py` and one 2-minute smoke; no stage 1-20 sweeps or "3 consecutive runs" unless the task is
    balance/difficulty. New or edited tests step game time faster than real time (`__mnr.step(dt)` loops), never wait on wall-clock play.
+   PLAY AT x100, NEVER IN REAL TIME (owner, 23 Oct 2026: "it's a worker, play more on speed x100, you are not a human"): every play test,
+   balance measure and review runs the game in stepped simulation at >= 100x real time (qa/simhunt.js; the street through its street mode),
+   with many runs (>= 50 per bot) instead of a few real-time ones. Real-time play is allowed only for what cannot be stepped (audio clock,
+   network loading), capped at 60 s per test.
 10. REVIEWS SCORE FUN, NOT FIXES (owner, 22 Oct 05:55: "the review must be strict, the score is not even 12/100"): every reviewer
    is anchored to the real players' score (10-12/100). Score what a player experiences (fun, clarity, fairness, tension, looks, sound),
    never whether a fix landed. Each category starts at the players' level and moves only with concrete before/after evidence
