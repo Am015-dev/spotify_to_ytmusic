@@ -4,7 +4,7 @@
 /* HUD Minimal drew only the score; the multiplier and combo lived in HUD Full. This adds ONE number: the multiplier (tier colour), captioned in words for the first 12 s
    of play ("SCORE MULTIPLIER: a hit halves it"). A hit that halves it flashes the number red for 2 s and says what was lost ("CHAIN BROKEN  x2.4 -> x1.2").
    Drawn after the lean HUD, so it never moves the other items. HUD Full already shows the multiplier and is left alone. */
-if(RET.multhud===undefined)RET.multhud=/[?&]mult=1/.test(location.search);
+if(RET.multhud===undefined)RET.multhud=!/[?&]mult=0/.test(location.search);
 const MH=window.MH={brk:0,from:0,to:0,prev:1,cap:0,capDone:false};
 if(RET.multhud){
   NR.on('runStart',()=>{MH.brk=0;MH.prev=1;MH.cap=0;});
