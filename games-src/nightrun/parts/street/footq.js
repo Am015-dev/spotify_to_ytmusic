@@ -17,11 +17,15 @@ F.dprMax=3;
 /* ----- the sheets this stage can draw ----- */
 FQ.list=()=>{const k=[];for(const w in ART.FM)for(const a of ART.FM[w]._all)k.push(w+'/'+a);
   for(const p of ['car/loop','police/loop','holo/loop','beacon/loop','steam/glow'])k.push('prop-'+p);k.push('pk-ammo/spin');return k.filter(x=>ART.ANIM.s[x]);};
+/* the still pictures the street draws over props and pickups (foot/sc-*, foot/pk-*): W162 found they were never waited for, so every crate, barrel and pick-up showed its code-drawn box or name until the first draw had started the download (the whole run in a stepped test) */
+FQ.pics=()=>{const a=[];for(const f of FA._rd)if(/^foot\/(sc|pk)-/.test(f))a.push(f);return a;};
+FQ.picOk=f=>{const r=FA._im[f];return !r||r.ok||r.bad;};
+FQ.picsReady=()=>{FA.init();return !!FA._rdDone&&FQ.pics().every(FQ.picOk);};
 FQ.state=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return 'none';if(ART.err&&ART.err[n])return 'bad';return ART.anim(k)?'ok':'wait';};   // ART.anim also starts the load
 /* the songs the run plays (the stage's own, then the one-song cut of street3.js) are part of the wait (23 Oct 2026: "game music is not playing"); a song that failed its 3 tries does not block; asking also starts the load */
 FQ.songs=()=>RET.preload&&!NOMUSIC&&!/[?&]sim=1/.test(location.search)?(RET.streetsong?['street1']:['stage2','street1']).filter(s=>TR.by[s]):[];
 FQ.songOk=s=>{const i=TR.by[s];if(!i||TR.bufs[i.file]||(TR.bad[i.file]&&((TR.tries&&TR.tries[i.file])||0)>3))return true;if(AU.a)loadTrack(s);return !AU.a;};
-FQ.ready=()=>{if(!RET.sprites)return FQ.songs().every(FQ.songOk);if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return FQ.songs().map(FQ.songOk).every(Boolean)&&ok;};
+FQ.ready=()=>{if(!FQ.picsReady())return false;if(!RET.sprites)return FQ.songs().every(FQ.songOk);if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return FQ.songs().map(FQ.songOk).every(Boolean)&&ok;};
 FQ.pending=()=>FQ.list().filter(k=>FQ.state(k)==='wait');
 FQ.pct=()=>{const l=FQ.list(),m=FQ.songs();const n=l.length+3*m.length;return n?Math.round(100*(l.filter(k=>FQ.state(k)!=='wait').length+3*m.filter(FQ.songOk).length)/n):100;};
 /* ----- loading hold: returns true when it took over the start (cb runs when the sheets are ready or after 8 s) ----- */

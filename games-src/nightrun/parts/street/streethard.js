@@ -17,9 +17,9 @@ if(RET.streethard===undefined)RET.streethard=!/[?&]streethard=0/.test(location.s
 (function(){
 if(!RET.streethard||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
 const F=FOOT,IN=F._in,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs;
-const SH=F.SH={HPK:{rusher:1.7,gunner:2.2,heavy:.6},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
+const SH=F.SH={HPK:{rusher:1.4,gunner:1.2,heavy:1},FRONT:.25,CHEST:81,HUG:90,BURST:2,COVERGAP:250,SLUGR:26,CROUCH:.6,CALL:5,CALL0:2,CALLT:65,CALLEND:135,KEEP:0,CAPX:0,GMAX:1,HEART:0,CHIP:1.5,COVER:{scrate:1,car:1,kiosk:1},log:null};
 const on=()=>RET.streethard&&F.S&&F.S.st===ST&&F.S.s3;
-S3.T.peakT=130;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=7.4;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
+S3.T.peakT=124;S3.T.cap=4;S3.T.thr0=1;S3.T.thrPeak=8.2;   // fewer, tougher foes: threat 1 -> 7 (was 2 -> 8), at most 4 on the street at once (was 5); the peak (7) is the last wave only
 /* 4c: more cover to choose from (the street had one cover prop per ~750 px: a gunner shot almost never met one): a covered crate every COVERGAP px, clear of the props already there */
 if(SH.COVERGAP){const xs=ST.props.map(p=>p[0]);for(let x=700;x<ST.boss.x-900;x+=SH.COVERGAP)if(!xs.some(q=>abs(q-x)<130)){ST.props.push([x,'scrate',{cover:1,dr:[]}]);xs.push(x);}}
 /* 1: tougher foes, and the time-to-kill log (seen -> dead, game seconds) */

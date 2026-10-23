@@ -9,6 +9,7 @@ const freePort = () => new Promise(r => { const s = net.createServer(); s.listen
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const RUN = async () => { const M = __mnr, ART = M.ART, RET = M.RET, F = FOOT; RET.tale = false; F.start('zeil');
   for (let i = 0; i < 150 && !ART.anim('kai/run'); i++) await new Promise(r => setTimeout(r, 100));
+  for (let i = 0; i < 100 && !(F.q && F.q.picsReady()); i++) await new Promise(r => setTimeout(r, 100));   // the street's own loading wait (footq.js) covers the prop and pickup pictures
   F.on = false; await new Promise(r => setTimeout(r, 50)); const S = F.S, P = S.P, c = F._in.L().ctx, SL = F.look;
   let tag = '', inProp = 0; Object.defineProperty(SL, 'tag', { get: () => tag, set: v => { tag = v; }, configurable: true });
   const bad = {}, frame = { n: 0 }; let propDraws = 0, pkDraws = 0, cur = 0;
