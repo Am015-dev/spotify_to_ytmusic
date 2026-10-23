@@ -54,7 +54,7 @@ const AL=window.AL={
         if(a.fs===0)e.arm=false;
         /* charge: close drones / flankers, chargers on their own clock */
         const rammer=e.type==='charger'||e.type==='drone'||e.type==='flank'||e.type==='swarm';a.cc-=dt;
-        if(rammer&&this.nch()<(ST.n>=2?2:1)&&a.fs===0&&a.cc<=0&&e.x>P.x+80&&(Math.hypot(e.x-P.x,e.y-P.y)<this.CHR||e.type==='charger')){a.ph='tell';a.t=0;a.fs=0;e.arm=false;}}
+        if(rammer&&this.nch()<(ST.n>=2?2:(this.ch1||1))&&a.fs===0&&a.cc<=0&&e.x>P.x+80&&(Math.hypot(e.x-P.x,e.y-P.y)<this.CHR||e.type==='charger')){a.ph='tell';a.t=0;a.fs=0;e.arm=false;}}
       else if(a.ph==='tell'){const q=this.lead(.45);a.gx=q.x;a.gy=q.y;e.aimL=0;e.x+=(GR()-.5)*3;   // a shiver and the red aim line
         if(a.t>=this.TELL){a.ph='charge';a.t=0;const dx=a.gx-e.x,dy=a.gy-e.y,l=Math.hypot(dx,dy)||1,v=e.type==='charger'?820:720;a.vx=dx/l*v;a.vy=dy/l*v;a.left=Math.min(l+60,380);}}
       else if(a.ph==='charge'){e.aimL=0;if(Math.hypot(P.x-e.x,P.y-e.y)<(e.r||14)+16&&!(P.inv>0)){const h0=P.hp;hurt(2);if(P.hp<h0)AL.rams++;}   // a ram that lands costs 2 hull (b.js' body hit is 1)

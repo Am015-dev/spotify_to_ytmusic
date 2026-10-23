@@ -4,6 +4,7 @@
 // Legend on stages 10/20, endless to wave 20, 3 seeds each, and checks invariants every step. Writes qa/SIMHUNT.md (ranked).
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/simhunt.js
 //   env: GAME_DIR=<dir with index.html> PAR=4 SEEDS=3 STAGES=1-45 BUDGET=540 (s: stop starting runs after this) OUT=<md path> JSON=<raw json>
+//        ENDLESS=0 (skip the endless runs) URLX=&flag=0 (extra query, e.g. A/B a flag)
 //        ONLY=stage:bot:seed[:diff]  (one run, e.g. ONLY=12:human:2 or ONLY=endless:human:1 or ONLY=10:human:1:legend) prints every violation
 // Runs on a 390x763 phone viewport (portrait: the HUD band and turned world are live). Prints one summary line per 30 runs and PASS/FAIL at the end.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
@@ -91,6 +92,8 @@ const SETUP = (o) => {
     if (sig !== S.lastSig) { S.lastSig = sig; S.sigT = t; } else if (t - S.sigT > 20 && !S.stuckRep && !G.dead) { S.stuckRep = 1; add('stuck', t, `no score/kill/spawn/boss-hp change since t=${S.sigT.toFixed(0)} (enemies ${G.en.length}, bullets ${G.eb.length}, boss ${boss})`); }
     // unexplained death: no enemy bullet / body within 60 px of the ship in the last 8 steps
     S.hist.push({ px: P.x, py: P.y, eb: G.eb.map(b => [b.x, b.y]), en: G.en.filter(e => !(e.hp <= 0 || e.dead)).map(e => [e.x, e.y, e.r || 14, e.type]), laser: !!(G.boss && G.boss.lasers && G.boss.lasers.length) }); if (S.hist.length > 8) S.hist.shift();
+    { let dn = 1e9; for (const b of G.eb) dn = Math.min(dn, Math.hypot(b.x - P.x, b.y - P.y)); for (const e of G.en) if (e.hp > 0 && !e.dead) dn = Math.min(dn, Math.hypot(e.x - P.x, e.y - P.y) - (e.r || 14) + 15);   // danger moment: threat within 40 px of the ship
+      if (dn < 40) { if (t - (S.dgLast ?? -9) > .5) (S.dg || (S.dg = [])).push(+t.toFixed(2)); S.dgLast = t; } }
     if (G.dead && !S.deadChecked) {
       S.deadChecked = true; let why = null;
       for (const h of S.hist) { if (h.laser) why = 'laser'; for (const b of h.eb) if (Math.hypot(b[0] - h.px, b[1] - h.py) < 60) why = why || 'bullet'; for (const e of h.en) if (Math.hypot(e[0] - h.px, e[1] - h.py) - e[2] < 60) why = why || 'body:' + e[3]; }
@@ -113,7 +116,7 @@ const SETUP = (o) => {
   window.__recOut = (m) => {
     const lives = [], esc = []; let kill = 0, escN = 0; for (const [e, r] of S.track) { if (r.boss || r.gnd || r.in < 0 || r.end === undefined) continue; const d = r.end - r.in; if (d > 0) lives.push(d); if (r.killed) kill++; else if (r.esc) { escN++; if (esc.length < 3) esc.push(`${r.ty}@(${Math.round(r.x)},${Math.round(r.y)})`); } }
     const G = m.G;
-    return { V, cnt, maxEn: S.maxEn, empty: +S.empty.toFixed(1), emptyMax: +S.emptyMax.toFixed(1), emptyAt: +S.emptyAt.toFixed(1), bossDur: +S.bossDur.toFixed(1), bossN: S.bossN, bossOpen: S.bossT0 >= 0, kill, escN, escEx: esc, lives, txOver: S.txOver, txAt: S.txAt || {}, deathWhy: S.deathWhy || null, frames: S.frames, steps: S.steps, wave: window.ENDR ? ENDR.w : 0, score: G.score, hp: m.P.hp };
+    return { V, cnt, maxEn: S.maxEn, empty: +S.empty.toFixed(1), emptyMax: +S.emptyMax.toFixed(1), emptyAt: +S.emptyAt.toFixed(1), bossDur: +S.bossDur.toFixed(1), bossN: S.bossN, bossOpen: S.bossT0 >= 0, kill, escN, escEx: esc, lives, txOver: S.txOver, txAt: S.txAt || {}, deathWhy: S.deathWhy || null, dg: S.dg || [], s1f: window.S1F && S1F.on() ? { emp: S1F.log.emp, gz: S1F.log.gz, dec: (window.SL ? SL.log.dec : []).map(d => d.k + ':' + d.got), boss: !!m.ST.spawned, hits: m.ST.hits } : null, frames: S.frames, steps: S.steps, wave: window.ENDR ? ENDR.w : 0, score: G.score, hp: m.P.hp };
   };
 };
 // ---- one run inside the page
@@ -132,7 +135,7 @@ const RUNFN = `(async (o) => { (${SETUP.toString()})(o); const BOT = ${BOTSRC};
     await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
     await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
     await p.addInitScript(PROBE);
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1`, { waitUntil: 'domcontentloaded' });
+    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1${process.env.URLX || ''}`, { waitUntil: 'domcontentloaded' });
     await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 20000 }).catch(() => { }); await sleep(400);
     return p;
   };
@@ -141,7 +144,7 @@ const RUNFN = `(async (o) => { (${SETUP.toString()})(o); const BOT = ${BOTSRC};
   const buildOf = n => n <= 5 ? 'fresh' : n <= 20 ? 'mid' : 'late';
   for (let n = S0; n <= last; n++) for (const bot of ['human', 'parked']) for (let s = 1; s <= SEEDS; s++) jobs.push({ n, bot, seed: s, build: bot === 'parked' ? 'fresh' : buildOf(n), diff: 'normal', MAXT: 300, label: `st${n}/${bot}/s${s}` });
   for (const n of [10, 20]) if (n <= last) for (const bot of ['human', 'parked']) for (let s = 1; s <= SEEDS; s++) jobs.push({ n, bot, seed: s, build: bot === 'parked' ? 'fresh' : 'mid', diff: 'legend', MAXT: 300, label: `st${n}/${bot}/s${s}/legend` });
-  for (let s = 1; s <= SEEDS; s++) jobs.push({ n: 20, endless: true, bot: 'human', seed: s, build: 'mid', diff: 'normal', MAXT: 1200, label: `endless/human/s${s}` });
+  if (process.env.ENDLESS !== '0') for (let s = 1; s <= SEEDS; s++) jobs.push({ n: 20, endless: true, bot: 'human', seed: s, build: 'mid', diff: 'normal', MAXT: 1200, label: `endless/human/s${s}` });
   let list = jobs;
   if (process.env.ONLY) { const [a, b, c, d] = process.env.ONLY.split(':'); list = jobs.filter(j => (a === 'endless' ? j.endless : !j.endless && j.n === +a && (d === 'legend') === (j.diff === 'legend')) && j.bot === b && j.seed === +c); }
   list.sort((x, y) => (y.MAXT - x.MAXT) || (y.n - x.n));   // longest first: the budget cuts the cheap tail
