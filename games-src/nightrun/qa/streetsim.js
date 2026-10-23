@@ -75,7 +75,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   for (let i = 0; i < 60; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/index.html`)).ok) break; } catch (e) { } await sleep(100); }
   const br = await PW.chromium.launch(), errs = [];
   const open = async () => { const ctx = await br.newContext({ viewport: { width: 1440, height: 860 } }); await ctx.addInitScript(SEED); if (process.env.DBG) await ctx.addInitScript(fs.readFileSync(process.env.DBG, 'utf8')); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.FOOT && FOOT.S3, null, { timeout: 20000 }); await sleep(300); return { ctx, p }; };
+    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1${process.env.Q || ""}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.FOOT && FOOT.S3, null, { timeout: 20000 }); await sleep(300); return { ctx, p }; };
   const jobs = []; for (const bot of BOTS) for (let i = 0; i < RUNS; i++) jobs.push({ bot, i, seed: seedOf(i) });
   const only = process.env.ONLY && process.env.ONLY.split(':'), list = only ? jobs.filter(j => j.bot === only[0] && j.seed === +only[1]) : jobs, out = [];
   let next = 0; const pages = await Promise.all(Array.from({ length: PAR }, open));

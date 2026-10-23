@@ -4790,11 +4790,11 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
 
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
 function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
-  let want=Math.max(S.camX,P.x-vw*(F.camK||.38));if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);
+  let want=Math.max(S.camX,P.x-vw*(RET.cam2?.3:(F.camK||.38)));/* W164 cam2: Kai sits at 30-37% while running right */if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);
   if(!S.lock)for(const l of st.locks)if(!S.lockDone[l.id]&&want>=l.x-vw/2){S.lock={id:l.id,cam:l.x-vw/2};note('ARENA LOCK',1.6);sfx('warn');for(const w of S.waves)if(w.lock===l.id)w.started=true,w.next=S.time+(w.delay||0);break;}
   const bc=Math.min(st.boss.x-vw/2,st.len-vw);if(!S.lock&&!S.bossOn&&want>=bc-1){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.6;note('WARNING: WARDEN',1.8);sfx('warn');S.eb.length=0;}
   if(S.lock)want=Math.min(want,S.lock.cam);
-  S.camX+=(want-S.camX)*Math.min(1,dt*8);if(Math.abs(want-S.camX)<.5)S.camX=want;
+  S.camX+=(want-S.camX)*Math.min(1,dt*(RET.cam2?14:8));if(Math.abs(want-S.camX)<.5)S.camX=want;
   if(S.lock&&S.lock.id!=='boss'){const left=S.E.some(e=>!e.dead&&e.lock===S.lock.id)||S.waves.some(w=>w.lock===S.lock.id&&!w.done);
     if(!left){S.lockDone[S.lock.id]=1;S.lock=null;note('GO  ▶',1.5);sfx('up');}}
   if(S.bossOn&&!S.boss&&S.time>=S.bossAt){const b=spawn(st.boss.id,S.camX+vw-70,FL,{boss:true});b.grace=1.2;}
@@ -5351,6 +5351,7 @@ F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{
    Kai may walk back (camera eases back <= 35% of the view, not behind the section checkpoint); auto-fire turns Kai to a target behind. Poses without a sheet borrow the nearest act (art.js ART.FB).
    HUD: hearts / weapon / ammo / bombs / power-ups / fever in one panel top-left (14 px+ text), score + time left of the pause button, the hint under both. ---------- */
 if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
+if(RET.cam2===undefined)RET.cam2=/[?&]cam2=1/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents. OFF by default until streetsim is retuned (HANDOFF-W164.md); ?cam2=1 = on
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;
@@ -5408,10 +5409,20 @@ function slBlit(c,kind,k,cam,x0,w,t0,res){const pic=slPic(BGL[kind][1]),Hh=FL+2-
 
 /* ----- near layer (x1, on the road): the approved prop sheets only, each <= 1.25 characters tall, bottom on the road ----- */
 const PROPS=[['car',.62],['police',.72],['holo',1.15],['beacon',.95],['steam',.9]];   // [sheet, height in characters]
+/* W164 (RET.cam2): steam rises from fixed street vents, one per 1100 units on the road line (every vent is always drawn while on screen, so nothing pops), 1.7 characters tall;
+   only the sheet frames holding >= 60% of the fullest frame's pixels are used (ping-pong), so the plume never fades to almost nothing. */
+const PROPS4=PROPS.filter(q=>q[0]!=='steam'),STEAM='prop-steam/glow',SV={cell:1100,h:1.7};let steamSeq=null;
+function steamFrames(){if(steamSeq)return steamSeq;const o=ART.aS&&ART.aS(STEAM),im=o&&ART.anim(STEAM);if(!o||!im||!im.width)return null;const n=o.m[0],w=o.m[2],h=o.m[3],cv=document.createElement('canvas');cv.width=im.width;cv.height=h;const g=cv.getContext('2d');g.drawImage(im,0,0);
+  const cov=[];for(let i=0;i<n;i++){const d=g.getImageData(i*w,0,w,h).data;let k=0;for(let j=3;j<d.length;j+=4)if(d[j]>16)k++;cov.push(k);}
+  const mx=Math.max(...cov),ok=[];for(let i=0;i<n;i++)if(cov[i]>=.6*mx)ok.push(i);const seq=ok.slice();for(let i=ok.length-2;i>0;i--)seq.push(ok[i]);   // up, then back down
+  return steamSeq={seq,cov,t:seq.map(i=>i?o.cum[i-1]:0),fps:o.m[1]};}
+SL.steam=(c,cam,x0,w,fl,t)=>{const C=CH*SL.k,m=ART.ANIM.s[STEAM],sf=steamFrames();if(!m||!sf)return;const h=SV.h*C,i0=Math.floor((cam+x0)/SV.cell)-1,i1=Math.ceil((cam+x0+w)/SV.cell)+1,fi=Math.floor(t*sf.fps)%sf.seq.length;
+  for(let i=i0;i<=i1;i++){const px=i*SV.cell-cam+SV.cell*(.3+.4*hs(i*5+11)),k=(fi+i+4*sf.seq.length)%sf.seq.length;SL.tag='prop';SL.steamLast={x:px,frame:sf.seq[k],cov:sf.cov[sf.seq[k]],vent:i};ART.drawAnim(c,STEAM,sf.t[k],px,fl-h*.5+.03*h,h/m[3],false,.95);SL.tag='';}};
 if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART.drawAnim)return;const C=CH*SL.k,x0=SL.x0||0,cell=400,i0=Math.floor((cam+x0)/cell)-1,i1=Math.ceil((cam+x0+w)/cell)+1;
   for(let i=i0;i<=i1;i++){const r=hs(i*41+7),px=i*cell-cam+cell*(.2+.6*hs(i*5+1));if(r>.58)continue;
-    const q=PROPS[Math.floor(hs(i*97+3)*PROPS.length)],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),m=ART.ANIM.s[k];if(!m||!ART.anim(k))continue;
-    const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
+    const PL=RET.cam2?PROPS4:PROPS,q=PL[Math.floor(hs(i*97+3)*PL.length)],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),m=ART.ANIM.s[k];if(!m||!ART.anim(k))continue;
+    const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}
+  if(RET.cam2)SL.steam(c,cam,x0,w,fl,t);};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
 
 /* ----- painted street (22 Oct 2026): foot/bg-sky|far|mid|near|floor, 2048x1024 each, used only when all five are loaded (else the placeholders below). Same convention as footart.js FA.bg: the picture's street line is 80% down,
    scaled so that line lands on the road line FL (top of the picture at the top of the visible sky), tiles are 2:1 and repeat sideways. Sky is opaque and almost fixed, the others scroll slower the further away they are,
@@ -14700,7 +14711,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='2daf6a4524 2026-10-23 08:55 UTC';
+const NR_STAMP='72d3690f2e 2026-10-23 11:21 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -17465,7 +17476,7 @@ function plan(intro){const T=S3.T,N=T.waves,out=[];for(let i=0;i<N;i++){const t=
 S3.plan=plan;
 const gate=(S,vw)=>{const bc=Math.min(ST.boss.x-vw/2,ST.len-vw);return clamp(bc*S.time/S3.T.boss,0,bc);};
 /* the camera never runs ahead of the clock */
-if(F.look&&F.look.back){const b0=F.look.back;F.look.back=function(S,P,vw,want){const w=b0.apply(this,arguments);return S.s3&&S.st===ST?Math.min(w,Math.max(S.s3.gate,S.camX)):w;};}   // holds the camera, never pulls it back
+if(F.look&&F.look.back){const b0=F.look.back;F.look.back=function(S,P,vw,want){const w=b0.apply(this,arguments);return S.s3&&S.st===ST?(RET.cam2?Math.min(w,Math.max(S.camX,Math.min(ST.boss.x-vw/2,ST.len-vw)-2)):Math.min(w,Math.max(S.s3.gate,S.camX))):w;};}   // cam2: the camera follows Kai; only the boss arena waits for the clock (the boss trigger below uses the gate)   // holds the camera, never pulls it back
 const s2step=ST.hook.step;
 ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)return;const vw=env.G.viewW||960,P=S.P;
   if(!S.s3){const bpm=(typeof BT!=='undefined'&&BT.bpm>40?BT.bpm:120),intro=+(S3.T.beats*60/bpm).toFixed(2);
