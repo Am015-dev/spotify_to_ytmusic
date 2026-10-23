@@ -53,7 +53,8 @@ FE.gunner=wrap({hp:3,w:30,h:64,score:200,c:'#e07a2a',drops:['w_hmg','w_shot','he
     if(!cov&&e.state!=='charge'){let best=null,bd=1e9;for(const p of S.pr)if(p.hp>0&&!p.gone&&p.cover&&!(p.claim&&p.claim!==e&&!p.claim.dead)&&p.x>P.x+90&&p.x<env.G.camX+env.G.viewW-20&&abs(p.x-e.x)<bd){bd=abs(p.x-e.x);best=p;}
       e.cov=best;if(best)best.claim=e;if(!best&&e.state!=='open')go(e,'open');}
     if(age(e,env)>14&&e.state!=='charge'){go(e,'charge');e.hid=false;}
-    if(e.state==='charge'){walk(e,env,abs(dx)>120?e.facing*170:abs(dx)<90?-e.facing*120:0,dt);e.hid=false;e.cd=(e.cd||1)-dt;if(e.cd<=0&&abs(dx)<400){e.cd=1.8;env.shoot(e,Math.atan2(P.y-40-(e.y-40),dx),330,1);}return;}
+    if(e.state==='charge'){walk(e,env,abs(dx)>120?e.facing*170:abs(dx)<90?-e.facing*120:0,dt);e.hid=false;e.cd=(e.cd||1)-dt;if(RET.slots){if(e.cd<=0&&e.tele<=0&&!e.ctw&&abs(dx)<400){e.tele=.5;e.ctw=1;}if(e.ctw&&e.tele<=0){e.ctw=0;e.cd=1.8;env.shoot(e,Math.atan2(P.y-40-(e.y-40),dx),330,1);}return;}   // W170 slots: the charge-mode shot gets the same 0.5 s shoot pose + red flash as the others
+      if(e.cd<=0&&abs(dx)<400){e.cd=1.8;env.shoot(e,Math.atan2(P.y-40-(e.y-40),dx),330,1);}return;}
     const c2=e.cov&&e.cov.hp>0?e.cov:null;
     if(c2){const side=sgn(c2.x-P.x)||1,tx=c2.x+side*(c2.w/2+16);if(abs(tx-e.x)>6){walk(e,env,sgn(tx-e.x)*150,dt);e.hid=false;return;}e.vx=0;
       const flank=sgn(e.x-c2.x)!==sgn(P.x-c2.x)?false:true,above=P.y<FL-70&&abs(dx)<300;
