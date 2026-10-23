@@ -22,7 +22,13 @@ const RUNG = RUN.replace(NEAR, "{ const ga = window.__gf && live.find(e => e.id 
     " if (ga && !live.some(e => e.id === 'rusher' && Math.abs(e.x - P.x) < 170)) { window.__gpush = ga.x > P.x ? 1 : -1; window.__gpd = Math.abs(ga.x - P.x); } else window.__gpush = 0; }")
   .replace("for (const p of S.pk) if (", "if (window.__gpush && window.__gpd > 150) { I.l = window.__gpush < 0 ? 1 : 0; I.r = window.__gpush > 0 ? 1 : 0; P.facing = window.__gpush; }\n    for (const p of S.pk) if (")
   .replace(DUCK, "for (const b of S.eb) { const t = (P.x - b.x) / (b.vx || 1e-6); if (t > 0 && t < .35 && !b.vy && P.onGround && see({ id: 'd', _bid: b.x0 || (b.x0 = b.x) }, 'd')) b.duck = 1; if (b.duck && t > -.1 && t < .35) I.d = 1; }\n" + DUCK);
-const RUND = RUNG.replace(REACT, 'S.time + .1, go: true');
+const RUND = RUNG.replace(REACT, 'S.time + .1, go: true')
+  .replace(DUCK, "for (const e of live) if (e.boss && e.atk) { const dx = e.x - P.x;   // W167 streetboss (?sboss=1): the answer to each boss attack on its telegraph\n" +
+    "  if (e.state === 'charge' && Math.sign(-dx) === e.facing && P.onGround) { I.l = I.r = 0; I.jumpP = I.jump = (Math.abs(dx) - 60) / 560 < .12 ? 1 : 0; }\n" +
+    "  if (e.state === 'sb_poundW' && e.sT > .65 && Math.abs(dx) < 260 && P.onGround) { I.jumpP = 1; I.jump = 1; }\n" +
+    "  if (/^sb_throw/.test(e.state)) { I.l = dx > 0 ? 1 : 0; I.r = dx < 0 ? 1 : 0; }\n" +
+    "  if (/^sb_leap/.test(e.state)) { const m = e.tx - P.x; if (Math.abs(m) < 110) { I.l = m > 0 ? 1 : 0; I.r = m < 0 ? 1 : 0; if (e.state === 'sb_leap' && e.sT > .45) I.dashP = 1; } } }\n" +
+    "for (const b of S.eb) if (b.ground && b.src === 'bigheavy') { const t = (P.x - b.x) / (b.vx || 1e-6); if (t > 0 && t < .25 && P.onGround) { I.d = 0; I.jumpP = 1; I.jump = 1; } }\n" + DUCK);
 const CODE = { nearest: RUN, gfirst: RUNG, dodge: RUND };
 
 // ---- in the page: telemetry wrapped round FOOT.ctl (called once per update step, before the step), then the bot / idle run
@@ -145,6 +151,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   if (rt) { L(rt.rep, `determinism: the same seed twice gives the same hurts and end time`); L(rt.same, `one seed equals a real-time run (idle, seed ${seedOf(0)}: stepped hurts [${rt.stepped}] vs real-time [${rt.real}] over the first ${rt.lim} s, tolerance 1 s)`); }
   md += `## Gates\n\n` + lines.map(([p, n]) => `- ${p ? 'PASS' : 'FAIL'} ${n}`).join('\n') + '\n';
   fs.writeFileSync(OUT, md);
+  if (process.env.JSONOUT) fs.writeFileSync(process.env.JSONOUT, JSON.stringify(out.map(o => ({ bot: o.j.bot, seed: o.j.seed, clear: o.r.clear, tEnd: o.r.tEnd, dbg: o.r.dbg }))));   // every run, for qa/bossprobe.js
   for (const [p, n] of lines) console.log((p ? 'PASS ' : 'FAIL ') + n);
   console.log(`INFO wrote ${OUT}`);
   const speedFail = lines.filter(([p, n]) => !p && /speed|determinism|real-time|suite/.test(n)).length;
