@@ -63,7 +63,7 @@ const INSTALL = () => {
     for (const [X, Y] of [[x - 1.2 * h, y - 3 * h], [x + 1.2 * h, y - 3 * h], [x - 1.2 * h, y], [x + 1.2 * h, y]]) { xs.push(m.a * X + m.c * Y + m.e); ys.push(m.b * X + m.d * Y + m.f); }
     const bx = Math.max(0, Math.floor(Math.min(...xs))), by = Math.max(0, Math.floor(Math.min(...ys)));
     const bw = Math.min(W, Math.ceil(Math.max(...xs))) - bx, bh = Math.min(H, Math.ceil(Math.max(...ys))) - by;
-    const r = { who, pose, n: 0, a: 0, px: 0 };
+    const fe = window.__mnr && __mnr.ART && __mnr.ART.fE, r = { who: fe && fe.id === 'guard' ? 'guard' : who, pose, n: 0, a: 0, px: 0 };   // W171: the street guard draws the shield sheet; checked on its own line
     const before = bw > 0 && bh > 0 ? ctx.getImageData(bx, by, bw, bh).data : null;
     F.cur = r; try { od.apply(this, arguments); } finally { F.cur = null; }
     if (before) {
@@ -80,7 +80,7 @@ async function measure(p) {
   // one foe type at a time, alone, 150 units into the view (the phone view is ~330 units wide: spawning all at once put every 4th foe off screen or on top of another)
   const ids = await p.evaluate(() => { window.__fv.rec = []; window.__fv.on = true; return Object.keys(window.FOOT_ENEMIES || {}); });
   for (const id of ids) {
-    await p.evaluate(id => { const S = FOOT.S; for (const e of S.E) e.remove = true; FOOT.env.spawn(id, S.camX + 150, null); }, id);
+    await p.evaluate(id => { const S = FOOT.S; S.E.length = 0; const e = FOOT.env.spawn(id, S.camX + 150, null); if (e) e._sd = 1; }, id);   // emptied at once (flagged foes stayed in S.E, so env.spawn's 16-foe cap refused the last ids); _sd: street2 would move a foe born near Kai off screen
     await sleep(Math.max(500, SECS * 1000 / ids.length));
   }
   return p.evaluate(() => {
