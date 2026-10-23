@@ -14712,7 +14712,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='1ef9fca771 2026-10-23 13:28 UTC';
+const NR_STAMP='2f6cdbe795 2026-10-23 13:49 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16653,8 +16653,8 @@ ST.hook={
     for(const e of S.E){if(e.seen&&e.seenAt2==null)e.seenAt2=S.time;if(e.dead&&!e._s2){e._s2=1;if(e.seenAt2!=null){f.life.push(+(S.time-e.seenAt2).toFixed(1));if(e.boss)f.bossLife=+(S.time-e.seenAt2).toFixed(1);}}}
     // enemy bullets: cover stops them and wears down
     for(const b of S.eb){if(b.life<=0)continue;for(const p of S.pr){if(p.hp<=0||p.gone||p.k==='barrel')continue;if(b.x>p.x-p.w/2-b.r&&b.x<p.x+p.w/2+b.r&&b.y>p.y-p.h-b.r&&b.y<p.y+4){b.life=0;IN.hitProp(p,.5);break;}}}
-    // climax: rushers keep coming while the big heavy stands (max 3 at once)
-    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<3){F.env.spawn('rusher',f.adds++%2&&!RET.fairstreet?S.camX-40:S.camX+env.G.viewW+40,null);}}},
+    // climax: rushers keep coming while the big heavy stands (max 3 at once; with the phased boss none, W168)
+    if(S.bossOn&&S.boss&&!S.boss.dead&&S.time>=f.addT){f.addT=S.time+3.5;if(S.E.filter(e=>!e.dead&&e.id==='rusher').length<(RET.sboss?0:3)){F.env.spawn('rusher',f.adds++%2&&!RET.fairstreet?S.camX-40:S.camX+env.G.viewW+40,null);}}},
   draw(c,S){},
   hud(c,vw,u,box,fs,S){const x0=vw*.18,bw=vw*.64,y=540-14*u,h=6*u,pr=clamp(S.P.maxX/ST.boss.x,0,1);
     c.fillStyle='#ffffff22';c.fillRect(x0,y,bw,h);c.fillStyle='#19e3ff';c.fillRect(x0,y,bw*pr,h);
@@ -18590,7 +18590,7 @@ if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;
 const IN=F._in,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1;
 const PH=[null,{n:'THE CHARGE',at:['charge','throw']},{n:'GROUND POUND',at:['pound']},{n:'LEAP',at:['leap']}],LINE=[0,1,.66,.33];
 const CAP={charge:'CHARGE · JUMP OR DASH',throw:'BARREL · STEP BACK',pound:'GROUND POUND · JUMP THE WAVE',leap:'LEAP · DASH OUT'};
-const WIND={throw:.7,pound:.8,leap:.6},OPEN=1.0,ROAR=1.2,LEAPT=.7,HPK=+((location.search.match(/[?&]sbhp=([\d.]+)/)||[])[1]||1);   // boss hp x HPK; ?sbhp= to tune (W168: x5 gives a 32 s dodge-bot fight, x8 47 s, but the rushers that join every 3.5 s then kill the bots)
+const WIND={throw:.7,pound:.8,leap:.6},OPEN=1.0,ROAR=1.2,LEAPT=.7,HPK=+((location.search.match(/[?&]sbhp=([\d.]+)/)||[])[1]||8);   // boss hp x HPK (W168: default 8 = a 45-90 s fight; ?sbhp= to tune) (W168: x5 gives a 32 s dodge-bot fight, x8 47 s, but the rushers that join every 3.5 s then kill the bots)
 const SB=F.SB={log:[]};   // per fight: {ph:[[phase,t]], at:[[attack,t]]} for the probe
 const name=e=>'BIG HEAVY · PHASE '+e.ph+': '+PH[e.ph].n;
 function go(e,s){e.state=s;e.sT=0;}
@@ -18648,7 +18648,7 @@ if(RET.shieldfoe===undefined)RET.shieldfoe=/[?&]shieldfoe=1/.test(location.searc
 if(!window.FOOT||!FOOT._in||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1;
 const FE=window.FOOT_ENEMIES=window.FOOT_ENEMIES||{};
-const G=F.GD={TURN:1,TIRED:10,SPD:60,REACH:100,CROUCH:.6,BASH:.25,REST:.8,CD:3.2,WAVES:[4,8],log:null};
+const G=F.GD={TURN:1,TIRED:4,SPD:60,REACH:100,CROUCH:.8,BASH:.25,REST:.8,CD:8,WAVES:[4,8],log:null};
 const age=(e,env)=>e.seenAt2==null?0:env.G.time-e.seenAt2;
 function go(e,s){e.state=s;e.sT=0;}
 function walk(e,env,v,dt){const g=env.G,lo=g.camX+e.w/2,hi=g.camX+g.viewW-e.w/2,nx=e.x+v*dt;if(!e.seen||(nx>=lo&&nx<=hi))e.x=nx;e.vx=v;}
