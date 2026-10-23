@@ -74,9 +74,9 @@ const ftUnlocked=()=>{try{return (sSave.stars[3]|0)>=1||!!sSave.all;}catch(e){re
 const F={on:false,STAGES,WEAPONS,PICKUPS,FDIFF,FB,unlocked:ftUnlocked,save:()=>SV,ctl:null,S:null,start,stop,sim,step:null,layout:null};
 let S=null,L=null,raf=0,lastT=0;
 const I={x:0,y:0,l:0,r:0,u:0,d:0,fire:0,jump:0,melee:0,dash:0,bomb:0,jumpP:0,meleeP:0,dashP:0,bombP:0,stick:0};
-/* W173 belt floor (RET.belt, default OFF, ?belt=1): every actor has a depth z on the street (0 = back by the wall, 1 = front); up/down walks in depth,
+/* W173 belt floor (RET.belt, default ON since W180, ?belt=0 = old): every actor has a depth z on the street (0 = back by the wall, 1 = front); up/down walks in depth,
    jump stays a height. A hit lands only when the two depths are within ZT (15% of the band), so stepping up/down dodges. streetlook.js draws the band. */
-if(RET.belt===undefined)RET.belt=/[?&]belt=1/.test(location.search);
+if(RET.belt===undefined)RET.belt=!/[?&]belt=0/.test(location.search);   // W180: ON by default, ?belt=0 = the old flat road
 const ZT=.15,ZSPD=1.2,zok=(a,b,t)=>!RET.belt||a==null||b==null||Math.abs(a-b)<=(t||ZT);
 
 /* ===== run state ===== */
@@ -170,7 +170,7 @@ function aimAngle(P){const up=!RET.belt&&(I.u||I.y<-.5),dn=!RET.belt&&(I.d||I.y>
   if(up)return mx?(mx>0?-Math.PI/4:-Math.PI*3/4):-Math.PI/2;
   if(dn&&!P.onGround)return mx?(mx>0?Math.PI/4:Math.PI*3/4):Math.PI/2;
   return P.facing>0?0:Math.PI;}
-function aimAssist(P,a,ox,oy){let best=a,bd=S.st.aimCone||.3;for(const e of S.E){if(e.dead||!e.seen)continue;const dx=e.x-ox,dy=e.y-e.h/2-oy;if(dx*dx+dy*dy>640*640)continue;let d=Math.atan2(dy,dx)-a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;if(Math.abs(d)<bd){bd=Math.abs(d);best=a+d;}}return best;}   // 8-way aim + a small cone (0.3 rad) toward the closest enemy in it
+function aimAssist(P,a,ox,oy){let best=a,bd=S.st.aimCone||.3;for(const e of S.E){if(e.dead||!e.seen||!zok(e.z,P.z))continue;const dx=e.x-ox,dy=e.y-e.h/2-oy;if(dx*dx+dy*dy>640*640)continue;let d=Math.atan2(dy,dx)-a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;if(Math.abs(d)<bd){bd=Math.abs(d);best=a+d;}}return best;}   // 8-way aim + a small cone (0.3 rad) toward the closest enemy in it
 /* auto-fire (touch default): shoot while an enemy (or a floor prop) is on screen on the side you face, or above you when the stick aims up */
 function autoTarget(P){const up=!RET.belt&&(I.u||I.y<-.5),vw=viewW(),fc=P.facing;
   for(const e of S.E){if(e.dead||!e.seen||!hittable(e))continue;const dx=(e.x-P.x)*fc;if(Math.abs(e.x-P.x)>vw)continue;if(dx>-20||(up&&Math.abs(e.x-P.x)<260&&e.y-e.h/2<P.y-70))return true;}
@@ -231,7 +231,7 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
   if(!I.jump&&P.vy<-260&&P.jh){P.vy=-260;P.jh=0;}   // variable height: let go early = short hop
   P.vy+=GRAV*dt;const oy=P.y;P.x+=P.vx*dt;P.y+=P.vy*dt;P.onGround=false;
   if(P.y>=FL){P.y=FL;P.vy=0;P.onGround=true;}
-  else if(P.vy>=0&&!(I.d&&I.jumpP))for(const [px,py,pw] of S.st.plats)if(P.x>px-6&&P.x<px+pw+6&&oy<=py+1&&P.y>=py){P.y=py;P.vy=0;P.onGround=true;break;}
+  else if(P.vy>=0&&!(I.d&&I.jumpP)&&!RET.belt)for(const [px,py,pw] of S.st.plats)if(P.x>px-6&&P.x<px+pw+6&&oy<=py+1&&P.y>=py){P.y=py;P.vy=0;P.onGround=true;break;}
   const lo=S.camX+16,hi=S.camX+viewW()-16;P.x=clamp(P.x,lo,hi);
   if(P.x>P.maxX+2){S.moved+=P.x-P.maxX;P.maxX=P.x;P.idle=0;}else P.idle+=dt;
   if((I.fire||(autoOn()&&autoTarget(P)))&&P.cd<=0&&!S.win){fire(P);P.cd=1/wstat(P.w,P.lv).rate;}
@@ -482,7 +482,7 @@ function kaiX(P){const t=S.time,dt=Math.min(.1,Math.max(0,t-(P._xt==null?t:P._xt
 function draw(){if(!L||!S)return;if(F.look&&F.look.draw&&F.look.draw(L.ctx))return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#05030c';c.fillRect(0,0,L.cv.width,L.cv.height);c.setTransform(sc,0,0,sc,(L.box.x-L.ox)*L.dpr,(L.box.y-L.oy)*L.dpr);const sh=S.shake?ftRnd(-S.shake,S.shake)*.5:0;
   drawBg(c,vw,L.exl||0,L.exr||0);c.save();c.translate(-S.camX+sh,sh*.5);
-  for(const [px,py,pw] of S.st.plats){c.fillStyle='#3a2a52';c.fillRect(px,py,pw,12);c.fillStyle='#19e3ff';c.fillRect(px,py,pw,2);}
+  if(!RET.belt)for(const [px,py,pw] of S.st.plats){c.fillStyle='#3a2a52';c.fillRect(px,py,pw,12);c.fillStyle='#19e3ff';c.fillRect(px,py,pw,2);}
   if(S.cp==null){c.fillStyle='#19e3ff55';c.fillRect(S.st.cp-2,FL-120,4,120);c.fillStyle='#19e3ff';c.fillRect(S.st.cp-2,FL-120,22,12);}
   for(const p of S.pr){if(p.hp<=0&&!p.fl)continue;c.fillStyle=p.fl>0?'#fff':p.c;c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);c.strokeStyle='#ffffff55';c.lineWidth=2;c.strokeRect(p.x-p.w/2+2,p.y-p.h+2,p.w-4,p.h-4);}
   for(const p of S.pk){const d=PICKUPS[p.k],bob=Math.sin(p.t*5)*3;if(p.k==='ammo'&&RET.sprites&&ART.ANIM.c['pk-ammo/spin']&&ART.anim('pk-ammo/spin')){c.globalAlpha=p.t>13?.5+.5*Math.sin(p.t*20):1;ART.drawAnim(c,'pk-ammo/spin',p.t,p.x,p.y+bob,32/ART.ANIM.c['pk-ammo/spin'].bw,false);c.globalAlpha=1;continue;}c.fillStyle=d.c;c.globalAlpha=p.t>13?.5+.5*Math.sin(p.t*20):1;c.beginPath();c.arc(p.x,p.y+bob,15,0,6.283);c.fill();c.globalAlpha=1;

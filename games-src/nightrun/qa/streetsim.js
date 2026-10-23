@@ -15,9 +15,13 @@ const res = [], ok = (p, n) => { res.push(!!p); console.log((p ? 'PASS ' : 'FAIL
 const seedOf = i => 4321 + i * 7919;
 
 // ---- the bots: taken from the street tests themselves (one source of truth)
-const src = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN = src.slice(src.indexOf('const RUN = ') + 12, src.indexOf('\n(async () =>')).trim().replace(/;$/, '').replace('i < 200', 'i < 300');   // W168: a 45-90 s boss fight ends after 200 s game time
+const src = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'); let RUN = src.slice(src.indexOf('const RUN = ') + 12, src.indexOf('\n(async () =>')).trim().replace(/;$/, '').replace('i < 200', 'i < 300');   // W168: a 45-90 s boss fight ends after 200 s game time
 const NEAR = 'if (near) P.facing = near.x > P.x ? 1 : -1;', DUCK = '// bullets: hop low ones', REACT = 'S.time + .2 + rnd() * .15, go: rnd() > .25';
 for (const k of [NEAR, DUCK, REACT, "for (const p of S.pk) if ("]) if (!RUN.includes(k)) { console.log('FAIL streetsim: street2-test bot changed, missing: ' + k); process.exit(2); }
+// W180: the platforms have no depth yet (HANDOFF-W173), so on the belt the bots stay on the road: shots from a platform fly over the foes on the floor
+const PATHK = "rnd() < .5 ? 'high' : 'low'";
+if (!RUN.includes(PATHK)) { console.log('FAIL streetsim: street2-test bot changed, missing: ' + PATHK); process.exit(2); }
+RUN = RUN.replace(PATHK, "rnd() < .5 && !RET.belt ? 'high' : 'low'");
 const RUNG = RUN.replace(NEAR, "{ const ga = window.__gf && live.find(e => e.id === 'gunner'), gf = ga && !ga.hid ? ga : null, tg = gf || near; if (tg) P.facing = tg.x > P.x ? 1 : -1;" +
     " if (ga && !live.some(e => e.id === 'rusher' && Math.abs(e.x - P.x) < 170)) { window.__gpush = ga.x > P.x ? 1 : -1; window.__gpd = Math.abs(ga.x - P.x); } else window.__gpush = 0; }")
   .replace("for (const p of S.pk) if (", "if (window.__gpush && window.__gpd > 150) { I.l = window.__gpush < 0 ? 1 : 0; I.r = window.__gpush > 0 ? 1 : 0; P.facing = window.__gpush; }\n" +
@@ -33,7 +37,7 @@ const RUND = RUNG.replace(REACT, 'S.time + .1, go: true')
     "  if (/^sb_throw/.test(e.state)) { I.l = dx > 0 ? 1 : 0; I.r = dx < 0 ? 1 : 0; }\n" +
     "  if (/^sb_leap/.test(e.state)) { const m = e.tx - P.x; if (Math.abs(m) < 110) { I.l = m > 0 ? 1 : 0; I.r = m < 0 ? 1 : 0; if (e.state === 'sb_leap' && e.sT > .45) I.dashP = 1; } } }\n" +
     "for (const b of S.eb) if (b.ground && b.src === 'bigheavy') { const t = (P.x - b.x) / (b.vx || 1e-6); if (t > 0 && t < .25 && P.onGround) { I.d = 0; I.jumpP = 1; I.jump = 1; } }\n" + DUCK);
-// W173 belt (Q=&belt=1): every bot lines up with its target's depth (stick up/down); the dodge bot steps 0.35 of the band out of line on every telegraph and every shot in its lane
+// W173 belt (default ON since W180; Q=&belt=0 = old road): every bot lines up with its target's depth (stick up/down); the dodge bot steps 0.35 of the band out of line on every telegraph and every shot in its lane
 const BEND = 'I.l = p.x < P.x; } };';
 if (!RUN.includes(BEND)) { console.log('FAIL streetsim: street2-test bot changed, missing: ' + BEND); process.exit(2); }
 const BELT = "I.l = p.x < P.x; }\n    if (RET.belt && P.z != null) { I.u = I.d = 0; const gt = window.__gf && live.find(e => e.id === 'gunner' && !e.hid), nb = live.filter(e => !(e._sk > S.time)).sort((a, b) => Math.abs(a.x - P.x) - Math.abs(b.x - P.x))[0], tg = gt || nb || near; if (tg) { if (S._tg !== tg || S._tgH !== tg.hp) { S._tg = tg; S._tgH = tg.hp; S._tgT = S.time; } else if (S.time - S._tgT > 2.5) { tg._sk = S.time + 3; S._tg = null; } } let tz = tg && tg.z != null ? tg.z : P.z;" +
@@ -41,6 +45,7 @@ const BELT = "I.l = p.x < P.x; }\n    if (RET.belt && P.z != null) { I.u = I.d =
   " if (__DZ__) { const th = live.find(e => e.z != null && Math.abs(e.z - P.z) < .22 && Math.abs(e.x - P.x) < 420 && (e.tele > 0 || e.wind > 0 || /wind|charge|lunge|crouch/.test(e.state || '')))," +
   " bl = S.eb.find(b => { const t = (P.x - b.x) / (b.vx || 1e-6); return b.z != null && Math.abs(b.z - P.z) < .22 && t > 0 && t < .5; }), src = th || bl;" +
   " if (src) { S._dzT = S.time + .35; S._dzTo = src.z > .5 ? Math.max(0, src.z - .4) : Math.min(1, src.z + .4); } }" +
+  " if (I.jumpP && P.onGround && P.y > 464) { const th = live.some(e => e.z != null && Math.abs(e.z - P.z) <= .15 && Math.abs(e.x - P.x) < 330 && /crouch|lunge|charge|wind/.test(e.state || '')) || S.eb.some(b => b.z != null && Math.abs(b.z - P.z) <= .15); if (!th || S.time - (S._jt || -9) < 1.6) I.jumpP = I.jump = 0; else S._jt = S.time; }" +
   " if (S._dzT > S.time) tz = S._dzTo; if (tz > P.z + .04) I.d = 1; else if (tz < P.z - .04) I.u = 1; } };";
 const CODE = { nearest: RUN.replace(BEND, BELT.replace('__DZ__', 'false')), gfirst: RUNG.replace(BEND, BELT.replace('__DZ__', 'false')), dodge: RUND.replace(BEND, BELT.replace('__DZ__', 'true')) };
 
@@ -55,7 +60,10 @@ const TEL = () => {
     const P = S.P, T = window.__T, t = S.time, vw = (FOOT._in.L() || {}).vw || 960; T.steps++;
     if (!num(P.x) || !num(P.y) || !num(P.hp) || S.E.some(e => !num(e.x) || !num(e.y) || (e.hp !== undefined && !num(e.hp))) || S.eb.some(b => !num(b.x) || !num(b.y))) { T.nan++; if (!T.nanEx) T.nanEx = `t=${t.toFixed(1)} P(${P.x},${P.y},${P.hp})`; }
     if (T.prevX != null && Math.abs(P.x - T.prevX) < .01 && P.hp > 0) T.still += 1 / 60; T.prevX = P.x;
-    const sig = [Math.round(P.maxX / 5), S.kills, S.score, S.hurts, S.boss ? Math.round(S.boss.hp) : 0].join('|'); if (sig !== T.sig) { T.sig = sig; T.sigT = t; } else if (t - T.sigT > 25 && T.stuckAt < 0 && !S.end && P.hp > 0 && !window.__idle) T.stuckAt = +t.toFixed(1);
+    const snap = () => 'on' + S.bossOn + ' t' + (S.time|0) + ' lock' + (S.lock && S.lock.id) + ' E' + S.E.map(e => e.id + ':' + e.state + ':dx' + Math.round(e.x - P.x) + ':z' + (e.z||0).toFixed(2) + ':hp' + e.hp.toFixed(1) + ':sk' + (e._sk > S.time ? 1 : 0)).join(' ') + ' P z' + (+P.z).toFixed(2) + ' y' + Math.round(P.y) + ' vy' + Math.round(P.vy) + (P.onGround ? 'G' : 'A') + ' x' + Math.round(P.x) + ' hp' + P.hp + ' hs' + (S.hitstop|0) + ' pz' + !!S.paused + ' w' + P.w + ' aim' + P.aim.toFixed(2) + ' fc' + P.facing + ' pb' + S.pb.length + ' ' + JSON.stringify(S.pb.slice(-1).map(b => [Math.round(b.x - P.x), Math.round(b.y), +(b.z||0).toFixed(2), Math.round(b.vx), Math.round(b.vy)])) + ' pr' + JSON.stringify(S.pr.filter(q => Math.abs(q.x - P.x) < 400).map(q => [q.k, Math.round(q.x - P.x), q.hp, +(q.z||0).toFixed(2), q.cover ? 1 : 0]));
+        if (T.stuckAt >= 0 && !T.tr && t > T.stuckAt + 1 && t < T.stuckAt + 5 && T.steps % 12 === 0) { (T.trb = T.trb || []).push('t' + t.toFixed(1) + ' shots' + S.shots + ' k' + S.kills + ' hurts' + S.hurts + ' ' + snap().replace(/ lock\w* /, ' ').slice(0, 700)); if (T.trb.length >= 14) T.tr = T.trb; }
+    const sig = [Math.round(P.maxX / 5), S.kills, S.score, S.hurts, S.boss ? Math.round(S.boss.hp) : 0].join('|'); if (sig !== T.sig) { T.sig = sig; T.sigT = t; } else if (t - T.sigT > 25 && T.stuckAt < 0 && !S.end && P.hp > 0 && !window.__idle) { T.stuckAt = +t.toFixed(1); T.stuckBoss = snap(); }
+    if (T.stuckAt >= 0 && !T.s2 && t > T.stuckAt + 4) { T.s2 = 1; T.stuckBoss += ' || ' + snap(); }
     T.hpMin = Math.min(T.hpMin, P.hp); if (T.hpPrev != null && P.hp < T.hpPrev) T.hpLost += T.hpPrev - P.hp; T.hpPrev = P.hp;
     for (const e of S.E) if (e._o === undefined && !e.dead) e._o = e.x < S.camX ? 'L' : 'R';   // W161: which side a foe was born on
     if (S.hurts > T.lastHurts) { const src = (S.hlog || [])[S.hurts - 1] || '', m = /^(mel|touch):(.*)$/.exec(src);
@@ -77,13 +85,13 @@ const TEL = () => {
   return () => { delete F.ctl; F.ctl = null; };
 };
 // run one bot+seed stepped (fast); returns the bot's own result plus the telemetry
-const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); window.__idle = ${bot === 'idle'}; const w0 = performance.now(); let r;
+const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); window.__idle = ${bot === 'idle'}; window.__TR0 = ${+process.env.TR0 || 0}; const w0 = performance.now(); let r;
   if (${bot === 'idle'}) { let s = ${seed}; Math.random = () => (s = (s * 16807) % 2147483647) / 2147483647; FOOT.ctl = (S, I) => { for (const k in I) if (typeof I[k] === 'number') I[k] = 0; };
     RET.tale = false; FOOT.start('zeil'); let S = FOOT.S; for (let j = 0; j < 200 && S && !S.end; j++) S = FOOT.sim(1, 1 / 60); S = FOOT.S; r = { clear: !!(S.end && S.end.cleared), time: +S.time.toFixed(1), hp: S.P.hp, hurts: S.hurts, kills: S.kills }; }
   else { window.__gf = ${bot !== 'nearest'}; r = (${codeFn})(${seed}); }
   const ms = performance.now() - w0, S = FOOT.S, T = window.__T, sh = S.sh || {}, s3 = S.s3 || {};
   const tu = {}; r.zmiss = S.zmiss | 0; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
-  r.tel = { mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
+  r.tel = { tr: T.tr, stuckBoss: T.stuckBoss, mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
     called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' ') };
   try { FOOT.stop(); } catch (e) {} un(); return r; })()`;
 const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story', JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 })); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } catch (e) {} };
@@ -107,7 +115,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   const ok0 = out.filter(o => !o.r.err), simSecs = ok0.reduce((a, o) => a + (o.r.tEnd || 0), 0), simMs = ok0.reduce((a, o) => a + o.r.ms, 0);
   const clearT = out.filter(o => o.r.clear).map(o => o.r.tEnd), Lref = clearT.length ? med(clearT) : Math.max(1, ...ok0.map(o => o.r.tEnd));
   if (process.env.DUMP) fs.writeFileSync(process.env.DUMP, JSON.stringify(out.map(o => ({ bot: o.j.bot, seed: o.j.seed, clear: !!o.r.clear, tEnd: o.r.tEnd, dbg: o.r.dbg }))));   // DUMP=<json>: every run's probe record (W169)
-  if (process.env.LIST) for (const o of out) if (o.r.tel && o.r.tel.stuckAt >= 0) console.log('STUCK', o.j.bot, o.j.seed, 'at', o.r.tel.stuckAt, 'end', o.r.tEnd, (o.r.alive || '').slice(0, 300));
+  if (process.env.LIST) for (const o of out) if (o.r.tel && o.r.tel.stuckAt >= 0) { console.log('STUCK', o.j.bot, o.j.seed, 'at', o.r.tel.stuckAt, 'end', o.r.tEnd, o.r.tel.stuckBoss.slice(0, 200)); if (process.env.TR && o.r.tel.tr) console.log(o.r.tel.tr.join('\n')); }
   const rows = {};
   for (const bot of BOTS) { const rs = out.filter(o => o.j.bot === bot).map(o => o.r), good = rs.filter(r => !r.err), cl = good.filter(r => r.clear), dead = good.filter(r => !r.clear && r.end), tl = good.map(r => r.tel);
     const hs = {}; for (const r of good) for (const h of (r.tel.hlog || '').split(' ').filter(Boolean)) hs[h] = (hs[h] || 0) + 1;
@@ -163,10 +171,10 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
     const gN = rows.nearest && rows.nearest.ttk.guard, gC = rows.dodge && rows.dodge.ttk.guard, gG = rows.gfirst && rows.gfirst.ttk.guard;
     L(gN != null && gC != null && Math.abs(gN - gC) >= .3 * Math.max(gN, gC), `W171 guard time to kill differs >= 30% with its counter (dodge gets behind it ${gC} s, gfirst ${gG} s; nearest shoots its front ${gN} s)`); }
   if (rows.nearest && rows.gfirst) L(rows.gfirst.clearPct - rows.nearest.clearPct >= 15, `kill order matters: gunner-first clears >= 15 points more than nearest-first (${rows.gfirst.clearPct.toFixed(0)}% vs ${rows.nearest.clearPct.toFixed(0)}%)`);
-  if (rows.dodge) { L(rows.dodge.duck >= 3, `ducking prevents >= 3 hits per run for the dodge bot (${rows.dodge.duck.toFixed(1)})`); L(rows.dodge.blocked >= 3, `cover prevents >= 3 hits per run for the dodge bot (${rows.dodge.blocked.toFixed(1)})`); }
+  if (rows.dodge) { if (/belt=0/.test(process.env.Q || '')) L(rows.dodge.duck >= 3, `ducking prevents >= 3 hits per run for the dodge bot (${rows.dodge.duck.toFixed(1)})`); L(rows.dodge.blocked >= 3, `cover prevents >= 3 hits per run for the dodge bot (${rows.dodge.blocked.toFixed(1)})`); }
   L(rows.__mel.under === 0, `every melee hit comes from a foe on screen >= 1.2 s before it (${rows.__mel.n} hits, ${rows.__mel.under} under 1.2 s, min ${rows.__mel.min} s)`);
   L(rows.__mel.beh / Math.max(1, rows.__mel.tot) < .2, `< 20% of hearts lost to foes that entered from behind (${rows.__mel.beh} of ${rows.__mel.tot} hits)`);
-  if (/belt=1/.test(process.env.Q || '')) { const G = ok0.filter(o => o.j.bot !== 'idle'), zb = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; for (const o of G) o.r.tel.zb.forEach((v, i) => zb[i] += v); const zt = zb.reduce((a, b) => a + b, 0), used = zb.filter(v => v >= .02 * zt).length;
+  if (!/belt=0/.test(process.env.Q || '')) { const G = ok0.filter(o => o.j.bot !== 'idle'), zb = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; for (const o of G) o.r.tel.zb.forEach((v, i) => zb[i] += v); const zt = zb.reduce((a, b) => a + b, 0), used = zb.filter(v => v >= .02 * zt).length;
     const band = med(ok0.map(o => o.r.band)), dg = ok0.filter(o => o.j.bot === 'dodge'), zm = dg.reduce((a, o) => a + o.r.zmiss, 0), zh = dg.reduce((a, o) => a + (o.r.hurts || 0), 0), sp = med(G.flatMap(o => o.r.tel.zs));
     L(band >= .25 && used >= 6, `W173 D1 floor band >= 25% of the view (${(100 * band).toFixed(0)}%) and actors use >= 60% of it (${used * 10}% of depth slices hold >= 2% of actor time)`);
     L(zh + zm > 0 && zm / (zm + zh) >= .3, `W173 D2 the dodge bot avoids >= 30% of attacks by depth (${zm} out-of-depth misses vs ${zh} hits = ${(100 * zm / Math.max(1, zm + zh)).toFixed(0)}%)`);
