@@ -136,7 +136,9 @@ async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.f
   try{await new Promise((ok,no)=>{const t0=performance.now(),el=s.el,iv=setInterval(()=>{if(s.file!==info.file){clearInterval(iv);no('evicted');}else if(s.err||el.error){clearInterval(iv);no('error');}
       else if(slotReady(s)){clearInterval(iv);ok();}else if(performance.now()-t0>60000){clearInterval(iv);no('timeout');}},80);});
     TR.bufs[info.file]=s;AU.trackReady(stage);}
-  catch(e){if(e!=='evicted'){TR.bad[info.file]=1;AU.freeSlot(s);}}
+  catch(e){if(e!=='evicted'){TR.bad[info.file]=1;AU.freeSlot(s);
+    /* owner 23 Oct 2026 "game music is not playing": the server sometimes answers 503; a failed song was never asked for again (silent stage). Try again up to 3 times (1.5 s, 3 s, 4.5 s) */
+    const T=TR.tries||(TR.tries={}),n=T[info.file]=(T[info.file]||0)+1;if(n<=3)setTimeout(()=>{delete TR.bad[info.file];loadTrack(stage);},1500*n);}}
   TR.busy[info.file]=0;}
 
 /* ---------- latency test (settings): clicks on the audio clock, the player taps, the median lateness becomes the Audio sync ---------- */
