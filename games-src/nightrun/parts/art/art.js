@@ -226,7 +226,7 @@ ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=A
 ART.PROPS=[['car',80,0],['police',84,0],['steam',120,0],['beacon',160,0],['neon',150,0],['banner',170,0],['holo',150,0],['windows',190,0],['drone',58,1]];
 ART.footProps=(c,camX,vw,fl,t)=>{if(!RET.sprites)return;const cell=560,off=camX*.7,i0=Math.floor(off/cell)-1,n=Math.ceil(vw/cell)+3;
   for(let i=i0;i<i0+n;i++){const r=((Math.imul((i|0)^61,0x45d9f3b)>>>7)&1023)/1024;if(r>.62)continue;const q=ART.PROPS[(Math.imul(i*7+3,0x9e3779b1)>>>9)%ART.PROPS.length],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),a=ART.anim(k);if(!a)continue;
-    const m=ART.ANIM.s[k],sc=q[1]/m[3],px=i*cell-off+cell*(.25+r*.6),py=q[2]?fl-190+Math.sin(t*.7+i)*8:fl-q[1]/2+3;ART.drawAnim(c,k,t+i*.37,px,py,sc,false,.92);}};
+    const m=ART.ANIM.s[k],sc=q[1]/m[3],px=i*cell-off+cell*(.25+r*.6),py=q[2]?fl-190+Math.sin(t*.7+i)*8:fl-q[1]/2+3;ART.drawAnim(c,k,t+i*.37,px,py,sc,false,RET.footmove?.62:.92);}};   // W223 footmove: the glowing back-street props sit behind the play plane, not on top of it
 /* ----- weapon fx (muzzle / impact), explosions (burst), small fx (spark, hit-confirm, shield glow) and pickups (spin). Each effect keeps its old key; ART.fxSheet maps it to the sheet, 0 when there is none.
    Sizes: calibration bw (content width in sheet px) so a sheet is drawn as wide as the still it replaces. Per-weapon 'beam' sheets stay unwired: the player's shots are small sprites (FXW.bullet), a 392 px beam would not fit them.
    debris / ground-dust have no hook yet (nothing draws them as stills either). ----- */

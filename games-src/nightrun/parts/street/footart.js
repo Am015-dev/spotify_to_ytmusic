@@ -30,7 +30,7 @@ const dot=(ctx,x,y,r,col)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r,0,6.
 const flash=(ctx,x,y,t,r)=>{const big=BK(t,18)===0,R=r*(big?1:.6);ctx.fillStyle='#ff9a2d';ctx.beginPath();for(let i=0;i<16;i++){const a=i*.3927,q=i%2?R*.4:R;ctx.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q);}ctx.closePath();ctx.fill();dot(ctx,x,y,R*.4,'#fff6a0');};
 let SHD=null;
 const shadow=(ctx,wd,a)=>{if(a<=.02)return;if(!SHD){const c=document.createElement('canvas');c.width=64;c.height=16;const g=c.getContext('2d'),r=g.createRadialGradient(32,8,0,32,8,32);r.addColorStop(0,'rgba(0,0,0,.85)');r.addColorStop(.6,'rgba(0,0,0,.4)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.translate(0,8);g.scale(1,.25);g.translate(0,-32);g.fillRect(0,0,64,64);SHD=c;}
-  const o=ctx.globalAlpha;ctx.globalAlpha=o*.55*a;ctx.drawImage(SHD,-wd*.6,-wd*.09,wd*1.2,wd*.18);ctx.globalAlpha=o;};   // same soft ellipse as the ground bosses' road shadow (UIK.bossShadow), flat on the street line
+  const o=ctx.globalAlpha;ctx.globalAlpha=o*(RET.footmove?.85:.55)*a;ctx.drawImage(SHD,-wd*.6,-wd*.09,wd*1.2,wd*.18);ctx.globalAlpha=o;};   // same soft ellipse as the ground bosses' road shadow (UIK.bossShadow), flat on the street line
 FA.shadow=shadow;
 const label=(ctx,txt,x,y,S,col)=>{if(!window.phText())return;ctx.save();ctx.scale(1/S,1/S);ctx.fillStyle=col;ctx.font='700 '+Math.max(8,Math.round(.1*S))+'px "Share Tech Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x*S,y*S);ctx.restore();};
 /* ---- humanoid pose table: lf/lb = [thigh angle, knee bend] of front/back leg, af/ab = [upper arm, forearm] (af holds the weapon), lean, lift (feet off the ground) ---- */
