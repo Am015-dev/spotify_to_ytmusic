@@ -14,7 +14,7 @@ const RUN = async (shots, STEPS) => { const M = __mnr, ART = M.ART, RET = M.RET,
   F.on = false; await new Promise(r => setTimeout(r, 50)); const S = F.S, P = S.P, c = F._in.L().ctx, SL = F.look, FL = 470;
   P.x = S.st.boss.x - 420; P.max = 99; F.ctl = (S_, I) => { I.l = I.u = I.d = 0; I.r = 0; I.fire = 0; I.jump = 0; };
   const o = { steps: 0, boss: 0, bar: 0, overlap: 0, worst: null, ww: 0, wwMarked: 0, shots: {}, err: '' };
-  for (let i = 0; i < STEPS && !S.end; i++) { P.hp = P.max; F.sim(1 / 60, 1 / 60); F.look.draw(c); o.steps++;
+  for (let i = 0; i < STEPS && !S.end; i++) { P.hp = P.max; if (i === 2 && !S.bossOn) { const vw = (F._in.L().hud && F._in.L().hud.vw) || 800, bc = Math.min(S.st.boss.x - vw / 2, S.st.len - vw); S.bossOn = true; S.lock = { id: 'boss', cam: bc }; S.bossAt = S.time + 1.2; S.camX = bc; P.x = bc + vw * 0.3; P.maxX = Math.max(P.maxX || 0, P.x); S.E.length = 0; } F.sim(1 / 60, 1 / 60); F.look.draw(c); o.steps++;
     const B = S.boss, L = F._in.L(); if (!B || B.dead) continue; o.boss++;
     const hud = (L.hud && L.hud.hud || []).concat(L.hud && L.hud.hint ? [L.hud.hint] : []), top = FL - SL.band, t0 = SL.t0;
     if (hud.some(r => r.h > 0 && r.y + t0 < FL && r.y + t0 + r.h > top)) { o.overlap++; if (!o.worst) o.worst = hud.filter(r => r.y + t0 + r.h > top).map(r => [r.x | 0, (r.y + t0) | 0, r.w | 0, r.h | 0]); }
