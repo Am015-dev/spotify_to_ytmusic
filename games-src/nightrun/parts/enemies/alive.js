@@ -34,7 +34,7 @@ const AL=window.AL={
     const p=this.pv;if(p.t){p.vx+=((P.x-p.x)/dt-p.vx)*Math.min(1,dt*6);p.vy+=((P.y-p.y)/dt-p.vy)*Math.min(1,dt*6);}p.x=P.x;p.y=P.y;p.t=1;
     const mx=this.maxX();let i=0;
     for(const e of WV.st.foes){if(e.dead||e.hp<=0||!e.wv)continue;i++;
-      if(this.leaving(e)){if(e.al){e.al.ph='out';e.aimL=0;}if(e.sl&&e.sl.out)e.wv.sx+=110*dt;continue;}   // slice's slow drift out: brisker
+      if(this.leaving(e)){if(e.al){e.al.ph='out';e.aimL=0;}if(e.sl&&e.sl.out)e.wv.sx+=(window.SHM&&SHM.on()?SHM.exit(e,dt):110*dt);continue;}   // slice's slow drift out: brisker
       if(!e.al)this.init(e,i);const a=e.al,k=this.k(e);a.t+=dt;
       e.bf=99;   // the beat shots of b.js are replaced by the tell + burst below
       if(a.ph==='in'){const u=Math.min(1,a.t/a.dur),s=1-Math.pow(1-u,3),dx=a.ax-a.x0,dy=a.ay-a.y0,l=Math.hypot(dx,dy)||1,o=Math.sin(Math.PI*u)*a.arc;
