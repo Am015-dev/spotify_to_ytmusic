@@ -17,7 +17,9 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
       if(l.t<2*BT.spb)this.pic('fx-eb-aim-line',700,0,1400,10,0,.9);else this.pic('fx-eb-laser-sweep',700,0,1400,40,0,.95);ctx.restore();}
     const wd=(wcv!==cv?1.9:1.2)*(ak===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak]),   // art only (e.r stays the hitbox); a phone boss body is >= 40% of the short side
       mv=UIK.boss[nm]&&UIK.boss[nm].move||'air',by=mv==='air'?Math.sin(t*1.6)*3:0,tl=mv==='air'?Math.sin(t*.9)*.035:0;
-    ctx.save();ctx.translate(e.x,e.y);if(e.b2s)this.shield(e,t);SPR.boss(e,nm,wd,by,tl,e.flash>0);ctx.restore();return true;},
+    ctx.save();ctx.translate(e.x,e.y);if(e.b2s)this.shield(e,t);
+    const da=ART.drawAnim;ART.drawAnim=(c,key,tt,x,y,sc,fl,al,sy)=>{if(al==null&&!fl&&c===ctx&&PURL.cel(key,sc,'b')){if(PURL.HALO)PURL.dcel(key,tt,sc,'h',x,y,.9);return PURL.dcel(key,tt,sc,'b',x,y);}return da(c,key,tt,x,y,sc,fl,al,sy);};   // W227: the boss gets the foes' value pass (dark halo + warm strip, cached once per sheet and size)
+    try{SPR.boss(e,nm,wd,by,tl,e.flash>0);}finally{ART.drawAnim=da;}ctx.restore();return true;},
   gate(e,t){ctx.save();ctx.translate(e.x,0);const top=e.gy-e.gap/2,bot=e.gy+e.gap/2,fl=e.flash>0;
     if(e.on){for(const [y0,y1] of[[0,top],[bot,H]])this.pic('fx-eb-laser-sweep',0,(y0+y1)/2,y1-y0,36,Math.PI/2,.95);}
     else if(e.tele){for(const [y0,y1] of[[0,top],[bot,H]])this.pic('fx-eb-aim-line',0,(y0+y1)/2,y1-y0,8,Math.PI/2,.5+.4*Math.abs(Math.sin(t*8)));}
@@ -28,8 +30,9 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
       if(b.k==='n'){this.pic('fx-bullet-needle',b.x,b.y,r*9,0,a);continue;}
       if(b.k==='r'){this.pic('fx-bullet-rocket',b.x,b.y,r*8,0,a);continue;}
       if(b.ew||b.k==='m'){this.pic('fx-eb-mine',b.x,b.y,r*5);continue;}
-      this.pic('fx-bullet-shell',b.x,b.y,r*5.2);}},
-  pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.translate(p.x,y);if(p.t==='pw')PW.coin(p.k,16);else pkPaint(p,t);ctx.restore();}},   // power-ups: the owner's icon only (no glow disc, dashed ring or name)
+      this.pic('fx-bullet-shell',b.x,b.y,Math.max(r*5.2,(PURL.ph?16:12)/S));}},   // W227: the orange shell, never under ~8 px of visible core on the phone
+  pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.translate(p.x,y);if(p.t==='pw')PW.coin(p.k,16);else if(!(p.t==='shard'&&this.gold()))pkPaint(p,t);else{const o=ART.sp('pk-shard~g',13);if(o)ART.put(o,0,0,0,null,.35+.65*Math.abs(Math.cos(t*3+p.bob)),1);}ctx.restore();}},
+  gold(){const n='pk-shard~g';if(ART.bm[n])return true;const b=this.img('pk-shard');if(!b)return false;const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter='sepia(1) saturate(3.2) hue-rotate(-8deg) brightness(1.15)';x.drawImage(b,0,0);ART.bm[n]=c;return true;},   // W227: pickups own one hue, gold (teal is the tower windows), made once   // power-ups: the owner's icon only (no glow disc, dashed ring or name)
   bar(w){const b=G.boss;if(!b||b.x>=W||!(b.max>0))return;ctx.fillStyle='#ff6a2a';ctx.fillRect(0,0,w*clamp(b.hp/b.max,0,1),4);}};
 {const f=PURL.foe;PURL.foe=function(e,t){if(e.type==='boss')return PB.boss(e,t);if(e.type==='gate')return PB.gate(e,t);return f.call(this,e,t);};}
 PURL.pickups=function(t){PB.pickups(t);};

@@ -261,7 +261,7 @@ RET.gradeOf=(dp,hits)=>{const r=dp/64;return r>=.35&&hits===0?'S':r>=.2&&hits<=1
 NR.on('runStart',()=>{const g=RET.gr;g.bar=0;g.perf=G.perf|0;g.hits=0;g.hp=P.hp;g.list=[];RET.chipV=GA.bank;});
 NR.on('tick',()=>{const g=RET.gr;if(P.hp<g.hp)g.hits+=g.hp-P.hp;g.hp=P.hp;});
 NR.on('bar',()=>{if(!RET.grade||!G.live||G.dead)return;const g=RET.gr;if(++g.bar%16)return;
-  const L=RET.gradeOf((G.perf|0)-g.perf,g.hits);g.list.push(L);g.perf=G.perf|0;g.hits=0;RET.pop(L);});
+  const L=RET.gradeOf((G.perf|0)-g.perf,g.hits);g.list.push(L);g.perf=G.perf|0;g.hits=0;if(!RET.purelook)RET.pop(L);});   // W227: no letter in the play field under the pure look (the grades show on the run-end strip)
 RET.pop=function(L){let e=$('retPop');if(!e){e=document.createElement('div');e.id='retPop';e.setAttribute('aria-hidden','true');($('stage')||document.body).appendChild(e);
     e.addEventListener('animationend',()=>e.classList.remove('on'));}
   e.textContent=L;e.style.color=L==='S'?'#ffe14d':L==='A'?'#3dffb0':L==='B'?'#19e3ff':'#c9c4ec';e.classList.remove('on');void e.offsetWidth;e.classList.add('on');

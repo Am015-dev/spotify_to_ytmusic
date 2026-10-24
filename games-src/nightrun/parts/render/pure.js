@@ -9,7 +9,8 @@
    arming circles, hit flashes, tier glow, screen flash / glitch, floating text, edge pulses. Bosses and gate pylons have no single sheet
    drawn here yet: they keep the old draw. Gameplay is not touched (the sim never calls render). ---------- */
 if(RET.purelook===undefined)RET.purelook=!/[?&]purelook=0/.test(location.search);   // W215: the default flight look
-const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W219: player 1.6x the enemies' texel scale on the phone, 1.3x on PC
+const PURL=window.PURL={K:90/520,get ph(){return wcv!==cv||Math.min(innerWidth,innerHeight)<500;},   // W227: the phone layout (the portrait world, or any screen under 500 px), not only wcv!==cv
+  get PK(){return this.ph?1.6:1.3;},   // W215/W219: player 1.6x the enemies' texel scale on the phone, 1.3x on PC
   pl(){const s=ART.ANIM.s['ship-'+shipDef().id+'/flame'];return(s?s[2]:260)*this.K*this.PK;},   // the player's drawn length (world units)
   WARM:/^(beat|disc|flame|orbit|shell|storm|swarm)$/,   // W215: weapon shot pictures in the enemy-shot hues (lime / yellow / orange): drawn as the cool standard shot instead
   dim(b,v){v=v||.32;const D=this.DM||(this.DM=new Map()),k=D.get(b)||{};D.set(b,k);let c=k[v];if(c)return c;   // W219/W224: backdrop layers only, once per picture: brightness .32, saturate .6, so the play layer is the brightest thing
@@ -32,15 +33,15 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     if(nr)this.tile(nr,H-130,130,scroll,1.1,1);},   // the near strip keeps full value (play-layer depth)
   sheet(e){const M=ENEMY_ART[FOEART.id(e)];if(!M||e.type==='gate')return null;const m=M.native?{s:M.s||'e'+e.type,k:M.k||4.2}:FOEART.map(e);if(!m||!m.s)return null;
     const b='ship-'+m.s+'/',v=e.arm&&ART.ANIM.s[b+'volley']&&ART.anim(b+'volley'),key=b+(v?'volley':'flame');if(!ART.ANIM.s[key]||!ART.anim(key))return null;ART.anim(b+'death');return{m,key};},
-  foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],mn=this.pl()*(wcv!==cv?.8:.55),w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,mn),Math.max(this.K*fw*1.25,mn)),sc=w/fw,rot=m.rot?m.rot(e,t):0;   // W224: a phone enemy is >= .8 x the player's length
+  foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],mn=this.pl()*(this.ph?.8:.72),w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,mn),Math.max(this.K*fw*1.25,mn)),sc=w/fw,rot=m.rot?m.rot(e,t):0;   // W224/W227: an enemy is >= .8 x the player's length on the phone, .72 x on PC
     ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);
     if(this.HALO)this.pool(1,w*.45,0,sc*s[3]);if(!this.lit(key,(e.t||0)+eb_(e),sc,rot))ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false);ctx.restore();
     e._fs=sc;e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
   HALO:1,   // W224 probe switch (qa/w224probe.js measures the sprite without its halo)
   get LD(){const d=1.5/S;return wcv!==cv?[d,d]:[d,-d];},   // the key light (top-right pink neon) in world units: the phone world is turned a quarter
-  cel(key,sc,kd){const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return null;const m=o.m,w=m[2],h=m[3],cw=Math.max(1,Math.round(w*sc*S)),C=this.CC||(this.CC=new Map()),k=key+'|'+cw+kd;let q=C.get(k);if(q)return q;   // W224: one cached strip per sheet, drawn size and kind: h = soft dark halo, b = brightness 1.6 (1.35 and 1.45 measured under the 3:1 gate), r = neon rim tint
-    const ch=Math.max(1,Math.round(h*cw/w)),p=kd==='h'?Math.ceil(Math.max(cw,ch)*.08)+3:kd==='r'?2:0,fw=cw+2*p,fh=ch+2*p,c=document.createElement('canvas');c.width=fw*m[0];c.height=fh;const g=c.getContext('2d');g.imageSmoothingQuality='high';
-    g.filter=kd==='h'?`brightness(0) blur(${Math.max(1.5,p/2.2)}px)`:kd==='b'?'brightness(1.6) saturate(1.2)':'none';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*fw+p,p,cw,ch);g.filter='none';
+  cel(key,sc,kd){const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return null;const m=o.m,w=m[2],h=m[3],cw=Math.max(1,Math.round(w*sc*S)),C=this.CC||(this.CC=new Map()),k=key+'|'+cw+kd;let q=C.get(k);if(q)return q;   // W224: one cached strip per sheet, drawn size and kind: h = soft dark halo, b = warm value pass (W227: a warm key, the family of the enemy shots, so threats are the warmest and lightest actors), r = neon rim tint
+    const ch=Math.max(1,Math.round(h*cw/w)),p=kd==='h'?Math.ceil(Math.max(cw,ch)*.12)+3:kd==='r'?2:0,fw=cw+2*p,fh=ch+2*p,c=document.createElement('canvas');c.width=fw*m[0];c.height=fh;const g=c.getContext('2d');g.imageSmoothingQuality='high';
+    g.filter=kd==='h'?`brightness(0) blur(${Math.max(1.5,p/2.2)}px)`:kd==='b'?'sepia(.35) saturate(2) brightness(2.2)':'none';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*fw+p,p,cw,ch);g.filter='none';
     if(kd==='r'){const d=g.getImageData(0,0,c.width,c.height),a=d.data;for(let i=0;i<a.length;i+=4){a[i]=255;a[i+1]=110;a[i+2]=225;}g.putImageData(d,0,0);}
     C.set(k,q={c,fw,fh,p,cw});return q;},
   dcel(key,t,sc,kd,ox,oy,al){const q=this.cel(key,sc,kd);if(!q)return false;const o=ART.aS(key),m=o.m,u=m[2]*sc/q.cw,i=ART.aframe(key,t);if(al!=null)ctx.globalAlpha=al;
@@ -104,4 +105,4 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     if(G.empT>0)AH.pic('fx-pw-bomb-pulse',(0.6-G.empT)*2800,P.x,P.y,0,Math.min(1,G.empT*2.2));
     ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
     if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.drawImage(wcv,0,0);ctx.setTransform(VS,0,0,VS,0,0);if(running&&!HUDOFF)drawHUDP(t);}
-    else if(running&&!HUDOFF){drawHUD(t);const s=G.pw,n=s?s.act.length+(s.drop?1:0):0,k=n>2?.5:.7;PW.hud(t,345,H-4-20*k-46*k*Math.max(0,n-1),k);}}};   // W224: the power-up panel sits inside the bottom HUD band (top >= H-78, the hull box's top), right of the hull box (was in the sky at y 112)
+    else if(running&&!HUDOFF){drawHUD(t);const s=G.pw,n=s?s.act.length+(s.drop?1:0):0,k=n>1?.36:.5;PW.hud(t,345,H-6-20*k-46*k*Math.max(0,n-1),k);}}};   // W227: smaller, so even a stack of cards stays inside the band. W224: the power-up panel sits inside the bottom HUD band (top >= H-78, the hull box's top), right of the hull box (was in the sky at y 112)
