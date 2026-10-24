@@ -136,7 +136,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
   const dE=e=>{if(e.dead&&!(e.ext&&!e.remove))return;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)return;SL.z=e.z;   // fully off screen: nothing to draw (a shape fallback's label would hang past the edge)
     const pose=e.dead?'die':(()=>{try{return e.def.pose?e.def.pose(e):'idle';}catch(x){return'idle';}})(),ey=e.ext&&e.fly?e.y+e.h/2:e.y;
     at(c,e.x,ey,K);
-    if(e.tele>0){c.fillStyle='#ff304a';c.globalAlpha=.35+.35*Math.sin(S.time*30);c.beginPath();c.arc(e.x+e.facing*e.w*.4,e.y-e.h*.62,10+e.w*.1,0,6.283);c.fill();c.globalAlpha=1;}
+    if(e.tele>0){c.fillStyle='#ff304a';c.globalAlpha=RET.footrun?.55:.35+.35*Math.sin(S.time*30);c.beginPath();c.arc(e.x+e.facing*e.w*.4,e.y-e.h*.62,10+e.w*.1,0,6.283);c.fill();c.globalAlpha=1;}   // footrun: one steady glow while it winds up, no pulse
     if(e.wind>0){c.strokeStyle='#ff304a';c.lineWidth=3;c.strokeRect(e.x-e.w/2-4,e.y-e.h-4,e.w+8,e.h+8);}
     c.globalAlpha=1;   /* owner 23 Oct 2026 "all enemies are transparent": foes died inside their 0.9 s grace and were only ever drawn at .65; always solid now */
     ART.fE=e;SL.tag='actor';IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;SL.tag='';c.globalAlpha=1;

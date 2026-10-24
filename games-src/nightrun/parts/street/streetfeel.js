@@ -82,7 +82,7 @@ ART.footDraw=function(c,who,pose,x,y,h,flip,t){const e=ART.fE,S=F.S;if(!RET.feel
   const base=who.indexOf('kai')===0?'kai':who,bk=FEEL.BODY[base+'/'+act],ref=FEEL.BODY[base+'/idle'];if(!RET.bodyscale&&bk&&ref&&!/crouch|die|jump|land|dash/.test(act))h*=ref/bk;   // bodyscale: one scale from the json body instead
   let tt=t,bob=0;
   if(m&&RUNA[act]&&abs(e._lv)>5){const o=ART.aS(key),n=m[0],sc=ART.bsc(m,h),step=(FEEL.ST[base+'/'+act]||FEEL.ST[base+'/run']||m[2]*.8)*sc,cyc=2*step;
-    const ph=(e._fd/cyc)%1,fi=Math.floor(ph*n),fr=ph*n-fi,a0=fi?o.cum[fi-1]:0;tt=a0+(o.cum[fi]-a0)*fr;   // frame = distance / stride: the planted foot moves with the road
+    let ph=(e._fd/cyc)%1;if(RET.footrun&&e!==S.P&&e._lv*(flip?-1:1)<0)ph=(1-ph)%1;const fi=Math.floor(ph*n),fr=ph*n-fi,a0=fi?o.cum[fi-1]:0;tt=a0+(o.cum[fi]-a0)*fr;   // frame = distance / stride: the planted foot moves with the road
     if(e._fa!==key){e._fa=key;}e._f0=0;bob=-abs(Math.sin(ph*2*Math.PI))*h*.025;
     const half=Math.floor(ph*2);if(e._hc!==half){e._hc=half;if(e._hc!=null&&(e===S.P?e.onGround:!e.fly)&&window.AH&&S.fx.length<200){AH.ftPush(S.fx,'fx-ft-dust',x-(flip?-1:1)*h*.12,y-3,h*.42,.28);FEEL.log.dust++;}}}
   else e._hc=null;
