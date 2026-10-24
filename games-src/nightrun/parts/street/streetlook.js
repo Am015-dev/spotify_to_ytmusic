@@ -198,5 +198,5 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
     else if(S.st.hook&&S.st.hook.hud&&!RET.purefoot){const dy=by+10*u-(VH-14*u);c.save();c.translate(0,dy);try{S.st.hook.hud(c,vw,u,(x,y,w,h)=>box(x,y+dy,w,h),fs,S);}catch(x){}c.restore();SL.hudB+=24*u;}}
   else if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};IN.ghost();}
-SL._p={slFrame,slPainted,slBackdrop,at,pkPic,slPic,slHud};   // purefoot.js (W217) reuses the frame, the painted backdrop, the depth placement and the HUD
+SL._p={slFrame,slPainted,slBackdrop,at,pkPic,slPic,slHud,slRR};   // purefoot.js (W217) reuses the frame, the painted backdrop, the depth placement and the HUD
 })();

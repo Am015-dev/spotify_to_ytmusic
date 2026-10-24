@@ -4,7 +4,7 @@
 /* ---------- PUREFOOT (W217, owner 24 Oct 2026: "the owner's art is good, our code overlays made it ugly"). The outermost F.look.draw: with RET.purefoot on, none of the
    overlay wrappers run (street3 lamp pools / grade / wet mirror, streetblend, streetguard meter and OPEN text, streetcombo HITS panel, streetfeel OVERDRIVE panel).
    Drawn: streetlook's painted backdrop and prop sheets, street2 prop pictures, pickup pictures, actors through drawWho (sheets, FA.shadow soft contact shadow), owner shot /
-   muzzle / grenade / fx pictures, enemy bullets as fx-bullet-enemy, then streetlook's HUD without the hint line, the BEHIND caption and the progress bar.
+   muzzle / grenade / fx pictures, enemy bullets as a keyed fx-bullet-enemy core (normal blend, pistol-flash size), then streetlook's HUD without the hint line, the BEHIND caption and the progress bar, and the overdrive / guard meters under the hearts panel.
    Not drawn: code shapes (wind-up discs and boxes, shield ring, dash box, shadow ellipses, rings, slashes, squares, checkpoint flags), play-field text, the occlusion fade.
    Telegraphs are poses: a foe winding up shows its melee sheet, a gunner calling a shot its shoot sheet. Gameplay is untouched (the sim never draws). ---------- */
 (function(){
@@ -12,6 +12,20 @@ if(!window.FOOT||!FOOT._in||!FOOT.look||!FOOT.look._p)return;
 const F=FOOT,IN=F._in,SL=F.look,X=SL._p,FL=470,old=SL.draw;
 const pic=(c,id,x,y,w,a,al)=>{if(window.AH&&AH.ftDraw(c,id,x,y,w,a,al))return true;const o=typeof ART!=='undefined'&&ART.img&&ART.img(id)&&ART.sp(id,w);if(!o)return false;   // owner fx pictures are painted on black: added with 'lighter'
   c.save();c.globalCompositeOperation='lighter';c.globalAlpha=al==null?1:Math.max(0,Math.min(1,al));c.translate(x,y);if(a)c.rotate(a);c.drawImage(o.c,-o.w/2,-o.h/2,o.w,o.h);c.restore();return true;};
+/* foe shots: the owner's orb is painted on black (no alpha). One keyed copy: alpha from brightness, the faint outer glow cut, cropped to the core, drawn with the normal blend */
+const KEY={};function keyed(id){if(id in KEY)return KEY[id];const im=typeof ART!=='undefined'&&ART.img&&ART.img(id);if(!im||!im.width)return null;
+  const w=im.width,h=im.height,cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d');g.drawImage(im,0,0);const D=g.getImageData(0,0,w,h),d=D.data;let x0=w,y0=h,x1=0,y1=0;
+  for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]),a=m<70?0:Math.min(255,(m-70)*255/120);if(a>0){for(let j=0;j<3;j++)d[i+j]=Math.min(255,d[i+j]*255/m);const q=i/4,x=q%w,y=(q-x)/w;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}d[i+3]=a;}
+  if(x1<x0)return KEY[id]=null;g.putImageData(D,0,0);const o=document.createElement('canvas');o.width=x1-x0+1;o.height=y1-y0+1;o.getContext('2d').drawImage(cv,-x0,-y0);return KEY[id]=o;}
+/* edge HUD tells under the hearts panel (no play-field drawing): overdrive meter / READY, guard meter while it is used or refilling */
+function tells(c,L,S,u,fs){const b=L.hud&&L.hud.hud&&L.hud.hud[0];if(!b)return;const rows=[],OD=F.OD,g=S.gd;
+  if(RET.overdrive&&OD&&OD.v>0){const full=OD.v>=OD.max;rows.push([full?'OVERDRIVE READY: BOMB':'OVERDRIVE',OD.v/OD.max,full?(Math.floor(S.time*4)%2?'#ffffff':'#19e3ff'):'#19a8c8']);}
+  if(g&&(g.on||g.m<1))rows.push([g.cd>0?'GUARD BROKEN':'GUARD',g.m,g.m<.3?'#ff4060':'#5ad1ff']);if(!rows.length)return;
+  const t0=SL.t0,pd=8*u,rh=26*u,x=b.x,y=t0+b.y+b.h+6*u,w=b.w,h=2*pd+rows.length*rh-6*u;
+  c.save();c.fillStyle='rgba(5,3,12,.62)';X.slRR(c,x,y,w,h,8*u);c.fill();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=u;c.stroke();
+  c.textAlign='left';c.textBaseline='top';c.font='bold '+fs(12)+'px monospace';rows.forEach(([t,v,col],i)=>{const ry=y+pd+i*rh;c.fillStyle=col;c.fillText(t,x+pd,ry,w-2*pd);
+    c.fillStyle='#ffffff1c';c.fillRect(x+pd,ry+15*u,w-2*pd,5*u);c.fillStyle=col;c.fillRect(x+pd,ry+15*u,(w-2*pd)*Math.max(0,Math.min(1,v)),5*u);});c.restore();
+  L.hud.hud.push({x,y:y-t0,w,h});SL.hudB=Math.max(SL.hudB||0,y-t0+h+8*u);}
 function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L);
   const K=SL.k,t0=SL.t0,dpr=L.dpr||1,sc=L.sc*dpr,vw=L.vw,exl=L.exl||0,exr=L.exr||0,P=S.P,u=1/L.sc,at=X.at;
   c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
@@ -39,8 +53,8 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L);
     if(e.patch)for(let x=e.patch.x0+12;x<e.patch.x1;x+=24){at(c,x,FL-10,K);pic(c,'fx-ft-flame',x,FL-10,30,-Math.PI/2,.8);c.restore();}}SL.z=null;
   for(const b of S.pb){SL.z=b.z;at(c,b.x,b.y,K);window.AH&&AH.ftBul(c,b);c.restore();}
   for(const g of S.bombsL){SL.z=g.z;at(c,g.x,g.y,K);pic(c,'fx-ft-grenade',g.x,g.y,22,S.time*7);c.restore();}
-  for(const b of S.eb){SL.z=b.z;at(c,b.x,b.y,K);if(!pic(c,'fx-bullet-enemy',b.x,b.y,Math.max(16,b.r*2.4),Math.atan2(b.vy||0,b.vx||1))){c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();}c.restore();}   // no picture yet: the plain shot
+  for(const b of S.eb){SL.z=b.z;at(c,b.x,b.y,K);const ko=keyed('fx-bullet-enemy');if(ko){const w=14,h=w*ko.height/ko.width;c.drawImage(ko,b.x-w/2,b.y-h/2,w,h);}else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();}c.restore();}   // no picture yet: the plain shot
   SL.z=null;for(const f of S.fx){if(!window.AH)break;if(f.pic){if(SL.band)SL.z=f.z==null?null:f.z;at(c,f.x,f.y,K);AH.ftFx(c,f);c.restore();}else if(f.arc)AH.ftArc(c,Object.assign({},f,{arc:f.arc.map(([x,y])=>[x,SL.my(y)])}));}SL.z=null;
-  c.restore();const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);return true;}
+  c.restore();const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);return true;}
 SL.draw=function(c){return RET.purefoot?pure(c):old.apply(this,arguments);};
 })();

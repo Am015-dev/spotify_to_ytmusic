@@ -29,7 +29,7 @@ Line numbers are on this branch (`parts/street/...` unless named).
 | Front-shield bar (blue rect) | streetlook.js:143 | off |
 | Shield ring (code arc), dash afterimage box | streetlook.js:149-150 | off |
 | Muzzle fallback white disc | streetlook.js:152 | off (owner muzzle picture `fx-ft-*-muzzle` only) |
-| Enemy shots: dark ring + flat disc (READ.footEb) or disc + white core | streetlook.js:157, render/readable.js:63 | owner `fx-bullet-enemy` orb, 'lighter', width 2.4 x hit radius (flat disc only while the picture loads) |
+| Enemy shots: dark ring + flat disc (READ.footEb) or disc + white core | streetlook.js:157, render/readable.js:63 | owner `fx-bullet-enemy` orb as a keyed copy (alpha from brightness, faint outer glow cut, cropped to the core), normal blend, 14 units wide (about the pistol muzzle flash; round 2, orchestrator: the first version drew it ~150 px) |
 | Player shots without a picture: rects / discs | streetlook.js:155 | owner `fx-ft-*` bullet pictures only |
 | Effects: slash arcs, rings (e.g. CALLING HELP ring, streethard.js:50), particle squares | streetlook.js:160-163 | off; owner fx pictures (`f.pic`) and the arc picture stay |
 | Floating text in the field ("+120", "+180 BEAT", "CALLING HELP") | streetlook.js:165-166, streethard.js:46 | off |
@@ -39,9 +39,9 @@ Line numbers are on this branch (`parts/street/...` unless named).
 | Sign pole + flat prop box with white stroke | streetlook.js:124-126 | off; street2 prop pictures; a prop with no picture keeps a plain box (it blocks shots) |
 | Placeholder backdrop tiles with labels | streetlook.js:66-73 | not reached while the painted layers are loaded (same as before) |
 | Stage hook drawings: danger lanes (dashed), pound marks (ellipse), flamer tongue (gradient), fire patch (rect), heal beam (line) | footstage.js:179-183 | lanes / marks / beam off (the attack pose is the tell); flamer tongue and fire patch as owner `fx-ft-flame` pictures |
-| Guard arc, guard meter + "GUARD" label, "OPEN" over staggered foes, full-screen white parry flash | streetguard.js:71-76 | off (guard and parry still work; the button and sounds are unchanged) |
+| Guard arc, guard meter + "GUARD" label, "OPEN" over staggered foes, full-screen white parry flash | streetguard.js:71-76 | off in the field; the guard meter (GUARD / GUARD BROKEN) is an edge-HUD row under the hearts panel while guarding or refilling |
 | Combo panel "N HITS / in a row, keep hitting" | streetcombo.js:24-32 | off |
-| OVERDRIVE panel + caption | streetfeel.js:53-60 | off (the mechanic is unchanged; the bomb button still fires it) |
+| OVERDRIVE panel + caption | streetfeel.js:53-60 | edge-HUD row under the hearts panel (same plate style): meter, then "OVERDRIVE READY: BOMB" blinking when full |
 | Hint line in the field ("GUARD: hold to block...") | streetlook.js:190 | off |
 | BEHIND caption ("foe arriving from the left") | streetlook.js:192 | only the arrow at the left edge |
 | Section progress bar under the HUD | streetlook.js:198 (stage hook hud) | off |
@@ -58,11 +58,11 @@ Scores 0-10 per row, from the shots in this folder.
 
 | Test | off | on | What still fails with purefoot on, and the fix |
 |---|---|---|---|
-| 1 Owner-art (code marks in the field) | 2 | 8 | Only edge HUD left. The HUD panel is code text on the owner's plate; numbers are fine, the PISTOL / bomb lines could be owner icons |
+| 1 Owner-art (code marks in the field) | 2 | 8 | Only edge HUD left (hearts panel + the overdrive / guard plate under it). The HUD panel is code text on the owner's plate; numbers are fine, the PISTOL / bomb lines could be owner icons |
 | 2 Grayscale (actors vs street by value) | 4 | 6 | The olive-green foes and the dark hooded Kai sit at the same value as the dark street; the benchmark outlines every actor. Art fix (not code): a 2-3 px dark outline + lighter top-light on the actor sheets |
 | 3 Silhouette | 6 | 7 | Rusher / gunner / Kai read apart by shape (knife, pistol arm, hood). Two rushers side by side merge |
 | 4 Find-the-player (phone) | 4 | 6 | Kai is the only hooded figure, but is no brighter than the foes. A clean rim/engine-like accent in the Kai sheet would do it (art) |
-| 5 Bullets | 4 | 7 | Gunner shot = one big lime owner orb, a colour nothing else uses. Player pistol shots are small; muzzle flash carries them |
+| 5 Bullets | 4 | 7 | Gunner shot = a small lime owner orb (flash-sized), a colour nothing else uses. Player pistol shots are small; muzzle flash carries them. Its hit radius (26) is now larger than the picture |
 | 6 Clutter (non-art marks) | 1 (8 marks: hint, progress bar, 2 OVERDRIVE lines, HITS panel, CALLING HELP, +180 BEAT, pink squares) | 9 (0) | - |
 | 7 Benchmark side by side | 2 | 6 | Still amateur next to the benchmark: actors are thin and small against a very detailed painting (benchmark actors are chunkier with stronger outlines), and the foreground rubble strip takes ~20% of the phone field |
 
