@@ -34,21 +34,22 @@ function turn(c,e,x){const now=F.S.time,sn=now-(e._td==null?-9:e._td)<=.1;e._td=
 /* W234 bullets, the ENGINE-LESSONS 1 recipe (normal blend): 1 px dark rim, tinted edge, small white core; 'lighter' only for a small halo. Foe shots are round and warm (their own colour unless it is cyan-ish), player shots are long cyan streaks */
 const hueOf=h=>{h=/^#[0-9a-f]{6}$/i.test(h)?h:'#ff4a6a';const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),bl=parseInt(h.slice(5,7),16),mx=Math.max(r,g,bl),mn=Math.min(r,g,bl);if(mx-mn<40)return 350;const d=mx-mn,q=mx===r?((g-bl)/d+6)%6:mx===g?(bl-r)/d+2:(r-g)/d+4;return q*60;};
 function halo(c,x,y,r,col,al){c.save();c.globalCompositeOperation='lighter';c.globalAlpha=al;const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col);g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(x-r,y-r,2*r,2*r);c.restore();}
-function eShot(c,b){const a=Math.atan2(b.vy,b.vx),sp=Math.hypot(b.vx,b.vy),h=hueOf(b.c),ed=h>140&&h<230?350:h,tl=Math.max(6,Math.min(13,sp*.035)),E='hsl('+Math.round(ed)+',100%,66%)',R=3.6;c.save();c.translate(b.x,b.y);c.rotate(a);
-  halo(c,0,0,R*2.1,'hsl('+Math.round(ed)+',100%,55%)',.35);
-  c.fillStyle='#120818';c.beginPath();c.moveTo(0,-R-1);c.lineTo(-tl,0);c.lineTo(0,R+1);c.arc(0,0,R+1,Math.PI/2,-Math.PI/2,true);c.fill();   // rim: the orb and its short tail, 1 px bigger
-  c.fillStyle='hsl('+Math.round(ed)+',100%,40%)';c.beginPath();c.moveTo(0,-R*.8);c.lineTo(-tl*.85,0);c.lineTo(0,R*.8);c.fill();
-  c.fillStyle=E;c.beginPath();c.arc(0,0,R,0,6.283);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(0,0,R*.6,0,6.283);c.fill();c.restore();}
-function pShot(c,b){if(b.kind!=='bul'&&b.kind!=='pel')return AH.ftBul(c,b);const a=Math.atan2(b.vy,b.vx),pel=b.kind==='pel',L=pel?5:9,R=pel?1.8:2;c.save();c.translate(b.x,b.y);c.rotate(a);
-  halo(c,0,0,L*1.1,'hsl(188,100%,55%)',.3);
-  c.fillStyle='#061418';c.beginPath();c.moveTo(-L-1,0);c.lineTo(-L*.2,-R-1);c.lineTo(L*.35,-R-1);c.lineTo(L*.7+1,0);c.lineTo(L*.35,R+1);c.lineTo(-L*.2,R+1);c.fill();
-  c.fillStyle='hsl(188,100%,62%)';c.beginPath();c.moveTo(-L,0);c.lineTo(-L*.2,-R);c.lineTo(L*.35,-R);c.lineTo(L*.7,0);c.lineTo(L*.35,R);c.lineTo(-L*.2,R);c.fill();
-  c.fillStyle='#fff';c.fillRect(-L*.3,-R*.38,L*.8,R*.76);c.restore();}   // a streak, longer than wide, under the foe shots (drawn first)
+/* W237 bullets (ENGINE-LESSONS 1, normal blend, sized in CSS px): foe shot = an elongated tracer about 14 x 4 px, white-hot core, its own warm edge, a dark rim; player shot = a thin cyan needle with a bright head, drawn first (under foe shots) */
+const px=c=>{const m=c.getTransform();return (window.devicePixelRatio||1)/Math.hypot(m.a,m.b);};
+function caps(c,L,R){c.beginPath();c.moveTo(-L/2+R,-R);c.lineTo(L/2-R,-R);c.arc(L/2-R,0,R,-Math.PI/2,Math.PI/2);c.lineTo(-L/2+R,R);c.arc(-L/2+R,0,R,Math.PI/2,Math.PI*1.5);c.fill();}
+function eShot(c,b){const a=Math.atan2(b.vy,b.vx),h=hueOf(b.c),ed=h>140&&h<230?350:h,q=px(c);c.save();c.translate(b.x,b.y);c.rotate(a);c.scale(q,q);
+  c.fillStyle='#0c0410';caps(c,19,4);   // dark rim, 2 px all round
+  c.fillStyle='hsl('+Math.round(ed)+',100%,52%)';caps(c,15,2.2);   // coloured edge
+  c.fillStyle='hsl('+Math.round(ed)+',100%,85%)';caps(c,12,1.6);c.fillStyle='#fff';c.translate(1.5,0);caps(c,9,1.3);c.restore();}   // hot core, brightest at the head
+function pShot(c,b){if(b.kind!=='bul'&&b.kind!=='pel')return AH.ftBul(c,b);const a=Math.atan2(b.vy,b.vx),pel=b.kind==='pel',L=pel?12:20,q=px(c);c.save();c.translate(b.x,b.y);c.rotate(a);c.scale(q,q);
+  c.fillStyle='#04121a';c.beginPath();c.moveTo(-L/2-1.5,0);c.lineTo(L/2-3,-3);c.lineTo(L/2+2.5,0);c.lineTo(L/2-3,3);c.fill();   // dark rim: a needle, pointed both ends
+  c.fillStyle='hsl(188,100%,58%)';c.beginPath();c.moveTo(-L/2,0);c.lineTo(L/2-3,-1.6);c.lineTo(L/2+.8,0);c.lineTo(L/2-3,1.6);c.fill();
+  c.fillStyle='#f4feff';c.fillRect(L/2-9,-.8,8.5,1.6);c.restore();}
 function efx(c,K,at,ko){const S=F.S,now=S.time,d=efT==null?0:Math.max(0,Math.min(.1,now-efT));efT=now;
   for(const b of S.eb)if(!EB.has(b)){EB.add(b);EFX.push({x:b.x,y:b.y,z:b.z,t:0,m:.08,k:'m'});MV.log.muz++;}
   const cur=new Set(S.eb);for(const b of ebLast)if(!cur.has(b)&&b.life>.05){EFX.push({x:b.x,y:b.y,z:b.z,t:0,m:.18,k:'i'});MV.log.imp++;}ebLast=S.eb.slice();
   for(let i=EFX.length-1;i>=0;i--){const f=EFX[i];f.t+=d;if(f.t>=f.m||EFX.length>40){EFX.splice(i,1);continue;}if(!ko)continue;const k=f.t/f.m,w=f.k==='m'?10*(1-.4*k):6+9*k;SL.z=f.z;at(c,f.x,f.y,K);
-    halo(c,f.x,f.y,w*.8,f.k==='m'?'#ffd9a0':'#ffffff',(1-k)*.7);c.restore();}   /* W234: a small white-hot flash in the shot's own spot (the owner's green orb tinted every foe shot green) */SL.z=null;}   // enemy muzzle frame at the shot's start, impact where it stopped (cover, Kai, the knife)
+    halo(c,f.x,f.y,w*.6,f.k==='m'?'#ffd9a0':'#ffffff',(1-k)*.45);c.restore();}   /* W234: a small white-hot flash in the shot's own spot (the owner's green orb tinted every foe shot green) */SL.z=null;}   // enemy muzzle frame at the shot's start, impact where it stopped (cover, Kai, the knife)
 /* edge HUD tells under the hearts panel (no play-field drawing): overdrive meter / READY, guard meter while it is used or refilling */
 function tells(c,L,S,u,fs){const b=L.hud&&L.hud.hud&&L.hud.hud[0];if(!b)return;const rows=[],OD=F.OD,g=S.gd;
   if(RET.overdrive&&OD&&OD.v>0){const full=OD.v>=OD.max;rows.push([full?'OVERDRIVE READY: BOMB':'OVERDRIVE',OD.v/OD.max,full?(Math.floor(S.time*4)%2?'#ffffff':'#19e3ff'):'#19a8c8']);}
@@ -66,7 +67,8 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
   const sh=S.shake?IN.ftRnd(-S.shake,S.shake)*.5:0;SL.road=L.box.y+(FL+sh*.5-t0)*L.sc;SL.cam=S.camX;
   c.save();c.translate(sh,sh*.5);X.slBackdrop(c,S,vw,exl,exr,t0,Math.min(3,sc));if(RET.footmove){const FR=FL-(SL.band||0),g=c.createLinearGradient(0,t0,0,FR);const bx=-exl-20,bw=vw+exl+exr+40;c.save();c.globalCompositeOperation='saturation';c.fillStyle='rgba(128,128,128,.45)';c.fillRect(bx,t0-10,bw,FR-t0+10);c.restore();   // W228: backdrop saturation down
     g.addColorStop(0,'rgba(9,5,26,.55)');g.addColorStop(1,'rgba(9,5,26,.42)');c.fillStyle=g;c.fillRect(bx,t0-10,bw,FR-t0+10);   // W228: backdrop value down (actors are the loudest plane)
-    const hz=(FR-t0)*.4,hg=c.createLinearGradient(0,FR-hz,0,FR);hg.addColorStop(0,'rgba(70,58,96,0)');hg.addColorStop(.7,'rgba(70,58,96,.26)');hg.addColorStop(1,'rgba(70,58,96,.14)');c.fillStyle=hg;c.fillRect(bx,FR-hz,bw,hz);
+    const hz=(FR-t0)*.4,hg=c.createLinearGradient(0,FR-hz,0,FR);hg.addColorStop(0,'rgba(70,58,96,0)');hg.addColorStop(.7,'rgba(70,58,96,.12)');hg.addColorStop(1,'rgba(70,58,96,.06)');c.fillStyle=hg;c.fillRect(bx,FR-hz,bw,hz);
+    const vh=(FR-t0)*.62,vg=c.createLinearGradient(0,FR-vh,0,FR+20);vg.addColorStop(0,'rgba(4,2,12,0)');vg.addColorStop(.55,'rgba(4,2,12,.32)');vg.addColorStop(1,'rgba(4,2,12,.4)');c.fillStyle=vg;c.fillRect(bx,FR-vh,bw,vh+20);   // W237: a soft dark band behind the fighters' bodies (backdrop only, under the actors), so the rim and outline separate them without lifting their colours
     const fg=c.createLinearGradient(0,FR,0,FR+36);fg.addColorStop(0,'rgba(70,58,96,.14)');fg.addColorStop(1,'rgba(70,58,96,0)');c.fillStyle=fg;c.fillRect(bx,FR,bw,36);
     c.fillStyle='rgba(5,3,12,.38)';c.fillRect(bx,FR,bw,L.cv.height/(L.sc*dpr)+t0-FR+40);
     const fd=c.createLinearGradient(0,FR,0,FL+30);fd.addColorStop(0,'rgba(5,3,12,0)');fd.addColorStop(.45,'rgba(5,3,12,.3)');fd.addColorStop(1,'rgba(5,3,12,.55)');c.fillStyle=fd;c.fillRect(bx,FR,bw,L.cv.height/(L.sc*dpr)+t0-FR+40);}   // W232: the front lanes settle darker, so the road reflections under Kai and the foes stay below their value   // W228: the floor a value step down too, so the lit fighters lead   // W228: a haze band behind the play line   // footmove: the backdrop a step darker than the play plane (aerial depth), the floor untouched
