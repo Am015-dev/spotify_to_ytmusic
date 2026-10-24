@@ -51,7 +51,7 @@ const RUN = async (SEED) => { const rnd = sd => () => { sd = (sd * 16807) % 2147
         for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) if (m[y * bw + x]) for (let yy = Math.max(0, y - rg); yy <= Math.min(bh - 1, y + rg); yy += 2) for (let xx = Math.max(0, x - rg); xx <= Math.min(bw - 1, x + rg); xx += 2) dil[yy * bw + xx] = 1;
         for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) { const j = ((y + by0) * W + x + bx0) * 4; if (m[y * bw + x]) { ca += lum(A.d, j); na++; } else if (dil[y * bw + x]) { cr += lum(A.d, j); nr++; } } }
       const a = na ? ca / na : 0, r = nr ? cr / nr : 0, con = na > 20 && nr ? (Math.max(a, r) + .05) / (Math.min(a, r) + .05) : null;
-      row.push({ who: o.e === P ? 'kai' : o.e.id, z: o.e.z == null ? null : +o.e.z.toFixed(2), dark: dark == null ? null : +dark.toFixed(2), con: con == null ? null : +con.toFixed(2), a: +a.toFixed(3), r: +r.toFixed(3) }); }
+      row.push({ st: o.e.state + (o.e._ka ? '/ka' : ''), who: o.e === P ? 'kai' : o.e.id, z: o.e.z == null ? null : +o.e.z.toFixed(2), dark: dark == null ? null : +dark.toFixed(2), con: con == null ? null : +con.toFixed(2), a: +a.toFixed(3), r: +r.toFixed(3) }); }
     out.push({ t: +S.time.toFixed(1), spread: spread == null ? null : +spread.toFixed(2), f: row });
     if (Math.abs(t - 45) < 1e-6) { shot = out.length - 1; if (window.__snap) await window.__snap(); } }
   const steps = i; return { steps, out, shot, ms };
@@ -65,7 +65,7 @@ const RUN = async (SEED) => { const rnd = sd => () => { sd = (sd * 16807) % 2147
   const t0 = Date.now(), r = await p.evaluate(`(${RUN})(${SEED})`), wall = (Date.now() - t0) / 1000;
   const med = a => { const s = a.filter(v => v != null).sort((x, y) => x - y); return s.length ? s[s.length >> 1] : null; }, mn = a => { const s = a.filter(v => v != null); return s.length ? Math.min(...s) : null; };
   const M = r.out.filter((o, k) => k !== r.shot || r.out.length <= 8).slice(0, 8);   // the 8 random moments (the t = 45 s frame is the shot)
-  for (const o of r.out) console.log('t ' + o.t + ' spread ' + o.spread + ' | ' + o.f.map(f => f.who + ' z' + f.z + ' sh' + f.dark + ' c' + f.con + (process.env.DBG ? ' a' + f.a + ' r' + f.r : '')).join(', '));
+  for (const o of r.out) console.log('t ' + o.t + ' spread ' + o.spread + ' | ' + o.f.map(f => f.who + ' z' + f.z + ' sh' + f.dark + ' c' + f.con + (process.env.DBG ? ' a' + f.a + ' r' + f.r + ' ' + f.st : '')).join(', '));
   const sp = med(M.map(o => o.spread)), dk = mn(M.flatMap(o => o.f.map(f => f.dark))), cn = mn(M.flatMap(o => o.f.map(f => f.con))), cmed = med(M.flatMap(o => o.f.map(f => f.con)));
   console.log(`${sp >= .4 ? 'PASS' : 'FAIL'} median depth spread ${sp} (>= .40 of the belt)`);
   console.log(`${dk >= .25 ? 'PASS' : 'FAIL'} min shadow darkness ${dk} (>= .25)`);

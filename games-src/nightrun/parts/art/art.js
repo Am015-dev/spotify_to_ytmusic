@@ -161,11 +161,23 @@ ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(ke
   if(ts<(fo?.9:.75)){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
     if(!q){ch=Math.max(1,Math.round(h*cw/w));const cv_=document.createElement('canvas');cv_.width=cw*m[0];cv_.height=ch;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*cw,0,cw,ch);q=ART.sc[k]={c:cv_,h:ch};}
     b=q.c;ch=q.h;}
+  let pd=0;if(ART.olK){const k='o|'+ART.olK+(flip?'F':'')+'|'+key+'@'+cw,q=ART.sc[k]||(ART.sc[k]=ART.olB(b,cw,ch,m[0],ART.olK,flip,cw/(w*ts)));b=q.c;pd=q.p;}   // W230: the outlined + rim-lit copy (built once per strip, scale and facing)
   if(flip){c.save();c.translate(x,y);c.scale(-1,1);x=0;y=0;}
-  const dx=x-m[4]*sc,dy=y-m[5]*sv;if(al!=null)c.globalAlpha=al*ga;
-  c.drawImage(b,i*cw,0,cw,ch,dx,dy,w*sc,h*sv);
-  if(cf>0){c.globalAlpha=(al==null?1:al)*ga*cf;c.drawImage(b,((i+1)%m[0])*cw,0,cw,ch,dx,dy,w*sc,h*sv);}
+  const ux=w*sc/cw,uy=h*sv/ch,dx=x-m[4]*sc-pd*ux,dy=y-m[5]*sv-pd*uy,cs=cw+2*pd,dw=cs*ux,dh=(ch+2*pd)*uy;if(al!=null)c.globalAlpha=al*ga;
+  c.drawImage(b,i*cs,0,cs,ch+2*pd,dx,dy,dw,dh);
+  if(cf>0){c.globalAlpha=(al==null?1:al)*ga*cf;c.drawImage(b,((i+1)%m[0])*cs,0,cs,ch+2*pd,dx,dy,dw,dh);}
   if(flip)c.restore();c.globalAlpha=ga;return true;};
+/* W230 footmove (owner exception, WORKER-RULES 17h): an on-foot actor strip with a 2-3 px near-black violet outline, a thin rim light on the top / neon side (cyan on Kai, warm orange on foes),
+   the key light baked in (was a per-draw filter) and, on Kai only, the darkest values lifted. u = strip px per device px; returns {c, p}: cells padded by p on every side */
+ART.olB=(src,cw,ch,n,md,flip,u)=>{const kai=md==='kai',p=Math.ceil(3*u)+1,cs=cw+2*p,H=ch+2*p,mk=(w,h)=>{const v=document.createElement('canvas');v.width=w;v.height=h;return v;};
+  const out=mk(cs*n,H),o=out.getContext('2d'),a=mk(cs,H),g=a.getContext('2d'),s=mk(cs,H),q=s.getContext('2d'),r=2*u,lx=(flip?1:-1)*.5,ly=-1,rw=Math.max(1,(kai?2:1.6)*u);
+  for(let j=0;j<n;j++){g.clearRect(0,0,cs,H);g.filter=kai?'brightness(1.75) saturate(1.1)':'brightness(1.75) saturate(1.15)';g.drawImage(src,j*cw,0,cw,ch,p,p,cw,ch);g.filter='none';   // the key light, as before
+    if(kai){const im=g.getImageData(0,0,cs,H),d=im.data;for(let i=0;i<d.length;i+=4){if(!d[i+3])continue;for(let k=0;k<3;k++){const v=d[i+k]/255;d[i+k]=255*(v+.2*Math.pow(1-v,3));}}g.putImageData(im,0,0);}   // Kai: lift the darkest values (a black 0 -> .2, mid .5 -> .53)
+    q.clearRect(0,0,cs,H);q.globalCompositeOperation='source-over';for(let k=0;k<16;k++){const t=k*Math.PI/8;q.drawImage(a,r*Math.cos(t),r*Math.sin(t));}q.globalCompositeOperation='source-in';q.fillStyle='#12081c';q.fillRect(0,0,cs,H);   // outline: the silhouette dilated r px
+    q.globalCompositeOperation='source-over';q.drawImage(a,0,0);
+    g.globalCompositeOperation='destination-out';g.drawImage(a,-lx*rw,-ly*rw);g.globalCompositeOperation='source-in';g.fillStyle=kai?'#7ff6ff':'#ffa04a';g.fillRect(0,0,cs,H);g.globalCompositeOperation='source-over';   // the rim: the edge of the body that faces the light
+    q.globalAlpha=kai?.9:.8;q.drawImage(a,0,0);q.globalAlpha=1;o.drawImage(s,j*cs,0);}
+  return {c:out,p};};
 ART.gh=[];      // clips that outlive their object (boss defeat, ship death): {key,x,y,k,t}
 ART.ghosts=()=>{const g=ART.gh;for(let i=g.length-1;i>=0;i--){const q=g[i],o=ART.aS(q.key);q.t+=FD;if(!o||q.t>o.tot+.2){g.splice(i,1);continue;}ART.drawAnim(ctx,q.key,q.t,q.x,q.y,q.k,false);}};
 const SPR={_sq:1,_di:-1};
@@ -219,9 +231,9 @@ ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=A
   const cr=false,sc=ART.bsc(m,h),sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;
   const dead=act==='die'&&who!=='kai',fade=dead?1-.85*Math.min(1,Math.max(0,tt-.4)/.8):1,ga=c.globalAlpha;
   c.save();c.translate(x,y);if(RET.footmove&&who!=='drone'&&who!=='jetpack'&&ART.fE){c.save();c.globalCompositeOperation='multiply';c.globalAlpha=ga*fade;c.filter='brightness(0) blur(1px)';c.transform(1,0,.4,1,0,0);c.scale(1,-.22);ART.drawAnim(c,key,tt,0,0,sc,flip,null,1);c.restore();}   /* W223 footmove (OpenBOR): the shadow is the actor's own frame, flattened onto the road and multiplied */
-  if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*(RET.footmove?.95:.75),who==='drone'||who==='jetpack'?.6*fade:fade);
+  if(window.FA&&FA.shadow)FA.shadow(c,RET.footmove?Math.max(m[2]*sc*.95,h*.5):m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
   if(act==='run'||act==='runshoot'||act==='walk')c.rotate(sm.lean.run_deg*Math.PI/180*(flip?-1:1));
-  c.globalAlpha=ga*fade;const kl=RET.footmove&&ART.fE;if(kl)c.filter='brightness(1.75) saturate(1.15)';ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);if(kl)c.filter='none';if(sub&&pose==='hit'){c.globalCompositeOperation='lighter';ART.drawAnim(c,key,tt,0,0,sc,flip,.5,sy);c.globalCompositeOperation='source-over';}c.restore();return true;};   // a borrowed hit act flashes white
+  c.globalAlpha=ga*fade;const kl=RET.footmove&&ART.fE;if(kl)ART.olK=who==='kai'?'kai':'foe';try{ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);}finally{ART.olK=null;}if(sub&&pose==='hit'){c.globalCompositeOperation='lighter';ART.drawAnim(c,key,tt,0,0,sc,flip,.5,sy);c.globalCompositeOperation='source-over';}c.restore();return true;};   // a borrowed hit act flashes white
 }
 /* ----- street props behind the actors: a few per parallax cell, standing on the road line (pf = FL), looping at the sheet fps ----- */
 ART.PROPS=[['car',80,0],['police',84,0],['steam',120,0],['beacon',160,0],['neon',150,0],['banner',170,0],['holo',150,0],['windows',190,0],['drone',58,1]];
