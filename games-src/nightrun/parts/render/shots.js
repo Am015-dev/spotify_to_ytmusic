@@ -4,7 +4,7 @@
 /* ---------- shots.js (owner, 24 Oct 2026: "bullets of ships are identical, player bullets are not visible at all"). RET.shots.
    Player shots (FXW.bullet hook, drawn in the player-shot loop of render(), BEFORE any enemy shot): a dark underlay, the weapon's own picture (media/fx-w-<weapon>-bullet) 30 % larger and
    full strength, and a cyan glow line with a white core that is at least 6 screen px wide. Muzzle flashes and hit sparks (ART.boom keys *-muzzle / *-hit / hit-spark) are drawn 50 % larger.
-   Enemy shots (FXV.bullets hook + ART.fxDraw hook): drawn AFTER the explosions, so nothing covers them. One look per kind, each a shape AND a colour of its own, all with a dark outline and a white core:
+   Enemy shots (FXV.bullets hook + ART.fxDraw hook): the owner's pictures (fx-bullet-enemy / needle / shell / rocket, fx-eb-plasma, fx-eb-rocket-trail) on a dark outline, drawn AFTER the explosions, so nothing covers them. One look per kind, each a shape AND a colour of its own, all with a dark outline and a white core:
    turret = pink ball, timing-wall bullets = lime square, gunship = orange diamond, charger = red hollow ring, drone / flanker = yellow needle, shell = big orange ball with a white ring, rocket = red rocket, homing = magenta ball in a ring.
    Hit sizes, counts and damage are untouched (b.r stays); only drawing changes. ---------- */
 if(RET.shots===undefined)RET.shots=!/[?&]shots=0/.test(location.search);
@@ -17,23 +17,24 @@ const SHOTS=window.SHOTS={seq:0,pLast:0,eFirst:1e9,eUnder:0,seen:{},pp:[],
   cvs:null,   // qa: the canvas the last player shot was drawn on (the world canvas when the screen is turned)
   reset(){this.seq=0;this.pLast=0;this.eFirst=1e9;this.eUnder=0;this.pp.length=0;},
   log(){return{looks:Object.keys(this.seen),eUnderP:this.eUnder,pp:this.pp.slice()};},
-  /* enemy shots: one pass per look layer so a layer is one path */
+  /* enemy shots: the owner's pictures (PIC: id, hue shift or 0, width in radii, extra), each on a dark outline disc with a white core so they read on any backdrop; the old drawn shapes only when the picture is missing */
+  PIC:{orb:['fx-bullet-enemy',-92,3.6],square:['fx-bullet-enemy',0,3.6],homer:['fx-bullet-enemy',-140,3.6],ring:['fx-bullet-shell',0,3.4],shell:['fx-bullet-shell',0,4.6],diamond:['fx-eb-plasma',0,4.4],needle:['fx-bullet-needle',0,9],rocket:['fx-bullet-rocket',0,5.4]},
+  spr(l,w){const q=this.PIC[l],id=q[0];if(!ART.have(id))return null;return q[1]?ART.hue(id,w,q[1]):ART.sp(id,w);},
   enemy(){if(!RET.shots||!running)return;const L=G.eb;if(!L.length)return;const hc=SET.hc||RET.asBigOn(),bg=(RET.asBigOn()?1.35:1)*1.12,C=this.COL,R=this.RING;
     ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=1;for(const b of L){const l=this.look(b);this.seen[l]=1;G_(b.x,b.y,b.r*bg*3.4,C[l],.4);}
     ctx.globalCompositeOperation='source-over';ctx.lineCap='round';
     for(const b of L){const l=this.look(b),c=C[l],r=b.r*bg,x=b.x,y=b.y;if(this.eFirst>this.seq)this.eFirst=this.seq;if(this.seq<this.pLast)this.eUnder++;this.seq++;
-      if(l==='needle'||l==='rocket'){const a=Math.atan2(b.vy,b.vx),ca=Math.cos(a),sa=Math.sin(a),n=l==='needle',l0=n?r*3.4:r*3.2,l1=n?r*1.8:r*2.2,w=n?r:r*1.5,
-          seg=(wd,col,e0,e1)=>{ctx.strokeStyle=col;ctx.lineWidth=wd;ctx.beginPath();ctx.moveTo(x-ca*e0,y-sa*e0);ctx.lineTo(x+ca*e1,y+sa*e1);ctx.stroke();};
-        if(hc)seg(w*3.4,'#fff',l0+2,l1+2);seg(w*2.7,R,l0+1.2,l1+1.2);seg(w*1.7,c,l0,l1);seg(w*.8,this.CORE,l0*.8,l1*.7);continue;}
-      const k=l==='shell'?1.5:l==='diamond'?1.15:1,rr=r*k;
+      const a=Math.atan2(b.vy,b.vx),ca=Math.cos(a),sa=Math.sin(a),lin=l==='needle'||l==='rocket',rr=r*(l==='shell'?1.5:1),o=this.spr(l,r*this.PIC[l][2]*(l==='shell'?1.3:1));
+      if(l==='rocket'){const t=ART.sp('fx-eb-rocket-trail',r*11);if(t){ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x-ca*r*6,y-sa*r*6);ctx.rotate(a);ctx.drawImage(t.c,-t.w/2,-t.h/2,t.w,t.h);ctx.restore();}}
+      if(lin){const l0=l==='needle'?r*3.4:r*3.2,l1=l==='needle'?r*1.8:r*2.2,w=l==='needle'?r:r*1.5,seg=(wd,col,e0,e1)=>{ctx.strokeStyle=col;ctx.lineWidth=wd;ctx.beginPath();ctx.moveTo(x-ca*e0,y-sa*e0);ctx.lineTo(x+ca*e1,y+sa*e1);ctx.stroke();};
+        if(hc)seg(w*3.4,'#fff',l0+2,l1+2);seg(w*2.7,R,l0+1.2,l1+1.2);
+        if(!o)seg(w*1.7,c,l0,l1);else{ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);ctx.rotate(a);ctx.drawImage(o.c,-o.w*.55,-o.h*(l==='needle'?1.6:.5),o.w,o.h*(l==='needle'?3.2:1));ctx.restore();}
+        seg(w*.8,this.CORE,l0*.8,l1*.7);continue;}
       if(hc){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,rr*2.1,0,7);ctx.fill();}
-      if(l==='square'){const q=(m)=>ctx.fillRect(x-rr*m,y-rr*m,rr*m*2,rr*m*2);ctx.fillStyle=R;q(1.75);ctx.fillStyle=c;q(1.3);ctx.fillStyle=this.CORE;q(.6);continue;}
-      if(l==='diamond'){const d=(m)=>{ctx.beginPath();ctx.moveTo(x,y-rr*m);ctx.lineTo(x+rr*m,y);ctx.lineTo(x,y+rr*m);ctx.lineTo(x-rr*m,y);ctx.closePath();ctx.fill();};
-        ctx.fillStyle=R;d(2.2);ctx.fillStyle=c;d(1.65);ctx.fillStyle=this.CORE;d(.85);continue;}
       ctx.fillStyle=R;ctx.beginPath();ctx.arc(x,y,rr*(l==='ring'?2:1.75),0,7);ctx.fill();
-      ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,rr*(l==='ring'?1.65:1.3),0,7);ctx.fill();
-      if(l==='ring'){ctx.fillStyle=R;ctx.beginPath();ctx.arc(x,y,rr*.85,0,7);ctx.fill();ctx.fillStyle=this.CORE;ctx.beginPath();ctx.arc(x,y,rr*.4,0,7);ctx.fill();}
-      else{ctx.fillStyle=this.CORE;ctx.beginPath();ctx.arc(x,y,rr*.62,0,7);ctx.fill();}
+      if(o){ctx.globalCompositeOperation='lighter';ctx.drawImage(o.c,x-o.w/2,y-o.h/2,o.w,o.h);ctx.globalCompositeOperation='source-over';}
+      else{ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,rr*1.3,0,7);ctx.fill();}
+      ctx.fillStyle=this.CORE;ctx.beginPath();ctx.arc(x,y,rr*.5,0,7);ctx.fill();
       if(l==='shell'||l==='homer'){ctx.strokeStyle=l==='shell'?'#fff':R;ctx.lineWidth=l==='shell'?1.8:2.4;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(x,y,rr*(l==='shell'?2.1:2.3),0,7);ctx.stroke();ctx.globalAlpha=1;}}
     ctx.restore();},
   lens(x0,x1,h){ctx.beginPath();ctx.moveTo(x0,0);ctx.quadraticCurveTo((x0+x1)/2,-h*1.6,x1,0);ctx.quadraticCurveTo((x0+x1)/2,h*1.6,x0,0);},   // a pointed bolt, h = half thickness (the curves reach 0.8 h)
