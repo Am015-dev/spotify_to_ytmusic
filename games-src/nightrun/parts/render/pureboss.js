@@ -25,11 +25,11 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
     ctx.restore();return true;},
   ebul(){for(const b of G.eb){const a=Math.atan2(b.vy||0,b.vx||-1),r=b.r||5;
       if(b.hm>0){this.pic('fx-bullet-shell',b.x,b.y,r*7,0,G.t*5);continue;}
-      if(b.k==='n'){this.pic('fx-bullet-needle',b.x,b.y,r*9,0,a);continue;}
+      if(b.k==='n'){if(PURL.pic('fx-bullet-shell',b.x,b.y,r*7,a,.38))PURL.pic('fx-bullet-needle~w',b.x,b.y,r*6,a,1.4);continue;}   // W215 r3: the yellow needle read as the player's colour: an orange shell bolt with a white-hot core
       if(b.k==='r'){this.pic('fx-bullet-rocket',b.x,b.y,r*8,0,a);continue;}
       if(b.ew||b.k==='m'){this.pic('fx-eb-mine',b.x,b.y,r*5);continue;}
       this.pic('fx-bullet-shell',b.x,b.y,r*5.2);}},
-  pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.translate(p.x,y);if(p.t==='pw')PW.coin(p.k,16);else pkPaint(p,t);ctx.restore();}},   // power-ups: the owner's icon only (no glow disc, dashed ring or name)
+  pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.translate(p.x,y);if(p.t==='pw')PW.coin(p.k,16);else if(!(p.t==='shard'&&PURL.coin(p,0,t,0)))pkPaint(p,t);ctx.restore();}},   // power-ups: the owner's icon only (no glow disc, dashed ring or name)
   bar(w){const b=G.boss;if(!b||b.x>=W||!(b.max>0))return;ctx.fillStyle='#ff6a2a';ctx.fillRect(0,0,w*clamp(b.hp/b.max,0,1),4);}};
 {const f=PURL.foe;PURL.foe=function(e,t){if(e.type==='boss')return PB.boss(e,t);if(e.type==='gate')return PB.gate(e,t);return f.call(this,e,t);};}
 PURL.pickups=function(t){PB.pickups(t);};
