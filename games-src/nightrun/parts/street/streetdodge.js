@@ -15,7 +15,7 @@ F.dodged=function(S,n,src){const P=S.P,d=get(S);
   if(!(P.dash>0)||d.got||DASH-P.dash>WIN)return;
   d.got=1;d.cc++;P.dgCrit=S.time+CRIT;
   if(!P.pw.slow)P.pw.slow={lv:1,t:SLOW,cc:1};else if(P.pw.slow.cc)P.pw.slow.t=SLOW;
-  S.pop.push({x:P.x,y:P.y-100,t:'CLOSE CALL','c':'#19e3ff',l:1.4,m:1.4,big:true});
+  S.pop.push({x:P.x,y:P.y-100,t:'CLOSE CALL','c':'#9ff8ff',l:1.4,m:1.4,big:true});
   if(!d.said){d.said=1;S.note={t:2.6,txt:'CLOSE CALL: TIME SLOWS, YOUR NEXT KNIFE HIT DOES DOUBLE'};}};
 const hf0=F.hitFeel;
 F.hitFeel=function(e,dm,src){if(hf0)hf0.apply(this,arguments);
