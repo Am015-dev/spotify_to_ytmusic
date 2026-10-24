@@ -4651,7 +4651,7 @@ function ftShake(v){if(reduce())return;S.shake=Math.max(S.shake,window.COM?COM.s
 const SFXID={shot:'f_shot',hit:'f_hit',pick:'f_pick',big:'f_big',hurt:'f_hurt',dash:'f_dash',graze:'f_graze',warn:'f_warn',up:'f_up',tier:'f_fever'};   // LAB (ON FOOT group of the SOUND page): each on-foot sound has its own switch
 // 22 Oct: 'window.AU' is undefined (AU is a script-level const), so these three calls never ran: no on-foot sound, no stage song. They use AU directly now, each behind its ON FOOT switch.
 const sndF=id=>!window.sndOn||sndOn(id);
-function sfx(n){try{if(!sndF(SFXID[n]||'f_'+n))return;if(typeof AU!=='undefined'&&AU.sfx)AU.sfx(n);}catch(e){}}
+function sfx(n){try{if(window.FTX&&FTX.owns(n)){FTX.old(n);return;}if(!sndF(SFXID[n]||'f_'+n))return;if(typeof AU!=='undefined'&&AU.sfx)AU.sfx(n);}catch(e){}}
 /* the song's beat: bpos() from a.js when the beat clock runs, else our own 120 bpm clock */
 function beatPos(){try{if(typeof bpos==='function'&&typeof BT!=='undefined'&&BT.mode!=='none'){const p=bpos(performance.now());if(isFinite(p))return p;}}catch(e){}return S?S.time*2:0;}
 function ftOnBeat(){const p=beatPos(),f=Math.abs(p-Math.round(p)),spb=(typeof BT!=='undefined'&&BT.spb)||.5,win=.11+((RET.asWinMs&&RET.asWinMs())||0)/1000;return f*spb<win;}
@@ -4698,7 +4698,7 @@ const hittable=e=>!e.dead&&!(e.def.canHit&&e.def.canHit(e)===false);
 function circHit(x,y,r,b){const cx=clamp(x,b.x,b.x+b.w),cy=clamp(y,b.y,b.y+b.h);return (x-cx)*(x-cx)+(y-cy)*(y-cy)<=r*r;}
 function dmgE(e,d,src){if(!hittable(e))return;const k=(S.P.pw.dbl?[1,2,2.4,2.8][S.P.pw.dbl.lv]:1)*(S.feverT>0?1.25:1);d*=k;
   if(e.def.front&&src&&Math.sign(src.vx||0)===-e.facing&&!src.pierce&&e.def.fb){d*=.4;}   // fallback shield: front blocks most
-  e.hp-=d;e.flash=.08;if(F.hitFeel)F.hitFeel(e,d,src);try{e.def.onHit&&e.def.onHit(e,d,env,{x:src&&src.x!=null?src.x-(src.vx||0)*.01:S.P.x,melee:!!(src&&src.melee)});}catch(x){}
+  e.hp-=d;e.flash=.08;if(window.FTX)FTX.ev(e.hp<=0?'foedeath':'foehurt');if(F.hitFeel)F.hitFeel(e,d,src);try{e.def.onHit&&e.def.onHit(e,d,env,{x:src&&src.x!=null?src.x-(src.vx||0)*.01:S.P.x,melee:!!(src&&src.melee)});}catch(x){}
   if(e.ext&&e.boss&&e.phase!==e._lp){if(e._lp!=null){hitstop(60);ftShake(10);note('PHASE '+e.phase,1.4);NR.emit('footPhase',{id:e.id,phase:e.phase});}e._lp=e.phase;}
   if(!e.ext&&e.boss&&e.def.phases){const fr=e.hp/e.max;while(e.phase<e.def.phases.length&&fr<=e.def.phases[e.phase].hp){e.phase++;hitstop(60);ftShake(10);note('PHASE '+(e.phase+1),1.4);NR.emit('footPhase',{id:e.id,phase:e.phase});}}
   if(e.hp<=0)ftKill(e);}
@@ -4726,7 +4726,7 @@ function autoTarget(P){const up=!RET.belt&&(I.u||I.y<-.5),vw=viewW(),fc=P.facing
   for(const p of S.pr){if(p.hp<=0)continue;const dx=(p.x-P.x)*fc;if(dx>10&&dx<300&&p.x>S.camX&&p.x<S.camX+vw&&(p.y>=FL-1||up))return true;}
   return false;}
 function fire(P){const s=wstat(P.w,P.lv),w=s.w,lv=P.lv,a0=aimAngle(P),a1=aimAssist(P,a0,P.x,P.y-(P.crouch?26:44)),a=P.aim=F.aimX?F.aimX(P,a1,a0):a1,ox0=P.x+Math.cos(a)*18,oy0=P.y-(P.crouch?26:44)+Math.sin(a)*14,mz=F.mz&&F.mz(P,a),ox=mz?mz[0]:ox0,oy=mz?mz[1]:oy0;   // streetfeel.js: from the drawn gun's muzzle
-  S.shots++;P.shotT=.12;const pr=(t)=>({z:P.z,x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
+  S.shots++;P.shotT=.12;if(window.FTX)FTX.ev('shot',P.w);const pr=(t)=>({z:P.z,x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
   if(w.kind==='bul'){const sp=(w.spr||0)*(1-.12*(lv-1)),n=(P.w==='hmg'&&lv>=5)?2:(P.w==='pistol'&&lv>=3?2:1);
     for(let i=0;i<n;i++){const aa=a+ftRnd(-sp,sp)+(n>1?(i-.5)*.08:0);S.pb.push(pr({vx:Math.cos(aa)*w.spd,vy:Math.sin(aa)*w.spd,pierce:(P.w==='hmg'&&lv>=3)?1:0}));}}
   else if(w.kind==='pel'){const n=w.pel+(lv>=3?2:0);for(let i=0;i<n;i++){const aa=a+(i-(n-1)/2)*(w.spr/n)*2+ftRnd(-.03,.03),v=w.spd*ftRnd(.85,1.1);S.pb.push(pr({vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,r:4,pierce:lv>=5?1:0,kb:lv>=5?220:60}));}if(!RET.hitfeel)ftShake(2);}
@@ -4750,8 +4750,9 @@ function collect(p){const P=S.P,d=PICKUPS[p.k];sfx('pick');let lv=1;
   else if(p.k==='bomb'){P.bombs=Math.min(9,P.bombs+1);pop(P.x,P.y-90,'+1 BOMB','#ffb020',true);}
   else{const c=P.pw[p.k];lv=c?Math.min(d.max,c.lv+1):1;P.pw[p.k]={lv,t:d.t+(p.k==='slow'?1.5*(lv-1):0)};pop(P.x,P.y-90,d.n+(d.max>1?' LV'+lv:''),d.c,true);}
   NR.emit('footPick',{id:p.k,lv});}
-function ftHurt(n,fromX,src){const P=S.P;if(P.inv>0||P.dashIF>0||S.win||P.hp<=0)return false;
-  if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');sfx('graze');return false;}
+function ftHurt(n,fromX,src,b){const P=S.P;if(P.inv>0||P.dashIF>0||S.win||P.hp<=0)return false;if(F.guardHit){const g=F.guardHit(n,fromX,src,b);if(g)return g>1;}   // streetguard.js: 1 = blocked, 2 = blocked and the shot is spent
+
+  if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');if(window.FTX)FTX.ev('block');sfx('graze');return false;}
   P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*(RET.hitfeel?170:240);
   sfx('hurt');ftShake(8);hitstop(40);ftBurst(P.x,P.y-40,'#ff4060',10);
   if(P.w!=='pistol'){const nl=P.lv-1;if(nl<1){pop(P.x,P.y-96,WEAPONS[P.w].n+' LOST','#ff4060');setW(P,'pistol',1,Infinity,false);}else{setW(P,P.w,nl,P.ammo,false);pop(P.x,P.y-96,WEAPONS[P.w].n+' LV'+nl,'#ff4060');}}
@@ -4784,11 +4785,11 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
   const lo=S.camX+16,hi=S.camX+viewW()-16;P.x=clamp(P.x,lo,hi);
   if(P.x>P.maxX+2){S.moved+=P.x-P.maxX;P.maxX=P.x;P.idle=0;}else P.idle+=dt;
   if((I.fire||(autoOn()&&autoTarget(P)))&&P.cd<=0&&!S.win){fire(P);P.cd=1/wstat(P.w,P.lv).rate;}
-  if(I.meleeP&&P.melCd<=0){P.mel=.2;P.melCd=.35;const r={x:P.facing>0?P.x:P.x-62,y:P.y-(P.crouch?44:64),w:62,h:P.crouch?44:64};let hit=0;
-    for(const e of S.E)if(hittable(e)&&zok(e.z,P.z)){const b=ebox(e);if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){dmgE(e,3,{pierce:1,melee:true,x:P.x});hit++;}}
+  if(I.meleeP&&P.melCd<=0){P.mel=.2;P.melCd=.35;if(window.FTX)FTX.ev('swish');const r={x:P.facing>0?P.x:P.x-62,y:P.y-(P.crouch?44:64),w:62,h:P.crouch?44:64};let hit=0;
+    if(!(RET.reach&&F.reachD&&S.st.fs))for(const e of S.E)if(hittable(e)&&zok(e.z,P.z)){const b=ebox(e);if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){dmgE(e,3,{pierce:1,melee:true,x:P.x});hit++;}}
     for(const p of S.pr)if(p.hp>0&&zok(p.z,P.z)&&r.x<p.x+p.w/2&&r.x+r.w>p.x-p.w/2&&r.y<p.y&&r.y+r.h>p.y-p.h)hitProp(p,2);
     for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(zok(b.z,P.z)&&b.x>r.x&&b.x<r.x+r.w&&b.y>r.y&&b.y<r.y+r.h){S.eb.splice(i,1);hit++;}}   // the knife cuts bullets
-    S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:r.w,l:.15,c:'#e8f6ff'});if(hit)hitstop(25);sfx('graze');}
+    S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:r.w,l:.15,c:'#e8f6ff'});if(hit){hitstop(25);if(window.FTX)FTX.ev('knifehit');}sfx('graze');}
   if(P.mel>0)P.mel-=dt;
   if(I.bombP)bomb(P);
   for(const k of PW_KEYS){const c=P.pw[k];if(c){c.t-=dt;if(c.t<=0)delete P.pw[k];}}
@@ -4870,7 +4871,7 @@ function stepShots(dt){const P=S.P,slow=P.pw.slow?.45:1;
   for(const b of S.eb){const k=dt*slow;if(b.grav)b.vy+=GRAV*.45*k;b.x+=b.vx*k;b.y+=b.vy*k;b.life-=k;
     if(b.y>FL+4||b.x<S.camX-80||b.x>S.camX+viewW()+80||b.y<-200)b.life=0;
     if(b.life>0&&!zok(b.z,P.z)){if(!b.zm&&circHit(b.x,b.y,b.r*.75,pb_)){b.zm=1;S.zmiss=(S.zmiss||0)+1;}}
-    else if(b.life>0&&circHit(b.x,b.y,b.r*.75,pb_)){if(ftHurt(b.dmg,b.x-b.vx,'bul:'+(b.src||''))||P.inv>0||P.dashIF>0){if(P.dashIF>0&&!b.gz){b.gz=1;continue;}b.life=0;}}}
+    else if(b.life>0&&circHit(b.x,b.y,b.r*.75,pb_)){if(ftHurt(b.dmg,b.x-b.vx,'bul:'+(b.src||''),b)||P.inv>0||P.dashIF>0){if(P.dashIF>0&&!b.gz){b.gz=1;continue;}b.life=0;}}}
   S.eb=S.eb.filter(b=>b.life>0);
   for(const g of S.bombsL){g.t+=dt;g.vy+=GRAV*dt;g.x+=g.vx*dt;g.y+=g.vy*dt;let hit=g.y>=FL||g.t>2;
     for(const e of S.E)if(!e.dead&&zok(g.z,e.z)&&circHit(g.x,g.y,8,ebox(e)))hit=true;if(hit){boom(g.x,Math.min(g.y,FL),95,8);g.done=1;}}
@@ -5126,7 +5127,7 @@ if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');F.ui=1;start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
-F._in={boom,hitProp,ftHurt,ftBurst,dmgE,hitstop,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
+F._in={hittable,ebox,zok,boom,hitProp,ftHurt,ftBurst,dmgE,hitstop,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd,I};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
 return F;})();
 
 // PURPOSE: the finished on-foot stage (7 sections, Warden gate)
@@ -14742,7 +14743,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='47b212f87b 2026-10-24 11:55 UTC';
+const NR_STAMP='bbc5b3139d 2026-10-24 15:50 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16496,7 +16497,7 @@ if(window.SND&&window.LABX){
   const FT_={f_shot:'shot',f_hit:'hit',f_pick:'pick',f_big:'big',f_hurt:'hurt',f_dash:'dash',f_graze:'graze',f_warn:'warn',f_up:'up',f_fever:'tier'};   // ON FOOT rows -> the AU.sfx sound they gate (the four song rows have no preview: they would change the music)
   SND.play=function(id){AU.unlock();if(!AU.a||AU.a.state!=='running')return false;const r=SND.T.find(x=>x[0]===id);if(!r)return false;
     if(r[1]==='mu'){this.pv[id]=performance.now()+PV_MS;this.apply();later(()=>this.apply(),PV_MS+80);MU[id]();return true;}
-    this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='ft'){if(FT_[id])AU.sfx(FT_[id]);}else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
+    this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='ft'){if(window.FTX&&FTX.has(id.slice(2)))FTX.play(id.slice(2),{force:1});else if(FT_[id])AU.sfx(FT_[id]);}else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
     return true;};
   // a song preview: the song starts at once (not mapped through the picks); STOP puts back what was playing
   SND.pvSong=null;
@@ -16548,6 +16549,72 @@ if(window.SND&&window.LABX){
   if(typeof LF!=='undefined'&&LF.restore){const r0=LF.restore;LF.restore=function(s){if(s&&s.ls){const v=SNDLS.get.call(localStorage,'nr_snd');if(v===null)delete s.ls.nr_snd;else s.ls.nr_snd=v;}return r0.apply(this,arguments);};}   // leaving the Lab must not undo the choice
   const t0=LABX.tabs;LABX.tabs=()=>(t0?t0():[]).concat([['sound','SOUND']]);LABX.build=Object.assign(LABX.build||{},{sound:build});
   {const ls=labSync;labSync=function(){ls();const b=$('labTab_sound');if(b)b.classList.toggle('on',LAB.tab==='sound');};}
+}
+
+// PURPOSE: on-foot sound set (4 weapon shots, knife, finisher, impact, foe hurt / death, Kai hurt, block, pick-up), synthesized, quiet, never touches the song
+// FLAG: footsfx (?footsfx=0 = the old on-foot sounds)
+// TEST: qa/footsfx-test.js
+/* ---------- FOOTSFX (W193, owner 24 Oct 2026: "no sound effects, e.g. shoot variation, kicks, hits, without distorting the music").
+   The song path is never touched: no duck, no filter, no volume change. Every sound is made with Web Audio on its own bus (FTX.bus -> limiter -> AU.sfxv), peak well under the song.
+   Each sound has 3 tone / pitch variants (never the same one twice in a row), a minimum gap, and a shared cap of 8 voices (the oldest is faded out when a 9th starts).
+   One SND row per sound (group ft, default on) so the Lab SOUND page can switch any of them off. Events come from foot.js / streetmelee.js through FTX.ev(name, arg).
+   Named hooks for features that are not in this build yet: FTX.guard() (W192 guard button: block clang), FTX.kick(), FTX.punch() (impact thud). ---------- */
+if(RET.footsfx===undefined)RET.footsfx=!/[?&]footsfx=0/.test(location.search);
+const FTX=window.FTX=(()=>{
+  // id: [Lab row text, minimum gap s, bus level]; every id is also the name used by FTX.ev / FTX.play
+  const T={pistol:['Pistol shot',.08,.9],smg:['Machine gun shot',.065,.7],shotgun:['Shotgun blast',.18,1],rocket:['Rocket launch',.3,1],
+    swish:['Knife swish',.1,.8],knifehit:['Knife hit (thud)',.05,.9],finisher:['Combo finisher (crack)',.2,1],impact:['Kick and punch hit',.07,.9],
+    foehurt:['Foe is hit (grunt noise)',.07,.6],foedeath:['Foe goes down',.09,.8],kaihurt:['Kai is hit',.25,1],block:['Block or guard clang',.12,.8],pickup:['Pick-up chime',.1,.6]};
+  const CAP=8,BUSG=.12,vox=[],last={},lastV={},nbs=new WeakMap();
+  const noiseBuf=c=>{let b=nbs.get(c);if(!b){b=c.createBuffer(1,c.sampleRate,c.sampleRate);const d=b.getChannelData(0);let s=12345;for(let i=0;i<d.length;i++){s=(s*1664525+1013904223)>>>0;d[i]=s/2147483648-1;}nbs.set(c,b);}return b;};   // fixed noise, so a variant sounds the same each time it is rendered
+  // helpers: every source is recorded in rec so a stolen voice can be stopped; dest is the voice gain
+  const osc=(c,d,rec,t,type,f0,f1,dur,vol,cut)=>{const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);if(f1)o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+dur);let n=o;
+    if(cut){const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=cut;o.connect(f);n=f;}n.connect(g);g.connect(d);o.start(t);o.stop(t+dur+.02);rec.push(o);};
+  const noise=(c,d,rec,t,type,f0,f1,dur,vol,q)=>{const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=noiseBuf(c);s.loop=true;f.type=type;f.frequency.setValueAtTime(f0,t);if(q)f.Q.value=q;
+    if(f1)f.frequency.exponentialRampToValueAtTime(f1,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(d);s.start(t);s.stop(t+dur+.02);rec.push(s);};
+  // the sounds: S[id](c, d, rec, t, v) with v = 0, 1, 2 (three different tones / pitches)
+  const S={
+    pistol:(c,d,r,t,v)=>{const p=[1,.84,1.2][v],k=[3200,2300,4600][v];noise(c,d,r,t,'highpass',1800*p,0,.05,.5);osc(c,d,r,t,'triangle',460*p,95*p,.1,.4,k);},
+    smg:(c,d,r,t,v)=>{const p=[1,.88,1.25][v];noise(c,d,r,t,'bandpass',2600*p,0,.035,.45,.8);osc(c,d,r,t,'square',320*p,110*p,.05,.22,2200*p);},
+    shotgun:(c,d,r,t,v)=>{const p=[1,.8,1.3][v],k=[2200,1500,3200][v];noise(c,d,r,t,'lowpass',k,k/5,.24,.8);osc(c,d,r,t,'sine',140*p,40,.22,.6);noise(c,d,r,t,'highpass',2500,0,.04,.4);},
+    rocket:(c,d,r,t,v)=>{const p=[1,.75,1.35][v];noise(c,d,r,t,'bandpass',600*p,2400*p,.5,.5,.9);osc(c,d,r,t,'sawtooth',120*p,50*p,.4,.3,900);},
+    swish:(c,d,r,t,v)=>{const p=[1,.8,1.3][v];noise(c,d,r,t,'bandpass',1700*p,5200*p,.12,.4,1.2);},
+    knifehit:(c,d,r,t,v)=>{const p=[1,.82,1.22][v];osc(c,d,r,t,'triangle',250*p,90*p,.09,.5);noise(c,d,r,t,'bandpass',3000*p,0,.04,.3,.9);},
+    finisher:(c,d,r,t,v)=>{const p=[1,.85,1.2][v];noise(c,d,r,t,'highpass',1500*p,0,.07,.6);osc(c,d,r,t,'sine',190*p,45,.24,.8);osc(c,d,r,t,'square',900*p,300*p,.06,.2,2500);},
+    impact:(c,d,r,t,v)=>{const p=[1,.75,1.3][v],k=[1200,700,1800][v];osc(c,d,r,t,'sine',160*p,50,.13,.7);noise(c,d,r,t,'lowpass',k,k/3,.07,.45);},
+    foehurt:(c,d,r,t,v)=>{const p=[1,.8,1.3][v];noise(c,d,r,t,'bandpass',700*p,400*p,.12,.45,1.5);osc(c,d,r,t,'sawtooth',270*p,140*p,.12,.22,1200);},
+    foedeath:(c,d,r,t,v)=>{const p=[1,.75,1.3][v];noise(c,d,r,t,'bandpass',900*p,250*p,.36,.5,1.1);osc(c,d,r,t,'sawtooth',210*p,50*p,.36,.35,700);},
+    kaihurt:(c,d,r,t,v)=>{const p=[1,.8,1.25][v];noise(c,d,r,t,'bandpass',950*p,350*p,.26,.55,1);osc(c,d,r,t,'sawtooth',340*p,90*p,.26,.38,1500);osc(c,d,r,t,'sine',90*p,40,.2,.5);},
+    block:(c,d,r,t,v)=>{const p=[1,.8,1.35][v];osc(c,d,r,t,'square',1200*p,0,.18,.16,5000);osc(c,d,r,t,'triangle',1870*p,0,.2,.2);noise(c,d,r,t,'highpass',4000,0,.03,.3);},
+    pickup:(c,d,r,t,v)=>{const p=[1,.89,1.26][v];osc(c,d,r,t,'triangle',880*p,0,.1,.22);osc(c,d,r,t+.06,'triangle',1320*p,0,.14,.2);}};
+  const F={T,S,CAP,vox,stat:{played:0,gap:0,steal:0,off:0},bus:null,
+    has:id=>!!T[id],
+    // true while the old on-foot sound of that name is replaced by this set
+    owns:n=>!!RET.footsfx&&(n==='shot'||n==='hit'||n==='pick'||n==='hurt'||n==='graze'),
+    old:n=>{if(n==='pick')F.play('pickup');else if(n==='hurt')F.play('kaihurt');},
+    // the sound bus: gain -> limiter -> dest (live: AU.sfxv; the offline probe uses the same chain)
+    chain(c,dest){const lim=c.createDynamicsCompressor();lim.threshold.value=-22;lim.knee.value=6;lim.ratio.value=12;lim.attack.value=.002;lim.release.value=.1;
+      const g=c.createGain();g.gain.value=BUSG;const o=c.createGain();o.gain.value=.7;g.connect(lim);lim.connect(o);o.connect(dest);return g;},   // o: trim after the limiter, keeps the transient peaks it lets through under the song
+    wire(){const a=typeof AU!=='undefined'&&AU.a;if(!a||!AU.sfxv)return false;if(this.bus&&this.ctx===a)return true;this.ctx=a;this.bus=this.chain(a,AU.sfxv);return true;},
+    // renders sound id / variant v on any context at time t into dest (used by play() and by the offline probes)
+    synth(c,dest,id,v,t,level){const g=c.createGain(),rec=[];g.gain.value=level==null?1:level;g.connect(dest);S[id](c,g,rec,t,v);return{g,rec};},
+    play(id,o){o=o||{};if(!RET.footsfx||!T[id]||!(o.force||(window.sndOn?sndOn('f_'+id):true)))return false;
+      if(!this.wire()||AU.a.state!=='running')return false;const a=AU.a,t=a.currentTime+.005;
+      if(!o.force&&t-(last[id]||-9)<T[id][1]){this.stat.gap++;return false;}last[id]=t;
+      let v=o.v!=null?o.v:(Math.random()*3|0);if(o.v==null&&v===lastV[id])v=(v+1+(Math.random()*2|0))%3;lastV[id]=v;
+      for(let i=vox.length-1;i>=0;i--)if(vox[i].end<t)vox.splice(i,1);
+      while(vox.length>=CAP){const o2=vox.shift();this.stat.steal++;try{o2.g.gain.cancelScheduledValues(t);o2.g.gain.setTargetAtTime(0,t,.008);for(const s of o2.rec)s.stop(t+.04);}catch(e){}}
+      const vol=(window.SND&&SND.cfg?SND.cfg.vol:1)*T[id][2],x=this.synth(a,this.bus,id,v,t,vol);x.end=t+.7;vox.push(x);this.stat.played++;this.last={id,v};return true;},
+    // game events -> sounds
+    ev(n,arg){if(!RET.footsfx)return;switch(n){
+      case'shot':{const k={pistol:'pistol',hmg:'smg',smg:'smg',shot:'shotgun',rocket:'rocket'}[arg];if(k)this.play(k);break;}
+      case'foedeath':case'foehurt':case'swish':case'knifehit':case'finisher':case'block':case'kaihurt':case'impact':case'pickup':this.play(n);break;}},
+    guard(){this.play('block');},kick(){this.play('impact',{v:1});},punch(){this.play('impact',{v:0});}};
+  return F;})();
+if(RET.footsfx){
+  for(const id of Object.keys(FTX.T))SNDT.push(['f_'+id,'ft',FTX.T[id][0],1]);   // one Lab row each (ON FOOT group), default on
+  {const i0=AU.init;AU.init=function(){const r=i0.apply(this,arguments);FTX.wire();return r;};}
 }
 
 // PURPOSE: the picture looks painted, not pasted: no light discs behind enemies, a much lighter black veil over the city
@@ -19024,7 +19091,7 @@ F.hitFeel=function(e,d,src){if(hf0)hf0.apply(this,arguments);
   const S=F.S,cb=S&&get(S);if(!cb||!src||!src.melee||src.cmbL||e.boss||e.fly||S.P.mel<=0)return;
   if(fresh(S,cb))begin(S,cb);
   if(cb.n!==3)return;
-  const x=e.x;e._lch={dir:sgn(e.x-S.P.x),left:FAR,hit:[]};cb.fin++;
+  const x=e.x;e._lch={dir:sgn(e.x-S.P.x),left:FAR,hit:[]};cb.fin++;if(window.FTX)FTX.ev('finisher');
   S.hf=Math.max(S.hf||0,8/60);if(!S.sim)IN.hitstop(8/60*1000);S.shake=Math.max(S.shake||0,window.COM&&COM.sk?COM.sk(6):6);   // headless sim() only records the freeze, as hitfeel does
   S.fx.push({slash:1,x:x,y:e.y-e.h/2,w:130,l:.2,c:'#ffd23a'});
   if(!e.dead)flinch(e);};
@@ -19040,6 +19107,134 @@ F.post=function(S,dt){if(post0)post0.apply(this,arguments);
     for(const o of S.E){if(o===e||o.dead||o.boss||o.fly||o.hid||l.hit.indexOf(o)>=0||!zin(e,o)||abs(o.x-e.x)>(e.w+o.w)/2+32)continue;
       l.hit.push(o);if(l.hit.length===1)cb.fin2++;IN.dmgE(o,1,{pierce:1,cmbL:1,x:e.x,vx:l.dir*300});flinch(o);}
     if(l.left<=0)e._lch=null;}};
+})();
+
+// PURPOSE: Street melee reach: a melee hit lands only when the attacker's limb or blade, on an ACTIVE strike frame, reaches the target's visible body
+// FLAG: reach (?reach=0 old)
+// TEST: qa/reach-probe.js (gap per landed hit, read from the sheets), qa/streetsim.js (BOTS=melee)
+/* ---------- STREETREACH (W191). Tip table = the farthest opaque column ahead of the anchor on each of the 4 frames of the strike sheet (kai melee / combo2 / combo3,
+   knife melee = rusher, bruiser melee = heavy and boss), in sheet px; a sheet px is h/256 units (ART.bsc, body px 256). A frame is ACTIVE when its tip is >= 80% of the
+   sheet's farthest tip (windup and recovery frames are not). Body edge of a target = its idle sheet's front column x scale, never wider than its box.
+   Kai: the knife hit is no longer instant: it lands on the active frames of the swing (12 fps in the street, 10 fps otherwise) when the tip reaches the body edge.
+   Foes: env.melee for rusher / heavy / bigheavy lands only on an active frame and when the tip reaches Kai's body edge; the heavy's charge counts as active
+   from frame 1 on (the whole shoulder is the weapon while the one-shot sheet holds its last frame). Telemetry: S.rch = {log:[{k,who,fr,gap}], hits}. ---------- */
+if(RET.reach===undefined)RET.reach=!/[?&]reach=0/.test(location.search);
+(function(){
+if(!RET.reach||!RET.foot||!window.FOOT||!FOOT._in)return;
+const F=window.FOOT,IN=F._in,abs=Math.abs,max=Math.max;
+const TIP={kai:[[62,89,84,55],[57,84,87,58],[63,59,95,66]],knife:[[72,93,103,65]],bruiser:[[95,112,131,78]]};
+const IDLE={kai:48,knife:39,bruiser:59,gunman:42},SHEET={rusher:'knife',gunner:'gunman',heavy:'bruiser',bigheavy:'bruiser'};
+const fps=()=>RET.street3?12:10,frame=a=>Math.min(3,Math.floor(a*fps()+1e-6)),on=S=>!!S&&S.st&&S.st.fs;
+const live=(t,i)=>t[i]>=.8*max.apply(0,t);
+const half=e=>{const s=SHEET[e.id];return s?Math.min(e.w/2,IDLE[s]*e.h/256):e.w/2;};
+const KAI=P=>IDLE.kai*P.h/256;
+F.reachD=e=>max.apply(0,TIP.kai[0])*F.S.P.h/256+half(e);   // how close a player must stand to hit this foe with the first swing (qa bots)
+const log=(S,o)=>{const R=S.rch||(S.rch={sw:null,pm:0,hits:0,log:[]});R.hits++;if(R.log.length<6000)R.log.push(o);};
+/* ----- Kai ----- */
+const post0=F.post;
+F.post=function(S,dt){if(post0)post0.apply(this,arguments);if(!RET.reach||!on(S))return;
+  const P=S.P,R=S.rch||(S.rch={sw:null,pm:0,hits:0,log:[]}),cb=S.cmb;
+  if(P.mel>R.pm+1e-9)R.sw={t0:S.time,f:P.facing<0?-1:1,k:RET.combo&&cb&&cb.n>0?Math.min(2,cb.n-1):0,done:[]};   // P.mel rises on every press
+  R.pm=P.mel;const sw=R.sw;if(!sw)return;
+  const a=S.time-sw.t0;if(a>=4/fps()){R.sw=null;return;}
+  const fr=frame(a),t=TIP.kai[sw.k];if(!live(t,fr))return;
+  const tip=P.x+sw.f*t[fr]*P.h/256,y=P.y-(P.crouch?44:64),h=P.crouch?44:64;let hit=0;
+  for(const e of S.E){if(sw.done.indexOf(e)>=0||!IN.hittable(e)||!IN.zok(e.z,P.z))continue;
+    const b=IN.ebox(e);if(!(y<b.y+b.h&&y+h>b.y)||sw.f*(e.x-P.x)<-4)continue;
+    const gap=sw.f*((e.x-sw.f*half(e))-tip);if(gap>0)continue;
+    sw.done.push(e);const m=P.mel;P.mel=max(m,.02);   // streetmelee still sees a swing in progress on a late active frame
+    IN.dmgE(e,3,{pierce:1,melee:true,x:P.x});P.mel=m;hit++;log(S,{k:'kai',who:e.id,fr:fr,act:sw.k,gap:gap,f:sw.f,ax:P.x,ah:P.h,tx:e.x,tw:e.w,thh:e.h,tsh:SHEET[e.id]||null});}
+  if(hit)IN.hitstop(25);};
+/* ----- foes ----- */
+const env=F.env,m0=env&&env.melee;
+if(m0)env.melee=function(e,r,dmg,o){const S=F.S,sh=SHEET[e.id],T=sh&&TIP[sh];
+  if(!RET.reach||!T||!on(S)||(o&&o.beam))return m0.apply(this,arguments);
+  const P=S.P,fr=frame(e.sT||0),t=T[0],f=e.facing<0?-1:1;
+  if(!(live(t,fr)||(e.heavy&&e.state==='charge'&&fr>=1)))return false;
+  const gap=f*((P.x-f*KAI(P))-(e.x+f*t[fr]*e.h/256));if(f*(P.x-e.x)<-4||gap>0)return false;
+  const hit=m0.call(this,e,{x:P.x-1,y:r.y,w:2,h:r.h},dmg,o);
+  if(hit)log(S,{k:'foe',who:e.id,fr:fr,act:0,gap:gap,f:f,ax:e.x,ah:e.h,tx:P.x,tw:28,thh:P.h,tsh:'kai'});return hit;};
+})();
+
+// PURPOSE: Street GUARD: hold to block hits from the front (no damage, Kai is pushed back, the guard meter drops); pressed within 0.15 s before a hit it is a PARRY (no damage, the attacker is OPEN for 1 s and takes double damage; a parried slug flies back)
+// FLAG: guard2 (?guard2=0 old)
+// TEST: qa/streetsim.js (BOTS=dodge,parry)
+/* ---------- STREETGUARD (W192, owner 24 Oct 2026: "no defense parry button"). The decision: shoot, close in, or wait for the attack and parry it.
+   The guard is a stance, not a shell: it lasts at most 0.6 s per press (then 0.3 s before the next), only covers Kai's front, stops his gun and knife and plants his feet;
+   each block costs a share of the meter (melee 30%, shots 15%), a heavy blow (2 damage) empties it, and an empty meter breaks the guard (the hit lands). Pose: the kai crouchshoot frame + a cyan arc.
+   Keys: I or ; (J/K/L are fire/jump/knife); phone: GUARD button next to KNIFE. Engine hooks: F.guardHit (called by foot.js ftHurt), F.post, F.hitFeel, F.look.draw.
+   Telemetry for the sim: S.gd {blocks, parries, refl, breaks, maxOn}. ---------- */
+if(RET.guard2===undefined)RET.guard2=!/[?&]guard2=0/.test(location.search);
+(function(){
+if(!RET.guard2||!RET.foot||!window.FOOT||!FOOT._in||!FOOT._in.I)return;
+const F=window.FOOT,IN=F._in,I=IN.I,abs=Math.abs;
+const HOLD=.4,REST=.5,PARRY=.15,OPEN=1,REGEN=.15,CM=.5,CB=.2;
+const G=S=>S.gd||(S.gd={on:0,t0:-9,cd:0,m:1,x:0,bt:-9,pf:0,blocks:0,parries:0,refl:0,breaks:0,maxOn:0,flash:0,cap:0});
+let seen=0;try{seen=+localStorage.getItem('mnr_parry')||0;}catch(e){}
+/* input -> stance; called from guardHit (a hit can land in the step the key went down) and from post */
+function sync(S){const g=G(S),P=S.P;
+  if(I.guardP&&!g.pf){g.pf=1;if(!g.on&&g.cd<=0&&g.m>.05&&P.hp>0){g.on=1;g.pd=0;g.t0=g.last=S.time;g.x=P.x;}}
+  if(g.on&&(!I.guard&&!I.guardP||S.time-g.t0>=HOLD)){g.maxOn=Math.max(g.maxOn,g.last-g.t0);g.on=0;g.cd=REST;}
+  return g;}
+F.guardHit=function(n,fromX,src,b){const S=F.S;if(!S||!RET.guard2)return 0;const g=sync(S),P=S.P;src=src||'';
+  if(!g.on||src==='blast'||(fromX!=null&&(fromX-P.x)*P.facing<-8))return 0;   // only the front, never a blast
+  const shot=/^bul:/.test(src);
+  if(S.time-g.t0<=PARRY&&!g.pd){g.pd=1;g.parries++;g.bt=S.time;g.flash=.25;IN.hitstop(70);IN.sfx('big');IN.pop(P.x+P.facing*20,P.y-84,'PARRY','#ffd23a',true);
+    S.fx.push({slash:1,x:P.x+P.facing*26,y:P.y-40,w:90,l:.2,c:'#ffffff'});
+    if(seen<1){seen=1;S.note={t:3,txt:'PARRY: guard just before the hit'};try{localStorage.setItem('mnr_parry','1');}catch(e){}}
+    if(shot&&b){g.refl++;S.pb.push({z:P.z,x:b.x,y:b.y,vx:-b.vx*1.3,vy:-(b.vy||0),wid:'pistol',dmg:3,kind:'b',life:1.5,c:'#ffd23a',r:Math.max(5,b.r||6),pierce:0,hit:[],t:0});}
+    else{const id=src.split(':')[1];let e=null;for(const o of S.E)if(!o.dead&&o.id===id&&(!e||abs(o.x-P.x)<abs(e.x-P.x)))e=o;
+      if(e&&!e.boss&&abs(e.x-P.x)<220){e._opn=S.time+OPEN;e._ox=e.x+(e.x>P.x?1:-1)*Math.max(0,70-abs(e.x-P.x));}}   // knocked out of reach, frozen
+    return shot?2:1;}
+  if(g.pd&&S.time-g.bt<.3){g.bt=S.time;return shot?2:1;}   // the rest of a parried attack (contact frames) is absorbed
+  if(n>=2&&!shot){g.m=0;g.bt=S.time;}   // a heavy blow (2 damage) breaks any guard: parry it, step out of line or jump
+  else if(S.time-g.bt>.3){g.m-=shot?CB:CM;g.blocks++;}g.bt=S.time;
+  if(g.m<=0){g.m=0;g.on=0;g.cd=1;g.breaks++;IN.pop(P.x,P.y-84,'GUARD BROKEN','#ff4060');return 0;}
+  P.x-=P.facing*(shot?6:22);g.x=P.x;IN.sfx('graze');IN.pop(P.x,P.y-84,'BLOCK','#5ad1ff');IN.ftBurst(P.x+P.facing*22,P.y-40,'#5ad1ff',6);
+  return shot?2:1;};
+const post0=F.post;
+F.post=function(S,dt){if(post0)post0.apply(this,arguments);const g=sync(S),P=S.P;g.pf=0;I.guardP=0;
+  if(g.cd>0)g.cd-=dt;if(g.flash>0)g.flash-=dt;
+  if(g.on){g.last=S.time;P.x=g.x;P.cd=Math.max(P.cd,.05);P.melCd=Math.max(P.melCd,.05);P._gd=1;}else{P._gd=0;if(S.time-g.bt>.5)g.m=Math.min(1,g.m+REGEN*dt);}
+  for(const e of S.E)if(e._opn>S.time&&!e.dead){e.x=e._ox;e.tele=0;e.wind=0;e.cd=Math.max(e.cd||0,.3);if(e.vx)e.vx=0;}
+  if(!S.sim)btn();};
+/* OPEN foes take double damage */
+const hf0=F.hitFeel;
+F.hitFeel=function(e,d,src){if(hf0)hf0.apply(this,arguments);const S=F.S;if(!S||!(e._opn>S.time)||e.dead||(src&&src.gb))return;IN.dmgE(e,d,{gb:1,x:src&&src.x});};
+/* pose: the braced crouchshoot frame while the guard is up */
+const kx0=IN.kaiX;IN.kaiX=function(P){const r=kx0.apply(this,arguments);return P._gd&&!P.hurtT&&P.hp>0?'crouchshoot':r;};
+/* the phone button, next to KNIFE (same size and style); keys I and ; */
+let B=null,bk='';
+function btn(){const L=IN.L();if(!L||!L.btn||!L.btn.melee)return;
+  if(!B){B=document.createElement('button');B.type='button';B.className='fb';B.id='fGuard';B.textContent='GUARD';L.root.appendChild(B);
+    const dn=e=>{e.preventDefault();if(!I.guard)I.guardP=1;I.guard=1;B.classList.add('on');try{B.setPointerCapture(e.pointerId);}catch(x){}},up=()=>{I.guard=0;B.classList.remove('on');};
+    B.addEventListener('pointerdown',dn);B.addEventListener('pointerup',up);B.addEventListener('pointercancel',up);B.addEventListener('lostpointercapture',up);}
+  const m=L.btn.melee,k=m.style.left+m.style.top+m.style.width+m.style.display+m.hidden;if(k===bk)return;bk=k;
+  if(m.hidden||m.style.display==='none'){B.hidden=true;B.style.display='none';return;}
+  const z=parseFloat(m.style.width)||56,top=parseFloat(m.style.top),row=Object.values(L.btn).filter(b=>!b.hidden&&b.style.display!=='none'&&abs(parseFloat(b.style.top)+parseFloat(b.style.width)/2-top-z/2)<z/2);
+  const x0=Math.min(...row.map(b=>parseFloat(b.style.left)));
+  const ml=parseFloat(m.style.left),nb=row.filter(b=>parseFloat(b.style.left)<ml).sort((a,b)=>parseFloat(b.style.left)-parseFloat(a.style.left))[0];   // the button left of KNIFE moves out one slot, GUARD takes its place
+  let gx=x0-z-8;if(nb){gx=parseFloat(nb.style.left);nb.style.left=Math.round(x0-parseFloat(nb.style.width)-8)+'px';bk=m.style.left+m.style.top+m.style.width+m.style.display+m.hidden;}
+  B.hidden=false;B.style.display='';B.style.width=B.style.height=z+'px';B.style.left=Math.round(gx)+'px';B.style.top=Math.round(top)+'px';}
+addEventListener('keydown',e=>{if(!F.on||!F.S||(e.code!=='KeyI'&&e.code!=='Semicolon'))return;e.preventDefault();e.stopImmediatePropagation();if(!e.repeat&&!I.guard)I.guardP=1;I.guard=1;},true);
+addEventListener('keyup',e=>{if(e.code==='KeyI'||e.code==='Semicolon'){I.guard=0;}},true);
+addEventListener('blur',()=>{I.guard=0;});
+/* draw: a cyan arc in front of a guarding Kai, the meter under it, OPEN over a staggered foe, a white flash on a parry */
+const SL=F.look;
+if(SL&&SL.draw){const d0=SL.draw;
+  SL.draw=function(c){const r=d0.apply(this,arguments);const S=F.S,L=IN.L();if(!r||!S||!L||!S.gd&&!S.E.some(e=>e._opn))return r;
+    const g=G(S),P=S.P,K=SL.k,wy=(y,z)=>SL.my(y)-(z!=null&&SL.band?(1-z)*SL.band:0);
+    c.save();c.translate(-S.camX,0);
+    if(g.on){const y=wy(P.y-26,P.z),cx=P.x+P.facing*4*K;c.strokeStyle='#5ad1ff';c.lineWidth=5*K;c.globalAlpha=.85;c.beginPath();
+      c.arc(cx,y,28*K,P.facing>0?-1:Math.PI-1,P.facing>0?1:Math.PI+1);c.stroke();c.globalAlpha=1;}
+    if(g.on||g.m<1){const y=wy(P.y+6,P.z),w=40*K;c.fillStyle='rgba(5,3,12,.7)';c.fillRect(P.x-w/2-1,y-1,w+2,7);c.fillStyle=g.m<.3?'#ff4060':'#5ad1ff';c.fillRect(P.x-w/2,y,w*g.m,5);
+      c.font='bold 9px monospace';c.textAlign='center';c.textBaseline='top';c.fillText('GUARD',P.x,y+7);}
+    for(const e of S.E)if(e._opn>S.time&&!e.dead){const y=wy(e.y-e.h-14,e.z);c.font='bold 14px monospace';c.textAlign='center';c.textBaseline='bottom';c.fillStyle='#05030c';c.fillText('OPEN',e.x+1,y+1);c.fillStyle='#ffd23a';c.fillText('OPEN',e.x,y);}
+    c.restore();
+    if(g.flash>0){c.save();c.setTransform(1,0,0,1,0,0);c.globalAlpha=g.flash*1.2;c.fillStyle='#ffffff';c.fillRect(0,0,L.cv.width,L.cv.height);c.restore();}
+    if(!g.cap&&S.time>3&&!S.end){g.cap=1;let n=0;try{n=+localStorage.getItem('mnr_guard')||0;}catch(e){}
+      if(n<1){S.note={t:3.5,txt:L.touch?'GUARD: hold to block hits from the front':'GUARD: hold I to block hits from the front'};try{localStorage.setItem('mnr_guard','1');}catch(e){}}}
+    return r;};}
 })();
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
