@@ -21,19 +21,25 @@ With the old look there are also text overlaps. The draw-site list in VISUAL-INV
 phone-check: 390x763, 375x553 and 844x390 PASS. The three rotation scenarios crash inside the harness (`setViewportSize: Protocol
 error (Browser.setWindowBounds)`) before the game is involved.
 
+## Round 2: critic W219 (round 1 scored find-player 1, bullets 3, grayscale 3, silhouette 4, benchmark 2 on nr/W214-pure)
+- The player is now 1.6x the enemies' texel scale on the phone and 1.4x on PC (PURL.PK).
+- Player shots: the standard streak is 2.4x longer and 1.7x thicker, with its core drawn again additively. Weapon shot pictures are 44 wide.
+- The backdrop (bg, far, mid) is drawn from a copy made once per picture with brightness .65 and saturate .85. The near strip and
+  every sprite are not filtered. The shots above are from round 2. Render-only change: the sim does not call render, so simhunt is unchanged.
+
 ## Strict critic pass (game-look). Benchmark: Ref A, https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/347160/ss_adc04f49419d282ee67a894af25cfdf5bed88439.1920x1080.jpg
 
 | # | test | score | what still fails |
 |---|---|---|---|
 | 1 | Owner art only | 6 | Pickups are still drawn by code in the play field: the cyan "B" letter and the green WINGMATES hex with its caption (`pkPaint`, `PW.pickup`; not in this task's scope). The player outline is code, but it matches the benchmark. |
-| 2 | Grayscale | 7 | The player (light outline) and the enemies separate from the city by value. The lime orbs separate too. Needles are thin on the phone. |
+| 2 | Grayscale | 8 | With the backdrop at .65 value, the player, the enemies and every shot are the brightest things on screen. |
 | 3 | Silhouette | 7 | The long player dart and the round drones/gunship read as different shapes. Enemies are small next to Ref A's. |
-| 4 | Find the player (phone) | 7 | The outline, the engine light and a fan of white shots mark it at once. The ship's own colours are still blue on a blue city. |
+| 4 | Find the player (phone) | 8 | The ship is about 1/7 of the screen width, and its outline, engine light and fan of white shots mark it at once. The ship's own colours are still blue on a blue city. |
 | 5 | Bullets | 7 | Player shots are white/cyan and enemy shots lime/yellow; nothing shares a hue. The yellow needles are still thin on the phone, and the white player streaks have the same shape as the needles. |
 | 6 | Clutter | 8 | Field marks: "B" and WINGMATES (2). The HUD is at the edges. |
-| 7 | Benchmark side by side | 5 | Ref A has a few big, bright, outlined actors on a quiet backdrop. Ours is a busy, bright painting with small actors, and no shot reaches Ref A's chunky, glowing bullets. |
+| 7 | Benchmark side by side | 6 | Ref A has a few big, bright, outlined actors on a quiet backdrop. The backdrop is now quieter, but the enemies are still small, and no shot reaches Ref A's chunky, glowing bullets. |
 
 Not every row is at 7 or higher. Rows 1 and 7 are below, and fixing them is outside this task:
 1. Draw the pickups ("B" letter, power-up hex and caption) from owner pictures, with no text in the field.
 2. Enemy actors at the player's scale, or larger pictures for the small drones (art or size decision, for the owner).
-3. Calmer phone backdrop behind the play band (art: a darker variant of `bg-<district>-phone`) so the actors become the brightest layer.
+3. Done in round 2 by dimming the backdrop in code. A darker painted variant from the owner would look better than the filter.

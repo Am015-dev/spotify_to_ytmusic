@@ -9,10 +9,12 @@
    arming circles, hit flashes, tier glow, screen flash / glitch, floating text, edge pulses. Bosses and gate pylons have no single sheet
    drawn here yet: they keep the old draw. Gameplay is not touched (the sim never calls render). ---------- */
 if(RET.purelook===undefined)RET.purelook=!/[?&]purelook=0/.test(location.search);   // W215: the default flight look
-const PURL=window.PURL={K:90/520,PK:1.35,
+const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.4;},   // W215/W219: player 1.6x the enemies' texel scale on the phone, 1.4x on PC
   WARM:/^(beat|disc|flame|orbit|shell|storm|swarm)$/,   // W215: weapon shot pictures in the enemy-shot hues (lime / yellow / orange): drawn as the cool standard shot instead
-  cover(b,w,h){const s=Math.max(w/b.width,h/b.height),sw=w/s,sh=h/s;ctx.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,w,h);},
-  tile(b,y,h,scroll,par){const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
+  dim(b){const D=this.DM||(this.DM=new Map());let c=D.get(b);if(c)return c;   // W219: backdrop layers only, once per picture: brightness .65, saturate .85, so the play layer is the brightest thing
+    c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter='brightness(.65) saturate(.85)';x.drawImage(b,0,0);D.set(b,c);return c;},
+  cover(b,w,h){b=this.dim(b);const s=Math.max(w/b.width,h/b.height),sw=w/s,sh=h/s;ctx.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,w,h);},
+  tile(b,y,h,scroll,par,keep){if(!keep)b=this.dim(b);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
     for(let j=Math.floor(off/tw);j*tw-off<W;j++){const x=j*tw-off;if(x+tw<=0)continue;
       if(j&1){ctx.save();ctx.translate(x+tw,y);ctx.scale(-1,1);ctx.drawImage(b,0,0,tw,h);ctx.restore();}else ctx.drawImage(b,x,y,tw,h);}},
   bg(port,scroll){const di=G.di,n=ART.dn[di],D=DISTRICTS[di],bm=ART.bm;ctx.fillStyle='#000';
@@ -22,7 +24,7 @@ const PURL=window.PURL={K:90/520,PK:1.35,
     const far=bm['ly-far-'+n],mid=bm['ly-mid-'+n],nr=bm['ly-near-'+D.near];
     if(far){const fh=W*far.height/far.width;this.tile(far,H-60-fh,fh,scroll,.03);}
     if(mid)this.tile(mid,H-340,310,scroll,.3);
-    if(nr)this.tile(nr,H-130,130,scroll,1.1);},
+    if(nr)this.tile(nr,H-130,130,scroll,1.1,1);},   // the near strip keeps full value (play-layer depth)
   sheet(e){const M=ENEMY_ART[FOEART.id(e)];if(!M||e.type==='gate')return null;const m=M.native?{s:M.s||'e'+e.type,k:M.k||4.2}:FOEART.map(e);if(!m||!m.s)return null;
     const b='ship-'+m.s+'/',v=e.arm&&ART.ANIM.s[b+'volley']&&ART.anim(b+'volley'),key=b+(v?'volley':'flame');if(!ART.ANIM.s[key]||!ART.anim(key))return null;ART.anim(b+'death');return{m,key};},
   foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],w=clamp(m.w||e.r*(m.k||4.2),this.K*fw*.8,this.K*fw*1.25),sc=w/fw,rot=m.rot?m.rot(e,t):0;
@@ -44,9 +46,9 @@ const PURL=window.PURL={K:90/520,PK:1.35,
     ctx.drawImage(O[0],-W_/2,-H_/2,W_,H_);},
   pic(n,x,y,w,ang,hk){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
   shots(){for(const b of G.pb){const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
-      if(wn&&this.pic(wn,b.x,b.y,34,a))continue;
-      const n=b.hv?'fx-shot-hv':b.ec?'fx-shot-ec':'fx-shot-std',w=b.hv?46:b.ec?34:(b.len||(b.big?22:20))*1.9*(b.pf?1.3:1);
-      if(this.pic(n,b.x,b.y,w,a)&&n==='fx-shot-std')this.pic(n,b.x,b.y,w,a);}   // the thin standard streak twice (additive): bright enough to read at game size
+      if(wn&&this.pic(wn,b.x,b.y,44,a))continue;
+      const n=b.hv?'fx-shot-hv':b.ec?'fx-shot-ec':'fx-shot-std',w=b.hv?52:b.ec?40:(b.len||(b.big?22:20))*2.4*(b.pf?1.3:1);
+      if(this.pic(n,b.x,b.y,w,a,1.7)&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
     for(const b of G.eb){const a=Math.atan2(b.vy||0,b.vx||-1);
       if(b.hm>0&&this.pic('fx-orb-homing',b.x,b.y,b.r*3.6))continue;
       if(b.k==='n'&&this.pic('fx-bullet-needle',b.x,b.y,b.r*10,a,2.4)){this.pic('fx-bullet-needle',b.x,b.y,b.r*10,a,2.4);continue;}   // W215: the thin needle twice and longer, it vanished at game size
