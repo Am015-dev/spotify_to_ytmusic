@@ -21,6 +21,8 @@ Pins: [../sources/racers.md](../sources/racers.md). Code under `LEGORacers/src/r
 - `src/98z_race_items.js`: R15_boxes/R15_boxTick/R15_pop. Floating "?" LEGO bricks, one instanced mesh, 4 across, row every ~650 m, 2.5 s respawn. 6 items: missile, turbo, shield, web, mines, lightning (random).
 - Boost: `src/98k_boost2k.js` (drift-to-boost).
 
+- Racers bricks (bricks-r24i, `?proto=1`, Westend race): `src/98rb_racersbricks.js` ports colour/white stacking, levels, durations, AI use; GO `race/racers-bricks`.
+
 ## Gap
 No colour choice, no white stacking, no levels. Plan: [../../DESIGN_racers_rebuild.md](../../DESIGN_racers_rebuild.md) step 1 (red=missile, yellow=mines/web, blue=shield, green=turbo; GO: green + 2 white = turbo 5 s +-0.1).
 Excerpt (LGPL, short): [code/powerup-stacking.md](code/powerup-stacking.md)
