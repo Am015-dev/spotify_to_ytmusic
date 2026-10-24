@@ -15,20 +15,27 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
 /* q=1: a bulk load from the ready.json queue (shapes.js), at most 2 at a time and only while no on-demand load is in flight, so a sheet the current stage asks for is never stuck behind hundreds of full-size pictures (22 Oct 2026: Kai was not drawn for 15 s) */
 ART.pend=0;ART.lowN=0;ART.q=[];
 ART.pump=()=>{while(ART.q.length&&ART.lowN<2&&ART.pend===0){const n=ART.q.shift();if(n in ART.bm)continue;ART.lowN++;ART.load(n,1);}};
-ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();if(!q)ART.pend++;let fin=false;const end=()=>{if(fin)return;fin=true;if(q)ART.lowN--;else ART.pend--;ART.pump();};
-  im.onload=()=>{
+/* W199 (owner, 24 Oct 2026: "lags on PC at launch"): a picture is fetched as a blob and decoded by createImageBitmap(blob), which runs off the main thread (the old Image + createImageBitmap(img) decoded ~1.4 s on it in the first 12 s);
+   at most ART.MAXP fetches run at once (187 requests were in flight at launch); ART.nOn / ART.nDone count the on-demand loads for the progress line (parts/art/progress.js). */
+ART.nOn=0;ART.nDone=0;ART.act=0;ART.MAXP=8;ART.boot=0;ART.wait=[];
+ART.slot=(f,low)=>{if(!low||ART.act<ART.MAXP){ART.act++;f();}else ART.wait.push(f);};   // only the start-up loads (ART.boot) wait for a free slot; what a stage or menu asks for later starts at once
+ART.slotEnd=()=>{ART.act--;while(ART.wait.length&&ART.act<ART.MAXP){ART.act++;ART.wait.shift()();}};
+ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;if(!q){ART.pend++;ART.nOn++;}let fin=false;const end=()=>{if(fin)return;fin=true;if(q)ART.lowN--;else{ART.pend--;ART.nDone++;}ART.slotEnd();ART.pump();};
+  const done=b=>{ART.bm[n]=ART.fix?ART.fix(n,b):b;end();};
+  const fail=(k)=>{if(k<3){setTimeout(()=>go(k+1,1),1200*(k+1));return;}ART.err[n]=1;end();};/* owner 23 Oct 2026 "some assets are not shown": a 503 from the server was final; try again up to 3 times */
+  const use=(b,fresh)=>{
     /* STALE STRIP (owner, 23 Oct 2026: "the on foot sprites are invisible" right after the 287 re-delivered strips went live): on the first load after a deploy the OLD service worker still answers
        from its old cache, so the new page sliced an old strip with the new cell sizes and drew empty cells. A strip must be frames x cell wide and one cell high (ART.ANIM.s): if not, drop it from
        every cache and fetch it once more past the caches (?r= is not in any cache and not in the browser's HTTP cache) */
-    if(n.startsWith('anim/')&&!im.__r){const m=ART.ANIM&&ART.ANIM.s[n.slice(5,-6)];if(m&&(im.naturalWidth!==m[0]*m[2]||im.naturalHeight!==m[3])){im.__r=1;ART.stale=(ART.stale||0)+1;const u=im.src.split('?')[0],go=()=>{im.src=u+'?r='+Date.now();};
-      (self.caches?caches.keys().then(ks=>Promise.all(ks.map(k=>caches.open(k).then(c=>c.delete(u,{ignoreSearch:true}))))):Promise.resolve()).then(go,go);return;}}
-    const done=b=>{ART.bm[n]=ART.fix?ART.fix(n,b):b;end();};
+    if(n.startsWith('anim/')&&!fresh){const m=ART.ANIM&&ART.ANIM.s[n.slice(5,-6)];if(m&&(b.width!==m[0]*m[2]||b.height!==m[3])){ART.stale=(ART.stale||0)+1;const u=ART.base+n+'.webp',again=()=>go(0,1,1);
+      (self.caches?caches.keys().then(ks=>Promise.all(ks.map(k=>caches.open(k).then(c=>c.delete(u,{ignoreSearch:true}))))):Promise.resolve()).then(again,again);return;}}
     /* effects made as light on a solid black square (no alpha): turn the black into transparency once, colours un-premultiplied, so they look right with normal blending and identical when drawn additively */
-    if((n.startsWith('fx-')&&!n.startsWith('fx-fuse'))||n.startsWith('nv-ev-')){try{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
+    if((n.startsWith('fx-')&&!n.startsWith('fx-fuse'))||n.startsWith('nv-ev-')){try{const w=b.width,h=b.height,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(b,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
       if(solid&&dark>=3){for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]);if(m<3){d[i+3]=0;continue;}d[i+3]=m;const k=255/m;d[i]=Math.min(255,d[i]*k);d[i+1]=Math.min(255,d[i+1]*k);d[i+2]=Math.min(255,d[i+2]*k);}g.putImageData(id,0,0);done(c);return;}}catch(e){}}
-    if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
-  im.onerror=()=>{const k=im.__e=(im.__e||0)+1;if(k<=3){setTimeout(()=>{im.src=ART.base+n+'.webp?r='+Date.now();},1200*k);return;}ART.err[n]=1;end();};/* owner 23 Oct 2026 "some assets are not shown": a 503 from the server was final; try again up to 3 times */im.src=ART.base+n+'.webp';};
+    done(b);};
+  const go=(k,fresh,again)=>fetch(ART.base+n+'.webp'+(fresh?'?r='+Date.now():'')).then(r=>{if(!r.ok)throw r.status;return r.blob();}).then(bl=>createImageBitmap(bl)).then(b=>use(b,again),()=>fail(k));
+  ART.slot(()=>go(0),ART.boot);};
 ART.have=n=>!!ART.bm[n];
 ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
@@ -120,10 +127,11 @@ ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;
     g.strokeStyle='#ff3040';g.lineWidth=Math.max(2,px/48);g.shadowColor='#ff3040';g.shadowBlur=px/20;g.beginPath();g.arc(r,r,r-3-g.lineWidth/2,0,7);g.stroke();o=ART.sc[key]=c;}
   ctx.save();ctx.globalAlpha=al;ctx.drawImage(o,cx-sz/2,y,sz,sz);ctx.restore();};
 /* ----- start-up: the gameplay sprites first, bosses and the rest of the districts one at a time while the title is up ----- */
-{for(const n of ART.shipN)ART.load('spr-ship-'+n);for(const n of ART.enN)ART.load('spr-en-'+n);for(const n of ART.fxN)ART.load('fx-'+n);for(const n of ART.pkN)ART.load('pk-'+n);
-  ART.warm(0);
+{ART.boot=1;let me='std';try{me=shipDef().id;}catch(e){}   // the title and the first stage first (the player's ship, the first backdrop, the shots), then the rest
+  ART.load('spr-ship-'+me);ART.warm(0);for(const n of ART.fxN)ART.load('fx-'+n);for(const n of ART.shipN)ART.load('spr-ship-'+n);for(const n of ART.enN)ART.load('spr-en-'+n);for(const n of ART.pkN)ART.load('pk-'+n);
   const rest=[];for(const n of ART.bossN){rest.push('spr-boss-'+n);rest.push('boss-'+n);}
-  let i=0;const step=()=>{if(i<rest.length)ART.load(rest[i++]);else if(i<rest.length+DISTRICTS.length){ART.warm(i++-rest.length);}else return;setTimeout(step,350);};setTimeout(step,1500);}
+  ART.boot=0;
+  let i=0;const step=()=>{ART.boot=1;if(i<rest.length)ART.load(rest[i++]);else if(i<rest.length+DISTRICTS.length){ART.warm(i++-rest.length);}else{ART.boot=0;return;}ART.boot=0;setTimeout(step,350);};setTimeout(step,1500);}
 NR.on('kill',({e,boss})=>{
   if(boss){const bx=e.x,by=e.y,dl=RET.sprites?SPR.bossDefeat(e):0;for(let i=0;i<5;i++)G.delayed.push({t:dl+i*.16,f:()=>ART.boom(FXW.bk(i===4?'explosion-boss':'explosion-big',e,i===4?320:170),bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
   {const sz=e.type==='gunship'?150:e.type==='mine'?90:Math.max(54,e.r*3.6);ART.boom(FXW.bk(e.type==='gunship'||e.type==='mine'?'explosion-big':'explosion-small',e,sz),e.x,e.y,sz,.42);if(e.type==='gunship'||e.type==='mine')AH.debris(e.x,e.y,sz);}});
