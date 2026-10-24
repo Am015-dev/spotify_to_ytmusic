@@ -55,3 +55,5 @@ the design-review skill (.claude/skills/design-review), impeccable critique.
 6. Clutter test: count non-art marks in the play field (text, icons, rings). Benchmark shooters show almost none; > 3 at once = FAIL.
 7. Benchmark side by side: put the shot next to a well-regarded modern shooter frame (URL) and list what still looks amateur.
 Score each 0-10, report the weakest three with the fix, and keep iterating until every row is >= 7.
+
+Reference techniques (animation rate, layers, one grain pass, telegraphs, hit feedback, parry, HUD) with testable gates: games-src/nightrun/benchmark/REF-RUNGUN-TECHNIQUES.md
