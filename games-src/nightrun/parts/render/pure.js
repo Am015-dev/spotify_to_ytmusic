@@ -12,40 +12,42 @@ if(RET.purelook===undefined)RET.purelook=!/[?&]purelook=0/.test(location.search)
 const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W219: player 1.6x the enemies' texel scale on the phone, 1.3x on PC
   pl(){const s=ART.ANIM.s['ship-'+shipDef().id+'/flame'];return(s?s[2]:260)*this.K*this.PK;},   // the player's drawn length (world units)
   WARM:/^(?!(arc|frost|wave)$)/,   // W219 r3: only the cyan weapon pictures stay; every other weapon (warm, pink, violet) is drawn as the white standard streak   // W215: weapon shot pictures in the enemy-shot hues (lime / yellow / orange): drawn as the cool standard shot instead
-  dim(b,v){const D=this.DM||(this.DM=new Map());let c=D.get(b);if(c)return c;   // W219: backdrop layers only, once per picture: brightness .65, saturate .85, so the play layer is the brightest thing
-    c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=`brightness(${v||.65}) saturate(.85)`;x.drawImage(b,0,0);D.set(b,c);return c;},
-  cover(b,w,h){b=this.dim(b,.42);   // the phone painting is brighter than the PC strips: a lower value lands it at the PC's level
+  dim(b,v,bl){const D=this.DM||(this.DM=new Map());let c=D.get(b);if(c)return c;   // W219: backdrop layers only, once per picture: brightness .65, saturate .85, so the play layer is the brightest thing
+    c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=`blur(${bl||2}px) brightness(${v||.6}) saturate(.7)`   /* W215c: far planes soft, darker, less saturated: they read as distance */;x.drawImage(b,0,0);D.set(b,c);return c;},
+  cover(b,w,h){b=this.dim(b,.42,1.8);   // the phone painting is brighter than the PC strips: a lower value lands it at the PC's level
    const s=Math.max(w/b.width,h/b.height),sw=w/s,sh=h/s;ctx.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,w,h);},
-  tile(b,y,h,scroll,par,keep){if(!keep)b=this.dim(b);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
+  tile(b,y,h,scroll,par,v,bl){b=this.dim(b,v,bl);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
     for(let j=Math.floor(off/tw);j*tw-off<W;j++){const x=j*tw-off;if(x+tw<=0)continue;
       if(j&1){ctx.save();ctx.translate(x+tw,y);ctx.scale(-1,1);ctx.drawImage(b,0,0,tw,h);ctx.restore();}else ctx.drawImage(b,x,y,tw,h);}},
   bg(port,scroll){const di=G.di,n=ART.dn[di],D=DISTRICTS[di],bm=ART.bm;ctx.fillStyle='#000';
     if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.cover(b,PW_,PH_);return;}
     ART.paintReady(di);const b=bm['bg-'+n];if(!b){ctx.fillRect(0,0,W,H);return;}
-    this.tile(b,0,H,scroll,.03);
+    this.tile(b,0,H,scroll,.03,.5,3);
     const far=bm['ly-far-'+n],mid=bm['ly-mid-'+n],nr=bm['ly-near-'+D.near];
-    if(far){const fh=W*far.height/far.width;this.tile(far,H-60-fh,fh,scroll,.03);}
-    if(mid)this.tile(mid,H-340,310,scroll,.3);
-    if(nr)this.tile(nr,H-130,130,scroll,1.1,1);},   // the near strip keeps full value (play-layer depth)
+    if(far){const fh=W*far.height/far.width;this.tile(far,H-60-fh,fh,scroll,.06,.55,2.5);}
+    if(mid)this.tile(mid,H-340,310,scroll,.3,.62,1.5);
+    if(nr)this.tile(nr,H-130,130,scroll,1.1,.75,1);},   // parallax .03 / .06 / .3 / 1.1; every plane behind the ships is softer and darker than the ships
   sheet(e){const M=ENEMY_ART[FOEART.id(e)];if(!M||e.type==='gate')return null;const m=M.native?{s:M.s||'e'+e.type,k:M.k||4.2}:FOEART.map(e);if(!m||!m.s)return null;
     const b='ship-'+m.s+'/',v=e.arm&&ART.ANIM.s[b+'volley']&&ART.anim(b+'volley'),key=b+(v?'volley':'flame');if(!ART.ANIM.s[key]||!ART.anim(key))return null;ART.anim(b+'death');return{m,key};},
-  foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,this.pl()*.55),Math.max(this.K*fw*1.25,this.pl()*.55)),sc=w/fw,rot=m.rot?m.rot(e,t):0;
-    ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false);ctx.restore();
+  foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,this.pl()*.75),Math.max(this.K*fw*1.25,this.pl()*.75)),sc=w/fw,rot=m.rot?m.rot(e,t):0;
+    ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);this.lit(key,(e.t||0)+eb_(e),sc,s);ctx.restore();
     e._fs=sc;e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
   player(t){if(G.dead)return;const id=shipDef().id,key='ship-'+id+'/flame',k=this.K*this.PK;ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
     const s=ART.ANIM.s[key],L=s?s[2]*k:56,e=ART.bm['fx-engine'];   // W215: owner engine light (fx-engine, painted on black) under the tail, steady flicker, no ring or halo
     if(e){const w=L*(.42+.04*Math.sin(t*38)),h=w*e.height/e.width*1.3;ctx.globalCompositeOperation='lighter';ctx.drawImage(e,-L*.22-w,-h/2,w,h);ctx.globalCompositeOperation='source-over';}else if(e===undefined)ART.load('fx-engine');
-    if(RET.sprites&&SPR.shipOn(id)&&s)this.rim(key,t,k,s);   // the player one notch above the enemies' texel scale (1.35x, inside the 1.5x band): it must read first
+    if(RET.sprites&&SPR.shipOn(id)&&s)this.lit(key,t,k,s);   // the player one notch above the enemies' texel scale (1.35x, inside the 1.5x band): it must read first
    else ART.put(ART.sp('spr-ship-'+id,this.K*520*this.PK),0,0);
     ctx.restore();},
-  rim(key,t,k,s){   // W215: the player's frame with a 1 px light outline (the benchmark shooters outline the player ship so it reads on any backdrop; no glow, no ring)
-    const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),fw=s[2]*k*ps,fh=s[3]*k*ps,O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(fw+8),h=Math.ceil(fh+8);
-    for(const c of O)if(c.width<w||c.height<h){c.width=Math.max(c.width,w);c.height=Math.max(c.height,h);}
-    const a=O[0].getContext('2d'),b=O[1].getContext('2d'),cw=O[0].width,ch=O[0].height;a.setTransform(1,0,0,1,0,0);a.clearRect(0,0,cw,ch);a.setTransform(ps,0,0,ps,cw/2,ch/2);ART.drawAnim(a,key,t,0,0,k,false);
-    b.setTransform(1,0,0,1,0,0);b.clearRect(0,0,cw,ch);b.globalCompositeOperation='source-over';b.drawImage(O[0],0,0);b.globalCompositeOperation='source-in';b.fillStyle='#eafcff';b.fillRect(0,0,cw,ch);b.globalCompositeOperation='source-over';
-    const d=Math.max(1.2*(window.devicePixelRatio||1),1.6)/ps,W_=cw/ps,H_=ch/ps;
-    for(const[x,y]of[[-d,0],[d,0],[0,-d],[0,d],[-d*.7,-d*.7],[d*.7,-d*.7],[-d*.7,d*.7],[d*.7,d*.7]])ctx.drawImage(O[1],x-W_/2,y-H_/2,W_,H_);
-    ctx.drawImage(O[0],-W_/2,-H_/2,W_,H_);},
+  lit(key,t,k,s){   // W215c: one scene light for every ship, baked once per sheet frame and size: a key light from the upper neon side
+    // (soft lift on that side + a thin cyan rim), a slight under-shade on the far side. Never a flat tint; the owner's frame stays underneath.
+    const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),i=ART.aframe(key,t),q=Math.round(k*ps*64),id=key+'|'+i+'|'+q,C=this.LC||(this.LC=new Map());let c=C.get(id);
+    if(!c){if(C.size>600)C.clear();const fw=s[2]*k*ps,fh=s[3]*k*ps,w=Math.ceil(fw+8),h=Math.ceil(fh+8);c=document.createElement('canvas');c.width=w;c.height=h;
+      const a=c.getContext('2d');a.setTransform(ps,0,0,ps,w/2,h/2);ART.drawAnim(a,key,t,0,0,k,false);a.setTransform(1,0,0,1,0,0);
+      const r=document.createElement('canvas');r.width=w;r.height=h;const b=r.getContext('2d'),d=Math.max(1.5,ps*.9);
+      b.drawImage(c,0,0);b.globalCompositeOperation='source-in';b.fillStyle='#8ff4ff';b.fillRect(0,0,w,h);b.globalCompositeOperation='destination-out';b.drawImage(c,d*.6,d);   // the rim: silhouette minus itself shifted away from the light
+      a.globalCompositeOperation='source-atop';let g=a.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(205,240,255,.30)');g.addColorStop(.45,'rgba(205,240,255,0)');g.addColorStop(.6,'rgba(10,0,30,0)');g.addColorStop(1,'rgba(10,0,30,.38)');
+      a.fillStyle=g;a.fillRect(0,0,w,h);a.globalCompositeOperation='lighter';a.drawImage(r,0,0);a.globalCompositeOperation='source-over';C.set(id,c);}
+    const W_=c.width/ps,H_=c.height/ps;ctx.drawImage(c,-W_/2,-H_/2,W_,H_);},
   hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=v==='w'?'saturate(0) brightness(1.6)':'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,0,0);return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white (made once per picture)
   pic(n,x,y,w,ang,hk){const v=/~([ow])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
   shots(){for(const b of G.pb){const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
