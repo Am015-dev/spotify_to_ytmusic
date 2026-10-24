@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.160',date:'24 Oct 2026',items:[{t:'CHANGED',s:'The second time you open the game it loads faster: game files are kept on your device.'},{t:'NEW',s:'Preview page: the Westend race has LEGO Racers power-up bricks and a warmer, glossier look.'}]},
 {v:'v90m-beta.159',date:'24 Oct 2026',items:[{t:'FIXED',s:'On foot you no longer walk through buildings, walls and props, or into the river.'},{t:'FIXED',s:'Parked cars no longer drive off on their own while you look at them.'},{t:'FIXED',s:'If a garage car cannot load, you keep your current car and see a message.'},{t:'FIXED',s:'Wind turbine blades spin at the top of the tower again.'}]},
 {v:'v90m-beta.158',date:'22 Oct 2026',items:[{t:'CHANGED',s:'Cars now have a glossy paint finish by default (add ?gloss=0 to the address to turn it off).'},{t:'CHANGED',s:'The Takedown race is removed; all other races are unchanged.'}]},
 {v:'v90m-beta.157',date:'22 Oct 2026',items:[{t:'FIXED',s:'On foot you can no longer walk out of the world: you slow down and TURN BACK shows, like in the car.'},{t:'FIXED',s:'Only one TAP chip shows at a time, and the flight chip shows its plane icon once.'}]},
