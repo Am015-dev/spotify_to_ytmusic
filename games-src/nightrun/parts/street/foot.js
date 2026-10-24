@@ -432,7 +432,7 @@ function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv
   const vw=Math.min(760,cw/sc),hpx=Math.round(VH*sc);cx+=Math.round((cw-vw*sc)/2);
   cy=mode==='port'?Math.max(0,Math.round((ch-hpx)*.5)):Math.round((H-hpx)/2);
   L.sc=sc;L.vw=vw;L.mode=mode;L.box={x:cx,y:cy,w:Math.round(vw*sc),h:hpx};
-  const full=mode==='land',ox=full?0:cx,oy=full?0:cy,ow=full?W:L.box.w,oh=full?H:hpx;   // landscape: the canvas is the whole screen, the backdrop runs under the pad
+  const full=mode==='land'||RET.purefoot&&mode==='full',ox=full?0:cx,oy=full?0:cy,ow=full?W:L.box.w,oh=full?H:hpx;   // landscape: the canvas is the whole screen, the backdrop runs under the pad
   L.ox=ox;L.oy=oy;L.exl=(cx-ox)/sc;L.exr=(ow-(cx-ox)-L.box.w)/sc;
   const cv=L.cv;cv.style.left=ox+'px';cv.style.top=oy+'px';cv.style.width=ow+'px';cv.style.height=oh+'px';cv.width=Math.round(ow*dpr);cv.height=Math.round(oh*dpr);L.dpr=dpr;
   const show=T,auto=autoOn(),set=(el,x,y,s)=>{el.hidden=!show;el.style.display=show?'':'none';el.style.left=Math.round(x)+'px';el.style.top=Math.round(y)+'px';if(s){el.style.width=el.style.height=Math.round(s)+'px';}};

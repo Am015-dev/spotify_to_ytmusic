@@ -5,7 +5,7 @@ Code: `parts/street/purefoot.js` (new, the outermost `F.look.draw`), one export 
 `!RET.purefoot` guards in `streetlook.js` `slHud`, the flag + DPR line in `foot.js`, one line in `build.py`. Also a phone-button fix in
 `streetguard.js` (below).
 
-Shots: stage `zeil`, seed 7, stepped with `FOOT.sim(1/60)` by a fighting bot (stops when foes are on screen, steps back towards foes
+Shots (round 3: actors 1.7x, full-width PC, no debris strip): stage `zeil`, seed 7, stepped with `FOOT.sim(1/60)` by a fighting bot (stops when foes are on screen, steps back towards foes
 behind, fires), then ONE draw (`qa/purefoot-shot.js`). On and off are the same step of the same run (phone step 5816, PC step 3122:
 same foes, same positions, same shot in the air).
 - `phone-purefoot-off.webp` / `phone-purefoot-on.webp` (390x763, rendered at 3x, saved at 1x)
@@ -29,7 +29,7 @@ Line numbers are on this branch (`parts/street/...` unless named).
 | Front-shield bar (blue rect) | streetlook.js:143 | off |
 | Shield ring (code arc), dash afterimage box | streetlook.js:149-150 | off |
 | Muzzle fallback white disc | streetlook.js:152 | off (owner muzzle picture `fx-ft-*-muzzle` only) |
-| Enemy shots: dark ring + flat disc (READ.footEb) or disc + white core | streetlook.js:157, render/readable.js:63 | owner `fx-bullet-enemy` orb as a keyed copy (alpha from brightness, faint outer glow cut, cropped to the core), normal blend, 14 units wide (about the pistol muzzle flash; round 2, orchestrator: the first version drew it ~150 px) |
+| Enemy shots: dark ring + flat disc (READ.footEb) or disc + white core | streetlook.js:157, render/readable.js:63 | owner `fx-bullet-enemy` orb as a keyed copy (alpha from brightness, faint outer glow cut, cropped to the core), normal blend, 11 units wide (round 3: about 1.2x a head; round 1 drew it ~150 px). Drawn where the shot is in the sim (its hit height), not moved to the muzzle: moving the picture would show the shot where it cannot hit |
 | Player shots without a picture: rects / discs | streetlook.js:155 | owner `fx-ft-*` bullet pictures only |
 | Effects: slash arcs, rings (e.g. CALLING HELP ring, streethard.js:50), particle squares | streetlook.js:160-163 | off; owner fx pictures (`f.pic`) and the arc picture stay |
 | Floating text in the field ("+120", "+180 BEAT", "CALLING HELP") | streetlook.js:165-166, streethard.js:46 | off |
@@ -48,7 +48,9 @@ Line numbers are on this branch (`parts/street/...` unless named).
 | HUD panel (hearts, weapon, bombs, power-ups, fever), score + time, boss bar | streetlook.js:174-197 | kept: edge HUD |
 | Backing store capped by a 2.2 MP budget (then the browser scales the canvas up) | foot.js:427 | full device pixel ratio (max 3), no budget |
 | Image smoothing quality | (default low unless footq sets it) | `high` every frame |
-| Actor scale | one world scale K for all (streetlook.js slFrame) | unchanged: Kai and foes already share one texel scale |
+| Actor scale | one world scale K = 0.225 x field / 64 for all (streetlook.js slFrame) | round 3: 1.7x (K = 0.38 x field / 64), still one scale for every actor, pickup, shot and fx; purefoot puts the base K back after its frame because tidy.js reads SL.k to keep flyers under the HUD (with the big K left in place, streetsim changed: dodge 65% -> 55%) |
+| PC letterbox: the canvas was only the 760-unit view (black bars on 1440x860) | foot.js:434 | round 3: the canvas is the whole window on desktop; the backdrop and anything near the edge draw under the side bands (L.exl / L.exr, as on landscape phones). The view width and the camera are unchanged |
+| Foreground debris strip at the bottom of the floor picture (covered feet on the phone) | streetlook.js slPainted, floor tile | round 3: left out; the wet-road rows (69-90% of the picture) are stretched down to the screen edge |
 | Walk lean, recoil, dust puffs, borrowed-hit white flash | streetfeel.js:87, art/art.js:223 | kept: motion of the owner sheets / owner dust picture |
 
 ## Strict critic pass (game-look SKILL.md), vs the benchmark beat-'em-up
@@ -87,3 +89,8 @@ slot (a restart) BOMB and GUARD sat on top of each other (two labels on one butt
 branch (props 1.7 characters, feet off the road line, layer speeds and the `test ran` error in the behave section fail there too); the
 HUD-text row passes with purefoot (the 9 px GUARD label under Kai is gone). `qa/occl-test.js` checks the occlusion fade, which purefoot
 does not draw: run it with `?purefoot=0`.
+
+## Art note for the owner (not done in code, WORKER-RULES 17f)
+
+Kai's sheet (dark hoodie, dark trousers) and the olive foes sit at the same value as the night street: a 2-3 px dark outline and a light
+rim from above on the actor sheets would make them read in grayscale. No tint or glow was added in code.
