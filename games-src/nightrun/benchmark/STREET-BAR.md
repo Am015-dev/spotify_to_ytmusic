@@ -29,6 +29,15 @@ a row passes only on a measured number (stepped probe or qa/streetsim.js), never
 | B4 | Fight length 45-90 s for a decent player; the boss never feels like a damage sponge | median 45-90 s, dodge bot |
 | B5 | A boss is bigger than foes and shows its health bar with its name | bar + name always on screen |
 
+## Depth: the belt floor (owner, 23 Oct 2026: "the game is boring because the character moves left and right and you are not using the [benchmark's] environment logic")
+| # | Rule | Gate |
+|---|---|---|
+| D1 | Kai and every foe walk on a floor band in depth (up/down = into / out of the street), not on one line; jumps are a separate height | floor band >= 25% of the screen height; Kai and foes use >= 60% of it |
+| D2 | Hits land only on actors at about the same depth; stepping up/down dodges an attack | attacks out of depth miss; the dodge bot avoids >= 30% of hits by changing depth |
+| D3 | Foes spread in depth and flank: they come from both sides and different depths, not in a queue | median depth spread of attackers >= 30% of the band |
+| D4 | Actors are drawn back to front with a floor shadow, and slightly smaller further back | depth sort every frame; shadow under every actor |
+| D5 | The environment plays: props you can break, hazards that hurt foes too, and things to knock foes into | >= 3 interactive prop kinds on the street |
+
 ## Presentation
 | # | Rule | Gate |
 |---|---|---|
@@ -36,5 +45,16 @@ a row passes only on a measured number (stepped probe or qa/streetsim.js), never
 | P2 | One song per level, on beat, no jingles over it | streetsong + soundlab pass |
 | P3 | The camera shows where danger comes from | cam2-test: Kai in right 30% < 10% |
 | P4 | Readable on phone: actors >= 1/8 of screen height, HUD never covers the fight | probe on 390x763 |
+
+## Owner's 24 Oct 2026 list ("enemies slide, figures don't blend, no parry, knife hits from distance, blinking foes, no sound effects")
+| # | Rule | Gate |
+|---|---|---|
+| L1 | Foes run: a moving foe always plays its run cycle at a speed that plants its feet | stride error <= 20%, 0 frames moving while idle (W190) |
+| L2 | Foes are drawn solid; a hit is a short white flash, never a blink or see-through foe | alpha 1.0 on >= 99% of draws, 0 blink cycles (W190) |
+| G1 | A defence button: hold to block, tap just before a hit to parry and open the attacker | parry bot loses >= 30% fewer hearts than dodge bot (W192) |
+| M1 | Melee lands only in contact: blade or limb on its active frame reaches the body | 0 landed hits with a gap > 8 units (W191) |
+| S1 | Every action has its own sound; each weapon has >= 3 shot variants; hits, kicks, finishers, parries all sound different | variant check (W193) |
+| S2 | Sound effects sit under the song and never duck, filter or distort it | song gain constant; sfx peak <= song peak -6 dB (W193) |
+| V1 | Actors look lit by the scene: grade, contact shadow, wet-road reflection, rim light from neon | actor-to-scene colour distance halved (W194) |
 
 Saved screenshots of our own street are in benchmark/street/ (compare, don't retake).

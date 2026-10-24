@@ -33,7 +33,7 @@ const RUN = (seed) => { let s = seed; Math.random = () => (s = (s * 16807) % 214
       if (e.id === 'rusher' && (e.state === 'crouch' || e.state === 'lunge') && Math.abs(dx) < 190 && P.onGround && see(e, 'j' + Math.floor(e.t))) { I.jumpP = 1; I.jump = 1; }
       if (e.heavy && (e.state === 'wind' || e.state === 'charge') && toward && Math.abs(dx) < 300 && see(e, 'h' + Math.floor(e.t * .5))) {
         if (e.state === 'charge' && Math.abs(dx) < 150 && P.onGround) { I.jumpP = 1; I.jump = 1; } }
-      if (e.heavy && e.state !== 'stun' && Math.abs(dx) < 150 && !I.jumpP) I[dx > 0 ? 'l' : 'r'] = 1;   // keep off its front
+      if (e.heavy && e.state !== 'stun' && Math.abs(dx) < 150 && !I.jumpP && !(dx > 0 && P.x - S.camX < 60)) I[dx > 0 ? 'l' : 'r'] = 1;   // keep off its front (W172: not into the left screen edge: cornered there, foes stacked on Kai and he shot the wall for ever)
       if (e.heavy && e.state === 'stun' && P.bombs > 0 && (!S._bt || S.time - S._bt > 3)) { I.bombP = 1; S._bt = S.time; } }
     if (P.y < FL - 20 && P.onGround && (!gun || !(gun.cov && gun.cov.hp > 0)) && live.some(e => !e.dead && Math.abs(e.x - P.x) < 220)) { I.d = 1; I.jumpP = 1; }   // drop off the platform once the cover is gone
     if (near && Math.abs(near.x - P.x) < 60 && Math.abs(near.y - P.y) < 80 && P.melCd <= 0 && see(near, 'k' + Math.floor(S.time * 2))) I.meleeP = 1;   // knife what is on top of you

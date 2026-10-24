@@ -31,7 +31,7 @@ if(window.SND&&window.LABX){
   const FT_={f_shot:'shot',f_hit:'hit',f_pick:'pick',f_big:'big',f_hurt:'hurt',f_dash:'dash',f_graze:'graze',f_warn:'warn',f_up:'up',f_fever:'tier'};   // ON FOOT rows -> the AU.sfx sound they gate (the four song rows have no preview: they would change the music)
   SND.play=function(id){AU.unlock();if(!AU.a||AU.a.state!=='running')return false;const r=SND.T.find(x=>x[0]===id);if(!r)return false;
     if(r[1]==='mu'){this.pv[id]=performance.now()+PV_MS;this.apply();later(()=>this.apply(),PV_MS+80);MU[id]();return true;}
-    this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='ft'){if(FT_[id])AU.sfx(FT_[id]);}else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
+    this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='ft'){if(window.FTX&&FTX.has(id.slice(2)))FTX.play(id.slice(2),{force:1});else if(FT_[id])AU.sfx(FT_[id]);}else if(r[1]==='fly'){if(window.FYS&&FYS.has(id.slice(2)))FYS.play(id.slice(2),{force:1});}else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
     return true;};
   // a song preview: the song starts at once (not mapped through the picks); STOP puts back what was playing
   SND.pvSong=null;

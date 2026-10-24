@@ -12,7 +12,9 @@
    Kai may walk back (camera eases back <= 35% of the view, not behind the section checkpoint); auto-fire turns Kai to a target behind. Poses without a sheet borrow the nearest act (art.js ART.FB).
    HUD: hearts / weapon / ammo / bombs / power-ups / fever in one panel top-left (14 px+ text), score + time left of the pause button, the hint under both. ---------- */
 if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
-if(RET.cam2===undefined)RET.cam2=/[?&]cam2=1/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents. OFF by default until streetsim is retuned (HANDOFF-W164.md); ?cam2=1 = on
+if(RET.cam2===undefined)RET.cam2=!/[?&]cam2=0/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents. W181: ON by default; ?cam2=0 = old
+if(RET.occl===undefined)RET.occl=!/[?&]occl=0/.test(location.search);   // W182: a prop drawn in front of Kai (or a foe next to him) fades to 40% so he is never lost behind it; ?occl=0 = old
+if(RET.pound2===undefined)RET.pound2=!/[?&]pound2=0/.test(location.search);   // W186: boss bar + progress bar in the HUD stack (see slHud); the boss pound/leap keep one depth line (streetboss.js)
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;
@@ -47,11 +49,16 @@ SL.face=(P,hit)=>{const S=F.S,vw=IN.L().vw;let ah=0,bh=0;for(const e of S.E){if(
 
 /* ----- the scale for this frame and the height map (world y -> drawn y; the road line and everything under it stay put) ----- */
 function slFrame(L){const VV=SL.port?SL.VV:L.box.h/L.sc,K=Math.max(1,.225*VV/CH),t0=VH-VV,room=FL-t0-14-62*K;   // room: drawn height above the road a 58-unit flyer's feet may use
-  SL.VV=VV;SL.k=K;SL.t0=t0;SL.d0=Math.min(150,room*.8/K);SL.s=clamp((room-K*SL.d0)/(DTOP-SL.d0),.25,K);}
+  SL.VV=VV;SL.k=K;SL.t0=t0;SL.d0=Math.min(150,room*.8/K);SL.s=clamp((room-K*SL.d0)/(DTOP-SL.d0),.25,K);SL.band=RET.belt?Math.round(.27*VV):0;SL.z=null;}   // W173 belt: the floor band is 27% of the view tall, its front edge on the old road line
 const my=y=>{const d=FL-y;if(d<=0)return y;const K=SL.k,d0=SL.d0;return FL-(d<=d0?d*K:d0*K+(d-d0)*SL.s);};
 SL.my=my;
-const at=(c,x,y,k)=>{c.save();c.translate(x,my(y));c.scale(k,k);c.translate(-x,-y);};   // run the old drawing code for a body at (x,y): mapped and K times bigger about that spot
+const at=(c,x,y,k)=>{c.save();const z=SL.z;if(z!=null){k*=.9+.1*z;c.translate(x,my(y)-(1-z)*SL.band);}else c.translate(x,my(y));c.scale(k,k);c.translate(-x,-y);};   // belt: SL.z = depth of what is drawn (higher and up to 10% smaller further back)
+const slSh=(c,o,K)=>{const z=o.z,s=(.9+.1*z)*K,air=o.fly?.5:clamp(1-(FL-o.y)/320,.45,1),w=clamp((o.w||28)*.7,16,70)*s*air;c.fillStyle='rgba(0,0,0,.38)';c.beginPath();c.ellipse(o.x,FL-(1-z)*SL.band,w,w*.26,0,0,6.283);c.fill();};   // belt: a floor shadow under every actor   // run the old drawing code for a body at (x,y): mapped and K times bigger about that spot
 
+/* W182: the fade for a prop (1 = solid): 40% at once while Kai or a foe near him stands behind it on screen, easing back to solid after */
+const slOcc=(p,AC,K)=>{const pk=K*(.9+.1*p.z),pb=my(p.y)-(1-p.z)*SL.band,pt=pb-p.h*pk;let hid=false;
+  for(const a of AC){if(a.z>=p.z)continue;const ak=K*(.9+.1*a.z),yb=my(a.y)-(1-a.z)*SL.band;if(Math.abs(a.x-p.x)<(p.w*pk+(a.w>0?a.w:28)*ak)/2&&yb>pt&&yb-a.h*ak<pb){hid=true;break;}}
+  p._oa=hid?.4:Math.min(1,(p._oa==null?1:p._oa)+.08);return p._oa;};
 /* ----- backdrop tiles (built once per size): far skyline and mid buildings, drawn in world units, blitted with parallax ----- */
 /* ----- backdrop: NO new art (ASSET-POLICY.md). Until the owner delivers the street layers (ASSETS-NEEDED-STREET.md) each layer is a PLACEHOLDER: plain flat rectangles in one tint
    with its asset id as the label. A real file foot/bg-street-<layer>.webp listed in ready.json replaces its placeholder (tiled, parallax kept). The old media/foot/bg-*.webp are mock placeholders: not used. ----- */
@@ -91,17 +98,17 @@ if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART
 const PLY=['sky','far','mid','near','floor'],PSP={sky:.02,far:.12,mid:.4,near:.7,floor:1};
 SL.paint=0;
 function slPainted(c,x0,w,cam,t0){const P={};for(const l of PLY){const q=slPic('bg-'+l);if(!q||!q.width)return false;P[l]=q;}
-  const DH=(FL-t0)/.8,TW=2*DH,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;for(;x<x0+w;x+=TW)c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
-  const H=P.sky.height;tile('sky',t0-4,FL-t0+8,0,RET.artfix?Math.min(H,Math.round(H*(FL-t0+8)/DH)):H);/* artfix: the sky keeps its own aspect (only the rows above the street line, not the whole picture squeezed into them) */for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
-  const DF=Math.max(DH,(VH+2-FL)/.2),fy=FL-.8*DF,r0=.69;tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
+  const FR=FL-(SL.band||0),DH=(FR-t0)/.8,TW=2*DH,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;for(;x<x0+w;x+=TW)c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
+  const H=P.sky.height;tile('sky',t0-4,FR-t0+8,0,RET.artfix?Math.min(H,Math.round(H*(FR-t0+8)/DH)):H);/* artfix: the sky keeps its own aspect (only the rows above the street line, not the whole picture squeezed into them) */for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
+  const DF=Math.max(DH,(VH+2-FR)/.2),fy=FR-.8*DF,r0=.69;tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
   SL.paint=1;return true;}
-function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
-  if(slPainted(c,x0,w,cam,t0)){SL.x0=x0;if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FL,S.time);return;}SL.paint=0;
+function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,FR=FL-(SL.band||0),fh=FR-t0;
+  if(slPainted(c,x0,w,cam,t0)){SL.x0=x0;if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FR,S.time);return;}SL.paint=0;
   const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);if(window.phText()){c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}}
   slBlit(c,'far',SL.speeds.far,cam,x0,w,t0,res);slBlit(c,'mid',SL.speeds.mid,cam,x0,w,t0,res);
-  const rd=slPic('bg-street-road');if(rd){const TW=(VH-FL)*rd.width/rd.height;let x=x0-((cam%TW)+TW)%TW;for(;x<x0+w;x+=TW)c.drawImage(rd,x,FL,TW,VH-FL+2);}
-  else{c.fillStyle='#1b1530';c.fillRect(x0,FL,w,VH-FL+2);c.fillStyle='#3a2a60';c.fillRect(x0,FL,w,3);}
-  SL.x0=x0;if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FL,S.time);}
+  const rd=slPic('bg-street-road');if(rd){const TW=(VH-FL)*rd.width/rd.height;let x=x0-((cam%TW)+TW)%TW;for(;x<x0+w;x+=TW)c.drawImage(rd,x,FR,TW,VH-FR+2);}
+  else{c.fillStyle='#1b1530';c.fillRect(x0,FR,w,VH-FR+2);c.fillStyle='#3a2a60';c.fillRect(x0,FR,w,3);}
+  SL.x0=x0;if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FR,S.time);}
 
 /* ----- the frame ----- */
 SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
@@ -111,45 +118,49 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
   const sh=S.shake?IN.ftRnd(-S.shake,S.shake)*.5:0;SL.road=L.box.y+(FL+sh*.5-t0)*L.sc;SL.cam=S.camX;
   c.save();c.translate(sh,sh*.5);slBackdrop(c,S,vw,exl,exr,t0,Math.min(2,sc));
   c.translate(-S.camX,0);const lo=S.camX-exl,hi=S.camX+vw+exr;
-  for(const [px,py,pw] of S.st.plats){const y=my(py);c.fillStyle='#3a2a52';c.fillRect(px,y,pw,10);c.fillStyle='#19e3ff';c.fillRect(px,y,pw,2);}
+  if(!RET.belt)for(const [px,py,pw] of S.st.plats){const y=my(py);c.fillStyle='#3a2a52';c.fillRect(px,y,pw,10);c.fillStyle='#19e3ff';c.fillRect(px,y,pw,2);}
   if(S.cp==null&&S.st.cp){c.fillStyle='#19e3ff55';c.fillRect(S.st.cp-2,FL-1.2*CH*K,4,1.2*CH*K);c.fillStyle='#19e3ff';c.fillRect(S.st.cp-2,FL-1.2*CH*K,22,12);}
-  for(const p of S.pr){if(p.hp<=0&&!p.fl)continue;if(p.draw){try{if(p.draw(c,K,at))continue;}catch(x){}}const hd=Math.min(p.h,1.25*CH),up=p.y<FL-1;   // street2: props with their own picture
+  const dP=p=>{if(p.hp<=0&&!p.fl)return;SL.z=p.z;if(p.draw){try{if(p.draw(c,K,at))return;}catch(x){}}const hd=Math.min(p.h,1.25*CH),up=p.y<FL-1;   // street2: props with their own picture
     if(up){const y=my(p.y);c.fillStyle='#1d1834';c.fillRect(p.x-3*K,y,6*K,FL-y);c.fillRect(p.x-12*K,FL-4*K,24*K,4*K);}   // a sign stands on its pole
-    at(c,p.x,p.y,K);SL.tag='bprop';c.fillStyle=p.fl>0?'#fff':p.c;c.fillRect(p.x-p.w/2,p.y-hd,p.w,hd);SL.tag='';c.strokeStyle='#ffffff55';c.lineWidth=2;c.strokeRect(p.x-p.w/2+2,p.y-hd+2,p.w-4,hd-4);c.restore();}
+    at(c,p.x,p.y,K);SL.tag='bprop';c.fillStyle=p.fl>0?'#fff':p.c;c.fillRect(p.x-p.w/2,p.y-hd,p.w,hd);SL.tag='';c.strokeStyle='#ffffff55';c.lineWidth=2;c.strokeRect(p.x-p.w/2+2,p.y-hd+2,p.w-4,hd-4);c.restore();};   // belt: props are drawn inside the depth sort below (W180)
+  if(!SL.band)for(const p of S.pr)dP(p);SL.z=null;
   const PK=F.PICKUPS;
   for(const p of S.pk){const d=PK[p.k];if(!d)continue;const bob=Math.sin(p.t*5)*3,r=17*K,sx=p.x,edge=Math.min(sx-r-lo,hi-sx-r),fa=clamp((edge-6)/24,0,1);if(fa<=0)continue;
     const y=p.y+bob,Y=Math.max(my(y),t0+4+r);   // never above the top edge
-    const ga=(p.t>13?.5+.5*Math.sin(p.t*20):1)*fa;c.save();c.translate(p.x,Y);c.scale(K,K);c.translate(-p.x,-y);c.globalAlpha=ga;SL.tag='pk';
+    const ga=(p.t>13?.5+.5*Math.sin(p.t*20):1)*fa,pz=p.z!=null&&SL.band?p.z:1;c.save();c.translate(p.x,Y-(1-pz)*SL.band);c.scale(K*(.9+.1*pz),K*(.9+.1*pz));c.translate(-p.x,-y);c.globalAlpha=ga;SL.tag='pk';
     if(p.k==='ammo'&&RET.sprites&&typeof ART!=='undefined'&&ART.ANIM.c['pk-ammo/spin']&&ART.anim('pk-ammo/spin'))ART.drawAnim(c,'pk-ammo/spin',p.t,p.x,y,32/ART.ANIM.c['pk-ammo/spin'].bw,false);
-    else if(RET.fairstreet&&(()=>{const q=slPic(pkPic(p.k));if(!q||!q.width)return false;const h=40,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,y-h/2-4,w,h);return true;})()){c.fillStyle=d.c;c.font='bold 11px monospace';c.textAlign='center';c.textBaseline='top';c.fillText(d.n,p.x,y+18);}   // owner 23 Oct 2026: a sheet picture with its name under it, no flat disc
-    else if(RET.fairstreet){c.fillStyle=d.c;c.font='bold 13px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(d.n,p.x,y);}   // picture not loaded yet: the name alone
+    else if(RET.fairstreet&&(()=>{const q=slPic(pkPic(p.k));if(!q||!q.width)return false;const h=40,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,y-h/2-4,w,h);return true;})()){if(!RET.pound2){c.fillStyle=d.c;c.font='bold 11px monospace';c.textAlign='center';c.textBaseline='top';c.fillText(d.n,p.x,y+18);}}   // owner 23 Oct 2026: a sheet picture with its name under it, no flat disc
+    else if(RET.fairstreet){c.fillStyle=d.c;c.font='bold '+(RET.pound2?22:13)+'px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(RET.pound2?d.ic:d.n,p.x,y);}   // picture not loaded yet: the name alone
     else{c.fillStyle=d.c;c.beginPath();c.arc(p.x,y,15,0,6.283);c.fill();c.fillStyle='#05030c';c.font='bold 15px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(d.ic,p.x,y+1);}
     SL.tag='';c.globalAlpha=1;c.restore();}
-  for(const e of S.E){if(e.dead&&!(e.ext&&!e.remove))continue;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)continue;   // fully off screen: nothing to draw (a shape fallback's label would hang past the edge)
+  const dE=e=>{if(e.dead&&!(e.ext&&!e.remove))return;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)return;SL.z=e.z;   // fully off screen: nothing to draw (a shape fallback's label would hang past the edge)
     const pose=e.dead?'die':(()=>{try{return e.def.pose?e.def.pose(e):'idle';}catch(x){return'idle';}})(),ey=e.ext&&e.fly?e.y+e.h/2:e.y;
     at(c,e.x,ey,K);
     if(e.tele>0){c.fillStyle='#ff304a';c.globalAlpha=.35+.35*Math.sin(S.time*30);c.beginPath();c.arc(e.x+e.facing*e.w*.4,e.y-e.h*.62,10+e.w*.1,0,6.283);c.fill();c.globalAlpha=1;}
     if(e.wind>0){c.strokeStyle='#ff304a';c.lineWidth=3;c.strokeRect(e.x-e.w/2-4,e.y-e.h-4,e.w+8,e.h+8);}
     c.globalAlpha=1;   /* owner 23 Oct 2026 "all enemies are transparent": foes died inside their 0.9 s grace and were only ever drawn at .65; always solid now */
     ART.fE=e;SL.tag='actor';IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;SL.tag='';c.globalAlpha=1;
-    if(e.def.front&&e.def.fb){c.fillStyle='#a0c0ff';c.fillRect(e.x+e.facing*e.w*.5-3,e.y-e.h*.9,6,e.h*.8);}c.restore();}
+    if(e.def.front&&e.def.fb){c.fillStyle='#a0c0ff';c.fillRect(e.x+e.facing*e.w*.5-3,e.y-e.h*.9,6,e.h*.8);}c.restore();SL.z=null;};
+  if(!SL.band)for(const e of S.E)dE(e);
   if(S.st.hook&&S.st.hook.draw){const sw=[];for(const e of S.E)if(e.lane&&!e.dead){const y0=e.lane.y;sw.push([e.lane,y0]);e.lane.y=FL-(FL-my(y0+30))/K-30;}   // lanes: drawn under a plain K stretch, so pre-map their height
     const ft=c.fillText;c.fillText=function(s_,x,y,mw){c.save();c.translate(x,y);c.scale(1,1/K);ft.call(c,s_,0,0,mw);c.restore();};   // no stretched letters
     c.save();c.translate(0,FL);c.scale(1,K);c.translate(0,-FL);try{S.st.hook.draw(c,S);}catch(x){}c.restore();delete c.fillText;for(const [l,y0] of sw)l.y=y0;}
-  const blink=P.inv>0&&Math.floor(S.time*16)%2;if(!blink||P.hp<=0){at(c,P.x,P.y,K);
+  const dK=()=>{const blink=P.inv>0&&Math.floor(S.time*16)%2;if(!blink||P.hp<=0){SL.z=P.z;at(c,P.x,P.y,K);
     if(P.pw.shield){c.strokeStyle='#5ad1ff';c.lineWidth=2+P.pw.shield.lv;c.beginPath();c.arc(P.x,P.y-34,44,0,6.283);c.stroke();}
     if(P.dashIF>0){c.fillStyle='#19e3ff33';c.fillRect(P.x-24-P.facing*20,P.y-60,48,58);}
     P._xa=IN.kaiX(P);ART.fE=P;IN.drawWho(c,'kai',IN.ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);ART.fE=null;
-    if(P.shotT>0){const a=P.aim,mq=F.mzAt&&F.mzAt(P),mx=mq?mq[0]:P.x+Math.cos(a)*28,mY=mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20;if(!(window.AH&&AH.ftMuz(c,P.w,mx,mY,a))&&F.WEAPONS[P.w].kind!=='arc'){c.fillStyle='#fff';c.beginPath();c.arc(mx,mY,5,0,6.283);c.fill();}}c.restore();}
-  for(const b of S.pb){at(c,b.x,b.y,K);if(window.AH&&AH.ftBul(c,b)){c.restore();continue;}c.fillStyle=b.c;if(b.kind==='fire'){c.globalAlpha=Math.max(0,b.life*2);c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.globalAlpha=1;}else if(b.kind==='rkt'){c.fillRect(b.x-8,b.y-3,16,6);}else{c.fillRect(b.x-6,b.y-2,12,4);}c.restore();}
-  for(const g of S.bombsL){at(c,g.x,g.y,K);if(window.AH&&AH.ftDraw(c,'fx-ft-grenade',g.x,g.y,22,S.time*7)){c.restore();continue;}c.fillStyle='#ffb020';c.beginPath();c.arc(g.x,g.y,7,0,6.283);c.fill();c.restore();}
-  for(const b of S.eb){at(c,b.x,b.y,K);if(RET.read&&window.READ)READ.footEb(c,b);else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(b.x,b.y,b.r*.45,0,6.283);c.fill();}c.restore();}
-  for(const f of S.fx){c.globalAlpha=Math.min(1,f.l*3);
+    if(P.shotT>0){const a=P.aim,mq=F.mzAt&&F.mzAt(P),mx=mq?mq[0]:P.x+Math.cos(a)*28,mY=mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20;if(!(window.AH&&AH.ftMuz(c,P.w,mx,mY,a))&&F.WEAPONS[P.w].kind!=='arc'){c.fillStyle='#fff';c.beginPath();c.arc(mx,mY,5,0,6.283);c.fill();}}c.restore();SL.z=null;}};
+  if(SL.band){const A=S.E.filter(e=>e.z!=null&&!(e.dead&&!(e.ext&&!e.remove)));A.push(P);const PS=new Set();for(const p of S.pr)if(p.z!=null){A.push(p);PS.add(p);}A.sort((a,b)=>a.z-b.z);const AC=RET.occl?A.filter(a=>a===P||(!PS.has(a)&&Math.abs(a.x-P.x)<300)):[];for(const a of A){if(PS.has(a)){c.globalAlpha=slOcc(a,AC,K);dP(a);c.globalAlpha=1;SL.z=null;continue;}if(!a.dead&&a.x>lo-80&&a.x<hi+80)slSh(c,a,K);a===P?dK():dE(a);}}   // belt: back to front every frame, shadow first
+  else dK();
+  for(const b of S.pb){SL.z=b.z;at(c,b.x,b.y,K);if(window.AH&&AH.ftBul(c,b)){c.restore();continue;}c.fillStyle=b.c;if(b.kind==='fire'){c.globalAlpha=Math.max(0,b.life*2);c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.globalAlpha=1;}else if(b.kind==='rkt'){c.fillRect(b.x-8,b.y-3,16,6);}else{c.fillRect(b.x-6,b.y-2,12,4);}c.restore();}
+  for(const g of S.bombsL){SL.z=g.z;at(c,g.x,g.y,K);if(window.AH&&AH.ftDraw(c,'fx-ft-grenade',g.x,g.y,22,S.time*7)){c.restore();continue;}c.fillStyle='#ffb020';c.beginPath();c.arc(g.x,g.y,7,0,6.283);c.fill();c.restore();}
+  for(const b of S.eb){SL.z=b.z;at(c,b.x,b.y,K);if(RET.read&&window.READ)READ.footEb(c,b);else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(b.x,b.y,b.r*.45,0,6.283);c.fill();}c.restore();}
+  SL.z=null;for(const f of S.fx){c.globalAlpha=Math.min(1,f.l*3);if(SL.band){if(f.z===undefined){let bz=null,bd=1e9;for(const a of S.E.concat([P]))if(a.z!=null){const d=Math.abs(a.x-f.x)+Math.abs(a.y-a.h/2-f.y);if(d<bd){bd=d;bz=a.z;}}f.z=bz;}SL.z=f.z;}   // belt: a spark sits at the depth of the actor it came from
     if(f.pic&&window.AH){at(c,f.x,f.y,K);AH.ftFx(c,f);c.restore();continue;}
     if(f.arc&&window.AH&&AH.ftArc(c,Object.assign({},f,{arc:f.arc.map(([x,y])=>[x,my(y)])}))){}else if(f.arc){c.strokeStyle=f.c;c.lineWidth=3*K;c.beginPath();f.arc.forEach(([x,y],i)=>{const j=i?IN.ftRnd(-6,6):0;i?c.lineTo(x+j,my(y)+j):c.moveTo(x,my(y));});c.stroke();}
     else{at(c,f.x,f.y,K);if(f.slash){c.strokeStyle=f.c;c.lineWidth=4;c.beginPath();c.arc(f.x,f.y,f.w*.5,-1.2,1.2);c.stroke();}
       else if(f.ring){c.strokeStyle=f.c;c.lineWidth=4;c.beginPath();c.arc(f.x,f.y,f.r*(1-f.l/f.m*.6),0,6.283);c.stroke();}
-      else{c.fillStyle=f.c;c.fillRect(f.x-f.r/2,f.y-f.r/2,f.r,f.r);}c.restore();}}c.globalAlpha=1;
+      else{c.fillStyle=f.c;c.fillRect(f.x-f.r/2,f.y-f.r/2,f.r,f.r);}c.restore();}}c.globalAlpha=1;SL.z=null;
   const fs=n=>Math.max(14,n)*u,ptop=t0+(SL.hudB||100*u)+4*u;c.textAlign='center';c.textBaseline='alphabetic';SL.tag='pop';
   for(const p of S.pop){c.font='bold '+fs(p.big?17:15)+'px monospace';const tw=c.measureText(p.t).width,fh=fs(p.big?17:15),pl=S.camX+tw/2+8*u,pr=S.camX+vw-tw/2-8*u;   // inside the field, under the HUD
     c.globalAlpha=Math.min(1,p.l/p.m*2.5);c.fillStyle=p.c;c.fillText(p.t,pl>pr?S.camX+vw/2:clamp(p.x,pl,pr),Math.max(ptop+fh,Math.min(VH-8*u,my(p.y))));}c.globalAlpha=1;SL.tag='';
@@ -173,12 +184,18 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   let sr=vw-60*u,sy=t0+m+2*u;if(x+pw_+10*u>sr-sw){sr=vw-10*u;sy=t0+60*u;}   // narrow screen: under the pause button
   c.fillStyle='#fff';c.fillText(st,sr,sy);c.font='bold '+fs(14)+'px monospace';c.fillStyle='#c9c3e6';c.fillText(tt,sr,sy+20*u);box(sr-sw,sy,sw,38*u);
   const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;SL.hudFull=hudB+42*u;   // hudFull: the band with the hint line (tidy keeps flyers under it)
-  if(S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
+  if(!RET.pound2&&S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
   if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u;}
   if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=(SL.t0+VH)/2,a=.55+.45*Math.sin(S.time*14);c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';c.fillStyle='#ffb020';
     c.font='bold '+fs(34)+'px monospace';c.fillText('◀',6*u,fy);c.font='bold '+fs(14)+'px monospace';c.fillText('BEHIND',6*u+30*u,fy-8*u);c.fillText('foe arriving from the left',6*u+30*u,fy+9*u);c.globalAlpha=1;}   // W161: 1 s warning at the edge a foe comes from
-  SL.tag='';if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
+  SL.tag='';
+  if(RET.pound2){   // W186 (?pound2=1 = on; OFF until its gates pass): boss bar and run-progress bar sit in the HUD stack under the hint line, never on the floor band (they used to cover the front depth)
+    const by=t0+SL.hudB,bossOn=S.boss&&!S.boss.dead;
+    if(bossOn){const bw=vw*.7,bx=vw*.15;c.fillStyle='#ffffff22';c.fillRect(bx,by+18*u,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by+18*u,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
+      c.textAlign='center';c.fillStyle='#fff';c.textBaseline='top';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by,vw-20*u);box(bx,by-t0,bw,30*u);SL.hudB+=34*u;}
+    else if(S.st.hook&&S.st.hook.hud){const dy=by+10*u-(VH-14*u);c.save();c.translate(0,dy);try{S.st.hook.hud(c,vw,u,(x,y,w,h)=>box(x,y+dy,w,h),fs,S);}catch(x){}c.restore();SL.hudB+=24*u;}}
+  else if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};IN.ghost();}
 })();

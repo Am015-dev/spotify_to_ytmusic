@@ -52,3 +52,23 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
    (d) Screenshots: compare with games-src/nightrun/benchmark/ instead of retaking; retake only the screen you changed.
    (e) Automated tests catch crashes and regressions; feel and balance need the owner's play. Ask for it instead of looping bots past the point
        where numbers stop moving (23 Oct: four balance rounds moved the casual-bot clear rate 44 -> 4 -> 18 -> 20%).
+17. LOOK FIRST, BUILD SECOND (owner, 24 Oct 2026 17:10: "the prototype looks like shit; bullets, ships, environment, fun all below 10/100;
+    no need to continue expanding"). From public write-ups of games built with AI agents: agents do about 2x worse on graphics than on
+    gameplay tasks, a screenshot in the loop helps, and the working pattern is one small vertical slice played and judged before anything grows.
+   (a) FEATURE FREEZE until both slices pass (e): no new systems, modes, foes, flags or stages. Only work on the one flight stage and the
+       one street level as they are.
+   (b) ONE SHOT, NOT A GRID: before any work and after it, ONE phone (390x763) + ONE PC (1440x860) screenshot of normal play. If that first
+       pair is bad, stop and fix it; never produce 8-16 before/after shots of something that is bad in the first one.
+   (c) SIDE BY SIDE: place our shot next to a benchmark-game screenshot of the same moment (reference by URL only, never in the repo) and
+       score each row 0-100: SHIPS/ACTORS (size, silhouette, motion), BULLETS (player shots visible, enemy shots distinct per enemy,
+       readable over everything), ENVIRONMENT (one coherent scene, depth, no pasted layers), FEEL (hits, explosions, sound), FUN.
+       The owner's score is the baseline (24 Oct: all < 10). A worker's own score may never be higher than the owner's last score + 15.
+   (d) READABILITY RULES (flight, from shoot-'em-up design guides): player shots bright and always visible but drawn under enemy shots;
+       enemy shots high-contrast, a colour no other object uses, shape and colour differ per enemy type; ships big enough to read
+       (player >= 1/12 of the short screen side); enemies move on curves and formations, never straight mechanical lines.
+   (e) DONE = the owner says the one-shot pair looks good. Not a probe, not a colour-distance number, not a worker's verdict.
+   (f) Code cannot paint art: grading, tints and glow do not fix weak sprites (24 Oct: W194/W201 halved colour distance; the owner still
+       saw pasted layers). If the art is the problem, say so and list the sprite needed for Google Flow instead of tinting it.
+   (g) PLAY AS A BOT (owner, 24 Oct 17:25: "you are a bot, you can play multiple games x200, no need to run human time"): every probe,
+       audit and balance run is stepped at >= x200 (flight: qa/simhunt.js harness; street: FOOT.sim as qa/streetsim.js), several full
+       runs to the end of the boss. Real time only for the single screenshot moment.

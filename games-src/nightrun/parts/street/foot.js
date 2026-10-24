@@ -74,6 +74,10 @@ const ftUnlocked=()=>{try{return (sSave.stars[3]|0)>=1||!!sSave.all;}catch(e){re
 const F={on:false,STAGES,WEAPONS,PICKUPS,FDIFF,FB,unlocked:ftUnlocked,save:()=>SV,ctl:null,S:null,start,stop,sim,step:null,layout:null};
 let S=null,L=null,raf=0,lastT=0;
 const I={x:0,y:0,l:0,r:0,u:0,d:0,fire:0,jump:0,melee:0,dash:0,bomb:0,jumpP:0,meleeP:0,dashP:0,bombP:0,stick:0};
+/* W173 belt floor (RET.belt, default ON since W180, ?belt=0 = old): every actor has a depth z on the street (0 = back by the wall, 1 = front); up/down walks in depth,
+   jump stays a height. A hit lands only when the two depths are within ZT (15% of the band), so stepping up/down dodges. streetlook.js draws the band. */
+if(RET.belt===undefined)RET.belt=!/[?&]belt=0/.test(location.search);   // W180: ON by default, ?belt=0 = the old flat road
+const ZT=.15,ZSPD=1.2,zok=(a,b,t)=>!RET.belt||a==null||b==null||Math.abs(a-b)<=(t||ZT);
 
 /* ===== run state ===== */
 function newRun(id,fromCp){const st=STAGES[id],D=diffK(),old=S;
@@ -83,8 +87,8 @@ function newRun(id,fromCp){const st=STAGES[id],D=diffK(),old=S;
       w:'pistol',lv:1,ammo:Infinity,bombs:2,pw:{},aim:0,jh:0,maxX:120,idle:0,anim:0,shotT:0,hurtT:0},
     E:[],pb:[],eb:[],q:[],pk:[],pr:[],fx:[],pop:[],bombsL:[],waves:st.waves.map((w,i)=>Object.assign({i,done:false,left:w.count,next:0,started:false},w)),
     fever:0,feverT:0,hs:0,shake:0,lhb:null,note:{t:0,txt:''},cp:null,cpUsed:!!fromCp,assist:!!(RET.assistActive&&RET.assistActive()),lockedIds:{},idleSpawn:0,hintT:0,moved:0,shots:0};
-  S.pk=(st.pk||[]).map(([x,k])=>({k,x,y:FL-16,vy:0,t:0,on:true,fix:1}));
-  S.pr=st.props.map(([x,k],i)=>{const d=PROPD[k];return{x,y:d.y||FL,k,hp:d.hp,w:d.w,h:d.h,c:d.c,i,fl:0};});
+  S.pk=(st.pk||[]).map(([x,k])=>({k,x,y:FL-16,vy:0,t:0,on:true,fix:1,z:RET.belt?.5:undefined}));
+  S.pr=st.props.map(([x,k],i)=>{const d=PROPD[k];return{x,y:d.y||FL,k,hp:d.hp,w:d.w,h:d.h,c:d.c,i,fl:0,z:RET.belt?.12:undefined};});   // belt: props stand by the wall
   if(fromCp&&old&&old.cp){const c=old.cp,cpx=c.x!=null?c.x:st.cp;S.cpN=c.n|0;S.P.x=cpx+40;S.P.maxX=S.P.x;S.camX=Math.max(0,cpx-120);S.score=c.score;S.time=c.time;S.kills=c.kills;S.hurts=c.hurts;S.cp=c;
     for(const w of S.waves)if(w.lock?(st.locks.find(l=>l.id===w.lock)||{x:0}).x<cpx:w.x<cpx+200)w.done=true;
     for(const l of st.locks)if(l.x<cpx)S.lockDone[l.id]=1;S.pr=S.pr.filter(p=>p.x>cpx);S.pk=S.pk.filter(p=>p.x>cpx);S.P.w=c.w;S.P.lv=c.lv;S.P.ammo=c.ammo;S.P.bombs=Math.max(2,c.bombs);}
@@ -98,7 +102,7 @@ function ftShake(v){if(reduce())return;S.shake=Math.max(S.shake,window.COM?COM.s
 const SFXID={shot:'f_shot',hit:'f_hit',pick:'f_pick',big:'f_big',hurt:'f_hurt',dash:'f_dash',graze:'f_graze',warn:'f_warn',up:'f_up',tier:'f_fever'};   // LAB (ON FOOT group of the SOUND page): each on-foot sound has its own switch
 // 22 Oct: 'window.AU' is undefined (AU is a script-level const), so these three calls never ran: no on-foot sound, no stage song. They use AU directly now, each behind its ON FOOT switch.
 const sndF=id=>!window.sndOn||sndOn(id);
-function sfx(n){try{if(!sndF(SFXID[n]||'f_'+n))return;if(typeof AU!=='undefined'&&AU.sfx)AU.sfx(n);}catch(e){}}
+function sfx(n){try{if(window.FTX&&FTX.owns(n)){FTX.old(n);return;}if(!sndF(SFXID[n]||'f_'+n))return;if(typeof AU!=='undefined'&&AU.sfx)AU.sfx(n);}catch(e){}}
 /* the song's beat: bpos() from a.js when the beat clock runs, else our own 120 bpm clock */
 function beatPos(){try{if(typeof bpos==='function'&&typeof BT!=='undefined'&&BT.mode!=='none'){const p=bpos(performance.now());if(isFinite(p))return p;}}catch(e){}return S?S.time*2:0;}
 function ftOnBeat(){const p=beatPos(),f=Math.abs(p-Math.round(p)),spb=(typeof BT!=='undefined'&&BT.spb)||.5,win=.11+((RET.asWinMs&&RET.asWinMs())||0)/1000;return f*spb<win;}
@@ -123,7 +127,7 @@ function fbDef(id){if(fbCache[id])return fbCache[id];const b=FB[id]||FB.grunt;
   return fbCache[id]=d;}
 function spawn(id,x,y,o){const boss=!!(o&&o.boss),d=o&&o.fb?fbDef(id):edef(id,boss),D=S.D;
   const ext=!d.fb,e={id,def:d,ext,x,y:y==null?FL:y,vx:0,vy:0,w:d.w||30,h:d.h||60,hp:(d.hp||3)*D.hp*(ext&&boss?.3:1),t:0,state:'in',facing:x>S.P.x?-1:1,flash:0,tele:0,grace:GRACE,boss,phase:0,lock:o&&o.lock,fly:!!d.fly};
-  e.max=e.maxHp=e.mhp=e.hp;if(ext&&(d.flyer||d.fly))e.fly=true;if(ext&&e.fly&&y==null)e.y=FL-200;if(e.fly)e.hy=ftRnd(110,190);S.E.push(e);if(boss)S.boss=e;return e;}
+  e.max=e.maxHp=e.mhp=e.hp;if(RET.belt)e.z=F.beltZ(e);if(ext&&(d.flyer||d.fly))e.fly=true;if(ext&&e.fly&&y==null)e.y=FL-200;if(e.fly)e.hy=ftRnd(110,190);S.E.push(e);if(boss)S.boss=e;return e;}
 function envG(){const G=S.G||(S.G={ftok:[],airTop:80,airBottom:FL-150,obs:[]});const bp=beatPos(),spb=(typeof BT!=='undefined'&&BT.spb)||.5;
   Object.assign(G,{time:S.time,floorY:FL,camX:S.camX,viewW:viewW(),eb:S.eb,beat:bp,beatLen:spb,bpm:60/spb});G.obs=S.pr.filter(p=>p.hp>0&&p.k==='crate').map(p=>({x:p.x-p.w/2,w:p.w,h:p.h}));return G;}
 const env={get P(){return S.P;},get G(){return S.G||envG();},get D(){return S.D;},rnd:ftRnd,
@@ -132,11 +136,11 @@ const env={get P(){return S.P;},get G(){return S.G||envG();},get D(){return S.D;
   shoot(e,a,spd,dmg,o){if(!S||S.dead)return;if(e.x<S.camX-10||e.x>S.camX+viewW()+10)return;   // never from off-screen
     if(e.ext){if(S.eb.length>=EBMAX||e.grace>0)return;o=o||{};const sp=(spd||300)*S.D.bs*((RET.asB&&RET.asB())||1),r=o.w||o.h?Math.max(4,Math.min(16,Math.max(o.w||0,o.h||0)/2)):6;
       const mz=F.emz&&!o.ground&&F.emz(e,a),sx=mz?mz[0]:o.ox!=null?o.ox:e.x+e.facing*e.w*.45,sy=o.ground?FL-8:mz?mz[1]:(o.oy!=null?o.oy:e.y-e.h*.62);
-      const xb={x:sx,y:sy,vx:o.vx!=null?o.vx:Math.cos(a)*sp,vy:o.ground?0:Math.sin(a)*sp,r,dmg:dmg||1,life:o.life||4,grav:!!o.grav,src:e.id,c:o.kind==='sniper'?'#e8ff40':o.kind==='shock'||o.kind==='shockline'?'#7df9ff':'#ff4a6a',ground:!!o.ground,qt:S.time};if(RET.beatshots&&S.st&&S.st.s3)(S.xq||(S.xq=[])).push(xb);else S.eb.push(xb);return;}   // streetsong: the bullet leaves on the next half beat of the song (like the queued shots below)
+      const xb={x:sx,y:sy,vx:o.vx!=null?o.vx:Math.cos(a)*sp,vy:o.ground?0:Math.sin(a)*sp,r,dmg:dmg||1,life:o.life||4,grav:!!o.grav,src:e.id,c:o.kind==='sniper'?'#e8ff40':o.kind==='shock'||o.kind==='shockline'?'#7df9ff':'#ff4a6a',ground:!!o.ground,qt:S.time,z:e.z};if(RET.beatshots&&S.st&&S.st.s3)(S.xq||(S.xq=[])).push(xb);else S.eb.push(xb);return;}   // streetsong: the bullet leaves on the next half beat of the song (like the queued shots below)
     if(S.q.length>=Math.round(QMAX*S.D.fr)&&!(o&&o.must))return;
     const t=Math.max(TELE,(o&&o.tele)||0)+Math.max(0,e.grace||0);e.tele=Math.max(e.tele,t);
     S.q.push({e,a,spd:(spd||340)*S.D.bs*((RET.asB&&RET.asB())||1),dmg:dmg||1,o:o||{},at:S.time+t});},
-  melee(e,r,dmg,o){if(e.grace>0||e.dead)return false;if(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2))return false;/* W161: a foe hits only after 1.2 s on screen */const P=S.P,b=pbox(P);let hit=false;if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y)hit=ftHurt(dmg||1,e.x,'mel:'+e.id);
+  melee(e,r,dmg,o){if(e.grace>0||e.dead)return false;if(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2))return false;/* W161: a foe hits only after 1.2 s on screen */const P=S.P,b=pbox(P);let hit=false;if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){if(zok(e.z,P.z))hit=ftHurt(dmg||1,e.x,'mel:'+e.id);else if(S.time-(e._zm||-9)>.5){e._zm=S.time;S.zmiss=(S.zmiss||0)+1;}}   // belt: S.zmiss counts attacks dodged by depth
     if(!e._mfx||S.time-e._mfx>.12){e._mfx=S.time;S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:Math.min(r.w,200),l:.15,c:o&&o.beam?'#ff2050':'#ff4a6a'});}return hit;}};
 F.env=env;
 function pbox(P){const h=P.crouch?40:P.h,bw=S.st.fs?28:P.w;return{x:P.x-bw/2,y:P.y-h,w:bw,h};}   // P.w is the weapon id (the street1 mock keeps its NaN box; footstage stages use the 28 px body)
@@ -145,11 +149,11 @@ const hittable=e=>!e.dead&&!(e.def.canHit&&e.def.canHit(e)===false);
 function circHit(x,y,r,b){const cx=clamp(x,b.x,b.x+b.w),cy=clamp(y,b.y,b.y+b.h);return (x-cx)*(x-cx)+(y-cy)*(y-cy)<=r*r;}
 function dmgE(e,d,src){if(!hittable(e))return;const k=(S.P.pw.dbl?[1,2,2.4,2.8][S.P.pw.dbl.lv]:1)*(S.feverT>0?1.25:1);d*=k;
   if(e.def.front&&src&&Math.sign(src.vx||0)===-e.facing&&!src.pierce&&e.def.fb){d*=.4;}   // fallback shield: front blocks most
-  e.hp-=d;e.flash=.08;try{e.def.onHit&&e.def.onHit(e,d,env,{x:src&&src.x!=null?src.x-(src.vx||0)*.01:S.P.x,melee:!!(src&&src.melee)});}catch(x){}
+  e.hp-=d;e.flash=.08;if(window.FTX)FTX.ev(e.hp<=0?'foedeath':'foehurt');if(F.hitFeel)F.hitFeel(e,d,src);try{e.def.onHit&&e.def.onHit(e,d,env,{x:src&&src.x!=null?src.x-(src.vx||0)*.01:S.P.x,melee:!!(src&&src.melee)});}catch(x){}
   if(e.ext&&e.boss&&e.phase!==e._lp){if(e._lp!=null){hitstop(60);ftShake(10);note('PHASE '+e.phase,1.4);NR.emit('footPhase',{id:e.id,phase:e.phase});}e._lp=e.phase;}
   if(!e.ext&&e.boss&&e.def.phases){const fr=e.hp/e.max;while(e.phase<e.def.phases.length&&fr<=e.def.phases[e.phase].hp){e.phase++;hitstop(60);ftShake(10);note('PHASE '+(e.phase+1),1.4);NR.emit('footPhase',{id:e.id,phase:e.phase});}}
   if(e.hp<=0)ftKill(e);}
-function ftKill(e){e.dead=true;const d=e.def,beat=ftOnBeat(),fv=S.feverT>0;let sc=Math.round((d.score||100)*(fv?2:1)*(beat?1.5:1));S.score+=sc;S.kills++;
+function ftKill(e){e.dead=true;S.kz=e.z;const d=e.def,beat=ftOnBeat(),fv=S.feverT>0;let sc=Math.round((d.score||100)*(fv?2:1)*(beat?1.5:1));S.score+=sc;S.kills++;
   pop(e.x,e.y-e.h-8,'+'+sc+(beat?' BEAT':''),beat?'#ffd23a':'#fff');ftBurst(e.x,e.y-e.h/2,d.c||'#f46',e.boss?40:12,e.boss?420:260);if(e.boss)AH.ftPush(S.fx,'fx-boom-ground-dust',e.x,e.y-20,200,.6);else AH.ftPush(S.fx,'fx-ft-blood-spark',e.x,e.y-e.h/2,70,.3);
   if(!fv)S.fever=Math.min(100,S.fever+(beat?14:6));if(S.fever>=100&&S.feverT<=0){S.feverT=8;S.fever=0;note('FEVER!',1.6);sfx('tier');}
   if(e.boss||e.w>60){hitstop(e.boss?60:30);ftShake(e.boss?14:6);}sfx(e.boss?'big':'hit');
@@ -158,25 +162,25 @@ function ftKill(e){e.dead=true;const d=e.def,beat=ftOnBeat(),fv=S.feverT>0;let s
   else{const ch=e.boss?1:(e.w>40?.6:.16);if(Math.random()<ch){const L=(d.drops&&d.drops.length?d.drops:DROPS).filter(k=>PICKUPS[k]);if(L.length)drop(L[Math.floor(Math.random()*L.length)],e.x,e.y-e.h/2);}}
   NR.emit('footKill',{id:e.id,boss:!!e.boss,x:e.x,y:e.y});
   if(e.boss){S.win=1.8;S.eb.length=0;S.q.length=0;note('WARDEN DOWN',2);for(const o of S.E)if(!o.dead&&o!==e){o.dead=true;ftBurst(o.x,o.y-o.h/2,'#fff',8);}}}
-function drop(k,x,y){S.pk.push({k,x,y,vy:-260,t:0,on:false});}
+function drop(k,x,y){S.pk.push({k,x,y,vy:-260,t:0,on:false,z:S.kz});}
 
 /* ===== player ===== */
 function wstat(id,lv){const w=WEAPONS[id],m=1+.22*(lv-1);return{dmg:w.dmg*m,rate:w.rate*(1+.12*(lv-1))*(S.feverT>0?1.4:1),w};}
-function aimAngle(P){const up=I.u||I.y<-.5,dn=I.d||I.y>.5,mx=I.r?1:I.l?-1:(Math.abs(I.x)>.35?Math.sign(I.x):0);
+function aimAngle(P){const up=!RET.belt&&(I.u||I.y<-.5),dn=!RET.belt&&(I.d||I.y>.5),mx=I.r?1:I.l?-1:(Math.abs(I.x)>.35?Math.sign(I.x):0);
   if(up)return mx?(mx>0?-Math.PI/4:-Math.PI*3/4):-Math.PI/2;
   if(dn&&!P.onGround)return mx?(mx>0?Math.PI/4:Math.PI*3/4):Math.PI/2;
   return P.facing>0?0:Math.PI;}
-function aimAssist(P,a,ox,oy){let best=a,bd=S.st.aimCone||.3;for(const e of S.E){if(e.dead||!e.seen)continue;const dx=e.x-ox,dy=e.y-e.h/2-oy;if(dx*dx+dy*dy>640*640)continue;let d=Math.atan2(dy,dx)-a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;if(Math.abs(d)<bd){bd=Math.abs(d);best=a+d;}}return best;}   // 8-way aim + a small cone (0.3 rad) toward the closest enemy in it
+function aimAssist(P,a,ox,oy){let best=a,bd=S.st.aimCone||.3;for(const e of S.E){if(e.dead||!e.seen||!zok(e.z,P.z))continue;const dx=e.x-ox,dy=e.y-e.h/2-oy;if(dx*dx+dy*dy>640*640)continue;let d=Math.atan2(dy,dx)-a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;if(Math.abs(d)<bd){bd=Math.abs(d);best=a+d;}}return best;}   // 8-way aim + a small cone (0.3 rad) toward the closest enemy in it
 /* auto-fire (touch default): shoot while an enemy (or a floor prop) is on screen on the side you face, or above you when the stick aims up */
-function autoTarget(P){const up=I.u||I.y<-.5,vw=viewW(),fc=P.facing;
+function autoTarget(P){const up=!RET.belt&&(I.u||I.y<-.5),vw=viewW(),fc=P.facing;
   for(const e of S.E){if(e.dead||!e.seen||!hittable(e))continue;const dx=(e.x-P.x)*fc;if(Math.abs(e.x-P.x)>vw)continue;if(dx>-20||(up&&Math.abs(e.x-P.x)<260&&e.y-e.h/2<P.y-70))return true;}
   for(const p of S.pr){if(p.hp<=0)continue;const dx=(p.x-P.x)*fc;if(dx>10&&dx<300&&p.x>S.camX&&p.x<S.camX+vw&&(p.y>=FL-1||up))return true;}
   return false;}
 function fire(P){const s=wstat(P.w,P.lv),w=s.w,lv=P.lv,a0=aimAngle(P),a1=aimAssist(P,a0,P.x,P.y-(P.crouch?26:44)),a=P.aim=F.aimX?F.aimX(P,a1,a0):a1,ox0=P.x+Math.cos(a)*18,oy0=P.y-(P.crouch?26:44)+Math.sin(a)*14,mz=F.mz&&F.mz(P,a),ox=mz?mz[0]:ox0,oy=mz?mz[1]:oy0;   // streetfeel.js: from the drawn gun's muzzle
-  S.shots++;P.shotT=.12;const pr=(t)=>({x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
+  S.shots++;P.shotT=.12;if(window.FTX)FTX.ev('shot',P.w);const pr=(t)=>({z:P.z,x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
   if(w.kind==='bul'){const sp=(w.spr||0)*(1-.12*(lv-1)),n=(P.w==='hmg'&&lv>=5)?2:(P.w==='pistol'&&lv>=3?2:1);
     for(let i=0;i<n;i++){const aa=a+ftRnd(-sp,sp)+(n>1?(i-.5)*.08:0);S.pb.push(pr({vx:Math.cos(aa)*w.spd,vy:Math.sin(aa)*w.spd,pierce:(P.w==='hmg'&&lv>=3)?1:0}));}}
-  else if(w.kind==='pel'){const n=w.pel+(lv>=3?2:0);for(let i=0;i<n;i++){const aa=a+(i-(n-1)/2)*(w.spr/n)*2+ftRnd(-.03,.03),v=w.spd*ftRnd(.85,1.1);S.pb.push(pr({vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,r:4,pierce:lv>=5?1:0,kb:lv>=5?220:60}));}ftShake(2);}
+  else if(w.kind==='pel'){const n=w.pel+(lv>=3?2:0);for(let i=0;i<n;i++){const aa=a+(i-(n-1)/2)*(w.spr/n)*2+ftRnd(-.03,.03),v=w.spd*ftRnd(.85,1.1);S.pb.push(pr({vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,r:4,pierce:lv>=5?1:0,kb:lv>=5?220:60}));}if(!RET.hitfeel)ftShake(2);}
   else if(w.kind==='fire'){const v=w.spd*(lv>=3?1.4:1)*ftRnd(.9,1.1),aa=a+ftRnd(-.12,.12);S.pb.push(pr({vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,r:7,pierce:9,life:w.life*(lv>=3?1.3:1),burn:lv>=5}));}
   else if(w.kind==='rkt'){S.pb.push(pr({vx:Math.cos(a)*w.spd,vy:Math.sin(a)*w.spd,r:6,rad:w.rad*(lv>=3?1.45:1),hom:lv>=5,life:2}));sfx('shot');}
   else if(w.kind==='arc'){arcShot(P,ox,oy,a,s.dmg,lv);}
@@ -197,23 +201,27 @@ function collect(p){const P=S.P,d=PICKUPS[p.k];sfx('pick');let lv=1;
   else if(p.k==='bomb'){P.bombs=Math.min(9,P.bombs+1);pop(P.x,P.y-90,'+1 BOMB','#ffb020',true);}
   else{const c=P.pw[p.k];lv=c?Math.min(d.max,c.lv+1):1;P.pw[p.k]={lv,t:d.t+(p.k==='slow'?1.5*(lv-1):0)};pop(P.x,P.y-90,d.n+(d.max>1?' LV'+lv:''),d.c,true);}
   NR.emit('footPick',{id:p.k,lv});}
-function ftHurt(n,fromX,src){const P=S.P;if(P.inv>0||P.dashIF>0||S.win||P.hp<=0)return false;
-  if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');sfx('graze');return false;}
-  P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*240;
+function ftHurt(n,fromX,src,b){const P=S.P;if(P.dashIF>0&&P.inv<=0&&!S.win&&P.hp>0&&F.dodged)F.dodged(S,n,src);   // streetdodge: an attack the dash i-frames absorbed
+  if(P.inv>0||P.dashIF>0||S.win||P.hp<=0)return false;if(F.guardHit){const g=F.guardHit(n,fromX,src,b);if(g)return g>1;}   // streetguard.js: 1 = blocked, 2 = blocked and the shot is spent
+
+  if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');if(window.FTX)FTX.ev('block');sfx('graze');return false;}
+  P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*(RET.hitfeel?170:240);
   sfx('hurt');ftShake(8);hitstop(40);ftBurst(P.x,P.y-40,'#ff4060',10);
   if(P.w!=='pistol'){const nl=P.lv-1;if(nl<1){pop(P.x,P.y-96,WEAPONS[P.w].n+' LOST','#ff4060');setW(P,'pistol',1,Infinity,false);}else{setW(P,P.w,nl,P.ammo,false);pop(P.x,P.y-96,WEAPONS[P.w].n+' LV'+nl,'#ff4060');}}
   if(P.hp<=0){P.hp=0;S.dead=1.4;note('DOWN',2);NR.emit('footDown',{stage:S.id});}
   return true;}
-function bomb(P){if(P.bombs<=0)return;P.bombs--;S.bombsL.push({x:P.x+P.facing*10,y:P.y-50,vx:P.facing*380+P.vx*.4,vy:-420,t:0});}
-function boom(x,y,rad,dmg){AH.ftPush(S.fx,'fx-ft-rocket-hit',x,y,rad*2.4,.35);if(y>=FL-30)AH.ftPush(S.fx,'fx-boom-ground-dust',x,y-10,rad*2,.5);ftBurst(x,y,'#ffb020',24,380);ftBurst(x,y,'#fff',8,200);ftShake(9);sfx('boom');S.fx.push({ring:1,x,y,r:rad,l:.3,m:.3,c:'#ffb020'});
-  for(const e of S.E)if(!e.dead&&circHit(x,y,rad,ebox(e)))dmgE(e,dmg,{pierce:1});
+function bomb(P){if(P.bombs<=0)return;P.bombs--;S.bombsL.push({z:P.z,x:P.x+P.facing*10,y:P.y-50,vx:P.facing*380+P.vx*.4,vy:-420,t:0});}
+function boom(x,y,rad,dmg){AH.ftPush(S.fx,'fx-ft-rocket-hit',x,y,rad*2.4,.35);if(y>=FL-30)AH.ftPush(S.fx,'fx-boom-ground-dust',x,y-10,rad*2,.5);ftBurst(x,y,'#ffb020',24,380);ftBurst(x,y,'#fff',8,200);if(!RET.hitfeel)ftShake(9);sfx('boom');S.fx.push({ring:1,x,y,r:rad,l:.3,m:.3,c:'#ffb020'});
+  let nh=0;for(const e of S.E)if(!e.dead&&circHit(x,y,rad,ebox(e))){dmgE(e,dmg,{pierce:1});nh++;}
+  if(RET.hitfeel&&nh)ftShake(9);   // hitfeel: a blast that hits nothing does not shake
   for(const p of S.pr)if(p.hp>0&&circHit(x,y,rad,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h}))hitProp(p,dmg);
   for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(Math.hypot(b.x-x,b.y-y)<rad)S.eb.splice(i,1);}}
-function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x,p.y-p.h/2,p.c,14);S.score+=50;pop(p.x,p.y-p.h,'+50','#ccc');const D=p.dr||PROPD[p.k].dr;if(D.length)drop(D[p.i%D.length],p.x,p.y-p.h/2);if(p.onBreak)p.onBreak(p);sfx('hit');}}   // street2: p.dr = own rewards ([] = none), p.onBreak = debris / blast
+function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x,p.y-p.h/2,p.c,14);S.score+=50;pop(p.x,p.y-p.h,'+50','#ccc');const D=p.dr||PROPD[p.k].dr;S.kz=p.z;if(D.length)drop(D[p.i%D.length],p.x,p.y-p.h/2);if(p.onBreak)p.onBreak(p);sfx('hit');}}   // street2: p.dr = own rewards ([] = none), p.onBreak = debris / blast
 
 function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.min(FL,P.y+P.vy*dt);return;}
   const mx=I.r?1:I.l?-1:(Math.abs(I.x)>.25?clamp(I.x*1.4,-1,1):0),spdLv=P.pw.speed?P.pw.speed.lv:0,spd=230*(1+.15*spdLv);
-  P.crouch=P.onGround&&(I.d||I.y>.6)&&P.dash<=0;
+  P.crouch=!RET.belt&&P.onGround&&(I.d||I.y>.6)&&P.dash<=0;
+  if(RET.belt){const mz=I.d?1:I.u?-1:(Math.abs(I.y)>.25?clamp(I.y*1.4,-1,1):0);P.z=clamp((P.z==null?.6:P.z)+mz*ZSPD*dt,0,1);if(mz)P.zm=(P.zm||0)+Math.abs(mz)*dt;}   // belt: up/down = into / out of the street
   if(mx)P.facing=mx>0?1:-1;else if(F.look&&F.look.face&&autoOn())F.look.face(P,hittable);   // streetlook: auto-fire turns to a target behind
   for(const k of ['inv','dashCd','dashIF','melCd','cd','shotT','hurtT'])if(P[k]>0)P[k]-=dt;
   if(I.dashP&&P.dashCd<=0){const beat=ftOnBeat();AH.ftPush(S.fx,'fx-ft-dust',P.x,P.y-6,64,.35);P.dash=.24;P.dashCd=.75/(1+.25*spdLv);P.dashIF=beat?.45:.26;P.vy=Math.min(P.vy,0);
@@ -225,20 +233,26 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
   if(!I.jump&&P.vy<-260&&P.jh){P.vy=-260;P.jh=0;}   // variable height: let go early = short hop
   P.vy+=GRAV*dt;const oy=P.y;P.x+=P.vx*dt;P.y+=P.vy*dt;P.onGround=false;
   if(P.y>=FL){P.y=FL;P.vy=0;P.onGround=true;}
-  else if(P.vy>=0&&!(I.d&&I.jumpP))for(const [px,py,pw] of S.st.plats)if(P.x>px-6&&P.x<px+pw+6&&oy<=py+1&&P.y>=py){P.y=py;P.vy=0;P.onGround=true;break;}
+  else if(P.vy>=0&&!(I.d&&I.jumpP)&&!RET.belt)for(const [px,py,pw] of S.st.plats)if(P.x>px-6&&P.x<px+pw+6&&oy<=py+1&&P.y>=py){P.y=py;P.vy=0;P.onGround=true;break;}
   const lo=S.camX+16,hi=S.camX+viewW()-16;P.x=clamp(P.x,lo,hi);
   if(P.x>P.maxX+2){S.moved+=P.x-P.maxX;P.maxX=P.x;P.idle=0;}else P.idle+=dt;
   if((I.fire||(autoOn()&&autoTarget(P)))&&P.cd<=0&&!S.win){fire(P);P.cd=1/wstat(P.w,P.lv).rate;}
-  if(I.meleeP&&P.melCd<=0){P.mel=.2;P.melCd=.35;const r={x:P.facing>0?P.x:P.x-62,y:P.y-(P.crouch?44:64),w:62,h:P.crouch?44:64};let hit=0;
-    for(const e of S.E)if(hittable(e)){const b=ebox(e);if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){dmgE(e,3,{pierce:1,melee:true,x:P.x});hit++;}}
-    for(const p of S.pr)if(p.hp>0&&r.x<p.x+p.w/2&&r.x+r.w>p.x-p.w/2&&r.y<p.y&&r.y+r.h>p.y-p.h)hitProp(p,2);
-    for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(b.x>r.x&&b.x<r.x+r.w&&b.y>r.y&&b.y<r.y+r.h){S.eb.splice(i,1);hit++;}}   // the knife cuts bullets
-    S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:r.w,l:.15,c:'#e8f6ff'});if(hit)hitstop(25);sfx('graze');}
+  if(I.meleeP&&P.melCd<=0){P.mel=.2;P.melCd=.35;if(window.FTX)FTX.ev('swish');const r={x:P.facing>0?P.x:P.x-62,y:P.y-(P.crouch?44:64),w:62,h:P.crouch?44:64};let hit=0;
+    if(!(RET.reach&&F.reachD&&S.st.fs))for(const e of S.E)if(hittable(e)&&zok(e.z,P.z)){const b=ebox(e);if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){dmgE(e,3,{pierce:1,melee:true,x:P.x});hit++;}}
+    for(const p of S.pr)if(p.hp>0&&zok(p.z,P.z)&&r.x<p.x+p.w/2&&r.x+r.w>p.x-p.w/2&&r.y<p.y&&r.y+r.h>p.y-p.h)hitProp(p,2);
+    for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(zok(b.z,P.z)&&b.x>r.x&&b.x<r.x+r.w&&b.y>r.y&&b.y<r.y+r.h){S.eb.splice(i,1);hit++;}}   // the knife cuts bullets
+    S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:r.w,l:.15,c:'#e8f6ff'});if(hit){hitstop(25);if(window.FTX)FTX.ev('knifehit');}sfx('graze');}
   if(P.mel>0)P.mel-=dt;
   if(I.bombP)bomb(P);
   for(const k of PW_KEYS){const c=P.pw[k];if(c){c.t-=dt;if(c.t<=0)delete P.pw[k];}}
   P.anim+=dt*(Math.abs(P.vx)>5?1:0);}
 
+/* W173 belt: foes arrive on lanes spread over the band (back, front, middle...), keep their lane while far; near Kai the closest one drifts into his line
+   (slower than Kai walks, so stepping out of line dodges) once they are within 300 units of him. */
+const ZL=[.15,.85,.5,.3,.7];
+F.beltZ=e=>{if(e.boss)return e.hz=.5;S.zi=(S.zi||0)+1;return e.hz=clamp(ZL[S.zi%5]+ftRnd(-.05,.05),0,1);};
+function beltE(dt){const P=S.P;let c1=null,cd=300;for(const e of S.E)if(!e.dead&&e.z!=null&&Math.abs(e.x-P.x)<cd){cd=Math.abs(e.x-P.x);c1=e;}   // the closest foe (and the boss, and any foe winding up a shot) steps into Kai's line; the rest hold lanes beside him
+  for(const e of S.E){if(e.dead||e.z==null)continue;const near=Math.abs(e.x-P.x)<300,tz=!near?e.hz:e===c1||e.boss||e.tele>0?P.z:clamp(P.z+(e.hz-.5)*.95,0,1),v=(e.boss?.32:.42)*dt;e.z+=clamp(tz-e.z,-v,v);}}
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
 function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
   let want=Math.max(S.camX,P.x-vw*(RET.cam2?.3:(F.camK||.38)));/* W164 cam2: Kai sits at 30-37% while running right */if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);
@@ -257,7 +271,7 @@ function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
     if(!w.started){if(w.lock||edge<w.x)continue;w.started=true;w.next=S.time+(w.delay||0);}
     if(S.time<w.next)continue;
     if(S.E.filter(e=>!e.dead).length>=14){w.next=S.time+.5;continue;}
-    const side=w.side||'r';let x,y=null;
+    const side=RET.belt&&(w.side||'r')==='r'&&(w.count-w.left)%3===2?'l':w.side||'r';let x,y=null;   // belt: every 3rd foe of a wave flanks from behind
     if(side==='l'&&RET.fairstreet){if(!w.wa){w.wa=S.time+1;S.behind={until:w.wa};}if(S.time<w.wa)continue;w.wa=0;}   // W161: 1 s BEHIND warning before every spawn from the left
     if(side==='l')x=S.camX-40;else if(side==='at')x=w.at+(w.count-w.left)*90;else if(side==='top'){x=S.camX+ftRnd(.35,.95)*vw;y=-30;}else x=edge+40;
     const e=spawn(w.enemy,x,y,{lock:w.lock});if(side==='top'){e.fly=true;e.y=-30;}
@@ -277,7 +291,8 @@ function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&
     if(e.fly&&!e.ext&&e.y>FL-20){e.y=FL-20;}
     if(e.burn>0){e.burn-=dt;e.bt=(e.bt||0)-dt;if(e.bt<=0){e.bt=.25;dmgE(e,.4,{pierce:1});}}
     if(!e.boss&&(e.x<S.camX-400||e.x>S.camX+viewW()+600))e.dead=true,e.gone=1;
-    if(!e.dead){const b=ebox(e),pb_=pbox(P);if(e.def.touch!==0&&!e.fly&&b.x<pb_.x+pb_.w&&b.x+b.w>pb_.x&&b.y<pb_.y+pb_.h&&b.y+b.h>pb_.y&&e.grace<=0&&e.w>40&&!(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2)))ftHurt(1,e.x,'touch:'+e.id);}}
+    if(!e.dead){const b=ebox(e),pb_=pbox(P);if(e.def.touch!==0&&!e.fly&&b.x<pb_.x+pb_.w&&b.x+b.w>pb_.x&&b.y<pb_.y+pb_.h&&b.y+b.h>pb_.y&&e.grace<=0&&e.w>40&&zok(e.z,P.z)&&!(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2)))ftHurt(1,e.x,'touch:'+e.id);}}
+  if(RET.belt)beltE(edt);
   S.E=S.E.filter(e=>!e.dead||e===S.boss||(e.ext&&!e.remove&&!e.gone));
   // queued enemy shots: released on the next half beat once their telegraph is over
   const hb=Math.floor(beatPos()*2);if(S.lhb===null)S.lhb=hb;
@@ -286,7 +301,7 @@ function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&
   if(hb!==S.lhb||S.q.some(s=>S.time-s.at>.6)){S.lhb=hb;const keep=[];
     for(const s of S.q){if(s.e.dead){continue;}if(S.time<s.at&&!(S.time-s.at>.6)){keep.push(s);continue;}
       if(S.eb.length>=EBMAX)continue;const e=s.e,sy=s.o.y!=null?s.o.y:e.y-e.h*.62,sx=e.x+e.facing*e.w*.4;
-      S.eb.push({x:sx,y:sy,vx:Math.cos(s.a)*s.spd,vy:Math.sin(s.a)*s.spd,r:s.o.r||6,dmg:s.dmg,life:4,grav:!!s.o.grav,src:e.id,c:s.o.c||'#ff4a6a'});}
+      S.eb.push({x:sx,y:sy,vx:Math.cos(s.a)*s.spd,vy:Math.sin(s.a)*s.spd,r:s.o.r||6,dmg:s.dmg,life:4,grav:!!s.o.grav,src:e.id,c:s.o.c||'#ff4a6a',z:e.z});}
     S.q=keep;}}
 function stepShots(dt){const P=S.P,slow=P.pw.slow?.45:1;
   for(const b of S.pb){b.t+=dt;b.life-=dt;
@@ -297,26 +312,27 @@ function stepShots(dt){const P=S.P,slow=P.pw.slow?.45:1;
     if(b.y>FL&&b.kind==='rkt'){boom(b.x,FL,b.rad,b.dmg);b.life=0;}
     if(b.life<=0&&b.kind==='rkt'&&!b.bo){b.bo=1;boom(b.x,b.y,b.rad,b.dmg);}
     if(b.life<=0)continue;
-    for(const e of S.E){if(!hittable(e)||b.hit.indexOf(e)>=0)continue;if(!circHit(b.x,b.y,b.r,ebox(e)))continue;
+    for(const e of S.E){if(!hittable(e)||b.hit.indexOf(e)>=0||!zok(b.z,e.z))continue;if(!circHit(b.x,b.y,b.r,ebox(e)))continue;
       if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.life=0;b.bo=1;break;}
       b.hit.push(e);const dd=b.kind==='fire'?b.dmg:b.dmg;dmgE(e,dd,b);if(b.burn)e.burn=2;if(b.kb&&!e.boss)e.vx+=Math.sign(b.vx)*b.kb;
       AH.ftHit(S.fx,b.wid,b.x,b.y);ftBurst(b.x,b.y,b.c,2,140);if(b.pierce>0){b.pierce--;}else{b.life=0;break;}}
-    if(b.life>0)for(const p of S.pr){if(p.hp<=0||p.pass)continue;if(circHit(b.x,b.y,b.r,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h})){if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.bo=1;}else hitProp(p,b.kind==='fire'?b.dmg*.5:1);b.life=0;break;}}
+    if(b.life>0)for(const p of S.pr){if(p.hp<=0||p.pass||!zok(b.z,p.z))continue;if(circHit(b.x,b.y,b.r,{x:p.x-p.w/2,y:p.y-p.h,w:p.w,h:p.h})){if(b.kind==='rkt'){boom(b.x,b.y,b.rad,b.dmg);b.bo=1;}else hitProp(p,b.kind==='fire'?b.dmg*.5:1);b.life=0;break;}}
     if(b.x<S.camX-60||b.x>S.camX+viewW()+60||b.y<-80)b.life=0;}
   S.pb=S.pb.filter(b=>b.life>0);if(S.pb.length>160)S.pb.splice(0,S.pb.length-160);
   const pb_=pbox(P);
   for(const b of S.eb){const k=dt*slow;if(b.grav)b.vy+=GRAV*.45*k;b.x+=b.vx*k;b.y+=b.vy*k;b.life-=k;
     if(b.y>FL+4||b.x<S.camX-80||b.x>S.camX+viewW()+80||b.y<-200)b.life=0;
-    if(b.life>0&&circHit(b.x,b.y,b.r*.75,pb_)){if(ftHurt(b.dmg,b.x-b.vx,'bul:'+(b.src||''))||P.inv>0||P.dashIF>0){if(P.dashIF>0&&!b.gz){b.gz=1;continue;}b.life=0;}}}
+    if(b.life>0&&!zok(b.z,P.z)){if(!b.zm&&circHit(b.x,b.y,b.r*.75,pb_)){b.zm=1;S.zmiss=(S.zmiss||0)+1;}}
+    else if(b.life>0&&circHit(b.x,b.y,b.r*.75,pb_)){if(ftHurt(b.dmg,b.x-b.vx,'bul:'+(b.src||''),b)||P.inv>0||P.dashIF>0){if(P.dashIF>0&&!b.gz){b.gz=1;continue;}b.life=0;}}}
   S.eb=S.eb.filter(b=>b.life>0);
   for(const g of S.bombsL){g.t+=dt;g.vy+=GRAV*dt;g.x+=g.vx*dt;g.y+=g.vy*dt;let hit=g.y>=FL||g.t>2;
-    for(const e of S.E)if(!e.dead&&circHit(g.x,g.y,8,ebox(e)))hit=true;if(hit){boom(g.x,Math.min(g.y,FL),95,8);g.done=1;}}
+    for(const e of S.E)if(!e.dead&&zok(g.z,e.z)&&circHit(g.x,g.y,8,ebox(e)))hit=true;if(hit){boom(g.x,Math.min(g.y,FL),95,8);g.done=1;}}
   S.bombsL=S.bombsL.filter(g=>!g.done);}
 function stepPickups(dt){const P=S.P,mg=P.pw.magnet?[0,140,220,320][P.pw.magnet.lv]:0;
   for(const p of S.pk){p.t+=dt;if(!p.on){p.vy+=GRAV*.6*dt;p.y+=p.vy*dt;if(p.y>=FL-16){p.y=FL-16;p.on=true;}}
     const dx=P.x-p.x,dy=P.y-36-p.y,d=Math.hypot(dx,dy);
-    if(mg&&d<mg&&d>1){p.x+=dx/d*420*dt;p.y+=dy/d*420*dt;}
-    if(d<40&&P.hp>0){collect(p);p.got=1;}
+    if(mg&&d<mg&&d>1){p.x+=dx/d*420*dt;p.y+=dy/d*420*dt;if(p.z!=null&&P.z!=null)p.z+=clamp(P.z-p.z,-dt,dt);}
+    if(d<40&&P.hp>0&&zok(p.z,P.z,.22)){collect(p);p.got=1;}
     if(p.x<S.camX-20)p.got=1;   // anything left of the screen edge is out of reach (the hero stops 16 px inside it)
     if(p.t>16&&!mg&&!p.fix)p.got=1;}
   S.pk=S.pk.filter(p=>!p.got);
@@ -324,7 +340,7 @@ function stepPickups(dt){const P=S.P,mg=P.pw.magnet?[0,140,220,320][P.pw.magnet.
   S.fx=S.fx.filter(f=>f.l>0);for(const p of S.pop){p.l-=dt;p.y-=40*dt;}S.pop=S.pop.filter(p=>p.l>0);
   for(const p of S.pr)if(p.fl>0)p.fl-=dt;S.pr=S.pr.filter(p=>!p.gone||p.fl>0);}
 function ftUpdate(rdt){if(!S||S.paused||S.end)return;
-  let dt=Math.min(rdt,.05);if(S.hs>0){S.hs-=rdt;dt*=.05;}
+  let dt=Math.min(rdt,.05);if(S.hf>0)S.hf-=rdt;if(S.hs>0){S.hs-=rdt;dt*=.05;}
   if(F.ctl)try{F.ctl(S,I);}catch(e){}
   S.time+=dt;if(S.note.t>0)S.note.t-=rdt;if(S.shake>0)S.shake=Math.max(0,S.shake-rdt*30);if(S.feverT>0)S.feverT-=dt;S.hintT+=rdt;
   stepPlayer(dt);stepStage(dt);if(S.st.hook&&S.st.hook.step)S.st.hook.step(S,dt,env);stepEnemies(dt);stepShots(dt);stepPickups(dt);if(F.post)F.post(S,dt);   // tidy.js: arena player cap + flyers kept under the HUD
@@ -468,7 +484,7 @@ function kaiX(P){const t=S.time,dt=Math.min(.1,Math.max(0,t-(P._xt==null?t:P._xt
 function draw(){if(!L||!S)return;if(F.look&&F.look.draw&&F.look.draw(L.ctx))return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#05030c';c.fillRect(0,0,L.cv.width,L.cv.height);c.setTransform(sc,0,0,sc,(L.box.x-L.ox)*L.dpr,(L.box.y-L.oy)*L.dpr);const sh=S.shake?ftRnd(-S.shake,S.shake)*.5:0;
   drawBg(c,vw,L.exl||0,L.exr||0);c.save();c.translate(-S.camX+sh,sh*.5);
-  for(const [px,py,pw] of S.st.plats){c.fillStyle='#3a2a52';c.fillRect(px,py,pw,12);c.fillStyle='#19e3ff';c.fillRect(px,py,pw,2);}
+  if(!RET.belt)for(const [px,py,pw] of S.st.plats){c.fillStyle='#3a2a52';c.fillRect(px,py,pw,12);c.fillStyle='#19e3ff';c.fillRect(px,py,pw,2);}
   if(S.cp==null){c.fillStyle='#19e3ff55';c.fillRect(S.st.cp-2,FL-120,4,120);c.fillStyle='#19e3ff';c.fillRect(S.st.cp-2,FL-120,22,12);}
   for(const p of S.pr){if(p.hp<=0&&!p.fl)continue;c.fillStyle=p.fl>0?'#fff':p.c;c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);c.strokeStyle='#ffffff55';c.lineWidth=2;c.strokeRect(p.x-p.w/2+2,p.y-p.h+2,p.w-4,p.h-4);}
   for(const p of S.pk){const d=PICKUPS[p.k],bob=Math.sin(p.t*5)*3;if(p.k==='ammo'&&RET.sprites&&ART.ANIM.c['pk-ammo/spin']&&ART.anim('pk-ammo/spin')){c.globalAlpha=p.t>13?.5+.5*Math.sin(p.t*20):1;ART.drawAnim(c,'pk-ammo/spin',p.t,p.x,p.y+bob,32/ART.ANIM.c['pk-ammo/spin'].bw,false);c.globalAlpha=1;continue;}c.fillStyle=d.c;c.globalAlpha=p.t>13?.5+.5*Math.sin(p.t*20):1;c.beginPath();c.arc(p.x,p.y+bob,15,0,6.283);c.fill();c.globalAlpha=1;
@@ -516,8 +532,8 @@ function drawHud(c,vw,fs){const P=S.P,u=1/L.sc,m=10*u,hb=[],box=(x,y,w,h)=>hb.pu
   if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};
   ghost();}
-function hintOn(){return S&&!SV.hint&&S.hintT<20&&(S.moved<250||S.shots<1);}
-function hintText(){if(S.moved<250)return L&&L.touch?'Push the stick right':'D or → to run';return L&&L.touch?(autoOn()?'Face an enemy: you shoot':(RET.bossfix!==false?'Tap or hold FIRE to shoot':'Hold FIRE to shoot')):'Hold J to shoot';}
+function hintOn(){return S&&!SV.hint&&S.hintT<20&&(S.moved<250||S.shots<1||(RET.belt&&!(S.P.zm>.3)));}
+function hintText(){if(RET.belt&&S.moved>=250&&!(S.P.zm>.3))return L&&L.touch?'Stick up/down: step nearer or further to dodge':'W/S or ↑/↓: step nearer or further to dodge';if(S.moved<250)return L&&L.touch?'Push the stick right':'D or → to run';return L&&L.touch?(autoOn()?'Face an enemy: you shoot':(RET.bossfix!==false?'Tap or hold FIRE to shoot':'Hold FIRE to shoot')):'Hold J to shoot';}
 function ghost(){const g=L.ghost;if(!L.touch||!hintOn()||S.note.t>0||(L.menu&&!L.menu.hidden)||(autoOn()&&S.moved>=250)){g.hidden=true;return;}g.hidden=false;
   const tgt=S.moved<250?L.stick:L.btn.fire,r=tgt.getBoundingClientRect(),ph=(S.time%1.2)/1.2;
   g.style.left=(r.left+r.width/2+(S.moved<250?r.width*.3*ph:0))+'px';g.style.top=(r.top+r.height/2)+'px';}
@@ -554,7 +570,7 @@ function start(id){id=id||'street1';if(!RET.foot||!STAGES[id])return false;if(ty
   begin(id);return true;}
 function stop(){if(S&&!S.end)finish(false,true);if(!F.lab&&S&&S.hintT>8&&S.moved>250&&S.shots>0&&!SV.hint){SV.hint=1;svSave();}F.on=false;if(raf)cancelAnimationFrame(raf);raf=0;if(L){L.root.hidden=true;hideMenu();}
   for(const k in I)I[k]=0;try{if(typeof AU!=='undefined'&&AU.menuMusic&&sndF('f_mmenu')&&!(typeof running!=='undefined'&&running))AU.menuMusic();}catch(e){}}
-function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);while(n-->0&&S&&!S.end)ftUpdate(dt);return S;}   // headless fast-forward for tests
+function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);if(S)S.sim=1;while(n-->0&&S&&!S.end)ftUpdate(dt);return S;}   // headless fast-forward for tests
 
 /* ===== MENU button: STREET RUN (unlocked after story stage 3) ===== */
 if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)return false;if(document.getElementById('footBtn'))return true;
@@ -563,5 +579,5 @@ if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');F.ui=1;start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
-F._in={boom,hitProp,ftHurt,ftBurst,dmgE,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
+F._in={hittable,ebox,zok,boom,hitProp,ftHurt,ftBurst,dmgE,hitstop,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd,I};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
 return F;})();
