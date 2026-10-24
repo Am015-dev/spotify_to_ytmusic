@@ -102,7 +102,7 @@ function ftShake(v){if(reduce())return;S.shake=Math.max(S.shake,window.COM?COM.s
 const SFXID={shot:'f_shot',hit:'f_hit',pick:'f_pick',big:'f_big',hurt:'f_hurt',dash:'f_dash',graze:'f_graze',warn:'f_warn',up:'f_up',tier:'f_fever'};   // LAB (ON FOOT group of the SOUND page): each on-foot sound has its own switch
 // 22 Oct: 'window.AU' is undefined (AU is a script-level const), so these three calls never ran: no on-foot sound, no stage song. They use AU directly now, each behind its ON FOOT switch.
 const sndF=id=>!window.sndOn||sndOn(id);
-function sfx(n){try{if(!sndF(SFXID[n]||'f_'+n))return;if(typeof AU!=='undefined'&&AU.sfx)AU.sfx(n);}catch(e){}}
+function sfx(n){try{if(window.FTX&&FTX.owns(n)){FTX.old(n);return;}if(!sndF(SFXID[n]||'f_'+n))return;if(typeof AU!=='undefined'&&AU.sfx)AU.sfx(n);}catch(e){}}
 /* the song's beat: bpos() from a.js when the beat clock runs, else our own 120 bpm clock */
 function beatPos(){try{if(typeof bpos==='function'&&typeof BT!=='undefined'&&BT.mode!=='none'){const p=bpos(performance.now());if(isFinite(p))return p;}}catch(e){}return S?S.time*2:0;}
 function ftOnBeat(){const p=beatPos(),f=Math.abs(p-Math.round(p)),spb=(typeof BT!=='undefined'&&BT.spb)||.5,win=.11+((RET.asWinMs&&RET.asWinMs())||0)/1000;return f*spb<win;}
@@ -149,7 +149,7 @@ const hittable=e=>!e.dead&&!(e.def.canHit&&e.def.canHit(e)===false);
 function circHit(x,y,r,b){const cx=clamp(x,b.x,b.x+b.w),cy=clamp(y,b.y,b.y+b.h);return (x-cx)*(x-cx)+(y-cy)*(y-cy)<=r*r;}
 function dmgE(e,d,src){if(!hittable(e))return;const k=(S.P.pw.dbl?[1,2,2.4,2.8][S.P.pw.dbl.lv]:1)*(S.feverT>0?1.25:1);d*=k;
   if(e.def.front&&src&&Math.sign(src.vx||0)===-e.facing&&!src.pierce&&e.def.fb){d*=.4;}   // fallback shield: front blocks most
-  e.hp-=d;e.flash=.08;if(F.hitFeel)F.hitFeel(e,d,src);try{e.def.onHit&&e.def.onHit(e,d,env,{x:src&&src.x!=null?src.x-(src.vx||0)*.01:S.P.x,melee:!!(src&&src.melee)});}catch(x){}
+  e.hp-=d;e.flash=.08;if(window.FTX)FTX.ev(e.hp<=0?'foedeath':'foehurt');if(F.hitFeel)F.hitFeel(e,d,src);try{e.def.onHit&&e.def.onHit(e,d,env,{x:src&&src.x!=null?src.x-(src.vx||0)*.01:S.P.x,melee:!!(src&&src.melee)});}catch(x){}
   if(e.ext&&e.boss&&e.phase!==e._lp){if(e._lp!=null){hitstop(60);ftShake(10);note('PHASE '+e.phase,1.4);NR.emit('footPhase',{id:e.id,phase:e.phase});}e._lp=e.phase;}
   if(!e.ext&&e.boss&&e.def.phases){const fr=e.hp/e.max;while(e.phase<e.def.phases.length&&fr<=e.def.phases[e.phase].hp){e.phase++;hitstop(60);ftShake(10);note('PHASE '+(e.phase+1),1.4);NR.emit('footPhase',{id:e.id,phase:e.phase});}}
   if(e.hp<=0)ftKill(e);}
@@ -177,7 +177,7 @@ function autoTarget(P){const up=!RET.belt&&(I.u||I.y<-.5),vw=viewW(),fc=P.facing
   for(const p of S.pr){if(p.hp<=0)continue;const dx=(p.x-P.x)*fc;if(dx>10&&dx<300&&p.x>S.camX&&p.x<S.camX+vw&&(p.y>=FL-1||up))return true;}
   return false;}
 function fire(P){const s=wstat(P.w,P.lv),w=s.w,lv=P.lv,a0=aimAngle(P),a1=aimAssist(P,a0,P.x,P.y-(P.crouch?26:44)),a=P.aim=F.aimX?F.aimX(P,a1,a0):a1,ox0=P.x+Math.cos(a)*18,oy0=P.y-(P.crouch?26:44)+Math.sin(a)*14,mz=F.mz&&F.mz(P,a),ox=mz?mz[0]:ox0,oy=mz?mz[1]:oy0;   // streetfeel.js: from the drawn gun's muzzle
-  S.shots++;P.shotT=.12;const pr=(t)=>({z:P.z,x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
+  S.shots++;P.shotT=.12;if(window.FTX)FTX.ev('shot',P.w);const pr=(t)=>({z:P.z,x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
   if(w.kind==='bul'){const sp=(w.spr||0)*(1-.12*(lv-1)),n=(P.w==='hmg'&&lv>=5)?2:(P.w==='pistol'&&lv>=3?2:1);
     for(let i=0;i<n;i++){const aa=a+ftRnd(-sp,sp)+(n>1?(i-.5)*.08:0);S.pb.push(pr({vx:Math.cos(aa)*w.spd,vy:Math.sin(aa)*w.spd,pierce:(P.w==='hmg'&&lv>=3)?1:0}));}}
   else if(w.kind==='pel'){const n=w.pel+(lv>=3?2:0);for(let i=0;i<n;i++){const aa=a+(i-(n-1)/2)*(w.spr/n)*2+ftRnd(-.03,.03),v=w.spd*ftRnd(.85,1.1);S.pb.push(pr({vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,r:4,pierce:lv>=5?1:0,kb:lv>=5?220:60}));}if(!RET.hitfeel)ftShake(2);}
@@ -202,7 +202,8 @@ function collect(p){const P=S.P,d=PICKUPS[p.k];sfx('pick');let lv=1;
   else{const c=P.pw[p.k];lv=c?Math.min(d.max,c.lv+1):1;P.pw[p.k]={lv,t:d.t+(p.k==='slow'?1.5*(lv-1):0)};pop(P.x,P.y-90,d.n+(d.max>1?' LV'+lv:''),d.c,true);}
   NR.emit('footPick',{id:p.k,lv});}
 function ftHurt(n,fromX,src,b){const P=S.P;if(P.inv>0||P.dashIF>0||S.win||P.hp<=0)return false;if(F.guardHit){const g=F.guardHit(n,fromX,src,b);if(g)return g>1;}   // streetguard.js: 1 = blocked, 2 = blocked and the shot is spent
-  if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');sfx('graze');return false;}
+
+  if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');if(window.FTX)FTX.ev('block');sfx('graze');return false;}
   P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*(RET.hitfeel?170:240);
   sfx('hurt');ftShake(8);hitstop(40);ftBurst(P.x,P.y-40,'#ff4060',10);
   if(P.w!=='pistol'){const nl=P.lv-1;if(nl<1){pop(P.x,P.y-96,WEAPONS[P.w].n+' LOST','#ff4060');setW(P,'pistol',1,Infinity,false);}else{setW(P,P.w,nl,P.ammo,false);pop(P.x,P.y-96,WEAPONS[P.w].n+' LV'+nl,'#ff4060');}}
@@ -235,11 +236,11 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
   const lo=S.camX+16,hi=S.camX+viewW()-16;P.x=clamp(P.x,lo,hi);
   if(P.x>P.maxX+2){S.moved+=P.x-P.maxX;P.maxX=P.x;P.idle=0;}else P.idle+=dt;
   if((I.fire||(autoOn()&&autoTarget(P)))&&P.cd<=0&&!S.win){fire(P);P.cd=1/wstat(P.w,P.lv).rate;}
-  if(I.meleeP&&P.melCd<=0){P.mel=.2;P.melCd=.35;const r={x:P.facing>0?P.x:P.x-62,y:P.y-(P.crouch?44:64),w:62,h:P.crouch?44:64};let hit=0;
-    for(const e of S.E)if(hittable(e)&&zok(e.z,P.z)){const b=ebox(e);if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){dmgE(e,3,{pierce:1,melee:true,x:P.x});hit++;}}
+  if(I.meleeP&&P.melCd<=0){P.mel=.2;P.melCd=.35;if(window.FTX)FTX.ev('swish');const r={x:P.facing>0?P.x:P.x-62,y:P.y-(P.crouch?44:64),w:62,h:P.crouch?44:64};let hit=0;
+    if(!(RET.reach&&F.reachD&&S.st.fs))for(const e of S.E)if(hittable(e)&&zok(e.z,P.z)){const b=ebox(e);if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){dmgE(e,3,{pierce:1,melee:true,x:P.x});hit++;}}
     for(const p of S.pr)if(p.hp>0&&zok(p.z,P.z)&&r.x<p.x+p.w/2&&r.x+r.w>p.x-p.w/2&&r.y<p.y&&r.y+r.h>p.y-p.h)hitProp(p,2);
     for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(zok(b.z,P.z)&&b.x>r.x&&b.x<r.x+r.w&&b.y>r.y&&b.y<r.y+r.h){S.eb.splice(i,1);hit++;}}   // the knife cuts bullets
-    S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:r.w,l:.15,c:'#e8f6ff'});if(hit)hitstop(25);sfx('graze');}
+    S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:r.w,l:.15,c:'#e8f6ff'});if(hit){hitstop(25);if(window.FTX)FTX.ev('knifehit');}sfx('graze');}
   if(P.mel>0)P.mel-=dt;
   if(I.bombP)bomb(P);
   for(const k of PW_KEYS){const c=P.pw[k];if(c){c.t-=dt;if(c.t<=0)delete P.pw[k];}}
@@ -577,5 +578,5 @@ if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');F.ui=1;start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
-F._in={boom,hitProp,ftHurt,ftBurst,dmgE,hitstop,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd,I};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
+F._in={hittable,ebox,zok,boom,hitProp,ftHurt,ftBurst,dmgE,hitstop,pop,sfx,PROPD,L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd,I};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
 return F;})();

@@ -46,4 +46,15 @@ a row passes only on a measured number (stepped probe or qa/streetsim.js), never
 | P3 | The camera shows where danger comes from | cam2-test: Kai in right 30% < 10% |
 | P4 | Readable on phone: actors >= 1/8 of screen height, HUD never covers the fight | probe on 390x763 |
 
+## Owner's 24 Oct 2026 list ("enemies slide, figures don't blend, no parry, knife hits from distance, blinking foes, no sound effects")
+| # | Rule | Gate |
+|---|---|---|
+| L1 | Foes run: a moving foe always plays its run cycle at a speed that plants its feet | stride error <= 20%, 0 frames moving while idle (W190) |
+| L2 | Foes are drawn solid; a hit is a short white flash, never a blink or see-through foe | alpha 1.0 on >= 99% of draws, 0 blink cycles (W190) |
+| G1 | A defence button: hold to block, tap just before a hit to parry and open the attacker | parry bot loses >= 30% fewer hearts than dodge bot (W192) |
+| M1 | Melee lands only in contact: blade or limb on its active frame reaches the body | 0 landed hits with a gap > 8 units (W191) |
+| S1 | Every action has its own sound; each weapon has >= 3 shot variants; hits, kicks, finishers, parries all sound different | variant check (W193) |
+| S2 | Sound effects sit under the song and never duck, filter or distort it | song gain constant; sfx peak <= song peak -6 dB (W193) |
+| V1 | Actors look lit by the scene: grade, contact shadow, wet-road reflection, rim light from neon | actor-to-scene colour distance halved (W194) |
+
 Saved screenshots of our own street are in benchmark/street/ (compare, don't retake).
