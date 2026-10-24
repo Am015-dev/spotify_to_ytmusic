@@ -1,5 +1,7 @@
+import os as _os
+_ROOT=_os.path.abspath(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)),'..','..','..'))+'/'   # repo root from this file, so a worktree builds its own code
 import re,sys,os
-P='/home/user/spotify_to_ytmusic/games-src/nightrun/parts/'
+P=_ROOT+'games-src/nightrun/parts/'
 IDX={f:r for r,_,fs in os.walk(P) for f in fs}   # basename -> folder (parts/<module>/<file>); names are unique across folders, build order below is unchanged
 rd=lambda n:open(os.path.join(IDX[n],n),encoding='utf8').read()
 def rep(s,a,b,cnt=1):
@@ -10,7 +12,7 @@ bg=rd('bg.js'); dr=rd('draw.js'); b=rd('b.js')   # (the old string patches are b
 FOOTWHO=set('kai grunt gunman shield bruiser knife sniper drone turret mech warden jetpack hound flamer ninja medic'.split())   # on-foot actors keep the bottom-centre anchor (feet)
 def _anim():
     import json
-    R='/home/user/spotify_to_ytmusic/';md=R+'games/mainhattan-nightrun/media/anim/';sd=R+'games-src/anims/mainhattan-nightrun/sheets/';s={}
+    R=_ROOT+'';md=R+'games/mainhattan-nightrun/media/anim/';sd=R+'games-src/anims/mainhattan-nightrun/sheets/';s={}
     for who in sorted(os.listdir(md)):
         for f in sorted(os.listdir(md+who)):
             if not f.endswith('-strip.webp'):continue
@@ -22,7 +24,7 @@ ANIM=_anim()
 # bg patches
 # (the beat pulse no longer flashes the backdrop: it lives on the screen edges and the ship ring, see parts/fx.js)
 # draw patches
-out=rd('head.html')+rd('a.js')+"\n"+rd('songs.js')+"\n"+bg+"\n"+b+"\n"+dr+"\n"+rd('garage.js')+"\n"+rd('shop.js')+"\n"+rd('fx.js')+"\n"+rd('power.js')+"\n"+rd('story.js')+"\n"+rd('map.js')+"\n"+rd('athens.js')+"\n"+rd('dir.js')+"\n"+rd('paths.js')+"\n"+rd('upgrades.js')+"\n"+rd('up2.js')+"\n"+rd('perks2.js')+"\n"+rd('strategy.js')+"\n"+rd('art.js').replace('__ANIM__',ANIM)+"\n"+rd('ai.js')+"\n"+rd('meta.js')+"\n"+rd('ret.js')+"\n"+rd('fxwave.js')+"\n"+rd('arthooks.js')+"\n"+rd('flavor.js')+"\n"+rd('footart.js')+"\n"+rd('footen.js')+"\n"+rd('foot.js')+"\n"+rd('footstage.js')+"\n"+rd('streetlook.js')+"\n"+rd('footq.js')+"\n"+rd('leak.js')+"\n"+rd('zoo.js')+"\n"+rd('formations.js')+"\n"+rd('stagescripts.js')+"\n"+rd('remix.js')+"\n"+rd('variants.js')+"\n"+rd('scale.js')+"\n"+rd('powerups.js')+"\n"+rd('flow.js')+"\n"+rd('musicpack.js')+"\n"+rd('storydata.js')+"\n"+rd('tale.js')+"\n"+rd('stats.js')+"\n"+rd('feedback.js')+"\n"+rd('lab.js')+"\n"+rd('labassets.js')+"\n"+rd('labfull.js')+"\n"+rd('shapes.js')+"\n"+rd('hud.js')+"\n"+rd('uikit.js').replace('__BOSSANIM__',open('/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/media/anim-boss.json').read().replace('\n','').replace(' ',''))+"\n"+rd('lagfix.js')+"\n"+rd('g.js')+"\n"+rd('wpx.js')+"\n"+rd('fair.js')+"\n"+rd('hard.js')+"\n"+rd('react.js')+"\n"+rd('armour.js')+"\n"+rd('reward.js')+"\n"+rd('choices.js')+"\n"+rd('bossmoves.js')+"\n"+rd('bossvis.js')+"\n"+rd('powlevels.js')+"\n"+rd('abilities.js')+"\n"+rd('forge.js')+"\n"+rd('inventory.js')+"\n"+rd('forgeui.js')+"\n"+rd('forgeone.js')+"\n"+rd('counter.js')+"\n"+rd('timing.js')+"\n"+rd('visible.js')+"\n"+rd('grit.js')+"\n"+rd('density.js')+"\n"+rd('bossplay.js')+"\n"+rd('rules.js')+"\n"+rd('novelty.js')+"\n"+rd("anticamp.js")+"\n"+rd("holdline.js")+"\n"+rd("pacing.js")+"\n"+rd("bite.js")+"\n"+rd('flankers.js')+"\n"+rd('foeart.js')+"\n"+rd('fleet.js')+"\n"+rd('endramp.js')+"\n"+rd('bandclear.js')+"\n"+rd('legend.js')+"\n"+rd('h.js')+"\n"+rd('fun.js')+"\n"+rd('tut.js')+"\n"+rd('lessons.js')+"\n"+rd('saga.js')+"\n"+rd('title.js')+"\n"+rd('cp.js')+"\n"+rd('fs.js')+"\n"+rd('readable.js')+"\n"+rd('bulletart.js')+"\n"+rd('legible.js')+"\n"+rd('arsenal.js')+"\n"+rd('abup.js')+"\n"+rd('zonehint.js')+"\n"+rd('econfit.js')+"\n"+rd('comfort.js')+"\n"+rd('classes.js')+"\n"+rd('saves.js')+"\n"+rd('stamp.js')+"\n"+rd('polish.js')+"\n"+rd('diet.js')+"\n"+rd('mix.js')+"\n"+rd('hub.js')+"\n"+rd('layout.js')+"\n"+rd('school.js')+"\n"+rd('schoolfull.js')+"\n"+rd('tidy.js')+"\n"+rd('menufix.js')+"\n"+rd('explain.js')+"\n"+rd('calm.js')+"\n"+rd('waves.js')+"\n"+rd('nocaps.js')+"\n"+rd('c.js')
+out=rd('head.html')+rd('a.js')+"\n"+rd('songs.js')+"\n"+bg+"\n"+b+"\n"+dr+"\n"+rd('garage.js')+"\n"+rd('shop.js')+"\n"+rd('fx.js')+"\n"+rd('power.js')+"\n"+rd('story.js')+"\n"+rd('map.js')+"\n"+rd('athens.js')+"\n"+rd('dir.js')+"\n"+rd('paths.js')+"\n"+rd('upgrades.js')+"\n"+rd('up2.js')+"\n"+rd('perks2.js')+"\n"+rd('strategy.js')+"\n"+rd('art.js').replace('__ANIM__',ANIM)+"\n"+rd('ai.js')+"\n"+rd('meta.js')+"\n"+rd('ret.js')+"\n"+rd('fxwave.js')+"\n"+rd('arthooks.js')+"\n"+rd('flavor.js')+"\n"+rd('footart.js')+"\n"+rd('footen.js')+"\n"+rd('foot.js')+"\n"+rd('footstage.js')+"\n"+rd('streetlook.js')+"\n"+rd('footq.js')+"\n"+rd('leak.js')+"\n"+rd('zoo.js')+"\n"+rd('formations.js')+"\n"+rd('stagescripts.js')+"\n"+rd('remix.js')+"\n"+rd('variants.js')+"\n"+rd('scale.js')+"\n"+rd('powerups.js')+"\n"+rd('flow.js')+"\n"+rd('musicpack.js')+"\n"+rd('storydata.js')+"\n"+rd('tale.js')+"\n"+rd('stats.js')+"\n"+rd('feedback.js')+"\n"+rd('lab.js')+"\n"+rd('labassets.js')+"\n"+rd('labfull.js')+"\n"+rd('shapes.js')+"\n"+rd('hud.js')+"\n"+rd('uikit.js').replace('__BOSSANIM__',open(_ROOT+'games/mainhattan-nightrun/media/anim-boss.json').read().replace('\n','').replace(' ',''))+"\n"+rd('lagfix.js')+"\n"+rd('g.js')+"\n"+rd('wpx.js')+"\n"+rd('fair.js')+"\n"+rd('hard.js')+"\n"+rd('react.js')+"\n"+rd('armour.js')+"\n"+rd('reward.js')+"\n"+rd('choices.js')+"\n"+rd('bossmoves.js')+"\n"+rd('bossvis.js')+"\n"+rd('powlevels.js')+"\n"+rd('abilities.js')+"\n"+rd('forge.js')+"\n"+rd('inventory.js')+"\n"+rd('forgeui.js')+"\n"+rd('forgeone.js')+"\n"+rd('counter.js')+"\n"+rd('timing.js')+"\n"+rd('visible.js')+"\n"+rd('grit.js')+"\n"+rd('density.js')+"\n"+rd('bossplay.js')+"\n"+rd('rules.js')+"\n"+rd('novelty.js')+"\n"+rd("anticamp.js")+"\n"+rd("holdline.js")+"\n"+rd("pacing.js")+"\n"+rd("bite.js")+"\n"+rd('flankers.js')+"\n"+rd('foeart.js')+"\n"+rd('fleet.js')+"\n"+rd('endramp.js')+"\n"+rd('bandclear.js')+"\n"+rd('legend.js')+"\n"+rd('h.js')+"\n"+rd('fun.js')+"\n"+rd('tut.js')+"\n"+rd('lessons.js')+"\n"+rd('saga.js')+"\n"+rd('title.js')+"\n"+rd('cp.js')+"\n"+rd('fs.js')+"\n"+rd('readable.js')+"\n"+rd('bulletart.js')+"\n"+rd('legible.js')+"\n"+rd('arsenal.js')+"\n"+rd('abup.js')+"\n"+rd('zonehint.js')+"\n"+rd('econfit.js')+"\n"+rd('comfort.js')+"\n"+rd('classes.js')+"\n"+rd('saves.js')+"\n"+rd('stamp.js')+"\n"+rd('polish.js')+"\n"+rd('diet.js')+"\n"+rd('mix.js')+"\n"+rd('hub.js')+"\n"+rd('layout.js')+"\n"+rd('school.js')+"\n"+rd('schoolfull.js')+"\n"+rd('tidy.js')+"\n"+rd('menufix.js')+"\n"+rd('explain.js')+"\n"+rd('calm.js')+"\n"+rd('waves.js')+"\n"+rd('nocaps.js')+"\n"+rd('c.js')
 PARTS_EXTRA=[]   # new parts: append one line PARTS_EXTRA.append('<file>.js') below; they go in just before c.js (the game start)
 PARTS_EXTRA.append('slice.js')
 PARTS_EXTRA.append('puremusic.js')
@@ -66,19 +68,19 @@ PARTS_EXTRA.append('pure.js')
 PARTS_EXTRA.append('purefoot.js')
 PARTS_EXTRA.append('pureboss.js')
 out=out[:out.rindex(rd('c.js'))]+''.join(rd(p)+"\n" for p in PARTS_EXTRA)+rd('c.js')
-OUT=os.environ.get('NR_OUT','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path
+OUT=os.environ.get('NR_OUT',_ROOT+'games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path
 import hashlib,datetime
 _h=hashlib.sha1(out.encode('utf8')).hexdigest()[:10]   # the stamp is filled in AFTER hashing, so it is the same hash that names the service worker caches
 out=out.replace('__STAMP__',_h+' '+datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'))
 open(OUT,'w',encoding='utf8').write(out)
 if 'NR_OUT' not in os.environ:   # media/assets-index.json for the Lab ASSETS tab (labassets.js): the manifest plus every other media file, so the tab never goes stale
     import json
-    _md='/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/media/'
-    _mf=json.load(open('/home/user/spotify_to_ytmusic/games-src/nightrun/assets-manifest.json',encoding='utf8'))
+    _md=_ROOT+'games/mainhattan-nightrun/media/'
+    _mf=json.load(open(_ROOT+'games-src/nightrun/assets-manifest.json',encoding='utf8'))
     _in={e['file'] for e in _mf}
     json.dump({'manifest':_mf,'extra':sorted(f for f in os.listdir(_md) if f.endswith('.webp') and f not in _in)},open(_md+'assets-index.json','w',encoding='utf8'),separators=(',',':'))
 print(len(out))
 import subprocess,hashlib
 if 'NR_OUT' not in os.environ:   # B30: the service worker carries a hash of the page, so every deploy is a new worker and new cache names
     open(os.path.join(os.path.dirname(OUT),'sw.js'),'w',encoding='utf8').write(rd('sw.js').replace('__BUILD__',_h))
-if 'NR_OUT' not in os.environ:subprocess.run(['python3','/home/user/spotify_to_ytmusic/games-src/scripts/stamp-copyright.py',OUT],check=True)
+if 'NR_OUT' not in os.environ:subprocess.run(['python3',_ROOT+'games-src/scripts/stamp-copyright.py',OUT],check=True)
