@@ -111,3 +111,8 @@ Model and status come from the session list. Cost is blank: the session list doe
 | flag-rulings-r22e33 | beta.158 | Sonnet | gloss ON, takedown deleted | #63 PASS, shipped |
 | flake-quietdirt-r22e34 | — | Sonnet | stopped (no repro); Alex's bug took the slot | docs only |
 | deploy beta.158 | beta.158 | coord | Beta now gets all per-car model files (were missing) | shipped v324 |
+| parked-jump-r22e29 | beta.159 | Sonnet | parked cars never drive off | #64 PASS, shipped |
+| garage-cars-r22e35 | beta.159 | Opus ($13) | chunk fallback + PUBLISH_FILES + GO | shipped |
+| onfoot-collide-r24a | beta.159 | Sonnet | walk-through + river regression from beta.157 | shipped |
+| turbine-r24c | beta.159 | Sonnet | rotor pivot at hub | shipped |
+| proto-westend-r24b | — (flag) | Opus | Westend 2K-look prototype ?proto=1 | shots to Alex |
