@@ -23,3 +23,4 @@ Pins: [../sources/racers.md](../sources/racers.md). Code under `LEGORacers/src/r
 
 ## Gap
 No colour choice, no white stacking, no levels. Plan: [../../DESIGN_racers_rebuild.md](../../DESIGN_racers_rebuild.md) step 1 (red=missile, yellow=mines/web, blue=shield, green=turbo; GO: green + 2 white = turbo 5 s +-0.1).
+Excerpt (LGPL, short): [code/powerup-stacking.md](code/powerup-stacking.md)

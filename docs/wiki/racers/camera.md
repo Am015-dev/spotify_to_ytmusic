@@ -12,3 +12,4 @@ Pins: [../sources/racers.md](../sources/racers.md). `RaceCameraController`, `g_d
 
 ## Gap
 Close enough. Racers has 3 selectable views; we have one chase cam. Optional: a far-high view.
+Excerpt (LGPL, short): [code/camera.md](code/camera.md)

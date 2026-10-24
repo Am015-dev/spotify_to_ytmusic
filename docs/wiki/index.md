@@ -12,6 +12,7 @@ Rules: [SCHEMA.md](SCHEMA.md) | history: [log.md](log.md) | pins: [sources/racer
 - [racers/car-builder.md](racers/car-builder.md): 10x6x15 grid, 64 pieces, stats from volume
 
 - [racers/code/rubber-band.md](racers/code/rubber-band.md): LGPL excerpt of the rubber-band update
+- [racers/code/powerup-stacking.md](racers/code/powerup-stacking.md), [racers/code/ai-line-follow.md](racers/code/ai-line-follow.md), [racers/code/camera.md](racers/code/camera.md): LGPL excerpts
 - [sources/licences.md](sources/licences.md): what we may port from each repo (LGPL/MIT/GPL), no assets
 
 ## Our game (key files, invariants, known bugs)

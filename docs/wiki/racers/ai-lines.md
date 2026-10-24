@@ -16,3 +16,4 @@ Pins: [../sources/racers.md](../sources/racers.md).
 ## Gap
 No lane width/wobble per route point; rivals don't use items by roll/cone. Plan: design doc step 2 (rival lateral spread > 1.5 m, band 0.95-1.05).
 See [rubber-band.md](rubber-band.md).
+Excerpt (LGPL, short): [code/ai-line-follow.md](code/ai-line-follow.md)
