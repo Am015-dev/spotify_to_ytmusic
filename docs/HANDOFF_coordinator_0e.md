@@ -1,6 +1,6 @@
 # Coordinator handoff (OD 0e), 2026-10-22 ~07:40 UTC
 Coordinator session_01L97MfPJRbeb3t9g3h8vcM3. Read CLAUDE.md, then this. Deploy recipe: docs/HANDOFF_coordinator_0c.md (worked for beta.151; Artifact publish needs read of live page + models/lx.js, xf.js first).
-LIVE NOW: beta.160 (0e978ba8, Beta v326 + preview v6 with ?proto ON: Westend bricks + look r2). Running: look2k-r3-r24k session_01QtaJ6T94bokepXdRTtwnb8 (shadows, bloom, gloss). Next: boot CPU (95 s at 6x to drivable), lowmem resume (aeeb52d WIP), bricks fixes (grey wall in shot 2, pale small bricks). Cap 2 workers; visible work + screenshots first (Alex 24 Oct).
+LIVE NOW: beta.161 (9f4287be, Beta v327 + preview v7). Running: stkcam-r24m (STK chase camera port, Alex 'camera zoom in and out'). Game is GPL-3.0 (Alex 24 Oct). Next: HUD coin chip overlaps speedo (proto3 shot 2), bricks: grey wall + pale bricks, proto: cast shadows + paint reflections, boot CPU 95 s, lowmem resume.
 ## Live
 beta.151 (ce32c02, Beta v317), built from 7394743: speed feel, solid-cars r3 (camera turn), ground-tile + coin prewarm, core reveal, xf1/water. gloss and ?cl=core,studs default OFF.
 ## Reviewed since (on trunk, not live)

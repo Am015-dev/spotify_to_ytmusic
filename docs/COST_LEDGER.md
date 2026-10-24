@@ -120,3 +120,5 @@ Model and status come from the session list. Cost is blank: the session list doe
 | look2k-r24j | beta.160 preview | Opus | Westend look r2 (warm sun, haze) | preview |
 | bricks-r24i | beta.160 preview | Opus | LEGO Racers bricks (LGPL port) | preview |
 | lowmem-r24h | — | Opus | stopped for visible work; -24/-35 % GPU est WIP | parked |
+| look2k-r3 | beta.161 | Opus | code-text popup root fix, dark roads, glow | shipped |
+| racefree-r24l | beta.161 | Opus | full street, grounded rivals, race bounds | shipped |
