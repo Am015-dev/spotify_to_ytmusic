@@ -11,17 +11,19 @@ One rule for all three, each with its own tell and answer: **make it miss, then 
 - `qa/streetsim.js`: time to kill for the new ids, a W185 gate block (only with `Q=&morefoes=1`), and the dodge bot's answers (it jumps the hound's pounce and stays out of a burning line). With the flag off, the bot code paths are unchanged.
 - `qa/footvis-test.js`: the new foes are checked on their own lines.
 
-## Gates (streetsim RUNS=50 per bot, stepped)
+## Gates (streetsim RUNS=50 per bot, stepped, on beta.183 merged: knife combo on)
 | | casual (nearest) | gfirst | dodge |
 |---|---|---|---|
-| flag off (today's live game) | 24% | 42% | 72% |
-| `?morefoes=1` | 4% | 26% | 94% |
+| flag off (today's live game) | 30% | 68% | 68% |
+| `?morefoes=1` | 6% | 54% | 96% |
 
 - PASS >= 6 live foe types in hearts by source (rusher, gunner, heavy, sninja, shound, sflamer)
-- PASS ninja time to kill: dodge 3.21 s vs gfirst 7.02 s (nearest 13.13 s)
-- PASS hound time to kill: dodge 3.39 s vs gfirst 6.2 s
-- FAIL flamer time to kill: dodge 4.57 s vs gfirst 6.15 s (26%; the gate needs 30%)
-- FAIL casual clear 25-40% (4%) and dodge 60-80% (94%): answering the tells matters a lot now. The casual bot dies to the gunners and rushers left in a wave while it shoots foes it can't hurt yet.
+- PASS ninja time to kill: dodge 2.16 s vs gfirst 4.2 s (nearest 7.21 s)
+- PASS hound time to kill: dodge 3.13 s vs gfirst 6.2 s
+- FAIL flamer time to kill: dodge 4.69 s vs gfirst 6.54 s (28%; the gate needs 30%)
+- FAIL casual clear 25-40% (6%) and dodge 60-80% (96%): answering the tells matters a lot now. The casual bot dies to the gunners and rushers left in a wave while it shoots foes it can't hurt yet.
+- No NaN / stuck / page errors. Threat peak, cover and depth-spread gates also fail with the flag off (not this change).
+- simhunt (flight stages, untouched): the same 2 severe kinds as the committed 22 Oct report (unexplained ship deaths).
 - footvis-test: PASS, every new foe drawn solid (alpha 1.00) on phone and PC, fresh and stale strips.
 - Shield guard (`?shieldfoe=1`): its own W171 gate FAILS (guard time to kill: dodge 3.77 s, gfirst 4.22 s, nearest 3.68 s), so its default was NOT flipped.
 
