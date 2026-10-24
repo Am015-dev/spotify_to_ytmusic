@@ -104,7 +104,7 @@ const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); w
     RET.tale = false; FOOT.start('zeil'); let S = FOOT.S; for (let j = 0; j < 200 && S && !S.end; j++) S = FOOT.sim(1, 1 / 60); S = FOOT.S; r = { clear: !!(S.end && S.end.cleared), time: +S.time.toFixed(1), hp: S.P.hp, hurts: S.hurts, kills: S.kills }; }
   else { window.__gf = ${bot !== 'nearest'}; r = (${codeFn})(${seed}); }
   const ms = performance.now() - w0, S = FOOT.S, T = window.__T, sh = S.sh || {}, s3 = S.s3 || {};
-  const tu = {}; r.zmiss = S.zmiss | 0; r.cmb = S.cmb || null; r.gd = S.gd ? { b: S.gd.blocks, p: S.gd.parries, rf: S.gd.refl, br: S.gd.breaks, mx: +S.gd.maxOn.toFixed(2) } : null; r.rch = S.rch ? { log: S.rch.log } : null; r.mh = (S.hlog || []).filter(x => /^mel:(rusher|heavy|bigheavy)$/.test(x)).length; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
+  const tu = {}; r.zmiss = S.zmiss | 0; r.cmb = S.cmb || null; r.cn = S.cn ? { f: S.cn.feints, s: S.cn.slams, fl: S.cn.flanks } : null; r.gd = S.gd ? { b: S.gd.blocks, p: S.gd.parries, rf: S.gd.refl, br: S.gd.breaks, mx: +S.gd.maxOn.toFixed(2) } : null; r.rch = S.rch ? { log: S.rch.log } : null; r.mh = (S.hlog || []).filter(x => /^mel:(rusher|heavy|bigheavy)$/.test(x)).length; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
   r.tel = { tr: T.tr, stuckBoss: T.stuckBoss, mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, far: T.far || 0, lingerInfo: T.lingerInfo, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
     called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' '), od: FOOT.OD && FOOT.OD.log, combo: window.FOOT.COMBO ? FOOT.COMBO.best : -1, bnc: window.FOOT.COMBO ? FOOT.COMBO.bounces : 0 };
   try { FOOT.stop(); } catch (e) {} un(); return r; })()`;
@@ -128,7 +128,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   // ---- aggregate per bot
   const ok0 = out.filter(o => !o.r.err), simSecs = ok0.reduce((a, o) => a + (o.r.tEnd || 0), 0), simMs = ok0.reduce((a, o) => a + o.r.ms, 0);
   const clearT = out.filter(o => o.r.clear).map(o => o.r.tEnd), Lref = clearT.length ? med(clearT) : Math.max(1, ...ok0.map(o => o.r.tEnd));
-  if (process.env.DUMP) fs.writeFileSync(process.env.DUMP, JSON.stringify(out.map(o => ({ bot: o.j.bot, seed: o.j.seed, clear: !!o.r.clear, tEnd: o.r.tEnd, dbg: o.r.dbg }))));   // DUMP=<json>: every run's probe record (W169)
+  if (process.env.DUMP) fs.writeFileSync(process.env.DUMP, JSON.stringify(out.map(o => ({ bot: o.j.bot, seed: o.j.seed, clear: !!o.r.clear, tEnd: o.r.tEnd }))));   // DUMP=<json>: every run's probe record (W169)
   if (process.env.LIST) for (const o of out) if (o.r.tel && o.r.tel.stuckAt >= 0) { console.log('STUCK', o.j.bot, o.j.seed, 'at', o.r.tel.stuckAt, 'end', o.r.tEnd, o.r.tel.stuckBoss.slice(0, 200)); if (process.env.TR && o.r.tel.tr) console.log(o.r.tel.tr.join('\n')); }
   const rows = {};
   for (const bot of BOTS) { const rs = out.filter(o => o.j.bot === bot).map(o => o.r), good = rs.filter(r => !r.err), cl = good.filter(r => r.clear), dead = good.filter(r => !r.clear && r.end), tl = good.map(r => r.tel);
@@ -205,6 +205,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
     L(sp != null && sp >= .3, `W173 D3 median depth spread of foes near Kai >= 30% of the band (${sp == null ? '-' : (100 * sp).toFixed(0) + '%'})`); }
   if (BOTS.includes('parry')) { const gd = ok0.filter(o => o.j.bot === 'parry').map(o => o.r.gd || { b: 0, p: 0, rf: 0, br: 0, mx: 0 }), ps = gd.map(x => x.p), mx = Math.max(0, ...ok0.filter(o => o.r.gd).map(o => o.r.gd.mx));   // W192
     console.log(`INFO parry bot: parries/run median ${med(ps)} mean ${mean(ps).toFixed(1)}, blocks/run ${mean(gd.map(x => x.b)).toFixed(1)}, reflected slugs/run ${mean(gd.map(x => x.rf)).toFixed(1)}, guard breaks/run ${mean(gd.map(x => x.br)).toFixed(1)}, longest guard ${mx} s`);
+    { const cn = ok0.filter(o => o.j.bot === 'parry').map(o => o.r.cn || { f: 0, s: 0, fl: 0 }); console.log(`INFO W198 per run (parry bot): feints ${mean(cn.map(x => x.f)).toFixed(1)}, unblockable slams ${mean(cn.map(x => x.s)).toFixed(1)}, flankers ${mean(cn.map(x => x.fl)).toFixed(1)}`); }
     if (rows.dodge) L(rows.parry.hearts <= .7 * rows.dodge.hearts, `W192 the parry bot loses >= 30% fewer hearts than the dodge bot (${rows.parry.hearts.toFixed(2)} vs ${rows.dodge.hearts.toFixed(2)} per run)`);
     L(mean(ps) >= 5, `W192 >= 5 parries per run for the parry bot (mean ${mean(ps).toFixed(1)})`);
     L(mx <= .6 + 1e-6, `W192 the guard never covers Kai for > 0.6 s in a row (longest ${mx} s)`); }
@@ -228,7 +229,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   if (rt) { L(rt.rep, `determinism: the same seed twice gives the same hurts and end time`); L(rt.same, `one seed equals a real-time run (idle, seed ${seedOf(0)}: stepped hurts [${rt.stepped}] vs real-time [${rt.real}] over the first ${rt.lim} s, tolerance 1 s)`); }
   md += `## Gates\n\n` + lines.map(([p, n]) => `- ${p ? 'PASS' : 'FAIL'} ${n}`).join('\n') + '\n';
   fs.writeFileSync(OUT, md);
-  if (process.env.JSONOUT) fs.writeFileSync(process.env.JSONOUT, JSON.stringify(out.map(o => ({ bot: o.j.bot, seed: o.j.seed, clear: o.r.clear, tEnd: o.r.tEnd, dbg: o.r.dbg }))));   // every run, for qa/bossprobe.js
+  if (process.env.JSONOUT) fs.writeFileSync(process.env.JSONOUT, JSON.stringify(out.map(o => ({ bot: o.j.bot, seed: o.j.seed, clear: o.r.clear, tEnd: o.r.tEnd }))));   // every run, for qa/bossprobe.js
   for (const [p, n] of lines) console.log((p ? 'PASS ' : 'FAIL ') + n);
   console.log(`INFO wrote ${OUT}`);
   const speedFail = lines.filter(([p, n]) => !p && /speed|determinism|real-time|suite/.test(n)).length;
