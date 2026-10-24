@@ -31,7 +31,7 @@ F.hitFeel=function(e,d,src){if(!RET.hitfeel||!src||src.kind==='fire'||(!src.kind
   e._kbd=(src.melee?Math.sign(e.x-src.x)||1:Math.sign(src.vx)||1)*clamp(10*d,4,16);e._kbt=F.S.time;F.FEEL.log.kb++;};   // a drawn recoil that eases back in 0.14 s: a real shove made the dodge bot clear 100% (was 86%), see HANDOFF-W169.md
 /* ===== W187 OVERDRIVE (?overdrive=1, off by default; STREET-REVIEW 24 Oct, task 4): the meter fills +1 per landed hit and +4 per kill and drops to 0 on a hurt; when it is full BOMB
    fires the special instead of a grenade (3 damage to every foe within 220 units, all depths). Decision: keep hits clean to fire it, or take a risky hit for the kill. ===== */
-if(RET.overdrive===undefined)RET.overdrive=/[?&]overdrive=1/.test(location.search);
+if(RET.overdrive===undefined)RET.overdrive=!/[?&]overdrive=0/.test(location.search);
 const OD=F.OD={max:90,r:220,dmg:3,v:0,hurts:0,log:{fills:[],uses:0,hits:[],resets:0},busy:0};
 const odReset=S=>{OD.v=0;OD.hurts=S.hurts|0;OD.last=S.time;OD.log={fills:[],uses:0,hits:[],resets:0};};
 const odHit=F.hitFeel;

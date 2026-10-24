@@ -14,7 +14,7 @@
 if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
 if(RET.cam2===undefined)RET.cam2=!/[?&]cam2=0/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents. W181: ON by default; ?cam2=0 = old
 if(RET.occl===undefined)RET.occl=!/[?&]occl=0/.test(location.search);   // W182: a prop drawn in front of Kai (or a foe next to him) fades to 40% so he is never lost behind it; ?occl=0 = old
-if(RET.pound2===undefined)RET.pound2=/[?&]pound2=1/.test(location.search);   // W186: boss bar + progress bar in the HUD stack (see slHud); the boss pound/leap keep one depth line (streetboss.js)
+if(RET.pound2===undefined)RET.pound2=!/[?&]pound2=0/.test(location.search);   // W186: boss bar + progress bar in the HUD stack (see slHud); the boss pound/leap keep one depth line (streetboss.js)
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;

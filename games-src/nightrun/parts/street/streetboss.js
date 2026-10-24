@@ -10,7 +10,7 @@
    The player decision: read which attack is coming and pick its answer (jump / step back / dash), then punish the 1 s opening (OPEN, full damage) after every attack.
    Damage cannot skip a phase: hp stops at the phase line until the roar is over (an opening in progress is finished first). ---------- */
 if(RET.sboss===undefined)RET.sboss=!/[?&]sboss=0/.test(location.search);
-if(RET.pound2===undefined)RET.pound2=/[?&]pound2=1/.test(location.search);   // W186 (?pound2=1 = on; OFF until its gates pass): the pound's wave and the leap's landing keep ONE depth line, drawn in red during the 0.8 s wind-up
+if(RET.pound2===undefined)RET.pound2=!/[?&]pound2=0/.test(location.search);   // W186 (?pound2=1 = on; OFF until its gates pass): the pound's wave and the leap's landing keep ONE depth line, drawn in red during the 0.8 s wind-up
 (function(){
 const F=window.FOOT,FBS=window.FOOT_BOSS||{},d=FBS.bigheavy;
 if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;

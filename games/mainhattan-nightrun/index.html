@@ -5367,6 +5367,7 @@ F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{
 if(RET.fairstreet===undefined)RET.fairstreet=!/[?&]fairstreet=0/.test(location.search);   // W161: no hits from off-screen foes, a 1 s BEHIND warning, no code-drawn junk over props and pickups
 if(RET.cam2===undefined)RET.cam2=!/[?&]cam2=0/.test(location.search);   // W164: the camera leads Kai (30-40% from the left) and the steam stands on fixed vents. W181: ON by default; ?cam2=0 = old
 if(RET.occl===undefined)RET.occl=!/[?&]occl=0/.test(location.search);   // W182: a prop drawn in front of Kai (or a foe next to him) fades to 40% so he is never lost behind it; ?occl=0 = old
+if(RET.pound2===undefined)RET.pound2=!/[?&]pound2=0/.test(location.search);   // W186: boss bar + progress bar in the HUD stack (see slHud); the boss pound/leap keep one depth line (streetboss.js)
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
 if(!RET.streetlook||!window.FOOT||!FOOT._in)return;
@@ -5536,13 +5537,19 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   let sr=vw-60*u,sy=t0+m+2*u;if(x+pw_+10*u>sr-sw){sr=vw-10*u;sy=t0+60*u;}   // narrow screen: under the pause button
   c.fillStyle='#fff';c.fillText(st,sr,sy);c.font='bold '+fs(14)+'px monospace';c.fillStyle='#c9c3e6';c.fillText(tt,sr,sy+20*u);box(sr-sw,sy,sw,38*u);
   const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;SL.hudFull=hudB+42*u;   // hudFull: the band with the hint line (tidy keeps flyers under it)
-  if(S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
+  if(!RET.pound2&&S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
   if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u;}
   if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=(SL.t0+VH)/2,a=.55+.45*Math.sin(S.time*14);c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';c.fillStyle='#ffb020';
     c.font='bold '+fs(34)+'px monospace';c.fillText('◀',6*u,fy);c.font='bold '+fs(14)+'px monospace';c.fillText('BEHIND',6*u+30*u,fy-8*u);c.fillText('foe arriving from the left',6*u+30*u,fy+9*u);c.globalAlpha=1;}   // W161: 1 s warning at the edge a foe comes from
-  SL.tag='';if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
+  SL.tag='';
+  if(RET.pound2){   // W186 (?pound2=1 = on; OFF until its gates pass): boss bar and run-progress bar sit in the HUD stack under the hint line, never on the floor band (they used to cover the front depth)
+    const by=t0+SL.hudB,bossOn=S.boss&&!S.boss.dead;
+    if(bossOn){const bw=vw*.7,bx=vw*.15;c.fillStyle='#ffffff22';c.fillRect(bx,by+18*u,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by+18*u,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
+      c.textAlign='center';c.fillStyle='#fff';c.textBaseline='top';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by,vw-20*u);box(bx,by-t0,bw,30*u);SL.hudB+=34*u;}
+    else if(S.st.hook&&S.st.hook.hud){const dy=by+10*u-(VH-14*u);c.save();c.translate(0,dy);try{S.st.hook.hud(c,vw,u,(x,y,w,h)=>box(x,y+dy,w,h),fs,S);}catch(x){}c.restore();SL.hudB+=24*u;}}
+  else if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};IN.ghost();}
 })();
 
@@ -14735,7 +14742,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='f269061d91 2026-10-24 10:58 UTC';
+const NR_STAMP='557f49fa8a 2026-10-24 11:24 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16875,7 +16882,7 @@ if(window.FOOT&&!('_bfT' in FOOT)){let ft=false;FOOT._bfT=1;
   Object.defineProperty(FOOT,'forceTouch',{configurable:true,get(){return ft||(RET.bossfix!==false&&innerWidth<=600&&innerHeight>innerWidth*1.05);},set(v){ft=!!v;}});}
 
 // PURPOSE: Street feel: feet that grip the road (run frames tied to ground speed, bob, dust, lean, skid), one body scale, bullets from the gun's muzzle, a Kai sprite set per weapon
-// FLAG: feel (?feel=0), hitfeel (?hitfeel=1, off by default)
+// FLAG: feel (?feel=0), hitfeel (?hitfeel=1, off by default), overdrive (?overdrive=1, off by default)
 // TEST: qa/streetfeel-test.js
 /* ---------- STREETFEEL. Owner, 22 Oct 2026: "the art is completely fine as a sprite; the issue is it does not look like it is running; the hero is significantly smaller
    than the rest; the taxi is like a toy; ... it shoots but bullets fly not from the gun; gun variation should select the correct sprite; running sprites look like they slide".
@@ -16905,6 +16912,36 @@ F.hitFeel=function(e,d,src){if(!RET.hitfeel||!src||src.kind==='fire'||(!src.kind
   const heavy=e.hp<=0||d>=2;const ms=heavy?100:d<1?33:50;if(!F.S.sim)IN.hitstop(ms);F.S.hf=Math.max(F.S.hf||0,ms/1000);   // headless sim() only records the freeze (S.hf): applying it would change how often a bot samples, not the game
   if(e.boss||e.hp<=0||src.kb||/^(wind|charge|crouch|lunge|pop|stun)$/.test(e.state))return;   // committed attacks and stuns do not rock back
   e._kbd=(src.melee?Math.sign(e.x-src.x)||1:Math.sign(src.vx)||1)*clamp(10*d,4,16);e._kbt=F.S.time;F.FEEL.log.kb++;};   // a drawn recoil that eases back in 0.14 s: a real shove made the dodge bot clear 100% (was 86%), see HANDOFF-W169.md
+/* ===== W187 OVERDRIVE (?overdrive=1, off by default; STREET-REVIEW 24 Oct, task 4): the meter fills +1 per landed hit and +4 per kill and drops to 0 on a hurt; when it is full BOMB
+   fires the special instead of a grenade (3 damage to every foe within 220 units, all depths). Decision: keep hits clean to fire it, or take a risky hit for the kill. ===== */
+if(RET.overdrive===undefined)RET.overdrive=!/[?&]overdrive=0/.test(location.search);
+const OD=F.OD={max:90,r:220,dmg:3,v:0,hurts:0,log:{fills:[],uses:0,hits:[],resets:0},busy:0};
+const odReset=S=>{OD.v=0;OD.hurts=S.hurts|0;OD.last=S.time;OD.log={fills:[],uses:0,hits:[],resets:0};};
+const odHit=F.hitFeel;
+F.hitFeel=function(e,d,src){odHit.apply(this,arguments);const S=F.S;if(!RET.overdrive||!S||OD.busy||!src||src.kind==='fire'||e._odk)return;
+  const was=OD.v;if(e.hp<=0){e._odk=1;OD.v=Math.min(OD.max,OD.v+4);}else OD.v=Math.min(OD.max,OD.v+1);
+  if(was<OD.max&&OD.v>=OD.max){OD.log.fills.push(+(S.time-(OD.last||0)).toFixed(2));OD.last=S.time;}};
+const odCtl=F.ctl;
+F.ctl=function(){if(odCtl)odCtl.apply(this,arguments);F.odCtl.apply(this,arguments);};
+F.odCtl=function(S,I){if(!RET.overdrive)return;   // streetsim calls this itself: its bot replaces F.ctl
+  if(OD.S!==S){OD.S=S;odReset(S);}   // a new run: S is rebuilt, so the meter starts empty
+  if((S.hurts|0)>OD.hurts){OD.hurts=S.hurts|0;if(OD.v>0)OD.log.resets++;OD.v=0;OD.last=S.time;}
+  const P=S.P;if(I.bombP&&OD.v>=OD.max&&P.hp>0){I.bombP=0;F.odSpecial(S);}};
+F.odSpecial=function(S){const P=S.P;OD.busy=1;OD.v=0;OD.last=S.time;let n=0;P._gt=.4;   // the grenade pose
+  for(const e of S.E.slice())if(!e.dead&&Math.abs(e.x-P.x)<OD.r){IN.dmgE(e,OD.dmg,{pierce:1,x:P.x,vx:0});n++;}
+  OD.busy=0;OD.log.uses++;OD.log.hits.push(n);
+  S.fx.push({ring:1,x:P.x,y:P.y-8,r:OD.r,l:.5,m:.5,c:'#19e3ff'});if(window.AH)AH.ftPush(S.fx,'fx-boom-large-electric',P.x,P.y-12,OD.r*2,.5);
+  IN.sfx('boom');if(!S.sim)IN.hitstop(80);IN.pop(P.x,P.y-96,'OVERDRIVE!','#19e3ff',true);};
+/* the bar: right side under the score and time (a plain placeholder until the Wave 1 art), "hud-overdrive" */
+if(F.look&&F.look.draw){const dr=F.look.draw;F.look.draw=function(c){const r=dr.apply(this,arguments),S=F.S,L=IN.L();if(!r||!RET.overdrive||!S||!L||!L.hud)return r;
+  const u=1/L.sc,t0=F.look.t0,vw=L.vw,w=118*u,h=10*u,full=OD.v>=OD.max,x=vw-w-10*u,y=t0+(vw<600?118:72)*u;
+  S._odShow=(S._odShow||0)+(OD.v>0?1:0);
+  c.save();c.fillStyle='#000a';c.fillRect(x-4*u,y-18*u,w+8*u,h+36*u);c.fillStyle='#ffffff22';c.fillRect(x,y,w,h);
+  c.fillStyle=full?(Math.floor(S.time*6)%2?'#ffffff':'#19e3ff'):'#19a8c8';c.fillRect(x,y,w*OD.v/OD.max,h);
+  c.textAlign='right';c.textBaseline='bottom';c.font='bold '+14*u+'px monospace';c.fillStyle=full?'#19e3ff':'#c9c3e6';c.fillText(full?'OVERDRIVE READY':'OVERDRIVE',x+w,y-2*u);
+  c.textBaseline='top';c.font='bold '+12*u+'px monospace';c.fillStyle='#ffffffcc';
+  const cap=full?'press BOMB: hits all foes near':S._odShow<600?'OVERDRIVE: land hits without getting hurt':'';if(cap)c.fillText(cap,x+w,y+h+3*u);
+  c.restore();L.hud.hud.push({x:x-4*u,y:y-18*u-t0,w:w+8*u,h:h+36*u});return r;};}
 if(!RET.feel)return;
 const RUNA={run:1,runshoot:1,walk:1};
 const sheetOf=k=>{const i=k.indexOf('/');return [k.slice(0,i),k.slice(i+1)];};
@@ -18678,13 +18715,14 @@ const CAR=S1F.CAR={LIFE:24,X:.76,PHP:36,CHP:84,
    The player decision: read which attack is coming and pick its answer (jump / step back / dash), then punish the 1 s opening (OPEN, full damage) after every attack.
    Damage cannot skip a phase: hp stops at the phase line until the roar is over (an opening in progress is finished first). ---------- */
 if(RET.sboss===undefined)RET.sboss=!/[?&]sboss=0/.test(location.search);
+if(RET.pound2===undefined)RET.pound2=!/[?&]pound2=0/.test(location.search);   // W186 (?pound2=1 = on; OFF until its gates pass): the pound's wave and the leap's landing keep ONE depth line, drawn in red during the 0.8 s wind-up
 (function(){
 const F=window.FOOT,FBS=window.FOOT_BOSS||{},d=FBS.bigheavy;
 if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;
 const IN=F._in,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1;
 const PH=[null,{n:'THE CHARGE',at:['charge','throw']},{n:'GROUND POUND',at:['pound']},{n:'LEAP',at:['leap']}],LINE=[0,1,.66,.33];
-const CAP={charge:'CHARGE · JUMP OR DASH',throw:'BARREL · STEP BACK',pound:'GROUND POUND · JUMP THE WAVE',leap:'LEAP · DASH OUT'};
-const WIND={throw:.7,pound:.8,leap:.6},OPEN=1.0,ROAR=1.2,LEAPT=.7,HPK=+((location.search.match(/[?&]sbhp=([\d.]+)/)||[])[1]||8);   // boss hp x HPK (W168: default 8 = a 45-90 s fight; ?sbhp= to tune) (W168: x5 gives a 32 s dodge-bot fight, x8 47 s, but the rushers that join every 3.5 s then kill the bots)
+const CAP={charge:'CHARGE · JUMP OR DASH',throw:'BARREL · STEP BACK',pound:RET.pound2?'POUND · LEAVE THE RED LINE OR JUMP':'GROUND POUND · JUMP THE WAVE',leap:RET.pound2?'LEAP · LEAVE THE RED RING':'LEAP · DASH OUT'};
+const WIND={throw:.7,pound:.8,leap:RET.pound2?.8:.6},OPEN=1.0,ROAR=1.2,LEAPT=.7,HPK=+((location.search.match(/[?&]sbhp=([\d.]+)/)||[])[1]||8);   // boss hp x HPK (W168: default 8 = a 45-90 s fight; ?sbhp= to tune) (W168: x5 gives a 32 s dodge-bot fight, x8 47 s, but the rushers that join every 3.5 s then kill the bots)
 const SB=F.SB={log:[]};   // per fight: {ph:[[phase,t]], at:[[attack,t]]} for the probe
 const name=e=>'BIG HEAVY · PHASE '+e.ph+': '+PH[e.ph].n;
 function go(e,s){e.state=s;e.sT=0;}
@@ -18693,7 +18731,7 @@ function pick(e,P){const at=[].concat(...PH.slice(1,e.ph+1).map(p=>p.at)),far=ab
   let w=at.map(a=>a===e.last?.25:a==='throw'?(far?2:.3):a==='leap'?(far?1.6:1):1),s=w.reduce((a,b)=>a+b,0),r=Math.random()*s;
   for(let i=0;i<at.length;i++){r-=w[i];if(r<=0)return at[i];}return at[0];}
 function begin(e,a,S,env){e.atk=a;e.last=a;e.L.at.push([a,+S.time.toFixed(2)]);if(!e.capd[a]){e.capd[a]=1;IN.pop(cx(e,env),e.y-e.h-30,CAP[a],'#ffb020');}
-  if(a==='charge'){go(e,'wind');return;}go(e,'sb_'+a+'W');e.tele=WIND[a];if(a==='leap'){e.tx=S.P.x;e.x0=e.x;}}
+  if(a==='charge'){go(e,'wind');return;}go(e,'sb_'+a+'W');e.tele=WIND[a];if(a==='leap'){e.tx=S.P.x;e.x0=e.x;}if(RET.pound2&&e.z!=null)e.zl=e.z;}
 const a0=d.ai,p0=d.pose,h0=d.onHit;
 d.onHit=function(e,dm){h0.apply(this,arguments);if(e._sb)e.hp=Math.max(e.hp,e.state==='sb_roar'?e.hpLock:e.ph<3?e.max*LINE[e.ph+1]:-1e9);};   // no skipping a phase, even with a bomb or a barrel
 d.pose=e=>/^sb_.*W$/.test(e.state)?'crouch':e.state==='sb_roar'?'hit':/^sb_/.test(e.state)?'melee':p0(e);
@@ -18707,15 +18745,17 @@ d.ai=function(e,dt,env){const S=F.S,P=env.P;
   if(/^sb_/.test(e.state)){e.sT+=dt;e.y=FL;e.heavy=1;e.label='';const st=e.state;
     if(st==='sb_roar'){e.vx=0;if(e.sT>=ROAR){go(e,'walk');e.cd=0;}return;}
     if(st==='sb_throwW'||st==='sb_poundW'||st==='sb_leapW'){e.vx=0;e.facing=sgn(P.x-e.x);e.tele=Math.max(0,WIND[e.atk]-e.sT);
-      if(st==='sb_leapW')mark(S,e.tx);
+      if(RET.pound2)hold(e,env);
+      if(st==='sb_leapW')mark(S,e.tx,e);
       if(e.sT>=WIND[e.atk]){e.tele=0;
         if(e.atk==='throw'){const dx=P.x-e.x,T=.85,vx=dx/T,vy=-(855*T)/2+(FL-30-(e.y-e.h*.8))/T;const n0=S.eb.length,q0=(S.xq||[]).length;env.shoot(e,0,300,1,{vx,grav:1,oy:e.y-e.h*.8,w:22,h:22});const b=S.eb.length>n0?S.eb[n0]:(S.xq||[]).length>q0?S.xq[q0]:null;if(b){b.vy=vy;b.sb=1;}go(e,'sb_throw');}
-        else if(e.atk==='pound'){for(const s of [-1,1])env.shoot(e,0,300,1,{ground:1,vx:s*300,ox:e.x+s*e.w/2,life:3});shake(S,8);go(e,'sb_pound');}
+        else if(e.atk==='pound'){if(RET.pound2)hold(e,env);for(const s of [-1,1])env.shoot(e,0,300,1,{ground:1,vx:s*300,ox:e.x+s*e.w/2,life:3});shake(S,8);go(e,'sb_pound');}
         else go(e,'sb_leap');}
       return;}
-    if(st==='sb_throw'||st==='sb_pound'){e.vx=0;if(e.sT>=.3)open(e);return;}
-    if(st==='sb_leap'){const u=Math.min(1,e.sT/LEAPT);e.x=e.x0+(e.tx-e.x0)*u;e.y=FL-Math.sin(Math.PI*u)*200;e.vx=(e.tx-e.x0)/LEAPT;mark(S,e.tx);
-      if(u>=1){e.y=FL;e.vx=0;env.melee(e,{x:e.tx-70,y:FL-e.h,w:140,h:e.h},2);shake(S,9);open(e);}return;}}
+    if(st==='sb_throw'||st==='sb_pound'){e.vx=0;if(e.sT>=.3){clr(e);open(e);}return;}
+    if(RET.pound2&&st==='sb_leap')hold(e,env);
+    if(st==='sb_leap'){const u=Math.min(1,e.sT/LEAPT);e.x=e.x0+(e.tx-e.x0)*u;e.y=FL-Math.sin(Math.PI*u)*200;e.vx=(e.tx-e.x0)/LEAPT;mark(S,e.tx,e);
+      if(u>=1){e.y=FL;e.vx=0;env.melee(e,{x:e.tx-70,y:FL-e.h,w:140,h:e.h},2);shake(S,9);clr(e);open(e);}return;}}
   const s0=e.state,x0=e.x;a0.call(this,e,dt,e.state==='charge'?low(env):env);
   if(e.state==='charge'&&e.sT>.05&&e.x===x0){open(e);return;}   // stuck a few px short of the screen edge (walk() refuses the step, the wall test never fires): that is the wall
   if(e.state==='wind'&&s0!=='wind'){const a=e.next||pick(e,P);e.next=null;begin(e,a,S,env);}   // heavyDef chose to attack: this phase picks which
@@ -18723,7 +18763,11 @@ d.ai=function(e,dt,env){const S=F.S,P=env.P;
 function low(env){const o=Object.create(env);o.melee=(e,r,n)=>e.sT<.12?false:env.melee(e,{x:r.x,y:r.y+r.h*.35,w:r.w,h:r.h*.65},n);return o;}   // charges head down (a jump clears it) and launches 0.12 s before it can hit (a jump at point blank works)
 function cx(e,env){const G=env.G,m=Math.min(170,G.viewW/2);return Math.max(G.camX+m,Math.min(G.camX+G.viewW-m,e.x));}   // captions stay on screen on a phone
 function shake(S,v){S.shake=Math.max(S.shake||0,v);}
-function mark(S,x){for(let i=-2;i<=2;i++)S.fx.push({x:x+i*30,y:FL-4,l:.04,c:'#ff2d3a',r:12});}
+function mark(S,x,e){if(!RET.pound2||e.zl==null){for(let i=-2;i<=2;i++)S.fx.push({x:x+i*30,y:FL-4,l:.04,c:'#ff2d3a',r:12});return;}
+  if(!e.mk){e.mk=[{ring:1,x,y:FL-4,r:78,m:1e3,c:'#ff2d3a',z:e.zl},{ring:1,x,y:FL-4,r:40,m:1e3,c:'#ff2d3a',z:e.zl}];for(const f of e.mk)S.fx.push(f);}
+  for(const f of e.mk)f.l=.4;}   // W186: one ring pair (a shadow) on the landing spot at the boss's depth, kept alive each step
+function hold(e,env){e.z=e.zl;if(e.atk!=='pound')return;if(e.mk){for(const f of e.mk)f.l=.4;return;}const G=env.G,S=F.S;e.mk=[];for(let x=G.camX+10;x<G.camX+G.viewW;x+=36)e.mk.push({x,y:FL-4,l:.4,c:'#ff2d3a',r:14,z:e.zl});for(const f of e.mk)S.fx.push(f);}
+function clr(e){if(e.mk)for(const f of e.mk)f.l=0;e.mk=null;e.zl=null;}
 })();
 
 // PURPOSE: Street fourth foe: the shield guard, a foe whose answer no other street foe asks for (get behind it)
