@@ -166,8 +166,8 @@ ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(ke
   c.drawImage(b,i*cw,0,cw,ch,dx,dy,w*sc,h*sv);
   if(cf>0){c.globalAlpha=(al==null?1:al)*ga*cf;c.drawImage(b,((i+1)%m[0])*cw,0,cw,ch,dx,dy,w*sc,h*sv);}
   if(flip)c.restore();c.globalAlpha=ga;return true;};
-ART.gh=[];      // clips that outlive their object (boss defeat, ship death): {key,x,y,k,t}
-ART.ghosts=()=>{const g=ART.gh;for(let i=g.length-1;i>=0;i--){const q=g[i],o=ART.aS(q.key);q.t+=FD;if(!o||q.t>o.tot+.2){g.splice(i,1);continue;}ART.drawAnim(ctx,q.key,q.t,q.x,q.y,q.k,false);}};
+ART.gh=[];      // clips that outlive their object (boss defeat, ship death): {key,x,y,k,t,g}. W236: g = G.t at the push; a clip ages by game time too, so a stepped run (render dt 0) no longer keeps every kill on screen as a frozen second ship
+ART.ghosts=()=>{const g=ART.gh;for(let i=g.length-1;i>=0;i--){const q=g[i],o=ART.aS(q.key),gt=G.t||0;q.t+=Math.max(FD,q.g!=null?gt-q.g:0);q.g=gt;if(!o||q.t>o.tot+.2){g.splice(i,1);continue;}ART.drawAnim(ctx,q.key,q.t,q.x,q.y,q.k,false);}};
 const SPR={_sq:1,_di:-1};
 /* ----- bosses: idle / attack / hit / defeat. Sheets face left like the stills; the body is drawn as wide as the still was (calibration bw), the frame bottom sits where the still's bottom did (+ the idle gap), so the feet do not move ----- */
 SPR.boss=(e,nm,wd,by,tl,fl)=>{const cb=ART.ANIM.c['boss-'+nm],st=ART.bm['spr-boss-'+nm];if(!cb||!st||e.labPose)return false;const base='boss-'+nm+'/',ik=base+'idle';
@@ -188,13 +188,13 @@ SPR.boss=(e,nm,wd,by,tl,fl)=>{const cb=ART.ANIM.c['boss-'+nm],st=ART.bm['spr-bos
   if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,0,y,k,false,sm.hitstop.flash_white*.5,sy);}   // the hit flash stays on top
   ctx.restore();return true;};
 /* a boss that just died: its defeat clip plays once where it stood; returns the seconds the explosion waits */
-SPR.bossDefeat=e=>{const p=e._sp;if(!p||!ART.anim(p.base+'defeat'))return 0;const key=p.base+'defeat';ART.gh.push({key,x:e.x,y:e.y+p.y,k:p.k,t:0});return Math.min(1.2,ART.aS(key).tot);};
+SPR.bossDefeat=e=>{const p=e._sp;if(!p||!ART.anim(p.base+'defeat'))return 0;const key=p.base+'defeat';ART.gh.push({key,x:e.x,y:e.y+p.y,k:p.k,t:0,g:G.t});return Math.min(1.2,ART.aS(key).tot);};
 /* ----- player ships: flame (ship + jet, replaces fx-engine) and death. The frame centre goes where calibration puts the nose where the still's nose was ----- */
 SPR.shipOn=id=>{ART.anim('ship-'+id+'/death');return !!(ART.ANIM.c['ship-'+id]&&ART.anim('ship-'+id+'/flame'));};
 SPR.ship=(c,id,t,bob)=>{const cb=ART.ANIM.c['ship-'+id],bk=ART.ANIM.sm.ship_bank,f=Math.min(1,Math.abs(P.tilt)/(bk.tilt_deg*Math.PI/180));
   SPR._sq+=((1-f*(1-bk.squash_y))-SPR._sq)*Math.min(1,FD*1000/bk.ease_ms);                 // banking: the existing tilt, plus a squash while the ship moves up / down
   return ART.drawAnim(c,'ship-'+id+'/flame',t,cb.ox,bob+cb.oy,cb.k,false,null,SPR._sq);};
-SPR.shipDeath=()=>{const id=shipDef().id,cb=ART.ANIM.c['ship-'+id],key='ship-'+id+'/death';if(!cb||!ART.anim(key))return 0;ART.gh.push({key,x:P.x+cb.ox,y:P.y+cb.oy,k:cb.k,t:0});return ART.aS(key).tot;};
+SPR.shipDeath=()=>{const id=shipDef().id,cb=ART.ANIM.c['ship-'+id],key='ship-'+id+'/death';if(!cb||!ART.anim(key))return 0;ART.gh.push({key,x:P.x+cb.ox,y:P.y+cb.oy,k:cb.k,t:0,g:G.t});return ART.aS(key).tot;};
 /* ----- enemy ships: flame (loops) / volley (while the shot is armed: the beat before it fires) / death (a ghost clip where it died). Sheets face left like the old shapes; w = drawn width in world px; rot turns the nose (dives); art only, e.r stays the hitbox ----- */
 SPR.foe=(e,id,t,x,y,w,rot,fl)=>{if(!RET.sprites)return false;const b='ship-'+id+'/',fk=b+'flame';if(!ART.ANIM.s[fk]||!ART.anim(fk))return false;ART.anim(b+'death');const hv=ART.ANIM.s[b+'volley']&&ART.anim(b+'volley')&&e.arm?'volley':'flame';
   if(hv!==e._ea){e._ea=hv;e._es=t;}const key=b+hv,sc=w/ART.ANIM.s[key][2],tt=t-e._es;e._fs=sc;e._fw=w;e._fa=FOEART.fr;
@@ -202,7 +202,7 @@ SPR.foe=(e,id,t,x,y,w,rot,fl)=>{if(!RET.sprites)return false;const b='ship-'+id+
   ART.drawAnim(ctx,key,tt,x,y,sc,false);if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,x,y,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}
   if(rot)ctx.restore();return true;};
 NR.on('kill',({e,boss})=>{if(!RET.sprites||boss||!e||!e._fs)return;const m=window.FOEART&&FOEART.map(e),k='ship-'+(m?m.s:e.type==='gunship'||e.type==='kamikaze'?'e'+e.type:e.type)+'/death';   // m: the foeart sheet this unit was drawn from (its own death clip)
-  if(ART.ANIM.s[k]&&ART.anim(k)&&ART.gh.length<12)ART.gh.push({key:k,x:e.x,y:e.y,k:e._fs,t:0});});
+  if(ART.ANIM.s[k]&&ART.anim(k)&&ART.gh.length<12)ART.gh.push({key:k,x:e.x,y:e.y,k:e._fs,t:0,g:G.t});});
 /* ----- on-foot actors: pose -> act (HANDOFF-SPRITES.md). The draw loop in foot.js sets ART.fE to the entity before it draws (it carries the act start); Kai's extra acts arrive in e._xa. Feet are the anchor (bottom-centre); the cell is drawn h tall, so the old hit box is unchanged. A missing sheet / ?sprites=0 = the stills and shapes ----- */
 {const H=(o)=>Object.assign({idle:'idle','run-a':'run','run-b':'run',run:'run',shoot:'shoot',melee:'melee',die:'die',jump:'jump',fall:'jump'},o||{}),M={idle:'idle',shoot:'shoot',die:'die','run-a':'idle','run-b':'idle',jump:'idle',fall:'idle',crouch:'idle','crouch-shoot':'shoot',melee:'idle'};
 ART.FM={kai:H({hit:'hurt','crouch-shoot':'crouchshoot'}),grunt:H(),gunman:H(),shield:H(),bruiser:H(),knife:H(),sniper:H(),warden:H({attack2:'melee',enrage:'idle'}),drone:M,turret:M,mech:M,

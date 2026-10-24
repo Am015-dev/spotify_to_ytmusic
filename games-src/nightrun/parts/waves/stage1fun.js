@@ -86,11 +86,11 @@ S1F.TC={g:S1F.T.g.filter(g=>g[0]<21||g[0]>27).concat([[21,[['K',.74,.5]],{dec:'c
   [28,[['C',.72,.3],['P',.6,.5],['C',.72,.7]]]]).sort((a,b)=>a[0]-b[0])};
 const CAR=S1F.CAR={LIFE:24,X:.76,PHP:36,CHP:84,
   /* plate: y share of H, x offset, pattern, colour */
-  PL:[[.24,-6,'fan','#ffa02d'],[.5,-34,'burst','#ff6a3d'],[.76,-6,'sweep','#ffd23d']],
+  PL:[[.24,-6,'fan','#ffa02d'],[.5,-96,'burst','#ff6a3d'],[.76,-6,'sweep','#ffd23d']],   // W236: the middle plate sat 34 px into the carrier's hull (two ships drawn on top of each other); mk() puts it just clear of the drawn boxes (-96 without spread.js)
   on(){return S1F.on()&&!!RET.s1carrier;},
   spawn(){WV.own++;try{this.mk();}finally{WV.own--;}},
   mk(){const c=en('carrier',{x:W+90,y:H*.5,r:30,hp:9999,score:2500});c.el=0;c.carC=1;c.hp=c.max=9999;c.open=0;c.t0=G.t;c.bf=99;
-    c.pl=this.PL.map((p,i)=>{const e=en('turret',{x:W+90+p[1],y:H*p[0],stop:1e9});e.el=0;e.r=20;e.hp=e.max=this.PHP;e.score=400;e.carP=1;e.pat=p[2];e.col=p[3];e.cy=p[0];e.cx=p[1];e.car=c;e.nb=(G.bc|0)+3+i;e.bf=99;return e;});
+    c.pl=this.PL.map((p,i)=>{const e=en('turret',{x:W+90+p[1],y:H*p[0],stop:1e9});e.el=0;e.r=20;e.hp=e.max=this.PHP;e.score=400;e.carP=1;e.pat=p[2];e.col=p[3];e.cy=p[0];e.cx=p[1];if(p[1]<-20&&RET.spread&&window.SPREAD)e.cx=-Math.ceil((SPREAD.box(c).w+SPREAD.box(e).w)/2);e.car=c;e.nb=(G.bc|0)+3+i;e.bf=99;return e;});
     S1F.car={t0:+G.t.toFixed(1),open:-1,t1:-1,how:'',plates:[]};this.c=c;},
   alive(e){return e&&!e.dead&&e.hp>0;},
   /* every beat: each live plate fires on its own rhythm (a glow beat first: e.arm), the open core fires rings */
