@@ -22,3 +22,18 @@ function OF_solidGo(){const r=OF_go('jump');if(RO.foot!=='walk')return r;const s
 {const reg2=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg2);
  __chk.items.push({ver:'solid1',id:'foot-solid-go',area:'people',text:'foot: · SOLID ON FOOT (📍 GO: on foot, runs straight at 3 building walls, 3 parked cars, 3 props and 3 fill-blocks). Pass line: never a frame inside a collider, stops within 3 m of the face (the walk-fra line). Frankfurt + Athens.'});
  __chk.GO['solid1/foot-solid-go']=['fra','ath'].map(c=>({c,n:'walk into solids',secs:60,fn:()=>OF_solidGo()}))},500)}
+// onfoot-collide-r24a: GO foot/river (on foot, walking into the Main from 6 bank/park lines never gets the figure into the water) + xf1/river (xf code: a car from the bank becomes the boat)
+function OF_riverGo(){const r=OF_go('jump');if(RO.foot!=='walk')return r;if(CID!=='fra')return'📍 ON-FOOT RIVER · Frankfurt only (no river) ✅';const sv={x:OF.x,z:OF.z,y:OF.y},kk={KeyW:K.KeyW,ShiftLeft:K.ShiftLeft},P=MAINR.pts,bad=[];let n=0;
+  try{K.KeyW=true;K.ShiftLeft=false;
+   for(let i=Math.floor(P.length*.1);i<P.length*.9&&n<8;i+=Math.max(1,Math.floor(P.length/20)))for(const sd of[1,-1]){const p=P[i],nx=p.tz*sd,nz=-p.tx*sd,ex=p.x+nx*p.hw,ez=p.z+nz*p.hw,sx=ex+nx*7,sz=ez+nz*7,y=groundY(sx,sz);
+    if(n>=8||inRiver(sx,sz,-2)||roamHit(sx,sz,OF_R+.6,y+1)||Math.abs(groundAt(sx,sz,y+1)-y)>.5)continue;n++;const yaw=Math.atan2(-nx,-nz);
+    OF.x=sx;OF.z=sz;OF.y=groundAt(sx,sz,y+1);OF.vx=OF.vz=OF.vy=0;OF.air=false;OF.cy=OF.cyIn=OF.h=yaw;OF.inA=0;OF.camT=9;let why='';
+    for(let j=0;j<240&&!why;j++){OF.cy=OF.cyIn=yaw;OF.inA=0;OF_step(1/30);if(inRiver(OF.x,OF.z,.3))why='in the water'}
+    if(why)bad.push('bank@'+Math.round(ex)+','+Math.round(ez)+' '+why)}}
+  finally{K.KeyW=kk.KeyW;K.ShiftLeft=kk.ShiftLeft;OF.x=sv.x;OF.z=sv.z;OF.y=sv.y}
+  return'📍 ON-FOOT RIVER · '+n+' runs from the bank'+(n<4?' ❌ too few bank lines':bad.length?' ❌ '+bad.join(' | '):' ✅')}
+{const reg3=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg3);
+ __chk.items.push({ver:'solid1',id:'foot-river',area:'people',text:'foot: · NOT IN THE RIVER (📍 GO: on foot, walks from 8 bank and park lines straight at the Main). Pass line: never a frame with the figure 0.3 m inside the water. Frankfurt.'});
+ __chk.GO['solid1/foot-river']=[{c:'fra',n:'walk into the Main',secs:60,fn:()=>OF_riverGo()}];
+ __chk.items.push({ver:'solid1',id:'boat-bank',area:'city',text:'AUTO TRANSFORM bank → water (📍 GO drives from 4 bank / park lines, not the slipway, into the Main): within 0.5 s on the water you are a BOAT. Frankfurt.'});
+ __chk.GO['solid1/boat-bank']=[{c:'fra',n:'river bank (no slipway)',secs:90,fn:()=>window.__xf?__xf.GOS.river.fn(goSay):'📍 XF not loaded (models/xf.js; ?xf=0 turns it off) ❌'}]},500)}
