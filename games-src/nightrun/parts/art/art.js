@@ -71,7 +71,7 @@ ART.dflash=(n,w,x,y,rot,fl,col,a)=>{const o=ART.sp(n,w);if(!o)return false;ART.p
 ART.boom=(k,x,y,sz,life,delay)=>{const f=ART.fx;if(f.length>=24)f.shift();f.push({k,x,y,sz,t:-(delay||0),m:life});};   // delay: seconds before it shows (a sprite clip plays first)
 ART.fxDraw=()=>{const f=ART.fx;if(!f.length)return;ctx.globalCompositeOperation='lighter';
   for(let i=f.length-1;i>=0;i--){const q=f[i];q.t+=FD;if(q.t<0)continue;const sk=RET.sprites&&ART.fxSheet(q.k),so=sk&&ART.aS(sk),ml=so?so.tot+SPR.fxTail:q.m,k=q.t/ml;if(k>=1){f.splice(i,1);continue;}
-    if(sk&&ART.anim(sk)){ART.drawAnim(ctx,sk,q.t,q.x,q.y,q.sz/ART.ANIM.c[sk].bw,false,Math.min(1,(ml-q.t)/SPR.fxTail)*(q.k==='hit-spark'?.9:1));continue;}   // the sheet plays its frames, with a short fade after the last one
+    if(sk&&ART.anim(sk)){const nb=RET.boomart&&/^boom-/.test(q.k);if(nb)ctx.globalCompositeOperation='source-over';ART.drawAnim(ctx,sk,q.t,q.x,q.y,q.sz/ART.ANIM.c[sk].bw,false,Math.min(1,(ml-q.t)/SPR.fxTail)*(q.k==='hit-spark'?.9:1));if(nb)ctx.globalCompositeOperation='lighter';continue;}   // the sheet plays its frames, with a short fade after the last one
     const b=ART.bm['fx-'+q.k];if(!b)continue;const grow=q.k==='muzzle'||q.k==='hit-spark'||/-(muzzle|hit)$/.test(q.k)?.8+.4*k:.55+.65*k,w=q.sz*grow,h=w*b.height/b.width;
     ctx.globalAlpha=Math.min(1,(1-k)*1.6)*(q.k==='hit-spark'?.9:1);ctx.drawImage(b,q.x-w/2,q.y-h/2,w,h);}
   ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';};
