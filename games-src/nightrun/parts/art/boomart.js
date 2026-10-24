@@ -19,3 +19,5 @@ FXW.bk=function(base,e,sz){
 NR.on('kill',({e,boss})=>{if(!RET.boomart||!RET.sprites||boss||!e||BOOMA.cls(e)==='small')return;
   if((e.type==='gunship'||e.type==='mine')&&AH.ok('fx-boom-debris'))return;   // art.js already draws it for these two
   if(FXW.has('boom-debris'))ART.boom('boom-debris',e.x,e.y,Math.max(54,(e.r||14)*3.6)*1.2,.55);});
+{const bm=ART.boom,K={small:1.7,medium:1.8,large:2,boss:1.5};   // owner/orchestrator 24 Oct: a kill boom reads at about twice the ship it replaces
+ART.boom=function(k,x,y,sz){if(RET.boomart){const m=/^boom-(small|medium|large|boss)/.exec(k);if(m)arguments[2+1]=sz*K[m[1]];}return bm.apply(this,arguments);};}
