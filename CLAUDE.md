@@ -11,7 +11,7 @@ Old rules and lessons (read only when needed): `games-src/RULES-ARCHIVE.md`.
 - Before pushing: `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push; `git add` explicit paths only.
 - If a command is blocked, stop and tell the owner. Never ask a worker question you could decide yourself; never wait.
 - Screenshots: compare with nightrun/benchmark/ + benchmark games (URLs); owner OKs phone+PC shots before any visual deploy.
-- Coding/token rules: games-src/nightrun/WORKER-RULES.md 15-16.
+- Nightrun FEATURE FREEZE (24 Oct): look first, rules in WORKER-RULES.md 15-17 (17 = one-shot benchmark gate).
 
 ## How we work (owner, 14 Oct 2026: "you waste way too many tokens and deliver shit results")
 - Workers: owner (20 Oct 2026) wants at least 5 workers + 1 reviewer at once on Nightrun, models chosen by task (see Cheapest model line). Never 15 in parallel.
