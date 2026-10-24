@@ -1,0 +1,3 @@
+onfoot-collide-r24a: root cause = e61c770 (beta.157 onfoot-edge). Its edge block in OF_walk rebuilt nx/nz from the raw velocity (nx=OF.x+OF.vx*dt), discarding the OF_collide/roamHit-corrected step, so the walker passed through everything. Fix: scale the collided step by the edgeStep factor.
+GO solid1/foot-solid-go (src/99oe_edge.js, OF_solidGo): 3 building walls, 3 props, 3 fill-blocks per city, never inside a collider (FAILED on the unfixed build in fra+ath, passes now). Gate phone 78/78, unit 0 FAIL, edge1/onfoot-edge still passes.
+Gap: 0 parked-car targets found by the GO (no car had a free approach / roamHit centre), so cars are not covered by this GO; footSurf.js B still covers cars.

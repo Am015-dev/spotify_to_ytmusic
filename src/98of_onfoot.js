@@ -184,7 +184,7 @@ function OF_walk(dt){const I=OF_input(),il=Math.hypot(I.fx,I.fy),ia=Math.atan2(I
   [nx,nz]=OF_collide(nx,nz,OF.y);if(roamHit(nx,nz,OF_R*.6,OF.y+1)){nx=OF.x;nz=OF.z}
   const moved=Math.hypot(nx-OF.x,nz-OF.z);if(m>.3&&moved<tv*dt*.25){OF.n.stuckF++;if((OF.stk||(OF.stk=[])).length<12&&OF.n.stuckF%10===1)OF.stk.push([Math.round(OF.x),Math.round(OF.z),why||(roamHit(OF.x,OF.z,OF_R+.1,OF.y+1)?'bld':'car/prop')])}if(m>.3)OF.n.walkF++;
   // r22e31: the world edge, same as driving (71_roam_drive: clamp 10 m inside + edgeStep's slow-down and TURN BACK banner); on foot the walker used to leave the world box
-  {const sp=Math.hypot(OF.vx,OF.vz);if(sp>.01){RO.v=sp;RO.vh=Math.atan2(OF.vx,OF.vz);edgeStep(dt);const k=Math.max(0,RO.v)/sp;OF.vx*=k;OF.vz*=k;nx=OF.x+OF.vx*dt;nz=OF.z+OF.vz*dt;RO.v=0}
+  {const sp=Math.hypot(OF.vx,OF.vz);if(sp>.01){RO.v=sp;RO.vh=Math.atan2(OF.vx,OF.vz);edgeStep(dt);const k=Math.max(0,RO.v)/sp;OF.vx*=k;OF.vz*=k;/* r24a: scale the COLLIDED step; rebuilding it from the velocity threw away OF_collide / roamHit and the walker passed through everything (beta.157) */nx=OF.x+(nx-OF.x)*k;nz=OF.z+(nz-OF.z)*k;RO.v=0}
    const cx=clamp(nx,WX0+10,WX1-10),cz=clamp(nz,WZS+10,WZN-10);if(cx!==nx){OF.vx=0;nx=cx}if(cz!==nz){OF.vz=0;nz=cz}}
   OF.x=nx;OF.z=nz;const g=groundAt(OF.x,OF.z,OF.y+OF_STEP+.05);
   if(OF.air||OF.y>g+.05){OF.vy-=OF_G*dt;OF.y+=OF.vy*dt;if(OF.y<=g){OF.y=g;OF.vy=0;OF.air=false}else OF.air=true}else{OF.y=g;OF.vy=0}
