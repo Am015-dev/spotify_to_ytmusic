@@ -1,5 +1,5 @@
 # Source pins: LEGO Racers study (read 2026-10-24)
-Raw sources are third-party and immutable. We store only these pins; nothing is vendored. Code is proprietary decompiled output: read it, never copy it.
+Raw sources are third-party and immutable. We store only these pins plus short licensed excerpts; nothing is vendored.
 
 | Repo | Pinned HEAD (git ls-remote, 2026-10-24) | What it is |
 |---|---|---|
@@ -9,8 +9,9 @@ Raw sources are third-party and immutable. We store only these pins; nothing is 
 | github.com/Laupetin/Lego-Racers-Mod | b0959faaeb6cf47acd33e58183edd3484ee6242b | JAM/GDB tools; README lists asset types only |
 
 ## Re-fetch
+`bash tools/racers_fetch.sh` clones all four at the pins into git-ignored `ref/racers/`. Licences: [licences.md](licences.md).
 `git ls-remote https://github.com/isledecomp/racers HEAD` (same for the others) shows if the pin moved.
-To read: `git clone --depth 1 https://github.com/isledecomp/racers <scratch dir>` (scratch dir, never inside the repo), then `git -C <dir> checkout 5bb9f13` if you need the pinned state. Delete the clone afterwards.
+To read: `git clone --depth 1 https://github.com/isledecomp/racers <scratch dir>` into a scratch dir if you prefer.
 Via the GitHub MCP tools: `get_file_contents` with ref = SHA.
 
 ## Rules

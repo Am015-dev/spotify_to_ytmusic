@@ -11,6 +11,9 @@ Rules: [SCHEMA.md](SCHEMA.md) | history: [log.md](log.md) | pins: [sources/racer
 - [racers/file-formats.md](racers/file-formats.md): .rab/.wdb/.pwb/.hzb/.spb etc.
 - [racers/car-builder.md](racers/car-builder.md): 10x6x15 grid, 64 pieces, stats from volume
 
+- [racers/code/rubber-band.md](racers/code/rubber-band.md): LGPL excerpt of the rubber-band update
+- [sources/licences.md](sources/licences.md): what we may port from each repo (LGPL/MIT/GPL), no assets
+
 ## Our game (key files, invariants, known bugs)
 - [game/build-and-deploy.md](game/build-and-deploy.md): build.sh, ORDER/LAZY, deploy.sh, PUBLISH_FILES, Beta
 - [game/tests-and-gates.md](game/tests-and-gates.md): unit, GO checklist, gate.sh, bughunt, bot

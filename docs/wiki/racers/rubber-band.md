@@ -7,6 +7,8 @@ Pins: [../sources/racers.md](../sources/racers.md).
 - The player is never adjusted. Mild and symmetric: overtakes feel earned.
 - AI speed scale is also clamped to -0.5..2.75; spin-out x0.1, curse x0.5 (`RacerPhysics` route mode).
 
+- Extra additive term `m_rubberBandBoost` (default 0). Excerpt: [code/rubber-band.md](code/rubber-band.md).
+
 ## What we have
 - `src/98rf_race_fun.js:RF_rub(s,gap,ld)`: called from `src/30_race3.js` (`s.rubber=...`). Leaders wait for the player early; catch-up from behind up to +9 %, held-back up to -20 %, catch-up fades over the last 25 % of the race. Fallback branch in 30_race3: +6 % / -3 % by gap.
 

@@ -6,7 +6,7 @@ Pattern: Karpathy "LLM wiki". Raw sources are immutable and pinned (sources/). T
 - Names: lowercase-kebab.md. Folders: `racers/` (facts from the LEGO Racers study), `game/` (map of OUR game), `sources/` (pins).
 - Page shape: facts with numbers -> source pointers -> "what we have" (file:function) -> gap/known bugs -> links.
 - Link, don't copy: other docs by relative link (HANDOFF_*, REVIEW_*, BENCH_2K, LESSONS); our code as `src/<file>.js:<function>`.
-- **Never store code from LEGO Racers** (decompiled proprietary game). Facts in our own words + pointer (repo, SHA, path, function). No code from our own src/ either.
+- Racers code is open source (LGPL/MIT/GPL, see sources/licences.md). Short excerpts only (<= 30 lines), labelled repo@SHA, path, function, licence; longer ones in racers/code/<topic>.md (<= 4 KB). Never vendor repos: `bash tools/racers_fetch.sh` -> git-ignored ref/racers/. Never LEGO assets. Don't port GPL code without Alex's OK. No code copied from our own src/.
 - Every page appears in index.md, one line each.
 
 ## Ingest a source
