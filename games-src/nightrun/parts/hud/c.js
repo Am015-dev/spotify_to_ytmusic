@@ -121,6 +121,7 @@ function shotDraw(b,D){const ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0;let o,al=.
   if(!o)return;const d=o.w/2-10;ART.put(o,b.x+Math.cos(ang)*d,b.y+Math.sin(ang)*d,ang,al,1,sy);
   if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,RET.read?READ.pc(b,D):b.pf?'#ffe14d':D.b,.22);}
 function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierOf(C.n);
+  if(RET.purelook){PURL.draw(t,dt);return;}   // pure.js (?pure=1): the owner's pictures only
   const PT=wcv!==cv;                                     // portrait: the world is drawn on its own canvas (landscape coordinates) and turned upright afterwards
   if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);drawBGP(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(PW_,PH_);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
   else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
