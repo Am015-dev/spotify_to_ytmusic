@@ -14,7 +14,7 @@ if(RET.shipart===undefined)RET.shipart=!/[?&]shipart=0/.test(location.search);
 /* hue turn is relative to the sheets' own colour (measured: interceptor / bomber / gunship / carrier / cruiser sit at hue 228, kamikaze at 351) */
 const ENEMY_ART=window.ENEMY_ART={
   /* core director kinds (dir.js, draw.js) */
-  drone:{s:'edrone',k:5.1,ol:1,L:{k:6.3,t:[180,1.15,1.1]}},                       // L: the leader (e.ldr) is gold and a quarter larger
+  drone:{s:'edrone',k:5.1,ol:1,L:{k:6.3}},                       // L: the leader (e.ldr) is a quarter larger, the same sheet (W207: no recoloured copy of a sheet that exists)
   charger:{s:'echarger',k:3.6},
   turret:{s:'eturret',k:3.1,rot:e=>aim(e)+Math.PI},
   gate:{s:'egate',w:46,h:150},                                                // two pylons (FOEART.post), nose turned to the gap
@@ -28,7 +28,7 @@ const ENEMY_ART=window.ENEMY_ART={
   bomber:{s:'ezbomber',k:3.4,hp:1},
   sniper:{s:'esniper',k:3.7,hp:1},
   healer:{s:'ehealer',k:3.2,hp:1},
-  carrier:{s:'ecarrier',k:2.7,t:[37,1.1,1],hp:1},
+  carrier:{s:'ecarrier',k:2.7,hp:1},
   minelayer:{s:'eminelayer',k:3.2,hp:1},
   kamikaze:{native:1},
   zdrn:{s:'ezdrone',k:3.2},

@@ -56,7 +56,7 @@ const WV=window.WV={
   /* ---- spawn one foe of the table ---- */
   spawn(f,wi){const[type,fx,fy,mv,side]=f,sx=Math.min(fx*W,window.HB&&HB.on()?HB.maxX(22):W-62),sy=fy*H;
     const ent=side==='t'?{x:sx,y:-34}:side==='b'?{x:sx,y:H+34}:{x:W+40,y:sy};this.own++;let e;
-    const n0=G.en.length;try{e=ZOO.T[type]&&type!=='zdrn'?ZOO.mk(type,{x:ent.x,y:ent.y}):en(type,{x:ent.x,y:ent.y,amp:0,stop:sx,zt:1});}finally{this.own--;}
+    const n0=G.en.length;try{e=ZOO.T[type]&&type!=='zdrn'?ZOO.mk(type,{x:ent.x,y:ent.y}):window.FLEET&&FLEET.K[type]?FLEET.mk(type,{x:ent.x,y:ent.y,nd:2}):en(type,{x:ent.x,y:ent.y,amp:0,stop:sx,zt:1});}finally{this.own--;}
     for(const x of G.en.slice(n0))if(x!==e&&!x.wv&&x.type!=='boss'){x.wvX=1;this.log.culled++;}   // a variant pack's extra escorts: the table is the whole wave
     if(!e)return;if(!ZOO.T[type])e.zt=0;e.fp=null;e.x=ent.x;e.y=ent.y;e.wv={sx,sy,mv,ph:GR()*6.28,st:'in',t:0,wi,dash:0};if(type==='gate')e.gy=sy;
     const r=G.rings[G.rings.length-1];if(r&&r.x===W-14&&side&&side!=='r'){r.x=sx;r.y=side==='t'?8:H-8;}

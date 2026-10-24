@@ -38,7 +38,8 @@ const SETUP = (o) => {
     for (const e of G.en) { if (e.type === 'boss' || seen.has(e)) continue; seen.add(e); kd(FOEART.id(e)).spawned++; }
     const sh = NR.watch.shots; let fired = null;
     if (sh.length) { for (const s of sh) if (s.by && s.by.type && s.by.type !== 'boss' && G.en.includes(s.by) && s.by.x > 0 && s.by.x < 960 && s.by.y > 0 && s.by.y < 540) fired = fired || s.by; sh.length = 0; }
-    if (fired) { try { m.render(G.t, 1 / 60); } catch (_) { } const d = kd(FOEART.id(fired)); d.shots++; if (fired.__dk && /\/volley$/.test(fired.__dk)) d.vol++; }
+    if (fired && !fired.carC) {   // the stage-1 carrier hull is drawn by stage1fun.js, not seen by the draw hooks
+      try { m.render(G.t, 1 / 60); } catch (_) { } const d = kd(FOEART.id(fired)); d.shots++; if (fired.__dk && /\/volley$/.test(fired.__dk)) d.vol++; }
     if (i % 4 === 0) { try { m.render(G.t, 1 / 60); } catch (_) { }
       for (const e of G.en) { if (e.type === 'boss' || e.dead || e.hp <= 0 || e.x < 0 || e.x > 960 || e.y < -10 || e.y > 550) continue; const d = kd(FOEART.id(e)); d.seen++;
         const b = e.carC && e._fa === FOEART.fr ? 'ecarrier' : window.__base(e.__dk); if (!b || e._fa !== FOEART.fr) { d.none++; if (!d.ex) d.ex = `x${Math.round(e.x)} y${Math.round(e.y)} zst${e.zst} dk${e.__dk} fa${e._fa} fr${FOEART.fr} st${e.st} r${e.r} vz${e.vz}`; } else if (b === window.__exp(e)) d.own++; else { d.other++; d.otherKeys[b] = 1; } } }

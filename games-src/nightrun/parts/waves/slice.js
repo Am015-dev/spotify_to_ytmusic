@@ -8,7 +8,7 @@
 if(RET.slice===undefined)RET.slice=!/[?&]slice=0/.test(location.search);
 const SL=window.SL={
   /* roles: hull, life on screen (s) before it drifts out, waves.js move */
-  R:{P:['drone',2,7,'sine'],S:['turret',14,12,'sit'],C:['charger',2,11,'dash'],T:['gunship',30,18,'hold'],B:['drone',4,6,'hold'],L:['turret',22,16,'sit']},
+  R:{P:['drone',2,7,'sine'],S:['turret',14,12,'sit'],C:['charger',2,11,'dash'],T:['gunship',30,18,'hold'],B:['drone',4,6,'hold'],L:['turret',22,16,'sit'],F:['flank',3,11,'sine'],W:['swarm',2,9,'sine'],N:['sniper',8,12,'sit'],I:['einterceptor',6,12,'sine'],O:['ebomber',10,12,'sine']},   // W207: the stage-1 script also fields flank, swarm, sniper, interceptor, bomber (existing kinds and sheets)
   DRIFT:60,CAP:6,BK:{1:1,2:1.1,3:1.15},FN:{1:0,2:0,3:2},
   /* script: stage -> [bar, foes, opts]; a foe = role letter + slot x,y (shares of W,H) [+ side 't'/'b']; foes of one group enter on successive beats.
      opts: {dec:'bounty'|'power'|'lead', ann:[title, line]} ; loop: [fromBar, toBar] repeats while the stage still runs (kill stage) */

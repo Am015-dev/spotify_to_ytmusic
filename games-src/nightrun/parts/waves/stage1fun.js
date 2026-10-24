@@ -17,19 +17,19 @@ const S1F=window.S1F={
   MINI:{k:5,nm:'TRESOR-WART',r:38,pats:['fan5','ring','fan5'],lbl:'T'},
   T:{g:[[1,[['P',.6,.5],['P',.64,.36],['P',.64,.64],['C',.72,.2]]],                                   // V + a charger from the first beat
        [3,[['P',.62,.2],['P',.62,.4],['P',.62,.6],['P',.62,.8]]],                                     // wall
-       [5,[['C',.72,.25],['C',.72,.75],['P',.6,.5]]],                                                 // pincer
+       [5,[['C',.72,.25],['C',.72,.75],['F',.62,.5]]],                                                 // pincer
        [7,[['S',.74,.5],['P',.6,.25],['P',.6,.75]]],                                                  // the first shooter
-       [9,[['P',.58,.15],['P',.6,.32],['P',.62,.5],['P',.6,.68],['P',.58,.85]]],                      // column sweep
+       [9,[['P',.58,.15],['P',.6,.32],['W',.62,.5],['P',.6,.68],['P',.58,.85]]],                      // column sweep (a swarm drone in the middle)
        [11,[['S',.76,.25],['C',.7,.7],['P',.6,.45]]],
-       [13,[['T',.76,.5],['P',.62,.3]]],                                                              // first tank
+       [13,[['T',.76,.5],['I',.64,.3]]],                                                              // first tank
        [17,[['P',.62,.4],['P',.62,.6]]],
        [18,[['S',.72,.5],['B',.86,.13,'t'],['S',.74,.84]],{dec:'bounty',ann:['BOUNTY','a gold courier in the corner, two guns cover it: worth the risk?']}],
        [21,[['C',.72,.25],['C',.74,.5],['C',.72,.75],['P',.6,.35],['P',.6,.65]]],                     // charge wave
        [24,[['S',.76,.3],['S',.76,.7],['P',.6,.2],['P',.62,.5],['P',.6,.8]]],                         // cross-fire
        [27,[['T',.76,.4],['C',.72,.8],['P',.6,.2],['P',.6,.6]]],
        [31,[['S',.76,.2],['S',.78,.5],['S',.76,.8],['P',.6,.35],['P',.6,.65]],{dec:'emp',ann:['SWARM','three guns at once: an EMP wipes every bullet. Now, or keep it?']}],
-       [34,[['P',.58,.2],['P',.62,.35],['P',.66,.5],['P',.62,.65],['P',.58,.8]]],
-       [37,[['T',.76,.3],['S',.76,.75],['C',.7,.5],['P',.6,.2],['P',.6,.6]],{dec:'peak',ann:['FINAL PUSH','everything they have left']}],
+       [34,[['P',.58,.2],['P',.62,.35],['O',.68,.5],['P',.62,.65],['P',.58,.8]]],
+       [37,[['T',.76,.3],['S',.76,.75],['C',.7,.5],['N',.78,.2],['P',.6,.6]],{dec:'peak',ann:['FINAL PUSH','everything they have left']}],
        [39,[['P',.58,.15],['P',.6,.32],['P',.62,.5],['P',.6,.68],['P',.58,.85]]],
        [40,[['S',.76,.25],['S',.76,.75],['C',.7,.4],['C',.7,.6],['P',.6,.5]]],
        [42,[['C',.72,.2],['C',.72,.8],['P',.6,.4],['P',.6,.6]]],
@@ -114,7 +114,7 @@ const CAR=S1F.CAR={LIFE:24,X:.76,PHP:36,CHP:84,
     c.arm=c.open&&(G.bc|0)+1>=c.nb;},
   /* the hull: one armoured slab joining the plates (code-drawn, no new picture), the core shut (grey shutter) or open (pulsing red) */
   /* W207 (RET.shipart): the hull is the carrier's own ship sheet (ship-ecarrier: flame loop, volley when the core fires, death clip on the kill); the core stays on top as the tell */
-  sheet(c,t,o){if(!RET.shipart||!RET.foeart||!RET.sprites)return false;const m=ENEMY_ART.carrier,key=FOEART.sheet(m,c.arm?'volley':'flame')||FOEART.sheet(m,'flame');if(!key)return false;
+  sheet(c,t,o){if(!RET.shipart||!RET.foeart||!RET.sprites)return false;const m=ENEMY_ART.carrier,key=FOEART.sheet(m,c.arm||c._vt>G.t?'volley':'flame')||FOEART.sheet(m,'flame');if(!key)return false;
     const sm=ART.VS[key]||ART.ANIM.s[key],sc=H*.5/sm[2],hv=key.endsWith('volley');if(hv!==!!c._va){c._va=hv;c._vs=t;}
     ctx.save();ctx.translate(c.x,c.y);ART.drawAnim(ctx,key,hv?t-c._vs:t,0,0,sc,false);
     if(c.flash>0){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,hv?t-c._vs:t,0,0,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}
