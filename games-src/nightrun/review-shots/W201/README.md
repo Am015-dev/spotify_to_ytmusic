@@ -13,7 +13,7 @@ The before shots use `?flylook=0` and the after shots use the default. All 16 ar
 
 References are two well-regarded side-scrolling shooters' store pages, with screenshots in the page gallery. They are links only, nothing is downloaded, and no names are given here:
 - https://store.steampowered.com/app/1856900 (2022, 94% positive user reviews)
-- https://www.siliconera.com/gothic-shmup-deathsmiles-now-steam/
+- https://store.steampowered.com/app/1489300 (horizontal, praised on its community board as the best of its kind)
 
 Caveat: this session could not open the gallery images (the tools only return text), so the comparison below is against what this genre's reference screenshots typically show and the FLIGHT-BAR rules. The owner should look at both galleries next to these shots.
 
