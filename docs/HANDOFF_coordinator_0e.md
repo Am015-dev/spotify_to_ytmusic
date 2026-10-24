@@ -17,3 +17,4 @@ Pre-deploy adds `node tools/bughunt.js --hours 2 --city fra` (and ath): not wors
 Old coordinators OD 0c (session_01Ai8dkUF41GoPeiPc85NE6b) / 0d may still forward Alex asks. Branch cleanup is blocked by the permission classifier.
 
 - Reference from Alex (24 Oct): https://steponit.online/ = browser port of LEGO Racers (1999), based on the decompilation github.com/isledecomp/racers (+ racers-portable, warp.parts; C/C++ to wasm with SDL/Emscripten). Use only for ideas: track layout, camera, items, how a LEGO race reads. Copy NO code or assets (decompiled proprietary game, LEGO-owned art, no clear licence). Next proto round: workers take side-by-side shots of it as a 2nd benchmark.
+- Licences checked 24 Oct (Alex: code is open source, use it, no assets): isledecomp/racers + racers-portable LGPL-3.0, warp.parts MIT, Laupetin/Lego-Racers-Mod GPL-3.0. Ported LGPL code goes in its own src file with an LGPL header; no GPL ports without Alex's OK; never LEGO game assets.
