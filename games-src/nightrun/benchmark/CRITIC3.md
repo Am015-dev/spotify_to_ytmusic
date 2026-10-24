@@ -74,6 +74,45 @@ ENEMY VISIBILITY are +1 each. No row reaches 7 except find-the-player.
 
 
 
+## On foot: `nr/W225-foot` 68416df, `?footmove=1`
+
+How it was built: same `NR_OUT` build. The capture used W225's own `qa/purefoot-shot.js`, copied with the random seed changed from 7
+to 11 so the moment is not the workers' own. Street "zeil", stepped `FOOT.sim`, the first moment with 3+ foes near the player.
+
+Frames: `review-shots/W226/w225-foot-{phone,pc}.webp`.
+- Phone: 2 rushers, no shots in the air.
+- PC: a gunner and two rushers, one of them in its wind-up, with 1 enemy shot in the air.
+
+Moves and knockback cannot be judged from a still. The rows below judge only the look.
+
+Reference frames (URLs only, looked at both):
+- B1, a hand-drawn modern beat-'em-up, a five-fighter brawl on a neon stage:
+  https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/985890/ss_1f48943ea994936e2a75463b46ea635f72ba3a0a.1920x1080.jpg
+- B2, a pixel-art modern beat-'em-up, a three-player fight on a bridge:
+  https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1361510/ss_b02e0168a86d43489e65f8be98cd001f7c0491f0.1920x1080.jpg
+
+What B1 and B2 do:
+- Fighters spread across the whole depth of the floor (different y = different lanes).
+- Every fighter has a dark contact shadow.
+- The floor is the stage; the backdrop is flatter and either lower in contrast (B2) or a different hue family (B1).
+- Each fighter has its own costume hue, so 4-5 bodies never merge.
+- Hit sparks and swooshes are big, curved and drawn in the art style.
+
+| # | Test | Phone | PC | What my frames show |
+|---|---|---|---|---|
+| 1 | Owner-art | 5 | 6 | Phone: a large cyan ring fx floats in mid-air over the street lamp, attached to no fighter. Phone: the "OVERDRIVE READY: BOMB" text box sits inside the field under the weapon card. PC: the enemy shot is a flat lime disc with no rim or core. |
+| 2 | Grayscale | 5 | 5 | The fighters' dark jackets sit at the same value as the dark shop fronts behind them. The brightest objects are the vending machine (PC) and the lamp and moon (phone), not the actors. |
+| 3 | Silhouette | 3 | 4 | Phone: the player stands between two rushers on one line and the three merge into one mass. PC: four fighters stand at almost the same y in a row, and the two rushers are identical green jackets. |
+| 4 | Find the player | 4 | 6 | Phone: the player is sandwiched and found only by the hood. PC: readable, mid-row. |
+| 5 | Bullets | 5 | 5 | The muzzle flash is good, warm and in the art style. The enemy shot is a 50 px lime disc, readable but plain, the "ugly" the owner names. The ENGINE-LESSONS rule (dark rim, tinted edge, white core) is not applied. |
+| 6 | Clutter | 6 | 7 | Phone: weapon card, overdrive box and the ring fx. The large touch pad is fine because it sits outside the field. |
+| 7 | Benchmark side by side | 3 | 4 | B1 and B2 use the floor as the stage. Ours puts every fighter on the back sidewalk line and leaves the front 35-40% of the field (the wet road) empty. |
+| 8 | **STICKER** (props and background blending) | 4 | 4 | No contact shadow is visible under any fighter in either frame. The `footart.js:33` ellipse at alpha .85 is lost on the dark wet ground. The backdrop art has the same line weight, detail and saturation as the fighters, so the actors look cut out and laid over a poster. The lit vending machine (PC) is the hottest object on screen. |
+| 9 | **ENEMY VISIBILITY** | 5 | 6 | The enemies are readable as people, but they overlap the player and each other. Only one rusher's wind-up is readable (PC). |
+
+The worst problem on foot (worst problem 3 below): fighters stand on one line on the back sidewalk, with no lanes, no visible shadows
+and a backdrop as loud as the actors.
+
 ## The three worst problems and the exact fixes
 
 1. **Enemies are still invisible (flight rows 2, 3, 9).** The W224 halo approach is not enough. Fix the cause: enemy value.
@@ -94,11 +133,25 @@ ENEMY VISIBILITY are +1 each. No row reaches 7 except find-the-player.
    - The PC weapon card (name, LV, n BARS) is still drawn inside the field. W224 only moved `PW.hud` (`pure.js:102`). Move the weapon
      card into the same bottom band, right of the hull box.
    - Teal shards and the hex pickup: give pickups one reserved hue. Use gold, never teal (teal is the tower windows).
-3. (On foot: pending, `nr/W225-foot` not pushed yet.)
+3. **On foot, fighters stack on one line over a loud poster (foot rows 3, 4, 7, 8).**
+   - Use the floor depth. The spawn and approach lanes (enemy target depth in `parts/street/foot.js`, `space()` at :256) must spread
+     foes over the full belt, from the sidewalk edge down into the wet road. Use at least 3 distinct depth bands, and a foe never
+     takes the player's band within 0.6 body widths.
+   - `space()` today shifts only the drawn picture (`e._sx`). Make the separation real in x and depth, so the sim and the frame agree.
+   - Contact shadows: in `parts/street/footart.js:33`, draw the shadow from the actor's own frame (squashed black copy, as
+     ENGINE-LESSONS says), not a soft ellipse. Use alpha 1 under the feet, with a tight dark core of 0.6x the width.
+   - The backdrop gradient in `parts/street/purefoot.js:57` is too weak (.34). Push the backdrop and props behind the fighters with
+     value .7 and saturate .6. Dim the lit vending machine and the lamp fx by 40%, so the actors are the brightest plane.
+   - The enemy shot (lime disc): apply the ENGINE-LESSONS §1 bullet recipe (dark rim, tinted edge, white core, normal blend) in the
+     street shot draw.
+   - Move the phone "OVERDRIVE READY" box into the top HUD strip, and find the mid-air cyan ring fx (it attaches to no actor) and
+     remove it.
 
 ## Verdict
 
 | Build | Phone | PC | Verdict |
 |---|---|---|---|
 | `nr/W224-flight` a341b44 | 8 of 9 rows under 7 | 8 of 9 rows under 7 | **REDO, do not deploy.** A real step up on find-the-player and grayscale. The owner's two complaints (sticker look, invisible enemies) still score 3-4. |
-| `nr/W225-foot` | - | - | pending: not pushed yet |
+| `nr/W225-foot` 68416df `?footmove=1` | 9 of 9 rows under 7 | 8 of 9 rows under 7 | **REDO, keep the flag off.** It runs without page errors. The blending complaint stands: no visible shadows, fighters stacked on one line, a backdrop as loud as the actors. |
+
+Neither build may deploy: SHIP needs every row >= 7 on both devices, and the best row anywhere is 7.
