@@ -4750,7 +4750,8 @@ function collect(p){const P=S.P,d=PICKUPS[p.k];sfx('pick');let lv=1;
   else if(p.k==='bomb'){P.bombs=Math.min(9,P.bombs+1);pop(P.x,P.y-90,'+1 BOMB','#ffb020',true);}
   else{const c=P.pw[p.k];lv=c?Math.min(d.max,c.lv+1):1;P.pw[p.k]={lv,t:d.t+(p.k==='slow'?1.5*(lv-1):0)};pop(P.x,P.y-90,d.n+(d.max>1?' LV'+lv:''),d.c,true);}
   NR.emit('footPick',{id:p.k,lv});}
-function ftHurt(n,fromX,src,b){const P=S.P;if(P.inv>0||P.dashIF>0||S.win||P.hp<=0)return false;if(F.guardHit){const g=F.guardHit(n,fromX,src,b);if(g)return g>1;}   // streetguard.js: 1 = blocked, 2 = blocked and the shot is spent
+function ftHurt(n,fromX,src,b){const P=S.P;if(P.dashIF>0&&P.inv<=0&&!S.win&&P.hp>0&&F.dodged)F.dodged(S,n,src);   // streetdodge: an attack the dash i-frames absorbed
+  if(P.inv>0||P.dashIF>0||S.win||P.hp<=0)return false;if(F.guardHit){const g=F.guardHit(n,fromX,src,b);if(g)return g>1;}   // streetguard.js: 1 = blocked, 2 = blocked and the shot is spent
 
   if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');if(window.FTX)FTX.ev('block');sfx('graze');return false;}
   P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*(RET.hitfeel?170:240);
@@ -14743,7 +14744,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='bbc5b3139d 2026-10-24 15:50 UTC';
+const NR_STAMP='e81164e383 2026-10-24 15:57 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -19109,6 +19110,37 @@ F.post=function(S,dt){if(post0)post0.apply(this,arguments);
     if(l.left<=0)e._lch=null;}};
 })();
 
+// PURPOSE: Street dash with i-frames: DASH is 8 invincible frames (0.13 s); a dash that makes an attack miss in its first 0.15 s is a CLOSE CALL (caption, 0.5 s slow-down, next knife hit crits)
+// FLAG: dodgei (?dodgei=0 = the old longer dash i-frames)
+// TEST: qa/streetsim.js (BOTS=gfirst,dash)
+/* ---------- STREETDODGE (W197, BENCH-DOES-BETTER task N2). The decision: block and stay (guard) or dash through. Foot.js calls F.dodged(S,n,src) when the dash i-frames absorb an attack.
+   I-frames: 0.13 s, or 0.20 s for a dash on the beat; the dash lasts 0.24 s, so no i-frame outlives it. CLOSE CALL = the attack was absorbed within 0.15 s of the dash press (once per dash):
+   caption, 0.5 s TIME SLOW (the pickup's own slow; it is set, never added, and a real pickup is left alone) and the next knife hit within 3 s does double damage.
+   Telemetry for the sim: S.dg. ---------- */
+if(RET.dodgei===undefined)RET.dodgei=!/[?&]dodgei=0/.test(location.search);
+(function(){
+if(!RET.dodgei||!RET.foot||!window.FOOT)return;
+const F=window.FOOT;
+const IFR=.13,IFBEAT=.2,DASH=.24,WIN=.15,SLOW=.5,CRIT=3;
+const get=S=>S.dg||(S.dg={dashes:0,cc:0,crit:0,ifOut:0,stack:0});
+F.dodged=function(S,n,src){const P=S.P,d=get(S);
+  if(!(P.dash>0)||d.got||DASH-P.dash>WIN)return;
+  d.got=1;d.cc++;P.dgCrit=S.time+CRIT;
+  if(!P.pw.slow)P.pw.slow={lv:1,t:SLOW,cc:1};else if(P.pw.slow.cc)P.pw.slow.t=SLOW;
+  S.pop.push({x:P.x,y:P.y-100,t:'CLOSE CALL','c':'#9ff8ff',l:1.4,m:1.4,big:true});
+  if(!d.said){d.said=1;S.note={t:2.6,txt:'CLOSE CALL: TIME SLOWS, YOUR NEXT KNIFE HIT DOES DOUBLE'};}};
+const hf0=F.hitFeel;
+F.hitFeel=function(e,dm,src){if(hf0)hf0.apply(this,arguments);
+  const S=F.S,P=S&&S.P;if(!P||!(P.dgCrit>S.time)||!src||!src.melee||src.cmbL||e.dead)return;
+  P.dgCrit=0;e.hp-=dm;get(S).crit++;S.pop.push({x:e.x,y:e.y-e.h-20,t:'CRIT','c':'#ffd23a',l:.9,m:.9,big:true});};
+const post0=F.post;
+F.post=function(S,dt){if(post0)post0.apply(this,arguments);
+  const P=S.P,d=get(S);
+  if(P.dash>0&&!d.on){d.on=1;d.dashes++;P.dashIF=P.dashIF>.3?IFBEAT:IFR;}
+  else if(!(P.dash>0)){d.on=0;d.got=0;if(P.dashIF>1e-6)d.ifOut++;}
+  const sl=P.pw.slow;if(sl&&sl.cc&&sl.t>SLOW+1e-6)d.stack++;};
+})();
+
 // PURPOSE: Street melee reach: a melee hit lands only when the attacker's limb or blade, on an ACTIVE strike frame, reaches the target's visible body
 // FLAG: reach (?reach=0 old)
 // TEST: qa/reach-probe.js (gap per landed hit, read from the sheets), qa/streetsim.js (BOTS=melee)
@@ -19235,6 +19267,134 @@ if(SL&&SL.draw){const d0=SL.draw;
     if(!g.cap&&S.time>3&&!S.end){g.cap=1;let n=0;try{n=+localStorage.getItem('mnr_guard')||0;}catch(e){}
       if(n<1){S.note={t:3.5,txt:L.touch?'GUARD: hold to block hits from the front':'GUARD: hold I to block hits from the front'};try{localStorage.setItem('mnr_guard','1');}catch(e){}}}
     return r;};}
+})();
+
+// PURPOSE: Street circle: foes without an attack slot strafe in depth around Kai instead of queueing in front of him, and take turns closing in
+// FLAG: circle (?circle=0 = foes walk straight at Kai as before)
+// TEST: qa/streetsim.js (W196 gates: waiting foes keep moving, depth spread)
+/* ---------- STREETCIRCLE. Owner, 24 Oct 2026: "on foot is boring, foes just slide straight at Kai, the game is not strategic". Benchmark E2/N1.
+   At most SLOTS foes attack or close in at once (attackers count first). Every other rusher / heavy (and a gunner that has no cover left) is a WAITER: it
+   keeps 140-220 px from Kai on its own side, faces him, and every 1-2 s picks a new depth lane and distance to walk to at walk speed (no new art: the run strip
+   plays slower). When a slot frees (an attacker dies or goes back to waiting, RESTT after its last attack) the waiter that waited longest closes in: whom to
+   break first from a ring that is closing. This part only sets WHERE a waiter stands; the attacks themselves are the old ai (street2 / streethard). ---------- */
+if(RET.circle===undefined)RET.circle=!/[?&]circle=0/.test(location.search);
+(function(){
+if(!RET.circle||!window.FOOT||!FOOT.S3||!FOOT._in||!FOOT.env)return;
+const F=FOOT,S3=F.S3,ST=F.STAGES.zeil,abs=Math.abs,sgn=v=>v<0?-1:1,clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const C=F.CIRC={SLOTS:2,RMIN:140,RMAX:220,LEG0:1,LEG1:2,VX:110,VZ:.42,SLOW:.5,RESTT:3,NEAR:105,log:null};
+const ATK={rusher:['crouch','lunge'],heavy:['wind','charge'],bigheavy:['wind','charge'],gunner:['pop','charge']},atk=q=>(q.tele||0)>0||(ATK[q.id]||[]).includes(q.state);
+const on=()=>RET.circle&&F.S&&F.S.st===ST&&F.S.s3;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const free=e=>e.id!=='gunner'||(!(e.cov&&e.cov.hp>0&&!e.cov.gone)&&e.state!=='charge');   // a gunner behind cover keeps its cover game
+/* who closes in: SLOTS minus the foes already attacking, longest-waiting first (never one that attacked less than RESTT ago) */
+function turn(S,P){if(S._cirT===S.time)return S._cirS;S._cirT=S.time;
+  const live=S.E.filter(q=>!q.dead&&!q.boss&&q.seen),busy=live.filter(atk);
+  for(const q of live){if(atk(q))q._cirAt=S.time;}
+  const el=live.filter(q=>!atk(q)&&free(q)&&(q.id==='rusher'||q.id==='heavy'||q.id==='gunner')).sort((a,b)=>((a._cirAt||-9)+C.RESTT>S.time)-((b._cirAt||-9)+C.RESTT>S.time)||(a._cirW||0)-(b._cirW||0)||abs(a.x-P.x)-abs(b.x-P.x));
+  const s=new Set();let n=Math.max(0,C.SLOTS-busy.length);for(const q of el){if(n<=0)break;if((q._cirAt||-9)+C.RESTT>S.time&&el.some(o=>(o._cirAt||-9)+C.RESTT<=S.time&&!s.has(o)))continue;s.add(q);n--;}
+  for(const q of el)if(!s.has(q)&&q._cirW==null)q._cirW=S.time;
+  for(const q of s)q._cirW=null;
+  return S._cirS=s;}
+function wait(e,dt,env,S,P,mode){
+  const lo=env.G.camX+e.w/2,hi=env.G.camX+env.G.viewW-e.w/2;
+  if(e._cirSide==null){e._cirSide=sgn(e.x-P.x);e._cirLeg=0;e._cirZ=e.z==null?.5:e.z;}
+  e._cirLeg-=dt;
+  if(e._cirLeg<=0){e._cirLeg=rnd(C.LEG0,C.LEG1);e._cirR=rnd(C.RMIN,C.RMAX);let z=mode?clamp(P.z+rnd(-.15,.15),.05,.95):rnd(.05,.95);if(!mode&&abs(z-e._cirZ)<.25)z=clamp(e._cirZ+(z<e._cirZ?-1:1)*.3,.05,.95);e._cirTz=z;e._cirV=Math.min(C.VZ,abs(z-e._cirZ)/e._cirLeg);}
+  const dx=P.x-e.x;e.facing=sgn(dx);
+  const tx=clamp(P.x+e._cirSide*e._cirR,lo,hi),vx=mode==='z'?0:mode==='back'?-e.facing*C.VX*.6:clamp((tx-e.x)/Math.max(.2,e._cirLeg),-C.VX,C.VX);
+  e.x=clamp(e.x+vx*dt,lo,hi);e.vx=vx;
+  if(e.z!=null){e.z=e._cirZ;e.z+=clamp(e._cirTz-e.z,-e._cirV*dt,e._cirV*dt);e._cirZ=e.z;if(abs(vx)<=5&&abs(e._cirTz-e.z)>.005)e.vx=-e.facing*22;}   // a pure depth step still plays the run strip
+  e.t-=dt*C.SLOW;   // walk speed: the run strip plays at half pace
+  e._cirMv=1;}
+const FE=window.FOOT_ENEMIES||{};
+for(const id of ['rusher','gunner','heavy']){const d=FE[id];if(!d||d._cir)continue;d._cir=1;
+  const a0=d.ai;d.ai=function(e,dt,env){
+    const S=F.S,P=env.P;
+    if(!on()||e.dead||e.state==='dead'||!e.seen||e.grace>0||!free(e)){e._cirMv=0;return a0.apply(this,arguments);}
+    const run=s=>s==='in'||s==='run'||s==='walk'||s==='open'||s==='';
+    const rest=e.id==='rusher'&&e.state==='rest',close=turn(S,P).has(e);
+    if(atk(e)||!(run(e.state)||rest)||(!rest&&abs(P.x-e.x)<C.NEAR)||close&&!(e.id==='heavy')){if(e._cirMv){e._cirMv=0;e._cirSide=null;}return a0.apply(this,arguments);}
+    if(close||rest){const x1=e.x,s1=e.state;a0.apply(this,arguments);if(atk(e)||e.state==='dead'||e.state!==s1||abs(e.x-x1)>.01)return;wait(e,dt,env,S,P,rest?'back':'z');return;}   // a closer that is already in place, or a rusher recovering from a lunge, keeps moving
+    const x0=e.x,s0=e.state,t0=e.sT,c0=e.cd,y0=e.vx;
+    a0.apply(this,arguments);
+    if(atk(e)||e.state==='charge'||e.state==='dead'){return;}   // it was hit into a stun or got an attack of its own: the old ai wins
+    if(e.state!==s0&&!run(e.state)){e.state=s0;e.sT=t0;e.tele=0;e.tw=0;e.hid=false;if(c0!=null)e.cd=Math.max(.3,c0);}   // wanted to wind up while it has no slot: it waits
+    e.x=x0;e.vx=y0;
+    wait(e,dt,env,S,P);};}
+})();
+
+// PURPOSE: Street actors (Kai and the foes) stand IN the rainy neon street: scene grade toward the backdrop palette, neon rim light from the nearest lamp side, soft contact shadow, faint wet-road reflection, rain in front (W194)
+// FLAG: blend (?blend=1, off by default)
+// TEST: qa/streetblend-probe.js
+/* ---------- STREETBLEND (W194, owner 24 Oct 2026: "the figures do not blend well inside"). Diagnosis (1440x860, Kai + 3 foes, beta.186): the sheets are lit neutral and warm
+   (olive jackets, mean blue 80) on a violet street (mean blue 105), no reflection on the wet road, no light from the neon, and rain only behind them: mean colour distance to the
+   floor/backdrop around them 19 RGB. Per actor and frame: the old drawing goes into one reused scratch canvas, two source-atop fills grade it (ambient tint toward the backdrop
+   column behind it + the floor, then a side gradient in the colour of the nearest neon), and it is put back with a 3-band faded reflection and a soft shadow under the feet and a
+   few rain streaks over it. The palette is read ONCE from the near backdrop picture (160 columns: mean colour and brightest neon); per frame there are only lookups and fills.
+   Skipped: a foe's hit flash (stays white), the flamer's fire tongue (wider than the box), nested calls (a street foe drawing another sheet). ---------- */
+if(RET.blend===undefined)RET.blend=/[?&]blend=1/.test(location.search);   // off by default: the probe's halve gate is not met yet (HANDOFF-W194.md)
+(function(){
+if(!window.FOOT||!FOOT._in||!FOOT.look)return;
+const F=FOOT,IN=F._in,SL=F.look,FL=470,NC=160,od=IN.drawWho;
+const B=F.blend={amb:.75,kai:.55,lift:90,gmin:.7,gmax:1.15,rim:.18,refl:[.2,.11,.04],pal:null,n:0};
+let cv=null,cx=null,cv2=null,cx2=null,deep=0;
+function palette(){if(B.pal)return B.pal;const fa=window.FA,q=fa&&fa._pic&&fa._pic('foot/bg-near.webp'),fl=fa&&fa._pic&&fa._pic('foot/bg-floor.webp');if(!q||!q.width||!fl||!fl.width)return null;
+  try{const H=40,t=document.createElement('canvas');t.width=NC;t.height=H+8;const x=t.getContext('2d');x.drawImage(q,0,0,NC,H);x.drawImage(fl,0,Math.round(fl.height*.7),fl.width,fl.height-Math.round(fl.height*.7),0,H,NC,8);
+    const d=x.getImageData(0,0,NC,H+8).data,amb=[],neo=[],fm=[0,0,0];let fn=0;
+    for(let c=0;c<NC;c++){const m=[0,0,0];let n=0,bs=0,bc=[255,60,200];for(let r=0;r<H;r++){const k=(r*NC+c)*4,a=d[k+3];if(a<128)continue;const R=d[k],G=d[k+1],Bl=d[k+2],mx=Math.max(R,G,Bl),mn=Math.min(R,G,Bl);
+        if(r>=H*.45){m[0]+=R;m[1]+=G;m[2]+=Bl;n++;}const s=mx>0?(mx-mn)/mx*mx:0;if(s>bs){bs=s;bc=[R,G,Bl];}}
+      amb.push(n?m.map(v=>v/n):null);neo.push([bc,bs]);}
+    for(let r=H;r<H+8;r++)for(let c=0;c<NC;c++){const k=(r*NC+c)*4;if(d[k+3]<128)continue;fm[0]+=d[k];fm[1]+=d[k+1];fm[2]+=d[k+2];fn++;}
+    const g=amb.filter(Boolean),gm=[0,1,2].map(j=>g.reduce((a,v)=>a+v[j],0)/(g.length||1));
+    B.pal={amb:amb.map(v=>v||gm),neo,floor:fn?fm.map(v=>v/fn):gm};}catch(e){B.pal={amb:null};}
+  return B.pal;}
+let tc=null,tx=null;
+const AL=[];   // bodies drawn this frame
+function look(c){const S=F.S;if(!AL.length||!S)return;const o=AL[(B.rr=(B.rr||0)+1)%AL.length],q=o._bb;if(!q)return;   // after the frame: one body per frame, the street left and right of it and the body itself as the player sees them (8x8 each, one read back)
+  try{if(!tc){tc=document.createElement('canvas');tc.width=16;tc.height=8;tx=tc.getContext('2d',{willReadFrequently:true});}const cv0=c.canvas,y0=q.fy-q.ah*.85,hh=q.ah*.75,w=q.hw;
+    const lx=q.cx-w*2.6,rx=q.cx+w*1.4,lo=lx>=0,ro=rx+w*1.2<=cv0.width;if((!lo&&!ro)||y0<0||y0+hh>cv0.height)return;   // a side off the canvas reads black: use the other side only
+    tx.clearRect(0,0,16,8);if(lo)tx.drawImage(cv0,lx,y0,w*1.2,hh,0,0,ro?4:8,8);if(ro)tx.drawImage(cv0,rx,y0,w*1.2,hh,lo?4:0,0,lo?4:8,8);tx.drawImage(cv0,q.cx-w*.45,y0,w*.9,hh,8,0,8,8);
+    const d=tx.getImageData(0,0,16,8).data,bg=[0,0,0],bo=[0,0,0];for(let r=0;r<8;r++)for(let k=0;k<8;k++){const i=(r*16+k)*4;for(let j=0;j<3;j++){bg[j]+=d[i+j]/64;bo[j]+=d[i+32+j]/64;}}
+    const g=o._g||(o._g=[1,1,1]);for(let j=0;j<3;j++){const tg=bo[j]+(bg[j]-bo[j])*(o===S.P?B.kai:B.amb);g[j]=Math.max(B.gmin,Math.min(B.gmax,g[j]*Math.max(.92,Math.min(1.08,(tg+4)/(bo[j]+4)))));}B.reads=(B.reads||0)+1;}catch(e){}}
+const rgb=(v,a)=>'rgba('+(v[0]|0)+','+(v[1]|0)+','+(v[2]|0)+','+a+')';
+const sat=(v,k)=>{const m=(v[0]+v[1]+v[2])/3;return v.map(x=>Math.max(0,Math.min(255,m+(x-m)*k)));};
+/* the light at world x: ambient = the backdrop column behind it and the floor, rim = the brightest neon within reach (side -1 left, 1 right) */
+function light(o){const p=palette();if(!p||!p.amb)return null;const S=F.S,t0=SL.t0,FR=FL-(SL.band||0),DH=(FR-t0)/.8,TW=2*DH,off=(S.camX||0)*.7,x0=SL.x0||0;
+  const pos=((o.x-S.camX-x0+((off%TW)+TW)%TW)%TW+TW)%TW,ci=Math.floor(pos/TW*NC)%NC;
+  let best=0,bc=null,side=1;const R=Math.round(NC*.22);for(let d=-R;d<=R;d++){const [c,s]=p.neo[(ci+d+NC)%NC],w=s/(1+Math.abs(d)/8);if(w>best){best=w;bc=c;side=d<0?-1:1;}}
+  const rim=sat(bc||[255,60,200],1.3).map(v=>Math.min(255,v*1.25));
+  const L=o._bl||(o._bl={rim,side,s:side});for(let j=0;j<3;j++)L.rim[j]+=(rim[j]-L.rim[j])*.15;L.side=side;L.s+=(side-L.s)*.12;   // eased: no flicker when the nearest lamp changes
+  return L;}
+const d0=SL.draw;SL.draw=function(c){AL.length=0;const r=d0.apply(this,arguments);if(r&&RET.blend)look(c);return r;};
+IN.drawWho=function(c,who,pose,x,y,h,flip,t,col){const e=typeof ART!=='undefined'&&ART.fE;
+  if(!RET.blend||deep||!e||!F.S||c!==(IN.L()&&IN.L().ctx)||e.flash>0||e.state==='spray')return od.apply(this,arguments);
+  const m=c.getTransform(),W=c.canvas.width,H=c.canvas.height,X=(u,v)=>m.a*u+m.c*v+m.e,Y=(u,v)=>m.b*u+m.d*v+m.f;
+  if(!palette())return od.apply(this,arguments);
+  const bx=Math.max(0,Math.floor(Math.min(X(x-h,y-1.3*h),X(x+h,y)))),by=Math.max(0,Math.floor(Y(x,y-1.3*h))),bx1=Math.min(W,Math.ceil(Math.max(X(x-h,y),X(x+h,y)))),fy=Y(x,y),by1=Math.min(H,Math.ceil(fy+4));
+  const bw=bx1-bx,bh=by1-by;if(bw<4||bh<4)return od.apply(this,arguments);
+  if(!cv){cv=document.createElement('canvas');cv.id='footC';cx=cv.getContext('2d');}   // art.js picks the on-foot sprite copy by this id (not in the page)
+  if(cv.width<bw||cv.height<bh){cv.width=Math.max(cv.width,bw);cv.height=Math.max(cv.height,bh);}
+  cx.imageSmoothingEnabled=c.imageSmoothingEnabled;cx.imageSmoothingQuality=c.imageSmoothingQuality;cx.setTransform(1,0,0,1,0,0);cx.globalCompositeOperation='source-over';cx.globalAlpha=1;cx.clearRect(0,0,bw,bh);
+  cx.setTransform(m.a,m.b,m.c,m.d,m.e-bx,m.f-by);deep++;try{od.call(this,cx,who,pose,x,y,h,flip,t,col);}finally{deep--;}
+  cx.setTransform(1,0,0,1,0,0);const Lt=light(e),g_=e._g;AL.push(e);e._bb={cx:X(x,y),fy,ah:fy-by,hw:Math.abs(m.a)*h*.3};
+  if(g_){const gm=g_.map(v=>Math.min(1,v)*255),lf=g_.map(v=>Math.max(0,v-1)*B.lift);   // grade: gain below 1 multiplies the channel down, above 1 lifts it
+    if(!cv2){cv2=document.createElement('canvas');cx2=cv2.getContext('2d');}if(cv2.width<cv.width||cv2.height<cv.height){cv2.width=cv.width;cv2.height=cv.height;}
+    cx2.globalCompositeOperation='copy';cx2.drawImage(cv,0,0,bw,bh,0,0,bw,bh);   // the body's alpha
+    cx.globalCompositeOperation='multiply';cx.fillStyle=rgb(gm,1);cx.fillRect(0,0,bw,bh);cx.globalCompositeOperation='lighter';cx.fillStyle=rgb(lf,1);cx.fillRect(0,0,bw,bh);
+    cx.globalCompositeOperation='destination-in';cx.drawImage(cv2,0,0,bw,bh,0,0,bw,bh);cx.globalCompositeOperation='source-atop';}
+  const sd=Lt.s,cxx=X(x,y)-bx,hw=Math.abs(m.a)*h*.34,g=cx.createLinearGradient(cxx+sd*hw,0,cxx+sd*hw*.15,0);g.addColorStop(0,rgb(Lt.rim,B.rim*Math.min(1,Math.abs(sd)+.3)));g.addColorStop(1,rgb(Lt.rim,0));cx.fillStyle=g;cx.fillRect(0,0,bw,bh);   // rim light from the lamp side
+  cx.globalCompositeOperation='source-over';B.n++;
+  c.save();c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;
+  const ground=!e.fly&&e.y>=FL-3,ah=fy-by;
+  if(ground&&ah>8){const rh=ah*.5,sy=fy-by;c.setTransform(1,0,0,-.55,0,1.55*fy);   // wet road: the legs mirrored under the feet, squashed, fading in 3 bands
+    for(let i=0;i<3;i++){const s0=sy-(i+1)*rh/3,hh=rh/3;if(s0<0)break;c.globalAlpha=B.refl[i];c.drawImage(cv,0,s0,bw,hh,bx,by+s0,bw,hh);}
+    c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;
+    const sw=Math.min(bw*.36,ah*.3),gr=c.createRadialGradient(X(x,y),fy,0,X(x,y),fy,sw);gr.addColorStop(0,'rgba(8,2,18,.5)');gr.addColorStop(1,'rgba(8,2,18,0)');   // soft contact shadow
+    c.fillStyle=gr;c.save();c.translate(X(x,y),fy);c.scale(1,.28);c.translate(-X(x,y),-fy);c.fillRect(X(x,y)-sw,fy-sw,2*sw,2*sw);c.restore();}
+  c.drawImage(cv,0,0,bw,bh,bx,by,bw,bh);
+  const st=F.S.time,n=5,Lr=bh*.16;c.strokeStyle='rgba(205,195,255,.3)';c.lineWidth=Math.max(1,W/1400);c.beginPath();   // rain falling in front of the body
+  for(let i=0;i<n;i++){const fx=((i*.618+Math.floor(e.x/37)*.13)%1),fyy=((st*1.7+i*.37)%1);const sx=bx+fx*bw,sy=by+fyy*(bh-Lr);c.moveTo(sx,sy);c.lineTo(sx-Lr*.3,sy+Lr);}
+  c.stroke();c.restore();};
 })();
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
