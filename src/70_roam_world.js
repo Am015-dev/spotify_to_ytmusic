@@ -372,7 +372,7 @@ function sprintStep(dt){const sp=RO.sp;if(!sp)return;const e=sp.e;RO.cool=2;
   for(const a of sp.ai){if(a.fin!=null&&a.s>=e.len+40){continue}const q=spPos(e,Math.max(0,a.s));const gap=a.s-myS,rub=gap>150?.9:gap<-150?1.12:1;let tv=a.base*rub;if(q.toCorner<60&&q.i<e.path.length-1)tv=Math.min(tv,38);
     if(sp.cd>0)tv=0;a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.8:2.5));a.s+=a.v*dt;if(a.s>=e.len&&a.fin==null)a.fin=sp.t;
     const p2=spPos(e,Math.max(0,a.s)),ox=Math.cos(p2.h)*a.lane,oz=-Math.sin(p2.h)*a.lane,x=p2.x+ox,z=p2.z+oz;a.y=groundAt(x,z,(a.y??0)+3);a.h=(a.h??p2.h)+angDiff(p2.h,a.h??p2.h)*Math.min(1,dt*4);
-    a.g.position.set(x,a.y,z);a.g.rotation.y=a.h+Math.PI;const ud=a.g.userData;ud.m.position.y=1.6+Math.sin(T*6+a.lane)*.1;for(const rb of ud.ribbons){rb.scale.z=6+a.v/8;rb.material.uniforms.uT.value=T}
+    a.g.position.set(x,a.y,z);a.g.rotation.y=a.h+Math.PI;const ud=a.g.userData;ud.m.position.y=self.TK_pY?TK_pY(a.g,ud,false):1.6;for(const rb of ud.ribbons){rb.scale.z=6+a.v/8;rb.material.uniforms.uT.value=T}
     const d=Math.hypot(x-RO.x,z-RO.z);if(d<5.5&&Math.abs(a.y-RO.y)<3){const k=(5.5-d)/2;RO.x+=(RO.x-x)/d*k;RO.z+=(RO.z-z)/d*k;if(Math.abs(RO.v)>a.v+15&&pl&&pl.nitro){a.v*=.3;feed('SLAM · '+a.name,300,'#ff2d95');AU.sfx('crash');shake=.4;comboAdd(3)}else{a.v*=.9;RO.v*=.95;AU.sfx('bump')}}}
   const place=1+sp.ai.filter(a=>(a.fin!=null?e.len+1e6-a.fin:a.s)>myS).length;sp.place=place;RV3_gap(sp,sp.ai.map(a=>[a,a.fin!=null?e.len:Math.min(a.s,e.len)]),myS);
   sp.hud=`<b>🏁 ${e.name.toUpperCase()}</b><span>POS ${place}/${sp.ai.length+1} · CP ${Math.min(sp.gi,sp.G.length)}/${sp.G.length} · ${fmt(Math.max(0,sp.t))} · Esc to quit</span>`}
