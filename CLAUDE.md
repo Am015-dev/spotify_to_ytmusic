@@ -10,7 +10,8 @@ Old rules and lessons (read only when needed): `games-src/RULES-ARCHIVE.md`.
 - Don't edit Mainhattan Overdrive. Nightrun belongs to this orchestrator. Ticket to Ride is on hold.
 - Before pushing: `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push; `git add` explicit paths only.
 - If a command is blocked, stop and tell the owner. Never ask a worker question you could decide yourself; never wait.
-- Screenshots: compare with games-src/nightrun/benchmark/; retake only what changed.
+- Screenshots: compare with games-src/nightrun/benchmark/ and the benchmark games (URLs only); retake only what changed.
+  Owner gate (24 Oct 2026): every visual change goes to the owner as phone+PC screenshots BEFORE deploy; no OK, no deploy.
 - Coding/token rules: games-src/nightrun/WORKER-RULES.md 15-16.
 
 ## How we work (owner, 14 Oct 2026: "you waste way too many tokens and deliver shit results")
