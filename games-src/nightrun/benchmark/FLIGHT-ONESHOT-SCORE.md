@@ -132,3 +132,9 @@ reference frame (W208/W209/W210 say so); the three URLs above are now available 
 Overall after this round, if W208 + W209 (colour fixed) + W207 minus its roster go live: about **SHIPS 12, BULLETS 16, ENV 12, FEEL 13,
 FUN 9, BLEND 8**: still far below the references (75-90). Nobody touched the environment; the backdrop as bright and busy as the
 ships is now the biggest single gap (every README says it, no worker owns it).
+
+## Owner verdict, 24 Oct 2026 18:30 UTC
+"No, the screenshots are extremely ugly, they don't blend well with the background, they indicate huge sloppiness." All code-only look
+passes (nr/W206, nr/W207-ships, nr/W208-bullets, nr/W209-boom, nr/W210-motion, nr/W213-combo) are NOT merged and stay on their branches.
+Rule 17(e)/(f): no more code-only look passes on flight. The next look step starts from the owner's new matched background layers
+(benchmark/FLOW-FLIGHT-LAYERS.md); the first screen with them is judged as one phone + one PC shot before anything else.
