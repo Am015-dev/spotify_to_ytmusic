@@ -51,12 +51,12 @@ function btn(){const L=IN.L();if(!L||!L.btn||!L.btn.melee)return;
   if(!B){B=document.createElement('button');B.type='button';B.className='fb';B.id='fGuard';B.textContent='GUARD';L.root.appendChild(B);
     const dn=e=>{e.preventDefault();if(!I.guard)I.guardP=1;I.guard=1;B.classList.add('on');try{B.setPointerCapture(e.pointerId);}catch(x){}},up=()=>{I.guard=0;B.classList.remove('on');};
     B.addEventListener('pointerdown',dn);B.addEventListener('pointerup',up);B.addEventListener('pointercancel',up);B.addEventListener('lostpointercapture',up);}
-  const m=L.btn.melee,k=m.style.left+m.style.top+m.style.width+m.style.display+m.hidden;if(k===bk)return;bk=k;
+  const m=L.btn.melee,key=()=>Object.values(L.btn).map(b=>b.style.left+b.style.top+b.style.width+b.style.display+b.hidden).join('|'),k=key();if(k===bk)return;bk=k;   // every button counts: a relayout puts the one we moved back, and the key must notice
   if(m.hidden||m.style.display==='none'){B.hidden=true;B.style.display='none';return;}
   const z=parseFloat(m.style.width)||56,top=parseFloat(m.style.top),row=Object.values(L.btn).filter(b=>!b.hidden&&b.style.display!=='none'&&abs(parseFloat(b.style.top)+parseFloat(b.style.width)/2-top-z/2)<z/2);
   const x0=Math.min(...row.map(b=>parseFloat(b.style.left)));
   const ml=parseFloat(m.style.left),nb=row.filter(b=>parseFloat(b.style.left)<ml).sort((a,b)=>parseFloat(b.style.left)-parseFloat(a.style.left))[0];   // the button left of KNIFE moves out one slot, GUARD takes its place
-  let gx=x0-z-8;if(nb){gx=parseFloat(nb.style.left);nb.style.left=Math.round(x0-parseFloat(nb.style.width)-8)+'px';bk=m.style.left+m.style.top+m.style.width+m.style.display+m.hidden;}
+  let gx=x0-z-8;if(nb){gx=parseFloat(nb.style.left);nb.style.left=Math.round(x0-parseFloat(nb.style.width)-8)+'px';bk=key();}
   B.hidden=false;B.style.display='';B.style.width=B.style.height=z+'px';B.style.left=Math.round(gx)+'px';B.style.top=Math.round(top)+'px';}
 addEventListener('keydown',e=>{if(!F.on||!F.S||(e.code!=='KeyI'&&e.code!=='Semicolon'))return;e.preventDefault();e.stopImmediatePropagation();if(!e.repeat&&!I.guard)I.guardP=1;I.guard=1;},true);
 addEventListener('keyup',e=>{if(e.code==='KeyI'||e.code==='Semicolon'){I.guard=0;}},true);

@@ -22,7 +22,7 @@ html.h3 #garage.h3m:not([hidden]) #h3More{display:grid;grid-template-columns:rep
 #h3More .mt span{font-size:15px;line-height:1.3;color:#e4e0ff}
 #h3More .mt em:empty{visibility:hidden;border-color:transparent}
 #h3More .mt em{order:-1;align-self:flex-end;min-height:1.4em;margin:-6px -2px -4px 0;font:700 14px var(--display);font-style:normal;padding:2px 8px;border-radius:9px;background:#1a1236;border:1.5px solid var(--c);color:var(--c)}
-html.h3 #garage .tabs #mfMore.h3on{opacity:1;background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.h3 #garage .tabs #mfMore.h3on{opacity:1;background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border-color:#ffd0ea!important;color:#fff!important}
 html.h3 #garage.h3m .tabs button[data-t].on{background:#140d2e!important;color:var(--ink)!important;border-color:#3a2b5c!important;box-shadow:none!important}
 html.h3 #gaCards.f2 .h3R .f2-sheet .hd{flex-wrap:wrap}
 /* FORGE in the frame: the hangar header and tabs stay (forgeone hides every sibling of the cards) */

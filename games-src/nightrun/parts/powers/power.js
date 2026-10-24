@@ -80,14 +80,16 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     let cx=x+r;for(const it of items){const K=PWK[it.k];ctx.save();ctx.translate(cx,y-4*k);ctx.fillStyle='#05030cb0';ctx.beginPath();ctx.arc(0,0,r+3*k,0,7);ctx.fill();
       ctx.lineWidth=2.6*k;ctx.strokeStyle='#ffffff2a';ctx.beginPath();ctx.arc(0,0,r+1*k,0,7);ctx.stroke();ctx.strokeStyle=K.c;ctx.beginPath();ctx.arc(0,0,r+1*k,-Math.PI/2,-Math.PI/2+6.2832*it.f);ctx.stroke();
       this.coin(it.k,r-4*k);ctx.restore();cx+=2*r+10*k;}},
-  hud(t,x0,y0,k){const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null}));
+  hud(t,x0,y0,k){const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null,lv:window.__pw3&&__pw3.PW3L[a.k]?(a.l3||1):0}));
     if(s.drop){const d=s.drop,p=bpos();items.push({k:'drop',rem:d.blastB-p,tot:d.blastB-d.b0,txt:p<d.cutB?'CUT ON THE DOWNBEAT':'BLAST IN '+Math.max(1,Math.ceil((d.blastB-p)/4))+' BAR'});}
     let y=y0==null?112:y0;
     for(const it of items){const K=PWK[it.k],n=Math.round(it.tot/4),bw=132,sw=bw/n;ctx.save();ctx.translate(x0,y);ctx.scale(k,k);
       ctx.fillStyle='#05030cb0';ctx.fillRect(-6,-20,232,40);
       ctx.translate(14,0);this.coin(it.k,11);ctx.translate(-14,0);
-      ctx.textAlign='left';ctx.font='700 14px "Chakra Petch",sans-serif';ctx.fillStyle=K.c;ctx.fillText(K.n,32,-3);
-      ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#e9e6ff';ctx.fillText(it.txt||Math.max(1,Math.ceil(it.rem/4))+(Math.ceil(it.rem/4)>1?' BARS':' BAR'),220,-3);
+      ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#e9e6ff';const rt=it.txt||Math.max(1,Math.ceil(it.rem/4))+(Math.ceil(it.rem/4)>1?' BARS':' BAR');ctx.fillText(rt,220,-3);
+      const room=220-ctx.measureText(rt).width-32-10,nm=K.n+(it.lv?'  LV'+it.lv:'');let nf=14;ctx.textAlign='left';ctx.font='700 14px "Chakra Petch",sans-serif';   // name and level are ONE label that shrinks to the room left of the time: the two never touch
+      while(nf>9&&ctx.measureText(nm).width>room){nf-=.5;ctx.font='700 '+nf+'px "Chakra Petch",sans-serif';}
+      ctx.fillStyle=K.c;ctx.fillText(nm,32,-3,Math.max(20,room));
       for(let i=0;i<n;i++){const f=clamp(it.rem/4-i,0,1);ctx.fillStyle='#ffffff26';ctx.fillRect(32+i*sw,8,sw-2,5);ctx.fillStyle=K.c;ctx.fillRect(32+i*sw,8,(sw-2)*f,5);}
       ctx.restore();y+=46*k;}}
 };

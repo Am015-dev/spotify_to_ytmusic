@@ -66,6 +66,7 @@ function pageAudit(opts) {
     if (vw <= 900 && it.fs < 10.95) out.push(['small-font', `${tag} is ${it.fs.toFixed(1)} px`]);
     // covered by something else
     const px = [[.5, .5], [.2, .5], [.8, .5], [.5, .2], [.5, .8]], ins = inter(tr, vr); let cov = 0, by = null;
+    if (getComputedStyle(el).pointerEvents === 'none') { it.vis = ins; continue; }   // elementsFromPoint cannot see a pointer-events:none label (the DASH / EMP button words float over the canvas on purpose): the hit test would call it covered
     for (const [fx, fy] of px) { const x = ins.left + (ins.right - ins.left) * fx, y = ins.top + (ins.bottom - ins.top) * fy; if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
       const st = document.elementsFromPoint(x, y); let k = st.findIndex(e => e === el || e.contains(el) || el.contains(e)); if (k < 0) k = st.length;
       const above = st.slice(0, k).filter(e => { if (e.closest('#stDet') && !el.closest('#stDet')) return false; if (e.closest('#labP') && e.closest('#labP').contains(el)) return false; const c = getComputedStyle(e); return e.tagName === 'IMG' || e.tagName === 'CANVAS' || e.tagName === 'VIDEO' || e.tagName === 'svg' || (c.backgroundImage !== 'none') || (/rgba?\(/.test(c.backgroundColor) && !/rgba\(\d+, \d+, \d+, 0\)/.test(c.backgroundColor) && +(c.backgroundColor.split(',')[3] || 1) > .35); });

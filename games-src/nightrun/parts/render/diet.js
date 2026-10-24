@@ -91,7 +91,7 @@ if(DIET.on){
       ctx.fillStyle='#dcd8f6';ctx.fillText('EMP',172,y0+26);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(178+i*14,by-4,4.5,0,7);ctx.fill();}});
     Object.assign(HUDLOG,{x:HUDX.vals()});
     if(touchUI)buttons();
-    if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12);ctx.globalAlpha=1;});
+    if(G.note.t>0&&G.note.txt&&!(touchUI&&/^\u266a/.test(G.note.txt)))cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12);ctx.globalAlpha=1;});
     if(window.HINT&&HINT.on())HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});
     else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
     if(G.boss&&G.boss.x<W){const b=G.boss;ctx.fillStyle='#00000088';ctx.fillRect(W/2-200*ku,30*ku,400*ku,8*ku);ctx.fillStyle='#ff3040';ctx.fillRect(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);}

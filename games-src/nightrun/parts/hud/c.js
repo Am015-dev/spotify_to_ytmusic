@@ -50,7 +50,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     ctx.fillStyle='#dcd8f6';WP.hud(ctx,20,y0+62,1);
     if(mn)hudMin(ctx,1,18,y0-8,t);});
   if(ku>1.25)tierMeter(W-131*ku-14,H-8,ku);else tierMeter(W/2,H-8,ku);       // big HUD on a small screen: the meter moves to the right corner, clear of the bars frame
-  if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
+  if(G.note.t>0&&G.note.txt&&!(touchUI&&/^\u266a/.test(G.note.txt)))cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
   if(window.HINT&&HINT.on()){if(!(G.banner.t>0))HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});}   // F6: the one hint style (top third, under the HUD); not while the stage banner is up (they overlapped at 844x390)
   else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
   if(!mn){SH.hud(ctx,t,{nx:24,ny:90,dx:216,dy:H-52,sx:18,sy:H-60,ring:true});HUDX.ship(ctx,P.x,P.y,1,t);}else HUDX.ship(ctx,P.x,P.y,1,t);

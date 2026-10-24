@@ -126,7 +126,7 @@ const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/6
   if (spr !== true) fails.push('sprite pane without ART.ANIM: ' + spr);
 
   // on-foot and tutorial items (they leave the Lab); saves must be back after
-  const ft = await p.evaluate(async () => { const out = []; const it = LABFULL.R.get('foot'); const sec = [...it.items.keys()].filter(k => /^sec/.test(k)); if (sec.length < 7) out.push('foot sections ' + sec.length); return out; });
+  const ft = await p.evaluate(async () => { const out = []; const it = LABFULL.R.get('foot'); const sec = [...it.items.keys()].filter(k => /^sec/.test(k)); const want = 1 + ((FOOT.STAGES.zeil.cps || []).length); if (sec.length !== want) out.push('foot sections ' + sec.length + ' (want ' + want + ': START + one per checkpoint; street3.js plays zeil as one level with none)'); return out; });
   if (ft.length) fails.push(ft.join());
   await p.evaluate(() => { LABFULL.do(LABFULL.R.get('foot').items.get('ninja')); }); await sleep(900);
   const fo = await p.evaluate(() => ({ on: window.FOOT.S && window.FOOT.S.E.some(e => e.id === 'ninja' || e.type === 'ninja' || (e.def && e.def.id === 'ninja')), run: __mnr.running, e: window.FOOT.S ? window.FOOT.S.E.length : -1 }));
