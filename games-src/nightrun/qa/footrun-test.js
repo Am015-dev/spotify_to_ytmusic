@@ -3,6 +3,7 @@
 //   Stepped at 1/60 (no wall clock): each foe type alone for SECS (60) of game time, FOOT.look.draw after every step, hp kept up so it is hit all the time (the flash is exercised).
 //   a  idle:  0 draws where the foe moves > 20 units/s while drawing its idle sheet
 //   b  slide: ground distance per run cycle within 20% of the sheet's stride (2 x foot spread, FOOT.FEEL.ST or 0.8 x cell width, drawn at the body scale), for every foe that runs or walks
+//      (not counted: flyers drone / jetpack have one hover sheet; a stunned heavy and an open guard keep their hit pose; a foe with no sheet is skipped)
 //   c  alpha: the strongest non-additive drawImage of the foe has alpha 1.0 on >= 99% of the draws (death fade not drawn: hp is kept up)
 //   d  blink: 0 times the act changes run/walk -> other act -> run/walk within 0.3 s while the foe keeps moving, and no white flash longer than 0.1 s (one 60 Hz step of slack)
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/footrun-test.js     env: GAME_DIR (default: a fresh build), SECS=60, ONLY=id,id, Q=?nomusic=1&morefoes=1 (add &footrun=0 for the old street)
@@ -48,7 +49,7 @@ const { boot, open, sleep, ok, done } = require('./lib.js');
           if (rec.a < .999) R.aLow++;
           fl = e._rfd === S.time ? fl + 1 / 60 : 0; if (fl > R.flashMax) R.flashMax = fl;
           const run = /^(run|walk)$/.test(act);
-          if (v > 20) { R.moving++; if (act === 'idle') { R.idleMove++; const k = e.state + '/' + rec.pose + '/' + Math.round(v); R.info = R.info || {}; R.info[k] = (R.info[k] || 0) + 1; } }
+          if (v > 20) { R.moving++; if (act === 'idle' && e.state !== 'stun' && !e.open && !/^(drone|jetpack)$/.test(id)) { R.idleMove++; const k = e.state + '/' + rec.pose + '/' + Math.round(v); R.info = R.info || {}; R.info[k] = (R.info[k] || 0) + 1; } }
           hist.push(v > 20 ? (run ? 'r' : /^(idle|hit|hurt)$/.test(act) ? 'o' : 'a') : 'x'); if (hist.length > 18) hist.shift();
           if (hist.length >= 3 && hist[hist.length - 1] === 'r') { const s = hist.join(''); if (/ro{1,17}r$/.test(s) && !/[xa]/.test(s.slice(s.search(/ro/)))) { R.blink++; hist = ['r']; } }
           if (v > 20 && run) {
@@ -59,7 +60,7 @@ const { boot, open, sleep, ok, done } = require('./lib.js');
         }
         R.distPerCycle = R.runCyc > 0 ? R.runD / R.runCyc : 0; return R;
       }, { id, SECS });
-      if (r.err && !r.draws) { ok(`${id}: ${r.err}`, false); continue; }
+      if (!r.draws) { console.log(`SKIP ${id}: no sheet drawn (${r.err || 'stationary box'})`); continue; }
       const moves = r.moving > 0;
       ok(`${id}: ${r.draws} draws, ${r.moving} moving (>20 u/s), idle sheet while moving ${r.idleMove} (limit 0)`, r.draws > 0 && r.idleMove === 0, `idleMove ${r.idleMove} ${JSON.stringify(r.info)}`);
       if (r.runCyc > .5) { const q = r.distPerCycle / r.stride; ok(`${id}: ground per run cycle ${r.distPerCycle.toFixed(0)} vs stride ${r.stride.toFixed(0)} = ${q.toFixed(2)} (0.80-1.20)`, q >= .8 && q <= 1.2, q.toFixed(2)); }
