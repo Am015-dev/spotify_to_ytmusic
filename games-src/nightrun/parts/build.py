@@ -27,6 +27,7 @@ PARTS_EXTRA=[]   # new parts: append one line PARTS_EXTRA.append('<file>.js') be
 PARTS_EXTRA.append('slice.js')
 PARTS_EXTRA.append('puremusic.js')
 PARTS_EXTRA.append('soundlab.js')
+PARTS_EXTRA.append('footsfx.js')
 PARTS_EXTRA.append('cleanlook.js')
 PARTS_EXTRA.append('street2.js')
 PARTS_EXTRA.append('steadysong.js')
