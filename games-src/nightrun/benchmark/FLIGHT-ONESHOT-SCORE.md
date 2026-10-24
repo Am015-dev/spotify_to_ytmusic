@@ -25,6 +25,7 @@ Sizes below are px in the shot as given (refs at 1920x1080, ours at 1440x860 PC 
 | ENVIRONMENT | **12** | 75 | 92 | 82 |
 | FEEL | **6** | 85 | 85 | 75 |
 | FUN (guess from a still) | **7** | 80 | 75 | 80 |
+| BLEND (one picture?) | **5** | 78 | 90 | 88 |
 | **player-equivalent** | **7** | 80 | 83 | 80 |
 
 ## Reasons, row by row
@@ -72,6 +73,42 @@ Sizes below are px in the shot as given (refs at 1920x1080, ours at 1440x860 PC 
 - Ours: nothing in the frame says "danger here, choose a path": bullets do not read as threats, enemies do not read as targets,
   the player cannot see their own ship clearly. The owner's < 10 stands.
 - Refs: every frame poses a clear spatial question (thread the ring, dodge the orbs, fly between ships).
+
+## BLEND: scored with .claude/skills/game-look + the impeccable critique lens (orchestrator ask, 17:37 UTC)
+The full impeccable critique (two sub-agents, its HTML detector, Nielsen table) is built for UI pages, not a canvas game frame; here
+it is used inline only as a lens (Visual Noise Floor, P0-P3 priorities). Degraded run: single context, detector not applicable.
+
+Measured on our PC shot (luminance 0-255, median / 90th percentile; saturation 0-255 median):
+
+| plane | L med | L p90 | sat | game-look rule |
+|---|---|---|---|---|
+| far sky | 54 | 60 | 117 | should be darkest, least saturated: it is as saturated as the actors |
+| mid towers | 65 | 102 | 95 | brighter than the enemies |
+| near low city | 55 | 74 | 113 | no foreground plane passing in front at all |
+| enemy hulls | 46-63 | 70-125 | 102-106 | **at or below the sky** -> play layer is not the brightest thing (rule broken) |
+| player ship | 64 | 140 | 132 | only the neon trim lifts it |
+| enemy bullet disc | 7 | 186 | 191 | black body: darker than everything, reads as a hole |
+| player shot dash | 95 | 101 | 151 | 3 px tall, dimmer than tower windows |
+| white hit blob | 221 | 242 | 4 | brightest object on screen is a shapeless grey-white cloud |
+
+BLEND **5/100**: value planes inverted (actors <= backdrop), light direction differs per sprite (backdrop neon is pink/top-right,
+ships carry their own baked top-left highlights, no rim on the backdrop's side), pixel density mixed (painted plate ~1 texel/px,
+enemy sprites downscaled hard and soft, the white blob has no texels at all), outline weight mixed (player has a cyan outline,
+enemies none, the gold UI rings are 2 px vector strokes). The refs: B is one lit 3D scene (90); C keeps one pixel scale and a 1-px
+dark outline on every sprite (88); A keeps actors bright on a dark field (78).
+
+### The three worst "pasted" spots on our pair
+1. **[P0] Enemies darker than the sky they fly in** (PC x 760-860 y 130-240; phone y 200-300). Hull L 46-63 vs sky 54.
+   Fix (code): a rim light on the backdrop's key-light side (pink/magenta, top-right) via a 1-2 px additive edge pass, plus
+   darken/desaturate the far plates ~20% so the play layer wins. If still muddy after that: ask the owner in Google Flow for enemy
+   sprites drawn lit from top-right with a magenta rim and a 1-px dark outline, same texel size as the player.
+2. **[P0] The white hit blob** (PC x 1020-1180 y 400-470): a flat grey-white cloud (sat 4) larger than any ship, no texels.
+   Fix (code): replace the white fill/tint with the owner's fx-boom sheet in normal blending plus a <= 0.1 s white flash on the sprite
+   only (game-look "Feedback that blends"). If no fitting sheet exists: Flow sprite "8-frame small explosion, magenta/orange, smoke tail".
+3. **[P1] Rings and markers stacked on the player ship** (PC x 90-300 y 150-275: gold 120 px ring + grey ring + magenta ring + pink
+   blob; phone: 60 px ring + 3 gold diamonds). Vector UI strokes over a painted sprite are the loudest "pasted" signal and hide the ship.
+   Fix (code): one small hitbox dot only; show the graze/dash state as a tint of the engine flame, not rings (rule 8 caption once).
+   Close runner-up: black enemy bullet discs (L 7) on a mid-dark sky; recolour to a reserved bright hue with white core (code only).
 
 ## What would move ours the most (art problem, rule 17 (f))
 1. Enemy bullets: one bright colour nothing else uses (e.g. hot pink/white-core orbs 16-24 px with halo), a second shape per enemy type.
