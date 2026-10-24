@@ -76,7 +76,7 @@ const RUN = `(async (o) => { const B = window.__bm; window.__bmHook();
   ok('a every kill shows the boom sheet of its size and kind', plain.length > 0 && matched.length === plain.length, matched.length + '/' + plain.length + ' kills');
   const deb = plain.filter(k => sizeOf(k.r || 14) !== 'small'), debOk = deb.filter(k => k.ks.includes('boom-debris'));
   ok('b medium+ kills also queue debris', debOk.length === deb.length, debOk.length + '/' + deb.length);
-  const bl = cnt(boss.log); ok('b a boss kill queues five boss-a/b blasts, drawn', (bl['boom-boss-a'] || 0) + (bl['boom-boss-b'] || 0) === 5 && boss.drawn['fx-boom-boss-a/burst'] > 0 && boss.drawn['fx-boom-boss-b/burst'] > 0, JSON.stringify(bl) + ' ' + JSON.stringify(boss.drawn));
+  const bl = cnt(boss.log); ok('b a boss kill queues five boss-a/b blasts, drawn', bl['boom-boss-a'] === 4 && bl['boom-boss-b'] === 1 && boss.drawn['fx-boom-boss-a/burst'] > 0 && boss.drawn['fx-boom-boss-b/burst'] > 0, JSON.stringify(bl) + ' ' + JSON.stringify(boss.drawn));
   const lg = cnt(log);
   ok('c hits queue the spark sheet', (lg['hit-spark'] || 0) > 0, 'hit-spark ' + (lg['hit-spark'] || 0) + ', hitconfirm ' + (lg['hitconfirm'] || 0));
   for (const k in boss.drawn) drawn[k] = (drawn[k] || 0) + boss.drawn[k]; const sheets = Object.keys(drawn).filter(k => /^fx-boom-/.test(k));
