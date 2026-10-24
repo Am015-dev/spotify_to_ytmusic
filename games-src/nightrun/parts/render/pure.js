@@ -33,10 +33,12 @@ const PURL=window.PURL={K:90/520,get ph(){return wcv!==cv||Math.min(innerWidth,i
     if(nr)this.tile(nr,H-130,130,scroll,1.1,1);},   // the near strip keeps full value (play-layer depth)
   sheet(e){const M=ENEMY_ART[FOEART.id(e)];if(!M||e.type==='gate')return null;const m=M.native?{s:M.s||'e'+e.type,k:M.k||4.2}:FOEART.map(e);if(!m||!m.s)return null;
     const b='ship-'+m.s+'/',v=e.arm&&ART.ANIM.s[b+'volley']&&ART.anim(b+'volley'),key=b+(v?'volley':'flame');if(!ART.ANIM.s[key]||!ART.anim(key))return null;ART.anim(b+'death');return{m,key};},
-  foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],mn=this.pl()*(this.ph?.8:.72),w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,mn),Math.max(this.K*fw*1.25,mn)),sc=w/fw,rot=m.rot?m.rot(e,t):0;   // W224/W227: an enemy is >= .8 x the player's length on the phone, .72 x on PC
+  box(e,q){const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],mn=this.pl()*(this.ph?.8:.72),w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,mn),Math.max(this.K*fw*1.25,mn));return{w,sc:w/fw,h:w/fw*s[3]};},   // W235: the drawn box of a foe (SPREAD uses it to keep foes apart)
+  foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],{w,sc}=this.box(e,q),rot=m.rot?m.rot(e,t):0;   // W224/W227: an enemy is >= .8 x the player's length on the phone, .72 x on PC
     ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);
     if(this.HALO)this.pool(1,w*.45,0,sc*s[3]);if(!this.lit(key,(e.t||0)+eb_(e),sc,rot))ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false);ctx.restore();
     e._fs=sc;e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
+  get BP(){return this.ph?1.8:3;},   // W235: the boss lift curve's power: 3 made a pale box on the phone (mean luminance .5 vs .35 for the brightest foe); the PC backdrop is brighter and keeps 3
   BR:{'ship-echarger':3.2},   // W233: the charger's art is the darkest foe sheet (probe: 2.5 on a busy backdrop); a longer value lift for it only
   HUE:{'ship-eturret':-30},   // W231: gold is the pickups' hue; the brass gunship family turns copper-red (the enemy-shot family)
   PF:'saturate(1.3) brightness(3.5)',   // W231: the player's value lift: the clearest actor on the screen (qa/w231probe.js: player contrast >= every foe's)
@@ -46,7 +48,7 @@ const PURL=window.PURL={K:90/520,get ph(){return wcv!==cv||Math.min(innerWidth,i
     const ch=Math.max(1,Math.round(h*cw/w)),p=kd==='h'?Math.ceil(Math.max(cw,ch)*.12)+3:kd==='r'?2:0,fw=cw+2*p,fh=ch+2*p,c=document.createElement('canvas');c.width=fw*m[0];c.height=fh;const g=c.getContext('2d');g.imageSmoothingQuality='high';
     g.filter=kd==='h'?`brightness(0) blur(${Math.max(1.5,p/2.2)}px)`:kd==='b'?`sepia(.35) saturate(2)${this.HUE[key.split('/')[0]]?` hue-rotate(${this.HUE[key.split('/')[0]]}deg)`:''} brightness(${this.BR[key.split('/')[0]]||2.2})`:kd==='B'?'sepia(.25) saturate(1.4)':kd==='p'?this.PF:'none';   /* W231: B = the boss (milder: the 'b' pass clipped it to white), p = the player lift */for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*fw+p,p,cw,ch);g.filter='none';
     if(kd==='r'){const d=g.getImageData(0,0,c.width,c.height),a=d.data;for(let i=0;i<a.length;i+=4){a[i]=255;a[i+1]=110;a[i+2]=225;}g.putImageData(d,0,0);}
-    if(kd==='B'){const d=g.getImageData(0,0,c.width,c.height),a=d.data,L=new Uint8Array(256);for(let v=0;v<256;v++)L[v]=Math.round(255*(1-Math.pow(1-v/255,3)));for(let i=0;i<a.length;i+=4){a[i]=L[a[i]];a[i+1]=L[a[i+1]];a[i+2]=L[a[i+2]];}g.putImageData(d,0,0);}   // W231: the boss lift is a curve (darks and mids up, highlights kept under white), not brightness(): its hit / attack frames clipped
+    if(kd==='B'){const d=g.getImageData(0,0,c.width,c.height),a=d.data,L=new Uint8Array(256);for(let v=0;v<256;v++)L[v]=Math.round(255*(1-Math.pow(1-v/255,this.BP)));for(let i=0;i<a.length;i+=4){a[i]=L[a[i]];a[i+1]=L[a[i+1]];a[i+2]=L[a[i+2]];}g.putImageData(d,0,0);}   // W231: the boss lift is a curve (darks and mids up, highlights kept under white), not brightness(): its hit / attack frames clipped
     C.set(k,q={c,fw,fh,p,cw});return q;},
   dcel(key,t,sc,kd,ox,oy,al){const q=this.cel(key,sc,kd);if(!q)return false;const o=ART.aS(key),m=o.m,u=m[2]*sc/q.cw,i=ART.aframe(key,t);if(al!=null)ctx.globalAlpha=al;
     ctx.drawImage(q.c,i*q.fw,0,q.fw,q.fh,ox-m[4]*sc-q.p*u,oy-m[5]*sc-q.p*u,q.fw*u,q.fh*u);ctx.globalAlpha=1;return true;},
@@ -109,4 +111,4 @@ const PURL=window.PURL={K:90/520,get ph(){return wcv!==cv||Math.min(innerWidth,i
     if(G.empT>0)AH.pic('fx-pw-bomb-pulse',(0.6-G.empT)*2800,P.x,P.y,0,Math.min(1,G.empT*2.2));
     ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
     if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.drawImage(wcv,0,0);ctx.setTransform(VS,0,0,VS,0,0);if(running&&!HUDOFF)drawHUDP(t);}
-    else if(running&&!HUDOFF){drawHUD(t);const s=G.pw,n=s?s.act.length+(s.drop?1:0):0,k=n>1?.36:.5;PW.hud(t,345,H-6-20*k-46*k*Math.max(0,n-1),k);}}};   // W227: smaller, so even a stack of cards stays inside the band. W224: the power-up panel sits inside the bottom HUD band (top >= H-78, the hull box's top), right of the hull box (was in the sky at y 112)
+    else if(running&&!HUDOFF){drawHUD(t);}}};   // W235: the small WINGMATES / TEMPO UP tags are gone from the field (they sat over the road at the bottom centre; the power's effect shows on the ship). W227/W224 drew them in the band

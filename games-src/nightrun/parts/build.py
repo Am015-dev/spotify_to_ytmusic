@@ -67,6 +67,7 @@ PARTS_EXTRA.append('streetblend.js')
 PARTS_EXTRA.append('pure.js')
 PARTS_EXTRA.append('purefoot.js')
 PARTS_EXTRA.append('pureboss.js')
+PARTS_EXTRA.append('spread.js')
 out=out[:out.rindex(rd('c.js'))]+''.join(rd(p)+"\n" for p in PARTS_EXTRA)+rd('c.js')
 OUT=os.environ.get('NR_OUT',_ROOT+'games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path
 import hashlib,datetime

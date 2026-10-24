@@ -45,7 +45,7 @@ const MKSHAPE=['tri','circ','box'];
 /* ids that still draw their old picture: the sheet to ask for is in ASSETS-NEEDED-ENEMIES.md. The ground units walk, a ship cannot stand in for them. */
 const NEEDS=window.FOEART_NEEDS=['gwalker'];
 const FOEART=window.FOEART={fr:0,built:0,cnt:0,n:{all:0,sheet:0,stand:0,by:{}},flt:(()=>{try{return 'filter' in CanvasRenderingContext2D.prototype;}catch(_){return false;}})(),
-  id:e=>e.fk&&window.FLK&&FLK.K[e.fk]?'fk-'+e.fk:e.type,
+  id:e=>e.skin||(e.fk&&window.FLK&&FLK.K[e.fk]?'fk-'+e.fk:e.type),
   map:e=>{const m=ENEMY_ART[FOEART.id(e)];if(!m||m.native)return null;if(e.ldr&&m.L){if(!m._L)m._L=Object.assign({},m,m.L);return m._L;}return m;},
   /* the (tinted) strip key for an act; the tinted copy is built once, at most one per frame */
   sheet(m,act){const src='ship-'+m.s+'/'+act;if(!ART.ANIM.s[src])return null;const sb=ART.anim(src);if(!sb)return null;const t0=m.t,lb=RET.legible&&window.LGB?LGB.BR:1,tn=t0&&lb!==1?[t0[0],t0[1],t0[2]*lb]:t0;if(!tn||(!tn[0]&&tn[1]===1&&tn[2]===1))return src;   // lb: legible.js lifts dark hulls (LGB.BR)
