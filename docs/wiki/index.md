@@ -27,5 +27,13 @@ Rules: [SCHEMA.md](SCHEMA.md) | history: [log.md](log.md) | pins: [sources/racer
 - [game/flags.md](game/flags.md): OD_FLAG, preview build, flag lifecycle
 - [game/shot-library.md](game/shot-library.md): shot IDs, tools/shot.js, 2K references
 
+## Learned from other browser games (techniques in our words)
+- [learn/streaming.md](learn/streaming.md): fiveplay.lol io worker: range reads, hints, OPFS store, build-id URLs, progress
+- [learn/phone-profile.md](learn/phone-profile.md): their low-memory profile: 2 cores, mip skip, shadows off; GPU 1.16 -> 0.5 GB
+- [learn/threads-gpu.md](learn/threads-gpu.md): OffscreenCanvas GPU worker, shader packs, recipe prewarm, COOP/COEP on our hosts
+
+## Plans
+- [plan/open-world-streaming.md](plan/open-world-streaming.md): 7 iPhone-first lanes: low-mem profile, chunk cache, car swap, prewarm, tiles, read-ahead
+
 ## Elsewhere (not wiki)
 src/MAP.md (one line per module), CLAUDE.md (binding rules), docs/DESIGN_racers_rebuild.md (3-lane rebuild plan), docs/LESSONS_and_old_rules.md.
