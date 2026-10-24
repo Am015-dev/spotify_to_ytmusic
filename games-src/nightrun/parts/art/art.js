@@ -170,15 +170,22 @@ ART.gh=[];      // clips that outlive their object (boss defeat, ship death): {k
 ART.ghosts=()=>{const g=ART.gh;for(let i=g.length-1;i>=0;i--){const q=g[i],o=ART.aS(q.key);q.t+=FD;if(!o||q.t>o.tot+.2){g.splice(i,1);continue;}ART.drawAnim(ctx,q.key,q.t,q.x,q.y,q.k,false);}};
 const SPR={_sq:1,_di:-1};
 /* ----- bosses: idle / attack / hit / defeat. Sheets face left like the stills; the body is drawn as wide as the still was (calibration bw), the frame bottom sits where the still's bottom did (+ the idle gap), so the feet do not move ----- */
+SPR.acting=e=>{if(e.ph===undefined)return false;if(e.arm||e.fireT>0)return true;if(window.BMV&&BMV.hz){const t=G.t;for(const z of BMV.hz)if(!z.mk&&t>=z.t0&&t<z.on+.42)return true;}return false;};   // wind-up or shot: the boss's own beat shot, or a move zone from its telegraph to .42 s after it strikes
 SPR.boss=(e,nm,wd,by,tl,fl)=>{const cb=ART.ANIM.c['boss-'+nm],st=ART.bm['spr-boss-'+nm];if(!cb||!st||e.labPose)return false;const base='boss-'+nm+'/',ik=base+'idle';
   if(!ART.anim(ik)){return false;}ART.anim(base+'attack');ART.anim(base+'hit');ART.anim(base+'defeat');
   if(e.fireT>0)e.fireT=Math.max(0,e.fireT-FD);e._st=(e._st||0)+FD;const T=e._st,A=UIK.boss[nm];   // (the grid path ticked these; the sheets do now)
-  let want='idle';
-  if(e.ph!==undefined&&(e.arm||e.fireT>0)&&ART.anim(base+'attack'))want='attack';
+  let want='idle',rs=0;
+  if(RET.bossart){   // bossart: attack on every wind-up / shot (restarts on each beat, loops while it lasts), hit on every damage (short, then back), idle otherwise: never one held frame
+    const hs=ART.aS(base+'hit'),dmg=e.flash>(e._pfl||0)+1e-6||e.hp<(e._php===undefined?1e9:e._php);e._pfl=e.flash;e._php=e.hp;
+    if(dmg&&hs&&T>=(e._hc||0)){e._hc=T+hs.tot+.25;e._sa='';want='hit';}
+    else if(e._sa==='hit'&&hs&&T-e._s0<hs.tot)want='hit';
+    else if(SPR.acting(e)&&ART.anim(base+'attack')){want='attack';if(e.bt!==e._abt){e._abt=e.bt;rs=1;}}
+  }else if(e.ph!==undefined&&(e.arm||e.fireT>0)&&ART.anim(base+'attack'))want='attack';
   else if(e._sa==='hit'&&T-e._s0<ART.aS(base+'hit').tot)want='hit';
   else if(fl&&T>=(e._hc||0)&&ART.anim(base+'hit'))want='hit';
-  if(want!==e._sa){e._sa=want;e._s0=T;if(want==='hit')e._hc=T+ART.aS(base+'hit').tot+.6;}
-  const key=base+want,k=wd/cb.bw,y=RET.bodyscale&&!rotMode&&A&&A.move==='ground'&&e._dh?by+e._dh/2:by+wd*st.height/st.width/2+cb.gap*k,tt=T-e._s0,sm=ART.ANIM.sm;
+  if(want!==e._sa||rs){e._sa=want;e._s0=T;if(want==='hit'&&!RET.bossart)e._hc=T+ART.aS(base+'hit').tot+.6;}
+  const key=base+want,k=wd/cb.bw,y=RET.bodyscale&&!rotMode&&A&&A.move==='ground'&&e._dh?by+e._dh/2:by+wd*st.height/st.width/2+cb.gap*k,sm=ART.ANIM.sm;let tt=T-e._s0;
+  if(RET.bossart&&want==='attack'){const as=ART.aS(key);if(as&&tt>=as.tot)tt%=as.tot;}
   if(A){let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(ART.artK(e)===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;}
   if(!rotMode&&A&&A.move==='ground')e.y=UIK.groundY()-(e._dh||130)/2;   // a walker stands on the road line this very frame (bossMove sets the same value on the next step): the road moves when the LAB panel opens or the window changes
   const i=ART.aframe(key,tt);let sy=1;const sq=sm.squash.frames[want];if(sq&&sq.indexOf(i)>=0&&ART.aT<sm.squash.ms/1000)sy=1-sm.squash.amount*(1-ART.aT/(sm.squash.ms/1000));

@@ -1,0 +1,3 @@
+W206 boss strips: attack / hit / idle / defeat (flag `bossart`, `?bossart=0` = before).
+Shots: stage-1 boss (the eagle) in its attack strip, phone 390x763 and PC 1440x860 (WebP q82). They were taken through the LAB boss deep link (`?boss=`), so the LAB header and test grid are visible; they show the boss art, not a normal-play frame.
+Comparison with a boss frame of a well-regarded modern side-scrolling shoot-'em-up: no reference URL was verified in this session, so none is given here (repo benchmark/flight holds only normal-play frames). Owner: please paste the URL you want us measured against.
