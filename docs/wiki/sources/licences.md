@@ -1,11 +1,14 @@
-# Licences of the Racers study sources (checked 2026-10-24)
+# Licences (checked 2026-10-24)
+**The game is GPL-3.0-or-later** (Alex, 24 Oct: "yes i am fine"; LICENSE at the repo root). GPL/LGPL/MIT/BSD/zlib/Apache code may be ported with attribution. Never: leaked or unlicensed code (e.g. GTA V browser ports, re3/reVC, SM64 decomp) and never any game assets.
+
 Alex: the code is open source and may be used; we are not copying the assets.
 
 | Repo | Licence | What we may do |
 |---|---|---|
 | isledecomp/racers, racers-portable | LGPL-3.0 (LICENSE in racers verified) | Port logic into **its own src file** with an LGPL header + attribution (repo@SHA, path, function). That file stays LGPL. |
 | isledecomp/warp.parts | MIT | Port freely; keep the copyright notice. |
-| Laupetin/Lego-Racers-Mod | GPL-3.0 | File formats as **facts only**. Porting its code would make the whole game GPL: don't, without Alex's OK. |
+| Laupetin/Lego-Racers-Mod | GPL-3.0 | May be ported (the game is GPL-3.0 since 24 Oct). |
+| supertuxkart/stk-code | GPL-3.0 | May be ported: own src file, header with repo@SHA, path, function. Code only, no STK assets. |
 
 ## Never
 No LEGO assets: no models, textures, sounds or data files from the game.

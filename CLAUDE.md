@@ -29,7 +29,7 @@ Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-in
 18. One coordinator only; other sessions route Alex's asks to it. Deploy as soon as a reviewed fix is green (no 30-min batching).
 ## Standing orders from Alex
 - Never ask Alex anything; take the recommended option and note it in one line.
-- Reuse first: grep the repo, then three.js addons, LDraw/OMR, Yuka, etc. Note the licence in the commit.
+- Reuse first: grep the repo, then three.js addons, LDraw/OMR, Yuka, SuperTuxKart, LEGO Racers decomp, etc. The game is GPL-3.0 (Alex, 24 Oct), so GPL/LGPL/permissive code may be ported into its own file with an attribution header (docs/wiki/sources/licences.md). Never leaked/unlicensed code, never game assets.
 - Match LEGO 2K Drive (deep blue sky, brick clouds, glossy LEGO cars on the road, lively streets, fun varied tracks). Fun beats metrics: green tests ≠ playable.
 - Phone first: iPhone landscape + portrait, no HUD over controls, 12 px minimum text.
 - Keep `ALL_OPEN=true`, the credits "Made with ❤ by Alex" and "3D models by Alex", English UI, gas default on touch. No model names in files or commits.
