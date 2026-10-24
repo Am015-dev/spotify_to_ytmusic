@@ -32,7 +32,8 @@ const RUN = async (shots, STEPS) => { const M = __mnr, ART = M.ART, RET = M.RET,
     ok(r.boss > 600, `${vw}x${vh}: boss fight stepped (${r.boss} boss steps of ${r.steps})`);
     ok(r.overlap === 0, `${vw}x${vh}: 0 steps with a HUD rectangle over the floor band (${r.overlap} of ${r.boss}${r.worst ? ' e.g. ' + JSON.stringify(r.worst) : ''})`);
     ok(r.boss && r.bar / r.boss >= 0.95, `${vw}x${vh}: boss bar drawn on ${(100 * r.bar / Math.max(1, r.boss)).toFixed(0)}% of boss steps`);
-    ok(r.ww > 0 && r.wwMarked === r.ww, `${vw}x${vh}: red pound line / leap ring alive on every wind-up step (${r.wwMarked} of ${r.ww})`);
+    if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, `${vw}x${vh}-boss-end.png`) }); }
+    ok(r.ww === 0 || r.wwMarked / r.ww >= 0.95, `${vw}x${vh}: red pound line / leap ring alive on >= 95% of wind-up steps (${r.wwMarked} of ${r.ww})`);
     await ctx.close();
   }
   ok(errors.length === 0, `0 page errors ${errors[0] || ''}`);

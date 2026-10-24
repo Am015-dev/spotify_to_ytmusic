@@ -130,7 +130,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
     const ga=(p.t>13?.5+.5*Math.sin(p.t*20):1)*fa,pz=p.z!=null&&SL.band?p.z:1;c.save();c.translate(p.x,Y-(1-pz)*SL.band);c.scale(K*(.9+.1*pz),K*(.9+.1*pz));c.translate(-p.x,-y);c.globalAlpha=ga;SL.tag='pk';
     if(p.k==='ammo'&&RET.sprites&&typeof ART!=='undefined'&&ART.ANIM.c['pk-ammo/spin']&&ART.anim('pk-ammo/spin'))ART.drawAnim(c,'pk-ammo/spin',p.t,p.x,y,32/ART.ANIM.c['pk-ammo/spin'].bw,false);
     else if(RET.fairstreet&&(()=>{const q=slPic(pkPic(p.k));if(!q||!q.width)return false;const h=40,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,y-h/2-4,w,h);return true;})()){if(!RET.pound2){c.fillStyle=d.c;c.font='bold 11px monospace';c.textAlign='center';c.textBaseline='top';c.fillText(d.n,p.x,y+18);}}   // owner 23 Oct 2026: a sheet picture with its name under it, no flat disc
-    else if(RET.fairstreet){c.fillStyle=d.c;c.font='bold 13px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(d.n,p.x,y);}   // picture not loaded yet: the name alone
+    else if(RET.fairstreet){c.fillStyle=d.c;c.font='bold '+(RET.pound2?22:13)+'px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(RET.pound2?d.ic:d.n,p.x,y);}   // picture not loaded yet: the name alone
     else{c.fillStyle=d.c;c.beginPath();c.arc(p.x,y,15,0,6.283);c.fill();c.fillStyle='#05030c';c.font='bold 15px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(d.ic,p.x,y+1);}
     SL.tag='';c.globalAlpha=1;c.restore();}
   const dE=e=>{if(e.dead&&!(e.ext&&!e.remove))return;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)return;SL.z=e.z;   // fully off screen: nothing to draw (a shape fallback's label would hang past the edge)
