@@ -171,7 +171,7 @@ ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(ke
    the key light baked in (was a per-draw filter) and, on Kai only, the darkest values lifted. u = strip px per device px; returns {c, p}: cells padded by p on every side */
 ART.olT=0;ART.olTK=.26;   // W237: foes get no lift (the .44 lift washed them grey-white); Kai's mean luminance target, lift capped at y 2
 ART.olB=(src,cw,ch,n,md,flip,u)=>{const kai=md==='kai',p=Math.ceil(3*u)+1,cs=cw+2*p,H=ch+2*p,mk=(w,h)=>{const v=document.createElement('canvas');v.width=w;v.height=h;return v;};
-  const out=mk(cs*n,H),o=out.getContext('2d'),a=mk(cs,H),g=a.getContext('2d'),s=mk(cs,H),q=s.getContext('2d'),r=2.5*u,lx=(flip?1:-1)*.5,ly=-1,rw=Math.max(1,(kai?1.3:1.3)*u);
+  const out=mk(cs*n,H),o=out.getContext('2d'),a=mk(cs,H),g=a.getContext('2d'),s=mk(cs,H),q=s.getContext('2d'),r=2.5*u,lx=(flip?1:-1)*.5,ly=-1,rw=Math.max(1,(kai?1.3:1.9)*u);
   const kl=mk(cs*n,H),kg=kl.getContext('2d');kg.filter=kai?'brightness(1.75) saturate(1.1)':'brightness(1.75) saturate(1.15)';for(let j=0;j<n;j++)kg.drawImage(src,j*cw,0,cw,ch,j*cs+p,p,cw,ch);kg.filter='none';if(ART.olS){const sat=(g2,w2)=>{const d=g2.getImageData(0,0,w2,H).data;let a=0,m=0;for(let i=0;i<d.length;i+=16){if(d[i+3]<200)continue;const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);a+=mx?(mx-mn)/mx:0;m++;}return m?a/m:0;},rw0=mk(cs*n,H),rg0=rw0.getContext('2d');for(let j=0;j<n;j++)rg0.drawImage(src,j*cw,0,cw,ch,j*cs+p,p,cw,ch);ART.olS.push({md,raw:sat(rg0,cs*n),key:0,g:kg,w:cs*n,sat});}   // QA only (probe sets ART.olS): saturation of the raw sheet vs the lit strip   // the key light, as before, for the whole strip
   {const im=kg.getImageData(0,0,cs*n,H),d=im.data,lin=v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4),LT=new Float32Array(256).map((_,i)=>lin(i/255)),cv=(v,y)=>1-Math.pow(1-(kai?v+.2*Math.pow(1-v,3):v),y);
     const vk=(r,g,b,y)=>{const v=Math.max(r,g,b);return v?Math.min(255/v,255*cv(v/255,y)/v):1;},ml=y=>{let a=0,m=0;for(let i=0;i<d.length;i+=16){if(d[i+3]<200)continue;const k=vk(d[i],d[i+1],d[i+2],y);a+=.2126*LT[Math.min(255,Math.round(d[i]*k))]+.7152*LT[Math.min(255,Math.round(d[i+1]*k))]+.0722*LT[Math.min(255,Math.round(d[i+2]*k))];m++;}return m?a/m:1;};   // W237: the lift scales each pixel's value, so hue and saturation stay the owner's
@@ -180,8 +180,8 @@ ART.olB=(src,cw,ch,n,md,flip,u)=>{const kai=md==='kai',p=Math.ceil(3*u)+1,cs=cw+
   for(let j=0;j<n;j++){g.clearRect(0,0,cs,H);g.drawImage(kl,j*cs,0,cs,H,0,0,cs,H);
     q.clearRect(0,0,cs,H);q.globalCompositeOperation='source-over';for(let k=0;k<16;k++){const t=k*Math.PI/8;q.drawImage(a,r*Math.cos(t),r*Math.sin(t));}q.globalCompositeOperation='source-in';q.fillStyle='#12081c';q.fillRect(0,0,cs,H);   // outline: the silhouette dilated r px
     q.globalCompositeOperation='source-over';q.drawImage(a,0,0);
-    g.globalCompositeOperation='destination-out';g.drawImage(a,-lx*rw,-ly*rw);g.globalCompositeOperation='source-in';g.fillStyle=kai?'#7ff6ff':'#ffb466';g.fillRect(0,0,cs,H);g.globalCompositeOperation='source-over';   // the rim: the edge of the body that faces the light
-    q.globalAlpha=kai?.75:.85;q.drawImage(a,0,0);q.globalAlpha=1;o.drawImage(s,j*cs,0);}
+    g.globalCompositeOperation='destination-out';g.drawImage(a,-lx*rw,-ly*rw);g.globalCompositeOperation='source-in';g.fillStyle=kai?'#7ff6ff':'#ffc47a';g.fillRect(0,0,cs,H);g.globalCompositeOperation='source-over';   // the rim: the edge of the body that faces the light
+    q.globalAlpha=kai?.75:.95;q.drawImage(a,0,0);q.globalAlpha=1;o.drawImage(s,j*cs,0);}
   return {c:out,p};};
 ART.gh=[];      // clips that outlive their object (boss defeat, ship death): {key,x,y,k,t}
 ART.ghosts=()=>{const g=ART.gh;for(let i=g.length-1;i>=0;i--){const q=g[i],o=ART.aS(q.key);q.t+=FD;if(!o||q.t>o.tot+.2){g.splice(i,1);continue;}ART.drawAnim(ctx,q.key,q.t,q.x,q.y,q.k,false);}};

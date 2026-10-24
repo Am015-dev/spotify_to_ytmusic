@@ -61,7 +61,7 @@ const RUN = async (SEED) => { const process_t = window.__ts == null ? -1 : windo
       if (n < 6) return null; const p = Math.round(6 * (L.dpr || 1)); let rs = 0, nr = 0; for (let y = Math.max(0, by0 - p); y < Math.min(H, by1 + p); y += 1) for (let x = Math.max(0, bx0 - p); x < Math.min(W, bx1 + p); x += 1) { if (x >= bx0 - 2 && x <= bx1 + 2 && y >= by0 - 2 && y <= by1 + 2) continue; rs += lum(N.d, (y * W + x) * 4); nr++; }
       ls.sort((x, y) => y - x); const q4 = Math.max(3, ls.length >> 2), av = q => q.reduce((x, y) => x + y, 0) / q.length, mc = av(ls.slice(0, q4)), mk = av(ls.slice(-q4)), mr = nr ? rs / nr : 0, wc = v => (Math.max(v, mr) + .05) / (Math.min(v, mr) + .05), con = Math.max(wc(mc), wc(mk)); return { k: o.k, con: +con.toFixed(2), hue: Math.round(((Math.atan2(hy, hx) * 180 / Math.PI) + 360) % 360) }; }).filter(Boolean);
     const fsOn = row.length; out.push({ t: +S.time.toFixed(1), spread: spread == null ? null : +spread.toFixed(2), f: row.filter((_, k) => { const o = fs[k]; return o && o.x > .3 * o.h && o.x < W - .3 * o.h; }), sh });
-    if ((process_t >= 0 ? Math.abs(S.time - process_t) < .15 : Math.abs(t - 45) < 1e-6)) { shot = out.length - 1; if (window.__snap) await window.__snap(); } }
+    if ((process_t >= 0 ? Math.abs(t - process_t) < .06 : Math.abs(t - 45) < 1e-6)) { shot = out.length - 1; if (window.__snap) await window.__snap(); } }
   const steps = i; return { steps, out, shot, ms, olS: ART.olS };
 };
 (async () => {
