@@ -1,0 +1,4 @@
+# fastload-r24g (24 Oct): persistent chunk cache
+1. Built: `FST_*` loader (page head + src/10zf_fastload.js), read-ahead lazy chunk src/98zq_fastload_ahead.js, GO perf/fastload (src/99c9f_fastload_go.js), tools/perf/fastload.js; default ON, `?fc=0` off.
+2. Measured (Fast 4G, no HTTP cache): drivable 32.4 -> 22.7 s (-30 %) at CPU x1; at x6 CPU 103.5 -> 94.7 s (-8.5 %; 97.3 -> 88.1 with page+models.js HTTP-cached): boot is CPU-bound, the 40 % target is not reachable by caching alone. Cached car swap 9 ms vs 210 ms (x1). Storage throwing: boots, 0 errors, plain path.
+3. Left: index.html (3.5 MB) + models.js are not in the store (needs a service worker or HTTP caching on the host); perf/ios-reveal reports FAIL on the lab prewarm-abort also on the pre-change build (0 late links in both); wasmarcade.com Metal Slug link from Alex: a loader reference to read, not done.
