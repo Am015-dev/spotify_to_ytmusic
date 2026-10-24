@@ -113,7 +113,16 @@ const CAR=S1F.CAR={LIFE:24,X:.76,PHP:36,CHP:84,
     if(!c.open){if(c.flash>0&&G.t-(c.msg||0)>2.5){c.msg=G.t;floater(c.x-40,c.y-46,'ARMOURED: BREAK TWO PLATES','#8fa3c7');}c.hp=c.max;}
     c.arm=c.open&&(G.bc|0)+1>=c.nb;},
   /* the hull: one armoured slab joining the plates (code-drawn, no new picture), the core shut (grey shutter) or open (pulsing red) */
-  draw(c,t){const h=H*.56,w=46,o=c.open;ctx.save();ctx.translate(c.x,c.y);
+  /* W207 (RET.shipart): the hull is the carrier's own ship sheet (ship-ecarrier: flame loop, volley when the core fires, death clip on the kill); the core stays on top as the tell */
+  sheet(c,t,o){if(!RET.shipart||!RET.foeart||!RET.sprites)return false;const m=ENEMY_ART.carrier,key=FOEART.sheet(m,c.arm?'volley':'flame')||FOEART.sheet(m,'flame');if(!key)return false;
+    const sm=ART.VS[key]||ART.ANIM.s[key],sc=H*.5/sm[2],hv=key.endsWith('volley');if(hv!==!!c._va){c._va=hv;c._vs=t;}
+    ctx.save();ctx.translate(c.x,c.y);ART.drawAnim(ctx,key,hv?t-c._vs:t,0,0,sc,false);
+    if(c.flash>0){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,hv?t-c._vs:t,0,0,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}
+    const r=c.r,p=.5+.5*Math.sin(t*8);ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle=o?'rgba(255,61,106,'+(.55+.45*p)+')':'rgba(85,96,122,.85)';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=o?'#ffd0dc':'#8fa3c7';ctx.stroke();
+    if(o){ctx.beginPath();ctx.arc(0,0,r*.4,0,Math.PI*2);ctx.fillStyle='#ffffff';ctx.fill();}
+    else{ctx.strokeStyle='#8fa3c7';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-r*.7,-r*.7);ctx.lineTo(r*.7,r*.7);ctx.moveTo(-r*.7,r*.7);ctx.lineTo(r*.7,-r*.7);ctx.stroke();}
+    ctx.restore();c._fs=sc;c._fa=FOEART.fr;ART.anim('ship-ecarrier/death');return true;},
+  draw(c,t){const h=H*.56,w=46,o=c.open;if(this.sheet(c,t,o))return;ctx.save();ctx.translate(c.x,c.y);
     ctx.fillStyle='#232b3d';ctx.strokeStyle='#8fa3c7';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-w*.4,-h/2);ctx.lineTo(w,-h/2+30);ctx.lineTo(w,h/2-30);ctx.lineTo(-w*.4,h/2);ctx.lineTo(-w*.9,0);ctx.closePath();ctx.fill();ctx.stroke();
     ctx.strokeStyle='#4a5878';ctx.lineWidth=2;for(const k of[-.33,-.16,.16,.33]){ctx.beginPath();ctx.moveTo(-w*.5,k*h);ctx.lineTo(w*.9,k*h);ctx.stroke();}
     const r=c.r,p=.5+.5*Math.sin(t*8);ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle=o?'rgba(255,61,106,'+(.55+.45*p)+')':'#55607a';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=c.flash>0?'#ffffff':o?'#ffd0dc':'#8fa3c7';ctx.stroke();

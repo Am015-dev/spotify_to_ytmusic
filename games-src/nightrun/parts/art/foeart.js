@@ -9,6 +9,8 @@
    native: the sheet is drawn by SPR.foe (gunship, kamikaze, the four fleet ships). NEEDS: ids that still draw their old picture (ASSETS-NEEDED-ENEMIES.md).
    Test: nightrun/foeart-test.js (every spawnable id must be mapped or listed in NEEDS). ---------- */
 if(RET.foeart===undefined)RET.foeart=!/[?&]foeart=0/.test(location.search);
+/* RET.shipart (W207): a shot starts the unit's own volley clip (e._vt, set in eb()) even when no tell was armed; ?shipart=0 = as before */
+if(RET.shipart===undefined)RET.shipart=!/[?&]shipart=0/.test(location.search);
 /* hue turn is relative to the sheets' own colour (measured: interceptor / bomber / gunship / carrier / cruiser sit at hue 228, kamikaze at 351) */
 const ENEMY_ART=window.ENEMY_ART={
   /* core director kinds (dir.js, draw.js) */
@@ -57,9 +59,10 @@ const FOEART=window.FOEART={fr:0,built:0,cnt:0,n:{all:0,sheet:0,stand:0,by:{}},f
     ART.VS[vk]=ART.ANIM.s[src];ART.VB[vk]=cv;return vk;},
   /* draw the sheet body of e at the origin of the current transform (every call site has translated to the enemy). own: this site did not run VAR.in (dir.js, zoo.js, flankers.js do not go through draw.js) */
   body(e,t,fl,own){if(!RET.foeart||!RET.sprites)return false;const m=FOEART.map(e);if(!m)return false;
-    const act=e.arm&&ART.ANIM.s['ship-'+m.s+'/volley']?'volley':'flame',key=FOEART.sheet(m,act)||(act==='volley'?FOEART.sheet(m,'flame'):null);if(!key)return false;
+    const vol=(e.arm||(RET.shipart&&e._vt>G.t))&&ART.ANIM.s['ship-'+m.s+'/volley'],act=vol?'volley':'flame',key=FOEART.sheet(m,act)||(act==='volley'?FOEART.sheet(m,'flame'):null);if(!key)return false;
     if(own&&e.vz)VAR.in(e,t);
-    const r=e.r,w=m.w||r*m.k,sc=w/(ART.VS[key]||ART.ANIM.s[key])[2],tt=(e.t||0)+eb_(e),rot=m.rot?m.rot(e,t):0;
+    const r=e.r,w=m.w||r*m.k,sc=w/(ART.VS[key]||ART.ANIM.s[key])[2],rot=m.rot?m.rot(e,t):0;
+    let tt=(e.t||0)+eb_(e);if(RET.shipart){if(!!vol!==!!e._va){e._va=!!vol;e._vs=t;}if(vol)tt=t-e._vs;}   // the volley clip starts from its first frame
     ctx.save();if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,r-sc*(ART.VS[key]||ART.ANIM.s[key])[3]/2);if(m.ol){ctx.shadowColor='rgba(4,1,10,1)';ctx.shadowBlur=5;}ART.drawAnim(ctx,key,tt,0,0,sc,false);
     if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,0,0,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}ctx.restore();
     if(m.ov)m.ov(e,t,r,fl);

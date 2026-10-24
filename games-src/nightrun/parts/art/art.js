@@ -196,13 +196,13 @@ SPR.ship=(c,id,t,bob)=>{const cb=ART.ANIM.c['ship-'+id],bk=ART.ANIM.sm.ship_bank
   return ART.drawAnim(c,'ship-'+id+'/flame',t,cb.ox,bob+cb.oy,cb.k,false,null,SPR._sq);};
 SPR.shipDeath=()=>{const id=shipDef().id,cb=ART.ANIM.c['ship-'+id],key='ship-'+id+'/death';if(!cb||!ART.anim(key))return 0;ART.gh.push({key,x:P.x+cb.ox,y:P.y+cb.oy,k:cb.k,t:0});return ART.aS(key).tot;};
 /* ----- enemy ships: flame (loops) / volley (while the shot is armed: the beat before it fires) / death (a ghost clip where it died). Sheets face left like the old shapes; w = drawn width in world px; rot turns the nose (dives); art only, e.r stays the hitbox ----- */
-SPR.foe=(e,id,t,x,y,w,rot,fl)=>{if(!RET.sprites)return false;const b='ship-'+id+'/',fk=b+'flame';if(!ART.ANIM.s[fk]||!ART.anim(fk))return false;ART.anim(b+'death');const hv=ART.ANIM.s[b+'volley']&&ART.anim(b+'volley')&&e.arm?'volley':'flame';
+SPR.foe=(e,id,t,x,y,w,rot,fl)=>{if(!RET.sprites)return false;const b='ship-'+id+'/',fk=b+'flame';if(!ART.ANIM.s[fk]||!ART.anim(fk))return false;ART.anim(b+'death');const hv=ART.ANIM.s[b+'volley']&&ART.anim(b+'volley')&&(e.arm||(RET.shipart&&e._vt>G.t))?'volley':'flame';
   if(hv!==e._ea){e._ea=hv;e._es=t;}const key=b+hv,sc=w/ART.ANIM.s[key][2],tt=t-e._es;e._fs=sc;e._fw=w;e._fa=FOEART.fr;
   if(rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);x=0;y=0;}
   ART.drawAnim(ctx,key,tt,x,y,sc,false);if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,x,y,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}
   if(rot)ctx.restore();return true;};
 NR.on('kill',({e,boss})=>{if(!RET.sprites||boss||!e||!e._fs)return;const m=window.FOEART&&FOEART.map(e),k='ship-'+(m?m.s:e.type==='gunship'||e.type==='kamikaze'?'e'+e.type:e.type)+'/death';   // m: the foeart sheet this unit was drawn from (its own death clip)
-  if(ART.ANIM.s[k]&&ART.anim(k)&&ART.gh.length<12)ART.gh.push({key:k,x:e.x,y:e.y,k:e._fs,t:0});});
+  if(ART.ANIM.s[k]&&ART.anim(k)&&ART.gh.length<(RET.shipart?40:12))ART.gh.push({key:k,x:e.x,y:e.y,k:e._fs,t:0});});
 /* ----- on-foot actors: pose -> act (HANDOFF-SPRITES.md). The draw loop in foot.js sets ART.fE to the entity before it draws (it carries the act start); Kai's extra acts arrive in e._xa. Feet are the anchor (bottom-centre); the cell is drawn h tall, so the old hit box is unchanged. A missing sheet / ?sprites=0 = the stills and shapes ----- */
 {const H=(o)=>Object.assign({idle:'idle','run-a':'run','run-b':'run',run:'run',shoot:'shoot',melee:'melee',die:'die',jump:'jump',fall:'jump'},o||{}),M={idle:'idle',shoot:'shoot',die:'die','run-a':'idle','run-b':'idle',jump:'idle',fall:'idle',crouch:'idle','crouch-shoot':'shoot',melee:'idle'};
 ART.FM={kai:H({hit:'hurt','crouch-shoot':'crouchshoot'}),grunt:H(),gunman:H(),shield:H(),bruiser:H(),knife:H(),sniper:H(),warden:H({attack2:'melee',enrage:'idle'}),drone:M,turret:M,mech:M,
