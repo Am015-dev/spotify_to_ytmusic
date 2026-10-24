@@ -88,7 +88,7 @@ function LIFE_geos(){const fra=CID==='fra',P=Math.PI;
   planter:LIFE_g([[LB(.9,.55,.9),'#b85a3a',0,.28,0],[LS(.42,7),'#3aa046',0,.75,0],[LS(.14,5),'#ff4c8c',.2,1,.1],[LS(.14,5),'#ffd12c',-.2,.95,-.1]]),
   bin:LIFE_g([[LC(.32,.28,.95,10),'#3a8a4a',0,.48,0],[LC(.35,.35,.08,10),'#2a6a3a',0,.98,0]])};
  const pop=new THREE.IcosahedronGeometry(1.4,1),ring=new THREE.TorusGeometry(2.6,.22,6,24);colorize(pop,new THREE.Color('#ffffff'));colorize(ring,new THREE.Color('#ffffff'));
- const TB=LIFE.pre&&'tb'in LIFE.pre?LIFE.pre.tb:LIFE_ldTurb();LIFE.TB=TB&&TB.hub;if(TB)S.turbine=TB.geo;/* life-2: real 7747 turbine */
+ const TB=LIFE.pre&&'tb'in LIFE.pre?LIFE.pre.tb:LIFE_ldTurb();LIFE.TB=TB&&TB.hub;LIFE.TBG=TB&&TB.geo;if(TB)S.turbine=TB.geo;/* life-2: real 7747 turbine */
  return{S,Q,ball,dog,fig,torso,arms,M,pop,ring}}
 // ---------- pools: name → InstancedMesh (count set per frame; invisible while empty, so an empty pool costs no draw call)
 const LIFE_CAP={set:14,setM:14,prop:18,ball:14,dog:6,fig:180,sm:44,pop:8,bm:8};if(typeof LOWMEM!=='undefined'&&LOWMEM)LIFE_CAP.bm=3;// crash-5: the batched pools copy every geometry bm times (no addInstance before three r166): 8 -> 3 copies on low-mem phones = -23 MB CPU+GPU in Athens// bm: copies of each type in the batched pools (one draw call for all types)
@@ -215,7 +215,9 @@ const LIFE_LD=()=>LIFE.ldOn!==false&&!/[?&]ldlm=0/.test(location.search)&&typeof
 function LIFE_ldTurb(){if(!LIFE_LD()||!LD_MODELS.lxwt_base)return null;const one=L=>{const G=L.map(([g])=>g);const g=G.length>1?mergeGeometries(G):G[0];return g};
  const base=one(LIFE_ldM(LD_br('lxwt_base'))),rot=one(LIFE_ldM(LD_br('lxwt_rotor')));rot.computeBoundingBox();let rs=rot.boundingBox.getSize(new THREE.Vector3());
  if(rs.x<rs.z){base.rotateY(Math.PI/2);rot.rotateY(Math.PI/2)}base.computeBoundingBox();rot.computeBoundingBox();const bb=base.boundingBox.clone().union(rot.boundingBox),c=rot.boundingBox.getCenter(new THREE.Vector3()),bc=bb.getCenter(new THREE.Vector3()),S=16/(bb.max.y-bb.min.y);
- base.translate(-bc.x,-bb.min.y,-bc.z);base.scale(S,S,S);rot.translate(-c.x,-c.y,-c.z);rot.scale(S,S,S);
+ /* turbine-r24c (Alex: "turbin is moving out of head"): the bbox centre of a 3-blade rotor is ~1.9 m below its hub, so it spun about a point under the nacelle. The blades are 3-fold symmetric, so the mean of the rotor vertices IS the hub: centre the rotor there, and seat it 0.35 m forward so it clears the nacelle front */
+ const hp=rot.attributes.position.array;let hx=0,hy=0;for(let i=0;i<hp.length;i+=3){hx+=hp[i];hy+=hp[i+1]}hx/=hp.length/3;hy/=hp.length/3;c.x=hx;c.y=hy;c.z+=.35/S;
+ base.translate(-bc.x,-bb.min.y,-bc.z);base.scale(S,S,S);rot.translate(-c.x,-c.y,-(c.z-.35/S));rot.scale(S,S,S);
  for(const g of[base,rot])g.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*2),2));
  const bs=bb.getSize(new THREE.Vector3());return{geo:[base,rot],hub:{x:(c.x-bc.x)*S,y:(c.y-bb.min.y)*S,z:(c.z-bc.z)*S},w:bs.x*S,d:bs.z*S}}
 function LIFE_ldLm(fra){const p=fra?'lxfw':'lxmg';if(!LIFE_LD()||!LD_MODELS[p+'_base']||typeof LDW_geo!=='function')return null;
@@ -270,6 +272,8 @@ function LIFE_ringCam(x,y,z){const cp=camera.position;return(cp.x-x)**2+(cp.z-z)
 const LIFE_PA=[];LIFE_PA.n=0;function LIFE_pp(){const P=LIFE_PA,B=_lfB;let r=P[P.n];if(!r)r=P[P.n]=[0,0,0,0,0,0];r[0]=B[0];r[1]=B[1];r[2]=B[2];r[3]=B[3];r[4]=B[4];r[5]=B[5];P.n++}
 // perf-r13i: the per-pool instance counters are two reused objects (static / dynamic pass), zeroed per call, not a fresh dictionary per frame
 const LIFE_CN=[{},{}];function LIFE_cnt(S){const o=LIFE_CN[S?1:0];for(const k in o)o[k]=0;return o}
+// turbine pose, one source for the draw and the GO: the rotor mesh is centred on its hub (LIFE_ldTurb), so it spins about the hub at the nacelle
+function LIFE_tbA(it,tt){const H=LIFE.TB;if(H){const c=Math.cos(it.h),sn=Math.sin(it.h);_lfA[0]=it.x+H.x*c+H.z*sn;_lfA[1]=it.y+H.y;_lfA[2]=it.z-H.x*sn+H.z*c}else{_lfA[0]=it.x+Math.sin(it.h)*1.2;_lfA[1]=it.y+13.2;_lfA[2]=it.z+Math.cos(it.h)*1.2}_lfA[3]=0;_lfA[4]=it.h;_lfA[5]=tt*2.2;_lfA[6]=1}
 function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt=LIFE_cnt(S),sp=Math.abs(RO.v),air=!!(typeof pl!=='undefined'&&pl&&pl.air),dr=!!RO.dDir,stunt=air||dr&&sp>8;LIFE.ci=LIFE.ci||[];
  let cheer=0;
  for(const it of S?LIFE.L:LIFE.D){const dx=it.x-RO.x,dz=it.z-RO.z,d2=dx*dx+dz*dz;
@@ -277,7 +281,7 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt=LIFE_cnt(S),sp=Math
   else if(it.c==='pop'){const kk=it.kk,hy=kk?kk.y0-it.y+LIFE_KK.hgt+2.4:3.2;if(kk)(_lfA[0]=it.x,_lfA[1]=kk.y0,_lfA[2]=it.z,_lfA[3]=0,_lfA[4]=it.h,_lfA[5]=0,_lfA[6]=1,LIFE_put(M.kick,cnt));const busy=it.cd>t;if(busy)continue;/* r8: never draw the 6 m marker ring (2.6 x 2.3) with the camera inside it or within 1.5 m of its rim (v88v torus rule): at the Athens spawn the camera sat 1.7 m from a ring centre = the cyan ellipse/arc over the lower screen. 7.5 m from the centre the car (~6 m ahead of the camera) is already in the 4.2 m pickup */if(LIFE_ringCam(it.x,it.y,it.z)){LIFE.ringCam=(LIFE.ringCam||0)+1;continue}const i=(_lfA[0]=it.x,_lfA[1]=it.y+.35,_lfA[2]=it.z,_lfA[3]=Math.PI/2,_lfA[4]=0,_lfA[5]=0,_lfA[6]=2.3,LIFE_put(M.ring,cnt));/* r3E: a flat ground ring like every other marker; the floating translucent sphere over the lane is gone */if(i>=0){_lfC.set(it.K.col);M.ring.setColorAt(i,_lfC)}}
   else if(it.c==='set'){const T=it.t,tt=t+it.ph;(_lfA[0]=it.x,_lfA[1]=it.y,_lfA[2]=it.z,_lfA[3]=0,_lfA[4]=it.h,_lfA[5]=0,_lfA[6]=1,LIFE_put(M[it.ks||(it.ks='s_'+T)],cnt));const m=M[it.km||(it.km='m_'+T)];
    if(T==='windmill')(_lfA[0]=it.x+Math.sin(it.h)*1.25,_lfA[1]=it.y+7.2,_lfA[2]=it.z+Math.cos(it.h)*1.25,_lfA[3]=0,_lfA[4]=it.h,_lfA[5]=tt*1.4,_lfA[6]=1,LIFE_put(m,cnt));
-   else if(T==='turbine'){const H=LIFE.TB;if(H){const c=Math.cos(it.h),sn=Math.sin(it.h);(_lfA[0]=it.x+H.x*c+H.z*sn,_lfA[1]=it.y+H.y,_lfA[2]=it.z-H.x*sn+H.z*c,_lfA[3]=0,_lfA[4]=it.h,_lfA[5]=tt*2.2,_lfA[6]=1,LIFE_put(m,cnt))}else (_lfA[0]=it.x+Math.sin(it.h)*1.2,_lfA[1]=it.y+13.2,_lfA[2]=it.z+Math.cos(it.h)*1.2,_lfA[3]=0,_lfA[4]=it.h,_lfA[5]=tt*2.2,_lfA[6]=1,LIFE_put(m,cnt))}
+   else if(T==='turbine'){LIFE_tbA(it,tt);LIFE_put(m,cnt)}
    else if(T==='fountain'){const i=(_lfA[0]=it.x,_lfA[1]=it.y+2.2,_lfA[2]=it.z,_lfA[3]=0,_lfA[4]=tt,_lfA[5]=0,_lfA[6]=1,LIFE_put(m,cnt));if(i>=0){_lfS.set(1,1+Math.sin(tt*5)*.18+Math.sin(tt*3.1)*.12,1);_lfM.compose(_lfP,_lfQ,_lfS);m.setMatrixAt(i,_lfM)}}
    else if(T==='banner')(_lfA[0]=it.x,_lfA[1]=it.y+6.3,_lfA[2]=it.z,_lfA[3]=0,_lfA[4]=it.h+Math.sin(tt*1.7)*.5,_lfA[5]=Math.sin(tt*4.3)*.06,_lfA[6]=1,LIFE_put(m,cnt));
    else if(T==='billboard')(_lfA[0]=it.x,_lfA[1]=it.y+5.3,_lfA[2]=it.z,_lfA[3]=0,_lfA[4]=tt*.7,_lfA[5]=0,_lfA[6]=1,LIFE_put(m,cnt));
@@ -425,7 +429,24 @@ function LIFE_goLmLd(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const
  setTimeout(()=>{const turn=Math.abs(lm.spin.rotation[lm.ax]-a0);let tilt=0;if(D&&fra){lm.g.updateMatrixWorld(true);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),u=new THREE.Vector3();lm.g.traverse(o=>{if(!o.isInstancedMesh)return;for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);M.premultiply(o.matrixWorld);M.decompose(u,Q,new THREE.Vector3());u.set(0,1,0).applyQuaternion(Q);tilt=Math.max(tilt,Math.acos(Math.min(1,u.y))*180/Math.PI)}})}
   const sz=D?(fra?D.h:Math.max(D.w,D.d)):0,okS=fra?sz>=20&&sz<=30&&n>=30:sz>=14&&sz<=20&&n>=9,ok=!!D&&okS&&turn>.1&&tilt<2&&!!LIFE.TB;window.__chk=window.__chk||{};window.__chk.lmld={sz,n,turn,tilt,tb:!!LIFE.TB,ok};
   say(`📍 ${lm.k.toUpperCase()} (real LEGO set ${fra?'3681':'3668'}): ${D?sz.toFixed(1)+' m '+(fra?'tall':'wide')+', '+n+' parts':'stand-in ❌'}, turned ${turn.toFixed(2)} rad`+(fra?`, seats tilt ${tilt.toFixed(1)}°`:'')+`, turbines ${LIFE.TB?'7747':'stand-in'} `+(ok?'✅':'❌'))},2000);return r}
+// GO (turbine-r24c, Alex 24 Oct: "turbin is moving out of head"): for every turbine (the real ones near 60 street spots + 8 yaws) the rotor hub is within 0.5 m of the nacelle front
+// at the top of the tower, stays put (< 5 cm) while the blades spin for 2 s, and the blade tips really move
+function LIFE_goTurb(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const G=LIFE.TBG;if(!G||!LIFE.TB)return'📍 turbine stand-in, the real 7747 set is not loaded ❌';
+ const [B,R]=G,bp=B.attributes.position.array,rp=R.attributes.position.array;B.computeBoundingBox();const yt=B.boundingBox.max.y;let x0=1e9,x1=-1e9,y0=1e9,z1=-1e9;
+ for(let i=0;i<bp.length;i+=3)if(bp[i+1]>yt-2){x0=Math.min(x0,bp[i]);x1=Math.max(x1,bp[i]);y0=Math.min(y0,bp[i+1]);z1=Math.max(z1,bp[i+2])}
+ const nac=[(x0+x1)/2,(y0+yt)/2,z1];let hx=0,hy=0,hz=0,n=rp.length/3;for(let i=0;i<rp.length;i+=3){hx+=rp[i];hy+=rp[i+1];hz+=rp[i+2]}hx/=n;hy/=n;hz=0;/* the hub sits on the rotor mesh's own plane (its z origin), the spin axis is z through it */
+ let tip=[0,0,0],tr=0;for(let i=0;i<rp.length;i+=3){const r=Math.hypot(rp[i]-hx,rp[i+1]-hy);if(r>tr){tr=r;tip=[rp[i],rp[i+1],rp[i+2]]}}
+ const W=(q,it,tt)=>{LIFE_tbA(it,tt);const c=Math.cos(_lfA[5]),s=Math.sin(_lfA[5]),h=it.h,ch=Math.cos(h),sh=Math.sin(h),x1=q[0]*c-q[1]*s,y1=q[0]*s+q[1]*c;return[_lfA[0]+x1*ch+q[2]*sh,_lfA[1]+y1,_lfA[2]-x1*sh+q[2]*ch]};
+ const items=[];for(let k=0;k<8;k++)items.push({x:500,y:3,z:-200,h:k*Math.PI/4+.3,ph:k*.7});let real=0;
+ try{const seen=new Set();for(const p of LIFE_samples(60))for(const it of LIFE_win(p.x,p.z,300).set)if(it.t==='turbine'){const key=Math.round(it.x)+','+Math.round(it.z);if(seen.has(key))continue;seen.add(key);items.push(it);real++}}catch(e){}
+ let dMax=0,drift=0,move=1e9;for(const it of items){const t0=it.ph||0,hub=W([hx,hy,hz],it,t0),nw=W(nac,it,0);LIFE_tbA(it,0);const nb=[it.x+nac[0]*Math.cos(it.h)+nac[2]*Math.sin(it.h),it.y+nac[1],it.z-nac[0]*Math.sin(it.h)+nac[2]*Math.cos(it.h)];
+  dMax=Math.max(dMax,Math.hypot(hub[0]-nb[0],hub[1]-nb[1],hub[2]-nb[2]));for(let k=1;k<=20;k++){const q=W([hx,hy,hz],it,t0+k*.1/2.2*2.2);drift=Math.max(drift,Math.hypot(q[0]-hub[0],q[1]-hub[1],q[2]-hub[2]))}
+  const a=W(tip,it,t0),b=W(tip,it,t0+.5);move=Math.min(move,Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]))}
+ const ok=dMax<=.5&&drift<=.05&&move>1;window.__chk=window.__chk||{};window.__chk.turb={n:items.length,real,dMax,drift,move,ok,at:items.slice(8,11).map(i=>[Math.round(i.x),Math.round(i.z),+i.h.toFixed(2)])};
+ return`📍 TURBINE ${CID}: ${items.length} turbines (${real} real) · hub ${dMax.toFixed(2)} m from the nacelle front (max 0.5) · hub drifts ${(drift*100).toFixed(1)} cm while the blades spin 2 s (max 5) · blade tip moves ${move.toFixed(1)} m in 0.5 s `+(ok?'✅':'❌')}
 // by name, so a hot reload of one GO function takes effect
 const LIFE_GOS={'fra-density':{fn:s=>LIFE_go(s)},'ath-density':{fn:s=>LIFE_go(s)},'smash':{fn:s=>LIFE_goSmash(s)},
- 'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'fra-variety':{fn:s=>LIFE_goVar(s)},'fra-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-variety':{fn:s=>LIFE_goVar(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
-window.__life={init:LIFE_init,ringCam:LIFE_ringCam,CELL:LIFE_CELL,hit:LIFE_hit,SETR:LIFE_SETR,ldLm:LIFE_ldLm,setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
+ 'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'fra-variety':{fn:s=>LIFE_goVar(s)},'fra-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-landmark':{fn:s=>LIFE_goLmLd(s)},'fra-turbine':{fn:s=>LIFE_goTurb(s)},'ath-turbine':{fn:s=>LIFE_goTurb(s)},'ath-variety':{fn:s=>LIFE_goVar(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
+{const rg=setInterval(()=>{const C=window.__chk;if(!C||!C.GO||!C.items)return;clearInterval(rg);/* registered here: 99c_checklist.js is at its 200 KB cap */
+ for(const [id,c] of [['fra-turbine','fra'],['ath-turbine','ath']]){C.items.push({ver:'life2',id,area:'world',text:'turbine-r24c · Alex: "turbin is moving out of head". Every wind turbine in '+(c==='fra'?'Frankfurt':'Athens')+': the 3-blade rotor spins about its hub at the nacelle on top of the tower, not about a point below it (📍 GO: hub ≤ 0.5 m from the nacelle front, drifts < 5 cm while spinning, blades turn).'});C.GO['life2/'+id]=[{c,n:'wind turbine hub (real set)',fn:()=>LIFE_goTurb(()=>{})}]}},500)}
+window.__life={init:LIFE_init,ldTurb:LIFE_ldTurb,warp:(x,z,h)=>roamWarp(x,z,h),ringCam:LIFE_ringCam,CELL:LIFE_CELL,hit:LIFE_hit,SETR:LIFE_SETR,ldLm:LIFE_ldLm,setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
