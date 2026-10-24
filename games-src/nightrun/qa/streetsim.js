@@ -2,7 +2,7 @@
 // STREETSIM: the street stage (zeil) in fast stepped simulation, no drawing, no rAF, no wall clock (FOOT.sim(1, 1/60) loops), >= 100x real time.
 // Bots: idle (no input), nearest (street2-test's human-style bot, shoots the nearest foe), gfirst (streethard-test's gunner-first bot with ducking), dodge (gunner-first, reacts to every telegraph
 // in 0.1 s and always ducks level shots). Seeds are fixed (4321 + i * 7919), so a run is reproducible: ONLY=bot:seed prints that one run's record.
-//   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/streetsim.js     env: RUNS=50 (per bot)  PAR=1 (pages)  BOTS=idle,nearest,gfirst,dodge  OUT=<md>  RT=0 (skip the real-time check)  GATE=0 (numbers only)
+//   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/streetsim.js     env: RUNS=50 (per bot)  PAR=1 (pages)  BOTS=idle,nearest,gfirst,dodge(,melee,parry)  OUT=<md>  RT=0 (skip the real-time check)  GATE=0 (numbers only)
 // Gates (PASS/FAIL): no NaN/stuck  idle bot dies  best bot clears 50-80%  threat peak 80-90% (median over runs)  whole suite < 3 min  speed >= 100x  one seed equals a real-time run (deaths within 1 s)
 // Records per run: cleared/died and when, hearts lost and to what, time to kill per foe type, gunner calls, cover blocks, shots dodged by ducking, threat curve (live foe weight each second) and its peak,
 // seconds Kai stood still, NaN / stuck / lingering-foe checks.
@@ -53,7 +53,14 @@ const BELT = "I.l = p.x < P.x; }\n    if (RET.belt && P.z != null) { I.u = I.d =
 // W184 melee bot (?combo=1): nearest-first that closes in, drops the gun and chains the knife; once a string has started it keeps swinging (a player mashing KNIFE)
 const MELEE = "{ const cand = live.filter(e => !e.boss && !e.fly && !e.hid && Math.abs(e.x - P.x) < 460), pair = cand.filter(e => cand.some(o => o !== e && Math.sign(o.x - P.x) === Math.sign(e.x - P.x) && Math.abs(o.x - P.x) > Math.abs(e.x - P.x) && Math.abs(o.x - e.x) < 220 && (e.z == null || Math.abs(o.z - e.z) <= .15))), mt = (pair.length ? pair : cand).sort((a, b) => Math.abs(a.x - P.x) - Math.abs(b.x - P.x))[0] || null; if (mt && Math.abs(mt.x - P.x) < 460) { const dx = mt.x - P.x; I.fire = 0; I.l = I.r = 0; P.facing = dx > 0 ? 1 : -1; if (Math.abs(dx) > 48) I[dx > 0 ? 'r' : 'l'] = 1;" +
   " const cb = S.cmb || {}, mid = cb.n > 0 && cb.n < 3 && S.time - (cb.t0 + .2) < .3; if (P.melCd <= 0 && (mid || Math.abs(dx) < 58 && (mt.z == null || Math.abs(mt.z - P.z) < .12))) I.meleeP = 1; } }\n";
-const CODE = { nearest: RUN.replace(BEND, BELT.replace('__DZ__', 'false')), gfirst: RUNG.replace(BEND, BELT.replace('__DZ__', 'false')), dodge: RUND.replace(BEND, BELT.replace('__DZ__', 'true')), melee: RUN.replace(DUCK, MELEE + DUCK).replace(BEND, BELT.replace('__DZ__', 'false')) };
+// W192 parry bot (?guard2): the dodge bot's answers to the boss and the hound, but no stepping out of line: it waits for each attack and raises the guard ~0.1 s before it lands
+// (a parry), faces the threat, then shoots the OPEN foe. PJ=0.3: a human-like bot that raises it up to 0.3 s too early (a block, not a parry)
+const PARRYB = "{ const PJ = " + (+process.env.PJ || 0) + "; const g = S.gd || {}; let src = null; for (const e of live) { if (e.boss || (e.z != null && Math.abs(e.z - P.z) > .15)) continue; const dx = e.x - P.x, atk = /lunge|charge|swing|slam|bash|stomp|pounce/.test(e.state || ''), ttc = (Math.abs(dx) - 34) / Math.max(120, Math.abs(e.vx || 0)), lead = .12 + PJ * (e._pj == null ? (e._pj = Math.random()) : e._pj);" +
+  " if (Math.abs(dx) < 260 && ((atk && ttc < lead) || ((e.tele > 0 && e.tele < .08) || (e.wind > 0 && e.wind < .08)) && Math.abs(dx) < 110)) { src = e; break; } }" +
+  " if (!src) for (const b of S.eb) { if (b.z != null && Math.abs(b.z - P.z) > .15) continue; const t = (P.x - b.x) / (b.vx || 1e-6); if (t > 0 && t < .1 && Math.abs(b.y - (P.y - 34)) < 50) { src = b; break; } }" +
+  " if (src) { P.facing = src.x > P.x ? 1 : -1; if (!g.on) I.guardP = 1; I.guard = 1; I.l = I.r = 0; I.d = 0; } else I.guard = 0;" +
+  " const op = live.find(e => e._opn > S.time); if (op && !src) { P.facing = op.x > P.x ? 1 : -1; I.fire = 1; } }\n";
+const CODE = { nearest: RUN.replace(BEND, BELT.replace('__DZ__', 'false')), gfirst: RUNG.replace(BEND, BELT.replace('__DZ__', 'false')), dodge: RUND.replace(BEND, BELT.replace('__DZ__', 'true')), melee: RUN.replace(DUCK, MELEE + DUCK).replace(BEND, BELT.replace('__DZ__', 'false')), parry: RUND.replace(DUCK, PARRYB + DUCK).replace(BEND, BELT.replace('__DZ__', 'false')) };
 
 // W187: the getter below also fires a full OVERDRIVE for the bot when 3 foes are near
 // ---- in the page: telemetry wrapped round FOOT.ctl (called once per update step, before the step), then the bot / idle run
@@ -97,7 +104,7 @@ const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); w
     RET.tale = false; FOOT.start('zeil'); let S = FOOT.S; for (let j = 0; j < 200 && S && !S.end; j++) S = FOOT.sim(1, 1 / 60); S = FOOT.S; r = { clear: !!(S.end && S.end.cleared), time: +S.time.toFixed(1), hp: S.P.hp, hurts: S.hurts, kills: S.kills }; }
   else { window.__gf = ${bot !== 'nearest'}; r = (${codeFn})(${seed}); }
   const ms = performance.now() - w0, S = FOOT.S, T = window.__T, sh = S.sh || {}, s3 = S.s3 || {};
-  const tu = {}; r.zmiss = S.zmiss | 0; r.cmb = S.cmb || null; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
+  const tu = {}; r.zmiss = S.zmiss | 0; r.cmb = S.cmb || null; r.gd = S.gd ? { b: S.gd.blocks, p: S.gd.parries, rf: S.gd.refl, br: S.gd.breaks, mx: +S.gd.maxOn.toFixed(2) } : null; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
   r.tel = { tr: T.tr, stuckBoss: T.stuckBoss, mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, far: T.far || 0, lingerInfo: T.lingerInfo, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
     called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' '), od: FOOT.OD && FOOT.OD.log, combo: window.FOOT.COMBO ? FOOT.COMBO.best : -1, bnc: window.FOOT.COMBO ? FOOT.COMBO.bounces : 0 };
   try { FOOT.stop(); } catch (e) {} un(); return r; })()`;
@@ -196,6 +203,11 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
     L(band >= .25 && used >= 6, `W173 D1 floor band >= 25% of the view (${(100 * band).toFixed(0)}%) and actors use >= 60% of it (${used * 10}% of depth slices hold >= 2% of actor time)`);
     L(zh + zm > 0 && zm / (zm + zh) >= .3, `W173 D2 the dodge bot avoids >= 30% of attacks by depth (${zm} out-of-depth misses vs ${zh} hits = ${(100 * zm / Math.max(1, zm + zh)).toFixed(0)}%)`);
     L(sp != null && sp >= .3, `W173 D3 median depth spread of foes near Kai >= 30% of the band (${sp == null ? '-' : (100 * sp).toFixed(0) + '%'})`); }
+  if (BOTS.includes('parry')) { const gd = ok0.filter(o => o.j.bot === 'parry').map(o => o.r.gd || { b: 0, p: 0, rf: 0, br: 0, mx: 0 }), ps = gd.map(x => x.p), mx = Math.max(0, ...ok0.filter(o => o.r.gd).map(o => o.r.gd.mx));   // W192
+    console.log(`INFO parry bot: parries/run median ${med(ps)} mean ${mean(ps).toFixed(1)}, blocks/run ${mean(gd.map(x => x.b)).toFixed(1)}, reflected slugs/run ${mean(gd.map(x => x.rf)).toFixed(1)}, guard breaks/run ${mean(gd.map(x => x.br)).toFixed(1)}, longest guard ${mx} s`);
+    if (rows.dodge) L(rows.parry.hearts <= .7 * rows.dodge.hearts, `W192 the parry bot loses >= 30% fewer hearts than the dodge bot (${rows.parry.hearts.toFixed(2)} vs ${rows.dodge.hearts.toFixed(2)} per run)`);
+    L(mean(ps) >= 5, `W192 >= 5 parries per run for the parry bot (mean ${mean(ps).toFixed(1)})`);
+    L(mx <= .6 + 1e-6, `W192 the guard never covers Kai for > 0.6 s in a row (longest ${mx} s)`); }
   if (BOTS.includes('melee')) { const cs = ok0.filter(o => o.j.bot === 'melee' && o.r.cmb).map(o => o.r.cmb), sum = k => cs.reduce((a, c) => a + (c[k] | 0), 0), st = sum('strings'), c3 = sum('c3'), fin = sum('fin'), f2 = sum('fin2');
     L(st >= 50 && c3 / st >= .6, `W184 knife chains of 3 in >= 60% of the melee bot's strings (${c3} of ${st} strings = ${(100 * c3 / Math.max(1, st)).toFixed(0)}%)`);
     L(fin >= 20 && f2 / fin >= .25, `W184 >= 25% of finishers hit a second foe (${f2} of ${fin} = ${(100 * f2 / Math.max(1, fin)).toFixed(0)}%)`);
