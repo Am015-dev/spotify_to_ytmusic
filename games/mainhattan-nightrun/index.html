@@ -1622,14 +1622,16 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     let cx=x+r;for(const it of items){const K=PWK[it.k];ctx.save();ctx.translate(cx,y-4*k);ctx.fillStyle='#05030cb0';ctx.beginPath();ctx.arc(0,0,r+3*k,0,7);ctx.fill();
       ctx.lineWidth=2.6*k;ctx.strokeStyle='#ffffff2a';ctx.beginPath();ctx.arc(0,0,r+1*k,0,7);ctx.stroke();ctx.strokeStyle=K.c;ctx.beginPath();ctx.arc(0,0,r+1*k,-Math.PI/2,-Math.PI/2+6.2832*it.f);ctx.stroke();
       this.coin(it.k,r-4*k);ctx.restore();cx+=2*r+10*k;}},
-  hud(t,x0,y0,k){const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null}));
+  hud(t,x0,y0,k){const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null,lv:window.__pw3&&__pw3.PW3L[a.k]?(a.l3||1):0}));
     if(s.drop){const d=s.drop,p=bpos();items.push({k:'drop',rem:d.blastB-p,tot:d.blastB-d.b0,txt:p<d.cutB?'CUT ON THE DOWNBEAT':'BLAST IN '+Math.max(1,Math.ceil((d.blastB-p)/4))+' BAR'});}
     let y=y0==null?112:y0;
     for(const it of items){const K=PWK[it.k],n=Math.round(it.tot/4),bw=132,sw=bw/n;ctx.save();ctx.translate(x0,y);ctx.scale(k,k);
       ctx.fillStyle='#05030cb0';ctx.fillRect(-6,-20,232,40);
       ctx.translate(14,0);this.coin(it.k,11);ctx.translate(-14,0);
-      ctx.textAlign='left';ctx.font='700 14px "Chakra Petch",sans-serif';ctx.fillStyle=K.c;ctx.fillText(K.n,32,-3);
-      ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#e9e6ff';ctx.fillText(it.txt||Math.max(1,Math.ceil(it.rem/4))+(Math.ceil(it.rem/4)>1?' BARS':' BAR'),220,-3);
+      ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#e9e6ff';const rt=it.txt||Math.max(1,Math.ceil(it.rem/4))+(Math.ceil(it.rem/4)>1?' BARS':' BAR');ctx.fillText(rt,220,-3);
+      const room=220-ctx.measureText(rt).width-32-10,nm=K.n+(it.lv?'  LV'+it.lv:'');let nf=14;ctx.textAlign='left';ctx.font='700 14px "Chakra Petch",sans-serif';   // name and level are ONE label that shrinks to the room left of the time: the two never touch
+      while(nf>9&&ctx.measureText(nm).width>room){nf-=.5;ctx.font='700 '+nf+'px "Chakra Petch",sans-serif';}
+      ctx.fillStyle=K.c;ctx.fillText(nm,32,-3,Math.max(20,room));
       for(let i=0;i<n;i++){const f=clamp(it.rem/4-i,0,1);ctx.fillStyle='#ffffff26';ctx.fillRect(32+i*sw,8,sw-2,5);ctx.fillStyle=K.c;ctx.fillRect(32+i*sw,8,(sw-2)*f,5);}
       ctx.restore();y+=46*k;}}
 };
@@ -4981,7 +4983,7 @@ function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv
   const vw=Math.min(760,cw/sc),hpx=Math.round(VH*sc);cx+=Math.round((cw-vw*sc)/2);
   cy=mode==='port'?Math.max(0,Math.round((ch-hpx)*.5)):Math.round((H-hpx)/2);
   L.sc=sc;L.vw=vw;L.mode=mode;L.box={x:cx,y:cy,w:Math.round(vw*sc),h:hpx};
-  const full=mode==='land',ox=full?0:cx,oy=full?0:cy,ow=full?W:L.box.w,oh=full?H:hpx;   // landscape: the canvas is the whole screen, the backdrop runs under the pad
+  const full=mode==='land'||RET.purefoot&&mode==='full',ox=full?0:cx,oy=full?0:cy,ow=full?W:L.box.w,oh=full?H:hpx;   // landscape: the canvas is the whole screen, the backdrop runs under the pad
   L.ox=ox;L.oy=oy;L.exl=(cx-ox)/sc;L.exr=(ow-(cx-ox)-L.box.w)/sc;
   const cv=L.cv;cv.style.left=ox+'px';cv.style.top=oy+'px';cv.style.width=ow+'px';cv.style.height=oh+'px';cv.width=Math.round(ow*dpr);cv.height=Math.round(oh*dpr);L.dpr=dpr;
   const show=T,auto=autoOn(),set=(el,x,y,s)=>{el.hidden=!show;el.style.display=show?'':'none';el.style.left=Math.round(x)+'px';el.style.top=Math.round(y)+'px';if(s){el.style.width=el.style.height=Math.round(s)+'px';}};
@@ -5404,7 +5406,7 @@ SL.face=(P,hit)=>{const S=F.S,vw=IN.L().vw;let ah=0,bh=0;for(const e of S.E){if(
   if(!ah&&bh)P.facing=-P.facing;};
 
 /* ----- the scale for this frame and the height map (world y -> drawn y; the road line and everything under it stay put) ----- */
-function slFrame(L){const VV=SL.port?SL.VV:L.box.h/L.sc,K=Math.max(1,.225*VV/CH),t0=VH-VV,room=FL-t0-14-62*K;   // room: drawn height above the road a 58-unit flyer's feet may use
+function slFrame(L,m){const VV=SL.port?SL.VV:L.box.h/L.sc,K=Math.max(1,.225*(m||1)*VV/CH),t0=VH-VV,room=FL-t0-14-62*K;   // room: drawn height above the road a 58-unit flyer's feet may use
   SL.VV=VV;SL.k=K;SL.t0=t0;SL.d0=Math.min(150,room*.8/K);SL.s=clamp((room-K*SL.d0)/(DTOP-SL.d0),.25,K);SL.band=RET.belt?Math.round(.27*VV):0;SL.z=null;}   // W173 belt: the floor band is 27% of the view tall, its front edge on the old road line
 const my=y=>{const d=FL-y;if(d<=0)return y;const K=SL.k,d0=SL.d0;return FL-(d<=d0?d*K:d0*K+(d-d0)*SL.s);};
 SL.my=my;
@@ -5456,7 +5458,8 @@ SL.paint=0;
 function slPainted(c,x0,w,cam,t0){const P={};for(const l of PLY){const q=slPic('bg-'+l);if(!q||!q.width)return false;P[l]=q;}
   const FR=FL-(SL.band||0),DH=(FR-t0)/.8,TW=2*DH,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;for(;x<x0+w;x+=TW)c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
   const H=P.sky.height;tile('sky',t0-4,FR-t0+8,0,RET.artfix?Math.min(H,Math.round(H*(FR-t0+8)/DH)):H);/* artfix: the sky keeps its own aspect (only the rows above the street line, not the whole picture squeezed into them) */for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
-  const DF=Math.max(DH,(VH+2-FR)/.2),fy=FR-.8*DF,r0=.69;tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
+  const DF=Math.max(DH,(VH+2-FR)/.2),fy=FR-.8*DF,r0=.69;if(RET.purefoot){const H2=P.floor.height,a=Math.round(r0*H2),e=Math.round(.9*H2),y0=fy+r0*DF;tile('floor',y0,Math.max((e-a)*DF/H2,VH+2-y0),a,e-a);}   /* W217 purefoot: the debris strip at the bottom of the floor picture is left out; the wet road rows reach the screen edge (stretched down, nearer road) */
+  else tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
   SL.paint=1;return true;}
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,FR=FL-(SL.band||0),fh=FR-t0;
   if(slPainted(c,x0,w,cam,t0)){SL.x0=x0;if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FR,S.time);return;}SL.paint=0;
@@ -10337,10 +10340,7 @@ if(PW3.on){
     ctx.restore();});
   /* ----- the level on the HUD: 'LV3' on the power's bar (desktop list) and next to its round chip (phone strip) ----- */
   const lvTag=(it,x,y,fs)=>{ctx.save();ctx.font='700 '+fs+'px "Share Tech Mono",monospace';ctx.textAlign='left';ctx.fillStyle=PWK[it.k].c;ctx.fillText('LV'+it.lv,x,y);ctx.restore();};
-  {const hd=PW.hud;PW.hud=function(t,x0,y0,k){hd.call(this,t,x0,y0,k);const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;let y=y0==null?112:y0;
-    for(const a of s.act){if(PW3L[a.k]){ctx.save();ctx.translate(x0,y);ctx.scale(k,k);ctx.font='700 14px "Chakra Petch",sans-serif';const w=ctx.measureText(PWK[a.k].n).width;ctx.restore();
-        ctx.save();ctx.translate(x0,y);ctx.scale(k,k);ctx.fillStyle=PWK[a.k].c;ctx.font='700 14px "Share Tech Mono",monospace';ctx.textAlign='left';ctx.fillText('LV'+(a.l3||1),32+w+8,-3);ctx.restore();}
-      y+=46*k;}};}
+  // the desktop list card draws the level itself (power.js hud: name and LV are one label that fits beside the bars text)
   {const ch=PW.chips;PW.chips=function(t,x,y,k){ch.call(this,t,x,y,k);const s=G.pw;if(!s)return;const r=11*k;let cx=x+r;
     for(const a of s.act){if(PW3L[a.k])lvTag({k:a.k,lv:a.l3||1},cx-r*.9,y-4*k+r+11*k,Math.max(11,Math.round(11*k)));cx+=2*r+10*k;}};}
   window.__pw3={PW3,PW3L};
@@ -14746,7 +14746,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='fd67a3f2c9 2026-10-24 19:27 UTC';
+const NR_STAMP='3013ee7888 2026-10-24 19:42 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -14981,7 +14981,7 @@ if(DIET.on){
       ctx.fillStyle='#dcd8f6';ctx.fillText('EMP',172,y0+26);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(178+i*14,by-4,4.5,0,7);ctx.fill();}});
     Object.assign(HUDLOG,{x:HUDX.vals()});
     if(touchUI)buttons();
-    if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12);ctx.globalAlpha=1;});
+    if(G.note.t>0&&G.note.txt&&!(touchUI&&/^\u266a/.test(G.note.txt)))cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12);ctx.globalAlpha=1;});
     if(window.HINT&&HINT.on())HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});
     else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
     if(G.boss&&G.boss.x<W){const b=G.boss;ctx.fillStyle='#00000088';ctx.fillRect(W/2-200*ku,30*ku,400*ku,8*ku);ctx.fillStyle='#ff3040';ctx.fillRect(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);}
@@ -16965,8 +16965,9 @@ html.ui2 button.go,html.ui2 .pg button.go,html.ui2 #setm .sfoot button.go,html.u
 html.ui2 button.go small{font-family:var(--display)!important;font-weight:500!important;letter-spacing:.02em!important;text-transform:none;opacity:.78;color:var(--ink)}
 html.ui2 button.go:hover{border-color:#fff!important;background:linear-gradient(180deg,#2d2160,#1b1240)!important;transform:translateY(-1px)}
 html.ui2 button.go:focus-visible,html.ui2 button:focus-visible,html.ui2 [tabindex]:focus-visible{outline:none!important;box-shadow:0 0 0 2px #05030c,0 0 0 4px var(--u2ring)!important}
-html.ui2 button.go.on,html.ui2 button.go[aria-selected=true],html.ui2 button.go[aria-pressed=true]{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
-html.ui2 #playBtn,html.ui2 #resumeBtn,html.ui2 #srNext,html.ui2 #againBtn{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important;letter-spacing:.14em}
+html.ui2 button.go.on,html.ui2 button.go[aria-selected=true],html.ui2 button.go[aria-pressed=true]{background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.ui2 button.go.hubBk,html.ui2 button.go.alt.hubBk{padding:0!important;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding-bottom:3px!important}
+html.ui2 #playBtn,html.ui2 #resumeBtn,html.ui2 #srNext,html.ui2 #againBtn{background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border-color:#ffd0ea!important;color:#fff!important;letter-spacing:.14em}
 html.ui2 #playBtn small{opacity:.92}
 html.ui2 #playBtn:hover,html.ui2 #resumeBtn:hover,html.ui2 #srNext:hover,html.ui2 #againBtn:hover{background:linear-gradient(180deg,#ff78c4,#d4368d)!important}
 html.ui2 .row>button.go{white-space:nowrap;align-self:stretch}
@@ -16984,7 +16985,7 @@ html.ui2 #setm .card h2{background:none!important;font-style:normal!important;bo
 html.ui2 #setm .seg,html.ui2 #setm .sl{background:#140d2ee6!important;border:1.5px solid var(--u2line);border-radius:var(--u2r);padding:10px 16px!important;margin-bottom:8px}
 html.ui2 #setm,html.ui2 #setm *{font-style:normal!important}
 html.ui2 #setm .seg button{border-radius:8px!important;border:1.5px solid var(--u2line)!important;background:var(--u2fill)!important;color:var(--ink)!important}
-html.ui2 #setm .seg button[aria-pressed="true"]{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.ui2 #setm .seg button[aria-pressed="true"]{background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border-color:#ffd0ea!important;color:#fff!important}
 html.ui2 #garage .tabs{gap:6px}
 html.ui2 #garage .tabs button.go{padding:.4em .5em!important;letter-spacing:.03em;font-size:clamp(12px,3.3vw,16px)!important;min-width:0}
 html.ui2 #hubJump{padding:8px 12px 8px!important;gap:8px!important}
@@ -17402,7 +17403,7 @@ html.h2 #garage.h2x #h2Bay,html.h2 #garage.h2x #h2Pane{display:none!important}
  #h2Pane .pp,#h2Pane .pb{display:flex;gap:3px;width:90%}#h2Pane .pp i,#h2Pane .pb i{flex:1 1 0;height:10px;border-radius:5px;background:#ffffff22}
  #h2Pane .pp i:not(.nx):not([class=""]),#h2Pane .pb i.on{background:var(--h2c)}#h2Pane .pp i.on{background:var(--h2c)}
  #h2Pane .buy{margin-top:auto;width:100%;min-height:64px;font:700 22px var(--display)!important;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:12px!important;cursor:pointer;
-   background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border:1.5px solid #ffd0ea!important;color:#fff!important}
+   background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border:1.5px solid #ffd0ea!important;color:#fff!important}
  #h2Pane .buy[disabled]{background:#1a1236!important;border-color:#3a2b5c!important;color:var(--dim)!important;cursor:default;font-size:18px!important}
  #h2Pane .buy.eq{background:color-mix(in srgb,var(--h2c) 18%,#120b28)!important;border-color:var(--h2c)!important;color:var(--h2c)!important}
  #h2Pane .hint{font-size:15px;color:var(--dim)}
@@ -17849,7 +17850,7 @@ html.h3 #garage.h3m:not([hidden]) #h3More{display:grid;grid-template-columns:rep
 #h3More .mt span{font-size:15px;line-height:1.3;color:#e4e0ff}
 #h3More .mt em:empty{visibility:hidden;border-color:transparent}
 #h3More .mt em{order:-1;align-self:flex-end;min-height:1.4em;margin:-6px -2px -4px 0;font:700 14px var(--display);font-style:normal;padding:2px 8px;border-radius:9px;background:#1a1236;border:1.5px solid var(--c);color:var(--c)}
-html.h3 #garage .tabs #mfMore.h3on{opacity:1;background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.h3 #garage .tabs #mfMore.h3on{opacity:1;background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border-color:#ffd0ea!important;color:#fff!important}
 html.h3 #garage.h3m .tabs button[data-t].on{background:#140d2e!important;color:var(--ink)!important;border-color:#3a2b5c!important;box-shadow:none!important}
 html.h3 #gaCards.f2 .h3R .f2-sheet .hd{flex-wrap:wrap}
 /* FORGE in the frame: the hangar header and tabs stay (forgeone hides every sibling of the cards) */
@@ -19103,18 +19104,22 @@ if(RET.multhud){
   NR.on('hurt',()=>{if(G&&MH.prev>G.mult+.04){MH.from=MH.prev;MH.to=G.mult;MH.brk=2;}});
   const mtxt=m=>'×'+m.toFixed(1),col=()=>MH.brk>0&&(SET.reduce||Math.floor(MH.brk*8)%2===0)?'#ff3040':TIERC[tierOf(C.n)-1];
   const wrap=(name,draw)=>{const f=DIET[name];DIET[name]=function(t){f.apply(this,arguments);if(!G||!running)return;try{draw();}finally{MH.prev=G.mult;}};};
-  wrap('hudL',()=>{const k=HKL;ctx.save();ctx.translate(166*k,0);ctx.scale(k,k);ctx.textAlign='left';
-    ctx.font='700 30px "Chakra Petch",sans-serif';ctx.fillStyle=col();ctx.fillText(mtxt(G.mult),0,38);
+  /* ONE caption at a time: the "SCORE MULTIPLIER" line only shows in the free row under the bar, and never while a banner, a hint, a first-seen caption or the boss bar is up.
+     "CHAIN BROKEN" is never a second row: it sits in the bar, next to the number that just fell (and is dropped when it would not fit). */
+  const busy=()=>G.banner.t>0||(window.HINT&&HINT.on()?!!HINT.cur:G.hint.t>0)||!!(G.boss&&G.boss.x<W)||!!(window.EXP&&EXP.cap)||!!(window.ZH&&ZH.cap);
+  wrap('hudL',()=>{const k=HKL;ctx.save();ctx.translate(166*k,0);ctx.scale(k,k);ctx.textAlign='left';ctx.textBaseline='alphabetic';
+    ctx.font='700 30px "Chakra Petch",sans-serif';ctx.fillStyle=col();ctx.fillText(mtxt(G.mult),0,38);const nw=ctx.measureText(mtxt(G.mult)).width+12;
     ctx.font='11px "Share Tech Mono",monospace';
-    if(MH.brk>0){ctx.fillStyle='#ff3040';ctx.fillText('CHAIN BROKEN  '+mtxt(MH.from)+' → '+mtxt(MH.to),0,54);}
-    else if(!MH.capDone){ctx.fillStyle='#c9c4ec';ctx.fillText('SCORE MULTIPLIER: a hit halves it',0,54);}
+    if(MH.brk>0){if(!(G.boss&&G.boss.x<W)){ctx.fillStyle='#ff3040';ctx.fillText('CHAIN BROKEN  '+mtxt(MH.from)+' → '+mtxt(MH.to),nw,36);}}
+    else if(!MH.capDone&&!busy()){ctx.fillStyle='#c9c4ec';ctx.fillText('SCORE MULTIPLIER: a hit halves it',0,54);}
     ctx.restore();});
-  wrap('hudP',()=>{const k=HK,pad=10*k,sH=34*k;ctx.save();ctx.textAlign='left';
+  wrap('hudP',()=>{const k=HK,pad=10*k,sH=34*k;ctx.save();ctx.textAlign='left';ctx.textBaseline='alphabetic';
     ctx.font=`700 ${19*k}px "Chakra Petch",sans-serif`;const x=pad+ctx.measureText(String(G.score).padStart(8,'0')).width+12*k;
-    ctx.fillStyle=col();ctx.fillText(mtxt(G.mult),x,23*k);
+    ctx.fillStyle=col();ctx.fillText(mtxt(G.mult),x,23*k);const nx=x+ctx.measureText(mtxt(G.mult)).width+10*k;
     ctx.font=`${11*k}px "Share Tech Mono",monospace`;
-    if(MH.brk>0){ctx.fillStyle='#ff3040';ctx.fillText('CHAIN BROKEN  '+mtxt(MH.from)+' → '+mtxt(MH.to),pad,sH+16*k);}
-    else if(!MH.capDone){ctx.fillStyle='#c9c4ec';ctx.fillText('SCORE MULTIPLIER: a hit halves it',pad,sH+16*k);}
+    if(MH.brk>0){const hw=Math.min(12*k,90*k/P.max),room=PW_-pad-(P.max*(hw+3*k)-3*k)-8*k-nx,t='CHAIN BROKEN';   // the hull pips are the right edge of the bar
+      if(ctx.measureText(t).width<=room){ctx.fillStyle='#ff3040';ctx.fillText(t,nx,21*k);}}
+    else if(!MH.capDone&&!busy()){ctx.fillStyle='#c9c4ec';ctx.fillText('SCORE MULTIPLIER: a hit halves it',pad,sH+16*k);}
     ctx.restore();});
 }
 
@@ -19515,7 +19520,7 @@ function tells(c,L,S,u,fs){const b=L.hud&&L.hud.hud&&L.hud.hud[0];if(!b)return;c
   c.textAlign='left';c.textBaseline='top';c.font='bold '+fs(12)+'px monospace';rows.forEach(([t,v,col],i)=>{const ry=y+pd+i*rh;c.fillStyle=col;c.fillText(t,x+pd,ry,w-2*pd);
     c.fillStyle='#ffffff1c';c.fillRect(x+pd,ry+15*u,w-2*pd,5*u);c.fillStyle=col;c.fillRect(x+pd,ry+15*u,(w-2*pd)*Math.max(0,Math.min(1,v)),5*u);});c.restore();
   L.hud.hud.push({x,y:y-t0,w,h});SL.hudB=Math.max(SL.hudB||0,y-t0+h+8*u);}
-function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L);
+function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);   // actors 1.7x (benchmark-size); slFrame(L) at the end puts the base scale back for gameplay readers (tidy.js flyer band)
   const K=SL.k,t0=SL.t0,dpr=L.dpr||1,sc=L.sc*dpr,vw=L.vw,exl=L.exl||0,exr=L.exr||0,P=S.P,u=1/L.sc,at=X.at;
   c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#05030c';c.fillRect(0,0,L.cv.width,L.cv.height);
@@ -19542,9 +19547,9 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L);
     if(e.patch)for(let x=e.patch.x0+12;x<e.patch.x1;x+=24){at(c,x,FL-10,K);pic(c,'fx-ft-flame',x,FL-10,30,-Math.PI/2,.8);c.restore();}}SL.z=null;
   for(const b of S.pb){SL.z=b.z;at(c,b.x,b.y,K);window.AH&&AH.ftBul(c,b);c.restore();}
   for(const g of S.bombsL){SL.z=g.z;at(c,g.x,g.y,K);pic(c,'fx-ft-grenade',g.x,g.y,22,S.time*7);c.restore();}
-  for(const b of S.eb){SL.z=b.z;at(c,b.x,b.y,K);const ko=keyed('fx-bullet-enemy');if(ko){const w=14,h=w*ko.height/ko.width;c.drawImage(ko,b.x-w/2,b.y-h/2,w,h);}else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();}c.restore();}   // no picture yet: the plain shot
+  for(const b of S.eb){SL.z=b.z;at(c,b.x,b.y,K);const ko=keyed('fx-bullet-enemy');if(ko){const w=11,h=w*ko.height/ko.width;c.drawImage(ko,b.x-w/2,b.y-h/2,w,h);}else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();}c.restore();}   // no picture yet: the plain shot
   SL.z=null;for(const f of S.fx){if(!window.AH)break;if(f.pic){if(SL.band)SL.z=f.z==null?null:f.z;at(c,f.x,f.y,K);AH.ftFx(c,f);c.restore();}else if(f.arc)AH.ftArc(c,Object.assign({},f,{arc:f.arc.map(([x,y])=>[x,SL.my(y)])}));}SL.z=null;
-  c.restore();const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);return true;}
+  c.restore();const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);const hb=SL.hudB,hf=SL.hudFull;X.slFrame(L);SL.hudB=hb;SL.hudFull=hf;return true;}
 SL.draw=function(c){return RET.purefoot?pure(c):old.apply(this,arguments);};
 })();
 
@@ -19600,7 +19605,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     ctx.fillStyle='#dcd8f6';WP.hud(ctx,20,y0+62,1);
     if(mn)hudMin(ctx,1,18,y0-8,t);});
   if(ku>1.25)tierMeter(W-131*ku-14,H-8,ku);else tierMeter(W/2,H-8,ku);       // big HUD on a small screen: the meter moves to the right corner, clear of the bars frame
-  if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
+  if(G.note.t>0&&G.note.txt&&!(touchUI&&/^\u266a/.test(G.note.txt)))cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
   if(window.HINT&&HINT.on()){if(!(G.banner.t>0))HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});}   // F6: the one hint style (top third, under the HUD); not while the stage banner is up (they overlapped at 844x390)
   else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
   if(!mn){SH.hud(ctx,t,{nx:24,ny:90,dx:216,dy:H-52,sx:18,sy:H-60,ring:true});HUDX.ship(ctx,P.x,P.y,1,t);}else HUDX.ship(ctx,P.x,P.y,1,t);
