@@ -84,8 +84,8 @@ function steamFrames(){if(steamSeq)return steamSeq;const o=ART.aS&&ART.aS(STEAM)
   const cov=[];for(let i=0;i<n;i++){const d=g.getImageData(i*w,0,w,h).data;let k=0;for(let j=3;j<d.length;j+=4)if(d[j]>16)k++;cov.push(k);}
   const mx=Math.max(...cov),ok=[];for(let i=0;i<n;i++)if(cov[i]>=.6*mx)ok.push(i);const seq=ok.slice();for(let i=ok.length-2;i>0;i--)seq.push(ok[i]);   // up, then back down
   return steamSeq={seq,cov,t:seq.map(i=>i?o.cum[i-1]:0),fps:o.m[1]};}
-SL.steam=(c,cam,x0,w,fl,t)=>{const C=CH*SL.k,m=ART.ANIM.s[STEAM],sf=steamFrames();if(!m||!sf)return;const h=SV.h*C,i0=Math.floor((cam+x0)/SV.cell)-1,i1=Math.ceil((cam+x0+w)/SV.cell)+1,fi=Math.floor(t*sf.fps)%sf.seq.length;
-  for(let i=i0;i<=i1;i++){const px=i*SV.cell-cam+SV.cell*(.3+.4*hs(i*5+11)),k=(fi+i+4*sf.seq.length)%sf.seq.length;SL.tag='prop';SL.steamLast={x:px,frame:sf.seq[k],cov:sf.cov[sf.seq[k]],vent:i};ART.drawAnim(c,STEAM,sf.t[k],px,fl-h*.5+.03*h,h/m[3],false,.95);SL.tag='';}};
+SL.steam=(c,cam,x0,w,fl,t)=>{const C=CH*SL.k,m=ART.ANIM.s[STEAM],sf=steamFrames();if(!m||!sf)return;const fm=RET.footmove,h=(fm?1.1:SV.h)*C,i0=Math.floor((cam+x0)/SV.cell)-1,i1=Math.ceil((cam+x0+w)/SV.cell)+1,fi=Math.floor(t*sf.fps)%sf.seq.length;
+  for(let i=i0;i<=i1;i++){const px=i*SV.cell-cam+SV.cell*(.3+.4*hs(i*5+11)),k=(fi+i+4*sf.seq.length)%sf.seq.length;SL.tag='prop';SL.steamLast={x:px,frame:sf.seq[k],cov:sf.cov[sf.seq[k]],vent:i};ART.drawAnim(c,STEAM,sf.t[k],px,fl-h*.5+.03*h,h/m[3],false,fm?.4:.95);SL.tag='';}};   // W232 footmove: the cloud 1.1 characters tall at alpha .4, so it stays behind the fight instead of covering it
 if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART.drawAnim)return;const C=CH*SL.k,x0=SL.x0||0,cell=400,i0=Math.floor((cam+x0)/cell)-1,i1=Math.ceil((cam+x0+w)/cell)+1;
   for(let i=i0;i<=i1;i++){const r=hs(i*41+7),px=i*cell-cam+cell*(.2+.6*hs(i*5+1));if(r>.58)continue;
     const PL=RET.cam2?PROPS4:PROPS,q=PL[Math.floor(hs(i*97+3)*PL.length)],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),m=ART.ANIM.s[k];if(!m||!ART.anim(k))continue;

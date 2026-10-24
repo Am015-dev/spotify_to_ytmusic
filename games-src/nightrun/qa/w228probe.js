@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // W228 gates (street, ?footmove=1): a bot plays zeil in stepped FOOT.sim (x200+); at 8 seeded random moments (20-75 s) it draws one frame three ways (full / no actors / actors without shadows) and measures
 //   depth spread = max - min belt depth z of the on-screen fighters (Kai + ground foes), 1 = the whole belt; shadow darkness = 1 - L(full)/L(no actors) in the box under each fighter's drawn feet
-//   (relative luminance, sprite pixels excluded); actor contrast = WCAG ratio of the mean luminance of each fighter's pixels vs a 6 px ring around them. SHOT=<png> also saves the t = 45 s frame.
+//   (relative luminance, sprite pixels excluded); actor contrast = WCAG ratio of the mean luminance of each fighter's pixels vs a 6 px ring around them. SHOT=<png> also saves the t = 45 s frame. W232: a fighter already killed (knocked into the air, fading) is not measured.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/w228probe.js   env: VP=390x763|1440x860  Q='&footmove=1'  SEED=11  GAME_DIR=<built game>
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME = process.env.GAME_DIR || path.resolve(__dirname, '../../../games/mainhattan-nightrun'), Q = process.env.Q || '&footmove=1', SEED = +process.env.SEED || 11;
@@ -23,7 +23,7 @@ const RUN = async (SEED) => { const rnd = sd => () => { sd = (sd * 16807) % 2147
     if (dz < 0) I.u = 1; else if (dz > 0) I.d = 1; };
   const R = rnd(SEED * 31 + 5), T = []; for (let k = 0; k < 8; k++) T.push(20 + R() * 55); T.push(45); T.sort((a, b) => a - b);
   const rec = []; const odw = IN.drawWho, osh = window.FA && FA.shadow, oda = ART.drawAnim; let mode = 'full';
-  IN.drawWho = function (cc, who, pose, x, y, h) { const e = ART.fE; if (mode === 'none') return; const m = cc.getTransform(), p = m.transformPoint({ x, y }); if (e && !e.fly) rec.push({ e, x: p.x, y: p.y, h: h * Math.hypot(m.b, m.d) * (e._qh && e._qh !== h ? e._qh / h : 1) }); return odw.apply(this, arguments); };
+  IN.drawWho = function (cc, who, pose, x, y, h) { const e = ART.fE; if (mode === 'none') return; const m = cc.getTransform(), p = m.transformPoint({ x, y }); if (e && !e.fly && !e.dead && !(e.hp <= 0)) rec.push({ e, x: p.x, y: p.y, h: h * Math.hypot(m.b, m.d) * (e._qh && e._qh !== h ? e._qh / h : 1) }); return odw.apply(this, arguments); };
   const lin = v => { v /= 255; return v <= .04045 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }, LUT = new Float32Array(256).map((_, i) => lin(i));
   const lum = (d, i) => .2126 * LUT[d[i]] + .7152 * LUT[d[i + 1]] + .0722 * LUT[d[i + 2]];
   const draw = md => { mode = md; rec.length = 0; if (md === 'nosh') { FA.shadow = () => {}; ART.drawAnim = function (cc) { if (cc.filter && cc.filter.indexOf('brightness(0)') >= 0) return; return oda.apply(this, arguments); }; }
