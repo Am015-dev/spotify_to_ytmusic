@@ -44,3 +44,5 @@ Big single-line data files (50, 52, 02) are never read whole: `grep -o` a key in
 Owners: cars = alex/od-cars session · art/world = alex/od-art session · garage = garage worker · QA/UI = alex/od-qa · core/infra/build = infra worker.
 Where to put NEW code: in the module of your area (append near the related code), or a new file `src/NN_<area>_<what>.js` listed in ORDER right before `99_api.js`
 (still before `window.__mho`, the old "insert before window.__mho" convention). Wrap existing functions as before (`const _f=f; f=(...a)=>{…}` for `let`/function).
+| `10zf_fastload.js` | 3 | FST persistent chunk cache (fastload-r24g): core in the page head (src/02_data_json.html classic script: Cache API / IndexedDB store keyed by FSTV = build id; `FST_get FST_js FST_json FST_mus`; km.js loads through it); this module = preview switch + old-version cleanup. `?fc=0` off |
+| `98zq_fastload_ahead.js` | 3 | FST read-ahead (lazy chunk): equipped garage car + next 3 + menu/city music into the store at idle |

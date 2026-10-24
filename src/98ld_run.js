@@ -8,7 +8,7 @@ function LD_done(){if(LDL.rd&&!LDL.wait.size){LDL.rd=0;setTimeout(LD_redraw,0)}}
 function LD_ingest(id){const D=(window.__LDD||{})[id];if(!D||LDL.got.has(id))return;Object.assign(LD_MESH,D[0]);Object.assign(LD_MODELS,D[1]);LDL.got.add(id);LDW_reg();
  window.__ldm.models=Object.keys(LD_MODELS).length;const w=LDL.wait.get(id);if(w){LDL.wait.delete(id);w.r()}LD_done()}
 function LD_load(id){if(LDL.got.has(id)||!LDL.X.c[id]||LDL.bad.has(id))return Promise.resolve();let w=LDL.wait.get(id);if(w)return w.p;w={};w.p=new Promise(r=>{w.r=r});LDL.wait.set(id,w);
- const s=document.createElement('script');s.src=LDL.X.c[id].f;s.onerror=()=>{console.warn('LDM load',id);LDL.bad.add(id);LDL.wait.delete(id);w.r();LD_done()};document.head.appendChild(s);return w.p}
+ FST_js(LDL.X.c[id].f).then(ok=>{if(ok)return;console.warn('LDM load',id);LDL.bad.add(id);LDL.wait.delete(id);w.r();LD_done()});return w.p}
 function LD_need(ids){return Promise.all([...new Set(ids)].map(LD_load))}// ids = model ids (= chunk ids)
 // chunks a brick list needs (saved rides name mesh keys like 'ld3037' or 'ld60614@020')
 function LD_brMiss(B){const m=[];for(const b of B||[]){const t=b&&(b.t||b[0]);if(typeof t!=='string'||t.slice(0,2)!=='ld')continue;const k=t.split('@')[0],c=LDL.X.k[k];if(c&&!LD_MESH[k])m.push(c)}return m}

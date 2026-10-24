@@ -31,7 +31,7 @@ function MUS_play(name){const a=AU.a,t=a.currentTime;MUS_wire();
   const old=MUS.cur;if(old&&old.name===name)return;
   if(old){MUS.pos[old.name]=old.el.currentTime||0;old.g.gain.cancelScheduledValues(t);old.g.gain.setTargetAtTime(0,t,.45);const o=old,n0=o.name;setTimeout(()=>{if(MUS.cur!==o&&o.name===n0)try{o.el.pause()}catch(e){}},2600)}
   if(!name){MUS.cur=null;return}
-  const s=MUS.slots.find(q=>q!==old)||MUS.slots[0];s.name=name;const src='music/'+name+'.mp3';if(!s.el.src.endsWith(src)){s.el.preload='auto';s.el.src=src}
+  const s=MUS.slots.find(q=>q!==old)||MUS.slots[0];s.name=name;const src=FST_mus(name);if(!(s.el.src===src||s.el.src.endsWith(src))){s.el.preload='auto';s.el.src=src}
   const sk=MUS.pos[name]||0;if(s.el.readyState>=1){try{s.el.currentTime=sk}catch(e){}s.seek=null}else s.seek=sk; // resume where the track left off (seek after metadata when it is not loaded yet)
   s.g.gain.cancelScheduledValues(t);s.g.gain.setValueAtTime(0,t);s.g.gain.setTargetAtTime(MUS_level(),t+.02,old?.5:.12); // first start fades in fast
   s.el.muted=false;const p=s.el.play();if(p&&p.catch)p.catch(e=>{s.fail=String(e&&e.name||e)});MUS.cur=s}
@@ -54,7 +54,7 @@ setInterval(()=>{try{MUS_tick()}catch(e){MUS.err=String(e)}},100);
    for(const s of MUS.slots)if(s!==MUS.cur&&!s.name&&!s.bl&&(!s.el.src||s.el.src===MUS_SIL)){s.bl=1;try{if(!s.el.src)s.el.src=MUS_SIL;s.el.muted=true;const p=s.el.play();if(p&&p.then)p.then(()=>{if(!s.name)s.el.pause()},()=>{s.bl=0})}catch(_){s.bl=0}}};
  for(const ev of['pointerdown','pointerup','touchend','click','keydown'])addEventListener(ev,un,{capture:true,passive:true})}
 // prefetch menu.mp3 now (unless music is off): streaming playback can start on the first tap without a full fetch + decode
-MUS.slots.push(MUS_slot(TUNE.musOn>0&&(SET.mus??1)>0?'auto':'none'),MUS_slot());if(MUS.slots[0].el.preload==='auto'){MUS.slots[0].el.src='music/menu.mp3';try{MUS.slots[0].el.load()}catch(e){}}
+MUS.slots.push(MUS_slot(TUNE.musOn>0&&(SET.mus??1)>0?'auto':'none'),MUS_slot());if(MUS.slots[0].el.preload==='auto'){const m0=()=>{const e=MUS.slots[0].el;if(e.src)return;e.src=FST_mus('menu');try{e.load()}catch(_){}};if(FST_use())Promise.race([FST_warmMus(['menu']),new Promise(r=>setTimeout(r,1500))]).then(m0,m0);else m0()}  // fastload-r24g: a stored menu.mp3 plays from the store
 // SET sliders / SOUND button keep working: AU.setVol re-applies the music + sfx knobs on top
 {const f0=AU.setVol;AU.setVol=function(){const r=f0.apply(this,arguments);MUS.synth=null;if(MUS.cur)MUS.cur.lv=-1;try{MUS_synth();MUS_sfx()}catch(e){}return r}}
 window.__mus={knob:(t,s)=>{Object.assign(TUNE,t||{});Object.assign(SET,s||{});AU.setVol();return MUS_level()},st:()=>({mode:MUS.mode,track:MUS.cur&&MUS.cur.name,unlocked:MUS.unlocked,ctx:AU.a&&AU.a.state,muted:!!AU.muted,level:+MUS_level().toFixed(3),duck:MUS.duck,synth:MUS.synth,

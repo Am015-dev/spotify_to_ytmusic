@@ -5,6 +5,7 @@
 10_core3.js
 10_core4.js
 10_core5.js
+10zf_fastload.js
 10z_lazy.js
 10b_qt_data.js
 10c_qtc_blob.js
@@ -116,6 +117,7 @@
 98tk_go.js
 98ro_open.js
 98zp_perf_ctx.js
+98zq_fastload_ahead.js
 98bk_bake.js
 98fb_form_build.js
 98ba_build_anim.js
@@ -194,6 +196,7 @@
 99c7_rev5fix.js
 99c8_sfxhit.js
 99c9_collide.js
+99c9f_fastload_go.js
 99cs_solid.js
 99cb_athbudget.js
 99cc_reveal_desktop.js

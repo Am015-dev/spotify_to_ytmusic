@@ -72,7 +72,7 @@ function TU_apply(v){for(const k of TUNE_K)TU_set(k[1],TU_DEF[k[1]]);if(v&&typeo
 (async()=>{let db=null;try{if(window.claude&&typeof claude.use==='function')db=await claude.use('db')}catch(e){db=null}
  TU.db=db;if(db){TU.show=true;try{const c=await db.doc('tune/current').get();const v=c.exists?(c.data()||{}).v:null;if(v!=null){const d=await db.doc('tune_versions/v'+v).get();if(d.exists){TU_apply((d.data()||{}).values);TU.cur=v;TU.src='v'+v}}}catch(e){console.warn('TUNE load',e&&e.message||e)}
   TU_list()}
- else{try{const r=await fetch('./tune.json',{cache:'no-store'});if(r.ok){const j=await r.json();if(j&&typeof j==='object'){TU_apply(j.values||j);TU.cur=j.v??null;TU.src='tune.json'+(j.v!=null?' v'+j.v:'')}}}catch(e){}}
+ else{try{const j=await FST_json('./tune.json');{if(j&&typeof j==='object'){TU_apply(j.values||j);TU.cur=j.v??null;TU.src='tune.json'+(j.v!=null?' v'+j.v:'')}}}catch(e){}}
  if(TU.show)TU_ui()})();
 async function TU_list(){if(!TU.db)return;try{const q=await TU.db.collection('tune_versions').orderBy('v','desc').limit(60).get();TU.list=q.docs.map(d=>d.data()).filter(d=>d&&typeof d.v==='number')}catch(e){TU.msg='list failed: '+(e&&e.code||e)}if(TU.el)TU_render()}
 async function TU_save(note){if(!TU.db){TU.msg='no db here: use EXPORT';TU_render();return}TU.msg='saving…';TU_render();

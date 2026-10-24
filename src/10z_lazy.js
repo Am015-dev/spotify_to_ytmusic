@@ -9,9 +9,7 @@ function XC_eval(c){return eval(c)}   // direct eval: sees every module-level bi
 // fair-1: no `let` stubs / XC.apply are generated, so a chunk's exports (src/LAZY "f.js:a,b") go on window, where other chunks (checklist -> tkBot) see them by name
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
- return XC.q[name]||(XC.q[name]=new Promise(res=>{const s=document.createElement('script');s.src='xc/'+name+'.js?'+(XCV[name]||0);
-  s.onload=()=>{try{const c=window.__XC&&window.__XC[name];if(c){delete window.__XC[name];if(typeof BMK==='function')BMK('xc '+name);const o=XC_eval(c);if(XC.post[name])XC.post[name]();if(XC.apply[name]&&o)XC.apply[name](o);else if(o&&typeof o==='object')for(const k in o)if(typeof o[k]==='function'&&!(k in window))window[k]=o[k]}}catch(e){XC.err.push(name+': '+e);console.warn('XC '+name,e)}res()};
-  s.onerror=()=>{XC.err.push(name+': 404');res()};document.head.appendChild(s)}))}
+ return XC.q[name]||(XC.q[name]=new Promise(res=>{FST_js('xc/'+name+'.js?'+(XCV[name]||0)).then(ok=>{if(!ok){XC.err.push(name+': 404');return res()}try{const c=window.__XC&&window.__XC[name];if(c){delete window.__XC[name];if(typeof BMK==='function')BMK('xc '+name);const o=XC_eval(c);if(XC.post[name])XC.post[name]();if(XC.apply[name]&&o)XC.apply[name](o);else if(o&&typeof o==='object')for(const k in o)if(typeof o[k]==='function'&&!(k in window))window[k]=o[k]}}catch(e){XC.err.push(name+': '+e);console.warn('XC '+name,e)}res()})}))}
 // perf-r16c (REVIEW_2K_16 N3): on a player page (no ?test) only the chunks a player needs load after drivable: the city data and 99c_checklist (the 📋 strip).
 // The GO/test chunks (99c<digit>_*, 98tk_go, 98dest_go: 10-90 KB each, GO code only) load on demand: XC_go(true) from the checklist panel / 📍 GO. ?test pages and ?xcall=1 load all.
 const XC_TEST=n=>/^99c\d|^98tk_go$|^98dest_go$/.test(n),XC_ALL0=!!TQ||/[?&]xcall=1/.test(location.search);

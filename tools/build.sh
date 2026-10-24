@@ -33,6 +33,11 @@ bash tools/qa/pack.sh "$OUT" || { echo "BUILD FAIL: models/qa.js (qa-1 kit)"; ex
 if ls src/assets/music/*.mp3 >/dev/null 2>&1; then mkdir -p "$OUT/music"; cp src/assets/music/*.mp3 "$OUT/music/"; fi
 # every name in MUS_FILES (98m_music.js) must ship, so the page never requests a missing track (no 404s)
 for n in $(grep -o "^const MUS_FILES=\[[^]]*\]" src/98m_music.js | grep -o "'[a-z_0-9]*'" | tr -d "'"); do [ -f "src/assets/music/$n.mp3" ] || { echo "BUILD FAIL: MUS_FILES lists $n but src/assets/music/$n.mp3 is missing"; exit 1; }; done
+# fastload-r24g: FSTV = build id of the persistent chunk cache (src/10zf_fastload.js): the version + a hash of everything the page fetches by name (xc hashes, km.js, models.js, tune.json)
+FSTV="$(basename "$OUT")-$( (echo "$XCV"; cat "$OUT/km.js" "$OUT/models.js"; [ -f "$OUT/tune.json" ] && cat "$OUT/tune.json") | md5sum | cut -c1-8)"
+python3 - "$OUT/overdrive.html" "$FSTV" <<'PY' || { echo "BUILD FAIL: FSTV"; exit 1; }
+import sys;p,v=sys.argv[1:3];s=open(p,encoding='utf8').read();a="/*FSTV*/''/*end*/";assert s.count(a)==1,'FSTV placeholder';open(p,'w',encoding='utf8').write(s.replace(a,"/*FSTV*/'"+v+"'/*end*/"))
+PY
 # live page shell (head) + body + tail: identical to what tools/deploy.sh writes
 cat src/assets/shell_head.html > "$OUT/index.html"; cat "$OUT/overdrive.html" >> "$OUT/index.html"; printf '</body></html>' >> "$OUT/index.html"
 if [ $PREVIEW = 1 ]; then   # OD_PREVIEW=true in the page (and in every lazy chunk that carries the constant)
