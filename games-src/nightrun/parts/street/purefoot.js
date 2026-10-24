@@ -54,13 +54,17 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#05030c';c.fillRect(0,0,L.cv.width,L.cv.height);
   c.setTransform(sc,0,0,sc,(L.box.x-L.ox)*dpr,(L.box.y-L.oy)*dpr-t0*sc);
   const sh=S.shake?IN.ftRnd(-S.shake,S.shake)*.5:0;SL.road=L.box.y+(FL+sh*.5-t0)*L.sc;SL.cam=S.camX;
-  c.save();c.translate(sh,sh*.5);X.slBackdrop(c,S,vw,exl,exr,t0,Math.min(3,sc));if(RET.footmove){const FR=FL-(SL.band||0),g=c.createLinearGradient(0,t0,0,FR);g.addColorStop(0,'rgba(9,5,26,.34)');g.addColorStop(1,'rgba(9,5,26,.18)');c.fillStyle=g;c.fillRect(-exl-20,t0-10,vw+exl+exr+40,FR-t0+10);}   // footmove: the backdrop a step darker than the play plane (aerial depth), the floor untouched
+  c.save();c.translate(sh,sh*.5);X.slBackdrop(c,S,vw,exl,exr,t0,Math.min(3,sc));if(RET.footmove){const FR=FL-(SL.band||0),g=c.createLinearGradient(0,t0,0,FR);const bx=-exl-20,bw=vw+exl+exr+40;c.save();c.globalCompositeOperation='saturation';c.fillStyle='rgba(128,128,128,.45)';c.fillRect(bx,t0-10,bw,FR-t0+10);c.restore();   // W228: backdrop saturation down
+    g.addColorStop(0,'rgba(9,5,26,.55)');g.addColorStop(1,'rgba(9,5,26,.42)');c.fillStyle=g;c.fillRect(bx,t0-10,bw,FR-t0+10);   // W228: backdrop value down (actors are the loudest plane)
+    const hz=(FR-t0)*.4,hg=c.createLinearGradient(0,FR-hz,0,FR);hg.addColorStop(0,'rgba(70,58,96,0)');hg.addColorStop(.7,'rgba(70,58,96,.26)');hg.addColorStop(1,'rgba(70,58,96,.14)');c.fillStyle=hg;c.fillRect(bx,FR-hz,bw,hz);
+    const fg=c.createLinearGradient(0,FR,0,FR+36);fg.addColorStop(0,'rgba(70,58,96,.14)');fg.addColorStop(1,'rgba(70,58,96,0)');c.fillStyle=fg;c.fillRect(bx,FR,bw,36);
+    c.fillStyle='rgba(5,3,12,.38)';c.fillRect(bx,FR,bw,L.cv.height/(L.sc*dpr)+t0-FR+40);}   // W228: the floor a value step down too, so the lit fighters lead   // W228: a haze band behind the play line   // footmove: the backdrop a step darker than the play plane (aerial depth), the floor untouched
   c.translate(-S.camX,0);const lo=S.camX-exl,hi=S.camX+vw+exr,PK=F.PICKUPS;
   for(const p of S.pk){const d=PK[p.k],q=d&&X.slPic(X.pkPic(p.k)),am=p.k==='ammo'&&RET.sprites&&ART.ANIM.c['pk-ammo/spin']&&ART.anim('pk-ammo/spin');if(!am&&(!q||!q.width))continue;const bob=Math.sin(p.t*5)*3,r=17*K,edge=Math.min(p.x-r-lo,hi-p.x-r),fa=Math.max(0,Math.min(1,(edge-6)/24));if(fa<=0)continue;
     const y=p.y+bob,Y=Math.max(SL.my(y),t0+4+r),pz=p.z!=null&&SL.band?p.z:1,k=K*(.9+.1*pz),h=40,w=q&&q.width?h*q.width/q.height:h;
     c.save();c.translate(p.x,Y-(1-pz)*SL.band);c.scale(k,k);c.translate(-p.x,-y);c.globalAlpha=(p.t>13?.5+.5*Math.sin(p.t*20):1)*fa;SL.tag='pk';if(am)ART.drawAnim(c,'pk-ammo/spin',p.t,p.x,y,32/ART.ANIM.c['pk-ammo/spin'].bw,false);else c.drawImage(q,p.x-w/2,y-h/2-4,w,h);SL.tag='';c.restore();}
   const dP=p=>{if(p.hp<=0&&!p.fl)return;SL.z=p.z;let ok=false;if(RET.footmove&&window.FA&&FA.shadow){at(c,p.x,p.y,K);c.translate(p.x,p.y);FA.shadow(c,p.w*1.5,1);c.restore();}   // footmove: props stand on the floor like the actors (same soft contact shadow)
-   const gk=RET.footmove&&p.k==='kiosk';if(gk)c.filter='brightness(.7) saturate(.8)';if(p.draw){try{ok=p.draw(c,K,at);}catch(x){}}if(gk)c.filter='none';   // W225: the lit vending kiosk a value step under the fighters
+   const gk=RET.footmove;if(gk)c.filter=p.k==='kiosk'?'brightness(.6) saturate(.7)':'brightness(.8) saturate(.75)';if(p.draw){try{ok=p.draw(c,K,at);}catch(x){}}if(gk)c.filter='none';   // W225: the lit vending kiosk a value step under the fighters
     if(!ok){const hd=Math.min(p.h,1.25*64);at(c,p.x,p.y,K);c.fillStyle=p.c;c.fillRect(p.x-p.w/2,p.y-hd,p.w,hd);c.restore();}SL.z=null;};   // a prop with no picture yet keeps its flat box (it blocks shots)
   const dE=e=>{const sx=RET.footmove&&e._sx||0;e.x+=sx;try{dE0(e);}finally{e.x-=sx;}};   // W225 footmove: the drawn personal-space offset
   const dE0=e=>{if(e.dead&&!(e.ext&&!e.remove))return;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)return;SL.z=e.z;
@@ -73,7 +77,8 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
     ART.fE=P;IN.drawWho(c,'kai',kp,P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,'#19e3ff',P.crouch);ART.fE=null;
     if(P.shotT>0&&window.AH){const a=P.aim,mq=F.mzAt&&F.mzAt(P);AH.ftMuz(c,P.w,mq?mq[0]:P.x+Math.cos(a)*28,mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20,a);}c.restore();SL.z=null;};
   const A=S.E.filter(e=>!(e.dead&&!(e.ext&&!e.remove)));A.push(P);const PS=new Set(S.pr);for(const p of S.pr)A.push(p);
-  if(SL.band)A.sort(RET.footmove?(a,b)=>Math.round(200*(a.z==null?1:a.z))-Math.round(200*(b.z==null?1:b.z)):(a,b)=>(a.z==null?1:a.z)-(b.z==null?1:b.z));   // footmove: depth in 1/200 steps, ties keep the list order (stable sort): no front/behind flickerelse A.sort((a,b)=>PS.has(b)-PS.has(a));   // belt: back to front; flat road: props first
+  const zk=a=>PS.has(a)?-1:a.z==null?1:a.z;   // W228: props stand against the wall, behind every lane (their hit depth is unchanged)
+  if(SL.band)A.sort(RET.footmove?(a,b)=>Math.round(200*zk(a))-Math.round(200*zk(b)):(a,b)=>(a.z==null?1:a.z)-(b.z==null?1:b.z));   // footmove: depth in 1/200 steps, ties keep the list order (stable sort): no front/behind flickerelse A.sort((a,b)=>PS.has(b)-PS.has(a));   // belt: back to front; flat road: props first
   for(const a of A){if(PS.has(a))dP(a);else if(a===P)dK();else dE(a);}
   for(const e of S.E){if(e.dead)continue;SL.z=e.z;   // fire hazards as the owner's flame picture (the stage hook's lanes, marks, beams and OPEN text are code drawings: not drawn)
     if(e.fl)for(let x=e.fl.x+18;x<e.fl.x+e.fl.w;x+=30){at(c,x,FL-40,K);pic(c,'fx-ft-flame',x,FL-40,72,e.facing<0?Math.PI:0,.9);c.restore();}

@@ -218,10 +218,10 @@ ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=A
   if(e._fa!==kp){e._fa=kp;e._f0=t;}let tt=ART.fE?t-e._f0:t;if(act==='jump'){tt=fall?o.cum[1]+tt:Math.min(tt,o.cum[1]-.001);}
   const cr=false,sc=ART.bsc(m,h),sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;
   const dead=act==='die'&&who!=='kai',fade=dead?1-.85*Math.min(1,Math.max(0,tt-.4)/.8):1,ga=c.globalAlpha;
-  c.save();c.translate(x,y);if(RET.footmove&&who!=='drone'&&who!=='jetpack'&&ART.fE){c.save();c.globalCompositeOperation='multiply';c.globalAlpha=ga*.75*fade;c.filter='brightness(0) blur(1.5px)';c.transform(1,0,.4,1,0,0);c.scale(1,-.22);ART.drawAnim(c,key,tt,0,0,sc,flip,null,1);c.restore();}   /* W223 footmove (OpenBOR): the shadow is the actor's own frame, flattened onto the road and multiplied */
-  if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
+  c.save();c.translate(x,y);if(RET.footmove&&who!=='drone'&&who!=='jetpack'&&ART.fE){c.save();c.globalCompositeOperation='multiply';c.globalAlpha=ga*fade;c.filter='brightness(0) blur(1px)';c.transform(1,0,.4,1,0,0);c.scale(1,-.22);ART.drawAnim(c,key,tt,0,0,sc,flip,null,1);c.restore();}   /* W223 footmove (OpenBOR): the shadow is the actor's own frame, flattened onto the road and multiplied */
+  if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*(RET.footmove?.95:.75),who==='drone'||who==='jetpack'?.6*fade:fade);
   if(act==='run'||act==='runshoot'||act==='walk')c.rotate(sm.lean.run_deg*Math.PI/180*(flip?-1:1));
-  c.globalAlpha=ga*fade;ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);if(sub&&pose==='hit'){c.globalCompositeOperation='lighter';ART.drawAnim(c,key,tt,0,0,sc,flip,.5,sy);c.globalCompositeOperation='source-over';}c.restore();return true;};   // a borrowed hit act flashes white
+  c.globalAlpha=ga*fade;const kl=RET.footmove&&ART.fE;if(kl)c.filter='brightness(1.75) saturate(1.15)';ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);if(kl)c.filter='none';if(sub&&pose==='hit'){c.globalCompositeOperation='lighter';ART.drawAnim(c,key,tt,0,0,sc,flip,.5,sy);c.globalCompositeOperation='source-over';}c.restore();return true;};   // a borrowed hit act flashes white
 }
 /* ----- street props behind the actors: a few per parallax cell, standing on the road line (pf = FL), looping at the sheet fps ----- */
 ART.PROPS=[['car',80,0],['police',84,0],['steam',120,0],['beacon',160,0],['neon',150,0],['banner',170,0],['holo',150,0],['windows',190,0],['drone',58,1]];

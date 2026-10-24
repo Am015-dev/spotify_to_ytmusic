@@ -261,7 +261,12 @@ function space(dt){const P=S.P,L=S.E.filter(e=>!e.dead&&!e.fly&&!e.boss&&!e.remo
   for(const e of L){const dx=e.x+(e._sx||0)-P.x,sd=Math.sign(dx)||-e.facing||1,R=.7*(e.h+P.h),d=e.x+e._tx-P.x;   // Kai's ring wins: attackers come in to strike range, the rest hold at a readable distance
     if(!atk(e)&&near(e,P,.35)&&Math.abs(d)<R)e._tx=P.x+sd*R-e.x;}
   for(const e of L){const sx=e._sx||0;e._sx=sx+clamp(clamp(e._tx,-140,140)-sx,-300*dt,300*dt);}}
-function beltE(dt){const P=S.P;let c1=null,cd=300;for(const e of S.E)if(!e.dead&&e.z!=null&&Math.abs(e.x-P.x)<cd){cd=Math.abs(e.x-P.x);c1=e;}   // the closest foe (and the boss, and any foe winding up a shot) steps into Kai's line; the rest hold lanes beside him
+/* W228 footmove (OpenBOR-style lanes, owner 24 Oct 2026: "props and background are not blending"): near Kai a foe holds its own lane at least .3 of the belt away from his line and steps in
+   only to strike (wind-up, shot call, lunge); the rusher's own depth dash (streetfoe.js) still commits to the line Kai stood in. So the fight uses the whole floor, never one line. */
+function beltM(dt){const P=S.P;for(const e of S.E){if(e.dead||e.z==null)continue;const near=Math.abs(e.x-P.x)<300,atk=e.tele>0||e.wind>0||ATK.test(e.state)||e.state==='wind';if(!atk)e._cz=null;let tz=e.hz,v=.42*dt;
+  if(e.boss)tz=near?P.z:e.hz,v=.32*dt;else if(near&&atk){if(e._cz==null)e._cz=P.z;tz=e._cz;v=2.5*dt;}else if(near){let o=Math.abs(e.hz-P.z)>=.3?e.hz-P.z:(e.hz>=P.z?.3:-.3);if(P.z+o>1||P.z+o<0)o=-Math.sign(o)*Math.max(.3,Math.abs(o));tz=clamp(P.z+o,0,1);}
+  e.z+=clamp(tz-e.z,-v,v);}}
+function beltE(dt){const P=S.P;if(RET.footmove)return beltM(dt);let c1=null,cd=300;for(const e of S.E)if(!e.dead&&e.z!=null&&Math.abs(e.x-P.x)<cd){cd=Math.abs(e.x-P.x);c1=e;}   // the closest foe (and the boss, and any foe winding up a shot) steps into Kai's line; the rest hold lanes beside him
   for(const e of S.E){if(e.dead||e.z==null)continue;const near=Math.abs(e.x-P.x)<300,tz=!near?e.hz:e===c1||e.boss||e.tele>0?P.z:clamp(P.z+(e.hz-.5)*.95,0,1),v=(e.boss?.32:.42)*dt;e.z+=clamp(tz-e.z,-v,v);}}
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
 function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
