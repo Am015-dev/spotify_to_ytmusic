@@ -75,3 +75,6 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
    (g) PLAY AS A BOT (owner, 24 Oct 17:25: "you are a bot, you can play multiple games x200, no need to run human time"): every probe,
        audit and balance run is stepped at >= x200 (flight: qa/simhunt.js harness; street: FOOT.sim as qa/streetsim.js), several full
        runs to the end of the boss. Real time only for the single screenshot moment.
+   (h) OWNER EXCEPTION (Alex, 24 Oct 21:35 UTC, "I allow"): on-foot actors (Kai and foes only, never backdrop or props) may get a
+       code-drawn 2-3 px dark outline, a thin rim light and, on Kai only, a gentle lift of the darkest values, built once per frame and
+       cached. The owner's art stays underneath; no flat tint over a whole sprite.
