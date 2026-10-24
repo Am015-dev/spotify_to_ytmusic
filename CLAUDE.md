@@ -1,4 +1,5 @@
 # Mainhattan Overdrive (LEGO-2K-Drive-style, Frankfurt + Athens): read first
+Knowledge: docs/wiki/index.md (read it before grepping).
 Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-int2. Beta page: claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug. Owner: Alex (iPhone 17 landscape + PC). Full history and old rules: docs/LESSONS_and_old_rules.md (read only when needed).
 
 ## Production model (2026-10-14, after $700+ and many reverts)
