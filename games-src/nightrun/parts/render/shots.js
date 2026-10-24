@@ -39,7 +39,7 @@ const SHOTS=window.SHOTS={seq:0,pLast:0,eFirst:1e9,eUnder:0,seen:{},pp:[],
     ctx.restore();},
   lens(x0,x1,h){ctx.beginPath();ctx.moveTo(x0,0);ctx.quadraticCurveTo((x0+x1)/2,-h*1.6,x1,0);ctx.quadraticCurveTo((x0+x1)/2,h*1.6,x0,0);},   // a pointed bolt, h = half thickness (the curves reach 0.8 h)
   /* player shots (one call per shot, inside the 'lighter' loop of render()): underlay, the weapon's picture, glow line, white core */
-  player(b){if(this.ft!==G.t){this.ft=G.t;this.pp.length=0;}const u=window.READ?READ.ppu():1,ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,L=(b.len||(b.big?22:b.pn!=null?28:20))*1.5,tw=Math.max((b.th||3)*1.6,8/u),tf=ctx.getTransform(),
+  player(b){if(this.ft!==G.t){this.ft=G.t;this.pp.length=0;}const u=window.READ?READ.ppu():1,ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,L=(b.len||(b.big?22:b.pn!=null?28:20))*1.9,tw=Math.max((b.th||3)*2,11/u),tf=ctx.getTransform(),
       k=b.wid&&FXW.pic('w-'+b.wid+'-bullet')?'fx-w-'+b.wid+'-bullet':null,o=k&&ART.sp(k,Math.max(24,Math.min(140,L*1.4+tw*2))*1.3),sp=b.wid&&FXW.SPIN[b.wid];
     ctx.save();ctx.translate(b.x,b.y);ctx.rotate(ang);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=.5;ctx.fillStyle=this.RING;this.lens(-L*.3,L*.95,tw*1.5);ctx.fill();ctx.restore();
     if(o){ctx.save();if(!FXW.SOLID[b.wid])ctx.globalCompositeOperation='lighter';ART.put(o,b.x+(sp?0:Math.cos(ang)*L*.3),b.y+(sp?0:Math.sin(ang)*L*.3),ang+(sp?G.t*9:0),1);ctx.restore();}
