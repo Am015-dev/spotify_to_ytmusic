@@ -89,7 +89,7 @@ SL.steam=(c,cam,x0,w,fl,t)=>{const C=CH*SL.k,m=ART.ANIM.s[STEAM],sf=steamFrames(
 if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART.drawAnim)return;const C=CH*SL.k,x0=SL.x0||0,cell=400,i0=Math.floor((cam+x0)/cell)-1,i1=Math.ceil((cam+x0+w)/cell)+1;
   for(let i=i0;i<=i1;i++){const r=hs(i*41+7),px=i*cell-cam+cell*(.2+.6*hs(i*5+1));if(r>.58)continue;
     const PL=RET.cam2?PROPS4:PROPS,q=PL[Math.floor(hs(i*97+3)*PL.length)],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),m=ART.ANIM.s[k];if(!m||!ART.anim(k))continue;
-    const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}
+    const gl=RET.footmove&&/^(holo|beacon)$/.test(q[0]),h=q[1]*C*(gl?.7:1);SL.tag='prop';if(gl)c.filter='brightness(.5) saturate(.6)';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,gl?.45:.95);if(gl)c.filter='none';SL.tag='';}   // W225 footmove: the glowing beacon / holo pushed back (smaller, darker, fainter) so it never competes with the fighters
   if(RET.cam2)SL.steam(c,cam,x0,w,fl,t);};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
 
 /* ----- painted street (22 Oct 2026): foot/bg-sky|far|mid|near|floor, 2048x1024 each, used only when all five are loaded (else the placeholders below). Same convention as footart.js FA.bg: the picture's street line is 80% down,

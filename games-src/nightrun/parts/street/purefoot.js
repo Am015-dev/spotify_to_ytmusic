@@ -60,9 +60,10 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
     const y=p.y+bob,Y=Math.max(SL.my(y),t0+4+r),pz=p.z!=null&&SL.band?p.z:1,k=K*(.9+.1*pz),h=40,w=q&&q.width?h*q.width/q.height:h;
     c.save();c.translate(p.x,Y-(1-pz)*SL.band);c.scale(k,k);c.translate(-p.x,-y);c.globalAlpha=(p.t>13?.5+.5*Math.sin(p.t*20):1)*fa;SL.tag='pk';if(am)ART.drawAnim(c,'pk-ammo/spin',p.t,p.x,y,32/ART.ANIM.c['pk-ammo/spin'].bw,false);else c.drawImage(q,p.x-w/2,y-h/2-4,w,h);SL.tag='';c.restore();}
   const dP=p=>{if(p.hp<=0&&!p.fl)return;SL.z=p.z;let ok=false;if(RET.footmove&&window.FA&&FA.shadow){at(c,p.x,p.y,K);c.translate(p.x,p.y);FA.shadow(c,p.w*1.5,1);c.restore();}   // footmove: props stand on the floor like the actors (same soft contact shadow)
-   if(p.draw){try{ok=p.draw(c,K,at);}catch(x){}}
+   const gk=RET.footmove&&p.k==='kiosk';if(gk)c.filter='brightness(.7) saturate(.8)';if(p.draw){try{ok=p.draw(c,K,at);}catch(x){}}if(gk)c.filter='none';   // W225: the lit vending kiosk a value step under the fighters
     if(!ok){const hd=Math.min(p.h,1.25*64);at(c,p.x,p.y,K);c.fillStyle=p.c;c.fillRect(p.x-p.w/2,p.y-hd,p.w,hd);c.restore();}SL.z=null;};   // a prop with no picture yet keeps its flat box (it blocks shots)
-  const dE=e=>{if(e.dead&&!(e.ext&&!e.remove))return;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)return;SL.z=e.z;
+  const dE=e=>{const sx=RET.footmove&&e._sx||0;e.x+=sx;try{dE0(e);}finally{e.x-=sx;}};   // W225 footmove: the drawn personal-space offset
+  const dE0=e=>{if(e.dead&&!(e.ext&&!e.remove))return;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)return;SL.z=e.z;
     let pose=e.dead?'die':(()=>{try{return e.def.pose?e.def.pose(e):'idle';}catch(x){return'idle';}})();if(!e.dead){if(e.wind>0)pose='melee';else if(e.tele>0)pose='shoot';}   // telegraph = the attack pose
     let et=e.dead?e.dt_||0:e.t;if(RET.footmove&&!e.dead)[pose,et]=mvE(e,e.id,pose,et);
     const ey=e.ext&&e.fly?e.y+e.h/2:e.y;at(c,e.x,ey,K);if(RET.footmove&&!e.dead)turn(c,e,e.x);ART.fE=e;IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,et,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;c.restore();SL.z=null;};

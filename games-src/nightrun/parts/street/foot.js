@@ -98,7 +98,7 @@ const viewW=()=>L?L.vw:960;
 function note(t,s){S.note={t:s||2.2,txt:t};}
 function pop(x,y,t,c,big){S.pop.push({x,y,t,c:c||'#fff',l:big?1.4:.9,m:big?1.4:.9,big:!!big});if(S.pop.length>40)S.pop.shift();}
 function ftBurst(x,y,c,n,sp){if(S.fx.length>260)return;for(let i=0;i<n;i++){const a=ftRnd(0,6.283),v=ftRnd(.3,1)*(sp||260);S.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-80,l:ftRnd(.25,.6),c,r:ftRnd(2,4)});}}
-function hitstop(ms){if(!RET.juice||reduce())return;S.hs=Math.max(S.hs,ms/1000);}
+function hitstop(ms,a,b){if(!RET.juice||reduce())return;if(RET.footmove&&a&&!S.sim){for(const o of [a,b])if(o)o.hs=Math.max(o.hs||0,ms/1000);return;}S.hs=Math.max(S.hs,ms/1000);}   // footmove (OpenBOR pause_add): only the two fighters freeze; no actor given = the whole world (finisher, phase, overdrive)
 function ftShake(v){if(reduce())return;S.shake=Math.max(S.shake,window.COM?COM.sk(v):v);}
 const SFXID={shot:'f_shot',hit:'f_hit',pick:'f_pick',big:'f_big',hurt:'f_hurt',dash:'f_dash',graze:'f_graze',warn:'f_warn',up:'f_up',tier:'f_fever'};   // LAB (ON FOOT group of the SOUND page): each on-foot sound has its own switch
 // 22 Oct: 'window.AU' is undefined (AU is a script-level const), so these three calls never ran: no on-foot sound, no stage song. They use AU directly now, each behind its ON FOOT switch.
@@ -207,7 +207,7 @@ function ftHurt(n,fromX,src,b){const P=S.P;if(P.dashIF>0&&P.inv<=0&&!S.win&&P.hp
 
   if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');if(window.FTX)FTX.ev('block');sfx('graze');return false;}
   P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*(RET.hitfeel?170:240);
-  sfx('hurt');ftShake(8);hitstop(40);ftBurst(P.x,P.y-40,'#ff4060',10);
+  sfx('hurt');ftShake(8);hitstop(40,S.P);ftBurst(P.x,P.y-40,'#ff4060',10);
   if(P.w!=='pistol'){const nl=P.lv-1;if(nl<1){pop(P.x,P.y-96,WEAPONS[P.w].n+' LOST','#ff4060');setW(P,'pistol',1,Infinity,false);}else{setW(P,P.w,nl,P.ammo,false);pop(P.x,P.y-96,WEAPONS[P.w].n+' LV'+nl,'#ff4060');}}
   if(P.hp<=0){P.hp=0;S.dead=1.4;note('DOWN',2);NR.emit('footDown',{stage:S.id});}
   return true;}
@@ -242,7 +242,7 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
     if(!(RET.reach&&F.reachD&&S.st.fs))for(const e of S.E)if(hittable(e)&&zok(e.z,P.z)){const b=ebox(e);if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){dmgE(e,3,{pierce:1,melee:true,x:P.x});hit++;}}
     for(const p of S.pr)if(p.hp>0&&zok(p.z,P.z)&&r.x<p.x+p.w/2&&r.x+r.w>p.x-p.w/2&&r.y<p.y&&r.y+r.h>p.y-p.h)hitProp(p,2);
     for(let i=S.eb.length-1;i>=0;i--){const b=S.eb[i];if(zok(b.z,P.z)&&b.x>r.x&&b.x<r.x+r.w&&b.y>r.y&&b.y<r.y+r.h){S.eb.splice(i,1);hit++;}}   // the knife cuts bullets
-    S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:r.w,l:.15,c:'#e8f6ff'});if(hit){hitstop(25);if(window.FTX)FTX.ev('knifehit');}sfx('graze');}
+    S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:r.w,l:.15,c:'#e8f6ff'});if(hit){hitstop(25,S.P);if(window.FTX)FTX.ev('knifehit');}sfx('graze');}
   if(P.mel>0)P.mel-=dt;
   if(I.bombP)bomb(P);
   for(const k of PW_KEYS){const c=P.pw[k];if(c){c.t-=dt;if(c.t<=0)delete P.pw[k];}}
@@ -252,6 +252,15 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
    (slower than Kai walks, so stepping out of line dodges) once they are within 300 units of him. */
 const ZL=[.15,.85,.5,.3,.7];
 F.beltZ=e=>{if(e.boss)return e.hz=.5;S.zi=(S.zi||0)+1;return e.hz=clamp(ZL[S.zi%5]+ftRnd(-.05,.05),0,1);};
+const ATK=/^(lunge|dash|pounce|spray|bite|charge)$/;
+function space(dt){const P=S.P,L=S.E.filter(e=>!e.dead&&!e.fly&&!e.boss&&!e.remove&&e.state!=='dead');   // footmove: a personal-space ring on the belt (x and depth), DRAWN: e._sx shifts the picture only, the sim positions stay
+  const atk=e=>ATK.test(e.state)||e.wind>0,near=(a,b,d)=>!(a.z!=null&&b.z!=null&&Math.abs(a.z-b.z)>d);   // a real shove moved 20-run clear rates by 15-40 points (seed chaos), see review-shots/W225
+  for(const e of L)e._tx=0;
+  for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const a=L[i],b=L[j];if(!near(a,b,.3))continue;const m=.7*(a.h+b.h),dx=b.x+b._tx-a.x-a._tx;   // foes keep a body apart
+    if(Math.abs(dx)<m){const sd=Math.sign(dx)||1,v=(m-Math.abs(dx))/2;if(!atk(a))a._tx-=sd*v;if(!atk(b))b._tx+=sd*v;}}
+  for(const e of L){const dx=e.x+(e._sx||0)-P.x,sd=Math.sign(dx)||-e.facing||1,R=.7*(e.h+P.h),d=e.x+e._tx-P.x;   // Kai's ring wins: attackers come in to strike range, the rest hold at a readable distance
+    if(!atk(e)&&near(e,P,.35)&&Math.abs(d)<R)e._tx=P.x+sd*R-e.x;}
+  for(const e of L){const sx=e._sx||0;e._sx=sx+clamp(clamp(e._tx,-140,140)-sx,-300*dt,300*dt);}}
 function beltE(dt){const P=S.P;let c1=null,cd=300;for(const e of S.E)if(!e.dead&&e.z!=null&&Math.abs(e.x-P.x)<cd){cd=Math.abs(e.x-P.x);c1=e;}   // the closest foe (and the boss, and any foe winding up a shot) steps into Kai's line; the rest hold lanes beside him
   for(const e of S.E){if(e.dead||e.z==null)continue;const near=Math.abs(e.x-P.x)<300,tz=!near?e.hz:e===c1||e.boss||e.tele>0?P.z:clamp(P.z+(e.hz-.5)*.95,0,1),v=(e.boss?.32:.42)*dt;e.z+=clamp(tz-e.z,-v,v);}}
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
@@ -282,7 +291,7 @@ function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
     spawn('grunt',Math.random()<.5&&!RET.fairstreet?S.camX-40:edge+40,null,{fb:1});if(P.idle>16)spawn('gunman',edge+40,null,{fb:1});}}   // built-in walkers: they always come to you
 function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&&RET.asW())||1)*(S.st.hook&&S.st.hook.agg?S.st.hook.agg(S):1);
   envG();
-  for(const e of S.E){if(e.dead){if(e.ext&&!e.remove){e.dt_=(e.dt_||0)+edt;try{e.def.ai(e,edt,env);}catch(x){e.remove=true;}if(e.dt_>1.2)e.remove=true;}continue;}e.t+=edt;if(e.flash>0)e.flash-=dt;if(e.grace>0)e.grace-=edt;if(e.tele>0)e.tele-=edt;
+  for(const e of S.E){if(e.hs>0&&!e.dead){e.hs-=dt;continue;}if(e.dead){if(e.ext&&!e.remove){e.dt_=(e.dt_||0)+edt;try{e.def.ai(e,edt,env);}catch(x){e.remove=true;}if(e.dt_>1.2)e.remove=true;}continue;}e.t+=edt;if(e.flash>0)e.flash-=dt;if(e.grace>0)e.grace-=edt;if(e.tele>0)e.tele-=edt;
     try{e.def.ai(e,edt,env);}catch(x){if(!e._err){e._err=1;console.warn('foot ai',e.id,x);}e.def=fbDef(e.id);}
     if(!e.ext){if(!e.fly)e.vy+=GRAV*edt;e.x+=e.vx*edt;e.y+=e.vy*edt;}   // W3's ai moves its enemies itself
     if(!e.fly&&e.y>=FL){e.y=FL;e.vy=0;e.onGround=true;}
@@ -293,7 +302,7 @@ function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&
     if(e.burn>0){e.burn-=dt;e.bt=(e.bt||0)-dt;if(e.bt<=0){e.bt=.25;dmgE(e,.4,{pierce:1});}}
     if(!e.boss&&(e.x<S.camX-400||e.x>S.camX+viewW()+600))e.dead=true,e.gone=1;
     if(!e.dead){const b=ebox(e),pb_=pbox(P);if(e.def.touch!==0&&!e.fly&&b.x<pb_.x+pb_.w&&b.x+b.w>pb_.x&&b.y<pb_.y+pb_.h&&b.y+b.h>pb_.y&&e.grace<=0&&e.w>40&&zok(e.z,P.z)&&!(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2)))ftHurt(1,e.x,'touch:'+e.id);}}
-  if(RET.belt)beltE(edt);
+  if(RET.belt)beltE(edt);if(RET.footmove)space(edt);
   S.E=S.E.filter(e=>!e.dead||e===S.boss||(e.ext&&!e.remove&&!e.gone));
   // queued enemy shots: released on the next half beat once their telegraph is over
   const hb=Math.floor(beatPos()*2);if(S.lhb===null)S.lhb=hb;
@@ -344,7 +353,7 @@ function ftUpdate(rdt){if(!S||S.paused||S.end)return;
   let dt=Math.min(rdt,.05);if(S.hf>0)S.hf-=rdt;if(S.hs>0){S.hs-=rdt;dt*=.05;}
   if(F.ctl)try{F.ctl(S,I);}catch(e){}
   S.time+=dt;if(S.note.t>0)S.note.t-=rdt;if(S.shake>0)S.shake=Math.max(0,S.shake-rdt*30);if(S.feverT>0)S.feverT-=dt;S.hintT+=rdt;
-  stepPlayer(dt);stepStage(dt);if(S.st.hook&&S.st.hook.step)S.st.hook.step(S,dt,env);stepEnemies(dt);stepShots(dt);stepPickups(dt);if(F.post)F.post(S,dt);   // tidy.js: arena player cap + flyers kept under the HUD
+  if(S.P.hs>0)S.P.hs-=dt;else stepPlayer(dt);stepStage(dt);if(S.st.hook&&S.st.hook.step)S.st.hook.step(S,dt,env);stepEnemies(dt);stepShots(dt);stepPickups(dt);if(F.post)F.post(S,dt);   // tidy.js: arena player cap + flyers kept under the HUD
   I.jumpP=I.meleeP=I.dashP=I.bombP=0;
   if(S.dead){S.dead-=rdt;if(S.dead<=0)finish(false);}
   else if(S.win){S.win-=rdt;if(S.win<=0)finish(true);}}
