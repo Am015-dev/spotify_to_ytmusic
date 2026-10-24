@@ -4,7 +4,7 @@
 /* ---------- STREETCOMBO (W188, STREET-REVIEW task 5). Every landed hit adds 1 (burn ticks and flamer streams do not); a hurt or 2 s without a hit ends the streak.
    F.COMBO = {n, best, last, hurts}. Drawn under the score, right edge; its box joins L.hud so the hud-cover checks see it. A kill by the third melee swing or by a blast
    (grenade, shockwave) throws the foe up for 0.4 s: its own die frame, tilted, lifted on a sine (no new art). Foes that vanish at death (no die pose) do not bounce. ---------- */
-if(RET.combocount===undefined)RET.combocount=/[?&]combocount=1/.test(location.search);
+if(RET.combocount===undefined)RET.combocount=!/[?&]combocount=0/.test(location.search);
 (function(){
 if(!RET.combocount||!window.FOOT||!FOOT._in||!FOOT.look||typeof ART==='undefined')return;
 const F=window.FOOT,IN=F._in,SL=F.look,C=F.COMBO={n:0,best:0,last:-9,hurts:0,pop:-9,bounces:0,drawn:0,want:0},WIN=2,BNC=.4;
