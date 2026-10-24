@@ -1,8 +1,7 @@
 # Engine lessons from open-source code (W222, 24 Oct 2026)
 
 Owner, 24 Oct 20:20: "the assets I gave you are flawless and you turned the game into shit; look up open-source games of the same
-style and also open-source WebGL to understand the logic." Docs only; nothing here changes the game. Every gate below is one
-phone (390x763) + one PC (1440x860) shot or a `?scn=` probe, per WORKER-RULES 17.
+style and also open-source WebGL to understand the logic." Docs only. Gates: one phone + one PC shot or a `?scn=` probe (rule 17).
 
 Sources read (shallow clones, licence file checked in each):
 - **OpenBOR** (beat-'em-up engine, BSD 3-clause, `LICENSE`): `engine/openbor.c`, `engine/openbor.h`.
@@ -16,7 +15,6 @@ Sources read (shallow clones, licence file checked in each):
 
 Ours: `games-src/nightrun/parts/render/pure.js` (flight), `street/purefoot.js`, `street/streetlook.js`, `street/foot.js`,
 `street/footart.js`, `street/streetfeel.js`, `street/streetmelee.js`, `art/art.js`.
-
 The short version: the engines are not prettier because of WebGL. They are prettier because of a few compositing rules we
 break: bullets keep a dark rim and are drawn with normal (premultiplied) blending, not pure additive; every plane moves on a
 smooth parallax ladder; hits freeze the two fighters and send the victim on a real arc; shadows are the actor's own shape.
@@ -177,6 +175,6 @@ What a PixiJS layer would cost (measured from the npm builds):
 - Gain: one draw call per batch instead of one per `drawImage`; real premultiplied blending; filters on the GPU. Phone gain
   only matters if Canvas2D is the bottleneck, which no one has measured yet.
 
-**Decision rule.** Do fixes 1, 4, 5, 6, 8 first (each one task, Sonnet, behind a flag, owner pair before keeping). Move to a
+**Decision rule.** Do fixes 1, 4, 5, 6, 8 first (each one task, behind a flag, owner pair before keeping). Move to a
 PixiJS layer ONLY if a Chrome performance trace of the busy stage-1 moment on a mid phone (4x CPU throttle, 390x763) shows the
 canvas draw > 10 ms per frame after those fixes. Phaser is not worth it: we would use only its renderer and pay for the rest.
