@@ -69,3 +69,6 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
    (e) DONE = the owner says the one-shot pair looks good. Not a probe, not a colour-distance number, not a worker's verdict.
    (f) Code cannot paint art: grading, tints and glow do not fix weak sprites (24 Oct: W194/W201 halved colour distance; the owner still
        saw pasted layers). If the art is the problem, say so and list the sprite needed for Google Flow instead of tinting it.
+   (g) PLAY AS A BOT (owner, 24 Oct 17:25: "you are a bot, you can play multiple games x200, no need to run human time"): every probe,
+       audit and balance run is stepped at >= x200 (flight: qa/simhunt.js harness; street: FOOT.sim as qa/streetsim.js), several full
+       runs to the end of the boss. Real time only for the single screenshot moment.
