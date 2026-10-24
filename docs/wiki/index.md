@@ -23,6 +23,7 @@ Rules: [SCHEMA.md](SCHEMA.md) | history: [log.md](log.md) | pins: [sources/racer
 - [game/vehicles-xform.md](game/vehicles-xform.md): cars, auto transform, driving, damage
 - [game/garage-and-models.md](game/garage-and-models.md): builder, collection, LDraw chunks
 - [game/races-and-tracks.md](game/races-and-tracks.md): race world, items, duels, proto, quests
+- Proto-2 2K look (?proto=1, golden sun, haze, glows, speed lines): docs/HANDOFF_look2k-r24j.md, shots docs/shots/proto2, tool tools/tProto2.js
 - [game/render-and-perf.md](game/render-and-perf.md): tiers, culling, streaming, telemetry, iPhone gate
 - [game/flags.md](game/flags.md): OD_FLAG, preview build, flag lifecycle
 - [game/shot-library.md](game/shot-library.md): shot IDs, tools/shot.js, 2K references

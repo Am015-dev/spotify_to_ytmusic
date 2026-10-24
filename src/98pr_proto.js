@@ -27,8 +27,8 @@ function PR_build(sp){const M=PR_mats(),Gm=tkGeoOf(sp.C),P=Gm.seg.start,L=tkLen(
   for(const sd of[-1,1]){
     for(let s=-28,k=0;s<S1;s+=2,k++){const a=pt(s,sd*(hw-.45));put(k%2?M.wht:M.red,new THREE.BoxGeometry(.9,.22,1.96),a.x,a.y+.11,a.z,a.h);n++;   // kerb + 2 studs
       for(const o of[-.5,.5])put(k%2?M.wht:M.red,new THREE.CylinderGeometry(.24,.24,.16,8),a.x+Math.sin(a.h)*o,a.y+.3,a.z+Math.cos(a.h)*o,a.h)}
-    for(let s=-28,k=0;s<S1;s+=4,k++){const a=pt(s,sd*(hw+1.1));if(gap(a.x,a.z))continue;const mt=k%2?M.wht:M.red;put(mt,new THREE.BoxGeometry(.8,1.1,3.9),a.x,a.y+.55,a.z,a.h);n++;   // brick barrier, 2 studs on top
-      for(const o of[-1,1])put(mt,new THREE.CylinderGeometry(.26,.26,.18,8),a.x+Math.sin(a.h)*o,a.y+1.19,a.z+Math.cos(a.h)*o,a.h)}
+    for(let s=-28,k=0;s<S1;s+=4,k++){const a=pt(s,sd*(hw+1.1));if(gap(a.x,a.z))continue;const mt=k%2?M.wht:M.red;put(mt,new THREE.BoxGeometry(.6,.62,3.9),a.x,a.y+.31,a.z,a.h);n++;   // brick barrier (proto-2: lower, with a round top rail and 2 studs)
+      put(mt,new THREE.CylinderGeometry(.3,.3,3.9,12),a.x,a.y+.66,a.z,a.h,Math.PI/2);for(const o of[-1,1])put(mt,new THREE.CylinderGeometry(.2,.2,.16,10),a.x+Math.sin(a.h)*o,a.y+.98,a.z+Math.cos(a.h)*o,a.h)}
     const fc=[M.yel,M.blu,M.red,M.grn];for(let s=sd<0?6:16,k=0;s<S1;s+=20,k++){const a=pt(s,sd*(hw+2.6));if(gap(a.x,a.z))continue;put(M.wht,new THREE.CylinderGeometry(.14,.14,7.5,6),a.x,a.y+3.75,a.z,a.h);   // flag pole + banner
       put(fc[k%4],new THREE.BoxGeometry(.12,2.4,1.7),a.x+Math.sin(a.h)*.85,a.y+6.2,a.z+Math.cos(a.h)*.85,a.h);n+=2}
     for(let s=sd<0?30:50;s<S1;s+=45){const a=pt(s,sd*(hw+2.2));if(gap(a.x,a.z))continue;for(let j=0;j<3;j++)for(const o of[-.6,.6]){put(j%2?M.wht:M.blk,new THREE.CylinderGeometry(.55,.55,.42,12),a.x+Math.sin(a.h)*o,a.y+.21+j*.42,a.z+Math.cos(a.h)*o,a.h)}n++}}
@@ -36,24 +36,79 @@ function PR_build(sp){const M=PR_mats(),Gm=tkGeoOf(sp.C),P=Gm.seg.start,L=tkLen(
   for(let s=60;s<S1;s+=10){const h0=PR_at(P,L,s-15).h,h1=PR_at(P,L,s+15).h,dh=h1-h0;if(Math.abs(dh)<.035)continue;const sd=dh<0?1:-1,a=pt(s,sd*(hw+1.3));
     const pl=new THREE.PlaneGeometry(2.4,2.4);if(sd<0){const u=pl.attributes.uv;for(let i=0;i<u.count;i++)u.setX(i,1-u.getX(i))}put(M.chev,pl,a.x,a.y+2.6,a.z,a.h+Math.PI);put(M.blk,new THREE.BoxGeometry(.18,1.5,.18),a.x,a.y+.75,a.z,a.h);n++}
   // start line, grid slots, gantry
-  const sL=38;for(let s=-24;s<sL+6;s+=6){const a=pt(s+3,0);put(M.asp,new THREE.BoxGeometry(hw*2-1.2,.05,6.1),a.x,a.y+.02,a.z,a.h)}{const a=pt(sL,0);put(M.chk,new THREE.BoxGeometry(hw*2-1.2,.05,1.6),a.x,a.y+.05,a.z,a.h)}
+  const sL=38;for(let s=-24;s<S1;s+=6){const a=pt(s+3,0);put(M.asp,new THREE.BoxGeometry(hw*2-1.2,.05,6.1),a.x,a.y+.02,a.z,a.h);   // proto-2: dark 2K asphalt over the whole stretch (the city road read beige in the warm haze)
+    put(M.asp,new THREE.BoxGeometry(4.2,.24,6.1),a.x,a.y+.1,a.z,a.h);   // and over the boulevard's green studded median plate (CV_streets, ~0.17 m high): this was the green strip under the car
+    if(s>sL)for(const ln of[-hw/3,hw/3])if((s/6|0)%2===0){const d=pt(s+3,ln);put(M.wht,new THREE.BoxGeometry(.3,.05,3.2),d.x,d.y+.05,d.z,d.h)}}{const a=pt(sL,0);put(M.chk,new THREE.BoxGeometry(hw*2-1.2,.05,1.6),a.x,a.y+.05,a.z,a.h)}
   const nA=sp.ai.length,slots=[[4,4]];sp.ai.forEach((ai,i)=>{const r=nA-1-i;ai.s=11+7*r;ai.lane=r%2?4:-4;slots.push([ai.s,ai.lane])});
   for(const[s,ln]of slots){for(const o of[-1.7,1.7]){const a=pt(s,ln+o);put(M.wht,new THREE.BoxGeometry(.22,.05,4.6),a.x,a.y+.05,a.z,a.h)}const f=pt(s+2.5,ln);put(M.wht,new THREE.BoxGeometry(3.6,.05,.25),f.x,f.y+.05,f.z,f.h)}
-  {const gs=sL+4;for(const sd of[-1,1]){const a=pt(gs,sd*(hw+1.6));for(let k=0;k<6;k++)put(k%2?M.yel:M.red,new THREE.BoxGeometry(2.4,1.4,2.4),a.x,a.y+.7+k*1.4,a.z,a.h);for(const o of[-.6,.6])for(const p of[-.6,.6])put(M.yel,new THREE.CylinderGeometry(.42,.42,.3,10),a.x+Math.cos(a.h)*o+Math.sin(a.h)*p,a.y+8.55,a.z-Math.sin(a.h)*o+Math.cos(a.h)*p,a.h)}
+  {const gs=sL+4;for(const sd of[-1,1]){const a=pt(gs,sd*(hw+1.6));put(M.blu,new THREE.CylinderGeometry(.62,.72,8.4,16),a.x,a.y+4.2,a.z,a.h);for(const y of[1.6,4.2,6.8])put(M.wht,new THREE.CylinderGeometry(.76,.76,.34,16),a.x,a.y+y,a.z,a.h);   // proto-2: one slim round blue post with white bands (was a 2.4 m striped box tower)
+      put(M.yel,new THREE.CylinderGeometry(.5,.5,.28,14),a.x,a.y+8.54,a.z,a.h)}
     const c=pt(gs,0),bw=hw*2+5.6;put(M.blu,new THREE.BoxGeometry(bw,2.6,1.2),c.x,c.y+9.7,c.z,c.h);
     const pl=new THREE.PlaneGeometry(bw*.8,2.3);put(M.ban,pl,c.x-Math.sin(c.h)*.62,c.y+9.7,c.z-Math.cos(c.h)*.62,c.h+Math.PI);   // banner faces the grid
     const Lg=new THREE.Group();PROTO.lights=[];for(let i=0;i<5;i++){const o=(i-2)*1.6,x=c.x+Math.cos(c.h)*o-Math.sin(c.h)*.7,z=c.z-Math.sin(c.h)*o-Math.cos(c.h)*.7;put(M.blk,new THREE.BoxGeometry(1.2,1.4,.4),x,c.y+7.7,z,c.h);
-      const l=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.2,12),M.off);l.position.set(x-Math.sin(c.h)*.25,c.y+7.7,z-Math.cos(c.h)*.25);l.rotation.set(Math.PI/2,c.h,0,'YXZ');Lg.add(l);PROTO.lights.push(l)}
+      const l=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.2,12),M.off);l.position.set(x-Math.sin(c.h)*.25,c.y+7.7,z-Math.cos(c.h)*.25);l.rotation.set(Math.PI/2,c.h,0,'YXZ');Lg.add(l);PROTO.lights.push(l);
+      const hl=new THREE.Mesh(PR_q(),PR_glowMat('h'+i,0));hl.scale.setScalar(3.2);hl.position.set(x-Math.sin(c.h)*.4,c.y+7.7,z-Math.cos(c.h)*.4);hl.rotation.y=c.h+Math.PI;Lg.add(hl);l.userData.halo=hl}
     PROTO.lg=Lg}
   // ? bricks in the stretch: a purple glowing bubble + ring (2K item bubbles)
   for(const it of sp.items){const d=Math.hypot(it.x-P[0][0],it.z-P[0][1]);if(d>S1+10)continue;const y=it.g.position.y,a=PR_at(P,L,0);put(M.bub,new THREE.SphereGeometry(2.3,16,12),it.x,y,it.z,0);put(M.ring,new THREE.TorusGeometry(2.4,.16,8,28),it.x,y,it.z,it.g.rotation.y||a.h);n++}
   const G=new THREE.Group();G.name='proto1';for(const[mat,L2]of B){const g=mergeGeometries(L2.map(x=>x),false);for(const x of L2)x.dispose();const me=new THREE.Mesh(g,mat);me.matrixAutoUpdate=false;me.updateMatrix();G.add(me)}G.add(PROTO.lg);
   // the stretch is the show: traffic and parked cars on the race line go (race-only, at start)
   try{if(typeof SIMP_clearTraffic==='function')for(let _k=0,_c=HUB.cars||[],c;_k<_c.length&&(c=_c[_k],true);_k++){if(c.dead||c.route||c.x==null)continue;for(let s=-30;s<S1;s+=10){const q=PR_at(P,L,s);if(Math.hypot(c.x-q.x,c.z-q.z)<hw+4){SIMP_clearTraffic(c.x,c.z,1);break}}}}catch(err){}
-  if(PROTO.g)PR_drop();RO.grp.add(G);PROTO.g=G;PROTO.n=n;PROTO.draws=G.children.length;return G}
-function PR_drop(){const G=PROTO.g;if(!G)return;RO.grp.remove(G);G.traverse(m=>{if(m.geometry)m.geometry.dispose()});PROTO.g=null;PROTO.n=0}
-function PR_lights(sp){if(!PROTO.lights)return;const cd=sp.cd||0;PROTO.lights.forEach((l,i)=>{l.material=cd<=0?PROTO.M.lg:(3-cd)>=i*.55?PROTO.M.lr:PROTO.M.off})}
+  if(PROTO.g)PR_drop();RO.grp.add(G);PROTO.g=G;PROTO.n=n;PROTO.draws=G.children.length;try{PR_lookOn(sp,P,L)}catch(err){console.warn('proto2',err)}return G}
+function PR_drop(){try{PR_lookOff()}catch(err){}const G=PROTO.g;if(!G)return;RO.grp.remove(G);G.traverse(m=>{if(m.geometry)m.geometry.dispose()});PROTO.g=null;PROTO.n=0}
+function PR_lights(sp){if(!PROTO.lights)return;const cd=sp.cd||0;PROTO.lights.forEach((l,i)=>{l.material=cd<=0?PROTO.M.lg:(3-cd)>=i*.55?PROTO.M.lr:PROTO.M.off;const h=l.userData.halo;if(h){const m=h.material,on=l.material!==PROTO.M.off;m.opacity=on?.85:0;m.color.setRGB(...(cd<=0?[.25,1.6,.45]:[1.8,.22,.12]))}})}
+/* proto-2 (2026-10-24, same flag): the 2K light and finish, only while the proto race runs. Learned from three.js examples (MIT): webgl_shaders_sky (warm low sun
+   with a bright horizon band), webgl_materials_physical_clearcoat (low roughness + strong env on paint), webgl_postprocessing_unreal_bloom (only the hot emissives glow).
+   Phone budget: no new shader program. Every glow (tail lights, start-light halos, speed lines, boost trail) is the rig's own under-glow material type
+   (MeshBasic + GLOW map, additive, toneMapped:false), lights/sky/fog are uniforms, gloss is roughness/envMapIntensity only (no clearcoat toggles, which would relink).
+   The look is written right before each composer.render, after every mood / day-cycle / GFX writer, and restored when the race ends. */
+const PR_q=()=>new THREE.PlaneGeometry(1,1);
+function PR_glowMat(k,op,c){const C=PROTO.GM||(PROTO.GM=new Map());let m=C.get(k);if(!m){m=new THREE.MeshBasicMaterial({map:GLOW,color:new THREE.Color(...(c||[1,1,1])),transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});C.set(k,m)}return m}
+const PR_LOOK={sun:'#ffc48a',sunI:3.5,el:22,hemi:['#cfdcff','#b4885e',1.05],fog:'#f0c9a2',fogD:.0015,top:[.05,.2,.7],mid:[.34,.54,.96],hor:[1.3,.88,.58],sky:[2.8,1.6,.7],exp:1.06,env:.5,
+  rough:.16,envK:1.8}
+// a car's rear in its own frame: local bbox + the local forward axis (world forward f through the inverse world matrix)
+function PR_rear(g,f){g.updateMatrixWorld(true);const inv=g.matrixWorld.clone().invert(),B=new THREE.Box3(),b=new THREE.Box3(),m=new THREE.Matrix4();
+  g.traverse(o=>{if(!o.isMesh||!o.geometry||!o.visible)return;const mt=[].concat(o.material)[0];if(!mt||mt.transparent||mt.isMeshBasicMaterial)return;/* lit body parts only (no shadow blobs, glows or ribbons) */if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(m.multiplyMatrices(inv,o.matrixWorld));B.union(b)});
+  if(B.isEmpty())return null;const lf=f.clone().transformDirection(inv);lf.y=0;lf.normalize();const c=B.getCenter(new THREE.Vector3()),sz=B.getSize(new THREE.Vector3());
+  const ext=Math.abs(lf.x)*sz.x/2+Math.abs(lf.z)*sz.z/2,wid=Math.abs(lf.z)*sz.x+Math.abs(lf.x)*sz.z,ws=g.getWorldScale(new THREE.Vector3()).x||1;
+  const pv=new THREE.Group();pv.position.set(c.x-lf.x*ext,B.min.y,c.z-lf.z*ext);pv.rotation.y=Math.atan2(-lf.x,-lf.z);g.add(pv);return{pv,w:wid,h:sz.y,ws,dbg:[sz.x,sz.y,sz.z,lf.x,lf.z,ws].map(v=>+v.toFixed(2))}}
+function PR_gloss(X,m,r,k){if(!m||X.mats.has(m)||!(m.isMeshStandardMaterial)||m.transparent)return;X.mats.set(m,[m.roughness,m.envMapIntensity]);m.roughness=Math.min(m.roughness,r);m.envMapIntensity=(m.envMapIntensity||1)*k}
+function PR_attach(X){const K=PR_LOOK,sp=X.sp,P=X.P,L=X.L;
+  // the stray green stud strip under the cars was the old race rig's additive under-glow plane (20_race_world shipMesh): hidden in the proto race
+  scene.traverse(o=>{const u=o.userData&&o.userData.under;if(u&&u.material&&u.material.visible){u.material.visible=false;X.unders.push(u.material)}});
+  const gloss=PR_gloss.bind(null,X);
+  const cars=[];if(typeof pl!=='undefined'&&pl&&pl.mesh){const w=pl.mesh.getWorldPosition(new THREE.Vector3()).sub(camera.position);w.y=0;cars.push([pl.mesh,w.normalize(),1])};for(const a of sp.ai)if(a.g){const q=PR_at(P,L,a.s||0);cars.push([a.g,new THREE.Vector3(Math.sin(q.h),0,Math.cos(q.h)),0])}
+  for(const[g,f,me]of cars){g.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))if(m&&m.roughness<.6)gloss(m,K.rough,K.envK)});if(me)continue;/* the player rig's rear frame is still wrong (its glows landed ~3 m behind the car): rivals only, see HANDOFF_look2k-r24j */const r=PR_rear(g,f);if(!r)continue;(X.dbg||(X.dbg=[])).push(r.dbg);const s=1/r.ws;
+    // tail lights: a hot core + a soft halo per side (the cheap bloom), facing back at the chase camera
+    for(const sd of[-1,1]){const c=new THREE.Mesh(PR_q(),PR_glowMat('tl',1,[2.2,.18,.1]));c.scale.setScalar(.55*s);c.position.set(sd*r.w*.32,r.h*.5,.06*s);const hl=new THREE.Mesh(PR_q(),PR_glowMat('th',.45,[1.6,.25,.12]));hl.scale.setScalar(1.5*s);hl.position.set(sd*r.w*.32,r.h*.5,.08*s);r.pv.add(c,hl)}
+    if(me){const tr=[];for(const sd of[-1,1]){const q=new THREE.Mesh(PR_q(),PR_glowMat('tr',0,[.35,1.2,2.4]));q.rotation.x=-Math.PI/2;q.position.set(sd*r.w*.22,.25*s,0);q.scale.set(.55*s,1,1);r.pv.add(q);tr.push(q)}X.trail={tr,s}}
+    X.add.push(r.pv)}}
+function PR_lookOn(sp,P,L){PR_lookOff();const X=PROTO.p2={cars:[],mats:new Map(),unders:[],add:[],t:0},K=PR_LOOK,e=K.el*Math.PI/180;
+  X.sd=new THREE.Vector3(.6*Math.cos(e),Math.sin(e)*1.25,-.8*Math.cos(e)).normalize();   // the sky shader's sun azimuth (10_core4 SKY_FS), raised to a low golden-hour sun
+  X.o={mc:moonL.color.clone(),mi:moonL.intensity,mp:moonL.position.clone(),hc:hemi.color.clone(),hg:hemi.groundColor.clone(),hi:hemi.intensity,fc:scene.fog.color.clone(),fd:scene.fog.density,
+    sky:['uTop','uMid','uHor','uSun'].map(k=>SKYU[k].value.clone()),exp:renderer.toneMappingExposure,tm:renderer.toneMapping,env:scene.environmentIntensity};
+  X.sp=sp;X.P=P;X.L=L;X.f=0;
+  const M=PROTO.M;for(const k of['red','wht','yel','blu','grn','blk','org','chk','ban'])PR_gloss(X,M[k],.2,1.5);
+  // speed lines: thin GLOW streaks in camera space round the screen edge, each in the plane of the view axis and its tangent so it reads as a radial streak
+  const SL=new THREE.Group();SL.matrixAutoUpdate=false;X.lines=[];for(let i=0;i<18;i++){const a=i/18*Math.PI*2+Math.sin(i*7.3)*.15,rr=.72+.28*Math.abs(Math.sin(i*3.1)),u=new THREE.Vector3(Math.cos(a),Math.sin(a),0),t=new THREE.Vector3(Math.sin(a),-Math.cos(a),0);
+    const q=new THREE.Mesh(PR_q(),PR_glowMat('sl',0,[1.3,1.3,1.4]));q.matrixAutoUpdate=false;q.frustumCulled=false;q.userData={u:u.multiply(new THREE.Vector3(5.6*rr,2.6*rr,1)),t,z:2+((i*5.7)%12),m:new THREE.Matrix4().makeBasis(t,new THREE.Vector3(0,0,1),t.clone().cross(new THREE.Vector3(0,0,1)))};SL.add(q);X.lines.push(q)}
+  scene.add(SL);X.SL=SL}
+function PR_lookOff(){const X=PROTO.p2;if(!X)return;PROTO.p2=null;const o=X.o;for(const m of X.unders)m.visible=true;for(const[m,v]of X.mats){m.roughness=v[0];m.envMapIntensity=v[1]}
+  for(const pv of X.add){if(pv.parent)pv.parent.remove(pv);pv.traverse(q=>{if(q.geometry)q.geometry.dispose()})}if(X.SL){scene.remove(X.SL);X.SL.traverse(q=>{if(q.geometry)q.geometry.dispose()})}
+  moonL.color.copy(o.mc);moonL.intensity=o.mi;moonL.position.copy(o.mp);hemi.color.copy(o.hc);hemi.groundColor.copy(o.hg);hemi.intensity=o.hi;scene.fog.color.copy(o.fc);scene.fog.density=o.fd;
+  ['uTop','uMid','uHor','uSun'].forEach((k,i)=>SKYU[k].value.copy(o.sky[i]));renderer.toneMappingExposure=o.exp;renderer.toneMapping=o.tm;scene.environmentIntensity=o.env;try{FX.uniforms.uSpeed.value=0;FX.uniforms.uBoost.value=0}catch(e){}}
+// every frame, right before the composer renders
+function PR_look(dt){const X=PROTO.p2;if(!X||!PROTO.g)return;const K=PR_LOOK;if(++X.f===3)PR_attach(X);
+  moonL.color.set(K.sun);moonL.intensity=K.sunI;moonL.position.copy(moonL.target.position).addScaledVector(X.sd,400);hemi.color.set(K.hemi[0]);hemi.groundColor.set(K.hemi[1]);hemi.intensity=K.hemi[2];
+  scene.fog.color.set(K.fog);scene.fog.density=K.fogD;SKYU.uTop.value.set(...K.top);SKYU.uMid.value.set(...K.mid);SKYU.uHor.value.set(...K.hor);SKYU.uSun.value.set(...K.sky);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=K.exp;scene.environmentIntensity=K.env;
+  const v=Math.abs(RO.v||0),top=Math.max(30,RO.top||60),bst=(typeof pl!=='undefined'&&pl&&pl.nitro)?1:0,k=clamp((v/top-.45)/.4,0,1);X.t+=dt;
+  try{FX.uniforms.uSpeed.value=Math.max(FX.uniforms.uSpeed.value,k*.85);FX.uniforms.uBoost.value=Math.max(FX.uniforms.uBoost.value,bst)}catch(e){}   // the existing radial speed blur + vignette (motion feel), compiled at boot
+  const lm=PROTO.GM.get('sl');lm.opacity=(k*.55+bst*.35)*(X.lines.length?1:0);X.SL.visible=lm.opacity>.01;if(X.SL.visible){camera.updateMatrixWorld();X.SL.matrix.copy(camera.matrixWorld);X.SL.matrixWorldNeedsUpdate=true;
+    const sp=8+v*.9,len=1.2+k*3.2,m=new THREE.Matrix4(),sc=new THREE.Matrix4();for(const q of X.lines){const u=q.userData;u.z-=sp*dt;if(u.z<1.5)u.z+=12;sc.makeScale(.05,len,1);m.copy(u.m).multiply(sc);m.setPosition(u.u.x,u.u.y,-u.z);q.matrix.copy(m)}}
+  if(X.trail){const tm=PROTO.GM.get('tr');tm.opacity=clamp(k*.35+bst*.9,0,1);const L2=(1.2+k*2.5+bst*3.5)*X.trail.s;for(const q of X.trail.tr){q.scale.y=L2;q.position.z=L2/2+.1*X.trail.s}}}
 if(PROTO.on&&typeof tkStart==='function'){const _st=tkStart,_step=tkStep,_end=sprintEnd;
   tkStart=function(m,C0){const sp=_st.apply(this,arguments);try{if(sp&&sp.C===TK_C)PR_build(sp);else PR_drop()}catch(err){console.warn('proto1',err)}return sp};
   tkStep=function(dt){const r=_step.apply(this,arguments);try{const sp=RO.sp;if(PROTO.g&&sp)PR_lights(sp)}catch(err){}return r};
-  sprintEnd=function(){PR_drop();return _end.apply(this,arguments)}}
+  sprintEnd=function(){PR_drop();return _end.apply(this,arguments)};
+  {const _cr=composer.render;let t0=performance.now();composer.render=function(){const t=performance.now(),dt=Math.min(.1,(t-t0)/1000);t0=t;try{if(PROTO.p2)PR_look(dt)}catch(err){}return _cr.apply(this,arguments)}}}
