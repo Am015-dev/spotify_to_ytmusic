@@ -27,16 +27,27 @@ error (Browser.setWindowBounds)`) before the game is involved.
 - The backdrop (bg, far, mid) is drawn from a copy made once per picture with brightness .65 and saturate .85. The near strip and
   every sprite are not filtered. The shots above are from round 2. Render-only change: the sim does not call render, so simhunt is unchanged.
 
+## Round 3: critic W219 round 2 (owner-art 5, grayscale 6, silhouette 5, find-player 7, bullets 4, clutter 6, benchmark 4)
+- Enemy needles are the owner's orange shell picture drawn as a long bolt, with the needle picture (made white once) as a hot core.
+  They are in the orange family of the enemy shells and no longer look like the white player streaks.
+- The player muzzle burst (`muzzle` / `w-*-muzzle` fx) is drawn at half size. It is render-only: the fx list is not part of the sim.
+- Shards are the owner's spinning `pk-coin` sheet (22 px), so they read as pickups, not teal diamonds.
+- Power-up pickups show only the owner's `pk-<kind>` picture: no hex, dashed ring, glow or caption.
+- Enemies are at least 0.55x the player's drawn length. The player is 1.3x the enemies' texel scale on PC and 1.6x on the phone.
+- The phone backdrop is at brightness .55 (it is a brighter painting than the PC strips). The PC backdrop stays at .65.
+- The "B" letter (stage1fun) is still drawn in the field by code. That is not this task's file.
+Shots above are from round 3 (same seed and moment; the shot renders twice so lazily loaded pictures show).
+
 ## Strict critic pass (game-look). Benchmark: Ref A, https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/347160/ss_adc04f49419d282ee67a894af25cfdf5bed88439.1920x1080.jpg
 
 | # | test | score | what still fails |
 |---|---|---|---|
-| 1 | Owner art only | 6 | Pickups are still drawn by code in the play field: the cyan "B" letter and the green WINGMATES hex with its caption (`pkPaint`, `PW.pickup`; not in this task's scope). The player outline is code, but it matches the benchmark. |
+| 1 | Owner art only | 7 | Power-ups and shards are owner pictures now. The cyan "B" letter (stage1fun) is still code text in the field. The player outline is code, but it matches the benchmark. |
 | 2 | Grayscale | 8 | With the backdrop at .65 value, the player, the enemies and every shot are the brightest things on screen. |
 | 3 | Silhouette | 7 | The long player dart and the round drones/gunship read as different shapes. Enemies are small next to Ref A's. |
 | 4 | Find the player (phone) | 8 | The ship is about 1/7 of the screen width, and its outline, engine light and fan of white shots mark it at once. The ship's own colours are still blue on a blue city. |
-| 5 | Bullets | 7 | Player shots are white/cyan and enemy shots lime/yellow; nothing shares a hue. The yellow needles are still thin on the phone, and the white player streaks have the same shape as the needles. |
-| 6 | Clutter | 8 | Field marks: "B" and WINGMATES (2). The HUD is at the edges. |
+| 5 | Bullets | 7 | Player shots are white, cyan and pink; enemy shots are orange bolts with a white core and lime orbs. The pink pulse teardrops are the player's and the closest to a shared hue. |
+| 6 | Clutter | 8 | Field marks: the "B" letter (1). The HUD is at the edges. |
 | 7 | Benchmark side by side | 6 | Ref A has a few big, bright, outlined actors on a quiet backdrop. The backdrop is now quieter, but the enemies are still small, and no shot reaches Ref A's chunky, glowing bullets. |
 
 Not every row is at 7 or higher. Rows 1 and 7 are below, and fixing them is outside this task:
