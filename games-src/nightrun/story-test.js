@@ -13,7 +13,7 @@ const res = [], ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' : 'FAI
   await sleep(700);
   const br = await PW.chromium.launch(), errs = [];
   const open = async (w, h, q = '') => { const ctx = await br.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true });
-    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&first30=0${q}`, { waitUntil: 'domcontentloaded' });
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&first30=0&focus=0${q}`, { waitUntil: 'domcontentloaded' });
     await p.waitForFunction(() => window.__mnr && document.getElementById('playBtn'), null, { timeout: 15000 }); await sleep(400); p.ctx = ctx; return p; };
   const until = async (p, fn, ms = 4000) => { const t = Date.now(); while (Date.now() - t < ms) { if (await p.evaluate(fn)) return true; await sleep(60); } return false; };
   try {

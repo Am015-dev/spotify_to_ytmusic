@@ -20,8 +20,9 @@ html.ui2 button.go,html.ui2 .pg button.go,html.ui2 #setm .sfoot button.go,html.u
 html.ui2 button.go small{font-family:var(--display)!important;font-weight:500!important;letter-spacing:.02em!important;text-transform:none;opacity:.78;color:var(--ink)}
 html.ui2 button.go:hover{border-color:#fff!important;background:linear-gradient(180deg,#2d2160,#1b1240)!important;transform:translateY(-1px)}
 html.ui2 button.go:focus-visible,html.ui2 button:focus-visible,html.ui2 [tabindex]:focus-visible{outline:none!important;box-shadow:0 0 0 2px #05030c,0 0 0 4px var(--u2ring)!important}
-html.ui2 button.go.on,html.ui2 button.go[aria-selected=true],html.ui2 button.go[aria-pressed=true]{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
-html.ui2 #playBtn,html.ui2 #resumeBtn,html.ui2 #srNext,html.ui2 #againBtn{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important;letter-spacing:.14em}
+html.ui2 button.go.on,html.ui2 button.go[aria-selected=true],html.ui2 button.go[aria-pressed=true]{background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.ui2 button.go.hubBk,html.ui2 button.go.alt.hubBk{padding:0!important;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding-bottom:3px!important}
+html.ui2 #playBtn,html.ui2 #resumeBtn,html.ui2 #srNext,html.ui2 #againBtn{background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border-color:#ffd0ea!important;color:#fff!important;letter-spacing:.14em}
 html.ui2 #playBtn small{opacity:.92}
 html.ui2 #playBtn:hover,html.ui2 #resumeBtn:hover,html.ui2 #srNext:hover,html.ui2 #againBtn:hover{background:linear-gradient(180deg,#ff78c4,#d4368d)!important}
 html.ui2 .row>button.go{white-space:nowrap;align-self:stretch}
@@ -39,7 +40,7 @@ html.ui2 #setm .card h2{background:none!important;font-style:normal!important;bo
 html.ui2 #setm .seg,html.ui2 #setm .sl{background:#140d2ee6!important;border:1.5px solid var(--u2line);border-radius:var(--u2r);padding:10px 16px!important;margin-bottom:8px}
 html.ui2 #setm,html.ui2 #setm *{font-style:normal!important}
 html.ui2 #setm .seg button{border-radius:8px!important;border:1.5px solid var(--u2line)!important;background:var(--u2fill)!important;color:var(--ink)!important}
-html.ui2 #setm .seg button[aria-pressed="true"]{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.ui2 #setm .seg button[aria-pressed="true"]{background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border-color:#ffd0ea!important;color:#fff!important}
 html.ui2 #garage .tabs{gap:6px}
 html.ui2 #garage .tabs button.go{padding:.4em .5em!important;letter-spacing:.03em;font-size:clamp(12px,3.3vw,16px)!important;min-width:0}
 html.ui2 #hubJump{padding:8px 12px 8px!important;gap:8px!important}

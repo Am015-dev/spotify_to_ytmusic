@@ -110,7 +110,7 @@ html.h2 #garage.h2x #h2Bay,html.h2 #garage.h2x #h2Pane{display:none!important}
  #h2Pane .pp,#h2Pane .pb{display:flex;gap:3px;width:90%}#h2Pane .pp i,#h2Pane .pb i{flex:1 1 0;height:10px;border-radius:5px;background:#ffffff22}
  #h2Pane .pp i:not(.nx):not([class=""]),#h2Pane .pb i.on{background:var(--h2c)}#h2Pane .pp i.on{background:var(--h2c)}
  #h2Pane .buy{margin-top:auto;width:100%;min-height:64px;font:700 22px var(--display)!important;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:12px!important;cursor:pointer;
-   background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border:1.5px solid #ffd0ea!important;color:#fff!important}
+   background:linear-gradient(180deg,#c8308a,#9c1d63)!important;border:1.5px solid #ffd0ea!important;color:#fff!important}
  #h2Pane .buy[disabled]{background:#1a1236!important;border-color:#3a2b5c!important;color:var(--dim)!important;cursor:default;font-size:18px!important}
  #h2Pane .buy.eq{background:color-mix(in srgb,var(--h2c) 18%,#120b28)!important;border-color:var(--h2c)!important;color:var(--h2c)!important}
  #h2Pane .hint{font-size:15px;color:var(--dim)}

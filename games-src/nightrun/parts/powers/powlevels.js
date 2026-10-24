@@ -178,10 +178,7 @@ if(PW3.on){
     ctx.restore();});
   /* ----- the level on the HUD: 'LV3' on the power's bar (desktop list) and next to its round chip (phone strip) ----- */
   const lvTag=(it,x,y,fs)=>{ctx.save();ctx.font='700 '+fs+'px "Share Tech Mono",monospace';ctx.textAlign='left';ctx.fillStyle=PWK[it.k].c;ctx.fillText('LV'+it.lv,x,y);ctx.restore();};
-  {const hd=PW.hud;PW.hud=function(t,x0,y0,k){hd.call(this,t,x0,y0,k);const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;let y=y0==null?112:y0;
-    for(const a of s.act){if(PW3L[a.k]){ctx.save();ctx.translate(x0,y);ctx.scale(k,k);ctx.font='700 14px "Chakra Petch",sans-serif';const w=ctx.measureText(PWK[a.k].n).width;ctx.restore();
-        ctx.save();ctx.translate(x0,y);ctx.scale(k,k);ctx.fillStyle=PWK[a.k].c;ctx.font='700 14px "Share Tech Mono",monospace';ctx.textAlign='left';ctx.fillText('LV'+(a.l3||1),32+w+8,-3);ctx.restore();}
-      y+=46*k;}};}
+  // the desktop list card draws the level itself (power.js hud: name and LV are one label that fits beside the bars text)
   {const ch=PW.chips;PW.chips=function(t,x,y,k){ch.call(this,t,x,y,k);const s=G.pw;if(!s)return;const r=11*k;let cx=x+r;
     for(const a of s.act){if(PW3L[a.k])lvTag({k:a.k,lv:a.l3||1},cx-r*.9,y-4*k+r+11*k,Math.max(11,Math.round(11*k)));cx+=2*r+10*k;}};}
   window.__pw3={PW3,PW3L};
