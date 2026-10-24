@@ -67,6 +67,9 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
        enemy shots high-contrast, a colour no other object uses, shape and colour differ per enemy type; ships big enough to read
        (player >= 1/12 of the short screen side); enemies move on curves and formations, never straight mechanical lines.
    (e) DONE = the owner says the one-shot pair looks good. Not a probe, not a colour-distance number, not a worker's verdict.
+   (f0) THE OWNER'S ART IS GOOD (owner, 24 Oct 18:35: "they can blend well, it's your shitty work that makes it look so ugly"): before
+       blaming or re-requesting art, remove what OUR code adds on top of it: overlays, scanlines, tints, grades, glows, rings, blobs,
+       code-drawn shapes, play-field text, bad scaling or blurry upscaled canvases. Show the art as made first (?pure=1, W214).
    (f) Code cannot paint art: grading, tints and glow do not fix weak sprites (24 Oct: W194/W201 halved colour distance; the owner still
        saw pasted layers). If the art is the problem, say so and list the sprite needed for Google Flow instead of tinting it.
    (g) PLAY AS A BOT (owner, 24 Oct 17:25: "you are a bot, you can play multiple games x200, no need to run human time"): every probe,
