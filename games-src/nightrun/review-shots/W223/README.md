@@ -14,10 +14,12 @@ Shots: `qa/footmove-shot.js` (stepped with FOOT.sim, EB=1 waits for an enemy sho
   frame where a shot starts and impact frame where it stops (cover, Kai, the knife); player shots get two fading copies (tracer).
 - Depth: the backdrop gets a dark aerial gradient (stronger at the top) so the play plane reads in front; glowing back-street props
   drawn at .62 alpha; props get the actors' soft contact shadow; actor shadows .85 instead of .55.
+- Orchestrator lessons (OpenBOR, 20:28): actor shadows are the actor's own frame flattened onto the road and multiplied (plus the soft
+  ellipse at the feet); the belt depth sort compares depth in 1/200 steps and keeps list order on ties (no front/behind flicker).
 - Run cycle to ground speed was already on (streetfeel: frame = distance / stride), so not redone.
 
 ## Not done (why)
-- Acceleration / deceleration of Kai's velocity and knockback arcs / per-fighter hit-stop are gameplay. A tried accel (0.09 s / 0.055 s
+- Acceleration / deceleration of Kai's velocity, knockback gravity arcs and hit-stop that freezes only the two fighters change the sim (gameplay). A tried accel (0.09 s / 0.055 s
   to full speed) moved 20-run clear rates by up to 25 points (seed chaos), so it was reverted; footmove is draw-only.
 - Foes overlapping Kai (they stand inside him): AI spacing, gameplay.
 
@@ -28,13 +30,12 @@ footmove off: idle 0 / nearest 40 / gfirst 75 / dodge 65 %; on: 0 / 40 / 75 / 65
 | # | test | phone | PC | note |
 |---|---|---|---|---|
 | 1 | owner-art | 7 | 7 | only the haze gradient and the rim (derived from the owner orb) are code |
-| 2 | grayscale | 6 | 6 | actors separate a little better; the bright back props still compete |
+| 2 | grayscale | 6 | 7 | actors separate a little better; the bright back props still compete |
 | 3 | silhouette | 5 | 6 | foes stand inside Kai (AI spacing) |
 | 4 | find the player | 6 | 7 | phone: Kai merges with the foe overlapping him |
 | 5 | bullets | 7 | 7 | enemy bolt reserved green with a rim; player tracer small but visible |
 | 6 | clutter | 7 | 7 | HUD at the edges only; the beacon ring prop is the loudest mark |
-| 7 | benchmark side by side | 4 | 5 | overlap, contact shadows invisible on the dark road, big glowing beacon ring |
+| 7 | benchmark side by side | 5 | 5 | overlap, big glowing beacon ring; frame shadows now ground the fighters |
 
-Weakest three and the fix: (7)/(3) foes overlapping Kai, a spacing rule in the foe AI (gameplay task, balance check); contact shadows,
-OpenBOR-style frame-replica shadow (W222 lesson 8) instead of the radial ellipse; the beacon/holo back props, a smaller size or the owner
+Weakest three and the fix: (7)/(3) foes overlapping Kai, a spacing rule in the foe AI (gameplay task, balance check); the beacon/holo back props, a smaller size or the owner
 re-exporting them without the halo.

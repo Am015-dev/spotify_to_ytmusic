@@ -72,7 +72,7 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
     ART.fE=P;IN.drawWho(c,'kai',kp,P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,'#19e3ff',P.crouch);ART.fE=null;
     if(P.shotT>0&&window.AH){const a=P.aim,mq=F.mzAt&&F.mzAt(P);AH.ftMuz(c,P.w,mq?mq[0]:P.x+Math.cos(a)*28,mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20,a);}c.restore();SL.z=null;};
   const A=S.E.filter(e=>!(e.dead&&!(e.ext&&!e.remove)));A.push(P);const PS=new Set(S.pr);for(const p of S.pr)A.push(p);
-  if(SL.band)A.sort((a,b)=>(a.z==null?1:a.z)-(b.z==null?1:b.z));else A.sort((a,b)=>PS.has(b)-PS.has(a));   // belt: back to front; flat road: props first
+  if(SL.band)A.sort(RET.footmove?(a,b)=>Math.round(200*(a.z==null?1:a.z))-Math.round(200*(b.z==null?1:b.z)):(a,b)=>(a.z==null?1:a.z)-(b.z==null?1:b.z));   // footmove: depth in 1/200 steps, ties keep the list order (stable sort): no front/behind flickerelse A.sort((a,b)=>PS.has(b)-PS.has(a));   // belt: back to front; flat road: props first
   for(const a of A){if(PS.has(a))dP(a);else if(a===P)dK();else dE(a);}
   for(const e of S.E){if(e.dead)continue;SL.z=e.z;   // fire hazards as the owner's flame picture (the stage hook's lanes, marks, beams and OPEN text are code drawings: not drawn)
     if(e.fl)for(let x=e.fl.x+18;x<e.fl.x+e.fl.w;x+=30){at(c,x,FL-40,K);pic(c,'fx-ft-flame',x,FL-40,72,e.facing<0?Math.PI:0,.9);c.restore();}
