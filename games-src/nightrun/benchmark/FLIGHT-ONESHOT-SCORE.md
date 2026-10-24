@@ -116,12 +116,19 @@ dark outline on every sprite (88); A keeps actors bright on a dark field (78).
 3. Enemies: lighter or rim-lit sprites so they separate from the purple sky; the white blob replaced by a real explosion sprite.
 4. Environment: needs foreground/mid layers in the same style as the sprites; tinting the plate will not fix it (24 Oct, W194/W201).
 
-## Branch rows (W206-W210), checked once at ~40 min
+## Branch rows (W206-W210), checked once at 18:12 UTC (40 min in)
+Delta = points vs the base row above (SHIPS 8 / BULLETS 4 / ENV 12 / FEEL 6 / FUN 7 / BLEND 5), judged only from each branch's own
+review-shots pair (`games-src/nightrun/review-shots/<Wxx>/`). Cap: no row above 25. None of the four compared against a real
+reference frame (W208/W209/W210 say so); the three URLs above are now available to them.
 
-| branch | pushed? | score delta vs base (ships/bullets/env/feel/fun) | verdict |
-|---|---|---|---|
-| nr/W206-boss | (filled below) | | |
-| nr/W207-ships | | | |
-| nr/W208-bullets | | | |
-| nr/W209-boom | | | |
-| nr/W210-motion | | | |
+| branch | pushed? | delta S/B/E/F/Fun/Blend | new total | verdict |
+|---|---|---|---|---|
+| nr/W206-boss | **not pushed** by 18:12 | - | - | no row; score when it lands |
+| nr/W207-ships | yes, 7cc3e15 | +4 / +5 / 0 / 0 / +1 / -2 | 12/9/12/6/8/3 | **REDO.** The magenta carrier (~300x130 px) is the first enemy that reads, and the orange-ring enemy shots (~28 px, bright core) beat black discs. But: (1) it adds 5 enemy kinds to stage 1 = breaks the rule 17 (a) feature freeze; (2) the player is invisible in its PC shot (a pink hit burst + bare ring at x 210 y 620); (3) HUD text collides ("CARRIER:" over a cyan "B" glyph, "LV21 BARS" overprinted, "CHAIN BROKEN" on the same line) = rule 8 fail; (4) all enemy shots are one look, its own README admits. Keep the per-kind sheets/flame/death clips, drop the new wave roster, fix the text overlap. |
+| nr/W208-bullets | yes, 3982de3 | 0 / +12 / 0 / +1 / +2 / +3 | 8/16/12/7/9/8 | **KEEP** (best of the round). Lime-green orbs ~30 px with white core are a reserved hue nothing else uses and read over the purple; orange double rings and pale leaf blades give 3 looks in one frame (README: 5 in the stage); player bolts are now 50x15 px cyan spikes, visible. Fix before live: the pale-cyan enemy leaf blades and the cyan player bolts share one hue family (rule 17 (d): player shots and enemy shots must not share a colour); player ship still ~1/34 of the short side. |
+| nr/W209-boom | yes, 4ea58ba | 0 / 0 / 0 / +7 / +1 / +1 | 8/4/12/13/8/6 | **KEEP, with a redo of the colour.** The boom is now ~130 px (2x hull) with a shape, visible on phone too. But it is the same magenta as the player's engine, the city neon and the hit sparks, so it reads as a pink glow cloud, not fire; the shot is a staged kill in an empty frame (2 enemies, 0 enemy shots), not a busy moment. Next: hot white/orange core into magenta smoke, debris visible, then a real busy-moment pair. |
+| nr/W210-motion | yes, 1847a38 (flag off) | +2 / 0 / 0 / 0 / 0 / -1 | 10/4/12/6/7/4 | **REDO the evidence, keep the code behind the flag.** Banking is visible on phone (enemies tilted, 1.3-1.5x bigger), but a still cannot show motion and no clip or trajectory plot was given; enemy shots are still black discs with white slashes; texel density now differs ~1.5x between player and enemies (the game-look limit). Needs a 2-3 s clip or path trace next to a reference before anyone can score MOTION. |
+
+Overall after this round, if W208 + W209 (colour fixed) + W207 minus its roster go live: about **SHIPS 12, BULLETS 16, ENV 12, FEEL 13,
+FUN 9, BLEND 8**: still far below the references (75-90). Nobody touched the environment; the backdrop as bright and busy as the
+ships is now the biggest single gap (every README says it, no worker owns it).
