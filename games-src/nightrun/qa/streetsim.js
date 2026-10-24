@@ -58,7 +58,7 @@ const CODE = { nearest: RUN.replace(BEND, BELT.replace('__DZ__', 'false')), gfir
 // W187: the getter below also fires a full OVERDRIVE for the bot when 3 foes are near
 // ---- in the page: telemetry wrapped round FOOT.ctl (called once per update step, before the step), then the bot / idle run
 const TEL = () => {
-  const T = window.__T = { steps: 0, nan: 0, nanEx: '', still: 0, stuckAt: -1, sig: '', sigT: 0, thr: [], thrT: -1, duck: 0, hits: [], hurtAt: [], ttk: {}, lingerMax: 0, linger: 0, left: 0, seen: new Map(), prevX: null, bl: new Map(), mel: [], lastHurts: 0, hpMin: 99, hpPrev: null, hpLost: 0, tEnd: 0, zb: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], zs: [] };
+  const T = window.__T = { steps: 0, nan: 0, nanEx: '', still: 0, stuckAt: -1, sig: '', sigT: 0, thr: [], thrT: -1, duck: 0, hits: [], hurtAt: [], ttk: {}, lingerMax: 0, linger: 0, left: 0, seen: new Map(), prevX: null, bl: new Map(), mel: [], lastHurts: 0, hpMin: 99, hpPrev: null, hpLost: 0, tEnd: 0, cw: { n: 0, still: 0 }, zb: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], zs: [] };
   const W = { rusher: 1, gunner: 2, heavy: 4, guard: 2 }, num = v => typeof v === 'number' && isFinite(v), FE = window.FOOT_ENEMIES;
   for (const id of ['rusher', 'gunner', 'heavy', 'guard', 'sninja', 'shound', 'sflamer']) { const d = FE[id]; if (!d || d.__tk) continue; d.__tk = 1; const od = d.onDeath; d.onDeath = function (e) { const S = FOOT.S, T = window.__T; if (T && !e._tk) { e._tk = 1; const t0 = e.seenAt2 != null ? e.seenAt2 : e.born; if (S.P.w === 'pistol' && num(t0)) (T.ttk[id] = T.ttk[id] || []).push(+(S.time - t0).toFixed(2)); } return od ? od.apply(this, arguments) : undefined; }; }
   let inner = null;
@@ -83,6 +83,7 @@ const TEL = () => {
     if (Math.floor(t) !== T.thrT) { T.thrT = Math.floor(t); T.thr.push(w);
       if (P.z != null) { const a = S.E.filter(e => !e.dead && !e.boss && e.z != null && Math.abs(e.x - P.x) < 500).map(e => e.z); if (a.length >= 2) T.zs.push(Math.max(...a) - Math.min(...a)); } }   // W173 D3: depth spread of the foes near Kai
     if (P.z != null) { T.zb[Math.min(9, Math.floor(P.z * 10))]++; for (const e of S.E) if (!e.dead && e.z != null && e.x > S.camX && e.x < S.camX + vw) T.zb[Math.min(9, Math.floor(e.z * 10))]++; }   // W173 D1: depth use
+    for (const e of S.E) { if (e.dead || e.boss || !e.seen || e.z == null) { e._qx = undefined; continue; } if (e._qx !== undefined && Math.abs(e.x - P.x) < 250 && !(e.tele > 0 || ['crouch', 'lunge', 'wind', 'charge', 'pop'].includes(e.state))) { T.cw.n++; if (Math.abs(e.x - e._qx) < .001 && Math.abs(e.z - e._qz) < .00005) T.cw.still++; } e._qx = e.x; e._qz = e.z; }   // W196: non-attacking foes within 250 of Kai: share of their time spent standing still
     // level shots passing Kai while he ducks (crouch) and does not get hit = ducked shots
     for (const b of S.eb) { const side = Math.sign(b.x - P.x), pr = T.bl.get(b); if (pr && pr.side !== side && P.crouch && Math.abs(b.y - (P.y - 40)) < 60 && S.hurts === pr.h) T.duck++; T.bl.set(b, { side, h: S.hurts }); }
     if (T.bl.size > 400) T.bl.clear();
@@ -98,7 +99,7 @@ const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); w
   else { window.__gf = ${bot !== 'nearest'}; r = (${codeFn})(${seed}); }
   const ms = performance.now() - w0, S = FOOT.S, T = window.__T, sh = S.sh || {}, s3 = S.s3 || {};
   const tu = {}; r.zmiss = S.zmiss | 0; r.cmb = S.cmb || null; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
-  r.tel = { tr: T.tr, stuckBoss: T.stuckBoss, mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, far: T.far || 0, lingerInfo: T.lingerInfo, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
+  r.tel = { cw: T.cw, tr: T.tr, stuckBoss: T.stuckBoss, mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, far: T.far || 0, lingerInfo: T.lingerInfo, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
     called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' '), od: FOOT.OD && FOOT.OD.log, combo: window.FOOT.COMBO ? FOOT.COMBO.best : -1, bnc: window.FOOT.COMBO ? FOOT.COMBO.bounces : 0 };
   try { FOOT.stop(); } catch (e) {} un(); return r; })()`;
 const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story', JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 })); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } catch (e) {} };
@@ -196,6 +197,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
     L(band >= .25 && used >= 6, `W173 D1 floor band >= 25% of the view (${(100 * band).toFixed(0)}%) and actors use >= 60% of it (${used * 10}% of depth slices hold >= 2% of actor time)`);
     L(zh + zm > 0 && zm / (zm + zh) >= .3, `W173 D2 the dodge bot avoids >= 30% of attacks by depth (${zm} out-of-depth misses vs ${zh} hits = ${(100 * zm / Math.max(1, zm + zh)).toFixed(0)}%)`);
     L(sp != null && sp >= .3, `W173 D3 median depth spread of foes near Kai >= 30% of the band (${sp == null ? '-' : (100 * sp).toFixed(0) + '%'})`); }
+  { const cw = ok0.filter(o => o.j.bot !== 'idle').reduce((a, o) => ({ n: a.n + o.r.tel.cw.n, s: a.s + o.r.tel.cw.still }), { n: 0, s: 0 }); console.log(`INFO W196 non-attacking foes within 250 of Kai: ${cw.n} foe-steps, standing still ${(100 * cw.s / Math.max(1, cw.n)).toFixed(1)}%`);   L(cw.n > 0 && cw.s / cw.n < .2, `W196 non-attacking foes within 250 units stand still < 20% of their time (${(100 * cw.s / Math.max(1, cw.n)).toFixed(1)}%)`); }
   if (BOTS.includes('melee')) { const cs = ok0.filter(o => o.j.bot === 'melee' && o.r.cmb).map(o => o.r.cmb), sum = k => cs.reduce((a, c) => a + (c[k] | 0), 0), st = sum('strings'), c3 = sum('c3'), fin = sum('fin'), f2 = sum('fin2');
     L(st >= 50 && c3 / st >= .6, `W184 knife chains of 3 in >= 60% of the melee bot's strings (${c3} of ${st} strings = ${(100 * c3 / Math.max(1, st)).toFixed(0)}%)`);
     L(fin >= 20 && f2 / fin >= .25, `W184 >= 25% of finishers hit a second foe (${f2} of ${fin} = ${(100 * f2 / Math.max(1, fin)).toFixed(0)}%)`);
