@@ -46,3 +46,5 @@ Where to put NEW code: in the module of your area (append near the related code)
 (still before `window.__mho`, the old "insert before window.__mho" convention). Wrap existing functions as before (`const _f=f; f=(...a)=>{…}` for `let`/function).
 | `10zf_fastload.js` | 3 | FST persistent chunk cache (fastload-r24g): core in the page head (src/02_data_json.html classic script: Cache API / IndexedDB store keyed by FSTV = build id; `FST_get FST_js FST_json FST_mus`; km.js loads through it); this module = preview switch + old-version cleanup. `?fc=0` off |
 | `98zq_fastload_ahead.js` | 3 | FST read-ahead (lazy chunk): equipped garage car + next 3 + menu/city music into the store at idle |
+| `98sc_stkcam.js` | 3 | SKC chase camera (lazy, stkcam-r24m), ported from SuperTuxKart camera_normal.cpp (GPL-3.0): last roamCam layer, one smoothed length + one FOV, wall limit with hysteresis; `?stkcam=0` off |
+| `99cst_camsteady_go.js` | 3 | GO cam/steady (lazy): free roam + city race on the course line, camera distance / FOV reversals and rates per 10 s |

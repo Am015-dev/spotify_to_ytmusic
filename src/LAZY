@@ -30,3 +30,5 @@
 99c8_sfxhit.js:SFXL_gate
 99crf_racefree_go.js
 98rfb_race_bounds.js:TK_pY,TK_near,TK_bd
+98sc_stkcam.js
+99cst_camsteady_go.js
