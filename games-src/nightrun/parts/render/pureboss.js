@@ -10,12 +10,12 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
   
   img(n){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}return b;},
   pic(n,x,y,w,h,ang,al){const b=this.img(n);if(!b)return false;ctx.save();ctx.globalCompositeOperation='lighter';if(al!=null)ctx.globalAlpha=al;ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-(h||w*b.height/b.width)/2,w,h||w*b.height/b.width);ctx.restore();return true;},
-  shield(e,t){const k='fx-shield/glow';if(!ART.ANIM.s[k]||!ART.anim(k))return;const s=ART.ANIM.s[k];ctx.save();ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,k,t,0,0,e.r*3.2/s[3],false);ctx.restore();},
+  shield(e,t){const k='fx-shield/glow';if(!ART.ANIM.s[k]||!ART.anim(k))return;const s=ART.ANIM.s[k];ctx.save();ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,k,t,0,0,e.r*3.2*.8/s[3],false,.6);ctx.restore();},   // 0.8x at alpha .6: the boss outline shows through
   boss(e,t){const ak=ART.artK(e),nm=ART.bossN[ak];if(!nm)return true;const b=ART.bm['spr-boss-'+nm];if(!b){ART.load('spr-boss-'+nm);return true;}
     SPR.warmBoss(nm);
     for(const l of e.lasers||[]){ctx.save();ctx.translate(l.x,l.y);ctx.rotate(l.a);
       if(l.t<2*BT.spb)this.pic('fx-eb-aim-line',700,0,1400,10,0,.9);else this.pic('fx-eb-laser-sweep',700,0,1400,40,0,.95);ctx.restore();}
-    const wd=1.2*(ak===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak]),   // art only (e.r stays the hitbox); a boss must read first on a phone
+    const wd=(wcv!==cv?1.9:1.2)*(ak===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak]),   // art only (e.r stays the hitbox); a phone boss body is >= 40% of the short side
       mv=UIK.boss[nm]&&UIK.boss[nm].move||'air',by=mv==='air'?Math.sin(t*1.6)*3:0,tl=mv==='air'?Math.sin(t*.9)*.035:0;
     ctx.save();ctx.translate(e.x,e.y);SPR.boss(e,nm,wd,by,tl,e.flash>0);if(e.b2s)this.shield(e,t);ctx.restore();return true;},
   gate(e,t){ctx.save();ctx.translate(e.x,0);const top=e.gy-e.gap/2,bot=e.gy+e.gap/2,fl=e.flash>0;

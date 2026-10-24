@@ -21,3 +21,10 @@ Left over, not fixed: gwalker (ground walker, no sheet yet: `ship-egwalker`, ASS
 | Boss bar (HUD) | 7 | Thin orange line on the top edge, clear but easy to miss next to the progress strip. |
 | Environment | not in scope | Unchanged from W214. |
 My scores are higher than the owner's last (all < 10/100 + 15 allowed by rule 17c); this is a worker view, the owner's verdict decides.
+
+## Round 2 (critic W219: owner-art 6, silhouette 5, find-player 2, enemy shells 8)
+Merged origin/nr/W215-flight (player ship, shots, backdrop, pure default) cleanly. Shield fx now 0.8x at alpha .6 so the boss outline shows; phone boss art drawn 1.9x
+(body about 40% of the 390 px short side in the new shot; PC 1.2x). Enemy shells unchanged (orange family). New shots replace the old pair.
+Probe: PASS on phone and PC with SKIPSHIP=1. Without it W215's player rim light (PURL.player > rim, fillRect) shows up as code shapes; that is W215's part, not changed here.
+Re-scored from the new pair: boss 7 (outline readable now, but hit flashes still wash the body on PC), enemy shots 8, beams / gates 7 (unchanged, not re-viewed), boss bar 7.
+Find-player is W215's row: the player ship is small and pink-on-purple against the boss in the phone shot.
