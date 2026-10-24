@@ -42,3 +42,16 @@ screenshot of the same moment (URL only), name the three worst problems, fix tho
 ## Check before reporting
 Look at your one pair next to the benchmark frame and answer in the README, per row SHIPS, BULLETS, ENVIRONMENT, FEEL: what still
 looks pasted or sloppy. If the honest answer is "most of it", say so; do not report a probe number as success.
+
+## Strict critic pass (owner, 24 Oct 18:50: "use skills that give strict design feedback; use the benchmarks")
+Run on every one-shot pair before reporting; any FAIL means not done. Sources: game readability guides (silhouette and value tests),
+the design-review skill (.claude/skills/design-review), impeccable critique.
+1. Owner-art test: is anything on screen drawn by code that the owner's art could show (rings, blobs, discs, markers, tints, scanlines)?
+   Each one is a FAIL unless it is essential HUD at the screen edge.
+2. Grayscale test: convert the shot to grayscale. Player ship, enemies and enemy bullets must separate from the backdrop by value alone.
+3. Silhouette test: fill every actor black on grey. Player, each enemy kind and the boss must be told apart by shape.
+4. Find-the-player test: on the phone shot, can the player ship be found in under 1 s (size, contrast, a clean engine light)?
+5. Bullet test: enemy shots in a reserved colour and readable over everything; player shots visible but under enemy shots.
+6. Clutter test: count non-art marks in the play field (text, icons, rings). Benchmark shooters show almost none; > 3 at once = FAIL.
+7. Benchmark side by side: put the shot next to a well-regarded modern shooter frame (URL) and list what still looks amateur.
+Score each 0-10, report the weakest three with the fix, and keep iterating until every row is >= 7.
