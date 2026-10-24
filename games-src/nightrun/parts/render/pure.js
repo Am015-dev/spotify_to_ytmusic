@@ -37,20 +37,21 @@ const PURL=window.PURL={K:90/520,get ph(){return wcv!==cv||Math.min(innerWidth,i
     ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);
     if(this.HALO)this.pool(1,w*.45,0,sc*s[3]);if(!this.lit(key,(e.t||0)+eb_(e),sc,rot))ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false);ctx.restore();
     e._fs=sc;e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
+  BR:{'ship-echarger':3.2},   // W233: the charger's art is the darkest foe sheet (probe: 2.5 on a busy backdrop); a longer value lift for it only
   HUE:{'ship-eturret':-30},   // W231: gold is the pickups' hue; the brass gunship family turns copper-red (the enemy-shot family)
-  PF:'saturate(1.3) brightness(2.5)',   // W231: the player's value lift: the clearest actor on the screen (qa/w231probe.js: player contrast >= every foe's)
+  PF:'saturate(1.3) brightness(3.5)',   // W231: the player's value lift: the clearest actor on the screen (qa/w231probe.js: player contrast >= every foe's)
   HALO:1,   // W224 probe switch (qa/w224probe.js measures the sprite without its halo)
   get LD(){const d=1.5/S;return wcv!==cv?[d,d]:[d,-d];},   // the key light (top-right pink neon) in world units: the phone world is turned a quarter
   cel(key,sc,kd){const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return null;const m=o.m,w=m[2],h=m[3],cw=Math.max(1,Math.round(w*sc*S)),C=this.CC||(this.CC=new Map()),k=key+'|'+cw+kd;let q=C.get(k);if(q)return q;   // W224: one cached strip per sheet, drawn size and kind: h = soft dark halo, b = warm value pass (W227: a warm key, the family of the enemy shots, so threats are the warmest and lightest actors), r = neon rim tint
     const ch=Math.max(1,Math.round(h*cw/w)),p=kd==='h'?Math.ceil(Math.max(cw,ch)*.12)+3:kd==='r'?2:0,fw=cw+2*p,fh=ch+2*p,c=document.createElement('canvas');c.width=fw*m[0];c.height=fh;const g=c.getContext('2d');g.imageSmoothingQuality='high';
-    g.filter=kd==='h'?`brightness(0) blur(${Math.max(1.5,p/2.2)}px)`:kd==='b'?`sepia(.35) saturate(2)${this.HUE[key.split('/')[0]]?` hue-rotate(${this.HUE[key.split('/')[0]]}deg)`:''} brightness(2.2)`:kd==='B'?'sepia(.25) saturate(1.4)':kd==='p'?this.PF:'none';   /* W231: B = the boss (milder: the 'b' pass clipped it to white), p = the player lift */for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*fw+p,p,cw,ch);g.filter='none';
+    g.filter=kd==='h'?`brightness(0) blur(${Math.max(1.5,p/2.2)}px)`:kd==='b'?`sepia(.35) saturate(2)${this.HUE[key.split('/')[0]]?` hue-rotate(${this.HUE[key.split('/')[0]]}deg)`:''} brightness(${this.BR[key.split('/')[0]]||2.2})`:kd==='B'?'sepia(.25) saturate(1.4)':kd==='p'?this.PF:'none';   /* W231: B = the boss (milder: the 'b' pass clipped it to white), p = the player lift */for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*fw+p,p,cw,ch);g.filter='none';
     if(kd==='r'){const d=g.getImageData(0,0,c.width,c.height),a=d.data;for(let i=0;i<a.length;i+=4){a[i]=255;a[i+1]=110;a[i+2]=225;}g.putImageData(d,0,0);}
     if(kd==='B'){const d=g.getImageData(0,0,c.width,c.height),a=d.data,L=new Uint8Array(256);for(let v=0;v<256;v++)L[v]=Math.round(255*(1-Math.pow(1-v/255,3)));for(let i=0;i<a.length;i+=4){a[i]=L[a[i]];a[i+1]=L[a[i+1]];a[i+2]=L[a[i+2]];}g.putImageData(d,0,0);}   // W231: the boss lift is a curve (darks and mids up, highlights kept under white), not brightness(): its hit / attack frames clipped
     C.set(k,q={c,fw,fh,p,cw});return q;},
   dcel(key,t,sc,kd,ox,oy,al){const q=this.cel(key,sc,kd);if(!q)return false;const o=ART.aS(key),m=o.m,u=m[2]*sc/q.cw,i=ART.aframe(key,t);if(al!=null)ctx.globalAlpha=al;
     ctx.drawImage(q.c,i*q.fw,0,q.fw,q.fh,ox-m[4]*sc-q.p*u,oy-m[5]*sc-q.p*u,q.fw*u,q.fh*u);ctx.globalAlpha=1;return true;},
   lit(key,t,sc,rot){if(!this.cel(key,sc,'b'))return false;const[lx,ly]=this.LD,c=Math.cos(-rot||0),s_=Math.sin(-rot||0);   // W224: halo behind, neon rim on the light side, then the brightened sprite
-    if(this.HALO){this.dcel(key,t,sc,'h',0,0,.9);this.dcel(key,t,sc,'h',0,0,.4);ctx.globalCompositeOperation='lighter';this.dcel(key,t,sc,'r',lx*c-ly*s_,lx*s_+ly*c,.5);ctx.globalCompositeOperation='source-over';}
+    if(this.HALO){this.dcel(key,t,sc,'h',0,0,.9);ctx.globalCompositeOperation='lighter';this.dcel(key,t,sc,'r',lx*c-ly*s_,lx*s_+ly*c,.3);ctx.globalCompositeOperation='source-over';}
     return this.dcel(key,t,sc,'b',0,0);},
   pool(o,x,y,hh){const n='fx-engine',P_=this.PL||(this.PL={});let b=P_[o];   // W224: the engine light spilling on the haze behind a ship (the owner's fx-engine, blurred once; orange for enemies)
     if(!b){const s0=ART.bm[n];if(!s0){if(s0===undefined)ART.load(n);return;}b=P_[o]=document.createElement('canvas');b.width=s0.width+80;b.height=s0.height+80;const g=b.getContext('2d');g.filter='blur(12px)';g.drawImage(s0,40,40);
@@ -59,7 +60,7 @@ const PURL=window.PURL={K:90/520,get ph(){return wcv!==cv||Math.min(innerWidth,i
   player(t){if(G.dead)return;const id=shipDef().id,key='ship-'+id+'/flame',k=this.K*this.PK;ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
     const s=ART.ANIM.s[key],L=s?s[2]*k:56,e=ART.bm['fx-engine'];   // W215: owner engine light (fx-engine, painted on black) under the tail, steady flicker, no ring or halo
     if(e){const w=L*(.42+.04*Math.sin(t*38)),h=w*e.height/e.width*1.3;ctx.globalCompositeOperation='lighter';ctx.drawImage(e,-L*.22-w,-h/2,w,h);ctx.globalCompositeOperation='source-over';}else if(e===undefined)ART.load('fx-engine');
-    if(s)this.pool(0,-L*.5,0,s[3]*k);if(s&&this.HALO){this.dcel(key,t,k,'h',0,0,.9);this.dcel(key,t,k,'h',0,0,.8);}   // W231: the foes' dark halo behind the player too
+    if(s)this.pool(0,-L*.5,0,s[3]*k);if(s&&this.HALO){this.dcel(key,t,k,'h',0,0,.9);this.dcel(key,t,k,'h',0,0,.9);this.dcel(key,t,k,'h',0,0,.9);}   // W231: the foes' dark halo behind the player too
     if(RET.sprites&&SPR.shipOn(id)&&s)this.rim(key,t,k,s);   // the player one notch above the enemies' texel scale (1.35x, inside the 1.5x band): it must read first
    else ART.put(ART.sp('spr-ship-'+id,this.K*520*this.PK),0,0);
     ctx.restore();},

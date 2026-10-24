@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // W231 probe (from w227probe): adds player contrast (>= max enemy contrast at each moment), boss pixels clipped to white (< 5%),
-// and text drawn by the HUD inside the play field (banners) at every banner in the run. Default SEED is random (printed).
+// and text drawn by the HUD inside the play field (banners) at every banner in the run. SEED (default 1) picks the moments and seeds Math.random; run 3 seeds and take the minimum (qa/w233.sh).
 // W227 probe: the W224 measures at MANY moments, not one. Human bot, seed 1, stepped sim. At 8 random stage-1 moments (t 10-120 s, no boss)
 // and 6 s into the boss fight it measures, on the displayed canvas: grayscale contrast of each enemy sprite vs a 6 px ring (WCAG ratio),
 // enemy drawn length / player length, the boss body contrast, text drawn in the play field outside the HUD, the power-up card's screen
@@ -8,9 +8,9 @@
 const { boot, open, ok, done } = require('./lib');
 (async () => {
   const b = await boot(), Wd = +process.env.W || 390, Hd = +process.env.H || 763, ph = Wd < 700;
-  let sd = +process.env.SEED || (1 + Math.floor(Math.random() * 1e6)); console.log('SEED', sd); const rr = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  let sd = +process.env.SEED || 1; console.log('SEED', sd); const rr = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   const TS = Array.from({ length: 8 }, () => +(10 + 110 * rr()).toFixed(1)).sort((a, b) => a - b), SHOTT = process.env.SHOTT ? +process.env.SHOTT : -1;
-  const p = await open(b.br, b.base, Wd, Hd, '?sim=1&all=1&nomusic=1', 1, ph);
+  const p = await open(b.br, b.base, Wd, Hd, '?sim=1&all=1&nomusic=1', 1, ph, `(()=>{let a=${sd}>>>0;Math.random=()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})()`);   // W233: the game's own dice (waves, fx jitter) seeded too, or two runs of one seed see different foes
   const hb = require('fs').readFileSync(require('path').resolve(__dirname, '../humanbot.js'), 'utf8'), a0 = hb.indexOf('const BOT = (o) => {'), a1 = hb.indexOf('\n};\n(async', a0);
   const BOTSRC = hb.slice(a0 + 'const BOT = '.length, a1 + 3);
   await p.exposeFunction('__snap', async () => { });
@@ -33,11 +33,12 @@ const { boot, open, ok, done } = require('./lib');
           rl/=rn||1;const hi=Math.max(sl,rl),lo=Math.min(sl,rl);let wh=0;for(const q of px){const j=q*4;if(B[j]>=250&&B[j+1]>=250&&B[j+2]>=250)wh++;}o.push({cut:x0<=0||x1>=w-1||y0<TOPB||y1>BOTB,n:px.length,cr:+((hi+.05)/(lo+.05)).toFixed(2),wh:+(wh/px.length).toFixed(3)});}
         return o;};
       // one contrast per enemy: each foe alone (its largest blob), so overlapping foes do not merge
-      const fc=fs.filter(e=>e.x>0&&e.x<960&&e.y>0&&e.y<540).map(e=>{const o=comps([e]).sort((a,b)=>b.n-a.n)[0];if(o&&o.cut){CUT++;return null;}if(o&&o.cr<3)LOW.push({ty:e.type,id:m.FOEART?m.FOEART.id(e):0,x:e.x|0,y:e.y|0,r:e.r,sh:!!PURL.sheet(e),n:o.n,cr:o.cr});return o?o.cr:null;}).filter(v=>v!=null);
-      const bo_=bs.length?(comps(bs).sort((a,b)=>b.n-a.n)[0]||{}):{},bc=bs.length?bo_.cr:null,bw=bs.length?bo_.wh:null,pc=(comps('P').sort((a,b)=>b.n-a.n)[0]||{}).cr,pl=PURL.pl();
+      const fc=fs.filter(e=>e.x>0&&e.x<960&&e.y>0&&e.y<540).map(e=>{const o=comps([e]).sort((a,b)=>b.n-a.n)[0];if(o&&o.cut){CUT++;return null;}if(o&&o.cr<3)LOW.push({ty:e.type,id:m.FOEART?m.FOEART.id(e):0,x:e.x|0,y:e.y|0,r:e.r,sh:!!PURL.sheet(e),k:PURL.sheet(e)&&PURL.sheet(e).key,n:o.n,cr:o.cr});return o?o.cr:null;}).filter(v=>v!=null);
+      const noFx=f=>{const P_=CanvasRenderingContext2D.prototype,ns=['drawImage','fill','fillRect','stroke'],sv=ns.map(n=>P_[n]),pt=G.pt;G.pt=[];ns.forEach((n,i)=>{P_[n]=function(){if(this.globalCompositeOperation==='lighter')return;return sv[i].apply(this,arguments);};});try{return f();}finally{ns.forEach((n,i)=>{P_[n]=sv[i];});G.pt=pt;}};   // W233: additive ('lighter') draws and G.pt sparks = fx pixels; the sprite alone is what the white-clip gate measures
+      const bo_=bs.length?(comps(bs).sort((a,b)=>b.n-a.n)[0]||{}):{},bo2=bs.length?(noFx(()=>{const fl=bs.map(e=>e.flash);bs.forEach(e=>e.flash=0);try{return comps(bs);}finally{bs.forEach((e,i)=>e.flash=fl[i]);}}).sort((a,b)=>b.n-a.n)[0]||{}):{},bc=bs.length?bo_.cr:null,bw=bs.length?bo_.wh:null,bws=bs.length?bo2.wh:null,bn_=bs.length?[bo_.n,bo2.n]:null,pc=(comps('P').sort((a,b)=>b.n-a.n)[0]||{}).cr,pl=PURL.pl();
       const lens=fs.map(e=>e._fs&&PURL.sheet(e)?+(e._fs*m.ART.ANIM.s[PURL.sheet(e).key][2]/pl).toFixed(2):null).filter(v=>v);
       const pop=document.getElementById('retPop');m.render(G.t,0);G.shake=sh;
-      return{kind,t:+G.t.toFixed(1),n:fs.length,fc,bc,bw,pc,lens,tx:TX.slice(0,6),card:CARD.length?[Math.round(Math.min(...CARD)),Math.round(Math.max(...CARD))]:null,popOn:!!(pop&&pop.classList.contains('on'))};};
+      return{kind,t:+G.t.toFixed(1),n:fs.length,fc,bc,bw,bws,bn_,pc,lens,tx:TX.slice(0,6),card:CARD.length?[Math.round(Math.min(...CARD)),Math.round(Math.max(...CARD))]:null,popOn:!!(pop&&pop.classList.contains('on'))};};
     const BN=[];let lastB=null;const bannerCheck=()=>{const G=m.G;if(!(G.banner&&G.banner.t>0)||G.banner===lastB||G.banner.t>G.banner.m-.3)return;lastB=G.banner;const ys=[];const ft=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(s,x,y){const T=this.getTransform(),Y=T.f+T.b*x+T.d*y,X=T.e+T.a*x+T.c*y;const yy=Y;if(window.PB&&PB.hud&&String(s).trim())ys.push([String(s).slice(0,24),Math.round(yy)]);return ft.apply(this,arguments);};try{m.render(G.t,0);}finally{CanvasRenderingContext2D.prototype.fillText=ft;}BN.push({t:+G.t.toFixed(1),a:G.banner.a,field:ys.filter(([s,y])=>y>TOPB&&y<BOTB)});};
     window.__rec=(mm,i)=>{const G=m.G;bannerCheck();if(G.boss&&bossAt<0)bossAt=G.t;
       if(${SHOTT}>0&&!G.boss&&G.t>=${SHOTT}&&G.en.length>=2)throw 'SHOT';
@@ -50,15 +51,15 @@ const { boot, open, ok, done } = require('./lib');
   if (process.env.SHOT) { await p.evaluate(() => window.__mnr.render(window.__mnr.G.t, 0)); await p.screenshot({ path: process.env.SHOT }); }
   console.log('LOW', JSON.stringify(R.LOW), 'foes under a HUD strip or off the edge, not gated:', R.CUT);
   const dev = ph ? 'phone' : 'PC', st = R.out.filter(o => o.kind === 'stage'), bo = R.out.find(o => o.kind === 'boss');
-  for (const o of R.out) console.log(dev, o.kind, 't', o.t, 'foes', o.n, 'contrast', JSON.stringify(o.fc), 'len', JSON.stringify(o.lens), 'boss', o.bc, 'bossWhite', o.bw, 'player', o.pc, 'card', JSON.stringify(o.card), 'text', JSON.stringify(o.tx), 'pop', o.popOn);
+  for (const o of R.out) console.log(dev, o.kind, 't', o.t, 'foes', o.n, 'contrast', JSON.stringify(o.fc), 'len', JSON.stringify(o.lens), 'boss', o.bc, 'bossWhite', o.bw, 'spriteOnly', o.bws, 'px(all,sprite)', JSON.stringify(o.bn_), 'player', o.pc, 'card', JSON.stringify(o.card), 'text', JSON.stringify(o.tx), 'pop', o.popOn);
   const fcs = st.flatMap(o => o.fc), ls = st.flatMap(o => o.lens), lim = ph ? .8 : .7, minc = Math.min(...fcs), minl = Math.min(...ls);
   console.log(dev, 'moments', st.length, 'bossAt', R.bossAt, 'MIN enemy contrast', minc, 'MIN enemy length', minl, 'boss contrast', bo && bo.bc, 'grade pops in run', R.pops);
   if (process.env.SHOTT) { console.log('shot only'); await b.close(); return; }
   console.log(dev, 'banners', JSON.stringify(R.BN.map(b => [b.t, b.a, b.field.length])));
   const pgap = Math.min(...R.out.map(o => o.pc - Math.max(0, ...o.fc, o.bc || 0)));
-  console.log(dev, 'MIN player contrast', Math.min(...R.out.map(o => o.pc)), 'MIN player - max enemy', +pgap.toFixed(2), 'boss white', bo && bo.bw, 'field banner text', R.BN.reduce((a, b) => a + b.field.length, 0));
+  console.log(dev, 'MIN player contrast', Math.min(...R.out.map(o => o.pc)), 'MIN player - max enemy', +pgap.toFixed(2), 'boss white', bo && bo.bw, 'sprite-only white', bo && bo.bws, 'field banner text', R.BN.reduce((a, b) => a + b.field.length, 0));
   ok(dev + ' player contrast >= max enemy contrast at every moment (' + pgap.toFixed(2) + ')', pgap >= 0);
-  ok(dev + ' boss < 5% pixels clipped to white (' + (bo && bo.bw) + ')', bo && bo.bw < .05);
+  ok(dev + ' boss body < 5% pixels clipped to white (' + (bo && bo.bws) + '; the 60 ms hit-flash silhouette is white by design: with it ' + (bo && bo.bw) + ')', bo && bo.bws < .05);
   ok(dev + ' 0 banner text inside the field', R.BN.every(b => !b.field.length), JSON.stringify(R.BN.filter(b => b.field.length)));
   ok(dev + ' 8 stage moments measured', st.length >= 8, st.length);
   ok(dev + ' min enemy contrast >= 3.0 (' + minc + ')', fcs.length && minc >= 3);
