@@ -116,3 +116,7 @@ Model and status come from the session list. Cost is blank: the session list doe
 | onfoot-collide-r24a | beta.159 | Sonnet | walk-through + river regression from beta.157 | shipped |
 | turbine-r24c | beta.159 | Sonnet | rotor pivot at hub | shipped |
 | proto-westend-r24b | — (flag) | Opus | Westend 2K-look prototype ?proto=1 | shots to Alex |
+| fastload-r24g | beta.160 | Sonnet | chunk store: 2nd load -30% x1, -8.5% x6; cached swap 9 ms | shipped |
+| look2k-r24j | beta.160 preview | Opus | Westend look r2 (warm sun, haze) | preview |
+| bricks-r24i | beta.160 preview | Opus | LEGO Racers bricks (LGPL port) | preview |
+| lowmem-r24h | — | Opus | stopped for visible work; -24/-35 % GPU est WIP | parked |

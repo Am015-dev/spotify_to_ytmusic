@@ -1,6 +1,6 @@
 # Coordinator handoff (OD 0e), 2026-10-22 ~07:40 UTC
 Coordinator session_01L97MfPJRbeb3t9g3h8vcM3. Read CLAUDE.md, then this. Deploy recipe: docs/HANDOFF_coordinator_0c.md (worked for beta.151; Artifact publish needs read of live page + models/lx.js, xf.js first).
-LIVE NOW: beta.159 (1c5aaa3c, Beta v325 + preview v5, published from PUBLISH_FILES.txt incl. music/*.mp3, which were also missing before). Running: racers-study-r24d session_011jWqXDHqJFzWpw18N948Xi (read LEGO Racers decomp code, design doc only). Waiting on Alex: verdict on the Westend ?proto=1 shots (docs/shots/proto1). Cap: 2 workers. Parked: glossy look, reveal stall, ath slope traps, climb, garage swap slowdown after ~100 models.
+LIVE NOW: beta.160 (0e978ba8, Beta v326 + preview v6 with ?proto ON: Westend bricks + look r2). Running: look2k-r3-r24k session_01QtaJ6T94bokepXdRTtwnb8 (shadows, bloom, gloss). Next: boot CPU (95 s at 6x to drivable), lowmem resume (aeeb52d WIP), bricks fixes (grey wall in shot 2, pale small bricks). Cap 2 workers; visible work + screenshots first (Alex 24 Oct).
 ## Live
 beta.151 (ce32c02, Beta v317), built from 7394743: speed feel, solid-cars r3 (camera turn), ground-tile + coin prewarm, core reveal, xf1/water. gloss and ?cl=core,studs default OFF.
 ## Reviewed since (on trunk, not live)
