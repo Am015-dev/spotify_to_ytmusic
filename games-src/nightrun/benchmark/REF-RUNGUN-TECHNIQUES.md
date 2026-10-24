@@ -82,3 +82,43 @@ Sources (hard rule: URLs that contain the reference's name are not written here;
 
 ## Open items (not found publicly, ask the owner or measure on our own game, never from a copy)
 Layer counts and ratios, grain strength, windup frame counts, parry frame window, hit-stop frames, i-frames, screen-shake px.
+
+## The arcade run-and-gun (1996, hand-drawn soldiers, tanks, explosions) (W220 add-on, 24 Oct 2026)
+Same source rules: public interviews and articles only; no emulator page, ROM, recompilation or decompiled build was opened.
+Sources (named by outlet + title words, the game's name is not written here):
+- A1 Time Extension, "The Making Of" feature with the director and team (soldiers shoot only straight up, shots re-aimed at nimble humans, 18-month build, two bad location tests, ~6 months redesign)
+- A2 Automaton, interview with the lead animator (long detailed animations made programmers optimise; art team wanted to stand out among fighting games). Page body was cut off in my fetch: only the headline was read.
+- A3 a 2026 Foro3D retrospective, "when excess of 2D art surpasses 3D": every sprite has an uncommon number of frames, every explosion or destruction effect is a unique hand-drawn sequence
+- A4 roundtable of the team's pixel artists reported by trade press: human sprites were so small that one misplaced pixel broke a face, so they placed pixels one at a time
+- Open-source code to compare ideas (no ROM-derived code): Abuse (public-domain source, side-scrolling run-and-gun), OpenBOR (community 2D engine, check its LICENSE first)
+- Not used on purpose: a GitHub "recompilation" project that needs a ROM dump.
+NO PUBLIC NUMBER found for: sprite sizes, frames per animation, explosion frame counts, frame rate. (A comment on A1 claims 30 fps; unverified, ignore.)
+
+### R1. Big, readable characters, hand-placed pixels
+- How: at small sprite size every pixel decides the face (A4); heavy per-sprite animation for soldier and vehicle alike (A3); long cycles were worth the performance cost (A2).
+- Ours: actor scale `parts/enemies/scale.js`, street sizes `streetlook.js`.
+- Gate: at phone size (390x763) the player and each enemy are >= 1/12 of the short side (rule 17d) and a face/weapon silhouette is still telling at 1x.
+
+### R2. Explosions and debris as authored art
+- How: each explosion or destruction is its own drawn sequence, not one stock boom (A3).
+- Ours: owner fx sheets in `parts/fx/fx.js`; game-look says normal blend + brief additive core.
+- Gate: >= 3 distinct explosion sheets (small, vehicle, boss) in use, no code-drawn circle/arc explosion, debris is sprite pieces; each plays to its last frame.
+
+### R3. Enemy wind-ups
+- How: no public frame data. The lead animator's long cycles imply visible anticipation poses (inference, not a source claim). A1 says enemy shots were re-aimed to suit nimble humans, i.e. aimed shots at a moving target.
+- Ours: `bossmoves.js` telegraph >= 0.5 s; foes in `streetfoe.js`, `footen.js`.
+- Gate: every aimed enemy shot is preceded by a pose >= 0.25 s (grunt) / 0.5 s (boss) and fired at the position the player had at wind-up end, so a move after the pose dodges it.
+
+### R4. Player and bullets readable on busy scenes
+- How: no public statement. Design constraint from A1: soldiers shoot only straight up, not diagonally, so lanes stay simple.
+- Ours: `render/readable.js`, `legible.js`; shot rules rule 17d.
+- Gate: grayscale + silhouette tests of game-look pass on a busy shot with >= 6 enemies and 2 explosions; enemy bullets use the reserved colour.
+
+### R5. Hit feedback
+- How: no public numbers. Respawn invincibility is a known exploit and must be tuned (A1).
+- Ours: `streetfeel.js` hit-stop 33/50/100 ms; `streetdodge.js` i-frames.
+- Gate: respawn i-frames <= 2.0 s (craft) and drawn as a blink of the sprite alpha, not a code ring; every kill plays an explosion sheet.
+
+### R6. Cost of long animations (bug class)
+- How: heavy animation slowed the original game and forced optimisation (A2).
+- Gate: 6 enemies + boss + 3 explosions on screen keeps frame time p95 < 20 ms on the phone profile; sprites preloaded (`footq.js`).
