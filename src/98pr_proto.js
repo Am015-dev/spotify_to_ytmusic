@@ -64,8 +64,8 @@ function PR_lights(sp){if(!PROTO.lights)return;const cd=sp.cd||0;PROTO.lights.fo
    The look is written right before each composer.render, after every mood / day-cycle / GFX writer, and restored when the race ends. */
 const PR_q=()=>new THREE.PlaneGeometry(1,1);
 function PR_glowMat(k,op,c){const C=PROTO.GM||(PROTO.GM=new Map());let m=C.get(k);if(!m){m=new THREE.MeshBasicMaterial({map:GLOW,color:new THREE.Color(...(c||[1,1,1])),transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});C.set(k,m)}return m}
-const PR_LOOK={sun:'#ffc48a',sunI:3.5,el:22,hemi:['#cfdcff','#b4885e',1.05],fog:'#f0c9a2',fogD:.0015,top:[.05,.2,.7],mid:[.34,.54,.96],hor:[1.3,.88,.58],sky:[2.8,1.6,.7],exp:1.06,env:.5,
-  rough:.16,envK:1.8,
+const PR_LOOK={sun:'#ffc48a',sunI:2.7,el:22,hemi:['#cfdcff','#b4885e',1.05],fog:'#f0c9a2',fogD:.0015,top:[.05,.2,.7],mid:[.34,.54,.96],hor:[1.05,.74,.52],sky:[1.9,1.1,.5],exp:.94,env:.5,
+  rough:.16,envK:1.8,road:[.42,.42,.47],walk:[.8,.76,.72],
   /* proto-3 */ shCast:0,shSz:1024,shExt:24,shK:.58,shTint:[.035,.05,.13],ao:.55,bTh:1.7,bS:.9,bR:.4,pEnv:1.35,pRough:.2,bEnv:1.1}
 // a car's rear in its own frame: local bbox + the local forward axis (world forward f through the inverse world matrix)
 function PR_rear(g,f){g.updateMatrixWorld(true);const inv=g.matrixWorld.clone().invert(),B=new THREE.Box3(),b=new THREE.Box3(),m=new THREE.Matrix4();
@@ -100,7 +100,7 @@ function PR_lookOn(sp,P,L){PR_lookOff();const X=PROTO.p2={cars:[],mats:new Map()
   const SL=new THREE.Group();SL.matrixAutoUpdate=false;X.lines=[];for(let i=0;i<18;i++){const a=i/18*Math.PI*2+Math.sin(i*7.3)*.15,rr=.72+.28*Math.abs(Math.sin(i*3.1)),u=new THREE.Vector3(Math.cos(a),Math.sin(a),0),t=new THREE.Vector3(Math.sin(a),-Math.cos(a),0);
     const q=new THREE.Mesh(PR_q(),PR_glowMat('sl',0,[1.3,1.3,1.4]));q.matrixAutoUpdate=false;q.frustumCulled=false;q.userData={u:u.multiply(new THREE.Vector3(5.6*rr,2.6*rr,1)),t,z:2+((i*5.7)%12),m:new THREE.Matrix4().makeBasis(t,new THREE.Vector3(0,0,1),t.clone().cross(new THREE.Vector3(0,0,1)))};SL.add(q);X.lines.push(q)}
   scene.add(SL);X.SL=SL;try{PR3_on(X)}catch(err){PROTO.err3=String(err);console.warn('proto3',err)}}
-function PR_lookOff(){const X=PROTO.p2;if(!X)return;PROTO.p2=null;try{PR3_off(X)}catch(err){}const o=X.o;for(const m of X.unders)m.visible=true;for(const[m,v]of X.mats){m.roughness=v[0];m.envMapIntensity=v[1]}
+function PR_lookOff(){const X=PROTO.p2;if(!X)return;PROTO.p2=null;try{PR3_off(X)}catch(err){}try{if(X.rd){HUB.M.road.color.copy(X.rd[0]);if(X.rd[1])HUB.M.walk.color.copy(X.rd[1])}}catch(err){}const o=X.o;for(const m of X.unders)m.visible=true;for(const[m,v]of X.mats){m.roughness=v[0];m.envMapIntensity=v[1]}
   for(const pv of X.add){if(pv.parent)pv.parent.remove(pv);pv.traverse(q=>{if(q.geometry)q.geometry.dispose()})}if(X.SL){scene.remove(X.SL);X.SL.traverse(q=>{if(q.geometry)q.geometry.dispose()})}
   moonL.color.copy(o.mc);moonL.intensity=o.mi;moonL.position.copy(o.mp);hemi.color.copy(o.hc);hemi.groundColor.copy(o.hg);hemi.intensity=o.hi;scene.fog.color.copy(o.fc);scene.fog.density=o.fd;
   ['uTop','uMid','uHor','uSun'].forEach((k,i)=>SKYU[k].value.copy(o.sky[i]));renderer.toneMappingExposure=o.exp;renderer.toneMapping=o.tm;scene.environmentIntensity=o.env;try{FX.uniforms.uSpeed.value=0;FX.uniforms.uBoost.value=0}catch(e){}}
@@ -114,6 +114,8 @@ function PR_look(dt){const X=PROTO.p2;if(!X||!PROTO.g)return;const K=PR_LOOK;if(
   const lm=PROTO.GM.get('sl');lm.opacity=(k*.55+bst*.35)*(X.lines.length?1:0);X.SL.visible=lm.opacity>.01;if(X.SL.visible){camera.updateMatrixWorld();X.SL.matrix.copy(camera.matrixWorld);X.SL.matrixWorldNeedsUpdate=true;
     const sp=8+v*.9,len=1.2+k*3.2,m=new THREE.Matrix4(),sc=new THREE.Matrix4();for(const q of X.lines){const u=q.userData;u.z-=sp*dt;if(u.z<1.5)u.z+=12;sc.makeScale(.05,len,1);m.copy(u.m).multiply(sc);m.setPosition(u.u.x,u.u.y,-u.z);q.matrix.copy(m)}}
   try{PR3_frame(X)}catch(err){PROTO.err3=String(err)}
+  // the city road past the proto stretch read white under the warm sun (beta.160): darken its colour multiplier (a uniform, same program), every frame because applyMood rewrites it
+  try{const H=HUB.M;if(H){if(!X.rd)X.rd=[H.road.color.clone(),H.walk&&H.walk.color.clone()];H.road.color.setRGB(...K.road);if(H.walk)H.walk.color.setRGB(...K.walk).multiply(X.rd[1])}}catch(err){}
   if(X.trail){const tm=PROTO.GM.get('tr');tm.opacity=clamp(k*.35+bst*.9,0,1);const L2=(1.2+k*2.5+bst*3.5)*X.trail.s;for(const q of X.trail.tr){q.scale.y=L2;q.position.z=L2/2+.1*X.trail.s}}}
 if(PROTO.on&&typeof tkStart==='function'){const _st=tkStart,_step=tkStep,_end=sprintEnd;
   tkStart=function(m,C0){const sp=_st.apply(this,arguments);try{if(sp&&sp.C===TK_C)PR_build(sp);else PR_drop()}catch(err){console.warn('proto1',err)}return sp};

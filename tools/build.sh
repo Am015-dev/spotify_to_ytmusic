@@ -18,6 +18,7 @@ XC_ORDER=$(grep -vxF -f <(sed 's/:.*//;/^#/d;/^$/d;s/+/\n/g' src/LAZY 2>/dev/nul
 rm -rf "$OUT/xc"; XCV=$(node tools/lazy/pack.js "$OUT") || { echo "BUILD FAIL: lazy chunks"; exit 1; }
 for f in "$OUT"/xc/*.js; do [ -e "$f" ] && { node --check "$f" || { echo "BUILD FAIL: $f syntax"; exit 1; }; }; done
 ( cd src && node ../tools/strip.js $XC_ORDER ) | XCV="$XCV" python3 tools/lazy/inject.py > "$OUT/overdrive.html"   # deploy page: own-line comments stripped (tools/strip.js, AST-identical); --local dev page below stays unstripped
+python3 -c "import sys;s=open(sys.argv[1],encoding='utf8').read();t=s[s.rfind('</script>')+9:].strip();sys.exit('BUILD FAIL: page text after the last </script> (a src/ORDER module after 99_api.js that is not in src/LAZY): '+t[:80]) if t else 0" "$OUT/overdrive.html"   # beta.160: 99c8_sfxhit sat after the closing tag, its source showed as a text pop-up and never ran
 cp src/assets/km.js "$OUT/km.js"
 # LDraw model data (src/MODELS): out/<ver>/models.js = small index (presets, placements, chunk table; v89z) + out/<ver>/models/<id>.js, one chunk per model, loaded on demand
 python3 tools/ld/mkmodels.py "$OUT" || { echo "BUILD FAIL: models"; exit 1; }
