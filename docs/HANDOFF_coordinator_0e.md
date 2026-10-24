@@ -15,3 +15,5 @@ Pre-deploy adds `node tools/bughunt.js --hours 2 --city fra` (and ath): not wors
 1 bughunt fix-first list in docs/BUGHUNT_x1000.md (fra hill slope slides 71/h, ath NPC sideways slides/teleports). 2 smash look r3. 3 street life/emptiness. Dropped (2 lanes used): glossy (head/tail emissive lights need a design plan), core,studs flip (blocked on fra reveal stall).
 ## Notes
 Old coordinators OD 0c (session_01Ai8dkUF41GoPeiPc85NE6b) / 0d may still forward Alex asks. Branch cleanup is blocked by the permission classifier.
+
+- Reference from Alex (24 Oct): https://steponit.online/ = browser port of LEGO Racers (1999), based on the decompilation github.com/isledecomp/racers (+ racers-portable, warp.parts; C/C++ to wasm with SDL/Emscripten). Use only for ideas: track layout, camera, items, how a LEGO race reads. Copy NO code or assets (decompiled proprietary game, LEGO-owned art, no clear licence). Next proto round: workers take side-by-side shots of it as a 2nd benchmark.
