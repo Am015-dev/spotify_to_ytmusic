@@ -1,5 +1,5 @@
 // PURPOSE: Street feel: feet that grip the road (run frames tied to ground speed, bob, dust, lean, skid), one body scale, bullets from the gun's muzzle, a Kai sprite set per weapon
-// FLAG: feel (?feel=0), hitfeel (?hitfeel=1, off by default)
+// FLAG: feel (?feel=0), hitfeel (?hitfeel=1, off by default), overdrive (?overdrive=1, off by default)
 // TEST: qa/streetfeel-test.js
 /* ---------- STREETFEEL. Owner, 22 Oct 2026: "the art is completely fine as a sprite; the issue is it does not look like it is running; the hero is significantly smaller
    than the rest; the taxi is like a toy; ... it shoots but bullets fly not from the gun; gun variation should select the correct sprite; running sprites look like they slide".
@@ -29,6 +29,36 @@ F.hitFeel=function(e,d,src){if(!RET.hitfeel||!src||src.kind==='fire'||(!src.kind
   const heavy=e.hp<=0||d>=2;const ms=heavy?100:d<1?33:50;if(!F.S.sim)IN.hitstop(ms);F.S.hf=Math.max(F.S.hf||0,ms/1000);   // headless sim() only records the freeze (S.hf): applying it would change how often a bot samples, not the game
   if(e.boss||e.hp<=0||src.kb||/^(wind|charge|crouch|lunge|pop|stun)$/.test(e.state))return;   // committed attacks and stuns do not rock back
   e._kbd=(src.melee?Math.sign(e.x-src.x)||1:Math.sign(src.vx)||1)*clamp(10*d,4,16);e._kbt=F.S.time;F.FEEL.log.kb++;};   // a drawn recoil that eases back in 0.14 s: a real shove made the dodge bot clear 100% (was 86%), see HANDOFF-W169.md
+/* ===== W187 OVERDRIVE (?overdrive=1, off by default; STREET-REVIEW 24 Oct, task 4): the meter fills +1 per landed hit and +4 per kill and drops to 0 on a hurt; when it is full BOMB
+   fires the special instead of a grenade (3 damage to every foe within 220 units, all depths). Decision: keep hits clean to fire it, or take a risky hit for the kill. ===== */
+if(RET.overdrive===undefined)RET.overdrive=/[?&]overdrive=1/.test(location.search);
+const OD=F.OD={max:90,r:220,dmg:3,v:0,hurts:0,log:{fills:[],uses:0,hits:[],resets:0},busy:0};
+const odReset=S=>{OD.v=0;OD.hurts=S.hurts|0;OD.last=S.time;OD.log={fills:[],uses:0,hits:[],resets:0};};
+const odHit=F.hitFeel;
+F.hitFeel=function(e,d,src){odHit.apply(this,arguments);const S=F.S;if(!RET.overdrive||!S||OD.busy||!src||src.kind==='fire'||e._odk)return;
+  const was=OD.v;if(e.hp<=0){e._odk=1;OD.v=Math.min(OD.max,OD.v+4);}else OD.v=Math.min(OD.max,OD.v+1);
+  if(was<OD.max&&OD.v>=OD.max){OD.log.fills.push(+(S.time-(OD.last||0)).toFixed(2));OD.last=S.time;}};
+const odCtl=F.ctl;
+F.ctl=function(){if(odCtl)odCtl.apply(this,arguments);F.odCtl.apply(this,arguments);};
+F.odCtl=function(S,I){if(!RET.overdrive)return;   // streetsim calls this itself: its bot replaces F.ctl
+  if(OD.S!==S){OD.S=S;odReset(S);}   // a new run: S is rebuilt, so the meter starts empty
+  if((S.hurts|0)>OD.hurts){OD.hurts=S.hurts|0;if(OD.v>0)OD.log.resets++;OD.v=0;OD.last=S.time;}
+  const P=S.P;if(I.bombP&&OD.v>=OD.max&&P.hp>0){I.bombP=0;F.odSpecial(S);}};
+F.odSpecial=function(S){const P=S.P;OD.busy=1;OD.v=0;OD.last=S.time;let n=0;P._gt=.4;   // the grenade pose
+  for(const e of S.E.slice())if(!e.dead&&Math.abs(e.x-P.x)<OD.r){IN.dmgE(e,OD.dmg,{pierce:1,x:P.x,vx:0});n++;}
+  OD.busy=0;OD.log.uses++;OD.log.hits.push(n);
+  S.fx.push({ring:1,x:P.x,y:P.y-8,r:OD.r,l:.5,m:.5,c:'#19e3ff'});if(window.AH)AH.ftPush(S.fx,'fx-boom-large-electric',P.x,P.y-12,OD.r*2,.5);
+  IN.sfx('boom');if(!S.sim)IN.hitstop(80);IN.pop(P.x,P.y-96,'OVERDRIVE!','#19e3ff',true);};
+/* the bar: right side under the score and time (a plain placeholder until the Wave 1 art), "hud-overdrive" */
+if(F.look&&F.look.draw){const dr=F.look.draw;F.look.draw=function(c){const r=dr.apply(this,arguments),S=F.S,L=IN.L();if(!r||!RET.overdrive||!S||!L||!L.hud)return r;
+  const u=1/L.sc,t0=F.look.t0,vw=L.vw,w=118*u,h=10*u,full=OD.v>=OD.max,x=vw-w-10*u,y=t0+(vw<600?118:72)*u;
+  S._odShow=(S._odShow||0)+(OD.v>0?1:0);
+  c.save();c.fillStyle='#000a';c.fillRect(x-4*u,y-18*u,w+8*u,h+36*u);c.fillStyle='#ffffff22';c.fillRect(x,y,w,h);
+  c.fillStyle=full?(Math.floor(S.time*6)%2?'#ffffff':'#19e3ff'):'#19a8c8';c.fillRect(x,y,w*OD.v/OD.max,h);
+  c.textAlign='right';c.textBaseline='bottom';c.font='bold '+14*u+'px monospace';c.fillStyle=full?'#19e3ff':'#c9c3e6';c.fillText(full?'OVERDRIVE READY':'OVERDRIVE',x+w,y-2*u);
+  c.textBaseline='top';c.font='bold '+12*u+'px monospace';c.fillStyle='#ffffffcc';
+  const cap=full?'press BOMB: hits all foes near':S._odShow<600?'OVERDRIVE: land hits without getting hurt':'';if(cap)c.fillText(cap,x+w,y+h+3*u);
+  c.restore();L.hud.hud.push({x:x-4*u,y:y-18*u-t0,w:w+8*u,h:h+36*u});return r;};}
 if(!RET.feel)return;
 const RUNA={run:1,runshoot:1,walk:1};
 const sheetOf=k=>{const i=k.indexOf('/');return [k.slice(0,i),k.slice(i+1)];};

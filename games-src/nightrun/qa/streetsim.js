@@ -49,6 +49,7 @@ const BELT = "I.l = p.x < P.x; }\n    if (RET.belt && P.z != null) { I.u = I.d =
   " if (S._dzT > S.time) tz = S._dzTo; if (tz > P.z + .04) I.d = 1; else if (tz < P.z - .04) I.u = 1; } };";
 const CODE = { nearest: RUN.replace(BEND, BELT.replace('__DZ__', 'false')), gfirst: RUNG.replace(BEND, BELT.replace('__DZ__', 'false')), dodge: RUND.replace(BEND, BELT.replace('__DZ__', 'true')) };
 
+// W187: the getter below also fires a full OVERDRIVE for the bot when 3 foes are near
 // ---- in the page: telemetry wrapped round FOOT.ctl (called once per update step, before the step), then the bot / idle run
 const TEL = () => {
   const T = window.__T = { steps: 0, nan: 0, nanEx: '', still: 0, stuckAt: -1, sig: '', sigT: 0, thr: [], thrT: -1, duck: 0, hits: [], hurtAt: [], ttk: {}, lingerMax: 0, linger: 0, left: 0, seen: new Map(), prevX: null, bl: new Map(), mel: [], lastHurts: 0, hpMin: 99, hpPrev: null, hpLost: 0, tEnd: 0, zb: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], zs: [] };
@@ -81,7 +82,7 @@ const TEL = () => {
     if (T.bl.size > 400) T.bl.clear();
   };
   const F = FOOT; delete F.ctl;
-  Object.defineProperty(F, 'ctl', { configurable: true, get() { return inner ? (S, I) => { inner(S, I); obs(S); } : null; }, set(f) { inner = f; } });
+  Object.defineProperty(F, 'ctl', { configurable: true, get() { return inner ? (S, I) => { inner(S, I); const O = F.OD; if (O && RET.overdrive && O.v >= O.max && !I.bombP) { const P = S.P, n = S.E.filter(e => !e.dead && Math.abs(e.x - P.x) < O.r).length; if (n >= 3) I.bombP = 1; } if (F.odCtl) F.odCtl(S, I); obs(S); } : null; }, set(f) { inner = f; } });
   return () => { delete F.ctl; F.ctl = null; };
 };
 // run one bot+seed stepped (fast); returns the bot's own result plus the telemetry
@@ -92,7 +93,7 @@ const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); w
   const ms = performance.now() - w0, S = FOOT.S, T = window.__T, sh = S.sh || {}, s3 = S.s3 || {};
   const tu = {}; r.zmiss = S.zmiss | 0; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
   r.tel = { tr: T.tr, stuckBoss: T.stuckBoss, mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, far: T.far || 0, lingerInfo: T.lingerInfo, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
-    called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' ') };
+    called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' '), od: FOOT.OD && FOOT.OD.log };
   try { FOOT.stop(); } catch (e) {} un(); return r; })()`;
 const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story', JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 })); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } catch (e) {} };
 const med = a => a && a.length ? +a.slice().sort((x, y) => x - y)[a.length >> 1].toFixed(2) : null, mean = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
@@ -180,6 +181,10 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
     L(band >= .25 && used >= 6, `W173 D1 floor band >= 25% of the view (${(100 * band).toFixed(0)}%) and actors use >= 60% of it (${used * 10}% of depth slices hold >= 2% of actor time)`);
     L(zh + zm > 0 && zm / (zm + zh) >= .3, `W173 D2 the dodge bot avoids >= 30% of attacks by depth (${zm} out-of-depth misses vs ${zh} hits = ${(100 * zm / Math.max(1, zm + zh)).toFixed(0)}%)`);
     L(sp != null && sp >= .3, `W173 D3 median depth spread of foes near Kai >= 30% of the band (${sp == null ? '-' : (100 * sp).toFixed(0) + '%'})`); }
+  if (/overdrive=1/.test(process.env.Q || '')) { const od = b => ok0.filter(o => o.j.bot === b && o.r.tel.od).map(o => o.r.tel.od), fl = [].concat(...od('dodge').map(x => x.fills)), us = [].concat(...od('dodge').map(x => x.hits)), uses3 = us.filter(n => n >= 3).length;   // W187
+    console.log(`INFO overdrive dodge: ${fl.length} fills, median ${med(fl)} s apart; ${us.length} specials, hits per use median ${med(us)}, >= 3 foes in ${us.length ? (100 * uses3 / us.length).toFixed(0) : 0}%; resets by a hurt ${od('dodge').reduce((a, x) => a + x.resets, 0)}; casual specials ${[].concat(...od('nearest').map(x => x.hits)).length}`);
+    L(fl.length > 0 && med(fl) >= 25 && med(fl) <= 40, `W187 the dodge bot fills OVERDRIVE every 25-40 s (median ${fl.length ? med(fl) : '-'} s over ${fl.length} fills)`);
+    L(us.length > 0 && uses3 / us.length >= .5, `W187 specials hit >= 3 foes in >= 50% of uses (${uses3}/${us.length})`); }
   L(suiteSecs < 180, `whole suite < 3 min (${suiteSecs.toFixed(0)} s)`);
   L(factor >= 100, `speed >= x100 real time (x${factor.toFixed(0)}, ${rps.toFixed(2)} runs/s; slowest single run x${Math.min(...ok0.map(o => (o.r.tEnd || 0) / (o.r.ms / 1000))).toFixed(0)})`);
   if (rt) { L(rt.rep, `determinism: the same seed twice gives the same hurts and end time`); L(rt.same, `one seed equals a real-time run (idle, seed ${seedOf(0)}: stepped hurts [${rt.stepped}] vs real-time [${rt.real}] over the first ${rt.lim} s, tolerance 1 s)`); }
