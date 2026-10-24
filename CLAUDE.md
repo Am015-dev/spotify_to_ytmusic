@@ -10,7 +10,7 @@ Old rules and lessons (read only when needed): `games-src/RULES-ARCHIVE.md`.
 - Don't edit Mainhattan Overdrive. Nightrun belongs to this orchestrator. Ticket to Ride is on hold.
 - Before pushing: `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push; `git add` explicit paths only.
 - If a command is blocked, stop and tell the owner. Never ask a worker question you could decide yourself; never wait.
-- Screenshots: compare with nightrun/benchmark/ + benchmark games (URLs); owner OKs phone+PC shots before any visual deploy.
+- Screenshots vs benchmarks (URLs); no visual deploy unless every critic row >= 7 and the orchestrator saw the shots.
 - Nightrun FEATURE FREEZE (24 Oct): look first, rules in WORKER-RULES.md 15-17 (17 = one-shot benchmark gate).
 
 ## How we work (owner, 14 Oct 2026: "you waste way too many tokens and deliver shit results")
