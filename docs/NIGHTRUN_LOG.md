@@ -1,0 +1,5 @@
+# Night run log (Mainhattan Overdrive), 25-26 Oct 2026
+One line per deploy: version, what changed, what the shot shows, what is left.
+
+- beta.164 HOTFIX, BUILT NOT DEPLOYED (deploy.sh was refused by the session's permission check). Local branch hotfix-b164 (00a65de35) = 42e084c4 (beta.163, never live) + one speedo (83bdce54, review PASS) + iPhone reload fix (15aad944, review: safe as interim) + changelog. Build out/v90m-beta.164, 3.34 MiB, unit 0 FAIL, life1/xf1/terrain 42/42 phone profile. mem/no-reload fra: 0 reloads, textures +1 MB, peak 717 MB vs cap 700 (live beta.162: 1065 MB). Shot: docs/shots/racehud/grandprix_fra_one_speedo.jpg (one speedo, 212 KPH). Left: deploy + Beta/preview publish once allowed; one car's paint can lose reflections (fixed in WIP docs/HANDOFF_reload-r25e.patch).
+- Not shippable yet: racemode-r25a (Race Mode 42/42 playable) is on trunk but adds a race/racefree red (REVIEW_2K_23); a worker is on it. Athens heap ~580 MB needs a design lane (HANDOFF_reload-r25e.md).
