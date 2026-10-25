@@ -8,15 +8,19 @@
 const GL={P:{sun:24,sr:1.6,re:28,rw:2.5,rk:16,ek:.5},on:(()=>{const m=/[?&]gloss=([^&#]*)/.exec(location.search);return!m||m[1]!=='0'})(),tex:null,id:'',C:new Map(),n:0,ms:0,mats:new Set()};
 // r22e10: keyed on the mood id AND the key light (colour, intensity, direction, quantised), so a Frankfurt mood/time switch that keeps the id still rebuilds;
 // the last 4 envs stay cached (cycling day/dusk/night re-uses them, no PMREM churn)
-function GL_key(){const d=moonL.position.clone().normalize();return MOOD.id+'|'+moonL.color.getHexString()+'|'+Math.round(moonL.intensity)+'|'+[d.x,d.y,d.z].map(v=>Math.round(v*3)).join(',')+'|'+(lowGfx?1:0)}
+function GL_key(){const d=moonL.position.clone().sub(moonL.target.position).normalize();return MOOD.id+'|'+moonL.color.getHexString()+'|'+Math.round(moonL.intensity)+'|'+[d.x,d.y,d.z].map(v=>Math.round(v*3)).join(',')+'|'+(lowGfx?1:0)}
 function GL_env(){const id=GL_key();if(GL.tex&&GL.id===id)return GL.tex;const hit=GL.C.get(id);if(hit){GL.tex=hit;GL.id=id;return hit}const t0=performance.now(),Q=GL.P,add=[];
   const B=o=>Object.assign(new THREE.MeshBasicMaterial(o),{toneMapped:false,fog:false}),k=moonL.intensity/4.2,kk=Math.max(.15,Math.min(1,k)),sd=moonL.position.clone().normalize();
   const sun=new THREE.Mesh(new THREE.SphereGeometry(Q.sr,12,8),B({color:moonL.color.clone().multiplyScalar(Q.sun*Math.min(1.2,k))}));sun.position.copy(sd).multiplyScalar(40);add.push(sun);
   // the streak: a thin bright band all round the sky at ~re deg (what a chase/orbit camera sees mirrored in a roof or bonnet, whatever the heading)
   const R=60,e=Q.re*Math.PI/180,w=Q.rw*Math.PI/180,y0=R*Math.tan(e-w/2),y1=R*Math.tan(e+w/2);
   const ring=new THREE.Mesh(new THREE.CylinderGeometry(R,R,y1-y0,48,1,true),B({color:new THREE.Color(1,1,1.04).multiplyScalar(Q.rk*kk),side:THREE.DoubleSide}));ring.position.y=(y0+y1)/2;add.push(ring);
-  for(const o of add)ENVSC.add(o);let t;try{const pm=new THREE.PMREMGenerator(renderer);t=pm.fromScene(ENVSC,0).texture;pm.dispose()}finally{for(const o of add){ENVSC.remove(o);o.geometry.dispose();o.material.dispose()}}
-  GL.C.set(id,t);if(GL.C.size>4){const[k0,t0]=GL.C.entries().next().value;GL.C.delete(k0);if(t0!==GL.tex)t0.dispose()}GL.tex=t;GL.id=id;GL.n++;GL.ms=performance.now()-t0;return t}
+  for(const o of add)ENVSC.add(o);let t;try{const pm=new THREE.PMREMGenerator(renderer),rt=pm.fromScene(ENVSC,0);t=rt.texture;t.userData.rt=rt;pm.dispose()}finally{for(const o of add){ENVSC.remove(o);o.geometry.dispose();o.material.dispose()}}
+  GL.C.set(id,t);GL.tex=t;for(const[k0,t0]of GL.C){if(GL.C.size<=4)break;if(t0===t)continue;GL.C.delete(k0);GL_free(t0)}GL.id=id;GL.n++;GL.ms=performance.now()-t0;return t}
+// reload-r25d (Alex 25 Oct: "the game refreshed 5 times in 5 minutes", iPhone): the key read moonL.position, which follows the car while shadows are on
+// (71_roam_drive), so every ~100 m of driving made a new 6 MB PMREM env, and texture.dispose() never frees a PMREM render target (three r164):
+// +1 MB GPU per second of driving until iOS killed and reloaded the tab. Key = light direction (position - target); evicted envs free their render target.
+function GL_free(t){if(!t)return;for(const m of GL.mats)if(m.envMap===t)m.envMap=GL.tex;const rt=t.userData&&t.userData.rt;if(rt)rt.dispose();else t.dispose()}
 // a car paint material: vertex-coloured (or player livery) standard/physical, opaque; glass keeps its own (darker, sharper) look but takes the studio too
 function GL_paint(m){return m&&m.isMeshStandardMaterial&&!m.transparent&&m.envMap&&(m.isMeshPhysicalMaterial||m.envMapIntensity>1||m.userData.a10e!==undefined)}
 function GL_set(m,ei){if(!GL_paint(m))return;if(m.userData.gl0===undefined)m.userData.gl0=[m.envMapIntensity,m.clearcoatRoughness];
