@@ -32,3 +32,5 @@
 98rfb_race_bounds.js:TK_pY,TK_near,TK_bd
 98sc_stkcam.js
 99cst_camsteady_go.js
+98rd_race_dress.js:RDS_hw,RDS_inCor,RDS_build,RDS_drop
+99c9rd_racedress_go.js

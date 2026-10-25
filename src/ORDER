@@ -115,6 +115,7 @@
 98rfb_race_bounds.js
 98pr_proto.js
 98rb_racersbricks.js
+98rd_race_dress.js
 98fc_fair2.js
 98tk_go.js
 98ro_open.js
@@ -203,6 +204,7 @@
 99crf_racefree_go.js
 98sc_stkcam.js
 99cst_camsteady_go.js
+99c9rd_racedress_go.js
 99cs_solid.js
 99cb_athbudget.js
 99cc_reveal_desktop.js

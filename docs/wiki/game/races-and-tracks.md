@@ -7,6 +7,7 @@
 - Prototype stretch (`?proto=1`, default OFF): `src/98pr_proto.js` (`PR_build`, `PR_lights`), shots `docs/shots/proto1`.
 - Racers power-up bricks (`?proto=1`, Westend race only): `src/98rb_racersbricks.js` (LGPL-3.0 port; `window.RBR`, `RB_touch/RB_use/RB_tick`), GO `race/racers-bricks` (`src/99crb_bricks_go.js`), shots `docs/shots/bricks` ([HANDOFF](../../HANDOFF_bricks-r24i.md)).
 - Race freedom (racefree-r24l): city-race soft bounds + rival planting `src/98rfb_race_bounds.js` (lazy: `TK_bd`, `TK_near`, `TK_pY`), race-mode hold point keeps the player's line (`src/30_race2.js` physPlayer); GO `race/racefree` (`src/99crf_racefree_go.js`), [HANDOFF](../../HANDOFF_racefree-r24l.md).
+- Race dressing (racedress-r24n): every city race a closed course (barriers, closed side streets, chevrons, gantry + grid, stands, corridor cleared), lazy `src/98rd_race_dress.js` (`window.RDS`, `?rd=0` off); GO `race/dressed` (`src/99c9rd_racedress_go.js`), shots `docs/shots/racedress`, [HANDOFF](../../HANDOFF_racedress-r24n.md).
 - Story/missions/quests: `src/41_career_quests.js` (`QUESTS`, `qvGraph`), `src/80_story_m1.js`, `src/81_story_ath_m2_m3.js`; Athens specials `src/98esc_escape.js`.
 - Plans: [../../RACE2K_PLAN.md](../../RACE2K_PLAN.md), [../../RACE_MODES.md](../../RACE_MODES.md), [../../TRACKS_2K.md](../../TRACKS_2K.md), [../../TRACKS_2K_BEATS.md](../../TRACKS_2K_BEATS.md), [../../TRACKS_REF.md](../../TRACKS_REF.md).
 
