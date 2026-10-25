@@ -1,0 +1,26 @@
+{
+ "frames": 8,
+ "fps": 16,
+ "w": 257,
+ "h": 384,
+ "anchor": [
+  128,
+  384
+ ],
+ "order": [
+  "strip-prop-windows-loop#1",
+  "strip-prop-windows-loop#1~mid",
+  "strip-prop-windows-loop#2",
+  "strip-prop-windows-loop#2~mid",
+  "strip-prop-windows-loop#3",
+  "strip-prop-windows-loop#3~mid",
+  "strip-prop-windows-loop#4",
+  "strip-prop-windows-loop#4~mid"
+ ],
+ "expanded": {
+  "of": "loop-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

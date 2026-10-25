@@ -1,0 +1,26 @@
+{
+ "frames": 8,
+ "fps": 16,
+ "w": 381,
+ "h": 384,
+ "anchor": [
+  190,
+  384
+ ],
+ "order": [
+  "strip-prop-police-loop#1",
+  "strip-prop-police-loop#1~mid",
+  "strip-prop-police-loop#2",
+  "strip-prop-police-loop#2~mid",
+  "strip-prop-police-loop#3",
+  "strip-prop-police-loop#3~mid",
+  "strip-prop-police-loop#4",
+  "strip-prop-police-loop#4~mid"
+ ],
+ "expanded": {
+  "of": "loop-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

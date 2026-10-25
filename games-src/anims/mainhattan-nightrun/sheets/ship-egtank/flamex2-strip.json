@@ -1,0 +1,26 @@
+{
+ "frames": 8,
+ "fps": 24,
+ "w": 520,
+ "h": 165,
+ "anchor": [
+  260,
+  165
+ ],
+ "order": [
+  "strip-ship-egtank-flame#1",
+  "strip-ship-egtank-flame#1~mid",
+  "strip-ship-egtank-flame#2",
+  "strip-ship-egtank-flame#2~mid",
+  "strip-ship-egtank-flame#3",
+  "strip-ship-egtank-flame#3~mid",
+  "strip-ship-egtank-flame#4",
+  "strip-ship-egtank-flame#4~mid"
+ ],
+ "expanded": {
+  "of": "flame-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

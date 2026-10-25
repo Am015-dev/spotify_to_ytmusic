@@ -1,0 +1,26 @@
+{
+ "frames": 8,
+ "fps": 24,
+ "w": 523,
+ "h": 170,
+ "anchor": [
+  261,
+  170
+ ],
+ "order": [
+  "strip-ship-eminelayer-flame#1",
+  "strip-ship-eminelayer-flame#1~mid",
+  "strip-ship-eminelayer-flame#2",
+  "strip-ship-eminelayer-flame#2~mid",
+  "strip-ship-eminelayer-flame#3",
+  "strip-ship-eminelayer-flame#3~mid",
+  "strip-ship-eminelayer-flame#4",
+  "strip-ship-eminelayer-flame#4~mid"
+ ],
+ "expanded": {
+  "of": "flame-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

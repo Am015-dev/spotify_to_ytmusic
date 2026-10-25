@@ -1,0 +1,32 @@
+{
+ "frames": 8,
+ "fps": 8,
+ "w": 127,
+ "h": 275,
+ "anchor": [
+  63,
+  275
+ ],
+ "order": [
+  "strip-bruiser-idle#1",
+  "strip-bruiser-idle#1~mid",
+  "strip-bruiser-idle#2",
+  "strip-bruiser-idle#2~mid",
+  "strip-bruiser-idle#3",
+  "strip-bruiser-idle#3~mid",
+  "strip-bruiser-idle#4",
+  "strip-bruiser-idle#4~mid"
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.75
+ },
+ "px_per_m": 128.0,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

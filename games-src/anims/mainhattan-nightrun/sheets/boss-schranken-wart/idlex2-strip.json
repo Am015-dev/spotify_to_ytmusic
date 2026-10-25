@@ -1,0 +1,32 @@
+{
+ "frames": 8,
+ "fps": 8,
+ "w": 785,
+ "h": 672,
+ "anchor": [
+  392,
+  672
+ ],
+ "order": [
+  "strip-boss-schranken-wart-idle#1",
+  "strip-boss-schranken-wart-idle#1~mid",
+  "strip-boss-schranken-wart-idle#2",
+  "strip-boss-schranken-wart-idle#2~mid",
+  "strip-boss-schranken-wart-idle#3",
+  "strip-boss-schranken-wart-idle#3~mid",
+  "strip-boss-schranken-wart-idle#4",
+  "strip-boss-schranken-wart-idle#4~mid"
+ ],
+ "metres": {
+  "h": 4.0,
+  "w": 8.0
+ },
+ "px_per_m": 96.0,
+ "body": 384,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

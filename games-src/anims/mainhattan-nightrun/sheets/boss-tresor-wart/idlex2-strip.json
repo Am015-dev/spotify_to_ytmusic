@@ -1,0 +1,30 @@
+{
+ "frames": 6,
+ "fps": 8,
+ "w": 563,
+ "h": 639,
+ "anchor": [
+  281,
+  639
+ ],
+ "order": [
+  "strip-boss-tresor-wart-idle#1",
+  "strip-boss-tresor-wart-idle#1~mid",
+  "strip-boss-tresor-wart-idle#2",
+  "strip-boss-tresor-wart-idle#2~mid",
+  "strip-boss-tresor-wart-idle#3",
+  "strip-boss-tresor-wart-idle#3~mid"
+ ],
+ "metres": {
+  "h": 4.5,
+  "w": 7.0
+ },
+ "px_per_m": 85.33,
+ "body": 384,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

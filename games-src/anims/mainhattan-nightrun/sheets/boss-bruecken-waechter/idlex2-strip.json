@@ -1,0 +1,30 @@
+{
+ "frames": 6,
+ "fps": 8,
+ "w": 558,
+ "h": 457,
+ "anchor": [
+  279,
+  457
+ ],
+ "order": [
+  "strip-boss-bruecken-waechter-idle#1",
+  "strip-boss-bruecken-waechter-idle#1~mid",
+  "strip-boss-bruecken-waechter-idle#2",
+  "strip-boss-bruecken-waechter-idle#2~mid",
+  "strip-boss-bruecken-waechter-idle#3",
+  "strip-boss-bruecken-waechter-idle#3~mid"
+ ],
+ "metres": {
+  "h": 5.0,
+  "w": 10.0
+ },
+ "px_per_m": 76.8,
+ "body": 384,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

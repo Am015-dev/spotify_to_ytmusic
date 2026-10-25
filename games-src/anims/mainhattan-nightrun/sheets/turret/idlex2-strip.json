@@ -1,0 +1,32 @@
+{
+ "frames": 8,
+ "fps": 8,
+ "w": 306,
+ "h": 350,
+ "anchor": [
+  153,
+  350
+ ],
+ "order": [
+  "strip-turret-idle#1",
+  "strip-turret-idle#1~mid",
+  "strip-turret-idle#2",
+  "strip-turret-idle#2~mid",
+  "strip-turret-idle#3",
+  "strip-turret-idle#3~mid",
+  "strip-turret-idle#4",
+  "strip-turret-idle#4~mid"
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.6,
+  "w": 1.4
+ },
+ "px_per_m": 160.0,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

@@ -1,0 +1,32 @@
+{
+ "frames": 8,
+ "fps": 8,
+ "w": 167,
+ "h": 313,
+ "anchor": [
+  83,
+  313
+ ],
+ "order": [
+  "strip-mech-idle#1",
+  "strip-mech-idle#1~mid",
+  "strip-mech-idle#2",
+  "strip-mech-idle#2~mid",
+  "strip-mech-idle#3",
+  "strip-mech-idle#3~mid",
+  "strip-mech-idle#4",
+  "strip-mech-idle#4~mid"
+ ],
+ "body": 256,
+ "metres": {
+  "h": 3.2,
+  "w": 2.4
+ },
+ "px_per_m": 80.0,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

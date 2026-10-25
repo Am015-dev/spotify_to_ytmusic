@@ -1,0 +1,26 @@
+{
+ "frames": 8,
+ "fps": 24,
+ "w": 523,
+ "h": 286,
+ "anchor": [
+  261,
+  286
+ ],
+ "order": [
+  "strip-ship-ebait-flame#1",
+  "strip-ship-ebait-flame#1~mid",
+  "strip-ship-ebait-flame#2",
+  "strip-ship-ebait-flame#2~mid",
+  "strip-ship-ebait-flame#3",
+  "strip-ship-ebait-flame#3~mid",
+  "strip-ship-ebait-flame#4",
+  "strip-ship-ebait-flame#4~mid"
+ ],
+ "expanded": {
+  "of": "flame-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

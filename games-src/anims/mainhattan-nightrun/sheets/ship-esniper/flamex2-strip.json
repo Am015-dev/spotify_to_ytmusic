@@ -1,0 +1,26 @@
+{
+ "frames": 8,
+ "fps": 24,
+ "w": 520,
+ "h": 100,
+ "anchor": [
+  260,
+  100
+ ],
+ "order": [
+  "strip-ship-esniper-flame#1",
+  "strip-ship-esniper-flame#1~mid",
+  "strip-ship-esniper-flame#2",
+  "strip-ship-esniper-flame#2~mid",
+  "strip-ship-esniper-flame#3",
+  "strip-ship-esniper-flame#3~mid",
+  "strip-ship-esniper-flame#4",
+  "strip-ship-esniper-flame#4~mid"
+ ],
+ "expanded": {
+  "of": "flame-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

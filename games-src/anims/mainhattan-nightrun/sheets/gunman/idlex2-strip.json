@@ -1,0 +1,32 @@
+{
+ "frames": 8,
+ "fps": 8,
+ "w": 95,
+ "h": 259,
+ "anchor": [
+  47,
+  259
+ ],
+ "order": [
+  "strip-gunman-idle#1",
+  "strip-gunman-idle#1~mid",
+  "strip-gunman-idle#2",
+  "strip-gunman-idle#2~mid",
+  "strip-gunman-idle#3",
+  "strip-gunman-idle#3~mid",
+  "strip-gunman-idle#4",
+  "strip-gunman-idle#4~mid"
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

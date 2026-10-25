@@ -7,6 +7,7 @@
    frame in sheet px from the feet anchor (facing right), ST = foot spread at contact (one step) in sheet px. Slots for missing art: ART-SLOTS-STREET.md. ---------- */
 if(RET.feel===undefined)RET.feel=!/[?&]feel=0/.test(location.search);
 if(RET.bodyscale===undefined)RET.bodyscale=!/[?&]bodyscale=0/.test(location.search);   // art.js ART.bsc: one scale per character from its json body (owner, 22 Oct 2026)
+if(RET.expand===undefined)RET.expand=/[?&]expand=1/.test(location.search);   // art.js ART.x2: idle / hover / flame / glow / loop play the x2 strips (computed in-betweens, strip-expand.py); default OFF
 (function(){
 if(!window.FOOT||!FOOT._in||typeof ART==='undefined'||!ART.footDraw)return;
 const F=window.FOOT,IN=F._in,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;

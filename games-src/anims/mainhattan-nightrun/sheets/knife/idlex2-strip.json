@@ -1,0 +1,32 @@
+{
+ "frames": 8,
+ "fps": 8,
+ "w": 90,
+ "h": 260,
+ "anchor": [
+  45,
+  260
+ ],
+ "order": [
+  "strip-knife-idle#1",
+  "strip-knife-idle#1~mid",
+  "strip-knife-idle#2",
+  "strip-knife-idle#2~mid",
+  "strip-knife-idle#3",
+  "strip-knife-idle#3~mid",
+  "strip-knife-idle#4",
+  "strip-knife-idle#4~mid"
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.75,
+  "w": 0.55
+ },
+ "px_per_m": 146.29,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

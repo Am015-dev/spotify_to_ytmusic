@@ -1,0 +1,26 @@
+{
+ "frames": 8,
+ "fps": 24,
+ "w": 522,
+ "h": 164,
+ "anchor": [
+  261,
+  164
+ ],
+ "order": [
+  "strip-ship-hv-flame#1",
+  "strip-ship-hv-flame#1~mid",
+  "strip-ship-hv-flame#2",
+  "strip-ship-hv-flame#2~mid",
+  "strip-ship-hv-flame#3",
+  "strip-ship-hv-flame#3~mid",
+  "strip-ship-hv-flame#4",
+  "strip-ship-hv-flame#4~mid"
+ ],
+ "expanded": {
+  "of": "flame-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

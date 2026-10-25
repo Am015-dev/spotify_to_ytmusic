@@ -12,14 +12,14 @@ bg=rd('bg.js'); dr=rd('draw.js'); b=rd('b.js')   # (the old string patches are b
 FOOTWHO=set('kai grunt gunman shield bruiser knife sniper drone turret mech warden jetpack hound flamer ninja medic'.split())   # on-foot actors keep the bottom-centre anchor (feet)
 def _anim():
     import json
-    R=_ROOT+'';md=R+'games/mainhattan-nightrun/media/anim/';sd=R+'games-src/anims/mainhattan-nightrun/sheets/';s={}
+    R=_ROOT+'';md=R+'games/mainhattan-nightrun/media/anim/';sd=R+'games-src/anims/mainhattan-nightrun/sheets/';s={};x={}
     for who in sorted(os.listdir(md)):
         for f in sorted(os.listdir(md+who)):
             if not f.endswith('-strip.webp'):continue
             j=json.load(open(sd+who+'/'+f[:-5]+'.json',encoding='utf8'));ax,ay=j['anchor'] if who.startswith('boss-') or who in FOOTWHO else (j['w']/2,j['h']/2)
-            s[who+'/'+f[:-11]]=[j['frames'],j['fps'],j['w'],j['h'],ax,ay,j.get('body') or 0]   # [6] body: px of the standing height (sheets json), 0 = none
+            (x if f.endswith('x2-strip.webp') else s)[who+'/'+(f[:-13] if f.endswith('x2-strip.webp') else f[:-11])]=[j['frames'],j['fps'],j['w'],j['h'],ax,ay,j.get('body') or 0]   # [6] body: px of the standing height (sheets json), 0 = none; x = the <act>x2 strips from strip-expand.py (RET.expand)
     sm=json.load(open(sd+'smoothing.json',encoding='utf8'));sm.pop('_note',None)
-    return json.dumps({'s':s,'sm':sm,'c':json.load(open(R+'games-src/nightrun/sprite-calib.json',encoding='utf8'))},separators=(',',':'))
+    return json.dumps({'s':s,'x':x,'sm':sm,'c':json.load(open(R+'games-src/nightrun/sprite-calib.json',encoding='utf8'))},separators=(',',':'))
 ANIM=_anim()
 # bg patches
 # (the beat pulse no longer flashes the backdrop: it lives on the screen edges and the ship ring, see parts/fx.js)

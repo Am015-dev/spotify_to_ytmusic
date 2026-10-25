@@ -1,0 +1,32 @@
+{
+ "frames": 8,
+ "fps": 8,
+ "w": 127,
+ "h": 262,
+ "anchor": [
+  63,
+  262
+ ],
+ "order": [
+  "strip-grunt-idle#1",
+  "strip-grunt-idle#1~mid",
+  "strip-grunt-idle#2",
+  "strip-grunt-idle#2~mid",
+  "strip-grunt-idle#3",
+  "strip-grunt-idle#3~mid",
+  "strip-grunt-idle#4",
+  "strip-grunt-idle#4~mid"
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

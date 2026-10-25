@@ -1,0 +1,30 @@
+{
+ "frames": 6,
+ "fps": 8,
+ "w": 410,
+ "h": 494,
+ "anchor": [
+  205,
+  494
+ ],
+ "order": [
+  "strip-boss-flusskrake-idle#1",
+  "strip-boss-flusskrake-idle#1~mid",
+  "strip-boss-flusskrake-idle#2",
+  "strip-boss-flusskrake-idle#2~mid",
+  "strip-boss-flusskrake-idle#3",
+  "strip-boss-flusskrake-idle#3~mid"
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 7.0
+ },
+ "px_per_m": 64.0,
+ "body": 384,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

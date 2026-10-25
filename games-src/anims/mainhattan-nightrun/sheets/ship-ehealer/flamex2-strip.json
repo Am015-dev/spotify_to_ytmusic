@@ -1,0 +1,26 @@
+{
+ "frames": 8,
+ "fps": 24,
+ "w": 520,
+ "h": 192,
+ "anchor": [
+  260,
+  192
+ ],
+ "order": [
+  "strip-ship-ehealer-flame#1",
+  "strip-ship-ehealer-flame#1~mid",
+  "strip-ship-ehealer-flame#2",
+  "strip-ship-ehealer-flame#2~mid",
+  "strip-ship-ehealer-flame#3",
+  "strip-ship-ehealer-flame#3~mid",
+  "strip-ship-ehealer-flame#4",
+  "strip-ship-ehealer-flame#4~mid"
+ ],
+ "expanded": {
+  "of": "flame-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

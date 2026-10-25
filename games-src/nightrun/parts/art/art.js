@@ -144,11 +144,14 @@ ART.bsc=(m,h)=>h/(RET.bodyscale&&m[6]?m[6]:m[3]);
 ART.as={};ART.aDone=false;ART.aP=0;ART.aT=0;                // aDone / aP / aT: set by ART.aframe (a one-shot reached its end; progress 0..1 and seconds inside the frame)
 ART.LOOPA=new Set(['idle','run','flame','glow','loop','spin','hover']);   // every other act is a one-shot: it stops on its last frame
 ART.VS={};ART.VB={};     // tinted copies of enemy-ship sheets (foeart.js): meta and strip, kept out of ART.ANIM.s / ART.rd so the listed-sheet counts stay the real files
-ART.aS=key=>{let o=ART.as[key];if(o!==undefined)return o;const m=ART.ANIM.s[key]||ART.VS[key];if(!m)return ART.as[key]=null;   // per-sheet record, built once: cumulative frame end times (smoothing.json holds at the sheet fps)
-  const act=key.slice(key.lastIndexOf('/')+1),hd=ART.ANIM.sm.holds[act],n=m[0],cum=new Float32Array(n);let s=0;for(let i=0;i<n;i++){s+=(hd&&hd.length===n?hd[i]:1)/m[1];cum[i]=s;}
-  return ART.as[key]={m,act,cum,tot:s,loop:ART.LOOPA.has(act),xf:ART.ANIM.sm.crossfade.actions.indexOf(act)>=0};};
+ART.aS=key=>{let o=ART.as[key];if(o!==undefined)return o;const x2=ART.x2(key),m=x2?ART.ANIM.x[key]:ART.ANIM.s[key]||ART.VS[key];if(!m)return ART.as[key]=null;   // per-sheet record, built once: cumulative frame end times (smoothing.json holds at the sheet fps)
+  const act=key.slice(key.lastIndexOf('/')+1),hd=ART.ANIM.sm.holds[act],n=m[0],cum=new Float32Array(n);let s=0;for(let i=0;i<n;i++){s+=(hd&&hd.length===(x2?n/2:n)?hd[x2?i>>1:i]:1)/m[1];cum[i]=s;}
+  return ART.as[key]={m,act,cum,tot:s,loop:ART.LOOPA.has(act),xf:!x2&&ART.ANIM.sm.crossfade.actions.indexOf(act)>=0};};   // x2: the in-between frames replace the cross-fade; owner holds are repeated for both halves of a pair
+/* RET.expand: true once the <act>x2 strip of key is decoded (its load starts here); until then, and without the flag or the file, the original strip plays */
+ART.x2=key=>{if(!RET.expand||!ART.ANIM.x[key])return false;const n='anim/'+key+'x2-strip';if(ART.bm[n]){if(!ART.xr[key]){ART.xr[key]=1;delete ART.as[key];}return true;}if(ART.rd&&ART.rd.has(n+'.webp')&&!(n in ART.bm))ART.load(n);return false;};
+ART.xr={};
 /* the decoded strip for key ('boss-kronos/idle'), or null while it loads / when it is not listed in ready.json / with the flag off */
-ART.anim=key=>{if(!RET.sprites)return null;if(ART.VB[key])return ART.VB[key];const n='anim/'+key+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return null;const b=ART.bm[n];if(b)return b;if(!(n in ART.bm))ART.load(n);return null;};
+ART.anim=key=>{if(!RET.sprites)return null;if(ART.VB[key])return ART.VB[key];const n='anim/'+key+(ART.x2(key)?'x2':'')+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return null;const b=ART.bm[n];if(b)return b;if(!(n in ART.bm))ART.load(n);return null;};
 /* frame index at t seconds since the act began */
 ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;if(!o)return 0;const n=o.m[0];let u=t>0?t:0;
   if(o.loop)u%=o.tot;else if(u>=o.tot){ART.aDone=true;ART.aP=1;return n-1;}

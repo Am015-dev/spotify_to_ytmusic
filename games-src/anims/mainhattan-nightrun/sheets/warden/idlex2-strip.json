@@ -1,0 +1,32 @@
+{
+ "frames": 8,
+ "fps": 8,
+ "w": 144,
+ "h": 309,
+ "anchor": [
+  72,
+  309
+ ],
+ "order": [
+  "strip-warden-idle#1",
+  "strip-warden-idle#1~mid",
+  "strip-warden-idle#2",
+  "strip-warden-idle#2~mid",
+  "strip-warden-idle#3",
+  "strip-warden-idle#3~mid",
+  "strip-warden-idle#4",
+  "strip-warden-idle#4~mid"
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.2,
+  "w": 0.9
+ },
+ "px_per_m": 116.36,
+ "expanded": {
+  "of": "idle-strip",
+  "k": 1,
+  "loop": true,
+  "note": "even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)"
+ }
+}

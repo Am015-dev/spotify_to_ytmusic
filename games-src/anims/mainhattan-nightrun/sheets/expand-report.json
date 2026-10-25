@@ -1,0 +1,1074 @@
+{
+ "boss-bruecken-waechter/idle": {
+  "frames": [
+   3,
+   6
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.27,
+   "overlap": 0.925,
+   "drift": 0.1
+  }
+ },
+ "boss-flusskrake/idle": {
+  "frames": [
+   3,
+   6
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.23,
+   "overlap": 0.933,
+   "drift": 0.0
+  }
+ },
+ "boss-hoplite/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.22,
+   "overlap": 0.928,
+   "drift": 0.0
+  }
+ },
+ "boss-kronos/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.04,
+   "overlap": 0.909,
+   "drift": 0.1
+  }
+ },
+ "boss-messe-waechter/idle": {
+  "frames": [
+   3,
+   6
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 1.25,
+   "overlap": 0.803,
+   "drift": 1.9
+  }
+ },
+ "boss-schranken-wart/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.07,
+   "overlap": 0.941,
+   "drift": 0.2
+  }
+ },
+ "boss-sek-adler/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 1.1,
+   "overlap": 0.835,
+   "drift": 0.1
+  }
+ },
+ "boss-talos/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.48,
+   "overlap": 0.895,
+   "drift": 0.2
+  }
+ },
+ "boss-tresor-wart/idle": {
+  "frames": [
+   3,
+   6
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.11,
+   "overlap": 0.971,
+   "drift": 0.0
+  }
+ },
+ "boss-zentral-ice/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 1.71,
+   "overlap": 0.788,
+   "drift": 1.0
+  }
+ },
+ "bruiser/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.29,
+   "overlap": 0.984,
+   "drift": 0.0
+  }
+ },
+ "drone/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 1.31,
+   "overlap": 0.814,
+   "drift": 0.0
+  }
+ },
+ "fx-shield/glow": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 1.07,
+   "overlap": 0.663,
+   "drift": 3.5
+  }
+ },
+ "grunt/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.43,
+   "overlap": 0.945,
+   "drift": 0.0
+  }
+ },
+ "gunman/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.44,
+   "overlap": 0.946,
+   "drift": 0.1
+  }
+ },
+ "jetpack/hover": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.28,
+   "overlap": 0.955,
+   "drift": 0.5
+  }
+ },
+ "kai/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.81,
+   "overlap": 0.862,
+   "drift": 0.2
+  }
+ },
+ "knife/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.4,
+   "overlap": 0.934,
+   "drift": 0.1
+  }
+ },
+ "mech/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.65,
+   "overlap": 0.871,
+   "drift": 0.1
+  }
+ },
+ "prop-banner/loop": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 2.01,
+   "overlap": 0.661,
+   "drift": 1.3
+  }
+ },
+ "prop-beacon/loop": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 4.02,
+   "overlap": 0.472,
+   "drift": 13.3
+  }
+ },
+ "prop-car/loop": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 1.11,
+   "overlap": 0.827,
+   "drift": 0.6
+  }
+ },
+ "prop-drone/loop": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 2.08,
+   "overlap": 0.738,
+   "drift": 0.3
+  }
+ },
+ "prop-holo/loop": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.56,
+   "overlap": 0.948,
+   "drift": 0.6
+  }
+ },
+ "prop-neon/loop": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.18,
+   "overlap": 0.995,
+   "drift": 0.2
+  }
+ },
+ "prop-police/loop": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.19,
+   "overlap": 0.888,
+   "drift": 3.8
+  }
+ },
+ "prop-steam/glow": {
+  "frames": [
+   5,
+   10
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 1.06,
+   "overlap": 0.007,
+   "drift": 9.4
+  }
+ },
+ "prop-windows/loop": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   8,
+   16
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.14,
+   "overlap": 0.996,
+   "drift": 0.1
+  }
+ },
+ "shield/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.34,
+   "overlap": 0.962,
+   "drift": 0.0
+  }
+ },
+ "ship-drift/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.41,
+   "overlap": 0.958,
+   "drift": 2.2
+  }
+ },
+ "ship-ebait/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.27,
+   "overlap": 0.957,
+   "drift": 0.7
+  }
+ },
+ "ship-ebomber/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.28,
+   "overlap": 0.971,
+   "drift": 0.3
+  }
+ },
+ "ship-ec/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.26,
+   "overlap": 0.953,
+   "drift": 0.9
+  }
+ },
+ "ship-ecarrier/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.29,
+   "overlap": 0.978,
+   "drift": 0.6
+  }
+ },
+ "ship-ecdrone/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.42,
+   "overlap": 0.907,
+   "drift": 2.4
+  }
+ },
+ "ship-echarger/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.27,
+   "overlap": 0.975,
+   "drift": 0.0
+  }
+ },
+ "ship-ecrawler/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.31,
+   "overlap": 0.967,
+   "drift": 1.1
+  }
+ },
+ "ship-ecruiser/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.29,
+   "overlap": 0.968,
+   "drift": 0.3
+  }
+ },
+ "ship-ediver/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.4,
+   "overlap": 0.971,
+   "drift": 1.5
+  }
+ },
+ "ship-edrone/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.33,
+   "overlap": 0.943,
+   "drift": 1.0
+  }
+ },
+ "ship-eflank/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.25,
+   "overlap": 0.934,
+   "drift": 0.9
+  }
+ },
+ "ship-egate/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.19,
+   "overlap": 0.965,
+   "drift": 1.8
+  }
+ },
+ "ship-egtank/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.26,
+   "overlap": 0.977,
+   "drift": 0.5
+  }
+ },
+ "ship-egturret/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.4,
+   "overlap": 0.963,
+   "drift": 0.6
+  }
+ },
+ "ship-egunship/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.36,
+   "overlap": 0.968,
+   "drift": 0.4
+  }
+ },
+ "ship-ehealer/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.24,
+   "overlap": 0.984,
+   "drift": 0.3
+  }
+ },
+ "ship-einterceptor/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.3,
+   "overlap": 0.933,
+   "drift": 0.2
+  }
+ },
+ "ship-ekamikaze/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.35,
+   "overlap": 0.965,
+   "drift": 0.6
+  }
+ },
+ "ship-emine/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.38,
+   "overlap": 0.948,
+   "drift": 2.3
+  }
+ },
+ "ship-eminelayer/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.32,
+   "overlap": 0.957,
+   "drift": 0.4
+  }
+ },
+ "ship-eshielder/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.42,
+   "overlap": 0.972,
+   "drift": 0.6
+  }
+ },
+ "ship-esniper/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.38,
+   "overlap": 0.949,
+   "drift": 1.9
+  }
+ },
+ "ship-esplitter/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.38,
+   "overlap": 0.932,
+   "drift": 1.2
+  }
+ },
+ "ship-eswarm/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.41,
+   "overlap": 0.939,
+   "drift": 2.7
+  }
+ },
+ "ship-eturret/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.28,
+   "overlap": 0.97,
+   "drift": 0.2
+  }
+ },
+ "ship-ezbomber/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.3,
+   "overlap": 0.97,
+   "drift": 0.3
+  }
+ },
+ "ship-ezdrone/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.39,
+   "overlap": 0.94,
+   "drift": 1.5
+  }
+ },
+ "ship-hv/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.51,
+   "overlap": 0.964,
+   "drift": 0.6
+  }
+ },
+ "ship-lancer/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.27,
+   "overlap": 0.949,
+   "drift": 1.1
+  }
+ },
+ "ship-nova/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.26,
+   "overlap": 0.959,
+   "drift": 0.3
+  }
+ },
+ "ship-std/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.51,
+   "overlap": 0.929,
+   "drift": 2.3
+  }
+ },
+ "ship-swg/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.34,
+   "overlap": 0.961,
+   "drift": 0.2
+  }
+ },
+ "ship-syn/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.28,
+   "overlap": 0.958,
+   "drift": 0.3
+  }
+ },
+ "ship-tri/flame": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   12,
+   24
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.28,
+   "overlap": 0.93,
+   "drift": 1.0
+  }
+ },
+ "sniper/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": false,
+  "worst": {
+   "ghost": 1.41,
+   "overlap": 0.742,
+   "drift": 0.0
+  }
+ },
+ "turret/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.2,
+   "overlap": 0.987,
+   "drift": 0.1
+  }
+ },
+ "warden/idle": {
+  "frames": [
+   4,
+   8
+  ],
+  "fps": [
+   4,
+   8
+  ],
+  "ok": true,
+  "worst": {
+   "ghost": 1.38,
+   "overlap": 0.942,
+   "drift": 0.1
+  }
+ }
+}
