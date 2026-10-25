@@ -5,6 +5,8 @@
 - Driving: roam `src/71_roam_drive.js:roamStep`, vehicle cycle `cycleVehicle`; boats `LD_boat` in `src/98ld_import.js`; boost `src/98k_boost2k.js`; damage `src/98dmg_damage.js`; smash `src/98sm2_smash2.js`, `src/98dest_destruct.js`.
 - Facing/orientation notes: [../../FACING.md](../../FACING.md).
 
+- Wall bumper (walls-1, `roamStep`): eases the car before a wall; since drivefeel-r25g only the speed INTO the wall (`RO_wallInc`, 3 rays; corners/pillars/a bend ahead = full ease; `TUNE.wallInc=0` = old). GO `feel/drive` (`src/99cdf_drivefeel_go.js`): 30° glance at 60 km/h meets the wall at 48 km/h (was 25) and keeps 68-87 % (was 46 %).
+
 ## Invariants
 - Car body rests on 4 tyres on the road (no float/sink); ride lint in `tools/unit/lint_models.js` (fill, height, aspect, wheels).
 - The transform assist must not drag the car back along the road at grass edges (comment in `src/71_roam_drive.js` near line 62).

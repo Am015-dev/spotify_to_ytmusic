@@ -35,3 +35,4 @@
 98rd_race_dress.js:RDS_hw,RDS_inCor,RDS_build,RDS_drop
 99c9rd_racedress_go.js
 99crm_racemode_go.js
+99cdf_drivefeel_go.js:DF_go,DF_measure,DF_shot

@@ -75,7 +75,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(Math.abs(RO.h)>50){RO.h-=Math.r
   if(Math.abs(angDiff(RO.h,RO.vh))>.25&&sp>25&&!air&&(terr!=='road'))RO.v-=RO.v*.08*dt;
   /* walls-1 (2K-style bumper): a solid collider dead ahead inside braking distance eases the car down to a glancing speed (TUNE.wallV km/h, default 26 < dmgGlance) so a hands-off or full-gas driver scrapes walls with sparks, not damage. TUNE.wallAssist=0 off. */
   if(TUNE.wallAssist!==0&&RO.v>(TUNE.wallV??26)/3.6+.5&&!air&&!busy&&!RO.dDir){const wv=(TUNE.wallV??26)/3.6,ba=TUNE.wallDec??14,sx=Math.sin(RO.vh),sz=Math.cos(RO.vh),reach=Math.max(0,(RO.v*RO.v-wv*wv)/(2*ba))+3;let wd=-1;for(let d=3;d<=reach+1.5;d+=3){if(roamHit(RO.x+sx*d,RO.z+sz*d,2.4,RO.y)){wd=d;break}}
-   if(wd>=0){const lim=Math.sqrt(wv*wv+2*ba*Math.max(0,wd-3.5));if(RO.v>lim)RO.v=Math.max(lim,RO.v-ba*1.6*dt)}}
+   if(wd>=0){const lim=Math.sqrt(wv*wv+2*ba*Math.max(0,wd-3.5)),inc=RO_wallInc(wd);if(RO.v*inc>lim)RO.v=Math.max(lim/inc,RO.v-ba*1.6*dt)}}
   const fx=Math.sin(RO.vh),fz=Math.cos(RO.vh);let nx=RO.x+fx*RO.v*dt,nz=RO.z+fz*RO.v*dt;
   const N=roamTerr(nx,nz,RO.y+.3,_rtC);
   if(N.low){let pop=false;for(let _j2=0,_b2=ALL_DECKS;_j2<_b2.length;_j2++){const b=_b2[_j2];const h=deckAt(b,nx,nz);if(h!=null&&h-RO.y<4.5){RO.y=h;RO.vy=Math.max(RO.vy,3);pop=true}}
@@ -119,6 +119,11 @@ function roamWreckStep(dt){const W=RO.wk,s=pl;W.t+=dt;const fw=V3(Math.sin(RO.h)
     _m.compose(b.p,b.q,_s2.setScalar(b.s));RBRK.setMatrixAt(i,_m)});RBRK.instanceMatrix.needsUpdate=true;
   if(W.t>1.3&&!W.snap){W.snap=1;AU.sfx('pick')}if(W.t>=2){RBRK.visible=false;s.mesh.visible=true;RO.wk=null;RO.hp=100;RO.inv=2;camSnap=true;RO.camH=RO.camB=RO.camY=RO.camL=null;burst(SPARK,c0,40,18,.6,new THREE.Color(2.4,2.2,1));AU.sfx('boost');say('','REBUILT!',.9)}}
 // slide along the wall: pick the wall tangent the player steers toward (or the one closest to the current heading) and keep moving
+/* drivefeel-r25g: the wall bumper brakes only the speed INTO the wall (Alex: "playable"; idea from the Hit & Run web study: a glance keeps the car moving). Three 1 m rays (path, path +-0.3 rad) give the wall line;
+   returns sin(angle between path and wall), >= .5 (so the car meets a wall at <= 2x the bumper speed, 52 km/h); 1 = head-on, a pillar or no line found (old full brake). TUNE.wallInc=0 = old behaviour. GO feel/drive (src/99cdf_drivefeel_go.js). */
+function RO_wallInc(wd){if(TUNE.wallInc===0)return 1;const hp=a=>{const x=Math.sin(a),z=Math.cos(a);for(let d=1;d<=wd+9;d++)if(roamHit(RO.x+x*d,RO.z+z*d,2.4,RO.y))return[x*d,z*d];return null};
+  const c=hp(RO.vh),l=hp(RO.vh-.3),r=hp(RO.vh+.3);if(c&&c[0]*c[0]+c[1]*c[1]<=4.1){const x=Math.sin(RO.vh),z=Math.cos(RO.vh);for(let d=2;d<=wd+12;d+=2)if(roamHit(RO.x+x*d,RO.z+z*d,1.2,RO.y))return 1;return .5}/* the path is already inside the wall margin (2.4 m) after 1-2 m: the car scrapes along a wall beside it (the old bumper held it at 26 km/h all along the wall); a narrow 1.2 m ray finds a bend or a block ahead: full ease */if(!c||!l||!r)return 1/* a corner, an edge or a pillar: full ease (rv2k/walls) */;const a=l,b=r,tx=b[0]-a[0],tz=b[1]-a[1],tl=Math.sqrt(tx*tx+tz*tz);if(tl<.5)return 1;
+  return Math.max(.5,Math.abs(Math.sin(RO.vh)*tz-Math.cos(RO.vh)*tx)/tl)}
 function roamGlance(ax,sp){if(RO.v<0){RO.v=3;return}const st=(CTL&&CTL.steer)||0,a=ax==='x'?[0,Math.PI]:[Math.PI/2,-Math.PI/2];
   let t;if(Math.abs(st)>.2)t=a.find(x=>Math.sign(angDiff(x,RO.h))===-Math.sign(st))??a[0];else{const d0=Math.abs(angDiff(a[0],RO.h)),d1=Math.abs(angDiff(a[1],RO.h));t=Math.abs(d0-d1)<.05?a[R()<.5?0:1]:d0<d1?a[0]:a[1]}
   RO.h+=angDiff(t,RO.h)*.8;RO.vh=t;RO.yr=0;RO.v=Math.max(12,sp*.45);RO.stkT=0}
