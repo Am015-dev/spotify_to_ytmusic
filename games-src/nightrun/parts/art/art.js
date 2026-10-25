@@ -161,11 +161,28 @@ ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(ke
   if(ts<(fo?.9:.75)){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
     if(!q){ch=Math.max(1,Math.round(h*cw/w));const cv_=document.createElement('canvas');cv_.width=cw*m[0];cv_.height=ch;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*cw,0,cw,ch);q=ART.sc[k]={c:cv_,h:ch};}
     b=q.c;ch=q.h;}
+  let pd=0;if(ART.olK){const k='o|'+ART.olK+(flip?'F':'')+'|'+key+'@'+cw,q=ART.sc[k]||(ART.sc[k]=ART.olB(b,cw,ch,m[0],ART.olK,flip,cw/(w*ts)));b=q.c;pd=q.p;}   // W230: the outlined + rim-lit copy (built once per strip, scale and facing)
   if(flip){c.save();c.translate(x,y);c.scale(-1,1);x=0;y=0;}
-  const dx=x-m[4]*sc,dy=y-m[5]*sv;if(al!=null)c.globalAlpha=al*ga;
-  c.drawImage(b,i*cw,0,cw,ch,dx,dy,w*sc,h*sv);
-  if(cf>0){c.globalAlpha=(al==null?1:al)*ga*cf;c.drawImage(b,((i+1)%m[0])*cw,0,cw,ch,dx,dy,w*sc,h*sv);}
+  const ux=w*sc/cw,uy=h*sv/ch,dx=x-m[4]*sc-pd*ux,dy=y-m[5]*sv-pd*uy,cs=cw+2*pd,dw=cs*ux,dh=(ch+2*pd)*uy;if(al!=null)c.globalAlpha=al*ga;
+  c.drawImage(b,i*cs,0,cs,ch+2*pd,dx,dy,dw,dh);
+  if(cf>0){c.globalAlpha=(al==null?1:al)*ga*cf;c.drawImage(b,((i+1)%m[0])*cs,0,cs,ch+2*pd,dx,dy,dw,dh);}
   if(flip)c.restore();c.globalAlpha=ga;return true;};
+/* W230 footmove (owner exception, WORKER-RULES 17h): an on-foot actor strip with a 2-3 px near-black violet outline, a thin rim light on the top / neon side (cyan on Kai, warm orange on foes),
+   the key light baked in (was a per-draw filter) and, on Kai only, the darkest values lifted. u = strip px per device px; returns {c, p}: cells padded by p on every side */
+ART.olT=0;ART.olTK=.26;   // W237: foes get no lift (the .44 lift washed them grey-white); Kai's mean luminance target, lift capped at y 2
+ART.olB=(src,cw,ch,n,md,flip,u)=>{const kai=md==='kai',p=Math.ceil(3*u)+1,cs=cw+2*p,H=ch+2*p,mk=(w,h)=>{const v=document.createElement('canvas');v.width=w;v.height=h;return v;};
+  const out=mk(cs*n,H),o=out.getContext('2d'),a=mk(cs,H),g=a.getContext('2d'),s=mk(cs,H),q=s.getContext('2d'),r=2.5*u,lx=(flip?1:-1)*.5,ly=-1,rw=Math.max(1,(kai?1.3:1.9)*u);
+  const kl=mk(cs*n,H),kg=kl.getContext('2d');kg.filter=kai?'brightness(1.75) saturate(1.1)':'brightness(1.75) saturate(1.15)';for(let j=0;j<n;j++)kg.drawImage(src,j*cw,0,cw,ch,j*cs+p,p,cw,ch);kg.filter='none';if(ART.olS){const sat=(g2,w2)=>{const d=g2.getImageData(0,0,w2,H).data;let a=0,m=0;for(let i=0;i<d.length;i+=16){if(d[i+3]<200)continue;const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);a+=mx?(mx-mn)/mx:0;m++;}return m?a/m:0;},rw0=mk(cs*n,H),rg0=rw0.getContext('2d');for(let j=0;j<n;j++)rg0.drawImage(src,j*cw,0,cw,ch,j*cs+p,p,cw,ch);ART.olS.push({md,raw:sat(rg0,cs*n),key:0,g:kg,w:cs*n,sat});}   // QA only (probe sets ART.olS): saturation of the raw sheet vs the lit strip   // the key light, as before, for the whole strip
+  {const im=kg.getImageData(0,0,cs*n,H),d=im.data,lin=v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4),LT=new Float32Array(256).map((_,i)=>lin(i/255)),cv=(v,y)=>1-Math.pow(1-(kai?v+.2*Math.pow(1-v,3):v),y);
+    const vk=(r,g,b,y)=>{const v=Math.max(r,g,b);return v?Math.min(255/v,255*cv(v/255,y)/v):1;},ml=y=>{let a=0,m=0;for(let i=0;i<d.length;i+=16){if(d[i+3]<200)continue;const k=vk(d[i],d[i+1],d[i+2],y);a+=.2126*LT[Math.min(255,Math.round(d[i]*k))]+.7152*LT[Math.min(255,Math.round(d[i+1]*k))]+.0722*LT[Math.min(255,Math.round(d[i+2]*k))];m++;}return m?a/m:1;};   // W237: the lift scales each pixel's value, so hue and saturation stay the owner's
+    let y=1;const T=kai?ART.olTK:ART.olT;if(kai&&ml(1)<T){let lo=1,hi=2;for(let it=0;it<12;it++){const md=(lo+hi)/2;if(ml(md)<T)lo=md;else hi=md;}y=hi;}   // W232: the smallest lift that brings the strip's mean luminance to ART.olT (cached, once per strip)
+    if(y>1){for(let i=0;i<d.length;i+=4){if(!d[i+3])continue;const k=vk(d[i],d[i+1],d[i+2],y);d[i]*=k;d[i+1]*=k;d[i+2]*=k;}kg.putImageData(im,0,0);}if(ART.olS&&ART.olS.length){const z=ART.olS[ART.olS.length-1];if(z.g===kg){z.out=z.sat(kg,z.w);delete z.g;delete z.sat;}}}   // W237: Kai only (17h), a capped value lift; foes keep the key light alone   // Kai: the darkest values lifted (black -> .2); every actor: 1 - (1 - v)^y keeps black and white, raises the mid-tones
+  for(let j=0;j<n;j++){g.clearRect(0,0,cs,H);g.drawImage(kl,j*cs,0,cs,H,0,0,cs,H);
+    q.clearRect(0,0,cs,H);q.globalCompositeOperation='source-over';for(let k=0;k<16;k++){const t=k*Math.PI/8;q.drawImage(a,r*Math.cos(t),r*Math.sin(t));}q.globalCompositeOperation='source-in';q.fillStyle='#12081c';q.fillRect(0,0,cs,H);   // outline: the silhouette dilated r px
+    q.globalCompositeOperation='source-over';q.drawImage(a,0,0);
+    g.globalCompositeOperation='destination-out';g.drawImage(a,-lx*rw,-ly*rw);g.globalCompositeOperation='source-in';g.fillStyle=kai?'#7ff6ff':'#ffc47a';g.fillRect(0,0,cs,H);g.globalCompositeOperation='source-over';   // the rim: the edge of the body that faces the light
+    q.globalAlpha=kai?.75:.95;q.drawImage(a,0,0);q.globalAlpha=1;o.drawImage(s,j*cs,0);}
+  return {c:out,p};};
 ART.gh=[];      // clips that outlive their object (boss defeat, ship death): {key,x,y,k,t}
 ART.ghosts=()=>{const g=ART.gh;for(let i=g.length-1;i>=0;i--){const q=g[i],o=ART.aS(q.key);q.t+=FD;if(!o||q.t>o.tot+.2){g.splice(i,1);continue;}ART.drawAnim(ctx,q.key,q.t,q.x,q.y,q.k,false);}};
 const SPR={_sq:1,_di:-1};
@@ -218,15 +235,16 @@ ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=A
   if(e._fa!==kp){e._fa=kp;e._f0=t;}let tt=ART.fE?t-e._f0:t;if(act==='jump'){tt=fall?o.cum[1]+tt:Math.min(tt,o.cum[1]-.001);}
   const cr=false,sc=ART.bsc(m,h),sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;
   const dead=act==='die'&&who!=='kai',fade=dead?1-.85*Math.min(1,Math.max(0,tt-.4)/.8):1,ga=c.globalAlpha;
-  c.save();c.translate(x,y);if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
+  c.save();c.translate(x,y);/* W237: the frame-replica ink shadow is gone; the soft ellipse below is the contact shadow */
+  if(window.FA&&FA.shadow)FA.shadow(c,RET.footmove?Math.max(m[2]*sc*.95,h*.5):m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
   if(act==='run'||act==='runshoot'||act==='walk')c.rotate(sm.lean.run_deg*Math.PI/180*(flip?-1:1));
-  c.globalAlpha=ga*fade;ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);if(sub&&pose==='hit'){c.globalCompositeOperation='lighter';ART.drawAnim(c,key,tt,0,0,sc,flip,.5,sy);c.globalCompositeOperation='source-over';}c.restore();return true;};   // a borrowed hit act flashes white
+  c.globalAlpha=ga*fade;const kl=RET.footmove&&ART.fE;if(kl)ART.olK=who==='kai'?'kai':'foe';try{ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);}finally{ART.olK=null;}if(sub&&pose==='hit'){c.globalCompositeOperation='lighter';ART.drawAnim(c,key,tt,0,0,sc,flip,.5,sy);c.globalCompositeOperation='source-over';}c.restore();return true;};   // a borrowed hit act flashes white
 }
 /* ----- street props behind the actors: a few per parallax cell, standing on the road line (pf = FL), looping at the sheet fps ----- */
 ART.PROPS=[['car',80,0],['police',84,0],['steam',120,0],['beacon',160,0],['neon',150,0],['banner',170,0],['holo',150,0],['windows',190,0],['drone',58,1]];
 ART.footProps=(c,camX,vw,fl,t)=>{if(!RET.sprites)return;const cell=560,off=camX*.7,i0=Math.floor(off/cell)-1,n=Math.ceil(vw/cell)+3;
   for(let i=i0;i<i0+n;i++){const r=((Math.imul((i|0)^61,0x45d9f3b)>>>7)&1023)/1024;if(r>.62)continue;const q=ART.PROPS[(Math.imul(i*7+3,0x9e3779b1)>>>9)%ART.PROPS.length],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),a=ART.anim(k);if(!a)continue;
-    const m=ART.ANIM.s[k],sc=q[1]/m[3],px=i*cell-off+cell*(.25+r*.6),py=q[2]?fl-190+Math.sin(t*.7+i)*8:fl-q[1]/2+3;ART.drawAnim(c,k,t+i*.37,px,py,sc,false,.92);}};
+    const m=ART.ANIM.s[k],sc=q[1]/m[3],px=i*cell-off+cell*(.25+r*.6),py=q[2]?fl-190+Math.sin(t*.7+i)*8:fl-q[1]/2+3;ART.drawAnim(c,k,t+i*.37,px,py,sc,false,RET.footmove?.62:.92);}};   // W223 footmove: the glowing back-street props sit behind the play plane, not on top of it
 /* ----- weapon fx (muzzle / impact), explosions (burst), small fx (spark, hit-confirm, shield glow) and pickups (spin). Each effect keeps its old key; ART.fxSheet maps it to the sheet, 0 when there is none.
    Sizes: calibration bw (content width in sheet px) so a sheet is drawn as wide as the still it replaces. Per-weapon 'beam' sheets stay unwired: the player's shots are small sprites (FXW.bullet), a 392 px beam would not fit them.
    debris / ground-dust have no hook yet (nothing draws them as stills either). ----- */
