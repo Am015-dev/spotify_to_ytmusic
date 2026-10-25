@@ -37,3 +37,4 @@ window.__cst={go:()=>CST_go(),C:CST,pose:n=>{const ev=tkWorldEvs()[0],m=ev&&tkMa
 (function CST_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='cam'&&q.id==='steady'))C.items.push({ver:'cam',id:'steady',area:'drive',text:'stkcam-r24m · cam/steady: free roam + city race on the course line (building edges, boosts, slopes, a hairpin): the chase camera distance and FOV never pump (<= 4 reversals per 10 s, zoom-out <= 2 m/s, FOV <= 8°/s)'});
   C.GO['cam/steady']=['fra','ath'].map(c=>({c,n:'steady chase camera',secs:120,fn:()=>CST_go()}));return}
  if(i<600)setTimeout(()=>CST_reg(i+1),100)})(0);
+({CST_judge})

@@ -13,6 +13,7 @@ Pin: supertuxkart/stk-code@e05fef37e9d5045b7d272f56216dcc981bd6e616, `src/graphi
 - It runs as the LAST `roamCam` layer: keeps the direction the layers below chose (car -> camera line, orientation untouched) and sets only the length and the FOV.
 - Kept: our wall handling (roamHit scan behind the car + the foliage-cam raycast) as a limit with hysteresis: in fast (10/s), hold 0.6 s, out <= 1 m/s.
 - One FOV: base + speed + eased boost (4 deg) + kick (<= 1.5 deg), <= 7 deg/s.
+- Race mode (racemode-r25a): `SKC_race` wraps `updateCam` (state countdown/race/finished; not the crash cam, cockpit view or menu attract cam): keeps the rig's direction, sets one length (rig back/up at the smoothed ratio + eased nitro) and one FOV (slow ratio + eased nitro + kick <= 1.5 deg, <= 7 deg/s). The old rig pumped: raw speed ratio -> back + 26 deg FOV, nitro +-0.5 m / +7 deg per frame. GO `race/racemode-all`.
 - Not ported: the skid side swing, the flying/falling modes, TV cameras. `?stkcam=0` = the old stack.
 
 ## Measured (GO cam/steady, `src/99cst_camsteady_go.js`, phone profile)

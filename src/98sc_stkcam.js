@@ -33,4 +33,20 @@ function SKC_cam(dt,sn){const c=camera.position,C=RCAM[SET.rcam||'chase'];if(!C)
   fv=Math.min(fv,fc);
   SKC.fov=snap||SKC.fov==null?fv:SKC.fov+Math.max(-SKC.fr*dt,Math.min(SKC.fr*dt,(fv-SKC.fov)*Math.min(1,dt*3)));camera.fov=SKC.fov;camera.updateProjectionMatrix();SKC.n++}
 roamCam=(f=>function(dt){const sn=camSnap,r=f.apply(this,arguments);try{if(SKC.on&&state==='roam'&&!!pl&&(!RO.foot||RO.foot==='car')&&!(typeof M1!=='undefined'&&M1.cs)&&(SET.rcam||'chase')!=='high')SKC_cam(dt,sn);else SKC.d=null}catch(e){SKC.err=String(e).slice(0,160)}return r})(roamCam);
-window.__skc=SKC;
+// racemode-r25a: race mode (state race/finished, updateCam in 30_race3.js) gets the same single smoothed state. Its chase rig pumped for the same reason
+// (raw speed ratio -> back distance + 26 deg of FOV, nitro +-0.5 m / +7 deg toggled per frame, fovKick 8-10 deg). Kept: the rig's direction (track frame,
+// lateral lead, roll); set here: one length from the smoothed ratio (SKC tp) + eased nitro, one FOV from the slow ratio (SKC tf) + eased nitro + capped kick,
+// rate-limited to SKC.fr deg/s. Crash cam, cockpit view (camMode 1) and the menu attract cam are left alone.
+const SKR={r:null,rF:null,bE:0,d:null,fov:null,lt:0,n:0,u:new THREE.Vector3(),p:new THREE.Vector3()};
+function SKC_race(dt,sn){const s=pl;if(!s||!s.mesh)return;const c=camera.position,sp=SKR.p.copy(s.mesh.position);if(s.mesh.userData.m)sp.add(s.mesh.userData.m.position);
+  dt=Math.min(.1,Math.max(1e-4,dt||1/60));const u=SKR.u.copy(c).sub(sp),dRaw=u.length();if(dRaw<.5)return;u.multiplyScalar(1/dRaw);
+  const snap=sn||SKR.r==null,soft=!snap&&SKR.d==null;SKR.lt=performance.now();if(soft){SKR.d=dRaw;SKR.fov=camera.fov}   // after the crash cam / cockpit view: ease on from where the rig put the camera
+  const top=s.stats.top0||40,r0=Math.max(-.12,Math.min(1.25,s.v/top)),dl=Math.min(1,dt/Math.max(dt,SKC.tp));SKR.r=snap?r0:SKR.r+(r0-SKR.r)*dl;SKR.rF=snap||SKR.rF==null?r0:SKR.rF+(r0-SKR.rF)*Math.min(1,dt/Math.max(dt,SKC.tf));
+  const bo=!!(s.nitro||s.turbo>0);SKR.bE+=((bo?1:0)-SKR.bE)*Math.min(1,dt*(bo?2:1.2));
+  const tall=camera.aspect<1?1.3:1,ck=typeof CAM_rk==='function'?CAM_rk(s):{b:1,h:1},cd={close:.85,normal:1,far:1.2}[SET.camd]||1,spd=Math.min(1.2,Math.max(0,SKR.r));
+  const back=10.5*tall*cd*ck.b-CR_SPDCAM.b*spd+.45*SKR.bE,up=3.4*tall*cd*ck.h-CR_SPDCAM.h*spd,tgt=Math.hypot(back,up);
+  SKR.d=snap?tgt:SKR.d+(tgt-SKR.d)*dl;c.copy(sp).addScaledVector(u,SKR.d);
+  const fv=pFov({narrow:56,normal:62,wide:70}[SET.fov]+26*Math.pow(Math.min(1.25,Math.max(0,SKR.rF)),1.2)+7*TUNE.fxFov*SKR.bE+Math.min(1.5,(fovKick||0)*.15));
+  SKR.fov=snap||SKR.fov==null?fv:SKR.fov+Math.max(-SKC.fr*dt,Math.min(SKC.fr*dt,(fv-SKR.fov)*Math.min(1,dt*3)));camera.fov=SKR.fov;camera.updateProjectionMatrix();SKR.n++}
+updateCam=(f=>function(dt,snap){const r=f.apply(this,arguments);try{if(SKC.on&&(state==='race'||state==='finished'||state==='countdown')&&pl&&!CC&&camMode!==1)SKC_race(dt,snap||state==='countdown');else{SKR.d=null;if(state!=='race'&&state!=='finished'&&state!=='countdown')SKR.r=null}}catch(e){SKC.err=String(e).slice(0,160)}return r})(updateCam);
+window.__skc=SKC;SKC.race=SKR;
