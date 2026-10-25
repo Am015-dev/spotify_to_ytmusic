@@ -1,0 +1,31 @@
+// review rev26 (hr-boot-mstart): touch-path checks on the BUILT page, phone profile (iPhone UA, 852x393 touch, DPR 3, 6x CPU).
+// node rev26h.js <base url> <city> [shot.jpg]
+// (1) quest start card: a real quest (chStart on a world marker, as GO hr/mstart), then a trusted CDP touch tap on the card centre: does the long text open?
+// (2) race menu: real taps on the pause button (#tP) and on "QUIT TO TITLE": is #menu (race menu) shown, with its race tabs?
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const [BASE,C,SHOT]=process.argv.slice(2);
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+ const p=await ctx.newPage();p.setDefaultTimeout(600000);const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));
+ await p.goto(BASE+'?test='+C);await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:300000});
+ const cdp=await ctx.newCDPSession(p);await cdp.send('Emulation.setCPUThrottlingRate',{rate:6});
+ const EV=s=>p.evaluate(c=>__xc.ev(c),s);
+ const tap=async(x,y)=>{await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});await new Promise(r=>setTimeout(r,90));await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})};
+ const out={city:C};
+ await EV(`(typeof qvIntro==='function'?0:XC_need('99hrq_quest_intro'))`);await p.waitForFunction(()=>__xc.ev("typeof qvIntro==='function'"),null,{polling:250,timeout:120000});
+ out.start=await EV(`(()=>{const m=(RO.marks||[]).find(q=>!q.dyn&&q.ev&&qvUse(q));if(!m)return 'no quest marker';try{chAbort()}catch(e){}roamWarp(m.x+8,m.z+8,0,true);RO.frozen=false;RO.v=0;chStart(m,{});return m.ev.kind})()`);
+ await p.waitForFunction(()=>__xc.ev("!document.getElementById('npcSay').hidden&&!!document.getElementById('npcSay').dataset.more"),null,{polling:100,timeout:30000}).catch(()=>{});
+ const card=()=>EV(`(()=>{const el=document.getElementById('npcSay'),r=el.getBoundingClientRect();return{hidden:el.hidden,more:!!el.dataset.more,title:el.querySelector('b').textContent,words:el.querySelector('p').textContent.trim().split(/\\s+/).length,text:el.querySelector('p').textContent.trim().slice(0,90),cx:r.left+r.width/2,cy:r.top+r.height/2,top:document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)?.closest('#npcSay')?'card':String(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)?.id||document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)?.tagName)}})()`);
+ out.before=await card();if(SHOT)await p.screenshot({path:SHOT,type:'jpeg',quality:82});
+ if(!out.before.hidden){await EV(`(window.__r26ev=[],['touchstart','touchend','pointerdown','click'].forEach(t=>document.addEventListener(t,e=>__r26ev.push(t+(e.defaultPrevented?'(prevented)':'')+':'+(e.target.closest&&e.target.closest('#npcSay')?'card':e.target.id||e.target.tagName)),true)),0)`);
+  const t0=Date.now();await tap(out.before.cx,out.before.cy);out.tapMs=Date.now()-t0;await new Promise(r=>setTimeout(r,150));out.after=await card();out.events=await EV(`(__r26ev.slice(0,8))`);
+  // the touchend listener runs before the game's own; record defaultPrevented after dispatch too
+  out.hideTimerMs=4200}
+ // race menu from the pause menu
+ const P=await EV(`(()=>{const r=document.getElementById('tP').getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2,!document.getElementById('touch').hidden]})()`);
+ try{await EV(`(chAbort(),0)`)}catch(e){}
+ await tap(P[0],P[1]);await new Promise(r=>setTimeout(r,800));
+ const Q=await EV(`(()=>{const pz=document.getElementById('roamPause'),b=pz&&pz.querySelector('[data-p=quit]');if(!b||pz.hidden)return{pause:pz&&!pz.hidden};const r=b.getBoundingClientRect();return{pause:true,q:[r.left+r.width/2,r.top+r.height/2],qVisible:r.width>0&&r.top>=0&&r.bottom<=innerHeight}})()`);
+ out.pause=Q;if(Q.q){if(!Q.qVisible)await EV(`(document.querySelector('#roamPause [data-p=quit]').scrollIntoView({block:'center'}),0)`);const Q2=await EV(`(()=>{const r=document.querySelector('#roamPause [data-p=quit]').getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]})()`);await tap(Q2[0],Q2[1]);await new Promise(r=>setTimeout(r,3000));
+  out.menu=await EV(`(()=>{const m=document.getElementById('menu');return{state,menuShown:!m.hidden&&m.getBoundingClientRect().height>50,text:m.innerText.replace(/\\s+/g,' ').slice(0,160)}})()`)}
+ out.errs=errs.slice(0,3);console.log(JSON.stringify(out));await b.close()})().catch(e=>{console.log('ERR '+String(e).slice(0,300));process.exit(1)});

@@ -1,0 +1,13 @@
+// review rev26 (trafficpop-r25h): cost of IV_zone's per-frame camera frustum on the BUILT page, phone profile, 6x CPU.
+// node rev26f.js <base url> <city>: (1) the frustum rebuild (once per T) timed 2000x; (2) IV_zone calls per frame and their total time over 120 real frames
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const [BASE,C]=process.argv.slice(2);
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+ const p=await ctx.newPage();p.setDefaultTimeout(600000);
+ await p.goto(BASE+'?test='+C+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:300000});
+ const cdp=await ctx.newCDPSession(p);await cdp.send('Emulation.setCPUThrottlingRate',{rate:6});
+ const out=await p.evaluate(c=>__xc.ev(c),`(()=>{const C=camera.position;let t=performance.now();for(let i=0;i<2000;i++){IV.ft=-1;IV_zone(C.x+100,C.z+100,0)}const rebuild=(performance.now()-t)/2000;
+  const f0=IV_zone;let n=0,tt=0;IV_zone=function(){const a=performance.now();const r=f0.apply(this,arguments);tt+=performance.now()-a;n++;return r};let fr=0;
+  return new Promise(res=>{const t0=T;const tick=()=>{fr++;if(fr<120)requestAnimationFrame(tick);else{IV_zone=f0;res({rebuildMs:+rebuild.toFixed(4),callsPerFrame:+(n/fr).toFixed(1),zoneMsPerFrame:+(tt/fr).toFixed(4),simAdvanced:T>t0})}};requestAnimationFrame(tick)})})()`);
+ console.log(JSON.stringify({city:C,...out}));await b.close()})().catch(e=>{console.log('ERR '+String(e).slice(0,300));process.exit(1)});

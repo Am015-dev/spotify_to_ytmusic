@@ -1,0 +1,59 @@
+// review rev26 (drivefeel-r25g, RO_wallInc): wall-glance penetration bot on the BUILT page, phone profile (iPhone UA, 852x393 touch, DPR 3, 6x CPU).
+// node rev26.js <base url> <city> <episodes> [shot]
+// For random street spots it finds a REAL straight building/wall face 12-35 m away, then drives at it at 60 km/h, gas held, no steering,
+// at 5/10/20/30/45 deg to the face, once with the fix (TUNE.wallInc default) and once with the old bumper (TUNE.wallInc=0), from the same start.
+// Stepped like the game (JU fixed step 1/60), traffic and assist as in play, damage off (RO.inv) so wrecks do not end the run.
+// Per episode: vin (km/h at contact), keep (speed 0.5 s after / 60), and the detectors:
+//   inside  = car centre within 0.3 m of a collider box (deep in a wall), max depth past the face line
+//   through = car centre more than 0.5 m past the face line
+//   stuck   = speed < 1 m/s for > 1 s after contact with gas held
+//   vn      = speed along the face normal just before contact (km/h); > 32 = a damaging hit (TUNE.dmgGlance); dmgN/dmgO = episodes over it
+//   fly     = car more than 1.2 m above ground or vy > 5 after contact
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const [BASE,C,NE,SHOT]=process.argv.slice(2);
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+ const p=await ctx.newPage();p.setDefaultTimeout(1800000);const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));
+ const cdp=await ctx.newCDPSession(p);await cdp.send('Emulation.setCPUThrottlingRate',{rate:6});
+ const EV=(fn,arg)=>p.evaluate(c=>__xc.ev(c),'('+fn.toString()+')('+JSON.stringify(arg||{})+')');
+ await p.goto(BASE+'?test='+C+(SHOT?'':'&draw=0'));await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:300000});
+ await EV(()=>new Promise(r=>setTimeout(r,3000)));
+ const out=await EV(A=>{const R0=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(A.seed),res=[],W=a=>Math.atan2(Math.sin(a),Math.cos(a));
+  const T=o=>{TOUCH.on=true;TOUCH.used=true;TOUCH.dir=0;TOUCH.gas=!!o.gas;TOUCH.brake=false;TOUCH.hb=false};SET.touch='buttons';
+  const hitAt=(x,z,a,y,d0,d1)=>{const sx=Math.sin(a),sz=Math.cos(a);for(let d=d0;d<=d1;d+=.25)if(roamHit(x+sx*d,z+sz*d,.05,y+.5))return[x+sx*d,z+sz*d,d];return null};
+  let tries=0;while(res.length<A.n*5&&tries<4000){tries++;const q=rfSnap(WX0+R0()*(WX1-WX0),WZS+R0()*(WZN-WZS),40);if(!q)continue;const px=q[0],pz=q[1],g=groundAt(px,pz,99);if(g<-1||(CID==='fra'&&inRiver(px,pz,0)))continue;
+   const a=R0()*6.283,c=hitAt(px,pz,a,g,8,35);if(!c)continue;const l=hitAt(px,pz,a-.12,g,6,45),r=hitAt(px,pz,a+.12,g,6,45);if(!l||!r)continue;
+   let tx=r[0]-l[0],tz=r[1]-l[1];const tl=Math.hypot(tx,tz);if(tl<1.5)continue;tx/=tl;tz/=tl;
+   // straight face: c on the l-r line within 0.4 m
+   const off=(c[0]-l[0])*tz-(c[1]-l[1])*tx;if(Math.abs(off)>.4)continue;
+   let nx=tz,nz=-tx;if((px-c[0])*nx+(pz-c[1])*nz<0){nx=-nx;nz=-nz}// outward normal toward the street
+   for(const deg of [5,10,20,30,45]){const th=deg/57.3,sg=R0()<.5?1:-1,ux=-nx*Math.sin(th)+sg*tx*Math.cos(th),uz=-nz*Math.sin(th)+sg*tz*Math.cos(th),D=Math.min(22,3/Math.sin(th)+6)+4;
+    const sx=c[0]+nx*2.6-ux*D,sz=c[1]+nz*2.6-uz*D,sg0=groundAt(sx,sz,99);if(Math.abs(sg0-g)>.6||roamHit(sx,sz,2.8,sg0+.5))continue;
+    let clear=true;for(let d=0;d<D-4;d+=2){const x=sx+ux*d,z=sz+uz*d;if(roamHit(x,z,2.4,sg0+.5)||Math.abs(groundAt(x,z,99)-sg0)>.6){clear=false;break}}if(!clear)continue;
+    const ep={x:Math.round(c[0]),z:Math.round(c[1]),deg};
+    for(const v of ['new','old']){const w0=TUNE.wallInc;if(v==='old')TUNE.wallInc=0;try{
+      try{OF_reset()}catch(e){}roamWarp(sx,sz,Math.atan2(ux,uz),true);RO.x=sx;RO.z=sz;RO.y=sg0;RO.vy=0;RO.h=RO.vh=Math.atan2(ux,uz);RO.v=0;RO.gOn=false;RO.crTurn=null;T({gas:1});roamStep(1/60);
+      RO.x=sx;RO.z=sz;RO.y=sg0;RO.h=RO.vh=Math.atan2(ux,uz);RO.v=60/3.6;RO.yr=0;RO.dl=0;RO.dDir=0;RO.dT=0;RO.inv=99;RO.hp=100;RO.turbo=0;RO.stkT=0;camSnap=true;
+      let vnI=0,embed=0,hitI=-1,vin=0,keep=null,inside=0,depth=0,slow=0,stuck=0,fly=0,maxUp=0;
+      // vn = the largest normal speed at a building/prop bounce (what TUNE.dmgGlance reads); terrain bounces (RO.tb) are left out
+      const rb0=roamBounce;roamBounce=function(ax,sp,nX,nZ){const vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;let X=nX,Z=nZ;if(X==null){if(ax==='x'){X=-(Math.sign(vx)||1);Z=0}else{X=0;Z=-(Math.sign(vz)||1)}}if(!RO.tb){const q=Math.max(0,-(vx*X+vz*Z))*3.6;if(q>vnI)vnI=q}return rb0.apply(this,arguments)};
+      try{for(let i=0;i<240;i++){T({gas:1});RO.inv=99;roamStep(1/60);try{roamCam(1/60)}catch(e){}
+       const dn=(RO.x-c[0])*nx+(RO.z-c[1])*nz;// distance of the car centre in front of the face
+       if(hitI<0&&dn<2.7){hitI=i;vin=Math.round(RO.v*3.6)}
+       if(hitI>=0){if(-dn>depth)depth=-dn;if(roamHit(RO.x,RO.z,.3,RO.y+.5))inside++;if(roamHit(RO.x,RO.z,1.0,RO.y+.5))embed++;const up=RO.y-groundAt(RO.x,RO.z,99);if(up>maxUp)maxUp=up;if(up>1.2||RO.vy>5)fly++;
+        if(Math.abs(RO.v)<1){slow++;if(slow>60)stuck=1}else slow=0;if(i===hitI+30)keep=+(Math.abs(RO.v)*3.6/60).toFixed(2)}
+       if(RO.wk)break}}finally{roamBounce=rb0}
+      ep[v]={vin,vn:Math.round(vnI),keep,inside,embed,depth:+depth.toFixed(2),stuck,fly,up:+maxUp.toFixed(2),hit:hitI>=0,hitI};ep.st=[sx,sz,Math.atan2(ux,uz),sg0]}finally{TUNE.wallInc=w0}}
+    res.push(ep)}}
+  T({});TOUCH.used=false;return{tries,res}},{n:+NE,seed:C==='fra'?11:23});
+ const R=out.res,sum=v=>{const H=R.filter(e=>e[v].hit);return{eps:H.length,inside:H.filter(e=>e[v].inside).length,embed:H.filter(e=>e[v].embed).length,through:H.filter(e=>e[v].depth>.5).length,maxDepth:Math.max(0,...H.map(e=>e[v].depth)),stuck:H.filter(e=>e[v].stuck).length,fly:H.filter(e=>e[v].fly).length}};
+ const byDeg={};for(const e of R){const k=e.deg;(byDeg[k]=byDeg[k]||{n:0,vinN:0,vinO:0,keepN:0,keepO:0});const B=byDeg[k];if(e.new.hit&&e.new.vn>32)B.dmgN=(B.dmgN||0)+1;if(e.old.hit&&e.old.vn>32)B.dmgO=(B.dmgO||0)+1;if(e.new.hit&&e.old.hit&&e.new.keep!=null&&e.old.keep!=null){B.n++;B.vinN+=e.new.vin;B.vinO+=e.old.vin;B.keepN+=e.new.keep;B.keepO+=e.old.keep;B.vnN=(B.vnN||0)+e.new.vn;B.vnO=(B.vnO||0)+e.old.vn}}
+ for(const k in byDeg){const B=byDeg[k];if(B.n)for(const f of['vinN','vinO','keepN','keepO','vnN','vnO'])B[f]=+(B[f]/B.n).toFixed(2)}
+ const bad=R.filter(e=>e.new.hit&&(e.new.inside||e.new.embed||e.new.stuck||e.new.fly)).slice(0,6).map(e=>({x:e.x,z:e.z,deg:e.deg,new:e.new,old:e.old}));
+ console.log(JSON.stringify({city:C,tries:out.tries,new:sum('new'),old:sum('old'),byDeg,badNew:bad,errs:errs.slice(0,3)}));
+ // shot: replay the first 30 deg episode that met its wall (new bumper), stop 8 frames after contact, draw one 852x393 frame
+ const e30=R.find(e=>e.deg===30&&e.new.hit);
+ if(SHOT&&e30){const info=await EV(A=>{const [sx,sz,h,g]=A.st;roamWarp(sx,sz,h,true);RO.x=sx;RO.z=sz;RO.y=g;RO.vy=0;RO.h=RO.vh=h;RO.v=0;RO.gOn=false;Object.assign(TOUCH,{on:true,used:true,gas:true,dir:0,brake:false,hb:false});roamStep(1/60);
+   RO.x=sx;RO.z=sz;RO.y=g;RO.h=RO.vh=h;RO.v=60/3.6;RO.yr=0;RO.inv=99;camSnap=true;for(let i=0;i<=A.n;i++){roamStep(1/60);roamCam(1/60);try{roamPose(pl,1/60)}catch(e){}}RO.frozen=true;TOUCH.gas=false;return{kmh:Math.round(RO.v*3.6),x:Math.round(RO.x),z:Math.round(RO.z)}},{st:e30.st,n:e30.new.hitI+8});
+  await p.evaluate(()=>__tq.draw&&__tq.draw()).catch(()=>{});await p.evaluate(()=>new Promise(r=>setTimeout(r,1500)));await p.screenshot({path:SHOT,type:'jpeg',quality:82});console.log('SHOT '+JSON.stringify({ep:{x:e30.x,z:e30.z,new:e30.new},...info}))}
+ await b.close()})().catch(e=>{console.log('ERR '+String(e).slice(0,300));process.exit(1)});
