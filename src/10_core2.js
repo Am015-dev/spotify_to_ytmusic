@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.163',date:'25 Oct 2026',items:[{t:'NEW',s:'City races are real race courses: barriers, closed side streets, a start gantry with 3-2-1-GO, a grid, arches, flags and a finish banner.'},{t:'CHANGED',s:'No traffic or pedestrians on the course while you race.'}]},
 {v:'v90m-beta.162',date:'24 Oct 2026',items:[{t:'FIXED',s:'The car camera no longer zooms in and out: smooth chase camera (from SuperTuxKart).'}]},
 {v:'v90m-beta.161',date:'24 Oct 2026',items:[{t:'FIXED',s:'No more game code showing as text behind the screen.'},{t:'FIXED',s:'Races: you can use the whole street, rivals drive on the road (no more flying), leaving the course shows BACK TO TRACK and puts you back.'},{t:'CHANGED',s:'Preview: Westend look with dark roads, softer sun and glowing lights.'}]},
 {v:'v90m-beta.160',date:'24 Oct 2026',items:[{t:'CHANGED',s:'The second time you open the game it loads faster: game files are kept on your device.'},{t:'NEW',s:'Preview page: the Westend race has LEGO Racers power-up bricks and a warmer, glossier look.'}]},
