@@ -49,6 +49,5 @@ Where to put NEW code: in the module of your area (append near the related code)
 | `98sc_stkcam.js` | 3 | SKC chase camera (lazy, stkcam-r24m), ported from SuperTuxKart camera_normal.cpp (GPL-3.0): last roamCam layer, one smoothed length + one FOV, wall limit with hysteresis; `?stkcam=0` off |
 | `99crm_racemode_go.js` | 3 | GO race/racemode-all (lazy, racemode-r25a): every race-menu race started through the menu buttons, human-like bot (`RM_bot` race mode / `tkBot` city), picked / finish / stuck / walls / rivals / fly-sink / camera / errors; `window.__rm` for `tools/tRaceMode.js` |
 | `99cst_camsteady_go.js` | 3 | GO cam/steady (lazy): free roam + city race on the course line, camera distance / FOV reversals and rates per 10 s |
-| `99cdf_drivefeel_go.js` | 3 | GO feel/drive (lazy, drivefeel-r25g): phone buttons, stepped roamStep: steering build-up, DRIFT 90° turn, drift exit, 30°/80° hits on a temporary test wall, camera lag, hop; `DF_shot` drift frame for tools |
 | `98rd_race_dress.js` | 3 | racedress-r24n (lazy): city races dressed as closed courses: instanced kerbs + solid barriers, closed side streets, chevrons, gantry + 3-2-1-GO grid, flags/stands, corridor traffic clear; `?rd=0` off |
 | `99c9rd_racedress_go.js` | 3 | GO race/dressed (on-demand chunk): every city race in the city dressed, closed, 0 corridor traffic, countdown, restored |
