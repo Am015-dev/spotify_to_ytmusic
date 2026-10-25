@@ -3,7 +3,7 @@
 //   the pink drift bar, which turns into boost when the drift ends. 2 SMASH: breakables add boost (+pop next to the meter).
 // 3 BOOST METER (cyan, slow regen). BOOST on a full meter = big burst, turbines pop out; boost held 2 s = BRICKBASH (faster, knocks traffic aside).
 // 4 HOP: swipe up on GAS (Space on PC). API for races: window.B2K (see B2K_API at the bottom).
-window.B2K_DMIN=12; // m/s: lowest drift speed (hook in 71_roam_drive hbOk)
+window.B2K_DMIN=9.7; // m/s: lowest drift speed (hook in 71_roam_drive hbOk)
 const B2K={dm:0,dmS:0,dT:0,slS:0,slN:0,slMax:0,bt:0,bash:false,wasB:false,turbS:0,tG:false,tB:false,req:false,hopReq:false,pulse:0,
   log:{drift:[],smash:[],burst:0,bash:0,hop:0},trail:null,turb:null,tm:null,tbox:null,el:null,fr:0};
 const B2K_REGEN=4;   // net meter regen per s in roam (FL_RECH 9 minus 5): "regenerates slowly"

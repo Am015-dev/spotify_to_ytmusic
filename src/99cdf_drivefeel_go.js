@@ -18,6 +18,9 @@ function DF_measure(){const out={},W=a=>Math.atan2(Math.sin(a),Math.cos(a)),D=a=
   // 3 DRIFT button turn from 50 km/h: time until the path (velocity heading) has turned 90 deg
   const turn=o=>{home();at(50);const h0=RO.vh;let t=-1;st(180,o,i=>{if(Math.abs(W(RO.vh-h0))>=Math.PI/2){t=+((i+1)/60).toFixed(2);return false}});return{t90:t,kmh:Math.round(RO.v*3.6),path:D(Math.abs(W(RO.vh-h0)))}};
   out.hb50=turn({gas:1,dir:1,hb:1});
+  // 3b phonedrift-r25i: BRAKE + steer button from 50 km/h (touch path, no DRIFT button, no gas): DRIFT state within .3 s, path turned 90 deg in <= 1.3 s; BRAKE alone slows, never drifts
+  {home();at(50);const h0=RO.vh;let en=-1,t=-1;st(180,{brk:1,dir:1},i=>{if(en<0&&RO.dDir)en=+((i+1)/60).toFixed(2);if(Math.abs(W(RO.vh-h0))>=Math.PI/2){t=+((i+1)/60).toFixed(2);return false}});out.bd50={enter:en,t90:t,path:D(Math.abs(W(RO.vh-h0)))};
+  home();at(50);let dr=0;st(120,{brk:1},()=>{if(RO.dDir)dr++});out.bk50={drift:dr,kmh:Math.round(Math.abs(RO.v)*3.6)}}
   // 3c drift exit at 70 km/h: DRIFT 1 s, then let go of DRIFT and steering: time until slip < 5 deg
   home();at(70);st(60,{gas:1,dir:1,hb:1});const dd=RO.dDir;let ex=-1;st(120,{gas:1},i=>{if(Math.abs(W(RO.h-RO.vh))<5/57.3&&!RO.dDir){ex=+((i+1)/60).toFixed(2);return false}});out.exit={was:dd,t:ex};
   // 4 walls: from the spawn, find a building face 12-40 m away, aim at it at ang deg to the face, 60 km/h, gas held, no steering. keep = speed 0.5 s after contact / 60
@@ -45,15 +48,17 @@ function DF_go(){const m=DF_measure(),R=[],P=DF.pass;window.__chk.df=m;
 // pass line (phone buttons): 30 deg wall glance at 60 km/h reaches the wall at >= 45 km/h and keeps >= 60 % of 60 km/h 0.5 s later; an 80 deg hit is still eased to <= 32 km/h (walls-1 bumper);
 // steering 90 % in <= .25 s; DRIFT turn 90 deg at 50 km/h in <= 1.2 s; a released drift is straight (< 5 deg slip) within .35 s (never sticks)
 const DF_o=v=>v&&typeof v==='object';
-// shot helper (tools only): DRIFT-button turn from 50 km/h on the street spawn, stopped 0.6 s in (car sideways, skid marks); the caller draws and saves the frame
+// shot helper (tools only): BRAKE+steer touch drift (phonedrift-r25i) from 50 km/h on the street spawn, stopped 0.6 s in (car sideways, skid marks); the caller draws and saves the frame
 function DF_shot(){const H0=DF.h0||{x:CID==='fra'?(HX0+HX1)/2:RO.x,z:CID==='fra'?(HZS+HZN)/2:RO.z};const q=rfSnap(H0.x,H0.z,120);roamWarp(q[0],q[1],q[2],true);
  RO.v=0;RO.gOn=false;Object.assign(TOUCH,{on:true,used:true,gas:true,dir:0,hb:false});roamStep(1/60);RO.v=50/3.6;RO.vh=RO.h;RO.inv=99;
- for(let i=0;i<36;i++){Object.assign(TOUCH,{dir:1,hb:true});roamStep(1/60);roamCam(1/60);try{roamPose(pl,1/60)}catch(e){}}Object.assign(TOUCH,{dir:0,hb:false,gas:false,used:false});RO.frozen=true;
+ for(let i=0;i<36;i++){Object.assign(TOUCH,{dir:1,brake:true,hb:false,gas:false});roamStep(1/60);roamCam(1/60);try{roamPose(pl,1/60)}catch(e){}}Object.assign(TOUCH,{dir:0,hb:false,gas:false,used:false});RO.frozen=true;
  return{slip:Math.round(Math.abs(angDiff(RO.h,RO.vh))*57.3),kmh:Math.round(RO.v*3.6),dDir:RO.dDir}}
 DF.pass={glance:m=>!DF_o(m.glance30)?'no spot':m.glance30.vin>=45&&m.glance30.keep>=.6?'':m.glance30.vin+' km/h in, keep '+m.glance30.keep,
  wall80:m=>!DF_o(m.wall80)?'no spot':m.wall80.vin<=32?'':m.wall80.vin+' km/h in',steer:m=>m.steer90<=.25?'':m.steer90+' s',
- drift:m=>m.hb50.t90>0&&m.hb50.t90<=1.2?'':m.hb50.t90+' s',exit:m=>m.exit.t>=0&&m.exit.t<=.35?'':'stuck '+m.exit.t};
-(function DF_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='feel'&&q.id==='drive'))C.items.push({ver:'feel',id:'drive',area:'drive',text:'drivefeel-r25g · feel/drive: phone buttons, stepped: a 30° wall glance at 60 km/h meets the wall at ≥ 45 km/h and keeps ≥ 60 % (no invisible brake), an 80° hit is still eased to ≤ 32 km/h, steering 90 % ≤ .25 s, DRIFT 90° turn at 50 km/h ≤ 1.2 s, drift exit ≤ .35 s'});
+ drift:m=>m.hb50.t90>0&&m.hb50.t90<=1.2?'':m.hb50.t90+' s',
+ bdrift:m=>m.bd50.enter>0&&m.bd50.enter<=.3&&m.bd50.t90>0&&m.bd50.t90<=1.3?'':'enter '+m.bd50.enter+' t90 '+m.bd50.t90,brake:m=>m.bk50.drift===0&&m.bk50.kmh<=25?'':'brake alone drift '+m.bk50.drift+' f / '+m.bk50.kmh+' km/h',
+ exit:m=>m.exit.t>=0&&m.exit.t<=.35?'':'stuck '+m.exit.t};
+(function DF_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='feel'&&q.id==='drive'))C.items.push({ver:'feel',id:'drive',area:'drive',text:'drivefeel-r25g · feel/drive: phone buttons, stepped: a 30° wall glance at 60 km/h meets the wall at ≥ 45 km/h and keeps ≥ 60 % (no invisible brake), an 80° hit is still eased to ≤ 32 km/h, steering 90 % ≤ .25 s, DRIFT 90° turn at 50 km/h ≤ 1.2 s, drift exit ≤ .35 s, BRAKE+steer button at 50 km/h enters DRIFT ≤ .3 s and turns 90° ≤ 1.3 s, BRAKE alone at 50 km/h slows to ≤ 25 km/h in 2 s without drifting'});
   C.GO['feel/drive']=['fra','ath'].map(c=>({c,n:'drive feel',secs:60,fn:()=>DF_go()}));return}
  if(i<600)setTimeout(()=>DF_reg(i+1),100)})(0);
 ({DF_go,DF_measure,DF_shot})
