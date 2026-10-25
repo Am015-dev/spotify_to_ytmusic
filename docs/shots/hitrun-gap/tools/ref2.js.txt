@@ -1,0 +1,30 @@
+// player's first minutes on the Hit & Run web build (internal reference only), phone profile. Software GL: lab times != phone times.
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const OUT=process.argv[2];
+const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--autoplay-policy=no-user-gesture-required']});
+const c=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true,userAgent:UA});const p=await c.newPage();p.setDefaultTimeout(300000);
+const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,150)));const L=[],log=o=>{L.push(o);console.log(JSON.stringify(o).slice(0,420))};
+const t0=Date.now(),T=()=>+((Date.now()-t0)/1000).toFixed(1);const shot=async n=>{await p.screenshot({path:`${OUT}/${n}.jpg`,type:'jpeg',quality:75,timeout:150000}).catch(e=>log({shotFail:n}))};
+const fps=()=>p.evaluate(()=>new Promise(r=>{let n=0,t=performance.now();const f=()=>{n++;if(performance.now()-t<4000)requestAnimationFrame(f);else r(n/4)};requestAnimationFrame(f)}));
+const S=()=>p.evaluate(()=>{const g=i=>(document.getElementById(i)?.textContent||'').trim();const v=e=>{if(!e)return false;const r=e.getBoundingClientRect();if(r.width<2)return false;let n=e;while(n&&n!==document.body){const s=getComputedStyle(n);if(n.hidden||s.display==='none'||s.visibility==='hidden'||+s.opacity<.05)return false;n=n.parentElement}return true};
+ const txt=[...document.querySelectorAll('body *')].filter(e=>e.children.length===0&&(e.textContent||'').trim()&&v(e)).map(e=>e.textContent.trim().slice(0,40));
+ const btn=[...document.querySelectorAll('button')].filter(v).map(b=>(b.textContent||b.getAttribute('aria-label')||'').trim().slice(0,20));
+ return {hud:!document.getElementById('hud').hidden,menu:!document.getElementById('menu').hidden,mode:g('mode-badge'),v:+g('speed')||0,cond:g('condition'),obj:g('objective'),cp:g('checkpoint'),tm:g('timer'),toast:g('toast'),hints:g('drive-hints'),place:g('place-name'),coins:g('coin-count'),txt:txt.slice(0,20),btn}});
+await p.goto('https://vheissu.github.io/hit-and-run-web/',{waitUntil:'commit'});
+await p.waitForFunction(()=>document.getElementById('load-message')?.textContent==='Ready',null,{timeout:200000,polling:500});const tReady=T();log({ready:tReady});
+await p.waitForTimeout(1500);await shot('0_menu');log({menu:await S()});
+const tapTxt=async()=>0;const tTap=T();await p.evaluate(()=>document.getElementById('play').click());
+for(let i=0;i<80;i++){const s=await S();if(s.hud&&!s.menu){log({t:T(),control:+(T()-tTap).toFixed(1),s});break}await p.waitForTimeout(500)}
+await shot('1_first_drivable');log({labFps:await fps()});
+// drive: gas + steer pattern; crash = speed drop >= 15 km/h in one sample with gas held, or condition loss
+const D=[];let sh2=0,sh3=0,prev=null,stuck=0,back=0;
+for(let s=0;s<28;s++){const st=await S();const d={t:T(),v:st.v,cond:st.cond,toast:st.toast,place:st.place,coins:st.coins};D.push(d);if(s%4===0)log({drive:d});
+ if(prev&&!sh3&&(prev.v-st.v>=15||(parseInt(st.cond)<parseInt(prev.cond)))){sh3=1;await shot('3_crash');log({crashShot:{prev,now:d}})}
+ if(!sh2&&st.v>=40&&s>=6){sh2=1;await shot('2_street_traffic');log({shot2:d})}
+ if(st.v<4&&s>2)stuck++;else stuck=0;if(stuck>=2){back=1;stuck=0}
+ await p.keyboard.up('KeyA');await p.keyboard.up('KeyD');
+ if(back>0){back--;await p.keyboard.up('KeyW');await p.keyboard.down('KeyS');await p.keyboard.down('KeyA')}else{await p.keyboard.up('KeyS');await p.keyboard.down('KeyW');const ph=s%8;if(s>=14){}else if(ph===1)await p.keyboard.down('KeyA');else if(ph===5)await p.keyboard.down('KeyD')}
+ prev=d;if(sh3&&s>=18)break;await p.waitForTimeout(2500)}
+await p.keyboard.up('KeyW');await p.keyboard.up('KeyS');if(!sh2){await shot('2_street_traffic');log({shot2:'fallback'})}if(!sh3){await shot('3_crash');log({crashShot:'fallback'})}
+const vs=D.map(d=>d.v);log({driveSummary:{avg:Math.round(vs.reduce((a,b)=>a+b,0)/vs.length),max:Math.max(...vs),below5:vs.filter(v=>v<5).length,of:vs.length}});
+log({errors:errs.length});fs.writeFileSync(`${OUT}/ref.json`,JSON.stringify({L,D},null,1));await b.close()})();

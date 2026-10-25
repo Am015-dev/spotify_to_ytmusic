@@ -1,0 +1,63 @@
+// player's first minutes on OUR built page, phone profile (iPhone UA, 852x393 touch, dpr 1 for lab speed). Software GL: lab times != phone times.
+const {chromium}=require('/opt/node22/lib/node_modules/playwright'),http=require('http'),fs=require('fs'),path=require('path');
+const [DIR,OUT]=process.argv.slice(2);const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+const MT={'.html':'text/html','.js':'text/javascript','.json':'application/json','.mp3':'audio/mpeg'};
+const srv=http.createServer((q,r)=>{let f=path.join(DIR,decodeURIComponent(q.url.split('?')[0]));if(f.endsWith('/'))f+='index.html';fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':MT[path.extname(f)]||'application/octet-stream'});r.end(d)})});
+const VIS=`(()=>{const v=e=>{if(!e)return false;const r=e.getBoundingClientRect();if(r.width<4||r.height<4)return false;let n=e;while(n&&n!==document.body){const s=getComputedStyle(n);if(n.hidden||s.display==='none'||s.visibility==='hidden'||+s.opacity<.05)return false;n=n.parentElement}return r.right>0&&r.bottom>0&&r.left<innerWidth&&r.top<innerHeight};
+ const ids=['ld2','menu','cmap','slots','roam','story','roamCard','npcSay','m1Cs','touch','results','pause'].filter(i=>v(document.getElementById(i)));
+ const btn=[...document.querySelectorAll('button,.tbtn')].filter(v).map(b=>(b.textContent||b.getAttribute('aria-label')||'').trim().replace(/\\s+/g,' ').slice(0,22));
+ const txt=[...document.querySelectorAll('body *')].filter(e=>e.children.length===0&&(e.textContent||'').trim().length>1&&v(e)).map(e=>e.textContent.trim().slice(0,40));
+ const R=window.__tk?__tk.q('typeof RO!=="undefined"?RO:null'):null;return {ids,btn,txt:txt.slice(0,30),on:!!(R&&R.on),frozen:!!(R&&R.frozen),card:!!(R&&R.card),ch:!!(R&&R.ch),v:R?Math.round(Math.abs(R.v||0)*3.6):0}})()`;
+srv.listen(0,async()=>{const BASE='http://localhost:'+srv.address().port+'/index.html';
+ const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--autoplay-policy=no-user-gesture-required']});
+ const c=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true,userAgent:UA});const p=await c.newPage();p.setDefaultTimeout(300000);
+ const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));const L=[],log=o=>{L.push(o);console.log(JSON.stringify(o).slice(0,420))};
+ const Q=x=>p.evaluate(x=>__tk.q(x),x);const shot=async n=>{await p.screenshot({path:`${OUT}/${n}.jpg`,type:'jpeg',quality:75,timeout:150000}).catch(e=>log({shotFail:n}))};
+ const fps=()=>p.evaluate(()=>new Promise(r=>{let n=0,t=performance.now();const f=()=>{n++;if(performance.now()-t<4000)requestAnimationFrame(f);else r(n/4)};requestAnimationFrame(f)}));
+ const t0=Date.now(),T=()=>+((Date.now()-t0)/1000).toFixed(1);let ctl=0,taps=[],seen=new Set();
+ await p.goto(BASE);
+ while(T()<300){const s=await p.evaluate(VIS).catch(()=>null);if(!s){await p.waitForTimeout(500);continue}
+  for(const i of s.ids)if(!seen.has(i)){seen.add(i);log({t:T(),appear:i,btn:s.btn.slice(0,10),txt:s.txt.slice(0,8)});if(['menu','story','npcSay','m1Cs'].includes(i))await shot('boot_'+i)}
+  if(s.on&&!s.frozen&&s.ids.includes('roam')&&!s.ids.some(i=>['story','roamCard','m1Cs','slots','cmap','menu'].includes(i))){ctl=T();log({t:ctl,control:1,btn:s.btn,txt:s.txt});await shot('1_first_drivable');break}
+  const pick=await p.evaluate(()=>{const c=['#ob2Play','#hcStory','#storyGo','#rcNo','#slotList button','#cmStory','.m1skip','#m1Cs button','#ld2 button','#npcSay button'];for(const q of c){const e=document.querySelector(q);if(e&&e.offsetParent!==null&&!e.disabled){e.click();return q}}return ''}).catch(()=>'');
+  if(pick){taps.push([T(),pick]);log({t:T(),tap:pick})}
+  await p.waitForTimeout(500)}
+ log({boot:{toControl:ctl,taps:taps.length}});log({labFpsRoam:await fps()});
+ // drive 75 wall-s: gas + steer pattern, 1 sample / 2.5 s
+ const D=[];let shot2=0,back=0,stuck=0;
+ for(let s=0;s<30;s++){const st=await Q(`(()=>{const R=RO;let n40=0,n80=0,nd=1e9;for(const c of (HUB.cars||[])){const d=Math.hypot(c.x-R.x,c.z-R.z);if(d<40)n40++;if(d<80)n80++;if(d<nd)nd=d}return {v:Math.round(Math.abs(R.v)*3.6),n40,n80,nd:Math.round(nd),tot:(HUB.cars||[]).length,hp:Math.round(R.hp??100),card:!!R.card,ch:!!R.ch,ped:(typeof HUB.peds!=='undefined'&&HUB.peds)?HUB.peds.length:-1}})()`).catch(e=>({err:String(e).slice(0,80)}));
+  st.t=T();D.push(st);if(s%4===0)log({drive:st});
+  if(st.card){await p.evaluate(()=>{const e=document.querySelector('#rcNo');e&&e.click()});log({t:T(),popupCard:1})}
+  if(!shot2&&st.v>=30&&st.n40>=1){shot2=1;await shot('2_street_traffic');log({shot2:st})}
+  if(st.v<4)stuck++;else stuck=0;if(stuck>=2){back=1;stuck=0}
+  await p.keyboard.up('ArrowLeft');await p.keyboard.up('ArrowRight');
+  if(back>0){back--;await p.keyboard.up('KeyW');await p.keyboard.down('ArrowDown');await p.keyboard.down('ArrowLeft')}else{await p.keyboard.up('ArrowDown');await p.keyboard.down('KeyW');const ph=s%8;if(ph===1)await p.keyboard.down('ArrowLeft');else if(ph===5)await p.keyboard.down('ArrowRight')}
+  await p.waitForTimeout(2500)}
+ await p.keyboard.up('KeyW');await p.keyboard.up('ArrowDown');
+ if(!shot2){await shot('2_street_traffic');log({shot2:'fallback'})}
+ const vs=D.map(d=>d.v||0);log({driveSummary:{avg:Math.round(vs.reduce((a,b)=>a+b,0)/vs.length),max:Math.max(...vs),below5:vs.filter(v=>v<5).length,of:vs.length,n40avg:+(D.reduce((a,d)=>a+(d.n40||0),0)/D.length).toFixed(1),n80avg:+(D.reduce((a,d)=>a+(d.n80||0),0)/D.length).toFixed(1),tot:D[D.length-1].tot}});
+ // crash: nose-in at ~40 km/h into the nearest NPC car (staged placement, then real gas key)
+ const hit=await Q(`(()=>{let b=null,bd=1e9;for(const c of HUB.cars||[]){if(c.fake)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>8){bd=d;b=c}}if(!b)return null;
+   const h=Math.atan2(b.x-RO.x,b.z-RO.z);RO.x=b.x-Math.sin(h)*14;RO.z=b.z-Math.cos(h)*14;RO.y=groundAt(RO.x,RO.z,99)+.3;RO.h=RO.vh=h;RO.v=11;camSnap=true;window.__wT=b;window.__hp0=RO.hp??100;return {d:14}})()`).catch(e=>({err:String(e).slice(0,100)}));
+ await p.keyboard.down('KeyW');let minD=1e9,sh3=0,v0=null,vmin=999;
+ for(let i=0;i<14;i++){const r=await Q(`(()=>{const b=window.__wT;const dx=b.x-RO.x,dz=b.z-RO.z;return {d:+Math.hypot(dx,dz).toFixed(1),v:Math.round(Math.abs(RO.v)*3.6),hp:Math.round(RO.hp??100),bv:Math.round(Math.abs(b.v||b.spd||0)*3.6)}})()`).catch(()=>null);
+  if(r){if(v0==null)v0=r.v;minD=Math.min(minD,r.d);vmin=Math.min(vmin,r.v);if(!sh3&&r.d<4.5){sh3=1;await shot('3_crash');log({crashShot:r})}if(i%3===0)log({crash:r})}await p.waitForTimeout(500)}
+ await p.keyboard.up('KeyW');if(!sh3){await shot('3_crash');log({crashShot:'fallback',minD})}log({crashSummary:{hit,minD,v0,vmin}});
+ // mission: put the car 30 m before the nearest mission marker facing it, drive in like a player, accept the card
+ const mk=await Q(`(()=>{let b=null,bd=1e9;for(const m of RO.marks||[]){if(m.dyn||!m.ev)continue;const d=Math.hypot(m.x-RO.x,m.z-RO.z);if(d<bd){bd=d;b=m}}if(!b)return null;const h=Math.atan2(b.x-RO.x,b.z-RO.z);RO.x=b.x-Math.sin(h)*30;RO.z=b.z-Math.cos(h)*30;RO.y=groundAt(RO.x,RO.z,99)+.3;RO.h=RO.vh=h;RO.v=0;camSnap=true;window.__mk=b;return {kind:b.ev.kind,id:b.ev.id,name:b.ev.name||b.ev.t||'',d:Math.round(bd)}})()`).catch(e=>({err:String(e).slice(0,100)}));
+ log({mark:mk});await p.keyboard.down('KeyW');let card=0;const tm0=T();
+ for(let i=0;i<30&&!card;i++){await p.waitForTimeout(1000);const s=await p.evaluate(VIS).catch(()=>null);if(s&&(s.card||s.ids.includes('roamCard'))){card=1;await p.keyboard.up('KeyW');log({t:T(),cardAfter:+(T()-tm0).toFixed(1),btn:s.btn,txt:s.txt});await shot('4_mission_start')}}
+ await p.keyboard.up('KeyW');
+ if(!card){log({card:'not reached by driving; chStart by API'});await Q('chStart(window.__mk,{})').catch(e=>log({e:String(e).slice(0,100)}));await p.waitForTimeout(1500);await shot('4_mission_start');const s=await p.evaluate(VIS);log({afterChStart:s})}
+ else{await p.evaluate(()=>document.querySelector('#rcGo')?.click());}
+ for(let i=0;i<20;i++){await p.waitForTimeout(1000);const s=await p.evaluate(VIS).catch(()=>null);if(s&&s.ch&&s.on&&!s.frozen){await p.keyboard.down('KeyW');await p.waitForTimeout(4000);await shot('5_mission_hud');log({t:T(),missionHud:await p.evaluate(VIS)});break}
+  const pick=await p.evaluate(()=>{for(const q of ['#storyGo','#npcSay button','.m1skip']){const e=document.querySelector(q);if(e&&e.offsetParent!==null){e.click();return q}}return ''}).catch(()=>'');if(pick)log({tap:pick})}
+ await p.keyboard.up('KeyW');
+ const chs=await Q(`RO.ch?{v2:!!RO.ch.v2,left:RO.ch.v2?Math.round(RO.ch.v2.left):null,kind:RO.ch.m&&RO.ch.m.ev&&RO.ch.m.ev.kind}:null`).catch(()=>null);log({ch:chs});
+ // fail: accelerate the mission clock (state shortcut: lab runs ~1 fps), then read the result screen and tap retry like a player
+ await Q(`(()=>{if(RO.ch&&RO.ch.v2)RO.ch.v2.left=.2;else if(RO.ch)RO.ch.left=.2})()`).catch(()=>{});
+ let fs6=0;for(let i=0;i<20&&!fs6;i++){await p.waitForTimeout(1000);const s=await p.evaluate(VIS).catch(()=>null);if(s&&s.btn.some(x=>/RETRY/.test(x))){fs6=1;await p.waitForTimeout(1500);await shot('6_fail_retry');log({t:T(),failScreen:s})}}
+ if(!fs6){await shot('6_fail_retry');log({fail:'no retry button seen',vis:await p.evaluate(VIS)})}
+ else{const tr=T();await p.evaluate(()=>{const e=[...document.querySelectorAll('button')].find(b=>/RETRY/.test(b.textContent)&&b.offsetParent);e&&e.click()});
+  for(let i=0;i<20;i++){await p.waitForTimeout(1000);const s=await p.evaluate(VIS);if(s.ch&&s.on&&!s.frozen){log({retryToDrive:+(T()-tr).toFixed(1)});break}}}
+ log({errors:errs.length,firstErr:errs.slice(0,3)});fs.writeFileSync(`${OUT}/ours.json`,JSON.stringify({L,D},null,1));await b.close();srv.close()});

@@ -1,0 +1,45 @@
+// player's first minutes on the Hit & Run web build (internal reference only), phone profile. Software GL: lab times != phone times.
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const OUT=process.argv[2];
+const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--autoplay-policy=no-user-gesture-required']});
+const c=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true,userAgent:UA});const p=await c.newPage();p.setDefaultTimeout(300000);
+const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,150)));const L=[],log=o=>{L.push(o);console.log(JSON.stringify(o).slice(0,420))};
+const t0=Date.now(),T=()=>+((Date.now()-t0)/1000).toFixed(1);const shot=async n=>{await p.screenshot({path:`${OUT}/${n}.jpg`,type:'jpeg',quality:75,timeout:150000}).catch(e=>log({shotFail:n}))};
+const fps=()=>p.evaluate(()=>new Promise(r=>{let n=0,t=performance.now();const f=()=>{n++;if(performance.now()-t<4000)requestAnimationFrame(f);else r(n/4)};requestAnimationFrame(f)}));
+const S=()=>p.evaluate(()=>{const g=i=>(document.getElementById(i)?.textContent||'').trim();const v=e=>{if(!e)return false;const r=e.getBoundingClientRect();if(r.width<2)return false;let n=e;while(n&&n!==document.body){const s=getComputedStyle(n);if(n.hidden||s.display==='none'||s.visibility==='hidden'||+s.opacity<.05)return false;n=n.parentElement}return true};
+ const txt=[...document.querySelectorAll('body *')].filter(e=>e.children.length===0&&(e.textContent||'').trim()&&v(e)).map(e=>e.textContent.trim().slice(0,40));
+ const btn=[...document.querySelectorAll('button')].filter(v).map(b=>(b.textContent||b.getAttribute('aria-label')||'').trim().slice(0,20));
+ return {hud:!document.getElementById('hud').hidden,menu:!document.getElementById('menu').hidden,mode:g('mode-badge'),v:+g('speed')||0,cond:g('condition'),obj:g('objective'),cp:g('checkpoint'),tm:g('timer'),toast:g('toast'),hints:g('drive-hints'),place:g('place-name'),coins:g('coin-count'),txt:txt.slice(0,20),btn}});
+await p.goto('https://vheissu.github.io/hit-and-run-web/',{waitUntil:'commit'});
+await p.waitForFunction(()=>document.getElementById('load-message')?.textContent==='Ready',null,{timeout:200000,polling:500});const tReady=T();log({ready:tReady});
+await p.waitForTimeout(1500);await shot('0_menu');log({menu:await S()});
+const tapTxt=async re=>{const h=await p.evaluateHandle(re=>{const v=e=>{const r=e.getBoundingClientRect();if(r.width<2)return false;let n=e;while(n&&n!==document.body){const s=getComputedStyle(n);if(n.hidden||s.display==='none'||s.visibility==='hidden')return false;n=n.parentElement}return true};return [...document.querySelectorAll('button,[role=button],a,li')].find(b=>v(b)&&new RegExp(re,'i').test((b.textContent||'').trim()||b.getAttribute('aria-label')||''))||null},re);const e=h.asElement();if(!e)return 0;const bb=await e.boundingBox();if(!bb)return 0;await p.touchscreen.tap(bb.x+bb.width/2,bb.y+bb.height/2);return 1};
+const tTap=T();let nTap=0;
+for(let i=0;i<80;i++){const s=await S();if(s.hud&&!s.menu){log({t:T(),control:+(T()-tTap).toFixed(1),taps:nTap,s});break}
+ if(i%4===0){let ok=0;const hasPS=(await S()).btn.some(x=>/PRESS START/i.test(x));if(hasPS){const bb=await p.evaluate(()=>{const b=[...document.querySelectorAll('button')].find(b=>/PRESS START/i.test((b.textContent||'').trim()||b.getAttribute('aria-label')||''));window.__psHTML=b.outerHTML.slice(0,200);const r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}});await p.touchscreen.tap(bb.x,bb.y);ok=1;log({how:'touch PRESS START',bb,html:await p.evaluate(()=>window.__psHTML)})}
+  if(!ok&&i===40){await p.keyboard.press('Enter');log({how:'Enter'})}if(!ok&&i===60){await p.evaluate(()=>document.getElementById('play').click());log({how:'js #play'})}
+  if(!ok)ok=await tapTxt('^\\s*(PRESS START|START|CONTINUE|NEW GAME|FREE DRIVE|PLAY)');if(ok){nTap++;const s2=await S();log({t:T(),tapped:nTap,btn:s2.btn,txt:s2.txt.slice(0,10)});if(nTap<=3)await shot('0_menu_'+nTap)}}
+ await p.waitForTimeout(500)}
+await shot('1_first_drivable');log({labFps:await fps()});
+// drive: gas + steer pattern; crash = speed drop >= 15 km/h in one sample with gas held, or condition loss
+const D=[];let sh2=0,sh3=0,prev=null,stuck=0,back=0;
+for(let s=0;s<40;s++){const st=await S();const d={t:T(),v:st.v,cond:st.cond,toast:st.toast,place:st.place,coins:st.coins};D.push(d);if(s%4===0)log({drive:d});
+ if(prev&&!sh3&&(prev.v-st.v>=15||(parseInt(st.cond)<parseInt(prev.cond)))){sh3=1;await shot('3_crash');log({crashShot:{prev,now:d}})}
+ if(!sh2&&st.v>=40&&s>=6){sh2=1;await shot('2_street_traffic');log({shot2:d})}
+ if(st.v<4&&s>2)stuck++;else stuck=0;if(stuck>=2){back=1;stuck=0}
+ await p.keyboard.up('KeyA');await p.keyboard.up('KeyD');
+ if(back>0){back--;await p.keyboard.up('KeyW');await p.keyboard.down('KeyS');await p.keyboard.down('KeyA')}else{await p.keyboard.up('KeyS');await p.keyboard.down('KeyW');const ph=s%8;if(s>=24){}else if(ph===1)await p.keyboard.down('KeyA');else if(ph===5)await p.keyboard.down('KeyD')}
+ prev=d;if(sh3&&s>=30)break;await p.waitForTimeout(2500)}
+await p.keyboard.up('KeyW');await p.keyboard.up('KeyS');if(!sh2){await shot('2_street_traffic');log({shot2:'fallback'})}if(!sh3){await shot('3_crash');log({crashShot:'fallback'})}
+const vs=D.map(d=>d.v);log({driveSummary:{avg:Math.round(vs.reduce((a,b)=>a+b,0)/vs.length),max:Math.max(...vs),below5:vs.filter(v=>v<5).length,of:vs.length}});
+// mission: START (pause) -> menu -> Springfield Run
+await p.tap('#pause',{timeout:20000}).catch(e=>log({e:String(e).slice(0,80)}));await p.waitForTimeout(3000);log({pauseMenu:await S()});
+{const mb=await S();log({menuBtns:mb.btn,txt:mb.txt});if(!(await tapTxt('SPRINGFIELD RUN|CHALLENGE|MISSION|RACE'))){log({challenge:'clicked hidden #challenge'});await p.evaluate(()=>document.getElementById('challenge').click())}}const tm0=T();
+await p.waitForTimeout(3000);await shot('4_mission_start');log({t:T(),missionStart:await S()});
+await p.keyboard.down('KeyW');for(let i=0;i<4;i++){await p.waitForTimeout(2500);log({mission:await S()})}await shot('5_mission_hud');log({missionHud:await S()});
+await p.keyboard.up('KeyW');
+// fail: try R (reset in a mission fails it per the repo docs), then E (out of car)
+await p.keyboard.press('KeyR');for(let i=0;i<6;i++){await p.waitForTimeout(2000);const s=await S();log({afterR:s});if(/fail|retry|try again|busted|wrecked/i.test(s.txt.join(' ')+s.toast+s.obj)){await shot('6_fail_retry');log({failSeen:'R'});break}}
+const s6=await S();if(!/fail|retry|try again/i.test(s6.txt.join(' ')+s6.toast+s6.obj)){await p.keyboard.press('KeyE');for(let i=0;i<8;i++){await p.waitForTimeout(2500);const s=await S();log({afterE:s});if(/fail|retry|try again/i.test(s.txt.join(' ')+s.toast+s.obj)){break}}await shot('6_fail_retry')}
+const tr=T();await p.keyboard.press('Enter');for(let i=0;i<12;i++){await p.waitForTimeout(1500);const s=await S();if(i%3===0)log({afterEnter:s});if(s.hud&&!s.menu&&s.obj){log({retryToDrive:+(T()-tr).toFixed(1)});break}}
+log({errors:errs.length,firstErr:errs.slice(0,3)});fs.writeFileSync(`${OUT}/ref.json`,JSON.stringify({L,D},null,1));await b.close()})();

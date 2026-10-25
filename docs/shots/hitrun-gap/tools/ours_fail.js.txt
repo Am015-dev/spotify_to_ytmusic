@@ -1,0 +1,19 @@
+// our mission fail/retry screen + retry time, fast test start (?test=fra), phone profile
+const {chromium}=require('/opt/node22/lib/node_modules/playwright'),http=require('http'),fs=require('fs'),path=require('path');
+const [DIR,OUT]=process.argv.slice(2);const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+const MT={'.html':'text/html','.js':'text/javascript','.json':'application/json','.mp3':'audio/mpeg'};
+const srv=http.createServer((q,r)=>{let f=path.join(DIR,decodeURIComponent(q.url.split('?')[0]));if(f.endsWith('/'))f+='index.html';fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':MT[path.extname(f)]||'application/octet-stream'});r.end(d)})});
+const VIS=`(()=>{const v=e=>{if(!e)return false;const r=e.getBoundingClientRect();if(r.width<4||r.height<4)return false;let n=e;while(n&&n!==document.body){const s=getComputedStyle(n);if(n.hidden||s.display==='none'||s.visibility==='hidden'||+s.opacity<.05)return false;n=n.parentElement}return true};
+ const btn=[...document.querySelectorAll('button,.tbtn')].filter(v).map(b=>(b.textContent||'').trim().replace(/\\s+/g,' ').slice(0,26));const txt=[...document.querySelectorAll('body *')].filter(e=>e.children.length===0&&(e.textContent||'').trim().length>1&&v(e)).map(e=>e.textContent.trim().slice(0,40));
+ const R=__tk.q('RO');return {btn,txt:txt.slice(0,30),on:R.on,frozen:!!R.frozen,ch:!!R.ch}})()`;
+srv.listen(0,async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const c=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true,userAgent:UA});const p=await c.newPage();p.setDefaultTimeout(300000);
+ const log=o=>console.log(JSON.stringify(o).slice(0,700));const Q=x=>p.evaluate(x=>__tk.q(x),x);const shot=n=>p.screenshot({path:`${OUT}/${n}.jpg`,type:'jpeg',quality:75,timeout:150000}).catch(()=>log({shotFail:n}));
+ await p.goto('http://localhost:'+srv.address().port+'/index.html?test=fra');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__tk,null,{timeout:300000,polling:1000});
+ log({start:await Q(`(()=>{const m=(RO.marks||[]).find(m=>m.ev&&m.ev.id==='cl3')||(RO.marks||[]).find(m=>m.ev&&!m.dyn);chStart(m,{});return {ok:!!RO.ch,id:m.ev.id}})()`)});
+ const l0=await Q('RO.ch.v2.left');await p.keyboard.down('KeyW');await p.waitForTimeout(8000);const l1=await Q('({left:RO.ch.v2.left,v:RO.v,fz:RO.ch.fz,card:!!RO.card,frozen:!!RO.frozen,paused:typeof paused!=="undefined"?paused:null})');log({timerTick:{l0,l1}});await p.keyboard.up('KeyW');
+ await Q(`qvFail(RO.ch,'TIME UP')`);const t0=Date.now();
+ for(let i=0;i<30;i++){await p.waitForTimeout(1000);const s=await p.evaluate(VIS);if(s.btn.some(x=>/RETRY/.test(x))){await p.waitForTimeout(1500);await shot('6_fail_retry');log({failScreen:s,afterS:(Date.now()-t0)/1000});break}if(i%5===0)log({wait:s.txt.slice(0,6)})}
+ const tr=Date.now();await p.evaluate(()=>{const e=[...document.querySelectorAll('button')].find(b=>/RETRY/.test(b.textContent)&&b.offsetParent);e&&e.click()});
+ for(let i=0;i<30;i++){await p.waitForTimeout(1000);const s=await p.evaluate(VIS);if(s.ch&&s.on&&!s.frozen){log({retryToDrive:(Date.now()-tr)/1000,txt:s.txt.slice(0,6)});break}}
+ await b.close();srv.close()});
