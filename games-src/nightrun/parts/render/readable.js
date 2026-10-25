@@ -23,7 +23,7 @@ const READ=window.READ={D:'#ff2d78',CORE:'#ffffff',RING:'#07030f',SHOT:'#7fe6ff'
   hue(c){let q=this._pc[c];if(q)return q;const m=/^#([0-9a-f]{6})/i.exec(c||'');if(!m)return this._pc[c]={h:0,s:0,l:1};const v=parseInt(m[1],16),r=(v>>16)/255,g=(v>>8&255)/255,b=(v&255)/255,
       mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h=(h*60+360)%360;}return this._pc[c]={h,s:mx?d/mx:0,l:mx};},
   pc(b,D){const c=b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b),o=this.hue(c);if(o.s<.25&&o.l>.7)return this.SHOT2;
-    return o.h>=160&&o.h<=285?c:(b.big||b.pf?this.SHOT2:this.SHOT);},
+    return b.big||b.pf?this.SHOT2:D;},   // one danger colour for every enemy shot: the teal ones vanished into the cyan towers
   ring(x,y,r,w){ctx.strokeStyle=this.RING;ctx.lineWidth=w||2.4;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.stroke();ctx.globalAlpha=1;},
   /* every enemy bullet (replaces fx.js FXV.bullets + the ai.js kinds while RET.read is on) */
   bullets(){const L=G.eb;this.stat.eb=L.length;if(!L.length)return;const hc=SET.hc||RET.asBigOn(),bg=RET.asBigOn()?1.35:1,D=this.D,rm=SET.reduce;
