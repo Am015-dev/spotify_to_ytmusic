@@ -5,15 +5,14 @@
 // Fix: a GAS+BRAKE drift (and the touch BRAKE+steer drift above W14_ST.hbCity) only starts after BRAKE is held TUNE.gbHold s with
 // |steer| ≥ TUNE.gbSteer; before that it is a normal brake. DRIFT (button, X, Ctrl) drifts at once as before. Rear grip loss on braking
 // C26.kR .38 → .12; heading-vs-travel slip outside drift capped at TUNE.slipMax (was .6 rad, inline in 71 roamStep). Free roam only.
-// phonedrift-r25i: the BRAKE button (the only drift control on a phone) waits only TUNE.gbHoldT .12 s (a tap still brakes); B2K_DMIN 12 -> 9.7 m/s (35 km/h) in 98k so the brake does not take the car under the gate first.
 // v88f values: gbHold 0, slipMax .6, C26.kR .38.
 // v89l: gbHold .6 → .35. Phones have no DRIFT button (5-button rule), so GAS+BRAKE+steer is THE drift; at .6 s the brake bled the speed under
 // B2K_DMIN first, so it only drifted above ~80 km/h (play/driftprobe.js). Now from ~55 km/h; a quick tap (≤ 0.3 s) still only brakes (v88g).
-TUNE.gbHold=.35;TUNE.gbHoldT=.12;TUNE.gbSteer=.5;TUNE.slipMax=.12;C26.kR=.12;
+TUNE.gbHold=.35;TUNE.gbSteer=.5;TUNE.slipMax=.12;C26.kR=.12;
 const D26={gbT:0,n:0,blocked:0};
 {const f0=ctlPlayer;ctlPlayer=function(){const c=f0.apply(this,arguments);try{if(state==='roam'){const dt=Math.min(arguments[0]||1/60,.05);
   const ex=!!(K.KeyX||K.ControlLeft||TOUCH.hb);   // the DRIFT control itself: drift at once
-  if(c.hb&&!ex&&!RO.dDir){D26.gbT+=dt;if(D26.gbT<((TOUCH.on&&TOUCH.used&&TOUCH.brake)?TUNE.gbHoldT:TUNE.gbHold)||Math.abs(c.steer||0)<TUNE.gbSteer){c.hb=0;c.brk=1;c.thr=0;D26.blocked+=dt}else D26.n++}
+  if(c.hb&&!ex&&!RO.dDir){D26.gbT+=dt;if(D26.gbT<TUNE.gbHold||Math.abs(c.steer||0)<TUNE.gbSteer){c.hb=0;c.brk=1;c.thr=0;D26.blocked+=dt}else D26.n++}
   else if(!c.hb)D26.gbT=0}}catch(e){}return c}}
 window.__d26=()=>({gbT:+D26.gbT.toFixed(2),drifts:D26.n,blocked:+D26.blocked.toFixed(2),slip:+((typeof RO!=='undefined'&&RO.vh!=null?angDiff(RO.h,RO.vh):0)*180/Math.PI).toFixed(2),
   gbHold:TUNE.gbHold,gbSteer:TUNE.gbSteer,slipMax:TUNE.slipMax,kR:C26.kR});

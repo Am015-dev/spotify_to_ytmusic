@@ -1,6 +1,0 @@
-# HANDOFF phonedrift-r25i (touch drift at city speed)
-1. Cause: the touch BRAKE+steer drift already existed (98k B2K -> 98e D26 -> 71 hbOk) but the brake bled the car under B2K_DMIN (12 m/s) during D26's 0.35 s hold, so at 50 km/h it never drifted (enter 2.93 s, path 25 deg in 3 s, GO measured before).
-2. Fix: `TUNE.gbHoldT=.12` (98e: touch BRAKE hold, tap still brakes; keys keep .35) + `B2K_DMIN` 12 -> 9.7 m/s (98k, 35 km/h). No new physics or buttons; W14_ST.hbCity (125 km/h immediate path) untouched.
-3. GO feel/drive (phone buttons, stepped, fra+ath): BRAKE+steer at 50 km/h enters DRIFT 0.13 s, 90 deg path turn 1.12 s (pass <= .3 / <= 1.3); BRAKE alone: 0 drift frames, stopped in 2 s. Shot: docs/shots/phonedrift/brake_steer_drift_fra.jpg (39 deg slip, 52 km/h).
-4. Left: the 5-button HUD still has no hint that BRAKE+steer drifts (tutorial/controls text says GAS+BRAKE); the BRAKE button could glow while drifting; tools/tChkGo.js got BOOT_MS (boot wait) for loaded machines.
-5. Read/reused: CLAUDE.md, wiki index, game/vehicles-xform.md, HANDOFF_drivefeel-r25g, learn/hit-and-run.md (handbrake idea only), src/MAP.md; reused B2K/D26/hbOk drift code and the 99cdf harness. No external code or assets.
