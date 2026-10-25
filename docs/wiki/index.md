@@ -33,6 +33,7 @@ Rules: [SCHEMA.md](SCHEMA.md) | history: [log.md](log.md) | pins: [sources/racer
 - [learn/streaming.md](learn/streaming.md): fiveplay.lol io worker: range reads, hints, OPFS store, build-id URLs, progress
 - [learn/phone-profile.md](learn/phone-profile.md): their low-memory profile: 2 cores, mip skip, shadows off; GPU 1.16 -> 0.5 GB
 - [learn/stk.md](learn/stk.md): SuperTuxKart chase camera ported (SKC): one smoothed length + FOV, wall hysteresis, GO cam/steady
+- [learn/cuphead-structure.md](learn/cuphead-structure.md): Cuphead recreation (Unity, MIT): folder layout, state machines, boss folders. Organisation only, never its art
 - [learn/threads-gpu.md](learn/threads-gpu.md): OffscreenCanvas GPU worker, shader packs, recipe prewarm, COOP/COEP on our hosts
 
 ## Plans
