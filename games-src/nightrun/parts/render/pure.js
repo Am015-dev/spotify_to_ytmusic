@@ -23,19 +23,11 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
    if(dw<2||dh<2||dw*eh>4e6){this.cover(b,w,h);return;}
    if(C.b!==b||C.w!==dw||C.h!==dh){const c=C.cv||(C.cv=document.createElement('canvas'));c.width=dw;c.height=eh;const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,dw,eh);g.fillStyle='rgba(12,8,24,.22)';g.fillRect(0,0,dw,eh);C.b=b;C.w=dw;C.h=dh;}
    const p=ex>0?off*m.d%(2*ex):0,y=Math.round(p>ex?2*ex-p:p),q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';ctx.drawImage(C.cv,0,ex-y,dw,dh,0,0,w,h);ctx.imageSmoothingQuality=q;},
-  vtile(b,w,off,zoom,al){b=this.dim(b);const m=ctx.getTransform(),ww=w*zoom,lh=ww*b.height/b.width,dw=Math.round(ww*m.a),dl=Math.round(lh*m.d),C=this.VC||(this.VC={});let e=C[zoom];   // W250: top-down rooftop strip scrolling down the portrait screen; one device-size copy of [picture; mirrored picture] per zoom, so each frame is 1:1 copies (no seam, no per-frame scaling)
-    if(!e||e.b!==b||e.w!==dw||e.h!==dl||e.a!==al){e=C[zoom]=e||{cv:document.createElement('canvas')};e.cv.width=dw;e.cv.height=2*dl;const g=e.cv.getContext('2d');g.imageSmoothingQuality='high';g.globalAlpha=al;g.drawImage(b,0,0,dw,dl);g.translate(0,2*dl);g.scale(1,-1);g.drawImage(b,0,0,dw,dl);e.b=b;e.w=dw;e.h=dl;e.a=al;const q=b.getContext('2d').getImageData(0,0,b.width,b.height).data;let a=0,z=b.width;   // the empty street gap in the middle: the widest column band with no picture, found once
-      for(let y=0;y<b.height;y+=4)for(let x=0;x<b.width;x++){if(q[(y*b.width+x)*4+3]>8){if(x<b.width/2)a=Math.max(a,x+1);else z=Math.min(z,x);}}
-      e.l=Math.ceil(a/b.width*dw)+1;e.r=Math.floor(z/b.width*dw)-1;}
-    const x=(w-ww)/2,o=off%(2*lh),q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';
-    const X=Math.round(x*m.a+m.e),Hd=2*dl,L=e.l,R=e.r;
-    for(let y=Math.round((o-2*lh)*m.d+m.f);y<(PH_+4)*m.d+m.f;y+=Hd){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(e.cv,0,0,L,Hd,X,y,L,Hd);ctx.drawImage(e.cv,R,0,dw-R,Hd,X+R,y,dw-R,Hd);ctx.restore();}   // whole device pixels, only the two side bands (the middle 40 % of every roof picture is empty street)
-    ctx.imageSmoothingQuality=q;},
   tile(b,y,h,scroll,par,keep){if(!keep)b=this.dim(b);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
     for(let j=Math.floor(off/tw);j*tw-off<W;j++){const x=j*tw-off;if(x+tw<=0)continue;
       if(j&1){ctx.save();ctx.translate(x+tw,y);ctx.scale(-1,1);ctx.drawImage(b,0,0,tw,h);ctx.restore();}else ctx.drawImage(b,x,y,tw,h);}},
   bg(port,scroll){const di=G.di,n=ART.dn[di],D=DISTRICTS[di],bm=ART.bm;ctx.fillStyle='#000';
-    if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.pan(b,PW_,PH_,scroll*.1);const ly=bm['ly-phone-'+n];if(ly){this.vtile(ly,PW_,scroll*.6,1.3,.7);}return;}   // W250: three planes, ratios .1 / .3 / .6: far sky pans, mid rooftops fainter, near rooftops larger and faster
+    if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.pan(b,PW_,PH_,scroll*.1);return;}   // W250: three planes, ratios .1 / .3 / .6: far sky pans, mid rooftops fainter, near rooftops larger and faster
     ART.paintReady(di);const b=bm['bg-'+n];if(!b){ctx.fillRect(0,0,W,H);return;}
     this.tile(b,0,H,scroll,.03);
     const far=bm['ly-far-'+n],mid=bm['ly-mid-'+n],nr=bm['ly-near-'+D.near];
@@ -45,7 +37,7 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
   sheet(e){const M=ENEMY_ART[FOEART.id(e)];if(!M||e.type==='gate')return null;const m=M.native?{s:M.s||'e'+e.type,k:M.k||4.2}:FOEART.map(e);if(!m||!m.s)return null;
     const b='ship-'+m.s+'/',v=e.arm&&ART.ANIM.s[b+'volley']&&ART.anim(b+'volley'),key=b+(v?'volley':'flame');if(!ART.ANIM.s[key]||!ART.anim(key))return null;ART.anim(b+'death');return{m,key};},
   foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,this.pl()*.55),Math.max(this.K*fw*1.25,this.pl()*.55)),sc=w/fw,rot=m.rot?m.rot(e,t):0;
-    ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);const q_=sc*Math.max(s[2],s[3])+8;this.ink(q_,q_,()=>ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false));ctx.restore();
+    ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);this.ink(sc*s[2]+8,sc*s[3]+8,()=>ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false),null,key+'|'+Math.round(sc*20)+'|'+this.fk(key,(e.t||0)+eb_(e)));ctx.restore();
     e._fs=sc;e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
   player(t){if(G.dead)return;const id=shipDef().id,key='ship-'+id+'/flame',k=this.K*this.PK;ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
     const s=ART.ANIM.s[key],L=s?s[2]*k:56,e=ART.bm['fx-engine'];   // W215: owner engine light (fx-engine, painted on black) under the tail, steady flicker, no ring or halo
@@ -53,23 +45,28 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     if(RET.sprites&&SPR.shipOn(id)&&s)this.rim(key,t,k,s);   // the player one notch above the enemies' texel scale (1.35x, inside the 1.5x band): it must read first
    else ART.put(ART.sp('spr-ship-'+id,this.K*520*this.PK),0,0);
     ctx.restore();},
-  rim(key,t,k,s){this.ink(s[2]*k+8,s[3]*k+8,()=>ART.drawAnim(ctx,key,t,0,0,k,false));},   // W215: the player's frame with a 1 px outline (no glow, no ring)
-  ink(w_,h_,fn,lit){   // W244: ONE ink pass for every actor (player, enemies, boss, pickups): fn draws the actor at the local origin (current transform = its place); we add the same outline weight, one soft ink shadow offset down-right (key light upper left) and a thin warm lit edge on the upper left. No blur: offset copies of one silhouette, built into pooled canvases.
+  rim(key,t,k,s){this.ink(s[2]*k+8,s[3]*k+8,()=>ART.drawAnim(ctx,key,t,0,0,k,false),null,key+'|'+Math.round(k*20)+'|'+this.fk(key,t));},   // W215: the player's frame with a 1 px outline (no glow, no ring)
+  fk(key,t){const i=ART.aframe(key,t);return i+'.'+Math.round(ART.aP*4);},   // W255: sheet frame + crossfade step, the cache key part of an animated actor (looping time would never repeat)
+  ink(w_,h_,fn,lit,ck){   // W244: ONE ink pass for every actor (player, enemies, boss, pickups): fn draws the actor at the local origin (current transform = its place); we add the same outline weight, one soft ink shadow offset down-right (key light upper left) and a thin warm lit edge on the upper left. No blur: offset copies of one silhouette, built into pooled canvases.
     const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(w_*ps+8),h=Math.ceil(h_*ps+8);
     if(!(ps>0)||w*h>4e6){fn();return;}
+    const CC=this.IC||(this.IC=new Map()),CK=ck&&ck+'|'+Math.round(ps*50)+'|'+Math.round(Math.atan2(m.b,m.a)*12)+'|'+lit,hit=CK&&CC.get(CK);   // W255: an actor sheet frame (time in 1/15 s steps, rotation in 1/12 rad steps) is inked once and then copied: the ink pass was 18 canvas ops per actor per frame
+    if(hit){ctx.drawImage(hit.cv,0,0,hit.w,hit.h,-hit.W/2,-hit.H/2,hit.W,hit.H);return;}
     for(const c of O)if(c.width<w||c.height<h){c.width=Math.max(c.width,w);c.height=Math.max(c.height,h);}
     const a=O[0].getContext('2d'),b=O[1].getContext('2d'),W_=w/ps,H_=h/ps,o=ctx;
     a.setTransform(1,0,0,1,0,0);a.globalAlpha=1;a.globalCompositeOperation='source-over';a.clearRect(0,0,w,h);a.setTransform(ps,0,0,ps,w/2,h/2);
     ctx=a;try{fn();}finally{ctx=o;}
     b.setTransform(1,0,0,1,0,0);b.globalCompositeOperation='source-over';b.clearRect(0,0,w,h);b.drawImage(O[0],0,0,w,h,0,0,w,h);const pb=window.PB;if(pb)pb.hud++;b.globalCompositeOperation='source-in';b.fillStyle='#07030f';b.fillRect(0,0,w,h);b.globalCompositeOperation='source-over';if(pb)pb.hud--;   // tint fills on the pooled canvases are not play-field shapes (qa/pureprobe.js counts them out)
     
-    const d=Math.max(1.2*(window.devicePixelRatio||1),1.6)/ps,ox=3*d,oy=5*d,lx=(ox*m.a+oy*m.b)/ps,ly=(oy*m.a-ox*m.b)/ps,X=-W_/2,Y=-H_/2,im=(c,x,y)=>ctx.drawImage(c,0,0,w,h,X+x,Y+y,W_,H_);
-    ctx.globalAlpha=.4;im(O[1],lx,ly);ctx.globalAlpha=1;   // the shadow rotates with the actor so it always falls the same way on screen
+    const T=CK?document.createElement('canvas'):null;let tc=ctx;if(T){T.width=w;T.height=h;tc=T.getContext('2d');tc.setTransform(ps,0,0,ps,w/2,h/2);}
+    const d=Math.max(1.2*(window.devicePixelRatio||1),1.6)/ps,ox=3*d,oy=5*d,lx=(ox*m.a+oy*m.b)/ps,ly=(oy*m.a-ox*m.b)/ps,X=-W_/2,Y=-H_/2,im=(c,x,y)=>tc.drawImage(c,0,0,w,h,X+x,Y+y,W_,H_);
+    tc.globalAlpha=.4;im(O[1],lx,ly);tc.globalAlpha=1;   // the shadow rotates with the actor so it always falls the same way on screen
     for(const[x,y]of[[-d,0],[d,0],[0,-d],[0,d],[-d*.7,-d*.7],[d*.7,-d*.7],[-d*.7,d*.7],[d*.7,d*.7]])im(O[1],x,y);
     im(O[0],0,0);
     if(lit!==0){const c=O[2].getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.clearRect(0,0,w,h);c.drawImage(O[0],0,0,w,h,0,0,w,h);c.globalCompositeOperation='source-in';c.fillStyle='#ffe6c4';if(pb)pb.hud++;c.fillRect(0,0,w,h);if(pb)pb.hud--;   // upper-left lit edge: the art's own shape minus itself shifted down-right
       c.globalCompositeOperation='destination-out';const sx=ps*d*1.6,cs=m.a/ps,sn=m.b/ps;c.drawImage(O[0],0,0,w,h,sx*.7*(cs+sn),sx*.7*(cs-sn),w,h);c.globalCompositeOperation='source-over';
-      ctx.globalAlpha=lit||.35;im(O[2],0,0);ctx.globalAlpha=1;}},
+      tc.globalAlpha=lit||.35;im(O[2],0,0);tc.globalAlpha=1;}
+    if(T){const px=(this.IP||0)+w*h;this.IP=px;CC.set(CK,{cv:T,w,h,W:W_,H:H_});for(const[k,e]of CC){if(this.IP<=8e6)break;this.IP-=e.w*e.h;CC.delete(k);}ctx.drawImage(T,0,0,w,h,X,Y,W_,H_);}},
   hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=v==='w'?'saturate(0) brightness(1.6)':'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,0,0);return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white (made once per picture)
   pic(n,x,y,w,ang,hk){const v=/~([ow])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
   shots(){for(const b of G.pb){if(b.y<12)continue;const fa=Math.min(b.x>W*.7?1-(b.x-W*.7)/(W*.3):1,1-(Math.hypot(b.x-P.x,b.y-P.y)-W*.4)/(W*.25));if(fa<.05)continue;ctx.globalAlpha=Math.min(1,fa);const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange

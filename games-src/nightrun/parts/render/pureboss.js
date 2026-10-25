@@ -36,7 +36,7 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
       if(b.k==='r'){this.pic('fx-bullet-rocket',b.x,b.y,r*8,0,a);continue;}
       if(b.ew||b.k==='m'){this.pic('fx-eb-mine',b.x,b.y,r*5);continue;}
       this.pic('fx-bullet-shell',b.x,b.y,r*5.2);}},
-  pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.translate(p.x,y);PURL.ink(56,56,()=>{if(p.t==='pw')PW.coin(p.k,16);else pkPaint(p,t);},.3);ctx.restore();}},   // W244: pickups sit in the scene with the same ink shadow   // power-ups: the owner's icon only (no glow disc, dashed ring or name)
+  pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.translate(p.x,y);PURL.ink(56,56,()=>{if(p.t==='pw')PW.coin(p.k,16);else pkPaint(p,t);},.3,'pk|'+p.t+'|'+p.k+'|'+(p.t==='pw'?PURL.fk(SPR.PK[p.k]||'',G.t):p.t==='shard'?Math.round(Math.abs(Math.cos(t*3+p.bob))*6):Math.round(Math.sin(t*2+p.bob)*4)));ctx.restore();}},   // W244: pickups sit in the scene with the same ink shadow   // power-ups: the owner's icon only (no glow disc, dashed ring or name)
   bar(w){const b=G.boss;if(!b||b.x>=W||!(b.max>0))return;ctx.fillStyle='#ff6a2a';ctx.fillRect(0,0,w*clamp(b.hp/b.max,0,1),4);}};
 NR.on('tick',()=>{if(RET.purelook&&G&&G.boss)PB.keep(G.boss);});
 {const f=PURL.foe;PURL.foe=function(e,t){if(e.type==='boss')return PB.boss(e,t);if(e.type==='gate')return PB.gate(e,t);return f.call(this,e,t);};}
