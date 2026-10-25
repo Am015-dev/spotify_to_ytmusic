@@ -15,7 +15,10 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
   dim(b,v){const D=this.DM||(this.DM=new Map());let c=D.get(b);if(c)return c;   // W219: backdrop layers only, once per picture: brightness .65, saturate .85, so the play layer is the brightest thing
     c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=`brightness(${v||.65}) saturate(.85)`;x.drawImage(b,0,0);D.set(b,c);return c;},
   cover(b,w,h){b=this.dim(b,.55);   // the phone painting is brighter than the PC strips: a lower value lands it at the PC's level
-   const s=Math.max(w/b.width,h/b.height),sw=w/s,sh=h/s;ctx.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,w,h);},
+   const s=Math.max(w/b.width,h/b.height),sw=w/s,sh=h/s,m=ctx.getTransform(),dw=Math.round(w*m.a),dh=Math.round(h*m.d),C=this.CV||(this.CV={});   // W241: the still backdrop is cropped and scaled once per size, then copied 1:1 each frame
+   if(dw>1&&dh>1&&dw*dh<4e6){if(C.b!==b||C.w!==dw||C.h!==dh){const cv_=C.cv||(C.cv=document.createElement('canvas'));cv_.width=dw;cv_.height=dh;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,dw,dh);C.b=b;C.w=dw;C.h=dh;}
+     const q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';ctx.drawImage(C.cv,0,0,w,h);ctx.imageSmoothingQuality=q;return;}
+   ctx.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,w,h);},
   tile(b,y,h,scroll,par,keep){if(!keep)b=this.dim(b);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
     for(let j=Math.floor(off/tw);j*tw-off<W;j++){const x=j*tw-off;if(x+tw<=0)continue;
       if(j&1){ctx.save();ctx.translate(x+tw,y);ctx.scale(-1,1);ctx.drawImage(b,0,0,tw,h);ctx.restore();}else ctx.drawImage(b,x,y,tw,h);}},
@@ -61,7 +64,7 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
   coin(p,y,t){const k='pk-coin/spin',s=ART.ANIM.s[k];if(!s||!ART.anim(k))return false;ART.drawAnim(ctx,k,t+p.bob,p.x,y,22/s[2],false);return true;},   // W219: shards as the owner's spinning coin: it reads as a pickup, not a bullet
   pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;if(p.t==='pw'){const o=ART.sp('pk-'+p.k,40);if(!o&&ART.bm['pk-'+p.k]===undefined)ART.load('pk-'+p.k);if(o){ctx.save();ctx.translate(p.x,y);ART.put(o,0,0,Math.sin(t*2+p.bob)*.08);ctx.restore();}continue;}   // W219: the owner's power-up picture only (no hex, ring, glow or caption)
       if(p.t==='shard'&&this.coin(p,y,t))continue;ctx.save();ctx.translate(p.x,y);pkPaint(p,t);ctx.restore();}},
-  draw(t,dt){const PT=wcv!==cv;for(const c of[vctx,wctx]){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';}
+  draw(t,dt){const PT=wcv!==cv;for(const c of[vctx,wctx]){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='medium';}
     if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);this.bg(true,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
     else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
     ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
@@ -76,5 +79,5 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     this.player(t);
     if(G.empT>0)AH.pic('fx-pw-bomb-pulse',(0.6-G.empT)*2800,P.x,P.y,0,Math.min(1,G.empT*2.2));
     ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-    if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.drawImage(wcv,0,0);ctx.setTransform(VS,0,0,VS,0,0);if(running&&!HUDOFF)drawHUDP(t);}
+    if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(wcv,0,0);ctx.imageSmoothingEnabled=true;ctx.setTransform(VS,0,0,VS,0,0);if(running&&!HUDOFF)drawHUDP(t);}
     else if(running&&!HUDOFF){drawHUD(t);PW.hud(t);}}};

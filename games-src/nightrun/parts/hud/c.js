@@ -263,11 +263,12 @@ let last=performance.now();
 let simOn=false;
 let fpsN=0,fpsT=0;
 function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){requestAnimationFrame(loop);return;}   // FPS cap: 30 skips every other frame; 60 holds a 120/144/240 Hz screen to 60-80 draws a second (the game was drawing every refresh)
-  let dt=Math.min(.05,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
+  let dt=Math.min(.25,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
   if(SET.fpsc){fpsN++;if(now-fpsT>500){$('fpsEl').hidden=!FPSOK();$('fpsEl').textContent=Math.round(fpsN*1000/(now-fpsT))+' FPS';fpsN=0;fpsT=now;}}
   if(CAL.on)calFrame();
   if(!paused)fbT+=dt;
-  if(running&&!paused){update(dt);if(raw<1000&&!document.hidden){FPS.n++;FPS.t+=raw;if(raw>FPS.worst)FPS.worst=raw;if(raw>40)FPS.slow++;RSC.feed(raw);}}
+  if(running&&!paused){for(let r=dt;r>1e-6;){const s=Math.min(r,.034);update(s);r-=s;}   // slow frame: catch the clock up in <= 34 ms steps
+    if(raw<1000&&!document.hidden){FPS.n++;FPS.t+=raw;if(raw>FPS.worst)FPS.worst=raw;if(raw>40)FPS.slow++;RSC.feed(raw);}}
   else if(!running){G.t+=dt;G.scroll+=60*dt;for(const p of G.pt){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;}G.pt=G.pt.filter(p=>p.l>0);}
   if(!running&&!G.dead&&!G.over){G.attract=(G.attract||0)+dt;if(G.attract>9){G.attract=0;const n=(G.di+1)%DISTRICTS.length;G.di=n;bgFor(n);}}
   const bp=bpos(),fr=bp-Math.floor(bp);PHF=fr;PUL=Math.pow(1-fr,2.5)*(((Math.floor(bp)%4)+4)%4===0?1:.65);
