@@ -19,11 +19,15 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
    if(dw>1&&dh>1&&dw*dh<4e6){if(C.b!==b||C.w!==dw||C.h!==dh){const cv_=C.cv||(C.cv=document.createElement('canvas'));cv_.width=dw;cv_.height=dh;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,dw,dh);g.fillStyle='rgba(12,8,24,.22)';g.fillRect(0,0,dw,dh);C.b=b;C.w=dw;C.h=dh;}
      const q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';ctx.drawImage(C.cv,0,0,w,h);ctx.imageSmoothingQuality=q;return;}
    ctx.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,w,h);ctx.fillStyle='rgba(12,8,24,.22)';ctx.fillRect(0,0,w,h);},
+  pan(b,w,h,off){b=this.dim(b,.55);const X=1.35,s=Math.max(w/b.width,h*X/b.height),sw=w/s,sh=h*X/s,m=ctx.getTransform(),dw=Math.round(w*m.a),dh=Math.round(h*m.d),eh=Math.round(dh*X),ex=eh-dh,C=this.PC||(this.PC={});   // W250: the phone sky is cropped once at 1.35x height, then a window of it slides 1:1 (far plane, ratio .1, no flip, no seam: it pans back and forth)
+   if(dw<2||dh<2||dw*eh>4e6){this.cover(b,w,h);return;}
+   if(C.b!==b||C.w!==dw||C.h!==dh){const c=C.cv||(C.cv=document.createElement('canvas'));c.width=dw;c.height=eh;const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,dw,eh);g.fillStyle='rgba(12,8,24,.22)';g.fillRect(0,0,dw,eh);C.b=b;C.w=dw;C.h=dh;}
+   const p=ex>0?off*m.d%(2*ex):0,y=Math.round(p>ex?2*ex-p:p),q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';ctx.drawImage(C.cv,0,ex-y,dw,dh,0,0,w,h);ctx.imageSmoothingQuality=q;},
   tile(b,y,h,scroll,par,keep){if(!keep)b=this.dim(b);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
     for(let j=Math.floor(off/tw);j*tw-off<W;j++){const x=j*tw-off;if(x+tw<=0)continue;
       if(j&1){ctx.save();ctx.translate(x+tw,y);ctx.scale(-1,1);ctx.drawImage(b,0,0,tw,h);ctx.restore();}else ctx.drawImage(b,x,y,tw,h);}},
   bg(port,scroll){const di=G.di,n=ART.dn[di],D=DISTRICTS[di],bm=ART.bm;ctx.fillStyle='#000';
-    if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.cover(b,PW_,PH_);return;}
+    if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.pan(b,PW_,PH_,scroll*.1);return;}   // W250: three planes, ratios .1 / .3 / .6: far sky pans, mid rooftops fainter, near rooftops larger and faster
     ART.paintReady(di);const b=bm['bg-'+n];if(!b){ctx.fillRect(0,0,W,H);return;}
     this.tile(b,0,H,scroll,.03);
     const far=bm['ly-far-'+n],mid=bm['ly-mid-'+n],nr=bm['ly-near-'+D.near];
@@ -33,7 +37,7 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
   sheet(e){const M=ENEMY_ART[FOEART.id(e)];if(!M||e.type==='gate')return null;const m=M.native?{s:M.s||'e'+e.type,k:M.k||4.2}:FOEART.map(e);if(!m||!m.s)return null;
     const b='ship-'+m.s+'/',v=e.arm&&ART.ANIM.s[b+'volley']&&ART.anim(b+'volley'),key=b+(v?'volley':'flame');if(!ART.ANIM.s[key]||!ART.anim(key))return null;ART.anim(b+'death');return{m,key};},
   foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,this.pl()*.55),Math.max(this.K*fw*1.25,this.pl()*.55)),sc=w/fw,rot=m.rot?m.rot(e,t):0;
-    ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false);ctx.restore();
+    ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);this.ink(sc*s[2]+8,sc*s[3]+8,()=>ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false),null,key+'|'+Math.round(sc*20)+'|'+this.fk(key,(e.t||0)+eb_(e)));ctx.restore();
     e._fs=sc;e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
   player(t){if(G.dead)return;const id=shipDef().id,key='ship-'+id+'/flame',k=this.K*this.PK;ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
     const s=ART.ANIM.s[key],L=s?s[2]*k:56,e=ART.bm['fx-engine'];   // W215: owner engine light (fx-engine, painted on black) under the tail, steady flicker, no ring or halo
@@ -41,30 +45,44 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     if(RET.sprites&&SPR.shipOn(id)&&s)this.rim(key,t,k,s);   // the player one notch above the enemies' texel scale (1.35x, inside the 1.5x band): it must read first
    else ART.put(ART.sp('spr-ship-'+id,this.K*520*this.PK),0,0);
     ctx.restore();},
-  rim(key,t,k,s){   // W215: the player's frame with a 1 px light outline (the benchmark shooters outline the player ship so it reads on any backdrop; no glow, no ring)
-    const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),fw=s[2]*k*ps,fh=s[3]*k*ps,O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(fw+8),h=Math.ceil(fh+8);
+  rim(key,t,k,s){this.ink(s[2]*k+8,s[3]*k+8,()=>ART.drawAnim(ctx,key,t,0,0,k,false),null,key+'|'+Math.round(k*20)+'|'+this.fk(key,t));},   // W215: the player's frame with a 1 px outline (no glow, no ring)
+  fk(key,t){const i=ART.aframe(key,t);return i+'.'+Math.round(ART.aP*4);},   // W255: sheet frame + crossfade step, the cache key part of an animated actor (looping time would never repeat)
+  ink(w_,h_,fn,lit,ck){   // W244: ONE ink pass for every actor (player, enemies, boss, pickups): fn draws the actor at the local origin (current transform = its place); we add the same outline weight, one soft ink shadow offset down-right (key light upper left) and a thin warm lit edge on the upper left. No blur: offset copies of one silhouette, built into pooled canvases.
+    const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(w_*ps+8),h=Math.ceil(h_*ps+8);
+    if(!(ps>0)||w*h>4e6){fn();return;}
+    const CC=this.IC||(this.IC=new Map()),CK=ck&&ck+'|'+Math.round(ps*50)+'|'+Math.round(Math.atan2(m.b,m.a)*12)+'|'+lit,hit=CK&&CC.get(CK);   // W255: an actor sheet frame (time in 1/15 s steps, rotation in 1/12 rad steps) is inked once and then copied: the ink pass was 18 canvas ops per actor per frame
+    if(hit){ctx.drawImage(hit.cv,0,0,hit.w,hit.h,-hit.W/2,-hit.H/2,hit.W,hit.H);return;}
     for(const c of O)if(c.width<w||c.height<h){c.width=Math.max(c.width,w);c.height=Math.max(c.height,h);}
-    const a=O[0].getContext('2d'),b=O[1].getContext('2d'),cw=O[0].width,ch=O[0].height;a.setTransform(1,0,0,1,0,0);a.clearRect(0,0,cw,ch);a.setTransform(ps,0,0,ps,cw/2,ch/2);ART.drawAnim(a,key,t,0,0,k,false);
-    b.setTransform(1,0,0,1,0,0);b.clearRect(0,0,cw,ch);b.globalCompositeOperation='source-over';b.drawImage(O[0],0,0);b.globalCompositeOperation='source-in';b.fillStyle='#07030f';b.fillRect(0,0,cw,ch);b.globalCompositeOperation='source-over';
-    const d=Math.max(1.2*(window.devicePixelRatio||1),1.6)/ps,W_=cw/ps,H_=ch/ps;
-    ctx.globalAlpha=.4;ctx.drawImage(O[1],3*d-W_/2,5*d-H_/2,W_,H_);ctx.globalAlpha=1;   // one soft ink shadow, offset down-right from one upper-left key light (no blur: a blur per frame is too slow)
-    for(const[x,y]of[[-d,0],[d,0],[0,-d],[0,d],[-d*.7,-d*.7],[d*.7,-d*.7],[-d*.7,d*.7],[d*.7,d*.7]])ctx.drawImage(O[1],x-W_/2,y-H_/2,W_,H_);
-    ctx.drawImage(O[0],-W_/2,-H_/2,W_,H_);},
+    const a=O[0].getContext('2d'),b=O[1].getContext('2d'),W_=w/ps,H_=h/ps,o=ctx;
+    a.setTransform(1,0,0,1,0,0);a.globalAlpha=1;a.globalCompositeOperation='source-over';a.clearRect(0,0,w,h);a.setTransform(ps,0,0,ps,w/2,h/2);
+    ctx=a;try{fn();}finally{ctx=o;}
+    b.setTransform(1,0,0,1,0,0);b.globalCompositeOperation='source-over';b.clearRect(0,0,w,h);b.drawImage(O[0],0,0,w,h,0,0,w,h);const pb=window.PB;if(pb)pb.hud++;b.globalCompositeOperation='source-in';b.fillStyle='#07030f';b.fillRect(0,0,w,h);b.globalCompositeOperation='source-over';if(pb)pb.hud--;   // tint fills on the pooled canvases are not play-field shapes (qa/pureprobe.js counts them out)
+    
+    const T=CK?document.createElement('canvas'):null;let tc=ctx;if(T){T.width=w;T.height=h;tc=T.getContext('2d');tc.setTransform(ps,0,0,ps,w/2,h/2);}
+    const d=Math.max(1.2*(window.devicePixelRatio||1),1.6)/ps,ox=3*d,oy=5*d,lx=(ox*m.a+oy*m.b)/ps,ly=(oy*m.a-ox*m.b)/ps,X=-W_/2,Y=-H_/2,im=(c,x,y)=>tc.drawImage(c,0,0,w,h,X+x,Y+y,W_,H_);
+    tc.globalAlpha=.4;im(O[1],lx,ly);tc.globalAlpha=1;   // the shadow rotates with the actor so it always falls the same way on screen
+    for(const[x,y]of[[-d,0],[d,0],[0,-d],[0,d],[-d*.7,-d*.7],[d*.7,-d*.7],[-d*.7,d*.7],[d*.7,d*.7]])im(O[1],x,y);
+    im(O[0],0,0);
+    if(lit!==0){const c=O[2].getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.clearRect(0,0,w,h);c.drawImage(O[0],0,0,w,h,0,0,w,h);c.globalCompositeOperation='source-in';c.fillStyle='#ffe6c4';if(pb)pb.hud++;c.fillRect(0,0,w,h);if(pb)pb.hud--;   // upper-left lit edge: the art's own shape minus itself shifted down-right
+      c.globalCompositeOperation='destination-out';const sx=ps*d*1.6,cs=m.a/ps,sn=m.b/ps;c.drawImage(O[0],0,0,w,h,sx*.7*(cs+sn),sx*.7*(cs-sn),w,h);c.globalCompositeOperation='source-over';
+      tc.globalAlpha=lit||.35;im(O[2],0,0);tc.globalAlpha=1;}
+    if(T){const px=(this.IP||0)+w*h;this.IP=px;CC.set(CK,{cv:T,w,h,W:W_,H:H_});for(const[k,e]of CC){if(this.IP<=8e6)break;this.IP-=e.w*e.h;CC.delete(k);}ctx.drawImage(T,0,0,w,h,X,Y,W_,H_);}},
   hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=v==='w'?'saturate(0) brightness(1.6)':'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,0,0);return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white (made once per picture)
   pic(n,x,y,w,ang,hk){const v=/~([ow])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
-  shots(){for(const b of G.pb){const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
+  shots(){for(const b of G.pb){if(b.y<12)continue;const fa=Math.min(b.x>W*.7?1-(b.x-W*.7)/(W*.3):1,1-(Math.hypot(b.x-P.x,b.y-P.y)-W*.4)/(W*.25));if(fa<.05)continue;ctx.globalAlpha=Math.min(1,fa);const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
       if(wn&&this.pic(wn,b.x,b.y,44,a))continue;
       const n=b.hv?'fx-shot-hv':b.ec?'fx-shot-ec':'fx-shot-std',w=b.hv?52:b.ec?40:(b.len||(b.big?22:20))*2.4*(b.pf?1.3:1);
       if(this.pic(n,b.x,b.y,w,a,1.7)&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
+    ctx.globalAlpha=1;
     for(const b of G.eb){const a=Math.atan2(b.vy||0,b.vx||-1);
       if(b.hm>0&&this.pic('fx-orb-homing',b.x,b.y,b.r*3.6))continue;
       if(b.k==='n'&&this.pic('fx-bullet-shell',b.x,b.y,b.r*7,a,.38)){this.pic('fx-bullet-needle~w',b.x,b.y,b.r*6,a,1.4);continue;}   // W219: needle = the owner's orange shell drawn as a long bolt (the shell family reads best) with the needle, whitened once, as its hot core
       if(b.k==='r'&&this.pic('fx-bullet-rocket',b.x,b.y,b.r*6,a))continue;
       if(b.k&&this.pic('fx-bullet-shell',b.x,b.y,b.r*4,a))continue;
       this.pic('fx-bullet-enemy',b.x,b.y,b.r*3.4);}},
-  coin(p,y,t){const k='pk-coin/spin',s=ART.ANIM.s[k];if(!s||!ART.anim(k))return false;ART.drawAnim(ctx,k,t+p.bob,p.x,y,22/s[2],false);return true;},   // W219: shards as the owner's spinning coin: it reads as a pickup, not a bullet
+  coin(p,y,t){const k='pk-coin/spin',s=ART.ANIM.s[k];if(!s||!ART.anim(k))return false;ctx.save();ctx.filter='hue-rotate(105deg)';ART.drawAnim(ctx,k,t+p.bob,p.x,y,22/s[2],false);ctx.restore();return true;},   // W219: shards as the owner's spinning coin: it reads as a pickup, not a bullet
   pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;if(p.t==='pw'){const o=ART.sp('pk-'+p.k,40);if(!o&&ART.bm['pk-'+p.k]===undefined)ART.load('pk-'+p.k);if(o){ctx.save();ctx.translate(p.x,y);ART.put(o,0,0,Math.sin(t*2+p.bob)*.08);ctx.restore();}continue;}   // W219: the owner's power-up picture only (no hex, ring, glow or caption)
-      if(p.t==='shard'&&this.coin(p,y,t))continue;ctx.save();ctx.translate(p.x,y);pkPaint(p,t);ctx.restore();}},
+      if(p.t==='shard'){this.coin(p,y,t);continue;}ctx.save();ctx.translate(p.x,y);pkPaint(p,t);ctx.restore();}},
   draw(t,dt){const PT=wcv!==cv;for(const c of[vctx,wctx]){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='medium';}
     if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);this.bg(true,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
     else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}

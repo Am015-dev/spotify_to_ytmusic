@@ -30,6 +30,7 @@ F.hitFeel=function(e,d,src){if(hf0)hf0.apply(this,arguments);
   const x=e.x;e._lch={dir:sgn(e.x-S.P.x),left:FAR,hit:[]};cb.fin++;if(window.FTX)FTX.ev('finisher');
   S.hf=Math.max(S.hf||0,8/60);if(!S.sim)IN.hitstop(8/60*1000);S.shake=Math.max(S.shake||0,window.COM&&COM.sk?COM.sk(6):6);   // headless sim() only records the freeze, as hitfeel does
   S.fx.push({slash:1,x:x,y:e.y-e.h/2,w:130,l:.2,c:'#ffd23a'});
+  if(RET.footmove&&!e.dead&&!e.boss)e._ka={t:S.time,dir:sgn(e.x-S.P.x)||1,die:false};   // footmove: the finisher's slide gets the knockback arc
   if(!e.dead)flinch(e);};
 const post0=F.post;
 F.post=function(S,dt){if(post0)post0.apply(this,arguments);

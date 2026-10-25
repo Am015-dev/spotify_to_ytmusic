@@ -8,7 +8,7 @@ if(RET.multhud===undefined)RET.multhud=!/[?&]mult=0/.test(location.search);
 const MH=window.MH={brk:0,from:0,to:0,prev:1,cap:0,capDone:false};
 if(RET.multhud){
   NR.on('runStart',()=>{MH.brk=0;MH.prev=1;MH.cap=0;});
-  NR.on('tick',dt=>{if(!G)return;if(!MH.capDone){MH.cap+=dt;if(MH.cap>12)MH.capDone=true;}if(MH.brk>0)MH.brk-=dt;});
+  NR.on('tick',dt=>{if(!G)return;if(!MH.capDone){MH.cap+=dt;if(MH.cap>(RET.purelook?4:12))MH.capDone=true;}if(MH.brk>0)MH.brk-=dt;});
   NR.on('hurt',()=>{if(G&&MH.prev>G.mult+.04){MH.from=MH.prev;MH.to=G.mult;MH.brk=2;}});
   const mtxt=m=>'×'+m.toFixed(1),col=()=>MH.brk>0&&(SET.reduce||Math.floor(MH.brk*8)%2===0)?'#ff3040':TIERC[tierOf(C.n)-1];
   const wrap=(name,draw)=>{const f=DIET[name];DIET[name]=function(t){f.apply(this,arguments);if(!G||!running)return;try{draw();}finally{MH.prev=G.mult;}};};
