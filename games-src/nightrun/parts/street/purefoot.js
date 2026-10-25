@@ -42,8 +42,8 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
   const dE=e=>{if(e.dead&&!(e.ext&&!e.remove))return;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)return;SL.z=e.z;
     let pose=e.dead?'die':(()=>{try{return e.def.pose?e.def.pose(e):'idle';}catch(x){return'idle';}})();if(!e.dead){if(e.wind>0)pose='melee';else if(e.tele>0)pose='shoot';}   // telegraph = the attack pose
     const ey=e.ext&&e.fly?e.y+e.h/2:e.y;at(c,e.x,ey,K);ART.fE=e;IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;c.restore();SL.z=null;};
-  const dK=()=>{if(P.inv>0&&Math.floor(S.time*16)%2&&P.hp>0)return;SL.z=P.z;at(c,P.x,P.y,K);
-    P._xa=IN.kaiX(P);ART.fE=P;IN.drawWho(c,'kai',IN.ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,'#19e3ff',P.crouch);ART.fE=null;
+  const dK=()=>{SL.z=P.z;at(c,P.x,P.y,K);
+    P._xa=IN.kaiX(P);ART.fE=P;IN.drawWho(c,'kai',IN.ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,P.inv>1.38?'#ffffff':'#19e3ff',P.crouch);ART.fE=null;F.invRing(c,P);
     if(P.shotT>0&&window.AH){const a=P.aim,mq=F.mzAt&&F.mzAt(P);AH.ftMuz(c,P.w,mq?mq[0]:P.x+Math.cos(a)*28,mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20,a);}c.restore();SL.z=null;};
   const A=S.E.filter(e=>!(e.dead&&!(e.ext&&!e.remove)));A.push(P);const PS=new Set(S.pr);for(const p of S.pr)A.push(p);
   if(SL.band)A.sort((a,b)=>(a.z==null?1:a.z)-(b.z==null?1:b.z));else A.sort((a,b)=>PS.has(b)-PS.has(a));   // belt: back to front; flat road: props first
