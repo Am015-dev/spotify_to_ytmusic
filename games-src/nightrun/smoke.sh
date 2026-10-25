@@ -23,6 +23,7 @@ run ui-align-844x390 env VP=844x390 ONLY="$UI" node "$HERE/ui-align-test.js"
 # hub-test and sprites-test run in SMOKE=1 mode (fewer samples, same screens: see their headers); the nightly run leaves SMOKE unset
 run hub              env SMOKE=1 node "$HERE/hub-test.js"
 run story            node "$HERE/story-test.js"
+run flow             node "$HERE/qa/flow-test.js"
 run sprites          env SMOKE=1 ONLY="${SPR:-hoplite}" node "$HERE/sprites-test.js"   # one boss for the anchor check; all bosses nightly
 run labfull          node "$HERE/labfull-test.js"
 echo "$([ $bad -eq 0 ] && echo PASS || echo FAIL) smoke: $bad failed, $(( $(date +%s)-t0 )) s"

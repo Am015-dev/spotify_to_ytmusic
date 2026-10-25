@@ -15,6 +15,7 @@ html.focus #title .lede{display:none!important}
 #focusBox{width:100%;max-width:min(94%,440px);display:flex;flex-direction:column;gap:12px;margin-top:8px}
 #focusBox .go{width:100%;min-height:64px;font-size:clamp(20px,min(5.4vw,3.8vh),28px)}
 #focusBox .fr2{display:flex;gap:10px}#focusBox .fr2 .go{flex:1 1 0;min-height:52px;font-size:18px}
+html.focus #pausem .row>#quitBtn{grid-column:auto}   /* RETRY and TITLE share one row under RESUME (the hidden SETTINGS button made TITLE span the full width and RETRY sit alone) */
 html.focus #srNext,html.focus #srMenu,html.focus #stBtn2,html.focus #pSetBtn,html.focus #fFly,html.focus #fCp{display:none!important}
 `;document.head.appendChild(st);
   setTimeout(()=>{   // the title and result nodes exist after the parts have run
