@@ -36,3 +36,5 @@
 99c9rd_racedress_go.js
 99crm_racemode_go.js
 99cdf_drivefeel_go.js:DF_go,DF_measure,DF_shot
+99hrq_quest_intro.js:qvIntro,qvShort
+99c6hr_mstart_go.js:HRM_run,HRM_card
