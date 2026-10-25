@@ -27,6 +27,8 @@ Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-in
 16. A play-like bot (tools/bughunt.js, time-accelerated) on the phone profile is a pre-deploy gate once it exists.
 17. Small measurable fixes may ship on green automated gates without waiting for the reviewer; the reviewer handles visuals, feel and core code first.
 18. One coordinator only; other sessions route Alex's asks to it. Deploy as soon as a reviewed fix is green (no 30-min batching).
+19. Coordinator reference (Alex, 25 Oct): before routing ANY structural or multi-module task (new level/race/city folder, shared base class, state machine, scene split), the coordinator reads docs/wiki/learn/cuphead-structure.md (the Cuphead recreation, MIT: organisation only, never its art or music) and copies the relevant line into the worker brief. The coordinator never reads or copies the Cuphead code itself; workers port ideas, not Unity files.
+20. Coordinator briefs always name: the lane's deliverable, the timebox, the model, the wiki pages to read first (docs/wiki/index.md), and the licence rule (docs/wiki/sources/licences.md).
 ## Standing orders from Alex
 - Never ask Alex anything; take the recommended option and note it in one line.
 - Reuse first: grep the repo, then three.js addons, LDraw/OMR, Yuka, SuperTuxKart, LEGO Racers decomp, etc. The game is GPL-3.0 (Alex, 24 Oct), so GPL/LGPL/permissive code may be ported into its own file with an attribution header (docs/wiki/sources/licences.md). Never leaked/unlicensed code, never game assets.
