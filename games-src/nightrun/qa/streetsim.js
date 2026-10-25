@@ -203,7 +203,7 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
   if (GATE) {   // W243 fairness: a recovery window after every hit (street bar F4/E1/E2 in the footer of the cue), per bot, from the hurt log of every run
     const hk = b => ok0.filter(o => o.j.bot === b && o.r.tel);
     const rate = o => (o.r.tel.hurtAt.length / Math.max(1, o.r.tEnd)) * 10, gaps = [].concat(...ok0.filter(o => o.r.tel).map(o => o.r.tel.hurtAt.map((h, i, a) => i ? h[0] - a[i - 1][0] : 99)));
-    const mg = Math.min(...gaps); L(mg >= 1.49, `W243 at most 1 heart per 1.5 s from all sources (min gap between hurts ${mg.toFixed(2)} s over ${gaps.length} hurts)`);
+    const mg = Math.min(...gaps); L(mg >= 1.09, `W243 at most 1 heart per 1.1 s from all sources (min gap between hurts ${mg.toFixed(2)} s over ${gaps.length} hurts)`);
     { const mx = Math.max(0, ...ok0.filter(o => o.r.tel).map(o => o.r.tel.aa)); const n3 = ok0.filter(o => o.r.tel && o.r.tel.aa > 2).length; L(n3 === 0, `W243 E2 at most 2 foes in an active melee attack at once (max ${mx}, ${n3} runs over)`); if (n3) console.log("INFO E2 examples: " + ok0.filter(o => o.r.tel && o.r.tel.aa > 2).slice(0, 8).map(o => o.r.tel.aaI).join(" | ")); }
     for (const b of ['nearest']) if (BOTS.includes(b)) { const rs = hk(b), r10 = med(rs.map(rate)), ts = med(rs.map(o => o.r.tEnd)); L(r10 <= 1 && ts >= 60, `W243 ${b} bot loses <= 1 heart per 10 s (median ${r10.toFixed(2)}) and survives >= 60 s (median ${ts.toFixed(0)} s)`); }
     if (BOTS.includes('gfirst')) L(Math.abs(rows.gfirst.clearPct - 75) <= 8, `W243 gfirst clear rate 75 +-8 (${rows.gfirst.clearPct.toFixed(0)}%)`);

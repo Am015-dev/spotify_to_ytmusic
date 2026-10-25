@@ -153,7 +153,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
   const dK=()=>{{SL.z=P.z;at(c,P.x,P.y,K);
     if(P.pw.shield){c.strokeStyle='#5ad1ff';c.lineWidth=2+P.pw.shield.lv;c.beginPath();c.arc(P.x,P.y-34,44,0,6.283);c.stroke();}
     if(P.dashIF>0){c.fillStyle='#19e3ff33';c.fillRect(P.x-24-P.facing*20,P.y-60,48,58);}
-    P._xa=IN.kaiX(P);ART.fE=P;IN.drawWho(c,'kai',IN.ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,P.inv>1.38?'#ffffff':S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);ART.fE=null;F.invRing(c,P);
+    P._xa=IN.kaiX(P);ART.fE=P;IN.drawWho(c,'kai',IN.ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,P.inv>.98?'#ffffff':S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);ART.fE=null;F.invRing(c,P);
     if(P.shotT>0){const a=P.aim,mq=F.mzAt&&F.mzAt(P),mx=mq?mq[0]:P.x+Math.cos(a)*28,mY=mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20;if(!(window.AH&&AH.ftMuz(c,P.w,mx,mY,a))&&F.WEAPONS[P.w].kind!=='arc'){c.fillStyle='#fff';c.beginPath();c.arc(mx,mY,5,0,6.283);c.fill();}}c.restore();SL.z=null;}};
   if(SL.band){const A=S.E.filter(e=>e.z!=null&&!(e.dead&&!(e.ext&&!e.remove)));A.push(P);const PS=new Set();for(const p of S.pr)if(p.z!=null){A.push(p);PS.add(p);}A.sort((a,b)=>a.z-b.z);const AC=RET.occl?A.filter(a=>a===P||(!PS.has(a)&&Math.abs(a.x-P.x)<300)):[];for(const a of A){if(PS.has(a)){c.globalAlpha=slOcc(a,AC,K);dP(a);c.globalAlpha=1;SL.z=null;continue;}if(!a.dead&&a.x>lo-80&&a.x<hi+80)slSh(c,a,K);a===P?dK():dE(a);}}   // belt: back to front every frame, shadow first
   else dK();

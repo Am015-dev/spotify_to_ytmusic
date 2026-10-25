@@ -89,7 +89,7 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
   const dK=()=>{SL.z=P.z;at(c,P.x,P.y,K);
     P._xa=IN.kaiX(P);let kp=IN.ppose(P);if(RET.footmove){if(P.shotT>(P._pst||0)+1e-4){P._lst=S.time;if(P.onGround&&!P.crouch)P._fa=null;}P._pst=P.shotT;   // each shot restarts the shoot sheet (recoil frames)
       if(S.time-(P._lst==null?-9:P._lst)<.45&&P.onGround&&!P.crouch&&/^(idle|run-a|run-b)$/.test(kp)&&!P._xa){kp='shoot';P._xa=Math.abs(P.vx)>5?'runshoot':'';}turn(c,P,P.x);}   // auto-fire keeps the aim pose between shots instead of popping to idle
-    ART.fE=P;IN.drawWho(c,'kai',kp,P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,P.inv>1.38?'#ffffff':'#19e3ff',P.crouch);ART.fE=null;F.invRing(c,P);
+    ART.fE=P;IN.drawWho(c,'kai',kp,P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,P.inv>.98?'#ffffff':'#19e3ff',P.crouch);ART.fE=null;F.invRing(c,P);
     if(P.shotT>0&&window.AH){const a=P.aim,mq=F.mzAt&&F.mzAt(P);AH.ftMuz(c,P.w,mq?mq[0]:P.x+Math.cos(a)*28,mq?mq[1]:P.y-(P.crouch?26:44)+Math.sin(a)*20,a);}c.restore();SL.z=null;};
   const A=S.E.filter(e=>!(e.dead&&!(e.ext&&!e.remove)));A.push(P);const PS=new Set(S.pr);for(const p of S.pr)A.push(p);
   const zk=a=>PS.has(a)?-1:a.z==null?1:a.z;   // W228: props stand against the wall, behind every lane (their hit depth is unchanged)

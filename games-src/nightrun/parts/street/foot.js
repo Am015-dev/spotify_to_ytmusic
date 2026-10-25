@@ -11,7 +11,7 @@
    Save: localStorage mnr_foot = {best:{<stage>:{score,rank,time}},clr:{<stage>:n},seen:{b:1,a:1},hint:1}; it is in the save export list. ---------- */
 if(RET.foot===undefined)RET.foot=!/[?&]foot=0/.test(location.search);
 const FOOT=window.FOOT=(()=>{
-const VH=540,FL=VH-70,GRAV=1900,SKEY='mnr_foot',EBMAX=40,TELE=.4,GRACE=.9,INV=1.5,HITGAP=1.5,MAXATK=2,QMAX=5;   // QMAX: at most this many enemy shots wind up at once (x fr)
+const VH=540,FL=VH-70,GRAV=1900,SKEY='mnr_foot',EBMAX=40,TELE=.4,GRACE=.9,INV=1.1,HITGAP=1.1,MAXATK=2,QMAX=5;   // QMAX: at most this many enemy shots wind up at once (x fr)
 const FDIFF={easy:{hp:.75,fr:.7,bs:.85,dmg:1,hearts:6},normal:{hp:1,fr:1,bs:1,dmg:1,hearts:5},hard:{hp:1.3,fr:1.25,bs:1.1,dmg:1,hearts:4},
   vhard:{hp:1.6,fr:1.4,bs:1.2,dmg:1,hearts:3},legend:{hp:2,fr:1.6,bs:1.3,dmg:2,hearts:4}};   // Legend hits for 2 hearts but you get 4 (2 hits from the boss)
 /* ===== WEAPONS: LV1-5. Each level: +22% damage, +12% rate. t3 / t5 = the trait that LV3 / LV5 adds. Picking the same weapon again = +1 LV (and ammo); taking a hit = -1 LV (LV0 = back to the pistol). ===== */
