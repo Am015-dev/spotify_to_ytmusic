@@ -124,11 +124,11 @@ const q = (a, f) => { if (!a.length) return 0; const s = a.slice().sort((x, y) =
   const dts = profile.timeDeltas; const cnt = {}; profile.samples.forEach((id, i) => { cnt[id] = (cnt[id] || 0) + (dts[i] || 0); });
   let tot = 0; for (const id in cnt) { const n = byId[id], cf = n.callFrame; const k = (cf.functionName || '(anon)') + ':' + (cf.lineNumber + 1); self[k] = (self[k] || 0) + cnt[id]; tot += cnt[id]; }
   const top = Object.entries(self).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([k, v]) => k + ' ' + (100 * v / tot).toFixed(1) + '%');
-  const d = await p.evaluate(() => ({ fr: __pf.fr, js: __pf.js, lt: __pf.lt.filter(l => l[0] > __pf.tOn), ltAll: __pf.lt.length, lat: __pf.lat, firstRaf: __pf.firstRaf | 0 }));
+  const d = await p.evaluate(() => ({ fr: __pf.fr, js: __pf.js, lt: __pf.lt.filter(l => l[0] > __pf.tOn), ltAll: __pf.lt.length, tOn: __pf.tOn, lat: __pf.lat, firstRaf: __pf.firstRaf | 0 }));
   const lat = d.lat.map(x => x[1]);
   const res = { mode: MODE, dev: DEV, base: BASE, load, ui: { ov: ui.ov, small: ui.small, off: ui.off, cv: ui.cv, n: ui.bs.length, bs: ui.bs.map(b => b.id + '[' + b.t + ']@' + b.x + ',' + b.y + ' ' + b.w + 'x' + b.h) },
     frames: d.fr.length, fps: +(1000 * d.fr.length / (SECS * 1000)).toFixed(1), p50: q(d.fr, .5), p95: q(d.fr, .95), p99: q(d.fr, .99), max: Math.max(...d.fr), over33: d.fr.filter(x => x > 33.4).length, over50: d.fr.filter(x => x > 50).length,
-    jsP50: q(d.js, .5), jsP95: q(d.js, .95), longtasks: d.lt.length, longMax: d.lt.reduce((a, b) => Math.max(a, b[1]), 0), longSum: d.lt.reduce((a, b) => a + b[1], 0),
+    jsP50: q(d.js, .5), jsP95: q(d.js, .95), longtasks: d.lt.length, ltList: d.lt.map(l => [l[0] - Math.round(d.tOn), l[1]]).slice(0, 60), longMax: d.lt.reduce((a, b) => Math.max(a, b[1]), 0), longSum: d.lt.reduce((a, b) => a + b[1], 0),
     latN: lat.length, latP50: q(lat, .5), latP95: q(lat, .95), latMiss: lat.filter(x => x >= 1000).length,
     hits, hitsPerMin: +(hits * 60 / SECS).toFixed(1), deaths, hitLog: hitLog.slice(0, 30), worst, top, errs: [...new Set(errs)].slice(0, 8), cons: [...new Set(cons)].slice(0, 8) };
   console.log(JSON.stringify(res));

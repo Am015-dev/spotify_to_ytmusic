@@ -95,14 +95,18 @@ if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART
 /* ----- painted street (22 Oct 2026): foot/bg-sky|far|mid|near|floor, 2048x1024 each, used only when all five are loaded (else the placeholders below). Same convention as footart.js FA.bg: the picture's street line is 80% down,
    scaled so that line lands on the road line FL (top of the picture at the top of the visible sky), tiles are 2:1 and repeat sideways. Sky is opaque and almost fixed, the others scroll slower the further away they are,
    the floor (rows 720-1023, transparent above) moves with the road. Draw order: sky, far, mid, near, floor, then props and actors. ----- */
+const SCL={};   // W241: one pre-scaled copy of each backdrop layer at its on-screen device size, rebuilt only when the size changes (a resize), so a frame blits ~1:1 instead of filtering a 2048 px picture
+function slScaled(l,pic,sy,sh,dw,dh){if(dw<2||dh<2||dw*dh>5e6)return null;const k=dw+'x'+dh+'|'+sy+'|'+sh;let o=SCL[l];if(o&&o.k===k)return o.cv;
+  const cv=o&&o.cv||document.createElement('canvas');cv.width=dw;cv.height=dh;const g=cv.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(pic,0,sy,pic.width,sh,0,0,dw,dh);SCL[l]={k,cv};return cv;}
 const PLY=['sky','far','mid','near','floor'],PSP={sky:.02,far:.12,mid:.4,near:.7,floor:1};
 SL.paint=0;
 function slPainted(c,x0,w,cam,t0){const P={};for(const l of PLY){const q=slPic('bg-'+l);if(!q||!q.width)return false;P[l]=q;}
-  const FR=FL-(SL.band||0),DH=(FR-t0)/.8,TW=2*DH,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;for(;x<x0+w;x+=TW)c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
+  const FR=FL-(SL.band||0),DH=(FR-t0)/.8,TW=2*DH,qs=c.imageSmoothingQuality,dsc=c.getTransform().a,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;const src=slScaled(l,P[l],sy,sh,Math.round((TW+1)*dsc),Math.round(h*dsc));for(;x<x0+w;x+=TW)src?c.drawImage(src,x,y,TW+1,h):c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
+  c.imageSmoothingQuality='low';   // W241: backdrop layers are 1:1 copies of a per-resize pre-scaled canvas; 'high' stays for the actors (restored below)
   const H=P.sky.height;tile('sky',t0-4,FR-t0+8,0,RET.artfix?Math.min(H,Math.round(H*(FR-t0+8)/DH)):H);/* artfix: the sky keeps its own aspect (only the rows above the street line, not the whole picture squeezed into them) */for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
   const DF=Math.max(DH,(VH+2-FR)/.2),fy=FR-.8*DF,r0=.69;if(RET.purefoot){const H2=P.floor.height,a=Math.round(r0*H2),e=Math.round(.9*H2),y0=fy+r0*DF;tile('floor',y0,Math.max((e-a)*DF/H2,VH+2-y0),a,e-a);}   /* W217 purefoot: the debris strip at the bottom of the floor picture is left out; the wet road rows reach the screen edge (stretched down, nearer road) */
   else tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
-  SL.paint=1;return true;}
+  c.imageSmoothingQuality=qs;SL.paint=1;return true;}
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,FR=FL-(SL.band||0),fh=FR-t0;
   if(slPainted(c,x0,w,cam,t0)){SL.x0=x0;if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FR,S.time);return;}SL.paint=0;
   const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);if(window.phText()){c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}}
