@@ -6,7 +6,7 @@ const [,,BASE,OUT='/tmp/rm',CITY='fra',ONLY='']=process.argv,ONL=ONLY?ONLY.split
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
  const p=await ctx.newPage();p.setDefaultTimeout(600000);const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));
- await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test='+CITY+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__rm,null,{polling:250,timeout:120000});
+ await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test='+CITY+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__rm,null,{polling:250,timeout:400000});
  const L=await p.evaluate(()=>__rm.list()),rows=[];
  for(let i=0;i<L.length;i++){if(ONL.length&&!ONL.some(q=>L[i]===q))continue;const e0=errs.length;let R;
   try{await p.evaluate(()=>{const b=document.querySelector('#r3Up [data-r3u=ok]');if(b&&b.offsetParent)b.click()});   // a level-up card queued between races: tap CONTINUE like a player
