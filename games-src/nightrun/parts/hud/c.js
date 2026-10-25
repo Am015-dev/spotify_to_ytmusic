@@ -88,6 +88,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     const lb=P.over?'OVERHEAT':'HEAT',bwd=64*k;ctx.textAlign='right';ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle=P.over?'#ff3040':'#dcd8f6';ctx.fillText(lb,rx-bwd-5*k,32*k);
     ctx.fillStyle='#ffffff1a';ctx.fillRect(rx-bwd,25*k,bwd,7*k);ctx.fillStyle=P.over?(SET.reduce||BK(t,10)?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(rx-bwd,25*k,bwd*P.heat/100,7*k);}
   Object.assign(HUDLOG,{x:HUDX.vals()});
+  if(SET.auto){const hw2=Math.min(11*k,70*k/P.max),hid=P.max*(hw2+3*k)-3*k;ctx.textAlign='right';ctx.font=`700 ${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#ffffff99';ctx.fillText('AUTO-FIRE',w-pad-hid-26*k,13*k);}   // W242: the phone has no FIRE button: say that shooting is handled
   let ny=sH+6*k;
   const short=h*Math.max(.2,frame.clientWidth/w)<800;   // short phone (390x763 and below): the secondary HUD collapses to hull / score / meters + one thin boss bar, and the hint moves to the bottom band
   if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(330,w-120),by=short?ny+2*k:ny+12*k,bh=(short?5:6)*k;ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,by,bw,bh);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,by,bw*clamp(b.hp/b.max,0,1),bh);if(b.b2s&&window.B2X)B2X.sheen((w-bw)/2,by,bw*clamp(b.hp/b.max,0,1),bh);

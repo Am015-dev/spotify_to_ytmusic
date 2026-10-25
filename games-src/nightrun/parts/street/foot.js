@@ -521,6 +521,7 @@ function drawHud(c,vw,fs){const P=S.P,u=1/L.sc,m=10*u,hb=[],box=(x,y,w,h)=>hb.pu
   for(const k of PW_KEYS){const p=P.pw[k];if(!p)continue;const d=PICKUPS[k];c.fillStyle=d.c;c.fillText(d.ic+(d.max>1?p.lv:''),x,y);x+=40*u;}
   box(m,y,x-m,16*u);
   c.textAlign='right';c.fillStyle='#fff';const st=String(S.score),tt=fmtT(S.time);c.fillText(st,vw-62*u,m+4*u);c.fillStyle='#c9c3e6';c.fillText(tt,vw-62*u,m+24*u);
+  if(autoOn()){c.font='bold '+fs(10)+'px monospace';c.fillStyle='#ffffff99';c.fillText('AUTO-FIRE',vw-62*u,m+44*u);c.font='bold '+fs(15)+'px monospace';}   // W242: the phone has no FIRE button
   const sw=Math.max(c.measureText(st).width,c.measureText(tt).width);box(vw-62*u-sw,m+4*u,sw,36*u);
   const lo=m+(P.max*24+22)*u,hi=vw-62*u-sw-10*u,fw=Math.min(220*u,hi-lo);   // the fever bar sits between the hearts and the score
   if(fw>40*u){const fx=clamp(vw/2-fw/2,lo,hi-fw);c.fillStyle='#ffffff18';c.fillRect(fx,m,fw,8*u);c.fillStyle=S.feverT>0?'#ffd23a':'#ff2d95';c.fillRect(fx,m,fw*(S.feverT>0?S.feverT/8:S.fever/100),8*u);box(fx,m,fw,8*u);}

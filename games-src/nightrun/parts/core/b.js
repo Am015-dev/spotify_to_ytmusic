@@ -351,7 +351,7 @@ function update(dt){
   if(ST.on){ST.tick(dt);}
   else if(G.lab||G.tut){}                                        // the LAB stage: no waves, no district clock, no boss timer; the LAB panel decides what appears (lab.js)
   else if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;DIR.tick(dt);                 // the director schedules the waves on bar lines; it also decides when the boss comes
-    if(!G.preload&&G.dt>10){G.preload=true;const n=nextDi(G.di).di;loadTrack(stageFor(G.di,true));loadTrack(stageFor(n,false));}}
+    if(!G.preload&&G.dt>30){G.preload=true;loadTrack(stageFor(G.di,true));}}   // W242: the boss track only; the next district's track is fetched at the pit stop
   else if(!G.dead&&G.boss&&G.boss.mini&&!ST.on){G.dt+=dt;DIR.tick(dt);}
   if(G.transT>=0&&!ST.on){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});const nx=nextDi(G.di);if(nx.wrap)G.loop++;SH.pit(()=>enterDistrict(nx.di));}}
 

@@ -41,7 +41,7 @@ function facts(key){if(info[key])return info[key];const m=ART.ANIM.s[key],b=ART.
   return info[key]={fr,W,H};}
 V.facts=facts;V.info=info;V.ready=k=>!!ART.anim(k);V.has=k=>!!ART.ANIM.s[k];   // for the tests (ART is not on window)
 /* ----- painted street (the five street layers, no actors, no waves) ----- */
-const BG={};for(const n of ['sky','far','mid','near','floor']){const im=new Image();im.src='media/foot/bg-'+n+'.webp';BG[n]=im;}
+const BG={};for(const n of ['sky','far','mid','near','floor'])Object.defineProperty(BG,n,{get(){const im=new Image();im.src='media/foot/bg-'+n+'.webp';Object.defineProperty(BG,n,{value:im});return im;},configurable:true});   // W242: loaded when the LAB street view first draws, not at boot (1 MB)
 const still={};
 function street(g,W,H,road){g.fillStyle='#0a0612';g.fillRect(0,0,W,H);const ok=im=>im&&im.complete&&im.naturalWidth;
   if(ok(BG.sky)){const s=Math.max(W/BG.sky.naturalWidth,road/BG.sky.naturalHeight);g.drawImage(BG.sky,(W-BG.sky.naturalWidth*s)/2,road-BG.sky.naturalHeight*s,BG.sky.naturalWidth*s,BG.sky.naturalHeight*s);}

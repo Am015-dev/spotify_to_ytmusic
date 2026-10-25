@@ -18,9 +18,11 @@ window.FA=FA;
 /* ---- real pictures: ready.json lists the painted files; each is loaded once (a failed load is remembered and silently ignored) ---- */
 FA._base=()=>FA.base||(typeof ART!=='undefined'&&ART.base)||'media/';
 FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{if(typeof AFX!=='undefined')AFX.fixFoot(f,r);r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
-FA.ready=a=>{if(!Array.isArray(a))return;for(const f of a)if(typeof f==='string'&&f.indexOf('foot/')===0){FA._rd.add(f);FA._load(f);}};
+FA.ready=a=>{if(!Array.isArray(a))return;for(const f of a)if(typeof f==='string'&&f.indexOf('foot/')===0){FA._rd.add(f);if(FA._go&&FA._now.test(f))FA._load(f);}};   // W242: the street pictures (1 MB+) are fetched when the player starts ON FOOT (FA.go), not at boot
+FA._now=/^foot\/(bg-|sc-|pk-)/;   // the rest (a still per actor and pose, 25 MB) is fetched when it is first drawn
+FA.go=()=>{FA._go=true;for(const f of FA._rd)if(FA._now.test(f))FA._load(f);};
 FA.init=()=>{if(FA._init)return;FA._init=true;if(typeof fetch==='function')fetch(FA._base()+'ready.json').then(r=>r.json()).then(FA.ready).catch(()=>{}).then(()=>{FA._rdDone=true;});else FA._rdDone=true;};
-FA._pic=f=>{FA.init();const r=FA._im[f];return r&&r.ok?r.im:null;};
+FA._pic=f=>{FA.init();if(!FA._go&&window.FOOT&&FOOT.on)FA.go();if(FA._go&&!FA._im[f]&&FA._rd.has(f))FA._load(f);const r=FA._im[f];return r&&r.ok?r.im:null;};
 FA.has=(who,pose)=>!!FA._pic('foot/'+who+'-'+pose+'.webp');
 /* ---- helpers ---- */
 const shade=(hex,f)=>{const n=parseInt(hex.slice(1),16);return 'rgb('+Math.min(255,Math.round((n>>16)*f))+','+Math.min(255,Math.round(((n>>8)&255)*f))+','+Math.min(255,Math.round((n&255)*f))+')';};

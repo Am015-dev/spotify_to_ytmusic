@@ -82,7 +82,7 @@ if(RET.streetsong){
   {const f0=MP.foot;if(f0)MP.foot=function(){return ssFoot()?undefined:f0.apply(this,arguments);};}
   /* the hold also waits for the song file (an unloaded file played the synth first, then swapped on a bar line) */
   {const FQ=F.q,r0=FQ&&FQ.ready,p0=FQ&&FQ.pct;
-   const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return !!(TR.bufs[i.file]||TR.bad[i.file]);};
+   const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return true;};   // W242: asks for the file, never waits for it
    if(r0)FQ.ready=()=>r0()&&fileOk();if(p0)FQ.pct=()=>{const a=p0();return fileOk()?a:Math.min(a,99);};}}
 if(window.NR&&NR.on)NR.on('footStart',d=>{if(RET.streetsong&&ssOn()){S3.song=SSNG;MP.fbase=SSNG;MP.fk=SSNG;return;}if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
 /* ----- loading: the hold also waits for the painted street and the prop pictures (no placeholder backdrop, then a swap) ----- */
