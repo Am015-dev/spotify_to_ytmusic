@@ -78,3 +78,15 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
    (h) OWNER EXCEPTION (Alex, 24 Oct 21:35 UTC, "I allow"): on-foot actors (Kai and foes only, never backdrop or props) may get a
        code-drawn 2-3 px dark outline, a thin rim light and, on Kai only, a gentle lift of the darkest values, built once per frame and
        cached. The owner's art stays underneath; no flat tint over a whole sprite.
+18. CODE HYGIENE (owner, 25 Oct 2026: "the code is a huge mess, make it less of one"; evidence from W240/W241: a phone DPR set in three
+   places (core/b.js, street/foot.js layout, footq.js dprMax) disagreed and cost 15x speed; death ghosts aged by render time only, so
+   stepped runs kept dead foes on screen). Rules:
+   (a) One owner per behaviour: before adding a setting, grep for the existing one and change that line; never add a second cap, flag
+       or copy of the same calculation. Name the owner file in your report.
+   (b) Flags that have shipped (on by default for 3+ days) get their off-branch deleted in the same PR, not kept as `?flag=0` forks.
+   (c) One clock: game logic advances only through the fixed-step `update` (dt capped, stepped in <= 34 ms), never by render time.
+   (d) Generated files and probe output are never hand-edited; a probe that writes into a source folder is a bug.
+   (e) Each PR removes at least one dead branch, duplicate draw or stale flag from the files it touches, or says why not.
+   (f) Study other projects only where the licence lets you (MIT, BSD, Apache 2.0, CC-BY), and say which licence in the commit. Never
+       read, copy or mine code or assets from a commercial game, including unofficial dumps or ports; describe the effect the owner wants
+       and build it from our own or open-source code.
