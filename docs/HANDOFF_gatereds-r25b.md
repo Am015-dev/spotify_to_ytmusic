@@ -1,0 +1,7 @@
+# HANDOFF gatereds-r25b
+1. race/racefree "hands off 3 s" red = the GO, not src/98sc_stkcam.js: SKC_race only moves camera.position/fov and is never called by the GO's stepSim loop. Trace: the car was at hull 0 (never reset across 48 full-lock sweeps), died and respawned at the line (x=0, 30_race3 stepSim) in the hands-off phase (drift 11-16 m); also rivals on the start grid at d=80 shoved it (1.7-2.1 m). Fix in src/99crf_racefree_go.js: s.hull=100 per sweep, rivals sit out (eliminated) and are restored. stkcam=0 only looked better by chance of which sample/car came up.
+2. why/solid-cars (d) in src/99sc_solidcars.js: stale assert. (i) respawn half of a RD_unstack/DR_unjam recycle (1.4e7 m from the AYD_park spot, dz already 0) now takes the same exemption as the park half (e.us); (ii) a moving car > 60 m may step 3.5 m between samples (HT_cars cap/LOD, 70_roam_world perf-r13a); 2 m stays within 60 m.
+3. xf1/water, xf1/land: green on this trunk (3/3 runs), no change.
+4. Measured on BUILT page, phone profile: racefree 5/5 fra+ath, gate TAG=why,life1,xf1,terrain 78/78, unit 0 FAIL, solid-cars fra 4/4 after fix.
+5. Left: kerb-reach count varies 5/24..24/24 between runs (info only, n>=10 judged): one steer direction sometimes does not respond (known open item in HANDOFF_racefree-r24l.md).
+Read/reused: wiki index, game/tests-and-gates.md, game/traffic.md; GO owners 99crf_racefree_go.js and 99sc_solidcars.js (e.us exemption reused), stepSim, HT_cars, DR_unjam, AYD_park.

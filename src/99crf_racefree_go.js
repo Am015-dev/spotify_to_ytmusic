@@ -22,12 +22,14 @@ function RFG_city(R){const ev=tkWorldEvs()[0],m=ev&&tkMarkOf(ev),C=m&&tkCourseOf
   try{$('#spRes').hidden=true}catch(e){}try{if(RO.sp===sp)sprintEnd()}catch(e){}}
 function RFG_track(R){const tr=CID==='ath'?'akro':'grand';try{if(RO.sp)sprintEnd();chAbort()}catch(e){}RO.on=false;menuTab='quick';menuTrack=tr;quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;
   state='race';const tu=TOUCH.used,to=TOUCH.on;TOUCH.on=TOUCH.used=true;const s=pl,L=TD.L;let n=0,ok=0,drift=0,worst=1;
+  /* gatereds-r25b: the first sample (d=80) is inside the starting grid: rivals within 40 m shove the hands-off car (stepSim ship-ship push, 1.7-2.1 m seen). The test is about steering freedom, so the rivals sit out (stepSim skips eliminated ships) and are restored after. */
+  const rivals=ships.filter(o=>o!==s&&!o.eliminated);rivals.forEach(o=>{o.eliminated=true});
   try{for(let d=80;d<L-60&&n<24;d+=Math.max(20,L/24)){let lo=1e9,hi=-1e9,B=null;
-    for(const dir of[-1,1]){s.dist=d;s.x=0;s.v=s.stats.top0*.55;s.beta=0;s.yaw=0;s.yawRate=0;s.holdX=null;s.air=null;s.dead=0;s.wall=0;TOUCH.steer=dir;
+    for(const dir of[-1,1]){s.dist=d;s.x=0;s.v=s.stats.top0*.55;s.beta=0;s.yaw=0;s.yawRate=0;s.holdX=null;s.air=null;s.dead=0;s.wall=0;s.hull=100;/* gatereds-r25b: the hull was never reset: the wall hits of 48 full-lock sweeps wore it to 0, the car was destroyed and respawned at the line (x=0, 30_race3 stepSim) in the hands-off phase = 'drift back 11-16 m' (red ~1 run in 2 for the cars with a low hull, any camera). The test is about steering, not damage. */TOUCH.steer=dir;
       for(let i=0;i<300;i++){TOUCH.dir=TOUCH.target=TOUCH.steer=dir;stepSim();lo=Math.min(lo,s.x);hi=Math.max(hi,s.x);if(!i)B=R15_b(s,s.x)}
       const xr=s.x;let ln=false;for(let i=0;i<360;i++){TOUCH.dir=TOUCH.target=TOUCH.steer=0;stepSim();if(R15_inLane(s)||R15_mouth(s))ln=true}if(Math.abs(xr)>6&&!ln)drift=Math.max(drift,(s.x-xr)*Math.sign(-xr))}
     const W=B[1]-B[0];if(W>45)continue;n++;const r=(hi-lo)/W;worst=Math.min(worst,r);if(r>=.9)ok++}}
-  finally{TOUCH.dir=TOUCH.target=TOUCH.steer=0;TOUCH.used=tu;TOUCH.on=to}
+  finally{rivals.forEach(o=>{o.eliminated=false});TOUCH.dir=TOUCH.target=TOUCH.steer=0;TOUCH.used=tu;TOUCH.on=to}
   R.push([`race mode ${tr}, touch: kerb to kerb >= 90 % on ${ok}/${n} samples (worst ${(worst*100).toFixed(0)} %; info: after a city race in the same page one steer direction can stop responding in this test, open in docs/HANDOFF_racefree-r24l.md)`,n>=10]);
   R.push([`hands off 3 s at the kerb: drift back to the line ${drift.toFixed(1)} m (<= 2)`,drift<=2])}
 (function RFG_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='race'&&q.id==='racefree'))C.items.push({ver:'race',id:'racefree',area:'race',text:'racefree-r24l · race/racefree: city races: rivals on the road, steady chase camera, soft course bounds (BACK TO TRACK + respawn); race mode: whole street width with touch, no snap back to the line'});
