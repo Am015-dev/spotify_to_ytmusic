@@ -146,17 +146,24 @@ ART.LOOPA=new Set(['idle','run','flame','glow','loop','spin','hover']);   // eve
 ART.VS={};ART.VB={};     // tinted copies of enemy-ship sheets (foeart.js): meta and strip, kept out of ART.ANIM.s / ART.rd so the listed-sheet counts stay the real files
 ART.aS=key=>{let o=ART.as[key];if(o!==undefined)return o;const m=ART.ANIM.s[key]||ART.VS[key];if(!m)return ART.as[key]=null;   // per-sheet record, built once: cumulative frame end times (smoothing.json holds at the sheet fps)
   const act=key.slice(key.lastIndexOf('/')+1),hd=ART.ANIM.sm.holds[act],n=m[0],cum=new Float32Array(n);let s=0;for(let i=0;i<n;i++){s+=(hd&&hd.length===n?hd[i]:1)/m[1];cum[i]=s;}
-  return ART.as[key]={m,act,cum,tot:s,loop:ART.LOOPA.has(act),xf:ART.ANIM.sm.crossfade.actions.indexOf(act)>=0};};
+  const sx=RET.smooth&&n>1&&n<=6&&m[1]<12&&ART.SMA.has(act)&&!/^(fx|wpn)-/.test(key);   // W253 RET.smooth: slow, short, continuous strips blend into the next frame for their whole frame time (fx, muzzle, hits, attacks stay crisp)
+  return ART.as[key]={m,act,cum,tot:s,loop:ART.LOOPA.has(act),xf:sx||(!RET.smooth||!/^(muzzle|impact|burst)$/.test(act))&&ART.ANIM.sm.crossfade.actions.indexOf(act)>=0,sx,pp:sx&&n>2&&(act==='idle'||act==='hover')?-1:0};};
+ART.SMA=new Set(['idle','hover','walk','fly','glow','loop','spin','flame','run','block','heal']);
+ART.aDir=1;
+ART.ppOpen=(o,im)=>{o.pp=0;try{const n=o.m[0],w=o.m[2],h=o.m[3],cv=document.createElement('canvas');cv.width=16;cv.height=32;const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0,w,h,0,0,16,16);g.drawImage(im,(n-1)*w,0,w,h,0,16,16,16);
+  const d=g.getImageData(0,0,16,32).data;let e=0;for(let j=0;j<16*16*4;j++)e+=Math.abs(d[j]-d[j+16*16*4]);o.pp=e/(16*16*4)>6?1:0;}catch(_){}};   // mean per-channel difference between frame 0 and the last frame: closed (<= 6 of 255) loops stay forward
 /* the decoded strip for key ('boss-kronos/idle'), or null while it loads / when it is not listed in ready.json / with the flag off */
 ART.anim=key=>{if(!RET.sprites)return null;if(ART.VB[key])return ART.VB[key];const n='anim/'+key+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return null;const b=ART.bm[n];if(b)return b;if(!(n in ART.bm))ART.load(n);return null;};
 /* frame index at t seconds since the act began */
-ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;if(!o)return 0;const n=o.m[0];let u=t>0?t:0;
-  if(o.loop)u%=o.tot;else if(u>=o.tot){ART.aDone=true;ART.aP=1;return n-1;}
+ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;ART.aDir=1;if(!o)return 0;const n=o.m[0];let u=t>0?t:0;
+  if(o.pp===1&&o.loop){u%=o.tot*2;if(u>o.tot){u=o.tot*2-u;ART.aDir=-1;}}   // W253 ping-pong (0,1,2,3,2,1) for an idle whose last frame does not close onto its first (o.pp: 1 = open, set by ART.ppOpen)
+  else if(o.loop)u%=o.tot;else if(u>=o.tot){ART.aDone=true;ART.aP=1;return n-1;}
   for(let i=0;i<n;i++)if(u<o.cum[i]){const a=i?o.cum[i-1]:0;ART.aT=u-a;ART.aP=ART.aT/(o.cum[i]-a);return i;}
   return n-1;};
 /* one cell, its anchor on x,y; sc = world units per sheet px; flip mirrors around the anchor; sy = extra vertical squash about the anchor; idle / flame cross-fade into the next frame (smoothing.json) */
-ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return false;const i=ART.aframe(key,t),p=ART.aP,m=o.m,w=m[2],h=m[3],sv=sc*(sy||1),X=ART.ANIM.sm.crossfade,
-    cf=o.xf&&p>X.from&&(o.loop||i+1<m[0])?(p-X.from)/(1-X.from)*X.max_alpha:0,ga=c.globalAlpha;
+ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{let q;const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return false;if(o.pp===-1)ART.ppOpen(o,b0);
+  const i=ART.aframe(key,t),p=ART.aP,m=o.m,w=m[2],h=m[3],sv=sc*(sy||1),X=ART.ANIM.sm.crossfade,dr=ART.aDir,nx=o.pp===1?i+dr:(i+1)%m[0],
+    cf=o.sx?(nx>=0&&nx<m[0]?(q=dr<0?1-p:p,q*q*(3-2*q)):0):o.xf&&p>X.from&&(o.loop||i+1<m[0])?(p-X.from)/(1-X.from)*X.max_alpha:0,ga=c.globalAlpha;
   let b=b0,cw=w,ch=h;const fo=c.canvas&&c.canvas.id==='footC',ts=sc*(fo?Math.hypot(c.getTransform().a,c.getTransform().b):S);   // footq: the on-foot canvas has its own scale (not the fly S): the copy is made at the real device-pixel size, never a small copy blown up       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
   if(ts<(fo?.9:.75)){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
     if(!q){ch=Math.max(1,Math.round(h*cw/w));const cv_=document.createElement('canvas');cv_.width=cw*m[0];cv_.height=ch;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*cw,0,cw,ch);q=ART.sc[k]={c:cv_,h:ch};}
@@ -164,7 +171,7 @@ ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(ke
   if(flip){c.save();c.translate(x,y);c.scale(-1,1);x=0;y=0;}
   const dx=x-m[4]*sc,dy=y-m[5]*sv;if(al!=null)c.globalAlpha=al*ga;
   c.drawImage(b,i*cw,0,cw,ch,dx,dy,w*sc,h*sv);
-  if(cf>0){c.globalAlpha=(al==null?1:al)*ga*cf;c.drawImage(b,((i+1)%m[0])*cw,0,cw,ch,dx,dy,w*sc,h*sv);}
+  if(cf>0){c.globalAlpha=(al==null?1:al)*ga*cf;c.drawImage(b,nx*cw,0,cw,ch,dx,dy,w*sc,h*sv);}
   if(flip)c.restore();c.globalAlpha=ga;return true;};
 ART.gh=[];      // clips that outlive their object (boss defeat, ship death): {key,x,y,k,t}
 ART.ghosts=()=>{const g=ART.gh;for(let i=g.length-1;i>=0;i--){const q=g[i],o=ART.aS(q.key);q.t+=FD;if(!o||q.t>o.tot+.2){g.splice(i,1);continue;}ART.drawAnim(ctx,q.key,q.t,q.x,q.y,q.k,false);}};

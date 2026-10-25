@@ -26,7 +26,7 @@ const FEEL=F.FEEL={
    (foot.js fire) and Kai's hurt shove is 170 u/s x 0.35 s = 60 units. */
 if(RET.hitfeel===undefined)RET.hitfeel=!/[?&]hitfeel=0/.test(location.search);
 F.hitFeel=function(e,d,src){if(!RET.hitfeel||!src||src.kind==='fire'||(!src.kind&&!src.melee&&d<1))return;
-  const heavy=e.hp<=0||d>=2;const ms=heavy?100:d<1?33:50;if(!F.S.sim)IN.hitstop(ms);F.S.hf=Math.max(F.S.hf||0,ms/1000);   // headless sim() only records the freeze (S.hf): applying it would change how often a bot samples, not the game
+  const heavy=e.hp<=0||d>=2;const ms=heavy?100:d<1?33:50;if(!F.S.sim)IN.hitstop(ms,e,F.S.P);F.S.hf=Math.max(F.S.hf||0,ms/1000);   // headless sim() only records the freeze (S.hf): applying it would change how often a bot samples, not the game
   if(e.boss||e.hp<=0||src.kb||/^(wind|charge|crouch|lunge|pop|stun)$/.test(e.state))return;   // committed attacks and stuns do not rock back
   e._kbd=(src.melee?Math.sign(e.x-src.x)||1:Math.sign(src.vx)||1)*clamp(10*d,4,16);e._kbt=F.S.time;F.FEEL.log.kb++;};   // a drawn recoil that eases back in 0.14 s: a real shove made the dodge bot clear 100% (was 86%), see HANDOFF-W169.md
 /* ===== W187 OVERDRIVE (?overdrive=1, off by default; STREET-REVIEW 24 Oct, task 4): the meter fills +1 per landed hit and +4 per kill and drops to 0 on a hurt; when it is full BOMB

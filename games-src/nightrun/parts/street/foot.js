@@ -98,7 +98,8 @@ const viewW=()=>L?L.vw:960;
 function note(t,s){S.note={t:s||2.2,txt:t};}
 function pop(x,y,t,c,big){S.pop.push({x,y,t,c:c||'#fff',l:big?1.4:.9,m:big?1.4:.9,big:!!big});if(S.pop.length>40)S.pop.shift();}
 function ftBurst(x,y,c,n,sp){if(S.fx.length>260)return;for(let i=0;i<n;i++){const a=ftRnd(0,6.283),v=ftRnd(.3,1)*(sp||260);S.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-80,l:ftRnd(.25,.6),c,r:ftRnd(2,4)});}}
-function hitstop(ms){if(!RET.juice||reduce())return;S.hs=Math.max(S.hs,ms/1000);}
+function hitstop(ms,a,b){if(!RET.juice||reduce())return;if(RET.smooth&&!S.sim&&a){const h=Math.min(ms,66)/1000;for(const x of[a,b])if(x)x.hs=Math.max(x.hs||0,h);return;}   // W253 RET.smooth: a hit freezes only the actors named (2-4 frames), the world keeps moving
+  S.hs=Math.max(S.hs,ms/1000);}
 function ftShake(v){if(reduce())return;S.shake=Math.max(S.shake,window.COM?COM.sk(v):v);}
 const SFXID={shot:'f_shot',hit:'f_hit',pick:'f_pick',big:'f_big',hurt:'f_hurt',dash:'f_dash',graze:'f_graze',warn:'f_warn',up:'f_up',tier:'f_fever'};   // LAB (ON FOOT group of the SOUND page): each on-foot sound has its own switch
 // 22 Oct: 'window.AU' is undefined (AU is a script-level const), so these three calls never ran: no on-foot sound, no stage song. They use AU directly now, each behind its ON FOOT switch.
@@ -157,7 +158,7 @@ function dmgE(e,d,src){if(!hittable(e))return;const k=(S.P.pw.dbl?[1,2,2.4,2.8][
 function ftKill(e){e.dead=true;S.kz=e.z;const d=e.def,beat=ftOnBeat(),fv=S.feverT>0;let sc=Math.round((d.score||100)*(fv?2:1)*(beat?1.5:1));S.score+=sc;S.kills++;
   pop(e.x,e.y-e.h-8,'+'+sc+(beat?' BEAT':''),beat?'#ffd23a':'#fff');ftBurst(e.x,e.y-e.h/2,d.c||'#f46',e.boss?40:12,e.boss?420:260);if(e.boss)AH.ftPush(S.fx,'fx-boom-ground-dust',e.x,e.y-20,200,.6);else AH.ftPush(S.fx,'fx-ft-blood-spark',e.x,e.y-e.h/2,70,.3);
   if(!fv)S.fever=Math.min(100,S.fever+(beat?14:6));if(S.fever>=100&&S.feverT<=0){S.feverT=8;S.fever=0;note('FEVER!',1.6);sfx('tier');}
-  if(e.boss||e.w>60){hitstop(e.boss?60:30);ftShake(e.boss?14:6);}sfx(e.boss?'big':'hit');
+  if(e.boss||e.w>60){hitstop(e.boss?60:30,S.P);ftShake(e.boss?14:6);}sfx(e.boss?'big':'hit');
   try{d.onDeath&&d.onDeath(e,env);}catch(x){}
   if(e.ext&&Array.isArray(e.dropList)){for(const k of e.dropList)if(PICKUPS[k])drop(k,e.x,e.y-e.h/2);}
   else{const ch=e.boss?1:(e.w>40?.6:.16);if(Math.random()<ch){const L=(d.drops&&d.drops.length?d.drops:DROPS).filter(k=>PICKUPS[k]);if(L.length)drop(L[Math.floor(Math.random()*L.length)],e.x,e.y-e.h/2);}}
@@ -207,7 +208,7 @@ function ftHurt(n,fromX,src,b){const P=S.P;if(P.dashIF>0&&P.inv<=0&&!S.win&&P.hp
 
   if(P.pw.shield&&P.pw.shield.lv>0){P.pw.shield.lv--;if(!P.pw.shield.lv)delete P.pw.shield;P.inv=.6;pop(P.x,P.y-80,'BLOCK','#5ad1ff');if(window.FTX)FTX.ev('block');sfx('graze');return false;}
   P.hp-=n*S.D.dmg;S.hurts++;(S.hlog=S.hlog||[]).push(src||'?');P.inv=1.3;P.hurtT=.35;P.vx=0;P.vy=-280;P.onGround=false;P.kx=(P.x<(fromX==null?P.x+1:fromX)?-1:1)*(RET.hitfeel?170:240);
-  sfx('hurt');ftShake(8);hitstop(40);ftBurst(P.x,P.y-40,'#ff4060',10);
+  sfx('hurt');ftShake(8);hitstop(40,P);ftBurst(P.x,P.y-40,'#ff4060',10);
   if(P.w!=='pistol'){const nl=P.lv-1;if(nl<1){pop(P.x,P.y-96,WEAPONS[P.w].n+' LOST','#ff4060');setW(P,'pistol',1,Infinity,false);}else{setW(P,P.w,nl,P.ammo,false);pop(P.x,P.y-96,WEAPONS[P.w].n+' LV'+nl,'#ff4060');}}
   if(P.hp<=0){P.hp=0;S.dead=1.4;note('DOWN',2);NR.emit('footDown',{stage:S.id});}
   return true;}
@@ -220,6 +221,7 @@ function boom(x,y,rad,dmg){AH.ftPush(S.fx,'fx-ft-rocket-hit',x,y,rad*2.4,.35);if
 function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x,p.y-p.h/2,p.c,14);S.score+=50;pop(p.x,p.y-p.h,'+50','#ccc');const D=p.dr||PROPD[p.k].dr;S.kz=p.z;if(D.length)drop(D[p.i%D.length],p.x,p.y-p.h/2);if(p.onBreak)p.onBreak(p);sfx('hit');}}   // street2: p.dr = own rewards ([] = none), p.onBreak = debris / blast
 
 function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.min(FL,P.y+P.vy*dt);return;}
+  if(P.hs>0){P.hs-=dt;dt*=.05;}   // W253 per-actor hit-stop: Kai crawls (input still read) while the freeze lasts
   const mx=I.r?1:I.l?-1:(Math.abs(I.x)>.25?clamp(I.x*1.4,-1,1):0),spdLv=P.pw.speed?P.pw.speed.lv:0,spd=230*(1+.15*spdLv);
   P.crouch=!RET.belt&&P.onGround&&(I.d||I.y>.6)&&P.dash<=0;
   if(RET.belt){const mz=I.d?1:I.u?-1:(Math.abs(I.y)>.25?clamp(I.y*1.4,-1,1):0);P.z=clamp((P.z==null?.6:P.z)+mz*ZSPD*dt,0,1);if(mz)P.zm=(P.zm||0)+Math.abs(mz)*dt;}   // belt: up/down = into / out of the street
@@ -282,7 +284,7 @@ function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
     spawn('grunt',Math.random()<.5&&!RET.fairstreet?S.camX-40:edge+40,null,{fb:1});if(P.idle>16)spawn('gunman',edge+40,null,{fb:1});}}   // built-in walkers: they always come to you
 function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&&RET.asW())||1)*(S.st.hook&&S.st.hook.agg?S.st.hook.agg(S):1);
   envG();
-  for(const e of S.E){if(e.dead){if(e.ext&&!e.remove){e.dt_=(e.dt_||0)+edt;try{e.def.ai(e,edt,env);}catch(x){e.remove=true;}if(e.dt_>1.2)e.remove=true;}continue;}e.t+=edt;if(e.flash>0)e.flash-=dt;if(e.grace>0)e.grace-=edt;if(e.tele>0)e.tele-=edt;
+  for(const e of S.E){if(e.dead){if(e.ext&&!e.remove){e.dt_=(e.dt_||0)+edt;try{e.def.ai(e,edt,env);}catch(x){e.remove=true;}if(e.dt_>1.2)e.remove=true;}continue;}if(e.hs>0){e.hs-=dt;continue;}e.t+=edt;if(e.flash>0)e.flash-=dt;if(e.grace>0)e.grace-=edt;if(e.tele>0)e.tele-=edt;
     try{e.def.ai(e,edt,env);}catch(x){if(!e._err){e._err=1;console.warn('foot ai',e.id,x);}e.def=fbDef(e.id);}
     if(!e.ext){if(!e.fly)e.vy+=GRAV*edt;e.x+=e.vx*edt;e.y+=e.vy*edt;}   // W3's ai moves its enemies itself
     if(!e.fly&&e.y>=FL){e.y=FL;e.vy=0;e.onGround=true;}
