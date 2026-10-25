@@ -68,8 +68,24 @@ function RM_close(R){K.ShiftLeft=K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=K.Arr
 async function RM_all(cap=300){const out=[],L=RM_list();for(let i=0;i<L.length;i++){let R;try{R=RM_open(i);await new Promise(r=>setTimeout(r,1500));RM_seen(R);if(R.w)RM_drive(R,cap)}catch(e){R=R||{n:L[i].n};R.threw=String(e).slice(0,140)}out.push(RM_close(R))}RMG.out=out;return out}
 const RM_row=R=>`${R.ok?'✓':'✗'} ${R.n}${R.picked?'':' [started '+R.got+']'}${R.fin?'':' not finished'}${R.stuck?' stuck '+R.stuck:''}${R.riv?'':' rivals '+R.rivN}${R.fly?' fly':''}${R.sink?' sink':''}${R.camOk===false?' cam':''}${R.err?' err '+R.err:''}${R.threw?' threw '+R.threw:''}`;
 async function RM_go(){const o=await RM_all(),bad=o.filter(r=>!r.ok);return`📍 RACE MODE ALL · ${o.length-bad.length}/${o.length} races OK · ${(bad.length?bad:o.slice(0,3)).map(RM_row).join(' · ')} → ${bad.length?'❌ FAIL':'✅ PASS'}`}
+// racehud-r25c: GO race/one-speedo. Every race of the menu (same list and menu path as racemode-all), 6 s of bot driving, then the HUD refreshed once: exactly ONE speed readout is visible
+// (a leaf element with the unit KPH / KM/H / MPH; a race-mode race owns #spd, a city course owns #roamGauge) and its number is the car's real speed (+-10 %, at least 8 km/h)
+function RM_vis(e){if(!e)return false;const r=e.getBoundingClientRect();if(r.width<1||r.height<1)return false;for(let q=e;q;q=q.parentElement){const c=getComputedStyle(q);if(c.display==='none'||c.visibility==='hidden'||+c.opacity===0)return false}return true}
+function RM_speedos(){const o=[];for(const e of document.querySelectorAll('body *')){if(e.children.length||/^(STYLE|SCRIPT)$/.test(e.tagName))continue;if(/^\s*(KM\/H|KPH|MPH)\s*$/i.test(e.textContent)&&RM_vis(e))o.push(e)}return o}
+async function RM_speedo(){const L=RM_list(),bad=[];let n=0,moved=0;
+  for(let i=0;i<L.length;i++){let R,why='';try{R=RM_open(i);await new Promise(r=>setTimeout(r,1500));RM_seen(R);if(!R.w){bad.push(L[i].n+' not started');continue}
+    let vmax=0;for(let k=0;k<3;k++){RM_drive(R,2);vmax=Math.max(vmax,Math.abs(R.w.city?RO.v:pl.v))}
+    if(R.w.city)roamHud();else updHud();
+    const S=RM_speedos(),city=!!R.w.city,real=Math.round(Math.abs(city?RO.v:pl.v)*3.6),root=document.getElementById(city?'rgSpd':'spd'),shown=parseInt(root?root.textContent:'',10);
+    if(S.length!==1)why='speedos '+S.length+' ('+S.map(e=>(e.parentElement.id||e.id||e.tagName)).join(',')+')';
+    else if(!RM_vis(root)||!(Math.abs(shown-real)<=Math.max(8,real*.1)))why='shows '+shown+' real '+real+(RM_vis(root)?'':' (owner hidden)');
+    if(vmax*3.6>10)moved++;n++}catch(e){why='threw '+String(e).slice(0,80)}
+    try{if(R)RM_close(R)}catch(e){}if(why)bad.push(L[i].n+': '+why)}
+  return`📍 ONE SPEEDO · ${n-bad.length}/${L.length} races show exactly 1 speedo with the real speed (${moved} moving)${bad.length?' · '+bad.slice(0,4).join(' · '):''} → ${bad.length||moved<n-2?'❌ FAIL':'✅ PASS'}`}
 window.addEventListener('error',()=>RMG.errs++);
 window.__rm={list:()=>RM_list().map(q=>q.n),open:i=>(RMG.cur=RM_open(i),1),what:()=>{const R=RM_seen(RMG.cur);return{n:R.n,picked:R.picked,got:R.got}},drive:s=>{if(RMG.cur.w)RM_drive(RMG.cur,s);else RMG.cur.end=1;return{st:RMG.cur.st,end:!!RMG.cur.end}},close:()=>RM_close(RMG.cur),all:RM_all,go:RM_go,G:RMG,ev:src=>eval(src)};   // ev: probes (module scope)
 (function RM_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='race'&&q.id==='racemode-all'))C.items.push({ver:'race',id:'racemode-all',area:'race',text:'racemode-r25a · race/racemode-all: every race of the race menu (each Race track, Cup, Time trial, Zone, Arena, Derby, Crash Jct, Daily, World rivals) starts the race that was picked through the real menu buttons, the human-like bot finishes it with no stuck spot, every rival finishes on its wheels, the camera does not pump, no page errors'});
+  if(!C.items.some(q=>q.ver==='race'&&q.id==='one-speedo'))C.items.push({ver:'race',id:'one-speedo',area:'race',text:'racehud-r25c · race/one-speedo: every race of the race menu shows exactly one speedo (KPH / KM/H) and its number is the real car speed'});
+  C.GO['race/one-speedo']=[{c:'fra',n:'One speedo (Frankfurt)',secs:400,fn:()=>RM_speedo()},{c:'ath',n:'One speedo (Athens)',secs:400,fn:()=>RM_speedo()}];
   C.GO['race/racemode-all']=[{c:'fra',n:'Race menu (Frankfurt)',secs:600,fn:()=>RM_go()},{c:'ath',n:'Race menu (Athens)',secs:600,fn:()=>RM_go()}];return}
  if(i<600)setTimeout(()=>RM_reg(i+1),100)})(0);

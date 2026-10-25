@@ -1,0 +1,5 @@
+racehud-r25c: one speedo in every race-mode race (Frankfurt + Athens).
+Root cause: a race started from the menu while the roam HUD was still shown (the menu path of the race triage, toMenu keeps #roam) left #roamGauge ("0 KM/H", never updated) visible beside the race HUD #spd. Fix: startRace (src/72_roam_map_loop_boot.js) hides #roam; the owners stay as they were (#spd via updHud in race mode, #rgSpd via roamGauge in roam).
+GO race/one-speedo (src/99crm_racemode_go.js): per race counts visible KPH/KM/H/MPH leaves (must be 1) and checks the shown number vs the real speed. Before: 0/23 fra (2 speedos: spd + roamGauge); after: fra 23/23, ath 19/19 PASS. Shot docs/shots/racehud/grandprix_fra_one_speedo.jpg.
+Left: nothing for this lane; a city course (sp.tk) still uses #roamGauge as its only speedo (counted by the same GO).
+Read/reused: docs/wiki/index.md, game/races-and-tracks.md, learn/stk.md, src/MAP.md; reused updHud/hudEl.spd (40_hud_input_menu.js), roamGauge/roamHud (71_roam_drive.js), RM_list/RM_open/RM_drive (99crm_racemode_go.js); no new speedo written.
