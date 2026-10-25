@@ -32,3 +32,28 @@ into the game) is on our side; you only upload, generate, download.
 
 ## Pass checks (we run them)
 First/last frames identical to the originals; neighbouring-frame silhouette overlap >= 85%; colour drift < 6 per channel; foot line within 2 px; no fringe.
+
+## Image-generator method (owner's suggestion, 25 Oct): sprite technique with the IMAGE tool, no video
+Use Flow's image generation (or the Gemini image model, whichever your Flow lists for images). Images give a transparent-friendly flat background and
+a real frame per generation, so there is no video-to-frame extraction. The risk is that each frame drifts, so ALWAYS attach the existing frames
+as references and generate them in small steps.
+
+### I1. One in-between at a time (most consistent)
+1. Attach kai-idle-1.png and kai-idle-2.png as the two reference images.
+2. Prompt:
+   > Same character as both reference images, same design, colours, proportions, outline weight, camera and scale, same plain white background, same ground line. Draw ONE new frame of the animation that sits exactly halfway between reference image 1 and reference image 2 (a pose between them, not a copy of either). Square 1:1, character centred, feet on the same line as the references, no text, no shadow.
+3. Generate 4 takes; keep the one whose silhouette sits between the two references. For 3 in-betweens per pair, repeat with (1, halfway) then (halfway, 2) as the references.
+4. Name the files kai-idle-1b.png, kai-idle-1c.png ... in playing order.
+
+### I2. A whole row in one image (fastest, check drift)
+1. Attach all four kai-idle-N.png frames as references.
+2. Prompt:
+   > A sprite-sheet row for a 2D game: 8 frames of the same character in a single horizontal strip, equal square cells, plain white background, no borders, no text. Frames 1, 3, 5, 7 are exactly the four reference poses in order; frames 2, 4, 6, 8 are the smooth in-between poses (frame 8 leads back into frame 1). Same character, colours, outline, scale and ground line in every cell.
+3. Slice into cells on our side. Reject the row if a reference-pose cell is not a copy of its reference.
+
+### Which poses to do first
+Run, hit, melee, dash, jump and the boss attack: poses differ, so the in-between matters. Idle: ask for a larger gentle breath (shoulders and jacket move more) because the originals barely differ.
+
+### Pass checks (we run them)
+Original frames come back pixel-identical (we paste the originals back and keep only the NEW frames); neighbouring-frame silhouette overlap >= 85%;
+colour drift < 6 per channel; foot line within 2 px; no fringe. If a method fails these three times in a row, use the other one.
