@@ -1,0 +1,28 @@
+// review rev24: mem/no-reload on the phone profile (6x) in one city + stale-envMap check + rebuild timings + shot.
+// node memrev.js <base url> <city> <outdir>
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
+const [BASE,C,OUT]=process.argv.slice(2);fs.mkdirSync(OUT,{recursive:true});
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info','--js-flags=--expose-gc']});
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+ const p=await ctx.newPage();const EV=(fn)=>p.evaluate(c=>__xc.ev(c),'('+fn.toString()+')()');p.setDefaultTimeout(1800000);const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));let navs=0;p.on('framenavigated',f=>{if(f===p.mainFrame())navs++});
+ await p.goto(BASE+'?test='+C+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});
+ const cdp=await ctx.newCDPSession(p);await cdp.send('Emulation.setCPUThrottlingRate',{rate:6});
+ await EV(()=>{const R=window.__rev={reb:[],keys:[],freed:0};const G=__gl.GL;
+  if(typeof GL_free==="function"){const f0=GL_free;GL_free=function(t){if(t){t.userData.freed=1;R.freed++}return f0(t)}};
+  const e0=GL_env;GL_env=function(){const n=G.n,t=performance.now(),r=e0();if(G.n>n){R.reb.push(+(performance.now()-t).toFixed(1));R.keys.push(G.id)}return r};
+  R.on=G.on;R.env=!!scene.environment;R.low=typeof lowGfx!=='undefined'?lowGfx:null});
+ const line=await EV(()=>new Promise(res=>XC_need('99c4_mem').then(()=>{const r=MEM1_go('no-reload',s=>{if(/[✅❌]/.test(s))res(s)});if(r&&/[✅❌]/.test(r))res(r)})));
+ // stale check: any material anywhere pointing at a freed env
+ const st=await EV(()=>{let mats=0,stale=0,ex='';const ck=m=>{if(!m)return;mats++;if(m.envMap&&m.envMap.userData&&m.envMap.userData.freed){stale++;ex=ex||m.name||m.type}};
+  scene.traverse(o=>{if(o.material)[].concat(o.material).forEach(ck)});if(HUB&&HUB.cim)for(const k in HUB.cim){const im=HUB.cim[k];if(im)[].concat(im.material).forEach(ck)}
+  for(const m of __gl.GL.mats)ck(m);const R=__rev;return{mats,stale,ex,freed:R.freed,n:__gl.GL.n,cached:__gl.GL.C.size,on:R.on,env:R.env,low:R.low,tex:renderer.info.memory.textures,reb:R.reb,keys:R.keys}});
+ // forced rebuilds with a GPU sync (readPixels) so software-GL execution time is included (upper bound vs a real GPU)
+ const forced=await EV(()=>{const G=__gl.GL,gl=renderer.getContext(),px=new Uint8Array(4),sync=()=>gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px),o=[];
+  for(let i=0;i<5;i++){sync();const id=G.id;G.C.delete(id);G.id='';const t=performance.now();GL_env();sync();o.push(+(performance.now()-t).toFixed(1))}GL_apply();return o});
+ // shot: player car after the run, chase cam, 852x393
+ await cdp.send('Emulation.setCPUThrottlingRate',{rate:1});
+ await EV(()=>{for(let i=0;i<60;i++){K.ArrowUp=true;roamStep(1/30)}K.ArrowUp=false;for(let i=0;i<20;i++)roamStep(1/30);GL_apply();__tq.draw();__tq.draw()});
+ await p.screenshot({path:OUT+'/glossy_'+C+'.jpg',type:'jpeg',quality:80,scale:'css'});
+ const s=st.reb.slice().sort((a,b)=>a-b);
+ console.log(JSON.stringify({city:C,line,navs,errs:errs.slice(0,5),stale:st.stale,staleEx:st.ex,mats:st.mats,freed:st.freed,built:st.n,cached:st.cached,on:st.on,env:st.env,low:st.low,rebuilds:s.length,rebMed:s[s.length>>1],rebMax:s[s.length-1],forcedSync:forced,keys:st.keys.slice(0,6)}));
+ await b.close()})().catch(e=>{console.log('ERR '+e);process.exit(1)});
