@@ -122,3 +122,12 @@ Model and status come from the session list. Cost is blank: the session list doe
 | lowmem-r24h | — | Opus | stopped for visible work; -24/-35 % GPU est WIP | parked |
 | look2k-r3 | beta.161 | Opus | code-text popup root fix, dark roads, glow | shipped |
 | racefree-r24l | beta.161 | Opus | full street, grounded rivals, race bounds | shipped |
+| racemode-r25a review x2 | beta.164 | Opus | Race Mode 42/42 reviewed (FAIL then PASS) | shipped |
+| racehud-r25c | beta.164 | Sonnet | one speedo in races | shipped |
+| reload-r25d/e | beta.164 | Opus | iPhone reload: car env leak fixed; Athens heap open | shipped (part) |
+| gatereds-r25b | beta.164 | Sonnet | racefree GO fixed; solid-cars loosening rejected | shipped (part) |
+| trafficpop-r25h | beta.164 | Sonnet | far traffic no longer jumps | shipped |
+| hr-boot-mstart | beta.164 | Sonnet | PLAY to driving, short mission start (~$2.40) | shipped |
+| hitrun study + gap plan | — | Sonnet+Opus | docs/wiki/learn/hit-and-run.md, docs/HITRUN_GAP.md | docs |
+| drivefeel-r25g + phonedrift-r25i | — | Opus+Sonnet | review FAIL, reverted | reverted |
+| hr-hit + drivefix-r25k | — | Opus+Sonnet | stopped by Alex (~$7.60 + $1.50) | stopped |
