@@ -69,7 +69,7 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);this.bg(true,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
     else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
     ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-    const sh=G.shake;ctx.save();if(sh)ctx.translate(rnd(-sh,sh)*.5,rnd(-sh,sh)*.5);
+    const sh=G.shake,gs=RET.grain&&sh?GRAIN.shake(sh,performance.now()/1000):null;ctx.save();if(gs)ctx.translate(gs[0],gs[1]);else if(sh)ctx.translate(rnd(-sh,sh)*.5,rnd(-sh,sh)*.5);
     if(!PT)this.bg(false,G.scroll);
     this.pickups(t);
     FOEART.fr++;for(const e of G.en)if(!this.foe(e,t))drawEnemy(e,t);   // bosses / gate pylons: the old draw (no single sheet here yet)
@@ -80,5 +80,5 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     this.player(t);
     if(G.empT>0)AH.pic('fx-pw-bomb-pulse',(0.6-G.empT)*2800,P.x,P.y,0,Math.min(1,G.empT*2.2));
     ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-    if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(wcv,0,0);ctx.imageSmoothingEnabled=true;ctx.setTransform(VS,0,0,VS,0,0);if(running&&!HUDOFF)drawHUDP(t);}
-    else if(running&&!HUDOFF){drawHUD(t);PW.hud(t);}}};
+    if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(wcv,0,0);ctx.imageSmoothingEnabled=true;ctx.setTransform(VS,0,0,VS,0,0);GRAIN.draw(ctx,cv.width,cv.height,t);if(running&&!HUDOFF)drawHUDP(t);}
+    else{GRAIN.draw(ctx,cv.width,cv.height,t);if(running&&!HUDOFF){drawHUD(t);PW.hud(t);}}}};
