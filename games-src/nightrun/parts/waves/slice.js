@@ -50,7 +50,7 @@ const SL=window.SL={
     if(S.gi>=L.g.length&&L.loop&&bar>=L.loop[1]){S.gi=L.g.findIndex(g=>g[0]>=L.loop[0]);S.off+=L.loop[1]-L.loop[0];}
     let on=0;for(const e of G.en)if(e.type!=='boss'&&e.hp>0&&!e.dead)on++;
     for(let k=S.q.length-1;k>=0;k--){const q=S.q[k];if(q.b>i)continue;if(on>=this.CAP){q.b=i+1;continue;}on++;S.q.splice(k,1);
-      if(q.first&&q.o&&q.o.ann){banner(q.o.ann[0],q.o.ann[1],false,2.6);if(G.banner){G.banner.sm=1;G.banner.wv=1;}this.log.dec.push({k:q.o.dec,t:+G.t.toFixed(1),got:0});}
+      if(q.first&&q.o&&q.o.ann){if(!RET.purelook){banner(q.o.ann[0],q.o.ann[1],false,2.6);if(G.banner){G.banner.sm=1;G.banner.wv=1;}}this.log.dec.push({k:q.o.dec,t:+G.t.toFixed(1),got:0});}
       this.spawn(q.f,q.o,i);}},
   tick(dt){if(!this.on()||!running||G.dead||ST.over)return;if(this.st.n!==ST.n)this.reset();WV.st.phase='slice';
     let on=0;for(const e of G.en)if(e.type!=='boss'&&e.hp>0&&!e.dead)on++;this.log.maxOn=Math.max(this.log.maxOn,on);
