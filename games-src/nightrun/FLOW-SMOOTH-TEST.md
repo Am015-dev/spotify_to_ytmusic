@@ -4,7 +4,21 @@ Why: our strips have 3-6 frames per action at 4-14 fps. Smooth side-scrolling an
 12-16 for a hit or dash, 16+ for a jump, at 12-24 fps. Poses painted one by one drift in shape and colour; a clip does not.
 Targets and sheet rules: games-src/nightrun/ASSET-SPEC-SMOOTH.md (branch nr/W253-smooth).
 
-## Method (one character, two actions first)
+## Method A (preferred): EXPAND the sheets we already have, do not replace them
+Our existing frames are the keyframes. Keep every one of them, in the same order, untouched. Flow only adds the in-between frames.
+1. Take two neighbouring frames of an existing strip, for example Kai idle frame 1 and frame 2 (cut them from media/anim/kai/idle-strip.webp).
+2. Use them as the START and END frame of a short clip ("first frame to last frame" if Flow offers it; otherwise start frame plus the prompt
+   below). Ask for 3 in-between poses.
+3. Repeat for 2-3, 3-4 and 4-1 (the loop closes back to the first frame). A 4-frame strip becomes 16 frames: 4 originals + 12 new in-betweens.
+4. Rebuild the strip with originals and new frames in order, same cell size and anchor, raise its fps in the sheets json to match. The old strip
+   stays in git history; nothing is deleted.
+Prompt for each pair:
+> Two key poses of the same character are given as the first and last frame. Create the smooth in-between motion only: 3 intermediate poses, same character design, same colours, same outline weight, same camera, same scale, same flat background. No new details, no style change, no zoom, no pan.
+Pass checks: first and last frames are pixel-identical to the originals; each in-between lies between its neighbours (silhouette overlap >= 85% with both);
+colour drift < 6 per channel; foot line within 2 px.
+
+## Method B (only where there is no existing art for an action): clips from the reference
+
 1. Reference: the existing Kai reference sheet (foot-kai-sheet in FOOT-FLOW-PROMPTS.md). Use it as the start image for every clip.
 2. Generate a short looping clip per action with the prompts below. Keep the same seed, style block and reference for every clip.
 3. Extract frames at 12-16 fps, cut the background (games-src/scripts/cutout.py), align every frame to one foot anchor and one cell size,
