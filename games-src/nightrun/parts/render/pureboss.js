@@ -17,6 +17,7 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
       if(l.t<2*BT.spb)this.pic('fx-eb-aim-line',700,0,1400,10,0,.9);else this.pic('fx-eb-laser-sweep',700,0,1400,40,0,.95);ctx.restore();}
     const wd=(wcv!==cv?1.9:1.2)*(ak===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak]),   // art only (e.r stays the hitbox); a phone boss body is >= 40% of the short side
       mv=UIK.boss[nm]&&UIK.boss[nm].move||'air',by=mv==='air'?Math.sin(t*1.6)*3:0,tl=mv==='air'?Math.sin(t*.9)*.035:0;
+    {const R=wd*.9,g=ctx.createRadialGradient(e.x,e.y,R*.7,e.x,e.y,R*1.9);g.addColorStop(0,'rgba(0,0,0,.2)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.save();ctx.fillStyle=g;ctx.fillRect(e.x-R*1.9,e.y-R*1.9,R*3.8,R*3.8);ctx.restore();}   // W239: a soft vignette (<= 20%) on the backdrop band behind the boss, never on its pixels (drawn before it)
     ctx.save();ctx.translate(e.x,e.y);SPR.boss(e,nm,wd,by,tl,e.flash>0);if(e.b2s)this.shield(e,t);ctx.restore();return true;},
   gate(e,t){ctx.save();ctx.translate(e.x,0);const top=e.gy-e.gap/2,bot=e.gy+e.gap/2,fl=e.flash>0;
     if(e.on){for(const [y0,y1] of[[0,top],[bot,H]])this.pic('fx-eb-laser-sweep',0,(y0+y1)/2,y1-y0,36,Math.PI/2,.95);}
@@ -34,6 +35,16 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
 {const f=PURL.foe;PURL.foe=function(e,t){if(e.type==='boss')return PB.boss(e,t);if(e.type==='gate')return PB.gate(e,t);return f.call(this,e,t);};}
 PURL.pickups=function(t){PB.pickups(t);};
 {const f=PURL.shots;PURL.shots=function(){const eb=G.eb;G.eb=[];try{f.call(this);}finally{G.eb=eb;}PB.ebul();};}
+/* W239 (PC seed 2: the ship flew under the score panel and could not be seen): the score / multiplier panel and the HULL panel fade to 35% while the ship's box overlaps them.
+   The HUD is drawn once as always; the pixels under each overlapped panel are copied first and laid back over it at (1 - fade) afterwards, so every HUD implementation fades the same way. */
+PB.FA=[1,1];PB.FADE=.35;
+PB.fadeBox=()=>{const sh=ART.ANIM.s['ship-'+shipDef().id+'/flame'],k=PURL.K*PURL.PK,hw=(sh?sh[2]*k:56)/2+4,hh=(sh?sh[3]*k:30)/2+4,hk=HKL;
+  const rs=[[0,0,260*hk,70*hk],[0,H-78*hk,330*hk,78*hk]];   // score + multiplier (+ its caption), HULL / HEAT / DASH / EMP / weapons plate
+  return rs.map((r,i)=>{const hit=!G.dead&&P.x+hw>r[0]&&P.x-hw<r[0]+r[2]&&P.y+hh>r[1]&&P.y-hh<r[1]+r[3];PB.FA[i]+=((hit?PB.FADE:1)-PB.FA[i])*.35;if(Math.abs(PB.FA[i]-(hit?PB.FADE:1))<.01)PB.FA[i]=hit?PB.FADE:1;return r;});};
+PB.fadeRun=(f,self,args)=>{const rs=PB.fadeBox(),T=ctx.getTransform(),cvs=ctx.canvas,sn=[];
+  rs.forEach((r,i)=>{if(PB.FA[i]>=1)return;const x0=Math.max(0,Math.floor(T.a*r[0]+T.e)),y0=Math.max(0,Math.floor(T.d*r[1]+T.f)),x1=Math.min(cvs.width,Math.ceil(T.a*(r[0]+r[2])+T.e)),y1=Math.min(cvs.height,Math.ceil(T.d*(r[1]+r[3])+T.f));
+    if(x1<=x0||y1<=y0)return;const c=document.createElement('canvas');c.width=x1-x0;c.height=y1-y0;c.getContext('2d').drawImage(cvs,x0,y0,x1-x0,y1-y0,0,0,x1-x0,y1-y0);sn.push([c,x0,y0,PB.FA[i]]);});
+  try{return f.apply(self,args);}finally{if(sn.length){ctx.save();ctx.setTransform(1,0,0,1,0,0);for(const [c,x,y,a] of sn){ctx.globalAlpha=1-a;ctx.drawImage(c,x,y);}ctx.restore();}}};
 {const h1=drawHUDP,h2=drawHUD,w=(f,wd)=>function(){PB.hud++;const b=G.boss,pl=RET.purelook&&b;if(pl)G.boss=null;   // the old boss bars / pips read G.boss: hidden here, the one thin bar is drawn after
-    try{f.apply(this,arguments);}finally{if(pl)G.boss=b;if(pl)PB.bar(wd());PB.hud--;}};drawHUDP=w(h1,()=>PW_);drawHUD=w(h2,()=>W);}
+    try{if(wd()===W&&RET.purelook)PB.fadeRun(f,this,arguments);else f.apply(this,arguments);}finally{if(pl)G.boss=b;if(pl)PB.bar(wd());PB.hud--;}};drawHUDP=w(h1,()=>PW_);drawHUD=w(h2,()=>W);}
 {const h=PW.hud;PW.hud=function(){PB.hud++;try{return h.apply(this,arguments);}finally{PB.hud--;}};}   // the power-up panel is HUD (pure.js draws it after drawHUD)
