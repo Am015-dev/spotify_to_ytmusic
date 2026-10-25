@@ -47,6 +47,7 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     const a=O[0].getContext('2d'),b=O[1].getContext('2d'),cw=O[0].width,ch=O[0].height;a.setTransform(1,0,0,1,0,0);a.clearRect(0,0,cw,ch);a.setTransform(ps,0,0,ps,cw/2,ch/2);ART.drawAnim(a,key,t,0,0,k,false);
     b.setTransform(1,0,0,1,0,0);b.clearRect(0,0,cw,ch);b.globalCompositeOperation='source-over';b.drawImage(O[0],0,0);b.globalCompositeOperation='source-in';b.fillStyle='#07030f';b.fillRect(0,0,cw,ch);b.globalCompositeOperation='source-over';
     const d=Math.max(1.2*(window.devicePixelRatio||1),1.6)/ps,W_=cw/ps,H_=ch/ps;
+    ctx.globalAlpha=.4;ctx.drawImage(O[1],3*d-W_/2,5*d-H_/2,W_,H_);ctx.globalAlpha=1;   // one soft ink shadow, offset down-right from one upper-left key light (no blur: a blur per frame is too slow)
     for(const[x,y]of[[-d,0],[d,0],[0,-d],[0,d],[-d*.7,-d*.7],[d*.7,-d*.7],[-d*.7,d*.7],[d*.7,d*.7]])ctx.drawImage(O[1],x-W_/2,y-H_/2,W_,H_);
     ctx.drawImage(O[0],-W_/2,-H_/2,W_,H_);},
   hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=v==='w'?'saturate(0) brightness(1.6)':'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,0,0);return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white (made once per picture)
