@@ -19,11 +19,23 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
    if(dw>1&&dh>1&&dw*dh<4e6){if(C.b!==b||C.w!==dw||C.h!==dh){const cv_=C.cv||(C.cv=document.createElement('canvas'));cv_.width=dw;cv_.height=dh;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,dw,dh);g.fillStyle='rgba(12,8,24,.22)';g.fillRect(0,0,dw,dh);C.b=b;C.w=dw;C.h=dh;}
      const q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';ctx.drawImage(C.cv,0,0,w,h);ctx.imageSmoothingQuality=q;return;}
    ctx.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,w,h);ctx.fillStyle='rgba(12,8,24,.22)';ctx.fillRect(0,0,w,h);},
+  pan(b,w,h,off){b=this.dim(b,.55);const X=1.35,s=Math.max(w/b.width,h*X/b.height),sw=w/s,sh=h*X/s,m=ctx.getTransform(),dw=Math.round(w*m.a),dh=Math.round(h*m.d),eh=Math.round(dh*X),ex=eh-dh,C=this.PC||(this.PC={});   // W250: the phone sky is cropped once at 1.35x height, then a window of it slides 1:1 (far plane, ratio .1, no flip, no seam: it pans back and forth)
+   if(dw<2||dh<2||dw*eh>4e6){this.cover(b,w,h);return;}
+   if(C.b!==b||C.w!==dw||C.h!==dh){const c=C.cv||(C.cv=document.createElement('canvas'));c.width=dw;c.height=eh;const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,dw,eh);g.fillStyle='rgba(12,8,24,.22)';g.fillRect(0,0,dw,eh);C.b=b;C.w=dw;C.h=dh;}
+   const p=ex>0?off*m.d%(2*ex):0,y=Math.round(p>ex?2*ex-p:p),q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';ctx.drawImage(C.cv,0,ex-y,dw,dh,0,0,w,h);ctx.imageSmoothingQuality=q;},
+  vtile(b,w,off,zoom,al){b=this.dim(b);const m=ctx.getTransform(),ww=w*zoom,lh=ww*b.height/b.width,dw=Math.round(ww*m.a),dl=Math.round(lh*m.d),C=this.VC||(this.VC={});let e=C[zoom];   // W250: top-down rooftop strip scrolling down the portrait screen; one device-size copy of [picture; mirrored picture] per zoom, so each frame is 1:1 copies (no seam, no per-frame scaling)
+    if(!e||e.b!==b||e.w!==dw||e.h!==dl||e.a!==al){e=C[zoom]=e||{cv:document.createElement('canvas')};e.cv.width=dw;e.cv.height=2*dl;const g=e.cv.getContext('2d');g.imageSmoothingQuality='high';g.globalAlpha=al;g.drawImage(b,0,0,dw,dl);g.translate(0,2*dl);g.scale(1,-1);g.drawImage(b,0,0,dw,dl);e.b=b;e.w=dw;e.h=dl;e.a=al;const q=b.getContext('2d').getImageData(0,0,b.width,b.height).data;let a=0,z=b.width;   // the empty street gap in the middle: the widest column band with no picture, found once
+      for(let y=0;y<b.height;y+=4)for(let x=0;x<b.width;x++){if(q[(y*b.width+x)*4+3]>8){if(x<b.width/2)a=Math.max(a,x+1);else z=Math.min(z,x);}}
+      e.l=Math.ceil(a/b.width*dw)+1;e.r=Math.floor(z/b.width*dw)-1;}
+    const x=(w-ww)/2,o=off%(2*lh),q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';
+    const X=Math.round(x*m.a+m.e),Hd=2*dl,L=e.l,R=e.r;
+    for(let y=Math.round((o-2*lh)*m.d+m.f);y<(PH_+4)*m.d+m.f;y+=Hd){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(e.cv,0,0,L,Hd,X,y,L,Hd);ctx.drawImage(e.cv,R,0,dw-R,Hd,X+R,y,dw-R,Hd);ctx.restore();}   // whole device pixels, only the two side bands (the middle 40 % of every roof picture is empty street)
+    ctx.imageSmoothingQuality=q;},
   tile(b,y,h,scroll,par,keep){if(!keep)b=this.dim(b);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
     for(let j=Math.floor(off/tw);j*tw-off<W;j++){const x=j*tw-off;if(x+tw<=0)continue;
       if(j&1){ctx.save();ctx.translate(x+tw,y);ctx.scale(-1,1);ctx.drawImage(b,0,0,tw,h);ctx.restore();}else ctx.drawImage(b,x,y,tw,h);}},
   bg(port,scroll){const di=G.di,n=ART.dn[di],D=DISTRICTS[di],bm=ART.bm;ctx.fillStyle='#000';
-    if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.cover(b,PW_,PH_);return;}
+    if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.pan(b,PW_,PH_,scroll*.1);const ly=bm['ly-phone-'+n];if(ly){this.vtile(ly,PW_,scroll*.3,1,.38);this.vtile(ly,PW_,scroll*.6,1.3,.7);}return;}   // W250: three planes, ratios .1 / .3 / .6: far sky pans, mid rooftops fainter, near rooftops larger and faster
     ART.paintReady(di);const b=bm['bg-'+n];if(!b){ctx.fillRect(0,0,W,H);return;}
     this.tile(b,0,H,scroll,.03);
     const far=bm['ly-far-'+n],mid=bm['ly-mid-'+n],nr=bm['ly-near-'+D.near];
