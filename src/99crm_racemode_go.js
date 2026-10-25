@@ -3,7 +3,7 @@
 // real menu path (toMenu, tab button, city + track button, START), then driven on a stepped clock by a human-like bot (lag 0.15 s, plain arrow keys):
 // city courses with tkBot (98tk_go.js), race-mode spline tracks with RM_bot (target = road centre, same steering lag). Per race:
 // picked = the started race is the one picked; fin = the race ends (race types: player finished, not DNF; endless modes: ran 60 s); stuck = 2 s standstill
-// with the gas held; walls = speed halved from > 14 m/s; riv = every rival finished (race types); fly = a city rival > 3 m above / 1 m under the ground, a race-mode rival airborne > 4 s or off its road plane;
+// with the gas held; walls = speed halved from > 14 m/s; riv = every rival finished (race types); fly = a city rival > 3 m above / 1 m under the ground, a race-mode rival airborne > 6 s or off its road plane;
 // cam = camera distance / FOV judged like cam/steady (CST_judge, 99cst_camsteady_go.js); err = page errors during the race.
 const RMG={lag:.15,out:null,errs:0};
 function RM_list(){const ath=CID==='ath',T=ath?ATH_TRACKS:TDF,L=[];
@@ -35,7 +35,7 @@ function RM_bot(){const q=[],lagN=Math.round(RMG.lag/H);return()=>{const s=pl;if
 function RM_cal(){if(RMG.sR)return;const s=pl,b0=s.beta;K.ArrowRight=true;for(let i=0;i<8;i++)stepSim();K.ArrowRight=false;const pos=s.beta>b0;RMG.sR=pos?'ArrowRight':'ArrowLeft';RMG.sL=pos?'ArrowLeft':'ArrowRight'}
 function RM_air(y,x,z){const g=groundAt(x,z,y+3);return g==null||!isFinite(g)?0:y-g}
 // drive one race. Phase 1 to `mid` sim-seconds (shot), phase 2 to the end (cap secs)
-function RM_drive(R,secs){const it=R.it,city=R.w&&R.w.city;let cam=R.cam||(R.cam=[]),seg=R.seg|0;
+function RM_drive(R,secs){const it=R.it,city=R.w&&R.w.city;let cam=R.cam||(R.cam=[]),seg=(R.seg|0)+1;R.cs=(R.cs|0)+1;   // each call starts a new judging window: between calls the page's own real-time loop runs (shots)
   if(city){const sp=RO.sp;if(!R.bot){const C=sp.C,G=tkGeoOf(C),P=C.water||C.off?G.pB:G.pA;R.bot=tkBot(P,{lag:RMG.lag});R.len=tkLen(P);sp.cd=0;camSnap=true}
     for(let i=0;i<secs*30&&RO.sp===sp&&!sp.done;i++){R.bot(sp);roamStep(1/30);roamCam(1/30);R.st++;
       for(const a of sp.ai){if(!a.g||a.fin!=null||a.wet||RO.veh==='boat')continue;const p=a.g.position,d=RM_air(p.y,p.x,p.z);if(d>3)R.fly++;if(d<-1)R.sink++}
@@ -49,7 +49,7 @@ function RM_drive(R,secs){const it=R.it,city=R.w&&R.w.city;let cam=R.cam||(R.cam
   for(let i=0;i<n&&(state==='race'||state==='finished');i++){R.bot();stepSim();raceT+=H;lapLogic();for(const s of ships)posShip(s,H);updateCam(H);if(state==='finished'){finishT+=H;if(finishT>4.5)break}R.st++;
     const s=pl;if(!s)break;R.pv.push(s.v);if(R.pv.length>8){const v0=R.pv.shift();if(v0>14&&s.v<v0*.5&&!s.dead)R.walls++}
     if(Math.abs(s.v)<1.5&&K.ArrowUp&&!s.dead){if(++R.still===Math.round(2/H)){R.stuck++;R.still=0}}else R.still=0;
-    for(const o of ships){if(o.isPlayer||o.dead>0||o.finished||!o.mesh)continue;o.rmAir=o.air?(o.rmAir||0)+H:0;if(o.rmAir>4)R.fly++;if(o.boatMode||o.air)continue;frameAt(TD,o.dist,F2);const dy=o.mesh.position.y+(o.mesh.userData.m?o.mesh.userData.m.position.y:0)-(F2.p.y+F2.r.y*o.x);if(dy<-1||dy>4)R.sink++}   // race mode places a car on the (banked) road plane at its lateral x: off it = sunk or floating; airborne > 4 s = flying
+    for(const o of ships){if(o.isPlayer||o.dead>0||o.finished||!o.mesh)continue;o.rmAir=o.air?(o.rmAir||0)+H:0;if(o.rmAir>6)R.fly++;if(o.boatMode||o.air)continue;frameAt(TD,o.dist,F2);const dy=o.mesh.position.y+(o.mesh.userData.m?o.mesh.userData.m.position.y:0)-(F2.p.y+F2.r.y*o.x);if(dy<-1||dy>4)R.sink++}   // race mode places a car on the (banked) road plane at its lateral x: off it = sunk or floating; airborne > 6 s = flying (the Skyline drop is ~4.3 s for every car)
     if(!!CC!==!!R.cc){R.cc=!!CC;R.cs=(R.cs|0)+1}if(i%2===0&&!CC){const c=camera.position,m=s.mesh.position.clone();if(s.mesh.userData.m)m.add(s.mesh.userData.m.position);cam.push([Math.hypot(c.x-m.x,c.y-m.y,c.z-m.z),camera.fov,Math.abs(s.v),R.cs|0])}}   // crash-cam cutaways (takedown / wreck) are not chase-cam frames: new window after one
   const s=pl;R.prog=Math.round(Math.max(0,s.dist)/TD.L*100)/100;const rs=ships.filter(o=>!o.isPlayer);
   if(endless){R.end=state!=='race'||raceT-R.t0>=60;R.fin=!s.dead||raceT-R.t0>=60;R.riv=true;R.rivN='—'}
