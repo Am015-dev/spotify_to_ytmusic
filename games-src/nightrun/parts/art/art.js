@@ -185,7 +185,7 @@ SPR.boss=(e,nm,wd,by,tl,fl)=>{const cb=ART.ANIM.c['boss-'+nm],st=ART.bm['spr-bos
   if(!e._sp)e._sp={base:'',y:0,k:1};e._sp.base=base;e._sp.y=y;e._sp.k=k;
   ctx.save();if(tl){ctx.translate(0,by);ctx.rotate(tl);ctx.translate(0,-by);}
   ART.drawAnim(ctx,key,tt,0,y,k,false,null,sy);
-  if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,0,y,k,false,sm.hitstop.flash_white*.5,sy);}   // the hit flash stays on top
+  if(fl&&!rotMode){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,0,y,k,false,sm.hitstop.flash_white*.5,sy);}   // the hit flash stays on top (portrait: the hit sheet alone shows it, an added flash clipped the sprite white)
   ctx.restore();return true;};
 /* a boss that just died: its defeat clip plays once where it stood; returns the seconds the explosion waits */
 SPR.bossDefeat=e=>{const p=e._sp;if(!p||!ART.anim(p.base+'defeat'))return 0;const key=p.base+'defeat';ART.gh.push({key,x:e.x,y:e.y+p.y,k:p.k,t:0});return Math.min(1.2,ART.aS(key).tot);};
