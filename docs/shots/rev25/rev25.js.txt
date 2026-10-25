@@ -1,0 +1,46 @@
+// review rev25: race/racefree adversarial checks on the BUILT page, phone profile (iPhone UA, 852x393 touch, DPR 3).
+// node rev25.js <base url> <city> <mode>   mode: race | sweep | oldgo | far
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const [BASE,C,MODE,OPT]=process.argv.slice(2);
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+ const p=await ctx.newPage();p.setDefaultTimeout(1800000);const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));
+ const EV=(fn,arg)=>p.evaluate(c=>__xc.ev(c),'('+fn.toString()+')('+JSON.stringify(arg||{})+')');
+ await p.goto(BASE+'?test='+C+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});
+ await EV(()=>new Promise(r=>setTimeout(r,3000)));
+ // shared: start race mode like RFG_track
+ const START=`const tr=CID==='ath'?'akro':'grand';try{if(RO.sp)sprintEnd();chAbort()}catch(e){}RO.on=false;menuTab='quick';menuTrack=tr;quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;state='race';TOUCH.on=TOUCH.used=true;const s=pl,L=TD.L;`;
+ let out;
+ if(MODE==='race'){ // E1: a real race with rivals racing, natural hull: steer full lock to the kerb, let go 3 s, measure drift back
+  out=await EV(new Function('o',`${START}
+   const st=(d)=>{TOUCH.dir=TOUCH.target=TOUCH.steer=d;stepSim()};const near=()=>{let m=1e9;for(const o of ships){if(o===s||o.eliminated||o.dead>0)continue;const dd=Math.abs(tdd(o.dist,s.dist));if(dd<8)m=Math.min(m,Math.hypot(dd,o.x-s.x))}return m};
+   for(let i=0;i<240;i++)st(0);const E=[];let dir=1;
+   for(let ep=0;ep<60&&!s.finished;ep++){dir=-dir;let k=0;const d0=s.dead;for(;k<300;k++){st(dir);const B=R15_b(s,s.x),room=dir>0?B[1]-s.x:s.x-B[0];if(room<1.2&&k>30)break}
+    const xr=s.x,B=R15_b(s,s.x),W=B[1]-B[0];let ln=false,mn=1e9,dead=false,h0=s.hull,hmin=s.hull,x1=xr;for(let i=0;i<360;i++){st(0);if(R15_inLane(s)||R15_mouth(s))ln=true;mn=Math.min(mn,near());if(s.dead>0)dead=true;hmin=Math.min(hmin,s.hull)}
+    const dr=(s.x-xr)*Math.sign(-xr);E.push({ep,dir,k,xr:+xr.toFixed(1),W:+W.toFixed(0),drift:+dr.toFixed(2),ln,near:+mn.toFixed(1),dead,hull:+h0.toFixed(0),v:+s.v.toFixed(0)});
+    for(let i=0;i<120;i++)st(0)}
+   const J=E.filter(e=>Math.abs(e.xr)>6&&!e.ln);const bad=J.filter(e=>e.drift>2);
+   return{n:E.length,judged:J.length,maxDrift:Math.max(0,...J.map(e=>e.drift)),bad,badNoContact:bad.filter(e=>e.near>4&&!e.dead).length,deadEps:E.filter(e=>e.dead).length,minNear:Math.min(...E.map(e=>e.near)),lapDist:+s.dist.toFixed(0),L}`));
+ }else if(MODE==='sweepgo'){await EV(()=>{window.__rgo=null;const C=window.__chk;Promise.resolve(C.GO['race/racefree'][0].fn()).then(r=>window.__rgo=String(r).slice(0,400),e=>window.__rgo='threw '+e)});await p.waitForFunction(()=>window.__rgo,null,{polling:500,timeout:300000});console.log(await p.evaluate(()=>window.__rgo));
+ }
+ if(MODE==='sweep'||MODE==='sweepcity'||MODE==='sweepgo'){ // E2: the GO's sweep, per direction: does steering toward that side move the car?
+  out=await EV(new Function('o',`${MODE==='sweepcity'?'try{RFG_city([])}catch(e){window.__ce=String(e)}K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=false;':''}${START}
+   if(o.down)K.ArrowDown=true;const rv=ships.filter(o=>o!==s&&!o.eliminated);rv.forEach(o=>o.eliminated=true);const D=[];
+   try{for(let d=80,n=0;d<L-60&&n<24;d+=Math.max(20,L/24),n++){for(const dir of[-1,1]){s.dist=d;s.x=0;s.v=s.stats.top0*.55;s.beta=0;s.yaw=0;s.yawRate=0;s.holdX=null;s.air=null;s.dead=0;s.wall=0;s.hull=100;
+     let lo=0,hi=0,st10=0,x60=0,B=null;for(let i=0;i<300;i++){TOUCH.dir=TOUCH.target=TOUCH.steer=dir;stepSim();lo=Math.min(lo,s.x);hi=Math.max(hi,s.x);if(!i)B=R15_b(s,s.x);if(i===60)x60=s.x}
+     const reach=dir>0?hi:-lo,half=dir>0?B[1]:-B[0];D.push({d:Math.round(d),dir,reach:+reach.toFixed(1),half:+half.toFixed(1),x60:+x60.toFixed(2),r:+(reach/Math.max(1,half)).toFixed(2),roll:+(s.rollT||0).toFixed(2),mir:typeof mirror!=='undefined'?mirror:null,sens:SET.touch,dead:s.dead>0,air:!!s.air})}}}
+   finally{rv.forEach(o=>o.eliminated=false);TOUCH.dir=TOUCH.target=TOUCH.steer=0}
+   const W=D.filter(e=>e.half<22.5);const weak=W.filter(e=>e.r<.8);return{n:W.length,weakL:weak.filter(e=>e.dir<0).length,weakR:weak.filter(e=>e.dir>0).length,weak:weak.slice(0,8),x60L:W.filter(e=>e.dir<0).map(e=>e.x60).slice(0,6),x60R:W.filter(e=>e.dir>0).map(e=>e.x60).slice(0,6),keys:Object.keys(K).filter(k=>K[k]),pressed:typeof pressed!=="undefined"?JSON.stringify(pressed).slice(0,200):null,T:JSON.stringify(TOUCH).slice(0,300),tilt:typeof TILT!=="undefined"?JSON.stringify(TILT).slice(0,100):null,touch:SET.touch,ce:window.__ce||null}`),{down:OPT==='down'});
+ }else if(MODE==='oldgo'){ // E3: the OLD racefree track check (no hull reset, rivals in), logging the cause of each drift > 2 m
+  out=await EV(new Function('o',`${START}
+   const R=[];let n=0;for(let d=80;d<L-60&&n<24;d+=Math.max(20,L/24)){n++;for(const dir of[-1,1]){s.dist=d;s.x=0;s.v=s.stats.top0*.55;s.beta=0;s.yaw=0;s.yawRate=0;s.holdX=null;s.air=null;s.dead=0;s.wall=0;const h0=s.hull;
+     for(let i=0;i<300;i++){TOUCH.dir=TOUCH.target=TOUCH.steer=dir;stepSim()}const xr=s.x,dr0=s.dist;let ln=false,dead=false,mn=1e9,hm=s.hull;
+     for(let i=0;i<360;i++){TOUCH.dir=TOUCH.target=TOUCH.steer=0;stepSim();if(R15_inLane(s)||R15_mouth(s))ln=true;if(s.dead>0)dead=true;hm=Math.min(hm,s.hull);for(const q of ships){if(q===s||q.eliminated)continue;const dd=Math.abs(tdd(q.dist,s.dist));if(dd<8)mn=Math.min(mn,Math.hypot(dd,q.x-s.x))}}
+     const dr=Math.abs(xr)>6&&!ln?(s.x-xr)*Math.sign(-xr):0;if(dr>2)R.push({d:Math.round(d),dir,drift:+dr.toFixed(1),h0:+h0.toFixed(0),dead,near:+mn.toFixed(1)})}}
+   TOUCH.dir=TOUCH.target=TOUCH.steer=0;return{reds:R.length,deadCaused:R.filter(e=>e.dead).length,rivalCaused:R.filter(e=>!e.dead&&e.near<4).length,other:R.filter(e=>!e.dead&&e.near>=4),R:R.slice(0,8)}`));
+ }else if(MODE==='far'){ // E4: why/solid-cars far-car steps: step size vs speed x summed dt, and how far away
+  out=await EV(new Function('o',`return new Promise(res=>{if(o.touch){TOUCH.on=TOUCH.used=true}const S=[],P=[],FM=new THREE.Matrix4(),FR=new THREE.Frustum(),SP=new THREE.Sphere();const f0=HT_car;const DP=c=>{const im=HUB.cim[c.k];if(!im)return null;const C=im.userData.pc,a=C?C.src:im.instanceMatrix.array,o=c.j*16;return[a[o+12],a[o+14]]};const DS=[];HT_car=function(c,im,N,d){const x=c.x,z=c.z,p0=DP(c);const r=f0.apply(this,arguments);const p1=DP(c);const dst=p0&&p1?Math.hypot(p1[0]-p0[0],p1[1]-p0[1]):0;const st=Math.hypot(c.x-x,c.z-z),dist=Math.hypot(c.x-RO.x,c.z-RO.z);if(dst>1&&dst<50){FM.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);FR.setFromProjectionMatrix(FM);SP.center.set(p1[0],(c.y||0)+1,p1[1]);SP.radius=2;if(FR.intersectsSphere(SP))DS.push([+dst.toFixed(2),+dist.toFixed(0),+(Math.abs(c.cv||0)*d).toFixed(2)])}if(st>50)c.__rc=1;else if(st>2&&c.__rc&&dist<60)P.push([+st.toFixed(2),+dist.toFixed(0)]);if(st>2&&st<=50){FM.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);FR.setFromProjectionMatrix(FM);SP.center.set(c.x,(c.y||0)+1,c.z);SP.radius=2;S.push([+st.toFixed(2),+dist.toFixed(0),+d.toFixed(3),+(Math.abs(c.cv||0)*d).toFixed(2),FR.intersectsSphere(SP)?1:0])}return r};
+   let line;Promise.resolve(typeof SC_go==='function'?0:XC_need('99sc_solidcars')).then(()=>{try{line=SC_go()}catch(e){line='threw '+e}HT_car=f0;
+   const near=S.filter(q=>q[1]<60),far=S.filter(q=>q[1]>=60),tele=S.filter(q=>q[0]>q[3]+1);for(const c of HUB.cars)delete c.__rc;res({band60_250:DS.filter(q=>q[1]>=60&&q[1]<250).length,band60_250max:Math.max(0,...DS.filter(q=>q[1]>=60&&q[1]<250).map(q=>q[0])),band60_250gt2:DS.filter(q=>q[1]>=60&&q[1]<250&&q[0]>2).length,bandGt250gt5:DS.filter(q=>q[1]>=250&&q[0]>5).length,drawnStepGt1OnScreen:DS.length,drawnMax:Math.max(0,...DS.map(q=>q[0])),drawnEx:DS.sort((a,b)=>b[0]-a[0]).slice(0,6),postRecycleNear:P.length,pr:P.slice(0,5),line:String(line).slice(-260),steps2m:S.length,near60:near.length,far:far.length,maxFar:Math.max(0,...far.map(q=>q[0])),maxDtFar:Math.max(0,...far.map(q=>q[2])),stepGtVdtPlus1:tele.length,tele:tele.slice(0,6),ex:far.slice(0,3),onScreen:S.filter(q=>q[4]).length,onScreenFar60_250:S.filter(q=>q[4]&&q[1]<250).map(q=>q.slice(0,4)).slice(0,8),summedDt:S.filter(q=>q[2]>.03).length})})})`),{touch:OPT==="touch"});
+ }
+ console.log(JSON.stringify({city:C,mode:MODE,out,errs:errs.slice(0,3)}));await b.close()})().catch(e=>{console.log('ERR '+String(e).slice(0,300));process.exit(1)});
