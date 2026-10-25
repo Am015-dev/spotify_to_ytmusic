@@ -1,59 +1,45 @@
-# Google Flow: step by step, with the frames we already have
+# Google Flow: expand our sprite strips with the method we already proved
 
-What you do in Flow is generate short clips from our frames. What we do afterwards (extract frames, cut the background, build the strip, wire it
-into the game) is on our side; you only upload, generate, download.
+Our 229 approved sheets were made with the STRIP method (games-src/anims/FLOW-SPRITE-STRIPS.md): ONE Flow image per action, all frames side by side in
+one row, the character's own painting as the "@" reference, then cut into frames. It stays the method. Frame-by-frame images and video drift; a strip
+is drawn as one sequence, so cycle, scale and ground line stay consistent. What changes: MORE frames per action (we have 3-6; smooth needs 8-16).
+Nothing is replaced: the approved strip stays as the reference and as a fallback; a new strip only goes in after the owner's viewer review.
 
-## One-time setup
-1. Open Google Flow (labs.google/flow), start a New project, name it "Nightrun frames".
-2. Pick the mode "Frames to Video" (the dropdown next to Text to Video). Choose the highest quality model offered; first-and-last-frame needs a
-   model that supports it (Veo 3.1 does; check the model list in settings).
-3. Set the aspect ratio 1:1 if offered (our frames are square on white), clip length the shortest available (about 8 s is the usual minimum).
+## Frame targets (games-src/nightrun/ASSET-SPEC-SMOOTH.md has the full list)
+Kai idle 8 (@10-12 fps), run 8 (@14), hit 6, melee 6, dash 6, jump 8, die 8; common foes run 8, idle 8, melee 6; each boss idle 8-12, attack 8-12.
 
-## For every pair of frames (example: Kai idle 1 -> 2)
-1. Click the + in the prompt box, upload kai-idle-1.png as the START frame.
-2. Click the second + , upload kai-idle-2.png as the END frame.
-3. Paste this prompt (same every time):
-   > Two key poses of the same character are given as the first and last frame. Create the smooth in-between motion only, slow and gentle: 3 intermediate poses, same character design, same colours, same outline weight, same camera, same scale, same plain white background. No new details, no style change, no zoom, no pan, no cut, no text.
-4. Generate. Pick the take where the face, jacket and backpack keep the same design for the whole clip. Discard takes where the character changes.
-5. Download the video (original quality, not a GIF) and name it kai-idle-1-2.mp4. Repeat for 2-3, 3-4 and 4-1.
-6. Send the four videos to the repo owner session (or drop them in games-src/nightrun/incoming/flow/).
+## How to get 8 frames when one strip holds 4-6: two strips of ONE cycle
+Ask for the cycle in two halves, with the SAME reference and the SAME shared rules, so both halves keep the same design and scale:
+- Strip A = frames 1-4 of the 8-frame cycle, strip B = frames 5-8. Name them strip-<who>-<act>a and strip-<who>-<act>b (act stays one word).
+- Spell out every frame in each prompt, so strip B continues exactly where strip A ends and frame 8 leads back into frame 1.
+- Or try 6-8 frames in one 16:9 row first (rule 2: draw the subject a little smaller, wide gaps). If a row of 8 comes out cramped or touching, use the two-strip way.
+- If Flow returns a 2x4 grid, we re-arrange the quadrants into a row locally (no new image needed).
 
-## What happens next (not your job)
-- Frames are cut from the video at 12-16 fps (ffmpeg), the white is cut out (cutout.py), every frame is aligned to the foot anchor, and the strip
-  is rebuilt as 4 originals + the new in-betweens, in order. Originals stay pixel-identical.
-- The game plays it, and we send you before/after shots.
+## Steps in Flow (what you do)
+1. New Flow project "Nightrun expand". Upload as "@" ingredients: the CURRENT approved strip of the action (e.g. media/anim/kai/run-strip.webp on white)
+   and, if you have it, Kai's reference painting. Attach both to every card of that character.
+2. Image mode, 16:9, paste the prompt below (fill {n}, the frame list, the facing), generate 4 takes, keep the one that looks like the reference character
+   with the cleanest row. Download the image as strip-kai-run-a.jpg etc.
+3. Send the images (or drop them in games-src/nightrun/incoming/flow/). We cut, scale, pack, auto-check and show them in the viewer for your approve or needs work.
 
-## Which actions to do first, and the limit of this method
-- The existing Kai idle frames are almost the same pose (slight breathing). In-betweening nearly identical poses adds little. So:
-  - For IDLE: ask for a bigger gentle motion in one clip instead (text prompt with kai-idle-1.png as the start frame): "same character, slow breathing idle, shoulders rise and fall, weapon hand relaxed, jacket and satchel settle slightly, seamless loop, same plain white background". Keep the first frame equal to the original.
-  - For RUN, HIT, MELEE, DASH, JUMP and the boss ATTACK: poses differ a lot, so pair in-betweening works best. Start with run (6 frames -> 6 pairs).
-- Flow cannot output transparent video; that is why every input has a plain white background.
-- Flow does not export single frames; we extract them from the downloaded video.
+## Prompt (shared rules from the strip method, copied verbatim, only the blanks change)
+> Same character as the reference picture: identical design, colours, painted style and outline weight. 2D game sprite sheet: EXACTLY {n} frames in ONE single horizontal row, left to right, never two rows, never a grid. Each frame inside its own equal-size slot with WIDE empty gaps between the slots; nothing (weapon, foot, cape, effect) reaches into or touches the neighbouring slot; draw the character a little smaller so everything fits. Every frame shows the same character at the same size and scale, standing on the same ground line, nothing cropped. Strict SIDE VIEW facing RIGHT in EVERY frame; the head stays on the same side and the character never turns around. Draw ONLY the character itself in each frame, never a scene or buildings. Flat plain pure white background, no floor, no shadows, no frame borders, no numbers, no text, no letters. The cycle, frame by frame: {frame list}.
 
-## Pass checks (we run them)
-First/last frames identical to the originals; neighbouring-frame silhouette overlap >= 85%; colour drift < 6 per channel; foot line within 2 px; no fringe.
+## Frame lists to paste (cycles spelled out)
+- **Kai run, 8 frames, two strips of 4**
+  - A (frames 1-4): 1 contact, front leg extended, rear arm forward; 2 down, body lowest, knee bent; 3 passing, rear leg swings under the body; 4 up, push-off, body highest.
+  - B (frames 5-8): 5 contact, other leg extended, other arm forward; 6 down; 7 passing, other leg swings under; 8 up, push-off, leads back into frame 1.
+- **Kai idle, 8 frames, two strips of 4 (bigger, gentle breath than the current one)**
+  - A: 1 neutral stand; 2 inhale, chest and shoulders rise, jacket lifts slightly; 3 held breath, slight head tilt up; 4 start to exhale, shoulders begin to drop.
+  - B: 5 exhale, shoulders lowest, weight shifts to the other foot; 6 settle, satchel swings back; 7 small head turn back; 8 returns to the neutral stand of frame 1.
+- **Kai hit, 6 frames (one strip)**: 1 ready stance; 2 impact, head snaps back; 3 recoil, body leans back, arms out; 4 stagger, one step back; 5 recover, weight returns forward; 6 ready stance again.
+- Other actions: same pattern, one line per frame, the first and last frames equal the first pose of the cycle.
 
-## Image-generator method (owner's suggestion, 25 Oct): sprite technique with the IMAGE tool, no video
-Use Flow's image generation (or the Gemini image model, whichever your Flow lists for images). Images give a transparent-friendly flat background and
-a real frame per generation, so there is no video-to-frame extraction. The risk is that each frame drifts, so ALWAYS attach the existing frames
-as references and generate them in small steps.
+## Things we learned (from the strip playbook, keep them)
+- The reference's orientation beats the prompt: if the reference faces left, prompt LEFT.
+- Long weapons held close to the body so they stay inside their slot. Spinning parts: "SOLID, SHARP, NO motion blur".
+- Bodies on white, light effects on black. Each action key is ONE word without hyphens.
 
-### I1. One in-between at a time (most consistent)
-1. Attach kai-idle-1.png and kai-idle-2.png as the two reference images.
-2. Prompt:
-   > Same character as both reference images, same design, colours, proportions, outline weight, camera and scale, same plain white background, same ground line. Draw ONE new frame of the animation that sits exactly halfway between reference image 1 and reference image 2 (a pose between them, not a copy of either). Square 1:1, character centred, feet on the same line as the references, no text, no shadow.
-3. Generate 4 takes; keep the one whose silhouette sits between the two references. For 3 in-betweens per pair, repeat with (1, halfway) then (halfway, 2) as the references.
-4. Name the files kai-idle-1b.png, kai-idle-1c.png ... in playing order.
-
-### I2. A whole row in one image (fastest, check drift)
-1. Attach all four kai-idle-N.png frames as references.
-2. Prompt:
-   > A sprite-sheet row for a 2D game: 8 frames of the same character in a single horizontal strip, equal square cells, plain white background, no borders, no text. Frames 1, 3, 5, 7 are exactly the four reference poses in order; frames 2, 4, 6, 8 are the smooth in-between poses (frame 8 leads back into frame 1). Same character, colours, outline, scale and ground line in every cell.
-3. Slice into cells on our side. Reject the row if a reference-pose cell is not a copy of its reference.
-
-### Which poses to do first
-Run, hit, melee, dash, jump and the boss attack: poses differ, so the in-between matters. Idle: ask for a larger gentle breath (shoulders and jacket move more) because the originals barely differ.
-
-### Pass checks (we run them)
-Original frames come back pixel-identical (we paste the originals back and keep only the NEW frames); neighbouring-frame silhouette overlap >= 85%;
-colour drift < 6 per channel; foot line within 2 px; no fringe. If a method fails these three times in a row, use the other one.
+## Pass checks (we run them, plus your viewer review)
+Frame count equals the card; no empty or clipped frames; no size jumps; neighbouring-frame silhouette overlap >= 85%; colour drift < 6 per channel;
+foot line within 2 px; no white fringe; frame 8 close to frame 1 (the loop). Only strips you approve in the viewer go into the game.
