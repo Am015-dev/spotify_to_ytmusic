@@ -27,7 +27,8 @@ const FEEL=F.FEEL={
    (foot.js fire) and Kai's hurt shove is 170 u/s x 0.35 s = 60 units. */
 if(RET.hitfeel===undefined)RET.hitfeel=!/[?&]hitfeel=0/.test(location.search);
 F.hitFeel=function(e,d,src){if(!RET.hitfeel||!src||src.kind==='fire'||(!src.kind&&!src.melee&&d<1))return;
-  const heavy=e.hp<=0||d>=2;const ms=heavy?100:d<1?33:50;if(!F.S.sim)IN.hitstop(ms);F.S.hf=Math.max(F.S.hf||0,ms/1000);   // headless sim() only records the freeze (S.hf): applying it would change how often a bot samples, not the game
+  const heavy=e.hp<=0||d>=2;const ms=heavy?100:d<1?33:50;if(!F.S.sim)IN.hitstop(ms,e,src.melee?F.S.P:null);F.S.hf=Math.max(F.S.hf||0,ms/1000);   // headless sim() only records the freeze (S.hf): applying it would change how often a bot samples, not the game
+  if(RET.footmove&&!e.boss&&!e.fly&&(e.hp<=0||d>=2))e._ka={t:F.S.time,dir:(src.melee?Math.sign(e.x-src.x):Math.sign(src.vx))||1,die:e.hp<=0};   // footmove knockback: a gravity arc (OpenBOR dropv 3 up : 1.2 back, gravity .1/tick), a landing squash, a short slide
   if(e.boss||e.hp<=0||src.kb||/^(wind|charge|crouch|lunge|pop|stun)$/.test(e.state))return;   // committed attacks and stuns do not rock back
   e._kbd=(src.melee?Math.sign(e.x-src.x)||1:Math.sign(src.vx)||1)*clamp(10*d,4,16);e._kbt=F.S.time;F.FEEL.log.kb++;};   // a drawn recoil that eases back in 0.14 s: a real shove made the dodge bot clear 100% (was 86%), see HANDOFF-W169.md
 /* ===== W187 OVERDRIVE (?overdrive=1, off by default; STREET-REVIEW 24 Oct, task 4): the meter fills +1 per landed hit and +4 per kill and drops to 0 on a hurt; when it is full BOMB
@@ -78,6 +79,8 @@ ART.footDraw=function(c,who,pose,x,y,h,flip,t){const e=ART.fE,S=F.S;if(!RET.feel
   if(who==='kai'&&e===S.P){const ws=wset(e);if(ws!=='kai'&&ART.ANIM.s[ws+'/'+actOf(ws,pose,e)])who=ws;}
   track(e,x,t);
   if(e._kbd){const k=(S.time-e._kbt)/.14;if(k>=1||k<0)e._kbd=0;else x+=e._kbd*(1-k)*h/64;}   // hitfeel recoil
+  let sq=0;if(e._ka){const k=S.time-e._ka.t,u=h/76,T=.3;if(k<0||k>(e._ka.die?2:.5))e._ka=null;else{if(k<T)y-=(600*k-2000*k*k)*u;else if(k<T+.09)sq=1-(k-T)/.09;   // air .3 s, 45 px apex, then the landing frame
+      if(e._ka.die){const w=Math.min(1,Math.max(0,(k-T)/.16));x+=e._ka.dir*u*(240*Math.min(k,T)+60*(1-(1-w)*(1-w)));}}}   // a dead foe flies back 72 px and slides 60 px more; a living one already slides in the sim (finisher)
   const act=actOf(who,pose,e),key=act&&who+'/'+act,m=key&&ART.ANIM.s[key];
   // scale: the visible body, not the frame, is h tall (standing acts)
   const base=who.indexOf('kai')===0?'kai':who,bk=FEEL.BODY[base+'/'+act],ref=FEEL.BODY[base+'/idle'];if(!RET.bodyscale&&bk&&ref&&!/crouch|die|jump|land|dash/.test(act))h*=ref/bk;   // bodyscale: one scale from the json body instead
@@ -87,7 +90,7 @@ ART.footDraw=function(c,who,pose,x,y,h,flip,t){const e=ART.fE,S=F.S;if(!RET.feel
     if(e._fa!==key){e._fa=key;}e._f0=0;bob=-abs(Math.sin(ph*2*Math.PI))*h*.025;
     const half=Math.floor(ph*2);if(e._hc!==half){e._hc=half;if(e._hc!=null&&(e===S.P?e.onGround:!e.fly)&&window.AH&&S.fx.length<200){AH.ftPush(S.fx,'fx-ft-dust',x-(flip?-1:1)*h*.12,y-3,h*.42,.28);FEEL.log.dust++;}}}
   else e._hc=null;
-  const ln=e._ln||0;c.save();c.translate(x,y+bob);if(ln)c.rotate(ln);   // lean into a start, back on a stop
+  const ln=e._ln||0;c.save();c.translate(x,y+bob);if(sq)c.scale(1+.14*sq,1-.18*sq);if(ln)c.rotate(ln);   // lean into a start, back on a stop
   const r=fd0.call(this,c,who,pose,0,0,h,flip,tt);c.restore();
   // remember where this frame's gun is (bullets and the flash come from it)
   const kk=e._fa;if(r&&kk){const[kw,ka]=sheetOf(kk),mz=(RET.bodyscale&&FEEL.MZB[(kw.indexOf('kai')===0?'kai':kw)+'/'+ka]||FEEL.MZ[(kw.indexOf('kai')===0?'kai':kw)+'/'+ka]),mm=ART.ANIM.s[kk];

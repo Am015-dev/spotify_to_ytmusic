@@ -50,7 +50,8 @@ let B=null,bk='';
 function btn(){const L=IN.L();if(!L||!L.btn||!L.btn.melee)return;
   if(!B){B=document.createElement('button');B.type='button';B.className='fb';B.id='fGuard';B.textContent='GUARD';L.root.appendChild(B);
     const dn=e=>{e.preventDefault();if(!I.guard)I.guardP=1;I.guard=1;B.classList.add('on');try{B.setPointerCapture(e.pointerId);}catch(x){}},up=()=>{I.guard=0;B.classList.remove('on');};
-    B.addEventListener('pointerdown',dn);B.addEventListener('pointerup',up);B.addEventListener('pointercancel',up);B.addEventListener('lostpointercapture',up);}
+    B.addEventListener('pointerdown',dn);B.addEventListener('pointerup',up);B.addEventListener('pointercancel',up);B.addEventListener('lostpointercapture',up);
+    const mo=new MutationObserver(()=>btn());for(const e of Object.values(L.btn))mo.observe(e,{attributes:true,attributeFilter:['style','hidden']});}   // W238: a relayout puts BOMB back under GUARD; re-seat both before the next paint, not on the next post
   const m=L.btn.melee,kf=()=>Object.values(L.btn).map(b=>b.style.left+b.style.top+b.style.width+b.style.display+b.hidden).join('|'),k=kf();if(k===bk)return;bk=k;   // W217: every button in the key, so a relayout that puts BOMB back under GUARD is seen
   if(m.hidden||m.style.display==='none'){B.hidden=true;B.style.display='none';return;}
   const z=parseFloat(m.style.width)||56,top=parseFloat(m.style.top),row=Object.values(L.btn).filter(b=>!b.hidden&&b.style.display!=='none'&&abs(parseFloat(b.style.top)+parseFloat(b.style.width)/2-top-z/2)<z/2);
