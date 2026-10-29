@@ -1,0 +1,33 @@
+// hr-hit-2 (2026-10-29) · GO hr/hit: "not even close to Hit and Run" (Alex); docs/HITRUN_GAP.md gap 1 "I can't hit anything: cars slip away".
+// 10 staged nose-ins per city, no graphics: a traffic car on a long street is slowed to 25 km/h (a slower car ahead), the player starts 14 m behind it in its lane
+// at 40 km/h, holds 40 km/h on the GAS and steers at it (keys, real roamStep + hubTrafficStep at dt 1/60, 4 s). Per run: contact (HT_smash on that car), the player's speed
+// lost before contact on frames with GAS held, how far the hit car moved off its own path or turned in the 1.5 s after (reaction), frames with the boxes
+// overlapping > 0.3 m (pass-through), smashed (a wreck) and the player's hp loss. Pass line: >= 9/10 runs with contact, loss before contact <= 5 %,
+// reaction >= 1 m or 15 deg, 0 overlap frames, not smashed and hp loss <= 15 (a 40 km/h nose-in is a dent). Owner of the fix: 98ayd_yield.js (AYD.near).
+// Real-input twin (phone profile, the real GAS and steer buttons): docs/shots/hr-hit/rt.js.txt.
+function HH_run(c){const N=HUB.nodes,A=N[c.a],B=N[c.b],l=Math.hypot(B.x-A.x,B.z-A.z),dx=(B.x-A.x)/l,dz=(B.z-A.z)/l,h=Math.atan2(dx,dz),v0=c.v,dt=1/60,F=[];
+ const x=c.x-dx*14,z=c.z-dz*14;if(!roamWarp(x,z,h)){RO.x=x;RO.z=z}RO.y=groundAt(RO.x,RO.z,99)+.3;RO.h=RO.vh=h;RO.v=40/3.6;RO.frozen=false;camSnap=true;c.v=Math.min(c.v||9,7);
+ const hp0=RO.hp??100,[w,cl]=OB_cdim(c.k);let hit=-1,hitV=0;HH.c=c;HH.on=1;
+ try{for(let s=0;s<240;s++){const e=angDiff(Math.atan2(c.x-RO.x,c.z-RO.z),RO.h),g=RO.v<40/3.6,v1=RO.v;K.ArrowUp=g;K.ArrowLeft=K.ArrowRight=false;if(hit<0&&Math.abs(e)>.05)K[e>0?'ArrowLeft':'ArrowRight']=true;
+   T+=dt;roamStep(dt);roamCam(dt);camera.updateMatrixWorld()/* the contact rules follow the camera (an undrawn car is not solid): look like play */;if(hit<0&&HH.f>=0){hit=F.length;hitV=HH.v}const dd=c.dead>0,hd=Math.atan2(c.hdx??dx,c.hdz??dz),M=dd?null:NC_mtv(RO.x,RO.z,RO.h,OB_HW,OB_HL,c.x,c.z,hd,w,cl);
+   F.push([s*dt,RO.x,RO.z,RO.v,dd?NaN:c.x,dd?NaN:c.z,hd,dd?1:0,M?M[2]:0,g?Math.max(0,v1-RO.v):0]);if(hit>=0&&F.length-hit>90)break}}
+ finally{HH.on=0;HH.c=null;HH.f=-1;K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;if(!(c.dead>0))c.v=v0}
+ const hi=hit<0?F.length:hit;let vmax=0,lost=0;for(let i=0;i<hi;i++){vmax=Math.max(vmax,F[i][3]);lost+=F[i][9]}/* speed lost while GAS was held (lifting off to hold 40 km/h is the player's own coasting) */const pre=vmax>0?lost/vmax:0;let mv=0,sp=0,sm=false,pen=0;
+ for(const r of F)if(r[8]>.3)pen++;
+ if(hit>=0){const a=F[Math.max(0,hit-3)],b=F[Math.max(0,hit-9)],q=Math.max(1e-3,a[0]-b[0]),vx=(a[4]-b[4])/q,vz=(a[5]-b[5])/q;
+  for(let i=hit;i<F.length&&F[i][0]-a[0]<1.5;i++){const r=F[i];if(r[7]){sm=true;continue}const t=r[0]-a[0];mv=Math.max(mv,Math.hypot(r[4]-a[4]-vx*t,r[5]-a[5]-vz*t));sp=Math.max(sp,Math.abs(angDiff(r[6],a[6]))*57.3)}}
+ const hpL=hp0-(RO.hp??100),ok=hit>=0&&pre<=.05&&(mv>=1||sp>=15)&&!pen&&!sm&&hpL<=15;
+ return{ok,hit:hit>=0,t:hit>=0?+F[hit][0].toFixed(2):null,kmh:hit>=0?Math.round(hitV*3.6):null,pre:+(pre*100).toFixed(1),mv:+mv.toFixed(1),sp:Math.round(sp),pen,sm,hp:+hpL.toFixed(1)}}
+const HH={on:0,c:null,f:-1,v:0};
+HT_smash=(f=>function(c){if(HH.on&&c===HH.c&&HH.f<0){HH.f=1;HH.v=RO.v}return f.apply(this,arguments)})(HT_smash);
+function HH_go(){if(state!=='roam'||!RO.on)return'📍 Start free roam to run this';const P0=[RO.x,RO.z,RO.h],S0={ch:RO.ch,card:RO.card,story:RO.story,hp:RO.hp},N=HUB.nodes,L=[],out=[];
+ for(const c of HUB.cars){if(c.dead>0||c.pk||c.tr||c.route&&!c.CVr||c.fake)continue;const A=N[c.a],B=N[c.b];if(!A||!B||A.ab||Math.hypot(B.x-A.x,B.z-A.z)<25)continue;L.push([Math.hypot(c.x-RO.x,c.z-RO.z),c])}
+ L.sort((p,q)=>p[0]-q[0]);let ok=0;
+ try{RO.card=null;RO.story=null;for(let i=0;i<10&&i<L.length;i++){const c=L[i][1];if(c.dead>0)continue;const r=HH_run(c);if(r.ok)ok++;out.push(r);if(RO.hp!=null)RO.hp=S0.hp??100}}
+ finally{try{if(RO.ch&&RO.ch!==S0.ch)chAbort()}catch(e){}RO.card=S0.card;RO.story=S0.story;if(S0.hp!=null)RO.hp=S0.hp;K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;RO.x=P0[0];RO.z=P0[1];RO.h=RO.vh=P0[2];RO.v=0;camSnap=true}
+ const n=out.length,pass=n>=10&&ok>=9,bad=out.filter(r=>!r.ok).slice(0,3).map(r=>JSON.stringify(r)).join(' ');
+ return`📍 hr/hit · ${ok}/${n} nose-ins at 40 km/h made contact and the car reacted (>= 9/10)${pass?' ✅':' ❌'} · contact ${out.filter(r=>r.hit).length}/${n}, median ${(out.filter(r=>r.hit).map(r=>r.t).sort((a,b)=>a-b)[Math.floor(out.filter(r=>r.hit).length/2)]??'-')} s at ${(out.filter(r=>r.hit).map(r=>r.kmh).sort((a,b)=>a-b)[Math.floor(out.filter(r=>r.hit).length/2)]??'-')} km/h · max loss before contact ${Math.max(0,...out.map(r=>r.pre))} % (<= 5) · min reaction ${Math.min(...out.filter(r=>r.hit).map(r=>r.mv),99)} m · overlap frames ${out.reduce((a,r)=>a+r.pen,0)} (0) · smashed ${out.filter(r=>r.sm).length} (0) · max hp loss ${Math.max(0,...out.map(r=>r.hp))} (<= 15)${bad?' · misses: '+bad:''}`}
+{const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
+ __chk.items.unshift({ver:'hr',id:'hit',area:'world',text:'hr-hit-2: you can hit traffic (Hit & Run). 📍 GO: 10 staged nose-ins per city, 40 km/h held on the GAS, 14 m behind a slower car (25 km/h) in its lane, steering at it; pass line: >= 9/10 make contact, the player loses <= 5 % speed before contact, the hit car moves >= 1 m off its path or turns >= 15 deg, 0 frames of overlapping boxes, no smash and <= 15 hp lost (a dent, not a wreck).'});
+ __chk.GO['hr/hit']=['fra','ath'].map(c=>({c,n:'hit traffic '+(c==='fra'?'Frankfurt':'Athens'),secs:120,fn:()=>HH_go()}))},500)}
+window.__hh={go:HH_go,run:HH_run};

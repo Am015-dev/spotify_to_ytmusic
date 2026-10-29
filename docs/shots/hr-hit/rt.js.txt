@@ -1,0 +1,24 @@
+// real-input hit test: phone profile, built page, real GAS + steer touches (CDP), N staged nose-ins at 40 km/h from 14 m behind a traffic car
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
+const URL=process.argv[2],CITY=process.argv[3]||'fra',N=+(process.argv[4]||10),SHOT=process.env.SHOT;
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+const p=await ctx.newPage();await p.addInitScript(()=>{window.__dbg=1});const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,150)));
+await p.goto(URL+(URL.includes('?')?'&':'?')+'test='+CITY+(process.env.DRAW0?'&draw=0':''));await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:180000});
+const cdp=await ctx.newCDPSession(p);if(process.env.THROTTLE)await cdp.send('Emulation.setCPUThrottlingRate',{rate:+process.env.THROTTLE});
+const E=s=>p.evaluate(c=>window.__oc.ev(c),s);await E(fs.readFileSync(__dirname+'/rt_page.js','utf8'));
+const box=async id=>{const r=await p.evaluate(i=>{const e=document.querySelector(i);if(!e||e.offsetParent===null)return null;const b=e.getBoundingClientRect();return{x:b.x+b.width/2,y:b.y+b.height/2}},id);return r};
+await p.waitForFunction(()=>{const e=document.querySelector('#tG');return e&&e.offsetParent!==null},null,{polling:250,timeout:60000}).catch(()=>{});
+const G=await box('#tG'),Lb=await box('#tL'),Rb=await box('#tR');if(!G||!Lb||!Rb){console.log('NO TOUCH BUTTONS',{G,Lb,Rb});process.exit(1)}
+// CDP touch: the list is the set of points still down after the change (one changed point per event)
+const act=new Map();const send=async(type)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:[...act.values()]});
+const down=async(k,q,id)=>{if(act.has(k))return;act.set(k,{x:q.x,y:q.y,id});await send('touchStart')},up=async k=>{if(!act.has(k))return;act.delete(k);await send('touchEnd')};
+let ok=0;const rows=[];const UPT={};let GL=0;const VT=+(process.env.VT||40);
+for(let t=0;t<N;t++){const s=await E(`__H.setup(${t})`);
+ for(let k=0;k<600;k++){const st=await E('__H.st()');if(process.env.TR)console.log(JSON.stringify(st));if(st.dt>4||(st.hit>=0&&st.n-st.hit>90))break;
+  if(st.v<VT-2)await down('g',G,1);else if(st.v>=VT){await up('g');if(st.gas&&!act.has('g')){GL++;await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[...act.values(),{x:G.x,y:G.y,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[...act.values()]})}}   // a GAS that stayed down after its touchEnd is lifted again   // the GAS pedal: a player holding ~40 km/h
+  const want=st.hit>=0?null:st.err>.05?'L':st.err<-.05?'R':null;for(const s2 of['L','R'])if(s2!==want&&act.has(s2)){await up(s2);UPT[s2]=Date.now()}if(want&&!act.has(want)&&Date.now()-(UPT[want]||0)>350)await down(want,want==='L'?Lb:Rb,2);   // no re-tap within 350 ms: a double-tap is the SMASH lunge
+  if(SHOT&&st.hit>=0&&st.n-st.hit>=3&&!rows.shot){rows.shot=1;await E('__tq.draw&&__tq.draw()').catch(()=>{});await p.screenshot({path:SHOT,type:'jpeg',quality:80})}}
+ for(const k of[...act.keys()])await up(k);
+ const r=await E('__H.res()');r.cv0=s.cv;const pass=r.hit&&r.preLoss<=5&&(r.react>=1||r.spin>=15)&&r.pen===0&&!r.smashed&&r.hpLoss<=15;if(pass)ok++;rows.push(r);console.log((pass?'ok  ':'MISS')+' '+CITY+' #'+t+' '+JSON.stringify({hit:r.hit,minD:r.minD,vHit:r.vHit,pre:r.preLoss,react:r.react,sm:r.smashed,pen:r.pen,why:r.why,S:pass?undefined:r.S}))}
+console.log(`gas re-lifts ${GL}`);console.log(`RT ${CITY} ${ok}/${N} ${ok>=Math.ceil(N*.9)?'PASS':'FAIL'} errs=${errs.length}`);if(errs.length)console.log(errs.slice(0,3));await b.close()})();
