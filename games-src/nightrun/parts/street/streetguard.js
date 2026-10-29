@@ -48,7 +48,7 @@ const kx0=IN.kaiX;IN.kaiX=function(P){const r=kx0.apply(this,arguments);return P
 /* the phone button, next to KNIFE (same size and style); keys I and ; */
 let B=null,bk='';
 function btn(){const L=IN.L();if(!L||!L.btn||!L.btn.melee)return;
-  if(!B){B=document.createElement('button');B.type='button';B.className='fb';B.id='fGuard';B.textContent='GUARD';L.root.appendChild(B);
+  if(!B){B=document.createElement('button');B.type='button';B.className='fb';B.id='fGuard';B.textContent='GUARD';L.root.insertBefore(B,L.menu);/* before #fMenu: appended last it drew above the result / pause overlay */
     const dn=e=>{e.preventDefault();if(!I.guard)I.guardP=1;I.guard=1;B.classList.add('on');try{B.setPointerCapture(e.pointerId);}catch(x){}},up=()=>{I.guard=0;B.classList.remove('on');};
     B.addEventListener('pointerdown',dn);B.addEventListener('pointerup',up);B.addEventListener('pointercancel',up);B.addEventListener('lostpointercapture',up);
     const mo=new MutationObserver(()=>btn());for(const e of Object.values(L.btn))mo.observe(e,{attributes:true,attributeFilter:['style','hidden']});}   // W238: a relayout puts BOMB back under GUARD; re-seat both before the next paint, not on the next post

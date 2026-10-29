@@ -49,7 +49,7 @@ function makeInput(p, plat) {
         if (!ids[k]) { ids[k] = nid++; touches.set(k, { x: want[k].x, y: want[k].y, id: ids[k] }); await touch('touchStart'); }
         else if (Math.abs(touches.get(k).x - want[k].x) > 1) { touches.get(k).x = want[k].x; touches.get(k).y = want[k].y; await touch('touchMove'); } }
     },
-    async release() { if (plat === 'pc') { for (const k of [...held]) await p.keyboard.up(KEYS[k]); held.clear(); } else { touches.clear(); for (const k in ids) delete ids[k]; await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); } },
+    async release() { if (plat === 'pc') { for (const k of [...held]) await p.keyboard.up(KEYS[k]); held.clear(); } else { const any = touches.size; touches.clear(); for (const k in ids) delete ids[k]; if (any) await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); } },
     async tap(sel) {   // a real tap / click on an element's centre (menus, pause): touch tap on the phone, mouse click on the PC
       const bb = await p.locator(sel).boundingBox(); if (!bb) return false; const x = bb.x + bb.width / 2, y = bb.y + bb.height / 2;
       if (plat === 'phone') await p.touchscreen.tap(x, y); else await p.mouse.click(x, y); return true; },
