@@ -13,7 +13,9 @@
    "ghost": 1.27,
    "overlap": 0.925,
    "drift": 0.1
-  }
+  },
+  "orig_err": 0,
+  "bytes": 1203616
  },
  "boss-flusskrake/idle": {
   "frames": [
@@ -29,7 +31,9 @@
    "ghost": 1.23,
    "overlap": 0.933,
    "drift": 0.0
-  }
+  },
+  "orig_err": 0,
+  "bytes": 1150008
  },
  "boss-hoplite/idle": {
   "frames": [
@@ -45,23 +49,9 @@
    "ghost": 1.22,
    "overlap": 0.928,
    "drift": 0.0
-  }
- },
- "boss-kronos/idle": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   4,
-   8
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.04,
-   "overlap": 0.909,
-   "drift": 0.1
-  }
+  },
+  "orig_err": 0,
+  "bytes": 877470
  },
  "boss-messe-waechter/idle": {
   "frames": [
@@ -93,7 +83,9 @@
    "ghost": 1.07,
    "overlap": 0.941,
    "drift": 0.2
-  }
+  },
+  "orig_err": 0,
+  "bytes": 1688434
  },
  "boss-sek-adler/idle": {
   "frames": [
@@ -125,7 +117,9 @@
    "ghost": 1.48,
    "overlap": 0.895,
    "drift": 0.2
-  }
+  },
+  "orig_err": 0,
+  "bytes": 750814
  },
  "boss-tresor-wart/idle": {
   "frames": [
@@ -141,7 +135,9 @@
    "ghost": 1.11,
    "overlap": 0.971,
    "drift": 0.0
-  }
+  },
+  "orig_err": 0,
+  "bytes": 1171544
  },
  "boss-zentral-ice/idle": {
   "frames": [
@@ -173,7 +169,9 @@
    "ghost": 1.29,
    "overlap": 0.984,
    "drift": 0.0
-  }
+  },
+  "orig_err": 0,
+  "bytes": 315224
  },
  "drone/idle": {
   "frames": [
@@ -221,55 +219,9 @@
    "ghost": 1.43,
    "overlap": 0.945,
    "drift": 0.0
-  }
- },
- "gunman/idle": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   4,
-   8
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.44,
-   "overlap": 0.946,
-   "drift": 0.1
-  }
- },
- "jetpack/hover": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   8,
-   16
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.28,
-   "overlap": 0.955,
-   "drift": 0.5
-  }
- },
- "kai/idle": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   4,
-   8
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.81,
-   "overlap": 0.862,
-   "drift": 0.2
-  }
+  },
+  "orig_err": 0,
+  "bytes": 232342
  },
  "knife/idle": {
   "frames": [
@@ -285,7 +237,9 @@
    "ghost": 1.4,
    "overlap": 0.934,
    "drift": 0.1
-  }
+  },
+  "orig_err": 0,
+  "bytes": 199666
  },
  "mech/idle": {
   "frames": [
@@ -296,7 +250,7 @@
    4,
    8
   ],
-  "ok": true,
+  "ok": false,
   "worst": {
    "ghost": 1.65,
    "overlap": 0.871,
@@ -367,22 +321,6 @@
    "drift": 0.3
   }
  },
- "prop-holo/loop": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   8,
-   16
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.56,
-   "overlap": 0.948,
-   "drift": 0.6
-  }
- },
  "prop-neon/loop": {
   "frames": [
    4,
@@ -397,7 +335,9 @@
    "ghost": 1.18,
    "overlap": 0.995,
    "drift": 0.2
-  }
+  },
+  "orig_err": 0,
+  "bytes": 474372
  },
  "prop-police/loop": {
   "frames": [
@@ -413,7 +353,9 @@
    "ghost": 1.19,
    "overlap": 0.888,
    "drift": 3.8
-  }
+  },
+  "orig_err": 0,
+  "bytes": 899186
  },
  "prop-steam/glow": {
   "frames": [
@@ -445,7 +387,9 @@
    "ghost": 1.14,
    "overlap": 0.996,
    "drift": 0.1
-  }
+  },
+  "orig_err": 0,
+  "bytes": 894120
  },
  "shield/idle": {
   "frames": [
@@ -461,7 +405,9 @@
    "ghost": 1.34,
    "overlap": 0.962,
    "drift": 0.0
-  }
+  },
+  "orig_err": 0,
+  "bytes": 364240
  },
  "ship-drift/flame": {
   "frames": [
@@ -477,23 +423,9 @@
    "ghost": 1.41,
    "overlap": 0.958,
    "drift": 2.2
-  }
- },
- "ship-ebait/flame": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   12,
-   24
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.27,
-   "overlap": 0.957,
-   "drift": 0.7
-  }
+  },
+  "orig_err": 0,
+  "bytes": 664572
  },
  "ship-ebomber/flame": {
   "frames": [
@@ -509,7 +441,9 @@
    "ghost": 1.28,
    "overlap": 0.971,
    "drift": 0.3
-  }
+  },
+  "orig_err": 0,
+  "bytes": 831414
  },
  "ship-ec/flame": {
   "frames": [
@@ -525,7 +459,9 @@
    "ghost": 1.26,
    "overlap": 0.953,
    "drift": 0.9
-  }
+  },
+  "orig_err": 0,
+  "bytes": 570054
  },
  "ship-ecarrier/flame": {
   "frames": [
@@ -541,7 +477,9 @@
    "ghost": 1.29,
    "overlap": 0.978,
    "drift": 0.6
-  }
+  },
+  "orig_err": 0,
+  "bytes": 795596
  },
  "ship-ecdrone/flame": {
   "frames": [
@@ -557,7 +495,9 @@
    "ghost": 1.42,
    "overlap": 0.907,
    "drift": 2.4
-  }
+  },
+  "orig_err": 0,
+  "bytes": 775922
  },
  "ship-echarger/flame": {
   "frames": [
@@ -573,7 +513,9 @@
    "ghost": 1.27,
    "overlap": 0.975,
    "drift": 0.0
-  }
+  },
+  "orig_err": 0,
+  "bytes": 646464
  },
  "ship-ecrawler/flame": {
   "frames": [
@@ -589,7 +531,9 @@
    "ghost": 1.31,
    "overlap": 0.967,
    "drift": 1.1
-  }
+  },
+  "orig_err": 0,
+  "bytes": 898834
  },
  "ship-ecruiser/flame": {
   "frames": [
@@ -605,7 +549,9 @@
    "ghost": 1.29,
    "overlap": 0.968,
    "drift": 0.3
-  }
+  },
+  "orig_err": 0,
+  "bytes": 707510
  },
  "ship-ediver/flame": {
   "frames": [
@@ -621,7 +567,9 @@
    "ghost": 1.4,
    "overlap": 0.971,
    "drift": 1.5
-  }
+  },
+  "orig_err": 0,
+  "bytes": 860412
  },
  "ship-edrone/flame": {
   "frames": [
@@ -637,7 +585,9 @@
    "ghost": 1.33,
    "overlap": 0.943,
    "drift": 1.0
-  }
+  },
+  "orig_err": 0,
+  "bytes": 858290
  },
  "ship-eflank/flame": {
   "frames": [
@@ -653,23 +603,9 @@
    "ghost": 1.25,
    "overlap": 0.934,
    "drift": 0.9
-  }
- },
- "ship-egate/flame": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   12,
-   24
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.19,
-   "overlap": 0.965,
-   "drift": 1.8
-  }
+  },
+  "orig_err": 0,
+  "bytes": 463256
  },
  "ship-egtank/flame": {
   "frames": [
@@ -685,7 +621,9 @@
    "ghost": 1.26,
    "overlap": 0.977,
    "drift": 0.5
-  }
+  },
+  "orig_err": 0,
+  "bytes": 647968
  },
  "ship-egturret/flame": {
   "frames": [
@@ -701,7 +639,9 @@
    "ghost": 1.4,
    "overlap": 0.963,
    "drift": 0.6
-  }
+  },
+  "orig_err": 0,
+  "bytes": 740274
  },
  "ship-egunship/flame": {
   "frames": [
@@ -717,7 +657,9 @@
    "ghost": 1.36,
    "overlap": 0.968,
    "drift": 0.4
-  }
+  },
+  "orig_err": 0,
+  "bytes": 720854
  },
  "ship-ehealer/flame": {
   "frames": [
@@ -733,7 +675,9 @@
    "ghost": 1.24,
    "overlap": 0.984,
    "drift": 0.3
-  }
+  },
+  "orig_err": 0,
+  "bytes": 897764
  },
  "ship-einterceptor/flame": {
   "frames": [
@@ -749,7 +693,9 @@
    "ghost": 1.3,
    "overlap": 0.933,
    "drift": 0.2
-  }
+  },
+  "orig_err": 0,
+  "bytes": 714908
  },
  "ship-ekamikaze/flame": {
   "frames": [
@@ -765,23 +711,9 @@
    "ghost": 1.35,
    "overlap": 0.965,
    "drift": 0.6
-  }
- },
- "ship-emine/flame": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   12,
-   24
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.38,
-   "overlap": 0.948,
-   "drift": 2.3
-  }
+  },
+  "orig_err": 0,
+  "bytes": 734226
  },
  "ship-eminelayer/flame": {
   "frames": [
@@ -797,23 +729,9 @@
    "ghost": 1.32,
    "overlap": 0.957,
    "drift": 0.4
-  }
- },
- "ship-eshielder/flame": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   12,
-   24
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.42,
-   "overlap": 0.972,
-   "drift": 0.6
-  }
+  },
+  "orig_err": 0,
+  "bytes": 848558
  },
  "ship-esniper/flame": {
   "frames": [
@@ -829,23 +747,9 @@
    "ghost": 1.38,
    "overlap": 0.949,
    "drift": 1.9
-  }
- },
- "ship-esplitter/flame": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   12,
-   24
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.38,
-   "overlap": 0.932,
-   "drift": 1.2
-  }
+  },
+  "orig_err": 0,
+  "bytes": 375260
  },
  "ship-eswarm/flame": {
   "frames": [
@@ -861,7 +765,9 @@
    "ghost": 1.41,
    "overlap": 0.939,
    "drift": 2.7
-  }
+  },
+  "orig_err": 0,
+  "bytes": 390610
  },
  "ship-eturret/flame": {
   "frames": [
@@ -877,7 +783,9 @@
    "ghost": 1.28,
    "overlap": 0.97,
    "drift": 0.2
-  }
+  },
+  "orig_err": 0,
+  "bytes": 667072
  },
  "ship-ezbomber/flame": {
   "frames": [
@@ -893,7 +801,9 @@
    "ghost": 1.3,
    "overlap": 0.97,
    "drift": 0.3
-  }
+  },
+  "orig_err": 0,
+  "bytes": 913142
  },
  "ship-ezdrone/flame": {
   "frames": [
@@ -909,23 +819,9 @@
    "ghost": 1.39,
    "overlap": 0.94,
    "drift": 1.5
-  }
- },
- "ship-hv/flame": {
-  "frames": [
-   4,
-   8
-  ],
-  "fps": [
-   12,
-   24
-  ],
-  "ok": true,
-  "worst": {
-   "ghost": 1.51,
-   "overlap": 0.964,
-   "drift": 0.6
-  }
+  },
+  "orig_err": 0,
+  "bytes": 736338
  },
  "ship-lancer/flame": {
   "frames": [
@@ -941,7 +837,9 @@
    "ghost": 1.27,
    "overlap": 0.949,
    "drift": 1.1
-  }
+  },
+  "orig_err": 0,
+  "bytes": 501462
  },
  "ship-nova/flame": {
   "frames": [
@@ -957,7 +855,9 @@
    "ghost": 1.26,
    "overlap": 0.959,
    "drift": 0.3
-  }
+  },
+  "orig_err": 0,
+  "bytes": 544516
  },
  "ship-std/flame": {
   "frames": [
@@ -973,7 +873,9 @@
    "ghost": 1.51,
    "overlap": 0.929,
    "drift": 2.3
-  }
+  },
+  "orig_err": 0,
+  "bytes": 412590
  },
  "ship-swg/flame": {
   "frames": [
@@ -989,7 +891,9 @@
    "ghost": 1.34,
    "overlap": 0.961,
    "drift": 0.2
-  }
+  },
+  "orig_err": 0,
+  "bytes": 801438
  },
  "ship-syn/flame": {
   "frames": [
@@ -1005,7 +909,9 @@
    "ghost": 1.28,
    "overlap": 0.958,
    "drift": 0.3
-  }
+  },
+  "orig_err": 0,
+  "bytes": 721438
  },
  "ship-tri/flame": {
   "frames": [
@@ -1021,7 +927,9 @@
    "ghost": 1.28,
    "overlap": 0.93,
    "drift": 1.0
-  }
+  },
+  "orig_err": 0,
+  "bytes": 830308
  },
  "sniper/idle": {
   "frames": [
@@ -1053,7 +961,9 @@
    "ghost": 1.2,
    "overlap": 0.987,
    "drift": 0.1
-  }
+  },
+  "orig_err": 0,
+  "bytes": 527068
  },
  "warden/idle": {
   "frames": [
@@ -1069,6 +979,8 @@
    "ghost": 1.38,
    "overlap": 0.942,
    "drift": 0.1
-  }
+  },
+  "orig_err": 0,
+  "bytes": 317390
  }
 }

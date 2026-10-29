@@ -102,7 +102,7 @@ function tune(k){if(tuned[k]||!RET.street3)return;const o=ART.aS(k);if(!o)return
   if(r){const n=o.m[0],cum=new Float32Array(n);for(let i=0;i<n;i++)cum[i]=(i+1)/r;o.cum=cum;o.tot=n/r;}}
 const af0=ART.aframe;
 ART.aframe=function(key,t){if(RET.street3&&isFoot(key)){tune(key);const o=ART.aS(key);
-    if(o&&o.act==='idle'&&o.m[0]>2){const n=o.m[0],L=2*n-2,u=Math.max(0,t)*S3.IDLE,k=Math.floor(u)%L;ART.aDone=false;ART.aP=u%1;ART.aT=ART.aP/S3.IDLE;return k<n?k:L-k;}}   // ping-pong 0 1 2 3 2 1
+    if(o&&o.act==='idle'&&o.m[0]>2){const n=o.m[0]-(o.x2?1:0),L=2*n-2,u=Math.max(0,t)*S3.IDLE*(o.x2?2:1),k=Math.floor(u)%L;ART.aDone=false;ART.aP=u%1;ART.aT=ART.aP/(S3.IDLE*(o.x2?2:1));return k<n?k:L-k;}}   // ping-pong 0 1 2 3 2 1; x2 strip: the last frame (the in-between that closes the loop) is not on the ping-pong path
   return af0.apply(this,arguments);};
 const URG=/hit|hurt|die|shoot|melee|jump|fall|crouch|dash|land|grenade|combo|aim|victory/;
 const fd1=ART.footDraw;

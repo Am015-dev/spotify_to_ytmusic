@@ -146,7 +146,7 @@ ART.LOOPA=new Set(['idle','run','flame','glow','loop','spin','hover']);   // eve
 ART.VS={};ART.VB={};     // tinted copies of enemy-ship sheets (foeart.js): meta and strip, kept out of ART.ANIM.s / ART.rd so the listed-sheet counts stay the real files
 ART.aS=key=>{let o=ART.as[key];if(o!==undefined)return o;const x2=ART.x2(key),m=x2?ART.ANIM.x[key]:ART.ANIM.s[key]||ART.VS[key];if(!m)return ART.as[key]=null;   // per-sheet record, built once: cumulative frame end times (smoothing.json holds at the sheet fps)
   const act=key.slice(key.lastIndexOf('/')+1),hd=ART.ANIM.sm.holds[act],n=m[0],cum=new Float32Array(n);let s=0;for(let i=0;i<n;i++){s+=(hd&&hd.length===(x2?n/2:n)?hd[x2?i>>1:i]:1)/m[1];cum[i]=s;}
-  return ART.as[key]={m,act,cum,tot:s,loop:ART.LOOPA.has(act),xf:!x2&&ART.ANIM.sm.crossfade.actions.indexOf(act)>=0};};   // x2: the in-between frames replace the cross-fade; owner holds are repeated for both halves of a pair
+  return ART.as[key]={m,act,cum,tot:s,x2,loop:ART.LOOPA.has(act),xf:!x2&&ART.ANIM.sm.crossfade.actions.indexOf(act)>=0};};   // x2: the in-between frames replace the cross-fade; owner holds are repeated for both halves of a pair
 /* RET.expand: true once the <act>x2 strip of key is decoded (its load starts here); until then, and without the flag or the file, the original strip plays */
 ART.x2=key=>{if(!RET.expand||!ART.ANIM.x[key])return false;const n='anim/'+key+'x2-strip';if(ART.bm[n]){if(!ART.xr[key]){ART.xr[key]=1;delete ART.as[key];}return true;}if(ART.rd&&ART.rd.has(n+'.webp')&&!(n in ART.bm))ART.load(n);return false;};
 ART.xr={};
@@ -158,7 +158,8 @@ ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;if(!o
   for(let i=0;i<n;i++)if(u<o.cum[i]){const a=i?o.cum[i-1]:0;ART.aT=u-a;ART.aP=ART.aT/(o.cum[i]-a);return i;}
   return n-1;};
 /* one cell, its anchor on x,y; sc = world units per sheet px; flip mirrors around the anchor; sy = extra vertical squash about the anchor; idle / flame cross-fade into the next frame (smoothing.json) */
-ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return false;const i=ART.aframe(key,t),p=ART.aP,m=o.m,w=m[2],h=m[3],sv=sc*(sy||1),X=ART.ANIM.sm.crossfade,
+ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const b0=ART.anim(key),o=b0&&ART.aS(key);if(!b0)return false;   // anim first: it switches the record to the x2 strip, so strip and record never disagree for a frame
+  const i=ART.aframe(key,t),p=ART.aP,m=o.m,w=m[2],h=m[3],sv=sc*(sy||1),X=ART.ANIM.sm.crossfade,
     cf=o.xf&&p>X.from&&(o.loop||i+1<m[0])?(p-X.from)/(1-X.from)*X.max_alpha:0,ga=c.globalAlpha;
   let b=b0,cw=w,ch=h;const fo=c.canvas&&c.canvas.id==='footC',ts=sc*(fo?Math.hypot(c.getTransform().a,c.getTransform().b):S);   // footq: the on-foot canvas has its own scale (not the fly S): the copy is made at the real device-pixel size, never a small copy blown up       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
   if(ts<(fo?.9:.75)){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];

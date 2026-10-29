@@ -10,11 +10,17 @@ import sys, os, json
 import numpy as np, cv2
 from PIL import Image
 
+# W265 LOOK (contact sheets old/new, every strip): dropped although the numbers pass: kai/idle soft in-betweens + grey smear behind the boots; gunman, jetpack/hover (ghost doubled gun arm / flame);
+# prop-holo (glitch frames blur into ghosts); boss-kronos (spikes smear / double); ship-ebait (bright flame blob); ship-egate (beacon ghost); ship-esplitter + ship-emine (doubled flame / spike);
+# ship-eshielder, ship-hv (grey streak behind the flame)
+SKIP = {'kai/idle', 'gunman/idle', 'jetpack/hover', 'prop-holo/loop', 'boss-kronos/idle', 'ship-ebait/flame', 'ship-egate/flame', 'ship-esplitter/flame', 'ship-emine/flame', 'ship-eshielder/flame', 'ship-hv/flame'}
 ACTS = ('idle', 'hover', 'flame', 'glow', 'loop')
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MEDIA = ROOT + '/games/mainhattan-nightrun/media/'
 SHEETS = ROOT + '/games-src/anims/mainhattan-nightrun/sheets/'
-LIM = dict(ghost=2.0, overlap=0.85, drift=6.0)   # the gate from the brief: semi-transparent area <= 2x the larger neighbour, silhouette overlap >= 85%, colour drift < 6 / channel
+LIM = dict(ghost=2.0, overlap=0.88, drift=6.0)   # the gate from the brief: semi-transparent area <= 2x the larger neighbour, silhouette overlap >= 88%, colour drift < 6 / channel
+
+ENC = dict(lossy=os.environ.get('EXPAND_LOSSY') == '1', q=90, tol=int(os.environ.get('EXPAND_TOL', 1)))   # W265: lossless max effort (method 6) by default; EXPAND_LOSSY=1 = webp q90 (alpha q100), kept only if the originals stay within EXPAND_TOL levels
 
 def split(path, n, w):
     im = np.array(Image.open(path).convert('RGBA'))
@@ -61,7 +67,7 @@ def strips(only):
     for who in sorted(os.listdir(SHEETS)):
         if not os.path.isdir(SHEETS + who): continue
         for act in ACTS:
-            if os.path.exists(f'{SHEETS}{who}/{act}-strip.json') and os.path.exists(f'{MEDIA}anim/{who}/{act}-strip.webp') and (not only or f'{who}/{act}' in only):
+            if os.path.exists(f'{SHEETS}{who}/{act}-strip.json') and os.path.exists(f'{MEDIA}anim/{who}/{act}-strip.webp') and (not only or f'{who}/{act}' in only) and f'{who}/{act}' not in SKIP:
                 yield who, act
 
 def build(who, act, write=True):
@@ -72,9 +78,11 @@ def build(who, act, write=True):
     ok &= same
     res = dict(frames=[n, len(out)], fps=[j['fps'], j['fps'] * 2], ok=bool(ok), worst=dict(ghost=max(r['ghost'] for r in rep), overlap=min(r['overlap'] for r in rep), drift=max(r['drift'] for r in rep)))
     if ok and write:
-        Image.fromarray(np.concatenate(out, 1), 'RGBA').save(f'{MEDIA}anim/{who}/{act}x2-strip.webp', lossless=True, exact=True, quality=100, method=1)
-        back = split(f'{MEDIA}anim/{who}/{act}x2-strip.webp', 2 * n, w)   # re-read what was written: the originals must survive the encode
-        if not all(np.array_equal(back[2 * i], fr[i]) for i in range(n)): os.remove(f'{MEDIA}anim/{who}/{act}x2-strip.webp'); res['ok'] = False; res['why'] = 'encode changed an original'; return res, fr, out
+        dst = f'{MEDIA}anim/{who}/{act}x2-strip.webp'; im = Image.fromarray(np.concatenate(out, 1), 'RGBA')
+        im.save(dst, quality=ENC['q'], alpha_quality=100, method=6) if ENC['lossy'] else im.save(dst, lossless=True, exact=True, quality=100, method=6)
+        back = split(dst, 2 * n, w)   # re-read what was written: the originals must survive the encode (lossless: identical; lossy: worst premultiplied level error is reported and must be <= ENC['tol'])
+        err = max(int(np.abs(pm(f32(back[2 * i])) * 255 - pm(f32(fr[i])) * 255).max() + .5) for i in range(n)); res['orig_err'] = err; res['bytes'] = os.path.getsize(dst)
+        if err > (ENC['tol'] if ENC['lossy'] else 0): os.remove(dst); res['ok'] = False; res['why'] = 'encode changed an original'; return res, fr, out
         k = dict(j); k['frames'] = 2 * n; k['fps'] = j['fps'] * 2
         if 'order' in j: k['order'] = [x for o in j['order'] for x in (o, o + '~mid')]
         k['expanded'] = dict(of=f'{act}-strip', k=1, loop=True, note='even frames = the original strip, odd frames = computed in-betweens (strip-expand.py)')
@@ -99,6 +107,11 @@ def main(a):
         for s in a[2:]: pack(*s.rsplit('/', 1), a[1])
         return
     only = set(a); rep = {}; done = []
+    if not only:   # a full run starts clean: x2 files of strips that are now rejected or skipped are removed
+        for who in os.listdir(SHEETS):
+            for act in ACTS:
+                for f in (f'{MEDIA}anim/{who}/{act}x2-strip.webp', f'{SHEETS}{who}/{act}x2-strip.json'):
+                    if os.path.exists(f): os.remove(f)
     for who, act in strips(only):
         res, _, _ = build(who, act); rep[f'{who}/{act}'] = res
         print(('OK   ' if res['ok'] else 'FAIL ') + f'{who}/{act}', res['frames'], res['worst'])
