@@ -18,9 +18,11 @@ window.FA=FA;
 /* ---- real pictures: ready.json lists the painted files; each is loaded once (a failed load is remembered and silently ignored) ---- */
 FA._base=()=>FA.base||(typeof ART!=='undefined'&&ART.base)||'media/';
 FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{if(typeof AFX!=='undefined')AFX.fixFoot(f,r);r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
-FA.ready=a=>{if(!Array.isArray(a))return;for(const f of a)if(typeof f==='string'&&f.indexOf('foot/')===0){FA._rd.add(f);FA._load(f);}};
+FA.ready=a=>{if(!Array.isArray(a))return;for(const f of a)if(typeof f==='string'&&f.indexOf('foot/')===0){FA._rd.add(f);if(FA._go&&FA._now.test(f))FA._load(f);}};   // W242: the street pictures (1 MB+) are fetched when the player starts ON FOOT (FA.go), not at boot
+FA._now=/^foot\/(bg-|sc-|pk-)/;   // the rest (a still per actor and pose, 25 MB) is fetched when it is first drawn
+FA.go=()=>{FA._go=true;for(const f of FA._rd)if(FA._now.test(f))FA._load(f);};
 FA.init=()=>{if(FA._init)return;FA._init=true;if(typeof fetch==='function')fetch(FA._base()+'ready.json').then(r=>r.json()).then(FA.ready).catch(()=>{}).then(()=>{FA._rdDone=true;});else FA._rdDone=true;};
-FA._pic=f=>{FA.init();const r=FA._im[f];return r&&r.ok?r.im:null;};
+FA._pic=f=>{FA.init();if(!FA._go&&window.FOOT&&FOOT.on)FA.go();if(FA._go&&!FA._im[f]&&FA._rd.has(f))FA._load(f);const r=FA._im[f];return r&&r.ok?r.im:null;};
 FA.has=(who,pose)=>!!FA._pic('foot/'+who+'-'+pose+'.webp');
 /* ---- helpers ---- */
 const shade=(hex,f)=>{const n=parseInt(hex.slice(1),16);return 'rgb('+Math.min(255,Math.round((n>>16)*f))+','+Math.min(255,Math.round(((n>>8)&255)*f))+','+Math.min(255,Math.round((n&255)*f))+')';};
@@ -29,8 +31,8 @@ const limb=(ctx,pts,w,col)=>{ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap='ro
 const dot=(ctx,x,y,r,col)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r,0,6.2832);ctx.fill();};
 const flash=(ctx,x,y,t,r)=>{const big=BK(t,18)===0,R=r*(big?1:.6);ctx.fillStyle='#ff9a2d';ctx.beginPath();for(let i=0;i<16;i++){const a=i*.3927,q=i%2?R*.4:R;ctx.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q);}ctx.closePath();ctx.fill();dot(ctx,x,y,R*.4,'#fff6a0');};
 let SHD=null;
-const shadow=(ctx,wd,a)=>{if(a<=.02)return;if(!SHD){const c=document.createElement('canvas');c.width=64;c.height=16;const g=c.getContext('2d'),r=RET.footmove?g.createRadialGradient(32,32,0,32,32,32):g.createRadialGradient(32,8,0,32,8,32);const m=RET.footmove;r.addColorStop(0,m?'rgba(0,0,0,1)':'rgba(0,0,0,.85)');if(m)r.addColorStop(.4,'rgba(0,0,0,.82)');r.addColorStop(.7,m?'rgba(0,0,0,.4)':'rgba(0,0,0,.4)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.translate(0,8);g.scale(1,.25);g.translate(0,-32);g.fillRect(0,0,64,64);SHD=c;}
-  const o=ctx.globalAlpha;ctx.globalAlpha=o*(RET.footmove?1:.55)*a;ctx.drawImage(SHD,-wd*.6,-wd*.09,wd*1.2,wd*.18);ctx.globalAlpha=o;};   // same soft ellipse as the ground bosses' road shadow (UIK.bossShadow), flat on the street line
+const shadow=(ctx,wd,a)=>{if(a<=.02)return;if(!SHD){const c=document.createElement('canvas');c.width=64;c.height=16;const g=c.getContext('2d'),r=g.createRadialGradient(32,8,0,32,8,32);r.addColorStop(0,'rgba(0,0,0,.85)');r.addColorStop(.6,'rgba(0,0,0,.4)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.translate(0,8);g.scale(1,.25);g.translate(0,-32);g.fillRect(0,0,64,64);SHD=c;}
+  const o=ctx.globalAlpha;ctx.globalAlpha=o*.55*a;ctx.drawImage(SHD,-wd*.6,-wd*.09,wd*1.2,wd*.18);ctx.globalAlpha=o;};   // same soft ellipse as the ground bosses' road shadow (UIK.bossShadow), flat on the street line
 FA.shadow=shadow;
 const label=(ctx,txt,x,y,S,col)=>{if(!window.phText())return;ctx.save();ctx.scale(1/S,1/S);ctx.fillStyle=col;ctx.font='700 '+Math.max(8,Math.round(.1*S))+'px "Share Tech Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x*S,y*S);ctx.restore();};
 /* ---- humanoid pose table: lf/lb = [thigh angle, knee bend] of front/back leg, af/ab = [upper arm, forearm] (af holds the weapon), lean, lift (feet off the ground) ---- */
