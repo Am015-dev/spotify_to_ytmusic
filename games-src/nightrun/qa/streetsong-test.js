@@ -33,6 +33,7 @@ const s2 = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN
     await sleep(500); const a = [];
     for (let k = 0; k < 5; k++) { a.push(await sample()); await sleep(1000); }
     poss.push(a);
+    console.log('  samples ' + a.map(x => x.st + '/' + x.bt + '/' + x.mode + '/' + x.t.toFixed(1)).join(' '));
     await p.evaluate(`(${RUN})(${4321 + i * 7919})`);   // the bot plays the whole stage (stepped), starting its own run
     const r = await p.evaluate(() => ({ calls: window.LOGM.calls.slice(), s3: FOOT.S3.snd, st: FOOT.S && FOOT.S.time, end: FOOT.S && !!FOOT.S.end }));
     starts.push(r.calls.filter(c => /^startStage/.test(c))); blocked.push({ other: r.calls.filter(c => !/^startStage:street1/.test(c)), refused: r.s3.blocked.length });

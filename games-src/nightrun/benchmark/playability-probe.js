@@ -115,6 +115,10 @@ const q = (a, f) => { if (!a.length) return 0; const s = a.slice().sort((x, y) =
     await sleep(120);
   }
   for (const k of [...held]) await kup(k); if (fTouch) await touch('touchEnd', []);
+  // W269: the frame numbers are taken BEFORE the profiling seconds (they used to include them, which inflated fps by (SECS+12)/SECS)
+  const d = await p.evaluate(() => ({ fr: __pf.fr, js: __pf.js, lt: __pf.lt.filter(l => l[0] > __pf.tOn), ltAll: __pf.lt.length, tOn: __pf.tOn, lat: __pf.lat, firstRaf: __pf.firstRaf | 0 }));
+  let top = [];
+  if (!process.env.NOPROFILE) {
   // CPU profile of 12 s more play (bot idle-steering) to rank the heaviest functions
   await cdp.send('Profiler.enable'); await cdp.send('Profiler.setSamplingInterval', { interval: 500 }); await cdp.send('Profiler.start');
   if (!PHONE) { await kdn(MODE === 'street' ? 'KeyD' : 'ArrowUp'); if (MODE === 'street') await kdn('KeyJ'); }
@@ -123,11 +127,11 @@ const q = (a, f) => { if (!a.length) return 0; const s = a.slice().sort((x, y) =
   const self = {}, byId = {}; for (const n of profile.nodes) byId[n.id] = n;
   const dts = profile.timeDeltas; const cnt = {}; profile.samples.forEach((id, i) => { cnt[id] = (cnt[id] || 0) + (dts[i] || 0); });
   let tot = 0; for (const id in cnt) { const n = byId[id], cf = n.callFrame; const k = (cf.functionName || '(anon)') + ':' + (cf.lineNumber + 1); self[k] = (self[k] || 0) + cnt[id]; tot += cnt[id]; }
-  const top = Object.entries(self).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([k, v]) => k + ' ' + (100 * v / tot).toFixed(1) + '%');
-  const d = await p.evaluate(() => ({ fr: __pf.fr, js: __pf.js, lt: __pf.lt.filter(l => l[0] > __pf.tOn), ltAll: __pf.lt.length, tOn: __pf.tOn, lat: __pf.lat, firstRaf: __pf.firstRaf | 0 }));
+  top = Object.entries(self).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([k, v]) => k + ' ' + (100 * v / tot).toFixed(1) + '%');
+  }
   const lat = d.lat.map(x => x[1]);
   const res = { mode: MODE, dev: DEV, base: BASE, load, ui: { ov: ui.ov, small: ui.small, off: ui.off, cv: ui.cv, n: ui.bs.length, bs: ui.bs.map(b => b.id + '[' + b.t + ']@' + b.x + ',' + b.y + ' ' + b.w + 'x' + b.h) },
-    frames: d.fr.length, fps: +(1000 * d.fr.length / (SECS * 1000)).toFixed(1), p50: q(d.fr, .5), p95: q(d.fr, .95), p99: q(d.fr, .99), max: Math.max(...d.fr), over33: d.fr.filter(x => x > 33.4).length, over50: d.fr.filter(x => x > 50).length,
+    frames: d.fr.length, fps: +(1000 * d.fr.length / d.fr.reduce((a, b) => a + b, 0)).toFixed(1), p50: q(d.fr, .5), p95: q(d.fr, .95), p99: q(d.fr, .99), max: Math.max(...d.fr), over33: d.fr.filter(x => x > 33.4).length, over50: d.fr.filter(x => x > 50).length,
     jsP50: q(d.js, .5), jsP95: q(d.js, .95), longtasks: d.lt.length, ltList: d.lt.map(l => [l[0] - Math.round(d.tOn), l[1]]).slice(0, 60), longMax: d.lt.reduce((a, b) => Math.max(a, b[1]), 0), longSum: d.lt.reduce((a, b) => a + b[1], 0),
     latN: lat.length, latP50: q(lat, .5), latP95: q(lat, .95), latMiss: lat.filter(x => x >= 1000).length,
     hits, hitsPerMin: +(hits * 60 / SECS).toFixed(1), deaths, hitLog: hitLog.slice(0, 30), worst, top, errs: [...new Set(errs)].slice(0, 8), cons: [...new Set(cons)].slice(0, 8) };
