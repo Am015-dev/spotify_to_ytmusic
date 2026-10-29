@@ -22,7 +22,7 @@ function fit(){
   stage.classList.toggle('p',rotMode);stage.classList.toggle('sd',side>0);stage.classList.toggle('tl',left);
   stage.style.setProperty('--strip',strip+'px');stage.style.setProperty('--shift',side?(left?40:-40)+'px':'0px');
   frame.style.width=w+'px';frame.style.height=h+'px';
-  const dpr=window.RET&&RET.purelook?Math.min(3,window.devicePixelRatio||1):Math.max(.4,Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1,Math.sqrt((PXB[SET.q]||PXB.M)/(w*h)))*RSC.k),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
+  const dpr=window.RET&&RET.purelook?Math.min(touchUI?1.5:3,window.devicePixelRatio||1,touchUI?Math.sqrt(1.6e6/(w*h)):9):Math.max(.4,Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1,Math.sqrt((PXB[SET.q]||PXB.M)/(w*h)))*RSC.k),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
   if(cv.width!==cw||cv.height!==ch){cv.width=cw;cv.height=ch;}
   if(rotMode){                                           // the world keeps its landscape coordinates on its own canvas; render() turns it upright
     if(wcv===cv){wcv=document.createElement('canvas');wctx=wcv.getContext('2d');}
@@ -351,7 +351,7 @@ function update(dt){
   if(ST.on){ST.tick(dt);}
   else if(G.lab||G.tut){}                                        // the LAB stage: no waves, no district clock, no boss timer; the LAB panel decides what appears (lab.js)
   else if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;DIR.tick(dt);                 // the director schedules the waves on bar lines; it also decides when the boss comes
-    if(!G.preload&&G.dt>30){G.preload=true;loadTrack(stageFor(G.di,true));}}   // W242: the boss track only; the next district's track is fetched at the pit stop
+    if(!G.preload&&G.dt>10){G.preload=true;const n=nextDi(G.di).di;loadTrack(stageFor(G.di,true));loadTrack(stageFor(n,false));}}
   else if(!G.dead&&G.boss&&G.boss.mini&&!ST.on){G.dt+=dt;DIR.tick(dt);}
   if(G.transT>=0&&!ST.on){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});const nx=nextDi(G.di);if(nx.wrap)G.loop++;SH.pit(()=>enterDistrict(nx.di));}}
 
