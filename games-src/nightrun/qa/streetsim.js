@@ -13,7 +13,7 @@ const XB = ['melee', 'dash'];   // bots left out of the whole-street gates (own 
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const res = [], ok = (p, n) => { res.push(!!p); console.log((p ? 'PASS ' : 'FAIL ') + n); };
-const seedOf = i => 4321 + i * 7919;
+const seedOf = i => (+process.env.SEED0 || 4321) + i * 7919;   // SEED0=<n>: another block of seeds (W263: three RUNS=12 blocks to show the spread)
 
 // ---- the bots: taken from the street tests themselves (one source of truth)
 const src = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'); let RUN = src.slice(src.indexOf('const RUN = ') + 12, src.indexOf('\n(async () =>')).trim().replace(/;$/, '').replace('i < 200', 'i < 300');   // W168: a 45-90 s boss fight ends after 200 s game time
