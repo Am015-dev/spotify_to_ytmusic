@@ -7,9 +7,9 @@
               GRAVITY WELL   pulls every pickup in, bends close bullets away
    OFFENSIVE  SPLINTER       a kill throws 2 shards at the nearest foes    LANCE BURST  piercing lance every 2 beats, strips shields
               HORNETS        2 homing micro-missiles on every beat         OVERDRIVE    double fire rate, the gun heats much faster
-   UTILITY    EMP CHARGE     +1 EMP now, the EMP meter fills x2            DASH REFUND  (charge) the dash that empties you refills every charge
+   UTILITY    EMP CHARGE     +1 EMP now, the EMP meter charges faster            DASH REFUND  (charge) the dash that empties you refills every charge
               NEON ZONE      a ring on the field: score x2 while the ship is inside    DECOY DRONE  a drone ahead draws aimed fire and eats bullets
-   RISKY      GLASS CANNON   damage x2, but i-frames after a hit are halved
+   RISKY      GLASS CANNON   up to x2 damage (the per-shot cap counts damage above 2 at half), but i-frames after a hit are halved
    Stacking: at most 2 of these timed powers at once (the oldest one ends; the older powers keep their own one-at-a-time rules, a cap on all of them
    cost the late build half its stage-3 clears) + 1 stored charge (a new charge replaces the stored one; a charge fades after 32 bars).
    Picker (PW.pick): weighted by stage (rare ones only from later stages), the equipped weapons, the hull (hp and ship power SC.f) and the last 3 drops
@@ -26,11 +26,11 @@ const PWX=window.PWX={get on(){return!!RET.powers;},MAXT:2,REP:4,CHG_BARS:32,
      lance:{n:'LANCE BURST',tip:'LANCE: piercing shots break shields',c:'#e8f6ff',r:'off',st:2,w:2},
      hornet:{n:'HORNETS',tip:'HORNETS: homing missiles on the beat',c:'#ffa04d',r:'off',st:4,w:1.6},
      ovd:{n:'OVERDRIVE',tip:'OVERDRIVE: double fire, more heat',c:'#ff5a5a',r:'off',st:5,w:1.4},
-     empr:{n:'EMP CHARGE',tip:'EMP CHARGE: +1 EMP, meter fills x2',c:'#ffc23d',r:'utl',st:1,w:1.8},
+     empr:{n:'EMP CHARGE',tip:'EMP CHARGE: +1 EMP, the EMP meter charges faster',c:'#ffc23d',r:'utl',st:1,w:1.8},
      dashr:{n:'DASH REFUND',tip:'DASH REFUND: empty dash refills once',c:'#5ef0ff',r:'utl',st:3,w:1.6,chg:1},
      zone:{n:'NEON ZONE',tip:'NEON ZONE: stay in the ring, score x2',c:'#ff4fd8',r:'utl',st:3,w:1.5},
      decoy:{n:'DECOY DRONE',tip:'DECOY: a drone draws enemy fire',c:'#d8ff5a',r:'utl',st:6,w:1.3},
-     glass:{n:'GLASS CANNON',tip:'GLASS: damage x2, hits hurt longer',c:'#ff9ad0',r:'risk',st:8,w:1.1}},
+     glass:{n:'GLASS CANNON',tip:'GLASS: up to x2 damage, hits hurt longer',c:'#ff9ad0',r:'risk',st:8,w:1.1}},
   WPN:{swarm:{hornet:.3},laser:{lance:.4},disc:{splint:.6},arc:{splint:.7},beat:{ovd:.7}},   // a power the equipped weapon already does is rarer
   DIST:[{gwell:1.3,empr:1.2},{lance:1.8,splint:1.2},{stasis:1.5,decoy:1.4},{hornet:1.4,splint:1.3},{bubble:1.5,glass:1.3}],   // per district (G.di 0-4)
   stat:{pick:0,newPick:0,bubble:0,stasis:0,gwell:0,bend:0,splint:0,lance:0,pop:0,hornet:0,ovd:0,empr:0,dashr:0,zone:0,decoy:0,glass:0,trim:0,chg:0,fade:0},
