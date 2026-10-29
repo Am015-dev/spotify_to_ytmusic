@@ -1,0 +1,161 @@
+// W260 FLIGHT GAUNTLET: a bot plays FLIGHT from the title through stages and the boss with REAL input only
+// (phone 390x763: CDP touch drag + touch taps on DASH/EMP/PAUSE; PC 1440x860: keyboard + mouse clicks on menus).
+// The clock is stepped (__mnr.step) between input bursts; the game never gets a function call that drives it.
+//   GAME_DIR=<dir> NODE_PATH=$(npm root -g) node games-src/nightrun/qa/gauntlet-flight.js
+//   env: SEEDS=8 STRATS=idle,random,dodger,shooter DEVS=phone,pc STAGES=10 PAR=4 SHOTS=<dir> OUT=<json> TICKS=<game seconds cap per run, default 900>
+// Prints one line per run and a summary with minimums. Console/page errors, promise rejections, stuck states, dead controls,
+// UI overlap / small targets, boss seen+killed, result screens, HUD vs state, frame time p95 are recorded per run.
+const L = require('./lib.js'), { PW, sleep } = L, fs = require('fs');
+const WALL = +process.env.WALL || 150, SEEDS = +process.env.SEEDS || 8, STAGES = +process.env.STAGES || 10, PAR = +process.env.PAR || 4, TCAP = +process.env.TICKS || 900;
+const STRATS = (process.env.STRATS || 'idle,random,dodger,shooter').split(','), DEVS = (process.env.DEVS || 'phone,pc').split(','), SHOTS = process.env.SHOTS;
+const DEV = { phone: { W: 390, H: 763, touch: true }, pc: { W: 1440, H: 860, touch: false } };
+const rngOf = s => { let a = s * 2654435761 >>> 0 || 1; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+const SEEDJS = s => `(()=>{let a=${s}*2654435761>>>0||1;Math.random=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
+ window.__rej=[];addEventListener('unhandledrejection',e=>window.__rej.push(String(e.reason&&e.reason.message||e.reason).slice(0,160)));
+ window.__ft=[];let l=0;const f=t=>{if(window.__ftOn&&l)window.__ft.push(t-l);l=t;requestAnimationFrame(f)};requestAnimationFrame(f);})()`;
+const st = p => p.evaluate(() => { const m = window.__mnr; if (!m.G) return { live: false, over: false, paused: false, title: true, overEl: false, res: false, shop: false, stage: 0, t: 0, score: 0, hp: 0 }; const h = id => { const e = document.getElementById(id); return !!e && !e.hidden && getComputedStyle(e).display !== 'none'; };
+  return { live: !!m.G.live, over: !!m.G.over, paused: h('pausem'), title: h('title'), overEl: h('over'), res: h('stres'), shop: h('shop'), stage: m.ST.on ? m.ST.n : 0, t: m.G.t, score: m.G.score, hp: m.P.hp, boss: !!m.G.boss, bossDone: !!m.G.bossDone, emp: m.P.emp, dashT: m.P.dashT, dashCd: m.P.dashCd, heat: m.P.heat, pb: m.G.pb.length }; });
+const world = p => p.evaluate(() => { const m = window.__mnr, G = m.G, P = m.P; const q = a => a.map(b => [b.x, b.y, b.vx || 0, b.vy || 0, b.r || 0, b.t || '']);
+  return { px: P.x, py: P.y, eb: q(G.eb), en: q(G.en), pk: q(G.pk), boss: G.boss ? [G.boss.x, G.boss.y] : null, hp: P.hp, emp: P.emp, rot: m.rotMode }; });
+const step = (p, n) => p.evaluate(n => { for (let i = 0; i < n; i++) window.__mnr.step(1 / 60); }, n);
+const ZOOM = 1;
+// ---- real input layers ----
+function makeInput(p, dev) {
+  const I = { dev, cdp: null, finger: null, keys: new Set() };
+  I.init = async () => { if (dev.touch) I.cdp = await p.context().newCDPSession(p);
+    I.geo = await p.evaluate(() => { const e = document.getElementById('frame') || document.querySelector('canvas'); const r = e.getBoundingClientRect(); return { l: r.left, t: r.top, w: r.width, h: r.height }; }); };
+  const tp = (type, x, y, id) => I.cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: id || 1 }] });
+  I.tap = async (x, y) => { const f = I.finger ? [{ x: I.finger.x, y: I.finger.y, id: 1 }] : []; await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [...f, { x, y, id: 7 }] }); await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: f }); };   // a second finger taps; the steering finger stays down
+  I.clickEl = async sel => { const bb = await p.locator(sel).boundingBox(); if (!bb) return false; const x = bb.x + bb.width / 2, y = bb.y + bb.height / 2; if (dev.touch) await I.tap(x, y); else await p.mouse.click(x, y); return true; };
+  // movement: want = unit-ish vector in game coords (gx forward = right on PC / up on phone). PC: keys; phone: finger drag, re-grabbed at the edge
+  I.move = async (dx, dy, rot, fire) => {
+    if (!dev.touch) { const want = new Set(); if (dx > 6) want.add('ArrowRight'); if (dx < -6) want.add('ArrowLeft'); if (dy > 6) want.add('ArrowDown'); if (dy < -6) want.add('ArrowUp'); if (fire) want.add('Space');
+      for (const k of I.keys) if (!want.has(k)) { await p.keyboard.up(k); I.keys.delete(k); } for (const k of want) if (!I.keys.has(k)) { await p.keyboard.down(k); I.keys.add(k); } return; }
+    const g = I.geo, sx = rot ? g.w / 540 : g.w / 960, sy = rot ? g.h / 960 : g.h / 540;
+    const gain = 0.55;   // ship travel per finger travel is SENS (1.5 default); the finger moves a bit less than the error
+    const ddx = rot ? dy * sx * gain : dx * sx * gain, ddy = rot ? -dx * sy * gain : dy * sy * gain;
+    if (!fire && !I.finger) return;
+    if (!I.finger) { I.finger = { x: g.l + g.w / 2, y: g.t + g.h * .72 }; await tp('touchStart', I.finger.x, I.finger.y); }
+    let nx = I.finger.x + ddx, ny = I.finger.y + ddy;
+    const m = 30; if (nx < g.l + m || nx > g.l + g.w - m || ny < g.t + m || ny > g.t + g.h - m) { await tp('touchEnd'); I.finger = null; return; }   // let go, re-grab next tick
+    I.finger = { x: nx, y: ny }; await tp('touchMove', nx, ny);
+  };
+  I.release = async () => { if (dev.touch) { if (I.finger) { await tp('touchEnd'); I.finger = null; } } else { for (const k of I.keys) await p.keyboard.up(k); I.keys.clear(); } };
+  I.dash = async () => { if (dev.touch) await I.clickEl('#bDash'); else { await p.keyboard.down('ShiftLeft'); await p.keyboard.up('ShiftLeft'); } };
+  I.emp = async () => { if (dev.touch) await I.clickEl('#bEmp'); else { await p.keyboard.down('KeyX'); await p.keyboard.up('KeyX'); } };
+  I.pause = async () => { if (dev.touch) await I.clickEl('#bPause'); else await p.keyboard.press('KeyP'); };
+  return I;
+}
+// ---- strategies: return {dx,dy,fire,dash,emp} from the world ----
+function brain(name, rnd) {
+  let wx = 0, wy = 0, wt = 0;
+  const danger = (w, cx, cy, d) => { let c = 0; for (const b of w.eb) { const px = b[0] + b[2] * .14, py = b[1] + b[3] * .14, q = Math.hypot(px - cx, py - cy); if (q < 70) c += (70 - q) * (70 - q) * (q < 26 ? 30 : 1); }
+    for (const e of w.en) { const q = Math.hypot(e[0] - cx, e[1] - cy), r = (e[4] || 22) + 30; if (q < r) c += (r - q) * (r - q) * 4; } if (w.boss) { const q = Math.hypot(w.boss[0] - cx, w.boss[1] - cy); if (q < 110) c += (110 - q) * (110 - q); } return c; };
+  return w => {
+    if (name === 'idle') return { dx: 0, dy: 0, fire: false };
+    if (name === 'random') { wt -= 1; if (wt <= 0) { wt = 8 + rnd() * 20; wx = (rnd() - .5) * 2 * 30; wy = (rnd() - .5) * 2 * 30; } return { dx: wx, dy: wy, fire: rnd() < .8, dash: rnd() < .01, emp: rnd() < .005 }; }
+    // dodger / shooter: grid search around the ship for the lowest cost
+    let best = null, bc = 1e18; const tx = 200 + (name === 'shooter' ? 40 : 0);
+    let near = null; for (const e of w.en) if (e[0] > w.px + 20 && (!near || Math.abs(e[1] - w.py) < Math.abs(near[1] - w.py))) near = e;
+    let pk = null; if (name === 'shooter') for (const q of w.pk) if (q[0] > 20 && q[0] < 700 && (!pk || q[0] < pk[0])) pk = q;
+    const aimY = pk ? pk[1] : near ? near[1] : w.boss ? w.boss[1] : 270, aimX = pk ? Math.min(pk[0], 560) : tx;
+    for (let gx = -90; gx <= 90; gx += 30) for (let gy = -90; gy <= 90; gy += 30) { const cx = w.px + gx, cy = w.py + gy; if (cx < 40 || cx > 900 || cy < 40 || cy > 500) continue;
+      const c = danger(w, cx, cy) + Math.abs(cy - aimY) * 1.2 + Math.abs(cx - aimX) * .6 + Math.hypot(gx, gy) * .4; if (c < bc) { bc = c; best = [gx, gy]; } }
+    if (!best) best = [0, 0]; let close = 0; for (const b of w.eb) if (Math.hypot(b[0] - w.px, b[1] - w.py) < 150) close++;
+    const imminent = w.eb.some(b => Math.hypot(b[0] + b[2] * .08 - w.px, b[1] + b[3] * .08 - w.py) < 30);
+    return { dx: best[0], dy: best[1], fire: true, emp: name === 'shooter' && close >= 4 && w.emp > 0, dash: imminent && rnd() < .5 };
+  };
+}
+// ---- UI audit: visible buttons, size, overlap, off-screen ----
+const uiAudit = (p, phone) => p.evaluate(phone => { const out = [], R = []; for (const e of document.querySelectorAll('button,[role=button],.btn')) { if (e.hidden || e.offsetParent === null && getComputedStyle(e).position !== 'fixed') continue; const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) continue; const r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) continue;
+    let anc = e, hid = false; while (anc) { if (anc.hidden) { hid = true; break; } anc = anc.parentElement; } if (hid) continue;
+    const id = e.id || e.className || e.tagName; R.push({ id: String(id).slice(0, 24), r });
+    if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) out.push('offscreen ' + id);
+    if (phone && (r.width < 44 || r.height < 44)) out.push(`small ${id} ${r.width | 0}x${r.height | 0}`); }
+  for (let i = 0; i < R.length; i++) for (let j = i + 1; j < R.length; j++) { const a = R[i].r, b = R[j].r; const w = Math.min(a.right, b.right) - Math.max(a.left, b.left), h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); if (w > 4 && h > 4) out.push(`overlap ${R[i].id}/${R[j].id} ${w | 0}x${h | 0}`); } return out; }, phone);
+const shot = async (p, tag) => { if (SHOTS) await p.screenshot({ path: `${SHOTS}/${tag}.png` }).catch(() => { }); };
+async function openPage(br, devName, seed) {
+  const d = DEV[devName]; const ctx = await br.newContext({ viewport: { width: d.W, height: d.H }, deviceScaleFactor: 1, hasTouch: d.touch, isMobile: d.touch, userAgent: d.touch ? L.UA : undefined });
+  const p = await ctx.newPage(); p.errs = []; p.cons = []; p.on('pageerror', e => p.errs.push(String(e.message).slice(0, 160))); p.on('console', m => { if (m.type() === 'error' && !/net::ERR_FAILED/.test(m.text())) p.cons.push(m.text().slice(0, 160)); }); p.on('requestfailed', r => { if (!/fonts\.(googleapis|gstatic)|^blob:/.test(r.url())) p.cons.push('requestfailed ' + r.url().replace(/^https?:\/\/[^/]+/, '').slice(0, 100)); }); p.on('response', r => { if (r.status() >= 400) p.cons.push('http ' + r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '').slice(0, 100)); });
+  await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+  await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
+  await p.addInitScript(SEEDJS(seed));
+  await p.goto(L.GAME_DIR ? global.__BASE + '?nomusic=1' : '', { waitUntil: 'domcontentloaded' });
+  await p.waitForFunction(() => window.__mnr, null, { timeout: 15000 }); await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }).catch(() => { }); await sleep(400);
+  return p;
+}
+async function startFlight(p, I) { await I.clickEl('#focFlight'); for (let i = 0; i < 40 && !(await st(p)).live; i++) await sleep(100); await p.evaluate(() => window.__mnr.simOn(true)); await step(p, 20); return (await st(p)).live; }
+// ---- one gauntlet run ----
+async function run(br, devName, strat, seed) {
+  const d = DEV[devName], rnd = rngOf(seed * 31 + strat.length), R = { dev: devName, strat, seed, errs: [], defects: [], stages: [], deaths: 0, maxStage: 0, bossSeen: 0, bossKilled: 0, results: 0, stuck: 0, hudBad: 0, hudN: 0, ui: new Set(), gameSec: 0, wall: 0 };
+  const t0 = Date.now(); const p = await openPage(br, devName, seed), I = makeInput(p, d); await I.init(); const tag = `${devName}-${strat}-${seed}`;
+  if (!(await startFlight(p, I))) { R.defects.push('FLIGHT did not start from the title click'); R.errs.push(...p.errs); await p.context().close(); return R; }
+  const brn = brain(strat, rnd); let s = await st(p), lastChange = s.t, lastKey = s.score + ':' + s.hp, stageSeen = -1, bossWas = false, sec = 0, tick = 0, attempts = 0;
+  const hudCheck = async () => { const r = await p.evaluate(() => { const m = window.__mnr; try { m.render(); } catch (e) { return { err: String(e) }; } const h = m.HUD; return { sc: h.score, hp: h.hp, gs: String(m.G.score).padStart(8, '0'), ghp: m.P.hp, mx: h.hpMax, gmx: m.P.max, ht: h.heat, gh: Math.round(m.P.heat), emp: h.emp, gemp: m.P.emp }; });
+    R.hudN++; if (r.err || r.sc !== r.gs || r.hp !== r.ghp || r.emp !== r.gemp) { R.hudBad++; if (R.hudBad <= 3) R.defects.push('HUD!=state ' + JSON.stringify(r)); } };
+  while (R.gameSec < TCAP && R.maxStage <= STAGES) {
+    if (Date.now() - t0 > WALL * 1000) { R.defects.push('run wall cap hit: ' + JSON.stringify(await st(p))); break; }
+    s = await st(p);
+    if (s.stage && s.stage !== stageSeen) { stageSeen = s.stage; R.maxStage = Math.max(R.maxStage, s.stage); R.stages.push(s.stage); lastChange = s.t; await I.release(); await step(p, 40); await shot(p, `${tag}-stage${s.stage}`);
+      const ui = await uiAudit(p, d.touch); ui.forEach(u => R.ui.add('play: ' + u)); }
+    if (s.res) { R.results++; await shot(p, `${tag}-result${s.stage}`); (await uiAudit(p, d.touch)).forEach(u => R.ui.add('result: ' + u)); if (s.stage >= STAGES) break; await I.release(); if (!(await I.clickEl('#srNext'))) { R.defects.push('result NEXT STAGE not clickable'); break; } await sleep(300); await step(p, 30); continue; }
+    if (s.shop) { (await uiAudit(p, d.touch)).forEach(u => R.ui.add('pit: ' + u)); await I.release(); if (!(await I.clickEl('#shGo'))) { R.defects.push('pit SKIP not clickable'); break; } await sleep(200); await step(p, 30); continue; }
+    if (s.overEl || s.over && !s.res && !s.live) { R.deaths++; await I.release(); await shot(p, `${tag}-death${R.deaths}-s${s.stage}`); (await uiAudit(p, d.touch)).forEach(u => R.ui.add('over: ' + u));
+      if (++attempts > 3) break; if (!(await I.clickEl('#againBtn'))) { R.defects.push('game over AGAIN not clickable'); break; } await sleep(300); await step(p, 40); lastChange = (await st(p)).t; stageSeen = -1; continue; }
+    if (s.title || s.paused) { R.defects.push('left play unexpectedly: ' + JSON.stringify({ title: s.title, paused: s.paused })); break; }
+    if (s.boss && !bossWas) { bossWas = true; R.bossSeen++; await shot(p, `${tag}-boss${s.stage}`); }
+    if (!s.boss && bossWas) { bossWas = false; if (s.bossDone || s.res) R.bossKilled++; }
+    const w = await world(p), a = brn(w);
+    await I.move(a.dx, a.dy, w.rot, a.fire); if (a.dash) await I.dash(); if (a.emp) await I.emp();
+    await step(p, 4); R.gameSec += 4 / 60; tick++;
+    const n = await st(p); if (n.score + ':' + n.hp !== lastKey) { lastKey = n.score + ':' + n.hp; lastChange = n.t; }
+    if (n.t - lastChange > 20 && n.live && !n.over) { R.stuck++; R.defects.push(`stuck 20s at stage ${n.stage} t=${n.t.toFixed(0)} score=${n.score} hp=${n.hp}`); lastChange = n.t; if (R.stuck >= 2) break; }
+    if (tick % 120 === 0) await hudCheck();
+    if (n.stage && n.stage !== stageSeen) lastChange = n.t;
+  }
+  await I.release(); R.errs.push(...p.errs.map(e => 'page: ' + e), ...p.cons.map(e => 'console: ' + e)); R.rej = await p.evaluate(() => window.__rej.slice()); R.ui = [...R.ui]; R.wall = (Date.now() - t0) / 1000;
+  const bad = await p.evaluate(() => (window.__mnr.G.boss ? 1 : 0)); await p.context().close(); return R;
+}
+// ---- controls probe: every control must visibly do something ----
+async function controls(br, devName, seed) {
+  const d = DEV[devName], R = { dev: devName, seed, defects: [], ok: {} }; const p = await openPage(br, devName, seed), I = makeInput(p, d); await I.init();
+  if (!(await startFlight(p, I))) { R.defects.push('FLIGHT did not start'); await p.context().close(); return R; }
+  await step(p, 200); const rot = (await world(p)).rot; const chk = (n, c, i) => { R.ok[n] = !!c; if (!c) R.defects.push('control does nothing: ' + n + (i ? ' ' + i : '')); };
+  let w0 = await world(p); await I.move(0, -30, rot, true); await I.move(0, -30, rot, true); await step(p, 30); let w1 = await world(p); chk('move up/down axis', Math.hypot(w1.px - w0.px, w1.py - w0.py) > 8, JSON.stringify([w0.px, w0.py, w1.px, w1.py]));
+  await I.move(30, 0, rot, true); await I.move(30, 0, rot, true); await step(p, 30); const w2 = await world(p); chk('move forward axis', Math.hypot(w2.px - w1.px, w2.py - w1.py) > 8, JSON.stringify([w1.px, w1.py, w2.px, w2.py]));
+  await I.move(0, 0, rot, true); const f0 = await st(p); let pbMax = 0, hMax = 0; for (let i = 0; i < 20; i++) { await step(p, 3); const f = await st(p); pbMax = Math.max(pbMax, f.pb); hMax = Math.max(hMax, f.heat); } chk('fire (shots appear or heat rises)', pbMax > 0 || hMax > f0.heat, JSON.stringify([pbMax, f0.heat, hMax]));
+  await I.release(); const g0 = await st(p); const e0 = g0.emp; await I.dash(); let dMax = 0, cMax = 0; for (let i = 0; i < 20; i++) { await step(p, 3); const f = await st(p); dMax = Math.max(dMax, f.dashT); cMax = Math.max(cMax, f.dashCd); } chk('dash (queued to the beat, <= 0.3 s)', dMax > 0 || cMax > 0, JSON.stringify([g0.dashT, dMax, cMax]));
+  await step(p, 120); await I.emp(); await step(p, 6); const g2 = await st(p); chk('EMP', g2.emp < e0, JSON.stringify([e0, g2.emp]));
+  await I.pause(); await sleep(150); const q1 = await st(p); chk('pause', q1.paused); const t0 = q1.t; await step(p, 30); chk('frozen while paused', (await st(p)).t === t0);
+  const ui = await uiAudit(p, d.touch); ui.forEach(u => R.defects.push('pause UI: ' + u));
+  await I.clickEl('#resumeBtn'); await sleep(1800); await step(p, 20); const q2 = await st(p); chk('resume', !q2.paused && q2.live);
+  R.errs = [...p.errs, ...p.cons]; await p.context().close(); return R;
+}
+// ---- real-time frame time sample (the loop runs on rAF, a dodger plays) ----
+async function perf(br, devName, seed) {
+  const d = DEV[devName]; const p = await openPage(br, devName, seed), I = makeInput(p, d); await I.init(); await I.clickEl('#focFlight'); await sleep(1500);
+  await p.evaluate(() => { window.__ft.length = 0; window.__ftOn = true; }); const brn = brain('dodger', rngOf(seed)); const t0 = Date.now();
+  while (Date.now() - t0 < 12000) { const w = await world(p); const a = brn(w); await I.move(a.dx, a.dy, w.rot, true); await sleep(60); }
+  const ft = await p.evaluate(() => window.__ft.slice().sort((a, b) => a - b)); await I.release(); await p.context().close();
+  return { dev: devName, n: ft.length, p50: ft[ft.length >> 1], p95: ft[Math.floor(ft.length * .95)], max: ft[ft.length - 1] };
+}
+const pct = (a, q) => { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * q))]; };
+(async () => {
+  const b = await L.boot(); global.__BASE = b.base; const jobs = [];
+  for (const dv of DEVS) for (const sd of Array.from({ length: SEEDS }, (_, i) => i + 1)) { jobs.push(() => controls(b.br, dv, sd)); for (const stg of STRATS) jobs.push(() => run(b.br, dv, stg, sd)); }
+  const out = [], ctl = []; let ji = 0;
+  await Promise.all(Array.from({ length: PAR }, async () => { while (ji < jobs.length) { const j = jobs[ji++]; try { const r = await j(); (r.strat ? out : ctl).push(r);
+    if (r.strat) console.log(`${r.dev} ${r.strat} s${r.seed}: maxStage ${r.maxStage} deaths ${r.deaths} boss ${r.bossSeen}/${r.bossKilled} results ${r.results} stuck ${r.stuck} hud ${r.hudBad}/${r.hudN} err ${r.errs.length} rej ${(r.rej || []).length} ui ${r.ui.length} sim ${r.gameSec.toFixed(0)}s wall ${r.wall.toFixed(0)}s${r.defects.length ? ' DEF ' + r.defects.slice(0, 2).join(' | ').slice(0, 200) : ''}`);
+    else console.log(`${r.dev} controls s${r.seed}: ${JSON.stringify(r.ok)}${r.defects.length ? ' DEF ' + r.defects.join(' | ').slice(0, 300) : ''}`); } catch (e) { console.log('RUNNER ERROR', String(e.stack).split('\n').filter(l => /gauntlet|Error/.test(l)).join(' / ').slice(0, 400)); out.push({ dev: 'x', strat: 'crash', seed: 0, errs: ['runner: ' + e], defects: [String(e)], ui: [], stages: [] }); } } }));
+  const pf = []; for (const dv of DEVS) { try { pf.push(await perf(b.br, dv, 1)); } catch (e) { console.log('perf failed', dv, String(e).slice(0, 120)); } }
+  await b.close();
+  console.log('\n== SUMMARY (minimums over runs) ==');
+  for (const dv of DEVS) for (const stg of STRATS) { const rs = out.filter(r => r.dev === dv && r.strat === stg); if (!rs.length) continue; const mn = f => Math.min(...rs.map(f));
+    console.log(`${dv} ${stg}: runs ${rs.length} minStage ${mn(r => r.maxStage)} bossSeen ${rs.filter(r => r.bossSeen).length} bossKilled ${rs.filter(r => r.bossKilled).length} resultRuns ${rs.filter(r => r.results).length} stuckRuns ${rs.filter(r => r.stuck).length} errRuns ${rs.filter(r => r.errs.length).length} rejRuns ${rs.filter(r => (r.rej || []).length).length} hudBad ${rs.reduce((a, r) => a + r.hudBad, 0)}/${rs.reduce((a, r) => a + r.hudN, 0)} uiRuns ${rs.filter(r => r.ui.length).length}`); }
+  const uniq = {}; for (const r of out) for (const d of [...r.defects, ...r.errs, ...(r.ui || []), ...(r.rej || []).map(x => 'rej: ' + x)]) { const k = d.replace(/\d+/g, '#').slice(0, 110); (uniq[k] = uniq[k] || { n: 0, ex: d, who: `${r.dev}/${r.strat}/s${r.seed}` }).n++; }
+  for (const r of ctl) for (const d of [...r.defects, ...r.errs]) { const k = 'ctl ' + d.replace(/\d+/g, '#').slice(0, 100); (uniq[k] = uniq[k] || { n: 0, ex: d, who: `${r.dev}/controls/s${r.seed}` }).n++; }
+  console.log('controls probe: ' + DEVS.map(dv => `${dv} ${ctl.filter(r => r.dev === dv && !r.defects.length).length}/${ctl.filter(r => r.dev === dv).length} clean`).join(', '));
+  console.log('frame time (real time, headless software GL): ' + JSON.stringify(pf));
+  console.log('DISTINCT FINDINGS:'); Object.values(uniq).sort((a, b) => b.n - a.n).forEach(u => console.log(`  x${u.n} [${u.who}] ${u.ex.slice(0, 260)}`));
+  if (process.env.OUT) fs.writeFileSync(process.env.OUT, JSON.stringify({ out, ctl, pf }, null, 1)); process.exit(0);
+})();
