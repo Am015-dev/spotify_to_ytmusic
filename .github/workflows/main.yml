@@ -1,6 +1,8 @@
 name: Python package
 
-on: [push]
+on:
+  push:
+    branches: [main, alex/brave-carson-rbpmlk]   # worker review branches (nr/*) are not linted on every push; they are checked when merged here
 
 jobs:
   build:

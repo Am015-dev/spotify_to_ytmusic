@@ -2,6 +2,7 @@
 # Expand a sprite strip with computed in-between frames (optical flow, no new art). Prototype used for the owner review of 25 Oct:
 #   python3 games-src/scripts/strip-interp.py <who> <act> <k in-betweens per pair> <outdir>   (run from the repo root; needs opencv-python-headless)
 # Writes a before/after PNG and old/new GIFs only. Originals are never touched; a worker builds the real strips from the same functions.
+import sys,json,numpy as np,cv2
 from PIL import Image
 def split(path,n,w,h):
     im=np.array(Image.open(path).convert('RGBA')).astype(np.float32)/255
