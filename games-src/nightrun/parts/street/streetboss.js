@@ -1,5 +1,5 @@
 // PURPOSE: Street boss phases: the big heavy fights in 3 named phases with 4 attacks, each with its own telegraph and its own answer, and an opening after every attack
-// FLAG: sboss (?sboss=1; off by default)
+// FLAG: sboss (ON by default; ?sboss=0 turns it off)
 // TEST: qa/streetsim.js with Q='&sboss=1' DBG=qa/bossprobe.js (boss gate lines)
 /* ---------- STREETBOSS (W167, design: benchmark/STREET-BAR-SCORE-2026-10-23.md task 1; rows B1-B3 of benchmark/STREET-BAR.md).
    Was: one attack (wind-up -> charge) and no phases; the fight ended after 2 charges. Now (wraps FOOT_BOSS.bigheavy from street2.js heavyDef):

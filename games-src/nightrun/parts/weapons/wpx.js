@@ -1,7 +1,7 @@
 /* ===== 4b. WEAPON LEVELS BOUGHT IN THE GARAGE + EIGHT MORE WEAPONS (loads after g.js) =====
    Every weapon has a permanent level 1..10 (key mnr_wplv, bought in Garage > WEAPONS with Neon). In a run the effective level is the permanent level
    plus the pit-stop level bonus (at most +2, g.js WP.lvOf). Levels grow rate, size and count; damage per shot stays under the soft cap (b.js DMG.hit).
-   Total weapon DPS at level 10 is held at about 2.5x level 1 (weapon-test.js measures it). WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
+   The card shows power 2.5x at level 10 (a displayed number, WPX_POWER); real DPS per weapon is not measured here. WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
 const WEAPON_META=true;
 const WPX_PRICE=L=>window.RET&&RET.econ?Math.round(30*Math.pow(1.28,L-1)*RET.wk):Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
 const WPX_POWER=(L,id)=>window.SC&&SC.scaled(id)?SC.lvW(L):1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
