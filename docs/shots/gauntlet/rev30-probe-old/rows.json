@@ -1,0 +1,182 @@
+[
+ {
+  "id": "boot/playVisible",
+  "what": "page open → PLAY button visible",
+  "num": "61.9 s lab",
+  "bar": "INFO (lab, software GL)",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/rev30-probe-old/fra_0_title.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl",
+  "what": "PLAY tap → first control of the car",
+  "num": "312.8 s lab (6x CPU)",
+  "bar": "<= 8 s lab",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/rev30-probe-old/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/menu",
+  "what": "race menu never shows after PLAY (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "boot/loader",
+  "what": "loader never covers a controllable car (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls",
+  "what": "HUD text over the touch buttons (first control)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev30-probe-old/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "hud/minText",
+  "what": "smallest visible text (first control)",
+  "num": "0 items < 12 px",
+  "bar": "0 (CLAUDE.md: 12 px minimum)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/time",
+  "what": "2 min street drive, gas held, following streets",
+  "num": "120 s game, 2.18 km, avg 65 km/h",
+  "bar": ">= 110 s game and >= 1.0 km",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev30-probe-old/fra_2_street_at_speed.jpg",
+  "note": ""
+ },
+ {
+  "id": "drive/frustration",
+  "what": "time under 10 km/h with GAS held",
+  "num": "4 %",
+  "bar": "<= 15 % (bughunt frustration limit)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/pop",
+  "what": "traffic car pops on screen (in view, 6-60 m)",
+  "num": "0 jumps > 2 m, 0 appear < 40 m",
+  "bar": "0 jumps > 2 m; 0 appear < 40 m",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "rev/latres",
+  "what": "REVIEW probe: sideways HT_LAT residual on in-view cars 6-60 m",
+  "num": "n 3015 >1m 14.3% >2m 7.4% >4m 1.29% max 5.17 m (k9 120>119@0.00 d7 T25.8) long>3s 0",
+  "bar": "INFO",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/onStreet",
+  "what": "bot check: share of the drive on a street (a bot off the street makes the drive rows meaningless)",
+  "num": "55 %",
+  "bar": ">= 80 % (script validity)",
+  "pass": "FAIL",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/near",
+  "what": "traffic near the player (HITRUN_GAP gap 8)",
+  "num": "0.9 cars within 40 m (avg)",
+  "bar": ">= 2.5 (hr/near)",
+  "pass": "FAIL",
+  "shot": "",
+  "note": "avg cars per frame by distance: <40 0.9, 40-80 1.8, 80-150 6.6, 150-300 24.1, >300 24.9; parked 4.8, dead 12.0; standing (<150 m, cv<1) 1.0; cars 75, hour 10.8, hourK 1.00, trHour 1; far(>240 m) cars: {\"n\":52,\"route\":7,\"tr\":0,\"pk\":0,\"dead\":12,\"noPop\":0,\"ok\":33} held 6033 law false lvTraf 1 trFar 240"
+ },
+ {
+  "id": "hud/overControls2",
+  "what": "HUD text over the touch buttons (later in roam)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "ath/boot",
+  "what": "Athens: PLAY → first control",
+  "num": "221.3 s lab, city ath",
+  "bar": "control, city ath",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev30-probe-old/ath_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "rev/latres-ath",
+  "what": "REVIEW probe Athens",
+  "num": "n 0 >1m 0.0% >2m 0.0% >4m 0.00% max 0 m () long>3s 0",
+  "bar": "INFO",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "ath/drive",
+  "what": "Athens: 60 s drive following streets",
+  "num": "60 s game, 1 % under 10 km/h, 0 pops",
+  "bar": ">= 55 s, <= 15 % slow, 0 pops",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev30-probe-old/ath_2_drive.jpg",
+  "note": ""
+ },
+ {
+  "id": "ath/race",
+  "what": "Athens: pause → QUIT → RACES → START reaches the grid",
+  "num": "quit true races true start true grid true",
+  "bar": "grid reached",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev30-probe-old/ath_3_race_start.jpg",
+  "note": ""
+ },
+ {
+  "id": "page/reload",
+  "what": "page never reloads",
+  "num": "0 reloads",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/jsErrors",
+  "what": "no JS errors (pageerror + console.error)",
+  "num": "0 errors",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/memory",
+  "what": "JS heap high-water (performance.memory)",
+  "num": "78 MB",
+  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ }
+]
