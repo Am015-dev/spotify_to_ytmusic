@@ -80,7 +80,7 @@ function heavyDef(hp,h,w,score,boss){return wrap({hp,w,h,score,c:'#a03050',heavy
       const G=env.G,wall=e.x<=G.camX+half(e)+2||e.x>=G.camX+G.viewW-half(e)-2;if(e.state==='charge'&&(e.sT>=1.1||wall)){const tired=age(e,env)>15;go(e,wall||tired?'stun':'walk');if(wall||tired)e.stun=tired?2:1;e.cd=boss?1.3:2.6;}}
     else if(e.state==='stun'){e.vx=0;if(e.sT>=(e.stun||2.2)){go(e,'walk');e.cd=boss?1.6:2.2;}}});}
 FE.heavy=heavyDef(22,84,46,500,false);
-FBS.bigheavy=FE.bigheavy=heavyDef(120,96,54,3000,true);   // ext bosses get x0.3 hp in the engine: 120 -> 36
+FBS.bigheavy=FE.bigheavy=heavyDef(120,96,54,3000,true);   // x0.3 in the engine, x HPK 8 (streetboss.js) = boss hp 288: W281 sweep 180-288 never reached 40-80% on both devices; lower hp breaks the casual-bot gate (nearest 45-53%), so the highest hp stays
 /* ----- the stage ----- */
 const ROOMS=[{n:'THE STREET',x:0},{n:'BEHIND THE CAR',x:1450},{n:'THE HEAVY',x:2450},{n:'KIOSK ROW',x:3450},{n:'TWO WAYS',x:4450},{n:'CLIMAX',x:5450}];
 const w=(x,enemy,count,gap,o)=>Object.assign({x,enemy,count,gap},o||{}),k=(lock,enemy,count,gap,delay,o)=>Object.assign({lock,enemy,count,gap,delay},o||{});
