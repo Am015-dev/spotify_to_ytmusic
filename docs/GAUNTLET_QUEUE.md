@@ -50,3 +50,8 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - world-r30h pushed c7a7842 + d10705c (round-3 patch + 3 foliage-cam root causes; sq_tv_1 fig not reproduced, persistent START clear added). Gates green; gauntlet FAIL rows = trunk baseline. Needs an OPUS review after review-r30-9 (touchdrive) finishes.
 - Running: links-r30i (SONNET, late shader links), tilebuild-r30j (OPUS design plan for boot ≤ 36 s, session_01RR7mnb5U1JRaBr7aPxJqRz), reviewer review-r30-9.
 - beta.165 still waits for world + touchdrive verdicts.
+
+## 30 Oct ~16:25
+- tilebuild-r30j done: docs/DESIGN_tiled_city_build.md (b3256db). tb1 (SONNET, session_01RR7mnbL8oRMHJiL4MmTEsK) started: fra toControl ≤ 58 s behind ?tb1.
+- touchdrive round 3 FAIL (REVIEW_2K_35): (a) chord uses performance.now() fallback, so late touches roll; compare raw e.timeStamp; (d) portrait tip 400 px on 390 px, cut and over the car; plus decide touch smash in city QUICK RACE ('roam'). Round 4 (~30 min, same worker session_01RR7mnXYxNGypZruSqUdFZx) starts when a worker slot frees (links-r30i or tb1). If beta.165 is ready first, ship it with touchdrive reverted.
+- review-r30-10 (OPUS, session_01RR7mnb21PbB4bMneoNFPxV) reviewing world-r30b+r30h.
