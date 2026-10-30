@@ -7,7 +7,7 @@
 // Per run: page + console errors, unhandled rejections, stuck (20 s game time with nothing changing), enemies spawned / attacked / hurt Kai / died,
 // pickups, camera keeps Kai in view, BEHIND caption vs spawns, progress bar, result screen, button sizes + overlaps (phone), frame p95, 5 shots.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/gauntlet-foot.js
-//   env: GAME_DIR (a built dir)  SEEDS=8  PLAT=phone,pc  STRATS=idle,random,aggressor,dodger  TS=3  MAXREAL=150 (s per run)  OUT=<dir for shots + results.json>  CONTROLS=0 (skip the control check)
+//   env: GAME_DIR (a built dir)  SEEDS=8  PLAT=phone,pc  STRATS=idle,random,aggressor,dodger,tactician  TS=3  MAXREAL=150 (s per run)  OUT=<dir for shots + results.json>  CONTROLS=0 (skip the control check)
 const fs = require('fs'), path = require('path');
 const { boot, sleep, UA } = require('./lib.js');
 const SEEDS = process.env.SEEDS === undefined ? 8 : +process.env.SEEDS, PLATS = (process.env.PLAT || 'phone,pc').split(','), STRATS = (process.env.STRATS || 'idle,random,aggressor,dodger').split(','), TS = +process.env.TS || 3, MAXREAL = (+process.env.MAXREAL || 150) * 1000;
@@ -61,10 +61,10 @@ function makeInput(p, plat) {
 const SNAP = () => { const F = window.FOOT, S = F && F.S; if (!S) return null; const P = S.P, u = window.__u = window.__u || { n: 0 };
   const E = []; for (const e of S.E) { if (e.__u == null) e.__u = ++u.n; E.push({ u: e.__u, id: e.id, x: e.x, y: e.y, hp: e.hp, st: e.state, w: e.wind || 0, f: e.facing, d: !!e.dead, b: !!e.boss, hid: !!e.hid }); }
   const cam = F._in.L(); const g = S.gd || null;
-  return { on: F.on, t: S.time, end: S.end ? { cleared: S.end.cleared, quit: S.end.quit } : null, paused: S.paused, camX: S.camX, vw: (cam && cam.vw) || 960, lock: S.lock && S.lock.id, bossOn: S.bossOn,
+  return { on: F.on, t: S.time, end: S.end ? { cleared: S.end.cleared, quit: S.end.quit } : null, paused: S.paused, camX: S.camX, vw: (cam && cam.vw) || 960, lock: S.lock && S.lock.id, wl: S.lock ? S.waves.filter(w => w.lock === S.lock.id && !w.done).length : 0, bossOn: S.bossOn,
     P: { x: P.x, y: P.y, hp: P.hp, max: P.max, g: P.onGround, f: P.facing, inv: P.inv, dash: P.dash, dashIF: P.dashIF, mel: P.mel, bombs: P.bombs, maxX: P.maxX }, guard: g && { on: g.on, m: g.m },
     E, eb: S.eb.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy || 0 })), pk: S.pk.map(k => ({ k: k.k, x: k.x, y: k.y })), shots: S.shots, kills: S.kills, hurts: S.hurts, score: S.score, moved: S.moved,
-    behind: S.behind ? S.behind.until : null, bossX: S.st.boss && S.st.boss.x, len: S.st.len, boss: S.boss ? { hp: S.boss.hp, max: S.boss.max, dead: !!S.boss.dead } : null, auto: F.autoOn && F.autoOn(), fl: 540 - 70 }; };
+    behind: S.behind ? S.behind.until : null, bossX: S.st.boss && S.st.boss.x, len: S.st.len, stage: S.id + ' ' + S.st.n + ' s2=' + S.st.s2 + ' locks=' + (S.st.locks || []).map(l => l.id + '@' + l.x).join(',') + ' boss=' + JSON.stringify(S.st.boss) + ' waves=' + S.waves.length + ' lockDone=' + Object.keys(S.lockDone).join(''), boss: S.boss ? { hp: S.boss.hp, max: S.boss.max, dead: !!S.boss.dead } : null, auto: F.autoOn && F.autoOn(), fl: 540 - 70 }; };
 
 // ---- the strategies: snapshot -> want
 function strategy(name, rnd) {
@@ -82,6 +82,39 @@ function strategy(name, rnd) {
       if (atk && Math.abs(dx) < 170) { if (front && s.guard && s.guard.m > .05) { w.guard = true; w.fire = false; w.melee = false; w.mx = 0; } else if (s.P.inv <= 0 && (Math.abs(dx) < 110)) { w.dash = true; w.mx = -Math.sign(dx); } } }
     for (const b of s.eb) { const dx = b.x - s.P.x; if (Math.abs(dx) < 190 && dx * b.vx < 0 && Math.abs(b.y - (s.P.y - 30)) < 60 && s.P.g) { w.jump = true; break; } }
     return w; };
+  if (name === 'tactician') {   // W274: state-aware, human-matchable: parry the telegraphed lunge, punish the OPEN foe, dash/jump the heavy's charge, kite gunners, grenade crowds + the boss, take hearts, stay off the right wall
+    let bombAt = -9, dodgeAt = -9;
+    return s => {
+      const P = s.P, w = { mx: 0, fire: false, melee: false, jump: false, guard: false, dash: false, bomb: false };
+      const live = s.E.filter(e => !e.d && !e.hid && e.x > s.camX - 30 && e.x < s.camX + s.vw + 30), dist = e => Math.abs(e.x - P.x), front = e => Math.sign(e.x - P.x) === P.f;
+      const tele = e => e.st === 'crouch' || e.w > 0 || e.st === 'wind' || e.st === 'charge' || e.st === 'lunge';
+      const heavy = e => e.id === 'heavy' || e.id === 'bigheavy' || e.b;
+      const nearest = live.slice().sort((x, y) => dist(x) - dist(y))[0], right = s.camX + s.vw - P.x;
+      const face = e => Math.sign(e.x - P.x) || 1;
+      // 1. incoming heavy charge: a charge hits for 2 and breaks the guard, so leave the line (dash i-frames through it) or jump it
+      const hv = live.find(e => heavy(e) && (e.st === 'wind' || e.st === 'charge') && dist(e) < 330 && front(e));
+      if (hv) { w.mx = -face(hv); if (hv.st === 'charge' && dist(hv) < 230 && P.inv <= 0 && s.t - dodgeAt > .6) { w.dash = true; w.mx = face(hv); dodgeAt = s.t; } if (P.g && dist(hv) < 260) w.jump = true; return w; }
+      // 2. a melee foe in its telegraph within reach, in front: GUARD (parry window is the last 0.15 s); a foe from behind: dash out
+      const mel = live.find(e => !heavy(e) && e.id !== 'gunner' && tele(e) && dist(e) < 150);
+      if (mel) { if (front(mel) && s.guard && s.guard.m > .05) { w.guard = true; w.mx = 0; return w; } if (P.inv <= 0 && s.t - dodgeAt > .6) { w.dash = true; w.mx = -face(mel); dodgeAt = s.t; return w; } w.mx = -face(mel); return w; }
+      // 3. a bullet on the way: jump it
+      for (const b of s.eb) { const dx = b.x - P.x; if (Math.abs(dx) < 200 && dx * b.vx < 0 && Math.abs(b.y - (P.y - 30)) < 70 && P.g) { w.jump = true; break; } }
+      // 4. hearts: hurt and a heal is near and nothing is about to hit
+      const heal = P.hp < P.max ? s.pk.filter(k => k.k === 'heal' && k.x > s.camX && k.x < s.camX + s.vw).sort((x, y) => Math.abs(x.x - P.x) - Math.abs(y.x - P.x))[0] : null;
+      if (heal && (!nearest || dist(nearest) > 130)) { w.mx = Math.abs(heal.x - P.x) > 12 ? Math.sign(heal.x - P.x) : 0; w.fire = !!nearest && front(nearest); return w; }
+      if (!nearest) { w.mx = right < 130 ? -.6 : P.x < s.camX + s.vw * .45 ? 1 : 0; return w; }   // empty street: advance to the middle of the screen, never sit on the wall
+      const n = nearest, d = dist(n);
+      // 5. grenade: three or more within 300 px, or the heavy / boss up close
+      if (P.bombs > 0 && s.t - bombAt > 4 && (live.filter(e => dist(e) < 300).length >= 3 || live.some(e => heavy(e) && dist(e) < 280))) { w.bomb = true; bombAt = s.t; }
+      // 6. punish: an OPEN / stunned / resting foe in knife range gets the knife, a far one gets bullets; the heavy is shot from range and only knifed when stunned
+      const open = n.st === 'rest' || n.st === 'back' || n.st === 'stun' || n.st === 'open' && n.id !== 'gunner';
+      if (heavy(n)) { w.fire = front(n); if (n.st === 'stun' && d < 90) { w.melee = Math.floor(s.t * 6) % 2 === 0; w.mx = face(n) * .3; } else w.mx = d < 260 ? -face(n) : d > 420 ? face(n) : 0; }
+      else if (n.id === 'gunner') { w.fire = front(n); w.mx = d > 330 ? face(n) : d < 200 ? face(n) : 0; if (d < 90) w.melee = true; }   // close the gap on a gunner (it backs off if rushed) or hold range
+      else { w.fire = front(n) && d < 640; if (open && d < 95) { w.melee = Math.floor(s.t * 6) % 2 === 0; w.mx = face(n) * .3; } else w.mx = d < 150 ? -face(n) : d > 260 ? face(n) * .5 : 0; }
+      if (right < 90 && w.mx > 0) w.mx = 0;
+      if (Math.sign(w.mx) && Math.sign(w.mx) !== P.f && !w.fire) w.fire = false;
+      return w; };
+  }
   return name === 'aggressor' ? s => aggr(s, false) : s => aggr(s, true);
 }
 
@@ -153,6 +186,7 @@ async function run(b, plat, strat, seed) {
       if (!shotsDone.mid && s.t > 8 && s.E.filter(e => !e.d && Math.abs(e.x - s.P.x) < 380).length >= 2) { shotsDone.mid = 1; await shot('mid'); }
       if (!shotsDone.boss && s.boss && !s.boss.dead && s.bossOn) { shotsDone.boss = 1; await sleep(250); await shot('boss'); }
       if (!shotsDone.death && s.P.hp <= 0) { shotsDone.death = 1; await shot('death'); }
+      if (process.env.TRACE && s.t - (R.trT || -9) >= 1) { R.trT = s.t; (R.trace = R.trace || []).push([(R.stage = R.stage || s.stage) && '',+s.t.toFixed(1), Math.round(s.P.x), Math.round(s.camX), s.lock || '-', s.P.hp, s.E.filter(e => !e.d).length, s.E.filter(e => !e.d).map(e => e.id + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 6).join(' '), s.kills, 'wavesLeft=' + s.wl].join(' ')); }
       prev = s; lastS = s;
     }
     await inp.release(); await sleep(150); s = await p.evaluate(SNAP) || lastS; R.end = s && s.end; R.t = s && s.t; R.kills = s && s.kills; R.hurts = s && s.hurts; R.hpEnd = s && s.P.hp; R.maxX = s && s.P.maxX;

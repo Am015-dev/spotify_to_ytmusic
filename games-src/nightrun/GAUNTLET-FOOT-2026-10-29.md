@@ -35,3 +35,18 @@ Strategy runs (completed before the stop; 70 s real cap, TS 4, phone and PC ran 
 Minimums over those runs: no page / console / rejection error, no stuck state, Kai never left the screen (min camera margin 15 px), no foe spawned from the left without BEHIND active, every foe that spawned was seen attacking or dying, result screen shown every time a run ended (buttons >= 44 px, not covered). No run cleared the stage: STREET CLEAR screen, the clear result shot and the death-at-boss shot are NOT verified.
 The aggressor FAIL lines "progress value ... (335x/902x)" were a test bug (the bar clamps at 1 when Kai passes the boss x); fixed in the script after those runs, not re-run.
 The "camera moved back" notes (28-149x) are the designed retreat easing (streetlook SL.back), not a defect.
+
+## W274 (30 Oct 2026): the street is clearable, and what x=7847 is
+Quiet machine, one browser at a time, real input, TS=4, MAXREAL 170, build of nr/W273-proof. Game time in seconds.
+| device | strategy | seed | result | kills | boss |
+|---|---|---|---|---|---|
+| PC | dodger | 0 | CLEARED, t=366 | 47 | reached at t=148, killed |
+| PC | dodger | 1 | died t=125 | 36 | not reached |
+| PC | dodger | 2 | died t=129 | 36 | not reached |
+| phone | dodger | 0 | died t=133 | 41 | not reached |
+| phone | dodger | 1 | died t=161 | 44 | reached, died in phase 1 (boss bar full) |
+| phone | dodger | 2 | died t=212 | 45 | reached, died |
+| phone | tactician (new) | 0 | died t=88 | 23 | not reached |
+| PC | tactician (new) | 0 | died t=35 | 3 | not reached |
+Clears: PC dodger 1 of 3, phone dodger 0 of 3, tactician 0 of 2. NOT run (time limit): dodger seeds 3-7, tactician seeds 1-7, aggressor, random, idle (W261 has loaded-machine numbers for them). Boss hp left was not recorded for the phone deaths (the shot shows a full bar); no run reached phase 2.
+The W273 "0 cleared, died at 69-99 s" came from an overloaded machine (frame p95 100-667 ms); on a quiet one the dodger lives 125-212 s and one PC run clears.
