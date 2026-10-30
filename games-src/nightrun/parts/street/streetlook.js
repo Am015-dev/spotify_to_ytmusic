@@ -34,7 +34,7 @@ SL.layout=(L,W,H,dpr,T)=>{SL.port=false;F.camK=undefined;if(!(T&&H>W*1.05))retur
   const rows=auto?[['dash','jump'],['bomb','melee']]:[['dash','fire'],['bomb','melee','jump']],sz=k=>k===big?f:s,rh=rows.map(r=>Math.max(...r.map(sz)));
   let y=H-mg,minX=W;rows.forEach((r,i)=>{y-=rh[i];let x=W-14;for(let j=r.length-1;j>=0;j--){const z=sz(r[j]);x-=z;set(L.btn[r[j]],x,y+(rh[i]-z)/2,z);x-=8;}minX=Math.min(minX,x+8);y-=8;});
   const fb=L.btn.fire;if(auto){fb.hidden=true;fb.style.display='none';}
-  const sk=clamp(Math.min(Z-2*mg,W*.38,minX-16-12),96,160);set(L.stick,16,hf+(Z-sk)/2,sk);
+  const sk=clamp(Math.min(Z-2*mg,W*.38,minX-16-12-(auto?0:s+8)),96,160);set(L.stick,16,hf+(Z-sk)/2,sk);
   const pb=L.root.querySelector('#fPause');pb.style.left=(W-52)+'px';pb.style.top='8px';return true;};
 
 /* ----- walking back: the left wall is no longer the camera's furthest point; Kai may retreat while the camera eases back up to 35% of the view, never behind the

@@ -52,7 +52,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running
 addEventListener('pageshow',()=>{if(!paused&&!document.hidden)AU.resume();});
 for(const ev of['pointerdown','touchstart','touchend','mouseup','click'])addEventListener(ev,()=>AU.unlock(),true);
 addEventListener('touchstart',()=>{if(!touchUI){touchUI=true;relayout();syncUI();}},{capture:true,passive:true});
-stage.addEventListener('touchstart',e=>{if(e.target.closest('button,.ov,input,label,#touch,#labP'))return;e.preventDefault();
+stage.addEventListener('touchstart',e=>{if(e.target.closest('button,.ov,input,label,#touch,#labP,#taleCard'))return;e.preventDefault();
   if(!running||paused||touch)return;const t=e.changedTouches[0],[x,y]=toGame(t);
   touch={id:t.identifier,sx:x,sy:y,px:P.x,py:P.y,x,y};touchFire=true;pressed.Fire=stampOf(e);},{passive:false});
 stage.addEventListener('touchmove',e=>{if(!touch)return;e.preventDefault();for(const t of e.changedTouches)if(t.identifier===touch.id){const[x,y]=toGame(t);touch.x=x;touch.y=y;}},{passive:false});
