@@ -1,0 +1,822 @@
+From e5430cc7581e241a0ae003fe0cce08d1568d2732 Mon Sep 17 00:00:00 2001
+From: Alexandros Kouris <noreply@anthropic.com>
+Date: Fri, 30 Oct 2026 13:32:29 +0000
+Subject: [PATCH] tmp squash r3
+
+---
+ docs/shots/gauntlet/world-r30f-g/REPORT.md  |  20 +++
+ docs/shots/gauntlet/world-r30f-g/meta.json  |   1 +
+ docs/shots/gauntlet/world-r30f-g/rows.json  | 128 ++++++++++++++++++++
+ docs/shots/gauntlet/world-r30f-q/REPORT.md  |  20 +++
+ docs/shots/gauntlet/world-r30f-q/meta.json  |   1 +
+ docs/shots/gauntlet/world-r30f-q/rows.json  | 128 ++++++++++++++++++++
+ docs/shots/gauntlet/world-r30f-qa/REPORT.md |  20 +++
+ docs/shots/gauntlet/world-r30f-qa/meta.json |   1 +
+ docs/shots/gauntlet/world-r30f-qa/rows.json | 128 ++++++++++++++++++++
+ src/60_city_build6.js                       |   2 +-
+ src/98fc_foliage_cam.js                     |  74 +++++++----
+ src/98l_lively.js                           |   6 +-
+ src/99c6wr_world_go.js                      |  21 +++-
+ tools/gauntlet.js                           |  37 ++++--
+ 14 files changed, 544 insertions(+), 43 deletions(-)
+ create mode 100644 docs/shots/gauntlet/world-r30f-g/REPORT.md
+ create mode 100644 docs/shots/gauntlet/world-r30f-g/meta.json
+ create mode 100644 docs/shots/gauntlet/world-r30f-g/rows.json
+ create mode 100644 docs/shots/gauntlet/world-r30f-q/REPORT.md
+ create mode 100644 docs/shots/gauntlet/world-r30f-q/meta.json
+ create mode 100644 docs/shots/gauntlet/world-r30f-q/rows.json
+ create mode 100644 docs/shots/gauntlet/world-r30f-qa/REPORT.md
+ create mode 100644 docs/shots/gauntlet/world-r30f-qa/meta.json
+ create mode 100644 docs/shots/gauntlet/world-r30f-qa/rows.json
+
+diff --git a/docs/shots/gauntlet/world-r30f-g/REPORT.md b/docs/shots/gauntlet/world-r30f-g/REPORT.md
+new file mode 100644
+index 0000000..15f7463
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-g/REPORT.md
+@@ -0,0 +1,20 @@
++# Gauntlet world-r30f-g
++
++2026-10-30T13:31Z · `node tools/gauntlet.js --build out/w30f --ver world-r30f-g --only boot,world` · 615 s wall · **1 FAIL** of 12 rows. How to read and extend: [docs/GAUNTLET.md](../../../GAUNTLET.md).
++
++| row | what the player does | number | bar | result | shot |
++|---|---|---|---|---|---|
++| boot/playVisible | page open → PLAY button visible | 38.4 s lab | INFO (lab, software GL) | INFO | [fra_0_title.jpg](fra_0_title.jpg) |
++| boot/toControl | PLAY tap → first control of the car | 216.2 s lab (6x CPU) | <= 8 s lab | **FAIL** | [fra_1_first_control.jpg](fra_1_first_control.jpg) |
++| boot/menu | race menu never shows after PLAY (hr/boot) | 0 samples | 0 | PASS |  |
++| boot/loader | loader never covers a controllable car (hr/boot) | 0 samples | 0 | PASS |  |
++| hud/overControls | HUD text over the touch buttons (first control) | 0 overlaps | 0 | PASS | [fra_1_first_control.jpg](fra_1_first_control.jpg) |
++| hud/minText | smallest visible text (first control) | 0 items < 12 px | 0 (CLAUDE.md: 12 px minimum) | PASS |  |
++| world/quests | 3 quest(s) started by real input (beacon, prompt, LET'S GO): anything drawn inside my car? | 3/3 started, 0 objects in the car body<br><small>q_pigeons d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_photo d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_wedding d7m v0 opened tapped LET'S GO ▶ started; (abandoned)</small> | 3/3 started, 0 (gauntlet seen/prop-on-car) | PASS | [world_quest1_start.jpg](world_quest1_start.jpg) |
++| world/pickup | drive at the garage 🔧: the icon is readable on the way into its ring | opacity 40 m 1 · 25 m 1 · 12 m 1 | >= 0.75 at 25 m and 12 m (REVIEW_2K_28: 0.31 at 26 m) | PASS | [world_garage_25m.jpg](world_garage_25m.jpg) |
++| world/glance | drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object | 0/39 frames inside a prop (tlight, closest 2.8 m); 0 frames inside a building (INFO) | passes <= 4 m from the prop (REVIEW_2K_31), 0 frames (gauntlet seen/camera-in-props) | PASS | [world_glance_kiosk.jpg](world_glance_kiosk.jpg) |
++| world/birds | scattered pigeons seen from the car at >= 55 km/h (real drive) | 0/42 bird samples at camera height (0 %), 6 samples | <= 10 % at camera height (REVIEW_2K_28: grey drones 3-8 m up) | PASS | [world_birds_speed.jpg](world_birds_speed.jpg) |
++| hud/overControls2 | HUD text over the touch buttons (later in roam) | 0 overlaps | 0 | PASS |  |
++| page/reload | page never reloads | 0 reloads | 0 | PASS |  |
++| page/jsErrors | no JS errors (pageerror + console.error) | 0 errors | 0 | PASS |  |
++| page/memory | JS heap high-water (performance.memory) | 21 MB | INFO (phone cap 700 MB process, NIGHTRUN_LOG) | INFO |  |
+diff --git a/docs/shots/gauntlet/world-r30f-g/meta.json b/docs/shots/gauntlet/world-r30f-g/meta.json
+new file mode 100644
+index 0000000..572eda8
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-g/meta.json
+@@ -0,0 +1 @@
++{"when":"2026-10-30T13:31Z","cmd":"node tools/gauntlet.js --build out/w30f --ver world-r30f-g --only boot,world","wall":"615"}
+\ No newline at end of file
+diff --git a/docs/shots/gauntlet/world-r30f-g/rows.json b/docs/shots/gauntlet/world-r30f-g/rows.json
+new file mode 100644
+index 0000000..5eb5f94
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-g/rows.json
+@@ -0,0 +1,128 @@
++[
++ {
++  "id": "boot/playVisible",
++  "what": "page open → PLAY button visible",
++  "num": "38.4 s lab",
++  "bar": "INFO (lab, software GL)",
++  "pass": "INFO",
++  "shot": "docs/shots/gauntlet/world-r30f-g/fra_0_title.jpg",
++  "note": ""
++ },
++ {
++  "id": "boot/toControl",
++  "what": "PLAY tap → first control of the car",
++  "num": "216.2 s lab (6x CPU)",
++  "bar": "<= 8 s lab",
++  "pass": "FAIL",
++  "shot": "docs/shots/gauntlet/world-r30f-g/fra_1_first_control.jpg",
++  "note": ""
++ },
++ {
++  "id": "boot/menu",
++  "what": "race menu never shows after PLAY (hr/boot)",
++  "num": "0 samples",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "boot/loader",
++  "what": "loader never covers a controllable car (hr/boot)",
++  "num": "0 samples",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "hud/overControls",
++  "what": "HUD text over the touch buttons (first control)",
++  "num": "0 overlaps",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-g/fra_1_first_control.jpg",
++  "note": ""
++ },
++ {
++  "id": "hud/minText",
++  "what": "smallest visible text (first control)",
++  "num": "0 items < 12 px",
++  "bar": "0 (CLAUDE.md: 12 px minimum)",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "world/quests",
++  "what": "3 quest(s) started by real input (beacon, prompt, LET'S GO): anything drawn inside my car?",
++  "num": "3/3 started, 0 objects in the car body",
++  "bar": "3/3 started, 0 (gauntlet seen/prop-on-car)",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-g/world_quest1_start.jpg",
++  "note": "q_pigeons d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_photo d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_wedding d7m v0 opened tapped LET'S GO ▶ started; (abandoned)"
++ },
++ {
++  "id": "world/pickup",
++  "what": "drive at the garage 🔧: the icon is readable on the way into its ring",
++  "num": "opacity 40 m 1 · 25 m 1 · 12 m 1",
++  "bar": ">= 0.75 at 25 m and 12 m (REVIEW_2K_28: 0.31 at 26 m)",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-g/world_garage_25m.jpg",
++  "note": ""
++ },
++ {
++  "id": "world/glance",
++  "what": "drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object",
++  "num": "0/39 frames inside a prop (tlight, closest 2.8 m); 0 frames inside a building (INFO)",
++  "bar": "passes <= 4 m from the prop (REVIEW_2K_31), 0 frames (gauntlet seen/camera-in-props)",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-g/world_glance_kiosk.jpg",
++  "note": ""
++ },
++ {
++  "id": "world/birds",
++  "what": "scattered pigeons seen from the car at >= 55 km/h (real drive)",
++  "num": "0/42 bird samples at camera height (0 %), 6 samples",
++  "bar": "<= 10 % at camera height (REVIEW_2K_28: grey drones 3-8 m up)",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-g/world_birds_speed.jpg",
++  "note": ""
++ },
++ {
++  "id": "hud/overControls2",
++  "what": "HUD text over the touch buttons (later in roam)",
++  "num": "0 overlaps",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "page/reload",
++  "what": "page never reloads",
++  "num": "0 reloads",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "page/jsErrors",
++  "what": "no JS errors (pageerror + console.error)",
++  "num": "0 errors",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "page/memory",
++  "what": "JS heap high-water (performance.memory)",
++  "num": "21 MB",
++  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
++  "pass": "INFO",
++  "shot": "",
++  "note": ""
++ }
++]
+\ No newline at end of file
+diff --git a/docs/shots/gauntlet/world-r30f-q/REPORT.md b/docs/shots/gauntlet/world-r30f-q/REPORT.md
+new file mode 100644
+index 0000000..1b8eb7b
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-q/REPORT.md
+@@ -0,0 +1,20 @@
++# Gauntlet world-r30f-q
++
++2026-10-30T13:20Z · `node tools/gauntlet.js --build out/w30f --ver world-r30f-q --only boot,world` · 667 s wall · **2 FAIL** of 12 rows. How to read and extend: [docs/GAUNTLET.md](../../../GAUNTLET.md).
++
++| row | what the player does | number | bar | result | shot |
++|---|---|---|---|---|---|
++| boot/playVisible | page open → PLAY button visible | 51.6 s lab | INFO (lab, software GL) | INFO | [fra_0_title.jpg](fra_0_title.jpg) |
++| boot/toControl | PLAY tap → first control of the car | 276.9 s lab (6x CPU) | <= 8 s lab | **FAIL** | [fra_1_first_control.jpg](fra_1_first_control.jpg) |
++| boot/menu | race menu never shows after PLAY (hr/boot) | 0 samples | 0 | PASS |  |
++| boot/loader | loader never covers a controllable car (hr/boot) | 0 samples | 0 | PASS |  |
++| hud/overControls | HUD text over the touch buttons (first control) | 0 overlaps | 0 | PASS | [fra_1_first_control.jpg](fra_1_first_control.jpg) |
++| hud/minText | smallest visible text (first control) | 0 items < 12 px | 0 (CLAUDE.md: 12 px minimum) | PASS |  |
++| world/quests | 3 quest(s) started by real input (beacon, prompt, LET'S GO): anything drawn inside my car? | 3/3 started, 0 objects in the car body<br><small>q_pigeons d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_photo d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_wedding d7m v0 opened tapped LET'S GO ▶ started; (abandoned)</small> | 3/3 started, 0 (gauntlet seen/prop-on-car) | PASS | [world_quest1_start.jpg](world_quest1_start.jpg) |
++| world/pickup | drive at the garage 🔧: the icon is readable on the way into its ring | opacity 40 m 1 · 25 m 1 · 12 m 1 | >= 0.75 at 25 m and 12 m (REVIEW_2K_28: 0.31 at 26 m) | PASS | [world_garage_25m.jpg](world_garage_25m.jpg) |
++| world/glance | drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object | no tall prop | passes <= 4 m from the prop (REVIEW_2K_31), 0 frames (gauntlet seen/camera-in-props) | **FAIL** |  |
++| world/birds | scattered pigeons seen from the car at >= 55 km/h (real drive) | 0/252 bird samples at camera height (0 %), 6 samples | <= 10 % at camera height (REVIEW_2K_28: grey drones 3-8 m up) | PASS | [world_birds_speed.jpg](world_birds_speed.jpg) |
++| hud/overControls2 | HUD text over the touch buttons (later in roam) | 0 overlaps | 0 | PASS |  |
++| page/reload | page never reloads | 0 reloads | 0 | PASS |  |
++| page/jsErrors | no JS errors (pageerror + console.error) | 0 errors | 0 | PASS |  |
++| page/memory | JS heap high-water (performance.memory) | 23 MB | INFO (phone cap 700 MB process, NIGHTRUN_LOG) | INFO |  |
+diff --git a/docs/shots/gauntlet/world-r30f-q/meta.json b/docs/shots/gauntlet/world-r30f-q/meta.json
+new file mode 100644
+index 0000000..b4c1792
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-q/meta.json
+@@ -0,0 +1 @@
++{"when":"2026-10-30T13:20Z","cmd":"node tools/gauntlet.js --build out/w30f --ver world-r30f-q --only boot,world","wall":"667"}
+\ No newline at end of file
+diff --git a/docs/shots/gauntlet/world-r30f-q/rows.json b/docs/shots/gauntlet/world-r30f-q/rows.json
+new file mode 100644
+index 0000000..0ae0df9
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-q/rows.json
+@@ -0,0 +1,128 @@
++[
++ {
++  "id": "boot/playVisible",
++  "what": "page open → PLAY button visible",
++  "num": "51.6 s lab",
++  "bar": "INFO (lab, software GL)",
++  "pass": "INFO",
++  "shot": "docs/shots/gauntlet/world-r30f-q/fra_0_title.jpg",
++  "note": ""
++ },
++ {
++  "id": "boot/toControl",
++  "what": "PLAY tap → first control of the car",
++  "num": "276.9 s lab (6x CPU)",
++  "bar": "<= 8 s lab",
++  "pass": "FAIL",
++  "shot": "docs/shots/gauntlet/world-r30f-q/fra_1_first_control.jpg",
++  "note": ""
++ },
++ {
++  "id": "boot/menu",
++  "what": "race menu never shows after PLAY (hr/boot)",
++  "num": "0 samples",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "boot/loader",
++  "what": "loader never covers a controllable car (hr/boot)",
++  "num": "0 samples",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "hud/overControls",
++  "what": "HUD text over the touch buttons (first control)",
++  "num": "0 overlaps",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-q/fra_1_first_control.jpg",
++  "note": ""
++ },
++ {
++  "id": "hud/minText",
++  "what": "smallest visible text (first control)",
++  "num": "0 items < 12 px",
++  "bar": "0 (CLAUDE.md: 12 px minimum)",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "world/quests",
++  "what": "3 quest(s) started by real input (beacon, prompt, LET'S GO): anything drawn inside my car?",
++  "num": "3/3 started, 0 objects in the car body",
++  "bar": "3/3 started, 0 (gauntlet seen/prop-on-car)",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-q/world_quest1_start.jpg",
++  "note": "q_pigeons d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_photo d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_wedding d7m v0 opened tapped LET'S GO ▶ started; (abandoned)"
++ },
++ {
++  "id": "world/pickup",
++  "what": "drive at the garage 🔧: the icon is readable on the way into its ring",
++  "num": "opacity 40 m 1 · 25 m 1 · 12 m 1",
++  "bar": ">= 0.75 at 25 m and 12 m (REVIEW_2K_28: 0.31 at 26 m)",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-q/world_garage_25m.jpg",
++  "note": ""
++ },
++ {
++  "id": "world/glance",
++  "what": "drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object",
++  "num": "no tall prop",
++  "bar": "passes <= 4 m from the prop (REVIEW_2K_31), 0 frames (gauntlet seen/camera-in-props)",
++  "pass": "FAIL",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "world/birds",
++  "what": "scattered pigeons seen from the car at >= 55 km/h (real drive)",
++  "num": "0/252 bird samples at camera height (0 %), 6 samples",
++  "bar": "<= 10 % at camera height (REVIEW_2K_28: grey drones 3-8 m up)",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-q/world_birds_speed.jpg",
++  "note": ""
++ },
++ {
++  "id": "hud/overControls2",
++  "what": "HUD text over the touch buttons (later in roam)",
++  "num": "0 overlaps",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "page/reload",
++  "what": "page never reloads",
++  "num": "0 reloads",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "page/jsErrors",
++  "what": "no JS errors (pageerror + console.error)",
++  "num": "0 errors",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "page/memory",
++  "what": "JS heap high-water (performance.memory)",
++  "num": "23 MB",
++  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
++  "pass": "INFO",
++  "shot": "",
++  "note": ""
++ }
++]
+\ No newline at end of file
+diff --git a/docs/shots/gauntlet/world-r30f-qa/REPORT.md b/docs/shots/gauntlet/world-r30f-qa/REPORT.md
+new file mode 100644
+index 0000000..04e78a4
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-qa/REPORT.md
+@@ -0,0 +1,20 @@
++# Gauntlet world-r30f-qa
++
++2026-10-30T14:29Z · `node tools/gauntlet.js --build out/w30f --ver world-r30f-qa --only ath,athq` · 4822 s wall · **2 FAIL** of 12 rows. How to read and extend: [docs/GAUNTLET.md](../../../GAUNTLET.md).
++
++| row | what the player does | number | bar | result | shot |
++|---|---|---|---|---|---|
++| boot/playVisible | page open → PLAY button visible | 52.1 s lab | INFO (lab, software GL) | INFO | [fra_0_title.jpg](fra_0_title.jpg) |
++| boot/toControl | PLAY tap → first control of the car | 271.4 s lab (6x CPU) | <= 8 s lab | **FAIL** | [fra_1_first_control.jpg](fra_1_first_control.jpg) |
++| boot/menu | race menu never shows after PLAY (hr/boot) | 0 samples | 0 | PASS |  |
++| boot/loader | loader never covers a controllable car (hr/boot) | 0 samples | 0 | PASS |  |
++| hud/overControls | HUD text over the touch buttons (first control) | 0 overlaps | 0 | PASS | [fra_1_first_control.jpg](fra_1_first_control.jpg) |
++| hud/minText | smallest visible text (first control) | 0 items < 12 px | 0 (CLAUDE.md: 12 px minimum) | PASS |  |
++| hud/overControls2 | HUD text over the touch buttons (later in roam) | 0 overlaps | 0 | PASS |  |
++| ath/boot | Athens: PLAY → first control | 328.0 s lab, city ath | control, city ath | PASS | [ath_1_first_control.jpg](ath_1_first_control.jpg) |
++| world/quests-ath | 1 quest(s) started by real input (beacon, prompt, LET'S GO): anything drawn inside my car? | 0/1 started, 0 objects in the car body<br><small>atc_koulouri d704m v-5 no card</small> | 1/1 started, 0 (gauntlet seen/prop-on-car) | **FAIL** | [ath_quest1_start.jpg](ath_quest1_start.jpg) |
++| ath/drive | Athens: 60 s drive following streets | 60 s game, 1 % under 10 km/h, 0 pops | >= 55 s, <= 15 % slow, 0 pops | PASS | [ath_2_drive.jpg](ath_2_drive.jpg) |
++| ath/race | Athens: pause → QUIT → RACES → START reaches the grid | quit true races true start true grid true | grid reached | PASS | [ath_3_race_start.jpg](ath_3_race_start.jpg) |
++| page/reload | page never reloads | 0 reloads | 0 | PASS |  |
++| page/jsErrors | no JS errors (pageerror + console.error) | 0 errors | 0 | PASS |  |
++| page/memory | JS heap high-water (performance.memory) | 468 MB | INFO (phone cap 700 MB process, NIGHTRUN_LOG) | INFO |  |
+diff --git a/docs/shots/gauntlet/world-r30f-qa/meta.json b/docs/shots/gauntlet/world-r30f-qa/meta.json
+new file mode 100644
+index 0000000..30f7264
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-qa/meta.json
+@@ -0,0 +1 @@
++{"when":"2026-10-30T14:29Z","cmd":"node tools/gauntlet.js --build out/w30f --ver world-r30f-qa --only ath,athq","wall":"4822"}
+\ No newline at end of file
+diff --git a/docs/shots/gauntlet/world-r30f-qa/rows.json b/docs/shots/gauntlet/world-r30f-qa/rows.json
+new file mode 100644
+index 0000000..a1b5ebc
+--- /dev/null
++++ b/docs/shots/gauntlet/world-r30f-qa/rows.json
+@@ -0,0 +1,128 @@
++[
++ {
++  "id": "boot/playVisible",
++  "what": "page open → PLAY button visible",
++  "num": "52.1 s lab",
++  "bar": "INFO (lab, software GL)",
++  "pass": "INFO",
++  "shot": "docs/shots/gauntlet/world-r30f-qa/fra_0_title.jpg",
++  "note": ""
++ },
++ {
++  "id": "boot/toControl",
++  "what": "PLAY tap → first control of the car",
++  "num": "271.4 s lab (6x CPU)",
++  "bar": "<= 8 s lab",
++  "pass": "FAIL",
++  "shot": "docs/shots/gauntlet/world-r30f-qa/fra_1_first_control.jpg",
++  "note": ""
++ },
++ {
++  "id": "boot/menu",
++  "what": "race menu never shows after PLAY (hr/boot)",
++  "num": "0 samples",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "boot/loader",
++  "what": "loader never covers a controllable car (hr/boot)",
++  "num": "0 samples",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "hud/overControls",
++  "what": "HUD text over the touch buttons (first control)",
++  "num": "0 overlaps",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-qa/fra_1_first_control.jpg",
++  "note": ""
++ },
++ {
++  "id": "hud/minText",
++  "what": "smallest visible text (first control)",
++  "num": "0 items < 12 px",
++  "bar": "0 (CLAUDE.md: 12 px minimum)",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "hud/overControls2",
++  "what": "HUD text over the touch buttons (later in roam)",
++  "num": "0 overlaps",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "ath/boot",
++  "what": "Athens: PLAY → first control",
++  "num": "328.0 s lab, city ath",
++  "bar": "control, city ath",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-qa/ath_1_first_control.jpg",
++  "note": ""
++ },
++ {
++  "id": "world/quests-ath",
++  "what": "1 quest(s) started by real input (beacon, prompt, LET'S GO): anything drawn inside my car?",
++  "num": "0/1 started, 0 objects in the car body",
++  "bar": "1/1 started, 0 (gauntlet seen/prop-on-car)",
++  "pass": "FAIL",
++  "shot": "docs/shots/gauntlet/world-r30f-qa/ath_quest1_start.jpg",
++  "note": "atc_koulouri d704m v-5 no card"
++ },
++ {
++  "id": "ath/drive",
++  "what": "Athens: 60 s drive following streets",
++  "num": "60 s game, 1 % under 10 km/h, 0 pops",
++  "bar": ">= 55 s, <= 15 % slow, 0 pops",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-qa/ath_2_drive.jpg",
++  "note": ""
++ },
++ {
++  "id": "ath/race",
++  "what": "Athens: pause → QUIT → RACES → START reaches the grid",
++  "num": "quit true races true start true grid true",
++  "bar": "grid reached",
++  "pass": "PASS",
++  "shot": "docs/shots/gauntlet/world-r30f-qa/ath_3_race_start.jpg",
++  "note": ""
++ },
++ {
++  "id": "page/reload",
++  "what": "page never reloads",
++  "num": "0 reloads",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "page/jsErrors",
++  "what": "no JS errors (pageerror + console.error)",
++  "num": "0 errors",
++  "bar": "0",
++  "pass": "PASS",
++  "shot": "",
++  "note": ""
++ },
++ {
++  "id": "page/memory",
++  "what": "JS heap high-water (performance.memory)",
++  "num": "468 MB",
++  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
++  "pass": "INFO",
++  "shot": "",
++  "note": ""
++ }
++]
+\ No newline at end of file
+diff --git a/src/60_city_build6.js b/src/60_city_build6.js
+index b5d53c2..2f427e4 100644
+--- a/src/60_city_build6.js
++++ b/src/60_city_build6.js
+@@ -219,7 +219,7 @@ function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=
+     if(p.jy<=0&&(!RO.foot||RO.foot==='car')&&d<(sp>12?14:2.6)&&Math.abs(RO.y-p.y)<4){const ax=bx-RO.x,az=bz-RO.z,al=Math.hypot(ax,az)||1;p.jv=d<5?10:7.5;p.jy=.01;p.kx=ax/al*(d<5?8:5.5);p.kz=az/al*(d<5?8:5.5);p.spin=d<5?(R()<.5?-1:1)*8:0;if(R()<.35)AU.sfx('pick');if(d<5&&sp>20&&R()<.5){feed(['HEY!','WATCH IT!','PASS AUF!','OI!'][Math.floor(R()*4)],0,'#ffd12c')}}
+     if(p.jy>0){p.jv-=26*dt;p.jy+=p.jv*dt;p.jx+=p.kx*dt;p.jz+=p.kz*dt;if(p.jy<=0){p.jy=0;p.spin=0}}else{p.jx*=Math.max(0,1-dt*.5);p.jz*=Math.max(0,1-dt*.5)}
+     const x=bx+p.jx,z=bz+p.jz;p._x=x;p._z=z;if(!p.yc||(i+HUB.fr)%8===0){p.y=groundAt(x,z,(p.y||0)+3);if(p.y<-1){pedPlace(p,120,380);continue}p.y=Math.max(0,p.y)}p.yc=1;
+-    const air=p.jy>0,sw=air||p.cw||S?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=(S?S.h:p.cw?p.ch:Math.atan2(dx,dz))+(p.spin?performance.now()/1000*p.spin:0),S2=(SC_S&&SC_S.on?SC_K.ped:.66)*(p.cw?p.gs:1);
++    const air=p.jy>0,sw=air||p.cw||S?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=(S?S.h:p.cw?p.ch:Math.atan2(dx,dz))+(p.spin?performance.now()/1000*p.spin:0),S2=(SC_S&&SC_S.on?SC_K.ped:.66)*(p.cw?p.gs:1)*(p.fh?0:1)/* world-r30b: FC fade */;
+     if(L3_ON&&L3_pose(p,i,x,z,h,S2,air,S,d,sp,dt))continue;/* life-3: natural minifig walk + idles (98l3) */
+     _pq.setFromAxisAngle(up,h);_pB.compose(_pv.set(x,p.y+p.jy+bob,z),_pq,_ps.set(S2,S2,S2));
+     (_pA[0]=-.3,_pA[1]=1.25,_pA[2]=0,_pA[3]=air?-.5:sw,_pA[4]=0,pedPart(Q.legL,i));(_pA[0]=.3,_pA[1]=1.25,_pA[2]=0,_pA[3]=air?.4:-sw,_pA[4]=0,pedPart(Q.legR,i));(_pA[0]=0,_pA[1]=1.36,_pA[2]=0,_pA[3]=0,_pA[4]=0,pedPart(Q.hip,i));(_pA[0]=0,_pA[1]=2.22,_pA[2]=0,_pA[3]=0,_pA[4]=0,pedPart(Q.tor,i));
+diff --git a/src/98fc_foliage_cam.js b/src/98fc_foliage_cam.js
+index a1a540c..8a324b8 100644
+--- a/src/98fc_foliage_cam.js
++++ b/src/98fc_foliage_cam.js
+@@ -3,7 +3,7 @@
+ // clear 0.4 s. Throttled to 8 Hz, 3x3 prop-grid cells, roam car camera only. ?fcam=0 turns it off. NOT a wall/terrain fix: the 'foliage' GO hits on the
+ // Messe -> Mainkai road are building/road meshes without a roamHit collider (see docs/HANDOFF_fcam1.md).
+ const FC={on:!/[?&]fcam=0/.test(location.search),t:0,hid:[],M:new THREE.Matrix4(),Z:new THREE.Matrix4().makeScale(0,0,0),n:0,lift:0,hide:0,near:0,nearR:10};
+-function FC_crown(p){let c=p._fc;if(c)return c;const A=window.__as&&__as.A;let V=A&&p.av&&A.V&&A.V[p.av];if(V&&V.H&&V.rx&&V.cls!=='keep'){const a=p.cvs?p.cvs[0]:1,b=p.cvs?p.cvs[1]:1;return p._fc=[V.rx*a+2,p.y+V.H*b*.2,p.y+V.H*b]}
++function FC_crown(p){let c=p._fc;if(c)return c;const A=window.__as&&__as.A;let V=A&&p.av&&A.V&&A.V[p.av];if(V&&V.H&&V.rx&&V.cls!=='keep'){const a=p.cvs?p.cvs[0]:1,b=p.cvs?p.cvs[1]:1;return p._fc=[V.rx*a+.8/* world-r30b (REVIEW_2K_31): was +2 m = crowns 2 m beside the line hidden in plain view */,p.y+V.H*b*.2,p.y+V.H*b]}
+   const g=p.im&&p.im.geometry;if(!g)return p._fc=[0,0,0];if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox;p.im.getMatrixAt(p.i,FC.M);const e=FC.M.elements,s=Math.hypot(e[4],e[5],e[6])||1,sx=Math.hypot(e[0],e[1],e[2])||1;
+   const h=(b.max.y-b.min.y)*s;return p._fc=[Math.max(b.max.x-b.min.x,b.max.z-b.min.z)*.5*sx*.85,p.y+b.min.y*s+h*.35,p.y+b.max.y*s]}
+ // world-r30b (gauntlet seen/camera-in-props): any other grid prop (kiosk, umbrella, statue, bush, sign) whose body holds the camera or the 75 % point of the car -> camera line
+@@ -25,13 +25,13 @@ function FC_step(){const c=camera.position,ox=RO.x,oy=RO.y+1,oz=RO.z;
+     for(const p of l){const tree=CVF_RX.test(p.t);if(p._hcE||!tree&&(!FC.prop||!p.im||p.t==='lamp'))continue;const f=p.alive===false?FC.hid.find(h=>h.p===p):null;if(p.alive===false&&!f)continue;const cr=tree?FC_crown(p):FC_body(p);if(!cr[0])continue;let hit=0;
+       if((p.x-ox)**2+(p.z-oz)**2<9)continue;
+       for(let q=0;q<(tree?3:2)&&!hit;q++){const w=S[q];if(w[1]>cr[1]&&w[1]<cr[2]+.6&&(w[0]-p.x)**2+(w[2]-p.z)**2<cr[0]*cr[0])hit=1}
+-      if(!hit&&!tree)continue;if(!hit){const my=(cr[1]+cr[2])/2,dx=p.x-c.x,dy=my-c.y,dz=p.z-c.z;if(my>oy+1&&dx*dx+dy*dy+dz*dz<nr2&&dx*fw.x+dy*fw.y+dz*fw.z>-cr[0]){hit=1;if(!f)FC.near++}}
+-      if(!hit)continue;if(f){f.t=FC.t;continue}
++      if(!hit&&!tree)continue;if(!hit){const my=(cr[1]+cr[2])/2,dx=p.x-c.x,dy=my-c.y,dz=p.z-c.z;if(my>oy+1&&dx*dx+dy*dy+dz*dz<cr[0]**2){hit=1;if(!f)FC.near++}/* world-r30b (REVIEW_2K_31): only a crown that holds the lens (was any crown within 10 m: hidden in plain view) */}
++      if(!hit)continue;if(f){if(!f.ms)f.t=FC.t;continue}/* a START-hidden prop (ms) keeps its own timer */
+       p.im.getMatrixAt(p.i,FC.M);FC.hid.push({p,m:FC.M.clone(),t:FC.t});p.alive=false;p.rt=1e9;p.im.setMatrixAt(p.i,FC.Z);p.im.instanceMatrix.needsUpdate=true;FC.hide++;k++}}
+   // world-r30b: LIFE set pieces (lz biome content, userData.lf: rocks, banners, swings...) are plain meshes: hidden while their box holds the camera / 75 % point
+   try{if(FC.prop)FC_lfStep(S)}catch(e){}
+-  // world-r30b (REVIEW_2K_28 cafe-at-lens): a street-life cluster prop (stall / café set, LV) at the camera or the 75 % point: the cluster is re-placed by LV (C.mv)
+-  try{if(FC.prop&&LV.cl)for(const C of LV.cl.L){if(!C.on||C.mv)continue;for(const q of C.pr||[]){if(q.dead)continue;if(S.slice(0,2).some(w=>(w[0]-q.x)**2+(w[2]-q.z)**2<(q.r+.8)**2&&w[1]<C.y+3.2)){C.mv=1;FC.lvMv=(FC.lvMv||0)+1;break}}}}catch(e){}
++  // world-r30b (REVIEW_2K_31): café / stall props, walkers and building-variety pieces (bvL: kiosks, billboards, murals) at the lens or on the line: faded, back once clear
++  try{if(FC.prop)FC_fdStep(S)}catch(e){FC.fdErr=String(e).slice(0,120)}
+   if(k)FC_kick();FC_restore(false)}
+ // camera pull-in (fcam-2, like 2K Drive): the car -> camera line is cast against the big building / glass meshes (learned list, refreshed every 8 s; the
+ // roamHit colliders do not cover these facades). The ray goes camera -> car (both faces); a wall on the line moves the camera in at once (k = car side of the wall/len, never closer than 3 m to the car);
+@@ -113,7 +113,7 @@ function FC_pull(dt){const c=camera.position;
+   if(FC.k<.999){FC.off.copy(dv).multiplyScalar(1-FC.k);c.sub(FC.off);FC.pulls++}}
+ roamCam=(f=>function(dt){if(FC.off.lengthSq()){camera.position.add(FC.off);FC.off.set(0,0,0)}f(dt);if(!FC.on||state!=='roam'||(RO.foot&&RO.foot!=='car')||(typeof M1!=='undefined'&&M1.cs)){if(FC.hid.length)FC_restore(true);FC.k=1;FC.kt=1;return}
+   // foliage over / around the camera
+-  FC.t+=dt;FC.n+=dt;if(FC.n>=.125){FC.n=0;try{FC_step()}catch(e){}}try{FC_pull(dt)}catch(e){}})(roamCam);
++  FC.t+=dt;FC.n+=dt;if(FC.n>=.125){FC.n=0;try{FC_step()}catch(e){}}try{FC_pull(dt)}catch(e){}if(FC.prop)try{const c=camera.position,ox=RO.x,oy=RO.y+1,oz=RO.z;FC_fdObjs([[c.x,c.y,c.z],[ox+(c.x-ox)*.75,oy+(c.y-oy)*.75,oz+(c.z-oz)*.75]],14,null,false)}catch(e){}/* world-r30b: the lens / line fade every frame, after the pull-in moved the camera (8 Hz let the lens sit inside a piece for 1-4 frames) */})(roamCam);
+ window.__fcam=FC;
+ // perf-r10e GO r10e/fcpull: the camera wall-pull list holds only meshes that can be hit (no raycast=()=>{} no-ops), FC_occ is cheap, and one 20 Hz raycast pass is cheap.
+ // Pass line: 0 no-op occluders, FC_occ < 15 ms, raycast pass (median of 20, camera 9 m behind the car) < 5 ms.
+@@ -125,24 +125,56 @@ function FC_r10eGo(){if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam
+ 
+ // LIFE set pieces (lx): list refreshed every 4 s (meshes with userData.lf under HUB.grp), hidden by visible=false, back after the line is clear 0.4 s / the START zone is 30 m away
+ FC.lf={L:[],t:-9,hid:new Map(),B:new THREE.Box3(),V:new THREE.Vector3()};
+-function FC_lfList(){const F=FC.lf;if(FC.t-F.t<4&&F.L.length)return F.L;F.t=FC.t;F.L=[];HUB.grp.traverse(o=>{if(o.isMesh&&o.userData&&o.userData.lf&&o.geometry)F.L.push(o)});return F.L}
++function FC_lfList(){const F=FC.lf;if(FC.t-F.t<4&&F.L.length)return F.L;F.t=FC.t;F.L=[];HUB.grp.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.userData&&o.userData.lf&&o.geometry)F.L.push(o)});return F.L}
+ function FC_lfIn(o,pts,m){const F=FC.lf,g=o.geometry;if(!g.boundingBox){if(!g.attributes.position||!g.attributes.position.array)return false;g.computeBoundingBox()}F.B.copy(g.boundingBox).applyMatrix4(o.matrixWorld).expandByScalar(m);return pts.some(p=>F.B.containsPoint(F.V.set(p[0],p[1],p[2])))}
+ function FC_lfStep(S){const F=FC.lf,c=camera.position;for(const o of FC_lfList()){if(!o.parent)continue;const h=F.hid.get(o);if(!o.visible&&!h)continue;o.getWorldPosition(F.V);if(F.V.distanceToSquared(c)>400)continue;
+     if(FC_lfIn(o,S.slice(0,2),.3)){if(h)h.t=FC.t;else{F.hid.set(o,{t:FC.t});o.visible=false}}}
+   for(const[o,h]of F.hid){if(h.ms){if(Math.hypot(RO.x-h.ms[0],RO.z-h.ms[1])>30){o.visible=true;F.hid.delete(o)}}else if(FC.t-h.t>=.4){o.visible=true;F.hid.delete(o)}}}
+-// world-r30b (gauntlet seen/prop-on-car): a mission starts with a clear spot. Grid props within 4.5 m of the car or of its first 12 m ahead are hidden the FC way
+-// (alive:false, instance zeroed, matrix kept) and come back once the car is 30 m away; a street-life cluster (stall / café / crowd) in that zone is flagged C.mv
+-// (LV_clStep re-places it at a far corner, people included). Was: a flat beige slab and a black/red/yellow block sat on the road inside the player's car at START.
+-function FC_clear(R){const x=RO.x,z=RO.z,fx=Math.sin(RO.h),fz=Math.cos(RO.h),near=(px,pz,r)=>{const dx=px-x,dz=pz-z,a=Math.max(0,Math.min(12,dx*fx+dz*fz)),ex=dx-fx*a,ez=dz-fz*a;return ex*ex+ez*ez<(R+r)*(R+r)};let n=0;
+-  const kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const l=HUB.pgrid&&HUB.pgrid.get((kx+a)*10000+kz+b);if(!l)continue;
+-    for(const p of l){if(!p.im||p.alive===false||p.t==='lamp')continue;const bd=CVF_RX.test(p.t)?[1]:FC_body(p);if(!bd[0]||!near(p.x,p.z,Math.min(bd[0],3)))continue;
++
++// ---- world-r30b round 3 (REVIEW_2K_31): ONE rule for everything FC hides besides grid props / LIFE pieces: an object is faded only while it holds the lens or sits
++// on the car -> camera line (camera + 75 % point), or stands in the car body at START; it always comes back (line clear 0.4 s, START car 8 m away). Nothing is moved.
++FC.fd=new Map();FC.fdn={hide:0,back:0};FC.bv={L:[],t:-9};
++function FC_fdAdd(key,hide,show,ms){const h=FC.fd.get(key);if(h){if(!h.ms)h.t=FC.t;return}hide();FC.fd.set(key,{t:FC.t,show,ms});FC.fdn.hide++}
++function FC_fdBack(){for(const[k,h]of FC.fd){if(h.ms?Math.hypot(RO.x-h.ms[0],RO.z-h.ms[1])>8:FC.t-h.t>=.4){try{h.show()}catch(e){}FC.fd.delete(k);FC.fdn.back++}}}
++function FC_bvList(){const B=FC.bv;if(FC.t-B.t<4&&B.L.length)return B.L;B.t=FC.t;B.L=[];HUB.grp.traverse(o=>{if(o.isInstancedMesh&&o.userData&&('bvL' in o.userData||o.userData.lf)&&o.geometry)B.L.push(o)});return B.L}/* + instanced LIFE pieces */
++// per instance: world centre + local box test (PC-wrapped getMatrixAt = original index); positions cached once (static)
++function FC_bvPos(o){if(o._fcP&&o._fcN===o.instanceMatrix.count&&!o.userData.lf)return o._fcP;o._fcN=o.instanceMatrix.count;const n=o.instanceMatrix.count,P=new Float32Array(n*3);for(let i=0;i<n;i++){o.getMatrixAt(i,FC.M);const e=FC.M.elements;P[i*3]=e[12];P[i*3+1]=e[13];P[i*3+2]=e[14]}return o._fcP=P}
++const FC_I=new THREE.Matrix4(),FC_B=new THREE.Box3(),FC_P=new THREE.Vector3();
++function FC_inInst(o,i,pts,m,M0){if(M0)FC.M.copy(M0);else o.getMatrixAt(i,FC.M);const e=FC.M.elements;if(e[0]===0&&e[5]===0&&e[10]===0)return false;FC_I.copy(FC.M).premultiply(o.matrixWorld).invert();const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();FC_B.copy(g.boundingBox).expandByScalar(m);return pts.some(p=>FC_B.containsPoint(FC_P.set(p[0],p[1],p[2]).applyMatrix4(FC_I)))}
++function FC_fdObjs(pts,R,ms,body){const c=pts[0];let n=0;
++  // café / stall props (LV clusters)
++  if(typeof LV!=='undefined'&&LV.cl)LV.cl.L.forEach((C,k)=>{if(!C.on)return;for(const q of C.pr||[]){if(q.dead)continue;const hit=pts.some(w=>(w[0]-q.x)**2+(w[2]-q.z)**2<(q.r+(body?.2:.6))**2&&w[1]<C.y+3.2&&w[1]>C.y-.5);if(!hit)continue;n++;
++    FC_fdAdd(q,()=>{q.fh=1;LV_clDraw(k,C);LV_clUpd()},()=>{q.fh=0;if(C.on&&C.pr.includes(q)){LV_clDraw(k,C);LV_clUpd()}},ms)}});
++  // walkers (cluster people included): a 0.45 m x 1.9 m body
++  if(HUB.peds)for(const p of HUB.peds){if(p._x==null||Math.abs(p._x-c[0])>R||Math.abs(p._z-c[2])>R)continue;const y0=p.y||0;if(!pts.some(w=>(w[0]-p._x)**2+(w[2]-p._z)**2<(body?.9:.7)**2&&w[1]>y0-.3&&w[1]<y0+2.1))continue;n++;FC_fdAdd(p,()=>{p.fh=1},()=>{p.fh=0},ms)}
++  // building-variety pieces (bvL instances)
++  for(const o of FC_bvList()){if(!o.parent||!o.visible)continue;const P=FC_bvPos(o),N=P.length/3;for(let i=0;i<N;i++){if(Math.abs(P[i*3]-c[0])>R||Math.abs(P[i*3+2]-c[2])>R)continue;const key=o.uuid+':'+i,h=FC.fd.get(key);if(!FC_inInst(o,i,pts,body?.1:.3,h&&h.m0))continue;n++;if(h){if(!h.ms&&!ms)h.t=FC.t;continue}
++    const m0=FC.M.clone();FC_fdAdd(key,()=>{o.setMatrixAt(i,FC.Z);o.instanceMatrix.needsUpdate=true},()=>{o.setMatrixAt(i,m0);o.instanceMatrix.needsUpdate=true},ms);FC.fd.get(key).m0=m0}}
++  // WB near proxies (wbP: copies of instanced street pieces near the camera, rebuilt from their source): hide the slot now and the source instance at the same spot,
++  // so the next rebuild keeps it hidden; restoring the source brings both back (the proxy rebuilds when the source changes)
++  try{if(typeof WBC!=='undefined'&&WBC.grps)for(const G of WBC.grps){const Pm=G.P;if(!Pm||!Pm.count||!Pm.parent||!Pm.visible)continue;for(let i=0;i<Pm.count;i++){Pm.getMatrixAt(i,FC.M);const e=FC.M.elements;if(Math.abs(e[12]-c[0])>R||Math.abs(e[14]-c[2])>R)continue;if(!FC_inInst(Pm,i,pts,body?.1:.3))continue;
++      const sx=e[12],sz=e[14];let src=null,sj=-1;for(const q of G.L){const o=q.o;for(let j=0;j<o.count;j++){o.getMatrixAt(j,FC_M2);if(Math.abs(FC_M2.elements[12]-sx)<.05&&Math.abs(FC_M2.elements[14]-sz)<.05){src=o;sj=j;break}}if(src)break}if(!src)continue;
++      const key=src.uuid+':'+sj;n++;if(FC.fd.has(key)){const h=FC.fd.get(key);if(!h.ms&&!ms)h.t=FC.t;continue}src.getMatrixAt(sj,FC_M2);const m0=FC_M2.clone(),slot=i;
++      FC_fdAdd(key,()=>{src.setMatrixAt(sj,FC.Z);src.instanceMatrix.needsUpdate=true;Pm.setMatrixAt(slot,FC.Z);Pm.instanceMatrix.needsUpdate=true},()=>{src.setMatrixAt(sj,m0);src.instanceMatrix.needsUpdate=true},ms);FC.fd.get(key).m0=m0}}}catch(e){FC.fdErr='wbP '+String(e).slice(0,100)}
++  return n}
++const FC_M2=new THREE.Matrix4();
++function FC_fdStep(S){FC_fdObjs(S.slice(0,2),14,null,false);FC_fdBack()}
++// world-r30b (gauntlet seen/prop-on-car; REVIEW_2K_31): at START / card open, anything drawn INSIDE THE CAR BODY (grid props, LIFE pieces, café/stall props, walkers,
++// building-variety pieces) is faded and comes back once the car is 8 m away. Only the car body (+-2.4 m along, 1.2 m around): nothing in plain view, nothing moved.
++function FC_clear(){const x=RO.x,z=RO.z,fx=Math.sin(RO.h),fz=Math.cos(RO.h),near=(px,pz,r)=>{const dx=px-x,dz=pz-z,a=Math.max(-2.4,Math.min(2.4,dx*fx+dz*fz)),ex=dx-fx*a,ez=dz-fz*a;return ex*ex+ez*ez<(1.2+r)*(1.2+r)};let n=0;
++  const kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const l=HUB.pgrid&&HUB.pgrid.get((kx+a)*10000+kz+b);if(!l)continue;
++    for(const p of l){if(!p.im||p.alive===false||p.t==='lamp')continue;const bd=CVF_RX.test(p.t)?[.6]:FC_body(p);if(!bd[0]||!near(p.x,p.z,Math.min(bd[0]-.5,1.5)))continue;
+       p.im.getMatrixAt(p.i,FC.M);FC.hid.push({p,m:FC.M.clone(),t:1e9,ms:[x,z]});p.alive=false;p.rt=1e9;p.im.setMatrixAt(p.i,FC.Z);p.im.instanceMatrix.needsUpdate=true;n++}}
+-  try{if(LV.cl)for(const C of LV.cl.L)if(C.on&&(near(C.x,C.z,3.5)||(C.pr||[]).some(q=>!q.dead&&near(q.x,q.z,q.r)))){C.mv=1;n++}}catch(e){}
+-  try{const P=[];for(let a=0;a<=12;a+=3)P.push([x+fx*a,RO.y+.9,z+fz*a]);for(const o of FC_lfList()){if(!o.visible||!o.parent)continue;if(FC_lfIn(o,P,R-1.4)){o.visible=false;FC.lf.hid.set(o,{t:FC.t,ms:[x,z]});n++}}}catch(e){}
+-  // REVIEW_2K_28 follow-up: a walker (LV pedestrian) standing in the car body at START is re-placed on another street (cluster people move with their cluster above)
+-  try{if(HUB.peds&&typeof LV_pedPut==='function')for(const p of HUB.peds){if(p.cw||p.x==null||!near(p.x,p.z,.6))continue;LV_pedPut(p);n++}}catch(e){}
++  const P=[];for(const a of[-2.2,-1.1,0,1.1,2.2])for(const l of[-.8,0,.8])P.push([x+fx*a+fz*l,RO.y+.7,z+fz*a-fx*l]);
++  try{for(const o of FC_lfList()){if(!o.visible||!o.parent)continue;if(FC_lfIn(o,P,.05)){o.visible=false;FC.lf.hid.set(o,{t:FC.t,ms:[x,z]});n++}}}catch(e){}
++  try{n+=FC_fdObjs(P,8,[x,z],true)}catch(e){FC.cerr=String(e).slice(0,120)}
++  // any other small instanced piece drawn inside the car body (a quest figure, a set piece): faded per instance, back once the car is 8 m away
++  try{const skip=new Set([...FC_bvList(),...(RO.marks||[]).map(m=>m.g)]);scene.traverse(o=>{if(!o.isInstancedMesh||!o.visible||skip.has(o)||o.userData.wbP||!o.geometry||!o.geometry.boundingBox&&!(o.geometry.attributes.position&&o.geometry.attributes.position.array))return;let q=o;while(q){if(q===(pl&&pl.mesh)||skip.has(q)||q.userData&&q.userData.carG!==undefined)return;q=q.parent}
++    if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();const sz=o.geometry.boundingBox.getSize(FC_P).length();for(let i=0;i<o.count;i++){o.getMatrixAt(i,FC.M);const e=FC.M.elements;if(e[0]===0&&e[5]===0&&e[10]===0)continue;FC_P.setFromMatrixPosition(FC.M).applyMatrix4(o.matrixWorld);if(Math.hypot(FC_P.x-x,FC_P.z-z)>6)continue;
++      if(sz*Math.hypot(e[0],e[1],e[2])>8)continue;if(!FC_inInst(o,i,P,.05))continue;const key=o.uuid+':'+i;if(FC.fd.has(key))continue;const m0=FC.M.clone();n++;FC_fdAdd(key,()=>{o.setMatrixAt(i,FC.Z);o.instanceMatrix.needsUpdate=true},()=>{o.setMatrixAt(i,m0);o.instanceMatrix.needsUpdate=true},[x,z]);FC.fd.get(key).m0=m0}})}catch(e){FC.cerr='inst '+String(e).slice(0,100)}
+   if(n)FC_kick();FC.clr=(FC.clr||0)+n;return n}
+-function FC_clearBack(){for(const h of FC.hid)if(h.ms&&Math.hypot(RO.x-h.ms[0],RO.z-h.ms[1])>30){h.t=-1;h.ms=null}}
+-chStart=(f=>function(m,o){let r;try{FC_clear(4.5)}catch(e){FC.cerr=String(e).slice(0,120)}r=f.apply(this,arguments);try{FC_clear(4.5)}catch(e){}return r})(chStart);
+-roamOpen=(f=>function(m){const r=f.apply(this,arguments);try{if(RO.card)FC_clear(4.5)}catch(e){}return r})(roamOpen);
+-roamHud=(f=>function(){const r=f.apply(this,arguments);if(FC.hid.length&&((FC.cb=(FC.cb||0)+1)%30===0))try{FC_clearBack();if(!FC.on||state!=='roam')FC_restore(false)}catch(e){}return r})(roamHud);
++function FC_clearBack(){for(const h of FC.hid)if(h.ms&&Math.hypot(RO.x-h.ms[0],RO.z-h.ms[1])>8){h.t=-1;h.ms=null}
++  for(const[o,h]of FC.lf.hid)if(h.ms&&Math.hypot(RO.x-h.ms[0],RO.z-h.ms[1])>8){o.visible=true;FC.lf.hid.delete(o)}FC_fdBack()}
++chStart=(f=>function(m,o){let r;try{FC_clear()}catch(e){FC.cerr=String(e).slice(0,120)}r=f.apply(this,arguments);try{FC_clear()}catch(e){}FC.clrT=1.5;return r})(chStart);   // + 1.5 s of re-clears: a tile / set piece laid in the first frames after START (REVIEW_2K_31 ath sq_yi_1)
++roamOpen=(f=>function(m){const r=f.apply(this,arguments);try{if(RO.card)FC_clear()}catch(e){}return r})(roamOpen);
++roamHud=(f=>function(){const r=f.apply(this,arguments);if(FC.clrT>0&&((FC.cc=(FC.cc||0)+1)%6===0)){FC.clrT-=6/60;try{if(state==='roam'&&RO.ch)FC_clear()}catch(e){}}if((FC.hid.length||FC.fd.size||FC.lf.hid.size)&&((FC.cb=(FC.cb||0)+1)%30===0))try{FC_clearBack();if(!FC.on||state!=='roam')FC_restore(false)}catch(e){}return r})(roamHud);
+diff --git a/src/98l_lively.js b/src/98l_lively.js
+index 563f59a..2b7cc5b 100644
+--- a/src/98l_lively.js
++++ b/src/98l_lively.js
+@@ -182,9 +182,9 @@ function LV_clProps(k,C){const S=LV.cl,ax=-Math.cos(C.h),az=Math.sin(C.h);C.pr=[
+   if(C.k==='market'){const two=C.n>=5;for(let j=0;j<(two?2:1);j++){const o=two?(j?1.6:-1.6):0;C.pr.push({m:'s',j,x:C.x+ax*o,z:C.z+az*o,r:1.6,dead:false})}}
+   else if(C.k==='cafe'){for(let j=0;j<2;j++){const o=j?1.5:-1.5;C.pr.push({m:'c',j,x:C.x+ax*o,z:C.z+az*o,r:1.25,dead:false})}}}
+ function LV_clDraw(k,C){const S=LV.cl,g=C.gs;for(let j=0;j<2;j++){const i=k*2+j;for(const m of [S.s,S.a,S.c,S.u])m.setMatrixAt(i,_lvZ)}
+-  if(!C.on)return;for(const p of C.pr){if(p.dead)continue;const i=k*2+p.j;if(p.m==='s'){LV_set(S.s,i,p.x,C.y,p.z,0,C.h,0,g);LV_set(S.a,i,p.x,C.y,p.z,0,C.h,0,g)}else{LV_set(S.c,i,p.x,C.y,p.z,0,C.h+p.j*.9,0,g);LV_set(S.u,i,p.x,C.y,p.z,0,C.h,0,g)}}}
++  if(!C.on)return;for(const p of C.pr){if(p.dead||p.fh)continue;/* world-r30b: p.fh = faded by FC (at the lens / on the car-camera line), drawn again once clear */const i=k*2+p.j;if(p.m==='s'){LV_set(S.s,i,p.x,C.y,p.z,0,C.h,0,g);LV_set(S.a,i,p.x,C.y,p.z,0,C.h,0,g)}else{LV_set(S.c,i,p.x,C.y,p.z,0,C.h+p.j*.9,0,g);LV_set(S.u,i,p.x,C.y,p.z,0,C.h,0,g)}}}
+ const LV_clUpd=()=>{const S=LV.cl;for(const m of [S.s,S.a,S.c,S.u])m.instanceMatrix.needsUpdate=true};
+-function LV_clPut(k,C,near){C.mv=0;const S=LV.cl,own=S.L.filter(q=>q!==C);const ath=CID!=='fra',sp=near?(k%2||ath&&k<4?LV_corner(ath?16:20,ath?40:45,.6,own)||LV_corner(15,60,.3,own):LV_corner(35,70,.82,own)||LV_corner(25,90,.5,own)):(LV_corner(60,115,.8,own)||LV_corner(55,130,.5,own));
++function LV_clPut(k,C,near){const S=LV.cl,own=S.L.filter(q=>q!==C);const ath=CID!=='fra',sp=near?(k%2||ath&&k<4?LV_corner(ath?16:20,ath?40:45,.6,own)||LV_corner(15,60,.3,own):LV_corner(35,70,.82,own)||LV_corner(25,90,.5,own)):(LV_corner(60,115,.8,own)||LV_corner(55,130,.5,own));
+   if(!sp){C.on=false;LV_clDraw(k,C);return false}Object.assign(C,{on:true,x:sp.x,z:sp.z,y:sp.y,h:sp.h,a:sp.a,b:sp.b,gs:near?1:.05,t:0,ux:sp.ux,uz:sp.uz,sd:sp.sd});LV_clProps(k,C);LV_clDraw(k,C);return true}
+ // people of cluster k stand in a loose ring on the road side of the props (crowd: around a centre), facing each other
+ function LV_clPeople(k,C,base,P){const n=C.n,rx=Math.sin(C.h),rz=Math.cos(C.h),ax=-Math.cos(C.h),az=Math.sin(C.h);
+@@ -200,7 +200,7 @@ function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=
+     if(k>=N||base+C.n>P.length){if(C.on){C.on=false;LV_clDraw(k,C)}for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}base+=C.n;continue}
+     const dx=C.x-RO.x,dz=C.z-RO.z,d=Math.hypot(dx,dz),behind=dx*fx+dz*fz<-d*.2;
+     const jk=jn>0&&k===LV.clC%S.L.length&&LV.clJ>0;if(jk){jn--;LV.clJ--;LV.clC++}
+-    if(jk||!C.on&&(LV.fr+k)%10===0||C.on&&(C.mv||d>170||behind&&d>30)){if(jk||moved<2){moved++;LV_clPut(k,C,jk||!C.on&&LV.fr<30);if(C.on)LV_clPeople(k,C,base,P);else for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}}}
++    if(jk||!C.on&&(LV.fr+k)%10===0||C.on&&(d>170||behind&&d>30)){if(jk||moved<2){moved++;LV_clPut(k,C,jk||!C.on&&LV.fr<30);if(C.on)LV_clPeople(k,C,base,P);else for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}}}
+     if(C.on){C.t+=dt;if(C.gs<1){C.gs=Math.min(1,C.gs+dt*2.2);LV_clDraw(k,C)}
+       // props: the car smashes a stall / café set (brick burst, studs, slight slow-down); slow contact pushes the car out (collider = the drawn size)
+       for(const q of C.pr){if(q.dead)continue;const ex=RO.x-q.x,ez=RO.z-q.z,e2=ex*ex+ez*ez,rr2=q.r+1.1;if(e2>rr2*rr2||Math.abs((RO.y||0)-C.y)>3)continue;
+diff --git a/src/99c6wr_world_go.js b/src/99c6wr_world_go.js
+index 108c3a7..796d38e 100644
+--- a/src/99c6wr_world_go.js
++++ b/src/99c6wr_world_go.js
+@@ -15,9 +15,9 @@ function WRG_back(o){Object.assign(RO,o);RO.v=0;try{camSnap=true}catch(e){}}
+ function WRG_inside(pts,R,skip){const out=[];const near=pts[0];scene.traverse(o=>{if(!(o.isMesh||o.isInstancedMesh)||!o.geometry||skip(o))return;let v=true,q=o;while(q){if(!q.visible){v=false;break}q=q.parent}if(!v)return;
+   const g=o.geometry;if(!g.boundingBox){if(!g.attributes.position||!g.attributes.position.array)return;g.computeBoundingBox()}const bb=g.boundingBox,sz=bb.getSize(WRG_V).length();if(!o.isInstancedMesh&&sz>16)return;
+   const test=mw=>{WRG_I.copy(mw).invert();for(const p of pts){const l=p.clone().applyMatrix4(WRG_I);WRG_B.copy(bb).expandByScalar(.05);if(WRG_B.containsPoint(l))return true}return false};
+-  if(o.isInstancedMesh){const a=o.instanceMatrix.array,n=o.count;for(let i=0;i<n;i++){const e=i*16;if(a[e]===0&&a[e+5]===0&&a[e+10]===0)continue;WRG_M.fromArray(a,e).premultiply(o.matrixWorld);WRG_V.setFromMatrixPosition(WRG_M);if(WRG_V.distanceTo(near)>R)continue;if(test(WRG_M)){const e=WRG_M.elements,sz=bb.getSize(WRG_V),w=Math.max(sz.x*Math.hypot(e[0],e[1],e[2]),sz.y*Math.hypot(e[4],e[5],e[6]),sz.z*Math.hypot(e[8],e[9],e[10]));const pu=o.parent&&o.parent.userData||{};out.push((w>6||'bvL' in pu||'athB' in pu?'bld ':'')/* buildings: > 6 m, or the building-variety / Athens building layers */+(o.name||'im')+':'+i+'/'+(o.parent&&(o.parent.name||o.parent.type))+'{'+Object.keys(o.userData).slice(0,3)+'} '+w.toFixed(1)+'m')}}}
++  if(o.isInstancedMesh){const a=o.instanceMatrix.array,n=o.count;for(let i=0;i<n;i++){const e=i*16;if(a[e]===0&&a[e+5]===0&&a[e+10]===0)continue;WRG_M.fromArray(a,e).premultiply(o.matrixWorld);WRG_V.setFromMatrixPosition(WRG_M);if(WRG_V.distanceTo(near)>R)continue;if(test(WRG_M)){const e=WRG_M.elements,sz=bb.getSize(WRG_V),w=Math.max(sz.x*Math.hypot(e[0],e[1],e[2]),sz.y*Math.hypot(e[4],e[5],e[6]),sz.z*Math.hypot(e[8],e[9],e[10]));const pu=o.parent&&o.parent.userData||{};out.push((w>6||'athB' in pu||'athB' in o.userData?'bld ':'')/* buildings: > 6 m, or the building-variety / Athens building layers */+(o.name||'im')+':'+i+'/'+(o.parent&&(o.parent.name||o.parent.type))+'{'+Object.keys(o.userData).slice(0,3)+'} '+w.toFixed(1)+'m')}}}
+   else{o.getWorldPosition(WRG_V);if(WRG_V.distanceTo(near)>R)return;if(test(o.matrixWorld))out.push(o.name||o.type)}});
+-  try{if(LV.cl)for(const C of LV.cl.L)if(C.on&&!C.mv)for(const q of C.pr||[])if(!q.dead&&pts.some(p=>(p.x-q.x)**2+(p.z-q.z)**2<q.r*q.r&&p.y<C.y+2.6&&p.y>C.y))out.push('LV:'+C.k)}catch(e){}return out}
++  try{if(LV.cl)for(const C of LV.cl.L)if(C.on)for(const q of C.pr||[])if(!q.dead&&!q.fh&&pts.some(p=>(p.x-q.x)**2+(p.z-q.z)**2<q.r*q.r&&p.y<C.y+2.6&&p.y>C.y))out.push('LV:'+C.k)}catch(e){}return out}
+ function WRG_carMesh(o){let q=o;while(q){if(q===(pl&&pl.mesh)||q.userData&&(q.userData.carG!==undefined||q.userData.sky))return true;q=q.parent}return false}
+ function WRG_pickup(){const r={marks:0,hi:0,noSh:0,badge:0,worst:0,op:[]},P=new THREE.Vector3(),s0=WRG_save();
+   for(const m of RO.marks||[]){if(!m.sp||!m.g)continue;r.marks++;m.g.updateMatrixWorld(true);m.sp.getWorldPosition(P);const g=groundY(m.x,m.z),h=P.y-g;if(h>3)r.hi++;r.worst=Math.max(r.worst,+h.toFixed(2));if(!m.sh||m.sh.parent!==m.g)r.noSh++;
+@@ -47,12 +47,23 @@ function WRG_mstart(){const r={quests:0,started:0,before:0,after:0,ex:[]},s0=WRG
+     r.before+=WRG_inside(body(),12,WRG_carMesh).length;roamOpen(m);const go=document.getElementById('rcGo');if(go&&!go.disabled)go.click();
+     return WRG_wait(1,30000).then(()=>{if(RO.ch)r.started++;const h=WRG_inside(body(),12,WRG_carMesh);r.after+=h.length;if(h.length&&r.ex.length<4)r.ex.push(m.ev.id+':'+h.slice(0,2).join('+'));try{chAbort()}catch(e){}return WRG_wait(.3,8000)}).then(one)};
+   return one().then(()=>{WRG_back(s0);r.ok=r.started>=Math.min(3,ms.length)&&r.after===0;return r})}
++
++// REVIEW_2K_31: everything FC holds hidden for > 0.6 s must sit on the car -> camera segment or around the lens (its own box, 0.8 m margin); START-hidden (ms) items are judged by world/mstart
++const WRG_OFF=new Map(),WRG_R=new THREE.Ray(),WRG_X=new THREE.Box3(),WRG_Y=new THREE.Vector3();
++function WRG_onLine(box){const c=camera.position,o=WRG_Y.set(RO.x,RO.y+1,RO.z),d=c.clone().sub(o),L=d.length();WRG_R.set(o,d.normalize());box.expandByScalar(.8);if(box.containsPoint(c))return true;const h=WRG_R.intersectBox(box,new THREE.Vector3());return!!h&&h.distanceTo(o)<=L}
++function WRG_offLine(r,seen){const now=T,chk=(key,mk)=>{if(!seen.has(key))seen.set(key,now);if(now-seen.get(key)<.6)return;let b=null;try{b=mk()}catch(e){}const off=b&&!WRG_onLine(b);if(!off){WRG_OFF.delete(key);return}if(!WRG_OFF.has(key))WRG_OFF.set(key,now);if(now-WRG_OFF.get(key)>.5){/* off the line for > 0.5 s continuously (FC brings a prop back 0.4 s after the line is clear) */r.offLine++;if(r.offEx.length<4)r.offEx.push(String(key&&key.t?key.t+'@'+(key.x|0)+','+(key.z|0):key).slice(0,30))}};const live=new Set();
++  for(const h of FC.hid){if(h.ms)continue;const p=h.p,key=p;live.add(key);chk(key,()=>{if(CVF_RX.test(p.t)){/* trees: the drawn crown (asset LOD size, FC margin removed) */const cr=FC_crown(p),r0=Math.max(.3,cr[0]-.8);return new THREE.Box3(new THREE.Vector3(p.x-r0,cr[1],p.z-r0),new THREE.Vector3(p.x+r0,cr[2],p.z+r0))}const g=p.im.geometry;return g.boundingBox.clone().applyMatrix4(h.m.clone().premultiply(p.im.matrixWorld))})}
++  for(const[o,h]of FC.lf.hid){if(h.ms)continue;const key='lf:'+o.uuid;live.add(key);chk(key,()=>new THREE.Box3().setFromObject(o))}
++  for(const[k,h]of FC.fd){if(h.ms)continue;const key='fd:'+(typeof k==='string'?k:(k._x!=null?'ped':'cafe'));const kk=typeof k==='string'?k:k;live.add(kk);
++    chk(kk,()=>{if(typeof k==='string'){const[u,i]=k.split(':');let o=null;HUB.grp.traverse(q=>{if(q.uuid===u)o=q});return o.geometry.boundingBox.clone().applyMatrix4(h.m0.clone().premultiply(o.matrixWorld))}
++      if(k._x!=null)return new THREE.Box3(new THREE.Vector3(k._x-.4,(k.y||0),k._z-.4),new THREE.Vector3(k._x+.4,(k.y||0)+2,k._z+.4));return new THREE.Box3(new THREE.Vector3(k.x-k.r,RO.y-1,k.z-k.r),new THREE.Vector3(k.x+k.r,RO.y+3,k.z+k.r))})}
++  for(const k of[...seen.keys()])if(!live.has(k))seen.delete(k)}
+ function WRG_camprop(){const s0=WRG_save(),r={props:0,frames:0,inside:0,ex:[]};const L=[];for(const l of HUB.pgrid.values())for(const p of l){if(!p.im||p.alive===false||p.t==='lamp'||CVF_RX.test(p.t))continue;const d=Math.hypot(p.x-RO.x,p.z-RO.z);if(d<400)L.push([d,p])}
+   const P=L.sort((a,b)=>a[0]-b[0]).map(q=>q[1]).filter(p=>{const g=p.im.geometry;if(!g.boundingBox)return false;return g.boundingBox.max.y-g.boundingBox.min.y>1.6}).slice(0,4);if(!P.length)return Promise.resolve({err:'no tall prop'});
+-  const f0=roamCam;let on=false,t0=0;roamCam=function(dt){const o=f0.apply(this,arguments);if(on&&T-t0>.3){r.frames++;const h=WRG_inside([camera.position.clone()],10,WRG_carMesh),hp=h.filter(x=>!/^bld /.test(x));if(h.length>hp.length)r.bld=(r.bld||0)+1/* camera inside a BUILDING (Athens athB boxes): reported, not this row (props) */;if(hp.length){r.inside++;if(r.ex.length<4)r.ex.push(hp[0])}}return o};
++  const f0=roamCam;let on=false,t0=0;r.offLine=0;r.offEx=[];const seen=new Map();roamCam=function(dt){const o=f0.apply(this,arguments);if(on&&T-t0>.3){WRG_offLine(r,seen);r.frames++;const h=WRG_inside([camera.position.clone()],10,WRG_carMesh),hp=h.filter(x=>!/^bld /.test(x));if(h.length>hp.length)r.bld=(r.bld||0)+1/* camera inside a BUILDING (Athens athB boxes): reported, not this row (props) */;if(hp.length){r.inside++;if(r.ex.length<4)r.ex.push(hp[0])}}return o};
+   let k=0;const one=()=>{if(k>=P.length)return Promise.resolve();const p=P[k++];r.props++;const a=Math.atan2(RO.x-p.x,RO.z-p.z)||0;RO.h=RO.vh=a;RO.x=p.x+Math.sin(a)*6.5;RO.z=p.z+Math.cos(a)*6.5;RO.y=groundY(RO.x,RO.z);RO.v=0;camSnap=true;t0=T;on=true;
+     return WRG_wait(1.5,40000).then(()=>{on=false}).then(one)};
+-  return one().then(()=>{roamCam=f0;WRG_back(s0);try{FC_restore(true)}catch(e){}r.ok=r.props>0&&r.frames>3&&r.inside===0;return r})}
++  return one().then(()=>{roamCam=f0;WRG_back(s0);try{FC_restore(true)}catch(e){}r.fc={fd:FC.fdn,err:FC.fdErr||'',bv:FC.bv.L.length,prop:FC.prop,on:FC.on};r.ok=r.props>0&&r.frames>3&&r.inside===0&&r.offLine===0;return r})}
+ WRG.say=(n,r)=>'📍 '+n+' · '+JSON.stringify(r).slice(0,420)+(r.ok?' ✅ PASS':' ❌ FAIL');
+ // registered after every lazy chunk (XC.done): world/birds drives through traffic at speed, so these run after the why/* traffic items (gate order = item order)
+ (function WRG_reg(i){const C=window.__chk;if(C&&C.GO&&C.items&&C.goSay&&XC.done){
+@@ -64,6 +75,6 @@ WRG.say=(n,r)=>'📍 '+n+' · '+JSON.stringify(r).slice(0,420)+(r.ok?' ✅ PASS'
+   add('camprop','a tall street prop right behind the car, real chase-camera frames: the lens is never inside anything drawn after 0.3 s (gauntlet seen/camera-in-props, REVIEW_2K_28 cafe-at-lens).');
+   const sync={pickup:WRG_pickup,roof:WRG_roof},asy={birds:WRG_birds,mstart:WRG_mstart,camprop:WRG_camprop};
+   for(const id in sync)C.GO['world/'+id]=['fra','ath'].map(c=>({c,n:id,secs:20,fn:()=>{let r;try{r=sync[id]()}catch(e){r={err:String(e).slice(0,160)}}return WRG.say(id.toUpperCase(),r)}}));
+-  for(const id in asy)C.GO['world/'+id]=['fra','ath'].map(c=>({c,n:id,secs:120,fn:()=>{try{asy[id]().then(r=>C.goSay(WRG.say(id.toUpperCase(),r)),e=>C.goSay('📍 '+id+' · '+e+' ❌ FAIL'))}catch(e){return '📍 '+id+' · '+e+' ❌ FAIL'}return '📍 '+id.toUpperCase()+' · running…'}}));return}
++  for(const id in asy)C.GO['world/'+id]=['fra','ath'].map(c=>({c,n:id,secs:120,fn:()=>{const tok=WRG.tok=(WRG.tok||0)+1;/* a late result of an earlier item must not land on the next item's line */try{asy[id]().then(r=>{if(tok===WRG.tok)C.goSay(WRG.say(id.toUpperCase(),r))},e=>{if(tok===WRG.tok)C.goSay('📍 '+id+' · '+e+' ❌ FAIL')})}catch(e){return '📍 '+id+' · '+e+' ❌ FAIL'}return '📍 '+id.toUpperCase()+' · running…'}}));return}
+  if(i<600)setTimeout(()=>WRG_reg(i+1),100)})(0);
+ ({WRG_pickup,WRG_roof,WRG_birds,WRG_mstart,WRG_camprop,WRG_inside,WRG_carMesh})
+diff --git a/tools/gauntlet.js b/tools/gauntlet.js
+index 5fdc3cf..0762eff 100644
+--- a/tools/gauntlet.js
++++ b/tools/gauntlet.js
+@@ -61,17 +61,18 @@ G.step=(n,dt)=>{for(let i=0;i<n;i++){G.vt+=dt*1000;const q=G.q;G.q=[];for(const
+ G.pullPops=()=>{const p=G.pops;G.pops=[];return p};
+ G.resetStats=()=>{G.hb=[0,0,0,0,0,0,0,0];G.n40=0;G.n40s=0;G.maxDrop=0;G.pops=[];G.LR={n:0,g2:0,g4:0,mx:0,why:'',long:0}};
+ // world-r30b reads (no writes): mark icons + their drawn opacity, drawn objects inside the car body / at the lens (WRG_inside = the GO world/* scan), tall props, scattered flocks vs the camera height
++G.chId=()=>RO.ch&&RO.ch.m&&RO.ch.m.ev?RO.ch.m.ev.id||'':'';
+ G.mk=k=>(RO.marks||[]).filter(m=>k==='quest'?m.kind==='quest'&&m.ev&&!m.dyn&&!markLocked(m)&&!markDone(m):m.kind===k).map(m=>({x:m.x,z:m.z,id:(m.ev&&m.ev.id)||m.id||'',op:m.sp?+m.sp.material.opacity.toFixed(2):null,d:Math.round(Math.hypot(m.x-RO.x,m.z-RO.z))})).sort((a,b)=>a.d-b.d).slice(0,8);
+ const WV=new THREE.Vector3(),WM=new THREE.Matrix4(),WI=new THREE.Matrix4(),WB=new THREE.Box3(),WP=new THREE.Vector3();
+ const carM=o=>{const MG=new Set((RO.marks||[]).map(m=>m.g).filter(Boolean));let q=o;while(q){if(q===(pl&&pl.mesh)||MG.has(q)||q.userData&&(q.userData.carG!==undefined||q.userData.sky))return true;q=q.parent}return false};   // the car, the sky and the beacons themselves are not 'objects in the car'
+ // drawn objects (visible meshes / instanced slots, their own bounding box) that hold one of the points; read-only (same rule as GO world/*); buildings (> 6 m or building layers) are tagged 'bld'
+ const inside=(pts,R)=>{const out=[];scene.traverse(o=>{if(!(o.isMesh||o.isInstancedMesh)||!o.geometry||carM(o))return;let v=true,q=o;while(q){if(!q.visible){v=false;break}q=q.parent}if(!v)return;const g=o.geometry,bb=g.boundingBox;if(!bb)return;const sz=bb.getSize(WV).clone();if(!o.isInstancedMesh&&sz.length()>16)return;
+-  const hit=mw=>{WI.copy(mw).invert();WB.copy(bb).expandByScalar(.05);return pts.some(p=>WB.containsPoint(WP.copy(p).applyMatrix4(WI)))},tag=mw=>{const e=mw.elements,w=Math.max(sz.x*Math.hypot(e[0],e[1],e[2]),sz.y*Math.hypot(e[4],e[5],e[6]),sz.z*Math.hypot(e[8],e[9],e[10])),pu=o.parent&&o.parent.userData||{};return(w>6||'bvL' in pu||'athB' in pu?'bld ':'')+(o.name||o.type)+'<'+(o.parent&&(o.parent.name||o.parent.type))+'{'+Object.keys(pu).slice(0,3)+'}{'+Object.keys(o.userData).slice(0,3)+'} '+w.toFixed(1)+'m'};
++  const hit=mw=>{WI.copy(mw).invert();WB.copy(bb).expandByScalar(.05);return pts.some(p=>WB.containsPoint(WP.copy(p).applyMatrix4(WI)))},tag=mw=>{const e=mw.elements,w=Math.max(sz.x*Math.hypot(e[0],e[1],e[2]),sz.y*Math.hypot(e[4],e[5],e[6]),sz.z*Math.hypot(e[8],e[9],e[10])),pu=o.parent&&o.parent.userData||{};return(w>6||'athB' in pu||'athB' in o.userData?'bld ':'')+(o.name||o.type)+'<'+(o.parent&&(o.parent.name||o.parent.type))+'{'+Object.keys(pu).slice(0,3)+'}{'+Object.keys(o.userData).slice(0,3)+'} '+w.toFixed(1)+'m'};
+   if(o.isInstancedMesh){const a=o.instanceMatrix.array;for(let i=0;i<o.count;i++){const e=i*16;if(a[e]===0&&a[e+5]===0&&a[e+10]===0)continue;WM.fromArray(a,e).premultiply(o.matrixWorld);WV.setFromMatrixPosition(WM);if(WV.distanceTo(pts[0])>R)continue;if(hit(WM))out.push(tag(WM))}}
+   else{o.getWorldPosition(WV);if(WV.distanceTo(pts[0])<=R&&hit(o.matrixWorld))out.push(tag(o.matrixWorld))}});return out};
+ G.over=()=>{try{const fx=Math.sin(RO.h),fz=Math.cos(RO.h),P=[-1.6,0,1.6].map(a=>new THREE.Vector3(RO.x+fx*a,RO.y+.8,RO.z+fz*a));return inside(P,12)}catch(e){return['err '+String(e).slice(0,40)]}};
+ G.camIn=()=>{try{return inside([camera.position.clone()],10)}catch(e){return['err '+String(e).slice(0,40)]}};
+-G.props=()=>{const L=[];for(const l of HUB.pgrid.values())for(const p of l){if(!p.im||p.alive===false||p.t==='lamp'||CVF_RX.test(p.t))continue;const g=p.im.geometry;if(!g.boundingBox||g.boundingBox.max.y-g.boundingBox.min.y<1.6)continue;const d=Math.hypot(p.x-RO.x,p.z-RO.z);if(d>30&&d<220)L.push({x:p.x,z:p.z,t:p.t,d:Math.round(d)})}return L.sort((a,b)=>a.d-b.d).slice(0,6)};
++G.props=()=>{const L=[];let E=null;for(const l of HUB.pgrid.values())for(const p of l){if(!p.im||p.alive===false||p.t==='lamp'||CVF_RX.test(p.t))continue;const g=p.im.geometry;if(!g.boundingBox||g.boundingBox.max.y-g.boundingBox.min.y<1.6)continue;const d=Math.hypot(p.x-RO.x,p.z-RO.z);if(!(d>30&&d<220))continue;if(!E){E=[];const N=HUB.nodes||[];for(const A of N){if(Math.hypot(A.x-RO.x,A.z-RO.z)>300)continue;for(const j of A.nb||[]){const B=N[j];if(B)E.push([A.x,A.z,B.x,B.z])}}}let nd=1e9;for(const[ax,az,bx,bz]of E){const ux=bx-ax,uz=bz-az,L2=ux*ux+uz*uz||1,t=Math.max(0,Math.min(1,((p.x-ax)*ux+(p.z-az)*uz)/L2));nd=Math.min(nd,Math.hypot(ax+ux*t-p.x,az+uz*t-p.z))}if(nd<9)/* beside a street: the car can pass it within 4 m */L.push({x:p.x,z:p.z,t:p.t,d:Math.round(d)})}return L.sort((a,b)=>a.d-b.d).slice(0,6)};
+ G.flock=()=>{const B=window.LV&&LV.birds||(typeof LV!=='undefined'&&LV.birds);if(!B)return null;const c=camera.position;let n=0,band=0,dmin=1e9,fl=0;for(const F of B.fl){if(!F.on||F.st!==2||F.gull)continue;fl++;for(const b of F.b){const hd=Math.hypot(b.x-c.x,b.z-c.z);if(hd>60)continue;n++;if(hd<45&&Math.abs(b.y-c.y)<2.5)band++;dmin=Math.min(dmin,hd)}}return{fl,n,band,dmin:Math.round(dmin)}};
+ return 'ok'})()`;
+ // visible-element boxes: buttons the thumbs use, and every visible text/HUD element
+@@ -273,27 +274,36 @@ async function scMission(P,router){let marks=await P.ev('__GH.marks()');const QK
+   row('mission/retry','RETRY from the fail screen puts me back in the mission',ok?`${(st.T-tr).toFixed(1)} s game, ${((Date.now()-wr)/1000).toFixed(1)} s lab`:'mission not restarted','back driving <= 2 s game',ok&&st.T-tr<=2,'');
+   if(ok){await P.run(3,s=>router.drive(s));await P.allUp();const ab=await P.ev('0');void ab}}}
+ 
++
++// world-r30b round 3: shortest street path (Dijkstra over __GH.nodes()) to a goal, followed waypoint by waypoint (the Router follows streets but does not plan to a goal)
++function planPath(N,from,goal){const near=(x,z)=>{let b=-1,bd=1e18;for(let i=0;i<N.length;i++){if(N[i][4])continue;const d=(N[i][0]-x)**2+(N[i][1]-z)**2;if(d<bd){bd=d;b=i}}return b};const a=near(from[0],from[1]),t=near(goal[0],goal[1]);if(a<0||t<0)return[];
++ const D=new Float64Array(N.length).fill(1e18),Pv=new Int32Array(N.length).fill(-1),done=new Uint8Array(N.length);D[a]=0;for(;;){let u=-1,ud=1e18;for(let i=0;i<N.length;i++)if(!done[i]&&D[i]<ud){ud=D[i];u=i}if(u<0||u===t)break;done[u]=1;for(const v of N[u][2]){if(v==null||!N[v]||N[v][4])continue;const w=ud+Math.hypot(N[v][0]-N[u][0],N[v][1]-N[u][1]);if(w<D[v]){D[v]=w;Pv[v]=u}}}
++ const out=[];for(let v=t;v>=0;v=Pv[v])out.unshift([N[v][0],N[v][1]]);out.push(goal);return out}
++const mkGo=(P,router)=>{return async(goal,stopR,maxS,kmh,each)=>{let st=P.st,stuck=0,rev=0;const WP=planPath(P.NODES||(P.NODES=await P.ev('__GH.nodes()')),[st.x,st.z],goal);const t0=st.T;while(st.T-t0<maxS){st=await P.run(.5,s=>{if(rev>0){rev-=DT*3;return['tB','tL']}const d=Math.hypot(goal[0]-s.x,goal[1]-s.z);if(d<stopR)return s.v>1?['tB']:[];if(s.v<3){stuck+=DT*3;if(stuck>2){stuck=0;rev=1.2}}else stuck=0;while(WP.length>1&&Math.hypot(WP[0][0]-s.x,WP[0][1]-s.z)<14)WP.shift();const w=d<40||!WP.length?goal:WP[0],a=Math.atan2(w[0]-s.x,w[1]-s.z);/* world-r30b round 3: GAS is on by default on touch, so letting go does not slow the car; brake alone (no steer: BRAKE + steer drifts) whenever over the target, like a player braking into a marker */const tg=d<60?Math.max(10,Math.min(18,d*.6)):kmh;if(s.v>tg+3)return['tB'];return[...(s.v<tg-3?['tG']:[]),...steer(s,a)]});const d=Math.hypot(goal[0]-st.x,goal[1]-st.z);if(each&&await each(st,d))break;if(d<stopR&&st.v<2)break}await P.allUp();return st};};
+ // world-r30b (REVIEW_2K_28): the world rows by real input only: the garage icon on approach, 3 quest STARTs, a kiosk glance, a pigeon flock at speed. Opt-in: --only world
+ async function scWorld(P,router){
+  const closeCard=async()=>{for(let i=0;i<3;i++){const v=await P.vis();if(!(v.ids.roamCard||v.ids.rcGo))break;await P.allUp();if(!await P.tapText(/^LATER$|NOT NOW|CLOSE|^✕$/i))break;await P.step(6)}};await closeCard();
+- const go=async(goal,stopR,maxS,kmh,each)=>{let st=P.st,stuck=0,rev=0;const t0=st.T;while(st.T-t0<maxS){st=await P.run(.5,s=>{if(rev>0){rev-=DT*3;return['tB','tL']}const d=Math.hypot(goal[0]-s.x,goal[1]-s.z);if(d<stopR)return s.v>2?['tB']:[];if(s.v<3){stuck+=DT*3;if(stuck>2){stuck=0;rev=1.2}}else stuck=0;const a=d<150?Math.atan2(goal[0]-s.x,goal[1]-s.z):router.aim(s,goal);return[...pace(s,d<25?15:d<60?Math.min(kmh,30):kmh),...steer(s,a)]});const d=Math.hypot(goal[0]-st.x,goal[1]-st.z);if(each&&await each(st,d))break;if(d<stopR&&st.v<2)break}await P.allUp();return st};
++ const go=mkGo(P,router);
++ await scQuests(P,go,3,'world','fra');
+  // 1 garage icon: opacity read + shots at 40 / 25 / 12 m on a real approach
+- {const g=(await P.ev('__GH.mk("garage")'))[0];const ops={},sh={};if(g){await go([g.x,g.z],9,80,45,async(st,d)=>{for(const k of[40,25,12])if(d<=k&&ops[k]==null){const m=(await P.ev('__GH.mk("garage")'))[0];ops[k]=m?m.op:null;sh[k]=await P.shot('world_garage_'+k+'m')}return ops[12]!=null})}
++ {const g=(await P.ev('__GH.mk("garage")'))[0];const ops={},sh={};if(g){await go([g.x,g.z],9,150,45,async(st,d)=>{for(const k of[40,25,12])if(d<=k&&ops[k]==null){const m=(await P.ev('__GH.mk("garage")'))[0];ops[k]=m?m.op:null;sh[k]=await P.shot('world_garage_'+k+'m')}return ops[12]!=null})}
+   const v=[ops[25],ops[12]].filter(x=>x!=null);row('world/pickup','drive at the garage 🔧: the icon is readable on the way into its ring',g?`opacity 40 m ${ops[40]} · 25 m ${ops[25]} · 12 m ${ops[12]}`:'no garage marker','>= 0.75 at 25 m and 12 m (REVIEW_2K_28: 0.31 at 26 m)',v.length===2&&Math.min(...v)>=.75,sh[25]||sh[40]||'')}
+- // 2 three quests: stop in the beacon, open, LET'S GO, look at the car; abandon with ✕
+- {let n=0,started=0,over=0;const ex=[],shots=[],notes=[];const tried=new Set();for(let k=0;k<3;k++){const q=(await P.ev('__GH.mk("quest")')).find(m=>!tried.has(m.id)&&m.d<700);if(!q)break;tried.add(q.id);n++;
+-   let st=await go([q.x,q.z],7,100,45,async(st,d)=>{if(d<12){const v=await P.vis();if(v.ids.roamPrompt&&!st.card){await P.allUp();await P.tapSel('#roamPrompt');await P.step(6)}const s2=await P.step(1);return s2.card||s2.ch}return false});
+-   st=await P.step(6);for(let w=0;w<10&&!(st.card||st.ch);w++){const v=await P.vis();if(v.ids.roamPrompt){await P.tapSel('#roamPrompt');await P.step(6)}else{await P.p.waitForTimeout(500)/* the TAP TO OPEN prompt runs on a wall-clock timer */;const d=Math.hypot(q.x-st.x,q.z-st.z);await P.run(.3,s=>d>6?[...pace(s,8),...steer(s,Math.atan2(q.x-s.x,q.z-s.z))]:(s.v>1?['tB']:[]))}st=await P.step(1)}
+-   const opened=st.card||st.ch,acc=await P.tapText(/LET'?S GO|START|GO ▶|^GO$|ACCEPT/i);await P.step(30);st=await P.step(1);if(st.ch)started++;notes.push(q.id+` d${Math.round(Math.hypot(q.x-st.x,q.z-st.z))}m v${Math.round(st.v)}`+(opened?' opened':' no card')+(acc?' tapped '+acc:'')+(st.ch?' started':''));const o=await P.ev('__GH.over()');over+=o.length;if(o.length)ex.push(q.id+':'+o.slice(0,2).join('+'));shots.push(await P.shot('world_quest'+(k+1)+'_start'));
+-   if(st.ch){await P.tapSel('#qAbn');await P.step(10);await P.tapText(/ABANDON|YES|QUIT|OK/i).catch(()=>0);await P.step(20)}void acc}
+-  row('world/quests','3 quests started by real input (beacon, prompt, LET\'S GO): anything drawn inside my car?',`${started}/${n} started, ${over} objects in the car body${ex.length?' ('+ex.join(', ')+')':''}`,'3/3 started, 0 (gauntlet seen/prop-on-car)',started>=3&&over===0,shots[0]||'',notes.join('; '))}
+  // 3 kiosk glance: drive past a tall street prop 2.5 m to its side at ~40 km/h; every step: is the lens inside anything drawn?
+  {const pr=(await P.ev('__GH.props()'))[0];let fr=0,inside=0,bldF=0,sh='',best=1e9;const ex=[];if(pr){let st=P.st;const a=Math.atan2(pr.x-st.x,pr.z-st.z),gx=pr.x+Math.cos(a)*2.5,gz=pr.z-Math.sin(a)*2.5;
+-   st=await go([gx-Math.sin(a)*30,gz-Math.cos(a)*30],6,60,40);const t0=st.T;while(st.T-t0<6){st=await P.run(.2,s=>[...pace(s,40),...steer(s,Math.atan2(gx+Math.sin(a)*20-s.x,gz+Math.cos(a)*20-s.z))]);const d=Math.hypot(pr.x-st.x,pr.z-st.z);const c0=await P.ev('__GH.camIn()'),c=c0.filter(x=>!/^bld /.test(x));fr++;if(c0.length>c.length)bldF++;if(c.length){inside++;if(ex.length<3)ex.push(c[0])}if(d<best){best=d;if(d<8)sh=await P.shot('world_glance_kiosk')}if(d>best+15)break}await P.allUp()}
+-  row('world/glance','drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object',pr?`${inside}/${fr} frames inside a prop (${pr.t}, closest ${best.toFixed(1)} m)${ex.length?' '+ex.join(','):''}; ${bldF} frames inside a building (INFO)`:'no tall prop','0 frames (gauntlet seen/camera-in-props)',!!pr&&fr>5&&inside===0,sh)}
++   st=await go([gx-Math.sin(a)*22,gz-Math.cos(a)*22],4,90,40);const t0=st.T;while(st.T-t0<8){st=await P.run(.2,s=>{/* brake-aware pass (GAS on by default): aim at the point beside the prop, then 20 m past it */const dd=Math.hypot(gx-s.x,gz-s.z),tx=dd>4?gx:gx+Math.sin(a)*20,tz=dd>4?gz:gz+Math.cos(a)*20;if(s.v>33)return['tB'];return[...(s.v<27?['tG']:[]),...steer(s,Math.atan2(tx-s.x,tz-s.z))]});const d=Math.hypot(pr.x-st.x,pr.z-st.z);const c0=await P.ev('__GH.camIn()'),c=c0.filter(x=>!/^bld /.test(x));fr++;if(c0.length>c.length)bldF++;if(c.length){inside++;if(ex.length<3)ex.push(c[0])}if(d<best){best=d;if(d<8)sh=await P.shot('world_glance_kiosk')}if(d>best+15)break}await P.allUp()}
++  row('world/glance','drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object',pr?`${inside}/${fr} frames inside a prop (${pr.t}, closest ${best.toFixed(1)} m)${ex.length?' '+ex.join(','):''}; ${bldF} frames inside a building (INFO)`:'no tall prop','passes <= 4 m from the prop (REVIEW_2K_31), 0 frames (gauntlet seen/camera-in-props)',!!pr&&fr>5&&best<=4&&inside===0,sh)}
+  // 4 birds at speed: drive the streets at ~70 km/h until a flock scatters ahead; band = birds at camera height (+-2.5 m, < 45 m)
+  {let st=P.st;const t0=st.T;let sh='',n=0,band=0,seen=0;while(st.T-t0<90&&seen<6){st=await P.run(.5,s=>router.drive(s,70));const f=await P.ev('__GH.flock()');if(f&&f.fl&&f.n){if(st.v>=55){n+=f.n;band+=f.band;seen++;if(!sh)sh=await P.shot('world_birds_speed')}}}await P.allUp();
+   row('world/birds','scattered pigeons seen from the car at >= 55 km/h (real drive)',seen?`${band}/${n} bird samples at camera height (${(100*band/Math.max(1,n)).toFixed(0)} %), ${seen} samples`:'no flock scattered in 90 s','<= 10 % at camera height (REVIEW_2K_28: grey drones 3-8 m up)',seen>0&&band/Math.max(1,n)<=.1,sh)}}
++// quest STARTs by real input (beacon, TAP TO OPEN, LET'S GO), then: anything drawn inside my car? abandon with ✕
++async function scQuests(P,go,N,lab,city){const rid=city==='fra'?'world/quests':'world/quests-'+city;
++let n=0,started=0,over=0;const ex=[],shots=[],notes=[];const tried=new Set();for(let k=0;k<N;k++){const q=(await P.ev('__GH.mk("quest")')).find(m=>!tried.has(m.id)&&m.d<(city==='fra'?900:1500));if(!q)break;tried.add(q.id);n++;
++   const tapChip=async()=>{/* the stop-next-to-a-marker chip is #rqAsk ('… · TAP TO OPEN', 99rq_roamquiet), #roamPrompt is the older prompt */for(const sel of['#rqAsk','#roamPrompt'])if(await P.tapSel(sel)){await P.step(6);return true}return false};
++   let st=await go([q.x,q.z],7,150,45,async(st,d)=>{if(d<12&&st.v<4){await P.allUp();await tapChip();const s2=await P.step(1);return s2.card||s2.ch}return false});
++   st=await P.step(6);for(let w=0;w<12&&!(st.card||st.ch);w++){if(!await tapChip()){await P.p.waitForTimeout(500)/* the TAP TO OPEN prompt runs on a wall-clock timer */;const d=Math.hypot(q.x-st.x,q.z-st.z);await P.run(.3,s=>d>6?[...pace(s,8),...steer(s,Math.atan2(q.x-s.x,q.z-s.z))]:(s.v>1?['tB']:[]))}st=await P.step(1)}
++   const opened=st.card||st.ch,acc=await P.tapText(/LET'?S GO|START|GO ▶|^GO$|ACCEPT/i);await P.step(30);st=await P.step(1);const cid=st.ch?await P.ev('__GH.chId()'):'';if(st.ch&&cid===q.id)started++;notes.push(q.id+` d${Math.round(Math.hypot(q.x-st.x,q.z-st.z))}m v${Math.round(st.v)}`+(opened?' opened':' no card')+(acc?' tapped '+acc:'')+(st.ch?(cid===q.id?' started':' (another quest running: '+cid+')'):''));const o=(await P.ev('__GH.over()')).filter(x=>!/^bld /.test(x))/* a building = the car pressed into a wall, not a prop on the car */;over+=o.length;if(o.length)ex.push(q.id+':'+o.slice(0,2).join('+'));shots.push(await P.shot(lab+'_quest'+(k+1)+'_start'));
++   if(st.ch){/* phone: ↺ / ✕ live in the pause menu: ❚❚ then '✕ Abandon' (the on-screen #qAbn is hidden on touch) */await P.allUp();if(!await P.tapSel('#qAbn'))0;await P.step(6);let s3=await P.step(1);if(s3.ch){await P.tapSel('#tP');await P.step(6);await P.tapText(/Abandon/i);await P.step(10);await P.tapText(/RESUME/i).catch(()=>0);await P.step(10);s3=await P.step(1)}notes.push(s3.ch?'(abandon failed)':'(abandoned)');if(s3.ch)break}void acc}
++  row(rid,N+' quest(s) started by real input (beacon, prompt, LET\'S GO): anything drawn inside my car?',`${started}/${n} started, ${over} objects in the car body${ex.length?' ('+ex.join(', ')+')':''}`,N+'/'+N+' started, 0 (gauntlet seen/prop-on-car)',started>=N&&over===0,shots[0]||'',notes.join('; '))}
+ async function scPause(P){let st=await P.run(1.5,s=>['tG']);await P.allUp();await P.tapSel('#tP');await P.step(6);let v=await P.vis();const open=v.ids.roamPause||v.ids.pause;
+  const c0=await P.ev('__GH.cars(80)');const a=await P.step(1);st=await P.step(30);const c1=await P.ev('__GH.cars(80)');const carMv=Math.hypot(st.x-a.x,st.z-a.z);
+  const trMv=Math.max(0,...c0.map(c=>{const o=c1.find(q=>q.i===c.i);return o?Math.hypot(o.x-c.x,o.z-c.z):0}));const frozen=carMv<.05&&trMv<.05;
+@@ -373,6 +383,7 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
+    await harness(A);const r2=Router(await A.ev('__GH.nodes()'));await A.ev('__GH.resetStats();0');let st=await A.step(1);const t0=st.T;let stuck=0,rev=0,slow=0,n=0;
+    st=await A.run(60,s=>{n++;if(s.v<10)slow++;if(rev>0){rev-=DT*3;return['tB','tL']}if(s.v<3){stuck+=DT*3;if(stuck>2){stuck=0;rev=1.5;}}else stuck=0;return r2.drive(s)});await A.allUp();
+    if(on('boost'))await scBoost(A,r2,'ath',120);
++   if(on('world')||on('athq')){const v0=await A.vis();if(v0.ids.roamCard||v0.ids.rcGo){await A.tapText(/^LATER$|NOT NOW|CLOSE|^✕$/i);await A.step(6)}await scQuests(A,mkGo(A,r2),1,'ath','ath')}
+    const sh=await A.shot('ath_2_drive');const pops=await A.ev('__GH.pullPops()');
+    row('ath/drive','Athens: 60 s drive following streets',`${(st.T-t0).toFixed(0)} s game, ${Math.round(100*slow/Math.max(n,1))} % under 10 km/h, ${pops.filter(p=>p.kind==='jump').length} pops`,'>= 55 s, <= 15 % slow, 0 pops',st.T-t0>=55&&slow/Math.max(n,1)<=.15&&!pops.some(p=>p.kind==='jump'),sh);
+    await A.allUp();await A.tapSel('#tP');await A.step(6);const q=await A.tapText(/QUIT TO TITLE/);await A.ev('__GH.release();0');await A.p.waitForTimeout(3000);const r=(await A.vis()).btn.some(x=>/START RACE/.test(x.t))?'menu':await A.tapText(/RACES/);await A.p.waitForTimeout(2500);const s=await A.tapSel('#startBtn');
+-- 
+2.43.0
+
