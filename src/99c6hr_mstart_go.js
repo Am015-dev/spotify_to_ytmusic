@@ -6,10 +6,18 @@ const HRM={};
 function HRM_card(){const el=document.getElementById('npcSay'),p=el&&el.querySelector('p');if(!el||el.hidden||!p)return null;const r=el.getBoundingClientRect(),W=innerWidth,H=innerHeight,words=p.textContent.trim().split(/\s+/).filter(Boolean).length,
  fs=parseFloat(getComputedStyle(p).fontSize),over=[...document.querySelectorAll('#touch button,#touch .tbtn,#touch [id^=t]')].filter(b=>{const q=b.getBoundingClientRect();return q.width>8&&q.height>8&&getComputedStyle(b).visibility!=='hidden'&&q.left<r.right&&q.right>r.left&&q.top<r.bottom&&q.bottom>r.top}).length;
  return{text:p.textContent.trim().slice(0,60),words,fs,area:+(r.width*r.height/(W*H)).toFixed(3),over,more:!!el.dataset.more}}
-function HRM_run(){const R={},T=o=>{TOUCH.on=true;TOUCH.used=true;TOUCH.dir=0;TOUCH.gas=true;TOUCH.brake=false;TOUCH.hb=false};
- const m=(RO.marks||[]).find(q=>!q.dyn&&q.ev&&qvUse(q));if(!m)return Promise.resolve({err:'no quest marker'});
- try{chAbort()}catch(e){}const h=Math.atan2(m.x-RO.x,m.z-RO.z),q0=rfSnap(m.x-Math.sin(h)*30,m.z-Math.cos(h)*30,60);roamWarp(q0?q0[0]:m.x-Math.sin(h)*30,q0?q0[1]:m.z-Math.cos(h)*30,q0?q0[2]:h,true);
- RO.frozen=false;RO.card=null;RO.inv=99;RO.hp=100;RO.v=60/3.6;RO.vh=RO.h;camSnap=true;T();roamStep(1/60);RO.v=60/3.6;RO.vh=RO.h;
+// gui-r30a (rule 15: 4 of 8 runs red across 4 commits, 26-44 % speed kept): the start spot used to be 30 m behind the first marker along the bearing from wherever the car was, so a traffic car, kerb or prop in
+// that 30-80 m decided the verdict. Now every candidate spot (3 markers x 4 compass approaches) is first driven for 4 s at 60 km/h with gas and NO quest: a spot that already loses > 5 % speed is
+// skipped, so the countdown is the only thing left that can slow the car. No clean spot = a FAIL with the reason, never a lucky pass.
+function HRM_place(x,z,h0){const q0=rfSnap(x,z,60);roamWarp(q0?q0[0]:x,q0?q0[1]:z,q0?q0[2]:h0,true);RO.frozen=false;RO.card=null;RO.inv=99;RO.hp=100;RO.v=60/3.6;RO.vh=RO.h;camSnap=true;HRM_T();roamStep(1/60);RO.v=60/3.6;RO.vh=RO.h}
+function HRM_T(){TOUCH.on=true;TOUCH.used=true;TOUCH.dir=0;TOUCH.gas=true;TOUCH.brake=false;TOUCH.hb=false}
+function HRM_free(){const v0=Math.abs(RO.v);let vmin=1e9;for(let n=0;n<240;n++){HRM_T();roamStep(1/60);vmin=Math.min(vmin,Math.abs(RO.v))}return vmin/v0}
+function HRM_run(){const R={},T=HRM_T;
+ const ms=(RO.marks||[]).filter(q=>!q.dyn&&q.ev&&qvUse(q)).slice(0,3);if(!ms.length)return Promise.resolve({err:'no quest marker'});
+ try{chAbort()}catch(e){}let m=null,tried=0,bx=0,bz=0,bh=0;
+ outer:for(const mk of ms)for(let a=0;a<4;a++){const h=a*Math.PI/2;tried++;const x=mk.x-Math.sin(h)*30,z=mk.z-Math.cos(h)*30;HRM_place(x,z,h);if(HRM_free()>=.95){m=mk;bx=x;bz=z;bh=h;break outer}}
+ R.tried=tried;if(!m){TOUCH.gas=false;TOUCH.used=false;RO.v=0;return Promise.resolve({err:'no clean 4 s straight at 60 km/h within 30 m of any quest marker (tried '+tried+')'})}
+ HRM_place(bx,bz,bh);
  const v0=Math.abs(RO.v);chStart(m,{});R.kind=m.ev.kind;
  return new Promise(res=>setTimeout(()=>{R.card=HRM_card();let vmin=1e9,n=0;for(;n<300;n++){T();roamStep(1/60);vmin=Math.min(vmin,Math.abs(RO.v));if(RO.ch&&RO.ch.cd<=0&&n>240)break}
   R.keep=+(vmin/v0).toFixed(2);R.cd=RO.ch?+(RO.ch.cd||0).toFixed(2):null;try{chAbort()}catch(e){}TOUCH.gas=false;TOUCH.used=false;RO.v=0;const el=document.getElementById('npcSay');if(el)el.hidden=true;res(R)},700))}
