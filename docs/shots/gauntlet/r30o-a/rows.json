@@ -1,0 +1,443 @@
+[
+ {
+  "id": "boot/playVisible",
+  "what": "page open → PLAY button visible",
+  "num": "14.7 s lab",
+  "bar": "INFO (lab, software GL)",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_0_title.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl",
+  "what": "PLAY tap → first control of the car",
+  "num": "73.3 s lab (6x CPU)",
+  "bar": "<= 36 s lab at 6x (= ~5 s on an iPhone: 5 s x 7.2-7.3, REVIEW_2K_33, docs/GAUNTLET.md)",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/menu",
+  "what": "race menu never shows after PLAY (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "boot/loader",
+  "what": "loader never covers a controllable car (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls",
+  "what": "HUD text over the touch buttons (first control)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "hud/minText",
+  "what": "smallest visible text (first control)",
+  "num": "0 items < 12 px",
+  "bar": "0 (CLAUDE.md: 12 px minimum)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "perf/frame",
+  "what": "frame time while driving (real clock, 6x CPU, software GL)",
+  "num": "p95 983 ms, 18/18 frames > 50 ms",
+  "bar": "INFO (lab GL; iPhone truth = perf/ios-reveal)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "steer/buttons",
+  "what": "hold GAS + ◀ (or ▶) for 1.2 s at ~30-50 km/h turns the car that way",
+  "num": "◀ left 54°, left 55° · ▶ right 54°, right 63°",
+  "bar": "each >= 20° the pressed way",
+  "pass": "PASS",
+  "shot": "",
+  "note": "from 47.8 km/h, from 46 km/h, from 45.4 km/h, from 45 km/h"
+ },
+ {
+  "id": "drive/time",
+  "what": "2 min street drive, gas held, following streets",
+  "num": "120 s game, 1.70 km, avg 51 km/h",
+  "bar": ">= 110 s game and >= 1.0 km",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_2_street_at_speed.jpg",
+  "note": ""
+ },
+ {
+  "id": "drive/frustration",
+  "what": "time under 10 km/h with GAS held",
+  "num": "0 %",
+  "bar": "<= 15 % (bughunt frustration limit)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/pop",
+  "what": "traffic car pops on screen (in view, 6-60 m)",
+  "num": "0 jumps > 2 m, 0 appear < 40 m",
+  "bar": "0 jumps > 2 m; 0 appear < 40 m",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/onStreet",
+  "what": "bot check: share of the drive on a street (a bot off the street makes the drive rows meaningless)",
+  "num": "99 %",
+  "bar": ">= 80 % (script validity)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/offLane",
+  "what": "in-view traffic sideways off its lane (junction hand-off residual, 6-60 m; REVIEW_2K_30 rev/latres)",
+  "num": ">2 m 3.0 %, >4 m 1.14 % of 1489 samples, 0 samples > 2 m for > 3 s, max 7.32 m (k7 86>819@0.00 d49)",
+  "bar": "INFO",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/near",
+  "what": "traffic near the player (HITRUN_GAP gap 8)",
+  "num": "0.5 cars within 40 m (avg)",
+  "bar": ">= 2.5 (hr/near)",
+  "pass": "FAIL",
+  "shot": "",
+  "note": "avg cars per frame by distance: <40 0.5, 40-80 0.7, 80-150 5.9, 150-300 31.0, >300 20.1; parked 4.7, dead 12.0; standing (<150 m, cv<1) 0.9; cars 75, hour 10.8, hourK 1.00, trHour 1; far(>240 m) cars: {\"n\":46,\"route\":5,\"tr\":0,\"pk\":0,\"dead\":12,\"noPop\":0,\"ok\":29} held 5681 law false lvTraf 1 trFar 240"
+ },
+ {
+  "id": "boost/fra",
+  "what": "BOOST tapped every 3 s for 2 min down busy streets (real taps, GAS+◀▶ like a player): a SMASH lunge only when the press has the arrow held toward a car beside",
+  "num": "41 BOOST presses, 0 lunges; a car in the window in 15/1200 samples; 0 presses had the arrow held toward a car beside",
+  "bar": "lunges <= presses with the arrow toward a car beside (0 unwanted)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hit/contact",
+  "what": "nose into 5 traffic cars on my street that close on me (target rules: REVIEW_2K_32), GAS held in the last 18 m",
+  "num": "4/4 contacts (+1 no target found in 4 windows)",
+  "bar": ">= 4/5 (hr/hit: contact in >= 9/10); a window with no valid target is not a miss",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_3_hit_1.jpg",
+  "note": "picks 150, off-street 5, cars<90 m avg 0.4, with a valid target 4; hit at 84.4 km/h, hit at 65.2 km/h, no car in front, hit at 58.3 km/h, hit at 58.1 km/h"
+ },
+ {
+  "id": "hit/react",
+  "what": "hit car reacts: its HUB position velocity changes > 2 m/s within 0.3-1.2 s",
+  "num": "1/4 contacts",
+  "bar": "INFO: this read misses thrown cars (shots show them tumbling); judge by the hit shots",
+  "pass": "INFO",
+  "shot": "",
+  "note": "Δv 5.1 m/s, Δv 0 m/s, Δv 1.3 m/s, Δv 0 m/s"
+ },
+ {
+  "id": "hit/noBrake",
+  "what": "our speed lost between 12 m and contact (no braking against nothing)",
+  "num": "max -2 %",
+  "bar": "<= 5 % (HITRUN_GAP gap 1)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drift/start",
+  "what": "BRAKE + steer at ~50 km/h starts a drift",
+  "num": "3/3 (peak slip 40.1°, 40.1°, 39.9°)",
+  "bar": "3/3 with slip >= 15°",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_4_drift_1.jpg",
+  "note": "53.1->59.5 km/h, 59.2->33.5 km/h, 55.8->97.3 km/h"
+ },
+ {
+  "id": "drift/tap",
+  "what": "a 0.15 s BRAKE tap in a corner never slides",
+  "num": "0/3 slid (peak 0.8°, 0.9°, 0.3°)",
+  "bar": "0 slid, 3 valid setups",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "wall/glance",
+  "what": "glance a wall at 20-45° at ~40 km/h",
+  "num": "1/4 keep >= 60 % & no damage (41° 37 km/h 0% -0hp, 21° 37 km/h 70% -0hp; 2 not set up (script))",
+  "bar": "4/4",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_5_head_1.jpg",
+  "note": ""
+ },
+ {
+  "id": "wall/headon",
+  "what": "head-on into a wall at ~45 km/h slows hard",
+  "num": "0/2 (42->47 km/h -0hp; 1 not set up (script))",
+  "bar": "2/2 keep <= 35 %",
+  "pass": "FAIL",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "pause/resume",
+  "what": "❚❚ opens pause (car + traffic stand still for 1 s), ▶ RESUME drives on",
+  "num": "open true, car moved 0.00 m, traffic moved 0.00 m, resumed true",
+  "bar": "open, 0 m / 0 m, resumed",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_9_pause.jpg",
+  "note": ""
+ },
+ {
+  "id": "mission/reach",
+  "what": "drive to the nearest mission marker (quest \"sq_gn_1\", 118 m)",
+  "num": "25 s game, tapped the TAP TO OPEN prompt",
+  "bar": "reached <= 60 s game",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "mission/card",
+  "what": "mission card before START: name + ONE line (buttons not counted)",
+  "num": "name 1 words + line 5 words: \"👮 Gnome-napping | Ram the van 4 times\"",
+  "bar": "name <= 4 words, objective line <= 6 words, nothing else (Alex: a 40-word card; Hit & Run shows 3; gui-r30a: stars, times, rewards and the long brief are behind DETAILS)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_6_mission_card.jpg",
+  "note": ""
+ },
+ {
+  "id": "mission/details",
+  "what": "DETAILS is one tap away and shows the stars / times / rewards",
+  "num": "35 words after the tap",
+  "bar": "a DETAILS tap shows > 6 words (and START is still on the card)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_6a_mission_details.jpg",
+  "note": "SIDE QUEST 👮 Kommissar Becker · Gnome-napping (The Gnome Gang 1/3) ★★★ NOT PLAYED YET “The Gnome Ga"
+ },
+ {
+  "id": "mission/cover",
+  "what": "HUD/cards over the touch buttons at mission start",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_6_mission_card.jpg",
+  "note": ""
+ },
+ {
+  "id": "mission/objective",
+  "what": "first objective text after START (largest text line)",
+  "num": "6 words: \"GNOME-NAPPING (THE GNOME GANG 1/3) · 1/2 ·\"",
+  "bar": "<= 6 words (hr/mstart)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_6b_mission_start.jpg",
+  "note": "GNOME-NAPPING (THE GNOME GANG 1/3) · 1/2 · | ➤ | Catch · 440 m | 04:56.3"
+ },
+ {
+  "id": "mission/toast",
+  "what": "the coach toast over the road after START",
+  "num": "on screen 3.0 s game (from 1.5 s after START)",
+  "bar": "<= 4 s on screen (the objective lives in the one-line HUD slot)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "mission/end",
+  "what": "mission ends with a fail screen that offers RETRY",
+  "num": "fail screen with RETRY",
+  "bar": "RETRY visible",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_8_mission_end.jpg",
+  "note": "GNOME-NAPPING (THE GNOME GANG 1/3) | THE VAN ESCAPED | No stars this time · try again | 0/2 stages · 4.8 km · ★★★ 02:55."
+ },
+ {
+  "id": "mission/retry",
+  "what": "RETRY from the fail screen puts me back in the mission",
+  "num": "0.2 s game, 0.1 s lab",
+  "bar": "back driving <= 2 s game",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls2",
+  "what": "HUD text over the touch buttons (later in roam)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "menu/tiles",
+  "what": "every race tile has a preview image and its full name at >= 12 px",
+  "num": "11/11 tiles ok",
+  "bar": "0 tiles blank, cut, < 12 px, drawn as > 4 separate pieces, or with a name below the screen and no scroll container (gui-r30a, REVIEW_2K_27)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_10_race_menu.jpg",
+  "note": ""
+ },
+ {
+  "id": "race/start",
+  "what": "pause → QUIT TO TITLE → RACES → START reaches the grid",
+  "num": "countdown",
+  "bar": "countdown or race",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_10_race_menu.jpg",
+  "note": ""
+ },
+ {
+  "id": "race/rollOverlap",
+  "what": "race touch hand-over: ◀ held 0.3 s, ▶ lands while ◀ is still down (1-3 frames, 33-100 ms), ◀ lifts: no roll",
+  "num": "0/10 rolled",
+  "bar": "0/10 (REVIEW_2K_32 point 3)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "race/rollBoth",
+  "what": "race touch chord: ◀ and ▶ land together (one touch event): the SMASH roll fires",
+  "num": "10/10 fired",
+  "bar": "10/10",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "race/rollTaps",
+  "what": "one full race steered like a player (bot taps ◀/▶ to hold the lane): steer presses and would-be double-taps (same side twice within .35 s game time; the lab clock cannot fire the real-time detector, CRSM.acc 0)",
+  "num": "73 steer presses, 1 would-be double-taps = accidental rolls",
+  "bar": "INFO (a roll needs a deliberate gesture if this is > 0)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "race/finish",
+  "what": "race finishes with a result screen",
+  "num": "results after 137 s game",
+  "bar": "#results visible <= 480 s game",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/fra_12_race_finish.jpg",
+  "note": "5TH PLACE"
+ },
+ {
+  "id": "ath/boot",
+  "what": "Athens: PLAY → first control",
+  "num": "101.2 s lab (6x CPU), city ath",
+  "bar": "control in city ath, <= 36 s lab at 6x (same bar as Frankfurt, REVIEW_2K_33 (i))",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30o-a/ath_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boost/ath",
+  "what": "BOOST tapped every 3 s for 2 min down busy streets (real taps, GAS+◀▶ like a player): a SMASH lunge only when the press has the arrow held toward a car beside",
+  "num": "41 BOOST presses, 1 lunges; a car in the window in 22/1200 samples; 1 presses had the arrow held toward a car beside",
+  "bar": "lunges <= presses with the arrow toward a car beside (0 unwanted)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "ath/drive",
+  "what": "Athens: 60 s drive following streets",
+  "num": "60 s game, 1 % under 10 km/h, 0 pops",
+  "bar": ">= 55 s, <= 15 % slow, 0 pops",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/ath_2_drive.jpg",
+  "note": ""
+ },
+ {
+  "id": "ath/race",
+  "what": "Athens: pause → QUIT → RACES → START reaches the grid",
+  "num": "quit true races true start true grid true",
+  "bar": "grid reached",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/ath_3_race_start.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/boot",
+  "what": "portrait 390x844: PLAY → control (1x CPU)",
+  "num": "27.8 s lab",
+  "bar": "control reached",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/band",
+  "what": "portrait: the 3D view reaches the bottom of the screen (no flat pale band under the road)",
+  "num": "mean brightness of the 84-88 % rows 56",
+  "bar": "< 140 (the beta.164 band measures 174: pale blue, no road; gui-r30a near-plane fix)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/hud",
+  "what": "portrait: HUD text over the touch buttons",
+  "num": "0 overlaps, 0 texts < 12 px",
+  "bar": "0 / 0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30o-a/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl1x",
+  "what": "PLAY tap → first control, unthrottled (1x CPU, software GL)",
+  "num": "26.7 s lab (1x)",
+  "bar": "INFO: <= 15 s (5 s x 2.9, docs/GAUNTLET.md); not a gate",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/r30o-a/fra1x_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "page/reload",
+  "what": "page never reloads",
+  "num": "0 reloads",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/jsErrors",
+  "what": "no JS errors (pageerror + console.error)",
+  "num": "0 errors",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/memory",
+  "what": "JS heap high-water (performance.memory)",
+  "num": "78 MB",
+  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ }
+]
