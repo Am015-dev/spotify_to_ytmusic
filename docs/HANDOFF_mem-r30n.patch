@@ -1,0 +1,221 @@
+diff --git a/src/10_core4.js b/src/10_core4.js
+index f12c720..4fac9d8 100644
+--- a/src/10_core4.js
++++ b/src/10_core4.js
+@@ -185,8 +185,11 @@ const FOGC=new THREE.Color('#1c1030');scene.fog=new THREE.FogExp2(FOGC,0.00042);
+ const camera=new THREE.PerspectiveCamera(64,1,.4,9000);scene.add(camera);
+ let lowGfx=matchMedia('(pointer:coarse)').matches;
+ // crash-1: low-memory tier, auto on iPhone/iPad/Android (iOS Safari kills the tab when the page gets too big). ?lowmem=0 off, ?lowmem=1 on anywhere
+-function LOWMEM_is(u,tp,q){if(q==='0'||q==='1')return q==='1';return /iPhone|iPad|iPod|Android/.test(u||'')||/Macintosh/.test(u||'')&&tp>1}
+-const LOWMEM=LOWMEM_is(navigator.userAgent,navigator.maxTouchPoints,new URLSearchParams(location.search).get('lowmem'));window.__lowmem=LOWMEM;
++// lowmem-r24h (plan lane 1): also on with navigator.deviceMemory <= 4 (Safari has none: UA test); ?low=1|0 = same switch as ?lowmem=1|0
++function LOWMEM_is(u,tp,q,dm){if(q==='0'||q==='1')return q==='1';return /iPhone|iPad|iPod|Android/.test(u||'')||/Macintosh/.test(u||'')&&tp>1||dm>0&&dm<=4}
++const LOWMEM=LOWMEM_is(navigator.userAgent,navigator.maxTouchPoints,(_q=>_q.get('low')??_q.get('lowmem'))(new URLSearchParams(location.search)),navigator.deviceMemory||0);window.__lowmem=LOWMEM;
++// lowmem-r24h: every image/canvas texture > 512 px uploads downscaled (three's resizeImage reads capabilities.maxTextureSize at upload; the source canvas stays, updates still work). ?ltex=0 off
++if(LOWMEM&&!/[?&]ltex=0/.test(location.search))renderer.capabilities.maxTextureSize=Math.min(renderer.capabilities.maxTextureSize,512);
+ // ios-r17s/r17z: touch/lowmem far building LOD: range cap 900 m (?lodrt=0 off) and coarser cell (?lodc=N); set here because the cells are built at load
+ if(LOWMEM){const _q=new URLSearchParams(location.search),_r=_q.get('lodrt'),_c=_q.get('lodc');TUNE.wbLodRt=_r==null?900:+_r||0;if(_c!=null&&+_c>0)TUNE.wbLodCell=+_c}
+ // crash-2: live GPU bytes (buffers + textures), counted at the GL calls; renderer.info counts objects, not bytes, and a first-visit upload of
+diff --git a/src/10_core5.js b/src/10_core5.js
+index 5e3ba7a..7a9f560 100644
+--- a/src/10_core5.js
++++ b/src/10_core5.js
+@@ -1,4 +1,8 @@
+-let ENVD=true;const ENVC=new Map();function buildEnv(){ENVD=false;const id=MOOD.id;let t=ENVC.get(id);if(!t){const pm=new THREE.PMREMGenerator(renderer);t=pm.fromScene(ENVSC,.02).texture;pm.dispose();ENVC.set(id,t)}scene.environment=t;if(ENVC.size>3)for(const[k,o]of ENVC)if(o!==t){o.dispose();ENVC.delete(k);break}}
++let ENVD=true;const ENVC=new Map(),ENV_old=[];function buildEnv(){ENVD=false;const id=MOOD.id;let t=ENVC.get(id);if(!t){const pm=new THREE.PMREMGenerator(renderer);const rt=pm.fromScene(ENVSC,.02);t=rt.texture;t.userData.rt=rt;pm.dispose();ENVC.set(id,t)}scene.environment=t;const cap=LOWMEM&&!/[?&]ltex=0/.test(location.search)?1:3;for(const[k,o]of ENVC)if(ENVC.size>cap&&o!==t){ENV_free(o,t);ENVC.delete(k)}while(ENV_old.length){const o=ENV_old.pop();if(o!==t)ENV_free(o,t)}}   // lowmem-r24h: the low tier keeps only the current mood's env map (each PMREM is 6 MB half-float)
++// lowmem-r24h: a PMREM env is a render target: texture.dispose() alone never freed its GL texture (three r164), so every evicted env stayed on the GPU. Free the target.
++// Low tier only (the desktop keeps the old no-op dispose): materials still holding the old env are moved to the current one first.
++function ENV_free(t,cur){if(!t)return;const rt=t.userData&&t.userData.rt;if(!rt||!LOWMEM||/[?&]ltex=0/.test(location.search)){t.dispose();return}
++  scene.traverse(o=>{for(const m of[].concat(o.material||[]))if(m&&m.envMap===t)m.envMap=cur||null});if(scene.environment===t)scene.environment=cur||null;rt.dispose()}
+ scene.environmentIntensity=.8;
+ let lightningT=6,litV=0;
+ function applyMood(id){const m=MOODS.find(x=>x.id===id)||ATHM.find(x=>x.id===id)||MOODS[0];const changed=m!==MOOD;MOOD=m;const U=SKYU;
+@@ -23,7 +27,15 @@ function dataTex(d,w,h,v,srgb){let t;
+   if(v.half){const a=new Uint16Array(d.length);for(let i=0;i<d.length;i++){const x=d[i]/255;a[i]=THREE.DataUtils.toHalfFloat(srgb&&(i&3)!==3?s2l(x):x)}t=new THREE.DataTexture(a,w,h,THREE.RGBAFormat,THREE.HalfFloatType)}
+   else{t=new THREE.DataTexture(new Uint8Array(d),w,h);if(srgb)t.colorSpace=THREE.SRGBColorSpace}
+   t.flipY=true;return t}
+-function mkTex(c,v,srgb){let t;
++// lowmem-r24h (plan lane 1, top mip skipped): on the low-memory tier a canvas texture >= 256 px uploads at half size (a quarter of the GPU bytes; the city's
++// 512 px facades were 46 of 79 MB). Updates still work: needsUpdate redraws the half copy from the source canvas. ?ltex=0 off.
++const LTEX=typeof LOWMEM!=='undefined'&&LOWMEM&&!/[?&]ltex=0/.test(location.search),LTEX_st={n:0,saved:0};
++function LTEX_half(c){if(!LTEX||!c||!c.getContext||Math.max(c.width,c.height)<256)return null;const h=document.createElement('canvas');h.width=Math.max(1,c.width>>1);h.height=Math.max(1,c.height>>1);
++  const draw=()=>{const g=h.getContext('2d');g.clearRect(0,0,h.width,h.height);g.imageSmoothingQuality='high';g.drawImage(c,0,0,h.width,h.height)};draw();h._base=c._base;LTEX_st.n++;LTEX_st.saved+=(c.width*c.height-h.width*h.height)*4;return{h,draw}}
++function mkTex(c,v,srgb){const H=v.none?null:LTEX_half(c);if(H){const t=mkTex0(H.h,v,srgb);t.userData.lsrc=c;if(t.userData.src)t.userData.src=H.h;
++  Object.defineProperty(t,'needsUpdate',{configurable:true,set(x){if(x){H.draw();if(t.isDataTexture){const d=H.h.getContext('2d').getImageData(0,0,H.h.width,H.h.height).data,a=t.image.data;if(a instanceof Uint8Array)a.set(d)}t.version++;if(t.source)t.source.needsUpdate=true}}});return t}
++  return mkTex0(c,v,srgb)}
++function mkTex0(c,v,srgb){let t;
+   if(v.none){const col=new THREE.Color();let a=0;if(c._base&&c._base!=='transparent'){try{col.setStyle(c._base,THREE.SRGBColorSpace);a=255}catch(e){}}
+     t=new THREE.DataTexture(new Uint8Array([col.r*255,col.g*255,col.b*255,a].map(Math.round)),1,1);if(srgb)t.colorSpace=THREE.SRGBColorSpace}
+   else if(v.canvas){t=new THREE.CanvasTexture(c);if(srgb)t.colorSpace=THREE.SRGBColorSpace}
+diff --git a/src/97_art.js b/src/97_art.js
+index 414fed1..e7b2684 100644
+--- a/src/97_art.js
++++ b/src/97_art.js
+@@ -75,7 +75,7 @@ if(typeof CLOUDS!=='undefined'&&CLOUDS&&!CLOUDS.userData.art){const p=CLOUDS.par
+ // sky + light, applied after every mood / day-cycle update while roaming by day
+ function ART_light(){if(!RO.on||!MOOD)return;const n=typeof FL!=='undefined'&&FL.n||0;if(n>.5||MOOD.id==='night'||MOOD.id==='flnight')return;const w=1-n*2;
+   const U=SKYU,L=(v,a)=>v.lerp(new THREE.Vector3(...a),w);L(U.uTop.value,ART.top);L(U.uMid.value,ART.mid);L(U.uHor.value,ART.hor);L(U.uGround.value,ART.gnd);L(U.uSun.value,ART.sun);U.uCloud.value*=1-w;U.uBand.value=0;U.uStar.value*=1-w;
+-  scene.fog.color.setRGB(.7,.84,1.0);hemi.color.set('#e6edfb');hemi.groundColor.set('#7d9852');hemi.intensity=1.0;moonL.color.set('#fff3e0');moonL.intensity=3.1;renderer.toneMappingExposure=1.0;scene.environmentIntensity=.55;if(!ART.envDay){ART.envDay=1;ENVSC.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='BoxGeometry')o.visible=false});ENVC.clear();ENVD=true}if(ART.hook)try{ART.hook(w)}catch(e){}}
++  scene.fog.color.setRGB(.7,.84,1.0);hemi.color.set('#e6edfb');hemi.groundColor.set('#7d9852');hemi.intensity=1.0;moonL.color.set('#fff3e0');moonL.intensity=3.1;renderer.toneMappingExposure=1.0;scene.environmentIntensity=.55;if(!ART.envDay){ART.envDay=1;ENVSC.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='BoxGeometry')o.visible=false});if(LOWMEM)for(const o of ENVC.values())ENV_old.push(o);ENVC.clear()/* lowmem-r24h: the next buildEnv frees them (6 MB each) and re-points their materials */;ENVD=true}if(ART.hook)try{ART.hook(w)}catch(e){}}
+ {const _am=applyMood;applyMood=function(){const r=_am.apply(this,arguments);ART_light();return r}}
+ {const _fa=FL_apply;FL_apply=function(){const r=_fa.apply(this,arguments);ART_light();return r}}
+ {const _he=hubEnter;hubEnter=function(){const r=_he.apply(this,arguments);ART_hub();ART_light();return r}}
+diff --git a/src/98gc_glossy.js b/src/98gc_glossy.js
+index 4872f93..1d2f732 100644
+--- a/src/98gc_glossy.js
++++ b/src/98gc_glossy.js
+@@ -5,30 +5,38 @@
+ // camera, whatever the heading). Paint keeps its own env intensity x .5 (ek), which cancels the clearcoat's extra sky sheen: measured on the body
+ // (tools/tGloss2.js + glossStats.py, 852x393, fra day/dusk, phone and desktop) hue +-2 deg, saturation -2..-4 %, value +2 %.
+ // Same PMREM size as buildEnv, no new shaders, materials or passes. Default ON since r22e33 (review #59 ruling); ?gloss=0 is the kill switch.
+-const GL={P:{sun:24,sr:1.6,re:28,rw:2.5,rk:16,ek:.5},on:(()=>{const m=/[?&]gloss=([^&#]*)/.exec(location.search);return!m||m[1]!=='0'})(),tex:null,id:'',C:new Map(),n:0,ms:0,mats:new Set()};
++const GL={P:{sun:24,sr:1.6,re:28,rw:2.5,rk:16,ek:.5},on:(()=>{const m=/[?&]gloss=([^&#]*)/.exec(location.search);return!m||m[1]!=='0'})(),tex:null,id:'',C:new Map(),n:0,ms:0,mats:new Set(),ry:NaN,dt:60000,tb:0};
+ // r22e10: keyed on the mood id AND the key light (colour, intensity, direction, quantised), so a Frankfurt mood/time switch that keeps the id still rebuilds;
+ // the last 4 envs stay cached (cycling day/dusk/night re-uses them, no PMREM churn)
+-function GL_key(){const d=moonL.position.clone().sub(moonL.target.position).normalize();return MOOD.id+'|'+moonL.color.getHexString()+'|'+Math.round(moonL.intensity)+'|'+[d.x,d.y,d.z].map(v=>Math.round(v*3)).join(',')+'|'+(lowGfx?1:0)}
++// mem-r30n: the env is built with its sun at azimuth 0 and turned to the light's azimuth with envMapRotation (GL_rot, every roam step): GFX_sunFollow swings the
++// sun with the view heading, and with the azimuth in the key every 20-40° of steering built a new 6 MB PMREM (~50 per 5 min). Key = mood, colour (1/16 steps),
++// intensity, elevation (4° steps), tier; a non-mood key change (time-of-day drift) rebuilds at most once per GL.dt ms (GL_apply).
++function GL_dir(){return(GL.dv||(GL.dv=new THREE.Vector3())).copy(moonL.position).sub(moonL.target.position).normalize()}
++function GL_key(){const d=GL_dir(),c=moonL.color;return MOOD.id+'|'+[c.r,c.g,c.b].map(v=>Math.round(v*16)).join(',')+'|'+Math.round(moonL.intensity)+'|'+Math.round(Math.asin(Math.max(-1,Math.min(1,d.y)))*45/Math.PI)+'|'+(lowGfx?1:0)}
++function GL_rot(){if(!GL.on||!GL.mats.size)return;const d=GL_dir(),y=-Math.atan2(d.z,d.x);if(Math.abs(y-GL.ry)<1e-4)return;GL.ry=y;for(const m of GL.mats)if(m.envMapRotation)m.envMapRotation.y=y}
++roamStep=(f=>function(dt){f(dt);try{GL_rot()}catch(e){}})(roamStep);
+ function GL_env(){const id=GL_key();if(GL.tex&&GL.id===id)return GL.tex;const hit=GL.C.get(id);if(hit){GL.tex=hit;GL.id=id;return hit}const t0=performance.now(),Q=GL.P,add=[];
+-  const B=o=>Object.assign(new THREE.MeshBasicMaterial(o),{toneMapped:false,fog:false}),k=moonL.intensity/4.2,kk=Math.max(.15,Math.min(1,k)),sd=moonL.position.clone().normalize();
++  const B=o=>Object.assign(new THREE.MeshBasicMaterial(o),{toneMapped:false,fog:false}),k=moonL.intensity/4.2,kk=Math.max(.15,Math.min(1,k)),sd=(d=>new THREE.Vector3(Math.sqrt(Math.max(0,1-d.y*d.y)),d.y,0))(GL_dir());
+   const sun=new THREE.Mesh(new THREE.SphereGeometry(Q.sr,12,8),B({color:moonL.color.clone().multiplyScalar(Q.sun*Math.min(1.2,k))}));sun.position.copy(sd).multiplyScalar(40);add.push(sun);
+   // the streak: a thin bright band all round the sky at ~re deg (what a chase/orbit camera sees mirrored in a roof or bonnet, whatever the heading)
+   const R=60,e=Q.re*Math.PI/180,w=Q.rw*Math.PI/180,y0=R*Math.tan(e-w/2),y1=R*Math.tan(e+w/2);
+   const ring=new THREE.Mesh(new THREE.CylinderGeometry(R,R,y1-y0,48,1,true),B({color:new THREE.Color(1,1,1.04).multiplyScalar(Q.rk*kk),side:THREE.DoubleSide}));ring.position.y=(y0+y1)/2;add.push(ring);
+   for(const o of add)ENVSC.add(o);let t;try{const pm=new THREE.PMREMGenerator(renderer),rt=pm.fromScene(ENVSC,0);t=rt.texture;t.userData.rt=rt;pm.dispose()}finally{for(const o of add){ENVSC.remove(o);o.geometry.dispose();o.material.dispose()}}
+-  GL.C.set(id,t);GL.tex=t;for(const[k0,t0]of GL.C){if(GL.C.size<=4)break;if(t0===t)continue;GL.C.delete(k0);GL_free(t0)}GL.id=id;GL.n++;GL.ms=performance.now()-t0;return t}
++  GL.C.set(id,t);GL.tex=t;const cap=LOWMEM&&!/[?&]ltex=0/.test(location.search)?1:4;/* lowmem-r24h: the low tier keeps only the current env (6 MB each) */for(const[k0,t0]of GL.C){if(GL.C.size<=cap)break;if(t0===t)continue;GL.C.delete(k0);GL_free(t0)}GL.id=id;GL.n++;GL.tb=performance.now();GL.ry=NaN;GL.ms=GL.tb-t0;return t}
+ // reload-r25d (Alex 25 Oct: "the game refreshed 5 times in 5 minutes", iPhone): the key read moonL.position, which follows the car while shadows are on
+ // (71_roam_drive), so every ~100 m of driving made a new 6 MB PMREM env, and texture.dispose() never frees a PMREM render target (three r164):
+ // +1 MB GPU per second of driving until iOS killed and reloaded the tab. Key = light direction (position - target); evicted envs free their render target.
+-function GL_free(t){if(!t)return;for(const m of GL.mats)if(m.envMap===t)m.envMap=GL.tex;const rt=t.userData&&t.userData.rt;if(rt)rt.dispose();else t.dispose()}
++// rev24: cloned paint (LDraw car groups) is in neither GL.mats nor HUB.cim: re-point every material in the scene that still holds t (~1 free per 6 s, cheap)
++function GL_rp(m,t){for(const q of[].concat(m||[]))if(q&&q.envMap===t){q.envMap=GL.tex;GL.mats.add(q)}}
++function GL_free(t){if(!t)return;for(const m of GL.mats)if(m.envMap===t)m.envMap=GL.tex;scene.traverse(o=>GL_rp(o.material,t));if(typeof pl!=='undefined'&&pl&&pl.mesh)pl.mesh.traverse(o=>GL_rp(o.material,t));(GL.fr||(GL.fr=new WeakSet)).add(t);const rt=t.userData&&t.userData.rt;if(rt)rt.dispose();else t.dispose()}
+ // a car paint material: vertex-coloured (or player livery) standard/physical, opaque; glass keeps its own (darker, sharper) look but takes the studio too
+ function GL_paint(m){return m&&m.isMeshStandardMaterial&&!m.transparent&&m.envMap&&(m.isMeshPhysicalMaterial||m.envMapIntensity>1||m.userData.a10e!==undefined)}
+ function GL_set(m,ei){if(!GL_paint(m))return;if(m.userData.gl0===undefined)m.userData.gl0=[m.envMapIntensity,m.clearcoatRoughness];
+-  if(m.envMap!==GL.tex)m.envMap=GL.tex;const gls=m.roughness<.1;m.envMapIntensity=gls?1.5:m.userData.gl0[0]*ei;if(m.isMeshPhysicalMaterial){if(m.clearcoat<.8)m.clearcoat=1;m.clearcoatRoughness=gls?.03:.05}GL.mats.add(m)}
+-function GL_apply(){if(!GL.on||!scene.environment)return;if(!GL.tex||GL.id!==GL_key())GL_env();const ei=GL.P.ek;
++  if(m.envMap!==GL.tex)m.envMap=GL.tex;if(m.envMapRotation&&GL.ry===GL.ry)m.envMapRotation.y=GL.ry;const gls=m.roughness<.1;m.envMapIntensity=gls?1.5:m.userData.gl0[0]*ei;if(m.isMeshPhysicalMaterial){if(m.clearcoat<.8)m.clearcoat=1;m.clearcoatRoughness=gls?.03:.05}GL.mats.add(m)}
++function GL_apply(){if(!GL.on||!scene.environment)return;const k=GL_key();if(!GL.tex||GL.id!==k&&(GL.C.has(k)||k.split('|')[0]!==GL.id.split('|')[0]||k.slice(-1)!==GL.id.slice(-1)||performance.now()-GL.tb>GL.dt))GL_env();const ei=GL.P.ek;
+   if(HUB&&HUB.cim)for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const m of[].concat(im.material))GL_set(m,ei)}
+   if(typeof pl!=='undefined'&&pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))GL_set(m,ei)})}
+-function GL_off(){for(const m of GL.mats){const o=m.userData.gl0;m.envMap=scene.environment;if(o){m.envMapIntensity=o[0];if(o[1]!=null)m.clearcoatRoughness=o[1]}}GL.mats.clear()}
++function GL_off(){for(const m of GL.mats){const o=m.userData.gl0;m.envMap=scene.environment;if(m.envMapRotation)m.envMapRotation.y=0;if(o){m.envMapIntensity=o[0];if(o[1]!=null)m.clearcoatRoughness=o[1]}}GL.mats.clear();GL.ry=NaN}
+ // ART10_cars (every 500 ms in roam) re-points car paint at scene.environment and caps it: run after it, same cadence
+ ART10_cars=(f=>function(){const r=f.apply(this,arguments);try{GL_apply()}catch(e){}return r})(ART10_cars);
+ // GO why/glossy: paint on player + traffic carries the studio env with clearcoat; material + program counts unchanged (±2) after switching it on;
+diff --git a/src/98gx_gfx.js b/src/98gx_gfx.js
+index de057c5..eb29dff 100644
+--- a/src/98gx_gfx.js
++++ b/src/98gx_gfx.js
+@@ -80,7 +80,7 @@ function GFX_ao2(m){if(m.userData.gfxAo)return;m.userData.gfxAo=1;const ob=m.onB
+  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);if(!sh.fragmentShader.includes('vLkW'))return;sh.uniforms.uGfxG=GFX.G;
+   sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform vec4 uGfxG;\nvoid main() {').replace('#include <lights_fragment_end>','#include <lights_fragment_end>\n{float gh=vLkW.y-uGfxG.x;float ga=mix(.42,1.,smoothstep(0.,1.8,gh));ga=mix(ga,1.,smoothstep(45.,75.,length(vLkW.xz-uGfxG.yz))*uGfxG.w+(1.-uGfxG.w));reflectedLight.indirectDiffuse*=ga;reflectedLight.directDiffuse*=mix(1.,ga,.55);}')};
+  m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|gfxao'};m.needsUpdate=true}
+-function GFX_room(){if(GFX.room)return GFX.room;try{const pm=new THREE.PMREMGenerator(renderer);GFX.room=pm.fromScene(new RoomEnvironment(),.04).texture;pm.dispose()}catch(e){GFX.room=scene.environment}return GFX.room}
++function GFX_room(){if(LTEX)return scene.environment;/* lowmem-r24h: the low tier shares the mood env (no 6 MB studio PMREM) */if(GFX.room)return GFX.room;try{const pm=new THREE.PMREMGenerator(renderer);GFX.room=pm.fromScene(new RoomEnvironment(),.04).texture;pm.dispose()}catch(e){GFX.room=scene.environment}return GFX.room}
+ // stock GTAOPass (three r164 addon) after the RenderPass, PC high tier by day only: contact shadows where bricks meet the street and in corners.
+ // It re-renders scene normals/depth, so it costs one extra geometry pass: never on med/phone.
+ // measured (Athens, high): +~720 draw calls per frame (1229 vs 510) for its normal pass: opt-in only (?ao=1 or localStorage mho_gfxao=1)
+diff --git a/src/99c4_mem.js b/src/99c4_mem.js
+index 4244071..72a5751 100644
+--- a/src/99c4_mem.js
++++ b/src/99c4_mem.js
+@@ -9,15 +9,15 @@ function MEM1_go(kind,say){const ok=b=>b?' ✅':' ❌';
+  // reload-r25d (Alex 25 Oct, iPhone: "The game refreshed 5 times in 5 minutes while I was playing"): no code path reloads in roam, so the reload was iOS killing the tab
+  // for memory (Safari reloads it). no-reload: 5 min of mixed play (drive + steer, 2 warps, 1 race with the bot), sampled every 20 s game time;
+  // asserts 0 page unloads, GPU texture MB after 60 s grows <= MEM1_TEXG, and the heap + GPU estimate high-water stays <= MEM1_CAP (phone profile).
+- if(kind==='no-reload'){const N=5*60*30,R={hw:0,un:0,n:0},MB=x=>Math.round(x/1048576),hrf=location.href,un=()=>{R.un++},mx=()=>{const s=MEM1_smp(),e=Math.round(s.heap+(MEM_GPU.est?MEM_GPU.est():s.gpu));if(e>R.hw)R.hw=e;R.n++;return MB(MEM_GPU.tb)};
++ if(kind==='no-reload'){const N=5*60*30,R={hw:0,un:0,n:0},MB=x=>Math.round(x/1048576),hrf=location.href,un=()=>{R.un++},mx=()=>{const s=MEM1_smp(),e=Math.round(s.heap+(MEM_GPU.est?MEM_GPU.est():s.gpu));if(e>R.hw){R.hw=e;const G=MEM_GPU,c=renderer.domElement;R.at={i,heap:s.heap,buf:MB(G.bb),tex:MB(G.tb),rb:MB(G.rbb||0),mip:MB(G.mxb||0),cv:MB(c.width*c.height*12)}}R.n++;return MB(MEM_GPU.tb)};
+   addEventListener('pagehide',un);addEventListener('beforeunload',un);let i=0,sp=null,bot=null;const warp=()=>{const q=rfSnap(RO.x+(Math.random()-.5)*2400,RO.z+(Math.random()-.5)*2400,300);if(q)roamWarp(q[0],q[1],q[2]||0,true);RO.v=0};
+   const step=()=>{for(let n=0;n<150&&i<N;n++,i++){if(i===Math.round(N*.25)||i===Math.round(N*.5))warp();
+     if(i===Math.round(N*.7))try{const mk=tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p));tkStart(mk,TK_C);sp=RO.sp;sp.cd=0;bot=tkBot(tkGeoOf(TK_C).pA,{lag:.15})}catch(e){sp=null}
+     if(i===Math.round(N*.85)&&sp){try{$('#spRes').hidden=true}catch(e){}RO.fin=false;if(RO.sp===sp)try{sprintEnd()}catch(e){}sp=null}
+     if(sp&&RO.sp===sp)bot(sp);else{K.ArrowUp=true;K.ArrowLeft=((i/90|0)%3===0)}roamStep(1/30);if(i%600===0){MEM1_draw();const t=mx();if(i===1800)R.t60=t}}
+    if(i<N){setTimeout(step,0);return}
+-   K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;MEM1_draw();R.tz=mx();removeEventListener('pagehide',un);removeEventListener('beforeunload',un);const rl=R.un+(location.href!==hrf?1:0),tg=R.tz-(R.t60|0),env=typeof GL!=='undefined'?GL.C.size+' cached / '+GL.n+' built':'n/a';window.__chk.noreload=R;
+-   say('📍 NO RELOAD · 5 min mixed play'+(LOWMEM?' (low-mem tier)':'')+' · page reloads '+rl+' · GPU textures at 60 s '+R.t60+' → end '+R.tz+' MB (+'+tg+' ≤ '+MEM1_TEXG+') · heap + GPU high-water '+R.hw+' MB ≤ '+MEM1_CAP+' · car envs '+env+ok(rl===0&&tg<=MEM1_TEXG&&R.hw>0&&R.hw<=MEM1_CAP))};
++   K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;MEM1_draw();R.tz=mx();removeEventListener('pagehide',un);removeEventListener('beforeunload',un);let st=0;if(typeof GL!=='undefined'&&GL.fr)scene.traverse(o=>{for(const q of[].concat(o.material||[]))if(q&&q.envMap&&GL.fr.has(q.envMap))st++});const rl=R.un+(location.href!==hrf?1:0),tg=R.tz-(R.t60|0),env=typeof GL!=='undefined'?GL.C.size+' cached / '+GL.n+' built':'n/a';window.__chk.noreload=R;
++   say('📍 NO RELOAD · 5 min mixed play'+(LOWMEM?' (low-mem tier)':'')+' · page reloads '+rl+' · GPU textures at 60 s '+R.t60+' → end '+R.tz+' MB (+'+tg+' ≤ '+MEM1_TEXG+') · heap + GPU high-water '+R.hw+' MB ≤ '+MEM1_CAP+' (at peak: '+JSON.stringify(R.at||{})+') · materials on a freed env '+st+' · car envs '+env+ok(rl===0&&st===0&&tg<=MEM1_TEXG&&R.hw>0&&R.hw<=MEM1_CAP))};
+   setTimeout(step,0);return'📍 NO RELOAD · 5 min scripted play…'}
+  if(kind==='tier'){const ios='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',pc='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36',pad='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15';
+   const a=LOWMEM_is(ios,5,null),p=LOWMEM_is(pad,5,null),b=!LOWMEM_is(pc,0,null),m=!LOWMEM_is(pad,0,null),c=!LOWMEM_is(ios,5,'0'),pr=renderer.getPixelRatio(),d=!LOWMEM||pr<=1.5+1e-6&&!!TUNE.memFree;
+diff --git a/src/99c7_rev5fix.js b/src/99c7_rev5fix.js
+index a8566e4..9666628 100644
+--- a/src/99c7_rev5fix.js
++++ b/src/99c7_rev5fix.js
+@@ -800,6 +800,19 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
+  const go=c=>()=>{run(c).then(r=>goSay(r));return'📍 iOS REVEAL · booting '+c+' throttled…'};
+  C.GO['perf/ios-reveal']=[{c:'fra',n:'iPhone reveal (Frankfurt)',fn:go('fra'),secs:300}];C.GO['perf/ios-reveal-ath']=[{c:'ath',n:'iPhone reveal (Athens)',fn:go('ath'),secs:300}]}return}
+  if(i<600)setTimeout(()=>R20F_reg(i+1),100)})(0);
++// lowmem-r24h: GO perf/lowmem (plan lane 1). State asserts: the low-memory switch is on for the iPhone UA, iPad-as-Mac, deviceMemory <= 4, off for a PC with 8 GB, ?low=0 wins;
++// this page (phone profile) has it on with half-size canvas textures; then boots the city twice in an iframe (?low=1 vs ?low=1&ltex=0) and compares MEM_GPU.est(): drop >= 30 %.
++(function LM24_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='lowmem')){
++ C.items.push({ver:'perf',id:'lowmem',area:'perf',text:'lowmem-r24h · Low-memory phone profile: 📍 GO checks the switch (iPhone/iPad UA, deviceMemory ≤ 4, ?low=1|0) and boots the city twice in an iframe: GPU memory estimate with the profile ≥ 30 % below the same boot with ?ltex=0 (before r24h: Frankfurt 173 MB, Athens 138 MB).'});
++ const boot=async(c,q)=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;z-index:99999';f.src=location.pathname+'?test='+c+'&draw=0&low=1'+q;document.body.appendChild(f);
++  try{const t0=performance.now();let w=null;while(performance.now()-t0<240000){await new Promise(r=>setTimeout(r,1000));try{w=f.contentWindow}catch(e){}if(w&&w.__tq&&w.__tq.ready)break}
++   if(!w||!w.__tq||!w.__tq.ready)return null;w.__tq.draw();await new Promise(r=>setTimeout(r,500));return w.MEM_GPU.est()}finally{f.remove()}};
++ const run=async c=>{const ios='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',pc='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36',mac='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15';
++  const sw=LOWMEM_is(ios,5,null,0)&&LOWMEM_is(mac,5,null,0)&&LOWMEM_is(pc,0,null,4)&&!LOWMEM_is(pc,0,null,8)&&!LOWMEM_is(ios,5,'0',0)&&LOWMEM_is(pc,0,'1',8),ph=/iPhone/.test(navigator.userAgent),pg=!ph||LOWMEM&&LTEX&&LTEX_st.n>0;
++  const lo=await boot(c,''),hi=await boot(c,'&ltex=0'),d=lo&&hi?Math.round((1-lo/hi)*100):-1,ok=sw&&pg&&d>=30;
++  return`📍 LOW-MEM PROFILE ${c} · switch (iPhone, iPad, ≤ 4 GB on, 8 GB PC off, ?low=0 wins) ${sw?'✓':'✗'} · this page ${LOWMEM?'ON':'off'}${ph?' (iPhone UA)':''}, ${LTEX_st.n} half-size textures (-${Math.round(LTEX_st.saved*4/3/1048576)} MB) ${pg?'✓':'✗'} · GPU estimate ${lo} MB vs ${hi} MB without = -${d} % (≥ 30 %) ${ok?'✅ PASS':'❌ FAIL'}`};
++ C.GO['perf/lowmem']=['fra','ath'].map(c=>({c,n:'low-memory profile '+c,secs:300,fn:()=>{run(c).then(r=>goSay(r),e=>goSay('📍 LOW-MEM PROFILE · threw '+String(e&&e.message).slice(0,80)+' ❌ FAIL'));return'📍 LOW-MEM PROFILE · booting '+c+' twice…'}}))}return}
++ if(i<600)setTimeout(()=>LM24_reg(i+1),100)})(0);
+ // ios-r21f: GO perf/prewarm-default. State asserts on PREW_decide (no graphics): no db (live site) -> OFF; db (Beta page) -> ON, then OFF, then ON (per-device alternation, localStorage od_prew_arm, first run ON);
+ // ?prewarm=0 forces OFF and ?prewarm=1 forces ON whatever the db; the arm lands in the session doc as prewArm and doc.prew carries {ran,abortedAtMs,programs,ms}.
+ (function R21F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='prewarm-default')){
+diff --git a/src/99c_checklist.js b/src/99c_checklist.js
+index 5bdbabc..6f8aa05 100644
+--- a/src/99c_checklist.js
++++ b/src/99c_checklist.js
+@@ -660,7 +660,7 @@ function RP_scan(){const bld=[],tall=[],lane=[];(RO.ramps||[]).forEach((r,i)=>{c
+  GO['debris1/float']=['fra','ath'].map(c=>({c,n:'leafy park, no floating bricks',fn:()=>{if(!CVF_park())return'📍 DEBRIS · no park found ❌';const s0=HUB.smashed;setTimeout(()=>{const cp=camera.position;let fl=0,ex='';for(const p of HUB.props)if(p.alive!==false&&CVF_RX.test(p.t)&&Math.hypot(p.x-RO.x,p.z-RO.z)<80&&p.y>groundY(p.x,p.z)+2){fl++;ex=ex||p.t}const deb=DEB?DEB.list.filter(d=>d.p.distanceTo(cp)<60).length:0,sm=HUB.smashed-s0,ok=fl===0&&sm===0&&deb===0;goSay(`📍 DEBRIS: ${sm} smashes on warp, ${deb} live bricks, ${fl} floating foliage props${ex?' ('+ex+')':''} → ${ok?'✅ PASS':'❌ FAIL'}`)},2500);return'📍 DEBRIS · measuring 2.5 s…'}}));
+  GO['debris1/float']=GO['debris1/float'].concat(['fra','ath'].map(c=>({c,n:'smash debris + race: small, gone in 1.5 s',fn:()=>{const at=V3(RO.x,groundY(RO.x,RO.z)+3,RO.z),g=groundY(RO.x,RO.z);debris(at,V3(0,26,0),40,[new THREE.Color('#2e9b3a'),new THREE.Color('#222'),new THREE.Color('#e8302a')],3,g);let big=0;for(const d of DEB.list)big=Math.max(big,d.s.x*1.6,d.s.y*1.6,d.s.z*1.6);setTimeout(()=>{const hi=DEB.list.filter(d=>d.p.y>groundY(d.p.x,d.p.z)+3).length,left=DEB.list.length;goSay(`📍 DEBRIS smash: 40 pieces, largest ${big.toFixed(2)} m, after 2 s ${left} alive / ${hi} above 3 m → ${big<=1.5&&hi===0?'✅ PASS':'❌ FAIL'}`)},2100);return'📍 DEBRIS · smash burst, measuring 2.1 s…'}})));
+  GO['tr1/models']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt trees':'Athens trees',fn:()=>window.__tr1&&__tr1.go?__tr1.go():'📍 PENDING · trees still loading'}));
+- for(const k of['stable','tier','ath-boot','no-reload'])GO['mem/'+k]=[{c:k<'b'?'ath':'fra',n:k,secs:k<'t'?900:10,fn:()=>(XC_need('99c4_mem').then(()=>{const r=MEM1_go(k,goSay);if(r)goSay(r)}),'📍 mem '+k+'…')}];
++ for(const k of['stable','tier','ath-boot','no-reload'])GO['mem/'+k]=(k==='no-reload'?['fra','ath']:[k<'b'?'ath':'fra']).map(c=>({c,n:k,secs:k<'t'?900:10,fn:()=>(XC_need('99c4_mem').then(()=>{const r=MEM1_go(k,goSay);if(r)goSay(r)}),'📍 mem '+k+'…')}));
+  for(const k of['racepop','finish','pos'])GO['rv2k3/'+k]=[{c:'fra',n:k,secs:120,fn:()=>(XC_need('99c3_rv3c').then(()=>RV3C_go(k,goSay)),'📍 '+k+'…')}];
+  for(const c of['fra','ath']){GO['cvf1/audit']=(GO['cvf1/audit']||[]).concat([{c,n:'start spot',fn:()=>'📍 CVF AUDIT '+JSON.stringify(__cvf.audit(150))}]);GO['cvf1/mix']=(GO['cvf1/mix']||[]).concat([{c,n:'leafiest park',fn:()=>{if(!CVF.on)return'📍 PENDING · foliage mix is OFF (TUNE.cvFol=0; add ?cvf=1)';const k=CVF_park();if(!k)return'📍 CVF MIX · no park found ❌';const a=CVF_audit(150),ok=a.heights>=4&&a.topShare<=.3&&a.beds>=30;return`📍 CVF MIX: ${a.foliageNear} trees/bushes within 150 m, ${a.foliageLooks} looks, top look ${Math.round(a.topShare*100)} %, ${a.heights} heights, ${a.beds} tree pits ${ok?'✅':'❌'}`}}])}
+  for(const c of['fra','ath'])GO['bv1/'+c]=[{c,fn:()=>BV.on?BV_go():'📍 PENDING · building variety is OFF (?bv=0)',n:'busiest street'}];
+diff --git a/src/assets/as/code.js b/src/assets/as/code.js
+index c16691f..3f9ead1 100644
+--- a/src/assets/as/code.js
++++ b/src/assets/as/code.js
+@@ -169,7 +169,7 @@ function AS_far(L){const M=new THREE.Matrix4(),dirty=new Set();for(const p of L)
+ // (cell/255), so the city's per-tile prop meshes keep one geometry + one material per base type and AS_far just writes the cell per instance.
+ const AS_IP=.04,AS_IE=22;// cell padding (uv); capture elevation (deg): from the side the flat leaf plates are edge-on slivers
+ function AS_impAtlas(){const V=ASSET.V,L=Object.values(V).filter(v=>v.cls!=='keep');if(ASSET.imp&&ASSET.imp.city===ASSET.city&&ASSET.imp.n===L.length)return ASSET.imp;
+- const R=renderer,S=256,rt=new THREE.WebGLRenderTarget(S*4,S*4,{generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter,magFilter:THREE.LinearFilter}),sc=new THREE.Scene(),cam=new THREE.OrthographicCamera(-1,1,1,0,-200,200);ASSET.mat=ASSET.mat||new THREE.MeshStandardMaterial({vertexColors:true,roughness:.32,metalness:0});
++ const R=renderer,S=typeof LTEX!=='undefined'&&LTEX?128:256/* lowmem-r24h: 512 px atlas on the low tier (far impostors, -4 MB) */,rt=new THREE.WebGLRenderTarget(S*4,S*4,{generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter,magFilter:THREE.LinearFilter}),sc=new THREE.Scene(),cam=new THREE.OrthographicCamera(-1,1,1,0,-200,200);ASSET.mat=ASSET.mat||new THREE.MeshStandardMaterial({vertexColors:true,roughness:.32,metalness:0});
+  sc.add(new THREE.HemisphereLight(0xdfefff,0x55603a,1.6));const sun=new THREE.DirectionalLight(0xfff2dd,2.4);sun.position.set(.5,1,.9);sc.add(sun);const ms=new THREE.Mesh(undefined,ASSET.mat);sc.add(ms);
+  const pr=R.getRenderTarget(),cc=R.getClearColor(new THREE.Color()),ca=R.getClearAlpha(),ac=R.autoClear,sh=R.shadowMap.autoUpdate;R.autoClear=false;R.shadowMap.autoUpdate=false;const TD=typeof TQ!=='undefined'&&TQ?TQ:null,d0=TD&&TD.draw;if(TD)TD.draw=1;// &draw=0 test pages block renderer.render unless TQ.draw
+  L.forEach((v,i)=>{v.cell=i;const cx=(i%4)*S,cy=Math.floor(i/4)*S,p=Math.round(AS_IP*S);ms.geometry=v.gm;const e=AS_IE*Math.PI/180;cam.position.set(0,Math.sin(e)*50,Math.cos(e)*50);cam.lookAt(0,0,0);cam.updateMatrixWorld();let y0=1e9,y1=-1e9;
+diff --git a/tools/perf/lowmem.js b/tools/perf/lowmem.js
+new file mode 100644
+index 0000000..bd43514
+--- /dev/null
++++ b/tools/perf/lowmem.js
+@@ -0,0 +1,16 @@
++// lowmem-r24h: phone-profile memory + frame probe on a BUILT page (plan lane 1). node tools/perf/lowmem.js <page url> <fra|ath> [extra query, e.g. low=0] [shot.jpg]
++// iPhone UA, 852x393 touch, DPR 3. Boots ?test=<city>&draw=0, settles 10 s game time, then reads JS heap (after gc) + MEM_GPU.est() (buffers + textures + mips + render buffers + canvas)
++// + renderer.info; then 6x CPU and drives a fixed route 30 s (900 x 1/30 s, roamStep + one real composer frame each) -> median / p95 frame ms. One JSON line.
++const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,C,XQ,SHOT]=process.argv.slice(2);
++const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
++(async()=>{const b=await chromium.launch({args:['--js-flags=--expose-gc','--enable-precise-memory-info','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
++ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:UA});const p=await ctx.newPage();p.setDefaultTimeout(900000);const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));
++ await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test='+(C||'fra')+'&draw=0'+(XQ?'&'+XQ:''));await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:300000});
++ const ev=s=>p.evaluate(s=>__xc.ev(s),s);
++ await ev(`window.__LM={mem(){try{gc();gc()}catch(e){}const i=renderer.info,G=MEM_GPU;return{low:!!LOWMEM,heap:Math.round(performance.memory.usedJSHeapSize/1048576),gpu:MEM_GPU.est(),texMB:+((G.tb+G.mxb)/1048576).toFixed(1),bufMB:+(G.bb/1048576).toFixed(1),rbMB:+(G.rbb/1048576).toFixed(1),cv:renderer.domElement.width+'x'+renderer.domElement.height,geo:i.memory.geometries,tex:i.memory.textures,sh:!!renderer.shadowMap.enabled,cars:(HUB.cars||[]).filter(c=>!c.dead).length}},
++  drive(n,draw){const ms=[];let calls=0;K.ArrowUp=true;for(let i=0;i<n;i++){K.ArrowLeft=((i/90|0)%4===1);K.ArrowRight=((i/90|0)%4===3);const t=performance.now();roamStep(1/30);if(draw){__tq.draw();calls+=renderer.info.render.calls}ms.push(performance.now()-t)}K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;ms.sort((a,b)=>a-b);return{med:+ms[n>>1].toFixed(1),p95:+ms[Math.floor(n*.95)].toFixed(1),calls:Math.round(calls/Math.max(1,n))}}}`);
++ await ev('__LM.drive(300,0)');await p.evaluate(()=>__tq.draw());const m=await ev('__LM.mem()');
++ if(SHOT)await p.screenshot({path:SHOT,type:'jpeg',quality:80});
++ const cdp=await ctx.newCDPSession(p);await cdp.send('Emulation.setCPUThrottlingRate',{rate:6});
++ const f=await ev('__LM.drive(900,1)');await cdp.send('Emulation.setCPUThrottlingRate',{rate:1});const m2=await ev('__LM.mem()');
++ console.log(JSON.stringify({city:C,q:XQ||'',...m,heapEnd:m2.heap,gpuEnd:m2.gpu,...f,errs:errs.slice(0,3)}));await b.close()})();

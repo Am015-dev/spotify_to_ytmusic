@@ -1,0 +1,15 @@
+// memp.js <builddir> <city> [tag]: mem/no-reload on the phone profile (iPhone UA, 852x393 touch, dpr 3, 6x CPU), built page. Prints the GO line + env rebuild stats.
+const {chromium}=require('/opt/node22/lib/node_modules/playwright'),http=require('http'),fs=require('fs'),path=require('path');
+const [DIR,C,TAG='']=process.argv.slice(2);
+const serve=dir=>new Promise(res=>{const T={'.html':'text/html','.js':'text/javascript','.json':'application/json'};const s=http.createServer((q,r)=>{let f=path.join(dir,decodeURIComponent(q.url.split('?')[0]));if(f.endsWith('/'))f+='index.html';fs.readFile(f,(e,b)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'content-type':T[path.extname(f)]||'application/octet-stream'});r.end(b)})}).listen(0,'127.0.0.1',()=>res([s,s.address().port]))});
+(async()=>{const[srv,port]=await serve(path.resolve(DIR));const b=await chromium.launch({proxy:{server:process.env.HTTPS_PROXY,bypass:'127.0.0.1,localhost'},args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info','--js-flags=--expose-gc']});
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+ await ctx.addInitScript(()=>{const st0=window.setTimeout;window.setTimeout=function(f,d,...a){if(d===120000&&typeof f==='function'&&/clearInterval\(iv\)/.test(String(f)))d=1800000;return st0.call(window,f,d,...a)}});const p=await ctx.newPage();const EV=(fn)=>p.evaluate(c=>__xc.ev(c),'('+fn.toString()+')()');p.setDefaultTimeout(2400000);const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));
+ await p.goto('http://127.0.0.1:'+port+'/index.html?test='+C+'&draw=0'+(process.env.Q||''));await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:900000});
+ const cdp=await ctx.newCDPSession(p);await cdp.send('Emulation.setCPUThrottlingRate',{rate:6});
+ await EV(()=>{const R=window.__rev={keys:[],n0:GL.n};const e0=GL_env;GL_env=function(){const n=GL.n,r=e0();if(GL.n>n)R.keys.push(GL.id);return r}});
+ const line=await EV(()=>new Promise(res=>XC_need('99c4_mem').then(()=>{const r=MEM1_go('no-reload',s=>{if(/[✅❌]/.test(s))res(s)});if(r&&/[✅❌]/.test(r))res(r)})));
+ const st=await EV(()=>({reb:GL.n-__rev.n0,keys:__rev.keys.slice(0,8)}));
+ if(process.env.SHOT){await cdp.send('Emulation.setCPUThrottlingRate',{rate:1});await EV(()=>{for(let i=0;i<60;i++){K.ArrowUp=true;roamStep(1/30)}K.ArrowUp=false;for(let i=0;i<20;i++)roamStep(1/30);GL_apply();__tq.draw();__tq.draw()});await p.screenshot({path:process.env.SHOT,type:'jpeg',quality:80,scale:'css'})}
+ console.log(TAG+' '+C+' '+line.replace(/^📍 /,'').slice(0,600));console.log(TAG+' '+C+' envRebuilds5min='+st.reb+' keys='+JSON.stringify(st.keys)+' errs='+errs.length+(errs[0]?' '+errs[0]:''));
+ await b.close();srv.close()})().catch(e=>{console.log('ERR '+e);process.exit(1)});
