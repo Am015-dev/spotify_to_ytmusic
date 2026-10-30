@@ -8,10 +8,12 @@ const BOOT2G=!/[?&]boot2g=0/.test(location.search);// ground/Autobahn deferral, 
 const B2={q:[],on:false,defer:false,ms:{},t0:0,done:0};
 function B2_slice(gen,first){if(first)B2.q.unshift(gen);else B2.q.push(gen)}
 // perf-2: slice 4 ms (was 8) and never past the idle deadline, so an idle slice cannot push the next frame out (B2_pump was 6 s in 20 s of driving)
-function B2_pump(dl){if(!B2.q.length){B2.on=false;B2.done=performance.now();return}const t=performance.now(),B=Math.max(1.5,Math.min(4,dl&&dl.timeRemaining&&!dl.didTimeout?dl.timeRemaining()-1:4));
-  try{while(B2.q.length&&performance.now()-t<B){const g=B2.q[0];let r;try{r=g.next()}catch(e){console.error(e);r={done:true}}if(r.done)B2.q.shift()}}catch(e){console.error(e)}
+function B2_pump(dl){const T=B2.tb;if(!B2.q.length&&!T){B2.on=false;B2.done=performance.now();return}const t=performance.now(),B=Math.max(1.5,Math.min(4,dl&&dl.timeRemaining&&!dl.didTimeout?dl.timeRemaining()-1:4));
+  try{/* tb1b: the tiled city build (B2.tb) is not queued behind the boot generators: it takes half of every slice (all of it once they are done), the generators keep the other half */
+    if(T){const tm=B2.q.length?B/2:B,t1=performance.now();do{let r;const s0=performance.now();try{r=T.next()}catch(e){console.error(e);r={done:true}}if(typeof TB!=='undefined')TB_step(performance.now()-s0);if(r.done){B2.tb=null;break}}while(performance.now()-t1<tm)}
+    let first=!!T&&!!B2.q.length;while(B2.q.length&&(first||performance.now()-t<B)){first=false;const g=B2.q[0];let r;try{r=g.next()}catch(e){console.error(e);r={done:true}}if(r.done)B2.q.shift()}}catch(e){console.error(e)}
   (window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:60}):requestAnimationFrame)(B2_pump)}
-function B2_start(){if(B2.on||!B2.q.length)return;B2.on=true;B2.t0=performance.now();requestAnimationFrame(()=>requestAnimationFrame(B2_pump))}
+function B2_start(){if(B2.on||!(B2.q.length||B2.tb))return;B2.on=true;B2.t0=performance.now();requestAnimationFrame(()=>requestAnimationFrame(B2_pump))}
 if(BOOT2){
   // (1) deferred city pieces: each one gets its own batch so the start district's batch flushes without them
   for(const nm of['worldGroundBuild','abBuild']){const f=nm==='abBuild'?abBuild:worldGroundBuild;const w=function(grp,bt,BM,M){if(!B2.defer)return f.apply(this,arguments);const a=arguments;

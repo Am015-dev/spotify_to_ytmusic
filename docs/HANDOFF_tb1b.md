@@ -1,0 +1,6 @@
+# HANDOFF tb1b (2026-10-30): tb1 round 2, ?tb1 stays default OFF
+- Done: TB has its own slot in B2_pump (B2.tb, half of every 4 ms slice; before: 3rd generator in B2.q, never ran in a real boot). Queue re-sorts by the car's current position about every second (rank 1-5) and picks the nearest unbuilt tile group each time (rank 6). Kerb-run planner for deferred filler roads now runs at the original time (roadK in src/60_city_build4.js; only the kerb geometry is deferred), so the order-dependent kerb pieces (z 229, x 1209) are gone.
+- GO perf/tb-geo now boots a second ?tb1=0 page and compares hashes: ON 790269a7/288 = OFF 790269a7/288. New GO perf/tb-play (real title -> PLAY in an iframe, 6x after the reveal window): control -> TB.fin 137.9 s (bar 15 s) FAIL, longest queue step 738 ms (bar 100) FAIL. Queue steps now run; the bar is not met.
+- Why: the queue is 14.4 s of pure CPU at 6x (TB_drain under THROTTLE=6), so 15 s incl. the 4 s delay cannot be met by scheduling alone; in a real boot software-GL frames take the rest. Needs less work before fin (tb2/tb3 move more to R0 reduction) or a bar set per CPU cost; a single tile flush (mergeGeometries) is the 738 ms step, split it.
+- Not done: Athens ON/OFF numbers (tb1 is Frankfurt-only: no change), gauntlet toControl re-measure.
+- Gates: unit 0 FAIL; tb-geo PASS; life1,xf1,terrain: see message.
