@@ -53,6 +53,17 @@ Output: one table on stdout (`PASS|FAIL|INFO row number bar`) and `docs/shots/ga
 
 Shots (`docs/shots/gauntlet/<ver>/`): title, first control, street at speed, each hit, a drift, walls, pause, mission card, mission HUD, mission end, race menu, race start, race finish, Athens. **Look at every one**; anything sloppy you see (floating objects, clutter, text over controls, black or empty frames) goes into the report's "Seen in the shots" list as a row.
 
+## boot/toControl: what the lab number means (boot-r30e, 2026-10-30)
+Measured with `node tools/perf/boottoctl.js out/<ver> --throttle <k> [--prof]` (same profile as the gauntlet boot: iPhone UA, 852x393 touch, dpr 2, software GL, real title -> PLAY tap; prints the phase table from the game's own `BMK` marks, network after the tap, rAF gaps, and the beacon's `bootMs`).
+
+**Profiles, trunk d094be2 (PLAY -> control):** unthrottled 39.1 s (a 2nd run 32.3 s) · 4x CPU 58.0 s · 6x CPU 84.9 s (gauntlet run: 106 s). From 1x to 6x the time grows only ~46 s, so **~30 s of the lab boot does not scale with the CPU**: it is the software-GL GPU process (pipeline builds and raster under `readPixels`/`getProgramParameter`, 7.4 s + 1.2 s self at 1x) and frames waited on. CDP throttling slows only the page's main thread, never swiftshader. 4x is not a closer iPhone stand-in: the lab boot is GPU-bound, not JS-bound.
+
+**Split at 1x (instrumented trunk):** city build `buildHubG` ~16 s · the start-view renders under the curtain (R17_off, one 7.5 s task) · program compile + prewarm ("Painting the sky") 1.6 s · roamPre/setupRace ("Warming up the engine") 1.4 s · far-street merge 0.8 s · download after the tap 0 s that matters (2.75 MB, all from the local server/cache, done before the city is). At 6x the city build is ~51 s of the total.
+
+**Lab vs a real iPhone (same build, paired):** Alex's iPhone (Apple GPU, beacon `boot` docs in the Beta perf db) booted beta.142-151 Frankfurt in 12.3-12.8 s from page open to the first drivable frame (beta.151: 12.6 s; this includes his own pause on the title). The same beta.151 deploy (live branch ce32c021) in the lab: 90.3 s at 6x, 36.7 s at 1x (PLAY -> control 73.2 s / 27.3 s). **Lab 6x ≈ 7.2x an iPhone; lab 1x ≈ 2.9x.** The iPhone pause on the title makes these ratios a lower bound (the phone is at least this much faster).
+
+**So the old bar (8 s at 6x) means ~1.1 s on an iPhone** — stricter than Hit & Run and not reachable while the lab rasterises in software. **Proposed bar (needs the coordinator):** "an iPhone player drives within 5 s of PLAY" = **boot/toControl <= 36 s lab at 6x** (5 s x 7.2), with an unthrottled companion <= 15 s (5 s x 2.9). Today: ~76 s at 6x ≈ 10.5 s on the phone. Re-pair the ratio when a new iPhone `boot` doc lands (`ArtifactData query perf kind==boot`, compare with `boottoctl.js` on that deploy).
+
 ## Adding or tightening a row (fix lanes)
 - A fix lane starts from the FAIL row that names its bug (rule 13): run `--only <part>` on the live build, see the row FAIL, fix the game, see it PASS on the built page.
 - New row: add a `row(id, what, number, bar, pass, shot, note)` call in the matching `sc*` function. Input must go through `Player.down/up/set/tapSel/tapText`; reads through `__GH.read/cars/car/marks` or a new read-only helper in `HARNESS`. A helper that writes anything the game reads is not allowed.
