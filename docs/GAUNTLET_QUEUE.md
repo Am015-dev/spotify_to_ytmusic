@@ -66,3 +66,8 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - Done: links-r30i 8b3eca7 (phone reveal links 0: fra 5/5, ath 3/3; TWG_late under the curtain, ~1 s at 6x) → needs OPUS review after tb1's. size-r30k a28ed13 (245 old changelog entries → docs archive, page 3.44 MB; unit green) → small, ships on green gates (rule 17).
 - Running: review-r30-11 (tb1, can ?tb1 default ON), reload-r30l (SONNET, Athens self-reload at quest START), touchdrive-r30m (SONNET, round 4: re-apply + 3 items).
 - beta.165 = gui, traffic, boot-r30e/g, jserr, size, links (if review PASS), tb1 ON (if review says so).
+
+## 30 Oct ~18:45
+- tb1 PASS behind ?tb1 (REVIEW_2K_37: ON 56-57 s vs OFF 76.5 s) but NOT default ON: TB queue starves behind 2 boot generators on a real PLAY boot (control+40 s: 180/660 cells), tb-geo never compares with OFF, queue not re-sorted by car position. tb1 round 2 (SONNET) at the next free worker slot; rule 11 clock runs from 30 Oct.
+- Trunk gauntlet crashes after the drive rows on CRB_side (removed by revert 4d432e4); touchdrive-r30m was told to restore it and guard the tool.
+- review-r30-12 (OPUS, session_01RR7mnb9MABLLVF1xF2sLyD): links-r30i + size-r30k.
