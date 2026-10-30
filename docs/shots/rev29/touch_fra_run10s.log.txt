@@ -1,0 +1,32 @@
+fra touch bd35 {"dEn":0.317,"vEn":25,"s3":0.35,"s5":0.367,"s10":0.433,"yaw15":0.3,"driftF":72,"slip":40,"turn":130,"kmh":50,"lunges":0,"tr":"34/0 33/0 31/0 29/1 27/1 25/1 25D/4 25D/9 26D/13 27D/17 28D/21 29D/25 30D/28 31D/32 33D/35 34D/38 35D/40 37D/40 38D/40 39D/40 40D/40 42D/40 43D/40 44D/40"}
+fra touch bd50 {"dEn":0.317,"vEn":40,"s3":0.333,"s5":0.367,"s10":0.417,"yaw15":0.283,"driftF":72,"slip":40,"turn":132,"kmh":58,"lunges":0,"tr":"49/0 48/0 46/1 44/1 42/1 40/1 40D/5 40D/10 40D/15 41D/20 42D/24 43D/28 44D/32 45D/35 46D/38 47D/40 48D/40 49D/40 49D/40 50D/40 51D/40 52D/40 53D/40 54D/40"}
+fra touch gbd50 {"dEn":0.517,"vEn":42,"s3":0.533,"s5":0.567,"s10":0.617,"yaw15":0.383,"driftF":62,"slip":40,"turn":117,"kmh":57,"lunges":0,"tr":"50/0 50/0 51/0 52/0 51/0 49/0 48/1 46/1 44/1 42/1 42D/5 42D/10 42D/15 43D/20 43D/24 44D/28 45D/32 46D/35 47D/38 48D/40 49D/40 50D/40 51D/40 51D/40"}
+fra touch bk50 {"dEn":-1,"vEn":-1,"s3":-1,"s5":-1,"s10":-1,"yaw15":-1,"driftF":0,"slip":0,"turn":0,"kmh":38,"lunges":0,"tr":"49/0 48/0 46/0 44/0 42/0 40/0 38/0 36/0 34/0 32/0 30/0 28/0 26/0 24/0 22/0 20/0 18/0 16/0 14/0 12/0 10/0 8/0 6/0 4/0"}
+fra touch tapNoGas100@40 {"driftF":0,"slip":1,"kmh":29}
+fra touch tapNoGas200@40 {"driftF":0,"slip":1,"kmh":25}
+fra touch tapNoGas300@40 {"driftF":0,"slip":1,"kmh":22}
+fra touch tapNoGas350@40 {"driftF":3,"slip":5,"kmh":22}
+fra touch tapNoGas450@40 {"driftF":9,"slip":14,"kmh":23}
+fra touch tapNoGas100@55 {"driftF":0,"slip":1,"kmh":41}
+fra touch tapNoGas200@55 {"driftF":0,"slip":1,"kmh":38}
+fra touch tapNoGas300@55 {"driftF":0,"slip":1,"kmh":35}
+fra touch tapNoGas350@55 {"driftF":3,"slip":5,"kmh":35}
+fra touch tapNoGas450@55 {"driftF":9,"slip":15,"kmh":36}
+fra touch bd35 {"dEn":0.317,"vEn":25,"s3":0.35,"s5":0.367,"s10":0.433,"yaw15":0.3,"driftF":72,"slip":40,"turn":130,"kmh":50,"lunges":0,"tr":"34/0 33/0 31/0 29/1 27/1 25/1 25D/4 25D/9 26D/13 27D/17 28D/21 29D/25 30D/28 31D/32 33D/35 34D/38 35D/40 37D/40 38D/40 39D/40 40D/40 42D/40 43D/40 44D/40"}
+fra touch bd50 {"dEn":0.317,"vEn":40,"s3":0.333,"s5":0.367,"s10":0.417,"yaw15":0.283,"driftF":72,"slip":40,"turn":125,"kmh":58,"lunges":0,"tr":"49/0 48/0 46/1 44/1 42/1 40/1 40D/5 40D/10 40D/15 41D/20 42D/21 43D/23 44D/27 45D/30 46D/33 47D/36 48D/39 49D/40 49D/40 50D/40 51D/40 52D/40 53D/40 53D/40"}
+fra touch gbd50 {"dEn":0.517,"vEn":42,"s3":0.533,"s5":0.567,"s10":0.617,"yaw15":0.383,"driftF":62,"slip":40,"turn":117,"kmh":57,"lunges":0,"tr":"50/0 50/0 51/0 52/0 51/0 49/0 48/1 46/1 44/1 42/1 42D/5 42D/10 42D/15 43D/20 43D/24 44D/28 45D/32 46D/35 47D/38 48D/40 49D/40 50D/40 51D/40 51D/40"}
+fra touch bk50 {"dEn":-1,"vEn":-1,"s3":-1,"s5":-1,"s10":-1,"yaw15":1.65,"driftF":0,"slip":0,"turn":23,"kmh":24,"lunges":0,"tr":"49/0 48/0 46/0 44/0 42/0 40/0 38/0 36/0 34/0 32/0 30/0 28/0 26/0 24/0 22/0 20/0 18/0 16/0 14/0 12/0 10/0 8/0 6/0 4/0"}
+fra touch tapNoGas100@40 {"driftF":0,"slip":1,"kmh":29}
+fra touch tapNoGas200@40 {"driftF":0,"slip":1,"kmh":25}
+fra touch tapNoGas300@40 {"driftF":0,"slip":1,"kmh":22}
+fra touch tapNoGas350@40 {"driftF":3,"slip":5,"kmh":22}
+fra touch tapNoGas450@40 {"driftF":9,"slip":14,"kmh":23}
+fra touch tapNoGas100@55 {"driftF":0,"slip":1,"kmh":41}
+fra touch tapNoGas200@55 {"driftF":0,"slip":1,"kmh":38}
+fra touch tapNoGas300@55 {"driftF":0,"slip":1,"kmh":35}
+fra touch tapNoGas350@55 {"driftF":3,"slip":5,"kmh":35}
+fra touch tapNoGas450@55 {"driftF":9,"slip":15,"kmh":36}
+fra touch street {"secs":10,"presses":3,"pressWithCarBeside":1,"crbFired":1,"lunges":1,"exposurePct":17}
+fra touch errs []
+
+[exited with code 0]

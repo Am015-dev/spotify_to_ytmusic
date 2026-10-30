@@ -1,0 +1,29 @@
+ath touch bd35 {"dEn":0.317,"vEn":25,"s3":0.35,"s5":0.367,"s10":0.417,"yaw15":0.3,"driftF":72,"slip":40,"turn":130,"kmh":50,"lunges":0,"tr":"34/0 33/0 31/0 29/1 27/1 25/1 25D/4 26D/9 26D/13 27D/17 28D/21 29D/25 31D/28 32D/32 33D/35 34D/39 36D/40 37D/40 38D/40 40D/40 41D/40 42D/40 43D/40 44D/40"}
+ath touch bd50 {"dEn":0.317,"vEn":40,"s3":0.333,"s5":0.367,"s10":0.417,"yaw15":0.283,"driftF":72,"slip":40,"turn":132,"kmh":55,"lunges":0,"tr":"49/0 48/0 46/1 44/1 42/1 40/1 40D/5 40D/10 41D/15 41D/20 42D/24 43D/28 44D/32 45D/35 46D/38 47D/40 48D/40 49D/40 50D/40 51D/40 52D/40 52D/40 53D/40 54D/40"}
+ath touch gbd50 {"dEn":0.517,"vEn":42,"s3":0.533,"s5":0.567,"s10":0.617,"yaw15":0.383,"driftF":62,"slip":40,"turn":109,"kmh":57,"lunges":0,"tr":"50/0 50/0 51/0 52/0 51/0 50/0 48/1 46/1 44/1 42/1 42D/5 42D/10 43D/15 43D/20 44D/24 45D/28 46D/32 47D/35 48D/38 49D/40 50D/40 50D/40 51D/39 52D/40"}
+ath touch bk50 {"dEn":-1,"vEn":-1,"s3":-1,"s5":-1,"s10":-1,"yaw15":-1,"driftF":0,"slip":0,"turn":0,"kmh":38,"lunges":0,"tr":"49/0 48/0 46/0 44/0 42/0 40/0 38/0 36/0 34/0 32/0 30/0 28/0 26/0 24/0 22/0 20/0 18/0 16/0 14/0 12/0 10/0 8/0 6/0 4/0"}
+ath touch tapNoGas100@40 {"driftF":0,"slip":1,"kmh":29}
+ath touch tapNoGas200@40 {"driftF":0,"slip":1,"kmh":26}
+ath touch tapNoGas300@40 {"driftF":0,"slip":1,"kmh":22}
+ath touch tapNoGas350@40 {"driftF":3,"slip":5,"kmh":22}
+ath touch tapNoGas450@40 {"driftF":9,"slip":14,"kmh":23}
+ath touch tapNoGas100@55 {"driftF":0,"slip":1,"kmh":42}
+ath touch tapNoGas200@55 {"driftF":0,"slip":1,"kmh":39}
+ath touch tapNoGas300@55 {"driftF":0,"slip":1,"kmh":36}
+ath touch tapNoGas350@55 {"driftF":3,"slip":5,"kmh":36}
+ath touch tapNoGas450@55 {"driftF":9,"slip":15,"kmh":36}
+ath touch bd35 {"dEn":0.317,"vEn":25,"s3":0.35,"s5":0.367,"s10":0.417,"yaw15":0.3,"driftF":72,"slip":40,"turn":123,"kmh":50,"lunges":0,"tr":"34/0 33/0 31/0 29/1 27/1 25/1 25D/4 26D/9 26D/13 27D/17 28D/21 29D/25 31D/28 32D/32 33D/35 34D/39 36D/40 37D/40 38D/40 40D/40 41D/40 42D/40 43D/39 44D/39"}
+ath touch bd50 {"dEn":0.317,"vEn":40,"s3":0.333,"s5":0.367,"s10":0.417,"yaw15":0.283,"driftF":72,"slip":40,"turn":135,"kmh":58,"lunges":0,"tr":"49/0 48/0 46/1 44/1 42/1 40/1 40D/5 40D/10 41D/15 41D/20 42D/24 43D/28 44D/32 45D/35 46D/38 47D/40 48D/40 49D/40 50D/0 51D/4 52D/9 53D/14 53D/19 54D/22"}
+ath touch gbd50 {"dEn":0.517,"vEn":42,"s3":0.533,"s5":0.567,"s10":0.617,"yaw15":0.383,"driftF":62,"slip":40,"turn":116,"kmh":57,"lunges":0,"tr":"50/0 50/0 51/0 52/0 51/0 50/0 48/1 46/1 44/1 42/1 42D/5 42D/10 43D/15 43D/20 44D/24 45D/28 46D/32 47D/35 48D/38 49D/40 50D/40 50D/40 51D/40 52D/40"}
+ath touch bk50 {"dEn":-1,"vEn":-1,"s3":-1,"s5":-1,"s10":-1,"yaw15":2.1,"driftF":0,"slip":0,"turn":23,"kmh":0,"lunges":0,"tr":"49/0 48/0 46/0 44/0 42/0 40/0 38/0 36/0 34/0 32/0 30/0 28/0 26/0 24/0 22/0 20/0 18/0 16/0 14/0 12/0 10/0 8/0 6/0 4/0"}
+ath touch tapNoGas100@40 {"driftF":0,"slip":1,"kmh":29}
+ath touch tapNoGas200@40 {"driftF":0,"slip":1,"kmh":26}
+ath touch tapNoGas300@40 {"driftF":0,"slip":1,"kmh":22}
+ath touch tapNoGas350@40 {"driftF":3,"slip":5,"kmh":22}
+ath touch tapNoGas450@40 {"driftF":9,"slip":14,"kmh":23}
+ath touch tapNoGas100@55 {"driftF":0,"slip":1,"kmh":42}
+ath touch tapNoGas200@55 {"driftF":0,"slip":1,"kmh":39}
+ath touch tapNoGas300@55 {"driftF":0,"slip":1,"kmh":36}
+ath touch tapNoGas350@55 {"driftF":3,"slip":5,"kmh":36}
+ath touch tapNoGas450@55 {"driftF":9,"slip":15,"kmh":36}
+ERR Error: cdpSession.send: Target page, context or browser has been closed
