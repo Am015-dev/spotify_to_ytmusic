@@ -61,3 +61,8 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - Deploy blocker: unit page/size-headroom red even after the revert (beta.165 page 3,505,383 B vs 3.5e6). Next free worker slot: size-r30k (SONNET) moves a GO-only module into src/LAZY (≥ 8 KB headroom). beta.165 changelog drafted (gui, traffic, boot, jserr).
 - New top bug (Alex's own complaint "the game refreshed 5 times in 5 minutes"): REVIEW_2K_36 saw the Athens page reload itself at quest START under 6x in 2/2 runs. Bug lane reload-r30l (SONNET, 90 min) after size-r30k: reproduce on 4d432e4, fix root cause, GO mem/no-reload extended to ath quest START.
 - Then: touchdrive round 4 (3 items in REVIEW_2K_35), world round 4 (3 items in REVIEW_2K_36), tb2..tb5.
+
+## 30 Oct ~18:25
+- Done: links-r30i 8b3eca7 (phone reveal links 0: fra 5/5, ath 3/3; TWG_late under the curtain, ~1 s at 6x) → needs OPUS review after tb1's. size-r30k a28ed13 (245 old changelog entries → docs archive, page 3.44 MB; unit green) → small, ships on green gates (rule 17).
+- Running: review-r30-11 (tb1, can ?tb1 default ON), reload-r30l (SONNET, Athens self-reload at quest START), touchdrive-r30m (SONNET, round 4: re-apply + 3 items).
+- beta.165 = gui, traffic, boot-r30e/g, jserr, size, links (if review PASS), tb1 ON (if review says so).
