@@ -13,7 +13,7 @@ const XB = ['melee', 'dash'];   // bots left out of the whole-street gates (own 
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const res = [], ok = (p, n) => { res.push(!!p); console.log((p ? 'PASS ' : 'FAIL ') + n); };
-const seedOf = i => 4321 + i * 7919;
+const seedOf = i => (+process.env.SEED0 || 4321) + i * 7919;   // SEED0=<n>: another block of seeds (W263: three RUNS=12 blocks to show the spread)
 
 // ---- the bots: taken from the street tests themselves (one source of truth)
 const src = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'); let RUN = src.slice(src.indexOf('const RUN = ') + 12, src.indexOf('\n(async () =>')).trim().replace(/;$/, '').replace('i < 200', 'i < 300');   // W168: a 45-90 s boss fight ends after 200 s game time
@@ -81,6 +81,7 @@ const TEL = () => {
         if (T.stuckAt >= 0 && !T.tr && t > T.stuckAt + 1 && t < T.stuckAt + 5 && T.steps % 12 === 0) { (T.trb = T.trb || []).push('t' + t.toFixed(1) + ' shots' + S.shots + ' k' + S.kills + ' hurts' + S.hurts + ' ' + snap().replace(/ lock\w* /, ' ').slice(0, 700)); if (T.trb.length >= 14) T.tr = T.trb; }
     const sig = [Math.round(P.maxX / 5), S.kills, S.score, S.hurts, S.boss ? Math.round(S.boss.hp) : 0].join('|'); if (sig !== T.sig) { T.sig = sig; T.sigT = t; } else if (t - T.sigT > 25 && T.stuckAt < 0 && !S.end && P.hp > 0 && !window.__idle) { T.stuckAt = +t.toFixed(1); T.stuckBoss = snap(); }
     if (T.stuckAt >= 0 && !T.s2 && t > T.stuckAt + 4) { T.s2 = 1; T.stuckBoss += ' || ' + snap(); }
+    if (S.bossOn && T.bossT == null) { T.bossT = +S.time.toFixed(1); T.bossHp = P.hp; }   // W280: per-phase split (street part vs boss fight)
     T.hpMin = Math.min(T.hpMin, P.hp); if (T.hpPrev != null && P.hp < T.hpPrev) T.hpLost += T.hpPrev - P.hp; T.hpPrev = P.hp;
     for (const e of S.E) if (e._o === undefined && !e.dead) e._o = e.x < S.camX ? 'L' : 'R';   // W161: which side a foe was born on
     if (S.hurts > T.lastHurts) { const src = (S.hlog || [])[S.hurts - 1] || '', m = /^(mel|touch):(.*)$/.exec(src);
@@ -110,7 +111,7 @@ const ONE = (bot, seed, codeFn) => `(() => { const un = (${TEL.toString()})(); w
   else { window.__gf = ${bot !== 'nearest'}; r = (${codeFn})(${seed}); }
   const ms = performance.now() - w0, S = FOOT.S, T = window.__T, sh = S.sh || {}, s3 = S.s3 || {};
   const tu = {}; r.zmiss = S.zmiss | 0; r.cmb = S.cmb || null; r.dg = S.dg || null; r.gd = S.gd ? { b: S.gd.blocks, p: S.gd.parries, rf: S.gd.refl, br: S.gd.breaks, mx: +S.gd.maxOn.toFixed(2) } : null; r.rch = S.rch ? { log: S.rch.log } : null; r.mh = (S.hlog || []).filter(x => /^mel:(rusher|heavy|bigheavy)$/.test(x)).length; r.band = (() => { try { if (!RET.belt) return 0; const L = FOOT._in.L(); FOOT.look.draw(L.ctx); return +(FOOT.look.band / FOOT.look.VV).toFixed(3); } catch (e) { return -1; } })(); r.end = !!S.end; r.ms = ms; r.dbg = window.__dbgLog; r.tEnd = +S.time.toFixed(1);
-  r.tel = { aa: T.aa | 0, aaI: T.aaI, cw: T.cw, tr: T.tr, stuckBoss: T.stuckBoss, mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, far: T.far || 0, lingerInfo: T.lingerInfo, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
+  r.tel = { bossT: T.bossT, bossHp: T.bossHp, aa: T.aa | 0, aaI: T.aaI, cw: T.cw, tr: T.tr, stuckBoss: T.stuckBoss, mel: T.mel, steps: T.steps, nan: T.nan, nanEx: T.nanEx, zb: T.zb, zs: T.zs, still: +T.still.toFixed(1), stuckAt: T.stuckAt, thr: T.thr, duck: T.duck, hurtAt: T.hurtAt, ttk: T.ttk, lingerMax: +T.lingerMax.toFixed(1), linger: T.linger, far: T.far || 0, lingerInfo: T.lingerInfo, left: T.left, hpMin: T.hpMin, hpLost: +T.hpLost.toFixed(1),
     called: sh.called | 0, blocked: sh.blocked | 0, coverBroke: sh.coverBroke | 0, plan: (s3.waves || []).map(x => [x.t, x.thr]), boss: s3.boss, heals: s3.healN | 0, hlog: (S.hlog || []).join(' '), od: FOOT.OD && FOOT.OD.log, combo: window.FOOT.COMBO ? FOOT.COMBO.best : -1, bnc: window.FOOT.COMBO ? FOOT.COMBO.bounces : 0 };
   try { FOOT.stop(); } catch (e) {} un(); return r; })()`;
 const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story', JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 })); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } catch (e) {} };
@@ -206,6 +207,8 @@ const peakT = thr => { let best = -1, bt = 0; for (let i = 0; i < thr.length; i+
     const mg = Math.min(...gaps); L(mg >= 1.09, `W243 at most 1 heart per 1.1 s from all sources (min gap between hurts ${mg.toFixed(2)} s over ${gaps.length} hurts)`);
     { const mx = Math.max(0, ...ok0.filter(o => o.r.tel).map(o => o.r.tel.aa)); const n3 = ok0.filter(o => o.r.tel && o.r.tel.aa > 2).length; L(n3 === 0, `W243 E2 at most 2 foes in an active melee attack at once (max ${mx}, ${n3} runs over)`); if (n3) console.log("INFO E2 examples: " + ok0.filter(o => o.r.tel && o.r.tel.aa > 2).slice(0, 8).map(o => o.r.tel.aaI).join(" | ")); }
     for (const b of ['nearest']) if (BOTS.includes(b)) { const rs = hk(b), r10 = med(rs.map(rate)), ts = med(rs.map(o => o.r.tEnd)); L(r10 <= 1 && ts >= 60, `W243 ${b} bot loses <= 1 heart per 10 s (median ${r10.toFixed(2)}) and survives >= 60 s (median ${ts.toFixed(0)} s)`); }
+    for (const b of BOTS) { const rs = ok0.filter(o => o.j.bot === b), rb = rs.filter(o => o.r.tel.bossT != null), wb = rb.filter(o => o.r.clear);   // W280: street part vs boss fight
+      console.log(`INFO phase ${b}: reached boss ${rb.length}/${rs.length}, hearts at boss median ${med(rb.map(o => o.r.tel.bossHp))}, boss on at median ${med(rb.map(o => o.r.tel.bossT))} s, won the boss ${wb.length}/${rb.length}`); }
     if (BOTS.includes('gfirst')) L(Math.abs(rows.gfirst.clearPct - 75) <= 8, `W243 gfirst clear rate 75 +-8 (${rows.gfirst.clearPct.toFixed(0)}%)`);
     if (BOTS.includes('dodge')) L(Math.abs(rows.dodge.clearPct - 65) <= 8, `W243 dodge clear rate 65 +-8 (${rows.dodge.clearPct.toFixed(0)}%)`);
   }
