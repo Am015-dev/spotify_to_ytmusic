@@ -63,7 +63,7 @@ const SNAP = () => { const F = window.FOOT, S = F && F.S; if (!S) return null; c
   const cam = F._in.L(); const cw = document.getElementById('game').width; const g = S.gd || null;
   return { on: F.on, t: S.time, end: S.end ? { cleared: S.end.cleared, quit: S.end.quit } : null, paused: S.paused, camX: S.camX, vw: (cam && cam.vw) || 960, lock: S.lock && S.lock.id, wl: S.lock ? S.waves.filter(w => w.lock === S.lock.id && !w.done).length : 0, bossOn: S.bossOn,
     P: { x: P.x, y: P.y, hp: P.hp, max: P.max, g: P.onGround, f: P.facing, inv: P.inv, dash: P.dash, dashIF: P.dashIF, mel: P.mel, bombs: P.bombs, maxX: P.maxX }, guard: g && { on: g.on, m: g.m },
-    E, eb: S.eb.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy || 0 })), pk: S.pk.map(k => ({ k: k.k, x: k.x, y: k.y })), shots: S.shots, kills: S.kills, hurts: S.hurts, score: S.score, moved: S.moved,
+    E, eb: S.eb.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy || 0, sb: !!b.sb })), pk: S.pk.map(k => ({ k: k.k, x: k.x, y: k.y })), shots: S.shots, kills: S.kills, hurts: S.hurts, score: S.score, moved: S.moved,
     behind: S.behind ? S.behind.until : null, bossX: S.st.boss && S.st.boss.x, len: S.st.len, stage: S.id + ' ' + S.st.n + ' s2=' + S.st.s2 + ' locks=' + (S.st.locks || []).map(l => l.id + '@' + l.x).join(',') + ' boss=' + JSON.stringify(S.st.boss) + ' waves=' + S.waves.length + ' lockDone=' + Object.keys(S.lockDone).join(''), boss: S.boss ? { hp: S.boss.hp, max: S.boss.max, dead: !!S.boss.dead } : null, auto: F.autoOn && F.autoOn(), fl: 540 - 70 }; };
 
 // ---- the strategies: snapshot -> want
@@ -72,6 +72,7 @@ function strategy(name, rnd) {
   const near = s => { let b = null, d = 1e9; for (const e of s.E) { if (e.d || e.hid || e.x < s.camX - 20 || e.x > s.camX + s.vw + 20) continue; const dd = Math.abs(e.x - s.P.x); if (dd < d) { d = dd; b = e; } } return b && { e: b, d }; };
   const walk = (s, n) => { if (n) { const dx = n.e.x - s.P.x; return Math.abs(dx) > (n.e.id === 'rusher' || n.e.b ? 100 : 230) ? Math.sign(dx) : (Math.abs(dx) < 140 ? -Math.sign(dx) * .2 : Math.sign(dx) * .01); } return 1; };
   if (name === 'idle') return () => ({ mx: 0 });
+  if (name === 'masher') return s => { const n = near(s); return { mx: n ? Math.sign(n.e.x - s.P.x) || 1 : 1, fire: true, melee: Math.floor(s.t * 8) % 2 === 0, jump: Math.floor(s.t * 3) % 5 === 0 }; };   // W278: walks at the nearest foe mashing shoot + knife (+ a hop), never guards or dashes
   if (name === 'random') return s => { if (s.t > until) { until = s.t + .25 + rnd() * .5; cur = { mx: rnd() < .35 ? 0 : rnd() < .6 ? 1 : -1, fire: rnd() < .6, jump: rnd() < .15, melee: rnd() < .2, guard: rnd() < .12, dash: rnd() < .1, bomb: rnd() < .04 }; } if (s.t - last > .12) { last = s.t; return cur; } return Object.assign({}, cur, { jump: false, melee: false, guard: false, dash: false, bomb: false }); };
   const aggr = (s, dodge) => {
     const n = near(s), w = { mx: walk(s, n), fire: !!n && Math.abs(n.e.x - s.P.x) < 640, melee: false, jump: false, guard: false, dash: false, bomb: false };
@@ -94,6 +95,9 @@ function strategy(name, rnd) {
       // 1. incoming heavy charge: a charge hits for 2 and breaks the guard, so leave the line (dash i-frames through it) or jump it
       const hv = live.find(e => heavy(e) && (e.st === 'wind' || e.st === 'charge') && dist(e) < 330 && front(e));
       if (hv) { w.mx = -face(hv); if (hv.st === 'charge' && dist(hv) < 230 && P.inv <= 0 && s.t - dodgeAt > .6) { w.dash = true; w.mx = face(hv); dodgeAt = s.t; } if (P.g && dist(hv) < 260) w.jump = true; return w; }
+      // 1b. W278: the boss's barrel (tip 'BARREL · STEP BACK'): it is aimed at where Kai stands when thrown, so walk away during the wind-up and while it flies (never jump it)
+      const bt = live.find(e => e.b && e.st === 'sb_throwW'), br = s.eb.find(b => b.sb);
+      if (bt || br) { const from = bt ? bt.x : br.x - br.vx; w.mx = -(Math.sign(from - P.x) || 1); if (right < 60 && w.mx > 0 || P.x - s.camX < 60 && w.mx < 0) { if (P.inv <= 0 && br && s.t - dodgeAt > .6) { w.dash = true; w.mx = -w.mx; dodgeAt = s.t; } } return w; }
       // 2. a melee foe in its telegraph within reach, in front: GUARD (parry window is the last 0.15 s); a foe from behind: dash out
       const mel = live.find(e => !heavy(e) && e.id !== 'gunner' && tele(e) && dist(e) < 150);
       if (mel) { if (front(mel) && s.guard && s.guard.m > .05) { w.guard = true; w.mx = 0; return w; } if (P.inv <= 0 && s.t - dodgeAt > .6) { w.dash = true; w.mx = -face(mel); dodgeAt = s.t; return w; } w.mx = -face(mel); return w; }
@@ -162,6 +166,7 @@ async function run(b, plat, strat, seed) {
   try {
     const sres = await startFoot(p, inp); if (sres !== 'on') { fail('start: ' + sres); return R; }
     await sleep(400); await shot('start');
+    if (process.env.BADD || process.env.BOSSADDS) await p.evaluate(([c, o]) => { if (o === '0') window.RET.bossadds = false; if (c) { const [cap, gap] = c.split(',').map(Number); window.FOOT.S3.T.bAdd = { cap, gap }; } }, [process.env.BADD || '', process.env.BOSSADDS || '']);   // W278 sweep: BADD=cap,gap  BOSSADDS=0 = old
     if (process.env.JUMP) { await sleep(2500); await p.evaluate(j => { const S = window.FOOT.S; S.time = +j; S.P.x = 7350; S.camX = 7250; }, process.env.JUMP); R.notes.push('JUMP: stage clock set to ' + process.env.JUMP + ' (geometry probe only, not a clear-rate run)'); }
     if (plat !== 'pc') { R.audit = await p.evaluate(AUDIT); if (R.audit.small.length) fail('phone control < 44 px: ' + R.audit.small.join(', ')); if (R.audit.over.length) fail('phone controls overlap: ' + R.audit.over.join(', ')); if (R.audit.off.length) fail('phone control off screen: ' + R.audit.off.join(', ')); if (R.audit.clip.length) fail('phone label clipped: ' + R.audit.clip.join(', ')); }
     await p.evaluate(() => { window.__ftOn = true; }); const decide = strategy(strat, rnd);
@@ -198,6 +203,8 @@ async function run(b, plat, strat, seed) {
     }
     await inp.release(); await sleep(150); s = await p.evaluate(SNAP) || lastS; R.end = s && s.end; R.hlog = await p.evaluate(() => { const S = window.FOOT.S; return S && S.hlog ? S.hlog.slice() : []; }).catch(() => null); R.t = s && s.t; R.kills = s && s.kills; R.hurts = s && s.hurts; R.hpEnd = s && s.P.hp; R.maxX = s && s.P.maxX;
     if (!R.end) { if (Date.now() - t0 >= MAXREAL) R.notes.push('timeout ' + (MAXREAL / 1000) + ' s real, game t=' + (s && s.t.toFixed(0)) + ' x=' + (s && Math.round(s.P.x))); }
+    R.bossHp = s && s.boss ? Math.max(0, Math.round(s.boss.hp)) : null; R.bossT = await p.evaluate(() => { const l = window.FOOT.S3 && window.FOOT.S3.log; return l && l.boss || null; }).catch(() => null);
+    if (R.hlog) { const c = {}; for (const h of R.hlog) c[h] = (c[h] || 0) + 1; R.hurtBy = Object.entries(c).map(([k, v]) => k + ':' + v).join(','); }
     R.spawned = seen.size; R.attacked = atkd.size; R.died = died.size; R.maxFoes = maxFoes; R.pkMax = pkMax; R.minMargin = Math.round(minMargin); R.camBack = camBack; R.behindTicks = behindSeen; R.spawnLeft = spawnL.length; R.progBad = progBad; R.stuck = stuck;
     if (offT > 1) fail('Kai off screen ' + offT.toFixed(1) + ' s (camera not following)'); if (camBack > 0 && !s.lock) R.notes.push('camera moved back ' + camBack + 'x');
     if (spawnL.length > 0 && behindSeen === 0) fail('foe spawned from the left (' + spawnL.length + 'x) but BEHIND caption never active');
@@ -262,7 +269,7 @@ async function layouts(b) {
     for (const pl of PLATS) for (const st of STRATS) for (let sd = 0; sd < SEEDS; sd++) {
       if (process.env.ONLY && process.env.ONLY !== `${pl}:${st}:${sd}`) continue;
       const R = await run(b, pl, st, sd); results.push(R);
-      say(`${R.fails.length ? 'FAIL' : 'PASS'} ${pl} ${st} seed ${sd}: ${R.end ? (R.end.cleared ? 'CLEARED' : 'died') : 'no end'} t=${R.t != null ? R.t.toFixed(0) : '?'}s kills=${R.kills} hurts=${R.hurts} foes ${R.spawned}/atk ${R.attacked}/died ${R.died} pk<=${R.pkMax} margin=${R.minMargin} p95=${R.frameP95 ? R.frameP95.p95.toFixed(1) : '?'}ms real=${R.real}s${R.fails.length ? ' :: ' + R.fails.join(' | ').slice(0, 300) : ''}${R.notes.length ? ' [' + R.notes.join('; ') + ']' : ''}`);
+      say(`${R.fails.length ? 'FAIL' : 'PASS'} ${pl} ${st} seed ${sd}: ${R.end ? (R.end.cleared ? 'CLEARED' : 'died') : 'no end'} t=${R.t != null ? R.t.toFixed(0) : '?'}s kills=${R.kills} hurts=${R.hurts} bossHp=${R.bossHp != null ? R.bossHp : '-'} bossT=${R.bossT != null ? R.bossT : '-'} hurtBy=${R.hurtBy || '-'} foes ${R.spawned}/atk ${R.attacked}/died ${R.died} pk<=${R.pkMax} margin=${R.minMargin} p95=${R.frameP95 ? R.frameP95.p95.toFixed(1) : '?'}ms real=${R.real}s${R.fails.length ? ' :: ' + R.fails.join(' | ').slice(0, 300) : ''}${R.notes.length ? ' [' + R.notes.join('; ') + ']' : ''}`);
       if (R.fails.length) nfail++; }
   } finally { await b.close(); }
   fs.writeFileSync(path.join(OUT, 'results.json'), JSON.stringify(results, null, 1));
