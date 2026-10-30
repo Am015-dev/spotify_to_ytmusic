@@ -80,7 +80,7 @@ function GFX_ao2(m){if(m.userData.gfxAo)return;m.userData.gfxAo=1;const ob=m.onB
  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);if(!sh.fragmentShader.includes('vLkW'))return;sh.uniforms.uGfxG=GFX.G;
   sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform vec4 uGfxG;\nvoid main() {').replace('#include <lights_fragment_end>','#include <lights_fragment_end>\n{float gh=vLkW.y-uGfxG.x;float ga=mix(.42,1.,smoothstep(0.,1.8,gh));ga=mix(ga,1.,smoothstep(45.,75.,length(vLkW.xz-uGfxG.yz))*uGfxG.w+(1.-uGfxG.w));reflectedLight.indirectDiffuse*=ga;reflectedLight.directDiffuse*=mix(1.,ga,.55);}')};
  m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|gfxao'};m.needsUpdate=true}
-function GFX_room(){if(GFX.room)return GFX.room;try{const pm=new THREE.PMREMGenerator(renderer);GFX.room=pm.fromScene(new RoomEnvironment(),.04).texture;pm.dispose()}catch(e){GFX.room=scene.environment}return GFX.room}
+function GFX_room(){if(LTEX)return scene.environment;/* lowmem-r24h: the low tier shares the mood env (no 6 MB studio PMREM) */if(GFX.room)return GFX.room;try{const pm=new THREE.PMREMGenerator(renderer);GFX.room=pm.fromScene(new RoomEnvironment(),.04).texture;pm.dispose()}catch(e){GFX.room=scene.environment}return GFX.room}
 // stock GTAOPass (three r164 addon) after the RenderPass, PC high tier by day only: contact shadows where bricks meet the street and in corners.
 // It re-renders scene normals/depth, so it costs one extra geometry pass: never on med/phone.
 // measured (Athens, high): +~720 draw calls per frame (1229 vs 510) for its normal pass: opt-in only (?ao=1 or localStorage mho_gfxao=1)
