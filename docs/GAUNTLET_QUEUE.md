@@ -71,3 +71,9 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - tb1 PASS behind ?tb1 (REVIEW_2K_37: ON 56-57 s vs OFF 76.5 s) but NOT default ON: TB queue starves behind 2 boot generators on a real PLAY boot (control+40 s: 180/660 cells), tb-geo never compares with OFF, queue not re-sorted by car position. tb1 round 2 (SONNET) at the next free worker slot; rule 11 clock runs from 30 Oct.
 - Trunk gauntlet crashes after the drive rows on CRB_side (removed by revert 4d432e4); touchdrive-r30m was told to restore it and guard the tool.
 - review-r30-12 (OPUS, session_01RR7mnb9MABLLVF1xF2sLyD): links-r30i + size-r30k.
+
+## 30 Oct ~21:17
+- beta.165 live (Beta v330).
+- tb1b a341274 (flag OFF): the new PLAY-boot GO shows control → TB.fin 137.9 s vs the 15 s bar. Two lanes on tb1 now (rule 9) → next is an OPUS redesign of the post-control stream (less work before TB.fin, or cheaper far tiles), joined with tb2. Rule 11: ?tb1 ships ON or is deleted by 31 Oct; if the redesign is not green by then, delete the flag path and keep the design doc.
+- Running: review-r30-13 (touchdrive r4, waiting on its gauntlet), mem-r30n (OPUS, nudged at 21:17), gscript-r30o (SONNET: honest gauntlet drive rows + docs/GAUNTLET_ROWS.md, script vs game verdicts).
+- Review order: touchdrive → mem → (tb redesign later).
