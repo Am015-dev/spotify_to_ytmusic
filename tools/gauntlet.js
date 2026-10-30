@@ -321,6 +321,8 @@ async function scRace(P){// pause -> QUIT TO TITLE -> 🏁 RACES -> START, then 
  row('race/start','pause → QUIT TO TITLE → RACES → START reaches the grid',st.st,'countdown or race',st.st==='countdown'||st.st==='race',menuShot);
  if(st.st!=='countdown'&&st.st!=='race')return;
  st=await P.run(6,x=>x.st==='race'?'stop':['tG']);const startShot=await P.shot('fra_11_race_start');const t0=st.T;let maxLap=0;
+ {/* touchdrive-r29b: a race roll needs both arrows down together; one arrow held then tapped again does not roll */await P.set(['tG','tR']);await P.step(4);const a=await P.ev('(pl.rollT>0||pressed.roll)?1:0');await P.set(['tG','tR','tL']);await P.step(6);const b=await P.ev('(pl.rollT>0||pressed.roll)?1:0');await P.allUp();
+  row('race/rollBoth','race touch: ▶ held does not roll; ▶ + ◀ together does (the SMASH roll)',`one arrow ${a?'ROLL':'no roll'}, both arrows ${b?'ROLL':'no roll'}`,'no roll / ROLL',!a&&!!b,'')}
  let outT=0;const pol=x=>{if(x.st==='finished'||x.st==='results')return'stop';if(x.st!=='race'){outT+=DT*3;return outT>3?'stop':[]}outT=0;const R=x.race;if(!R)return['tG'];maxLap=Math.max(maxLap,R.lap||0);const want=Math.max(-.35,Math.min(.35,-R.x*.06));const e=want-R.yaw;return['tG',...(e>.04?['tR']:e<-.04?['tL']:[])]};
  const prs=[];let held='';const pol0=pol;const polM=x=>{const w=pol0(x);if(Array.isArray(w)){const sd=w.includes('tR')?'R':w.includes('tL')?'L':'';if(sd&&sd!==held)prs.push([sd,x.T]);held=sd}return w};
  polM.any=true;const acc0=await P.ev('CRSM.acc||0');st=await P.run(480,polM,3);await P.allUp();const acc1=await P.ev('CRSM.acc||0');let wb=0;for(let i=1;i<prs.length;i++)for(let j=i-1;j>=0&&prs[i][1]-prs[j][1]<=.35;j--)if(prs[j][0]===prs[i][0]){wb++;break}

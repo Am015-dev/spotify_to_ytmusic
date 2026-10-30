@@ -114,7 +114,8 @@ function CR_lgTap(d){const n=performance.now();if(CR_LG.d===d&&n-CR_LG.t<300){CR
 function CR_lgGo(d){if(state==='race'){if(!paused&&pl&&!pl.finished)pressed.roll=d;return}if(state!=='roam'||!pl||RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story||pl.air||(RO.crLgCd||0)>0||(RO.crLg||0)>0)return;
  RO.crLg=.3;RO.crLgD=d;RO.crLgCd=1;RO.crLgN=(RO.crLgN||0)+1;AU.sfx('roll');CR_lgFx(pl)}
 addEventListener('keydown',e=>{if(e.repeat||(state!=='roam'&&state!=='race'))return;const d={ArrowLeft:-1,KeyA:-1,ArrowRight:1,KeyD:1}[e.code];if(d)CR_lgTap(d)});
-BZ.addEventListener('touchstart',e=>{if(state!=='race'&&!(state==='roam'&&!TOUCH.used/* touchdrive-r29a: no double-tap lunge while driving on touch (two steer taps are just steering); BOOST beside a car does it, see CRB below */))return;const ts=CRSM_ts(e);for(const t of e.changedTouches)CRSM_tap(bzSide(t),ts)},{passive:true});
+// touchdrive-r29b: on touch nothing fires from ONE arrow tapped twice (corner feathering is two quick taps on the same arrow: the gauntlet race bot rolled by accident). Race roll = both arrows down together (the second finger decides the side). Keyboard double-tap (CR_lgTap) is unchanged.
+BZ.addEventListener('touchstart',e=>{if(state!=='race'||!e.touches||e.touches.length<2)return;const L=[];for(const t of e.touches)L.push(bzSide(t));if(L.includes(-1)&&L.includes(1))CRSM_go(bzSide(e.changedTouches[0]))},{passive:true});
 // the lunge moves the car sideways (screen left/right) for 0.3 s; it stops at walls
 roamStep=(f=>function(dt){if(state==='roam')pressed.roll=0;const r=f(dt);try{if(state==='roam'&&pl&&!RO.wk){RO.crLgCd=Math.max(0,(RO.crLgCd||0)-dt);
  if(RO.crLg>0){RO.crLg-=dt;const k=CR_LGV*dt*RO.crLgD,nx=RO.x-Math.cos(RO.h)*k,nz=RO.z+Math.sin(RO.h)*k;if(!roamHit(nx,nz,1.2,RO.y)){RO.x=nx;RO.z=nz}else RO.crLg=0}}}catch(e){}return r})(roamStep);
@@ -194,7 +195,7 @@ hitPop=(f=>function(t,col){try{if(/SMASH|TAKEDOWN/.test(String(t))&&performance.
 const R3B_PANELS=['journal','m1Cs','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
 function R3B_panelOpen(){for(const id of R3B_PANELS){const e=document.getElementById(id);if(e&&!e.hidden&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden')return true}return false}
 function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='HIT FAST = SMASH';document.body.appendChild(h)}
- {const t=state==='roam'&&TOUCH.used?'BOOST+STEER INTO CAR = SMASH':'HIT FAST = SMASH';if(h.textContent!==t)h.textContent=t}
+ {const t=TOUCH.used&&state==='roam'?'BOOST+STEER INTO CAR = SMASH':TOUCH.used&&state==='race'?'BOTH ARROWS = SMASH':'HIT FAST = SMASH';if(h.textContent!==t)h.textContent=t}
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
