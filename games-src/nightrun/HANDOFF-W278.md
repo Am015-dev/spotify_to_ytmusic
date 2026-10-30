@@ -12,7 +12,8 @@ Logs, results.json and shots (not committed): `/tmp/claude-0/-home-user-spotify-
 ## Trivial-fight check with the flags ON (?bossadds=1&sbhp=5, boss isolated, 3 seeds): FAILS, so the flags stay OFF
 - phone idle: did NOT die in 3/3 (no end at t=363-447 s, 1 heart lost, boss left 140-165 of 180): with no adds the boss barely reaches a standing Kai,
   and touch auto-fire wears it down. An idle player must die: the boss needs to come for Kai (or adds must stay) before this can ship.
-- PC masher: CLEARED seed 0 (t=250 s, 5 hearts lost to the barrel/pound). A masher must not clear. Other PC masher/idle seeds: still running at the hard stop, not read.
+- PC masher: CLEARED 2 of 3 (t=250 and 264 s; the third died with the boss on 19 hp). A masher must not clear.
+- PC idle: INVALID. These runs started after I restored the generated build to W277's, so they ran without the flag (rushers joined) and are not counted.
 - phone masher: harness crash x3 (`Input.dispatchTouchEvent: Exceeded maximum touch points limit of 16`): the masher's button flicker leaks touch ids in makeInput. Fix the harness first.
 ## NOT done (time: 55 min cap)
 - Full stage from the title with the flags, 8 seeds x phone/PC x tactician/dodger: NOT run. The dodger was not run on the boss either.
