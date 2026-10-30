@@ -159,6 +159,7 @@ Object.assign(WPX.demo,{
    box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)&&ART.isReal(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};
  gaDraw();}
 // painted weapon icons and fusion pictures: only the files that are real art (media/ready.json) are loaded
-try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{const q=l.filter(n=>/^(wp-|fx-fuse)/.test(n)).map(n=>n.replace(/\.webp$/,''));   // W242: 80 pictures asked at once at boot starved the ship sheets of the stage (pend=81): now two at a time, 12 s into a run
-  const iv=setInterval(()=>{if(!q.length)return clearInterval(iv);if(running&&G&&G.t>12&&ART.pend===0&&ART.lowN<2){const n=q.shift();if(!(n in ART.bm)){ART.lowN++;ART.load(n,1);}}},400);}).catch(()=>{});}catch(e){}
+try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{const q=l.filter(n=>/^(wp-|fx-fuse)/.test(n)).map(n=>n.replace(/\.webp$/,''));   // W242: 80 pictures asked at once at boot starved the ship sheets of the stage (pend=81): now two at a time, only while nothing is being played or loaded (W269: decoding them during a fight cost 20% of the frames on a phone)
+  const calm=()=>performance.now()>8000&&!(window.PRELOAD&&PRELOAD.veil)&&!(window.FOOT&&(FOOT.on||(FOOT.q&&FOOT.q.hold)))&&(!running||paused||(typeof SH!=='undefined'&&SH.active));
+  const iv=setInterval(()=>{if(!q.length)return clearInterval(iv);if(calm()&&ART.pend===0&&ART.lowN<2){const n=q.shift();if(!(n in ART.bm)){ART.lowN++;ART.load(n,1);}}},400);}).catch(()=>{});}catch(e){}
 window.__ga={GA,gsave,openGarage:f=>openGarage(f),WPD};          // test hook
