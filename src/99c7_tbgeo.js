@@ -1,0 +1,11 @@
+// tb1 (2026-10-30): GO perf/tb-geo. docs/DESIGN_tiled_city_build.md step 1. Pass line: `tb-geo fra: R0 cells n/n, all at +30 s, keys equal`.
+// ON (?tb1=1): at control every ground cell with its centre within 800 m exists and nothing within 800 m is queued; the queue then drains in <= 30 simulated game-s (4 ms slices at 30 fps)
+// to every ground cell; every TBatch key (material#hubTile) drawn has the vertex count recorded at add time. The same key hash is printed with the flag OFF: the two runs must match.
+(function TBGO_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='tb-geo'))C.items.push({ver:'perf',id:'tb-geo',area:'perf',text:'tb1 · tiled city build, geometry: ?tb1=1 builds ground cells, kerbs, pads and street ribbons of the 800 m ring before the reveal and the rest after control. Pass line: tb-geo fra: R0 cells n/n, all at +30 s, keys equal.'});
+  C.GO['perf/tb-geo']=[{c:'fra',n:'tiled city build geometry',secs:60,fn:()=>{const ok=b=>b?' ✅':' ❌';if(!TB.on)return'📍 tb-geo fra: flag off (?tb1=1), nothing deferred · keys '+TB_hash()+ok(true);
+    const s=TB_snap(),r=TB_drain(),g=TB.GL,keys=new Map();let all=0,got=0;if(g)for(let a=0;a<g.nx;a++)for(let b=0;b<g.nz;b++){all++;if(GND_in(g,g.x0+(a+.5)*g.dx,g.z0+(b+.5)*g.dz)!==undefined)got++}
+    HUB.grp.traverse(o=>{const k=o.userData&&o.userData.tbk;if(k&&o.geometry&&o.geometry.attributes.position)keys.set(k,(keys.get(k)||0)+o.geometry.attributes.position.count)});
+    let bad=0,first='';for(const[k,n]of TB.rec)if(keys.get(k)!==n){bad++;if(!first)first=k.slice(-12)+' '+keys.get(k)+'/'+n}
+    const sp=RO.spawn0?Math.hypot(RO.spawn0[0]-TB_spawn()[0],RO.spawn0[1]-TB_spawn()[1]):0,p1=s.cells[0]===s.cells[1]&&s.cells[1]>0&&s.near===0,p2=TB.fin&&r.sec<=30&&got===all&&TB.pend.length===0&&!TB.bt.m.size,p3=bad===0&&TB.rec.size>0,p4=sp<=TB.R;
+    return'📍 tb-geo fra: R0 cells '+s.cells[0]+'/'+s.cells[1]+', all at +'+(p2?'30':'>30')+' s (drained in '+r.sec+' game-s, '+r.ms+' ms CPU; cells '+got+'/'+all+', queued '+s.pend+' pieces, '+s.near+' of them in R0), keys '+(p3?'equal':'DIFFER '+bad+' ('+first+')')+' ('+TB_hash()+')'+(p4?'':' · spawn outside R0 by '+Math.round(sp)+' m')+ok(p1&&p2&&p3&&p4)}}];return}
+ if(i<600)setTimeout(()=>TBGO_reg(i+1),100)})(0);

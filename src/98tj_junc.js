@@ -85,11 +85,11 @@ function TJ_isRoad(mat){const M=HUB.M;return!!M&&(mat===M.road||mat===M.street||
 function TJ_capture(g,mat,matrix){if(!TJ.cap||!TJ_isRoad(mat)||mat.map===HUB.M.jn)return;const P=g.attributes.position,I=g.index,n=I?I.count:P.count,v=new THREE.Vector3(),W=[];
   for(let i=0;i<P.count;i++){v.fromBufferAttribute(P,i);if(matrix)v.applyMatrix4(matrix);W.push(v.x,v.y,v.z)}
   for(let t=0;t<n;t+=3){const a=(I?I.getX(t):t)*3,b=(I?I.getX(t+1):t+1)*3,c=(I?I.getX(t+2):t+2)*3,T=[W[a],W[a+1],W[a+2],W[b],W[b+1],W[b+2],W[c],W[c+1],W[c+2]];
-    const ar=(T[3]-T[0])*(T[8]-T[2])-(T[6]-T[0])*(T[5]-T[2]);if(Math.abs(ar)<1e-6)continue;T.push(ar);
+    const ar=(T[3]-T[0])*(T[8]-T[2])-(T[6]-T[0])*(T[5]-T[2]);if(Math.abs(ar)<1e-6)continue;T.push(ar,TB.ph);
     const i0=Math.floor(Math.min(T[0],T[3],T[6])/8),i1=Math.floor(Math.max(T[0],T[3],T[6])/8),j0=Math.floor(Math.min(T[2],T[5],T[8])/8),j1=Math.floor(Math.max(T[2],T[5],T[8])/8);if((i1-i0)*(j1-j0)>400)continue;
     for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++){const A=TJ.cap.get(i*100000+j);if(A)A.push(T)}}}
 // highest captured surface at (x,z) within 0.15 m of the ground (roads drape ≤ ~0.13 m; deck/bridge ramps above are not this junction's surface)
-function TJ_top(x,z,g){const A=TJ.cap&&TJ.cap.get(Math.floor(x/8)*100000+Math.floor(z/8));let m=-1e9;if(A)for(const T of A){const ar=T[9],w1=((T[3]-x)*(T[8]-z)-(T[6]-x)*(T[5]-z))/ar,w2=((T[6]-x)*(T[2]-z)-(T[0]-x)*(T[8]-z))/ar,w3=1-w1-w2;
+function TJ_top(x,z,g){const A=TJ.cap&&TJ.cap.get(Math.floor(x/8)*100000+Math.floor(z/8));let m=-1e9;if(A)for(const T of A){if(T[10]>TB.q)continue;const ar=T[9],w1=((T[3]-x)*(T[8]-z)-(T[6]-x)*(T[5]-z))/ar,w2=((T[6]-x)*(T[2]-z)-(T[0]-x)*(T[8]-z))/ar,w3=1-w1-w2;
     if(w1<-1e-4||w2<-1e-4||w3<-1e-4)continue;const y=w1*T[1]+w2*T[4]+w3*T[7];if(y>m&&y<g+.15)m=y}return m}
 function TJ_y(x,z,off,r=.75){const g=groundY(x,z);if(!TJ.conf||!TJ.cap)return g+off;let e=0;
   if(!r){const t=TJ_top(x,z,g);return Math.max(g+off,t+TJ.mg)}  // r=0: one sample (small decals: zebra stripes)
@@ -108,9 +108,9 @@ function TJ_padGeo(cx,cz,ax,az,bx,bz,A,B,off){let na=Math.max(1,Math.ceil(2*A/3)
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
   if(g.attributes.normal.getY(0)<0){idx.reverse();g.setIndex(idx);g.computeVertexNormals()}return g}
 function TJ_pads(bt,M){if(!TJ.pad||CID!=='fra'||!M.jn)return;const jm=new THREE.MeshStandardMaterial({map:M.jn,roughness:.85,metalness:0,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-8});let n=0;
-  for(const c of TJ_fx()){bt.add(TJ_padGeo(c.x,c.z,c.tx,c.tz,c.ux,c.uz,c.A,c.B,.056),jm);n++}HUB.tjPads=n}
+  for(const c of TJ_fx()){TB_put(bt,c.x,c.z,()=>(TB.lab='pad',TJ_padGeo(c.x,c.z,c.tx,c.tz,c.ux,c.uz,c.A,c.B,.056)),jm,6);n++}HUB.tjPads=n}
 {const _a=TBatch.prototype.add;TBatch.prototype.add=function(g,mat,matrix){try{TJ_capture(g,mat,matrix)}catch(e){}return _a.call(this,g,mat,matrix)}}
 // capture runs only while the hub is built (cells from the final street net: after hubRoads + RD_fillLoop, i.e. at the first road)
-{const _b=buildHubG;buildHubG=function*(){TJ.cap=null;TJ.capOn=TJ.conf;try{yield*_b()}finally{TJ.cap=null;TJ.capOn=0}}}
+{const _b=buildHubG;buildHubG=function*(){if(HUB.built)return;/* tb1: a later call (hub already built) must not drop the capture the queued pieces still use */TJ.cap=null;TJ.capOn=TJ.conf;try{yield*_b()}finally{if(!(TB.on&&(TB.pend.length||TB.gnd))){TJ.cap=null;TJ.capOn=0}}}}
 {const _r=TJ_capture;TJ_capture=function(g,mat,matrix){if(TJ.capOn&&!TJ.cap&&TJ_isRoad(mat))TJ.cap=TJ_cells();return _r(g,mat,matrix)}}
 {const _f=cityStreetsBuild;cityStreetsBuild=function(bt,M){_f(bt,M);try{TJ_pads(bt,M)}catch(e){console.warn('TJ_pads',e)}}}
