@@ -45,3 +45,8 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - Reviewed PASS and waiting for beta.165: gui-r30a (1584590, 1c1e191), traffic-r30c2 (1fb1138, fc3bda4), boot-r30e (330a5fb, 6bc9823), jserr-r30f (6b8da29).
 - Still on trunk with a FAILED review, reworks running: touchdrive (0aa5fa4..d094be2) and world-r30b (5063c2f, 90f612f). beta.165 waits for both (to avoid a multi-commit revert); if either fails again, revert it before the build.
 - Tools-only follow-ups for boot-r30g: gauntlet.js:373 WARN sampler print commented out; gauntlet.js:391 can crash before the jsErrors row if the portrait boot throws (guard Q).
+
+## 30 Oct ~16:10
+- world-r30h pushed c7a7842 + d10705c (round-3 patch + 3 foliage-cam root causes; sq_tv_1 fig not reproduced, persistent START clear added). Gates green; gauntlet FAIL rows = trunk baseline. Needs an OPUS review after review-r30-9 (touchdrive) finishes.
+- Running: links-r30i (SONNET, late shader links), tilebuild-r30j (OPUS design plan for boot ≤ 36 s, session_01RR7mnb5U1JRaBr7aPxJqRz), reviewer review-r30-9.
+- beta.165 still waits for world + touchdrive verdicts.
