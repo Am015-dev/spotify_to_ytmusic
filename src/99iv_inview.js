@@ -4,7 +4,7 @@
 // sideways in one step; it closes the rest towards its pose at that rate. A gap it cannot close (> IV.tp m: recycle, respawn, a re-route back to a node) on a spot
 // the player can see (HT_canPop false) is hidden in that frame and the car respawns out of sight (c.dead → HT_dead → HT_place), so a recycle shows only behind the camera.
 // Cars touching the player (< 8 m, hitT, tumble) keep their physical shove. ?iv=0 = off. GO: why/traffic-inview (fra + ath).
-const IV={on:!/[?&]iv=0/.test(location.search),r:70/* 60 m around the player + the chase-camera offset */,sl:.5,so:1.5,lat:2.5,tp:20,n:{cl:0,hide:0,snap:0},wT:-1,lt:null,lx:0,lz:0,ft:-1,fm:new THREE.Matrix4(),fr:new THREE.Frustum()},_ivM=new THREE.Matrix4(),_ivZ=new THREE.Matrix4().makeScale(0,0,0);
+const IV={on:!/[?&]iv=0/.test(location.search),near:/[?&]ivnear=1/.test(location.search),r:70/* 60 m around the player + the chase-camera offset */,sl:.5,so:1.5,lat:2.5,tp:20,n:{cl:0,hide:0,snap:0},wT:-1,lt:null,lx:0,lz:0,ft:-1,fm:new THREE.Matrix4(),fr:new THREE.Frustum()},_ivM=new THREE.Matrix4(),_ivZ=new THREE.Matrix4().makeScale(0,0,0);
 function IV_zone(x,z,y){const C=camera.position,d2=(x-C.x)**2+(z-C.z)**2;if(d2<IV.r*IV.r)return true;if(d2>62500)return false;/* traffic-pop-r25h: the view frustum is the camera's own, every frame. It used to be HT_POP.f, which only exists with the traffic law ON (default OFF), so beyond 70 m no car counted as seen: a 6-9 m junction hand-off step was closed at the out-of-sight 1.5 m per frame (90 m/s) on cars 60-250 m away, in plain view */if(IV.ft!==T){IV.ft=T;camera.updateMatrixWorld();IV.fm.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);IV.fr.setFromProjectionMatrix(IV.fm)}HT_PS.center.set(x,(y||0)+1,z);return IV.fr.intersectsSphere(HT_PS)}
 function IV_each(im,fn){if(!im)return;fn(im);if(im.userData.w)fn(im.userData.w);if(im.userData.g)fn(im.userData.g)}
 function IV_hide(c,im){IV_each(im,m=>m.setMatrixAt(c.j,_ivZ));c.dead=.3;c.ivx=null;IV.n.hide++;return 1}
@@ -13,7 +13,8 @@ function IV_guard(c,A,B,gA,im){const x=c.x,z=c.z,ox=c.ivx,oz=c.ivz;let el=T-c.iv
  if(!(el<.6&&el>-1e-6)){if(g>IV.tp&&!HT_canPop(x,z,c.y))return IV_hide(c,im);return}/* after a gap (pose skipped while far: c.x went stale) a car may not reappear in sight */el=Math.max(el,1/60);
  const v=Math.abs(c.cv||0);let sl=Math.min(IV.sl,Math.max(1.5,.5*v)*el),lm=IV.lat*el;if(g<.02)return;let hx=c.hdx,hz=c.hdz;const hm=Math.hypot(hx||0,hz||0);if(!(hm>.5)){hx=gx/g;hz=gz/g}else{hx/=hm;hz/=hm}
  const a0=gx*hx+gz*hz,l0=gz*hx-gx*hz;if(g<=IV.tp&&a0>=-sl&&a0<=v*el+sl&&Math.abs(l0)<=lm)return;/* already inside the rule */
- if((x-RO.x)**2+(z-RO.z)**2<64||c.hitT>0||c.crW)return;/* a shove from the player is physics */
+ if(c.hitT>0||c.crW||IV.near&&(x-RO.x)**2+(z-RO.z)**2<64)return;/* a shove from the player is physics (W10_bump sets hitT). traffic-r30c2: the < 8 m exemption is gone: it let HT_pose's own
+   lane re-pose snap 2-4 m sideways right beside the player (gauntlet drive/pop, 4.2 m at 8 m, same edge and t). ?ivnear=1 = old */
  const vis=IV_zone(x,z,c.y)||IV_zone(ox,oz,c.y);if(g>IV.tp){if(vis&&!HT_canPop(x,z,c.y))return IV_hide(c,im);IV.n.snap++;return}/* a recycle out of sight snaps */
  if(!vis){sl=Math.max(sl,IV.so);lm=Math.max(lm,IV.so)}/* out of sight it still closes, 1.5 m a step: a lag snapped as the camera turned away was a 7-13 m step when it turned back (why/solid-cars d) */
  const a=Math.max(-sl,Math.min(v*el+sl,a0)),l=Math.max(-lm,Math.min(lm,l0)),nx=ox+a*hx-l*hz,nz=oz+a*hz+l*hx,sx=nx-x,sz=nz-z;

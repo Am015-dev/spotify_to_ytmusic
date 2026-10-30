@@ -1,0 +1,1 @@
+{"when":"2026-10-30T05:09Z","cmd":"node tools/gauntlet.js --build out/r30c2-g --ver r30c2-g-s2 --seed 2 --only drive,hit,ath","wall":"730"}

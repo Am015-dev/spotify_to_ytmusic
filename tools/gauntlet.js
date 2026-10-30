@@ -9,6 +9,8 @@
 const {chromium}=(()=>{try{return require('playwright')}catch(e){return require('/opt/node22/lib/node_modules/playwright')}})();
 const fs=require('fs'),path=require('path'),http=require('http'),cp=require('child_process');
 const A=process.argv.slice(2),arg=(k,d)=>{const i=A.indexOf('--'+k);return i<0?d:(A[i+1]&&!A[i+1].startsWith('--')?A[i+1]:true)};
+// traffic-r30c2: the bot's own choices (branch pick, reverse steer, wall side) come from a seeded RNG (--seed N, default 7), so runs of two builds drive the same choices; the game's randomness is untouched
+const RNG=(s=>()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296)((+arg('seed',7))>>>0||7);
 const ROOT=path.join(__dirname,'..'),T0=Date.now(),wall=()=>((Date.now()-T0)/1000).toFixed(0);
 const ONLY=String(arg('only','boot,perf,hud,steer,drive,hit,drift,wall,mission,race,pause,ath,portrait')).split(','),on=k=>ONLY.includes(k);
 const THR=+arg('throttle',6),DT=1/30;
@@ -48,7 +50,7 @@ G.sample=dt=>{const x=RO.x,z=RO.z,P=G.P||{x,z,v:RO.v};const mv=Math.hypot(x-P.x,
  let n40=0;const live=new Set();
  if(state==='roam'&&RO.on)for(const c of HUB.cars||[]){if(!isFinite(c.x+c.z))continue;const alive=!(c.dead>0)&&!c.pk,dd=Math.hypot(c.x-x,c.z-z);if(alive&&dd<40)n40++;if(state==='roam'&&RO.on){const bi=c.pk?5:c.dead>0?6:dd<40?0:dd<80?1:dd<150?2:dd<300?3:4;G.hb[bi]++;if(!c.pk&&!(c.dead>0)&&dd<150&&(c.cv||0)<1)G.hb[7]++}live.add(c);const p=G.CP.get(c);
   if(alive&&dd<60&&dd>6&&!warp&&!(c.hitT>0)){const vx=c.x-cf[0],vz=c.z-cf[1],vd=Math.hypot(vx,vz)||1,view=(vx*cf[2]+vz*cf[3])/vd>.64;
-   if(view&&p&&p.alive){const j=Math.hypot(c.x-p.x,c.z-p.z);if(j>2)G.pops.push({T:+T.toFixed(1),kind:'jump',m:+j.toFixed(1),d:+dd.toFixed(0),x:+c.x.toFixed(0),z:+c.z.toFixed(0),why:'k'+c.k+' '+p.a+'>'+p.b+'@'+p.t+' -> '+c.a+'>'+c.b+'@'+(+c.t).toFixed(2)+' cv'+(c.cv||0).toFixed(1)})}
+   if(view&&p&&p.alive){const j=Math.hypot(c.x-p.x,c.z-p.z);if(j>2)G.pops.push({T:+T.toFixed(1),kind:'jump',m:+j.toFixed(1),d:+dd.toFixed(0),x:+c.x.toFixed(0),z:+c.z.toFixed(0),why:'k'+c.k+' '+p.a+'>'+p.b+'@'+p.t+' -> '+c.a+'>'+c.b+'@'+(+c.t).toFixed(2)+' cv'+(c.cv||0).toFixed(1)+(c.dgw&&T-c.dgT<.2?' w:'+c.dgw:'')})}
    else if(view&&p&&!p.alive&&dd<40)G.pops.push({T:+T.toFixed(1),kind:'appear',m:0,d:+dd.toFixed(0),x:+c.x.toFixed(0),z:+c.z.toFixed(0)})}
   G.CP.set(c,{x:c.x,z:c.z,alive,a:c.a,b:c.b,t:(+c.t).toFixed(2)})}
  if(state==='roam'&&RO.on){G.n40+=n40;G.n40s++}
@@ -99,7 +101,7 @@ function Router(nodes){const N=nodes,ok=i=>N[i]&&!N[i][3]&&!N[i][4];
  const near=st=>{let b=null;for(let i=0;i<N.length;i++){const n=N[i];if(!ok(i)||Math.abs(n[0]-st.x)>90||Math.abs(n[1]-st.z)>90)continue;for(const j of n[2]){if(!ok(j)||j<i&&N[j][2].includes(i))continue;const m=N[j],dx=m[0]-n[0],dz=m[1]-n[1],L2=dx*dx+dz*dz;if(L2<1)continue;let t=((st.x-n[0])*dx+(st.z-n[1])*dz)/L2;t=Math.max(0,Math.min(1,t));const d=Math.hypot(n[0]+dx*t-st.x,n[1]+dz*t-st.z);if(!b||d<b.d)b={i,j,t,d,w:Math.max(n[5],m[5])}}}return b};
  return{N,choice:{},
  seg(st){const s=near(st);if(!s)return null;let a=s.i,b=s.j,t=s.t;const n=N[a],m=N[b];if((m[0]-n[0])*Math.sin(st.h)+(m[1]-n[1])*Math.cos(st.h)<0){[a,b]=[b,a];t=1-t}return{a,b,t,d:s.d,w:s.w}},
- pick(a,b,h,goal){const k=a+'>'+b;if(this.choice[k]!=null)return this.choice[k];const m=N[b];let best=null,bs=1e9;for(const j of m[2]){if(j===a||!ok(j))continue;const q=N[j],ang=Math.atan2(q[0]-m[0],q[1]-m[1]),turn=Math.abs(W(ang-h));if(turn>2.4)continue;const sc=goal?Math.hypot(q[0]-goal[0],q[1]-goal[1])+turn*15:turn+Math.random()*.9;if(sc<bs){bs=sc;best=j}}this.choice[k]=best;return best},
+ pick(a,b,h,goal){const k=a+'>'+b;if(this.choice[k]!=null)return this.choice[k];const m=N[b];let best=null,bs=1e9;for(const j of m[2]){if(j===a||!ok(j))continue;const q=N[j],ang=Math.atan2(q[0]-m[0],q[1]-m[1]),turn=Math.abs(W(ang-h));if(turn>2.4)continue;const sc=goal?Math.hypot(q[0]-goal[0],q[1]-goal[1])+turn*15:turn+RNG()*.9;if(sc<bs){bs=sc;best=j}}this.choice[k]=best;return best},
  aim(st,goal){const s=this.seg(st);if(!s)return st.h;const n=N[s.a],m=N[s.b],L=Math.hypot(m[0]-n[0],m[1]-n[1]),rem=L*(1-s.t),look=12+Math.abs(st.v)/3.6*.6;this.bend=0;
   if(rem>=look){const f=(L*s.t+look)/L;return Math.atan2(n[0]+(m[0]-n[0])*f-st.x,n[1]+(m[1]-n[1])*f-st.z)}
   const h=Math.atan2(m[0]-n[0],m[1]-n[1]),j=this.pick(s.a,s.b,h,goal);if(j==null)return Math.atan2(m[0]-st.x,m[1]-st.z);
@@ -142,7 +144,7 @@ function hudCheck(v,tag){const out={over:[],small:[]};const ov=(a,b)=>Math.max(0
 
 async function scDrive(P,router){await P.ev('__GH.resetStats();0');const s0=await P.step(1);let gasT=0,slowT=0,stuck=0,rev=0,shot=null,km=0,last=s0,vs=[],offN=0,offR=0;
  const pol=async st=>{const dv=Math.hypot(st.x-last.x,st.z-last.z);if(dv<20)km+=dv/1000;last=st;vs.push(st.v);
-  if(rev>0){rev-=DT*3;return['tB',...(Math.random()<.5?['tL']:[])]}
+  if(rev>0){rev-=DT*3;return['tB',...(RNG()<.5?['tL']:[])]}
   if(st.v<3){stuck+=DT*3;if(stuck>2){stuck=0;rev=1.5;}}else stuck=0;
   if(process.env.GDEBUG&&offN%20===0){const sg=router.seg(st);console.log('DBG',JSON.stringify({held:[...P.pts.keys()],x:st.x,z:st.z,h:st.h,v:st.v,sg,aim:+router.aim(st).toFixed(2),off:+router.off(st).toFixed(1)}))}
   gasT+=DT*3;if(st.v<10)slowT+=DT*3;offN++;if(router.off(st)>1.5)offR++;
@@ -203,7 +205,7 @@ async function scDrift(P,router){const D=[],T=[];let shot='';
  row('drift/tap','a 0.15 s BRAKE tap in a corner never slides',`${tBad}/${3-tB} slid (peak ${T.map(t=>t.bad?'no setup':t.peak+'°').join(', ')})`,'0 slid, 3 valid setups',tBad===0&&tB===0,'')}
 
 async function scWalls(P,router){const G=[],H=[];let shots=[];
- const one=async(ang,kind,idx)=>{for(let a=0;a<6;a++){let st=await onStraight(P,router,kind==='head'?45:40);const side=Math.random()<.5?-1:1;const road=router.aim(st);const tgt=road+side*ang;
+ const one=async(ang,kind,idx)=>{for(let a=0;a<6;a++){let st=await onStraight(P,router,kind==='head'?45:40);const side=RNG()<.5?-1:1;const road=router.aim(st);const tgt=road+side*ang;
    if(st.bad)continue;const wd=await P.ev(`__GH.wallAhead(${tgt},45)`);if(!(wd>7)){await P.run(2,s=>router.drive(s));continue}
    // turn onto the wall line with ◀/▶, then hold GAS straight at it
    st=await P.run(2,s=>Math.abs(W(tgt-s.h))<.05?'stop':[...pace(s,kind==='head'?45:40),...steer(s,tgt,.03)]);
