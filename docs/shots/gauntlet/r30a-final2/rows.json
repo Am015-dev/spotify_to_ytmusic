@@ -1,0 +1,263 @@
+[
+ {
+  "id": "boot/playVisible",
+  "what": "page open → PLAY button visible",
+  "num": "14.8 s lab",
+  "bar": "INFO (lab, software GL)",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_0_title.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl",
+  "what": "PLAY tap → first control of the car",
+  "num": "75.2 s lab (6x CPU)",
+  "bar": "<= 8 s lab",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/menu",
+  "what": "race menu never shows after PLAY (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "boot/loader",
+  "what": "loader never covers a controllable car (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls",
+  "what": "HUD text over the touch buttons (first control)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "hud/minText",
+  "what": "smallest visible text (first control)",
+  "num": "0 items < 12 px",
+  "bar": "0 (CLAUDE.md: 12 px minimum)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "mission/reach",
+  "what": "drive to the nearest mission marker (collect \"Stud Rush: Bankenviertel\", 45 m)",
+  "num": "8 s game, tapped the TAP TO OPEN prompt",
+  "bar": "reached <= 60 s game",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "mission/card",
+  "what": "mission card before START: name + ONE line (buttons not counted)",
+  "num": "name 3 words + line 4 words: \"Stud Rush: Bankenviertel | Collect the golden bricks\"",
+  "bar": "name <= 4 words, objective line <= 6 words, nothing else (Alex: a 40-word card; Hit & Run shows 3; gui-r30a: stars, times, rewards and the long brief are behind DETAILS)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_6_mission_card.jpg",
+  "note": ""
+ },
+ {
+  "id": "mission/details",
+  "what": "DETAILS is one tap away and shows the stars / times / rewards",
+  "num": "120 words after the tap",
+  "bar": "a DETAILS tap shows > 6 words (and START is still on the card)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_6a_mission_details.jpg",
+  "note": "SIDE CHALLENGE Stud Rush: Bankenviertel ★★★ NOT PLAYED YET Golden bricks hidden in three districts. "
+ },
+ {
+  "id": "mission/cover",
+  "what": "HUD/cards over the touch buttons at mission start",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_6_mission_card.jpg",
+  "note": ""
+ },
+ {
+  "id": "mission/objective",
+  "what": "first objective text after START (largest text line)",
+  "num": "4 words: \"STUD RUSH: BANKENVIERTEL · 1/3 ·\"",
+  "bar": "<= 6 words (hr/mstart)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_6b_mission_start.jpg",
+  "note": "STUD RUSH: BANKENVIERTEL · 1/3 · | ➤ | Go · left in 20 m | 02:27.6"
+ },
+ {
+  "id": "mission/toast",
+  "what": "the coach toast over the road after START",
+  "num": "on screen 3.5 s game (from 1.5 s after START)",
+  "bar": "<= 4 s on screen (the objective lives in the one-line HUD slot)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_7a_toast_3s.jpg",
+  "note": ""
+ },
+ {
+  "id": "mission/end",
+  "what": "mission ends with a fail screen that offers RETRY",
+  "num": "fail screen with RETRY",
+  "bar": "RETRY visible",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_8_mission_end.jpg",
+  "note": "STUD RUSH: BANKENVIERTEL | TIME UP | No stars this time · try again | 0/3 stages · 4.6 km · ★★★ 03:05.0 · 🏎 RIVAL | ↺ R"
+ },
+ {
+  "id": "mission/retry",
+  "what": "RETRY from the fail screen puts me back in the mission",
+  "num": "0.2 s game, 0.1 s lab",
+  "bar": "back driving <= 2 s game",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls2",
+  "what": "HUD text over the touch buttons (later in roam)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "menu/tiles",
+  "what": "every race tile has a preview image and its full name at >= 12 px",
+  "num": "11/11 tiles ok",
+  "bar": "0 tiles blank, cut or < 12 px (gui-r30a)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_10_race_menu.jpg",
+  "note": ""
+ },
+ {
+  "id": "race/start",
+  "what": "pause → QUIT TO TITLE → RACES → START reaches the grid",
+  "num": "countdown",
+  "bar": "countdown or race",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_10_race_menu.jpg",
+  "note": ""
+ },
+ {
+  "id": "race/finish",
+  "what": "race finishes with a result screen",
+  "num": "results after 144 s game",
+  "bar": "#results visible <= 480 s game",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_12_race_finish.jpg",
+  "note": "6TH PLACE"
+ },
+ {
+  "id": "portrait/boot",
+  "what": "portrait 390x844: PLAY → control (1x CPU)",
+  "num": "23.4 s lab",
+  "bar": "control reached",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/band",
+  "what": "portrait: the 3D view reaches the bottom of the screen (no flat pale band under the road)",
+  "num": "mean brightness of the 84-88 % rows 56",
+  "bar": "< 140 (the beta.164 band measures 174: pale blue, no road; gui-r30a near-plane fix)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/hud",
+  "what": "portrait: HUD text over the touch buttons",
+  "num": "0 overlaps, 0 texts < 12 px",
+  "bar": "0 / 0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/r30a-final2/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "page/reload",
+  "what": "page never reloads",
+  "num": "0 reloads",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/jsErrors",
+  "what": "no JS errors (pageerror + console.error)",
+  "num": "0 errors",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/memory",
+  "what": "JS heap high-water (performance.memory)",
+  "num": "21 MB",
+  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "seen/floating-pickup",
+  "what": "wrench pickup hovers ~3 m above the road ahead in the very first drivable frame (HITRUN_GAP gap 2: pickups at car height)",
+  "num": "seen in the shot",
+  "bar": "nothing sloppy on screen",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "seen/roof-seam",
+  "what": "magenta seam along the long green building's roof edge, left of the first frame (also in portrait)",
+  "num": "seen in the shot",
+  "bar": "nothing sloppy on screen",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "seen/sky-debris",
+  "what": "grey blocky flocks over the park and the Athens street read as floating debris, not birds",
+  "num": "seen in the shot",
+  "bar": "nothing sloppy on screen",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_2_street_at_speed.jpg",
+  "note": ""
+ },
+ {
+  "id": "seen/prop-on-car",
+  "what": "at the mission start a flat beige slab and a black/red/yellow block sit on the road overlapping my car",
+  "num": "seen in the shot",
+  "bar": "nothing sloppy on screen",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_6b_mission_start.jpg",
+  "note": ""
+ },
+ {
+  "id": "seen/camera-in-props",
+  "what": "glancing a kiosk puts the camera inside a giant minifig head and an umbrella: the car is hidden",
+  "num": "seen in the shot",
+  "bar": "nothing sloppy on screen",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/r30a-final2/fra_5_glance_4.jpg",
+  "note": ""
+ }
+]

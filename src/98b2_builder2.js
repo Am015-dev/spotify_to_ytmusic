@@ -538,7 +538,9 @@ frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try
 
 // Race menu: the built-in builder tracks are listed after the city tracks (tap = open the builder on that track and drive it)
 const BX_DEMOS_SHOW=true,BX_RACE_LAPS=2; // trk-2: shown again after the beta.22 fixes (ride facing, rail slide, race mode; matrix 96/96). trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (trk-2: TWO-LEVEL CITY redone and shown). Races are 2 laps (coordinator)
-function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';
+// gui-r30a: race-menu preview of a builder track from its own piece log (cell i,j of every 'p' entry; a jump of > 3 cells, e.g. between split branches, starts a new line)
+function bxThumb(k){const D=BX_DEMOS[k],L=typeof D.log==='function'?D.log():D.log,polys=[];let cur=null,pi=0,pj=0;for(const a of L){if(a[0]!=='p')continue;const p={x:a[2],z:a[3],y:0};if(cur&&Math.hypot(a[2]-pi,a[3]-pj)<=3)cur.push(p);else polys.push(cur=[p]);pi=a[2];pj=a[3]}return thumbPaint('bx:'+k,polys.filter(q=>q.length>1),false)}
+function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';try{b.append(bxThumb(k))}catch(e){console.warn('bxThumb',e)}
  b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 2 laps</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
  b.onclick=e=>{e.stopPropagation();BX_raceStart(k)};tw.appendChild(b)}} // trk-2: a Race-menu track starts a RACE (countdown, rivals, position, results)
 buildMenu=(f=>function(){const r=f.apply(this,arguments);try{BX_raceMenu()}catch(e){console.warn(e)}return r})(buildMenu);

@@ -228,15 +228,21 @@ async function scMission(P,router){let marks=await P.ev('__GH.marks()');const m=
  if(!card)return;
  await P.step(6);let v=await P.vis();const cardShot=await P.shot('fra_6_mission_card');
  const cardTxt=v.txt.filter(t=>/roamCard|rc|card|Card|npcSay|banner|roamTop|qv/i.test(t.id+'')).map(t=>t.t);const big=v.txt.filter(t=>t.b[2]*t.b[3]>0.3*v.W*v.H);
- const cardT=await P.p.evaluate(()=>{const c=document.querySelector('#roamCard');if(!c||c.hidden)return'';const k=c.cloneNode(true);k.querySelectorAll('button').forEach(b=>b.remove());return(k.innerText||k.textContent||'').replace(/\s+/g,' ').trim()});
- const words={n:cardT.split(/\s+/).filter(w=>/[A-Za-z0-9]/.test(w)).length,s:cardT};
+ const cardP=await P.p.evaluate(()=>{const c=document.querySelector('#roamCard');if(!c||c.hidden)return{h:'',t:''};const k=c.cloneNode(true);k.querySelectorAll('button').forEach(b=>b.remove());const h=k.querySelector('h4'),ht=h?h.textContent:'';if(h)h.remove();const W=x=>(x||'').replace(/\s+/g,' ').trim();return{h:W(ht),t:W(k.innerText||k.textContent)}});
+ const wc=t=>t.split(/\s+/).filter(w=>/[A-Za-z0-9]/.test(w)).length,cardT=cardP.h+' | '+cardP.t;
+ const words={n:wc(cardP.t),nh:wc(cardP.h),s:cardT};
  const hc=hudCheck(v,'mission card');
- row('mission/card','mission card text before START (buttons not counted)',`${words.n} words: "${words.s.slice(0,70)}"`,'<= 6 words (Alex: a 40-word card; Hit & Run shows 3)',words.n<=6&&words.n>0,cardShot);
+ row('mission/card','mission card before START: name + ONE line (buttons not counted)',`name ${words.nh} words + line ${words.n} words: "${words.s.slice(0,70)}"`,'name <= 4 words, objective line <= 6 words, nothing else (Alex: a 40-word card; Hit & Run shows 3; gui-r30a: stars, times, rewards and the long brief are behind DETAILS)',words.n<=6&&words.n>0&&words.nh>0&&words.nh<=4,cardShot);
+ {const det=await P.tapText(/^DETAILS$/);await P.step(6);const dt=await P.p.evaluate(()=>{const c=document.querySelector('#roamCard');return c&&!c.hidden?(c.innerText||'').replace(/\s+/g,' ').trim():''});const dshot=await P.shot('fra_6a_mission_details');
+  row('mission/details','DETAILS is one tap away and shows the stars / times / rewards',det?`${dt.split(/\s+/).length} words after the tap`:'no DETAILS button','a DETAILS tap shows > 6 words (and START is still on the card)',!!det&&dt.split(/\s+/).length>6&&/LET'?S GO|START/i.test(dt),dshot,dt.slice(0,100))}
  row('mission/cover','HUD/cards over the touch buttons at mission start',`${hc.over.length} overlaps`,'0',hc.over.length===0,cardShot,hc.over.slice(0,2).join('; '));
  // accept like a player: the big green button on the card, if there is one
- const acc=await P.tapText(/LET'?S GO|START|GO ▶|^GO$|ACCEPT/i);if(acc){await P.step(30)}
- {const v3=await P.vis();const obj=v3.txt.filter(t=>t.b[1]<v3.H*.6&&!/^[\d:.\s]+$|KM\/H|❚/.test(t.t)&&/[A-Za-z]{3}/.test(t.t)).sort((a,b)=>b.b[2]*b.b[3]-a.b[2]*a.b[3])[0];const n=obj?obj.t.split(/\s+/).filter(w=>/[A-Za-z0-9]/.test(w)).length:0;const sh=await P.shot('fra_6b_mission_start');
+ const tGo=P.st.T,acc=await P.tapText(/LET'?S GO|START|GO ▶|^GO$|ACCEPT/i);if(acc){await P.step(30)}
+ {await P.step(12);/* the HUD pill is repainted on a wall-clock timer: give it a moment (script timing; the final run read it empty once) */const v3=await P.vis();const obj=v3.txt.filter(t=>t.b[1]<v3.H*.6&&!/^[\d:.\s]+$|KM\/H|❚/.test(t.t)&&/[A-Za-z]{3}/.test(t.t)).sort((a,b)=>b.b[2]*b.b[3]-a.b[2]*a.b[3])[0];const n=obj?obj.t.split(/\s+/).filter(w=>/[A-Za-z0-9]/.test(w)).length:0;const sh=await P.shot('fra_6b_mission_start');
   row('mission/objective','first objective text after START (largest text line)',obj?`${n} words: "${obj.t.slice(0,60)}"`:'none visible','<= 6 words (hr/mstart)',n>0&&n<=6,sh,v3.txt.filter(t=>t.b[1]<v3.H*.6).map(t=>t.t).join(' | ').slice(0,160))}
+ {/* the coach toast (#npcSay) must be gone within 4 s: sampled every 0.5 game s for 10 s after START (wall-clock timers do not run while the harness steps, so the toast also hides on game time) */
+  let first=null,last=null,toastShot='';for(let i=0;i<20;i++){const vis=await P.ev("(()=>{const e=document.getElementById('npcSay');if(!e||e.hidden)return false;const r=e.getBoundingClientRect();return r.height>0&&r.width>0})()");const t=P.st.T;if(vis){if(first==null)first=t;last=t;if(!toastShot&&t-first>=3)toastShot=await P.shot('fra_7a_toast_3s')}await P.step(15)}
+  const dur=first==null?0:last-first+.5;row('mission/toast','the coach toast over the road after START',first==null?'never shown':`on screen ${dur.toFixed(1)} s game (from ${(first-tGo).toFixed(1)} s after START)`,'<= 4 s on screen (the objective lives in the one-line HUD slot)',dur<=4,toastShot)}
  st=await P.step(3);const tq=st.T;let hudShot='';let res=null,lastLeft=null;
  while(st.T-tq<200){st=await P.run(2,s=>{if(s.tx!=null){const d=Math.hypot(s.tx-s.x,s.tz-s.z);return[...pace(s,d<40?30:60),...steer(s,d<50?Math.atan2(s.tx-s.x,s.tz-s.z):router.aim(s,[s.tx,s.tz]))]}return router.drive(s)});
   if(!hudShot&&st.ch&&st.T-tq>4)hudShot=await P.shot('fra_7_mission_hud');lastLeft=st.chLeft;
@@ -262,6 +268,8 @@ async function scRace(P){// pause -> QUIT TO TITLE -> 🏁 RACES -> START, then 
  await P.ev('__GH.release();0');await P.p.waitForTimeout(3000);
  let v=await P.vis();let r=v.btn.some(x=>/START RACE/.test(x.t))?'already on CHOOSE TRACK':await P.tapText(/RACES/);if(!r){await P.p.waitForTimeout(4000);r=await P.tapText(/RACES/)}
  await P.p.waitForTimeout(2500);const menuShot=await P.shot('fra_10_race_menu',false);
+ {const tl=await P.p.evaluate(()=>[...document.querySelectorAll('#tracks .trk')].filter(e=>e.offsetParent).map(e=>{const c=e.querySelector('canvas'),b=e.querySelector('b'),fs=b?parseFloat(getComputedStyle(b).fontSize):0;let ink=0;if(c){try{const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;for(let i=0;i<d.length;i+=16)if(d[i]+d[i+1]+d[i+2]>180)ink++}catch(x){}}return{n:(b?b.textContent:'').trim(),fs,ink,cut:b?(b.scrollWidth>b.clientWidth+1||b.scrollHeight>b.clientHeight+1||getComputedStyle(b).textOverflow==='ellipsis'&&b.scrollWidth>b.clientWidth):true,img:!!c}}));
+  const bad=tl.filter(t=>!t.img||t.ink<150||t.cut||t.fs<12);row('menu/tiles','every race tile has a preview image and its full name at >= 12 px',`${tl.length-bad.length}/${tl.length} tiles ok`+(bad.length?` (bad: ${bad.slice(0,4).map(t=>t.n+(t.img?'':' no preview')+(t.ink<150?' blank':'')+(t.cut?' cut':'')+(t.fs<12?' '+t.fs+'px':'')).join(', ')})`:''),'0 tiles blank, cut or < 12 px (gui-r30a)',tl.length>=8&&bad.length===0,menuShot)}
  const s=await P.tapSel('#startBtn');
  if(!q||!s){row('race/start','pause → QUIT TO TITLE → RACES → START',`quit ${!!q} races ${r} start ${s}`,'all taps land',false,menuShot);return}
  await P.p.waitForTimeout(1500);await P.ev('__GH.capture();0');let st=await P.step(3);
@@ -322,6 +330,8 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
    mem=Math.max(mem,await A.ev('__GH.mem').catch(()=>0));errsAll.push(...A.errs.map(e=>'ath '+e));reloads+=A.reloads;await A.ctx.close()}catch(e){row('run/ath','Athens run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(A){errsAll.push(...A.errs);reloads+=A.reloads;await A.shot('ath_script_error',false);await A.ctx.close().catch(()=>{})}}}
  if(on('portrait')){let Q=null;try{const BQ=await bootPlayer(b,base,{w:390,h:844,label:'portrait',throttle:1});Q=BQ.P;const v=await Q.vis();const hc=hudCheck(v,'portrait');
    row('portrait/boot','portrait 390x844: PLAY → control (1x CPU)',BQ.R.toCtl!=null?`${BQ.R.toCtl.toFixed(1)} s lab`:'never','control reached',BQ.R.toCtl!=null,BQ.R.ctlShot);
+   {const f=path.join(ROOT,BQ.R.ctlShot?path.relative(ROOT,BQ.R.ctlShot):'');let lum=-1;try{const cp=require('child_process'),[W,H]=cp.execSync(`identify -format "%w %h" "${f}"`).toString().split(' ').map(Number);lum=+cp.execSync(`convert "${f}" -crop ${W}x${Math.round(H*.04)}+0+${Math.round(H*.84)} -colorspace Gray -resize 1x1! -format "%[fx:mean*255]" info:`).toString()}catch(e){}
+    row('portrait/band','portrait: the 3D view reaches the bottom of the screen (no flat pale band under the road)',lum<0?'no shot':`mean brightness of the 84-88 % rows ${lum.toFixed(0)}`,'< 140 (the beta.164 band measures 174: pale blue, no road; gui-r30a near-plane fix)',lum>=0&&lum<140,BQ.R.ctlShot)}
    row('portrait/hud','portrait: HUD text over the touch buttons',`${hc.over.length} overlaps, ${hc.small.length} texts < 12 px`,'0 / 0',hc.over.length===0&&hc.small.length===0,BQ.R.ctlShot,[...hc.over,...hc.small].slice(0,2).join('; '));
    errsAll.push(...Q.errs.map(e=>'portrait '+e));reloads+=Q.reloads;await Q.ctx.close()}catch(e){row('run/portrait','portrait run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(Q)await Q.ctx.close().catch(()=>{})}}
  row('page/reload','page never reloads',`${reloads} reloads`,'0',reloads===0,'');

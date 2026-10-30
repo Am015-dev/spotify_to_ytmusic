@@ -88,7 +88,7 @@ addEventListener('touchstart',()=>{TOUCH.on=true;document.body.classList.add('to
 function parkSet(on){TOUCH.park=!!on;TOUCH.brake=false;document.body.classList.toggle('parked',TOUCH.park);const b=$('#tB');if(b)b.textContent=TOUCH.park?'GO ▶':'BRAKE';const c=$('#roamPark');if(c)c.hidden=!TOUCH.park;if(on)AU.sfx&&AU.sfx('pick')}
 function togglePause(force){if(state==='roam'){if(!$('#settings').hidden){closeSettings();return}if($('#roamPause')){if($('#roamPause').hidden)roamPauseOpen();else roamPauseClose();return}RO.frozen=true;openSettings();return}if(!(state==='race'||state==='countdown'||state==='finished'))return;paused=force===true?true:!paused;$('#pause').hidden=!paused;if(paused){AU.engine(pl,0,false);AU.scrape(false);$('#resBtn').focus()}}
 $('#resBtn').onclick=()=>togglePause(false);$('#rstBtn').onclick=()=>{paused=false;$('#pause').hidden=true;startRace()};$('#quitBtn').onclick=()=>{paused=false;$('#pause').hidden=true;if(RO.fromRoam)enterRoam(RO.lastMark);else toMenu()};
-$('#rcGo').onclick=roamGo;$('#careerBtn').onclick=showSlots;$('#slotX').onclick=()=>$('#slots').hidden=true;$('#storyGo').onclick=storyClose;$('#roamVeh').onclick=cycleVehicle;$('#roamMapBtn').onclick=()=>toggleMap();$('#roamFT').onclick=e=>{e.stopPropagation();fastTravel(RO.ftSel)};$('#roamMapX').onclick=()=>toggleMap(false);
+$('#rcGo').onclick=roamGo;$('#rcMore').onclick=()=>{if(RO.card)roamOpen(RO.card,1)};$('#careerBtn').onclick=showSlots;$('#slotX').onclick=()=>$('#slots').hidden=true;$('#storyGo').onclick=storyClose;$('#roamVeh').onclick=cycleVehicle;$('#roamMapBtn').onclick=()=>toggleMap();$('#roamFT').onclick=e=>{e.stopPropagation();fastTravel(RO.ftSel)};$('#roamMapX').onclick=()=>toggleMap(false);
 {const C=$('#roamMapC'),pts=new Map();let moved=0,pinch0=0,z0=0,t0=0,mt=0;const pos=e=>{const r=C.getBoundingClientRect();return[(e.clientX-r.left)*DPR2(),(e.clientY-r.top)*DPR2()]};
   C.addEventListener('pointerdown',e=>{try{C.setPointerCapture(e.pointerId)}catch(_){}PIN_menuClose();pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;if(pts.size===1){t0=e.timeStamp;mt=0}else mt=1;if(pts.size===2){const[a,b]=[...pts.values()];pinch0=Math.hypot(a[0]-b[0],a[1]-b[1]);z0=RO.mapZ}});
   C.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;const p0=pts.get(e.pointerId),dx=e.clientX-p0[0],dy=e.clientY-p0[1];pts.set(e.pointerId,[e.clientX,e.clientY]);
@@ -160,14 +160,16 @@ function W13_teamCard0(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRec
   g.fillStyle='#0b2a44';g.beginPath();g.ellipse(0,-6,8,16,0,0,7);g.fill();
   for(const x of[-40,0,40]){g.fillStyle=t.glow;g.shadowColor=t.glow;g.shadowBlur=14;g.beginPath();g.arc(x,34,5,0,7);g.fill()}g.shadowBlur=0;return c}
 const unlocked=i=>i<=0||(store.peek('mho_career',{})[EVENTS[i-1].id]||0)>0;
-const thumbs={};function trackThumb(def){if(thumbs[def.id])return thumbs[def.id];const[c,g]=cv(320,200);g.fillStyle='#030c18';g.fillRect(0,0,320,200);
-  const cur=new THREE.CatmullRomCurve3(def.cp.map(p=>V3(p[0],p[1],p[2])),true,'centripetal',.5),pts=cur.getSpacedPoints(240);let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,y0=1e9,y1=-1e9;
-  for(const p of pts){x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);z0=Math.min(z0,p.z);z1=Math.max(z1,p.z);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)}
-  const sc=Math.min(280/(x1-x0),160/(z1-z0)),ox=160-(x0+x1)/2*sc,oz=100-(z0+z1)/2*sc;
+const thumbs={};function trackThumb(def){if(thumbs[def.id])return thumbs[def.id];
+  const cur=new THREE.CatmullRomCurve3(def.cp.map(p=>V3(p[0],p[1],p[2])),true,'centripetal',.5);def.km=(cur.getLength()*S/1000).toFixed(1);return thumbPaint(def.id,[cur.getSpacedPoints(240)],true)}
+// gui-r30a: the neon preview drawn from point lists (x, z, optional y = hue); trackThumb above and the builder tracks (98b2_builder2.js bxThumb) share it
+function thumbPaint(key,polys,closed){if(thumbs[key])return thumbs[key];const[c,g]=cv(320,200);g.fillStyle='#030c18';g.fillRect(0,0,320,200);let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,y0=1e9,y1=-1e9;
+  for(const pts of polys)for(const p of pts){x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);z0=Math.min(z0,p.z);z1=Math.max(z1,p.z);y0=Math.min(y0,p.y||0);y1=Math.max(y1,p.y||0)}
+  const sc=Math.min(280/Math.max(1e-6,x1-x0),160/Math.max(1e-6,z1-z0)),ox=160-(x0+x1)/2*sc,oz=100-(z0+z1)/2*sc;
   g.strokeStyle='rgba(76,234,255,.12)';g.lineWidth=1;for(let x=0;x<320;x+=20){g.beginPath();g.moveTo(x,0);g.lineTo(x,200);g.stroke()}for(let y=0;y<200;y+=20){g.beginPath();g.moveTo(0,y);g.lineTo(320,y);g.stroke()}
-  g.lineJoin=g.lineCap='round';g.lineWidth=12;g.strokeStyle='rgba(0,10,25,.9)';g.beginPath();pts.forEach((p,i)=>{const X=ox+p.x*sc,Y=oz+p.z*sc;i?g.lineTo(X,Y):g.moveTo(X,Y)});g.closePath();g.stroke();
-  for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length],h=(a.y-y0)/Math.max(1,y1-y0);g.strokeStyle=`hsl(${190-h*140},100%,${58+h*10}%)`;g.lineWidth=5;g.shadowColor=g.strokeStyle;g.shadowBlur=8;g.beginPath();g.moveTo(ox+a.x*sc,oz+a.z*sc);g.lineTo(ox+b.x*sc,oz+b.z*sc);g.stroke()}
-  g.shadowBlur=0;g.fillStyle='#ffd12c';g.fillRect(ox+pts[0].x*sc-7,oz+pts[0].z*sc-3,14,6);def.km=(cur.getLength()*S/1000).toFixed(1);return thumbs[def.id]=c}
+  g.lineJoin=g.lineCap='round';g.lineWidth=12;g.strokeStyle='rgba(0,10,25,.9)';for(const pts of polys){g.beginPath();pts.forEach((p,i)=>{const X=ox+p.x*sc,Y=oz+p.z*sc;i?g.lineTo(X,Y):g.moveTo(X,Y)});if(closed)g.closePath();g.stroke()}
+  for(const pts of polys)for(let i=0;i<pts.length-(closed?0:1);i++){const a=pts[i],b=pts[(i+1)%pts.length],h=((a.y||0)-y0)/Math.max(1,y1-y0);g.strokeStyle=`hsl(${190-h*140},100%,${58+h*10}%)`;g.lineWidth=5;g.shadowColor=g.strokeStyle;g.shadowBlur=8;g.beginPath();g.moveTo(ox+a.x*sc,oz+a.z*sc);g.lineTo(ox+b.x*sc,oz+b.z*sc);g.stroke()}
+  g.shadowBlur=0;g.fillStyle='#ffd12c';const s0=polys[0][0];g.fillRect(ox+s0.x*sc-7,oz+s0.z*sc-3,14,6);return thumbs[key]=c}
 function refreshAttract(){if(state!=='menu')return;const ev=EVENTS[evIdx];const sea=menuTab==='season'?seasonRound(season().L,season().r):menuTab==='world'?(worldPick||(CID==='ath'?ATH_TRK_EV[0]:RIVAL_EV[0])):null,car=menuTab==='career',dl=menuTab==='daily'?dailyCfg():null;
   const at=sea?sea.track:car?(ev.track||'grand'):dl?dl.track:menuTrack;setupRace({type:'attract',laps:99,traffic:22,items:true,aggr:0,track:at,mood:isAthT(at)?TRACK_DEFS.find(t=>t.id===at).mood:'brick'})}
 const GOALS={quick:'Eight pilots, weapons on. Pick a circuit and the weather, then win it.',

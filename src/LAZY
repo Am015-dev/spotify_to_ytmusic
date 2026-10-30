@@ -37,3 +37,4 @@
 99crm_racemode_go.js
 99hrq_quest_intro.js:qvIntro,qvShort
 99c6hr_mstart_go.js:HRM_run,HRM_card
+99c6gui_card_go.js:GUC_run,GUC_card

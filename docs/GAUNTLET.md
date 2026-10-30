@@ -40,6 +40,8 @@ Output: one table on stdout (`PASS|FAIL|INFO row number bar`) and `docs/shots/ga
 | wall/headon | turns ~83° into the buildings at ~45 km/h, 2 times | 2/2 keep <= 35 % |
 | pause/resume | taps ❚❚, then ▶ RESUME | pause opens, game time stops, resume restarts it |
 | mission/reach, card, cover, objective | drives to the nearest mission marker (streets; straight at it inside 150 m), stops in it or taps the `TAP TO OPEN` prompt, taps START ▶ | card <= 60 s; card text without buttons <= 6 words; 0 card text over the touch buttons; first objective after START <= 6 words (hr/mstart) |
+| mission/details, mission/toast (gui-r30a) | taps DETAILS on the card; samples the coach toast every 0.5 game s for 10 s after START | DETAILS shows > 6 words and START stays; toast on screen <= 4 s. mission/card is now: name <= 4 words + ONE line <= 6 words, nothing else |
+| menu/tiles, portrait/band (gui-r30a) | race menu tiles; portrait first frame | 11/11 tiles with a preview and a full name >= 12 px; mean brightness of the 84-88 % rows < 140 (the old pale band measured 174) |
 | mission/end, mission/retry | taps the card's GO, drives at the objective; on a fail screen taps RETRY | ends <= 200 s; complete, or RETRY visible and back driving <= 2 s game |
 | race/start, race/finish | ❚❚ → QUIT TO TITLE → 🏁 RACES → START, holds GAS and steers to the track centre | grid reached; result screen <= 480 s game |
 | ath/boot, ath/drive, ath/race | Athens: PLAY, 60 s drive, RACES → START | control in Athens; >= 55 s, <= 15 % slow, 0 pops; grid reached |

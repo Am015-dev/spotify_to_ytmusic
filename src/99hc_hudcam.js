@@ -80,7 +80,7 @@ roamCam=(f=>function(dt){f(dt);
  if(hud){const r=HC_boostRel();const nw=performance.now();if(r)HC.bT=nw+1000;const on=r||nw<HC.bT;if(on!==HC.bOn){HC.bOn=on;b.classList.toggle('hcBoost',on)}}
  const ok=HC.on&&state==='roam'&&(!RO.foot||RO.foot==='car')&&!(typeof M1!=='undefined'&&M1.cs)&&!!pl;
  if(!ok){if(HC.F.length)HC_restoreAll();HC.pc=null;return}
- try{const c=camera.position,d=Math.hypot(c.x-RO.x,c.z-RO.z),n=d>=5?2.5:2;if(Math.abs(camera.near-n)>.01){camera.near=n;camera.updateProjectionMatrix()}
+ try{const c=camera.position,d=Math.hypot(c.x-RO.x,c.z-RO.z),n=camera.aspect<.9?.9:d>=5?2.5:2/* gui-r30a: portrait's 98 deg vertical FOV sees ground < 2.5 m (z-depth) under the camera: it was clipped to a flat pale band over the bottom quarter */;if(Math.abs(camera.near-n)>.01){camera.near=n;camera.updateProjectionMatrix()}
   HC_step(dt,c.x,c.y,c.z,RO.x,RO.y+1,RO.z)}catch(e){HC.err=String(e)}})(roamCam);
 window.__hc=HC;
 // ---- GOs
