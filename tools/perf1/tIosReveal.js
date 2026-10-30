@@ -1,15 +1,33 @@
-// ios-r20f: iPhone-like reveal probe. tIosReveal.js <outdir> <ver> : touch 852x393 + ?lowmem=1 + ?rvl=1; the page asks for 6x CDP CPU throttling when its curtain gate starts
-// (RVL.thr, src/98bp_warmall.js) and prints one RVL line per city: program links/compiles, texture/buffer uploads (count, ms) and frames > 100 ms in the first 3 s after reveal.
-// env: CITY=fra|ath (default both, one page each, in turn) QS=extra query  CPU=<rate> (6)
+// ios-r20f / boot-r30g: iPhone-like reveal probe through the REAL PLAY path. tIosReveal.js <outdir> <ver>
+// iPhone UA + touch 852x393 (dpr 2) + ?lowmem=1&rvl=1, title -> tap #ob2Play (no ?test= entry: that entry skips the curtain prewarm, so it measured what no player gets).
+// The page asks for 6x CDP CPU throttling when its curtain gate starts (RVL.thr, src/98bp_warmall.js) and prints one RVL line per run: program links/compiles, texture/buffer uploads and frames > 100 ms in the first 3 s after reveal.
+// env: CITY=fra|ath (default both, one page each, in turn) RUNS=<n per city> (1) QS=extra query  CPU=<rate> (6)
+// Athens: the save of a player who flew there (exactly what cityTravel() writes before its reload), same seed as tools/gauntlet.js.
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const http=require('http'),fs=require('fs'),path=require('path');
-const OUT=path.resolve(process.argv[2]),V=process.argv[3],CITIES=(process.env.CITY||'fra,ath').split(',');
+const OUT=path.resolve(process.argv[2]),V=process.argv[3],CITIES=(process.env.CITY||'fra,ath').split(','),RUNS=+(process.env.RUNS||1);
+const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
 const mime={'.html':'text/html','.js':'application/javascript','.json':'application/json','.mp3':'audio/mpeg'};
 const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.url.split('?')[0]));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream'});r.end(d)})}).listen(0,async()=>{
- const port=srv.address().port,b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
- for(const c of CITIES){const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true}),p=await ctx.newPage();p.setDefaultTimeout(600000);
+ const port=srv.address().port,b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});let bad=0;
+ for(const c of CITIES)for(let n=0;n<RUNS;n++){const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:2,isMobile:true,hasTouch:true,userAgent:UA});
+  if(c==='ath')await ctx.addInitScript(()=>{try{if(!localStorage.getItem('gauntlet_seed')){localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({otg:{},studs:[],tut:1}));localStorage.setItem('mho_roam.ath@1',JSON.stringify({otg:{},studs:[],tut:1}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('gauntlet_seed','1')}}catch(e){}});
+  const p=await ctx.newPage();p.setDefaultTimeout(600000);
   const cdp=await ctx.newCDPSession(p);await p.exposeFunction('__rvlThr',(m,a)=>cdp.send(m,a).then(()=>1,e=>String(e)));p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));
   p.on('console',m=>{const t=m.text();if(/^RVL /.test(t))console.log(t)});
-  await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${c}&lowmem=1&rvl=1&rvlcpu=${process.env.CPU||6}${process.env.QS?'&'+process.env.QS:''}`);
-  await p.waitForFunction(()=>window.RVL&&RVL.done,null,{polling:500});const r=await p.evaluate(()=>RVL.fr.filter(f=>f.dt>60||f.link||f.texMs>20||f.bufMs>20).slice(0,14).map(f=>`t${f.t} dt${Math.round(f.dt)} L${f.link}/${Math.round(f.linkMs+f.compMs)}ms T${f.tex}/${Math.round(f.texMs)}ms B${f.buf}/${Math.round(f.bufMs)}ms js${Math.round(f.fMs-f.rMs)} r${Math.round(f.rMs)}${f.xc?' xc '+f.xc:''}`));
-  console.log('RVLF '+c+' '+r.join(' | '));await ctx.close()}
- await b.close();srv.close()});
+  await p.goto(`http://127.0.0.1:${port}/${V}/index.html?lowmem=1&rvl=1&rvlcpu=${process.env.CPU||6}${process.env.QS?'&'+process.env.QS:''}`);
+  await p.waitForSelector('#ob2Play',{state:'visible',timeout:600000});await p.waitForTimeout(800);
+  await p.tap('#ob2Play');                                   // the player's own tap, on the real button
+  if(process.env.WHO){await p.waitForFunction(()=>window.RVL&&RVL.tc&&window.__tk,null,{polling:200});await p.evaluate(()=>__tk.q(`(()=>{const r=renderer,f=r.renderBufferDirect;window.__bl=[];r.renderBufferDirect=function(cam,sc,geo,mat,obj,grp){const n=r.info.programs.length;const x=f.apply(this,arguments);if(r.info.programs.length>n){const ch=[];for(let o=obj;o&&ch.length<5;o=o.parent)ch.push((o.name||o.type)+'['+Object.keys(o.userData).slice(0,6).join('.')+']');window.__bl.push([Math.round(performance.now()),obj.isInstancedMesh?'inst'+obj.count+(obj.instanceColor?'C':''):obj.type,mat.type,mat.name,ch.join('<'),(new Error().stack||'').split('\\n').slice(2,6).join(' ; ').slice(0,300)])}return x};return 1})()`))}
+  await p.waitForFunction(()=>window.RVL&&RVL.done,null,{polling:500});
+  const s=await p.evaluate(()=>({sum:RVL.sum,p0:RVL.p0,p5:RVL.p5,fr:RVL.fr.filter(f=>f.dt>60||f.link||f.texMs>20||f.bufMs>20).slice(0,14).map(f=>`t${f.t} dt${Math.round(f.dt)} L${f.link}/${Math.round(f.linkMs+f.compMs)}ms T${f.tex}/${Math.round(f.texMs)}ms B${f.buf}/${Math.round(f.bufMs)}ms js${Math.round(f.fMs-f.rMs)} r${Math.round(f.rMs)}${f.xc?' xc '+f.xc:''}`)}));
+  await p.waitForTimeout(2500);const p5=await p.evaluate(()=>RVL.p5);   // programs at +5 s (set 5 s after reveal)
+  if(process.env.DUMP)console.log('NEWPROGS '+JSON.stringify(await p.evaluate(()=>__tk.q('renderer.info.programs.slice(RVL.p0).map(q=>q.name+" "+String(q.cacheKey).slice(0,160))'))));
+  if(process.env.DUMP)console.log('NEWOBJ '+JSON.stringify(await p.evaluate(()=>__tk.q(`(()=>{const N=new Set(renderer.info.programs.slice(RVL.p0)),o=[];scene.traverse(x=>{for(const m of [].concat(x.material||[])){const cp=renderer.properties.get(m).currentProgram;if(cp&&N.has(cp))o.push([x.type,x.name,Object.keys(x.userData).join('.'),m.type,m.name,x.isInstancedMesh?x.count:0,'vis'+x.visible+(x.instanceColor?'C':'')+(x.castShadow?'S':'')+(x.receiveShadow?'R':'')+(x.isInstancedMesh?'I':'')+(x.frustumCulled?'f':''),x.geometry&&x.geometry.attributes&&x.geometry.attributes.position.count,x.parent&&x.parent.name].join('|'))}});return o.slice(0,12)})()`))));
+  if(process.env.DUMP)console.log('KEYDIFF '+JSON.stringify(await p.evaluate(()=>__tk.q(`(()=>{const P=renderer.info.programs,old=P.slice(0,RVL.p0),out=[];for(const q of P.slice(RVL.p0)){const a=String(q.cacheKey).split(','),words=a.length;let best=null;for(const r of old){const b=String(r.cacheKey).split(',');if(b.length!==a.length||b[0]!==a[0])continue;const d=[];for(let i=0;i<a.length;i++)if(a[i]!==b[i])d.push(i+':'+b[i]+'->'+a[i]);if(!best||d.length<best.length)best=d}out.push(q.name+' '+(best?best.join(' '):'no twin'))}return out})()`))));
+  if(process.env.DUMP)console.log('KEYTAIL '+JSON.stringify(await p.evaluate(()=>__tk.q(`renderer.info.programs.slice(RVL.p0).map(q=>{const a=String(q.cacheKey).split(',');return a.length+' @48 '+a.slice(46,60).join(',')+' ... '+a.slice(-3).map(x=>x.slice(0,80)).join(' | ')})`))));
+  if(process.env.DUMP)console.log('TWGDP '+JSON.stringify(await p.evaluate(()=>__tk.q('[TWG.dp,TWG.dpn,TWG.dpf]'))));
+  if(process.env.WHO)console.log('WHO '+JSON.stringify(await p.evaluate(()=>window.__bl)));
+  const S=s.sum,late=p5>=0?p5-s.p0:-1;if(S.link||late>0)bad++;
+  console.log(`RESULT ${c} run${n+1}: links ${S.link} (0), programs at reveal ${s.p0} at +5 s ${p5} (late ${late}), frames ${S.frames}, long>100ms ${S.long}, maxDt ${S.maxDt} ms, prewarm ran ${S.prew&&S.prew.ran}, curtain ${S.curtainMs} ms`);
+  console.log('RVLF '+c+' '+s.fr.join(' | '));await ctx.close()}
+ await b.close();srv.close();console.log(bad?`REVEAL FAIL ${bad} run(s) with program links`:'REVEAL PASS 0 links');process.exit(bad?1:0)});

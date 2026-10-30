@@ -12,7 +12,7 @@ const A=process.argv.slice(2),arg=(k,d)=>{const i=A.indexOf('--'+k);return i<0?d
 // traffic-r30c2: the bot's own choices (branch pick, reverse steer, wall side) come from a seeded RNG (--seed N, default 7), so runs of two builds drive the same choices; the game's randomness is untouched
 const RNG=(s=>()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296)((+arg('seed',7))>>>0||7);
 const ROOT=path.join(__dirname,'..'),T0=Date.now(),wall=()=>((Date.now()-T0)/1000).toFixed(0);
-const ONLY=String(arg('only','boot,perf,hud,steer,drive,hit,drift,wall,mission,race,pause,ath,portrait,boost')).split(','),on=k=>ONLY.includes(k);
+const ONLY=String(arg('only','boot,perf,hud,steer,drive,hit,drift,wall,mission,race,pause,ath,portrait,boost,boot1x')).split(','),on=k=>ONLY.includes(k);
 const THR=+arg('throttle',6),DT=1/30;
 const IPHONE_UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
 let BUILD=arg('build',''),URL0=arg('url','');
@@ -350,7 +350,7 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
  try{
   const B=await bootPlayer(b,base,{label:'fra'});P=B.P;const R=B.R;
   row('boot/playVisible','page open → PLAY button visible',`${R.tPlayVis.toFixed(1)} s lab`,'INFO (lab, software GL)',null,R.welcome);
-  row('boot/toControl','PLAY tap → first control of the car',R.toCtl!=null?`${R.toCtl.toFixed(1)} s lab (${THR}x CPU)`:'never','<= 8 s lab',R.toCtl!=null&&R.toCtl<=8,R.ctlShot);
+  row('boot/toControl','PLAY tap → first control of the car',R.toCtl!=null?`${R.toCtl.toFixed(1)} s lab (${THR}x CPU)`:'never','<= 36 s lab at 6x (= ~5 s on an iPhone: 5 s x 7.2-7.3, REVIEW_2K_33, docs/GAUNTLET.md)',R.toCtl!=null&&(THR!==6||R.toCtl<=36),R.ctlShot);
   row('boot/menu','race menu never shows after PLAY (hr/boot)',`${R.menuN} samples`,'0',R.menuN===0,'');
   row('boot/loader','loader never covers a controllable car (hr/boot)',`${R.ldCtlN} samples`,'0',R.ldCtlN===0,'');
   let v=await P.vis();let hc=hudCheck(v,'first control');
@@ -376,10 +376,11 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
   if(on('race'))await scRace(P);
   mem=Math.max(mem,await P.ev('__GH.mem').catch(()=>0));errsAll.push(...P.errs);reloads+=P.reloads;
   if(process.env.GTRAP){const j=await P.ev('JSON.stringify((globalThis.__NA||[]).splice(0))').catch(()=>'[]');if(j!=='[]')fs.appendFileSync(path.join(OUT,'trap.jsonl'),j+'\n')}
-  const ge=await P.ev('[__GH.err||"",__GH.serr||"",__GH.errN|0]').catch(()=>['','',0]);if(ge[0])for(let k=0;k<Math.max(1,ge[2]);k++)errsAll.push('frame threw'+(ge[2]>1?' ('+ge[2]+'x)':'')+': '+ge[0]);   // jserr-r30f: every frame throw counts (was the last one only)if(ge[1])console.log('WARN sampler: '+ge[1]);
+  const ge=await P.ev('[__GH.err||"",__GH.serr||"",__GH.errN|0]').catch(()=>['','',0]);if(ge[0])for(let k=0;k<Math.max(1,ge[2]);k++)errsAll.push('frame threw'+(ge[2]>1?' ('+ge[2]+'x)':'')+': '+ge[0]);   // jserr-r30f: every frame throw counts (was the last one only)
+  if(ge[1])console.log('WARN sampler: '+ge[1]);
   await trapDump(P);await P.ctx.close()}catch(e){row('run/fra','Frankfurt run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(P){errsAll.push(...P.errs);reloads+=P.reloads;await P.shot('fra_script_error',false);await trapDump(P);await P.ctx.close().catch(()=>{})}}
  if(on('ath')){let A=null;try{const BA=await bootPlayer(b,base,{label:'ath',init:()=>{try{if(!localStorage.getItem('gauntlet_seed')){/* exactly what cityTravel() writes before its reload: the save of a player who flew to Athens */localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({otg:{},studs:[],tut:1}));localStorage.setItem('mho_roam.ath@1',JSON.stringify({otg:{},studs:[],tut:1}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('gauntlet_seed','1')}}catch(e){}}});A=BA.P;
-   const city=await A.ev('CID');row('ath/boot','Athens: PLAY → first control',BA.R.toCtl!=null?`${BA.R.toCtl.toFixed(1)} s lab, city ${city}`:'never','control, city ath',BA.R.toCtl!=null&&city==='ath',BA.R.ctlShot);
+   const city=await A.ev('CID');row('ath/boot','Athens: PLAY → first control',BA.R.toCtl!=null?`${BA.R.toCtl.toFixed(1)} s lab (${THR}x CPU), city ${city}`:'never','control in city ath, <= 36 s lab at 6x (same bar as Frankfurt, REVIEW_2K_33 (i))',BA.R.toCtl!=null&&city==='ath'&&(THR!==6||BA.R.toCtl<=36),BA.R.ctlShot);
    await harness(A);const r2=Router(await A.ev('__GH.nodes()'));await A.ev('__GH.resetStats();0');let st=await A.step(1);const t0=st.T;let stuck=0,rev=0,slow=0,n=0;
    st=await A.run(60,s=>{n++;if(s.v<10)slow++;if(rev>0){rev-=DT*3;return['tB','tL']}if(s.v<3){stuck+=DT*3;if(stuck>2){stuck=0;rev=1.5;}}else stuck=0;return r2.drive(s)});await A.allUp();
    if(on('boost'))await scBoost(A,r2,'ath',120);
@@ -394,7 +395,10 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
    {const f=path.join(ROOT,BQ.R.ctlShot?path.relative(ROOT,BQ.R.ctlShot):'');let lum=-1;try{const cp=require('child_process'),[W,H]=cp.execSync(`identify -format "%w %h" "${f}"`).toString().split(' ').map(Number);lum=+cp.execSync(`convert "${f}" -crop ${W}x${Math.round(H*.04)}+0+${Math.round(H*.84)} -colorspace Gray -resize 1x1! -format "%[fx:mean*255]" info:`).toString()}catch(e){}
     row('portrait/band','portrait: the 3D view reaches the bottom of the screen (no flat pale band under the road)',lum<0?'no shot':`mean brightness of the 84-88 % rows ${lum.toFixed(0)}`,'< 140 (the beta.164 band measures 174: pale blue, no road; gui-r30a near-plane fix)',lum>=0&&lum<140,BQ.R.ctlShot)}
    row('portrait/hud','portrait: HUD text over the touch buttons',`${hc.over.length} overlaps, ${hc.small.length} texts < 12 px`,'0 / 0',hc.over.length===0&&hc.small.length===0,BQ.R.ctlShot,[...hc.over,...hc.small].slice(0,2).join('; '));
-   errsAll.push(...Q.errs.map(e=>'portrait '+e));{const ge=await Q.ev('[(window.__GH&&__GH.err)||"",(window.__GH&&__GH.errN)|0]').catch(()=>['',0]);if(ge[0])for(let k=0;k<Math.max(1,ge[1]);k++)errsAll.push('portrait frame threw: '+ge[0])}reloads+=Q.reloads;await trapDump(Q);await Q.ctx.close()}catch(e){row('run/portrait','portrait run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(Q)await trapDump(Q);await Q.ctx.close().catch(()=>{})}}
+   errsAll.push(...Q.errs.map(e=>'portrait '+e));{const ge=await Q.ev('[(window.__GH&&__GH.err)||"",(window.__GH&&__GH.errN)|0]').catch(()=>['',0]);if(ge[0])for(let k=0;k<Math.max(1,ge[1]);k++)errsAll.push('portrait frame threw: '+ge[0])}reloads+=Q.reloads;await trapDump(Q);await Q.ctx.close()}catch(e){row('run/portrait','portrait run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(Q){errsAll.push(...Q.errs.map(e=>'portrait '+e));reloads+=Q.reloads;await trapDump(Q).catch(()=>{});await Q.ctx.close().catch(()=>{})}}}
+ if(on('boot1x')){let C=null;try{const BC=await bootPlayer(b,base,{label:'fra1x',throttle:1});C=BC.P;   // boot-r30g: unthrottled companion, INFO only until it is stable within +-2 s (REVIEW_2K_33 (iii))
+   row('boot/toControl1x','PLAY tap → first control, unthrottled (1x CPU, software GL)',BC.R.toCtl!=null?`${BC.R.toCtl.toFixed(1)} s lab (1x)`:'never','INFO: <= 15 s (5 s x 2.9, docs/GAUNTLET.md); not a gate',null,BC.R.ctlShot);
+   errsAll.push(...C.errs.map(e=>'boot1x '+e));reloads+=C.reloads;await C.ctx.close()}catch(e){row('run/boot1x','1x boot companion finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(C){errsAll.push(...C.errs);reloads+=C.reloads;await C.ctx.close().catch(()=>{})}}}
  row('page/reload','page never reloads',`${reloads} reloads`,'0',reloads===0,'');
  row('page/jsErrors','no JS errors (pageerror + console.error)',`${errsAll.length} errors`,'0',errsAll.length===0,'',errsAll.slice(0,3).join(' ; ').slice(0,200));
  row('page/memory','JS heap high-water (performance.memory)',`${(mem/1048576).toFixed(0)} MB`,'INFO (phone cap 700 MB process, NIGHTRUN_LOG)',null,'');

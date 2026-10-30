@@ -57,8 +57,10 @@ function PB_base(kind){let ifr=false;try{ifr=window.self!==window.top}catch(e){i
   return{kind,at:new Date().toISOString(),build:(()=>{try{return OD_CHANGELOG[0].v}catch(e){return'?'}})(),city:typeof CID!=='undefined'?CID:'?',state,ua:navigator.userAgent.slice(0,200),vp:innerWidth+'x'+innerHeight,dpr:+(devicePixelRatio||1).toFixed(2),gpu:PB_gpu(),iframe:ifr,ri:PB_ri(),heap:PB_heap()}}
 function PB_hbGet(){try{const r=localStorage.getItem(PB.HK);return r?JSON.parse(r):null}catch(e){return null}}
 function PB_hbSet(o){try{if(o)localStorage.setItem(PB.HK,JSON.stringify(o));else localStorage.removeItem(PB.HK)}catch(e){}}
+// boot-r30g: playMs = the PLAY tap (first click on #ob2Play / #hcStory) -> first playable frame, so a real iPhone boot doc pairs with tools/perf/boottoctl.js PLAY->control (bootMs also holds the title wait). Read only.
+PB.tPlay=0;try{document.addEventListener('click',e=>{try{if(!PB.tPlay&&e.target&&e.target.closest&&e.target.closest('#ob2Play,#hcStory'))PB.tPlay=performance.now()}catch(x){}},true)}catch(e){}
 function PB_boot(now){if(PB.booted)return;PB.booted=1;PB.t1=now;const old=PB_hbGet();
-  setTimeout(()=>{try{if(old){PB_hbSet(null);PB_post(Object.assign(PB_base('killed'),{last:old}))}const d=PB_base('boot');d.bootMs=Math.round(now);PB_post(d)}catch(e){}},0)}
+  setTimeout(()=>{try{if(old){PB_hbSet(null);PB_post(Object.assign(PB_base('killed'),{last:old}))}const d=PB_base('boot');d.bootMs=Math.round(now);d.playMs=PB.tPlay?Math.round(now-PB.tPlay):null;PB_post(d)}catch(e){}},0)}
 function PB_life(now,ms){if(!PB.on)return;
   if(ms>PB.hw)PB.hw=ms;
   if(ms>1000&&!PB.hid&&!document.hidden&&PB.fz<3){PB.fz++;const fs={};for(const k in PB.fs)fs[k]=PB_r(PB.fs[k]);const d=PB_base('freeze');d.gapMs=Math.round(ms);d.fs=fs;d.n=PB.fz;setTimeout(()=>{try{PB_post(d)}catch(e){}},0)}

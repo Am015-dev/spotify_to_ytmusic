@@ -26,7 +26,8 @@ Output: one table on stdout (`PASS|FAIL|INFO row number bar`) and `docs/shots/ga
 ## The rows
 | row | the player does | bar (source) |
 |---|---|---|
-| boot/toControl | taps PLAY on the title card | first control <= 8 s lab (brief; HITRUN_GAP pair 1 was 76 s) |
+| boot/toControl, ath/boot | taps PLAY on the title card (Frankfurt; Athens with the cityTravel save) | first control <= **36 s lab at 6x CPU** in BOTH cities (= ~5 s on an iPhone, derivation below; boot-r30g, was 8 s) |
+| boot/toControl1x | same tap, unthrottled | INFO only: <= 15 s (5 s x 2.9); not a gate until it is stable within +-2 s (REVIEW_2K_33 (iii)) |
 | boot/menu, boot/loader | — | 0 samples with the race menu after PLAY; 0 control frames under the loader (hr/boot) |
 | hud/overControls(2), hud/minText | — | 0 text boxes over a touch button; 0 visible texts < 12 px (CLAUDE.md phone rules) |
 | perf/frame | holds GAS 8 s (real clock, 6x CPU) | INFO: p95 frame ms and frames > 50 ms (iPhone truth = perf/ios-reveal) |
@@ -65,7 +66,7 @@ Measured with `node tools/perf/boottoctl.js out/<ver> --throttle <k> [--prof]` (
 
 **Lab vs a real iPhone (same build, paired):** Alex's iPhone (Apple GPU, beacon `boot` docs in the Beta perf db) booted beta.142-151 Frankfurt in 12.3-12.8 s from page open to the first drivable frame (beta.151: 12.6 s; this includes his own pause on the title). The same beta.151 deploy (live branch ce32c021) in the lab: 90.3 s at 6x, 36.7 s at 1x (PLAY -> control 73.2 s / 27.3 s). **Lab 6x ≈ 7.2x an iPhone; lab 1x ≈ 2.9x.** The iPhone pause on the title makes these ratios a lower bound (the phone is at least this much faster).
 
-**So the old bar (8 s at 6x) means ~1.1 s on an iPhone** — stricter than Hit & Run and not reachable while the lab rasterises in software. **Proposed bar (needs the coordinator):** "an iPhone player drives within 5 s of PLAY" = **boot/toControl <= 36 s lab at 6x** (5 s x 7.2), with an unthrottled companion <= 15 s (5 s x 2.9). Today: ~76 s at 6x ≈ 10.5 s on the phone. Re-pair the ratio when a new iPhone `boot` doc lands (`ArtifactData query perf kind==boot`, compare with `boottoctl.js` on that deploy).
+**So the old bar (8 s at 6x) means ~1.1 s on an iPhone** — stricter than Hit & Run and not reachable while the lab rasterises in software. **Bar (approved by the coordinator, confirmed in REVIEW_2K_33, set in tools/gauntlet.js by boot-r30g):** "an iPhone player drives within 5 s of PLAY" = **boot/toControl <= 36 s lab at 6x** (5 s x 7.2, the same for ath/boot), with an unthrottled companion <= 15 s (5 s x 2.9) as INFO row boot/toControl1x. Derivation: beta.151 iPhone page->drivable 12.6 s vs lab 90.3 s at 6x (7.2x; the review re-measured 7.3x), 36.7 s at 1x (2.9x); 5 x 7.2 = 36, 5 x 2.9 = 14.5. Today: ~76 s at 6x ≈ 10.5 s on the phone. Re-pair the ratio when a new iPhone `boot` doc lands (`ArtifactData query perf kind==boot`, compare with `boottoctl.js` on that deploy).
 
 ## Adding or tightening a row (fix lanes)
 - A fix lane starts from the FAIL row that names its bug (rule 13): run `--only <part>` on the live build, see the row FAIL, fix the game, see it PASS on the built page.
