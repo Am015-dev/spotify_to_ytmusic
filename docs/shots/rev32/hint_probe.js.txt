@@ -1,0 +1,9 @@
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:2,isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+const p=await ctx.newPage();p.setDefaultTimeout(600000);
+await p.goto('http://127.0.0.1:8833/index.html?test=fra');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:500,timeout:400000});
+const g=await p.evaluate(()=>{const r=document.querySelector('#tG').getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]});
+await p.touchscreen.tap(g[0],g[1]);await p.waitForTimeout(2500);
+const R=await p.evaluate(c=>__xc.ev(c),'('+(()=>{const h=document.getElementById('crSmHint');if(!h)return{none:1,used:TOUCH.used,hn:__crsm.S.hn};const r=h.getBoundingClientRect(),cs=getComputedStyle(h);const ov=[...document.querySelectorAll('#touch button,#touch .tbtn,#tL,#tR,#tG,#tB,#tN')].filter(e=>{const q=e.getBoundingClientRect();return q.width&&!(q.right<r.left||q.left>r.right||q.bottom<r.top||q.top>r.bottom)}).map(e=>e.id);return{t:h.textContent,on:h.classList.contains('on'),disp:cs.display,vis:cs.visibility,op:cs.opacity,fs:cs.fontSize,r:[r.left,r.top,r.width,r.height].map(Math.round),ov,used:TOUCH.used,hn:__crsm.S.hn,state,body:document.body.className,par:h.parentElement&&h.parentElement.id}}).toString()+')()');
+console.log('HINT',JSON.stringify(R));await p.screenshot({path:'/workspace/spotify_to_ytmusic/docs/shots/rev32/hint_roam_touch.jpg',quality:70});await b.close()})();

@@ -1,0 +1,1 @@
+{"when":"2026-10-30T09:17Z","cmd":"node tools/gauntlet.js --url http://127.0.0.1:8832/index.html?ivnear=1&latsplit=0 --ver rev32-old-s10 --seed 10 --only hit","wall":"172"}
