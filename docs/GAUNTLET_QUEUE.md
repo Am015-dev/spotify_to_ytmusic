@@ -55,3 +55,9 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - tilebuild-r30j done: docs/DESIGN_tiled_city_build.md (b3256db). tb1 (SONNET, session_01RR7mnbL8oRMHJiL4MmTEsK) started: fra toControl ≤ 58 s behind ?tb1.
 - touchdrive round 3 FAIL (REVIEW_2K_35): (a) chord uses performance.now() fallback, so late touches roll; compare raw e.timeStamp; (d) portrait tip 400 px on 390 px, cut and over the car; plus decide touch smash in city QUICK RACE ('roam'). Round 4 (~30 min, same worker session_01RR7mnXYxNGypZruSqUdFZx) starts when a worker slot frees (links-r30i or tb1). If beta.165 is ready first, ship it with touchdrive reverted.
 - review-r30-10 (OPUS, session_01RR7mnb21PbB4bMneoNFPxV) reviewing world-r30b+r30h.
+
+## 30 Oct ~17:05
+- world-r30b+r30h FAIL (REVIEW_2K_36) and touchdrive r1-3 FAIL (REVIEW_2K_35): game code reverted in 4d432e4 (src only; docs, GO tools, gauntlet kept; touchdrive gauntlet rows boost/race will read FAIL until it returns). Each lane resumes from its own commits (revert the revert) in round 4.
+- Deploy blocker: unit page/size-headroom red even after the revert (beta.165 page 3,505,383 B vs 3.5e6). Next free worker slot: size-r30k (SONNET) moves a GO-only module into src/LAZY (≥ 8 KB headroom). beta.165 changelog drafted (gui, traffic, boot, jserr).
+- New top bug (Alex's own complaint "the game refreshed 5 times in 5 minutes"): REVIEW_2K_36 saw the Athens page reload itself at quest START under 6x in 2/2 runs. Bug lane reload-r30l (SONNET, 90 min) after size-r30k: reproduce on 4d432e4, fix root cause, GO mem/no-reload extended to ath quest START.
+- Then: touchdrive round 4 (3 items in REVIEW_2K_35), world round 4 (3 items in REVIEW_2K_36), tb2..tb5.
