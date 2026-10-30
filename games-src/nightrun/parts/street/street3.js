@@ -13,7 +13,7 @@
    4. LIGHT: lamp pools that light whoever passes, neon spill, a wet-road reflection, contact shadows under props, one colour grade (under the HUD).
    5. A RUN TWICE AS LONG: one heart more, a heal drops beside Kai when he is two hearts down, gunners reload 1.4x slower, at most 5 foes at once. ---------- */
 if(RET.street3===undefined)RET.street3=!/[?&]street3=0/.test(location.search);
-if(RET.bossadds===undefined)RET.bossadds=!/[?&]bossadds=0/.test(location.search);   // W278: no street adds during the big heavy fight; ?bossadds=0 = old
+if(RET.bossadds===undefined)RET.bossadds=/[?&]bossadds=1/.test(location.search);   // W278: no street adds during the big heavy fight; OFF until the PC clear-rate gate passes (BALANCE-W278.md), ?bossadds=1 = on
 (function(){
 if(!RET.street3||!RET.street2||!window.FOOT||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2||!FOOT._in)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;

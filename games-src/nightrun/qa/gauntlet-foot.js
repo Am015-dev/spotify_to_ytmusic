@@ -166,7 +166,7 @@ async function run(b, plat, strat, seed) {
   try {
     const sres = await startFoot(p, inp); if (sres !== 'on') { fail('start: ' + sres); return R; }
     await sleep(400); await shot('start');
-    if (process.env.BADD || process.env.BOSSADDS) await p.evaluate(([c, o]) => { if (o === '0') window.RET.bossadds = false; if (c) { const [cap, gap] = c.split(',').map(Number); window.FOOT.S3.T.bAdd = { cap, gap }; } }, [process.env.BADD || '', process.env.BOSSADDS || '']);   // W278 sweep: BADD=cap,gap  BOSSADDS=0 = old
+    if (process.env.BOSSADDS) await p.evaluate(o => { window.RET.bossadds = o === '1'; }, process.env.BOSSADDS);   // W278: BOSSADDS=1 = no street adds during the boss (or ?bossadds=1 via Q)
     if (process.env.JUMP) { await sleep(2500); await p.evaluate(j => { const S = window.FOOT.S; S.time = +j; S.P.x = 7350; S.camX = 7250; }, process.env.JUMP); R.notes.push('JUMP: stage clock set to ' + process.env.JUMP + ' (geometry probe only, not a clear-rate run)'); }
     if (plat !== 'pc') { R.audit = await p.evaluate(AUDIT); if (R.audit.small.length) fail('phone control < 44 px: ' + R.audit.small.join(', ')); if (R.audit.over.length) fail('phone controls overlap: ' + R.audit.over.join(', ')); if (R.audit.off.length) fail('phone control off screen: ' + R.audit.off.join(', ')); if (R.audit.clip.length) fail('phone label clipped: ' + R.audit.clip.join(', ')); }
     await p.evaluate(() => { window.__ftOn = true; }); const decide = strategy(strat, rnd);
