@@ -78,7 +78,7 @@ const I={x:0,y:0,l:0,r:0,u:0,d:0,fire:0,jump:0,melee:0,dash:0,bomb:0,jumpP:0,mel
    jump stays a height. A hit lands only when the two depths are within ZT (15% of the band), so stepping up/down dodges. streetlook.js draws the band. */
 if(RET.purefoot===undefined)RET.purefoot=!/[?&]purefoot=0/.test(location.search);   // W217: street draws only the owner's art (purefoot.js); ?purefoot=0 = the old look
 if(RET.belt===undefined)RET.belt=!/[?&]belt=0/.test(location.search);   // W180: ON by default, ?belt=0 = the old flat road
-const ZT=.15,ZSPD=1.2,zok=(a,b,t)=>!RET.belt||a==null||b==null||Math.abs(a-b)<=(t||ZT);
+const ZT=.15,ZTF=.21,ZSPD=1.2,zok=(a,b,t)=>!RET.belt||a==null||b==null||Math.abs(a-b)<=(t||ZT);
 
 /* ===== run state ===== */
 function newRun(id,fromCp){const st=STAGES[id],D=diffK(),old=S;
@@ -141,7 +141,7 @@ const env={get P(){return S.P;},get G(){return S.G||envG();},get D(){return S.D;
     if(S.q.length>=Math.round(QMAX*S.D.fr)&&!(o&&o.must))return;
     const t=Math.max(TELE,(o&&o.tele)||0)+Math.max(0,e.grace||0);e.tele=Math.max(e.tele,t);
     S.q.push({e,a,spd:(spd||340)*S.D.bs*((RET.asB&&RET.asB())||1),dmg:dmg||1,o:o||{},at:S.time+t});},
-  melee(e,r,dmg,o){if(e.grace>0||e.dead)return false;if(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2))return false;/* W161: a foe hits only after 1.2 s on screen */const P=S.P,b=pbox(P);let hit=false;if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){if(zok(e.z,P.z))hit=ftHurt(dmg||1,e.x,'mel:'+e.id);else if(S.time-(e._zm||-9)>.5){e._zm=S.time;S.zmiss=(S.zmiss||0)+1;}}   // belt: S.zmiss counts attacks dodged by depth
+  melee(e,r,dmg,o){if(e.grace>0||e.dead)return false;if(RET.fairstreet&&!e.boss&&(e.seenT==null||S.time-e.seenT<1.2))return false;/* W161: a foe hits only after 1.2 s on screen */const P=S.P,b=pbox(P);let hit=false;if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y){if(zok(e.z,P.z,ZTF))hit=ftHurt(dmg||1,e.x,'mel:'+e.id);else if(S.time-(e._zm||-9)>.5){e._zm=S.time;S.zmiss=(S.zmiss||0)+1;}}   // belt: S.zmiss counts attacks dodged by depth
     if(!e._mfx||S.time-e._mfx>.12){e._mfx=S.time;S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:Math.min(r.w,200),l:.15,c:o&&o.beam?'#ff2050':'#ff4a6a'});}return hit;}};
 F.env=env;
 function pbox(P){const h=P.crouch?40:P.h,bw=S.st.fs?28:P.w;return{x:P.x-bw/2,y:P.y-h,w:bw,h};}   // P.w is the weapon id (the street1 mock keeps its NaN box; footstage stages use the 28 px body)

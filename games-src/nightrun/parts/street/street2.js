@@ -43,7 +43,7 @@ FE.rusher=wrap({hp:3,w:28,h:62,score:120,c:'#ff4a9a',drops:['heal','bomb'],dropP
     if(e.state==='in'||e.state==='run'){e.facing=sgn(dx);walk(e,env,e.facing*300,dt);if(e.state==='in')go(e,'run');if(abs(dx)<120&&e.grace<=0&&abs(P.y-e.y)<120)go(e,'crouch');}
     else if(e.state==='crouch'){e.vx=0;e.tele=.4-e.sT;if(e.sT>=.4){go(e,'lunge');e.tele=0;}}
     else if(e.state==='lunge'){walk(e,env,e.facing*860,dt);env.melee(e,{x:e.x-20,y:e.y-50,w:40,h:50},1);if(e.sT>=.3)go(e,'rest');}
-    else if(e.state==='rest'){e.vx=0;if(e.sT>=.5)go(e,'back');}
+    else if(e.state==='rest'){walk(e,env,-e.facing*4,dt);if(e.sT>=.5)go(e,'back');}   // W263: it drifts back while it recovers (still punishable, never frozen)
     else if(e.state==='back'){e.facing=sgn(dx);walk(e,env,-e.facing*240,dt);if(e.sT>=.55||abs(dx)>220)go(e,'run');}});   // backs off after a lunge: a clear shot
 FE.gunner=wrap({hp:3,w:30,h:64,score:200,c:'#e07a2a',drops:['w_hmg','w_shot','heal'],dropP:.25,
   canHit:e=>!e.hid,
