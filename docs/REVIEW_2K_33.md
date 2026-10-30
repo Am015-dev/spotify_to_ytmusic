@@ -76,3 +76,10 @@ Probe: `tools/perf/boottoctl.js` copy + Athens seed (the gauntlet's own localSto
 
 ## Summary
 330a5fb + 6bc9823: **PASS**. The cut is real (fra -5 s, ath -12 s at 6x, no new programs after control, no visible pop from the merge). Two corrections to the claims: Frankfurt saves 5 s, not 9; the merge starts under the curtain and finishes in-game, not "after control". Open items, not from this commit: the perf/ios-reveal probe path (fix the probe), the teacups/picnic pop-in at ~1 s after control (bug lane), and the 1x boot (24 -> 32 s since beta.151).
+
+## Addendum: which flag adds the 3 Frankfurt reveal links (tIosReveal, fra, one run each)
+- `?twgwbl=0` (merge under the curtain, new prewarm): 27 links, 3 long frames, all in the first frame.
+- `?r17w=0` (old prewarm, merge deferred): 30 links, 5 long frames, **+3 at +3.0 s (477 ms frame)**.
+- Default (both new): 27 / 3 on this rerun; 30 / 5 on the first run.
+
+So the 1-px prewarm is clean. The **deferred far-street merge** sometimes links 3 programs (the merged far-street materials) inside the 3 s window, in a 300-480 ms lab frame (2 of 3 merge-deferred runs). On the player path it did not show (0 new programs, 14/14 runs). It is still a rule-10 regression in the probe metric. The fix is small: when `TWG.wbl` is on, compile the merged meshes' materials under the curtain (`renderer.compile` on one merged material per program, or `PREW_sc(1)` + one draw), or delay the 98wb hook until 3 s after `ldHide`. Until then, point 1/(c) is PASS with this item open (Sonnet, ~30 min).
