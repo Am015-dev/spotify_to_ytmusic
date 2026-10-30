@@ -114,8 +114,12 @@ function CR_lgTap(d){const n=performance.now();if(CR_LG.d===d&&n-CR_LG.t<300){CR
 function CR_lgGo(d){if(state==='race'){if(!paused&&pl&&!pl.finished)pressed.roll=d;return}if(state!=='roam'||!pl||RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story||pl.air||(RO.crLgCd||0)>0||(RO.crLg||0)>0)return;
  RO.crLg=.3;RO.crLgD=d;RO.crLgCd=1;RO.crLgN=(RO.crLgN||0)+1;AU.sfx('roll');CR_lgFx(pl)}
 addEventListener('keydown',e=>{if(e.repeat||(state!=='roam'&&state!=='race'))return;const d={ArrowLeft:-1,KeyA:-1,ArrowRight:1,KeyD:1}[e.code];if(d)CR_lgTap(d)});
-// touchdrive-r29b: on touch nothing fires from ONE arrow tapped twice (corner feathering is two quick taps on the same arrow: the gauntlet race bot rolled by accident). Race roll = both arrows down together (the second finger decides the side). Keyboard double-tap (CR_lgTap) is unchanged.
-BZ.addEventListener('touchstart',e=>{if(state!=='race'||!e.touches||e.touches.length<2)return;const L=[];for(const t of e.touches)L.push(bzSide(t));if(L.includes(-1)&&L.includes(1))CRSM_go(bzSide(e.changedTouches[0]))},{passive:true});
+// touchdrive-r29b/d: on touch nothing fires from ONE arrow tapped twice (corner feathering is two quick taps on the same arrow). Race roll = a CHORD: both arrows go down within CRC.W ms of each other
+// (two thumbs landing together; a hand-over, where the old arrow has been held longer than that when the new one lands, never rolls: REVIEW_2K_32 point 3). Keyboard double-tap (CR_lgTap) is unchanged.
+const CRC={t:{'-1':-1e9,'1':-1e9},W:60};
+BZ.addEventListener('touchstart',e=>{try{const ts=CRSM_ts(e),sides=[];for(const t of e.changedTouches)sides.push(bzSide(t));let hit=0;
+ if(state==='race'&&e.touches&&e.touches.length>=2){const all=[];for(const t of e.touches)all.push(bzSide(t));if(all.includes(-1)&&all.includes(1)){const last=sides[sides.length-1],other=-last;if(sides.includes(other)||ts-CRC.t[other]<=CRC.W)hit=last}}
+ for(const d of sides)CRC.t[d]=ts;if(hit)CRSM_go(hit)}catch(_){}},{passive:true});
 // the lunge moves the car sideways (screen left/right) for 0.3 s; it stops at walls
 roamStep=(f=>function(dt){if(state==='roam')pressed.roll=0;const r=f(dt);try{if(state==='roam'&&pl&&!RO.wk){RO.crLgCd=Math.max(0,(RO.crLgCd||0)-dt);
  if(RO.crLg>0){RO.crLg-=dt;const k=CR_LGV*dt*RO.crLgD,nx=RO.x-Math.cos(RO.h)*k,nz=RO.z+Math.sin(RO.h)*k;if(!roamHit(nx,nz,1.2,RO.y)){RO.x=nx;RO.z=nz}else RO.crLg=0}}}catch(e){}return r})(roamStep);
@@ -201,6 +205,17 @@ function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
  if(state==='roam')return;/* hudstack-1: the left HUD stack positions it */
  h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-22))+'px'}
+// touchdrive-r29d: the SMASH tip. The HUD-stack hint (#crSmHint) is hidden by quiet roam (body.fdq), so nobody could find "hold the arrow toward the car, then BOOST". This pill shows the first 3 times a car is beside you
+// while driving on touch (once per 20 s), 14 px, placed by CRSM_pos clear of every button and the minimap, gone after 3.5 s or when a panel opens.
+const CRT={n:0,last:-1e9,on:false,el:null};try{CRT.n=+(localStorage.getItem('mho_smTip')||0)||0}catch(e){}
+function CRT_hide(){CRT.on=false;if(CRT.el)CRT.el.style.display='none'}
+function CRT_tick(){const ok=state==='roam'&&TOUCH.on&&TOUCH.used&&!paused&&RO.on&&!RO.card&&!RO.mapOpen&&!RO.story&&!RO.wk&&!RO.frozen&&!R3B_panelOpen()&&!document.body.classList.contains('cine');
+ if(!ok){if(CRT.on)CRT_hide();return}if(CRT.on)return;if(CRT.n>=3||CRSM.hn>=2||performance.now()-CRT.last<20000||Math.abs(RO.v)<4)return;const d=CRB_side(0);if(!d)return;
+ let e=CRT.el;if(!e){e=CRT.el=document.createElement('div');e.id='crSmTip';e.style.cssText='position:fixed;z-index:7;pointer-events:none;font:800 14px/1.15 system-ui,sans-serif;letter-spacing:.03em;color:#241400;background:#ffd12c;border:2px solid #141413;border-radius:999px;padding:6px 12px;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.35);display:none';document.body.appendChild(e)}
+ e.textContent='HOLD '+(d<0?'◀':'▶')+' TOWARD THE CAR, THEN BOOST = SMASH';e.style.visibility='hidden';e.style.display='block';const[x,y]=CRSM_pos(d,e.offsetWidth,e.offsetHeight);e.style.left=x+'px';e.style.top=y+'px';e.style.visibility='';
+ CRT.on=true;CRT.last=performance.now();CRT.n++;try{localStorage.setItem('mho_smTip',String(CRT.n))}catch(_){}clearTimeout(CRT.t);CRT.t=setTimeout(CRT_hide,3500)}
+setInterval(()=>{try{CRT_tick()}catch(e){}},200);
+window.__crt=CRT;
 setInterval(()=>{try{CRSM_hint()}catch(e){}},250);
 window.__crsm={get S(){return CRSM},hint:()=>CRSM_hint()};
 // ---- CAR26a: races have no civilian traffic; Crash Junction keeps its (max 3) cars parked at the track edge

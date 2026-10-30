@@ -91,6 +91,7 @@ class Player{
  async touch(type,pts){await this.cdp.send('Input.dispatchTouchEvent',{type,touchPoints:pts})}
  async down(k){if(this.pts.has(k))return;let b=this.B[k];if(!b){await this.vis();b=this.B[k]}if(!b)return false;if(k==='tB'&&Date.now()-this.lastBrake<420&&Math.abs(this.st?this.st.v:0)<20)await this.p.waitForTimeout(420);if(k==='tB')this.lastBrake=Date.now();
   const pt={x:b[0]+b[2]/2,y:b[1]+b[3]/2,id:this.nid++};this.pts.set(k,pt);await this.touch('touchStart',[...this.pts.values()]);return true}
+ async downAll(ks){/* one CDP touchStart with every new finger: two thumbs landing together */const L=[];for(const k of ks){if(this.pts.has(k))continue;let b=this.B[k];if(!b){await this.vis();b=this.B[k]}if(!b)return false;const pt={x:b[0]+b[2]/2,y:b[1]+b[3]/2,id:this.nid++};this.pts.set(k,pt);L.push(pt)}await this.touch('touchStart',[...this.pts.values()]);return true}
  async up(k){const pt=this.pts.get(k);if(!pt)return;this.pts.delete(k);await this.touch('touchEnd',[pt])}
  async set(want){for(const k of [...this.pts.keys()])if(!want.includes(k))await this.up(k);for(const k of want)if(!this.pts.has(k))await this.down(k)}
  async allUp(){for(const k of [...this.pts.keys()])await this.up(k)}
@@ -324,8 +325,13 @@ async function scRace(P){// pause -> QUIT TO TITLE -> 🏁 RACES -> START, then 
  row('race/start','pause → QUIT TO TITLE → RACES → START reaches the grid',st.st,'countdown or race',st.st==='countdown'||st.st==='race',menuShot);
  if(st.st!=='countdown'&&st.st!=='race')return;
  st=await P.run(6,x=>x.st==='race'?'stop':['tG']);const startShot=await P.shot('fra_11_race_start');const t0=st.T;let maxLap=0;
- {/* touchdrive-r29b: a race roll needs both arrows down together; one arrow held then tapped again does not roll */await P.set(['tG','tR']);await P.step(4);const a=await P.ev('(pl.rollT>0||pressed.roll)?1:0');await P.set(['tG','tR','tL']);await P.step(6);const b=await P.ev('(pl.rollT>0||pressed.roll)?1:0');await P.allUp();
-  row('race/rollBoth','race touch: ▶ held does not roll; ▶ + ◀ together does (the SMASH roll)',`one arrow ${a?'ROLL':'no roll'}, both arrows ${b?'ROLL':'no roll'}`,'no roll / ROLL',!a&&!!b,'')}
+ {/* touchdrive-r29d: a race roll is a CHORD (both arrows land within 60 ms). A hand-over (the old arrow held 0.3 s, the new one lands, the old one lifts 33-100 ms later) never rolls; two thumbs landing in one touch event always do */
+  const acc=()=>P.ev('CRSM.acc||0');let ov=0,ch=0;await P.set(['tG']);
+  for(let i=0;i<10;i++){const a0=await acc();await P.set(['tG','tR']);await P.step(9);await P.set(['tG','tR','tL']);await P.step(1+i%3);await P.set(['tG','tL']);await P.step(4);await P.allUp();await P.set(['tG']);await P.step(3);if((await acc())>a0)ov++}
+  for(let i=0;i<10;i++){const a0=await acc();await P.downAll(['tR','tL']);await P.step(4);await P.allUp();await P.set(['tG']);await P.step(3);if((await acc())>a0)ch++}
+  await P.allUp();
+  row('race/rollOverlap','race touch hand-over: ◀ held 0.3 s, ▶ lands while ◀ is still down (1-3 frames, 33-100 ms), ◀ lifts: no roll',`${ov}/10 rolled`,'0/10 (REVIEW_2K_32 point 3)',ov===0,'');
+  row('race/rollBoth','race touch chord: ◀ and ▶ land together (one touch event): the SMASH roll fires',`${ch}/10 fired`,'10/10',ch===10,'')}
  let outT=0;const pol=x=>{if(x.st==='finished'||x.st==='results')return'stop';if(x.st!=='race'){outT+=DT*3;return outT>3?'stop':[]}outT=0;const R=x.race;if(!R)return['tG'];maxLap=Math.max(maxLap,R.lap||0);const want=Math.max(-.35,Math.min(.35,-R.x*.06));const e=want-R.yaw;return['tG',...(e>.04?['tR']:e<-.04?['tL']:[])]};
  const prs=[];let held='';const pol0=pol;const polM=x=>{const w=pol0(x);if(Array.isArray(w)){const sd=w.includes('tR')?'R':w.includes('tL')?'L':'';if(sd&&sd!==held)prs.push([sd,x.T]);held=sd}return w};
  polM.any=true;const acc0=await P.ev('CRSM.acc||0');st=await P.run(480,polM,3);await P.allUp();const acc1=await P.ev('CRSM.acc||0');let wb=0;for(let i=1;i<prs.length;i++)for(let j=i-1;j>=0&&prs[i][1]-prs[j][1]<=.35;j--)if(prs[j][0]===prs[i][0]){wb++;break}
