@@ -63,7 +63,7 @@ const SNAP = () => { const F = window.FOOT, S = F && F.S; if (!S) return null; c
   const cam = F._in.L(); const cw = document.getElementById('game').width; const g = S.gd || null;
   return { on: F.on, t: S.time, end: S.end ? { cleared: S.end.cleared, quit: S.end.quit } : null, paused: S.paused, camX: S.camX, vw: (cam && cam.vw) || 960, lock: S.lock && S.lock.id, wl: S.lock ? S.waves.filter(w => w.lock === S.lock.id && !w.done).length : 0, bossOn: S.bossOn,
     P: { x: P.x, y: P.y, hp: P.hp, max: P.max, g: P.onGround, f: P.facing, inv: P.inv, dash: P.dash, dashIF: P.dashIF, mel: P.mel, bombs: P.bombs, maxX: P.maxX }, guard: g && { on: g.on, m: g.m },
-    E, eb: S.eb.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy || 0, sb: !!b.sb })), pk: S.pk.map(k => ({ k: k.k, x: k.x, y: k.y })), shots: S.shots, kills: S.kills, hurts: S.hurts, score: S.score, moved: S.moved,
+    E, eb: S.eb.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy || 0, sb: !!b.sb, gr: !!b.ground })), pk: S.pk.map(k => ({ k: k.k, x: k.x, y: k.y })), shots: S.shots, kills: S.kills, hurts: S.hurts, score: S.score, moved: S.moved,
     behind: S.behind ? S.behind.until : null, bossX: S.st.boss && S.st.boss.x, len: S.st.len, stage: S.id + ' ' + S.st.n + ' s2=' + S.st.s2 + ' locks=' + (S.st.locks || []).map(l => l.id + '@' + l.x).join(',') + ' boss=' + JSON.stringify(S.st.boss) + ' waves=' + S.waves.length + ' lockDone=' + Object.keys(S.lockDone).join(''), boss: S.boss ? { hp: S.boss.hp, max: S.boss.max, dead: !!S.boss.dead } : null, auto: F.autoOn && F.autoOn(), fl: 540 - 70 }; };
 
 // ---- the strategies: snapshot -> want
@@ -101,8 +101,8 @@ function strategy(name, rnd) {
       // 2. a melee foe in its telegraph within reach, in front: GUARD (parry window is the last 0.15 s); a foe from behind: dash out
       const mel = live.find(e => !heavy(e) && e.id !== 'gunner' && tele(e) && dist(e) < 150);
       if (mel) { if (front(mel) && s.guard && s.guard.m > .05) { w.guard = true; w.mx = 0; return w; } if (P.inv <= 0 && s.t - dodgeAt > .6) { w.dash = true; w.mx = -face(mel); dodgeAt = s.t; return w; } w.mx = -face(mel); return w; }
-      // 3. a bullet on the way: jump it
-      for (const b of s.eb) { const dx = b.x - P.x; if (Math.abs(dx) < 200 && dx * b.vx < 0 && Math.abs(b.y - (P.y - 30)) < 70 && P.g) { w.jump = true; break; } }
+      // 3. a bullet on the way: jump it (W278: the pound's ground wave at 300 px/s only inside 120 px, else Kai lands on it)
+      for (const b of s.eb) { const dx = b.x - P.x; if (Math.abs(dx) < (b.gr ? 120 : 200) && dx * b.vx < 0 && Math.abs(b.y - (P.y - 30)) < 70 && P.g) { w.jump = true; break; } }
       // 4. hearts: hurt and a heal is near and nothing is about to hit
       const heal = P.hp < P.max ? s.pk.filter(k => k.k === 'heal' && k.x > s.camX && k.x < s.camX + s.vw).sort((x, y) => Math.abs(x.x - P.x) - Math.abs(y.x - P.x))[0] : null;
       if (heal && (!nearest || dist(nearest) > 130)) { w.mx = Math.abs(heal.x - P.x) > 12 ? Math.sign(heal.x - P.x) : 0; w.fire = !!nearest && front(nearest); return w; }
