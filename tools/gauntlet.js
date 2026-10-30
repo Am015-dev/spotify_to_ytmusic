@@ -24,7 +24,7 @@ const ROWS=[];const row=(id,what,num,bar,pass,shot,note)=>{const r={id,what,num:
 
 // ---------- in-page harness (evaluated in the game's module scope through __tk.q = read access; it WRITES nothing the game reads) ----------
 const HARNESS=String.raw`(()=>{if(window.__GH)return 'again';
-const G=window.__GH={q:[],on:false,draw:true,vt:0,frames:0,pops:[],n40:0,n40s:0,maxDrop:0,ev:[],P:null,CP:new Map(),mem:0};
+const G=window.__GH={q:[],on:false,draw:true,vt:0,frames:0,pops:[],n40:0,n40s:0,hb:[0,0,0,0,0,0,0,0],maxDrop:0,ev:[],P:null,CP:new Map(),mem:0};
 const raf0=window.requestAnimationFrame.bind(window);G.raf0=raf0;
 window.requestAnimationFrame=cb=>{if(G.on){G.q.push(cb);return 1}return raf0(cb)};
 {const r0=renderer.render.bind(renderer);renderer.render=function(){if(G.on&&!G.draw)return;return r0.apply(this,arguments)};
@@ -46,7 +46,7 @@ G.sample=dt=>{const x=RO.x,z=RO.z,P=G.P||{x,z,v:RO.v};const mv=Math.hypot(x-P.x,
  const drop=(Math.abs(P.v)-Math.abs(RO.v))*3.6;if(!warp&&drop>G.maxDrop)G.maxDrop=drop;
  let cf;try{const d=new THREE.Vector3();camera.getWorldDirection(d);cf=[camera.position.x,camera.position.z,d.x,d.z]}catch(e){cf=[x,z,Math.sin(RO.h),Math.cos(RO.h)]}
  let n40=0;const live=new Set();
- if(state==='roam'&&RO.on)for(const c of HUB.cars||[]){if(!isFinite(c.x+c.z))continue;const alive=!(c.dead>0)&&!c.pk,dd=Math.hypot(c.x-x,c.z-z);if(alive&&dd<40)n40++;live.add(c);const p=G.CP.get(c);
+ if(state==='roam'&&RO.on)for(const c of HUB.cars||[]){if(!isFinite(c.x+c.z))continue;const alive=!(c.dead>0)&&!c.pk,dd=Math.hypot(c.x-x,c.z-z);if(alive&&dd<40)n40++;if(state==='roam'&&RO.on){const bi=c.pk?5:c.dead>0?6:dd<40?0:dd<80?1:dd<150?2:dd<300?3:4;G.hb[bi]++;if(!c.pk&&!(c.dead>0)&&dd<150&&(c.cv||0)<1)G.hb[7]++}live.add(c);const p=G.CP.get(c);
   if(alive&&dd<60&&dd>6&&!warp&&!(c.hitT>0)){const vx=c.x-cf[0],vz=c.z-cf[1],vd=Math.hypot(vx,vz)||1,view=(vx*cf[2]+vz*cf[3])/vd>.64;
    if(view&&p&&p.alive){const j=Math.hypot(c.x-p.x,c.z-p.z);if(j>2)G.pops.push({T:+T.toFixed(1),kind:'jump',m:+j.toFixed(1),d:+dd.toFixed(0),x:+c.x.toFixed(0),z:+c.z.toFixed(0)})}
    else if(view&&p&&!p.alive&&dd<40)G.pops.push({T:+T.toFixed(1),kind:'appear',m:0,d:+dd.toFixed(0),x:+c.x.toFixed(0),z:+c.z.toFixed(0)})}
@@ -56,7 +56,7 @@ G.sample=dt=>{const x=RO.x,z=RO.z,P=G.P||{x,z,v:RO.v};const mv=Math.hypot(x-P.x,
 G.step=(n,dt)=>{for(let i=0;i<n;i++){G.vt+=dt*1000;const q=G.q;G.q=[];for(const cb of q){try{cb(G.vt)}catch(e){G.err=String(e).slice(0,120)}}G.frames++;try{G.sample(dt)}catch(e){G.serr=String(e).slice(0,120)}}
  try{const m=performance.memory&&performance.memory.usedJSHeapSize;if(m>G.mem)G.mem=m}catch(e){}return G.read()};
 G.pullPops=()=>{const p=G.pops;G.pops=[];return p};
-G.resetStats=()=>{G.n40=0;G.n40s=0;G.maxDrop=0;G.pops=[]};
+G.resetStats=()=>{G.hb=[0,0,0,0,0,0,0,0];G.n40=0;G.n40s=0;G.maxDrop=0;G.pops=[]};
 return 'ok'})()`;
 // visible-element boxes: buttons the thumbs use, and every visible text/HUD element
 const VIS=String.raw`(()=>{const v=e=>{if(!e)return null;const r=e.getBoundingClientRect();if(r.width<4||r.height<4)return null;let n=e;while(n&&n!==document.body){const s=getComputedStyle(n);if(n.hidden||s.display==='none'||s.visibility==='hidden'||+s.opacity<.05)return null;n=n.parentElement}if(r.right<=0||r.bottom<=0||r.left>=innerWidth||r.top>=innerHeight)return null;return [r.left,r.top,r.width,r.height]};
@@ -156,7 +156,7 @@ async function scDrive(P,router){await P.ev('__GH.resetStats();0');const s0=awai
  const jumps=pops.filter(q=>q.kind==='jump'),app=pops.filter(q=>q.kind==='appear');
  row('drive/pop','traffic car pops on screen (in view, 6-60 m)',`${jumps.length} jumps > 2 m, ${app.length} appear < 40 m`,'0 jumps > 2 m; 0 appear < 40 m',jumps.length===0&&app.length===0,'',pops.slice(0,3).map(q=>`${q.kind} ${q.m}m@${q.d}m T${q.T}`).join('; '));
  row('drive/onStreet','bot check: share of the drive on a street (a bot off the street makes the drive rows meaningless)',`${(100-100*offR/Math.max(offN,1)).toFixed(0)} %`,'>= 80 % (script validity)',100-100*offR/Math.max(offN,1)>=80,'');
- row('drive/near','traffic near the player (HITRUN_GAP gap 8)',`${n40.toFixed(1)} cars within 40 m (avg)`,'>= 2.5 (hr/near)',n40>=2.5,'');
+ const hb=await P.ev('__GH.hb.map(v=>v/Math.max(1,__GH.n40s))');row('drive/near','traffic near the player (HITRUN_GAP gap 8)',`${n40.toFixed(1)} cars within 40 m (avg)`,'>= 2.5 (hr/near)',n40>=2.5,'',`avg cars per frame by distance: <40 ${hb[0].toFixed(1)}, 40-80 ${hb[1].toFixed(1)}, 80-150 ${hb[2].toFixed(1)}, 150-300 ${hb[3].toFixed(1)}, >300 ${hb[4].toFixed(1)}; parked ${hb[5].toFixed(1)}, dead ${hb[6].toFixed(1)}; standing (<150 m, cv<1) ${hb[7].toFixed(1)}; ${await P.ev('`cars ${HUB.cars.length}, hour ${(FL_time()*24).toFixed(1)}, hourK ${QS_hourK().toFixed(2)}, trHour ${TUNE.trHour}`')}; far(>240 m) cars: ${await P.ev('(()=>{const o={n:0,route:0,tr:0,pk:0,dead:0,noPop:0,ok:0};for(const c of HUB.cars){if(Math.hypot(c.x-RO.x,c.z-RO.z)<240)continue;o.n++;if(c.route)o.route++;else if(c.tr)o.tr++;else if(c.pk)o.pk++;else if(c.dead>0)o.dead++;else if(!HT_canPop(c.x,c.z,c.y))o.noPop++;else o.ok++}return JSON.stringify(o)+" held "+HT_POP.held+" law "+HT_POP.on+" lvTraf "+TUNE.lvTraf+" trFar "+LV_trFar()})()')}`);
  return st}
 
 // ◀ / ▶ each turn the car: hold GAS 2.5 s, then GAS+◀ 1.2 s, straighten, GAS+▶ 1.2 s; heading change per side
