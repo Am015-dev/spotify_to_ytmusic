@@ -4,7 +4,7 @@
 // #tN (BOOST) and #tL/#tR (steer arrows); the sim is stepped 1/60 in the page between presses (as the GOs step it), street spawn as in GO feel/drive.
 // Cases (each `reps` times): bd50/bd40 BRAKE+right (no gas): DRIFT entered <= .35 s, path 90 deg <= 1.3 s; bk50 BRAKE alone: 0 drift frames, slip <= 6 deg, ends stopped or reversing (v <= 5 km/h);
 // tapNNN (100/200/300 ms BRAKE tap in a GAS+right corner at 40 and 60 km/h): 0 drift frames; dbl: two steer taps inside the double-tap window: 0 lunges;
-// smash: BOOST with a car beside the player: a lunge fires; BOOST with no car beside: none.
+// smash: BOOST + steer toward a car beside the player: a lunge fires; plain BOOST, steering away, or no car: none.
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');
 const [BASE,C,REPS,SHOT]=process.argv.slice(2);const N=+REPS||1;
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
@@ -33,6 +33,7 @@ const [BASE,C,REPS,SHOT]=process.argv.slice(2);const N=+REPS||1;
  const hold=async(ms)=>{const n=Math.max(1,Math.round(ms/1000*60));await step(n)};
  const R=[];const add=(name,ok,d)=>R.push({name,ok,...d});
  for(let i=0;i<N;i++){
+  if(!process.env.SMASHONLY){
   await set([]);await prep(50);await set(['R','B']);await step(120);let f=await fin();await set([]);add('bd50',f.enter>0&&f.enter<=.35&&f.t90>0&&f.t90<=1.3,f);
   await prep(35);await set(['R','B']);await step(120);f=await fin();await set([]);add('bd35',f.enter>0&&f.enter<=.35&&f.t90>0&&f.t90<=1.3,f);
   await prep(40);await set(['R','B']);await step(120);f=await fin();await set([]);add('bd40',f.enter>0&&f.enter<=.35&&f.t90>0&&f.t90<=1.3,f);
@@ -42,10 +43,12 @@ const [BASE,C,REPS,SHOT]=process.argv.slice(2);const N=+REPS||1;
   for(const [nm,key] of [['dbl','R'],['dblL','L']]){await prep(45);await set([]);const P=[],pt=[{x:pos[key][0],y:pos[key][1],id:ID[key]}];
    for(let t=0;t<2;t++){P.push(cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:pt}));await sleep(70);P.push(cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]}));await sleep(t?10:80)}
    await Promise.all(P);await step(60);f=await fin();add(nm,f.lunges===0&&f.bzn>=2,f)}
-  // BOOST beside a car (right of the car = +1 lunge side or -1): a car 3 m to the side, level with the player
-  for(const side of [1,-1]){await prep(40);await set(['G']);await step(10);await EV(A=>{const h=RO.h,lx=-Math.cos(h),lz=Math.sin(h),fx=Math.sin(h),fz=Math.cos(h);const c=HUB.cars.find(q=>q.dead<=0&&!q.pk)||HUB.cars[0];c.x=RO.x+lx*A.s*3.2;c.z=RO.z+lz*A.s*3.2;c.dead=0;c.y=RO.y;window.__tdc=c;return 1},{s:side});
-   await set(['G','N']);await step(6);await set(['G']);await step(30);f=await fin();await set([]);add('smash'+(side>0?'R':'L'),f.lunges===1,f)}
-  await prep(40);await set(['G']);await step(10);await set(['G','N']);await step(6);await set(['G']);await step(30);f=await fin();await set([]);add('boostNoCar',f.lunges===0,f);
+  }
+  // BOOST beside a car (touchdrive-r29b): a car 3.2 m to the side, level with the player. Lunge only with BOOST + steer TOWARD it: toward 1 lunge; away / straight / no car 0
+  const arrow={1:'R','-1':'L'};
+  for(const [nm,side,steer,want] of [['smashR',1,1,1],['smashL',-1,-1,1],['boostStraight',1,0,0],['boostAway',1,-1,0],['boostAwayL',-1,1,0]]){await prep(40);await set(['G']);await step(10);await EV(A=>{const h=RO.h,lx=-Math.cos(h),lz=Math.sin(h);const c=HUB.cars.find(q=>q.dead<=0&&!q.pk)||HUB.cars[0];c.x=RO.x+lx*A.s*3.2;c.z=RO.z+lz*A.s*3.2;c.dead=0;c.y=RO.y;return 1},{s:side});
+   await set(['G','N']);await step(2);if(steer){await set(['G','N',arrow[steer]]);await step(6)}await set(['G']);await step(30);f=await fin();await set([]);add(nm,f.lunges===want,f)}
+  await prep(40);await set(['G']);await step(10);await set(['G','N']);await step(2);await set(['G','N','R']);await step(6);await set(['G']);await step(30);f=await fin();await set([]);add('boostSteerNoCar',f.lunges===0,f);
  }
  if(SHOT){await prep(50);await set(['R','B']);await step(30);await EV(()=>{RO.frozen=true;try{roamPose(pl,1/60)}catch(e){}});await p.screenshot({path:SHOT,type:'jpeg',quality:80});await set([])}
  const by={};for(const r of R){(by[r.name]=by[r.name]||{n:0,pass:0,ex:null});by[r.name].n++;if(r.ok)by[r.name].pass++;if((!r.ok||process.env.ALL)&&!by[r.name].ex)by[r.name].ex=r}

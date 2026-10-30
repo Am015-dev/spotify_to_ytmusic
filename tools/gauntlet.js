@@ -1,7 +1,7 @@
 // gauntlet (gauntlet-g0, 2026-10-29): the test a PLAYER would be. Real boot of the BUILT page, phone profile, input ONLY through real
 // Playwright/CDP touch on the real on-screen buttons (PLAY, GAS, BRAKE, ◀ ▶, BOOST, ❚❚, RESUME, card buttons, RETRY, RACES, START).
 // page.evaluate only READS (position, speed, health, mission/race state, DOM boxes), like a player looking at the screen. Docs: docs/GAUNTLET.md.
-//   node tools/gauntlet.js [--build out/<ver>] [--url URL] [--ver <label>] [--only boot,drive,hit,drift,wall,mission,race,pause,ath,portrait] [--throttle 6]
+//   node tools/gauntlet.js [--build out/<ver>] [--url URL] [--ver <label>] [--only boot,drive,hit,drift,wall,mission,race,pause,ath,portrait,boost] [--throttle 6]
 // Output: one table (row, number, bar, PASS/FAIL, shot) on stdout and docs/shots/gauntlet/<ver>/REPORT.md, shots in the same folder. Exit code = FAIL rows.
 // Clock: this lab renders with software GL at ~2-3 fps, so after the (real-time, 6x CPU) boot the harness becomes the page's vsync: it steps the
 // game's own rAF callback at a fixed 1/30 s phone frame and skips GPU draws except for screenshots (bughunt's capture, tools/bughunt.js). That is the
@@ -12,7 +12,7 @@ const A=process.argv.slice(2),arg=(k,d)=>{const i=A.indexOf('--'+k);return i<0?d
 // traffic-r30c2: the bot's own choices (branch pick, reverse steer, wall side) come from a seeded RNG (--seed N, default 7), so runs of two builds drive the same choices; the game's randomness is untouched
 const RNG=(s=>()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296)((+arg('seed',7))>>>0||7);
 const ROOT=path.join(__dirname,'..'),T0=Date.now(),wall=()=>((Date.now()-T0)/1000).toFixed(0);
-const ONLY=String(arg('only','boot,perf,hud,steer,drive,hit,drift,wall,mission,race,pause,ath,portrait')).split(','),on=k=>ONLY.includes(k);
+const ONLY=String(arg('only','boot,perf,hud,steer,drive,hit,drift,wall,mission,race,pause,ath,portrait,boost')).split(','),on=k=>ONLY.includes(k);
 const THR=+arg('throttle',6),DT=1/30;
 const IPHONE_UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
 let BUILD=arg('build',''),URL0=arg('url','');
@@ -301,6 +301,12 @@ async function scPause(P){let st=await P.run(1.5,s=>['tG']);await P.allUp();awai
  await P.tapText(/RESUME/);await P.step(6);v=await P.vis();const closed=!v.ids.roamPause&&!v.ids.pause;const b=await P.step(1);await P.down('tG');st=await P.step(30);await P.up('tG');const moved=Math.hypot(st.x-b.x,st.z-b.z)>.3;
  row('pause/resume','❚❚ opens pause (car + traffic stand still for 1 s), ▶ RESUME drives on',`open ${!!open}, car moved ${carMv.toFixed(2)} m, traffic moved ${trMv.toFixed(2)} m, resumed ${closed&&moved}`,'open, 0 m / 0 m, resumed',!!open&&frozen&&closed&&moved,sh)}
 
+// touchdrive-r29b: BOOST held down a busy street for `sec` s game, steering like scDrive. Counts SMASH lunges (RO.crLgN) and how often a traffic car was in the lunge window (any side) / on the side the car steered to.
+// A lunge with no steer-toward-a-car sample is an unwanted smash (bar 0); plain BOOST must never lunge.
+async function scBoost(P,router,tag,sec){const n0=await P.ev('RO.crLgN||0'),t0=P.st.T;let win=0,tow=0,k=0,boostOn=0;
+ const pol=async st=>{k++;const w=router.drive(st),d=w.includes('tR')?1:w.includes('tL')?-1:0,e=await P.ev(`[CRB_side(0),${d?`CRB_side(${d})`:0},!!TOUCH.boost]`);if(e[0])win++;if(d&&e[1])tow++;if(e[2])boostOn++;return[...w,'tN']};
+ let st=P.st;for(let i=0;i<Math.ceil(sec/10)&&st.T-t0<sec;i++)st=await P.run(10,pol);await P.allUp();
+ const ln=(await P.ev('RO.crLgN||0'))-n0;row('boost/'+tag,'BOOST held for 2 min down busy streets (real taps, GAS+◀▶ like a player): no SMASH lunge unless steering toward a car beside',`${ln} lunges in ${(st.T-t0).toFixed(0)} s game; a car in the window in ${win}/${k} samples (BOOST down ${boostOn}), steering toward it in ${tow}`,'0 lunges with plain BOOST (a lunge needs a steer-toward sample)',(st.T-t0)>=sec-10&&boostOn>k*.9&&(ln===0||tow>0),'');return ln}
 async function scRace(P){// pause -> QUIT TO TITLE -> 🏁 RACES -> START, then race with ◀ ▶ GAS like a player
  await P.allUp();await P.tapSel('#tP');await P.step(6);let q=await P.tapText(/QUIT TO TITLE/);await P.release?.();
  await P.ev('__GH.release();0');await P.p.waitForTimeout(3000);
@@ -316,7 +322,9 @@ async function scRace(P){// pause -> QUIT TO TITLE -> 🏁 RACES -> START, then 
  if(st.st!=='countdown'&&st.st!=='race')return;
  st=await P.run(6,x=>x.st==='race'?'stop':['tG']);const startShot=await P.shot('fra_11_race_start');const t0=st.T;let maxLap=0;
  let outT=0;const pol=x=>{if(x.st==='finished'||x.st==='results')return'stop';if(x.st!=='race'){outT+=DT*3;return outT>3?'stop':[]}outT=0;const R=x.race;if(!R)return['tG'];maxLap=Math.max(maxLap,R.lap||0);const want=Math.max(-.35,Math.min(.35,-R.x*.06));const e=want-R.yaw;return['tG',...(e>.04?['tR']:e<-.04?['tL']:[])]};
- pol.any=true;st=await P.run(480,pol,3);await P.allUp();
+ const prs=[];let held='';const pol0=pol;const polM=x=>{const w=pol0(x);if(Array.isArray(w)){const sd=w.includes('tR')?'R':w.includes('tL')?'L':'';if(sd&&sd!==held)prs.push([sd,x.T]);held=sd}return w};
+ polM.any=true;const acc0=await P.ev('CRSM.acc||0');st=await P.run(480,polM,3);await P.allUp();const acc1=await P.ev('CRSM.acc||0');let wb=0;for(let i=1;i<prs.length;i++)for(let j=i-1;j>=0&&prs[i][1]-prs[j][1]<=.35;j--)if(prs[j][0]===prs[i][0]){wb++;break}
+ row('race/rollTaps','one full race steered like a player (bot taps ◀/▶ to hold the lane): steer presses and would-be double-taps (same side twice within .35 s game time; the lab clock cannot fire the real-time detector, CRSM.acc '+(acc1-acc0)+')',`${prs.length} steer presses, ${wb} would-be double-taps = accidental rolls`,'INFO (a roll needs a deliberate gesture if this is > 0)',null,'');
  let v2=await P.vis();for(let i=0;i<60&&!v2.ids.results;i++){st=await P.step(9);v2=await P.vis()}/* the finish cam runs at 0.2x: results after ~12 s game */
  const finShot=await P.shot('fra_12_race_finish');
  row('race/finish','race finishes with a result screen',v2.ids.results?`results after ${(st.T-t0).toFixed(0)} s game`:`no results (state ${st.st}, lap ${maxLap}, ${(st.T-t0).toFixed(0)} s game)`,'#results visible <= 480 s game',!!v2.ids.results,finShot,(v2.txt.find(t=>/PLACE|ST|ND|RD|TH/.test(t.t))||{t:''}).t)}
@@ -346,6 +354,7 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
   if(on('world'))await scWorld(P,router);   // world-r30b: first, from the spawn (garage 66 m, quests near); its rows do not depend on the later parts
   if(on('steer'))await scSteer(P,router);
   if(on('drive'))await scDrive(P,router);
+  if(on('boost'))await scBoost(P,router,'fra',120);
   if(on('hit'))await scHits(P,router);
   if(on('drift'))await scDrift(P,router);
   if(on('wall'))await scWalls(P,router);
@@ -361,6 +370,7 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
    const city=await A.ev('CID');row('ath/boot','Athens: PLAY → first control',BA.R.toCtl!=null?`${BA.R.toCtl.toFixed(1)} s lab, city ${city}`:'never','control, city ath',BA.R.toCtl!=null&&city==='ath',BA.R.ctlShot);
    await harness(A);const r2=Router(await A.ev('__GH.nodes()'));await A.ev('__GH.resetStats();0');let st=await A.step(1);const t0=st.T;let stuck=0,rev=0,slow=0,n=0;
    st=await A.run(60,s=>{n++;if(s.v<10)slow++;if(rev>0){rev-=DT*3;return['tB','tL']}if(s.v<3){stuck+=DT*3;if(stuck>2){stuck=0;rev=1.5;}}else stuck=0;return r2.drive(s)});await A.allUp();
+   if(on('boost'))await scBoost(A,r2,'ath',120);
    const sh=await A.shot('ath_2_drive');const pops=await A.ev('__GH.pullPops()');
    row('ath/drive','Athens: 60 s drive following streets',`${(st.T-t0).toFixed(0)} s game, ${Math.round(100*slow/Math.max(n,1))} % under 10 km/h, ${pops.filter(p=>p.kind==='jump').length} pops`,'>= 55 s, <= 15 % slow, 0 pops',st.T-t0>=55&&slow/Math.max(n,1)<=.15&&!pops.some(p=>p.kind==='jump'),sh);
    await A.allUp();await A.tapSel('#tP');await A.step(6);const q=await A.tapText(/QUIT TO TITLE/);await A.ev('__GH.release();0');await A.p.waitForTimeout(3000);const r=(await A.vis()).btn.some(x=>/START RACE/.test(x.t))?'menu':await A.tapText(/RACES/);await A.p.waitForTimeout(2500);const s=await A.tapSel('#startBtn');

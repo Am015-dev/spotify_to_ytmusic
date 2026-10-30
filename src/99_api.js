@@ -155,10 +155,11 @@ const CRSM={d:0,t:-1e9,b:null,n:0,hn:0,pt:0,pd:0,acc:0};try{CRSM.hn=+(localStora
 function CRSM_ts(e){const n=performance.now(),t=e&&e.timeStamp;return typeof t==='number'&&t>0&&Math.abs(n-t)<2000?t:n}
 function CRSM_tap(d,ts){if(!d)return;const g=ts-CRSM.t;if(CRSM.d===d&&g>=0&&g<=350){CRSM.t=-1e9;CRSM_go(d)}else{CRSM.d=d;CRSM.t=ts}}
 CR_lgTap=function(d){CRSM_tap(d,performance.now())};
-// touchdrive-r29a: touch SMASH lunge = BOOST pressed with a traffic car beside you (1-5.5 m to the side, within 6 m ahead/behind), toward that car. Steering never fires it.
+// touchdrive-r29b: touch SMASH lunge = BOOST held while STEERING TOWARD a traffic car beside you (steer side = car side, 1-5.5 m to the side, within 6 m ahead/behind); fires once when that combination begins.
+// Plain BOOST down a street (no steering, or steering away from the car) never lunges: REVIEW_2K_29 point c, a car was in the window 17 % of a normal drive.
 const CRB={p:false,n:0};
-function CRB_side(){const h=RO.h,lx=-Math.cos(h),lz=Math.sin(h),fx=Math.sin(h),fz=Math.cos(h);let bd=0,bl=9;for(const c of (typeof HUB!=='undefined'&&HUB.cars)||[]){if(!(c.dead<=0)||Math.abs((c.y||0)-RO.y)>3)continue;const ox=c.x-RO.x,oz=c.z-RO.z,lat=ox*lx+oz*lz,fw=ox*fx+oz*fz;if(Math.abs(fw)<=6&&Math.abs(lat)>=1&&Math.abs(lat)<=5.5&&Math.abs(lat)<bl){bl=Math.abs(lat);bd=Math.sign(lat)}}return bd}
-roamStep=(f=>function(dt){try{if(state==='roam'){const b=!!(TOUCH.on&&TOUCH.used&&TOUCH.boost);if(b&&!CRB.p){const d=CRB_side();if(d){CRB.n++;CRSM_go(d)}}CRB.p=b}}catch(e){}return f(dt)})(roamStep);
+function CRB_side(want){const h=RO.h,lx=-Math.cos(h),lz=Math.sin(h),fx=Math.sin(h),fz=Math.cos(h);let bd=0,bl=9;for(const c of (typeof HUB!=='undefined'&&HUB.cars)||[]){if(!(c.dead<=0)||Math.abs((c.y||0)-RO.y)>3)continue;const ox=c.x-RO.x,oz=c.z-RO.z,lat=ox*lx+oz*lz,fw=ox*fx+oz*fz;if(want&&Math.sign(lat)!==want)continue;if(Math.abs(fw)<=6&&Math.abs(lat)>=1&&Math.abs(lat)<=5.5&&Math.abs(lat)<bl){bl=Math.abs(lat);bd=Math.sign(lat)}}return bd}
+roamStep=(f=>function(dt){try{if(state==='roam'){const d=TOUCH.on&&TOUCH.used&&TOUCH.boost&&TOUCH.dir?TOUCH.dir:0,go=d&&CRB_side(d)===d;if(go&&!CRB.p){CRB.n++;CRSM_go(d)}CRB.p=!!go}}catch(e){}return f(dt)})(roamStep);
 function CRSM_modal(){if(paused||!pl)return true;if(state==='race')return !!(pl.finished||pl.dead>0);if(state==='roam')return !!(RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story);return true}
 function CRSM_go(d){if(CRSM_modal())return;CRSM.acc++;CRSM.b={d,age:0,t0:performance.now()};try{CRSM_fx(d)}catch(e){}CRSM_try()}
 function CRSM_try(){const b=CRSM.b;if(!b)return;if(b.age>.45||performance.now()-b.t0>1500||CRSM_modal()){CRSM.b=null;return}
@@ -193,7 +194,7 @@ hitPop=(f=>function(t,col){try{if(/SMASH|TAKEDOWN/.test(String(t))&&performance.
 const R3B_PANELS=['journal','m1Cs','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
 function R3B_panelOpen(){for(const id of R3B_PANELS){const e=document.getElementById(id);if(e&&!e.hidden&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden')return true}return false}
 function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='HIT FAST = SMASH';document.body.appendChild(h)}
- {const t=state==='roam'&&TOUCH.used?'BOOST BY A CAR = SMASH':'HIT FAST = SMASH';if(h.textContent!==t)h.textContent=t}
+ {const t=state==='roam'&&TOUCH.used?'BOOST+STEER INTO CAR = SMASH':'HIT FAST = SMASH';if(h.textContent!==t)h.textContent=t}
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
