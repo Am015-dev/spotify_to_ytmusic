@@ -219,7 +219,7 @@ function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=
     if(p.jy<=0&&(!RO.foot||RO.foot==='car')&&d<(sp>12?14:2.6)&&Math.abs(RO.y-p.y)<4){const ax=bx-RO.x,az=bz-RO.z,al=Math.hypot(ax,az)||1;p.jv=d<5?10:7.5;p.jy=.01;p.kx=ax/al*(d<5?8:5.5);p.kz=az/al*(d<5?8:5.5);p.spin=d<5?(R()<.5?-1:1)*8:0;if(R()<.35)AU.sfx('pick');if(d<5&&sp>20&&R()<.5){feed(['HEY!','WATCH IT!','PASS AUF!','OI!'][Math.floor(R()*4)],0,'#ffd12c')}}
     if(p.jy>0){p.jv-=26*dt;p.jy+=p.jv*dt;p.jx+=p.kx*dt;p.jz+=p.kz*dt;if(p.jy<=0){p.jy=0;p.spin=0}}else{p.jx*=Math.max(0,1-dt*.5);p.jz*=Math.max(0,1-dt*.5)}
     const x=bx+p.jx,z=bz+p.jz;p._x=x;p._z=z;if(!p.yc||(i+HUB.fr)%8===0){p.y=groundAt(x,z,(p.y||0)+3);if(p.y<-1){pedPlace(p,120,380);continue}p.y=Math.max(0,p.y)}p.yc=1;
-    const air=p.jy>0,sw=air||p.cw||S?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=(S?S.h:p.cw?p.ch:Math.atan2(dx,dz))+(p.spin?performance.now()/1000*p.spin:0),S2=(SC_S&&SC_S.on?SC_K.ped:.66)*(p.cw?p.gs:1);
+    const air=p.jy>0,sw=air||p.cw||S?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=(S?S.h:p.cw?p.ch:Math.atan2(dx,dz))+(p.spin?performance.now()/1000*p.spin:0),S2=(SC_S&&SC_S.on?SC_K.ped:.66)*(p.cw?p.gs:1)*(p.fh?0:1)/* world-r30b: FC fade */;
     if(L3_ON&&L3_pose(p,i,x,z,h,S2,air,S,d,sp,dt))continue;/* life-3: natural minifig walk + idles (98l3) */
     _pq.setFromAxisAngle(up,h);_pB.compose(_pv.set(x,p.y+p.jy+bob,z),_pq,_ps.set(S2,S2,S2));
     (_pA[0]=-.3,_pA[1]=1.25,_pA[2]=0,_pA[3]=air?-.5:sw,_pA[4]=0,pedPart(Q.legL,i));(_pA[0]=.3,_pA[1]=1.25,_pA[2]=0,_pA[3]=air?.4:-sw,_pA[4]=0,pedPart(Q.legR,i));(_pA[0]=0,_pA[1]=1.36,_pA[2]=0,_pA[3]=0,_pA[4]=0,pedPart(Q.hip,i));(_pA[0]=0,_pA[1]=2.22,_pA[2]=0,_pA[3]=0,_pA[4]=0,pedPart(Q.tor,i));

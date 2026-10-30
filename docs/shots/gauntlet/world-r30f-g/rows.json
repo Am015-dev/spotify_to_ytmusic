@@ -1,0 +1,128 @@
+[
+ {
+  "id": "boot/playVisible",
+  "what": "page open → PLAY button visible",
+  "num": "38.4 s lab",
+  "bar": "INFO (lab, software GL)",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/world-r30f-g/fra_0_title.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl",
+  "what": "PLAY tap → first control of the car",
+  "num": "216.2 s lab (6x CPU)",
+  "bar": "<= 8 s lab",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/world-r30f-g/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/menu",
+  "what": "race menu never shows after PLAY (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "boot/loader",
+  "what": "loader never covers a controllable car (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls",
+  "what": "HUD text over the touch buttons (first control)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/world-r30f-g/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "hud/minText",
+  "what": "smallest visible text (first control)",
+  "num": "0 items < 12 px",
+  "bar": "0 (CLAUDE.md: 12 px minimum)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "world/quests",
+  "what": "3 quest(s) started by real input (beacon, prompt, LET'S GO): anything drawn inside my car?",
+  "num": "3/3 started, 0 objects in the car body",
+  "bar": "3/3 started, 0 (gauntlet seen/prop-on-car)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/world-r30f-g/world_quest1_start.jpg",
+  "note": "q_pigeons d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_photo d7m v0 opened tapped LET'S GO ▶ started; (abandoned); q_wedding d7m v0 opened tapped LET'S GO ▶ started; (abandoned)"
+ },
+ {
+  "id": "world/pickup",
+  "what": "drive at the garage 🔧: the icon is readable on the way into its ring",
+  "num": "opacity 40 m 1 · 25 m 1 · 12 m 1",
+  "bar": ">= 0.75 at 25 m and 12 m (REVIEW_2K_28: 0.31 at 26 m)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/world-r30f-g/world_garage_25m.jpg",
+  "note": ""
+ },
+ {
+  "id": "world/glance",
+  "what": "drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object",
+  "num": "0/39 frames inside a prop (tlight, closest 2.8 m); 0 frames inside a building (INFO)",
+  "bar": "passes <= 4 m from the prop (REVIEW_2K_31), 0 frames (gauntlet seen/camera-in-props)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/world-r30f-g/world_glance_kiosk.jpg",
+  "note": ""
+ },
+ {
+  "id": "world/birds",
+  "what": "scattered pigeons seen from the car at >= 55 km/h (real drive)",
+  "num": "0/42 bird samples at camera height (0 %), 6 samples",
+  "bar": "<= 10 % at camera height (REVIEW_2K_28: grey drones 3-8 m up)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/world-r30f-g/world_birds_speed.jpg",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls2",
+  "what": "HUD text over the touch buttons (later in roam)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/reload",
+  "what": "page never reloads",
+  "num": "0 reloads",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/jsErrors",
+  "what": "no JS errors (pageerror + console.error)",
+  "num": "0 errors",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/memory",
+  "what": "JS heap high-water (performance.memory)",
+  "num": "21 MB",
+  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ }
+]
