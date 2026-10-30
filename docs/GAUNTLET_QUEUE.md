@@ -77,3 +77,13 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - tb1b a341274 (flag OFF): the new PLAY-boot GO shows control → TB.fin 137.9 s vs the 15 s bar. Two lanes on tb1 now (rule 9) → next is an OPUS redesign of the post-control stream (less work before TB.fin, or cheaper far tiles), joined with tb2. Rule 11: ?tb1 ships ON or is deleted by 31 Oct; if the redesign is not green by then, delete the flag path and keep the design doc.
 - Running: review-r30-13 (touchdrive r4, waiting on its gauntlet), mem-r30n (OPUS, nudged at 21:17), gscript-r30o (SONNET: honest gauntlet drive rows + docs/GAUNTLET_ROWS.md, script vs game verdicts).
 - Review order: touchdrive → mem → (tb redesign later).
+
+## 30 Oct ~21:55
+- beta.166 live (Beta v331): beta.165 + touchdrive-r30m (REVIEW_2K_39 PASS).
+- tb1b PASS for flag OFF (REVIEW_2K_40): B2_pump is equivalent with B2.tb null; OFF boot median 76.7 vs 74.0 s (noise). It ships in the next deploy. ON: frame-bound queue (2-4 ms per ~250 ms phone frame) → redesign input in REVIEW_2K_40 §3 (frame-share budget, less work before fin, split the 738 ms tile merge).
+- Rule-15 reds to clear within 1 day, in this order at the next free worker slots:
+  1. ath page/jsErrors "WebGLAttributes buffer size does not match" (REVIEW_2K_39; suspect 98tr_terrain.js:147 memFree) — SONNET bug lane.
+  2. perf/ios-reveal fra: 0 links but one ~1.4 s stall after reveal (REVIEW_2K_40, on beta.165 too) — SONNET.
+  3. why/solid-cars#1 flake (gate 77/78, re-run PASS) — fix or delete — SONNET.
+- Then: OPUS tb redesign (+tb2), world round 4.
+- Running: gscript-r30o, mem-r30p (both SONNET/OPUS workers). Reviewer slot free.
