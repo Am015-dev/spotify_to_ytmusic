@@ -34,7 +34,7 @@ function glow(col0){if(gc[col0])return gc[col0];const col=/^#[0-9a-f]{3}$/i.test
 function G_(x,y,r,col,a=1){ctx.globalAlpha=window.COM?a*COM.g():a;ctx.drawImage(glow(col),x-r,y-r,r*2,r*2);ctx.globalAlpha=1;}
 
 /* ---------- storage + settings ---------- */
-function load(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function load(k,d){try{const v=localStorage.getItem(k);if(v==null)return d;const x=JSON.parse(v);return d!==null&&d!==undefined&&(x===null||(typeof d==='object'&&typeof x!=='object'))?d:x;}catch(e){return d;}}   // a stored null / wrong type (a hand-edited or damaged save) falls back to the default instead of throwing at boot
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 let best=load('mnr_best',{score:0,dist:''});
 const todayN=()=>{const d=(window.RET&&RET.daily&&RET.clock)?new Date(RET.clock()):new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
