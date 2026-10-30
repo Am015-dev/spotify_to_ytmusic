@@ -1,0 +1,7 @@
+fra_portrait natural 68s {"t":"HOLD ◀ TOWARD THE CAR, THEN BOOST = SMASH","fs":"14px","disp":"block","vis":"visible","op":"1","r":[6,497,400,32],"inView":false,"overCtl":[],"overMini":false,"side":-1,"kmh":55,"st":"roam"}
+fra_portrait placed LEFT {"t":"HOLD ◀ TOWARD THE CAR, THEN BOOST = SMASH","fs":"14px","disp":"block","vis":"visible","op":"1","r":[6,500,400,32],"inView":false,"overCtl":[],"overMini":false,"side":-1,"kmh":74,"st":"roam"}
+fra_portrait placed RIGHT {"t":"HOLD ▶ TOWARD THE CAR, THEN BOOST = SMASH","fs":"14px","disp":"block","vis":"visible","op":"1","r":[6,485,400,32],"inView":false,"overCtl":[],"overMini":false,"side":1,"kmh":93,"st":"roam"}
+fra_portrait count after 3
+fra_portrait race city-quick(default) tip shown 0/40 state roam+sp kind=quick v=0 null
+fra_portrait race cup tip shown 0/40 state countdown+sp kind=quick v=0 null
+fra_portrait errs []

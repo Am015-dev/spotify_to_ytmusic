@@ -1,0 +1,17 @@
+fra state countdown tab=cup raceT=0.0
+fra handover300_ov20       1/10 rolled page gaps ms: 301,301,302,301,301,301,389,301,302,319 countdown,race
+fra handover300_ov40       7/10 rolled page gaps ms: 300,303,305,311,301,302,302,316,304,301 race
+fra handover300_ov60       6/10 rolled page gaps ms: 301,302,301,306,312,300,334,308,316,301 race
+fra handover300_ov80       6/10 rolled page gaps ms: 301,301,301,335,299,320,302,301,301,403 race
+fra reversal_hold40        6/6 rolled page gaps ms: 47,42,42,40,40,45 race
+fra reversal_hold80        5/6 rolled page gaps ms: 174,81,62,81,18,80 race
+fra reversal_hold120       5/6 rolled page gaps ms: 136,123,122,132,123,119 race
+fra chord_gap0             10/10 rolled page gaps ms: 0,0,0,0,0,0,0,0,0,0 race
+fra chord_gap15            10/10 rolled page gaps ms: 16,15,15,16,16,16,15,15,16,16 race
+fra chord_gap30            9/10 rolled page gaps ms: 52,31,31,30,34,30,32,31,31,31 race
+fra chord_gap45            10/10 rolled page gaps ms: 46,44,46,47,45,45,45,45,46,46 race
+fra chord_gap60            2/6 rolled page gaps ms: 60,61,61,62,61,61 race
+fra chord_gap80            4/6 rolled page gaps ms: 81,80,88,81,81,80 race
+fra chord_gap100           1/6 rolled page gaps ms: 108,104,112,101,100,111 race
+fra errs []
+fra JSON {"handover300_ov20":{"rolls":1,"n":10,"gaps":"301,301,302,301,301,301,389,301,302,319","st":"countdown,race"},"handover300_ov40":{"rolls":7,"n":10,"gaps":"300,303,305,311,301,302,302,316,304,301","st":"race"},"handover300_ov60":{"rolls":6,"n":10,"gaps":"301,302,301,306,312,300,334,308,316,301","st":"race"},"handover300_ov80":{"rolls":6,"n":10,"gaps":"301,301,301,335,299,320,302,301,301,403","st":"race"},"reversal_hold40":{"rolls":6,"n":6,"gaps":"47,42,42,40,40,45","st":"race"},"reversal_hold80":{"rolls":5,"n":6,"gaps":"174,81,62,81,18,80","st":"race"},"reversal_hold120":{"rolls":5,"n":6,"gaps":"136,123,122,132,123,119","st":"race"},"chord_gap0":{"rolls":10,"n":10,"gaps":"0,0,0,0,0,0,0,0,0,0","st":"race"},"chord_gap15":{"rolls":10,"n":10,"gaps":"16,15,15,16,16,16,15,15,16,16","st":"race"},"chord_gap30":{"rolls":9,"n":10,"gaps":"52,31,31,30,34,30,32,31,31,31","st":"race"},"chord_gap45":{"rolls":10,"n":10,"gaps":"46,44,46,47,45,45,45,45,46,46","st":"race"},"chord_gap60":{"rolls":2,"n":6,"gaps":"60,61,61,62,61,61","st":"race"},"chord_gap80":{"rolls":4,"n":6,"gaps":"81,80,88,81,81,80","st":"race"},"chord_gap100":{"rolls":1,"n":6,"gaps":"108,104,112,101,100,111","st":"race"}}

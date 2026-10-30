@@ -1,0 +1,17 @@
+ath state roam raceT=0.0
+ath handover300_ov20       0/10 rolled page gaps ms: 302,302,309,301,301,301,302,348,301,301 roam
+ath handover300_ov40       0/10 rolled page gaps ms: 309,300,332,301,301,301,301,306,301,302 roam
+ath handover300_ov60       0/10 rolled page gaps ms: 304,323,301,301,300,302,305,300,303,304 roam
+ath handover300_ov80       0/10 rolled page gaps ms: 299,301,301,315,301,309,313,301,315,396 roam
+ath reversal_hold40        0/6 rolled page gaps ms: 42,40,40,41,54,42 roam
+ath reversal_hold80        0/6 rolled page gaps ms: 138,171,81,82,139,80 roam
+ath reversal_hold120       0/6 rolled page gaps ms: 121,123,116,121,123,127 roam
+ath chord_gap0             0/10 rolled page gaps ms: 0,0,0,0,0,0,0,0,0,0 roam
+ath chord_gap15            0/10 rolled page gaps ms: 15,18,15,15,17,16,14,21,15,15 roam
+ath chord_gap30            0/10 rolled page gaps ms: 30,30,38,31,46,32,31,38,30,31 roam
+ath chord_gap45            0/10 rolled page gaps ms: 45,46,45,46,59,45,46,46,45,46 roam
+ath chord_gap60            0/6 rolled page gaps ms: 57,61,103,72,82,60 roam
+ath chord_gap80            0/6 rolled page gaps ms: 83,81,84,80,107,81 roam
+ath chord_gap100           0/6 rolled page gaps ms: 103,99,101,100,101,100 roam
+ath errs []
+ath JSON {"handover300_ov20":{"rolls":0,"n":10,"gaps":"302,302,309,301,301,301,302,348,301,301","st":"roam"},"handover300_ov40":{"rolls":0,"n":10,"gaps":"309,300,332,301,301,301,301,306,301,302","st":"roam"},"handover300_ov60":{"rolls":0,"n":10,"gaps":"304,323,301,301,300,302,305,300,303,304","st":"roam"},"handover300_ov80":{"rolls":0,"n":10,"gaps":"299,301,301,315,301,309,313,301,315,396","st":"roam"},"reversal_hold40":{"rolls":0,"n":6,"gaps":"42,40,40,41,54,42","st":"roam"},"reversal_hold80":{"rolls":0,"n":6,"gaps":"138,171,81,82,139,80","st":"roam"},"reversal_hold120":{"rolls":0,"n":6,"gaps":"121,123,116,121,123,127","st":"roam"},"chord_gap0":{"rolls":0,"n":10,"gaps":"0,0,0,0,0,0,0,0,0,0","st":"roam"},"chord_gap15":{"rolls":0,"n":10,"gaps":"15,18,15,15,17,16,14,21,15,15","st":"roam"},"chord_gap30":{"rolls":0,"n":10,"gaps":"30,30,38,31,46,32,31,38,30,31","st":"roam"},"chord_gap45":{"rolls":0,"n":10,"gaps":"45,46,45,46,59,45,46,46,45,46","st":"roam"},"chord_gap60":{"rolls":0,"n":6,"gaps":"57,61,103,72,82,60","st":"roam"},"chord_gap80":{"rolls":0,"n":6,"gaps":"83,81,84,80,107,81","st":"roam"},"chord_gap100":{"rolls":0,"n":6,"gaps":"103,99,101,100,101,100","st":"roam"}}
