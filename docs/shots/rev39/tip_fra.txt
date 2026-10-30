@@ -1,0 +1,7 @@
+fra natural 96s null
+fra placed LEFT {"t":"HOLD ◀ TOWARD THE CAR, THEN BOOST = SMASH","fs":"14px","disp":"block","vis":"visible","op":"1","r":[22,118,360,48],"inView":true,"overCtl":[],"overMini":false,"side":-1,"kmh":64,"st":"roam"}
+fra placed RIGHT {"t":"HOLD ▶ TOWARD THE CAR, THEN BOOST = SMASH","fs":"14px","disp":"block","vis":"visible","op":"1","r":[464,118,360,48],"inView":true,"overCtl":[],"overMini":false,"side":1,"kmh":82,"st":"roam"}
+fra count after 3
+fra race city-quick(default) tip shown 0/40 state roam+sp kind=quick v=0 null
+fra race cup tip shown 0/40 state countdown+sp kind=quick v=0 null
+fra errs []

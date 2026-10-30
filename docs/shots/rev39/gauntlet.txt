@@ -1,0 +1,44 @@
+gauntlet rev39-full · phone profile (iPhone UA, 852x393 touch, dpr 2, 6x CPU for boot) · http://localhost:8839/index.html
+INFO boot/playVisible 15.6 s lab                   bar INFO (lab, software GL)
+FAIL boot/toControl   78.9 s lab (6x CPU)          bar <= 36 s lab at 6x (= ~5 s on an iPhone: 5 s x 7.2-7.3, REVIEW_2K_33, docs/GAUNTLET.md)
+PASS boot/menu        0 samples                    bar 0
+PASS boot/loader      0 samples                    bar 0
+PASS hud/overControls 0 overlaps                   bar 0
+PASS hud/minText      0 items < 12 px              bar 0 (CLAUDE.md: 12 px minimum)
+INFO perf/frame       p95 1000 ms, 18/18 frames > 50 ms bar INFO (lab GL; iPhone truth = perf/ios-reveal)
+PASS steer/buttons    ◀ left 56°, left 56° · ▶ right 54°, right 51° bar each >= 20° the pressed way · from 43.4 km/h, from 45.6 km/h, from 45.9 km/h, from 47.3 km/h
+PASS drive/time       120 s game, 2.71 km, avg 83 km/h bar >= 110 s game and >= 1.0 km
+PASS drive/frustration 4 %                          bar <= 15 % (bughunt frustration limit)
+PASS drive/pop        0 jumps > 2 m, 0 appear < 40 m bar 0 jumps > 2 m; 0 appear < 40 m
+FAIL drive/onStreet   42 %                         bar >= 80 % (script validity)
+INFO drive/offLane    >2 m 2.0 %, >4 m 0.94 % of 2127 samples, 0 samples > 2 m for > 3 s, max 4.75 m (k7 1767>1602@0.00 d46) bar INFO
+FAIL drive/near       0.7 cars within 40 m (avg)   bar >= 2.5 (hr/near) · avg cars per frame by distance: <40 0.7, 40-80 1.9, 80-150 7.6, 150-300 18.5, >300 29.2; parked 4.9, dead 12.1; standing (<150 m, cv<1) 3.5; cars 75, hour 10.8, hourK 1.00, trHour 1; far(>240 m) cars: {"n":40,"route":1,"tr":0,"pk":0,"dead":12,"noPop":0,"ok":27} held 7787 law false lvTraf 1 trFar 240
+PASS boost/fra        41 BOOST presses, 0 lunges; a car in the window in 15/1201 samples; 0 presses had the arrow held toward a car beside bar lunges <= presses with the arrow toward a car beside (0 unwanted)
+PASS hit/contact      4/5 contacts                 bar >= 4/5 (hr/hit: contact in >= 9/10) · miss, closest 26.7 m, hit at 66.3 km/h, hit at 59.3 km/h, hit at 64.7 km/h, hit at 52.9 km/h
+INFO hit/react        1/4 contacts                 bar INFO: this read misses thrown cars (shots show them tumbling); judge by the hit shots · Δv 140 m/s, Δv 1.6 m/s, Δv 0 m/s, Δv 1.5 m/s
+PASS hit/noBrake      max 3 %                      bar <= 5 % (HITRUN_GAP gap 1)
+FAIL drift/start      2/3 (peak slip 40.1°, 40.1°, no setup) bar 3/3 with slip >= 15° · 1 setups never reached 46-64 km/h (script) · 47.2->54.9 km/h, 48.4->52.2 km/h
+FAIL drift/tap        0/1 slid (peak no setup, no setup, 6.9°) bar 0 slid, 3 valid setups
+FAIL wall/glance      0/4 keep >= 60 % & no damage (20° 37 km/h 0% -0hp; 3 not set up (script)) bar 4/4
+FAIL wall/headon      0/2 (no wall reached; 2 not set up (script)) bar 2/2 keep <= 35 %
+PASS pause/resume     open true, car moved 0.00 m, traffic moved 0.00 m, resumed true bar open, 0 m / 0 m, resumed
+FAIL mission/reach    no card in 90 s              bar reached <= 60 s game
+PASS hud/overControls2 0 overlaps                   bar 0
+PASS menu/tiles       11/11 tiles ok               bar 0 tiles blank, cut, < 12 px, drawn as > 4 separate pieces, or with a name below the screen and no scroll container (gui-r30a, REVIEW_2K_27)
+PASS race/start       countdown                    bar countdown or race
+PASS race/rollOverlap 0/10 rolled                  bar 0/10 (REVIEW_2K_32 point 3)
+PASS race/rollBoth    10/10 fired                  bar 10/10
+INFO race/rollTaps    93 steer presses, 2 would-be double-taps = accidental rolls bar INFO (a roll needs a deliberate gesture if this is > 0)
+PASS race/finish      results after 141 s game     bar #results visible <= 480 s game · 5TH PLACE
+FAIL ath/boot         114.1 s lab (6x CPU), city ath bar control in city ath, <= 36 s lab at 6x (same bar as Frankfurt, REVIEW_2K_33 (i))
+PASS boost/ath        41 BOOST presses, 0 lunges; a car in the window in 0/1200 samples; 0 presses had the arrow held toward a car beside bar lunges <= presses with the arrow toward a car beside (0 unwanted)
+PASS ath/drive        60 s game, 1 % under 10 km/h, 0 pops bar >= 55 s, <= 15 % slow, 0 pops
+PASS ath/race         quit true races true start true grid true bar grid reached
+PASS portrait/boot    28.6 s lab                   bar control reached
+PASS portrait/band    mean brightness of the 84-88 % rows 56 bar < 140 (the beta.164 band measures 174: pale blue, no road; gui-r30a near-plane fix)
+PASS portrait/hud     0 overlaps, 0 texts < 12 px  bar 0 / 0
+INFO boot/toControl1x 31.0 s lab (1x)              bar INFO: <= 15 s (5 s x 2.9, docs/GAUNTLET.md); not a gate
+PASS page/reload      0 reloads                    bar 0
+FAIL page/jsErrors    2 errors                     bar 0 · ath frame threw (2x): Error: THREE.WebGLAttributes: The size of the buffer attribute's array buffer does not match the original size. Resizing buffer attributes is not supported. at WebGLRenderer.<ano
+INFO page/memory      43 MB                        bar INFO (phone cap 700 MB process, NIGHTRUN_LOG)
+FAIL gauntlet rev39-full · 10 FAIL rows · report docs/shots/gauntlet/rev39-full/REPORT.md · 802 s wall

@@ -1,0 +1,1 @@
+FAIL 77/78 ["life1/fra-density"] errors=0 wall=486s
