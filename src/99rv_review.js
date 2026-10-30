@@ -102,3 +102,5 @@ function RV16_type(say){const b=document.getElementById('qaBugTop'),sh=document.
   setTimeout(()=>{const sent=got.length===1&&got[0].note==='wasd ';ta.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',code:'Escape',bubbles:true,cancelable:true}));const closed=sh.style.display==='none';delete window.__qaDbMock;
    const ok=rel&&foc&&!reached&&!pd&&!held.length&&sent&&closed;
    say('📍 BUG TYPING · held keys released on open: '+rel+' · note box focused: '+foc+' · 7 game keys typed: reached the game '+reached+', blocked from typing '+pd+', held keys after '+held.length+' · Enter sent "wasd ": '+sent+' · Esc closed: '+closed+(ok?' ✅':' ❌'))},700)},300);return'📍 BUG TYPING · typing wasd into the note…'}
+
+({RV14_vis,RV14_ovl,RV14_carBox,RV14_mark,RV14_near,RV14_start,RV14_ride,RV14_pairs,RV14_reset,RV14_go,RV15_go,RV16_bug,RV16_turb,RV16_freed,RV16_near,RV16_type,RV15_SPOTS})

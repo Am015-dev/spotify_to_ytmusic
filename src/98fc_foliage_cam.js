@@ -6,10 +6,15 @@ const FC={on:!/[?&]fcam=0/.test(location.search),t:0,hid:[],M:new THREE.Matrix4(
 function FC_crown(p){let c=p._fc;if(c)return c;const A=window.__as&&__as.A;let V=A&&p.av&&A.V&&A.V[p.av];if(V&&V.H&&V.rx&&V.cls!=='keep'){const a=p.cvs?p.cvs[0]:1,b=p.cvs?p.cvs[1]:1;return p._fc=[V.rx*a+2,p.y+V.H*b*.2,p.y+V.H*b]}
   const g=p.im&&p.im.geometry;if(!g)return p._fc=[0,0,0];if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox;p.im.getMatrixAt(p.i,FC.M);const e=FC.M.elements,s=Math.hypot(e[4],e[5],e[6])||1,sx=Math.hypot(e[0],e[1],e[2])||1;
   const h=(b.max.y-b.min.y)*s;return p._fc=[Math.max(b.max.x-b.min.x,b.max.z-b.min.z)*.5*sx*.85,p.y+b.min.y*s+h*.35,p.y+b.max.y*s]}
+// world-r30b (gauntlet seen/camera-in-props): any other grid prop (kiosk, umbrella, statue, bush, sign) whose body holds the camera or the 75 % point of the car -> camera line
+// is hidden the same way (a glance put the lens inside a giant minifig head + an umbrella); body = the whole instance box (+0.5 m), not the crown. ?fcprop=0 off
+FC.prop=!/[?&]fcprop=0/.test(location.search);
+function FC_body(p){let c=p._fb;if(c)return c;const g=p.im&&p.im.geometry;if(!g)return p._fb=[0,0,0];if(!g.boundingBox){if(!g.attributes.position||!g.attributes.position.array)return p._fb=[0,0,0];g.computeBoundingBox()}const b=g.boundingBox;p.im.getMatrixAt(p.i,FC.M);
+  const e=FC.M.elements,s=Math.hypot(e[4],e[5],e[6])||1,sx=Math.hypot(e[0],e[1],e[2])||1,h=(b.max.y-b.min.y)*s;if(h<.9)return p._fb=[0,0,0];return p._fb=[Math.max(b.max.x-b.min.x,b.max.z-b.min.z)*.5*sx+.5,p.y+b.min.y*s,p.y+b.max.y*s]}
 // hidden = alive:false for the prop (the AS tree LODs, smash and respawn all skip dead props), its tile instance zeroed; AS_step is forced to refill
 function FC_kick(){const A=window.__as&&__as.A;if(A)A.cx=1e9}
 function FC_restore(all){let k=0;for(let i=FC.hid.length-1;i>=0;i--){const h=FC.hid[i],p=h.p;if(!all&&FC.t-h.t<.4)continue;FC.hid.splice(i,1);
-  if(!p.im||p.im.count<=p.i)continue;try{p.alive=true;p.im.setMatrixAt(p.i,h.m);p.im.instanceMatrix.needsUpdate=true;k++}catch(e){}}if(k)FC_kick()}
+  if(!p.im)continue;try{p.alive=true;p.im.setMatrixAt(p.i,h.m);p.im.instanceMatrix.needsUpdate=true;k++}catch(e){}}if(k)FC_kick()}
 function FC_step(){const c=camera.position,ox=RO.x,oy=RO.y+1,oz=RO.z;
   // sample points on the car -> camera line: camera, 75 %, 50 % of the way back (the 25 % point stays out: trunks near the car remain solid)
   const S=[[c.x,c.y,c.z],[ox+(c.x-ox)*.75,oy+(c.y-oy)*.75,oz+(c.z-oz)*.75],[ox+(c.x-ox)*.5,oy+(c.y-oy)*.5,oz+(c.z-oz)*.5]];
@@ -17,10 +22,10 @@ function FC_step(){const c=camera.position,ox=RO.x,oy=RO.y+1,oz=RO.z;
   const fw=camera.getWorldDirection(FC.fw||(FC.fw=new THREE.Vector3())),nr2=FC.nearR*FC.nearR;
   const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16);let k=0;
   for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const l=HUB.pgrid&&HUB.pgrid.get((kx+a)*10000+kz+b);if(!l)continue;
-    for(const p of l){if(!CVF_RX.test(p.t)||p._hcE)continue;const f=p.alive===false?FC.hid.find(h=>h.p===p):null;if(p.alive===false&&!f)continue;const cr=FC_crown(p);if(!cr[0])continue;let hit=0;
+    for(const p of l){const tree=CVF_RX.test(p.t);if(p._hcE||!tree&&(!FC.prop||!p.im||p.t==='lamp'))continue;const f=p.alive===false?FC.hid.find(h=>h.p===p):null;if(p.alive===false&&!f)continue;const cr=tree?FC_crown(p):FC_body(p);if(!cr[0])continue;let hit=0;
       if((p.x-ox)**2+(p.z-oz)**2<9)continue;
-      for(let q=0;q<3&&!hit;q++){const w=S[q];if(w[1]>cr[1]&&w[1]<cr[2]+.6&&(w[0]-p.x)**2+(w[2]-p.z)**2<cr[0]*cr[0])hit=1}
-      if(!hit){const my=(cr[1]+cr[2])/2,dx=p.x-c.x,dy=my-c.y,dz=p.z-c.z;if(my>oy+1&&dx*dx+dy*dy+dz*dz<nr2&&dx*fw.x+dy*fw.y+dz*fw.z>-cr[0]){hit=1;if(!f)FC.near++}}
+      for(let q=0;q<(tree?3:2)&&!hit;q++){const w=S[q];if(w[1]>cr[1]&&w[1]<cr[2]+.6&&(w[0]-p.x)**2+(w[2]-p.z)**2<cr[0]*cr[0])hit=1}
+      if(!hit&&!tree)continue;if(!hit){const my=(cr[1]+cr[2])/2,dx=p.x-c.x,dy=my-c.y,dz=p.z-c.z;if(my>oy+1&&dx*dx+dy*dy+dz*dz<nr2&&dx*fw.x+dy*fw.y+dz*fw.z>-cr[0]){hit=1;if(!f)FC.near++}}
       if(!hit)continue;if(f){f.t=FC.t;continue}
       p.im.getMatrixAt(p.i,FC.M);FC.hid.push({p,m:FC.M.clone(),t:FC.t});p.alive=false;p.rt=1e9;p.im.setMatrixAt(p.i,FC.Z);p.im.instanceMatrix.needsUpdate=true;FC.hide++;k++}}
   if(k)FC_kick();FC_restore(false)}
@@ -113,3 +118,16 @@ function FC_r10eGo(){if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam 
  T.sort((a,b)=>a-b);const r={occ:FC.occ.length,nop,occMs:+occMs.toFixed(1),passMs:+T[10].toFixed(2)};window.__chk=window.__chk||{};window.__chk.r10e=r;
  return`📍 camera occluders ${r.occ}, no-op raycast ones ${nop}; FC_occ ${r.occMs} ms; one raycast pass ${r.passMs} ms (median of 20)`+(nop===0&&occMs<15&&r.passMs<5?' ✅':' ❌')}
 (function FC_r10eReg(i){const C=window.__chk;if(C&&C.GO){if(Array.isArray(C.items)&&!C.items.some(x=>x.ver==='r10e'))C.items.push({ver:'r10e',id:'fcpull',area:'perf',text:'perf-r10e · the camera wall-pull only raycasts meshes that can be hit, and one pass stays under 5 ms'});C.GO['r10e/fcpull']=[{c:'fra',n:'fcpull',fn:()=>FC_r10eGo()},{c:'ath',n:'fcpull',fn:()=>FC_r10eGo()}];return}if(i<600)setTimeout(()=>FC_r10eReg(i+1),100)})(0);
+// world-r30b (gauntlet seen/prop-on-car): a mission starts with a clear spot. Grid props within 4.5 m of the car or of its first 12 m ahead are hidden the FC way
+// (alive:false, instance zeroed, matrix kept) and come back once the car is 30 m away; a street-life cluster (stall / café / crowd) in that zone is flagged C.mv
+// (LV_clStep re-places it at a far corner, people included). Was: a flat beige slab and a black/red/yellow block sat on the road inside the player's car at START.
+function FC_clear(R){const x=RO.x,z=RO.z,fx=Math.sin(RO.h),fz=Math.cos(RO.h),near=(px,pz,r)=>{const dx=px-x,dz=pz-z,a=Math.max(0,Math.min(12,dx*fx+dz*fz)),ex=dx-fx*a,ez=dz-fz*a;return ex*ex+ez*ez<(R+r)*(R+r)};let n=0;
+  const kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const l=HUB.pgrid&&HUB.pgrid.get((kx+a)*10000+kz+b);if(!l)continue;
+    for(const p of l){if(!p.im||p.alive===false||p.t==='lamp')continue;const bd=CVF_RX.test(p.t)?[1]:FC_body(p);if(!bd[0]||!near(p.x,p.z,Math.min(bd[0],3)))continue;
+      p.im.getMatrixAt(p.i,FC.M);FC.hid.push({p,m:FC.M.clone(),t:1e9,ms:[x,z]});p.alive=false;p.rt=1e9;p.im.setMatrixAt(p.i,FC.Z);p.im.instanceMatrix.needsUpdate=true;n++}}
+  try{if(LV.cl)for(const C of LV.cl.L)if(C.on&&(near(C.x,C.z,3.5)||(C.pr||[]).some(q=>!q.dead&&near(q.x,q.z,q.r)))){C.mv=1;n++}}catch(e){}
+  if(n)FC_kick();FC.clr=(FC.clr||0)+n;return n}
+function FC_clearBack(){for(const h of FC.hid)if(h.ms&&Math.hypot(RO.x-h.ms[0],RO.z-h.ms[1])>30){h.t=-1;h.ms=null}}
+chStart=(f=>function(m,o){let r;try{FC_clear(4.5)}catch(e){FC.cerr=String(e).slice(0,120)}r=f.apply(this,arguments);try{FC_clear(4.5)}catch(e){}return r})(chStart);
+roamOpen=(f=>function(m){const r=f.apply(this,arguments);try{if(RO.card)FC_clear(4.5)}catch(e){}return r})(roamOpen);
+roamHud=(f=>function(){const r=f.apply(this,arguments);if(FC.hid.length&&((FC.cb=(FC.cb||0)+1)%30===0))try{FC_clearBack();if(!FC.on||state!=='roam')FC_restore(false)}catch(e){}return r})(roamHud);

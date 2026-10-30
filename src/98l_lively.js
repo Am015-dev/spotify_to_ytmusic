@@ -46,27 +46,28 @@ const LV_PF=6,LV_PB=7,LV_GF=3,LV_GB=4;
 function LV_birdInit(){const nb=LV_PF*LV_PB+LV_GF*LV_GB;
   // ~0.55 m chunky LEGO bird (readable at 30 m), white vertex colours tinted per instance
   const body=mergeG([cbox(.26,.24,.44,0,.2,0,'#ffffff'),cbox(.2,.2,.2,0,.38,.22,'#ffffff'),cbox(.07,.05,.12,0,.36,.37,'#f0a020'),cbox(.18,.05,.16,0,.24,-.28,'#ffffff')]);
-  const wing=mergeG([cbox(.36,.04,.22,.2,0,0,'#ffffff'),cbox(.36,.04,.22,-.2,0,0,'#ffffff')]);
-  const B=LV.birds={b:LV_im(body,nb),w:LV_im(wing,nb),fl:[],c:new THREE.Color()};
+  // world-r30b: one wing per instance, hinged at the body (2 instances per bird, same draw call) so the pair flaps as a V; the old single bar rolled like a see-saw and flocks read as tumbling grey debris (gauntlet seen/sky-debris)
+  const wing=mergeG([cbox(.5,.035,.2,.31,0,0,'#ffffff'),cbox(.18,.03,.12,.6,0,-.03,'#ffffff')]);
+  const B=LV.birds={b:LV_im(body,nb),w:LV_im(wing,nb*2),fl:[],c:new THREE.Color()};
   for(let f=0;f<LV_PF+LV_GF;f++){const gull=f>=LV_PF,n=gull?LV_GB:LV_PB,F={gull,st:0,x:0,z:0,y:0,t:0,on:false,b:[]};
     for(let j=0;j<n;j++){const k=B.fl.reduce((a,q)=>a+q.b.length,0)+j;F.b.push({k,ox:rr(-2.2,2.2),oz:rr(-2.2,2.2),h:R()*6.3,ph:R()*6.3,x:0,y:0,z:0,vx:0,vy:0,vz:0});
-      B.c.set(gull?'#f4f6f8':['#8a8f9a','#9aa0aa','#7a808c','#b0a8a0'][j%4]);B.b.setColorAt(k,B.c);B.c.set(gull?'#d8dde4':['#6a707c','#7a808a','#5a606c'][j%3]);B.w.setColorAt(k,B.c)}
+      B.c.set(gull?'#f4f6f8':['#8a8f9a','#9aa0aa','#7a808c','#b0a8a0'][j%4]);B.b.setColorAt(k,B.c);B.c.set(gull?'#d8dde4':['#6a707c','#7a808a','#5a606c'][j%3]);B.w.setColorAt(k*2,B.c);B.w.setColorAt(k*2+1,B.c)}
     B.fl.push(F)}B.b.instanceColor.needsUpdate=true;B.w.instanceColor.needsUpdate=true}
 function LV_birdStep(dt){const B=LV.birds;if(!B)return;const d=LV_d('lvBird'),act=Math.round(LV_PF*Math.min(1.5,d)),now=LV.t,sp=Math.abs(RO.v);
   for(let f=0;f<B.fl.length;f++){const F=B.fl[f],want=F.gull?d>0&&f-LV_PF<Math.ceil(LV_GF*Math.min(1,d)):f<act;
     const far=F.on&&Math.hypot(F.x-RO.x,F.z-RO.z)>(F.gull?380:240);
-    if(!want||far||(F.on&&F.st===2&&F.t>6)){if(F.on){F.on=false;for(const b of F.b){B.b.setMatrixAt(b.k,_lvZ);B.w.setMatrixAt(b.k,_lvZ)}}if(!want)continue}
+    if(!want||far||(F.on&&F.st===2&&F.t>6)){if(F.on){F.on=false;for(const b of F.b){B.b.setMatrixAt(b.k,_lvZ);B.w.setMatrixAt(b.k*2,_lvZ);B.w.setMatrixAt(b.k*2+1,_lvZ)}}if(!want)continue}
     if(!F.on){if((LV.fr+f)%20)continue;const s=LV_spot(F.gull?60:24,F.gull?200:70,!F.gull);if(!s)continue;F.on=true;F.st=F.gull?3:0;F.t=0;F.x=s.x;F.z=s.z;F.y=s.y;
       for(const b of F.b){b.x=s.x+b.ox;b.z=s.z+b.oz;b.y=F.gull?s.y+rr(26,40):Math.max(0,groundAt(b.x,b.z,s.y+3));b.vx=b.vy=b.vz=0}}
     F.t+=dt;const dx=F.x-RO.x,dz=F.z-RO.z,dd=Math.hypot(dx,dz);
     // pigeons: scatter when the car comes within 22 m (any speed > 3 m/s) or 9 m (standing); also when a pedestrian leaps nearby is not tracked (cheap)
     if(F.st===0&&(dd<(sp>3?22:9))){F.st=2;F.t=0;const al=dd||1;for(const b of F.b){const a=Math.atan2(dx/al+rr(-.7,.7),dz/al+rr(-.7,.7)),v=rr(5,9);b.vx=Math.sin(a)*v;b.vz=Math.cos(a)*v;b.vy=rr(4,7);b.h=a}if(dd<14&&R()<.6)AU.sfx('pick')}
     for(const b of F.b){let y,fl,pitch=0;
-      if(F.st===3){const a=now*.35+b.ph,r=14+b.ox*3;b.x=F.x+Math.sin(a)*r;b.z=F.z+Math.cos(a)*r;y=b.y+Math.sin(now*.8+b.ph)*1.2;b.h=a+Math.PI/2;fl=Math.sin(now*9+b.ph)*.5*(Math.sin(now*.7+b.ph)>.3?1:.15)}
-      else if(F.st===2){b.vy-=2.2*dt;if(b.vy<1.5)b.vy=1.5;b.x+=b.vx*dt;b.y+=b.vy*dt;b.z+=b.vz*dt;y=b.y;fl=Math.sin(now*26+b.ph)*.9;pitch=-.35}
+      if(F.st===3){const a=now*.35+b.ph,r=14+b.ox*3;b.x=F.x+Math.sin(a)*r;b.z=F.z+Math.cos(a)*r;y=b.y+Math.sin(now*.8+b.ph)*1.2;b.h=a+Math.PI/2;fl=.18+Math.sin(now*9+b.ph)*.45*(Math.sin(now*.7+b.ph)>.3?1:.2)}
+      else if(F.st===2){b.vy-=(F.t>1.6?6:2.2)*dt;if(b.vy<(F.t>1.6?0:1.5))b.vy=F.t>1.6?0:1.5;b.x+=b.vx*dt;b.y+=b.vy*dt;b.z+=b.vz*dt;y=b.y;fl=.2+Math.sin(now*22+b.ph)*.75;pitch=F.t>1.6?-.08:-.35}
       else{// grounded: peck (body pitch) and shuffle
         const pk=Math.max(0,Math.sin(now*3+b.ph*3));pitch=pk*.5;b.h+=Math.sin(now*.6+b.ph)*dt*.8;y=b.y;fl=.05}
-      const sc=F.gull?2.2:1.5;LV_set(B.b,b.k,b.x,y,b.z,pitch,b.h,0,sc);LV_set(B.w,b.k,b.x,y+.3*sc,b.z,pitch,b.h,fl,sc)}}
+      const sc=F.gull?2.2:1.5;LV_set(B.b,b.k,b.x,y,b.z,pitch,b.h,0,sc);if(F.st===0){B.w.setMatrixAt(b.k*2,_lvZ);B.w.setMatrixAt(b.k*2+1,_lvZ);continue}LV_set(B.w,b.k*2,b.x,y+.3*sc,b.z,pitch,b.h,fl,sc);LV_set(B.w,b.k*2+1,b.x,y+.3*sc,b.z,-pitch,b.h+Math.PI,fl,sc)}}
   B.b.instanceMatrix.needsUpdate=true;B.w.instanceMatrix.needsUpdate=true}
 // ---------- 3 · rooftop flags: pole + cloth, the cloth swings about the pole and ripples (scale) in the wind. Roofs 9-60 m up, one per 60 m cell.
 // A pool of 36 flags (× knob) sits on the nearest such roofs within 380 m of the player; re-picked every second as you drive.
@@ -183,7 +184,7 @@ function LV_clProps(k,C){const S=LV.cl,ax=-Math.cos(C.h),az=Math.sin(C.h);C.pr=[
 function LV_clDraw(k,C){const S=LV.cl,g=C.gs;for(let j=0;j<2;j++){const i=k*2+j;for(const m of [S.s,S.a,S.c,S.u])m.setMatrixAt(i,_lvZ)}
   if(!C.on)return;for(const p of C.pr){if(p.dead)continue;const i=k*2+p.j;if(p.m==='s'){LV_set(S.s,i,p.x,C.y,p.z,0,C.h,0,g);LV_set(S.a,i,p.x,C.y,p.z,0,C.h,0,g)}else{LV_set(S.c,i,p.x,C.y,p.z,0,C.h+p.j*.9,0,g);LV_set(S.u,i,p.x,C.y,p.z,0,C.h,0,g)}}}
 const LV_clUpd=()=>{const S=LV.cl;for(const m of [S.s,S.a,S.c,S.u])m.instanceMatrix.needsUpdate=true};
-function LV_clPut(k,C,near){const S=LV.cl,own=S.L.filter(q=>q!==C);const ath=CID!=='fra',sp=near?(k%2||ath&&k<4?LV_corner(ath?16:20,ath?40:45,.6,own)||LV_corner(15,60,.3,own):LV_corner(35,70,.82,own)||LV_corner(25,90,.5,own)):(LV_corner(60,115,.8,own)||LV_corner(55,130,.5,own));
+function LV_clPut(k,C,near){C.mv=0;const S=LV.cl,own=S.L.filter(q=>q!==C);const ath=CID!=='fra',sp=near?(k%2||ath&&k<4?LV_corner(ath?16:20,ath?40:45,.6,own)||LV_corner(15,60,.3,own):LV_corner(35,70,.82,own)||LV_corner(25,90,.5,own)):(LV_corner(60,115,.8,own)||LV_corner(55,130,.5,own));
   if(!sp){C.on=false;LV_clDraw(k,C);return false}Object.assign(C,{on:true,x:sp.x,z:sp.z,y:sp.y,h:sp.h,a:sp.a,b:sp.b,gs:near?1:.05,t:0,ux:sp.ux,uz:sp.uz,sd:sp.sd});LV_clProps(k,C);LV_clDraw(k,C);return true}
 // people of cluster k stand in a loose ring on the road side of the props (crowd: around a centre), facing each other
 function LV_clPeople(k,C,base,P){const n=C.n,rx=Math.sin(C.h),rz=Math.cos(C.h),ax=-Math.cos(C.h),az=Math.sin(C.h);
@@ -199,7 +200,7 @@ function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=
     if(k>=N||base+C.n>P.length){if(C.on){C.on=false;LV_clDraw(k,C)}for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}base+=C.n;continue}
     const dx=C.x-RO.x,dz=C.z-RO.z,d=Math.hypot(dx,dz),behind=dx*fx+dz*fz<-d*.2;
     const jk=jn>0&&k===LV.clC%S.L.length&&LV.clJ>0;if(jk){jn--;LV.clJ--;LV.clC++}
-    if(jk||!C.on&&(LV.fr+k)%10===0||C.on&&(d>170||behind&&d>30)){if(jk||moved<2){moved++;LV_clPut(k,C,jk||!C.on&&LV.fr<30);if(C.on)LV_clPeople(k,C,base,P);else for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}}}
+    if(jk||!C.on&&(LV.fr+k)%10===0||C.on&&(C.mv||d>170||behind&&d>30)){if(jk||moved<2){moved++;LV_clPut(k,C,jk||!C.on&&LV.fr<30);if(C.on)LV_clPeople(k,C,base,P);else for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}}}
     if(C.on){C.t+=dt;if(C.gs<1){C.gs=Math.min(1,C.gs+dt*2.2);LV_clDraw(k,C)}
       // props: the car smashes a stall / café set (brick burst, studs, slight slow-down); slow contact pushes the car out (collider = the drawn size)
       for(const q of C.pr){if(q.dead)continue;const ex=RO.x-q.x,ez=RO.z-q.z,e2=ex*ex+ez*ez,rr2=q.r+1.1;if(e2>rr2*rr2||Math.abs((RO.y||0)-C.y)>3)continue;

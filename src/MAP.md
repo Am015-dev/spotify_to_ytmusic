@@ -51,3 +51,4 @@ Where to put NEW code: in the module of your area (append near the related code)
 | `99cst_camsteady_go.js` | 3 | GO cam/steady (lazy): free roam + city race on the course line, camera distance / FOV reversals and rates per 10 s |
 | `98rd_race_dress.js` | 3 | racedress-r24n (lazy): city races dressed as closed courses: instanced kerbs + solid barriers, closed side streets, chevrons, gantry + 3-2-1-GO grid, flags/stands, corridor traffic clear; `?rd=0` off |
 | `99c9rd_racedress_go.js` | 3 | GO race/dressed (on-demand chunk): every city race in the city dressed, closed, 0 corridor traffic, countdown, restored |
+| `99c6wr_world_go.js` | 4 | GO world/pickup, world/roof, world/birds (lazy, world-r30b): mark icons <= 3 m + contact shadow, no neon roof strips, mirrored bird wings + pigeon scatter <= 14 m; the gauntlet seen rows as state asserts |
