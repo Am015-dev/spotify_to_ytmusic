@@ -134,3 +134,5 @@ Model and status come from the session list. Cost is blank: the session list doe
 | gui-r30a, traffic-r30c2, boot-r30e/g, jserr-r30f, links-r30i, size-r30k | beta.165 | Sonnet + Opus reviews | shipped | shipped |
 | world-r30b/h, touchdrive-r29a/b/d | — | Sonnet + Opus reviews | FAIL, reverted 4d432e4 (touchdrive back in r30m) | reverted |
 | tilebuild-r30j, tb1, reload-r30l | — | Opus + Sonnet | design, flag OFF, findings | docs/flag |
+| touchdrive-r30m | beta.166 | Sonnet + Opus review | shipped (round 4) | shipped |
+| mem-r30n | — | Opus | blocked by 120 s quick-test give-up, docs + patch only | carried to mem-r30p |
