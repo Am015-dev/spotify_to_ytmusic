@@ -29,11 +29,13 @@ function B2K_hop(){if(state==='roam')pressed.fire=true;else B2K.hopReq=true;B2K.
 // BRAKE+steer above B2K_RDMIN (60 km/h) drifts, so phone players can drift.
 // touch-r21b: free roam on a phone also drifts with steer + BRAKE held (2 thumbs, GAS not needed); D26 still needs BRAKE held gbHold s with |steer| >= gbSteer, so a tap only brakes.
 window.B2K_RDMIN=16.7; // m/s
+// touchdrive-r29a: touch BRAKE+steer drift. Pressed at >= B2K_TMIN (9.2 m/s = 33 km/h) it may start and keep going down to B2K_TLO (6 m/s = 22 km/h), because the .31 s BRAKE hold in D26 costs ~8 km/h before the drift starts; B2K_DMIN (keys, GAS+BRAKE) is unchanged.
+window.B2K_TMIN=9.2;window.B2K_TLO=6;window.B2K_TOK=false;
 {const f0=ctlPlayer;ctlPlayer=function(){const c=f0.apply(this,arguments);try{if(state==='roam'||state==='race'){
   const gas=TOUCH.gas||B2K.tG||K.ArrowUp||K.KeyW,brk=TOUCH.brake||B2K.tB||K.ArrowDown||K.KeyS,race=state==='race',tauto=race&&TOUCH.on&&TOUCH.used;
   const sp=race?(pl?pl.v:0):Math.abs(RO.v),dr=race?!!(pl&&pl.hbDir):!!RO.dDir,st=dr||Math.abs(c.steer)>.25;
-  if(brk&&!B2K.bPrev)B2K.bG=!!gas;B2K.bPrev=!!brk;if(!gas)B2K.bG=false;
-  B2K.req=brk&&st&&!TOUCH.park&&(gas&&B2K.bG&&sp>window.B2K_DMIN||!race&&TOUCH.on&&TOUCH.used&&TOUCH.brake&&sp>window.B2K_DMIN||tauto&&(sp>window.B2K_RDMIN||dr&&sp>window.B2K_DMIN));if(B2K.req){c.hb=1;c.brk=0;c.thr=1}}}catch(e){}return c}}
+  if(brk&&!B2K.bPrev){B2K.bG=!!gas;B2K.bV=sp}B2K.bPrev=!!brk;if(!gas)B2K.bG=false;
+  window.B2K_TOK=!race&&!!(TOUCH.on&&TOUCH.used&&TOUCH.brake)&&B2K.bV>window.B2K_TMIN;B2K.req=brk&&st&&!TOUCH.park&&(gas&&B2K.bG&&sp>window.B2K_DMIN||!race&&TOUCH.on&&TOUCH.used&&TOUCH.brake&&(sp>window.B2K_DMIN||B2K.bV>window.B2K_TMIN&&sp>window.B2K_TLO)||tauto&&(sp>window.B2K_RDMIN||dr&&sp>window.B2K_DMIN));if(B2K.req){c.hb=1;c.brk=0;c.thr=1}}}catch(e){}return c}}
 // ---- HUD: pink drift bar over a cyan boost bar, just above the speed readout
 (()=>{const st=document.createElement('style');st.id='b2kCss';st.textContent=`
 #b2kM{position:fixed;left:50%;bottom:calc(36px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:clamp(150px,22vw,200px);z-index:6;pointer-events:none;display:none}

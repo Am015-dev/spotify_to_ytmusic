@@ -114,7 +114,7 @@ function CR_lgTap(d){const n=performance.now();if(CR_LG.d===d&&n-CR_LG.t<300){CR
 function CR_lgGo(d){if(state==='race'){if(!paused&&pl&&!pl.finished)pressed.roll=d;return}if(state!=='roam'||!pl||RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story||pl.air||(RO.crLgCd||0)>0||(RO.crLg||0)>0)return;
  RO.crLg=.3;RO.crLgD=d;RO.crLgCd=1;RO.crLgN=(RO.crLgN||0)+1;AU.sfx('roll');CR_lgFx(pl)}
 addEventListener('keydown',e=>{if(e.repeat||(state!=='roam'&&state!=='race'))return;const d={ArrowLeft:-1,KeyA:-1,ArrowRight:1,KeyD:1}[e.code];if(d)CR_lgTap(d)});
-BZ.addEventListener('touchstart',e=>{if(state!=='roam'&&state!=='race')return;const ts=CRSM_ts(e);for(const t of e.changedTouches)CRSM_tap(bzSide(t),ts)},{passive:true});
+BZ.addEventListener('touchstart',e=>{if(state!=='race'&&!(state==='roam'&&!TOUCH.used/* touchdrive-r29a: no double-tap lunge while driving on touch (two steer taps are just steering); BOOST beside a car does it, see CRB below */))return;const ts=CRSM_ts(e);for(const t of e.changedTouches)CRSM_tap(bzSide(t),ts)},{passive:true});
 // the lunge moves the car sideways (screen left/right) for 0.3 s; it stops at walls
 roamStep=(f=>function(dt){if(state==='roam')pressed.roll=0;const r=f(dt);try{if(state==='roam'&&pl&&!RO.wk){RO.crLgCd=Math.max(0,(RO.crLgCd||0)-dt);
  if(RO.crLg>0){RO.crLg-=dt;const k=CR_LGV*dt*RO.crLgD,nx=RO.x-Math.cos(RO.h)*k,nz=RO.z+Math.sin(RO.h)*k;if(!roamHit(nx,nz,1.2,RO.y)){RO.x=nx;RO.z=nz}else RO.crLg=0}}}catch(e){}return r})(roamStep);
@@ -155,6 +155,10 @@ const CRSM={d:0,t:-1e9,b:null,n:0,hn:0,pt:0,pd:0,acc:0};try{CRSM.hn=+(localStora
 function CRSM_ts(e){const n=performance.now(),t=e&&e.timeStamp;return typeof t==='number'&&t>0&&Math.abs(n-t)<2000?t:n}
 function CRSM_tap(d,ts){if(!d)return;const g=ts-CRSM.t;if(CRSM.d===d&&g>=0&&g<=350){CRSM.t=-1e9;CRSM_go(d)}else{CRSM.d=d;CRSM.t=ts}}
 CR_lgTap=function(d){CRSM_tap(d,performance.now())};
+// touchdrive-r29a: touch SMASH lunge = BOOST pressed with a traffic car beside you (1-5.5 m to the side, within 6 m ahead/behind), toward that car. Steering never fires it.
+const CRB={p:false,n:0};
+function CRB_side(){const h=RO.h,lx=-Math.cos(h),lz=Math.sin(h),fx=Math.sin(h),fz=Math.cos(h);let bd=0,bl=9;for(const c of (typeof HUB!=='undefined'&&HUB.cars)||[]){if(!(c.dead<=0)||Math.abs((c.y||0)-RO.y)>3)continue;const ox=c.x-RO.x,oz=c.z-RO.z,lat=ox*lx+oz*lz,fw=ox*fx+oz*fz;if(Math.abs(fw)<=6&&Math.abs(lat)>=1&&Math.abs(lat)<=5.5&&Math.abs(lat)<bl){bl=Math.abs(lat);bd=Math.sign(lat)}}return bd}
+roamStep=(f=>function(dt){try{if(state==='roam'){const b=!!(TOUCH.on&&TOUCH.used&&TOUCH.boost);if(b&&!CRB.p){const d=CRB_side();if(d){CRB.n++;CRSM_go(d)}}CRB.p=b}}catch(e){}return f(dt)})(roamStep);
 function CRSM_modal(){if(paused||!pl)return true;if(state==='race')return !!(pl.finished||pl.dead>0);if(state==='roam')return !!(RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story);return true}
 function CRSM_go(d){if(CRSM_modal())return;CRSM.acc++;CRSM.b={d,age:0,t0:performance.now()};try{CRSM_fx(d)}catch(e){}CRSM_try()}
 function CRSM_try(){const b=CRSM.b;if(!b)return;if(b.age>.45||performance.now()-b.t0>1500||CRSM_modal()){CRSM.b=null;return}
@@ -189,6 +193,7 @@ hitPop=(f=>function(t,col){try{if(/SMASH|TAKEDOWN/.test(String(t))&&performance.
 const R3B_PANELS=['journal','m1Cs','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
 function R3B_panelOpen(){for(const id of R3B_PANELS){const e=document.getElementById(id);if(e&&!e.hidden&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden')return true}return false}
 function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='HIT FAST = SMASH';document.body.appendChild(h)}
+ {const t=state==='roam'&&TOUCH.used?'BOOST BY A CAR = SMASH':'HIT FAST = SMASH';if(h.textContent!==t)h.textContent=t}
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
