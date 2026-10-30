@@ -39,3 +39,9 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - Next boot lane boot-r30g SONNET (~45 min): set the gauntlet bar to 36 s; compile the far-street merged materials under the curtain (3 late program links ~3 s after reveal in 2 of 3 tIosReveal fra runs); make perf/ios-reveal boot via PLAY (its ?test= entry skips the prewarm, so it is red on trunk); add playMs to the iPhone beacon.
 - New bug, own lane later: teacups/picnic group pops in ~1 s after control (on old builds too).
 - Boot still ~76 s fra / 110 s ath at 6x vs 36: the big cost is buildHubG (~51 s). Needs a tiled city build design lane (OPUS, 4+ modules).
+
+## 30 Oct ~14:30 (REVIEW_2K_34)
+- PASS: jserr-r30f 6b8da29 (drift trail was managed by memFree as static; 0 jsErrors on seeds 31-33 fra+ath+portrait; census: no other memFree-managed mesh is rewritten). Deploy blocker cleared.
+- Reviewed PASS and waiting for beta.165: gui-r30a (1584590, 1c1e191), traffic-r30c2 (1fb1138, fc3bda4), boot-r30e (330a5fb, 6bc9823), jserr-r30f (6b8da29).
+- Still on trunk with a FAILED review, reworks running: touchdrive (0aa5fa4..d094be2) and world-r30b (5063c2f, 90f612f). beta.165 waits for both (to avoid a multi-commit revert); if either fails again, revert it before the build.
+- Tools-only follow-ups for boot-r30g: gauntlet.js:373 WARN sampler print commented out; gauntlet.js:391 can crash before the jsErrors row if the portrait boot throws (guard Q).
