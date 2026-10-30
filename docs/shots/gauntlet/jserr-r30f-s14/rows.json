@@ -1,0 +1,398 @@
+[
+ {
+  "id": "boot/playVisible",
+  "what": "page open → PLAY button visible",
+  "num": "19.1 s lab",
+  "bar": "INFO (lab, software GL)",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_0_title.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl",
+  "what": "PLAY tap → first control of the car",
+  "num": "94.4 s lab (6x CPU)",
+  "bar": "<= 8 s lab",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/menu",
+  "what": "race menu never shows after PLAY (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "boot/loader",
+  "what": "loader never covers a controllable car (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls",
+  "what": "HUD text over the touch buttons (first control)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "hud/minText",
+  "what": "smallest visible text (first control)",
+  "num": "0 items < 12 px",
+  "bar": "0 (CLAUDE.md: 12 px minimum)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "perf/frame",
+  "what": "frame time while driving (real clock, 6x CPU, software GL)",
+  "num": "p95 1850 ms, 12/12 frames > 50 ms",
+  "bar": "INFO (lab GL; iPhone truth = perf/ios-reveal)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "world/pickup",
+  "what": "drive at the garage 🔧: the icon is readable on the way into its ring",
+  "num": "opacity 40 m 1 · 25 m 1 · 12 m 1",
+  "bar": ">= 0.75 at 25 m and 12 m (REVIEW_2K_28: 0.31 at 26 m)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/world_garage_25m.jpg",
+  "note": ""
+ },
+ {
+  "id": "world/quests",
+  "what": "3 quests started by real input (beacon, prompt, LET'S GO): anything drawn inside my car?",
+  "num": "0/3 started, 1 objects in the car body (q_thief:Mesh<Group{lz,pcN,pcV}{lf,lfR,nsh} 2.0m)",
+  "bar": "3/3 started, 0 (gauntlet seen/prop-on-car)",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/world_quest1_start.jpg",
+  "note": "q_pigeons d364m v72 no card; q_thief d116m v115 no card; q_photo d585m v70 no card"
+ },
+ {
+  "id": "world/glance",
+  "what": "drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object",
+  "num": "0/14 frames inside a prop (fence, closest 38.5 m); 0 frames inside a building (INFO)",
+  "bar": "0 frames (gauntlet seen/camera-in-props)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "world/birds",
+  "what": "scattered pigeons seen from the car at >= 55 km/h (real drive)",
+  "num": "13/144 bird samples at camera height (9 %), 6 samples",
+  "bar": "<= 10 % at camera height (REVIEW_2K_28: grey drones 3-8 m up)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/world_birds_speed.jpg",
+  "note": ""
+ },
+ {
+  "id": "steer/buttons",
+  "what": "hold GAS + ◀ (or ▶) for 1.2 s at ~30-50 km/h turns the car that way",
+  "num": "◀ left 58°, left 63° · ▶ right 61°, right 42°",
+  "bar": "each >= 20° the pressed way",
+  "pass": "PASS",
+  "shot": "",
+  "note": "from 51.4 km/h, from 45.8 km/h, from 50.7 km/h, from 50.8 km/h"
+ },
+ {
+  "id": "drive/time",
+  "what": "2 min street drive, gas held, following streets",
+  "num": "120 s game, 2.64 km, avg 80 km/h",
+  "bar": ">= 110 s game and >= 1.0 km",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_2_street_at_speed.jpg",
+  "note": ""
+ },
+ {
+  "id": "drive/frustration",
+  "what": "time under 10 km/h with GAS held",
+  "num": "0 %",
+  "bar": "<= 15 % (bughunt frustration limit)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/pop",
+  "what": "traffic car pops on screen (in view, 6-60 m)",
+  "num": "0 jumps > 2 m, 0 appear < 40 m",
+  "bar": "0 jumps > 2 m; 0 appear < 40 m",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/onStreet",
+  "what": "bot check: share of the drive on a street (a bot off the street makes the drive rows meaningless)",
+  "num": "83 %",
+  "bar": ">= 80 % (script validity)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/offLane",
+  "what": "in-view traffic sideways off its lane (junction hand-off residual, 6-60 m; REVIEW_2K_30 rev/latres)",
+  "num": ">2 m 6.2 %, >4 m 1.46 % of 2874 samples, 0 samples > 2 m for > 3 s, max 6.3 m (k8 68>67@0.05 d60)",
+  "bar": "INFO",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/near",
+  "what": "traffic near the player (HITRUN_GAP gap 8)",
+  "num": "1.2 cars within 40 m (avg)",
+  "bar": ">= 2.5 (hr/near)",
+  "pass": "FAIL",
+  "shot": "",
+  "note": "avg cars per frame by distance: <40 1.2, 40-80 2.2, 80-150 5.6, 150-300 20.2, >300 28.7; parked 4.9, dead 12.2; standing (<150 m, cv<1) 1.4; cars 75, hour 10.8, hourK 1.00, trHour 1; far(>240 m) cars: {\"n\":59,\"route\":2,\"tr\":0,\"pk\":0,\"dead\":11,\"noPop\":4,\"ok\":42} held 26874 law false lvTraf 1 trFar 240"
+ },
+ {
+  "id": "boost/fra",
+  "what": "BOOST tapped every 3 s for 2 min down busy streets (real taps, GAS+◀▶ like a player): a SMASH lunge only when the press has the arrow held toward a car beside",
+  "num": "41 BOOST presses, 0 lunges; a car in the window in 1/1200 samples; 0 presses had the arrow held toward a car beside",
+  "bar": "lunges <= presses with the arrow toward a car beside (0 unwanted)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hit/contact",
+  "what": "nose into 5 traffic cars ahead that close on me (oncoming/slower), GAS held in the last 18 m",
+  "num": "4/5 contacts",
+  "bar": ">= 4/5 (hr/hit: contact in >= 9/10)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_3_hit_1.jpg",
+  "note": "hit at 59.2 km/h, hit at 53.3 km/h, hit at 48.4 km/h, no car in front, hit at 66.1 km/h"
+ },
+ {
+  "id": "hit/react",
+  "what": "hit car reacts: its HUB position velocity changes > 2 m/s within 0.3-1.2 s",
+  "num": "2/4 contacts",
+  "bar": "INFO: this read misses thrown cars (shots show them tumbling); judge by the hit shots",
+  "pass": "INFO",
+  "shot": "",
+  "note": "Δv 5.7 m/s, Δv 0 m/s, Δv 6.7 m/s, Δv 0 m/s"
+ },
+ {
+  "id": "hit/noBrake",
+  "what": "our speed lost between 12 m and contact (no braking against nothing)",
+  "num": "max 11 %",
+  "bar": "<= 5 % (HITRUN_GAP gap 1)",
+  "pass": "FAIL",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drift/start",
+  "what": "BRAKE + steer at ~50 km/h starts a drift",
+  "num": "3/3 (peak slip 40.1°, 38.6°, 40.1°)",
+  "bar": "3/3 with slip >= 15°",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_4_drift_1.jpg",
+  "note": "53.2->56.5 km/h, 55.2->60.2 km/h, 60.6->53.4 km/h"
+ },
+ {
+  "id": "drift/tap",
+  "what": "a 0.15 s BRAKE tap in a corner never slides",
+  "num": "0/3 slid (peak 6.8°, 6.9°, 2.7°)",
+  "bar": "0 slid, 3 valid setups",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "wall/glance",
+  "what": "glance a wall at 20-45° at ~40 km/h",
+  "num": "2/4 keep >= 60 % & no damage (37° 27 km/h 97% -0hp, 45° 37 km/h 115% -0hp; 2 not set up (script))",
+  "bar": "4/4",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_5_head_2.jpg",
+  "note": ""
+ },
+ {
+  "id": "wall/headon",
+  "what": "head-on into a wall at ~45 km/h slows hard",
+  "num": "0/2 (42->39 km/h -0hp; 1 not set up (script))",
+  "bar": "2/2 keep <= 35 %",
+  "pass": "FAIL",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "pause/resume",
+  "what": "❚❚ opens pause (car + traffic stand still for 1 s), ▶ RESUME drives on",
+  "num": "open true, car moved 0.00 m, traffic moved 0.00 m, resumed true",
+  "bar": "open, 0 m / 0 m, resumed",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_9_pause.jpg",
+  "note": ""
+ },
+ {
+  "id": "mission/reach",
+  "what": "drive to the nearest mission marker (ball \"The Giant Ball\", 914 m)",
+  "num": "no card in 90 s",
+  "bar": "reached <= 60 s game",
+  "pass": "FAIL",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls2",
+  "what": "HUD text over the touch buttons (later in roam)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "menu/tiles",
+  "what": "every race tile has a preview image and its full name at >= 12 px",
+  "num": "11/11 tiles ok",
+  "bar": "0 tiles blank, cut, < 12 px, drawn as > 4 separate pieces, or with a name below the screen and no scroll container (gui-r30a, REVIEW_2K_27)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_10_race_menu.jpg",
+  "note": ""
+ },
+ {
+  "id": "race/start",
+  "what": "pause → QUIT TO TITLE → RACES → START reaches the grid",
+  "num": "countdown",
+  "bar": "countdown or race",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_10_race_menu.jpg",
+  "note": ""
+ },
+ {
+  "id": "race/rollBoth",
+  "what": "race touch: ▶ held does not roll; ▶ + ◀ together does (the SMASH roll)",
+  "num": "one arrow no roll, both arrows no roll",
+  "bar": "no roll / ROLL",
+  "pass": "FAIL",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "race/rollTaps",
+  "what": "one full race steered like a player (bot taps ◀/▶ to hold the lane): steer presses and would-be double-taps (same side twice within .35 s game time; the lab clock cannot fire the real-time detector, CRSM.acc 0)",
+  "num": "0 steer presses, 0 would-be double-taps = accidental rolls",
+  "bar": "INFO (a roll needs a deliberate gesture if this is > 0)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "race/finish",
+  "what": "race finishes with a result screen",
+  "num": "no results (state race, lap 0, 21 s game)",
+  "bar": "#results visible <= 480 s game",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/fra_12_race_finish.jpg",
+  "note": "5TH/8"
+ },
+ {
+  "id": "ath/boot",
+  "what": "Athens: PLAY → first control",
+  "num": "133.6 s lab, city ath",
+  "bar": "control, city ath",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/ath_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boost/ath",
+  "what": "BOOST tapped every 3 s for 2 min down busy streets (real taps, GAS+◀▶ like a player): a SMASH lunge only when the press has the arrow held toward a car beside",
+  "num": "41 BOOST presses, 0 lunges; a car in the window in 12/1200 samples; 0 presses had the arrow held toward a car beside",
+  "bar": "lunges <= presses with the arrow toward a car beside (0 unwanted)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "ath/drive",
+  "what": "Athens: 60 s drive following streets",
+  "num": "60 s game, 1 % under 10 km/h, 0 pops",
+  "bar": ">= 55 s, <= 15 % slow, 0 pops",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/ath_2_drive.jpg",
+  "note": ""
+ },
+ {
+  "id": "ath/race",
+  "what": "Athens: pause → QUIT → RACES → START reaches the grid",
+  "num": "quit true races true start true grid true",
+  "bar": "grid reached",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/ath_3_race_start.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/boot",
+  "what": "portrait 390x844: PLAY → control (1x CPU)",
+  "num": "36.8 s lab",
+  "bar": "control reached",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/band",
+  "what": "portrait: the 3D view reaches the bottom of the screen (no flat pale band under the road)",
+  "num": "mean brightness of the 84-88 % rows 56",
+  "bar": "< 140 (the beta.164 band measures 174: pale blue, no road; gui-r30a near-plane fix)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/hud",
+  "what": "portrait: HUD text over the touch buttons",
+  "num": "0 overlaps, 0 texts < 12 px",
+  "bar": "0 / 0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/jserr-r30f-s14/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "page/reload",
+  "what": "page never reloads",
+  "num": "0 reloads",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/jsErrors",
+  "what": "no JS errors (pageerror + console.error)",
+  "num": "0 errors",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/memory",
+  "what": "JS heap high-water (performance.memory)",
+  "num": "58 MB",
+  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ }
+]

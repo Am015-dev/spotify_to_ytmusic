@@ -20,6 +20,9 @@ Output: one table on stdout (`PASS|FAIL|INFO row number bar`) and `docs/shots/ga
 - **Clock (honest note):** software GL in this container renders ~2-3 fps, i.e. 0.15 game-s per real second. After the boot, the harness becomes the page's vsync (same capture as `tools/bughunt.js`): it steps the game's own rAF callback at a fixed 1/30 s phone frame and skips GPU draws between screenshots (every screenshot renders real frames first). That is the clock and the GPU, never game state. CPU throttle is off while stepping (it would only slow the wall clock). **All bars are in game seconds (`T`).** Wall-clock UI timers (toasts, card fades) still run in real time.
 - **Athens:** the run starts as a returning player whose save is in Athens: before the page loads it writes exactly what the game's own `cityTravel()` writes before its reload (`mho_slot=1`, `mho_roam@1`, `mho_roam.ath@1`, `mho_city@1=ath`); the path to fly there is not driven (it is far on the map).
 
+## Debug: who uploaded a null array (GTRAP, jserr-r30f)
+`python3 tools/trap/mktrap.py <three.module.js r164.1> /tmp/three.trap.js`, then `GTRAP=/tmp/three.trap.js node tools/gauntlet.js ...`: the page gets an instrumented three (served by a Playwright route, never deployed) and every null-array upload lands in `docs/shots/gauntlet/<ver>/trap.jsonl` with the drawn object, the attribute, and the stacks where the array was nulled / the geometry disposed / needsUpdate set. It found the drift-trail zip in one reproducing run.
+
 ## The rows
 | row | the player does | bar (source) |
 |---|---|---|
@@ -46,7 +49,7 @@ Output: one table on stdout (`PASS|FAIL|INFO row number bar`) and `docs/shots/ga
 | race/start, race/finish | ❚❚ → QUIT TO TITLE → 🏁 RACES → START, holds GAS and steers to the track centre | grid reached; result screen <= 480 s game |
 | ath/boot, ath/drive, ath/race | Athens: PLAY, 60 s drive, RACES → START | control in Athens; >= 55 s, <= 15 % slow, 0 pops; grid reached |
 | portrait/boot, portrait/hud | 390x844: PLAY | control; 0 overlaps / 0 small texts |
-| page/reload, page/jsErrors | — | 0 reloads; 0 page errors / console errors |
+| page/reload, page/jsErrors | — | 0 reloads; 0 page errors / console errors / frame throws (hard bar; every frame throw counts, Frankfurt, Athens and portrait: jserr-r30f) |
 | page/memory | — | INFO: JS heap high-water |
 
 **Seen rows:** after looking at the shots, write `docs/shots/gauntlet/<ver>/SEEN.md` with one `- id | what I saw | shot.jpg` line per sloppy thing; the next run (or a re-run) turns each into a `seen/<id>` FAIL row. Delete a line only when the shot shows it fixed.

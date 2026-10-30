@@ -10,6 +10,7 @@
 - iPhone truth: no build is smooth without the throttled gate (6x CPU, 0 shader links and no long frames in the first 3 s after reveal).
 - Phone path differs from desktop (invisible-car bug only on phone): test phone first.
 - Allocation in the frame loop causes GC spikes (Athens spikes were GC).
+- memFree / streaming (`98mf_memfree.js`, phone tier) only manages STATIC geometry: a mesh its owner rewrites every frame must use `setUsage(THREE.DynamicDrawUsage)` (MEMF_dyn skips it), and a zip whose arrays were written during the deflate is dropped. A nulled array on a drawn mesh whose version was bumped = render throw "null (reading 'byteLength')" (jserr-r30f: the drift trail; bug-r19a: SM_upload + dispose). GOs `bug/no-jserr-drive`, `bug/no-raf-error`; find the owner with the gauntlet's GTRAP mode (docs/GAUNTLET.md).
 
 ## Known bugs / history
 - Perf lanes: [../../HANDOFF_perf.md](../../HANDOFF_perf.md), [../../PERF_1.md](../../PERF_1.md), [../../PERF_BISECT.md](../../PERF_BISECT.md), [../../PLAN_ATH_PERF.md](../../PLAN_ATH_PERF.md), [../../PLAN_PC_GRAPHICS.md](../../PLAN_PC_GRAPHICS.md), [../../EFFICIENCY_PLAN.md](../../EFFICIENCY_PLAN.md).

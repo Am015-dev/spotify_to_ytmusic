@@ -98,6 +98,7 @@ function B2K_turbines(s,on,dt){if(!s||!s.mesh)return;const mesh=B2K_frame(s.mesh
 function B2K_spk(n){return TUNE.fxSpk>0?n*Math.max(0,TUNE.fxSpkN):0}
 // ---- pink drift trail (two ribbons from the rear tyres)
 function B2K_trailInit(par){const N=64,g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*2*2*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(N*2*2*3),3));
+  for(const k of['position','color'])g.attributes[k].setUsage(THREE.DynamicDrawUsage);   // jserr-r30f: rewritten every frame; memFree skips dynamic meshes (it zipped this one and nulled its arrays while drawn: render threw 'null (reading byteLength)')
   const idx=[];for(let sd=0;sd<2;sd++)for(let i=0;i<N-1;i++){const a=(sd*N+i)*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(idx);
   const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));m.frustumCulled=false;m.renderOrder=3;par.add(m);
   B2K.trail={m,g,N,pts:[[],[]],t:0}}

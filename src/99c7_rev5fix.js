@@ -756,6 +756,29 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
  const go=()=>{run().then(r=>goSay(r));return'📍 NO RAF ERROR · roaming 90 s…'};
  C.GO['bug/no-raf-error']=[{c:'fra',n:'no render-loop error (Frankfurt)',fn:go,secs:150},{c:'ath',n:'no render-loop error (Athens)',fn:go,secs:150}]}return}
  if(i<600)setTimeout(()=>R19A_reg(i+1),100)})(0);
+// jserr-r30f: GO bug/no-jserr-drive (+ -ath). REVIEW_2K_32 / world-r30d: the gauntlet logged 8-36 "null (reading 'byteLength')" render throws on long drives. Cause: memFree
+// managed the drift trail (a mesh rewritten every frame) like static city geometry; MEMF_zip deflated it 650 m from its pack centre and nulled its arrays after the trail
+// had bumped its version, so the next draw re-uploaded from null. The GO drives 5 min of game time (streets + a 2 s handbrake drift every 9 s, a real render every 15 sim
+// frames, the streaming/zip steps running) and fails on ANY render throw, window error / unhandled rejection, visible null-array mesh (MEMF_bad) or memFree-managed dynamic mesh.
+(function JE30_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='bug'&&q.id==='no-jserr-drive')){C.items.push({ver:'bug',id:'no-jserr-drive',area:'perf',text:'jserr-r30f · no JS error on a long mixed drive: 📍 GO (Frankfurt, then -ath) drives 5 min of game time along the streets with a handbrake drift every 9 s (drift trail on), real renders and the phone streaming / zip running, and checks 0 render throws, 0 uncaught errors, 0 visible meshes that would upload from a null array and 0 dynamic meshes managed by memFree. Pass line ends ✅ PASS.',go:'bug/no-jserr-drive'});
+ const run=async()=>{const M=typeof MEMF!=='undefined'?MEMF:null,T=!!(M&&TUNE.gpuStr),R=renderer,rr=R.render;let rE=0,wE=0,bad=0,bL=[],rmsg='',wmsg='',dr=0,km=0;
+  const oe=e=>{wE++;wmsg=wmsg||String(e&&(e.message||e.reason&&e.reason.message||e.reason)).slice(0,60)};window.addEventListener('error',oe);window.addEventListener('unhandledrejection',oe);
+  R.render=function(){try{return rr.apply(this,arguments)}catch(err){rE++;rmsg=rmsg||String(err&&err.message).slice(0,60)}};
+  const vs=g=>Object.values(g.attributes).map(a=>a.version).join(),V0=new Map(),seen=()=>{if(M)for(const e of M.S.concat(M.G))if(!V0.has(e))V0.set(e,vs(e.m.geometry))},dyn=()=>M?M.S.concat(M.G).filter(e=>V0.has(e)&&V0.get(e)!==vs(e.m.geometry)).length:0,tr=()=>{const t=typeof B2K!=='undefined'&&B2K.trail,e=t&&M&&M.S.find(q=>q.m===t.m);return !t?'no trail':!e?'trail not managed':`trail managed on${e.on?1:0} dr${e.dr|0} cz${e.cz?1:0} ${Math.round(Math.hypot(e.x-RO.x,e.z-RO.z))} m from its pack centre`},chk=()=>{if(!M)return;const b=MEMF_bad();if(b.n>bad){bad=b.n;bL=b.L}};
+  const draw=()=>{try{composer.render()}catch(err){rE++;rmsg=rmsg||String(err&&err.message).slice(0,60)}chk()};
+  const hold=M?M.gHold:0;try{if(M){M.gHold=0;M.zT=performance.now()-1}
+    const W=a=>Math.atan2(Math.sin(a),Math.cos(a));let n=0,lx=RO.x,lz=RO.z;
+    for(let t=0;t<300;t+=1/30){const la=12+RO.v*.9,q=rfSnap(RO.x+Math.sin(RO.h)*la,RO.z+Math.cos(RO.h)*la,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0,d=t%9>7;
+      K.KeyW=K.ArrowUp=true;K.KeyX=d&&RO.v>8;K.ArrowLeft=d?e>=0:e>.06;K.ArrowRight=d?e<0:e<-.06;if(RO.dDir)dr+=1/30;
+      try{roamStep(1/30)}catch(err){wE++;wmsg=wmsg||String(err&&err.message).slice(0,60)}if(T){try{MEMF_gstep();MEMF_Gstep()}catch(err){wE++}}
+      km+=Math.hypot(RO.x-lx,RO.z-lz)/1000;lx=RO.x;lz=RO.z;if(++n%15===0){seen();draw();await new Promise(r=>setTimeout(r,0))}}
+    K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=K.KeyX=false;await new Promise(r=>setTimeout(r,50));draw();const dn=dyn(),ok=rE===0&&wE===0&&bad===0&&dn===0&&dr>=5;
+    return`📍 NO JS ERROR DRIVE · ${ok?'✓':'✗'} 300 s game, ${km.toFixed(1)} km, drifting ${dr.toFixed(0)} s (>= 5)${M?`, zips ${M.zst.n} (${M.zst.chg||0} dropped: written meanwhile)`:''} · ${rE} render throws${rmsg?' ('+rmsg+')':''} (0) · ${wE} uncaught errors${wmsg?' ('+wmsg+')':''} (0) · ${bad} visible null-array meshes (0)${bL.length?' '+bL.join(','):''} · ${dn} memFree-managed meshes rewritten during the drive (0; ${tr()}) → ${ok?'✅ PASS':'❌ FAIL'}`}
+  catch(err){return`📍 NO JS ERROR DRIVE · threw ${String(err&&err.message).slice(0,80)} → ❌ FAIL`}
+  finally{R.render=rr;K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=K.KeyX=false;window.removeEventListener('error',oe);window.removeEventListener('unhandledrejection',oe);if(M)M.gHold=hold}};
+ const go=()=>{run().then(r=>goSay(r));return'📍 NO JS ERROR DRIVE · driving 5 min…'};
+ C.GO['bug/no-jserr-drive']=[{c:'fra',n:'no JS error on a long mixed drive (Frankfurt)',fn:go,secs:600},{c:'ath',n:'no JS error on a long mixed drive (Athens)',fn:go,secs:600}]}return}
+ if(i<600)setTimeout(()=>JE30_reg(i+1),100)})(0);
 // ios-r20f: GO perf/ios-reveal (+ -ath). Boots the city in an iframe like an iPhone (touch, ?lowmem=1, ?rvl=1: 6x CDP CPU throttling from the curtain gate on, 98bp RVL) and reads the
 // first 3 s after the curtain lifts. Pass: 0 program links, no texture upload > 20 ms, and no stall: no frame gap > 2.5x the window's median gap and none > 1.5 s.
 // (SwiftShader at 6x renders every frame in 450-850 ms, so an absolute 100 ms line can't be met in the lab; a link or a chunk eval shows as a 2-10x gap.)

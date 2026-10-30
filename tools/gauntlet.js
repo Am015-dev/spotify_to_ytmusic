@@ -56,7 +56,7 @@ G.sample=dt=>{const x=RO.x,z=RO.z,P=G.P||{x,z,v:RO.v};const mv=Math.hypot(x-P.x,
   G.CP.set(c,{x:c.x,z:c.z,alive,a:c.a,b:c.b,t:(+c.t).toFixed(2)})}
  if(state==='roam'&&RO.on){G.n40+=n40;G.n40s++}
  G.P={x,z,v:RO.v}};
-G.step=(n,dt)=>{for(let i=0;i<n;i++){G.vt+=dt*1000;const q=G.q;G.q=[];for(const cb of q){try{cb(G.vt)}catch(e){G.err=String(e&&e.stack||e).replace(/\s+/g," ").replace(/ at [^ ]* \(https:\/\/cdn[^)]*\)/g,"").slice(0,500)}}G.frames++;try{G.sample(dt)}catch(e){G.serr=String(e).slice(0,120)}}
+G.step=(n,dt)=>{for(let i=0;i<n;i++){G.vt+=dt*1000;const q=G.q;G.q=[];for(const cb of q){try{cb(G.vt)}catch(e){G.errN=(G.errN|0)+1;G.err=String(e&&e.stack||e).replace(/\s+/g," ").replace(/ at [^ ]* \(https:\/\/cdn[^)]*\)/g,"").slice(0,500)}}G.frames++;try{G.sample(dt)}catch(e){G.serr=String(e).slice(0,120)}}
  try{const m=performance.memory&&performance.memory.usedJSHeapSize;if(m>G.mem)G.mem=m}catch(e){}return G.read()};
 G.pullPops=()=>{const p=G.pops;G.pops=[];return p};
 G.resetStats=()=>{G.hb=[0,0,0,0,0,0,0,0];G.n40=0;G.n40s=0;G.maxDrop=0;G.pops=[];G.LR={n:0,g2:0,g4:0,mx:0,why:'',long:0}};
@@ -125,11 +125,14 @@ function Router(nodes){const N=nodes,ok=i=>N[i]&&!N[i][3]&&!N[i][4];
  drive(st,kmh=55,goal){const a=this.aim(st,goal),e=Math.abs(W(a-st.h));return[...pace(st,e>.6||this.bend>.6?30:kmh),...steer(st,a)]},
  off(st){const s=near(st);return s?s.d-s.w/2:99}}}
 
+// debug (GTRAP): the instrumented three's null-array upload records -> <report>/trap.jsonl
+async function trapDump(P){if(!process.env.GTRAP||!P)return;const j=await P.ev('JSON.stringify((globalThis.__NA||[]).splice(0))').catch(()=>'[]');if(j&&j!=='[]')fs.appendFileSync(path.join(OUT,'trap.jsonl'),j+'\n')}
 // ---------- scenarios ----------
 async function bootPlayer(b,base,{w=852,h=393,label='fra',throttle=THR,init=null}={}){
  const ctx=await b.newContext({viewport:{width:w,height:h},deviceScaleFactor:2,isMobile:true,hasTouch:true,userAgent:IPHONE_UA});if(init)await ctx.addInitScript(init);
+ if(process.env.GTRAP){const tb=fs.readFileSync(process.env.GTRAP,'utf8');await ctx.route(/three@0\.164\.1\/build\/three\.module\.js/,r=>r.fulfill({status:200,contentType:'text/javascript',body:tb}))}   // debug: an instrumented three (null attribute uploads -> window.__NA)
  const p=await ctx.newPage();p.setDefaultTimeout(300000);const cdp=await ctx.newCDPSession(p);const P=new Player(ctx,p,cdp);
- p.on('pageerror',e=>{P.errs.push(String(e).slice(0,160));if(process.env.GSTACK)console.log('STACK '+String(e.stack||e).replace(/\s+/g,' ').slice(0,700))});p.on('console',m=>{if(m.type()==='error')P.errs.push('console: '+m.text().slice(0,160))});
+ p.on('pageerror',e=>{P.errs.push(String(e).slice(0,160));if(process.env.GTRAP)p.evaluate('JSON.stringify((globalThis.__NA||[]).splice(0))').then(j=>{if(j!=='[]')fs.appendFileSync(path.join(OUT,'trap.jsonl'),j+'\n')}).catch(()=>{});if(process.env.GSTACK)console.log('STACK '+String(e.stack||e).replace(/\s+/g,' ').slice(0,700))});p.on('console',m=>{if(m.type()==='error')P.errs.push('console: '+m.text().slice(0,160))});
  let loads=0;p.on('load',()=>{loads++;if(loads>1)P.reloads++});
  if(throttle>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:throttle});
  const tg=Date.now();await p.goto(base);
@@ -366,8 +369,9 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
   row('hud/overControls2','HUD text over the touch buttons (later in roam)',`${hc.over.length} overlaps`,'0',hc.over.length===0,'',hc.over.slice(0,2).join('; '));
   if(on('race'))await scRace(P);
   mem=Math.max(mem,await P.ev('__GH.mem').catch(()=>0));errsAll.push(...P.errs);reloads+=P.reloads;
-  const ge=await P.ev('[__GH.err||"",__GH.serr||""]').catch(()=>['','']);if(ge[0])errsAll.push('frame threw: '+ge[0]);if(ge[1])console.log('WARN sampler: '+ge[1]);
-  await P.ctx.close()}catch(e){row('run/fra','Frankfurt run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(P){errsAll.push(...P.errs);reloads+=P.reloads;await P.shot('fra_script_error',false);await P.ctx.close().catch(()=>{})}}
+  if(process.env.GTRAP){const j=await P.ev('JSON.stringify((globalThis.__NA||[]).splice(0))').catch(()=>'[]');if(j!=='[]')fs.appendFileSync(path.join(OUT,'trap.jsonl'),j+'\n')}
+  const ge=await P.ev('[__GH.err||"",__GH.serr||"",__GH.errN|0]').catch(()=>['','',0]);if(ge[0])for(let k=0;k<Math.max(1,ge[2]);k++)errsAll.push('frame threw'+(ge[2]>1?' ('+ge[2]+'x)':'')+': '+ge[0]);   // jserr-r30f: every frame throw counts (was the last one only)if(ge[1])console.log('WARN sampler: '+ge[1]);
+  await trapDump(P);await P.ctx.close()}catch(e){row('run/fra','Frankfurt run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(P){errsAll.push(...P.errs);reloads+=P.reloads;await P.shot('fra_script_error',false);await trapDump(P);await P.ctx.close().catch(()=>{})}}
  if(on('ath')){let A=null;try{const BA=await bootPlayer(b,base,{label:'ath',init:()=>{try{if(!localStorage.getItem('gauntlet_seed')){/* exactly what cityTravel() writes before its reload: the save of a player who flew to Athens */localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({otg:{},studs:[],tut:1}));localStorage.setItem('mho_roam.ath@1',JSON.stringify({otg:{},studs:[],tut:1}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('gauntlet_seed','1')}}catch(e){}}});A=BA.P;
    const city=await A.ev('CID');row('ath/boot','Athens: PLAY → first control',BA.R.toCtl!=null?`${BA.R.toCtl.toFixed(1)} s lab, city ${city}`:'never','control, city ath',BA.R.toCtl!=null&&city==='ath',BA.R.ctlShot);
    await harness(A);const r2=Router(await A.ev('__GH.nodes()'));await A.ev('__GH.resetStats();0');let st=await A.step(1);const t0=st.T;let stuck=0,rev=0,slow=0,n=0;
@@ -378,13 +382,13 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
    await A.allUp();await A.tapSel('#tP');await A.step(6);const q=await A.tapText(/QUIT TO TITLE/);await A.ev('__GH.release();0');await A.p.waitForTimeout(3000);const r=(await A.vis()).btn.some(x=>/START RACE/.test(x.t))?'menu':await A.tapText(/RACES/);await A.p.waitForTimeout(2500);const s=await A.tapSel('#startBtn');
    let ok=false;for(let i=0;i<60&&!ok;i++){await A.p.waitForTimeout(1000);const x=await A.ev('state');ok=x==='countdown'||x==='race'}
    const rs=await A.shot('ath_3_race_start',false);row('ath/race','Athens: pause → QUIT → RACES → START reaches the grid',`quit ${!!q} races ${!!r} start ${s} grid ${ok}`,'grid reached',ok,rs);
-   mem=Math.max(mem,await A.ev('__GH.mem').catch(()=>0));errsAll.push(...A.errs.map(e=>'ath '+e));reloads+=A.reloads;await A.ctx.close()}catch(e){row('run/ath','Athens run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(A){errsAll.push(...A.errs);reloads+=A.reloads;await A.shot('ath_script_error',false);await A.ctx.close().catch(()=>{})}}}
+   mem=Math.max(mem,await A.ev('__GH.mem').catch(()=>0));errsAll.push(...A.errs.map(e=>'ath '+e));{const ge=await A.ev('[__GH.err||"",__GH.errN|0]').catch(()=>['',0]);if(ge[0])for(let k=0;k<Math.max(1,ge[1]);k++)errsAll.push('ath frame threw'+(ge[1]>1?' ('+ge[1]+'x)':'')+': '+ge[0])}reloads+=A.reloads;await trapDump(A);await A.ctx.close()}catch(e){row('run/ath','Athens run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(A){errsAll.push(...A.errs);reloads+=A.reloads;await A.shot('ath_script_error',false);await trapDump(A);await A.ctx.close().catch(()=>{})}}}
  if(on('portrait')){let Q=null;try{const BQ=await bootPlayer(b,base,{w:390,h:844,label:'portrait',throttle:1});Q=BQ.P;const v=await Q.vis();const hc=hudCheck(v,'portrait');
    row('portrait/boot','portrait 390x844: PLAY → control (1x CPU)',BQ.R.toCtl!=null?`${BQ.R.toCtl.toFixed(1)} s lab`:'never','control reached',BQ.R.toCtl!=null,BQ.R.ctlShot);
    {const f=path.join(ROOT,BQ.R.ctlShot?path.relative(ROOT,BQ.R.ctlShot):'');let lum=-1;try{const cp=require('child_process'),[W,H]=cp.execSync(`identify -format "%w %h" "${f}"`).toString().split(' ').map(Number);lum=+cp.execSync(`convert "${f}" -crop ${W}x${Math.round(H*.04)}+0+${Math.round(H*.84)} -colorspace Gray -resize 1x1! -format "%[fx:mean*255]" info:`).toString()}catch(e){}
     row('portrait/band','portrait: the 3D view reaches the bottom of the screen (no flat pale band under the road)',lum<0?'no shot':`mean brightness of the 84-88 % rows ${lum.toFixed(0)}`,'< 140 (the beta.164 band measures 174: pale blue, no road; gui-r30a near-plane fix)',lum>=0&&lum<140,BQ.R.ctlShot)}
    row('portrait/hud','portrait: HUD text over the touch buttons',`${hc.over.length} overlaps, ${hc.small.length} texts < 12 px`,'0 / 0',hc.over.length===0&&hc.small.length===0,BQ.R.ctlShot,[...hc.over,...hc.small].slice(0,2).join('; '));
-   errsAll.push(...Q.errs.map(e=>'portrait '+e));reloads+=Q.reloads;await Q.ctx.close()}catch(e){row('run/portrait','portrait run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(Q)await Q.ctx.close().catch(()=>{})}}
+   errsAll.push(...Q.errs.map(e=>'portrait '+e));{const ge=await Q.ev('[(window.__GH&&__GH.err)||"",(window.__GH&&__GH.errN)|0]').catch(()=>['',0]);if(ge[0])for(let k=0;k<Math.max(1,ge[1]);k++)errsAll.push('portrait frame threw: '+ge[0])}reloads+=Q.reloads;await trapDump(Q);await Q.ctx.close()}catch(e){row('run/portrait','portrait run finished without a script error',String(e).split('\n')[0].slice(0,120),'no error',false,'');if(Q)await trapDump(Q);await Q.ctx.close().catch(()=>{})}}
  row('page/reload','page never reloads',`${reloads} reloads`,'0',reloads===0,'');
  row('page/jsErrors','no JS errors (pageerror + console.error)',`${errsAll.length} errors`,'0',errsAll.length===0,'',errsAll.slice(0,3).join(' ; ').slice(0,200));
  row('page/memory','JS heap high-water (performance.memory)',`${(mem/1048576).toFixed(0)} MB`,'INFO (phone cap 700 MB process, NIGHTRUN_LOG)',null,'');

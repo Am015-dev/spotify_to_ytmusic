@@ -11,10 +11,12 @@ function MEMF_free(m,part){const g=m.geometry;if(!g||g.userData.mfDone)return;g.
   const A=part?MEMF.attrs.map(k=>g.attributes[k]).filter(Boolean):Object.values(g.attributes);if(g.index&&!part)A.push(g.index);let b=0;for(const a of A){if(!a.array||a.isInstancedBufferAttribute||a.isInterleavedBufferAttribute||a.usage!==THREE.StaticDrawUsage)continue;b+=a.array.byteLength;a.array=null;a.getX=a.getY=a.getZ=a.getW=BA_freed}
   MEMF.n++;MEMF.mb+=b/1048576}
 function MEMF_sweep(){if(!TUNE.memFree)return;const hook=m=>{if(m.isInstancedMesh&&TUNE.gpuStr&&m.geometry&&!MEMF.seen.has(m)&&!m.userData.sky){MEMF.seen.add(m);MEMF_ipack(m);return}
-  if(m.isMesh&&!m.isInstancedMesh&&!m.isSkinnedMesh&&m.geometry&&!MEMF.seen.has(m)){MEMF.seen.add(m);const u=m.userData;let part=0,cd=0;for(const s of MEMF.skip)if(u[s]){if(LOWMEM&&MEMF.part.includes(s)){part=1;MEMF_gadd(m);break}if(s==='cd'&&TUNE.gpuStr){cd=1;continue}return}
+  if(m.isMesh&&!m.isInstancedMesh&&!m.isSkinnedMesh&&m.geometry&&!MEMF.seen.has(m)){MEMF.seen.add(m);const u=m.userData;if(MEMF_dyn(m.geometry))return;let part=0,cd=0;for(const s of MEMF.skip)if(u[s]){if(LOWMEM&&MEMF.part.includes(s)){part=1;MEMF_gadd(m);break}if(s==='cd'&&TUNE.gpuStr){cd=1;continue}return}
     if(!part&&TUNE.gpuStr){const g=m.geometry,w=MEMF.gu.get(g);if(w===undefined){if(!MEMF_ha(g))return;MEMF.gu.set(g,m);m.updateMatrixWorld();MEMF_pack(m,cd?u.cd:0);return}if(w){MEMF.gu.set(g,null);const i=MEMF.S.findIndex(e=>e.m===w);if(i>=0){const e=MEMF.S[i];if(e.zb)e.zb=2;if(e.cz)MEMF_shh(e,m);else{MEMF.S.splice(i,1);e.m.layers.enable(0)}}}if(cd)return}   // crash-5: shared geometry -> memFree as before (crash-6: a shared cd geometry is left alone)
     const f=m.onAfterRender;m.onAfterRender=function(){MEMF_free(this,part);this.onAfterRender=f}}};
   const walk=o=>{if(o===RO.grp||o.userData.keep&&!o.isMesh||o.userData.gb)return;hook(o);for(const c of o.children)walk(c)};walk(scene)}
+// jserr-r30f: a mesh its owner rewrites every frame (DynamicDrawUsage, e.g. the drift trail) is not static world geometry: never freed, packed, streamed or zipped
+function MEMF_dyn(g){for(const k in g.attributes)if(g.attributes[k].usage!==THREE.StaticDrawUsage)return true;return !!g.index&&g.index.usage!==THREE.StaticDrawUsage}
 setInterval(MEMF_sweep,2500);
 // crash-5: GPU streaming of static city meshes in the low-mem tier (TUNE.gpuStr, ?gs=0 off). memFree used to drop their CPU copy after the first
 // draw, so every chunk ever seen stayed on the GPU (buffers 146 -> 224 MB in 5 min). Now their arrays are packed once (normal -> Int8, colour -> Uint8,
@@ -53,17 +55,18 @@ MEMF.ts=MEMF.zOn&&!/[?&]tstream=0/.test(location.search);   // ios-r18m: ON for 
 Object.assign(MEMF,{ubm:(q=>q==null?1:+q)(new URLSearchParams(location.search).get('tsub')),zbm:(q=>q==null?1:+q)(new URLSearchParams(location.search).get('tszb'))});
 async function MEMF_zip(e){const g=e.m.geometry,P=[],zon=e.on&&!e.g;let tot=0;e.zb=1;MEMF.zbusy++;if(zon&&!e.dr){MEMF.zbusy--;e.zb=0;return}
   try{const A=Object.entries(g.attributes);if(g.index)A.push(['@i',g.index]);
-    for(const[k,a]of A){if(!a.array&&e.g)continue;if(!a.array||a.isInterleavedBufferAttribute||a.isInstancedBufferAttribute||a.usage!==THREE.StaticDrawUsage){e.zfail=1;return}const b=a.array.byteLength;P.push({k,a,T:a.array.constructor,n:a.array.length,off:tot,b});tot+=(b+3)&~3}
+    for(const[k,a]of A){if(!a.array&&e.g)continue;if(!a.array||a.isInterleavedBufferAttribute||a.isInstancedBufferAttribute||a.usage!==THREE.StaticDrawUsage){e.zfail=1;return}const b=a.array.byteLength;P.push({k,a,T:a.array.constructor,n:a.array.length,off:tot,b,arr:a.array,v:a.version});tot+=(b+3)&~3}
     const t0=performance.now(),buf=new Uint8Array(tot);for(const p of P)buf.set(new Uint8Array(p.a.array.buffer,p.a.array.byteOffset,p.b),p.off);
     const z=new Uint8Array(await new Response(new Blob([buf]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
     if((e.on&&!zon)||(zon&&(!e.on||!e.dr))||e.zb!==1||Math.hypot(e.x-camera.position.x,e.z-camera.position.z)-e.r<(e.zr||e.ro))return;   // came back into range meanwhile: keep the raw arrays
+    if(P.some(p=>p.a.array!==p.arr||p.a.version!==p.v)){MEMF.zst.chg=(MEMF.zst.chg||0)+1;return}   // jserr-r30f: written during the deflate: the copy is stale and the GPU copy is older than the array (nulling it made the next draw upload from null)
     if(e.g&&(MEMF.gHold>performance.now()||!P.length))return;e.cz={z,P:P.map(p=>({k:p.k,T:p.T,n:p.n,off:p.off})),st:1};e.zk=null;if(e.g){e.lm=e.m.layers.mask;e.m.layers.disableAll();MEMF.gst.n++;MEMF.gst.rawMB+=tot/1048576;MEMF.gst.zMB+=z.length/1048576}for(const p of P){p.a.array=null;p.a.getX=p.a.getY=p.a.getZ=p.a.getW=BA_freed}
     const st=MEMF.zst;st.n++;if(zon)st.on=(st.on||0)+1;st.rawMB+=tot/1048576;st.zMB+=z.length/1048576;st.maxMs=Math.max(st.maxMs,performance.now()-t0)}
   catch(err){e.zfail=1}finally{MEMF.zbusy--;e.zb=0}}
 async function MEMF_unzip(e){const c=e.cz;c.st=2;MEMF.ubusy++;
   try{const ab=await new Response(new Blob([c.z]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer(),g=e.m.geometry,t0=performance.now();
     for(const p of c.P){const a=p.k==='@i'?g.index:g.attributes[p.k];delete a.getX;delete a.getY;delete a.getZ;delete a.getW;a.array=new p.T(ab,p.off,p.n)}
-    if(MEMF.ts&&!e.g)e.zk={z:c.z,P:c.P,ab};if(e.g){e.m.layers.mask=e.lm;MEMF.gst.back++}else if(!e.on)g.dispose();e.cz=null;if(e.shm)MEMF_shr(e);MEMF.zst.back++;MEMF.zst.maxMs=Math.max(MEMF.zst.maxMs,performance.now()-t0)}
+    if(MEMF.ts&&!e.g)e.zk={z:c.z,P:c.P,ab,v:c.P.map(p=>(p.k==='@i'?g.index:g.attributes[p.k]).version)};if(e.g){e.m.layers.mask=e.lm;MEMF.gst.back++}else if(!e.on)g.dispose();e.cz=null;if(e.shm)MEMF_shr(e);MEMF.zst.back++;MEMF.zst.maxMs=Math.max(MEMF.zst.maxMs,performance.now()-t0)}
   catch(err){c.st=1;e.zfail=1}finally{MEMF.ubusy--}}
 (function MEMF_raf(){try{MEMF_gstep()}catch(e){}try{MEMF_Gstep()}catch(e){}requestAnimationFrame(MEMF_raf)})();
 // ios-r17r (?tstream=1): the off chunks are deflated under the load curtain, so the gain shows at ready. roamLoad starts MEMF_cur next to TWG_run and awaits
@@ -103,7 +106,7 @@ function MEMF_gpre(id,run,say){if(!MEMF.ts||/^perf\//.test(id))return false;say(
 Object.assign(MEMF,{nr:(q=>q==null?500:+q)(new URLSearchParams(location.search).get('tsnr')),nz:MEMF.ts&&!/[?&]tsnz=0/.test(location.search)});MEMF.zst.rz=0;
 function MEMF_dh(e){if(!MEMF.ts)return;const m=e.m,f=m.onAfterRender;e.dr=0;m.onAfterRender=function(){e.dr=1;this.onAfterRender=f;return f.apply(this,arguments)}}
 function MEMF_rz(e){const k=e.zk;if(!k||e.cz||e.zb||e.zfail||e.on&&!e.dr)return false;const g=e.m.geometry,A=[];
-  for(const p of k.P){const a=p.k==='@i'?g.index:g.attributes[p.k];if(!a||!a.array||a.array.buffer!==k.ab){e.zk=null;return false}A.push(a)}
+  for(let i=0;i<k.P.length;i++){const p=k.P[i],a=p.k==='@i'?g.index:g.attributes[p.k];if(!a||!a.array||a.array.buffer!==k.ab||a.version!==k.v[i]/* jserr-r30f: written since the inflate: the deflated copy is stale */){e.zk=null;return false}A.push(a)}
   e.cz={z:k.z,P:k.P,st:1};e.zk=null;for(const a of A){a.array=null;a.getX=a.getY=a.getZ=a.getW=BA_freed}MEMF.zst.rz++;return true}   // r18m: zk.ab kept the raw buffer alive after the re-zip
 // bug-r19a: review #20's 'null (reading byteLength)' render throw ~55 s into the roam. SM_upload (SM3, lowmem) uploads every hub geometry and then frees its CPU
 // arrays; the streaming off line then disposed that geometry, so the chunk shown again was re-uploaded from a null array. Rules now: a geometry is disposed only
