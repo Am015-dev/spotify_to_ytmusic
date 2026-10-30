@@ -42,3 +42,16 @@ Flight: no regression shown. Phone, fixed harness, seeds 1-4: control (W272) 4/8
 - Phone boss head close to the name bar (low to medium).
 - Pause button above the result overlay (low).
 - Seeds far below target for every row; nothing here is a clear rate with an interval.
+
+## W285 update (30 Oct 2026, branch nr/W285-deployable): DO NOT SHIP, see HANDOFF-W285.md
+| # | Check | W285 result |
+|---|---|---|
+| 8 | Boss head >= 8 px below name bar | PASS (fixed + asserted): 42 px phone, 8.5 px 844x390, 67 px PC; NUDGE=1 fails at 844x390 |
+| 9,10 | flake8, build | PASS |
+| 11-13,15 | flow 61, shell, claims, focus (preload too) | PASS on the final tree |
+| 14 | bossbar-layout-test | PASS (head clearance now asserted) |
+| 16 | preload-test | PASS (0 failed) |
+| 17,18,19,20,22 | streetsong, streetdraw, footvis, streetsim, 3-size loads | NOT RE-RUN on the final tree (passed on the RC before the boss draw change) |
+| 21 | smoke.sh | FAIL 2 of 11 on BOTH live and RC: fingerprint (PRE-EXISTING), sprites (PRE-EXISTING, same 2); labfull PASS on both (W284's fail not reproduced) |
+| 5c | phone flight | unchanged: RC 4/8 = control 4/8 |
+| PC flight 8 runs | NOT RE-RUN |

@@ -5,7 +5,7 @@
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/fingerprint-test.js            compare with fingerprints.json (one PASS/FAIL line per scenario)
 //   UPDATE=1 ... writes fingerprints.json (only when a step explicitly changes behaviour and the owner approved)
 //   env: PAGE=<built html> (default: a fresh NR_OUT build in a temp dir), ONLY=fly2,boss (subset), TWICE=1 (run each scenario twice, check run-to-run stability),
-//        COVER=<file> (write V8 function coverage of the page script, used by CONSOLIDATION-PLAN.md), FRAMES=1800 (frames per scenario), Q='&grit=0' (extra URL flags: proves the fingerprint sees a change)
+//        SHOTS=<dir> (also write a jpeg of the canvas at the end of each scenario: read-only, hashes unchanged), COVER=<file> (write V8 function coverage of the page script, used by CONSOLIDATION-PLAN.md), FRAMES=1800 (frames per scenario), Q='&grit=0' (extra URL flags: proves the fingerprint sees a change)
 // Determinism: Math.random is a seeded generator per scenario, performance.now / Date.now / requestAnimationFrame are a virtual clock that
 // only moves with the sim (1/60 s per frame), localStorage starts empty (fresh context per scenario), all images are awaited before frame 0.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), cp = require('child_process'), fs = require('fs'), os = require('os'), net = require('net'), crypto = require('crypto');
@@ -36,6 +36,7 @@ const DRIVE = async (o) => {
     while (FOOT.S && !FOOT.S.end && i < o.frames && (FOOT.S.cpN || 0) < o.secs) { window.__vt += 1000 / 60; i++; window.__dcOn = i % 600 === 0; const q = window.__raf.splice(0); if (q.length) q.forEach(f => f(window.__vt)); else FOOT.sim(dt, dt); window.__dcOn = false;   // the street's own rAF loop (update + draw) runs on the virtual clock
       if (i % 60 === 0) { const S = FOOT.S, P = S.P; H.push([r6(S.time), Math.round(P.x), Math.round(P.y), P.hp, S.kills, S.score, S.cpN | 0, S.hurts | 0, S.E.map(e => [e.k || e.type, Math.round(e.x), Math.round(e.y), e.hp]), S.eb.length, Math.round(S.eb.reduce((s, b) => s + b.x + b.y, 0)), S.pk.length, window.__rng].join('|')); } }
     out.frames = i; out.end = FOOT.S && FOOT.S.end ? (FOOT.S.end.cleared ? 'cleared' : 'ended') + ' at section ' + (FOOT.S.cpN | 0) : 'section ' + (FOOT.S && FOOT.S.cpN | 0) + ' x ' + Math.round(FOOT.S.P.x) + (FOOT.S.lock ? ' lock ' + FOOT.S.lock.id : '') + ' foes ' + FOOT.S.E.length; out.sec = FOOT.S && FOOT.S.cpN; FOOT.ctl = null; FOOT.stop();
+    if (o.shot) { draw(); out.shot = document.querySelector('canvas') && document.querySelector('canvas').toDataURL('image/jpeg', .8); }
     out.H = H; return out;
   }
   m.SET.diff = o.diff; if (o.kind === 'endless' || o.kind === 'boss') { m.ST.on = false; document.getElementById('startBtn').click(); } else m.startStory(o.n); m.simOn(true);
@@ -49,6 +50,7 @@ const DRIVE = async (o) => {
       if (i % 600 === 0) draw(); }
     if (G.boss) boss++; if (G.dead) break; }
   if (o.kind === 'boss') out.end = (boss ? 'boss on screen ' + boss + ' frames' : 'NO BOSS') + (G.dead ? ', dead' : '');
+  if (o.shot) { draw(); out.shot = document.querySelector('canvas') && document.querySelector('canvas').toDataURL('image/jpeg', .8); }
   out.frames = i; out.dead = !!G.dead; out.H = H; m.abort(); return out;
 };
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
@@ -73,8 +75,10 @@ const sha = s => crypto.createHash('sha1').update(s).digest('hex').slice(0, 16);
     await p.waitForTimeout(400);   // ART.img decodes; the virtual clock does not move while we wait
     await p.waitForFunction(() => { const A = __mnr.ART; return !A.ANIM || Object.keys(A.ANIM.s).filter(k => /^ship-e[a-z]+\/(flame|volley|death)$/.test(k)).map(k => A.anim(k)).every(Boolean); }, null, { timeout: 20000, polling: 100 }).catch(() => { });   // every enemy ship sheet decoded before frame 0, so which draw path runs never depends on decode timing
     await p.evaluate(() => { window.__rng = 0; for (const k in window.__dc) delete window.__dc[k]; });
-    const r = await p.evaluate(DRIVE, { ...s, frames: s.frames || FRAMES });
+    const r = await p.evaluate(DRIVE, { ...s, frames: s.frames || FRAMES, shot: !!process.env.SHOTS });
+    if (process.env.SHOTS && r.shot) fs.writeFileSync(path.join(process.env.SHOTS, s.id + '.jpg'), Buffer.from(r.shot.split(',')[1], 'base64'));
     const dc = await p.evaluate(() => window.__dc);
+    if (process.env.SHOTS && s.kind === 'foot') { await p.evaluate(() => { const q = window.__raf.splice(0); q.forEach(f => f(window.__vt)); }); await p.screenshot({ path: path.join(process.env.SHOTS, s.id + '.png') }); }
     if (cov) cov.push(...(await p.coverage.stopJSCoverage()).filter(e => /index\.html/.test(e.url)));
     await ctx.close();
     return { state: sha(r.H.join('\n')), draw: sha(JSON.stringify(Object.keys(dc).sort().map(k => [k, dc[k]]))), frames: r.frames, samples: r.H.length, rng: r.H.length ? +r.H[r.H.length - 1].split('|').pop() : 0, dcalls: Object.keys(dc).filter(k => k[0] === 'k').reduce((a, k) => a + dc[k], 0), end: r.end || (r.dead ? 'dead' : null), err: r.renderErr };

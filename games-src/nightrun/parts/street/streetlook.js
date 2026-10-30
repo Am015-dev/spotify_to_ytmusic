@@ -200,7 +200,7 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   if(RET.pound2){   // W186 (?pound2=1 = on; OFF until its gates pass): boss bar and run-progress bar sit in the HUD stack under the hint line, never on the floor band (they used to cover the front depth)
     const by=t0+SL.hudB,bossOn=S.boss&&!S.boss.dead;
     if(bossOn){const bw=vw*.7,bx=vw*.15;c.fillStyle='#ffffff22';c.fillRect(bx,by+18*u,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by+18*u,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
-      c.textAlign='center';c.fillStyle='#fff';c.textBaseline='top';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by,vw-20*u);box(bx,by,bw,30*u);SL.hudB+=34*u;}
+      c.textAlign='center';c.fillStyle='#fff';c.textBaseline='top';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by,vw-20*u);box(bx,by,bw,30*u);{const tm=c.getTransform();SL.barBot=tm.d*(by+30*u)+tm.f;}SL.hudB+=34*u;}
     else if(S.st.hook&&S.st.hook.hud&&!RET.purefoot){const dy=by+10*u-(VH-14*u);c.save();c.translate(0,dy);try{S.st.hook.hud(c,vw,u,(x,y,w,h)=>box(x,y+dy,w,h),fs,S);}catch(x){}c.restore();SL.hudB+=24*u;}}
   else if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};IN.ghost();}
