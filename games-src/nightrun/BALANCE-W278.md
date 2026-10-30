@@ -15,3 +15,4 @@ real touch / keys, TS 4, state-aware bot (tactician), 8 seeds each. Clears / bos
 Choice: no adds at all (cap 1 measured worse). x5 meets the phone gate (>= 30%, <= 90%); PC 1/8 misses >= 50%, so both stay opt-in (rule: ON only if the gates hold).
 PC cause (seen in hurtBy): boss melee 4-5 hearts per run; PC has no auto-fire, so a bot backing off faces away and does not shoot. The bot now
 turns to shoot every other 0.4 s; that lifted PC damage (boss left 105-148 instead of 153-176) but not the clear rate. A PC human aims; the bot does not.
+Trivial check (flags on, 3 seeds): phone idle never dies (1 heart lost in 300 s) and a PC masher cleared: the flags are NOT shippable as they stand.

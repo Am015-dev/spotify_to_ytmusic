@@ -58,3 +58,7 @@ Phone dodger, 8 seeds, before: 0/8 cleared, died t=99-209, boss reached in 6-7 o
 Frozen boss of W276's ?bossframe=1: its env wrapper assigned the getter-only env.G (TypeError every tick). Replaced by a figure half-width (street2.js heavyDef FW=58, foot.js clamp); flag deleted.
 Figure >= 95% in view, boss fight isolated (JUMP=152), phone dodger: 49% -> 100% of frames (min 0.75 -> 1.00), wind-up 66% -> 100%. Boss still walks, winds up, charges, recovers; hitbox/hp unchanged.
 Clears (boss isolated, 8 seeds): phone dodger 0/8 before and after, tactician 0/8; PC dodger 0/8. 53 of 57 hearts lost on phone went to street foes during the boss fight, 4 to the boss. Details: HANDOFF-W277.md.
+
+## W278 (30 Oct): boss fight without street adds (opt-in ?bossadds=1, boss hp ?sbhp=5), boss isolated (JUMP=152), real input, TS 4
+Tactician 8 seeds: phone 5/8 (twice), PC 1/8. Idle phone 0/3 deaths in 300 s (FAIL: idle must die). PC masher cleared 1 seed (FAIL). Phone masher: harness touch-id leak (crash).
+Defaults unchanged (flags off). Details: BALANCE-W278.md, HANDOFF-W278.md.

@@ -9,11 +9,17 @@ Logs, results.json and shots (not committed): `/tmp/claude-0/-home-user-spotify-
 ## Measured (boss fight on its own: JUMP=152, real touch 390x763 / keys 1440x860, TS 4, 8 seeds): see BALANCE-W278.md
 - adds 1 at a time: phone 0/8. No adds, hp x8: phone 1/8. No adds, hp x5: phone 5/8 (run twice, 5/8 both times), PC 1/8. 
 - With no adds every heart lost is the boss's (barrel/pound "bul:bigheavy" and charge "mel:bigheavy"), so the add problem is solved; what is left is the boss vs the bot.
+## Trivial-fight check with the flags ON (?bossadds=1&sbhp=5, boss isolated, 3 seeds): FAILS, so the flags stay OFF
+- phone idle: did NOT die in 3/3 (no end at t=363-447 s, 1 heart lost, boss left 140-165 of 180): with no adds the boss barely reaches a standing Kai,
+  and touch auto-fire wears it down. An idle player must die: the boss needs to come for Kai (or adds must stay) before this can ship.
+- PC masher: CLEARED seed 0 (t=250 s, 5 hearts lost to the barrel/pound). A masher must not clear. Other PC masher/idle seeds: still running at the hard stop, not read.
+- phone masher: harness crash x3 (`Input.dispatchTouchEvent: Exceeded maximum touch points limit of 16`): the masher's button flicker leaks touch ids in makeInput. Fix the harness first.
 ## NOT done (time: 55 min cap)
 - Full stage from the title with the flags, 8 seeds x phone/PC x tactician/dodger: NOT run. The dodger was not run on the boss either.
 - streetsim RUNS=40 x3 blocks with the flags: NOT run. With the defaults OFF the shipped game is identical to W277's except for the build,
   so W277's gates stand (gfirst 83/80/83, dodge 68/68/65, idle 0, nearest 43/38/38, stand-still 19.6 s).
 - The random bot: not run. Shots of wind-up/charge/kill: not taken, not looked at (the harness wrote start/boss/death/result shots per run into the folders above, unviewed).
-## Next step (one task, opus): PC. Find why the PC tactician loses 4-5 hearts to the boss's melee (charge) while the phone one loses 2-3: it is the same bot apart from
+## Next step (one task, opus): the boss itself, not the adds. Without adds it is too passive vs an idle phone player and too tough vs the PC bot; a masher clears on PC.
+Look at streetboss.js approach/attack choice vs a still Kai, then PC. Find why the PC tactician loses 4-5 hearts to the boss's melee (charge) while the phone one loses 2-3: it is the same bot apart from
 auto-fire. Check whether the turn-to-shoot walks Kai into the charge; then re-run PC 8 seeds with ?bossadds=1&sbhp=5, then the full stage, masher/idle/random, streetsim x3.
 If PC reaches >= 50%: switch both defaults on (bossadds, HPK 5) and delete the off branch (WORKER-RULES 18).
