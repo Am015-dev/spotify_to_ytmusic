@@ -50,7 +50,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(Math.abs(RO.h)>50){RO.h-=Math.r
   for(const pd of RO.pads||[]){if(!air&&Math.sqrt((pd.x-RO.x)*(pd.x-RO.x)+(pd.z-RO.z)*(pd.z-RO.z))<7&&(RO.padT||0)<=0){RO.turbo=Math.max(RO.turbo,1.8);RO.v=Math.max(RO.v,top*1.05);RO.padT=.8;award(s,'BOOST PAD',8,100,'#ffd12c');comboAdd(1);AU.sfx('boost');fovKick=Math.max(fovKick,10)}}RO.padT=Math.max(0,(RO.padT||0)-dt);
   // steering: target yaw rate eases in; sharper when slow, calmer when fast; velocity heading follows with surface grip (slight slide on dirt/water)
   const sp=Math.abs(RO.v),vr=clamp(sp/Math.max(30,top),0,1),maxR=(TUNE.stMax-TUNE.stSpd*vr)*(RO_STK[SET.steer]||1)*lvl.han*(air?.45:1)*(air?clamp(sp/9,0,1):Math.max(.6,clamp(sp/9,0,1)));
-  const hbOk=c.hb&&!air&&sp>(window.B2K_DMIN||22)&&!busy; // B2K hook: drift speed from 98k_boost2k
+  const hbOk=c.hb&&!air&&(sp>(window.B2K_DMIN||22)||window.B2K_TOK&&sp>(window.B2K_TLO||6))&&!busy; // B2K hook: drift speed from 98k_boost2k
   if(hbOk&&!RO.dDir&&Math.abs(c.steer)>.2){RO.dDir=Math.sign(c.steer);RO.dT=0;AU.sfx('roll')}
   if(RO.dDir&&!hbOk){const tr=RO.dT>2?3:RO.dT>1.1?2:RO.dT>.5?1:0;if(tr){RO.tutTurbo=true;RO.turbo=Math.max(RO.turbo,[0,.8,1.3,2][tr]);s.bm=Math.min(100,s.bm+6*tr);award(s,['','MINI-TURBO','SUPER TURBO','ULTRA TURBO'][tr],0,250*tr*tr,['','#4ceaff','#ff9a3c','#c46bff'][tr]);AU.sfx('boost');fovKick=Math.max(fovKick,5+3*tr);comboAdd(tr)}RO.dDir=0;RO.dT=0;RO.dEx=TUNE.drExitT/* handling-r21d: slip springs back for TUNE.drExitT s after a release */}
   RO.dEx=Math.max(0,(RO.dEx||0)-dt);
