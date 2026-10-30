@@ -145,7 +145,7 @@ async function openRun(b, plat, seed) {
     window.__ft = []; window.__ftOn = false; let l = 0; const f = t => { if (l && window.__ftOn) window.__ft.push(t - l); l = t; requestAnimationFrame(f); }; requestAnimationFrame(f);
     try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { }
   }, 1000 + seed * 7919);
-  await p.goto(b.base + '?nomusic=1', { waitUntil: 'domcontentloaded' });
+  await p.goto(b.base + '?nomusic=1' + (process.env.Q || ''), { waitUntil: 'domcontentloaded' });
   await p.waitForFunction(() => window.__mnr && window.FOOT, null, { timeout: 15000 });
   await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }).catch(() => { });
   await sleep(500); return p;
@@ -255,7 +255,7 @@ async function layouts(b) {
     const T = `phone ${W}x${H} auto-fire ${auto ? 'on' : 'off'}: `, ctx = await b.br.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, hasTouch: true, isMobile: true, userAgent: UA }), p = await ctx.newPage(); p.errs = [];
     p.on('pageerror', e => p.errs.push(String(e.message).slice(0, 160))); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
     await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
-    await p.goto(b.base + '?nomusic=1', { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.FOOT, null, { timeout: 15000 }); await sleep(900);
+    await p.goto(b.base + '?nomusic=1' + (process.env.Q || ''), { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.FOOT, null, { timeout: 15000 }); await sleep(900);
     try { const inp = makeInput(p, 'phone'); await inp.init(); const r = await startFoot(p, inp); if (r !== 'on') { chk(T + 'start', false, r); continue; }
       if (!auto) { await p.evaluate(() => window.FOOT.setAuto(false)); }
       await sleep(1800); const a = await p.evaluate(AUDIT); chk(T + 'all controls >= 44 px', !a.small.length, a.small.join()); chk(T + 'no control overlaps another (GUARD / KNIFE / BOMB / DASH)', !a.over.length, a.over.join()); chk(T + 'controls on screen', !a.off.length, a.off.join()); chk(T + 'labels fit inside their buttons', !a.clip.length, a.clip.join());
