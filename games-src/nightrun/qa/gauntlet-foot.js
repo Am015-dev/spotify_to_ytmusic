@@ -112,7 +112,7 @@ function strategy(name, rnd) {
       if (P.bombs > 0 && s.t - bombAt > 4 && (live.filter(e => dist(e) < 300).length >= 3 || live.some(e => heavy(e) && dist(e) < 280))) { w.bomb = true; bombAt = s.t; }
       // 6. punish: an OPEN / stunned / resting foe in knife range gets the knife, a far one gets bullets; the heavy is shot from range and only knifed when stunned
       const open = n.st === 'rest' || n.st === 'back' || n.st === 'stun' || n.st === 'open' && n.id !== 'gunner';
-      if (heavy(n)) { w.fire = front(n); if (n.st === 'stun' && d < 90) { w.melee = Math.floor(s.t * 6) % 2 === 0; w.mx = face(n) * .3; } else w.mx = d < 260 ? -face(n) : d > 420 ? face(n) : 0; }
+      if (heavy(n)) { w.fire = front(n); if (n.st === 'stun' && d < 90) { w.melee = Math.floor(s.t * 6) % 2 === 0; w.mx = face(n) * .3; } else { w.mx = d < 260 ? -face(n) : d > 420 ? face(n) : 0; if (w.mx === -face(n) && Math.floor(s.t * 2.5) % 2) { w.mx = face(n) * .35; w.fire = true; } } }   // W278: backing off turns Kai away (no auto-fire on PC): every other 0.4 s turn and shoot
       else if (n.id === 'gunner') { w.fire = front(n); w.mx = d > 330 ? face(n) : d < 200 ? face(n) : 0; if (d < 90) w.melee = true; }   // close the gap on a gunner (it backs off if rushed) or hold range
       else { w.fire = front(n) && d < 640; if (open && d < 95) { w.melee = Math.floor(s.t * 6) % 2 === 0; w.mx = face(n) * .3; } else w.mx = d < 150 ? -face(n) : d > 260 ? face(n) * .5 : 0; }
       if (right < 90 && w.mx > 0) w.mx = 0;
