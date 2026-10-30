@@ -20,6 +20,7 @@ const worldFn = () => { const m = window.__mnr, G = m.G, P = m.P; const q = a =>
   return { px: P.x, py: P.y, eb: q(G.eb), en: q(G.en), pk: q(G.pk), boss: G.boss ? [G.boss.x, G.boss.y] : null, hp: P.hp, emp: P.emp, rot: m.rotMode }; };
 const st = p => p.evaluate(stFn), world = p => p.evaluate(worldFn);
 const step = (p, n) => p.evaluate(n => { for (let i = 0; i < n; i++) window.__mnr.step(1 / 60); }, n);
+const frames = p => p.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
 const STEPS = +process.env.STEPS || 8;   // sim steps (1/60 s) between decisions; one page round trip per decision
 const snap = (p, n) => p.evaluate(([n, a, b]) => { const m = window.__mnr; for (let i = 0; i < n; i++) m.step(1 / 60); return { s: eval('(' + a + ')')(), w: eval('(' + b + ')')() }; }, [n, stFn.toString(), worldFn.toString()]);   // step + state + world in ONE round trip
 
@@ -115,6 +116,7 @@ async function run(br, devName, strat, seed, start) {
     if (!s.boss && bossWas) { bossWas = false; if (s.bossDone || s.res) R.bossKilled++; }
     const w = SN.w, a = brn(w);
     await I.move(a.dx, a.dy, w.rot, a.fire); if (a.dash) await I.dash(); if (a.emp) await I.emp();
+    await frames(p);   // W283: let the page paint two frames so the input just sent is applied before the next stepped burst (without it a fast machine lost every run: 0/4 PC dodger on W272 vs 2/2 with it)
     R.gameSec += STEPS / 60; tick++;
     const n = s; if (n.score + ':' + n.hp !== lastKey) { lastKey = n.score + ':' + n.hp; lastChange = n.t; }
     if (n.t - lastChange > 20 && n.live && !n.over) { R.stuck++; R.defects.push(`stuck 20s at stage ${n.stage} t=${n.t.toFixed(0)} score=${n.score} hp=${n.hp} ship=${w.px | 0},${w.py | 0} boss=${JSON.stringify(w.boss)} en=${w.en.length} eb=${w.eb.length} enemies=${JSON.stringify(w.en.slice(0, 4).map(e => [e[0] | 0, e[1] | 0, e[5]]))}`); lastChange = n.t; if (R.stuck >= 2) break; }

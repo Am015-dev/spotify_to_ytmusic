@@ -1,8 +1,8 @@
 # Release check, branch nr/W282-rc (from nr/W281-boss-hp), 30 Oct 2026. Not deployed.
 Logs and shots (not committed): `/tmp/claude-0/-home-user-spotify-to-ytmusic/a3f01345-05bc-5980-86c5-93f31a03fca5/scratchpad/` (street/dodger*, street/bad, chk/*.txt, shots/, shots/flight, shots/flight12).
 One browser at a time, all on this one machine, 60 min limit: **seed counts are far below the 8 asked for**; every shortfall is in the table.
-## Recommendation: DO NOT SHIP
-Flight stage 1 (the first thing the focus-mode player plays) was cleared by 0 of 16 real-input runs here (W273 measured 11 of 18 with the same bots); the street boss is cleared 1/3 on phone and 2/3 on PC by the dodger bot. Boss head clearance on phone is still unmeasured. Not shippable until the flight result is explained (regression or harness drift).
+## Recommendation: DO NOT SHIP (updated W283: the flight 0/16 is explained, it was the harness; the phone flight clear rate is 2/8 and still unexplained)
+Flight stage 1 (the first thing the focus-mode player plays): the 0/16 below was the harness (W283 row 5b); with the fix PC clears 4/4, phone 2/8. The street boss is cleared 1/3 on phone and 2/3 on PC by the dodger bot. Boss head clearance on phone is still unmeasured. Not shippable until the flight result is explained (regression or harness drift).
 ## Checks
 | # | Check | Result | Number |
 |---|---|---|---|
@@ -10,8 +10,9 @@ Flight stage 1 (the first thing the focus-mode player plays) was cleared by 0 of
 | 2 | Same, PC keyboard+mouse 1440x860 | NOT RUN to 8 | 3 seeds: CLEARED 2/3 (226 s, 225 s); s0 died 118 s before the boss (3 gunner + 5 rusher hits) |
 | 3 | Phone vs PC cause | NOT FOUND | 1/3 vs 2/3 is inside noise at n=3. Only difference seen: phone takes more boss-shot hits (6/5/4 vs 2/4). No change made, no gate run for one |
 | 4 | Street idle / random / masher must die | PASS, 1 seed each (not 3) | phone died 97 / 114 / 64 s; PC died 20 / 65 / 120 s; 0 clears (TS 4) |
-| 5 | Flight stage 1 dodger+shooter, qa/gauntlet-flight.js, defaults, 3 seeds/device | **FAIL** | 0 boss kills in 12 runs, boss seen 0, 4 lives lost in 9; 0 errors |
-| 6 | Same with W273 settings (STEPS=12 WALL=420), 4 seeds/device | **FAIL** | 0 clears in 16 runs, boss seen 5 (phone 1, PC 3 dodger/shooter), 0 page errors, 0 rejections. 4 phone/PC runs ended early with the harness "stuck 20 s, score 0, 0 enemies" flag (t=20-21): not explained, may be a harness artefact |
+| 5 | Flight stage 1 dodger+shooter, qa/gauntlet-flight.js, defaults, 3 seeds/device | SUPERSEDED (W283) | the 0 clears were a harness defect, not a game regression: see row 5b |
+| 6 | Same with W273 settings, 4 seeds/device | SUPERSEDED (W283) | same cause, see row 5b |
+| 5b | W283: flight stage 1, fixed harness (2 frames painted after each input burst), STEPS=12 WALL=420, one browser | PC PASS, phone BELOW GATE | PC dodger on this RC: 4/4 cleared (W281: 4/4). Phone on this RC (CDP touch): dodger 0/4, shooter 2/4 = 2/8 (25%, gate was 40%); the 6 phone failures lost all 4 lives with the boss seen 1-3 times, 0 page errors. Old harness on the W272 control: PC dodger 0/4 (same code that W273 measured 5/5). PC 8 seeds and a phone control on W272 with the fixed harness: see HANDOFF-W283.md |
 | 7 | HUD under result screen (defect b) | PASS (fixed) | streetlook.js slHud draws nothing when S.end is set; bossbar-layout-test asserts 0 HUD boxes with the result up at 3 sizes. Same check fails on W281 (4 boxes) |
 | 8 | Boss head >= 8 px below name bar (defect a) | NOT FIXED | the new measurement printed -71 px phone / -108 px landscape / -21 px PC, but the 1440 shot shows the head ~70 px below the bar, so the measurement counts an effect image: left as INFO in the test. Phone shot (W282 pc/phone dodger boss.jpg) shows ~5-10 px by eye |
 | 9 | flake8 E9,F63,F7,F82 | PASS | 0 |
