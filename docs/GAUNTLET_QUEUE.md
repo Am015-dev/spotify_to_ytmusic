@@ -25,3 +25,10 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - world-r30b round 2 (90f612f) FAIL REVIEW_2K_31 (d): camera-in-props handling moves cafe clusters away for good in plain view; Athens world/camprop red 2/3; a walker fills the lens. Passed: icon, birds, debris, honest GOs. Rework queued for the next free slot, narrow scope: props only fade while between camera and car and always come back; walkers step aside; plus the gauntlet bot must brake into quest markers (GAS is default on touch) so quest START x3 is verified by real input.
 - traffic-r30c2 rework running (hit/contact 9/10 with the teleport fix). touchdrive rework running (BOOST + steer toward the car).
 - Open, no lane yet: black building face (HANDOFF_world-r30b), TypeError byteLength in three's buffer upload on long drives (trunk; 0 in a 120 s run on beta.164), boot/toControl, density ring.
+
+## 30 Oct ~10:20 (REVIEW_2K_32)
+- PASS: traffic-r30c2 1fb1138 + fc3bda4 (no near-car teleports; hit misses are the bot's target choice; script fix written in REVIEW_2K_32). Watch: turning cars slide 3-3.7 m across the centre line at 8-21 m.
+- FAIL: touchdrive-r29b d094be2: (3) a two-thumb race correction (left still held 33-100 ms when right lands) rolls 10/10 -> needs a chord window; (2b) the SMASH hint never shows (body.fdq hides #crSmHint, 99fd_drivefirst.js:35). Rework queued (session_01RR7mnXYxNGypZruSqUdFZx).
+- DEPLOY BLOCKER (rule 15): page/jsErrors 8x "byteLength" in a full gauntlet run on trunk, not caused by the traffic flags. Bug lane jserr-r30f OPUS gets the next free slot, before the touchdrive rework.
+- Running: world-r30b round 3, boot-r30e.
+- Next after these: gauntlet hit-target script fix (SONNET), density ring (rule 9 exception: repro exists), black building face.
