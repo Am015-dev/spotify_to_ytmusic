@@ -1,0 +1,92 @@
+[
+ {
+  "id": "boot/playVisible",
+  "what": "page open → PLAY button visible",
+  "num": "15.0 s lab",
+  "bar": "INFO (lab, software GL)",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/tb1on/fra_0_title.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl",
+  "what": "PLAY tap → first control of the car",
+  "num": "55.0 s lab (6x CPU)",
+  "bar": "<= 36 s lab at 6x (= ~5 s on an iPhone: 5 s x 7.2-7.3, REVIEW_2K_33, docs/GAUNTLET.md)",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/tb1on/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/menu",
+  "what": "race menu never shows after PLAY (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "boot/loader",
+  "what": "loader never covers a controllable car (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls",
+  "what": "HUD text over the touch buttons (first control)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/tb1on/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "hud/minText",
+  "what": "smallest visible text (first control)",
+  "num": "0 items < 12 px",
+  "bar": "0 (CLAUDE.md: 12 px minimum)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls2",
+  "what": "HUD text over the touch buttons (later in roam)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/reload",
+  "what": "page never reloads",
+  "num": "0 reloads",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/jsErrors",
+  "what": "no JS errors (pageerror + console.error)",
+  "num": "0 errors",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/memory",
+  "what": "JS heap high-water (performance.memory)",
+  "num": "21 MB",
+  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ }
+]
