@@ -131,3 +131,6 @@ Model and status come from the session list. Cost is blank: the session list doe
 | hitrun study + gap plan | — | Sonnet+Opus | docs/wiki/learn/hit-and-run.md, docs/HITRUN_GAP.md | docs |
 | drivefeel-r25g + phonedrift-r25i | — | Opus+Sonnet | review FAIL, reverted | reverted |
 | hr-hit + drivefix-r25k | — | Opus+Sonnet | stopped by Alex (~$7.60 + $1.50) | stopped |
+| gui-r30a, traffic-r30c2, boot-r30e/g, jserr-r30f, links-r30i, size-r30k | beta.165 | Sonnet + Opus reviews | shipped | shipped |
+| world-r30b/h, touchdrive-r29a/b/d | — | Sonnet + Opus reviews | FAIL, reverted 4d432e4 (touchdrive back in r30m) | reverted |
+| tilebuild-r30j, tb1, reload-r30l | — | Opus + Sonnet | design, flag OFF, findings | docs/flag |
