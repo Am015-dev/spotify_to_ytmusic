@@ -32,3 +32,10 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - DEPLOY BLOCKER (rule 15): page/jsErrors 8x "byteLength" in a full gauntlet run on trunk, not caused by the traffic flags. Bug lane jserr-r30f OPUS gets the next free slot, before the touchdrive rework.
 - Running: world-r30b round 3, boot-r30e.
 - Next after these: gauntlet hit-target script fix (SONNET), density ring (rule 9 exception: repro exists), black building face.
+
+## 30 Oct ~11:30 (REVIEW_2K_33)
+- PASS: boot-r30e 330a5fb + 6bc9823 (A/B at 6x: fra -5 s, ath -12 s; 0 programs linked after control; no holes in 0-10 s).
+- Bar APPROVED by the coordinator, confirmed by review (beta.151 re-measured: 7.3x vs Alex's iPhone 12.6 s): boot/toControl <= 36 s at 6x in fra AND ath (= ~5 s on an iPhone); 1x <= 15 s as INFO only. The code bar is still 8 s: the next boot lane sets it.
+- Next boot lane boot-r30g SONNET (~45 min): set the gauntlet bar to 36 s; compile the far-street merged materials under the curtain (3 late program links ~3 s after reveal in 2 of 3 tIosReveal fra runs); make perf/ios-reveal boot via PLAY (its ?test= entry skips the prewarm, so it is red on trunk); add playMs to the iPhone beacon.
+- New bug, own lane later: teacups/picnic group pops in ~1 s after control (on old builds too).
+- Boot still ~76 s fra / 110 s ath at 6x vs 36: the big cost is buildHubG (~51 s). Needs a tiled city build design lane (OPUS, 4+ modules).
