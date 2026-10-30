@@ -17,13 +17,14 @@ if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;
 const IN=F._in,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1,clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const PH=[null,{n:'THE CHARGE',at:['charge','throw']},{n:'GROUND POUND',at:['pound']},{n:'LEAP',at:['leap']}],LINE=[0,1,.66,.33];
 const CAP={charge:'CHARGE · JUMP OR DASH',throw:'BARREL · STEP BACK',pound:RET.pound2?'POUND · LEAVE THE RED LINE OR JUMP':'GROUND POUND · JUMP THE WAVE',leap:RET.pound2?'LEAP · LEAVE THE RED RING':'LEAP · DASH OUT'};
-// W279 tuning block (BALANCE-W279.md). Telegraphs: every wind-up >= 0.8 s, the phone reaction window W277 measured.
+// Tuning block (BALANCE-W279.md, BALANCE-W280.md): these are the shipped defaults, no flags. Telegraphs: every wind-up >= 0.8 s, the phone reaction window W277 measured.
 const WIND={throw:.8,pound:.8,leap:.8},   // wind-up per attack in s (the charge's 0.8 s lives in street2.js heavyDef); W279: throw .7 -> .8, leap .6 -> .8
   OPEN=1.0,ROAR=1.2,LEAPT=.7,             // opening after an attack, phase roar, leap flight (s)
   HPK=8,                                  // boss hp = 36 x HPK = 288 (W279 sweep, no adds: 180 and 234 are cleared by the state-aware bot with equal reaction on both devices; 288 = top of the allowed range)
   CHDMG=2,                                // hearts a charge takes (W279 sweep: 1 let the phone bot clear 8/8 and an idle phone Kai outlast the boss)
-  GAP=200,                                // W279: run-up in px; closer than this the boss backs off before it may wind up, so a still or cornered Kai still gets charged
-  BACKV=110;                              // its back-off speed (px/s; it walks in at 70)
+  GAP=150,                                // run-up in px before a CHARGE (W280: charge only, 200 -> 150; W279 backed off 200 px before every attack): closer than this it backs off first, so the charge has its 0.12 s launch even vs a still Kai
+  BACKV=110,                              // its back-off speed (px/s; it walks in at 70)
+  PINX=28,PINDMG=2;                       // W280: a charge that reaches the screen edge with Kai pinned there lands from PINX px (shoulder tip on his body edge) for PINDMG hearts (PC idle Kai was never hit: 45-51 px short every charge)
 const SB=F.SB={log:[]};   // per fight: {ph:[[phase,t]], at:[[attack,t]]} for the probe
 const name=e=>'BIG HEAVY · PHASE '+e.ph+': '+PH[e.ph].n;
 function go(e,s){e.state=s;e.sT=0;}
@@ -57,13 +58,17 @@ d.ai=function(e,dt,env){const S=F.S,P=env.P;
     if(RET.pound2&&st==='sb_leap')hold(e,env);
     if(st==='sb_leap'){const u=Math.min(1,e.sT/LEAPT);e.x=e.x0+(e.tx-e.x0)*u;e.y=FL-Math.sin(Math.PI*u)*200;e.vx=(e.tx-e.x0)/LEAPT;mark(S,e.tx,e);
       if(u>=1){e.y=FL;e.vx=0;env.melee(e,{x:e.tx-70,y:FL-e.h,w:140,h:e.h},2);shake(S,9);clr(e);open(e);}return;}}
-  if(e.state==='walk'&&GAP&&back(e,P,dt,env))return;
+  if(e.state==='walk'&&back(e,P,dt,env))return;
+  e._pin=e.state==='charge'&&e.sT>=.12&&pin(e,P,env.G);
   const s0=e.state,x0=e.x;a0.call(this,e,dt,e.state==='charge'?low(env):env);
   if(e.state==='charge'&&e.sT>.05&&e.x===x0){open(e);return;}   // stuck a few px short of the screen edge (walk() refuses the step, the wall test never fires): that is the wall
   if(e.state==='wind'&&s0!=='wind'){const a=e.next||pick(e,P);e.next=null;begin(e,a,S,env);}   // heavyDef chose to attack: this phase picks which
   else if(s0==='charge'&&e.state==='walk')open(e);};   // an opening after every charge, not only after a wall hit
-function low(env){const o=Object.create(env);o.melee=(e,r)=>{if(e.sT<.12)return false;const k=(e.fw||e.w/2)-e.w/2;return env.melee(e,{x:r.x+(e.facing>0?0:-k),y:r.y+r.h*.35,w:r.w+k,h:r.h*.65},CHDMG);};return o;}   // charges head down (a jump clears it) and launches 0.12 s before it can hit (a jump at point blank works); W279: its reach is the front of the DRAWN figure (fw), so a charge stopped by the screen edge still lands on a cornered Kai (body hitbox unchanged)
+function low(env){const o=Object.create(env);o.melee=(e,r)=>{if(e.sT<.12)return false;return env.melee(e,{x:r.x,y:r.y+r.h*.35,w:r.w,h:r.h*.65},e._pin?PINDMG:CHDMG);};return o;}   // charges head down (a jump clears it: streetreach.js keeps this y band) and launches 0.12 s before it can hit (a jump at point blank works); its x reach is the shoulder tip (streetreach.js), W280: W279's fw widening here never applied and is gone, the screen-edge case is pin()
+function pin(e,P,G){const h=e.fw||e.w/2,f=e.facing>0?1:-1,edge=f>0?G.camX+G.viewW:G.camX;   // W280: Kai pinned in the strip between the drawn figure and the screen edge (the fw clamp keeps its centre h px off the edge,
+  if(f*(edge-e.x)-h>=12||f*(P.x-e.x)<=0||f*(edge-P.x)>=h)return false;e.x=P.x-f*PINX;return true;}   // streetreach.js lands a hit only from the shoulder tip, ~18 px past the centre): it steps into the strip for the slam (the engine clamp puts it back next frame)
 function back(e,P,dt,env){const dx=P.x-e.x;if(abs(dx)>=GAP||(e.cd||0)>dt||e.grace>0||!e.seen)return false;   // only when its attack is due: it walks in as before, backs off, then winds up
+  if(!e.next)e.next=pick(e,P);if(e.next!=='charge')return false;   // W280: only a charge needs the run-up; barrel, pound and leap come from where it stands (W279 backed off for all four: the pound's wave then met a jumping Kai as he landed)
   const G=env.G,h=e.fw||e.w/2,nx=clamp(e.x-sgn(dx)*BACKV*dt,G.camX+h,G.camX+G.viewW-h);
   if(abs(nx-e.x)<BACKV*dt*.5)return false;e.x=nx;e.vx=-sgn(dx)*BACKV;e.facing=sgn(dx);return true;}   // W279: no room behind it = it attacks from where it stands
 function cx(e,env){const G=env.G,m=Math.min(170,G.viewW/2);return Math.max(G.camX+m,Math.min(G.camX+G.viewW-m,e.x));}   // captions stay on screen on a phone
