@@ -3,9 +3,9 @@
 // TEST: qa/streetsim.js with Q='&sboss=1' DBG=qa/bossprobe.js (boss gate lines)
 /* ---------- STREETBOSS (W167, design: benchmark/STREET-BAR-SCORE-2026-10-23.md task 1; rows B1-B3 of benchmark/STREET-BAR.md).
    Was: one attack (wind-up -> charge) and no phases; the fight ended after 2 charges. Now (wraps FOOT_BOSS.bigheavy from street2.js heavyDef):
-   PHASE 1 THE CHARGE (100-66% hp): charge (red crouch 0.8 s; JUMP it or DASH through) and, when Kai keeps his distance, a barrel throw (wind-up 0.7 s; STEP BACK or stand behind cover).
+   PHASE 1 THE CHARGE (100-66% hp): charge (red crouch 0.8 s; JUMP it or DASH through) and, when Kai keeps his distance, a barrel throw (wind-up 0.8 s; STEP BACK or stand behind cover); W279: closer than 200 px it backs off first, so it charges a still or cornered Kai too.
    PHASE 2 GROUND POUND (66-33%): + pound: two shock waves roll along the road both ways (wind-up 0.8 s; JUMP the wave).
-   PHASE 3 LEAP (33-0%): + leaping slam on the spot Kai stood on when it crouched (wind-up 0.6 s, red marks on the road; DASH or run out of them).
+   PHASE 3 LEAP (33-0%): + leaping slam on the spot Kai stood on when it crouched (wind-up 0.8 s, red marks on the road; DASH or run out of them).
    Each phase starts with a 1.2 s roar (no damage, its name over the boss and on the bar) and then the phase's new attack, so every fight that reaches 33% sees all of them.
    The player decision: read which attack is coming and pick its answer (jump / step back / dash), then punish the 1 s opening (OPEN, full damage) after every attack.
    Damage cannot skip a phase: hp stops at the phase line until the roar is over (an opening in progress is finished first). ---------- */
@@ -17,7 +17,13 @@ if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;
 const IN=F._in,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1,clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const PH=[null,{n:'THE CHARGE',at:['charge','throw']},{n:'GROUND POUND',at:['pound']},{n:'LEAP',at:['leap']}],LINE=[0,1,.66,.33];
 const CAP={charge:'CHARGE · JUMP OR DASH',throw:'BARREL · STEP BACK',pound:RET.pound2?'POUND · LEAVE THE RED LINE OR JUMP':'GROUND POUND · JUMP THE WAVE',leap:RET.pound2?'LEAP · LEAVE THE RED RING':'LEAP · DASH OUT'};
-const WIND={throw:.7,pound:.8,leap:RET.pound2?.8:.6},OPEN=1.0,ROAR=1.2,LEAPT=.7,HPK=+((location.search.match(/[?&]sbhp=([\d.]+)/)||[])[1]||8);   // boss hp x HPK (W278: ?sbhp=5 = 180 hp: with ?bossadds=1 the state-aware bot clears 5/8 on phone, 1/8 on PC; not the default until PC passes, BALANCE-W278.md) (W168: default 8 = a 45-90 s fight; ?sbhp= to tune) (W168: x5 gives a 32 s dodge-bot fight, x8 47 s, but the rushers that join every 3.5 s then kill the bots)
+// W279 tuning block (BALANCE-W279.md). Telegraphs: every wind-up >= 0.8 s, the phone reaction window W277 measured.
+const WIND={throw:.8,pound:.8,leap:.8},   // wind-up per attack in s (the charge's 0.8 s lives in street2.js heavyDef); W279: throw .7 -> .8, leap .6 -> .8
+  OPEN=1.0,ROAR=1.2,LEAPT=.7,             // opening after an attack, phase roar, leap flight (s)
+  HPK=8,                                  // boss hp = 36 x HPK = 288 (W279 sweep, no adds: 180 and 234 are cleared by the state-aware bot with equal reaction on both devices; 288 = top of the allowed range)
+  CHDMG=2,                                // hearts a charge takes (W279 sweep: 1 let the phone bot clear 8/8 and an idle phone Kai outlast the boss)
+  GAP=200,                                // W279: run-up in px; closer than this the boss backs off before it may wind up, so a still or cornered Kai still gets charged
+  BACKV=110;                              // its back-off speed (px/s; it walks in at 70)
 const SB=F.SB={log:[]};   // per fight: {ph:[[phase,t]], at:[[attack,t]]} for the probe
 const name=e=>'BIG HEAVY · PHASE '+e.ph+': '+PH[e.ph].n;
 function go(e,s){e.state=s;e.sT=0;}
@@ -51,11 +57,15 @@ d.ai=function(e,dt,env){const S=F.S,P=env.P;
     if(RET.pound2&&st==='sb_leap')hold(e,env);
     if(st==='sb_leap'){const u=Math.min(1,e.sT/LEAPT);e.x=e.x0+(e.tx-e.x0)*u;e.y=FL-Math.sin(Math.PI*u)*200;e.vx=(e.tx-e.x0)/LEAPT;mark(S,e.tx,e);
       if(u>=1){e.y=FL;e.vx=0;env.melee(e,{x:e.tx-70,y:FL-e.h,w:140,h:e.h},2);shake(S,9);clr(e);open(e);}return;}}
+  if(e.state==='walk'&&GAP&&back(e,P,dt,env))return;
   const s0=e.state,x0=e.x;a0.call(this,e,dt,e.state==='charge'?low(env):env);
   if(e.state==='charge'&&e.sT>.05&&e.x===x0){open(e);return;}   // stuck a few px short of the screen edge (walk() refuses the step, the wall test never fires): that is the wall
   if(e.state==='wind'&&s0!=='wind'){const a=e.next||pick(e,P);e.next=null;begin(e,a,S,env);}   // heavyDef chose to attack: this phase picks which
   else if(s0==='charge'&&e.state==='walk')open(e);};   // an opening after every charge, not only after a wall hit
-function low(env){const o=Object.create(env);o.melee=(e,r,n)=>e.sT<.12?false:env.melee(e,{x:r.x,y:r.y+r.h*.35,w:r.w,h:r.h*.65},n);return o;}   // charges head down (a jump clears it) and launches 0.12 s before it can hit (a jump at point blank works)
+function low(env){const o=Object.create(env);o.melee=(e,r)=>{if(e.sT<.12)return false;const k=(e.fw||e.w/2)-e.w/2;return env.melee(e,{x:r.x+(e.facing>0?0:-k),y:r.y+r.h*.35,w:r.w+k,h:r.h*.65},CHDMG);};return o;}   // charges head down (a jump clears it) and launches 0.12 s before it can hit (a jump at point blank works); W279: its reach is the front of the DRAWN figure (fw), so a charge stopped by the screen edge still lands on a cornered Kai (body hitbox unchanged)
+function back(e,P,dt,env){const dx=P.x-e.x;if(abs(dx)>=GAP||(e.cd||0)>dt||e.grace>0||!e.seen)return false;   // only when its attack is due: it walks in as before, backs off, then winds up
+  const G=env.G,h=e.fw||e.w/2,nx=clamp(e.x-sgn(dx)*BACKV*dt,G.camX+h,G.camX+G.viewW-h);
+  if(abs(nx-e.x)<BACKV*dt*.5)return false;e.x=nx;e.vx=-sgn(dx)*BACKV;e.facing=sgn(dx);return true;}   // W279: no room behind it = it attacks from where it stands
 function cx(e,env){const G=env.G,m=Math.min(170,G.viewW/2);return Math.max(G.camX+m,Math.min(G.camX+G.viewW-m,e.x));}   // captions stay on screen on a phone
 function shake(S,v){S.shake=Math.max(S.shake||0,v);}
 function mark(S,x,e){if(!RET.pound2||e.zl==null){for(let i=-2;i<=2;i++)S.fx.push({x:x+i*30,y:FL-4,l:.04,c:'#ff2d3a',r:12});return;}
