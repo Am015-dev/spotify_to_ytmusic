@@ -84,7 +84,9 @@ if(RET.streetsong){
   {const FQ=F.q,r0=FQ&&FQ.ready,p0=FQ&&FQ.pct;
    const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return true;};   // W242: asks for the file, never waits for it
    if(r0)FQ.ready=()=>r0()&&fileOk();if(p0)FQ.pct=()=>{const a=p0();return fileOk()?a:Math.min(a,99);};}}
-if(window.NR&&NR.on)NR.on('footStart',d=>{if(RET.streetsong&&ssOn()){S3.song=SSNG;MP.fbase=SSNG;MP.fk=SSNG;return;}if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
+if(window.NR&&NR.on)NR.on('footStart',d=>{if(RET.streetsong&&ssOn()){S3.song=SSNG;MP.fbase=SSNG;MP.fk=SSNG;return;}
+  if(RET.streetsong&&on()&&MP&&MP.on&&MP.on()){S3.song=SSNG;try{AU.startStage(SSNG);}catch(e){}return;}   // W272: the file is no longer waited for (W264/W269), so start the bed at once (synth until the file joins) instead of 0.5 s of silence
+  if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
 /* ----- loading: the hold also waits for the painted street and the prop pictures (no placeholder backdrop, then a swap) ----- */
 const FQ=F.q;
 const pics=()=>{const fa=window.FA;if(!fa||!fa._rd)return [];return [...fa._rd].filter(f=>/^foot\/(bg-|sc-)/.test(f));};

@@ -25,7 +25,7 @@ const s2 = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN
     const hook = () => { const S = FOOT.S; if (!S || !S.eb || S.__h) return; S.__h = 1; let v; const wrap = a => { const pu = a.push; a.push = function (b) { const G = S.G; L.pushes = (L.pushes || 0) + 1; if (G && G.beatLen) { const f = (G.beat * 2) % 1, spb2 = G.beatLen / 2; L.rel.push(+(Math.min(f, 1 - f) * spb2 * 1000).toFixed(1)); } return pu.apply(this, arguments); }; return a; };
       v = wrap(S.eb); Object.defineProperty(S, 'eb', { get() { return v; }, set(a) { v = wrap(a); }, configurable: true }); };   // S.eb is rebuilt every frame: wrap each new array
     const st0 = FOOT.start; FOOT.start = function () { const r = st0.apply(this, arguments); hook(); return r; }; });
-  const sample = async () => p.evaluate(() => { const c = SND.AU.cur; return { st: c && c.stage, t: c && c.el ? c.el.currentTime : -1, bt: __mnr.BT.stage, mode: __mnr.BT.mode }; });
+  const sample = async () => p.evaluate(() => { const c = SND.AU.cur; return { st: (c && c.stage) || (__mnr.BT.mode === 'synth' ? __mnr.BT.stage : null), t: c && c.el ? c.el.currentTime : -1, bt: __mnr.BT.stage, mode: __mnr.BT.mode }; });
   const starts = [], blocked = [], poss = [];
   for (let i = 0; i < RUNS; i++) {
     await p.evaluate(() => { window.LOGM.calls.length = 0; RET.tale = false; });

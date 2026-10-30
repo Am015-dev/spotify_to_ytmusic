@@ -197,8 +197,8 @@ async function loading(b, W, H, touch) {
   const T = `${W}x${H} loading `, ctx = await b.br.newContext({ viewport: { width: W, height: H }, hasTouch: touch, isMobile: touch }); const p = await ctx.newPage(); p.errs = []; p.on('pageerror', e => p.errs.push(e.message));
   await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
-  await p.goto(b.base + '?nomusic=1', { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }); await sleep(400);
-  await p.route(/\/media\/(?!title)/, async r => { await sleep(700); r.continue().catch(() => { }); });     // slow assets
+  await p.route(/\/media\/(?!title)/, async r => { await sleep(700); r.continue().catch(() => { }); });     // slow assets from the first request (W264 loads the stage pictures at boot, so a route added after boot has nothing left to slow)
+  await p.goto(b.base + '?nomusic=1', { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && document.documentElement.classList.contains('rdy'), null, { timeout: 15000 });
   const seen = []; await p.exposeFunction('__veil', t => seen.push(t));
   await p.evaluate(() => { const o = new MutationObserver(() => { const e = document.getElementById('stageQ') || document.getElementById('footQ'); if (e) window.__veil(e.id + ':' + e.textContent + ':' + e.getAttribute('role')); }); o.observe(document.body, { childList: true, subtree: true, characterData: true }); });
   await press(p, '#focFlight', touch); await sleep(2500);
