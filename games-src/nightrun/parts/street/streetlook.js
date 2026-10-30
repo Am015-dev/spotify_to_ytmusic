@@ -192,17 +192,19 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;SL.hudFull=hudB+42*u;   // hudFull: the band with the hint line (tidy keeps flyers under it)
   if(!RET.pound2&&S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
+  const bossOn=S.boss&&!S.boss.dead,rl=x+pw_+10*u,rr=sr-sw-10*u,top=bossOn&&RET.pound2&&rr-rl>=150*u&&VH<=520*u,bk=bossOn&&RET.pound2&&!top?24*u:0;   // W286: boss bar in the free top row on a short wide screen; else directly under the panel with the hint line BELOW it (bk = its room), so the hint never pushes the bar onto the boss's head
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
-  if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u;}
+  if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u+bk;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u+bk;}
   if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=VH-20*u,a=.6+.4*Math.sin(S.time*14),bt='◀ BEHIND: a foe is arriving from the left';c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';
     c.font='bold '+fs(14)+'px monospace';const bw=Math.min(c.measureText(bt).width,vw-24*u);c.fillStyle='#000b';c.fillRect(6*u,fy-12*u,bw+12*u,24*u);c.fillStyle='#ffb020';c.fillText(bt,12*u,fy,vw-24*u);c.globalAlpha=1;}   // W161: 1 s warning for the edge a foe comes from; W267: one line on the empty road strip at the bottom, never over the actors
   SL.tag='';
   if(RET.pound2){   // W186 (?pound2=1 = on; OFF until its gates pass): boss bar and run-progress bar sit in the HUD stack under the hint line, never on the floor band (they used to cover the front depth)
-    const by=t0+SL.hudB,bossOn=S.boss&&!S.boss.dead;
-    if(bossOn){const bw=vw*.7,bx=vw*.15;c.fillStyle='#ffffff22';c.fillRect(bx,by+18*u,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by+18*u,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
-      c.textAlign='center';c.fillStyle='#fff';c.textBaseline='top';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by,vw-20*u);box(bx,by,bw,30*u);{const tm=c.getTransform();SL.barBot=tm.d*(by+30*u)+tm.f;}SL.hudB+=34*u;}
+    const by=top?t0+m:t0+hudB+4*u;
+    SL.bar=null;
+    if(bossOn){const bw=top?Math.min(rr-rl,360*u):vw*.7,bx=top?(rl+rr-bw)/2:vw*.15,bh=18*u;SL.bar={x:bx,y:by-t0,w:bw,h:bh};c.fillStyle='#00000099';c.fillRect(bx,by,bw,bh);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),bh);   // W286: one thin bar with the name on it (was name line + bar, 30u): the HUD is thinner, the boss art keeps its size
+      c.textAlign='center';c.textBaseline='middle';c.font='bold '+fs(12)+'px monospace';c.lineWidth=3*u;c.lineJoin='round';c.strokeStyle='#000c';const nm=S.boss.bname||'WARDEN';c.strokeText(nm,vw/2,by+bh/2+1*u,bw-12*u);c.fillStyle='#fff';c.fillText(nm,vw/2,by+bh/2+1*u,bw-12*u);box(bx,by,bw,bh);{const tm=c.getTransform();SL.barBot=tm.d*(by+bh)+tm.f;}if(!top)SL.hudB=Math.max(SL.hudB,hudB+4*u+bh+6*u);}
     else if(S.st.hook&&S.st.hook.hud&&!RET.purefoot){const dy=by+10*u-(VH-14*u);c.save();c.translate(0,dy);try{S.st.hook.hud(c,vw,u,(x,y,w,h)=>box(x,y+dy,w,h),fs,S);}catch(x){}c.restore();SL.hudB+=24*u;}}
   else if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
-  L.hud={hud:hb,hint,vw};IN.ghost();}
+  L.hud={hud:hb,hint,vw,bar:SL.bar};IN.ghost();}
 SL._p={slFrame,slPainted,slBackdrop,at,pkPic,slPic,slHud,slRR};   // purefoot.js (W217) reuses the frame, the painted backdrop, the depth placement and the HUD
 })();

@@ -26,7 +26,7 @@ const SEED = () => { try { localStorage.setItem('mnr_story', JSON.stringify({ st
       window.__hd = top; IN.drawWho = function (c, who) { const B = FOOT.S.boss, isB = B && !B.dead && who === B.id; let d0, rec = [];
         if (isB) { d0 = c.drawImage; c.drawImage = function (...a) { const nine = a.length >= 9, q = nine ? a.slice(5, 9) : a.slice(1, 5), m = c.getTransform(), o = nine ? opq(a[0], a[1], a[2], a[3], a[4]) : 0, y0 = q[1] + o * q[3]; if (q[3] > 40) rec.push([m.d * y0 + m.b * q[0] + m.f, Math.abs(q[2] * q[3] * m.a * m.d)]); return d0.apply(this, a); }; }
         try { return w0.apply(this, arguments); } finally { if (isB) { c.drawImage = d0; if (rec.length) top.hd.push([rec.reduce((a, b) => b[1] > a[1] ? b : a)[0], B.y, B.st]); } } };
-      X.slHud = function (c, L, S, vw, u, fs) { const m = c.getTransform(), r = h0.apply(this, arguments), bb = ((L.hud || {}).hud || []).find(q => Math.abs(q.w - .7 * vw) < 2);
+      X.slHud = function (c, L, S, vw, u, fs) { const m = c.getTransform(), r = h0.apply(this, arguments), bb = (L.hud || {}).bar;   // W286: the bar rect the HUD drew (top row on a short wide screen, else under the stack)
         if (bb && top.hd.length) { const bot = m.d * (bb.y + bb.h + SL.t0) + m.f, h = top.hd[0], hd = h[0] + (window.__nudge ? -20 : 0); top.fr.push([hd - bot, h[1], h[2]]); top.bar = bot; } top.hd = []; return r; }; });
     await p.evaluate(nd => { window.__nudge = nd; }, !!process.env.NUDGE);
     await p.waitForTimeout(6000);
@@ -34,10 +34,10 @@ const SEED = () => { try { localStorage.setItem('mnr_story', JSON.stringify({ st
       return { clear: g.length ? Math.min(...g.map(a => a[0])) : 1e9, all: f.length ? Math.min(...f.map(a => a[0])) : 1e9, n: g.length, bar: window.__hd.bar }; });
     const CLEAR = 8, hdOk = hdc.n > 20 && hdc.clear >= CLEAR; if (!hdOk) fails++;   // W282: INFO only. The measured value (-21 px on PC) contradicts the 1440x860 shot (head ~70 px below the bar): a halo / effect image drawn inside drawWho is probably counted as the head. Not trusted until it is measured on the opaque body pixels only.
     console.log((hdOk ? 'PASS' : 'FAIL') + ` ${w}x${h}: boss head clearance below the name bar: min ${hdc.clear.toFixed(1)} px over ${hdc.n} grounded frames (any frame incl. leaps: ${hdc.all.toFixed(1)}) (>= ${CLEAR} px)`);
-    const r = await p.evaluate(() => { const L = FOOT._in.L(), H = L.hud || {}; return { boxes: (H.hud || []).map(b => [b.x, b.y, b.w, b.h].map(v => Math.round(v))), hint: H.hint && [H.hint.x, H.hint.y, H.hint.w, H.hint.h].map(v => Math.round(v)), vw: H.vw, boss: !!FOOT.S.boss }; });
+    const r = await p.evaluate(() => { const L = FOOT._in.L(), H = L.hud || {}; return { boxes: (H.hud || []).map(b => [b.x, b.y, b.w, b.h].map(v => Math.round(v))), hint: H.hint && [H.hint.x, H.hint.y, H.hint.w, H.hint.h].map(v => Math.round(v)), vw: H.vw, bar: H.bar && [H.bar.x, H.bar.y, H.bar.w, H.bar.h].map(v => Math.round(v)), boss: !!FOOT.S.boss }; });
     if (process.env.DBG) console.log(JSON.stringify(r));
     // boxes are in view units (the HUD's own scale), so the boss bar is found by its width (0.7 x view width), not by pixel height
-    const bossBar = r.boxes.find(q => Math.abs(q[2] - .7 * r.vw) < 2), meter = r.boxes[r.boxes.length - 1];
+    const bossBar = r.bar || r.boxes.find(q => Math.abs(q[2] - .7 * r.vw) < 2), meter = r.boxes[r.boxes.length - 1];
     const overlaps = all => { const o = []; for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = all[i], b = all[j]; if (a[0] < b[0] + b[2] - 1 && a[0] + a[2] > b[0] + 1 && a[1] < b[1] + b[3] - 1 && a[1] + a[3] > b[1] + 1) o.push(JSON.stringify(a) + ' x ' + JSON.stringify(b)); } return o; };
     const nudge = bossBar ? [[bossBar[0], bossBar[1] + 6, bossBar[2], bossBar[3]]] : [], all = r.boxes.concat(r.hint ? [r.hint] : []), ov = overlaps(process.env.OVERLAP ? all.concat(nudge) : all);   // OVERLAP=1: deliberate overlap, the run must FAIL
     // the test must be able to fail: the same check on the real boxes plus a copy of the boss bar nudged 6 units down (a deliberate overlap) has to report it
