@@ -120,7 +120,7 @@ function buildDebris(){const n=320,im=new THREE.InstancedMesh(brickGeo(),new THR
   _m.makeScale(0,0,0);const c=new THREE.Color(1,1,1);for(let i=0;i<n;i++){im.setMatrixAt(i,_m);im.setColorAt(i,c)}scene.add(im);DEB={im,n,list:[],next:0}}
 function debris(at,vel,n,cols,size=1,floor){if(!DEB)return;size=Math.min(size,1)*.62/* debris-2: pieces <= ~0.9 m whatever the caller asks, so a smashed tree never throws house-size bricks */;for(let k=0;k<n;k++){const i=DEB.next;DEB.next=(DEB.next+1)%DEB.n;const j=DEB.list.findIndex(o=>o.i===i);if(j>=0)DEB.list.splice(j,1);
     DEB.list.push({i,p:at.clone().add(V3(rr(-1.2,1.2),rr(0,1),rr(-1.2,1.2))),v:vel.clone().add(V3(rr(-11,11),rr(5,17),rr(-11,11))).clampLength(0,22),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-10,10),rr(-10,10),rr(-10,10)),
-      s:V3(rr(.45,.9),rr(.35,.65),rr(.45,.9)).multiplyScalar(size),life:rr(2.2,2.8)/* world-r30b: long enough to land (apex ~0.7 s, down by ~1.6 s); was 1-1.5 s = bricks shrank away mid-air, read as debris hanging in the sky */,floor:Math.min(floor??at.y-1.2,at.y)});DEB.im.setColorAt(i,cols[k%cols.length])}DEB.im.instanceColor.needsUpdate=true}
+      s:V3(rr(.45,.9),rr(.35,.65),rr(.45,.9)).multiplyScalar(size),life:rr(1,1.5),floor:Math.min(floor??at.y-1.2,at.y)});DEB.im.setColorAt(i,cols[k%cols.length])}DEB.im.instanceColor.needsUpdate=true}
 // burst-1: transform celebration. A fresh instanced-brick group per swap (named brickfx_burst), 0.3 s life, shared geometry, disposed on expiry.
 // boot-4: materials are pooled (XFB_MP), not disposed: a disposed last user freed the program, so every burst re-linked it (~25-30 s Athens long frames); xfWarm() links it in the loader
 const XFB=[],XFB_MP=[];let XFB_GEO=null;

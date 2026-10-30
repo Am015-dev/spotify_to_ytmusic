@@ -2,7 +2,6 @@
 99c8_bot.js:BOT_go,BOT_rows,BOT_esc,BOT_escScan,BOT_dbg,RCL_scan,RCL_go
 99c9_collide.js:CA_rows,CA_run,CA_go
 99ctf_traffic_go.js:TRF_rows,TRF_go,TRF_measure
-99ctd_touchdrive_go.js:TD_rows,TD_go,TD_measure
 99ctl_traffic_law.js:TLW_rows,TLW_go,TLW_measure,TLF_go,TLF_table
 99c_checklist.js
 99c2_slowspots.js:SLOW1_go
@@ -39,5 +38,3 @@
 99hrq_quest_intro.js:qvIntro,qvShort
 99c6hr_mstart_go.js:HRM_run,HRM_card
 99c6gui_card_go.js:GUC_run,GUC_card
-99c6wr_world_go.js:WRG_pickup,WRG_roof,WRG_birds,WRG_mstart,WRG_camprop,WRG_inside,WRG_carMesh
-99rv_review.js:RV14_vis,RV14_ovl,RV14_carBox,RV14_mark,RV14_near,RV14_start,RV14_ride,RV14_pairs,RV14_reset,RV14_go,RV15_go,RV16_bug,RV16_turb,RV16_freed,RV16_near,RV16_type,RV15_SPOTS

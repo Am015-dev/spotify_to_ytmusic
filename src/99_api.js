@@ -114,12 +114,7 @@ function CR_lgTap(d){const n=performance.now();if(CR_LG.d===d&&n-CR_LG.t<300){CR
 function CR_lgGo(d){if(state==='race'){if(!paused&&pl&&!pl.finished)pressed.roll=d;return}if(state!=='roam'||!pl||RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story||pl.air||(RO.crLgCd||0)>0||(RO.crLg||0)>0)return;
  RO.crLg=.3;RO.crLgD=d;RO.crLgCd=1;RO.crLgN=(RO.crLgN||0)+1;AU.sfx('roll');CR_lgFx(pl)}
 addEventListener('keydown',e=>{if(e.repeat||(state!=='roam'&&state!=='race'))return;const d={ArrowLeft:-1,KeyA:-1,ArrowRight:1,KeyD:1}[e.code];if(d)CR_lgTap(d)});
-// touchdrive-r29b/d: on touch nothing fires from ONE arrow tapped twice (corner feathering is two quick taps on the same arrow). Race roll = a CHORD: both arrows go down within CRC.W ms of each other
-// (two thumbs landing together; a hand-over, where the old arrow has been held longer than that when the new one lands, never rolls: REVIEW_2K_32 point 3). Keyboard double-tap (CR_lgTap) is unchanged.
-const CRC={t:{'-1':-1e9,'1':-1e9},W:60};
-BZ.addEventListener('touchstart',e=>{try{const ts=CRSM_ts(e),sides=[];for(const t of e.changedTouches)sides.push(bzSide(t));let hit=0;
- if(state==='race'&&e.touches&&e.touches.length>=2){const all=[];for(const t of e.touches)all.push(bzSide(t));if(all.includes(-1)&&all.includes(1)){const last=sides[sides.length-1],other=-last;if(sides.includes(other)||ts-CRC.t[other]<=CRC.W)hit=last}}
- for(const d of sides)CRC.t[d]=ts;if(hit)CRSM_go(hit)}catch(_){}},{passive:true});
+BZ.addEventListener('touchstart',e=>{if(state!=='roam'&&state!=='race')return;const ts=CRSM_ts(e);for(const t of e.changedTouches)CRSM_tap(bzSide(t),ts)},{passive:true});
 // the lunge moves the car sideways (screen left/right) for 0.3 s; it stops at walls
 roamStep=(f=>function(dt){if(state==='roam')pressed.roll=0;const r=f(dt);try{if(state==='roam'&&pl&&!RO.wk){RO.crLgCd=Math.max(0,(RO.crLgCd||0)-dt);
  if(RO.crLg>0){RO.crLg-=dt;const k=CR_LGV*dt*RO.crLgD,nx=RO.x-Math.cos(RO.h)*k,nz=RO.z+Math.sin(RO.h)*k;if(!roamHit(nx,nz,1.2,RO.y)){RO.x=nx;RO.z=nz}else RO.crLg=0}}}catch(e){}return r})(roamStep);
@@ -160,11 +155,6 @@ const CRSM={d:0,t:-1e9,b:null,n:0,hn:0,pt:0,pd:0,acc:0};try{CRSM.hn=+(localStora
 function CRSM_ts(e){const n=performance.now(),t=e&&e.timeStamp;return typeof t==='number'&&t>0&&Math.abs(n-t)<2000?t:n}
 function CRSM_tap(d,ts){if(!d)return;const g=ts-CRSM.t;if(CRSM.d===d&&g>=0&&g<=350){CRSM.t=-1e9;CRSM_go(d)}else{CRSM.d=d;CRSM.t=ts}}
 CR_lgTap=function(d){CRSM_tap(d,performance.now())};
-// touchdrive-r29b: touch SMASH lunge = the arrow toward a car held, then BOOST PRESSED (a fresh press, not BOOST already held) with a traffic car beside you on that side (1-5.5 m to the side, within 6 m ahead/behind).
-// Plain BOOST, BOOST held while lane-steering, or steering away never lunges: REVIEW_2K_29 point c (a car sits in the window 17 % of a normal drive; the gauntlet lane bot lunged 4x in 2 min with BOOST held).
-const CRB={p:false,n:0};
-function CRB_side(want){const h=RO.h,lx=-Math.cos(h),lz=Math.sin(h),fx=Math.sin(h),fz=Math.cos(h);let bd=0,bl=9;for(const c of (typeof HUB!=='undefined'&&HUB.cars)||[]){if(!(c.dead<=0)||Math.abs((c.y||0)-RO.y)>3)continue;const ox=c.x-RO.x,oz=c.z-RO.z,lat=ox*lx+oz*lz,fw=ox*fx+oz*fz;if(want&&Math.sign(lat)!==want)continue;if(Math.abs(fw)<=6&&Math.abs(lat)>=1&&Math.abs(lat)<=5.5&&Math.abs(lat)<bl){bl=Math.abs(lat);bd=Math.sign(lat)}}return bd}
-roamStep=(f=>function(dt){try{if(state==='roam'){const b=!!(TOUCH.on&&TOUCH.used&&TOUCH.boost);if(b&&!CRB.p){const d=TOUCH.dir;if(d&&CRB_side(d)===d){CRB.n++;CRSM_go(d)}}CRB.p=b}}catch(e){}return f(dt)})(roamStep);
 function CRSM_modal(){if(paused||!pl)return true;if(state==='race')return !!(pl.finished||pl.dead>0);if(state==='roam')return !!(RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story);return true}
 function CRSM_go(d){if(CRSM_modal())return;CRSM.acc++;CRSM.b={d,age:0,t0:performance.now()};try{CRSM_fx(d)}catch(e){}CRSM_try()}
 function CRSM_try(){const b=CRSM.b;if(!b)return;if(b.age>.45||performance.now()-b.t0>1500||CRSM_modal()){CRSM.b=null;return}
@@ -199,23 +189,11 @@ hitPop=(f=>function(t,col){try{if(/SMASH|TAKEDOWN/.test(String(t))&&performance.
 const R3B_PANELS=['journal','m1Cs','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
 function R3B_panelOpen(){for(const id of R3B_PANELS){const e=document.getElementById(id);if(e&&!e.hidden&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden')return true}return false}
 function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='HIT FAST = SMASH';document.body.appendChild(h)}
- {const t=TOUCH.used&&state==='roam'?'ARROW + BOOST AT A CAR = SMASH':TOUCH.used&&state==='race'?'BOTH ARROWS = SMASH':'HIT FAST = SMASH';if(h.textContent!==t)h.textContent=t}
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
  if(state==='roam')return;/* hudstack-1: the left HUD stack positions it */
  h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-22))+'px'}
-// touchdrive-r29d: the SMASH tip. The HUD-stack hint (#crSmHint) is hidden by quiet roam (body.fdq), so nobody could find "hold the arrow toward the car, then BOOST". This pill shows the first 3 times a car is beside you
-// while driving on touch (once per 20 s), 14 px, placed by CRSM_pos clear of every button and the minimap, gone after 3.5 s or when a panel opens.
-const CRT={n:0,last:-1e9,on:false,el:null};try{CRT.n=+(localStorage.getItem('mho_smTip')||0)||0}catch(e){}
-function CRT_hide(){CRT.on=false;if(CRT.el)CRT.el.style.display='none'}
-function CRT_tick(){const ok=state==='roam'&&TOUCH.on&&TOUCH.used&&!paused&&RO.on&&!RO.card&&!RO.mapOpen&&!RO.story&&!RO.wk&&!RO.frozen&&!R3B_panelOpen()&&!document.body.classList.contains('cine');
- if(!ok){if(CRT.on)CRT_hide();return}if(CRT.on)return;if(CRT.n>=3||CRSM.hn>=2||performance.now()-CRT.last<20000||Math.abs(RO.v)<4)return;const d=CRB_side(0);if(!d)return;
- let e=CRT.el;if(!e){e=CRT.el=document.createElement('div');e.id='crSmTip';e.style.cssText='position:fixed;z-index:7;pointer-events:none;font:800 14px/1.15 system-ui,sans-serif;letter-spacing:.03em;color:#241400;background:#ffd12c;border:2px solid #141413;border-radius:999px;padding:6px 12px;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.35);display:none';document.body.appendChild(e)}
- e.textContent='HOLD '+(d<0?'◀':'▶')+' TOWARD THE CAR, THEN BOOST = SMASH';e.style.visibility='hidden';e.style.display='block';const[x,y]=CRSM_pos(d,e.offsetWidth,e.offsetHeight);e.style.left=x+'px';e.style.top=y+'px';e.style.visibility='';
- CRT.on=true;CRT.last=performance.now();CRT.n++;try{localStorage.setItem('mho_smTip',String(CRT.n))}catch(_){}clearTimeout(CRT.t);CRT.t=setTimeout(CRT_hide,3500)}
-setInterval(()=>{try{CRT_tick()}catch(e){}},200);
-window.__crt=CRT;
 setInterval(()=>{try{CRSM_hint()}catch(e){}},250);
 window.__crsm={get S(){return CRSM},hint:()=>CRSM_hint()};
 // ---- CAR26a: races have no civilian traffic; Crash Junction keeps its (max 3) cars parked at the track edge

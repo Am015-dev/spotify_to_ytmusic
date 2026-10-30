@@ -37,8 +37,7 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){if((BHQ
   // custom landmark towers (glass), used for the skyline icons
   const addBld=(x,z,w,d,h,kind,col,roof)=>{bt.add(colorize(bxUV(w,h,d,14,12).translate(x,h/2,z),new THREE.Color(col)),BM[kind]);let H=h;
     if(roof==='crown'){bt.add(cbox(w*.7,h*.06,d*.7,x,h+h*.03,z,col),BM.glass);bt.add(cbox(w*.4,h*.08,d*.4,x,h*1.09,z,'#dfe8f0'),BM.plain);H=h*1.13}else bt.add(cbox(w+.4,.6,d+.4,x,h+.3,z,'#3a3f48'),BM.plain);
-    // world-r30b: no neon trim on the roof edges (the old neon-city loop drew a magenta/cyan seam along every roof, gauntlet seen/roof-seam); the dark cap above stays; rnd() is still drawn so the seeded layout after it is unchanged
-    rnd();
+    const nm=pick(NEONS);for(const[a,b2,c2,d2]of[[w,.4,.4,0],[w,.4,.4,1],[.4,.4,d,2],[.4,.4,d,3]]){const g2=new THREE.BoxGeometry(a,b2,c2);g2.translate(x+(d2===2?-w/2:d2===3?w/2:0),H,z+(d2===0?-d/2:d2===1?d/2:0));bt.add(g2,nm)}
     if(h>80){const pg=new THREE.PlaneGeometry(w*.8,w*.4);pg.translate(x,h*.62,z+d/2+.5);bt.add(pg,pick(ADM))}hubAddB({x,z,hw:w/2,hd:d/2,h:H})};
   // Kenney buildings: instanced per model, tinted per instance; every footprint is checked against streets, filler roads, water and exclusions
   const KCELL=320,KB={},OCC=new Map(),ok=(x,z)=>Math.floor(x/50)*100000+Math.floor(z/50);
