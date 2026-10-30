@@ -1,8 +1,8 @@
 # Release check, branch nr/W282-rc (from nr/W281-boss-hp), 30 Oct 2026. Not deployed.
 Logs and shots (not committed): `/tmp/claude-0/-home-user-spotify-to-ytmusic/a3f01345-05bc-5980-86c5-93f31a03fca5/scratchpad/` (street/dodger*, street/bad, chk/*.txt, shots/, shots/flight, shots/flight12).
 One browser at a time, all on this one machine, 60 min limit: **seed counts are far below the 8 asked for**; every shortfall is in the table.
-## Recommendation: DO NOT SHIP (updated W283: the flight 0/16 is explained, it was the harness; the phone flight clear rate is 2/8 and still unexplained)
-Flight stage 1 (the first thing the focus-mode player plays): the 0/16 below was the harness (W283 row 5b); with the fix PC clears 4/4, phone 2/8. The street boss is cleared 1/3 on phone and 2/3 on PC by the dodger bot. Boss head clearance on phone is still unmeasured. Not shippable until the flight result is explained (regression or harness drift).
+## Recommendation: DO NOT SHIP (W284, 30 Oct 2026)
+Flight: no regression shown. Phone, fixed harness, seeds 1-4: control (W272) 4/8, RC 4/8 (z 0, p ~ 1); the check at n=8 per build cannot see a drop under about 60 points. The RC is 50 % (CI 22-78 %) against the 40 % gate: not resolvable either way. Dodger is the weak strategy on phone (control 0/4, RC 1/4) while PC dodger clears 4/4. No game-side defect was found for it (touch latency/speed/overlap measured fine, 85 % of life losses are in the wave phase, not the boss): see HANDOFF-W284.md. Not shippable yet because: fingerprint, sprites and labfull FAIL in smoke (not compared with the live branch, no time), the boss-head clearance (row 8) is still open, and no row has 8 seeds.
 ## Checks
 | # | Check | Result | Number |
 |---|---|---|---|
@@ -12,6 +12,7 @@ Flight stage 1 (the first thing the focus-mode player plays): the 0/16 below was
 | 4 | Street idle / random / masher must die | PASS, 1 seed each (not 3) | phone died 97 / 114 / 64 s; PC died 20 / 65 / 120 s; 0 clears (TS 4) |
 | 5 | Flight stage 1 dodger+shooter, qa/gauntlet-flight.js, defaults, 3 seeds/device | SUPERSEDED (W283) | the 0 clears were a harness defect, not a game regression: see row 5b |
 | 6 | Same with W273 settings, 4 seeds/device | SUPERSEDED (W283) | same cause, see row 5b |
+| 5c | W284: flight stage 1 phone, fixed harness, seeds 1-4 only, control vs RC | NOT RESOLVABLE | control W272: dodger 0/4, shooter 4/4 = 4/8; RC: dodger 1/4, shooter 3/4 = 4/8. All failures = 4 lives lost, 0 page errors. Seeds 5-8 not run (3 min per seed, 60 min limit). PC 8 seeds not re-run. Causes: HANDOFF-W284.md |
 | 5b | W283: flight stage 1, fixed harness (2 frames painted after each input burst), STEPS=12 WALL=420, one browser | PC PASS, phone BELOW GATE | PC dodger on this RC: 4/4 cleared (W281: 4/4). Phone on this RC (CDP touch): dodger 0/4, shooter 2/4 = 2/8 (25%, gate was 40%); the 6 phone failures lost all 4 lives with the boss seen 1-3 times, 0 page errors. Old harness on the W272 control: PC dodger 0/4 (same code that W273 measured 5/5). PC 8 seeds and a phone control on W272 with the fixed harness: see HANDOFF-W283.md |
 | 7 | HUD under result screen (defect b) | PASS (fixed) | streetlook.js slHud draws nothing when S.end is set; bossbar-layout-test asserts 0 HUD boxes with the result up at 3 sizes. Same check fails on W281 (4 boxes) |
 | 8 | Boss head >= 8 px below name bar (defect a) | NOT FIXED | the new measurement printed -71 px phone / -108 px landscape / -21 px PC, but the 1440 shot shows the head ~70 px below the bar, so the measurement counts an effect image: left as INFO in the test. Phone shot (W282 pc/phone dodger boss.jpg) shows ~5-10 px by eye |
@@ -25,9 +26,9 @@ Flight stage 1 (the first thing the focus-mode player plays): the 0/16 below was
 | 16 | preload-test | PASS | 15 pass |
 | 17 | streetsong 3 of 3 | PASS | RUNS=3, 6 pass |
 | 18 | streetdraw | PASS | 3 pass |
-| 19 | footvis | NOT RUN | needs git history (ref 58585ec51) that this shallow clone lacks; fetch failed |
+| 19 | footvis | PASS (W284) | 171 pass, 0 fail (phone + PC, fresh + stale strips, ref 58585ec51 present after the unshallow fetch) |
 | 20 | streetsim RUNS=40 x3 (4321 / 9001 / 17003) | PASS (balance gates) | gfirst 73/78/78, dodge 68/70/65, nearest 40/40/33, idle 0/40 (19.6 s). Still FAIL as on W280: threat peak (62%), cover >= 3 (0.3); block 17003 also D3 depth spread and real-time equality |
-| 21 | smoke.sh | NOT RUN | no time left; its fingerprint-test would also need the missing git ref. flow, shell and ui checks above were run individually |
+| 21 | smoke.sh (W284, 807 s, one browser) | FAIL 3 of 11 | PASS hud-cover, ui-align x3, hub 54, story 31, flow 61. FAIL fingerprint (8 of 8 scenarios differ from the stored hashes: fly2/6/10/14, boss, endless10, legend10, street; the runner did not hang, 286 s), FAIL sprites (2 of 38: hoplite boss arrives; f8 fx sheets not drawn in a real run, fx 0), FAIL labfull (1). NOT run on the live branch: it is not known which are new vs the live branch |
 | 22 | Page loads 0 errors 390x763 touch, 844x390, 1440x860 | PASS | 0 page errors in bossbar-layout-test (3 sizes), flow, shell, focus runs; flight and street gauntlets 0 errors |
 | 23 | Shots at 3 sizes of title, flight 10 s, flight boss, street 10 s, boss, pause, results | PARTLY | looked at: phone street boss, phone street clear result, PC street boss, phone result after the fix, phone flight 10 s, phone flight death screen. Not taken: 844x390 and 1440x860 for most screens, pause, flight boss, title |
 ## Looked at, ranked by what a new player sees first

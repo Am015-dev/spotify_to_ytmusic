@@ -17,7 +17,7 @@ e. Decision rate: NOT measured (no time for a STEPS=3 vs 12 run). Reasoning only
 ## Smallest game-side factor / ONE change
 No game defect found (no overlay, dead zone or speed clamp). Phone-specific difference that remains: the dodger bot's finger is lifted whenever it reaches 30 px from the frame edge (gauntlet-flight.js I.move) and re-grabbed one decision (0.2 s) later; the game stops the ship when the touch ends. That costs about 0.2 s of steering per edge visit, which exists only on touch. This is a bot artefact, UNPROVEN: not tested. Proposed ONE change (bot, not game): anchor the finger at the frame centre and re-centre it with a short separate move instead of lifting. No game code changed, no difficulty or art change.
 ## 3. footvis / smoke
-See the rows in RELEASE-CHECK-2026-10-30.md (19, 21).
+footvis PASS 171/0. smoke.sh FAIL 3 of 11 (fingerprint 8 scenarios differ from stored hashes, sprites 2 fail, labfull 1 fail), not compared with the live branch. Verdict DO NOT SHIP.
 ## Not done
 Seeds 5-8 on both builds; STEPS=3 comparison; PC 8 seeds; shots of the phone boss not looked at; the edge-lift hypothesis.
 ## Next (one task, sonnet)
