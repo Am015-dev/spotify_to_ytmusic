@@ -1,0 +1,5 @@
+# HANDOFF reload-r30l (Alex: "refreshed 5 times in 5 minutes"; REVIEW_2K_36 saw Athens reload at quest START under 6x)
+1. NOT reproduced. New check tools/reloadprobe.js (built page, iPhone UA, 852x393 touch, 6x CPU; START 3 Athens quests by the card button; counts navigations, pagehide, Location.reload calls, context loss, page errors): trunk a28ed13 6/6 runs 0 reloads; world-r30h c7a7842 4/4 runs 0 reloads. No FAIL seen, so no fix was made.
+2. Likely cause of the rev36 reload: its startprobe.js ran GO world/roof via __chk.go before the quest loop; GO items (src/99c_checklist.js ~688-693) set location.href to a ?go= test-drive URL when not in roam, i.e. a probe-made navigation, not a game reload. Unconfirmed; the world lane is not the cause.
+3. No self-reload path in game code at START: location.reload only in athDistGo (off by default, SM_ON seamless Athens), city flight, save import, rotation-free. Alex's real reloads were the iOS memory kill fixed in r25d (PMREM leak, GO mem/no-reload).
+4. Left: Frankfurt START not run; r25d note says the env is still rebuilt ~49x/5 min (key drift) = remaining iOS memory risk; needs a real-phone report from Beta.
