@@ -87,3 +87,9 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
   3. why/solid-cars#1 flake (gate 77/78, re-run PASS) — fix or delete — SONNET.
 - Then: OPUS tb redesign (+tb2), world round 4.
 - Running: gscript-r30o, mem-r30p (both SONNET/OPUS workers). Reviewer slot free.
+
+## 30 Oct ~23:00
+- gscript-r30o done (cf257a2, docs/GAUNTLET_ROWS.md): steer, drive/time/frustration/onStreet, hit/contact, drift/start, drift/tap were SCRIPT faults, now PASS in 2/2 runs. Real GAME reds: (1) drive/near traffic density near the player 0.5-0.7 vs bar 2.5 (density ring patch exists in docs/shots/traffic-r30c2/); (2) wall/headon: a head-on into a facade does not stop the car (a 40° glance does); (3) boot (known). Unstable, not closed: hit/noBrake, mission/reach, wall/glance setup.
+- mem-r30p: harness fix 76f98df on trunk (test-quick waits until ready). Patch measured (fra peak 558-576, ath 651-713 MB; env rebuilds 34-49 → 1 per 5 min) but held: why/glossy red + fra mem/stable +16 %. → mem-r30q (SONNET) landing it. TAG=mem trunk reds predate it (ath-boot, mem-quant, mem-own).
+- Started glbuf-r30r (SONNET): ath jsErrors WebGLAttributes buffer size.
+- Next worker slots: traffic density ring (drive/near), wall head-on stop, fra ios-reveal 1.4 s stall, solid-cars flake, TAG=mem trunk reds, unstable gauntlet rows; OPUS tb redesign; world round 4.
