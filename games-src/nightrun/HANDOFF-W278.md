@@ -20,6 +20,10 @@ Logs, results.json and shots (not committed): `/tmp/claude-0/-home-user-spotify-
 - streetsim RUNS=40 x3 blocks with the flags: NOT run. With the defaults OFF the shipped game is identical to W277's except for the build,
   so W277's gates stand (gfirst 83/80/83, dodge 68/68/65, idle 0, nearest 43/38/38, stand-still 19.6 s).
 - The random bot: not run. Shots of wind-up/charge/kill: not taken, not looked at (the harness wrote start/boss/death/result shots per run into the folders above, unviewed).
+## streetsim, 1 block (SEED0 4321, RUNS=40, Q=&bossadds=1&sbhp=5): indicative only
+It started about when I restored the build to W277's, so it most likely ran with sbhp=5 but WITHOUT the add stop. Against W277's block 1:
+gfirst 83% (83), dodge 68% (68), idle 0/40, nearest **53% (43): the casual gate 25-40 now fails**; threat peak 64% and cover 0.4 fail as on base.
+So boss hp x5 makes the stage too easy for a casual player. Another reason it must not ship as it stands. Report: scratchpad w278/streetsim-flags.md.
 ## Next step (one task, opus): the boss itself, not the adds. Without adds it is too passive vs an idle phone player and too tough vs the PC bot; a masher clears on PC.
 Look at streetboss.js approach/attack choice vs a still Kai, then PC. Find why the PC tactician loses 4-5 hearts to the boss's melee (charge) while the phone one loses 2-3: it is the same bot apart from
 auto-fire. Check whether the turn-to-shoot walks Kai into the charge; then re-run PC 8 seeds with ?bossadds=1&sbhp=5, then the full stage, masher/idle/random, streetsim x3.
