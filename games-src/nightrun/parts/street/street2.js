@@ -103,7 +103,7 @@ ST.hook={
   step(S,dt,env){const P=S.P;if(!S.s2){S.s2={broke:0,life:[],adds:0,addT:0,rooms:[]};S2.log=S.s2;
       for(const p of S.pr){const o=(ST.props[p.i]||[])[2]||{},d=IN.PROPD[p.k];p.mhp=p.hp;p.cover=!!o.cover;p.dr=o.dr||(p.k==='scrate'&&p.i%3===0?[['heal','bomb','w_shot','w_rocket'][p.i%4]]:[]);p.draw=propDraw(p);
         p.onBreak=q=>{S.s2.broke++;debris(S,q);if(q.k==='barrel')barrelBlast(S,q);};}}
-    const f=S.s2;S.note.t=0;   // no captions or chips during play
+    const f=S.s2;if(!S.note.teach)S.note.t=0;   // no captions or chips during play, except the one-time teaching notes (guard, parry, close call; W267: they were wiped every frame)
     const r=roomOf(S);if(f.rooms[f.rooms.length-1]!==r){f.rooms.push(r);}
     for(const p of S.pr)p.pass=p.hp>0&&p.cover&&abs(p.x-P.x)<p.w/2+70;   // the cover Kai stands at: his shots go over it
     for(const e of S.E)if(!e.dead&&!e.seen&&!e._sd&&!e.boss){e._sd=1;const G=env.G;if(abs(e.x-P.x)<260&&!e.fly){const other=e.x>P.x?G.camX-40:G.camX+G.viewW+40;if(abs(other-P.x)>=260)e.x=other;}}   // never spawn on top of Kai: come in from the far side

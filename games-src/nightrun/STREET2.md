@@ -23,7 +23,7 @@ Code: parts/street/street2.js (replaces FOOT.STAGES.zeil when on). Test: qa/stre
 - Scale: one body height per kind (Kai 64, rusher 62, gunner 64, heavy 84, boss heavy 96 units) drawn through the street's single
   world scale; feet on the road line (FL 470). Props use the existing sc-* pictures and the car strip, bottom on the road.
 - No captions or chips during play (the engine's ARENA/CHECKPOINT/WARNING notes are muted on this stage); telegraphs are red glows.
-- Rooms: each beat is a soft room (the camera holds until its foes are down), a short walk between rooms, one checkpoint at room 4 (it gives a heart back).
+- Rooms: each beat is a soft room (the camera holds until its foes are down), a short walk between rooms, no checkpoint on the live street3 stage (st.cps is empty; only ?street3=0 has the room-4 checkpoint).
 
 ## Gates (qa/street2-test.js)
 human-style bot clears 60-90%; >= 8 destructibles broken per run; no enemy alive > 25 s after it is seen;

@@ -2,8 +2,8 @@
 // FLAG: abil (?abil=0)
 // TEST: abil-test.js
 /* ---------- DASH + EMP abilities (flag RET.abil, ?abil=0 = the old dash and EMP exactly). b.js calls ABIL.dashIn() and ABIL.emp() where it read the keys.
-   DASH: charges (3, 4 from LV3) that refill one at a time (1.7 s at LV1 .. 1.2 s at LV5), fires on the press in the move / last stick direction.
-     On the beat it pays the old bonus (score, ON BEAT, tier +3) and refunds a fifth of a charge; off the beat it is a plain dash (no tier drop).
+   DASH: charges (3, 4 from LV3) that refill one at a time (4.1 s at LV1 .. 2.9 s at LV5 on Normal: base 1.7 s .. 1.2 s x TIM.RF 2.4), fires on the press in the move / last stick direction.
+     On the beat it pays the old bonus (score, ON BEAT, tier +3). The fifth-charge refund runs only with ?timing=0; under timing (default) a dead-on-beat dash that parries a shot gets a whole charge back (timing.js dash()).
      LV1-5 = 1 + the shop's extra-dash upgrade (SH.dmax) + 1 for a running power-up at LV3, +2 at LV5.
      The running timed power-up (G.pw.act) gives the dash a trait:
        NOVA / DRUM / TEMPO       burn trail: the path burns ordinary enemies that cross it

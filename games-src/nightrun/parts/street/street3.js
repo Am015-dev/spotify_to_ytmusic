@@ -1,4 +1,4 @@
-// PURPOSE: Street 3: the Zeil street as ONE 2.5-3 min stage on ONE song, threat rising gradually to a late peak, sheets loaded before play, steady frame rates, street lighting
+// PURPOSE: Street 3: the Zeil street as ONE stage of about 4-4.5 min (median clear 243-269 s measured W266; the 3 min target drifted) on ONE song, threat rising gradually to a late peak, sheets loaded before play, steady frame rates, street lighting
 // FLAG: street3 (?street3=0 = the street2 stage exactly)
 // TEST: qa/street3-test.js
 /* ---------- STREET3. Owner, 22 Oct 2026 (tested on foot): "stop making more stages, focus on one stage. The old assets load before the new ones; the assets are blurring;
