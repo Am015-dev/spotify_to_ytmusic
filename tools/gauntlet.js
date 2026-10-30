@@ -39,11 +39,13 @@ G.read=()=>{const o={T:+T.toFixed(3),st:state,on:!!RO.on,fz:!!RO.frozen,bh:!!RO.
  try{if(pl&&(state==='race'||state==='countdown'||state==='finished')){o.race={x:+pl.x.toFixed(2),yaw:+pl.yaw.toFixed(3),v:+(pl.v*3.6).toFixed(0),lap:pl.lap,dist:+pl.dist.toFixed(0),fin:!!pl.fin,hw:+((typeof TD!=='undefined'&&TD.hw)||0)}}}catch(e){}
  return o};
 G.cars=(R)=>{const out=[];for(const c of HUB.cars||[]){if(c.dead>0||c.pk)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<R)out.push({i:HUB.cars.indexOf(c),x:+c.x.toFixed(2),z:+c.z.toFixed(2),d:+d.toFixed(1),hh:typeof c.hh==='number'?+c.hh.toFixed(3):null})}return out.sort((a,b)=>a.d-b.d)};
-G.car=i=>{const c=(HUB.cars||[])[i];return c?{T:+T.toFixed(3),x:+c.x.toFixed(2),z:+c.z.toFixed(2),dead:+(c.dead||0),pk:!!c.pk,hitT:c.hitT||0,d:+Math.hypot(c.x-RO.x,c.z-RO.z).toFixed(2)}:null};
+G.cars2=(R)=>{const out=[];for(const c of HUB.cars||[]){if(c.dead>0||c.pk)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<R)out.push({i:HUB.cars.indexOf(c),x:+c.x.toFixed(2),z:+c.z.toFixed(2),d:+d.toFixed(1),a:c.a,b:c.b,t:+(+c.t).toFixed(3),cv:+(c.cv||0).toFixed(2),hitT:c.hitT||0})}return out};   // gscript-r30o: edge + speed of a traffic car (read-only), for the hit target choice
+G.car=i=>{const c=(HUB.cars||[])[i];return c?{a:c.a,b:c.b,T:+T.toFixed(3),x:+c.x.toFixed(2),z:+c.z.toFixed(2),dead:+(c.dead||0),pk:!!c.pk,hitT:c.hitT||0,d:+Math.hypot(c.x-RO.x,c.z-RO.z).toFixed(2)}:null};
 G.nodes=()=>(HUB.nodes||[]).map(n=>[+n.x.toFixed(1),+n.z.toFixed(1),n.nb||[],n.pk?1:0,n.ab?1:0,+(n.w||8)]);
 G.marks=()=>(RO.marks||[]).filter(m=>m.ev).map(m=>({x:m.x,z:m.z,kind:m.ev.kind,id:m.ev.id||'',name:String(m.ev.name||m.ev.t||'').slice(0,40),dyn:!!m.dyn,d:Math.round(Math.hypot(m.x-RO.x,m.z-RO.z))})).sort((a,b)=>a.d-b.d).slice(0,40);
 // pure collider lookup (no side effects): used only to SEE where a wall is, like a player looking ahead
 G.wallAhead=(a,R)=>{for(let r=2;r<=R;r+=1){const x=RO.x+Math.sin(a)*r,z=RO.z+Math.cos(a)*r;let b=null;try{b=roamHit(x,z,.6,RO.y+.5)}catch(e){return -1}if(b)return r}return 0};
+G.wallScan=(as,R)=>as.map(a=>{for(let r=2;r<=R;r+=1){const x=RO.x+Math.sin(a)*r,z=RO.z+Math.cos(a)*r;let lo=null,hi=null;try{lo=roamHit(x,z,.6,RO.y+.5);if(lo)hi=roamHit(x,z,.6,RO.y+5)}catch(e){return -1}if(lo)return hi?r:0}return 0});   // a WALL is solid at car height AND 5 m up (a building); a prop/tree/minifig only at car height blocks the scan (0)   // gscript-r30o: the same pure collider lookup at several angles (a facade is a wall at ALL of them, a prop or a minifig only at one)
 G.sample=dt=>{const x=RO.x,z=RO.z,P=G.P||{x,z,v:RO.v};const mv=Math.hypot(x-P.x,z-P.z),warp=mv>12;
  const drop=(Math.abs(P.v)-Math.abs(RO.v))*3.6;if(!warp&&drop>G.maxDrop)G.maxDrop=drop;
  let cf;try{const d=new THREE.Vector3();camera.getWorldDirection(d);cf=[camera.position.x,camera.position.z,d.x,d.z]}catch(e){cf=[x,z,Math.sin(RO.h),Math.cos(RO.h)]}
@@ -109,7 +111,8 @@ const W=a=>Math.atan2(Math.sin(a),Math.cos(a));
 // measured (row steer/buttons): ◀ makes RO.h grow (+x is screen-left with the camera looking down +z), ▶ makes it shrink
 const steer=(st,a,dead=.06)=>{const e=W(a-st.h);return e>dead?['tL']:e<-dead?['tR']:[]};
 // speed hold with GAS / BRAKE like a thumb would
-const pace=(st,kmh)=>st.v<kmh-3?['tG']:st.v>kmh+10?['tB']:[];
+// BRAKE + an arrow is a drift in this game (and a drift gains speed: drift/start 61 -> 114 km/h), so a thumb that only wants to slow down lifts GAS first and brakes only far over the pace
+const pace=(st,kmh)=>st.v<kmh-3?['tG']:st.v>kmh+25?['tB']:[];
 
 // ---------- road follower (reads the street graph = the streets the player sees) ----------
 function Router(nodes){const N=nodes,ok=i=>N[i]&&!N[i][3]&&!N[i][4];
@@ -124,7 +127,7 @@ function Router(nodes){const N=nodes,ok=i=>N[i]&&!N[i][3]&&!N[i][4];
   const q=N[j],L2=Math.hypot(q[0]-m[0],q[1]-m[1])||1,f=Math.min(1,(look-rem)/L2);this.bend=Math.abs(W(Math.atan2(q[0]-m[0],q[1]-m[1])-h));
   return Math.atan2(m[0]+(q[0]-m[0])*f-st.x,m[1]+(q[1]-m[1])*f-st.z)},
  // a thumb slows for a bend: cruise kmh, 30 km/h into a bend > 0.6 rad
- drive(st,kmh=55,goal){const a=this.aim(st,goal),e=Math.abs(W(a-st.h));return[...pace(st,e>.6||this.bend>.6?30:kmh),...steer(st,a)]},
+ drive(st,kmh=55,goal){const a=this.aim(st,goal),e=Math.abs(W(a-st.h));const p=pace(st,e>.6||this.bend>.6?30:kmh);return[...p,...(p.includes('tB')?[]:steer(st,a))]},
  off(st){const s=near(st);return s?s.d-s.w/2:99}}}
 
 // debug (GTRAP): the instrumented three's null-array upload records -> <report>/trap.jsonl
@@ -189,22 +192,37 @@ async function scSteer(P,router){const out={};const dbg=process.env.GDEBUG;
  const okL=out.tL.every(x=>!x.bad&&x.dh>20),okR=out.tR.every(x=>!x.bad&&x.dh<-20);
  row('steer/buttons','hold GAS + ◀ (or ▶) for 1.2 s at ~30-50 km/h turns the car that way',`◀ ${out.tL.map(x=>'left '+x.dh+'°').join(', ')} · ▶ ${out.tR.map(x=>'right '+(-x.dh)+'°').join(', ')}`,'each >= 20° the pressed way',okL&&okR,'',out.tL.concat(out.tR).map(x=>(x.bad?'no setup (script) at ':'from ')+x.v0+' km/h').join(', '))}
 
-async function scHits(P,router){const res=[];const shots=[];
- for(let k=0;k<5;k++){// a traffic car 12-70 m ahead within ±60°: drive at it, catching up if it drives away, ~40 km/h in the last 15 m
-  let st=P.st,tgt=null;for(let tries=0;tries<20&&!tgt;tries++){const c1=await P.ev('__GH.cars(70)');st=await P.run(.3,s=>router.drive(s));const c2=await P.ev('__GH.cars(70)');const fx=Math.sin(st.h),fz=Math.cos(st.h);const cand=c2.map(c=>{const o=c1.find(q=>q.i===c.i);if(!o)return null;const vx=(c.x-o.x)/.3,vz=(c.z-o.z)/.3;return{...c,along:vx*fx+vz*fz}}).filter(c=>c&&c.d>12&&c.d<70&&Math.abs(W(Math.atan2(c.x-st.x,c.z-st.z)-st.h))<1.0);tgt=cand.find(c=>c.along<6)||(tries>=8?cand.find(c=>c.along<12):null);if(!tgt)st=await P.run(1.5,s=>router.drive(s))}
-  if(!tgt){res.push({ok:false,minD:null,why:'no car in front'});continue}
-  const t0=st.T,hp0=st.hp;let minD=1e9,contact=null,vAt12=null,vC=null,prev=null,velB=null,velA=null,gone=null;
-  while(st.T-t0<12){const c=await P.ev(`__GH.car(${tgt.i})`);if(!c)break;if(prev&&Math.hypot(c.x-prev.x,c.z-prev.z)>15){if(!contact&&prev.d<7){contact={T:st.T,d:prev.d,smash:1};vC=st.v;velA=[99,99];velB=[0,0]}else if(!contact)gone=prev.d;break}
-   if(prev&&c.T>prev.T){const vx=(c.x-prev.x)/(c.T-prev.T),vz=(c.z-prev.z)/(c.T-prev.T);if(!contact)velB=[vx,vz];else if(st.T-contact.T>.3&&!velA)velA=[vx,vz]}prev=c;
-   minD=Math.min(minD,c.d);if(vAt12==null&&c.d<12)vAt12=st.v;
-   if(!contact&&c.d<6){contact={T:st.T,d:c.d};vC=st.v;shots[k]=await P.shot(`fra_3_hit_${k+1}`)}
-   if(contact&&velA)break;if(contact&&st.T-contact.T>1.2)break;
-   const a=Math.atan2(c.x-st.x,c.z-st.z);await P.set([...(c.d>18?pace(st,c.d>30?65:45):['tG']),...steer(st,a,.04)]);st=await P.step(2)}/* last 18 m: GAS held, never BRAKE, so any speed lost before contact is the game's */
-  const dv=velB&&velA?Math.hypot(velA[0]-velB[0],velA[1]-velB[1]):0;
-  res.push({ok:!!contact,gone,minD:+minD.toFixed(1),vAt12,vC,dv:+dv.toFixed(1),react:!!contact&&dv>2,hp:+(hp0-st.hp).toFixed(1)});
+async function scHits(P,router){const res=[];const shots=[];const N=router.N;let noCar=0;const PK={off:0,n:0,cars:0,cand:0};
+ const eL=c=>{const a=N[c.a],b=N[c.b];return a&&b?Math.hypot(b[0]-a[0],b[1]-a[1]):0};
+ // REVIEW_2K_32 "how the hit row should pick its target": a car on MY street (|bearing| <= .35 rad, <= 5 m off my heading line: oncoming traffic sits in the other lane 3-4 m over), that CLOSES (>= 3 m/s) and drives (cv >= 2 m/s),
+ // that has street left ahead of it (the edge ends are short here, so >= 15 m left or enough for the meeting; a turn-off before the meeting re-picks, it is not a miss), picked only while I am on a street
+ const pick=async()=>{const s0=P.st,c1=await P.ev('__GH.cars2(90)');const st=await P.run(.3,s=>router.drive(s));const dt=Math.max(.1,st.T-s0.T);const c2=await P.ev('__GH.cars2(90)');
+  if(router.off(st)>1.5){PK.off++;return{st}}
+  const fx=Math.sin(st.h),fz=Math.cos(st.h),vp=st.v/3.6;
+  const cand=c2.map(c=>{const o=c1.find(q=>q.i===c.i);if(!o||o.a!==c.a||o.b!==c.b)return null;const dx=c.x-st.x,dz=c.z-st.z,d=Math.hypot(dx,dz),brg=W(Math.atan2(dx,dz)-st.h),lat=Math.abs(dx*fz-dz*fx),cl=(o.d-c.d)/dt,rem=(1-c.t)*eL(c),tc=d/Math.max(cl,.1);
+   const vx=(c.x-o.x)/dt,vz=(c.z-o.z)/dt,along=vx*fx+vz*fz;return{...c,brg,lat,cl,along,rem,tc}}).filter(c=>c&&c.d>12&&c.d<70&&Math.abs(c.brg)<=.35&&c.lat<=5&&c.cl>=3&&c.cv>=2&&(c.rem>=c.cv*c.tc+4||c.rem>=15));
+  if(process.env.GDEBUG){const all=c2.map(c=>{const o=c1.find(q=>q.i===c.i);if(!o||o.a!==c.a||o.b!==c.b)return null;const dx=c.x-st.x,dz=c.z-st.z;return{d:c.d,brg:+W(Math.atan2(dx,dz)-st.h).toFixed(2),lat:+Math.abs(dx*fz-dz*fx).toFixed(1),cl:+((o.d-c.d)/dt).toFixed(1),cv:c.cv,rem:+((1-c.t)*eL(c)).toFixed(0)}}).filter(c=>c&&c.d>12&&c.d<70);console.log('DBG pick',c2.length,'cars<90',JSON.stringify(all.slice(0,5)))}
+  PK.n++;PK.cars+=c2.length;PK.cand+=cand.length>0;
+  cand.sort((p,q)=>(p.along<0?0:1)-(q.along<0?0:1)||p.d-q.d);return{st,tgt:cand[0]||null}};
+ for(let k=0;k<5;k++){// up to 4 pick windows of 25 tries each before "no car" counts; re-pick (not a miss) when the target changes edge before it is inside 12 m
+  let st=P.st,tgt=null,rp=0,r=null;
+  for(let win=0;win<4&&!tgt;win++){for(let tries=0;tries<25&&!tgt;tries++){const q=await pick();st=q.st;tgt=q.tgt||null;if(!tgt)st=await P.run(.5,s=>router.drive(s))}}
+  while(tgt){const t0=st.T,hp0=st.hp;let minD=1e9,contact=null,vAt12=null,vC=null,prev=null,velB=null,velA=null,gone=null,repick=false,cl=8;
+   while(st.T-t0<12){const c=await P.ev(`__GH.car(${tgt.i})`);if(!c)break;
+    if(prev&&(c.a!==tgt.a||c.b!==tgt.b)&&prev.d>12&&rp<3){repick=true;break}
+    if(prev&&Math.hypot(c.x-prev.x,c.z-prev.z)>15){if(!contact&&(prev.hitT>0||prev.d<7+cl*.12)){contact={T:st.T,d:prev.d,smash:1};vC=st.v;velA=[99,99];velB=[0,0]}else if(!contact)gone=prev.d;break}
+    if(prev&&c.T>prev.T){cl=Math.max(0,(prev.d-c.d)/(c.T-prev.T));const vx=(c.x-prev.x)/(c.T-prev.T),vz=(c.z-prev.z)/(c.T-prev.T);if(!contact)velB=[vx,vz];else if(st.T-contact.T>.3&&!velA)velA=[vx,vz]}prev=c;
+    minD=Math.min(minD,c.d);if(vAt12==null&&c.d<12)vAt12=st.v;
+    if(!contact&&c.d<6){contact={T:st.T,d:c.d};vC=st.v;shots[k]=await P.shot(`fra_3_hit_${k+1}`)}
+    if(contact&&velA)break;if(contact&&st.T-contact.T>1.2)break;
+    const a=Math.atan2(c.x-st.x,c.z-st.z);await P.set([...(c.d>18?pace(st,c.d>30?65:45):['tG']),...steer(st,a,.04)]);st=await P.step(2)}/* last 18 m: GAS held, never BRAKE, so any speed lost before contact is the game's */
+   if(repick){rp++;await P.allUp();tgt=null;for(let tries=0;tries<25&&!tgt;tries++){const q=await pick();st=q.st;tgt=q.tgt||null;if(!tgt)st=await P.run(.5,s=>router.drive(s))}if(tgt)continue;break}
+   const dv=velB&&velA?Math.hypot(velA[0]-velB[0],velA[1]-velB[1]):0;
+   r={ok:!!contact,gone,minD:+minD.toFixed(1),vAt12,vC,dv:+dv.toFixed(1),react:!!contact&&dv>2,hp:+(hp0-st.hp).toFixed(1),rp};break}
+  if(!r){noCar++;res.push({ok:false,minD:null,why:'no car in front'})}else res.push(r);
   await P.allUp();st=await P.run(1,s=>['tB']);st=await P.run(2,s=>router.drive(s))}
- const n=res.filter(r=>r.ok).length,re=res.filter(r=>r.react).length;
- row('hit/contact','nose into 5 traffic cars ahead that close on me (oncoming/slower), GAS held in the last 18 m',`${n}/5 contacts`,'>= 4/5 (hr/hit: contact in >= 9/10)',n>=4,shots.find(Boolean)||'',res.map(r=>r.ok?`hit at ${r.vC} km/h`:r.minD==null?'no car in front':r.gone!=null?`target vanished at ${r.gone} m`:`miss, closest ${r.minD} m`).join(', '));
+ const tried=res.filter(r=>r.minD!=null),n=res.filter(r=>r.ok).length,re=res.filter(r=>r.react).length;
+ row('hit/contact','nose into 5 traffic cars on my street that close on me (target rules: REVIEW_2K_32), GAS held in the last 18 m',`${n}/${tried.length} contacts${noCar?` (+${noCar} no target found in 4 windows)`:''}`,'>= 4/5 (hr/hit: contact in >= 9/10); a window with no valid target is not a miss',tried.length>=4&&n>=4&&n/tried.length>=.8,shots.find(Boolean)||'',`picks ${PK.n}, off-street ${PK.off}, cars<90 m avg ${(PK.cars/Math.max(1,PK.n)).toFixed(1)}, with a valid target ${PK.cand}; `+res.map(r=>r.ok?`hit at ${r.vC} km/h${r.rp?' (re-picked '+r.rp+')':''}`:r.minD==null?'no car in front':r.gone!=null?`target vanished at ${r.gone} m`:`miss, closest ${r.minD} m`).join(', '));
  row('hit/react','hit car reacts: its HUB position velocity changes > 2 m/s within 0.3-1.2 s',`${re}/${n} contacts`,'INFO: this read misses thrown cars (shots show them tumbling); judge by the hit shots',null,'',res.filter(r=>r.ok).map(r=>'Δv '+r.dv+' m/s').join(', '));
  const slow=res.filter(r=>r.ok&&r.vAt12>0).map(r=>100*(1-r.vC/r.vAt12));
  row('hit/noBrake','our speed lost between 12 m and contact (no braking against nothing)',slow.length?`max ${Math.max(...slow).toFixed(0)} %`:'n/a (no contact)','<= 5 % (HITRUN_GAP gap 1)',slow.length?Math.max(...slow)<=5:false,'');
@@ -225,26 +243,40 @@ async function scDrift(P,router){const D=[],T=[];let shot='';
  row('drift/tap','a 0.15 s BRAKE tap in a corner never slides',`${tBad}/${3-tB} slid (peak ${T.map(t=>t.bad?'no setup':t.peak+'°').join(', ')})`,'0 slid, 3 valid setups',tBad===0&&tB===0,'')}
 
 async function scWalls(P,router){const G=[],H=[];let shots=[];
- const one=async(ang,kind,idx)=>{for(let a=0;a<6;a++){let st=await onStraight(P,router,kind==='head'?45:40);const side=RNG()<.5?-1:1;const road=router.aim(st);const tgt=road+side*ang;
-   if(st.bad)continue;const wd=await P.ev(`__GH.wallAhead(${tgt},45)`);if(!(wd>7)){await P.run(2,s=>router.drive(s));continue}
+ const one=async(ang,kind,idx)=>{for(let a=0;a<10;a++){let st=await onStraight(P,router,kind==='head'?45:40);const side=RNG()<.5?-1:1;const road=router.aim(st);
+   if(st.bad)continue;
+   // aim at a wall the way a player picks one: look along headings 11-86 deg off the street, take a facade (three probes at a-7, a, a+7 deg hit nearly one straight line, 10-40 m away),
+   // and use the MEASURED angle between my line and that wall (0 = scrape, 90 = head-on): glance 17-49 deg (nearest to the asked angle), head-on >= 72 deg. A prop or minifig fails the straight-line test.
+   let best=null;{const OFF=[];for(let o=.2;o<=1.55;o+=.1)OFF.push(o);
+    for(const sd of side>0?[1,-1]:[-1,1]){const as=[];for(const o of OFF){const a0=road+sd*o;as.push(a0-.12,a0,a0+.12)}const ds=await P.ev(`__GH.wallScan(${JSON.stringify(as)},45)`);
+     for(let q=0;q<OFF.length;q++){const [l,c,r]=ds.slice(q*3,q*3+3);if(!(l>0&&c>=10&&c<=40&&r>0))continue;const a0=road+sd*OFF[q],pl=[Math.sin(a0-.12)*l,Math.cos(a0-.12)*l],pc=[Math.sin(a0)*c,Math.cos(a0)*c],pr=[Math.sin(a0+.12)*r,Math.cos(a0+.12)*r];
+      const tx=pr[0]-pl[0],tz=pr[1]-pl[1],tl=Math.hypot(tx,tz);if(tl<3)continue;if(Math.abs((pc[0]-pl[0])*tz-(pc[1]-pl[1])*tx)/tl>1.5)continue;
+      const dth=Math.abs(W(Math.atan2(tx,tz)-a0)),inc=Math.min(dth,Math.PI-dth);if(kind==='head'?inc<1.25:(inc<.30||inc>.85))continue;
+      const score=kind==='head'?-inc:Math.abs(inc-ang);if(!best||score<best.score)best={a:a0,wd:c,inc,score}}
+     if(best)break}if(process.env.GDEBUG)console.log('DBG wall',kind,'v',st.v,'best',best&&JSON.stringify({d:best.wd,inc:+(best.inc*57.3).toFixed(0)}))}
+   if(!best){await P.run(2,s=>router.drive(s));continue}
+   const tgt=best.a,wd=best.wd,inc=best.inc;
    // turn onto the wall line with ◀/▶, then hold GAS straight at it
    st=await P.run(2,s=>Math.abs(W(tgt-s.h))<.05?'stop':[...pace(s,kind==='head'?45:40),...steer(s,tgt,.03)]);
    const hp0=st.hp;let vb=null,hit=null,va=null,peakDrop=0;const t0=st.T;let prev=st;const sx=st.x,sz=st.z;
    while(st.T-t0<6){st=await P.step(1);const drop=prev.v-st.v;if(!hit&&drop>2.5&&st.v<prev.v&&Math.hypot(st.x-sx,st.z-sz)>=wd-3.5){hit={T:st.T};vb=prev.v;if(vb<(kind==='head'?30:25)){hit=null;break}shots[idx]=await P.shot(`fra_5_${kind}_${idx+1}`)}if(hit&&st.T-hit.T>=.5){va=st.v;break}if(!hit){const k=Math.abs(W(tgt-st.h))>.04?steer(st,tgt,.03):[];await P.set([...pace(st,kind==='head'?45:40),...k])}else await P.set(['tG']);prev=st}
    await P.allUp();if(!hit)continue;st=await P.run(1.2,s=>['tB']);await P.allUp();st=await P.run(1.5,s=>router.drive(s));
-   if(!hit)continue;return{ang:Math.round(ang*57.3),vb:+vb.toFixed(0),va:+(va??st.v).toFixed(0),keep:Math.round(100*(va??0)/Math.max(vb,1)),hp:+(hp0-st.hp).toFixed(1),dist:wd}}return null};
+   if(!hit)continue;return{ang:Math.round(inc*57.3),vb:+vb.toFixed(0),va:+(va??st.v).toFixed(0),keep:Math.round(100*(va??0)/Math.max(vb,1)),hp:+(hp0-st.hp).toFixed(1),dist:wd}}return null};
  const angs=[.35,.5,.65,.78];for(let i=0;i<4;i++)G.push(await one(angs[i],'glance',i));for(let i=0;i<2;i++)H.push(await one(1.45,'head',i));
  const g=G.filter(Boolean),h=H.filter(Boolean),gOk=g.filter(x=>x.keep>=60&&x.hp<=0).length;
  row('wall/glance','glance a wall at 20-45° at ~40 km/h',`${gOk}/4 keep >= 60 % & no damage (${g.map(x=>x.ang+'° '+x.vb+' km/h '+x.keep+'% -'+x.hp+'hp').join(', ')||'no wall reached'}${G.length-g.length?'; '+(G.length-g.length)+' not set up (script)':''})`,'4/4',gOk===4,shots.slice(0,4).find(Boolean)||'');
  const hOk=h.filter(x=>x.keep<=35).length;
  row('wall/headon','head-on into a wall at ~45 km/h slows hard',`${hOk}/2 (${h.map(x=>x.vb+'->'+x.va+' km/h -'+x.hp+'hp').join(', ')||'no wall reached'}${H.length-h.length?'; '+(H.length-h.length)+' not set up (script)':''})`,'2/2 keep <= 35 %',hOk===2,shots.slice(4).find(Boolean)||'')}
 
-async function scMission(P,router){let marks=await P.ev('__GH.marks()');const QK=['quest','collect','smash','wall','drift','speed','longjump','chase','deliver','taxi','photo','stunt','escort','ball','checkpoint'],m=marks.find(q=>['quest','collect'].includes(q.kind)&&!q.dyn&&q.d<400)||marks.filter(q=>QK.includes(q.kind)&&!q.dyn).sort((a,b)=>a.d-b.d)[0]/* a quest / challenge card at any distance, never a race-mode card */||marks.find(q=>!q.dyn&&!['garage','flight','nav','pit','gate','chase'].includes(q.kind));/* a static beacon (quest / stud rush) first: a chase van drives off */
+async function scMission(P,router){let marks=await P.ev('__GH.marks()');const QK=['quest','collect','smash','wall','drift','speed','longjump','deliver','taxi','photo','stunt','escort','ball','checkpoint'];
+ // gscript-r30o: the nearest open quest beacon first (a static, not-done, not-locked mark: __GH.mk), then any static challenge; never a chase van (it drives off). Routed along streets like world/quests.
+ const qs=(await P.ev('__GH.mk("quest")')).sort((a,b)=>a.d-b.d),m=qs[0]?{kind:'quest',name:qs[0].id,x:qs[0].x,z:qs[0].z,d:qs[0].d}:(marks.filter(q=>QK.includes(q.kind)&&!q.dyn).sort((a,b)=>a.d-b.d)[0]||marks.find(q=>!q.dyn&&!['garage','flight','nav','pit','gate','chase'].includes(q.kind)));
  if(!m){row('mission/reach','drive to the nearest mission marker','no marker','reached <= 60 s game',false,'');return}
- let st=P.st;const t0=st.T;let card=false,stuck=0,rev=0;const goal=[m.x,m.z];
- let tapped=0;while(st.T-t0<90&&!card){st=await P.run(1,s=>{if(rev>0){rev-=DT*3;return['tB','tL']}const d=Math.hypot(goal[0]-s.x,goal[1]-s.z);if(d<9)return s.v>2?['tB']:[];/* stop in the beacon */if(s.v<3){stuck+=DT*3;if(stuck>2){stuck=0;rev=1.2}}else stuck=0;const a=d<150?Math.atan2(goal[0]-s.x,goal[1]-s.z):router.aim(s,goal);return[...pace(s,d<40?25:45),...steer(s,a)]/* within 150 m a player turns to the beacon and drives straight at it */});
-  let v=await P.vis();if(v.ids.roamPrompt&&!st.card){await P.allUp();if(await P.tapSel('#roamPrompt'))tapped++;await P.step(6);v=await P.vis()}
-  card=st.card||v.ids.roamCard||v.ids.rcGo||st.ch;if(process.env.GDEBUG)console.log('DBG mission',JSON.stringify({d:Math.round(Math.hypot(goal[0]-st.x,goal[1]-st.z)),v:st.v,card:st.card,ch:st.ch,ids:Object.keys(v.ids).filter(k=>v.ids[k]).join(',')}))}
+ let st=P.st;const t0=st.T;let card=false;const goal=[m.x,m.z];
+ let tapped=0;const tapChip=async()=>{/* the stop-next-to-a-marker chip is #rqAsk ('… · TAP TO OPEN'), #roamPrompt is the older prompt */for(const sel of['#rqAsk','#roamPrompt'])if(await P.tapSel(sel)){await P.step(6);return true}return false};
+ st=await mkGo(P,router)(goal,7,90,60,async(s,d)=>{if(d<12&&s.v<4){await P.allUp();if(await tapChip())tapped++;const s2=await P.step(1);return s2.card||s2.ch}return false});
+ st=await P.step(6);for(let w=0;w<12&&!(st.card||st.ch);w++){if(!await tapChip()){await P.p.waitForTimeout(500)/* the TAP TO OPEN prompt runs on a wall-clock timer */;const d=Math.hypot(goal[0]-st.x,goal[1]-st.z);await P.run(.3,s=>d>6?[...pace(s,8),...steer(s,Math.atan2(goal[0]-s.x,goal[1]-s.z))]:(s.v>1?['tB']:[]))}else tapped++;st=await P.step(1)}
+ {const v=await P.vis();card=st.card||v.ids.roamCard||v.ids.rcGo||st.ch}
  await P.allUp();
  row('mission/reach',`drive to the nearest mission marker (${m.kind} "${m.name}", ${m.d} m)`,card?`${(st.T-t0).toFixed(0)} s game${tapped?', tapped the TAP TO OPEN prompt':', stopped in the beacon'}`:'no card in 90 s','reached <= 60 s game',card&&st.T-t0<=60,'');
  if(!card)return;
