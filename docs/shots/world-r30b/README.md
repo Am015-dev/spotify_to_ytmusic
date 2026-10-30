@@ -1,6 +1,6 @@
-# world-r30b: before (trunk 1584590) / after, same spot + camera, 852x393 phone
-- before/after_pickup: garage 🔧 mark from 38 m. Before: 10 m icon 12 m up (the "floating wrench"). After: 3.2 m icon at car height over the ring + contact shadow.
-- before/after_birds: a pigeon flock scattering 14 m ahead. Before: grey flat bars (one wing bar rolled like a see-saw = debris). After: two wings per bird in a V flap. Same frame shows the magenta roof seam (before, top-left) gone.
-- before/after_mstart: car put on a fence next to the Opa's Golden Bricks quest, START. GO world/mstart: 7 props in the clear zone before START, 0 after. (The exact beta.164 slab/block was not reproduced off the gauntlet route; the fix is a generic clear zone.)
-- before/after_camprop: car 5.5 m from a street sign/stall with the camera at it: after, FC hides the prop (GO world/camprop 5/5).
-- Gauntlet shots: docs/shots/gauntlet/world-r30b-b/ (fra_1_first_control: no wrench in the sky, no roof seam).
+# world-r30b shots: REAL INPUT only (title -> PLAY, touch GAS/BRAKE/◀▶, `node tools/gauntlet.js --only boot,world`), 852x393 phone
+The round-1 staged before/after shots were removed (REVIEW_2K_28: city off / staging debris).
+- real_world_garage_40m / 25m / 12m: driving at the fra garage 🔧. The icon sits at car height over its ring and stays fully readable (opacity 1 at 40, 25, 12 m; round 1 left 0.31 at 26 m). The black face on the long green building is still there (left): seen row black-face, root cause NOT found (see HANDOFF).
+- real_world_birds_speed: 83 km/h street drive. No pigeon flock at camera height (row world/birds 0/60 samples); the bricks in the air are a stall the car just smashed (debris now lives 2.2-2.8 s so it lands instead of vanishing mid-air). Bush leaves at the lens = the car is inside a bush (FC keeps props within 3 m of the car solid).
+- real_world_glance_kiosk: off-road glance in a park: car visible; 1/24 frames had the lens inside a LIFE set piece (FC 8 Hz).
+- Quest START x3 by real input: NOT reached (the scripted drive overshoots / loses the route on trunk's faster touch drive). Lab GO world/mstart covers it (3 quests started with the card START button, 0 drawn objects in the car body).

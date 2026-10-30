@@ -39,5 +39,5 @@
 99hrq_quest_intro.js:qvIntro,qvShort
 99c6hr_mstart_go.js:HRM_run,HRM_card
 99c6gui_card_go.js:GUC_run,GUC_card
-99c6wr_world_go.js:WRG_pickup,WRG_roof,WRG_birds,WRG_mstart,WRG_camprop
+99c6wr_world_go.js:WRG_pickup,WRG_roof,WRG_birds,WRG_mstart,WRG_camprop,WRG_inside,WRG_carMesh
 99rv_review.js:RV14_vis,RV14_ovl,RV14_carBox,RV14_mark,RV14_near,RV14_start,RV14_ride,RV14_pairs,RV14_reset,RV14_go,RV15_go,RV16_bug,RV16_turb,RV16_freed,RV16_near,RV16_type,RV15_SPOTS

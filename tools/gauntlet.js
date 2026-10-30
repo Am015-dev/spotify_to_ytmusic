@@ -55,10 +55,23 @@ G.sample=dt=>{const x=RO.x,z=RO.z,P=G.P||{x,z,v:RO.v};const mv=Math.hypot(x-P.x,
   G.CP.set(c,{x:c.x,z:c.z,alive,a:c.a,b:c.b,t:(+c.t).toFixed(2)})}
  if(state==='roam'&&RO.on){G.n40+=n40;G.n40s++}
  G.P={x,z,v:RO.v}};
-G.step=(n,dt)=>{for(let i=0;i<n;i++){G.vt+=dt*1000;const q=G.q;G.q=[];for(const cb of q){try{cb(G.vt)}catch(e){G.err=String(e).slice(0,120)}}G.frames++;try{G.sample(dt)}catch(e){G.serr=String(e).slice(0,120)}}
+G.step=(n,dt)=>{for(let i=0;i<n;i++){G.vt+=dt*1000;const q=G.q;G.q=[];for(const cb of q){try{cb(G.vt)}catch(e){G.err=String(e&&e.stack||e).replace(/\s+/g," ").replace(/ at [^ ]* \(https:\/\/cdn[^)]*\)/g,"").slice(0,500)}}G.frames++;try{G.sample(dt)}catch(e){G.serr=String(e).slice(0,120)}}
  try{const m=performance.memory&&performance.memory.usedJSHeapSize;if(m>G.mem)G.mem=m}catch(e){}return G.read()};
 G.pullPops=()=>{const p=G.pops;G.pops=[];return p};
 G.resetStats=()=>{G.hb=[0,0,0,0,0,0,0,0];G.n40=0;G.n40s=0;G.maxDrop=0;G.pops=[]};
+// world-r30b reads (no writes): mark icons + their drawn opacity, drawn objects inside the car body / at the lens (WRG_inside = the GO world/* scan), tall props, scattered flocks vs the camera height
+G.mk=k=>(RO.marks||[]).filter(m=>k==='quest'?m.kind==='quest'&&m.ev&&!m.dyn&&!markLocked(m)&&!markDone(m):m.kind===k).map(m=>({x:m.x,z:m.z,id:(m.ev&&m.ev.id)||m.id||'',op:m.sp?+m.sp.material.opacity.toFixed(2):null,d:Math.round(Math.hypot(m.x-RO.x,m.z-RO.z))})).sort((a,b)=>a.d-b.d).slice(0,8);
+const WV=new THREE.Vector3(),WM=new THREE.Matrix4(),WI=new THREE.Matrix4(),WB=new THREE.Box3(),WP=new THREE.Vector3();
+const carM=o=>{const MG=new Set((RO.marks||[]).map(m=>m.g).filter(Boolean));let q=o;while(q){if(q===(pl&&pl.mesh)||MG.has(q)||q.userData&&(q.userData.carG!==undefined||q.userData.sky))return true;q=q.parent}return false};   // the car, the sky and the beacons themselves are not 'objects in the car'
+// drawn objects (visible meshes / instanced slots, their own bounding box) that hold one of the points; read-only (same rule as GO world/*); buildings (> 6 m or building layers) are tagged 'bld'
+const inside=(pts,R)=>{const out=[];scene.traverse(o=>{if(!(o.isMesh||o.isInstancedMesh)||!o.geometry||carM(o))return;let v=true,q=o;while(q){if(!q.visible){v=false;break}q=q.parent}if(!v)return;const g=o.geometry,bb=g.boundingBox;if(!bb)return;const sz=bb.getSize(WV).clone();if(!o.isInstancedMesh&&sz.length()>16)return;
+  const hit=mw=>{WI.copy(mw).invert();WB.copy(bb).expandByScalar(.05);return pts.some(p=>WB.containsPoint(WP.copy(p).applyMatrix4(WI)))},tag=mw=>{const e=mw.elements,w=Math.max(sz.x*Math.hypot(e[0],e[1],e[2]),sz.y*Math.hypot(e[4],e[5],e[6]),sz.z*Math.hypot(e[8],e[9],e[10])),pu=o.parent&&o.parent.userData||{};return(w>6||'bvL' in pu||'athB' in pu?'bld ':'')+(o.name||o.type)+'<'+(o.parent&&(o.parent.name||o.parent.type))+'{'+Object.keys(pu).slice(0,3)+'}{'+Object.keys(o.userData).slice(0,3)+'} '+w.toFixed(1)+'m'};
+  if(o.isInstancedMesh){const a=o.instanceMatrix.array;for(let i=0;i<o.count;i++){const e=i*16;if(a[e]===0&&a[e+5]===0&&a[e+10]===0)continue;WM.fromArray(a,e).premultiply(o.matrixWorld);WV.setFromMatrixPosition(WM);if(WV.distanceTo(pts[0])>R)continue;if(hit(WM))out.push(tag(WM))}}
+  else{o.getWorldPosition(WV);if(WV.distanceTo(pts[0])<=R&&hit(o.matrixWorld))out.push(tag(o.matrixWorld))}});return out};
+G.over=()=>{try{const fx=Math.sin(RO.h),fz=Math.cos(RO.h),P=[-1.6,0,1.6].map(a=>new THREE.Vector3(RO.x+fx*a,RO.y+.8,RO.z+fz*a));return inside(P,12)}catch(e){return['err '+String(e).slice(0,40)]}};
+G.camIn=()=>{try{return inside([camera.position.clone()],10)}catch(e){return['err '+String(e).slice(0,40)]}};
+G.props=()=>{const L=[];for(const l of HUB.pgrid.values())for(const p of l){if(!p.im||p.alive===false||p.t==='lamp'||CVF_RX.test(p.t))continue;const g=p.im.geometry;if(!g.boundingBox||g.boundingBox.max.y-g.boundingBox.min.y<1.6)continue;const d=Math.hypot(p.x-RO.x,p.z-RO.z);if(d>30&&d<220)L.push({x:p.x,z:p.z,t:p.t,d:Math.round(d)})}return L.sort((a,b)=>a.d-b.d).slice(0,6)};
+G.flock=()=>{const B=window.LV&&LV.birds||(typeof LV!=='undefined'&&LV.birds);if(!B)return null;const c=camera.position;let n=0,band=0,dmin=1e9,fl=0;for(const F of B.fl){if(!F.on||F.st!==2||F.gull)continue;fl++;for(const b of F.b){const hd=Math.hypot(b.x-c.x,b.z-c.z);if(hd>60)continue;n++;if(hd<45&&Math.abs(b.y-c.y)<2.5)band++;dmin=Math.min(dmin,hd)}}return{fl,n,band,dmin:Math.round(dmin)}};
 return 'ok'})()`;
 // visible-element boxes: buttons the thumbs use, and every visible text/HUD element
 const VIS=String.raw`(()=>{const v=e=>{if(!e)return null;const r=e.getBoundingClientRect();if(r.width<4||r.height<4)return null;let n=e;while(n&&n!==document.body){const s=getComputedStyle(n);if(n.hidden||s.display==='none'||s.visibility==='hidden'||+s.opacity<.05)return null;n=n.parentElement}if(r.right<=0||r.bottom<=0||r.left>=innerWidth||r.top>=innerHeight)return null;return [r.left,r.top,r.width,r.height]};
@@ -115,7 +128,7 @@ function Router(nodes){const N=nodes,ok=i=>N[i]&&!N[i][3]&&!N[i][4];
 async function bootPlayer(b,base,{w=852,h=393,label='fra',throttle=THR,init=null}={}){
  const ctx=await b.newContext({viewport:{width:w,height:h},deviceScaleFactor:2,isMobile:true,hasTouch:true,userAgent:IPHONE_UA});if(init)await ctx.addInitScript(init);
  const p=await ctx.newPage();p.setDefaultTimeout(300000);const cdp=await ctx.newCDPSession(p);const P=new Player(ctx,p,cdp);
- p.on('pageerror',e=>P.errs.push(String(e).slice(0,160)));p.on('console',m=>{if(m.type()==='error')P.errs.push('console: '+m.text().slice(0,160))});
+ p.on('pageerror',e=>{P.errs.push(String(e).slice(0,160));if(process.env.GSTACK)console.log('STACK '+String(e.stack||e).replace(/\s+/g,' ').slice(0,700))});p.on('console',m=>{if(m.type()==='error')P.errs.push('console: '+m.text().slice(0,160))});
  let loads=0;p.on('load',()=>{loads++;if(loads>1)P.reloads++});
  if(throttle>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:throttle});
  const tg=Date.now();await p.goto(base);
@@ -258,6 +271,27 @@ async function scMission(P,router){let marks=await P.ev('__GH.marks()');const QK
   row('mission/retry','RETRY from the fail screen puts me back in the mission',ok?`${(st.T-tr).toFixed(1)} s game, ${((Date.now()-wr)/1000).toFixed(1)} s lab`:'mission not restarted','back driving <= 2 s game',ok&&st.T-tr<=2,'');
   if(ok){await P.run(3,s=>router.drive(s));await P.allUp();const ab=await P.ev('0');void ab}}}
 
+// world-r30b (REVIEW_2K_28): the world rows by real input only: the garage icon on approach, 3 quest STARTs, a kiosk glance, a pigeon flock at speed. Opt-in: --only world
+async function scWorld(P,router){
+ const closeCard=async()=>{for(let i=0;i<3;i++){const v=await P.vis();if(!(v.ids.roamCard||v.ids.rcGo))break;await P.allUp();if(!await P.tapText(/^LATER$|NOT NOW|CLOSE|^✕$/i))break;await P.step(6)}};await closeCard();
+ const go=async(goal,stopR,maxS,kmh,each)=>{let st=P.st,stuck=0,rev=0;const t0=st.T;while(st.T-t0<maxS){st=await P.run(.5,s=>{if(rev>0){rev-=DT*3;return['tB','tL']}const d=Math.hypot(goal[0]-s.x,goal[1]-s.z);if(d<stopR)return s.v>2?['tB']:[];if(s.v<3){stuck+=DT*3;if(stuck>2){stuck=0;rev=1.2}}else stuck=0;const a=d<150?Math.atan2(goal[0]-s.x,goal[1]-s.z):router.aim(s,goal);return[...pace(s,d<25?15:d<60?Math.min(kmh,30):kmh),...steer(s,a)]});const d=Math.hypot(goal[0]-st.x,goal[1]-st.z);if(each&&await each(st,d))break;if(d<stopR&&st.v<2)break}await P.allUp();return st};
+ // 1 garage icon: opacity read + shots at 40 / 25 / 12 m on a real approach
+ {const g=(await P.ev('__GH.mk("garage")'))[0];const ops={},sh={};if(g){await go([g.x,g.z],9,80,45,async(st,d)=>{for(const k of[40,25,12])if(d<=k&&ops[k]==null){const m=(await P.ev('__GH.mk("garage")'))[0];ops[k]=m?m.op:null;sh[k]=await P.shot('world_garage_'+k+'m')}return ops[12]!=null})}
+  const v=[ops[25],ops[12]].filter(x=>x!=null);row('world/pickup','drive at the garage 🔧: the icon is readable on the way into its ring',g?`opacity 40 m ${ops[40]} · 25 m ${ops[25]} · 12 m ${ops[12]}`:'no garage marker','>= 0.75 at 25 m and 12 m (REVIEW_2K_28: 0.31 at 26 m)',v.length===2&&Math.min(...v)>=.75,sh[25]||sh[40]||'')}
+ // 2 three quests: stop in the beacon, open, LET'S GO, look at the car; abandon with ✕
+ {let n=0,started=0,over=0;const ex=[],shots=[],notes=[];const tried=new Set();for(let k=0;k<3;k++){const q=(await P.ev('__GH.mk("quest")')).find(m=>!tried.has(m.id)&&m.d<700);if(!q)break;tried.add(q.id);n++;
+   let st=await go([q.x,q.z],7,100,45,async(st,d)=>{if(d<12){const v=await P.vis();if(v.ids.roamPrompt&&!st.card){await P.allUp();await P.tapSel('#roamPrompt');await P.step(6)}const s2=await P.step(1);return s2.card||s2.ch}return false});
+   st=await P.step(6);for(let w=0;w<10&&!(st.card||st.ch);w++){const v=await P.vis();if(v.ids.roamPrompt){await P.tapSel('#roamPrompt');await P.step(6)}else{await P.p.waitForTimeout(500)/* the TAP TO OPEN prompt runs on a wall-clock timer */;const d=Math.hypot(q.x-st.x,q.z-st.z);await P.run(.3,s=>d>6?[...pace(s,8),...steer(s,Math.atan2(q.x-s.x,q.z-s.z))]:(s.v>1?['tB']:[]))}st=await P.step(1)}
+   const opened=st.card||st.ch,acc=await P.tapText(/LET'?S GO|START|GO ▶|^GO$|ACCEPT/i);await P.step(30);st=await P.step(1);if(st.ch)started++;notes.push(q.id+` d${Math.round(Math.hypot(q.x-st.x,q.z-st.z))}m v${Math.round(st.v)}`+(opened?' opened':' no card')+(acc?' tapped '+acc:'')+(st.ch?' started':''));const o=await P.ev('__GH.over()');over+=o.length;if(o.length)ex.push(q.id+':'+o.slice(0,2).join('+'));shots.push(await P.shot('world_quest'+(k+1)+'_start'));
+   if(st.ch){await P.tapSel('#qAbn');await P.step(10);await P.tapText(/ABANDON|YES|QUIT|OK/i).catch(()=>0);await P.step(20)}void acc}
+  row('world/quests','3 quests started by real input (beacon, prompt, LET\'S GO): anything drawn inside my car?',`${started}/${n} started, ${over} objects in the car body${ex.length?' ('+ex.join(', ')+')':''}`,'3/3 started, 0 (gauntlet seen/prop-on-car)',started>=3&&over===0,shots[0]||'',notes.join('; '))}
+ // 3 kiosk glance: drive past a tall street prop 2.5 m to its side at ~40 km/h; every step: is the lens inside anything drawn?
+ {const pr=(await P.ev('__GH.props()'))[0];let fr=0,inside=0,bldF=0,sh='',best=1e9;const ex=[];if(pr){let st=P.st;const a=Math.atan2(pr.x-st.x,pr.z-st.z),gx=pr.x+Math.cos(a)*2.5,gz=pr.z-Math.sin(a)*2.5;
+   st=await go([gx-Math.sin(a)*30,gz-Math.cos(a)*30],6,60,40);const t0=st.T;while(st.T-t0<6){st=await P.run(.2,s=>[...pace(s,40),...steer(s,Math.atan2(gx+Math.sin(a)*20-s.x,gz+Math.cos(a)*20-s.z))]);const d=Math.hypot(pr.x-st.x,pr.z-st.z);const c0=await P.ev('__GH.camIn()'),c=c0.filter(x=>!/^bld /.test(x));fr++;if(c0.length>c.length)bldF++;if(c.length){inside++;if(ex.length<3)ex.push(c[0])}if(d<best){best=d;if(d<8)sh=await P.shot('world_glance_kiosk')}if(d>best+15)break}await P.allUp()}
+  row('world/glance','drive past a kiosk/sign/stall 2.5 m to its side at ~40 km/h: the lens inside a drawn object',pr?`${inside}/${fr} frames inside a prop (${pr.t}, closest ${best.toFixed(1)} m)${ex.length?' '+ex.join(','):''}; ${bldF} frames inside a building (INFO)`:'no tall prop','0 frames (gauntlet seen/camera-in-props)',!!pr&&fr>5&&inside===0,sh)}
+ // 4 birds at speed: drive the streets at ~70 km/h until a flock scatters ahead; band = birds at camera height (+-2.5 m, < 45 m)
+ {let st=P.st;const t0=st.T;let sh='',n=0,band=0,seen=0;while(st.T-t0<90&&seen<6){st=await P.run(.5,s=>router.drive(s,70));const f=await P.ev('__GH.flock()');if(f&&f.fl&&f.n){if(st.v>=55){n+=f.n;band+=f.band;seen++;if(!sh)sh=await P.shot('world_birds_speed')}}}await P.allUp();
+  row('world/birds','scattered pigeons seen from the car at >= 55 km/h (real drive)',seen?`${band}/${n} bird samples at camera height (${(100*band/Math.max(1,n)).toFixed(0)} %), ${seen} samples`:'no flock scattered in 90 s','<= 10 % at camera height (REVIEW_2K_28: grey drones 3-8 m up)',seen>0&&band/Math.max(1,n)<=.1,sh)}}
 async function scPause(P){let st=await P.run(1.5,s=>['tG']);await P.allUp();await P.tapSel('#tP');await P.step(6);let v=await P.vis();const open=v.ids.roamPause||v.ids.pause;
  const c0=await P.ev('__GH.cars(80)');const a=await P.step(1);st=await P.step(30);const c1=await P.ev('__GH.cars(80)');const carMv=Math.hypot(st.x-a.x,st.z-a.z);
  const trMv=Math.max(0,...c0.map(c=>{const o=c1.find(q=>q.i===c.i);return o?Math.hypot(o.x-c.x,o.z-c.z):0}));const frozen=carMv<.05&&trMv<.05;
@@ -307,6 +341,7 @@ if(arg('report-only',false)){for(const r of JSON.parse(fs.readFileSync(path.join
    const p95=F.length?F[Math.floor(F.length*.95)]:0,long=F.filter(x=>x>50).length;
    row('perf/frame','frame time while driving (real clock, 6x CPU, software GL)',`p95 ${p95.toFixed(0)} ms, ${long}/${F.length} frames > 50 ms`,'INFO (lab GL; iPhone truth = perf/ios-reveal)',null,'')}
   await harness(P);const router=Router(await P.ev('__GH.nodes()'));
+  if(on('world'))await scWorld(P,router);   // world-r30b: first, from the spawn (garage 66 m, quests near); its rows do not depend on the later parts
   if(on('steer'))await scSteer(P,router);
   if(on('drive'))await scDrive(P,router);
   if(on('hit'))await scHits(P,router);

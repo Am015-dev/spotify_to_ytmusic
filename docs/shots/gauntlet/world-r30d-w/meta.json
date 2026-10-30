@@ -1,0 +1,1 @@
+{"when":"2026-10-30T06:17Z","cmd":"node tools/gauntlet.js --build out/w30d --ver world-r30d-w --only boot,world","wall":"605"}

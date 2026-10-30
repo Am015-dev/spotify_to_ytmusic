@@ -47,7 +47,7 @@ function LV_birdInit(){const nb=LV_PF*LV_PB+LV_GF*LV_GB;
   // ~0.55 m chunky LEGO bird (readable at 30 m), white vertex colours tinted per instance
   const body=mergeG([cbox(.26,.24,.44,0,.2,0,'#ffffff'),cbox(.2,.2,.2,0,.38,.22,'#ffffff'),cbox(.07,.05,.12,0,.36,.37,'#f0a020'),cbox(.18,.05,.16,0,.24,-.28,'#ffffff')]);
   // world-r30b: one wing per instance, hinged at the body (2 instances per bird, same draw call) so the pair flaps as a V; the old single bar rolled like a see-saw and flocks read as tumbling grey debris (gauntlet seen/sky-debris)
-  const wing=mergeG([cbox(.5,.035,.2,.31,0,0,'#ffffff'),cbox(.18,.03,.12,.6,0,-.03,'#ffffff')]);
+  const wing=mergeG([cbox(.24,.035,.16,.15,0,0,'#ffffff'),cbox(.1,.03,.1,.31,0,-.02,'#ffffff')]);/* REVIEW_2K_28: span ~1.6x the body (was ~3x: grey X shapes = drones) */
   const B=LV.birds={b:LV_im(body,nb),w:LV_im(wing,nb*2),fl:[],c:new THREE.Color()};
   for(let f=0;f<LV_PF+LV_GF;f++){const gull=f>=LV_PF,n=gull?LV_GB:LV_PB,F={gull,st:0,x:0,z:0,y:0,t:0,on:false,b:[]};
     for(let j=0;j<n;j++){const k=B.fl.reduce((a,q)=>a+q.b.length,0)+j;F.b.push({k,ox:rr(-2.2,2.2),oz:rr(-2.2,2.2),h:R()*6.3,ph:R()*6.3,x:0,y:0,z:0,vx:0,vy:0,vz:0});
@@ -61,10 +61,10 @@ function LV_birdStep(dt){const B=LV.birds;if(!B)return;const d=LV_d('lvBird'),ac
       for(const b of F.b){b.x=s.x+b.ox;b.z=s.z+b.oz;b.y=F.gull?s.y+rr(26,40):Math.max(0,groundAt(b.x,b.z,s.y+3));b.vx=b.vy=b.vz=0}}
     F.t+=dt;const dx=F.x-RO.x,dz=F.z-RO.z,dd=Math.hypot(dx,dz);
     // pigeons: scatter when the car comes within 22 m (any speed > 3 m/s) or 9 m (standing); also when a pedestrian leaps nearby is not tracked (cheap)
-    if(F.st===0&&(dd<(sp>3?22:9))){F.st=2;F.t=0;const al=dd||1;for(const b of F.b){const a=Math.atan2(dx/al+rr(-.7,.7),dz/al+rr(-.7,.7)),v=rr(5,9);b.vx=Math.sin(a)*v;b.vz=Math.cos(a)*v;b.vy=rr(4,7);b.h=a}if(dd<14&&R()<.6)AU.sfx('pick')}
+    if(F.st===0&&(dd<(sp>3?22+sp*1.6:9))){F.st=2;F.t=0;const al=dd||1;for(const b of F.b){const a=Math.atan2(dx/al+rr(-.7,.7),dz/al+rr(-.7,.7)),v=rr(5,9);b.vx=Math.sin(a)*v;b.vz=Math.cos(a)*v;b.vy=rr(11,14);b.h=a}if(dd<14&&R()<.6)AU.sfx('pick')}
     for(const b of F.b){let y,fl,pitch=0;
       if(F.st===3){const a=now*.35+b.ph,r=14+b.ox*3;b.x=F.x+Math.sin(a)*r;b.z=F.z+Math.cos(a)*r;y=b.y+Math.sin(now*.8+b.ph)*1.2;b.h=a+Math.PI/2;fl=.18+Math.sin(now*9+b.ph)*.45*(Math.sin(now*.7+b.ph)>.3?1:.2)}
-      else if(F.st===2){b.vy-=(F.t>1.6?6:2.2)*dt;if(b.vy<(F.t>1.6?0:1.5))b.vy=F.t>1.6?0:1.5;b.x+=b.vx*dt;b.y+=b.vy*dt;b.z+=b.vz*dt;y=b.y;fl=.2+Math.sin(now*22+b.ph)*.75;pitch=F.t>1.6?-.08:-.35}
+      else if(F.st===2){/* REVIEW_2K_28: climb out of the camera band (never level off at camera height) and keep >= 6 m from the lens */b.vy-=2.2*dt;if(b.vy<4)b.vy=4;{const c=camera.position,ex=b.x-c.x,ey=b.y-c.y,ez=b.z-c.z,e=Math.hypot(ex,ey,ez);if(e<6){const k=(6-e)*4*dt/(e||1);b.x+=ex*k;b.z+=ez*k;b.y+=Math.abs(ey)*k+dt*3}}b.x+=b.vx*dt;b.y+=b.vy*dt;b.z+=b.vz*dt;y=b.y;fl=.2+Math.sin(now*22+b.ph)*.75;pitch=-.35}
       else{// grounded: peck (body pitch) and shuffle
         const pk=Math.max(0,Math.sin(now*3+b.ph*3));pitch=pk*.5;b.h+=Math.sin(now*.6+b.ph)*dt*.8;y=b.y;fl=.05}
       const sc=F.gull?2.2:1.5;LV_set(B.b,b.k,b.x,y,b.z,pitch,b.h,0,sc);if(F.st===0){B.w.setMatrixAt(b.k*2,_lvZ);B.w.setMatrixAt(b.k*2+1,_lvZ);continue}LV_set(B.w,b.k*2,b.x,y+.3*sc,b.z,pitch,b.h,fl,sc);LV_set(B.w,b.k*2+1,b.x,y+.3*sc,b.z,-pitch,b.h+Math.PI,fl,sc)}}
