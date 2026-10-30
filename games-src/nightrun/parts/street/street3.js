@@ -13,12 +13,12 @@
    4. LIGHT: lamp pools that light whoever passes, neon spill, a wet-road reflection, contact shadows under props, one colour grade (under the HUD).
    5. A RUN TWICE AS LONG: one heart more, a heal drops beside Kai when he is two hearts down, gunners reload 1.4x slower, at most 5 foes at once. ---------- */
 if(RET.street3===undefined)RET.street3=!/[?&]street3=0/.test(location.search);
-if(RET.bossadds===undefined)RET.bossadds=!/[?&]bossadds=0/.test(location.search);   // W278: cap the street adds during the big heavy fight (S3.T.bAdd); ?bossadds=0 = old
+if(RET.bossadds===undefined)RET.bossadds=!/[?&]bossadds=0/.test(location.search);   // W278: no street adds during the big heavy fight; ?bossadds=0 = old
 (function(){
 if(!RET.street3||!RET.street2||!window.FOOT||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2||!FOOT._in)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const S3=F.S3={GCD:1.9,ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
-  T:{beats:8,boss:145,waves:12,peakT:136,t0:2,thr0:2,thrPeak:8,cap:5,bAdd:{cap:1,gap:6}},   // bAdd (W278, BALANCE-W278.md): while the big heavy is on, at most cap adds at once, gap s apart, none during its wind-up or charge
+  T:{beats:8,boss:145,waves:12,peakT:136,t0:2,thr0:2,thrPeak:8,cap:5},
   TH:{rusher:1,gunner:2,heavy:4,bigheavy:8}};
 const on=()=>RET.street3&&F.S&&F.S.st===ST;
 /* ----- the stage: street2's rooms stretched over a longer road (the gate decides the pace, not the length) ----- */
@@ -48,16 +48,13 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   const alive=S.E.filter(e=>!e.dead).length;
   if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy
   if(S.time>20&&S.time-(f.lastHeal||0)>12&&P.hp>0&&P.hp<=P.max-2&&!S.pk.some(q=>q.k==='heal')){f.lastHeal=S.time;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // two hearts down: a heal drops beside Kai (at most one every 12 s)
-  for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap){w.next=S.time+.4;f.held++;continue;}
-    if(RET.bossadds&&S.bossOn&&bossBusy(S,f)){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits
+  for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap||RET.bossadds&&S.bossOn){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits; W278 (BALANCE-W278.md): none joins once the big heavy is on
     const fromL=w.left[0]==='rusher'&&w.i>=3&&(w.spawned%(RET.fairstreet?5:3)===(RET.fairstreet?4:2));
     if(fromL&&RET.fairstreet){if(!w.wa){w.wa=S.time+1;S.behind={until:w.wa};}if(S.time<w.wa)continue;w.wa=0;}   // W161: 1 s BEHIND warning (arrow + caption at the left edge) before a rusher walks in from the left
     const id=w.left.shift(),x=fromL?S.camX-40:S.camX+vw+40;
-    const e=F.env.spawn(id,x,null);if(e){w.spawned++;f.spawnLog.push([+S.time.toFixed(1),id,w.i]);if(S.bossOn)f.addAt=S.time+S3.T.bAdd.gap;}w.next=S.time+(id==='heavy'?1.6:.9);break;}
+    const e=F.env.spawn(id,x,null);if(e){w.spawned++;f.spawnLog.push([+S.time.toFixed(1),id,w.i]);}w.next=S.time+(id==='heavy'?1.6:.9);break;}
   if(f.hp0!==P.hp){(f.hpLog||(f.hpLog=[])).push(Math.round(S.time)+':'+P.hp);f.hp0=P.hp;}
   f.live.push(alive);if(f.live.length>600)f.live.shift();};
-/* W278: the boss fight is the big heavy's: an add waits while cap adds are up, for gap s after the last one, and while the boss winds up or charges */
-function bossBusy(S,f){const B=S3.T.bAdd,b=S.boss;return S.E.filter(e=>!e.dead&&!e.boss).length>=B.cap||S.time<(f.addAt||0)||!!b&&!b.dead&&(b.state==='wind'||b.state==='charge');}
 /* contact shadow under a prop, on the road */
 function propShadow(c,p){if(p.hp<=0||RET.fairstreet)return;const w=p.w*.62;c.save();c.globalAlpha=.42;const g=c.createRadialGradient(p.x,FL,0,p.x,FL,w);g.addColorStop(0,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,0)');
   c.fillStyle=g;c.translate(p.x,FL);c.scale(1,.16);c.translate(-p.x,-FL);c.beginPath();c.arc(p.x,FL,w,0,6.283);c.fill();c.restore();}
