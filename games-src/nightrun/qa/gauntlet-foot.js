@@ -59,8 +59,8 @@ function makeInput(p, plat) {
 
 // ---- state snapshot: plain data only
 const SNAP = () => { const F = window.FOOT, S = F && F.S; if (!S) return null; const P = S.P, u = window.__u = window.__u || { n: 0 };
-  const E = []; for (const e of S.E) { if (e.__u == null) e.__u = ++u.n; E.push({ u: e.__u, id: e.id, x: e.x, y: e.y, hp: e.hp, st: e.state, w: e.wind || 0, f: e.facing, d: !!e.dead, b: !!e.boss, hid: !!e.hid }); }
-  const cam = F._in.L(); const g = S.gd || null;
+  const E = []; for (const e of S.E) { if (e.__u == null) e.__u = ++u.n; E.push({ u: e.__u, id: e.id, x: e.x, y: e.y, hp: e.hp, st: e.state, w: e.wind || 0, f: e.facing, d: !!e.dead, b: !!e.boss, hid: !!e.hid, bw: e.w || 0, hp2: e.hp, mx: e.max || 0 }); }
+  const cam = F._in.L(); const cw = document.getElementById('game').width; const g = S.gd || null;
   return { on: F.on, t: S.time, end: S.end ? { cleared: S.end.cleared, quit: S.end.quit } : null, paused: S.paused, camX: S.camX, vw: (cam && cam.vw) || 960, lock: S.lock && S.lock.id, wl: S.lock ? S.waves.filter(w => w.lock === S.lock.id && !w.done).length : 0, bossOn: S.bossOn,
     P: { x: P.x, y: P.y, hp: P.hp, max: P.max, g: P.onGround, f: P.facing, inv: P.inv, dash: P.dash, dashIF: P.dashIF, mel: P.mel, bombs: P.bombs, maxX: P.maxX }, guard: g && { on: g.on, m: g.m },
     E, eb: S.eb.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy || 0 })), pk: S.pk.map(k => ({ k: k.k, x: k.x, y: k.y })), shots: S.shots, kills: S.kills, hurts: S.hurts, score: S.score, moved: S.moved,
@@ -162,6 +162,7 @@ async function run(b, plat, strat, seed) {
   try {
     const sres = await startFoot(p, inp); if (sres !== 'on') { fail('start: ' + sres); return R; }
     await sleep(400); await shot('start');
+    if (process.env.JUMP) { await sleep(2500); await p.evaluate(j => { const S = window.FOOT.S; S.time = +j; S.P.x = 7350; S.camX = 7250; }, process.env.JUMP); R.notes.push('JUMP: stage clock set to ' + process.env.JUMP + ' (geometry probe only, not a clear-rate run)'); }
     if (plat === 'phone') { R.audit = await p.evaluate(AUDIT); if (R.audit.small.length) fail('phone control < 44 px: ' + R.audit.small.join(', ')); if (R.audit.over.length) fail('phone controls overlap: ' + R.audit.over.join(', ')); if (R.audit.off.length) fail('phone control off screen: ' + R.audit.off.join(', ')); if (R.audit.clip.length) fail('phone label clipped: ' + R.audit.clip.join(', ')); }
     await p.evaluate(() => { window.__ftOn = true; }); const decide = strategy(strat, rnd);
     const seen = new Set(), atkd = new Set(), died = new Set(), maxHp = {}; let prev = null, sigT = 0, sig = '', stuck = 0, offT = 0, shotsDone = {}, minMargin = 1e9, camBack = 0, spawnL = [], behindSeen = 0, behindUntil = -1, unwarned = 0, pkMax = 0, lastS = null, fastOn = false, ticks = 0, maxFoes = 0, progBad = 0;
@@ -169,6 +170,7 @@ async function run(b, plat, strat, seed) {
     while (s && !s.end && Date.now() - t0 < MAXREAL) {
       ticks++; if (!fastOn && Date.now() - t0 > 8000) { fastOn = true; R.frameP95 = await p.evaluate(() => { const a = window.__ft.slice().sort((x, y) => x - y); window.__ftOn = false; return a.length ? { n: a.length, p50: a[a.length >> 1], p95: a[Math.floor(a.length * .95)] } : null; }); await p.evaluate(ts => { window.FOOT.ts = ts; }, TS); }
       if (s.paused) { fail('paused unexpectedly'); break; }
+      if (process.env.GOD && s.bossOn) await p.evaluate(() => { const S = window.FOOT.S; if (S.P.hp > 0) S.P.hp = S.P.max; });   // geometry probe: Kai survives so every attack is measured
       await inp.apply(decide(s));
       await sleep(22); s = await p.evaluate(SNAP); if (!s) { fail('FOOT.S vanished'); break; }
       // ---- per-tick checks
@@ -184,6 +186,10 @@ async function run(b, plat, strat, seed) {
       const g = [Math.round(s.P.x), Math.round(s.camX), s.kills, s.score, s.P.hp, s.E.length, s.E.reduce((a, e) => a + Math.round(e.x + e.y), 0), s.eb.length, s.pk.length].join();
       if (g !== sig) { sig = g; sigT = s.t; } else if (s.t - sigT > 20 && s.P.hp > 0) { stuck++; fail('stuck 20 s game time, nothing changed at t=' + s.t.toFixed(1) + ' x=' + Math.round(s.P.x) + ' lock=' + s.lock); break; }
       if (!shotsDone.mid && s.t > 8 && s.E.filter(e => !e.d && Math.abs(e.x - s.P.x) < 380).length >= 2) { shotsDone.mid = 1; await shot('mid'); }
+      if (process.env.BOSSVIS) { const B = s.E.find(e => e.b && !e.d); if (B && s.bossOn) { const fr = (a, b2) => Math.max(0, Math.min(b2, s.camX + s.vw) - Math.max(a, s.camX)) / Math.max(1, b2 - a), body = fr(B.x - 55, B.x + 55), tele = /^(wind|sb_.*W)$/.test(B.st), px = Math.min(B.x, s.P.x), px2 = Math.max(B.x, s.P.x), path = fr(px - 1, px2 + 1);
+          const V = R.bv = R.bv || { n: 0, body: [], tele: [], path: [], t0: s.t, camX: s.camX, geo: [] }; V.n++; V.body.push(body); if (tele) { V.tele.push(body); if (B.st !== V.ls) V.path.push(path); }
+          
+          V.ls = B.st; if (!V.geo.length || s.t - V.geo[V.geo.length - 1][0] > 4) V.geo.push([+s.t.toFixed(1), Math.round(s.camX), Math.round(s.vw), Math.round(s.P.x), Math.round(B.x), B.st, Math.round(body * 100), Math.round(B.hp2)]); V.hpEnd = B.hp2; V.mx = B.mx; } }
       if (!shotsDone.boss && s.boss && !s.boss.dead && s.bossOn) { shotsDone.boss = 1; await sleep(250); await shot('boss'); }
       if (!shotsDone.death && s.P.hp <= 0) { shotsDone.death = 1; await shot('death'); }
       if (process.env.TRACE && s.t - (R.trT || -9) >= 1) { R.trT = s.t; (R.trace = R.trace || []).push([(R.stage = R.stage || s.stage) && '',+s.t.toFixed(1), Math.round(s.P.x), Math.round(s.camX), s.lock || '-', s.P.hp, s.E.filter(e => !e.d).length, s.E.filter(e => !e.d).map(e => e.id + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 6).join(' '), s.kills, 'wavesLeft=' + s.wl].join(' ')); }
