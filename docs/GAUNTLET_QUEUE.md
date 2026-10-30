@@ -12,3 +12,11 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 | wall/glance, wall/headon (script set-up first, then the reverted drivefeel redo: glances no damage) | wall-r30d SONNET | queued |
 | boot/toControl 106 s lab | boot-r30e OPUS (measure unthrottled + perf/ios-reveal first; lab GL renders 2-3 fps) | queued |
 | hit/react (INFO, read misses thrown cars) | gauntlet script fix inside wall-r30d | queued |
+
+## 30 Oct ~05:00 status
+- PASS, waiting for a deploy: gui-r30a 1584590 + 1c1e191 (REVIEW_2K_29).
+- FAIL, rework queued for the next free worker slot: touchdrive-r29a 0aa5fa4 (REVIEW_2K_29 c: BOOST lunges into next-lane traffic 1 in 3; fix = BOOST + steer toward the car). Session session_01RR7mnXYxNGypZruSqUdFZx.
+- Rework running: world-r30b (session_01RR7mnYsNgKumNtw8HdSvQe).
+- Running: traffic-r30c2 OPUS (session_01RR7mnbHxaitimxqGvtVT8Q): near-car 7.9 m one-frame teleport (on trunk too) first, then the density patch v3 only with 0 pops. Rule 9: last lane on density.
+- Gauntlet on trunk tip (rev29-r30a2): 1 FAIL, boot/toControl. Next lane after the reworks: boot-r30e.
+- Deploy plan: one deploy (beta.165) once touchdrive and world pass review; otherwise revert the failed commit before building, as for beta.164.
