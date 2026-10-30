@@ -8,6 +8,7 @@
 const L = require('./lib.js'), { PW, sleep } = L, fs = require('fs');
 const WALL = +process.env.WALL || 150, SEEDS = +process.env.SEEDS || 8, STAGES = +process.env.STAGES || 10, PAR = +process.env.PAR || 4, TCAP = +process.env.TICKS || 900;
 const STRATS = (process.env.STRATS || 'idle,random,dodger,shooter').split(','), DEVS = (process.env.DEVS || 'phone,pc').split(','), SHOTS = process.env.SHOTS;
+const FOCUS0 = process.env.FOCUS0 === '1', STARTS = (process.env.STARTS || '').split(',').filter(Boolean).map(Number);   // FOCUS0=1: ?focus=0 (the result screen then offers NEXT STAGE); STARTS=2,5: begin at that story stage through the game's own startStory hook
 const DEV = { phone: { W: 390, H: 763, touch: true }, pc: { W: 1440, H: 860, touch: false } };
 const rngOf = s => { let a = s * 2654435761 >>> 0 || 1; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
 const SEEDJS = s => `(()=>{let a=${s}*2654435761>>>0||1;Math.random=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
@@ -83,16 +84,17 @@ async function openPage(br, devName, seed) {
   await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
   await p.addInitScript(SEEDJS(seed));
-  await p.goto(L.GAME_DIR ? global.__BASE + '?nomusic=1' : '', { waitUntil: 'domcontentloaded' });
+  await p.goto(L.GAME_DIR ? global.__BASE + '?nomusic=1' + (FOCUS0 ? '&focus=0' : '') : '', { waitUntil: 'domcontentloaded' });
   await p.waitForFunction(() => window.__mnr, null, { timeout: 15000 }); await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }).catch(() => { }); await sleep(400);
   return p;
 }
-async function startFlight(p, I) { await I.clickEl('#focFlight'); for (let i = 0; i < 40 && !(await st(p)).live; i++) await sleep(100); await p.evaluate(() => window.__mnr.simOn(true)); await step(p, 20); return (await st(p)).live; }
+async function startFlight(p, I, start) { if (FOCUS0 && !start) start = 1;   // no FLIGHT button when focus is off
+  if (start) await p.evaluate(n => window.__mnr.startStory(n), start); else await I.clickEl('#focFlight'); for (let i = 0; i < 40 && !(await st(p)).live; i++) await sleep(100); await p.evaluate(() => window.__mnr.simOn(true)); await step(p, 20); return (await st(p)).live; }
 // ---- one gauntlet run ----
-async function run(br, devName, strat, seed) {
+async function run(br, devName, strat, seed, start) {
   const d = DEV[devName], rnd = rngOf(seed * 31 + strat.length), R = { dev: devName, strat, seed, errs: [], defects: [], stages: [], deaths: 0, maxStage: 0, bossSeen: 0, bossKilled: 0, results: 0, stuck: 0, hudBad: 0, hudN: 0, ui: new Set(), gameSec: 0, wall: 0 };
-  const t0 = Date.now(); const p = await openPage(br, devName, seed), I = makeInput(p, d); await I.init(); const tag = `${devName}-${strat}-${seed}`;
-  if (!(await startFlight(p, I))) { R.defects.push('FLIGHT did not start from the title click'); R.errs.push(...p.errs); await p.context().close(); return R; }
+  const t0 = Date.now(); const p = await openPage(br, devName, seed), I = makeInput(p, d); await I.init(); const tag = `${devName}-${strat}-${seed}` + (start ? `-from${start}` : '');
+  R.start = start || 0; if (!(await startFlight(p, I, start))) { R.defects.push('FLIGHT did not start from the ' + (start ? 'startStory hook' : 'title click')); R.errs.push(...p.errs); await p.context().close(); return R; }
   const brn = brain(strat, rnd); let nextSteps = 0, s = await st(p), lastChange = s.t, lastKey = s.score + ':' + s.hp, stageSeen = -1, bossWas = false, sec = 0, tick = 0, attempts = 0;
   const hudCheck = async () => { const r = await p.evaluate(() => { const m = window.__mnr; try { m.render(); } catch (e) { return { err: String(e) }; } const h = m.HUD; return { sc: h.score, hp: h.hp, gs: String(m.G.score).padStart(8, '0'), ghp: m.P.hp, mx: h.hpMax, gmx: m.P.max, ht: h.heat, gh: Math.round(m.P.heat), emp: h.emp, gemp: m.P.emp }; });
     R.hudN++; if (r.err || r.sc !== r.gs || r.hp !== r.ghp || r.emp !== r.gemp) { R.hudBad++; if (R.hudBad <= 3) R.defects.push('HUD!=state ' + JSON.stringify(r)); } };
@@ -101,7 +103,10 @@ async function run(br, devName, strat, seed) {
     const SN = await snap(p, nextSteps); nextSteps = STEPS; s = SN.s;
     if (s.stage && s.stage !== stageSeen) { stageSeen = s.stage; R.maxStage = Math.max(R.maxStage, s.stage); R.stages.push(s.stage); lastChange = s.t; await I.release(); await step(p, 40); await shot(p, `${tag}-stage${s.stage}`);
       const ui = await uiAudit(p, d.touch); ui.forEach(u => R.ui.add('play: ' + u)); }
-    if (s.res) { R.results++; await shot(p, `${tag}-result${s.stage}`); (await uiAudit(p, d.touch)).forEach(u => R.ui.add('result: ' + u)); if (s.stage >= STAGES) break; await I.release(); if (!(await I.clickEl('#srNext'))) { R.defects.push('result NEXT STAGE not clickable'); break; } await sleep(300); await step(p, 30); nextSteps = 0; continue; }
+    if (s.res) { R.results++; await shot(p, `${tag}-result${s.stage}`); (await uiAudit(p, d.touch)).forEach(u => R.ui.add('result: ' + u)); if (s.stage >= STAGES && !start) break; await I.release();
+      const dg = await p.evaluate(() => { const e = document.getElementById('srNext'); if (!e) return 'no #srNext'; const r = e.getBoundingClientRect(), cs = getComputedStyle(e), t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return JSON.stringify({ hidden: e.hidden, display: cs.display, pe: cs.pointerEvents, disabled: e.disabled, box: [r.width | 0, r.height | 0], topAtCentre: t ? (t.id || t.className || t.tagName) : null, focusMode: document.documentElement.classList.contains('focus') }); });
+      if (!(await I.clickEl('#srNext'))) { R.defects.push('result NEXT STAGE not clickable ' + dg); break; } await sleep(300); await step(p, 30); const nx = await st(p);
+      if (nx.stage === s.stage + 1 && nx.live) { R.nextOk = (R.nextOk || 0) + 1; await shot(p, `${tag}-next${nx.stage}`); if (start) break; } else { R.defects.push(`NEXT STAGE click did not start stage ${s.stage + 1}: ${JSON.stringify({ stage: nx.stage, live: nx.live, res: nx.res })} ${dg}`); break; } nextSteps = 0; continue; }
     if (s.shop) { (await uiAudit(p, d.touch)).forEach(u => R.ui.add('pit: ' + u)); await I.release(); if (!(await I.clickEl('#shGo'))) { R.defects.push('pit SKIP not clickable'); break; } await sleep(200); await step(p, 30); nextSteps = 0; continue; }
     if (s.overEl || s.over && !s.res && !s.live) { R.deaths++; await I.release(); await shot(p, `${tag}-death${R.deaths}-s${s.stage}`); (await uiAudit(p, d.touch)).forEach(u => R.ui.add('over: ' + u));
       if (++attempts > 3) break; if (!(await I.clickEl('#againBtn'))) { R.defects.push('game over AGAIN not clickable'); break; } await sleep(300); await step(p, 40); lastChange = (await st(p)).t; stageSeen = -1; nextSteps = 0; continue; }
@@ -112,7 +117,7 @@ async function run(br, devName, strat, seed) {
     await I.move(a.dx, a.dy, w.rot, a.fire); if (a.dash) await I.dash(); if (a.emp) await I.emp();
     R.gameSec += STEPS / 60; tick++;
     const n = s; if (n.score + ':' + n.hp !== lastKey) { lastKey = n.score + ':' + n.hp; lastChange = n.t; }
-    if (n.t - lastChange > 20 && n.live && !n.over) { R.stuck++; R.defects.push(`stuck 20s at stage ${n.stage} t=${n.t.toFixed(0)} score=${n.score} hp=${n.hp}`); lastChange = n.t; if (R.stuck >= 2) break; }
+    if (n.t - lastChange > 20 && n.live && !n.over) { R.stuck++; R.defects.push(`stuck 20s at stage ${n.stage} t=${n.t.toFixed(0)} score=${n.score} hp=${n.hp} ship=${w.px | 0},${w.py | 0} boss=${JSON.stringify(w.boss)} en=${w.en.length} eb=${w.eb.length} enemies=${JSON.stringify(w.en.slice(0, 4).map(e => [e[0] | 0, e[1] | 0, e[5]]))}`); lastChange = n.t; if (R.stuck >= 2) break; }
     if (tick % 40 === 0) await hudCheck();
     if (n.stage && n.stage !== stageSeen) lastChange = n.t;
   }
@@ -153,16 +158,16 @@ const pct = (a, q) => { const s = [...a].sort((x, y) => x - y); return s[Math.mi
 (async () => {
   const b = await L.boot(); global.__BASE = b.base; const jobs = [];
   // one browser PROCESS per worker (below): contexts sharing a process starved each other (30 sim-s in 400 s)
-  for (const dv of DEVS) for (const sd of Array.from({ length: SEEDS }, (_, i) => i + 1)) { jobs.push(br => controls(br, dv, sd)); for (const stg of STRATS) jobs.push(br => run(br, dv, stg, sd)); }
+  for (const dv of DEVS) for (const sd of Array.from({ length: SEEDS }, (_, i) => i + 1)) { jobs.push(br => controls(br, dv, sd)); for (const stg of STRATS) for (const sn of (STARTS.length ? STARTS : [0])) jobs.push(br => run(br, dv, stg, sd, sn)); }
   const out = [], ctl = []; let ji = 0;
   await Promise.all(Array.from({ length: PAR }, async (_, wi) => { const wb = wi ? await PW.chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }) : b.br; while (ji < jobs.length) { const j = jobs[ji++]; try { const r = await j(wb); (r.strat ? out : ctl).push(r);
-    if (r.strat) console.log(`${r.dev} ${r.strat} s${r.seed}: maxStage ${r.maxStage} deaths ${r.deaths} boss ${r.bossSeen}/${r.bossKilled} results ${r.results} stuck ${r.stuck} hud ${r.hudBad}/${r.hudN} err ${r.errs.length} rej ${(r.rej || []).length} ui ${r.ui.length} sim ${r.gameSec.toFixed(0)}s wall ${r.wall.toFixed(0)}s${r.defects.length ? ' DEF ' + r.defects.slice(0, 2).join(' | ').slice(0, 200) : ''}`);
+    if (r.strat) console.log(`${r.dev} ${r.strat} s${r.seed}${r.start ? ' from' + r.start : ''}: next ${r.nextOk || 0} bossname ${r.bossName || '-'} maxStage ${r.maxStage} deaths ${r.deaths} boss ${r.bossSeen}/${r.bossKilled} results ${r.results} stuck ${r.stuck} hud ${r.hudBad}/${r.hudN} err ${r.errs.length} rej ${(r.rej || []).length} ui ${r.ui.length} sim ${r.gameSec.toFixed(0)}s wall ${r.wall.toFixed(0)}s${r.defects.length ? ' DEF ' + r.defects.slice(0, 2).join(' | ').slice(0, 200) : ''}`);
     else console.log(`${r.dev} controls s${r.seed}: ${JSON.stringify(r.ok)}${r.defects.length ? ' DEF ' + r.defects.join(' | ').slice(0, 300) : ''}`); } catch (e) { console.log('RUNNER ERROR', String(e.stack).split('\n').filter(l => /gauntlet|Error/.test(l)).join(' / ').slice(0, 400)); out.push({ dev: 'x', strat: 'crash', seed: 0, errs: ['runner: ' + e], defects: [String(e)], ui: [], stages: [] }); } } }));
   const pf = []; for (const dv of DEVS) { try { pf.push(await perf(b.br, dv, 1)); } catch (e) { console.log('perf failed', dv, String(e).slice(0, 120)); } }
   await b.close();
   console.log('\n== SUMMARY (minimums over runs) ==');
-  for (const dv of DEVS) for (const stg of STRATS) { const rs = out.filter(r => r.dev === dv && r.strat === stg); if (!rs.length) continue; const mn = f => Math.min(...rs.map(f));
-    console.log(`${dv} ${stg}: runs ${rs.length} minStage ${mn(r => r.maxStage)} bossSeen ${rs.filter(r => r.bossSeen).length} bossKilled ${rs.filter(r => r.bossKilled).length} resultRuns ${rs.filter(r => r.results).length} stuckRuns ${rs.filter(r => r.stuck).length} errRuns ${rs.filter(r => r.errs.length).length} rejRuns ${rs.filter(r => (r.rej || []).length).length} hudBad ${rs.reduce((a, r) => a + r.hudBad, 0)}/${rs.reduce((a, r) => a + r.hudN, 0)} uiRuns ${rs.filter(r => r.ui.length).length}`); }
+  for (const dv of DEVS) for (const stg of STRATS) for (const sn of (STARTS.length ? STARTS : [0])) { const rs = out.filter(r => r.dev === dv && r.strat === stg && (r.start || 0) === sn); if (!rs.length) continue; const mn = f => Math.min(...rs.map(f));
+    console.log(`${dv} ${stg}${sn ? ' from' + sn : ''}: runs ${rs.length} minStage ${mn(r => r.maxStage)} bossSeen ${rs.filter(r => r.bossSeen).length} bossKilled ${rs.filter(r => r.bossKilled).length} resultRuns ${rs.filter(r => r.results).length} stuckRuns ${rs.filter(r => r.stuck).length} errRuns ${rs.filter(r => r.errs.length).length} rejRuns ${rs.filter(r => (r.rej || []).length).length} hudBad ${rs.reduce((a, r) => a + r.hudBad, 0)}/${rs.reduce((a, r) => a + r.hudN, 0)} uiRuns ${rs.filter(r => r.ui.length).length}`); }
   const uniq = {}; for (const r of out) for (const d of [...r.defects, ...r.errs, ...(r.ui || []), ...(r.rej || []).map(x => 'rej: ' + x)]) { const k = d.replace(/\d+/g, '#').slice(0, 110); (uniq[k] = uniq[k] || { n: 0, ex: d, who: `${r.dev}/${r.strat}/s${r.seed}` }).n++; }
   for (const r of ctl) for (const d of [...r.defects, ...r.errs]) { const k = 'ctl ' + d.replace(/\d+/g, '#').slice(0, 100); (uniq[k] = uniq[k] || { n: 0, ex: d, who: `${r.dev}/controls/s${r.seed}` }).n++; }
   console.log('controls probe: ' + DEVS.map(dv => `${dv} ${ctl.filter(r => r.dev === dv && !r.defects.length).length}/${ctl.filter(r => r.dev === dv).length} clean`).join(', '));
