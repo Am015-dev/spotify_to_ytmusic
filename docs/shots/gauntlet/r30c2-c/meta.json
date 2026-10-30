@@ -1,0 +1,1 @@
+{"when":"2026-10-30T04:31Z","cmd":"node tools/gauntlet.js --build out/r30c2-c --ver r30c2-c --only drive","wall":"244"}
