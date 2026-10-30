@@ -1,0 +1,218 @@
+[
+ {
+  "id": "boot/playVisible",
+  "what": "page open → PLAY button visible",
+  "num": "15.3 s lab",
+  "bar": "INFO (lab, software GL)",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/fra_0_title.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl",
+  "what": "PLAY tap → first control of the car",
+  "num": "57.2 s lab (6x CPU)",
+  "bar": "<= 36 s lab at 6x (= ~5 s on an iPhone: 5 s x 7.2-7.3, REVIEW_2K_33, docs/GAUNTLET.md)",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/menu",
+  "what": "race menu never shows after PLAY (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "boot/loader",
+  "what": "loader never covers a controllable car (hr/boot)",
+  "num": "0 samples",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "hud/overControls",
+  "what": "HUD text over the touch buttons (first control)",
+  "num": "0 overlaps",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/fra_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "hud/minText",
+  "what": "smallest visible text (first control)",
+  "num": "0 items < 12 px",
+  "bar": "0 (CLAUDE.md: 12 px minimum)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "perf/frame",
+  "what": "frame time while driving (real clock, 6x CPU, software GL)",
+  "num": "p95 917 ms, 20/20 frames > 50 ms",
+  "bar": "INFO (lab GL; iPhone truth = perf/ios-reveal)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "steer/buttons",
+  "what": "hold GAS + ◀ (or ▶) for 1.2 s at ~30-50 km/h turns the car that way",
+  "num": "◀ left 55°, left 54° · ▶ right 62°, right 47°",
+  "bar": "each >= 20° the pressed way",
+  "pass": "PASS",
+  "shot": "",
+  "note": "from 46.1 km/h, from 47.9 km/h, from 45.6 km/h, from 44.7 km/h"
+ },
+ {
+  "id": "drive/time",
+  "what": "2 min street drive, gas held, following streets",
+  "num": "120 s game, 1.63 km, avg 48 km/h",
+  "bar": ">= 110 s game and >= 1.0 km",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/fra_2_street_at_speed.jpg",
+  "note": ""
+ },
+ {
+  "id": "drive/frustration",
+  "what": "time under 10 km/h with GAS held",
+  "num": "2 %",
+  "bar": "<= 15 % (bughunt frustration limit)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/pop",
+  "what": "traffic car pops on screen (in view, 6-60 m)",
+  "num": "0 jumps > 2 m, 0 appear < 40 m",
+  "bar": "0 jumps > 2 m; 0 appear < 40 m",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/onStreet",
+  "what": "bot check: share of the drive on a street (a bot off the street makes the drive rows meaningless)",
+  "num": "94 %",
+  "bar": ">= 80 % (script validity)",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/offLane",
+  "what": "in-view traffic sideways off its lane (junction hand-off residual, 6-60 m; REVIEW_2K_30 rev/latres)",
+  "num": ">2 m 2.0 %, >4 m 0.00 % of 2976 samples, 0 samples > 2 m for > 3 s, max 3.21 m (k10 1767>1602@0.42 d38)",
+  "bar": "INFO",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "drive/near",
+  "what": "traffic near the player (HITRUN_GAP gap 8)",
+  "num": "1.3 cars within 40 m (avg)",
+  "bar": ">= 2.5 (hr/near)",
+  "pass": "FAIL",
+  "shot": "",
+  "note": "avg cars per frame by distance: <40 1.3, 40-80 1.9, 80-150 9.0, 150-300 30.4, >300 15.9; parked 4.3, dead 12.2; standing (<150 m, cv<1) 2.9; cars 75, hour 10.8, hourK 1.00, trHour 1; far(>240 m) cars: {\"n\":49,\"route\":6,\"tr\":0,\"pk\":0,\"dead\":12,\"noPop\":0,\"ok\":31} held 4532 law false lvTraf 1 trFar 240"
+ },
+ {
+  "id": "run/fra",
+  "what": "Frankfurt run finished without a script error",
+  "num": "Error: page.evaluate: ReferenceError: CRB_side is not defined",
+  "bar": "no error",
+  "pass": "FAIL",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "ath/boot",
+  "what": "Athens: PLAY → first control",
+  "num": "113.5 s lab (6x CPU), city ath",
+  "bar": "control in city ath, <= 36 s lab at 6x (same bar as Frankfurt, REVIEW_2K_33 (i))",
+  "pass": "FAIL",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/ath_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "run/ath",
+  "what": "Athens run finished without a script error",
+  "num": "Error: page.evaluate: ReferenceError: CRB_side is not defined",
+  "bar": "no error",
+  "pass": "FAIL",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "portrait/boot",
+  "what": "portrait 390x844: PLAY → control (1x CPU)",
+  "num": "21.7 s lab",
+  "bar": "control reached",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/band",
+  "what": "portrait: the 3D view reaches the bottom of the screen (no flat pale band under the road)",
+  "num": "mean brightness of the 84-88 % rows 56",
+  "bar": "< 140 (the beta.164 band measures 174: pale blue, no road; gui-r30a near-plane fix)",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "portrait/hud",
+  "what": "portrait: HUD text over the touch buttons",
+  "num": "0 overlaps, 0 texts < 12 px",
+  "bar": "0 / 0",
+  "pass": "PASS",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/portrait_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "boot/toControl1x",
+  "what": "PLAY tap → first control, unthrottled (1x CPU, software GL)",
+  "num": "25.9 s lab (1x)",
+  "bar": "INFO: <= 15 s (5 s x 2.9, docs/GAUNTLET.md); not a gate",
+  "pass": "INFO",
+  "shot": "docs/shots/gauntlet/rev37-tb1on/fra1x_1_first_control.jpg",
+  "note": ""
+ },
+ {
+  "id": "page/reload",
+  "what": "page never reloads",
+  "num": "0 reloads",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/jsErrors",
+  "what": "no JS errors (pageerror + console.error)",
+  "num": "0 errors",
+  "bar": "0",
+  "pass": "PASS",
+  "shot": "",
+  "note": ""
+ },
+ {
+  "id": "page/memory",
+  "what": "JS heap high-water (performance.memory)",
+  "num": "0 MB",
+  "bar": "INFO (phone cap 700 MB process, NIGHTRUN_LOG)",
+  "pass": "INFO",
+  "shot": "",
+  "note": ""
+ }
+]
