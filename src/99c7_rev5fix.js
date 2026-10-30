@@ -814,3 +814,34 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
    finally{PREW.q=q0;PREW.arm=a0;window.__pbDbMock=m0;PB.db=d0;try{if(v0==null)localStorage.removeItem(k);else localStorage.setItem(k,v0)}catch(e){}}
    goSay(`📍 PREWARM DEFAULT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${R.every(r=>r[1])?'✅ PASS':'❌ FAIL'}`)})();return'📍 PREWARM DEFAULT · running…'}}]}return}
  if(i<600)setTimeout(()=>R21F_reg(i+1),100)})(0);
+// glbuf-r30r: GO bug/no-glbuf-resize (Athens). REVIEW_2K_39: the Athens gauntlet threw "WebGLAttributes: The size of the buffer attribute's array buffer does not match the original
+// size" twice, nondeterministically. An uploaded BufferAttribute must never get an array of another byte length: three throws on the next version bump. Owner: TRN_athRecolor
+// (src/98tr_terrain.js) rebuilt a freed colour array as Float32 (4 B/value) over the packed Uint8 (1 B/value) the GPU already holds, then set needsUpdate. The GO takes the Athens
+// backdrop ridge through the phone's life (drawn+uploaded, deflated by memFree, then recoloured while its arrays are gone, then inflated and drawn again) and fails on any
+// render throw, any console error, any array of another byte length than the one first uploaded, or colours that are not the recolour (top/low) after the round trip.
+(function GB30_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='bug'&&q.id==='no-glbuf-resize')){C.items.push({ver:'bug',id:'no-glbuf-resize',area:'perf',text:'glbuf-r30r · no GL buffer resize: 📍 GO (Athens) draws the backdrop ridge, lets memFree deflate it, recolours it while its arrays are freed, inflates and draws again; checks 0 render throws, 0 console errors, every attribute keeps the byte length it was uploaded with, and the ridge colours survive. Pass line ends ✅ PASS.',go:'bug/no-glbuf-resize'})}
+ const run=async()=>{const R=renderer,rr=R.render,ce=console.error;let thr=0,msg='',cer=0;
+  const draw=()=>{try{window.__tq&&__tq.draw?__tq.draw():composer.render()}catch(err){thr++;msg=msg||String(err&&err.message).slice(0,70)}};   // ?test=…&draw=0 pages draw only through __tq.draw
+  console.error=function(){cer++;msg=msg||String(arguments[0]).slice(0,70);return ce.apply(this,arguments)};
+  try{const G=HUB.ridge;let m=null;G&&G.traverse(o=>{if(o.isMesh&&o.userData.ridge)m=o});
+   if(!m)return'📍 NO GL BUFFER RESIZE · no ridge mesh in this city → ❌ FAIL';
+   const g=m.geometry,e=(typeof MEMF!=='undefined'?MEMF.S.concat(MEMF.G||[]):[]).find(q=>q.m===m),size=()=>Object.entries(g.attributes).map(([k,a])=>k+':'+(a.array?a.array.byteLength:'freed')).join(' ');
+   m.layers.enable(0);draw();                                   // uploaded (as packed by the phone path, or raw)
+   const up=Object.fromEntries(Object.entries(g.attributes).map(([k,a])=>[k,a.array?a.array.byteLength:-1])),v0=g.attributes.color.version;
+   let zipped='no stream entry';
+   if(e){e.on=true;e.dr=1;e.zb=1;e.zr=-1e9;e.cz=null;await MEMF_zip(e);zipped=e.cz?'deflated':'zip refused'}   // memFree's far-chunk path: arrays nulled
+   G.userData.rc=0;if(typeof TRN_ridgeFit==='function')TRN_ridgeFit();                               // the lazy recolour while the arrays are gone
+   draw();
+   if(e&&e.cz){e.cz.st=1;await MEMF_unzip(e)}                                                      // inflated again, as when the camera is back
+   m.layers.enable(0);draw();
+   const bad=Object.entries(g.attributes).filter(([k,a])=>a.array&&up[k]>=0&&a.array.byteLength!==up[k]).map(([k,a])=>k+' '+up[k]+'→'+a.array.byteLength);
+   const p=g.attributes.position,c=g.attributes.color,top=new THREE.Color('#4f5d80'),low=new THREE.Color('#8a90a2');let wrong=0,n=0;
+   if(p.array&&c.array)for(let k=0;k<p.count;k+=7){const C=p.getY(k)>-39?top:low;n++;if(Math.abs(c.getX(k)-C.r)>.03||Math.abs(c.getY(k)-C.g)>.03||Math.abs(c.getZ(k)-C.b)>.03)wrong++}
+   const ok=thr===0&&cer===0&&bad.length===0&&wrong===0&&n>0;
+   return`📍 NO GL BUFFER RESIZE · ${ok?'✓':'✗'} ridge ${zipped} · ${thr} render throws${msg?' ('+msg+')':''} (0) · ${cer} console errors (0) · ${bad.length} attributes with another byte length than uploaded (0)${bad.length?' '+bad.join(','):''} · ${wrong}/${n} ridge vertices not in the recolour (0) · ${size()} → ${ok?'✅ PASS':'❌ FAIL'}`}
+  catch(err){return`📍 NO GL BUFFER RESIZE · threw ${String(err&&err.message).slice(0,80)} → ❌ FAIL`}
+  finally{console.error=ce}};
+ const go=()=>{run().then(r=>goSay(r));return'📍 NO GL BUFFER RESIZE · running…'};
+ C.GO['bug/no-glbuf-resize']=[{c:'ath',n:'no GL buffer resize on the Athens backdrop ridge',fn:go,secs:90}]
+ return}
+ if(i<600)setTimeout(()=>GB30_reg(i+1),100)})(0);

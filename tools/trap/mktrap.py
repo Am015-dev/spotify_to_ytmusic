@@ -5,6 +5,8 @@
 #        GTRAP=/tmp/three.trap.js node tools/gauntlet.js ...   -> docs/shots/gauntlet/<ver>/trap.jsonl
 # Every upload of a BufferAttribute whose array is null (createBuffer, or a version bump of a buffer already on the GPU) records the drawn object,
 # the attribute key, where the array was nulled (ns), where its geometry was disposed (ds) and where needsUpdate was set on the freed array (vs).
+# glbuf-r30r: also every version bump whose array byteLength differs from the uploaded size (the 'size of the buffer attribute's array buffer does not match' throw): path 'resize',
+# with up (uploaded bytes), now (new bytes) and as (stack of the assignment that replaced the array).
 import sys
 s = open(sys.argv[1], encoding='utf8').read()
 rec = ("try { const o = globalThis.__curObj, g = o && o.geometry; let k = '?'; if ( g ) { for ( const n in g.attributes ) if ( g.attributes[ n ] === attribute ) k = n; if ( g.index === attribute ) k = 'index'; } "
@@ -19,10 +21,12 @@ rep("\tfunction createBuffer( attribute, bufferType ) {\n\n\t\tconst array = att
     "\tfunction createBuffer( attribute, bufferType ) {\n\n\t\tconst array = attribute.array;\n\t\tif ( array === null ) { " + rec % 'create' + " }")
 rep("\t\t\tif ( data.size !== attribute.array.byteLength ) {",
     "\t\t\tif ( attribute.array === null ) { " + rec % 'update' + " }\n\t\t\tif ( data.size !== attribute.array.byteLength ) {")
+rep("\t\t\tif ( data.size !== attribute.array.byteLength ) {",
+    "\t\t\tif ( data.size !== attribute.array.byteLength ) { " + (rec % 'resize').replace("ns: attribute.__ns,", "up: data.size, now: attribute.array.byteLength, as: attribute.__as, ns: attribute.__ns,"))
 rep("\tfunction update( object ) {\n\n\t\tconst frame = info.render.frame;\n",
     "\tfunction update( object ) {\n\n\t\tconst frame = info.render.frame;\n\t\tglobalThis.__curObj = object;\n")
 s += """
-Object.defineProperty(BufferAttribute.prototype,'array',{configurable:true,get(){return this.__a},set(v){if(v===null&&this.__a)this.__ns=new Error('nulled').stack.slice(0,1500);this.__a=v}});
+Object.defineProperty(BufferAttribute.prototype,'array',{configurable:true,get(){return this.__a},set(v){if(v===null&&this.__a)this.__ns=new Error('nulled').stack.slice(0,1500);if(v!==null&&this.__ub!==undefined&&this.__ub!==v.byteLength)this.__as=new Error('replaced '+this.__ub+'->'+v.byteLength).stack.slice(0,1500);if(v!==null&&this.__ub===undefined)this.__ub=v.byteLength;this.__a=v}});
 {const D=Object.getOwnPropertyDescriptor(BufferAttribute.prototype,'needsUpdate');Object.defineProperty(BufferAttribute.prototype,'needsUpdate',{configurable:true,set(v){if(v===true&&this.__a===null)this.__vs=new Error('needsUpdate on freed').stack.slice(0,1500);D.set.call(this,v)}})}
 {const d=BufferGeometry.prototype.dispose;BufferGeometry.prototype.dispose=function(){this.__ds=new Error('gdispose').stack.slice(0,1200);return d.call(this)}}
 """
