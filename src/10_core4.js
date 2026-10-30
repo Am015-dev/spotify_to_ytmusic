@@ -185,8 +185,11 @@ const FOGC=new THREE.Color('#1c1030');scene.fog=new THREE.FogExp2(FOGC,0.00042);
 const camera=new THREE.PerspectiveCamera(64,1,.4,9000);scene.add(camera);
 let lowGfx=matchMedia('(pointer:coarse)').matches;
 // crash-1: low-memory tier, auto on iPhone/iPad/Android (iOS Safari kills the tab when the page gets too big). ?lowmem=0 off, ?lowmem=1 on anywhere
-function LOWMEM_is(u,tp,q){if(q==='0'||q==='1')return q==='1';return /iPhone|iPad|iPod|Android/.test(u||'')||/Macintosh/.test(u||'')&&tp>1}
-const LOWMEM=LOWMEM_is(navigator.userAgent,navigator.maxTouchPoints,new URLSearchParams(location.search).get('lowmem'));window.__lowmem=LOWMEM;
+// lowmem-r24h (plan lane 1): also on with navigator.deviceMemory <= 4 (Safari has none: UA test); ?low=1|0 = same switch as ?lowmem=1|0
+function LOWMEM_is(u,tp,q,dm){if(q==='0'||q==='1')return q==='1';return /iPhone|iPad|iPod|Android/.test(u||'')||/Macintosh/.test(u||'')&&tp>1||dm>0&&dm<=4}
+const LOWMEM=LOWMEM_is(navigator.userAgent,navigator.maxTouchPoints,(_q=>_q.get('low')??_q.get('lowmem'))(new URLSearchParams(location.search)),navigator.deviceMemory||0);window.__lowmem=LOWMEM;
+// lowmem-r24h: every image/canvas texture > 512 px uploads downscaled (three's resizeImage reads capabilities.maxTextureSize at upload; the source canvas stays, updates still work). ?ltex=0 off
+if(LOWMEM&&!/[?&]ltex=0/.test(location.search))renderer.capabilities.maxTextureSize=Math.min(renderer.capabilities.maxTextureSize,512);
 // ios-r17s/r17z: touch/lowmem far building LOD: range cap 900 m (?lodrt=0 off) and coarser cell (?lodc=N); set here because the cells are built at load
 if(LOWMEM){const _q=new URLSearchParams(location.search),_r=_q.get('lodrt'),_c=_q.get('lodc');TUNE.wbLodRt=_r==null?900:+_r||0;if(_c!=null&&+_c>0)TUNE.wbLodCell=+_c}
 // crash-2: live GPU bytes (buffers + textures), counted at the GL calls; renderer.info counts objects, not bytes, and a first-visit upload of

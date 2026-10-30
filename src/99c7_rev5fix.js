@@ -800,6 +800,19 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
  const go=c=>()=>{run(c).then(r=>goSay(r));return'📍 iOS REVEAL · booting '+c+' throttled…'};
  C.GO['perf/ios-reveal']=[{c:'fra',n:'iPhone reveal (Frankfurt)',fn:go('fra'),secs:300}];C.GO['perf/ios-reveal-ath']=[{c:'ath',n:'iPhone reveal (Athens)',fn:go('ath'),secs:300}]}return}
  if(i<600)setTimeout(()=>R20F_reg(i+1),100)})(0);
+// lowmem-r24h: GO perf/lowmem (plan lane 1). State asserts: the low-memory switch is on for the iPhone UA, iPad-as-Mac, deviceMemory <= 4, off for a PC with 8 GB, ?low=0 wins;
+// this page (phone profile) has it on with half-size canvas textures; then boots the city twice in an iframe (?low=1 vs ?low=1&ltex=0) and compares MEM_GPU.est(): drop >= 30 %.
+(function LM24_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='lowmem')){
+ C.items.push({ver:'perf',id:'lowmem',area:'perf',text:'lowmem-r24h · Low-memory phone profile: 📍 GO checks the switch (iPhone/iPad UA, deviceMemory ≤ 4, ?low=1|0) and boots the city twice in an iframe: GPU memory estimate with the profile ≥ 30 % below the same boot with ?ltex=0 (before r24h: Frankfurt 173 MB, Athens 138 MB).'});
+ const boot=async(c,q)=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;z-index:99999';f.src=location.pathname+'?test='+c+'&draw=0&low=1'+q;document.body.appendChild(f);
+  try{const t0=performance.now();let w=null;while(performance.now()-t0<240000){await new Promise(r=>setTimeout(r,1000));try{w=f.contentWindow}catch(e){}if(w&&w.__tq&&w.__tq.ready)break}
+   if(!w||!w.__tq||!w.__tq.ready)return null;w.__tq.draw();await new Promise(r=>setTimeout(r,500));return w.MEM_GPU.est()}finally{f.remove()}};
+ const run=async c=>{const ios='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',pc='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36',mac='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15';
+  const sw=LOWMEM_is(ios,5,null,0)&&LOWMEM_is(mac,5,null,0)&&LOWMEM_is(pc,0,null,4)&&!LOWMEM_is(pc,0,null,8)&&!LOWMEM_is(ios,5,'0',0)&&LOWMEM_is(pc,0,'1',8),ph=/iPhone/.test(navigator.userAgent),pg=!ph||LOWMEM&&LTEX&&LTEX_st.n>0;
+  const lo=await boot(c,''),hi=await boot(c,'&ltex=0'),d=lo&&hi?Math.round((1-lo/hi)*100):-1,ok=sw&&pg&&d>=30;
+  return`📍 LOW-MEM PROFILE ${c} · switch (iPhone, iPad, ≤ 4 GB on, 8 GB PC off, ?low=0 wins) ${sw?'✓':'✗'} · this page ${LOWMEM?'ON':'off'}${ph?' (iPhone UA)':''}, ${LTEX_st.n} half-size textures (-${Math.round(LTEX_st.saved*4/3/1048576)} MB) ${pg?'✓':'✗'} · GPU estimate ${lo} MB vs ${hi} MB without = -${d} % (≥ 30 %) ${ok?'✅ PASS':'❌ FAIL'}`};
+ C.GO['perf/lowmem']=['fra','ath'].map(c=>({c,n:'low-memory profile '+c,secs:300,fn:()=>{run(c).then(r=>goSay(r),e=>goSay('📍 LOW-MEM PROFILE · threw '+String(e&&e.message).slice(0,80)+' ❌ FAIL'));return'📍 LOW-MEM PROFILE · booting '+c+' twice…'}}))}return}
+ if(i<600)setTimeout(()=>LM24_reg(i+1),100)})(0);
 // ios-r21f: GO perf/prewarm-default. State asserts on PREW_decide (no graphics): no db (live site) -> OFF; db (Beta page) -> ON, then OFF, then ON (per-device alternation, localStorage od_prew_arm, first run ON);
 // ?prewarm=0 forces OFF and ?prewarm=1 forces ON whatever the db; the arm lands in the session doc as prewArm and doc.prew carries {ran,abortedAtMs,programs,ms}.
 (function R21F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='prewarm-default')){

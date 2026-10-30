@@ -11,10 +11,16 @@ function MEMF_free(m,part){const g=m.geometry;if(!g||g.userData.mfDone)return;g.
   const A=part?MEMF.attrs.map(k=>g.attributes[k]).filter(Boolean):Object.values(g.attributes);if(g.index&&!part)A.push(g.index);let b=0;for(const a of A){if(!a.array||a.isInstancedBufferAttribute||a.isInterleavedBufferAttribute||a.usage!==THREE.StaticDrawUsage)continue;b+=a.array.byteLength;a.array=null;a.getX=a.getY=a.getZ=a.getW=BA_freed}
   MEMF.n++;MEMF.mb+=b/1048576}
 function MEMF_sweep(){if(!TUNE.memFree)return;const hook=m=>{if(m.isInstancedMesh&&TUNE.gpuStr&&m.geometry&&!MEMF.seen.has(m)&&!m.userData.sky){MEMF.seen.add(m);MEMF_ipack(m);return}
-  if(m.isMesh&&!m.isInstancedMesh&&!m.isSkinnedMesh&&m.geometry&&!MEMF.seen.has(m)){MEMF.seen.add(m);const u=m.userData;if(MEMF_dyn(m.geometry))return;let part=0,cd=0;for(const s of MEMF.skip)if(u[s]){if(LOWMEM&&MEMF.part.includes(s)){part=1;MEMF_gadd(m);break}if(s==='cd'&&TUNE.gpuStr){cd=1;continue}return}
+  if(m.isMesh&&!m.isInstancedMesh&&!m.isSkinnedMesh&&m.geometry&&!MEMF.seen.has(m)){MEMF.seen.add(m);const u=m.userData;if(MEMF_dyn(m.geometry))return;let part=0,cd=0;for(const s of MEMF.skip)if(u[s]){if(LOWMEM&&MEMF.part.includes(s)){part=1;MEMF_gadd(m);if(MEMF.hq)MEMF_hpk(m);break}if(s==='cd'&&TUNE.gpuStr){cd=1;continue}return}
     if(!part&&TUNE.gpuStr){const g=m.geometry,w=MEMF.gu.get(g);if(w===undefined){if(!MEMF_ha(g))return;MEMF.gu.set(g,m);m.updateMatrixWorld();MEMF_pack(m,cd?u.cd:0);return}if(w){MEMF.gu.set(g,null);const i=MEMF.S.findIndex(e=>e.m===w);if(i>=0){const e=MEMF.S[i];if(e.zb)e.zb=2;if(e.cz)MEMF_shh(e,m);else{MEMF.S.splice(i,1);e.m.layers.enable(0)}}}if(cd)return}   // crash-5: shared geometry -> memFree as before (crash-6: a shared cd geometry is left alone)
     const f=m.onAfterRender;m.onAfterRender=function(){MEMF_free(this,part);this.onAfterRender=f}}};
   const walk=o=>{if(o===RO.grp||o.userData.keep&&!o.isMesh||o.userData.gb)return;hook(o);for(const c of o.children)walk(c)};walk(scene)}
+// mem-r30p: Athens keeps ~38 MB of ground / drive-surface meshes (trG, gk, dr) that are hidden and never drawn, so memFree's after-draw drop never runs on them.
+// While hidden, their normal -> Int8 and colour -> Uint8 (normalized, as MEMF_q; position + index stay for raycasts / height reads). ?hq=0 off.
+MEMF.hq=LOWMEM&&!/[?&]hq=0/.test(location.search);
+function MEMF_hpk(m){for(let o=m;o;o=o.parent)if(!o.visible){const g=m.geometry,A=g.attributes;if(g.userData.hq)return;g.userData.hq=1;const q=(k,T,s,lo)=>{const a=A[k];if(!a||!a.array||a.normalized||a.isInterleavedBufferAttribute||a.usage!==THREE.StaticDrawUsage||!(a.array instanceof Float32Array))return;
+  const n=a.array.length,r=new T(n);for(let i=0;i<n;i++)r[i]=Math.round(Math.max(lo,Math.min(1,a.array[i]))*s);g.setAttribute(k,new THREE.BufferAttribute(r,a.itemSize,true));MEMF.st.hqMB=(MEMF.st.hqMB||0)+(n*4-n)/1048576};
+  g.dispose();q('normal',Int8Array,127,-1);q('color',Uint8Array,255,0);MEMF.st.hq=(MEMF.st.hq||0)+1;return}}
 // jserr-r30f: a mesh its owner rewrites every frame (DynamicDrawUsage, e.g. the drift trail) is not static world geometry: never freed, packed, streamed or zipped
 function MEMF_dyn(g){for(const k in g.attributes)if(g.attributes[k].usage!==THREE.StaticDrawUsage)return true;return !!g.index&&g.index.usage!==THREE.StaticDrawUsage}
 setInterval(MEMF_sweep,2500);

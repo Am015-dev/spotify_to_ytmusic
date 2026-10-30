@@ -1,4 +1,8 @@
-let ENVD=true;const ENVC=new Map();function buildEnv(){ENVD=false;const id=MOOD.id;let t=ENVC.get(id);if(!t){const pm=new THREE.PMREMGenerator(renderer);t=pm.fromScene(ENVSC,.02).texture;pm.dispose();ENVC.set(id,t)}scene.environment=t;if(ENVC.size>3)for(const[k,o]of ENVC)if(o!==t){o.dispose();ENVC.delete(k);break}}
+let ENVD=true;const ENVC=new Map(),ENV_old=[];function buildEnv(){ENVD=false;const id=MOOD.id;let t=ENVC.get(id);if(!t){const pm=new THREE.PMREMGenerator(renderer);const rt=pm.fromScene(ENVSC,.02);t=rt.texture;t.userData.rt=rt;pm.dispose();ENVC.set(id,t)}scene.environment=t;const cap=LOWMEM&&!/[?&]ltex=0/.test(location.search)?1:3;for(const[k,o]of ENVC)if(ENVC.size>cap&&o!==t){ENV_free(o,t);ENVC.delete(k)}while(ENV_old.length){const o=ENV_old.pop();if(o!==t)ENV_free(o,t)}}   // lowmem-r24h: the low tier keeps only the current mood's env map (each PMREM is 6 MB half-float)
+// lowmem-r24h: a PMREM env is a render target: texture.dispose() alone never freed its GL texture (three r164), so every evicted env stayed on the GPU. Free the target.
+// Low tier only (the desktop keeps the old no-op dispose): materials still holding the old env are moved to the current one first.
+function ENV_free(t,cur){if(!t)return;const rt=t.userData&&t.userData.rt;if(!rt||!LOWMEM||/[?&]ltex=0/.test(location.search)){t.dispose();return}
+  scene.traverse(o=>{for(const m of[].concat(o.material||[]))if(m&&m.envMap===t)m.envMap=cur||null});if(scene.environment===t)scene.environment=cur||null;rt.dispose()}
 scene.environmentIntensity=.8;
 let lightningT=6,litV=0;
 function applyMood(id){const m=MOODS.find(x=>x.id===id)||ATHM.find(x=>x.id===id)||MOODS[0];const changed=m!==MOOD;MOOD=m;const U=SKYU;
@@ -23,7 +27,15 @@ function dataTex(d,w,h,v,srgb){let t;
   if(v.half){const a=new Uint16Array(d.length);for(let i=0;i<d.length;i++){const x=d[i]/255;a[i]=THREE.DataUtils.toHalfFloat(srgb&&(i&3)!==3?s2l(x):x)}t=new THREE.DataTexture(a,w,h,THREE.RGBAFormat,THREE.HalfFloatType)}
   else{t=new THREE.DataTexture(new Uint8Array(d),w,h);if(srgb)t.colorSpace=THREE.SRGBColorSpace}
   t.flipY=true;return t}
-function mkTex(c,v,srgb){let t;
+// lowmem-r24h (plan lane 1, top mip skipped): on the low-memory tier a canvas texture >= 256 px uploads at half size (a quarter of the GPU bytes; the city's
+// 512 px facades were 46 of 79 MB). Updates still work: needsUpdate redraws the half copy from the source canvas. ?ltex=0 off.
+const LTEX=typeof LOWMEM!=='undefined'&&LOWMEM&&!/[?&]ltex=0/.test(location.search),LTEX_st={n:0,saved:0};
+function LTEX_half(c){if(!LTEX||!c||!c.getContext||Math.max(c.width,c.height)<256)return null;const h=document.createElement('canvas');h.width=Math.max(1,c.width>>1);h.height=Math.max(1,c.height>>1);
+  const draw=()=>{const g=h.getContext('2d');g.clearRect(0,0,h.width,h.height);g.imageSmoothingQuality='high';g.drawImage(c,0,0,h.width,h.height)};draw();h._base=c._base;LTEX_st.n++;LTEX_st.saved+=(c.width*c.height-h.width*h.height)*4;return{h,draw}}
+function mkTex(c,v,srgb){const H=v.none?null:LTEX_half(c);if(H){const t=mkTex0(H.h,v,srgb);t.userData.lsrc=c;if(t.userData.src)t.userData.src=H.h;
+  Object.defineProperty(t,'needsUpdate',{configurable:true,set(x){if(x){H.draw();if(t.isDataTexture){const d=H.h.getContext('2d').getImageData(0,0,H.h.width,H.h.height).data,a=t.image.data;if(a instanceof Uint8Array)a.set(d)}t.version++;if(t.source)t.source.needsUpdate=true}}});return t}
+  return mkTex0(c,v,srgb)}
+function mkTex0(c,v,srgb){let t;
   if(v.none){const col=new THREE.Color();let a=0;if(c._base&&c._base!=='transparent'){try{col.setStyle(c._base,THREE.SRGBColorSpace);a=255}catch(e){}}
     t=new THREE.DataTexture(new Uint8Array([col.r*255,col.g*255,col.b*255,a].map(Math.round)),1,1);if(srgb)t.colorSpace=THREE.SRGBColorSpace}
   else if(v.canvas){t=new THREE.CanvasTexture(c);if(srgb)t.colorSpace=THREE.SRGBColorSpace}
