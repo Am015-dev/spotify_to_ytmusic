@@ -53,3 +53,8 @@ The W273 "0 cleared, died at 69-99 s" came from an overloaded machine (frame p95
 
 ## W276 (30 Oct 2026): phone boss framing
 Phone dodger, 8 seeds, before: 0/8 cleared, died t=99-209, boss reached in 6-7 of 8, boss hp left 156-238 of 288. The boss FIGURE (+-55 px, drawn sprite) is cropped at the view walls because its body box is 54 px wide: figure in view min 0.76, median 0.87, 42% of boss frames >= 95%, wind-up frames 57% >= 95%. Fix tried (streetboss.js `?bossframe=1`) gave figure 1.00 but froze the boss; left OFF. See HANDOFF-W276.md.
+
+## W277 (30 Oct 2026): phone boss frozen-fix and framing
+Frozen boss of W276's ?bossframe=1: its env wrapper assigned the getter-only env.G (TypeError every tick). Replaced by a figure half-width (street2.js heavyDef FW=58, foot.js clamp); flag deleted.
+Figure >= 95% in view, boss fight isolated (JUMP=152), phone dodger: 49% -> 100% of frames (min 0.75 -> 1.00), wind-up 66% -> 100%. Boss still walks, winds up, charges, recovers; hitbox/hp unchanged.
+Clears (boss isolated, 8 seeds): phone dodger 0/8 before and after, tactician 0/8; PC dodger 0/8. 53 of 57 hearts lost on phone went to street foes during the boss fight, 4 to the boss. Details: HANDOFF-W277.md.

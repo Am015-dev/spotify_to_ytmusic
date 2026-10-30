@@ -35,7 +35,10 @@ function wrap(def,fn){def.touch=0;def.ai=function(e,dt,env){if(!e._i){e._i=1;e.s
     e.sT+=dt;e.y=FL;if(e.state==='dead'){e.vx=0;e.tele=0;e.wind=0;if(e.sT>.5)e.remove=true;return;}fn(e,dt,env);};
   def.onDeath=function(e){e.state='dead';e.sT=0;e.tele=0;e.wind=0;const L=def.drops||[];e.dropList=L.length&&Math.random()<(def.dropP||0)?[L[Math.floor(Math.random()*L.length)]]:[];};return def;}
 function go(e,s){e.state=s;e.sT=0;}
-function walk(e,env,v,dt){const G=env.G,lo=G.camX+e.w/2,hi=G.camX+G.viewW-e.w/2,nx=e.x+v*dt;if(!e.seen||(nx>=lo&&nx<=hi))e.x=nx;e.vx=v;}
+/* W277: e.fw = the half-width of the DRAWN figure (bosses: the big heavy's sprite is about +-55 px around its 54 px body box). Every clamp below
+   (walk, charge wall, leap landing in streetboss.js) keeps the whole figure on screen; a step back toward the road is always allowed. Hitbox unchanged. */
+const half=e=>e.fw||e.w/2;
+function walk(e,env,v,dt){const G=env.G,lo=G.camX+half(e),hi=G.camX+G.viewW-half(e),nx=e.x+v*dt;if(!e.seen||(nx>=lo&&nx<=hi)||(nx<lo&&nx>e.x)||(nx>hi&&nx<e.x))e.x=nx;e.vx=v;}
 const age=(e,env)=>e.seenAt2==null?0:env.G.time-e.seenAt2;
 FE.rusher=wrap({hp:3,w:28,h:62,score:120,c:'#ff4a9a',drops:['heal','bomb'],dropP:.12,
   pose:e=>e.state==='dead'?'die':e.flash>0?'hit':e.state==='crouch'?'crouch':e.state==='lunge'?'melee':abs(e.vx)>5?(Math.floor(e.t*8)%2?'run-a':'run-b'):'idle'},
@@ -65,15 +68,16 @@ FE.gunner=wrap({hp:3,w:30,h:64,score:200,c:'#e07a2a',drops:['w_hmg','w_shot','he
     // no cover left: in the open, keeps range and fires
     e.hid=false;const want=230;walk(e,env,abs(dx)>want+30?e.facing*150:abs(dx)<want-60?-e.facing*110:0,dt);
     e.cd=(e.cd==null?1:e.cd)-dt;if(e.cd<=0&&e.tele<=0&&!e.tw){e.tele=.5;e.tw=1;}if(e.tw&&e.tele<=0){e.tw=0;e.cd=2.2;env.shoot(e,Math.atan2(P.y-40-(e.y-44),dx),360,1,{oy:e.y-44});}});
+const FW=58;   // W277: the big heavy's drawn figure half-width (measured +-55 at the W276 sprite scale, +3 px margin)
 function heavyDef(hp,h,w,score,boss){return wrap({hp,w,h,score,c:'#a03050',heavyK:1,drops:['heal','w_rocket'],dropP:boss?0:.6,
   onHit(e,d,env,hit){if(e.state==='dead')return;const front=hit&&!hit.melee&&hit.x!=null&&sgn(hit.x-e.x)===e.facing&&e.state!=='stun';if(front)e.hp+=d*.7;else if(e.state==='stun')e.hp-=d;},
   pose:e=>e.state==='dead'?'die':e.state==='stun'?'hit':e.flash>0?'hit':e.state==='wind'?'crouch':e.state==='charge'?'melee':abs(e.vx)>5?(Math.floor(e.t*5)%2?'run-a':'run-b'):'idle'},
-  (e,dt,env)=>{const P=env.P,S=F.S,dx=P.x-e.x;e.heavy=1;e.label=e.state==='stun'?'OPEN':'';
+  (e,dt,env)=>{const P=env.P,S=F.S,dx=P.x-e.x;e.heavy=1;e.label=e.state==='stun'?'OPEN':'';if(boss)e.fw=FW;
     if(e.state==='in'||e.state==='walk'){e.facing=sgn(dx);walk(e,env,abs(dx)>140?e.facing*70:0,dt);if(e.state==='in')go(e,'walk');e.cd=(e.cd==null?1.6:e.cd)-dt;if(e.cd<=0&&e.grace<=0&&e.seen)go(e,'wind');}
     else if(e.state==='wind'){e.vx=0;e.tele=.8-e.sT;if(e.sT>=.8){e.tele=0;go(e,'charge');e.chX=e.x;}}
     else if(e.state==='charge'){walk(e,env,e.facing*(boss?560:520),dt);env.melee(e,{x:e.x-e.w/2,y:e.y-e.h,w:e.w,h:e.h},boss?2:1);
       for(const p of S.pr)if(p.hp>0&&!p.gone&&abs(p.x-e.x)<p.w/2+e.w/2){if(p.k==='barrel'){IN.hitProp(p,5);}else IN.hitProp(p,99);}
-      const G=env.G,wall=e.x<=G.camX+e.w/2+2||e.x>=G.camX+G.viewW-e.w/2-2;if(e.state==='charge'&&(e.sT>=1.1||wall)){const tired=age(e,env)>15;go(e,wall||tired?'stun':'walk');if(wall||tired)e.stun=tired?2:1;e.cd=boss?1.3:2.6;}}
+      const G=env.G,wall=e.x<=G.camX+half(e)+2||e.x>=G.camX+G.viewW-half(e)-2;if(e.state==='charge'&&(e.sT>=1.1||wall)){const tired=age(e,env)>15;go(e,wall||tired?'stun':'walk');if(wall||tired)e.stun=tired?2:1;e.cd=boss?1.3:2.6;}}
     else if(e.state==='stun'){e.vx=0;if(e.sT>=(e.stun||2.2)){go(e,'walk');e.cd=boss?1.6:2.2;}}});}
 FE.heavy=heavyDef(22,84,46,500,false);
 FBS.bigheavy=FE.bigheavy=heavyDef(120,96,54,3000,true);   // ext bosses get x0.3 hp in the engine: 120 -> 36

@@ -12,7 +12,7 @@ const fs = require('fs'), path = require('path');
 const { boot, sleep, UA } = require('./lib.js');
 const SEEDS = process.env.SEEDS === undefined ? 8 : +process.env.SEEDS, PLATS = (process.env.PLAT || 'phone,pc').split(','), STRATS = (process.env.STRATS || 'idle,random,aggressor,dodger').split(','), TS = +process.env.TS || 3, MAXREAL = (+process.env.MAXREAL || 150) * 1000;
 const OUT = process.env.OUT || path.join(require('os').tmpdir(), 'gauntlet-foot'); fs.mkdirSync(OUT, { recursive: true });
-const SIZE = { phone: [390, 763], pc: [1440, 860] };
+const SIZE = { phone: [390, 763], land: [844, 390], pc: [1440, 860] };   // land (W277): a phone held sideways, touch
 const KEYS = { l: 'KeyA', r: 'KeyD', fire: 'KeyJ', jump: 'KeyK', melee: 'KeyL', guard: 'KeyI', dash: 'ShiftLeft', bomb: 'KeyG' };
 const BTN = { fire: '#fFire', jump: '#fJump', melee: '#fMelee', guard: '#fGuard', dash: '#fDash', bomb: '#fBomb' };
 const results = [], lines = []; let nfail = 0;
@@ -30,7 +30,7 @@ function makeInput(p, plat) {
   const touch = async (type, ids) => { const pts = [...touches.values()].map(t => ({ x: t.x, y: t.y, id: t.id, radiusX: 6, radiusY: 6, force: 1 })); await cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts }); };
   let nid = 1; const ids = {};
   const api = {
-    async init() { if (plat === 'phone') cdp = await p.context().newCDPSession(p); },
+    async init() { if (plat !== 'pc') cdp = await p.context().newCDPSession(p); },
     // want: { mx: -1..1, fire, jump, melee, guard, dash, bomb } -> events; a held state is kept until the want changes
     async apply(w) {
       if (plat === 'pc') {
@@ -52,7 +52,7 @@ function makeInput(p, plat) {
     async release() { if (plat === 'pc') { for (const k of [...held]) await p.keyboard.up(KEYS[k]); held.clear(); } else { const any = touches.size; touches.clear(); for (const k in ids) delete ids[k]; if (any) await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); } },
     async tap(sel) {   // a real tap / click on an element's centre (menus, pause): touch tap on the phone, mouse click on the PC
       const bb = await p.locator(sel).boundingBox(); if (!bb) return false; const x = bb.x + bb.width / 2, y = bb.y + bb.height / 2;
-      if (plat === 'phone') await p.touchscreen.tap(x, y); else await p.mouse.click(x, y); return true; },
+      if (plat !== 'pc') await p.touchscreen.tap(x, y); else await p.mouse.click(x, y); return true; },
   };
   return api;
 }
@@ -129,7 +129,7 @@ const AUDIT = () => { const out = { small: [], off: [], over: [], clip: [] }, W 
   return out; };
 
 async function openRun(b, plat, seed) {
-  const [W, H] = SIZE[plat], touch = plat === 'phone';
+  const [W, H] = SIZE[plat], touch = plat !== 'pc';
   const ctx = await b.br.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, hasTouch: touch, isMobile: touch, userAgent: touch ? UA : undefined });
   const p = await ctx.newPage(); p.errs = []; p.cons = []; p.bad = [];
   p.on('pageerror', e => p.errs.push(String(e.message).slice(0, 160))); p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|fonts\.|Ignored attempt to cancel a touchstart/.test(m.text())) p.cons.push(m.text().slice(0, 160)); });
@@ -163,7 +163,7 @@ async function run(b, plat, strat, seed) {
     const sres = await startFoot(p, inp); if (sres !== 'on') { fail('start: ' + sres); return R; }
     await sleep(400); await shot('start');
     if (process.env.JUMP) { await sleep(2500); await p.evaluate(j => { const S = window.FOOT.S; S.time = +j; S.P.x = 7350; S.camX = 7250; }, process.env.JUMP); R.notes.push('JUMP: stage clock set to ' + process.env.JUMP + ' (geometry probe only, not a clear-rate run)'); }
-    if (plat === 'phone') { R.audit = await p.evaluate(AUDIT); if (R.audit.small.length) fail('phone control < 44 px: ' + R.audit.small.join(', ')); if (R.audit.over.length) fail('phone controls overlap: ' + R.audit.over.join(', ')); if (R.audit.off.length) fail('phone control off screen: ' + R.audit.off.join(', ')); if (R.audit.clip.length) fail('phone label clipped: ' + R.audit.clip.join(', ')); }
+    if (plat !== 'pc') { R.audit = await p.evaluate(AUDIT); if (R.audit.small.length) fail('phone control < 44 px: ' + R.audit.small.join(', ')); if (R.audit.over.length) fail('phone controls overlap: ' + R.audit.over.join(', ')); if (R.audit.off.length) fail('phone control off screen: ' + R.audit.off.join(', ')); if (R.audit.clip.length) fail('phone label clipped: ' + R.audit.clip.join(', ')); }
     await p.evaluate(() => { window.__ftOn = true; }); const decide = strategy(strat, rnd);
     const seen = new Set(), atkd = new Set(), died = new Set(), maxHp = {}; let prev = null, sigT = 0, sig = '', stuck = 0, offT = 0, shotsDone = {}, minMargin = 1e9, camBack = 0, spawnL = [], behindSeen = 0, behindUntil = -1, unwarned = 0, pkMax = 0, lastS = null, fastOn = false, ticks = 0, maxFoes = 0, progBad = 0;
     const t0 = Date.now(); let s = await p.evaluate(SNAP);
@@ -189,13 +189,14 @@ async function run(b, plat, strat, seed) {
       if (process.env.BOSSVIS) { const B = s.E.find(e => e.b && !e.d); if (B && s.bossOn) { const fr = (a, b2) => Math.max(0, Math.min(b2, s.camX + s.vw) - Math.max(a, s.camX)) / Math.max(1, b2 - a), body = fr(B.x - 55, B.x + 55), tele = /^(wind|sb_.*W)$/.test(B.st), px = Math.min(B.x, s.P.x), px2 = Math.max(B.x, s.P.x), path = fr(px - 1, px2 + 1);
           const V = R.bv = R.bv || { n: 0, body: [], tele: [], path: [], t0: s.t, camX: s.camX, geo: [] }; V.n++; V.body.push(body); if (tele) { V.tele.push(body); if (B.st !== V.ls) V.path.push(path); }
           
+          if (B.st === 'wind' && V.ls !== 'wind') { V.rw = V.rw || []; V.rw.push({ t: s.t, d: Math.abs(B.x - s.P.x), hp: s.P.hp }); } if (V.rw && V.rw.length && s.P.hp < V.rw[V.rw.length - 1].hp && V.rw[V.rw.length - 1].hit == null && s.t - V.rw[V.rw.length - 1].t < 2.5 && /^(wind|charge)$/.test(B.st)) V.rw[V.rw.length - 1].hit = +(s.t - V.rw[V.rw.length - 1].t).toFixed(2);   // W277 reaction window: Kai-boss distance at each charge wind-up start, wind-up start -> hurt time
           V.ls = B.st; if (!V.geo.length || s.t - V.geo[V.geo.length - 1][0] > 4) V.geo.push([+s.t.toFixed(1), Math.round(s.camX), Math.round(s.vw), Math.round(s.P.x), Math.round(B.x), B.st, Math.round(body * 100), Math.round(B.hp2)]); V.hpEnd = B.hp2; V.mx = B.mx; } }
       if (!shotsDone.boss && s.boss && !s.boss.dead && s.bossOn) { shotsDone.boss = 1; await sleep(250); await shot('boss'); }
       if (!shotsDone.death && s.P.hp <= 0) { shotsDone.death = 1; await shot('death'); }
       if (process.env.TRACE && s.t - (R.trT || -9) >= 1) { R.trT = s.t; (R.trace = R.trace || []).push([(R.stage = R.stage || s.stage) && '',+s.t.toFixed(1), Math.round(s.P.x), Math.round(s.camX), s.lock || '-', s.P.hp, s.E.filter(e => !e.d).length, s.E.filter(e => !e.d).map(e => e.id + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 6).join(' '), s.kills, 'wavesLeft=' + s.wl].join(' ')); }
       prev = s; lastS = s;
     }
-    await inp.release(); await sleep(150); s = await p.evaluate(SNAP) || lastS; R.end = s && s.end; R.t = s && s.t; R.kills = s && s.kills; R.hurts = s && s.hurts; R.hpEnd = s && s.P.hp; R.maxX = s && s.P.maxX;
+    await inp.release(); await sleep(150); s = await p.evaluate(SNAP) || lastS; R.end = s && s.end; R.hlog = await p.evaluate(() => { const S = window.FOOT.S; return S && S.hlog ? S.hlog.slice() : []; }).catch(() => null); R.t = s && s.t; R.kills = s && s.kills; R.hurts = s && s.hurts; R.hpEnd = s && s.P.hp; R.maxX = s && s.P.maxX;
     if (!R.end) { if (Date.now() - t0 >= MAXREAL) R.notes.push('timeout ' + (MAXREAL / 1000) + ' s real, game t=' + (s && s.t.toFixed(0)) + ' x=' + (s && Math.round(s.P.x))); }
     R.spawned = seen.size; R.attacked = atkd.size; R.died = died.size; R.maxFoes = maxFoes; R.pkMax = pkMax; R.minMargin = Math.round(minMargin); R.camBack = camBack; R.behindTicks = behindSeen; R.spawnLeft = spawnL.length; R.progBad = progBad; R.stuck = stuck;
     if (offT > 1) fail('Kai off screen ' + offT.toFixed(1) + ' s (camera not following)'); if (camBack > 0 && !s.lock) R.notes.push('camera moved back ' + camBack + 'x');
@@ -219,7 +220,7 @@ async function controls(b, plat) {
   try {
     const r = await startFoot(p, inp); if (!chk(T + 'ON FOOT starts the run', r === 'on', r)) return;
     await p.evaluate(() => { const S = window.FOOT.S; S.P.hp = S.P.max; }); void 0;
-    if (plat === 'phone') { await inp.tap('#fPause'); await sleep(200); const a = await p.evaluate(() => { const b = document.getElementById('fAuto'); return b && b.textContent; }); if (/ON/.test(a || '')) { await inp.tap('#fAuto'); await sleep(200); } await inp.tap('#fResume'); await sleep(1900); }
+    if (plat !== 'pc') { await inp.tap('#fPause'); await sleep(200); const a = await p.evaluate(() => { const b = document.getElementById('fAuto'); return b && b.textContent; }); if (/ON/.test(a || '')) { await inp.tap('#fAuto'); await sleep(200); } await inp.tap('#fResume'); await sleep(1900); }
     await sleep(2200);   // let the opening grace and LOADING pass
     let a = await st(); await hold({ mx: 1 }, 700); let c = await st(); chk(T + 'move right', c.P.x > a.P.x + 60, [a.P.x, c.P.x]);
     a = c; await hold({ mx: -1 }, 600); c = await st(); chk(T + 'move left', c.P.x < a.P.x - 40, [a.P.x, c.P.x]);
@@ -230,7 +231,7 @@ async function controls(b, plat) {
     a = await st(); await inp.apply({ mx: 1, dash: true }); await sleep(120); c = await st(); chk(T + 'dash (i-frames)', c.P.dash > 0 && c.P.dashIF > 0, JSON.stringify({ d: c.P.dash, i: c.P.dashIF })); await inp.apply({ mx: 0 }); await sleep(900);
     a = await st(); await inp.apply({ mx: 0, bomb: true }); await sleep(150); c = await st(); chk(T + 'grenade (BOMB) used', c.P.bombs === a.P.bombs - 1, [a.P.bombs, c.P.bombs]); await inp.apply({ mx: 0 }); await sleep(300);
     // pause -> resume -> pause -> retry -> pause -> quit to title
-    const pause = async () => { if (plat === 'phone') await inp.tap('#fPause'); else await p.keyboard.press('Escape'); await sleep(250); };
+    const pause = async () => { if (plat !== 'pc') await inp.tap('#fPause'); else await p.keyboard.press('Escape'); await sleep(250); };
     await pause(); c = await st(); chk(T + 'pause opens and freezes', c.paused, JSON.stringify({ p: c.paused })); const t1 = c.t; await sleep(500); c = await st(); chk(T + 'game frozen while paused', c.t === t1, [t1, c.t]);
     const menu = await p.evaluate(() => [...document.querySelectorAll('#fMenu button')].map(b => { const r = b.getBoundingClientRect(); return b.id + ':' + (r.height | 0); })); chk(T + 'pause menu buttons >= 44 px', menu.length >= 3 && menu.every(x => +x.split(':')[1] >= 44), menu.join());
     await inp.tap('#fResume'); await sleep(300); c = await st(); chk(T + 'resume unpauses', !c.paused, JSON.stringify({ p: c.paused })); await sleep(500); c = await st(); chk(T + 'time runs again after resume', c.t > t1, [t1, c.t]);

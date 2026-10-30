@@ -15,11 +15,6 @@ if(RET.pound2===undefined)RET.pound2=!/[?&]pound2=0/.test(location.search);   //
 const F=window.FOOT,FBS=window.FOOT_BOSS||{},d=FBS.bigheavy;
 if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;
 const IN=F._in,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1,clamp=(v,a,b)=>v<a?a:v>b?b:v;
-/* W276 (RET.bossframe, OFF by default, ?bossframe=1 = on; it FREEZES the boss, see HANDOFF-W276.md): the drawn big heavy is 124 px wide each way from its centre (the figure itself about +-55) but its body box is 54 px (walk and wall clamp at w/2 = 27), so a charge or walk to the
-   left wall left a third of the figure outside a phone's 330 px view (measured W276). The boss now keeps BF px of road to each screen edge for its walk, charge stop and leap landing; hitboxes, hp and attacks are unchanged. */
-if(RET.bossframe===undefined)RET.bossframe=/[?&]bossframe=1/.test(location.search);
-const BF=62;
-const inset=env=>{if(!RET.bossframe)return env;const G=env.G,o=Object.create(env);o.G=Object.assign(Object.create(G),{camX:G.camX+BF-27,viewW:G.viewW-2*(BF-27)});return o;};
 const PH=[null,{n:'THE CHARGE',at:['charge','throw']},{n:'GROUND POUND',at:['pound']},{n:'LEAP',at:['leap']}],LINE=[0,1,.66,.33];
 const CAP={charge:'CHARGE · JUMP OR DASH',throw:'BARREL · STEP BACK',pound:RET.pound2?'POUND · LEAVE THE RED LINE OR JUMP':'GROUND POUND · JUMP THE WAVE',leap:RET.pound2?'LEAP · LEAVE THE RED RING':'LEAP · DASH OUT'};
 const WIND={throw:.7,pound:.8,leap:RET.pound2?.8:.6},OPEN=1.0,ROAR=1.2,LEAPT=.7,HPK=+((location.search.match(/[?&]sbhp=([\d.]+)/)||[])[1]||8);   // boss hp x HPK (W168: default 8 = a 45-90 s fight; ?sbhp= to tune) (W168: x5 gives a 32 s dodge-bot fight, x8 47 s, but the rushers that join every 3.5 s then kill the bots)
@@ -31,7 +26,7 @@ function pick(e,P){const at=[].concat(...PH.slice(1,e.ph+1).map(p=>p.at)),far=ab
   let w=at.map(a=>a===e.last?.25:a==='throw'?(far?2:.3):a==='leap'?(far?1.6:1):1),s=w.reduce((a,b)=>a+b,0),r=Math.random()*s;
   for(let i=0;i<at.length;i++){r-=w[i];if(r<=0)return at[i];}return at[0];}
 function begin(e,a,S,env){e.atk=a;e.last=a;e.L.at.push([a,+S.time.toFixed(2)]);if(!e.capd[a]){e.capd[a]=1;IN.pop(cx(e,env),e.y-e.h-30,CAP[a],'#ffb020');}
-  if(a==='charge'){go(e,'wind');return;}go(e,'sb_'+a+'W');e.tele=WIND[a];if(a==='leap'){e.tx=RET.bossframe?clamp(S.P.x,env.G.camX+BF,env.G.camX+env.G.viewW-BF):S.P.x;e.x0=e.x;}if(RET.pound2&&e.z!=null)e.zl=e.z;}
+  if(a==='charge'){go(e,'wind');return;}go(e,'sb_'+a+'W');e.tele=WIND[a];if(a==='leap'){e.tx=clamp(S.P.x,env.G.camX+(e.fw||e.w/2),env.G.camX+env.G.viewW-(e.fw||e.w/2));e.x0=e.x;}if(RET.pound2&&e.z!=null)e.zl=e.z;}
 const a0=d.ai,p0=d.pose,h0=d.onHit;
 d.onHit=function(e,dm){h0.apply(this,arguments);if(e._sb)e.hp=Math.max(e.hp,e.state==='sb_roar'?e.hpLock:e.ph<3?e.max*LINE[e.ph+1]:-1e9);};   // no skipping a phase, even with a bomb or a barrel
 d.pose=e=>/^sb_.*W$/.test(e.state)?'crouch':e.state==='sb_roar'?'hit':/^sb_/.test(e.state)?'melee':p0(e);
@@ -56,7 +51,7 @@ d.ai=function(e,dt,env){const S=F.S,P=env.P;
     if(RET.pound2&&st==='sb_leap')hold(e,env);
     if(st==='sb_leap'){const u=Math.min(1,e.sT/LEAPT);e.x=e.x0+(e.tx-e.x0)*u;e.y=FL-Math.sin(Math.PI*u)*200;e.vx=(e.tx-e.x0)/LEAPT;mark(S,e.tx,e);
       if(u>=1){e.y=FL;e.vx=0;env.melee(e,{x:e.tx-70,y:FL-e.h,w:140,h:e.h},2);shake(S,9);clr(e);open(e);}return;}}
-  const s0=e.state,x0=e.x,ie=inset(env);a0.call(this,e,dt,e.state==='charge'?low(ie):ie);
+  const s0=e.state,x0=e.x;a0.call(this,e,dt,e.state==='charge'?low(env):env);
   if(e.state==='charge'&&e.sT>.05&&e.x===x0){open(e);return;}   // stuck a few px short of the screen edge (walk() refuses the step, the wall test never fires): that is the wall
   if(e.state==='wind'&&s0!=='wind'){const a=e.next||pick(e,P);e.next=null;begin(e,a,S,env);}   // heavyDef chose to attack: this phase picks which
   else if(s0==='charge'&&e.state==='walk')open(e);};   // an opening after every charge, not only after a wall hit
