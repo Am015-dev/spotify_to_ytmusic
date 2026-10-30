@@ -327,10 +327,10 @@ async function scRace(P){// pause -> QUIT TO TITLE -> 🏁 RACES -> START, then 
  st=await P.run(6,x=>x.st==='race'?'stop':['tG']);const startShot=await P.shot('fra_11_race_start');const t0=st.T;let maxLap=0;
  {/* touchdrive-r29d: a race roll is a CHORD (both arrows land within 60 ms). A hand-over (the old arrow held 0.3 s, the new one lands, the old one lifts 33-100 ms later) never rolls; two thumbs landing in one touch event always do */
   const acc=()=>P.ev('CRSM.acc||0');let ov=0,ch=0;await P.set(['tG']);
-  for(let i=0;i<10;i++){const a0=await acc();await P.set(['tG','tR']);await P.step(9);await P.set(['tG','tR','tL']);await P.step(1+i%3);await P.set(['tG','tL']);await P.step(4);await P.allUp();await P.set(['tG']);await P.step(3);if((await acc())>a0)ov++}
+  for(let i=0;i<10;i++){const a0=await acc();await P.set(['tG','tR']);await P.step(9);await P.p.waitForTimeout(300)/* REAL time: the chord window is wall-clock, step() is sim time */;await P.set(['tG','tR','tL']);await P.step(1+i%3);await P.set(['tG','tL']);await P.step(4);await P.allUp();await P.set(['tG']);await P.step(3);if((await acc())>a0)ov++}
   for(let i=0;i<10;i++){const a0=await acc();await P.downAll(['tR','tL']);await P.step(4);await P.allUp();await P.set(['tG']);await P.step(3);if((await acc())>a0)ch++}
   await P.allUp();
-  row('race/rollOverlap','race touch hand-over: ◀ held 0.3 s, ▶ lands while ◀ is still down (1-3 frames, 33-100 ms), ◀ lifts: no roll',`${ov}/10 rolled`,'0/10 (REVIEW_2K_32 point 3)',ov===0,'',ov?JSON.stringify((await P.ev('CRC.log||[]')).slice(-14)):'');
+  row('race/rollOverlap','race touch hand-over: ◀ held 0.3 s, ▶ lands while ◀ is still down (1-3 frames, 33-100 ms), ◀ lifts: no roll',`${ov}/10 rolled`,'0/10 (REVIEW_2K_32 point 3)',ov===0,'');
   row('race/rollBoth','race touch chord: ◀ and ▶ land together (one touch event): the SMASH roll fires',`${ch}/10 fired`,'10/10',ch===10,'')}
  let outT=0;const pol=x=>{if(x.st==='finished'||x.st==='results')return'stop';if(x.st!=='race'){outT+=DT*3;return outT>3?'stop':[]}outT=0;const R=x.race;if(!R)return['tG'];maxLap=Math.max(maxLap,R.lap||0);const want=Math.max(-.35,Math.min(.35,-R.x*.06));const e=want-R.yaw;return['tG',...(e>.04?['tR']:e<-.04?['tL']:[])]};
  const prs=[];let held='';const pol0=pol;const polM=x=>{const w=pol0(x);if(Array.isArray(w)){const sd=w.includes('tR')?'R':w.includes('tL')?'L':'';if(sd&&sd!==held)prs.push([sd,x.T]);held=sd}return w};

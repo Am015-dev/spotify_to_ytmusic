@@ -118,7 +118,7 @@ addEventListener('keydown',e=>{if(e.repeat||(state!=='roam'&&state!=='race'))ret
 // (two thumbs landing together; a hand-over, where the old arrow has been held longer than that when the new one lands, never rolls: REVIEW_2K_32 point 3). Keyboard double-tap (CR_lgTap) is unchanged.
 const CRC={t:{'-1':-1e9,'1':-1e9},W:60};
 BZ.addEventListener('touchstart',e=>{try{const ts=CRSM_ts(e),sides=[];for(const t of e.changedTouches)sides.push(bzSide(t));let hit=0;
- if(state==='race'&&e.touches&&e.touches.length>=2){const all=[];for(const t of e.touches)all.push(bzSide(t));if(all.includes(-1)&&all.includes(1)){const last=sides[sides.length-1],other=-last;if(sides.includes(other)||ts-CRC.t[other]<=CRC.W)hit=last;(CRC.log=CRC.log||[]).push([Math.round(ts),Math.round(performance.now()),sides.join(),all.join(),Math.round(ts-CRC.t[other]),hit]);if(CRC.log.length>30)CRC.log.shift()}}
+ if(state==='race'&&e.touches&&e.touches.length>=2){const all=[];for(const t of e.touches)all.push(bzSide(t));if(all.includes(-1)&&all.includes(1)){const last=sides[sides.length-1],other=-last;if(sides.includes(other)||ts-CRC.t[other]<=CRC.W)hit=last}}
  for(const d of sides)CRC.t[d]=ts;if(hit)CRSM_go(hit)}catch(_){}},{passive:true});
 // the lunge moves the car sideways (screen left/right) for 0.3 s; it stops at walls
 roamStep=(f=>function(dt){if(state==='roam')pressed.roll=0;const r=f(dt);try{if(state==='roam'&&pl&&!RO.wk){RO.crLgCd=Math.max(0,(RO.crLgCd||0)-dt);
