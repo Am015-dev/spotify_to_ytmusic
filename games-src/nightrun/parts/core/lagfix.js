@@ -6,17 +6,19 @@ const _loadTrack=async stage=>{const h=TRQ.hist;h.push(stage+' start '+(performa
 const TRQ=NR.lag={mid:0,urgent:0,loads:0,log:[],hist:[]};
 const calmNow=()=>!running||paused||(typeof SH!=='undefined'&&SH.active)||!G||G.dead||G.over||G.dt<3.5;   // (kept for the tests: counts a late load as "during play")
 function wantSongs(){
-  if(!running||!G)return['menu','stage1','stage2'];
+  if(!running||!G)return['menu'];                                                              // W242: only the menu loop; a stage's track is fetched when that stage starts
   if(ST.on){const o=[ST.def.song];if(ST.def.goal.k==='boss'){const sg=bossSong(DISTRICTS[ST.def.di].boss,false);if(sg)o.push(sg);}return o;}
   let di=G.di,L=G.loop,done=G.bossDone;
   if(SH.active){const nx=nextDi(di);di=nx.di;if(nx.wrap)L++;done=false;}                       // pit stop: get ready for the district that comes next
-  const o=[songFor(di,L)],sg=bossSong(DISTRICTS[di].boss,false);if(sg&&!done)o.push(sg);
-  const nx2=nextDi(di);o.push(songFor(nx2.di,nx2.wrap?L+1:L));return o;}
+  const o=[songFor(di,L)],sg=bossSong(DISTRICTS[di].boss,false);if(sg&&!done&&(SH.active||G.dt>30))o.push(sg);   // W242: the boss song once the district is half way, the next district's only at the pit stop (above)
+  return o;}
 TR.keepFn=file=>(TRQ.hold&&TRQ.hold.has(file))||wantSongs().some(s=>TR.by[s]&&TR.by[s].file===file);   // TRQ.hold: test hook that keeps extra songs buffered
 function pumpTracks(){if(!AU.a)return;
-  for(const s of wantSongs()){const info=TR.by[s];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file])continue;TRQ.loads++;_loadTrack(s);}}
+  for(const s of wantSongs()){const info=TR.by[s];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file])continue;if(s==='menu'&&startBusy())continue;TRQ.loads++;_loadTrack(s);}}
 setInterval(pumpTracks,300);
+const startBusy=()=>!!((window.PRELOAD&&PRELOAD.veil)||(window.FOOT&&FOOT.q&&FOOT.q.hold));   // W242: a stage is loading its pictures: the menu loop waits (no 2.7 MB beside them)
 loadTrack=function(stage,urgent){const info=TR.by[stage];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file]||!AU.a)return;
+  if(stage==='menu'&&startBusy())return;
   if(urgent){TRQ.urgent++;if(!calmNow())TRQ.mid++;TRQ.log.push(stage+'@'+(G?G.t|0:0));if(TRQ.log.length>20)TRQ.log.shift();}
   TRQ.loads++;return _loadTrack(stage);};
 /* Skylines (landscape and portrait) of every district are built one at a time in calm moments (title, pit stop, pause, banner), never in the middle of a fight:
