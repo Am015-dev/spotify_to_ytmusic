@@ -13,7 +13,6 @@
    4. LIGHT: lamp pools that light whoever passes, neon spill, a wet-road reflection, contact shadows under props, one colour grade (under the HUD).
    5. A RUN TWICE AS LONG: one heart more, a heal drops beside Kai when he is two hearts down, gunners reload 1.4x slower, at most 5 foes at once. ---------- */
 if(RET.street3===undefined)RET.street3=!/[?&]street3=0/.test(location.search);
-if(RET.bossadds===undefined)RET.bossadds=/[?&]bossadds=1/.test(location.search);   // W278: no street adds during the big heavy fight; OFF until the PC clear-rate gate passes (BALANCE-W278.md), ?bossadds=1 = on
 (function(){
 if(!RET.street3||!RET.street2||!window.FOOT||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2||!FOOT._in)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
@@ -48,7 +47,7 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   const alive=S.E.filter(e=>!e.dead).length;
   if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy
   if(S.time>20&&S.time-(f.lastHeal||0)>12&&P.hp>0&&P.hp<=P.max-2&&!S.pk.some(q=>q.k==='heal')){f.lastHeal=S.time;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // two hearts down: a heal drops beside Kai (at most one every 12 s)
-  for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap||RET.bossadds&&S.bossOn){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits; W278 (BALANCE-W278.md): none joins once the big heavy is on
+  for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap||S.bossOn){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits; W278/W279 (BALANCE-W279.md): none joins once the big heavy is on (adds cost 53 of 57 hearts in the boss fight)
     const fromL=w.left[0]==='rusher'&&w.i>=3&&(w.spawned%(RET.fairstreet?5:3)===(RET.fairstreet?4:2));
     if(fromL&&RET.fairstreet){if(!w.wa){w.wa=S.time+1;S.behind={until:w.wa};}if(S.time<w.wa)continue;w.wa=0;}   // W161: 1 s BEHIND warning (arrow + caption at the left edge) before a rusher walks in from the left
     const id=w.left.shift(),x=fromL?S.camX-40:S.camX+vw+40;
