@@ -174,6 +174,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
 /* ----- HUD: one panel top-left; score + time left of the pause button; hint below both; boss bar above the progress bar ----- */
 function slRR(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
 function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pl=!!(typeof UIK!=='undefined'&&ART.bm&&ART.bm['ui-hud-mult']),pd=(pl?13:8)*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
+  if(S.end&&!S.end.quit){L.hud={hud:[],hint:null,vw};SL.hudB=0;SL.hudFull=0;SL.tag='';return;}   // W282: the result overlay is up: no HUD under it (it showed dimmed through the overlay)
   c.textBaseline='top';c.textAlign='left';c.font='bold '+fs(14)+'px monospace';
   const wt=W.n+(P.w==='pistol'?'':' LV'+P.lv+' · '+P.ammo),pw=[];for(const k of IN.PW_KEYS){const p=P.pw[k];if(p)pw.push([PK[k].c,PK[k].ic+(PK[k].max>1?p.lv:'')]);}
   const bt='●×'+P.bombs,r3=c.measureText(bt).width+pw.length*36*u;

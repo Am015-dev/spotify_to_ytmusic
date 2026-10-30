@@ -51,7 +51,7 @@ F.odSpecial=function(S){const P=S.P;OD.busy=1;OD.v=0;OD.last=S.time;let n=0;P._g
   S.fx.push({ring:1,x:P.x,y:P.y-8,r:OD.r,l:.5,m:.5,c:'#19e3ff'});if(window.AH)AH.ftPush(S.fx,'fx-boom-large-electric',P.x,P.y-12,OD.r*2,.5);
   IN.sfx('boom');if(!S.sim)IN.hitstop(80);IN.pop(P.x,P.y-96,'OVERDRIVE!','#19e3ff',true);};
 /* the bar: right side under the score and time (a plain placeholder until the Wave 1 art), "hud-overdrive" */
-if(F.look&&F.look.draw){const dr=F.look.draw;F.look.draw=function(c){const r=dr.apply(this,arguments),S=F.S,L=IN.L();if(!r||!RET.overdrive||!S||!L||!L.hud)return r;
+if(F.look&&F.look.draw){const dr=F.look.draw;F.look.draw=function(c){const r=dr.apply(this,arguments),S=F.S,L=IN.L();if(!r||!RET.overdrive||!S||S.end||!L||!L.hud)return r;
   const u=1/L.sc,t0=F.look.t0,vw=L.vw,w=118*u,h=10*u,full=OD.v>=OD.max,x=vw-w-10*u,y=t0+(RET.pound2&&F.look.hudB?F.look.hudB+18*u:(vw<600?118:72)*u);
   S._odShow=(S._odShow||0)+(OD.v>0?1:0);
   c.save();c.fillStyle='#000a';c.fillRect(x-4*u,y-18*u,w+8*u,h+36*u);c.fillStyle='#ffffff22';c.fillRect(x,y,w,h);
