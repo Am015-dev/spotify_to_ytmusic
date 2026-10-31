@@ -1,0 +1,6 @@
+# HANDOFF memland-r31a (e9c97a1 onto trunk + mem/no-reload fra only)
+1. Cherry-picked e9c97a1 onto efd5c29 with no conflicts ('ridge' in MEMF.skip kept, glbuf changes kept); removed the ath entry of mem/no-reload (src/99c_checklist.js). Built out/r31a; unit 0 FAIL (5381 pass, three installed).
+2. TAG=mem (phone profile, built page): red = fra mem/stable (536→623 MB, 16 %, lower than trunk's 20 %), fra perf/mem-quant, fra perf/mem-own, ath mem/ath-boot (1241 > 913; REVIEW_2K_42 branch 1146, trunk 1312, run noise), ath perf/mem-quant#1. fra mem/no-reload GREEN (trunk red 769); ath no-reload gone; ath perf/mem-own#1 GREEN again. Strict subset of trunk's reds (REVIEW_2K_42 table), no new red.
+3. TAG=why,glbuf,life1,xf1,terrain via gate.sh: PASS 78/78. bug/ath-hills-drawn: PASS 1/1.
+4. memp x1 (tools/perf/lowmem.js, 6x CPU, draw=0): fra heap 332 + GPU 109 = 441 MB (end 344+130), ath 505+69 = 574 MB (end 524+76). Not the same metric as REVIEW_2K_42's peaks (565/554, 684/697): that run was not repeated; these are lower than the reviewer's.
+5. Left: the default full gate and shots were not re-run (visuals unchanged by this commit; shots in rev42 cover them); mem/stable fra and ath-boot stay red as on trunk.
