@@ -1,0 +1,7 @@
+# W316 (branch nr/W316-street from nr/W313-duel5). Measurement + trace instrument; no game constant changed. Numbers: BALANCE-W316.md
+Done: qa/gauntlet-foot.js W316=1 (5 s trace: street time, hp, foes + types + distance, Kai x vs camera, input sent; a shot at every heart lost; <tag>.trace.txt in OUT).
+Numbers (6 seeds, from the title): phone duelist reach 4/6 clear 4/6; PC duelist 5/6, 5/6; phone late 6/6 reach, 5/6 clear; PC late 3/6 reach, 0-1/6 clear (summary lost, see BALANCE-W316.md).
+Answer: bot is fine (real stick held, guard/dash/jump fire on telegraphs). W313's 0/6 phone is not reproduced; cause unmeasured (candidate: parallel load slowing the bot in game time). Real finding: the street is 145 s clock-paced and a bot that runs ahead waits about 97 s pinned at the right view edge while 2-4 rushers at a time spawn 56 units from it; all street deaths are there (seeds: phone 0 at 76 s, phone 5 at 135 s, PC 5 at 131 s).
+Wrong / open: PC late dies in the street 3/6 (131-142 s); the wall wait is a game design smell (no decision for the player, cornered). Smallest candidate fix if wanted: when the street is clear and Kai is at the arena camera, let the boss gate follow Kai instead of the clock (street3.js gate / bc check), then re-run streetsim RUNS=40 gates. Not done: it changes the attrition W300 relied on.
+Not run: load test, streetsim, 844x390, exact PC late summary (two runs shared one OUT by mistake).
+Files: qa/gauntlet-foot.js, BALANCE-W316.md, HANDOFF-W316.md.
