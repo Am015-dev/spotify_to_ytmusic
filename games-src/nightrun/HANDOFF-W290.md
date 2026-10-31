@@ -44,3 +44,9 @@ attacks (sb_poundW / sb_throwW etc.), so they lose every boss fight (won 0/22, 0
    (HPK 7-8) rather than from shorter windows; 8 seeds x PC / 390x763 / 844x390.
 3. Teach streetsim's dodge / gfirst bots the new answers (sb_tel + atk) so the whole-street gates measure again; decide with the owner whether the
    generic gauntlet dodger should still be expected to beat this boss.
+
+## Full stage from the title (g/f1), PC keys, TS 3, 2 seeds each
+duelist 0/2, late 0/2: all four died BEFORE the boss (t 36-65 s, every heart to rushers) because the 'tactician' street bot they use before the boss
+loses to rushers; the duel was never reached, so the full-stage duel clear rate is NOT MEASURED. Phone / 844x390 full stage NOT RUN.
+One FAIL line in late seed 0: 'foe spawned from the left (2x) but BEHIND caption never active' (pre-boss street, not this change's code).
+Next: the full-stage duelist must play the street as the W286 'dodger' (PC 3/4 there), then switch to the duel answers at the boss.
