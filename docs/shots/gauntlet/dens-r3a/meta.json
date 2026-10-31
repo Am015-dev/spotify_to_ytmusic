@@ -1,0 +1,1 @@
+{"when":"2026-10-31T00:17Z","cmd":"node tools/gauntlet.js --build out/ring3 --ver dens-r3a --only drive,ath --seed 7","wall":"366"}
