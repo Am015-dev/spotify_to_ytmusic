@@ -31,7 +31,7 @@ SL.layout=(L,W,H,dpr,T)=>{SL.port=false;F.camK=undefined;if(!(T&&H>W*1.05))retur
   L.sc=sc;L.vw=W/sc;L.mode='port';L.box={x:0,y:0,w:W,h:hf};L.ox=0;L.oy=0;L.exl=0;L.exr=0;L.dpr=dpr;SL.VV=hf/sc;
   const cv=L.cv;cv.style.left='0px';cv.style.top='0px';cv.style.width=W+'px';cv.style.height=hf+'px';cv.width=Math.round(W*dpr);cv.height=Math.round(hf*dpr);
   const set=(el,x,y,z)=>{el.hidden=false;el.style.display='';el.style.left=Math.round(x)+'px';el.style.top=Math.round(y)+'px';if(z)el.style.width=el.style.height=Math.round(z)+'px';};
-  const rows=auto?[['dash','jump'],['bomb','melee']]:[['dash','fire'],['bomb','melee','jump']],sz=k=>k===big?f:s,rh=rows.map(r=>Math.max(...r.map(sz)));
+  const rows=auto?[['dash','jump'],['bomb','guard','melee']]:[['guard','dash','fire'],['bomb','melee','jump']],sz=k=>k===big?f:s,rh=rows.map(r=>Math.max(...r.map(sz)));
   let y=H-mg,minX=W;rows.forEach((r,i)=>{y-=rh[i];let x=W-14;for(let j=r.length-1;j>=0;j--){const z=sz(r[j]);x-=z;set(L.btn[r[j]],x,y+(rh[i]-z)/2,z);x-=8;}minX=Math.min(minX,x+8);y-=8;});
   const fb=L.btn.fire;if(auto){fb.hidden=true;fb.style.display='none';}
   const sk=clamp(Math.min(Z-2*mg,W*.38,minX-16-12-(auto?0:s+8)),96,160);set(L.stick,16,hf+(Z-sk)/2,sk);

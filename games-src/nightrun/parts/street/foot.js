@@ -413,11 +413,11 @@ const CSS=`
 function build(){if(L)return L;const st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
   const root=document.createElement('div');root.id='footL';root.hidden=true;
   root.innerHTML='<canvas id="footC"></canvas><div class="fpad" id="fStick"><i></i></div>'+
-    '<button type="button" class="fb" id="fFire">FIRE</button><button type="button" class="fb" id="fJump">JUMP</button><button type="button" class="fb" id="fMelee">KNIFE</button><button type="button" class="fb" id="fDash">DASH</button><button type="button" class="fb" id="fBomb">BOMB</button>'+
+    '<button type="button" class="fb" id="fFire">FIRE</button><button type="button" class="fb" id="fJump">JUMP</button><button type="button" class="fb" id="fMelee">KNIFE</button><button type="button" class="fb" id="fDash">DASH</button><button type="button" class="fb" id="fBomb">BOMB</button><button type="button" class="fb" id="fGuard">GUARD</button>'+
     '<button type="button" id="fPause" aria-label="Pause">II</button><div id="fGhost" hidden></div><div id="fMenu" hidden><div class="in"></div></div>';
   document.body.appendChild(root);
   const cv=root.querySelector('#footC');L={root,cv,ctx:cv.getContext('2d'),vw:960,sc:1,touch:false,menu:root.querySelector('#fMenu'),ghost:root.querySelector('#fGhost'),stick:root.querySelector('#fStick'),btn:{}};
-  const bmap={fFire:'fire',fJump:'jump',fMelee:'melee',fDash:'dash',fBomb:'bomb'};
+  const bmap={fFire:'fire',fJump:'jump',fMelee:'melee',fDash:'dash',fBomb:'bomb',fGuard:'guard'};
   for(const id in bmap){const b=root.querySelector('#'+id),k=bmap[id];L.btn[k]=b;
     const dn=e=>{e.preventDefault();if(!I[k]){I[k+'P']=1;}I[k]=1;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(x){}};
     const up=e=>{I[k]=0;b.classList.remove('on');};
@@ -464,7 +464,7 @@ function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv
     // right cluster: rows from the bottom up, right-aligned, 8 px gaps. FIRE (JUMP when auto-fire hides FIRE) is the big one. Left: the stick, nothing else.
     const zone=mode==='port'?{x:0,y:cy+hpx,w:W,h:H-(cy+hpx)}:{x:W-sw,y:0,w:sw,h:H},big=auto?'jump':'fire';
     const s=mode==='port'?clamp(Math.round(zone.h*.22),56,64):56,f=mode==='port'?clamp(Math.round(zone.h*.38),80,100):clamp(Math.round(zone.w*.5),76,84);
-    const rows=auto?[['dash','jump'],['bomb','melee']]:mode==='port'?[['dash','fire'],['bomb','melee','jump']]:[['dash','fire'],['melee','jump'],['bomb']];
+    const rows=auto?mode==='port'?[['dash','jump'],['bomb','guard','melee']]:[['dash','jump'],['bomb','melee'],['guard']]:mode==='port'?[['guard','dash','fire'],['bomb','melee','jump']]:[['dash','fire'],['melee','jump'],['bomb','guard']];   /* GUARD is a normal slot here: the one owner of every button position (W312) */
     const sz=k=>k===big?f:s,rh=rows.map(r=>Math.max(...r.map(sz))),stack=rh.reduce((a,b)=>a+b,0)+8*(rows.length-1),bot=mode==='port'?Math.max(10,(zone.h-stack)/2):14;
     let y=zone.y+zone.h-bot;rows.forEach((r,i)=>{y-=rh[i];let x=zone.x+zone.w-(mode==='port'?14:8);for(let j=r.length-1;j>=0;j--){const z=sz(r[j]);x-=z;set(L.btn[r[j]],x,y+(rh[i]-z)/2,z);x-=8;}y-=8;});
     const fb=L.btn.fire;if(auto){fb.hidden=true;fb.style.display='none';}
