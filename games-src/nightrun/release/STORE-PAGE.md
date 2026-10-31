@@ -1,6 +1,6 @@
 # Store page text: Mainhattan Nightrun (itch.io, $5)
 
-Every line below was checked against the build in `dist/nightrun-web.zip` (31 Oct 2026). No quotes, reviews or press lines are used because none exist.
+Every line below was checked against the build in `dist/nightrun-web.zip` (31 Oct 2026). Sale path and exact itch settings: `SELL-PATH.md`. Music cleared for sale: `MUSIC-PROVENANCE.md`. No quotes, reviews or press lines are used because none exist.
 
 **Title:** Mainhattan Nightrun
 
@@ -26,9 +26,9 @@ Pick one of five difficulty levels, from easy to legend. Play with your keyboard
 - Nine selectable ships.
 - Dash and EMP buttons, plus a hull meter, so you decide when to take a risk.
 - Five difficulty levels: easy, normal, hard, very hard, legend.
-- Original soundtrack: 11 full tracks plus extra stage cues and stingers.
+- Soundtrack: built-in synth music that follows the beat. (Do NOT claim an original song soundtrack, or a track count, until the owner has cleared the songs in `MUSIC-PROVENANCE.md` and removed them from `MUSIC-BLOCKED.txt`.)
 - Illustrated neon art: hundreds of pictures for ships, bosses, streets and skylines.
-- Works with keyboard or touch, and runs in the browser with no install.
+- Download for Windows and Linux (unzip and run), or unzip and open PLAY.html in a browser. Keyboard or touch. Works offline. (macOS: no build yet.)
 
 ## Controls
 
@@ -40,7 +40,13 @@ Pick one of five difficulty levels, from easy to legend. Play with your keyboard
 
 $5 suggested. Reason: one complete, polished mode set (flight and on foot, five districts, bosses, original soundtrack) that a player can finish a first session in, with no ads and no in-game purchases. $5 sits in the usual range for a small itch.io action game and is low enough for an impulse buy from the browser page.
 
-NOTE FOR THE OWNER: itch.io only takes payment for "Downloadable" projects. Browser games can only receive donations (see `HANDOFF-W294.md`, step 3). Check the claim "complete" against the stage progression the other workers (W19 a-c) ship before you publish.
+**Pricing setup that itch.io allows (sources and quotes in `SELL-PATH.md`):**
+- Kind of project: **Downloadable** (not HTML). itch.io: "it's possible to sell access to your game by setting its "Kind of Game" to "Downloadable"" and "Currently all HTML5 games on itch.io are set up to only take payments as donations."
+- Pricing: **Paid**, minimum price **$5.00**. itch.io: "any price you set is the minimum price" and "any item that can accept money is automatically "pay what you want"" (buyers may pay more).
+- Uploads: `Mainhattan-Nightrun-win32-x64.zip` (Windows), `Mainhattan-Nightrun-linux-x64.zip` (Linux), `nightrun-download.zip` (any system: open PLAY.html). Do NOT tick "This file will be played in the browser" on any of them.
+- Optional free browser demo: a separate HTML project is allowed to be free or donation-only; it is not required for the sale.
+- Wording: say "Windows and Linux", not "all platforms". No macOS build exists.
+- Keep the AI disclosure box ticked (music and images).
 
 ## Tags (itch allows 10)
 

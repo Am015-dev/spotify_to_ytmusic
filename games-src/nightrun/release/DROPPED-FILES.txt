@@ -1,4 +1,4 @@
-# left out of nightrun-web.zip only (108 files, 3.1 MB); still in the repo
+# left out of the zips only (108 files, 3.1 MB); still in the repo
 media/abup-dd.webp
 media/abup-ecap.webp
 media/abup-trail.webp
