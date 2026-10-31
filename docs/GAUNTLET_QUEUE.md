@@ -126,3 +126,7 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 ## 31 Oct ~14:50
 - og2 review FAIL for ship-ON (REVIEW_2K_44). The code is fine and reuses the existing markers, cards and roamGo. Blockers: (1) on a fresh save LEVEL UP covers the results, so returning takes 2 real taps (the GO clicked a covered button); (2) the card says "3 laps", but the race runs LAP 1/1; the pause button says MENU but returns to the city. → og2b (SONNET, ~45 min) at the next free worker slot: 1-tap return through level-up, the GO taps only visible elements, card laps == RC.laps, rename the pause button.
 - Running: og3 (one HUD), og1b (builder feel round 2). flakes-r31d closed: parked-jump is load timing; the solid-cars teleport is unreproduced and needs a guard log.
+
+## 31 Oct ~16:03
+- og3 review FAIL for ship-ON (REVIEW_2K_45). It reads as one game, and it fixes a real 6 px "KPH" in races. Blockers: (1) its own GO onegame/hud is red in gate order (BX_close leaves #touch hidden); (2) the speed pill covers the car in landscape; (3) the old readouts are hidden instead of deleted (+6.6 KB, double boost meter). Also: under og3, races become hold-GAS (no auto-accelerate), which Alex must feel before it ships. → og3b (SONNET) at the next free worker slot.
+- Running: og1b (gates running, tOpen/TAG green), og2b (GO passes, real-touch shots). Reviewer slot free until one reports.
