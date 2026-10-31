@@ -60,6 +60,32 @@ async function flow(b, W, H, touch) {
   ok(T + 'no page errors', p.errs.length === 0, p.errs.join('|'));
   await p.context().close();
 }
+// W292 PROGRESSION: clear 1 -> NEXT STAGE -> 2 -> NEXT STAGE -> 3 by real clicks; the save survives a reload (FLIGHT says Stage 3, the row replays 1..3); a corrupt save falls back to Stage 1 without errors.
+async function chain(b, W, H, touch) {
+  const T = `${W}x${H} chain: `; const p = await open(b.br, b.base, W, H, '?nomusic=1', null, touch);
+  const clickB = async sel => { const bb = await p.locator(sel).boundingBox(); await p.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); await sleep(120); };
+  const label = () => p.evaluate(() => { const l = document.getElementById('focStage'); return l ? l.textContent : 'none'; });
+  const rowN = () => p.evaluate(() => { const r = document.getElementById('focStages'); return !r || r.hidden ? 0 : r.querySelectorAll('button').length; });
+  const stageN = () => p.evaluate(() => window.__mnr.ST.n);
+  const back = async () => { await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }).catch(() => { }); await sleep(500); };
+  ok(T + 'fresh save: FLIGHT says Stage 1, no stage row', (await label()) === 'Stage 1' && (await rowN()) === 0, (await label()) + ' row ' + (await rowN()));
+  await clickB('#focFlight'); await sleep(700); await step(p, 30); ok(T + 'FLIGHT starts stage 1', (await stageN()) === 1 && (await st(p)).run);
+  for (const n of [1, 2]) {
+    await p.evaluate(() => window.__mnr.ST.clear(false)); const r = await toResult(p, 20); ok(T + 'stage ' + n + ' clear shows the result screen', r === 'ok', r);
+    const u = await usable(p, '#srNext'); ok(T + 'stage ' + n + ' result: NEXT STAGE usable (not hidden by focus mode)', u === 'ok', u);
+    if (SHOTS && n === 1) await p.screenshot({ path: `${SHOTS}/next-${W}.png` });
+    await clickB('#srNext'); await sleep(700); await step(p, 30); ok(T + 'NEXT STAGE click starts stage ' + (n + 1), (await stageN()) === n + 1 && (await st(p)).run && !(await resShown(p)), 'stage ' + (await stageN()));
+  }
+  await back(); ok(T + 'after reload FLIGHT continues at Stage 3', (await label()) === 'Stage 3', await label());
+  ok(T + 'after reload the stage row offers 1..3', (await rowN()) === 3, 'n=' + (await rowN()));
+  const u3 = await usable(p, '#focS1'); ok(T + 'stage row button 1 usable', u3 === 'ok', u3); if (SHOTS) await p.screenshot({ path: `${SHOTS}/title-stages-${W}.png` });
+  await clickB('#focS2'); await sleep(700); await step(p, 30); ok(T + 'stage row replays stage 2', (await stageN()) === 2 && (await st(p)).run, 'stage ' + (await stageN()));
+  await back(); await p.evaluate(() => localStorage.setItem('mnr_story', '{"stars":')); await back();
+  ok(T + 'corrupt save: title still works and says Stage 1', (await label()) === 'Stage 1' && (await rowN()) === 0, await label());
+  await p.evaluate(() => localStorage.setItem('mnr_story', 'null')); await back(); ok(T + 'null save falls back to Stage 1', (await label()) === 'Stage 1', await label());
+  ok(T + 'no page errors', p.errs.length === 0, p.errs.join('|'));
+  await p.context().close();
+}
 async function fsCard(b) {   // iOS Safari card: appears on the title after 2.5 s, must not cover LAUNCH, and must be gone once a run starts
   const p = await open(b.br, b.base, 390, 763, '?nomusic=1', { mnr_fscard: '0' }, true); await sleep(3000);
   const seen = await vis(p, '#fsCard'); ok('390x763 fullscreen card shown on iOS title (precondition)', seen, 'card not shown');
@@ -68,4 +94,4 @@ async function fsCard(b) {   // iOS Safari card: appears on the title after 2.5 
   ok('390x763 fullscreen card gone when the run starts', !(await vis(p, '#fsCard')) && (await st(p)).run, JSON.stringify(await st(p)));
   await p.context().close();
 }
-(async () => { const b = await boot(); try { await flow(b, 390, 763, true); await flow(b, 1440, 860, false); await fsCard(b); } finally { await b.close(); } done('flow'); })();
+(async () => { const b = await boot(); try { await flow(b, 390, 763, true); await flow(b, 1440, 860, false); await chain(b, 390, 763, true); await chain(b, 1440, 860, false); await fsCard(b); } finally { await b.close(); } done('flow'); })();
