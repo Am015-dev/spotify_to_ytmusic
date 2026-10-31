@@ -45,6 +45,8 @@ const stripNouns = t => { let s = t; for (const n of PROPER) s = s.replace(new R
     const ov = rows.filter(r => r.over); ok(T + 'no string is cut or runs off its box', ov.length === 0, ov.slice(0, 6).map(r => `${r.scr}:"${r.t.slice(0, 40)}"`).join(' | '));
     // 4 boss warning is readable (>= 16 px on screen)
     const bw = rows.filter(r => r.k === 'cv' && /^WARNING\b/.test(r.t)); ok(T + 'boss warning drawn in English', bw.length > 0 && bw.every(r => /^WARNING · /.test(r.t) && !/WARNUNG/.test(r.t)), bw.map(r => r.t).join('|') || 'not seen');
+    const bb = rows.filter(r => r.k === 'cv' && /^(MINI-)?BOSS · /.test(r.t)); ok(T + 'W324 boss bar names the boss ("BOSS · NAME" / "MINI-BOSS · NAME")', bb.length > 0 && bb.every(r => /^(MINI-)?BOSS · [A-ZÄÖÜ\- ]+$/.test(r.t)), bb.map(r => r.t).join(','));
+    const pm = rows.filter(r => r.k === 'cv' && /^POINTS/.test(r.t)); ok(T + 'W324 multiplier carries the word POINTS (phone: next to the number; PC: POINTS MULTIPLIER)', pm.length > 0, pm.map(r => r.t).slice(0, 3).join(','));
     ok(T + 'boss warning >= 16 px', bw.length > 0 && bw.every(r => r.fs >= 16), bw.map(r => r.fs.toFixed(1)).join(','));
     // 4b W321 result screens: every number says what it counts; the garage line shows only with the GARAGE button; the test widget is behind ?lab=1
     const RES = /^(game-over|result)$/, bad = rows.filter(r => RES.test(r.scr) && /Marked|\bBROKEN\b|\(you: |Land (at least )?\d+ PERFECT|^Banked|^Goal\b|\bPerfect\b \d/.test(r.t));
