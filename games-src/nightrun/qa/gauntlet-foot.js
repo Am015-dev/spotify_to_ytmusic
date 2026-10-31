@@ -204,7 +204,7 @@ async function run(b, plat, strat, seed) {
       ticks++; if (!fastOn && Date.now() - t0 > 8000) { fastOn = true; R.frameP95 = await p.evaluate(() => { const a = window.__ft.slice().sort((x, y) => x - y); window.__ftOn = false; return a.length ? { n: a.length, p50: a[a.length >> 1], p95: a[Math.floor(a.length * .95)] } : null; }); await p.evaluate(ts => { window.FOOT.ts = ts; }, TS); }
       if (s.paused) { fail('paused unexpectedly'); break; }
       if (process.env.GOD && s.bossOn) await p.evaluate(() => { const S = window.FOOT.S; if (S.P.hp > 0) S.P.hp = S.P.max; });   // geometry probe: Kai survives so every attack is measured
-      await inp.apply(decide(s));
+      { const w = decide(s); R.lastW = { mx: +(w.mx || 0).toFixed(2), f: w.fire ? 1 : 0, m: w.melee ? 1 : 0, j: w.jump ? 1 : 0, g: w.guard ? 1 : 0, d: w.dash ? 1 : 0 }; await inp.apply(w); }
       await sleep(22); s = await p.evaluate(SNAP); if (!s) { fail('FOOT.S vanished'); break; }
       // ---- per-tick checks
       for (const e of s.E) { if (e.d) { if (seen.has(e.u)) died.add(e.u); continue; } if (!seen.has(e.u)) { seen.add(e.u); if (e.x < s.camX + 5 && e.x > s.camX - 200) spawnL.push({ t: s.t, x: e.x - s.camX }); } if (/^(lunge|dash|pounce|spray|bite|charge|sb_)/.test(e.st || '') || e.w > 0) atkd.add(e.u); }
@@ -228,6 +228,10 @@ async function run(b, plat, strat, seed) {
       if (!shotsDone.death && s.P.hp <= 0) { shotsDone.death = 1; await shot('death'); }
       if (process.env.TRACE && s.t - (R.trT || -9) >= 1) { R.trT = s.t; (R.trace = R.trace || []).push([(R.stage = R.stage || s.stage) && '',+s.t.toFixed(1), Math.round(s.P.x), Math.round(s.camX), s.lock || '-', s.P.hp, s.E.filter(e => !e.d).length, s.E.filter(e => !e.d).map(e => e.id + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 6).join(' '), s.kills, 'wavesLeft=' + s.wl].join(' ')); }
       if (process.env.BTRACE && s.bossOn && s.t - (R.btT || -9) >= .5) { R.btT = s.t; const B = s.E.find(e => e.b && !e.d); (R.btrace = R.btrace || []).push([+s.t.toFixed(1), 'hp' + s.P.hp, 'Pz' + s.P.z, B ? [B.st, Math.round(B.x - s.P.x), 'z' + B.z, Math.round(B.hp2)].join(' ') : '-', 'zm' + s.zm, 'adds' + s.E.filter(e => !e.d && !e.b).length].join(' ')); }
+      if (process.env.W316) {   // W316: every 5 s game time one line (street time, hp, foes, types, Kai x vs camera, input sent) + a shot at each heart lost
+        const live = s.E.filter(e => !e.d && !e.hid), I = R.lastW || {};
+        if (s.t - (R.w316T == null ? -9 : R.w316T) >= 5) { R.w316T = s.t; (R.w316 = R.w316 || []).push(`t=${s.t.toFixed(0)} hp=${s.P.hp}/${s.P.max} foes=${live.length} [${live.map(e => e.id + (e.x < s.camX ? '<' : e.x > s.camX + s.vw ? '>' : '') + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 7).join(' ')}] kaiX=${Math.round(s.P.x)} cam=${Math.round(s.camX)} vw=${Math.round(s.vw)} kaiRel=${Math.round(s.P.x - s.camX)} lock=${s.lock || '-'} in=${JSON.stringify(I)} kills=${s.kills}`); }
+        if (prev && s.P.hp < prev.P.hp) { const nh = (R.w316h = (R.w316h || 0) + 1); (R.w316 = R.w316 || []).push(`HIT#${nh} t=${s.t.toFixed(1)} hp ${prev.P.hp}->${s.P.hp} hurtBy=${(await p.evaluate(() => { const h = window.FOOT.S.hlog; return h && h.length ? h[h.length - 1] : null; })) } foes=[${live.map(e => e.id + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 7).join(' ')}] kaiRel=${Math.round(s.P.x - s.camX)}/${Math.round(s.vw)}`); await shot('hit' + nh); } }
       prev = s; lastS = s;
     }
     await inp.release(); await sleep(150); s = await p.evaluate(SNAP) || lastS; R.end = s && s.end; R.hlog = await p.evaluate(() => { const S = window.FOOT.S; return S && S.hlog ? S.hlog.slice() : []; }).catch(() => null); R.duel = await p.evaluate(() => { const l = window.FOOT.SB && window.FOOT.SB.log, c = {}; for (const f of l || []) for (const x of f.at) { const k = x[0] + ':' + (x[2] || 'open'); c[k] = (c[k] || 0) + 1; } return Object.entries(c).map(([k, v]) => k + '=' + v).join(','); }).catch(() => null); R.t = s && s.t; R.kills = s && s.kills; R.hurts = s && s.hurts; R.hpEnd = s && s.P.hp; R.maxX = s && s.P.maxX;
@@ -247,7 +251,7 @@ async function run(b, plat, strat, seed) {
     R.errs = p.errs.concat(await p.evaluate(() => window.__rej.map(r => 'rejection: ' + r))).concat(p.cons.map(c => 'console: ' + c)); for (const e of R.errs) fail('error: ' + e); if (p.bad.length) R.notes.push('http: ' + p.bad.slice(0, 3).join(' '));
   } catch (e) { fail('bot crashed: ' + String(e.stack || e).slice(0, 300)); }
   finally { await inp.release().catch(() => { }); await p.context().close().catch(() => { }); }
-  R.real = Math.round((Date.now() - t00) / 1000); return R;
+  if (process.env.W316 && R.w316) fs.writeFileSync(path.join(OUT, tag + '.trace.txt'), R.w316.join('\n') + '\n'); R.real = Math.round((Date.now() - t00) / 1000); return R;
 }
 
 // ---- control check: every control, one at a time, then the pause menu (resume, retry, quit). Real time (x1), phone with auto-fire OFF so FIRE exists.
