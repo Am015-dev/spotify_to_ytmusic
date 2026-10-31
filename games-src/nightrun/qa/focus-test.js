@@ -43,7 +43,7 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
     }
     SAMPLE(); return { why, eye: document.getElementById('overEyebrow').textContent, hp: M.P.hp, t: M.G.t, boss: !!M.G.bossDone || !!M.G.boss, st: M.ST.n };
   }, clearAt);
-  await p.evaluate(() => { MODE = 'flight'; }); await p.click('#focFlight');
+  await p.evaluate(() => { MODE = 'flight'; }); await p.evaluate(() => document.getElementById('focS1').click());   // the save sits at stage 4 (FLIGHT would resume there, and later stages legitimately play their own boss/district songs): the one-song rule is stage 1's
   await p.waitForFunction(() => __mnr.running, null, { timeout: 8000 });
   const f1 = await flightRun(900); console.log(`  flight run 1: ${JSON.stringify(f1)}`);
   const sc = await p.evaluate(() => { const v = id => { const e = document.getElementById(id); return !!(e && e.getClientRects().length); }; return { res: v('stres'), over: v('over'), next: v('srNext'), stages: v('srMenu') || v('stBtn2'), retry: v('srRetry') || v('againBtn'), title: v('focTitle') || v('menuBtn') }; });
