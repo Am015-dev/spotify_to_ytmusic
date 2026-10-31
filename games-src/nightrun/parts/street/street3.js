@@ -5,7 +5,7 @@
    the sprites are moving fast and abnormally, idle looks not smooth; enemy sprites also move fast and look abnormal; better lighting and shadows; one stage, one song,
    max 3 minutes; the difficulty should increase gradually". Builds on street2.js (same props, foes and climax), changes:
    1. TIME: the camera may not run ahead of a gate that moves with the stage clock (SL.back), so the run lasts about the same for everyone: 8 beats of calm, then 12 waves (W310: the first, two rushers, already after w0 = 4 beats: it walks in while "Push the stick right" still shows) whose
-      threat score (rusher 1, gunner 2, heavy 4) grows linearly from 2 to 8 to the peak at ~81-85% of the run, a breather, the big heavy once the street is clear. No locks, no checkpoint, no captions,
+      threat score (rusher 1, gunner 2, heavy 4) grows linearly from 2 to 8 to the peak at ~81-85% of the run, a breather, the big heavy once the street is clear. No locks, one checkpoint (W320: RESUME FROM BOSS), no captions,
       no music cues: one song (street1, 192 s) from start to end (musicpack's lock/boss/clear switches are blocked for this stage). S3.log.waves = the threat curve.
    2. LOADING: the STREET RUN hold (footq.js) also waits for the painted street (foot/bg-*) and prop pictures, so the first frame is the full-size art (no swap).
    3. ANIMATION: no cross-fade on foot sheets (it doubled the outline = blur), idle ping-pong at 7 fps, shots/melee 12 fps one-shots, a walk/idle change waits for the
@@ -38,6 +38,7 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   if(!S.s3){const bpm=(typeof BT!=='undefined'&&BT.bpm>40?BT.bpm:120),intro=+(S3.T.beats*60/bpm).toFixed(2);
     S.P.max++;S.P.hp++;   // a run twice as long as street2's: one heart more
     S.s3={intro,bpm,gate:0,waves:plan(intro),spawnLog:[],live:[],held:0,boss:0};S3.log=S.s3;
+    if(S.bres){P.hp=Math.min(P.max,Math.max(3,S.bres.hp));for(const w of S.s3.waves)w.left=[];}   // W320 RESUME FROM BOSS: hearts as at arrival (min 3), the street waves are over
     {const w=S.s3.waves[0];w.t=w.next=+Math.min(intro,S3.T.w0*60/bpm).toFixed(2);}   // W310: only the first wave comes early (all 12 earlier cost the gunner-first bot 15 points of clears)
     for(const p of S.pr)if(p.draw&&!p._d3){const d0=p.draw;p._d3=1;p.draw=(c,K,at)=>{propShadow(c,p);return snap(c,()=>d0(c,K,at));};}}
   const f=S.s3;f.gate=gate(S,vw);S.idleSpawn=S.time+60;   // the clock sets the pace: standing at the gate is not camping (no idle spawns of other foes)
@@ -46,6 +47,7 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   f.clr=(RET.cam2&&S.camX>=bc-4&&!alive0)?(f.clr||0)+dt:0;   // W318: camera at its stop and no foe alive: seconds the street has been clear
   const wq=f.waves.find(w=>w.left.length);if(f.clr>=8&&wq&&!S.bossOn)wq.next=Math.min(wq.next,S.time);   // W318: a cleared street calls the next wave at once (no pinned wait); the whole ramp still comes, so the attrition is the same
   if(!S.bossOn&&((f.gate>=bc-40&&(!alive0||S.time>S3.T.boss+12))||(f.clr>=2&&!wq))){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.2;f.boss=+S.time.toFixed(1);
+    if(!S.bres)S.bcp={x:P.x,camX:S.camX,time:S.time,score:S.score,kills:S.kills,hurts:S.hurts,hp:P.hp,w:P.w,lv:P.lv,ammo:P.ammo,bombs:P.bombs};   // W320: the boss checkpoint, taken when the big heavy is called
     for(let i=0;i<Math.min(2,P.max-P.hp);i++){f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*(60+50*i),S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}}   // up to two heals as the big heavy walks in (its charge hits for 2)   // the boss comes in quietly (no warning sting), once the street is clear (12 s at most)
   const alive=S.E.filter(e=>!e.dead).length;
   if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy

@@ -200,7 +200,18 @@ async function run(b, plat, strat, seed) {
     await p.evaluate(() => { window.__ftOn = true; }); const decide = strategy(strat, rnd);
     const seen = new Set(), atkd = new Set(), died = new Set(), maxHp = {}; let prev = null, sigT = 0, sig = '', stuck = 0, offT = 0, shotsDone = {}, minMargin = 1e9, camBack = 0, spawnL = [], behindSeen = 0, behindUntil = -1, unwarned = 0, pkMax = 0, lastS = null, fastOn = false, ticks = 0, maxFoes = 0, progBad = 0;
     const t0 = Date.now(); let s = await p.evaluate(SNAP);
-    while (s && !s.end && Date.now() - t0 < MAXREAL) {
+    R.resumes = 0; R.reach = false; const RESUME = +process.env.RESUME || 0;   // W320: RESUME=n = a bot that dies at the boss taps RESUME FROM BOSS (real tap / click) up to n times
+    while (s && Date.now() - t0 < MAXREAL) {
+      if (s.bossOn) R.reach = true;
+      if (s.end) {
+        if (!(RESUME > R.resumes && !s.end.cleared && !s.end.quit && s.bossOn)) break;
+        await inp.release(); await sleep(700); const rb = await p.evaluate(() => { const b = document.getElementById('fBoss'), m = document.getElementById('fMenu'); if (!b || !m || m.hidden) return null; const r = b.getBoundingClientRect(), bs = [...m.querySelectorAll('button')].filter(x => x.getBoundingClientRect().width > 0).map(x => { const q = x.getBoundingClientRect(); return { t: x.textContent, x: Math.round(q.left), y: Math.round(q.top), w: Math.round(q.width), h: Math.round(q.height), inside: q.left >= 0 && q.top >= 0 && q.right <= innerWidth && q.bottom <= innerHeight }; }); return { first: m.querySelector('button') === b, bs, sm: [...m.querySelectorAll('.sm')].map(x => x.textContent).join(' | ') }; });
+        if (!rb) { fail('boss death but no RESUME FROM BOSS button'); break; }
+        if (R.resumes === 0) { await shot('down-resume'); R.rb = rb; if (!rb.first) fail('RESUME FROM BOSS is not the first button'); if (rb.bs.some(x => x.h < 44 || !x.inside)) fail('result buttons < 44 px or outside the viewport: ' + JSON.stringify(rb.bs)); }
+        await inp.tap('#fBoss'); R.resumes++; await sleep(500); s = await p.evaluate(SNAP); if (!s || s.end) { fail('RESUME FROM BOSS did not restart the run'); break; }
+        if (R.resumes === 1) R.afterResume = { t: s.t, hp: s.P.hp, bossOn: s.bossOn, score: s.score };
+        sig = ''; sigT = s.t; prev = null; continue;
+      }
       ticks++; if (!fastOn && Date.now() - t0 > 8000) { fastOn = true; R.frameP95 = await p.evaluate(() => { const a = window.__ft.slice().sort((x, y) => x - y); window.__ftOn = false; return a.length ? { n: a.length, p50: a[a.length >> 1], p95: a[Math.floor(a.length * .95)] } : null; }); await p.evaluate(ts => { window.FOOT.ts = ts; }, TS); }
       if (s.paused) { fail('paused unexpectedly'); break; }
       if (process.env.GOD && s.bossOn) await p.evaluate(() => { const S = window.FOOT.S; if (S.P.hp > 0) S.P.hp = S.P.max; });   // geometry probe: Kai survives so every attack is measured
@@ -303,7 +314,7 @@ async function layouts(b) {
     for (const pl of PLATS) for (const st of STRATS) for (let sd = 0; sd < SEEDS; sd++) {
       if (process.env.ONLY && process.env.ONLY !== `${pl}:${st}:${sd}`) continue;
       const R = await run(b, pl, st, sd); results.push(R);
-      say(`${R.fails.length ? 'FAIL' : 'PASS'} ${pl} ${st} seed ${sd}: ${R.end ? (R.end.cleared ? 'CLEARED' : 'died') : 'no end'} t=${R.t != null ? R.t.toFixed(0) : '?'}s kills=${R.kills} hurts=${R.hurts} bossHp=${R.bossHp != null ? R.bossHp : '-'} bossT=${R.bossT != null ? R.bossT : '-'} hurtBy=${R.hurtBy || '-'} duel=${R.duel || '-'} foes ${R.spawned}/atk ${R.attacked}/died ${R.died} pk<=${R.pkMax} margin=${R.minMargin} p95=${R.frameP95 ? R.frameP95.p95.toFixed(1) : '?'}ms real=${R.real}s${R.fails.length ? ' :: ' + R.fails.join(' | ').slice(0, 300) : ''}${R.notes.length ? ' [' + R.notes.join('; ') + ']' : ''}`);
+      say(`${R.fails.length ? 'FAIL' : 'PASS'} ${pl} ${st} seed ${sd}: ${R.end ? (R.end.cleared ? 'CLEARED' : 'died') : 'no end'} t=${R.t != null ? R.t.toFixed(0) : '?'}s kills=${R.kills} hurts=${R.hurts} reach=${R.reach ? 1 : 0} resumes=${R.resumes} bossHp=${R.bossHp != null ? R.bossHp : '-'} bossT=${R.bossT != null ? R.bossT : '-'} hurtBy=${R.hurtBy || '-'} duel=${R.duel || '-'} foes ${R.spawned}/atk ${R.attacked}/died ${R.died} pk<=${R.pkMax} margin=${R.minMargin} p95=${R.frameP95 ? R.frameP95.p95.toFixed(1) : '?'}ms real=${R.real}s${R.fails.length ? ' :: ' + R.fails.join(' | ').slice(0, 300) : ''}${R.notes.length ? ' [' + R.notes.join('; ') + ']' : ''}`);
       if (R.fails.length) nfail++; }
   } finally { await b.close(); }
   fs.writeFileSync(path.join(OUT, 'results.json'), JSON.stringify(results, null, 1));

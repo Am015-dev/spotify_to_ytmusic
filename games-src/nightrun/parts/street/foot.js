@@ -93,6 +93,8 @@ function newRun(id,fromCp){const st=STAGES[id],D=diffK(),old=S;
   if(fromCp&&old&&old.cp){const c=old.cp,cpx=c.x!=null?c.x:st.cp;S.cpN=c.n|0;S.P.x=cpx+40;S.P.maxX=S.P.x;S.camX=Math.max(0,cpx-120);S.score=c.score;S.time=c.time;S.kills=c.kills;S.hurts=c.hurts;S.cp=c;
     for(const w of S.waves)if(w.lock?(st.locks.find(l=>l.id===w.lock)||{x:0}).x<cpx:w.x<cpx+200)w.done=true;
     for(const l of st.locks)if(l.x<cpx)S.lockDone[l.id]=1;S.pr=S.pr.filter(p=>p.x>cpx);S.pk=S.pk.filter(p=>p.x>cpx);S.P.w=c.w;S.P.lv=c.lv;S.P.ammo=c.ammo;S.P.bombs=Math.max(2,c.bombs);}
+  if(fromCp==='boss'&&old&&old.bcp){const c=old.bcp;S.bcp=c;S.bres=c;S.bossCp=1;S.cpUsed=true;S.P.x=c.x;S.P.maxX=c.x;S.camX=c.camX;S.score=c.score;S.time=c.time;S.kills=c.kills;S.hurts=c.hurts;   // W320: RESUME FROM BOSS = the moment the big heavy was called, boss at full hp; street3 puts hearts and waves back
+    S.P.w=c.w;S.P.lv=c.lv;S.P.ammo=c.ammo;S.P.bombs=Math.max(2,c.bombs);S.pr=S.pr.filter(p=>p.x>c.camX-200);S.pk=S.pk.filter(p=>p.x>c.camX);}
   F.S=S;return S;}
 const viewW=()=>L?L.vw:960;
 function note(t,s){S.note={t:s||2.2,txt:t};}
@@ -376,8 +378,9 @@ function rankOf(){const pts=S.score+Math.max(0,240-S.time)*25+S.P.hp*800-S.hurts
 function finish(cleared,quit){if(S.end)return;if(F.lab){S.end={cleared,quit:!!quit,neon:0,rank:'-',first:false,rec:false,time:S.time,score:S.score};NR.emit('footEnd',{stage:S.id,cleared,score:S.score,neon:0,time:Math.round(S.time),rank:'-',quit:!!quit,kills:S.kills,hurts:S.hurts,lab:true});return;}   // LAB: no Neon, best score, clear count or save write
   const id=S.id,first=cleared&&!(SV.clr[id]>0),rank=cleared?(S.cpUsed&&rankOf()==='S'?'A':rankOf()):'-';
   let neon=0;if(!quit){neon=cleared?(first?150:15+({S:30,A:20,B:10,C:5}[rank]||0)):Math.min(25,Math.floor(S.score/400));}
+  if(S.bossCp)neon=Math.round(neon*.75);   // W320: a boss resume pays Neon x0.75 and sets no record (same rule as the flight checkpoint)
   try{if(neon&&typeof GA!=='undefined'){GA.bank+=neon;gsave();}}catch(e){}
-  let rec=false;if(cleared){SV.clr[id]=(SV.clr[id]|0)+1;const b=SV.best[id];if(!S.assist&&(!b||S.score>b.score)){SV.best[id]={score:S.score,rank,time:Math.round(S.time)};rec=true;}svSave();}
+  let rec=false;if(cleared){SV.clr[id]=(SV.clr[id]|0)+1;const b=SV.best[id];if(!S.assist&&!S.bossCp&&(!b||S.score>b.score)){SV.best[id]={score:S.score,rank,time:Math.round(S.time)};rec=true;}svSave();}
   S.end={cleared,quit:!!quit,neon,rank,first,rec,time:S.time,score:S.score};
   NR.emit('footEnd',{stage:id,cleared,score:S.score,neon,time:Math.round(S.time),rank,quit:!!quit,kills:S.kills,hurts:S.hurts,assist:S.assist});
   if(!quit)showRes();}
@@ -575,8 +578,8 @@ function pause(on){if(!S||S.end)return;S.paused=on;for(const k in I)I[k]=0;if(on
 function showRes(){const E=S.end,id=S.id,b=SV.best[id];
   const rows=[['SCORE',E.score],['TIME',fmtT(E.time)],['KILLS',S.kills],['NEON','+'+E.neon+(E.first?' · first clear':'')]];
   if(b)rows.push(['BEST',b.score+' · '+b.rank]);if(S.st.hook&&S.st.hook.rows)S.st.hook.rows(S,rows);
-  const html='<h2>'+(E.cleared?'STREET CLEAR':'YOU WENT DOWN')+'</h2>'+(E.cleared?'<div class="rk" id="fRank">'+E.rank+'</div>':'')+rows.map(r=>'<div class="fr"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('')+(S.assist?'<div class="sm">ⓐ Assist run · no records</div>':'');
-  const bt=[];if(!E.cleared&&S.cp)bt.push(['FROM CHECKPOINT',()=>{hideMenu();begin(id,true);},'fCp']);
+  const html='<h2>'+(E.cleared?'STREET CLEAR':'YOU WENT DOWN')+'</h2>'+(E.cleared?'<div class="rk" id="fRank">'+E.rank+'</div>':'')+rows.map(r=>'<div class="fr"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('')+(S.assist?'<div class="sm">ⓐ Assist run · no records</div>':'')+(S.bcp?'<div class="sm">'+(E.cleared?'Resumed at the boss':'Resume: back at the boss, boss at full health')+' · Neon ×0.75, no record</div>':'');
+  const bt=[];if(!E.cleared&&S.bcp)bt.push(['RESUME FROM BOSS',()=>{hideMenu();begin(id,'boss');},'fBoss']);if(!E.cleared&&S.cp)bt.push(['FROM CHECKPOINT',()=>{hideMenu();begin(id,true);},'fCp']);
   bt.push([E.cleared?'RUN AGAIN':'RETRY',()=>{hideMenu();begin(id);},'fAgain']);
   bt.push(['FLY ON',()=>{leave(()=>{try{const sb=$('storyBtn');if(sb)sb.click();}catch(e){}});},'fFly']);
   bt.push(['BACK TO CITY',()=>leave(),'fCity']);menu(html,bt);}
