@@ -13,6 +13,7 @@ const HP = process.env.HP ? JSON.parse(process.env.HP) : {};   // human paramete
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const BOT = (o) => {
   const process_noBossGod = !!o.noBossGod;
+  { let gs = (o.seed * 104729 + 7) >>> 0; Math.random = () => { gs = (gs + 0x6D2B79F5) >>> 0; let t = gs; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }   // W314: game dice seeded per run too, so every bot plays the same seeds (paired)
   const m = window.__mnr, { n, build, bot, seed } = o; m.SET.diff = o.diff || 'normal'; try { m.applySet(); } catch (e) { }
   if (o.endless) { m.ST.on = false; document.getElementById('startBtn').click(); } else if(n>0)m.startStory(n);else{m.ST.on=false;document.getElementById('startBtn').click();} m.simOn(true); const e0 = window.ABIL ? window.ABIL.stat.emp : 0;
   let sd = seed * 7919 + 13; const rnd = () => { sd = (sd * 1103515245 + 12345) & 0x7fffffff; return sd / 0x7fffffff; };   // own dice: a run is repeatable
@@ -107,7 +108,7 @@ const BOT = (o) => {
   const life = []; for (const [e, r] of rec) { if (r.boss || r.mini || !r.killed || r.in < 0 || r.end - r.in <= 0) continue; life.push([r.ty, +(r.end - r.in).toFixed(2)]); }
   let sp = 0, lk = 0, lw = 0; for (const [e, r] of rec) { if (r.boss || r.mini || !LK || !(LK.weight(e) > 0)) continue; sp++; if (e.lkd) { lk++; lw += LK.weight(e); } }
   if (o.endless) cleared = window.ENDR.w >= n && !m.G.dead;
-  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0), seed, policy: pol, score: m.G.score, gold: window.WV && WV.bt ? WV.bt.n : 0, sqs: window.WV && WV.bt ? WV.bt.m : 0, sw, sqMode: [...sqm.entries()].sort((a, b) => a[0] - b[0]).map(([k, c]) => c[1] > c[0] ? 1 : 0), sqLog: window.WV ? WV.log.sqs : [], cf: CF, flak: window.WV ? WV.log.flak | 0 : 0 };
+  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, hpEnd: m.P.hp, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0), seed, policy: pol, score: m.G.score, gold: window.WV && WV.bt ? WV.bt.n : 0, sqs: window.WV && WV.bt ? WV.bt.m : 0, sw, sqMode: [...sqm.entries()].sort((a, b) => a[0] - b[0]).map(([k, c]) => c[1] > c[0] ? 1 : 0), sqLog: window.WV ? WV.log.sqs : [], cf: CF, flak: window.WV ? WV.log.flak | 0 : 0 };
   m.abort(); return res;
 };
 (async () => {
