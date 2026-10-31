@@ -2,7 +2,7 @@
 // W293 push-or-hold gate (waves.js GOLD bounty, design DESIGN-DECISION-W247.md). Runs humanbot.js (human model, Normal, fresh build, sim steps) four ways:
 //   HOLD (home x 220, the old bot), PUSH (flies in on every bounty squad), CHOOSE (pushes when hull >= 2 and no charger aims at its row),
 //   CHOOSE-NOAB (CHOOSE with DASH and EMP off). Prints PASS/FAIL lines only; TABLE=1 adds the table.
-//   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/push-gate.js     env: RUNS=8 STAGES=1,2,3,4,5,6 PAR=4 GAME_DIR=... TABLE=1 OUT=/tmp/pg
+//   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/push-gate.js     env: SEEDBASE=0 RUNS=8 STAGES=1,2,3,4,5,6 PAR=4 GAME_DIR=... TABLE=1 OUT=/tmp/pg
 const cp = require('child_process'), path = require('path'), fs = require('fs'), os = require('os');
 const RUNS = process.env.RUNS || '8', STAGES = process.env.STAGES || '1,2,3,4,5,6', PAR = process.env.PAR || '4';
 const OUT = process.env.OUT || fs.mkdtempSync(path.join(os.tmpdir(), 'pg-')); fs.mkdirSync(OUT, { recursive: true });
