@@ -7,7 +7,7 @@ const freePort = () => new Promise(r => { const s = net.createServer(); s.listen
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const res = [], ok = (n, p, i) => { res.push(!!p); console.log((p ? 'PASS ' : 'FAIL ') + n + (p || i == null ? '' : ' :: ' + (typeof i === 'string' ? i : JSON.stringify(i)))); };
 const STORY = JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 });
-// the scripted bot: runs right, faces and shoots the nearest enemy, hops over bullets, knifes close enemies, bombs crowds, dashes on the beat
+// the scripted bot (STALE since W243/W248/guard: mortal it dies in ~20 s to drone bullets, with GOD=1 it sticks at arena locks with flying drones; the maintained bots are in qa/streetsim.js): runs right, faces and shoots the nearest enemy, hops over bullets, knifes close enemies, bombs crowds, dashes on the beat
 const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5: 0 };
   NR.on('footLevel', d => { if (d.up) { __fl.up++; if (d.lv >= 5) __fl.lv5++; } else __fl.down++; }); NR.on('footPick', () => __fl.pick++); NR.on('footKill', () => __fl.kill++); NR.on('footCp', () => __fl.cp++);
   FOOT.ctl = (S, I) => { const P = S.P; if (window.__god) P.hp = P.max; let near = null, nd = 1e9; for (const e of S.E) { if (e.dead || e.x < S.camX - 5) continue; const d = Math.abs(e.x - P.x) + Math.abs(e.y - P.y) * .5; if (d < nd) { nd = d; near = e; } }
@@ -54,7 +54,7 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
     const sk = document.getElementById('fStick'); if (sk.style.display !== 'none') { const c = sk.getBoundingClientRect(), R = c.width / 2, cx = c.left + R, cy = c.top + R;
       for (const [id, r] of bs) { const nx = Math.max(r.left, Math.min(cx, r.right)), ny = Math.max(r.top, Math.min(cy, r.bottom)); if (Math.hypot(nx - cx, ny - cy) < R + 8) o.stick.push(id); } }
     const u = 1 / I.sc, h = I.hud; if (h && h.hint) { const t = h.hint; if (t.x < 0 || t.x + t.w > h.vw + .5) o.hint.push('outside'); for (const q of h.hud) if (t.x < q.x + q.w && t.x + t.w > q.x && t.y < q.y + q.h && t.y + t.h > q.y) o.hint.push('HUD'); }
-    if (touch) { if (I.mode === 'port' && bx.h < H * .58) o.field.push('port ' + bx.h + '/' + H); if (I.mode === 'land' && (bx.h < H - 2 || cv.width < W - 1)) o.field.push('land ' + bx.h + '/' + H); if (bx.w < 420 * I.sc - 1) o.field.push('narrow'); }
+    if (touch) { if (I.mode === 'port' && bx.h < H * .58) o.field.push('port ' + bx.h + '/' + H); if (I.mode === 'land' && (bx.h < H - 2 || cv.width < W - 1)) o.field.push('land ' + bx.h + '/' + H); const minW = window.FOOT.look && FOOT.look.port ? 330 : 420; if (bx.w < minW * I.sc - 1) o.field.push('narrow');/* street look portrait: scale = W/330, 330 field units is its floor */ }
     return o; });
   const clean = a => !a.small.length && !a.out.length && !a.over.length && !a.gap.length && !a.stick.length && !a.hint.length && !a.field.length && !a.scroll;
   try {
@@ -104,10 +104,10 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
       ok(name + ': a bot run lasts 2-6 minutes', runs.some(o => o.end && o.end.cleared ? o.t >= 120 && o.t <= 360 : o.t > 60), runs.map(o => o.t));
       ok(name + ': weapons level up and down, pickups collected, kills', fl.up > 2 && fl.down > 0 && fl.pick > 3 && fl.kill > 20, fl);
       // results screen
-      await p.evaluate(() => { FOOT.ctl = null; }); const rs = await p.evaluate(() => { const m = document.getElementById('fMenu'); return { shown: !m.hidden, btn: [...m.querySelectorAll('button')].map(b => [b.textContent, Math.round(b.getBoundingClientRect().height)]) }; });
-      ok(name + ': results screen with RETRY / FLY ON / BACK TO CITY (44px+)', rs.shown && rs.btn.length >= 3 && rs.btn.every(b => b[1] >= 44) && rs.btn.some(b => b[0] === 'FLY ON'), rs);
+      await p.evaluate(() => { FOOT.ctl = null; }); const rs = await p.evaluate(() => { const m = document.getElementById('fMenu'); return { shown: !m.hidden, btn: [...m.querySelectorAll('button')].map(b => [b.textContent, Math.round(b.getBoundingClientRect().height)]), vis: [...m.querySelectorAll('button')].filter(b => getComputedStyle(b).display !== 'none').map(b => [b.textContent, Math.round(b.getBoundingClientRect().height)]) }; });
+      ok(name + ': results screen with RETRY and TITLE visible, 44px+ (focus title hides FLY ON and FROM CHECKPOINT: menus/focus.js; fCity is relabelled TITLE)', rs.shown && rs.vis.length >= 2 && rs.vis.every(b => b[1] >= 44) && rs.vis.some(b => b[0] === 'RETRY' || b[0] === 'RUN AGAIN') && rs.vis.some(b => b[0] === 'TITLE'), rs);
       if (name === 'phone') { // rotation: landscape keeps the controls off the play area
-        await p.setViewportSize({ width: 763, height: 390 }); await sleep(700); await p.evaluate(() => { document.getElementById('fMenu').hidden = true; FOOT.layout(); });
+        await p.evaluate(() => document.fullscreenElement && document.exitFullscreen()).catch(() => {}); await sleep(300); await p.setViewportSize({ width: 763, height: 390 }); await sleep(700); await p.evaluate(() => { document.getElementById('fMenu').hidden = true; FOOT.layout(); });
         const a2 = await audit(p); ok('phone rotated: controls beside the play area, field fills the screen', clean(a2), a2);
         await p.setViewportSize({ width: 390, height: 763 }); await sleep(700); }
       await p.evaluate(() => { document.getElementById('fMenu').hidden = false; }); await p.click('#fCity'); await sleep(400);
@@ -139,7 +139,7 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
       const u = await p.evaluate(() => { const S = FOOT.S, P = S.P, o = {}; P.inv = 0; P.dashIF = 0;
         const give = k => { S.pk.push({ k, x: P.x, y: P.y - 36, vy: 0, t: 0, on: true }); FOOT.step(1 / 60); };
         give('w_hmg'); o.hmg1 = P.w + P.lv; for (let i = 0; i < 6; i++) give('w_hmg'); o.hmg5 = P.w + P.lv;
-        const hit = () => { P.inv = 0; P.dashIF = 0; S.eb.push({ x: P.x, y: P.y - 30, vx: 0, vy: 0, r: 6, dmg: 1, life: 1 }); FOOT.step(1 / 60); };
+        const hit = () => { P.inv = 0; P.dashIF = 0; P.lastHurt = -9; S.eb.push({ x: P.x, y: P.y - 30, vx: 0, vy: 0, r: 6, dmg: 1, life: 1 }); FOOT.step(1 / 60); };
         P.hp = 9; P.max = 9; hit(); o.afterHit = P.w + P.lv; for (let i = 0; i < 4; i++) hit(); o.lost = P.w + P.lv;
         give('shield'); give('shield'); o.sh = P.pw.shield && P.pw.shield.lv; const hp = P.hp; hit(); o.block = P.hp === hp;
         give('dbl'); give('dbl'); give('dbl'); give('dbl'); o.dbl = P.pw.dbl.lv; give('bomb'); o.bombs = P.bombs; P.hp = 1; give('heal'); o.heal = P.hp;
