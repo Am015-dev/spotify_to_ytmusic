@@ -432,7 +432,7 @@ RET.pwaX=(function(){
   X.draw=async function(){const row=$('pwaRow');if(!row)return;await X.count();
     const note=$('pwaNote'),btn=$('pwaBtn'),tip=$('pwaIos');
     note.hidden=!(RET.pwa&&X.ready);note.textContent='Offline ready'+(X.songs?' · '+X.songs+' songs saved':'');
-    btn.hidden=!(RET.pwa&&X.defer&&!standalone());tip.hidden=!(RET.pwa&&ios()&&!standalone());
+    btn.hidden=!(RET.pwa&&X.defer&&!standalone());tip.hidden=!(RET.pwa&&ios()&&!standalone()&&!(window.FSX&&FSX.embedded));
     row.hidden=note.hidden&&btn.hidden&&tip.hidden;};
   X.build=function(){const mn=$('mnMore');if(!mn||$('pwaRow')||!RET.pwa)return;
     const row=document.createElement('div');row.id='pwaRow';row.hidden=true;
