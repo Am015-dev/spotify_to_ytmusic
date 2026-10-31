@@ -20,7 +20,7 @@ const WV=window.WV={
      The risk: a wave gun foe (turret, gunship, shielder) answers a ship inside FR px with a flak ring: a red ring tells it FT s ahead,
      two rings of FN bullets (FS and .7 FS px/s, offset half a step) from the foe, so a bullet needs >= FT s + travel to reach the ship (MINSHOT's one second to react holds); DASH and EMP answer it.
      Measured (W293): the close bonus alone never shortened a clear, and inside the 190 px no-fire floor pushing cost nothing. */
-  GT0:1.5,GT1:1,GN:5,GPK:2,CLOSE:.5,FR:170,FT:.6,FN:16,FS:190,FCD:1.6,
+  GT0:1.5,GT1:1,GN:5,GPK:2,CLOSE:.5,FR:170,FT:.6,FN:16,FS:190,FCD:1.0,
   REST:3.5,SCK:650,TMAX:22,CAP:8,KG:.72,ENTER:300,
   /* the wave table: stage -> waves; a wave = [name, what to do, foes, opts]; a foe = [type, slot x (share of W), slot y (share of H), move, side]
      move: 'hold' strafe on the slot | 'sine' weave up and down | 'dash' charger: hold, aim at the ship's line, dash, come back from the right | 'sit' turret
@@ -104,7 +104,7 @@ const WV=window.WV={
       if(!B.live||q.t0<B.live.t0)B.live=q;
 }
     for(const e of this.st.foes){if(!e.bq||e.hp<=0||e.dead||!/turret|gunship|shielder/.test(e.type)||e.wv&&e.wv.st!=='on'||e.sl&&e.sl.out)continue;   // the flak ring: told FT s ahead, then FN bullets
-      if(e._ft){if(G.t-e._ft>=this.FT){e._ft=0;e._fc=G.t+this.FCD;const o=eb.src;eb.src=e;const a0=GR()*6.28;for(let i=0;i<this.FN;i++){eb(e.x,e.y,a0+i*6.2832/this.FN,this.FS);eb(e.x,e.y,a0+(i+.5)*6.2832/this.FN,this.FS*.7);}eb.src=o;this.log.flak=(this.log.flak|0)+1;}}
+      if(e._ft){if(G.t-e._ft>=this.FT){e._ft=0;e._fc=G.t+this.FCD;const o=eb.src,n0=G.eb.length;eb.src=e;const a0=GR()*6.28;for(let i=0;i<this.FN;i++){eb(e.x,e.y,a0+i*6.2832/this.FN,this.FS);eb(e.x,e.y,a0+(i+.5)*6.2832/this.FN,this.FS*.7);}eb.src=o;for(let i=n0;i<G.eb.length;i++)G.eb[i].fl=1;this.log.flak=(this.log.flak|0)+1;}}
       else if(!(e._fc>G.t)&&Math.hypot(P.x-e.x,P.y-e.y)<this.FR){e._ft=G.t;G.rings.push({x:e.x,y:e.y,l:this.FT,m:this.FT,c:'#ff3d6a'});}}
     const q=B.live;if(q){const s=Math.max(0,q.T-(G.t-q.t0));this.chip('GOLD '+Math.ceil(s)+'s','fly in close, kill the squad · '+B.n+'/'+this.GN,.4);}},
   best(n){try{return(JSON.parse(localStorage.getItem('mnr_wvgold')||'{}')[n]|0);}catch(e){return 0;}},

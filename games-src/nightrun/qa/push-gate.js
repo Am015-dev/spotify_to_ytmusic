@@ -8,9 +8,10 @@ const RUNS = process.env.RUNS || '8', STAGES = process.env.STAGES || '1,2,3,4,5,
 const OUT = process.env.OUT || fs.mkdtempSync(path.join(os.tmpdir(), 'pg-')); fs.mkdirSync(OUT, { recursive: true });
 const HB = path.resolve(__dirname, '../humanbot.js');
 const CFG = [['hold', 'hold', '{}'], ['push', 'push', '{}'], ['choose', 'choose', '{}'], ['noab', 'choose', '{"dash":0,"emp":999}']];
-const res = {};
+const res = {}, ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null, REUSE = process.env.REUSE;   // ONLY=push,choose re-runs just those; REUSE=dir takes the others from an earlier run (hold/noab never meet the flak, so they do not move with the GOLD constants)
 for (const [k, pol, hp] of CFG) {
   const json = path.join(OUT, k + '.json');
+  if (ONLY && !ONLY.includes(k) && REUSE && fs.existsSync(path.join(REUSE, k + '.json'))) { fs.copyFileSync(path.join(REUSE, k + '.json'), json); res[k] = JSON.parse(fs.readFileSync(json, 'utf8')); continue; }
   const r = cp.spawnSync('node', [HB], { env: Object.assign({}, process.env, { POLICY: pol, HP: hp, BOTS: 'human', BUILDS: 'fresh', STAGES, RUNS, PAR, JSON: json }), encoding: 'utf8', maxBuffer: 1 << 26 });
   if (!fs.existsSync(json)) { console.log('FAIL push-gate: humanbot ' + k + ' wrote no result\n' + (r.stdout || '').slice(-600) + (r.stderr || '').slice(-600)); process.exit(1); }
   if (/FAIL page error|RUN ERROR/.test(r.stdout || '')) console.log('FAIL ' + k + ': page errors\n' + r.stdout.split('\n').filter(l => /FAIL page|RUN ERROR/.test(l)).slice(0, 3).join('\n'));
