@@ -20,7 +20,8 @@ Design + final constants: BALANCE-W300.md. Logs / shots (not committed): /tmp/w3
 |---|---|---|---|---|---|---|
 | PC 1440x860 | 2/2 (+2/2 at accept .75/.85) | 1/4 | 1/1 | 0/1 | 0/1 | 0/1 |
 | phone 390x763 | 2/2 | 0/4 (boss left 2/15/32/100 hp) | 0/1 | 0/1 | 0/1 | 0/1 |
-| phone 844x390 | see /tmp/w300/g/d2.log (2 seeds, may be cut by the stop) | same | NOT RUN | NOT RUN | NOT RUN | NOT RUN |
+| phone 844x390 | 2/2 | 2/2 (touch +.04 helps more here) | NOT RUN | NOT RUN | NOT RUN | NOT RUN |
+Every 844x390 run also FAILs 'result buttons not usable: fCity 420x48' on the STREET CLEAR screen (menu code, not this task's scope).
 8 seeds per cell NOT RUN (45 s per run; one browser; tuning took 4 late rounds, see BALANCE-W300.md trail). Duelist: 0 hearts lost in every boss-only run = 100%,
 above the 60-90% band: a 250-350 ms reader never misses with these windows; the band would need attrition (adds, a faster second half), not shorter windows.
 
