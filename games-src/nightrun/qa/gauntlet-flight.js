@@ -35,8 +35,8 @@ function makeInput(p, dev) {
   const I = { dev, cdp: null, finger: null, keys: new Set() };
   I.init = async () => { if (dev.touch) I.cdp = await p.context().newCDPSession(p);
     I.geo = await p.evaluate(() => { const e = document.getElementById('frame') || document.querySelector('canvas'); const r = e.getBoundingClientRect(); return { l: r.left, t: r.top, w: r.width, h: r.height }; }); };
-  const tp = (type, x, y, id) => I.cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: id || 1 }] });
-  I.tap = async (x, y) => { const f = I.finger ? [{ x: I.finger.x, y: I.finger.y, id: 1 }] : []; await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [...f, { x, y, id: 7 }] }); await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: f }); };   // a second finger taps; the steering finger stays down
+  const tp = (type, x, y, id) => I.cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? (I.finger ? [{ x: I.finger.x, y: I.finger.y, id: 1 }] : []) : [{ x, y, id: id || 1 }] });   // W305: CDP touchEnd lists the points that END
+  I.tap = async (x, y) => { const f = I.finger ? [{ x: I.finger.x, y: I.finger.y, id: 1 }] : []; await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [...f, { x, y, id: 7 }] }); await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [{ x, y, id: 7 }] }); };   // W305: a second finger taps; touchEnd lists the TAP finger (W302 listed the steering finger: it was lifted on every dash/EMP tap; proved in qa/w305-lift.js)
   I.clickEl = async sel => { const bb = await p.locator(sel).boundingBox(); if (!bb) return false; const x = bb.x + bb.width / 2, y = bb.y + bb.height / 2; if (dev.touch) await I.tap(x, y); else await p.mouse.click(x, y); return true; };
   // movement: want = unit-ish vector in game coords (gx forward = right on PC / up on phone). PC: keys; phone: finger drag, re-grabbed at the edge
   I.move = async (dx, dy, rot, fire) => {
