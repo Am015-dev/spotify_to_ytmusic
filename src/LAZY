@@ -31,7 +31,7 @@
 99c8_sfxhit.js:SFXL_gate
 99crf_racefree_go.js
 98rfb_race_bounds.js:TK_pY,TK_near,TK_bd
-98sc_stkcam.js
+98sc_stkcam.js:SKC_free,SKC_fv
 99cst_camsteady_go.js:CST_judge
 98rd_race_dress.js:RDS_hw,RDS_inCor,RDS_build,RDS_drop
 99c9rd_racedress_go.js
@@ -39,3 +39,4 @@
 99hrq_quest_intro.js:qvIntro,qvShort
 99c6hr_mstart_go.js:HRM_run,HRM_card
 99c6gui_card_go.js:GUC_run,GUC_card
+99c9og_onegame_go.js

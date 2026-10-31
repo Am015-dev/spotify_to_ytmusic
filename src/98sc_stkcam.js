@@ -14,6 +14,8 @@ const SKC={on:!/[?&]stkcam=0/.test(location.search),tp:.6,tf:1.5,rF:null,wIn:10,
 function SKC_free(C,r){const sp=TUNE.camSpr!==0,b=C.b+C.bk*r*(sp?.5:1),h=C.h+C.hk*r;return[b,h]}
 // horizontal back distance a wall allows behind the car (the roamCam scan, along the camera heading)
 function SKC_wall(bmax){const a=RO.camH!=null?RO.camH:RO.h,fx=Math.sin(a),fz=Math.cos(a);for(let d=2;d<=bmax;d+=.5)if(roamHit(RO.x-fx*d,RO.z-fz*d,1.5,RO.y+2.5))return Math.max(CR_minBack(),d-1);return 1e9}
+// one FOV: base + speed (slow ratio) + eased boost + kick; the feel-r21a cap (rest + 12 deg) still holds. Shared with the builder DRIVE (og1, 98b2 BX_ogCam)
+function SKC_fv(rF,bE,kick){const fv=pFov(TUNE.fov+({narrow:-6,normal:0,wide:8}[SET.fov]||0)+Math.min(10,TUNE.fovSpd*.7*Math.min(rF,1))+4*bE+Math.min(1.5,(kick||0)*.15)),fc=typeof F21!=='undefined'&&F21.on&&F21.rest?F21.rest+F21.max:1e9;return Math.min(fv,fc)}
 function SKC_cam(dt,sn){const c=camera.position,C=RCAM[SET.rcam||'chase'];if(!C)return;dt=Math.min(.1,Math.max(1e-4,dt||1/60));
   const u=SKC.u.set(c.x-RO.x,c.y-RO.y,c.z-RO.z),dRaw=u.length();if(dRaw<.5)return;u.multiplyScalar(1/dRaw);
   const snap=SKC.d==null||sn||SKC.lt>0&&performance.now()-SKC.lt>500;SKC.lt=performance.now();
@@ -29,8 +31,7 @@ function SKC_cam(dt,sn){const c=camera.position,C=RCAM[SET.rcam||'chase'];if(!C)
   if(snap)SKC.d=tgt;else if(tgt<SKC.d)SKC.d+=(tgt-SKC.d)*Math.min(1,dt*SKC.wIn);else SKC.d=Math.min(tgt,SKC.d+Math.min(SKC.wOut*1.5*dt,(tgt-SKC.d)*dl));
   c.set(RO.x+u.x*SKC.d,RO.y+u.y*SKC.d,RO.z+u.z*SKC.d);{const gc=groundAt(c.x,c.z,c.y+2);if(c.y<gc+.7)c.y=gc+.7}
   // one FOV from the same smoothed ratio
-  let fv=pFov(TUNE.fov+({narrow:-6,normal:0,wide:8}[SET.fov]||0)+Math.min(10,TUNE.fovSpd*.7*Math.min(SKC.rF,1))+4*SKC.bE+Math.min(1.5,(fovKick||0)*.15)),fc=typeof F21!=='undefined'&&F21.on&&F21.rest?F21.rest+F21.max:1e9;   // the feel-r21a cap (rest + 12 deg) still holds
-  fv=Math.min(fv,fc);
+  const fv=SKC_fv(SKC.rF,SKC.bE,fovKick||0);
   SKC.fov=snap||SKC.fov==null?fv:SKC.fov+Math.max(-SKC.fr*dt,Math.min(SKC.fr*dt,(fv-SKC.fov)*Math.min(1,dt*3)));camera.fov=SKC.fov;camera.updateProjectionMatrix();SKC.n++}
 roamCam=(f=>function(dt){const sn=camSnap,r=f.apply(this,arguments);try{if(SKC.on&&state==='roam'&&!!pl&&(!RO.foot||RO.foot==='car')&&!(typeof M1!=='undefined'&&M1.cs)&&(SET.rcam||'chase')!=='high')SKC_cam(dt,sn);else SKC.d=null}catch(e){SKC.err=String(e).slice(0,160)}return r})(roamCam);
 // racemode-r25a: race mode (state race/finished, updateCam in 30_race3.js) gets the same single smoothed state. Its chase rig pumped for the same reason

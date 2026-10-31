@@ -5,7 +5,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function launch(q=''){const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const c=await b.newContext({viewport:(process.env.VP||'852x393').split('x').reduce((o,v,i)=>(o[i?'height':'width']=+v,o),{}),hasTouch:true,isMobile:true,deviceScaleFactor:1});const p=await c.newPage();const E=[];
  p.on('pageerror',e=>E.push('PAGEERR '+e.message));p.on('console',m=>{if(m.type()==='error')E.push('CONSOLE '+m.text())});
- await p.goto('http://127.0.0.1:8766/local_dbg.html?bxfast=1'+q,{timeout:180000});await p.waitForSelector('#bxMenuBtn',{state:'visible',timeout:180000});await sleep(1500);
+ await p.goto('http://127.0.0.1:8766/local_dbg.html?bxfast=1'+q+(process.env.Q||''),{timeout:180000});await p.waitForSelector('#bxMenuBtn',{state:'visible',timeout:180000});await sleep(1500);
  const cdp=await c.newCDPSession(p);return{b,p,E,cdp}}
 const T=async(cdp,type,pts)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:pts.map((q,i)=>({x:q[0],y:q[1],id:q[2]??i}))});
 async function tap(cdp,x,y){await T(cdp,'touchStart',[[x,y]]);await sleep(60);await T(cdp,'touchEnd',[]);await sleep(160)}
@@ -28,7 +28,7 @@ function holder(p,cdp){const H={};const pts=async()=>{const out=[];for(const k i
 // SLOPPY=<metres>: a human-like player: wanders up to ~1.6x that many metres off the line, reacts 0.3 s late, brakes late
 const SL=+process.env.SLOPPY||0,LAG=SL?.3:0;
 async function drive(p,cdp,{ch=[],secs=90,out,tag,shots={},wpExtra=null,stopLaps=1,maxWall=900}){const W=wpExtra||await p.evaluate(c=>__bx.route(c),ch);const h=holder(p,cdp);const Q=[];let idx=0,last=-1,taken={},t0=Date.now(),info=[];
- const st=()=>p.evaluate(()=>__bx.st());let s=await st();
+ const st=()=>p.evaluate(()=>__bx.st());let s=await st();const og=!(await p.$('#bxL')),K=og?{L:'tL',R:'tR',B:'tB'}:{L:'bxL',R:'bxR',B:'bxB'},ped=og&&await p.evaluate(()=>{const e=document.getElementById('tG');return!!(e&&e.getBoundingClientRect().width)}); // og1: the shared #touch controls (GAS held in pedal mode)
  while(true){s=await st();const V=s.v;if(!V)break;if(s.m.t>secs||s.m.laps>=stopLaps||(Date.now()-t0)/1000>maxWall)break;
   // advance along the route (never backwards more than a few points; after a respawn re-find)
   let best=1e9,bi=idx;for(let i=Math.max(0,idx-6);i<Math.min(W.length,idx+40);i++){const d=Math.hypot(W[i][0]-V.p[0],W[i][2]-V.p[2])+Math.abs(W[i][1]-V.p[1])*.5;if(d<best){best=d;bi=i}}
@@ -36,11 +36,11 @@ async function drive(p,cdp,{ch=[],secs=90,out,tag,shots={},wpExtra=null,stopLaps
   idx=Math.max(idx,bi);if(idx>=W.length-2&&stopLaps<=1&&!W.loop)idx=W.length-2;
   const look=Math.min(W.length-1,idx+Math.max(3,Math.round(V.sp/3.2))),tw=W[look%W.length],tw2=W[Math.min(W.length-1,look+1)],wob=SL?SL*Math.sin(s.m.t*.8)+SL*.6*Math.sin(s.m.t*2.3):0,tl=Math.hypot(tw2[0]-tw[0],tw2[2]-tw[2])||1,dx=tw[0]+wob*(tw2[2]-tw[2])/tl-V.p[0],dz=tw[2]-wob*(tw2[0]-tw[0])/tl-V.p[2],fh=Math.hypot(V.F[0],V.F[2])||1;
   const cross=(V.F[2]*dx-V.F[0]*dz)/fh,dot=(V.F[0]*dx+V.F[2]*dz)/fh,ang=Math.atan2(cross,dot); // >0: target is to the LEFT (x-left convention: right = F x up)
-  const steer0=Math.abs(ang)<.06?0:ang>0?-1:1;Q.push([s.m.t,steer0]);while(Q.length>1&&Q[1][0]<=s.m.t-LAG)Q.shift();const steer=SL?Q[0][1]:steer0;await h.set('bxL',steer<0);await h.set('bxR',steer>0);
+  const steer0=Math.abs(ang)<.06?0:ang>0?-1:1;Q.push([s.m.t,steer0]);while(Q.length>1&&Q[1][0]<=s.m.t-LAG)Q.shift();const steer=SL?Q[0][1]:steer0;await h.set(K.L,steer<0);await h.set(K.R,steer>0);
   // brake like a player before a corner: the tightest radius in the next ~45 m of course (heading change per metre) vs speed (yaw limit ~1.25 rad/s)
   let need=99;{let acc=0,i=idx,a0=null;const P=[];while(acc<45&&i<W.length-1){const a=W[i],b=W[i+1],d=Math.hypot(b[0]-a[0],b[2]-a[2]);if(d>.3)P.push([Math.atan2(b[0]-a[0],b[2]-a[2]),d,acc]);acc+=d;i++}
    for(let k=0;k<P.length;k++){let dd=0,m=k;while(m<P.length-1&&dd<14){dd+=P[m][1];m++}if(dd<8)break;const t=Math.abs(Math.atan2(Math.sin(P[m][0]-P[k][0]),Math.cos(P[m][0]-P[k][0])));if(t>.05){const R=dd/t,v=1.25*R+Math.max(0,P[k][2]-10)*.5;if(v<need)need=v}}}
-  const brk=(Math.abs(ang)>.9&&V.sp>16)||V.sp>Math.max(12,need)+2+(SL?6:0);if(process.env.DBG&&s.m.t>+process.env.DBG)console.log('drv',s.m.t.toFixed(2),idx,ang.toFixed(2),need.toFixed(1),V.sp,brk,steer);await h.set('bxB',brk);
+  const brk=(Math.abs(ang)>.9&&V.sp>16)||V.sp>Math.max(12,need)+2+(SL?6:0);if(process.env.DBG&&s.m.t>+process.env.DBG)console.log('drv',s.m.t.toFixed(2),idx,ang.toFixed(2),need.toFixed(1),V.sp,brk,steer);await h.set(K.B,brk);if(ped)await h.set('tG',!brk);
   for(const k in shots)if(!taken[k]&&shots[k](s)){taken[k]=1;await shot(p,`${out}/${tag}_${k}.png`)}
   info.push([+s.m.t.toFixed(2),...V.p,V.sp,V.g?1:0,V.boat?1:0,idx]);await sleep(70)}
  await h.clear();return{s,info,taken}}

@@ -319,7 +319,7 @@ function BX_burst(p,n,col,spd){const F=BX.fx;for(let i=0;i<n;i++){const o=F.P[F.
 function BX_fxStep(dt){const F=BX.fx,c=new THREE.Color();F.P.forEach((o,i)=>{if(o.t>0){o.t-=dt;o.v.y-=BXG*dt;o.p.addScaledVector(o.v,dt)}F.mt.makeTranslation(o.p.x,o.t>0?o.p.y:-99,o.p.z);F.m.setMatrixAt(i,F.mt);F.m.setColorAt(i,c.set(o.c||0xffffff))});
  F.m.instanceMatrix.needsUpdate=true;if(F.m.instanceColor)F.m.instanceColor.needsUpdate=true}
 // ---------------------------------------------------------------- vehicle
-function BX_car(){if(BX.car)return BX.car;const root=new THREE.Group();let mesh=null;
+function BX_car(){if(BX_og())return BX_carOg();if(BX.car&&!BX.carT)return BX.car;BX_carDrop();const root=new THREE.Group();let mesh=null;
  try{mesh=shipMesh(TEAMS[typeof teamIdx!=='undefined'?teamIdx:0]);mesh.updateMatrixWorld(true)}catch(e){mesh=null}
  if(!mesh){mesh=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(2,1,4.2),new THREE.MeshStandardMaterial({color:0xc91a09}));b.position.y=.8;mesh.add(b)}
  BX_noFlat(mesh);
@@ -330,16 +330,40 @@ function BX_car(){if(BX.car)return BX.car;const root=new THREE.Group();let mesh=
  mesh.traverse(o=>{if(o.isMesh)o.castShadow=true});BX.carM=mesh;
  const sh=new THREE.Mesh(new THREE.CircleGeometry(1.7,20),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.22,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4}));sh.rotation.x=-Math.PI/2;BX.shM=sh;
  BX.car=root;return root}
+// og1 (one game S1, docs/DESIGN_one_game.md): the builder DRIVE is a mode on the shared car core: makeShip (same mesh + garage loadout as roam), roam stats, roam RCAM chase + SKC FOV, ctlPlayer + #touch
+function BX_og(){return BX.og1f!=null?!!BX.og1f:OD_FLAG('og1')}
+function BX_carDrop(){if(!BX.car)return;if(BX.sc)BX.sc.remove(BX.car,BX.shM);if(BX.carT)try{disposeTree(BX.car,true)}catch(e){}BX.car=BX.carT=BX.ship=null}
+function BX_carOg(){const t=playerTeam(),key=teamIdx+'|'+JSON.stringify(gbBuild()||0);if(BX.car&&BX.carT===key)return BX.car;BX_carDrop();
+ const s=makeShip(t,true,'YOU',1),g=s.mesh,ud=g.userData,root=new THREE.Group();scene.remove(g);root.add(g);try{SC_ship(g,true);vehMode(s,1)}catch(e){} // the roam car: playerTeam (garage loadout), ride scale, car mode
+ ud.m.quaternion.setFromAxisAngle(bxV(0,1,0),Math.PI);ud.m.position.set(0,1.6*(SC_S.on?SC_K.hover:1)-.5,0); // roamPose: basis(right,up,-fwd) at hover 1.6 over the ground; the BX car point rides 0.5 m over the deck
+ g.traverse(o=>{if(o.isMesh)o.castShadow=true});BX.carM=g;BX.ship=s;BX.cyaw=0;
+ BX.shM=BX.shM||new THREE.Mesh(new THREE.CircleGeometry(1.7,20),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.22,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4}));BX.shM.rotation.x=-Math.PI/2;
+ BX.car=root;BX.carT=key;return root}
+// roam stats of that car: top = RO.top (roamStep: stats.top*.8*carStat().top), acc = stats.acc*TUNE.acc*carStat().acc, grip from the handling; BX_step keeps its piece/off-road/boat factors on top
+function BX_ogStats(s){const L=carStat(),same=typeof pl!=='undefined'&&pl&&pl.team&&(pl.team===s.team||pl.team.name===s.team.name)&&RO.top>0;
+ return{top:same?RO.top:s.stats.top*.8*L.top,acc:s.stats.acc*TUNE.acc*L.acc,grip:11*(s.stats.han||1)*L.han}}
+function BX_ogInp(dt){if(BX.auto&&BX.v)return BX_input();const c=ctlPlayer(dt),k=BX_input(),b=c.brk>0||k.b?1:0,bo=!!c.boost;if(bo&&!BX.bo0)BX_boostGo();BX.bo0=bo;
+ return{s:Math.max(-1,Math.min(1,c.steer+k.s)),g:b?0:Math.max(c.thr,k.g),b}}
+function BX_ogCam(dt){const V=BX.v,cam=BX.cam,q=BX.og,D=BX.camD,C=RCAM[SET.rcam]||RCAM.chase,stick=V.on&&V.on.def.stick,sn=D.r==null,K=window.__skc||{tp:.6,tf:1.5,fr:7};dt=Math.min(.1,dt||0);
+ const r0=Math.max(-.12,Math.min(1.4,Math.abs(V.v.dot(V.F))/Math.max(30,q.top))),bo=V.boost>0,air=!V.g&&!V.boat&&V.air>.3;
+ D.r=sn?r0:D.r+(r0-D.r)*Math.min(1,dt/K.tp);D.rF=sn?r0:D.rF+(r0-D.rF)*Math.min(1,dt/K.tf);D.bE=sn?0:D.bE+((bo?1:0)-D.bE)*Math.min(1,dt*(bo?2:1.2));D.a=sn?0:D.a+((air?1:0)-D.a)*Math.min(1,dt*3);
+ const[b,h]=typeof SKC_free==='function'?SKC_free(C,D.r):[C.b,C.h],up=stick?V.U.clone():bxV(0,1,0).lerp(V.U,.35).normalize(),Fh=V.F.clone();if(!stick){Fh.y*=.4;Fh.normalize()}
+ D.f=sn||!D.f?Fh.clone():D.f.lerp(Fh,Math.min(1,dt*(stick?14:TUNE.camK))).normalize();
+ const want=V.p.clone().addScaledVector(D.f,-(b+.45*D.bE)).addScaledVector(up,h-.5+D.a),k=sn?1:1-Math.exp(-dt*(stick?14:10));D.p.lerp(want,k);D.up.lerp(up,1-Math.exp(-dt*5)).normalize();
+ const gy=BX_h(D.p.x,D.p.z)+1;if(D.p.y<gy&&!stick)D.p.y=gy;cam.position.copy(D.p);cam.up.copy(D.up);cam.lookAt(V.p.clone().addScaledVector(D.f,C.l+C.lk*D.r).addScaledVector(up,C.ly-.5));
+ const fv=typeof SKC_fv==='function'?SKC_fv(D.rF,D.bE,0):TUNE.fov;D.fov=sn||D.fov==null?fv:D.fov+Math.max(-K.fr*dt,Math.min(K.fr*dt,(fv-D.fov)*Math.min(1,dt*3)));cam.fov=D.fov;BX_sunAt(V.p)}
+function BX_dBtns(){return BX.og?['bxPz','bxRsp',...['tL','tR','tB','tG','tN'].filter(id=>{const e=$('#'+id),r=e&&e.getBoundingClientRect();return r&&r.width>0})]:BX_DRIVE_BTNS}
 function BX_vmode(v){const ud=BX.carM&&BX.carM.userData;try{if(ud&&ud.gbV)CR_vis({vmode:v},ud)}catch(e){}
  if(!(ud&&ud.gbV&&ud.gbV.boat)&&BX.carM)BX.carM.position.y=v==='boat'?-.4:BX.carM.position.y}
 function BX_spawn(){const L=BX.pcs.filter(p=>!p.dead),st=L.find(p=>p.def.start)||L[0];let p,F;
  if(st){const s=st.S[0][1]||st.S[0][0];p=s.p.clone().addScaledVector(s.U,.6);F=s.F.clone()}else{const fr=BX_fr(BX.cur);p=fr.o.clone();p.y=BX_h(p.x,p.z)+.6;F=fr.F.clone()}
  return{p,F}}
-function BX_driveStart(){BX.mode='drive';BX_after();const car=BX_car();BX.sc.add(car,BX.shM);const sp=BX_spawn();
+function BX_driveStart(){BX.mode='drive';BX_after();const car=BX_car();BX.og=BX.ship?BX_ogStats(BX.ship):null;BX.sc.add(car,BX.shM);const sp=BX_spawn();BX_ogShow(!!BX.og);
  BX.v={p:sp.p.clone(),v:sp.F.clone().multiplyScalar(2),F:sp.F.clone(),U:bxV(0,1,0),g:false,air:0,pk:sp.p.y,on:null,boat:false,steer:0,boost:0,safe:{p:sp.p.clone(),F:sp.F.clone()},lastCp:null,tMin:BX.th.reduce((a,b)=>Math.min(a,b),1e9),fallPk:-1e9,hist:[],sT:0,far:0,stuck:0,cpN:0,lap:0,cps:new Set(),msg:'',msgT:0,lastPc:null};
  BX.m={t:0,dist:0,air:0,airMax:0,jumps:0,yMin:1e9,yMax:-1e9,off:0,resp:0,wall:0,boat:0,boatSp:0,terrT:0,swaps:0,bump:0,pcs:new Set(),seen:BX.seenAll=BX.seenAll||new Set(),loops:0,laps:0,lapT:[],lap0:0,respWhy:[],lastLand:null,backT:null,respAt:null,backs:[]};BX_vmode('car');BX_ui();
- BX.camD={p:sp.p.clone().addScaledVector(sp.F,-9).add(bxV(0,4,0)),up:bxV(0,1,0)}}
-function BX_driveStop(){BX.mode='build';if(BX.car)BX.sc.remove(BX.car,BX.shM);BX_after();BX_ui()}
+ BX.camD={p:sp.p.clone().addScaledVector(sp.F,-9).add(bxV(0,4,0)),up:bxV(0,1,0)};if(BX.og)BX.fov0=BX.fov0||BX.cam.fov}
+function BX_ogShow(on){document.body.classList.toggle('bxOg',on);const t=$('#touch');if(t)t.hidden=!on;if(on){BX.touch=false;BX.bo0=1;if(TOUCH.on)TOUCH.used=true;const n=$('#tN');if(n&&!n.dataset.bx){n.dataset.bx=1;const go=()=>{if(BX.on&&BX.og&&BX.mode==='drive')BX_boostGo()};n.addEventListener('touchstart',go,{passive:true});n.addEventListener('mousedown',go)}}else if(BX.cam&&BX.fov0)BX.cam.fov=BX.fov0}
+function BX_driveStop(){BX.mode='build';BX_ogShow(false);if(BX.car)BX.sc.remove(BX.car,BX.shM);BX_after();BX_ui()}
 function BX_hud(){const V=BX.v,m=BX.m,H=$('#bxHud'),M=$('#bxMsg');if(!H)return;const cps=BX.pcs.filter(p=>!p.dead&&p.def.cp).length;
  H.textContent=`${Math.round(V.v.length()*3.6)} km/h · ${V.boat?'BOAT':'CAR'}${cps?' · CP '+V.cps.size+'/'+cps:''} · LAP ${Math.min(m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS}`;M.textContent=V.msgT>0?V.msg:'';const bo=$('#bxBo');if(bo){bo.style.setProperty('--e',(V.boostE||0).toFixed(2));bo.classList.toggle('rdy',(V.boostE||0)>=.34)}}
 function BX_say(t,s=1.4){const V=BX.v;if(V){V.msg=t;V.msgT=s}}
@@ -365,7 +389,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  // water: boat when the ground under the car is deep enough and the car is at the surface
  const gy=BX_h(V.p.x,V.p.z),wantBoat=gy<-.7&&V.p.y<.9&&!(grounded&&pc);
  if(wantBoat!==V.boat&&(wantBoat||grounded)){V.boat=wantBoat;BX_vmode(V.boat?'boat':'car');m.swaps++;BX_burst(V.p.clone().add(bxV(0,.3,0)),18,V.boat?0xbfe4ff:0x8d7b68,7);BX_say(V.boat?'SPLASH! BOAT':'BACK ON WHEELS',1)}
- const top=(V.boat?20:pc?34:27)+(V.boost>0?14:0),grip=V.boat?3.6:pc?11:6.5,acc=(V.boat?13:22)+(V.boost>0?18:0);
+ const q=BX.og,T0=q?q.top/34:1,top=((V.boat?20:pc?34:27)+(V.boost>0?14:0))*T0,grip=(V.boat?3.6:pc?11:6.5)*(q?q.grip/11:1),acc=(V.boat?13:22)*(q?q.acc/22:1)+(V.boost>0?18*T0:0); // og1: the piece/off-road/boat factors scale the car's roam stats
  V.steer+=(inp.s-V.steer)*Math.min(1,dt*7);
  if(V.boat){grounded=false;const wave=.12*Math.sin(BX.t*2.1+V.p.x*.2);V.p.y+=(.05+wave-V.p.y)*Math.min(1,dt*6);V.v.y*=.8;
   U.lerp(bxV(.06*Math.sin(BX.t*1.7),1,.06*Math.sin(BX.t*1.3)),Math.min(1,dt*4)).normalize();m.boat+=dt;
@@ -379,7 +403,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
   V.air=0;V.pk=V.p.y;
   const g=bxV(0,-BXG,0),gn=g.dot(U),stick=pc&&pc.def.stick&&V.v.length()>9;
   if(gn>BXG*.25&&!stick){grounded=false}else V.v.addScaledVector(g,dt).addScaledVector(U,-gn*dt)}
- if(grounded||V.boat){F.addScaledVector(U,-F.dot(U)).normalize();const sp=V.v.dot(F),yaw=-V.steer*2.1*Math.min(1,Math.abs(sp)/6)*(1-.38*Math.min(1,Math.abs(sp)/34))*Math.sign(sp||1);
+ if(grounded||V.boat){F.addScaledVector(U,-F.dot(U)).normalize();const sp=V.v.dot(F),yaw=-V.steer*2.1*Math.min(1,Math.abs(sp)/6)*(1-.38*Math.min(1,Math.abs(sp)/(34*T0)))*Math.sign(sp||1);
   F.applyAxisAngle(U,yaw*dt).normalize();const S2=bxV().crossVectors(F,U).normalize();
   let a=inp.g*acc*Math.max(0,1-sp/top);if(inp.b){a=sp>.5?-24:sp>-9?-9:0}if(!inp.g&&!inp.b)a=-Math.sign(sp)*Math.min(Math.abs(sp)/dt,2.5);
   V.v.addScaledVector(F,a*dt);const vs=V.v.dot(S2);V.v.addScaledVector(S2,-vs*Math.min(1,grip*dt));if(V.v.dot(F)>top+2)V.v.addScaledVector(F,-(V.v.dot(F)-top)*Math.min(1,dt*2));
@@ -428,10 +452,10 @@ function BX_camDrive(dt){const V=BX.v,cam=BX.cam,D=BX.camD,air=!V.g&&!V.boat&&V.
 function BX_sunAt(t){const s=BX.sun;s.position.set(t.x+60,t.y+120,t.z+40);s.target.position.copy(t);s.target.updateMatrixWorld()}
 // ---------------------------------------------------------------- frame
 function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/1000);BX.last=now;BX.t+=dt;const cam=BX.cam;cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
- if(BX.mode==='drive'&&BX.hold){BX_camDrive(0)}else if(BX.mode==='drive'){const inp=BX.inp=BX_input(dt);BX.acc+=dt;let n=0;while(BX.acc>=1/120&&n<10){BX_step(1/120,inp);BX.acc-=1/120;n++}BX_farCheck(dt);
+ const camF=BX.og?BX_ogCam:BX_camDrive;if(BX.mode==='drive'&&BX.hold){camF(0)}else if(BX.mode==='drive'){const inp=BX.inp=(BX.og?BX_ogInp:BX_input)(dt);BX.acc+=dt;let n=0;while(BX.acc>=1/120&&n<10){BX_step(1/120,inp);BX.acc-=1/120;n++}BX_farCheck(dt);
   const V=BX.v;BX.car.position.copy(V.p);const S=bxV().crossVectors(V.F,V.U).normalize();BX.car.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(S.negate(),V.U,V.F));
   const gy=BX_h(V.p.x,V.p.z);BX.shM.visible=V.p.y-gy<14&&!V.boat;BX.shM.position.set(V.p.x,V.on&&V.g?V.p.y+.06:Math.max(gy,V.boat?0:gy)+.08,V.p.z); // trk-3: on a road the blob sits on the deck, not 0.1 m under it (near-coplanar flicker)
-  if(V.msgT>0)V.msgT-=dt;BX_camDrive(dt);BX_hud()}else BX_camBuild();
+  if(V.msgT>0)V.msgT-=dt;camF(dt);BX_hud()}else BX_camBuild();
  BX_fxStep(dt);if(BX.chevMat)BX.chevMat.emissiveIntensity=.5+.2*Math.sin(BX.t*7);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
  BX.rf=(BX.rf||0)+1;if(BX.tfast&&BX.rf%6&&!BX.shotNow)return;BX.shotNow=0;const R=renderer;R.setRenderTarget(null);R.render(BX.sc,cam)}
 // ---------------------------------------------------------------- input (keys + touch buttons; gas is on by default on touch)
@@ -442,6 +466,7 @@ function BX_input(){if(BX.auto&&BX.v)return BX_autoInp(BX.auto.W,BX.auto.st);con
 // ---------------------------------------------------------------- UI
 function BX_css(){if($('#bxCss'))return;const s=document.createElement('style');s.id='bxCss';s.textContent=`
 body.bxOn>*:not(#c):not(#bx){visibility:hidden!important}
+body.bxOn.bxOg>#touch:not(#c):not(#bx){visibility:visible!important}body.bxOg #tP,body.bxOg #tF,body.bxOg #tU{display:none!important}
 #bx{--bxT:env(safe-area-inset-top,0px);position:fixed;inset:0;z-index:60;pointer-events:none;font:700 13px system-ui,-apple-system,sans-serif;color:#fff;user-select:none;-webkit-user-select:none}
 #bx button{pointer-events:auto;font:800 12px system-ui,-apple-system,sans-serif;color:#fff;background:rgba(14,42,104,.86);border:2px solid rgba(255,255,255,.55);border-radius:10px;touch-action:manipulation;min-height:40px;padding:2px 6px;letter-spacing:.02em}
 #bx button.on{background:#f2cd37;color:#14243f;border-color:#fff}
@@ -476,10 +501,10 @@ function BX_boostGo(){const V=BX.v;if(!V||BX.hold)return;if((V.boostE||0)>=.34){
 function BX_pause(on){BX.hold=on?1:0;BX.paused=!!on;const c=$('#bxPause');if(c)c.hidden=!on;if(!on)BX.last=0}
 function BX_ui(){BX_css();let R=$('#bx');if(!R){R=document.createElement('div');R.id='bx';document.body.appendChild(R)}const d=BX.mode==='drive';
  R.innerHTML=d?`<div id="bxD"><button id="bxBack" style="position:absolute;top:calc(var(--bxT) + 6px);left:max(8px,env(safe-area-inset-left))">◀ BUILD</button><button id="bxRsp" style="position:absolute;top:calc(var(--bxT) + 6px);right:max(8px,env(safe-area-inset-right))">↺ RESPAWN</button>
-  <div id="bxHud"></div><div id="bxMsg"></div><button class="st" id="bxL" style="left:max(14px,env(safe-area-inset-left))">◀</button><button class="st" id="bxR" style="left:calc(max(14px,env(safe-area-inset-left)) + 100px)">▶</button>
+  <div id="bxHud"></div><div id="bxMsg"></div>${BX.og?'':`<button class="st" id="bxL" style="left:max(14px,env(safe-area-inset-left))">◀</button><button class="st" id="bxR" style="left:calc(max(14px,env(safe-area-inset-left)) + 100px)">▶</button>
   <button class="st" id="bxB" style="right:max(14px,env(safe-area-inset-right));font-size:14px">BRAKE</button>
   <button class="st" id="bxG" style="right:max(14px,env(safe-area-inset-right));bottom:calc(max(10px,env(safe-area-inset-bottom)) + 98px);font-size:15px">GAS</button>
-  <button class="st" id="bxBo" style="right:calc(max(14px,env(safe-area-inset-right)) + 100px);bottom:calc(max(10px,env(safe-area-inset-bottom)) + 98px);font-size:13px">🔥 BOOST</button>
+  <button class="st" id="bxBo" style="right:calc(max(14px,env(safe-area-inset-right)) + 100px);bottom:calc(max(10px,env(safe-area-inset-bottom)) + 98px);font-size:13px">🔥 BOOST</button>`}
   <button id="bxPz" style="position:absolute;top:calc(var(--bxT) + 6px);right:calc(max(8px,env(safe-area-inset-right)) + 104px)">⏸ PAUSE</button>
   <div id="bxPause" hidden><b>PAUSED</b><button id="bxPzGo">▶ RESUME</button><button id="bxPzRe">↺ RESTART</button><button id="bxPzBk">◀ BUILD</button></div></div>`
  :`<div id="bxTap"></div><div id="bxTop"><button id="bxExit">◀ EXIT</button><button id="bxT1" class="${BX.tab==='track'?'on':''}">TRACK</button><button id="bxT2" class="${BX.tab==='land'?'on':''}">LAND</button>
@@ -487,9 +512,9 @@ function BX_ui(){BX_css();let R=$('#bx');if(!R){R=document.createElement('div');
   <div id="bxAct">${BX.tab==='track'?'<button id="bxPlace">✔ PLACE</button><button id="bxTurn">↻ TURN</button><button id="bxUp">▲ UP</button><button id="bxDn">▼ DOWN</button><button id="bxDel">✖ DEL</button>':'<button id="bxView">⟲ VIEW</button>'}<button id="bxUndo">↶ UNDO</button><button id="bxGo" class="go">▶ DRIVE</button></div>`;
  const on=(id,f)=>{const b=$('#'+id);if(b)b.onclick=e=>{e.stopPropagation();try{AU.sfx&&AU.sfx('pick')}catch(_){}f()}};
  if(d){on('bxBack',()=>{BX.auto=null;BX_pause(0);BX_driveStop()});on('bxRsp',()=>BX_respawn('button'));on('bxBo',BX_boostGo);on('bxPz',()=>BX_pause(1));on('bxPzGo',()=>BX_pause(0));
-  on('bxPzRe',()=>{BX_pause(0);const rc=!!BX.race;BX_driveStart();if(rc)BX_raceSetup()});on('bxPzBk',()=>{BX.auto=null;BX_pause(0);try{BX_raceClear()}catch(e){}BX_driveStop()});BX.tc={};for(const[id,k]of[['bxL','l'],['bxR','r'],['bxB','b'],['bxG','g']]){const b=$('#'+id),set=v=>e=>{e.preventDefault();BX.tc[k]=v;BX.touch=BX.touch||e.type.startsWith('touch')};
+  on('bxPzRe',()=>{BX_pause(0);const rc=!!BX.race;BX_driveStart();if(rc)BX_raceSetup()});on('bxPzBk',()=>{BX.auto=null;BX_pause(0);try{BX_raceClear()}catch(e){}BX_driveStop()});BX.tc={};for(const[id,k]of[['bxL','l'],['bxR','r'],['bxB','b'],['bxG','g']]){const b=$('#'+id);if(!b)continue;const set=v=>e=>{e.preventDefault();BX.tc[k]=v;BX.touch=BX.touch||e.type.startsWith('touch')};
    b.addEventListener('touchstart',set(1),{passive:false});b.addEventListener('touchend',set(0));b.addEventListener('touchcancel',set(0));b.addEventListener('mousedown',set(1));b.addEventListener('mouseup',set(0));b.addEventListener('mouseleave',set(0))}
-  BX.touch=matchMedia('(pointer:coarse)').matches;return}
+  BX.touch=!BX.og&&matchMedia('(pointer:coarse)').matches;return}
  const P=$('#bxPal');if(BX.tab==='track'){for(const t of BX_PAL){const b=document.createElement('button');b.dataset.p=t;if(t===BX.sel)b.className='on';b.appendChild(BX_icon(t));b.append(BX_P[t].n);b.onclick=()=>{BX.sel=t;BX_ghost();P.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};P.appendChild(b)}}
  else{P.insertAdjacentHTML('beforeend','<h4>BRUSH · tap the ground</h4>');for(const[t,n]of BX_TOOLS){const b=document.createElement('button');b.dataset.t=t;b.textContent=n;b.style.height='44px';if(t===BX.tool)b.className='on';b.onclick=()=>{BX.tool=t;P.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b))};P.appendChild(b)}
   P.insertAdjacentHTML('beforeend','<h4>WORLD · resets the ground</h4>');for(const w in BX_WORLDS){const b=document.createElement('button');b.dataset.w=w;b.textContent=BX_WORLDS[w].n;b.style.height='44px';if(w===BX.world)b.className='on';b.onclick=()=>{BX_do(['w',w]);BX_ui()};P.appendChild(b)}}
@@ -532,7 +557,7 @@ const BX_DEMOS={};
 // ---------------------------------------------------------------- open / close
 function BX_open(){try{const g=$('#gbx');if(g&&!g.hidden)gbClose(false)}catch(e){}BX_scene();try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
  if(!BX.log.length){BX.log=[['w','valley']];BX_replay()}else BX_buildAll();BX.camGo=1;BX_ui();BX_seed()}
-function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mode==='drive')BX_driveStop();const R=$('#bx');if(R)R.remove();$('#menu').hidden=false;$('#topBtns').hidden=false;try{resize()}catch(e){}}
+function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mode==='drive')BX_driveStop();BX_ogShow(false);const R=$('#bx');if(R)R.remove();$('#menu').hidden=false;$('#topBtns').hidden=false;try{resize()}catch(e){}}
 frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try{BX_tick(now)}catch(e){console.error(e);BX.on=false}})(frame);
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
 
@@ -680,9 +705,9 @@ function BX_openData(){const R=[];for(const ch of[[0,0,0],[1,1,1]]){const S=BX_l
 function BX_autoInp(W,st){const V=BX.v,n=W.length;let bi=st.i,bd=1e9;for(let k=-6;k<90;k++){const j=((st.i+k)%n+n)%n,d=W[j].distanceToSquared(V.p);if(d<bd){bd=d;bi=j}}
  if(bd>900)W.forEach((p,j)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=j}});st.i=bi;const sp=V.v.length(),tw=W[(bi+Math.max(5,Math.round(sp/1.6)))%n],dx=tw.x-V.p.x,dz=tw.z-V.p.z,
  S=bxV().crossVectors(V.F,V.U),a=Math.atan2(S.x*dx+S.z*dz,V.F.x*dx+V.F.z*dz);return{s:bxCl(a*3,-1,1),g:1,b:Math.abs(a)>.9&&sp>16?1:0}}
-function BX_sim(ch=[],maxT=220){try{BX_raceClear()}catch(e){}BX_driveStart();const V=BX.v,m=BX.m,W=BX_lap(ch).map(o=>o.s.p),st={i:0},dt=1/120;let slow=0,slowMax=0,t0=performance.now();const tr=[];
- for(let i=0;i<maxT*120&&W.length;i++){const inp=BX.inp=BX_autoInp(W,st);BX_step(dt,inp);if(i%4===0)BX_farCheck(dt*4);const sp=V.v.length();slow=sp<2?slow+dt:0;slowMax=Math.max(slowMax,slow);if(i%(BX.trK||240)===0)tr.push([+m.t.toFixed(1),Math.round(V.p.x),Math.round(V.p.y),Math.round(V.p.z),st.i,V.g?1:0,+inp.s.toFixed(2),Math.round(sp),V.on?V.on.type:"-"]);if(m.laps>=1)break}
- const r={laps:m.laps,t:+m.t.toFixed(1),lap:m.lapT[0]||0,slowMax:+slowMax.toFixed(2),resp:m.resp,why:m.respWhy.join(','),turned:m.turned||0,air1:(m.lands||[]).filter(l=>l.air>=1).length,airs:(m.lands||[]).map(l=>l.air),ms:Math.round(performance.now()-t0)};BX.simTr=tr;BX_driveStop();return r}
+function BX_sim(ch=[],maxT=220){try{BX_raceClear()}catch(e){}BX_driveStart();const V=BX.v,m=BX.m,W=BX_lap(ch).map(o=>o.s.p),st={i:0},dt=1/120;let slow=0,slowMax=0,t0=performance.now(),vTop=0;const tr=[];
+ for(let i=0;i<maxT*120&&W.length;i++){const inp=BX.inp=BX_autoInp(W,st);BX_step(dt,inp);if(V.on&&V.g&&V.boost<=0)vTop=Math.max(vTop,V.v.dot(V.F));if(i%4===0)BX_farCheck(dt*4);const sp=V.v.length();slow=sp<2?slow+dt:0;slowMax=Math.max(slowMax,slow);if(i%(BX.trK||240)===0)tr.push([+m.t.toFixed(1),Math.round(V.p.x),Math.round(V.p.y),Math.round(V.p.z),st.i,V.g?1:0,+inp.s.toFixed(2),Math.round(sp),V.on?V.on.type:"-"]);if(m.laps>=1)break}
+ const r={laps:m.laps,t:+m.t.toFixed(1),lap:m.lapT[0]||0,slowMax:+slowMax.toFixed(2),resp:m.resp,why:m.respWhy.join(','),turned:m.turned||0,air1:(m.lands||[]).filter(l=>l.air>=1).length,airs:(m.lands||[]).map(l=>l.air),ms:Math.round(performance.now()-t0),vTop:+vTop.toFixed(1),cfgTop:BX.og?+BX.og.top.toFixed(1):34};BX.simTr=tr;BX_driveStop();return r}
 const bxRes=C=>({ok:C.every(c=>c[1]),fails:C.filter(c=>!c[1]).map(c=>c[0]),msg:C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')});
 // phone layout of a set of buttons: inside the screen, >= 40 px, the button itself is under its centre (nothing covers it), no two overlap
 function BX_btnChk(ids){const W=innerWidth,H=innerHeight,B=ids.map(id=>[id,$('#'+id)]),bad=[];const R=B.map(([id,e])=>[id,e&&e.getBoundingClientRect()]);
@@ -702,7 +727,7 @@ Object.assign(BX_TESTS,{
   return bxRes(R.map(([k,r])=>[k,r.air1>=3,`${k}: ${r.air1} jumps ≥ 1 s air (${r.airs.join('/')||'none'})`]))}},
  'bx-o-ai':{n:'AI LAP: all tracks',log:()=>BX_DEMOS['CANYON SPLIT'].log,drive:1,auto:1,chk:()=>{const R=BX_eachDemo(()=>[BX_sim([0,0,0]),BX_sim([1,1,1])]);
   return bxRes(R.map(([k,rr])=>[k,rr.every(r=>r.laps>=1&&r.slowMax<=2&&r.resp===0&&r.turned===0),`${k}: `+rr.map(r=>`lap ${r.laps?r.lap.toFixed(0)+' s':'NOT done ('+r.t+' s)'}, stuck max ${r.slowMax} s, respawns ${r.resp}${r.why?' '+r.why:''}, turned ${r.turned}`).join(' | ')]))}},
- 'bx-o-btn':{n:'RACE BUTTONS: CLIFF RUN',log:()=>BX_DEMOS['CLIFF RUN'].log,drive:1,race:1,chk:()=>{const c=BX_btnChk(BX_DRIVE_BTNS);return bxRes([['race buttons',BX.mode==='drive'&&!c.bad.length,c.msg]])}},
+ 'bx-o-btn':{n:'RACE BUTTONS: CLIFF RUN',log:()=>BX_DEMOS['CLIFF RUN'].log,drive:1,race:1,chk:()=>{const c=BX_btnChk(BX_dBtns());return bxRes([['race buttons',BX.mode==='drive'&&!c.bad.length,c.msg]])}},
  'bx-o-ui':{n:'BUILDER BUTTONS',log:()=>BX_DEMOS['CLIFF RUN'].log,chk:()=>{if(BX.mode!=='build')return bxRes([['build mode',false,'not in build mode']]);const ids=[...document.querySelectorAll('#bxTop button,#bxAct button')].map(e=>e.id),c=BX_btnChk(ids),
   H=innerHeight,W=innerWidth,pal=[...document.querySelectorAll('#bxPal button')].filter(e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=H&&r.left>=0&&r.right<=W&&r.height>=40}).length;
   return bxRes([['top + side buttons',!c.bad.length,c.msg],['piece buttons',pal>=4,`${pal} piece buttons fully on screen`]])}}});
@@ -720,7 +745,8 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
   while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type,pc.id]);
    const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||BX_gapNext(L,seen,e)}return out},
- h:(x,z)=>BX_h(x,z),clear:()=>BX_terrClear(),sim:(ch,t)=>BX_sim(ch,t),lap:ch=>BX_lap(ch),openData:()=>BX_openData(),side:(s,pc,g)=>BX_side(s,pc,g),demos:()=>BX_DEMOS,log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
+ h:(x,z)=>BX_h(x,z),clear:()=>BX_terrClear(),sim:(ch,t)=>BX_sim(ch,t),lap:ch=>BX_lap(ch),openData:()=>BX_openData(),side:(s,pc,g)=>BX_side(s,pc,g),demos:()=>BX_DEMOS,log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n),
+ og:f=>{BX.og1f=f},drive:()=>{BX_driveStart();(BX.og?BX_ogCam:BX_camDrive)(0)},stopDrive:()=>BX_driveStop(),btns:()=>BX_dBtns()};
 
 // ---------------------------------------------------------------- RACE on a builder track (trk-2 MVP, coordinator-approved; Alex beta.22: "none of the race methods is applied")
 // 3-2-1-GO countdown (car held), 5 rivals (the city race team rides) on the course waypoints with a curve speed profile, position "3/6" + lap timer,

@@ -284,7 +284,7 @@ Object.assign(BX_TESTS,{
  'fs-ai':{n:'GRAND TOUR: AI LAP',log:fsLog,drive:1,auto:1,chk:()=>{const R=[[0,0],[1,1]].map(c=>BX_sim(c));
   return bxRes(R.map((r,i)=>['route '+i,r.laps>=1&&r.slowMax<=2&&r.resp===0,`lap ${r.laps?r.lap.toFixed(1)+' s':'NOT done'}, stuck max ${r.slowMax} s, respawns ${r.resp}${r.why?' '+r.why:''}, ${r.air1} jumps ≥ 1 s`]))}},
  'fs-resp':{n:'GRAND TOUR: RESPAWN',log:fsLog,drive:1,race:1,chk:()=>{const r=FS_respSim();return bxRes([['respawn',r.back<=2&&r.lost<=1,`back on the road in ${r.back} s, place ${r.p0} → worst ${r.pMax} (lost ${r.lost})`]])}},
- 'fs-btn':{n:'GRAND TOUR: RACE BUTTONS',log:fsLog,drive:1,race:1,chk:()=>{const c=BX_btnChk(BX_DRIVE_BTNS);return bxRes([['race buttons',BX.mode==='drive'&&!c.bad.length,c.msg]])}},
+ 'fs-btn':{n:'GRAND TOUR: RACE BUTTONS',log:fsLog,drive:1,race:1,chk:()=>{const c=BX_btnChk(BX_dBtns());return bxRes([['race buttons',BX.mode==='drive'&&!c.bad.length,c.msg]])}},
  'fs-life':{n:'GRAND TOUR: LIVELY',log:fsLog,chk:()=>{const st=FS.g?FS.g.children.length:0,stands=FS.col.filter(c=>c.box).length;
   return bxRes([['set pieces',FS.on&&FS.walls.length>=5&&FS.studs.length>=80&&stands>=4&&(FS.chevN||0)>=20,`${FS.walls.length} breakable walls, ${FS.studs.length} studs, ${stands} grandstands, ${FS.chevN||0} chevron boards, ${FS.ld||0} LEGO sets loaded, ${st} set-piece objects`]])}}});
 Object.assign(window.__bx,{fs:FS,fsTimeline:FS_timeline,fsRace:FS_raceSim,fsResp:FS_respSim,fsBiomes:FS_biomes});

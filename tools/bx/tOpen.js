@@ -16,7 +16,7 @@ const ALL=['bx-o-width','bx-o-routes','bx-o-open','bx-o-jumps','bx-o-ai','bx-o-b
  for(const id of IDS.length?IDS:ALL){const t=Date.now();try{await go(id);await sleep(1200);if(id.includes('/'))await p.waitForFunction(()=>!__bx.BX.m||__bx.BX.mode!=='drive'||__bx.BX.m.t>=4,null,{polling:300,timeout:150000});
   if(id==='bx-o-btn'||id==='bx-o-ui'){const rr=[];for(const vp of[[852,393],[393,852]]){await p.setViewportSize({width:vp[0],height:vp[1]});await sleep(700);const r=await chk(id);rr.push(r)}
    const acts=[];
-   if(id==='bx-o-btn'){await p.evaluate(()=>{__bx.BX.v.boostE=1});const b0=await p.evaluate(()=>__bx.BX.v.boost);await tap('#bxBo');const b1=await p.evaluate(()=>__bx.BX.v.boost);acts.push(['BOOST tap',b1>0&&b1>b0,`boost ${b0.toFixed(1)} -> ${b1.toFixed(1)} s`]);
+   if(id==='bx-o-btn'){await p.evaluate(()=>{__bx.BX.v.boostE=1});const b0=await p.evaluate(()=>__bx.BX.v.boost);await tap(await p.$('#bxBo')?'#bxBo':'#tN');const b1=await p.evaluate(()=>__bx.BX.v.boost);acts.push(['BOOST tap',b1>0&&b1>b0,`boost ${b0.toFixed(1)} -> ${b1.toFixed(1)} s`]);
     await tap('#bxPz');const ps=await p.evaluate(()=>({h:!!__bx.BX.hold,c:!!document.querySelector('#bxPause:not([hidden])')}));acts.push(['PAUSE tap',ps.h&&ps.c,`paused ${ps.h}, card ${ps.c}`]);
     await tap('#bxPzGo');const rs=await p.evaluate(()=>!__bx.BX.hold&&!document.querySelector('#bxPause:not([hidden])'));acts.push(['RESUME tap',rs,`resumed ${rs}`])}
    else{await tap('#bxT2');const t2=await p.evaluate(()=>__bx.BX.tab);await tap('#bxT1');const t1=await p.evaluate(()=>__bx.BX.tab);acts.push(['LAND/TRACK taps',t2==='land'&&t1==='track',`tabs ${t2}, ${t1}`])}
