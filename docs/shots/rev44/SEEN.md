@@ -1,0 +1,8 @@
+# rev44 shots: what I see (BUILT page out/rev44, `?og2=1`, iPhone UA, 852x393 touch, 1x CPU, SwiftShader)
+
+1. **1_marker_ahead**: Frankfurt daytime street with the bridge on the right. The og2 marker floats about 22 m ahead over the road: a purple ring with a chequered-flag disc and a pink beam. It is readable, and it looks the same as the other purple Mode markers. A second pink ring shows at the left edge, about a block away (the cluster). GAS, BRAKE and the steer pads are clear.
+2. **2_drive_under_marker**: at 56 km/h with GAS held, the car passes under the ring. The disc fills the top-centre of the screen. No chip appeared, because the car was still moving.
+3. **3_card**: the card is clean. It shows "MODE · Grand Prix · Race · NOT PLAYED YET · 3 laps against the field", the star targets, PLAY ▶ and LATER. It sits clear of the pads, and the text is at least 12 px.
+4. **4_race_start**: a different world. It is a neon night spline track with a hex floor, dark towers and a different HUD (timer, 8TH/8, lap). There is no GAS button, only the steer pads and BRAKE. The car looks the same red build as in the city. The city→race cut is instant and readable, but the look and HUD change completely (S3/S4 work, not og2).
+5. **5_race_lap1of1**: the HUD says **LAP 1/1**, but the card promised "3 laps against the field". This mismatch is player-visible.
+6. **6_finish_levelup_over_results**: after the finish, the LEVEL UP dialog (LVL 2, PERKS / CONTINUE) covers the results card. "🌍 BACK TO FREE ROAM" is visible only as a strip under the dialog and can't be touched. A real player needs CONTINUE, then BACK: **2 taps**, while S2 requires 1 or fewer. On a fresh save, the first race almost always levels you up.
