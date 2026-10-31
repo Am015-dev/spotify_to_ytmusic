@@ -9,24 +9,55 @@ function OG_mesh(g){if(!g)return null;const ud=g.userData||{},m=ud.m,q=m&&m.quat
 function OG_touch(){const t=document.getElementById('touch');if(!t||t.hidden||getComputedStyle(t).visibility!=='visible')return 0;
  return['tB','tG','tN','steerZone','tL','tR'].filter(id=>{const e=document.getElementById(id);if(!e)return 0;const r=e.getBoundingClientRect();return r.width>0&&getComputedStyle(e).visibility==='visible'}).length}
 const OG_BTN='#bx #bxL,#bx #bxR,#bx #bxB,#bx #bxG,#bx #bxBo';
+// og1b (REVIEW_2K_43): launch, camera, ground. Lowest visible point of a car (world y; the speed ribbons/flares and transparent bits are not the car)
+function OG_low(root){{let r=root;while(r.parent)r=r.parent;r.updateMatrixWorld(true)}const ud=root.userData||{},sk=new Set([...(ud.ribbons||[]),...(ud.flares||[])]),v=new THREE.Vector3();let m=1e9;
+ root.traverseVisible(o=>{if(!o.isMesh||o.userData.a8s||sk.has(o)||o.material&&o.material.transparent&&o.material.opacity<.5)return;for(let q=o.parent;q;q=q.parent)if(sk.has(q))return;const P=o.geometry&&o.geometry.attributes.position;if(!P)return;const st=Math.max(1,Math.floor(P.count/3000));for(let i=0;i<P.count;i+=st){v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);if(v.y<m)m=v.y}});return m}
+// on-screen width (px) of a car-sized box (roam mesh size) standing on ground point g, facing F
+function OG_px(cam,g,F,M){cam.updateMatrixWorld(true);const U=new THREE.Vector3(0,1,0),S=new THREE.Vector3().crossVectors(F,U).normalize(),xs=[];for(const a of[-1,1])for(const b of[0,1])for(const c of[-1,1])xs.push(g.clone().addScaledVector(S,a*M.x/2).addScaledVector(U,b*M.y).addScaledVector(F,c*M.z/2).project(cam).x);return Math.round((Math.max(...xs)-Math.min(...xs))*innerWidth/2)}
+// roam: real roamStep from standstill with the gas held (sim frozen, stepped here), then the roam camera rig at 20 m/s and at rest; everything put back
+async function OG_roamRef(M){const n=SET.rcam||'chase',cOn=CAM.on;for(let k=0;k<40;k++){const T=CAM.T[n];if(T&&Math.abs(RCAM[n].b-T.b)<.02&&Math.abs(RCAM[n].h-T.h)<.02)break;await ogWait(100)}CAM.on=0;const Cs={...RCAM[n]};const f0=ctlPlayer,P0=paused,S0={x:RO.x,y:RO.y,z:RO.z,h:RO.h,vh:RO.vh,v:RO.v,yr:RO.yr},o={};let force=1;
+ ctlPlayer=dt=>{const c=f0(dt);if(force){c.thr=1;c.steer=0;c.brk=0;c.boost=0}return c};paused=true;
+ try{RO.v=0;RO.thA=0;const v={};for(let i=1;i<=300;i++){roamStep(1/60);if(i===180||i===300)v[i/60]=+RO.v.toFixed(1)}o.v=v;o.tt=+(RO.qsV||0).toFixed(1)}finally{force=0;ctlPlayer=f0;Object.assign(RO,S0)}
+ const cam=async v=>{camSnap=true;for(let i=0;i<240;i++){RO.v=v;roamCam(1/60);if(i%8===0)await ogWait(16)}const c=camera.position;return{b:+Math.hypot(c.x-RO.x,c.z-RO.z).toFixed(2),h:+(c.y-RO.y).toFixed(2),fov:+camera.fov.toFixed(1),px:OG_px(camera,new THREE.Vector3(RO.x,RO.y,RO.z),new THREE.Vector3(Math.sin(RO.h),0,Math.cos(RO.h)),M)}};
+ try{o.c20=await cam(20);const C20={...RCAM[n]};o.c0=await cam(0);o.C={...RCAM[n]};o.Cchg=Math.abs(C20.b-o.C.b)>.01||Math.abs(C20.h-o.C.h)>.01}finally{RO.v=S0.v;camSnap=true;paused=P0;CAM.on=cOn;Object.assign(RCAM[n],Cs)}return o} // the chase rig (RCAM, CAM-fitted per ride) is held still while roam is measured; the builder is measured with the same rig
+// builder (og ON, flat straight): settle, launch 5 s, camera at rest / 20 m/s (car moved by hand, the camera stepped), wheel gap on the deck and on grass
+function OG_bxRef(X,M,Cs){const n=SET.rcam||'chase',C0={...RCAM[n]};Object.assign(RCAM[n],Cs);try{return OG_bxRef2(X,M)}finally{Object.assign(RCAM[n],C0)}}
+function OG_bxRef2(X,M){const B=X.BX,V=B.v,o={},Y=new THREE.Vector3(0,1,0),ray=new THREE.Raycaster();
+ const gnd=()=>{const L=[];B.sc.traverse(q=>{if(q.isMesh&&q.visible&&q!==B.shM){for(let a=q;a;a=a.parent)if(a===B.car)return;L.push(q)}});ray.set(V.p.clone().add(new THREE.Vector3(0,2,0)),new THREE.Vector3(0,-1,0));ray.far=8;const h=ray.intersectObjects(L,false)[0];return h?h.point.y:X.h(V.p.x,V.p.z)};
+ const gap=()=>{X.pose();return +(OG_low(B.carM)-gnd()).toFixed(2)};
+ const rest=()=>{V.v.set(0,0,0);for(let i=0;i<240;i++){X.step(1/120,{s:0,g:0,b:0});if(i%10===0)X.pose()}V.v.set(0,0,0);V.thA=0};
+ const cam=v=>{B.camD.r=null;const F=V.F.clone();F.y=0;F.normalize();for(let i=0;i<480;i++){V.v.copy(F).multiplyScalar(v);V.p.addScaledVector(V.v,1/120);X.ogCam(1/120)}X.pose();const c=B.cam.position,g=V.p.clone().addScaledVector(V.U,-.5);
+  return{b:+Math.hypot(c.x-V.p.x,c.z-V.p.z).toFixed(2),h:+(c.y-g.y).toFixed(2),fov:+B.cam.fov.toFixed(1),px:OG_px(B.cam,g,F,M)}};
+ rest();o.deck=gap();o.on=!!V.on;const p0=V.p.clone(),F0=V.F.clone();
+ {const v={};for(let i=1;i<=600;i++){X.step(1/120,{s:0,g:1,b:0});if(i===360||i===600)v[i/120]=+V.v.length().toFixed(1)}o.v=v;o.wall=B.m.wall}
+ V.p.copy(p0);V.F.copy(F0);rest();o.c0=cam(0);V.p.copy(p0);V.F.copy(F0);rest();o.c20=cam(20);
+ V.p.copy(p0);V.F.copy(F0);const gx=p0.x+60,gz=p0.z+60;V.p.set(gx,X.h(gx,gz)+.6,gz);V.U.set(0,1,0);rest();o.grass=gap();o.gOn=!V.on&&V.g&&!V.boat;o.top=+B.og.top.toFixed(1);o.tt=+(B.og.tt||0).toFixed(1);return o}
 async function OG_builderCar(){const e0=OGG.errs;for(let k=0;k<200&&!(state==='roam'&&pl&&RO.top>0);k++)await ogWait(100);
  if(!(state==='roam'&&pl))return'📍 BUILDER CAR → ❌ FAIL (no roam car)';
  for(let k=0;k<20&&Math.abs(RO.v)>.5;k++)await ogWait(100);   // the roam FOV at rest (the builder FOV is read at rest too)
- const ro={top:+RO.top.toFixed(1),fov:+camera.fov.toFixed(1),mesh:OG_mesh(pl.mesh),team:pl.team&&pl.team.name};
+ const ro={top:+RO.top.toFixed(1),tt:typeof RD_top==='function'?+RD_top().toFixed(1):0,fov:+camera.fov.toFixed(1),mesh:OG_mesh(pl.mesh),team:pl.team&&pl.team.name};const MM=ro.mesh||{x:2.6,y:1.75,z:4.4};ro.ref=await OG_roamRef(MM);const tch0=document.getElementById('touch').hidden;
  try{BX_open()}catch(e){}for(let k=0;k<100&&!window.__bx;k++)await ogWait(100);const X=window.__bx;if(!X)return'📍 BUILDER CAR → ❌ FAIL (builder chunk not loaded)';
  if(!X.BX.on)X.open();X.load(X.demos()['CLIFF RUN'],'CLIFF RUN');const out={};
  for(const f of[false,true]){X.og(f);X.drive();await ogWait(900);const B=X.BX,r={mesh:OG_mesh(B.carM),fov:+B.cam.fov.toFixed(1),btn:document.querySelectorAll(OG_BTN).length,touch:OG_touch(),shared:!!B.ship};
   X.stopDrive();const sim=X.sim([],60);r.top=sim.cfgTop;r.vTop=sim.vTop;out[f?'on':'off']=r}
- X.og(null);try{X.close()}catch(e){}
- const on=out.on,M=ro.mesh,Q=on.mesh,w=(a,b)=>b>0&&Math.abs(a/b-1)<=.05,
+ // og1b: launch / camera / ground on a flat straight (CLIFF RUN climbs and jumps inside 5 s), flag ON
+ X.load(X.lay('mountain',[8,4,1,3],['sf',...Array(22).fill('st')]),'OG STRAIGHT');X.og(true);X.drive();X.BX.hold=1;let bx=null;try{bx=OG_bxRef(X,MM,ro.ref.C)}catch(e){bx={err:String(e).slice(0,120)}}X.BX.hold=0;X.stopDrive();
+ X.og(null);try{X.close()}catch(e){}const tch=()=>document.getElementById('touch').hidden,tchOn=tch();
+ // flag OFF session: open, drive, close: #touch must be exactly as before (REVIEW_2K_43: it was left hidden)
+ const tA=tch();try{BX_open()}catch(e){}if(!X.BX.on)X.open();X.og(false);X.load(X.demos()['CLIFF RUN'],'CLIFF RUN');X.drive();await ogWait(300);document.getElementById('touch').hidden=false;X.stopDrive();try{X.close()}catch(e){}X.og(null);const tchOff=tch();document.getElementById('touch').hidden=tA;
+ const on=out.on,M=ro.mesh,Q=on.mesh,w=(a,b)=>b>0&&Math.abs(a/b-1)<=.05,near=(a,b,k)=>b>0&&Math.abs(a/b-1)<=k,R=ro.ref,
   C=[['mesh',Q&&M&&Q.n===M.n&&w(Q.x,M.x)&&w(Q.y,M.y)&&w(Q.z,M.z)&&on.shared,`mesh ${Q&&Q.n} parts ${Q&&[Q.x,Q.y,Q.z].join('x')} m vs roam ${M.n} parts ${[M.x,M.y,M.z].join('x')} m (OFF ${out.off.mesh&&out.off.mesh.n} parts ${out.off.mesh&&[out.off.mesh.x,out.off.mesh.y,out.off.mesh.z].join('x')})`],
-   ['top',w(on.top,ro.top),`top ${on.top} m/s (lap max ${on.vTop}) vs roam RO.top ${ro.top} (OFF ${out.off.top}, lap max ${out.off.vTop})`],
+   ['top',w(on.top,ro.top),`top ${on.top} m/s (lap max ${on.vTop}) vs roam RO.top ${ro.top} (launch curve toward roam's road top ${ro.tt}; OFF ${out.off.top}, lap max ${out.off.vTop})`],
    ['fov',Math.abs(on.fov-ro.fov)<=2,`FOV ${on.fov}° vs roam ${ro.fov}° (OFF ${out.off.fov}°)`],
    ['touch',on.touch>=2&&on.btn===0,`#touch ${on.touch} controls visible, #bx drive buttons ${on.btn} (OFF: touch ${out.off.touch}, buttons ${out.off.btn})`],
+   ['launch',!bx.err&&[3,5].every(t=>near(bx.v[t],R.v[t],.1)),`v at 3/5 s gas held ${bx.v&&bx.v[3]}/${bx.v&&bx.v[5]} m/s vs roamStep ${R.v[3]}/${R.v[5]} (±10 %; curve toward ${bx.tt} = roam tt ${R.tt}, cap ${bx.top})${bx.err?' '+bx.err:''}`],
+   ['camera',!bx.err&&!R.Cchg&&['c0','c20'].every(k=>Math.abs(bx[k].b-R[k].b)<=.3&&Math.abs(bx[k].h-R[k].h)<=.3&&near(bx[k].px,R[k].px,.1)),`camera back/up/car width at rest ${bx.c0&&[bx.c0.b,bx.c0.h,bx.c0.px+'px'].join('/')} vs roam ${[R.c0.b,R.c0.h,R.c0.px+'px'].join('/')}, at 20 m/s ${bx.c20&&[bx.c20.b,bx.c20.h,bx.c20.px+'px'].join('/')} vs ${[R.c20.b,R.c20.h,R.c20.px+'px'].join('/')} (±0.3 m, ±10 %)`],
+   ['ground',!bx.err&&Math.abs(bx.deck)<=.15&&Math.abs(bx.grass)<=.15&&bx.on&&bx.gOn,`wheel gap deck ${bx.deck} m, grass ${bx.grass} m (≤ 0.15)`],
+   ['touchOff',tchOff===false,`flag OFF: #touch shown during the drive is ${tchOff?'HIDDEN':'left as it was'} by stop + close (pre-og1 code never touched it; BX_open hides it as always; ON session ${tch0} -> ${tchOn})`],
    ['errors',OGG.errs===e0,`${OGG.errs-e0} page errors`]],bad=C.filter(c=>!c[1]).map(c=>c[0]);
- window.__ogRes={ro,out};
+ window.__ogRes={ro,out,bx};
  return`📍 BUILDER CAR (${ro.team}, CLIFF RUN) · ${C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(' · ')} → ${bad.length?'❌ FAIL ('+bad.join(',')+')':'✅ PASS'}`}
-(function OG_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='onegame'&&q.id==='builder-car'))C.items.push({ver:'onegame',id:'builder-car',area:'race',text:'og1 · onegame/builder-car: the builder DRIVE uses your roam car: same mesh and size as roam (±5 %), top speed = RO.top ±5 %, camera FOV = roam ±2°, the shared #touch controls and no builder drive buttons, no page errors'});
+(function OG_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='onegame'&&q.id==='builder-car'))C.items.push({ver:'onegame',id:'builder-car',area:'race',text:'og1 · onegame/builder-car: the builder DRIVE uses your roam car: same mesh and size as roam (±5 %), top speed = RO.top ±5 %, launch v at 3/5 s = roamStep ±10 %, camera back/up ±0.3 m and car width ±10 % of roam at rest and 20 m/s, wheels ≤ 0.15 m over deck and grass, #touch unchanged with the flag OFF, camera FOV = roam ±2°, the shared #touch controls and no builder drive buttons, no page errors'});
   C.GO['onegame/builder-car']=[{c:'fra',n:'Builder car = roam car',secs:120,fn:()=>OG_builderCar()}];return}
  if(i<600)setTimeout(()=>OG_reg(i+1),100)})(0);
 window.__og={run:OG_builderCar,mesh:OG_mesh,ev:s=>eval(s)};   // ev: test harness hook (tools/og1), this chunk is test-only

@@ -1,0 +1,1 @@
+(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));for(let k=0;k<200&&!window.__og;k++)await w(200);const s=await window.__og.run();return{s,res:window.__ogRes&&{ref:window.__ogRes.ro.ref,bx:window.__ogRes.bx}}})()

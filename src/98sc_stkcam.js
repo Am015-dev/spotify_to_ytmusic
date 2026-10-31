@@ -12,6 +12,9 @@
 // ?stkcam=0 = the old stack.
 const SKC={on:!/[?&]stkcam=0/.test(location.search),tp:.6,tf:1.5,rF:null,wIn:10,hold:.6,wOut:1,fr:7,r:null,d:null,L:1e9,lt:0,bE:0,fov:null,n:0,u:new THREE.Vector3()};
 function SKC_free(C,r){const sp=TUNE.camSpr!==0,b=C.b+C.bk*r*(sp?.5:1),h=C.h+C.hk*r;return[b,h]}
+// og1b: where the roam stack puts the chase camera for a free rig (back bk, up up): roamCam keeps it >= 2 m over the car and the 90 JU layer >= 2.2 m, then SKC_cam keeps that
+// direction at the length hypot(bk,up). Shared with the builder DRIVE (98b2 BX_ogCam) so its camera sits where roam's does.
+function SKC_rig(bk,up){const L=Math.hypot(bk,up),hu=Math.max(up,typeof JU!=='undefined'&&JU.on===false?2:2.2),n=Math.hypot(bk,hu)||1;return[bk*L/n,hu*L/n]}
 // horizontal back distance a wall allows behind the car (the roamCam scan, along the camera heading)
 function SKC_wall(bmax){const a=RO.camH!=null?RO.camH:RO.h,fx=Math.sin(a),fz=Math.cos(a);for(let d=2;d<=bmax;d+=.5)if(roamHit(RO.x-fx*d,RO.z-fz*d,1.5,RO.y+2.5))return Math.max(CR_minBack(),d-1);return 1e9}
 // one FOV: base + speed (slow ratio) + eased boost + kick; the feel-r21a cap (rest + 12 deg) still holds. Shared with the builder DRIVE (og1, 98b2 BX_ogCam)
