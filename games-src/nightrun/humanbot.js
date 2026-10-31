@@ -29,7 +29,8 @@ const BOT = (o) => {
   };
   ups();
   const keepPw = () => { if (!late) return; for (const k of ['drum', 'tempo', 'slow', 'mag', 'tri']) if (!m.PW.on(k)) { try { m.PW.give(k); } catch (e) { } } };
-  const H = Object.assign({ dMin: .18, dMax: .2, xtra: .7, miss: .1, blind: .4, look: 260, noise: 8, dash: .4, emp: 4, empR: 150, aimErr: 38, retarget: .45, lapseEvery: 30, lapse: 1 }, o.hp || {});
+  const H = Object.assign({ home: 220, dMin: .18, dMax: .2, xtra: .7, miss: .1, blind: .4, look: 260, noise: 8, dash: .4, emp: 4, empR: 150, aimErr: 38, retarget: .45, lapseEvery: 30, lapse: 1 }, o.hp || {});
+  const pol = o.policy || 'hold', sqm = new Map(); let mode = -1, sw = 0;
   const hist = []; let delay = H.dMin + rnd() * (H.dMax - H.dMin), blindUntil = -1, wasThreat = false, lapseAt = H.lapseEvery * (.5 + rnd()), lapseUntil = -1, aimY = 270, aimT = -9, nx = 0, ny = 0, nT = -9, hold = null;
   const snap = () => { const G = m.G; return { t: G.t, px: m.P.x, py: m.P.y, eb: G.eb.map(b => [b.x, b.y, b.vx, b.vy]), en: G.en.map(e => [e.type, e.x, e.y, e.r, e.gy, e.gap]) }; };
   let BM = null; const bmUpd = () => { BM = window.BMV && window.BMV.on && m.G.boss ? window.BMV : null; };   // endless meets bosses mid-run: look each decision
@@ -61,7 +62,19 @@ const BOT = (o) => {
       aimY = ty + gauss() * H.aimErr;
     }
     if (G.t - nT > .3) { nT = G.t; nx = gauss() * H.noise; ny = gauss() * H.noise; }
-    let tx = 220 + 70 * Math.sin(G.t * .55); PULL = .6; XW = .15; const hk = pickHp(); if (hk) { tx = hk.x; aimY = hk.y; PULL = 1.2; XW = .6; } let bc = 1e18, bx = P.x, by = P.y, c0 = 0;
+    let tx = H.home + 70 * Math.sin(G.t * .55); PULL = .6; XW = .15;
+    const WV = window.WV, B = WV && WV.bt, live = B && B.live;   // W293 policy: hold (home x, the old bot) | push (fly in on every bounty squad) | choose (push when hull >= 2 and no charger aims at its row)
+    let push = false;
+    if (WV && pol !== 'hold' && (live || pol === 'push')) {   // push: every squad, gold or not; choose: soft squads (drones) at hull >= 2, hard ones (guns, chargers) only at hull >= 3 with DASH or EMP ready
+      let f = null, hard = false; for (const e of WV.st.foes) if ((live ? e.bq === live : e.bq) && e.hp > 0 && !e.dead && !(e.wv && e.wv.st === 'out') && !(e.sl && e.sl.out)) { if (!f || e.x < f.x) f = e; if (/turret|gunship|charger|shielder|mine/.test(e.type)) hard = true; }
+      if (f && pol === 'choose') for (const e of WV.st.foes) if (e.bq && e.hp > 0 && !e.dead && /turret|gunship|shielder/.test(e.type) && Math.hypot(e.x - (f.x - 100), e.y - f.y) < 200) hard = true;   // a gun near the push spot counts too
+      const aimed = G.en.some(e => e.aimL && Math.abs(e.y - P.y) < 70), ready = (H.dash > 0 && P.dashCd <= 0) || (H.emp < 99 && P.emp > 0);
+      push = !!f && (pol === 'push' || (!aimed && (hard ? P.hp >= 3 && ready : P.hp >= 2)));
+      if (push) { tx = Math.max(H.home, Math.min(f.x - 100, 700)); aimY = f.y + gauss() * H.aimErr * .5; XW = .5; }
+    }
+    const md = push ? 1 : 0; if (md !== mode) { if (mode >= 0) sw++; mode = md; }
+    const cur = B && (B.live || B.now); if (cur) { const c = sqm.get(cur.id) || [0, 0]; c[md]++; sqm.set(cur.id, c); }
+    const hk = pickHp(); if (hk) { tx = hk.x; aimY = hk.y; PULL = 1.2; XW = .6; } let bc = 1e18, bx = P.x, by = P.y, c0 = 0;
     for (let ix = -5; ix <= 5; ix++) for (let iy = -5; iy <= 5; iy++) { const cx = P.x + ix * 24, cy = P.y + iy * 24; if (cx < 30 || cx > 900 || cy < 40 || cy > 480) continue; const c = cost(S, cx, cy, aimY, tx, H.look) + Math.hypot(ix, iy) * 4; if (ix === 0 && iy === 0) c0 = c; if (c < bc) { bc = c; bx = cx; by = cy; } }
     const threat = c0 > 4000;   // standing where it is costs a lot: a dodge is needed
     if (threat && !wasThreat && G.t > blindUntil && rnd() < H.miss) blindUntil = G.t + H.blind;   // one roll per threat episode
@@ -91,14 +104,14 @@ const BOT = (o) => {
   const life = []; for (const [e, r] of rec) { if (r.boss || r.mini || !r.killed || r.in < 0 || r.end - r.in <= 0) continue; life.push([r.ty, +(r.end - r.in).toFixed(2)]); }
   let sp = 0, lk = 0, lw = 0; for (const [e, r] of rec) { if (r.boss || r.mini || !LK || !(LK.weight(e) > 0)) continue; sp++; if (e.lkd) { lk++; lw += LK.weight(e); } }
   if (o.endless) cleared = window.ENDR.w >= n && !m.G.dead;
-  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0) };
+  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0), seed, policy: pol, score: m.G.score, gold: window.WV && WV.bt ? WV.bt.n : 0, sqs: window.WV && WV.bt ? WV.bt.m : 0, sw, sqMode: [...sqm.entries()].sort((a, b) => a[0] - b[0]).map(([k, c]) => c[1] > c[0] ? 1 : 0), sqLog: window.WV ? WV.log.sqs : [] };
   m.abort(); return res;
 };
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
   const br = await PW.chromium.launch(), jobs = [], res = []; let next = 0, errs = 0;
-  for (const bot of BOTS) for (const build of BUILDS) for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, build, bot, seed: k + 1, MAXT, hp: HP, endless: ENDLESS, diff: DIFF, noBossGod: process.env.BOSSGOD === '0' });
+  for (const bot of BOTS) for (const build of BUILDS) for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, build, bot, seed: k + 1, MAXT, hp: HP, policy: process.env.POLICY || 'hold', endless: ENDLESS, diff: DIFF, noBossGod: process.env.BOSSGOD === '0' });
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('FAIL page error ' + e.message); });
     await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ''}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
