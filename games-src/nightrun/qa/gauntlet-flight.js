@@ -2,7 +2,7 @@
 // (phone 390x763: CDP touch drag + touch taps on DASH/EMP/PAUSE; PC 1440x860: keyboard + mouse clicks on menus).
 // The clock is stepped (__mnr.step) between input bursts; the game never gets a function call that drives it.
 //   GAME_DIR=<dir> NODE_PATH=$(npm root -g) node games-src/nightrun/qa/gauntlet-flight.js
-//   env: SEEDS=8 STRATS=idle,random,dodger,shooter DEVS=phone,pc STAGES=10 PAR=4 SHOTS=<dir> OUT=<json> TICKS=<game seconds cap per run, default 900>
+//   env: JUMP=1 starts at the boss gate (G.dbar = lead + 3) so a wall-limited run reaches the boss; NOCTL=1 skips the controls probe and frame-time sample; SEEDS=8 STRATS=idle,random,dodger,shooter DEVS=phone,pc STAGES=10 PAR=4 SHOTS=<dir> OUT=<json> TICKS=<game seconds cap per run, default 900>
 // Prints one line per run and a summary with minimums. Console/page errors, promise rejections, stuck states, dead controls,
 // UI overlap / small targets, boss seen+killed, result screens, HUD vs state, frame time p95 are recorded per run.
 const L = require('./lib.js'), { PW, sleep } = L, fs = require('fs');
@@ -102,6 +102,7 @@ async function run(br, devName, strat, seed, start) {
   const d = DEV[devName], rnd = rngOf(seed * 31 + strat.length), R = { dev: devName, strat, seed, errs: [], defects: [], stages: [], deaths: 0, maxStage: 0, bossSeen: 0, bossKilled: 0, results: 0, stuck: 0, hudBad: 0, hudN: 0, ui: new Set(), gameSec: 0, wall: 0 };
   const t0 = Date.now(); const p = await openPage(br, devName, seed), I = makeInput(p, d); await I.init(); const tag = `${devName}-${strat}-${seed}` + (start ? `-from${start}` : '');
   R.start = start || 0; if (!(await startFlight(p, I, start))) { R.defects.push('FLIGHT did not start from the ' + (start ? 'startStory hook' : 'title click')); R.errs.push(...p.errs); await p.context().close(); return R; }
+  if (process.env.JUMP) await p.evaluate(() => { const m = window.__mnr; m.G.dbar = Math.max(m.G.dbar, (m.ST.def.lead || 0) + 3); });   // fixture (JUMP=1): skip the stage run-up to the boss gate; the boss fight itself is real input
   const brn = brain(strat, rnd); let nextSteps = 0, s = await st(p), lastChange = s.t, lastKey = s.score + ':' + s.hp, stageSeen = -1, bossWas = false, sec = 0, tick = 0, attempts = 0;
   const hudCheck = async () => { const r = await p.evaluate(() => { const m = window.__mnr; try { m.render(); } catch (e) { return { err: String(e) }; } const h = m.HUD; return { sc: h.score, hp: h.hp, gs: String(m.G.score).padStart(8, '0'), ghp: m.P.hp, mx: h.hpMax, gmx: m.P.max, ht: h.heat, gh: Math.round(m.P.heat), emp: h.emp, gemp: m.P.emp }; });
     R.hudN++; if (r.err || r.sc !== r.gs || r.hp !== r.ghp || r.emp !== r.gemp) { R.hudBad++; if (R.hudBad <= 3) R.defects.push('HUD!=state ' + JSON.stringify(r)); } };
@@ -167,12 +168,12 @@ const pct = (a, q) => { const s = [...a].sort((x, y) => x - y); return s[Math.mi
 (async () => {
   const b = await L.boot(); global.__BASE = b.base; const jobs = [];
   // one browser PROCESS per worker (below): contexts sharing a process starved each other (30 sim-s in 400 s)
-  for (const dv of DEVS) for (const sd of Array.from({ length: SEEDS }, (_, i) => i + 1 + SEED0)) { jobs.push(br => controls(br, dv, sd)); for (const stg of STRATS) for (const sn of (STARTS.length ? STARTS : [0])) jobs.push(br => run(br, dv, stg, sd, sn)); }
+  for (const dv of DEVS) for (const sd of Array.from({ length: SEEDS }, (_, i) => i + 1 + SEED0)) { if (!process.env.NOCTL) jobs.push(br => controls(br, dv, sd)); for (const stg of STRATS) for (const sn of (STARTS.length ? STARTS : [0])) jobs.push(br => run(br, dv, stg, sd, sn)); }
   const out = [], ctl = []; let ji = 0;
   await Promise.all(Array.from({ length: PAR }, async (_, wi) => { const wb = wi ? await PW.chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }) : b.br; while (ji < jobs.length) { const j = jobs[ji++]; try { const r = await j(wb); (r.strat ? out : ctl).push(r);
     if (r.strat) console.log(`${r.dev} ${r.strat} s${r.seed}${r.start ? ' from' + r.start : ''}: next ${r.nextOk || 0} bossname ${r.bossName || '-'} maxStage ${r.maxStage} deaths ${r.deaths} boss ${r.bossSeen}/${r.bossKilled} results ${r.results} stuck ${r.stuck} hud ${r.hudBad}/${r.hudN} err ${r.errs.length} rej ${(r.rej || []).length} ui ${r.ui.length} sim ${r.gameSec.toFixed(0)}s wall ${r.wall.toFixed(0)}s${r.hits && r.hits.length ? ' HITS ' + r.hits.map(h => (h.boss ? 'B' : 's' + h.st) + ':' + (h.b || h.en || 'none') + (h.bossD != null ? '/bd' + h.bossD : '')).join(',') : ''}${r.defects.length ? ' DEF ' + r.defects.slice(0, 2).join(' | ').slice(0, 200) : ''}`);
     else console.log(`${r.dev} controls s${r.seed}: ${JSON.stringify(r.ok)}${r.defects.length ? ' DEF ' + r.defects.join(' | ').slice(0, 300) : ''}`); } catch (e) { console.log('RUNNER ERROR', String(e.stack).split('\n').filter(l => /gauntlet|Error/.test(l)).join(' / ').slice(0, 400)); out.push({ dev: 'x', strat: 'crash', seed: 0, errs: ['runner: ' + e], defects: [String(e)], ui: [], stages: [] }); } } }));
-  const pf = []; for (const dv of DEVS) { try { pf.push(await perf(b.br, dv, 1)); } catch (e) { console.log('perf failed', dv, String(e).slice(0, 120)); } }
+  const pf = []; if (!process.env.NOCTL) for (const dv of DEVS) { try { pf.push(await perf(b.br, dv, 1)); } catch (e) { console.log('perf failed', dv, String(e).slice(0, 120)); } }
   await b.close();
   console.log('\n== SUMMARY (minimums over runs) ==');
   for (const dv of DEVS) for (const stg of STRATS) for (const sn of (STARTS.length ? STARTS : [0])) { const rs = out.filter(r => r.dev === dv && r.strat === stg && (r.start || 0) === sn); if (!rs.length) continue; const mn = f => Math.min(...rs.map(f));
