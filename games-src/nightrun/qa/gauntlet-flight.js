@@ -2,7 +2,7 @@
 // (phone 390x763: CDP touch drag + touch taps on DASH/EMP/PAUSE; PC 1440x860: keyboard + mouse clicks on menus).
 // The clock is stepped (__mnr.step) between input bursts; the game never gets a function call that drives it.
 //   GAME_DIR=<dir> NODE_PATH=$(npm root -g) node games-src/nightrun/qa/gauntlet-flight.js
-//   env: JUMP=1 starts at the boss gate (G.dbar = lead + 3) so a wall-limited run reaches the boss; NOCTL=1 skips the controls probe and frame-time sample; SEEDS=8 STRATS=idle,random,dodger,shooter DEVS=phone,pc STAGES=10 PAR=4 SHOTS=<dir> OUT=<json> TICKS=<game seconds cap per run, default 900>
+//   env: NOAUDIO=1 (beat clock = stepped time), ZONES=0 (bots blind to telegraph zones, the W292 bots), JUMP=1 starts at the boss gate (G.dbar = lead + 3) so a wall-limited run reaches the boss; NOCTL=1 skips the controls probe and frame-time sample; SEEDS=8 STRATS=idle,random,dodger,shooter DEVS=phone,pc STAGES=10 PAR=4 SHOTS=<dir> OUT=<json> TICKS=<game seconds cap per run, default 900>
 // Prints one line per run and a summary with minimums. Console/page errors, promise rejections, stuck states, dead controls,
 // UI overlap / small targets, boss seen+killed, result screens, HUD vs state, frame time p95 are recorded per run.
 const L = require('./lib.js'), { PW, sleep } = L, fs = require('fs');
@@ -17,7 +17,8 @@ const SEEDJS = s => `(()=>{let a=${s}*2654435761>>>0||1;Math.random=()=>{a=a+0x6
 const stFn = () => { const m = window.__mnr; if (!m.G) return { live: false, over: false, paused: false, title: true, overEl: false, res: false, shop: false, stage: 0, t: 0, score: 0, hp: 0 }; const h = id => { const e = document.getElementById(id); return !!e && !e.hidden && getComputedStyle(e).display !== 'none'; };
   return { live: !!m.G.live, over: !!m.G.over, paused: h('pausem'), title: h('title'), overEl: h('over'), res: h('stres'), shop: h('shop'), stage: m.ST.on ? m.ST.n : 0, t: m.G.t, score: m.G.score, hp: m.P.hp, boss: !!m.G.boss, bossDone: !!m.G.bossDone, emp: m.P.emp, dashT: m.P.dashT, dashCd: m.P.dashCd, heat: m.P.heat, pb: m.G.pb.length }; };
 const worldFn = () => { const m = window.__mnr, G = m.G, P = m.P; const q = a => a.map(b => [b.x, b.y, b.vx || 0, b.vy || 0, b.r || 0, b.t || '']);
-  return { px: P.x, py: P.y, eb: q(G.eb), en: q(G.en), pk: q(G.pk), boss: G.boss ? [G.boss.x, G.boss.y] : null, hp: P.hp, emp: P.emp, rot: m.rotMode }; };
+  const zc = window.__zg && G.boss ? window.__zg(m, P.x, P.y) : null, zw = zc && zc[24] > 0 ? window.__zg(m, P.x, P.y, 50, 300) : null;   // W301: telegraphed zones / arena rule (qa/botzone.js)
+  return { px: P.x, py: P.y, eb: q(G.eb), en: q(G.en), pk: q(G.pk), boss: G.boss ? [G.boss.x, G.boss.y] : null, hp: P.hp, emp: P.emp, rot: m.rotMode, zc, zw }; };
 const st = p => p.evaluate(stFn), world = p => p.evaluate(worldFn);
 const step = (p, n) => p.evaluate(n => { for (let i = 0; i < n; i++) window.__mnr.step(1 / 60); }, n);
 const frames = p => p.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
@@ -70,8 +71,9 @@ function brain(name, rnd) {
     let near = null; for (const e of w.en) if (e[0] > w.px + 20 && (!near || Math.abs(e[1] - w.py) < Math.abs(near[1] - w.py))) near = e;
     let pk = null; if (name === 'shooter') for (const q of w.pk) if (q[0] > 20 && q[0] < 700 && (!pk || q[0] < pk[0])) pk = q;
     const aimY = pk ? pk[1] : near ? near[1] : w.boss ? w.boss[1] : 270, aimX = pk ? Math.min(pk[0], 560) : tx;
-    for (let gx = -90; gx <= 90; gx += 30) for (let gy = -90; gy <= 90; gy += 30) { const cx = w.px + gx, cy = w.py + gy; if (cx < 40 || cx > 900 || cy < 40 || cy > 500) continue;
-      const c = danger(w, cx, cy) + Math.abs(cy - aimY) * 1.2 + Math.abs(cx - aimX) * .6 + Math.hypot(gx, gy) * .4; if (c < bc) { bc = c; best = [gx, gy]; } }
+    let zi = 0; for (let gx = -90; gx <= 90; gx += 30) for (let gy = -90; gy <= 90; gy += 30) { const zc = w.zc ? w.zc[zi] : 0; zi++; const cx = w.px + gx, cy = w.py + gy; if (cx < 40 || cx > 900 || cy < 40 || cy > 500) continue;
+      const c = danger(w, cx, cy) + zc + Math.abs(cy - aimY) * 1.2 + Math.abs(cx - aimX) * .6 + Math.hypot(gx, gy) * .4; if (c < bc) { bc = c; best = [gx, gy]; } }
+    if (w.zw) { const R = 300, S = 50, n = 2 * R / S + 1; let bw = null, bwc = 1e18; for (let i = 0; i < w.zw.length; i++) { const gx = -R + S * Math.floor(i / n), gy = -R + S * (i % n), cx = w.px + gx, cy = w.py + gy; if (cx < 40 || cx > 900 || cy < 40 || cy > 500) continue; const c = w.zw[i] + Math.hypot(gx, gy) * 2 + danger(w, cx, cy); if (c < bwc) { bwc = c; bw = [gx, gy]; } } if (bw) { const k = Math.min(1, 90 / Math.max(1, Math.hypot(bw[0], bw[1]))); best = [bw[0] * k, bw[1] * k]; } }   // standing in a telegraphed zone: head for the nearest clear cell within 300 px
     if (!best) best = [0, 0]; let close = 0; for (const b of w.eb) if (Math.hypot(b[0] - w.px, b[1] - w.py) < 150) close++;
     const imminent = w.eb.some(b => Math.hypot(b[0] + b[2] * .08 - w.px, b[1] + b[3] * .08 - w.py) < 30);
     return { dx: best[0], dy: best[1], fire: true, emp: name === 'shooter' && close >= 4 && w.emp > 0, dash: imminent && rnd() < .5 };
@@ -90,7 +92,8 @@ async function openPage(br, devName, seed) {
   const p = await ctx.newPage(); p.errs = []; p.cons = []; p.on('pageerror', e => p.errs.push(String(e.message).slice(0, 160))); p.on('console', m => { if (m.type() === 'error' && !/net::ERR_FAILED/.test(m.text())) p.cons.push(m.text().slice(0, 160)); }); p.on('requestfailed', r => { if (!/fonts\.(googleapis|gstatic)|^blob:/.test(r.url())) p.cons.push('requestfailed ' + r.url().replace(/^https?:\/\/[^/]+/, '').slice(0, 100)); }); p.on('response', r => { if (r.status() >= 400) p.cons.push('http ' + r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '').slice(0, 100)); });
   await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
-  await p.addInitScript(SEEDJS(seed));
+  await p.addInitScript(SEEDJS(seed)); if (process.env.ZONES !== '0') await p.addInitScript('window.__zg=' + require('./botzone.js').toString());   // W301: the bots read the telegraphs a player sees
+  if (process.env.NOAUDIO === '1') await p.addInitScript(() => { window.AudioContext = undefined; window.webkitAudioContext = undefined; });   // W301: no audio clock: the beat follows the stepped game time (with audio the beats run on wall time while the sim steps run slower than real time)
   await p.goto(L.GAME_DIR ? global.__BASE + '?nomusic=1' + (FOCUS0 ? '&focus=0' : '') : '', { waitUntil: 'domcontentloaded' });
   await p.waitForFunction(() => window.__mnr, null, { timeout: 15000 }); await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }).catch(() => { }); await sleep(400);
   return p;
