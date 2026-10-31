@@ -19,8 +19,8 @@ if(RET.multhud){
     ctx.font='700 30px "Chakra Petch",sans-serif';ctx.fillStyle=col();ctx.fillText(mtxt(G.mult),0,38);const nw=ctx.measureText(mtxt(G.mult)).width+12;
     ctx.font='11px "Share Tech Mono",monospace';
     if(MH.brk>0){if(!(G.boss&&G.boss.x<W)){ctx.fillStyle='#ff3040';ctx.fillText('CHAIN BROKEN  '+mtxt(MH.from)+' → '+mtxt(MH.to),nw,36);}}
-    else{ctx.fillStyle='#c9c4ec';   // W324: the number always says what it multiplies (the long caption for the first seconds, then the short one)
-      ctx.fillText(!MH.capDone&&!busy()?'SCORE MULTIPLIER: a hit halves it':'POINTS MULTIPLIER',0,54);}
+    else if(!busy()){ctx.fillStyle='#c9c4ec';   // W324: the number always says what it multiplies (the long caption for the first seconds, then the short one); W326: never under a banner / hint / boss bar (ui-align overlap with the stage banner at 844x390)
+      ctx.fillText(!MH.capDone?'SCORE MULTIPLIER: a hit halves it':'POINTS MULTIPLIER',0,54);}
     ctx.restore();});
   wrap('hudP',()=>{const k=HK,pad=10*k,sH=34*k;ctx.save();ctx.textAlign='left';ctx.textBaseline='alphabetic';
     ctx.font=`700 ${19*k}px "Chakra Petch",sans-serif`;const x=pad+ctx.measureText(String(G.score).padStart(8,'0')).width+12*k;
