@@ -150,11 +150,11 @@ async function behaviour(b, W, H, touch) {
   await p.evaluate(() => __mnr.setVal('fpsc', true)); await sleep(200); const fpsOn = await shown(p, '#fpsEl'); await p.evaluate(() => __mnr.setVal('fpsc', false)); await sleep(200);
   if (touch) ok(T + 'FPS counter row is hidden on a phone, where it can never show (it works on PC and with ?test=1 only)', !(await shown(p, '#setBody .seg[data-k="fpsc"]')), 'row is offered but FPSOK() is false on touch');
   else ok(T + 'FPS counter On shows the counter, Off hides it', fpsOn && !(await shown(p, '#fpsEl')), String(fpsOn));
-  // calibration: TAP TEST really measures and sets Latency
+  // calibration: TAP CHECK really measures and sets Latency
   await p.evaluate(() => __mnr.setVal('sync', 0)); await reach(p, '#calBtn', touch);
-  ok(T + 'TAP TEST opens the pad', (await press(p, '#calBtn', touch)) === 'ok' && await shown(p, '#calPad'));
+  ok(T + 'TAP CHECK opens the pad', (await press(p, '#calBtn', touch)) === 'ok' && await shown(p, '#calPad'));
   const cal0 = await p.evaluate(() => ({ on: __mnr.CAL.on, need: __mnr.CAL.need }));
-  ok(T + 'TAP TEST starts the click track and asks for 8 taps', cal0.on && cal0.need === 8, JSON.stringify(cal0));
+  ok(T + 'TAP CHECK starts the click track and asks for 8 taps', cal0.on && cal0.need === 8, JSON.stringify(cal0));
   for (let i = 0; i < 8; i++) { await press(p, '#calPad', touch); await sleep(260); }
   const cal1 = await p.evaluate(() => ({ done: __mnr.CAL.done, taps: __mnr.CAL.taps.length, info: document.getElementById('calInfo').textContent, sync: __mnr.SET.sync }));
   ok(T + 'after 8 taps the test finishes and says so', /Done|Too far|Last tap/.test(cal1.info), JSON.stringify(cal1));

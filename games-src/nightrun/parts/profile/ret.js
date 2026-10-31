@@ -25,7 +25,7 @@ function retShow(){
   for(const [id,host] of [['retO',$('over').querySelector('.in')],['retR',$('stres').querySelector('.in')]]){
     const e=retMake(id,host);e.hidden=!on;if(!on)continue;
     e.className='retBar'+(nx&&nx.can?' can':'');const gp=nx&&add>0?Math.min(nx.pct,Math.max(1,Math.round(100*add/nx.price))):0;
-    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> '+nx.price:'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price)+'<div class="rb"><i style="width:'+Math.max(0,nx.pct-gp)+'%"></i>'+(gp?'<i class="gain" style="width:'+gp+'%"></i>':'')+'</div>':'Everything unlocked');}
+    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> · '+nx.price+' Neon':'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price+' Neon')+'<div class="rb"><i style="width:'+Math.max(0,nx.pct-gp)+'%"></i>'+(gp?'<i class="gain" style="width:'+gp+'%"></i>':'')+'</div>':'Everything unlocked');}
   /* menufix3 (E12): after a first-session death the first primary button is RETRY; the GARAGE shortcut shows only when something is affordable */
   const fresh=!Object.keys(sSave.stars).some(k=>(sSave.stars[k]|0)>0),g2=$('gaBtn2');
   $('againBtn').textContent=fresh?'RETRY':on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';
@@ -403,20 +403,20 @@ RET.assistSchema=function(SC){if(!RET.assist)return;
   const acc=SC.find(g=>g.g==='Accessibility');if(acc)SC.splice(SC.indexOf(acc),1);
   const O=[[false,'Off'],[true,'On']];
   SC.push({g:'Assist',rows:[
-    {k:'asSpd',l:'World speed',o:[[100,'100%'],[85,'85%'],[70,'70%']],d:'Enemies, bullets and scrolling move slower. The music and the beat do not change. Marks the run ⓐ.'},
-    {k:'asBul',l:'Enemy bullets',o:[[100,'Normal'],[85,'Slower'],[70,'Slowest']],d:'Only enemy bullets fly slower, so there is more time to dodge. Marks the run ⓐ.'},
+    {k:'asSpd',l:'World speed',o:[[100,'100%'],[85,'85%'],[70,'70%']],d:'Slows the whole game down: enemies, bullets and scrolling. Marks the run ⓐ.'},
+    {k:'asBul',l:'Enemy bullets',o:[[100,'Normal'],[85,'Slower'],[70,'Slowest']],d:'Enemy bullets fly slower. Marks the run ⓐ.'},
     {k:'asHull',l:'Extra hull',o:[[0,'Off'],[2,'+2']],d:'Start every run with 2 more hull. Marks the run ⓐ.'},
-    {k:'asWin',l:'Beat window',o:[[0,'Normal'],[60,'+60 ms'],[120,'+120 ms']],d:'More time to hit the beat for a PERFECT, on top of Timing window. Marks the run ⓐ.'},
-    {k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']],d:'How exact a tap has to be. Never marks a run.'},
-    {k:'asBig',l:'Big bullets',o:O,d:'Enemy bullets are drawn bigger with a white halo. The real hit size is unchanged. Never marks a run.'},
-    {k:'hc',l:'High-contrast bullets',o:O,d:'Bright white halo around enemy bullets. Never marks a run.'},
-    {k:'rm',l:'Reduced motion',o:O,d:'Calmer effects, no strobing, no count-up. Never marks a run.'}]});};
+    {k:'asWin',l:'Beat window',o:[[0,'Normal'],[60,'+60 ms'],[120,'+120 ms']],d:'Widens the beat window for a PERFECT, on top of Timing window. Marks the run ⓐ.'},
+    {k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']],d:'Tight asks for exact taps, Loose forgives them. Never marks a run.'},
+    {k:'asBig',l:'Big bullets',o:O,d:'Draws enemy bullets bigger. Never marks a run.'},
+    {k:'hc',l:'High-contrast bullets',o:O,d:'Adds a white halo to enemy bullets. Never marks a run.'},
+    {k:'rm',l:'Reduced motion',o:O,d:'Calmer effects. Never marks a run.'}]});};
 RET.assistBuild=function(){if(!RET.assist)return;
   const css=document.createElement('style');css.textContent='#setm .as>span{font-size:14px}#setm .as button{min-height:44px;font-size:14px}#setm .asd{margin:0 0 6px;font:14px/1.35 var(--mono,monospace);color:#b4d2e2}#setm .asn{margin:0 0 8px;font:14px/1.4 var(--mono,monospace);color:#e6f6ff}';
   document.head.appendChild(css);
   const g=SCHEMA.find(x=>x.g==='Assist');let first=true;
   for(const r of g.rows){const row=setRows[r.k];if(!row)continue;row.classList.add('as');
-    if(first){const n=document.createElement('p');n.className='asn';n.id='asNote';n.textContent='Assist makes the game easier. It never blocks progress and never costs Neon. A run with World speed, Enemy bullets, Extra hull or Beat window on is marked ⓐ and sets no records (best, daily, weekly, Heat medal). Looks-only options never mark a run.';
+    if(first){const n=document.createElement('p');n.className='asn';n.id='asNote';n.textContent='Assist makes the game easier. A run with World speed, Enemy bullets, Extra hull or Beat window on is marked ⓐ and sets no records (best, daily, weekly, Heat medal). Looks-only options never mark a run.';
       row.parentNode.insertBefore(n,row);first=false;}
     const p=document.createElement('p');p.className='asd';p.textContent=r.d;row.after(p);}};
 /* ---------- B30 installable PWA + offline cache (POLISH.md). Flag RET.pwa (off with ?pwa=0): off = no manifest link, no service worker, no MENU note (an old worker of ours is unregistered).

@@ -65,7 +65,7 @@ const LSN=[
         if(m.sel[0]!==need){m.fail(['WEAPON','WEAPON','CORE','PASSIVE'][i]+' slot takes a '+(need==='w'?'weapon':need==='c'?'core':'passive')+' only');return;}
         m.fill[i]=m.sel;m.sel=null;if(m.fill.every(Boolean))m.win('2 weapons, a core and a passive');}m.chipSync();},
     sel:(m,v)=>v==='i:'+m.sel||m.fill.includes(v.slice(2))&&v[0]==='i'||(v[0]==='s'&&!!m.fill[+v[2]]),prog:m=>m.fill.filter(Boolean).length/4},
-   {id:'s-fly',say:'Test flight: both weapons fire together',chips:[],init:m=>{m.wp=['pulse','laser'];for(let i=0;i<3;i++)lsFoe(m,{x:m.w*.6+i*30,y:m.h*.5,k:'line',hp:4,r:12});
+   {id:'s-fly',say:'Practice flight: both weapons fire together',chips:[],init:m=>{m.wp=['pulse','laser'];for(let i=0;i<3;i++)lsFoe(m,{x:m.w*.6+i*30,y:m.h*.5,k:'line',hp:4,r:12});
       for(let i=0;i<6;i++)lsFoe(m,{x:m.w*(.78+.06*(i%2)),y:m.h*(.1+.16*i),hp:2,r:10,vy:24*(i%2?1:-1)});},
     tick:m=>{if(m.fo.every(f=>f.dead))m.win('spread for crowds, lance for armour');},prog:m=>m.kills/9}]},
  {id:'ship',n:'SHIPS',ph:[

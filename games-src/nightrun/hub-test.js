@@ -35,15 +35,14 @@ const F = [
   ['practice', '#hub_training', '.hubAct:nth-child(3)', 'VIS("#stsel")'],
   ['lab', '#hub_training', '[data-door="#labBtn"]', 'document.getElementById("title").hidden'],
   ['stats', '#hub_profile', '[data-door="#statsBtn"]', 'VIS("#stSheet")'],
-  ['checklist', '#hub_profile', '[data-door=".ckB"]', 'VIS("#nrChk")'],
-  ['story log', '#hub_profile', '.hubAct:nth-child(3)', 'VIS("#sgLog")||VIS("#taleLog")'],
-  ['settings', '#hub_profile', '.hubAct:nth-child(4)', 'VIS("#setm")'],
-  ['saves / export', '#hub_profile', '.hubAct:nth-child(5)', 'VIS("#setm")&&VIS("#svBox")&&VIS("#sioBox")&&(window.__tidy?__tidy.page()==="more":Math.abs(document.getElementById("hubSG_da").getBoundingClientRect().top-document.getElementById("setBody").getBoundingClientRect().top)<40)'],
+  ['story log', '#hub_profile', '.hubAct:nth-child(2)', 'VIS("#sgLog")||VIS("#taleLog")'],
+  ['settings', '#hub_profile', '.hubAct:nth-child(3)', 'VIS("#setm")'],
+  ['saves / export', '#hub_profile', '.hubAct:nth-child(4)', 'VIS("#setm")&&VIS("#svBox")&&VIS("#sioBox")&&(window.__tidy?__tidy.page()==="more":Math.abs(document.getElementById("hubSG_da").getBoundingClientRect().top-document.getElementById("setBody").getBoundingClientRect().top)<40)'],
   ['full screen', '#hub_profile', '[data-door="#fsBtn"]', 'true'],
   ['update check', '#hub_profile', '.hubMore button:nth-child(2)', 'VIS("#setm")&&VIS("#stampBtn")'],
   ['build stamp', '#hub_profile', null, '/build /.test(document.getElementById("hubStamp").textContent)'],
   ['controls legend', '#hub_training', null, 'VIS("#hub_trainingScr .keys")'],
-  ['music mix (settings > audio)', '#hub_profile', '.hubAct:nth-child(4)', 'VIS(\'#setBody .seg[data-k="mus"]\')'],
+  ['music mix (settings > audio)', '#hub_profile', '.hubAct:nth-child(3)', 'VIS(\'#setBody .seg[data-k="mus"]\')'],
 ];
 /* the screen audit: main actions (MORE row, back arrow, cards, settings options aside), header, overlap */
 const AUD = (root) => {
@@ -94,7 +93,7 @@ const AUD = (root) => {
     await p.context().close();
     if (w > 400 && w !== 763) continue;
     // ---- the other screens a section opens share the header ----
-    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(4)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(3)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#mfMore|#h3M_pick', '#wpm']]) {
+    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(3)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(3)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#mfMore|#h3M_pick', '#wpm']]) {
       p = await open(w, h); await tap(p, tile); for (const d of door.split('|')) await tap(p, tile === '#hub_hangar' ? d : tile + 'Scr ' + d); await sleep(300);
       if (root === '#stSheet') await p.evaluate(() => { const s = document.getElementById('stSheet'); s.scrollTop = 0; });
       const a = await p.evaluate(AUD, root);
@@ -114,7 +113,7 @@ const AUD = (root) => {
   }
   // ---- back arrow returns to the section, hint + dots ----
   {
-    const p = await open(390, 763); await tap(p, '#hub_profile'); await tap(p, '#hub_profileScr .hubAct:nth-child(4)'); await tap(p, '#setm .hubHd .hubBk');
+    const p = await open(390, 763); await tap(p, '#hub_profile'); await tap(p, '#hub_profileScr .hubAct:nth-child(3)'); await tap(p, '#setm .hubHd .hubBk');
     ok('settings back arrow returns to PROFILE', await p.evaluate(() => VIS('#hub_profileScr') && !VIS('#setm')));
     await tap(p, '#hub_profileBack'); ok('section back arrow returns to HOME', await p.evaluate(() => VIS('#hub_profile') && !VIS('#hub_profileScr')));
     const g = await p.evaluate(() => [...document.querySelectorAll('#setBody .hubSG')].map(e => e.textContent));
@@ -147,7 +146,7 @@ const AUD = (root) => {
     ok('?hub=0: no hub, old title buttons visible, old garage BACK', !o.hub && !o.grid && o.more && o.start && o.ga && o.gaB === 'BACK' && !o.sec, JSON.stringify(o));
     await tap(p, '#moreBtn');
     const ids = await p.evaluate(() => [...document.querySelectorAll('#mnMore button')].filter(b => b.id !== 'pwaBtn').map(b => b.id === 'sgBtn' ? 'taleBtn' : b.id || b.className.split(' ').pop()).join(','));
-    ok('?hub=0: MENU sheet as before', ids === 'storyBtn,wkBtn,wpBtn,labBtn,ckB,tutBtn,lsBtn,setBtn,diffBtn,fsBtn,footBtn,statsBtn,taleBtn,mnBack', ids);
+    ok('?hub=0: MENU sheet as before', ids === 'storyBtn,wkBtn,wpBtn,labBtn,tutBtn,lsBtn,setBtn,diffBtn,fsBtn,footBtn,statsBtn,taleBtn,mnBack', ids);
     await p.context().close();
   }
   ok('no page errors', errs.length === 0, errs.slice(0, 3).join(' | '));
