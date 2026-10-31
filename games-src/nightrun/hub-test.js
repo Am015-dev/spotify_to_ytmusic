@@ -93,7 +93,7 @@ const AUD = (root) => {
     await p.context().close();
     if (w > 400 && w !== 763) continue;
     // ---- the other screens a section opens share the header ----
-    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(3)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(3)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#mfMore|#h3M_pick', '#wpm']]) {
+    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(3)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(2)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#mfMore|#h3M_pick', '#wpm']]) {
       p = await open(w, h); await tap(p, tile); for (const d of door.split('|')) await tap(p, tile === '#hub_hangar' ? d : tile + 'Scr ' + d); await sleep(300);
       if (root === '#stSheet') await p.evaluate(() => { const s = document.getElementById('stSheet'); s.scrollTop = 0; });
       const a = await p.evaluate(AUD, root);

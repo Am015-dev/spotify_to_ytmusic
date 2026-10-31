@@ -144,7 +144,7 @@ const NR_CHECKLIST=[
  const trow=document.querySelector('#title .row');
  const DEVCHK=/[?&]chk=1/.test(location.search);   // W295: the owner test list is not a player screen; open the page with ?chk=1 to get its buttons
  {const sb=document.getElementById('setBody');if(sb&&DEVCHK){const w=document.createElement('div');w.style.cssText='margin:10px 0 4px';w.appendChild(mk());sb.appendChild(w);}}   // top of the settings list: the footer is too narrow for a third button on a small phone
- if(trow&&DEVCHK){const r2=document.createElement('div');r2.className='row';r2.id='titleRow2';r2.appendChild(mk());trow.after(r2);}
+ if(trow){const r2=document.createElement('div');r2.className='row';r2.id='titleRow2';if(DEVCHK)r2.appendChild(mk());trow.after(r2);}   // the row always exists: WEAPONS (below) and FLIGHT SCHOOL (drills/tut.js) are added to it
  badge();
  window.__chk={open:()=>nrChkOpen(),text,items:NR_CHECKLIST,left,ver:NR_VER};}
 
