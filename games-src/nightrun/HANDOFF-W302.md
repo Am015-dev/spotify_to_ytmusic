@@ -27,4 +27,43 @@ call made during `render()` into READ POL LIT LGB PCB DIET CALM COM BA PURL PB A
 - Player shots (`PURL.shots`): phone 1.4x size and thicker, fade starts at .55 W (was .4); still drawn under enemy shots.
 - Player (`PURL.player`): value lift `PURL.SHIPF`, lit edge .9, larger engine light + hot core pass on phone.
 - Enemies (`PURL.foe`): value lift `PURL.FOEF`, lit edge .6; phone size floor .68 of the player's length (art only, hitbox unchanged).
-## 4. Critic and clear rates: see the tables appended below.
+## 4. Strict critic pass (game-look), shots LOOKED at
+Shots: qa/w302-owners.js HASH=1 SHOTS=<dir> AT=13,22,37,48,59,71,88,101,118,128 (8 stepped moments + 2 boss moments; the W291 shot script
+stops at ~61 s because the real-time loop keeps running beside the stepped sim, so it never reached the boss). Phone 10/10 looked at in colour
+and grayscale; PC 6 of 10 looked at. Bullet board: qa/w302-bullets.js (every enemy shot kind next to the ship, phone + PC).
+| row (minimum over moments) | before (W291) | after phone | after PC |
+|---|---|---|---|
+| owner-art | 7 | 7 | 7 |
+| grayscale | 5 | 5 (small foes in m2/m3 still sink into the city; shots and ship pass) | 6 |
+| silhouette | 5 | 5 (all small foes one helicopter shape: art) | 6 |
+| bullets | 5 | 7 (pink + dark ring, >= 11 px; boss small shots paler) | 7 |
+| find-player | 6 | 7 (brightest thing at the bottom, engine light) | 6 (violet ship on a violet skyline) |
+| clutter | 7 | 7 | 7 |
+| benchmark | 4 | 5 | 5 |
+NOT all >= 7. Left: grayscale/silhouette of small foes (needs wider, lighter enemy sheets: ART list; code already lifts value 2x on the
+last build, not yet seen in a shot), PC find-player (ship hue = skyline hue: a cool-white rim for the player on PC is the next step), benchmark.
+The last change (foe value lift 2.0 + phone foe size floor .68) was built and run through the boss on phone (0 errors); its 2 shots had no
+small foe on screen, so it is NOT judged yet.
+## 5. Dodger gap (4 seeds, not 8: the box ran ~100 s of game time per 424 s of wall with 4 pages, load 20+)
+| run | result |
+|---|---|
+| phone dodger, W302 build, dash on (W291 config) | killed: every run hit the 424 s wall cap at ~100 s game time (unusable) |
+| phone dodger, NODASH=1, pull 520 | 1/4 cleared (s3, 0 game overs, boss killed); s1/s2/s4 2-3 game overs, then wall cap |
+| PKEY (phone UA + portrait rotMode, keyboard input) dodger | 4/4 cleared the stage + killed the boss (s4 0 game overs; s1-s3 after 1 game over), 0 errors: SAME portrait geometry, keys = fine |
+| pull cap 300 (GAME_DIR copy with 520 -> 300) | not run (time) |
+| PC dodger / phone shooter 8 seeds | not run (time) |
+Lead (harness, not game): on phone the dodger dashes by tapping #bDash with a second finger; qa/gauntlet-flight.js I.tap then sends a CDP
+touchEnd that lists the steering finger. CDP's rule is that touchEnd carries no points (it ends the touch sequence), so the steering finger is
+probably lifted on every dash tap and the ship stops following until the next touchMove re-presses it. W291's 0/8 had dash on; NODASH gave 1/4.
+Fix to try first (bot side): release the tap finger with a touchMove that lists only the steering finger, not touchEnd. Then re-run 8 seeds.
+Conclusion: the gap is the TOUCH INPUT PATH (harness finger and/or the game's 520 u/s finger pull), not the rotMode geometry (boss x, spawn
+lead, ebCap): keys in the same portrait field clear 4/4, touch clears 1/4. Not split further (pull cap 300 untested). No game change made.
+## 6. Not done / checks
+- Phone fps probe (benchmark/playability-probe.js, 3 alternating runs) NOT run (time); visible-test / w227probe NOT run.
+- Checks run: qa/w302-owners.js phone + PC through the boss, 0 page errors; qa/w302-bullets.js phone + PC, 0 errors; flake8 E9/F63/F7/F82 = 0.
+- Gauntlet changes: DEV `pkey` (phone UA + portrait, keyboard) in qa/gauntlet-flight.js.
+## 7. Next (one task each)
+1. (sonnet) Harness: dash/EMP tap releases with touchMove [steering finger] instead of touchEnd; re-run phone dodger/shooter 8 seeds, PC dodger 8
+   seeds, on a quieter box or PAR=2 with WALL >= 900. If the phone still trails pkey: try the game's touch pull 520 -> 300 (core/b.js line ~329).
+2. (opus) PC find-player: cool-white rim on the player only (PURL.player lit colour), then the strict critic pass on both devices.
+3. (sonnet) Delete readable.js / polish.js / legible.js / cleanlook.js: move the few globals the street/HUD read into their owners first.
