@@ -105,7 +105,7 @@ const SFXID={shot:'f_shot',hit:'f_hit',pick:'f_pick',big:'f_big',hurt:'f_hurt',d
 const sndF=id=>!window.sndOn||sndOn(id);
 function sfx(n){try{if(window.FTX&&FTX.owns(n)){FTX.old(n);return;}if(!sndF(SFXID[n]||'f_'+n))return;if(typeof AU!=='undefined'&&AU.sfx)AU.sfx(n);}catch(e){}}
 /* the song's beat: bpos() from a.js when the beat clock runs, else our own 120 bpm clock */
-function beatPos(){try{if(typeof bpos==='function'&&typeof BT!=='undefined'&&BT.mode!=='none'){if(S.bA==null||S.bAt>S.time){const q=bpos(performance.now());S.bA=isFinite(q)?q-S.time/(BT.spb||.5):null;}S.bAt=S.time;if(S.bA!=null){const p=S.bA+S.time/(BT.spb||.5);if(isFinite(p))return p;}}}catch(e){}return S?S.time*2:0;}   // ONE-CLOCK #2: the song position is read from the wall once per run (anchor), then follows the stepped street time S.time
+function beatPos(){try{if(typeof bpos==='function'&&typeof BT!=='undefined'&&BT.mode!=='none'){const p=bpos(performance.now());if(isFinite(p))return p;}}catch(e){}return S?S.time*2:0;}
 function ftOnBeat(){const p=beatPos(),f=Math.abs(p-Math.round(p)),spb=(typeof BT!=='undefined'&&BT.spb)||.5,win=.11+((RET.asWinMs&&RET.asWinMs())||0)/1000;return f*spb<win;}
 
 /* ===== enemies ===== */
