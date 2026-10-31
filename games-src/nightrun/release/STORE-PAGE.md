@@ -1,6 +1,6 @@
 # Store page text: Mainhattan Nightrun (itch.io, $5)
 
-Every line below was checked against the build in `dist/nightrun-web.zip` (31 Oct 2026). Sale path and exact itch settings: `SELL-PATH.md`. Music cleared for sale: `MUSIC-PROVENANCE.md`. No quotes, reviews or press lines are used because none exist.
+Every line below was checked against the build in `dist/nightrun-web.zip` (31 Oct 2026). Sale path and exact itch settings: `SELL-PATH.md`. Music provenance (NOT cleared for sale yet, so the page makes no music claim): `MUSIC-PROVENANCE.md`. No quotes, reviews or press lines are used because none exist.
 
 **Title:** Mainhattan Nightrun
 
@@ -12,7 +12,7 @@ Every line below was checked against the build in `dist/nightrun-web.zip` (31 Oc
 
 Frankfurt, 2099. It never stops raining. You are a courier pilot, and tonight the sky is full of things that want you grounded.
 
-Fly your ship through five city districts, weave between bullets, dash through gaps and fire an EMP when it gets ugly. The soundtrack is tuned to the game's beat timing, and there are bosses to beat.
+Fly your ship through the first flight stages, weave between bullets, dash through gaps and fire an EMP when it gets ugly. There is a boss fight to beat.
 
 When the ship is not enough, switch to ON FOOT. Run the wet streets as Kai, shoot, dodge between lanes and fight your way past guards.
 
@@ -21,12 +21,10 @@ Pick one of five difficulty levels, from easy to legend. Play with your keyboard
 ## Feature bullets (all true on this build)
 
 - Two ways to play from the title screen: FLIGHT (shoot-'em-up) and ON FOOT (side-view street run).
-- Five city districts: Bankenviertel, Mainufer, Ostend, Messe and Athina.
-- Boss fights: ten different bosses.
-- Nine selectable ships.
+- Flight stages 1 and 2, and the on-foot street level, each ending in a boss fight.
+- Unlock nine ships in the garage.
 - Dash and EMP buttons, plus a hull meter, so you decide when to take a risk.
 - Five difficulty levels: easy, normal, hard, very hard, legend.
-- Soundtrack: built-in synth music that follows the beat. (Do NOT claim an original song soundtrack, or a track count, until the owner has cleared the songs in `MUSIC-PROVENANCE.md` and removed them from `MUSIC-BLOCKED.txt`.)
 - Illustrated neon art: hundreds of pictures for ships, bosses, streets and skylines.
 - Download for Windows and Linux (unzip and run), or unzip and open PLAY.html in a browser. Keyboard or touch. Works offline. (macOS: no build yet.)
 
@@ -38,7 +36,7 @@ Pick one of five difficulty levels, from easy to legend. Play with your keyboard
 
 ## Price
 
-$5 suggested. Reason: one complete, polished mode set (flight and on foot, five districts, bosses, original soundtrack) that a player can finish a first session in, with no ads and no in-game purchases. $5 sits in the usual range for a small itch.io action game and is low enough for an impulse buy from the browser page.
+$5 suggested. Reason: one complete, polished mode set (flight stages 1 and 2, the on-foot street level, boss fights) that a player can finish a first session in, with no ads and no in-game purchases. $5 sits in the usual range for a small itch.io action game and is low enough for an impulse buy from the browser page.
 
 **Pricing setup that itch.io allows (sources and quotes in `SELL-PATH.md`):**
 - Kind of project: **Downloadable** (not HTML). itch.io: "it's possible to sell access to your game by setting its "Kind of Game" to "Downloadable"" and "Currently all HTML5 games on itch.io are set up to only take payments as donations."
