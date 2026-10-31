@@ -1,0 +1,109 @@
+{
+ "boot_s": 40.517,
+ "roam": {
+  "state": "roam",
+  "team": "Kronos Finanz",
+  "ride": null,
+  "RO_v": 0.5,
+  "RO_top": 40.74336,
+  "pl_v": 0.5,
+  "pl_top": 50.9,
+  "fov": 66.11120400122444,
+  "BX": {
+   "on": false,
+   "mode": "build",
+   "v": null,
+   "fov": null
+  },
+  "hud": [
+   "roam",
+   "touch"
+  ]
+ },
+ "list": [
+  "Race · Grand Prix",
+  "Race · Westhafen",
+  "Race · Fraport",
+  "Race · Skyline",
+  "Race · Nordschleife",
+  "Race · Twister",
+  "Race · Riverbank Rally",
+  "Cup · round 1",
+  "Time trial · Grand Prix",
+  "Zone · Grand Prix",
+  "Arena · Grand Prix",
+  "Derby · Grand Prix",
+  "Crash Jct · Grand Prix",
+  "Daily",
+  "World · ROSSI",
+  "World · WEBER",
+  "World · MOREAU",
+  "World · OKAFOR",
+  "World · FERREIRA",
+  "World · ÇELIK",
+  "World · BRANDT",
+  "World · NAKAMURA",
+  "World · KAISER (boss)"
+ ],
+ "race_load_s": 7.937,
+ "raceName": "Race · Grand Prix",
+ "race": {
+  "state": "countdown",
+  "team": "Kronos Finanz",
+  "ride": null,
+  "RO_v": 5.8,
+  "RO_top": 40.74336,
+  "pl_v": 0,
+  "pl_top": 61.1,
+  "fov": 62,
+  "BX": {
+   "on": false,
+   "mode": "build",
+   "v": null,
+   "fov": null
+  },
+  "hud": [
+   "hud",
+   "touch"
+  ]
+ },
+ "bx_load_s": 0.791,
+ "bxTrack": "CLIFF RUN",
+ "bx": {
+  "state": "countdown",
+  "team": "Kronos Finanz",
+  "ride": null,
+  "RO_v": 5.8,
+  "RO_top": 40.74336,
+  "pl_v": 0,
+  "pl_top": 61.1,
+  "fov": 62,
+  "BX": {
+   "on": true,
+   "mode": "drive",
+   "v": 0,
+   "fov": 55
+  },
+  "hud": [
+   "bx"
+  ]
+ },
+ "afterBx": {
+  "state": "countdown",
+  "team": "Kronos Finanz",
+  "ride": null,
+  "RO_v": 5.8,
+  "RO_top": 40.74336,
+  "pl_v": 0,
+  "pl_top": 61.1,
+  "fov": 62,
+  "BX": {
+   "on": false,
+   "mode": "build",
+   "v": 0,
+   "fov": 55
+  },
+  "hud": []
+ },
+ "errs": []
+}
