@@ -90,3 +90,9 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
    (f) Study other projects only where the licence lets you (MIT, BSD, Apache 2.0, CC-BY), and say which licence in the commit. Never
        read, copy or mine code or assets from a commercial game, including unofficial dumps or ports; describe the effect the owner wants
        and build it from our own or open-source code.
+
+19. RELEASE GOAL (owner, 31 Oct 2026: "fix the game to be playable, use as many workers as you want, make it ready to play and
+    sell at least $5"). The 24 Oct feature freeze is lifted for exactly this: (a) progression past stage 1 (stages 2-10 and their
+    bosses unlocked in order, saved), (b) the W247 player decision (games-src/nightrun/DESIGN-DECISION-W247.md), (c) a winnable
+    street boss on phone and PC, (d) release polish (text, licences, store package). Everything ships only with the gauntlet
+    proof (real input, seeds, minimums) and the W263 fairness gates; the owner's play is the final judge. Nothing else is unfrozen.
