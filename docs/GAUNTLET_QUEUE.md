@@ -117,3 +117,8 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - Started og2 (SONNET): races start from city markers and return you (S2).
 - Started flakes-r31d (SONNET): why/solid-cars, quiet-dirt, parked-jump deterministic (rule 15).
 - Paused: wallhit (head-on stop), density design (OPUS), tb redesign (OPUS), world round 4.
+
+## 31 Oct ~13:53
+- og1 review FAIL on feel (REVIEW_2K_43): the builder still runs its own physics with a slower launch (17 vs 20.5 m/s at 3 s), the camera sits further back (car 105 vs 180 px wide), and the car floats above the deck. The flag stays OFF; the code is safe on trunk. og1 round 2 (OPUS) starts at the next free worker slot, with the 3 items from the review.
+- og2 under review (review-r31-18, OPUS).
+- og3 (one HUD) running its gates. flakes-r31d nudged; it now also owns why/hud6 portrait + why/quiet-dirt.
