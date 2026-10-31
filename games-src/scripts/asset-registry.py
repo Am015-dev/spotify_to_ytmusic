@@ -179,7 +179,7 @@ def laptop_hits(names, paths):
 FOLDER = {"audio": "shared", "bosses": "boss", "core": "shared", "difficulty": "fly-stage", "districts": "fly-stage", "drills": "fly-stage", "enemies": "fly-stage",
           "fx": "fly-stage", "hangar": "hangar", "hud": "hud", "lab": "lab", "menus": "menus", "music": "shared", "powers": "fly-stage", "profile": "menus",
           "qa-hooks": "lab", "render": "fly-stage", "story": "story", "street": "street-stage", "waves": "fly-stage", "weapons": "fly-stage", "art": "shared"}
-FILE = {"menus/title.js": "title", "art/foeart.js": "fly-stage", "art/bulletart.js": "fly-stage", "art/fxwave.js": "fly-stage",
+FILE = {"menus/title.js": "title", "art/foeart.js": "fly-stage", "art/fxwave.js": "fly-stage",
         "weapons/forge.js": "hangar", "weapons/forgeone.js": "hangar", "weapons/forgeui.js": "hangar", "weapons/inventory.js": "hangar"}
 BOSSN = ("boss-", "spr-boss-", "anim-boss-", "kronos-", "messe-", "bruecken-", "flusskrake-", "hoplite-", "schranken-", "sek-", "talos-", "tresor-", "zentral-")
 PFX_SCREEN = [("title", "title"), (BOSSN, "boss"), (("foot/", "code:street-"), "street-stage"),

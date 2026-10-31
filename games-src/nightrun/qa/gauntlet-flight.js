@@ -9,7 +9,7 @@ const L = require('./lib.js'), { PW, sleep } = L, fs = require('fs');
 const SEED0 = +process.env.SEED0 || 0, WALL = +process.env.WALL || 150, SEEDS = +process.env.SEEDS || 8, STAGES = +process.env.STAGES || 10, PAR = +process.env.PAR || 4, TCAP = +process.env.TICKS || 900;
 const STRATS = (process.env.STRATS || 'idle,random,dodger,shooter').split(','), DEVS = (process.env.DEVS || 'phone,pc').split(','), SHOTS = process.env.SHOTS;
 const FOCUS0 = process.env.FOCUS0 === '1', STARTS = (process.env.STARTS || '').split(',').filter(Boolean).map(Number);   // FOCUS0=1: ?focus=0 (the result screen then offers NEXT STAGE); STARTS=2,5: begin at that story stage through the game's own startStory hook
-const DEV = { phone: { W: 390, H: 763, touch: true }, pc: { W: 1440, H: 860, touch: false } };
+const DEV = { phone: { W: 390, H: 763, touch: true }, pc: { W: 1440, H: 860, touch: false }, pkey: { W: 390, H: 763, touch: false, ua: true } };   // W302 pkey: phone UA + portrait (rotMode) driven by the keyboard: splits input path from geometry
 const rngOf = s => { let a = s * 2654435761 >>> 0 || 1; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
 const SEEDJS = s => `(()=>{let a=${s}*2654435761>>>0||1;Math.random=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
  window.__rej=[];addEventListener('unhandledrejection',e=>window.__rej.push(String(e.reason&&e.reason.message||e.reason).slice(0,160)));
@@ -86,7 +86,7 @@ const uiAudit = (p, phone) => p.evaluate(phone => { const out = [], R = []; for 
   for (let i = 0; i < R.length; i++) for (let j = i + 1; j < R.length; j++) { const a = R[i].r, b = R[j].r; const w = Math.min(a.right, b.right) - Math.max(a.left, b.left), h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); if (w > 4 && h > 4) out.push(`overlap ${R[i].id}/${R[j].id} ${w | 0}x${h | 0}`); } return out; }, phone);
 const shot = async (p, tag) => { if (SHOTS) await p.screenshot({ path: `${SHOTS}/${tag}.png` }).catch(() => { }); };
 async function openPage(br, devName, seed) {
-  const d = DEV[devName]; const ctx = await br.newContext({ viewport: { width: d.W, height: d.H }, deviceScaleFactor: 1, hasTouch: d.touch, isMobile: d.touch, userAgent: d.touch ? L.UA : undefined });
+  const d = DEV[devName]; const ctx = await br.newContext({ viewport: { width: d.W, height: d.H }, deviceScaleFactor: 1, hasTouch: d.touch, isMobile: d.touch, userAgent: d.touch || d.ua ? L.UA : undefined });
   const p = await ctx.newPage(); p.errs = []; p.cons = []; p.on('pageerror', e => p.errs.push(String(e.message).slice(0, 160))); p.on('console', m => { if (m.type() === 'error' && !/net::ERR_FAILED/.test(m.text())) p.cons.push(m.text().slice(0, 160)); }); p.on('requestfailed', r => { if (!/fonts\.(googleapis|gstatic)|^blob:/.test(r.url())) p.cons.push('requestfailed ' + r.url().replace(/^https?:\/\/[^/]+/, '').slice(0, 100)); }); p.on('response', r => { if (r.status() >= 400) p.cons.push('http ' + r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '').slice(0, 100)); });
   await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
