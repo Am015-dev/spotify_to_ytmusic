@@ -342,7 +342,7 @@ function BX_carOg(){const t=playerTeam(),key=teamIdx+'|'+JSON.stringify(gbBuild(
 // roam stats of that car: top = RO.top (roamStep: stats.top*.8*carStat().top), acc = stats.acc*TUNE.acc*carStat().acc, grip from the handling; BX_step keeps its piece/off-road/boat factors on top
 function BX_ogStats(s){const L=carStat(),same=typeof pl!=='undefined'&&pl&&pl.team&&(pl.team===s.team||pl.team.name===s.team.name)&&RO.top>0;
  return{top:same?RO.top:s.stats.top*.8*L.top,acc:s.stats.acc*TUNE.acc*L.acc,grip:11*(s.stats.han||1)*L.han}}
-function BX_ogInp(dt){if(BX.auto&&BX.v)return BX_input();const c=ctlPlayer(dt),k=BX_input(),b=c.brk>0||k.b?1:0,bo=!!c.boost;if(bo&&!BX.bo0)BX_boostGo();BX.bo0=bo;
+function BX_ogInp(dt){if(BX.auto&&BX.v)return BX_input();const c=ctlPlayer(dt),k=BX_input(),b=c.brk>0||k.b?1:0,bo=!!c.boost;if(bo&&!BX.bo0)BX_boostGo();BX.bo0=bo;{const on=(BX.v.boostE||0)>=.34;if(on!==BX.hcB){BX.hcB=on;document.body.classList.toggle('hcBoost',on)}} // the shared BOOST shows when a boost is ready (roam: 99hc hcBoost)
  return{s:Math.max(-1,Math.min(1,c.steer+k.s)),g:b?0:Math.max(c.thr,k.g),b}}
 function BX_ogCam(dt){const V=BX.v,cam=BX.cam,q=BX.og,D=BX.camD,C=RCAM[SET.rcam]||RCAM.chase,stick=V.on&&V.on.def.stick,sn=D.r==null,K=window.__skc||{tp:.6,tf:1.5,fr:7};dt=Math.min(.1,dt||0);
  const r0=Math.max(-.12,Math.min(1.4,Math.abs(V.v.dot(V.F))/Math.max(30,q.top))),bo=V.boost>0,air=!V.g&&!V.boat&&V.air>.3;
@@ -352,7 +352,7 @@ function BX_ogCam(dt){const V=BX.v,cam=BX.cam,q=BX.og,D=BX.camD,C=RCAM[SET.rcam]
  const want=V.p.clone().addScaledVector(D.f,-(b+.45*D.bE)).addScaledVector(up,h-.5+D.a),k=sn?1:1-Math.exp(-dt*(stick?14:10));D.p.lerp(want,k);D.up.lerp(up,1-Math.exp(-dt*5)).normalize();
  const gy=BX_h(D.p.x,D.p.z)+1;if(D.p.y<gy&&!stick)D.p.y=gy;cam.position.copy(D.p);cam.up.copy(D.up);cam.lookAt(V.p.clone().addScaledVector(D.f,C.l+C.lk*D.r).addScaledVector(up,C.ly-.5));
  const fv=typeof SKC_fv==='function'?SKC_fv(D.rF,D.bE,0):TUNE.fov;D.fov=sn||D.fov==null?fv:D.fov+Math.max(-K.fr*dt,Math.min(K.fr*dt,(fv-D.fov)*Math.min(1,dt*3)));cam.fov=D.fov;BX_sunAt(V.p)}
-function BX_dBtns(){return BX.og?['bxPz','bxRsp',...['tL','tR','tB','tG','tN'].filter(id=>{const e=$('#'+id),r=e&&e.getBoundingClientRect();return r&&r.width>0})]:BX_DRIVE_BTNS}
+function BX_dBtns(){return BX.og?['bxPz','bxRsp',...['btnZone','tB','tG','tN'].filter(id=>{const e=$('#'+id),r=e&&e.getBoundingClientRect();return r&&r.width>0&&getComputedStyle(e).visibility==='visible'})]:BX_DRIVE_BTNS}
 function BX_vmode(v){const ud=BX.carM&&BX.carM.userData;try{if(ud&&ud.gbV)CR_vis({vmode:v},ud)}catch(e){}
  if(!(ud&&ud.gbV&&ud.gbV.boat)&&BX.carM)BX.carM.position.y=v==='boat'?-.4:BX.carM.position.y}
 function BX_spawn(){const L=BX.pcs.filter(p=>!p.dead),st=L.find(p=>p.def.start)||L[0];let p,F;
@@ -362,7 +362,7 @@ function BX_driveStart(){BX.mode='drive';BX_after();const car=BX_car();BX.og=BX.
  BX.v={p:sp.p.clone(),v:sp.F.clone().multiplyScalar(2),F:sp.F.clone(),U:bxV(0,1,0),g:false,air:0,pk:sp.p.y,on:null,boat:false,steer:0,boost:0,safe:{p:sp.p.clone(),F:sp.F.clone()},lastCp:null,tMin:BX.th.reduce((a,b)=>Math.min(a,b),1e9),fallPk:-1e9,hist:[],sT:0,far:0,stuck:0,cpN:0,lap:0,cps:new Set(),msg:'',msgT:0,lastPc:null};
  BX.m={t:0,dist:0,air:0,airMax:0,jumps:0,yMin:1e9,yMax:-1e9,off:0,resp:0,wall:0,boat:0,boatSp:0,terrT:0,swaps:0,bump:0,pcs:new Set(),seen:BX.seenAll=BX.seenAll||new Set(),loops:0,laps:0,lapT:[],lap0:0,respWhy:[],lastLand:null,backT:null,respAt:null,backs:[]};BX_vmode('car');BX_ui();
  BX.camD={p:sp.p.clone().addScaledVector(sp.F,-9).add(bxV(0,4,0)),up:bxV(0,1,0)};if(BX.og)BX.fov0=BX.fov0||BX.cam.fov}
-function BX_ogShow(on){document.body.classList.toggle('bxOg',on);const t=$('#touch');if(t)t.hidden=!on;if(on){BX.touch=false;BX.bo0=1;if(TOUCH.on)TOUCH.used=true;const n=$('#tN');if(n&&!n.dataset.bx){n.dataset.bx=1;const go=()=>{if(BX.on&&BX.og&&BX.mode==='drive')BX_boostGo()};n.addEventListener('touchstart',go,{passive:true});n.addEventListener('mousedown',go)}}else if(BX.cam&&BX.fov0)BX.cam.fov=BX.fov0}
+function BX_ogShow(on){document.body.classList.toggle('bxOg',on);const t=$('#touch');if(t)t.hidden=!on;if(on){BX.touch=false;BX.bo0=1;if(TOUCH.on)TOUCH.used=true;const n=$('#tN');if(n&&!n.dataset.bx){n.dataset.bx=1;const go=()=>{if(BX.on&&BX.og&&BX.mode==='drive')BX_boostGo()};n.addEventListener('touchstart',go,{passive:true});n.addEventListener('mousedown',go)}}else{if(BX.cam&&BX.fov0)BX.cam.fov=BX.fov0;if(BX.hcB){BX.hcB=false;document.body.classList.remove('hcBoost')}}}
 function BX_driveStop(){BX.mode='build';BX_ogShow(false);if(BX.car)BX.sc.remove(BX.car,BX.shM);BX_after();BX_ui()}
 function BX_hud(){const V=BX.v,m=BX.m,H=$('#bxHud'),M=$('#bxMsg');if(!H)return;const cps=BX.pcs.filter(p=>!p.dead&&p.def.cp).length;
  H.textContent=`${Math.round(V.v.length()*3.6)} km/h · ${V.boat?'BOAT':'CAR'}${cps?' · CP '+V.cps.size+'/'+cps:''} · LAP ${Math.min(m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS}`;M.textContent=V.msgT>0?V.msg:'';const bo=$('#bxBo');if(bo){bo.style.setProperty('--e',(V.boostE||0).toFixed(2));bo.classList.toggle('rdy',(V.boostE||0)>=.34)}}
