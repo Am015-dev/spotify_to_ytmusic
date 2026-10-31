@@ -1,7 +1,7 @@
 // r3E (docs/REVIEW_2K_3.md #9 and other bugs): GO rv2k3/builder. BUILD opens a baseplate grid + START piece; centre 50 % of the canvas < 20 % pure black.
 // The test page runs with draw=0 (renderer.render is a stub), so the GO switches drawing on for ONE synchronous render and reads the canvas in the same task.
 function R3E_builderGo(){if(typeof BX==='undefined')return'📍 builder missing ❌';const T=window.__tq&&__tq.o,was=BX.on,IDS=['#menu','#topBtns','#hud','#touch'],hid=IDS.map(i=>{const e=$(i);return e?e.hidden:null});try{if(!BX.on)BX_open();const ok=b=>b?' ✅':' ❌',cam=BX.cam,d0=T&&T.draw;if(T)T.draw=1;
-  cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();BX_camBuild();renderer.setRenderTarget(null);renderer.render(BX.sc,cam);
+  cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();BX_camBuild();BX_draw();
   const cv=renderer.domElement,w=cv.width,h=cv.height,o=document.createElement('canvas');o.width=w;o.height=h;const x=o.getContext('2d',{willReadFrequently:true});x.drawImage(cv,0,0);if(T)T.draw=d0;
   const x0=Math.floor(w*.25),y0=Math.floor(h*.25),W=Math.floor(w*.5),H=Math.floor(h*.5),D=x.getImageData(x0,y0,W,H).data;let blk=0;for(let i=0;i<D.length;i+=4)if(D[i]<10&&D[i+1]<10&&D[i+2]<10)blk++;
   const pct=100*blk/(D.length/4),np=BX.pcs.filter(p=>!p.dead).length,gr=!!BX.gridG;
@@ -11,7 +11,7 @@ function R3E_visibleGo(){if(typeof BX==='undefined')return'📍 builder missing 
  try{try{if(typeof gbOpen==='function'&&($('#gbx')||{hidden:1}).hidden)gbOpen()}catch(e){}
   if(!BX.on)BX_open();
   const gb=$('#gbx'),cx=Math.floor(innerWidth/2),cy=Math.floor(innerHeight/2),top=document.elementFromPoint(cx,cy),cover=!!(gb&&!gb.hidden)||!!(top&&top.closest&&top.closest('#gbx')),T=window.__tq&&__tq.o,d0=T&&T.draw;if(T)T.draw=1;
-  BX.cam.aspect=innerWidth/innerHeight;BX.cam.updateProjectionMatrix();BX_camBuild();renderer.setRenderTarget(null);renderer.render(BX.sc,BX.cam);
+  BX.cam.aspect=innerWidth/innerHeight;BX.cam.updateProjectionMatrix();BX_camBuild();BX_draw();
   const cv=renderer.domElement,w=cv.width,h=cv.height,o=document.createElement('canvas');o.width=w;o.height=h;const x=o.getContext('2d',{willReadFrequently:true});x.drawImage(cv,0,0);if(T)T.draw=d0;
   const D=x.getImageData(Math.floor(w*.25),Math.floor(h*.25),Math.floor(w*.5),Math.floor(h*.5)).data;let blk=0;for(let i=0;i<D.length;i+=4)if(D[i]<10&&D[i+1]<10&&D[i+2]<10)blk++;
   const pct=100*blk/(D.length/4);let meshes=0;BX.sc.traverse(m=>{if(m.isMesh&&m.visible)meshes++});

@@ -143,3 +143,29 @@ async function OG3_hud(){const e0=OGG.errs;
   C.GO['onegame/hud']=[{c:'fra',n:'One HUD kit (3 modes)',secs:180,fn:()=>OG3_hud()}];return}
  if(i<600)setTimeout(()=>OG3_reg(i+1),100)})(0);
 window.__og3={run:OG3_hud,probe:OG3_probe,car:OG3_car};
+
+// ---- GO onegame/look (og4, one game S4): ONE look. The sky uniforms (SKYU.uTop) and the mood id are the same in free roam, the builder DRIVE and a Race Mode race;
+// BX.sc has no sky mesh or lights of its own (only the borrowed city shell); builder frames go through composer.render (> 0) and never renderer.render(BX.sc) to the screen.
+function OG4_look1(){return{mood:MOOD.id,top:SKYU.uTop.value.toArray().map(x=>+x.toFixed(3)),cl:!!(CLOUDS&&CLOUDS.parent&&CLOUDS.visible)}}
+function OG4_own(){const B=window.__bx&&__bx.BX,sh=(window.__bx&&__bx.og4&&__bx.og4.objs||[]).map(x=>x[0]),r={sky:0,lights:0,fog:null};if(!B||!B.sc)return r;
+ B.sc.traverse(o=>{if(sh.some(s=>s===o||o.parent===s&&s.isLight))return;if(o.isLight)r.lights++;if(o.isMesh&&o!==sky&&o.material&&o.material.isShaderMaterial&&o.material.side===THREE.BackSide)r.sky++});r.fog=B.sc.fog===scene.fog;return r}
+window.__og4={look:OG4_look1,own:OG4_own,cnt:()=>window.__og4c||null};
+async function OG4_look(){const e0=OGG.errs;
+ if(!OD_FLAG('og4')){const m=OG4_rmood({type:'race',mood:'night'});return m==='night'?'📍 ONE LOOK → ✅ PASS (flag og4 OFF: race moods and the builder scene unchanged)':'📍 ONE LOOK → ❌ FAIL (flag OFF but the race night became '+m+')'}
+ for(let k=0;k<200&&!(state==='roam'&&pl&&RO.built&&!LD.busy);k++)await ogWait(100);if(!(state==='roam'&&pl))return'📍 ONE LOOK → ❌ FAIL (no roam)';
+ await ogWait(600);const R={roam:OG4_look1()},bad=[];
+ try{await XC_need('98b2_builder2')}catch(e){}for(let k=0;k<100&&!(window.__bx&&window.__bx.raceStart);k++)await ogWait(100);const X=window.__bx;
+ if(X){X.raceStart('CLIFF RUN');await ogWait(1200);const B=X.BX,c={comp:0,dir:0},cr=composer.render,rr=renderer.render;
+  composer.render=function(){if(B.on)c.comp++;return cr.apply(this,arguments)};renderer.render=function(sc){if(sc===B.sc&&renderer.getRenderTarget()===null)c.dir++;return rr.apply(this,arguments)};
+  try{await ogWait(1500)}finally{composer.render=cr;renderer.render=rr}window.__og4c=c;R.bx={...OG4_look1(),own:OG4_own(),comp:c.comp,dir:c.dir};try{X.close()}catch(e){}await ogWait(800);R.back=OG4_look1()}else bad.push('builder chunk not loaded');
+ if(window.__rm){const L=window.__rm.list(),i=Math.max(0,L.findIndex(n=>/race|grand/i.test(n)&&!/city|duel|sprint/i.test(n)));window.__rm.open(i);
+  for(let k=0;k<300&&!(state==='race'||state==='countdown');k++)await ogWait(100);await ogWait(1500);R.race=OG4_look1();R.raceN=L[i]}else bad.push('__rm missing');
+ const M=[R.roam,R.bx,R.race].filter(Boolean),same=(a,b)=>a.mood===b.mood&&a.top.every((v,j)=>Math.abs(v-b.top[j])<.002);
+ if(M.length===3&&!M.every(m=>same(m,M[0])))bad.push('mood/sky differ: '+['roam','builder','race'].map((n,j)=>n+' '+M[j].mood+' '+M[j].top).join(' / '));
+ if(R.bx){const o=R.bx.own;if(o.sky)bad.push('BX.sc own sky meshes '+o.sky);if(o.lights)bad.push('BX.sc own lights '+o.lights);if(!o.fog)bad.push('BX.sc fog not shared');if(!(R.bx.comp>0))bad.push('builder composer.render count 0');if(R.bx.dir)bad.push('direct renderer.render(BX.sc) '+R.bx.dir);if(!R.bx.cl)bad.push('no brick clouds in the builder')}
+ if(R.race&&!R.race.cl)bad.push('no brick clouds in the race');if(R.back&&R.roam&&R.back.mood!==R.roam.mood)bad.push('roam mood after the builder '+R.back.mood+' (was '+R.roam.mood+')');
+ const err=OGG.errs-e0;window.__ogRes4=R;
+ return`📍 ONE LOOK · roam ${R.roam.mood} · builder ${R.bx?R.bx.mood+' (own sky '+R.bx.own.sky+', own lights '+R.bx.own.lights+', composer '+R.bx.comp+', direct '+R.bx.dir+')':'—'} · race ${R.race?R.race.mood:'—'} · ${err} page errors → ${bad.length||err?'❌ FAIL ('+bad.concat(err?[err+' errors']:[]).join('; ')+')':'✅ PASS'}`}
+(function OG4_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='onegame'&&q.id==='look'))C.items.push({ver:'onegame',id:'look',area:'race',text:'og4 · onegame/look: one look: the sky uniform and the mood id are the same in free roam, the builder DRIVE and a Race Mode race; BX.sc has no own sky mesh or lights; builder frames go through composer.render (> 0) and direct renderer.render(BX.sc) is 0; brick clouds in all 3; flag OFF: nothing changed'});
+  C.GO['onegame/look']=[{c:'fra',n:'One look (3 modes)',secs:150,fn:()=>OG4_look()}];return}
+ if(i<600)setTimeout(()=>OG4_reg(i+1),100)})(0);

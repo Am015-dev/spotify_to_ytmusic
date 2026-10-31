@@ -119,7 +119,7 @@ function startRace(){if(!RO.launching)RO.sprId=null;$('#tF').textContent='FIRE';
       :menuTab==='arena'?{type:'arena',laps:9999,traffic:quickTraffic?8:0,items:true,aggr:.2}
       :menuTab==='derby'?{type:'arena',derby:true,laps:9999,traffic:0,items:false,aggr:.75}
       :menuTab==='junction'?{type:'junction',laps:9999,traffic:46,items:false,aggr:0}
-      :{type:'race',laps:tk.laps,traffic:quickTraffic?20:0,items:true,aggr:.15};cfg.track=menuTrack;cfg.mirror=menuMirror;cfg.mood=menuMood}
+      :{type:'race',laps:tk.laps,traffic:quickTraffic?20:0,items:true,aggr:.15};cfg.track=menuTrack;cfg.mirror=menuMirror;cfg.mood=menuMood;cfg.moodPick=1}
   setupRace(cfg);if(pl&&PK.has('crown')){pl.stats.top*=1.03;pl.stats.top0*=1.03}if(pl&&PK.has('start')&&cfg.items)pl.item=pickItem(pl);prevPlace=0;radioCd=0;if(RC.world){const r=ships.find(s=>s.pid===RC.world.p);say(RC.boss?(RC.world.p==='DRAKOS'?'AKROPOLIS CUP FINAL':'GRAND ARENA'):'RIVAL RACE',PD[RC.world.p].full.toUpperCase()+' · '+(RC.boss?'BOSS':SIG[RC.world.sig].toUpperCase()),2.2);if(r){const ln=RC.world.line;setTimeout(()=>{if(state==='race'||state==='countdown')radioLine(r,ln)},2500)}}if(RC.season){const S=season();say(RC.round.name.toUpperCase(),LEAGUES[S.L].name.toUpperCase()+' · ROUND '+(S.r+1)+'/5'+(RC.round.dbl?' · DOUBLE POINTS':''),2.2)}const nm=ships.find(s=>s.nem);if(nm)setTimeout(()=>{if(state==='countdown'||state==='race')radio(nm,'intro')},2600);if(RC.season){}else if(RC.ev)say(RC.ev.name.toUpperCase(),RC.ev.sub.toUpperCase(),2.2);else if(RC.type==='duel'&&!duelGhost)say('GHOST DUEL','NO GHOST YET · SET THE PACE',2.2);else say(RC.daily?'DAILY':'',RC.daily?setLabel().toUpperCase():'',RC.daily?2.2:0);document.body.classList.add('racing')}
 $('#startBtn').onclick=startRace;
 

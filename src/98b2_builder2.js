@@ -299,7 +299,7 @@ function BX_trees(){if(BX.trM){BX.sc.remove(BX.trM);BX.trM=null}const T=[],RK=[]
 function BX_bld(){if(BX.bM){BX.sc.remove(BX.bM);BX.bM=null}if(!BX.bld||!BX.bld.length)return;const g=BX.bM=new THREE.Group();
  for(const b of BX.bld){const geo=new THREE.BoxGeometry(b.w,b.h,b.d),c=bxCol(b.c),col=[];for(let i=0;i<geo.attributes.position.count;i++)col.push(c.r,c.g,c.b);geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
   const uv=geo.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*b.w/6,uv.getY(i)*b.h/6);const m=new THREE.Mesh(geo,BX_mats().bld);m.position.set(b.x,b.y+b.h/2,b.z);m.castShadow=m.receiveShadow=true;g.add(m)}BX.sc.add(g)}
-function BX_scene(){if(BX.sc)return;const sc=BX.sc=new THREE.Scene();BX_mats();
+function BX_scene(){if(BX.sc)return;const sc=BX.sc=new THREE.Scene();BX_mats();if(!OG4){
  const sky=new THREE.Mesh(new THREE.SphereGeometry(900,24,12),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader:'varying vec3 vp;void main(){vp=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
   fragmentShader:'varying vec3 vp;void main(){float h=clamp(normalize(vp).y,0.,1.);gl_FragColor=vec4(mix(vec3(.62,.82,1.),vec3(.08,.36,.86),pow(h,.55)),1.);}'}));sc.add(sky);
  sc.fog=new THREE.Fog(0xa9d3ff,260,700);sc.add(new THREE.HemisphereLight(0xcfe8ff,0x4f8f3a,1.1));
@@ -309,8 +309,8 @@ function BX_scene(){if(BX.sc)return;const sc=BX.sc=new THREE.Scene();BX_mats();
  const base=new THREE.Mesh(new THREE.PlaneGeometry(1600,1600),new THREE.MeshStandardMaterial({color:0x4fb33a,roughness:.9}));base.rotation.x=-Math.PI/2;base.position.y=-9;sc.add(base);
  // a few brick clouds (sparse: lesson 10, no white ceiling)
  const cm=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.9});for(let i=0;i<9;i++){const g=new THREE.Group();for(let j=0;j<3;j++){const b=new THREE.Mesh(new THREE.BoxGeometry(18-j*4,5,10-j*2),cm);b.position.set(j*7-7,j===1?3:0,0);g.add(b)}
-  const a=i/9*Math.PI*2;g.position.set(Math.cos(a)*420,110+(i%3)*25,Math.sin(a)*420);g.lookAt(0,g.position.y,0);sc.add(g)}
- BX.gP=new THREE.Group();sc.add(BX.gP);BX.cam=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.3,1500);BX.ray=new THREE.Raycaster();
+  const a=i/9*Math.PI*2;g.position.set(Math.cos(a)*420,110+(i%3)*25,Math.sin(a)*420);g.lookAt(0,g.position.y,0);sc.add(g)}}
+ BX.gP=new THREE.Group();sc.add(BX.gP);BX.cam=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.3,OG4?2400:1500);BX.ray=new THREE.Raycaster();
  BX.fx=BX_fxInit()}
 // splash / dust bricks (one small pool)
 function BX_fxInit(){const n=60,m=new THREE.InstancedMesh(new THREE.BoxGeometry(.5,.35,.5),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.4}),n);m.count=n;m.frustumCulled=false;
@@ -331,6 +331,21 @@ function BX_car(){if(BX_og())return BX_carOg();if(BX.car&&!BX.carT)return BX.car
  const sh=new THREE.Mesh(new THREE.CircleGeometry(1.7,20),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.22,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4}));sh.rotation.x=-Math.PI/2;BX.shM=sh;
  BX.car=root;return root}
 // og1 (one game S1, docs/DESIGN_one_game.md): the builder DRIVE is a mode on the shared car core: makeShip (same mesh + garage loadout as roam), roam stats, roam RCAM chase + SKC FOV, ctlPlayer + #touch
+// og4 (one game S4, docs/DESIGN_one_game.md): one look. Under ?og4=1 the builder has no sky, fog, lights or clouds of its own: it borrows the city's shell
+// (sky dome + SKYU, brick clouds, hemi + sun (moonL) + shipKey, fog, env map) into BX.sc for as long as it is open, renders through the shared composer (post, bloom,
+// grade) and sets applyMood('brick'); BX_close hands everything back exactly as it was. Flag OFF: unchanged (the own copies stay until og4 ships ON).
+const OG4=OD_FLAG('og4'),OG4S={on:0};
+function BX_draw(){if(OG4){composer.render();return}const R=renderer;R.setRenderTarget(null);R.render(BX.sc,BX.cam)}
+function OG4_shell(on){const S=OG4S,rp=composer.passes[0],sh=moonL.shadow,c=sh.camera,F=FX.uniforms;
+ if(on){if(S.on)return;S.on=1;S.mo=MOOD;S.cl=!!(CLOUDS&&CLOUDS.parent);S.clv=CLOUDS?CLOUDS.visible:1;OG4_cl();
+  S.objs=[sky,CLOUDS,hemi,moonL,moonL.target,shipKey].filter(Boolean).map(o=>[o,o.parent]);for(const[o]of S.objs)BX.sc.add(o);
+  S.sh={cast:moonL.castShadow,ms:sh.mapSize.x,c:[c.left,c.right,c.top,c.bottom,c.near,c.far],b:sh.bias,nb:sh.normalBias,p:moonL.position.clone(),t:moonL.target.position.clone(),en:renderer.shadowMap.enabled};
+  const ms=lowGfx?1024:2048;moonL.castShadow=true;if(sh.mapSize.x!==ms){sh.mapSize.set(ms,ms);if(sh.map){sh.map.dispose();sh.map=null}}c.left=c.bottom=-70;c.right=c.top=70;c.near=1;c.far=400;c.updateProjectionMatrix();sh.bias=-.0006;sh.normalBias=.08;
+  BX.sun=moonL;applyMood(CCF.mood||'brick');try{if(ENVD)buildEnv()}catch(e){}BX.sc.fog=scene.fog;BX.sc.environment=scene.environment;BX.sc.environmentIntensity=scene.environmentIntensity;
+  S.fx={};for(const k of['uSpeed','uBoost','uCA','uCAk','uFlash','uHit','uMirror']){S.fx[k]=F[k].value;F[k].value=0}S.rp=[rp.scene,rp.camera];rp.scene=BX.sc;rp.camera=BX.cam;return}
+ if(!S.on)return;S.on=0;rp.scene=S.rp[0];rp.camera=S.rp[1];for(const k in S.fx)F[k].value=S.fx[k];for(const[o,p]of S.objs)if(p)p.add(o);else if(o.parent)o.parent.remove(o);
+ const v=S.sh;moonL.castShadow=v.cast;if(sh.mapSize.x!==v.ms){sh.mapSize.set(v.ms,v.ms);if(sh.map){sh.map.dispose();sh.map=null}}[c.left,c.right,c.top,c.bottom,c.near,c.far]=v.c;c.updateProjectionMatrix();sh.bias=v.b;sh.normalBias=v.nb;
+ moonL.position.copy(v.p);moonL.target.position.copy(v.t);moonL.target.updateMatrixWorld();renderer.shadowMap.enabled=v.en;if(CLOUDS){CLOUDS.visible=S.clv;if(!S.cl)cloudsOn(false)}const m=S.mo;if(MOODS.includes(m)||ATHM.includes(m)||typeof FL_apply!=='function'||state!=='roam')applyMood(m.id);else FL_apply(FL_time(),true)}
 function BX_og(){return BX.og1f!=null?!!BX.og1f:OD_FLAG('og1')}
 function BX_carDrop(){if(!BX.car)return;if(BX.sc)BX.sc.remove(BX.car,BX.shM);if(BX.carT)try{disposeTree(BX.car,true)}catch(e){}BX.car=BX.carT=BX.ship=null}
 function BX_carOg(){const t=playerTeam(),key=teamIdx+'|'+JSON.stringify(gbBuild()||0);if(BX.car&&BX.carT===key)return BX.car;BX_carDrop();
@@ -462,14 +477,14 @@ function BX_camDrive(dt){const V=BX.v,cam=BX.cam,D=BX.camD,air=!V.g&&!V.boat&&V.
  const up=stick?V.U.clone():bxV(0,1,0).lerp(V.U,.35).normalize(),Fh=V.F.clone();if(!stick){Fh.y*=.4;Fh.normalize()}
  const want=V.p.clone().addScaledVector(Fh,air?-10:-6.4).addScaledVector(up,air?4.2:2.3),k=1-Math.exp(-dt*(stick?14:6));D.p.lerp(want,k);D.up.lerp(up,1-Math.exp(-dt*5)).normalize();
  const gy=BX_h(D.p.x,D.p.z)+1;if(D.p.y<gy&&!stick)D.p.y=gy;cam.position.copy(D.p);cam.up.copy(D.up);cam.lookAt(V.p.clone().addScaledVector(Fh,4).addScaledVector(up,1.1));BX_sunAt(V.p)}
-function BX_sunAt(t){const s=BX.sun;s.position.set(t.x+60,t.y+120,t.z+40);s.target.position.copy(t);s.target.updateMatrixWorld()}
+function BX_sunAt(t){const s=BX.sun;if(!s)return;if(OG4){const k=MOOD.key[2],l=Math.hypot(k[0],k[1],k[2])||1;s.position.set(t.x+k[0]/l*150,t.y+k[1]/l*150,t.z+k[2]/l*150)}else s.position.set(t.x+60,t.y+120,t.z+40);s.target.position.copy(t);s.target.updateMatrixWorld()}
 // ---------------------------------------------------------------- frame
 function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/1000);BX.last=now;BX.t+=dt;const cam=BX.cam;cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
  const camF=BX.og?BX_ogCam:BX_camDrive;if(BX.mode==='drive'&&BX.hold){camF(0)}else if(BX.mode==='drive'){const inp=BX.inp=(BX.og?BX_ogInp:BX_input)(dt);BX.acc+=dt;let n=0;while(BX.acc>=1/120&&n<10){BX_step(1/120,inp);BX.acc-=1/120;n++}BX_farCheck(dt);
   const V=BX.v;BX_pose();
   if(V.msgT>0)V.msgT-=dt;camF(dt);BX_hud()}else BX_camBuild();
  BX_fxStep(dt);if(BX.chevMat)BX.chevMat.emissiveIntensity=.5+.2*Math.sin(BX.t*7);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
- BX.rf=(BX.rf||0)+1;if(BX.tfast&&BX.rf%6&&!BX.shotNow)return;BX.shotNow=0;const R=renderer;R.setRenderTarget(null);R.render(BX.sc,cam)}
+ BX.rf=(BX.rf||0)+1;if(BX.tfast&&BX.rf%6&&!BX.shotNow)return;BX.shotNow=0;BX_draw()}
 // ---------------------------------------------------------------- input (keys + touch buttons; gas is on by default on touch)
 addEventListener('keydown',e=>{if(!BX.on)return;BX.keys[e.code]=1;if(BX.mode==='drive'&&e.code==='KeyR')BX_respawn('key');if(e.code==='Escape')BX.mode==='drive'?BX_driveStop():BX_close();e.stopImmediatePropagation()},true);
 addEventListener('keyup',e=>{if(!BX.on)return;BX.keys[e.code]=0;e.stopImmediatePropagation()},true);
@@ -567,9 +582,9 @@ function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=
  add('✚ NEW EMPTY TRACK',()=>{BX_load({log:[['w','valley']]},'MY TRACK');BX_seed()});add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
 const BX_DEMOS={};
 // ---------------------------------------------------------------- open / close
-function BX_open(){try{const g=$('#gbx');if(g&&!g.hidden)gbClose(false)}catch(e){}BX_scene();try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
+function BX_open(){try{const g=$('#gbx');if(g&&!g.hidden)gbClose(false)}catch(e){}BX_scene();if(OG4)OG4_shell(1);try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);if(!OG4)BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
  if(!BX.log.length){BX.log=[['w','valley']];BX_replay()}else BX_buildAll();BX.camGo=1;BX_ui();BX_seed()}
-function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mode==='drive')BX_driveStop();BX_ogShow(false);{const t=$('#touch');if(t&&BX.ogT0!=null)t.hidden=!!BX.ogT0;BX.ogT0=null}if(OG3){const c=document.querySelector('#hkMap canvas');if(c)c.width=84;if(state==='roam'){const t=$('#touch');if(t)t.hidden=!TOUCH.on}}const R=$('#bx');if(R)R.remove();$('#menu').hidden=false;$('#topBtns').hidden=false;try{resize()}catch(e){}}
+function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mode==='drive')BX_driveStop();if(OG4)OG4_shell(0);BX_ogShow(false);{const t=$('#touch');if(t&&BX.ogT0!=null)t.hidden=!!BX.ogT0;BX.ogT0=null}if(OG3){const c=document.querySelector('#hkMap canvas');if(c)c.width=84;if(state==='roam'){const t=$('#touch');if(t)t.hidden=!TOUCH.on}}const R=$('#bx');if(R)R.remove();$('#menu').hidden=false;$('#topBtns').hidden=false;try{resize()}catch(e){}}
 frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try{BX_tick(now)}catch(e){console.error(e);BX.on=false}})(frame);
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
 
@@ -747,7 +762,7 @@ function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(c
  BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();BX.auto=null;if(T.drive)BX_driveStart();if(T.race)BX_raceSetup();
  if(T.auto)BX.auto={W:BX_lap([0,0,0]).map(o=>o.s.p),st:{i:0}};return T.n} // trk-4: auto = the AI drives the lap you watch (the check runs the same autopilot in fast time)
 window.BX=BX;   // lazy-split: the builder is a lazy chunk (src/LAZY), so eager code (98v_r3_levels typeof BX) and the checklist chunk see it on window
-window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
+window.__bx={BX,og4:OG4S,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
  proj:(x,y,z)=>{const v=bxV(x,y,z).project(BX.cam);return[(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z<1?1:0]},
  cell:(i,j,l)=>{const p=bxV(BXO+(i+.5)*BXC,l==null?BX_h(BXO+(i+.5)*BXC,BXO+(j+.5)*BXC):l*BXH,BXO+(j+.5)*BXC).project(BX.cam);return[(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]},
  ghostXY:()=>{const pc=BX_mk(BX.sel,BX.cur,-1);if(!pc)return null;const s=pc.S[0][Math.floor(pc.S[0].length/2)],v=s.p.clone().project(BX.cam);return[(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight]},
