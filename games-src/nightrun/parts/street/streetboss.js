@@ -31,8 +31,8 @@ const TEL={swing:1.0,charge:1.05,pound:1.1},  // telegraph start -> hit (s)
   CAMP=4,                                 // s without an attack -> a CHARGE (gap-closer)
   REACH=120,POUNDR=560,CHV=600,CHT=.6,    // swing reach, pound reach (px), charge speed (px/s) and time (s)
   GAP=150,BACKV=110,WALKV=110,            // run-up before a charge (px), its back-off and walk speeds (px/s)
-  ENR=.8, ENRAT=.5,                        // W309: at half hp the telegraphs run ENR x as long (the read part shrinks, the commit CUT stays)
-  HPK=8;                                  // boss hp = 36 x HPK
+  ENR=.9, ENRAT=.5,                        // W309: at half hp the telegraphs run ENR x as long (the read part shrinks, the commit CUT stays)
+  HPK=7;                                  // boss hp = 36 x HPK
 const NL={beam:1};   // not a limb: the charge's body and the pound's ground band skip streetreach.js's fist-tip test (its own bypass flag)
 const SB=F.SB={log:[],fx:[],flash:0};   // per fight: {at:[[attack,t,result]]} for the probes; fx / flash: the duel's own drawn words (purefoot.js calls SB.draw)
 const tt=(e,a)=>TEL[a]*(e&&e.tm||1);   // W309: telegraph length (the enraged half is ENR x shorter)

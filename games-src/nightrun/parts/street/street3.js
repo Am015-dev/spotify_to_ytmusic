@@ -45,7 +45,7 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   const bc=Math.min(ST.boss.x-vw/2,ST.len-vw);
   const alive0=S.E.some(e=>!e.dead&&!e.boss);
   f.clr=(RET.cam2&&S.camX>=bc-4&&!alive0)?(f.clr||0)+dt:0;   // W318: camera at its stop and no foe alive: seconds the street has been clear
-  const wq=f.waves.find(w=>w.left.length);if(f.clr>=8&&wq&&!S.bossOn)wq.next=Math.min(wq.next,S.time);   // W318: a cleared street calls the next wave at once (no pinned wait); the whole ramp still comes, so the attrition is the same
+  const wq=f.waves.find(w=>w.left.length);if(f.clr>=10&&wq&&!S.bossOn)wq.next=Math.min(wq.next,S.time);   // W318: a cleared street calls the next wave at once (no pinned wait); the whole ramp still comes, so the attrition is the same
   if(!S.bossOn&&((f.gate>=bc-40&&(!alive0||S.time>S3.T.boss+12))||(f.clr>=2&&!wq))){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.2;f.boss=+S.time.toFixed(1);
     if(!S.bres)S.bcp={x:P.x,camX:S.camX,time:S.time,score:S.score,kills:S.kills,hurts:S.hurts,hp:P.hp,w:P.w,lv:P.lv,ammo:P.ammo,bombs:P.bombs};   // W320: the boss checkpoint, taken when the big heavy is called
     for(let i=0;i<Math.min(2,P.max-P.hp);i++){f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*(60+50*i),S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}}   // up to two heals as the big heavy walks in (its charge hits for 2)   // the boss comes in quietly (no warning sting), once the street is clear (12 s at most)
