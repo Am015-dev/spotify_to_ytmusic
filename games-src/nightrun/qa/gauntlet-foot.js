@@ -86,7 +86,7 @@ function strategy(name, rnd) {
     return w; };
   if (name === 'duelist' || name === 'late') {   // W290: reads the big heavy's telegraph (SWING -> GUARD, CHARGE -> DASH through, POUND -> JUMP) and answers it RT s after it starts (game time), then punishes the OPEN boss
     // W300: before the boss both play the street as the W286 'dodger' (the 'tactician' lost every run to rushers before the boss)
-    const RT = name === 'late' ? () => .6 : () => .25 + rnd() * .1, ANS = { swing: 'guard', charge: 'dash', pound: 'jump' }, pre = strategy('dodger', rnd);
+    const RT = name === 'late' ? () => .45 + rnd() * .3 : () => .25 + rnd() * .1, ANS = { swing: 'guard', charge: 'dash', pound: 'jump' }, pre = strategy('dodger', rnd);
     let tid = -1, R = 0, t0 = 0, key = null, kT = -9, stun0 = -1, Rp = 0;
     return s => {
       const B = s.E.find(e => e.b && !e.d); if (!B || !s.bossOn) return pre(s);

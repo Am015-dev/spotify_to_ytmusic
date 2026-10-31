@@ -23,18 +23,20 @@ const DMG={swing:1,charge:2,pound:1};
 // Tuning block (BALANCE-W290.md): shipped defaults, no flags.
 const TEL={swing:1.0,charge:1.05,pound:1.1},  // telegraph start -> hit (s)
   CUT={swing:.44,charge:.39,pound:.28},   // the last CUT s of a telegraph: the boss commits (READ ends at .56 / .66 / .82 s)
-  GRACE=.18,                              // an answer up to GRACE s after the READ end still counts (accepted until .69 / .79 / .95 s); later = TOO LATE (W300 PC late reader: .75/.85 4/4, .70/.82 3/4, .70/.80 4/4, .68/.78 1/4)
-  TGRACE=.02,                             // + on a touch screen (tap latency; phone late reader: +0 at .70/.82 0/4, +0 at .75/.85 3/4, +.08 at .70/.80 4/4)
+  GRACE=.28,                              // an answer up to GRACE s after the READ end still counts (accepted until .69 / .79 / .95 s); later = TOO LATE (W300 PC late reader: .75/.85 4/4, .70/.82 3/4, .70/.80 4/4, .68/.78 1/4)
+  TGRACE=.09,                             // + on a touch screen (tap latency; phone late reader: +0 at .70/.82 0/4, +0 at .75/.85 3/4, +.08 at .70/.80 4/4)
   PUN=1.6,                                // punish window after a right answer (s; stun = x2 damage)
   REC=.9,                                 // after a missed / wrong attack: it shakes it off, no punish (s)
   GAPT=.9,                                // between attacks: it walks (s)
   CAMP=4,                                 // s without an attack -> a CHARGE (gap-closer)
   REACH=120,POUNDR=560,CHV=600,CHT=.6,    // swing reach, pound reach (px), charge speed (px/s) and time (s)
   GAP=150,BACKV=110,WALKV=110,            // run-up before a charge (px), its back-off and walk speeds (px/s)
-  HPK=6;                                  // boss hp = 36 x HPK
+  ENR=.8, ENRAT=.5,                        // W309: at half hp the telegraphs run ENR x as long (the read part shrinks, the commit CUT stays)
+  HPK=8;                                  // boss hp = 36 x HPK
 const NL={beam:1};   // not a limb: the charge's body and the pound's ground band skip streetreach.js's fist-tip test (its own bypass flag)
 const SB=F.SB={log:[],fx:[],flash:0};   // per fight: {at:[[attack,t,result]]} for the probes; fx / flash: the duel's own drawn words (purefoot.js calls SB.draw)
-const acc=a=>{const L=IN.L();return TEL[a]-CUT[a]+GRACE+(L&&L.touch?TGRACE:0);};   // last moment an answer counts
+const tt=(e,a)=>TEL[a]*(e&&e.tm||1);   // W309: telegraph length (the enraged half is ENR x shorter)
+const acc=(a,e)=>{const L=IN.L();return tt(e,a)-CUT[a]+GRACE+(L&&L.touch?TGRACE:0);};   // last moment an answer counts
 const p0=d.pose,a0=d.ai;
 function go(e,s){e.state=s;e.sT=0;}
 function keys(){return {guard:!!(I.guard||I.guardP),dash:!!(I.dash||I.dashP),jump:!!(I.jump||I.jumpP)};}
@@ -43,14 +45,14 @@ function scr(e,env,x){const G=env.G,h=e.fw||e.w/2;return clamp(x,G.camX+h,G.camX
 function cx(e,env){const G=env.G,m=Math.min(170,G.viewW/2);return Math.max(G.camX+m,Math.min(G.camX+G.viewW-m,e.x));}   // captions stay on screen on a phone
 function shake(S,v){S.shake=Math.max(S.shake||0,v);}
 function say(t,c,l,big){SB.fx.push({t,c,l,m:l,big});if(SB.fx.length>4)SB.fx.shift();}
-function tel(e,a,S,env){e.atk=a;e.ans=null;e.tid=(e.tid|0)+1;go(e,'sb_tel');e.tele=0;e.sbT=TEL[a];e.facing=sgn(S.P.x-e.x);
+function tel(e,a,S,env){e.atk=a;e.ans=null;e.tid=(e.tid|0)+1;go(e,'sb_tel');e.tele=0;e.tm=e.hp<=e.max*ENRAT?ENR:1;e.sbT=tt(e,a);e.facing=sgn(S.P.x-e.x);
   e.L.at.push([a,+S.time.toFixed(2),'']);IN.sfx(SND[a]);}
 function done(e,S,res){const r=e.L.at[e.L.at.length-1];if(r)r[2]=res;e.last=S.time;e.tele=0;e.sbT=0;e.label='';}
 function punish(e,S,env){done(e,S,'right');IN.hitstop(70);IN.sfx('big');say(GOOD[e.atk],'#7dff8a',.9,1);go(e,'stun');e.stun=PUN;e.vx=0;}
 function miss(e,S,res){done(e,S,res);e.hitd=0;go(e,'sb_rec');e.vx=0;}
 d.pose=e=>e.state==='sb_tel'?POSE[e.atk]:e.state==='sb_go'?(e.atk==='pound'?'crouch':e.atk==='charge'?'run-a':'melee'):e.state==='stun'?'hit':e.state==='sb_rec'?'idle':p0(e);
 // drawn scale per state (purefoot.js reads e.dsc): the telegraph pose grows into its shape over the READ part and holds it in the commit
-function dsc(e){if(e.state!=='sb_tel'&&!(e.state==='sb_go'&&e.atk==='charge')){e.dsc=e.state==='stun'?[1,.94]:null;return;}const q=DSC[e.atk],k=e.state==='sb_go'?1:Math.min(1,e.sT/(TEL[e.atk]-CUT[e.atk]));e.dsc=[1+(q[0]-1)*k,1+(q[1]-1)*k];}
+function dsc(e){if(e.state!=='sb_tel'&&!(e.state==='sb_go'&&e.atk==='charge')){e.dsc=e.state==='stun'?[1,.94]:null;return;}const q=DSC[e.atk],k=e.state==='sb_go'?1:Math.min(1,e.sT/(tt(e,e.atk)-CUT[e.atk]));e.dsc=[1+(q[0]-1)*k,1+(q[1]-1)*k];}
 d.ai=function(e,dt,env){const S=F.S,P=env.P;
   if(e.state==='dead'||!e._i)return a0.apply(this,arguments);
   if(!e._sb){e._sb=1;e.hp=e.max=e.maxHp=e.mhp=e.max*HPK;e.i=0;e.last=S.time;e.L={at:[]};SB.log.push(e.L);S.sbL=e.L;e.bname='BIG HEAVY';go(e,'sb_walk');}
@@ -66,9 +68,9 @@ function ai1(e,dt,env,S,P,dx,st){
     if(nxt==='charge'&&abs(dx)<GAP&&e.sT<GAPT+.8){const nx=scr(e,env,e.x-sgn(dx)*BACKV*dt);if(abs(nx-e.x)>BACKV*dt*.5){e.x=nx;e.vx=-sgn(dx)*BACKV;return;}}   // run-up: backs off first (no room behind it: charges from where it stands)
     if(nxt==='pound'&&abs(dx)>POUNDR-80){walkTo(e,env,dx,dt,nxt);return;}
     if(!camp)e.i++;e.vx=0;tel(e,nxt,S,env);return;}
-  if(st==='sb_tel'){e.vx=0;const T=TEL[e.atk],k=edge(e);e.tele=0;e.sbT=Math.max(0,T-e.sT);
+  if(st==='sb_tel'){e.vx=0;const T=tt(e,e.atk),k=edge(e);e.tele=0;e.sbT=Math.max(0,T-e.sT);
     if(e.sT<T-CUT[e.atk])e.facing=sgn(dx);   // it tracks Kai in the read part, then commits to that side
-    if(k&&!e.ans){e.ans=e.sT<=acc(e.atk)?k:'late';const r=e.L.at[e.L.at.length-1];if(r){r[3]=+e.sT.toFixed(3);r[4]=k;}}   // W304: the log keeps when (s after the telegraph started) and which key the first answer came   // the first answer key is the decision (read part + GRACE)
+    if(k&&!e.ans){e.ans=e.sT<=acc(e.atk,e)?k:'late';const r=e.L.at[e.L.at.length-1];if(r){r[3]=+e.sT.toFixed(3);r[4]=k;}}   // W304: the log keeps when (s after the telegraph started) and which key the first answer came   // the first answer key is the decision (read part + GRACE)
     if(e.atk==='pound')e.y=FL-Math.min(1,e.sT/T)*40;   // it rises up on its toes
     if(e.sT>=T){const ok=e.ans===ANS[e.atk];e.y=FL;
       if(!ok){say(e.ans&&e.ans!=='late'?'WRONG: '+BTN[ANS[e.atk]]:'TOO LATE: '+BTN[ANS[e.atk]],'#ff5a6a',.9,1);SB.flash=.22;}
@@ -98,7 +100,7 @@ SB.draw=function(c,o){const S=F.S,e=SB.on,u=o.u,vw=o.vw,L=IN.L();if(!S)return;co
   const big=fsz(u,L&&L.touch?30:34),mid=fsz(u,22),touch=!!(L&&L.touch);c.save();c.textAlign='center';c.textBaseline='alphabetic';
   const place=(t,px,y)=>{c.font='900 '+px+'px monospace';const w=c.measureText(t).width;return [Math.max(S.camX+w/2+8*u,Math.min(S.camX+vw-w/2-8*u,e.x)),Math.max(top+px,y),w];};
   let y0=head-8*u;
-  if(e.state==='sb_tel'){const a=e.atk,an=ANS[a],t=touch?BTN[an]+'!':BTN[an]+' ['+KEY[an]+']',A=acc(a),left=Math.max(0,A-e.sT),gone=left<=0,col=gone?'#ffffff':COL[a];
+  if(e.state==='sb_tel'){const a=e.atk,an=ANS[a],t=touch?BTN[an]+'!':BTN[an]+' ['+KEY[an]+']',A=acc(a,e),left=Math.max(0,A-e.sT),gone=left<=0,col=gone?'#ffffff':COL[a];
     const [x,y,w]=place(t,big,y0-14*u);const pul=gone?1:1+.06*Math.sin(S.time*22);c.save();c.translate(x,y);c.scale(pul,pul);txt(c,t,0,0,col,big,u);c.restore();
     const bw=Math.max(w,120*u),bh=10*u,by=y+8*u;c.fillStyle='rgba(5,3,12,.8)';c.fillRect(x-bw/2-2*u,by-2*u,bw+4*u,bh+4*u);c.fillStyle=col;c.fillRect(x-bw/2,by,bw*left/A,bh);
     if(e.ans&&e.ans!=='late')txt(c,e.ans===an?'✓':'✗',x+w/2+18*u,y,e.ans===an?'#7dff8a':'#ff5a6a',mid,u);y0=y-big-6*u;}
