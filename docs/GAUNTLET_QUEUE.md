@@ -93,3 +93,11 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - mem-r30p: harness fix 76f98df on trunk (test-quick waits until ready). Patch measured (fra peak 558-576, ath 651-713 MB; env rebuilds 34-49 → 1 per 5 min) but held: why/glossy red + fra mem/stable +16 %. → mem-r30q (SONNET) landing it. TAG=mem trunk reds predate it (ath-boot, mem-quant, mem-own).
 - Started glbuf-r30r (SONNET): ath jsErrors WebGLAttributes buffer size.
 - Next worker slots: traffic density ring (drive/near), wall head-on stop, fra ios-reveal 1.4 s stall, solid-cars flake, TAG=mem trunk reds, unstable gauntlet rows; OPUS tb redesign; world round 4.
+
+## 31 Oct ~10:00
+- beta.167 live (Beta v332).
+- hills-r30t b4eb438: Athens backdrop hills drawn again ('ridge' exempt from memFree; GO bug/ath-hills-drawn 0/3 → 3/3; gate 78/78). Small, measured, shots taken → ships in beta.168 on green gates (rule 17).
+- density-r30s: not shipped (ring v3 near 3.05 avg but +7-10 % frame time vs 5 % bar). Rule 9: design note in docs/HANDOFF_density-r30s.md → next is an OPUS design lane (reuse dead/far cars instead of stepping more near cars).
+- REVIEW_2K_42: memory patch good (fra 554-565, ath 684-697 MB; env rebuilds 1 per 5 min) but FAIL on one new GO line (ath mem/no-reload at the cap). → memland-r31a (SONNET) lands it without that line.
+- Started wallhit-r31b (SONNET): head-on facade hits must stop the car.
+- After: OPUS density design, OPUS tb redesign, fra ios-reveal stall, solid-cars flake, mem trunk reds (mem/stable, mem-quant, mem-own, ath-boot), world round 4.
