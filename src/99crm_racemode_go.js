@@ -89,3 +89,13 @@ window.__rm={list:()=>RM_list().map(q=>q.n),open:i=>(RMG.cur=RM_open(i),1),what:
   C.GO['race/one-speedo']=[{c:'fra',n:'One speedo (Frankfurt)',secs:400,fn:()=>RM_speedo()},{c:'ath',n:'One speedo (Athens)',secs:400,fn:()=>RM_speedo()}];
   C.GO['race/racemode-all']=[{c:'fra',n:'Race menu (Frankfurt)',secs:600,fn:()=>RM_go()},{c:'ath',n:'Race menu (Athens)',secs:600,fn:()=>RM_go()}];return}
  if(i<600)setTimeout(()=>RM_reg(i+1),100)})(0);
+// og3b-fix (REVIEW_2K_47): GO race/timer. A race runs its time: after 6 s of driving the race timer reads not 00:00.0 and has grown. Flag og3 OFF: #tRace (updHud); og3 ON: the HUD kit's #hkTime (HK_tick)
+function RT_sec(s){const m=/(\d+):(\d+(?:\.\d+)?)/.exec(s||'');return m?+m[1]*60+ +m[2]:NaN}
+function RT_read(){const e=document.getElementById(OG3?'hkTime':'tRace');return e?e.textContent.trim():''}
+async function RT_timer(){let R;try{R=RM_open(0);await new Promise(r=>setTimeout(r,1500));RM_seen(R);if(!R.w)return'📍 RACE TIMER → ❌ FAIL (race did not start)';
+  const t0=RT_read();for(let k=0;k<3;k++)RM_drive(R,2);if(OG3)HK_tick();else updHud();
+  const t1=RT_read(),a=RT_sec(t0),b=RT_sec(t1),ok=t1!==''&&t1!=='00:00.0'&&b>a;
+  return`📍 RACE TIMER (og3 ${OG3?'ON':'OFF'}) · ${t0} → ${t1} after ~6 s → ${ok?'✅ PASS':'❌ FAIL'}`}
+  catch(e){return'📍 RACE TIMER → ❌ FAIL (threw '+String(e).slice(0,80)+')'}finally{try{if(R)RM_close(R)}catch(e){}}}
+(function RT_reg(){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='race'&&q.id==='timer'))C.items.push({ver:'race',id:'timer',area:'race',text:'og3b-fix · race/timer: a race starts and its race timer (#tRace, og3 OFF; #hkTime, og3 ON) leaves 00:00.0 and grows over ~6 s of driving'});
+  C.GO['race/timer']=[{c:'fra',n:'Race timer (Frankfurt)',secs:120,fn:()=>RT_timer()},{c:'ath',n:'Race timer (Athens)',secs:120,fn:()=>RT_timer()}];return}})();

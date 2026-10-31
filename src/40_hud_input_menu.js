@@ -22,7 +22,7 @@ function updHud(){if(!pl)return;const n=ships.filter(active).length;
   else if(RC.type==='duel'){const ahead=!duelGhost||pl.dist>=duelGhost.f[Math.min(duelGhost.f.length-2,Math.floor(raceT*20)*2)];setT(hudEl.pos,'pos',duelGhost?`${ahead?'01':'02'}<small> / GHOST</small>`:'SOLO')}
   else setT(hudEl.pos,'pos',RC.type==='tt'?'TT':RC.type==='race'||RC.type==='elim'?`${ord(pl.place)}<small>/${n}</small>`:`${pad2(pl.place)}<small> / ${pad2(n)}</small>`);
   if(RC.type!=='zone')setT(hudEl.lap,'lap',RC.type==='elim'||RC.type==='arena'||lapAttack()?`LAP ${Math.max(1,pl.lap+1)}`:`LAP ${clamp(pl.lap+1,1,RC.laps)} / ${RC.laps}`);}
-  setT(hudEl.tLap,'tl',fmt(Math.max(0,raceT-pl.lapStart)));setT(hudEl.tBest,'tb',fmt(ghost?Math.min(ghost.t,pl.best):pl.best));
+  setT(hudEl.tLap,'tl',fmt(Math.max(0,raceT-pl.lapStart)));setT(hudEl.tBest,'tb',fmt(ghost?Math.min(ghost.t,pl.best):pl.best));if(!OG3)setT(hudEl.tRace,'tr',fmt(raceT));/* og3 OFF: the race timer; og3 ON: the HUD kit shows it (40h_hud_kit.js) */
   if(duelGhost&&state==='race'){const d=raceT-duelAt(pl.dist);setT(hudEl.tGhost,'tg',(d>=0?'+':'−')+Math.abs(d).toFixed(2))}
   else if(ghost&&pl.lap>=0){const lt=raceT-pl.lapStart;const my=mod(pl.dist,TD.L);let j=0;while(j<ghost.f.length&&ghost.f[j]<my)j+=2;const d=lt-j/2/20;setT(hudEl.tGhost,'tg',(d>=0?'+':'−')+Math.abs(d).toFixed(2))}
   if(!OG3){setT(hudEl.spd,'spd',`${String(Math.round(pl.v*(SET.units==='mph'?2.237:3.6))).padStart(3,'0')}<small>${SET.units==='mph'?'MPH':'KPH'}</small>`);hudEl.bar.style.width=clamp(pl.v/(pl.stats.top*1.3)*100,0,100)+'%';
