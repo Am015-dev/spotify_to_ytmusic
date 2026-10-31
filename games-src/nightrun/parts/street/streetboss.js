@@ -68,7 +68,7 @@ function ai1(e,dt,env,S,P,dx,st){
     if(!camp)e.i++;e.vx=0;tel(e,nxt,S,env);return;}
   if(st==='sb_tel'){e.vx=0;const T=TEL[e.atk],k=edge(e);e.tele=0;e.sbT=Math.max(0,T-e.sT);
     if(e.sT<T-CUT[e.atk])e.facing=sgn(dx);   // it tracks Kai in the read part, then commits to that side
-    if(k&&!e.ans)e.ans=e.sT<=acc(e.atk)?k:'late';   // the first answer key is the decision (read part + GRACE)
+    if(k&&!e.ans){e.ans=e.sT<=acc(e.atk)?k:'late';const r=e.L.at[e.L.at.length-1];if(r){r[3]=+e.sT.toFixed(3);r[4]=k;}}   // W304: the log keeps when (s after the telegraph started) and which key the first answer came   // the first answer key is the decision (read part + GRACE)
     if(e.atk==='pound')e.y=FL-Math.min(1,e.sT/T)*40;   // it rises up on its toes
     if(e.sT>=T){const ok=e.ans===ANS[e.atk];e.y=FL;
       if(!ok){say(e.ans&&e.ans!=='late'?'WRONG: '+BTN[ANS[e.atk]]:'TOO LATE: '+BTN[ANS[e.atk]],'#ff5a6a',.9,1);SB.flash=.22;}

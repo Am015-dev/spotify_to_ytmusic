@@ -117,6 +117,10 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
     // ---- landscape phones: the field is the whole screen, the pad sits over the side bands
     for (const [w, h] of [[763, 390], [844, 390]]) { const p = await open(w, h, '', { touch: true }); const st = await enter(p, true); ok('land ' + w + 'x' + h + ': STREET RUN opens', st === 'on', st); if (st !== 'on') { await p.ctx.close(); continue; }
       await sleep(400); for (const au of [true, false]) { await p.evaluate(a => { FOOT.setAuto(a); FOOT.layout(); }, au); await sleep(150); const a = await audit(p); ok('land ' + w + 'x' + h + ' auto-fire ' + (au ? 'ON' : 'OFF') + ': layout audit', clean(a), a); }
+      // W304: the result screen on a short landscape phone: every button inside the screen and hit-testable (BACK TO CITY used to be pushed off at 844x390)
+      await p.evaluate(() => { FOOT.S.P.hp = 0; FOOT.S.dead = 0.05; FOOT.sim(2, 1 / 60); }); await sleep(1500);
+      const lr = await p.evaluate(() => { const m = document.getElementById('fMenu'); if (!m || m.hidden) return null; return [...m.querySelectorAll('button')].map(b => { const r = b.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return { id: b.id, h: Math.round(r.height), ok: !!t && (t === b || b.contains(t)) && r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth }; }); });
+      ok('land ' + w + 'x' + h + ': result screen buttons (RETRY / BACK TO CITY) inside the screen, 44px+, hit-testable', !!lr && lr.length >= 2 && lr.some(b => b.id === 'fCity') && lr.every(b => b.ok && b.h >= 44), lr);
       await p.ctx.close(); }
     // ---- pause menu toggles auto-fire (touch), the choice is saved
     { const p = await open(390, 763, '', { touch: true }); const st = await enter(p, true); if (st === 'on') { await p.evaluate(() => { FOOT.step(1 / 60); document.getElementById('fPause').click(); }); await sleep(150);
