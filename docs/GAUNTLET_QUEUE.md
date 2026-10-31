@@ -110,3 +110,10 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 ## 31 Oct ~10:22
 - onegame-r31c done: docs/DESIGN_one_game.md (9e9b377). Splits: builder is its own game (own scene/sky/light, BX_step physics, camera, HUD, input, save, 0 XP, black car); 3 physics models (same car 146 / 220 / 122 km/h roam / Race Mode / builder), 3 cameras (FOV 66/62/55), 3 HUDs; Race Mode is a separate neon night world 5 taps + 7.9 s from the city.
 - Steps: S1 og1 builder drives YOUR car (OPUS, started: session og1) → S2 og2 races start from city markers and return you (SONNET) → S3 og3 one HUD kit (SONNET) → S4 og4 one look (OPUS) → see doc for S5/S6. Page headroom only ~50 KB: steps must delete duplicates.
+
+## 31 Oct ~12:17
+- beta.168 live (Beta v333): memory patch (memland-r31a) + Athens hills.
+- og1 done (1a70ae9..8771115, flag OFF): builder DRIVE uses the player's car, roam stats, roam camera, shared touch controls; GO onegame/builder-car PASS. → review-r31-17 (OPUS) decides ship ON in beta.169. No preview build: --preview also forces ?tb1 ON, which is not ready (REVIEW_2K_40).
+- Started og2 (SONNET): races start from city markers and return you (S2).
+- Started flakes-r31d (SONNET): why/solid-cars, quiet-dirt, parked-jump deterministic (rule 15).
+- Paused: wallhit (head-on stop), density design (OPUS), tb redesign (OPUS), world round 4.
