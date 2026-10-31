@@ -10,7 +10,7 @@ Built page out/rev46: 3,463,034 B (the worker's 3,463,033 B plus 1). Phone profi
 - **Blocker 2 (card laps) is fixed.** The card uses the same `CR_RK` scaling as setupRace: "1 lap", and the race shows LAP 1/1. The GO asserts card laps == RC.laps.
 - **Blocker 3 (pause label) is fixed.** "🌍 BACK TO CITY" shows when `RO.fromRoam`.
 - **The GO is honest now.** `OG2_tap` fails when the element is hidden or covered (it checks `elementFromPoint`), and it runs on a fresh save where the level-up really fires (lv1>2) and on a used save.
-- **The 10 s cap is not hiding slowness, but it is a dead check.** The return wait itself stops at 8 s (`wait(...,8000)`), so `ms>10000` can never fire. The real times I measured with real taps are 0.6–1.5 s at 6x CPU, and 0–0.1 s at 1x. In the GO they are 0 ms. Put the cap back to 3 s (item 3).
+- **The 10 s cap is not hiding slowness, but it is a dead check.** The return wait itself stops at 8 s (`wait(...,8000)`), so `ms>10000` can never fire. The real times I measured with real taps are 0.6–1.7 s at 6x CPU, and 0–0.1 s at 1x. In the GO they are 0 ms. Put the cap back to 3 s (item 3).
 
 ## 2. Play (real CDP touch, fresh save xp 0; harness play_rev46.js)
 | run | trip | result |
@@ -19,7 +19,7 @@ Built page out/rev46: 3,463,034 B (the worker's 3,463,033 B plus 1). Phone profi
 | fra 6x | Westhafen, quit mid-race | pause → "BACK TO CITY", 1 tap → city 0.9 s, 0.02 m |
 | fra 1x | same two trips | city 0.0 s / 0.1 s, 0 m |
 | ath 6x | Akropolis, finish | same as fra; back 1.5 s; the LEVEL UP toast shows in the city (ath_back.jpg) |
-| ath 6x | quit | not completed with real touch: my straight GAS run toward Syntagma left the road and stuck on a kerb (ath_synt_stuck.jpg, a harness fault); a second try was still loading at the timebox. The GO covers the ath quit (PAPPAS, fresh + used: 1 tap, 0 m) |
+| ath 6x | Kifisias, quit mid-race (re-run; the first try toward Syntagma stuck on a kerb, a harness fault: ath_synt_stuck.jpg) | pause → BACK TO CITY, 1 tap → city 1.7 s, 0.01 m. Also Kallimarmaro finish: 1 tap → city 1.6 s, 0.03 m |
 Page errors: 0 in every run.
 
 Confusing moments:
