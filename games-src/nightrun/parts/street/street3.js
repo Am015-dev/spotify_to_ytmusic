@@ -42,7 +42,9 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   const f=S.s3;f.gate=gate(S,vw);S.idleSpawn=S.time+60;   // the clock sets the pace: standing at the gate is not camping (no idle spawns of other foes)
   const bc=Math.min(ST.boss.x-vw/2,ST.len-vw);
   const alive0=S.E.some(e=>!e.dead&&!e.boss);
-  if(!S.bossOn&&f.gate>=bc-40&&(!alive0||S.time>S3.T.boss+12)){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.2;f.boss=+S.time.toFixed(1);
+  f.clr=(RET.cam2&&S.camX>=bc-4&&!alive0)?(f.clr||0)+dt:0;   // W318: camera at its stop and no foe alive: seconds the street has been clear
+  const wq=f.waves.find(w=>w.left.length);if(f.clr>=8&&wq&&!S.bossOn)wq.next=Math.min(wq.next,S.time);   // W318: a cleared street calls the next wave at once (no pinned wait); the whole ramp still comes, so the attrition is the same
+  if(!S.bossOn&&((f.gate>=bc-40&&(!alive0||S.time>S3.T.boss+12))||(f.clr>=2&&!wq))){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.2;f.boss=+S.time.toFixed(1);
     for(let i=0;i<Math.min(2,P.max-P.hp);i++){f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*(60+50*i),S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}}   // up to two heals as the big heavy walks in (its charge hits for 2)   // the boss comes in quietly (no warning sting), once the street is clear (12 s at most)
   const alive=S.E.filter(e=>!e.dead).length;
   if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy
