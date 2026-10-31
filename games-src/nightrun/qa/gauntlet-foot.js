@@ -85,7 +85,8 @@ function strategy(name, rnd) {
     for (const b of s.eb) { const dx = b.x - s.P.x; if (Math.abs(dx) < 190 && dx * b.vx < 0 && Math.abs(b.y - (s.P.y - 30)) < 60 && s.P.g) { w.jump = true; break; } }
     return w; };
   if (name === 'duelist' || name === 'late') {   // W290: reads the big heavy's telegraph (SWING -> GUARD, CHARGE -> DASH through, POUND -> JUMP) and answers it RT s after it starts (game time), then punishes the OPEN boss
-    const RT = name === 'late' ? () => .6 : () => .25 + rnd() * .1, ANS = { swing: 'guard', charge: 'dash', pound: 'jump' }, pre = strategy('tactician', rnd);
+    // W300: before the boss both play the street as the W286 'dodger' (the 'tactician' lost every run to rushers before the boss)
+    const RT = name === 'late' ? () => .6 : () => .25 + rnd() * .1, ANS = { swing: 'guard', charge: 'dash', pound: 'jump' }, pre = strategy('dodger', rnd);
     let tid = -1, R = 0, t0 = 0, key = null, kT = -9, stun0 = -1, Rp = 0;
     return s => {
       const B = s.E.find(e => e.b && !e.d); if (!B || !s.bossOn) return pre(s);
@@ -138,7 +139,16 @@ function strategy(name, rnd) {
       if (Math.sign(w.mx) && Math.sign(w.mx) !== P.f && !w.fire) w.fire = false;
       return w; };
   }
-  return name === 'aggressor' ? s => aggr(s, false) : s => aggr(s, true);
+  if (name === 'dodger') {   // W300: the generic dodger also answers the boss's telegraph (its own reaction 300-450 ms game time); everything else is aggr(dodge)
+    const ANS = { swing: 'guard', charge: 'dash', pound: 'jump' }; let tid = -1, R = 0, t0 = 0, key = null, kT = -9;
+    return s => { const B = s.E.find(e => e.b && !e.d && e.st === 'sb_tel'), w = aggr(s, true);
+      if (!B) { if (key === 'dash' && s.t - kT < .3) { const n = s.E.find(e => e.b && !e.d); if (n) w.mx = Math.sign(n.x - s.P.x) || 1; } return w; }
+      if (B.tid !== tid) { tid = B.tid; t0 = s.t - B.sT; R = .3 + rnd() * .15; key = null; }
+      Object.assign(w, { guard: false, dash: false, jump: false }); if (!key && s.t >= t0 + R) { key = ANS[B.a]; kT = s.t; }
+      if (key && s.t - kT < .12) { w[key] = true; if (key === 'dash') w.mx = Math.sign(B.x - s.P.x) || 1; if (key === 'guard') { w.fire = false; w.melee = false; w.mx = 0; } }
+      return w; };
+  }
+  return s => aggr(s, false);
 }
 
 // ---- layout audit (phone): every control >= 44 px, inside the screen, no two overlap, labels fit
