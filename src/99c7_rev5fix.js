@@ -845,3 +845,24 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
  C.GO['bug/no-glbuf-resize']=[{c:'ath',n:'no GL buffer resize on the Athens backdrop ridge',fn:go,secs:90}]
  return}
  if(i<600)setTimeout(()=>GB30_reg(i+1),100)})(0);
+// hills-r30t: the Athens backdrop hills (athRidge, a ring that follows the camera) were never drawn on the phone path: memFree packed the ridge as a streamed chunk centred on
+// the world origin (its bounding sphere, taken before the group follows the camera), so 3 km from the origin the stream hid it for good (layers=0, entry on:false). The ridge is a
+// camera-following backdrop and is now exempt from memFree (userData.ridge in MEMF.skip). GO: at the Athens spawn and two other spots (one 3.5 km from the origin) the ridge mesh
+// is enabled on layer 0, visible, and was really drawn (onAfterRender) in the last frame, after the stream had a chance to hide it.
+(function HL30_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='bug'&&q.id==='ath-hills-drawn')){C.items.push({ver:'bug',id:'ath-hills-drawn',area:'render',text:'hills-r30t · Athens hills drawn: 📍 GO (Athens) warps to the spawn and 2 other spots and checks the backdrop ridge mesh is on layer 0, visible and drawn in the last frame. Pass line ends ✅ PASS.',go:'bug/ath-hills-drawn'})}
+ const run=async()=>{const SP=[['spawn',1884,-3178],['origin',0,0],['far',-2600,2400]],out=[];let bad=0;
+  try{const G=HUB.ridge;let m=null;G&&G.traverse(o=>{if(o.isMesh&&o.userData.ridge)m=o});
+   if(!m)return'📍 ATHENS HILLS · no ridge mesh → ❌ FAIL';
+   if(typeof MEMF!=='undefined')MEMF.gHold=0;
+   let drawn=0;const f0=m.onAfterRender;m.onAfterRender=function(){drawn++;return f0.apply(this,arguments)};
+   const draw=()=>{try{window.__tq&&__tq.draw?__tq.draw():composer.render()}catch(err){}};
+   for(const[nm,x,z]of SP){const q=typeof rfSnap==='function'?rfSnap(x,z,400):null;roamWarp(q?q[0]:x,q?q[1]:z,q&&q[2]!=null?q[2]:RO.h);
+    for(let k=0;k<8;k++){if(typeof hubTrafficStep==='function')hubTrafficStep(.016);if(typeof MEMF_gstep==='function')MEMF_gstep();draw();await new Promise(r=>setTimeout(r,250))}
+    drawn=0;draw();const ent=typeof MEMF!=='undefined'?MEMF.S.find(e=>e.m===m):null,L=!!(m.layers.mask&1),V=m.visible&&G.visible,D=drawn>0,ok=L&&V&&D;if(!ok)bad++;
+    out.push(`${nm} ${Math.round(camera.position.x)},${Math.round(camera.position.z)} layer ${L?1:0} visible ${V?1:0} drawn ${drawn}${ent?' entry '+(ent.on?'on':'off'):''} ${ok?'✓':'✗'}`)}
+   return`📍 ATHENS HILLS · ${out.join(' · ')} → ${bad===0?'✅ PASS':'❌ FAIL'}`}
+  catch(err){return`📍 ATHENS HILLS · threw ${String(err&&err.message).slice(0,80)} → ❌ FAIL`}};
+ const go=()=>{run().then(r=>goSay(r));return'📍 ATHENS HILLS · running…'};
+ C.GO['bug/ath-hills-drawn']=[{c:'ath',n:'Athens backdrop hills are drawn at the spawn and 2 other spots',fn:go,secs:60}]
+ return}
+ if(i<600)setTimeout(()=>HL30_reg(i+1),100)})(0);

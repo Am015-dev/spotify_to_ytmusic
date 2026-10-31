@@ -3,7 +3,7 @@
 // mesh.onAfterRender; after the first draw (= uploaded) it computes the bounds, nulls position/normal/color/uv/index arrays (same trick as STR strFree / SM3).
 // Skipped: instanced, car/footman groups, anything a raycast or CPU-side reader may touch (trG ground, gk, simp, lf, keep, P, bmk, cd, dr, gb, sim, ramp).
 if(TUNE.memFree===undefined){const q=new URLSearchParams(location.search).get('mf');TUNE.memFree=q==='1'||LOWMEM&&q!=='0'?1:0}   // crash-1: on in the low-mem tier (iPhone)   // default OFF (breaks xf1/grass + terr4/5 hill tests, they read world mesh arrays); ?mf=1 on
-const MEMF={seen:new WeakSet(),n:0,mb:0,skip:['trG','gk','simp','lf','keep','P','bmk','cd','dr','gb','sim','ramp','lz','sky','nr']};
+const MEMF={seen:new WeakSet(),n:0,mb:0,skip:['trG','gk','simp','lf','keep','P','bmk','cd','dr','gb','sim','ramp','lz','sky','nr','ridge']};
 // crash-3: ground / drive-surface meshes (trG, gk, dr) are raycast and height-read on the CPU, so they keep position + index; their normal/uv/color
 // copies (~60 % of the bytes, nothing reads them after upload) are dropped in the low-mem tier (MEMF.part).
 MEMF.part=['trG','gk','dr'];MEMF.attrs=['normal','uv','color'];
