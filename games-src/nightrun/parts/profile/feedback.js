@@ -46,5 +46,5 @@ const FB=(function(on){
     document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fbCopy');if(b)copy(b);});
   }
   return{on,answer,load,counts,sheet,show,hide};
-})(/[?&]lab=1/.test(location.search));   // test widget: only with ?lab=1 (the same flag the LAB uses); a buyer never sees it
+})(RET.lab);   // test widget: only with ?lab=1 (the same flag the LAB uses); a buyer never sees it
 window.FB=FB;

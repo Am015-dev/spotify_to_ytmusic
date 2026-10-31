@@ -37,7 +37,7 @@ html.focus #srMenu,html.focus #stBtn2,html.focus #pSetBtn,html.focus #fFly,html.
   box.append(fl,row,
     mk('focFoot','ON FOOT','alt',()=>{if(running||!window.FOOT)return;FOOT.ui=1;FOOT.start(FOOT.main||'street1');}));
   /* LAB is the developer sandbox: shown only with ?lab=1 (buyers never see it) */
-  r2.append(mk('focSet','SETTINGS','dim',click('setBtn')));if(/[?&]lab=1/.test(location.search))r2.append(mk('focLab','LAB','dim',click('labBtn')));box.append(r2);
+  r2.append(mk('focSet','SETTINGS','dim',click('setBtn')));if(RET.lab)r2.append(mk('focLab','LAB','dim',click('labBtn')));box.append(r2);
   titleEl.querySelector('.in').querySelector('h1').after(box);
   /* result / pause screens: relabel and add TITLE where the stage result had none */
   const tb=mk('focTitle','TITLE','dim',()=>{const b=$('menuBtn');if(b)b.click();});$('srRetry').after(tb);
