@@ -6,7 +6,7 @@ const DEV = { phone: { W: 390, H: 763, touch: true }, land: { W: 844, H: 390, to
   for (const dn of (process.env.ONLY || 'phone,pc').split(',')) {
     const d = DEV[dn], p = await L.open(b.br, b.base, d.W, d.H, '?nomusic=1', 3, d.touch);
     await p.evaluate(() => { document.getElementById('focFlight').click(); }); for (let i = 0; i < 40; i++) { if (await p.evaluate(() => !!window.__mnr.G && !!window.__mnr.G.live)) break; await sleep(100); }
-    await p.evaluate(async () => { const m = window.__mnr; for (const k in m.ART.anim ? m.ART.ANIM.s : {}) m.ART.anim(k); await new Promise(r => setTimeout(r, 4000)); m.god = true; m.bossNow(); });
+    await p.evaluate(async (JUMP) => { const m = window.__mnr; for (const k in m.ART.anim ? m.ART.ANIM.s : {}) m.ART.anim(k); await new Promise(r => setTimeout(r, 4000)); m.god = true; if (JUMP) m.G.dbar = m.ST.lead + 3; else m.bossNow(); }, !!process.env.JUMP);
     let info = null;
     for (let n = 0; n < 3000; n++) {
       info = await p.evaluate(() => { const m = window.__mnr, G = m.G; for (let i = 0; i < 6; i++) { m.P.hp = m.P.max; m.P.inv = 1; m.step(1 / 60); } return { boss: !!G.boss, x: G.boss && G.boss.x, t: G.t, W: m.W, nm: G.boss && G.boss.nm, en: G.en.length }; });
