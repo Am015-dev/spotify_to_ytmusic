@@ -4,7 +4,7 @@
 // in the city above 125 km/h (was 86 km/h, which the faster city car reaches on every street).
 /* r22e28 preview (CLAUDE.md rule 11): tools/build.sh <ver> --preview flips OD_PREVIEW to true, so every flag resolved through OD_FLAG that is default OFF is ON; an explicit ?name=0 still wins ('cl.x' = key x of ?cl=a,b; ?cl=off|0 kills all) */
 const OD_PREVIEW=false;
-const OD_ON=new Set(['og1']);   // flags shipped default ON after review (rule 11); ?name=0 still turns one off
+const OD_ON=new Set(['og1','og2']);   // flags shipped default ON after review (rule 11); ?name=0 still turns one off
 const OD_FLAG=k=>{const q=location.search;if(k.startsWith('cl.')){const m=/[?&]cl=([^&#]*)/.exec(q),ks=m?m[1].split(','):[];return!ks.includes('off')&&!ks.includes('0')&&(ks.includes(k.slice(3))||ks.includes('all')||OD_PREVIEW)}const m=new RegExp('[?&]'+k+'=([^&#]*)').exec(q);return m?m[1]==='1':(OD_ON.has(k)||OD_PREVIEW)};
 const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
 // TUNE (tune20): live-tunable driving numbers that used to be inline literals; defaults = the v87w values. Knob table + ?tune=1 drawer: src/99t_tune.js.

@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.170',date:'31 Oct 2026',items:[{t:'NEW',s:'Every Race Mode race now has a marker in the city: drive up, tap, race, and you are back on the same street.'},{t:'CHANGED',s:'After a race, level-up shows once you are back in the city, not over the results.'}]},
 {v:'v90m-beta.169',date:'31 Oct 2026',items:[{t:'CHANGED',s:'Track builder: DRIVE now uses your own car, with the same speed, handling, camera and touch controls as the city.'},{t:'FIXED',s:'Race timer counts again.'}]},
 {v:'v90m-beta.168',date:'31 Oct 2026',items:[{t:'FIXED',s:'Uses about 10 % less memory, so iPhone should no longer reload the game by itself as often.'},{t:'FIXED',s:'Athens: the hills on the horizon are back.'},{t:'FIXED',s:'Car reflections no longer rebuild while you drive (less stutter).'}]},
 {v:'v90m-beta.167',date:'31 Oct 2026',items:[{t:'FIXED',s:'Athens: no more graphics error from the hills recolouring.'},{t:'CHANGED',s:'Groundwork for a faster Frankfurt start (off for now).'}]},
