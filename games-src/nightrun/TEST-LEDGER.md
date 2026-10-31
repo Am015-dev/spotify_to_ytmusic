@@ -3,7 +3,7 @@
 Which test file is run by which runner. RUN = in smoke.sh (each under a hard timeout). BROKEN = known red or hanging, reason in test-status.tsv. NOT RUN = no automatic runner on every change.
 Nightly pass/fail results of the root tests: TEST-RESULTS-NIGHTLY.md (test-ledger.sh).
 
-Totals: 156 test files: 8 RUN, 142 NOT RUN, 6 BROKEN.
+Totals: 157 test files: 9 RUN, 141 NOT RUN, 7 BROKEN.
 
 | Test | Runner status | Note |
 |---|---|---|
@@ -39,11 +39,11 @@ Totals: 156 test files: 8 RUN, 142 NOT RUN, 6 BROKEN.
 | flankers-test.js | NOT RUN | nightly set: test-ledger.sh |
 | fleet-test.js | NOT RUN | nightly set: test-ledger.sh |
 | foeart-test.js | NOT RUN | nightly set: test-ledger.sh |
-| foot-test.js | NOT RUN | nightly set: test-ledger.sh |
+| foot-test.js | BROKEN | W311: test repaired (focus result buttons, fullscreen exit before rotate, street-look 330 floor, hit gap); still FAIL on HEAD: GAME layout, GUARD/BOMB re-seat (streetguard.js) leaves BOMB 4 px (<8) from the stick circle in portrait auto-fire OFF, and GUARD/BOMB inside the play box in landscape 763x390 and 844x390; BOT is stale (dies in ~20 s to drone bullets; with GOD=1 sticks at arena locks with flying drones); street/stats rows not reached |
 | footart-test.js | NOT RUN | nightly set: test-ledger.sh |
 | footen-test.js | NOT RUN | nightly set: test-ledger.sh |
 | footq-test.js | BROKEN | 3 real FAIL on HEAD (6 old draw calls in a 12 s run; Kai height wobble 4%; crouch ratio): street code, owner = street worker. Dpr expectation + `// true` fixed in W297. |
-| footstage-test.js | NOT RUN | nightly set: test-ledger.sh |
+| footstage-test.js | BROKEN | W311: 6/16 FAIL on HEAD. main stage is now street2 (rows BROKEN not SECTION), footstage=0 / fingerprint rows and 'progress bar box' expect the old footstage stage; FLY ON hidden by the focus title (btn height 0); b.relays not iterable crash. Needs a rewrite for street2 |
 | forge-test.js | NOT RUN | nightly set: test-ledger.sh |
 | forge2-test.js | NOT RUN | nightly set: test-ledger.sh |
 | forgeui-test.js | NOT RUN | nightly set: test-ledger.sh |
@@ -60,7 +60,7 @@ Totals: 156 test files: 8 RUN, 142 NOT RUN, 6 BROKEN.
 | hud-cover-test.js | RUN | smoke.sh |
 | hudband-test.js | NOT RUN | nightly set: test-ledger.sh |
 | labassets-test.js | BROKEN | killed at 150 s with no PASS/FAIL lines (review 6-C); state unknown |
-| labfull-test.js | BROKEN | 2 FAIL on 31 Oct (W297 smoke): repro URL did not replay the spawn; saves mnr_svauto/mnr_svinfo differ after the foot sandbox. No game code touched by W297. smoke skips it unless LABFULL=1 |
+| labfull-test.js | RUN | smoke.sh |
 | layout-test.js | NOT RUN | nightly set: test-ledger.sh |
 | legend-test.js | NOT RUN | nightly set: test-ledger.sh |
 | legible-test.js | NOT RUN | nightly set: test-ledger.sh |
@@ -86,6 +86,7 @@ Totals: 156 test files: 8 RUN, 142 NOT RUN, 6 BROKEN.
 | qa/alive-test.js | NOT RUN | qa/ test, no runner (run by hand: node games-src/nightrun/qa/alive-test.js) |
 | qa/bossbar-layout-test.js | NOT RUN | qa/ test, no runner (run by hand: node games-src/nightrun/qa/bossbar-layout-test.js) |
 | qa/cam2-test.js | NOT RUN | qa/ test, no runner (run by hand: node games-src/nightrun/qa/cam2-test.js) |
+| qa/copy-test.js | NOT RUN | qa/ test, no runner (run by hand: node games-src/nightrun/qa/copy-test.js) |
 | qa/flow-test.js | RUN | smoke.sh |
 | qa/flysfx-test.js | NOT RUN | qa/ test, no runner (run by hand: node games-src/nightrun/qa/flysfx-test.js) |
 | qa/focus-test.js | NOT RUN | qa/ test, no runner (run by hand: node games-src/nightrun/qa/focus-test.js) |

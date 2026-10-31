@@ -29,8 +29,7 @@ run hub              env SMOKE=1 node "$HERE/hub-test.js"
 run story            node "$HERE/story-test.js"
 run flow             node "$HERE/qa/flow-test.js"
 [ -n "${SPRITES:-}" ] && TMO=300 run sprites env SMOKE=1 ONLY="${SPR:-hoplite}" node "$HERE/sprites-test.js"   # slow: >120 s (hit the timeout on 31 Oct), so nightly; SPRITES=1 runs it
-if [ -n "${LABFULL:-}" ]; then run labfull node "$HERE/labfull-test.js"
-else echo "SKIP labfull (BROKEN on 31 Oct: repro URL does not replay the spawn; saves differ after the foot sandbox; see test-status.tsv; LABFULL=1 runs it)"; fi
+TMO=240 run labfull node "$HERE/labfull-test.js"   # passes on a fresh build in the temp dir (31 Oct W311); the W297 FAILs came from running it against the committed games/ build
 run gunnertele      node "$HERE/qa/gunnertele-test.js"   # 0.4 s gunner telegraph fairness gate (exit code now follows the verdict)
 run nocaps          node "$HERE/nocaps-test.js"
 python3 "$HERE/ledger.py" >/dev/null 2>&1 && echo "ledger: TEST-LEDGER.md regenerated" || echo "ledger: FAILED to regenerate TEST-LEDGER.md"
