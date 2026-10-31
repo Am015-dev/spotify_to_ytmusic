@@ -106,3 +106,7 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - TOP PRIORITY now. onegame-r31c (OPUS, session_01RR7mnZXCzzUCapZ8fyt6YT): audit of what roam / races / builder each own vs share + target structure (shared core, thin modes as state machines) + 4-6 step lanes. First step must be player-visible.
 - wallhit-r31b paused (archived after 4 min, nothing pushed) to keep 2 workers; it returns after onegame's first step.
 - memland-r31a continues (memory fix → beta.168 with hills-r30t).
+
+## 31 Oct ~10:22
+- onegame-r31c done: docs/DESIGN_one_game.md (9e9b377). Splits: builder is its own game (own scene/sky/light, BX_step physics, camera, HUD, input, save, 0 XP, black car); 3 physics models (same car 146 / 220 / 122 km/h roam / Race Mode / builder), 3 cameras (FOV 66/62/55), 3 HUDs; Race Mode is a separate neon night world 5 taps + 7.9 s from the city.
+- Steps: S1 og1 builder drives YOUR car (OPUS, started: session og1) → S2 og2 races start from city markers and return you (SONNET) → S3 og3 one HUD kit (SONNET) → S4 og4 one look (OPUS) → see doc for S5/S6. Page headroom only ~50 KB: steps must delete duplicates.
