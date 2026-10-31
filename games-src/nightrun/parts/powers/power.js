@@ -86,7 +86,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     for(const it of items){const K=PWK[it.k],n=Math.round(it.tot/4),bw=132,sw=bw/n;ctx.save();ctx.translate(x0,y);ctx.scale(k,k);
       ctx.fillStyle='#05030cb0';ctx.fillRect(-6,-20,232,40);
       ctx.translate(14,0);this.coin(it.k,11);ctx.translate(-14,0);
-      ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#e9e6ff';const rt=it.txt||Math.max(1,Math.ceil(it.rem/4))+(Math.ceil(it.rem/4)>1?' BARS':' BAR');ctx.fillText(rt,220,-3);
+      ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#e9e6ff';const rt=it.txt||Math.max(1,Math.ceil(it.rem/4))+(Math.ceil(it.rem/4)>1?' BARS LEFT':' BAR LEFT');ctx.fillText(rt,220,-3);
       const room=220-ctx.measureText(rt).width-32-10,nm=K.n+(it.lv?'  LV'+it.lv:'');let nf=14;ctx.textAlign='left';ctx.font='700 14px "Chakra Petch",sans-serif';   // name and level are ONE label that shrinks to the room left of the time: the two never touch
       while(nf>9&&ctx.measureText(nm).width>room){nf-=.5;ctx.font='700 '+nf+'px "Chakra Petch",sans-serif';}
       ctx.fillStyle=K.c;ctx.fillText(nm,32,-3,Math.max(20,room));

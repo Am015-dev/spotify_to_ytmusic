@@ -53,7 +53,13 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
       if(b.ew||b.k==='m'){this.eshot('fx-eb-mine',b.x,b.y,Math.max(r*5,mn*1.3));continue;}
       this.eshot('fx-bullet-shell',b.x,b.y,Math.max(r*5.2,mn));}},
   pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.translate(p.x,y);PURL.ink(56,56,()=>{if(p.t==='pw')PW.coin(p.k,16);else pkPaint(p,t);},.3,'pk|'+p.t+'|'+p.k+'|'+(p.t==='pw'?PURL.fk(SPR.PK[p.k]||'',G.t):p.t==='shard'?Math.round(Math.abs(Math.cos(t*3+p.bob))*6):Math.round(Math.sin(t*2+p.bob)*4)));ctx.restore();}},   // W244: pickups sit in the scene with the same ink shadow   // power-ups: the owner's icon only (no glow disc, dashed ring or name)
-  bar(w){const b=G.boss;if(!b||b.x>=W||!(b.max>0))return;ctx.fillStyle='#ff6a2a';ctx.fillRect(0,0,w*clamp(b.hp/b.max,0,1),4);}};
+  bar(w){const b=G.boss;if(!b||!(b.max>0))return;   // W324: the boss bar with its name (it was one 4 px line): shows from the moment the boss is spawned, boss and mini-boss alike
+    const ph=w<600,bw=ph?w-28:Math.max(160,Math.min(480,w-424)),bh=ph?10:14,x=ph?(w-bw)/2:Math.max((w-bw)/2,400),y=ph?66:40,f=clamp(b.hp/b.max,0,1),lab=(b.mini?'MINI-BOSS · ':'BOSS · ')+b.nm,fs=ph?13:15;
+    ctx.save();ctx.textBaseline='alphabetic';ctx.font='700 '+fs+'px "Chakra Petch",sans-serif';ctx.textAlign='left';
+    ctx.fillStyle='#05030ccc';ctx.fillRect(x-4,y-fs-6,bw+8,bh+fs+12);ctx.strokeStyle='#ff3040';ctx.lineWidth=1.5;ctx.strokeRect(x-3.25,y-fs-5.25,bw+6.5,bh+fs+10.5);
+    ctx.fillStyle='#fff';ctx.fillText(lab,x,y-5,bw*.72);if(b.ph>1){ctx.textAlign='right';ctx.fillStyle='#ffb020';ctx.fillText('PHASE '+b.ph,x+bw,y-5);}
+    ctx.fillStyle='#ffffff1c';ctx.fillRect(x,y,bw,bh);const g=ctx.createLinearGradient(x,0,x+bw,0);g.addColorStop(0,'#ff3040');g.addColorStop(1,'#ff9a2a');ctx.fillStyle=g;ctx.fillRect(x,y,bw*f,bh);
+    ctx.fillStyle='#ffffff55';ctx.fillRect(x,y,bw*f,Math.max(2,bh*.25));ctx.fillStyle='#05030c';for(let i=1;i<4;i++)ctx.fillRect(x+bw*i/4-1,y,2,bh);ctx.restore();}};
 NR.on('tick',()=>{if(RET.purelook&&G&&G.boss)PB.keep(G.boss);});
 {const f=PURL.foe;PURL.foe=function(e,t){if(e.type==='boss')return PB.boss(e,t);if(e.type==='gate')return PB.gate(e,t);return f.call(this,e,t);};}
 /* W239 (PC seed 2: the ship flew under the score panel and could not be seen): the score / multiplier panel and the HULL panel fade to 35% while the ship's box overlaps them.
