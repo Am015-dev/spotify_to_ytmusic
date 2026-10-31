@@ -13,6 +13,7 @@ const HP = process.env.HP ? JSON.parse(process.env.HP) : {};   // human paramete
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const BOT = (o) => {
   const process_noBossGod = !!o.noBossGod;
+  { let gs = (o.seed * 104729 + 7) >>> 0; Math.random = () => { gs = (gs + 0x6D2B79F5) >>> 0; let t = gs; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }   // W314: game dice seeded per run too, so every bot plays the same seeds (paired)
   const m = window.__mnr, { n, build, bot, seed } = o; m.SET.diff = o.diff || 'normal'; try { m.applySet(); } catch (e) { }
   if (o.endless) { m.ST.on = false; document.getElementById('startBtn').click(); } else if(n>0)m.startStory(n);else{m.ST.on=false;document.getElementById('startBtn').click();} m.simOn(true); const e0 = window.ABIL ? window.ABIL.stat.emp : 0;
   let sd = seed * 7919 + 13; const rnd = () => { sd = (sd * 1103515245 + 12345) & 0x7fffffff; return sd / 0x7fffffff; };   // own dice: a run is repeatable
@@ -107,19 +108,20 @@ const BOT = (o) => {
   const life = []; for (const [e, r] of rec) { if (r.boss || r.mini || !r.killed || r.in < 0 || r.end - r.in <= 0) continue; life.push([r.ty, +(r.end - r.in).toFixed(2)]); }
   let sp = 0, lk = 0, lw = 0; for (const [e, r] of rec) { if (r.boss || r.mini || !LK || !(LK.weight(e) > 0)) continue; sp++; if (e.lkd) { lk++; lw += LK.weight(e); } }
   if (o.endless) cleared = window.ENDR.w >= n && !m.G.dead;
-  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0), seed, policy: pol, score: m.G.score, gold: window.WV && WV.bt ? WV.bt.n : 0, sqs: window.WV && WV.bt ? WV.bt.m : 0, sw, sqMode: [...sqm.entries()].sort((a, b) => a[0] - b[0]).map(([k, c]) => c[1] > c[0] ? 1 : 0), sqLog: window.WV ? WV.log.sqs : [], cf: CF, flak: window.WV ? WV.log.flak | 0 : 0 };
+  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, hpEnd: m.P.hp, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0), seed, policy: pol, score: m.G.score, gold: window.WV && WV.bt ? WV.bt.n : 0, sqs: window.WV && WV.bt ? WV.bt.m : 0, sw, sqMode: [...sqm.entries()].sort((a, b) => a[0] - b[0]).map(([k, c]) => c[1] > c[0] ? 1 : 0), sqLog: window.WV ? WV.log.sqs : [], cf: CF, flak: window.WV ? WV.log.flak | 0 : 0 };
   m.abort(); return res;
 };
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
   const br = await PW.chromium.launch(), jobs = [], res = []; let next = 0, errs = 0;
-  for (const bot of BOTS) for (const build of BUILDS) for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, build, bot, seed: k + 1, MAXT, hp: HP, policy: process.env.POLICY || 'hold', endless: ENDLESS, diff: DIFF, noBossGod: process.env.BOSSGOD === '0' });
+  for (const bot of BOTS) for (const build of BUILDS) for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, build, bot, seed: k + 1 + (+process.env.SEEDBASE || 0), MAXT, hp: HP, policy: process.env.POLICY || 'hold', endless: ENDLESS, diff: DIFF, noBossGod: process.env.BOSSGOD === '0' });
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('FAIL page error ' + e.message); });
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ''}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
-    if (process.env.PRE) await p.evaluate(process.env.PRE);
-    while (next < jobs.length) { const j = jobs[next++]; try { res.push(await p.evaluate(BOT, j)); } catch (e) { console.log('RUN ERROR', j.n, j.build, e.message.slice(0, 200)); } }
+    const load = async () => { await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ''}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
+      if (process.env.PRE) await p.evaluate(process.env.PRE); };
+    await load();
+    while (next < jobs.length) { const j = jobs[next++]; if (process.env.FRESH) await load(); try { res.push(await p.evaluate(BOT, j)); } catch (e) { console.log('RUN ERROR', j.n, j.build, e.message.slice(0, 200)); } }
     await p.close();
   }));
   await br.close(); srv.kill();
