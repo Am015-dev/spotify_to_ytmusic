@@ -9,7 +9,7 @@ const L = require('./lib.js'), { PW, sleep } = L, fs = require('fs');
 const SEED0 = +process.env.SEED0 || 0, WALL = +process.env.WALL || 150, SEEDS = +process.env.SEEDS || 8, STAGES = +process.env.STAGES || 10, PAR = +process.env.PAR || 4, TCAP = +process.env.TICKS || 900;
 const STRATS = (process.env.STRATS || 'idle,random,dodger,shooter').split(','), DEVS = (process.env.DEVS || 'phone,pc').split(','), SHOTS = process.env.SHOTS;
 const FOCUS0 = process.env.FOCUS0 === '1', STARTS = (process.env.STARTS || '').split(',').filter(Boolean).map(Number);   // FOCUS0=1: ?focus=0 (the result screen then offers NEXT STAGE); STARTS=2,5: begin at that story stage through the game's own startStory hook
-const DEV = { phone: { W: 390, H: 763, touch: true }, pc: { W: 1440, H: 860, touch: false } };
+const DEV = { phone: { W: 390, H: 763, touch: true }, pc: { W: 1440, H: 860, touch: false }, pkey: { W: 390, H: 763, touch: false, ua: true } };   // W302 pkey: phone UA + portrait (rotMode) driven by the keyboard: splits input path from geometry
 const rngOf = s => { let a = s * 2654435761 >>> 0 || 1; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
 const SEEDJS = s => `(()=>{let a=${s}*2654435761>>>0||1;Math.random=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
  window.__rej=[];addEventListener('unhandledrejection',e=>window.__rej.push(String(e.reason&&e.reason.message||e.reason).slice(0,160)));
@@ -24,11 +24,11 @@ const step = (p, n) => p.evaluate(n => { for (let i = 0; i < n; i++) window.__mn
 const frames = p => p.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
 const STEPS = +process.env.STEPS || 8;   // sim steps (1/60 s) between decisions; one page round trip per decision
 // W284: read-only recorder inside the same page round trip: per sim step, a hp drop is logged with the nearest bullet/enemy kind (window.__hits), and every new bullet is counted (window.__bs, split boss / not boss)
-const snap = (p, n) => p.evaluate(([n, a, b]) => { const m = window.__mnr; const H = window.__hits = window.__hits || [], seen = window.__seen = window.__seen || new WeakSet(), B = window.__bs = window.__bs || { boss: 0, bossS: 0, all: 0, allS: 0 };
-  for (let i = 0; i < n; i++) { let G = m.G, P = m.P; const hp0 = P.hp, bo = !!G.boss; let nb = null, nd = 1e9, ne = null, ned = 1e9;
+const snap = (p, n) => p.evaluate(([n, a, b]) => { const m = window.__mnr; const H = window.__hits = window.__hits || [], seen = window.__seen = window.__seen || new WeakMap(), B = window.__bs = window.__bs || { boss: 0, bossS: 0, all: 0, allS: 0 };
+  for (let i = 0; i < n; i++) { let G = m.G, P = m.P; const hp0 = P.hp, bo = !!G.boss, tNow = G.t; let nb = null, nd = 1e9, ne = null, ned = 1e9;
     for (const x of G.eb) { const d = Math.hypot(x.x - P.x, x.y - P.y); if (d < nd) { nd = d; nb = x; } } for (const x of G.en) { const d = Math.hypot(x.x - P.x, x.y - P.y); if (d < ned) { ned = d; ne = x; } }
-    m.step(1 / 60); G = m.G; P = m.P; for (const x of G.eb) if (!seen.has(x)) { seen.add(x); B.all++; if (G.boss) B.boss++; } B.allS += 1 / 60; if (G.boss) B.bossS += 1 / 60;
-    if (P.hp < hp0 && G.live) H.push({ t: +G.t.toFixed(1), boss: bo, st: m.ST.on ? m.ST.n : 0, b: nb && nd < 90 ? (nb.t || nb.k || '?') + '@' + (nd | 0) : null, en: ne && ned < 70 ? (ne.t || ne.k || '?') + '@' + (ned | 0) : null, bossD: G.boss ? Math.hypot(G.boss.x - P.x, G.boss.y - P.y) | 0 : null }); }
+    m.step(1 / 60); G = m.G; P = m.P; for (const x of G.eb) { let q = seen.get(x); if (!q) { q = { t: G.t, x: x.x, y: x.y, inT: null }; seen.set(x, q); B.all++; if (G.boss) B.boss++; } if (q.inT === null && x.x >= 0 && x.x <= 960 && x.y >= 0 && x.y <= 540) q.inT = G.t; } B.allS += 1 / 60; if (G.boss) B.bossS += 1 / 60;
+    if (P.hp < hp0 && G.live) H.push({ t: +G.t.toFixed(1), boss: bo, st: m.ST.on ? m.ST.n : 0, b: nb && nd < 90 ? (nb.t || nb.k || '?') + '@' + (nd | 0) : null, en: ne && ned < 70 ? (ne.t || ne.k || '?') + '@' + (ned | 0) : null, bossD: G.boss ? Math.hypot(G.boss.x - P.x, G.boss.y - P.y) | 0 : null, K: nb && nd < 90 ? { k: nb.t || nb.k || '?', r: nb.r, sp: Math.round(Math.hypot(nb.vx, nb.vy)), d: nd | 0, age: +(tNow - (seen.get(nb) || { t: tNow }).t).toFixed(2), on: seen.get(nb) && seen.get(nb).inT !== null ? +(tNow - seen.get(nb).inT).toFixed(2) : null, b0: seen.get(nb) ? [seen.get(nb).x | 0, seen.get(nb).y | 0] : null, bx: nb.x | 0, by: nb.y | 0 } : null, px: P.x | 0, py: P.y | 0, E: ne && ned < 70 ? { k: ne.t || ne.k || '?', ty: ne.type, x: ne.x | 0, y: ne.y | 0 } : null }); }
   return { s: eval('(' + a + ')')(), w: eval('(' + b + ')')() }; }, [n, stFn.toString(), worldFn.toString()]);   // step + state + world in ONE round trip
 
 // ---- real input layers ----
@@ -36,8 +36,8 @@ function makeInput(p, dev) {
   const I = { dev, cdp: null, finger: null, keys: new Set() };
   I.init = async () => { if (dev.touch) I.cdp = await p.context().newCDPSession(p);
     I.geo = await p.evaluate(() => { const e = document.getElementById('frame') || document.querySelector('canvas'); const r = e.getBoundingClientRect(); return { l: r.left, t: r.top, w: r.width, h: r.height }; }); };
-  const tp = (type, x, y, id) => I.cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: id || 1 }] });
-  I.tap = async (x, y) => { const f = I.finger ? [{ x: I.finger.x, y: I.finger.y, id: 1 }] : []; await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [...f, { x, y, id: 7 }] }); await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: f }); };   // a second finger taps; the steering finger stays down
+  const tp = (type, x, y, id) => I.cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? (I.finger ? [{ x: I.finger.x, y: I.finger.y, id: 1 }] : []) : [{ x, y, id: id || 1 }] });   // W305: CDP touchEnd lists the points that END
+  I.tap = async (x, y) => { const f = I.finger ? [{ x: I.finger.x, y: I.finger.y, id: 1 }] : []; await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [...f, { x, y, id: 7 }] }); await I.cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [{ x, y, id: 7 }] }); };   // W305: a second finger taps; touchEnd lists the TAP finger (W302 listed the steering finger: it was lifted on every dash/EMP tap; proved in qa/w305-lift.js)
   I.clickEl = async sel => { const bb = await p.locator(sel).boundingBox(); if (!bb) return false; const x = bb.x + bb.width / 2, y = bb.y + bb.height / 2; if (dev.touch) await I.tap(x, y); else await p.mouse.click(x, y); return true; };
   // movement: want = unit-ish vector in game coords (gx forward = right on PC / up on phone). PC: keys; phone: finger drag, re-grabbed at the edge
   I.move = async (dx, dy, rot, fire) => {
@@ -49,7 +49,7 @@ function makeInput(p, dev) {
     if (!fire && !I.finger) return;
     if (!I.finger) { I.finger = { x: g.l + g.w / 2, y: g.t + g.h * .72 }; await tp('touchStart', I.finger.x, I.finger.y); }
     let nx = I.finger.x + ddx, ny = I.finger.y + ddy;
-    const m = 30; if (nx < g.l + m || nx > g.l + g.w - m || ny < g.t + m || ny > g.t + g.h - m) { await tp('touchEnd'); I.finger = null; return; }   // let go, re-grab next tick
+    const m = 30; if (nx < g.l + m || nx > g.l + g.w - m || ny < g.t + m || ny > g.t + g.h - m) { await tp('touchEnd'); I.finger = { x: g.l + g.w / 2, y: g.t + g.h * .72 }; await tp('touchStart', I.finger.x, I.finger.y); nx = I.finger.x + ddx; ny = I.finger.y + ddy; }   // W291: a thumb re-grips in ~80 ms, not one 0.2 s decision later: lift and re-grab in the same tick
     if (Math.hypot(nx - I.finger.x, ny - I.finger.y) < 1.5) return; I.finger = { x: nx, y: ny }; await tp('touchMove', nx, ny);   // a CDP touch costs ~30 ms: skip moves under 1.5 px
   };
   I.release = async () => { if (dev.touch) { if (I.finger) { await tp('touchEnd'); I.finger = null; } } else { for (const k of I.keys) await p.keyboard.up(k); I.keys.clear(); } };
@@ -88,7 +88,7 @@ const uiAudit = (p, phone) => p.evaluate(phone => { const out = [], R = []; for 
   for (let i = 0; i < R.length; i++) for (let j = i + 1; j < R.length; j++) { const a = R[i].r, b = R[j].r; const w = Math.min(a.right, b.right) - Math.max(a.left, b.left), h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); if (w > 4 && h > 4) out.push(`overlap ${R[i].id}/${R[j].id} ${w | 0}x${h | 0}`); } return out; }, phone);
 const shot = async (p, tag) => { if (SHOTS) await p.screenshot({ path: `${SHOTS}/${tag}.png` }).catch(() => { }); };
 async function openPage(br, devName, seed) {
-  const d = DEV[devName]; const ctx = await br.newContext({ viewport: { width: d.W, height: d.H }, deviceScaleFactor: 1, hasTouch: d.touch, isMobile: d.touch, userAgent: d.touch ? L.UA : undefined });
+  const d = DEV[devName]; const ctx = await br.newContext({ viewport: { width: d.W, height: d.H }, deviceScaleFactor: 1, hasTouch: d.touch, isMobile: d.touch, userAgent: d.touch || d.ua ? L.UA : undefined });
   const p = await ctx.newPage(); p.errs = []; p.cons = []; p.on('pageerror', e => p.errs.push(String(e.message).slice(0, 160))); p.on('console', m => { if (m.type() === 'error' && !/net::ERR_FAILED/.test(m.text())) p.cons.push(m.text().slice(0, 160)); }); p.on('requestfailed', r => { if (!/fonts\.(googleapis|gstatic)|^blob:/.test(r.url())) p.cons.push('requestfailed ' + r.url().replace(/^https?:\/\/[^/]+/, '').slice(0, 100)); }); p.on('response', r => { if (r.status() >= 400) p.cons.push('http ' + r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '').slice(0, 100)); });
   await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
@@ -126,7 +126,7 @@ async function run(br, devName, strat, seed, start) {
     if (!s.boss && bossWas) { bossWas = false; if (s.bossDone || s.res) R.bossKilled++; }
     const w = SN.w, a = brn(w);
     if (s.boss && w.rot) { const ys = w.eb.filter(b => b[0] > w.px + 10 && b[0] < w.px + 320).map(b => b[1]).concat([40, 500]).sort((x, y) => x - y); let g = 0; for (let i = 1; i < ys.length; i++) g = Math.max(g, ys[i] - ys[i - 1]); (R.corr = R.corr || []).push([ys.length - 2, g | 0]); }   // W284: bullets within 320 world px ahead of the ship, widest free lateral gap in the 40..500 field
-    await I.move(a.dx, a.dy, w.rot, a.fire); if (a.dash) await I.dash(); if (a.emp) await I.emp();
+    await I.move(a.dx, a.dy, w.rot, a.fire); if (a.dash && !process.env.NODASH) await I.dash(); if (a.emp) await I.emp();
     await frames(p);   // W283: let the page paint two frames so the input just sent is applied before the next stepped burst (without it a fast machine lost every run: 0/4 PC dodger on W272 vs 2/2 with it)
     R.gameSec += STEPS / 60; tick++;
     const n = s; if (n.score + ':' + n.hp !== lastKey) { lastKey = n.score + ':' + n.hp; lastChange = n.t; }

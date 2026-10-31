@@ -4,7 +4,6 @@ Build-order parts (`build.py` finds them by name, order is in `build.py`). Files
 
 - `art.js`: painted art loading, ART.img/anim, sprite strips
 - `arthooks.js`: literal id table for fx/fg/wpmount/wp/rule/rx/ui pictures plus the hooks that draw them when re
-- `bulletart.js`: real bullet pictures (converted approved previews) for enemy orb/needle/shell/rocket and every 
 - `foeart.js`: every fly-stage enemy draws from an approved ship sheet
 - `fxwave.js`: EFFECTS ASSET WAVE 8 (owner, 18 Oct 2026). Pictures for shot
 

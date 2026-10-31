@@ -1,5 +1,5 @@
 // PURPOSE: ?pure=1 bosses, gate pylons and enemy shots from the owner's pictures only (boss idle/attack/hit/defeat sheets, fx-shield, fx-eb-*, fx-bullet-*)
-// FLAG: purelook (same as pure.js; this part only adds PURL.boss / PURL.gate / PURL.ebul and wraps PURL.foe / PURL.shots)
+// FLAG: purelook (same as pure.js; this part adds PB.boss / PB.gate / PB.ebul (the ONE enemy-shot owner) / PB.pickups and wraps PURL.foe)
 // TEST: node qa/pureprobe.js (0 code-drawn shapes in the play field, stage 1 and a boss fight)
 /* ---------- W216 (owner, 24 Oct 2026): pure.js left bosses and gate pylons on the old draw chain (tints, rings, crosshairs, plates, lasers drawn with
    fillRect) and enemy shots as lime orbs. Here: the boss is SPR.boss (its four sheets: idle, attack while it fires, hit on damage; defeat is the ghost
@@ -30,18 +30,32 @@ const PB=window.PB={hud:0,   // >0 while a HUD function runs (qa/pureprobe.js co
     else if(e.tele){for(const [y0,y1] of[[0,top],[bot,H]])this.pic('fx-eb-aim-line',0,(y0+y1)/2,y1-y0,8,Math.PI/2,.5+.4*Math.abs(Math.sin(t*8)));}
     for(const y of[top,bot])if(!FOEART.post(e,y,y===top,fl))gatePost(y,y===top,fl);
     ctx.restore();return true;},
-  ebul(){for(const b of G.eb){const a=Math.atan2(b.vy||0,b.vx||-1),r=b.r||5;
-      if(b.hm>0){this.pic('fx-bullet-shell',b.x,b.y,r*7,0,G.t*5);continue;}
-      if(b.k==='n'){this.pic('fx-bullet-needle',b.x,b.y,r*9,0,a);continue;}
-      if(b.k==='r'){this.pic('fx-bullet-rocket',b.x,b.y,r*8,0,a);continue;}
-      if(b.ew||b.k==='m'){this.pic('fx-eb-mine',b.x,b.y,r*5);continue;}
-      this.pic('fx-bullet-shell',b.x,b.y,r*5.2);}},
+  // W302: ONE owner for every enemy shot. The owner's shot pictures (painted on black) are gradient-mapped once to the reserved enemy hue (alpha from
+  // their own light: dark -> clear, mid -> danger pink, hot -> white), then each size gets a dark ink outline (8 offset copies of the silhouette) and is
+  // drawn source-over, so a shot reads by value over the bright city, explosions and the ship's engine (no other object uses this pink).
+  EBC:[255,34,120],
+  ramp(n){const R=this.RM||(this.RM={});if(R[n]!==undefined)return R[n];const b=this.img(n);if(!b)return null;const w=b.width,h=b.height,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(b,0,0);
+    let d;try{d=g.getImageData(0,0,w,h);}catch(e){return R[n]=b;}const D=d.data,[pr,pg,pb_]=this.EBC,op=D[3]===0;let mx=1;for(let i=0;i<D.length;i+=4)mx=Math.max(mx,D[i],D[i+1],D[i+2]);
+    for(let i=0;i<D.length;i+=4){const L=Math.max(D[i],D[i+1],D[i+2])/mx,a=op?D[i+3]/255*Math.min(1,.45+L):Math.min(1,Math.max(0,(L-.05)*3)),u=Math.max(0,(Math.pow(L,2.2)-.8)/.2)*.8;
+      D[i]=pr+(255-pr)*u;D[i+1]=pg+(240-pg)*u;D[i+2]=pb_+(248-pb_)*u;D[i+3]=a*255;}
+    g.putImageData(d,0,0);return R[n]=c;},
+  spr(n,w,h){const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),pw=Math.max(4,Math.round(w*ps/2)*2),ph=Math.max(4,Math.round(h*ps/2)*2),k=n+'|'+pw+'|'+ph,C=this.SC||(this.SC=new Map());let c=C.get(k);if(c)return c;
+    const b=this.ramp(n);if(!b)return null;const o=Math.max(2,Math.round(Math.min(pw,ph)*.16));c=document.createElement('canvas');c.width=pw+o*2;c.height=ph+o*2;const g=c.getContext('2d');
+    const t=document.createElement('canvas');t.width=pw;t.height=ph;const q=t.getContext('2d');q.drawImage(b,0,0,pw,ph);q.globalCompositeOperation='source-in';this.hud++;q.fillStyle='#14000a';q.fillRect(0,0,pw,ph);this.hud--;
+    g.globalAlpha=.9;for(const[x,y]of[[-1,0],[1,0],[0,-1],[0,1],[-.7,-.7],[.7,-.7],[-.7,.7],[.7,.7]])g.drawImage(t,o+x*o,o+y*o);g.globalAlpha=1;g.drawImage(b,o,o,pw,ph);
+    C.set(k,c={c,W:(pw+o*2)/ps,H:(ph+o*2)/ps});if(C.size>240)C.delete(C.keys().next().value);return c;},
+  eshot(n,x,y,w,h,ang){const b=this.img(n);if(!b)return;h=h||w*b.height/b.width;const s=this.spr(n,w,h);if(!s)return;ctx.save();ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(s.c,-s.W/2,-s.H/2,s.W,s.H);ctx.restore();},
+  ebul(){const u=Math.max(.2,(cv.clientWidth||W)/(rotMode?H:W)),mn=12/u;   // phone: an orb is never under ~11 css px across (its bright body >= 8 px)
+    for(const b of G.eb){const a=Math.atan2(b.vy||0,b.vx||-1),r=b.r||5;
+      if(b.hm>0){this.eshot('fx-bullet-shell',b.x,b.y,Math.max(r*6,mn*1.2),0,G.t*5);continue;}
+      if(b.k==='n'){const L=Math.max(r*9,mn*2.2);this.eshot('fx-bullet-shell',b.x,b.y,L,Math.max(L*.32,mn*.8),a);continue;}   // needle: the owner's shell picture as a long bolt (the needle picture is too dark to read at game size)
+      if(b.k==='r'){this.eshot('fx-bullet-rocket',b.x,b.y,Math.max(r*8,mn*1.8),0,a);continue;}
+      if(b.ew||b.k==='m'){this.eshot('fx-eb-mine',b.x,b.y,Math.max(r*5,mn*1.3));continue;}
+      this.eshot('fx-bullet-shell',b.x,b.y,Math.max(r*5.2,mn));}},
   pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.translate(p.x,y);PURL.ink(56,56,()=>{if(p.t==='pw')PW.coin(p.k,16);else pkPaint(p,t);},.3,'pk|'+p.t+'|'+p.k+'|'+(p.t==='pw'?PURL.fk(SPR.PK[p.k]||'',G.t):p.t==='shard'?Math.round(Math.abs(Math.cos(t*3+p.bob))*6):Math.round(Math.sin(t*2+p.bob)*4)));ctx.restore();}},   // W244: pickups sit in the scene with the same ink shadow   // power-ups: the owner's icon only (no glow disc, dashed ring or name)
   bar(w){const b=G.boss;if(!b||b.x>=W||!(b.max>0))return;ctx.fillStyle='#ff6a2a';ctx.fillRect(0,0,w*clamp(b.hp/b.max,0,1),4);}};
 NR.on('tick',()=>{if(RET.purelook&&G&&G.boss)PB.keep(G.boss);});
 {const f=PURL.foe;PURL.foe=function(e,t){if(e.type==='boss')return PB.boss(e,t);if(e.type==='gate')return PB.gate(e,t);return f.call(this,e,t);};}
-PURL.pickups=function(t){PB.pickups(t);};
-{const f=PURL.shots;PURL.shots=function(){const eb=G.eb;G.eb=[];try{f.call(this);}finally{G.eb=eb;}PB.ebul();};}
 /* W239 (PC seed 2: the ship flew under the score panel and could not be seen): the score / multiplier panel and the HULL panel fade to 35% while the ship's box overlaps them.
    The HUD is drawn once as always; the pixels under each overlapped panel are copied first and laid back over it at (1 - fade) afterwards, so every HUD implementation fades the same way. */
 PB.FA=[1,1];PB.FADE=.35;

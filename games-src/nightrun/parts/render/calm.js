@@ -12,12 +12,12 @@ const CALM=window.CALM={get on(){return running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
   small(bn){return!!bn&&this.on&&(!!bn.sm||(!bn.warn&&!!bn.ev));},
   /* top-band strip: one line, under the score bar, off the middle of the field */
-  draw(bn,w,h,k){const kk=bn.t,a=Math.max(0,Math.min(1,kk*3,(bn.m-kk)*6)),D=DISTRICTS[G.di],y=(G.boss&&G.boss.x<W?52:38)*k,hh=(bn.warn?30:24)*k,fs0=bn.warn?17:12,fmin=bn.warn?16:8;   // W295: the boss warning chip is >= 16 px on screen (size constant only; placement is W291's)
+  draw(bn,w,h,k){const kk=bn.t,a=Math.max(0,Math.min(1,kk*3,(bn.m-kk)*6)),D=DISTRICTS[G.di],y=(G.boss&&G.boss.x<W?52:38)*k,hh=(bn.warn?32:24)*k,fs0=bn.warn?17:12,fmin=bn.warn?16:8;   // W295: the boss warning chip is >= 16 px on screen; W302: warn chip red
     ctx.save();ctx.globalAlpha=a*.9;ctx.fillStyle='#05030cd0';ctx.fillRect(0,y,w,hh);ctx.fillStyle=D.a;ctx.fillRect(0,y,3*k,hh);ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    let txt=bn.a+(bn.b?' · '+bn.b:'');ctx.font=`700 ${fs0*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#e9e6ff';
+    let txt=bn.a+(bn.b?' · '+bn.b:'');ctx.font=`700 ${fs0*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=bn.warn?'#ff6070':'#e9e6ff';
     let f=fs0*k;while(f>fmin*k&&ctx.measureText(txt).width>w-16*k){f-=.5*k;ctx.font=`700 ${f}px "Chakra Petch",sans-serif`;}
-    if(ctx.measureText(txt).width>w-16*k)txt=bn.warn&&bn.b?bn.a+' · '+bn.b.split(' · ')[0]:bn.a;   // a long boss line keeps the boss name   // the sub line does not fit one chip: the title alone
-    if(bn.warn&&ctx.measureText(txt).width>w-16*k)txt=bn.b.split(' · ')[0];ctx.fillText(txt,w/2,y+hh*.68);ctx.restore();},
+    if(ctx.measureText(txt).width>w-16*k)txt=bn.warn&&bn.b?bn.a+' · '+bn.b.split(' · ')[0]:bn.a;   // a long boss line keeps the boss name
+    if(bn.warn&&ctx.measureText(txt).width>w-16*k)txt=bn.b.split(' · ')[0];ctx.fillText(txt,w/2,y+hh*(bn.warn?.7:.68));ctx.restore();},
   cls(s){let r=0,g=0,b=0;if(typeof s!=='string')return 2;let m=s.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
     if(m){r=parseInt(m[1],16);g=parseInt(m[2],16);b=parseInt(m[3],16);}else if((m=s.match(/rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/))){r=+m[1];g=+m[2];b=+m[3];}else return 2;
     if(r>=220&&g<130)return 0;if(r>=220&&g>=180&&b<130)return 1;return 2;},

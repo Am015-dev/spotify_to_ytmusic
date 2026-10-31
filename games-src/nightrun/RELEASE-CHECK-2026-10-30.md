@@ -24,8 +24,8 @@ Replaced the 40 % shrink: the name bar is one thin bar with the name on it (18 u
 | 15 | streetsim RUNS=40 seeds 4321 / 9001 / 17003 | PASS (gates) | gfirst 73 / 78 / 78 %, dodge 68 / 70 / 65 %, idle 0 % (died 19.6 s), nearest 40 / 40 / 33 %. Still FAIL as on W280: threat peak (62 %), cover >= 3 (0.3), D3 depth spread on 2 of 3 blocks (28 / 30 / 29 %). Stand-still of non-attacking foes 11.4-12.3 %. No numbers moved vs W285 |
 | 16 | Page errors at 390x763 touch, 844x390, 1440x860 | PASS | 0 in bossbar-layout-test, focus, flow, shell, footvis and both gauntlets |
 | 17 | Flight stage 1, PC dodger, 8 seeds, fixed harness | PASS | 8 of 8 cleared the stage (boss killed 8/8), 0 errors; gate 60 % |
-| 18 | Flight stage 1, phone dodger, 8 seeds | WEAK, no worse than control | 1 of 8 cleared (boss seen 7, killed 1); W272 control dodger 0 of 4 |
-| 19 | Flight stage 1, phone shooter, 8 seeds | PASS vs control | 5 of 8 cleared; control shooter 4 of 4 (control total 4 of 8, now 6 of 16) |
+| 18 | Flight stage 1, phone dodger, 8 seeds (W305, harness fixed) | PASS | boss killed 8 of 8; 5 of 8 with 0 game overs (62 %), 7 of 8 with at most 1; gate 40 %. The old 1 of 8 was the harness lifting the steering finger on every dash tap (HANDOFF-W305.md) |
+| 19 | Flight stage 1, phone shooter, 8 seeds (W305, harness fixed) | PASS | boss killed 8 of 8; 7 of 8 with 0 game overs (88 %), s3 needed 2 retries; gate 60 % |
 | 20 | Street full stage dodger, phone 390x763, 4 seeds | WEAK | 0 of 4 cleared (died 122 / 105 / 231 / 216 s; boss reached in 2, boss hp left 138 / 179) |
 | 21 | Street full stage dodger, PC 1440x860, 4 seeds | PASS | 3 of 4 cleared (257 / 249 / 244 s), 1 died before the boss (137 s) |
 | 22 | Street idle and random must die, 1 seed per device | PASS | idle died 107 s phone / 22 s PC; random 96 s phone / 49 s PC; 0 clears |
@@ -34,7 +34,7 @@ Replaced the 40 % shrink: the name bar is one thin bar with the name on it (18 u
 | 25 | Shots: title, pause, flight 10 s, results at 844x390 | NOT TAKEN | out of time |
 ## Known issues (severity for a player)
 - Phone street boss is hard to beat (0 of 4 for the bot): HIGH.
-- Phone flight dodger-style play rarely clears stage 1 (1 of 8): HIGH.
+- Phone flight dodger-style play rarely clears stage 1 (1 of 8): was a harness bug, CLOSED by W305 (rows 18/19).
 - Fingerprint hashes stale and sprite smoke fails (pre-existing, not player-visible): LOW.
 - Streetsim: depth spread (28-30 %) and cover-hit count below gate: LOW.
 - Boss hint line on the phone sits over the boss body for its few seconds on screen: LOW.
