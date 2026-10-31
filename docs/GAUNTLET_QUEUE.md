@@ -135,3 +135,7 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - og2 re-review (REVIEW_2K_46): og2b round PASSES (all 3 rev44 blockers fixed, seen with real touch), but ?og2 not ON yet. Items: (1) why/drive-start ath red 2/3 with og2 ON ("hint pill 0x0 on a fresh save"); (2) at an og2 ring, the chip must name that race (fra Grand Prix ring offers the Eiserner Steg leap); (3) the GO return-time cap back to 3 s, with a real wait. → og2c (SONNET, ~30 min) at the next free worker slot.
 - og3b done (7422f09) → review-r31-21 (OPUS) running.
 - Workers: og1b (way over its timebox, told to wrap up), wallhit-r31e (head-on stop).
+
+## 31 Oct ~18:03
+- og1b done (142e901, flag OFF). GO numbers: launch 20.4/31.2 vs roam 20.5/31.7 m/s; camera identical; wheel gap ≤ 0.05 m; gates 78/78 OFF and ON. It touches SHARED roam code (71 RD_pow/RD_thr/RD_top, 99_api CR_acc, SKC_rig), so city driving changes for everyone even with the flag OFF. Watch: why/solid-cars missed 6/10 on builds with og1b vs 0/4 on trunk (RD_unstack respawn), unexplained; check the new RD_* names against traffic RD_unstack. → OPUS review after review-r31-21.
+- Started og2c (SONNET, REVIEW_2K_46 items). Workers: og2c, wallhit-r31e.
