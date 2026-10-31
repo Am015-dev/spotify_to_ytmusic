@@ -23,8 +23,8 @@ const DMG={swing:1,charge:2,pound:1};
 // Tuning block (BALANCE-W290.md): shipped defaults, no flags.
 const TEL={swing:1.0,charge:1.05,pound:1.1},  // telegraph start -> hit (s)
   CUT={swing:.44,charge:.39,pound:.28},   // the last CUT s of a telegraph: the boss commits (READ ends at .56 / .66 / .82 s)
-  GRACE=.13,                              // an answer up to GRACE s after the READ end still counts (accepted until .69 / .79 / .95 s); later = TOO LATE (W300 PC late reader: .75/.85 4/4, .70/.82 3/4, .70/.80 4/4, .68/.78 1/4)
-  TGRACE=.04,                             // + on a touch screen (tap latency; phone late reader: +0 at .70/.82 0/4, +0 at .75/.85 3/4, +.08 at .70/.80 4/4)
+  GRACE=.18,                              // an answer up to GRACE s after the READ end still counts (accepted until .69 / .79 / .95 s); later = TOO LATE (W300 PC late reader: .75/.85 4/4, .70/.82 3/4, .70/.80 4/4, .68/.78 1/4)
+  TGRACE=.02,                             // + on a touch screen (tap latency; phone late reader: +0 at .70/.82 0/4, +0 at .75/.85 3/4, +.08 at .70/.80 4/4)
   PUN=1.6,                                // punish window after a right answer (s; stun = x2 damage)
   REC=.9,                                 // after a missed / wrong attack: it shakes it off, no punish (s)
   GAPT=.9,                                // between attacks: it walks (s)
