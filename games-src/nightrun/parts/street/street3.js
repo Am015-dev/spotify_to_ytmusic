@@ -4,7 +4,7 @@
 /* ---------- STREET3. Owner, 22 Oct 2026 (tested on foot): "stop making more stages, focus on one stage. The old assets load before the new ones; the assets are blurring;
    the sprites are moving fast and abnormally, idle looks not smooth; enemy sprites also move fast and look abnormal; better lighting and shadows; one stage, one song,
    max 3 minutes; the difficulty should increase gradually". Builds on street2.js (same props, foes and climax), changes:
-   1. TIME: the camera may not run ahead of a gate that moves with the stage clock (SL.back), so the run lasts about the same for everyone: 8 beats of calm, then 12 waves whose
+   1. TIME: the camera may not run ahead of a gate that moves with the stage clock (SL.back), so the run lasts about the same for everyone: 4 beats of calm (W310: was 8; the first rusher walks in while "Push the stick right" still shows), then 12 waves whose
       threat score (rusher 1, gunner 2, heavy 4) grows linearly from 2 to 8 to the peak at ~81-85% of the run, a breather, the big heavy once the street is clear. No locks, no checkpoint, no captions,
       no music cues: one song (street1, 192 s) from start to end (musicpack's lock/boss/clear switches are blocked for this stage). S3.log.waves = the threat curve.
    2. LOADING: the STREET RUN hold (footq.js) also waits for the painted street (foot/bg-*) and prop pictures, so the first frame is the full-size art (no swap).
@@ -17,7 +17,7 @@ if(RET.street3===undefined)RET.street3=!/[?&]street3=0/.test(location.search);
 if(!RET.street3||!RET.street2||!window.FOOT||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2||!FOOT._in)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const S3=F.S3={GCD:1.9,ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
-  T:{beats:8,boss:145,waves:12,peakT:136,t0:2,thr0:2,thrPeak:8,cap:5},
+  T:{beats:4,boss:145,waves:12,peakT:136,t0:2,thr0:2,thrPeak:8,cap:5},
   TH:{rusher:1,gunner:2,heavy:4,bigheavy:8}};
 const on=()=>RET.street3&&F.S&&F.S.st===ST;
 /* ----- the stage: street2's rooms stretched over a longer road (the gate decides the pace, not the length) ----- */
