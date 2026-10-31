@@ -38,3 +38,17 @@ Replaced the 40 % shrink: the name bar is one thin bar with the name on it (18 u
 - Fingerprint hashes stale and sprite smoke fails (pre-existing, not player-visible): LOW.
 - Streetsim: depth spread (28-30 %) and cover-hit count below gate: LOW.
 - Boss hint line on the phone sits over the boss body for its few seconds on screen: LOW.
+
+## Stage rows (W301, 31 Oct 2026, branch nr/W301-bosses, PC in-page bot, stepped beat clock, 3 seeds, details HANDOFF-W301.md)
+| stage | dodger | shooter | note |
+|---|---|---|---|
+| 1 boss | 3/3 | 3/3 | boss killed in 33-37 s; the W292 "shooter not killing" was the wall-clock beat |
+| 2 | 3/3 | 3/3 | |
+| 3 | 0/3 | 3/3 | dodger dies (7-9 hull); phone dodger 0/2 |
+| 4 | 2/3 | 3/3 | |
+| 5 mini-boss | 0/3 | 1/3 | killable (GOD: 67-76 s); bots die to zone/slab/enrage hits: balance |
+| 6 | 2/3 | 3/3 | |
+| 7 | 0/3 | 1/3 | |
+| 8 boss | 0/3 | 0/3 | killable (GOD: 100-115 s); closest 19 % hp left; balance |
+| 9 | 1/3 | 2/3 | |
+| 10 | 0/3 | 3/3 | |
