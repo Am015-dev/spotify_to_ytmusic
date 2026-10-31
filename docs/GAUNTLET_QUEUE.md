@@ -101,3 +101,8 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - REVIEW_2K_42: memory patch good (fra 554-565, ath 684-697 MB; env rebuilds 1 per 5 min) but FAIL on one new GO line (ath mem/no-reload at the cap). → memland-r31a (SONNET) lands it without that line.
 - Started wallhit-r31b (SONNET): head-on facade hits must stop the car.
 - After: OPUS density design, OPUS tb redesign, fra ios-reveal stall, solid-cars flake, mem trunk reds (mem/stable, mem-quant, mem-own, ath-boot), world round 4.
+
+## 31 Oct ~10:06 (Alex: "The races and the city seem like 2 seperate games they don't communicate well, the race builder is even worse like a seperate game not taking the libraries from either free roam or races")
+- TOP PRIORITY now. onegame-r31c (OPUS, session_01RR7mnZXCzzUCapZ8fyt6YT): audit of what roam / races / builder each own vs share + target structure (shared core, thin modes as state machines) + 4-6 step lanes. First step must be player-visible.
+- wallhit-r31b paused (archived after 4 min, nothing pushed) to keep 2 workers; it returns after onegame's first step.
+- memland-r31a continues (memory fix → beta.168 with hills-r30t).
