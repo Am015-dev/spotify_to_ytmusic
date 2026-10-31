@@ -62,14 +62,21 @@ window.__og2={run:OG2_roundtrip,trip:OG2_trip};
 
 // ---- GO onegame/hud (og3, one game S3): ONE HUD kit in roam, Race Mode and the builder DRIVE: the same element ids visible, every HUD text >= 12 px,
 // 0 HUD rects over the touch controls (852x393 and portrait 390x844), and the GAS button present in all 3 modes. Flag OFF: no #hk, nothing changed.
-const OG3_IDS=['hkSpd','hkPlace','hkLap','hkTime','hkBoost','hkMap'],OG3_TXT=['hkSpdN','hkSpdU','hkPlace','hkLap','hkTime'],OG3_CT=['tL','tR','tG','tB','tN','tD','tF','tP','bxL','bxR','bxG','bxB','bxBo','bxPz','bxRsp','bxBack'];   // bx*: the builder's own drive buttons when og1 is off
+const OG3_IDS=['hkSpd','hkBoost','hkMap'],OG3_TXT=['hkSpdN','hkSpdU','hkPlace','hkLap','hkTime'],OG3_CT=['tL','tR','tG','tB','tN','tD','tF','tP','bxL','bxR','bxG','bxB','bxBo','bxPz','bxRsp','bxBack'];   // bx*: the builder's own drive buttons when og1 is off
 function OG3_vis(e){if(!e)return null;const r=e.getBoundingClientRect(),cs=getComputedStyle(e);if(r.width<=0||r.height<=0||cs.visibility!=='visible'||cs.display==='none'||+cs.opacity<.05)return null;
  for(let a=e;a&&a!==document.body;a=a.parentElement)if(a.hidden||getComputedStyle(a).display==='none')return null;return r}
+// the player car's screen rect: its opaque meshes' bounding boxes projected through the live camera (px, same space as getBoundingClientRect)
+function OG3_car(){const B=window.__bx&&window.__bx.BX,bx=B&&B.on&&B.mode==='drive',cam=bx?B.cam:camera,obj=bx?B.car:(pl&&pl.mesh);if(!cam||!obj)return null;obj.updateMatrixWorld(true);cam.updateMatrixWorld(true);
+ const v=new THREE.Vector3(),bb=new THREE.Box3();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;obj.traverseVisible(o=>{if(!o.isMesh||!o.geometry||o.userData.a8s||(o.material&&o.material.transparent))return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();bb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);
+  for(let i=0;i<8;i++){v.set(i&1?bb.max.x:bb.min.x,i&2?bb.max.y:bb.min.y,i&4?bb.max.z:bb.min.z).project(cam);if(v.z>1)continue;const X=(v.x+1)/2*innerWidth,Y=(1-v.y)/2*innerHeight;x0=Math.min(x0,X);x1=Math.max(x1,X);y0=Math.min(y0,Y);y1=Math.max(y1,Y)}});
+ return x0<x1?{left:x0,right:x1,top:y0,bottom:y1}:null}
 function OG3_probe(){const bad=[],R={},ct=[];for(const id of OG3_IDS){const r=OG3_vis(document.getElementById(id));if(!r)bad.push('#'+id+' hidden');else R[id]=r}
  for(const id of OG3_TXT){const e=document.getElementById(id),f=e?parseFloat(getComputedStyle(e).fontSize):0;if(!(f>=12))bad.push('#'+id+' '+f+'px')}
  for(const id of OG3_CT){const r=OG3_vis(document.getElementById(id));if(r)ct.push([id,r])}
  let ov=0;for(const id of['hkSpd','hkPlace','hkLap','hkTime','hkMap']){const a=R[id];if(!a)continue;for(const[cid,b]of ct)if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1){ov++;bad.push('#'+id+' over #'+cid)}}
- const gas=!!ct.find(c=>c[0]==='tG'||c[0]==='bxG');if(!gas)bad.push('no GAS');return{bad,gas,ids:Object.keys(R).length,ov}}
+ const gas=!!ct.find(c=>c[0]==='tG'||c[0]==='bxG');if(!gas)bad.push('no GAS');
+ const sp=R.hkSpd,car=innerWidth>innerHeight?OG3_car():null;   // landscape: the speed strip is a thin bottom bar (<= 34 px) and never on the car
+ if(sp&&innerWidth>innerHeight){if(sp.height>34)bad.push('speed strip '+Math.round(sp.height)+' px tall');if(car&&Math.min(sp.right,car.right)-Math.max(sp.left,car.left)>1&&Math.min(sp.bottom,car.bottom)-Math.max(sp.top,car.top)>1)bad.push('speed strip over the car ('+[sp.left,sp.top,sp.right,sp.bottom,car.left,car.top,car.right,car.bottom].map(Math.round)+')')}return{bad,gas,ids:Object.keys(R).length,ov}}
 async function OG3_mode(name,out){for(const[w,h]of[[852,393],[390,844]]){if(window.__vp){await window.__vp(w,h);await ogWait(500)}else if(w!==innerWidth)continue;
   let p=OG3_probe();for(let k=0;k<6&&p.bad.length;k++){await ogWait(400);p=OG3_probe()}out.push({m:name,vp:w+'x'+h,...p})}}
 async function OG3_hud(){const e0=OGG.errs;
@@ -87,4 +94,4 @@ async function OG3_hud(){const e0=OGG.errs;
 (function OG3_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='onegame'&&q.id==='hud'))C.items.push({ver:'onegame',id:'hud',area:'phone',text:'og3 · onegame/hud: one HUD kit: the same element ids (speed pill, place, lap, time, boost, minimap slot) visible in roam, Race Mode and the builder DRIVE, every HUD text >= 12 px, 0 HUD rects over the touch controls at 852x393 and 390x844, a GAS button in all 3 modes, 0 errors (flag og3; OFF: no #hk)'});
   C.GO['onegame/hud']=[{c:'fra',n:'One HUD kit (3 modes)',secs:180,fn:()=>OG3_hud()}];return}
  if(i<600)setTimeout(()=>OG3_reg(i+1),100)})(0);
-window.__og3={run:OG3_hud,probe:OG3_probe};
+window.__og3={run:OG3_hud,probe:OG3_probe,car:OG3_car};

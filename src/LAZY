@@ -40,3 +40,4 @@
 99c6hr_mstart_go.js:HRM_run,HRM_card
 99c6gui_card_go.js:GUC_run,GUC_card
 99c9og_onegame_go.js
+40h_hud_kit.js:HK_tick,HK_mode

@@ -18,15 +18,15 @@ function setT(el,k,v){if(lastHud[k]!==v){lastHud[k]=v;el.innerHTML=v}}
 function cells(el,key,n,on,extra){const k=on+'|'+extra;if(lastHud[key]===k)return;lastHud[key]=k;el.className='cells '+extra;[...el.children].forEach((c,i)=>c.className=i<on?'on':'')}
 const duelAt=d=>{const f=duelGhost.f;let lo=0,hi=f.length/2-1;while(lo<hi){const m=(lo+hi)>>1;if(f[m*2]<d)lo=m+1;else hi=m}return lo/20};
 function updHud(){if(!pl)return;const n=ships.filter(active).length;
-  if(RC.type==='zone'){setT(hudEl.pos,'pos',`${pad2(RC.zone.k)}<small> ZONE</small>`);setT(hudEl.lap,'lap',(pl.dist/1000).toFixed(2)+' KM')}
+  if(!OG3){  if(RC.type==='zone'){setT(hudEl.pos,'pos',`${pad2(RC.zone.k)}<small> ZONE</small>`);setT(hudEl.lap,'lap',(pl.dist/1000).toFixed(2)+' KM')}
   else if(RC.type==='duel'){const ahead=!duelGhost||pl.dist>=duelGhost.f[Math.min(duelGhost.f.length-2,Math.floor(raceT*20)*2)];setT(hudEl.pos,'pos',duelGhost?`${ahead?'01':'02'}<small> / GHOST</small>`:'SOLO')}
   else setT(hudEl.pos,'pos',RC.type==='tt'?'TT':RC.type==='race'||RC.type==='elim'?`${ord(pl.place)}<small>/${n}</small>`:`${pad2(pl.place)}<small> / ${pad2(n)}</small>`);
-  if(RC.type!=='zone')setT(hudEl.lap,'lap',RC.type==='elim'||RC.type==='arena'||lapAttack()?`LAP ${Math.max(1,pl.lap+1)}`:`LAP ${clamp(pl.lap+1,1,RC.laps)} / ${RC.laps}`);
-  setT(hudEl.tLap,'tl',fmt(Math.max(0,raceT-pl.lapStart)));setT(hudEl.tBest,'tb',fmt(ghost?Math.min(ghost.t,pl.best):pl.best));setT(hudEl.tRace,'tr',fmt(raceT));
+  if(RC.type!=='zone')setT(hudEl.lap,'lap',RC.type==='elim'||RC.type==='arena'||lapAttack()?`LAP ${Math.max(1,pl.lap+1)}`:`LAP ${clamp(pl.lap+1,1,RC.laps)} / ${RC.laps}`);}
+  setT(hudEl.tLap,'tl',fmt(Math.max(0,raceT-pl.lapStart)));setT(hudEl.tBest,'tb',fmt(ghost?Math.min(ghost.t,pl.best):pl.best));
   if(duelGhost&&state==='race'){const d=raceT-duelAt(pl.dist);setT(hudEl.tGhost,'tg',(d>=0?'+':'−')+Math.abs(d).toFixed(2))}
   else if(ghost&&pl.lap>=0){const lt=raceT-pl.lapStart;const my=mod(pl.dist,TD.L);let j=0;while(j<ghost.f.length&&ghost.f[j]<my)j+=2;const d=lt-j/2/20;setT(hudEl.tGhost,'tg',(d>=0?'+':'−')+Math.abs(d).toFixed(2))}
-  setT(hudEl.spd,'spd',`${String(Math.round(pl.v*(SET.units==='mph'?2.237:3.6))).padStart(3,'0')}<small>${SET.units==='mph'?'MPH':'KPH'}</small>`);hudEl.bar.style.width=clamp(pl.v/(pl.stats.top*1.3)*100,0,100)+'%';
-  cells(hudEl.bc,'bc',10,Math.ceil(pl.bm/10-.05),pl.nitro?'nitro':'');cells(hudEl.hc,'hc',8,Math.ceil(clamp(pl.hull,0,100)/12.5),pl.hull<30?'crit':'');
+  if(!OG3){setT(hudEl.spd,'spd',`${String(Math.round(pl.v*(SET.units==='mph'?2.237:3.6))).padStart(3,'0')}<small>${SET.units==='mph'?'MPH':'KPH'}</small>`);hudEl.bar.style.width=clamp(pl.v/(pl.stats.top*1.3)*100,0,100)+'%';
+  cells(hudEl.bc,'bc',10,Math.ceil(pl.bm/10-.05),pl.nitro?'nitro':'');cells(hudEl.hc,'hc',8,Math.ceil(clamp(pl.hull,0,100)/12.5),pl.hull<30?'crit':'')}
   {const now=performance.now(),spin=pl.item&&now<itemSpinUntil,k=spin?ITEM_KEYS[Math.floor(now/70)%ITEM_KEYS.length]:pl.item||'',key=k+(spin?'s':'');if(key!==itemShown){itemShown=key;const ib=$('#itemBox');ib.classList.toggle('full',!!k);ib.classList.toggle('spin',!!spin);ib.querySelector('img').src=k?itemIcon(k):'data:,';ib.querySelector('span').textContent=k&&!spin?ITEMS[k].name:'';$('#tF').style.backgroundImage=k&&!spin?`url(${itemIcon(k)})`:'';if(k&&!spin&&pl.item)AU.sfx&&0}}
   const it=pl.item?ITEMS[pl.item]:null;setT(hudEl.chip,'it',pl.shield>0?'SHIELD '+pl.shield.toFixed(1):it?it.name+' · SPACE':'NO WEAPON');hudEl.chip.className=it||pl.shield>0?'full':'';hudEl.chip.style.setProperty('--c',it?it.col:'#31f5c4');
   setT(hudEl.sec,'sec',TD.SEC[frameAt(TD,pl.dist,F2).i]+(pl.wrong>1?' · WRONG WAY':''));

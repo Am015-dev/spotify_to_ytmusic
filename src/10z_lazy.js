@@ -22,3 +22,4 @@ XC.post['98b2_builder2']=()=>{try{if(!document.querySelector('.bxTrk'))window.BX
 window.__xc={XC,need:XC_need,go:XC_go,ev:XC_eval};   // ev = test hook: eval in module scope
 // per-city boot data (52_terrain_data.js awaits these): start the downloads NOW, ~40 modules before the await, so they run parallel to the rest of the page's start-up
 for(const n of CID==='ath'?['10c_qtc_blob','52a_terr_ath']:['52f_terr_fra'])XC_need(n);
+if(OG3)XC_need('40h_hud_kit');   // og3: the HUD kit loads with the city data (it is a chunk, not page weight)
