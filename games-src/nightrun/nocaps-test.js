@@ -73,7 +73,7 @@ const PLAY = new Function('o', `
       // SKIP path on another stage: stage starts, the thing is not offered again
       const s3 = await p.evaluate(() => { __mnr.startStory(3); const c = document.getElementById('ncCard'); return { shown: !!c && !c.hidden, k: NC.last && NC.last.k }; });
       if (s3.shown) { await p.click('#ncSkip'); await sleep(300); const r = await p.evaluate(() => ({ running: __mnr.running, card: !document.getElementById('ncCard').hidden })); ok('SKIP starts the stage', r.running && !r.card, r); await p.evaluate(() => __mnr.abort()); }
-      else ok('stage 3 first visit offered a card (or everything on it was already offered)', true);
+      else ok('stage 3 first visit offered a card', false, s3);
       const prof = await p.evaluate(() => JSON.parse(localStorage.getItem('mnr_nocaps') || '{}'));
       ok('profile remembers the offered things once', prof.off && Object.keys(prof.off).length >= 2 && prof.vis && prof.vis.s1, prof);
       await ctx.close();

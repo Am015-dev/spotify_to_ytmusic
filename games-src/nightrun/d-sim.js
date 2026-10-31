@@ -77,5 +77,5 @@ if (require.main === module) (async () => {
     out[diff + '/' + type] = row;
     console.log(diff.padEnd(7), type.padEnd(9), String(row.died).padStart(5) + '%', row.t.toFixed(0).padStart(9), row.fh.toFixed(1).padStart(11), row.hits.toFixed(1).padStart(6), row.tier.toFixed(2).padStart(7), row.score.toFixed(0).padStart(8), STAGE ? String(row.clear).padStart(6) + '%' : ''); }
   { const f = Object.values(res).flat().filter(x => x.fun); if (f.length) console.log('fun events per run (' + f.length + ' runs): ' + ['sets', 'fences', 'drops', 'dropsHit', 'rewards'].map(k => k + ' ' + (f.reduce((a, x) => a + x.fun[k], 0) / f.length).toFixed(1)).join(', ') + ', minis ' + (f.reduce((a, x) => a + x.minis, 0) / f.length).toFixed(1)); }
-  fs.writeFileSync(path.join(__dirname, 'playtest', 'd-sim' + (STAGE ? '-s' + STAGE : '') + '.json'), JSON.stringify(out, null, 1));
+  fs.writeFileSync(path.join(process.env.NR_OUT || require('os').tmpdir(), 'd-sim' + (STAGE ? '-s' + STAGE : '') + '.json'), JSON.stringify(out, null, 1));
 })().catch(e => { console.error(e); process.exit(2); });

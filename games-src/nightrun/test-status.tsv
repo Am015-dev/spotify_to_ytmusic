@@ -1,0 +1,7 @@
+# file	status	reason  (only BROKEN rows; ledger.py reads this. RUN = listed in smoke.sh. Everything else = NOT RUN.)
+footq-test.js	BROKEN	3 real FAIL on HEAD (6 old draw calls in a 12 s run; Kai height wobble 4%; crouch ratio): street code, owner = street worker. Dpr expectation + `|| true` fixed in W297.
+afk-test.js	BROKEN	Playwright TimeoutError before any assertion, identical on a page with no game (review 6-E); ledger FAIL since 20 Oct
+where-test.js	BROKEN	4 FAIL (WHERE.md stale/over 8 KB, MODULES-COMPACT.md 12 KB) and it rewrites tracked MODULES-COMPACT.md; needs a temp-dir compare
+labassets-test.js	BROKEN	killed at 150 s with no PASS/FAIL lines (review 6-C); state unknown
+fingerprint-test.js	BROKEN	PRE-EXISTING: hangs 5-8+ min and stale hashes on HEAD (W246/W254/W273/W282); smoke skips it unless FINGERPRINT=1
+labfull-test.js	BROKEN	2 FAIL on 31 Oct (W297 smoke): repro URL did not replay the spawn; saves mnr_svauto/mnr_svinfo differ after the foot sandbox. No game code touched by W297. smoke skips it unless LABFULL=1

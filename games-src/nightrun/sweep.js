@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Mainhattan Nightrun bug sweep: plays the REAL page with real input (CDP touch, real keys) and asserts every step.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/sweep.js
+//   Screenshots and sweep-result.json go to $NR_OUT (default: tmpdir/nightrun-playtest), never into the repo.
 //   env: SIZES=375x553 (only these sizes) RUNS=34 (bot runs, split over the 4 sizes) SECS=22 (seconds per run) PAR=2 (pages at once) SKIP=beat,pause,... ONLY=beat SEED=1 SHOTS=1 (save playtest screenshots)
 // It fails on: page errors, audio errors, a run that stands still >8 s, ship not following input, buttons off screen or covered,
 // horizontal scroll, average FPS < 45, a boss that cannot be hurt or reached, HUD text not equal to the game state, NaN state,
@@ -11,7 +12,7 @@
 // Beat checks use a generated 120 BPM test WAV served by a route override (nothing is written to the repo).
 const PW = require(process.env.PW || 'playwright'), fs = require('fs'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
-const OUT = path.join(__dirname, 'playtest'); fs.mkdirSync(OUT, { recursive: true });
+const OUT = process.env.NR_OUT || path.join(require('os').tmpdir(), 'nightrun-playtest'); fs.mkdirSync(OUT, { recursive: true });   // probe output goes to a scratch folder, never the source tree (WORKER-RULES 18d)
 for (const f of fs.readdirSync(OUT)) if (/^fail.*\.png$/.test(f)) fs.unlinkSync(path.join(OUT, f));
 const ECON = +process.env.ECON || 0, ECONSECS = +process.env.ECONSECS || 150;
 const RUNS = +process.env.RUNS || 34, SECS = +process.env.SECS || 22, PAR = +process.env.PAR || 2;

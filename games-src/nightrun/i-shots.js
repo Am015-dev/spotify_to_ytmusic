@@ -2,7 +2,7 @@
 // Screenshots of the painted-art update into games-src/nightrun/playtest/i-*.png: title, mid-run, boss, Athens, garage, game over, at 390x763 and 1280x800.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/i-shots.js        env: ONLY=title,run,boss,athens,garage,over
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
-const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun'), OUT = path.join(__dirname, 'playtest');
+const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun'), OUT = process.env.NR_OUT || path.join(require('os').tmpdir(), 'nightrun-playtest'); require('fs').mkdirSync(OUT, { recursive: true });
 const ONLY = (process.env.ONLY || '').split(',').filter(Boolean), want = n => !ONLY.length || ONLY.includes(n);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const bot = (fs.readFileSync(path.join(__dirname, 'f-shots.js'), 'utf8').match(/const bot = `([\s\S]*?)`;/) || [])[1];   // the same dodging bot as f-shots.js
