@@ -118,9 +118,10 @@ const BOT = (o) => {
   for (const bot of BOTS) for (const build of BUILDS) for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, build, bot, seed: k + 1 + (+process.env.SEEDBASE || 0), MAXT, hp: HP, policy: process.env.POLICY || 'hold', endless: ENDLESS, diff: DIFF, noBossGod: process.env.BOSSGOD === '0' });
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('FAIL page error ' + e.message); });
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ''}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
-    if (process.env.PRE) await p.evaluate(process.env.PRE);
-    while (next < jobs.length) { const j = jobs[next++]; try { res.push(await p.evaluate(BOT, j)); } catch (e) { console.log('RUN ERROR', j.n, j.build, e.message.slice(0, 200)); } }
+    const load = async () => { await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ''}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
+      if (process.env.PRE) await p.evaluate(process.env.PRE); };
+    await load();
+    while (next < jobs.length) { const j = jobs[next++]; if (process.env.FRESH) await load(); try { res.push(await p.evaluate(BOT, j)); } catch (e) { console.log('RUN ERROR', j.n, j.build, e.message.slice(0, 200)); } }
     await p.close();
   }));
   await br.close(); srv.kill();

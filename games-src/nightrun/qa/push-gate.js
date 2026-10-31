@@ -17,7 +17,7 @@ const OUT = path.join(OUT0, 'b' + SB); fs.mkdirSync(OUT, { recursive: true }); c
 for (const [k, pol, hp] of CFG) {
   const json = path.join(OUT, k + '.json'), rj = REUSE && path.join(REUSE, 'b' + SB, k + '.json');
   if (ONLY && !ONLY.includes(k) && rj && fs.existsSync(rj)) { fs.copyFileSync(rj, json); res[k] = JSON.parse(fs.readFileSync(json, 'utf8')); continue; }
-  const r = cp.spawnSync('node', [HB], { env: Object.assign({}, process.env, { POLICY: pol, HP: hp, BOTS: 'human', BUILDS: 'fresh', STAGES, RUNS, PAR, JSON: json, SEEDBASE: SB }), encoding: 'utf8', maxBuffer: 1 << 26 });
+  const r = cp.spawnSync('node', [HB], { env: Object.assign({}, process.env, { POLICY: pol, HP: hp, BOTS: 'human', BUILDS: 'fresh', STAGES, RUNS, PAR, JSON: json, SEEDBASE: SB, FRESH: '1' }), encoding: 'utf8', maxBuffer: 1 << 26 });
   if (!fs.existsSync(json)) { console.log('FAIL push-gate: humanbot ' + k + ' wrote no result\n' + (r.stdout || '').slice(-600) + (r.stderr || '').slice(-600)); process.exit(1); }
   if (/FAIL page error|RUN ERROR/.test(r.stdout || '')) console.log('FAIL ' + k + ': page errors\n' + r.stdout.split('\n').filter(l => /FAIL page|RUN ERROR/.test(l)).slice(0, 3).join('\n'));
   res[k] = JSON.parse(fs.readFileSync(json, 'utf8'));
