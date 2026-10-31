@@ -54,6 +54,11 @@ const stripNouns = t => { let s = t; for (const n of PROPER) s = s.replace(new R
     ok(T + 'result screens say what PERFECT hits are', rows.some(r => RES.test(r.scr) && /PERFECT hits/.test(r.t)) && rows.filter(r => r.scr === 'result' && /PERFECT hits/.test(r.t)).every(r => /on the beat/.test(r.t)), rows.filter(r => /PERFECT hits/.test(r.t)).map(r => r.scr + ':' + r.t).join('|'));
     ok(T + 'game over: the "garage" line shows only when the GARAGE button shows', go.garage === /garage/i.test(go.sub) && /\S/.test(go.sub), JSON.stringify(go));
     ok(T + 'no FUN / SAME AGAIN / BORING widget without ?lab=1', !go.fb && !rows.some(r => /SAME AGAIN|How did this run feel/.test(r.t)), JSON.stringify(go));
+
+    // 4b W323 GOLD copy: the reward is stated on the strip, the win and the miss say why in <= 5 words, the result line says what it earned
+    if (W === 390) { const src = fs.readFileSync(require('path').join(__dirname, '../../../games/mainhattan-nightrun/index.html'), 'utf8'); const must = ['x3 points, +1 weapon', 'GOLD! squad killed up close', 'no GOLD: too far', 'no GOLD: too slow', 'no GOLD: squad fled', 'earned x3 points + '];
+      ok('GOLD strip, win, miss and result copy is shipped in English', must.every(t => src.includes(t)), must.filter(t => !src.includes(t)).join('|'));
+      ok('GOLD win/miss reasons are <= 5 words', ['GOLD! squad killed up close', 'no GOLD: too far', 'no GOLD: too slow', 'no GOLD: squad fled'].every(t => t.split(/\s+/).length <= 5)); }
     // 5 the owner test list is not reachable from title / settings
     ok(T + 'no test checklist button for players', (await p.evaluate(() => document.querySelectorAll('.ckB').length)) === 0);
     ok(T + 'no page errors', p.errs.length === 0, p.errs.join('|'));
