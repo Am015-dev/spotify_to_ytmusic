@@ -1,4 +1,4 @@
-// PURPOSE: FOCUS MODE: the title offers FLIGHT, ON FOOT, SETTINGS, LAB only; flight stage 1 and the street play one song each
+// PURPOSE: FOCUS MODE: the title offers FLIGHT, ON FOOT, SETTINGS only (LAB with ?lab=1); flight stage 1 and the street play one song each
 // FLAG: focus (?focus=0 = the whole game as before)
 // TEST: qa/focus-test.js
 /* ---------- FOCUS (owner, 23 Oct 2026: "all levels are horrible, focus on one on-foot level and one stage, all music is mixed, on foot is shit, all game is very boring").
@@ -36,7 +36,8 @@ html.focus #srMenu,html.focus #stBtn2,html.focus #pSetBtn,html.focus #fFly,html.
   new MutationObserver(sync).observe(titleEl,{attributes:true,attributeFilter:['hidden']});sync();
   box.append(fl,row,
     mk('focFoot','ON FOOT','alt',()=>{if(running||!window.FOOT)return;FOOT.ui=1;FOOT.start(FOOT.main||'street1');}));
-  r2.append(mk('focSet','SETTINGS','dim',click('setBtn')),mk('focLab','LAB','dim',click('labBtn')));box.append(r2);
+  /* LAB is the developer sandbox: shown only with ?lab=1 (buyers never see it) */
+  r2.append(mk('focSet','SETTINGS','dim',click('setBtn')));if(/[?&]lab=1/.test(location.search))r2.append(mk('focLab','LAB','dim',click('labBtn')));box.append(r2);
   titleEl.querySelector('.in').querySelector('h1').after(box);
   /* result / pause screens: relabel and add TITLE where the stage result had none */
   const tb=mk('focTitle','TITLE','dim',()=>{const b=$('menuBtn');if(b)b.click();});$('srRetry').after(tb);
