@@ -1,3 +1,24 @@
+# R2 release verdict, 31 Oct 2026 (branch nr/W317-integrate4, reviewer nr/REVIEW-R2; details REVIEW-2026-10-31-R2.md)
+## Verdict: DO NOT SHIP (player-equivalent about 35/100; critic rows 3-8, none of the fun rows at 7)
+### Blockers (must change before the first sale)
+1. Street boss for a casual player: late/nearest bot cleared 1 of 6 (PC 0/3, phone 1/3; deaths at boss hp 13-80), and RETRY replays the whole ~3.5 min street. Need a boss checkpoint (RETRY BOSS) and the W317 streetsim "nearest" back in band 25-40 (13 now).
+2. Flight decision does not pay: GOLD push CHOOSE clears 51 % vs HOLD 71 % (W317 push-gate), and the GOLD reward is never stated on screen. The store's "you decide when to take a risk" is not true until pushing can win.
+3. Result-screen copy: stage-1 COURIER DOWN says "SPEND NEON IN THE GARAGE" with no garage button (profile/ret.js:32 hides it until affordable); unexplained "Perfect 12", "Marked ↺: Neon x0.75", "Goal MINI-BOSS", "BROKEN", "PERFECT hits"; HUD score 28757 vs card "Score 6023" on the stage-1 clear; the FUN / SAME AGAIN / BORING test widget and a stray "Saved" pill on paid result screens.
+4. LAB on the title (god mode, cheats, hit boxes, sheet tester): hide for the sale build.
+5. Store page: the Price paragraph claims an "original soundtrack" that the same page and MUSIC-BLOCKED.txt forbid. Fix the text.
+### Ship with, fix next
+- 844x390 game over: TITLE below the screen edge, "Saved" pill over RETRY.
+- Phone flight performance: 17 fps / p95 100 ms under 4x CPU throttle (was 6.5 fps); expect stutter on mid phones.
+- Stage-1 boss arrival has no boss bar or distinct boss in the shots; "TEMPO UP 7 BARS", "x5.8" unexplained.
+- Street: actors drawn inside each other at the boss; phone hint strip under the hearts panel.
+- Stage 2+ is hard for the scripted shooter (2 deaths in stage 2 on phone and PC); store sells 5 districts / 10 bosses most buyers will not see.
+- Store: say "unlock nine ships in the garage" (ships are not on the title).
+- W317 BEHIND-caption FAIL: harness artefact of boss-only JUMP mode, not reproduced in 6 full runs; no game change needed.
+### Passed in R2
+0 page / console errors in 11 real-input runs; pause/resume/retry/title on 3 sizes; NEXT STAGE by real tap to stage 2 (phone, PC); street controls >= 44 px, no overlaps (390x763, 375x553, 844x390); claims-check 17/17.
+
+---
+
 # Release check, branch nr/W286-final (from nr/W285-deployable), 30 Oct 2026. Not deployed.
 Logs and shots (not committed): /tmp/claude-0/-home-user-spotify-to-ytmusic/6c9bd49e-2dc3-5841-95e9-cfd53638cb70/scratchpad/ (chk/ = unit gates, g/ = smoke, flight and street runs, b0 b1 b2 b3 = boss bar shots before/after).
 ## Verdict: DO NOT SHIP
