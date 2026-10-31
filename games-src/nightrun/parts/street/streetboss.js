@@ -1,81 +1,115 @@
-// PURPOSE: Street boss phases: the big heavy fights in 3 named phases with 4 attacks, each with its own telegraph and its own answer, and an opening after every attack
+// PURPOSE: Street boss duel: the big heavy cycles 3 attacks (SWING, CHARGE, POUND), each with its own telegraph and ONE right answer (GUARD, DASH, JUMP); the right answer opens a punish window, a wrong or late one costs hearts
 // FLAG: sboss (ON by default; ?sboss=0 turns it off)
-// TEST: qa/streetsim.js with Q='&sboss=1' DBG=qa/bossprobe.js (boss gate lines)
-/* ---------- STREETBOSS (W167, design: benchmark/STREET-BAR-SCORE-2026-10-23.md task 1; rows B1-B3 of benchmark/STREET-BAR.md).
-   Was: one attack (wind-up -> charge) and no phases; the fight ended after 2 charges. Now (wraps FOOT_BOSS.bigheavy from street2.js heavyDef):
-   PHASE 1 THE CHARGE (100-66% hp): charge (red crouch 0.8 s; JUMP it or DASH through) and, when Kai keeps his distance, a barrel throw (wind-up 0.8 s; STEP BACK or stand behind cover); W279: closer than 200 px it backs off first, so it charges a still or cornered Kai too.
-   PHASE 2 GROUND POUND (66-33%): + pound: two shock waves roll along the road both ways (wind-up 0.8 s; JUMP the wave).
-   PHASE 3 LEAP (33-0%): + leaping slam on the spot Kai stood on when it crouched (wind-up 0.8 s, red marks on the road; DASH or run out of them).
-   Each phase starts with a 1.2 s roar (no damage, its name over the boss and on the bar) and then the phase's new attack, so every fight that reaches 33% sees all of them.
-   The player decision: read which attack is coming and pick its answer (jump / step back / dash), then punish the 1 s opening (OPEN, full damage) after every attack.
-   Damage cannot skip a phase: hp stops at the phase line until the roar is over (an opening in progress is finished first). ---------- */
+// TEST: qa/gauntlet-foot.js STRATS=duelist,late,dodger JUMP=152 (boss only) and from the title; qa/bossduel-shots.js; design and numbers: BALANCE-W300.md
+/* ---------- STREETBOSS (W290 duel, replaces the W167 three-phase fight; wraps FOOT_BOSS.bigheavy from street2.js heavyDef).
+   One decision per attack. Every attack has a telegraph of TEL s (pose + sound + the answer word over the boss); the answer must be given in the
+   READ part of it (all but the last CUT s, when the boss commits and flashes). The first answer key pressed (guard / dash / jump) is the decision:
+   right = no damage and the boss is OPEN for PUN s (heavyDef's stun: x2 damage, no armour); wrong or none = the attack lands (SWING 1, CHARGE 2, POUND 1 heart).
+   Order: SWING (walks in, raised fist: GUARD), CHARGE (crouches low: DASH through), POUND (rises up: JUMP), repeated so the player learns it.
+   Camping: CAMP s without an attack (Kai keeps away or stands still) = a CHARGE straight away, out of order (the gap-closer). ---------- */
 if(RET.sboss===undefined)RET.sboss=!/[?&]sboss=0/.test(location.search);
-if(RET.pound2===undefined)RET.pound2=!/[?&]pound2=0/.test(location.search);   // W186 (?pound2=1 = on; OFF until its gates pass): the pound's wave and the leap's landing keep ONE depth line, drawn in red during the 0.8 s wind-up
+if(RET.pound2===undefined)RET.pound2=!/[?&]pound2=0/.test(location.search);   // W186: HUD layout of the boss bar (streetlook.js, streetfeel.js); the boss itself no longer reads it
 (function(){
 const F=window.FOOT,FBS=window.FOOT_BOSS||{},d=FBS.bigheavy;
 if(!RET.sboss||!F||!F._in||!d||!d.ai||d._sb)return;d._sb=1;
-const IN=F._in,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1,clamp=(v,a,b)=>v<a?a:v>b?b:v;
-const PH=[null,{n:'THE CHARGE',at:['charge','throw']},{n:'GROUND POUND',at:['pound']},{n:'LEAP',at:['leap']}],LINE=[0,1,.66,.33];
-const CAP={charge:'CHARGE · JUMP OR DASH',throw:'BARREL · STEP BACK',pound:RET.pound2?'POUND · LEAVE THE RED LINE OR JUMP':'GROUND POUND · JUMP THE WAVE',leap:RET.pound2?'LEAP · LEAVE THE RED RING':'LEAP · DASH OUT'};
-// Tuning block (BALANCE-W279.md, BALANCE-W280.md): these are the shipped defaults, no flags. Telegraphs: every wind-up >= 0.8 s, the phone reaction window W277 measured.
-const WIND={throw:.8,pound:.8,leap:.8},   // wind-up per attack in s (the charge's 0.8 s lives in street2.js heavyDef); W279: throw .7 -> .8, leap .6 -> .8
-  OPEN=1.0,ROAR=1.2,LEAPT=.7,             // opening after an attack, phase roar, leap flight (s)
-  HPK=8,                                  // boss hp = 36 x HPK = 288 (W279 sweep, no adds: 180 and 234 are cleared by the state-aware bot with equal reaction on both devices; 288 = top of the allowed range)
-  CHDMG=2,                                // hearts a charge takes (W279 sweep: 1 let the phone bot clear 8/8 and an idle phone Kai outlast the boss)
-  GAP=150,                                // run-up in px before a CHARGE (W280: charge only, 200 -> 150; W279 backed off 200 px before every attack): closer than this it backs off first, so the charge has its 0.12 s launch even vs a still Kai
-  BACKV=110,                              // its back-off speed (px/s; it walks in at 70)
-  PINX=28,PINDMG=2;                       // W280: a charge that reaches the screen edge with Kai pinned there lands from PINX px (shoulder tip on his body edge) for PINDMG hearts (PC idle Kai was never hit: 45-51 px short every charge)
-const SB=F.SB={log:[]};   // per fight: {ph:[[phase,t]], at:[[attack,t]]} for the probe
-const name=e=>'BIG HEAVY · PHASE '+e.ph+': '+PH[e.ph].n;
+const IN=F._in,I=IN.I,FL=470,abs=Math.abs,sgn=v=>v<0?-1:1,clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const CYCLE=['swing','charge','pound'];
+const ANS={swing:'guard',charge:'dash',pound:'jump'},WORD={swing:'GUARD!',charge:'DASH!',pound:'JUMP!'},COL={swing:'#ffd23a',charge:'#ff3a4a',pound:'#4ad8ff'};
+const SND={swing:'warn',charge:'dash',pound:'up'},POSE={swing:'melee',charge:'crouch',pound:'idle'},GOOD={swing:'PARRY!',charge:'DODGED!',pound:'CLEARED!'};
+const KEY={guard:'I',dash:'SHIFT',jump:'K'},BTN={guard:'GUARD',dash:'DASH',jump:'JUMP'};   // the answer's control: PC key (streetguard.js / foot.js KM) or the phone button's own label
+// W300 poses (owner's frames only, 17h): [x scale, y scale, lean] drawn about the feet by purefoot.js; SWING looms (melee frame, 1.1x), CHARGE coils low and long (crouch, squashed), POUND stands tall (idle, stretched, rising)
+const DSC={swing:[1.1,1.1],charge:[1.16,.84],pound:[.94,1.16]};
+const DMG={swing:1,charge:2,pound:1};
+// Tuning block (BALANCE-W290.md): shipped defaults, no flags.
+const TEL={swing:1.0,charge:1.05,pound:1.1},  // telegraph start -> hit (s)
+  CUT={swing:.44,charge:.39,pound:.28},   // the last CUT s of a telegraph: the boss commits (READ ends at .56 / .66 / .82 s)
+  GRACE=.18,                              // an answer up to GRACE s after the READ end still counts (accepted until .69 / .79 / .95 s); later = TOO LATE (W300 PC late reader: .75/.85 4/4, .70/.82 3/4, .70/.80 4/4, .68/.78 1/4)
+  TGRACE=.02,                             // + on a touch screen (tap latency; phone late reader: +0 at .70/.82 0/4, +0 at .75/.85 3/4, +.08 at .70/.80 4/4)
+  PUN=1.6,                                // punish window after a right answer (s; stun = x2 damage)
+  REC=.9,                                 // after a missed / wrong attack: it shakes it off, no punish (s)
+  GAPT=.9,                                // between attacks: it walks (s)
+  CAMP=4,                                 // s without an attack -> a CHARGE (gap-closer)
+  REACH=120,POUNDR=560,CHV=600,CHT=.6,    // swing reach, pound reach (px), charge speed (px/s) and time (s)
+  GAP=150,BACKV=110,WALKV=110,            // run-up before a charge (px), its back-off and walk speeds (px/s)
+  HPK=6;                                  // boss hp = 36 x HPK
+const NL={beam:1};   // not a limb: the charge's body and the pound's ground band skip streetreach.js's fist-tip test (its own bypass flag)
+const SB=F.SB={log:[],fx:[],flash:0};   // per fight: {at:[[attack,t,result]]} for the probes; fx / flash: the duel's own drawn words (purefoot.js calls SB.draw)
+const acc=a=>{const L=IN.L();return TEL[a]-CUT[a]+GRACE+(L&&L.touch?TGRACE:0);};   // last moment an answer counts
+const p0=d.pose,a0=d.ai;
 function go(e,s){e.state=s;e.sT=0;}
-function open(e){go(e,'stun');e.stun=OPEN;e.cd=1.3;e.tele=0;e.atk='';}   // heavyDef's stun: OPEN, full damage, then it walks again
-function pick(e,P){const at=[].concat(...PH.slice(1,e.ph+1).map(p=>p.at)),far=abs(P.x-e.x)>260;
-  let w=at.map(a=>a===e.last?.25:a==='throw'?(far?2:.3):a==='leap'?(far?1.6:1):1),s=w.reduce((a,b)=>a+b,0),r=Math.random()*s;
-  for(let i=0;i<at.length;i++){r-=w[i];if(r<=0)return at[i];}return at[0];}
-function begin(e,a,S,env){e.atk=a;e.last=a;e.L.at.push([a,+S.time.toFixed(2)]);if(!e.capd[a]){e.capd[a]=1;IN.pop(cx(e,env),e.y-e.h-30,CAP[a],'#ffb020');}
-  if(a==='charge'){go(e,'wind');return;}go(e,'sb_'+a+'W');e.tele=WIND[a];if(a==='leap'){e.tx=clamp(S.P.x,env.G.camX+(e.fw||e.w/2),env.G.camX+env.G.viewW-(e.fw||e.w/2));e.x0=e.x;}if(RET.pound2&&e.z!=null)e.zl=e.z;}
-const a0=d.ai,p0=d.pose,h0=d.onHit;
-d.onHit=function(e,dm){h0.apply(this,arguments);if(e._sb)e.hp=Math.max(e.hp,e.state==='sb_roar'?e.hpLock:e.ph<3?e.max*LINE[e.ph+1]:-1e9);};   // no skipping a phase, even with a bomb or a barrel
-d.pose=e=>/^sb_.*W$/.test(e.state)?'crouch':e.state==='sb_roar'?'hit':/^sb_/.test(e.state)?'melee':p0(e);
-d.ai=function(e,dt,env){const S=F.S,P=env.P;
-  if(!e._sb){e._sb=1;e.ph=1;e.hp=e.max=e.maxHp=e.mhp=e.max*HPK;e.capd={};e.L={ph:[[1,+S.time.toFixed(2)]],at:[]};SB.log.push(e.L);e.bname=name(e);}
-  if(e.state==='dead'||!e._i)return a0.apply(this,arguments);
-  // phase line: hp stops there until the roar is done
-  const want=e.hp<=e.max*LINE[3]?3:e.hp<=e.max*LINE[2]?2:1;
-  if(want>e.ph&&!/^sb_/.test(e.state)&&e.state!=='charge'&&e.state!=='stun'){e.ph++;e.hpLock=e.max*LINE[e.ph];e.hp=Math.max(e.hp,e.hpLock);e.bname=name(e);e.next=PH[e.ph].at[0];e.L.ph.push([e.ph,+S.time.toFixed(2)]);
-    go(e,'sb_roar');e.vx=0;e.tele=0;IN.pop(cx(e,env),e.y-e.h-30,'PHASE '+e.ph+': '+PH[e.ph].n,'#ff4a6a',1);shake(S,6);}
-  if(/^sb_/.test(e.state)){e.sT+=dt;e.y=FL;e.heavy=1;e.label='';const st=e.state;
-    if(st==='sb_roar'){e.vx=0;if(e.sT>=ROAR){go(e,'walk');e.cd=0;}return;}
-    if(st==='sb_throwW'||st==='sb_poundW'||st==='sb_leapW'){e.vx=0;e.facing=sgn(P.x-e.x);e.tele=Math.max(0,WIND[e.atk]-e.sT);
-      if(RET.pound2)hold(e,env);
-      if(st==='sb_leapW')mark(S,e.tx,e);
-      if(e.sT>=WIND[e.atk]){e.tele=0;
-        if(e.atk==='throw'){const dx=P.x-e.x,T=.85,vx=dx/T,vy=-(855*T)/2+(FL-30-(e.y-e.h*.8))/T;const n0=S.eb.length,q0=(S.xq||[]).length;env.shoot(e,0,300,1,{vx,grav:1,oy:e.y-e.h*.8,w:22,h:22});const b=S.eb.length>n0?S.eb[n0]:(S.xq||[]).length>q0?S.xq[q0]:null;if(b){b.vy=vy;b.sb=1;}go(e,'sb_throw');}
-        else if(e.atk==='pound'){if(RET.pound2)hold(e,env);for(const s of [-1,1])env.shoot(e,0,300,1,{ground:1,vx:s*300,ox:e.x+s*e.w/2,life:3});shake(S,8);go(e,'sb_pound');}
-        else go(e,'sb_leap');}
-      return;}
-    if(st==='sb_throw'||st==='sb_pound'){e.vx=0;if(e.sT>=.3){clr(e);open(e);}return;}
-    if(RET.pound2&&st==='sb_leap')hold(e,env);
-    if(st==='sb_leap'){const u=Math.min(1,e.sT/LEAPT);e.x=e.x0+(e.tx-e.x0)*u;e.y=FL-Math.sin(Math.PI*u)*200;e.vx=(e.tx-e.x0)/LEAPT;mark(S,e.tx,e);
-      if(u>=1){e.y=FL;e.vx=0;env.melee(e,{x:e.tx-70,y:FL-e.h,w:140,h:e.h},2);shake(S,9);clr(e);open(e);}return;}}
-  if(e.state==='walk'&&back(e,P,dt,env))return;
-  e._pin=e.state==='charge'&&e.sT>=.12&&pin(e,P,env.G);
-  const s0=e.state,x0=e.x;a0.call(this,e,dt,e.state==='charge'?low(env):env);
-  if(e.state==='charge'&&e.sT>.05&&e.x===x0){open(e);return;}   // stuck a few px short of the screen edge (walk() refuses the step, the wall test never fires): that is the wall
-  if(e.state==='wind'&&s0!=='wind'){const a=e.next||pick(e,P);e.next=null;begin(e,a,S,env);}   // heavyDef chose to attack: this phase picks which
-  else if(s0==='charge'&&e.state==='walk')open(e);};   // an opening after every charge, not only after a wall hit
-function low(env){const o=Object.create(env);o.melee=(e,r)=>{if(e.sT<.12)return false;return env.melee(e,{x:r.x,y:r.y+r.h*.35,w:r.w,h:r.h*.65},e._pin?PINDMG:CHDMG);};return o;}   // charges head down (a jump clears it: streetreach.js keeps this y band) and launches 0.12 s before it can hit (a jump at point blank works); its x reach is the shoulder tip (streetreach.js), W280: W279's fw widening here never applied and is gone, the screen-edge case is pin()
-function pin(e,P,G){const h=e.fw||e.w/2,f=e.facing>0?1:-1,edge=f>0?G.camX+G.viewW:G.camX;   // W280: Kai pinned in the strip between the drawn figure and the screen edge (the fw clamp keeps its centre h px off the edge,
-  if(f*(edge-e.x)-h>=12||f*(P.x-e.x)<=0||f*(edge-P.x)>=h)return false;e.x=P.x-f*PINX;return true;}   // streetreach.js lands a hit only from the shoulder tip, ~18 px past the centre): it steps into the strip for the slam (the engine clamp puts it back next frame)
-function back(e,P,dt,env){const dx=P.x-e.x;if(abs(dx)>=GAP||(e.cd||0)>dt||e.grace>0||!e.seen)return false;   // only when its attack is due: it walks in as before, backs off, then winds up
-  if(!e.next)e.next=pick(e,P);if(e.next!=='charge')return false;   // W280: only a charge needs the run-up; barrel, pound and leap come from where it stands (W279 backed off for all four: the pound's wave then met a jumping Kai as he landed)
-  const G=env.G,h=e.fw||e.w/2,nx=clamp(e.x-sgn(dx)*BACKV*dt,G.camX+h,G.camX+G.viewW-h);
-  if(abs(nx-e.x)<BACKV*dt*.5)return false;e.x=nx;e.vx=-sgn(dx)*BACKV;e.facing=sgn(dx);return true;}   // W279: no room behind it = it attacks from where it stands
+function keys(){return {guard:!!(I.guard||I.guardP),dash:!!(I.dash||I.dashP),jump:!!(I.jump||I.jumpP)};}
+function edge(e){const k=keys(),o=e.k0||{};e.k0=k;for(const a of ['guard','dash','jump'])if(k[a]&&!o[a])return a;return null;}
+function scr(e,env,x){const G=env.G,h=e.fw||e.w/2;return clamp(x,G.camX+h,G.camX+G.viewW-h);}
 function cx(e,env){const G=env.G,m=Math.min(170,G.viewW/2);return Math.max(G.camX+m,Math.min(G.camX+G.viewW-m,e.x));}   // captions stay on screen on a phone
 function shake(S,v){S.shake=Math.max(S.shake||0,v);}
-function mark(S,x,e){if(!RET.pound2||e.zl==null){for(let i=-2;i<=2;i++)S.fx.push({x:x+i*30,y:FL-4,l:.04,c:'#ff2d3a',r:12});return;}
-  if(!e.mk){e.mk=[{ring:1,x,y:FL-4,r:78,m:1e3,c:'#ff2d3a',z:e.zl},{ring:1,x,y:FL-4,r:40,m:1e3,c:'#ff2d3a',z:e.zl}];for(const f of e.mk)S.fx.push(f);}
-  for(const f of e.mk)f.l=.4;}   // W186: one ring pair (a shadow) on the landing spot at the boss's depth, kept alive each step
-function hold(e,env){e.z=e.zl;if(e.atk!=='pound')return;if(e.mk){for(const f of e.mk)f.l=.4;return;}const G=env.G,S=F.S;e.mk=[];for(let x=G.camX+10;x<G.camX+G.viewW;x+=36)e.mk.push({x,y:FL-4,l:.4,c:'#ff2d3a',r:14,z:e.zl});for(const f of e.mk)S.fx.push(f);}
-function clr(e){if(e.mk)for(const f of e.mk)f.l=0;e.mk=null;e.zl=null;}
+function say(t,c,l,big){SB.fx.push({t,c,l,m:l,big});if(SB.fx.length>4)SB.fx.shift();}
+function tel(e,a,S,env){e.atk=a;e.ans=null;e.tid=(e.tid|0)+1;go(e,'sb_tel');e.tele=0;e.sbT=TEL[a];e.facing=sgn(S.P.x-e.x);
+  e.L.at.push([a,+S.time.toFixed(2),'']);IN.sfx(SND[a]);}
+function done(e,S,res){const r=e.L.at[e.L.at.length-1];if(r)r[2]=res;e.last=S.time;e.tele=0;e.sbT=0;e.label='';}
+function punish(e,S,env){done(e,S,'right');IN.hitstop(70);IN.sfx('big');say(GOOD[e.atk],'#7dff8a',.9,1);go(e,'stun');e.stun=PUN;e.vx=0;}
+function miss(e,S,res){done(e,S,res);e.hitd=0;go(e,'sb_rec');e.vx=0;}
+d.pose=e=>e.state==='sb_tel'?POSE[e.atk]:e.state==='sb_go'?(e.atk==='pound'?'crouch':e.atk==='charge'?'run-a':'melee'):e.state==='stun'?'hit':e.state==='sb_rec'?'idle':p0(e);
+// drawn scale per state (purefoot.js reads e.dsc): the telegraph pose grows into its shape over the READ part and holds it in the commit
+function dsc(e){if(e.state!=='sb_tel'&&!(e.state==='sb_go'&&e.atk==='charge')){e.dsc=e.state==='stun'?[1,.94]:null;return;}const q=DSC[e.atk],k=e.state==='sb_go'?1:Math.min(1,e.sT/(TEL[e.atk]-CUT[e.atk]));e.dsc=[1+(q[0]-1)*k,1+(q[1]-1)*k];}
+d.ai=function(e,dt,env){const S=F.S,P=env.P;
+  if(e.state==='dead'||!e._i)return a0.apply(this,arguments);
+  if(!e._sb){e._sb=1;e.hp=e.max=e.maxHp=e.mhp=e.max*HPK;e.i=0;e.last=S.time;e.L={at:[]};SB.log.push(e.L);S.sbL=e.L;e.bname='BIG HEAVY';go(e,'sb_walk');}
+  e.sT+=dt;e.y=FL;e.heavy=1;const dx=P.x-e.x,st=e.state;SB.on=e;try{return ai1(e,dt,env,S,P,dx,st);}finally{dsc(e);}};
+function ai1(e,dt,env,S,P,dx,st){
+  if(st==='stun'){e.vx=0;e.label='OPEN';if(e.sT>=e.stun){e.label='';go(e,'sb_walk');e.last=S.time;}return;}
+  if(st==='sb_rec'){e.vx=0;if(e.sT>=REC){go(e,'sb_walk');e.last=S.time;}return;}
+  if(st==='sb_walk'||st==='in'||st==='walk'){e.label='';e.tele=0;if(st!=='sb_walk')go(e,'sb_walk');e.k0=keys();
+    if(e.grace>0||!e.seen){e.vx=0;e.facing=sgn(dx);return;}
+    const camp=S.time-e.last>=CAMP,nxt=camp?'charge':CYCLE[e.i%CYCLE.length];e.facing=sgn(dx);
+    if(e.sT<GAPT&&!camp){walkTo(e,env,dx,dt,nxt);return;}
+    if(nxt==='swing'&&abs(dx)>80){walkTo(e,env,dx,dt,nxt);return;}
+    if(nxt==='charge'&&abs(dx)<GAP&&e.sT<GAPT+.8){const nx=scr(e,env,e.x-sgn(dx)*BACKV*dt);if(abs(nx-e.x)>BACKV*dt*.5){e.x=nx;e.vx=-sgn(dx)*BACKV;return;}}   // run-up: backs off first (no room behind it: charges from where it stands)
+    if(nxt==='pound'&&abs(dx)>POUNDR-80){walkTo(e,env,dx,dt,nxt);return;}
+    if(!camp)e.i++;e.vx=0;tel(e,nxt,S,env);return;}
+  if(st==='sb_tel'){e.vx=0;const T=TEL[e.atk],k=edge(e);e.tele=0;e.sbT=Math.max(0,T-e.sT);
+    if(e.sT<T-CUT[e.atk])e.facing=sgn(dx);   // it tracks Kai in the read part, then commits to that side
+    if(k&&!e.ans){e.ans=e.sT<=acc(e.atk)?k:'late';const r=e.L.at[e.L.at.length-1];if(r){r[3]=+e.sT.toFixed(3);r[4]=k;}}   // W304: the log keeps when (s after the telegraph started) and which key the first answer came   // the first answer key is the decision (read part + GRACE)
+    if(e.atk==='pound')e.y=FL-Math.min(1,e.sT/T)*40;   // it rises up on its toes
+    if(e.sT>=T){const ok=e.ans===ANS[e.atk];e.y=FL;
+      if(!ok){say(e.ans&&e.ans!=='late'?'WRONG: '+BTN[ANS[e.atk]]:'TOO LATE: '+BTN[ANS[e.atk]],'#ff5a6a',.9,1);SB.flash=.22;}
+      e.ok=ok;go(e,'sb_go');if(e.atk==='pound'){shake(S,9);for(const s of [-1,1])for(let i=1;i<=6;i++)S.fx.push({x:e.x+s*i*POUNDR/6,y:FL-4,l:.25+i*.04,c:COL.pound,r:16});}}
+    return;}
+  if(st==='sb_go'){const a=e.atk;
+    if(a==='swing'){if(!e.ok&&!e.hitd)e.hitd=env.melee(e,{x:e.facing>0?e.x:e.x-REACH,y:e.y-e.h,w:REACH,h:e.h},DMG.swing);if(e.sT>=.35){e.ok?punish(e,S,env):miss(e,S,(e.ans?'wrong-'+e.ans:'none')+(e.hitd?'+hit':''));}return;}
+    if(a==='pound'){if(!e.ok&&e.sT<dt*1.5)e.hitd=env.melee(e,{x:e.x-POUNDR,y:FL-46,w:POUNDR*2,h:46},DMG.pound,NL);if(e.sT>=.25){e.ok?punish(e,S,env):miss(e,S,(e.ans?'wrong-'+e.ans:'none')+(e.hitd?'+hit':''));}return;}
+    // charge: straight at where Kai stood at the commit; a right answer = it runs through him and stumbles (punish), else it can hit for 2
+    const nx=scr(e,env,e.x+e.facing*CHV*dt),wall=abs(nx-e.x)<CHV*dt*.5;e.x=nx;e.vx=e.facing*CHV;
+    if(!e.ok&&!e.hitd)e.hitd=env.melee(e,{x:e.x-(e.fw||e.w/2),y:e.y-e.h,w:2*(e.fw||e.w/2),h:e.h},DMG.charge,NL);
+    for(const p of S.pr)if(p.hp>0&&!p.gone&&abs(p.x-e.x)<p.w/2+e.w/2)IN.hitProp(p,p.k==='barrel'?5:99);
+    if(e.sT>=CHT||wall){if(wall)shake(S,7);e.ok?punish(e,S,env):miss(e,S,(e.ans?'wrong-'+e.ans:'none')+(e.hitd?'+hit':''));}
+    return;}
+  go(e,'sb_walk');}
+function walkTo(e,env,dx,dt,nxt){const want=nxt==='swing'?60:200;if(abs(dx)<=want){e.vx=0;return;}const nx=scr(e,env,e.x+sgn(dx)*WALKV*dt);e.vx=(nx-e.x)/dt;e.x=nx;}
+// ---- W300: the duel's words, drawn by purefoot.js inside the street's world transform (camX applied); my / band / K from streetlook.js
+// During a telegraph: the answer (PC key / phone button label) big over the boss in the attack's colour, a bar under it that empties at the last moment the answer counts;
+// right answer: PARRY! / DODGED! / CLEARED! then OPEN x2 over the boss with a bar for the 1.6 s; wrong / late: a red flash over the street and the right answer in red.
+const fsz=(u,n)=>Math.max(14,n)*u;
+function txt(c,t,x,y,col,px,u){c.font='900 '+px+'px monospace';c.lineJoin='round';c.lineWidth=Math.max(3,px*.16);c.strokeStyle='rgba(5,3,12,.9)';c.strokeText(t,x,y);c.fillStyle=col;c.fillText(t,x,y);}
+SB.draw=function(c,o){const S=F.S,e=SB.on,u=o.u,vw=o.vw,L=IN.L();if(!S)return;const dt=Math.max(0,Math.min(.1,S.time-(SB.t0==null?S.time:SB.t0)));SB.t0=S.time;
+  for(const f of SB.fx)f.l-=dt;SB.fx=SB.fx.filter(f=>f.l>0);SB.flash=Math.max(0,SB.flash-dt);
+  if(SB.flash>0){c.save();c.globalAlpha=SB.flash/.22*.28;c.fillStyle='#ff1030';c.fillRect(S.camX-40,o.t0-40,vw+80,2000);c.restore();}
+  if(!e||e.dead||S.boss!==e){SB.fx.length=0;return;}
+  const z=e.z==null?1:e.z,k=o.K*(RET.footmove?.85+.15*z:.9+.1*z),sy=(e.dsc?e.dsc[1]:1),head=o.my(e.y)-(1-z)*o.band-e.h*k*sy*1.02,top=o.t0+(o.hudB||0)+6*u;
+  const big=fsz(u,L&&L.touch?30:34),mid=fsz(u,22),touch=!!(L&&L.touch);c.save();c.textAlign='center';c.textBaseline='alphabetic';
+  const place=(t,px,y)=>{c.font='900 '+px+'px monospace';const w=c.measureText(t).width;return [Math.max(S.camX+w/2+8*u,Math.min(S.camX+vw-w/2-8*u,e.x)),Math.max(top+px,y),w];};
+  let y0=head-8*u;
+  if(e.state==='sb_tel'){const a=e.atk,an=ANS[a],t=touch?BTN[an]+'!':BTN[an]+' ['+KEY[an]+']',A=acc(a),left=Math.max(0,A-e.sT),gone=left<=0,col=gone?'#ffffff':COL[a];
+    const [x,y,w]=place(t,big,y0-14*u);const pul=gone?1:1+.06*Math.sin(S.time*22);c.save();c.translate(x,y);c.scale(pul,pul);txt(c,t,0,0,col,big,u);c.restore();
+    const bw=Math.max(w,120*u),bh=10*u,by=y+8*u;c.fillStyle='rgba(5,3,12,.8)';c.fillRect(x-bw/2-2*u,by-2*u,bw+4*u,bh+4*u);c.fillStyle=col;c.fillRect(x-bw/2,by,bw*left/A,bh);
+    if(e.ans&&e.ans!=='late')txt(c,e.ans===an?'✓':'✗',x+w/2+18*u,y,e.ans===an?'#7dff8a':'#ff5a6a',mid,u);y0=y-big-6*u;}
+  else if(e.state==='stun'){const left=Math.max(0,e.stun-e.sT),t='OPEN ×2';const [x,y,w]=place(t,big,y0-14*u),bl=.75+.25*Math.sin(S.time*14);
+    c.globalAlpha=bl;txt(c,t,x,y,'#7dff8a',big,u);c.globalAlpha=1;const bw=Math.max(w,120*u),bh=10*u,by=y+8*u;c.fillStyle='rgba(5,3,12,.8)';c.fillRect(x-bw/2-2*u,by-2*u,bw+4*u,bh+4*u);c.fillStyle='#7dff8a';c.fillRect(x-bw/2,by,bw*left/PUN,bh);
+    const g=SB.fx.length&&SB.fx[SB.fx.length-1].c==='#7dff8a'&&e.sT<.7?SB.fx[SB.fx.length-1].t+' ':'';   // the right answer's word sits on the line under OPEN (above it, it hid OPEN on a short screen)
+    txt(c,g+'HIT IT NOW',x,by+bh+fsz(u,18)+4*u,'#e8ffe8',fsz(u,18),u);c.restore();return;}
+  for(let i=SB.fx.length-1;i>=0;i--){const f=SB.fx[i],px=f.big?mid:fsz(u,16),[x,y]=place(f.t,px,y0-(1-f.l/f.m)*14*u);c.globalAlpha=Math.min(1,f.l/f.m*3);txt(c,f.t,x,y,f.c,px,u);c.globalAlpha=1;y0=y-px-4*u;}
+  c.restore();};
+// W300: the old street tips (dodge by stepping, run right, the guard tip) and the touch ghost hand tell other answers: muted while the duel is on
+const hO=IN.hintOn,gO=IN.ghost,duel=()=>{const S=F.S;return !!(S&&S.boss&&S.boss._sb&&!S.boss.dead);};
+IN.hintOn=function(){return !duel()&&hO.apply(this,arguments);};
+IN.ghost=function(){if(duel()){const L=IN.L();if(L&&L.ghost)L.ghost.hidden=true;const S=F.S;if(S.note&&S.note.teach)S.note.t=0;return;}return gO.apply(this,arguments);};
 })();

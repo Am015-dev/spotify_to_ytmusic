@@ -406,6 +406,8 @@ const CSS=`
 #fMenu .rk{font-size:56px;font-weight:800;color:#ffd23a;line-height:1}
 #fMenu .go{min-height:48px;width:100%;font-size:17px}
 #fMenu .sm{font-size:14px;color:#c9c3e6}
+/* W304: result screen on a short landscape phone (844x390): stats left, buttons right, so BACK TO CITY is not pushed off the screen */
+@media (max-height:460px){#fMenu{padding:6px 12px}#fMenu .in:has(.fr){max-width:760px;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:row dense;column-gap:20px;row-gap:5px;align-content:center}#fMenu .in:has(.fr)>*{grid-column:1}#fMenu .in:has(.fr)>.go{grid-column:2;grid-row:auto;font-size:16px}#fMenu .in:has(.fr) h2{font-size:26px;margin:0}#fMenu .in:has(.fr) .rk{font-size:30px}#fMenu .in:has(.fr) .fr{padding:3px 2px;font-size:15px}}
 #footBtn small{display:block;font-size:14px;font-weight:600}
 `;
 function build(){if(L)return L;const st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
