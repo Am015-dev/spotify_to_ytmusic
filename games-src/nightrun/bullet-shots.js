@@ -2,7 +2,7 @@
 // Enemy bullets on screen, before vs after (mid-stage, district 2, god mode, 35 s per run): screenshots at the busiest moment into playtest/.
 //   NODE_PATH=$(npm root -g) OLD=<dir with the old index.html> node games-src/nightrun/bullet-shots.js
 const PW = require('playwright'), path = require('path'), net = require('net'), cp = require('child_process');
-const NEW = path.resolve(__dirname, '../../games/mainhattan-nightrun'), OLD = process.env.OLD, OUT = path.join(__dirname, 'playtest');
+const NEW = path.resolve(__dirname, '../../games/mainhattan-nightrun'), OLD = process.env.OLD, OUT = process.env.NR_OUT || path.join(require('os').tmpdir(), 'nightrun-playtest'); require('fs').mkdirSync(OUT, { recursive: true });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 (async () => {
