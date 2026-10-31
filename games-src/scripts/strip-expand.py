@@ -14,6 +14,13 @@ from PIL import Image
 # prop-holo (glitch frames blur into ghosts); boss-kronos (spikes smear / double); ship-ebait (bright flame blob); ship-egate (beacon ghost); ship-esplitter + ship-emine (doubled flame / spike);
 # ship-eshielder, ship-hv (grey streak behind the flame)
 SKIP = {'kai/idle', 'gunman/idle', 'jetpack/hover', 'prop-holo/loop', 'boss-kronos/idle', 'ship-ebait/flame', 'ship-egate/flame', 'ship-esplitter/flame', 'ship-emine/flame', 'ship-eshielder/flame', 'ship-hv/flame'}
+# W296 LOOK (contact sheets old/new at flame zoom): dropped for ghosting / smeared flame / smudged hull emblem: ship-ecdrone, ship-eflank, ship-drift (fuzzy doubled flame in-between),
+# ship-std (translucent box behind the flame), ship-esniper, ship-eswarm, ship-ezdrone (fuzzy flame blobs), ship-ehealer (cross emblem smudges). Never re-add.
+SKIP |= {'ship-ecdrone/flame', 'ship-eflank/flame', 'ship-drift/flame', 'ship-std/flame', 'ship-esniper/flame', 'ship-eswarm/flame', 'ship-ezdrone/flame', 'ship-ehealer/flame'}
+# W296 BUDGET (<= 12 MB added, lossless only: lossy q92..q100 changes the original frames by 15-40 levels, gate is 2): flight flames play at 24 fps already, so ships go first.
+# Kept ship: nova only (smallest player ship; 11.6 MB total, lancer would put it over 12 MB). Every other ship flame is out for size only (they looked fine).
+BUDGET_SKIP = {f'ship-{n}/flame' for n in 'ebomber ec ecarrier echarger ecrawler ecruiser ediver edrone egtank egturret egunship einterceptor ekamikaze eminelayer eturret ezbomber lancer swg syn tri'.split()}
+SKIP |= BUDGET_SKIP
 ACTS = ('idle', 'hover', 'flame', 'glow', 'loop')
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MEDIA = ROOT + '/games/mainhattan-nightrun/media/'
