@@ -68,6 +68,7 @@ window.__og={run:OG_builderCar,mesh:OG_mesh,ev:s=>eval(s)};   // ev: test harnes
 function OG2_tap(sel){const el=$(sel);if(!el||el.hidden||!el.getClientRects().length)return'hidden';const r=el.getBoundingClientRect();if(r.width<4||r.height<4)return'hidden';const x=r.left+r.width/2,y=r.top+r.height/2,top=document.elementFromPoint(x,y);if(!top||!(top===el||el.contains(top)))return'covered by '+(top?(top.id||top.className||top.tagName):'nothing');
  const o={bubbles:true,cancelable:true,clientX:x,clientY:y,pointerType:'touch',isPrimary:true};for(const t of['pointerdown','mousedown','pointerup','mouseup'])top.dispatchEvent(t.startsWith('p')?new PointerEvent(t,o):new MouseEvent(t,o));top.dispatchEvent(new MouseEvent('click',o));return'ok'}
 async function OG2_trip(key,how,save){const m=RO.marks.find(q=>markKey(q)===key);if(!m)return{key,err:'no marker'};
+ R3U.q.length=0;R3U.cur=null;{const U=$('#r3Up');if(U)U.hidden=true}   /* GO isolation: a level-up queued by an earlier GO in this page must not cover PLAY/BACK; the trip's own level-up still fires */
  const p0=prof();if(save==='fresh'){store.set('mho_prof',Object.assign({},p0,{xp:0}))}else if(save==='used'){store.set('mho_prof',Object.assign({},p0,{xp:Math.max(p0.xp,20000)}))}const lv0=lvlOf(prof().xp),bad=[],wait=async(f,ms)=>{for(let k=0;k<ms/50&&!f();k++)await ogWait(50);return f()},built0=RO.built,grp0=RO.grp;
  RO.x=m.x-Math.sin(m.h)*14;RO.z=m.z-Math.cos(m.h)*14;RO.h=RO.vh=m.h;RO.v=0;RO.y=groundAt(RO.x,RO.z,RO.y);RO.cool=0;camSnap=true;let taps=0;
  await wait(()=>RO.card===m||RO.pm===m||RO.pmNew===m,4000);if(RO.card!==m){if(!roamPromptOpen())roamOpen(m);taps++}
@@ -76,20 +77,36 @@ async function OG2_trip(key,how,save){const m=RO.marks.find(q=>markKey(q)===key)
  await ogWait(400);const t0=performance.now();let back=0;
  if(how==='quit'){togglePause(true);const q=$('#quitBtn');if(!/CITY/i.test(q.textContent))bad.push('pause button says '+q.textContent);const r=OG2_tap('#quitBtn');if(r!=='ok')bad.push('quit '+r);back=1}
  else{await wait(()=>state==='race',6000);if(state==='race')raceT=Math.max(raceT,236);await wait(()=>state==='results'&&!$('#roamBack').hidden,15000);await ogWait(1500);const r=OG2_tap('#roamBack');if(r!=='ok')bad.push('BACK TO FREE ROAM '+r+(r==='ok'?'':' (level-up '+(!$('#r3Up').hidden)+')'));else back=1}
- const t1=performance.now();await wait(()=>state==='roam'&&RO.on&&!LD.busy,8000);const ms=Math.round(performance.now()-t1+(how==='quit'?0:0));
+ const t1=performance.now();await wait(()=>state==='roam'&&RO.on&&!LD.busy,6000);const ms=Math.round(performance.now()-t1+(how==='quit'?0:0));
  const dh=Math.abs(Math.atan2(Math.sin(RO.h-h0),Math.cos(RO.h-h0))),dp=Math.hypot(RO.x-x0,RO.z-z0);
  const lv1=lvlOf(prof().xp);if(save==='fresh'&&how==='finish'&&lv1<=lv0)bad.push('fresh save did not level up (test is vacuous)');return{key,save,lv:lv0+'>'+lv1,bad,type,how,taps,back,ms,dp:+dp.toFixed(1),dh:+dh.toFixed(3),reuse:RO.built===built0&&RO.grp===grp0,menu:!$('#menu').hidden,roam:state==='roam'&&RO.on}}
 async function OG2_roundtrip(){const e0=OGG.errs;for(let k=0;k<200&&!(state==='roam'&&pl&&RO.built&&!LD.busy);k++)await ogWait(100);
  if(!OD_FLAG('og2')){const n=RO.marks.filter(q=>q.og2).length;return n===0?'📍 RACE ROUNDTRIP → ✅ PASS (flag og2 OFF: 0 og2 markers, nothing changed)':'📍 RACE ROUNDTRIP → ❌ FAIL (flag OFF but '+n+' og2 markers)'}
  const prof0=prof(),ath=CID==='ath',L=ath?[['rm_akro','finish'],['PAPPAS','quit'],['rm_synt','finish']]:[['rm_grand','finish'],['rm_cup','quit'],['rm_hafen','finish']],R=[];
  for(const sv of['fresh','used'])for(const[k,h]of L){const r=await OG2_trip(k,h,sv);R.push(r);if(r.err)continue}
- const bad=[];for(const r of R){if(r.err){bad.push(r.key+' '+r.err);continue}if(!r.type||r.type==='-')bad.push(r.key+' not started');if(r.taps>2)bad.push(r.key+' taps '+r.taps);if(r.back!==1)bad.push(r.key+' no single back tap');for(const b of r.bad||[])bad.push(r.key+' ('+r.save+') '+b);if(!r.roam||r.menu)bad.push(r.key+' not back in the city');if(r.dp>5||r.dh>.2)bad.push(r.key+' pos '+r.dp+'m '+r.dh+'rad');if(!r.reuse)bad.push(r.key+' hub rebuilt');if(r.ms>10000)bad.push(r.key+' back '+r.ms+'ms')}
+ const bad=[];for(const r of R){if(r.err){bad.push(r.key+' '+r.err);continue}if(!r.type||r.type==='-')bad.push(r.key+' not started');if(r.taps>2)bad.push(r.key+' taps '+r.taps);if(r.back!==1)bad.push(r.key+' no single back tap');for(const b of r.bad||[])bad.push(r.key+' ('+r.save+') '+b);if(!r.roam||r.menu)bad.push(r.key+' not back in the city');if(r.dp>5||r.dh>.2)bad.push(r.key+' pos '+r.dp+'m '+r.dh+'rad');if(!r.reuse)bad.push(r.key+' hub rebuilt');if(r.ms>3000)bad.push(r.key+' back '+r.ms+'ms')}
  store.set('mho_prof',prof0);if(OGG.errs!==e0)bad.push((OGG.errs-e0)+' page errors');window.__og2Res=R;
  return`📍 RACE ROUNDTRIP (${CID}) · ${R.map(r=>r.err?r.key+' '+r.err:`${r.key}/${r.save} lv${r.lv} ${r.type} taps ${r.taps} · ${r.how} → city ${r.ms} ms · ${r.dp} m ${r.dh} rad · hub ${r.reuse?'reused':'REBUILT'}`).join(' | ')} → ${bad.length?'❌ FAIL ('+bad.join('; ')+')':'✅ PASS'}`}
 (function OG2_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='onegame'&&q.id==='race-roundtrip'))C.items.push({ver:'onegame',id:'race-roundtrip',area:'race',text:'og2 · onegame/race-roundtrip: every Race Mode race has a city marker, 1 card tap starts it, finish/quit returns to the exact spot and heading (<= 5 m, 0.2 rad) without a menu, hub reused, 0 errors (flag og2; OFF: no og2 markers)'});
   C.GO['onegame/race-roundtrip']=[{c:'fra',n:'Race round trip (Frankfurt)',secs:300,fn:()=>OG2_roundtrip()},{c:'ath',n:'Race round trip (Athens)',secs:300,fn:()=>OG2_roundtrip()}];return}
  if(i<600)setTimeout(()=>OG2_reg(i+1),100)})(0);
-window.__og2={run:OG2_roundtrip,trip:OG2_trip};
+
+// ---- GO onegame/ring-chip (og2c): park inside every og2 ring; the chip / card names THAT race (not a neighbouring leap or sprint), and no og2 ring sits within the chip radius of the free-roam spawn.
+async function OG2_chips(){const e0=OGG.errs;for(let k=0;k<200&&!(state==='roam'&&pl&&RO.built&&!LD.busy);k++)await ogWait(100);
+ if(!OD_FLAG('og2'))return RO.marks.some(q=>q.og2)?'📍 RING CHIP → ❌ FAIL (flag OFF but og2 markers exist)':'📍 RING CHIP → ✅ PASS (flag og2 OFF: 0 og2 markers, nothing changed)';
+ const bad=[],ms=RO.marks.filter(q=>q.og2),sp=RO.spawn0,x0=RO.x,z0=RO.z,h0=RO.h,wait=async(f,t)=>{for(let k=0;k<t/50&&!f();k++)await ogWait(50);return f()};let ok=0;
+ for(const p of OG2_sps())for(const m of ms)if(Math.hypot(m.x-p[0],m.z-p[1])<45)bad.push(markTitle(m)+' is '+Math.round(Math.hypot(m.x-p[0],m.z-p[1]))+' m from the spawn');   /* spawn points, not RO.spawn0 (a finished trip resets that to a ring) */
+ for(const m of ms){const q=RO.marks.find(o=>o!==m&&Math.hypot(o.x-m.x,o.z-m.z)<25);if(q)bad.push(markTitle(m)+' sits '+Math.round(Math.hypot(q.x-m.x,q.z-m.z))+' m from '+markTitle(q))}
+ for(const m of ms){RO.card=null;$('#roamCard').hidden=true;RO.pm=null;for(const off of[9,-9]){RO.x=m.x-Math.sin(m.h)*off;RO.z=m.z-Math.cos(m.h)*off;if(!roamHit(RO.x,RO.z,3))break}RO.h=RO.vh=m.h;RO.v=0;RO.y=groundAt(RO.x,RO.z,RO.y);RO.cool=0;camSnap=true;   /* inside the ring (11 m) but off its centre, like a real stop */
+  await wait(()=>RO.card||RO.pm,3000);const g=RO.card||RO.pm,t=markTitle(m);
+  if(g!==m)bad.push(t+': ring offers '+(g?markTitle(g):'nothing'));
+  else{const el=RO.card?$('#roamCard'):$('#roamPrompt'),b=el&&el.querySelector('b,h2,h3'),tx=((b&&b.textContent)||(el&&el.textContent)||'').trim();if(!tx.includes(t))bad.push(t+': chip says "'+tx.slice(0,40)+'"');else ok++}}
+ RO.card=null;$('#roamCard').hidden=true;RO.pm=null;RO.x=x0;RO.z=z0;RO.h=RO.vh=h0;RO.v=0;RO.cool=1;if(OGG.errs!==e0)bad.push((OGG.errs-e0)+' page errors');
+ return`📍 RING CHIP (${CID}) · ${ok}/${ms.length} rings name their own race → ${bad.length||ok!==ms.length||!ms.length?'❌ FAIL ('+bad.join('; ')+')':'✅ PASS'}`}
+(function OG2c_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='onegame'&&q.id==='ring-chip'))C.items.push({ver:'onegame',id:'ring-chip',area:'race',text:'og2c · onegame/ring-chip: park in every og2 ring, the chip/card names that race; no og2 ring within 45 m of the spawn (flag og2; OFF: no og2 markers)'});
+  C.GO['onegame/ring-chip']=[{c:'fra',n:'Ring chip (Frankfurt)',secs:240,fn:()=>OG2_chips()},{c:'ath',n:'Ring chip (Athens)',secs:240,fn:()=>OG2_chips()}];return}
+ if(i<600)setTimeout(()=>OG2c_reg(i+1),100)})(0);
+window.__og2={run:OG2_roundtrip,trip:OG2_trip,chips:OG2_chips};
 
 // ---- GO onegame/hud (og3, one game S3): ONE HUD kit in roam, Race Mode and the builder DRIVE: the same element ids visible, every HUD text >= 12 px,
 // 0 HUD rects over the touch controls (852x393 and portrait 390x844), and the GAS button present in all 3 modes. Flag OFF: no #hk, nothing changed.
