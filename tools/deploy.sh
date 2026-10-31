@@ -9,7 +9,7 @@ URL=https://am015-dev.github.io/spotify_to_ytmusic/mainhattan-overdrive/
 ! grep -q "__LDX" "$OUT/models.js" 2>/dev/null || [ -d "$OUT/models" ] || { echo "need $OUT/models/ (models.js loads its chunks; since v89z)"; exit 1; }
 grep -q 'ALL_OPEN=true' "$OUT/overdrive.html" || { echo "ALL_OPEN=true missing"; exit 1; }
 grep -q 'by Alex' "$OUT/overdrive.html" || { echo "credits missing"; exit 1; }
-W=$(mktemp -d); git clone -q --depth 1 -b "$BR" "$(git remote get-url origin)" "$W"
+W=$(mktemp -d); trap 'rm -rf "$W"' EXIT; git clone -q --depth 1 -b "$BR" "$(git remote get-url origin)" "$W"
 python3 - "$W/$D/index.html" "$OUT/overdrive.html" <<'PY'
 import sys
 p,b=sys.argv[1],sys.argv[2]
