@@ -139,3 +139,7 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 ## 31 Oct ~18:03
 - og1b done (142e901, flag OFF). GO numbers: launch 20.4/31.2 vs roam 20.5/31.7 m/s; camera identical; wheel gap ≤ 0.05 m; gates 78/78 OFF and ON. It touches SHARED roam code (71 RD_pow/RD_thr/RD_top, 99_api CR_acc, SKC_rig), so city driving changes for everyone even with the flag OFF. Watch: why/solid-cars missed 6/10 on builds with og1b vs 0/4 on trunk (RD_unstack respawn), unexplained; check the new RD_* names against traffic RD_unstack. → OPUS review after review-r31-21.
 - Started og2c (SONNET, REVIEW_2K_46 items). Workers: og2c, wallhit-r31e.
+
+## 31 Oct ~18:46
+- og3b re-review (REVIEW_2K_47): all 3 items fixed, and ON reads as one game in every mode. But there is a FLAG-OFF REGRESSION on trunk: og3b removed setT(hudEl.tRace…) from updHud unconditionally, so with og3 OFF the race timer stays at 00:00.0. TRUNK IS NOT DEPLOYABLE until fixed. → timer-r31f (HAIKU, ~15 min): put the tRace write back inside !OG3, plus a GO for the OFF race timer. This is the first job at the next free worker slot. After that, og3 can ship ON, pending Alex's iPhone feel of hold-GAS in races.
+- og1b review started (review-r31-22): shared roam code unchanged OFF? why/solid-cars rate?
