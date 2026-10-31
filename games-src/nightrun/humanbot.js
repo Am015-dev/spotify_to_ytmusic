@@ -84,6 +84,7 @@ const BOT = (o) => {
     let cnt = 0; for (const b of G.eb) if (Math.hypot(b.x - P.x, b.y - P.y) < H.empR) cnt++;
     return { bx: bx + nx, by: by + ny, dash: near && P.dashCd <= 0 && G.t > blindUntil && rnd() < H.dash * .5, emp: P.emp > 0 && cnt >= H.emp };
   };
+  const CF = { t: 0, push: 0, live: 0, livePush: 0, c: {}, cp: {} };
   const human = bot === 'human', rec = new Map(); let i = 0, lastBeat = -1, tapAt = -1, d = null, cleared = false; const dt = 1 / 60;
   const LK = window.LEAK;
   while (m.running && m.G.t < o.MAXT && !(n === 0 && !o.endless && LK && LK.waves >= 10) && !(o.endless && window.ENDR.w >= n)) {   // ENDLESS=1: n = the endramp wave to reach (endramp-test.js)
@@ -97,14 +98,16 @@ const BOT = (o) => {
     if (tapAt >= 0 && bp >= tapAt) { m.press('Fire'); tapAt = -1; }
     const G = m.G;
     for (const e of G.en) { let r = rec.get(e); if (!r) { r = { ty: e.type + (e.el ? '*' : ''), in: -1, end: -1, boss: e.type === 'boss', mini: !!e.mini }; rec.set(e, r); } if (r.in < 0 && e.x < 960 - (e.r || 14)) r.in = G.t; }
-    m.step(dt); i++; if (window.__rec) window.__rec(m, i);   // optional recorder (pacing-test.js)
+    const hp0 = m.P.hp, ebs = m.G.eb.map(b => [b.x, b.y, !!b.fl]), ens = m.G.en.map(e => [e.type, e.x, e.y, e.r]), px0 = m.P.x, py0 = m.P.y, bspan = m.G.boss ? 1 : 0;
+    m.step(dt); i++; CF.t++; if (mode === 1) CF.push++; if (window.WV && WV.bt && WV.bt.live) { CF.live++; if (mode === 1) CF.livePush++; }
+    if (m.P.hp < hp0) { const near = ebs.filter(b => Math.hypot(b[0] - px0, b[1] - py0) < 45); let c = bspan ? 'boss' : near.some(b => b[2]) ? 'flak' : near.length ? 'bullet' : ens.some(e => Math.hypot(e[1] - px0, e[2] - py0) < e[3] + 25) ? 'collision' : 'other'; CF.c[c] = (CF.c[c] || 0) + hp0 - m.P.hp; if (mode === 1) CF.cp[c] = (CF.cp[c] || 0) + hp0 - m.P.hp; } if (window.__rec) window.__rec(m, i);   // optional recorder (pacing-test.js)
     for (const [e, r] of rec) if (r.end < 0 && (e.dead || !m.G.en.includes(e))) { r.end = m.G.t; r.killed = e.hp <= 0; }
     if (m.ST.over || m.G.dead) { cleared = !!m.ST.over && !m.G.dead; break; }
   }
   const life = []; for (const [e, r] of rec) { if (r.boss || r.mini || !r.killed || r.in < 0 || r.end - r.in <= 0) continue; life.push([r.ty, +(r.end - r.in).toFixed(2)]); }
   let sp = 0, lk = 0, lw = 0; for (const [e, r] of rec) { if (r.boss || r.mini || !LK || !(LK.weight(e) > 0)) continue; sp++; if (e.lkd) { lk++; lw += LK.weight(e); } }
   if (o.endless) cleared = window.ENDR.w >= n && !m.G.dead;
-  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0), seed, policy: pol, score: m.G.score, gold: window.WV && WV.bt ? WV.bt.n : 0, sqs: window.WV && WV.bt ? WV.bt.m : 0, sw, sqMode: [...sqm.entries()].sort((a, b) => a[0] - b[0]).map(([k, c]) => c[1] > c[0] ? 1 : 0), sqLog: window.WV ? WV.log.sqs : [] };
+  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0), seed, policy: pol, score: m.G.score, gold: window.WV && WV.bt ? WV.bt.n : 0, sqs: window.WV && WV.bt ? WV.bt.m : 0, sw, sqMode: [...sqm.entries()].sort((a, b) => a[0] - b[0]).map(([k, c]) => c[1] > c[0] ? 1 : 0), sqLog: window.WV ? WV.log.sqs : [], cf: CF, flak: window.WV ? WV.log.flak | 0 : 0 };
   m.abort(); return res;
 };
 (async () => {
