@@ -116,7 +116,7 @@ hookable('SH.volley',()=>SH.volley,f=>SH.volley=f);   // layers (build order): u
 NR.on('kill',d=>SH.award(d.e));
 NR.on('districtEnd',()=>{if(SH.live){SH.neon+=5;SH.earned+=5;SH.flash=.5;}});
 NR.on('runStart',()=>{SH.live=true;SH.neon=0;SH.earned=0;const sd=shipDef();if(sd.id!=='std'&&G.live)G.note={t:4,txt:sd.n+' ready'};});
-NR.on('runEnd',d=>{if(SH.active){SH.active=false;shopEl.hidden=true;}const add=SH.bankRun(false,d&&!d.quit&&!d.cleared?(d.story?1:(d.di|0)+1):0);const el=$('oNeon');if(el)el.innerHTML=add?'Banked '+neonI+' <strong>+'+add+'</strong> · garage '+GA.bank:'Banked nothing';gaDraw();});
+NR.on('runEnd',d=>{if(SH.active){SH.active=false;shopEl.hidden=true;}const add=SH.bankRun(false,d&&!d.quit&&!d.cleared?(d.story?1:(d.di|0)+1):0);const el=$('oNeon');if(el)el.innerHTML=add?'Banked '+neonI+' <strong>+'+add+'</strong> · in garage: '+GA.bank:'Banked nothing';gaDraw();});
 
 /* ----- the pit-stop screen ----- */
 const shopEl=document.createElement('div');shopEl.id='shop';shopEl.className='ov solid pg';shopEl.hidden=true;

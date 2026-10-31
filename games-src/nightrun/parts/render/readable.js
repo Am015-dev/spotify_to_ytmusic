@@ -76,4 +76,4 @@ HOOK.drawPlayer(dp=>function(t){dp(t);READ.dot();});
 if(RET.read&&PW.p2&&PW.p2.K&&PW.p2.K.nova)PW.p2.K.nova.c=READ.NOVA;
 /* Settings > Assist (or Accessibility when Assist is off): 'Show hitbox' */
 {const f=RET.assistSchema;RET.assistSchema=function(SC){if(f)f.call(this,SC);if(!RET.read)return;const g=SC.find(x=>x.g==='Assist')||SC.find(x=>x.g==='Accessibility');if(!g||g.rows.some(r=>r.k==='hbox'))return;
-  const i=g.rows.findIndex(r=>r.k==='hc');g.rows.splice(i<0?g.rows.length:i+1,0,{k:'hbox',l:'Show hitbox',o:[[false,'Off'],[true,'On']],d:'A small white dot on the ship marks the only spot that can be hit. Never marks a run.'});};}
+  const i=g.rows.findIndex(r=>r.k==='hc');g.rows.splice(i<0?g.rows.length:i+1,0,{k:'hbox',l:'Show hitbox',o:[[false,'Off'],[true,'On']],d:'Shows a small white dot on the ship, at the spot that can be hit. Never marks a run.'});};}

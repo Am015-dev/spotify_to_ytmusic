@@ -1243,7 +1243,7 @@ async function settingsTests(browser, cfg) {
     await chk(dd.bad.length === 0 && !dd.hard && !dd.mute, 'settings', 'DEFAULTS left ' + JSON.stringify(dd));
     // latency tap test: 8 taps 60 ms after the clicks set the Audio sync to about -60 ms; a tap halfway between clicks is ignored
     await ev(p, () => document.getElementById('calBtn').scrollIntoView({ block: 'center' })); await press(p, cfg, T, '#calBtn'); await sleep(300);
-    await chk(await ev(p, () => document.getElementById('calBox').classList.contains('on') && __mnr.CAL.on), 'calibration', 'TAP TEST did not open');
+    await chk(await ev(p, () => document.getElementById('calBox').classList.contains('on') && __mnr.CAL.on), 'calibration', 'TAP CHECK did not open');
     for (const b of (await ev(p, () => window.__bot.probe().bad))) await fail(p, tag, 'layout', 'tap test ' + b);
     const cal = await ev(p, async () => {
       const m = __mnr, C = m.CAL, pad = document.getElementById('calPad'), tapAt = async (t, late) => { await new Promise(r => { const iv = setInterval(() => { if (m.calNow() >= t + late) { clearInterval(iv); r(); } }, 1); }); pad.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true })); };

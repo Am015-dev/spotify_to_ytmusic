@@ -202,7 +202,7 @@ function buildSettings(){const body=$('setBody');
         r.o.forEach(([v,lab],i)=>{const b=document.createElement('button');b.type='button';b.textContent=lab;b.dataset.v=i;b.addEventListener('click',()=>setVal(r.k,v));row.appendChild(b);});}
       else{row.className='sl';const id='s'+r.k[0].toUpperCase()+r.k.slice(1);row.innerHTML=`<span>${r.l}</span><input type="range" id="${id}" min="${r.s[0]}" max="${r.s[1]}" step="${r.s[2]}" aria-label="${r.l}"><output id="v${id.slice(1)}"></output>`;
         row.querySelector('input').addEventListener('input',e=>{const x=+e.target.value;setVal(r.k,r.p?x/100:x);});
-        if(r.tap){const b=document.createElement('button');b.type='button';b.id='calBtn';b.className='go dim';b.style.cssText='min-height:34px;font-size:12px;padding:.3em .9em';b.textContent='TAP TEST';b.addEventListener('click',toggleCal);row.appendChild(b);}}
+        if(r.tap){const b=document.createElement('button');b.type='button';b.id='calBtn';b.className='go dim';b.style.cssText='min-height:34px;font-size:12px;padding:.3em .9em';b.textContent='TAP CHECK';b.addEventListener('click',toggleCal);row.appendChild(b);}}
       body.appendChild(row);
       if(r.tap){const cb=document.createElement('div');cb.id='calBox';cb.innerHTML='<div id="calInfo">Tap the pad on every click. 8 taps.</div><button id="calPad" type="button">TAP TO THE CLICK</button><div id="calPips">'+'<i></i>'.repeat(8)+'</div>';body.appendChild(cb);
         $('calPad').addEventListener('pointerdown',e=>{e.preventDefault();doCalTap(e.timeStamp);});}}}}
@@ -216,7 +216,7 @@ let defArmed=0;
 $('setDef').addEventListener('click',()=>{const b=$('setDef');if(!defArmed){defArmed=setTimeout(()=>{defArmed=0;b.textContent='DEFAULTS';},3000);b.textContent='TAP AGAIN TO RESET';return;}
   clearTimeout(defArmed);defArmed=0;b.textContent='DEFAULTS';Object.assign(SET,DEFS,{v3:1,afv:1});saveSet();applySet();syncSet();});
 // latency test: clicks on the audio clock, 8 taps, the median lateness becomes the Audio sync
-function stopCal(){calStop();$('calBox').classList.remove('on');$('calBtn').textContent='TAP TEST';}
+function stopCal(){calStop();$('calBox').classList.remove('on');$('calBtn').textContent='TAP CHECK';}
 function toggleCal(){if($('calBox').classList.contains('on')){stopCal();return;}AU.unlock();calStart();$('calBox').classList.add('on');$('calBtn').textContent='CLOSE';calUI();}
 function doCalTap(ts){if(!CAL.on)return;const d=calTap(ts);calUI();if(CAL.done!=null)syncSet();return d;}
 function calUI(){const pips=$('calPips').children;for(let i=0;i<pips.length;i++)pips[i].classList.toggle('on',i<CAL.taps.length);
