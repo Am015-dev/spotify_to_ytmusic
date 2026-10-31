@@ -136,3 +136,5 @@ Model and status come from the session list. Cost is blank: the session list doe
 | tilebuild-r30j, tb1, reload-r30l | — | Opus + Sonnet | design, flag OFF, findings | docs/flag |
 | touchdrive-r30m | beta.166 | Sonnet + Opus review | shipped (round 4) | shipped |
 | mem-r30n | — | Opus | blocked by 120 s quick-test give-up, docs + patch only | carried to mem-r30p |
+| 31 Oct | review-r31-24 (OPUS) | rev50 wallhit PASS | ~$2.86 |
+| 31 Oct | racereds-r31g (SONNET) | diagnosis only, no fix | ~$1.51 |
