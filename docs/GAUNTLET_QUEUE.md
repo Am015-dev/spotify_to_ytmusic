@@ -122,3 +122,7 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 - og1 review FAIL on feel (REVIEW_2K_43): the builder still runs its own physics with a slower launch (17 vs 20.5 m/s at 3 s), the camera sits further back (car 105 vs 180 px wide), and the car floats above the deck. The flag stays OFF; the code is safe on trunk. og1 round 2 (OPUS) starts at the next free worker slot, with the 3 items from the review.
 - og2 under review (review-r31-18, OPUS).
 - og3 (one HUD) running its gates. flakes-r31d nudged; it now also owns why/hud6 portrait + why/quiet-dirt.
+
+## 31 Oct ~14:50
+- og2 review FAIL for ship-ON (REVIEW_2K_44). The code is fine and reuses the existing markers, cards and roamGo. Blockers: (1) on a fresh save LEVEL UP covers the results, so returning takes 2 real taps (the GO clicked a covered button); (2) the card says "3 laps", but the race runs LAP 1/1; the pause button says MENU but returns to the city. → og2b (SONNET, ~45 min) at the next free worker slot: 1-tap return through level-up, the GO taps only visible elements, card laps == RC.laps, rename the pause button.
+- Running: og3 (one HUD), og1b (builder feel round 2). flakes-r31d closed: parked-jump is load timing; the solid-cars teleport is unreproduced and needs a guard log.
