@@ -130,3 +130,8 @@ Baseline beta.164: 16 FAIL / 43 (docs/shots/gauntlet/v90m-beta.164/REPORT.md).
 ## 31 Oct ~16:03
 - og3 review FAIL for ship-ON (REVIEW_2K_45). It reads as one game, and it fixes a real 6 px "KPH" in races. Blockers: (1) its own GO onegame/hud is red in gate order (BX_close leaves #touch hidden); (2) the speed pill covers the car in landscape; (3) the old readouts are hidden instead of deleted (+6.6 KB, double boost meter). Also: under og3, races become hold-GAS (no auto-accelerate), which Alex must feel before it ships. → og3b (SONNET) at the next free worker slot.
 - Running: og1b (gates running, tOpen/TAG green), og2b (GO passes, real-touch shots). Reviewer slot free until one reports.
+
+## 31 Oct ~17:53
+- og2 re-review (REVIEW_2K_46): og2b round PASSES (all 3 rev44 blockers fixed, seen with real touch), but ?og2 not ON yet. Items: (1) why/drive-start ath red 2/3 with og2 ON ("hint pill 0x0 on a fresh save"); (2) at an og2 ring, the chip must name that race (fra Grand Prix ring offers the Eiserner Steg leap); (3) the GO return-time cap back to 3 s, with a real wait. → og2c (SONNET, ~30 min) at the next free worker slot.
+- og3b done (7422f09) → review-r31-21 (OPUS) running.
+- Workers: og1b (way over its timebox, told to wrap up), wallhit-r31e (head-on stop).
