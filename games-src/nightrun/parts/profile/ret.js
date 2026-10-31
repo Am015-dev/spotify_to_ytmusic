@@ -29,7 +29,8 @@ function retShow(){
   /* menufix3 (E12): after a first-session death the first primary button is RETRY; the GARAGE shortcut shows only when something is affordable */
   const fresh=!Object.keys(sSave.stars).some(k=>(sSave.stars[k]|0)>0),g2=$('gaBtn2');
   $('againBtn').textContent=fresh?'RETRY':on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';
-  if(g2)g2.hidden=!(typeof affordCount==='function'&&affordCount()>0);}
+  if(g2)g2.hidden=!(typeof affordCount==='function'&&affordCount()>0);
+  const sb=$('overSub');if(sb)sb.textContent=g2&&!g2.hidden?'Spend your Neon in the garage, then retry':'Try again. Your Neon is saved.';}   // W321: the garage line shows only when the GARAGE button does
 NR.on('runEnd',d=>{if(!d||d.quit)return;retShow();});
 
 /* ===== B1 pay, B2 economy, B3 mercy ===== */
@@ -269,8 +270,7 @@ RET.pop=function(L){let e=$('retPop');if(!e){e=document.createElement('div');e.i
   if(L==='S')try{AU.sfx('up');}catch(x){}};
 /* run end: count the score up (the texts are written after the event, so wait one tick), show the grade strip */
 NR.on('runEnd',d=>{if(!d||d.quit||!RET.trans&&!RET.grade)return;setTimeout(()=>{
-  if(RET.trans){for(const [id,sc] of [['oScore','over'],['srScore','stres']]){const el=$(id);if(!el||$(sc).hidden)continue;const to=G.score|0;
-      RET.countUp(n=>{el.textContent=window.fmtN(n);},0,to,800);}
+  if(RET.trans){   // W321: the score is written once, final (a count-up showed a different number than the HUD for 0.8 s)
     RET.chipSync();}
   if(RET.grade)for(const [id,host] of [['grO',$('over')],['grR',$('stres')]]){let e=$(id);const L=RET.gr.list;
     if(!e){e=document.createElement('div');e.id=id;e.className='retGr';host.querySelector('.in').insertBefore(e,host.querySelector('.row'));}

@@ -102,6 +102,7 @@ const stK=s=>stLen(s)/46;                                 // the old goals were 
 const wallK=s=>window.RET&&RET.walls&&!s.ch?(RET.wallKill[s.n]||(ARC.active()?RET.wallKill.all:RET.wallKill.classic)):1;   // RET.walls: a kill goal is cut so the stage ends with its song
 const stKill=s=>Math.round(s.goal.v*stK(s)*wallK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
 const stS3=s=>Math.round(s.s3*stK(s)/5000)*5000;
+const goalPlain=s=>{const g=s.goal;return s.ch?goalTxt(s).toLowerCase():g.k==='survive'?'survive to the end of the song':g.k==='kill'?'destroy '+stKill(s)+' enemies':g.k==='score'?'score '+(stScore(s)/1000)+'K':g.k==='mini'?'beat the mini-boss':'beat the boss';};   // W321: the goal in player words (goalTxt stays for the stage plate)
 const goalTxt=s=>{const g=s.goal;return s.ch==='nohit'?'NO HIT · '+stLen(s)+' BARS':s.ch==='perfect'?'PERFECT '+stPerf(s)+' · '+stLen(s)+' BARS':s.ch==='speed'?'KILL '+stKill(s)+' IN '+Math.round(stLen(s)*s.tb)+' BARS':g.k==='survive'?'SURVIVE '+stLen(s)+' BARS':g.k==='kill'?'KILL '+stKill(s):g.k==='score'?'SCORE '+(stScore(s)/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
 /* the three stars of a stage: [clear, PERFECT target, no hull lost (challenges: a score)] as plain lines */
 const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'?Math.round(stPerf(s)*1.4):stPerf(s))+' PERFECT hits',s.ch?'Score '+(stS3(s)/1000)+'K':'No hull lost'];
@@ -157,8 +158,8 @@ else SH.pit(()=>this.finish());}return;}
     if(!boss)banner('STAGE CLEAR',this.def.name,false,2.6);
     G.flash=Math.max(G.flash,.3*FX());AU.sfx('up');AU.intense(false);NR.emit('stageClear',{n:this.n});},
   fail(){running=false;NR.emit('runEnd',{story:this.n,score:G.score,di:G.di,kills:G.kills});
-    $('overEyebrow').textContent=this.why||('Stage '+this.n+' failed');$('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
-    const b=sSave.stars[this.n]||0;$('oBest').innerHTML=this.def.goal.k==='boss'||this.def.goal.k==='mini'?'Goal <strong>'+goalTxt(this.def)+'</strong>':'Goal <strong>'+goalTxt(this.def)+'</strong> · '+this.label();
+    $('overEyebrow').textContent=this.why||('Stage '+this.n+' failed');$('oScore').textContent=window.fmtN(G.score);$('oDL').textContent='Stage';$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
+    const b=sSave.stars[this.n]||0;$('oBest').innerHTML='To clear it: <strong>'+goalPlain(this.def)+'</strong>';
     $('stBtn2').hidden=false;
     overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);
     G.over=true;},
@@ -168,7 +169,7 @@ else SH.pit(()=>this.finish());}return;}
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
     const s=this.def;resEl.classList.toggle('evlc',ART.isReal('event-level-clear'));$('srEye').textContent=n===MAIN?'Story complete':s.ch?'Challenge clear':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
-    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(G.perf>0?'Land ':'Land at least ')+(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT hits'+(G.perf>0?' (you: '+G.perf+')':''))   // W307: "(you: 0)" read as a stray label; a player who fired nothing sees the goal as a sentence+row(st[2],s.ch?'Score '+(this.s3/1000)+'K (you: '+Math.round(G.score/1000)+'K)':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)))+(window.RET&&RET.clearPay?RET.resultRow():'');
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],'PERFECT hits (shots on the beat): '+G.perf+' of '+(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn))+row(st[2],s.ch?'Score '+Math.round(G.score/1000)+'K of '+(this.s3/1000)+'K':'No hull lost');   // W321: the 3rd star row is back; the medal, medal chips, Neon / GOLD rows that followed it were never drawn in the reviewed build (inside a comment) and stay off until they are explained (HANDOFF-W321)
     $('srScore').textContent=window.fmtN(G.score);
     $('srNext').hidden=n>=MAIN;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},

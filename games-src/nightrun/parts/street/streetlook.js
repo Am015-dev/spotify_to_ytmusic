@@ -194,7 +194,13 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   const bossOn=S.boss&&!S.boss.dead,rl=x+pw_+10*u,rr=sr-sw-10*u,top=bossOn&&RET.pound2&&rr-rl>=150*u&&VH<=520*u,bk=bossOn&&RET.pound2&&!top?24*u:0;   // W286: boss bar in the free top row on a short wide screen; else directly under the panel with the hint line BELOW it (bk = its room), so the hint never pushes the bar onto the boss's head
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
-  if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u+bk;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u+bk;}
+  let side=null;   // W321: the hint goes in the empty sky RIGHT of the hearts panel (under the score), wrapped to at most 3 lines, so it never sits on the OVERDRIVE / GUARD plates or the boss bar under the panel; no room = the old strip under the panel
+  if(line&&!bossOn){const f=fs(14),rl2=x+pw_+8*u,rw=vw-8*u-rl2-16*u;c.font='bold '+f+'px monospace';
+    if(rw>=120*u){const ws=line.split(' '),ls=[''];for(const w of ws){const t=ls[ls.length-1]?ls[ls.length-1]+' '+w:w;if(c.measureText(t).width<=rw||!ls[ls.length-1])ls[ls.length-1]=t;else ls.push(w);}
+      if(ls.length<=3){const lw=Math.max(...ls.map(l=>c.measureText(l).width)),bw=lw+16*u,lh=f*1.2,bh=ls.length*lh+8*u,bx=vw-8*u-bw,by=sy+40*u;
+        c.fillStyle='#000b';c.fillRect(bx,by,bw,bh);c.fillStyle='#fff';c.textAlign='left';ls.forEach((l,i)=>c.fillText(l,bx+8*u,by+4*u+i*lh));
+        side={x:bx,y:by-t0,w:bw,h:bh};hint=side;c.textAlign='center';}}}
+  if(line&&!side){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u+bk;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u+bk;}
   if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=VH-20*u,a=.6+.4*Math.sin(S.time*14),bt='◀ BEHIND: a foe is arriving from the left';c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';
     c.font='bold '+fs(14)+'px monospace';const bw=Math.min(c.measureText(bt).width,vw-24*u);c.fillStyle='#000b';c.fillRect(6*u,fy-12*u,bw+12*u,24*u);c.fillStyle='#ffb020';c.fillText(bt,12*u,fy,vw-24*u);c.globalAlpha=1;}   // W161: 1 s warning for the edge a foe comes from; W267: one line on the empty road strip at the bottom, never over the actors
   SL.tag='';
