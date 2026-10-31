@@ -58,7 +58,7 @@ const tpDrones=()=>Math.min(DRONE_CAP,TP.l('drn')+SH.n('dr'));
   const boost=n0=>{const dm=tpDmg(),pc=tpCrit();const off=SYN.off();for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];b.dm*=b.pf?dm:dm*off;if(pc&&Math.random()<pc){b.dm*=3;b.crit=1;if(!b.big&&!b.hv)b.big=1;}}};
   HOOK['SH.volley'](vol=>function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);boost(n0);
     const dd=tpDouble();if(dd&&Math.random()<dd)G.delayed.push({t:.07,f:()=>{if(G.dead||!running||P.over)return;const m=G.pb.length;vol.call(SH,P.x+22,P.y+2,0);boost(m);}});});
-  HOOK.hurt(hurt0=>function(){if(PW.on('bub')){if(P.inv<=0){P.inv=.0;}if(!TP.bt||performance.now()-TP.bt>400){TP.bt=performance.now();burst(P.x,P.y,'#3dffb0',10,220,.3);AU.sfx('graze');}return;}hurt0();});
+  HOOK.hurt(hurt0=>function(){if(PW.on('bub')){if(P.inv<=0){P.inv=.0;}if(!TP.bt||G.t<TP.bt||G.t-TP.bt>.4){TP.bt=G.t;burst(P.x,P.y,'#3dffb0',10,220,.3);AU.sfx('graze');}return;}hurt0();});
   const die0=die;die=function(){if(TP.revLeft>0&&!G.dead){TP.revLeft--;P.hp=Math.max(2,Math.ceil(P.max/2));P.inv=3;G.eb=[];G.flash=Math.max(G.flash,.5*FX());shake(14);
       burst(P.x,P.y,'#ff2d95',30,380,.6);G.rings.push({x:P.x,y:P.y,l:.7,m:.7,c:'#ff2d95'});floater(P.x,P.y-28,'REVIVED','#ff2d95');AU.sfx('up');return;}die0();};}
 NR.on('runStart',()=>{TP.revLeft=TP.l('rev');TP.rgnT=0;TP.dn=0;TP.drones=[];
