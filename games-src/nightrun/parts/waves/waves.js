@@ -97,16 +97,18 @@ const WV=window.WV={
       if(!B.now||q.t0<B.now.t0)B.now=q;
       let near=0;for(const e of this.st.foes)if(e.bq===q){if(e.hp<=0){last=e;if(e._rwC)near++;continue;}if(e.dead||e.wv&&e.wv.st==='out'||e.sl&&e.sl.out)fled++;else alive++;}
       const age=G.t-q.t0,full=q.sp>=q.k;
-      if(fled||age>q.T||this.bossy()){q.end=1;q.fled=fled;this.log.sqs.push({id:q.id,k:q.k,t:+age.toFixed(2),gold:0,why:fled?'fled':age>q.T?'time':'boss'});if(!this.bossy()&&G.banner&&G.banner.gd)this.chip('GOLD LOST',B.n+'/'+this.GN,.9,1);continue;}
-      if(full&&!alive&&near<q.k*this.CLOSE){q.end=1;this.log.sqs.push({id:q.id,k:q.k,t:+age.toFixed(2),gold:0,why:'far',near});if(G.banner&&G.banner.gd)this.chip('GOLD LOST','too far: kill them up close · '+B.n+'/'+this.GN,1,1);continue;}
+      if(fled||age>q.T||this.bossy()){q.end=1;q.fled=fled;this.log.sqs.push({id:q.id,k:q.k,t:+age.toFixed(2),gold:0,why:fled?'fled':age>q.T?'time':'boss'});if(!this.bossy()&&G.banner&&G.banner.gd)this.chip(fled?'no GOLD: squad fled':'no GOLD: too slow',B.n+'/'+this.GN,.9,1);continue;}
+      if(full&&!alive&&near<q.k*this.CLOSE){q.end=1;this.log.sqs.push({id:q.id,k:q.k,t:+age.toFixed(2),gold:0,why:'far',near});if(G.banner&&G.banner.gd)this.chip('no GOLD: too far','kill them up close · '+B.n+'/'+this.GN,1,1);continue;}
       if(full&&!alive){q.end=1;q.gold=1;B.n++;B.claim[q.sg]=1;this.log.gold=B.n;this.log.sqs.push({id:q.id,k:q.k,t:+age.toFixed(2),gold:1,why:'gold'});const x=last?last.x:W*.6,y=last?last.y:H/2;
-        G.pk.push({t:'up',x,y,vx:-40,vy:0,bob:0,gold:1});G.score+=Math.max(0,Math.round((G.score-q.s0)*this.GPK));try{AU.sfx('up');}catch(e){}this.chip('GOLD '+B.n+'/'+this.GN,'+1 weapon level',1.2,1);NR.emit('gold',{n:B.n,id:q.id});continue;}
+        G.pk.push({t:'up',x,y,vx:-40,vy:0,bob:0,gold:1});G.score+=Math.max(0,Math.round((G.score-q.s0)*this.GPK));let rp=0;if(P.hp<P.max&&(P.dashCd<=0||P.emp>0)){P.hp++;rp=1;floater(P.x,P.y-24,'HULL +1','#3dffb0');}   // W323 GOLD repairs 1 hull when DASH or EMP was ready at the kill
+        try{AU.sfx('up');}catch(e){}this.chip('GOLD! squad killed up close','x3 points, +1 weapon'+(rp?', +1 hull':'')+' · '+B.n+'/'+this.GN,1.2,1);NR.emit('gold',{n:B.n,id:q.id});continue;}
       if(!B.live||q.t0<B.live.t0)B.live=q;
 }
-    for(const e of this.st.foes){if(!e.bq||e.hp<=0||e.dead||!/turret|gunship|shielder/.test(e.type)||e.wv&&e.wv.st!=='on'||e.sl&&e.sl.out)continue;   // the flak ring: told FT s ahead, then FN bullets
-      if(e._ft){if(G.t-e._ft>=this.FT){e._ft=0;e._fc=G.t+this.FCD;const o=eb.src,n0=G.eb.length;eb.src=e;const a0=GR()*6.28;for(let i=0;i<this.FN;i++){eb(e.x,e.y,a0+i*6.2832/this.FN,this.FS);eb(e.x,e.y,a0+(i+.5)*6.2832/this.FN,this.FS*.7);}eb.src=o;for(let i=n0;i<G.eb.length;i++)G.eb[i].fl=1;this.log.flak=(this.log.flak|0)+1;}}
-      else if(!(e._fc>G.t)&&Math.hypot(P.x-e.x,P.y-e.y)<this.FR){e._ft=G.t;G.rings.push({x:e.x,y:e.y,l:this.FT,m:this.FT,c:'#ff3d6a'});}}
-    const q=B.live;if(q){const s=Math.max(0,q.T-(G.t-q.t0));this.chip('GOLD '+Math.ceil(s)+'s','fly in close, kill the squad · '+B.n+'/'+this.GN,.4);}},
+    const lh=P.hp<=1;   // W323 last-hull punisher: at 1 hull every foe of the live bounty squad flaks (range x1.3, cooldown x.6)
+    for(const e of this.st.foes){if(!e.bq||e.hp<=0||e.dead||!(/turret|gunship|shielder/.test(e.type)||lh&&e.bq===B.live)||e.wv&&e.wv.st!=='on'||e.sl&&e.sl.out)continue;   // the flak ring: told FT s ahead, then FN bullets
+      if(e._ft){if(G.t-e._ft>=this.FT){e._ft=0;e._fc=G.t+this.FCD*(lh?.6:1);const o=eb.src,n0=G.eb.length;eb.src=e;const a0=GR()*6.28;for(let i=0;i<this.FN;i++){eb(e.x,e.y,a0+i*6.2832/this.FN,this.FS);eb(e.x,e.y,a0+(i+.5)*6.2832/this.FN,this.FS*.7);}eb.src=o;for(let i=n0;i<G.eb.length;i++)G.eb[i].fl=1;this.log.flak=(this.log.flak|0)+1;}}
+      else if(!(e._fc>G.t)&&Math.hypot(P.x-e.x,P.y-e.y)<this.FR*(lh?1.3:1)){e._ft=G.t;G.rings.push({x:e.x,y:e.y,l:this.FT,m:this.FT,c:'#ff3d6a'});}}
+    const q=B.live;if(q){const s=Math.max(0,q.T-(G.t-q.t0));this.chip('GOLD '+Math.ceil(s)+'s · x3 points, +1 weapon','fly in close, kill the squad · '+B.n+'/'+this.GN,.4);}},
   best(n){try{return(JSON.parse(localStorage.getItem('mnr_wvgold')||'{}')[n]|0);}catch(e){return 0;}},
   keep(n,v){try{const o=JSON.parse(localStorage.getItem('mnr_wvgold')||'{}');if(v>(o[n]|0)){o[n]=v;localStorage.setItem('mnr_wvgold',JSON.stringify(o));}}catch(e){}},
   end(){const S=this.st,lw=this.log.waves[this.log.waves.length-1];if(lw){lw.t1=+G.t.toFixed(2);if(this.bt)lw.gold=this.bt.n;}S.phase='rest';S.rest=clamp(this.REST+(this.per()-17)*.25,this.REST,5);S.q=[];},
@@ -157,6 +159,6 @@ const WV=window.WV={
   NR.on('kill',o=>{const e=o&&o.e;if(e&&e.wv){const lw=WV.log.waves[WV.log.waves.length-1];if(lw)lw.killed++;}});
   NR.on('runStart',()=>WV.reset());
   { const rr=RET.resultRow;RET.resultRow=function(){const r=rr.apply(this,arguments);const B=WV.bt;if(!RET.gold||!B||!ST.on||WV.st.n!==ST.n||!ST.n)return r;WV.keep(ST.n,B.n);const b=WV.best(ST.n);   // W293: GOLD n/5 on the stage result, best kept
-      return r+`<div class="sr${B.n?' ok':''}" id="srGold"><span class="sg">◆</span> GOLD ${B.n}/${WV.GN}${b>B.n?' · best '+b+'/'+WV.GN:B.n&&b===B.n?' · best':''}</div>`;}; }
+      return r+`<div class="sr${B.n?' ok':''}" id="srGold"><span class="sg">◆</span> GOLD ${B.n}/${WV.GN}${B.n?' · earned x3 points + '+B.n+' weapon level'+(B.n>1?'s':''):' · push a squad up close to earn x3 points + a weapon level'}${b>B.n?' · best '+b+'/'+WV.GN:B.n&&b===B.n?' · best':''}</div>`;}; }
   NR.on('tick',dt=>WV.tick(dt));
 }

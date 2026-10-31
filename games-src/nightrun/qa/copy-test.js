@@ -45,6 +45,10 @@ const stripNouns = t => { let s = t; for (const n of PROPER) s = s.replace(new R
     // 4 boss warning is readable (>= 16 px on screen)
     const bw = rows.filter(r => r.k === 'cv' && /^WARNING\b/.test(r.t)); ok(T + 'boss warning drawn in English', bw.length > 0 && bw.every(r => /^WARNING · /.test(r.t) && !/WARNUNG/.test(r.t)), bw.map(r => r.t).join('|') || 'not seen');
     ok(T + 'boss warning >= 16 px', bw.length > 0 && bw.every(r => r.fs >= 16), bw.map(r => r.fs.toFixed(1)).join(','));
+    // 4b W323 GOLD copy: the reward is stated on the strip, the win and the miss say why in <= 5 words, the result line says what it earned
+    if (W === 390) { const src = fs.readFileSync(require('path').join(__dirname, '../../../games/mainhattan-nightrun/index.html'), 'utf8'); const must = ['x3 points, +1 weapon', 'GOLD! squad killed up close', 'no GOLD: too far', 'no GOLD: too slow', 'no GOLD: squad fled', 'earned x3 points + '];
+      ok('GOLD strip, win, miss and result copy is shipped in English', must.every(t => src.includes(t)), must.filter(t => !src.includes(t)).join('|'));
+      ok('GOLD win/miss reasons are <= 5 words', ['GOLD! squad killed up close', 'no GOLD: too far', 'no GOLD: too slow', 'no GOLD: squad fled'].every(t => t.split(/\s+/).length <= 5)); }
     // 5 the owner test list is not reachable from title / settings
     ok(T + 'no test checklist button for players', (await p.evaluate(() => document.querySelectorAll('.ckB').length)) === 0);
     ok(T + 'no page errors', p.errs.length === 0, p.errs.join('|'));
