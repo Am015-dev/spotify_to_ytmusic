@@ -20,7 +20,7 @@ const frames = p => p.evaluate(() => new Promise(r => requestAnimationFrame(() =
         if (!await tap('focFlight')) { console.log(`FAIL ${dn} flight: no FLIGHT button`); await ctx.close(); continue; }
         for (let i = 0; i < 40 && !(await p.evaluate(() => !!window.__mnr.G.live)); i++) await sleep(100);
         await p.evaluate(() => window.__mnr.simOn(true));
-        for (const T of [3, 6, 10]) { await p.evaluate(T => { const m = window.__mnr; while (m.G.t < T && m.G.live) m.step(1 / 60); }, T); await frames(p);
+        for (const T of [3, 6, 10]) { await p.evaluate(T => { const m = window.__mnr; while (m.G.t < T && m.G.live) m.step(1 / 60); try { m.render(); } catch (e) { } }, T); await frames(p);
           const info = await p.evaluate(() => { const G = window.__mnr.G; return `t ${G.t.toFixed(1)} foes ${G.en.filter(e => !e.dead && e.hp > 0).length} enemy shots ${G.eb.length} banner ${G.banner ? JSON.stringify([G.banner.t || G.banner.a, G.banner.s || G.banner.b]).slice(0, 80) : '-'}`; });
           await p.screenshot({ path: path.join(OUT, `${dn}-flight-${T}s.jpg`), type: 'jpeg', quality: 60 }); console.log(`shot ${dn} flight ${T}s: ${info}`); }
       } else {
