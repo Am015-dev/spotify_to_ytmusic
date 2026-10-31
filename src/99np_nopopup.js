@@ -39,7 +39,7 @@ async function NP_go(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),vis=e=>!
    // the chip stays 5+ s at 90 km/h (25 m/s) and never moves; level + result toasts stack below it and cover no pause/minimap/gauge/touch control
    const y0=cr.top,a1=OG.ask;let still=0;for(let i=0;i<180;i++){RO.v=25;roamStep(1/30);if(OG.ask===a1)still=i+1}
    ck('chip still shown after '+(still/30).toFixed(1)+' s at 90 km/h, '+Math.round(Math.hypot(RO.x-sp.x,RO.z-sp.z))+' m past the start (≥ 5 s)',still>=150&&vis(OG_el('ogAsk')));
-   try{addXP(6000,'no-popup test 2');R3_upPump()}catch(e){}OG_res(fake,3,12.3,500,true);RO.v=10;
+   try{addXP(6000,'no-popup test 2');R3_upPump()}catch(e){}RO.v=10;/* wallhit-r31e: moving BEFORE the result is built (the 6 s loop above can end in a wall stop, which now really stops the car, and a stopped car gets the big card) */OG_res(fake,3,12.3,500,true);RO.v=10;
    const noA=document.createElement('style');noA.textContent='*{animation:none!important}';document.head.appendChild(noA);   // measure the resting positions, not the first frame of the fade-in
    const rs=[['chip',OG_el('ogAsk')],['level',U],['result',OG_el('ogRes')]].filter(x=>vis(x[1])).map(x=>[x[0],(x[0]==='level'?(x[1].firstElementChild||x[1]):x[1]).getBoundingClientRect()]),hz=['tP','roamMini','roamGauge','tL','tR','tG','tB','tN','roamTop','roamPlate'].map(id=>[id,document.getElementById(id)]).filter(x=>vis(x[1])&&x[1].getBoundingClientRect().width>0).map(x=>[x[0],x[1].getBoundingClientRect()]),bad=[];
    const ov=(a,b)=>Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1;

@@ -79,8 +79,8 @@ function DMG_goWall(say){if(state!=='roam'||!RO.on)return'📍 Start free roam f
   const wd=(o)=>{for(let d=2;d<=48;d+=.5)if(roamHit(A.x+fx*d+fz*o,A.z+fz*d-fx*o,.3,y+.5))return d;return 0};const w=wd(0);if(w<26)continue;const wl=wd(-1.5),wr=wd(1.5);if(!wl||!wr||Math.abs(wl-w)>.6||Math.abs(wr-w)>.6)continue;/* head-on: a flat wall square to the run */let ok=true;for(let d=0;d<w-4&&ok;d+=1){const g=groundAt(A.x+fx*d,A.z+fz*d,999);if(Math.abs(g-y)>.6)ok=false}
   if(ok)S={x:A.x+fx*(w-24),z:A.z+fz*(w-24),h,w:24}}}
  if(!S)return'📍 no straight 24 m run at a wall near here ❌';RO.hp=100;RO.inv=0;DMG_panels(0);DMG.deb.length=0;DMG.lastHit=-1e9;if(RO.wk){RO.wk=null;try{RBRK.visible=false;pl.mesh.visible=true}catch(e){}}
- roamWarp(S.x,S.z,S.h,true);RO.x=S.x;RO.z=S.z;RO.h=RO.vh=S.h;RO.v=62/3.6;const h0=DMG.n.hits,d0=DMG.n.deb,t0=performance.now();DMG.lastV=0;K.ArrowUp=true;
- const iv=setInterval(()=>{if(DMG.n.hits===h0&&performance.now()-t0<4000)return;clearInterval(iv);K.ArrowUp=false;const v=DMG.lastV||0,nb=DMG.n.deb-d0,hp=RO.hp??100;
+ roamWarp(S.x,S.z,S.h,true);RO.x=S.x;RO.z=S.z;RO.h=RO.vh=S.h;RO.v=62/3.6;const wa0=TUNE.wallAssist;TUNE.wallAssist=0/* wallhit-r31e: this GO tests the 60 km/h CRASH; the walls-1 bumper would ease the car to 26 km/h first (red since the bumper, REVIEW_2K_26) */;const h0=DMG.n.hits,d0=DMG.n.deb,t0=performance.now();DMG.lastV=0;K.ArrowUp=true;
+ const iv=setInterval(()=>{if(DMG.n.hits===h0&&performance.now()-t0<4000)return;clearInterval(iv);K.ArrowUp=false;TUNE.wallAssist=wa0;const v=DMG.lastV||0,nb=DMG.n.deb-d0,hp=RO.hp??100;
   setTimeout(()=>{const x0=RO.x,z0=RO.z;K.ArrowDown=true;setTimeout(()=>{K.ArrowDown=false;const mv=Math.hypot(RO.x-x0,RO.z-z0),ok=DMG.n.hits>h0&&v>=60&&nb>=2&&hp>0&&!RO.wk&&mv>=2;
    window.__chk=window.__chk||{};window.__chk.dmgWall={v:+v.toFixed(0),nb,hp:+hp.toFixed(0),mv:+mv.toFixed(1),ok};
    say(`📍 WALL CRASH: hit at ${v.toFixed(0)} km/h, ${nb} bricks flew off, health ${hp.toFixed(0)} %, reversed ${mv.toFixed(1)} m after `+(ok?'✅':'❌'))},1500)},400)},50);return'📍 WALL CRASH · driving at the wall…'}

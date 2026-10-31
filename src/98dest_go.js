@@ -1,8 +1,9 @@
 // dest-1 test-only code (lazy chunk, src/LAZY): GO dest/stops (2-min wander bot, hard stops per minute with dest off vs on), dest/smash (each listed item type breaks at 45 km/h), dest/shortcut (a bot takes every shortcut, saves >= 20 % vs the road route).
+// wallhit-r31e: a SQUARE facade hit is meant to stop the car (DEST.ws marks that stop 'wallstop'); it is a wall, not an item, so it is not counted as an item stop.
 // Evaluated in the page's module scope after the game is drivable. A hard stop = speed drop > 50 % within 0.3 s from > 8 m/s; counted only when an item / solid / traffic function cut the speed (respawn = roamWarp and the slope drag TR_pre belong to other lanes).
 const DEST_ITEM=/roamBounce|LIFE_slide|LIFE_hit|W10_bump|DMG_traf|SM2_|smashCheck|DEST_|LV_|TR_cars/;
 function DEST_wander(secs,seed){try{__tq.reset()}catch(e){}const q=CAM_road(70);if(q)roamWarp(q.x,q.z,q.h,true);RO.v=0;RO.turbo=0;__qa.step(30);let sd=seed|0||7;const rnd=()=>(sd=(sd*1664525+1013904223)>>>0)/4294967296,W=x=>Math.atan2(Math.sin(x),Math.cos(x));
- let cause=[],v=RO.v;Object.defineProperty(RO,'v',{configurable:true,get(){return v},set(n){if(Math.abs(v)>4&&Math.abs(n)<Math.abs(v)*.85){const L=(new Error().stack||'').split('\n').slice(2,9).map(l=>(l.trim().split(' ')[1]||'?'));cause.push(L.filter(x=>DEST_ITEM.test(x)).concat(L.filter(x=>/roamWarp|TR_pre/.test(x))).join('>')||'other')}v=n}});
+ let cause=[],v=RO.v;Object.defineProperty(RO,'v',{configurable:true,get(){return v},set(n){if(Math.abs(v)>4&&Math.abs(n)<Math.abs(v)*.85){const L=(new Error().stack||'').split('\n').slice(2,9).map(l=>(l.trim().split(' ')[1]||'?'));cause.push(DEST.ws?'wallstop':L.filter(x=>DEST_ITEM.test(x)).concat(L.filter(x=>/roamWarp|TR_pre/.test(x))).join('>')||'other')}v=n}});
  const dt=1/30,hist=[],stops=[];let t=0,tgt=RO.h,tchg=0,cool=0;
  try{for(let i=0,N=secs*30;i<N;i++){cause=[];t+=dt;if(t>=tchg){tgt=rnd()*6.283;tchg=t+2+rnd()*3}const e=W(tgt-RO.h);K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.08;K.ArrowRight=e<-.08;roamStep(dt);
   hist.push({v:Math.abs(RO.v),c:cause});if(hist.length>10)hist.shift();cool-=dt;

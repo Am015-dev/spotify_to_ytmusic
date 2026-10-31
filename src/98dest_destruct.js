@@ -15,11 +15,16 @@ function DEST_set(it,sp,rr){const cols=DEST_SET[it.t];if(!DEST.on||!cols)return 
 function DEST_slide(nx,nz){const s=RO.v<0?-1:1,hx=Math.sin(RO.h)*s,hz=Math.cos(RO.h)*s,cin=-(hx*nx+hz*nz);if(cin<=0)return 1;if(s>0&&cin<.95){const side=hx*-nz+hz*nx>=0?1:-1;RO.h+=angDiff(Math.atan2(-nz*side,nx*side),RO.h)*.25}DEST.n.slide++;return 1-.12*cin}
 // solids: the rebound (<= 12 m/s, a dead stop) becomes a slide along the wall at >= 60 % of the speed (glancing hits keep more). Damage / sound / shake are the old code's.
 roamBounce=(f=>function(ax,sp,nX,nZ){if(!DEST.on||RO.tb)return f.apply(this,arguments);const vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;let X=nX,Z=nZ;if(X==null){if(ax==='x'){X=-(Math.sign(vx)||1);Z=0}else{X=0;Z=-(Math.sign(vz)||1)}}
- const vn=vx*X+vz*Z,s0=Math.abs(RO.v),v0=RO.v;const r=f.apply(this,arguments);
+ const vn=vx*X+vz*Z,s0=Math.abs(RO.v),v0=RO.v;
+ /* wallhit-r31e: square = nose-on (a > .9, sliding part < 30 % of the speed) and fast (> 4 m/s): decided BEFORE the old rebound so every speed cut of this hit is tagged 'wallstop' (DEST_wander, not an item stop) */
+ const sq=TUNE.wallStop!==0&&s0>4&&vn<-.05&&RO.vy<=1&&-vn/Math.max(s0,.1)>.9&&Math.sqrt(Math.max(0,s0*s0-vn*vn))<.3*s0;DEST.ws=sq?1:0;let r;try{r=f.apply(this,arguments)}finally{DEST.ws=0}
  const hv=DEST.hv,fl=hv.length?Math.max(...hv)*.56:0;/* no solid takes more than 44 % of the speed of the last 0.3 s */
  if(vn>-.05||s0<2||RO.vy>1)return r;
+ const a=Math.min(1,-vn/Math.max(s0,.1));let tx=vx-vn*X,tz=vz-vn*Z,tl=Math.hypot(tx,tz);
+ /* wallhit-r31e: a SQUARE hit (sliding part < 30 % of the speed) is a stop, not a slide: dest-1 turned the head-on rebound into a sideways run at >= 56 % of the speed, so the car never stopped at a facade. It now backs off at <= 8 % of the impact speed (and <= 1.2 m/s) along its own heading; glancing hits slide as before. TUNE.wallStop=0 = old. Only the nose-on case (tl < .3 s0, a > .9) and only above 4 m/s. */
+ if(sq){const fd=Math.sin(RO.h)*X+Math.cos(RO.h)*Z;RO.vh=RO.h;DEST.ws=1;RO.v=(fd<0?-1:1)*Math.min(1.2,.08*s0);DEST.ws=0;RO.yr*=.3;RO.stkT=0;DEST.n.stop=(DEST.n.stop||0)+1;return r}
  if(Math.abs(RO.v)>=Math.max(s0*.6,fl))return r;
- const a=Math.min(1,-vn/Math.max(s0,.1));let tx=vx-vn*X,tz=vz-vn*Z,tl=Math.hypot(tx,tz);if(tl<.3*s0){/* head-on: slide to the side the car is steered / pointing to */const sd=Math.sign(Math.sin(RO.h)*-Z+Math.cos(RO.h)*X)||1;tx=-Z*sd;tz=X*sd;tl=1}
+if(tl<.3*s0){/* head-on: slide to the side the car is steered / pointing to */const sd=Math.sign(Math.sin(RO.h)*-Z+Math.cos(RO.h)*X)||1;tx=-Z*sd;tz=X*sd;tl=1}
  const k=Math.max(.6,1-.4*a*a),tf=Math.atan2(tx/tl,tz/tl);RO.vh=tf;RO.h+=angDiff(tf,RO.h)*.6;RO.v=(v0<0?-1:1)*Math.max(s0*k,fl);RO.stkT=0;DEST.n.slide++;return r})(roamBounce);
 // ---------- shortcuts: pairs of street nodes 60-130 m apart (longer cut-throughs kept hitting streamed or moving obstacles) (as the crow flies) whose road route is >= 1.45x longer (>= 31 % saved) and whose straight corridor is open ground
 // (no collider within 2.6 m, no river, flat, mostly off the road network). Found incrementally (DEST_step, <= 4 ms per roam frame), marked with chevron decals.
