@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.169',date:'31 Oct 2026',items:[{t:'CHANGED',s:'Track builder: DRIVE now uses your own car, with the same speed, handling, camera and touch controls as the city.'},{t:'FIXED',s:'Race timer counts again.'}]},
 {v:'v90m-beta.168',date:'31 Oct 2026',items:[{t:'FIXED',s:'Uses about 10 % less memory, so iPhone should no longer reload the game by itself as often.'},{t:'FIXED',s:'Athens: the hills on the horizon are back.'},{t:'FIXED',s:'Car reflections no longer rebuild while you drive (less stutter).'}]},
 {v:'v90m-beta.167',date:'31 Oct 2026',items:[{t:'FIXED',s:'Athens: no more graphics error from the hills recolouring.'},{t:'CHANGED',s:'Groundwork for a faster Frankfurt start (off for now).'}]},
 {v:'v90m-beta.166',date:'30 Oct 2026',items:[{t:'CHANGED',s:'Phone driving: hold BRAKE and steer to drift on purpose; steering alone never lunges into traffic.'},{t:'CHANGED',s:'SMASH: steer toward a car beside you, then tap BOOST. A small tip shows when a car is beside you.'},{t:'FIXED',s:'Race roll needs both arrows pressed together; late or overlapping taps no longer roll the car.'}]},
