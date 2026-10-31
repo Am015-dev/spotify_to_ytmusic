@@ -190,7 +190,7 @@ function tkFinish(dnf){const sp=RO.sp,C=sp.C,n=sp.ai.length;sp.done=true;const p
 {const _st=sprintStep,_end=sprintEnd;sprintStep=function(dt){if(RO.sp&&RO.sp.tk)return tkStep(dt);return _st(dt)};
  sprintEnd=function(){const sp=RO.sp;if(sp&&sp.tk){const R=RO.ramps.splice(sp.ramps0);for(const o of RO.grp.children.slice())if(o.userData.ramp&&R.some(r=>Math.hypot(o.position.x-r.x,o.position.z-r.z)<20)){RO.grp.remove(o);try{OBJ_free(o)}catch(e){}}TK.sp=null}return _end()}}
 // a World-menu event (Athens has no rival markers) -> its map marker, or a markerless stand-in placed by the builder
-function tkMarkOf(ev){if(!ev)return null;const boss=ev===BOSS_EV||(typeof ATH_BOSS_EV!=='undefined'&&ev===ATH_BOSS_EV)||ev.sig==='boss',kind=boss?'boss':'rival';return RO.marks&&RO.marks.find(m=>m.kind===kind&&m.ev&&m.ev.p===ev.p)||{kind,ev,x:null,z:null}}
+function tkMarkOf(ev){if(!ev)return null;const boss=ev===BOSS_EV||(typeof ATH_BOSS_EV!=='undefined'&&ev===ATH_BOSS_EV)||ev.sig==='boss',kind=boss?'boss':'rival';return RO.marks&&RO.marks.find(m=>m.kind===kind&&!m.og2&&m.ev&&m.ev.p===ev.p)||{kind,ev,x:null,z:null}}
 function tkWorldEvs(){return CID==='ath'?[...ATH_TRK_EV,ATH_BOSS_EV]:[...RIVAL_EV,BOSS_EV]}
 {const f0=startRace;startRace=function(){const ev=worldPick;if(TK.on&&menuTab==='world'&&ev&&!RO.launching&&!(typeof SP_S!=='undefined'&&SP_S.on)){
    const go=()=>{const m=tkMarkOf(ev),C=tkCourseOf(m);if(C){$('#menu').hidden=true;tkStart(m,C)}else say('','NO CITY COURSE HERE',1.6)};const r=enterRoam();if(r&&r.then)r.then(()=>setTimeout(go,60));else go();return}return f0()}}
@@ -200,7 +200,7 @@ function tkQuickSpec(){const id=menuTrack,sid=typeof SPR_TRACK!=='undefined'&&Ob
 {const f1=startRace;startRace=function(){if(TK.on&&menuTab==='quick'&&!RO.sprId&&!RO.launching&&!(typeof SP_S!=='undefined'&&SP_S.on)){const C=tkBuild(tkQuickSpec());
    if(C){const go=()=>{$('#menu').hidden=true;tkStart({kind:'quick',ev:null},C)};const r=enterRoam();if(r&&r.then)r.then(()=>setTimeout(go,60));else go();return}}return f1()}}
 // rival / boss / track-sprint markers start a city course instead of the spline track
-function tkWants(m){return TK.on&&m&&(m.kind==='rival'||m.kind==='boss'||m.kind==='sprint')&&!!tkCourseOf(m)}
+function tkWants(m){return TK.on&&m&&!m.og2&&(m.kind==='rival'||m.kind==='boss'||m.kind==='sprint')&&!!tkCourseOf(m)}
 {const _go=roamGo;roamGo=function(){const m=RO.card;if(m&&!$('#rcGo').disabled&&!(CM.on&&!['garage','cruise'].includes(m.kind))&&tkWants(m)){pickAdd(m);tkStart(m);return}return _go()};$('#rcGo').onclick=roamGo}
 // GO helpers (99c_checklist.js): AI time on each route with the race's own speed model, fake clock
 function tkRouteTimes(C){C=C||TK_C;const r=tkSpread(C);return{A:r.A,B:r.B,spread:r.spread}}

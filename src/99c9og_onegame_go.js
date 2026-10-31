@@ -30,3 +30,29 @@ async function OG_builderCar(){const e0=OGG.errs;for(let k=0;k<200&&!(state==='r
   C.GO['onegame/builder-car']=[{c:'fra',n:'Builder car = roam car',secs:120,fn:()=>OG_builderCar()}];return}
  if(i<600)setTimeout(()=>OG_reg(i+1),100)})(0);
 window.__og={run:OG_builderCar,mesh:OG_mesh,ev:s=>eval(s)};   // ev: test harness hook (tools/og1), this chunk is test-only
+
+// ---- GO onegame/race-roundtrip (og2, one game S2): every Race Mode race has a city marker; one card tap starts it; finish/quit returns to the exact spot + heading without a menu.
+// Per race: park on the marker (the stop opens the card; a prompt tap would count as a tap), tap GO, wait for the countdown/race, end the race (DNF clock) or quit, tap #roamBack, measure.
+async function OG2_trip(key,how){const m=RO.marks.find(q=>markKey(q)===key);if(!m)return{key,err:'no marker'};
+ const wait=async(f,ms)=>{for(let k=0;k<ms/50&&!f();k++)await ogWait(50);return f()},built0=RO.built,grp0=RO.grp;
+ RO.x=m.x-Math.sin(m.h)*14;RO.z=m.z-Math.cos(m.h)*14;RO.h=RO.vh=m.h;RO.v=0;RO.y=groundAt(RO.x,RO.z,RO.y);RO.cool=0;camSnap=true;let taps=0;
+ await wait(()=>RO.card===m||RO.pm===m||RO.pmNew===m,4000);if(RO.card!==m){if(!roamPromptOpen())roamOpen(m);taps++}
+ const x0=RO.x,z0=RO.z,h0=RO.h;taps++;$('#rcGo').click();
+ const started=await wait(()=>['countdown','race'].includes(state)&&RC,15000),type=started?RC.type+'/'+(RC.world?RC.world.p:RC.track||''):'-';
+ await ogWait(400);const t0=performance.now();let back=0;
+ if(how==='quit'){paused=true;$('#pause').hidden=false;$('#quitBtn').click();back=1}
+ else{await wait(()=>state==='race',6000);if(state==='race')raceT=Math.max(raceT,236);await wait(()=>state==='results'&&!$('#roamBack').hidden,15000);if(!$('#roamBack').hidden){$('#roamBack').click();back=1}}
+ const t1=performance.now();await wait(()=>state==='roam'&&RO.on&&!LD.busy,8000);const ms=Math.round(performance.now()-t1+(how==='quit'?0:0));
+ const dh=Math.abs(Math.atan2(Math.sin(RO.h-h0),Math.cos(RO.h-h0))),dp=Math.hypot(RO.x-x0,RO.z-z0);
+ return{key,type,how,taps,back,ms,dp:+dp.toFixed(1),dh:+dh.toFixed(3),reuse:RO.built===built0&&RO.grp===grp0,menu:!$('#menu').hidden,roam:state==='roam'&&RO.on}}
+async function OG2_roundtrip(){const e0=OGG.errs;for(let k=0;k<200&&!(state==='roam'&&pl&&RO.built&&!LD.busy);k++)await ogWait(100);
+ if(!OD_FLAG('og2')){const n=RO.marks.filter(q=>q.og2).length;return n===0?'📍 RACE ROUNDTRIP → ✅ PASS (flag og2 OFF: 0 og2 markers, nothing changed)':'📍 RACE ROUNDTRIP → ❌ FAIL (flag OFF but '+n+' og2 markers)'}
+ const ath=CID==='ath',L=ath?[['rm_akro','finish'],['PAPPAS','quit'],['rm_synt','finish']]:[['rm_grand','finish'],['rm_cup','quit'],['rm_hafen','finish']],R=[];
+ for(const[k,h]of L){const r=await OG2_trip(k,h);R.push(r);if(r.err)continue}
+ const bad=[];for(const r of R){if(r.err){bad.push(r.key+' '+r.err);continue}if(!r.type||r.type==='-')bad.push(r.key+' not started');if(r.taps>2)bad.push(r.key+' taps '+r.taps);if(!r.roam||r.menu)bad.push(r.key+' not back in the city');if(r.dp>5||r.dh>.2)bad.push(r.key+' pos '+r.dp+'m '+r.dh+'rad');if(!r.reuse)bad.push(r.key+' hub rebuilt');if(r.ms>3000)bad.push(r.key+' back '+r.ms+'ms')}
+ if(OGG.errs!==e0)bad.push((OGG.errs-e0)+' page errors');window.__og2Res=R;
+ return`📍 RACE ROUNDTRIP (${CID}) · ${R.map(r=>r.err?r.key+' '+r.err:`${r.key} ${r.type} taps ${r.taps} · ${r.how} → city ${r.ms} ms · ${r.dp} m ${r.dh} rad · hub ${r.reuse?'reused':'REBUILT'}`).join(' | ')} → ${bad.length?'❌ FAIL ('+bad.join('; ')+')':'✅ PASS'}`}
+(function OG2_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='onegame'&&q.id==='race-roundtrip'))C.items.push({ver:'onegame',id:'race-roundtrip',area:'race',text:'og2 · onegame/race-roundtrip: every Race Mode race has a city marker, 1 card tap starts it, finish/quit returns to the exact spot and heading (<= 5 m, 0.2 rad) without a menu, hub reused, 0 errors (flag og2; OFF: no og2 markers)'});
+  C.GO['onegame/race-roundtrip']=[{c:'fra',n:'Race round trip (Frankfurt)',secs:150,fn:()=>OG2_roundtrip()},{c:'ath',n:'Race round trip (Athens)',secs:150,fn:()=>OG2_roundtrip()}];return}
+ if(i<600)setTimeout(()=>OG2_reg(i+1),100)})(0);
+window.__og2={run:OG2_roundtrip,trip:OG2_trip};
