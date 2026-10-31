@@ -23,11 +23,11 @@ const step = (p, n) => p.evaluate(n => { for (let i = 0; i < n; i++) window.__mn
 const frames = p => p.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
 const STEPS = +process.env.STEPS || 8;   // sim steps (1/60 s) between decisions; one page round trip per decision
 // W284: read-only recorder inside the same page round trip: per sim step, a hp drop is logged with the nearest bullet/enemy kind (window.__hits), and every new bullet is counted (window.__bs, split boss / not boss)
-const snap = (p, n) => p.evaluate(([n, a, b]) => { const m = window.__mnr; const H = window.__hits = window.__hits || [], seen = window.__seen = window.__seen || new WeakSet(), B = window.__bs = window.__bs || { boss: 0, bossS: 0, all: 0, allS: 0 };
-  for (let i = 0; i < n; i++) { let G = m.G, P = m.P; const hp0 = P.hp, bo = !!G.boss; let nb = null, nd = 1e9, ne = null, ned = 1e9;
+const snap = (p, n) => p.evaluate(([n, a, b]) => { const m = window.__mnr; const H = window.__hits = window.__hits || [], seen = window.__seen = window.__seen || new WeakMap(), B = window.__bs = window.__bs || { boss: 0, bossS: 0, all: 0, allS: 0 };
+  for (let i = 0; i < n; i++) { let G = m.G, P = m.P; const hp0 = P.hp, bo = !!G.boss, tNow = G.t; let nb = null, nd = 1e9, ne = null, ned = 1e9;
     for (const x of G.eb) { const d = Math.hypot(x.x - P.x, x.y - P.y); if (d < nd) { nd = d; nb = x; } } for (const x of G.en) { const d = Math.hypot(x.x - P.x, x.y - P.y); if (d < ned) { ned = d; ne = x; } }
-    m.step(1 / 60); G = m.G; P = m.P; for (const x of G.eb) if (!seen.has(x)) { seen.add(x); B.all++; if (G.boss) B.boss++; } B.allS += 1 / 60; if (G.boss) B.bossS += 1 / 60;
-    if (P.hp < hp0 && G.live) H.push({ t: +G.t.toFixed(1), boss: bo, st: m.ST.on ? m.ST.n : 0, b: nb && nd < 90 ? (nb.t || nb.k || '?') + '@' + (nd | 0) : null, en: ne && ned < 70 ? (ne.t || ne.k || '?') + '@' + (ned | 0) : null, bossD: G.boss ? Math.hypot(G.boss.x - P.x, G.boss.y - P.y) | 0 : null }); }
+    m.step(1 / 60); G = m.G; P = m.P; for (const x of G.eb) { let q = seen.get(x); if (!q) { q = { t: G.t, x: x.x, y: x.y, inT: null }; seen.set(x, q); B.all++; if (G.boss) B.boss++; } if (q.inT === null && x.x >= 0 && x.x <= 960 && x.y >= 0 && x.y <= 540) q.inT = G.t; } B.allS += 1 / 60; if (G.boss) B.bossS += 1 / 60;
+    if (P.hp < hp0 && G.live) H.push({ t: +G.t.toFixed(1), boss: bo, st: m.ST.on ? m.ST.n : 0, b: nb && nd < 90 ? (nb.t || nb.k || '?') + '@' + (nd | 0) : null, en: ne && ned < 70 ? (ne.t || ne.k || '?') + '@' + (ned | 0) : null, bossD: G.boss ? Math.hypot(G.boss.x - P.x, G.boss.y - P.y) | 0 : null, K: nb && nd < 90 ? { k: nb.t || nb.k || '?', r: nb.r, sp: Math.round(Math.hypot(nb.vx, nb.vy)), d: nd | 0, age: +(tNow - (seen.get(nb) || { t: tNow }).t).toFixed(2), on: seen.get(nb) && seen.get(nb).inT !== null ? +(tNow - seen.get(nb).inT).toFixed(2) : null, b0: seen.get(nb) ? [seen.get(nb).x | 0, seen.get(nb).y | 0] : null, bx: nb.x | 0, by: nb.y | 0 } : null, px: P.x | 0, py: P.y | 0, E: ne && ned < 70 ? { k: ne.t || ne.k || '?', ty: ne.type, x: ne.x | 0, y: ne.y | 0 } : null }); }
   return { s: eval('(' + a + ')')(), w: eval('(' + b + ')')() }; }, [n, stFn.toString(), worldFn.toString()]);   // step + state + world in ONE round trip
 
 // ---- real input layers ----
@@ -48,7 +48,7 @@ function makeInput(p, dev) {
     if (!fire && !I.finger) return;
     if (!I.finger) { I.finger = { x: g.l + g.w / 2, y: g.t + g.h * .72 }; await tp('touchStart', I.finger.x, I.finger.y); }
     let nx = I.finger.x + ddx, ny = I.finger.y + ddy;
-    const m = 30; if (nx < g.l + m || nx > g.l + g.w - m || ny < g.t + m || ny > g.t + g.h - m) { await tp('touchEnd'); I.finger = null; return; }   // let go, re-grab next tick
+    const m = 30; if (nx < g.l + m || nx > g.l + g.w - m || ny < g.t + m || ny > g.t + g.h - m) { await tp('touchEnd'); I.finger = { x: g.l + g.w / 2, y: g.t + g.h * .72 }; await tp('touchStart', I.finger.x, I.finger.y); nx = I.finger.x + ddx; ny = I.finger.y + ddy; }   // W291: a thumb re-grips in ~80 ms, not one 0.2 s decision later: lift and re-grab in the same tick
     if (Math.hypot(nx - I.finger.x, ny - I.finger.y) < 1.5) return; I.finger = { x: nx, y: ny }; await tp('touchMove', nx, ny);   // a CDP touch costs ~30 ms: skip moves under 1.5 px
   };
   I.release = async () => { if (dev.touch) { if (I.finger) { await tp('touchEnd'); I.finger = null; } } else { for (const k of I.keys) await p.keyboard.up(k); I.keys.clear(); } };
@@ -122,7 +122,7 @@ async function run(br, devName, strat, seed, start) {
     if (!s.boss && bossWas) { bossWas = false; if (s.bossDone || s.res) R.bossKilled++; }
     const w = SN.w, a = brn(w);
     if (s.boss && w.rot) { const ys = w.eb.filter(b => b[0] > w.px + 10 && b[0] < w.px + 320).map(b => b[1]).concat([40, 500]).sort((x, y) => x - y); let g = 0; for (let i = 1; i < ys.length; i++) g = Math.max(g, ys[i] - ys[i - 1]); (R.corr = R.corr || []).push([ys.length - 2, g | 0]); }   // W284: bullets within 320 world px ahead of the ship, widest free lateral gap in the 40..500 field
-    await I.move(a.dx, a.dy, w.rot, a.fire); if (a.dash) await I.dash(); if (a.emp) await I.emp();
+    await I.move(a.dx, a.dy, w.rot, a.fire); if (a.dash && !process.env.NODASH) await I.dash(); if (a.emp) await I.emp();
     await frames(p);   // W283: let the page paint two frames so the input just sent is applied before the next stepped burst (without it a fast machine lost every run: 0/4 PC dodger on W272 vs 2/2 with it)
     R.gameSec += STEPS / 60; tick++;
     const n = s; if (n.score + ':' + n.hp !== lastKey) { lastKey = n.score + ':' + n.hp; lastChange = n.t; }
@@ -167,12 +167,12 @@ const pct = (a, q) => { const s = [...a].sort((x, y) => x - y); return s[Math.mi
 (async () => {
   const b = await L.boot(); global.__BASE = b.base; const jobs = [];
   // one browser PROCESS per worker (below): contexts sharing a process starved each other (30 sim-s in 400 s)
-  for (const dv of DEVS) for (const sd of Array.from({ length: SEEDS }, (_, i) => i + 1 + SEED0)) { jobs.push(br => controls(br, dv, sd)); for (const stg of STRATS) for (const sn of (STARTS.length ? STARTS : [0])) jobs.push(br => run(br, dv, stg, sd, sn)); }
+  for (const dv of DEVS) for (const sd of Array.from({ length: SEEDS }, (_, i) => i + 1 + SEED0)) { if (!process.env.NOCTL) jobs.push(br => controls(br, dv, sd)); for (const stg of STRATS) for (const sn of (STARTS.length ? STARTS : [0])) jobs.push(br => run(br, dv, stg, sd, sn)); }
   const out = [], ctl = []; let ji = 0;
   await Promise.all(Array.from({ length: PAR }, async (_, wi) => { const wb = wi ? await PW.chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }) : b.br; while (ji < jobs.length) { const j = jobs[ji++]; try { const r = await j(wb); (r.strat ? out : ctl).push(r);
     if (r.strat) console.log(`${r.dev} ${r.strat} s${r.seed}${r.start ? ' from' + r.start : ''}: next ${r.nextOk || 0} bossname ${r.bossName || '-'} maxStage ${r.maxStage} deaths ${r.deaths} boss ${r.bossSeen}/${r.bossKilled} results ${r.results} stuck ${r.stuck} hud ${r.hudBad}/${r.hudN} err ${r.errs.length} rej ${(r.rej || []).length} ui ${r.ui.length} sim ${r.gameSec.toFixed(0)}s wall ${r.wall.toFixed(0)}s${r.hits && r.hits.length ? ' HITS ' + r.hits.map(h => (h.boss ? 'B' : 's' + h.st) + ':' + (h.b || h.en || 'none') + (h.bossD != null ? '/bd' + h.bossD : '')).join(',') : ''}${r.defects.length ? ' DEF ' + r.defects.slice(0, 2).join(' | ').slice(0, 200) : ''}`);
     else console.log(`${r.dev} controls s${r.seed}: ${JSON.stringify(r.ok)}${r.defects.length ? ' DEF ' + r.defects.join(' | ').slice(0, 300) : ''}`); } catch (e) { console.log('RUNNER ERROR', String(e.stack).split('\n').filter(l => /gauntlet|Error/.test(l)).join(' / ').slice(0, 400)); out.push({ dev: 'x', strat: 'crash', seed: 0, errs: ['runner: ' + e], defects: [String(e)], ui: [], stages: [] }); } } }));
-  const pf = []; for (const dv of DEVS) { try { pf.push(await perf(b.br, dv, 1)); } catch (e) { console.log('perf failed', dv, String(e).slice(0, 120)); } }
+  const pf = []; for (const dv of process.env.NOCTL ? [] : DEVS) { try { pf.push(await perf(b.br, dv, 1)); } catch (e) { console.log('perf failed', dv, String(e).slice(0, 120)); } }
   await b.close();
   console.log('\n== SUMMARY (minimums over runs) ==');
   for (const dv of DEVS) for (const stg of STRATS) for (const sn of (STARTS.length ? STARTS : [0])) { const rs = out.filter(r => r.dev === dv && r.strat === stg && (r.start || 0) === sn); if (!rs.length) continue; const mn = f => Math.min(...rs.map(f));

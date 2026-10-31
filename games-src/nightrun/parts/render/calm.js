@@ -12,12 +12,12 @@ const CALM=window.CALM={get on(){return running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
   small(bn){return!!bn&&this.on&&(!!bn.sm||(!bn.warn&&!!bn.ev));},
   /* top-band strip: one line, under the score bar, off the middle of the field */
-  draw(bn,w,h,k){const kk=bn.t,a=Math.max(0,Math.min(1,kk*3,(bn.m-kk)*6)),D=DISTRICTS[G.di],y=(G.boss&&G.boss.x<W?52:38)*k,hh=24*k;
+  draw(bn,w,h,k){const kk=bn.t,a=Math.max(0,Math.min(1,kk*3,(bn.m-kk)*6)),D=DISTRICTS[G.di],y=(G.boss&&G.boss.x<W?52:38)*k,hh=(bn.warn?32:24)*k,fz=(bn.warn?17:12)*k;
     ctx.save();ctx.globalAlpha=a*.9;ctx.fillStyle='#05030cd0';ctx.fillRect(0,y,w,hh);ctx.fillStyle=D.a;ctx.fillRect(0,y,3*k,hh);ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    let txt=bn.a+(bn.b?' · '+bn.b:'');ctx.font=`700 ${12*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#e9e6ff';
-    let f=12*k;while(f>8*k&&ctx.measureText(txt).width>w-16*k){f-=.5*k;ctx.font=`700 ${f}px "Chakra Petch",sans-serif`;}
+    let txt=bn.a+(bn.b?' · '+bn.b:'');ctx.font=`700 ${fz}px "Chakra Petch",sans-serif`;ctx.fillStyle=bn.warn?'#ff6070':'#e9e6ff';
+    let f=fz;while(f>(bn.warn?16:8)*k&&ctx.measureText(txt).width>w-16*k){f-=.5*k;ctx.font=`700 ${f}px "Chakra Petch",sans-serif`;}
     if(ctx.measureText(txt).width>w-16*k)txt=bn.a;   // the sub line does not fit one chip: the title alone
-    ctx.fillText(txt,w/2,y+hh*.68);ctx.restore();},
+    ctx.fillText(txt,w/2,y+hh*(bn.warn?.7:.68));ctx.restore();},
   cls(s){let r=0,g=0,b=0;if(typeof s!=='string')return 2;let m=s.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
     if(m){r=parseInt(m[1],16);g=parseInt(m[2],16);b=parseInt(m[3],16);}else if((m=s.match(/rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/))){r=+m[1];g=+m[2];b=+m[3];}else return 2;
     if(r>=220&&g<130)return 0;if(r>=220&&g>=180&&b<130)return 1;return 2;},
@@ -30,7 +30,7 @@ const CALM=window.CALM={get on(){return running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,
 /* ---- 1. banners: the rule card is small and short ---- */
 {const bn0=banner;banner=function(a,b,warn,t){const r=bn0.apply(this,arguments);
   if(running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
-  else if(G&&G.banner&&(!warn||a==='WARNUNG')&&!G.banner.ev){   // review 10 #4: the boss intro is the same chip (name + sub on one line)
+  else if(G&&G.banner&&(!warn||a==='WARNING')&&!G.banner.ev){   // review 10 #4: the boss intro is the same chip (name + sub on one line)
     G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
   return r;};}
 /* ---- 2. beams: thin and soft ---- */

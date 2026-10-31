@@ -180,7 +180,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
   const nm=o.nm||D.bossName;
   G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
     col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?6:14,p3:mini?11:26,minBar:mini?14:BOSS_MIN_BAR,floor:Math.ceil(hp*.62)};
-  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');NR.emit('bossIn',{mini});
+  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNING',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');NR.emit('bossIn',{mini});
   if(G.live){const sg=bossSong(k,mini);if(sg){AU.switchTo(sg);AU.intense(false);}else AU.intense(true);}
   return G.boss;}
 
