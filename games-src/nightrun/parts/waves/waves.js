@@ -1,7 +1,7 @@
 // PURPOSE: stages 1-6 play named waves with one idea each, a breather between, a rising curve to the finale
 // FLAG: none (always on)
 // TEST: waves-test.js
-/* ---------- waves.js (W151, owner 22 Oct 2026 on a phone: "stages extremely boring, a swarm of enemies, no logic"). Flag RET.waves, default ON; ?waves=0 = the director as before.
+/* ---------- waves.js (W151, owner 22 Oct 2026 on a phone: "stages extremely boring, a swarm of enemies, no logic"). Always on (the RET.waves flag and ?waves=0 are gone; W293 removed this stale note).
    Story stages 1-6 (the first impression) no longer stream the director's shuffled patterns. Each stage plays the wave table WV.T (design: nightrun/WAVES.md):
    - 4-5 named waves, ONE idea each, announced in the top chip ("WAVE 2/5 · CHARGE LANES · sidestep the dash");
    - at most 8 enemies on screen; wave foes fly to a slot and stay (strafe, hold, charge and come back) until killed or the wave's time is up, then they
@@ -11,7 +11,16 @@
    - a kill stage's goal is WV.KG of the foes in the table (the bot clears it), the waves loop from wave 2 ("ENCORE") until the stage ends.
    Other spawners (director, zoo, fleet, set pieces) are muted on these stages; bosses, mini-boss summons and their children are never touched.
    Stats for the test: WV.log. ---------- */
+if(RET.gold===undefined)RET.gold=!/[?&]gold=0/.test(location.search);   // W293 the push-or-hold bounty (default ON; ?gold=0 = off for the before/after tests)
 const WV=window.WV={
+  /* W293 GOLD (design: nightrun/DESIGN-DECISION-W247.md, measured change in BALANCE-W293.md): every squad starts a bounty clock of GT0+GT1*k s (k = its foes).
+     Kill the whole squad before the clock runs out, at least half of it hit up close (reward.js' close-range bonus, e._rwC), = GOLD: +1 weapon level for the stage
+     (the 'up' pickup at the last kill) and the squad's points paid GPK times again. A foe that leaves, a clock at 0 or a squad shot from afar loses the bounty
+     (no hull cost). The stage is cut in GN fifths (by bar); each fifth pays one GOLD, so the player picks WHICH squad to push (result line: GOLD n/5, best kept).
+     The risk: a wave gun foe (turret, gunship, shielder) answers a ship inside FR px with a flak ring: a red ring tells it FT s ahead,
+     two rings of FN bullets (FS and .7 FS px/s, offset half a step) from the foe, so a bullet needs >= FT s + travel to reach the ship (MINSHOT's one second to react holds); DASH and EMP answer it.
+     Measured (W293): the close bonus alone never shortened a clear, and inside the 190 px no-fire floor pushing cost nothing. */
+  GT0:1.5,GT1:1,GN:5,GPK:2,CLOSE:.5,FR:170,FT:.6,FN:16,FS:190,FCD:1.6,
   REST:3.5,SCK:650,TMAX:22,CAP:8,KG:.72,ENTER:300,
   /* the wave table: stage -> waves; a wave = [name, what to do, foes, opts]; a foe = [type, slot x (share of W), slot y (share of H), move, side]
      move: 'hold' strafe on the slot | 'sine' weave up and down | 'dash' charger: hold, aim at the ship's line, dash, come back from the right | 'sit' turret
@@ -51,7 +60,7 @@ const WV=window.WV={
   on(){return ST.on&&ST.n>=1&&ST.n<=6&&!ST.ch&&!G.lab&&!G.tut&&!!this.T[ST.n];},
   total(n){let k=0;for(const w of this.T[n]||[])k+=w[2].length*(w[3]&&w[3].rep||(w[3]&&w[3].lead!=null?1:n===5?3:2));return k;},
   bossy(){const k=ST.def.goal.k;return(k==='mini'||k==='boss')&&(ST.spawned||G.dbar>=ST.lead-1.5);},
-  reset(){this.st={i:-1,nx:0,phase:'rest',t:0,rest:2,foes:[],q:[],loop:0,lead:null,n:this.on()?ST.n:0};this.log={waves:[],maxOn:0,culled:0,ann:[]};this.own=0;try{this.goal();}catch(e){}},
+  reset(){this.st={i:-1,nx:0,phase:'rest',t:0,rest:2,foes:[],q:[],loop:0,lead:null,n:this.on()?ST.n:0};this.log={waves:[],maxOn:0,culled:0,ann:[],gold:0,sqs:[]};this.bt={n:0,m:0,list:[],cur:null,live:null,now:null,claim:{}};this.own=0;try{this.goal();}catch(e){}},
   alive(){return this.st.foes.filter(e=>!e.dead&&e.hp>0);},
   /* ---- spawn one foe of the table ---- */
   spawn(f,wi){const[type,fx,fy,mv,side]=f,sx=Math.min(fx*W,window.HB&&HB.on()?HB.maxX(22):W-62),sy=fy*H;
@@ -60,6 +69,7 @@ const WV=window.WV={
     for(const x of G.en.slice(n0))if(x!==e&&!x.wv&&x.type!=='boss'){x.wvX=1;this.log.culled++;}   // a variant pack's extra escorts: the table is the whole wave
     if(!e)return;if(!ZOO.T[type])e.zt=0;e.fp=null;e.x=ent.x;e.y=ent.y;e.wv={sx,sy,mv,ph:GR()*6.28,st:'in',t:0,wi,dash:0};if(type==='gate')e.gy=sy;
     const r=G.rings[G.rings.length-1];if(r&&r.x===W-14&&side&&side!=='r'){r.x=sx;r.y=side==='t'?8:H-8;}
+    if(this.cur){const q=this.cur;e.bq=q;q.sp++;if(q.t0==null)q.t0=G.t;}
     this.st.foes.push(e);},
   /* ---- a wave starts: chip in the top band, foes enter one after another ---- */
   start(){const S=this.st,L=this.T[ST.n];S.i++;let wi,enc=false;
@@ -73,8 +83,33 @@ const WV=window.WV={
   left(){const k=ST.def.goal.k,end=k==='mini'||k==='boss'?ST.lead:ST.len;return Math.max(0,(end-G.dbar)*4*BT.spb);},   // seconds until the boss or the end of the song
   per(){const L=this.T[ST.n],k=Math.max(1,L.length-this.st.nx);return this.left()/k;},   // seconds per wave still to play
   rep(w){if(w[3]&&w[3].rep)return w[3].rep;if(w[3]&&w[3].lead!=null)return 1;const k=ST.def.goal.k;return this.per()>(k==='mini'||k==='boss'?30:21)?3:2;},
-  squad(w,t0){w[2].forEach((f,k)=>this.st.q.push({at:t0+k*.28,f,k,lead:w[3]&&w[3].lead===k&&this.st.sq===1}));},
-  end(){const S=this.st,lw=this.log.waves[this.log.waves.length-1];if(lw)lw.t1=+G.t.toFixed(2);S.phase='rest';S.rest=clamp(this.REST+(this.per()-17)*.25,this.REST,5);S.q=[];},
+  squad(w,t0){const bq=this.bopen(w[2].length);w[2].forEach((f,k)=>this.st.q.push({at:t0+k*.28,f,k,bq,lead:w[3]&&w[3].lead===k&&this.st.sq===1}));},   // W293: each squad carries its bounty clock
+  /* ---- W293 the bounty: open one per squad (WV.squad here, SL.beat on the slice stages); settled in bty() every frame ---- */
+  gold(){return!!RET.gold&&this.on();},
+  seg(){const k=ST.def.goal.k,end=k==='mini'||k==='boss'?ST.lead:ST.len;return clamp(Math.floor(this.GN*G.dbar/Math.max(1,end)),0,this.GN-1);},
+  bopen(k){if(!this.gold()||!this.bt)return null;const sg=this.seg(),q={id:this.bt.m++,k,sg,pay:!this.bt.claim[sg],sp:0,t0:null,s0:G.score,T:this.GT0+this.GT1*k,end:0,gold:0,dead:0,fled:0};this.bt.list.push(q);return q;},
+  chip(a,b,t,toast){const c=G.banner;if(c&&c.t>0&&!c.gd)return;   // never over another chip (wave names, announcements, boss)
+    if(c&&c.gd&&c.t>0){if(!toast&&c.hold>G.t)return;c.a=a;c.b=b;c.t=toast?t:Math.max(c.t,t);c.m=Math.max(c.m,c.t+.25);if(toast)c.hold=G.t+t;return;}   // refresh in place: CALM fades in over m-t
+    G.banner={t,m:t+.25,a,b,warn:false,sm:1,wv:1,gd:1,hold:toast?G.t+t:0};},
+  bty(){const B=this.bt;if(!B)return;B.live=null;B.now=null;
+    for(const q of B.list){if(q.end||q.t0==null)continue;let alive=0,fled=0,last=null;if(q.pay&&B.claim[q.sg])q.pay=0;
+      if(!q.pay){let on=0;for(const e of this.st.foes)if(e.bq===q&&e.hp>0&&!e.dead&&!(e.wv&&e.wv.st==='out')&&!(e.sl&&e.sl.out))on++;if(!on&&q.sp>=q.k||G.t-q.t0>40)q.end=1;else if(!B.now||q.t0<B.now.t0)B.now=q;continue;}   // a squad of a fifth already paid: no clock
+      if(!B.now||q.t0<B.now.t0)B.now=q;
+      let near=0;for(const e of this.st.foes)if(e.bq===q){if(e.hp<=0){last=e;if(e._rwC)near++;continue;}if(e.dead||e.wv&&e.wv.st==='out'||e.sl&&e.sl.out)fled++;else alive++;}
+      const age=G.t-q.t0,full=q.sp>=q.k;
+      if(fled||age>q.T||this.bossy()){q.end=1;q.fled=fled;this.log.sqs.push({id:q.id,k:q.k,t:+age.toFixed(2),gold:0,why:fled?'fled':age>q.T?'time':'boss'});if(!this.bossy()&&G.banner&&G.banner.gd)this.chip('GOLD LOST',B.n+'/'+this.GN,.9,1);continue;}
+      if(full&&!alive&&near<q.k*this.CLOSE){q.end=1;this.log.sqs.push({id:q.id,k:q.k,t:+age.toFixed(2),gold:0,why:'far',near});if(G.banner&&G.banner.gd)this.chip('GOLD LOST','too far: kill them up close · '+B.n+'/'+this.GN,1,1);continue;}
+      if(full&&!alive){q.end=1;q.gold=1;B.n++;B.claim[q.sg]=1;this.log.gold=B.n;this.log.sqs.push({id:q.id,k:q.k,t:+age.toFixed(2),gold:1,why:'gold'});const x=last?last.x:W*.6,y=last?last.y:H/2;
+        G.pk.push({t:'up',x,y,vx:-40,vy:0,bob:0,gold:1});G.score+=Math.max(0,Math.round((G.score-q.s0)*this.GPK));try{AU.sfx('up');}catch(e){}this.chip('GOLD '+B.n+'/'+this.GN,'+1 weapon level',1.2,1);NR.emit('gold',{n:B.n,id:q.id});continue;}
+      if(!B.live||q.t0<B.live.t0)B.live=q;
+}
+    for(const e of this.st.foes){if(!e.bq||e.hp<=0||e.dead||!/turret|gunship|shielder/.test(e.type)||e.wv&&e.wv.st!=='on'||e.sl&&e.sl.out)continue;   // the flak ring: told FT s ahead, then FN bullets
+      if(e._ft){if(G.t-e._ft>=this.FT){e._ft=0;e._fc=G.t+this.FCD;const o=eb.src;eb.src=e;const a0=GR()*6.28;for(let i=0;i<this.FN;i++){eb(e.x,e.y,a0+i*6.2832/this.FN,this.FS);eb(e.x,e.y,a0+(i+.5)*6.2832/this.FN,this.FS*.7);}eb.src=o;this.log.flak=(this.log.flak|0)+1;}}
+      else if(!(e._fc>G.t)&&Math.hypot(P.x-e.x,P.y-e.y)<this.FR){e._ft=G.t;G.rings.push({x:e.x,y:e.y,l:this.FT,m:this.FT,c:'#ff3d6a'});}}
+    const q=B.live;if(q){const s=Math.max(0,q.T-(G.t-q.t0));this.chip('GOLD '+Math.ceil(s)+'s','fly in close, kill the squad · '+B.n+'/'+this.GN,.4);}},
+  best(n){try{return(JSON.parse(localStorage.getItem('mnr_wvgold')||'{}')[n]|0);}catch(e){return 0;}},
+  keep(n,v){try{const o=JSON.parse(localStorage.getItem('mnr_wvgold')||'{}');if(v>(o[n]|0)){o[n]=v;localStorage.setItem('mnr_wvgold',JSON.stringify(o));}}catch(e){}},
+  end(){const S=this.st,lw=this.log.waves[this.log.waves.length-1];if(lw){lw.t1=+G.t.toFixed(2);if(this.bt)lw.gold=this.bt.n;}S.phase='rest';S.rest=clamp(this.REST+(this.per()-17)*.25,this.REST,5);S.q=[];},
   flee(){for(const e of this.alive())if(e.wv.st!=='out'){e.wv.st='out';e.aimL=0;}},
   /* ---- every frame (after the enemy loop in b.js): positions of the wave foes, the wave clock ---- */
   tick(dt){if(!this.on()||!running||G.dead||ST.over||!G.en)return;const S=this.st;if(S.n!==ST.n)this.reset();
@@ -93,9 +128,10 @@ const WV=window.WV={
       else if(v.mv==='sit'){e.x=v.sx;e.y=v.sy+Math.sin(G.t*.7+v.ph)*8;}
       else{e.x=v.sx+Math.sin(G.t*1.1+v.ph)*10;e.y=clamp(v.sy+Math.sin(G.t*1.3+v.ph)*34,40,H-40);}
       e.by=e.y;if(e.type==='turret')e.t=Math.min(e.t,6);if(e.type==='gunship')e.t=Math.min(e.t,12);}
+    if(this.gold())this.bty();
     if(this.bossy()){if(S.phase!=='boss'){S.phase='boss';S.q=[];this.flee();}return;}
     if(S.phase==='wave'){S.t+=dt;
-      for(let k=S.q.length-1;k>=0;k--){const q=S.q[k];if(S.t>=q.at){S.q.splice(k,1);this.spawn(q.f,S.wi);if(q.lead){const e=S.foes[S.foes.length-1];if(e){S.lead=e;e.ldr=1;e.el=1;e.hp=Math.round(e.hp*1.6);e.max=e.hp;}}}}
+      for(let k=S.q.length-1;k>=0;k--){const q=S.q[k];if(S.t>=q.at){S.q.splice(k,1);this.cur=q.bq||null;this.spawn(q.f,S.wi);this.cur=null;if(q.lead){const e=S.foes[S.foes.length-1];if(e){S.lead=e;e.ldr=1;e.el=1;e.hp=Math.round(e.hp*1.6);e.max=e.hp;}}}}
       if(S.lead&&(S.lead.dead||S.lead.hp<=0)){S.lead=null;this.flee();floater(W*.55,H*.5,'LEADER DOWN: THEY RUN','#ffd23d');}
       const left=this.alive().length;
       const w=this.T[ST.n][S.wi];
@@ -120,5 +156,7 @@ const WV=window.WV={
   NR.on('spawn',e=>{if(!WV.on()||WV.own||!e||e.type==='boss'||e.mini||G.boss||e.type==='zdrn')return;if(e.wv)return;e.wvX=1;WV.log.culled++;});   // anything else that spawns on a wave stage is taken off before it is drawn
   NR.on('kill',o=>{const e=o&&o.e;if(e&&e.wv){const lw=WV.log.waves[WV.log.waves.length-1];if(lw)lw.killed++;}});
   NR.on('runStart',()=>WV.reset());
+  { const rr=RET.resultRow;RET.resultRow=function(){const r=rr.apply(this,arguments);const B=WV.bt;if(!RET.gold||!B||!ST.on||WV.st.n!==ST.n||!ST.n)return r;WV.keep(ST.n,B.n);const b=WV.best(ST.n);   // W293: GOLD n/5 on the stage result, best kept
+      return r+`<div class="sr${B.n?' ok':''}" id="srGold"><span class="sg">◆</span> GOLD ${B.n}/${WV.GN}${b>B.n?' · best '+b+'/'+WV.GN:B.n&&b===B.n?' · best':''}</div>`;}; }
   NR.on('tick',dt=>WV.tick(dt));
 }
