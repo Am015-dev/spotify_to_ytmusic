@@ -4,7 +4,7 @@
 /* ---------- STREETGUARD (W192, owner 24 Oct 2026: "no defense parry button"). The decision: shoot, close in, or wait for the attack and parry it.
    The guard is a stance, not a shell: it lasts at most 0.6 s per press (then 0.3 s before the next), only covers Kai's front, stops his gun and knife and plants his feet;
    each block costs a share of the meter (melee 30%, shots 15%), a heavy blow (2 damage) empties it, and an empty meter breaks the guard (the hit lands). Pose: the kai crouchshoot frame + a cyan arc.
-   Keys: I or ; (J/K/L are fire/jump/knife); phone: GUARD button next to KNIFE. Engine hooks: F.guardHit (called by foot.js ftHurt), F.post, F.hitFeel, F.look.draw.
+   Keys: I or ; (J/K/L are fire/jump/knife); phone: GUARD button (placed by foot.js layout). Engine hooks: F.guardHit (called by foot.js ftHurt), F.post, F.hitFeel, F.look.draw.
    Telemetry for the sim: S.gd {blocks, parries, refl, breaks, maxOn}. ---------- */
 if(RET.guard2===undefined)RET.guard2=!/[?&]guard2=0/.test(location.search);
 (function(){
@@ -40,26 +40,13 @@ F.post=function(S,dt){if(post0)post0.apply(this,arguments);const g=sync(S),P=S.P
   if(g.cd>0)g.cd-=dt;if(g.flash>0)g.flash-=dt;
   if(g.on){g.last=S.time;P.x=g.x;P.cd=Math.max(P.cd,.05);P.melCd=Math.max(P.melCd,.05);P._gd=1;}else{P._gd=0;if(S.time-g.bt>.5)g.m=Math.min(1,g.m+REGEN*dt);}
   for(const e of S.E)if(e._opn>S.time&&!e.dead){e.x=e._ox;e.tele=0;e.wind=0;e.cd=Math.max(e.cd||0,.3);if(e.vx)e.vx=0;}
-  if(!S.sim)btn();};
+  };
 /* OPEN foes take double damage */
 const hf0=F.hitFeel;
 F.hitFeel=function(e,d,src){if(hf0)hf0.apply(this,arguments);const S=F.S;if(!S||!(e._opn>S.time)||e.dead||(src&&src.gb))return;IN.dmgE(e,d,{gb:1,x:src&&src.x});};
 /* pose: the braced crouchshoot frame while the guard is up */
 const kx0=IN.kaiX;IN.kaiX=function(P){const r=kx0.apply(this,arguments);return P._gd&&!P.hurtT&&P.hp>0?'crouchshoot':r;};
-/* the phone button, next to KNIFE (same size and style); keys I and ; */
-let B=null,bk='';
-function btn(){const L=IN.L();if(!L||!L.btn||!L.btn.melee)return;
-  if(!B){B=document.createElement('button');B.type='button';B.className='fb';B.id='fGuard';B.textContent='GUARD';L.root.insertBefore(B,L.menu);/* before #fMenu: appended last it drew above the result / pause overlay */
-    const dn=e=>{e.preventDefault();if(!I.guard)I.guardP=1;I.guard=1;B.classList.add('on');try{B.setPointerCapture(e.pointerId);}catch(x){}},up=()=>{I.guard=0;B.classList.remove('on');};
-    B.addEventListener('pointerdown',dn);B.addEventListener('pointerup',up);B.addEventListener('pointercancel',up);B.addEventListener('lostpointercapture',up);
-    const mo=new MutationObserver(()=>btn());for(const e of Object.values(L.btn))mo.observe(e,{attributes:true,attributeFilter:['style','hidden']});}   // W238: a relayout puts BOMB back under GUARD; re-seat both before the next paint, not on the next post
-  const m=L.btn.melee,kf=()=>Object.values(L.btn).map(b=>b.style.left+b.style.top+b.style.width+b.style.display+b.hidden).join('|'),k=kf();if(k===bk)return;bk=k;   // W217: every button in the key, so a relayout that puts BOMB back under GUARD is seen
-  if(m.hidden||m.style.display==='none'){B.hidden=true;B.style.display='none';return;}
-  const z=parseFloat(m.style.width)||56,top=parseFloat(m.style.top),row=Object.values(L.btn).filter(b=>!b.hidden&&b.style.display!=='none'&&abs(parseFloat(b.style.top)+parseFloat(b.style.width)/2-top-z/2)<z/2);
-  const x0=Math.min(...row.map(b=>parseFloat(b.style.left)));
-  const ml=parseFloat(m.style.left),nb=row.filter(b=>parseFloat(b.style.left)<ml).sort((a,b)=>parseFloat(b.style.left)-parseFloat(a.style.left))[0];   // the button left of KNIFE moves out one slot, GUARD takes its place
-  let gx=x0-z-8;if(nb){gx=parseFloat(nb.style.left);nb.style.left=Math.round(x0-parseFloat(nb.style.width)-8)+'px';bk=kf();}
-  B.hidden=false;B.style.display='';B.style.width=B.style.height=z+'px';B.style.left=Math.round(gx)+'px';B.style.top=Math.round(top)+'px';}
+/* the phone button #fGuard is built and placed by foot.js layout (one owner of every button position); keys I and ; */
 addEventListener('keydown',e=>{if(!F.on||!F.S||(e.code!=='KeyI'&&e.code!=='Semicolon'))return;e.preventDefault();e.stopImmediatePropagation();if(!e.repeat&&!I.guard)I.guardP=1;I.guard=1;},true);
 addEventListener('keyup',e=>{if(e.code==='KeyI'||e.code==='Semicolon'){I.guard=0;}},true);
 addEventListener('blur',()=>{I.guard=0;});
