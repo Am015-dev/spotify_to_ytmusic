@@ -28,6 +28,7 @@ const stripNouns = t => { let s = t; for (const n of PROPER) s = s.replace(new R
     await p.evaluate(() => { const m = __mnr; m.G.boss = null; m.G.en = []; m.ST.bossDown({ nm: 'ZENTRAL-ICE' }, 1000); }); await sleep(100); for (let i = 0; i < 20; i++) { if (await p.evaluate(() => { const e = document.getElementById('stres'); return !!e && !e.hidden; })) break; if (await p.evaluate(() => { const e = document.getElementById('shGo'); return !!e && !e.hidden && e.offsetParent; })) { await click('#shGo'); } await step(60); } await snap('result');
     await p.evaluate(() => { __mnr.step(1 / 60); }); const ft = await p.evaluate(() => !document.getElementById('focTitle').hidden); if (ft) await click('#focTitle'); await sleep(200);
     await click('#focFlight'); await sleep(700); await step(30); await p.evaluate(() => { const m = __mnr; m.P.inv = 0; m.P.sh = 0; m.P.hp = 0; m.hurt(99); }); await step(120); await sleep(300); await snap('game-over');
+    const go = await p.evaluate(() => { const g = document.getElementById('gaBtn2'), s = document.getElementById('overSub'); return { garage: !!(g && g.getClientRects().length), sub: s ? s.textContent : '', fb: !!document.querySelector('.fbBar:not([hidden])') }; });   // W321
     if (await p.evaluate(() => !document.getElementById('menuBtn').closest('[hidden]'))) await click('#menuBtn').catch(() => { }); await sleep(300);
     await click('#focFlight').catch(() => { }); await sleep(600); await step(30); if (touch) await click('#bPause'); else await p.keyboard.press('p'); await sleep(250); await snap('pause'); await click('#quitBtn'); await sleep(250);
     await click('#focFoot'); await sleep(800); await snap('story-card'); await step(30); await sleep(200);
@@ -45,6 +46,12 @@ const stripNouns = t => { let s = t; for (const n of PROPER) s = s.replace(new R
     // 4 boss warning is readable (>= 16 px on screen)
     const bw = rows.filter(r => r.k === 'cv' && /^WARNING\b/.test(r.t)); ok(T + 'boss warning drawn in English', bw.length > 0 && bw.every(r => /^WARNING · /.test(r.t) && !/WARNUNG/.test(r.t)), bw.map(r => r.t).join('|') || 'not seen');
     ok(T + 'boss warning >= 16 px', bw.length > 0 && bw.every(r => r.fs >= 16), bw.map(r => r.fs.toFixed(1)).join(','));
+    // 4b W321 result screens: every number says what it counts; the garage line shows only with the GARAGE button; the test widget is behind ?lab=1
+    const RES = /^(game-over|result)$/, bad = rows.filter(r => RES.test(r.scr) && /Marked|\bBROKEN\b|\(you: |Land (at least )?\d+ PERFECT|^Banked|^Goal\b|\bPerfect\b \d/.test(r.t));
+    ok(T + 'result screens: no unexplained "Marked / BROKEN / Banked / Goal / Perfect N / (you: N)"', bad.length === 0, bad.slice(0, 4).map(r => `${r.scr}:"${r.t.slice(0, 40)}"`).join(' | '));
+    ok(T + 'result screens say what PERFECT hits are', rows.some(r => RES.test(r.scr) && /PERFECT hits/.test(r.t)) && rows.filter(r => r.scr === 'result' && /PERFECT hits/.test(r.t)).every(r => /on the beat/.test(r.t)), rows.filter(r => /PERFECT hits/.test(r.t)).map(r => r.scr + ':' + r.t).join('|'));
+    ok(T + 'game over: the "garage" line shows only when the GARAGE button shows', go.garage === /garage/i.test(go.sub) && /\S/.test(go.sub), JSON.stringify(go));
+    ok(T + 'no FUN / SAME AGAIN / BORING widget without ?lab=1', !go.fb && !rows.some(r => /SAME AGAIN|How did this run feel/.test(r.t)), JSON.stringify(go));
     // 5 the owner test list is not reachable from title / settings
     ok(T + 'no test checklist button for players', (await p.evaluate(() => document.querySelectorAll('.ckB').length)) === 0);
     ok(T + 'no page errors', p.errs.length === 0, p.errs.join('|'));
