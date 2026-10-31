@@ -129,4 +129,5 @@ $('shGo').addEventListener('click',()=>{if(SH.lock<=0)SH.close();});
 addEventListener('keydown',e=>{if(!SH.active)return;if(e.code==='Digit1'||e.code==='Digit2'||e.code==='Digit3'){SH.buy(+e.code.slice(5)-1);e.preventDefault();}
   else if(e.code==='KeyR')SH.reroll();else if(e.code==='Enter'||e.code==='Space'){if(SH.lock<=0)SH.close();e.preventDefault();}});
 // "banked" line on the game-over screen
-{const d=document.createElement('div');d.className='stat';d.id='oNeon';$('oBest').after(d);}
+{const d=document.createElement('div');d.className='stat';d.id='oNeon';d.hidden=true;   // W321: hidden; the run-end bar (ret.js retShow) says what this run paid and the Neon chip shows the garage total
+  $('oBest').after(d);}
