@@ -75,8 +75,8 @@ function RM_speedos(){const o=[];for(const e of document.querySelectorAll('body 
 async function RM_speedo(){const L=RM_list(),bad=[];let n=0,moved=0;
   for(let i=0;i<L.length;i++){let R,why='';try{R=RM_open(i);await new Promise(r=>setTimeout(r,1500));RM_seen(R);if(!R.w){bad.push(L[i].n+' not started');continue}
     let vmax=0;for(let k=0;k<3;k++){RM_drive(R,2);vmax=Math.max(vmax,Math.abs(R.w.city?RO.v:pl.v))}
-    if(R.w.city)roamHud();else updHud();
-    const S=RM_speedos(),city=!!R.w.city,real=Math.round(Math.abs(city?RO.v:pl.v)*3.6),root=document.getElementById(city?'rgSpd':'spd'),shown=parseInt(root?root.textContent:'',10);
+    if(R.w.city)roamHud();else updHud();if(OG3)HK_tick();/* og3: the kit owns the speedo */
+    const S=RM_speedos(),city=!!R.w.city,real=Math.round(Math.abs(city?RO.v:pl.v)*3.6),root=document.getElementById(OG3?'hkSpdN':city?'rgSpd':'spd'),shown=parseInt(root?root.textContent:'',10);
     if(S.length!==1)why='speedos '+S.length+' ('+S.map(e=>(e.parentElement.id||e.id||e.tagName)).join(',')+')';
     else if(!RM_vis(root)||!(Math.abs(shown-real)<=Math.max(8,real*.1)))why='shows '+shown+' real '+real+(RM_vis(root)?'':' (owner hidden)');
     if(vmax*3.6>10)moved++;n++}catch(e){why='threw '+String(e).slice(0,80)}

@@ -217,7 +217,8 @@ function MEM_drop(){if(!LOWMEM)return;try{const T=new Set;scene.traverse(o=>{if(
 const adaptR=()=>store.get('mho_adapt',0),adaptMul=()=>SET.adapt==='off'?1:1+.06*adaptR(),diffMul=()=>({relaxed:.93,normal:1,hard:1.06}[SET.diff]||1)*adaptMul();
 function adaptAfter(place,n,margin){if(n<2)return;let d=place===1?(margin>4?.3:.15):place<=3?.05:place>=Math.max(4,Math.ceil(n*.6))?-.25:-.1;const r=clamp(adaptR()+d,-1,1);store.set('mho_adapt',+r.toFixed(2));return r}
 const SET_DEF={cc:'full',perf:false,dres:lowGfx?'on':'off',qm:'auto',res:lowGfx?'sharp':'auto',thr:'city',q:lowGfx?'med':'high',fx:'full',fov:'normal',camd:'normal',vol:.8,mus:.6,sfx:.9,diff:'normal',adapt:'on',rcam:'chase',steer:'normal',units:'kph',touch:'buttons',assist:'on',tiltInv:'off',sens:3};
-const SET=Object.assign({},SET_DEF,store.get('mho_set',{}));if(!SET.thrV){SET.thr='city';SET.thrV=1}SET.touch='buttons';const thrEff=()=>SET.thr==='city'?(state==='roam'?'pedal':'auto'):SET.thr;const saveSet=()=>store.set('mho_set',SET);
+const OG3=OD_FLAG('og3');/* og3: one HUD kit (src/40h_hud_kit.js) */
+const SET=Object.assign({},SET_DEF,store.get('mho_set',{}));if(!SET.thrV){SET.thr='city';SET.thrV=1}SET.touch='buttons';const thrEff=()=>SET.thr==='city'?(state==='roam'||OG3?'pedal':'auto'):SET.thr;const saveSet=()=>store.set('mho_set',SET);
 const fxK=()=>({full:1,reduced:.4,off:0})[SET.fx];let rainScale=1;
 const rt=new THREE.WebGLRenderTarget(16,16,{type:THREE.HalfFloatType,stencilBuffer:true,samples:SET.q==='high'?4:0});
 const composer=new EffectComposer(renderer,rt);

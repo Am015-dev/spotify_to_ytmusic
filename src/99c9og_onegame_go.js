@@ -56,3 +56,32 @@ async function OG2_roundtrip(){const e0=OGG.errs;for(let k=0;k<200&&!(state==='r
   C.GO['onegame/race-roundtrip']=[{c:'fra',n:'Race round trip (Frankfurt)',secs:150,fn:()=>OG2_roundtrip()},{c:'ath',n:'Race round trip (Athens)',secs:150,fn:()=>OG2_roundtrip()}];return}
  if(i<600)setTimeout(()=>OG2_reg(i+1),100)})(0);
 window.__og2={run:OG2_roundtrip,trip:OG2_trip};
+
+// ---- GO onegame/hud (og3, one game S3): ONE HUD kit in roam, Race Mode and the builder DRIVE: the same element ids visible, every HUD text >= 12 px,
+// 0 HUD rects over the touch controls (852x393 and portrait 390x844), and the GAS button present in all 3 modes. Flag OFF: no #hk, nothing changed.
+const OG3_IDS=['hkSpd','hkPlace','hkLap','hkTime','hkBoost','hkMap'],OG3_TXT=['hkSpdN','hkSpdU','hkPlace','hkLap','hkTime'],OG3_CT=['tL','tR','tG','tB','tN','tD','tF','tP','bxL','bxR','bxG','bxB','bxBo','bxPz','bxRsp','bxBack'];   // bx*: the builder's own drive buttons when og1 is off
+function OG3_vis(e){if(!e)return null;const r=e.getBoundingClientRect(),cs=getComputedStyle(e);if(r.width<=0||r.height<=0||cs.visibility!=='visible'||cs.display==='none'||+cs.opacity<.05)return null;
+ for(let a=e;a&&a!==document.body;a=a.parentElement)if(a.hidden||getComputedStyle(a).display==='none')return null;return r}
+function OG3_probe(){const bad=[],R={},ct=[];for(const id of OG3_IDS){const r=OG3_vis(document.getElementById(id));if(!r)bad.push('#'+id+' hidden');else R[id]=r}
+ for(const id of OG3_TXT){const e=document.getElementById(id),f=e?parseFloat(getComputedStyle(e).fontSize):0;if(!(f>=12))bad.push('#'+id+' '+f+'px')}
+ for(const id of OG3_CT){const r=OG3_vis(document.getElementById(id));if(r)ct.push([id,r])}
+ let ov=0;for(const id of['hkSpd','hkPlace','hkLap','hkTime','hkMap']){const a=R[id];if(!a)continue;for(const[cid,b]of ct)if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1){ov++;bad.push('#'+id+' over #'+cid)}}
+ const gas=!!ct.find(c=>c[0]==='tG'||c[0]==='bxG');if(!gas)bad.push('no GAS');return{bad,gas,ids:Object.keys(R).length,ov}}
+async function OG3_mode(name,out){for(const[w,h]of[[852,393],[390,844]]){if(window.__vp){await window.__vp(w,h);await ogWait(500)}else if(w!==innerWidth)continue;
+  let p=OG3_probe();for(let k=0;k<6&&p.bad.length;k++){await ogWait(400);p=OG3_probe()}out.push({m:name,vp:w+'x'+h,...p})}}
+async function OG3_hud(){const e0=OGG.errs;
+ if(!OG3){const clean=!document.getElementById('hk')&&!document.body.classList.contains('og3');return clean?'📍 HUD KIT → ✅ PASS (flag og3 OFF: no #hk, nothing changed)':'📍 HUD KIT → ❌ FAIL (flag OFF but #hk exists)'}
+ for(let k=0;k<200&&!(state==='roam'&&pl&&RO.built&&!LD.busy);k++)await ogWait(100);if(!(state==='roam'&&pl))return'📍 HUD KIT → ❌ FAIL (no roam)';
+ const out=[];await ogWait(600);await OG3_mode('roam',out);
+ try{await XC_need('98b2_builder2')}catch(e){}for(let k=0;k<100&&!(window.__bx&&window.__bx.raceStart);k++)await ogWait(100);const X=window.__bx;
+ if(X){X.raceStart('CLIFF RUN');await ogWait(1500);await OG3_mode('builder',out);try{X.close()}catch(e){}await ogWait(600)}else out.push({m:'builder',vp:'-',bad:['builder chunk not loaded'],gas:0,ids:0,ov:0});
+ if(window.__vp)await window.__vp(852,393);
+ if(window.__rm){const L=window.__rm.list(),i=Math.max(0,L.findIndex(n=>/race|grand/i.test(n)&&!/city|duel|sprint/i.test(n)));window.__rm.open(i);
+  for(let k=0;k<300&&!(state==='race'||state==='countdown');k++)await ogWait(100);await ogWait(1500);await OG3_mode('race',out)}else out.push({m:'race',vp:'-',bad:['__rm missing'],gas:0,ids:0,ov:0});
+ const bad=out.filter(o=>o.bad.length),fail=bad.map(o=>o.m+' '+o.vp+': '+o.bad.slice(0,3).join(', ')),err=OGG.errs-e0;window.__ogRes3=out;
+ const sum=['roam','builder','race'].map(m=>{const q=out.filter(o=>o.m===m);return q.length?`${m} ${q.every(o=>!o.bad.length)?'✔':'✘'} (ids ${q.map(o=>o.ids+'/6').join(' ')}, gas ${q.every(o=>o.gas)?'yes':'NO'}, overlaps ${q.reduce((a,o)=>a+o.ov,0)})`:m+' ✘ not run'}).join(' · ');
+ return`📍 HUD KIT · ${sum} · text >= 12 px · ${err} page errors → ${fail.length||err?'❌ FAIL ('+fail.concat(err?[err+' errors']:[]).join('; ')+')':'✅ PASS'}`}
+(function OG3_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='onegame'&&q.id==='hud'))C.items.push({ver:'onegame',id:'hud',area:'phone',text:'og3 · onegame/hud: one HUD kit: the same element ids (speed pill, place, lap, time, boost, minimap slot) visible in roam, Race Mode and the builder DRIVE, every HUD text >= 12 px, 0 HUD rects over the touch controls at 852x393 and 390x844, a GAS button in all 3 modes, 0 errors (flag og3; OFF: no #hk)'});
+  C.GO['onegame/hud']=[{c:'fra',n:'One HUD kit (3 modes)',secs:180,fn:()=>OG3_hud()}];return}
+ if(i<600)setTimeout(()=>OG3_reg(i+1),100)})(0);
+window.__og3={run:OG3_hud,probe:OG3_probe};
