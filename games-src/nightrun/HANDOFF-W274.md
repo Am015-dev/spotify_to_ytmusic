@@ -1,0 +1,12 @@
+# W274 street proof (branch nr/W274-street from nr/W273-proof). 30 Oct 2026. No game code changed (only qa/gauntlet-foot.js).
+## x=7847 explained (state trace: TRACE=1 in qa/gauntlet-foot.js)
+- The live stage is neither footstage.js (14600) nor foot.js (11100). Probe in the run: stage 'zeil', s2=1, len 8200, boss {x:7700, id:'bigheavy'}, no locks, no waves, no checkpoints. street2.js (6 rooms) is rewritten by street3.js (ST.len=8200, ST.boss.x=7700, locks=[], waves=[]; 12 clock-driven waves, boss start on the stage clock).
+- x=7847 on the phone = camX 7533 + the right edge of the view. The camera stops at the boss-arena position bc = 7700 - vw/2 (street3.js; with RET.cam2 only the boss arena holds the camera). Kai gets there at t=45 s. The boss starts when the clock gate reaches bc-40 (about t=144 s) and the street is clear, or at t>157 s. Trace t=45.8 to 130: x 7847, camX 7533, lock none, foes keep arriving. A designed wall, not a softlock: no lock, arena or spawn that never ends. Runs that live long enough start the boss (phone dodger seeds 1, 2; PC seed 0 killed it). On PC the stop is camX 7318.
+- Effect on play: the road is walked in 45 s, then Kai fights about 100 s pinned at the right wall; foes spawn 40 px outside the view (camX+vw+40 right, camX-40 left), on a phone (view about 330 px) that is next to him.
+## Fixes: none. No real defect found; W263 gates untouched.
+## Bot: strategy `tactician` added (parry on telegraph, punish rest/open, dash/jump the heavy charge, kite gunners, grenade, hearts, off the wall). It is WORSE than the dodger (phone t=88, PC t=35). Not tuned; use `dodger`.
+## One change that most plausibly helps phone clears (not implemented, not measured)
+Phone dodger dies at 130-210 s pinned at the wall. Candidate: release the wall (let the camera follow the clock gate, the non-cam2 street3 branch) or do not spawn right-hand foes while Kai is within 120 px of the wall. No estimate measured; needs streetsim.js RUNS=40 x3 against the W263 gates (gfirst 75, dodge 65+-8, idle 0, nearest 25-40) before any change.
+## Shots looked at
+PC boss (phase 1, 6 hearts): readable, boss bar and name fine. PC STREET CLEAR: card clear, buttons >= 44 px. Phone death at the boss: Kai on the road under the boss, hearts panel empty, boss cropped by the left edge of the 390 px view so the charge is only half visible. Not looked at: 1440x860 death, phone clear (none happened).
+## Not run (time): 8 seeds per cell, aggressor/random/idle tables, streetsim RUNS=40 x3.

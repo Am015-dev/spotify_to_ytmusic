@@ -1,6 +1,8 @@
 # On-foot enemies and boss (parts/footen.js)
 
-Data and behaviour only; the on-foot engine (`parts/foot.js`) calls it and `FA.draw` paints it. HP is for Normal (the engine scales it). Damage: 1 = half a heart.
+LIVE DEFAULT (street3, W266/W267): 6 rooms, only rusher, gunner, heavy and the boss `bigheavy` spawn; median clear 243-269 s. The nine-foe roster below and the Warden are defined in data but only run with `?street2=0` / `?street3=0`.
+
+Data and behaviour only; the on-foot engine (`parts/foot.js`) calls it and `FA.draw` paints it. HP is for Normal (the engine scales it). Damage: 1 = one whole heart (6 hearts on a fresh profile, measured W266).
 Test: `node games-src/nightrun/footen-test.js` (fake env, 200+ checks: telegraphs, ranges, shield/turret/mech hit rules, token cap, boss phases, damage cap).
 Every attack has a visible wind-up of 0.4 s or more, projectiles are slow enough for a running + jumping hero, nothing spawns on the hero, and at most 2 ranged enemies aim/fire at once (token in `G.ftok`).
 

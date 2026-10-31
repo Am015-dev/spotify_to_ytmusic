@@ -22,7 +22,7 @@ function tierMeter(cx,by,k){const T=tierOf(C.n),col=TIERC[T-1],w=262*k,h=40*k,x0
 /* MINIMAL HUD (the default; settings > Visuals > HUD): no best score, no upgrade icon rows, no stat chips round the ship; only a small shield count and a revive count where the hull is.
    The numbers are still logged for the tests. */
 const HUDMIN=()=>SET.hud!=='full';
-const FPSOK=()=>!!SET.fpsc&&(/[?&]test=1/.test(location.search)||!touchUI);   // the FPS counter: PC any time; on a phone only in test mode (?test=1)
+const FPSOK0=()=>/[?&]test=1/.test(location.search)||!touchUI;const FPSOK=()=>!!SET.fpsc&&FPSOK0();   // the FPS counter: PC any time; on a phone only in test mode (?test=1)
 function setRing(b,f,c,n){const key=f.toFixed(2)+'|'+n;if(!b||b._k===key)return;b._k=key;b.classList.toggle('rgR',f>=.999&&!!n);b.classList.toggle('rgE',!n);b.classList.toggle('rgC',f<.999&&!!n);b.style.setProperty('--f',f);b.style.setProperty('--rc',c);b.dataset.n=n;}   // charge ring + count on a touch button
 function hudMin(c,k,x,y,t){try{Object.assign(HUDLOG,{x:HUDX.vals()});}catch(e){}
   const parts=[];if(SH.sh>0)parts.push(['#19e3ff','◆'+SH.sh]);if(TP.revLeft>0)parts.push(['#ff2d95','+'+TP.revLeft]);if(!parts.length)return;
@@ -226,7 +226,8 @@ function calFrame(){const pad=$('calPad');if(!pad||setEl.hidden||!CAL.on)return;
 $('setBack').addEventListener('click',closeSettings);
 $('setBtn').addEventListener('click',()=>openSettings('title'));
 $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
-buildSettings();if(window.RET&&RET.assistBuild)RET.assistBuild();if(window.RET&&RET.stampX)RET.stampX.build();
+buildSettings();if(setRows.fpsc&&!FPSOK0())setRows.fpsc.hidden=true;   // the counter only draws on a PC or with ?test=1 (FPSOK): a phone must not be offered a switch that does nothing
+if(window.RET&&RET.assistBuild)RET.assistBuild();if(window.RET&&RET.stampX)RET.stampX.build();
 function setPause(on){if(!running||on===paused)return;if(!on&&window.NRF&&NRF.holdResume())return;paused=on;pauseEl.hidden=!on;
   if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'');}   // the counters the phone HUD hides while you play (owner 22 Oct: perks/upgrades jargon dropped)
   if(on){if(!(window.NRF&&NRF.keepOn()))AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}

@@ -1,6 +1,6 @@
 /* ---------- music power-ups: glowing enemies drop them, collecting one exactly on the beat gives +50% time ----------
    DRUM BURST  drum layer + an auto-shot on every beat, on-beat presses fire double
-   TEMPO UP    double-time fire on 8th notes, score x2, faster waves (the song never changes speed or pitch)
+   TEMPO UP    double-time fire on 8th notes, score x2 (the song never changes speed or pitch)
    SLOW GROOVE bullet time: world at 0.6x, the song plays on, a gentle low-pass colours it
    DROP        the music cuts for one bar, then a screen-clearing blast on the next downbeat
    Durations are counted in bars of the music, not seconds. Works with the song files and with the synth. */
@@ -27,7 +27,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     this.wk=1;AU.slowColour(false);if(G)G.pw=null;},
   tick(dt){const s=this.st(),cur=this.cur();
     for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(cur-a.s>=a.d){s.act.splice(i,1);this.stat.ended++;this.log.push({k:a.k,beats:cur-a.s,d:a.d,ob:a.ob,ms:performance.now()-a.w,spb:BT.spb});if(this.log.length>40)this.log.shift();this.off(a.k);}}
-    const tp=s.act.find(a=>a.k==='tempo');if(tp){if(G.score>s.ls)G.score+=G.score-s.ls;if(G.waveT>0&&!G.waveWait)G.waveT-=dt*.5;}   // score x2, waves come 1.5x as fast
+    const tp=s.act.find(a=>a.k==='tempo');if(tp){if(G.score>s.ls)G.score+=G.score-s.ls;if(G.waveT>0&&!G.waveWait)G.waveT-=dt*.5;}   // score x2 (the wave timer also runs 1.5x as fast when a timed wave is waiting; not measured, so no text promises it)
     s.ls=G.score;
     if(s.act.some(a=>a.k==='tempo')&&!G.dead){const h=Math.floor(bpos()*2);if(s.h8===undefined)s.h8=h;if(h!==s.h8){s.h8=h;if(h%2){const x=P.x+22,y=P.y;G.pb.push({x,y:y-5,vx:900,vy:-40,dm:1,pf:0},{x,y:y+5,vx:900,vy:40,dm:1,pf:0});   // the off-beat 8th note: double-time fire
         try{const a=AU.a;if(a&&a.state==='running'&&sndOn('hat'))AU.noise(a.currentTime,.04,.16,8500,AU.musv);}catch(e){}}}}else s.h8=undefined;   // a quiet hi-hat on the off-beats

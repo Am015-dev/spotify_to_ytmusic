@@ -20,20 +20,23 @@ FQ.list=()=>{const k=[];for(const w in ART.FM)for(const a of ART.FM[w]._all)k.pu
 /* the still pictures the street draws over props and pickups (foot/sc-*, foot/pk-*): W162 found they were never waited for, so every crate, barrel and pick-up showed its code-drawn box or name until the first draw had started the download (the whole run in a stepped test) */
 FQ.pics=()=>{const a=[];for(const f of FA._rd)if(/^foot\/(sc|pk)-/.test(f))a.push(f);return a;};
 FQ.picOk=f=>{const r=FA._im[f];return !r||r.ok||r.bad;};
-FQ.picsReady=()=>{FA.init();return !!FA._rdDone&&FQ.pics().every(FQ.picOk);};
+FQ.picsReady=()=>{FA.init();FA.go();return !!FA._rdDone&&FQ.pics().every(FQ.picOk);};
 FQ.state=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return 'none';if(ART.err&&ART.err[n])return 'bad';return ART.anim(k)?'ok':'wait';};   // ART.anim also starts the load
 /* the songs the run plays (the stage's own, then the one-song cut of street3.js) are part of the wait (23 Oct 2026: "game music is not playing"); a song that failed its 3 tries does not block; asking also starts the load */
-FQ.songs=()=>RET.preload&&!NOMUSIC&&!/[?&]sim=1/.test(location.search)?(RET.streetsong?['street1']:['stage2','street1']).filter(s=>TR.by[s]):[];
+FQ.songs=()=>[];   // W242: the song is no longer part of the wait (begin() asks for it; the beat grid runs silently until it has arrived)
 FQ.songOk=s=>{const i=TR.by[s];if(!i||TR.bufs[i.file]||(TR.bad[i.file]&&((TR.tries&&TR.tries[i.file])||0)>3))return true;if(AU.a)loadTrack(s);return !AU.a;};
-FQ.ready=()=>{if(!FQ.picsReady())return false;if(!RET.sprites)return FQ.songs().every(FQ.songOk);if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return FQ.songs().map(FQ.songOk).every(Boolean)&&ok;};
+/* W242: the hold waits for Kai's sheets and the street pictures; the other actors' sheets are asked for once Kai is in (a first foe is a few seconds away) and join as they arrive */
+FQ.kai=()=>FQ.list().filter(k=>/^kai\//.test(k));
+FQ.ready=()=>{if(!FQ.picsReady())return false;if(!RET.sprites)return FQ.songs().every(FQ.songOk);if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.kai()){const s=FQ.state(k);if(s==='wait')ok=false;}if(ok)for(const k of FQ.list())FQ.state(k);return FQ.songs().map(FQ.songOk).every(Boolean)&&ok;};
 FQ.pending=()=>FQ.list().filter(k=>FQ.state(k)==='wait');
-FQ.pct=()=>{const l=FQ.list(),m=FQ.songs();const n=l.length+3*m.length;return n?Math.round(100*(l.filter(k=>FQ.state(k)!=='wait').length+3*m.filter(FQ.songOk).length)/n):100;};
+FQ.pct=()=>{const l=FQ.kai(),m=FQ.songs();const n=l.length+3*m.length;return n?Math.round(100*(l.filter(k=>FQ.state(k)!=='wait').length+3*m.filter(FQ.songOk).length)/n):100;};
 /* ----- loading hold: returns true when it took over the start (cb runs when the sheets are ready or after 8 s) ----- */
 /* only the STREET RUN button asks for it (F.ui, foot.js): FOOT.start() from code (tests, tools) still starts at once and just draws nothing for a sheet that is not decoded yet */
 F.hold=cb=>{if(FQ.ready())return false;if(FQ.hold)return true;FA.init&&FA.init();
-  const d=document.createElement('div');d.id='footQ';d.setAttribute('role','status');d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#05030c;color:#c9c3e6;font:700 16px "Share Tech Mono",monospace;letter-spacing:.12em';
-  d.textContent='LOADING STREET RUN 0%';document.body.appendChild(d);FQ.hold=d;FQ.held++;const t0=performance.now();
-  const tick=()=>{d.textContent='LOADING STREET RUN '+FQ.pct()+'%';if(FQ.ready()||performance.now()-t0>8000){d.remove();FQ.hold=null;FQ.waited=performance.now()-t0;cb();}else setTimeout(tick,50);};setTimeout(tick,0);return true;};
+  const d=document.createElement('div');d.id='footQ';d.setAttribute('role','status');d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;background:#05030c;color:#c9c3e6;font:700 16px "Share Tech Mono",monospace;letter-spacing:.12em';
+  const tx=document.createElement('span'),br=document.createElement('i');br.style.cssText='display:block;width:min(60vw,260px);height:4px;border-radius:2px;background:#ffffff1c;background-image:linear-gradient(#19e3ff,#19e3ff);background-repeat:no-repeat;background-size:0% 100%';d.append(tx,br);   // W242: slim progress bar under the word
+  tx.textContent='LOADING STREET RUN 0%';document.body.appendChild(d);FQ.hold=d;FQ.held++;const t0=performance.now();
+  const tick=()=>{const q=FQ.pct();tx.textContent='LOADING STREET RUN '+q+'%';br.style.backgroundSize=q+'% 100%';if(FQ.ready()||performance.now()-t0>8000){d.remove();FQ.hold=null;FQ.waited=performance.now()-t0;cb();}else setTimeout(tick,50);};setTimeout(tick,0);return true;};
 /* ----- every frame: smooth, high quality ----- */
 F.pre=c=>{c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';};
 /* ----- one height per entity ----- */

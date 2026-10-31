@@ -38,7 +38,7 @@ Test column = test file and its status in `TEST-LEDGER.md`: P PASS, F FAIL, Fl F
 | counter | counter.js | threats that make DASH and EMP the answer | counter-test Fl |
 | timing | timing.js | DASH/EMP need beat and window (default ON in code) | timing-test F |
 | reward | reward.js | graze chain multiplier: risk pays | reward-test F |
-| bossplay | bossplay.js | boss encounter mechanics. **OFF**; `?bossplay=1` turns on | bossplay-test P |
+| bossplay | bossplay.js | boss encounter mechanics. **ON** (bosses/bossplay.js:20 ships it on); `?bossplay=0` turns off | bossplay-test P |
 | build2 | choices.js | build pressure and real choices. **OFF**; `?build2=1` turns on | choices-test P |
 | deck | fun.js | replaces the fixed WEAVE / FENCE / DROP metronome | none |
 | hintdiet | uikit.js:62 | a hint shows at most N times per ask | none |
@@ -73,7 +73,7 @@ Test column = test file and its status in `TEST-LEDGER.md`: P PASS, F FAIL, Fl F
 | assist / juice / pwa | ret.js (`?assist=0` etc.) | Assist mode; juice caps; service worker | ret-assist P, ret-juice P, ret-pwa P |
 | arcade, daily, dpool, grade, heat, layers, oneMore, saveio, sting, trans, walls | ret.js, a.js, b.js, story.js | **no query switch**: set `RET.x=false` in code. Arcade length, daily run, district song pools, grade stars, Heat ladder, music layers, ONE MORE RUN, save backup, stingers, transitions, walls (BALANCE.md "Walls") | ret-arcade P, ret-daily F, ret-dpool F, ret-clear -, ret-heat F, ret-music P, ret-test P, ret-saveio P, ret-trans P, ret-walls F |
 
-Key rule: a feature shipped OFF is not measured. Review 4 found `bossplay` and `build2` OFF with no gate passed.
+Key rule: a feature shipped OFF is not measured. Review 4 found `bossplay` and `build2` OFF with no gate passed (since then `bossplay` shipped ON, bosses/bossplay.js:20; W267 corrected the table).
 
 ## 3. Tests
 
@@ -103,7 +103,7 @@ Key rule: a feature shipped OFF is not measured. Review 4 found `bossplay` and `
 - What went wrong:
   - Tests ran in parallel and loaded the box (ledger: one at a time).
   - Workers went idle asking "which do you want?": 6 of 15 never reported (`BRIEF-TEMPLATE.md`).
-  - Features shipped OFF and were never measured (`bossplay`, `build2`).
+  - Features shipped OFF and were never measured (`build2`; `bossplay` has since shipped ON).
   - Concurrent edits to `build.py` and built files (`BRIEF-FOOT.md`).
   - Same feature rebuilt 3-4 times, and per-tick deploys **(not in repo)**.
 
@@ -111,7 +111,7 @@ Key rule: a feature shipped OFF is not measured. Review 4 found `bossplay` and `
 
 1. **Grade the strike** (top tier, design and feel): no-oracle bot >= 55% on Normal. Complaint g; hard FAIL S23 (review 4 task 2).
 2. **Anti-camp**: `anticamp.js` exists, default ON, not in the ledger. Gate: camper <= dodger - 25 points (review 4 task 3). Run anticamp-test and reward-test (F) first.
-3. **Boss gates**: `bossplay` stays OFF until ignoring a boss costs >= 2x. Measured 1.0-1.6x (review 4 task 4). `bossplay-test` passes but is not the gate.
+3. **Boss gates**: `bossplay` (now ON in the code, W267 doc fix; the 2x gate was never met) was to stay OFF until ignoring a boss costs >= 2x. Measured 1.0-1.6x (review 4 task 4). `bossplay-test` passes but is not the gate.
 4. **Audit and test fixes**: audit S24 contacts, S31 time lock, reward-test NaN score (review 4 task 5). Without them the gates lie.
 5. **Hour-3 repetition**: S13 0.82 (gate < 0.75); S15 30.2 min (gate <= 15). `remix` and `rules` are ON; re-measure on a fresh audit.
 6. **Timing**: review 4 task 1 (flip `RET.timing` ON) is already done in code. `timing-test` still FAILs.

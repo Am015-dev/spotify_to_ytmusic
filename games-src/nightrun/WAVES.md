@@ -10,10 +10,10 @@ Code: `parts/waves.js` (flag `RET.waves`, default ON, `?waves=0` = the director 
   Bosses, mini-boss summons and their children are left alone.
 - **Enemies stay until killed.** Each foe flies to its slot and holds there (strafes, weaves, or for a charger: aims and dashes, then comes back from
   the right). After 22 s, whatever is left flies back out to the right. That never counts as a leak or costs hull.
-- **A breather between waves.** The field stays empty for 3.5-5 s (the length depends on how much song is left), and density.js curtains stay off.
+- **A breather between waves.** A rest timer of 3.5-5 s starts when a wave ends (the length depends on how much song is left); measured with an aimbot (W266), the gap from the last kill to the next live foe was 1.3-13.5 s, about half under 3.5 s, and density.js curtains stay off.
   The next wave starts on a bar downbeat, so waves land on the song's phrases.
 - **Rising curve.** A wave sends its squad 2-3 times: the next squad comes in when only 2 or fewer of the last one are left.
-  The last wave is a leader wave (a gold leader with 1.6x hull; kill it and the rest run). On stage 5 the waves give way to the mini-boss (the waves leave
+  The last wave is a leader wave (a gold leader; kill it and the rest run; the hull factor is not measured, so none is promised). On stage 5 the waves give way to the mini-boss (the waves leave
   1.5 bars before it). If the song still has time before the finale, one middle wave plays again, announced `MORE · <name>`.
 - Goals: on a kill stage the goal is 72% of the foes in the table. On a score stage it is 72% of the foes x 650 points (stage 3: 23 000).
 

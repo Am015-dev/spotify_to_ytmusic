@@ -1,7 +1,7 @@
 /* ===== 4b. WEAPON LEVELS BOUGHT IN THE GARAGE + EIGHT MORE WEAPONS (loads after g.js) =====
    Every weapon has a permanent level 1..10 (key mnr_wplv, bought in Garage > WEAPONS with Neon). In a run the effective level is the permanent level
    plus the pit-stop level bonus (at most +2, g.js WP.lvOf). Levels grow rate, size and count; damage per shot stays under the soft cap (b.js DMG.hit).
-   Total weapon DPS at level 10 is held at about 2.5x level 1 (weapon-test.js measures it). WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
+   The card shows power 2.5x at level 10 (a displayed number, WPX_POWER); real DPS per weapon is not measured here. WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
 const WEAPON_META=true;
 const WPX_PRICE=L=>window.RET&&RET.econ?Math.round(30*Math.pow(1.28,L-1)*RET.wk):Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
 const WPX_POWER=(L,id)=>window.SC&&SC.scaled(id)?SC.lvW(L):1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
@@ -159,5 +159,7 @@ Object.assign(WPX.demo,{
    box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)&&ART.isReal(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};
  gaDraw();}
 // painted weapon icons and fusion pictures: only the files that are real art (media/ready.json) are loaded
-try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{for(const n of l)if(/^(wp-|fx-fuse)/.test(n))ART.load(n.replace(/\.webp$/,''));}).catch(()=>{});}catch(e){}
+try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{const q=l.filter(n=>/^(wp-|fx-fuse)/.test(n)).map(n=>n.replace(/\.webp$/,''));   // W242: 80 pictures asked at once at boot starved the ship sheets of the stage (pend=81): now two at a time, only while nothing is being played or loaded (W269: decoding them during a fight cost 20% of the frames on a phone)
+  const calm=()=>performance.now()>8000&&!(window.PRELOAD&&PRELOAD.veil)&&!(window.FOOT&&(FOOT.on||(FOOT.q&&FOOT.q.hold)))&&(!running||paused||(typeof SH!=='undefined'&&SH.active));
+  const iv=setInterval(()=>{if(!q.length)return clearInterval(iv);if(calm()&&ART.pend===0&&ART.lowN<2){const n=q.shift();if(!(n in ART.bm)){ART.lowN++;ART.load(n,1);}}},400);}).catch(()=>{});}catch(e){}
 window.__ga={GA,gsave,openGarage:f=>openGarage(f),WPD};          // test hook

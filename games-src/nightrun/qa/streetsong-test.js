@@ -25,7 +25,7 @@ const s2 = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN
     const hook = () => { const S = FOOT.S; if (!S || !S.eb || S.__h) return; S.__h = 1; let v; const wrap = a => { const pu = a.push; a.push = function (b) { const G = S.G; L.pushes = (L.pushes || 0) + 1; if (G && G.beatLen) { const f = (G.beat * 2) % 1, spb2 = G.beatLen / 2; L.rel.push(+(Math.min(f, 1 - f) * spb2 * 1000).toFixed(1)); } return pu.apply(this, arguments); }; return a; };
       v = wrap(S.eb); Object.defineProperty(S, 'eb', { get() { return v; }, set(a) { v = wrap(a); }, configurable: true }); };   // S.eb is rebuilt every frame: wrap each new array
     const st0 = FOOT.start; FOOT.start = function () { const r = st0.apply(this, arguments); hook(); return r; }; });
-  const sample = async () => p.evaluate(() => { const c = SND.AU.cur; return { st: c && c.stage, t: c && c.el ? c.el.currentTime : -1, bt: __mnr.BT.stage, mode: __mnr.BT.mode }; });
+  const sample = async () => p.evaluate(() => { const c = SND.AU.cur; return { st: (c && c.stage) || (__mnr.BT.mode === 'synth' ? __mnr.BT.stage : null), t: c && c.el ? c.el.currentTime : -1, bt: __mnr.BT.stage, mode: __mnr.BT.mode }; });
   const starts = [], blocked = [], poss = [];
   for (let i = 0; i < RUNS; i++) {
     await p.evaluate(() => { window.LOGM.calls.length = 0; RET.tale = false; });
@@ -33,6 +33,7 @@ const s2 = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN
     await sleep(500); const a = [];
     for (let k = 0; k < 5; k++) { a.push(await sample()); await sleep(1000); }
     poss.push(a);
+    console.log('  samples ' + a.map(x => x.st + '/' + x.bt + '/' + x.mode + '/' + x.t.toFixed(1)).join(' '));
     await p.evaluate(`(${RUN})(${4321 + i * 7919})`);   // the bot plays the whole stage (stepped), starting its own run
     const r = await p.evaluate(() => ({ calls: window.LOGM.calls.slice(), s3: FOOT.S3.snd, st: FOOT.S && FOOT.S.time, end: FOOT.S && !!FOOT.S.end }));
     starts.push(r.calls.filter(c => /^startStage/.test(c))); blocked.push({ other: r.calls.filter(c => !/^startStage:street1/.test(c)), refused: r.s3.blocked.length });
@@ -43,8 +44,8 @@ const s2 = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN
   await p.keyboard.up('KeyD'); await p.keyboard.up('KeyJ');
   const rel = await p.evaluate(() => window.LOGM.rel), med = rel.length ? rel.slice().sort((x, y) => x - y)[rel.length >> 1] : -1, mx = rel.length ? Math.max(...rel) : -1;
   console.log(`  enemy bullets spawned ${await p.evaluate(() => window.LOGM.pushes | 0)}; on the beat grid ${rel.length}; offset after the half beat: median ${med} ms, max ${mx} ms`);
-  ok(poss.every(a => a.every(s => s.st === 'street1' && s.bt === 'street1' && s.mode === 'file')), 'song is the street1 file from the first sample, every run');
-  ok(starts.every(s => s.length <= 2 && s.every(c => /^startStage:street1/.test(c))), `song starts per run: ${starts.map(s => s.length).join(',')} (<= 2 incl. the bot's own start, street1)`);
+  ok(poss.every(a => a.every(s => s.st === 'street1' && s.bt === 'street1') && a[a.length - 1].mode === 'file'), 'song is street1 from the first sample and the file plays by the last, every run');   // W242: the file is no longer waited for
+  ok(starts.every(s => s.length <= 3 && s.every(c => /^startStage:street1/.test(c))), `song starts per run: ${starts.map(s => s.length).join(',')} (<= 3: the bot's own start, street1, and the join when the file arrives)`);
   ok(blocked.every(b => !b.other.length), `no switch / sting / duck / other song: ${blocked.map(b => b.other.length + ' (refused ' + b.refused + ')').join(', ')}`);
   ok(poss.every(a => a.every((s, i) => !i || s.t > a[i - 1].t || s.t < 1)), `song position keeps increasing: ${poss[0].map(s => s.t.toFixed(1)).join(' ')}`);
   if (!(await p.evaluate(() => RET.beatshots))) console.log('INFO (d) skipped: RET.beatshots is off by default (enemy bullets on the half beat; run with ?beatshots=1 once it is ready)');

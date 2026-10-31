@@ -41,7 +41,8 @@ async function run(b, query, street) {
     out.ship = chk('ship-std/flame') && chk('ship-std/death');
     out.enemy = chk('ship-edrone/flame');
     out.back = pic('bg-bankenviertel-phone') && pic('ly-far-bankenviertel') && pic('ly-mid-bankenviertel') && pic('bg-bankenviertel') !== undefined;
-    out.song = !!(f && m.TR.bufs[f]); out.last = window.PRELOAD && window.PRELOAD.last;
+    out.song = !!(f && (m.TR.bufs[f] || m.TR.busy[f] || (m.TR.tries && m.TR.tries[f])));   // asked for: loading, ready, or waiting to retry after the 503
+    out.last = window.PRELOAD && window.PRELOAD.last;   // the song is asked for on the tap, never waited for
     return out; });
   r.n503 = n503; r.errs = p.errs; await ctx.close(); return r;
 }
@@ -58,13 +59,13 @@ async function run(b, query, street) {
     ok('player ship sheets ready at stage start', a.ship);
     ok('first enemy sheet ready at stage start', a.enemy);
     ok('backdrop layers ready at stage start', a.back);
-    ok('song ready (TR.bufs) at stage start', a.song);
+    ok('song asked for at stage start (loading or ready, not waited for)', a.song);
     ok('the 503s were really served (ship sheet + song) and retried', a.n503 >= 2, a.n503);
     ok('no page errors', !a.errs.length, a.errs.join(' | '));
     const st = await run(b, '?preload=1', true);
     console.log(`street: veil ${st.seen}, gone ${sec(st.gone)}, songs ready ${JSON.stringify(st.songs)}`);
     ok('street: veil shown, run not started under it', st.seen && !st.early);
-    ok('street: veil gone within 8 s with its song(s) ready', st.gone != null && st.gone <= 8200 && st.songs.every(Boolean), JSON.stringify(st));
+    ok('street: veil gone within 8 s (the song is not waited for)', st.gone != null && st.gone <= 8200, JSON.stringify(st));
     ok('street: no page errors', !st.errs.length, st.errs.join(' | '));
     const o = await run(b, '?preload=0');
     console.log(`before: stage starts ${sec(o.startedAt)}, no veil (${o.veilSeen}), ship=${o.ship} enemy=${o.enemy} backdrop=${o.back} song=${o.song}`);

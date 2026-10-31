@@ -1,4 +1,4 @@
-// PURPOSE: Street 3: the Zeil street as ONE 2.5-3 min stage on ONE song, threat rising gradually to a late peak, sheets loaded before play, steady frame rates, street lighting
+// PURPOSE: Street 3: the Zeil street as ONE stage of about 4-4.5 min (median clear 243-269 s measured W266; the 3 min target drifted) on ONE song, threat rising gradually to a late peak, sheets loaded before play, steady frame rates, street lighting
 // FLAG: street3 (?street3=0 = the street2 stage exactly)
 // TEST: qa/street3-test.js
 /* ---------- STREET3. Owner, 22 Oct 2026 (tested on foot): "stop making more stages, focus on one stage. The old assets load before the new ones; the assets are blurring;
@@ -47,7 +47,7 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   const alive=S.E.filter(e=>!e.dead).length;
   if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy
   if(S.time>20&&S.time-(f.lastHeal||0)>12&&P.hp>0&&P.hp<=P.max-2&&!S.pk.some(q=>q.k==='heal')){f.lastHeal=S.time;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // two hearts down: a heal drops beside Kai (at most one every 12 s)
-  for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits
+  for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap||S.bossOn){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits; W278/W279 (BALANCE-W279.md): none joins once the big heavy is on (adds cost 53 of 57 hearts in the boss fight)
     const fromL=w.left[0]==='rusher'&&w.i>=3&&(w.spawned%(RET.fairstreet?5:3)===(RET.fairstreet?4:2));
     if(fromL&&RET.fairstreet){if(!w.wa){w.wa=S.time+1;S.behind={until:w.wa};}if(S.time<w.wa)continue;w.wa=0;}   // W161: 1 s BEHIND warning (arrow + caption at the left edge) before a rusher walks in from the left
     const id=w.left.shift(),x=fromL?S.camX-40:S.camX+vw+40;
@@ -82,9 +82,11 @@ if(RET.streetsong){
   {const f0=MP.foot;if(f0)MP.foot=function(){return ssFoot()?undefined:f0.apply(this,arguments);};}
   /* the hold also waits for the song file (an unloaded file played the synth first, then swapped on a bar line) */
   {const FQ=F.q,r0=FQ&&FQ.ready,p0=FQ&&FQ.pct;
-   const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return !!(TR.bufs[i.file]||TR.bad[i.file]);};
+   const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return true;};   // W242: asks for the file, never waits for it
    if(r0)FQ.ready=()=>r0()&&fileOk();if(p0)FQ.pct=()=>{const a=p0();return fileOk()?a:Math.min(a,99);};}}
-if(window.NR&&NR.on)NR.on('footStart',d=>{if(RET.streetsong&&ssOn()){S3.song=SSNG;MP.fbase=SSNG;MP.fk=SSNG;return;}if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
+if(window.NR&&NR.on)NR.on('footStart',d=>{if(RET.streetsong&&ssOn()){S3.song=SSNG;MP.fbase=SSNG;MP.fk=SSNG;return;}
+  if(RET.streetsong&&on()&&MP&&MP.on&&MP.on()){S3.song=SSNG;try{AU.startStage(SSNG);}catch(e){}return;}   // W272: the file is no longer waited for (W264/W269), so start the bed at once (synth until the file joins) instead of 0.5 s of silence
+  if(!on()||!MP||!MP.on||!MP.on()||!MP.has('street1'))return;S3.song='street1';if(MP.fbase!=='street1'){MP.fbase='street1';MP.fk='street1';try{AU.startStage('street1');}catch(e){}}});
 /* ----- loading: the hold also waits for the painted street and the prop pictures (no placeholder backdrop, then a swap) ----- */
 const FQ=F.q;
 const pics=()=>{const fa=window.FA;if(!fa||!fa._rd)return [];return [...fa._rd].filter(f=>/^foot\/(bg-|sc-)/.test(f));};

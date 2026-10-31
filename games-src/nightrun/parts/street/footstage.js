@@ -1,4 +1,4 @@
-// PURPOSE: the finished on-foot stage (7 sections, Warden gate)
+// PURPOSE: the old on-foot stage (7 sections, Warden gate; runs only with ?street2=0, the live default is street3: 6 rooms, boss bigheavy)
 // FLAG: footstage (?footstage=0)
 // TEST: footstage-test.js
 /* ---------- FOOTSTAGE: the finished on-foot stage (flag RET.footstage, default ON; ?footstage=0 = the street1 mock exactly: nothing here runs). Test: nightrun/footstage-test.js.

@@ -91,6 +91,7 @@ const hd=el('div');hd.id='l2h';hd.hidden=true;
 const back=btn(hd,'‹ LAB HOME',()=>go('home'));back.id='l2back';back.setAttribute('aria-label','Back to the Lab home');
 const ttl=el('div','l2t','LAB');ttl.id='l2title';hd.append(ttl);
 const ex=btn(hd,'EXIT',()=>{labExit();},'x');ex.id='l2exit';ex.setAttribute('aria-label','Leave the Lab');
+addEventListener('keydown',e=>{if(e.code==='Escape'&&ex.offsetParent&&!e.defaultPrevented){e.preventDefault();labExit();}});   // Escape leaves the Lab like the EXIT button
 const home=el('div','l2pg');home.id='l2home';home.hidden=true;
 const view=el('div','l2pg');view.id='l2v';view.hidden=true;
 document.body.append(hd,home,view,labEl);   // fixed to the screen, outside the stage: the stage shrinks to the space the panels leave, so nothing covers the boss

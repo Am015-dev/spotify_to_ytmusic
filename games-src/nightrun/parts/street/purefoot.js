@@ -55,7 +55,7 @@ function efx(c,K,at,ko){const S=F.S,now=S.time,d=efT==null?0:Math.max(0,Math.min
 function tells(c,L,S,u,fs){const b=L.hud&&L.hud.hud&&L.hud.hud[0];if(!b)return;const rows=[],OD=F.OD,g=S.gd;
   if(RET.overdrive&&OD&&OD.v>0){const full=OD.v>=OD.max;rows.push([full?'OVERDRIVE READY: BOMB':'OVERDRIVE',OD.v/OD.max,full?(Math.floor(S.time*4)%2?'#ffffff':'#19e3ff'):'#19a8c8']);}
   if(g&&(g.on||g.m<1))rows.push([g.cd>0?'GUARD BROKEN':'GUARD',g.m,g.m<.3?'#ff4060':'#5ad1ff']);if(!rows.length)return;
-  const t0=SL.t0,pd=8*u,rh=26*u,x=b.x,y=t0+b.y+b.h+6*u,w=b.w,h=2*pd+rows.length*rh-6*u;
+  const t0=SL.t0,pd=8*u,rh=26*u,x=b.x,hn=L.hud.hint,w=b.w,y=t0+Math.max(b.y+b.h+6*u,hn?hn.y+hn.h+6*u:0,S.boss&&!S.boss.dead?SL.hudB||0:0),h=2*pd+rows.length*rh-6*u;   // W280: under the boss name bar too (slHud's stack bottom SL.hudB includes it; the meter used to draw on top of BIG HEAVY's name)
   c.save();c.fillStyle='rgba(5,3,12,.62)';X.slRR(c,x,y,w,h,8*u);c.fill();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=u;c.stroke();
   c.textAlign='left';c.textBaseline='top';c.font='bold '+fs(12)+'px monospace';rows.forEach(([t,v,col],i)=>{const ry=y+pd+i*rh;c.fillStyle=col;c.fillText(t,x+pd,ry,w-2*pd);
     c.fillStyle='#ffffff1c';c.fillRect(x+pd,ry+15*u,w-2*pd,5*u);c.fillStyle=col;c.fillRect(x+pd,ry+15*u,(w-2*pd)*Math.max(0,Math.min(1,v)),5*u);});c.restore();
@@ -85,7 +85,8 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
   const dE0=e=>{if(e.dead&&!(e.ext&&!e.remove))return;const ex=e.h*K*.7;if(e.x-ex>hi||e.x+ex<lo)return;SL.z=e.z;
     let pose=e.dead?'die':(()=>{try{return e.def.pose?e.def.pose(e):'idle';}catch(x){return'idle';}})();if(!e.dead){if(e.wind>0)pose='melee';else if(e.tele>0)pose='shoot';}   // telegraph = the attack pose
     let et=e.dead?e.dt_||0:e.t;if(RET.footmove&&!e.dead)[pose,et]=mvE(e,e.id,pose,et);
-    const ey=e.ext&&e.fly?e.y+e.h/2:e.y;at(c,e.x,ey,K);if(RET.footmove&&!e.dead)turn(c,e,e.x);ART.fE=e;IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,et,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;c.restore();SL.z=null;};
+    const ey=e.ext&&e.fly?e.y+e.h/2:e.y;at(c,e.x,ey,K);if(RET.footmove&&!e.dead)turn(c,e,e.x);if(S.boss===e&&SL.barBot&&!e.dead){const m=c.getTransform(),dp=window.devicePixelRatio||1,f=Math.max(.88,Math.min(1,(m.d*ey+m.f-(SL.barBot+8*dp))/(1.25*e.h*m.d)));c.translate(e.x,ey);c.scale(f,f);c.translate(-e.x,-ey);}   // W285/W286: on a short screen the boss name bar covered the head: draw the boss a little smaller (feet fixed, never below 88 %) until the head top is >= 8 px under the bar (draw only, hitboxes unchanged)
+    ART.fE=e;IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,et,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;c.restore();SL.z=null;};
   const dK=()=>{SL.z=P.z;at(c,P.x,P.y,K);
     P._xa=IN.kaiX(P);let kp=IN.ppose(P);if(RET.footmove){if(P.shotT>(P._pst||0)+1e-4){P._lst=S.time;if(P.onGround&&!P.crouch)P._fa=null;}P._pst=P.shotT;   // each shot restarts the shoot sheet (recoil frames)
       if(S.time-(P._lst==null?-9:P._lst)<.45&&P.onGround&&!P.crouch&&/^(idle|run-a|run-b)$/.test(kp)&&!P._xa){kp='shoot';P._xa=Math.abs(P.vx)>5?'runshoot':'';}turn(c,P,P.x);}   // auto-fire keeps the aim pose between shots instead of popping to idle

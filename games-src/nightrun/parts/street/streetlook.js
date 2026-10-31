@@ -34,7 +34,7 @@ SL.layout=(L,W,H,dpr,T)=>{SL.port=false;F.camK=undefined;if(!(T&&H>W*1.05))retur
   const rows=auto?[['dash','jump'],['bomb','melee']]:[['dash','fire'],['bomb','melee','jump']],sz=k=>k===big?f:s,rh=rows.map(r=>Math.max(...r.map(sz)));
   let y=H-mg,minX=W;rows.forEach((r,i)=>{y-=rh[i];let x=W-14;for(let j=r.length-1;j>=0;j--){const z=sz(r[j]);x-=z;set(L.btn[r[j]],x,y+(rh[i]-z)/2,z);x-=8;}minX=Math.min(minX,x+8);y-=8;});
   const fb=L.btn.fire;if(auto){fb.hidden=true;fb.style.display='none';}
-  const sk=clamp(Math.min(Z-2*mg,W*.38,minX-16-12),96,160);set(L.stick,16,hf+(Z-sk)/2,sk);
+  const sk=clamp(Math.min(Z-2*mg,W*.38,minX-16-12-(auto?0:s+8)),96,160);set(L.stick,16,hf+(Z-sk)/2,sk);
   const pb=L.root.querySelector('#fPause');pb.style.left=(W-52)+'px';pb.style.top='8px';return true;};
 
 /* ----- walking back: the left wall is no longer the camera's furthest point; Kai may retreat while the camera eases back up to 35% of the view, never behind the
@@ -174,6 +174,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
 /* ----- HUD: one panel top-left; score + time left of the pause button; hint below both; boss bar above the progress bar ----- */
 function slRR(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
 function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pl=!!(typeof UIK!=='undefined'&&ART.bm&&ART.bm['ui-hud-mult']),pd=(pl?13:8)*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
+  if(S.end&&!S.end.quit){L.hud={hud:[],hint:null,vw};SL.hudB=0;SL.hudFull=0;SL.tag='';return;}   // W282: the result overlay is up: no HUD under it (it showed dimmed through the overlay)
   c.textBaseline='top';c.textAlign='left';c.font='bold '+fs(14)+'px monospace';
   const wt=W.n+(P.w==='pistol'?'':' LV'+P.lv+' · '+P.ammo),pw=[];for(const k of IN.PW_KEYS){const p=P.pw[k];if(p)pw.push([PK[k].c,PK[k].ic+(PK[k].max>1?p.lv:'')]);}
   const bt='●×'+P.bombs,r3=c.measureText(bt).width+pw.length*36*u;
@@ -191,17 +192,19 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;SL.hudFull=hudB+42*u;   // hudFull: the band with the hint line (tidy keeps flyers under it)
   if(!RET.pound2&&S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
+  const bossOn=S.boss&&!S.boss.dead,rl=x+pw_+10*u,rr=sr-sw-10*u,top=bossOn&&RET.pound2&&rr-rl>=150*u&&VH<=520*u,bk=bossOn&&RET.pound2&&!top?24*u:0;   // W286: boss bar in the free top row on a short wide screen; else directly under the panel with the hint line BELOW it (bk = its room), so the hint never pushes the bar onto the boss's head
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
-  if(line&&!RET.purefoot){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u;}
-  if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=(SL.t0+VH)/2,a=.55+.45*Math.sin(S.time*14);c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';c.fillStyle='#ffb020';
-    c.font='bold '+fs(34)+'px monospace';c.fillText('◀',6*u,fy);c.font='bold '+fs(14)+'px monospace';if(!RET.purefoot){c.fillText('BEHIND',6*u+30*u,fy-8*u);c.fillText('foe arriving from the left',6*u+30*u,fy+9*u);}c.globalAlpha=1;}   // W161: 1 s warning at the edge a foe comes from
+  if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u+bk;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u+bk;}
+  if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=VH-20*u,a=.6+.4*Math.sin(S.time*14),bt='◀ BEHIND: a foe is arriving from the left';c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';
+    c.font='bold '+fs(14)+'px monospace';const bw=Math.min(c.measureText(bt).width,vw-24*u);c.fillStyle='#000b';c.fillRect(6*u,fy-12*u,bw+12*u,24*u);c.fillStyle='#ffb020';c.fillText(bt,12*u,fy,vw-24*u);c.globalAlpha=1;}   // W161: 1 s warning for the edge a foe comes from; W267: one line on the empty road strip at the bottom, never over the actors
   SL.tag='';
   if(RET.pound2){   // W186 (?pound2=1 = on; OFF until its gates pass): boss bar and run-progress bar sit in the HUD stack under the hint line, never on the floor band (they used to cover the front depth)
-    const by=t0+SL.hudB,bossOn=S.boss&&!S.boss.dead;
-    if(bossOn){const bw=vw*.7,bx=vw*.15;c.fillStyle='#ffffff22';c.fillRect(bx,by+18*u,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by+18*u,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
-      c.textAlign='center';c.fillStyle='#fff';c.textBaseline='top';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by,vw-20*u);box(bx,by-t0,bw,30*u);SL.hudB+=34*u;}
+    const by=top?t0+m:t0+hudB+4*u;
+    SL.bar=null;
+    if(bossOn){const bw=top?Math.min(rr-rl,360*u):vw*.7,bx=top?(rl+rr-bw)/2:vw*.15,bh=18*u;SL.bar={x:bx,y:by-t0,w:bw,h:bh};c.fillStyle='#00000099';c.fillRect(bx,by,bw,bh);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),bh);   // W286: one thin bar with the name on it (was name line + bar, 30u): the HUD is thinner, the boss art keeps its size
+      c.textAlign='center';c.textBaseline='middle';c.font='bold '+fs(12)+'px monospace';c.lineWidth=3*u;c.lineJoin='round';c.strokeStyle='#000c';const nm=S.boss.bname||'WARDEN';c.strokeText(nm,vw/2,by+bh/2+1*u,bw-12*u);c.fillStyle='#fff';c.fillText(nm,vw/2,by+bh/2+1*u,bw-12*u);box(bx,by,bw,bh);{const tm=c.getTransform();SL.barBot=tm.d*(by+bh)+tm.f;}if(!top)SL.hudB=Math.max(SL.hudB,hudB+4*u+bh+6*u);}
     else if(S.st.hook&&S.st.hook.hud&&!RET.purefoot){const dy=by+10*u-(VH-14*u);c.save();c.translate(0,dy);try{S.st.hook.hud(c,vw,u,(x,y,w,h)=>box(x,y+dy,w,h),fs,S);}catch(x){}c.restore();SL.hudB+=24*u;}}
   else if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
-  L.hud={hud:hb,hint,vw};IN.ghost();}
+  L.hud={hud:hb,hint,vw,bar:SL.bar};IN.ghost();}
 SL._p={slFrame,slPainted,slBackdrop,at,pkPic,slPic,slHud,slRR};   // purefoot.js (W217) reuses the frame, the painted backdrop, the depth placement and the HUD
 })();

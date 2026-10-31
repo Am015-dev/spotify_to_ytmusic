@@ -22,7 +22,7 @@ function fit(){
   stage.classList.toggle('p',rotMode);stage.classList.toggle('sd',side>0);stage.classList.toggle('tl',left);
   stage.style.setProperty('--strip',strip+'px');stage.style.setProperty('--shift',side?(left?40:-40)+'px':'0px');
   frame.style.width=w+'px';frame.style.height=h+'px';
-  const dpr=window.RET&&RET.purelook?Math.min(touchUI?1.5:3,window.devicePixelRatio||1,touchUI?Math.sqrt(1.6e6/(w*h)):9):Math.max(.4,Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1,Math.sqrt((PXB[SET.q]||PXB.M)/(w*h)))*RSC.k),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
+  const dpr=window.RET&&RET.purelook?Math.min(touchUI?1.5:3,window.devicePixelRatio||1,touchUI?Math.sqrt(1.6e6/(w*h)):9)*Math.min(1,(QD[SET.q]||QD.M)/QD.M):Math.max(.4,Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1,Math.sqrt((PXB[SET.q]||PXB.M)/(w*h)))*RSC.k),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
   if(cv.width!==cw||cv.height!==ch){cv.width=cw;cv.height=ch;}
   if(rotMode){                                           // the world keeps its landscape coordinates on its own canvas; render() turns it upright
     if(wcv===cv){wcv=document.createElement('canvas');wctx=wcv.getContext('2d');}
@@ -52,10 +52,10 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running
 addEventListener('pageshow',()=>{if(!paused&&!document.hidden)AU.resume();});
 for(const ev of['pointerdown','touchstart','touchend','mouseup','click'])addEventListener(ev,()=>AU.unlock(),true);
 addEventListener('touchstart',()=>{if(!touchUI){touchUI=true;relayout();syncUI();}},{capture:true,passive:true});
-stage.addEventListener('touchstart',e=>{if(e.target.closest('button,.ov,input,label,#touch,#labP'))return;e.preventDefault();
+stage.addEventListener('touchstart',e=>{if(e.target.closest('button,.ov,input,label,#touch,#labP,#taleCard'))return;if(e.cancelable)e.preventDefault();   // a second finger during a drag/scroll arrives non-cancelable: preventDefault there logs a console notice
   if(!running||paused||touch)return;const t=e.changedTouches[0],[x,y]=toGame(t);
   touch={id:t.identifier,sx:x,sy:y,px:P.x,py:P.y,x,y};touchFire=true;pressed.Fire=stampOf(e);},{passive:false});
-stage.addEventListener('touchmove',e=>{if(!touch)return;e.preventDefault();for(const t of e.changedTouches)if(t.identifier===touch.id){const[x,y]=toGame(t);touch.x=x;touch.y=y;}},{passive:false});
+stage.addEventListener('touchmove',e=>{if(!touch)return;if(e.cancelable)e.preventDefault();for(const t of e.changedTouches)if(t.identifier===touch.id){const[x,y]=toGame(t);touch.x=x;touch.y=y;}},{passive:false});
 const tEnd=e=>{for(const t of e.changedTouches)if(touch&&t.identifier===touch.id){touch=null;touchFire=false;}};
 stage.addEventListener('touchend',tEnd);stage.addEventListener('touchcancel',tEnd);
 const btn=(id,fn)=>$(id).addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();AU.unlock();fn(e);});

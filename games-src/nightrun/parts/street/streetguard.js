@@ -15,6 +15,7 @@ const G=S=>S.gd||(S.gd={on:0,t0:-9,cd:0,m:1,x:0,bt:-9,pf:0,blocks:0,parries:0,re
 let seen=0;try{seen=+localStorage.getItem('mnr_parry')||0;}catch(e){}
 /* input -> stance; called from guardHit (a hit can land in the step the key went down) and from post */
 function sync(S){const g=G(S),P=S.P;
+  if(!g.cap&&S.time>3&&!S.end){g.cap=1;let n=0;try{n=+localStorage.getItem('mnr_guard')||0;}catch(e){}if(n<1){S.note={teach:1,t:3.5,txt:IN.L().touch?'GUARD: hold to block hits from the front':'GUARD: hold I to block hits from the front'};try{localStorage.setItem('mnr_guard','1');}catch(e){}}}   // W267: the teaching note moved here from the draw wrapper (purefoot skips that wrapper, so it never showed)
   if(I.guardP&&!g.pf){g.pf=1;if(!g.on&&g.cd<=0&&g.m>.05&&P.hp>0){g.on=1;g.pd=0;g.t0=g.last=S.time;g.x=P.x;}}
   if(g.on&&(!I.guard&&!I.guardP||S.time-g.t0>=HOLD)){g.maxOn=Math.max(g.maxOn,g.last-g.t0);g.on=0;g.cd=REST;}
   return g;}
@@ -23,7 +24,7 @@ F.guardHit=function(n,fromX,src,b){const S=F.S;if(!S||!RET.guard2)return 0;const
   const shot=/^bul:/.test(src);
   if(S.time-g.t0<=PARRY&&!g.pd){g.pd=1;g.parries++;g.bt=S.time;g.flash=.25;IN.hitstop(70);IN.sfx('big');IN.pop(P.x+P.facing*20,P.y-84,'PARRY','#ffd23a',true);
     S.fx.push({slash:1,x:P.x+P.facing*26,y:P.y-40,w:90,l:.2,c:'#ffffff'});
-    if(seen<1){seen=1;S.note={t:3,txt:'PARRY: guard just before the hit'};try{localStorage.setItem('mnr_parry','1');}catch(e){}}
+    if(seen<1){seen=1;S.note={teach:1,t:3,txt:'PARRY: guard just before the hit'};try{localStorage.setItem('mnr_parry','1');}catch(e){}}
     if(shot&&b){g.refl++;S.pb.push({z:P.z,x:b.x,y:b.y,vx:-b.vx*1.3,vy:-(b.vy||0),wid:'pistol',dmg:3,kind:'b',life:1.5,c:'#ffd23a',r:Math.max(5,b.r||6),pierce:0,hit:[],t:0});}
     else{const id=src.split(':')[1];let e=null;for(const o of S.E)if(!o.dead&&o.id===id&&(!e||abs(o.x-P.x)<abs(e.x-P.x)))e=o;
       if(e&&!e.boss&&abs(e.x-P.x)<220){e._opn=S.time+OPEN;e._ox=e.x+(e.x>P.x?1:-1)*Math.max(0,70-abs(e.x-P.x));}}   // knocked out of reach, frozen
@@ -48,7 +49,7 @@ const kx0=IN.kaiX;IN.kaiX=function(P){const r=kx0.apply(this,arguments);return P
 /* the phone button, next to KNIFE (same size and style); keys I and ; */
 let B=null,bk='';
 function btn(){const L=IN.L();if(!L||!L.btn||!L.btn.melee)return;
-  if(!B){B=document.createElement('button');B.type='button';B.className='fb';B.id='fGuard';B.textContent='GUARD';L.root.appendChild(B);
+  if(!B){B=document.createElement('button');B.type='button';B.className='fb';B.id='fGuard';B.textContent='GUARD';L.root.insertBefore(B,L.menu);/* before #fMenu: appended last it drew above the result / pause overlay */
     const dn=e=>{e.preventDefault();if(!I.guard)I.guardP=1;I.guard=1;B.classList.add('on');try{B.setPointerCapture(e.pointerId);}catch(x){}},up=()=>{I.guard=0;B.classList.remove('on');};
     B.addEventListener('pointerdown',dn);B.addEventListener('pointerup',up);B.addEventListener('pointercancel',up);B.addEventListener('lostpointercapture',up);
     const mo=new MutationObserver(()=>btn());for(const e of Object.values(L.btn))mo.observe(e,{attributes:true,attributeFilter:['style','hidden']});}   // W238: a relayout puts BOMB back under GUARD; re-seat both before the next paint, not on the next post
@@ -75,7 +76,5 @@ if(SL&&SL.draw){const d0=SL.draw;
     for(const e of S.E)if(e._opn>S.time&&!e.dead){const y=wy(e.y-e.h-14,e.z);c.font='bold 14px monospace';c.textAlign='center';c.textBaseline='bottom';c.fillStyle='#05030c';c.fillText('OPEN',e.x+1,y+1);c.fillStyle='#ffd23a';c.fillText('OPEN',e.x,y);}
     c.restore();
     if(g.flash>0){c.save();c.setTransform(1,0,0,1,0,0);c.globalAlpha=g.flash*1.2;c.fillStyle='#ffffff';c.fillRect(0,0,L.cv.width,L.cv.height);c.restore();}
-    if(!g.cap&&S.time>3&&!S.end){g.cap=1;let n=0;try{n=+localStorage.getItem('mnr_guard')||0;}catch(e){}
-      if(n<1){S.note={t:3.5,txt:L.touch?'GUARD: hold to block hits from the front':'GUARD: hold I to block hits from the front'};try{localStorage.setItem('mnr_guard','1');}catch(e){}}}
     return r;};}
 })();
