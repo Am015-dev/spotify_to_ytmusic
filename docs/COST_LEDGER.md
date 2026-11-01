@@ -139,3 +139,4 @@ Model and status come from the session list. Cost is blank: the session list doe
 | 31 Oct | review-r31-24 (OPUS) | rev50 wallhit PASS | ~$2.86 |
 | 31 Oct | racereds-r31g (SONNET) | diagnosis only, no fix | ~$1.51 |
 | 31 Oct | gpcorner-r31h (SONNET) | GP corner fix, partial | ~$1.84 |
+| 31 Oct | og4 (OPUS) | one look S4, 2 rounds | ~$6.72 |
