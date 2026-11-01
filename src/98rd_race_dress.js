@@ -66,6 +66,8 @@ function RDS_build(sp){RDS_drop();const M=RDS_mats(),GE=RDS_geos(),C=sp.C,Gm=tkG
         put(sd>0?'chevR':'chevL',x,y+1.9,z,p.h+Math.PI,0xffffff,1,1,1,1);put('post',x,y,z,p.h,RDS_COL.blk,1,.8,1);n0++}
       st.corners.push({k:ln.k,s,dh:+dh.toFixed(2),n:n0,x:+q.x.toFixed(1),z:+q.z.toFixed(1)});(ln.cin=ln.cin||[]).push([s,-sd]);st.chev+=n0};
     for(let s=15;s<ln.L-15;s+=4){const dh=angDiff(ln.at(s+15).h,ln.at(s-15).h);if(Math.abs(dh)>Math.PI/4){if(!best)best={a:s,b:s,dh};best.b=s;if(Math.abs(dh)>Math.abs(best.dh))best.dh=dh}else flush()}flush()}
+  // gpcorner: a sharp corner that sits exactly on the joint between two legs (Grand Prix route (-600,600)->(-600,360)->(-772,360): leg A ends, the finish leg starts there) is inside neither line, so the loop above never saw it and the inside got a full collider wall on both legs: a 24.7 m 'building' 12 m inside the turn that the racing line hit until the DNF. Mirror the in-line rule: the inside barrier steps back and has no collider 26 m before / 14 m after the joint.
+  for(const[a,b]of[[0,1],[0,2],[1,3],[2,3]]){const p=lines[a],n=lines[b];if(p.L<30||n.L<30)continue;const dh=angDiff(n.at(15).h,p.at(p.L-15).h);if(Math.abs(dh)>Math.PI/4){const sd=dh<0?-1:1;(p.cin=p.cin||[]).push([p.L,sd]);(n.cin=n.cin||[]).push([0,sd])}}
   for(const ln of lines){const L=ln.L;if(L<4)continue;const s0=ln.k==='start'?-30:0,s1=ln.k==='fin'?L+20:L;
     for(const sd of[-1,1]){let mouth=null;const endM=()=>{if(!mouth)return;st.mouths++;if(mouth.open)st.cutOpen++;else st.closed+=mouth.bar===mouth.n?1:0;mouth.miss=mouth.n-mouth.bar;(st.mouthL=st.mouthL||[]).push(mouth);
         const q=ln.at((mouth.a+mouth.b)/2),hw0=mouth.hw,x=q.x+Math.cos(q.h)*sd*(hw0+2.1),z=q.z-Math.sin(q.h)*sd*(hw0+2.1),y=yAt(x,z,groundAt(q.x,q.z,99));
