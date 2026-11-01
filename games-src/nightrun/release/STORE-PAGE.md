@@ -22,7 +22,7 @@ Pick one of five difficulty levels, from easy to legend. Play with your keyboard
 
 - Two ways to play from the title screen: FLIGHT (shoot-'em-up) and ON FOOT (side-view street run).
 - Flight stages 1 and 2, and the on-foot street level, each ending in a boss fight.
-- Unlock nine ships in the garage.
+- Unlock seven more ships in the garage (eight in all).
 - Dash and EMP buttons, plus a hull meter, so you decide when to take a risk.
 - Five difficulty levels: easy, normal, hard, very hard, legend.
 - Illustrated neon art: hundreds of pictures for ships, bosses, streets and skylines.

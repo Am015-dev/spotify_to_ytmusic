@@ -578,7 +578,7 @@ function pause(on){if(!S||S.end)return;S.paused=on;for(const k in I)I[k]=0;if(on
 function showRes(){const E=S.end,id=S.id,b=SV.best[id];
   const rows=[['SCORE',E.score],['TIME',fmtT(E.time)],['KILLS',S.kills],['NEON','+'+E.neon+(E.first?' · first clear':'')]];
   if(b)rows.push(['BEST',b.score+' · '+b.rank]);if(S.st.hook&&S.st.hook.rows)S.st.hook.rows(S,rows);
-  const html='<h2>'+(E.cleared?'STREET CLEAR':'YOU WENT DOWN')+'</h2>'+(E.cleared?'<div class="rk" id="fRank">'+E.rank+'</div>':'')+rows.map(r=>'<div class="fr"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('')+(S.assist?'<div class="sm">ⓐ Assist run · no records</div>':'')+(S.bcp?'<div class="sm">'+(E.cleared?'Resumed at the boss':'Resume: back at the boss, boss at full health')+' · Neon ×0.75, no record</div>':'');
+  const html='<h2>'+(E.cleared?'STREET CLEAR':'YOU WENT DOWN')+'</h2>'+(E.cleared?'<div class="rk" id="fRank">'+E.rank+'</div>':'')+rows.map(r=>'<div class="fr"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('')+(S.assist?'<div class="sm">ⓐ Assist run · no records</div>':'')+((E.cleared?S.bossCp:S.bcp)?'<div class="sm">'+(E.cleared?'Resumed at the boss':'Resume: back at the boss, boss at full health')+' · Neon ×0.75, no record</div>':'');
   const bt=[];if(!E.cleared&&S.bcp)bt.push(['RESUME FROM BOSS',()=>{hideMenu();begin(id,'boss');},'fBoss']);if(!E.cleared&&S.cp)bt.push(['FROM CHECKPOINT',()=>{hideMenu();begin(id,true);},'fCp']);
   bt.push([E.cleared?'RUN AGAIN':'RETRY',()=>{hideMenu();begin(id);},'fAgain']);
   bt.push(['FLY ON',()=>{leave(()=>{try{const sb=$('storyBtn');if(sb)sb.click();}catch(e){}});},'fFly']);

@@ -30,7 +30,7 @@ function retShow(){
   /* menufix3 (E12): after a first-session death the first primary button is RETRY; the GARAGE shortcut shows only when something is affordable */
   const fresh=!Object.keys(sSave.stars).some(k=>(sSave.stars[k]|0)>0),g2=$('gaBtn2');
   $('againBtn').textContent=fresh?'RETRY':on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';
-  if(g2)g2.hidden=!(typeof affordCount==='function'&&affordCount()>0);
+  const can=typeof affordCount==='function'&&affordCount()>0;if(g2)g2.hidden=!can;const g3=$('gaBtn3')||(()=>{const sr=$('srRetry');if(!sr||typeof openGarage!=='function')return null;const b=document.createElement('button');b.className='go dim';b.id='gaBtn3';b.type='button';b.textContent='GARAGE';sr.after(b);b.addEventListener('click',()=>{$('stres').hidden=true;openGarage('stres');});return b;})();if(g3)g3.hidden=!can;   // the clear card gets the same GARAGE shortcut, so 'Ready in Garage' never shows without a button
   const sb=$('overSub');if(sb)sb.textContent=g2&&!g2.hidden?'Spend your Neon in the garage, then retry':'Try again. Your Neon is saved.';}   // W321: the garage line shows only when the GARAGE button does
 NR.on('runEnd',d=>{if(!d||d.quit)return;retShow();});
 
@@ -275,7 +275,7 @@ NR.on('runEnd',d=>{if(!d||d.quit||!RET.trans&&!RET.grade)return;setTimeout(()=>{
     RET.chipSync();}
   if(RET.grade)for(const [id,host] of [['grO',$('over')],['grR',$('stres')]]){let e=$(id);const L=RET.gr.list;
     if(!e){e=document.createElement('div');e.id=id;e.className='retGr';host.querySelector('.in').insertBefore(e,host.querySelector('.row'));}
-    e.hidden=!L.length;e.innerHTML=L.length?'Grades'+L.map(x=>'<b class="'+x+'">'+x+'</b>').join(''):'';}},0);});
+    e.hidden=!L.length;e.innerHTML=L.length?'GRADE '+L.map(x=>'<b class="'+x+'">'+x+'</b>').join(''):'';}},0);});
 
 /* ---------- B24 save export / import (POLISH.md). Flag RET.saveio; off = Settings exactly as before. Hooks: click listeners on the Settings buttons and NR 'runEnd'. Nothing is executed: a file or code is parsed as data only. ---------- */
 if(RET.saveio===undefined)RET.saveio=true;

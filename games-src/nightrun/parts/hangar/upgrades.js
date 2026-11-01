@@ -161,7 +161,7 @@ gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
   affUpd();};
 function affUpd(){const n=affordCount();afford.all=n;const g=$('gaBtn');
   if(g){g.innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+GA.bank+(n?'<small>'+n+' UPGRADE'+(n>1?'S':'')+' READY</small>':'');g.classList.toggle('rdy',n>0);}
-  const g2=$('gaBtn2');if(g2){g2.innerHTML='GARAGE'+(n?'<small>'+n+' READY</small>':'');g2.classList.toggle('rdy',n>0);}}
+  for(const id of ['gaBtn2','gaBtn3']){const g2=$(id);if(g2){g2.innerHTML='GARAGE'+(n?'<small>'+n+' READY</small>':'');g2.classList.toggle('rdy',n>0);}}}
 gaDraw();
 
 /* ----- the pit stop: the "you can afford N" row (the cards, picks, slots and selling are in strategy.js) ----- */
