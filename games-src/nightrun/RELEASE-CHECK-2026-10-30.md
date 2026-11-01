@@ -1,3 +1,12 @@
+## R3 (independent review, 1 Nov 2026, nr/REVIEW-R3 = origin/nr/W327-final 05a71f8): DO NOT SHIP as built (3 copy blockers, small fixes)
+Full file: REVIEW-2026-10-31-R3.md. Player-equivalent ~42/100 (R2 35).
+- R2 blockers: (1) casual street FIXED: late bot first try 4/6, 5/6 with one RESUME FROM BOSS (works, first button); (2) GOLD text FIXED, push-gate not re-run (W326: CHOOSE >= HOLD 88/75, 81/68);
+  (3) result screens PARTLY: flight game over explained and fits at 844x390, but STREET CLEAR shows "Resumed at the boss · Neon x0.75, no record" on every first-try clear (foot.js:581 tests S.bcp, must be S.bossCp);
+  (4) title FIXED: FLIGHT / ON FOOT / SETTINGS, LAB only ?lab=1, no widget; (5) store soundtrack claim FIXED, but "nine ships" is false (8 ships in code).
+- Rows: flight phone dodger+shooter (7 valid runs) boss killed 7/7, NEXT STAGE by real tap 7/7, err 0; real-input flight start/pause/game over at 390x763, 844x390, 1440x860: 0 errors;
+  gauntlet-shell 401/0 twice (no veil flicker alone); streetsim RUNS=40 nearest 25 / gfirst 90 / dodge 73 / idle 0; claims-check PASS.
+- Blockers before the first sale: street-clear resume line; flight STAGE 1 CLEAR card (two scores 21850 vs 28490, "Ready in Garage" without a garage button); store page ship count.
+
 # Release check, branch nr/W286-final (from nr/W285-deployable), 30 Oct 2026. Not deployed.
 Logs and shots (not committed): /tmp/claude-0/-home-user-spotify-to-ytmusic/6c9bd49e-2dc3-5841-95e9-cfd53638cb70/scratchpad/ (chk/ = unit gates, g/ = smoke, flight and street runs, b0 b1 b2 b3 = boss bar shots before/after).
 ## Verdict: DO NOT SHIP
