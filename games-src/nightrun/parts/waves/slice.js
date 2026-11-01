@@ -46,12 +46,12 @@ const SL=window.SL={
   /* every beat: groups whose bar has come enter one foe per beat */
   beat(i){const S=this.st,L=this.T[ST.n];if(!L||ST.over)return;
     const bar=Math.floor(i/4)-S.off;
-    while(S.gi<L.g.length&&L.g[S.gi][0]<=bar&&i%4===0){const g=L.g[S.gi++];g[1].forEach((f,k)=>S.q.push({b:i+k,f,o:g[2],first:k===0}));}
+    while(S.gi<L.g.length&&L.g[S.gi][0]<=bar&&i%4===0){const g=L.g[S.gi++],bq=WV.bopen(g[1].length);g[1].forEach((f,k)=>S.q.push({b:i+k,f,o:g[2],first:k===0,bq}));}
     if(S.gi>=L.g.length&&L.loop&&bar>=L.loop[1]){S.gi=L.g.findIndex(g=>g[0]>=L.loop[0]);S.off+=L.loop[1]-L.loop[0];}
     let on=0;for(const e of G.en)if(e.type!=='boss'&&e.hp>0&&!e.dead)on++;
     for(let k=S.q.length-1;k>=0;k--){const q=S.q[k];if(q.b>i)continue;if(on>=this.CAP){q.b=i+1;continue;}on++;S.q.splice(k,1);
       if(q.first&&q.o&&q.o.ann){if(!RET.purelook){banner(q.o.ann[0],q.o.ann[1],false,2.6);if(G.banner){G.banner.sm=1;G.banner.wv=1;}}this.log.dec.push({k:q.o.dec,t:+G.t.toFixed(1),got:0});}
-      this.spawn(q.f,q.o,i);}},
+      WV.cur=q.bq||null;this.spawn(q.f,q.o,i);WV.cur=null;}},   // W293: the group is one bounty squad (waves.js WV.bopen)
   tick(dt){if(!this.on()||!running||G.dead||ST.over)return;if(this.st.n!==ST.n)this.reset();WV.st.phase='slice';
     let on=0;for(const e of G.en)if(e.type!=='boss'&&e.hp>0&&!e.dead)on++;this.log.maxOn=Math.max(this.log.maxOn,on);
     for(const e of WV.st.foes){const s=e.sl;if(!s)continue;const r=s.rec;

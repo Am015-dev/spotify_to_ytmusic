@@ -57,13 +57,13 @@ const PROBE = async () => { const cv = document.getElementById('footC'), A = __m
     const whos = [...new Set(seen)]; ok('drawn height constant per entity across frames and acts (<= 2%), ' + whos.length + ' ids: ' + whos.join(','), whos.length >= 6 && !bad.length, bad.length ? bad : { whos });
     const stand = Q.act.filter(a => a.kai && !a.crouch).map(a => a.h), cr = Q.act.filter(a => a.kai && a.crouch).map(a => a.h);
     if (cr.length) { const r = (cr.reduce((a, b) => a + b, 0) / cr.length) / (stand.reduce((a, b) => a + b, 0) / stand.length); ok('Kai crouch is x0.6875 of standing', Math.abs(r - .6875) < .02, r); } else ok('Kai crouch (not exercised in the bot run, see the sweep)', true);
-    ok('canvas is device-pixel wide (dpr 3)', Math.abs(pr.cw / pr.cssw - 3) < .05, pr);
+    ok('canvas is 1.5x css wide (phone render cap, a01c347)', Math.abs(pr.cw / pr.cssw - 1.5) < .05, pr);
     ok('image smoothing high', pr.smooth === 'high' && pr.en === true, pr);
     const ex = Math.max(0, ...Q.blit.map(b => b.up / b.ideal)); ok('no sprite blit is blown up from a copy smaller than its device size or its sheet (worst x' + ex.toFixed(2) + ' of the ideal, ' + Q.blit.length + ' blits)', Q.blit.length > 50 && ex <= 1.05, { ex });
     if (A.pr) { const sw = A.pr.sweep, ids = Object.keys(sw).filter(k => !/\|crouch/.test(k)), bad = ids.filter(k => (sw[k][1] - sw[k][0]) / sw[k][1] > .02);
     ok('sweep of every act and pose for ' + ids.length + ' ids: one drawn height each (<= 2%)', ids.length >= 16 && !bad.length, bad.map(k => k + ' ' + sw[k]));
     const kc = sw['kai|crouch'], ks = sw.kai; ok('sweep: Kai crouch sheet drawn at x0.6875 of standing', kc && Math.abs(kc[1] / ks[1] - .6875) < .02 && kc[1] - kc[0] < .02 * kc[1], { kc, ks }); }
-  ok('no sheet missing mid-run for an id that has sheets', !pr.miss || Object.keys(pr.miss).every(k => !k) || true);
+  ok('no sheet missing mid-run for an id that has sheets', !pr.miss || Object.keys(pr.miss).every(k => !k));
   }
   ok('no page errors', errs.length === 0, errs.slice(0, 3));
   await br.close(); srv.kill(); const f = res.filter(x => !x).length; console.log(f ? 'FAIL footq ' + f : 'PASS footq all'); process.exit(f ? 1 : 0);

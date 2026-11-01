@@ -121,6 +121,6 @@ ST.hook={
     c.fillStyle='#ffffff22';c.fillRect(x0,y,bw,h);c.fillStyle='#19e3ff';c.fillRect(x0,y,bw*pr,h);
     for(const s of ROOMS.slice(1)){const sx=x0+bw*s.x/ST.boss.x;c.fillStyle=S.P.maxX>=s.x?'#ffd23a':'#ffffff88';c.fillRect(sx-1.5*u,y-3*u,3*u,h+6*u);}
     box(x0,y-8*u,bw,h+16*u);},
-  rows(S,rows){rows.splice(3,0,['BROKEN',String(S.s2?S.s2.broke:0)]);}};
+  rows(S,rows){rows.splice(3,0,['CRATES SMASHED',String(S.s2?S.s2.broke:0)]);}};
 F.STAGES.zeil=ST;F.SEC=ROOMS;
 })();

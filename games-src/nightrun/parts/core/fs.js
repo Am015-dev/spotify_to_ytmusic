@@ -8,19 +8,20 @@ RET.fs=RET.fs!==false&&!/[?&]fs=0\b/.test(location.search);
 if(RET.fs){(()=>{
   const de=document.documentElement,rq=de.requestFullscreen||de.webkitRequestFullscreen,ex=document.exitFullscreen||document.webkitExitFullscreen;
   const touch=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>1,standalone=matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  const emb=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();   // inside another page's iframe (itch.io): Add to Home Screen would install that page, not the game
   const isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement)||matchMedia('(display-mode: fullscreen)').matches;
   let pref;try{pref=localStorage.getItem('mnr_fs');}catch(e){}
   let off=pref==='0',lastTry=0;
   const enter=()=>{if(!rq||isFS()||off)return;const n=Date.now();if(n-lastTry<400)return;lastTry=n;try{const p=rq.call(de,{navigationUI:'hide'});if(p&&p.catch)p.catch(()=>{});}catch(e){}};
   const leave=()=>{if(ex&&isFS()){try{const p=ex.call(document);if(p&&p.catch)p.catch(()=>{});}catch(e){}}};
   const save=()=>{try{localStorage.setItem('mnr_fs',off?'0':'1');}catch(e){}};
-  window.FSX={on:()=>!off,isFS,supported:!!rq,standalone:!!standalone,enter,leave,set(v){off=!v;save();if(v)enter();else leave();paint();}};
+  window.FSX={embedded:emb,on:()=>!off,isFS,supported:!!rq,standalone:!!standalone,enter,leave,set(v){off=!v;save();if(v)enter();else leave();paint();}};
 
   /* iPhone and iPad browsers have no page full screen: the only way is the installed icon (Add to Home Screen opens the game without the browser bars) */
   const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   let cardEl=null,asked=0;try{asked=+localStorage.getItem('mnr_fscard')||0;}catch(e){}
   const closeCard=(never)=>{if(cardEl){cardEl.remove();cardEl=null;}try{localStorage.setItem('mnr_fscard',String(never?99:asked+1));}catch(e){}};
-  FSX.card=function(force){if(cardEl||(!ios&&!force)||standalone)return;if(!force&&asked>=3)return;
+  FSX.card=function(force){if(cardEl||emb||(!ios&&!force)||standalone)return;if(!force&&asked>=3)return;
     cardEl=document.createElement('div');cardEl.id='fsCard';cardEl.setAttribute('role','dialog');cardEl.setAttribute('aria-label','Full screen');
     cardEl.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99999;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));background:#0b0618f2;border-top:2px solid #ff2d78;color:#fff;font:600 15px/1.35 system-ui,sans-serif;text-align:left';
     cardEl.innerHTML='<div style="font:700 17px/1.2 system-ui,sans-serif;margin-bottom:6px">PLAY FULL SCREEN</div>'+
@@ -40,7 +41,7 @@ if(RET.fs){(()=>{
   document.addEventListener('webkitfullscreenchange',()=>{paint();try{window.dispatchEvent(new Event('resize'));}catch(e){}});
   let fsEl=null;
   function paint(){if(!fsEl)return;const on=isFS();fsEl.textContent=!rq&&!standalone?'FULL SCREEN: ADD TO HOME':on?'FULL SCREEN: ON':'FULL SCREEN: OFF';fsEl.setAttribute('aria-pressed',on?'true':'false');}
-  setTimeout(()=>{const mg=document.querySelector('#mnMore .mg');if(!mg||fsEl)return;
+  setTimeout(()=>{const mg=document.querySelector('#mnMore .mg');if(!mg||fsEl||(emb&&!rq))return;
     fsEl=document.createElement('button');fsEl.type='button';fsEl.className='go dim wide';fsEl.id='fsBtn';
     fsEl.addEventListener('click',()=>{if(!rq){FSX.card(true);return;}FSX.set(!(isFS()));});
     mg.appendChild(fsEl);paint();},0);

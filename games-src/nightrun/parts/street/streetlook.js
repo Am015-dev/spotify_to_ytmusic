@@ -31,7 +31,7 @@ SL.layout=(L,W,H,dpr,T)=>{SL.port=false;F.camK=undefined;if(!(T&&H>W*1.05))retur
   L.sc=sc;L.vw=W/sc;L.mode='port';L.box={x:0,y:0,w:W,h:hf};L.ox=0;L.oy=0;L.exl=0;L.exr=0;L.dpr=dpr;SL.VV=hf/sc;
   const cv=L.cv;cv.style.left='0px';cv.style.top='0px';cv.style.width=W+'px';cv.style.height=hf+'px';cv.width=Math.round(W*dpr);cv.height=Math.round(hf*dpr);
   const set=(el,x,y,z)=>{el.hidden=false;el.style.display='';el.style.left=Math.round(x)+'px';el.style.top=Math.round(y)+'px';if(z)el.style.width=el.style.height=Math.round(z)+'px';};
-  const rows=auto?[['dash','jump'],['bomb','melee']]:[['dash','fire'],['bomb','melee','jump']],sz=k=>k===big?f:s,rh=rows.map(r=>Math.max(...r.map(sz)));
+  const rows=auto?[['dash','jump'],['bomb','guard','melee']]:[['guard','dash','fire'],['bomb','melee','jump']],sz=k=>k===big?f:s,rh=rows.map(r=>Math.max(...r.map(sz)));
   let y=H-mg,minX=W;rows.forEach((r,i)=>{y-=rh[i];let x=W-14;for(let j=r.length-1;j>=0;j--){const z=sz(r[j]);x-=z;set(L.btn[r[j]],x,y+(rh[i]-z)/2,z);x-=8;}minX=Math.min(minX,x+8);y-=8;});
   const fb=L.btn.fire;if(auto){fb.hidden=true;fb.style.display='none';}
   const sk=clamp(Math.min(Z-2*mg,W*.38,minX-16-12-(auto?0:s+8)),96,160);set(L.stick,16,hf+(Z-sk)/2,sk);
@@ -194,7 +194,13 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText(S.boss.bname||'WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   const bossOn=S.boss&&!S.boss.dead,rl=x+pw_+10*u,rr=sr-sw-10*u,top=bossOn&&RET.pound2&&rr-rl>=150*u&&VH<=520*u,bk=bossOn&&RET.pound2&&!top?24*u:0;   // W286: boss bar in the free top row on a short wide screen; else directly under the panel with the hint line BELOW it (bk = its room), so the hint never pushes the bar onto the boss's head
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
-  if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u+bk;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u+bk;}
+  let side=null;   // W321: the hint goes in the empty sky RIGHT of the hearts panel (under the score), wrapped to at most 3 lines, so it never sits on the OVERDRIVE / GUARD plates or the boss bar under the panel; no room = the old strip under the panel
+  if(line&&!bossOn){const f=fs(14),rl2=x+pw_+8*u,rw=vw-8*u-rl2-16*u;c.font='bold '+f+'px monospace';
+    if(rw>=120*u){const ws=line.split(' '),ls=[''];for(const w of ws){const t=ls[ls.length-1]?ls[ls.length-1]+' '+w:w;if(c.measureText(t).width<=rw||!ls[ls.length-1])ls[ls.length-1]=t;else ls.push(w);}
+      if(ls.length<=3){const lw=Math.max(...ls.map(l=>c.measureText(l).width)),bw=lw+16*u,lh=f*1.2,bh=ls.length*lh+8*u,bx=vw-8*u-bw,by=sy+40*u;
+        c.fillStyle='#000b';c.fillRect(bx,by,bw,bh);c.fillStyle='#fff';c.textAlign='left';ls.forEach((l,i)=>c.fillText(l,bx+8*u,by+4*u+i*lh));
+        side={x:bx,y:by-t0,w:bw,h:bh};hint=side;c.textAlign='center';}}}
+  if(line&&!side){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u+bk;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u+bk;}
   if(RET.fairstreet&&S.behind&&S.time<S.behind.until){const fy=VH-20*u,a=.6+.4*Math.sin(S.time*14),bt='◀ BEHIND: a foe is arriving from the left';c.globalAlpha=a;c.textAlign='left';c.textBaseline='middle';
     c.font='bold '+fs(14)+'px monospace';const bw=Math.min(c.measureText(bt).width,vw-24*u);c.fillStyle='#000b';c.fillRect(6*u,fy-12*u,bw+12*u,24*u);c.fillStyle='#ffb020';c.fillText(bt,12*u,fy,vw-24*u);c.globalAlpha=1;}   // W161: 1 s warning for the edge a foe comes from; W267: one line on the empty road strip at the bottom, never over the actors
   SL.tag='';

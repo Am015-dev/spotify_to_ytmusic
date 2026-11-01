@@ -67,8 +67,8 @@ const { boot, open, sleep, ok, done } = require('./lib.js');
     ok('god mode hearts back to full after a frame', await p.evaluate(() => FOOT.S.P.hp === FOOT.S.P.max));
     await sleep(200);
     ok('infinite ammo keeps the rocket launcher full', await p.evaluate(() => FOOT.S.P.ammo === Infinity));
-    for (const w of ['pistol', 'hmg', 'shot', 'flame', 'rocket', 'arc']) { await p.evaluate(w => FOOTLAB.give(w), w); const g = await p.evaluate(() => FOOT.S.P.w); if (g !== w) ok('give weapon ' + w, false, g); }
-    ok('give every weapon', true);
+    const giveBad = []; for (const w of ['pistol', 'hmg', 'shot', 'flame', 'rocket', 'arc']) { await p.evaluate(w => FOOTLAB.give(w), w); const g = await p.evaluate(() => FOOT.S.P.w); if (g !== w) giveBad.push(w + '->' + g); }
+    ok('give every weapon', giveBad.length === 0, giveBad.join());
     // pause + step
     const ps = await p.evaluate(() => { const S = FOOT.S; FOOTLAB.pause(true); const t0 = S.time; FOOT.sim(0); return t0; });
     await sleep(400);

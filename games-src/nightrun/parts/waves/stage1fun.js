@@ -66,7 +66,7 @@ const S1F=window.S1F={
   NR.on('tick',dt=>{if(!S1F.on())return;S1F.apply();const e=P.emp|0;if(e<S1F.e0)S1F.log.emp.push(+G.dbar.toFixed(1));S1F.e0=e;
     const p=S1F.gold;if(p&&!G.dead){if(p.dead){S1F.gold=null;if(!p.exp){S1F.log.paid=(S1F.log.paid|0)+1;G.score+=1000;floater(P.x,P.y-44,'BOUNTY +1000','#ffd23d');const d=SL.log.dec[SL.log.dec.length-1];if(d)d.got=1;}}   // collected by touch (b.js adds the repair)
       else{p.age+=dt;p.vx=0;p.vy=0;if(p.age>3){p.dead=1;p.exp=1;}}}
-    if(RET.s1gaps&&!S1F.warned&&S1F.bar()>=S1F.LEAD-1){S1F.warned=1;S1F.log.warn=+G.t.toFixed(1);banner('WARNUNG','something huge is closing in',true,2.6);AU.sfx('warn');}});
+    if(RET.s1gaps&&!S1F.warned&&S1F.bar()>=S1F.LEAD-1){S1F.warned=1;S1F.log.warn=+G.t.toFixed(1);banner('WARNING','something huge is closing in',true,2.6);AU.sfx('warn');}});
   NR.on('bossIn',()=>{if(S1F.on())S1F.log.bossIn=+G.t.toFixed(1);});
   /* W177 BOUNTY WITH TEETH (RET.s1bounty): the courier pays nothing when shot (slice.js would pay 1000 at once); it drops a gold repair that waits 3 s where it died, between the two guns, and +1000 is paid when the ship touches it */
   if(RET.s1bounty===undefined)RET.s1bounty=!/[?&]s1bounty=0/.test(location.search);

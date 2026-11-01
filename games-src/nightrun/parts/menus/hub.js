@@ -90,7 +90,6 @@ if(RET.hub)setTimeout(()=>{
       ['LAB',()=>'try any enemy, boss or weapon','#labBtn',1]],keys:1},
     profile:{t:'PROFILE',a:[
       ['STATS',()=>'records and achievements','#statsBtn'],
-      ['CHECKLIST',()=>{const b=old('.ckB');const m=b&&/\((\d+)\)/.exec(b.textContent);return m?m[1]+' items to check':'owner test list';},'.ckB'],
       ['STORY LOG',()=>'everything that happened so far','#sgBtn|#taleBtn'],
       ['SETTINGS',()=>'gameplay, display, audio, controls','#setBtn'],
       ['SAVES',()=>'save slots, export and import','#setBtn',0,0,'da']],

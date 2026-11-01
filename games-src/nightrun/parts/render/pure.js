@@ -11,6 +11,7 @@
 if(RET.purelook===undefined)RET.purelook=!/[?&]purelook=0/.test(location.search);   // W215: the default flight look
 const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W219: player 1.6x the enemies' texel scale on the phone, 1.3x on PC
   pl(){const s=ART.ANIM.s['ship-'+shipDef().id+'/flame'];return(s?s[2]:260)*this.K*this.PK;},   // the player's drawn length (world units)
+  FOEF:'brightness(2) contrast(1.15) saturate(1.1)',SHIPF:'brightness(1.3) saturate(1.15)',   // W302 (17h value lift only): enemies off the dark city by value, the player one step brighter still
   WARM:/^(beat|disc|flame|orbit|shell|storm|swarm)$/,   // W215: weapon shot pictures in the enemy-shot hues (lime / yellow / orange): drawn as the cool standard shot instead
   dim(b,v){const D=this.DM||(this.DM=new Map());let c=D.get(b);if(c)return c;   // W219: backdrop layers only, once per picture: brightness .65, saturate .85, so the play layer is the brightest thing
     c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=`brightness(${v||.65}) saturate(.85)`;x.drawImage(b,0,0);D.set(b,c);return c;},
@@ -36,16 +37,16 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     if(nr)this.tile(nr,H-130,130,scroll,1.1,1);},   // the near strip keeps full value (play-layer depth)
   sheet(e){const M=ENEMY_ART[FOEART.id(e)];if(!M||e.type==='gate')return null;const m=M.native?{s:M.s||'e'+e.type,k:M.k||4.2}:FOEART.map(e);if(!m||!m.s)return null;
     const b='ship-'+m.s+'/',v=e.arm&&ART.ANIM.s[b+'volley']&&ART.anim(b+'volley'),key=b+(v?'volley':'flame');if(!ART.ANIM.s[key]||!ART.anim(key))return null;ART.anim(b+'death');return{m,key};},
-  foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,this.pl()*.55),Math.max(this.K*fw*1.25,this.pl()*.55)),sc=w/fw,rot=m.rot?m.rot(e,t):0;
-    ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);this.ink(sc*s[2]+8,sc*s[3]+8,()=>ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false),null,key+'|'+Math.round(sc*20)+'|'+this.fk(key,(e.t||0)+eb_(e)));ctx.restore();
+  foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],fl=this.pl()*(wcv!==cv?.68:.55),w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,fl),Math.max(this.K*fw*1.25,fl)),sc=w/fw,rot=m.rot?m.rot(e,t):0;
+    ctx.save();ctx.translate(e.x,e.y);if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,e.r-sc*s[3]/2);this.ink(sc*s[2]+8,sc*s[3]+8,()=>{ctx.filter=this.FOEF;ART.drawAnim(ctx,key,(e.t||0)+eb_(e),0,0,sc,false);ctx.filter='none';},.6,key+'|'+Math.round(sc*20)+'|'+this.fk(key,(e.t||0)+eb_(e)));ctx.restore();
     e._fs=sc;e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
   player(t){if(G.dead)return;const id=shipDef().id,key='ship-'+id+'/flame',k=this.K*this.PK;ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
     const s=ART.ANIM.s[key],L=s?s[2]*k:56,e=ART.bm['fx-engine'];   // W215: owner engine light (fx-engine, painted on black) under the tail, steady flicker, no ring or halo
-    if(e){const w=L*(.42+.04*Math.sin(t*38)),h=w*e.height/e.width*1.3;ctx.globalCompositeOperation='lighter';ctx.drawImage(e,-L*.22-w,-h/2,w,h);ctx.globalCompositeOperation='source-over';}else if(e===undefined)ART.load('fx-engine');
+    if(e){const w=L*((wcv!==cv?.6:.46)+.04*Math.sin(t*38)),h=w*e.height/e.width*1.3;ctx.globalCompositeOperation='lighter';ctx.drawImage(e,-L*.22-w,-h/2,w,h);ctx.drawImage(e,-L*.22-w*.6,-h*.3,w*.6,h*.6);ctx.globalCompositeOperation='source-over';}   // W302: engine light larger on phone and a hot core pass: the ship is found by its light firstelse if(e===undefined)ART.load('fx-engine');
     if(RET.sprites&&SPR.shipOn(id)&&s)this.rim(key,t,k,s);   // the player one notch above the enemies' texel scale (1.35x, inside the 1.5x band): it must read first
    else ART.put(ART.sp('spr-ship-'+id,this.K*520*this.PK),0,0);
     ctx.restore();},
-  rim(key,t,k,s){this.ink(s[2]*k+8,s[3]*k+8,()=>ART.drawAnim(ctx,key,t,0,0,k,false),null,key+'|'+Math.round(k*20)+'|'+this.fk(key,t));},   // W215: the player's frame with a 1 px outline (no glow, no ring)
+  rim(key,t,k,s){this.ink(s[2]*k+8,s[3]*k+8,()=>{ctx.filter=this.SHIPF;ART.drawAnim(ctx,key,t,0,0,k,false);ctx.filter='none';},.9,key+'|'+Math.round(k*20)+'|'+this.fk(key,t));},   // W215: the player's frame with a 1 px outline (no glow, no ring)
   fk(key,t){const i=ART.aframe(key,t);return i+'.'+Math.round(ART.aP*4);},   // W255: sheet frame + crossfade step, the cache key part of an animated actor (looping time would never repeat)
   ink(w_,h_,fn,lit,ck){   // W244: ONE ink pass for every actor (player, enemies, boss, pickups): fn draws the actor at the local origin (current transform = its place); we add the same outline weight, one soft ink shadow offset down-right (key light upper left) and a thin warm lit edge on the upper left. No blur: offset copies of one silhouette, built into pooled canvases.
     const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(w_*ps+8),h=Math.ceil(h_*ps+8);
@@ -69,30 +70,22 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     if(T){const px=(this.IP||0)+w*h;this.IP=px;CC.set(CK,{cv:T,w,h,W:W_,H:H_});for(const[k,e]of CC){if(this.IP<=8e6)break;this.IP-=e.w*e.h;CC.delete(k);}ctx.drawImage(T,0,0,w,h,X,Y,W_,H_);}},
   hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=v==='w'?'saturate(0) brightness(1.6)':'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,0,0);return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white (made once per picture)
   pic(n,x,y,w,ang,hk){const v=/~([ow])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
-  shots(){for(const b of G.pb){if(b.y<12)continue;const fa=Math.min(b.x>W*.7?1-(b.x-W*.7)/(W*.3):1,1-(Math.hypot(b.x-P.x,b.y-P.y)-W*.4)/(W*.25));if(fa<.05)continue;ctx.globalAlpha=Math.min(1,fa);const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
-      if(wn&&this.pic(wn,b.x,b.y,44,a))continue;
-      const n=b.hv?'fx-shot-hv':b.ec?'fx-shot-ec':'fx-shot-std',w=b.hv?52:b.ec?40:(b.len||(b.big?22:20))*2.4*(b.pf?1.3:1);
-      if(this.pic(n,b.x,b.y,w,a,1.7)&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
-    ctx.globalAlpha=1;
-    for(const b of G.eb){const a=Math.atan2(b.vy||0,b.vx||-1);
-      if(b.hm>0&&this.pic('fx-orb-homing',b.x,b.y,b.r*3.6))continue;
-      if(b.k==='n'&&this.pic('fx-bullet-shell',b.x,b.y,b.r*7,a,.38)){this.pic('fx-bullet-needle~w',b.x,b.y,b.r*6,a,1.4);continue;}   // W219: needle = the owner's orange shell drawn as a long bolt (the shell family reads best) with the needle, whitened once, as its hot core
-      if(b.k==='r'&&this.pic('fx-bullet-rocket',b.x,b.y,b.r*6,a))continue;
-      if(b.k&&this.pic('fx-bullet-shell',b.x,b.y,b.r*4,a))continue;
-      this.pic('fx-bullet-enemy',b.x,b.y,b.r*3.4);}},
-  coin(p,y,t){const k='pk-coin/spin',s=ART.ANIM.s[k];if(!s||!ART.anim(k))return false;ctx.save();ctx.filter='hue-rotate(105deg)';ART.drawAnim(ctx,k,t+p.bob,p.x,y,22/s[2],false);ctx.restore();return true;},   // W219: shards as the owner's spinning coin: it reads as a pickup, not a bullet
-  pickups(t){for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;if(p.t==='pw'){const o=ART.sp('pk-'+p.k,40);if(!o&&ART.bm['pk-'+p.k]===undefined)ART.load('pk-'+p.k);if(o){ctx.save();ctx.translate(p.x,y);ART.put(o,0,0,Math.sin(t*2+p.bob)*.08);ctx.restore();}continue;}   // W219: the owner's power-up picture only (no hex, ring, glow or caption)
-      if(p.t==='shard'){this.coin(p,y,t);continue;}ctx.save();ctx.translate(p.x,y);pkPaint(p,t);ctx.restore();}},
+  shots(){const ph=wcv!==cv,g=ph?1.4:1;   // W302: phone player shots 1.4x and thicker (owner: 'player bullets are not visible at all'); still under the enemy shots (drawn first)
+    for(const b of G.pb){if(b.y<12)continue;const fa=Math.min(b.x>W*.7?1-(b.x-W*.7)/(W*.3):1,1-(Math.hypot(b.x-P.x,b.y-P.y)-W*.55)/(W*.25));if(fa<.05)continue;ctx.globalAlpha=Math.min(1,fa);const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
+      if(wn&&this.pic(wn,b.x,b.y,44*g,a))continue;
+      const n=b.hv?'fx-shot-hv':b.ec?'fx-shot-ec':'fx-shot-std',w=(b.hv?52:b.ec?40:(b.len||(b.big?22:20))*2.4*(b.pf?1.3:1))*g;
+      if(this.pic(n,b.x,b.y,w,a,ph?2.4:1.7)&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,ph?1.4:1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
+    ctx.globalAlpha=1;},   // W302: player shots only; enemy shots have ONE owner, PB.ebul (pureboss.js), called from draw() right after this
   draw(t,dt){const PT=wcv!==cv;for(const c of[vctx,wctx]){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='medium';}
     if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);this.bg(true,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
     else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
     ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
     const sh=G.shake;ctx.save();if(sh)ctx.translate(rnd(-sh,sh)*.5,rnd(-sh,sh)*.5);
     if(!PT)this.bg(false,G.scroll);
-    this.pickups(t);
+    PB.pickups(t);   // W302: pickups have one owner, PB.pickups (pureboss.js)
     FOEART.fr++;for(const e of G.en)if(!this.foe(e,t))drawEnemy(e,t);   // bosses / gate pylons: the old draw (no single sheet here yet)
     if(ART.gh.length)ART.ghosts();
-    this.shots();
+    this.shots();PB.ebul();
     for(const q of ART.fx)if(!q._h&&/muzzle/.test(q.k)){q.sz*=.5;q._h=1;}   // W219: the player's muzzle burst at half size (render-only fx list)
     ART.fxDraw();
     this.player(t);

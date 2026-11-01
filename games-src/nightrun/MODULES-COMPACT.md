@@ -98,7 +98,6 @@ title|6|title diet + CONTINUE, 14 px type floor|title,title,type+
 cp|10|checkpoints with grace on long stages|cp,cp
 fs|5|phone full screen on first tap|fs,fs
 readable|11|bullets and threats readable at a glance|read,read
-bulletart|1|real bullet pictures (converted approved previews) for enemy|-
 legible|7|enemies, enemy bullets and pickups readable on every stage b|legible,legible
 arsenal|17|12 extra power-ups and the context-aware drop picker|powers,powers
 abup|20|DASH/EMP upgrades and power-up interaction|abup,abup

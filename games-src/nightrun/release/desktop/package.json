@@ -1,0 +1,10 @@
+{
+  "name": "mainhattan-nightrun",
+  "productName": "Mainhattan Nightrun",
+  "version": "1.0.0",
+  "description": "Mainhattan Nightrun desktop build",
+  "main": "main.js",
+  "author": "Am015-dev",
+  "license": "UNLICENSED",
+  "private": true
+}

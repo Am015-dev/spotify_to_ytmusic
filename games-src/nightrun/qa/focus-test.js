@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FOCUS (parts/menus/focus.js, flag RET.focus): title = FLIGHT / ON FOOT / SETTINGS / LAB; one song per mode; result + pause screens RETRY / TITLE.
+// FOCUS (parts/menus/focus.js, flag RET.focus): title = FLIGHT / ON FOOT / SETTINGS (+ LAB with ?lab=1); one song per mode; result + pause screens RETRY / TITLE.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/qa/focus-test.js     env: GAME_DIR=<dir with index.html>
 // Stepped (no real-time play): flight stage 1 is stepped with __mnr.step, the street with street2-test's bot (FOOT.sim). Audio needs the autoplay switch (set here).
 // Every step the song that is really playing (AU.cur.stage, BT.stage, a pending change) is sampled; every AU.startStage / switchTo call is logged with the mode.
@@ -10,7 +10,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const res = [], ok = (p, n, i) => { res.push(!!p); console.log((p ? 'PASS ' : 'FAIL ') + n + (p || !i ? '' : ' :: ' + String(i).slice(0, 300))); };
 const s3 = fs.readFileSync(path.join(__dirname, 'street3-test.js'), 'utf8'), m = s3.match(/const SEED = (\(\) => \{.*\});\n/), SEED = eval(m[1]);
 const s2 = fs.readFileSync(path.join(__dirname, 'street2-test.js'), 'utf8'), RUN = s2.slice(s2.indexOf('const RUN = ') + 12, s2.indexOf('\n(async () =>')).trim().replace(/;$/, '');
-const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.getClientRects().length && getComputedStyle(b).visibility !== 'hidden').map(b => b.textContent.trim().replace(/\s+/g, ' '));
+const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.getClientRects().length && getComputedStyle(b).visibility !== 'hidden' && !/^focS\d+$/.test(b.id)).map(b => b.textContent.trim().replace(/\s+/g, ' ').replace(/^FLIGHT.*$/, 'FLIGHT'));   // W292/W303: stage-row digits are not menu buttons; FLIGHT carries a 'Stage N' label
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME], { stdio: 'ignore' });
   await sleep(700); const br = await PW.chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }), errs = [];
@@ -25,7 +25,7 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
   // ---- focus on
   const p = await page(''); await p.evaluate(() => { SND.AU.init(); SND.AU.a.resume(); }); await sleep(300);
   const tv = await p.evaluate(VIS);
-  ok(tv.length === 4 && ['FLIGHT', 'ON FOOT', 'SETTINGS', 'LAB'].every(t => tv.includes(t)), `title has exactly the 4 buttons: ${tv.join(' | ')}`);
+  ok(tv.length === 3 && ['FLIGHT', 'ON FOOT', 'SETTINGS'].every(t => tv.includes(t)) && !tv.includes('LAB'), `title has exactly the 3 buttons (no LAB without ?lab=1): ${tv.join(' | ')}`);
   await p.evaluate(() => { window.MODE = 'title'; window.LOG = []; window.PLAY = {}; const AU = SND.AU;
     for (const f of ['startStage', 'switchTo']) { const o = AU[f]; AU[f] = function () { LOG.push(MODE + ':' + f + ':' + [].slice.call(arguments).join(',')); return o.apply(this, arguments); }; }
     window.SAMPLE = () => { const c = SND.AU.cur, B = __mnr.BT, set = (PLAY[MODE] = PLAY[MODE] || new Set()); if (c && c.stage) set.add(c.stage); if (B && B.stage) set.add(B.stage); if (B && B.pend && B.pend.v && B.pend.v.stage) set.add(B.pend.v.stage); if (SND.AU.want) set.add(SND.AU.want); }; });
@@ -43,12 +43,12 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
     }
     SAMPLE(); return { why, eye: document.getElementById('overEyebrow').textContent, hp: M.P.hp, t: M.G.t, boss: !!M.G.bossDone || !!M.G.boss, st: M.ST.n };
   }, clearAt);
-  await p.evaluate(() => { MODE = 'flight'; }); await p.click('#focFlight');
+  await p.evaluate(() => { MODE = 'flight'; }); await p.evaluate(() => document.getElementById('focS1').click());   // the save sits at stage 4 (FLIGHT would resume there, and later stages legitimately play their own boss/district songs): the one-song rule is stage 1's
   await p.waitForFunction(() => __mnr.running, null, { timeout: 8000 });
   const f1 = await flightRun(900); console.log(`  flight run 1: ${JSON.stringify(f1)}`);
   const sc = await p.evaluate(() => { const v = id => { const e = document.getElementById(id); return !!(e && e.getClientRects().length); }; return { res: v('stres'), over: v('over'), next: v('srNext'), stages: v('srMenu') || v('stBtn2'), retry: v('srRetry') || v('againBtn'), title: v('focTitle') || v('menuBtn') }; });
   ok(f1.why === 'clear', `flight stage 1 ran to its end (${f1.why}, stage ${f1.st})`);
-  ok(!sc.next && !sc.stages && sc.retry && sc.title, `result screen offers RETRY + TITLE only: ${JSON.stringify(sc)}`);
+  ok(!sc.stages && sc.retry && sc.title, `result screen offers (NEXT STAGE,) RETRY + TITLE, no stage map: ${JSON.stringify(sc)}`);
   await clickRetry(); await p.waitForFunction(() => __mnr.running, null, { timeout: 8000 });
   // stage 1 has no boss: ask for the boss song, a boss second part, a fever cue, a sting and a duck the way the boss / music pack code does
   await p.evaluate(() => { __mnr.simOn(true); for (let i = 0; i < 300; i++) { __mnr.P.hp = __mnr.P.max; __mnr.step(1 / 60); } const AU = SND.AU; AU.startStage('boss'); AU.switchTo('boss2'); AU.switchTo('boss-d0~b'); AU.switchTo('fever-120'); AU.startStage('stage2'); AU.sting('clear'); AU.duckMusic(1); for (let i = 0; i < 300; i++) { __mnr.P.hp = __mnr.P.max; __mnr.step(1 / 60); if (i % 30 === 0) SAMPLE(); } });
@@ -62,7 +62,7 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
   const fl = await p.evaluate(() => ({ calls: LOG.filter(c => /^flight:/.test(c)), play: [...(PLAY.flight || [])] }));
   ok(fl.play.length === 1 && fl.play[0] === song1, `flight: exactly one song ever playing: ${fl.play.join(',')} (stage-1 song ${song1})`);
   console.log(`  flight calls: ${fl.calls.length} (${[...new Set(fl.calls)].join(' ')})`);
-  const back = await p.evaluate(VIS); ok(back.length === 4, `back at the title with the 4 buttons: ${back.join(' | ')}`);
+  const back = await p.evaluate(VIS); ok(back.length === 3, `back at the title with the 3 buttons: ${back.join(' | ')}`);
   // ---- street run: ON FOOT -> bot plays the stage -> RETRY -> TITLE
   await p.evaluate(() => { MODE = 'street'; PLAY.street = new Set(); LOG.length = 0; RET.tale = false; });
   await p.click('#focFoot'); await p.waitForFunction(() => FOOT.on && FOOT.S && !document.getElementById('footQ'), null, { timeout: 20000 });
@@ -81,7 +81,7 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
   const st = await p.evaluate(() => ({ calls: LOG.filter(c => /^street:/.test(c)), play: [...PLAY.street] }));
   ok(st.play.length === 1 && st.play[0] === 'street1', `street: exactly one song ever playing: ${st.play.join(',')}`);
   ok(st.calls.every(c => /startStage:street1/.test(c)), `street: every call is street1: ${[...new Set(st.calls)].join(' ')}`);
-  const end = await p.evaluate(VIS); ok(end.length === 4, `title again after the street: ${end.join(' | ')}`);
+  const end = await p.evaluate(VIS); ok(end.length === 3, `title again after the street: ${end.join(' | ')}`);
   ok(errs.length === 0, `page errors ${errs.length} ${errs[0] || ''}`);
   await br.close(); srv.kill(); const f = res.filter(x => !x).length; console.log(f ? 'FAIL focus-test' : 'PASS focus-test'); process.exit(f ? 1 : 0);
 })().catch(e => { console.log('FAIL focus-test ' + e.message); process.exit(1); });

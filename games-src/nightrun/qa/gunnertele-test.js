@@ -20,6 +20,6 @@ const RUN = async runs => { const M = __mnr, RET = M.RET, F = FOOT; RET.tale = f
   const b = await PW.chromium.launch(), p = await b.newPage(), errors = []; p.on('pageerror', e => errors.push(e.message));
   await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1${Q}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.FOOT, null, { timeout: 20000 }); await sleep(600);
   const g = await p.evaluate(`(${RUN})(${RUNS})`), ok = g.filter(x => x >= 0), mn = Math.min(...ok), md = ok.slice().sort((a, b) => a - b)[ok.length >> 1];
-  console.log(`gaps n=${ok.length}/${g.length} min=${mn} median=${md} max=${Math.max(...ok)}`); console.log((ok.length >= RUNS * 0.8 && mn >= 0.4 ? 'PASS' : 'FAIL') + ' gunner charge-shot telegraph gap >= 0.4 s'); console.log((errors.length ? 'FAIL ' + errors[0] : 'PASS 0 page errors'));
-  await b.close(); srv.kill(); process.exit(0);
+  console.log(`gaps n=${ok.length}/${g.length} min=${mn} median=${md} max=${Math.max(...ok)}`); const pass = ok.length >= RUNS * 0.8 && mn >= 0.4 && !errors.length; console.log((ok.length >= RUNS * 0.8 && mn >= 0.4 ? 'PASS' : 'FAIL') + ' gunner charge-shot telegraph gap >= 0.4 s'); console.log((errors.length ? 'FAIL ' + errors[0] : 'PASS 0 page errors'));
+  await b.close(); srv.kill(); process.exit(pass ? 0 : 1);
 })().catch(e => { console.log('FAIL crashed: ' + e.stack); process.exit(2); });

@@ -67,10 +67,11 @@ RET.st=(function(on){
   const BY=Object.fromEntries(A.map(a=>[a.id,a]));
   const TC={b:'#d08a4a',s:'#c9d2e0',g:'#ffd23d'},TN={b:'BRONZE',s:'SILVER',g:'GOLD'};
   /* ---- toast queue: one at a time, each shown 2 s, non-blocking ---- */
-  const Q=[];let showing=false;
+  const Q=[];let showing=false,tk=0;
   function toast(a){Q.push(a);if(!showing)next();}
   /* the toast waits (queued) while the pit stop, the clear screen or the chest reveal is open: it used to cover their titles */
-  const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';})||!!(G&&G.banner&&G.banner.warn&&G.banner.t>0)||(typeof running!=='undefined'&&running&&!(typeof paused!=='undefined'&&paused));   // review 10 #12; owner 22 Oct: nothing pops up during play, achievements wait for the end of the stage: no toast during a boss intro
+  const scr=()=>['shop','stres','chest','over'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';});   // W307: a result / fail / shop / chest screen with buttons and the FUN row
+  const blocked=()=>scr()||!!(G&&G.banner&&G.banner.warn&&G.banner.t>0)||(typeof running!=='undefined'&&running&&!(typeof paused!=='undefined'&&paused));   // review 10 #12; owner 22 Oct: nothing pops up during play, achievements wait for the end of the stage: no toast during a boss intro
   /* menufix: the toast sits in the first slot (top, then bottom) where no button, tab, card or input lies under it; if none is clear it waits (queued) */
   const HIT='button,a[href],input,select,textarea,label,[role=button],[onclick],.go,.card,.tabs,.seg';
   function mfFree(e){const r=e.getBoundingClientRect();if(!r.width)return false;for(let i=0;i<=6;i++)for(let j=0;j<=2;j++){const x=r.left+r.width*i/6,y=r.top+r.height*j/2,t=document.elementFromPoint(Math.min(innerWidth-1,Math.max(0,x)),Math.min(innerHeight-1,Math.max(0,y)));if(t&&t!==e&&t.closest(HIT))return false;}return true;}
@@ -82,7 +83,8 @@ RET.st=(function(on){
     e.className='';e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
     if(!mfSlot(e)){Q.unshift(a);setTimeout(next,500);return;}
     e.classList.add('show');try{if(window.AU&&AU.sting)AU.sting('clear');}catch(x){}
-    setTimeout(()=>{e.classList.remove('show');setTimeout(next,0);},2000);}
+    const id=++tk,iv=setInterval(()=>{if(id!==tk){clearInterval(iv);return;}if(scr()){clearInterval(iv);tk++;e.classList.remove('show');Q.unshift(a);setTimeout(next,400);}},100);   // W307: a screen opened under a toast that was already up: take it down, show it again after
+    setTimeout(()=>{if(id!==tk)return;clearInterval(iv);tk++;e.classList.remove('show');setTimeout(next,0);},2000);}
   /* ---- unlocks ---- */
   function check(silent){if(!on)return[];const got=[];
     for(const a of A){if(D.a[a.id])continue;let ok=false;try{ok=!!a.f();}catch(e){}

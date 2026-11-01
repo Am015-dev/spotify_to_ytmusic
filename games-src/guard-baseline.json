@@ -460,7 +460,6 @@
    "nightrun/parts/difficulty/cp.js",
    "nightrun/parts/core/fs.js",
    "nightrun/parts/render/readable.js",
-   "nightrun/parts/art/bulletart.js",
    "nightrun/parts/render/legible.js",
    "nightrun/parts/powers/arsenal.js",
    "nightrun/parts/powers/abup.js",

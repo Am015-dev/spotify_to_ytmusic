@@ -1,0 +1,53 @@
+# Music NOT cleared for sale (W298). One game-relative path per line. package.py leaves these out of nightrun-web.zip and
+# nightrun-download.zip and removes them from music/tracks.json and offline.json. Delete a line only after the owner has
+# confirmed its row in MUSIC-PROVENANCE.md; then run: python3 games-src/nightrun/release/package.py
+# --- A. older songs (11): generator and plan not recorded in the repo
+music/athina.mp3
+music/athina2.mp3
+music/boss.mp3
+music/boss2.mp3
+music/boss3.mp3
+music/endless.mp3
+music/endless2.mp3
+music/menu.mp3
+music/stage1.mp3
+music/stage2.mp3
+music/stage3.mp3
+# --- B. polish pack (37): Treblo, commercial terms unverified
+media/mp-athA.mp3
+media/mp-athB.mp3
+media/mp-boss-d1.mp3
+media/mp-boss-d1_b.mp3
+media/mp-boss-d2.mp3
+media/mp-boss-d2_b.mp3
+media/mp-boss-d3.mp3
+media/mp-boss-d3_b.mp3
+media/mp-boss-d4.mp3
+media/mp-boss-d4_b.mp3
+media/mp-d1a.mp3
+media/mp-d1b.mp3
+media/mp-d2a.mp3
+media/mp-d2b.mp3
+media/mp-d3a.mp3
+media/mp-d3b.mp3
+media/mp-d4a.mp3
+media/mp-d4b.mp3
+media/mp-endless3.mp3
+media/mp-fever-120.mp3
+media/mp-fever-128.mp3
+media/mp-fever-132.mp3
+media/mp-pit.mp3
+media/mp-st-boss-in.mp3
+media/mp-st-clear.mp3
+media/mp-st-fail.mp3
+media/mp-st-perfect.mp3
+media/mp-st-phase.mp3
+media/mp-st-tierup1.mp3
+media/mp-st-tierup2.mp3
+media/mp-st-tierup3.mp3
+media/mp-st-unlock.mp3
+media/mp-street1-boss.mp3
+media/mp-street1-boss_b.mp3
+media/mp-street1-clear.mp3
+media/mp-street1-lock.mp3
+media/mp-street1.mp3

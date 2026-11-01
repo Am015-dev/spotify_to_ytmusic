@@ -40,12 +40,15 @@ async function audioGain(p) { return p.evaluate(() => { const A = __mnr.AU; retu
 async function title(b, W, H, touch) {
   const T = `${W}x${H} title `, p = await open(b.br, b.base, W, H, '?nomusic=1', null, touch);
   ok(T + 'title visible at load', await shown(p, '#title'));
-  const labels = { '#focFlight': 'FLIGHT', '#focFoot': 'ON FOOT', '#focSet': 'SETTINGS', '#focLab': 'LAB' };
-  for (const s in labels) { const r = await p.evaluate(s => { const e = document.querySelector(s); if (!e) return 'missing'; const r = e.getBoundingClientRect(); return e.textContent.trim() === ({ '#focFlight': 'FLIGHT', '#focFoot': 'ON FOOT', '#focSet': 'SETTINGS', '#focLab': 'LAB' })[s] && r.width >= 44 && r.height >= 44 ? 'ok' : 'label/size ' + e.textContent + ' ' + r.width + 'x' + r.height; }, s); ok(T + s + ' says ' + labels[s] + ' and is >= 44 px', r === 'ok', r); }
+  const labels = { '#focFlight': 'FLIGHT', '#focFoot': 'ON FOOT', '#focSet': 'SETTINGS' };
+  for (const s in labels) { const r = await p.evaluate(s => { const e = document.querySelector(s); if (!e) return 'missing'; const r = e.getBoundingClientRect(); return e.textContent.trim().startsWith(({ '#focFlight': 'FLIGHT', '#focFoot': 'ON FOOT', '#focSet': 'SETTINGS', '#focLab': 'LAB' })[s]) && r.width >= 44 && r.height >= 44 ? 'ok' : 'label/size ' + e.textContent + ' ' + r.width + 'x' + r.height; }, s); ok(T + s + ' says ' + labels[s] + ' and is >= 44 px', r === 'ok', r); }
+  // buyers (no ?lab=1): three title buttons, LAB not shown
+  { const pb = await open(b.br, b.base, W, H, '?nomusic=1', null, touch); ok(T + 'no ?lab=1: FLIGHT, ON FOOT, SETTINGS only (LAB hidden)', await pb.evaluate(() => !document.getElementById('focLab') && ['focFlight', 'focFoot', 'focSet'].every(i => !!document.getElementById(i))), ''); await pb.context().close(); }
+  { const pl = await open(b.br, b.base, W, H, '?nomusic=1&lab=1', null, touch); ok(T + '?lab=1: LAB is the fourth title button', await pl.evaluate(() => { const e = document.getElementById('focLab'); return !!e && e.textContent.trim() === 'LAB'; }), ''); await pl.context().close(); }
   // tab order on the title = the visible reading order
   const order = []; await p.evaluate(() => document.activeElement && document.activeElement.blur());
   for (let i = 0; i < 14; i++) { await p.keyboard.press('Tab'); const f = await p.evaluate(() => { const a = document.activeElement; if (!a || a === document.body) return ''; const r = a.getBoundingClientRect(); return (a.id || a.tagName) + (r.width > 0 && r.height > 0 && getComputedStyle(a).visibility !== 'hidden' ? '' : '!HIDDEN'); }); order.push(f); }
-  const i0 = order.indexOf('focFlight'); ok(T + 'Tab reaches FLIGHT, ON FOOT, SETTINGS, LAB in that order', i0 >= 0 && order.slice(i0, i0 + 4).join() === 'focFlight,focFoot,focSet,focLab', order.join());
+  const i0 = order.indexOf('focFlight'); ok(T + 'Tab reaches FLIGHT, ON FOOT, SETTINGS in that order', i0 >= 0 && order.slice(i0, i0 + 3).join() === 'focFlight,focFoot,focSet', order.join());
   ok(T + 'no hidden element takes keyboard focus on the title', !order.some(x => /!HIDDEN/.test(x)), order.filter(x => /!HIDDEN/.test(x)).join());
   const ring = await p.evaluate(() => { const e = document.getElementById('focFlight'); e.focus(); const c = getComputedStyle(e); return c.outlineStyle !== 'none' && parseFloat(c.outlineWidth) > 0 || c.boxShadow !== 'none'; });
   ok(T + 'focused FLIGHT shows a focus ring', ring);
@@ -150,11 +153,11 @@ async function behaviour(b, W, H, touch) {
   await p.evaluate(() => __mnr.setVal('fpsc', true)); await sleep(200); const fpsOn = await shown(p, '#fpsEl'); await p.evaluate(() => __mnr.setVal('fpsc', false)); await sleep(200);
   if (touch) ok(T + 'FPS counter row is hidden on a phone, where it can never show (it works on PC and with ?test=1 only)', !(await shown(p, '#setBody .seg[data-k="fpsc"]')), 'row is offered but FPSOK() is false on touch');
   else ok(T + 'FPS counter On shows the counter, Off hides it', fpsOn && !(await shown(p, '#fpsEl')), String(fpsOn));
-  // calibration: TAP TEST really measures and sets Latency
+  // calibration: TAP CHECK really measures and sets Latency
   await p.evaluate(() => __mnr.setVal('sync', 0)); await reach(p, '#calBtn', touch);
-  ok(T + 'TAP TEST opens the pad', (await press(p, '#calBtn', touch)) === 'ok' && await shown(p, '#calPad'));
+  ok(T + 'TAP CHECK opens the pad', (await press(p, '#calBtn', touch)) === 'ok' && await shown(p, '#calPad'));
   const cal0 = await p.evaluate(() => ({ on: __mnr.CAL.on, need: __mnr.CAL.need }));
-  ok(T + 'TAP TEST starts the click track and asks for 8 taps', cal0.on && cal0.need === 8, JSON.stringify(cal0));
+  ok(T + 'TAP CHECK starts the click track and asks for 8 taps', cal0.on && cal0.need === 8, JSON.stringify(cal0));
   for (let i = 0; i < 8; i++) { await press(p, '#calPad', touch); await sleep(260); }
   const cal1 = await p.evaluate(() => ({ done: __mnr.CAL.done, taps: __mnr.CAL.taps.length, info: document.getElementById('calInfo').textContent, sync: __mnr.SET.sync }));
   ok(T + 'after 8 taps the test finishes and says so', /Done|Too far|Last tap/.test(cal1.info), JSON.stringify(cal1));
@@ -173,7 +176,7 @@ async function back(b, W, H, touch) {
   await openSettingsFromTitle(p, touch); await goPage(p, 'assist', touch); await press(p, '#setm .hubHd .hubBk', touch); ok(T + 'settings > Assist: header back arrow goes up one level (to settings)', (await page(p)) === 'main' && await shown(p, '#setm'));
   await goPage(p, 'more', touch); await press(p, '#tdBack', touch); ok(T + 'settings > More: "‹ Settings" goes up one level', (await page(p)) === 'main'); await press(p, '#setBack', touch);
   // LAB
-  await press(p, '#focLab', touch); await sleep(600); const lab = await p.evaluate(() => { const v = [...document.querySelectorAll('.ov,.screen,[id*=lab]')].filter(e => e.offsetParent && /lab/i.test(e.id + e.className)); return v.map(e => e.id || e.className).slice(0, 4); });
+  await p.evaluate(() => document.getElementById('labBtn').click()); await sleep(600); const lab = await p.evaluate(() => { const v = [...document.querySelectorAll('.ov,.screen,[id*=lab]')].filter(e => e.offsetParent && /lab/i.test(e.id + e.className)); return v.map(e => e.id || e.className).slice(0, 4); });
   ok(T + 'LAB opens (the title is covered)', !(await shown(p, '#title')) || (await p.evaluate(() => !!document.getElementById('l2exit') && document.getElementById('l2exit').offsetParent !== null)), JSON.stringify(lab));
   const labBack = await p.evaluate(() => { const bs = [...document.querySelectorAll('button')].filter(e => e.offsetParent && /back|‹|close|title|exit/i.test(e.textContent + e.getAttribute('aria-label') + e.id)).map(e => e.id || e.textContent.trim().slice(0, 12)); return labBack = bs; }).catch(() => []);
   await p.keyboard.press('Escape'); await sleep(400); let t1 = await shown(p, '#title');

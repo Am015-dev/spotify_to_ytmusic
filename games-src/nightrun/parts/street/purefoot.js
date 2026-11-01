@@ -86,6 +86,7 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
     let pose=e.dead?'die':(()=>{try{return e.def.pose?e.def.pose(e):'idle';}catch(x){return'idle';}})();if(!e.dead){if(e.wind>0)pose='melee';else if(e.tele>0)pose='shoot';}   // telegraph = the attack pose
     let et=e.dead?e.dt_||0:e.t;if(RET.footmove&&!e.dead)[pose,et]=mvE(e,e.id,pose,et);
     const ey=e.ext&&e.fly?e.y+e.h/2:e.y;at(c,e.x,ey,K);if(RET.footmove&&!e.dead)turn(c,e,e.x);if(S.boss===e&&SL.barBot&&!e.dead){const m=c.getTransform(),dp=window.devicePixelRatio||1,f=Math.max(.88,Math.min(1,(m.d*ey+m.f-(SL.barBot+8*dp))/(1.25*e.h*m.d)));c.translate(e.x,ey);c.scale(f,f);c.translate(-e.x,-ey);}   // W285/W286: on a short screen the boss name bar covered the head: draw the boss a little smaller (feet fixed, never below 88 %) until the head top is >= 8 px under the bar (draw only, hitboxes unchanged)
+    if(e.dsc&&!e.dead){c.translate(e.x,ey);c.scale(e.dsc[0],e.dsc[1]);c.translate(-e.x,-ey);}   // W300: the boss duel's pose shape (streetboss.js), about the feet
     ART.fE=e;IN.drawWho(c,e.id,pose,e.x,ey,e.h,e.facing<0,et,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;c.restore();SL.z=null;};
   const dK=()=>{SL.z=P.z;at(c,P.x,P.y,K);
     P._xa=IN.kaiX(P);let kp=IN.ppose(P);if(RET.footmove){if(P.shotT>(P._pst||0)+1e-4){P._lst=S.time;if(P.onGround&&!P.crouch)P._fa=null;}P._pst=P.shotT;   // each shot restarts the shoot sheet (recoil frames)
@@ -103,6 +104,8 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
   for(const g of S.bombsL){SL.z=g.z;at(c,g.x,g.y,K);pic(c,'fx-ft-grenade',g.x,g.y,22,S.time*7);c.restore();}
   for(const b of S.eb){SL.z=b.z;at(c,b.x,b.y,K);const ko=keyed('fx-bullet-enemy');if(RET.footmove)eShot(c,b);else if(ko){const w=11,h=w*ko.height/ko.width;c.drawImage(ko,b.x-w/2,b.y-h/2,w,h);}else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();}c.restore();}   // no picture yet: the plain shot
   if(RET.footmove)efx(c,K,at,keyed('fx-bullet-enemy'));SL.z=null;for(const f of S.fx){if(!window.AH)break;if(f.pic){if(SL.band)SL.z=f.z==null?null:f.z;at(c,f.x,f.y,K);AH.ftFx(c,f);c.restore();}else if(f.arc)AH.ftArc(c,Object.assign({},f,{arc:f.arc.map(([x,y])=>[x,SL.my(y)])}));}SL.z=null;
-  c.restore();const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);const hb=SL.hudB,hf=SL.hudFull;X.slFrame(L);SL.hudB=hb;SL.hudFull=hf;return true;}
+  c.restore();const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);
+  if(F.SB&&F.SB.draw){c.save();c.translate(-S.camX,0);F.SB.draw(c,{u,vw,K,t0,my:SL.my,band:SL.band||0,hudB:SL.hudB});c.restore();}   // W300: the boss duel's words, over the HUD stack's bottom (streetboss.js)const hb=SL.hudB,hf=SL.hudFull;X.slFrame(L);SL.hudB=hb;SL.hudFull=hf;return true;}
+  const hb=SL.hudB,hf=SL.hudFull;X.slFrame(L);SL.hudB=hb;SL.hudFull=hf;return true;}
 SL.draw=function(c){return RET.purefoot?pure(c):old.apply(this,arguments);};
 })();

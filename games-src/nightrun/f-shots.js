@@ -2,7 +2,7 @@
 // Screenshots of the F update into games-src/nightrun/playtest/f-*.png: endless mid-song, a dense section, Athens (portrait, landscape), the new upgrades on the ship, the new ships, the pit stop and the garage.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/f-shots.js        env: ONLY=athens,dense,...
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
-const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun'), OUT = path.join(__dirname, 'playtest');
+const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun'), OUT = process.env.NR_OUT || path.join(require('os').tmpdir(), 'nightrun-playtest'); require('fs').mkdirSync(OUT, { recursive: true });
 const ONLY = (process.env.ONLY || '').split(',').filter(Boolean), want = n => !ONLY.length || ONLY.includes(n);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function freePort() { return new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); }); }

@@ -49,7 +49,7 @@ RET.SV=(()=>{
       good=put('mnr_svauto',txt)&&get('mnr_svauto')===txt;
       if(good){setInfo({t:Date.now()});S.flushes++;if(S.fail){S.fail=false;S.msg='';}}else{del('mnr_svauto');if(prev!=null)put('mnr_svauto',prev);fail();}
     }catch(e){good=false;fail();}
-    S.inFlush=false;ui();if(good&&now!==true&&!live()&&S.toastOk)toast('Saved');return good;}
+    S.inFlush=false;ui();if(good&&now!==true&&!live()&&S.toastOk&&!document.querySelector('#over:not([hidden]),#stres:not([hidden]),#fMenu:not([hidden])'))toast('Saved');return good;}   // W321: the Saved pill never sits over a result sheet's buttons
   function soon(){if(S.freeze||!RET.saves)return;S.pending++;if(!tm)tm=setTimeout(()=>{tm=0;flush();},1500);}
   /* ---- slots ---- */
   function saveSlot(i,name){if(i<1||i>S.slots)return false;sync();flush(true);const m=snap(),old=get(slotKey(i)),

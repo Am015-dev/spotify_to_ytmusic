@@ -62,7 +62,7 @@ const AUDIT = ({ root, minPx }) => {
     await menuOpen(p);
     a = await p.evaluate(AUDIT, { root: '#mnMore', minPx: minTxt });
     ok('menu: all buttons >= 44 px, text >= 14 px, nothing clipped' + tag, !a.btn.length && !a.txt.length && !a.clip.length, JSON.stringify(a));
-    const ids = ['#storyBtn', '#wkBtn', '#wpBtn', '#labBtn', '.ckB', '#tutBtn', '#setBtn', '#diffBtn'];
+    const ids = ['#storyBtn', '#wkBtn', '#wpBtn', '#labBtn', '#tutBtn', '#setBtn', '#diffBtn'];
     const seen = {}; for (const i of ids) seen[i] = await p.evaluate(s => { const e = document.querySelector('#mnMore ' + s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0; }, i);
     ok('menu: every old entry point is there (stage map, weekly, weapons, lab, checklist, flight school, settings, difficulty)' + tag, Object.values(seen).every(Boolean), JSON.stringify(seen));
     const scrolls = await p.evaluate(() => { const m = document.getElementById('mnMore'); return m.scrollHeight > m.clientHeight + 1; });

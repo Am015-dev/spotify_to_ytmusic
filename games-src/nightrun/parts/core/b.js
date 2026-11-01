@@ -106,7 +106,7 @@ const nextDi=i=>{const p=posOf(i)+1;return p>=ORDER.length?{di:ORDER[0],wrap:tru
 const songFor=(i,loop)=>{const p=posOf(i);if(window.RET&&RET.dpool)return RET.DP.endless(i,loop|0);return loop?['endless','endless2'][p%2]:DISTRICTS[i]&&DISTRICTS[i].song||['stage1','stage2','stage3'][p%3];};
 const stageFor=(i,boss)=>ST.on?ST.def.song:boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):songFor(i,G.loop);
 function enterDistrict(i){G.di=i;G.pos=posOf(i);G.dt=0;G.d0=G.bc;G.dprog=0;G.force=false;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);DIR.begin(i);
-  if(!(typeof TUT!=='undefined'&&(TUT.on||TUT.D)))banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:'')+DIR.tag(),false,3.2);AU.root=D.root;AU.boss=false;   // review 9 #12: drills show no district banner
+  if(!(typeof TUT!=='undefined'&&(TUT.on||TUT.D)))banner(D.name,D.sub+(G.loop?`  ·  LOOP ${G.loop+1}`:'')+DIR.tag(),false,3.2);AU.root=D.root;AU.boss=false;   // review 9 #12: drills show no district banner
   if(G.live)AU.switchTo(stageFor(i,false));}
 
 /* ---------- the damage model: enemies are seen and fought (BALANCE.md) ----------
@@ -180,7 +180,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
   const nm=o.nm||D.bossName;
   G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
     col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?6:14,p3:mini?11:26,minBar:mini?14:BOSS_MIN_BAR,floor:Math.ceil(hp*.62)};
-  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');NR.emit('bossIn',{mini});
+  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNING',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');NR.emit('bossIn',{mini});
   if(G.live){const sg=bossSong(k,mini);if(sg){AU.switchTo(sg);AU.intense(false);}else AU.intense(true);}
   return G.boss;}
 
@@ -442,7 +442,7 @@ function bossDown(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:tr
   if(!ST.on){const nx=nextDi(G.di),L=nx.wrap?G.loop+1:G.loop;if(G.live)AU.switchTo(songFor(nx.di,L));}   // back to a stage song on the next bar line
   bossLoot(e);
   if(ST.on){ST.bossDown(e,pts);return;}
-  banner('SEKTOR FREI',D.name+' cleared · +'+pts,false,3);G.transT=4.5;}
+  banner('SECTOR CLEAR',D.name+' cleared · +'+pts,false,3);G.transT=4.5;}
 function bossLoot(e){if(!ST.on||GX()<ST.heal)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-80,vy:-40,bob:0});
   G.pk.push({t:WP.canGain()?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
   for(let i=0;i<8;i++)G.pk.push({t:'shard',x:e.x+rnd(-30,30),y:e.y+rnd(-30,30),vx:rnd(-160,-40),vy:rnd(-90,90),bob:0});}

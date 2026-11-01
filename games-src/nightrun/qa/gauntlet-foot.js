@@ -60,7 +60,7 @@ function makeInput(p, plat) {
 
 // ---- state snapshot: plain data only
 const SNAP = () => { const F = window.FOOT, S = F && F.S; if (!S) return null; const P = S.P, u = window.__u = window.__u || { n: 0 };
-  const E = []; for (const e of S.E) { if (e.__u == null) e.__u = ++u.n; E.push({ u: e.__u, id: e.id, x: e.x, y: e.y, hp: e.hp, st: e.state, w: e.wind || 0, f: e.facing, d: !!e.dead, b: !!e.boss, hid: !!e.hid, bw: e.w || 0, hp2: e.hp, mx: e.max || 0, z: e.z == null ? null : +e.z.toFixed(2) }); }
+  const E = []; for (const e of S.E) { if (e.__u == null) e.__u = ++u.n; E.push({ u: e.__u, id: e.id, x: e.x, y: e.y, hp: e.hp, st: e.state, w: e.wind || 0, f: e.facing, d: !!e.dead, b: !!e.boss, hid: !!e.hid, bw: e.w || 0, hp2: e.hp, mx: e.max || 0, z: e.z == null ? null : +e.z.toFixed(2), a: e.atk || '', sT: e.sT || 0, tid: e.tid || 0 }); }
   const cam = F._in.L(); const cw = document.getElementById('game').width; const g = S.gd || null;
   return { on: F.on, t: S.time, end: S.end ? { cleared: S.end.cleared, quit: S.end.quit } : null, paused: S.paused, camX: S.camX, vw: (cam && cam.vw) || 960, lock: S.lock && S.lock.id, wl: S.lock ? S.waves.filter(w => w.lock === S.lock.id && !w.done).length : 0, bossOn: S.bossOn,
     zm: S.zmiss || 0, P: { z: P.z == null ? null : +P.z.toFixed(2), x: P.x, y: P.y, hp: P.hp, max: P.max, g: P.onGround, f: P.facing, inv: P.inv, dash: P.dash, dashIF: P.dashIF, mel: P.mel, bombs: P.bombs, maxX: P.maxX }, guard: g && { on: g.on, m: g.m },
@@ -84,6 +84,25 @@ function strategy(name, rnd) {
       if (atk && Math.abs(dx) < 170) { if (front && s.guard && s.guard.m > .05) { w.guard = true; w.fire = false; w.melee = false; w.mx = 0; } else if (s.P.inv <= 0 && (Math.abs(dx) < 110)) { w.dash = true; w.mx = -Math.sign(dx); } } }
     for (const b of s.eb) { const dx = b.x - s.P.x; if (Math.abs(dx) < 190 && dx * b.vx < 0 && Math.abs(b.y - (s.P.y - 30)) < 60 && s.P.g) { w.jump = true; break; } }
     return w; };
+  if (name === 'duelist' || name === 'late') {   // W290: reads the big heavy's telegraph (SWING -> GUARD, CHARGE -> DASH through, POUND -> JUMP) and answers it RT s after it starts (game time), then punishes the OPEN boss
+    // W300: before the boss both play the street as the W286 'dodger' (the 'tactician' lost every run to rushers before the boss)
+    const RT = name === 'late' ? () => .45 + rnd() * .3 : () => .25 + rnd() * .1, ANS = { swing: 'guard', charge: 'dash', pound: 'jump' }, pre = strategy('dodger', rnd);
+    let tid = -1, R = 0, t0 = 0, key = null, kT = -9, stun0 = -1, Rp = 0;
+    return s => {
+      const B = s.E.find(e => e.b && !e.d); if (!B || !s.bossOn) return pre(s);
+      const P = s.P, dx = B.x - P.x, face = Math.sign(dx) || 1, d = Math.abs(dx), w = { mx: 0, fire: P.f === face, melee: false, jump: false, guard: false, dash: false, bomb: false };
+      if (B.st === 'sb_tel') { if (B.tid !== tid) { tid = B.tid; t0 = s.t - B.sT; R = RT(); key = null; }
+        if (!key && s.t >= t0 + R) { key = ANS[B.a]; kT = s.t; }
+        if (key && s.t - kT < .12) { w[key] = true; if (key === 'dash') w.mx = face; }
+        return w; }
+      if (key === 'dash' && s.t - kT < .3) { w.mx = face; return w; }
+      if (B.st === 'stun') { if (stun0 < 0) { stun0 = s.t - B.sT; Rp = RT(); }
+        if (s.t >= stun0 + Rp) { if (d > 70) w.mx = face; else { w.melee = Math.floor(s.t * 6) % 2 === 0; w.mx = face * .2; } w.fire = P.f === face; }
+        return w; }
+      stun0 = -1;
+      if (d > 320) w.mx = face; else if (P.f !== face) w.mx = face * .35;   // keep the boss in front, in range
+      return w; };
+  }
   if (name === 'tactician') {   // W274: state-aware, human-matchable: parry the telegraphed lunge, punish the OPEN foe, dash/jump the heavy's charge, kite gunners, grenade crowds + the boss, take hearts, stay off the right wall
     let bombAt = -9, dodgeAt = -9;
     return s => {
@@ -120,7 +139,16 @@ function strategy(name, rnd) {
       if (Math.sign(w.mx) && Math.sign(w.mx) !== P.f && !w.fire) w.fire = false;
       return w; };
   }
-  return name === 'aggressor' ? s => aggr(s, false) : s => aggr(s, true);
+  if (name === 'dodger') {   // W300: the generic dodger also answers the boss's telegraph (its own reaction 300-450 ms game time); everything else is aggr(dodge)
+    const ANS = { swing: 'guard', charge: 'dash', pound: 'jump' }; let tid = -1, R = 0, t0 = 0, key = null, kT = -9;
+    return s => { const B = s.E.find(e => e.b && !e.d && e.st === 'sb_tel'), w = aggr(s, true);
+      if (!B) { if (key === 'dash' && s.t - kT < .3) { const n = s.E.find(e => e.b && !e.d); if (n) w.mx = Math.sign(n.x - s.P.x) || 1; } return w; }
+      if (B.tid !== tid) { tid = B.tid; t0 = s.t - B.sT; R = .3 + rnd() * .15; key = null; }
+      Object.assign(w, { guard: false, dash: false, jump: false }); if (!key && s.t >= t0 + R) { key = ANS[B.a]; kT = s.t; }
+      if (key && s.t - kT < .12) { w[key] = true; if (key === 'dash') w.mx = Math.sign(B.x - s.P.x) || 1; if (key === 'guard') { w.fire = false; w.melee = false; w.mx = 0; } }
+      return w; };
+  }
+  return s => aggr(s, false);
 }
 
 // ---- layout audit (phone): every control >= 44 px, inside the screen, no two overlap, labels fit
@@ -172,11 +200,22 @@ async function run(b, plat, strat, seed) {
     await p.evaluate(() => { window.__ftOn = true; }); const decide = strategy(strat, rnd);
     const seen = new Set(), atkd = new Set(), died = new Set(), maxHp = {}; let prev = null, sigT = 0, sig = '', stuck = 0, offT = 0, shotsDone = {}, minMargin = 1e9, camBack = 0, spawnL = [], behindSeen = 0, behindUntil = -1, unwarned = 0, pkMax = 0, lastS = null, fastOn = false, ticks = 0, maxFoes = 0, progBad = 0;
     const t0 = Date.now(); let s = await p.evaluate(SNAP);
-    while (s && !s.end && Date.now() - t0 < MAXREAL) {
+    R.resumes = 0; R.reach = false; const RESUME = +process.env.RESUME || 0;   // W320: RESUME=n = a bot that dies at the boss taps RESUME FROM BOSS (real tap / click) up to n times
+    while (s && Date.now() - t0 < MAXREAL) {
+      if (s.bossOn) R.reach = true;
+      if (s.end) {
+        if (!(RESUME > R.resumes && !s.end.cleared && !s.end.quit && s.bossOn)) break;
+        await inp.release(); await sleep(700); const rb = await p.evaluate(() => { const b = document.getElementById('fBoss'), m = document.getElementById('fMenu'); if (!b || !m || m.hidden) return null; const r = b.getBoundingClientRect(), bs = [...m.querySelectorAll('button')].filter(x => x.getBoundingClientRect().width > 0).map(x => { const q = x.getBoundingClientRect(); return { t: x.textContent, x: Math.round(q.left), y: Math.round(q.top), w: Math.round(q.width), h: Math.round(q.height), inside: q.left >= 0 && q.top >= 0 && q.right <= innerWidth && q.bottom <= innerHeight }; }); return { first: m.querySelector('button') === b, bs, sm: [...m.querySelectorAll('.sm')].map(x => x.textContent).join(' | ') }; });
+        if (!rb) { fail('boss death but no RESUME FROM BOSS button'); break; }
+        if (R.resumes === 0) { await shot('down-resume'); R.rb = rb; if (!rb.first) fail('RESUME FROM BOSS is not the first button'); if (rb.bs.some(x => x.h < 44 || !x.inside)) fail('result buttons < 44 px or outside the viewport: ' + JSON.stringify(rb.bs)); }
+        await inp.tap('#fBoss'); R.resumes++; await sleep(500); s = await p.evaluate(SNAP); if (!s || s.end) { fail('RESUME FROM BOSS did not restart the run'); break; }
+        if (R.resumes === 1) R.afterResume = { t: s.t, hp: s.P.hp, bossOn: s.bossOn, score: s.score };
+        sig = ''; sigT = s.t; prev = null; continue;
+      }
       ticks++; if (!fastOn && Date.now() - t0 > 8000) { fastOn = true; R.frameP95 = await p.evaluate(() => { const a = window.__ft.slice().sort((x, y) => x - y); window.__ftOn = false; return a.length ? { n: a.length, p50: a[a.length >> 1], p95: a[Math.floor(a.length * .95)] } : null; }); await p.evaluate(ts => { window.FOOT.ts = ts; }, TS); }
       if (s.paused) { fail('paused unexpectedly'); break; }
       if (process.env.GOD && s.bossOn) await p.evaluate(() => { const S = window.FOOT.S; if (S.P.hp > 0) S.P.hp = S.P.max; });   // geometry probe: Kai survives so every attack is measured
-      await inp.apply(decide(s));
+      { const w = decide(s); R.lastW = { mx: +(w.mx || 0).toFixed(2), f: w.fire ? 1 : 0, m: w.melee ? 1 : 0, j: w.jump ? 1 : 0, g: w.guard ? 1 : 0, d: w.dash ? 1 : 0 }; await inp.apply(w); }
       await sleep(22); s = await p.evaluate(SNAP); if (!s) { fail('FOOT.S vanished'); break; }
       // ---- per-tick checks
       for (const e of s.E) { if (e.d) { if (seen.has(e.u)) died.add(e.u); continue; } if (!seen.has(e.u)) { seen.add(e.u); if (e.x < s.camX + 5 && e.x > s.camX - 200) spawnL.push({ t: s.t, x: e.x - s.camX }); } if (/^(lunge|dash|pounce|spray|bite|charge|sb_)/.test(e.st || '') || e.w > 0) atkd.add(e.u); }
@@ -200,10 +239,15 @@ async function run(b, plat, strat, seed) {
       if (!shotsDone.death && s.P.hp <= 0) { shotsDone.death = 1; await shot('death'); }
       if (process.env.TRACE && s.t - (R.trT || -9) >= 1) { R.trT = s.t; (R.trace = R.trace || []).push([(R.stage = R.stage || s.stage) && '',+s.t.toFixed(1), Math.round(s.P.x), Math.round(s.camX), s.lock || '-', s.P.hp, s.E.filter(e => !e.d).length, s.E.filter(e => !e.d).map(e => e.id + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 6).join(' '), s.kills, 'wavesLeft=' + s.wl].join(' ')); }
       if (process.env.BTRACE && s.bossOn && s.t - (R.btT || -9) >= .5) { R.btT = s.t; const B = s.E.find(e => e.b && !e.d); (R.btrace = R.btrace || []).push([+s.t.toFixed(1), 'hp' + s.P.hp, 'Pz' + s.P.z, B ? [B.st, Math.round(B.x - s.P.x), 'z' + B.z, Math.round(B.hp2)].join(' ') : '-', 'zm' + s.zm, 'adds' + s.E.filter(e => !e.d && !e.b).length].join(' ')); }
+      if (process.env.W316) {   // W316: every 5 s game time one line (street time, hp, foes, types, Kai x vs camera, input sent) + a shot at each heart lost
+        const live = s.E.filter(e => !e.d && !e.hid), I = R.lastW || {};
+        if (s.t - (R.w316T == null ? -9 : R.w316T) >= 5) { R.w316T = s.t; (R.w316 = R.w316 || []).push(`t=${s.t.toFixed(0)} hp=${s.P.hp}/${s.P.max} foes=${live.length} [${live.map(e => e.id + (e.x < s.camX ? '<' : e.x > s.camX + s.vw ? '>' : '') + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 7).join(' ')}] kaiX=${Math.round(s.P.x)} cam=${Math.round(s.camX)} vw=${Math.round(s.vw)} kaiRel=${Math.round(s.P.x - s.camX)} lock=${s.lock || '-'} in=${JSON.stringify(I)} kills=${s.kills}`); }
+        if (prev && s.P.hp < prev.P.hp) { const nh = (R.w316h = (R.w316h || 0) + 1); (R.w316 = R.w316 || []).push(`HIT#${nh} t=${s.t.toFixed(1)} hp ${prev.P.hp}->${s.P.hp} hurtBy=${(await p.evaluate(() => { const h = window.FOOT.S.hlog; return h && h.length ? h[h.length - 1] : null; })) } foes=[${live.map(e => e.id + ':' + Math.round(e.x - s.P.x) + ':' + (e.st || '')).slice(0, 7).join(' ')}] kaiRel=${Math.round(s.P.x - s.camX)}/${Math.round(s.vw)}`); await shot('hit' + nh); } }
       prev = s; lastS = s;
     }
-    await inp.release(); await sleep(150); s = await p.evaluate(SNAP) || lastS; R.end = s && s.end; R.hlog = await p.evaluate(() => { const S = window.FOOT.S; return S && S.hlog ? S.hlog.slice() : []; }).catch(() => null); R.t = s && s.t; R.kills = s && s.kills; R.hurts = s && s.hurts; R.hpEnd = s && s.P.hp; R.maxX = s && s.P.maxX;
+    await inp.release(); await sleep(150); s = await p.evaluate(SNAP) || lastS; R.end = s && s.end; R.hlog = await p.evaluate(() => { const S = window.FOOT.S; return S && S.hlog ? S.hlog.slice() : []; }).catch(() => null); R.duel = await p.evaluate(() => { const l = window.FOOT.SB && window.FOOT.SB.log, c = {}; for (const f of l || []) for (const x of f.at) { const k = x[0] + ':' + (x[2] || 'open'); c[k] = (c[k] || 0) + 1; } return Object.entries(c).map(([k, v]) => k + '=' + v).join(','); }).catch(() => null); R.t = s && s.t; R.kills = s && s.kills; R.hurts = s && s.hurts; R.hpEnd = s && s.P.hp; R.maxX = s && s.P.maxX;
     if (!R.end) { if (Date.now() - t0 >= MAXREAL) R.notes.push('timeout ' + (MAXREAL / 1000) + ' s real, game t=' + (s && s.t.toFixed(0)) + ' x=' + (s && Math.round(s.P.x))); }
+    R.sbl = await p.evaluate(() => { const l = window.FOOT.SB && window.FOOT.SB.log; return l && l.length ? l[l.length - 1].at : null; }).catch(() => null);   // W304: per attack [kind, t, result, first answer s after telegraph start, key]
     R.bossHp = s && s.boss ? Math.max(0, Math.round(s.boss.hp)) : null; R.bossT = await p.evaluate(() => { const l = window.FOOT.S3 && window.FOOT.S3.log; return l && l.boss || null; }).catch(() => null);
     if (R.hlog) { const c = {}; for (const h of R.hlog) c[h] = (c[h] || 0) + 1; R.hurtBy = Object.entries(c).map(([k, v]) => k + ':' + v).join(','); }
     R.spawned = seen.size; R.attacked = atkd.size; R.died = died.size; R.maxFoes = maxFoes; R.pkMax = pkMax; R.minMargin = Math.round(minMargin); R.camBack = camBack; R.behindTicks = behindSeen; R.spawnLeft = spawnL.length; R.progBad = progBad; R.stuck = stuck;
@@ -218,7 +262,7 @@ async function run(b, plat, strat, seed) {
     R.errs = p.errs.concat(await p.evaluate(() => window.__rej.map(r => 'rejection: ' + r))).concat(p.cons.map(c => 'console: ' + c)); for (const e of R.errs) fail('error: ' + e); if (p.bad.length) R.notes.push('http: ' + p.bad.slice(0, 3).join(' '));
   } catch (e) { fail('bot crashed: ' + String(e.stack || e).slice(0, 300)); }
   finally { await inp.release().catch(() => { }); await p.context().close().catch(() => { }); }
-  R.real = Math.round((Date.now() - t00) / 1000); return R;
+  if (process.env.W316 && R.w316) fs.writeFileSync(path.join(OUT, tag + '.trace.txt'), R.w316.join('\n') + '\n'); R.real = Math.round((Date.now() - t00) / 1000); return R;
 }
 
 // ---- control check: every control, one at a time, then the pause menu (resume, retry, quit). Real time (x1), phone with auto-fire OFF so FIRE exists.
@@ -270,7 +314,7 @@ async function layouts(b) {
     for (const pl of PLATS) for (const st of STRATS) for (let sd = 0; sd < SEEDS; sd++) {
       if (process.env.ONLY && process.env.ONLY !== `${pl}:${st}:${sd}`) continue;
       const R = await run(b, pl, st, sd); results.push(R);
-      say(`${R.fails.length ? 'FAIL' : 'PASS'} ${pl} ${st} seed ${sd}: ${R.end ? (R.end.cleared ? 'CLEARED' : 'died') : 'no end'} t=${R.t != null ? R.t.toFixed(0) : '?'}s kills=${R.kills} hurts=${R.hurts} bossHp=${R.bossHp != null ? R.bossHp : '-'} bossT=${R.bossT != null ? R.bossT : '-'} hurtBy=${R.hurtBy || '-'} foes ${R.spawned}/atk ${R.attacked}/died ${R.died} pk<=${R.pkMax} margin=${R.minMargin} p95=${R.frameP95 ? R.frameP95.p95.toFixed(1) : '?'}ms real=${R.real}s${R.fails.length ? ' :: ' + R.fails.join(' | ').slice(0, 300) : ''}${R.notes.length ? ' [' + R.notes.join('; ') + ']' : ''}`);
+      say(`${R.fails.length ? 'FAIL' : 'PASS'} ${pl} ${st} seed ${sd}: ${R.end ? (R.end.cleared ? 'CLEARED' : 'died') : 'no end'} t=${R.t != null ? R.t.toFixed(0) : '?'}s kills=${R.kills} hurts=${R.hurts} reach=${R.reach ? 1 : 0} resumes=${R.resumes} bossHp=${R.bossHp != null ? R.bossHp : '-'} bossT=${R.bossT != null ? R.bossT : '-'} hurtBy=${R.hurtBy || '-'} duel=${R.duel || '-'} foes ${R.spawned}/atk ${R.attacked}/died ${R.died} pk<=${R.pkMax} margin=${R.minMargin} p95=${R.frameP95 ? R.frameP95.p95.toFixed(1) : '?'}ms real=${R.real}s${R.fails.length ? ' :: ' + R.fails.join(' | ').slice(0, 300) : ''}${R.notes.length ? ' [' + R.notes.join('; ') + ']' : ''}`);
       if (R.fails.length) nfail++; }
   } finally { await b.close(); }
   fs.writeFileSync(path.join(OUT, 'results.json'), JSON.stringify(results, null, 1));

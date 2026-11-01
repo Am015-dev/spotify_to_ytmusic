@@ -102,5 +102,5 @@ if (require.main === module) (async () => {
     console.log(diff.padEnd(7), type.padEnd(9), String(row.died).padStart(4) + '%', row.min.toFixed(1).padStart(7), (row.cl.toFixed(1) + ' / ' + row.clmin + ' / ' + row.clmax).padStart(20), row.hits.toFixed(1).padStart(6), row.pits.toFixed(1).padStart(5), row.upg.toFixed(1).padStart(8), row.neon.toFixed(0).padStart(6), row.score.toFixed(0).padStart(10), '  ', a.slice(0, 4).map(x => `${x.pos + 1}/L${x.loop + 1}@${x.bar}${x.boss ? 'B' + x.bossHp : ''}`).join(' ')); }
   for (const k in res) { const by = {}; for (const x of res[k]) for (const j in x.hitsBy) by[j] = (by[j] || 0) + x.hitsBy[j] / res[k].length; console.log('hits per district index (0-based) ' + k + ': ' + Object.keys(by).map(j => j + ':' + by[j].toFixed(1)).join(' ')); }
   console.log('hit causes:', JSON.stringify(causeSum));
-  fs.writeFileSync(path.join(__dirname, 'playtest', 'f-sim.json'), JSON.stringify(out, null, 1));
+  fs.writeFileSync(path.join(process.env.NR_OUT || require('os').tmpdir(), 'f-sim.json'), JSON.stringify(out, null, 1));
 })().catch(e => { console.error(e); process.exit(2); });

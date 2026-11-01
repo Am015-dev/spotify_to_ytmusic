@@ -193,3 +193,7 @@ games-src/**/sweep-shots/
 games-src/**/shots/
 games-src/lab-shots/
 games-src/next-wave/cutout-tests/
+
+# Nightrun probe output (W297): sweep/d-sim/f-sim/shots write to $NR_OUT or tmpdir; only story-sim.json (SAVE=1 data input) stays tracked
+games-src/nightrun/playtest/*
+!games-src/nightrun/playtest/story-sim.json

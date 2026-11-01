@@ -58,7 +58,7 @@ NR.on('tick',dt=>{if(!RET.cp||!running||!ST.on||!G.live)return;
 /* marked run: counts like an assist run (no Heat medal, no records), pays 75%, no hull-lost star */
 {const ar=RET.assistRun;RET.assistRun=()=>ar()||(RET.cp&&CHK.marked&&!CHK.inRow);
  const rr=RET.resultRow;RET.resultRow=function(){CHK.inRow=true;let s;try{s=rr.call(this);}finally{CHK.inRow=false;}
-   return s+(RET.cp&&CHK.marked?'<div class="sr"><span class="sg">↺</span> Resumed run · Neon ×'+CHK.k+', no records</div>':'');};
+   return s+(RET.cp&&CHK.marked?'<div class="sr"><span class="sg">↺</span> Resumed from a checkpoint · Neon pay '+Math.round(CHK.k*100)+'%, no records</div>':'');};
  const pc=RET.payClear;RET.payClear=function(n,sum){const pay=pc.call(this,n,sum);if(!RET.cp||!CHK.marked||!(pay>0))return pay;
    const cut=Math.round(pay*(1-CHK.k));GA.bank=Math.max(0,GA.bank-cut);gsave();if(this.last)this.last.pay=pay-cut;return pay-cut;};}
 NR.on('stageClear',()=>{if(RET.cp&&CHK.marked&&ST.stars)ST.stars[2]=0;});
@@ -73,9 +73,9 @@ function chkBox(){let e=$('cpBox');if(!e){const host=$('over').querySelector('.i
   e.innerHTML='<button type="button" id="cpResume">↺ RESUME FROM CHECKPOINT</button><p id="cpNote"></p>';host.insertBefore(e,host.querySelector('.row'));
   $('cpResume').addEventListener('click',()=>{if(!overlayReady)return;CHK.go();});}return e;}
 NR.on('runEnd',d=>{if(!RET.cp)return;const e=chkBox();
-  if(CHK.marked&&d&&d.story&&!d.quit){const el=$('oNeon');if(el){const a=SH.lastBank|0;el.innerHTML=a?'Banked '+neonI+' <strong>+'+a+'</strong> · garage '+window.fmtN(GA.bank):'Banked nothing';}retShow();}
+  if(CHK.marked&&d&&d.story&&!d.quit){const el=$('oNeon');if(el){const a=SH.lastBank|0;el.innerHTML=a?'Banked '+neonI+' <strong>+'+a+'</strong> · in garage: '+window.fmtN(GA.bank):'Banked nothing';}retShow();}
   const on=!!d&&!!d.story&&!d.cleared&&!d.quit&&CHK.eligible();e.hidden=!on;
-  if(on){$('cpNote').textContent='Half hull, '+CHK.grace+' s safe. Marked ↺: Neon ×'+CHK.k+', no records.';setTimeout(()=>{if(!overEl.hidden&&!e.hidden)$('cpResume').focus();},700);}});
+  if(on){$('cpNote').textContent='Restart here with half your hull and '+CHK.grace+' s of safety. Neon pay is '+Math.round(CHK.k*100)+'% and this run sets no records.';setTimeout(()=>{if(!overEl.hidden&&!e.hidden)$('cpResume').focus();},700);}});
 
 /* the flags on the progress bar (landscape: the bar under the stage name; portrait: the hairline on the top edge) and the shimmer round the ship */
 {const flag=(x,y,h,col,s)=>{ctx.fillStyle=col;ctx.fillRect(x-s*.5,y,s,h);ctx.beginPath();ctx.moveTo(x+s*.5,y);ctx.lineTo(x+s*.5+h*.55,y+h*.3);ctx.lineTo(x+s*.5,y+h*.6);ctx.closePath();ctx.fill();};

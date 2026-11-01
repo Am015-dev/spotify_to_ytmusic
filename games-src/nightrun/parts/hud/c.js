@@ -100,7 +100,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   HUDX.ship(ctx,P.y,PH_-P.x,k,t,true);
   if(window.ABIL&&ABIL.on)ABIL.rings();else{const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}
   if(G.note.t>0&&G.note.txt&&!(innerHeight<600&&/^\u266a/.test(G.note.txt))){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
-  if(window.HINT&&HINT.on())HINT.draw(ctx,{W:w,H:h,mode:'port',cpu:Math.max(.2,frame.clientWidth/w),top:short?h*.8+4:(G.boss&&G.boss.x<W?112:92)*k,x0:6,x1:w-6,ship:{x:P.y,y:PH_-P.x},acc:D.a});   // F6: the one hint style
+  if(window.HINT&&HINT.on()){if(!(G.boss&&G.boss.x<W))HINT.draw(ctx,{W:w,H:h,mode:'port',cpu:Math.max(.2,frame.clientWidth/w),top:short?h*.8+4:(G.boss&&G.boss.x<W?112:92)*k,x0:6,x1:w-6,ship:{x:P.y,y:PH_-P.x},acc:D.a});}   // F6: the one hint style; W291: not over the boss (it fills the top third)
   else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(w/2,h-170*k,17*k,k,w,28*k,44*k);ctx.globalAlpha=1;}
   if(G.banner.t>0&&window.CALM&&CALM.small(G.banner))CALM.draw(G.banner,PW_,PH_,HK);else if(G.banner.t>0){const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
     if(G.banner.pic!=null)ART.portrait(G.banner.pic,w/2,h/2-58*k-100*k,92*k,Math.max(0,a));
@@ -202,7 +202,7 @@ function buildSettings(){const body=$('setBody');
         r.o.forEach(([v,lab],i)=>{const b=document.createElement('button');b.type='button';b.textContent=lab;b.dataset.v=i;b.addEventListener('click',()=>setVal(r.k,v));row.appendChild(b);});}
       else{row.className='sl';const id='s'+r.k[0].toUpperCase()+r.k.slice(1);row.innerHTML=`<span>${r.l}</span><input type="range" id="${id}" min="${r.s[0]}" max="${r.s[1]}" step="${r.s[2]}" aria-label="${r.l}"><output id="v${id.slice(1)}"></output>`;
         row.querySelector('input').addEventListener('input',e=>{const x=+e.target.value;setVal(r.k,r.p?x/100:x);});
-        if(r.tap){const b=document.createElement('button');b.type='button';b.id='calBtn';b.className='go dim';b.style.cssText='min-height:34px;font-size:12px;padding:.3em .9em';b.textContent='TAP TEST';b.addEventListener('click',toggleCal);row.appendChild(b);}}
+        if(r.tap){const b=document.createElement('button');b.type='button';b.id='calBtn';b.className='go dim';b.style.cssText='min-height:34px;font-size:12px;padding:.3em .9em';b.textContent='TAP CHECK';b.addEventListener('click',toggleCal);row.appendChild(b);}}
       body.appendChild(row);
       if(r.tap){const cb=document.createElement('div');cb.id='calBox';cb.innerHTML='<div id="calInfo">Tap the pad on every click. 8 taps.</div><button id="calPad" type="button">TAP TO THE CLICK</button><div id="calPips">'+'<i></i>'.repeat(8)+'</div>';body.appendChild(cb);
         $('calPad').addEventListener('pointerdown',e=>{e.preventDefault();doCalTap(e.timeStamp);});}}}}
@@ -216,7 +216,7 @@ let defArmed=0;
 $('setDef').addEventListener('click',()=>{const b=$('setDef');if(!defArmed){defArmed=setTimeout(()=>{defArmed=0;b.textContent='DEFAULTS';},3000);b.textContent='TAP AGAIN TO RESET';return;}
   clearTimeout(defArmed);defArmed=0;b.textContent='DEFAULTS';Object.assign(SET,DEFS,{v3:1,afv:1});saveSet();applySet();syncSet();});
 // latency test: clicks on the audio clock, 8 taps, the median lateness becomes the Audio sync
-function stopCal(){calStop();$('calBox').classList.remove('on');$('calBtn').textContent='TAP TEST';}
+function stopCal(){calStop();$('calBox').classList.remove('on');$('calBtn').textContent='TAP CHECK';}
 function toggleCal(){if($('calBox').classList.contains('on')){stopCal();return;}AU.unlock();calStart();$('calBox').classList.add('on');$('calBtn').textContent='CLOSE';calUI();}
 function doCalTap(ts){if(!CAL.on)return;const d=calTap(ts);calUI();if(CAL.done!=null)syncSet();return d;}
 function calUI(){const pips=$('calPips').children;for(let i=0;i<pips.length;i++)pips[i].classList.toggle('on',i<CAL.taps.length);
@@ -244,7 +244,7 @@ function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false
   else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;overEl.classList.toggle('evnr',/^New (best|daily)/.test(eye)&&ART.isReal('event-new-record'));   // record splash
-  $('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
+  $('oScore').textContent=window.fmtN(G.score);$('oDL').textContent='Reached';$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
   $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${window.fmtN(dailyBest.score)}</strong>`:`Best <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`;
   overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);showBest();
   G.over=true;lastDaily=G.daily;lastWeekly=!!G.weekly;}
@@ -267,8 +267,8 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
   let dt=Math.min(.25,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
   if(SET.fpsc){fpsN++;if(now-fpsT>500){$('fpsEl').hidden=!FPSOK();$('fpsEl').textContent=Math.round(fpsN*1000/(now-fpsT))+' FPS';fpsN=0;fpsT=now;}}
   if(CAL.on)calFrame();
-  if(!paused)fbT+=dt;
-  if(running&&!paused){for(let r=dt;r>1e-6;){const s=Math.min(r,.034);update(s);r-=s;}   // slow frame: catch the clock up in <= 34 ms steps
+  if(!paused&&!running)fbT+=dt;   // menus: render time; in a run the beat clock moves with the stepped update (one clock)
+  if(running&&!paused){for(let r=dt;r>1e-6;){const s=Math.min(r,.034);fbT+=s;update(s);r-=s;}   // slow frame: catch the clock up in <= 34 ms steps
     if(raw<1000&&!document.hidden){FPS.n++;FPS.t+=raw;if(raw>FPS.worst)FPS.worst=raw;if(raw>40)FPS.slow++;RSC.feed(raw);}}
   else if(!running){G.t+=dt;G.scroll+=60*dt;for(const p of G.pt){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;}G.pt=G.pt.filter(p=>p.l>0);}
   if(!running&&!G.dead&&!G.over){G.attract=(G.attract||0)+dt;if(G.attract>9){G.attract=0;const n=(G.di+1)%DISTRICTS.length;G.di=n;bgFor(n);}}

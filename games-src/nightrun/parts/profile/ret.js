@@ -3,6 +3,7 @@
 // TEST: ret-test.js
 /* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
 const RET=window.RET=window.RET||{};
+if(RET.lab===undefined)RET.lab=/[?&]lab=1/.test(location.search);   // W326: the ONE reader of ?lab=1 (LAB button, test widget, LAB auto-open); rule 18
 if(RET.sprites===undefined)RET.sprites=!/[?&]sprites=0/.test(location.search);   // animated strip sheets for bosses and player ships (parts/art.js SPR); ?sprites=0 = the stills as before
 if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
 if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
@@ -25,11 +26,12 @@ function retShow(){
   for(const [id,host] of [['retO',$('over').querySelector('.in')],['retR',$('stres').querySelector('.in')]]){
     const e=retMake(id,host);e.hidden=!on;if(!on)continue;
     e.className='retBar'+(nx&&nx.can?' can':'');const gp=nx&&add>0?Math.min(nx.pct,Math.max(1,Math.round(100*add/nx.price))):0;
-    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> '+nx.price:'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price)+'<div class="rb"><i style="width:'+Math.max(0,nx.pct-gp)+'%"></i>'+(gp?'<i class="gain" style="width:'+gp+'%"></i>':'')+'</div>':'Everything unlocked');}
+    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> · '+nx.price+' Neon':'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price+' Neon')+'<div class="rb"><i style="width:'+Math.max(0,nx.pct-gp)+'%"></i>'+(gp?'<i class="gain" style="width:'+gp+'%"></i>':'')+'</div>':'Everything unlocked');}
   /* menufix3 (E12): after a first-session death the first primary button is RETRY; the GARAGE shortcut shows only when something is affordable */
   const fresh=!Object.keys(sSave.stars).some(k=>(sSave.stars[k]|0)>0),g2=$('gaBtn2');
   $('againBtn').textContent=fresh?'RETRY':on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';
-  if(g2)g2.hidden=!(typeof affordCount==='function'&&affordCount()>0);}
+  const can=typeof affordCount==='function'&&affordCount()>0;if(g2)g2.hidden=!can;const g3=$('gaBtn3')||(()=>{const sr=$('srRetry');if(!sr||typeof openGarage!=='function')return null;const b=document.createElement('button');b.className='go dim';b.id='gaBtn3';b.type='button';b.textContent='GARAGE';sr.after(b);b.addEventListener('click',()=>{$('stres').hidden=true;openGarage('stres');});return b;})();if(g3)g3.hidden=!can;   // the clear card gets the same GARAGE shortcut, so 'Ready in Garage' never shows without a button
+  const sb=$('overSub');if(sb)sb.textContent=g2&&!g2.hidden?'Spend your Neon in the garage, then retry':'Try again. Your Neon is saved.';}   // W321: the garage line shows only when the GARAGE button does
 NR.on('runEnd',d=>{if(!d||d.quit)return;retShow();});
 
 /* ===== B1 pay, B2 economy, B3 mercy ===== */
@@ -269,12 +271,11 @@ RET.pop=function(L){let e=$('retPop');if(!e){e=document.createElement('div');e.i
   if(L==='S')try{AU.sfx('up');}catch(x){}};
 /* run end: count the score up (the texts are written after the event, so wait one tick), show the grade strip */
 NR.on('runEnd',d=>{if(!d||d.quit||!RET.trans&&!RET.grade)return;setTimeout(()=>{
-  if(RET.trans){for(const [id,sc] of [['oScore','over'],['srScore','stres']]){const el=$(id);if(!el||$(sc).hidden)continue;const to=G.score|0;
-      RET.countUp(n=>{el.textContent=window.fmtN(n);},0,to,800);}
+  if(RET.trans){   // W321: the score is written once, final (a count-up showed a different number than the HUD for 0.8 s)
     RET.chipSync();}
   if(RET.grade)for(const [id,host] of [['grO',$('over')],['grR',$('stres')]]){let e=$(id);const L=RET.gr.list;
     if(!e){e=document.createElement('div');e.id=id;e.className='retGr';host.querySelector('.in').insertBefore(e,host.querySelector('.row'));}
-    e.hidden=!L.length;e.innerHTML=L.length?'Grades'+L.map(x=>'<b class="'+x+'">'+x+'</b>').join(''):'';}},0);});
+    e.hidden=!L.length;e.innerHTML=L.length?'GRADE '+L.map(x=>'<b class="'+x+'">'+x+'</b>').join(''):'';}},0);});
 
 /* ---------- B24 save export / import (POLISH.md). Flag RET.saveio; off = Settings exactly as before. Hooks: click listeners on the Settings buttons and NR 'runEnd'. Nothing is executed: a file or code is parsed as data only. ---------- */
 if(RET.saveio===undefined)RET.saveio=true;
@@ -403,20 +404,20 @@ RET.assistSchema=function(SC){if(!RET.assist)return;
   const acc=SC.find(g=>g.g==='Accessibility');if(acc)SC.splice(SC.indexOf(acc),1);
   const O=[[false,'Off'],[true,'On']];
   SC.push({g:'Assist',rows:[
-    {k:'asSpd',l:'World speed',o:[[100,'100%'],[85,'85%'],[70,'70%']],d:'Enemies, bullets and scrolling move slower. The music and the beat do not change. Marks the run ⓐ.'},
-    {k:'asBul',l:'Enemy bullets',o:[[100,'Normal'],[85,'Slower'],[70,'Slowest']],d:'Only enemy bullets fly slower, so there is more time to dodge. Marks the run ⓐ.'},
+    {k:'asSpd',l:'World speed',o:[[100,'100%'],[85,'85%'],[70,'70%']],d:'Slows the whole game down: enemies, bullets and scrolling. Marks the run ⓐ.'},
+    {k:'asBul',l:'Enemy bullets',o:[[100,'Normal'],[85,'Slower'],[70,'Slowest']],d:'Enemy bullets fly slower. Marks the run ⓐ.'},
     {k:'asHull',l:'Extra hull',o:[[0,'Off'],[2,'+2']],d:'Start every run with 2 more hull. Marks the run ⓐ.'},
-    {k:'asWin',l:'Beat window',o:[[0,'Normal'],[60,'+60 ms'],[120,'+120 ms']],d:'More time to hit the beat for a PERFECT, on top of Timing window. Marks the run ⓐ.'},
-    {k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']],d:'How exact a tap has to be. Never marks a run.'},
-    {k:'asBig',l:'Big bullets',o:O,d:'Enemy bullets are drawn bigger with a white halo. The real hit size is unchanged. Never marks a run.'},
-    {k:'hc',l:'High-contrast bullets',o:O,d:'Bright white halo around enemy bullets. Never marks a run.'},
-    {k:'rm',l:'Reduced motion',o:O,d:'Calmer effects, no strobing, no count-up. Never marks a run.'}]});};
+    {k:'asWin',l:'Beat window',o:[[0,'Normal'],[60,'+60 ms'],[120,'+120 ms']],d:'Widens the beat window for a PERFECT, on top of Timing window. Marks the run ⓐ.'},
+    {k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']],d:'Tight asks for exact taps, Loose forgives them. Never marks a run.'},
+    {k:'asBig',l:'Big bullets',o:O,d:'Draws enemy bullets bigger. Never marks a run.'},
+    {k:'hc',l:'High-contrast bullets',o:O,d:'Adds a white halo to enemy bullets. Never marks a run.'},
+    {k:'rm',l:'Reduced motion',o:O,d:'Calmer effects. Never marks a run.'}]});};
 RET.assistBuild=function(){if(!RET.assist)return;
   const css=document.createElement('style');css.textContent='#setm .as>span{font-size:14px}#setm .as button{min-height:44px;font-size:14px}#setm .asd{margin:0 0 6px;font:14px/1.35 var(--mono,monospace);color:#b4d2e2}#setm .asn{margin:0 0 8px;font:14px/1.4 var(--mono,monospace);color:#e6f6ff}';
   document.head.appendChild(css);
   const g=SCHEMA.find(x=>x.g==='Assist');let first=true;
   for(const r of g.rows){const row=setRows[r.k];if(!row)continue;row.classList.add('as');
-    if(first){const n=document.createElement('p');n.className='asn';n.id='asNote';n.textContent='Assist makes the game easier. It never blocks progress and never costs Neon. A run with World speed, Enemy bullets, Extra hull or Beat window on is marked ⓐ and sets no records (best, daily, weekly, Heat medal). Looks-only options never mark a run.';
+    if(first){const n=document.createElement('p');n.className='asn';n.id='asNote';n.textContent='Assist makes the game easier. A run with World speed, Enemy bullets, Extra hull or Beat window on is marked ⓐ and sets no records (best, daily, weekly, Heat medal). Looks-only options never mark a run.';
       row.parentNode.insertBefore(n,row);first=false;}
     const p=document.createElement('p');p.className='asd';p.textContent=r.d;row.after(p);}};
 /* ---------- B30 installable PWA + offline cache (POLISH.md). Flag RET.pwa (off with ?pwa=0): off = no manifest link, no service worker, no MENU note (an old worker of ours is unregistered).
@@ -432,7 +433,7 @@ RET.pwaX=(function(){
   X.draw=async function(){const row=$('pwaRow');if(!row)return;await X.count();
     const note=$('pwaNote'),btn=$('pwaBtn'),tip=$('pwaIos');
     note.hidden=!(RET.pwa&&X.ready);note.textContent='Offline ready'+(X.songs?' · '+X.songs+' songs saved':'');
-    btn.hidden=!(RET.pwa&&X.defer&&!standalone());tip.hidden=!(RET.pwa&&ios()&&!standalone());
+    btn.hidden=!(RET.pwa&&X.defer&&!standalone());tip.hidden=!(RET.pwa&&ios()&&!standalone()&&!(window.FSX&&FSX.embedded));
     row.hidden=note.hidden&&btn.hidden&&tip.hidden;};
   X.build=function(){const mn=$('mnMore');if(!mn||$('pwaRow')||!RET.pwa)return;
     const row=document.createElement('div');row.id='pwaRow';row.hidden=true;
