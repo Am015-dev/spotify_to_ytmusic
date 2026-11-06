@@ -44,13 +44,23 @@ const log = (s) => { if (process.env.LOG) console.log('  ' + s); };
     // leave to the title: the menu song comes back only now
     await p.keyboard.press('p'); await sleep(300); await p.click('#quitBtn'); await sleep(300); let q = await snap(p); ok('quit to title: the title is up and the boss song has not been replaced yet', q.title && !q.run, JSON.stringify(q));
     await sleep(5000); q = await snap(p); ok('on the title the menu song plays (after leaving the stage)', q.title && q.song === 'menu' && !q.low, JSON.stringify(q));
+    await report('boss,quit,title');
     const mb = await p.evaluate(() => (window.__LT.tracks.map(t => t.s)));
     log('tracks ' + (await p.evaluate(() => JSON.stringify(__LT.tracks))));
   }
   if (part !== 'flight') {
-    const r = await p.evaluate(() => JSON.stringify({ calls: __LT.calls.length }));
+    if (part === 'foot') await fresh(); else { await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr, null, { timeout: 15000 }); await sleep(800); await fresh(); }
+    await p.waitForFunction(() => window.FOOT && FOOT.S3, null, { timeout: 20000 }); await p.evaluate(() => { RET.tale = false; FOOT.ui = 1; FOOT.start('zeil'); }); await p.waitForFunction(() => FOOT.on && FOOT.S && !document.getElementById('footQ'), null, { timeout: 25000 });
+    await sleep(6000); let s = await snap(p); ok('on foot: the street song plays', s.foot && s.song === 'street1' && s.mode === 'file', JSON.stringify(s));
+    const want = async (name, set, re, wait) => { await p.evaluate(set); await sleep(wait || 9000); const x = await snap(p); ok(`on foot: ${name}`, re.test(x.song || ''), JSON.stringify(x)); return x; };
+    await want('arena lock plays the lock song', () => { Object.defineProperty(FOOT.S, 'lock', { get: () => 1, set() { }, configurable: true }); }, /^street1-lock$/);
+    await want('boss plays its own boss song', () => { Object.defineProperty(FOOT.S, 'lock', { get: () => 0, set() { }, configurable: true }); FOOT.S.bossOn = 1; }, /^street1-boss/);
+    s = await want('clear plays the clear song (a full track), result screen 6 dB lower', () => { FOOT.S.bossOn = 0; FOOT.S.end = { cleared: true }; }, /^street1-clear$/); ok('on foot result: song lowered, no menu song', s.low, JSON.stringify(s));
+    await p.evaluate(() => { FOOT.S.end = null; }); await p.keyboard.press('p'); await sleep(300); await p.evaluate(() => { const b = document.getElementById('fQuit'); if (b) b.click(); }); await sleep(7000);
+    s = await snap(p); ok('after leaving the street the title plays the menu song', s.title && s.song === 'menu', JSON.stringify(s));
+    await report('on foot: street, lock, boss, clear, title');
   }
-  await report('boss,quit,title'); const T = { fx: reports.flatMap(r => r.fx), calls: reports.flatMap(r => r.calls), refused: reports.flatMap(r => r.refused) };
+  const T = { fx: reports.flatMap(r => r.fx), calls: reports.flatMap(r => r.calls), refused: reports.flatMap(r => r.refused) };
   const cnt = (a, re) => a.filter(x => re.test(x)).length;
   ok('every warn / perfect call was refused (none reached the mixer)', cnt(T.fx, /warn|perfect/) === cnt(T.refused, /^sfx:(warn|perfect)/), `${cnt(T.fx, /warn|perfect/)} calls, ${cnt(T.refused, /^sfx:(warn|perfect)/)} refused`);
   ok('every sting call was refused', T.calls.filter(c => / sting:/.test(c)).length === cnt(T.refused, /^sting:/), `${T.calls.filter(c => / sting:/.test(c)).length} calls, ${cnt(T.refused, /^sting:/)} refused`);
