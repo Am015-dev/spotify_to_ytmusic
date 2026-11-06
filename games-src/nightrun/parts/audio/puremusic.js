@@ -25,7 +25,7 @@ const SNDT=[
   ['f_big','ft','Your shot hits a boss or the big heavy (boom)',0],['f_hurt','ft','Kai is hit (crunch + music dip)',0],['f_dash','ft','Dash and jump whoosh',0],['f_graze','ft','Shield block and knife slash tick',0],
   ['f_warn','ft','Arena lock and boss warning beeps',0],['f_up','ft','Go-ahead and checkpoint chime',0],['f_fever','ft','FEVER starts (5 notes)',0],
   ['f_mstart','ft','The stage song starts when the run starts',1],['f_mcp','ft','Song restarts when you respawn at a checkpoint',0],
-  ['f_mcue','ft','Music-pack song switches: arena lock, boss, boss phase, clear (this one changes the music)',0],['f_mmenu','ft','Menu song comes back when you leave the stage',0],
+  ['f_mcue','ft','Street song changes: arena lock, boss, boss phase, clear (each a full song)',1],['f_mmenu','ft','Menu song comes back when you leave the stage',0],
   ['heart','pw','Heartbeat when you have 1 hull left',0],['hat','pw','TEMPO power-up hi-hat',0],['drums','pw','DRUM power-up drum kit',0],['pwnote','pw','Power-up notes (echo, nova, magnet, chord, level chime)',0],
   ['pwthump','pw','Power-up thump (nova, magnet)',0],['riser','pw','DROP power-up riser',0],['dropboom','pw','DROP power-up blast',0],['reward','pw','Reward shower boom',0]];
 const SNDGRP={fx:'GAME SOUNDS',st:'JINGLES ON THE BEAT',mu:'MUSIC EFFECTS',pw:'POWER-UP AND WAVE SOUNDS',ft:'ON FOOT'};
