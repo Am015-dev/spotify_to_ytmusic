@@ -30,7 +30,7 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
     for (const f of ['startStage', 'switchTo']) { const o = AU[f]; AU[f] = function () { LOG.push(MODE + ':' + f + ':' + [].slice.call(arguments).join(',')); return o.apply(this, arguments); }; }
     window.SAMPLE = () => { const c = SND.AU.cur, B = __mnr.BT, set = (PLAY[MODE] = PLAY[MODE] || new Set()); if (c && c.stage) set.add(c.stage); if (B && B.stage) set.add(B.stage); if (B && B.pend && B.pend.v && B.pend.v.stage) set.add(B.pend.v.stage); if (SND.AU.want) set.add(SND.AU.want); }; });
   await p.evaluate(() => SND.AU.menuMusic()); await sleep(1500); await p.evaluate(() => SAMPLE());
-  const tt = await p.evaluate(() => [...PLAY.title]); ok(!tt.length, `the title is silent (playing: ${tt.join(',') || 'nothing'})`);
+  const tt = await p.evaluate(() => [...PLAY.title]); ok(tt.length === 1 && tt[0] === 'menu', `the title plays the menu song, one song at a time (playing: ${tt.join(',') || 'nothing'})`);   // 6 Nov 2026: the title is no longer silent (parts/music/library.js)
   const song1 = await p.evaluate(() => __mnr.STAGES[0].song);
   // ---- flight stage 1, stepped: FLIGHT -> to the end -> RETRY -> to the end -> TITLE
   const clickRetry = async () => { const id = await p.evaluate(() => ['srRetry', 'againBtn'].find(i => document.getElementById(i).getClientRects().length)); await p.click('#' + id); };
@@ -50,8 +50,8 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
   ok(f1.why === 'clear', `flight stage 1 ran to its end (${f1.why}, stage ${f1.st})`);
   ok(!sc.stages && sc.retry && sc.title, `result screen offers (NEXT STAGE,) RETRY + TITLE, no stage map: ${JSON.stringify(sc)}`);
   await clickRetry(); await p.waitForFunction(() => __mnr.running, null, { timeout: 8000 });
-  // stage 1 has no boss: ask for the boss song, a boss second part, a fever cue, a sting and a duck the way the boss / music pack code does
-  await p.evaluate(() => { __mnr.simOn(true); for (let i = 0; i < 300; i++) { __mnr.P.hp = __mnr.P.max; __mnr.step(1 / 60); } const AU = SND.AU; AU.startStage('boss'); AU.switchTo('boss2'); AU.switchTo('boss-d0~b'); AU.switchTo('fever-120'); AU.startStage('stage2'); AU.sting('clear'); AU.duckMusic(1); for (let i = 0; i < 300; i++) { __mnr.P.hp = __mnr.P.max; __mnr.step(1 / 60); if (i % 30 === 0) SAMPLE(); } });
+  // 6 Nov 2026: songs are no longer forced to the stage song (library.js); only the sting and the duck are still asked for, and both must stay silent
+  await p.evaluate(() => { __mnr.simOn(true); for (let i = 0; i < 300; i++) { __mnr.P.hp = __mnr.P.max; __mnr.step(1 / 60); } const AU = SND.AU; AU.sting('clear'); AU.duckMusic(1); for (let i = 0; i < 300; i++) { __mnr.P.hp = __mnr.P.max; __mnr.step(1 / 60); if (i % 30 === 0) SAMPLE(); } });
   const f2 = await flightRun(); console.log(`  flight run 2 (after retry): ${JSON.stringify(f2)}`);
   // pause screen
   await clickRetry(); await p.waitForFunction(() => __mnr.running, null, { timeout: 8000 });
@@ -60,7 +60,7 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
   ok(!pz.open || (!pz.set && pz.retry && pz.title), `pause screen: no SETTINGS, has RETRY + TITLE: ${JSON.stringify(pz)}`);
   await p.evaluate(() => document.getElementById(document.getElementById('pausem').hidden ? 'menuBtn' : 'quitBtn').click()); await sleep(600);
   const fl = await p.evaluate(() => ({ calls: LOG.filter(c => /^flight:/.test(c)), play: [...(PLAY.flight || [])] }));
-  ok(fl.play.length === 1 && fl.play[0] === song1, `flight: exactly one song ever playing: ${fl.play.join(',')} (stage-1 song ${song1})`);
+  const flp = fl.play.filter(x => x !== 'menu'); ok(flp.length === 1 && flp[0] === song1, `flight: one song at a time, the stage-1 song (the menu song only on the title): ${fl.play.join(',')} (stage-1 song ${song1})`);
   console.log(`  flight calls: ${fl.calls.length} (${[...new Set(fl.calls)].join(' ')})`);
   const back = await p.evaluate(VIS); ok(back.length === 3, `back at the title with the 3 buttons: ${back.join(' | ')}`);
   // ---- street run: ON FOOT -> bot plays the stage -> RETRY -> TITLE
@@ -79,8 +79,8 @@ const VIS = () => [...document.querySelectorAll('#title button')].filter(b => b.
   ok(sv.fAgain && !sv.fFly && !sv.fCp && sv.fCity && ct === 'TITLE', `street result: RETRY + TITLE only: ${JSON.stringify(sv)} ${ct}`);
   await p.evaluate(() => { const b = document.getElementById('fCity'); if (b) b.click(); }); await sleep(800);
   const st = await p.evaluate(() => ({ calls: LOG.filter(c => /^street:/.test(c)), play: [...PLAY.street] }));
-  ok(st.play.length === 1 && st.play[0] === 'street1', `street: exactly one song ever playing: ${st.play.join(',')}`);
-  ok(st.calls.every(c => /startStage:street1/.test(c)), `street: every call is street1: ${[...new Set(st.calls)].join(' ')}`);
+  ok(st.play.filter(x => x !== 'menu').every(x => /^street1/.test(x)), `street: street songs only, one at a time: ${st.play.join(',')}`);
+  ok(st.calls.every(c => /startStage:(street1|menu)/.test(c)), `street: every call is a street song or the title song: ${[...new Set(st.calls)].join(' ')}`);
   const end = await p.evaluate(VIS); ok(end.length === 3, `title again after the street: ${end.join(' | ')}`);
   ok(errs.length === 0, `page errors ${errs.length} ${errs[0] || ''}`);
   await br.close(); srv.kill(); const f = res.filter(x => !x).length; console.log(f ? 'FAIL focus-test' : 'PASS focus-test'); process.exit(f ? 1 : 0);
