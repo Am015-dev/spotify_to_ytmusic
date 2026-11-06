@@ -97,6 +97,7 @@ if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART
    the floor (rows 720-1023, transparent above) moves with the road. Draw order: sky, far, mid, near, floor, then props and actors. ----- */
 const SCL={};   // W241: one pre-scaled copy of each backdrop layer at its on-screen device size, rebuilt only when the size changes (a resize), so a frame blits ~1:1 instead of filtering a 2048 px picture
 function slScaled(l,pic,sy,sh,dw,dh){if(dw<2||dh<2||dw*dh>5e6)return null;const k=dw+'x'+dh+'|'+sy+'|'+sh;let o=SCL[l];if(o&&o.k===k)return o.cv;
+  if(window.PURL)pic=PURL.dim(pic,'st-'+l);   // W330: depth grade, once per layer (render/pure.js PURL.GR)
   const cv=o&&o.cv||document.createElement('canvas');cv.width=dw;cv.height=dh;const g=cv.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(pic,0,sy,pic.width,sh,0,0,dw,dh);SCL[l]={k,cv};return cv;}
 const PLY=['sky','far','mid','near','floor'],PSP={sky:.02,far:.12,mid:.4,near:.7,floor:1};
 SL.paint=0;
