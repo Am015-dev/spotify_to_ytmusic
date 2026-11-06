@@ -13,28 +13,35 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?2.1:1.3;},   // W215/W
   pl(){const s=ART.ANIM.s['ship-'+shipDef().id+'/flame'];return(s?s[2]:260)*this.K*this.PK;},   // the player's drawn length (world units)
   FOEF:'brightness(2) contrast(1.15) saturate(1.1)',SHIPF:'brightness(1.3) saturate(1.15)',   // W302 (17h value lift only): enemies off the dark city by value, the player one step brighter still
   WARM:/^(beat|disc|flame|orbit|shell|storm|swarm)$/,   // W215: weapon shot pictures in the enemy-shot hues (lime / yellow / orange): drawn as the cool standard shot instead
-  dim(b,v){const D=this.DM||(this.DM=new Map());let c=D.get(b);if(c)return c;   // W219: backdrop layers only, once per picture: brightness .65, saturate .85, so the play layer is the brightest thing
-    c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=`brightness(${v||.65}) saturate(.85)`;x.drawImage(b,0,0);D.set(b,c);return c;},
-  cover(b,w,h){b=this.dim(b,.55);   // the phone painting is brighter than the PC strips: a lower value lands it at the PC's level
+  GR:{sky:[.48,.45,.85,1.2,.22],far:[.52,.5,.86,.8,.18],mid:[.58,.56,.88,.4,.12],near:[.82,.75,.95,0,.04],phone:[.5,.48,.85,.8,.16]},   // W330 depth grade [value, saturation, contrast, blur px, cool haze]: the farther, the darker, greyer, softer and hazier
+  dim(b,l){const D=this.DM||(this.DM=new Map()),k=l||'mid';let E=D.get(b);if(!E)D.set(b,E={});let c=E[k];if(c)return c;   // backdrop layers only, graded ONCE per picture and depth (cached canvas), so the play layer is the brightest, most saturated, sharpest thing
+    const[v,sa,co,bl,hz]=this.GR[k];c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=`contrast(${co}) brightness(${v}) saturate(${sa})`+(bl?` blur(${bl}px)`:'');x.drawImage(b,0,0);x.filter='none';
+    x.globalCompositeOperation='source-atop';x.fillStyle=`rgba(16,14,36,${hz})`;x.fillRect(0,0,c.width,c.height);E[k]=c;return c;},
+  veil(w,h,hy){const m=ctx.getTransform(),dw=Math.round(w*m.a),dh=Math.round(h*m.d);if(dw<2||dh<2)return;const V=this.VL||(this.VL={});   // W330: haze between the city and the play layer (strongest at the horizon hy) + a soft edge vignette, built once per size, under the actors and the HUD
+    if(V.w!==dw||V.h!==dh||V.y!==hy){const c=V.cv||(V.cv=document.createElement('canvas'));c.width=dw;c.height=dh;const g=c.getContext('2d'),l=g.createLinearGradient(0,0,0,dh);
+      l.addColorStop(0,'rgba(8,6,22,.1)');l.addColorStop(hy,'rgba(18,14,40,.22)');l.addColorStop(1,'rgba(6,5,18,.06)');g.fillStyle=l;g.fillRect(0,0,dw,dh);
+      const r=g.createRadialGradient(dw/2,dh/2,Math.min(dw,dh)*.35,dw/2,dh/2,Math.hypot(dw,dh)/2);r.addColorStop(0,'rgba(4,3,12,0)');r.addColorStop(1,'rgba(4,3,12,.15)');g.fillStyle=r;g.fillRect(0,0,dw,dh);V.w=dw;V.h=dh;V.y=hy;}
+    ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(V.cv,0,0);ctx.restore();},
+  cover(b,w,h){b=this.dim(b,'phone');   // the phone painting is brighter than the PC strips: a lower value lands it at the PC's level
    const s=Math.max(w/b.width,h/b.height),sw=w/s,sh=h/s,m=ctx.getTransform(),dw=Math.round(w*m.a),dh=Math.round(h*m.d),C=this.CV||(this.CV={});   // W241: the still backdrop is cropped and scaled once per size, then copied 1:1 each frame
    if(dw>1&&dh>1&&dw*dh<4e6){if(C.b!==b||C.w!==dw||C.h!==dh){const cv_=C.cv||(C.cv=document.createElement('canvas'));cv_.width=dw;cv_.height=dh;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,dw,dh);g.fillStyle='rgba(12,8,24,.22)';g.fillRect(0,0,dw,dh);C.b=b;C.w=dw;C.h=dh;}
      const q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';ctx.drawImage(C.cv,0,0,w,h);ctx.imageSmoothingQuality=q;return;}
    ctx.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,w,h);ctx.fillStyle='rgba(12,8,24,.22)';ctx.fillRect(0,0,w,h);},
-  pan(b,w,h,off){b=this.dim(b,.55);const X=1.35,s=Math.max(w/b.width,h*X/b.height),sw=w/s,sh=h*X/s,m=ctx.getTransform(),dw=Math.round(w*m.a),dh=Math.round(h*m.d),eh=Math.round(dh*X),ex=eh-dh,C=this.PC||(this.PC={});   // W250: the phone sky is cropped once at 1.35x height, then a window of it slides 1:1 (far plane, ratio .1, no flip, no seam: it pans back and forth)
+  pan(b,w,h,off){b=this.dim(b,'phone');const X=1.35,s=Math.max(w/b.width,h*X/b.height),sw=w/s,sh=h*X/s,m=ctx.getTransform(),dw=Math.round(w*m.a),dh=Math.round(h*m.d),eh=Math.round(dh*X),ex=eh-dh,C=this.PC||(this.PC={});   // W250: the phone sky is cropped once at 1.35x height, then a window of it slides 1:1 (far plane, ratio .1, no flip, no seam: it pans back and forth)
    if(dw<2||dh<2||dw*eh>4e6){this.cover(b,w,h);return;}
    if(C.b!==b||C.w!==dw||C.h!==dh){const c=C.cv||(C.cv=document.createElement('canvas'));c.width=dw;c.height=eh;const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,(b.width-sw)/2,(b.height-sh)/2,sw,sh,0,0,dw,eh);g.fillStyle='rgba(12,8,24,.22)';g.fillRect(0,0,dw,eh);C.b=b;C.w=dw;C.h=dh;}
    const p=ex>0?off*m.d%(2*ex):0,y=Math.round(p>ex?2*ex-p:p),q=ctx.imageSmoothingQuality;ctx.imageSmoothingQuality='low';ctx.drawImage(C.cv,0,ex-y,dw,dh,0,0,w,h);ctx.imageSmoothingQuality=q;},
-  tile(b,y,h,scroll,par,keep){if(!keep)b=this.dim(b);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
+  tile(b,y,h,scroll,par,l){b=this.dim(b,l);const tw=h*b.width/b.height,off=(scroll*par)%(2*tw);   // every other tile mirrored: no seam
     for(let j=Math.floor(off/tw);j*tw-off<W;j++){const x=j*tw-off;if(x+tw<=0)continue;
       if(j&1){ctx.save();ctx.translate(x+tw,y);ctx.scale(-1,1);ctx.drawImage(b,0,0,tw,h);ctx.restore();}else ctx.drawImage(b,x,y,tw,h);}},
   bg(port,scroll){const di=G.di,n=ART.dn[di],D=DISTRICTS[di],bm=ART.bm;ctx.fillStyle='#000';
-    if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.pan(b,PW_,PH_,scroll*.1);return;}   // W250: three planes, ratios .1 / .3 / .6: far sky pans, mid rooftops fainter, near rooftops larger and faster
+    if(port){const b=bm['bg-'+n+'-phone'];if(!b){ART.warm(di);ctx.fillRect(0,0,PW_,PH_);return;}this.pan(b,PW_,PH_,scroll*.1);this.veil(PW_,PH_,.6);return;}   // W250: three planes, ratios .1 / .3 / .6: far sky pans, mid rooftops fainter, near rooftops larger and faster
     ART.paintReady(di);const b=bm['bg-'+n];if(!b){ctx.fillRect(0,0,W,H);return;}
-    this.tile(b,0,H,scroll,.03);
+    this.tile(b,0,H,scroll,.03,'sky');
     const far=bm['ly-far-'+n],mid=bm['ly-mid-'+n],nr=bm['ly-near-'+D.near];
-    if(far){const fh=W*far.height/far.width;this.tile(far,H-60-fh,fh,scroll,.03);}
-    if(mid)this.tile(mid,H-340,310,scroll,.3);
-    if(nr)this.tile(nr,H-130,130,scroll,1.1,1);},   // the near strip keeps full value (play-layer depth)
+    if(far){const fh=W*far.height/far.width;this.tile(far,H-60-fh,fh,scroll,.03,'far');}
+    if(mid)this.tile(mid,H-340,310,scroll,.3,'mid');
+    if(nr)this.tile(nr,H-130,130,scroll,1.1,'near');this.veil(W,H,.7);},   // W330: the near strip (just behind the play layer) gets the lightest grade
   sheet(e){const M=ENEMY_ART[FOEART.id(e)];if(!M||e.type==='gate')return null;const m=M.native?{s:M.s||'e'+e.type,k:M.k||4.2}:FOEART.map(e);if(!m||!m.s)return null;
     const b='ship-'+m.s+'/',v=e.arm&&ART.ANIM.s[b+'volley']&&ART.anim(b+'volley'),key=b+(v?'volley':'flame');if(!ART.ANIM.s[key]||!ART.anim(key))return null;ART.anim(b+'death');return{m,key};},
   foe(e,t){const q=this.sheet(e);if(!q)return false;const{m,key}=q,s=ART.ANIM.s[key],fw=s[2],fl=this.pl()*(wcv!==cv?.68:.55),w=clamp(m.w||e.r*(m.k||4.2),Math.max(this.K*fw*.8,fl),Math.max(this.K*fw*1.25,fl)),sc=w/fw,rot=m.rot?m.rot(e,t):0;
