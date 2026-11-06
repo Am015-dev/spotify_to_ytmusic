@@ -84,13 +84,14 @@ if(DIET.on){
     banner(t,w,h,k);ctx.restore();};
   DIET.hudL=function(t){const D=DISTRICTS[G.di],ku=HKL;ctx.save();LOG();
     const cn=(ax,ay,f)=>{if(ku===1){f();return;}ctx.save();ctx.translate(ax,ay);ctx.scale(ku,ku);ctx.translate(-ax,-ay);f();ctx.restore();};
-    cn(0,0,()=>{UIK.plate(ctx,'ui-hud-mult',8,6,150,48,20,12,33,125);ctx.font='700 22px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.textAlign='left';ctx.fillText(String(G.score).padStart(8,'0'),20,37);});
-    cn(0,H,()=>{const y0=H-62;UIK.plate(ctx,'ui-hud-bars',8,y0,touchUI?118:228,50,24,12,157,197);const by=y0+36;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#dcd8f6';
+    const soft=(x,y,w,h)=>{const g=ctx.createRadialGradient(x+w/2,y+h/2,0,x+w/2,y+h/2,w*.62);g.addColorStop(0,'rgba(6,3,14,.62)');g.addColorStop(1,'rgba(6,3,14,0)');ctx.save();ctx.translate(x+w/2,y+h/2);ctx.scale(1,h/w);ctx.translate(-x-w/2,-y-h/2);ctx.fillStyle=g;ctx.fillRect(x-w*.2,y-w*.2,w*1.4,w*1.4);ctx.restore();};   // W329: no boxed plate on PC: a soft dark falloff (no edge) keeps the type readable over the city
+    cn(0,0,()=>{soft(0,0,190,62);ctx.font='700 24px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.textAlign='left';ctx.shadowColor=D.a;ctx.shadowBlur=12;ctx.fillText(String(G.score).padStart(8,'0'),20,38);ctx.shadowBlur=0;});
+    cn(0,H,()=>{const y0=H-62;soft(0,y0-4,touchUI?140:250,60);ctx.shadowColor=D.a;ctx.shadowBlur=6;const by=y0+36;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#dcd8f6';
       ctx.fillText('HULL',20,y0+26);pips(20,by-8,Math.min(16,88/P.max)-4,8,4);
       if(!touchUI){   // W324: with the touch buttons on screen they own the dash / EMP state (ring + count); the panel does not repeat it
       ctx.fillStyle='#dcd8f6';ctx.fillText('DASH',122,y0+26);ctx.fillStyle='#ffffff1a';ctx.fillRect(122,by-8,36,8);ctx.fillStyle=P.dashCd<=0?D.a:'#ffffff40';ctx.fillRect(122,by-8,36*(1-clamp(P.dashCd,0,1)),8);
       ctx.fillStyle='#dcd8f6';ctx.fillText('EMP',172,y0+26);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(178+i*14,by-4,4.5,0,7);ctx.fill();}}});
-    Object.assign(HUDLOG,{x:HUDX.vals()});
+    ctx.shadowBlur=0;Object.assign(HUDLOG,{x:HUDX.vals()});
     if(touchUI)buttons();
     if(G.note.t>0&&G.note.txt&&!(touchUI&&/^\u266a/.test(G.note.txt)))cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12);ctx.globalAlpha=1;});
     if(window.HINT&&HINT.on())HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});
