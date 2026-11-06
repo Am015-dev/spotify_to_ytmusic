@@ -80,7 +80,8 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?2.1:1.3;},   // W215/W
       {const cl=Math.cos(a),sl=Math.sin(a);this.pic(n+'~c',b.x-cl*w*.35,b.y-sl*w*.35,w*1.9,a,ph?2.6:2.2);}   // W329: tracer = a long soft cyan glow trailing the shot, then the owner's streak as the hot core
       if(this.pic(n,b.x,b.y,w,a,ph?2.4:1.7)&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,ph?1.4:1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
     ctx.globalAlpha=1;},   // W302: player shots only; enemy shots have ONE owner, PB.ebul (pureboss.js), called from draw() right after this
-  air(w,h,t){const A=this.AR||(this.AR=(()=>{const r=document.createElement('canvas');r.width=r.height=256;const g=r.getContext('2d');g.lineCap='round';
+  air(w,h,t,cx){const o_=ctx;if(cx)ctx=cx;try{this.air0(w,h,t);}finally{ctx=o_;}},   // W329: cx = another canvas (the street draws its own frame)
+  air0(w,h,t){const A=this.AR||(this.AR=(()=>{const r=document.createElement('canvas');r.width=r.height=256;const g=r.getContext('2d');g.lineCap='round';
       for(let i=0;i<70;i++){const x=Math.random()*256,y=Math.random()*256,l=10+Math.random()*22;g.strokeStyle=`rgba(${Math.random()<.5?'190,230,255':'255,170,230'},${.25+Math.random()*.35})`;g.lineWidth=Math.random()<.2?1.4:.8;for(const o of[0,-256,256]){g.beginPath();g.moveTo(x+o*.2,y+o);g.lineTo(x-l*.2+o*.2,y+l+o);g.stroke();}}
       const n=document.createElement('canvas');n.width=n.height=128;const q=n.getContext('2d'),d=q.createImageData(128,128);for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255|0;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}q.putImageData(d,0,0);
       return{r:ctx.createPattern(r,'repeat'),n:ctx.createPattern(n,'repeat')};})());   // W329: rain + film grain OVER the actors (the painted backdrop has both; the sprites had neither), tiles made once
