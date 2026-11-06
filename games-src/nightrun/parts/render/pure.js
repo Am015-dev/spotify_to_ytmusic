@@ -9,7 +9,7 @@
    arming circles, hit flashes, tier glow, screen flash / glitch, floating text, edge pulses. Bosses and gate pylons have no single sheet
    drawn here yet: they keep the old draw. Gameplay is not touched (the sim never calls render). ---------- */
 if(RET.purelook===undefined)RET.purelook=!/[?&]purelook=0/.test(location.search);   // W215: the default flight look
-const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W219: player 1.6x the enemies' texel scale on the phone, 1.3x on PC
+const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?2.1:1.3;},   // W215/W219/W329: player 2.1x the enemies' texel scale on the phone (bigger on screen, the sheet is still drawn below its own resolution), 1.3x on PC
   pl(){const s=ART.ANIM.s['ship-'+shipDef().id+'/flame'];return(s?s[2]:260)*this.K*this.PK;},   // the player's drawn length (world units)
   FOEF:'brightness(2) contrast(1.15) saturate(1.1)',SHIPF:'brightness(1.3) saturate(1.15)',   // W302 (17h value lift only): enemies off the dark city by value, the player one step brighter still
   WARM:/^(beat|disc|flame|orbit|shell|storm|swarm)$/,   // W215: weapon shot pictures in the enemy-shot hues (lime / yellow / orange): drawn as the cool standard shot instead
@@ -48,8 +48,8 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     ctx.restore();},
   rim(key,t,k,s){this.ink(s[2]*k+8,s[3]*k+8,()=>{ctx.filter=this.SHIPF;ART.drawAnim(ctx,key,t,0,0,k,false);ctx.filter='none';},.9,key+'|'+Math.round(k*20)+'|'+this.fk(key,t));},   // W215: the player's frame with a 1 px outline (no glow, no ring)
   fk(key,t){const i=ART.aframe(key,t);return i+'.'+Math.round(ART.aP*4);},   // W255: sheet frame + crossfade step, the cache key part of an animated actor (looping time would never repeat)
-  ink(w_,h_,fn,lit,ck){   // W244: ONE ink pass for every actor (player, enemies, boss, pickups): fn draws the actor at the local origin (current transform = its place); we add the same outline weight, one soft ink shadow offset down-right (key light upper left) and a thin warm lit edge on the upper left. No blur: offset copies of one silhouette, built into pooled canvases.
-    const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(w_*ps+8),h=Math.ceil(h_*ps+8);
+  ink(w_,h_,fn,lit,ck){   // W244/W329: ONE light pass for every actor (player, enemies, boss, pickups): fn draws the actor at the local origin; we add a soft contact shadow below, a faint 1 px dark rim, a cyan/magenta scene grade and a top-down neon rim light. Built once per sheet frame into pooled canvases, then cached.
+    const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(w_*ps+24),h=Math.ceil(h_*ps+24);
     if(!(ps>0)||w*h>4e6){fn();return;}
     const CC=this.IC||(this.IC=new Map()),CK=ck&&ck+'|'+Math.round(ps*50)+'|'+Math.round(Math.atan2(m.b,m.a)*12)+'|'+lit,hit=CK&&CC.get(CK);   // W255: an actor sheet frame (time in 1/15 s steps, rotation in 1/12 rad steps) is inked once and then copied: the ink pass was 18 canvas ops per actor per frame
     if(hit){ctx.drawImage(hit.cv,0,0,hit.w,hit.h,-hit.W/2,-hit.H/2,hit.W,hit.H);return;}
@@ -60,23 +60,33 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     b.setTransform(1,0,0,1,0,0);b.globalCompositeOperation='source-over';b.clearRect(0,0,w,h);b.drawImage(O[0],0,0,w,h,0,0,w,h);const pb=window.PB;if(pb)pb.hud++;b.globalCompositeOperation='source-in';b.fillStyle='#07030f';b.fillRect(0,0,w,h);b.globalCompositeOperation='source-over';if(pb)pb.hud--;   // tint fills on the pooled canvases are not play-field shapes (qa/pureprobe.js counts them out)
     
     const T=CK?document.createElement('canvas'):null;let tc=ctx;if(T){T.width=w;T.height=h;tc=T.getContext('2d');tc.setTransform(ps,0,0,ps,w/2,h/2);}
-    const d=Math.max(1.2*(window.devicePixelRatio||1),1.6)/ps,ox=3*d,oy=5*d,lx=(ox*m.a+oy*m.b)/ps,ly=(oy*m.a-ox*m.b)/ps,X=-W_/2,Y=-H_/2,im=(c,x,y)=>tc.drawImage(c,0,0,w,h,X+x,Y+y,W_,H_);
-    tc.globalAlpha=.4;im(O[1],lx,ly);tc.globalAlpha=1;   // the shadow rotates with the actor so it always falls the same way on screen
-    for(const[x,y]of[[-d,0],[d,0],[0,-d],[0,d],[-d*.7,-d*.7],[d*.7,-d*.7],[-d*.7,d*.7],[d*.7,d*.7]])im(O[1],x,y);
+    const cs=m.a/ps,sn=m.b/ps,[vx,vy]=this.DN||[0,1],dx=cs*vx+sn*vy,dy=cs*vy-sn*vx,u=1/ps,X=-W_/2,Y=-H_/2,im=(c,x,y)=>tc.drawImage(c,0,0,w,h,X+x,Y+y,W_,H_);   // W329: (dx,dy) = screen-down in the actor's own frame (phone world is turned onto the screen)
+    tc.filter=`blur(${Math.max(2,3.5*(window.devicePixelRatio||1))}px)`;tc.globalAlpha=.55;im(O[1],dx*4*u,dy*4*u);tc.filter='none';   // W329: a soft dark contact shadow just below the actor instead of the hard offset copy
+    tc.globalAlpha=.32;for(const[x,y]of[[-u,0],[u,0],[0,-u],[0,u]])im(O[1],x,y);tc.globalAlpha=1;   // 1 device px dark rim, faint: separates from bright sky, invisible on the dark city (no pale outline)
     im(O[0],0,0);
-    if(lit!==0){const c=O[2].getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.clearRect(0,0,w,h);c.drawImage(O[0],0,0,w,h,0,0,w,h);c.globalCompositeOperation='source-in';c.fillStyle='#ffe6c4';if(pb)pb.hud++;c.fillRect(0,0,w,h);if(pb)pb.hud--;   // upper-left lit edge: the art's own shape minus itself shifted down-right
-      c.globalCompositeOperation='destination-out';const sx=ps*d*1.6,cs=m.a/ps,sn=m.b/ps;c.drawImage(O[0],0,0,w,h,sx*.7*(cs+sn),sx*.7*(cs-sn),w,h);c.globalCompositeOperation='source-over';
-      tc.globalAlpha=lit||.35;im(O[2],0,0);tc.globalAlpha=1;}
+    const c=O[2].getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.clearRect(0,0,w,h);c.drawImage(O[0],0,0,w,h,0,0,w,h);c.globalCompositeOperation='source-in';
+    const gx=w/2-dx*h/2,gy=h/2-dy*h/2,gr=c.createLinearGradient(gx,gy,w/2+dx*h/2,h/2+dy*h/2);gr.addColorStop(0,'#38e8ff');gr.addColorStop(.55,'#7a3cff');gr.addColorStop(1,'#ff2fa8');c.fillStyle=gr;if(pb)pb.hud++;c.fillRect(0,0,w,h);if(pb)pb.hud--;
+    tc.globalCompositeOperation='soft-light';tc.globalAlpha=.5;im(O[2],0,0);tc.globalCompositeOperation='source-over';tc.globalAlpha=1;   // W329: graded toward the city's cyan (top) / magenta (bottom) so the actor sits in the scene's light
+    if(lit!==0){c.globalCompositeOperation='source-over';c.clearRect(0,0,w,h);c.drawImage(O[0],0,0,w,h,0,0,w,h);c.globalCompositeOperation='source-in';c.fillStyle='#bdf6ff';if(pb)pb.hud++;c.fillRect(0,0,w,h);if(pb)pb.hud--;   // top-down neon rim light: the art's own shape minus itself shifted down (screen)
+      const sx=Math.max(1.5,1.8*(window.devicePixelRatio||1));c.globalCompositeOperation='destination-out';c.drawImage(O[0],0,0,w,h,dx*sx,dy*sx,w,h);c.globalCompositeOperation='source-over';
+      tc.globalCompositeOperation='lighter';tc.globalAlpha=(lit||.35)*.55;im(O[2],0,0);tc.globalCompositeOperation='source-over';tc.globalAlpha=1;}
     if(T){const px=(this.IP||0)+w*h;this.IP=px;CC.set(CK,{cv:T,w,h,W:W_,H:H_});for(const[k,e]of CC){if(this.IP<=8e6)break;this.IP-=e.w*e.h;CC.delete(k);}ctx.drawImage(T,0,0,w,h,X,Y,W_,H_);}},
-  hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=v==='w'?'saturate(0) brightness(1.6)':'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,0,0);return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white (made once per picture)
-  pic(n,x,y,w,ang,hk){const v=/~([ow])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
+  hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');const P_=v==='c'?Math.round(b.height*.6):0;if(P_){c.width=b.width+2*P_;c.height=b.height+2*P_;}x.filter=v==='w'?'saturate(0) brightness(1.6)':v==='c'?`sepia(1) saturate(6) hue-rotate(150deg) brightness(1.1) blur(${Math.max(2,b.height*.18)}px)`:'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,P_,P_);return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white, ~c W329 soft cyan tracer glow (padded so the blur is not cut) (made once per picture)
+  pic(n,x,y,w,ang,hk){const v=/~([owc])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
   shots(){const ph=wcv!==cv,g=ph?1.4:1;   // W302: phone player shots 1.4x and thicker (owner: 'player bullets are not visible at all'); still under the enemy shots (drawn first)
     for(const b of G.pb){if(b.y<12)continue;const fa=Math.min(b.x>W*.7?1-(b.x-W*.7)/(W*.3):1,1-(Math.hypot(b.x-P.x,b.y-P.y)-W*.55)/(W*.25));if(fa<.05)continue;ctx.globalAlpha=Math.min(1,fa);const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
       if(wn&&this.pic(wn,b.x,b.y,44*g,a))continue;
       const n=b.hv?'fx-shot-hv':b.ec?'fx-shot-ec':'fx-shot-std',w=(b.hv?52:b.ec?40:(b.len||(b.big?22:20))*2.4*(b.pf?1.3:1))*g;
+      {const cl=Math.cos(a),sl=Math.sin(a);this.pic(n+'~c',b.x-cl*w*.35,b.y-sl*w*.35,w*1.9,a,ph?2.6:2.2);}   // W329: tracer = a long soft cyan glow trailing the shot, then the owner's streak as the hot core
       if(this.pic(n,b.x,b.y,w,a,ph?2.4:1.7)&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,ph?1.4:1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
     ctx.globalAlpha=1;},   // W302: player shots only; enemy shots have ONE owner, PB.ebul (pureboss.js), called from draw() right after this
-  draw(t,dt){const PT=wcv!==cv;for(const c of[vctx,wctx]){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='medium';}
+  air(w,h,t){const A=this.AR||(this.AR=(()=>{const r=document.createElement('canvas');r.width=r.height=256;const g=r.getContext('2d');g.lineCap='round';
+      for(let i=0;i<70;i++){const x=Math.random()*256,y=Math.random()*256,l=10+Math.random()*22;g.strokeStyle=`rgba(${Math.random()<.5?'190,230,255':'255,170,230'},${.25+Math.random()*.35})`;g.lineWidth=Math.random()<.2?1.4:.8;for(const o of[0,-256,256]){g.beginPath();g.moveTo(x+o*.2,y+o);g.lineTo(x-l*.2+o*.2,y+l+o);g.stroke();}}
+      const n=document.createElement('canvas');n.width=n.height=128;const q=n.getContext('2d'),d=q.createImageData(128,128);for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255|0;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}q.putImageData(d,0,0);
+      return{r:ctx.createPattern(r,'repeat'),n:ctx.createPattern(n,'repeat')};})());   // W329: rain + film grain OVER the actors (the painted backdrop has both; the sprites had neither), tiles made once
+    const pb=window.PB;if(pb)pb.hud++;ctx.save();const o=(t*900)%256;ctx.translate(-o*.2,o);ctx.globalAlpha=.32;ctx.fillStyle=A.r;ctx.fillRect(o*.2,-o,w,h);ctx.restore();
+    const gx=(t*7919)%128|0,gy=(t*6271)%128|0;ctx.save();ctx.translate(-gx,-gy);ctx.globalCompositeOperation='overlay';ctx.globalAlpha=.07;ctx.fillStyle=A.n;ctx.fillRect(gx,gy,w,h);ctx.restore();if(pb)pb.hud--;},
+  draw(t,dt){const PT=wcv!==cv;this.DN=PT?[-1,0]:[0,1];for(const c of[vctx,wctx]){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='medium';}
     if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);this.bg(true,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
     else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
     ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
@@ -91,5 +101,5 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     this.player(t);
     if(G.empT>0)AH.pic('fx-pw-bomb-pulse',(0.6-G.empT)*2800,P.x,P.y,0,Math.min(1,G.empT*2.2));
     ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-    if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(wcv,0,0);ctx.imageSmoothingEnabled=true;ctx.setTransform(VS,0,0,VS,0,0);if(running&&!HUDOFF)drawHUDP(t);}
-    else if(running&&!HUDOFF){drawHUD(t);PW.hud(t);}}};
+    if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(wcv,0,0);ctx.imageSmoothingEnabled=true;ctx.setTransform(VS,0,0,VS,0,0);this.air(PW_,PH_,t);if(running&&!HUDOFF)drawHUDP(t);}
+    else{this.air(W,H,t);if(running&&!HUDOFF){drawHUD(t);PW.hud(t);}}}};
