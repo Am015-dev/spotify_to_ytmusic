@@ -104,7 +104,8 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
   for(const g of S.bombsL){SL.z=g.z;at(c,g.x,g.y,K);pic(c,'fx-ft-grenade',g.x,g.y,22,S.time*7);c.restore();}
   for(const b of S.eb){SL.z=b.z;at(c,b.x,b.y,K);const ko=keyed('fx-bullet-enemy');if(RET.footmove)eShot(c,b);else if(ko){const w=11,h=w*ko.height/ko.width;c.drawImage(ko,b.x-w/2,b.y-h/2,w,h);}else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();}c.restore();}   // no picture yet: the plain shot
   if(RET.footmove)efx(c,K,at,keyed('fx-bullet-enemy'));SL.z=null;for(const f of S.fx){if(!window.AH)break;if(f.pic){if(SL.band)SL.z=f.z==null?null:f.z;at(c,f.x,f.y,K);AH.ftFx(c,f);c.restore();}else if(f.arc)AH.ftArc(c,Object.assign({},f,{arc:f.arc.map(([x,y])=>[x,SL.my(y)])}));}SL.z=null;
-  c.restore();const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);
+  c.restore();if(window.PURL&&PURL.air){const dp=window.devicePixelRatio||1;c.save();c.setTransform(dp,0,0,dp,0,0);PURL.air(c.canvas.width/dp,c.canvas.height/dp,S.time,c);c.restore();}   // W329: rain + grain OVER Kai and the foes (the painted rain was only behind them), under the HUD
+  const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);
   if(F.SB&&F.SB.draw){c.save();c.translate(-S.camX,0);F.SB.draw(c,{u,vw,K,t0,my:SL.my,band:SL.band||0,hudB:SL.hudB});c.restore();}   // W300: the boss duel's words, over the HUD stack's bottom (streetboss.js)const hb=SL.hudB,hf=SL.hudFull;X.slFrame(L);SL.hudB=hb;SL.hudFull=hf;return true;}
   const hb=SL.hudB,hf=SL.hudFull;X.slFrame(L);SL.hudB=hb;SL.hudFull=hf;return true;}
 SL.draw=function(c){return RET.purefoot?pure(c):old.apply(this,arguments);};
