@@ -7061,7 +7061,8 @@ MP.loadSt=function(n){const a=AU.a;if(!a||!MP.ready||!MP.ready.has('mp-st-'+n+'.
   let r;try{r=so.apply(this,arguments);}finally{if(old)AU.stg[n]=had;}
   if(r&&m==='mix'&&pack)MP.stOld[n]=!MP.stOld[n];return r;};}
 // on foot: the run plays stage2 or street1 by turns (new only: street1); lock / boss (a/b per boss phase) / clear are extras, read from the stage state twice a second
-MP.foot=function(){const F=window.FOOT;if(!MP.on()||!F||!F.on||!F.S||!sndOn('f_mcue'))return;   // Lab SOUND > ON FOOT: the song switches are off unless switched onconst S=F.S;
+MP.foot=function(){const F=window.FOOT;if(!MP.on()||!F||!F.on||!F.S||!sndOn('f_mcue'))return;   // Lab SOUND > ON FOOT: the song switches are off unless switched on
+  const S=F.S;
   let k=S.end&&S.end.cleared?'street1-clear':S.bossOn||S.boss?'street1-boss':S.lock?'street1-lock':MP.fbase||'street1';
   if(k==='street1-boss'&&MP.fb)k='street1-boss~b';
   if(!(k==='stage2'?TR.by.stage2:MP.has(k))||MP.fk===k)return;MP.fk=k;loadTrack(k);AU.startStage(k);};
@@ -14826,7 +14827,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='04374cb2d0 2026-11-01 00:51 UTC';
+const NR_STAMP='816b384bbd 2026-11-06 17:01 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -15054,13 +15055,14 @@ if(DIET.on){
     banner(t,w,h,k);ctx.restore();};
   DIET.hudL=function(t){const D=DISTRICTS[G.di],ku=HKL;ctx.save();LOG();
     const cn=(ax,ay,f)=>{if(ku===1){f();return;}ctx.save();ctx.translate(ax,ay);ctx.scale(ku,ku);ctx.translate(-ax,-ay);f();ctx.restore();};
-    cn(0,0,()=>{UIK.plate(ctx,'ui-hud-mult',8,6,150,48,20,12,33,125);ctx.font='700 22px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.textAlign='left';ctx.fillText(String(G.score).padStart(8,'0'),20,37);});
-    cn(0,H,()=>{const y0=H-62;UIK.plate(ctx,'ui-hud-bars',8,y0,touchUI?118:228,50,24,12,157,197);const by=y0+36;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#dcd8f6';
+    const soft=(x,y,w,h)=>{const g=ctx.createRadialGradient(x+w/2,y+h/2,0,x+w/2,y+h/2,w*.62);g.addColorStop(0,'rgba(6,3,14,.62)');g.addColorStop(1,'rgba(6,3,14,0)');ctx.save();ctx.translate(x+w/2,y+h/2);ctx.scale(1,h/w);ctx.translate(-x-w/2,-y-h/2);ctx.fillStyle=g;ctx.fillRect(x-w*.2,y-w*.2,w*1.4,w*1.4);ctx.restore();};   // W329: no boxed plate on PC: a soft dark falloff (no edge) keeps the type readable over the city
+    cn(0,0,()=>{soft(0,0,190,62);ctx.font='700 24px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.textAlign='left';ctx.shadowColor=D.a;ctx.shadowBlur=12;ctx.fillText(String(G.score).padStart(8,'0'),20,38);ctx.shadowBlur=0;});
+    cn(0,H,()=>{const y0=H-62;soft(0,y0-4,touchUI?140:250,60);ctx.shadowColor=D.a;ctx.shadowBlur=6;const by=y0+36;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#dcd8f6';
       ctx.fillText('HULL',20,y0+26);pips(20,by-8,Math.min(16,88/P.max)-4,8,4);
       if(!touchUI){   // W324: with the touch buttons on screen they own the dash / EMP state (ring + count); the panel does not repeat it
       ctx.fillStyle='#dcd8f6';ctx.fillText('DASH',122,y0+26);ctx.fillStyle='#ffffff1a';ctx.fillRect(122,by-8,36,8);ctx.fillStyle=P.dashCd<=0?D.a:'#ffffff40';ctx.fillRect(122,by-8,36*(1-clamp(P.dashCd,0,1)),8);
       ctx.fillStyle='#dcd8f6';ctx.fillText('EMP',172,y0+26);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(178+i*14,by-4,4.5,0,7);ctx.fill();}}});
-    Object.assign(HUDLOG,{x:HUDX.vals()});
+    ctx.shadowBlur=0;Object.assign(HUDLOG,{x:HUDX.vals()});
     if(touchUI)buttons();
     if(G.note.t>0&&G.note.txt&&!(touchUI&&/^\u266a/.test(G.note.txt)))cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12);ctx.globalAlpha=1;});
     if(window.HINT&&HINT.on())HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});
@@ -16497,7 +16499,7 @@ const SNDT=[
   ['f_big','ft','Your shot hits a boss or the big heavy (boom)',0],['f_hurt','ft','Kai is hit (crunch + music dip)',0],['f_dash','ft','Dash and jump whoosh',0],['f_graze','ft','Shield block and knife slash tick',0],
   ['f_warn','ft','Arena lock and boss warning beeps',0],['f_up','ft','Go-ahead and checkpoint chime',0],['f_fever','ft','FEVER starts (5 notes)',0],
   ['f_mstart','ft','The stage song starts when the run starts',1],['f_mcp','ft','Song restarts when you respawn at a checkpoint',0],
-  ['f_mcue','ft','Music-pack song switches: arena lock, boss, boss phase, clear (this one changes the music)',0],['f_mmenu','ft','Menu song comes back when you leave the stage',0],
+  ['f_mcue','ft','Street song changes: arena lock, boss, boss phase, clear (each a full song)',1],['f_mmenu','ft','Menu song comes back when you leave the stage',0],
   ['heart','pw','Heartbeat when you have 1 hull left',0],['hat','pw','TEMPO power-up hi-hat',0],['drums','pw','DRUM power-up drum kit',0],['pwnote','pw','Power-up notes (echo, nova, magnet, chord, level chime)',0],
   ['pwthump','pw','Power-up thump (nova, magnet)',0],['riser','pw','DROP power-up riser',0],['dropboom','pw','DROP power-up blast',0],['reward','pw','Reward shower boom',0]];
 const SNDGRP={fx:'GAME SOUNDS',st:'JINGLES ON THE BEAT',mu:'MUSIC EFFECTS',pw:'POWER-UP AND WAVE SOUNDS',ft:'ON FOOT'};
@@ -17820,9 +17822,8 @@ function snap(c,fn){const di=c.drawImage;c.drawImage=function(im){if(arguments.l
     if(!m.b&&!m.c&&m.a&&m.d){const X=a[o]*m.a+m.e,Y=a[o+1]*m.d+m.f,X2=Math.round((a[o]+a[o+2])*m.a+m.e),Y2=Math.round((a[o+1]+a[o+3])*m.d+m.f),rx=Math.round(X),ry=Math.round(Y);
       a[o]=(rx-m.e)/m.a;a[o+1]=(ry-m.f)/m.d;a[o+2]=(X2-rx)/m.a;a[o+3]=(Y2-ry)/m.d;}return di.apply(c,a);}return di.apply(c,arguments);};
   try{return fn();}finally{delete c.drawImage;}}
-/* ----- one song: musicpack's lock / boss / clear switches stay off on this stage; the run plays street1 (192 s, steady) from the first beat ----- */
+/* ----- one song at a time: the run plays street1 (192 s, steady) from the first beat; the arena lock, boss and clear songs (LIB, music/library.js) follow, each a full song, never a jingle ----- */
 const MP=RET.MP;
-if(MP&&MP.has){const h0=MP.has;MP.has=function(k){if(on()&&/^street1-/.test(k))return false;return h0.apply(this,arguments);};}
 /* ----- STREETSONG (owner, 23 Oct 2026: "music not on beat, one song one stage this lasts less than 20 seconds, music is distorted by jingles").
    Measured (qa/streetsong-test.js): a run started stage2, then street1 in the same frame, then street1 again on a bar line once the file had loaded (3 song starts in the first 0.5 s, the first
    seconds on the synth fallback); a RETRY started stage2 (170 s, other tempo) and kept the street1 title. Now: the stage song is street1 from the first call (ST.song), the STREET RUN hold waits for the
@@ -17835,9 +17836,8 @@ if(RET.streetsong){
   Object.defineProperty(ST,'song',{get(){return ssOn()?SSNG:'stage2';},set(v){},configurable:true});
   const ssFoot=()=>RET.streetsong&&F.on&&F.S&&F.S.st===ST&&ssOn();
   const blk=(n,a)=>{S3.snd.blocked.push(n+':'+[].join.call(a,','));return false;};
-  {const o=AU.startStage;AU.startStage=function(st){if(ssFoot()){if(st!==SSNG)return blk('startStage',arguments);S3.snd.starts.push(+(F.S.time).toFixed(2));}return o.apply(this,arguments);};}
+  {const o=AU.startStage;AU.startStage=function(st){if(ssFoot()){if(st!==SSNG&&!/^street1-/.test(st))return blk('startStage',arguments);S3.snd.starts.push(+(F.S.time).toFixed(2));}return o.apply(this,arguments);};}
   for(const f of ['switchTo','sting','duckMusic']){const o=AU[f];if(o)AU[f]=function(){return ssFoot()?blk(f,arguments):o.apply(this,arguments);};}
-  {const f0=MP.foot;if(f0)MP.foot=function(){return ssFoot()?undefined:f0.apply(this,arguments);};}
   /* the hold also waits for the song file (an unloaded file played the synth first, then swapped on a bar line) */
   {const FQ=F.q,r0=FQ&&FQ.ready,p0=FQ&&FQ.pct;
    const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return true;};   // W242: asks for the file, never waits for it
@@ -18774,7 +18774,7 @@ PL.ready=L=>{let ok=true;for(const x of L){if(!x.done)x.done=!!x.ok();if(!x.done
     if(r||w>PL.limit){d.remove();PL.veil=null;PL.waited=w;PL.last={n,wait:w,pct:PL.pct(L),timeout:!r};go();}else setTimeout(tick,50);};
   setTimeout(tick,0);};}
 
-// PURPOSE: FOCUS MODE: the title offers FLIGHT, ON FOOT, SETTINGS only (LAB with ?lab=1); flight stage 1 and the street play one song each
+// PURPOSE: FOCUS MODE: the title offers FLIGHT, ON FOOT, SETTINGS only (LAB with ?lab=1); the music is parts/music/library.js
 // FLAG: focus (?focus=0 = the whole game as before)
 // TEST: qa/focus-test.js
 /* ---------- FOCUS (owner, 23 Oct 2026: "all levels are horrible, focus on one on-foot level and one stage, all music is mixed, on foot is shit, all game is very boring").
@@ -18821,17 +18821,7 @@ html.focus #srMenu,html.focus #stBtn2,html.focus #pSetBtn,html.focus #fFly,html.
   const fix=()=>{txt($('againBtn'),'RETRY');txt($('srRetry'),'RETRY');txt($('restartBtn'),'RETRY');txt($('menuBtn'),'TITLE');txt($('quitBtn'),'TITLE');txt($('fCity'),'TITLE');txt($('fQuit'),'TITLE');txt($('fAgain'),'RETRY');};
   new MutationObserver(fix).observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['hidden']});fix();
   },0);
-  /* ----- music: one song per mode ----- */
-  const inFlight=()=>RET.focus&&ST.on&&ST.n===1&&!(window.FOOT&&FOOT.on);
-  const pick=p=>{try{const m=window.SND&&SND.cfg&&SND.cfg.music&&SND.cfg.music[p];return m&&SND.songs().includes(m)?m:null;}catch(e){return null;}};
-  {const s0=AU.startStage;AU.startStage=function(stage,at){
-    if(inFlight()){const w=ST.def.song;if(stage!==w)arguments[0]=stage=w;}   // boss, fever, district and menu songs all map to the stage song: a stage that wants the playing song keeps it
-    else if(stage==='menu'&&!(window.FOOT&&FOOT.on)&&!pick('title'))return;   // the title is silent
-    return s0.apply(this,arguments);};}
-  {const w0=AU.switchTo;AU.switchTo=function(stage){if(inFlight())return;return w0.apply(this,arguments);};}
-  for(const f of ['sting','duckMusic']){const o=AU[f];if(o)AU[f]=function(){return inFlight()?false:o.apply(this,arguments);};}
-  {const m0=AU.menuMusic;AU.menuMusic=function(){if(inFlight())return;return m0.apply(this,arguments);};}
-  {const MP=RET.MP;if(MP&&MP.foot){const f0=MP.foot;MP.foot=function(){return inFlight()?undefined:f0.apply(this,arguments);};}}
+  /* music: since 6 Nov 2026 the whole library plays (parts/music/library.js): the one-song-per-mode rule of 23 Oct is gone, a stage plays its own song, a boss its own, the title the menu song */
 }
 
 // PURPOSE: story stage 1 stops being boring: foes act at once, a rising script to a peak at ~85% of the waves, two decisions (bounty chase, EMP now or later), then a mini-boss
@@ -19634,7 +19624,7 @@ IN.drawWho=function(c,who,pose,x,y,h,flip,t,col){const e=typeof ART!=='undefined
    arming circles, hit flashes, tier glow, screen flash / glitch, floating text, edge pulses. Bosses and gate pylons have no single sheet
    drawn here yet: they keep the old draw. Gameplay is not touched (the sim never calls render). ---------- */
 if(RET.purelook===undefined)RET.purelook=!/[?&]purelook=0/.test(location.search);   // W215: the default flight look
-const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W219: player 1.6x the enemies' texel scale on the phone, 1.3x on PC
+const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?2.1:1.3;},   // W215/W219/W329: player 2.1x the enemies' texel scale on the phone (bigger on screen, the sheet is still drawn below its own resolution), 1.3x on PC
   pl(){const s=ART.ANIM.s['ship-'+shipDef().id+'/flame'];return(s?s[2]:260)*this.K*this.PK;},   // the player's drawn length (world units)
   FOEF:'brightness(2) contrast(1.15) saturate(1.1)',SHIPF:'brightness(1.3) saturate(1.15)',   // W302 (17h value lift only): enemies off the dark city by value, the player one step brighter still
   WARM:/^(beat|disc|flame|orbit|shell|storm|swarm)$/,   // W215: weapon shot pictures in the enemy-shot hues (lime / yellow / orange): drawn as the cool standard shot instead
@@ -19673,8 +19663,8 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     ctx.restore();},
   rim(key,t,k,s){this.ink(s[2]*k+8,s[3]*k+8,()=>{ctx.filter=this.SHIPF;ART.drawAnim(ctx,key,t,0,0,k,false);ctx.filter='none';},.9,key+'|'+Math.round(k*20)+'|'+this.fk(key,t));},   // W215: the player's frame with a 1 px outline (no glow, no ring)
   fk(key,t){const i=ART.aframe(key,t);return i+'.'+Math.round(ART.aP*4);},   // W255: sheet frame + crossfade step, the cache key part of an animated actor (looping time would never repeat)
-  ink(w_,h_,fn,lit,ck){   // W244: ONE ink pass for every actor (player, enemies, boss, pickups): fn draws the actor at the local origin (current transform = its place); we add the same outline weight, one soft ink shadow offset down-right (key light upper left) and a thin warm lit edge on the upper left. No blur: offset copies of one silhouette, built into pooled canvases.
-    const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(w_*ps+8),h=Math.ceil(h_*ps+8);
+  ink(w_,h_,fn,lit,ck){   // W244/W329: ONE light pass for every actor (player, enemies, boss, pickups): fn draws the actor at the local origin; we add a soft contact shadow below, a faint 1 px dark rim, a cyan/magenta scene grade and a top-down neon rim light. Built once per sheet frame into pooled canvases, then cached.
+    const m=ctx.getTransform(),ps=Math.hypot(m.a,m.b),O=this.O||(this.O=[document.createElement('canvas'),document.createElement('canvas'),document.createElement('canvas')]),w=Math.ceil(w_*ps+14),h=Math.ceil(h_*ps+14);
     if(!(ps>0)||w*h>4e6){fn();return;}
     const CC=this.IC||(this.IC=new Map()),CK=ck&&ck+'|'+Math.round(ps*50)+'|'+Math.round(Math.atan2(m.b,m.a)*12)+'|'+lit,hit=CK&&CC.get(CK);   // W255: an actor sheet frame (time in 1/15 s steps, rotation in 1/12 rad steps) is inked once and then copied: the ink pass was 18 canvas ops per actor per frame
     if(hit){ctx.drawImage(hit.cv,0,0,hit.w,hit.h,-hit.W/2,-hit.H/2,hit.W,hit.H);return;}
@@ -19685,23 +19675,33 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     b.setTransform(1,0,0,1,0,0);b.globalCompositeOperation='source-over';b.clearRect(0,0,w,h);b.drawImage(O[0],0,0,w,h,0,0,w,h);const pb=window.PB;if(pb)pb.hud++;b.globalCompositeOperation='source-in';b.fillStyle='#07030f';b.fillRect(0,0,w,h);b.globalCompositeOperation='source-over';if(pb)pb.hud--;   // tint fills on the pooled canvases are not play-field shapes (qa/pureprobe.js counts them out)
     
     const T=CK?document.createElement('canvas'):null;let tc=ctx;if(T){T.width=w;T.height=h;tc=T.getContext('2d');tc.setTransform(ps,0,0,ps,w/2,h/2);}
-    const d=Math.max(1.2*(window.devicePixelRatio||1),1.6)/ps,ox=3*d,oy=5*d,lx=(ox*m.a+oy*m.b)/ps,ly=(oy*m.a-ox*m.b)/ps,X=-W_/2,Y=-H_/2,im=(c,x,y)=>tc.drawImage(c,0,0,w,h,X+x,Y+y,W_,H_);
-    tc.globalAlpha=.4;im(O[1],lx,ly);tc.globalAlpha=1;   // the shadow rotates with the actor so it always falls the same way on screen
-    for(const[x,y]of[[-d,0],[d,0],[0,-d],[0,d],[-d*.7,-d*.7],[d*.7,-d*.7],[-d*.7,d*.7],[d*.7,d*.7]])im(O[1],x,y);
+    const cs=m.a/ps,sn=m.b/ps,[vx,vy]=this.DN||[0,1],dx=cs*vx+sn*vy,dy=cs*vy-sn*vx,u=1/ps,X=-W_/2,Y=-H_/2,im=(c,x,y)=>tc.drawImage(c,0,0,w,h,X+x,Y+y,W_,H_);   // W329: (dx,dy) = screen-down in the actor's own frame (phone world is turned onto the screen)
+    tc.filter=`blur(${Math.max(2,2.5*(window.devicePixelRatio||1))}px)`;tc.globalAlpha=.55;im(O[1],dx*3*u,dy*3*u);tc.filter='none';   // W329: a soft dark contact shadow just below the actor instead of the hard offset copy
+    tc.globalAlpha=.32;for(const[x,y]of[[-u,0],[u,0],[0,-u],[0,u]])im(O[1],x,y);tc.globalAlpha=1;   // 1 device px dark rim, faint: separates from bright sky, invisible on the dark city (no pale outline)
     im(O[0],0,0);
-    if(lit!==0){const c=O[2].getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.clearRect(0,0,w,h);c.drawImage(O[0],0,0,w,h,0,0,w,h);c.globalCompositeOperation='source-in';c.fillStyle='#ffe6c4';if(pb)pb.hud++;c.fillRect(0,0,w,h);if(pb)pb.hud--;   // upper-left lit edge: the art's own shape minus itself shifted down-right
-      c.globalCompositeOperation='destination-out';const sx=ps*d*1.6,cs=m.a/ps,sn=m.b/ps;c.drawImage(O[0],0,0,w,h,sx*.7*(cs+sn),sx*.7*(cs-sn),w,h);c.globalCompositeOperation='source-over';
-      tc.globalAlpha=lit||.35;im(O[2],0,0);tc.globalAlpha=1;}
+    const c=O[2].getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.clearRect(0,0,w,h);c.drawImage(O[0],0,0,w,h,0,0,w,h);c.globalCompositeOperation='source-in';
+    const gx=w/2-dx*h/2,gy=h/2-dy*h/2,gr=c.createLinearGradient(gx,gy,w/2+dx*h/2,h/2+dy*h/2);gr.addColorStop(0,'#38e8ff');gr.addColorStop(.55,'#7a3cff');gr.addColorStop(1,'#ff2fa8');c.fillStyle=gr;if(pb)pb.hud++;c.fillRect(0,0,w,h);if(pb)pb.hud--;
+    tc.globalCompositeOperation='soft-light';tc.globalAlpha=.5;im(O[2],0,0);tc.globalCompositeOperation='source-over';tc.globalAlpha=1;   // W329: graded toward the city's cyan (top) / magenta (bottom) so the actor sits in the scene's light
+    if(lit!==0){c.globalCompositeOperation='source-over';c.clearRect(0,0,w,h);c.drawImage(O[0],0,0,w,h,0,0,w,h);c.globalCompositeOperation='source-in';c.fillStyle='#bdf6ff';if(pb)pb.hud++;c.fillRect(0,0,w,h);if(pb)pb.hud--;   // top-down neon rim light: the art's own shape minus itself shifted down (screen)
+      const sx=Math.max(1.5,1.8*(window.devicePixelRatio||1));c.globalCompositeOperation='destination-out';c.drawImage(O[0],0,0,w,h,dx*sx,dy*sx,w,h);c.globalCompositeOperation='source-over';
+      tc.globalCompositeOperation='lighter';tc.globalAlpha=(lit||.35)*.55;im(O[2],0,0);tc.globalCompositeOperation='source-over';tc.globalAlpha=1;}
     if(T){const px=(this.IP||0)+w*h;this.IP=px;CC.set(CK,{cv:T,w,h,W:W_,H:H_});for(const[k,e]of CC){if(this.IP<=8e6)break;this.IP-=e.w*e.h;CC.delete(k);}ctx.drawImage(T,0,0,w,h,X,Y,W_,H_);}},
-  hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');x.filter=v==='w'?'saturate(0) brightness(1.6)':'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,0,0);return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white (made once per picture)
-  pic(n,x,y,w,ang,hk){const v=/~([ow])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
+  hot(n,v){const b=ART.bm[n];if(!b){if(b===undefined)ART.load(n);return null;}const c=document.createElement('canvas');c.width=b.width;c.height=b.height;const x=c.getContext('2d');const P_=v==='c'?Math.round(b.height*.35):0;if(P_){c.width=b.width+2*P_;c.height=b.height+2*P_;}x.filter=v==='w'?'saturate(0) brightness(1.6)':v==='c'?`sepia(1) saturate(6) hue-rotate(150deg) brightness(1.1) blur(${Math.max(2,b.height*.18)}px)`:'hue-rotate(-55deg) saturate(2.6) brightness(1.2)';x.drawImage(b,P_,P_);if(P_){x.filter='none';x.globalCompositeOperation='lighter';x.drawImage(b,P_,P_);}if(P_&&window.createImageBitmap)createImageBitmap(c).then(i=>{ART.bm[n+'~'+v]=i;},()=>{});return ART.bm[n+'~'+v]=c;},   // ~o orange-red, ~w white, ~c W329 tracer: the streak over its own soft cyan glow, baked into one picture (padded so the blur is not cut) (made once per picture)
+  pic(n,x,y,w,ang,hk){const v=/~([owc])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
   shots(){const ph=wcv!==cv,g=ph?1.4:1;   // W302: phone player shots 1.4x and thicker (owner: 'player bullets are not visible at all'); still under the enemy shots (drawn first)
     for(const b of G.pb){if(b.y<12)continue;const fa=Math.min(b.x>W*.7?1-(b.x-W*.7)/(W*.3):1,1-(Math.hypot(b.x-P.x,b.y-P.y)-W*.55)/(W*.25));if(fa<.05)continue;ctx.globalAlpha=Math.min(1,fa);const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
       if(wn&&this.pic(wn,b.x,b.y,44*g,a))continue;
       const n=b.hv?'fx-shot-hv':b.ec?'fx-shot-ec':'fx-shot-std',w=(b.hv?52:b.ec?40:(b.len||(b.big?22:20))*2.4*(b.pf?1.3:1))*g;
-      if(this.pic(n,b.x,b.y,w,a,ph?2.4:1.7)&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,ph?1.4:1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
+      const bb=ART.bm[n],tk=bb?(bb.width+2*Math.round(bb.height*.35))/bb.width:1;   // W329: tracer = glow + streak in one picture, drawn at the scale that keeps the streak where it was
+      if((this.pic(n+'~c',b.x,b.y,w*tk,a,ph?2.4:1.7)||this.pic(n,b.x,b.y,w,a,ph?2.4:1.7))&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,ph?1.4:1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
     ctx.globalAlpha=1;},   // W302: player shots only; enemy shots have ONE owner, PB.ebul (pureboss.js), called from draw() right after this
-  draw(t,dt){const PT=wcv!==cv;for(const c of[vctx,wctx]){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='medium';}
+  air(w,h,t,cx){const o_=ctx;if(cx)ctx=cx;try{this.air0(w,h,t);}finally{ctx=o_;}},   // W329: cx = another canvas (the street draws its own frame)
+  air0(w,h,t){const m=ctx.getTransform(),dw=Math.round(w*m.a),dh=Math.round(h*m.d);if(dw<2||dh<2)return;
+    const R=this.AR||(this.AR={});if(R.w!==dw||R.h!==dh){const r=document.createElement('canvas');r.width=r.height=256;const g=r.getContext('2d');g.lineCap='round';   // W329: rain OVER the actors (the painted rain was only behind them): one screen-size canvas built once per size,
+      for(let i=0;i<70;i++){const x=Math.random()*256,y=Math.random()*256,l=10+Math.random()*22;g.strokeStyle=`rgba(${Math.random()<.5?'190,230,255':'255,170,230'},${.08+Math.random()*.12})`;g.lineWidth=Math.random()<.2?1.4:.8;for(const o of[0,-256,256]){g.beginPath();g.moveTo(x+o*.2,y+o);g.lineTo(x-l*.2+o*.2,y+l+o);g.stroke();}}
+      const c=R.cv||(R.cv=document.createElement('canvas'));c.width=dw;c.height=dh+256;const q=c.getContext('2d');q.fillStyle=q.createPattern(r,'repeat');q.fillRect(0,0,dw,dh+256);R.w=dw;R.h=dh;}
+    const o=Math.floor(t*900)%256,pb=window.PB;if(pb)pb.hud++;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.drawImage(R.cv,0,256-o,dw,dh,0,0,dw,dh);ctx.restore();if(pb)pb.hud--;},   // then copied 1:1 at a whole-pixel offset each frame (a pattern fill per frame cost ~25% of the phone frame rate)
+  draw(t,dt){const PT=wcv!==cv;this.DN=PT?[-1,0]:[0,1];for(const c of[vctx,wctx]){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='medium';}
     if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);this.bg(true,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
     else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
     ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
@@ -19716,8 +19716,8 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?1.6:1.3;},   // W215/W
     this.player(t);
     if(G.empT>0)AH.pic('fx-pw-bomb-pulse',(0.6-G.empT)*2800,P.x,P.y,0,Math.min(1,G.empT*2.2));
     ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-    if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(wcv,0,0);ctx.imageSmoothingEnabled=true;ctx.setTransform(VS,0,0,VS,0,0);if(running&&!HUDOFF)drawHUDP(t);}
-    else if(running&&!HUDOFF){drawHUD(t);PW.hud(t);}}};
+    if(PT){ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(wcv,0,0);ctx.imageSmoothingEnabled=true;ctx.setTransform(VS,0,0,VS,0,0);this.air(PW_,PH_,t);if(running&&!HUDOFF)drawHUDP(t);}
+    else{this.air(W,H,t);if(running&&!HUDOFF){drawHUD(t);PW.hud(t);}}}};
 
 // PURPOSE: the street drawn with the owner's art only: painted backdrop layers in order, Kai and the foes from their sheets at one scale, owner fx/pickup/prop pictures, a minimal edge HUD
 // FLAG: purefoot (?purefoot=0 = the old look)
@@ -19825,7 +19825,8 @@ function pure(c){const L=IN.L(),S=F.S;if(!L||!S)return false;X.slFrame(L,1.7);  
   for(const g of S.bombsL){SL.z=g.z;at(c,g.x,g.y,K);pic(c,'fx-ft-grenade',g.x,g.y,22,S.time*7);c.restore();}
   for(const b of S.eb){SL.z=b.z;at(c,b.x,b.y,K);const ko=keyed('fx-bullet-enemy');if(RET.footmove)eShot(c,b);else if(ko){const w=11,h=w*ko.height/ko.width;c.drawImage(ko,b.x-w/2,b.y-h/2,w,h);}else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();}c.restore();}   // no picture yet: the plain shot
   if(RET.footmove)efx(c,K,at,keyed('fx-bullet-enemy'));SL.z=null;for(const f of S.fx){if(!window.AH)break;if(f.pic){if(SL.band)SL.z=f.z==null?null:f.z;at(c,f.x,f.y,K);AH.ftFx(c,f);c.restore();}else if(f.arc)AH.ftArc(c,Object.assign({},f,{arc:f.arc.map(([x,y])=>[x,SL.my(y)])}));}SL.z=null;
-  c.restore();const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);
+  c.restore();if(window.PURL&&PURL.air){const dp=window.devicePixelRatio||1;c.save();c.setTransform(dp,0,0,dp,0,0);PURL.air(c.canvas.width/dp,c.canvas.height/dp,S.time,c);c.restore();}   // W329: rain + grain OVER Kai and the foes (the painted rain was only behind them), under the HUD
+  const fs=n=>Math.max(14,n)*u;SL.hudB=0;X.slHud(c,L,S,vw,u,fs);tells(c,L,S,u,fs);
   if(F.SB&&F.SB.draw){c.save();c.translate(-S.camX,0);F.SB.draw(c,{u,vw,K,t0,my:SL.my,band:SL.band||0,hudB:SL.hudB});c.restore();}   // W300: the boss duel's words, over the HUD stack's bottom (streetboss.js)const hb=SL.hudB,hf=SL.hudFull;X.slFrame(L);SL.hudB=hb;SL.hudFull=hf;return true;}
   const hb=SL.hudB,hf=SL.hudFull;X.slFrame(L);SL.hudB=hb;SL.hudFull=hf;return true;}
 SL.draw=function(c){return RET.purefoot?pure(c):old.apply(this,arguments);};
@@ -19908,6 +19909,50 @@ PB.fadeRun=(f,self,args)=>{const rs=PB.fadeBox(),T=ctx.getTransform(),cvs=ctx.ca
 {const h1=drawHUDP,h2=drawHUD,w=(f,wd)=>function(){PB.hud++;const b=G.boss,pl=RET.purelook&&b;if(pl)G.boss=null;   // the old boss bars / pips read G.boss: hidden here, the one thin bar is drawn after
     try{if(wd()===W&&RET.purelook)PB.fadeRun(f,this,arguments);else f.apply(this,arguments);}finally{if(pl)G.boss=b;if(pl)PB.bar(wd());PB.hud--;}};drawHUDP=w(h1,()=>PW_);drawHUD=w(h2,()=>W);}
 {const h=PW.hud;PW.hud=function(){PB.hud++;try{return h.apply(this,arguments);}finally{PB.hud--;}};}   // the power-up panel is HUD (pure.js draws it after drawHUD)
+
+// PURPOSE: the owner's whole music library is used: one song per story stage, one per boss, endless rotation, nothing but songs between songs
+// FLAG: library (?library=0 = the older song picks and jingles)
+// TEST: qa/library-test.js
+/* ---------- LIBRARY (owner, 6 Nov 2026: "the music variety I gave you is not used, I listen annoying jingles in between"). The map is in MUSIC-MAP.md.
+   1. Flight: story stages 1-32 walk FLIGHT (11 songs, so any 10 stages in a row are 10 different songs, none twice in a row); Athens stages (33-40) walk ATH.
+   2. Bosses: DP.boss(k) is one fixed song per boss; the last boss changes song on each phase (BOSS6). Endless laps 2+ rotate ENDLESS.
+   3. No jingles: every sting is refused, and warn / perfect (and, outside a run, up / tier / phase) never sound. The boss-in sting is 2.6 s long, over the 1.5 s limit, so it is out too.
+   4. Result screens keep the song playing, 6 dB lower; the title plays the menu song only after the player has left the result screen.
+   The song change itself is the engine's own bar-line cross-fade (AU.xfade, one bar). ---------- */
+if(RET.library===undefined)RET.library=!/[?&]library=0/.test(location.search);
+const LIB=window.LIB={FLIGHT:['stage1','d1a','d2a','stage2','d1b','d2b','d3a','stage3','d3b','d4a','d4b'],ATH:['athina','athA','athina2','athB'],
+  BOSS:{0:'boss-d1',1:'boss-d2',2:'boss-d3',3:'boss-d4',6:'boss2'},BOSS6:['boss2','boss3','boss'],ENDLESS:['endless','endless2','endless3'],
+  NOSFX:['warn','perfect'],MENUSFX:['up','tier','phase','big'],low:false,leave:0,log:[],refused:[]};
+LIB.on=()=>RET.library;
+LIB.st=()=>({run:running,res:!resEl.hidden,over:!overEl.hidden,title:!titleEl.hidden,foot:!!(window.FOOT&&FOOT.on)});   // test hook
+LIB.has=k=>!!(TR.by&&TR.by[k]);
+LIB.pick=(pool,i)=>{const a=pool.filter(LIB.has);return a.length?a[i%a.length]:null;};
+if(RET.library){
+  /* flight: the song of story stage n (challenge stages keep their own, they are tuned to it) */
+  {let key=-1,seq=[];const build=()=>{seq=[];let f=0,a=0;for(const s of STAGES){if(s.ch)continue;seq[s.n]=s.di===4?LIB.pick(LIB.ATH,a++):LIB.pick(LIB.FLIGHT,f++);}key=TR.list.length;};
+   for(const s of STAGES){if(s.ch)continue;const old=s.song;
+     Object.defineProperty(s,'song',{configurable:true,enumerable:true,get(){if(key!==TR.list.length)build();return seq[this.n]||old;},set(v){Object.defineProperty(this,'song',{value:v,writable:true,configurable:true,enumerable:true});}});}}
+  /* bosses and endless laps: the dpool selectors give the fixed picks */
+  {const b0=DP.boss;DP.boss=function(k){const s=LIB.BOSS[k];return s&&LIB.has(s)?s:b0.apply(this,arguments);};
+   const e0=DP.endless;DP.endless=function(di,loop){if(loop>=1){const p=posOf(di),s=LIB.pick(LIB.ENDLESS,p+loop*2);if(s)return s;}return e0.apply(this,arguments);};}
+  /* the last boss changes song with each phase (the other bosses use their own a / b takes, musicpack.js) */
+  NR.on('bossPhase',()=>{if(!running)return;const cur=((AU.want||(BT.pend&&BT.pend.v.stage)||BT.stage)||'').replace('~b',''),i=LIB.BOSS6.indexOf(cur);if(i<0)return;
+    const nx=LIB.pick(LIB.BOSS6,i+1);if(nx&&nx!==cur){LIB.log.push('phase '+cur+'>'+nx);AU.switchTo(nx);}});
+  /* no jingles */
+  {const s0=AU.sting;AU.sting=function(n){LIB.refused.push('sting:'+n);return false;};void s0;}
+  {const x0=AU.sfx;AU.sfx=function(n){if(LIB.NOSFX.includes(n)||(!running&&LIB.MENUSFX.includes(n))){LIB.refused.push('sfx:'+n);return;}return x0.apply(this,arguments);};}
+  /* result screens: the stage song goes on, 6 dB lower; the menu song only on the title, after the result screen was left */
+  LIB.setLow=on=>{LIB.low=on;const a=AU.a;if(!a||!AU.musv)return;try{AU.musv.gain.setTargetAtTime(SET.music*(on?.501:1),a.currentTime,.35);}catch(e){}};
+  {const v0=AU.vol;AU.vol=function(){const r=v0.apply(this,arguments);if(LIB.low)LIB.setLow(true);return r;};}
+  const foot=()=>!!(window.FOOT&&FOOT.on);
+  NR.on('runStart',()=>{LIB.leave=0;});NR.on('footStart',()=>{LIB.leave=0;});
+  NR.on('runEnd',d=>{if(d&&d.quit)LIB.leave=LIB.leave||performance.now();});
+  setInterval(()=>{if(!AU.a)return;const now=performance.now();
+    const res=(!overEl.hidden||!resEl.hidden)&&!running||(foot()&&FOOT.S&&!!FOOT.S.end);
+    if(res!==LIB.low)LIB.setLow(res);
+    if(res&&!LIB.leave)LIB.leave=now;
+    if(!res&&!running&&!foot()&&!titleEl.hidden&&LIB.leave&&now-LIB.leave>900&&BT.stage!=='menu'){LIB.leave=0;LIB.log.push('menu after '+BT.stage);AU.startStage('menu');}},200);
+}
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;
