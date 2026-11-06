@@ -1,4 +1,4 @@
-// PURPOSE: FOCUS MODE: the title offers FLIGHT, ON FOOT, SETTINGS only (LAB with ?lab=1); flight stage 1 and the street play one song each
+// PURPOSE: FOCUS MODE: the title offers FLIGHT, ON FOOT, SETTINGS only (LAB with ?lab=1); the music is parts/music/library.js
 // FLAG: focus (?focus=0 = the whole game as before)
 // TEST: qa/focus-test.js
 /* ---------- FOCUS (owner, 23 Oct 2026: "all levels are horrible, focus on one on-foot level and one stage, all music is mixed, on foot is shit, all game is very boring").
@@ -45,15 +45,5 @@ html.focus #srMenu,html.focus #stBtn2,html.focus #pSetBtn,html.focus #fFly,html.
   const fix=()=>{txt($('againBtn'),'RETRY');txt($('srRetry'),'RETRY');txt($('restartBtn'),'RETRY');txt($('menuBtn'),'TITLE');txt($('quitBtn'),'TITLE');txt($('fCity'),'TITLE');txt($('fQuit'),'TITLE');txt($('fAgain'),'RETRY');};
   new MutationObserver(fix).observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['hidden']});fix();
   },0);
-  /* ----- music: one song per mode ----- */
-  const inFlight=()=>RET.focus&&ST.on&&ST.n===1&&!(window.FOOT&&FOOT.on);
-  const pick=p=>{try{const m=window.SND&&SND.cfg&&SND.cfg.music&&SND.cfg.music[p];return m&&SND.songs().includes(m)?m:null;}catch(e){return null;}};
-  {const s0=AU.startStage;AU.startStage=function(stage,at){
-    if(inFlight()){const w=ST.def.song;if(stage!==w)arguments[0]=stage=w;}   // boss, fever, district and menu songs all map to the stage song: a stage that wants the playing song keeps it
-    else if(stage==='menu'&&!(window.FOOT&&FOOT.on)&&!pick('title'))return;   // the title is silent
-    return s0.apply(this,arguments);};}
-  {const w0=AU.switchTo;AU.switchTo=function(stage){if(inFlight())return;return w0.apply(this,arguments);};}
-  for(const f of ['sting','duckMusic']){const o=AU[f];if(o)AU[f]=function(){return inFlight()?false:o.apply(this,arguments);};}
-  {const m0=AU.menuMusic;AU.menuMusic=function(){if(inFlight())return;return m0.apply(this,arguments);};}
-  {const MP=RET.MP;if(MP&&MP.foot){const f0=MP.foot;MP.foot=function(){return inFlight()?undefined:f0.apply(this,arguments);};}}
+  /* music: since 6 Nov 2026 the whole library plays (parts/music/library.js): the one-song-per-mode rule of 23 Oct is gone, a stage plays its own song, a boss its own, the title the menu song */
 }

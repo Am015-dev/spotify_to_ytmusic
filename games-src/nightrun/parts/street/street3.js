@@ -67,9 +67,8 @@ function snap(c,fn){const di=c.drawImage;c.drawImage=function(im){if(arguments.l
     if(!m.b&&!m.c&&m.a&&m.d){const X=a[o]*m.a+m.e,Y=a[o+1]*m.d+m.f,X2=Math.round((a[o]+a[o+2])*m.a+m.e),Y2=Math.round((a[o+1]+a[o+3])*m.d+m.f),rx=Math.round(X),ry=Math.round(Y);
       a[o]=(rx-m.e)/m.a;a[o+1]=(ry-m.f)/m.d;a[o+2]=(X2-rx)/m.a;a[o+3]=(Y2-ry)/m.d;}return di.apply(c,a);}return di.apply(c,arguments);};
   try{return fn();}finally{delete c.drawImage;}}
-/* ----- one song: musicpack's lock / boss / clear switches stay off on this stage; the run plays street1 (192 s, steady) from the first beat ----- */
+/* ----- one song at a time: the run plays street1 (192 s, steady) from the first beat; the arena lock, boss and clear songs (LIB, music/library.js) follow, each a full song, never a jingle ----- */
 const MP=RET.MP;
-if(MP&&MP.has){const h0=MP.has;MP.has=function(k){if(on()&&/^street1-/.test(k))return false;return h0.apply(this,arguments);};}
 /* ----- STREETSONG (owner, 23 Oct 2026: "music not on beat, one song one stage this lasts less than 20 seconds, music is distorted by jingles").
    Measured (qa/streetsong-test.js): a run started stage2, then street1 in the same frame, then street1 again on a bar line once the file had loaded (3 song starts in the first 0.5 s, the first
    seconds on the synth fallback); a RETRY started stage2 (170 s, other tempo) and kept the street1 title. Now: the stage song is street1 from the first call (ST.song), the STREET RUN hold waits for the
@@ -82,9 +81,8 @@ if(RET.streetsong){
   Object.defineProperty(ST,'song',{get(){return ssOn()?SSNG:'stage2';},set(v){},configurable:true});
   const ssFoot=()=>RET.streetsong&&F.on&&F.S&&F.S.st===ST&&ssOn();
   const blk=(n,a)=>{S3.snd.blocked.push(n+':'+[].join.call(a,','));return false;};
-  {const o=AU.startStage;AU.startStage=function(st){if(ssFoot()){if(st!==SSNG)return blk('startStage',arguments);S3.snd.starts.push(+(F.S.time).toFixed(2));}return o.apply(this,arguments);};}
+  {const o=AU.startStage;AU.startStage=function(st){if(ssFoot()){if(st!==SSNG&&!/^street1-/.test(st))return blk('startStage',arguments);S3.snd.starts.push(+(F.S.time).toFixed(2));}return o.apply(this,arguments);};}
   for(const f of ['switchTo','sting','duckMusic']){const o=AU[f];if(o)AU[f]=function(){return ssFoot()?blk(f,arguments):o.apply(this,arguments);};}
-  {const f0=MP.foot;if(f0)MP.foot=function(){return ssFoot()?undefined:f0.apply(this,arguments);};}
   /* the hold also waits for the song file (an unloaded file played the synth first, then swapped on a bar line) */
   {const FQ=F.q,r0=FQ&&FQ.ready,p0=FQ&&FQ.pct;
    const fileOk=()=>{if(!ssOn()||!AU.a||typeof TR==='undefined')return true;const i=TR.by[SSNG];if(!i)return true;try{loadTrack(SSNG);}catch(e){}return true;};   // W242: asks for the file, never waits for it
