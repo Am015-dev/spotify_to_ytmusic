@@ -6,9 +6,7 @@
 // It fails on: page errors, audio errors, a run that stands still >8 s, ship not following input, buttons off screen or covered,
 // horizontal scroll, average FPS < 45, a boss that cannot be hurt or reached, HUD text not equal to the game state, NaN state,
 // broken pause / restart / resume / settings, tab-hide not pausing, rotation breaking layout or input, and beat judging that is off by more than 80 ms.
-// Shop / garage (SKIP=shop,garage,econ to leave out): a pit stop opens after every district; touch buy / reroll / skip / 10 s timeout work; every upgrade really changes the game;
-//   garage purchases persist across reloads; the ships fire their own rhythms; no horizontal scroll; pit-stop and garage buttons >= 44 px (375x553 included); screenshots shop-*.png.
-//   ECON=6 (+ECONSECS=150) plays that many long bot runs and prints the Neon economy (Neon per run, picks per run, garage bank).
+// Shop / garage checks (SKIP=shop,garage,econ to leave out); ECON=6 (+ECONSECS=150) prints the Neon economy of long bot runs.
 // Beat checks use a generated 120 BPM test WAV served by a route override (nothing is written to the repo).
 const PW = require(process.env.PW || 'playwright'), fs = require('fs'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
