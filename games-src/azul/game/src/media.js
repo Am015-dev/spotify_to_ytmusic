@@ -7,6 +7,7 @@ const pre=(f,cb)=>{if(IMG_OK[f]!==undefined){cb&&IMG_OK[f]&&cb();return}IMG_OK[f
 const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 const TBL={'prism-light':1,'unmarked-slate':1,'sun-palace':1};
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
+  {const u=unl('cardback'),bf=u==='guild-seal'||u==='lamplight'?'back-'+u:'back-default';pre(bf,()=>{R.style.setProperty('--sg-back','url('+MEDIA+bf+'.webp)');R.dataset.sgback='1'})}
   set('--sg-title',phone()?'title-phone':'title');set('--sg-table',tableFile()||(innerHeight>innerWidth?'table-default-phone':'table-default'));set('--sg-end-win','end-win');set('--sg-end-lose','end-lose')}
 // ---- 3D table: a painted top laid on the walnut (the unlocked table replaces the default); plain walnut while loading and on Low graphics
 let skinPl=null,skinFile='',skinKey='';

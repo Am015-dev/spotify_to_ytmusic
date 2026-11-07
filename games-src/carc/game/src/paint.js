@@ -42,7 +42,7 @@ function endBanner(box,won){if(!box||box.querySelector('.endart')||!PAINT_ON)ret
 new MutationObserver(()=>{const r=document.querySelector('.gxc-res-on .gxc-res');if(r&&!r.querySelector('.endart'))endBanner(r,/\bwon\b/.test(r.closest('.gxc-res-on').className))}).observe(document.body,{childList:true,subtree:true});
 // ---------- music: five slots (Menu, Game, Last tiles, Victory, Defeat), two tracks each; choice a / b / shuffle / all / off ----------
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last tiles'],['victory','Victory'],['defeat','Defeat']];
-const MTITLE={'tavern-a':'Lute of the Meadow Fair','tavern-b':'Hearthlight Jig','main-a':"The Mason's Morning",'main-b':'Lute and Limewash','fight-a':'Keep of Hours','fight-b':'Ramshackle Round','victory-a':"The Jester's Triumph",'victory-b':'Crown of Green Fields','defeat-a':'Wistful Vale','defeat-b':'Fading to Grey'};
+const MTITLE={'tavern-a':'Lute of the Meadow Fair','tavern-b':'Hearthlight Jig','tavern-short-a':'Short menu loop A','tavern-short-b':'Short menu loop B','main-a':"The Mason's Morning",'main-b':'Lute and Limewash','fight-a':'Keep of Hours','fight-b':'Ramshackle Round','victory-a':"The Jester's Triumph",'victory-b':'Crown of Green Fields','defeat-a':'Wistful Vale','defeat-b':'Fading to Grey'};
 const MDEF={tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'};
 const MUS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;

@@ -74,7 +74,7 @@ function renderDock(){const el=$('#dockbody');if(!el)return;const s=sideToAct();
   h+=advHtml()+infoHtml();el.innerHTML=h}
 function sourcesHtml(){const one=(src,a)=>{const cnt={};for(const t of a)cnt[t]=(cnt[t]||0)+1;return `<div class="src ${src<0?'ctr':''}"><b>${src<0?'Courtyard'+(G.markerIn==='ctr'?' ☀':''):'Kiln '+(src+1)}</b><div class="row">${Object.keys(cnt).map(Number).sort((x,y)=>x-y).map(c=>`<button class="pk" data-pick='${JSON.stringify({src,c,j:c===PRISM?1:0})}' aria-label="${cnt[c]} ${TNAME[c]} from ${src<0?'the courtyard':'kiln '+(src+1)}">${tileChip(c,cnt[c])}</button>`).join('')}</div></div>`};
   let h='<div class="srcs">';G.fac.forEach((a,i)=>{if(a.length)h+=one(i,a)});if(G.ctr.length)h+=one(-1,G.ctr);return h+'</div>'}
-function infoHtml(){return `<div class="info">Clay sack ${G.bag.length} · shard box ${G.lid.length}${G.ex.gray?' · unmarked mosaics':''}${G.ex.prism?' · prism tiles':''}</div>`}
+function infoHtml(){return `<div class="info"><i class="sg-back" aria-hidden="true"></i>Clay sack ${G.bag.length} · shard box ${G.lid.length}${G.ex.gray?' · unmarked mosaics':''}${G.ex.prism?' · prism tiles':''}</div>`}
 function advHtml(){const hp=me();if(!hp)return '';if(!UI.adv)return `<div class="acts"><button class="btn sm cob" data-ui="advise">${IC('bulb')} Suggest a move</button></div>`;
   return `<div class="adv"><b>${IC('bulb')} Advice</b><p>${UI.adv.why}</p><div class="acts">${btn(UI.adv.m,'Do it','go')}<button class="btn ghost sm" data-ui="noadv">Dismiss</button></div></div>`}
 function endHtml(){const rows=G.over.scores;const L=[['place','Tiles set'],['floor','Breakage'],['rows','Rows +2'],['cols','Columns +7'],['colours','Full glazes +10'],['total','★ Total'],['fr','Complete rows (tie-break)']];

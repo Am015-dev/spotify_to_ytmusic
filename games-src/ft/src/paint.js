@@ -34,7 +34,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-paint]');i
   if(b&&!b.querySelector('.endart')&&PIMG[f]===1){const d=document.createElement('div');d.className='endart '+(won?'win':'lose');d.setAttribute('aria-hidden','true');d.style.backgroundImage='url('+MEDIA+f+'.webp)';b.insertBefore(d,b.firstChild)}}}}})();
 // ---------- music: five slots (Menu, Game, Last round, Victory, Defeat), two tracks each; choice a / b / shuffle / all / off ----------
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last round'],['victory','Victory'],['defeat','Defeat']];
-const MTITLE={'tavern-a':'Warm Welcome','tavern-b':'Oud Lanterns','main-a':'Desert Evening','main-b':'Ninety Steps','fight-a':'Last Stand','fight-b':'Frame Drum Rising','victory-a':'Golden Gates','victory-b':'Oud and Ney','defeat-a':'Ten Seconds of Dusk','defeat-b':'Softly, Then Still'};
+const MTITLE={'tavern-a':'Warm Welcome','tavern-b':'Oud Lanterns','tavern-short-a':'Short menu loop A','tavern-short-b':'Short menu loop B','main-a':'Desert Evening','main-b':'Ninety Steps','fight-a':'Last Stand','fight-b':'Frame Drum Rising','victory-a':'Golden Gates','victory-b':'Oud and Ney','defeat-a':'Ten Seconds of Dusk','defeat-b':'Softly, Then Still'};
 const MDEF={tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'};
 const MUS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
