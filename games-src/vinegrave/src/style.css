@@ -190,3 +190,36 @@ body:has(> .gxc:not([hidden])) .gx-app,body:has(> .gxc:not([hidden])) #start{vis
 html.gx-reduce .site .gd{animation:none}
 @media (max-width:999px){.cd .pic .ph{justify-content:center;padding:1px}.cd .pic .ph .pg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:86%;width:auto;max-height:none;opacity:.3}
   .cd .pic .ph .pn{position:relative;font-size:10.5px;color:#1f1505;text-shadow:0 0 3px rgba(255,255,255,.8)}.cd.fear .pic .ph .pn{color:#ffe6e0;text-shadow:0 0 3px #000}.cd .pic .ph .pt{display:none}}
+
+/* R4: result screen banner, stars and the cast's line */
+.rbox .rban{margin:0;font-size:clamp(30px,8vw,44px);font-weight:900;letter-spacing:.02em;color:#ffd36a;text-shadow:0 3px 0 #5a3a0a,0 0 24px rgba(255,211,106,.6);animation:rban .6s cubic-bezier(.2,1.5,.4,1) both}
+.rbox.lost .rban{color:#f0b0a0;text-shadow:0 3px 0 #4a1a12}
+.rbox.won{box-shadow:0 0 0 2px #ffd36a,0 0 60px rgba(255,211,106,.35)}
+.rstars{display:flex;justify-content:center;gap:8px;font-size:38px;line-height:1;color:rgba(255,255,255,.18)}
+.rstars span.on{color:#ffd36a;text-shadow:0 0 14px rgba(255,211,106,.8);animation:rstar .5s cubic-bezier(.2,1.6,.4,1) both}
+.rstars span.on:nth-child(2){animation-delay:.25s}.rstars span.on:nth-child(3){animation-delay:.5s}
+.rgoals{list-style:none;margin:0;padding:0;text-align:left;font-size:max(16px,.95em);color:var(--mute)}.rgoals li.on{color:#e9f5d8}
+.rquote{margin:0;font-style:italic;color:#f3e6c4}
+@keyframes rban{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes rstar{from{transform:scale(0) rotate(-40deg)}to{transform:none}}
+html.gx-reduce .rban,html.gx-reduce .rstars span{animation:none}
+
+/* R4: the guardian moment - dimmed board, light rays, a roar shake; a gold flash when it is overcome; the discovered ruin bursts */
+#fx:not([hidden]){pointer-events:auto;background:radial-gradient(circle,rgba(40,8,4,.35),rgba(0,0,0,.6));animation:fxbg .3s ease both}
+#fx.good:not([hidden]){background:radial-gradient(circle,rgba(60,48,8,.3),rgba(0,0,0,.55))}
+.fxcard{position:relative;overflow:visible;min-width:min(300px,86vw)}
+.fxcard .por{width:min(180px,44vw);height:min(180px,44vw);position:relative;z-index:1}
+.fxcard .rays{position:absolute;left:50%;top:96px;width:340px;height:340px;margin:-170px 0 0 -170px;background:repeating-conic-gradient(rgba(255,140,80,.22) 0 10deg,transparent 10deg 20deg);border-radius:50%;animation:rays 6s linear infinite;pointer-events:none;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%)}
+.fxcard.good .rays{background:repeating-conic-gradient(rgba(255,215,110,.3) 0 10deg,transparent 10deg 20deg)}
+.fxcard b{font-size:1.6em;position:relative;z-index:1}.fxcard span,.fxcard small{position:relative;z-index:1}.fxcard small{display:block;opacity:.7;margin-top:4px}
+#bd.shake{animation:shake .5s ease}
+.site.burst{animation:burst .9s ease}
+@keyframes rays{to{transform:rotate(360deg)}}
+@keyframes fxbg{from{opacity:0}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
+@keyframes burst{0%{box-shadow:0 0 0 0 rgba(255,230,140,.9)}60%{box-shadow:0 0 0 14px rgba(255,230,140,0)}100%{box-shadow:none}}
+html.gx-reduce .fxcard .rays,html.gx-reduce .site.burst{animation:none}
+/* R4: Menu section chips wrap instead of overlapping (phone); the hint finger points below the card, not over its cost and name; header icon clear of the stage text */
+.gx-set-nav{display:flex!important;flex-wrap:wrap;gap:6px}.gx-set-nav .gx-chip{flex:0 0 auto;width:auto!important;min-width:0;white-space:nowrap;padding-left:10px;padding-right:10px}
+.gxh-finger{margin-top:34px;margin-left:18px}
+.gx-bar h1{flex:0 0 auto;overflow:visible}.gx-bar h1 .ic{flex:0 0 auto}#barstat{margin-left:8px;min-width:0;overflow:hidden;text-overflow:ellipsis}

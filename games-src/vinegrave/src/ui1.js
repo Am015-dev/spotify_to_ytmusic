@@ -26,7 +26,7 @@ function opsHTML(ops) {
 const CARD_GLYPH = { item: 'coin', art: 'compass', fear: 'guard' }, CARD_KIND = { item: 'Item', art: 'Artifact', fear: 'Dread' };
 function cardHTML(id, o) {
   o = o || {}; const c = V.CARDS[id], cost = c.t === 'item' ? c.cost + ' ' + ic('coin') : c.t === 'art' ? c.cost + ' ' + ic('compass') : '';
-  const lab = c.name + (c.t === 'item' ? ', item, ' + c.cost + ' coins' : c.t === 'art' ? ', artifact, ' + c.cost + ' compasses' : '') + '. ' + c.text + ' Travel: ' + V.TNAME[c.tr] + '.';
+  const lab = c.name + (c.t === 'item' ? ', item, ' + c.cost + (c.cost === 1 ? ' coin' : ' coins') : c.t === 'art' ? ', artifact, ' + c.cost + (c.cost === 1 ? ' compass' : ' compasses') : '') + '. ' + c.text + ' Travel: ' + V.TNAME[c.tr] + '.';
   return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="ct"><span class="chip">${cost}</span>${ic(c.tr)}</span>
     <span class="cn">${esc(c.name)}</span>

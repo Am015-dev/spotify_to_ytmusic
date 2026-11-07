@@ -22,7 +22,7 @@ function refreshInsp() {
   } else if (I.kind === 'row' || I.kind === 'hand') {
     const id = I.kind === 'row' ? G.row[I.x] : me.hand[I.x]; if (!id) return closeInsp(); const c = V.CARDS[id];
     h += `<h3>${esc(c.name)}</h3><div class="irow"><div class="big">${cardHTML(id, {})}</div><div><p><b>${c.t === 'item' ? 'Item' : c.t === 'art' ? 'Artifact' : c.t === 'fear' ? 'Dread (fear)' : 'Starting card'}</b>${c.t === 'item' ? ' · costs ' + c.cost + ' ' + ic('coin') : c.t === 'art' ? ' · costs ' + c.cost + ' ' + ic('compass') : ''}</p><p>${esc(c.text)}</p>`;
-    h += `<p class="sm">Or discard it to pay one ${ic(c.tr)} ${V.TNAME[c.tr]} of travel.${c.vp ? ' Worth ' + c.vp + ' points at the end.' : ''}</p>`;
+    h += `<p class="sm">Or discard it to pay one ${ic(c.tr)} ${V.TNAME[c.tr]} of travel.${c.vp ? ' Worth ' + c.vp + (Math.abs(c.vp) === 1 ? ' point' : ' points') + ' at the end.' : ''}</p>`;
     h += `<p><button type="button" class="btn alt" data-a="cards" data-id="${id}">See it among all cards</button></p>`; if (c.t === 'item') h += '<p class="sm">Bought items go to the bottom of your deck.</p>'; if (c.t === 'art') h += '<p class="sm">Artifacts work at once when bought. Played later from your hand they cost 1 tablet.</p>';
     h += '</div></div>';
     L.forEach(m => { if (I.kind === 'row' && m.t === 'buy' && m.r === I.x) add(m, 'Buy it'); if (I.kind === 'hand' && m.t === 'play' && m.i === I.x) add(m, 'Play it' + (c.t === 'art' ? ' (1 tablet)' : '')); });
@@ -79,7 +79,7 @@ function doMove(m) {
   UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.min(delay, 900));
 }
 function after() {
-  if (!G) return; render();
+  if (!G) return; render(); if (typeof myTurn === 'function' && myTurn() && !$('#fx').hidden) fxHide();
   if (G.phase === 'over') { clearSave(); setTimeout(showResult, UI.fast ? 0 : 900); return; }
   const s = VG.actor(G);
   if (!isHuman(s)) { schedule(); return; }
@@ -103,9 +103,9 @@ function aiStep() {
 function showEvents(s) {
   let wait = 0; const ev = G.ev || [];
   ev.forEach(e => {
-    if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); toast((e.s === -2 ? G.rival.name : G.p[e.s].name) + ' discovers ' + V.SITE[e.tile].name + '!', 1800); }
-    if (e.k === 'guardian') { wait = Math.max(wait, 2300); setTimeout(() => fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', 'Overcome it for 5 points and a boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'), 700); setTimeout(() => sfx.play('roar'), 700); }
-    if (e.k === 'beat') { wait = Math.max(wait, 2000); sfx.play('win'); fxCard('guard', e.guard, 'Overcome!', G.p[e.s].name + ' tames ' + V.GUARD[e.guard].name + ': +5 points and a boon.', true); }
+    if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); const who = e.s === -2 ? G.rival.name : G.p[e.s].name; setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('burst'); }, 60); toast(who + (who === 'You' ? ' discover ' : ' discovers ') + V.SITE[e.tile].name + '!', 1800); }
+    if (e.k === 'guardian') { wait = Math.max(wait, 2700); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', 'Overcome it for 5 points and a boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
+    if (e.k === 'beat') { wait = Math.max(wait, 2300); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, 'Overcome!', w + (w === 'You' ? ' tame ' : ' tames ') + V.GUARD[e.guard].name + ': +5 points and a boon.', true); }
     if (e.k === 'idolfind') { sfx.play('coin'); }
     if (e.k === 'fear') { sfx.play('fear'); toast(G.log.filter(l => /Dread/.test(l.t)).slice(-1)[0].t, 2400); wait = Math.max(wait, 900); }
     if (e.k === 'round') { toast('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
@@ -116,17 +116,19 @@ function showEvents(s) {
   return UI.fast ? 0 : wait;
 }
 function fxCard(kind, id, title, text, good) {
-  if (UI.fast) return; const f = $('#fx'); f.hidden = false;
-  f.innerHTML = `<div class="fxcard${good ? ' good' : ''}" data-help><div class="por" data-art="guard-${id}"><svg><use href="#s-guard"/></svg></div><b>${esc(title)}</b><span>${esc(text)}</span></div>`;
+  if (UI.fast) return; const f = $('#fx'); f.hidden = false; f.className = good ? 'good' : 'bad';
+  f.innerHTML = `<div class="fxcard${good ? ' good' : ''}" data-help><div class="rays" aria-hidden="true"></div><div class="por" data-art="guard-${id}"><svg><use href="#s-guard"/></svg></div><b>${esc(title)}</b><span>${esc(text)}</span><small class="sm">Tap to close</small></div>`;
   if (typeof artApply === 'function') artApply(f);
-  clearTimeout(fxCard.t); fxCard.t = setTimeout(() => { f.hidden = true; f.innerHTML = ''; }, 1700);
+  f.onclick = fxHide; clearTimeout(fxCard.t); fxCard.t = setTimeout(fxHide, 1800);   /* gone before the next turn starts (R3 bug 4); a tap closes it sooner */
 }
+function fxHide() { const f = $('#fx'); if (!f) return; clearTimeout(fxCard.t); f.hidden = true; f.innerHTML = ''; f.className = ''; }
+function shake() { const b = $('#bd'); if (!b || document.documentElement.classList.contains('gx-reduce')) return; b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 600); }
 // ---------------------------------------------------------------- sound: small synth, silent until the first tap; muted from the Menu
 const sfx = (() => {
   let ctx = null; const on = () => UI.prefs.sound !== false;
   const tone = (f, d, type, v, at) => { if (!ctx) return; const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime + (at || 0); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); g.gain.setValueAtTime(v || .08, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + d + .02); };
   const S = { tap: () => tone(520, .06, 'triangle', .05), coin: () => { tone(880, .08, 'square', .03); tone(1320, .1, 'square', .025, .06); }, step: () => { tone(440, .1, 'triangle', .06); tone(660, .12, 'triangle', .05, .08); },
-    discover: () => { [392, 523, 659, 784].forEach((f, i) => tone(f, .25, 'triangle', .06, i * .09)); }, roar: () => { tone(90, .6, 'sawtooth', .09); tone(70, .7, 'sawtooth', .07, .1); },
+    discover: () => { [392, 523, 659, 784].forEach((f, i) => tone(f, .25, 'triangle', .06, i * .09)); }, roar: () => { tone(90, .6, 'sawtooth', .09); tone(70, .7, 'sawtooth', .07, .1); tone(140, .35, 'square', .04, .05); tone(55, .9, 'sawtooth', .06, .25); },
     win: () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, .3, 'triangle', .07, i * .1)); }, fear: () => { tone(220, .4, 'sine', .07); tone(207, .5, 'sine', .06, .2); }, round: () => tone(330, .3, 'sine', .06) };
   return { unlock() { if (ctx || !on()) return; try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ctx = null; } }, play(k) { if (!on() || UI.fast) return; try { this.unlock(); S[k] && S[k](); } catch (e) { } } };
 })();

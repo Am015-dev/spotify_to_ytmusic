@@ -1,7 +1,7 @@
 // ===================== part 4: Story (gx-campaign) and the guided first round (gx-tutor), then boot =====================
 const CAMP_OTHERS = { tamsin: ['Dr Okoro Bell'], quell: ['Tamsin Reed'], okoro: ['Mira Holt'], mira: ['Dr Okoro Bell'], sallow: ['Sallow (the other twin)'], vane: ['Mira Holt'], warden: [] };
 function campStart(def) {
-  const s = def.setup || {}, op = def.opponent || {}, np = s.players || 2, lv = op.aiLevel || 'normal';
+  const s = def.setup || {}, op = def.opponent || {}, np = s.players || 2, lv = def.id === 'c1' ? 'novice' : (op.aiLevel || 'normal');   /* stage 1: a gentler rival for a newcomer (R3 bug 3) */
   if (s.solo) return startGame('solo', { np: 1, solo: true, rivalLevel: lv, rivalName: 'Vane\'s crew', twist: def.twist, camp: def, seed: s.seed });
   const names = [op.name].concat(CAMP_OTHERS[op.cast] || []).slice(0, np - 1);
   return startGame('vs', { np, lvl: lv, names, twist: def.twist, camp: def, seed: s.seed });
@@ -45,7 +45,7 @@ function tutSetup() {
 }
 function tutSteps() {
   return [
-    { id: 'goal', title: 'Welcome to Vinegrave', say: 'Explore for 5 rounds; most points wins. This practice is one round against Tamsin.', target: tq('#map'), wait: null, ready: () => tmine() },
+    { id: 'goal', title: 'Welcome to Vinegrave', say: 'Explore for 5 rounds; most points wins. You start at -2: your deck holds two Dread cards, -1 point each until you exile them. This practice is one round against Tamsin.', target: tq('#map'), wait: null, ready: () => tmine() },
     { id: 'hand', title: 'Your cards', say: 'Play a card for its effect, or spend it to pay travel. Tap Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() },
     { id: 'play', title: 'Play it', say: 'Trail Notes gives a compass. One main action ends your turn.', target: tq(tinsp('Play it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()) },

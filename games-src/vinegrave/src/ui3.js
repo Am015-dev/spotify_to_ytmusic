@@ -47,7 +47,14 @@ UIACT.loadsave = () => { if (!loadSave()) { clearSave(); showTitle(); } };
 UIACT.title = () => { closeRes(); showTitle(); };
 UIACT.showres = () => showResult();
 UIACT.again = () => { closeRes(); UIACT.quick(); };
-UIACT.campfin = () => { closeRes(); try { GXC.finish(G); } catch (e) { console.error(e); showTitle(); } };
+UIACT.campfin = () => { closeRes(); try { GXC.finish(G); campBest(); } catch (e) { console.error(e); showTitle(); } };
+UIACT.campretry = () => { closeRes(); try { GXC.finish(G); const b = document.querySelector('.gxc-res .gxc-btn.go'); if (b) b.click(); campBest(); } catch (e) { console.error(e); showTitle(); } };
+/* best score per stage: the shared Story code keeps best:null, so the game records it and writes it back after every save */
+function campBest(id, sc) {
+  try { const K = 'vinegrave-camp-best', b = JSON.parse(localStorage.getItem(K) || '{}'); if (id && sc != null && (b[id] == null || sc > b[id])) b[id] = sc; localStorage.setItem(K, JSON.stringify(b));
+    const pk = 'gns-campaign-vinegrave', P = JSON.parse(localStorage.getItem(pk) || 'null'); if (!P || !P.ch) return;
+    Object.keys(b).forEach(k => { if (P.ch[k] && (P.ch[k].best == null || b[k] > P.ch[k].best)) P.ch[k].best = b[k]; }); localStorage.setItem(pk, JSON.stringify(P)); } catch (e) { }
+}
 UIACT.look = () => closeRes();
 UIACT.iam = () => { UI.view = VG.actor(G); $('#pass').hidden = true; render(); };
 function showPass(s) {
@@ -64,10 +71,24 @@ function showResult() {
   rows(0).forEach((row, k) => { t += `<tr><td>${row[0]}</td>${cols.map(c => `<td>${k === 6 ? '<b>' + c[k][1] + '</b>' : c[k][1]}</td>`).join('')}${G.rival ? `<td>${k === 6 ? '<b>' + VG.rivalScore(G) + '</b>' : k === 0 ? V.GLASS_VP[Math.min(V.TOP, G.rival.rows)] : k === 4 ? G.rival.vp : '—'}</td>` : ''}</tr>`; });
   t += '</table>';
   const camp = UI.camp && typeof GXC !== 'undefined' && GXC.active();
-  r.innerHTML = `<div class="tbox" data-art="${G.winner === 0 ? 'result-win' : 'result-lose'}"><p class="win">${esc(wn)}</p>${t}
-    <div class="trow2">${camp ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="again">Play again</button>'}</div>
-    <div class="trow2"><button type="button" class="tsb" data-a="look">Look at the island</button>${camp ? '' : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div>`;
-  r.hidden = false; musicSync();
+  const iWon = UI.humans.length === 1 ? G.winner === UI.humans[0] : G.winner >= 0, def = camp ? UI.camp : null;
+  const cWon = def ? campIsWon(G, def) : iWon, m = def ? campMetrics(G) : null;
+  let goals = '', line = '';
+  if (def) {   /* Story: the goals met (the stars the map will show), the cast's line, and on a loss a clear message + Try again */
+    const got = def.stars.map((st, i) => cWon && (i === 0 || (GXC.testStar ? GXC.testStar(st.test, m) : false)));
+    goals = `<div class="rstars" aria-label="${got.filter(Boolean).length} of 3 stars">${got.map(g => `<span class="${g ? 'on' : ''}">★</span>`).join('')}</div><ul class="rgoals">${def.stars.map((st, i) => `<li class="${got[i] ? 'on' : ''}">${got[i] ? '✓' : '·'} ${esc(st.text)}</li>`).join('')}</ul>`;
+    const op = def.opponent || {}, q = cWon ? op.praise : op.taunt;
+    if (q) line = `<p class="rquote"><b>${esc(op.name)}:</b> “${esc(q)}”</p>`;
+  }
+  const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : 'Defeat';
+  const sub = def && !cWon ? (G.winner === 0 ? 'You won the game but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again: the stage stays open.' : esc(wn);
+  const btns = def ? (cWon ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="campretry">Try again</button>')
+    : '<button type="button" class="tbtn" data-a="again">Play again</button>';
+  r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}" data-art="${G.winner === 0 ? 'result-win' : 'result-lose'}"><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}${t}
+    <div class="trow2">${btns}</div>
+    <div class="trow2"><button type="button" class="tsb" data-a="look">Look at the island</button>${def ? (cWon ? '' : '<button type="button" class="tsb" data-a="campfin">Story map</button>') : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div>`;
+  r.hidden = false; musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }
+  if (def && m) campBest(def.id, m.score);
   if (!UI.resDone && UI.mode !== 'tutorial' && !camp && window.GNS && GNS.result) { UI.resDone = true; try { GNS.result({ game: 'vinegrave', mode: UI.mode === 'hot' ? 'hot' : UI.mode === 'solo' ? 'solo' : 'vs', level: UI.opts.lvl, seats: G.p.map((p, i) => ({ name: p.name, me: UI.humans.indexOf(i) >= 0, ai: p.ai || undefined })), winner: G.winner, scores: G.p.map((p, i) => VG.score(G, i).total), turns: G.turns }); } catch (e) { } }
 }
 // ---------------------------------------------------------------- drawers: scores, log, rules
@@ -96,7 +117,7 @@ function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULE
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {
   if (!GX.reference) return;
-  const cardItem = id => { const c = V.CARDS[id]; return { id: 'c-' + id, name: c.name, text: c.text + (c.t !== 'fear' ? ' Travel: ' + V.TNAME[c.tr] + '.' : ' Travel: Boot.'), count: c.t === 'item' || c.t === 'art' ? 1 : (id === 'dread' ? 19 : 2), tags: [c.t === 'item' ? 'Item' : c.t === 'art' ? 'Artifact' : c.t === 'fear' ? 'Dread' : 'Starting card', V.TNAME[c.tr]], meta: (c.t === 'item' ? c.cost + ' coins' : c.t === 'art' ? c.cost + ' compasses' : 'start deck') + ' · ' + (c.vp || 0) + ' points', pic: { card: id } }; };
+  const cardItem = id => { const c = V.CARDS[id]; return { id: 'c-' + id, name: c.name, text: c.text + (c.t !== 'fear' ? ' Travel: ' + V.TNAME[c.tr] + '.' : ' Travel: Boot.'), count: c.t === 'item' || c.t === 'art' ? 1 : (id === 'dread' ? 19 : 2), tags: [c.t === 'item' ? 'Item' : c.t === 'art' ? 'Artifact' : c.t === 'fear' ? 'Dread' : 'Starting card', V.TNAME[c.tr]], meta: (c.t === 'item' ? c.cost + (c.cost === 1 ? ' coin' : ' coins') : c.t === 'art' ? c.cost + (c.cost === 1 ? ' compass' : ' compasses') : 'start deck') + ' · ' + (c.vp || 0) + (Math.abs(c.vp || 0) === 1 ? ' point' : ' points'), pic: { card: id } }; };
   const S = [
     { id: 'items', title: 'Items', items: V.ITEMS.map(cardItem) },
     { id: 'arts', title: 'Artifacts', items: V.ARTS.map(cardItem) },
