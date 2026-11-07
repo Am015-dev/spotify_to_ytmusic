@@ -195,7 +195,9 @@ AG.forced=()=>{if(G.tfx.skip||G.tfx.acted)return;const s=G.actor;const u=uncutOf
 AG.ready=()=>{if(G.over||G.tfx.wait)return;if(G.tfx.skip||G.tfx.acted){G.step='end';schedEnd();return}
   G.step='act';checkStuck()};
 function checkStuck(){if(mainMoves(G.actor,true).length)return;
-  if(hookAny('stuck',G.actor))return;lg(`${SP(G.actor).nm} has no legal cut left.`,'bad');explode('a crew member had no legal cut left (the bomb goes off, as the rules say for a hand that cannot be cut)')}
+  if(hookAny('stuck',G.actor))return;lg(`${SP(G.actor).nm} has no legal cut left.`,'bad');
+  if(![9,16,36].includes(G.mission)){skipTurn('no legal cut (no fuse step: only jobs 9, 16 and 36 blow the bomb)',0);return}   // the FAQ names the explosion only for job 9 (16 shares its gate; 36 kept per the audit); W391
+  explode('a crew member had no legal cut left (the bomb goes off, as the rules say for a hand that cannot be cut)')}
 function endAction(){G.tfx.acted=1;G.blockRun=0;if(G.step==='act'){G.step='end';schedEnd()}}
 function skipTurn(why,dial){G.tfx.acted=1;G.tfx.skipped=1;G.hist.push({seat:G.actor,kind:'skip',turn:G.turn});lg(`${SP(G.actor).nm} skips: ${why}.`);if(dial)advance(dial,'skipped turn');finishSkip()}
 AG.endTurn=()=>{if(G.over)return;const s=G.cur;hook('end',s);if(G.over)return;checkWin();if(G.over)return;
