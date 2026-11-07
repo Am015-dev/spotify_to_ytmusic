@@ -92,7 +92,59 @@ function tutLeave(){clearTimeout(BF.autoT);BF.autoT=null;try{BF.cardClear()}catc
   if(TUT_KEEP.auto!=null)UI.auto=TUT_KEEP.auto;if(TUT_KEEP.ghost!=null)BF.ghostDone=TUT_KEEP.ghost;TUT_KEEP.auto=TUT_KEEP.ghost=null;
   try{PHO.closePop(true)}catch(e){}
   G=null;UI.beats.length=0;UI.shown=-1;UI.sel=null;UI.tileSel=null;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};try{render()}catch(e){console.error(e)}}
-function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];TUT_STEPS=tutSteps();
+
+// ---------------------------------------------------------------- COACHED FIRST GAME (flag ?coach=1, off by default; owner 7 Nov addendum 4)
+// A real game from turn 1 (all legal moves free; stacked seed and deck only make the cases come up). The Cook speaks just in time: one bubble at a time,
+// never blocks input, dismissible. Each rule is explained the first time it matters; the rest go on a "Things you'll meet later" card. No forced taps.
+const COACH_ON=(()=>{try{return new URLSearchParams(location.search).has('coach')}catch(e){return false}})();
+const COACH={timer:0,done:{},cur:null,t0:0,later:0};
+const cbeat=()=>{try{if(!G||PHO.st!=='story')return null;const i=storyIdx();return i>=0?UI.beats[i]:null}catch(e){return null}};
+const cplan=()=>!!(G&&(PHO.st==='plan'||PHO.st==='plan2')&&!PHO.pop&&!UI.modal);
+const cact=t=>{try{return G.plan.acts.find(a=>a.pw.length&&a.type===t)}catch(e){return null}};
+const COACH_RULES=[
+ {id:'goal',when:()=>cplan()&&G.round===1,say:"Our ship is gone. Light a fire and stack 15 wood by day 12: a ship will see it. Pick a pawn, then a glowing place."},
+ {id:'pawns',when:()=>cplan()&&G.round===1&&G.plan.acts.some(a=>a.pw.length),say:"Each pawn does one job. I cook and heal, the Carpenter builds, Friday helps."},
+ {id:'dice',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length===1&&actNeed(a).roll),say:"One pawn alone rolls dice and can fail or get hurt. A second pawn makes it sure."},
+ {id:'sure',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length>=2),say:"Two pawns: no dice, a sure thing. Good, keep the Carpenter safe."},
+ {id:'explore',when:()=>cplan()&&!!cact('explore'),say:"Exploring finds new land; we can gather there tomorrow."},
+ {id:'build',when:()=>cplan()&&!!cact('build'),say:"Building costs wood. A shelter costs 2 wood and ends night wounds."},
+ {id:'gather',when:()=>cplan()&&!!cact('gather'),say:"Food and wood arrive after all the jobs are done, not before."},
+ {id:'camp',when:()=>cplan()&&!!cact('camp'),say:"Tidying the camp earns determination ✊ for skills and lifts morale."},
+ {id:'ready',when:()=>cplan()&&G.plan.acts.some(a=>a.pw.length)&&(()=>{try{return planProblems().length===0}catch(e){return false}})(),say:"Everyone has a job. Good plan. Tap Start day when you are ready."},
+ {id:'prod',when:()=>{const b=cbeat();return b&&b.kind==='prod'},say:"Each morning the camp's sources give 1 food or 1 wood."},
+ {id:'event',when:()=>{const b=cbeat();return b&&b.kind==='event'},say:"A new event card each morning: it happens now, then waits as a threat."},
+ {id:'threat',when:()=>{const b=cbeat();return b&&b.kind==='threat'||cplan()&&G.ev&&G.ev.threat&&G.ev.threat.some(Boolean)},say:"A threat sits at camp. Deal with it in time, or the card strikes."},
+ {id:'morning',when:()=>{const b=cbeat();return b&&b.kind==='morning'},say:"Morale moves our determination each morning. Low morale costs wounds."},
+ {id:'found',when:()=>{const b=cbeat();return b&&b.kind==='finds'},say:"The day's haul reaches camp. New land is now yours to use."},
+ {id:'fight',when:()=>{const b=cbeat();return b&&(b.kind==='fight'||b.kind==='adventure'||b.kind==='mystery')},say:"Adventures, mysteries and beasts are risky: weapons and dice decide."},
+ {id:'weather',when:()=>{const b=cbeat();return b&&b.kind==='weather'},say:"Clouds above our roof ruin 1 food and 1 wood each. A roof protects us."},
+ {id:'night',when:()=>{const b=cbeat();return b&&b.kind==='night'},say:"Night: everyone eats 1 food (or takes 2 wounds). No shelter means a wound each."},
+ {id:'wounds',when:()=>{const b=cbeat();return b&&b.kind==='daysum'},say:"Each wound costs a life ♥. Resting heals one. Build a shelter soon."},
+ {id:'skill',when:()=>cplan()&&G.chars.some(c=>!c.npc&&c.det>=2),say:"We have determination ✊: open the Camp tab to use a skill, once per round."},
+ {id:'fog',when:()=>cplan()&&G.map.some(m=>m.fog),say:"Fog hides a place: work there needs one more pawn."}
+];
+const COACH_LATER=[
+ ["Hunting","Hunt beasts for food and fur; your weapon level decides the fight."],["Resting","A rest job heals 1 wound."],
+ ["Distance","Places two tiles from camp need one extra pawn."],["Items and inventions","Build inventions for lasting help; some become items."],
+ ["Snow and storms","Winter clouds cost wood; a storm hits last."],["Healing at night","Pot, fire and rum can heal before sleep."],
+ ["Moving camp","Move camp at night; it halves your roof and palisade."],["Other scenarios","Hexed Isle, Stranded Friend and Settlers add their own goals."]];
+function coachEl(){let e=document.getElementById('coachb');if(!e){e=document.createElement('div');e.id='coachb';e.setAttribute('role','status');document.body.appendChild(e);
+  e.addEventListener('click',ev=>{if(ev.target.closest('[data-coach=x]'))coachHide()})}return e}
+function coachHide(){const e=document.getElementById('coachb');if(e)e.hidden=true;COACH.cur=null}
+function coachShow(id,say){const e=coachEl();COACH.cur=id;COACH.shownAt=Date.now();e.hidden=false;e.dataset.rule=id;e.innerHTML='<b class="cn">Cook</b><span class="ct"></span><button type="button" data-coach="x" aria-label="Dismiss">✕</button>';e.querySelector('.ct').textContent=say}
+function coachTick(){try{
+  if(!G||!G.coach){coachStop();return}
+  if(G.over&&!COACH.done.later){COACH.done.later=1;COACH.later=1;const w=G.over.win;const left=COACH_LATER.map(x=>'<li><b>'+x[0]+'.</b> '+x[1]+'</li>').join('');
+    const e=coachEl();COACH.cur='later';e.hidden=false;e.dataset.rule='later';e.innerHTML='<b class="cn">Cook: '+(w?'rescued!':'we did not make it')+'</b><span class="ct">Day '+G.round+' of '+G.rounds+', food '+food()+', wood '+G.res.wood+'. Things you’ll meet later:</span><ul>'+left+'</ul><button type="button" data-coach="x" aria-label="Close">✕</button>';return}
+  if(COACH.cur&&Date.now()-COACH.shownAt>(COACH.cur==='later'?60000:9000))coachHide();
+  if(COACH.cur)return;
+  for(const r of COACH_RULES){if(COACH.done[r.id])continue;let ok=false;try{ok=!!r.when()}catch(e){}if(ok){COACH.done[r.id]=1;coachShow(r.id,r.say);return}}
+ }catch(e){console.error(e)}}
+function coachStop(){clearInterval(COACH.timer);COACH.timer=0;coachHide()}
+function coachStart(){COACH.done={};COACH.cur=null;COACH.later=0;tutBegin();G.coach=1;clearInterval(COACH.timer);COACH.timer=setInterval(coachTick,600);coachTick()}
+window.COACHX={rules:COACH_RULES.map(r=>r.id),done:()=>Object.keys(COACH.done),state:COACH};
+
+function tutStart(o){if(typeof GXT==='undefined')return;if(COACH_ON&&!(o&&o.prologue))return coachStart();const pro=!!(o&&o.prologue);const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];TUT_STEPS=tutSteps();
   GXT.start({game:TUT_GAME,steps:TUT_STEPS,story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:'You know the rules',endText:pro?'We survived two days. The ship’s log is open: now the Story begins.':'Jobs, dice, camp, weather, wounds, skills. A real game lasts 12 days.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
