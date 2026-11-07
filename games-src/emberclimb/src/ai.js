@@ -1,17 +1,17 @@
 // Bot used by tests and the "Auto turn" helper. Enemy AI is the intent patterns in engine.js.
 (function () {
   var D = EC.D, E = EC.E;
-  function threat(G) { var t = 0; G.b.en.forEach(function (e) { if (!e.dead && e.intent && e.intent.atk) t += (e.intent.atk + (e.st.str || 0)) * (e.intent.hits || 1); }); return t; }
+  function threat(G, hi) { var t = 0; G.b.en.forEach(function (e, i) { if (!e.dead && e.intent && e.intent.atk && (e.intent.all || e.intent.tg === hi)) t += E.previewHit(i, hi) * (e.intent.hits || 1); }); return t; }
   function score(G, mv) {
-    var h = G.hs[G.b.cur], c = h.hand[mv.c], e = E.eff(c), s = 0, ops = e.ops, need = Math.max(0, threat(G) * (h.stance === 'w' ? 2 : 1) / G.hs.filter(function (x) { return !x.dead; }).length - h.blk), en = mv.e != null ? G.b.en[mv.e] : null;
+    var h = G.hs[G.b.cur], c = h.hand[mv.c], e = E.eff(c), s = 0, ops = e.ops, need = Math.max(0, threat(G, G.b.cur) - h.blk), en = mv.e != null ? G.b.en[mv.e] : null;
     ops.forEach(function (o) {
       var k = o[0];
       if (k === 'dmg' || k === 'hit' || k === 'all' || k === 'dmgx' || k === 'bodyslam') { s += 6 + (en && o[1] >= en.hp + en.blk ? 30 : 0) + (k === 'all' ? G.b.en.length * 3 : 0); }
       else if (k === 'blk') s += need > 0 ? 8 : 2;
       else if (k === 'str' || k === 'power' || k === 'dblStr') s += G.b.turn <= 3 ? 9 : 4;
       else if (k === 'draw' || k === 'nrg') s += 5; else if (k === 'vuln' || k === 'weak' || k === 'poison' || k === 'poisonAll' || k === 'weakAll') s += 5;
-      else if (k === 'stance') { s += o[1] === 'w' ? (h.stance === 'w' ? 0 : (need > 8 ? -3 : 4)) : (h.stance === 'w' ? 9 : 4); }
-      else if (k === 'chan' || k === 'shiv' || k === 'roll' || k === 'evoke2') s += 5;
+      else if (k === 'stance') { s += o[1] === 'w' ? (h.stance === 'w' ? 0 : (need > 8 ? -3 : 4)) : (h.stance === 'w' ? 9 : (h.stance === 'c' && o[1] === 'c' ? 0 : 4)); }
+      else if (k === 'chan' || k === 'shiv' || k === 'roll' || k === 'evoke2' || k === 'mir' || k === 'scry') s += 5;
       else s += 1;
     });
     if (en && en.hp > 0 && en.hp <= 12) s += 3; if (en) s += 8 / (1 + en.hp / 20) ;
@@ -20,12 +20,19 @@
   function aiMove(rndf) {
     var G = E.G(), vm = E.validMoves(); if (!vm.length) return null; rndf = rndf || Math.random;
     function pick(a) { return a[Math.floor(rndf() * a.length)]; }
+    if (G.scr === 'battle' && G.b.scry) {   // Scry: throw away junk (unplayable) cards, keep the rest
+      var sh = G.hs[G.b.scry.h], top = sh.draw.slice(-G.b.scry.n).reverse(), keep = [];
+      top.forEach(function (c, i) { if (D.CARDS[c.id].fl.indexOf('u') < 0 && D.CARDS[c.id].hero !== 'z') keep.push(i); });
+      return { t: 'scry', keep: keep };
+    }
     if (G.scr === 'battle') {
       var pl = vm.filter(function (m) { return m.t === 'play'; }), best = null, bs = -1;
       pl.forEach(function (m) { var sc = score(G, m); if (sc > bs) { bs = sc; best = m; } });
       var h = G.hs[G.b.cur];
       if (G.pots.length && G.hs[G.b.cur].hp < G.hs[G.b.cur].mhp * 0.4) { var hp = G.pots.indexOf('healing-draught'); if (hp >= 0) return { t: 'pot', p: hp }; }
       var pm = vm.filter(function (m) { return m.t === 'pot'; }); if (pm.length && G.b.kind !== 'm' && rndf() < 0.3) return pm[0];
+      // Miracle: spend one when it lets a card in hand be played this turn
+      if (h.mir > 0 && h.hand.some(function (c) { var ef = E.eff(c); return typeof ef.cost === 'number' && ef.fl.indexOf('u') < 0 && ef.cost > h.en && ef.cost <= h.en + h.mir; }) && (!best || bs < 6)) return { t: 'mir' };
       return best || { t: 'end' };
     }
     if (G.scr === 'map') { var fl = vm.filter(function (m) { var t = G.map[m.n].t; return t === 'r' || t === 'm' || t === 's' || t === 'v' || t === 't'; }); var lowhp = G.hs.some(function (h) { return h.hp < h.mhp * 0.5; }); if (lowhp) { var r = vm.filter(function (m) { return G.map[m.n].t === 'r'; }); if (r.length) return r[0]; } var mm = vm.filter(function (m) { return G.map[m.n].t !== 'e'; }); return pick(rndf() < 0.15 || !mm.length ? vm : mm); }

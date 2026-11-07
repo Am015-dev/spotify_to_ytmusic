@@ -1,206 +1,195 @@
 # Free art credits: perch-and-plume
 
-All pictures in this folder are composed by `compose.py` from CC0 material (no attribution required; logged anyway).
+Birds, food, nests, goals, cards, UI and backgrounds are drawn as flat vector SVG by `birds.py` / `ui.py` in this folder
+(our own work, released CC0) in the Kenney flat style. Portraits use Kenney Toon Characters 1 (CC0 1.0, Kenney,
+https://opengameart.org/content/toon-characters-1) with Kenney Hexagon Pack props (CC0 1.0, https://opengameart.org/content/hexagon-pack-310x).
 No picture contains text. No publisher, designer or original-game name or logo is used.
 
-## Sources used
-
-| Source | Author | Licence | URL | Files |
-|---|---|---|---|---|
-| Kenney Animal Pack Redux | Kenney | CC0 1.0 | https://opengameart.org/content/animal-pack-redux | 53 |
-| Kenney Cartography Pack | Kenney | CC0 1.0 | https://opengameart.org/content/cartography-pack | 16 |
-| Kenney Board Game Icons | Kenney | CC0 1.0 | https://opengameart.org/content/board-game-icons | 153 |
-| Poly Haven textures (diffuse maps, 1k) | Poly Haven contributors (see per-texture page) | CC0 1.0 | https://polyhaven.com/textures | 157 |
-| Quaternius low-poly animals (OBJ rendered to 2D with three.js, recoloured) | Quaternius | CC0 1.0 | https://opengameart.org/content/5-low-poly-animals | 99 |
-
-## Poly Haven textures used (CC0, https://polyhaven.com/a/<name>)
-
-aerial_grass_rock, brown_planks_03, damp_sand, forest_ground_04, rough_linen
-
-## Per file
-
-| File | Sources |
+| File | Source |
 |---|---|
-| bg-map.webp | kenney-carto, kenney-icons, polyhaven |
-| bg-result.webp | kenney-carto, kenney-icons, polyhaven |
-| bg-title.webp | kenney-carto, kenney-icons, polyhaven |
-| bird-amber-coot.webp | kenney-icons, polyhaven, quaternius |
-| bird-amber-lark.webp | kenney-icons, polyhaven, quaternius |
-| bird-amber-pipit.webp | kenney-icons, polyhaven, quaternius |
-| bird-amber-teal.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-ashen-bittern.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-ashen-sandpiper.webp | kenney-icons, polyhaven, quaternius |
-| bird-bramble-crow.webp | kenney-icons, polyhaven, quaternius |
-| bird-bramble-dove.webp | kenney-icons, polyhaven, quaternius |
-| bird-briar-woodpecker.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-cinder-egret.webp | kenney-icons, polyhaven, quaternius |
-| bird-cinder-kinglet.webp | kenney-icons, polyhaven, quaternius |
-| bird-clover-bittern.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-clover-waxwing.webp | kenney-icons, polyhaven, quaternius |
-| bird-cobalt-grebe.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-cobalt-kestrel.webp | kenney-icons, polyhaven, quaternius |
-| bird-cobalt-tern.webp | kenney-icons, polyhaven, quaternius |
-| bird-copper-hawk.webp | kenney-icons, polyhaven, quaternius |
-| bird-copper-oriole.webp | kenney-icons, polyhaven, quaternius |
-| bird-copper-thrush.webp | kenney-icons, polyhaven, quaternius |
-| bird-copper-warbler.webp | kenney-icons, polyhaven, quaternius |
-| bird-dawn-tanager.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-dusk-dove.webp | kenney-icons, polyhaven, quaternius |
-| bird-dusk-harrier.webp | kenney-icons, polyhaven, quaternius |
-| bird-dusk-vireo.webp | kenney-icons, polyhaven, quaternius |
-| bird-ember-lark.webp | kenney-icons, polyhaven, quaternius |
-| bird-ember-meadowlark.webp | kenney-icons, polyhaven, quaternius |
-| bird-ember-nuthatch.webp | kenney-icons, polyhaven, quaternius |
-| bird-fern-shrike.webp | kenney-icons, polyhaven, quaternius |
-| bird-fern-thrush.webp | kenney-icons, polyhaven, quaternius |
-| bird-fern-woodpecker.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-gilded-jay.webp | kenney-icons, polyhaven, quaternius |
-| bird-gilded-kingfisher.webp | kenney-icons, polyhaven, quaternius |
-| bird-gilded-owl.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-gilded-shrike.webp | kenney-icons, polyhaven, quaternius |
-| bird-gilded-sparrow.webp | kenney-icons, polyhaven, quaternius |
-| bird-gilded-treecreeper.webp | kenney-icons, polyhaven, quaternius |
-| bird-hazel-nuthatch.webp | kenney-icons, polyhaven, quaternius |
-| bird-hazel-owl.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-hazel-quail.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-hazel-warbler.webp | kenney-icons, polyhaven, quaternius |
-| bird-hollow-bunting.webp | kenney-icons, polyhaven, quaternius |
-| bird-hollow-hawk.webp | kenney-icons, polyhaven, quaternius |
-| bird-hollow-tanager.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-juniper-waxwing.webp | kenney-icons, polyhaven, quaternius |
-| bird-lantern-bittern.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-lantern-heron.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-lantern-kingfisher.webp | kenney-icons, polyhaven, quaternius |
-| bird-lantern-owl.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-lantern-plover.webp | kenney-icons, polyhaven, quaternius |
-| bird-larch-harrier.webp | kenney-icons, polyhaven, quaternius |
-| bird-larch-sandpiper.webp | kenney-icons, polyhaven, quaternius |
-| bird-larch-tanager.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-marsh-quail.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-marsh-vireo.webp | kenney-icons, polyhaven, quaternius |
-| bird-marsh-woodpecker.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-meadow-oriole.webp | kenney-icons, polyhaven, quaternius |
-| bird-mist-dove.webp | kenney-icons, polyhaven, quaternius |
-| bird-mist-rail.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-moss-jay.webp | kenney-icons, polyhaven, quaternius |
-| bird-moss-quail.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-nettle-coot.webp | kenney-icons, polyhaven, quaternius |
-| bird-nettle-grebe.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-nettle-oriole.webp | kenney-icons, polyhaven, quaternius |
-| bird-opal-kestrel.webp | kenney-icons, polyhaven, quaternius |
-| bird-pebble-bunting.webp | kenney-icons, polyhaven, quaternius |
-| bird-pebble-crow.webp | kenney-icons, polyhaven, quaternius |
-| bird-pebble-harrier.webp | kenney-icons, polyhaven, quaternius |
-| bird-pebble-swift.webp | kenney-icons, polyhaven, quaternius |
-| bird-pebble-treecreeper.webp | kenney-icons, polyhaven, quaternius |
-| bird-pine-finch.webp | kenney-icons, polyhaven, quaternius |
-| bird-pine-meadowlark.webp | kenney-icons, polyhaven, quaternius |
-| bird-pine-teal.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-pine-tern.webp | kenney-icons, polyhaven, quaternius |
-| bird-quill-sandpiper.webp | kenney-icons, polyhaven, quaternius |
-| bird-rush-pipit.webp | kenney-icons, polyhaven, quaternius |
-| bird-rush-plover.webp | kenney-icons, polyhaven, quaternius |
-| bird-russet-meadowlark.webp | kenney-icons, polyhaven, quaternius |
-| bird-russet-swift.webp | kenney-icons, polyhaven, quaternius |
-| bird-rust-nuthatch.webp | kenney-icons, polyhaven, quaternius |
-| bird-rust-swallow.webp | kenney-icons, polyhaven, quaternius |
-| bird-saffron-coot.webp | kenney-icons, polyhaven, quaternius |
-| bird-saffron-crane.webp | kenney-icons, polyhaven, quaternius |
-| bird-saffron-heron.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-saffron-kestrel.webp | kenney-icons, polyhaven, quaternius |
-| bird-saffron-rail.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-saffron-sparrow.webp | kenney-icons, polyhaven, quaternius |
-| bird-sedge-egret.webp | kenney-icons, polyhaven, quaternius |
-| bird-sedge-finch.webp | kenney-icons, polyhaven, quaternius |
-| bird-silver-bunting.webp | kenney-icons, polyhaven, quaternius |
-| bird-silver-treecreeper.webp | kenney-icons, polyhaven, quaternius |
-| bird-silver-waxwing.webp | kenney-icons, polyhaven, quaternius |
-| bird-slate-crane.webp | kenney-icons, polyhaven, quaternius |
-| bird-slate-crow.webp | kenney-icons, polyhaven, quaternius |
-| bird-slate-jay.webp | kenney-icons, polyhaven, quaternius |
-| bird-slate-pipit.webp | kenney-icons, polyhaven, quaternius |
-| bird-slate-shrike.webp | kenney-icons, polyhaven, quaternius |
-| bird-slate-wren.webp | kenney-icons, polyhaven, quaternius |
-| bird-smoke-crane.webp | kenney-icons, polyhaven, quaternius |
-| bird-sorrel-finch.webp | kenney-icons, polyhaven, quaternius |
-| bird-storm-kingfisher.webp | kenney-icons, polyhaven, quaternius |
-| bird-storm-sparrow.webp | kenney-icons, polyhaven, quaternius |
-| bird-storm-wren.webp | kenney-icons, polyhaven, quaternius |
-| bird-sun-kinglet.webp | kenney-icons, polyhaven, quaternius |
-| bird-sun-plover.webp | kenney-icons, polyhaven, quaternius |
-| bird-thistle-swallow.webp | kenney-icons, polyhaven, quaternius |
-| bird-tidal-swallow.webp | kenney-icons, polyhaven, quaternius |
-| bird-tidal-vireo.webp | kenney-icons, polyhaven, quaternius |
-| bird-tidal-warbler.webp | kenney-icons, polyhaven, quaternius |
-| bird-tidal-wren.webp | kenney-icons, polyhaven, quaternius |
-| bird-umber-lark.webp | kenney-icons, polyhaven, quaternius |
-| bird-umber-swift.webp | kenney-icons, polyhaven, quaternius |
-| bird-velvet-kinglet.webp | kenney-icons, polyhaven, quaternius |
-| bird-velvet-rail.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-velvet-teal.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-velvet-tern.webp | kenney-icons, polyhaven, quaternius |
-| bird-velvet-thrush.webp | kenney-icons, polyhaven, quaternius |
-| bird-willow-egret.webp | kenney-icons, polyhaven, quaternius |
-| bird-willow-grebe.webp | kenney-animals, kenney-icons, polyhaven |
-| bird-wisp-hawk.webp | kenney-icons, polyhaven, quaternius |
-| bird-wisp-heron.webp | kenney-animals, kenney-icons, polyhaven |
-| board-mat.webp | polyhaven |
-| bonus-angler.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-bargain.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-berry-picker.webp | kenney-icons, polyhaven |
-| bonus-big-wings.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-bowl-keeper.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-brood.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-flock-friend.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-ground-keeper.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-grub-digger.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-hoarder.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-hollow-keeper.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-ledge-keeper.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-marsh.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-mouser.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-prairie.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-seed-saver.webp | kenney-icons, polyhaven |
-| bonus-small-wings.webp | kenney-animals, kenney-icons, polyhaven |
-| bonus-woodland.webp | kenney-animals, kenney-icons, polyhaven |
-| card-back.webp | kenney-icons, polyhaven |
-| food-any.webp | kenney-icons |
-| food-berry.webp | kenney-icons |
-| food-fish.webp | quaternius |
-| food-grub.webp | kenney-animals |
-| food-gs.webp | kenney-icons |
-| food-rodent.webp | kenney-animals |
-| food-seed.webp | kenney-icons |
-| goal-birds-F.webp | quaternius |
-| goal-birds-G.webp | quaternius |
-| goal-birds-W.webp | quaternius |
-| goal-eggs-F.webp | kenney-icons |
-| goal-eggs-G.webp | kenney-icons |
-| goal-eggs-W.webp | kenney-icons |
-| goal-nest-bowl.webp | kenney-carto |
-| goal-nest-cavity.webp | kenney-carto |
-| goal-nest-ground.webp | kenney-carto |
-| goal-nest-platform.webp | kenney-carto |
-| goal-sets.webp | quaternius |
-| goal-total.webp | quaternius |
-| nest-bowl.webp | kenney-carto |
-| nest-cavity.webp | kenney-carto |
-| nest-ground.webp | kenney-carto |
-| nest-platform.webp | kenney-carto |
-| nest-star.webp | kenney-carto |
-| portrait-barnaby.webp | kenney-animals, polyhaven |
-| portrait-corvin.webp | kenney-animals, polyhaven |
-| portrait-delphine.webp | kenney-animals, polyhaven |
-| portrait-mags.webp | kenney-animals, polyhaven |
-| portrait-ottilie.webp | kenney-animals, polyhaven |
-| portrait-pip.webp | kenney-animals, polyhaven |
-| portrait-tobias.webp | kenney-animals, polyhaven |
-| portrait-you.webp | kenney-animals, polyhaven |
-| row-forest.webp | kenney-carto, polyhaven |
-| row-grassland.webp | kenney-carto, polyhaven |
-| row-wetland.webp | kenney-carto, polyhaven |
-| token-egg.webp | kenney-icons |
-| ui-cube.webp | kenney-icons |
-| ui-feeder.webp | kenney-carto, polyhaven |
-| ui-tray.webp | kenney-icons, polyhaven |
-| ui-trophy.webp | kenney-icons, polyhaven |
+| bg-map.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bg-result.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bg-title.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bird-amber-coot.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-amber-lark.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-amber-pipit.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-amber-teal.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-ashen-bittern.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-ashen-sandpiper.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-bramble-crow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-bramble-dove.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-briar-woodpecker.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-cinder-egret.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-cinder-kinglet.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-clover-bittern.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-clover-waxwing.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-cobalt-grebe.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-cobalt-kestrel.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-cobalt-tern.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-copper-hawk.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-copper-oriole.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-copper-thrush.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-copper-warbler.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-dawn-tanager.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-dusk-dove.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-dusk-harrier.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-dusk-vireo.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-ember-lark.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-ember-meadowlark.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-ember-nuthatch.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-fern-shrike.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-fern-thrush.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-fern-woodpecker.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-gilded-jay.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-gilded-kingfisher.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-gilded-owl.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-gilded-shrike.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-gilded-sparrow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-gilded-treecreeper.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-hazel-nuthatch.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-hazel-owl.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-hazel-quail.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-hazel-warbler.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-hollow-bunting.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-hollow-hawk.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-hollow-tanager.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-juniper-waxwing.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-lantern-bittern.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-lantern-heron.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-lantern-kingfisher.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-lantern-owl.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-lantern-plover.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-larch-harrier.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-larch-sandpiper.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-larch-tanager.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-marsh-quail.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-marsh-vireo.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-marsh-woodpecker.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-meadow-oriole.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-mist-dove.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-mist-rail.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-moss-jay.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-moss-quail.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-nettle-coot.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-nettle-grebe.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-nettle-oriole.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-opal-kestrel.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pebble-bunting.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pebble-crow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pebble-harrier.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pebble-swift.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pebble-treecreeper.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pine-finch.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pine-meadowlark.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pine-teal.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-pine-tern.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-quill-sandpiper.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-rush-pipit.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-rush-plover.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-russet-meadowlark.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-russet-swift.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-rust-nuthatch.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-rust-swallow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-saffron-coot.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-saffron-crane.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-saffron-heron.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-saffron-kestrel.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-saffron-rail.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-saffron-sparrow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-sedge-egret.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-sedge-finch.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-silver-bunting.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-silver-treecreeper.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-silver-waxwing.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-slate-crane.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-slate-crow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-slate-jay.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-slate-pipit.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-slate-shrike.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-slate-wren.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-smoke-crane.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-sorrel-finch.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-storm-kingfisher.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-storm-sparrow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-storm-wren.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-sun-kinglet.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-sun-plover.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-thistle-swallow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-tidal-swallow.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-tidal-vireo.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-tidal-warbler.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-tidal-wren.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-umber-lark.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-umber-swift.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-velvet-kinglet.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-velvet-rail.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-velvet-teal.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-velvet-tern.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-velvet-thrush.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-willow-egret.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-willow-grebe.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-wisp-hawk.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| bird-wisp-heron.webp | original flat-vector bird family (birds.py), CC0 by this project |
+| board-mat.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-angler.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-bargain.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-berry-picker.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-big-wings.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-bowl-keeper.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-brood.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-flock-friend.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-ground-keeper.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-grub-digger.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-hoarder.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-hollow-keeper.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-ledge-keeper.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-marsh.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-mouser.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-prairie.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-seed-saver.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-small-wings.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| bonus-woodland.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| card-back.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| food-any.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| food-berry.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| food-fish.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| food-grub.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| food-gs.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| food-rodent.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| food-seed.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| fx-chain-spark.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| fx-egg-pop.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| fx-food-pop.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-birds-F.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-birds-G.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-birds-W.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-eggs-F.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-eggs-G.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-eggs-W.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-nest-bowl.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-nest-cavity.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-nest-ground.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-nest-platform.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-sets.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| goal-total.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| nest-bowl.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| nest-cavity.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| nest-ground.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| nest-platform.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| nest-star.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| portrait-barnaby.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-corvin.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-delphine.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-mags.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-ottilie.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-pip.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-tobias.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-you.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| row-forest.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| row-grassland.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| row-wetland.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| token-egg.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| ui-cube.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| ui-feeder.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| ui-tray.webp | original flat-vector drawing (ui.py), CC0 by this project |
+| ui-trophy.webp | original flat-vector drawing (ui.py), CC0 by this project |
