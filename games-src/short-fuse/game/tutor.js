@@ -79,7 +79,7 @@ async function tutCrew(){const tok=UI.tutTok;for(let n=0;n<8&&tutAlive(tok)&&!G.
 // ---------------------------------------------------------------- the steps
 const tutCalm=()=>!document.querySelector('#tb .snap,#tb .buzz,#tb.shake,#fuse .burn,#fuse .phew');   // the cut / miss animation is over: the spotlight does not move
 const hitTxt=()=>{const t=G.st[1].w[tutIdx(1,7)];return t&&t.cut};
-function tutSteps(){return [
+function tutSteps(){return tutStory([
  {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires before the fuse burns out. The whole crew wins or loses together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.q},
  {id:'mine',title:'Your wires',say:'These wires are yours. Only you see the numbers. Every stand is sorted, lowest on the left.',target:tq('#mine'),wait:null},
  {id:'crew',title:'Their wires',say:'Teal and Plum hold the rest. You see only their backs, and they never see yours.',target:tq('#crew'),wait:null},
@@ -111,14 +111,18 @@ function tutSteps(){return [
  {id:'solo',title:'Solo cut',say:'You hold every 2 left, so cut them alone. Tap one: both are cut, with no risk.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()},
  {id:'win',title:'Defused!',say:'Every wire is cut: defused! Your last red was revealed for you. Win together, or lose together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.over&&G.over.win}
-]}
+])}
+// the story layer: every bubble is Brix (or Quill) talking: reaction, reason, then the one thing to do. All words live in story.js.
+function tutStory(steps){const wires=()=>G.st.reduce((a,s)=>a+s.w.length,0);
+  return steps.map(st=>{const d=STORY.tut.s[st.id];if(!d)return st;const who=d[1]==='quill'?STORY.rival.name:STORY.guide.name;const txt=d[3];
+    return Object.assign({},st,{chapter:d[0],who:d[1],title:()=>who+' · '+d[2],say:typeof txt==='function'?()=>txt(wires()):txt})})}
 // ---------------------------------------------------------------- the kit hooks
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
 function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:o?'Point, name, tokens, the fuse, gear, yellow, red. Now the Story begins.':'Point, name, tokens, the fuse, gear, yellow, red. Real jobs add twists: the lightbulb explains them.',
+    endTitle:STORY.tut.endTitle,endText:o?STORY.tut.endText:STORY.tut.endText+' '+STORY.tut.endTextPlain,
     endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:tutNew,
     onDone:r=>{tutLeave();const c=r&&r.choice;

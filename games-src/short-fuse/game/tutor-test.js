@@ -18,7 +18,7 @@ const totals={steps:0,wrong:0,runs:0,ids:[]};
 const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 
 async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.now();
-  const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true,userAgent:UA,serviceWorkers:'block'});
+  const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:W<800,hasTouch:true,userAgent:UA,serviceWorkers:'block'});
   await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
@@ -68,7 +68,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         saved:Object.keys(localStorage).filter(k=>/save/i.test(k))}});
     const s=info.s,id=s.id;
     totals.steps++;
-    if(wc(info.say)>20)note(tag,id+': say over 20 words ('+wc(info.say)+')');
+    if(wc(info.say)>26)note(tag,id+': say over 26 words ('+wc(info.say)+')');
     if(info.title&&wc(info.title)>4)note(tag,id+': title over 4 words');
     if(!info.say)note(tag,id+': empty text');
     if(info.hs)note(tag,id+': page scrolls sideways');
@@ -168,7 +168,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     await sleep(300);
     const e=await p.evaluate(()=>{const c=document.querySelector('.gxt-end');if(!c)return null;const r=c.querySelector('.gxt-endc').getBoundingClientRect();return {t:c.querySelector('.gxt-et').textContent,btns:[...c.querySelectorAll('[data-gxt-end]')].map(b=>({t:b.textContent,k:b.dataset.gxtEnd,r:(()=>{const q=b.getBoundingClientRect();return [q.left,q.top,q.right,q.bottom,q.width,q.height]})()})),inside:r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}});
     if(!e)note(tag,'no end card');else{
-      if(!/know the rules/i.test(e.t))note(tag,'end card title: '+e.t);
+      if(!/rig is silent|know the rules/i.test(e.t))note(tag,'end card title: '+e.t);
       const ks=e.btns.map(b=>b.k).join();if(ks!=='play,story')note(tag,'end card buttons: '+ks);
       if(!e.inside)note(tag,'end card outside the screen');
       for(const b of e.btns)if(b.r[5]<40)note(tag,'end button too small: '+b.t);
@@ -200,5 +200,7 @@ const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(
   const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);if(SIZES[1])jobs.push([SIZES[1][0],SIZES[1][1],'story']);
   for(const j of jobs){guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();
+  {const doc=fs.readFileSync(path.join(__dirname,'..','TUTORIAL-COVERAGE.md'),'utf8');const cited=new Set();doc.split('\n').filter(l=>l.startsWith('| [')).forEach(l=>{if(!l.startsWith('| [x]'))note('coverage','unticked rule: '+l.slice(0,60));(l.match(/`[a-z0-9]+`/g)||[]).forEach(x=>cited.add(x.slice(1,-1)))});
+    totals.ids.forEach(id=>{if(!cited.has(id))note('coverage','step '+id+' is not in TUTORIAL-COVERAGE.md')});cited.forEach(id=>{if(!totals.ids.includes(id))note('coverage','coverage cites '+id+' but the tutorial never showed it')})}
   console.log('steps checked',totals.steps,'wrong taps',totals.wrong,'step ids',totals.ids.join(','));
   console.log(probs.length?'PROBLEMS '+probs.length+'\n  '+probs.join('\n  '):'PROBLEMS 0');process.exit(probs.length?1:0)})();
