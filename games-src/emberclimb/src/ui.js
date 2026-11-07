@@ -95,6 +95,7 @@
     var g = G(); app.innerHTML = ''; tscr.innerHTML = '';
     if (UI.mode === 'title' || !g) { gameEl.hidden = true; tscr.hidden = false; try { GX.close(); } catch (e) { } try { GXH.hide(); } catch (e) { } return title(); }
     tscr.hidden = true; gameEl.hidden = false;
+    if (g.scr !== 'battle') { var tb0 = document.querySelector('.turnban'); if (tb0) tb0.remove(); }
     if (g.scr === 'map') mapScr(); else if (g.scr === 'battle') battle(); else if (g.scr === 'reward') reward();
     else if (g.scr === 'rest') rest(); else if (g.scr === 'shop') shop(); else if (g.scr === 'event') event(); else if (g.scr === 'over') over();
     if (UI.ov) overlay();

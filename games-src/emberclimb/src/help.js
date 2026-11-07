@@ -5,7 +5,7 @@
   // ---- rules cards (shared help kit): the old "How to climb" text, split into short cards; phase = where the player is
   var IC = { climb: '\u26F0', turn: '\u2694', intent: '\uD83D\uDC41', status: '\u2620', reward: '\uD83C\uDCCF', rest: '\uD83D\uDD25', duo: '\uD83D\uDC65', map: '\uD83D\uDDFA', boss: '\uD83D\uDC51', shop: '\uD83D\uDED2', event: '\u2753' };
   function svg(k) { return function () { return '<svg viewBox="0 0 100 60" width="100%" height="100%" aria-hidden="true"><text x="50" y="46" font-size="44" text-anchor="middle">' + IC[k] + '</text></svg>'; }; }
-  var TURN = { title: 'How a turn works', text: '1. Look above the enemy: it says what it will do next.\n2. Tap a glowing card, then tap it again (or tap the enemy) to play it.\n3. Each card costs energy (the gold coin); you get 3 a turn.\n4. Tap End turn. The enemy acts, step by step.\n5. Bring its HP to 0 to win, then pick a new card.', pic: svg('turn') };
+  var TURN = { title: 'How a turn works', text: '1. Above the enemy: what it does next.\n2. Tap a glowing card, then tap again to play.\n3. Cards cost energy (gold coin): 3 a turn.\n4. Tap End turn: the enemy acts step by step.\n5. Enemy at 0 HP: you win and pick a card.', pic: svg('turn') };
   var R = [
     TURN, Object.assign({}, TURN, { phase: ['map', 'battle', 'reward', 'rest', 'shop', 'event', 'over'] }),
     { title: 'The climb', text: 'Walk up the map room by room. Glowing rooms are your next step. Beat the boss at the top to win.', pic: svg('climb') },
