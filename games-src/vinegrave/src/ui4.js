@@ -48,7 +48,7 @@ const TS = id => { const t = V.STORY.tut[id]; return { title: t[0], say: t[1] };
 const tglow = sel => () => { const e = [...document.querySelectorAll(sel)].find(x => x.getBoundingClientRect().width); return e || null; };
 // ---------------------------------------------------------------- the coached first game (ADDENDUM 4): 2 forced taps, then free play with Pell's tips
 const CO = { seen: {}, q: [], cur: null, t: 0, fb: 0 };
-const coachOn = () => !!(G && UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.current() && GXT.current().id === 'free');
+const coachOn = () => !!(G && UI.mode === 'tutorial' && UI.coachFree);
 function coachSay(id, text) {   /* one bubble at a time; never blocks input; × dismisses */
   if (!coachOn()) return; if (!id) CO.q = CO.q.filter(x => x.id);   /* rule lines win over move feedback */ if (id && (CO.seen[id] || CO.q.some(x => x.id === id))) return;
   CO.q.push({ id, text: text || V.STORY.coach[id] }); coachPump();
@@ -97,6 +97,11 @@ function coachMove(m, best) {   /* one line why, for a strong or a weaker move (
 }
 const COVER = () => Object.keys(V.STORY.coach);
 window.coachReport = () => { const all = COVER(), seen = all.filter(id => CO.seen[id]); return { all, seen, later: all.filter(id => !CO.seen[id]) }; };
+function coachScoreStart() {   /* game over in the coached game: a second tutor run walks the score and shows the end card */
+  if (typeof GXT === 'undefined' || !UI.coachFree) return; UI.coachFree = false; coachHide();
+  const steps = tutSteps().filter(x => /^score/.test(x.id)), c = Object.assign({}, TUTCFG, { steps, setup: () => { } });
+  TUTCFG = c; GXT.start(c);
+}
 function tutSteps() {
   const sc = () => { const a = VG.score(G, 0), b = VG.score(G, 1); return [a, b]; };
   const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs table')) || $('#opp');
@@ -105,9 +110,8 @@ function tutSteps() {
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
     { id: 'play', title: 'Ch 1 · Landfall', say: 'Playing it gives +1 compass. That is your one action. After this, the island is yours to explore.', target: tq(tinsp('Play it')),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()), onEnter: () => { CO.seen.play = 1; } },
-    { id: 'free', title: 'Your expedition', say: '', target: () => ({ left: 0, top: 0, width: innerWidth, height: innerHeight }),
-      wait: { type: 'event', match: a => a.what === 'over' }, ready: () => true,
-      onEnter: () => { document.body.classList.add('vg-coached'); setTimeout(() => render(), 50); } },
+    { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
+      onEnter: () => { UI.coachFree = true; setTimeout(() => { try { GXT.stop(); } catch (x) { } render(); }, 0); } },   /* the tutor steps aside: free play, Pell coaches */
     { id: 'score1', title: 'Ch 2 · The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research: you ${a.research}, Tamsin ${b.research}. Temple tiles: ${a.temple} vs ${b.temple}. Higher on the track, more points.`; },
       target: tq(scoreTarget), wait: null, ready: () => true },
     { id: 'score2', title: 'Ch 2 · The count', say: () => { const [a, b] = sc(); return `Idols ${a.idols} vs ${b.idols}, empty shrine slots ${a.slots} vs ${b.slots}, guardians ${a.guards} vs ${b.guards}.`; }, target: tq(scoreTarget), wait: null, ready: () => true },
@@ -121,7 +125,8 @@ function tutStart(o) {
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; closeInsp();
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters[0];
   CO.seen = {}; CO.q = []; CO.cur = null; CO.fb = 0;
-  TUTCFG = { game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+  UI.coachFree = false;
+  TUTCFG = { game: TUT_GAME, steps: tutSteps().filter(x => !/^score/.test(x.id)), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'Prologue complete', endText: o ? 'Pell: "You played a whole expedition. Now the coast, and Tamsin, are waiting."' : 'Pell: "A whole expedition, start to count. A real game is 5 rounds. The lightbulb helps any time."',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start stage 1' }] : null,
     setup: tutSetup,
@@ -130,7 +135,8 @@ function tutStart(o) {
     onExit: () => { coachEnd(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); } };
   GXT.start(TUTCFG);
 }
-function coachEnd() { document.body.classList.remove('vg-coached'); CO.q = []; coachHide(); }
+function coachEnd() { document.body.classList.remove('vg-coached'); UI.coachFree = false; CO.q = []; coachHide(); }
+UIACT.tutleave = () => { coachEnd(); try { GXT.markDone(TUT_GAME); } catch (x) { } clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); };
 // ---------------------------------------------------------------- the Story map fits the screen (no scrolling: every stage visible at once)
 // gx-campaign lays the stages out 74 px apart (about 900 px for 10 stages); here the rows are pulled closer so the whole map fits the
 // viewport. Text sizes are untouched; only the vertical positions, the path height and the painted road scale.

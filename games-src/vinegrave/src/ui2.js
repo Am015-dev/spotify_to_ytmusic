@@ -69,7 +69,7 @@ $('#iscrim').addEventListener('click', () => { if (typeof GXT !== 'undefined' &&
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.insp) closeInsp(); });
 const UIACT = {};
 UIACT.tab = t => { showTab(t.dataset.t); UI.autoTab = false; render(); };
-function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; if (GXT.current() && GXT.current().id === 'free') return true;   /* coached game: every legal move is allowed */ return GXT.act(Object.assign({ type: 'tap' }, x)); }
+function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; if (UI.coachFree) return true;   /* coached game: every legal move is allowed */ return GXT.act(Object.assign({ type: 'tap' }, x)); }
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
   if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null; const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
@@ -82,7 +82,7 @@ function doMove(m) {
 }
 function after() {
   if (!G) return; render(); turnBanner(); if (typeof myTurn === 'function' && myTurn() && !$('#fx').hidden) fxHide();
-  if (G.phase === 'over') { clearSave(); setTimeout(() => { showResult(); if (UI.mode === 'tutorial' && typeof GXT !== 'undefined') try { GXT.act({ type: 'event', what: 'over' }); } catch (x) { } }, UI.fast ? 0 : 900); return; }
+  if (G.phase === 'over') { clearSave(); setTimeout(() => { showResult(); if (UI.mode === 'tutorial' && typeof coachScoreStart === 'function') try { coachScoreStart(); } catch (x) { console.warn(x); } }, UI.fast ? 0 : 900); return; }
   const s = VG.actor(G);
   if (!isHuman(s)) { schedule(); return; }
   if (s !== UI.view) { if (UI.humans.length > 1) showPass(s); else { UI.view = s; render(); } }

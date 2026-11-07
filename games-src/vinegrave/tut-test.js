@@ -23,8 +23,9 @@ const OUT = process.argv[2] || null;
     let ok = true, forced = 0, moves = 0, coachShots = 0; const t0 = Date.now();
     // 1) the forced first steps
     while (Date.now() - t0 < 60000) {
-      const st = await page.evaluate(() => window.GXT && GXT.state()); if (!st || !st.active) { ok = false; console.log(name, 'FAIL tutorial not active'); break; }
-      if (st.id === 'free') break; if (!st.shown) { await page.waitForTimeout(150); continue; }
+      if (await page.evaluate(() => !!UI.coachFree)) break;
+      const st = await page.evaluate(() => window.GXT && GXT.state()); if (!st || !st.active) { await page.waitForTimeout(150); continue; }
+      if (st.id === 'free' || !st.shown) { await page.waitForTimeout(150); continue; }
       const h = st.hole; const hit = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); const c = GXT.current(); const t = c && c.target && c.target(); return !!(t && t.contains && e && (t === e || t.contains(e))); }, [h.cx, h.cy]);
       if (!hit) { ok = false; console.log(name, 'FAIL forced step', st.id, 'target covered'); break; }
       await page.waitForTimeout(300); if (forced === 0) await shot('b-forced1'); forced++; await tapAt(h.cx, h.cy);
@@ -34,7 +35,7 @@ const OUT = process.argv[2] || null;
     if (ok && forced > 2) { ok = false; console.log(name, 'FAIL more than 2 forced steps'); }
     // 2) free play to the end of the game
     while (ok && Date.now() - t0 < 600000) {
-      const st = await page.evaluate(() => ({ id: GXT.current() && GXT.current().id, mine: !!(window.G && myTurn() && !UI.busy), fx: !document.querySelector('#fx').hidden, over: !!(window.G && G.phase === 'over'), coach: !!document.querySelector('#coach.on') }));
+      const st = await page.evaluate(() => ({ id: UI.coachFree ? 'free' : 'done', mine: !!(window.G && myTurn() && !UI.busy), fx: !document.querySelector('#fx').hidden, over: !!(window.G && G.phase === 'over'), coach: !!document.querySelector('#coach.on') }));
       if (st.id !== 'free') break;
       if (process.env.DBG && Date.now() - (global.lastLog || 0) > 10000) { global.lastLog = Date.now(); console.log(name, 'live', JSON.stringify(st), moves, await page.evaluate(() => G.round + ' ' + VG.actor(G) + ' ' + JSON.stringify(VG.moves(G).map(m => m.t)).slice(0, 120))); await page.screenshot({ path: '/tmp/claude-0/sh/co/live.png' }); }
       if (st.coach && coachShots < 3) { coachShots++; await shot('c-coach' + coachShots); }
@@ -56,6 +57,7 @@ const OUT = process.argv[2] || null;
     }
     // 3) the score walk-through and the end card
     let walk = 0;
+    await page.waitForFunction(() => window.GXT && GXT.running(), null, { timeout: 15000 }).catch(() => { ok = false; console.log(name, 'FAIL the score walk-through did not start'); });
     while (ok && Date.now() - t0 < 660000) {
       const st = await page.evaluate(() => window.GXT && GXT.state()); if (!st || !st.active || st.phase === 'end') break;
       if (!st.shown) { await page.waitForTimeout(150); continue; }

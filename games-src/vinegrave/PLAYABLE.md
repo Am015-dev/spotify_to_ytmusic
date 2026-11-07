@@ -67,7 +67,7 @@ After (playable-shots/layout-after-{map,row,track}-phone.webp):
 - The tutorial is a real 2-round game against the real computer (easy). It has only 2 forced steps (Trail Notes, Play it); after that every legal move is allowed and the tutor draws nothing over the board.
 - Pell speaks just in time, in one non-blocking bubble with a ×. He explains a rule the first time it becomes an option or happens, comments on 2 of your moves (good move / tip, from the hard AI's reasoning), and explains the rival's first move and first pass.
 - After the game: 3 steps walk through the final scoring with your real numbers. The end card lists "Things you'll meet later" for every rule that did not come up, then starts a real game.
-- tut-test.js plays the coached game through the UI with free legal choices and asserts every rule id was explained in play or listed on the end card. Run: phone 17/27 explained in play, pc 14/27, the rest listed. Coverage table: TUTORIAL-COVERAGE.md.
+- tut-test.js plays the coached game through the UI with free legal choices and asserts every rule id was explained in play or listed on the end card. Last run: phone 23/27 explained in play, pc 20/27, the rest listed on the end card. After the 2 forced steps the shared tutor steps aside (qa-bot drives tutor steps and cannot play a free game inside one). A second short tutor run starts at game end for the score walk-through and end card. During free play a "Leave tutorial" button sits next to Pass. Coverage table: TUTORIAL-COVERAGE.md.
 
 ## Remaining
 - Phone market cards still show effects as icons (no room for a sentence at 58 px); the name is readable and a tap opens the full text.
