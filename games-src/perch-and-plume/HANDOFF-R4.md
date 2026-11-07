@@ -24,7 +24,16 @@ Source: `src/*`; build with `python3 build.py`. New test: `story-check.js` (real
 | extra | | hand cards cut by the screen edge (menu scenario failed) | hand is exactly 3 cards wide on phones |
 
 ## Gate results (7 Nov 2026)
-See the report line of the session; numbers are repeated at the bottom of this file after the final run.
+| check | result |
+|---|---|
+| `VIS_SLUGS="," build-all.py --quick perch-and-plume` | PASS (all scenarios incl. the menu "cut by" check) |
+| `node rules-test.js 240` | PASS 240/240 AI games, avg 57.1 |
+| `node smoke.js` (phone + PC) | PASS, 0 errors |
+| `node ai-gate.js 100` | PASS: hard 100%, normal 100% vs the first-option bot; **hard beats normal 72/100** |
+| `ui-audit.spec.js` | phone-s A0 B4 C0 D0 E0 F0; phone A0 B1 C0 D0 E0 F0; PC A0 B0 C0 D0 E0 F0 (the B counts are the audit's own bottom-left test tag over drawer lines / the third hand card, see below; same on the base build) |
+| `play.js phone all` / `pc all` (real taps/clicks) | PASS: full 3-player game, solo vs the Rival Flock, tutorial 13/13, Story c1 won (3 stars), c2 played to its story result; on PC c2 was really LOST on the goal (0 stars, loss recorded) |
+| `play.js land game` / `tutorial` (844x390) | PASS |
+| `story-check.js phone|land|pc` | PASS x3: goal on the keep screen, live tracker, goal-missed result with the count while the year is won, story shows "Not this time" + "Try again", then a goal-met win: result star list == facts, stored stars == facts |
 
 ## Not fixed / remaining
 - Real art (birds, portraits, title scene): needs Flow; the code-drawn cards are deliberate stand-ins and the game should still be judged with that in mind.

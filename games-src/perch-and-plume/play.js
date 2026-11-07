@@ -122,7 +122,7 @@ async function playOut(p, label, maxMs) {
       if (opened) await tap(p, '[data-tut-tap]'); else { log(false, 'story ' + ch + ': chapter node not found on the map'); continue; }
       for (let k = 0; k < 24; k++) {
         await p.waitForTimeout(400);
-        const btn = await p.evaluate(() => { if (G && UI.camp && document.querySelector('.gxc') && !document.querySelector('.gxc').offsetParent) return 'in'; const b = [...document.querySelectorAll('.gxc button')].find(x => /play|start|begin|skip|continue|next|let/i.test(x.textContent) && x.offsetParent); if (b) { b.setAttribute('data-tut-tap', '1'); return 'btn'; } return G && UI.camp ? 'in' : 'none'; });
+        const btn = await p.evaluate(() => { if (G && UI.camp && document.querySelector('.gxc') && !document.querySelector('.gxc').offsetParent) return 'in'; const b = [...document.querySelectorAll('.gxc button:not(.gxc-node)')].find(x => /play|start|begin|skip|continue|next|let/i.test(x.textContent) && x.offsetParent); if (b) { b.setAttribute('data-tut-tap', '1'); return 'btn'; } return G && UI.camp ? 'in' : 'none'; });
         if (k === 23) await p.screenshot({ path: `shots/play-${SIZE}-story-${ch}-stuck.png` });
         if (btn === 'in') break; if (btn === 'btn') { await tap(p, '[data-tut-tap]'); await p.evaluate(() => { const e = document.querySelector('[data-tut-tap]'); if (e) e.removeAttribute('data-tut-tap'); }); }
       }
