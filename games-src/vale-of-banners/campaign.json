@@ -1,0 +1,1018 @@
+{
+ "game": "vale-of-banners",
+ "title": "The Steward's Valley",
+ "version": 1,
+ "cast": {
+  "wren": {
+   "name": "Wren",
+   "portrait": "portrait-wren",
+   "emoji": "📜",
+   "color": "#4f86c6"
+  },
+  "odo": {
+   "name": "Old Odo",
+   "portrait": "portrait-odo",
+   "emoji": "🧓",
+   "color": "#7a5c3e"
+  },
+  "cass": {
+   "name": "Cass Ferrow",
+   "portrait": "portrait-cass",
+   "emoji": "⚓",
+   "color": "#2f6fa8"
+  },
+  "hask": {
+   "name": "Lord Haskel",
+   "portrait": "portrait-hask",
+   "emoji": "🏰",
+   "color": "#2f5d3a"
+  },
+  "ivo": {
+   "name": "Ivo Grath",
+   "portrait": "portrait-ivo",
+   "emoji": "🪙",
+   "color": "#b8892b"
+  },
+  "marla": {
+   "name": "Marla Venn",
+   "portrait": "portrait-marla",
+   "emoji": "🐑",
+   "color": "#8fbf5a"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "Thaw",
+   "blurb": "Learn to build, sell and finish a region."
+  },
+  {
+   "act": 2,
+   "title": "High Summer",
+   "blurb": "Chains, flocks and a castle-builder."
+  },
+  {
+   "act": 3,
+   "title": "First Frost",
+   "blurb": "Full strength, and the silver baron."
+  }
+ ],
+ "twists": [
+  {
+   "id": "boss-silver",
+   "where": "setup",
+   "how": "After newGame, add param silver to the boss seat."
+  },
+  {
+   "id": "boss-workers",
+   "where": "setup",
+   "how": "After newGame, add param workers to the boss seat."
+  },
+  {
+   "id": "boss-vp",
+   "where": "setup",
+   "how": "After newGame, set the boss seat's points to param."
+  },
+  {
+   "id": "boss-first",
+   "where": "setup",
+   "how": "The boss goes first in the turn order at the start of the game."
+  },
+  {
+   "id": "no-black",
+   "where": "setup",
+   "how": "The back-lane stall is closed for the whole game."
+  },
+  {
+   "id": "you-workers",
+   "where": "setup",
+   "how": "The player starts with param fewer workers (param 1)."
+  }
+ ],
+ "chapters": [
+  {
+   "boss": false,
+   "twist": null,
+   "hints": true,
+   "id": "c1",
+   "act": 1,
+   "title": "First Furrow",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Welcome to the Vale, steward! Your first spring, and a bare patch of land."
+    },
+    {
+     "who": "odo",
+     "text": "Roll two dice. Each die is one action: take a tile, build it, sell goods, or take workers."
+    },
+    {
+     "who": "odo",
+     "text": "Build only on a space with the die's number, next to land you already own."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odo",
+     "text": "Good. A tidy estate grows from its edges. Remember that."
+    }
+   ],
+   "opponent": {
+    "name": "Tobin Reed",
+    "emoji": "🌾",
+    "cast": "tobin",
+    "personality": "Cheerful neighbour. Builds whatever is closest and sells late.",
+    "aiLevel": "easy",
+    "aiStyle": null
+   },
+   "setup": {
+    "players": 2,
+    "phases": 2
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the game."
+   },
+   "stars": [
+    {
+     "text": "Win the game",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Build 8 or more tiles",
+     "test": {
+      "k": "land",
+      "op": ">=",
+      "v": 8
+     }
+    },
+    {
+     "text": "Score 25 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 25
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Same gentle game; the coach keeps every tip on."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "odo",
+     "text": "Old Odo's portrait"
+    }
+   ]
+  },
+  {
+   "boss": false,
+   "twist": null,
+   "hints": true,
+   "id": "c2",
+   "act": 1,
+   "title": "Market Day",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Goods pile up in your barns. Silver only comes if you sell them."
+    },
+    {
+     "who": "odo",
+     "text": "Sell one kind of goods when a die shows its number. Every tile of that kind pays."
+    },
+    {
+     "who": "wren",
+     "text": "Try it three times this year. Dilly will be selling beside you."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odo",
+     "text": "Silver in the purse buys from the back lane. Use it."
+    }
+   ],
+   "opponent": {
+    "name": "Dilly Hart",
+    "emoji": "🧺",
+    "cast": "dilly",
+    "personality": "Chatty trader. Sells early, rarely plans a region.",
+    "aiLevel": "easy",
+    "aiStyle": null
+   },
+   "setup": {
+    "players": 2,
+    "phases": 3
+   },
+   "goal": {
+    "type": "custom",
+    "value": 3,
+    "text": "Win the game and sell goods at least 3 times."
+   },
+   "stars": [
+    {
+     "text": "Win and sell goods 3 times",
+     "test": {
+      "k": "winSales",
+      "op": ">=",
+      "v": 3
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    },
+    {
+     "text": "Score 45 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 45
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Dilly plays gently; the coach keeps every tip on."
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "trader",
+     "text": "Title: Fair Trader"
+    }
+   ]
+  },
+  {
+   "boss": true,
+   "twist": {
+    "id": "boss-workers",
+    "param": 2,
+    "text": "Boss rule: Cass starts with 2 extra workers."
+   },
+   "hints": true,
+   "id": "c3",
+   "act": 1,
+   "title": "Barge Down the Reach",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Cass Ferrow runs the river barges. She wants every landing on the Reach."
+    },
+    {
+     "who": "odo",
+     "text": "Finish a region and score big: the earlier the season, the bigger the bonus."
+    },
+    {
+     "who": "cass",
+     "text": "Fill a region, steward, or I will fill it for you."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cass",
+     "text": "You took the bank before I did. Fair enough."
+    },
+    {
+     "who": "odo",
+     "text": "Summer now. Different dice, harder neighbours."
+    }
+   ],
+   "opponent": {
+    "name": "Cass Ferrow",
+    "emoji": "⚓",
+    "cast": "cass",
+    "personality": "Brash barge-mistress. Rushes barges and bonus landings.",
+    "aiLevel": "easy",
+    "aiStyle": "barges",
+    "portrait": "portrait-cass",
+    "taunt": "The river carries me first, steward. Better luck next year.",
+    "praise": "You built faster than my barges. The Reach is yours."
+   },
+   "setup": {
+    "players": 2,
+    "phases": 3
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the game."
+   },
+   "stars": [
+    {
+     "text": "Win the game",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish a region",
+     "test": {
+      "k": "regions",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Win by 8 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 8
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Cass plays gently and starts with no extra workers."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "cass",
+     "text": "Cass Ferrow's portrait"
+    },
+    {
+     "type": "act",
+     "id": "act2",
+     "text": "Act 2: High Summer"
+    }
+   ]
+  },
+  {
+   "boss": false,
+   "twist": null,
+   "hints": false,
+   "id": "c4",
+   "act": 2,
+   "title": "A Keep of Your Own",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "High summer, longer days. Four seasons of building ahead of us."
+    },
+    {
+     "who": "odo",
+     "text": "A Keep gives you an extra action. A Moot Hall lets you build again at once."
+    },
+    {
+     "who": "odo",
+     "text": "String them together: one build can pull a second, then a third."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odo",
+     "text": "That is a chain. One good turn does the work of three."
+    }
+   ],
+   "opponent": {
+    "name": "Brannoc Dyer",
+    "emoji": "🎨",
+    "cast": "brannoc",
+    "personality": "Steady dyer. Fills one colour at a time and never rushes.",
+    "aiLevel": "normal",
+    "aiStyle": null
+   },
+   "setup": {
+    "players": 2,
+    "phases": 4
+   },
+   "goal": {
+    "type": "custom",
+    "value": 2,
+    "text": "Win the game and build at least 2 tiles by chain (Keep or Moot Hall)."
+   },
+   "stars": [
+    {
+     "text": "Win and build 2 tiles by chain",
+     "test": {
+      "k": "winChain",
+      "op": ">=",
+      "v": 2
+     }
+    },
+    {
+     "text": "Win by 12 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 12
+     }
+    },
+    {
+     "text": "Score 75 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 75
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Brannoc plays gently."
+   },
+   "unlock": [
+    {
+     "type": "cardback",
+     "id": "keep",
+     "text": "Card back: Keepstone"
+    }
+   ]
+  },
+  {
+   "boss": false,
+   "twist": {
+    "id": "no-black",
+    "text": "Rule: the back-lane stall is closed this game."
+   },
+   "hints": false,
+   "id": "c5",
+   "act": 2,
+   "title": "The Flock Road",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Marla Venn drives the biggest flocks in the Vale. Her pastures fill fast."
+    },
+    {
+     "who": "marla",
+     "text": "Sheep need no silver, steward. Only grass and patience."
+    },
+    {
+     "who": "odo",
+     "text": "The back-lane stall is closed this year. Plan your tiles; silver will not rescue you."
+    }
+   ],
+   "outro": [
+    {
+     "who": "marla",
+     "text": "You finish what you start. I do not forget that."
+    },
+    {
+     "who": "wren",
+     "text": "Lord Haskel is next. He builds in stone."
+    }
+   ],
+   "opponent": {
+    "name": "Marla Venn",
+    "emoji": "🐑",
+    "cast": "marla",
+    "personality": "Patient shepherd queen. Fills regions of pasture, sells wool.",
+    "aiLevel": "normal",
+    "aiStyle": "flocks",
+    "portrait": "portrait-marla"
+   },
+   "setup": {
+    "players": 2,
+    "phases": 4
+   },
+   "goal": {
+    "type": "score",
+    "value": 85,
+    "text": "Win with at least 85 points."
+   },
+   "stars": [
+    {
+     "text": "Score 85 or more and win",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 85
+     }
+    },
+    {
+     "text": "Finish 3 regions",
+     "test": {
+      "k": "regions",
+      "op": ">=",
+      "v": 3
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Marla plays gently and the back lane is open."
+   },
+   "unlock": [
+    {
+     "type": "table",
+     "id": "meadow",
+     "text": "Table: Green Meadow"
+    }
+   ]
+  },
+  {
+   "boss": true,
+   "twist": {
+    "id": "boss-first",
+    "text": "Boss rule: Lord Haskel goes first in the turn order."
+   },
+   "hints": false,
+   "id": "c6",
+   "act": 2,
+   "title": "The Castle Builder",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Lord Haskel is raising keeps across the whole valley."
+    },
+    {
+     "who": "hask",
+     "text": "Stone first, steward. Always stone. I shall move before you do."
+    },
+    {
+     "who": "odo",
+     "text": "He goes first and chains his Keeps. Beat him to the regions."
+    }
+   ],
+   "outro": [
+    {
+     "who": "hask",
+     "text": "Bold work. Even a keep must bow to a good harvest."
+    },
+    {
+     "who": "odo",
+     "text": "First frost next. Ivo Grath holds the silver."
+    }
+   ],
+   "opponent": {
+    "name": "Lord Haskel",
+    "emoji": "🏰",
+    "cast": "hask",
+    "personality": "Proud castle-builder. Packs Keeps and Moot Halls into long chains.",
+    "aiLevel": "normal",
+    "aiStyle": "keeps",
+    "portrait": "portrait-hask",
+    "taunt": "A fine estate, steward, but mine has walls.",
+    "praise": "You out-built me. Take the best acre."
+   },
+   "setup": {
+    "players": 2,
+    "phases": 4
+   },
+   "goal": {
+    "type": "margin",
+    "value": 5,
+    "text": "Beat Lord Haskel by 5 points or more."
+   },
+   "stars": [
+    {
+     "text": "Win by 5 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 5
+     }
+    },
+    {
+     "text": "Build 4 tiles by chain",
+     "test": {
+      "k": "chain",
+      "op": ">=",
+      "v": 4
+     }
+    },
+    {
+     "text": "Build 20 or more tiles",
+     "test": {
+      "k": "land",
+      "op": ">=",
+      "v": 20
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Haskel plays gently and takes no early lead."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "hask",
+     "text": "Lord Haskel's portrait"
+    },
+    {
+     "type": "act",
+     "id": "act3",
+     "text": "Act 3: First Frost"
+    }
+   ]
+  },
+  {
+   "boss": false,
+   "twist": null,
+   "hints": false,
+   "id": "c7",
+   "act": 3,
+   "title": "The Silver Road",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "First frost. Five seasons, the full year. Every rival plays at full strength."
+    },
+    {
+     "who": "marla",
+     "text": "I came for the wool price, steward. Sell well and we shall both eat."
+    },
+    {
+     "who": "odo",
+     "text": "Sell often, and the silver follows. No tricks this time: just a clean game."
+    }
+   ],
+   "outro": [
+    {
+     "who": "marla",
+     "text": "You sold as well as I did. That is rare."
+    },
+    {
+     "who": "wren",
+     "text": "Haskel wants a rematch."
+    }
+   ],
+   "opponent": {
+    "name": "Marla Venn",
+    "emoji": "🐑",
+    "cast": "marla",
+    "personality": "Patient shepherd queen. Fills regions of pasture, sells wool.",
+    "aiLevel": "hard",
+    "aiStyle": "flocks",
+    "portrait": "portrait-marla"
+   },
+   "setup": {
+    "players": 2,
+    "phases": 5
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the game."
+   },
+   "stars": [
+    {
+     "text": "Win the game",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Sell goods 8 times",
+     "test": {
+      "k": "sales",
+      "op": ">=",
+      "v": 8
+     }
+    },
+    {
+     "text": "Score 115 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 115
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Marla plays at normal strength."
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "drover",
+     "text": "Title: Drover's Friend"
+    }
+   ]
+  },
+  {
+   "boss": false,
+   "twist": {
+    "id": "boss-workers",
+    "param": 3,
+    "text": "Boss rule: Lord Haskel starts with 3 extra workers."
+   },
+   "hints": false,
+   "id": "c8",
+   "act": 3,
+   "title": "Keep Against Keep",
+   "intro": [
+    {
+     "who": "hask",
+     "text": "A rematch, steward. This time I bring workers by the dozen."
+    },
+    {
+     "who": "wren",
+     "text": "He starts with 3 extra workers. He can bend every die."
+    },
+    {
+     "who": "odo",
+     "text": "Do not race his chains. Finish your regions first."
+    }
+   ],
+   "outro": [
+    {
+     "who": "hask",
+     "text": "Hm. You built a bigger valley than I did."
+    },
+    {
+     "who": "odo",
+     "text": "One more. The silver baron."
+    }
+   ],
+   "opponent": {
+    "name": "Lord Haskel",
+    "emoji": "🏰",
+    "cast": "hask",
+    "personality": "Proud castle-builder. Packs Keeps and Moot Halls into long chains.",
+    "aiLevel": "hard",
+    "aiStyle": "keeps",
+    "portrait": "portrait-hask"
+   },
+   "setup": {
+    "players": 2,
+    "phases": 5
+   },
+   "goal": {
+    "type": "score",
+    "value": 120,
+    "text": "Win with at least 120 points."
+   },
+   "stars": [
+    {
+     "text": "Score 120 or more and win",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 120
+     }
+    },
+    {
+     "text": "Build 6 tiles by chain",
+     "test": {
+      "k": "chain",
+      "op": ">=",
+      "v": 6
+     }
+    },
+    {
+     "text": "Finish 4 regions",
+     "test": {
+      "k": "regions",
+      "op": ">=",
+      "v": 4
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Haskel plays at normal strength with no extra workers."
+   },
+   "unlock": [
+    {
+     "type": "cardback",
+     "id": "stone",
+     "text": "Card back: Stonework"
+    }
+   ]
+  },
+  {
+   "boss": false,
+   "twist": {
+    "id": "no-black",
+    "text": "Rule: the back-lane stall is closed this game."
+   },
+   "hints": false,
+   "id": "c9",
+   "act": 3,
+   "title": "Closed Lanes",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Frost has shut the back lane. Silver is worth only what you earn selling."
+    },
+    {
+     "who": "odo",
+     "text": "Sibyl Quarry hoards workers and builds in bursts. Watch her storage."
+    },
+    {
+     "who": "odo",
+     "text": "Without the back lane, every tile you take must count."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odo",
+     "text": "You waste nothing. Ivo Grath will notice."
+    },
+    {
+     "who": "wren",
+     "text": "The Silver Baron has asked for you by name."
+    }
+   ],
+   "opponent": {
+    "name": "Sibyl Quarry",
+    "emoji": "⛏️",
+    "cast": "sibyl",
+    "personality": "Dry quarry-master. Hoards workers, then builds in bursts.",
+    "aiLevel": "hard",
+    "aiStyle": null
+   },
+   "setup": {
+    "players": 2,
+    "phases": 5
+   },
+   "goal": {
+    "type": "margin",
+    "value": 8,
+    "text": "Beat Sibyl by 8 points or more."
+   },
+   "stars": [
+    {
+     "text": "Win by 8 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 8
+     }
+    },
+    {
+     "text": "Sell goods 10 times",
+     "test": {
+      "k": "sales",
+      "op": ">=",
+      "v": 10
+     }
+    },
+    {
+     "text": "Build 26 or more tiles",
+     "test": {
+      "k": "land",
+      "op": ">=",
+      "v": 26
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Sibyl plays at normal strength and the back lane is open."
+   },
+   "unlock": [
+    {
+     "type": "table",
+     "id": "frost",
+     "text": "Table: Frosted Oak"
+    }
+   ]
+  },
+  {
+   "boss": true,
+   "twist": {
+    "id": "boss-silver",
+    "param": 6,
+    "text": "Boss rule: Ivo Grath starts with 6 extra silver."
+   },
+   "hints": false,
+   "id": "c10",
+   "act": 3,
+   "title": "The Silver Baron",
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Ivo Grath owns half the silver in the Vale. He means to buy the rest."
+    },
+    {
+     "who": "ivo",
+     "text": "Everything has a price, steward. Even your estate."
+    },
+    {
+     "who": "odo",
+     "text": "He starts with 6 extra silver. Out-build him before he spends it."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ivo",
+     "text": "Hm. Not for sale, then. I shall remember that."
+    },
+    {
+     "who": "wren",
+     "text": "You did it. The Vale has a new steward."
+    },
+    {
+     "who": "odo",
+     "text": "A fine first year."
+    }
+   ],
+   "opponent": {
+    "name": "Ivo Grath",
+    "emoji": "🪙",
+    "cast": "ivo",
+    "personality": "Cold silver baron. Buys from the back lane every round and sells late.",
+    "aiLevel": "hard",
+    "aiStyle": "silver",
+    "portrait": "portrait-ivo",
+    "taunt": "Silver wins every year, steward. Mark my words.",
+    "praise": "Your estate outshines my coffers. Well built."
+   },
+   "setup": {
+    "players": 2,
+    "phases": 5
+   },
+   "goal": {
+    "type": "score",
+    "value": 125,
+    "text": "Win with at least 125 points."
+   },
+   "stars": [
+    {
+     "text": "Score 125 or more and win",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 125
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    },
+    {
+     "text": "Finish 5 regions",
+     "test": {
+      "k": "regions",
+      "op": ">=",
+      "v": 5
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ivo plays at normal strength with no extra silver."
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "steward",
+     "text": "Title: Steward of the Vale"
+    },
+    {
+     "type": "portrait",
+     "id": "ivo",
+     "text": "Ivo Grath's portrait"
+    }
+   ]
+  }
+ ]
+}

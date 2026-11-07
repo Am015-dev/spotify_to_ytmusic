@@ -43,7 +43,7 @@ function tutSteps(){
   const T1=TUT_ME.t1,T2=TUT_ME.t2,B=TUT_ME.bid;
   const p1=()=>T1.path[Math.min(2,dropsDone())];
   const p2=()=>T2.path[Math.min(2,dropsDone())];
-  return [
+  return tutStory([
  {id:'goal',title:'Win on points',say:'Most points at the end wins. Coins, tribes, land, goods and djinns all count.',target:tq('#seats'),wait:null,ready:()=>bidNow(0)},
  {id:'tribes',title:'Five tribes',say:'Every tile holds three people. Each colour is a tribe with its own power.',target:tTile(5),also:()=>[tTile(11)(),tTile(24)()],wait:null,ready:()=>bidNow(0)},
  {id:'bid1',title:'Bid for turn order',say:'Dearer spots play earlier, and coins are points. Tap the 5-coin spot.',target:spotBtn(B[0]),
@@ -84,12 +84,12 @@ function tutSteps(){
  {id:'others',title:'More tiles',say:'Grand Bazaar: 6 coins for 2 goods. Oasis: a palm tree, worth 3. Shrine: summon a djinn.',target:tTile(26),also:()=>[tTile(2)(),tTile(8)()],wait:null,ready:()=>!!G.over},
  {id:'shadows',title:'Shadows',say:"Red Shadows remove any person within that many steps, or a rival's Advisor or Sage.",target:tTile(13),wait:null,ready:()=>!!G.over},
  {id:'end',title:'How it ends',say:'A real game ends when someone places their last camel. Most points wins. You are ready!',target:tq('#seats'),wait:null,ready:()=>!!G.over}
-  ]}
+  ])}
 // ---------------------------------------------------------------- start, leave, Story prologue
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
 function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:o?'Bid, walk, take a tribe, claim land, sell goods. Now the Story begins.':'Bid, walk, take a tribe, claim land, sell goods. Djinns, Shadows and more: the lightbulb explains them.',
+    endTitle:LORE.endTitle,endText:o?LORE.endStory:LORE.endText,
     endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:()=>{try{GX.close()}catch(e){}tutQuiet();UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();tutNew();UI.snap=null;refresh()},
     onDone:r=>{tutLeave();const c=r&&r.choice;
