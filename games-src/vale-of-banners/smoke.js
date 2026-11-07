@@ -18,9 +18,9 @@ const TURNS = process.env.FULL ? 999 : 3;
       if (st.tv) { const b1 = page.locator('#tv .acts .btn:not(.alt)'); if (await b1.count()) await tap(b1.first()); else await tap(page.locator('#tvClose')); acts++; continue; }
       if (!st.mine) { await page.waitForTimeout(30); stuck++; if (stuck > 3000) { console.log(name, 'FAIL waiting'); break; } continue; }
       stuck = 0;
-      const order = ['#es .glow', '#endB', '#store .glow', '#mk .stgoods.glow', '#goods .glow', '#mk .tilebtn.glow', '#acts .btn.alt'];
+      const order = ['#es .glow', '#endB', '#store .glow', '#mk .stgoods.glow', '#goods .glow', '#mk .tilebtn.glow', '#tabs .tab.has', '#acts .btn.alt'].map(x => x + ' >> visible=true');   // phone portrait: the market sits behind a tab
       let did = false;
-      for (const sel of order) { const l = page.locator(sel); if (await l.count()) { const before = await page.evaluate(() => G.seq + ':' + UI.sel); await tap(l.first()); did = true; if (sel === '#endB') turns++; acts++; await page.waitForTimeout(20); const after = await page.evaluate(() => G.seq + ':' + UI.sel + ':' + !document.getElementById('tv').hidden); if (sel === '#store .glow' && after.startsWith(before.split(':')[0]) && after.includes(':null:false')) { /* deselected */ } break; } }
+      for (const sel of order) { const l = page.locator(sel); if (await l.count()) { const before = await page.evaluate(() => G.seq + ':' + UI.sel); await tap(l.first()); did = true; if (sel.startsWith('#endB')) turns++; acts++; await page.waitForTimeout(20); const after = await page.evaluate(() => G.seq + ':' + UI.sel + ':' + !document.getElementById('tv').hidden); if (sel === '#store .glow' && after.startsWith(before.split(':')[0]) && after.includes(':null:false')) { /* deselected */ } break; } }
       if (!did) { console.log(name, 'FAIL nothing to tap', await page.evaluate(() => VB.text(G))); fails++; break; }
       if (turns === 1 && acts < 40) await page.screenshot({ path: `shots/smoke-${name}-mid.png` });
     }

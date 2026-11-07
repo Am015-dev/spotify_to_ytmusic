@@ -34,6 +34,19 @@ rules-check MISSING 2/2 fixed in the engine with rules-test cases: solo mode (1 
 win only with all 37 spaces) and 2 v 2 teams (shared silver, workers, goods; team total wins; pool scores once). WRONG: 0 listed.
 SIMPLIFIED-ON-PURPOSE (5) are listed in the Rules drawer under "Simplified on purpose".
 
+## Phone layout redo (owner bug, 7 Nov 21:49)
+Before (shots/free-phone-6myturn.png): market (12 tiles + back lane) and estate squeezed on one screen, estate hexes ~36 px.
+After (shots/tabs-phone-6myturn.png, tabs-phone-3market.png): portrait phone shows ONE main view at a time behind three tabs under the
+score strip: Your estate (default, hexes ~52 px), Market (3x2 stalls + back lane, tiles 40-58 px with names), Rival (their estate, read-only).
+Dice, storage, goods and actions stay in the bottom dock; one instruction line (max 2 lines). A tab glows when it holds a legal move; the
+view switches by itself at natural moments (after you take a tile -> your estate; when the rival takes -> market; your turn -> estate).
+Landscape phone and PC keep the side-by-side layout. QA bot: 0 blockers, 0 majors.
+
+## Coached first game (ADDENDUM 4)
+The tutorial no longer forces 32 taps: only the first action is spotlit (2 steps), then it is a free real game against Tobin; Odo explains
+each rule when it first matters, comments on good/poor and rival moves (one dismissable bubble, never blocking), and the result card walks
+through the final count with your numbers plus a "Things you'll meet later" card. See TUTORIAL-COVERAGE.md.
+
 ## Free art kit
 Merged and tested with `free-art/install.py --force` (92 pictures): the title now has a painted scene, tiles show their pictures. Code only hides
 the emoji glyph when a picture exists; labels sit on the lower edge; the dim on not-playable tiles was lightened (opacity .6) so pictures stay

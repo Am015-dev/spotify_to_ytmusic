@@ -140,7 +140,7 @@ function describe(m, s) {
   return n + ' is choosing...';
 }
 function aiPlay(m) {
-  var s = VB.actor(G); setCap(describe(m, s)); if (L.tabs && (m.k === 'take' || m.k === 'grab' || m.k === 'buy') && UI.tab !== 'market') { UI.tab = 'market'; render(); }
+  var s = VB.actor(G); setCap(describe(m, s)); if (L.tabs && (m.k === 'take' || m.k === 'grab' || m.k === 'buy') && UI.tab !== 'market' && !UI.pinTab) { UI.tab = 'market'; render(); }
   var id = (m.k === 'take' || m.k === 'grab') ? 'mt-' + m.v + '-' + m.slot : m.k === 'buy' ? 'bl-' + m.slot : null, el = id && document.getElementById(id);
   if (el) el.classList.add('aipick');
   UI.busy = true;
@@ -207,7 +207,7 @@ function ensureTabs(y, pad) {
   t.innerHTML = '';
   [['estate', 'Your estate'], ['market', 'Market'], ['rival', rvName]].forEach(function (x) {
     var on = UI.tab === x[0], has = x[0] === 'market' ? mkHas : x[0] === 'estate' ? (mt && UI.sel != null) : false;
-    t.appendChild(h('button.tab' + (on ? '.on' : '') + (has && !on ? '.has' : ''), { type: 'button', id: 'tab-' + x[0], role: 'tab', 'aria-selected': on ? 'true' : 'false', text: x[1], onclick: function () { UI.tab = x[0]; render(); } }));
+    t.appendChild(h('button.tab' + (on ? '.on' : '') + (has && !on ? '.has' : ''), { type: 'button', id: 'tab-' + x[0], role: 'tab', 'aria-selected': on ? 'true' : 'false', text: x[1], onclick: function () { UI.tab = x[0]; UI.pinTab = null; render(); } }));
   });
 }
 function rivalSeat() { if (!G) return 1; var best = -1, bs = 1; for (var i = 0; i < G.n; i++) if (i !== UI.view && G.P[i].vp > best) { best = G.P[i].vp; bs = i; } return G.n === 1 ? 0 : bs; }
@@ -439,7 +439,7 @@ function tapStore(i) {
   if (myTurn() && top && top.t === 'discard') { showTile(t, [{ label: 'Drop this tile', fn: function () { doMove({ k: 'discard', s: i }); } }]); return; }
   var can = myTurn() && storeLegal(i);
   if (can && (UI.sel === i)) { UI.sel = null; render(); return; }
-  if (can) { UI.sel = i; UI.tab = 'estate'; render(); return; }
+  if (can) { UI.sel = i; UI.tab = 'estate'; UI.pinTab = null; render(); return; }
   var c = VB.CELLS.filter(function (x) { return x.col === t.t && !p.estate[x.i]; });
   showTile(t, [], !c.length ? 'No free ' + VB.COLNAME[t.t] + ' space left on your estate.' : VB.placeTargets(p, t, 0).length ? 'Build it on a ' + VB.COLNAME[t.t] + ' space next to your land; the die must show that space\'s number.' : 'No ' + VB.COLNAME[t.t] + ' space touches your land yet.');
 }
@@ -544,7 +544,7 @@ function onTurnChange() {
   if (G.turn % G.n === 0 && G.ti === 0) { sfx('dice'); toast((G.round === 0 ? VB.PHASES[G.phase] + ' begins! ' : '') + 'Round ' + (G.round + 1) + ': new dice', 1600); }
   var humans = G.seats.filter(function (s) { return s.human; }).length;
   if (humans > 1 && isHuman(a) && UI.lastHuman !== a) toast('Pass to ' + G.seats[a].name, 2000);
-  if (isHuman(a)) { UI.lastHuman = a; UI.quick = false; UI.cap = ''; if (L.tabs) UI.tab = 'estate'; if (UI.mode === 'tutorial' && G.round >= 1 && G.round <= 4 && UI.stacked !== G.round) { UI.stacked = G.round; try { tutStack(G.round + 1); } catch (e) { } } }
+  if (isHuman(a)) { UI.lastHuman = a; UI.quick = false; UI.cap = ''; if (L.tabs && !UI.pinTab) UI.tab = 'estate'; if (UI.mode === 'tutorial' && G.round >= 1 && G.round <= 4 && UI.stacked !== G.round) { UI.stacked = G.round; try { tutStack(G.round + 1); } catch (e) { } } }
   turnBanner();
 }
 function schedule() {
@@ -565,7 +565,7 @@ function startGame(o) {
   UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1;
   $('#start').hidden = true; $('#rs').hidden = true; $('#tv').hidden = true;
   try { GXH.setEnabled(o.hints !== false && (UI.mode !== 'story' || !!o.hints)); } catch (e) { }
-  UI.quick = false; UI.cap = ''; save(); render(); musSync(); sfx('dice'); toast(VB.PHASES[0] + ' begins: new dice for everyone', 1600); turnBanner(); schedule();
+  UI.quick = false; UI.cap = ''; UI.pinTab = null; UI.tab = 'estate'; save(); render(); musSync(); sfx('dice'); toast(VB.PHASES[0] + ' begins: new dice for everyone', 1600); turnBanner(); schedule();
   if (UI.mode === 'quick') { var qi = VSTORY.quickIntro; setTimeout(function () { say(qi[(G.seed0 || 0) % qi.length]); }, animMs(1100)); }
 }
 function resume() { try { G = JSON.parse(localStorage.getItem('vob_save')); } catch (e) { G = null; } if (!G) return showTitle(); UI.mode = 'quick'; UI.camp = false; UI.busy = false; $('#start').hidden = true; render(); musSync(); schedule(); }
