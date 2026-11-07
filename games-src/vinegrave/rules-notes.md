@@ -5,7 +5,7 @@ Deck-building + worker placement jungle expedition, 1-4 explorers, 5 rounds.
   Start resources by turn order: 2 coins | 1 coin 1 compass | 2 coins 1 compass | 1 coin 2 compasses.
 - Turn: one main action, then the next explorer; pass = out for the round. Round ends when all passed.
 - Main actions: play a card (artifact from hand costs 1 tablet; Dread has no effect); dig at a free camp site or discovered ruin
-  (pay travel icons by discarding cards: each card has one icon; Jeep pays Jeep or Boot, Boat pays Boat, Plane pays anything,
+  (pay travel icons by discarding cards: each card has one icon; Jeep pays Jeep or Boot, Boat pays Boat or Boot (rules-check WRONG 1), Plane pays anything,
   2 coins = a Plane); discover a hidden ruin (3 compasses level 1, 6 level 2, plus travel): reveal it, take an idol (instant gift),
   dig its loot, a guardian wakes there; overcome a guardian at a site where your explorer stands (pay its cost: 5 points + one
   free boon later); buy an item (coins, to the bottom of your deck) or artifact (compasses, its effect fires at once, free);
@@ -45,3 +45,8 @@ No open-source implementation of this game exists (searched GitHub and the web),
 Sources (facts only, nothing copied): rulespal.com rulebook summary (start resources, idols, temple, market, tie-break, Fear supply).
 Card COUNTS kept at the box's scale (35 items / 35 artifacts / 15 guardians / 16 site tiles split 10+8 here vs the box's mix); our cards,
 costs and effects are original, so print-and-play / workshop card lists were not needed for per-card numbers.
+
+## Rules check fixes (W378, 7 Nov)
+- WRONG 1: a Boat card now pays a Boot (engine CAN table). Test: "WRONG 1: a Boat card pays a Boot".
+- MISSING 1: 4 shrine slots on each board (1, 1, 1, 2 points) score while empty; each set idol fills the next slot (V.IDOL_SLOT_VP, score().slots). Tests: "MISSING 1: ...". Everyone now starts at +3 (5 slot points, -2 Dread).
+- SIMPLIFIED items are listed in the rules drawer under "Simplified on purpose".

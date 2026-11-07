@@ -1,0 +1,792 @@
+{
+ "slug": "sunglaze",
+ "size": "phone",
+ "seed": 5634,
+ "when": "2026-11-07T21:30Z",
+ "tutorial": {
+  "end": null,
+  "note": "no tutorial"
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 589
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 272
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "tap target 18px (<40) input x2: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-title-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 18px (<40) input x2: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"You\n★0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Olive\n☀\n★0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) i.bf-t.nud x2: \"Frost\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 35px (<40) i.bf-t x7: \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) div.bf-row x5: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−1\n−2\n−2\n−2\n−3\n−3\nfloor\n\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 30px (<40) i.bf-t.cr x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"Olive\n★1\n+3\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 37px (<40) i.bf-t x20: \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) i.bf-t.nud x2: \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 35px (<40) i.bf-t.sun x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) div.bf-row.ok x3: \"+0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) div.bf-row.dim x2: \"✗\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) div.bf-floor.ok x1: \"−1\n−1\n−2\n−2\n−2\n−3\n−3\nflo\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t.sun",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Obsidian\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): div.bf-pool under use",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Olive\n★0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 37px (<40) i.bf-t x27: \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−1\n−1\n−2\n−2\n−2\n−3\n−3\nflo\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #589 (Saffron)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 589 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-quick-noresult-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★21\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"Olive\n★12\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 37px (<40) i.bf-t.deal x20: \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 35px (<40) i.bf-t.sun x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 34px (<40) div.bf-row x5: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 30px (<40) i.bf-t x12: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−1\n−1\n−2\n−2\n−2\n−3\n−3\nflo\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t.deal \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t.deal \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t.sun",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: div.bf-pool / div.bf-row",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip x2: \"You\n★53\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 35px (<40) i.bf-t.sun x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) div.bf-row x5: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 30px (<40) i.bf-t x16: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−1\n−1\n−2\n−2\n−2\n−3\n−3\nflo\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t.sun",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"You\n☀\n★0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Tamsin Reed\n★0\n+1\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 37px (<40) i.bf-t x11: \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−2\n−2\n−3\n−3\nfloor\n−4\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 30px (<40) i.bf-t.cr x2: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Obsidian\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bf-k.empty / button.bf-ib \"✕\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button.bf-ib \"Menu\" under div.bf-ov \"You ★0 ☀ ✕ 1 2 3 4 5 -2 \"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): div.bf-k.empty under div.bf-ov \"You ★0 ☀ ✕ 1 2 3 4 5 -2 \"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★0\n+1\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"Tamsin Reed\n★1\n+2\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 37px (<40) i.bf-t x20: \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) i.bf-t.nud x2: \"Saffron\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 33px (<40) i.bf-t.sun x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) div.bf-row.dim x4: \"✗\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) div.bf-row.ok x1: \"Rack 5\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) div.bf-floor.ok x1: \"−1\n−1\n−2\n−2\n−2\n−3\n−3\nflo\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Saffron\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"You\n★0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Tamsin Reed\n☀\n★1\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 30px (<40) i.bf-t x8: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"floor\n−14\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 30px (<40) i.bf-t.cr x7: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #272 (−3 floor −11)",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 272 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-story-noresult-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "tap target 18px (<40) input x2: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-title-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★21\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"Olive\n★12\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 39px (<40) i.bf-t.deal x1: \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 35px (<40) i.bf-t.sun x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) div.bf-row x5: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 30px (<40) i.bf-t x12: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−1\n−1\n−2\n−2\n−2\n−3\n−3\nflo\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t.sun",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-pool / div.bf-row",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: i.bf-t.deal \"Garnet\" / i.bf-t.deal \"Saffron\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-k.can / div.bf-row",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 37px (<40) i.bf-t.deal x20: \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t.deal \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t.deal \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) button.bf-chip x2: \"You\n★0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Indigo\n★0\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 31px (<40) i.bf-t x28: \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 29px (<40) i.bf-t.sun x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.bf-ib \"Menu\" under div#modal \"Tile the king’s palace w\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): div.bf-pool under rect",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 31px (<40) i.bf-t x24: \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 37px (<40) i.bf-t.up x3: \"Frost\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 28px (<40) i.bf-t.nud x1: \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "tap target 18px (<40) input x2: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "no tutorial entry on the title screen (no learn/guided/tutorial button): game has no staged tutorial",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sunglaze/phone-tut-noentry-2.png"
+  }
+ ],
+ "secs": 21
+}
