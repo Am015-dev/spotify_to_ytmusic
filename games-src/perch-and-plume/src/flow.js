@@ -191,4 +191,4 @@ function startGame(o) {
 function resume(s) { stopTimers(); G = s.G; UI.mode = s.mode || 'vs'; UI.camp = null; UI.view = Math.max(0, humans()[0] || 0); ['title', 'setup', 'result', 'pass'].forEach(function (id) { $('#' + id).hidden = true; }); render(); pump(); }
 
 // the shared Menu's section chips only scroll: mark the chosen one so the tap shows
-document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (!c) return; $$('.gx-set-nav .gx-chip').forEach(function (x) { if (x !== c) x.removeAttribute('data-on'); }); c.setAttribute('data-on', ''); });
+document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (!c) return; $$('.gx-set-nav .gx-chip').forEach(function (x) { if (x !== c) x.removeAttribute('data-on'); }); c.setAttribute('data-on', ''); }, true);

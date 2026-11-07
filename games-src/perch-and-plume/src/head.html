@@ -179,10 +179,18 @@ svg{display:block}
 .logl{font-size:var(--fs);padding:3px 0;border-bottom:1px solid rgba(0,0,0,.08)}
 /* shared-kit gaps worked around here: 16 px text on wide screens, readable story discs, active settings chip */
 @media (min-width:1024px){.gx-drawer,.gx-drawer .gx-chip,.gx-drawer small,.gx-row-l small,.gx-drawer .gx-row-l{font-size:16px!important}}
-:root{--gxc-a1:#2f5a2a;--gxc-a2:#1f5566;--gxc-a3:#6a4a12}
+:root{--gxc-a1:#24481f;--gxc-a2:#1f5566;--gxc-a3:#6a4a12}
+@media (min-width:1024px){.gxc-small,.gxc-tag,.gxc-act b,.gxc-act small,.gxc-node .gxc-st,.gxc-sh-t small,.gxc-twist,.gxc-twist b,.gxc-slist,.gxc-sc-title,.gxc-boss-tag,.gxc-res-k,.gxc-quote b,.gxc-quote p,.gxc-unl>b,.gxc-unl-i,.gxc-lab,.gxc-node{font-size:16px!important}}
+
+.gx-drawer .gx-sb{color:#2a2116;background:#fffaf0}
+.gx-drawer .gx-sb[aria-pressed=true]{background:#e0a948;color:#1d140b}
+.gx-drawer .gx-row-l{background:var(--paper)}
+.gx-drawer .gx-row,.gx-drawer .gx-row-l{opacity:1!important;color:var(--ink)}
+@media (min-width:1024px){.gx-bar .gx-ibtn span,.gx-bar .gx-ibtn,.gxh-tt,.gxh-tx,.gxh-bd,.gxh-bd button,.gxt-bar,.gxt-bar *{font-size:16px!important}}
 .gxc-lock{color:#fff!important;background:#1d1510;border-radius:50%;padding:1px;font-style:normal}
 .gx-set-nav .gx-chip[data-on]{background:var(--acc);color:var(--ink);font-weight:700}
 .gx-drawer .gx-x{background:var(--paper)}
+.gx-drawer{transition:none!important}
 html.gx-noanim .firing,html.gx-noanim .popfx,html.gx-noanim .glow,html.gx-reduce .glow{animation:none}
 </style>
 </head>

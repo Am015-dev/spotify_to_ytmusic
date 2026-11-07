@@ -95,7 +95,7 @@ function campInit() {
     GXC.init({ game: 'perch-and-plume', data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
       portrait: function (who, size, c) { var f = CAST_FACE[who] || (c && CAST_FACE[c.cast]); if (!f) return null; var st = 'portrait-' + f; if (ART.have[st]) return 'media/' + st + '.webp'; var d = document.createElement('span'); d.className = 'art ph'; d.style.cssText = 'display:block;width:100%;height:100%'; d.innerHTML = placeholder(st); return d; },
       headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); tutStart(); }); return [b]; },
-      onExit: function () { UI.camp = null; showTitle(); },
+      onExit: function () { if (G && G.phase !== 'over' && UI.mode !== 'tutorial' && $('#title').hidden) { render(); return; } UI.camp = null; showTitle(); },   // opened from a running game's Menu: Back returns to that game
       scores: function (g) { return (g.final || g.pl.map(function (p, i) { return PP.scoreOf(g, i); })).map(function (s) { return s.total; }); },
       seats: function (g) { return g.pl.map(function (p, i) { return { name: p.name, me: i === 0, ai: p.kind !== 'human' ? p.lvl : undefined }; }); } });
   } catch (e) { }
@@ -109,7 +109,7 @@ function boot() {
     { id: 'win', name: 'Field champion', how: 'Win a game against the computer.', test: function (r) { return r.won && r.mode === 'vs'; } },
     { id: 'eighty', name: 'Teeming aviary', how: 'Score 80 or more.', test: function (r) { return r.score >= 80; } },
     { id: 'story', name: 'A year well spent', how: 'Win a story chapter.', test: function (r) { return r.won && r.mode === 'campaign'; } }]); } catch (e) { }
-  if (window.GXS && GXS.on) return;   // a ?scn= scenario builds its own state
+  if (window.GXS && GXS.on) { if (GXS.id === 'menu' && GXS.boardOpen) GXS.boardOpen(); return; }   // a ?scn= scenario builds its own state; the shelf's menu check opens panels over a running game, as in real play
   showTitle();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
