@@ -49,23 +49,11 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
     await tapSel('#rs [data-a=again]'); await pg.waitForTimeout(300); ok(await pg.evaluate(() => !!G && !G.over && UI.started), 'Play again starts a new game');
     await pg.evaluate(() => { GX.show('rulesd'); }); await pg.waitForTimeout(250); ok(await pg.evaluate(() => document.querySelector('#rulesd').classList.contains('on')), 'rules drawer opens'); await pg.keyboard.press('Escape');
   }
-  if (TUT) {
-    await tapSel('[data-gxt-open]'); await pg.waitForTimeout(600); let steps = 0;
-    for (let i = 0; i < 40; i++) {
-      const st = await pg.evaluate(() => { const c = typeof GXT !== 'undefined' && GXT.active() && GXT.current && GXT.current(); return c ? { id: c.id } : null; });
-      if (!st) { if (!(await pg.evaluate(() => GXT.active()))) break; await pg.waitForTimeout(300); continue; }
-      steps++; await pg.waitForTimeout(600);
-      try {
-        if (st.id === 'pick') await tap((await pg.$$('#offers .offer'))[2]);
-        else if (st.id === 'drag') { const q = await (await pg.$('#quilt')).boundingBox(); await drag(q.x + q.width * .3, q.y + q.height * .8, q.x + q.width * .35, q.y + q.height * .4); }
-        else if (st.id === 'sew') await tapSel('[data-a=sew]'); else if (st.id === 'adv') await tapSel('[data-a=advance],[data-a=adv]');
-        else { const nx = await pg.waitForSelector('.gxt-next', { timeout: 12000 }).catch(() => null); if (nx) await tap(nx); }
-      } catch (e) { console.log('tutorial step', st.id, e.message); }
-      if (steps === 5) await pg.screenshot({ path: path.join(OUT, tag + '-tut.png') });
-      await pg.waitForFunction(id => { const c = GXT.current && GXT.current(); return !GXT.active() || !c || c.id !== id; }, st.id, { timeout: 15000 }).catch(() => { ok(false, 'tutorial stuck on ' + st.id); });
-      if (fails) { await pg.screenshot({ path: path.join(OUT, tag + '-tut-stuck.png') }); break; }
-    }
-    ok(steps >= 6, 'tutorial walked ' + steps + ' steps');
+  if (TUT) {   // the tutorial is a coached first game (playable/play.js tut plays it to the end)
+    await tapSel('[data-gxt-open]'); await pg.waitForTimeout(600);
+    ok(await pg.evaluate(() => !!G && !!UI.coach && !G.over), 'tutorial starts a coached game');
+    for (let i = 0; i < 3; i++) { const k = await turn(); if (k === 'over') break; }
+    ok(await pg.evaluate(() => UI.coach.shown.length >= 3), 'Aunt Wren explained at least 3 things in 3 turns');
   }
   if (STORY) {
     await pg.evaluate(() => { try { GXT.markDone('stitchwise'); } catch (e) { } }); await tapSel('[data-a=story]'); await pg.waitForTimeout(500); await pg.screenshot({ path: path.join(OUT, tag + '-map.png') });

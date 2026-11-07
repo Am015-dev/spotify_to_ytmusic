@@ -65,7 +65,7 @@ function buildMenu() {
     help: function (S) { try { var w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) S.appendChild(w.firstChild); } catch (e) { } },
     about: { name: 'Stitchwise', version: '1.0', text: 'An original quilting duel. All names, patches and art are our own.' }, shelf: '../' });
 }
-function restart() { GX.close(); if (UI.tutorial) { tutStart(); return; } if (UI.camp && typeof GXC !== 'undefined') { var id = UI.camp.id; GXC.play(id); return; } newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: UI.lvl }); }
+function restart() { GX.close(); if (UI.tutorial || UI.coach) { tutStart(); return; } if (UI.camp && typeof GXC !== 'undefined') { var id = UI.camp.id; GXC.play(id); return; } newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: UI.lvl }); }
 // ---------- result
 function bonusTileHtml() { var i = artImg('bonus-tile', 'ic'); if (!i) return ''; i.width = i.height = 22; return i.outerHTML + ' '; }
 function emptyIdx(seat) { var r = []; G.board[seat].forEach(function (p, i) { if (p === -1 || p === 99) r.push(i); }); return r; }
@@ -74,7 +74,7 @@ function tieText(w) { return 'Tied on points: ' + nameOf(w) + ' reached the end 
 function showResult(o) {
   o = o || {}; try { GXH.hide(); } catch (e) { } var rs = $('#rs'); rs.hidden = false; rs.className = 'ov rsv'; var sc = [swScore(G, 0), swScore(G, 1)], w = swWinner(G), hot = UI.mode === 'hot';
   artBg(rs, 'bg-title'); var saved = UI.cs, saveNew = UI.newCells; UI.newCells = {}; var wide = innerWidth >= 700;
-  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 236 : 260)) / 9)));
+  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 236 : 260) - (UI.coach ? 120 : 0)) / 9)));
   var c = h('div.rv'), cols = h('div.rvcols'), cells = [], tot = [], pen = [];
   [0, 1].forEach(function (s) {
     var q = quiltEl(s, 'rvq'); q.removeAttribute('id'); q.style.setProperty('--cs', UI.cs + 'px'); q.style.backgroundImage = 'none'; q.classList.remove('art');
@@ -94,7 +94,8 @@ function showResult(o) {
     $$('.rvcol', c).forEach(function (e) { e.classList.add('done'); }); acts.textContent = ''; sfx('fanfare');
     if (w === 0 || hot) { for (var k = 0; k < 18; k++) c.appendChild(h('i.cf', { style: 'left:' + (Math.random() * 100) + '%;background:' + PAL[k % PAL.length] + ';animation-delay:' + (Math.random() * .6) + 's' })); } else sfx('thud');
     if (o.after) { var cb = h('button.btn.go.grow', { type: 'button' }, 'Continue'); cb.onclick = function () { o.after(); }; acts.appendChild(cb); cb.focus(); }
-    else { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'again' }, 'Play again')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title')); }
+    else if (UI.coach && UI.prologue) { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'story' }, 'Start the Story')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title')); }
+    else { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'again' }, UI.coach ? 'Play a real game' : 'Play again')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title')); }
   };
   var mx = Math.max(sc[0].empty, sc[1].empty), step = amt(1) ? Math.max(28, Math.min(110, Math.floor(2600 / Math.max(1, mx)))) : 0;
   if (!step || o.instant) { finishUp(); return; }

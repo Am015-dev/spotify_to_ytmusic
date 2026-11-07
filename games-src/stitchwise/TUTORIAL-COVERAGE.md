@@ -1,40 +1,36 @@
-# Stitchwise tutorial coverage (W381)
+# Stitchwise tutorial coverage (W381, ADDENDUM 4: a coached first game)
 
-The tutorial is the story's prologue: one complete, real game against Marden (fixed seed 4242, fixed patch ring), played from setup to
-the judging and the result screen. Guide: **Aunt Wren**. Rival: **Marden**, who has won the Parish Fair ribbon three years running and
-swears no newcomer will take it.
+The tutorial is the story's prologue and a **real game with free choices from turn 1** against Marden (fixed seed 4242 and patch ring
+so the situations come up; easy AI). No forced spotlight steps at all (0 of the allowed 2): every legal move works, the glow shows them.
+**Aunt Wren** (guide, portrait when art exists) speaks just in time in one line in the panel: when a rule first matters, when you make a
+good or poor first buy, and when Marden does something worth learning. One line at a time, never blocks input, × dismisses it.
+Rules that did not come up are listed on a **"Things you'll meet later"** card at the judging; the judging walks your score through
+with your real numbers ("Your score: 27 buttons + 0 bonus − 18 empty × 2 = −9. Marden: …").
 
-- **Chapter 1 · Your first turn** is spotlit and step by step (shared tutor kit): each step needs the real action.
-- **Chapters 2-4** are the same game played on, freely, with the glow showing legal moves. Aunt Wren's line in the panel (portrait,
-  chapter name, 2 short lines) appears the first time each rule happens, with the reason and a reaction. The player keeps doing the real actions.
-- Leave and resume: chapter 1 resumes at its step (tutor kit); from chapter 2 the game is saved like any game ("Continue your game" on the
-  title), Aunt Wren's progress included.
-- All text lives in `campaign.json` → `story` (prologue steps, coach lines, final lines).
-- Proof: `node playable/play.js 390x763 tut` and `1440x860 tut` play the whole tutorial game by centre taps to the result screen and assert
-  every line below was shown (PASS both, run on the final build).
+Leave and resume: the coached game is saved like any game ("Continue your game" on the title), Aunt Wren's progress included.
+All text: `campaign.json` → `story` (coach lines, later card, final lines). Proof: `node playable/play.js 390x763 tut` and
+`1440x860 tut` start the tutorial from the title and play it to the result by choosing **random legal moves through the UI**
+(random glowing patch, sometimes Advance), then assert every rule below was explained in the game or on the later card.
 
-| Rule (rules-notes.md + rules-check) | Taught by | Step / coach key | Story beat |
+| Rule (rules-notes.md + rules-check) | Explained when | Coach key | Story beat / reaction |
 |---|---|---|---|
-| Setup: 9x9 quilt, 5 buttons each, both tokens on space 0 | seeing | ch1 `pick` (pills show 5 buttons, empty quilt) | Marden's challenge |
-| Buy one of the 3 patches after the marker; cost in buttons | doing | ch1 `pick` | "Prove them wrong: buy the long strip, 3 buttons" |
-| Place without overlap, rotate / flip; empty squares cost 2 | doing | ch1 `drag` (Rotate / Flip on the panel) | "Lovely strip! Lay it on your quilt" |
-| Pay, then move your token by the patch's time | doing | ch1 `sew` | "Snug fit. Sew it on" |
-| The player further back on the track moves next | seeing | ch1 `opp` (Marden's whole turn, step by step) | "Watch the old fox" |
-| Advance: just past the rival, 1 button per space | doing | ch1 `adv` | "Low on buttons? Advance past Marden" |
-| Buttons are money and score | seeing | ch2 `start` | "Chapter 2: buttons are your money AND your score" |
-| Income: passing a gold spot pays the buttons printed on your patches (0 if none) | seeing/doing | ch2 `income_me` or `income_zero`, `income_opp` | "Pay day!" |
-| A patch you can't afford can't be bought (dim, "need N more") | seeing | ch3 `cant` | "Too dear for now!" |
-| Same player can move several times in a row (still behind) | seeing | ch3 `again` / `again_opp` | "Quick patches buy extra turns" |
-| Leather 1x1: first to pass it takes it and places it at once | doing / seeing | ch3 `leather_me` (tap a square) / `leather_opp` | "A leather scrap! Free" |
-| 7x7 bonus: first to fill a 7x7 block gets +7 | seeing | ch3 `bonus` when it happens, else the judging line "the +7 rosette stayed on the table" | "the gold rosette" |
-| Fill gaps late: each empty square -2 | seeing | ch4 `late` | "The fair closes soon" |
-| End: when both tokens reach the last space; the first to arrive waits | seeing | ch4 `end_me` / `end_opp` | "the judges come" |
-| Scoring: buttons + 7 bonus - 2 per empty square | seeing | judging (result count-down, -2 on each empty square, tally) + `final` | climax: Aunt Wren's verdict |
-| Tie-break: on equal points, whoever reached the end first wins | seeing | `final` tie line (when tied) and the result's tie line; also How to play | "A dead heat!" |
+| Setup: 9x9 quilt, 5 buttons each, both on space 0; buy one of the 3 patches; or Advance | turn 1 | `start` | "Marden swears no newcomer wins a ribbon. Buy any glowing patch, or Advance" |
+| Place without overlap (rotate/flip); empty squares −2 | first patch picked | `pick` | "Lay it on your quilt, then Sew it on" |
+| Pay buttons, move by time; what makes a buy good | first buy | `buy_good` / `buy_big` / `buy_cheap` / `buy_poor` | one line why it was good or poor |
+| The player further back moves next | Marden's first turn | `who_next` | "Now that is Marden: watch" |
+| Advance: just past the rival, +1 button per space | your first Advance (else in `start`) | `adv_me` | "Handy when you are broke" |
+| Income at gold spots (0 if no buttons on your patches) | first gold spot passed | `income_me` / `income_zero` / `income_opp` | "Pay day!" |
+| A patch you can't afford stays dim | first unaffordable offer | `cant` | "Too dear for now!" |
+| Several turns in a row | first time it happens / Marden buys slow | `again` / `again_opp` / `opp_slow` | "Quick patches buy extra turns" |
+| Leather 1x1: first to pass it, placed at once | first scrap | `leather_me` (you place it) / `leather_opp` | "A leather scrap! Free" |
+| 7x7 bonus +7 | when won, else at the judging ("stayed on the table") | `bonus` | "the gold rosette" |
+| Fill gaps late | your token reaches space 40 | `late` | "The fair closes soon" |
+| End: both reach the last space; the first waits | first to arrive | `end_me` / `end_opp` | "then the judges come" |
+| Scoring: buttons + 7 − 2 per empty square | judging | `final` + walk-through | Aunt Wren's verdict (win / lose / tie) |
+| Tie-break: equal points → first to reach the end wins | judging on a tie, else the later card | later card | "A dead heat!" |
+
+Both runs (390x763 and 1440x860) explained every rule during the game; the later card held only the tie-break (no tie).
 
 ## Honest gaps
-- **Tie-break** is shown in the tutorial only if the game actually ends tied (it does not with this seed); otherwise it is in the result
-  screen's tie line (when tied) and in How to play. Not "seen" in a normal tutorial run.
-- **No room for a patch** ("no room" on a card) and **an empty patch ring** practically never happen in a 2-player game; not covered.
-- **Full quilt skips the leather patch** (simplified on purpose, stated in How to play) is not shown.
-- The 7x7 bonus is *seen* either being won (it was at 1440x860) or as "stayed on the table" at the judging (390x763 run).
+- "No room for a patch" and an empty patch ring practically never happen in a 2-player game; not explained.
+- A full quilt skipping the leather patch (simplified on purpose) is stated in How to play only.

@@ -11,7 +11,7 @@ function drawGhost() { try { markLanding(); } catch (e) { }
   q.appendChild(g); var sew = $('[data-a=sew]'); if (sew) sew.disabled = !ok;
 }
 function bestPlacement(pid, seat) { return aiBestPlace(G.board[seat], PATCHES[pid]); }
-function selectOffer(k) {
+function selectOffer(k) { if (UI.coach) setTimeout(function () { if (UI.sel >= 0) coachSay('pick', null, true); }, 0);
   var s = swWho(G); if (G.over || UI.busy || !isHuman(s) || G.pend) return; var pid = swOffer(G)[k], p = PATCHES[pid]; if (pid == null) return;
   if (!tutAct({ what: 'offer', k: k })) return;
   if (UI.sel === k) { showPatch(pid); return; }
@@ -85,7 +85,7 @@ function turnCheck() { // banner + plain line when the turn changes (or stays: t
   if (hum) UI.fast = false;
   UI.again = hum && again ? (hot ? nameOf(w) + ' is still behind on the track, so plays again' : 'You are still behind on the track: play again') : '';
   if (!again) { banner(nm, UI.flavor && !UI.wide && UI.lastWho < 0 ? UI.flavor : '', !hum && !hot); } else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', '', !hum && !hot);
-  if (UI.coach) { if (UI.again) coachSay('again'); else if (!hum && again && !hot) coachSay('again_opp'); }
+  if (UI.coach) { if (!hum && !hot) coachSay('who_next'); if (UI.again) coachSay('again'); else if (!hum && again && !hot) coachSay('again_opp'); }
   UI.lastWho = w; if (prev !== UI.again) renderDock();
 }
 function schedule() {
@@ -106,7 +106,7 @@ function aiStep() { // the rival's turn, one visible step at a time (caption, fl
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
 // ---------- start / finish
 function newGame(mode, o) {
-  o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lastWho = -1; UI.again = ''; UI.peek = -1; UI.cap = ''; UI.fast = false; UI.coach = null; var QS = ((window.CAMPAIGN || {}).story || {}).quick; UI.flavor = mode === 'vs' && !o.camp && QS && QS.intro ? QS.intro[o.lvl || UI.lvl] || '' : ''; UI.lvl = o.lvl || UI.lvl;
+  o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lastWho = -1; UI.again = ''; UI.peek = -1; UI.cap = ''; UI.fast = false; UI.coach = null; var QS = ((window.CAMPAIGN || {}).story || {}).quick; UI.flavor = mode === 'vs' && !o.camp && !o.coach && QS && QS.intro ? QS.intro[o.lvl || UI.lvl] || '' : ''; UI.lvl = o.lvl || UI.lvl;
   var seed = o.seed != null ? o.seed : (Math.random() * 1e9) | 0; rngUI = swRng(seed + 17); UI.seed = seed;
   G = swNew({ seed: seed, first: o.first != null ? o.first : (UI.mode === 'hot' || UI.tutorial || UI.camp ? 0 : seed % 2), ring: o.ring });
   UI.names = UI.mode === 'hot' ? ['Player 1', 'Player 2'] : ['You', UI.camp ? UI.camp.opponent.name : (o.name || ({ easy: 'Poppy', normal: 'Marden', hard: 'Aurelia' }[UI.lvl] || 'Computer'))];

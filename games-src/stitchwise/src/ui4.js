@@ -16,19 +16,17 @@ function tutSteps() {
   var ST = ((window.CAMPAIGN || {}).story || {}).prologue; if (ST) steps.forEach(function (s) { var t = ST.steps[s.id]; if (t) { s.title = t[0]; s.say = t[1]; } });
   return steps;
 }
-function tutStart(o) {
-  try { clearTimeout(toast.t); $('#toast').classList.remove('on'); } catch (e) { }
-  if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; var first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'), endTitle: o ? 'You know the rules' : (PRO().endTitle || 'You know the rules'), endText: o ? 'Buy, place, advance, gold spots. Now the Story begins.' : (PRO().endText || 'Buy, place, advance, gold spots. Finish this game against Marden.'),
-    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'finish', label: (PRO().endButton || 'Finish this game') }, { id: 'title', label: 'Back to the title' }],
-    setup: function () { try { GX.close(); } catch (e) { } $('#start').hidden = true; $('#rs').hidden = true; newGame('tutorial', { seed: 4242, ring: TUT_RING, first: 0 }); },
-    onDone: function (r) { var c = r && r.choice; if (c === 'finish' && G && !G.over) { UI.tutorial = false; UI.tutAi = false; UI.lvl = 'easy'; UI.names[1] = 'Marden'; coachStart(); render(); saveGame(); schedule(); return; } tutLeave(); if (c === 'chapter' && first) { showStart(); GXC.play(first.id); } else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); },
-    onExit: function () { tutLeave(); showStart(); } });
+function tutStart(o) { // W381 ADDENDUM 4: the tutorial is a coached first game against Marden: free choices from turn 1, Aunt Wren speaks just in time
+  try { clearTimeout(toast.t); $('#toast').classList.remove('on'); GX.close(); } catch (e) { }
+  if (typeof GXT !== 'undefined' && GXT.active && GXT.active()) try { GXT.stop(); } catch (e) { }
+  $('#start').hidden = true; $('#rs').hidden = true;
+  newGame('vs', { seed: 4242, ring: TUT_RING, first: 0, lvl: 'easy', name: 'Marden', save: false, coach: true });
+  UI.prologue = !!(o && o.prologue); UI.flavor = ''; coachStart(); render(); saveGame();
 }
 function PRO() { return ((window.CAMPAIGN || {}).story || {}).prologue || {}; }
 // ---------- coach: the rest of the tutorial game (chapters 2-4). Aunt Wren notices each rule the first time it happens; the player keeps playing for real.
 function coachData() { return (window.CAMPAIGN || {}).story || {}; }
-function coachStart() { UI.coach = { seen: {}, qk: {}, q: [], line: '', ch: 2, fresh: 0, shown: [] }; coachSay('start', null, true); }
+function coachStart() { UI.coach = { seen: {}, qk: {}, q: [], line: '', ch: 1, fresh: 0, shown: [], buy: 0 }; coachSay('start', null, true); }
 function coachSay(key, vars, now) {
   var C = UI.coach; if (!C || C.seen[key] || C.qk[key]) return; var d = (coachData().coach || {})[key]; if (!d) return;
   var t = d[1].replace(/\{(\w+)\}/g, function (m, k) { return vars && vars[k] != null ? vars[k] : m; }); C.qk[key] = 1; var it = { k: key, ch: d[0], t: t };
@@ -40,13 +38,18 @@ function coachRender() {
   el.hidden = !txt || !G || G.over; if (el.hidden) return; el.innerHTML = '';
   var cast = ((window.CAMPAIGN || {}).cast || {}).wren || {}, chn = C ? (coachData().chapters || {})[C.ch] : '';
   el.appendChild(h('span.gface', { style: 'background:' + (C ? cast.color || '#3b7a8c' : '#a8432f'), 'aria-hidden': 'true' }, C ? (cast.emoji || '\u{1F9F5}') : '\u{1F380}')); var pim = C && artHas('portrait-wren') ? artImg('portrait-wren') : null; if (pim) { var gf = el.lastChild; gf.textContent = ''; pim.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover'; gf.appendChild(pim); }
-  el.appendChild(h('span.gtx', C ? h('b', (cast.name || 'Aunt Wren') + (chn ? ' \u00B7 Ch. ' + C.ch + ' ' + chn : '')) : null, h('span', txt)));
+  if (C) { var xb = h('button.gx-x.gclose', { type: 'button', 'aria-label': 'Hide Aunt Wren' }, '\u00D7'); xb.onclick = function (e) { e.stopPropagation(); C.line = ''; coachRender(); }; el.appendChild(xb); }
+  el.insertBefore(h('span.gtx', C ? h('b', (cast.name || 'Aunt Wren') + (chn ? ' \u00B7 Ch. ' + C.ch + ' ' + chn : '')) : null, h('span', txt)), C ? el.lastChild : null);
 }
 function coachCheck() { // after every move: what just happened for the first time?
   var C = UI.coach; if (!C || !G) return; C.fresh--;
   (G.ev || []).forEach(function (e) {
     if (e.k === 'move') SW.BTN_SPOTS.forEach(function (b) { if (b > e.from && b <= e.to) { if (e.s === 0) coachSay(G.inc[0] > 0 ? 'income_me' : 'income_zero', { n: G.inc[0] + ' button' + (G.inc[0] === 1 ? '' : 's') }); else coachSay('income_opp'); } });
     if (e.k === 'place' && e.pid === 100 && e.s === 1) coachSay('leather_opp');
+    if (e.k === 'place' && e.cost != null && e.pid != null && PATCHES[e.pid]) { var P = PATCHES[e.pid];
+      if (e.s === 0 && !C.buy) { C.buy = 1; coachSay(P.time >= 5 && P.inc === 0 ? 'buy_poor' : P.inc > 0 ? 'buy_good' : P.n >= 5 ? 'buy_big' : 'buy_cheap', null, true); }
+      if (e.s === 1 && P.time >= 5) coachSay('opp_slow'); }
+    if (e.k === 'move' && e.s === 0 && e.gain) coachSay('adv_me', null, true);
     if (e.k === 'bonus') coachSay('bonus', { name: e.s === 0 ? 'You' : nameOf(e.s) });
   });
   if (!G.over) {
@@ -57,10 +60,16 @@ function coachCheck() { // after every move: what just happened for the first ti
   }
   if (C.q.length && C.fresh <= 0) coachNext(); coachRender();
 }
-function coachFinal(ban, w, A, B) { // the judging: the tutorial's climax line on the result banner
+function coachFinal(ban, w, A, B) { // the judging: the tutorial's climax line on the result banner, the score walked through, rules still to meet
   var C = UI.coach; if (!C) return; var f = coachData().final || {}; C.seen.final = 1; C.shown.push('final');
+  var a = swScore(G, 0), b2 = swScore(G, 1); if (f.walk) ban.appendChild(h('div.rvt3.walk', f.walk.replace('{b}', a.btn).replace('{x}', a.bonus ? 7 : 0).replace('{e}', a.empty).replace('{t}', a.total).replace('{ob}', b2.btn).replace('{ox}', b2.bonus ? 7 : 0).replace('{oe}', b2.empty).replace('{ot}', b2.total)));
+  var L = coachData().later || {}, miss = [], has = function () { for (var i = 0; i < arguments.length; i++) if (C.seen[arguments[i]]) return true; return false; };
+  if (!has('income_me', 'income_zero', 'income_opp')) miss.push(L.income); if (!has('leather_me', 'leather_opp')) miss.push(L.leather); if (!has('cant')) miss.push(L.cant);
+  if (!has('again', 'again_opp', 'opp_slow')) miss.push(L.again); if (!has('bonus') && G.bonus != null) miss.push(L.bonus); if (!has('end_me', 'end_opp')) miss.push(L.end); if (A !== B) miss.push(L.tie);
+  if (miss.length) { var card = h('div.rvlater', h('b', 'Things you\u2019ll meet later')); miss.filter(Boolean).forEach(function (t) { card.appendChild(h('div', '\u2022 ' + t)); }); ban.appendChild(card); }
+  C.later = miss.length; try { if (typeof GXT !== 'undefined' && GXT.markDone) GXT.markDone(TUT_GAME); } catch (e) { }
   var t = A === B ? f.tie : w === 0 ? f.win : f.lose; if (G.bonus == null) { C.seen.bonus = 1; C.shown.push('bonus'); t += ' ' + (f.nobonus || ''); }
-  ban.appendChild(h('div.rvt3.wren', t)); try { localStorage.setItem('sw_tutcov', JSON.stringify(Object.keys(C.seen))); } catch (e) { }
+  var wl = h('div.rvt3.wren', t), t2 = ban.querySelector('.rvt2'); if (t2 && t2.nextSibling) ban.insertBefore(wl, t2.nextSibling); else ban.appendChild(wl); ban.classList.add('coachban'); try { localStorage.setItem('sw_tutcov', JSON.stringify(Object.keys(C.seen))); } catch (e) { }
 }
 function tutLeave() { UI.seq++; clearTimeout(UI.tm.ai); UI.tutorial = false; UI.tutAi = false; UI.started = false; UI.busy = 0; UI.sel = -1; try { GXH.hide(); } catch (e) { } G = null; $$('.flt,.coin').forEach(function (e) { e.remove(); }); }
 // ---------- story

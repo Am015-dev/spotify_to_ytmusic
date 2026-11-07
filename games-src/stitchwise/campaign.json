@@ -1039,14 +1039,15 @@
    "endButton": "Play on to the judging"
   },
   "chapters": {
+   "1": "Your first turn",
    "2": "Pay day",
    "3": "Fair surprises",
    "4": "The judging"
   },
   "coach": {
    "start": [
-    2,
-    "Chapter 2: buttons are your money AND your score. The gold spots on the track pay out."
+    1,
+    "Marden swears no newcomer wins a ribbon. Buy any glowing patch, or Advance for buttons."
    ],
    "income_me": [
     2,
@@ -1095,13 +1096,46 @@
    "end_opp": [
     4,
     "Marden reached the last space and waits. You keep playing until you get there too."
+   ],
+   "pick": [
+    1,
+    "Lay it on your quilt, then Sew it on. Every square left empty costs 2 at the judging."
+   ],
+   "buy_good": [
+    1,
+    "Good buy! It carries buttons, so it pays you at every gold spot on the track."
+   ],
+   "buy_big": [
+    1,
+    "A big patch: lots of squares filled at once. Big ones cost time, though."
+   ],
+   "buy_cheap": [
+    1,
+    "Cheap and quick: your token barely moves, so you may get the next turn too."
+   ],
+   "buy_poor": [
+    1,
+    "Slow and no buttons: that hands Marden extra turns. Cheaper, quicker patches next time."
+   ],
+   "adv_me": [
+    1,
+    "Advance: you hop just past Marden and take 1 button per space. Handy when you are broke."
+   ],
+   "who_next": [
+    1,
+    "Whoever is further back on the track moves next. Now that is Marden: watch."
+   ],
+   "opp_slow": [
+    3,
+    "Marden took a slow patch, so Marden's token jumped ahead: expect a few turns in a row."
    ]
   },
   "final": {
    "win": "Aunt Wren: Ten years I waited to see Marden lose a ribbon. Empty squares cost 2 each; you left fewer. Welcome to the fair!",
    "lose": "Aunt Wren: Marden wins this one, but you learned every rule. Empty squares cost 2 each; fill more next time.",
    "tie": "Aunt Wren: A dead heat! On a tie, whoever reached the end first takes the ribbon.",
-   "nobonus": "Nobody filled a 7x7 block, so the +7 rosette stayed on the judges' table."
+   "nobonus": "Nobody filled a 7x7 block, so the +7 rosette stayed on the judges' table.",
+   "walk": "Your score: {b} buttons + {x} bonus − {e} empty × 2 = {t}. Marden: {ob} + {ox} − {oe} × 2 = {ot}."
   },
   "quick": {
    "intro": {
@@ -1112,6 +1146,15 @@
    "win": "The judges pin the ribbon on your quilt.",
    "lose": "The ribbon goes to {name}. Fewer gaps next time.",
    "tie": "A dead heat. The ribbon goes to whoever finished first."
+  },
+  "later": {
+   "income": "Gold spots: passing one pays the buttons printed on your patches.",
+   "leather": "Leather scraps: the first player to pass one sews a free 1x1 on at once.",
+   "cant": "A patch you cannot pay for stays dim.",
+   "again": "The player further back moves, so one player can take several turns in a row.",
+   "bonus": "The first to fill a whole 7x7 block earns +7.",
+   "end": "When one player reaches the last space, the other plays on until they get there too.",
+   "tie": "On equal points, whoever reached the last space first wins."
   }
  }
 }
