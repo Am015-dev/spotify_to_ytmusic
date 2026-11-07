@@ -68,20 +68,21 @@ document.addEventListener('click', e => {
 $('#iscrim').addEventListener('click', () => { if (typeof GXT !== 'undefined' && GXT.active()) return; closeInsp(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.insp) closeInsp(); });
 const UIACT = {};
-function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; return GXT.act(Object.assign({ type: 'tap' }, x)); }
+UIACT.tab = t => { showTab(t.dataset.t); UI.autoTab = false; render(); };
+function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; if (UI.coachFree) return true;   /* coached game: every legal move is allowed */ return GXT.act(Object.assign({ type: 'tap' }, x)); }
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
-  if (!G) return; const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
+  if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null; const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
   if (!r.ok) { toast('That move is not allowed now.'); render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
   const delay = showEvents(s);
-  save(); render(); actFx(m, s, from, html, b);
+  save(); render(); actFx(m, s, from, html, b); if (best) coachMove(m, best);
   if (!UI.fast && m.t !== 'ans' && !m.free) $('#prompt').textContent = moveCaption(m, s);
   UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(650, Math.min(delay, 1200)));
 }
 function after() {
   if (!G) return; render(); turnBanner(); if (typeof myTurn === 'function' && myTurn() && !$('#fx').hidden) fxHide();
-  if (G.phase === 'over') { clearSave(); setTimeout(showResult, UI.fast ? 0 : 900); return; }
+  if (G.phase === 'over') { clearSave(); setTimeout(() => { showResult(); if (UI.mode === 'tutorial' && typeof coachScoreStart === 'function') try { coachScoreStart(); } catch (x) { console.warn(x); } }, UI.fast ? 0 : 900); return; }
   const s = VG.actor(G);
   if (!isHuman(s)) { schedule(); return; }
   if (s !== UI.view) { if (UI.humans.length > 1) showPass(s); else { UI.view = s; render(); } }
@@ -96,13 +97,13 @@ function aiStep() {
   const m = (UI.mode === 'tutorial' && tutAI(s)) || VAI.choose(G, G.p[s].ai || 'normal') || VG.moves(G).find(x => x.t === 'pass'), g0 = G;
   const cap = m ? moveCaption(m, s) : '', el0 = m ? moveEl(m, s) : null;
   UI.busy = true;
-  if (!UI.fast) { $('#docktitle').textContent = who(s) + '’s turn'; $('#prompt').textContent = cap; if (el0) el0.classList.add('aimark'); }
+  if (!UI.fast) { $('#docktitle').textContent = who(s) + '’s turn'; $('#prompt').textContent = cap; const tt = tabOf(el0); if (tt && tt !== UI.tab) { showTab(tt); UI.autoTab = true; } if (el0) el0.classList.add('aimark'); }
   turnWait(UI.fast ? 0 : 900, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
     if (G !== g0 || G.phase !== 'play' || VG.actor(G) !== s) { UI.busy = false; return; }
     const b = snapS(s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '';
     const r = m ? VG.apply(G, m) : { ok: false };
     if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); }
-    const d = showEvents(s); save(); render();
+    const d = showEvents(s); save(); render(); if (typeof coachRival === 'function') coachRival(m);
     if (!UI.fast) { $('#docktitle').textContent = who(s) + '’s turn'; $('#prompt').textContent = cap; actFx(m, s, from, html, b); }
     turnWait(UI.fast ? 0 : Math.max(d, 1000), () => { UI.busy = false; after(); });   /* step 2: the result stays readable before the next step */
   });
@@ -170,6 +171,7 @@ document.addEventListener('pointerdown', e => { if (turnWait.fn && G && !myTurn(
 function turnBanner() {
   if (!G || G.phase !== 'play' || UI.fast) return; const s = VG.actor(G); if (s === UI.bannerFor) return; UI.bannerFor = s; if (s === -1) return;
   const mine = isHuman(s), b = $('#tbanner'); if (!b) return;
+  if (mine && UI.autoTab) { UI.autoTab = false; showTab('map'); render(); }
   b.textContent = mine ? (UI.humans.length > 1 ? who(s) + ', your turn' : 'Your turn') : who(s) + '’s turn'; b.className = 'on' + (mine ? ' me' : '');
   clearTimeout(turnBanner.t); turnBanner.t = setTimeout(() => { b.className = ''; }, 1100);
 }
@@ -177,6 +179,7 @@ function turnBanner() {
 function showEvents(s) {
   let wait = 0; const ev = G.ev || [];
   ev.forEach(e => {
+    if (typeof coachEvent === 'function') coachEvent(e, s);
     if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); const who = e.s === -2 ? G.rival.name : G.p[e.s].name; setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('burst'); }, 60); toast(who + (who === 'You' ? ' discover ' : ' discovers ') + V.SITE[e.tile].name + '!', 1800); }
     if (e.k === 'guardian') { wait = Math.max(wait, 2700); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', 'Overcome it for 5 points and a boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
     if (e.k === 'beat') { wait = Math.max(wait, 2300); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, 'Overcome!', w + (w === 'You' ? ' tame ' : ' tames ') + V.GUARD[e.guard].name + ': +5 points and a boon.', true); }

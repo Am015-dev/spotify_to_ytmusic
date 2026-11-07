@@ -44,6 +44,12 @@
    "portrait": "camp-cloudspire.webp",
    "emoji": "🏔️",
    "color": "#5b7fa6"
+  },
+  "pell": {
+   "name": "Inspector Wren Pell",
+   "portrait": "",
+   "emoji": "🧐",
+   "color": "#6b3f8c"
   }
  },
  "acts": [
@@ -124,7 +130,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Level wings at the end. That is how it starts, Captain.",
+    "taunt": "She tipped too far. Ravi and I will set her level again."
    },
    "setup": {
     "players": 2,
@@ -203,7 +211,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Right speed, right space. The runway is yours.",
+    "taunt": "Too fast, or too slow. The engines need both of you."
    },
    "setup": {
     "players": 2,
@@ -282,7 +292,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Path clear. The radio did its job.",
+    "taunt": "A plane on the path ends the flight. Count the spaces first."
    },
    "setup": {
     "players": 2,
@@ -361,7 +373,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Wheels and flaps, both down. Nicely done.",
+    "taunt": "Something stayed up. Check gear and flaps before the last round."
    },
    "setup": {
     "players": 2,
@@ -440,7 +454,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Brakes set in order. Smooth stop.",
+    "taunt": "The brakes were not ready. Two, then four, then six."
    },
    "setup": {
     "players": 2,
@@ -618,7 +634,9 @@
     "name": "Foxmere Approach",
     "personality": "Polite but busy: the traffic die keeps adding planes.",
     "aiLevel": "hard",
-    "aiStyle": "traffic"
+    "aiStyle": "traffic",
+    "praise": "Runway is yours, Kestrel. Thanks for sorting the queue.",
+    "taunt": "Traffic got the better of you. Clear the queue early next time."
    },
    "setup": {
     "players": 2,
@@ -710,7 +728,9 @@
     "name": "Lake Orrin Tower",
     "personality": "A quiet night tower over a long lake. The fuel gauge is the real danger.",
     "aiLevel": "hard",
-    "aiStyle": "fuel"
+    "aiStyle": "fuel",
+    "praise": "Kestrel, tanks look healthy. Good night to you.",
+    "taunt": "Fuel ran thin. Watch the gauge before the last round."
    },
    "setup": {
     "players": 2,
@@ -905,7 +925,9 @@
     "name": "Castlemoor Tower",
     "personality": "A gentle dusk tower among spires, with a fuel gauge and two tabs.",
     "aiLevel": "normal",
-    "aiStyle": "abilities"
+    "aiStyle": "abilities",
+    "praise": "Dusk landing, clean and quiet. Welcome to Castlemoor.",
+    "taunt": "The spires were close tonight. Try again, calmly."
    },
    "setup": {
     "players": 2,
@@ -1005,7 +1027,9 @@
     "name": "Foxmere Approach",
     "personality": "Fog, stacked traffic and a nervous trainee on the flight deck.",
     "aiLevel": "normal",
-    "aiStyle": "fog-trainee"
+    "aiStyle": "fog-trainee",
+    "praise": "Out of the fog and on the ground. Well flown.",
+    "taunt": "Fog ate the plan. Hold, wait, and trust your crewmate."
    },
    "setup": {
     "players": 2,
@@ -1200,7 +1224,9 @@
     "name": "Twin Spires Tower",
     "personality": "Night storms between two glass towers; tabs swing from side to side.",
     "aiLevel": "normal",
-    "aiStyle": "storm-corridor"
+    "aiStyle": "storm-corridor",
+    "praise": "Between the storms and down. Not many manage that.",
+    "taunt": "The storm tabs swung against you. Read them again."
    },
    "setup": {
     "players": 2,
@@ -1292,7 +1318,9 @@
     "name": "Palmreach (no reply)",
     "personality": "A silent tower, warm rain and a tail wind that keeps adding speed.",
     "aiLevel": "normal",
-    "aiStyle": "tailwind"
+    "aiStyle": "tailwind",
+    "praise": "Rain on the runway and you stopped it anyway. Remarkable.",
+    "taunt": "The tail wind pushed you past. Next time, count it in."
    },
    "setup": {
     "players": 2,
@@ -1472,5 +1500,206 @@
     }
    ]
   }
- ]
+ ],
+ "tutorial": {
+  "guide": "chief",
+  "rival": "pell",
+  "chapters": [
+   {
+    "id": "ch1",
+    "title": "Chapter 1: Your first turn",
+    "before": "plane",
+    "beat": [
+     "Check ride, Captain. Inspector Pell is on the radio.",
+     "He says two pilots can't land blind."
+    ],
+    "round": 0,
+    "n": null,
+    "who": "chief"
+   },
+   {
+    "id": "ch2",
+    "title": "Chapter 2: Clear the way",
+    "before": "radio",
+    "beat": [
+     "Pell has parked a plane on our runway path.",
+     "Radio and engines will move us past it."
+    ],
+    "round": 0,
+    "n": 3,
+    "who": "ravi"
+   },
+   {
+    "id": "ch3",
+    "title": "Chapter 3: Landing day",
+    "before": "roll2",
+    "beat": [
+     "Last round. Every light must go green.",
+     "Wheels, flaps, wings, brakes: all of it."
+    ],
+    "round": 1,
+    "n": null,
+    "who": "chief"
+   }
+  ],
+  "steps": {
+   "plane": {
+    "title": "One plane, two seats",
+    "say": "Pell bets two pilots can't land blind. You and {rival} win or crash as one."
+   },
+   "goal": {
+    "title": "Pell's four lights",
+    "say": "To pass: runway clear, gear and flaps down, wings level, speed under the brakes."
+   },
+   "seats": {
+    "title": "Dice behind screens",
+    "say": "You are the blue Pilot. {rival}, the orange Co-pilot, hides his dice. Trust is the job."
+   },
+   "owners": {
+    "title": "Your spaces, his spaces",
+    "say": "Blue spaces are yours, orange are {rival}'s, grey take anyone. Pell is watching."
+   },
+   "rounds": {
+    "title": "Two rounds left",
+    "say": "I flew the first five. Each round: roll, then trade turns, one die each."
+   },
+   "roll": {
+    "title": "Dice up",
+    "say": "Plan out loud, never dice numbers. Pell is listening. Roll, then silence.",
+    "react": "Silence now. Trust him, Captain.",
+    "who": "chief"
+   },
+   "axis1": {
+    "title": "His move first",
+    "say": "{rival} laid a {ax1} on the axis, trusting you. Lift your {d0}."
+   },
+   "axis2": {
+    "title": "Keep her level",
+    "say": "Wings tip toward the higher die. A tilt of 3 is a spin, and Pell wins.",
+    "react": "The wings answer you. First turn flown!",
+    "who": "chief"
+   },
+   "radio": {
+    "title": "Traffic ahead",
+    "say": "A plane waits on space {planeAt}: fly through it and we are gone. Your {d2} clears it.",
+    "react": "Path clear. Pell goes quiet.",
+    "who": "chief"
+   },
+   "engines": {
+    "title": "Thrust",
+    "say": "{en1} + your {d1} = {sumE}. Blue {aeroB}, orange {aeroO}: beat a marker and the plane moves.",
+    "react": "She moves! Steady hands.",
+    "who": "chief"
+   },
+   "coffee": {
+    "title": "A spare die",
+    "say": "Nothing else fits? Coffee takes any die and earns a token to nudge one by a pip.",
+    "react": "Coffee earned. Ravi grins.",
+    "who": "ravi"
+   },
+   "round1": {
+    "title": "Round one done",
+    "say": "The tilt stays. Next is landing day: wheels down, speed under the brakes."
+   },
+   "roll2": {
+    "title": "Landing day",
+    "say": "Now the plane must stop. Plan out loud, then roll."
+   },
+   "rr1": {
+    "title": "A bad die",
+    "say": "Your {d0} cannot lower the last gear: it needs a 5 or 6. Spend the reroll token."
+   },
+   "rr2": {
+    "title": "Choose the die",
+    "say": "Pick the die to roll again. {rival} keeps his dice."
+   },
+   "rr3": {
+    "title": "Roll it again",
+    "say": "Hold your breath. Roll the die once more.",
+    "react": "A five! The gear can drop.",
+    "who": "ravi"
+   },
+   "cof": {
+    "title": "Coffee, spent",
+    "say": "The brake needs exactly 4. Spend your coffee token to lift your {d1} by one."
+   },
+   "brake": {
+    "title": "Set the brake",
+    "say": "Brakes go 2, then 4, then 6. The 2 is set: the 4 goes in now.",
+    "react": "Brakes biting. Two to go.",
+    "who": "chief"
+   },
+   "gear": {
+    "title": "Wheels down",
+    "say": "Gear takes 1-2, 3-4 or 5-6, any order. Your {d0} lowers the last one.",
+    "react": "Three greens on the gear. Nearly there.",
+    "who": "chief"
+   },
+   "axis3": {
+    "title": "Wings level",
+    "say": "The axis reads {tilt} {tdir}. Your {d2} against {rival}'s {ax1} tips her level.",
+    "react": "Level wings. Pell stops writing.",
+    "who": "chief"
+   },
+   "flaps": {
+    "title": "His job: flaps",
+    "say": "Flaps are {rival}'s: four spaces, in order. Each flap or gear lifts a speed marker."
+   },
+   "engines2": {
+    "title": "The last thrust",
+    "say": "Speed is your {d3} plus {rival}'s {en1}. It must stay within the brakes: {brake}."
+   },
+   "landed": {
+    "title": "Down and stopped",
+    "say": "Runway clear, gear and flaps down, wings level, speed in the brakes. Together.",
+    "react": "Pell: \"...Passed.\" Green Wings is open.",
+    "who": "chief"
+   }
+  },
+  "prologue": "Check ride at Port Alder. Chief Hedda Voss has flown five rounds; Captain Marlow takes the last two with First Officer Ravi Okoro. Inspector Pell is listening: if the crew lands clean, Green Wings flight school stays open.",
+  "end": {
+   "title": "You know the rules",
+   "text": "Pell lowers his pen: \"Fine. Green Wings stays open.\" Axis, engines, radio, gear, flaps, brakes, coffee, rerolls: flight school is yours."
+  },
+  "voice": {
+   "win": [
+    "Ravi: \"Down and stopped. Together, Captain.\"",
+    "Voss on the radio: \"That is how it is done.\"",
+    "Ravi: \"Pell can put his pen away.\""
+   ],
+   "lose": [
+    "Ravi: \"We read it wrong. Next one is ours.\"",
+    "Voss on the radio: \"Debrief, then again, Captain.\"",
+    "Ravi: \"Shake it off. Fresh dice, fresh plan.\""
+   ]
+  },
+  "coach": {
+   "intro": "Check ride, Captain. Pell bets two pilots can't land blind. You and {rival} win or crash as one. Plan aloud, never dice numbers, then roll.",
+   "seats": "Your dice are hidden from {rival}, his from you. Blue spaces are yours, orange his, grey anyone's.",
+   "goal": "Pell's four lights to land: runway clear, gear and flaps down, wings level, speed in the brakes. The strip at the bottom tracks them.",
+   "turns": "One die each, taking turns. Axis and engines must both be filled every round, or we lose.",
+   "axis": "Axis: the plane tips toward the higher die by the difference. A tilt of 3 is a spin and Pell wins.",
+   "radio": "A plane on the track is a collision. Radio clears the plane that many spaces ahead: yours counts from 1, {rival}'s from 2.",
+   "engines": "Engines: both dice add up. Past blue {aeroB} the plane moves one space, past orange {aeroO} two. It must end on the airport, not past it.",
+   "gear": "Landing gear takes 1-2, 3-4 or 5-6 in any order. Each gear lifts the blue marker.",
+   "flaps": "Flaps are {rival}'s: 1-2, 2-3, 4-5, 5-6 in order. Each flap lifts the orange marker.",
+   "brakes": "Brakes need exactly 2, then 4, then 6, in order. They count only in the last round.",
+   "coffee": "Coffee: any die earns a token. Spend tokens with the + and - buttons to nudge a die by one.",
+   "reroll": "A reroll token: either of you may spend it, even on the other's turn. Pick the dice to roll again, or keep them.",
+   "rounds": "Altitude falls each round. In the last round the plane stops: speed must fit the brakes.",
+   "final": "Landing round. No flying now: engine speed within the brake value, gear and flaps down, wings level."
+  },
+  "later": [
+   "Traffic die: some airports add planes each round (Story chapter 7).",
+   "Corridor tabs: some strips make the axis match a marker (chapter 9).",
+   "Fuel: a fuel space burns the die value; below 0 you lose (chapter 8).",
+   "Wind dial, trainee tokens, icy runway, the 60-second clock (chapters 11 to 15).",
+   "Crew cards, hand-over, flip side and cross-check (chapter 10).",
+   "A die that fits nowhere is thrown away and counts as your turn."
+  ],
+  "endText": {
+   "win": "Pell lowers his pen: \"...Passed.\" Green Wings stays open.",
+   "lose": "Pell smiles thinly: \"Not this time.\" Voss: \"Again, Captain. Everyone crashes once.\""
+  }
+ }
 }

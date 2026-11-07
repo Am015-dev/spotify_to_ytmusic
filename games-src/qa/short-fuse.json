@@ -2,22 +2,22 @@
  "slug": "short-fuse",
  "size": "phone",
  "seed": 40793,
- "when": "2026-11-07T21:15Z",
+ "when": "2026-11-07T22:54Z",
  "tutorial": {
-  "end": true,
-  "endButtons": 2
+  "end": false,
+  "coached": true,
+  "explained": 0,
+  "explainedIds": [],
+  "bubblesClosed": 0,
+  "clicks": 1108
  },
  "quick": {
-  "result": "cap",
-  "clicks": 491
+  "result": null
  },
  "story": {
-  "result": "cap",
-  "clicks": 88
+  "result": null
  },
- "fuzz": {
-  "taps": 293
- },
+ "fuzz": {},
  "bugs": [
   {
    "sev": "MINOR",
@@ -25,7 +25,7 @@
    "where": "title",
    "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-title-1.png"
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -33,321 +33,56 @@
    "where": "title",
    "desc": "tap target 34px (<40) summary x1: \"More\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-title-1.png"
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "text 9.0px (<12px) in span.en x1: \"Rewind\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "text 11.2px (<12px) in em.nt x1: \"≠2\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
+   "where": "tutorial-board",
    "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-tutorial-board-2.png"
   },
   {
    "sev": "MINOR",
-   "phase": "quick",
-   "where": "title",
-   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-title-3.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "title",
+   "phase": "tutorial",
+   "where": "tutorial-board",
    "desc": "tap target 34px (<40) summary x1: \"More\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-title-3.png"
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-tutorial-board-2.png"
   },
   {
    "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-quick-board-4.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "text 11.2px (<12px) in em.nt x1: \"≠5\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 34px (<40) summary x1: \"More\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-quick-board-4.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "text 11.2px (<12px) in em.nt x2: \"≠3\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-quick-board-5.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "text 11.5px (<12px) in span x1: \"Teal\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-quick-board-5.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "text 11.2px (<12px) in em.nt x1: \"≠2\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-quick-board-6.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "text 11.8px (<12px) in em x1: \"18\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-quick-board-6.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "text 11.8px (<12px) in em x1: \"14\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-quick-board-7.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 36px (<40) button.chip.sm x2: \"Twin Probe\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-quick-board-7.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick click #491 (4)",
-   "desc": "inconclusive: no result screen within the 150 s cap / 491 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-quick-noresult-8.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "text 9.0px (<12px) in span.en x1: \"Rewind\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-story-map-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "text 9.0px (<12px) in span.nd x1: \"2×2\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-story-map-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-story-map-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "text 9.0px (<12px) in span.en x1: \"Rewind\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "text 11.2px (<12px) in em.nt x1: \"≠2\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "text 11.2px (<12px) in em.nt x1: \"≠1\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-story-board-12.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
+   "phase": "tutorial",
+   "where": "tutorial-board",
    "desc": "tap target 36px (<40) button.chip.sm x1: \"Twin Probe\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-story-board-12.png"
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "story",
-   "where": "story click #88 (2)",
-   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 88 clicks (state kept changing)",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-story-noresult-13.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-title-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "tap target 34px (<40) summary x1: \"More\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-title-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 9.0px (<12px) in span.en x1: \"Rewind\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-15.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 9.0px (<12px) in span.nd x1: \"2×2\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-15.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-15.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "text 11.2px (<12px) in em.nt x1: \"≠4\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-tutorial-board-4.png"
   },
   {
    "sev": "MAJOR",
-   "phase": "fuzz",
-   "where": "fuzz tap #75",
-   "desc": "stuck overlay without any button: div.gx-scrim.on \"\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-fuzz-overlay-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 11.0px (<12px) in i.cn12 x3: \"10\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 9.0px (<12px) in span.en x5: \"Full Scan\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 9.0px (<12px) in span.nd x5: \"2×5\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 11.8px (<12px) in em x4: \"10\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 10.5px (<12px) in i.coin.c-b x2: \"10\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 30px (<40) button.tile.mine x9: \"1\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 9.0px (<12px) in span.en x5: \"Equal Tag\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 9.0px (<12px) in span.nd x5: \"2×12\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): div.eqk.art.locked \"12 Equal Tag 2×12\" under div#cover \"7 Last Lesson Go\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): div.jc.mk \"7.5 11.5\" under div#cover \"7 Last Lesson Go\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/short-fuse/phone-screen-fuzz-screen-18.png"
+   "phase": "tutorial",
+   "where": "tutorial click #1108 (8)",
+   "desc": "coached game: GXCOACH.done never became true within 360 s (1108 clicks, 0 rules explained)",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
+   "shot": "/tmp/qa-shots/short-fuse/phone-coach-notdone-6.png"
   }
  ],
- "secs": 349,
- "tutorialIn": {}
+ "secs": 364
 }

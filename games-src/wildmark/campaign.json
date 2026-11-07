@@ -1022,7 +1022,7 @@
    "hawk": "Hawks like to be alone: each hawk touching no other hawk scores.",
    "fox": "A fox scores 1 point for each different animal next to it.",
    "keystone": "A gold-rimmed keystone! Settling an animal there earns an acorn: 1 point at the end, or a favour now.",
-   "acornSpend": "You have an acorn. \"Acorn: free pick\" takes any tile with any animal; \"Acorn: replace\" swaps animals.",
+   "acornSpend": "You have an acorn. Tap \"Use acorn\": a free pick takes any tile with any animal, or replace the animals on offer.",
    "sweep3": "Three alike in the market. You may sweep them for fresh animals, once per turn, for free.",
    "wipe4": "Four alike: the market clears them by itself and deals new animals.",
    "rival": "Bram's turn. Watch the caption: he takes, places and settles just like you.",
