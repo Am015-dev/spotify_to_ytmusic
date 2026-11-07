@@ -193,6 +193,8 @@ function bfScore(i,v){const el=bfQ(`[data-bfsc="${i}"]`);if(el)el.textContent='�
 function bfBanner(t,sub){const tb=BF.tbl;if(!tb)return;const d=document.createElement('div');d.className='bf-ban';d.innerHTML=`<b>${esc(t)}</b>${sub?`<small>${esc(sub)}</small>`:''}`;tb.appendChild(d);
   if(!bfAnimOK()){d.remove();return}
   bfTrack(d.animate([{opacity:0,transform:'translateY(-50%) scale(.7)'},{opacity:1,transform:'translateY(-50%) scale(1.05)',offset:.18},{opacity:1,transform:'translateY(-50%) scale(1)',offset:.8},{opacity:0,transform:'translateY(-50%) scale(1)'}],{duration:bfD(1500),fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
+// W388: the instruction line says whose turn it is, before every rival move
+function bfTurn(t){BF.say=t;try{bfDraw()}catch(e){}}   // the instruction line announces the turn (a floating pill failed the text-topmost check and covered the score chips)
 // one idea at a time, in two short lines at most, above the action (guided game only, each once)
 const BF_TIPS={nofit:'Red ✗ colours fit no row.',slide:'Leftovers slid to the middle.',tiling:'Full rows slide onto the wall!',chain:'Touching tiles score more!',
   floor:'Extra tiles break: minus points.',sun:'☀ costs 1, but you start next.',bonus:'Full column +7 at the end!',
@@ -216,7 +218,7 @@ async function bfStep(e){const S=BF.disp;
   if(e.t==='take')return bfTake(e.x);
   if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
   if(e.t==='wall')return bfWall(e.x);
-  if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length))await bfFloors();
+  if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length)){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut&&TUT.part==='A')await tutPause('r1end')}
     S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
     bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(1500,500+S.fac.length*4*45));return}
@@ -225,6 +227,7 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   const m={src:x.src,c:x.c,j:(x.nj||x.c===PRISM)?1:0,line:x.line};const pre=x.src<0?'c':'f'+x.src;const picked=[],rest=[];
   a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
   const focus=x.p===bfFocus(),pl=P(x.p);BF.actor=x.p;
+  if(!focus||!pl||!pl.human||NET.on){BF.lastRival=1;bfTurn(pl.nm+"'s turn");await bfWait(700)}
   if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw()}
   // 1. the tiles lift (the player's own selection is already up)
   let lifted=false;for(const o of picked){const el=bfEl(o.key);if(el&&!el.classList.contains('up')){el.classList.add('up');lifted=true}}
@@ -359,7 +362,7 @@ function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
   else if(hp&&G.phase==='wall')say='Tap a glowing wall space';
   else if(hp&&UI.sel){const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src]||[];const n=a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length;chip=`<span class="bf-n">${bfUse(UI.sel.c)}<b>×${n}</b></span>`;say=movesFor(UI.sel).every(m=>m.line===5)?'No room: tap the floor':'Tap a glowing row';
     const nj=a.filter(t=>t===PRISM).length;if(UI.sel.c<NC&&nj)tg=`<button class="bf-pz${UI.sel.j?' on':''}" data-gxh-avoid data-bf="prism" aria-pressed="${!!UI.sel.j}" aria-label="Also take the prism tiles">${bfUse(PRISM)}${UI.sel.j?'✓':'✗'}</button>`}
-  else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap the floor':BF.seen.took?'Your turn: tap a colour':'Tap a colour to grab every tile');}
+  else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap the floor':'Your turn: tap a colour');}
   else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):''}
   if(BF.tip){say=BF.tip;chip='';tg=''}
   return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-gxh-avoid data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over&&!UI.tut?`<span class="bf-bw" data-gxh-avoid><button class="bf-ib bf-bulb gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?"></button></span>`:''}${live&&G.over&&BF.resHide&&!UI.tut?`<button class="bf-b" data-gxh-avoid data-bf="res">Result</button>`:''}`}
