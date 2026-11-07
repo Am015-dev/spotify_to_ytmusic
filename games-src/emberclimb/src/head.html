@@ -7,7 +7,15 @@
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Alegreya Sans',Georgia,serif;touch-action:manipulation}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden}
+#app{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
+#tscr{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;z-index:1}#tscr[hidden],#game[hidden]{display:none}
+.gx-board{position:relative;background:var(--bg)}
+.gx-bar h1{font-size:15px;letter-spacing:.08em;margin:0;text-shadow:none;color:var(--ember2);flex:none}
+@media (max-width:700px){.gx-bar h1{display:none}.gx-bar{gap:4px}}
+.gx-bar .chip{flex:none}
+.hud{display:flex;gap:5px;align-items:center;min-width:0;overflow:hidden}
+#dockact{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:6px}#dockact .btn{min-height:44px}
+#dockmsg{font-size:14px;line-height:1.25}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
 .btn{background:linear-gradient(#f2872b,#c8561b);color:#1a0e06;font-weight:700;border-radius:12px;padding:12px 22px;min-height:46px;min-width:46px;box-shadow:0 3px 0 #7a3410;letter-spacing:.03em}
 .btn.alt{background:linear-gradient(#4a3426,#31221a);color:var(--ink);box-shadow:0 3px 0 #1a100b}
@@ -181,4 +189,8 @@ h1,h2,.btn,.ct,.cname{font-family:'Cinzel',Georgia,serif}h1{margin:0;font-size:c
 .hand.dense .card .ct{padding-right:calc(var(--cw)*.04)}
 .stc:empty{display:none}
 @media (max-width:700px){.heropan{padding:2px 8px!important}.heropan .inf{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center}}
+.hero.locked{opacity:.55;filter:grayscale(.6)}
+@media (min-width:1024px){html body .gx-ibtn span,html body .gx-bar h1{font-size:16px!important}.gx-bar h1,.gx-ibtn span,.gx-dt,#dockmsg,.gx-bar .chip{font-size:16px}.gxc-act b,.gxc-act small,.gxc-lab{font-size:16px!important}}
+/* campaign map contrast: node discs and lock icons read on the dark map */
+.gxc-node .gxc-disc{background:#1d130d!important;color:#fff!important;border-color:#ffb35c!important}.gxc-node .gxc-lock{opacity:1!important;color:transparent!important;text-shadow:0 0 0 #fff!important}
 </style></head>

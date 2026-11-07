@@ -5,13 +5,15 @@
  "cast": {
   "guide": {
    "name": "Warden Ashgrove",
-   "emoji": "\ud83d\udd25",
-   "color": "#c8472b"
+   "emoji": "🔥",
+   "color": "#c8472b",
+   "portrait": "cast-guide.webp"
   },
   "rival": {
    "name": "The Gatekeeper",
-   "emoji": "\ud83d\udeaa",
-   "color": "#7a6a5a"
+   "emoji": "🚪",
+   "color": "#7a6a5a",
+   "portrait": "cast-rival.webp"
   }
  },
  "acts": [
@@ -77,7 +79,7 @@
    "hints": true,
    "opponent": {
     "name": "Gnawer",
-    "emoji": "\ud83d\udc00",
+    "emoji": "🐀",
     "cast": "guide",
     "personality": "A small rat. It only bites.",
     "aiLevel": "easy",
@@ -147,7 +149,7 @@
    "hints": true,
    "opponent": {
     "name": "Iron Warden",
-    "emoji": "\ud83d\udc79",
+    "emoji": "👹",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "easy",
@@ -200,7 +202,13 @@
     "maxStars": 2,
     "text": "Enemies have less HP and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "hero-s",
+     "text": "Rogue joins the Quick game"
+    }
+   ]
   },
   {
    "id": "c3",
@@ -226,7 +234,7 @@
    "hints": true,
    "opponent": {
     "name": "Thorn Brute",
-    "emoji": "\ud83d\udc80",
+    "emoji": "💀",
     "cast": "rival",
     "personality": "A guardian of the tower.",
     "aiLevel": "easy",
@@ -281,7 +289,13 @@
     "maxStars": 2,
     "text": "Enemies have less HP and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "hero-a",
+     "text": "Automaton joins the Quick game"
+    }
+   ]
   },
   {
    "id": "c4",
@@ -307,7 +321,7 @@
    "hints": false,
    "opponent": {
     "name": "Sleeper Statue",
-    "emoji": "\ud83d\udc79",
+    "emoji": "👹",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "normal",
@@ -360,7 +374,13 @@
     "maxStars": 2,
     "text": "Enemies have less HP and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "hero-m",
+     "text": "Monk joins the Quick game"
+    }
+   ]
   },
   {
    "id": "c5",
@@ -386,7 +406,7 @@
    "hints": false,
    "opponent": {
     "name": "Sleeper Statue",
-    "emoji": "\ud83d\udc79",
+    "emoji": "👹",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "normal",
@@ -470,7 +490,7 @@
    "hints": false,
    "opponent": {
     "name": "Mire Behemoth",
-    "emoji": "\ud83d\udc80",
+    "emoji": "💀",
     "cast": "rival",
     "personality": "A guardian of the tower.",
     "aiLevel": "normal",
@@ -552,7 +572,7 @@
    "hints": false,
    "opponent": {
     "name": "Ashen Wraith",
-    "emoji": "\ud83d\udc79",
+    "emoji": "👹",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "hard",
@@ -636,7 +656,7 @@
    "hints": false,
    "opponent": {
     "name": "Ashen Wraith",
-    "emoji": "\ud83d\udc79",
+    "emoji": "👹",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "hard",
@@ -720,7 +740,7 @@
    "hints": false,
    "opponent": {
     "name": "Gate Colossus",
-    "emoji": "\ud83d\udc80",
+    "emoji": "💀",
     "cast": "rival",
     "personality": "A guardian of the tower.",
     "aiLevel": "hard",

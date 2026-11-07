@@ -11,6 +11,8 @@
     if (def.easy && o.hpPct) o.hpPct = Math.min(o.hpPct, 80);
     E.newGame(o); UI.mode = 'game'; UI.sel = -1; UI.render();
   }
+  UI.campStart = start;
+  document.addEventListener('click', function (e) { var b = e.target && e.target.closest && e.target.closest('.gxc-score'); if (b) b.setAttribute('data-opened', String(Date.now())); }, true);
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
     game: 'emberclimb', artBase: 'media/', data: window.CAMPAIGN,
@@ -18,8 +20,10 @@
     isWon: function (G) { return !!G.won; },
     metrics: function (G) { return { won: !!G.won, hpPct: pct(G), gold: G.gold }; },
     headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Guide'; b.setAttribute('aria-label', 'Replay the guide'); b.addEventListener('click', function () { UI.camp = { setup: { tutorial: 1 }, id: 'guide' }; UI.tutStart(); }); return [b]; },
+    portrait: function (who, size) { if (!window.EC_A) return null; var e = EC_A('cast-' + who, '', { kind: 'portrait', ph: who === 'rival' ? '#5a4a3a' : '#a8431f' }); e.style.width = e.style.height = (size || 64) + 'px'; e.style.borderRadius = '50%'; e.style.backgroundSize = 'cover'; return e; },
     onExit: exitCamp,
     scores: function (G) { return [G.floor || 0]; },
     seats: function () { return [{ name: 'You', me: true }]; }
   });
+  var open0 = GXC.open; GXC.open = function () { try { var sk = document.querySelector('[data-gxt-skip]'); if (sk) sk.click(); } catch (e) { } return open0.apply(this, arguments); };   // opening Story while a guide runs ends the guide
 })();
