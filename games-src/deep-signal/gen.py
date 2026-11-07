@@ -2,6 +2,7 @@
 """Single source for Deep Signal's data: missions.json (+ titles and logs) -> campaign.json, missions-full.json, assets.json, Flow prompt files,
 music cues, ASSET-CHECK.md and ASSETS.md.   python3 games-src/deep-signal/gen.py"""
 import json, os, pathlib, collections
+OUTROS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "story.json"), encoding="utf-8"))   # one story line per mission (W369)
 D = pathlib.Path(__file__).resolve().parent; SP = D.parent; SLUG = 'deep-signal'
 M = json.load(open(D / 'missions.json'))
 TITLES = ["First Dive", "Two Lights", "In Order", "Three Echoes", "The Fever Watch", "Steady Hands", "Last Word", "Count Down", "The Faint Ping", "Four Lanterns",
@@ -67,7 +68,7 @@ for m in full:
     lines = [{'who': 'cap', 'text': m['log'][:110]}]
     if m['rule']: lines.append({'who': 'kito', 'text': m['rule'][:110]})
     ch = {'id': 'm%d' % n, 'act': act, 'title': 'Mission %d: %s' % (n, m['title']), 'boss': boss, 'intro': lines,
-          'outro': [{'who': 'cap', 'text': ['Logged. On to the next dive.', 'Clean work, crew.', 'The signal grows stronger.'][n % 3]}],
+          'outro': [{'who': 'cap', 'text': OUTROS[n - 1]}],
           'opponent': op, 'setup': {'players': 4, 'mission': n, 'seed': None},
           'twist': ({'id': m['sp'].split('-')[0], 'param': None, 'text': m['rule']} if m['sp'] else None),
           'goal': {'type': 'mission', 'value': n, 'text': goal + (' ' + m['rule'] if m['rule'] else '')},

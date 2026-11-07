@@ -134,7 +134,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "First beacon home. The Lanternfish's lamps catch something below: a pulse, steady as a heartbeat."
     }
    ],
    "opponent": {
@@ -206,7 +206,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "Two lights recovered. Ines logs the pulse: it repeats every forty seconds, from deeper than our charts go."
     }
    ],
    "opponent": {
@@ -278,7 +278,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "Kito swears the pulse changed pitch when we surfaced the last beacon. Bram says it's the hull creaking."
     }
    ],
    "opponent": {
@@ -350,7 +350,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "The old survey map ends here. Past this ridge the seabed is just a blank page marked 'unsounded'."
     }
    ],
    "opponent": {
@@ -426,7 +426,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "We dropped a marker buoy on the ridge. Whatever sends that pulse, we'll find our way back to it."
     }
    ],
    "opponent": {
@@ -506,7 +506,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "A dead research probe drifts past, its lamp still blinking. Its last log mentions the same pulse."
     }
    ],
    "opponent": {
@@ -578,7 +578,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Odile cracked the probe's memory: three more beacons were lost along this trench. We'll recover them."
     }
    ],
    "opponent": {
@@ -650,7 +650,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "The pulse is clearer now. Ines thinks it is not a signal at all, but an answer."
     }
    ],
    "opponent": {
@@ -726,7 +726,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "Strange lights in the dark: a field of glowing jellies parts around our hull and closes behind us."
     }
    ],
    "opponent": {
@@ -806,7 +806,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Ten dives logged. The crew is fast now; nobody wastes a signal. The trench mouth opens below."
     }
    ],
    "opponent": {
@@ -882,7 +882,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "Cold water floods the outer lockers. Bram fixes it with tape and stubbornness. We dive on."
     }
    ],
    "opponent": {
@@ -962,7 +962,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "The beacons down here are older, crusted with coral. Someone placed them long before us."
     }
    ],
    "opponent": {
@@ -1038,7 +1038,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "A second pulse joins the first, out of step. Kito calls it a duet. Ines calls it a warning."
     }
    ],
    "opponent": {
@@ -1122,7 +1122,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "Sonar paints a wall ahead, a ridge of black stone carved too straight to be natural."
     }
    ],
    "opponent": {
@@ -1202,7 +1202,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "We found a gate in the wall, shut tight. Something large circles on the other side."
     }
    ],
    "opponent": {
@@ -1278,7 +1278,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "The Warden of the Trench blocks the gate. Every sonar ping we send comes back louder."
     }
    ],
    "opponent": {
@@ -1370,7 +1370,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "Past the Warden, the water is warm. Act two: the hidden basin, and whatever built that gate."
     }
    ],
    "opponent": {
@@ -1454,7 +1454,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "Bioluminescent reefs line the basin floor like city streets. The pulse leads straight down them."
     }
    ],
    "opponent": {
@@ -1534,7 +1534,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "We recovered a beacon shaped like a shell. Odile hums along with its tone without noticing."
     }
    ],
    "opponent": {
@@ -1610,7 +1610,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "The basin has currents that run in circles. Twice we nearly lost the drone. Twice we got it back."
     }
    ],
    "opponent": {
@@ -1690,7 +1690,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "Ines found carvings near a beacon: the same task marks we use, one to five, in someone else's hand."
     }
    ],
    "opponent": {
@@ -1766,7 +1766,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Our lamps flicker every time the pulse peaks. Bram reroutes power. Nobody likes the silence after."
     }
    ],
    "opponent": {
@@ -1846,7 +1846,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "The relay buoy is jammed. For a while we dive with no word from the surface. We trust each other."
     }
    ],
    "opponent": {
@@ -1922,7 +1922,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "Halfway through the basin. Kito marks the map: twenty-three beacons home, none lost on the way."
     }
    ],
    "opponent": {
@@ -2006,7 +2006,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "A swarm of tiny lights follows the Lanternfish, copying our signals back to us, a beat late."
     }
    ],
    "opponent": {
@@ -2090,7 +2090,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "The swarm learns fast. It mimics our pings well enough to fool the drone. Signals must be sure now."
     }
    ],
    "opponent": {
@@ -2170,7 +2170,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "Odile names the swarm 'the Choir'. Ines asks her not to name things that might want to eat us."
     }
    ],
    "opponent": {
@@ -2246,7 +2246,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Below the reefs, a dead zone: our sonar shows nothing at all. We dive by memory and order marks."
     }
    ],
    "opponent": {
@@ -2326,7 +2326,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "We came out of the dead zone with every task done. Bram says that's the best crew he's served with."
     }
    ],
    "opponent": {
@@ -2402,7 +2402,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "The Choir has gathered at a narrow pass, thousands strong, humming the pulse back at the deep."
     }
    ],
    "opponent": {
@@ -2482,7 +2482,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Ines thinks the Choir guards the way down. Kito thinks it is waiting to see if we are worthy."
     }
    ],
    "opponent": {
@@ -2558,7 +2558,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "One more beacon before the pass. The pulse is so strong now we feel it in our teeth."
     }
    ],
    "opponent": {
@@ -2642,7 +2642,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "The Gatekeeper Swarm closes the pass. Every card must land exactly; one mistake and it swallows the light."
     }
    ],
    "opponent": {
@@ -2730,7 +2730,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "The Swarm parted. Act three: the abyss, where the pulse begins."
     }
    ],
    "opponent": {
@@ -2802,7 +2802,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "No reefs here, no swarm, only black water and the slow climb of the depth gauge."
     }
    ],
    "opponent": {
@@ -2878,7 +2878,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "A beacon older than any we've found, its tone low and patient. Ines records it twice to be sure."
     }
    ],
    "opponent": {
@@ -2962,7 +2962,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Pressure alarms sing for an hour. Bram keeps them company with bad jokes. We hold together."
     }
    ],
    "opponent": {
@@ -3042,7 +3042,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "The pulse slows down when we work as one crew. Kito noticed first. Now we all feel it."
     }
    ],
    "opponent": {
@@ -3118,7 +3118,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "We pass a field of wrecked submarines, none of them ours, none of them human-made."
     }
    ],
    "opponent": {
@@ -3202,7 +3202,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Odile reads the wrecks: each one turned back at the same depth. We keep going."
     }
    ],
    "opponent": {
@@ -3286,7 +3286,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "Silence again: no signals allowed in this stretch of the abyss. We plan with our eyes."
     }
    ],
    "opponent": {
@@ -3366,7 +3366,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "The drone's lamp died for a minute. When it came back it was glowing the pulse's colour."
     }
    ],
    "opponent": {
@@ -3438,7 +3438,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Forty-three dives. The beacons form a trail, and the trail forms a word nobody can read yet."
     }
    ],
    "opponent": {
@@ -3514,7 +3514,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "Ines finally reads it. It is not a word. It is our crew's own signal pattern, played back."
     }
    ],
    "opponent": {
@@ -3594,7 +3594,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "The deep is listening, and it has been learning from us since the first dive."
     }
    ],
    "opponent": {
@@ -3670,7 +3670,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "A great dark shape below, bigger than the Lanternfish, unmoving, glowing in time with the pulse."
     }
    ],
    "opponent": {
@@ -3750,7 +3750,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "We sent a sonar ping. The shape answered with one of its own. A greeting, or a test."
     }
    ],
    "opponent": {
@@ -3826,7 +3826,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Logged. On to the next dive."
+     "text": "The last beacons ring the shape like a crown. Every sonar must win its trick now."
     }
    ],
    "opponent": {
@@ -3910,7 +3910,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "Clean work, crew."
+     "text": "Final approach. Every crew mate has a job, and every job comes in order."
     }
    ],
    "opponent": {
@@ -3994,7 +3994,7 @@
    "outro": [
     {
      "who": "cap",
-     "text": "The signal grows stronger."
+     "text": "The Source falls silent, then answers in our pattern. Contact made. The Lanternfish crew goes home as legends."
     }
    ],
    "opponent": {

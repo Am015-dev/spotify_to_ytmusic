@@ -8,7 +8,8 @@ if (UI.fast) AIDELAY = 60;
 var $ = function (s) { return document.querySelector(s); };
 function mk(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 function ls(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-function nm(p) { return p === G.dummy ? 'Drone' : UI.hot && isHuman(p) ? 'Diver ' + (p + 1) : NAMES[p]; }
+function hname(p) { var n = (ls('ds-names') || [])[p]; return n && String(n).trim() ? String(n).trim().slice(0, 12) : 'Diver ' + (p + 1); }
+function nm(p) { return p === G.dummy ? 'Drone' : UI.hot && isHuman(p) ? hname(p) : NAMES[p]; }
 function askPending() { return !!G && G.phase === 'play' && !G.tricks.length && !G.trick.length && canFlare(G) && !UI.flareAsked && !UI.tut && !UI.flareMode; }
 function suitWord(l) { return SUIT_NAME[suitOf(l + '1')]; }
 function isHuman(s) { return UI.humans.indexOf(s) >= 0; }
@@ -48,7 +49,7 @@ function startGame(o) {
   UI.players = o.players || UI.players; UI.mission = o.mission || UI.mission;
   var nh = Math.max(1, Math.min(o.humans || 1, UI.players)); UI.humans = []; for (var hh = 0; hh < nh; hh++) UI.humans.push(hh); UI.hot = nh > 1; ME = 0; $('#pass').classList.remove('on');
   AIX.seed((o.seed || Date.now()) & 0xffff);
-  G = newGame({ players: UI.players, mission: UI.mission, seed: o.seed, deal: o.deal, taskCards: o.taskCards, names: UI.hot ? [0, 1, 2, 3, 4].map(function (i) { return isHuman(i) ? 'Diver ' + (i + 1) : NAMES[i]; }) : null });
+  G = newGame({ players: UI.players, mission: UI.mission, seed: o.seed, deal: o.deal, taskCards: o.taskCards, names: UI.hot ? [0, 1, 2, 3, 4].map(function (i) { return isHuman(i) ? hname(i) : NAMES[i]; }) : null });
   ['title', 'setup', 'res'].forEach(function (id) { $('#' + id).classList.remove('on'); }); closeZoom();
   var st = $('#stamp'); st.className = ''; st.innerHTML = '';
   $('#mname').textContent = 'Mission ' + G.mission.n + ': ' + (G.mission.title || '');
@@ -157,7 +158,7 @@ function render(anim) {
     var e = mk('div', 'seat'); e.id = 'seat' + p; e.style.left = (W * (i + .5) / k) + 'px'; e.style.setProperty('--sw', sw + 'px');
     if ((G.phase === 'play' && G.turn === p) || (G.phase === 'draft' && G.draftTurn === p) || (G.phase === 'ask' && askWho(G) === p)) e.classList.add('turn');
     if (targets.indexOf(p) >= 0) e.classList.add('pick');
-    var av = mk('div', 'av', p === G.dummy ? '🤖' : UI.hot && isHuman(p) ? String(p + 1) : NAMES[p][0]); av.style.background = SEATCOL[p]; av.setAttribute('data-art', p === G.dummy ? 'portrait-drone' : 'portrait-' + NAMES[p].toLowerCase()); e.appendChild(av);
+    var av = mk('div', 'av', p === G.dummy ? '🤖' : UI.hot && isHuman(p) ? hname(p)[0].toUpperCase() : NAMES[p][0]); av.style.background = SEATCOL[p]; av.setAttribute('data-art', p === G.dummy ? 'portrait-drone' : 'portrait-' + NAMES[p].toLowerCase()); e.appendChild(av);
     e.appendChild(mk('div', 'nm', nm(p)));
     e.appendChild(mk('div', 'st', (p === G.dummy ? '' : '<span class="bk" data-art="card-back"></span>' + G.hands[p].length + ' ') + '<span class="tw">won</span> ' + G.won[p]));
     if (G.cmd === p) { var cp = mk('span', 'cap', 'Captain'); cp.setAttribute('data-art', 'token-captain'); e.appendChild(cp); }
@@ -296,9 +297,13 @@ function endMission() {
   if (ok) { var lb = ls('ds-log') || {}; lb[G.mission.n] = 1; ls('ds-log', lb); }
   later(function () {
     if (UI.mode === 'tut') { try { GXT.act({ type: 'event', what: 'done' }); } catch (e) { } return; }
-    if (UI.mode === 'campaign' && window.GXC && GXC.active()) { GXC.finish(G); return; }
+    if (UI.mode === 'campaign' && window.GXC && GXC.active()) { var why = !G.result.ok && G.result.why; GXC.finish(G); if (why) whyOnResult(why, 0); return; }
     showResult();
   }, UI.fast ? 80 : 1900);
+}
+function whyOnResult(why, n) {   // the Story result card says why the mission failed (the shared card has no reason line)
+  var h = document.querySelector('.gxc-res h2'); if (h && !document.querySelector('.gxc-res .ds-why')) { var p = mk('p', 'ds-why', why + '.'); h.insertAdjacentElement('afterend', p); return; }
+  if (n < 40) setTimeout(function () { whyOnResult(why, n + 1); }, 100);
 }
 function showResult() {
   var ok = G.result.ok; var rs = $('#res'); rs.classList.remove('hasart'); rs.style.backgroundImage = ''; rs.setAttribute('data-art', ok ? 'result-complete' : 'result-lost'); artApply();
@@ -322,6 +327,8 @@ function showSetup() {
   var sg = $('#segP'); sg.innerHTML = ''; [2, 3, 4, 5].forEach(function (n) { var b = mk('button', n === UI.players ? 'on' : '', String(n)); b.setAttribute('aria-label', n + ' crew'); b.onclick = function () { UI.players = n; ls('ds-pl', n); showSetup(); }; sg.appendChild(b); });
   UI.nh = Math.min(UI.nh || 1, UI.players);
   var sh = $('#segH'); sh.innerHTML = ''; for (var hn = 1; hn <= UI.players; hn++) (function (hn) { var b = mk('button', hn === UI.nh ? 'on' : '', String(hn)); b.setAttribute('aria-label', hn + ' at this device'); b.onclick = function () { UI.nh = hn; showSetup(); }; sh.appendChild(b); })(hn);
+  var nr = $('#nameRow'); if (!nr) { nr = mk('div', 'setrow'); nr.id = 'nameRow'; $('#segH').parentNode.insertAdjacentElement('afterend', nr); } nr.innerHTML = ''; nr.style.display = UI.nh > 1 ? '' : 'none';
+  if (UI.nh > 1) { nr.appendChild(mk('label', null, 'Names')); var nl = ls('ds-names') || []; for (var q = 0; q < UI.nh; q++) (function (q) { var inp = mk('input', 'nmin'); inp.type = 'text'; inp.maxLength = 12; inp.placeholder = 'Diver ' + (q + 1); inp.value = nl[q] || ''; inp.setAttribute('aria-label', 'Name of diver ' + (q + 1)); inp.oninput = function () { var a = ls('ds-names') || []; a[q] = inp.value; ls('ds-names', a); }; nr.appendChild(inp); })(q); }
   var sl = $('#segL'); sl.innerHTML = ''; [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']].forEach(function (x) { var b = mk('button', x[0] === UI.qlevel ? 'on' : '', x[1]); b.onclick = function () { UI.qlevel = x[0]; ls('ds-lv', x[0]); showSetup(); }; sl.appendChild(b); });
   var m = DS_MISSIONS[UI.mission - 1]; $('#mNum').textContent = UI.mission; $('#mdesc').textContent = m.title + ': ' + m.log + (m.rule ? ' ' + m.rule : '') + (UI.players === 2 ? ' (2 crew: a drone plays face-up cards.)' : '');
   var lb = ls('ds-log') || {}, L = $('#logbook'); L.innerHTML = ''; for (var i = 1; i <= 50; i++) { var s = mk('span', lb[i] ? 'ok' : '', String(i)); L.appendChild(s); }
