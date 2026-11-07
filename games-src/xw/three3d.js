@@ -83,7 +83,7 @@ function flareTex(){if(V3.ft)return V3.ft;V3.ft=canvasTex(128,128,(x,w,h)=>{x.tr
 function puffTex(){if(V3.pt)return V3.pt;const S=128;V3.pt=canvasTex(S,S,(x)=>{const img=x.createImageData(S,S);for(let j=0;j<S;j++)for(let i=0;i<S;i++){const dx=i/S-.5,dy=j/S-.5,r=Math.hypot(dx,dy)*2;const n=fbm3(i/18,j/18,3.3,4);const a=Math.max(0,1-r*(1.05-.5*n))*Math.min(1,(1-r)*3);const k=(j*S+i)*4;const v=180+75*n;img.data[k]=img.data[k+1]=img.data[k+2]=v;img.data[k+3]=Math.max(0,Math.min(255,a*a*255))}x.putImageData(img,0,0)});return V3.pt}
 // ---- image-based lighting: a small "space studio" (nebula-tinted gradient, a warm key softbox, magenta and cyan panels) through PMREM ----
 function makeEnv(){const r=V3.r;const es=new THREE.Scene();
-  es.add(new THREE.Mesh(new THREE.SphereGeometry(50,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader:'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  es.add(new THREE.Mesh(new THREE.SphereGeometry(50,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,opacity:.4/* env bake only, never drawn on screen; opacity unused */,depthWrite:false,vertexShader:'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader:'varying vec3 vP;void main(){float y=vP.y;vec3 top=vec3(.06,.07,.2),hor=vec3(.35,.14,.34),gnd=vec3(.03,.02,.06);vec3 c=y>0.?mix(hor,top,smoothstep(0.,.7,y)):mix(hor,gnd,smoothstep(0.,-.4,y));c+=vec3(.9,.3,.5)*pow(max(0.,dot(vP,normalize(vec3(1.,.1,-.5)))),6.)*.8;c+=vec3(.2,.5,1.)*pow(max(0.,dot(vP,normalize(vec3(-.7,.2,-.8)))),6.)*.7;gl_FragColor=vec4(c,1.);}'})));
   const panel=(col,i,w,h,pos)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(col).multiplyScalar(i),side:THREE.DoubleSide}));m.position.copy(pos);m.lookAt(0,0,0);es.add(m)};
   panel(0xfff0dc,9,22,14,new THREE.Vector3(-8,30,24));panel(0xff4f9a,3.5,10,26,new THREE.Vector3(30,8,-18));panel(0x40b8ff,3,10,22,new THREE.Vector3(-26,6,-20));panel(0xffffff,1.6,40,5,new THREE.Vector3(0,36,-4));
@@ -134,7 +134,7 @@ function buildSky(){const sc=V3.scene,C=new THREE.Vector3(45.7,0,45.7);
     gl_FragColor=vec4(c*.9,1.);}`,1024,512);
   const planet=V3.planet=new THREE.Mesh(new THREE.SphereGeometry(760,96,64),new THREE.MeshStandardMaterial({map:pl,roughness:.85,metalness:0,envMapIntensity:0}));
   planet.position.set(-900,-980,-1500);planet.rotation.set(.35,.4,.25);planet.renderOrder=-7;sc.add(planet);
-  const atm=new THREE.Mesh(new THREE.SphereGeometry(800,96,64),new THREE.ShaderMaterial({uniforms:{L:{value:V3.key.position.clone().sub(V3.key.target.position).normalize()},col:{value:new THREE.Color(.35,.75,1.)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.FrontSide,
+  const atm=new THREE.Mesh(new THREE.SphereGeometry(800,96,64),new THREE.ShaderMaterial({uniforms:{L:{value:V3.key.position.clone().sub(V3.key.target.position).normalize()},col:{value:new THREE.Color(.35,.75,1.)}},transparent:true,opacity:.4,/* translucent glow shell: not a textured body */depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.FrontSide,
     vertexShader:'varying vec3 vN,vV;void main(){vec4 w=modelMatrix*vec4(position,1.);vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}',
     fragmentShader:'uniform vec3 L,col;varying vec3 vN,vV;void main(){float f=1.-max(0.,dot(vN,vV));float lit=smoothstep(-.35,.6,dot(vN,L));float a=pow(f,2.6)*lit*1.8+pow(f,6.)*.25;gl_FragColor=vec4(col*a,1.);\n#include <colorspace_fragment>\n}'}));
   V3.atm=atm;atm.position.copy(planet.position);atm.renderOrder=-6;sc.add(atm);
@@ -142,7 +142,7 @@ function buildSky(){const sc=V3.scene,C=new THREE.Vector3(45.7,0,45.7);
   const moon=V3.moon=new THREE.Mesh(new THREE.SphereGeometry(60,48,32),new THREE.MeshStandardMaterial({map:mt,roughness:.95,metalness:0,envMapIntensity:0}));moon.position.set(1250,-420,-1500);moon.renderOrder=-7;sc.add(moon)}
 // ---- the play mat: a dark glass plate with a holographic range grid, deployment bands, ruler ticks, a glowing frame and corner emitters ----
 function playMat(){const g=new THREE.Group();const M=91.4;
-  const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x04050c,roughness:.55,metalness:0,transparent:true,opacity:.86,envMapIntensity:.12}));
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x2f374d,roughness:.55,metalness:0,transparent:true,opacity:.86,envMapIntensity:.12}));
   plate.position.set(M/2,-.32,M/2);V3.plate=plate;plate.renderOrder=-3;plate.receiveShadow=true;g.add(plate);
   const grid=V3.gridMat=new THREE.ShaderMaterial({uniforms:{t:{value:0},c0:{value:new THREE.Color(0xff8a3a)},c1:{value:new THREE.Color(0xff3050)},cg:{value:new THREE.Color(0x5fb8ff)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     vertexShader:'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
@@ -165,8 +165,8 @@ function playMat(){const g=new THREE.Group();const M=91.4;
   // PlaneGeometry is centred: shift its positions so vP runs 0..M along x and 0..M from the far edge (board y = MAT - z)
   gp.geometry.translate(M/2,M/2,0);gp.position.set(0,.015,M);gp.renderOrder=-1;g.add(gp);
   // glowing frame bars and corner emitters
-  const fm=new THREE.MeshStandardMaterial({color:0x10131f,roughness:.3,metalness:.9,emissive:0x2f7fd0,emissiveIntensity:.9});
-  const cm=new THREE.MeshStandardMaterial({color:0x2a2418,roughness:.25,metalness:1,emissive:0xffb35a,emissiveIntensity:.6});
+  const fm=new THREE.MeshStandardMaterial({color:0x2c3550,roughness:.3,metalness:.9,emissive:0x2f7fd0,emissiveIntensity:.9});
+  const cm=new THREE.MeshStandardMaterial({color:0x4a3f2c,roughness:.25,metalness:1,emissive:0xffb35a,emissiveIntensity:.6});
   for(const [x,z,w,d] of [[M/2,-.6,M+1.2,.35],[M/2,M+.6,M+1.2,.35],[-.6,M/2,.35,M+1.2],[M+.6,M/2,.35,M+1.2]]){const b=new THREE.Mesh(new THREE.BoxGeometry(w,.35,d),fm);b.position.set(x,.05,z);g.add(b)}
   for(const [x,z] of [[0,0],[M,0],[0,M],[M,M]]){const e=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.4,.9,6),cm);e.position.set(x+(x?.6:-.6),.2,z+(z?.6:-.6));g.add(e);const l=glow(0xffc070,5,.55);l.position.set(e.position.x,1.1,e.position.z);g.add(l)}
   return g}
@@ -189,14 +189,14 @@ function hullMaps(){if(V3.hm)return V3.hm;const S=512,H=new Float32Array(S*S),A=
   const col=canvasTex(S,S,(x)=>{const img=x.createImageData(S,S);for(let i=0;i<S*S;i++){const v=Math.max(0,Math.min(1,A[i]))*255;img.data[i*4]=v;img.data[i*4+1]=v;img.data[i*4+2]=v*1.01;img.data[i*4+3]=255}x.putImageData(img,0,0)});
   const rough=grayTex(Rg,S,true),nor=normalFromHeight(H,S,5);[col,rough,nor].forEach(t=>{t.wrapS=t.wrapT=THREE.RepeatWrapping});V3.hm={col,rough,nor};return V3.hm}
 // faction material sets (cached): painted hull, secondary panels, faction trim paint, gunmetal, glass canopy, engine glow
-const FACCOL=[{hull:0xe6dccb,hull2:0x9c9486,trim:0xe8732a,eng:0xffa24f,glass:0x0b2a3a,base:'#f08a3a'},{hull:0x565e6e,hull2:0x2e3440,trim:0xc2203a,eng:0xff4f6a,glass:0x2a0608,base:'#e0304a'},{hull:0x8a7a52,hull2:0x4c4432,trim:0x3fc28a,eng:0x7dffb0,glass:0x08281a,base:'#39c27f'}];
+const FACCOL=[{hull:0xe6dccb,hull2:0x9c9486,trim:0xe8732a,eng:0xffa24f,glass:0x428cb3,base:'#f08a3a'},{hull:0x565e6e,hull2:0x2e3440,trim:0xc2203a,eng:0xff4f6a,glass:0x8c363b,base:'#e0304a'},{hull:0x8a7a52,hull2:0x4c4432,trim:0x3fc28a,eng:0x7dffb0,glass:0x3b8866,base:'#39c27f'}];
 function facMats(c){V3.fm=V3.fm||{};const k=c.hull+':'+c.trim;if(V3.fm[k])return V3.fm[k];const H=hullMaps();
   const paint=(color,o)=>new THREE.MeshStandardMaterial(Object.assign({color,map:H.col,roughnessMap:H.rough,normalMap:H.nor,normalScale:new THREE.Vector2(.6,.6),roughness:1,metalness:.25,envMapIntensity:1},o||{}));
   const M={hull:paint(c.hull),hull2:paint(c.hull2,{metalness:.45}),trim:paint(c.trim,{metalness:.15,roughness:.8}),
     metal:new THREE.MeshStandardMaterial({color:0x3a3d44,roughness:.32,metalness:.95,normalMap:H.nor,normalScale:new THREE.Vector2(.3,.3)}),
-    dark:new THREE.MeshStandardMaterial({color:0x15171c,roughness:.55,metalness:.6}),
+    dark:new THREE.MeshStandardMaterial({color:0x30343f,roughness:.55,metalness:.6}),
     glass:new THREE.MeshPhysicalMaterial({color:c.glass,roughness:.04,metalness:.2,clearcoat:1,clearcoatRoughness:.02,emissive:c.glass,emissiveIntensity:.35,envMapIntensity:2.2}),
-    nozzle:new THREE.MeshStandardMaterial({color:0x2a2622,roughness:.35,metalness:1}),
+    nozzle:new THREE.MeshStandardMaterial({color:0x4a443c,roughness:.35,metalness:1}),
     hot:new THREE.MeshBasicMaterial({color:new THREE.Color(c.eng).multiplyScalar(2.2)}),
     lamp:new THREE.MeshBasicMaterial({color:new THREE.Color(c.eng).multiplyScalar(2.5)}),
     white:new THREE.MeshBasicMaterial({color:new THREE.Color(1,1,1).multiplyScalar(2.2)})};
@@ -351,7 +351,7 @@ function bombMesh(t){const g=new THREE.Group();const mine=t.k==='mine';const H=h
   const l=glow(mine?0x66ccff:0xff7733,3.2,.8);l.position.y=1.9;g.add(l);g.userData.lamp=l;g.position.copy(W(t.x,t.y));g.userData.bomb=t.id;return g}
 function shipMesh(s){const g=new THREE.Group();const b=S3(B(s));const fc=FACCOL[FACTIONS[G.fac[s.side]].col];
   const blob=new THREE.Mesh(new THREE.PlaneGeometry(b*1.7,b*1.7),new THREE.MeshBasicMaterial({map:blobTex(),transparent:true,depthWrite:false,opacity:.8}));blob.rotation.x=-PI/2;blob.position.y=.02;g.add(blob);
-  const plastic=new THREE.MeshPhysicalMaterial({color:0x0b0c10,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15});
+  const plastic=new THREE.MeshPhysicalMaterial({color:0x30323c,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15});
   const base=new THREE.Mesh(baseGeo(b),plastic);base.castShadow=true;base.receiveShadow=true;g.add(base);
   const tok=new THREE.Mesh(new THREE.PlaneGeometry(b-.5,b-.5),new THREE.MeshStandardMaterial({map:tokenTex(s),roughness:.55,metalness:0}));tok.rotation.x=-PI/2;tok.rotation.z=0;tok.position.y=.53;tok.receiveShadow=true;g.add(tok);
   const rimC=new THREE.Color(fc.eng);const rim=new THREE.Mesh(new THREE.PlaneGeometry(b*1.45,b*1.45),new THREE.MeshBasicMaterial({map:ringTex(),color:rimC.clone().multiplyScalar(1.2),transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));rim.rotation.x=-PI/2;rim.position.y=.06;g.add(rim);
@@ -650,7 +650,7 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
 // on rock textures and shader compilation (about a second on slow GPUs). No game state is touched.
 function warm3D(){if(G||!V3.on||!V3.r)return;const g=new THREE.Group();
   try{const box=new THREE.BoxGeometry(1,1,1);const mk=m=>{const o=new THREE.Mesh(box,m);o.castShadow=true;o.receiveShadow=true;g.add(o);return o};
-    mk(new THREE.MeshPhysicalMaterial({color:0x0b0c10,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15}));
+    mk(new THREE.MeshPhysicalMaterial({color:0x30323c,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15}));
     mk(new THREE.MeshPhysicalMaterial({color:0xcfe6ff,roughness:.05,metalness:0,transparent:true,opacity:.28,clearcoat:1,envMapIntensity:2,depthWrite:false}));
     mk(new THREE.MeshStandardMaterial({map:ringTex(),roughness:.55,metalness:0}));
     mk(new THREE.MeshBasicMaterial({map:blobTex(),transparent:true,depthWrite:false,opacity:.8}));
