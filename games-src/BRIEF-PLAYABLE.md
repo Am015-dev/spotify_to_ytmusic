@@ -30,3 +30,11 @@ Owner: "All games require a narrative to make them interesting, even the tutoria
 - Story mode: every chapter has an intro scene (portrait + 2-3 lines: who, what is at stake, the twist rule) and an outro (win and loss variants) that leads into the next chapter; bosses talk before and after. Quick game: a one-line flavour intro and a result line in the game's voice.
 - Write the cast and the story arc (3 acts) in games-src/<DIR>/STORY.md; keep all text in one data file so it can be edited. Original names only, never the original game's characters or setting names.
 - Add the story beats to TUTORIAL-COVERAGE.md next to the rule each one teaches. The tutorial-to-end script must still pass.
+
+## ADDENDUM 4 (owner, 22:05 UTC): the tutorial must be a GAME, not tap-tap
+Owner on Wildmark: "The tutorial is not a game, it's tap tap, very bad. The game itself is better, but not all rules are covered." Forced spotlight steps ("tap here, now here") are rejected. Replace them with a COACHED FIRST GAME:
+- The player plays a real game with real free choices from turn 1 (all legal moves allowed); a stacked deck/seed only makes sure the needed situations come up.
+- The guide character speaks just-in-time: when a rule first matters ("You took a bear: bears score in pairs, put it next to the other one"), when the player makes a good/poor move (one line why), and when the rival does something worth learning. Never more than one bubble at a time; it never blocks input; it can be dismissed.
+- Spotlight/forced taps only for the very first action (max 2 forced steps), then free play.
+- Every rule in TUTORIAL-COVERAGE.md is explained the first time it becomes relevant during that game; rules that did not come up are explained in a short "Things you'll meet later" card at the end. The final scoring is walked through rule by rule with the player's real numbers.
+- The tutorial-to-end script plays the coached game by choosing legal moves through the UI (any legal move, not a scripted tap list) and asserts every coverage rule was explained.
