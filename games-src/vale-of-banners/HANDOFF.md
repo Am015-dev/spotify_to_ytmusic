@@ -21,12 +21,12 @@ Branch `shelf/W350-vale-of-banners` (not deployed). Slug `vale-of-banners`, fold
 ## AI (headless, `node gauntlet.js N A B [players]`)
 | match | games | win % | avg score |
 |---|---|---|---|
-| hard vs first-legal bot | 100 | 100% | 159 vs 26 |
-| normal vs first-legal bot | 100 | 100% | 135 vs 28 |
+| hard vs first-legal bot | 100 | 100% | 151 vs 25 (after the rulebook fixes; 159 vs 26 before) |
+| normal vs first-legal bot | 100 | 100% | 126 vs 23 (135 vs 28 before) |
 | easy vs first-legal bot | 100 | 100% | 105 vs 30 |
 | hard vs normal | 24 (40 earlier) | 88% (85%) | 154 vs 133 |
 | normal vs first, 4 players | 40 | 100% | 149 vs 39 |
-Spending: hard ends with 3.6 silver / 2.8 workers, normal 6.8 / 5.9 (both count as points at the end; normal still keeps a few workers).
+Spending (after fixes): hard ends with 3.8 silver / 3.0 workers, normal 7.9 / 7.2 (both count as points at the end; normal still keeps a few workers).
 
 ## Tests (all pass)
 - `node rules-test.js`: 28 checks (one per tricky rule) + 300 AI games over 2-4 players: 300/300 finished, 0 stuck, 0 invariant breaks.
