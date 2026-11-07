@@ -59,7 +59,7 @@ function showKeep(s) { hideHelp();
   var K = UI.keep;
   function draw() {
     var n = K.birds.length + K.food.length;
-    var h = '<h2>' + (humans().length > 1 ? esc(p.name) + ': your' : 'Your') + ' starting hand</h2><p>Keep 5 things in total: birds and food. We picked a good start; tap to change it.</p>' +
+    var h = '<h2>' + (humans().length > 1 ? esc(p.name) + ': your' : 'Your') + ' starting hand</h2>' + (UI.camp && UI.camp.goal ? '<p class="goalline"><b>Chapter goal:</b> ' + esc(UI.camp.goal.text) + '</p>' : '') + '<p>Keep 5 things in total: birds and food. We picked a good start; tap to change it.</p>' +
       '<div class="keepgrid">' + off.birds.map(function (id, i) { return cardHTML(id, 'hand', null, 'data-kb="' + i + '" role="button" tabindex="0"').replace('class="bc ', 'class="bc ' + (K.birds.indexOf(i) >= 0 ? 'on ' : 'off ')); }).join('') + '</div>' +
       '<div class="keepgrid">' + PP.FOODS.map(function (f) { return '<button type="button" class="fbtn ' + (K.food.indexOf(f) >= 0 ? 'on' : 'off') + '" data-kf="' + f + '" aria-label="keep ' + f + '">' + foodIcon(f) + '</button>'; }).join('') + '</div>' +
       '<p><b>' + K.birds.length + ' bird' + (K.birds.length === 1 ? '' : 's') + ' + ' + K.food.length + ' food = ' + n + '</b>' + (n === 5 ? ' ✓' : ' (need 5)') + '</p>' +
@@ -81,9 +81,17 @@ function gameOver() { hideHelp();
   if (UI.mode === 'tutorial') return;
   var me = humans()[0] || 0, sc = G.final, win = G.winner, winners = Array.isArray(win) ? win : [win];
   try { if (window.GNS && UI.mode !== 'tutorial') GNS.result({ game: 'perch-and-plume', mode: UI.camp ? 'campaign' : UI.mode, level: (G.pl.find(function (p) { return p.kind !== 'human'; }) || {}).lvl, seats: G.pl.map(function (p, i) { return { name: p.name, me: i === me, ai: p.kind !== 'human' ? p.lvl : undefined }; }), winner: Array.isArray(win) ? win : win, scores: sc.map(function (s) { return s.total; }), turns: G.turn, ms: Date.now() - UI.started }); } catch (e) { }
-  var el = $('#result'), order = sc.map(function (s, i) { return i; }).sort(function (a, b) { return sc[b].total - sc[a].total; });
+  var gwin, el = $('#result'), order = sc.map(function (s, i) { return i; }).sort(function (a, b) { return sc[b].total - sc[a].total; });
   var line = winners.length > 1 ? 'A tie at the top!' : isHuman(winners[0]) ? (humans().length > 1 ? G.pl[winners[0]].name + ' wins the year!' : 'You win the year!') : G.pl[winners[0]].name + ' wins the year.';
-  var h = artHTML('bg-result', 'bgart', '') + '<h2>' + esc(line) + '</h2><table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Food</th><th>Tucked</th><th>Total</th></tr>' +
+  var goalHTML = '';
+  if (UI.camp && UI.camp.goal) {   // story: say plainly whether the chapter goal was met, with the count, and what the stars need
+    var gr = campGoalLive(G, UI.camp), gm = campMetrics(G), gwin = campIsWon(G, UI.camp);
+    var sl = (UI.camp.stars || []).map(function (st, i) { var ok = i === 0 ? gwin : (gwin && GXC.testStar(st.test, gm)); return '<li class="' + (ok ? 'on' : '') + '"><i>\u2605</i> ' + esc(st.text) + '</li>'; }).join('');
+    goalHTML = '<div class="goalres ' + (gwin ? 'met' : 'miss') + '"><b>' + (gwin ? 'Chapter goal met!' : 'Chapter goal missed') + '</b><span>' + esc(UI.camp.goal.text) + (gr.need != null ? ' You had ' + gr.cur + '.' : '') + '</span>' +
+      (gwin ? '' : '<span>' + (win === 0 || winners.indexOf(me) >= 0 ? 'You won the year, but this chapter is only cleared when its goal is met. Try again!' : 'Try again: the goal is shown at the top of the board.') + '</span>') +
+      '<ul class="goalstars">' + sl + '</ul>' + (gwin ? '' : '<small>Stars are earned once the goal is met.</small>') + '</div>';
+  }
+  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Food</th><th>Tucked</th><th>Total</th></tr>' +
     order.map(function (i) { var s = sc[i]; return '<tr class="' + (winners.indexOf(i) >= 0 ? 'win' : '') + '"><td>' + esc(G.pl[i].name) + '</td><td>' + s.birds + '</td><td>' + s.bonus + '</td><td>' + s.goals + '</td><td>' + s.eggs + '</td><td>' + s.cache + '</td><td>' + s.tuck + (s.lead ? '+' + s.lead : '') + '</td><td><b data-engine="G.final[' + i + '].total">' + s.total + '</b></td></tr>'; }).join('') + '</table>';
   h += '<p>Birds = card points. Food = food cached on birds. Ties go to the most food left over.</p><div class="tmenu">' +
     (UI.camp ? '<button type="button" class="btn big primary" id="again">Continue the story</button>' : '<button type="button" class="btn big primary" id="again">Play again</button><button type="button" class="btn" id="totitle">Title screen</button>') + '</div>';

@@ -150,7 +150,7 @@
   // why (<= 15 words) for the hint bulb
   function why(G, seat, m) {
     if (!m) return '';
-    if (m.t === 'play') return 'Play ' + B[m.id].n + ': ' + B[m.id].p + ' points' + (PP.power(m.id).col === 'brown' ? ' and a power that repeats.' : '.');
+    if (m.t === 'play') return 'Play ' + B[m.id].n + ': ' + B[m.id].p + (B[m.id].p === 1 ? ' point' : ' points') + (PP.power(m.id).col === 'brown' ? ' and a power that repeats.' : '.');
     if (m.t === 'act') return m.a === 'food' ? 'Gather food: your birds in hand need it.' : m.a === 'eggs' ? 'Lay eggs: each egg is a point.' : 'Draw cards: you need more birds to play.';
     if (m.t === 'die') return 'Take ' + m.f + ': a bird in your hand eats it.';
     if (m.t === 'egg') return 'This nest has room and helps your goals.';

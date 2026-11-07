@@ -50,9 +50,9 @@ function moveTarget(m) {
 function helpInit() {
   if (!window.GXH) return;
   try {
-    GXH.init({ game: 'perch-and-plume', defaultOn: true, avoid: '.glow,#acts .btn',
+    GXH.init({ game: 'perch-and-plume', defaultOn: true, avoid: '.glow,#acts .btn,#feeder,#tray',
       steps: {
-        act: { target: function () { return $('.ract[data-h="0"]'); }, title: 'One action a turn', text: 'One action a turn: use a habitat row, or play a bird from your hand.' },
+        act: { target: function () { return $('.ract[data-h="0"]'); }, title: 'One action a turn', text: 'Use a habitat row, or play a bird from your hand.' },
         play: { target: function () { return $('.slot.next.glow') || $('#mat'); }, title: 'Place your bird', text: 'A bird goes in the leftmost free space. Spaces further right cost eggs.' },
         die: { target: function () { return $('#feeder'); }, title: 'The birdfeeder', text: 'Each die is one food. An empty feeder rolls all five dice again.' },
         egg: { target: function () { return $('.bc[data-a="bird"].glow') || $('#mat'); }, title: 'Lay eggs', text: 'Each egg is a point. A bird holds only as many eggs as its nest shows.' },
@@ -79,7 +79,7 @@ function campStart(def) {
   (su.extra || []).forEach(function (x) { seats.push({ name: x.name, kind: 'ai', lvl: def.easy ? 'easy' : (x.lvl || op.aiLevel), face: x.face }); });
   UI.hints = def.hints !== false;
   startGame({ seats: seats, mode: 'campaign', camp: def, twist: def.twist || null, seed: su.seed == null ? undefined : su.seed });
-  toast('Goal: ' + def.goal.text + (def.twist ? ' ' + def.twist.text : ''), 4200);
+  if (def.twist) setTimeout(function () { if (G && G.phase !== 'over' && $('#setup').hidden) toast(def.twist.text, 3600); }, 1500);   // the goal itself lives in the live tracker and on the starting-hand screen
 }
 function campMetrics(g) {
   var me = g.final ? g.final[0] : PP.scoreOf(g, 0), best = 0; g.pl.forEach(function (p, i) { if (i) best = Math.max(best, (g.final ? g.final[i] : PP.scoreOf(g, i)).total); });
@@ -115,6 +115,7 @@ function boot() {
     { id: 'eighty', name: 'Teeming aviary', how: 'Score 80 or more.', test: function (r) { return r.score >= 80; } },
     { id: 'story', name: 'A year well spent', how: 'Win a story chapter.', test: function (r) { return r.won && r.mode === 'campaign'; } }]); } catch (e) { }
   if (window.GXS && GXS.on) { if (GXS.id === 'menu' && GXS.boardOpen) GXS.boardOpen(); return; }   // a ?scn= scenario builds its own state; the shelf's menu check opens panels over a running game, as in real play
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var pp = $('#pop'); if (pp && !pp.hidden) { pp.hidden = true; e.preventDefault(); } } });
   showTitle();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

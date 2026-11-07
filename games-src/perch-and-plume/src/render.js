@@ -16,7 +16,7 @@ function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodI
 function cardHTML(id, size, st, attrs) {
   var b = B[id], pw = PP.power(id), col = pw.col || 'none';
   var h = '<div class="bc ' + (size === 'slot' ? 'on-board' : '') + '" ' + (attrs || '') + ' aria-label="' + esc(b.n + ', ' + b.p + ' points') + '">';
-  h += '<div class="pic">' + artHTML('bird-' + id) + '<span class="vp">' + b.p + '</span></div><div class="pwbar ' + col + '"></div>';
+  h += '<div class="pic">' + artHTML('bird-' + id) + '<span class="hband">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + '</span><span class="vp">' + b.p + '</span></div><div class="pwbar ' + col + '"></div>';
   if (size === 'slot') {
     h += '<div class="meta">';
     if (st && st.eggs) h += eggIcon() + '<b>' + st.eggs + '</b>';
@@ -27,7 +27,7 @@ function cardHTML(id, size, st, attrs) {
   } else if (size === 'tray') {
     h += '';
   } else {
-    h += '<div class="nm">' + esc(b.n) + '</div><div class="cost">' + costHTML(b) + '</div><div class="habs">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + nestIcon(b.nest) + '</div>';
+    h += '<div class="nm">' + esc(b.n) + '</div><div class="cost">' + costHTML(b) + '</div>' + (size === 'hand' ? '<div class="pwt ' + col + '">' + esc(pw.txt || 'No power.') + '</div>' : '') + '<div class="habs">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + nestIcon(b.nest) + '<em>' + b.e + ' eggs</em></div>';
   }
   return h + '</div>';
 }
@@ -36,9 +36,26 @@ function render() {
   if (!G) return;
   var vs = UI.view, p = G.pl[vs], cur = PP.sideToAct(G);
   $('#barstat').textContent = G.phase === 'over' ? 'Final' : 'Round ' + (G.round + 1) + '/' + G.rounds;
-  renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); fitMat();
+  renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
   glow();
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
+}
+// live chapter goal: always visible during a story chapter, with the count and a tick once met
+var GOAL_LABEL = { forest: 'Forest birds', eggs: 'Eggs', birds: 'Birds played', goals: 'Round-goal points', bonus: 'Bonus points', score: 'Score', margin: 'Lead over the best rival' };
+function campGoalLive(g, def) {
+  var gl = def.goal || {}, m = campMetrics(g), k = gl.type === 'score' ? 'score' : gl.type === 'margin' ? 'margin' : gl.type === 'custom' ? gl.k : null;
+  if (!k) return { label: 'Win the year', cur: m.margin > 0 ? 'ahead by ' + m.margin : m.margin === 0 ? 'level' : 'behind by ' + (-m.margin), met: m.won && g.phase === 'over', pending: g.phase !== 'over', lead: m.margin > 0 };
+  var v = Math.max(0, m[k]); if (k === 'margin') v = m.margin;
+  var met = campIsWon(g, def);
+  return { label: GOAL_LABEL[k] || k, cur: v + ' of ' + gl.value, met: k === 'margin' ? m.won && m.margin >= gl.value : (v >= gl.value && (gl.winNotNeeded || m.won)), pending: g.phase !== 'over', num: v, need: gl.value, winNeeded: !gl.winNotNeeded };
+}
+function renderGoalbar() {
+  var el = $('#goalbar'); if (!el) return;
+  var def = UI.camp && G && UI.mode === 'campaign' ? UI.camp : null;
+  if (!def || !def.goal) { el.hidden = true; return; }
+  var r = campGoalLive(G, def); el.hidden = false; el.className = r.met ? 'met' : '';
+  el.innerHTML = '<span class="gk">Goal</span><span class="gt">' + esc(r.label) + ': <b>' + esc(r.cur) + '</b></span><span class="gm">' + (r.met ? '\u2713 met' : '') + '</span>';
+  el.setAttribute('aria-label', 'Chapter goal. ' + r.label + ': ' + r.cur + (r.met ? ', met' : ''));
 }
 function renderOpps(cur) {
   var h = '';
@@ -78,7 +95,8 @@ function renderMat(p, vs) {
 }
 function renderDock(p, vs, cur) {
   var Q = G.q, mine = myTurn();
-  var who = G.phase === 'over' ? 'Game over' : 'Round ' + (G.round + 1) + ' of ' + G.rounds + ' · ' + (isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name : 'you') : G.pl[cur].name) + ' · ' + G.pl[cur].cubes + ' actions left';
+  var who = G.phase === 'over' ? 'Game over' : 'Round ' + (G.round + 1) + ' of ' + G.rounds + ' · ' + (isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name : 'you') : G.pl[cur].name) + ' · ' + G.pl[cur].cubes + (G.pl[cur].cubes === 1 ? ' action left' : ' actions left');
+  if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = 'Round ' + (G.round + 1) + ' of ' + G.rounds + ' · ' + (UI.animSeat === UI.view && humans().length === 1 ? 'your birds are firing' : G.pl[UI.animSeat].name + ' is playing');
   $('#dt').textContent = who;
   $('#prompt').textContent = promptText(mine);
   $('#acts').innerHTML = mine ? actsHTML() : '';
