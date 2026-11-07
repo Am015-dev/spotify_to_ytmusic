@@ -23,7 +23,7 @@ Review R4 scored 6.25. Everything below was fixed in `games-src/stitchwise/src` 
 
 ## Top 5
 1. **Real finish:** both quilts side by side, empty squares counted down one by one with "-2" on each and a tick sound, running Buttons / 7x7 / Empty x -2 / Total per quilt, then winner banner (gold for a win) with a fanfare and confetti, "Skip" while counting, tie-break line on a tie. Quick game shows Play again / Title; Story shows Continue, then the kit result with totals. Fits 844x390 (compact), 375x553, 390x763, 1440x860.
-2. **Title and table:** painted quilt backdrop (temp art `bg-title` redrawn as a patchwork), framed parchment card with a stitched border and serif display title. Dev line removed.
+2. **Title and table:** painted quilt backdrop (temp art `bg-title` redrawn as a quilt of fabric squares), framed parchment card with a stitched border and serif display title. Dev line removed.
 3. **Opponent quilt in play:** thumbnail of both quilts in the player pills (phone); on wide screens a larger "Marden's quilt" panel under the track (tap = full quilt).
 4. **Readable track:** phone track is 3 rows of 18 with direction arrows (‹ › per row), start and end markers, the next button/leather spot ringed in gold, and the landing space of the selected patch ringed in blue and pulsing.
 5. **Overlays and small bugs:** all of the table above.
