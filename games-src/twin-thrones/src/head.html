@@ -228,9 +228,11 @@ body.gxdrawer .gx-app,body.gxdrawer #start{visibility:hidden}
 /* 390px: effect line fits the card; 375x553 (xs): drawn chips instead of text */
 .card.sm .glyph .sfx{font-size:max(13px,var(--fmin));letter-spacing:-.07em;white-space:normal;line-height:1.05}
 .card.sm .band{letter-spacing:-.09em}
-.card.xs .glyph{display:none}.card.xs .fx{display:flex;left:1px;right:1px;bottom:34%;flex-wrap:wrap}
+.card.xs .fx{display:none}.card.xs .band{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-height:none}.card.xs .glyph{display:flex;left:2px;right:2px;top:33%;bottom:31%}.card.xs .glyph .sfx{white-space:normal;letter-spacing:-.06em;line-height:1.05;left:0;right:0}
 .chip.r-stone{background:#585d64}.chip.r-glass{background:#1b7aa6}.chip.r-clay{background:linear-gradient(90deg,#b4502d 0 48%,#6e2c15 48% 52%,#b4502d 52%)}
 @media (min-width:1000px){.card.xs .band,.card.xs .glyph .sfx{font-size:var(--fmin)}}
 .fx .chip.r-wood{background:#7a4c1d}.fx .chip.r-clay{background:#a8472a}.fx .chip.r-papyrus{background:#e0c872}
 .fx .chip.r-stone{clip-path:none;border-radius:6px}.fx .chip.r-glass{border-radius:6px}
+.gxc-act small,.gxc-act b{font-size:max(var(--fmin),14px)!important}
+.card.cov .glyph,.card.cov .fx,.card.cov .costs{display:none!important}
 </style></head>

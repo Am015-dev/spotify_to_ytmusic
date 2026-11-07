@@ -68,7 +68,7 @@ const which = process.argv[3]||'p'; const out=(process.env.SHOTS||'/tmp/ttshots'
 }else{
 const { chromium } = require(PW);
 
-const out = process.argv[2]||(process.env.SHOTS||'/tmp/ttshots');
+const out = (process.env.SHOTS||'/tmp/ttshots');
 (async()=>{
  for (const [n,vp,t] of (process.argv[3]==='d'?[['d',{width:1440,height:860},false]]:[['p',{width:390,height:763},true]])) {
   const b = await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--no-sandbox']});

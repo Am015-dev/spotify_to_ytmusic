@@ -390,7 +390,7 @@ var TT_TEST = {};
     return w === 0 ? 'The crown is yours. ' + who + ' bows to the better builder.' : who + ' wears the crown this time. Build faster next round.';
   }
   function reasonText(G) {
-    return { military: 'Military supremacy: the conflict pawn reached the rival capital.', science: 'Science supremacy: six different symbols.', points: 'Victory on points.', tiebreak: 'Won the tie on civic points.', draw: 'A perfect draw.' }[G.reason] || G.reason;
+    var mine = U.mode === 'cpu' ? G.winner === 0 : true; return { military: mine ? 'Military supremacy: the conflict pawn reached the rival capital.' : 'Military supremacy: the conflict pawn reached your capital.', science: 'Science supremacy: six different symbols.', points: 'Victory on points.', tiebreak: 'Won the tie on civic points.', draw: 'A perfect draw.' }[G.reason] || G.reason;
   }
   function showResult() {
     var G = U.G, r = $('res'); if (!r.hidden) return; clearTimeout(U.aiTimer); U.busy = true;

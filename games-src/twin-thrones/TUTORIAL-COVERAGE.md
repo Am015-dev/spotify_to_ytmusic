@@ -25,7 +25,7 @@ Legend: DO = the player does it, SEE = shown/explained once, NO = not covered (h
 | Science pair gives a progress token; pick one | DO | `build-pair`, `token` |
 | Six different symbols win at once | SEE | `sci` (live count in the strip) |
 | Guild card scores from the richer city | DO | `take-guild`, `build-guild` |
-| Age change, who starts (the one behind on the track chooses) | SEE | `years` text; the player is given the first move by the script (not the real chooser) |
+| Age change, who starts (the one behind on the track chooses; at a tie the player who took the last card chooses, W391 engine fix merged) | SEE | `years` text; the player is given the first move by the script (not the real chooser) |
 | Final scoring: civic, science, trade, guilds, wonders, tokens, coins, conflict | SEE (live) | `scoring` (count-up table) |
 | Most points wins; tie goes to civic points | SEE | `verdict` |
 | End by military or science | SEE | `pawn`, `sci` |

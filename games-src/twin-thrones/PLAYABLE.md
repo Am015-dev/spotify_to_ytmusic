@@ -16,15 +16,15 @@ Method: screenshots at 390x763 and 1440x860 (title, wonder draft, first turn, zo
 | 10 | Result was a bare table titled "Computer wins" | "Rival wins", totals count up (tap to finish), a line in the game's voice for points / military / science wins and losses |
 Also: legal cards glow with a pulsing gold ring, covered cards lose colour (not contrast), face-down cards carry a plate label, "Help" opens with "How a turn works" in 5 lines, Story chapters have 3-line intros, win and loss outros (`campaign.json`), the Story map's Tutorial button now opens How to play (the tutorial starts from the title, Menu or the drawer).
 
-## Gate (all run on the final build)
+## Gate (all run on the final build, 7 Nov 2026 22:50 UTC)
 - `VIS_SLUGS="," python3 games-src/scripts/build-all.py --quick twin-thrones`: PASS (5/5 scenarios).
-- `node rules-test.js 200`, `node smoke.js`: PASS.
-- `node tutorial-e2e.js p` and `d`: PASS (390x763 and 1440x860: the whole prologue by taps on the spotlit element's centre; every step id shown; nothing covers a tap target; 0 console errors).
-- `node playtest-ui.js quick p`, `story p`, `quick d`: PASS (Quick game and Story stage 1 played to the result by taps only).
-- ui-audit A-F: see the DONE report line (phone / phone-s / pc).
+- `node rules-test.js 200` PASS (with the merged W391 cases), `node smoke.js` PASS phone + pc, 0 console errors.
+- `node tutorial-e2e.js p` and `d`: PASS at 390x763 and 1440x860 (the whole prologue by taps on the centre of each spotlit element; all 31 step ids shown; no tap target covered; result screen and end card reached; 0 console errors).
+- `node playtest-ui.js quick p`, `quick d`, `story p`: PASS (Quick game and Story stage 1 played to the result by taps on visible UI only).
+- ui-audit A-F: phone A0 B0 C0 D0 E0 F0, phone-s A0 B0 C0 D0 E0 F0, pc A0 B0 C0 D0 E0 F0.
 
 ## Not fixed / honest limits
 - The phone pyramid card is still about 60 px wide (six across 390 px); the big card is the readable view. On the 375x553 phone the effect line is replaced by drawn chips and token names are cut (tap shows the full name).
-- Rules fixes (ADDENDUM 2) are W391's, in the engine; `origin/shelf/W391-rules-fixes` did not exist when this branch was pushed, so nothing was merged. This worker fixed 0 of the 2 WRONG items (engine files untouched). The tutorial text does not depend on them.
+- Rules fixes (ADDENDUM 2) are W391's, in the engine: `origin/shelf/W391-rules-fixes` (commit 1a6ecbe0: tie chooser = last-card taker, Customs Quay costs 4 coins, rules-test cases) is merged into this branch before the final gate; this worker did not edit the engine, rules or data files. Fixed 2 of 2 WRONG items (by W391); the 6 UNSURE card costs are unverified and unchanged.
 - The Age II start in the tutorial gives the player the first move by script (the real rule is "the player behind on the pawn chooses"), explained in the `years` step.
 - No new art; all pictures are still code-drawn (slots kept).
