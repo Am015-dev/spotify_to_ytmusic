@@ -5,7 +5,7 @@ Adapts: a two-to-four player tile-drafting and wall-building game (factory displ
 Sources checked
 - Publisher rulebook (EN) mirrored on tesera.ru and cdn.1j1ju.com (rulebook PDF); gray-side variant text as quoted in search results.
 - Joker-tile promo rules: ultraboardgames.com joker-tiles page (full rule text); tesera.ru joker-tiles PDF (listed, not opened).
-- Project notes: games-src/azul/game/rules-notes.md. Engine read: games-src/azul/game/src/engine.js (122 lines) and data.js.
+- Project notes: the sunglaze source dir per scripts/build-all.py (game/rules-notes.md). Engine read: game/src/engine.js (122 lines) and data.js.
 
 WRONG 0, MISSING 0, SIMPLIFIED 3 (all documented, all outside the base rules)
 
