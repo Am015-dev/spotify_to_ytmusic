@@ -253,3 +253,4 @@ html body .gx-drawer{transition:none}   /* panels appear at once: no half-slid f
 .cfinal .ch2{font-weight:800;margin:8px 0 2px}
 @media (min-width:1000px){#coachb p,.cfinal p,.cfinal li{font-size:16px}}
 @media (max-width:999px){#acts .ab{padding:6px 8px}#acts{gap:4px}}
+html.wm-title #zoom,html.wm-title .gx-bar .gx-ibtn,html.wm-title .gx-bar h1{visibility:hidden}   /* under the title screen: no board controls peeking through */
