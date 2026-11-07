@@ -9,7 +9,11 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function 
 try { UI.prefs = JSON.parse(localStorage.getItem('wm-prefs') || '{}') || {}; } catch (e) { UI.prefs = {}; }
 function savePrefs() { try { localStorage.setItem('wm-prefs', JSON.stringify(UI.prefs)); } catch (e) { } }
 function an(a) { return (/^[AEIOU]/.test(WM.ANI_NAME[a]) ? 'an ' : 'a ') + WM.ANI_NAME[a]; }
-function toast(t, ms) { var e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
+function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, just above the instruction line (never over the score chips)
+  var ln = $('#line'), st = $('#start'); if (!ln || !st || !st.hidden || !G) { e.style.top = ''; return; }
+  var r = ln.getBoundingClientRect(); e.style.top = r.height ? Math.max(64, r.top - 46) + 'px' : '';
+}
+function toast(t, ms) { var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 // ---------------------------------------------------------------- sound (synth; music slots via gx-music when files exist)
 var SND = { ctx: null };
 function sfxVol() { try { var p = GX.pref ? GX.pref() : {}; return (p.master == null ? 1 : p.master) * (p.sfx == null ? 0.8 : p.sfx); } catch (e) { return 0.8; } }
@@ -80,6 +84,14 @@ function aiStep() {
       try { WM.apply(G, m); } catch (e) { console.error(e); return; }
       if (m.t === 'wipe3') { toast(nm + ' swept three tokens.'); sfx('wipe'); }
       else if (G.stage === 'tile') { var h = G.hold; m = WM.AI.choose(G); WM.apply(G, m); var m2 = WM.AI.choose(G); WM.apply(G, m2); UI.lastAI = { seat: G.last.seat, tok: h.tok, m2: m2 }; toast(nm + (m2.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.'), 1600); if (G.last.acorn) sfx('acorn'); else sfx('place'); }
+      // show the rival's move: their valley for a moment, with the new tile lit (skipped in fast/test mode, tutorial and hot-seat)
+      var ps = UI.lastAI && UI.lastAI.seat, pc = m && m.c;
+      if (!UI.fast && UI.humans === 1 && UI.mode !== 'tutorial' && ps != null && pc) {
+        UI.showAI = { seat: ps, text: nm + (m2.t === 'tok' ? ' placed ' + an(h.tok) : ' placed a tile') };
+        UI.view = ps; fitView(); render(); setTimeout(function () { if (G && UI.view === ps) pop(pc, nm + "'s new tile", 'hab'); }, 60);
+        UI.aiT = setTimeout(function () { UI.showAI = null; if (!G) return; UI.view = meSeat(); fitView(); render(); step(); }, Math.max(900, AIDELAY * 1.3));
+        return;
+      }
       render(); step();
     }, UI.fast ? 10 : Math.round(AIDELAY * 0.8));
     return;
@@ -111,7 +123,10 @@ function act(m) {
 function pop(c, text, cls) {   // floating points at a map cell (DOM, readable size)
   var b = $('#board').getBoundingClientRect(), p = pix(c), z = UI.pan, x = p[0] * z.z + z.tx, y = p[1] * z.z + z.ty;
   var e = document.createElement('div'); e.className = 'pop ' + (cls || ''); e.textContent = text; e.style.left = Math.max(60, Math.min(b.width - 60, x)) + 'px'; e.style.top = Math.max(30, y - 20) + 'px';
-  $('#board').appendChild(e); setTimeout(function () { e.remove(); }, 1800);
+  // never stack unreadably: at most 2 live pops, a new one sits in its own row under the last one
+  var live = [].slice.call($('#board').querySelectorAll('.pop')); while (live.length > 1) live.shift().remove();
+  if (live.length) e.style.top = (parseFloat(live[0].style.top) + 40) + 'px';
+  $('#board').appendChild(e); setTimeout(function () { e.remove(); }, 1300);
 }
 function tutOK(x) { return typeof tutAct === 'function' ? tutAct(x) : true; }
 function myTurn() { return G && !G.over && !G.seats[G.cur].ai && UI.view === G.cur && $('#pass').hidden; }
@@ -245,10 +260,11 @@ function lineText() {
   if (G.over) return 'Season over';
   var s = G.seats[G.cur];
   if (UI.view !== G.cur && !s.ai) return '';
-  if (UI.view !== meSeat() && !myTurn()) return 'Viewing ' + G.seats[UI.view].name + '. Tap You to return';
+  if (UI.showAI && UI.view === UI.showAI.seat) return G.seats[UI.view].name + "'s valley: " + UI.showAI.text.replace(/^\S+ /, '');
+  if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
   if (s.ai) return s.name + ' is choosing';
   if (G.stage === 'pick') return UI.wipe ? 'Tap tokens to replace' : UI.free ? (UI.free.ti == null ? 'Pick any tile' : 'Now pick any token') : 'Pick a tile and token pair';
-  if (G.stage === 'tile') return UI.ghost ? 'Turn it, then tap Place' : 'Tap a glowing spot';
+  if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Turn it, then tap Place' : 'Tap Place (one terrain: no turning)') : 'Tap a glowing spot';
   if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Place the ' + WM.ANI_NAME[G.hold.tok] + ' on a glowing tile' : 'No room: return the token';
   return '';
 }
@@ -262,11 +278,12 @@ function renderTop() {
   var turn = Math.min(G.turns, G.seats[G.cur].done + 1);
   $('#barstat').innerHTML = '<span class="pill">Turn <b>' + turn + '/' + G.turns + '</b></span>' + (G.np > 1 ? '' : '<span class="pill">Score <b>' + sc.total + '</b></span>');
   $('#line').textContent = lineText();
+  var lp = $('#logp'); if (lp) lp.innerHTML = '<h3>Season log</h3><ol>' + G.log.slice(-8).reverse().map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>';
 }
 function render() {
   if (!G) return;
   renderDock(); renderTop(); drawMap();
-  if (window.GXH && GXH.phase) try { GXH.phase(myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
+  if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
   artApply();
 }
 UI.redraw = function () { if (G) render(); };
@@ -422,7 +439,7 @@ function boot() {
   try {
     GX.settings({ id: 'setd', title: 'Menu',
       game: function (S) { var a = document.createElement('button'); a.type = 'button'; a.className = 'gx-sb'; a.textContent = 'Title screen'; a.onclick = function () { GX.close(); UI.sv = 'title'; showTitle(); }; var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'gx-sb'; b2.textContent = 'New game'; b2.onclick = function () { GX.close(); UI.sv = 'setup'; showTitle(); }; var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'gx-sb'; rs.textContent = 'Restart'; rs.onclick = function () { GX.close(); if (UI.mode === 'camp' && UI.camp) campStart(UI.camp); else if (UI.cfg && UI.mode === 'quick') newGame(Object.assign({}, UI.cfg, { seed: null })); else { UI.sv = 'setup'; showTitle(); } }; S.appendChild(GX.row('This game', [rs, b2, a])); },
-      sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(!UI.prefs.mute, function (v) { UI.prefs.mute = !v; savePrefs(); }))); if (window.GXMUS) { var m = document.createElement('button'); m.type = 'button'; m.className = 'gx-sb'; m.textContent = 'Music'; m.onclick = function () { GXMUS.open(); }; S.appendChild(GX.row('Music', [m])); } },
+      sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(!UI.prefs.mute, function (v) { UI.prefs.mute = !v; savePrefs(); }))); if (window.GXMUS && (window.WM_MUSIC || []).length) { var m = document.createElement('button'); m.type = 'button'; m.className = 'gx-sb'; m.textContent = 'Choose tracks'; m.onclick = function () { GXMUS.open(); }; S.appendChild(GX.row('Music', [m])); } },
       help: function (S) { var r = document.createElement('button'); r.type = 'button'; r.className = 'gx-sb'; r.textContent = 'Rules'; r.onclick = function () { GX.close(); setTimeout(openRules, 50); }; var tu = document.createElement('button'); tu.type = 'button'; tu.className = 'gx-sb'; tu.textContent = 'Tutorial'; tu.onclick = function () { GX.close(); tutStart(); }; S.appendChild(GX.row('Read', [r, tu])); },
       about: { name: 'Wildmark', version: '1.0', text: 'Original names and rules text. Temporary art icons: game-icons.net (Delapouite, Lorc), CC BY 3.0.' } });
     AIDELAY = GX.aiDelay ? GX.aiDelay(650) : 650; if (GX.onPref) GX.onPref(function (k) { if (k === 'ai') AIDELAY = GX.aiDelay(650); });

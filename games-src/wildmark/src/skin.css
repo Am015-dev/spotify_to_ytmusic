@@ -38,9 +38,9 @@ button{font:inherit;color:inherit}
 #line:empty{display:none}
 #zoom{position:absolute;right:6px;bottom:6px;display:flex;flex-direction:column;gap:4px;z-index:3}
 .zb{width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(18,32,25,.82);font-size:22px;cursor:pointer}
-.pop{position:absolute;transform:translate(-50%,-50%);z-index:5;pointer-events:none;font-weight:800;font-size:22px;color:#fff6c8;text-shadow:0 2px 6px rgba(0,0,0,.8);white-space:nowrap;animation:wmpop 1.8s ease-out forwards}
+.pop{position:absolute;transform:translate(-50%,-50%);z-index:5;pointer-events:none;font-weight:800;font-size:22px;color:#fff6c8;text-shadow:0 2px 6px rgba(0,0,0,.8);white-space:nowrap;animation:wmpop 1.3s ease-out forwards;background:rgba(14,26,20,.78);padding:2px 12px;border-radius:99px}
 .pop.hab{color:#bff0c8}.pop.neg{color:#ffb4a8}.pop.acorn{color:#ffd88a}
-@keyframes wmpop{0%{opacity:0;margin-top:10px;transform:translate(-50%,-50%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}30%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;margin-top:-50px}}
+@keyframes wmpop{0%{opacity:0;margin-top:10px;transform:translate(-50%,-50%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}30%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;margin-top:-30px}}
 /* dock = the market */
 .gx-dock{background:#22392b;color:var(--wm-cream);border-left:1px solid rgba(255,255,255,.08)}
 .gx-dock-body{padding:10px}
@@ -168,3 +168,18 @@ html body .gxc-node .gxc-disc{background-image:none!important}
 @media (min-width:900px){.ttop .logo{font-size:56px}.tlogo{width:72px;height:72px}.tbot{width:460px}}
 @media (orientation:landscape) and (max-height:500px){#start.front{flex-direction:row;align-items:center;gap:20px}.ttop{flex-direction:column;text-align:center;width:auto}.tbot{width:min(420px,58%);gap:6px}.tbot .big{min-height:52px}.trow .ab{min-height:44px}}
 #start.front::before{content:'';position:absolute;inset:0 0 auto 0;height:30%;background:linear-gradient(to top,rgba(10,18,14,0),rgba(10,18,14,.7));pointer-events:none;z-index:0}
+/* phone landscape: the market goes to the right (like PC) so the valley keeps the full height */
+@media (orientation:landscape) and (max-height:500px) and (max-width:999px){
+  html body .gx-main{grid-template-columns:minmax(0,1fr) 300px!important;grid-template-rows:minmax(0,1fr)!important}
+  html body .gx-dock{max-height:none!important;border-radius:0!important}
+  html body #mk{grid-template-columns:1fr 1fr!important}
+  html body .mt{height:72px}html body .mt svg{height:66px}
+  #zoom{top:auto;bottom:8px}
+}
+/* PC: the side panel below the market shows the season log (who did what), so the rival's moves are visible */
+#logp{display:none}
+@media (min-width:1000px){#logp{display:block;margin:12px 8px 8px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.18);font-size:15px;line-height:1.4;overflow:auto;min-height:0;flex:1}
+  #logp h3{margin:0 0 6px;font-size:15px;opacity:.8;text-transform:uppercase;letter-spacing:.06em}#logp ol{margin:0;padding-left:18px}#logp li{margin:2px 0}#logp li:first-child{font-weight:700}}
+/* the shared chapter-result star row also carries the class "big": keep Wildmark's gold .big button look off it (stars in a row) */
+.gxc-stars.big{display:inline-flex;flex-direction:row;background:none;border-radius:0;min-height:0;padding:0;box-shadow:none;gap:6px;align-self:center}
+.gxc-stars.big .gxc-st{text-shadow:0 1px 0 #9c6a12,0 0 12px rgba(242,185,59,.55)}
