@@ -12,6 +12,8 @@ const tapSel=async(sel)=>{const r=await p.evaluate(sel=>{const e=document.queryS
 const tapText=async(re)=>{const r=await p.evaluate(src=>{const re=new RegExp(src,'i');const over=[...document.querySelectorAll('.gxc')].filter(e=>e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden');const bs=[...document.querySelectorAll('.gxc button')].filter(e=>e.getClientRects().length&&!e.disabled&&re.test(e.textContent));const e=bs[0];if(!e)return null;const q=e.getBoundingClientRect(),x=q.left+q.width/2,y=q.top+q.height/2,h=document.elementFromPoint(x,y);return{x,y,hit:!!(h&&(h===e||e.contains(h))),t:e.textContent.trim().slice(0,14)}},re.source);if(!r)return null;if(!r.hit){covered++;return null}await p.mouse.click(r.x,r.y);return r.t};
 // ---- Quick game
 await tapSel('#playB');await p.waitForSelector('#goB');
+ok(await tapSel('#swapB'),'Swap cards button is on the board');await tapSel('#hand .cd:not(.dead)');const sw=await p.evaluate(()=>document.querySelector('#goB').textContent);ok(/Swap 1/.test(sw),'swap mode: Go becomes '+sw);await tapSel('#goB');await p.waitForTimeout(200);
+ok(await p.evaluate(()=>G.cars[0].hand.length===7&&G.cars[0].dsc===G.round&&!document.querySelector('#swapB')),'swap done: hand back to 7, once per round');
 let done=false,turns=0;
 for(let i=0;i<2500&&!done;i++){
  done=await p.evaluate(()=>!!document.querySelector('#modal .podium'));if(done)break;

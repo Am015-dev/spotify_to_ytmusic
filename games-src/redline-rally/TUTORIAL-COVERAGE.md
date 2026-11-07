@@ -1,29 +1,30 @@
-# Tutorial coverage: Prologue "The Sunline Seat"
+# Tutorial coverage: coached first game "The Sunline Seat" (addendum 4)
 
-One real game: Practice Loop (30 spaces, 1 lap, corners at space 10 limit 5 and space 15 limit 4), you + Kit Marlow + Juno (real AI), played to the result screen.
-Six chapters, one round each (leave and resume: Menu > Guide chapters starts any chapter). Hands, deck tops and rival start spaces are stacked each round (`TUT_CH` in `src/tutor.js`).
-Text: `src/story.js` (`STORY.tut`). `tut-test.js` plays all 32 steps by tapping the spotlit elements at 390x763 and 1440x860 and asserts each step id was shown (`tutCoverage()`).
+A real game (Practice Loop, 30 spaces, 1 lap, you + Kit Marlow + Juno, real AI). Only the very first action is forced (2 spotlight steps: gear 2, then any two cards).
+After that: FREE PLAY with every legal choice. Hands are stacked each round (rounds 1-6) and the rivals sit near you, so the situations come up. Coach Mara speaks just-in-time
+(`coachSay` in `src/tutor.js`, text in `COACH_TXT`): one bubble at a time, never blocks input, "Got it" dismisses, "Skip" leaves. Good/poor-move lines follow your corner results.
+The end: your score walked through rule by rule with your real numbers, then "Things you will meet later" lists every rule that did not come up.
+`tut-test.js` plays the coached game with random legal moves by UI taps (phone + PC) and asserts every rule below was explained in game or listed on the later card.
 
-| Rule | Taught by (step id) | Story beat (Mara) | Status |
-|---|---|---|---|
-| Goal: first over the line wins after the laps | meet, result | "Win one lap and the seat stays yours." / result line | [x] |
-| Setup: start gear 1, 7-card hand, 6 engine heat | meet, tray (engine pips + "Engine heat") visible every chapter | meet | [x] shown, not drilled |
-| Gear = number of cards played | gear, cards | "Your gear is how many cards you play." | [x] by doing |
-| Shift one gear free | gear (gear 1 to 2), gear2 | - | [x] by doing |
-| Shift two gears costs 1 heat | gear3 (gear 1 to 3, button shows -1 heat) | "Shifting two gears costs one heat." | [x] by doing |
-| Speed = sum of cards, you move that many spaces | cards, go1, watch1 | "Two numbers: the sum is your speed." | [x] by doing |
-| Rivals move one by one, leader first | watch1, every chapter (banner "<Rival>'s turn", cards revealed) | "Each drive in turn. That is every round." | [x] seen |
-| Corner speed limit, each point over burns 1 heat | corner, push, read | "Every point over burns a heat." | [x] by doing |
-| Braking: stay under the limit, no heat lost | brake, go2, watch2 | "Brake instead." | [x] by doing |
-| Paying heat on purpose | gamble, go3, watch3 | "Spend one heat to catch him." | [x] by doing |
-| Heat cards are dead in hand (cannot be played) | deadcards | "They cannot be played." | [x] seen |
-| Cooldown (gear 1 returns heat cards from hand to engine) | gear1, go4, watch4 | "Gear 1 cools your engine." | [x] by doing |
-| Stress card (flip until a speed card shows) | stress, go4 | "A mystery speed." | [x] by doing |
-| Adrenaline for the car in last place | adr (you are staged last) | "Free help for the car behind." | [x] seen |
-| Slipstream (optional +2 behind or next to a car) | tuck, slip, watch5 | "You are on his bumper!" | [x] by doing (the "No thanks" choice is shown in other chapters: auto-declined with a caption) |
-| Boost (1 heat, extra flipped speed card) | finale, boost, go6 | "Boost: one heat for an extra card." | [x] by doing |
-| Race end, finishing order by distance, ties by arrival | result | result line | [x] seen |
-| Two cars per space, full space pushes you back | - | - | [ ] NOT covered (explained in Rules) |
-| Spin out (not enough heat for a corner) | - | - | [ ] NOT covered by doing (the corner chapters warn "would spin you out"); explained in Rules |
-| Upgrades mode | - | - | [ ] NOT covered (optional mode; explained in Rules) |
-| Rules from the rulebook check (extra stress cards on spin, discard-before-draw, finish handling) | - | - | [ ] pending: engine changes belong to worker W391; Rules drawer states them once merged |
+| Rule | Explained when (trigger) | Status |
+|---|---|---|
+| goal (first over the line) | start, + finish | [x] always |
+| gear = cards played | start (forced step 1) | [x] always |
+| cards add up to speed | start (forced step 2) | [x] always |
+| shift two gears = 1 heat | the moment you select a gear two away | [x] if it happens, else later card |
+| corner limit | a corner within 8 spaces | [x] when it comes up |
+| burning heat over the limit (+ good/poor line) | preview over the limit, and when you burn or take it clean | [x] when it comes up |
+| heat cards are dead | a heat card is in your hand (staged round 4) | [x] |
+| stress card | a stress card is in your hand (staged round 4) | [x] |
+| cooldown | your cool-down event | [x] if you use gear 1/2 with heat in hand |
+| rivals move in turn | first rival turn | [x] always |
+| adrenaline | your adrenaline event (rivals staged ahead in round 4) | [x] if you are last |
+| slipstream | the slipstream prompt | [x] if offered, else later card |
+| boost | you toggle boost / from round 5 with spare heat | [x] |
+| finish and order | you cross the line | [x] always |
+| spin out | your spin-out; else later card | later card if it did not happen |
+| two cars per space | later card | explained, not played |
+| too few cards (stall) | later card | explained, not played |
+| swap cards (optional discard) | button "Swap cards" on the board (all games); later card | explained, usable now |
+| Upgrades mode | later card | explained, not played |
+| tie / race goes on until all finish | scoring walkthrough + later card | [x] |

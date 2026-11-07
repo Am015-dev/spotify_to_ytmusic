@@ -105,7 +105,7 @@ function drawPlan() {
   c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H', j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() ? '' : 'glow'); });
   h += '</div><div id="acts"><button class="bo' + (UI.boost ? ' on' : '') + '" id="boostB"' + (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1 ? ' disabled' : '') + '>Boost -1</button><button id="sugB">Suggest</button><button class="go" id="goB">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
-  h += '<div class="chips tray" id="tray" data-art="ui-engine-tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span></div>';
+  h += '<div class="chips tray" id="tray" data-art="ui-engine-tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + (G.phase === 'plan' && c.dsc !== G.round && !G.hot && !tutOn() ? '<button type="button" id="swapB" class="swapb">' + (UI.swap ? 'Cancel swap' : 'Swap cards') + '</button>' : '') + '</div>';
   p.innerHTML = h; artApply(p);
   p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.touchedGear = 1; UI.gear = +b.getAttribute('data-g'); UI.sel = UI.sel.slice(0, needCards(c, UI.gear)); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
@@ -118,6 +118,9 @@ function drawPlan() {
   else { var ci = curveInfo(); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0] + ')'; setMsg((ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.spin ? '' : '. ' + STORY.planGo), ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
   if (!ready && need === 0) $('#goB').disabled = false;
   var dt = $('#dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · your turn'; banner(G.hot ? c.name.split(' ')[0] + "'s turn" : STORY.yourTurn, c.col, 'plan');
+  if (UI.swap && c.dsc !== G.round) swapMode(c);
+  else if (UI.mode === 'tutorial') coachPlan(c, ready ? curveInfo() : null);
+  var sw = $('#swapB'); if (sw) sw.onclick = function () { UI.swap = !UI.swap; UI.sel = []; drawPlan(); };
   hud();
 }
 var FLAME = '<svg viewBox="0 0 24 28" width="22" height="26" aria-hidden="true"><path d="M12 1C13 7 20 10 20 18a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 4 2 5 0-5 0-9 2-14z" fill="#ff7a3a" stroke="#ffd0a0" stroke-width="1.5"/></svg>';
@@ -133,6 +136,13 @@ function cardText(x) {
   if (x === 'H') return 'Heat card: a dead card, it cannot be played.';
   if (x === 'X') return 'Stress card: flips a random speed card from your deck.';
   return 'Speed ' + x + ': moves you ' + x + ' spaces.';
+}
+function swapMode(c) {   /* optional rulebook step: throw away speed cards you do not want (once per round), then draw back to a full hand */
+  var n = UI.sel.length; setMsg(n ? 'Throw away ' + n + ' card' + (n > 1 ? 's' : '') + '?' : 'Tap the cards to throw away.');
+  var g = $('#goB'); g.textContent = n ? 'Swap ' + n : 'Swap none'; g.disabled = !n; g.classList.toggle('glow', !!n);
+  document.querySelectorAll('.gb').forEach(function (b) { b.disabled = true; });
+  document.querySelectorAll('#hand .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () { if (c.hand[j] === 'H' || c.hand[j] === 'X') { setMsg('Heat and Stress cards stay in your hand.', 'warn'); return; } var k = UI.sel.indexOf(j); if (k >= 0) UI.sel.splice(k, 1); else UI.sel.push(j); drawPlan(); }; });
+  g.onclick = function () { var e = discardOptional(G, c.i, UI.sel.slice()); UI.swap = false; UI.sel = []; if (e) setMsg('Cannot swap: ' + e, 'warn'); drawPlan(); };
 }
 function cardHtml(x, sel, dead, j, cls) {
   var u = upgId(x), stem = u ? 'card-upgrade-' + u : x === 'H' ? 'card-heat' : x === 'X' ? 'card-stress' : 'card-speed-' + x;
@@ -186,6 +196,7 @@ async function playEvents(ev) {
   for (var k = 0; k < ev.length; k++) {
     var e = ev[k], c = G.cars[e.car], nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
+    if (UI.mode === 'tutorial') coachEvent(e, you);
     if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'is up') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : nm + ' is up.'); await wait(750); }
     if (e.t === 'shift') { setMsg(who + (who === 'You' ? ' shift' : ' shifts') + ' to gear ' + e.to + (e.cost ? ' (-1 heat)' : '') + '.'); await wait(700); }
     else if (e.t === 'cool') { setMsg(who + ' cool' + (who === 'You' ? '' : 's') + ' ' + e.n + ' heat back into the engine.'); pop('+' + e.n + ' engine', UI.vis[e.car].p, '#8ce6ff'); await wait(750); }
@@ -211,6 +222,7 @@ function showPlayed(e) {
   h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
 }
 function askSlip() {
+  if (UI.mode === 'tutorial') coachSay('slip');
   var p = G.pend, c = G.cars[p.car], cost = cornerCost(G, p.from, p.L1, p.speed, p.lim) - cornerCost(G, p.from, p.L0, p.speed, p.lim);
   var spin = cornerCost(G, p.from, p.L1, p.speed, p.lim) > c.eng;
   setMsg(cost ? 'Slipstream +2 costs ' + cost + ' more heat' : 'Slipstream: 2 free spaces');
@@ -221,6 +233,7 @@ function askSlip() {
 /* ================= result ================= */
 function showResult() {
   if (typeof GXC !== 'undefined' && GXC.active && GXC.active() && UI.cmpDef) { var wc = G.cars[G.rank[0]]; sfx(wc.human ? 'win' : 'lose'); return GXC.finish(G); }
+  if (UI.mode === 'tutorial') return coachFinish();
   UI.lockModal = true; var rows = '', me = G.cars.filter(function (c) { return c.human; });
   G.rank.forEach(function (ci, k) {
     var c = G.cars[ci], col = COLS[c.col].hex;

@@ -23,8 +23,13 @@ Method: screenshots of title, tutorial, first turn, rival turn, result at 390x76
 - `play-test.js`: a Quick game and Story chapter 1 played to the result by taps on visible, uncovered UI only (390x763), PASS, 0 console errors.
 - ui-audit (staged build, phone / phone-s / pc): A0 C0 D0 E0 F0 on all three; B1 on phone-s and pc (padlock emoji of the shared campaign kit), B2 on phone (same padlock + one "Slipstream" bold word in the Rules sheet that reads 3.0:1 only during the sheet slide-in; the screenshot of the settled sheet is dark text on parchment).
 
+## Round 2 (orchestrator orders 21:22 / 21:47 / 22:02)
+- Addendum 4: the tutorial is now a coached game (see TUTORIAL-COVERAGE.md): 2 forced first steps, then free play with just-in-time coach bubbles, end-of-game scoring walkthrough and a "Things you will meet later" card.
+- Optional discard step wired into the UI: "Swap cards" button, tap cards, "Swap N"; once per round (`discardOptional`, covered by the rules cases of W391; UI covered by `play-test.js`).
+- Starting upgrade card values: NOT changed. The rulebook text available (W391's extract) does not give their values; inventing numbers would be wrong. Open item for the owner.
+- QA-bot blocker "tutorial stuck at step 3/7 with one wide spotlight over two targets": gone with the forced-step design (no multi-target spotlight any more).
+
 ## Not done (honest)
-- The optional "discard before drawing" step (engine function `discardOptional`, rulebook case) has no button in the UI yet.
 - Spin out, two-cars-per-space pushback and Upgrades are explained in Rules but not played in the tutorial (see TUTORIAL-COVERAGE.md).
 - Story chapters 2-9 intro/outro text is still the short original text in campaign.json; no loss-variant outros. Portraits are code-drawn initials.
 - The "locked chapter" padlock emoji contrast comes from the shared campaign kit (read-only here).
