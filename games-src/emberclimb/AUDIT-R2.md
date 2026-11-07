@@ -1,0 +1,190 @@
+# AUDIT-R2: emberclimb
+
+Read-only independent audit (W340). No game file was changed; the build was run locally and served from a local static copy.
+
+## Checks run
+
+- Sizes: phone 390x763 (2x), phone-s 375x553 (2x), PC 1440x860.
+- Independent UI audit: `games-src/scripts/ui-audit.spec.js`, rules A-F on the title, board, panel and menu surfaces (rule C and D: no failures).
+- Scenario tests: `games-src/scripts/scenarios.spec.js`, 9 `?scn=` scenarios (menu, ec-map, ec-fight, ec-fight-two, ec-reward, ec-shop, ec-rest, ec-event, ec-result) x 3 sizes = 27 tests.
+
+## Result
+
+- Audit: 91 failing checks across the 3 sizes (50 unique checks).
+- Scenario tests: 12 of 27 failed (119 failing checks inside them).
+
+## Failing checks (audit)
+
+- **A text size** | screen: `board` | element: `div.en>div.bar>b` `"50/50" 10px (min 13)` | measured: "50/50" 10px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div.inf>div.bar>b` `"80/80" 10px (min 13)` | measured: "80/80" 10px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.ct` `"Cinder Strike" 6.4px (min 13)` | measured: "Cinder Strike" 6.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.cx` `"1" 8.4px (min 13)` | measured: "1" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div.card>div.cb>span.cl` `"Deal 6." 7px (min 13)` | measured: "Deal 6." 7px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.ct` `"Plate Guard" 6.4px (min 13)` | measured: "Plate Guard" 6.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div.card>div.cb>span.cl` `"Gain 5 Block." 7px (min 13)` | measured: "Gain 5 Block." 7px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **B text contrast / busy background** | screen: `start` | element: `button.hero>div.art>div.ph` `"Ione Stillwater" contrast 3.04:1 (<4.5)` | measured: "Ione Stillwater" contrast 3.04:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `start` | element: `button.hero>div.art>div.ph` `"Sable Quillfinger" contrast 4.48:1 (<4.5)` | measured: "Sable Quillfinger" contrast 4.48:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div.hand>div.card>div.ct` `"Plate Guard" contrast 3.48:1 (<4.5)` | measured: "Plate Guard" contrast 3.48:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div.inf>div.bar>b` `"80/80" contrast 4.44:1 (<4.5)` | measured: "80/80" contrast 4.44:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s
+- **F layout count** | screen: `start` | element: `body` `title has 0 big primary buttons (want 1): ` | measured: title has 0 big primary buttons (want 1):  | pass: exactly 1 big primary button on the title; <= 1 instruction line on the board; <= 5 top-bar buttons | sizes: phone, phone-s, pc
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.ct` `"Cinder Strike" 6.2px (min 13)` | measured: "Cinder Strike" 6.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.cx` `"1" 8px (min 13)` | measured: "1" 8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div.card>div.cb>span.cl` `"Deal 6." 6.7px (min 13)` | measured: "Deal 6." 6.7px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.ct` `"Plate Guard" 6.2px (min 13)` | measured: "Plate Guard" 6.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div.card>div.cb>span.cl` `"Gain 5 Block." 6.7px (min 13)` | measured: "Gain 5 Block." 6.7px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **B text contrast / busy background** | screen: `board` | element: `div.en>div.bar>b` `"50/50" contrast 4.44:1 (<4.5)` | measured: "50/50" contrast 4.44:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **A text size** | screen: `start` | element: `button.hero>div.art>div.ph` `"Garrick Cinderplate" 13px (min 16)` | measured: "Garrick Cinderplate" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div.heroes>button.hero>b` `"Garrick" 14px (min 16)` | measured: "Garrick" 14px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div.heroes>button.hero>i` `"Ember Warrior" 13px (min 16)` | measured: "Ember Warrior" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `button.hero>div.art>div.ph` `"Sable Quillfinger" 13px (min 16)` | measured: "Sable Quillfinger" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div.heroes>button.hero>b` `"Sable" 14px (min 16)` | measured: "Sable" 14px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div.heroes>button.hero>i` `"Venom Rogue" 13px (min 16)` | measured: "Venom Rogue" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `button.hero>div.art>div.ph` `"Cog-9" 13px (min 16)` | measured: "Cog-9" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div.heroes>button.hero>b` `"Cog-9" 14px (min 16)` | measured: "Cog-9" 14px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div.heroes>button.hero>i` `"Orb Automaton" 13px (min 16)` | measured: "Orb Automaton" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `button.hero>div.art>div.ph` `"Ione Stillwater" 13px (min 16)` | measured: "Ione Stillwater" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div.heroes>button.hero>b` `"Ione" 14px (min 16)` | measured: "Ione" 14px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div.heroes>button.hero>i` `"Stance Monk" 13px (min 16)` | measured: "Stance Monk" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div#title>div>div.refline` `"Strength: every point adds d" 14px (min 16)` | measured: "Strength: every point adds d" 14px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `start` | element: `div#title>div>div.refline` `"Pick 1 hero, or 2 to play to" 14px (min 16)` | measured: "Pick 1 hero, or 2 to play to" 14px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#app>div.top>span.chip` `"♥ 80/80" 13px (min 16)` | measured: "♥ 80/80" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#app>div.top>span.chip` `"● 99" 13px (min 16)` | measured: "● 99" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#app>div.top>button.chip` `"🎒 1" 13px (min 16)` | measured: "🎒 1" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#app>div.top>button.chip` `"🂠 10" 13px (min 16)` | measured: "🂠 10" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.intent>div.art>div.ph` `"✦" 13px (min 16)` | measured: "✦" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.en>div.art>div.ph` `"Hex Acolyte" 13px (min 16)` | measured: "Hex Acolyte" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.enemies>div.en>div.nm` `"Hex Acolyte" 13px (min 16)` | measured: "Hex Acolyte" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.en>div.bar>b` `"50/50" 10px (min 16)` | measured: "50/50" 10px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.heropan>div.art>div.ph` `"Garrick Cinderplate" 13px (min 16)` | measured: "Garrick Cinderplate" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.inf>div.bar>b` `"80/80" 10px (min 16)` | measured: "80/80" 10px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.ctl>div.piles>button.chip` `"↓ 5" 13px (min 16)` | measured: "↓ 5" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.ctl>div.piles>button.chip` `"↺ 0" 13px (min 16)` | measured: "↺ 0" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.ctl>div.piles>span.chip` `"Turn 1" 13px (min 16)` | measured: "Turn 1" 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.ct` `"Cinder Strike" 12px (min 16)` | measured: "Cinder Strike" 12px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.cx` `"1" 15.6px (min 16)` | measured: "1" 15.6px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.card>div.cb>span.cl` `"Deal 6." 13px (min 16)` | measured: "Deal 6." 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.hand>div.card>div.ct` `"Plate Guard" 12px (min 16)` | measured: "Plate Guard" 12px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div.card>div.cb>span.cl` `"Gain 5 Block." 13px (min 16)` | measured: "Gain 5 Block." 13px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+
+## Failing checks (scenarios)
+
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone 390x763) | element/measured: text under 11px: "50/50" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone 390x763) | element/measured: text under 11px: "Str 3" (10px) <span> | pass: text >= 11px
+- **text clipping (scenario)** | scenario: `?scn=ec-fight` (phone 390x763) | element/measured: text clipped: "Garrick Cinderplate" <div.ph in div.art.k-portrait -2,22,-2,24> | pass: text fits its box (no clipping)
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone 390x763) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone 390x763) | element/measured: text under 11px: "Cinder Strike" (6.4px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone 390x763) | element/measured: text under 11px: "1" (8.4px) <div.cx> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone 390x763) | element/measured: text under 11px: "Deal 6." (7px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone 390x763) | element/measured: text under 11px: "Anvil Blow" (6.4px) <div.ct> | pass: text >= 11px
+- **text clipping (scenario)** | scenario: `?scn=ec-fight-two` (phone 390x763) | element/measured: text clipped: "🂠 21" <button.chip.tap in div.top 367,18,-7,19> | pass: text fits its box (no clipping)
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone 390x763) | element/measured: text under 11px: "20/20" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone 390x763) | element/measured: text under 11px: "22/22" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone 390x763) | element/measured: text under 11px: "70/70" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone 390x763) | element/measured: text under 11px: "72/72" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone 390x763) | element/measured: text under 11px: "Quick Cut" (5.7px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone 390x763) | element/measured: text under 11px: "1" (7.4px) <div.cx> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone 390x763) | element/measured: text under 11px: "Deal 6." (6.1px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone 390x763) | element/measured: text under 11px: "54/54" (10px) <b> | pass: text >= 11px
+- **text clipping (scenario)** | scenario: `?scn=ec-map` (phone 390x763) | element/measured: text clipped: "Garrick Cinderplate" <div.ph in div.art.k-portrait -2,22,-2,24> | pass: text fits its box (no clipping)
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone 390x763) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone 390x763) | element/measured: text under 11px: "Plate Guard" (6.4px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone 390x763) | element/measured: text under 11px: "1" (8.4px) <div.cx> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone 390x763) | element/measured: text under 11px: "Gain 5 Block." (7px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone 390x763) | element/measured: text under 11px: "Anvil Blow" (6.4px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone 390x763) | element/measured: text under 11px: "2" (8.4px) <div.cx> | pass: text >= 11px
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: every font a loaded shelf face: N=18 [title] font "Cinzel" has no @font-face (falls back to a system font): "EMBERCLIMB" <h1> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Climb the tower. Build" <p.sub> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Garrick Cinderplate" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Garrick" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ember Warrior" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Sable Quillfinger" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Sable" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Venom Rogue" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Cog-9" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Cog-9" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Orb Automaton" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ione Stillwater" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ione" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Stance Monk" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **scenario check** | scenario: `?scn=menu` (phone 390x763) | element/measured: no box or text cut by the screen edge or an overflow:hidden parent: N=1 [board] cut by overflow:hidden <div.art.k-portrait> (2 px): text "Garrick Cinderplate" <div.ph> | pass: check passes
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "50/50" (10px) <b> | pass: text >= 11px
+- **text clipping (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text clipped: "Garrick Cinderplate" <div.ph in div.art.k-portrait -2,22,-2,24> | pass: text fits its box (no clipping)
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Cinder Strike" (6.4px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "1" (8.4px) <div.cx> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Deal 6." (7px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Plate Guard" (6.4px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Gain 5 Block." (7px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone-s 375x553) | element/measured: text under 11px: "50/50" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone-s 375x553) | element/measured: text under 11px: "Str 3" (10px) <span> | pass: text >= 11px
+- **text clipping (scenario)** | scenario: `?scn=ec-fight` (phone-s 375x553) | element/measured: text clipped: "Garrick Cinderplate" <div.ph in div.art.k-portrait -3,21,-3,22> | pass: text fits its box (no clipping)
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone-s 375x553) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone-s 375x553) | element/measured: text under 11px: "Cinder Strike" (6.2px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone-s 375x553) | element/measured: text under 11px: "1" (8px) <div.cx> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone-s 375x553) | element/measured: text under 11px: "Deal 6." (6.7px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (phone-s 375x553) | element/measured: text under 11px: "Anvil Blow" (6.2px) <div.ct> | pass: text >= 11px
+- **text clipping (scenario)** | scenario: `?scn=ec-fight-two` (phone-s 375x553) | element/measured: text clipped: "🂠 21" <button.chip.tap in div.top 367,18,-22,19> | pass: text fits its box (no clipping)
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone-s 375x553) | element/measured: text under 11px: "20/20" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone-s 375x553) | element/measured: text under 11px: "22/22" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone-s 375x553) | element/measured: text under 11px: "70/70" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone-s 375x553) | element/measured: text under 11px: "72/72" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone-s 375x553) | element/measured: text under 11px: "Quick Cut" (5.4px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone-s 375x553) | element/measured: text under 11px: "1" (7.1px) <div.cx> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (phone-s 375x553) | element/measured: text under 11px: "Deal 6." (5.9px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone-s 375x553) | element/measured: text under 11px: "54/54" (10px) <b> | pass: text >= 11px
+- **text clipping (scenario)** | scenario: `?scn=ec-map` (phone-s 375x553) | element/measured: text clipped: "Garrick Cinderplate" <div.ph in div.art.k-portrait -3,21,-3,22> | pass: text fits its box (no clipping)
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone-s 375x553) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone-s 375x553) | element/measured: text under 11px: "Plate Guard" (6.2px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone-s 375x553) | element/measured: text under 11px: "1" (8px) <div.cx> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone-s 375x553) | element/measured: text under 11px: "Gain 5 Block." (6.7px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone-s 375x553) | element/measured: text under 11px: "Anvil Blow" (6.2px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (phone-s 375x553) | element/measured: text under 11px: "2" (8px) <div.cx> | pass: text >= 11px
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: every font a loaded shelf face: N=18 [title] font "Cinzel" has no @font-face (falls back to a system font): "EMBERCLIMB" <h1> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Climb the tower. Build" <p.sub> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Garrick Cinderplate" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Garrick" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ember Warrior" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Sable Quillfinger" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Sable" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Venom Rogue" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Cog-9" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Cog-9" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Orb Automaton" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ione Stillwater" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ione" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Stance Monk" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **scenario check** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: no box or text cut by the screen edge or an overflow:hidden parent: N=1 [board] cut by overflow:hidden <div.art.k-portrait> (3 px): text "Garrick Cinderplate" <div.ph> | pass: check passes
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "50/50" (10px) <b> | pass: text >= 11px
+- **text clipping (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text clipped: "Garrick Cinderplate" <div.ph in div.art.k-portrait -3,21,-3,22> | pass: text fits its box (no clipping)
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Cinder Strike" (6.2px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "1" (8px) <div.cx> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Deal 6." (6.7px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Plate Guard" (6.2px) <div.ct> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Gain 5 Block." (6.7px) <span.cl> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (PC 1440x860) | element/measured: text under 11px: "50/50" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (PC 1440x860) | element/measured: text under 11px: "Str 3" (10px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight` (PC 1440x860) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (PC 1440x860) | element/measured: text under 11px: "20/20" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (PC 1440x860) | element/measured: text under 11px: "22/22" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (PC 1440x860) | element/measured: text under 11px: "70/70" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-fight-two` (PC 1440x860) | element/measured: text under 11px: "72/72" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (PC 1440x860) | element/measured: text under 11px: "54/54" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=ec-map` (PC 1440x860) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: every font a loaded shelf face: N=18 [title] font "Cinzel" has no @font-face (falls back to a system font): "EMBERCLIMB" <h1> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Climb the tower. Build" <p.sub> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Garrick Cinderplate" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Garrick" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ember Warrior" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Sable Quillfinger" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Sable" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Venom Rogue" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Cog-9" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Cog-9" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Orb Automaton" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ione Stillwater" <div.ph> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Ione" <b> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "Alegreya Sans" has no @font-face (falls back to a system font): "Stance Monk" <i> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "50/50" (10px) <b> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "80/80" (10px) <b> | pass: text >= 11px
+
