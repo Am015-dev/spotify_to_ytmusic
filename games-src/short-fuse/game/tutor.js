@@ -82,7 +82,7 @@ const hitTxt=()=>{const t=G.st[1].w[tutIdx(1,7)];return t&&t.cut};
 function tutSteps(){return tutStory([
  {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires before the fuse burns out. The whole crew wins or loses together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.q},
  {id:'mine',title:'Your wires',say:'These wires are yours. Only you see the numbers. Every stand is sorted, lowest on the left.',target:tq('#mine'),wait:null},
- {id:'crew',title:'Their wires',say:'Teal and Plum hold the rest. You see only their backs, and they never see yours.',target:tq('#crew'),wait:null},
+ {id:'crew',title:'Their wires',say:'Teal and Plum hold the rest. You see only their backs, and they never see yours.',target:()=>tq(innerWidth>=900?'#crew .sg':'#crew')(),wait:null},
  {id:'fuse',title:'The fuse',say:'A wrong cut burns one step. When none is left, or a red wire is cut, the bomb explodes.',target:tq('#fuse'),wait:null},
  {id:'token',title:'Show a wire',say:'Everyone starts by showing one wire. Tap your 3: a token tells the crew its number.',target:tutEl(0,8),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===8},ready:()=>!!G&&!!G.q&&G.q.who===0&&G.q.kind==='infoStd'},

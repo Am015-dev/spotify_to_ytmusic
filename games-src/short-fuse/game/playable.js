@@ -15,8 +15,8 @@ function plain(t){const me=plSeat();t=String(t||'');
     .replace(/^You point(.*) and says/,'You point$1 and say').replace(new RegExp('^'+n+"'s",'g'),'Your').replace(new RegExp(n+"'s",'g'),'your').replace(new RegExp('\\b'+n+'\\b','g'),'you')}
 function plCut(){return G?G.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0):0}
 // ---------- (a) the banner ----------
-function plBanner(txt,col){const tb=document.getElementById('tb');if(!tb)return;let b=document.getElementById('turnb');if(!b){b=document.createElement('div');b.id='turnb';b.setAttribute('aria-hidden','true');tb.appendChild(b)}
-  b.textContent=txt;b.style.setProperty('--bc',col||'#ffd34d');b.classList.remove('on');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.bt);PL.bt=setTimeout(()=>b.classList.remove('on'),Math.max(500,1100/(UI.speed||1)))}
+function plBanner(txt,col){const tb=document.getElementById('fx');if(!tb)return;let b=document.getElementById('turnb');if(!b){b=document.createElement('div');b.id='turnb';b.setAttribute('aria-hidden','true');b.setAttribute('data-help','');tb.appendChild(b)}
+  b.textContent=txt;b.style.setProperty('--bc',col||'#ffd34d');b.classList.remove('on');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.bt);PL.bt=setTimeout(()=>{b.classList.remove('on');b.remove()},Math.max(500,1100/(UI.speed||1)))}
 function plTurnWatch(){if(!G||!UI.started||G.over||UI.brief||G.phase!=='turn'||G.q||passTo()>=0){return}
   const s=decider();if(s<0)return;const key=G.mission+':'+G.turn+':'+s;if(key===PL.key)return;PL.key=key;
   if(UI._boost&&isHuman(s)){UI.speed=UI._boost;UI._boost=null}
@@ -29,15 +29,15 @@ function plTurnWatch(){if(!G||!UI.started||G.over||UI.brief||G.phase!=='turn'||G
 function plLines(n0){const out=[];for(const e of G.log){if(e.i<=n0)break;if(e.c==='turn'||/opening token|fuse is lit/i.test(e.t))continue;out.unshift(e)}return out}
 (function(){const o=applyMove;applyMove=function(m,seat){if(!G||G.over)return o(m,seat);const n0=G.logN,c0=plCut(),d0=G.dial;const r=o(m,seat);
   try{if(r&&r.success!==false&&G){const L=plLines(n0);if(L.length&&!(m.a==='q'&&!L.length)){const first=L[0],bad=L.some(e=>e.c==='bad'),good=L.some(e=>e.c==='good');
-      let t=plain(L.slice(0,2).map(e=>e.t).join(' ')),hold=Math.max(1400,2200/(UI.speed||1));if(m.a==='q'||!L.length)hold=0;
+      let t=plain(L.slice(0,2).map(e=>e.t).join(' '));if(t.length>84){const rs=L.find(e=>/^(Hit|Miss)/.test(e.t));t=plain((rs||L[0]).t)}let hold=Math.max(1400,2200/(UI.speed||1));if(m.a==='q'||!L.length)hold=0;
       if(hold){const say=document.getElementById('say');TBL.sayT=0;setSay(t,hold);if(say){say.classList.toggle('badc',bad&&!good);say.classList.toggle('goodc',good&&!bad);setTimeout(()=>say.classList.remove('badc','goodc'),hold)}}
       const dc=plCut()-c0;let pop=null;
       if(dc>0)pop=['+'+dc,dc>=3?'wires cut':(m.a==='solo'?'solo cut: no guessing needed':'a match: both wires cut'),'good'];
       else if(G.dial!=null&&d0!=null&&G.dial<d0)pop=['Fuse −'+(d0-G.dial),'a miss: nobody cut','bad'];
       if(pop)plPop(pop[0],pop[1],pop[2])}}}catch(e){console.error(e)}return r}})();
 // ---------- (d) the score pop ----------
-function plPop(big,why,cls){const tb=document.getElementById('tb');if(!tb||UI.tut&&false)return;let p=document.getElementById('spop');if(!p){p=document.createElement('div');p.id='spop';p.setAttribute('aria-hidden','true');tb.appendChild(p)}
-  p.className='';p.innerHTML='<b>'+esc(big)+'</b><span>'+esc(why)+'</span>';void p.offsetWidth;p.className='on '+cls;clearTimeout(PL.pt);PL.pt=setTimeout(()=>p.classList.remove('on'),Math.max(900,1700/(UI.speed||1)))}
+function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tut&&false)return;let p=document.getElementById('spop');if(!p){p=document.createElement('div');p.id='spop';p.setAttribute('aria-hidden','true');p.setAttribute('data-help','');tb.appendChild(p)}
+  p.className='';p.innerHTML='<b>'+esc(big)+'</b><span>'+esc(why)+'</span>';void p.offsetWidth;p.className='on '+cls;clearTimeout(PL.pt);PL.pt=setTimeout(()=>{p.classList.remove('on');p.remove()},Math.max(900,1700/(UI.speed||1)))}
 // ---------- (b) the one instruction line, in plain words ----------
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(!G||G.over||UI.brief||!V||V.seat<0)return t;const me=V.seat,s=decider();if(UI.tut)return t;
   if(V.q&&V.q.who===me&&V.q.kind==='infoStd')return 'First, show one of your wires: tap it. It tells the crew its number.';
