@@ -116,7 +116,8 @@
   ];
   var CHS = [ch1, ch2, ch3, ch4];
   // ---------------------------------------------------------------- chapters
-  function scene(lines) { return ((window.GXC && GXC.scene) ? GXC.scene(lines || [], { title: '', last: 'Continue' }) : Promise.resolve()).then(function () { try { if (window.GXC) GXC.close(); } catch (e) { } }); }
+  var RUN = 0;   // a scene that outlives its tutorial (the story map or the title was opened meanwhile) must not start it
+  function scene(lines, my) { return ((window.GXC && GXC.scene) ? GXC.scene(lines || [], { title: '', last: 'Continue' }) : Promise.resolve()).then(function () { if (my != null && my !== RUN) return false; try { if (window.GXC) GXC.close(); } catch (e) { } return true; }); }
   function runChapter(n, fresh, resumed) {
     T.ch = n; lsSet(n); var meta = (PRO.chapters || [])[n] || { title: 'Chapter ' + (n + 1), open: [], close: [] };
     var go = function () {
@@ -127,12 +128,12 @@
         onDone: function (r) { finishChapter(n, r && r.choice); }, onExit: function () { U.tut = false; U.rivalName = null; if (T.then) { var f = T.then; T.then = null; f(); } else UI.showStart(); } });
     };
     $('res').hidden = true; $('start').hidden = true;
-    scene(meta.open).then(go);
+    var my = ++RUN; scene(meta.open, my).then(function (ok) { if (ok) go(); });
   }
   function finishChapter(n, choice) {
     if (n < 3) {
       if (choice === 'leave') { lsSet(n + 1); U.tut = false; U.rivalName = null; UI.showStart(); return; }
-      lsSet(n + 1); var meta = PRO.chapters[n]; scene(meta.close.slice(1)).then(function () { runChapter(n + 1, false, false); }); return;
+      lsSet(n + 1); var meta = PRO.chapters[n], my2 = ++RUN; scene(meta.close.slice(1), my2).then(function (ok) { if (ok) runChapter(n + 1, false, false); }); return;
     }
     lsSet(0); U.tut = false; U.rivalName = null; $('res').hidden = true;
     var f = T.then; T.then = null; if (f) { f(); return; }
@@ -151,5 +152,5 @@
     if (n > 0 && n < 4 && !(o && o.fresh)) dialog(n); else runChapter(0, true, false);
   }
   function coverage() { var ids = []; CHS.forEach(function (c) { c.forEach(function (s) { ids.push(s.id); }); }); return { all: ids, seen: Object.keys(T.seen) }; }
-  window.TT_TUTOR = { start: start, aiMove: aiMove, steps: CHS, coverage: coverage, takeReaction: function () { var r = T.react; T.react = null; return r; }, beforePlayerMove: function () { T.av0 = av().map(function (c) { return c.i; }); } };
+  window.TT_TUTOR = { cancel: function () { RUN++; }, start: start, aiMove: aiMove, steps: CHS, coverage: coverage, takeReaction: function () { var r = T.react; T.react = null; return r; }, beforePlayerMove: function () { T.av0 = av().map(function (c) { return c.i; }); } };
 })();

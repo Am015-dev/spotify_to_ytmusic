@@ -187,7 +187,7 @@ var TT_TEST = {};
     if (U.camp && U.camp.hints && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = AI.pick(G, 'normal', function () { return 0.5; }); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
     G.pyr.forEach(function (cell) {
       var c = BY[cell.id], e = document.createElement('div');
-      e.className = 'card' + (d.w < 100 ? ' sm' : ''); e.dataset.col = c.col; e.id = 'c' + cell.i; e.style.setProperty('--cw', d.w + 'px'); e.style.setProperty('--cc', 'var(--c-' + c.col + ')');
+      e.className = 'card' + (d.w < 100 ? ' sm' : '') + (d.w < 56 ? ' xs' : ''); e.dataset.col = c.col; e.id = 'c' + cell.i; e.style.setProperty('--cw', d.w + 'px'); e.style.setProperty('--cc', 'var(--c-' + c.col + ')');
       e.style.width = d.w + 'px'; e.style.height = d.h + 'px'; e.style.left = (d.ox + cell.x * d.u - d.w / 2) + 'px'; e.style.top = (d.oy + cell.r * d.step) + 'px'; e.style.zIndex = cell.r + 1;
       if (cell.taken) e.classList.add('taken');
       else if (!cell.up) { e.classList.add('down', 'a' + G.age); e.innerHTML = slot('back-age' + G.age) + '<div class="dn">Age ' + AGE[G.age] + '</div>'; fillArt(e); }
@@ -222,13 +222,13 @@ var TT_TEST = {};
     var human = canAct(), pd = G.pend[0];
     dt.textContent = human ? (U.mode === 'two' ? name(p) + ': your move' : 'Your move') : isAI(p) ? name(p) + ' thinks' : 'Wait';
     if (!human && !U.narr && !isAI(p)) setInstr('Please wait', 'info', 'One moment...');
-    if (!human) { msg.textContent = U.narr ? 'Watch what happens' : isAI(p) ? name(p) + ' is thinking...' : 'Wait...'; return; }
+    if (!human) { msg.textContent = U.narr ? 'Turn in progress' : isAI(p) ? name(p) + ' is thinking...' : 'Wait...'; return; }
     var M = E.validMoves(G);
     if (pd && pd.type === 'first') {
       msg.textContent = 'Age ' + AGE[G.age] + ': who starts?'; instr(p, 'Choose who plays first in this age.');
       acts.innerHTML = '<button class="btn" data-first="' + p + '">I start</button><button class="btn alt" data-first="' + (1 - p) + '">Rival starts</button>';
     } else if (pd && pd.type === 'token') {
-      msg.textContent = 'Pick a progress token'; instr(p, 'Pick a progress token: a bonus you keep for the whole game.'); var l = pd.from === 'lib' ? pd.list : G.tokensUp;
+      msg.textContent = 'Progress token'; instr(p, 'Pick a progress token: a bonus you keep for the whole game.'); var l = pd.from === 'lib' ? pd.list : G.tokensUp;
       acts.innerHTML = '<div class="picker">' + l.map(function (t) { var d = BY[t]; return '<button class="tk" data-token="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(d.text) + '</button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'destroy') {
       msg.textContent = 'Discard a rival card'; instr(p, 'Pick one rival card to throw away.');
@@ -237,13 +237,13 @@ var TT_TEST = {};
       msg.textContent = 'Revive a discarded card'; instr(p, 'Pick a thrown-away card to build for free.');
       acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk" data-revive="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(describe(d)) + '</button>'; }).join('') + '</div>';
     } else if (G.phase === 'draft') {
-      msg.textContent = 'Pick a wonder'; sub.textContent = 'Each of you takes four.'; instr(p, 'Pick a wonder for your city. A wonder gives points and a power. You get 4.');
+      msg.textContent = 'Wonder draft'; sub.textContent = ''; instr(p, 'Pick a wonder for your city. A wonder gives points and a power. You get 4.');
     } else if (U.sel != null) {
       var cell = G.pyr[U.sel], c = BY[cell.id], bi = E.buildInfo(G, p, c), has = function (t, w) { return M.some(function (m) { return m.t === t && m.i === cell.i && (w == null || m.w === w); }); };
       msg.textContent = c.nm; sub.textContent = describe(c) + '. Cost: ' + (bi.chain ? 'free by chain' : bi.coins + ' coin' + (bi.coins === 1 ? '' : 's') + (bi.trade ? ' (' + bi.trade + ' for trade)' : ''));
-      acts.innerHTML = '<span class="hint">Choose in the big card: build, sell or wonder.</span>'; instr(p, 'Choose: Build it, Sell it for coins, or use it for a Wonder.');
+      instr(p, 'Choose: Build it, Sell it for coins, or use it for a Wonder.');
     } else {
-      msg.textContent = 'Tap a glowing card'; sub.textContent = ''; instr(p, 'Tap a glowing card. Glowing cards are free to take.');
+      msg.textContent = 'Gold glow = free to take'; sub.textContent = ''; instr(p, 'Tap a glowing card. Glowing cards are free to take.');
     }
   }
   // ---------- zoom: the tapped card big, every detail, and the three ways to use it
@@ -355,7 +355,7 @@ var TT_TEST = {};
 
   // ---------- screens
   function showStart() {
-    var s = $('start'); clearTimeout(U.aiTimer); U.busy = true; U.camp = null; $('res').hidden = true; s.hidden = false; bgSlot(s, 'title-bg'); $('zoom').hidden = true;
+    var s = $('start'); if (window.TT_TUTOR && TT_TUTOR.cancel) TT_TUTOR.cancel(); clearTimeout(U.aiTimer); U.busy = true; U.camp = null; $('res').hidden = true; s.hidden = false; bgSlot(s, 'title-bg'); $('zoom').hidden = true;
     var lv = U.lvl, prog = '';
     try { if (window.GXC && window.CAMPAIGN) { var p = GXC.progress(), n = window.CAMPAIGN.chapters.filter(function (c) { return p.ch[c.id] && p.ch[c.id].beaten; }).length; prog = n ? n + ' of ' + window.CAMPAIGN.chapters.length + ' chapters done' : 'The Twin Crowns: 10 chapters'; } } catch (e) { }
     s.innerHTML = '<h1>Twin Thrones</h1><p>Two rival cities, one pyramid of cards. Out-build, out-think, or out-march your rival.</p>' +
@@ -426,18 +426,19 @@ var TT_TEST = {};
   function campInit() {
     if (!window.GXC || !window.CAMPAIGN) return;
     GXC.init({ game: 'twin-thrones', artBase: 'media/', data: window.CAMPAIGN,
-      headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); if (window.TT_TUTOR) TT_TUTOR.start(); }); return [b]; },
+      headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'How to play'; b.setAttribute('aria-label', 'How to play and the tutorial'); b.addEventListener('click', function () { GXC.close(); GX.show('rulesd'); }); return [b]; },
       startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
       onExit: function () { U.camp = null; showStart(); },
       scores: function (G) { return [E.score(G, 0).total, E.score(G, 1).total]; },
-      seats: function () { return [{ name: 'You', me: true }, { name: U.camp ? U.camp.opponent.name : 'Computer', ai: U.lvl }]; } });
+      seats: function () { return [{ name: 'You', me: true }, { name: U.camp ? U.camp.opponent.name : 'Rival', ai: U.lvl }]; } });
+    var go0 = GXC.open; GXC.open = function () { try { if (window.TT_TUTOR && TT_TUTOR.cancel) TT_TUTOR.cancel(); if (window.GXT && GXT.running && GXT.running()) { GXT.stop(); U.tut = false; U.rivalName = null; } } catch (e) { } return go0.apply(this, arguments); };
   }
   function menuRender() {
     var b = $('menubody'); if (!b) return;
     b.innerHTML = '<div class="mrow"><button class="btn" data-menu="rules">Rules</button>' + tutBtn() + '<button class="btn alt" data-menu="restart">Restart game</button><button class="btn alt" data-snd="1">' + sndLabel() + '</button>' + (SND.hasMusic() ? '<button class="btn alt" data-menu="music">Music</button>' : '') + '<button class="btn alt" data-menu="title">Back to title</button></div>';
   }
   function rulesRender() {
-    $('rulesbox').innerHTML = '<div class="mrow">' + tutBtn() + '</div><h3>The goal</h3><p>Win by marching the conflict pawn to the rival capital, by collecting six different science symbols, or by having the most points after Age III.</p><h3>Your turn</h3><p>Take one uncovered card from the pyramid. <b>Build</b> it by paying its cost (missing resources are bought from the bank at 2 coins plus what your rival produces), <b>sell</b> it for 2 coins plus 1 per trade card you own, or <b>use it to raise a wonder</b>. Face-down cards flip when nothing covers them.</p><h3>Chains</h3><p>A card with an infinity mark is free when you own the matching symbol.</p><h3>Conflict</h3><p>Shields push the pawn toward your rival. Passing the marked spaces loots coins from them.</p><h3>Science</h3><p>A matching pair of symbols lets you pick a progress token.</p><h3>Wonders</h3><p>Four each, but only seven can ever be built in total.</p>';
+    $('rulesbox').innerHTML = '<div class="mrow">' + tutBtn() + '</div><h3>How a turn works</h3><ol class="turn5"><li>Look for the glowing cards. Only those are free to take.</li><li>Tap one to see it big, with its cost.</li><li>Choose <b>Build</b> (pay its cost), <b>Sell</b> (take coins) or <b>Wonder</b> (tuck it under a wonder).</li><li>Watch what happens: the card moves, points and coins pop up, the pawn may march.</li><li>Then your rival does the same, one step at a time. Tap the board to speed it up.</li></ol><h3>The goal</h3><p>Win by marching the conflict pawn to the rival capital, by collecting six different science symbols, or by having the most points after Age III.</p><h3>Your turn</h3><p>Take one uncovered card from the pyramid. <b>Build</b> it by paying its cost (missing resources are bought from the bank at 2 coins plus what your rival produces), <b>sell</b> it for 2 coins plus 1 per trade card you own, or <b>use it to raise a wonder</b>. Face-down cards flip when nothing covers them.</p><h3>Chains</h3><p>A card with an infinity mark is free when you own the matching symbol.</p><h3>Conflict</h3><p>Shields push the pawn toward your rival. Passing the marked spaces loots coins from them.</p><h3>Science</h3><p>A matching pair of symbols lets you pick a progress token.</p><h3>Wonders</h3><p>Four each, but only seven can ever be built in total.</p>';
   }
   function showCity(p) {
     var G = U.G, b = $('cityd').querySelector('.gx-drawer-body'), h = '<h3>' + esc(name(p)) + '</h3><div class="ref" id="cityref"></div>'; b.innerHTML = h; var c = $('cityref');
