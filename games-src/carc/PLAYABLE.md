@@ -24,11 +24,13 @@ Also: Help opens with "How a turn works" (5 short lines) and a "House rules" car
 - `build-all --quick rampart-and-vine`: PASS (scenarios 11/11, including ui-bar rules and axe contrast).
 - `tutor-test.js` 390x763 and 1440x860: 19 steps, wrong taps, spotlight not covered, rotate/leave/skip/story runs: 0 problems.
 - `playable-test.js both`: Quick game and Story chapter 1 played to the result by taps only: PASS, 0 console errors.
-- ui-audit (phone, phone-s, pc) before: A2/0/24 B14/20/12 C10 E3/0/1 F1; after: see the last section.
+- ui-audit (phone / phone-s / pc) before: A2/0/24 B14/20/12 C10 E3/0/1 F1 (D0). After: A0/0/1 B5/8/4 C9/10/10 D0 E0/0/1 F0. A and F are fixed, B and E are halved or gone. NOT zero: the remaining B (busy background behind painted-art labels, kit campaign map header buttons), C (the painted menu row art is drawn stretched; the scenario rv-art requires the painted rows) and E (one kit button) are in the painted skin and the shared campaign kit, left as they are.
+- sweep QUICK (4 full games with the help kit, rotation, result card): SWEEP CLEAN; geo_test and graph_test (77) pass.
+- After shots (phone, webp): `playable-shots/` title, first turn, rival turn, result.
 - rules fixed 0/0 (rules check found nothing WRONG; the one MISSING item is an expansion we do not have).
 
 ## Remaining (honest)
 - The tutorial game cannot teach River, Taverns, Merchants, ties, banners and the can't-place rule (see TUTORIAL-COVERAGE.md).
 - Story outros play only after a win (shared kit); no loss variants.
-- Commits on this branch before 21:35 UTC carry model attribution trailers that CLAUDE.md forbids; the branch was already pushed and force-push is
-  forbidden: squash at merge, or the owner may rewrite the branch.
+- The first commit on this branch (c6dc4f71) carries model attribution trailers that CLAUDE.md forbids (added by mistake from the harness template); it was pushed
+  before I noticed and force-push is forbidden: squash at merge, or the owner may rewrite that commit. Later commits are clean.
