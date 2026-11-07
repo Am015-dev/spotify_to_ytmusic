@@ -44,3 +44,14 @@ Counts: WRONG 4, MISSING 4, SIMPLIFIED 3
 - Exact count of Stress cards in the reserve and the printed number of Heat cards on other tracks (this booklet says "typically 6 heat and 3 stress"). Med.
 - The Starting Upgrade cards: values and whether they count as non-speed cards for the stress-card flip (the booklet's own example discards one while flipping). High that they exist, low on values.
 - Corner speed limits and corner positions of the two shipped tracks (original designs, not comparable).
+
+## Fixed (W391, branch shelf/W391-rules-fixes)
+- WRONG spin-out stress count -> fixed (1 stress card in gear 1-2, 2 in gear 3-4); test "spin-out-stress-count".
+- WRONG spin-out keeps heat -> fixed (pays all engine heat to the discard); test "spin-out-pays-all-heat".
+- WRONG adrenaline -> fixed (last car to move, last two with 5+ starting cars, also in 2-car races); tests "adrenaline-last-car-2-cars", "adrenaline-last-two-with-5-cars". The plan-screen preview now uses the same function.
+- WRONG race ends when first car finishes -> fixed (race continues until every car has finished; finishers ranked in finishing order, same round by distance); tests "race-continues-until-all-finish", "finisher-skipped-in-resolve".
+- MISSING too few playable cards -> fixed (play all, fill with heat from hand, no move, gear 1); test "stall-short-hand-no-move".
+- MISSING optional discard step -> engine function discardOptional(G, seat, idxs) added and tested ("optional-discard-before-draw", "discard-refuses-heat-stress"); NOT wired into the UI (UI layout is not in this task) and the AI does not use it.
+- MISSING slipstream/corners past the finish line -> fixed; test "no-slipstream-past-finish-line".
+- MISSING starting upgrade cards: left, the booklet text gives no values (unverified).
+- SIMPLIFIED lines (unlimited stress reserve, no starting upgrades, cooldown at shift time) added to the rules drawer.

@@ -165,7 +165,7 @@ test('green set 2: a green 4 gives yellow 1 or purple 1 only if that book is out
   const H = T.game(2, { setObj: SET('G', 2), round: 3 }); play(H, ['O1', 'G4']); T.stop(H, 0); T.stopOthers(H, 0); eq(P(H, 0).q.d.opts, ['Y1', 'P1']);
 });
 test('green set 3: whites exactly 7 -> the last chip slides forward by the sum of the green chips', () => {
-  const G = T.game(2, { setObj: SET('G', 3) }); play(G, ['G2', 'W3', 'W3', 'W1', 'G1']); const before = CF.spaceOf(P(G, 0)); T.stopOthers(G, 0); eq(G.hist.length + (P(G, 0).res ? 1 : 0) > 0, true); eq(P(G, 0).res.space - before, 3);
+  const G = T.game(2, { setObj: SET('G', 3) }); play(G, ['G2', 'W3', 'W3', 'W1', 'G1']); const before = CF.spaceOf(P(G, 0)); T.stopOthers(G, 0); eq(P(G, 0).q.h, 'g3'); T.answer(G, 0, { yes: true }); eq(P(G, 0).res.space - before, 3);
   const H = T.game(2, { setObj: SET('G', 3) }); play(H, ['G2', 'W3', 'W2', 'G1']); const b2 = CF.spaceOf(P(H, 0)); T.stopOthers(H, 0); eq(P(H, 0).res.space - b2, 0, 'whites are 5: no slide');
 });
 test('green set 4: pay 1 ruby per last/next-to-last green for a droplet step', () => {
@@ -373,6 +373,15 @@ test('day 9: Spilled Brew, Swap Stall, Fork, Haggler and Pedlar\'s Pick are skip
   const X = T.game(2); X.round = 3; P(X, 0).vp = 10; P(X, 1).vp = 10; X.force = 'bounty'; CF._.startRound(X); eq(CF.moves(X, 0).some(m => m.o === 'vp'), false, 'no points option when you trail by nothing'); yes(CF.moves(X, 0).length > 0);
 });
 
+test('pass up an action: Lucky-seven moss slide is always optional (declining keeps the scoring space)', () => {
+  const G = T.game(2, { setObj: SET('G', 3) }); play(G, ['G2', 'W3', 'W3', 'W1', 'G1']); const before = CF.spaceOf(P(G, 0)); T.stopOthers(G, 0);
+  eq(P(G, 0).q.h, 'g3'); T.answer(G, 0, { yes: false }); eq(P(G, 0).res.space, before); T.finish(G); T.inv(G);
+});
+test('upgrade does not touch the current round: the swapped chip stays in the cauldron and leaves for the supply at clean-up', () => {
+  const G = T.game(2, { setObj: SET('P', 4), round: 3 }); play(G, ['G1', 'P1']); T.stop(G, 0); T.stopOthers(G, 0); const n0 = P(G, 0).pot.length, g2 = G.supply.G2, g1 = G.supply.G1;
+  T.answer(G, 0, { from: 'G1', to: 'G2' }); eq(P(G, 0).pot.length, n0, 'pot unchanged'); yes(P(G, 0).pot.some(c => c.c === 'G' && c.v === 1), 'old chip still in the cauldron'); T.inv(G);
+  T.finish(G); eq(P(G, 0).bag.filter(c => c.c === 'G' && c.v === 1).length, 0, 'the swapped chip is gone'); eq(G.supply.G1, g1 + 1); eq(G.supply.G2, g2 - 1); T.inv(G);
+});
 let pass = 0, fail = 0;
 for (const [n, f] of tests) { try { f(); pass++; console.log('PASS ' + n); } catch (e) { fail++; console.log('FAIL ' + n + '\n     ' + (e.message || e).split('\n')[0]); } }
 console.log('\n' + pass + ' passed, ' + fail + ' failed (' + tests.length + ' tests)');
