@@ -23,7 +23,7 @@
     setup: function () { begin({ players: 4, mission: 2, seed: 4 }); toPlay(); return wait(300); },
     checks: [{ kind: 'tap', sel: '#helpB', name: 'rules open', state: function () { return !!document.querySelector('.gxh-rules,.gxh-sheet,[class*=gxh-r]'); }, expect: function (b, a) { return a || 'no rules'; } }] });
   GXS.add({ id: 'ds-signal', name: 'Send a signal', ask: 'Signal, then tap a white card', seed: 9, when: booted,
-    setup: function () { begin({ players: 4, mission: 2, seed: 9 }); toPlay(); return wait(400); },
+    setup: function () { begin({ players: 4, mission: 2, seed: 9 }); toPlay(); clearTimeout(UI.timer); G.turn = G.lead = 0; render(); return wait(400); },
     checks: [{ kind: 'play', name: 'signal sent', snap: function () { return { u: G.commUsed[0] }; }, steps: [{ sel: '#sigB' }, { sel: '#hand .cd.sigok' }], idle: function () { return true; },
       verify: function (b, a) { return !b.u && a.u && !!G.comm[0] || 'no signal'; } }], mut: [{ name: 'signal ignored', js: 'commPos = function(){return null}' }] });
   GXS.add({ id: 'ds-stamp', name: 'Mission complete stamp', ask: 'Does the stamp show clearly?', seed: 3, when: booted,

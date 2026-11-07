@@ -175,7 +175,7 @@ function render(anim) {
   drawHand();
   var tot = G.np <= 3 ? 13 : 40 / G.np;
   $('#mtrick').textContent = (G.phase === 'play' || G.phase === 'over' ? 'Trick ' + Math.min(G.tricks.length + 1, tot) + ' of ' + tot + ' · ' : '') + (G.mission.k ? G.tasks.filter(function (t) { return t.done; }).length + '/' + G.mission.k + ' tasks' : 'Special rule') + (G.mission.rule ? ' · ' + shortRule() : '');
-  try { if (window.GXH && !(window.GXT && GXT.active())) GXH.phase(phaseId()); } catch (e) { }
+  try { var ph = phaseId(); if (window.GXH && !(window.GXT && GXT.active()) && ph !== UI.lastPh) { UI.lastPh = ph; GXH.phase(ph); } } catch (e) { }
   musicSync();
 }
 function shortRule() { var s = G.mission.sp || ''; return s.split('-').map(function (x) { return { notrick: 'one diver wins nothing', onetrick: 'one diver wins one', decide: 'captain decides', dist: 'captain shares', dead: 'dead zone', nocomm: 'silence', late2: 'signals from trick 2', late3: 'signals from trick 3', sonar1: 'sonar 1 must win', sonars: 'every sonar wins' }[x] || x; }).join(', '); }
@@ -305,9 +305,9 @@ var RULES = [
 function helpInit() {
   try {
     GXH.init({ game: 'deep-signal', defaultOn: true, avoid: '.legal,#askp .btn,.seat.pick',
-      steps: { draft: { target: function () { return $('#pool'); }, title: 'Pick a task', text: 'Tap a task card. You must win the trick that holds that card.' },
-        lead: { target: function () { return $('#hand'); }, title: 'Your lead', text: 'Tap a glowing card to lead. Glow means legal.' },
-        follow: { target: function () { return $('#hand'); }, title: 'Follow suit', text: 'Play the colour that was led if you can. Highest wins.' },
+      steps: { draft: { target: function () { return $('#pool'); }, title: 'Task cards', text: 'You must win the trick that holds the task card you take.' },
+        lead: { target: function () { return $('#hand'); }, title: 'Your lead', text: 'Glow means legal. Any card may lead a trick.' },
+        follow: { target: function () { return $('#hand'); }, title: 'Following', text: 'The colour that was led must be followed if you can. Highest wins.' },
         ask: { target: function () { return $('#askp'); }, title: 'Captain asks', text: 'Say yes only if your hand can do it.' } },
       rules: RULES });
     GXH.bulb({ el: '#bulbbtn', suggest: suggest, rulesFor: function () { return phaseId() || 'lead'; } });
@@ -351,8 +351,10 @@ function boot() {
   $('#zoom').addEventListener('click', function (e) { if (e.target.id === 'zoom') closeZoom(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeZoom(); });
   window.addEventListener('resize', function () { if (G) render(); });
+  ['#board', '#hand', '#dock'].forEach(function (sel) { $(sel).addEventListener('click', function (e) { if (e.target === e.currentTarget || e.target.id === 'trick' || e.target.id === 'seats' || e.target.id === 'mine') nudge(); }); });
+  document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (c) c.classList.toggle('ds-hit'); });
   tutMenu();
-  if (!/[?&]scn=/.test(location.search) && !UI.fast && !ls('ds-seen')) { ls('ds-seen', 1); setTimeout(function () { zoomShow(null, '<b>Welcome aboard!</b><br>New here? The guided first dive teaches everything in about 3 minutes.', [['Start the tutorial', function () { startTutorial(false); }, true]]); }, 400); }
 }
+function nudge() { var m = $('#msg'); m.classList.remove('flash'); void m.offsetWidth; m.classList.add('flash'); setTimeout(function () { m.classList.remove('flash'); }, 700); }
 function tutMenu() { try { $('#tutSlot').innerHTML = GXT.menuHTML({ game: 'deep-signal', first: !ls('ds-played'), cls: 'btn', launch: function () { startTutorial(false); } }); } catch (e) { } }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
