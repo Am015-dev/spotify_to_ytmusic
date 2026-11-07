@@ -221,8 +221,8 @@ function drawHand() {
   var who = droneMine ? G.dummy : ME, h = G.hands[who], s = sideToAct(G); hd.classList.toggle('drone', droneMine);
   hd.onclick = function (ev) { if (ev.target === hd) nudge(); };
   var W = hd.clientWidth || 360, cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 58, n = h.length;
-  var fit = function (m) { return m > 1 ? Math.min(cw + 6, (W - cw - 8) / (m - 1)) : 0; }, rows = n > 1 && fit(n) < 46 || UI.twoG === G && n > 1 && !droneMine ? 2 : 1, per = Math.ceil(n / rows), rowOff = Math.round(cw * 0.9);
-  var y0 = droneMine ? 14 : 8; hd.style.height = (y0 + 6 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ch')) + (rows - 1) * rowOff) + 'px'; hd.classList.toggle('two', rows > 1); if (rows > 1 && !droneMine) UI.twoG = G;   // stays two rows for the mission: the hand never jumps
+  var fit = function (m) { return m > 1 ? Math.min(cw + 6, (W - cw - 8) / (m - 1)) : 0; }, rows = n > 1 && fit(n) < 46 ? 2 : 1, hrows = rows > 1 || UI.twoG === G && !droneMine ? 2 : 1, per = Math.ceil(n / rows), rowOff = Math.round(cw * 0.9);
+  var y0 = droneMine ? 14 : 8; hd.style.height = (y0 + 6 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ch')) + (hrows - 1) * rowOff) + 'px'; hd.classList.toggle('two', rows > 1); if (rows > 1 && !droneMine) UI.twoG = G;   // keeps the two-row height for the mission: the hand never jumps
   var legal = G.phase === 'play' && s === ME && !UI.hold && !UI.sigMode && !UI.flareMode && !askPending() ? legalCards(G, G.turn) : [];
   if (UI.tut && UI.tut.only && legal.indexOf(UI.tut.only) >= 0) legal = [UI.tut.only];
   h.forEach(function (c, i) {
