@@ -27,7 +27,7 @@ function showTitle() {
   clearTimeout(schedule.t); closeInsp(); UI.camp = null; const st = $('#start'), o = UI.opts, sv = hasSave(), first = !UI.prefs.played;
   st.innerHTML = `<div class="tbox">
     <h1 class="logo">Vinegrave</h1><p class="tag2">Dig the ruins. Wake the guardians. Reach the temple.</p>
-    ${first ? '<button type="button" class="tbtn primary" data-a="tut">Learn to play</button><button type="button" class="tsb" data-a="quick">Start a game<small>skip the guided round</small></button>'
+    ${first ? '<button type="button" class="tbtn primary" data-a="start">Learn to play</button><button type="button" class="tsb" data-a="quick">Start a game<small>skip the guided round</small></button>'
       : '<button type="button" class="tbtn primary" data-a="quick">Play</button>' + (sv ? '<button type="button" class="tsb" data-a="loadsave">Continue<small>your saved expedition</small></button>' : '<button type="button" class="tsb" data-a="tut">Guided round<small>learn or refresh the rules</small></button>')}
     <div class="lbl">Rivals</div>
     <div class="seg">${[[1, '1'], [2, '2'], [3, '3'], [0, 'Solo']].map(([v, l]) => `<button type="button" class="chipb${o.opp === v ? ' on' : ''}" data-a="opt" data-k="opp" data-v="${v}" aria-pressed="${o.opp === v}">${l}</button>`).join('')}</div>
