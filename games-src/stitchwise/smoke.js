@@ -9,7 +9,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
   const b = await chromium.launch({ executablePath: process.env.PW_CHROME || '/opt/pw-browsers/chromium', args: ['--no-sandbox'] }); const touch = sz[0] < 900;
   const ctx = await b.newContext({ viewport: { width: sz[0], height: sz[1] }, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1 }); const pg = await ctx.newPage(); const errs = [];
   await pg.addInitScript(p => { try { if (!sessionStorage.getItem('swinit')) { sessionStorage.setItem('swinit', '1'); localStorage.setItem('sw_seen', '1'); if (!p.anim) localStorage.setItem('gns-prefs', JSON.stringify({ anim: 'off', ai: 'fast' })); } } catch (e) { } }, { anim: ANIM });
-  pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
+  pg.on('response', r => { if (r.status() >= 400) errs.push(r.status() + ' ' + r.url()); }); pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });
   const cdp = await ctx.newCDPSession(pg);
   const tap = async el => { const bb = await el.boundingBox(); const x = bb.x + bb.width / 2, y = bb.y + bb.height / 2; if (touch) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] }); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await pg.waitForTimeout(60); } else await pg.mouse.click(x, y); };
   const tapSel = async s => { const el = await pg.$(s); if (!el) throw new Error('missing ' + s); await tap(el); };

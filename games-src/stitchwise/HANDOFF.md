@@ -15,11 +15,13 @@ Candidate moves are scored by board fit (small pockets and ragged edges penalise
 
 | match | win % |
 |---|---|
-| Hard vs simple bot | 91% (gate 70%) |
-| Normal vs simple bot | 75% (gate 55%) |
-| Easy vs simple bot | 73% |
-| Hard vs Normal | 63% |
-| Normal vs Easy | 68% |
+| Hard vs simple bot | 97% (gate 70%) |
+| Normal vs simple bot | 89% (gate 55%) |
+| Easy vs simple bot | 87% |
+| Hard vs Normal | 66% |
+| Normal vs Easy | 64% |
+
+With the real patch table (second pass; the first pass used guessed values: 91 / 75 / 73 / 63 / 68). Average Hard score +22 against the simple bot's -8, 500 games, avg 40 moves, no illegal or stuck games.
 
 500 AI games: no illegal move, no stuck state, `swCheck` invariants after every move, avg 33.6 moves. No hoarding: the AI buys whenever the value of the patch beats advancing (avg end buttons are spent, scores near 0 for Hard).
 
@@ -48,9 +50,10 @@ Candidate moves are scored by board fit (small pockets and ragged edges penalise
 10. Audit: teal buttons 4.16:1 -> darker teal; small text floors 13 px phone / 16 px wide.
 
 ## Known / not done
-- **Patch table values are reconstructed from memory** (cost, time, income per patch; track spot positions). Shapes are 33 distinct polyominoes. Fix the numbers in `src/data.js` if the owner's private research differs; nothing else depends on them. See `rules-notes.md` "Guessed".
+- **Patch data is now checked** (7 Nov, second pass): 31 of 33 patches agree exactly between two independent public implementations; track spots (5..53 step 6 income, 20/26/32/44/50 leather) and the other rules facts match them and a published study. 2 entries differ between the sources and use the more plausible one (see `rules-notes.md`, `cross-check.py`); confirm those two against the printed rulebook if available. Total 166 squares; the real set has duplicate shapes with different costs.
 - Audit rows left in shared kit surfaces: settings chips and `.gxc-ib` flagged "dead" (they scroll or toggle without a DOM change; a small attribute marker was added but the audit still reports them), Story map disc and emoji contrast (`gx-campaign.css`), kit helper text "Short buzz..." contrast. Not editable here (shared files read-only).
-- Wave-3 slots named and prompted but not yet drawn by code: bonus-tile, bg-map, fx-sparkle, fx-stitch, icon-bonus, icon-leather, ui-offer-card. Everything else in `assets.json` is wired.
+- Every slot in `assets.json` is now wired (bonus-tile on the result screen, icon-bonus on the player pill, icon-leather on the track, fx-sparkle at the income moment, fx-stitch when a patch is sewn, ui-offer-card behind offers, bg-map behind the Story map).
+- **Temporary art:** `temp-art/make-temp-art.py` draws 49 of the 63 pictures by code (33 fabrics, tokens, icons, leather, torn square, bonus rosette, fx, offer card, quilt and track frames, table and title cloth), original, no third-party pictures, written to `temp-art/media/*.webp` (committed, ~200 KB). **Deploy copy step:** copy `games-src/stitchwise/temp-art/media/*.webp` into `games/stitchwise/media/` with the deploy (skip any stem the owner has already delivered), then rebuild so `SW_HAVE` lists them. Missing temp art: bg-map, result-win, result-lose and the 11 portraits (emoji badges and CSS fills show). Tested: smoke at 390x763 and 1440x860 with the files served.
 - Offline: one self-contained `index.html` (+ optional `media/`, `music/`); `offline-manifest.py` and `offline-test.js` need the game deployed under `games/` and its slug in `games/sw.js` SLUGS and `games/sync.html` PREFIX: orchestrator step at deploy.
 - No online play, no undo (placing is a cancelable ghost), no Solo puzzle stages (Story uses the real game). Hot-seat has no pass-the-device screen because nothing is hidden.
 - `guard.py --update-baseline` has not been run for the new game (orchestrator at merge). `register-assets.py` not run (orchestrator at merge).

@@ -62,7 +62,7 @@ function floatText(txt, el, color) { var r = el ? el.getBoundingClientRect() : {
 function playEvents(evs, before, done) {
   var t = 0, step = amt(380), spots = 0; if (!step) { evs.forEach(function (e) { if (e.k === 'bonus') toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!'); }); return done(); }
   evs.forEach(function (e) {
-    if (e.k === 'place') { later(t, function () { sfx('place'); }); t += step * 1.2; }
+    if (e.k === 'place') { later(t, function () { sfx('place'); var q = $('#quilt'), c0 = e.cells[0]; if (q && c0) { var r = q.getBoundingClientRect(); fxImg('fx-stitch', r.left + q.clientLeft + (c0[0] + .5) * UI.cs, r.top + q.clientTop + (c0[1] + .5) * UI.cs, UI.cs * 1.6); } }); t += step * 1.2; }
     if (e.k === 'move') {
       var from = e.from, to = e.to; SW.BTN_SPOTS.forEach(function (b) { if (b > from && b <= to) { spots++; var tt = t + step * .6 * spots, seat = e.s, inc = G.inc[seat]; if (inc > 0) later(tt, function () { incomeMoment(seat, b, inc, spots); }); } });
       if (e.gain) later(t, function () { sfx('adv'); floatText('+' + e.gain, $('.nb[data-seat="' + e.s + '"]') || null, '#ffe9a0'); }); t += step * .8 + step * .6 * spots;
@@ -74,8 +74,9 @@ function playEvents(evs, before, done) {
 function incomeMoment(seat, spot, inc, i) { // coins fly from the button spot to the buttons counter
   var cell = $('.tc[data-i="' + spot + '"]'), tgt = $('.nb[data-seat="' + seat + '"]'); if (!cell || !tgt) return; var a = cell.getBoundingClientRect(), b = tgt.getBoundingClientRect();
   for (var k = 0; k < Math.min(inc, 6); k++) { (function (k) { setTimeout(function () { sfx('coin', k); var c = h('div.coin'); c.style.left = (a.left + a.width / 2 - 9) + 'px'; c.style.top = (a.top + a.height / 2 - 9) + 'px'; c.style.setProperty('--dx', (b.left + b.width / 2 - a.left - a.width / 2) + 'px'); c.style.setProperty('--dy', (b.top - a.top) + 'px'); document.body.appendChild(c); setTimeout(function () { c.remove(); tgt.classList.remove('bump'); void tgt.offsetWidth; tgt.classList.add('bump'); }, 800); }, k * 90); })(k); }
-  floatText('+' + inc + ' buttons', cell, '#ffe9a0');
+  floatText('+' + inc + ' buttons', cell, '#ffe9a0'); fxImg('fx-sparkle', a.left + a.width / 2, a.top + a.height / 2, 44);
 }
+function fxImg(stem, x, y, size) { var i = artImg(stem, 'fx'); if (!i) return; i.style.cssText = 'position:fixed;z-index:60;pointer-events:none;width:' + size + 'px;height:' + size + 'px;left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;animation:flt 1s ease-out forwards'; document.body.appendChild(i); setTimeout(function () { i.remove(); }, 1100); }
 function afterMove() { render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
 function schedule() {
   clearTimeout(UI.tm.ai); if (!G) return; if (G.over) { return later(amt(500), finish); }

@@ -39,6 +39,7 @@ function campStart(def) {
 }
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
+  var mapOpen = GXC.open; GXC.open = function () { var r = mapOpen.apply(GXC, arguments); setTimeout(function () { var e = $('.gxc'); if (e) artBg(e, 'bg-map'); }, 60); return r; };
   GXC.init({ game: 'stitchwise', data: window.CAMPAIGN,
     portrait: function (who, size, c) { var stem = c && c.portrait ? c.portrait.replace(/\.webp$/, '') : null; if (stem && artHas(stem)) { var i = artImg(stem); if (i) { i.style.width = i.style.height = size + 'px'; i.style.borderRadius = '50%'; i.style.objectFit = 'cover'; return i; } } return null; },
     headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); tutStart(); }); return [b]; },

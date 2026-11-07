@@ -9,6 +9,8 @@ try { UI.sound = localStorage.getItem('sw_sound') !== '0'; } catch (e) { }
 var SVG_BTN = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#e0a82e" stroke="#7a5410" stroke-width="1.4"/><circle cx="10" cy="10" r="5.6" fill="none" stroke="#7a5410" stroke-width="1"/><circle cx="8" cy="8.4" r="1" fill="#5a3a08"/><circle cx="12" cy="8.4" r="1" fill="#5a3a08"/><circle cx="8" cy="11.6" r="1" fill="#5a3a08"/><circle cx="12" cy="11.6" r="1" fill="#5a3a08"/></svg>';
 var SVG_TIME = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 2h10M5 18h10M6 2c0 5 8 5 8 8s-8 3-8 8M14 2c0 5-8 5-8 8s8 3 8 8" fill="none" stroke="#3a2a18" stroke-width="1.6" stroke-linecap="round"/><path d="M7.5 15.5h5L10 12.5z" fill="#c8553d"/></svg>';
 var SVG_LEA = '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2" fill="#8a5a3a" stroke="#4a2a12" stroke-width="1.2"/><rect x="6" y="6" width="8" height="8" fill="none" stroke="#f0d9b0" stroke-width="1.2" stroke-dasharray="2 1.5"/></svg>';
+function leaIc() { var i = artImg('icon-leather', 'ic'); return i ? i.outerHTML : SVG_LEA; }
+function bonusIc() { var i = artImg('icon-bonus', 'ic'); return i ? i.outerHTML : '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="8" r="6" fill="#e0a82e" stroke="#7a5410" stroke-width="1.3"/><path d="M6 13l-2 6 6-3 6 3-2-6" fill="#c8553d"/></svg>'; }
 function btnIc() { var i = artImg('icon-button', 'ic'); return i ? i.outerHTML : SVG_BTN; }
 function timeIc() { var i = artImg('icon-hourglass', 'ic'); return i ? i.outerHTML : SVG_TIME; }
 // ---------- sound: small synth, off-able; respects the shelf volume sliders
@@ -55,7 +57,7 @@ function strip(seat) {
   var sc = swScore(G, seat), w = swWho(G) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'Score now ' + sc.total, 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
     h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), h('b', nameOf(seat)),
-    h('span.st', h('span.bt', { html: btnIc() + '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span>', title: 'Buttons' }), h('span.bt', { html: '+' + G.inc[seat] + '<small>/spot</small>', title: 'Buttons earned each time a button spot is passed' })));
+    h('span.st', h('span.bt', { html: btnIc() + '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span>', title: 'Buttons' }), h('span.bt', { html: '+' + G.inc[seat] + '<small>/spot</small>', title: 'Buttons earned each time a button spot is passed' }), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
 }
 // ---------- track
 function trackCols() { return UI.wide ? 9 : 27; }
@@ -64,7 +66,7 @@ function renderTrack() {
   var cols = trackCols(), rows = Math.ceil(54 / cols), t = $('#track'); if (!t) { t = h('div#track', { role: 'img' }); }
   t.innerHTML = ''; t.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)'; t.style.gridTemplateRows = 'repeat(' + rows + ',auto)';
   for (var i = 0; i <= SW.TRACK; i++) { var rc = trackPos(i), cell = h('div.tc'); cell.dataset.i = i; cell.style.gridRow = rc[0] + 1; cell.style.gridColumn = rc[1] + 1;
-    if (SW.BTN_SPOTS.indexOf(i) >= 0) { cell.classList.add('bspot'); cell.innerHTML = btnIc(); } else if (SW.LEATHER_SPOTS.indexOf(i) >= 0) { cell.classList.add('lspot'); var taken = G.leather[SW.LEATHER_SPOTS.indexOf(i)] !== null; cell.innerHTML = taken ? '<span style="opacity:.45">&#10003;</span>' : SVG_LEA; } else if (i === 0) cell.classList.add('tstart'); else if (i === 53) cell.classList.add('tend');
+    if (SW.BTN_SPOTS.indexOf(i) >= 0) { cell.classList.add('bspot'); cell.innerHTML = btnIc(); } else if (SW.LEATHER_SPOTS.indexOf(i) >= 0) { cell.classList.add('lspot'); var taken = G.leather[SW.LEATHER_SPOTS.indexOf(i)] !== null; cell.innerHTML = taken ? '<span style="opacity:.45">&#10003;</span>' : leaIc(); } else if (i === 0) cell.classList.add('tstart'); else if (i === 53) cell.classList.add('tend');
     if (i < Math.min(G.pos[0], G.pos[1])) cell.classList.add('past'); t.appendChild(cell); }
   artBg(t, 'track-frame'); t.style.backgroundSize = '100% 100%';
   [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
@@ -100,6 +102,7 @@ function renderDock() {
   off.forEach(function (pid, k) {
     var p = PATCHES[pid], aff = hum && !G.pend && G.btn[s] >= p.cost, fits = hum && !G.pend && swPlacements(G.board[s], p).length > 0, why = !hum ? '' : G.pend ? '' : !aff ? 'need ' + (p.cost - G.btn[s]) + ' more' : !fits ? 'no room' : '';
     var b = h('button.offer' + (UI.sel === k ? '.sel' : '') + (hum && !G.pend && (!aff || !fits) ? '.no.cant' : '') + (!hum ? '.no' : ''), { type: 'button', 'data-a': 'offer', 'data-k': k, 'data-why': why, 'aria-label': p.name + ': cost ' + p.cost + ' buttons, time ' + p.time + ', earns ' + p.inc + ' per button spot, ' + p.n + ' squares' });
+    if (artHas('ui-offer-card')) { artBg(b, 'ui-offer-card'); b.style.backgroundSize = '100% 100%'; b.style.borderColor = 'transparent'; }
     b.appendChild(patchShape(pid, '', p.n > 6 ? 12 : 14)); b.appendChild(h('div.meta', { html: facts(p) })); box.appendChild(b);
   });
   if (!off.length) box.appendChild(h('div', 'No patches left.'));

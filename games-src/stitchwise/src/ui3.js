@@ -66,12 +66,13 @@ function buildMenu() {
 }
 function restart() { GX.close(); if (UI.tutorial) { tutStart(); return; } if (UI.camp && typeof GXC !== 'undefined') { var id = UI.camp.id; GXC.play(id); return; } newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: UI.lvl }); }
 // ---------- result
+function bonusTileHtml() { var i = artImg('bonus-tile', 'ic'); if (!i) return ''; i.width = i.height = 22; return i.outerHTML + ' '; }
 function showResult() {
   var rs = $('#rs'); rs.hidden = false; var a = swScore(G, 0), b = swScore(G, 1), w = swWinner(G), hot = UI.mode === 'hot'; artBg(rs, w === 0 ? 'result-win' : 'result-lose');
   var title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';
   var c = h('div.card'); c.appendChild(h('div.win', title));
   c.appendChild(h('div.rsgrid', { html: '<span class="h"></span><span class="h">' + nameOf(0) + '</span><span class="h">' + nameOf(1) + '</span>' +
-    '<span>Buttons</span><b>' + a.btn + '</b><b>' + b.btn + '</b><span>7×7 bonus</span><b>' + (a.bonus ? '+7' : '0') + '</b><b>' + (b.bonus ? '+7' : '0') + '</b><span>Empty squares</span><b>' + a.empty + ' (-' + a.pen + ')</b><b>' + b.empty + ' (-' + b.pen + ')</b><span><b>Total</b></span><b>' + a.total + '</b><b>' + b.total + '</b>' }));
+    '<span>Buttons</span><b>' + a.btn + '</b><b>' + b.btn + '</b><span>' + bonusTileHtml() + '7\u00D77 bonus</span><b>' + (a.bonus ? '+7' : '0') + '</b><b>' + (b.bonus ? '+7' : '0') + '</b><span>Empty squares</span><b>' + a.empty + ' (-' + a.pen + ')</b><b>' + b.empty + ' (-' + b.pen + ')</b><span><b>Total</b></span><b>' + a.total + '</b><b>' + b.total + '</b>' }));
   if (a.total === b.total) c.appendChild(h('p.sub', 'Tied on points: the player who reached the end first wins.'));
   var row = h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:10px' });
   row.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'again' }, 'Play again')); row.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'look' }, 'Look at the quilts')); row.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title'));

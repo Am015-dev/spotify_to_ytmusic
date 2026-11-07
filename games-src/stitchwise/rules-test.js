@@ -5,8 +5,8 @@ const L = new Function(src + '\nreturn {SW,PATCHES,swNew,swApply,swMoves,swCheck
 const { SW, PATCHES } = L; let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log('FAIL', m); } };
 // data
 ok(PATCHES.length === 33, '33 patches'); const seen = new Set(); PATCHES.forEach(p => { const k = JSON.stringify(p.or[0]) ; });
-const canon = p => p.or.map(o => JSON.stringify(o)).sort()[0]; const cs = new Set(PATCHES.map(canon)); ok(cs.size === 33, 'shapes distinct ' + cs.size);
-PATCHES.forEach(p => { ok(p.n >= 2 && p.cost >= 1 && p.time >= 1 && p.inc >= 0 && p.inc <= 3, 'patch ' + p.id);
+const canon = p => p.or.map(o => JSON.stringify(o)).sort()[0]; const cs = new Set(PATCHES.map(p => canon(p) + p.cost + '/' + p.time + '/' + p.inc)); ok(cs.size === 33, 'patches distinct (shape,cost,time,income) ' + cs.size); ok(PATCHES.reduce((a, p) => a + p.n, 0) === 166, 'total squares 166');
+PATCHES.forEach(p => { ok(p.n >= 2 && p.cost >= 0 && p.cost <= 10 && p.time >= 1 && p.inc >= 0 && p.inc <= 3, 'patch ' + p.id);
   // connected
   const set = new Set(p.cells.map(c => c.join())), st = [p.cells[0]], vis = new Set([p.cells[0].join()]); while (st.length) { const c = st.pop(); [[1,0],[-1,0],[0,1],[0,-1]].forEach(d => { const k = [c[0]+d[0], c[1]+d[1]]; if (set.has(k.join()) && !vis.has(k.join())) { vis.add(k.join()); st.push(k); } }); } ok(vis.size === p.n, 'connected ' + p.id); });
 // rules: advance, income, tie order

@@ -90,3 +90,6 @@ Style block (in front of every prompt): Flat 2D hand-stitched quilting illustrat
 
 Music: drop `tavern-a.mp3`, `main-a.mp3`, `fight-a.mp3`, `victory-a.mp3`, `defeat-a.mp3` into `games/stitchwise/music/`; the Music picker plays them. Silent until the files exist.
 Register for the owner's laptop list: `python3 games-src/stitchwise/register-assets.py`.
+
+## Credits (temporary art)
+All temporary pictures in `temp-art/media/` are drawn by `temp-art/make-temp-art.py` (original, procedural, no third-party files). No game-icons.net, Kenney or fan-made pictures were used. They are placeholders: a file with the same stem from `assets-inbox/stitchwise/` replaces them with no code change.

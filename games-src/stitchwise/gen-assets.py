@@ -81,7 +81,7 @@ print(len(I), "slots;", {w: sum(1 for i in I if i["wave"] == w) for w in (1, 2, 
 # ASSET-CHECK.md: every id the rules, campaign.json and the code use has a stem in assets.json AND a Flow prompt
 camp = json.load(open(D / "campaign.json"))
 code = "".join(p.read_text() for p in sorted((D / "src").glob("*.js")))
-used_in_code = sorted(set(re.findall(r"(?:artBg|artHas|artImg|artUrl)\([^)]*?'([a-z0-9-]+)'", code)))
+used_in_code = sorted(set(re.findall(r"artBg\([^,()]+(?:\([^)]*\))?[^,()]*,\s*'([a-z0-9-]+)'", code) + re.findall(r"(?:artHas|artImg|artUrl)\('([a-z0-9-]+)'", code) + re.findall(r"artBg\([^,]+,\s*(?:s === 0 \? )?'([a-z0-9-]+)'", code)))
 req = collections.OrderedDict()
 for i, (n, sh, c, t, inc) in enumerate(PATCH_DEF): req["fabric-%02d" % (i + 1)] = "patch: " + n
 for k, v in camp["cast"].items(): req["portrait-" + k] = "character: " + v["name"]
@@ -99,5 +99,5 @@ M = ["# Stitchwise: ASSET-CHECK", "", "Every distinct card/tile/piece/character/
      "| id | what | in assets.json | Flow prompt | wave |", "|---|---|---|---|---|"]
 byst = {i["stem"]: i for i in I}
 for k, why in req.items(): M.append("| %s | %s | %s | %s | %s |" % (k, why, "yes" if k in inj else "NO", "yes" if k in prompted else "NO", byst[k]["wave"] if k in byst else "-"))
-M += ["", "Wired (a dropped file shows with no code change): bg-title, bg-table, quilt-frame, track-frame, token-me, token-opp, icon-button, icon-hourglass, patch-leather, torn-square, result-win, result-lose, every fabric-NN (patch tiles, offers, reference) and every portrait-* (Story map/intro/boss card).", "Slot named and prompted but nothing draws it yet (wave 3 polish, needs a small wiring pass): bonus-tile, bg-map, fx-sparkle, fx-stitch, icon-bonus, icon-leather, ui-offer-card.", "", "Music cues: `games-src/next-wave/music/stitchwise/cues-wave1.json` lists a cue for each gx-music slot: " + ", ".join(s["slot"] for s in json.load(open(mu / "cues-wave1.json"))["slots"]) + "."]
+M += ["", "Wired (a dropped file shows with no code change): every slot in assets.json except the result/title/story backgrounds that are drawn as CSS fills when no file exists: all fabric-NN (quilt cells, offers, patch list), portrait-* (Story map/intro/boss card), bg-title, bg-table, bg-map (Story map), quilt-frame, track-frame, token-me, token-opp, icon-button, icon-hourglass, icon-leather (track), icon-bonus (player pill), bonus-tile (result screen), patch-leather, torn-square, fx-sparkle (income moment), fx-stitch (sewing), ui-offer-card (offers), result-win, result-lose.", "Temporary pictures (original, code-drawn, `temp-art/make-temp-art.py`) exist for 49 of the 63 slots; missing temp art: bg-map, result-win, result-lose and the 11 portraits (emoji badges show until the Flow files arrive).", "", "Music cues: `games-src/next-wave/music/stitchwise/cues-wave1.json` lists a cue for each gx-music slot: " + ", ".join(s["slot"] for s in json.load(open(mu / "cues-wave1.json"))["slots"]) + "."]
 (D / "ASSET-CHECK.md").write_text("\n".join(M) + "\n"); print("ASSET-CHECK required", len(req), "prompted", len([k for k in req if k in prompted]), "gaps", len(gaps), gaps, code_gaps)

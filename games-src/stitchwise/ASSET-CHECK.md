@@ -7,7 +7,7 @@ Every distinct card/tile/piece/character/boss/board/background/icon id that the 
 - patches: 33 (rules) -> fabric-01..fabric-33
 - characters in campaign.json: 11 (3 bosses: fernsby, marguerite, aurelia)
 - boards: quilt-frame, track-frame; backgrounds: bg-title, bg-table, bg-map, result-win, result-lose
-- stems the code asks for (artHas/artBg/artImg/artUrl): bg-title, icon-button, icon-hourglass, patch-leather, quilt-frame, result-win, token-me, torn-square, track-frame; not in assets.json: none
+- stems the code asks for (artHas/artBg/artImg/artUrl): bg-map, bg-table, bg-title, bonus-tile, icon-bonus, icon-button, icon-hourglass, icon-leather, patch-leather, quilt-frame, token-me, torn-square, track-frame, ui-offer-card; not in assets.json: none
 - assets.json has 63 slots (extras beyond the required list: none)
 
 | id | what | in assets.json | Flow prompt | wave |
@@ -76,7 +76,7 @@ Every distinct card/tile/piece/character/boss/board/background/icon id that the 
 | icon-leather | leather space | yes | yes | 3 |
 | ui-offer-card | offer card | yes | yes | 3 |
 
-Wired (a dropped file shows with no code change): bg-title, bg-table, quilt-frame, track-frame, token-me, token-opp, icon-button, icon-hourglass, patch-leather, torn-square, result-win, result-lose, every fabric-NN (patch tiles, offers, reference) and every portrait-* (Story map/intro/boss card).
-Slot named and prompted but nothing draws it yet (wave 3 polish, needs a small wiring pass): bonus-tile, bg-map, fx-sparkle, fx-stitch, icon-bonus, icon-leather, ui-offer-card.
+Wired (a dropped file shows with no code change): every slot in assets.json except the result/title/story backgrounds that are drawn as CSS fills when no file exists: all fabric-NN (quilt cells, offers, patch list), portrait-* (Story map/intro/boss card), bg-title, bg-table, bg-map (Story map), quilt-frame, track-frame, token-me, token-opp, icon-button, icon-hourglass, icon-leather (track), icon-bonus (player pill), bonus-tile (result screen), patch-leather, torn-square, fx-sparkle (income moment), fx-stitch (sewing), ui-offer-card (offers), result-win, result-lose.
+Temporary pictures (original, code-drawn, `temp-art/make-temp-art.py`) exist for 49 of the 63 slots; missing temp art: bg-map, result-win, result-lose and the 11 portraits (emoji badges show until the Flow files arrive).
 
 Music cues: `games-src/next-wave/music/stitchwise/cues-wave1.json` lists a cue for each gx-music slot: tavern, main, fight, victory, defeat.
