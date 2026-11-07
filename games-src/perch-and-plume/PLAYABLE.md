@@ -28,4 +28,26 @@ Also seen, not in the 10: the hand on a phone shows the top of the third card's 
 scrolls); the tray cards are smaller since the feeder dice got their words. Both left as is: the hand is a scroller by design
 and the tray card numbers stay readable.
 
-## Gate (see the report at the end of the run)
+Found while testing (fixed): on short phones (375x553) the three row buttons were taller than their rows and overlapped the
+next row; they now fit on one line. Zero food counters were 45 % opacity text (failed contrast); now solid text with a grey icon.
+
+## After: re-shot and re-critiqued
+Same screens re-shot (`shots/after4`, 4 copied to `playable-shots/`). A newcomer now sees, in order: a gold "Your turn" banner,
+one gold sentence saying what to tap, only the tappable things lit; after a tap the piece slides/pulses and a pop says what it was
+worth. The rival's turn reads as a short story: "Fern's turn" -> "Fern is choosing an action." -> "Fern plays Copper Oriole in the
+forest (+4)" with the card shown large -> "Your turn". Remaining weak spots: the five icon buttons in the shared header (#10), the
+hand's power text is 13 px on phones (the audit's floor for that size, same as before), and birds are still code-drawn stand-ins.
+
+## Gate (final build)
+| check | result |
+|---|---|
+| `VIS_SLUGS="," build-all.py --quick perch-and-plume` | PASS (9/9 scenarios, axe clean) |
+| `node rules-test.js 120` | PASS 120/120 |
+| `node smoke.js <served url>` | PASS phone + PC, 0 errors |
+| `tests/tutorial-end.js phone` / `pc` | PASS: 7/7 steps, every target uncovered at its centre, end card, "Play" starts a real game, 0 errors |
+| `tests/ui-play.js phone all` (taps only visible, uncovered UI; no engine calls to choose) | PASS: Quick game vs 1 computer to the result (~200 taps), Story chapter 1 to its result ("Goal met!"), 0 covered targets, 0 errors |
+| `ui-audit.spec.js` | phone A0 B0 C0 D0 E0 F0; PC A0 B0 C0 D0 E0 F0; phone-s A0 **B3** C0 D0 E0 F0 |
+
+phone-s B3, explained: two are the audit's own "Test:" tag (bottom-left, 10 px dark pill) sitting under the drawer/menu text line
+that happens to land there (same pair of colours, 2.82:1, in both; the base build had B4 here); the third is the shared campaign
+map's chapter disc "6" at 4.49:1 (shared kit, read-only for this task). Our own board, title and result have no B.
