@@ -38,7 +38,7 @@ function quiltEl(seat, cls) {
   var board = G.board[seat], q = h('div#quilt.' + cls), bx = patchBoxes(board), cs = UI.cs || 36;
   for (var i = 0; i < 81; i++) {
     var p = board[i], x = i % 9, y = (i / 9) | 0, c = h('div.qc'); c.dataset.x = x; c.dataset.y = y;
-    if (p === 99) c.classList.add('torn'); else if (p === 100) c.classList.add('lea'); else if (p >= 0) {
+    if (p === 99) { c.classList.add('torn'); if (artHas('torn-square')) artBg(c, 'torn-square'); } else if (p === 100) { c.classList.add('lea'); if (artHas('patch-leather')) { artBg(c, 'patch-leather'); c.style.backgroundSize = 'cover'; } } else if (p >= 0) {
       c.classList.add('f', ppat(p)); c.style.setProperty('--pc', pcol(p));
       if (x === 0 || board[i - 1] !== p) c.classList.add('eL'); if (x === 8 || board[i + 1] !== p) c.classList.add('eR'); if (y === 0 || board[i - 9] !== p) c.classList.add('eT'); if (y === 8 || board[i + 9] !== p) c.classList.add('eB');
       if (artHas(fabricStem(p))) { var b = bx[p], sz = Math.max(b[2] - b[0] + 1, b[3] - b[1] + 1) * cs; c.style.backgroundImage = 'url(media/' + fabricStem(p) + '.webp)'; c.style.backgroundSize = sz + 'px ' + sz + 'px'; c.style.backgroundPosition = (-(x - b[0]) * cs) + 'px ' + (-(y - b[1]) * cs) + 'px'; c.classList.add('img'); }
@@ -46,6 +46,7 @@ function quiltEl(seat, cls) {
     if (UI.newCells[seat + ':' + i]) c.classList.add('new');
     q.appendChild(c);
   }
+  if (artBg(q, 'quilt-frame')) { q.classList.add('art'); q.style.backgroundSize = '100% 100%'; }
   q.setAttribute('aria-label', nameOf(seat) + ' quilt: ' + swEmpty(board) + ' empty squares');
   return q;
 }
@@ -65,7 +66,8 @@ function renderTrack() {
   for (var i = 0; i <= SW.TRACK; i++) { var rc = trackPos(i), cell = h('div.tc'); cell.dataset.i = i; cell.style.gridRow = rc[0] + 1; cell.style.gridColumn = rc[1] + 1;
     if (SW.BTN_SPOTS.indexOf(i) >= 0) { cell.classList.add('bspot'); cell.innerHTML = btnIc(); } else if (SW.LEATHER_SPOTS.indexOf(i) >= 0) { cell.classList.add('lspot'); var taken = G.leather[SW.LEATHER_SPOTS.indexOf(i)] !== null; cell.innerHTML = taken ? '<span style="opacity:.45">&#10003;</span>' : SVG_LEA; } else if (i === 0) cell.classList.add('tstart'); else if (i === 53) cell.classList.add('tend');
     if (i < Math.min(G.pos[0], G.pos[1])) cell.classList.add('past'); t.appendChild(cell); }
-  [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }); t.appendChild(k); });
+  artBg(t, 'track-frame'); t.style.backgroundSize = '100% 100%';
+  [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
   t.setAttribute('aria-label', 'Time track. ' + nameOf(0) + ' at ' + G.pos[0] + ' of 53, ' + nameOf(1) + ' at ' + G.pos[1] + '.');
   return t;
 }
@@ -80,6 +82,7 @@ function trackInfo() {
 function render() {
   if (!G) return; renderDock(); layout(); var vs = viewSeat(), os = 1 - vs, qc = $('#qcol'), sd = $('#side'); qc.innerHTML = ''; sd.innerHTML = '';
   var q = quiltEl(vs, 'me'); UI.newCells = {};
+  artBg($('#board'), 'bg-table');
   var pills = h('div#pills', strip(vs), strip(os));
   if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); } else { qc.appendChild(pills); qc.appendChild(q); }
   var tr = renderTrack(); sd.appendChild(tr); if (UI.wide) sd.appendChild(h('div#tinfo', trackInfo())); placeTokens();

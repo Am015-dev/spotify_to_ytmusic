@@ -78,3 +78,26 @@ L += ["## Three drop-in steps", "", "1. Put finished files in `assets-inbox/stit
       "Music: drop `tavern-a.mp3`, `main-a.mp3`, `fight-a.mp3`, `victory-a.mp3`, `defeat-a.mp3` into `games/stitchwise/music/`; the Music picker plays them. Silent until the files exist.", "Register for the owner's laptop list: `python3 games-src/stitchwise/register-assets.py`."]
 (D / "ASSETS.md").write_text("\n".join(L) + "\n")
 print(len(I), "slots;", {w: sum(1 for i in I if i["wave"] == w) for w in (1, 2, 3)})
+# ASSET-CHECK.md: every id the rules, campaign.json and the code use has a stem in assets.json AND a Flow prompt
+camp = json.load(open(D / "campaign.json"))
+code = "".join(p.read_text() for p in sorted((D / "src").glob("*.js")))
+used_in_code = sorted(set(re.findall(r"(?:artBg|artHas|artImg|artUrl)\([^)]*?'([a-z0-9-]+)'", code)))
+req = collections.OrderedDict()
+for i, (n, sh, c, t, inc) in enumerate(PATCH_DEF): req["fabric-%02d" % (i + 1)] = "patch: " + n
+for k, v in camp["cast"].items(): req["portrait-" + k] = "character: " + v["name"]
+for k, why in [("bg-title", "title screen"), ("bg-table", "board background"), ("quilt-frame", "9x9 quilt board"), ("track-frame", "time track board"), ("token-me", "your time token"), ("token-opp", "opponent time token"),
+               ("icon-button", "button currency"), ("icon-hourglass", "time cost"), ("patch-leather", "leather patch (5 on the track)"), ("bonus-tile", "7x7 bonus tile"), ("torn-square", "story twist: torn squares"),
+               ("bg-map", "story map"), ("result-win", "win result"), ("result-lose", "loss result"), ("fx-sparkle", "income moment"), ("fx-stitch", "sewing flourish"), ("icon-bonus", "bonus icon"), ("icon-leather", "leather space"), ("ui-offer-card", "offer card")]: req[k] = why
+inj = {i["stem"] for i in I}; prompted = set()
+for f in out.glob("prompts-*.json"): prompted |= set(json.load(open(f))["cards"])
+gaps = [k for k in req if k not in inj or k not in prompted]; code_gaps = [s for s in used_in_code if s not in inj]
+boss = [c["opponent"]["cast"] for c in camp["chapters"] if c["boss"]]
+M = ["# Stitchwise: ASSET-CHECK", "", "Every distinct card/tile/piece/character/boss/board/background/icon id that the rules, campaign.json and the code use, and whether it has a stem in `assets.json` and a Flow prompt (`games-src/next-wave/flow-2d/stitchwise/`).", "",
+     "**required %d / prompted %d / gaps %d**" % (len(req), len([k for k in req if k in prompted]), len(gaps)), "",
+     "- patches: %d (rules) -> fabric-01..fabric-33" % len(PATCH_DEF), "- characters in campaign.json: %d (%d bosses: %s)" % (len(camp["cast"]), len(boss), ", ".join(boss)), "- boards: quilt-frame, track-frame; backgrounds: bg-title, bg-table, bg-map, result-win, result-lose",
+     "- stems the code asks for (artHas/artBg/artImg/artUrl): %s; not in assets.json: %s" % (", ".join(used_in_code) or "(patch fabrics and portraits are built from ids)", code_gaps or "none"), "- assets.json has %d slots (extras beyond the required list: %s)" % (len(inj), sorted(inj - set(req)) or "none"), "",
+     "| id | what | in assets.json | Flow prompt | wave |", "|---|---|---|---|---|"]
+byst = {i["stem"]: i for i in I}
+for k, why in req.items(): M.append("| %s | %s | %s | %s | %s |" % (k, why, "yes" if k in inj else "NO", "yes" if k in prompted else "NO", byst[k]["wave"] if k in byst else "-"))
+M += ["", "Wired (a dropped file shows with no code change): bg-title, bg-table, quilt-frame, track-frame, token-me, token-opp, icon-button, icon-hourglass, patch-leather, torn-square, result-win, result-lose, every fabric-NN (patch tiles, offers, reference) and every portrait-* (Story map/intro/boss card).", "Slot named and prompted but nothing draws it yet (wave 3 polish, needs a small wiring pass): bonus-tile, bg-map, fx-sparkle, fx-stitch, icon-bonus, icon-leather, ui-offer-card.", "", "Music cues: `games-src/next-wave/music/stitchwise/cues-wave1.json` lists a cue for each gx-music slot: " + ", ".join(s["slot"] for s in json.load(open(mu / "cues-wave1.json"))["slots"]) + "."]
+(D / "ASSET-CHECK.md").write_text("\n".join(M) + "\n"); print("ASSET-CHECK required", len(req), "prompted", len([k for k in req if k in prompted]), "gaps", len(gaps), gaps, code_gaps)

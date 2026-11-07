@@ -70,6 +70,10 @@ function musInit() {
   try { GXMUS.init({ key: 'sw', slots: MUS_SLOTS, slot: musSlot, on: function () { return UI.sound; } }); } catch (e) { }
 }
 // ---------- boot
+document.addEventListener('click', function (e) { // mark the chosen menu section / the last pressed menu button
+  var c = e.target.closest && e.target.closest('.gx-chip'); if (c) { $$('.gx-chip').forEach(function (x) { x.setAttribute('aria-current', 'false'); }); c.setAttribute('aria-current', 'true'); }
+  var m = e.target.closest && e.target.closest('.gx-row .btn, .gxc-ib'); if (m) m.setAttribute('data-last', String(Date.now()));
+}, true);
 function boot() {
   try { GX.init({ key: 'sw' }); } catch (e) { console.error(e); }
   buildMenu(); buildRules(); buildPatchList(); bindQuilt(); campInit(); hlpInit(); musInit(); try { if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) GX.offline({ sw: '../sw.js', scope: '../' }); } catch (e) { }

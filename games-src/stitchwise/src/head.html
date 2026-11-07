@@ -32,7 +32,7 @@ button{font:inherit;color:inherit}
 .bt svg{width:15px;height:15px}
 /* quilt */
 #quilt{display:grid;grid-template-columns:repeat(9,var(--cs));grid-template-rows:repeat(9,var(--cs));gap:0;position:relative;background:#e9dcc0;border:5px solid #7a5a3a;border-radius:6px;box-shadow:0 8px 24px #0006,inset 0 0 0 1px #0002;touch-action:none;user-select:none;-webkit-user-select:none;flex:0 0 auto}
-#quilt.me{border-color:#2a6f68}#quilt.opp{border-color:#9a4330}
+#quilt.art{border:0;padding:5px;background-color:transparent}#quilt.art .qc:not(.f):not(.lea):not(.torn){background:transparent}#quilt.me{border-color:#2a6f68}#quilt.opp{border-color:#9a4330}
 .qc{width:var(--cs);height:var(--cs);box-sizing:border-box;border:1px dashed rgba(90,70,40,.32);position:relative;background:#f1e5c8}
 .qc.f{border:0;background:var(--pc,#c0527a)}
 .qc.f::after{content:"";position:absolute;inset:0;pointer-events:none}
@@ -125,5 +125,12 @@ html.sm .btn{min-height:44px}html.sm .offer.cant::after{display:none}
 @media (min-width:700px){#barprompt{display:block}}
 .tc.tstart{border-left:3px solid var(--teal)}.tc.tend{border-right:3px solid var(--gold);background:#f6e7b0}
 @media (prefers-reduced-motion:reduce){.tk,#ghost{transition:none}}
+:root{--fs:13px}@media (min-width:1024px){:root{--fs:16px}}
+.card p.sub,.card .sub,.menu .btn small,.menu .btn span,.menu .btn b,.seg button,.row label,.rules p,.rules li,.big p,.refgrid button,.refgrid .meta,.offer .meta,.pstrip small,.pstrip .st,#detail,.tc,.flt,#toast,.gx-chip,.gx-row small,.gx-row-l{font-size:max(var(--fs),1em)}
+.menu .btn,.btn{font-size:max(var(--fs),.95rem)}.menu .btn small{font-size:max(var(--fs),.85rem)}.card p.sub{font-size:max(var(--fs),.95rem)}
+.pstrip b{font-size:max(var(--fs),.9rem)}#prompt{font-size:max(var(--fs),1rem)}
+.menu .btn.go,.btn.go{background:#1d6f66;color:#fff}
+.menu .btn.alt,.menu .btn{color:#2a2118}.menu .btn.go{color:#fff}
+html .gx-row .btn,html .gx-row-k .btn,html .gx-row-l small,html .gx-chip{font-size:max(var(--fs),1em)!important}
 </style>
 </head>

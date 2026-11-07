@@ -12,7 +12,7 @@ function showStart(view) {
   m.appendChild(h('button.btn', { type: 'button', 'data-a': 'quick' }, 'Quick game', h('small', 'Against the computer or a friend on this screen')));
   if (typeof GXT !== 'undefined') { var w = h('div'); w.innerHTML = GXT.menuHTML({ game: 'stitchwise', first: firstTime(), cls: 'btn', launch: tutStart }); while (w.firstChild) m.appendChild(w.firstChild); }
   m.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'rules' }, 'How to play'));
-  card.appendChild(m); card.appendChild(h('p.sub', { style: 'font-size:.8rem;margin-top:10px' }, 'Original game. Patches, names and art are our own.')); st.innerHTML = ''; st.appendChild(card);
+  card.appendChild(m); card.appendChild(h('p.sub', { style: 'margin-top:10px' }, 'Original game. Patches, names and art are our own.')); st.innerHTML = ''; st.appendChild(card);
   try { GX.showDock && 0; } catch (e) { }
 }
 function renderSetup(st) {
