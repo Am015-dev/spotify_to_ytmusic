@@ -216,7 +216,7 @@ html body .gx-set .gx-sec{scroll-margin-top:70px}   /* section titles land below
 @media (max-width:999px){.cc svg{width:24px!important;height:24px!important}.cc b{font-size:15px}#toast{font-size:15px!important}#line{font-size:15px}}
 @media (min-width:1000px){#cards{right:auto}.cc{flex:0 0 auto;min-width:76px;padding:4px 8px}.cc i{font-size:16px}.mk i{font-size:16px}#line{left:50%;right:auto;transform:translateX(-50%);max-width:640px}}
 html body .gx-drawer{transition:none}   /* panels appear at once: no half-slid frame where text sits over the board */
-#turnban{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(.9);z-index:6;pointer-events:none;background:#f6efdc;color:#1d2420;font-weight:800;font-size:24px;padding:10px 26px;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.5);opacity:0;white-space:nowrap}
+#turnban{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%) scale(.9);z-index:6;pointer-events:none;background:#f6efdc;color:#1d2420;font-weight:800;font-size:24px;padding:10px 26px;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.5);opacity:0;white-space:nowrap}
 #turnban.on{animation:wmban 1.1s ease-out forwards}
 @keyframes wmban{0%{opacity:0;transform:translate(-50%,-50%) scale(.8)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.04)}30%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0}}
 /* the guide in tutorial bubbles: a code-drawn crest (green disc, gold ring) until a painted portrait exists */
@@ -240,3 +240,16 @@ html body .gx-drawer{transition:none}   /* panels appear at once: no half-slid f
 .st td.best{color:#ffd88a;font-weight:800}
 @media (min-width:1000px){#line{font-size:18px}}
 @media (prefers-reduced-motion:reduce){#rs .st tr{animation:none}}
+/* coached first game: Rowan's bubble (one at a time, never blocks the board, dismissable) and the final walk-through */
+#coachb{position:absolute;left:8px;right:8px;top:112px;z-index:7;display:flex;align-items:flex-start;gap:10px;background:#f6efdc;color:#1d2420;border-radius:14px;padding:8px 6px 8px 10px;box-shadow:0 4px 16px rgba(0,0,0,.45);max-width:560px;margin:0 auto}
+#coachb[hidden]{display:none}
+#coachb p{margin:0;flex:1 1 auto;font-size:15px;line-height:1.3}
+#coachb .cx{flex:0 0 auto;width:44px;height:44px;border:0;background:none;font-size:24px;color:#1d2420;cursor:pointer}
+.cface{flex:0 0 auto;display:inline-block;width:38px;height:38px;border-radius:50%;background:#3f7a4a url(media/portrait-rowan.webp) center/cover no-repeat;box-shadow:0 0 0 2px #e6b04f;vertical-align:middle;margin-right:6px}
+.cfinal{background:rgba(243,234,210,.1);border-radius:12px;padding:8px 12px;margin:0 0 8px;text-align:left}
+.cfinal p,.cfinal li{font-size:15px;line-height:1.35}
+.cfinal ol,.cfinal ul{margin:4px 0;padding-left:20px}
+.cfinal .ch{display:flex;align-items:center;margin:0}
+.cfinal .ch2{font-weight:800;margin:8px 0 2px}
+@media (min-width:1000px){#coachb p,.cfinal p,.cfinal li{font-size:16px}}
+@media (max-width:999px){#acts .ab{padding:6px 8px}#acts{gap:4px}}

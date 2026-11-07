@@ -19,9 +19,10 @@ Benchmarks: the old shelf games the owner likes (cauldron-fair, hollowbough) and
    and all other tiles drop to 40% opacity. Market pairs that can't be taken right now drop to 50%.
 7. **Explain every score when it happens.** After each placement a plain toast: "+1: your Meadow grew to 2 joined tiles",
    "Bear +4: Groups of exactly 2 bears...", or "Fox settled, no points yet. <the card's one sentence>". Plus the floating number.
-8. **Tutorial = a real short game in chapters, every rule once.** Owner addendum (20:45): not 5-7 clicks but a staged real game
-   (fixed seed, stacked market) in chapters (First turn, Scoring, Special moves, Final score). Each step is one real action on a spotlit,
-   uncovered target. Keep a TUTORIAL-COVERAGE.md checklist and a tutorial-to-end tap script (see `tutorial-end.js`).
+8. **The tutorial is a coached first game, not tap-tap.** Owner (22:01): forced spotlight steps are rejected. It is a real short game
+   (free choices; market stacked so key cases come up). The guide explains each rule the first time it matters, in one non-blocking,
+   dismissable bubble, and gives one-line verdicts on moves. The result screen walks through the score with the player's real numbers
+   and lists "things you will meet later". Keep TUTORIAL-COVERAGE.md and a script that plays it with random legal moves (`tutorial-end.js`).
 9. **Help opens with "How a turn works" in 5 lines** (boxed, 15px) before any detail; scoring cards keep a small diagram + one sentence.
 10. **Turns read like turns.** A "Your turn" / "<Rival>'s turn" banner; the rival plays step by step (take, place, settle),
     ~1 s per step with a caption on the instruction bar and a score pop; tap anywhere to speed it up.
