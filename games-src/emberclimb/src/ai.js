@@ -3,14 +3,15 @@
   var D = EC.D, E = EC.E;
   function threat(G) { var t = 0; G.b.en.forEach(function (e) { if (!e.dead && e.intent && e.intent.atk) t += (e.intent.atk + (e.st.str || 0)) * (e.intent.hits || 1); }); return t; }
   function score(G, mv) {
-    var h = G.hs[G.b.cur], c = h.hand[mv.c], e = E.eff(c), s = 0, ops = e.ops, need = Math.max(0, threat(G) / G.hs.filter(function (x) { return !x.dead; }).length - h.blk), en = mv.e != null ? G.b.en[mv.e] : null;
+    var h = G.hs[G.b.cur], c = h.hand[mv.c], e = E.eff(c), s = 0, ops = e.ops, need = Math.max(0, threat(G) * (h.stance === 'w' ? 2 : 1) / G.hs.filter(function (x) { return !x.dead; }).length - h.blk), en = mv.e != null ? G.b.en[mv.e] : null;
     ops.forEach(function (o) {
       var k = o[0];
       if (k === 'dmg' || k === 'hit' || k === 'all' || k === 'dmgx' || k === 'bodyslam') { s += 6 + (en && o[1] >= en.hp + en.blk ? 30 : 0) + (k === 'all' ? G.b.en.length * 3 : 0); }
       else if (k === 'blk') s += need > 0 ? 8 : 2;
       else if (k === 'str' || k === 'power' || k === 'dblStr') s += G.b.turn <= 3 ? 9 : 4;
       else if (k === 'draw' || k === 'nrg') s += 5; else if (k === 'vuln' || k === 'weak' || k === 'poison' || k === 'poisonAll' || k === 'weakAll') s += 5;
-      else if (k === 'chan' || k === 'shiv' || k === 'stance' || k === 'roll' || k === 'evoke2') s += 5;
+      else if (k === 'stance') { s += o[1] === 'w' ? (h.stance === 'w' ? 0 : (need > 8 ? -3 : 4)) : (h.stance === 'w' ? 9 : 4); }
+      else if (k === 'chan' || k === 'shiv' || k === 'roll' || k === 'evoke2') s += 5;
       else s += 1;
     });
     if (en && en.hp > 0 && en.hp <= 12) s += 3; if (en) s += 8 / (1 + en.hp / 20) ;

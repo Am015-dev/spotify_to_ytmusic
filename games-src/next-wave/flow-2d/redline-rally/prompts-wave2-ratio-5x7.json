@@ -1,0 +1,19 @@
+{
+ "wave": 2,
+ "ratio": "5:7",
+ "flow_aspect": "3:4",
+ "style": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "redline-rally 2D wave 2, ratio 5:7. Paste with Flow aspect 3:4; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "redline-rally",
+  "count": 6
+ },
+ "cards": {
+  "card-upgrade-coolant": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A card illustration: a bold coil of frosty blue cooling pipes with a bright snowflake valve, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name.",
+  "card-upgrade-pit": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A card illustration: three mechanics in matching overalls leaping into action around a car with a lollipop sign, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name.",
+  "card-upgrade-grip": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A card illustration: a close-up of one fat racing tyre with a deep tread pattern gripping a curve, dust spraying, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name.",
+  "card-upgrade-brakes": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A card illustration: a large glowing red brake disc with a gold caliper clamping it, tiny sparks, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name.",
+  "card-upgrade-rocket": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A card illustration: a small rocket engine strapped to the back of a race car, a long orange flame trailing behind, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name.",
+  "card-upgrade-tuned": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A card illustration: a polished engine with a shiny turbo, little wrench and gauges around it, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name."
+ }
+}
