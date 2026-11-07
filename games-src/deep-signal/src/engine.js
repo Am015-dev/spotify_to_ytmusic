@@ -110,7 +110,8 @@ function performMove(G, m, seat) {
   if (!ok && m.t !== 'flare') return false;
   G.moves++;
   if (m.t === 'take') { var tk = G.pool.splice(m.i, 1)[0]; tk.owner = G.draftTurn; G.tasks.push(tk); log(G, seatName(G, G.draftTurn) + ' took task ' + cardName(tk.card));
-    G.draftTurn = (G.draftTurn + 1) % G.n; if (!G.pool.length) startPlay(G); return true; }
+    G.draftTurn = (G.draftTurn + 1) % G.n; if (G.chosen >= 0 && /notrick/.test(G.mission.sp || '') && G.draftTurn === G.chosen) G.draftTurn = (G.draftTurn + 1) % G.n;
+    if (!G.pool.length) startPlay(G); return true; }
   if (m.t === 'answer') { G.answers[m.p] = !!m.yes; return true; }
   if (m.t === 'choose') {
     var k = G.ask.kind;

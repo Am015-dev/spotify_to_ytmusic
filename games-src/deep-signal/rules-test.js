@@ -25,6 +25,9 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
   const FL = E.newGame({ players: 4, mission: 2, seed: 11 }); while (FL.phase === 'draft') E.performMove(FL, { t: 'take', i: 0 }, E.sideToAct(FL)); const picks = FL.hands.map(h => h.find(c => c[0] !== 'r'));
   ok(E.performMove(FL, { t: 'flare', dir: 1, picks }, 0) && FL.hands[1].includes(picks[0]), 'flare passes left'); ok(!E.canFlare(FL), 'one flare');
 })();
+// no-trick diver takes no tasks
+(() => { const G = E.newGame({ players: 4, mission: 26, seed: 5 }); let g = 0; while (G.phase !== 'play' && g++ < 50) { const s = E.sideToAct(G); const v = E.validMoves(G, s); E.performMove(G, v.find(m => m.t === 'answer' && m.yes) || v[0], s); }
+  ok(G.chosen >= 0 && !G.tasks.some(t => t.owner === G.chosen), 'no-trick diver holds no task'); })();
 // order check
 (() => { const G = E.newGame({ players: 4, mission: 3, seed: 21 }); while (G.phase === 'draft') E.performMove(G, { t: 'take', i: 0 }, E.sideToAct(G));
   const t1 = G.tasks.find(t => t.tok === '1'), t2 = G.tasks.find(t => t.tok === '2'); ok(E.taskAllowed(G, t1) && !E.taskAllowed(G, t2), 'task 2 not allowed before task 1'); })();

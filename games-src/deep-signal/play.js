@@ -10,26 +10,26 @@ const url = process.argv[2], NM = +process.argv[3] || 3, RUNS = +process.argv[4]
     const tap = async sel => { const l = typeof sel === 'string' ? p.locator(sel).first() : sel; await l.scrollIntoViewIfNeeded().catch(() => { }); return touch ? l.tap({ timeout: 4000 }) : l.click({ timeout: 4000 }); };
     const vis = async sel => (await p.locator(sel).count()) && await p.locator(sel).first().isVisible().catch(() => false);
     await p.goto(url + (url.includes('?') ? '&' : '?') + 'fast=1'); await p.waitForTimeout(500);
+    const ptap = async sel => { const bx = await p.locator(sel).first().boundingBox().catch(() => null); if (!bx) return; const x = bx.x + Math.min(10, bx.width / 2), y = bx.y + Math.min(30, bx.height / 2); if (touch) await p.touchscreen.tap(x, y); else await p.mouse.click(x, y); };
+    const tutRun = async () => { let reached = false; for (let i = 0; i < 300; i++) { await p.waitForTimeout(150); const st = await p.evaluate(() => { const c = GXT.active() && GXT.current(); return GXT.state && GXT.state().phase === 'end' ? 'end' : c ? c.id : 'off'; }); if (st === 'end') { reached = true; break; } if (st === 'off') break;
+      if (await vis('.gxt-next')) { await ptap('.gxt-next'); continue; } if (st === 'task') await ptap('#pool .tcard'); if (st === 'lead') await ptap('#hand .cd[data-c="c9"]'); } return reached; };
     // one player decision by real taps; returns false when nothing to do
     const act = async () => {
       if (await vis('.gxh-bub button,.gxh-bubble button')) { await tap('.gxh-bub button,.gxh-bubble button').catch(() => { }); return true; }
       if (await vis('#zoom.on')) { await tap('#zoom.on #zrow .btn:last-child'); return true; }
       if (await vis('#pool .tcard.legal')) { const i = await p.evaluate(() => AIX.draftPick(G, G.draftTurn)); await tap(p.locator('#pool .tcard').nth(i)); return true; }
       if (await vis('#askp.on .btn')) { const yes = await p.evaluate(() => G.phase === 'ask' && askWho(G) === 0 ? AIX.answer(G, 0) : null); if (yes != null) await tap(yes ? '#askp .btn.pri' : '#askp .btn:not(.pri)'); else { const c = await p.evaluate(() => { const q = AIX.act(G, 0, 'normal'); return q && q.p; }); await tap(p.locator('#askp .btn').nth(Math.max(0, await p.evaluate(c => chooseTargets(G).indexOf(c), c)))); } return true; }
-      if (await vis('#hand .cd.legal')) { const c = await p.evaluate(() => AIX.choosePlay(G, G.turn, 'normal')); const l = p.locator(`#hand .cd.legal[data-c="${c}"]`); const bx = await l.boundingBox(); if (touch) await p.touchscreen.tap(bx.x + 8, bx.y + 20); else await p.mouse.click(bx.x + 8, bx.y + 20); return true; }
+      if (await vis('#hand .cd.legal')) { const c = await p.evaluate(() => AIX.choosePlay(G, G.turn, 'normal')); let bx = await p.locator(`#hand .cd.legal[data-c="${c}"]`).boundingBox().catch(() => null); if (!bx) bx = await p.locator('#hand .cd.legal').first().boundingBox(); if (!bx) return false; if (touch) await p.touchscreen.tap(bx.x + 8, bx.y + 20); else await p.mouse.click(bx.x + 8, bx.y + 20); return true; }
       return false;
     };
-    const playMission = async (tag) => { for (let i = 0; i < 900; i++) { if (await p.evaluate(() => !!(G && G.result && UI.ended))) return p.evaluate(() => G.result); if (!(await act())) await p.waitForTimeout(80); } return null; };
+    const playMission = async (tag) => { let last = '', same = 0; for (let i = 0; i < 900; i++) { const fp = await p.evaluate(() => G.moves + ':' + G.phase + ':' + UI.hold); if (fp === last) { if (++same === 120) console.log('DEBUG', await p.evaluate(() => { const e = document.querySelector('#hand .cd.legal'); if (!e) return 'no legal; ' + line(sideToAct(G)) + ' s=' + sideToAct(G) + ' zoom=' + $('#zoom').className; const r = e.getBoundingClientRect(); const t = document.elementFromPoint(r.left + 8, r.top + 20); return 'top at legal: ' + t.className + ' / ' + (t.parentElement && t.parentElement.className); })); } else { same = 0; last = fp; } if (await p.evaluate(() => !!(G && G.result && UI.ended))) return p.evaluate(() => G.result); if (!(await act())) await p.waitForTimeout(80); } return null; };
     // 1) tutorial (real taps on what each step spotlights)
-    await tap('[data-gxt-open]');
-    for (let i = 0; i < 200; i++) { await p.waitForTimeout(150); const st = await p.evaluate(() => { const c = GXT.active() && GXT.current(); return c ? c.id : (GXT.isDone('deep-signal') ? 'done' : 'off'); }); if (st === 'done' || st === 'off') break;
-      if (await vis('.gxt-next,[data-gxt-next]')) { await tap('.gxt-next,[data-gxt-next]').catch(() => { }); continue; }
-      if (st === 'task') { await tap('#pool .tcard').catch(() => { }); continue; } if (st === 'lead') { await tap('#hand .cd[data-c="c9"]').catch(() => { }); continue; } }
-    await p.waitForTimeout(600); await p.screenshot({ path: `shots/play-${nm}-tutend.png` });
-    const tdone = await p.evaluate(() => GXT.isDone('deep-signal')); if (!tdone) { fails++; found.push(nm + ': tutorial did not finish'); }
+    await tap('[data-gxt-open]'); await p.waitForTimeout(400);
+    const tdone = await tutRun();
+    await p.waitForTimeout(600); await p.screenshot({ path: `shots/play-${nm}-tutend.png` }); if (!tdone) { fails++; found.push(nm + ': tutorial did not finish'); }
     console.log(nm, run, 'tutorial', tdone ? 'PASS' : 'FAIL');
     // leave the end card -> setup
-    for (const s of ['.gxt-end button', '[data-gxt-choice="play"]', '.gxt-end .btn']) if (await vis(s)) { await tap(s).catch(() => { }); break; }
+    await p.waitForTimeout(800); for (const s of ['.gxt-endc button', '.gxt-end button', '.gxt-dlg button']) if (await vis(s)) { await ptap(s); break; }
     // 2) quick missions
     if (!(await vis('#setup.on'))) await p.evaluate(() => showSetup());
     for (let m = 0; m < NM; m++) {
@@ -47,8 +47,8 @@ const url = process.argv[2], NM = +process.argv[3] || 3, RUNS = +process.argv[4]
       await tap(`.gxc-node.open, .gxc-node.next`).catch(() => { }); await p.waitForTimeout(300);
       for (let i = 0; i < 12; i++) { const btn = p.locator('.gxc button.gxc-pri, .gxc .gxc-play, .gxc button:has-text("Play"), .gxc button:has-text("Start"), .gxc button:has-text("Skip"), .gxc button:has-text("Next")'); if (await btn.count() && await btn.first().isVisible()) { await tap(btn.first()).catch(() => { }); await p.waitForTimeout(250); } else break; if (await p.evaluate(() => !!(window.G && !document.querySelector('.gxc.on, .gxc-on')))) break; }
       if (await p.evaluate(() => GXT.active())) { // story stage 1 = tutorial
-        for (let i = 0; i < 200; i++) { await p.waitForTimeout(150); const st = await p.evaluate(() => { const c = GXT.active() && GXT.current(); return c ? c.id : 'off'; }); if (st === 'off') break; if (await vis('.gxt-next,[data-gxt-next]')) { await tap('.gxt-next,[data-gxt-next]').catch(() => { }); continue; } if (st === 'task') await tap('#pool .tcard').catch(() => { }); if (st === 'lead') await tap('#hand .cd[data-c="c9"]').catch(() => { }); }
-        for (const s of ['.gxt-end button', '.gxt-end .btn']) if (await vis(s)) { await tap(s).catch(() => { }); break; }
+        await tutRun();
+        await p.waitForTimeout(800); for (const s of ['.gxt-endc button', '.gxt-end button', '.gxt-dlg button']) if (await vis(s)) { await ptap(s); break; }
       } else { const r = await playMission(); console.log(nm, run, 'story mission', await p.evaluate(() => G.mission.n), r && r.ok ? 'complete' : 'lost'); }
       await p.waitForTimeout(2500); await p.screenshot({ path: `shots/play-${nm}-story${ch + 1}.png` });
       for (let i = 0; i < 10; i++) { const btn = p.locator('.gxc button:visible'); if (!(await btn.count())) break; const txt = (await btn.first().innerText()).trim(); if (/map|continue|next|skip|ok|back/i.test(txt)) await tap(btn.first()).catch(() => { }); else break; await p.waitForTimeout(250); if (await vis('.gxc-node')) break; }

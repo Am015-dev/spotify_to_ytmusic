@@ -40,7 +40,9 @@ function musicInit() {
 function musicSync() { try { GXMUS.sync(); } catch (e) { } }
 // ---------------------------------------------------------------- start a mission
 function startGame(o) {
-  o = o || {}; clearTimeout(UI.timer); UI.mode = o.mode || 'quick'; UI.level = o.level || 'normal'; UI.flareFree = !!o.flareFree; UI.sigDone = {}; UI.sigMode = false; UI.flareMode = 0; UI.hold = false; UI.ended = false; UI.lastTricks = 0; UI.tut = o.tut || null;
+  o = o || {}; clearTimeout(UI.timer);
+  if (o.mode === 'tut') { if (UI.fastSave == null) UI.fastSave = UI.fast; UI.fast = false; UI.aiSave = AIDELAY; AIDELAY = 650; }   // the staged game keeps real timing so every step is shown
+  else { if (UI.fastSave != null) { UI.fast = UI.fastSave; AIDELAY = UI.aiSave; UI.fastSave = null; } try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } } UI.mode = o.mode || 'quick'; UI.level = o.level || 'normal'; UI.flareFree = !!o.flareFree; UI.sigDone = {}; UI.sigMode = false; UI.flareMode = 0; UI.hold = false; UI.ended = false; UI.lastTricks = 0; UI.tut = o.tut || null;
   UI.players = o.players || UI.players; UI.mission = o.mission || UI.mission;
   AIX.seed((o.seed || Date.now()) & 0xffff);
   G = newGame({ players: UI.players, mission: UI.mission, seed: o.seed, deal: o.deal, taskCards: o.taskCards });
@@ -89,13 +91,15 @@ function trickDone(fr, seatP) {
   later(function () {
     var wc = t.cards.filter(function (x) { return x.p === t.winner; })[0]; var we = document.querySelector('#trick .cd[data-c="' + wc.c + '"]'); if (we) we.classList.add('win');
     popAt(seatEl(t.winner), nm(t.winner) + (t.winner === 0 ? ' win' : ' wins'));
-    newly.forEach(function (x) { if (x.wonBy === x.owner) { sfx('task'); popAt(seatEl(x.owner), '✓ ' + cardName(x.card)); } else sfx('fail'); });
+    var last = G.result && G.result.ok;
+    newly.forEach(function (x) { var ce = document.querySelector('#trick .cd[data-c="' + x.card + '"]'); if (x.wonBy === x.owner) { sfx('task'); popAt(seatEl(x.owner), '✓ ' + cardName(x.card)); if (ce) ce.classList.add(last ? 'clutch' : 'got'); } else { sfx('fail'); if (ce) ce.classList.add('lostc'); } });
+    if (last && !UI.fast) popAt($('#trick'), 'Final task home!');
     if (!newly.length) sfx('win');
     later(function () {   // sweep to the winner
       var dst = seatEl(t.winner).getBoundingClientRect();
       document.querySelectorAll('#trick .cd').forEach(function (e) { var r = e.getBoundingClientRect(); e.style.transform = 'translate(' + (dst.left + dst.width / 2 - r.left - r.width / 2) + 'px,' + (dst.top + dst.height / 2 - r.top - r.height / 2) + 'px) scale(.35)'; e.style.opacity = '0'; });
       later(function () { UI.hold = false; UI.showTrick = null; try { if (window.GXT && GXT.active()) GXT.act({ type: 'event', what: 'trick', n: G.tricks.length }); } catch (e) { } step(); }, UI.fast ? 30 : 420);
-    }, UI.fast ? 30 : (newly.length ? 1300 : 900));
+    }, UI.fast ? 30 : (G.result && G.result.ok ? 1900 : newly.length ? 1300 : 900));
   }, UI.fast ? 30 : 450);
 }
 // ---------------------------------------------------------------- player input
