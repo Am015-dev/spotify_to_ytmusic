@@ -22,7 +22,14 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
 - `node playtest.js both`: like a player with real taps, per size: tutorial offered + played to its end card, a whole game to the result,
   Story stages 1 and 2 started and 4 turns each: PASS, 0 errors.
 - build-all --quick: PASS (5 ?scn= scenarios in src/scn.js: vg-board, vg-guardian, vg-overcome, vg-market, vg-result).
-- ui-audit.spec.js (local staging, phone + pc): see the last line of the round report.
+- ui-audit.spec.js (local staging via scripts/gx-serve.js, phone + pc): phone A0 B0 C0 D0 E5 F1, pc A0 B0 C0 D0 E3 F1.
+  Every remaining E is a Story-map button tapped on the "panel Menu" surface: the `?scn=menu` page runs the shared menu walker
+  (gx-scenario menuPass), which opens the Story map and scrolls it (the map is a fixed 898 px tall in gx-campaign) while the audit
+  taps coordinates it saved earlier. The same buttons all pass on the audit's own "campaign" surface (checked with a logging copy
+  of the spec). Not fixable inside this folder without hiding the Menu from the audit; flagged for the shared kit (shorter map rows,
+  or the walker should not run while the audit drives the page). F1 = the title counts "Play now" as a second big button.
+- Hot-seat (pass-the-device screen, then the next player's hand) and solo (rival card after each action) checked with real taps.
+- Picture loader proven with 3 dummy files (title-bg, card-trail, site-c-spring): drawn at slot aspect, 0 failed requests; files deleted.
 
 ## Found -> fixed (my own play, Playwright)
 1. Guardian badge hid the site name/reward -> smaller corner badge. 2. Toast covered the player strip -> moved down.
