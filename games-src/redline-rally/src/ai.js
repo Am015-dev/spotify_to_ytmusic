@@ -13,14 +13,15 @@ function aiPlan(G, c) {
   gearOpts(c).forEach(function (go) {
     var k = needCards(c, go.g);
     combos(play, k).forEach(function (idx) {
-      var base = 0, nx = 0; idx.forEach(function (j) { var x = c.hand[j]; if (x === 'X') { base += avg; nx++; } else base += +x; });
+      var base = 0, nx = 0, ul = 0, uc = 0; idx.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { base += UPG[u].sp; ul += UPG[u].lim; uc += UPG[u].cool; } else if (x === 'X') { base += avg; nx++; } else base += +x; });
       [false, true].forEach(function (boost) {
         var cost = go.cost + (boost ? 1 : 0); if (cost > c.eng) return;
         var sp = base + (boost ? avg : 0), safe = Math.ceil(sp + (nx || boost ? 1 : 0)), mv = Math.round(sp) + adr, L = c.pos + mv;
         var slipOk = others.some(function (o) { return o.pos % N === L % N || o.pos % N === (L + 1) % N; });
-        var L2 = slipOk ? L + 2 : L, heat = cornerCost(G, c.pos, L2, safe), left = c.eng - cost, spin = heat > left;
+        var L2 = slipOk ? L + 2 : L, heat = cornerCost(G, c.pos, L2, safe, ul), left = c.eng - cost, spin = heat > left;
         var score = mv + (slipOk ? 1.4 : 0) - heatW(c, cost) * (cost + Math.min(heat, left)) - (spin ? 16 : 0);
         score += go.g === 1 ? Math.min(handHeat, COOL[1]) * 1.6 : go.g === 2 ? Math.min(handHeat, COOL[2]) * 1.6 : 0;
+        score += Math.min(handHeat, uc) * 1.6;
         if (boost && c.eng <= 3) score -= 2;
         score += (rnd(G) - 0.5) * 2 * aiNoise(G);
         if (!best || score > best.s) best = { s: score, plan: { gear: go.g, idx: idx.slice(), boost: boost } };
@@ -32,8 +33,8 @@ function aiPlan(G, c) {
   c.hand = c.hand.filter(function (x, j) { return pl.idx.indexOf(j) < 0; });
   return { gear: pl.gear, cards: cards, boost: pl.boost, idx: pl.idx };
 }
-function aiSlip(G, c, from, L0, L1, speed) {
-  var extra = cornerCost(G, from, L1, speed) - cornerCost(G, from, L0, speed), cost0 = cornerCost(G, from, L0, speed);
+function aiSlip(G, c, from, L0, L1, speed, lim) {
+  var extra = cornerCost(G, from, L1, speed, lim) - cornerCost(G, from, L0, speed, lim), cost0 = cornerCost(G, from, L0, speed, lim);
   if (cost0 + extra > c.eng) return false;   /* would spin out */
   return 2 > heatW(c, 0) * extra;
 }
