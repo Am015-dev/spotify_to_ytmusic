@@ -6,7 +6,8 @@
   function rng(G) { var t = G.rng = (G.rng + 0x6D2B79F5) >>> 0; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }
   function shuf(G, a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rng(G) * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
-  function log(G, s, txt, k) { G.log.push({ r: G.round, s: s, t: txt }); if (G.log.length > 300) G.log.shift(); if (k) G.ev.push(Object.assign({ s: s }, k)); }
+  function you(t) { return t.replace(/\bYou's\b/g, 'Your').replace(/\bYou (\w+)\b/g, function (m, w) { return 'You ' + (/(ss|sh|ch)es$/.test(w) ? w.slice(0, -2) : /s$/.test(w) && w !== 'was' ? w.slice(0, -1) : w); }); }
+  function log(G, s, txt, k) { txt = you(txt); G.log.push({ r: G.round, s: s, t: txt }); if (G.log.length > 300) G.log.shift(); if (k) G.ev.push(Object.assign({ s: s }, k)); }
   function nm(G, s) { return s === -2 ? G.rival.name : G.p[s].name; }
   // ------------------------------------------------------------ setup
   function newGame(o) {
@@ -175,7 +176,7 @@
     if (m.t === 'dig') { var x = G.sites[m.s]; spendTravel(G, s, payPlan(G, s, x.cost)); digSite(G, s, m.s); endTurn(G); return { ok: true }; }
     if (m.t === 'disc') {
       var y = G.sites[m.s], pl = payPlan(G, s, y.cost); spendTravel(G, s, pl); p.res.compass -= V.DISC[y.lvl];
-      y.tile = (y.lvl === 1 ? G.s1 : G.s2).pop();
+      y.tile = (y.lvl === 1 ? G.s1 : G.s2).pop(); p.found = (p.found || 0) + 1;
       log(G, s, nm(G, s) + ' discovers ' + V.SITE[y.tile].name + '!', { k: 'discover', site: m.s, tile: y.tile });
       if (G.idols.length) { var idl = G.idols.pop(); p.idols.push({ id: idl, used: false }); gain(p, V.IDOL[idl].gift); log(G, s, nm(G, s) + ' finds the ' + V.IDOL[idl].name + ': +' + V.resText(V.IDOL[idl].gift) + '.', { k: 'idolfind', idol: idl }); }
       digSite(G, s, m.s);

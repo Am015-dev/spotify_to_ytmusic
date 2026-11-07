@@ -1,0 +1,880 @@
+{
+ "game": "vinegrave",
+ "title": "The Vines of Vinegrave",
+ "version": 1,
+ "cast": {
+  "pell": {
+   "name": "Pell Ardent",
+   "emoji": "🧭",
+   "color": "#2f6b45"
+  },
+  "tamsin": {
+   "name": "Tamsin Reed",
+   "emoji": "🎒",
+   "color": "#2a8c86"
+  },
+  "quell": {
+   "name": "Captain Ines Quell",
+   "emoji": "⚓",
+   "color": "#2a5a8a"
+  },
+  "okoro": {
+   "name": "Dr Okoro Bell",
+   "emoji": "📚",
+   "color": "#8a6a2a"
+  },
+  "mira": {
+   "name": "Mira Holt",
+   "emoji": "🗺️",
+   "color": "#7a3a8a"
+  },
+  "sallow": {
+   "name": "The Sallow Twins",
+   "emoji": "🐍",
+   "color": "#5a6a2a"
+  },
+  "vane": {
+   "name": "Dr Aurel Vane",
+   "emoji": "🎩",
+   "color": "#6a1a1a"
+  },
+  "warden": {
+   "name": "The Old Warden",
+   "emoji": "🗿",
+   "color": "#5a5a5a"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "The Mangrove Coast",
+   "blurb": "Learn to dig, discover and face your first guardians."
+  },
+  {
+   "act": 2,
+   "title": "The Deep Green",
+   "blurb": "Crowded jungle, sharper rivals, storms."
+  },
+  {
+   "act": 3,
+   "title": "The Temple Highlands",
+   "blurb": "Hard rivals, short seasons, and Dr Vane."
+  }
+ ],
+ "twists": [
+  {
+   "id": "woken",
+   "where": "setup",
+   "how": "N level-1 ruins start discovered with a guardian awake"
+  },
+  {
+   "id": "rich",
+   "where": "setup",
+   "how": "each rival starts with +N coins and compasses"
+  },
+  {
+   "id": "storm",
+   "where": "setup",
+   "how": "a plane costs 2+N coins"
+  },
+  {
+   "id": "short",
+   "where": "setup",
+   "how": "the game lasts N rounds"
+  },
+  {
+   "id": "shrewd",
+   "where": "setup",
+   "how": "solo rival starts with 3N points"
+  },
+  {
+   "id": "head",
+   "where": "setup",
+   "how": "rivals' magnifier starts on row N, notebook on N-1"
+  },
+  {
+   "id": "dread",
+   "where": "setup",
+   "how": "you start with N extra Dread cards"
+  },
+  {
+   "id": "idols",
+   "where": "setup",
+   "how": "rivals start with N idols"
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "First Footprints",
+   "boss": false,
+   "intro": [
+    {
+     "who": "pell",
+     "text": "Welcome to Vinegrave. The island hides a temple under a thousand vines."
+    },
+    {
+     "who": "pell",
+     "text": "Tamsin is new too. Race her across the coast: dig, buy, climb."
+    }
+   ],
+   "outro": [
+    {
+     "who": "pell",
+     "text": "Good. You read the trail like a veteran."
+    }
+   ],
+   "opponent": {
+    "name": "Tamsin Reed",
+    "emoji": "🎒",
+    "cast": "tamsin",
+    "personality": "Eager, grabs whatever is closest.",
+    "aiLevel": "easy",
+    "aiStyle": "greedy"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the expedition."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 30 or more",
+     "test": {
+      "k": "score",
+      "v": 30
+     }
+    },
+    {
+     "text": "Win by 5 or more",
+     "test": {
+      "k": "margin",
+      "v": 5
+     }
+    }
+   ],
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "tamsin",
+     "text": "Tamsin's portrait"
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "maxStars": 2,
+    "text": "The rivals play a little gentler."
+   }
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "Under the Roots",
+   "boss": false,
+   "intro": [
+    {
+     "who": "pell",
+     "text": "Hidden ruins pay best. Three compasses and a short walk flip one."
+    },
+    {
+     "who": "tamsin",
+     "text": "I'll find one first, you'll see!"
+    }
+   ],
+   "outro": [
+    {
+     "who": "pell",
+     "text": "Two ruins opened. The island noticed."
+    }
+   ],
+   "opponent": {
+    "name": "Tamsin Reed",
+    "emoji": "🎒",
+    "cast": "tamsin",
+    "personality": "Loves discovering new ruins.",
+    "aiLevel": "easy",
+    "aiStyle": "explorer"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win and discover 2 ruins."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Discover 2 ruins",
+     "test": {
+      "k": "found",
+      "v": 2
+     }
+    },
+    {
+     "text": "Score 35 or more",
+     "test": {
+      "k": "score",
+      "v": 35
+     }
+    }
+   ],
+   "unlock": [],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "maxStars": 2,
+    "text": "The rivals play a little gentler."
+   }
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "The Captain's Cove",
+   "boss": true,
+   "intro": [
+    {
+     "who": "pell",
+     "text": "Captain Quell landed at dawn. Her crew woke two guardians already."
+    },
+    {
+     "who": "quell",
+     "text": "The coast is mine, little digger. Keep out of my coves."
+    }
+   ],
+   "outro": [
+    {
+     "who": "pell",
+     "text": "Quell sails off. The coast is ours."
+    }
+   ],
+   "opponent": {
+    "name": "Captain Ines Quell",
+    "emoji": "⚓",
+    "cast": "quell",
+    "personality": "A brash captain who buys everything shiny.",
+    "aiLevel": "easy",
+    "aiStyle": "greedy",
+    "taunt": "My crew owns this coast!",
+    "praise": "Fair winds. You earned the cove."
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": {
+    "id": "woken",
+    "param": 2,
+    "text": "Boss rule: two guardians are already awake on the ruins."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win against Captain Quell."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Overcome a guardian",
+     "test": {
+      "k": "guards",
+      "v": 1
+     }
+    },
+    {
+     "text": "Score 35 or more",
+     "test": {
+      "k": "score",
+      "v": 35
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "maxStars": 2,
+    "text": "No guardians wait at the start."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "quell",
+     "text": "Captain Quell's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c4",
+   "act": 2,
+   "title": "The Scholar's Wager",
+   "boss": false,
+   "intro": [
+    {
+     "who": "okoro",
+     "text": "Ruins are a library, not a quarry. I bet my notes on research."
+    },
+    {
+     "who": "pell",
+     "text": "Beat him at his own game: climb the track."
+    }
+   ],
+   "outro": [
+    {
+     "who": "okoro",
+     "text": "Remarkable. You out-read me."
+    }
+   ],
+   "opponent": {
+    "name": "Dr Okoro Bell",
+    "emoji": "📚",
+    "cast": "okoro",
+    "personality": "Methodical, climbs the research track.",
+    "aiLevel": "normal",
+    "aiStyle": "scholar"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": null,
+   "goal": {
+    "type": "score",
+    "value": 40,
+    "text": "Win with 40 points or more."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win with 40+",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Research worth 10+",
+     "test": {
+      "k": "research",
+      "v": 10
+     }
+    },
+    {
+     "text": "Score 50 or more",
+     "test": {
+      "k": "score",
+      "v": 50
+     }
+    }
+   ],
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "okoro",
+     "text": "Dr Bell's portrait"
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "maxStars": 2,
+    "text": "The rivals play a little gentler."
+   }
+  },
+  {
+   "id": "c5",
+   "act": 2,
+   "title": "Three Camps",
+   "boss": false,
+   "intro": [
+    {
+     "who": "pell",
+     "text": "The deep green is crowded. Okoro and Mira both want these ruins."
+    },
+    {
+     "who": "mira",
+     "text": "Three maps, one jungle. Try to keep up."
+    }
+   ],
+   "outro": [
+    {
+     "who": "mira",
+     "text": "Fine. Your map was better."
+    }
+   ],
+   "opponent": {
+    "name": "Mira Holt",
+    "emoji": "🗺️",
+    "cast": "mira",
+    "personality": "Sharp cartographer, digs far and fast.",
+    "aiLevel": "normal",
+    "aiStyle": "explorer"
+   },
+   "setup": {
+    "players": 3
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win against two rivals."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Overcome 2 guardians",
+     "test": {
+      "k": "guards",
+      "v": 2
+     }
+    },
+    {
+     "text": "Win by 5 or more",
+     "test": {
+      "k": "margin",
+      "v": 5
+     }
+    }
+   ],
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "mira",
+     "text": "Mira's portrait"
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "maxStars": 2,
+    "text": "The rivals play a little gentler."
+   }
+  },
+  {
+   "id": "c6",
+   "act": 2,
+   "title": "Storm Season",
+   "boss": false,
+   "intro": [
+    {
+     "who": "pell",
+     "text": "Storms ground the planes. Flying now costs 3 coins, not 2."
+    },
+    {
+     "who": "mira",
+     "text": "Boots and boats, then. My favourite."
+    }
+   ],
+   "outro": [
+    {
+     "who": "pell",
+     "text": "You walked through a hurricane."
+    }
+   ],
+   "opponent": {
+    "name": "Mira Holt",
+    "emoji": "🗺️",
+    "cast": "mira",
+    "personality": "Never wastes a step.",
+    "aiLevel": "normal",
+    "aiStyle": "explorer"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": {
+    "id": "storm",
+    "param": 1,
+    "text": "Storm: a plane costs 3 coins."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win while the storm lasts."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 45 or more",
+     "test": {
+      "k": "score",
+      "v": 45
+     }
+    },
+    {
+     "text": "Win by 8 or more",
+     "test": {
+      "k": "margin",
+      "v": 8
+     }
+    }
+   ],
+   "unlock": [],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "maxStars": 2,
+    "text": "The rivals play a little gentler and the special rule is off."
+   }
+  },
+  {
+   "id": "c7",
+   "act": 2,
+   "title": "The Sallow Twins",
+   "boss": true,
+   "intro": [
+    {
+     "who": "sallow",
+     "text": "Two of us, one of you. And our pockets are full."
+    },
+    {
+     "who": "pell",
+     "text": "Smugglers with a head start. Outdig them."
+    }
+   ],
+   "outro": [
+    {
+     "who": "pell",
+     "text": "The twins slink back to their boat."
+    }
+   ],
+   "opponent": {
+    "name": "The Sallow Twins",
+    "emoji": "🐍",
+    "cast": "sallow",
+    "personality": "Smugglers who buy up the market.",
+    "aiLevel": "normal",
+    "aiStyle": "greedy",
+    "taunt": "Two heads beat one!",
+    "praise": "Hm. We'll find easier marks."
+   },
+   "setup": {
+    "players": 3
+   },
+   "twist": {
+    "id": "rich",
+    "param": 2,
+    "text": "Boss rule: the twins start with 2 extra coins and compasses each."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat both twins."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 45 or more",
+     "test": {
+      "k": "score",
+      "v": 45
+     }
+    },
+    {
+     "text": "Set an idol and keep 2",
+     "test": {
+      "k": "idols",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "maxStars": 2,
+    "text": "The twins play gently and start with nothing extra."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "sallow",
+     "text": "The twins' portrait"
+    }
+   ]
+  },
+  {
+   "id": "c8",
+   "act": 3,
+   "title": "Race the Rains",
+   "boss": false,
+   "intro": [
+    {
+     "who": "pell",
+     "text": "The rains come early in the highlands. Four rounds, no more."
+    },
+    {
+     "who": "mira",
+     "text": "Then every move counts."
+    }
+   ],
+   "outro": [
+    {
+     "who": "pell",
+     "text": "Done before the first drop."
+    }
+   ],
+   "opponent": {
+    "name": "Mira Holt",
+    "emoji": "🗺️",
+    "cast": "mira",
+    "personality": "At her best: fast and precise.",
+    "aiLevel": "hard",
+    "aiStyle": "explorer"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": {
+    "id": "short",
+    "param": 4,
+    "text": "The expedition lasts only 4 rounds."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win in 4 rounds."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 35 or more",
+     "test": {
+      "k": "score",
+      "v": 35
+     }
+    },
+    {
+     "text": "Win by 5 or more",
+     "test": {
+      "k": "margin",
+      "v": 5
+     }
+    }
+   ],
+   "unlock": [],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "maxStars": 2,
+    "text": "The rivals play a little gentler and the special rule is off."
+   }
+  },
+  {
+   "id": "c9",
+   "act": 3,
+   "title": "The Old Warden",
+   "boss": false,
+   "intro": [
+    {
+     "who": "warden",
+     "text": "..."
+    },
+    {
+     "who": "pell",
+     "text": "Vane's hired crew is tearing through the ruins. Alone, you must outscore them."
+    }
+   ],
+   "outro": [
+    {
+     "who": "pell",
+     "text": "The Warden lets you pass. The temple is near."
+    }
+   ],
+   "opponent": {
+    "name": "The Old Warden",
+    "emoji": "🗿",
+    "cast": "warden",
+    "personality": "An ancient stone guardian watches a rival crew.",
+    "aiLevel": "hard",
+    "aiStyle": "rival"
+   },
+   "setup": {
+    "players": 1,
+    "solo": true
+   },
+   "twist": {
+    "id": "shrewd",
+    "param": 1,
+    "text": "Vane's crew starts 3 points ahead."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat the rival expedition alone."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Overcome 2 guardians",
+     "test": {
+      "k": "guards",
+      "v": 2
+     }
+    },
+    {
+     "text": "Score 50 or more",
+     "test": {
+      "k": "score",
+      "v": 50
+     }
+    }
+   ],
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "warden",
+     "text": "The Warden's portrait"
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "maxStars": 2,
+    "text": "The rivals play a little gentler and the special rule is off."
+   }
+  },
+  {
+   "id": "c10",
+   "act": 3,
+   "title": "Vane's Gambit",
+   "boss": true,
+   "intro": [
+    {
+     "who": "vane",
+     "text": "You reached my temple? Charming. My scholars climbed it weeks ago."
+    },
+    {
+     "who": "pell",
+     "text": "He starts high on the track. Beat him anyway."
+    }
+   ],
+   "outro": [
+    {
+     "who": "pell",
+     "text": "The vines part. Vinegrave's temple is yours."
+    },
+    {
+     "who": "tamsin",
+     "text": "You did it! Can I carry the idols?"
+    }
+   ],
+   "opponent": {
+    "name": "Dr Aurel Vane",
+    "emoji": "🎩",
+    "cast": "vane",
+    "personality": "A ruthless collector with a head start.",
+    "aiLevel": "hard",
+    "aiStyle": "scholar",
+    "taunt": "The temple belongs to the highest bidder.",
+    "praise": "Impossible... Take it, then."
+   },
+   "setup": {
+    "players": 3
+   },
+   "twist": {
+    "id": "head",
+    "param": 3,
+    "text": "Boss rule: Vane and Mira start on research row 3."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat Dr Vane to the temple."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Reach the temple",
+     "test": {
+      "k": "glass",
+      "v": 8
+     }
+    },
+    {
+     "text": "Score 55 or more",
+     "test": {
+      "k": "score",
+      "v": 55
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "maxStars": 2,
+    "text": "Vane plays normal and starts at the bottom."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "vane",
+     "text": "Dr Vane's portrait"
+    },
+    {
+     "type": "title",
+     "id": "temple-finder",
+     "text": "Title: Temple Finder"
+    }
+   ]
+  }
+ ]
+}
