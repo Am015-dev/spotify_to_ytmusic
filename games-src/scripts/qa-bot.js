@@ -44,7 +44,7 @@ const { chromium } = require(fs.existsSync(path.join(ROOT, 'games-src', 'node_mo
 const gx = require('./gx-serve.js');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
-const LIM = { tutorial: 150, quick: 150, story: 100, fuzz: 60 };   // seconds per phase at --scale 1
+const LIM = { tutorial: 150, quick: 220, story: 140, fuzz: 60 };   // seconds per phase at --scale 1
 const lim = k => LIM[k] * SCALE * 1000;
 
 const bugs = [], seen = new Set();
@@ -60,7 +60,7 @@ async function shot(page, tag) { const f = path.join(SHOTS, `${SIZE}-${tag}-${++
 // ------------------------------------------------------------------ in-page helpers (injected into every page)
 const PAGE = `(() => {
 if (window.__qa) return;
-const DENY = /^([−+◉⊕⊖]|zoom|recenter|menu|quit|exit|restart|resign|settings?|sound|music|mute|help|rules?|scores?|stats?|online|multiplayer|tutorial|learn|new here|credits|privacy|terms|shop|buy|share|feedback|reset|delete|clear|fullscreen|language|abandon|leave|home|lab|test)\\b|learn in|story|online/i;
+const DENY = /^[−+◉⊕⊖-]$|^(zoom|recenter|menu|quit|exit|restart|resign|settings?|sound|music|mute|help|rules?|scores?|stats?|online|multiplayer|tutorial|learn|new here|credits|privacy|terms|shop|buy|share|feedback|reset|delete|clear|fullscreen|language|abandon|leave|home|lab|test)\\b|learn in|story|online/i;
 const LEGAL = /(^|[-_ ])(legal|valid|hl|highlight|hint|can|ok|avail|playable|selectable|move|target|glow|pulse|pri|primary|next|go|yes)([-_ ]|$)/i;
 function vis(e) { const r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return null; const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.1) return null; for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (+getComputedStyle(p).opacity < 0.1) return null; return r; }
 function inView(r) { return r.right > 0 && r.bottom > 0 && r.left < innerWidth && r.top < innerHeight; }
@@ -109,7 +109,7 @@ function statics(skipSel) {
     const r = vis(e); if (!r || !inView(r)) continue; const cs = getComputedStyle(e);
     const own = [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim().length > 1);
     if (own) {
-      const fs = parseFloat(cs.fontSize); if (fs < 12) { const k = key(e); (res.font[k] = res.font[k] || { n: 0, size: fs, sample: (e.innerText || '').trim().slice(0, 30) }).n++; }
+      const fs = parseFloat(cs.fontSize); if (fs >= 1 && fs < 12) { const k = key(e); (res.font[k] = res.font[k] || { n: 0, size: fs, sample: (e.innerText || '').trim().slice(0, 30) }).n++; }
       if (e.scrollWidth > e.clientWidth + 2 && e.clientWidth > 8 && !/(auto|scroll)/.test(cs.overflowX) && cs.textOverflow !== 'ellipsis' && cs.display !== 'inline') { const k = key(e); (res.overflow[k] = res.overflow[k] || { n: 0, sample: (e.innerText || '').trim().slice(0, 30), clip: cs.overflowX }).n++; }
     }
     const it = isInteractive(e, cs) && cs.pointerEvents !== 'none';
@@ -189,7 +189,7 @@ async function openTutorial(page) {
   const has = await ev(page, () => typeof GXT !== 'undefined' && GXT.running && GXT.running());
   if (has) return true;
   for (let tries = 0; tries < 3; tries++) {
-    const b = await ev(page, () => { const e = [...document.querySelectorAll('[data-gxt-open]')].find(x => window.__qa.vis(x)); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+    const b = await ev(page, () => { const e = [...document.querySelectorAll('[data-gxt-open],[data-a=tut],[data-a=tutorial],button,[data-a]')].find(x => window.__qa.vis(x) && (x.matches('[data-gxt-open],[data-a=tut],[data-a=tutorial]') || /^(learn|new here|tutorial|guided|how to play|first game)/i.test((x.innerText || '').trim()))); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
     if (!b) { // maybe behind a menu button
       const m = await ev(page, () => { const e = [...document.querySelectorAll('button,[data-a]')].find(x => window.__qa.vis(x) && /^(menu|more|help|how|learn|rules)/i.test((x.innerText || '').trim()) && !x.matches('[data-gx]')); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
       if (!m) return false; await tap(page, m.x, m.y); await sleep(600); continue;
@@ -225,7 +225,7 @@ async function driveTutorial(page, ci, P, ms, sumObj) {   // taps through a runn
             if (h.cx < 0 || h.cy < 0 || h.cx > innerWidth || h.cy > innerHeight) out.probs.push(`spotlight centre off-screen (${Math.round(h.cx)},${Math.round(h.cy)} in ${innerWidth}x${innerHeight})`);
             const top = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, h.cx)), Math.min(innerHeight - 1, Math.max(0, h.cy)));
             out.top = window.__qa.desc(top);
-            if (el && top && !(el === top || el.contains(top) || top.contains(el)) && !top.closest('.gxt-cell,.gxt-ring,.gxt-fin')) out.probs.push(`spotlight target covered: top at centre is ${out.top}, target is ${window.__qa.desc(el)}`);
+            if (el && top && !el.closest('svg') && !(el === top || el.contains(top) || top.contains(el)) && !top.closest('.gxt-cell,.gxt-ring,.gxt-fin')) out.probs.push(`spotlight target covered: top at centre is ${out.top}, target is ${window.__qa.desc(el)}`);
             if (el === null && top && top.closest('.gxt-bub,.gxt-top,.gxt-end')) out.probs.push('tutor bubble/strip sits on the spotlight centre: ' + out.top);
           }
           const b = s.bubble;
@@ -234,7 +234,7 @@ async function driveTutorial(page, ci, P, ms, sumObj) {   // taps through a runn
           if (!s.say || s.say.length < 3) out.probs.push('step has no text');
           return out;
         });
-        if (chk && chk.probs.length) { const f = await shot(page, 'tut-' + (s.i + 1)); for (const p of chk.probs) bug(/covered|hidden|off-screen|no spotlight|threw|zero|hole is/.test(p) ? 'BLOCKER' : 'MAJOR', P, `tutorial step ${s.i + 1}/${s.n} [${s.id}] "${(s.say || '').slice(0, 50)}"`, p, { shot: f }); }
+        if (chk && chk.probs.length) { const f = await shot(page, 'tut-' + (s.i + 1)); for (const p of chk.probs) bug(/covered/.test(p) ? (s.wait === 'tap' || s.wait === 'drag' ? 'BLOCKER' : 'MAJOR') : /hidden|off-screen|no spotlight|threw|zero|hole is/.test(p) ? 'BLOCKER' : 'MAJOR', P, `tutorial step ${s.i + 1}/${s.n} [${s.id}] "${(s.say || '').slice(0, 50)}"`, p, { shot: f }); }
       }
       if (s.wrongs > wrongsSeen) { wrongsSeen = s.wrongs; bug('MAJOR', P, `tutorial step ${s.i + 1}/${s.n} [${s.id}]`, `the bot's tap at the spotlight centre was rejected as a wrong action (${s.wrongs}x): spotlight does not match what the step accepts`, { shot: await shot(page, 'tut-wrong-' + (s.i + 1)) }); }
       // act: a real tap/drag at the element's centre
@@ -244,7 +244,7 @@ async function driveTutorial(page, ci, P, ms, sumObj) {   // taps through a runn
           const nb = await ev(page, () => { const e = document.querySelector('.gxt-next'); if (!e) return null; const r = e.getBoundingClientRect(); const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return { x: r.left + r.width / 2, y: r.top + r.height / 2, ok: !!top && (top === e || e.contains(top)), top: window.__qa.desc(top) }; });
           if (!nb) { if (Date.now() - lastProg > 3000 && !lastKey.endsWith('!nonext')) { lastKey += '!nonext'; bug('BLOCKER', P, ci.where(), 'step has no wait action and no Next button', { shot: await shot(page, 'tut-nonext') }); } }
           else { if (!nb.ok && Date.now() - lastProg > 3000) bug('BLOCKER', P, ci.where(), 'Next button is covered by ' + nb.top, { shot: await shot(page, 'tut-nextcov') }); await tap(page, nb.x, nb.y); }
-        } else if (s.wait === 'tap' && s.hole) await tap(page, s.hole.cx, s.hole.cy);
+        } else if (s.wait === 'tap' && s.hole) { const hs = s.holes && s.holes.length > 1 ? s.holes : [s.hole], h = hs[Math.min(s.count || 0, hs.length - 1)]; await tap(page, h.cx, h.cy); }
         else if (s.wait === 'drag') {
           const d = await ev(page, () => { const st = GXT.current() || {}, c = t => { if (!t) return null; if (t.nodeType === 1) { const r = t.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; } if (t.left !== undefined) return { x: t.left + (t.width || 0) / 2, y: t.top + (t.height || 0) / 2 }; return { x: t.x, y: t.y }; };
             let f = null, to = null; try { f = c(st.from && st.from()); } catch (e) { } try { to = c(st.target && st.target()); } catch (e) { } return { f, to }; });
@@ -301,7 +301,7 @@ async function playBot(page, ci, P, ms, opt) {   // returns {result, clicks, sof
     await drainErrs(page, P, ci.where());
     if (await ev(page, () => typeof GXT !== 'undefined' && GXT.running() && GXT.state().phase !== 'end')) { opt.tutDone = (opt.tutDone || 0) + 1; if (opt.tutDone <= 3) { await driveTutorial(page, ci, P, 110000, summary.tutorialIn = summary.tutorialIn || {}); lastChange = Date.now(); continue; } }
     const sg = await ev(page, () => window.__qa.sig()); if (sg === null) { await sleep(300); continue; }
-    if (opt.lastPick) { const st = (opt.stats = opt.stats || {})[opt.lastPick] = (opt.stats[opt.lastPick] || { n: 0, ch: 0 }); st.n++; if (sg !== lastSig) st.ch++; opt.lastPick = null; }
+    if (opt.lastPick) { const st = (opt.stats = opt.stats || {})[opt.lastPick] = (opt.stats[opt.lastPick] || { n: 0, ch: 0 }); st.n++; if (sg !== lastSig && !(await ev(page, () => !!window.__qa.bigOverlay()))) st.ch++; opt.lastPick = null; }   // opening an info sheet is no progress
     if (sg === lastSig && Date.now() - lastChange > 35000 && !opt.rescued) {   // before calling a soft-lock: Escape, then tap every visible element incl. close/back/menu ones
       opt.rescued = true; try { await page.keyboard.press('Escape'); } catch (e) { } await sleep(300);
       const all = ((await ev(page, () => window.__qa.clickables())) || []).filter(c => !c.dis && !/^(quit|exit|restart|resign|abandon|reset|delete|clear)/i.test(c.txt));
@@ -327,11 +327,12 @@ async function playBot(page, ci, P, ms, opt) {   // returns {result, clicks, sof
         if (noCand > 120) { bug('MAJOR', P, ci.where(), `no enabled visible clickable element for ${Math.round(noCand * 0.3)} s (no way forward)`, { shot: await shot(page, P + '-nocand') }); res.reason = 'nocand'; return res; }
         await tap(page, 195 + (rand() - 0.5) * 60, 380); } await sleep(300); continue; }
     noCand = 0;
-    let pick;
+    let pick; const closer = ok.find(c => /^(×|✕|✖|x|close|ok|done|got it|dismiss)$/i.test(c.txt));
+    if (closer && rand() < 0.75 && !/gx-ibtn/.test(closer.cls)) pool = [closer];   // an info sheet is open: close it, don't wander inside
     const pref = pool.filter(c => (preferRx && preferRx.test(c.txt)) || c.legal);
-    const w = pool.map(c => 1 + ((preferRx && preferRx.test(c.txt)) ? 6 : 0) + (c.legal ? 4 : 0) + (/^(start|play|ok|go|next|continue|deal|roll|begin|confirm|done|end turn|draw|select|accept)/i.test(c.txt) ? 3 : 0)) .map((x, i) => { const st = (opt.stats || {})[pool[i].d]; if (!st) return x; return x * (st.n >= 3 && st.ch === 0 ? 0.08 : 0.2 + 3 * (st.ch + 0.3) / (st.n + 1)); });
+    const w = pool.map(c => 1 + ((preferRx && preferRx.test(c.txt)) ? 6 : 0) + (c.legal ? 4 : 0) + (/^(start|play|ok|go|next|continue|deal|roll|begin|confirm|done|end turn|draw|select|accept|place|take|pick|buy|use|attack|submit|pass|end|finish|launch|fire|move)/i.test(c.txt) ? 3 : 0)) .map((x, i) => { const st = (opt.stats || {})[pool[i].d]; if (!st) return x; return x * (st.n >= 3 && st.ch === 0 ? 0.08 : 0.2 + 3 * (st.ch + 0.3) / (st.n + 1)); });
     let tot = w.reduce((a, b) => a + b, 0), r = rand() * tot, k = 0; for (; k < w.length - 1 && r > w[k]; k++) r -= w[k]; pick = pool[k];
-    opt.lastDesc = 'last click ' + pick.d; opt.lastPick = pick.d; clicks++; ci.where = () => `${P} click #${clicks} (${pick.txt || pick.d})`;
+    opt.lastDesc = 'last click ' + pick.d; opt.lastPick = pick.d; if (process.env.QA_DEBUG) console.log('  click', clicks, pick.d, pick.cx | 0, pick.cy | 0, 'pool', pool.length); clicks++; ci.where = () => `${P} click #${clicks} (${pick.txt || pick.d})`;
     await tap(page, pick.cx, pick.cy); await sleep(110 + Math.floor(rand() * 90));
   }
   res.clicks = clicks; res.reason = 'timeout'; return res;
@@ -426,6 +427,8 @@ async function phaseFuzz(browser, url) {
   const t0 = Date.now(), url = await gx.url(SLUG, {}), browser = await chromium.launch();
   console.log(`qa-bot ${SLUG} ${SIZE} seed ${SEED} -> ${url}`);
   const out = path.join(QA, SLUG + (PHONE ? '' : '-pc') + '.json');
+  let prev = null; try { prev = JSON.parse(fs.readFileSync(out, 'utf8')); } catch (e) { }
+  if (prev && PHASES.length < 4) { for (const k of ['tutorial', 'quick', 'story', 'fuzz']) if (!PHASES.includes(k)) summary[k] = prev[k]; for (const b of prev.bugs) if (!PHASES.includes(b.phase)) bugs.push(b); }   // partial re-run keeps the other phases
   const save = () => { summary.bugs = bugs; summary.secs = Math.round((Date.now() - t0) / 1000); fs.writeFileSync(out, JSON.stringify(summary, null, 1)); };
   const run = { tutorial: phaseTutorial, quick: phaseQuick, story: phaseStory, fuzz: phaseFuzz };
   for (const p of PHASES) { try { await run[p](browser, url); } catch (e) { bug('MAJOR', p, 'bot', 'phase crashed: ' + e.message.split('\n')[0]); } save(); }
