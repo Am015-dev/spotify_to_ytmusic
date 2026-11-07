@@ -33,6 +33,23 @@ var TBSTORY={
     round:{},
     end:{react:()=>myInf()>rivInf()?'You did it. Tamsin keeps the gate, and the heath is yours.':'Tamsin wins this one. Real games are longer: try again.'}
   },
+  // coached first game (free play): one line the first time a rule matters; a function gets the live game. id = rule in TUTORIAL-COVERAGE.md
+  coach:{
+    welcome:'The king is dead. Three regions, six locations: hold them and you hold the Throne. Play any card you like; I will speak up when a rule matters.',
+    goal:'Influence is your score. The most when the last round ends wears the crown.',
+    bid:'Every round starts with a secret bid. Tap a card, then the glowing spot. The highest bid chooses first.',
+    bids:()=>{const b=G.bstr||[],m=b[0],t=b[1];return m>t?'Your '+m+' beats Tamsin\'s '+t+': you choose first.':m<t?'Tamsin\'s '+t+' beats your '+m+': she chooses first.':'A tie goes to the higher on the Order Track.'},
+    kc:'The winner takes a Kingdom Card, a favour you keep all game. Your bid card goes under it.',
+    herald:'Place your Herald on a location. It pays only if you win that region; stand where Tamsin stands to steal from her.',
+    place:'Hide one card at each region, face down. Your Heir and your biggest cards belong where it matters.',
+    supp:'Supporters add +1 each in a region this round. Tap a region to send one, then Done.',
+    order:'You choose which region fights first. Tap the regions in order.',
+    clash:()=>{const ev=UI.card&&UI.card.ev;if(!ev||!ev.tot)return '';const t=ev.tot,me=t[0],o=Math.max(...Object.keys(t).filter(s=>+s!==0).map(s=>t[s]));return ev.winner===0?'Cards flip: your '+me+' beats '+o+'. The region is yours.':ev.winner<0?'Cards flip: '+me+' each. Nobody wins here.':'Cards flip: Tamsin\'s '+o+' beats your '+me+'. Hide bigger cards where you want to win.'},
+    claim:'Winner of a region claims one of its two locations: its Influence, plus +1 and a steal if your Herald stands there.',
+    score:()=>'Scoring: you have '+myInf()+', Tamsin '+rivInf()+'. Location reward, Herald bonus and steals all count.',
+    round:'The round ends: Supporters go home, played cards are discarded, a new round begins. Real games last 4 to 6 rounds.',
+    later:['Day and Night commands (Ambush, Retreat, Flank, Deadly)','Autumn: Govern and Journey, Lore, your Site of Power','Councils, the Favour and Tactics','Attrition when your deck runs out','Tied Clashes: the tied players clash again, then nobody scores']
+  },
   // the always-visible line, by decision kind (<= 2 short lines)
   ask:{bid:'Tap a card to bid it in secret. The highest bid picks first.',
     bidRes:'Tap a glowing Kingdom Card to take it.',

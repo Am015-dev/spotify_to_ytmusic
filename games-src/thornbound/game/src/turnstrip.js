@@ -20,7 +20,7 @@ html.tb-dim .tb-loc:not(.glow){opacity:.45;transition:opacity .25s}
 @media (prefers-reduced-motion:reduce){#tbturn.pulse .tbt-chip{animation:none}}
 `;document.head.appendChild(css);
 let el=null;const strip=()=>{if(el&&el.isConnected)return el;const rv=document.getElementById('rivals');if(!rv)return null;el=document.createElement('div');el.id='tbturn';el.setAttribute('role','status');el.setAttribute('aria-live','polite');rv.parentNode.insertBefore(el,rv.nextSibling);
-  el.addEventListener('click',()=>{if(UI._tbHold){UI._tbHold=0;paint();return}speedUp()});return el};
+  el.addEventListener('click',()=>{if(vNow){nextVoice();return}if(UI._tbHold){UI._tbHold=0;paint();return}speedUp()});return el};
 function speedUp(){if(!G||UI.card||G.over)return;const w=whoActs();if(w.ai.length&&viewSeatForQ()==null){clearTimeout(_pumpT);aiStep(w);pump()}}
 const poss=n=>String(n)+(/s$/i.test(n)?'\u2019':'\u2019s');
 const esc2=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -44,7 +44,7 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
   if(e.dataset.key!==key){e.dataset.key=key;e.className=cls+' pulse';e.innerHTML=html;try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}
   else{try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}}
 window.tbPaint=paint;window.tbVoice=voice;
-(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{paint()}catch(e){console.error('tbturn '+e.message)}return r}})();
+(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{paint()}catch(e){console.error('tbturn '+e.message)}try{if(window.tbCoachCheck)window.tbCoachCheck()}catch(e){}return r}})();
 // ---- the rival's step is announced in one plain caption, then held ~1.3 s so it can be read (tap the strip to skip)
 (function(){const o=aiStep;aiStep=function(w){const s=w.ai[0],l0=G.logN;const r=o.apply(this,arguments);
   try{let t=null;for(let i=G.log.length-1;i>=0&&G.log[i].i>l0;i--){if(G.log[i].s===s||G.log[i].s==null||G.log[i].s===undefined){t=G.log[i].t;break}}
@@ -73,4 +73,42 @@ setInterval(()=>{try{if(typeof GXT==='undefined')return;const st=GXT.active()?GX
   try{const c=UI.card,pc=document.getElementById('pc');if(c&&c.kind==='over'&&pc&&!pc.querySelector('.tbq')&&!(UI.camp)){const inf=G.pl.map(p=>p.inf),me=inf[0],ot=Math.max.apply(null,inf.slice(1));const Q=ST().quick||{};
     const t=me>ot?Q.win:me<ot?Q.lose:Q.tie;const sc=pc.querySelector('.cd-sc');if(t&&sc){const p=document.createElement('p');p.className='tbq';p.style.cssText='font:700 16px/1.3 "EB Garamond",Georgia,serif;margin:6px 0 10px;color:inherit';p.textContent=t;sc.insertBefore(p,sc.firstChild)}}}catch(e){}
   return r}})();
+
+// ---- coached first game (replaces the forced tap steps): real game, free moves, the guide speaks when a rule first matters
+window.TBCOACH={seen:[]};
+const coachOn=()=>!!(UI.cfg&&UI.cfg.tutorial&&UI.coachOn&&G&&UI.started);
+function say(id,force){const C=(ST().coach)||{};let t=C[id];if(typeof t==='function')t=t();if(!t)return;if(!force&&TBCOACH.seen.indexOf(id)>=0)return;if(TBCOACH.seen.indexOf(id)<0)TBCOACH.seen.push(id);
+  vq.length=0;voice(ST().guide||'ysolde',t,5200,'coach')}
+window.tbCoachSay=say;
+let lastSig='';
+function coachCheck(){try{if(!coachOn())return;if(G.over){if(!UI._tbEnd)tbEnd();return}
+  const c=UI.card;let sig='';
+  if(c&&c.kind==='event'){sig='ev'+c.ev.t+(c.ev.r!=null?c.ev.r:'');if(c.ev.t==='bids'&&!(c.rank&&c.revN>=c.rank.length))return}
+  else if(c&&c.kind==='news'&&c.big&&c.items&&c.items.some(infK))sig='news'
+  else if(!c&&G.q&&viewSeatForQ()!=null){const k=G.q.kind;sig='q'+k+(G.q.t==='menu'?menuPhase(G.q):'')}
+  if(!sig||sig===lastSig)return;lastSig=sig;
+  if(sig==='qbid'){say('welcome');say('goal');say('bid')}
+  else if(sig==='evbids')say('bids',true);
+  else if(sig==='qbidRes')say('kc');
+  else if(sig==='qherald')say('herald');
+  else if(sig==='qplace')say('place');
+  else if(/^qmenu/.test(sig)&&/Spring/.test(sig))say('supp');
+  else if(sig==='qclashOrder')say('order');
+  else if(/^evclash/.test(sig))say('clash',true);
+  else if(sig==='qlocation')say('claim');
+  else if(sig==='news')say('score',true);
+  else if(sig==='evsummary')say('round');
+}catch(e){}}
+setInterval(coachCheck,220);window.tbCoachCheck=coachCheck;
+function tbEnd(){UI._tbEnd=1;if(TBCOACH.seen.indexOf('round')<0)TBCOACH.seen.push('round');try{GXT.markDone('thornbound')}catch(e){}
+  const C=(ST().coach)||{};let over='';try{over=overHTML()}catch(e){}
+  const box=document.createElement('div');box.id='tbcend';box.style.cssText='position:fixed;inset:0;z-index:9999;background:#140c1a;color:#f6ecd2;overflow:auto;padding:16px;font:600 16px/1.35 "EB Garamond",Georgia,serif';
+  const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  box.innerHTML='<div style="max-width:560px;margin:0 auto"><h2 style="font:700 22px Cinzel,Georgia,serif;color:#f0c860;margin:0 0 8px">'+esc2(cast(ST().guide).name)+': you know the road</h2><p>'+esc2((ST().quick||{})[G.pl[0].inf>G.pl[1].inf?'win':G.pl[0].inf<G.pl[1].inf?'lose':'tie'])+'</p>'+'<p>'+esc2(C.round||'')+'</p>'+over+
+   '<h3 style="color:#f0c860">Things you will meet later</h3><ul>'+(C.later||[]).map(x=>'<li>'+esc2(x)+'</li>').join('')+'</ul><p style="display:flex;gap:10px;flex-wrap:wrap">'+(first?'<button class="btn pri" data-e="chapter" style="min-height:48px;padding:0 18px;font:700 16px inherit">Start chapter 1</button>':'')+'<button class="btn" data-e="menu" style="min-height:48px;padding:0 18px;font:700 16px inherit">Back to the menu</button></p></div>';
+  document.body.appendChild(box);
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-e]');if(!b)return;box.remove();tutLeave();UI.coachOn=0;if(b.dataset.e==='chapter'&&first&&typeof GXC!=='undefined'){showStart();GXC.play(first.id)}else{UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()}})}
+// start: no spotlight steps; the real tutorial game with free play (the Court is still scripted by the fixed seed)
+tutStart=function(o){const pro=!!(o&&o.prologue);TBCOACH.seen=[];lastSig='';UI._tbEnd=0;const old=document.getElementById('tbcend');if(old)old.remove();
+  try{GX.close()}catch(e){}hideStart();hideGloss();closePop(true);newGame('tutorial');UI.coachOn=1;UI.coachPro=pro;clearVoice();renderAll()};
 })();
