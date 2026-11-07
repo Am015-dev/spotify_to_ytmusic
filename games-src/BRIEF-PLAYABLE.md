@@ -22,3 +22,11 @@ Owner: "Tutorials in most games are not covering a real game and not all rules a
 
 ## ADDENDUM 2 (20:55 UTC): fix the rules
 The rulebook check is merged: games-src/rules-check/<slug>.md (and SUMMARY.md) on origin/alex/brave-carson-rbpmlk. Fix every WRONG and MISSING item for your game in the engine (not in the UI), each with a rules-test case named after the item; SIMPLIFIED-ON-PURPOSE items stay but must be stated in the help drawer. Update TUTORIAL-COVERAGE.md if a fixed rule changes what the tutorial teaches. Report "rules fixed n/total" in your DONE line.
+
+## ADDENDUM 3 (owner, 21:05 UTC): narrative everywhere, the tutorial is a story
+Owner: "All games require a narrative to make them interesting, even the tutorial. It's always click there, click this, highlight: boring."
+- The tutorial is the PROLOGUE of the game's story, not a list of clicks: a named guide character (portrait, code-drawn until art exists) and a rival with a reason to compete; every step has a story reason ("The river is rising: place this tile to give the elk a crossing"), then the action, then a reaction from the character ("The herd is safe. +3 for the run of forest!"). Max 2 short lines per bubble, written warm and punchy; no "click here" wording (the glow shows where).
+- Each tutorial chapter opens with a 1-2 line story beat and ends with a payoff beat; the final scoring is a climax (count-up, character reaction, what it means for the story).
+- Story mode: every chapter has an intro scene (portrait + 2-3 lines: who, what is at stake, the twist rule) and an outro (win and loss variants) that leads into the next chapter; bosses talk before and after. Quick game: a one-line flavour intro and a result line in the game's voice.
+- Write the cast and the story arc (3 acts) in games-src/<DIR>/STORY.md; keep all text in one data file so it can be edited. Original names only, never the original game's characters or setting names.
+- Add the story beats to TUTORIAL-COVERAGE.md next to the rule each one teaches. The tutorial-to-end script must still pass.
