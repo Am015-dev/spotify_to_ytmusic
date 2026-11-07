@@ -42,7 +42,7 @@ function musicSync() { try { GXMUS.sync(); } catch (e) { } }
 function startGame(o) {
   o = o || {}; clearTimeout(UI.timer);
   if (o.mode === 'tut') { if (UI.fastSave == null) UI.fastSave = UI.fast; UI.fast = false; UI.aiSave = AIDELAY; AIDELAY = 650; }   // the staged game keeps real timing so every step is shown
-  else { if (UI.fastSave != null) { UI.fast = UI.fastSave; AIDELAY = UI.aiSave; UI.fastSave = null; } try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } } UI.mode = o.mode || 'quick'; UI.level = o.level || 'normal'; UI.flareFree = !!o.flareFree; UI.sigDone = {}; UI.sigMode = false; UI.flareMode = 0; UI.hold = false; UI.ended = false; UI.lastTricks = 0; UI.tut = o.tut || null;
+  else { if (UI.fastSave != null) { UI.fast = UI.fastSave; AIDELAY = UI.aiSave; UI.fastSave = null; } try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } } UI.mode = o.mode || 'quick'; UI.level = o.level || 'normal'; UI.flareFree = !!o.flareFree; UI.sigDone = {}; UI.flareAsked = !!o.noFlareOffer; UI.sigMode = false; UI.flareMode = 0; UI.hold = false; UI.ended = false; UI.lastTricks = 0; UI.tut = o.tut || null;
   UI.players = o.players || UI.players; UI.mission = o.mission || UI.mission;
   AIX.seed((o.seed || Date.now()) & 0xffff);
   G = newGame({ players: UI.players, mission: UI.mission, seed: o.seed, deal: o.deal, taskCards: o.taskCards });
@@ -56,6 +56,7 @@ function later(f, ms) { clearTimeout(UI.timer); UI.timer = setTimeout(f, ms); }
 function step() {
   if (!G || UI.hold) return;
   if (G.result) return endMission();
+  if (G.phase === 'play' && canFlare(G) && !UI.flareAsked && !UI.tut && !UI.flareMode) { flareOffer(); return; }   // the crew may send a flare before anyone signals
   if (G.phase === 'play' && !G.trick.length && !UI.sigDone[G.tricks.length]) {
     UI.sigDone[G.tricks.length] = true; var any = false;
     if (!UI.tut) for (var p = 1; p < G.n; p++) { if (p === G.dummy) continue; var c = AIX.commPick(G, p); if (c && performMove(G, { t: 'comm', c: c }, p)) { any = true; popAt(seatEl(p), '📡 ' + cardName(c)); pingFx(seatEl(p)); sfx('ping'); } }
@@ -121,6 +122,12 @@ function onSeatTap(p) {
   if (!G) return;
   if (G.phase === 'ask' && askWho(G) < 0 && G.cap === 0 && chooseTargets(G).indexOf(p) >= 0) { apply({ t: 'choose', p: p }, 0); return; }
   zoomSeat(p);
+}
+function flareOffer() {
+  render(); var a = $('#askp'); a.innerHTML = ''; a.appendChild(mk('p', null, 'Before the first trick the crew may send one flare: everyone passes a card.'));
+  var r = mk('div', 'row'), d = mk('button', 'btn pri', 'Dive on'), f = mk('button', 'btn', '🔥 Send a flare'); d.id = 'diveB';
+  d.onclick = function () { UI.flareAsked = true; a.classList.remove('on'); step(); }; f.onclick = function () { UI.flareAsked = true; a.classList.remove('on'); $('#flareB').onclick(); };
+  r.appendChild(d); r.appendChild(f); a.appendChild(r); a.style.top = ($('#pool').style.top || '140px'); a.classList.add('on'); $('#msg').textContent = 'Flare or dive on?';
 }
 function doFlare(c) {
   var dir = UI.flareMode, picks = []; crew(G).forEach(function (p) { if (p === 0) picks[p] = c; else { var h = G.hands[p].filter(function (x) { return x[0] !== 'r'; }); picks[p] = h.sort(function (a, b) { return rankOf(a) - rankOf(b); })[0]; } });
@@ -217,7 +224,7 @@ function line(s) {
   return '';
 }
 function askPanel(top) {
-  var a = $('#askp'); a.innerHTML = ''; a.classList.remove('on'); if (G.phase !== 'ask' || UI.hold) return;
+  var a = $('#askp'); if (G.phase === 'play' && canFlare(G) && !UI.flareAsked && !UI.tut) return; a.innerHTML = ''; a.classList.remove('on'); if (G.phase !== 'ask' || UI.hold) return;
   var q = askWho(G), k = G.ask.kind, cards = k === 'dist' ? G.pool.slice(0, 1) : G.pool, txt;
   if (k === 'notrick') txt = 'Captain: who can stay out of every trick?'; else if (k === 'onetrick') txt = 'Captain: who can win exactly one trick?';
   else txt = k === 'dist' ? 'Captain: who takes this task?' : 'Captain: who carries all ' + cards.length + ' task' + (cards.length > 1 ? 's' : '') + '?';
@@ -236,7 +243,7 @@ function zoomShow(card, text, btns, task) {
   (btns || []).concat([['Close', closeZoom]]).forEach(function (x) { var bt = mk('button', 'btn' + (x[2] ? ' pri' : ''), x[0]); bt.onclick = function () { closeZoom(); if (x[1] !== closeZoom) x[1](); }; r.appendChild(bt); });
   z.classList.add('on');
 }
-function closeZoom() { $('#zoom').classList.remove('on'); }
+function closeZoom() { var was = $('#zoom').classList.contains('on'); $('#zoom').classList.remove('on'); if (was && G && UI.flareAsked && !UI.flareMode && G.phase === 'play' && !G.tricks.length && !G.trick.length && !G.result) later(step, 60); }
 function cardText(c) {
   var t = '<b>' + cardName(c) + '</b><br>'; t += c[0] === 'r' ? 'Sonar: beats every coloured card. Higher sonar beats lower sonar.' : 'Follow suit if you can. The highest ' + SUIT_NAME[c[0]] + ' wins unless a sonar is played.';
   var tk = taskOfCard(c); if (tk) t += '<br>Task card: ' + nm(tk.owner) + ' must win the trick holding it' + (tk.tok ? ' (' + (tk.tok === 'O' ? 'Ω' : tk.tok) + ': ' + TOKTXT[tk.tok] + ')' : '') + '.';
@@ -327,7 +334,7 @@ function menuInit() {
       game: function (S) { S.appendChild(GX.row('This game', [b('Rules', function () { GXH.rules(); }), b('Tutorial', function () { startTutorial(false); }), b('Restart', function () { if (G) startGame({ players: UI.players, mission: G.mission.n, mode: UI.mode === 'tut' ? 'quick' : UI.mode, level: UI.level }); }), b('Title', showTitle)])); },
       sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(SND.on, function (v) { SND.on = v; ls('ds-snd', v); }))); S.appendChild(GX.row('Music', [GX.onoff(MUSIC_ON, function (v) { MUSIC_ON = v; ls('ds-mus', v); musicSync(); }), b('Pick music', function () { try { GXMUS.open(); } catch (e) { } })], (window.DS_MUSIC || []).length ? '' : 'Music files arrive later; silent for now.')); },
       help: function (S) { try { S.appendChild(GXH.settingsRow()); } catch (e) { } },
-      about: { name: 'Deep Signal', version: '1.0', text: 'Original game design, names and art for the Game Night Shelf.' } });
+      about: { name: 'Deep Signal', version: '1.0', text: 'Original names, missions and art for the Game Night Shelf. Temporary icons: game-icons.net by Lorc and Delapouite, CC BY 3.0.' } });
     GX.onPref && GX.onPref(function (k) { if (k === 'ai') AIDELAY = UI.fast ? 60 : GX.aiDelay(650); });
     if (GX.aiDelay && !UI.fast) AIDELAY = GX.aiDelay(650);
   } catch (e) { console.warn(e); }

@@ -15,4 +15,31 @@ Prompts: `games-src/next-wave/flow-2d/deep-signal/prompts-waveN-ratio-WxH.json` 
 2. Run `python3 games-src/scripts/ingest-assets.py deep-signal` (resizes to the slot and writes `games/deep-signal/media/<stem>.webp`; see PLAYBOOK "Finished pictures from the owner").
 3. Rebuild: `python3 games-src/scripts/build-all.py deep-signal`. build.py lists the files present; no code changes.
 
+## Temporary pictures (until the Flow art arrives)
+18 icons rendered from game-icons.net by `temp-art/make.js` into `temp-art/<stem>.webp`; `python3 games-src/deep-signal/temp-art/install.py` copies them into `games/deep-signal/media/` (never over a finished picture).
+Licence: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), source https://game-icons.net via https://github.com/game-icons/icons; credit kept in the game (Menu > About).
+
+| stem | icon | author |
+|---|---|---|
+| icon-signal | delapouite/radio-tower | Delapouite |
+| token-signal | delapouite/radio-tower | Delapouite |
+| icon-flare | delapouite/torch | Delapouite |
+| token-captain | delapouite/ship-wheel | Delapouite |
+| icon-trick | delapouite/stack | Delapouite |
+| icon-silence | delapouite/silenced | Delapouite |
+| icon-deadzone | delapouite/fog | Delapouite |
+| icon-jammed | lorc/static | Lorc |
+| icon-decide | lorc/pointing | Lorc |
+| icon-share | delapouite/card-exchange | Delapouite |
+| icon-notrick | lorc/gas-mask | Lorc |
+| icon-onetrick | lorc/fishing-hook | Lorc |
+| icon-sonar-goal | lorc/radar-sweep | Lorc |
+| fx-ping | lorc/sonic-shout | Lorc |
+| logo-emblem | delapouite/diving-helmet | Delapouite |
+| boss-warden | delapouite/lighthouse | Delapouite |
+| boss-swarm | lorc/tornado | Lorc |
+| boss-source | lorc/spiral-shell | Lorc |
+
+Not used: print-and-play or workshop scans of the original cards (publisher art), and kenney.nl (blocked by the network proxy here).
+
 Wiring: card faces, task cards and portraits use `data-art` on the card / avatar; title, table, emblem, stamp, buttons and tokens also carry `data-art`. Boss portraits feed the Story cast.

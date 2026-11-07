@@ -31,3 +31,16 @@ Co-operative trick taking for 2-5 players; everyone wins or loses together.
   fails); simultaneous completions use the most favourable order; the flare passes one card per crew member (the drone does
   not pass); "captain decides" gives every task of that mission to one crew member; the 50 missions are original (same kinds
   of rules and growth, not copies).
+
+## Rulebook cross-check (7 Nov 2026, addendum 2)
+Checked against an online rules summary (https://lehi-innovation.github.io/boardgame-rules/rules/the-crew-the-quest-for-planet-nine/)
+and the published rulebook/FAQ search results (rulebook PDFs found online, rulespal FAQ):
+- Signals: once per mission, never during a trick, no trumps, top = highest / middle = only / bottom = lowest: matches.
+- Dead zone: card shown, position not given: matches (`'?'`). Disrupted communication for the first tricks: matches `late2`/`late3`.
+- Distress signal: allowed only BEFORE any communication; everyone passes one non-trump card the same way; +1 attempt:
+  MISMATCH FIXED. The engine allowed a flare after signals; now `canFlare` requires no signal yet, and the game offers
+  "Dive on / Send a flare" right after the draft, before any crew signal (the star replaces the attempt count).
+- 3 players: one card stays unplayed: matches.
+- Captain's decision (all tasks to one other player) and captain's distribution (yes/no questions, even split): match.
+- Order tokens: numbers strict, arrows relative, Ω last: match.
+- Card counts (40 cards, 36 task cards, tokens) checked against the components list of the same pages; no print-and-play art was used.

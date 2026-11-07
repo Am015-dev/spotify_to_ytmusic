@@ -18,6 +18,7 @@ const url = process.argv[2], NM = +process.argv[3] || 3, RUNS = +process.argv[4]
       if (await vis('.gxh-bub button,.gxh-bubble button')) { await tap('.gxh-bub button,.gxh-bubble button').catch(() => { }); return true; }
       if (await vis('#zoom.on')) { await tap('#zoom.on #zrow .btn:last-child'); return true; }
       if (await vis('#pool .tcard.legal')) { const i = await p.evaluate(() => AIX.draftPick(G, G.draftTurn)); await tap(p.locator('#pool .tcard').nth(i)); return true; }
+      if (await vis('#diveB')) { await tap('#diveB'); return true; }
       if (await vis('#askp.on .btn')) { const yes = await p.evaluate(() => G.phase === 'ask' && askWho(G) === 0 ? AIX.answer(G, 0) : null); if (yes != null) await tap(yes ? '#askp .btn.pri' : '#askp .btn:not(.pri)'); else { const c = await p.evaluate(() => { const q = AIX.act(G, 0, 'normal'); return q && q.p; }); await tap(p.locator('#askp .btn').nth(Math.max(0, await p.evaluate(c => chooseTargets(G).indexOf(c), c)))); } return true; }
       if (await vis('#hand .cd.legal')) { const c = await p.evaluate(() => AIX.choosePlay(G, G.turn, 'normal')); let bx = await p.locator(`#hand .cd.legal[data-c="${c}"]`).boundingBox().catch(() => null); if (!bx) bx = await p.locator('#hand .cd.legal').first().boundingBox(); if (!bx) return false; if (touch) await p.touchscreen.tap(bx.x + 8, bx.y + 20); else await p.mouse.click(bx.x + 8, bx.y + 20); return true; }
       return false;

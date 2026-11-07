@@ -2,7 +2,7 @@
 (function () {
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof startGame === 'function' && typeof UI !== 'undefined'; };
-  function begin(o) { UI.fast = true; AIDELAY = 30; window.ANIM = false; startGame(o); }
+  function begin(o) { UI.fast = true; AIDELAY = 30; window.ANIM = false; o.noFlareOffer = true; startGame(o); }
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function toPlay() { var g = 0; while (G.phase === 'draft' && g++ < 20) { var s = sideToAct(G); performMove(G, { t: 'take', i: AIX.draftPick(G, G.draftTurn) }, s); } UI.sigDone[0] = true; render(); }
   GXS.boardOpen = function () { if (!booted()) return; begin({ players: 4, mission: 2, seed: 11 }); };

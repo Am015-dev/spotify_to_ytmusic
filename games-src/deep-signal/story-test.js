@@ -16,6 +16,7 @@ const url = process.argv[2];
     const play = async () => { for (let i = 0; i < 900; i++) { if (await p.evaluate(() => !!(G.result && UI.ended))) return p.evaluate(() => G.result.ok); 
         if (await p.locator('.gxh-bub button:visible').count()) { await pt('.gxh-bub button'); continue; }
         if (await p.locator('#pool .tcard.legal').count()) { await pt('#pool .tcard', await p.evaluate(() => AIX.draftPick(G, G.draftTurn))); continue; }
+        if (await p.locator('#diveB:visible').count()) { await pt('#diveB'); continue; }
         if (await p.locator('#askp.on .btn').count()) { await pt('#askp.on .btn'); continue; }
         if (await p.locator('#hand .cd.legal').count()) { const c = await p.evaluate(() => AIX.choosePlay(G, G.turn, 'normal')); if (!(await pt(`#hand .cd.legal[data-c="${c}"]`))) await pt('#hand .cd.legal'); continue; }
         await p.waitForTimeout(80); } return null; };

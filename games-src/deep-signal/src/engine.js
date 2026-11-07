@@ -78,7 +78,7 @@ function commPos(G, p, c) {   // 'top' | 'only' | 'bot' | null
   if (same.length === 1) return 'only'; if (r === Math.max.apply(null, same)) return 'top'; if (r === Math.min.apply(null, same)) return 'bot'; return null;
 }
 function canComm(G, p) { return G.phase === 'play' && !G.trick.length && p !== G.dummy && !G.commUsed[p] && commAllowedNow(G) && !G.result; }
-function canFlare(G) { return G.phase === 'play' && !G.tricks.length && !G.trick.length && !G.flare && !G.result; }
+function canFlare(G) { return G.phase === 'play' && !G.tricks.length && !G.trick.length && !G.flare && !G.result && !(G.sig || []).length; }   // before any signal (rulebook)
 function validMoves(G, seat) {
   var out = [], s = sideToAct(G); if (G.result) return out;
   if (G.phase === 'draft') { if (s === seat) G.pool.forEach(function (t, i) { out.push({ t: 'take', i: i }); }); return out; }

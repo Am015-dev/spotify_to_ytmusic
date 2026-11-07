@@ -67,6 +67,17 @@ Other crew sizes (60 each, 1-10 / 11-25): 2p 57% / 57%, 3p 87% / 77%, 5p 63% / 3
 `gen.py` regenerates campaign.json, missions-full.json, assets.json, prompts, ASSET-CHECK.md and ASSETS.md from one source.
 `register-assets.py` (orchestrator, at merge) adds the rows to next-wave/expected-assets.json.
 
+## Addenda (reuse, web, temporary art)
+- Reuse: compared with Short Fuse (games-src/short-fuse/game, co-op crew + job list). It has no hot-seat; its shell pieces are the
+  same shared kit Deep Signal already inlines (shell, gx-kit Menu, gx-campaign, gx-tutor, gx-help, gx-music) in the Cauldron Fair
+  build pattern. Deep Signal's own pieces are tested (smoke, play.js, story-test, scenarios, audit), so nothing was replaced.
+- Open source: searched the web/GitHub for a permissive implementation of this game or a co-op trick-taking AI: none found with
+  code + MIT/BSD/Apache/ISC licence (one academic MCTS report, no code/licence). Nothing ported; no THIRD-PARTY.md needed.
+- Rulebook cross-check: see rules-notes.md; one mismatch fixed (flare only before any signal, offered after the draft).
+- Temporary art: 18 CC BY 3.0 icons from game-icons.net (Lorc, Delapouite) in `temp-art/`, credits in ASSETS.md and Menu > About.
+  Install at deploy: `python3 games-src/deep-signal/temp-art/install.py` then build. kenney.nl was blocked (HTTP 403 from the proxy);
+  no fan-made versions with an explicit reuse licence were found in the time box, and no publisher scans were used.
+
 ## Not done / weak
 - Hot-seat and online play are not built (brief: optional). Difficulty picker is not exposed in Quick game (normal crew; Story act 2-3 hard).
 - `GXC.validate` reports "needs 9 or 10 chapters (has 50)": deliberate, the brief makes the 50-mission logbook the campaign.
