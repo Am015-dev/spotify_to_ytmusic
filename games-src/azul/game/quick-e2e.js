@@ -5,7 +5,7 @@ const mode=process.argv[2]||'quick';const [W,H]=(process.argv[3]||'390x763').spl
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));let fail=0;const P=(ok,m)=>{console.log((ok?'PASS ':'FAIL ')+m);if(!ok)fail++};
 (async()=>{const browser=await PW.chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
 const desk=W>800;const ctx=await browser.newContext({viewport:{width:W,height:H},isMobile:!desk,hasTouch:!desk});
-await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+const BASE=process.env.BASEURL;if(!BASE)await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
 const p=await ctx.newPage();p.setDefaultTimeout(15000);const errs=[];
 p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))errs.push(m.text())});
 const tapXY=async(x,y)=>desk?p.mouse.click(x,y):p.touchscreen.tap(x,y);
@@ -13,7 +13,7 @@ const tapXY=async(x,y)=>desk?p.mouse.click(x,y):p.touchscreen.tap(x,y);
 const tapSel=async sel=>{const r=await p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const b=e.getBoundingClientRect();if(b.width<2||b.height<2)return null;const x=b.left+b.width/2,y=b.top+b.height/2;const h=document.elementFromPoint(x,y);return h&&(h===e||e.contains(h)||h.contains(e))?{x,y}:{x,y,covered:h&&(h.id||h.className)}},sel);
  if(!r)return false;if(r.covered){return 'covered:'+r.covered}await tapXY(r.x,r.y);return true};
 const shot=async n=>{if(SH){fs.mkdirSync(SH,{recursive:true});await p.screenshot({path:SH+'/'+n+'.png'})}};
-await p.goto('https://gns.test/'+(desk?'':'?phone=1'));await sleep(800);await p.evaluate(m=>{try{localStorage.clear();localStorage.setItem('sgz_offer','1');if(m==='story')localStorage.setItem('gxt-sunglaze','{"done":1}')}catch(e){}},mode);await p.reload();await sleep(1500);
+await p.goto(BASE?BASE+(desk?'':'?phone=1'):'https://gns.test/'+(desk?'':'?phone=1'));await sleep(800);await p.evaluate(m=>{try{localStorage.clear();localStorage.setItem('sgz_offer','1');if(m==='story')localStorage.setItem('gxt-sunglaze','{"done":1}')}catch(e){}},mode);await p.reload();await sleep(1500);
 await p.evaluate(()=>{window.bfD=ms=>ms*.3});
 await shot('01-title');
 const clickText=async(sel,re)=>{const i=await p.evaluate(([s,r])=>{const re=new RegExp(r,'i');const l=[...document.querySelectorAll(s)].filter(e=>{const b=e.getBoundingClientRect();return b.width>2&&re.test(e.textContent)});if(!l.length)return -1;l[0].setAttribute('data-e2e','1');return 1},[sel,re]);if(i<0)return false;const r=await tapSel('[data-e2e="1"]');await p.evaluate(()=>document.querySelectorAll('[data-e2e]').forEach(e=>e.removeAttribute('data-e2e')));return r===true};

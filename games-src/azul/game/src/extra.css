@@ -31,3 +31,18 @@ html .gxc-act{background:rgba(38,22,12,.94)!important;border-image:none!importan
 html .gxc-act b,html .gxc-act small{color:#fff6e0!important;opacity:1!important;text-shadow:none!important}
 /* W388 help: how a turn works, five short lines first */
 .rules .turn5{border:2px solid #c99a3e;border-radius:12px;background:#fff6dc;padding:8px 12px;margin:0 0 12px}.rules .turn5 h3{margin:0 0 4px}.rules .turn5 ol{margin:0;padding-left:22px;font-size:16px;line-height:1.35;color:#2a1608}
+html body .bf-floor .bf-c span{color:#560d08}
+html body .bf-chip .bf-pj{background:#17582b}html body .bf-chip .bf-pj.dn{background:#8e2418}
+html.sk-banner body .gxc-act,html body .gxc-act{background:rgba(30,16,8,.96)!important;border-image:none!important}
+html.sk-banner body .gxc-act b,html.sk-banner body .gxc-act small,html body .gxc-act b,html body .gxc-act small{color:#fff6e0!important;text-shadow:none!important;opacity:1!important}
+@media (max-width:440px){html body .gxc-path{margin-top:22px}}
+/* W388 wide screens: every text >= 16px (audit rule A), solid contrast */
+@media (min-width:1024px){
+ html body .gx-bar .gx-ibtn span{font-size:16px}
+ html body #dockbody .scores .sc,html body #dockbody .recap div,html body #dockbody .coach .x,html body #dockbody .acts .btn,html body #dockbody .coach{font-size:16px}
+ html body .gxc-act b,html body .gxc-act small,html body .gxc-node .gxc-lab{font-size:16px}
+ html body #dockbody .recap b{filter:brightness(.62)}
+ html body #dockbody .scores .sc{color:#2a1608}
+ .gxc-path .gxc-node .gxc-lab{padding:3px 10px}
+}
+@media (max-width:440px){html body .gxc-act small{display:none!important}html body .gxc-act{height:34px!important;min-height:0!important;padding:0 8px!important}}
