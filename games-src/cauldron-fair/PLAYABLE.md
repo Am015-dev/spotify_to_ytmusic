@@ -21,3 +21,9 @@ W391's engine fix (purple set 4 upgrade keeps the old chip in the pot) is merged
 
 ## Checks
 tutor-test.js (the tutorial played through real taps, wrong-tap, rotate, leave, skip, anim runs), tap-play.js (Quick game and Story chapter 1 to the result with taps only), rules-test, build-all --quick, ui-audit: see the report line in the branch's last commit message.
+
+## Round 2 (W398b)
+- Coached first game is the default: a first-time player's Play (and the "New here?" button, and Story's first run) starts it. `window.GXCOACH = {running, explained:[ids], done}`; 0 forced taps; Hask's bubbles + rival comments (`rival`, `rival2`) + an end card that walks the final count with the player's real numbers.
+- Story stage 1 by taps only: PASS at 390x763 (`tap-play.js 390x763 story`: coached prologue, then chapter 1 to its result). Quick game by taps: PASS.
+- qa-bot (`node games-src/scripts/qa-bot.js cauldron-fair`): 0 blockers, 0 majors, 38 minors (mostly tap targets under 40px on the fortune chip and top bar clipping by 2px); tutorial end reached.
+- ui-audit on a local staged build (phone / phone-s / pc): A 0/0/0, C 0, D 0, F 0/0/0 (one title primary button, one instruction line). NOT zero: B 6/6/7 (the painted header buttons, the bag count badge and fortune chip labels sit on painted art; some drawer text still reads as a busy background) and E 4/0/2 (Save, Load, Fast, Normal in the Menu, the Got it bubble, the Story button and a roster button are flagged as not changing the DOM within 1.5 s). Not fixed in this round.
