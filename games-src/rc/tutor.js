@@ -25,7 +25,8 @@ function tutLeave(){clearTimeout(BF.autoT);BF.autoT=null;try{BF.cardClear()}catc
 // ---------------------------------------------------------------- COACHED FIRST GAME (flag ?coach=1, off by default; owner 7 Nov addendum 4)
 // A real game from turn 1 (all legal moves free; stacked seed and deck only make the cases come up). The Cook speaks just in time: one bubble at a time,
 // never blocks input, dismissible. Each rule is explained the first time it matters; the rest go on a "Things you'll meet later" card. No forced taps.
-const COACH={timer:0,done:{},cur:null,later:0,pro:false,forced:{}};
+const COACH={timer:0,done:{},cur:null,later:0,pro:false,forced:{},finished:false};
+window.GXCOACH={get running(){return !!(G&&G.coach)},get explained(){return Object.keys(COACH.done).filter(k=>k!=='later')},get done(){return !!COACH.finished}};
 const cbeat=()=>{try{if(!G||PHO.st!=='story')return null;const i=storyIdx();return i>=0?UI.beats[i]:null}catch(e){return null}};
 const cplan=()=>!!(G&&(PHO.st==='plan'||PHO.st==='plan2')&&!PHO.pop&&!UI.modal);
 const cact=t=>{try{return G.plan.acts.find(a=>a.pw.length&&a.type===t)}catch(e){return null}};
@@ -63,21 +64,21 @@ const COACH_LATER=[
  ["Moving camp","Move camp at night; it halves your roof and palisade."],["Other scenarios","Hexed Isle, Stranded Friend and Settlers add their own goals."]];
 const TUT_KEY='gxt-'+TUT_GAME;
 const coachMark=p=>{try{const o=JSON.parse(localStorage.getItem(TUT_KEY)||'{}');Object.assign(o,p);localStorage.setItem(TUT_KEY,JSON.stringify(o))}catch(e){}};
-function coachEl(){let e=document.getElementById('coachb');if(!e){e=document.createElement('div');e.id='coachb';e.setAttribute('role','status');document.body.appendChild(e);
+function coachEl(){let e=document.getElementById('coachb');if(!e){e=document.createElement('div');e.id='coachb';e.className='coachb';e.setAttribute('role','status');document.body.appendChild(e);
   e.addEventListener('click',ev=>{const b=ev.target.closest('[data-coach]');if(!b)return;const k=b.dataset.coach;if(k==='x')coachHide();else coachFinish(k)})}return e}
-function coachSkipEl(){let e=document.getElementById('coachskip');if(!e){e=document.createElement('button');e.id='coachskip';e.type='button';e.textContent='Skip tutorial';e.setAttribute('aria-label','Skip the tutorial and leave this game');document.body.appendChild(e);
+function coachSkipEl(){let e=document.getElementById('coachskip');if(!e){e=document.createElement('button');e.id='coachskip';e.className='coachskip';e.type='button';e.textContent='Skip tutorial';e.setAttribute('aria-label','Skip the tutorial and leave this game');document.body.appendChild(e);
   e.addEventListener('click',()=>coachFinish('skip'))}return e}
 function coachHide(){const e=document.getElementById('coachb');if(e)e.hidden=true;COACH.cur=null}
 function coachShow(id,say,kind){const e=coachEl();COACH.cur=id;COACH.shownAt=Date.now();e.hidden=false;e.dataset.rule=id;e.dataset.kind=kind||'rule';e.innerHTML='<b class="cn">Cook</b><span class="ct"></span><button type="button" data-coach="x" aria-label="Dismiss">✕</button>';e.querySelector('.ct').textContent=say}
 // the end of the coached game: the final scoring walked through rule by rule with the player's real numbers, then what comes later
-function coachFinal(){const w=!!(G.over&&G.over.win);const alive=G.chars.filter(c=>!c.npc&&!c.dead).length,tot=G.chars.filter(c=>!c.npc).length;
+function coachFinal(){COACH.finished=true;const over=!!G.over,w=!!(G.over&&G.over.win);const alive=G.chars.filter(c=>!c.npc&&!c.dead).length,tot=G.chars.filter(c=>!c.npc).length;
   const fire=has('fire'),pile=(G.sc&&G.sc.pile)||0;
   const walk=[['Goal: fire',fire?'✓ lit':'✗ not lit'],['Goal: wood pile',pile+' of 15'],['Rescue window','days 10 to 12 (you ended on day '+G.round+')'],['Everyone alive',alive+' of '+tot+(alive<tot?': a death loses':'')],['Shelter',hasShelter()?'built (no night wounds)':'none (a wound each night)'],['Roof and palisade',G.camp.roof+' and '+G.camp.pal],['Food and wood left',food()+' and '+G.res.wood]];
   const e=coachEl();COACH.cur='later';e.hidden=false;e.dataset.rule='later';e.dataset.kind='final';
-  const btns=COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':'<button type="button" class="cb" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>';
-  e.innerHTML='<b class="cn">Cook: '+(w?'rescued!':'we did not make it')+'</b><span class="ct">Here is how it scored, rule by rule:</span><ul class="walk">'+walk.map(x=>'<li><b>'+x[0]+':</b> '+x[1]+'</li>').join('')+'</ul><span class="ct">Things you’ll meet later:</span><ul>'+COACH_LATER.map(x=>'<li><b>'+x[0]+'.</b> '+x[1]+'</li>').join('')+'</ul><div class="cbs">'+btns+'</div>';
+  const btns=(COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':(over?'':'<button type="button" class="cb" data-coach="keep">Keep playing</button>')+'<button type="button" class="cb" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>');
+  e.innerHTML='<b class="cn">Cook: '+(over?(w?'rescued!':'we did not make it'):'you have the hang of it')+'</b><span class="ct">'+(over?'Here is how it scored, rule by rule:':'Here is how the goal stands, rule by rule:')+'</span><ul class="walk">'+walk.map(x=>'<li><b>'+x[0]+':</b> '+x[1]+'</li>').join('')+'</ul><span class="ct">Things you’ll meet later:</span><ul>'+COACH_LATER.map(x=>'<li><b>'+x[0]+'.</b> '+x[1]+'</li>').join('')+'</ul><div class="cbs">'+btns+'</div>';
   coachMark({done:1,open:0,step:0})}
-function coachFinish(k){coachStop();const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function coachFinish(k){if(k==='keep'){coachStop();try{delete G.tut;delete G.coach;refresh()}catch(e){}return}coachStop();const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   if(k==='skip')coachMark({skipped:1,open:0});
   tutLeave();
   if(k==='chapter'&&first&&typeof GXC!=='undefined')GXC.play(first.id);
@@ -89,12 +90,13 @@ function coachTick(){try{
   // make the situations come up once: fog on a place and determination for a skill, from day 2
   if(cplan()&&G.round>=2){if(!COACH.forced.fog&&!G.map.some(m=>m.fog)){COACH.forced.fog=1;try{G.map[TUT_FOG].fog=1;refresh()}catch(e){}}
     if(!COACH.forced.det){COACH.forced.det=1;for(const c of G.chars)if(!c.npc)c.det=Math.max(c.det||0,3);try{refresh()}catch(e){}}}
+  if(!COACH.done.later&&cplan()&&G.round>=4&&Object.keys(COACH.done).length>=14){COACH.done.later=1;coachFinal();return}
   if(COACH.cur&&Date.now()-COACH.shownAt>9000)coachHide();
   if(COACH.cur)return;
   for(const r of COACH_RULES){if(COACH.done[r.id])continue;let ok=false;try{ok=!!r.when()}catch(e){}if(ok){COACH.done[r.id]=1;let t=r.say;try{if(typeof t==='function')t=t()}catch(e){t=''}if(t){coachShow(r.id,t,r.kind);return}}}
  }catch(e){console.error(e)}}
 function coachStop(){clearInterval(COACH.timer);COACH.timer=0;coachHide();const k=document.getElementById('coachskip');if(k)k.remove()}
-function coachStart(){COACH.done={};COACH.cur=null;COACH.later=0;COACH.forced={};tutBegin();G.coach=1;coachMark({open:1,done:0,skipped:0});coachSkipEl();clearInterval(COACH.timer);COACH.timer=setInterval(coachTick,600);coachTick()}
+function coachStart(){COACH.finished=false;COACH.done={};COACH.cur=null;COACH.later=0;COACH.forced={};tutBegin();G.coach=1;coachMark({open:1,done:0,skipped:0});coachSkipEl();clearInterval(COACH.timer);COACH.timer=setInterval(coachTick,600);coachTick()}
 window.COACHX={rules:COACH_RULES.map(r=>r.id),done:()=>Object.keys(COACH.done),state:COACH};
 
 function tutStart(o){COACH.pro=!!(o&&o.prologue);coachStart()}

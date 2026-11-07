@@ -15,7 +15,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  let taps=0,uncovered=0;const tap=async sel=>{const c=await centre(sel);if(!c)return false;await p.touchscreen.tap(c[0],c[1]);taps++;return c[2]||true};
  const log=[];
  // title -> start
- if(mode==='story'){await tap('#modal summary');await sleep(400);await tap('#modal [data-a=story]');await sleep(1500);if(await tap('.gxt-skip'))await sleep(1500)} else{await tap('#modal [data-a=start]');await sleep(600);await tap('.tutoffer [data-tutoffer=play]');await sleep(1500)}
+ if(mode==='story'){await tap('#modal summary');await sleep(400);await tap('#modal [data-a=story]');await sleep(1500);if(await tap('#coachskip'))await sleep(1500)} else{await tap('#modal [data-a=start]');await sleep(600);await tap('.tutoffer [data-tutoffer=play]');await sleep(1500)}
  const t0=Date.now();let last='',stall=0,over=null;
  while(Date.now()-t0<(+process.env.MAXMS||540000)){
    over=await p.evaluate(()=>{const r=document.querySelector('.gxc-res-on');if(r&&r.getBoundingClientRect().width)return {win:/won/.test(r.className),round:G?G.round:null,res:1};return G&&G.over?{win:!!G.over.win,round:G.round}:null});

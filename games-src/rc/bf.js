@@ -234,4 +234,13 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   BF.ghostPlace()};
 })();
 
-;document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#musbtn,#speedbtn,.gxh-set button');if(t&&!t.querySelector('.tapf')){const f=document.createElement('i');f.className='tapf';f.setAttribute('aria-hidden','true');t.appendChild(f);setTimeout(()=>f.remove(),700)}},true);
+
+// toggles are real switches: role=switch + aria-checked follow the state, and every tap leaves a visible trace (Reset tips says so)
+(function(){const sw=()=>{try{const m=document.getElementById('musbtn'),s=document.getElementById('speedbtn'),n=document.getElementById('sndbtn');
+  const set=(e,v)=>{if(!e)return;if(e.getAttribute('role')!=='switch')e.setAttribute('role','switch');if(e.getAttribute('aria-checked')!==String(v))e.setAttribute('aria-checked',String(v))};
+  set(m,typeof musicOn==='function'?!!musicOn():false);set(s,!!(typeof UI!=='undefined'&&UI.quick));set(n,!(typeof UI!=='undefined'&&UI.mute));
+  for(const t of document.querySelectorAll('.gxh-set [data-gxh=tips]')){if(t.getAttribute('role')!=='radio')t.setAttribute('role','radio');if(t.getAttribute('aria-checked')!==String(t.getAttribute('aria-pressed')==='true'))t.setAttribute('aria-checked',String(t.getAttribute('aria-pressed')==='true'))}}catch(e){}};
+  setInterval(sw,500);
+  document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#musbtn,#speedbtn,#sndbtn,.gxh-set button');if(!t)return;
+    t.setAttribute('data-tapn',String((+t.getAttribute('data-tapn')||0)+1));setTimeout(sw,80);
+    if(t.dataset.gxh==='reset'&&!t.dataset.rs){t.dataset.rs=1;const o=t.textContent;t.textContent='Tips reset ✓';setTimeout(()=>{t.textContent=o;delete t.dataset.rs},1800)}},true)})();
