@@ -5,21 +5,21 @@ KK.STORY = {
   guide: { name: 'Auntie Suzu', emoji: '🍵', color: '#b5452a', portrait: 'camp-suzu.webp' },
   rivalId: 'odile',
   // one line in the game's own voice when a Quick game starts and ends
-  quickIntro: 'The belt hums, the plates roll. Pick one, pass the rest.',
+  quickIntro: 'Welcome to the Turning Plate. The belt rolls!',
   quickResult: { win: 'You cleared the belt. Auntie Suzu would be proud.', lose: '%R took the Golden Plate this time. Same belt tomorrow?', tie: 'A dead heat. The belt keeps turning.' },
   // Help opens with these five lines
   turn: ['1. Everyone looks at their own hand of plates.', '2. Pick ONE plate. Everybody picks at the same time.', '3. The covers lift, one diner after another, and each plate lands on its owner\'s counter.', '4. Your points pop up with the reason.', '5. Your leftover hand slides to the next diner, theirs comes to you. Repeat until the hands are empty.'],
-  // the live-turn instruction line (banner | text); %N = next diner, %R = a rival
+  // the live-turn instruction line (banner | text, 8 words at most together: gate rule 5); %N = next diner, %R = a rival
   say: {
-    mine: 'Your turn|Tap the dish you want. The rest goes to %N.',
-    twin: 'Your turn|Twin Sticks: tap two dishes.',
-    twin2: 'Your turn|Now tap a second dish.',
-    tap2: 'Your turn|Tap it again to serve it.',
-    wait: '%R\'s turn|Everyone picks at once. Waiting for %R.',
-    cover: 'Picks are in|The covers lift one by one.',
-    land: 'Scoring|The dishes land on the counters.',
-    pass: 'Hands pass|Your leftovers go to %N. A new hand arrives.',
-    roundEnd: 'Round over|Counting every set on the counters.'
+    mine: 'Your turn|Tap a dish to take it.',
+    twin: 'Your turn|Tap two dishes.',
+    twin2: 'Your turn|Tap a second dish.',
+    tap2: 'Your turn|Tap it again.',
+    wait: '%R\'s turn|Waiting for %R.',
+    cover: 'Picks are in|Covers lift one by one.',
+    land: 'Scoring|Dishes land on counters.',
+    pass: 'Hands pass|Leftovers go to %N.',
+    roundEnd: 'Round over|Counting the counters.'
   },
   // tutorial chapters: a beat before (open) and a payoff after (done). Shown as story cards in the bubble.
   chapters: {

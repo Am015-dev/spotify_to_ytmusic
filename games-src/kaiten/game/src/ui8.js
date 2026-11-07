@@ -123,10 +123,8 @@ function stageOK() { return !!$('#tbl') && !!document.body.animate && !pxRM(); }
 function stageClear() { const s = $('#stage'); if (s) s.remove(); }
 const cap1 = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
 function revealCaption(sd, l) {
-  const me = sd === viewSeat(), nm = me ? 'You' : pname(sd);
-  const served = l ? l.served : 'a dish', d = l ? l.d : 0, why = l ? l.why.map(w => w.replace(/^[+\u2212]\d+ /, '')).join(' and ') : '';
-  const tail = d > 0 ? ' +' + d + (why ? ' ' + why : '') + '.' : d < 0 ? ' ' + d + '.' : (l && l.notes[0] ? ' ' + cap1(l.notes[0]) + '.' : '');
-  return (me ? 'Your turn' : pname(sd) + '\'s turn') + '|' + nm + (me ? ' serve ' : ' serves ') + served + '.' + tail;
+  const me = sd === viewSeat(), nm = me ? 'You' : pname(sd), served = l ? l.served : 'a dish', d = l ? l.d : 0;
+  return (me ? 'Your turn' : pname(sd) + '\'s turn') + '|' + nm + (me ? ' serve ' : ' serves ') + served + '.' + (d > 0 ? ' +' + d : '');
 }
 async function stageReveal(picks, tok, gains) {
   stageClear();

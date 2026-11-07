@@ -84,8 +84,9 @@ html:not(.kkmy) #belt .hc{filter:saturate(.75) brightness(.9)}
 #kkguide.on{opacity:1;transform:translate(-50%,0)}
 #kkguide .kgt{display:flex;flex-direction:column;font-size:15px;line-height:1.2;font-weight:700}
 #kkguide .kgt b{font-size:13px;color:#8c3b27;text-transform:uppercase;letter-spacing:.03em}
-.gxh-bub .gxh-tx{font-size:15px}
-.gxh-bub .gxh-tt{font-size:16px}
+html .gxh-bub .gxh-tx{font-size:15px!important;line-height:1.25!important}
+html .gxh-bub .gxh-tt{font-size:16px!important}
+html .gxt-bub .gxh-tx{padding-right:0!important}
 /* result card */
 #rs.kkfin .rsbox.bar{flex-direction:column;align-items:center;gap:10px;background:#fff3d6;border:3px solid #4a2a22;border-radius:16px;padding:12px;width:min(350px,calc(100vw - 20px));pointer-events:auto;box-shadow:0 14px 44px rgba(0,0,0,.55)}
 #rs.kkfin .rsbox.bar .btn{min-height:50px;min-width:120px;font-size:18px}
@@ -101,3 +102,14 @@ html:not(.kkmy) #belt .hc{filter:saturate(.75) brightness(.9)}
 html.ph #barstat{white-space:normal;line-height:1.05;font-size:14px;overflow:visible;min-width:0}
 html.ph #barstat b{font-weight:900}
 html.ph.ph-p #labmid #prompt.kk2{position:relative;z-index:70}
+/* contrast fixes found by the independent audit (rule B): >= 4.5:1 */
+.slot .st.rd{color:#1e5c28}
+.slot .sbox.empty .kkp3t{background:#2a1710;color:#fff3d6;border-radius:8px;padding:0 6px}
+:root{--gxc-a1:#2f6b2c;--gxc-a2:#8f5412;--gxc-a3:#8e3b46}
+.gxc-disc{background-image:none!important;text-shadow:none!important}
+.tbtn.gxt-first,html.sk .tbtn.gxt-first{border-image:none;border:3px solid #4a2a22;border-radius:18px;background:linear-gradient(180deg,#b8321d,#8f2412);color:#fff;text-shadow:none;filter:none;box-shadow:0 4px 0 #5b3221}
+.tbtn.gxt-first span{opacity:1;color:#fff}
+html .gxt-menu.gxt-first{background:linear-gradient(180deg,#b8321d,#8f2412)!important;color:#fff!important}
+html .gxt-menu.gxt-first span,html .gxt-menu.gxt-first b{color:#fff!important}
+html:has(.gx-drawer.on) #kkguide{display:none}
+html.sk .gxt-menu.gxt-first,html .gxt-menu.gxt-first{border-image:none!important;border:3px solid #4a2a22!important;border-radius:14px!important}
