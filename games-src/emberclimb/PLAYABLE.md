@@ -35,3 +35,18 @@ Chapter 2: new boss Warden Captain (iron-warden art, 56-60 HP) with a new move, 
 - Real card pictures and backgrounds still missing (code shapes stand in).
 - Hand cards hide during the enemy turn (by design: focus on the enemy); a human could want to see them.
 - Shared kit: Playwright 1.56.1 needs a browser-build-1194 shim in /opt/pw-browsers (outside the repo).
+
+## Addendum 1: the tutorial is a real guided climb
+`src/tutor.js` is now one short real climb (Warrior, seed 7, 7 rooms: fight, treasure, fight, campfire, shop, event, boss) played from setup to the
+"Climb won" result screen against the real enemy AI, in 4 chapters (first fight; map, treasure and a harder fight; campfire, shop, event; boss and
+the end). Leaving saves the chapter (`emberclimb.tutch`); the next launch starts there. Two free-play steps let the player win a fight on their own
+(the bubble hides, the dock line instructs, End turn and potions stay live). Coverage checklist: TUTORIAL-COVERAGE.md. `tools/tut-end.js` plays the
+whole guided climb at 390x763 and 1440x860 by tapping spotlit centres (uncovered) and fails if any of the 42 step ids was not shown.
+
+## Addendum 2: tabletop rules
+All 23 WRONG/MISSING items of games-src/rules-check/emberclimb.md fixed in the engine, each with a rules-test case R01-R23 (details in
+rules-notes.md). Shelf numbers stay 3x the tabletop scale (`D.SCALE = 3`: Weak -3 per hit, Wrath +3 per hit and 3 HP to end a turn in it, rest heals
+9, Shiv 3); caps in `D.CAPS`. UI follow-ups done here: intents use `E.previewHit`, Weak/Vulnerable/Poison texts, rest amount, Scry picker
+(tap cards to discard, Done), Miracle button (+1 energy), multi-relic rewards. SIMPLIFIED items are stated in Help > "Simplified on purpose".
+Balance after (`node bal.js 200`): Warrior 39%, Rogue 47%, Automaton 51%, Monk 36%; chapter 2 first-legal 83%, ai 95%.
+Known: duo runs became easy (enemy HP x1.6 table is an approximation); 3-act mode (`opt.acts`) exists in the engine but Quick game still plays 1 act.

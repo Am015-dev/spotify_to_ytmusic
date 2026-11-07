@@ -12,13 +12,13 @@ const MODE = process.argv[2] || 'both', SHOTS = path.join(__dirname, '..', 'shot
     let last = '', stuck = 0, sawGame = false;
     for (let i = 0; i < maxSteps; i++) {
       await sleep(250);
-      const s = await pg.evaluate(() => { const g = window.EC && EC.E.G(); const c = window.GXT && GXT.active() ? (GXT.current() || {}) : null; return { mode: UI.mode, scr: g && g.scr, ph: g && g.b && g.b.ph, busy: UI.busy, tut: c ? { id: c.id, next: !c.wait, ready: !c.ready || c.ready(), times: (c.wait && c.wait.times) || 1 } : null, end: !!document.querySelector('.gxt-end'), won: g && g.won, txt: document.body.innerText.slice(0, 4000) }; });
+      const s = await pg.evaluate(() => { const g = window.EC && EC.E.G(); const c = window.GXT && GXT.active() ? (GXT.current() || {}) : null; return { mode: UI.mode, scr: g && g.scr, ph: g && g.b && g.b.ph, busy: UI.busy, tut: c ? { id: c.id, free: !!c.free, next: !c.wait, ready: !c.ready || c.ready(), times: (c.wait && c.wait.times) || 1 } : null, end: !!document.querySelector('.gxt-end'), won: g && g.won, txt: document.body.innerText.slice(0, 4000) }; });
       const key = JSON.stringify([s.mode, s.scr, s.ph, s.busy, s.tut, s.end, s.txt.length]); if (key === last) stuck++; else stuck = 0; last = key;
       if (stuck > 80) { console.log('FAIL', label, 'stuck at', key); return false; }
       if (s.mode !== 'title') sawGame = true;
       if (label === 'quick' && s.scr === 'over') { console.log('PASS quick reached result:', s.won ? 'won' : 'lost'); return true; }
       if (s.end) { const b = await pg.$('.gxt-end .gxt-b.pri'); if (b) { await T(b); continue; } }
-      if (s.tut) {
+      if (s.tut && !s.tut.free) {
         if (!s.tut.ready) continue;
         if (s.tut.next && await pg.$('.gxt-next')) { await T('.gxt-next'); continue; }
         const mark = () => pg.evaluate(() => { document.querySelectorAll('[data-spot]').forEach(x => x.removeAttribute('data-spot')); const c = GXT.current(); const t = c && c.target && c.target(); if (t) t.setAttribute('data-spot', '1'); });

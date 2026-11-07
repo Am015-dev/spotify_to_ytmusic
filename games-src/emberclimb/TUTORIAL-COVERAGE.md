@@ -33,7 +33,8 @@ Chapters: 1 Your first fight · 2 Map, treasure, potions and a harder fight · 3
 | [x] Shop: buy with gold; card removal | shopitem, buy, shopleave | done (buy) + told (removal) |
 | [x] ? rooms are events with a choice | event, choose, evleave | done |
 | [x] Boss at the top; bosses repeat a pattern; Spikes | boss, spikes, win3 | done |
-| [x] Win: beat the boss, result screen | result | seen |
+| [x] Boss treasure: choose 1 of 3 relics (1 per hero + 1) | bossrelic | done |
+| [x] Win: beat the boss, result screen | leave4, result | done + seen |
 | [x] Other heroes' mechanics (poison and Shivs, orbs, stances) | heroes | told only; each Story chapter's first fight teaches its hero |
 
 Not covered by doing (honest): Smith upgrade and card removal are told, not done; elite rooms are not visited; duo play (2 heroes) and the

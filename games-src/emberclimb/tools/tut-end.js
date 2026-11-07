@@ -5,10 +5,10 @@ const { chromium } = require('playwright'), { serve, sleep, tap } = require('./t
   for (const [name, vp, touch] of [['phone', { width: 390, height: 763 }, true], ['pc', { width: 1440, height: 860 }, false]].filter(x => !process.env.ONLY || x[0] === process.env.ONLY)) {
     const ctx = await br.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }); const pg = await ctx.newPage(), errs = [];
     pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error' && !/404/.test(m.text())) errs.push(m.text()); });
-    const T = async s => { const r = await tap(pg, touch, s); if (r) { bad++; console.log('FAIL', name, r); } return !r; };
+    let seen = []; const T = async s => { const r = await tap(pg, touch, s); if (r) { bad++; console.log('FAIL', name, r, 'at step', seen[seen.length - 1]); } return !r; };
     await pg.goto(base); await pg.waitForSelector('#title'); await pg.evaluate(() => localStorage.clear()); await pg.goto(base); await pg.waitForSelector('#title'); await sleep(400);
     await T('.gxt-menu'); await sleep(800);
-    const seen = [], want = await pg.evaluate(() => EC_TUT_STEPS(0).map(s => s.id));
+    seen = []; const want = await pg.evaluate(() => EC_TUT_STEPS(0).map(s => s.id));
     const mark = () => pg.evaluate(() => { document.querySelectorAll('[data-spot]').forEach(x => x.removeAttribute('data-spot')); const s = GXT.current(); const t = s && s.target && s.target(); if (t) t.setAttribute('data-spot', '1'); return !!t; });
     if (process.env.DBG) console.log('  loop start', want.length);
     for (let i = 0; i < 900; i++) {

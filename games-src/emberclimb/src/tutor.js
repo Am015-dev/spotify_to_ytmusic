@@ -46,7 +46,7 @@
   }
   function stageBoss() { var G = g(); if (!G.b || G.b.staged) return; G.b.staged = 1; var e = G.b.en[0]; e.hp = e.mhp = 34; UI.render(); }
   function free(id, title, say, done, chN) {
-    return { ch: chN, id: id, title: title, free: true, target: function () { return $('.enemies') || $('#stage'); }, also: function () { return [$('#end'), $('.pots'), $('.hand'), $('.ctl'), $('#mir')].filter(Boolean); }, side: 'bottom', say: say, wait: ev(done), ready: function () { return !!$('#stage'); } };
+    return { ch: chN, id: id, title: title, free: true, target: function () { return $('.enemies') || $('#app'); }, also: function () { return [$('#end'), $('.pots'), $('.hand'), $('.ctl'), $('#mir')].filter(Boolean); }, side: 'bottom', say: say, wait: ev(done), ready: function () { return !!$('#stage'); } };
   }
   function steps(ch) {
     var S = [
@@ -91,7 +91,9 @@
       // ---- chapter 4: boss and the end
       { ch: 3, id: 'boss', title: 'Ch 4: The boss', target: function () { return $('.node.glow'); }, say: 'The crown room at the top is the boss. Beat it to win the climb. Tap it.', wait: ev(function (a) { return a.scr === 'battle'; }), ready: scr('map'), onEnter: function () { saveCh(3); } },
       { ch: 3, id: 'spikes', title: 'Boss pattern', target: function () { return $('.en .intent'); }, side: 'bottom', say: 'Bosses repeat a pattern. When it shows Spikes, attacks on it hurt you: use Block cards that turn.', wait: null, ready: battleP, onEnter: stageBoss },
-      free('win3', 'Beat the boss', 'Play your cards, then End turn. Read its move each turn.', function (a) { return a.scr === 'over'; }, 3),
+      free('win3', 'Beat the boss', 'Play your cards, then End turn. Read its move each turn.', function (a) { return a.scr === 'reward' || a.scr === 'over'; }, 3),
+      { ch: 3, id: 'bossrelic', title: 'Boss treasure', target: function () { return $('.reward .picks .item'); }, say: 'A boss offers 3 relics (1 per hero + 1 in a duo). Take one.', wait: ev(function (a) { return a.relic || a.scr === 'over'; }), ready: function () { return scr('reward')() && $('.reward .picks .item'); } },
+      { ch: 3, id: 'leave4', title: 'Finish the climb', target: function () { return $('#leave'); }, say: 'Tap Continue to finish the climb.', wait: ev(function (a) { return a.scr === 'over'; }), ready: scr('reward') },
       { ch: 3, id: 'result', title: 'Climb won', target: function () { return $('.over h1, .over h2, #app h1, #app h2'); }, side: 'bottom', say: 'Boss down: you win the climb. Stars and unlocks come in Story mode.', wait: null, ready: scr('over') },
       { ch: 3, id: 'heroes', title: 'More heroes', target: function () { return $('.over h1, .over h2, #app h1, #app h2'); }, side: 'bottom', say: 'Rogue: poison and Shivs. Automaton: orbs. Monk: stances. Each Story chapter teaches its hero.', wait: null, ready: scr('over') }
     ];

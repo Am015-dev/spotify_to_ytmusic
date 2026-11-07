@@ -101,12 +101,16 @@
     if (UI.ov) overlay();
     dock(g);
     if (UI.lastScr !== g.scr) { if (g.scr === 'reward' || (g.scr === 'over' && g.won)) SFX('win'); else if (g.scr === 'over') SFX('lose'); UI.lastScr = g.scr; }
-    try { if (window.GXT && GXT.active()) { var tk = g.rw && g.rw.took || {}; GXT.act({ type: 'event', w: 'scr', scr: g.scr, ph: g.b && g.b.ph, pots: (g.pots || []).filter(Boolean).length, relic: !!tk.relic, took0: !!tk.c0, shopSel: UI.shopSel == null ? -1 : UI.shopSel, bought: !!(g.shop && g.shop.items.some(function (x) { return x.sold; })), evres: !!(g.evn && g.evn.res) }); } } catch (e) { }
+    tutEvt();
     try { document.body.classList.toggle('ec-free', !!(UI.tutFree && UI.tutFree())); } catch (e) { }
     if (!window.EC_NOSAVE) E.save(); drain(); try { if (window.GXMUS) GXMUS.sync(); } catch (e) { }
   }
+  function tutEvt() {
+    var g = G(); if (!g) return;
+    try { if (window.GXT && GXT.active()) { var tk = g.rw && g.rw.took || {}; GXT.act({ type: 'event', w: 'scr', scr: g.scr, ph: g.b && g.b.ph, pots: (g.pots || []).filter(Boolean).length, relic: !!tk.relic, took0: !!tk.c0, shopSel: UI.shopSel == null ? -1 : UI.shopSel, bought: !!(g.shop && g.shop.items.some(function (x) { return x.sold; })), evres: !!(g.evn && g.evn.res) }); } } catch (e) { }
+  }
   UI.render = render;
-  setInterval(function () { try { document.body.classList.toggle('ec-free', !!(UI.tutFree && UI.tutFree())); } catch (e) { } }, 200);   // guide free-play steps hide the bubble (the dock line instructs)
+  setInterval(function () { try { var fr = !!(UI.tutFree && UI.tutFree()); document.body.classList.toggle('ec-free', fr); var eb = document.getElementById('end'); if (fr && eb && eb.disabled) eb.disabled = false; if (UI.mode !== 'title') tutEvt(); } catch (e) { } }, 200);   // guide free-play steps hide the bubble (the dock line instructs)
   function tutOk(a) { try { if (UI.tutFree && UI.tutFree()) return true; var ok = !(window.GXT && GXT.active()) || GXT.act(a); if (!ok) { toast('Do the glowing step first'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = 'Do the glowing step first.'; } return ok; } catch (e) { return true; } }
   function muteBtn() { var b = on(h('button', 'chip tap', SND.on ? '🔊' : '🔇'), function () { SND.toggle(); toast(SND.on ? 'Sound on' : 'Sound off'); render(); }); b.setAttribute('aria-label', SND.on ? 'Sound on: tap to mute' : 'Sound off: tap to unmute'); b.id = 'mute'; return b; }
   function tutBtn(cls) { try { var first = !GXT.status('emberclimb').seen && !localStorage.getItem('emberclimb.save'); var w = h('div'); w.innerHTML = GXT.menuHTML({ game: 'emberclimb', first: first, cls: cls || 'btn alt', launch: function () { UI.ov = null; UI.tutStart(); } }); return w.firstChild; } catch (e) { return null; } }
@@ -317,7 +321,7 @@
     var ctl = h('div', 'ctl');
     if (b.ph === 'p') {
       ctl.appendChild(h('div', 'piles', null, [on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { UI.ov = 'draw'; render(); }), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
-      var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; try { if (window.GXT && GXT.active()) eb.disabled = true; } catch (e) { }
+      var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
     }
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
@@ -458,7 +462,7 @@
       else dt.appendChild(h('div', 'refline', nm2 + ': ' + (sx.t === 'relic' ? D.RELICS[sx.id].t : D.POTIONS[sx.id].t)));
       var bb = on(h('button', 'btn' + (g.gold < sx.p ? ' alt' : ''), 'Buy ' + nm2 + ' (● ' + sx.p + ')'), function () { if (!E.performMove({ t: 'buy', i: UI.shopSel })) toast(g.gold < sx.p ? 'Not enough gold' : 'No room'); else UI.shopSel = -1; render(); }); bb.id = 'buy';
       dt.appendChild(bb); s.insertBefore(dt, it);
-    } else s.insertBefore(h('div', 'sub', 'Tap an item to see what it does.'), it); var slv = on(h('button', 'btn', 'Leave'), function () { UI.shopSel = -1; E.performMove({ t: 'leave' }); render(); }); slv.id = 'shop-leave'; s.appendChild(slv);
+    } else s.insertBefore(h('div', 'sub', 'Tap an item to see what it does.'), it); var slv = on(h('button', 'btn', 'Leave'), function () { UI.shopSel = -1; E.performMove({ t: 'leave' }); render(); }); slv.id = 'shop-leave'; slv.classList.add('shopleave'); var sh2 = s.querySelector('h2'); if (sh2 && sh2.after) sh2.after(slv); else s.appendChild(slv);
     hud(); app.appendChild(s);
   }
   function event() {
