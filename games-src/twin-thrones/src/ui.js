@@ -79,7 +79,7 @@ var TT_TEST = {};
     var G = U.G, P = G.players[p], el = $('s' + p), sc = E.score(G, p), fp = E.fixedProd(G, p), ch = E.choiceProd(G, p), cur = E.sideToAct(G) === p;
     el.classList.toggle('act', cur);
     var h = '<button class="pill vp who" data-city="' + p + '" style="min-width:0">' + esc(name(p)) + '</button><span class="pill coin">$' + P.coins + '</span><span class="pill vp">' + sc.total + ' pts</span>';
-    ['wood', 'clay', 'stone', 'glass', 'papyrus'].forEach(function (r) { var n = fp[r] || 0; h += '<span class="chip r-' + r + (n ? '' : ' empty') + '" style="--cw:130px;' + (n ? '' : 'opacity:.3') + '">' + RS[r] + n + '</span>'; });
+    ['wood', 'clay', 'stone', 'glass', 'papyrus'].forEach(function (r) { var n = fp[r] || 0; if (n) h += '<span class="chip r-' + r + '" style="--cw:130px">' + RS[r] + n + '</span>'; });
     if (ch.length) h += '<span class="pill pill-ch vp">+' + ch.length + ' any</span>';
     var sci = E.sciCounts(G, p); Object.keys(sci).forEach(function (s) { h += '<span class="pill vp" style="background:#2d7a52">' + SYM[s] + (sci[s] > 1 ? 'x' + sci[s] : '') + '</span>'; });
     P.tokens.forEach(function (t) { h += '<button class="tok mini" data-tok="' + t + '" title="' + esc(BY[t].nm) + '"><span>' + esc(BY[t].nm.slice(0, 2)) + '</span>' + slot(BY[t].stem) + '</button>'; });
@@ -108,6 +108,7 @@ var TT_TEST = {};
       if (cell.taken) e.classList.add('taken');
       else if (!cell.up) { e.classList.add('down', 'a' + G.age); var b = document.createElement('div'); b.className = 'back'; e.appendChild(b); }
       else { e.innerHTML = cardHtml(c, d.w); fillArt(e); }
+      if (!cell.taken && cell.up && E.covered(G, cell)) e.classList.add('cov');
       if (flips && flips.indexOf(cell.i) >= 0) e.classList.add('pop');
       if (!cell.taken && av.indexOf(cell.i) >= 0) {
         if (cell.up || true) { e.classList.add('av'); if (!human) e.classList.add('dim'); e.setAttribute('role', 'button'); e.tabIndex = 0; if (U.sel === cell.i) e.classList.add('sel'); }
@@ -312,6 +313,12 @@ var TT_TEST = {};
   }
   TT_TEST.U = U; TT_TEST.E = E;
   TT_TEST.forceEnd = function (seat) { var G = U.G; G.over = true; G.winner = seat; G.reason = 'military'; G.pend = []; render(); };
+  TT_TEST.newGame = newGame;
+  TT_TEST.select = function (i) { U.sel = i; renderPyr(); dock(); };
+  TT_TEST.toPlay = function (steps) { // test hook: let the AI draft and play on both seats until it is seat 0's turn
+    var G = U.G, rng = function () { return E.rnd(G); }, k = 0; clearTimeout(U.aiTimer);
+    while (!G.over && (G.phase === 'draft' || E.sideToAct(G) !== 0 || k < (steps || 0)) && k < 400) { E.apply(G, AI.pick(G, 'easy', rng)); k++; if (G.phase === 'play' && !G.pend.length && E.sideToAct(G) === 0 && k >= (steps || 0)) break; }
+    U.busy = false; U.sel = null; U.fingerDone = true; render(); };
   TT.U = U;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
