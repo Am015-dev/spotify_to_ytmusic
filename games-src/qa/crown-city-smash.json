@@ -1,0 +1,128 @@
+{
+ "slug": "crown-city-smash",
+ "size": "phone",
+ "seed": 18743,
+ "when": "2026-11-07T21:28Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 54
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 0
+ },
+ "fuzz": {
+  "taps": 43
+ },
+ "bugs": [
+  {
+   "sev": "MAJOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "text 0.0px (<12px) in i.crn x1: \"👑\"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-quick-board-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "text overflows its box (visible) in i.crn x1: \"👑\"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-quick-board-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #54 (🎲 Roll)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 54 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-quick-noresult-18.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 0.0px (<12px) in i.crn x1: \"👑\"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-story-map-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 38px (<40) button.pchip.me x1: \"Voltusk\n♥10\n★0\n⚡0\"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-story-map-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 38px (<40) button.pchip x2: \"Squidrik\n♥10\n★0\n⚡0\"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-story-map-19.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "tutorial step 2/22 [keep]",
+   "desc": "the bot's tap at the spotlight centre was rejected as a wrong action (1x): spotlight does not match what the step accepts",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-tut-wrong-2-20.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "tutorial step 2/22 [keep] \"Dice you tap stay put when you roll again. Tap both 3s.\"",
+   "desc": "STUCK >15 s: wait=tap x2 (count 1), hole=[38,477,67,67], top at centre=text, watch-pill=false, wrong taps=5",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-tut-stuck-2-24.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "tutorial step 2/22 [keep]",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 0 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-story-noresult-59.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 38px (<40) button.pchip.me x1: \"Voltusk\n♥6\n★6\n⚡1\"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 38px (<40) button.pchip.city x1: \"👑Squidrik\n♥7\n★1\n⚡0\"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 38px (<40) button.pchip x1: \"Shroomhulk\n♥10\n★0\n⚡0\"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 38px (<40) button.obo.K x1: \"Cosmic Gut: Power cards \"",
+   "repro": "node games-src/scripts/qa-bot.js crown-city-smash --size phone --seed 18743 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/crown-city-smash/phone-screen-tutorial-end-2.png"
+  }
+ ],
+ "secs": 110
+}
