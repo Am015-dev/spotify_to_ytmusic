@@ -23,8 +23,12 @@ Proof:
 
 ## Audit (rules A-F, staged build, W411)
 Before W411: phone A25 B8 E1 F1 | phone-s A25 B4 F1 | pc A146 B22 E7.
-After: see the final line below (written from the last run).
-E left: the shared help bubble's "Got it" (it hides itself with a style change, which the audit ignores). On pc, one start-mark button is still flagged dead: an occupied mark now shows a "not free" line, but a tap during the replay can still read as dead.
+After (final run, staged build): phone A0 B3 C0 D0 E2 F0 | phone-s A0 B0 C0 D0 E0 F0 | pc A0 B2 C0 D0 E8 F0. So the gate "A-F 0" is met on phone-s only.
+A run before the last changes gave pc E1 and phone E1, so E varies from run to run.
+E left:
+- The shared help bubble's last button: it hides itself with a style change, which the audit ignores.
+- A locked Story chapter node.
+- On pc, the start-mark list buttons. After the first mark is taken the others are no longer legal; a tap now writes a "not free" / "wait" line in the result box, but the audit still reads it as dead. Not solved.
 
 ## Rival turns
 Each step of a rival's move plays in order with its caption (dice, leviathans, the tile, the sail, any sinking): about 1 s per caption line, the animations as before. A tap skips the current step; "Skip to my turn" skips them all.

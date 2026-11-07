@@ -2,21 +2,21 @@
  "slug": "tidewake",
  "size": "phone",
  "seed": 95073,
- "when": "2026-11-07T21:20Z",
+ "when": "2026-11-07T23:38Z",
  "tutorial": {
   "end": true,
-  "endButtons": 2
+  "endButtons": 1
  },
  "quick": {
   "result": "cap",
-  "clicks": 432
+  "clicks": 491
  },
  "story": {
   "result": "cap",
-  "clicks": 236
+  "clicks": 339
  },
  "fuzz": {
-  "taps": 126
+  "taps": 230
  },
  "bugs": [
   {
@@ -25,7 +25,7 @@
    "where": "title",
    "desc": "tap target 30px (<40) summary x1: \"Play online (free, peer \"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -33,7 +33,7 @@
    "where": "title",
    "desc": "tap target 36px (<40) button.on x2: \"Me vs computers\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -41,23 +41,15 @@
    "where": "title",
    "desc": "tap target 36px (<40) button x5: \"Hot-seat\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "text 11.2px (<12px) in small x1: \"4 monsters · 50 tiles\"",
+   "where": "title",
+   "desc": "tap target 20px (<40) input x1: \"\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "overlapping clickables: button.pb \"Play again\" / button.gxt-b.pri \"Play a real game\"",
-   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -65,7 +57,7 @@
    "where": "title",
    "desc": "tap target 30px (<40) summary x1: \"Play online (free, peer \"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-3.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
@@ -73,7 +65,7 @@
    "where": "title",
    "desc": "tap target 36px (<40) button.on x2: \"Me vs computers\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-3.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
@@ -81,7 +73,15 @@
    "where": "title",
    "desc": "tap target 36px (<40) button x5: \"Hot-seat\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-3.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "tap target 20px (<40) input x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
@@ -89,7 +89,7 @@
    "where": "quick-board",
    "desc": "tap target 30px (<40) summary x1: \"Play online (free, peer \"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-quick-board-4.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
@@ -97,7 +97,7 @@
    "where": "quick-board",
    "desc": "tap target 36px (<40) button.on x2: \"Me vs computers\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-quick-board-4.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
@@ -105,31 +105,31 @@
    "where": "quick-board",
    "desc": "tap target 36px (<40) button x5: \"Hot-seat\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-quick-board-4.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick click #432 (Zoom to my ship)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 432 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "where": "quick-board",
+   "desc": "tap target 20px (<40) input x1: \"\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-quick-noresult-6.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #491 (Zoom to my ship)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 491 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-quick-noresult-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story-board",
-   "desc": "text 11.2px (<12px) in small x1: \"4 monsters · 50 tiles\"",
+   "where": "story click #339 (Zoom to my ship)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 339 clicks (state kept changing)",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-story-board-8.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story click #236 (Zoom to my ship)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 236 clicks (state kept changing)",
-   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-story-noresult-11.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-story-noresult-11.png"
   },
   {
    "sev": "MINOR",
@@ -137,7 +137,7 @@
    "where": "title",
    "desc": "tap target 30px (<40) summary x1: \"Play online (free, peer \"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-12.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-12.png"
   },
   {
    "sev": "MINOR",
@@ -145,7 +145,7 @@
    "where": "title",
    "desc": "tap target 36px (<40) button.on x2: \"Me vs computers\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-12.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-12.png"
   },
   {
    "sev": "MINOR",
@@ -153,7 +153,15 @@
    "where": "title",
    "desc": "tap target 36px (<40) button x5: \"Hot-seat\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-title-12.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "tap target 20px (<40) input x1: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-title-12.png"
   },
   {
    "sev": "MINOR",
@@ -161,7 +169,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 30px (<40) summary x1: \"Play online (free, peer \"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-fuzz-screen-13.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-13.png"
   },
   {
    "sev": "MINOR",
@@ -169,7 +177,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 36px (<40) button.on x2: \"Me vs computers\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-fuzz-screen-13.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-13.png"
   },
   {
    "sev": "MINOR",
@@ -177,33 +185,89 @@
    "where": "fuzz-screen",
    "desc": "tap target 36px (<40) button x5: \"Hot-seat\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-fuzz-screen-13.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-13.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "text 11.0px (<12px) in div x1: \"11 fps  92.9 / 166.6 ms p95  w\"",
+   "desc": "tap target 36px (<40) button.on x1: \"Me vs computers\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-fuzz-screen-15.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-14.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "text 11.0px (<12px) in b x1: \"11 fps\"",
+   "desc": "tap target 36px (<40) button x2: \"Hot-seat\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-fuzz-screen-15.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-14.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "text 11.0px (<12px) in span.bad x1: \"166.6\"",
+   "desc": "overlapping clickables: summary \"Play online (free, peer \" / p.gxc-sc-text.in \"Your ship follows the li\"",
    "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/tidewake/phone-screen-fuzz-screen-15.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.btn.small.pri \"Host\" / button.gxc-btn.go \"Next\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.0px (<12px) in div x1: \"52 fps  19.2 / 33.3 ms p95  wo\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.0px (<12px) in b x1: \"52 fps\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.0px (<12px) in span.bad x1: \"33.3\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.0px (<12px) in div x1: \"46 fps  21.9 / 33.4 ms p95  wo\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.0px (<12px) in b x1: \"46 fps\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.0px (<12px) in span.bad x1: \"33.4\"",
+   "repro": "node games-src/scripts/qa-bot.js tidewake --size phone --seed 95073 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5bf5cfe3-e92a-55c1-8052-1a244c48f6cb/scratchpad/qa/tidewake/phone-screen-fuzz-screen-16.png"
   }
  ],
- "secs": 509,
+ "secs": 454,
  "tutorialIn": {}
 }
