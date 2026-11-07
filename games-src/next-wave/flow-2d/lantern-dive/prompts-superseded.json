@@ -1,0 +1,25 @@
+{
+ "_note": "Superseded by finished 3D model sprites (W355). Do not generate.",
+ "items": {
+  "lantern-lit": {
+   "reason": "covered by the finished 3D lantern sprite (models/lantern@512.webp), shown on the command button and the Lantern reveal",
+   "cards": "the brass diving lantern exactly as in the reference: a round-glass storm lantern with a ring handle. State: burning at full brightness, a warm golden glow. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "meta": {
+    "element": "the brass diving lantern exactly as in the reference: lit state",
+    "why": "State set for lantern: same camera, scale and baseline",
+    "pri": 1,
+    "ref": "games/lantern-dive/models/lantern.webp",
+    "thumb": "lantern-dive/models/lantern.webp",
+    "bg": "green",
+    "align": "feet",
+    "save_as": "lantern-lit.png",
+    "target": "games/lantern-dive/media/poses/lantern-lit.webp",
+    "size": "1024x1024",
+    "ratio": "1:1",
+    "group": "lantern",
+    "tag": "poses",
+    "wave": "Wave 7"
+   }
+  }
+ }
+}
