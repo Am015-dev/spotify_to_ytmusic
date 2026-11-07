@@ -113,7 +113,7 @@
     G.sites.forEach(function (x, i) { if (x.occ === s && x.guard && has(p, V.GUARD[x.guard].cost)) out.push({ t: 'beat', s: i }); });
     G.row.forEach(function (id, r) { if (id && has(p, cardCost(id))) out.push({ t: 'buy', r: r }); });
     if (p.glass < V.TOP && has(p, V.TRACK[p.glass + 1].cost)) out.push({ t: 'res', k: 'g' });
-    if (p.note < p.glass && has(p, V.TRACK[p.note + 1].cost)) out.push({ t: 'res', k: 'n' });
+    if (p.note < p.glass && p.note + 1 < V.TOP && has(p, V.TRACK[p.note + 1].cost)) out.push({ t: 'res', k: 'n' });
     if (p.glass >= V.TOP) V.TEMPLE.forEach(function (t, k) { if (G.temple[k] > 0 && has(p, t.cost)) out.push({ t: 'temple', k: k }); });
     out.push({ t: 'pass' });
     return out;
@@ -148,9 +148,9 @@
   function stepFree(G, s, k) {
     var p = G.p[s];
     if (k === 'g') { if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
-    else { if (p.note < p.glass) { p.note++; arrive(G, s, p.note, 'notebook'); } else if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
+    else { if (p.note < p.glass && p.note + 1 < V.TOP) { p.note++; arrive(G, s, p.note, 'notebook'); } else if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
   }
-  function arrive(G, s, row, what) { var b = V.TRACK[row].bonus; gain(G.p[s], b); log(G, s, nm(G, s) + '\'s ' + what + ' climbs to row ' + row + (row === V.TOP ? ' (the temple)' : '') + ': +' + V.resText(b) + '.', { k: 'research', row: row, what: what }); }
+  function arrive(G, s, row, what) { if (row === V.TOP && what === 'magnifier') { G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(s) < 0) G.templeOrder.push(s); } var b = V.TRACK[row].bonus; gain(G.p[s], b); log(G, s, nm(G, s) + '\'s ' + what + ' climbs to row ' + row + (row === V.TOP ? ' (the temple)' : '') + ': +' + V.resText(b) + '.', { k: 'research', row: row, what: what }); }
   function digSite(G, s, i) {
     var x = G.sites[i], p = G.p[s], site = V.SITE[x.tile];
     x.occ = s; p.ex--; gain(p, site.rew);
@@ -222,7 +222,7 @@
     G.p.forEach(function (p) { p.disc = p.disc.concat(p.play); p.play = []; p.passed = false; p.idolTurn = false; });
     if (G.round >= G.rounds) return endGame(G);
     // the card row shifts: the last item before the artifacts leaves; an artifact takes its place
-    var nItems = Math.max(1, V.ROW - G.round); G.row[nItems - 1] = null;
+    var nItems = Math.max(1, V.ROW - G.round); G.row[nItems - 1] = null; if (nItems < V.ROW) G.row[nItems] = null;
     G.round++; refillRow(G);
     G.p.forEach(function (p) { draw(G, p, Math.max(0, V.HAND - p.hand.length)); });
     G.first = (G.first + 1) % G.np; G.turn = G.first;
@@ -233,14 +233,14 @@
     G.phase = 'over'; var sc = G.p.map(function (p, i) { return score(G, i).total; });
     var all = sc.slice(); if (G.rival) all.push(rivalScore(G));
     var best = Math.max.apply(null, all), win = []; all.forEach(function (v, i) { if (v === best) win.push(i); });
-    if (win.length > 1) { var tb = win.map(function (i) { return i < G.np ? G.p[i].guards.length * 10 + G.p[i].res.jewel : -1; }), m = Math.max.apply(null, tb); win = win.filter(function (i, k) { return tb[k] === m; }); }
+    if (win.length > 1) { var TO = G.templeOrder || [], tb = win.map(function (i) { if (i >= G.np) return -1; var t = TO.indexOf(i); return (t >= 0 ? 1000 - t * 100 : 0) + score(G, i).research; }), m = Math.max.apply(null, tb); win = win.filter(function (i, k) { return tb[k] === m; }); }
     G.winner = win.length === 1 ? (win[0] === G.np ? -2 : win[0]) : -1;
     log(G, -1, 'The expedition ends. ' + (G.winner === -1 ? 'A tie!' : (G.winner === -2 ? G.rival.name : G.p[G.winner].name) + ' wins.'), { k: 'over' });
   }
   function score(G, s) {
     var p = G.p[s], all = p.deck.concat(p.hand, p.play, p.disc);
     var cards = 0, fear = 0; all.forEach(function (id) { var c = card(id); if (c.t === 'fear') fear--; else cards += c.vp || 0; });
-    var research = V.NOTE_VP[p.note] + V.GLASS_VP[p.glass], temple = p.temple.reduce(function (a, b) { return a + b; }, 0);
+    var ti = (G.templeOrder || []).indexOf(s), research = V.NOTE_VP[p.note] + (p.glass >= V.TOP && ti >= 0 ? V.TEMPLE_ARRIVE[Math.min(ti, 3)] : V.GLASS_VP[p.glass]), temple = p.temple.reduce(function (a, b) { return a + b; }, 0);
     var idols = p.idols.reduce(function (a, d) { return a + (d.used ? V.IDOL_USED_VP : V.IDOL_VP); }, 0), guards = p.guards.length * V.GUARD_VP;
     return { research: research, temple: temple, idols: idols, guards: guards, cards: cards, fear: fear, total: research + temple + idols + guards + cards + fear };
   }

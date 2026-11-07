@@ -54,7 +54,7 @@ function tutSteps() {
       wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() },
     { id: 'disc', title: 'Discover it', say: 'Your two Dread cards pay the Boots. Tap Discover.', target: tq(tinsp('Discover')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }, ready: () => !!(UI.insp && tinsp('Discover')()) },
     { id: 'guard', title: 'A guardian wakes!', say: 'You took loot and an idol, but a guardian now shares the ruin with your explorer.', target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: null, ready: () => tmine() && !!G.sites[TUT_SITE].guard },
-    { id: 'idol', title: 'Your idol', say: 'Keep it for 3 points, or set it in a shrine for a boon.', target: tq('#extra [data-a=idol]'), wait: null, ready: () => tmine() && !!$('#extra [data-a=idol]') },
+    { id: 'idol', title: 'Your idol', say: 'Idols score 3 points. Set one in a shrine for a free boon.', target: tq('#extra [data-a=idol]'), wait: null, ready: () => tmine() && !!$('#extra [data-a=idol]') },
     { id: 'market', title: 'The market', say: 'Items cost coins; artifacts cost compasses. Tap the Tin Lamp.', target: tq('#row .cd[data-r="0"]'), wait: { type: 'tap', match: a => a.what === 'row' && a.x === 0 }, ready: () => tmine() },
     { id: 'buy', title: 'Buy it', say: 'Bought items go under your deck. Tap Buy it.', target: tq(tinsp('Buy it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }, ready: () => !!(UI.insp && tinsp('Buy it')()) },
     { id: 'track', title: 'Research', say: 'Climb this track with tablets, arrowheads and jewels for points. The top is the temple.', target: tq('#track'), wait: null, ready: () => tmine() },

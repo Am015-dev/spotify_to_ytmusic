@@ -17,7 +17,7 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
 
 ## Tests (all from this folder)
 - `node rules-test.js 200`: 15 rule checks + 200 AI games (1-4 players, solo at 3 rival levels): 0 stuck, 0 illegal, 0 invariant breaks.
-  Avg scores ~30-37; hard AI wins most (72/150 seats-wins vs normal 58, easy 20). Solo: normal AI vs rival easy/normal/hard 26/22, 36/48, 37/55.
+  After the AI and rules fixes: 2-player avg ~39-45; solo AI vs rival easy/normal/hard 40/23, 57/46, 58/57.
 - `node smoke.js`: real input, title tap, 3 turns, forced end to the result; phone 390x763 + PC 1440x860: PASS, 0 errors.
 - `node playtest.js both`: like a player with real taps, per size: tutorial offered + played to its end card, a whole game to the result,
   Story stages 1 and 2 started and 4 turns each: PASS, 0 errors.
@@ -30,6 +30,25 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
   or the walker should not run while the audit drives the page). F1 = the title counts "Play now" as a second big button.
 - Hot-seat (pass-the-device screen, then the next player's hand) and solo (rival card after each action) checked with real taps.
 - Picture loader proven with 3 dummy files (title-bg, card-trail, site-c-spring): drawn at slot aspect, 0 failed requests; files deleted.
+
+## Addendum gates (orchestrator, 7 Nov)
+- AI gate (`node ai-gate.js 100`, 2 players, seats alternated, vs a bot taking the first legal non-pass action): Hard wins 97%
+  (avg 52.0 vs 24.3), Normal 92% (49.8 vs 24.3). Spending: about 6 resources left at the end in total (~1 of each type), no hoarding.
+  Fix that got there: the AI overvalued hand cards and idle explorers (dug 73 times vs the bot's 179, passed early 45 times in 20 games).
+- ASSET-CHECK.md (`python3 asset-check.py`): 148 picture ids required by rules, UI and campaign cast; 148 with a stem, 148 with a
+  Flow prompt, gaps 0. Music cues for the 5 gx-music slots: `next-wave/music/vinegrave/cues-wave1.json`.
+- Menu: Restart, Title, Story map (Game); Sound effects + Music on/off + Pick songs (Sound); Rules, Tutorial (Help). Tapping any card
+  (hand or market) opens it large with its full text, cost, travel icon and points.
+- Offline: the game loads only index.html (+ media/*.webp and music/*.mp3 that exist; build.py lists only existing files).
+  `offline-manifest.py vinegrave` on a temporary copy in games/ gave {"files":[index.html 491 KB]} (copy removed again).
+  `offline-test.js` cannot run before deploy: it needs the slug in games/sw.js SLUGS, an entry in its ID map and the game on
+  sync.html (deploy-time shelf edits I may not make). Orchestrator: add `vinegrave` to games/sw.js SLUGS at deploy.
+- Reuse: shell, build layout, title/Story/tutorial/help wiring follow cauldron-fair (shell kits inlined from games-src/shell);
+  art loader + register-assets.py from redline-rally. Emberclimb/hollowbough were not copied: my deck/market/worker-spot code was
+  already written and tested (rules-test, playtest) before the reuse addendum arrived; nothing weaker was left to replace.
+- Web: no open-source implementation exists (GitHub/web search), so nothing ported and no THIRD-PARTY.md. Rules cross-checked
+  against a published rulebook summary; 7 mismatches fixed (see rules-notes.md). Layout follows the common digital pattern:
+  board centre, market row along the board, hand + actions at the bottom (phone) / right (desktop), tap for a large card view.
 
 ## Found -> fixed (my own play, Playwright)
 1. Guardian badge hid the site name/reward -> smaller corner badge. 2. Toast covered the player strip -> moved down.
@@ -49,4 +68,4 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
 ## Missing / weak
 - Art is placeholder (initials on gradients, SVG icons). AI is one-step greedy (no long plans); hard is only a bit stronger than normal.
 - No online mode, no undo, no reference drawer of every card (the card sheet explains any card you tap).
-- Solo rival hard is tough for the AI (wins 2/16); tune after human play.
+- Not in yet: first-to-arrive research bonuses, Fear supply limit (-2 tiles), assistants. Tune the rival after human play.

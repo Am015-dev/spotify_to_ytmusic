@@ -29,9 +29,9 @@ function refreshInsp() {
     if (q && q.h === 'buy' && I.kind === 'row') VG.moves(G).forEach(m => { if (m.v === I.x) add(m, 'Buy it ' + q.d.o + ' cheaper'); });
     if (!btns.length && myTurn() && !q) h += `<p class="sm">${I.kind === 'row' ? 'You cannot pay for it yet.' : c.t === 'fear' ? 'Dread does nothing when played: use it for travel.' : c.t === 'art' ? 'You need a tablet to play it.' : ''}</p>`;
   } else if (I.kind === 'track') {
-    h += `<h3>Research track</h3><p class="sm">Your magnifier ${ic('up')} climbs first; your notebook may follow but never pass it. Each row costs what it shows and gives a bonus. The top row is the temple.</p><table class="sct"><tr><th>Row</th><th>Cost</th><th>Bonus</th><th>Pts</th></tr>`;
+    h += `<h3>Research track</h3><p class="sm">Your magnifier ${ic('up')} climbs first; your notebook may follow but never pass it, and never enters the temple. Each row costs what it shows and gives a bonus. The top row is the temple.</p><table class="sct"><tr><th>Row</th><th>Cost</th><th>Bonus</th><th>Pts</th></tr>`;
     for (let r = V.TOP; r >= 1; r--) h += `<tr><td>${r === V.TOP ? 'Temple' : r}${me.glass === r ? ' 🔍' : ''}${me.note === r ? ' 📓' : ''}</td><td>${resHTML(V.TRACK[r].cost)}</td><td>${resHTML(V.TRACK[r].bonus)}</td><td>${V.NOTE_VP[r]}/${V.GLASS_VP[r]}</td></tr>`;
-    h += `</table><p class="sm">Points: notebook / magnifier. At the temple you buy tiles: ${V.TEMPLE.map((t, k) => t.vp + ' pts for ' + V.resText(t.cost) + ' (' + G.temple[k] + ' left)').join('; ')}.</p>`;
+    h += `</table><p class="sm">Points: notebook / magnifier (in the temple the magnifier scores ${V.TEMPLE_ARRIVE.join('/')} by order of arrival). At the temple you buy tiles: ${V.TEMPLE.map((t, k) => t.vp + ' pts for ' + V.resText(t.cost) + ' (' + G.temple[k] + ' left)').join('; ')}.</p>`;
     L.forEach(m => { if (m.t === 'res') add(m, m.k === 'g' ? 'Climb with the magnifier' : 'Climb with the notebook'); if (m.t === 'temple') add(m, 'Temple tile: ' + V.TEMPLE[m.k].vp + ' points'); });
   } else if (I.kind === 'guard') {
     const g = me.guards[I.x], gd = V.GUARD[g.id];
@@ -39,7 +39,7 @@ function refreshInsp() {
     L.forEach(m => { if (m.t === 'boon' && m.k === I.x) add(m, 'Use the boon (free)'); });
   } else if (I.kind === 'idol') {
     const d = me.idols[I.x], id = V.IDOL[d.id];
-    h += `<h3>${esc(id.name)}</h3><p>Kept, it is worth ${V.IDOL_VP} points. Set it in a shrine for a boon now; then it is worth ${V.IDOL_USED_VP}. One idol per turn, ${V.SLOTS} shrine slots.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
+    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end, in a shrine or not. Set it in a shrine for a one-time boon now. One idol per turn, ${V.SLOTS} shrine slots.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
     L.forEach(m => { if (m.t === 'idol' && m.k === I.x) add(m, 'Shrine: ' + V.SHRINE[m.sh].text, ''); });
   }
   $('#insp').innerHTML = `<button type="button" class="ix" data-a="ix" aria-label="Close">×</button>` + h + (btns.length ? `<div class="ibtns">${btns.join('')}</div>` : '');

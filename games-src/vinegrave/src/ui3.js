@@ -88,9 +88,9 @@ const RULES_HTML = `<div class="rules">
 <li><b>Discover</b> a hidden ruin: pay 3 compasses (deep ruins: 6) plus its travel. Flip it, take an idol, gain its loot, and a <b>guardian wakes</b> there.</li>
 <li><b>Overcome</b> a guardian where your explorer stands: pay its cost, take it (5 points) and keep its boon for one free use later.</li>
 <li><b>Buy</b> from the market: items with coins (to the bottom of your deck), artifacts with compasses (they work at once).</li>
-<li><b>Research</b>: climb with your magnifier, or let the notebook follow it. Pay the row's cost, gain its bonus. At the temple, buy temple tiles.</li></ul>
-<h3>Free actions</h3><p>Any time on your turn: use a guardian's boon, or set one idol in a shrine (a boon now; the idol then scores 1 instead of 3).</p>
-<h3>End of a round</h3><p>Explorers come home. An explorer still sharing a site with a guardian brings back a Dread card. Played cards go to your discard; draw up to 5. The market shifts: one item leaves and an artifact takes its place.</p>
+<li><b>Research</b>: climb with your magnifier, or let the notebook follow it. Pay the row's cost, gain its bonus. Only the magnifier enters the temple (earlier arrivals score more); there it buys temple tiles. Ties go to the first explorer into the temple.</li></ul>
+<h3>Free actions</h3><p>Any time on your turn: use a guardian's boon, or set one idol in a shrine for a one-time boon (idols score 3 either way).</p>
+<h3>End of a round</h3><p>Explorers come home. An explorer still sharing a site with a guardian brings back a Dread card. Played cards go to your discard; you keep unplayed cards and draw up to 5. The market shifts: the item and the artifact beside the divide leave, and one more artifact slot opens.</p>
 <h3>Solo</h3><p>A rival expedition plays one card after each of your actions: it camps on sites, takes market cards, climbs research and hunts guardians. Beat its score.</p></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + (window.GXT ? '<p><button type="button" class="btn go" data-a="tut">Play the guided round</button></p>' : ''); return d; }
 function drawers() {
@@ -128,13 +128,13 @@ function helpInit() {
   const P = (t) => () => `<svg viewBox="0 0 24 24" width="48" height="48"><use href="#s-${t}"/></svg>`;
   GXH.init({ game: 'vinegrave', defaultOn: true,
     steps: { guard: { target: () => $('.site .gd'), title: 'A guardian wakes', text: 'Overcome it for 5 points, or flee at round end with a Dread card.', pic: P('guard') },
-      idol: { target: () => $('#extra [data-a=idol]'), title: 'You found an idol', text: 'Keep it for 3 points, or set it in a shrine for a boon.', pic: P('idol') },
+      idol: { target: () => $('#extra [data-a=idol]'), title: 'You found an idol', text: 'Worth 3 points. Set it in a shrine for a boon too.', pic: P('idol') },
       'q-exile': { target: () => $('#qbox'), title: 'Exile a card', text: 'Removing Dread cards makes your deck stronger.', pic: P('exile') } },
     rules: [{ title: 'The goal', text: 'Five rounds. Points from research, temple, idols, guardians and cards. Dread costs 1 each.', pic: P('star') },
       { title: 'Travel', text: 'Each card pays one travel icon. A Jeep pays a Boot too; a Plane pays anything; 2 coins buy a Plane.', pic: P('boot') },
       { title: 'Discover', text: 'Three compasses and travel flip a hidden ruin: idol, loot, and a guardian wakes.', pic: P('compass') },
       { phase: 'guard', title: 'Overcome', text: 'Pay the guardian\'s cost while your explorer is there: 5 points and a one-time boon.', pic: P('guard') },
-      { phase: 'idol', title: 'Shrines', text: 'One idol a turn into a shrine: an instant boon, but it then scores 1.', pic: P('idol') }],
+      { phase: 'idol', title: 'Shrines', text: 'One idol a turn into a shrine: an instant boon. It still scores 3.', pic: P('idol') }],
     avoid: '.glow,#acts .btn,#qbox .btn,#insp' });
   GXH.bulb({ el: '#bulbbtn', suggest: () => { if (!myTurn()) return null; const m = VAI.choose(G, 'hard'); const t = moveTarget(m); return t ? { target: () => moveTarget(m), why: VAI.why(G, m) } : null; }, rulesFor: () => helpPhase() });
 }

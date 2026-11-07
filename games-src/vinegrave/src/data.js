@@ -127,7 +127,7 @@
     ['crystal-vault', 'Crystal Vault', { jewel: 2 }], ['lava-stair', 'Lava Stair', { arrow: 2, jewel: 1 }], ['sky-altar', 'Sky Altar', { tablet: 2, jewel: 1 }], ['drowned-hall', 'Drowned Hall', { jewel: 1, coin: 3 }],
     ['thorn-palace', 'Thorn Palace', { arrow: 2, tablet: 2 }], ['star-pool', 'Star Pool', { jewel: 1, compass: 3 }], ['bone-chapel', 'Bone Chapel', { tablet: 3, arrow: 1 }], ['jade-court', 'Jade Court', { jewel: 2, coin: 1 }]
   ];
-  // ---- idols: found on a discovered site (immediate gift); keep it for 3 points, or set it in a shrine slot for a boon (then it is worth 1). ----
+  // ---- idols: found on a discovered site (immediate gift); 3 points each, also when set in a shrine slot (a one-time boon; each slot once per game). ----
   var ID = [
     ['idol-owl', 'Owl Idol', { coin: 2 }], ['idol-frog', 'Frog Idol', { compass: 2 }], ['idol-sun', 'Sun Idol', { tablet: 1 }], ['idol-snake', 'Snake Idol', { arrow: 1 }],
     ['idol-moon', 'Moon Idol', { coin: 1, compass: 1 }], ['idol-boar', 'Boar Idol', { arrow: 1 }], ['idol-fish', 'Fish Idol', { coin: 2 }], ['idol-bat', 'Bat Idol', { compass: 2 }],
@@ -151,9 +151,11 @@
   ];
   var NOTE_VP = [0, 1, 2, 4, 6, 9, 12, 15, 19], GLASS_VP = [0, 0, 1, 2, 3, 4, 6, 8, 10], TOP = 8;
   // temple tiles (bought with the research action once your glass is in the temple)
-  var TEMPLE = [{ vp: 11, cost: { jewel: 3 }, n: 4 }, { vp: 6, cost: { jewel: 1, arrow: 1, tablet: 1 }, n: 6 }, { vp: 2, cost: { tablet: 1, coin: 1 }, n: 10 }];
-  var GUARD_VP = 5, IDOL_VP = 3, IDOL_USED_VP = 1, ROUNDS = 5, HAND = 5, ROW = 6, EXPL = 2;
-  var START = [{ coin: 2, compass: 1 }, { coin: 2, compass: 2 }, { coin: 3, compass: 2 }, { coin: 3, compass: 3 }];
+  // three stacks: 6 points for the left two cost parts, 6 for the right two, 11 for all three (parts: 2 tablets | 1 jewel | 2 arrowheads)
+  var TEMPLE = [{ vp: 6, cost: { tablet: 2, jewel: 1 }, n: 8 }, { vp: 6, cost: { jewel: 1, arrow: 2 }, n: 8 }, { vp: 11, cost: { tablet: 2, jewel: 1, arrow: 2 }, n: 4 }];
+  var TEMPLE_ARRIVE = [10, 8, 6, 4];   // magnifier points in the temple row, by order of arrival
+  var GUARD_VP = 5, IDOL_VP = 3, IDOL_USED_VP = 3, ROUNDS = 5, HAND = 5, ROW = 6, EXPL = 2;
+  var START = [{ coin: 2, compass: 0 }, { coin: 1, compass: 1 }, { coin: 2, compass: 1 }, { coin: 1, compass: 2 }];   // by turn order (rulebook)
   // ---- rival expedition (solo): one card per turn; each does the first thing it can. ----
   var RIVAL = [
     { id: 'rv-camp', name: 'Pitch camp', text: 'Takes a free camp site.', a: 'camp' }, { id: 'rv-camp2', name: 'Pitch camp', text: 'Takes a free camp site.', a: 'camp' },
@@ -186,7 +188,7 @@
   Object.keys(GUARD).forEach(function (k) { var g = GUARD[k]; g.text = 'Boon: ' + opText(g.boon) + '.'; });
   var VD = { RES: RES, RNAME: RNAME, TRAVEL: TRAVEL, TNAME: TNAME, CARDS: CARDS, ITEMS: I.map(function (r) { return r[0]; }), ARTS: A.map(function (r) { return r[0]; }),
     GUARD: GUARD, GUARDS: GU.map(function (r) { return r[0]; }), SITE: SITE, CAMP: CAMP, SLOT1: SLOT1, SLOT2: SLOT2, DISC: DISC, S1: S1.map(function (r) { return r[0]; }), S2: S2.map(function (r) { return r[0]; }),
-    IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE,
+    IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE,
     GUARD_VP: GUARD_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, opText: opText, resText: resText };
   if (typeof module !== 'undefined' && module.exports) module.exports = VD; else root.VD = VD;
 })(typeof window !== 'undefined' ? window : this);
