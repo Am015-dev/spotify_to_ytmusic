@@ -36,6 +36,7 @@
   }
   // ---- Menu: gx-kit settings (Rules, Tutorial, Restart, Sound, Music, Title + the shared sections)
   UI.kitMenu = function () {
+    var cbtn = function (label, fn, id) { var b = btn(label, function () { if (b.getAttribute('data-sure')) { fn(); return; } b.setAttribute('data-sure', '1'); b.textContent = 'Sure? Tap again'; setTimeout(function () { try { b.removeAttribute('data-sure'); b.textContent = label; } catch (e) { } }, 4000); }, id); return b; };
     var btn = function (label, fn, id) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gx-sb'; b.textContent = label; if (id) b.id = id; b.addEventListener('click', fn); return b; };
     GX.settings({
       id: 'setd', title: 'Menu',
@@ -49,11 +50,11 @@
         if (row.length) S.appendChild(GX.row('This run', row));
         var r2 = [];
         if (inRun) {
-          r2.push(btn('Restart', function () { GX.close(); if (UI.camp && UI.camp.setup) { var d = UI.camp; UI.camp = null; UI.fin = 0; UI.campStart(d); } else { UI.restart(); } }, 'm-restart'));
-          r2.push(btn(UI.camp ? 'Leave chapter' : 'Leave run', function () { GX.close(); UI.ov = null; UI.leave(); }, 'm-leave'));
+          r2.push(cbtn('Restart', function () { GX.close(); if (UI.camp && UI.camp.setup) { var d = UI.camp; UI.camp = null; UI.fin = 0; UI.campStart(d); } else { UI.restart(); } }, 'm-restart'));
+          r2.push(cbtn(UI.camp ? 'Leave chapter' : 'Leave run', function () { GX.close(); UI.ov = null; UI.leave(); }, 'm-leave'));
         }
-        r2.push(btn('Title screen', function () { GX.close(); UI.ov = null; if (UI.camp) { UI.campExit(); } else { UI.mode = 'title'; UI.sub = ''; UI.render(); } }, 'm-title'));
-        S.appendChild(GX.row('Leave', r2));
+        if (UI.mode !== 'title') r2.push((inRun && gg.scr !== 'over' ? cbtn : btn)('Title screen', function () { GX.close(); UI.ov = null; if (UI.camp) { UI.campExit(); } else { UI.mode = 'title'; UI.sub = ''; UI.render(); } }, 'm-title'));
+        if (r2.length) S.appendChild(GX.row('Leave', r2));
       },
       sound: function (S) {
         S.appendChild(GX.row('Sound', GX.onoff(SND.on, function (v) { if (v !== SND.on) SND.toggle(); if (window.GXMUS) GXMUS.sync(); })));

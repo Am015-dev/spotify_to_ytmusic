@@ -33,7 +33,7 @@
     window.EC_NOSAVE = 0; UI.ov = null;
     if (UI.camp) {
       var def = UI.camp;
-      if (done && def.id !== 'guide') { window.EC_NOSAVE = 0; var G = g(); G.won = 1; try { GXC.finish(G); } catch (e) { UI.campExit(); } return; }
+      if (done && def.id !== 'guide') { window.EC_NOSAVE = 0; var G = g(); G.won = 1; try { UI.mode = 'title'; UI.sub = ''; UI.render(); GXC.finish(G); } catch (e) { UI.campExit(); } return; }
       UI.campExit(); try { GXC.open(); } catch (e) { } return;
     }
     UI.mode = 'title'; UI.sub = '';

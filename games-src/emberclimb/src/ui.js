@@ -82,7 +82,7 @@
     o = o || {}; var e = E.eff(c), d = D.CARDS[c.id];
     var el = h('div', 'card t-' + e.type + (d.rar === 'r' ? ' rare' : d.rar === 'u' ? ' unc' : ''));
     var art = h('div', 'cart'); art.appendChild(A(c.id, '', { ph: TONE[d.hero] })); art.appendChild(A('frame-' + ({ A: 'attack', S: 'skill', P: 'power', X: 'status' })[e.type], '', { cls: 'cfr', noph: 1 }));
-    var ct = h('div', 'ct', e.name);
+    var ct = h('div', 'ct', e.name); art.appendChild(h('span', 'cty', ({ A: 'Attack', S: 'Skill', P: 'Power', X: 'Status' })[e.type] || ''));
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
     var kk = keyNum(e); if (kk) el.appendChild(h('div', 'ck k-' + kk[0], kk[1]));
@@ -162,7 +162,7 @@
   // hero HP + gold go in the shell bar (chips, not buttons); potions and the End turn button live in the dock
   function hud() {
     var g = G(), t = document.getElementById('hud'); t.innerHTML = '';
-    g.hs.forEach(function (x) { t.appendChild(h('span', 'chip', '♥ ' + x.hp + '/' + x.mhp)); });
+    g.hs.forEach(function (x) { t.appendChild(h('span', 'chip', '♥ ' + ((x.dead || x.hp <= 0 || (g.scr === 'over' && !g.won)) ? 0 : x.hp) + '/' + x.mhp)); });
     t.appendChild(h('span', 'chip', '● ' + g.gold));
   }
   function potRow() {
@@ -176,7 +176,7 @@
   }
   // dock: what to do now (one line) + End turn + potions
   function dock(g) {
-    var m = document.getElementById('dockmsg'), a = document.getElementById('dockact'), t = document.getElementById('dockt'); m.textContent = ''; a.innerHTML = '';
+    var m = document.getElementById('dockmsg'), a = document.getElementById('dockact'), t = document.getElementById('dockt'); m.textContent = ''; a.innerHTML = ''; var oldpi = a.parentNode.querySelector('.pcinfo'); if (oldpi) oldpi.remove();
     var txt = '', ttl = 'Your move';
     if (g.scr === 'map') { txt = 'Pick a glowing room.'; ttl = 'Climb'; }
     else if (g.scr === 'battle') {
@@ -188,9 +188,10 @@
     else if (g.scr === 'rest') { txt = 'Rest, or smith a card.'; ttl = 'Campfire'; }
     else if (g.scr === 'shop') { txt = 'Tap an item, then Buy.'; ttl = 'Shop'; }
     else if (g.scr === 'event') { txt = 'Choose one.'; ttl = 'Event'; }
-    else if (g.scr === 'over') { txt = g.won ? 'You reached the summit.' : 'This climb is over.'; ttl = 'Result'; }
+    else if (g.scr === 'over') { txt = g.won ? 'You won this climb.' : 'This climb is over.'; ttl = 'Result'; }
     m.textContent = txt; t.textContent = ttl;
     if (g.scr !== 'over') a.appendChild(potRow());
+    if (g.scr === 'battle' && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
     UI.endBtn = null;
   }
   var NODEG = { m: '⚔', e: '💀', r: '🔥', s: '🛒', v: '?', t: '🎁', b: '👑' }, NODEN = { m: 'node-monster', e: 'node-elite', r: 'node-rest', s: 'node-shop', v: 'node-event', t: 'node-treasure', b: 'node-boss' };

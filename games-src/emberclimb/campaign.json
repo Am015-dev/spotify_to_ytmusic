@@ -110,9 +110,11 @@
      }
     },
     {
-     "text": "Skip nothing",
+     "text": "Finish above 60% HP",
      "test": {
-      "k": "won"
+      "k": "hpPct",
+      "op": ">=",
+      "v": 60
      }
     }
    ],
