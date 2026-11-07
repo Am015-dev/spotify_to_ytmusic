@@ -29,7 +29,9 @@ GAMES = {
     "kaiten-kitchen":   ("kaiten/game",          "python3 build.py", "kaiten.html"),
     "lantern-dive":     ("lantern-dive/game",    "python3 build.py", "lantern-dive.html"),
     "nebula-aces":      ("xw",                   "python3 build.py", "nebula.html"),
+    "perch-and-plume":  ("perch-and-plume",      "python3 build.py", "perch-and-plume.html"),
     "redline-rally":    ("redline-rally",        "python3 build.py", "redline-rally.html"),
+    "deep-signal":      ("deep-signal",          "python3 build.py", "deep-signal.html"),
     "rampart-and-vine": ("carc/game/src",        "python3 build.py", "../rampart.html"),
     "sands-of-qamar":   ("ft/src",               "python3 build.py", "../sands.html"),
     "shipwreck-isle":   ("rc",                   "python3 build.py", "shipwreck.html"),
@@ -39,6 +41,8 @@ GAMES = {
     "tidewake":         ("tidewake/game",        "python3 build.py", "tidewake.html"),
     "twin-thrones":     ("twin-thrones",         "python3 build.py", "twin-thrones.html"),
     "vale-of-banners":  ("vale-of-banners",      "python3 build.py", "vale-of-banners.html"),
+    "wildmark":         ("wildmark",             "python3 build.py", "wildmark.html"),
+    "vinegrave":        ("vinegrave",            "python3 build.py", "vinegrave.html"),
 }
 
 # slug -> (dir relative to games-src with the game's own sweeps, [scripts]). Full run = the script's own default size (the gate); QUICK=1 makes it 4 games.
@@ -52,7 +56,9 @@ SWEEPS = {
     "kaiten-kitchen":   ("kaiten/game",         ["sweep.js"]),
     "lantern-dive":     ("lantern-dive/game",   ["sweep.js", "rotate-test.js"]),
     "nebula-aces":      ("xw",                  ["sweep.js"]),
+    "perch-and-plume":  ("perch-and-plume",     ["rules-test.js"]),
     "redline-rally":    ("redline-rally",       ["rules-test.js"]),
+    "deep-signal":      ("deep-signal",         ["rules-test.js"]),
     "rampart-and-vine": ("carc/game",           ["sweep.js", "rotate-test.js"]),
     "sands-of-qamar":   ("ft",                  ["sweep.js", "rotate-test.js"]),
     "shipwreck-isle":   ("rc",                  ["sweep.js"]),
@@ -62,6 +68,8 @@ SWEEPS = {
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
     "twin-thrones":     ("twin-thrones",        ["rules-test.js"]),
     "vale-of-banners":  ("vale-of-banners",     ["rules-test.js"]),
+    "wildmark":         ("wildmark",            ["rules-test.js"]),
+    "vinegrave":        ("vinegrave",           ["rules-test.js"]),
 }
 PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
 TIMES = []   # (slug, check, seconds)

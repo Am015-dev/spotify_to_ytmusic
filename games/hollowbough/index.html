@@ -344,8 +344,8 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
-.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
-@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 
@@ -6057,7 +6057,7 @@ const GA_DATA={sfx:{
 "error":"SUQzBAAAAAAAIlRTU0UAAAAOAAADTGF2ZjYxLjEuMTAwAAAAAAAAAAAAAAD/+0DAAAAAAAAAAAAAAAAAAAAAAABJbmZvAAAADwAAAAUAAAPFAFlZWVlZWVlZWVlZWVlZWVlZWVmDg4ODg4ODg4ODg4ODg4ODg4ODg6ysrKysrKysrKysrKysrKysrKys1tbW1tbW1tbW1tbW1tbW1tbW1tb//////////////////////////wAAAABMYXZjNjEuMy4AAAAAAAAAAAAAAAAkAkAAAAAAAAADxbpV7SwAAAAAAP/7MMQAAAcMZWFUwoABGRQuZx6wAAABwABAsABuJZ/Y4EAEAaEw/Xr73v8y3yE1EwHAMDh8XP/IHADAMDi53/xACAY8EwfB9//+U8P9AAH9gAACCGAABOh9VaqDkELgBlYPLuWfn4h1sldcM0DQnUO2U3SSyGgby1Evvx3Od1Pvve720eayG/LW7r/NKBr/KDjBURKs2WxAADQAu//7MsQEAAhgPW+dhgAxGAmstrJgAlaLSlMA4VqCljPtDNFOtbgxUkOoS07hyJYIiLXac9a7qh4wYfHAUAhItHvEp3qLCh4zSo8+/ZSZw6LKYUtRJISUuAA8QuRShXTQp1wogjYt8ymBmeUNOYdHpfSBJwMSWWpLX+GzM5+cDQGngKIgaH+DJ1QdLArxCGujnREDRY8CqGVyZPG4W/T/+zLEA4AIgP1gGYaAAQkS7meSgADDgyJ3ry/zEKzvegMBmi1Ywb/6H+g6jT/yXL5uEgHJ/+1ZuRwtn/+FwCrjnNzyaf//5o00ZAe5fT/+GC4gFAH/yBAxEiapdG0KBQBptChjGOd/MwiHu7kCg0XIOJPNHiofBOOJ2ZSTTZeBpSjHQecNHFWtM0MUDVrO37L86o8GqoSHK4wgAVMA//syxAQACJw9ZaYxgAEHjapo9IzgExSOAQBcBpiJJgVFyAeIB3AePn6keiSydLjfu9kaZAwSCgNPaBQWB2aQHTJp2VfpkVxVfe8OCqw87rDLVA1uggA06ATUS4mro/lKh1ipoUlBUKmwJWmmhxZoBM3VUof//+yhVjHVCg0HRLPV5VywVxFPCIGlHmgqGpXzsRSwah3aPFBzy5CmJ//7MMQEg8d0XxgN5MGA+48iAZYYkEJHzUOJj0kpbuvCGoE+U247UkPbQU8pxln3iCEMhEYenvtMoCADBwuD5QEBwIF3rP//Uafh8sLXLchAL8g1OASBERXTgEFLNIpOajjVW0SpzSOUSI4xxJJyJGnIzjHVtVXlE6DIaETwVhpT9ERT0Nd+ukxBTUUzLjEwMKqqqqqqqqqqqqqqqg==",
 },music:{
 "tavern-a":"url:music/tavern-a.mp3",
-"tavern-b":"url:music/tavern-b.mp3",
+"tavern-b":"url:music/tavern-b.mp3","tavern-short-a":"url:music/tavern-short-a.mp3","tavern-short-b":"url:music/tavern-short-b.mp3",
 "main-a":"url:music/main-a.mp3",
 "main-b":"url:music/main-b.mp3",
 "fight-a":"url:music/fight-a.mp3",
@@ -7724,7 +7724,7 @@ function rivalPortrait() {
 }
 // ---- music: five slots (Menu, Game, Fight, Victory, Defeat), two tracks each, saved choice a / b / shuffle / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Fight'], ['victory', 'Victory'], ['defeat', 'Defeat']];
-const MTITLE = { 'tavern-a': 'The Village Wakes', 'tavern-b': 'Sunlight Through the Canopy', 'main-a': 'Quiet Cartographer', 'main-b': 'Meadowlight Turn', 'fight-a': 'Last Harvest Before Winter', 'fight-b': "Fiddle at the Wood's Edge", 'victory-a': 'Grove of Golden Light', 'victory-b': 'Tambourine at the Woodland Gate', 'defeat-a': 'Late October', 'defeat-b': 'Last Chord, Golden Light' };
+const MTITLE = { 'tavern-a': 'The Village Wakes', 'tavern-b': 'Sunlight Through the Canopy','tavern-short-a': 'Short menu loop A','tavern-short-b': 'Short menu loop B', 'main-a': 'Quiet Cartographer', 'main-b': 'Meadowlight Turn', 'fight-a': 'Last Harvest Before Winter', 'fight-b': "Fiddle at the Wood's Edge", 'victory-a': 'Grove of Golden Light', 'victory-b': 'Tambourine at the Woodland Gate', 'defeat-a': 'Late October', 'defeat-b': 'Last Chord, Golden Light' };
 const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, game and fight tracks), a new one every ~2.5 min

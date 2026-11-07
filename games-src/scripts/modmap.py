@@ -31,6 +31,8 @@ GAMES = {
     "lantern-dive":     ("Lantern Dive",     "lantern-dive/game",   "lantern-dive"),
     "nebula-aces":      ("Nebula Aces",      "xw",                  "xw"),
     "redline-rally":    ("Redline Rally",    "redline-rally",       "redline-rally"),
+    "perch-and-plume":  ("Perch & Plume",   "perch-and-plume",     "perch-and-plume/src"),
+    "deep-signal":      ("Deep Signal",      "deep-signal",         "deep-signal"),
     "rampart-and-vine": ("Rampart and Vine", "carc/game/src",       "carc"),
     "sands-of-qamar":   ("Sands of Qamar",   "ft/src",              "ft"),
     "shipwreck-isle":   ("Shipwreck Isle",   "rc",                  "rc"),
@@ -40,6 +42,8 @@ GAMES = {
     "tidewake":         ("Tidewake",         "tidewake/game",       "tidewake"),
     "twin-thrones":     ("Twin Thrones",     "twin-thrones",        "twin-thrones"),
     "vale-of-banners":  ("Vale of Banners",  "vale-of-banners",     "vale-of-banners"),
+    "wildmark":         ("Wildmark",         "wildmark",            "wildmark"),
+    "vinegrave":        ("Vinegrave",        "vinegrave",           "vinegrave"),
     "mainhattan-nightrun": ("Mainhattan Nightrun", "nightrun/parts", "nightrun"),
 }
 MAP_DIR = {"mainhattan-nightrun": "nightrun"}   # where MODULES.md goes when not the build dir

@@ -163,6 +163,80 @@
    "mut": 0
   }
  ],
+ "deep-signal": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ds-board",
+   "name": "Dive: hand, crew, tasks",
+   "ask": "Can you see your hand and crew?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "ds-play",
+   "name": "Play a glowing card",
+   "ask": "Tap a glowing card: does it play?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "ds-zoom",
+   "name": "Zoom a card",
+   "ask": "Tap a dim card: does it show large?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "ds-help",
+   "name": "Rules drawer",
+   "ask": "Do the rules read clearly?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ds-signal",
+   "name": "Send a signal",
+   "ask": "Signal, then tap a white card",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "ds-stamp",
+   "name": "Mission complete stamp",
+   "ask": "Does the stamp show clearly?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ds-result",
+   "name": "Result screen",
+   "ask": "Can you start the next mission?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
  "doorkick-dungeon": [
   {
    "id": "menu",
@@ -761,6 +835,72 @@
    "mut": 0
   }
  ],
+ "perch-and-plume": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "pp-board",
+   "name": "Board: rows, feeder, hand",
+   "ask": "Can you see rows, feeder and hand?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "pp-chain",
+   "name": "Forest chain: powers fire",
+   "ask": "Do the forest birds fire one by one?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "pp-play",
+   "name": "Play a bird from hand",
+   "ask": "Tap a bird, a space, then Play.",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "pp-eggs",
+   "name": "Lay eggs in the grassland",
+   "ask": "Do eggs appear on your birds?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "pp-result",
+   "name": "End of the year: results",
+   "ask": "Can you read the final scores?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "pp-story",
+   "name": "Story map opens",
+   "ask": "Does the story map show 3 acts?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
  "rampart-and-vine": [
   {
    "id": "menu",
@@ -1149,6 +1289,14 @@
    "mut": 0
   },
   {
+   "id": "sg-guide",
+   "name": "Guide: switch it on and learn the rules",
+   "ask": "Does Guide do something you can see?",
+   "sizes": "pc",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -1328,6 +1476,146 @@
    "ask": "Can you read who won and why?",
    "sizes": "all",
    "group": "UI",
+   "mut": 0
+  }
+ ],
+ "vinegrave": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "vg-board",
+   "name": "Board: your first turn",
+   "ask": "Can you see the map, market and hand?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "vg-guardian",
+   "name": "Discover: a guardian wakes",
+   "ask": "Does the guardian show on the ruin?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "vg-overcome",
+   "name": "Overcome a guardian",
+   "ask": "Can you beat the guardian for 5 points?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "vg-market",
+   "name": "Market: buy an item",
+   "ask": "Can you read the prices and buy?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "vg-result",
+   "name": "Result: score breakdown",
+   "ask": "Can you read every score row?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "wildmark": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "wm-board",
+   "name": "Your turn: the market",
+   "ask": "Can you see the market and your valley?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "wm-place",
+   "name": "Place a tile",
+   "ask": "Do the spots glow and does Place work?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "wm-token",
+   "name": "Settle a token",
+   "ask": "Does the bear pair light and score?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "wm-sweep",
+   "name": "Three matching tokens",
+   "ask": "Is the Sweep button offered?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "wm-story",
+   "name": "Story: the region map",
+   "ask": "Can you open region 1?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  },
+  {
+   "id": "wm-boss",
+   "name": "Boss: Bram starts with acorns",
+   "ask": "Does the goal say Beat Bram?",
+   "sizes": "all",
+   "group": "Bosses",
+   "mut": 0
+  },
+  {
+   "id": "wm-cards",
+   "name": "Mixed animal cards",
+   "ask": "Do the cards show their new names?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "wm-result",
+   "name": "Season end: results",
+   "ask": "Can you read the score table?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
    "mut": 0
   }
  ]

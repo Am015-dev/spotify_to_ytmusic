@@ -1,0 +1,16 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"pp-board-phone.json",
+"pp-chain-phone.json",
+"pp-eggs-phone.json",
+"pp-play-phone.json",
+"pp-result-phone.json",
+"pp-story-phone.json",
+"story-scene-phone.json"
+]
+}
+}

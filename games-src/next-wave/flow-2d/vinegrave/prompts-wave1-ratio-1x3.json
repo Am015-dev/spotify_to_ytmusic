@@ -1,0 +1,14 @@
+{
+ "wave": 1,
+ "ratio": "1:3",
+ "flow_aspect": "9:16",
+ "style": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "vinegrave 2D wave 1, ratio 1:3. Paste with Flow aspect 9:16; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "vinegrave",
+  "count": 1
+ },
+ "cards": {
+  "track-bg": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A tall narrow painted view of a weathered stone stair climbing through jungle vines up to a vine-choked temple at the very top, steps evenly spaced."
+ }
+}

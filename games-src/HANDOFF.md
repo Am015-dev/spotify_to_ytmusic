@@ -78,3 +78,12 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Placeholder pictures: `wp-*` and fusion pictures are drawn into the UI only when `ART.isReal` (g.js, wpx.js); otherwise the code icon / demo is used. The Lab ASSETS tab is untouched.
 - For W14 (rebuilding this layout): keep `#wpm` opaque, fusion row inside `#wpL`, and run `ui-weapons-test.js`.
 - Not mine: readable-test fails on the old build too (flag-off check, contrast). `abil-test.js` and `mustmove-test.js` do not exist in the repo.
+
+## 7 Nov 2026 20:30 UTC (orchestrator)
+- Owner tested the new games live: "unplayable, unreadable, not easy to follow; assets super difficult to understand". Audits passed, the owner's eyes did not.
+  New-game work is FROZEN except one pilot: W376 Wildmark readability (shelf/W376-wildmark-readable, writes games-src/wildmark/READABLE.md).
+  Roll the recipe out to the other new games only after the owner says yes. No shelf cards for new games.
+- Live by direct link only (no card): wildmark, vinegrave, perch-and-plume, deep-signal. Fixed but not deployed: shelf/W368-stitchwise-fix,
+  shelf/W366-vale-fix, shelf/W373-emberclimb-polish (menu E/B fixed; ch.2 balance gate unmet).
+- Live today: 14 old games with wired 3D/pictures/music (19:34), cauldron-fair (20:11), offline fix (18:08).
+- Owner does art himself (refused: publisher/TTS scans; custom-art loader and upload page were cancelled by the owner).
