@@ -55,7 +55,9 @@ How-to-play surface, so the audit lists the Menu's section chips and taps them a
   current animal scores always visible, tap tile -> spot -> confirm -> token.
 - Card sets B-D implemented (src/cards.js, 12 scoring tests in rules-test.js, 'Mixed B-D' in Quick game setup, Story c8-c10).
 - Temporary free-licensed art: NOT done. FREE-ASSETS packs are not in the repo and the time/context budget went to B-D and the gates;
-  the 47 slots still show the code-drawn placeholders. Next worker: Kenney CC0 board-game pack -> tok-*/card frames.
+  the 47 slots still show the code-drawn placeholders. Next worker (20 min): game-icons.net animal icons (CC BY 3.0, credit) -> tok-*,
+  Kenney CC0 board-game pack -> card frames; fan-made art only with an explicit reuse licence, own drawing, no original name/logo
+  (owner clarification 7 Nov); list file + source + licence in ASSETS.md credits. Stopped here: session context near its limit.
 - Audit E3: proven to be the audit race. With one line changed in a temporary copy of ui-audit.spec.js (boot waits for `GXS.menuN`,
   i.e. the ?scn=menu walk has finished) the same build scores E0 on phone and PC; the extra A/B items it then revealed (coach text
   on PC, a map disc) are fixed. Proposed shared patch (scripts/ui-audit.spec.js line 196):
