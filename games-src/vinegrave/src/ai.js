@@ -2,7 +2,7 @@
    easy = noisy, short-sighted · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
 (function (root) {
   var VG = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.VG, V = VG.V;
-  var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.8, jewel: 1.3 };
+  var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.6, jewel: 1.3 };
   function opVal(ops) {
     var v = 0; (ops || []).forEach(function (o) {
       if (o.g) for (var k in o.g) v += W[k] * o.g[k];
@@ -14,13 +14,13 @@
   var CV = {}; Object.keys(V.CARDS).forEach(function (id) { var c = V.CARDS[id]; CV[id] = opVal(c.ops) - (c.t === 'art' ? 0.6 : 0); });
   function value(G, s, lvl) {
     var p = G.p[s], sc = VG.score(G, s), left = G.rounds - G.round + (p.passed ? 0 : 1), over = G.phase === 'over';
-    var f = over ? 0 : left >= 3 ? 1 : left === 2 ? 0.8 : 0.45, v = sc.total;
+    var f = over ? 0 : left >= 3 ? 1 : left === 2 ? 0.8 : 0.25, v = sc.total;
     if (over) return v;
     for (var k in p.res) v += W[k] * p.res[k] * f;
     var cards = p.deck.concat(p.disc, p.play), plays = Math.max(0, left - 1) * 0.3;
     cards.forEach(function (id) { v += CV[id] * plays; });
-    p.hand.forEach(function (id) { v += CV[id] * (p.passed ? plays : 0.55 + plays) + (p.passed ? 0 : 0.15); });
-    v += p.ex * (left > 0 && !p.passed ? 0.5 : 0);
+    p.hand.forEach(function (id) { v += CV[id] * (p.passed ? plays : 0.3 + plays); });
+    
     p.guards.forEach(function (g) { if (!g.used) v += opVal(V.GUARD[g.id].boon) * 0.8; });
     p.idols.forEach(function (d) { if (!d.used && f > 0.5) v += 0.6; });
     G.sites.forEach(function (x) { if (x.occ === s && x.guard) v -= VG.has(p, V.GUARD[x.guard].cost) ? 0.3 : 1.6; });
@@ -51,7 +51,7 @@
     var top = out[0];
     // free actions only when they help; otherwise prefer the best non-free main action
     if (top.m.free && top.d <= 0.2) { var main = out.filter(function (o) { return !o.m.free; })[0]; if (main) top = main; }
-    if (!inner && top.m.t !== 'pass' && !top.m.free && top.d < -0.6) { var ps = out.filter(function (o) { return o.m.t === 'pass'; })[0]; if (ps) top = ps; }
+    if (!inner && top.m.t !== 'pass' && !top.m.free && top.d < -1.5) { var ps = out.filter(function (o) { return o.m.t === 'pass'; })[0]; if (ps) top = ps; }
     return top.m;
   }
   function choose(G, lvl) { var s = VG.actor(G); if (s < 0) return null; var H = VG.clone(G); var m = best(H, s, lvl || 'normal', 0, !!G.q); return m; }
