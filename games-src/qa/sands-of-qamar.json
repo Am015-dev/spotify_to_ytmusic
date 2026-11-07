@@ -2,21 +2,21 @@
  "slug": "sands-of-qamar",
  "size": "phone",
  "seed": 20445,
- "when": "2026-11-07T21:13Z",
+ "when": "2026-11-07T22:32Z",
  "tutorial": {
   "end": true,
   "endButtons": 2
  },
  "quick": {
   "result": "cap",
-  "clicks": 558
+  "clicks": 1080
  },
  "story": {
   "result": "cap",
-  "clicks": 295
+  "clicks": 552
  },
  "fuzz": {
-  "taps": 265
+  "taps": 300
  },
  "bugs": [
   {
@@ -25,7 +25,7 @@
    "where": "title",
    "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-1.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -33,7 +33,7 @@
    "where": "title",
    "desc": "tap target 26px (<40) i.ri x1: \"📜\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-1.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -41,7 +41,7 @@
    "where": "title",
    "desc": "tap target 13px (<40) input x4: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-1.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -49,7 +49,7 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Djinns (help)\" under div#modal \"Sands of Qamar Lead the \"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-1.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -57,7 +57,7 @@
    "where": "tutorial-end",
    "desc": "element outside viewport button.gx-ibtn x1 rect 358,5,400,39: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -65,7 +65,7 @@
    "where": "tutorial-end",
    "desc": "tap target 34px (<40) button.gx-ibtn.gxh-bulb x1: \"Hint\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -73,7 +73,7 @@
    "where": "tutorial-end",
    "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -81,7 +81,7 @@
    "where": "tutorial-end",
    "desc": "tap target 16px (<40) i.mp x74: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -89,7 +89,7 @@
    "where": "tutorial-end",
    "desc": "tap target 30px (<40) button.dcard x2: \"Wazira\n6\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -97,7 +97,7 @@
    "where": "tutorial-end",
    "desc": "tap target 30px (<40) button.dcard.newc x1: \"Wahha\n8\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -105,7 +105,7 @@
    "where": "tutorial-end",
    "desc": "overlapping clickables: div.tile.red.k-small \"🧺 Stall 6\" / button.gxt-b.pri \"Play a real game\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -113,7 +113,7 @@
    "where": "tutorial-end",
    "desc": "overlapping clickables: i.mp / button.gxt-b.pri \"Play a real game\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -121,7 +121,7 @@
    "where": "tutorial-end",
    "desc": "overlapping clickables: div.tile.blue.k-sacred \"🕌 Shrine 6\" / button.gxt-b.pri \"Play a real game\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -129,7 +129,7 @@
    "where": "tutorial-end",
    "desc": "overlapping clickables: div.tile.blue.k-village \"🏘️ Hamlet 5 🐪 🏰\" / button.gxt-b.pri \"Play a real game\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
   },
   {
    "sev": "MINOR",
@@ -137,7 +137,7 @@
    "where": "title",
    "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-3.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
@@ -145,7 +145,7 @@
    "where": "title",
    "desc": "tap target 26px (<40) i.ri x1: \"📜\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-3.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
@@ -153,7 +153,7 @@
    "where": "title",
    "desc": "tap target 13px (<40) input x4: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-3.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
@@ -161,7 +161,7 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Djinns (help)\" under div#modal \"Sands of Qamar Lead the \"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-3.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
@@ -169,7 +169,7 @@
    "where": "quick-board",
    "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
@@ -177,7 +177,7 @@
    "where": "quick-board",
    "desc": "tap target 16px (<40) i.mp x87: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
@@ -185,15 +185,15 @@
    "where": "quick-board",
    "desc": "tap target 16px (<40) i.mp.h x3: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 30px (<40) button.dcard x3: \"Dalil\n6\"",
+   "desc": "tap target 30px (<40) button.dcard x3: \"Khanjar\n6\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
@@ -201,7 +201,7 @@
    "where": "quick-board",
    "desc": "tap target 16px (<40) i.mp x89: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-5.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
@@ -209,7 +209,7 @@
    "where": "quick-board",
    "desc": "tap target 16px (<40) i.mp.h x1: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-5.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
@@ -217,31 +217,23 @@
    "where": "quick-board",
    "desc": "tap target 16px (<40) i.mp x88: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-6.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 16px (<40) i.mp x77: \"\"",
+   "desc": "text 11.0px (<12px) in span.pp x1: \"🔮1\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-7.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-7.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 30px (<40) button.dcard x1: \"Zarifa\n5\"",
+   "where": "quick click #1080 (🔮)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1080 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-quick-board-7.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick click #558 (i.mp)",
-   "desc": "inconclusive: no result screen within the 150 s cap / 558 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-quick-noresult-8.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-quick-noresult-8.png"
   },
   {
    "sev": "MINOR",
@@ -249,7 +241,7 @@
    "where": "story-map",
    "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
   },
   {
    "sev": "MINOR",
@@ -257,7 +249,7 @@
    "where": "story-map",
    "desc": "tap target 16px (<40) i.mp x90: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
   },
   {
    "sev": "MINOR",
@@ -265,7 +257,7 @@
    "where": "story-map",
    "desc": "tap target 30px (<40) button.dcard x3: \"Nakhla\n8\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
   },
   {
    "sev": "MINOR",
@@ -273,7 +265,7 @@
    "where": "story-map",
    "desc": "tap target 34px (<40) button.sp-b.glow x7: \"18🪙\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
   },
   {
    "sev": "MINOR",
@@ -281,7 +273,7 @@
    "where": "story-board",
    "desc": "element outside viewport button.gx-ibtn x1 rect 358,5,400,39: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
@@ -289,7 +281,7 @@
    "where": "story-board",
    "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
@@ -297,7 +289,7 @@
    "where": "story-board",
    "desc": "tap target 16px (<40) i.mp x74: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
@@ -305,7 +297,7 @@
    "where": "story-board",
    "desc": "tap target 30px (<40) button.dcard x2: \"Wazira\n6\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
@@ -313,15 +305,15 @@
    "where": "story-board",
    "desc": "tap target 30px (<40) button.dcard.newc x1: \"Wahha\n8\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp x80: \"\"",
+   "desc": "tap target 16px (<40) i.mp x87: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
   },
   {
    "sev": "MINOR",
@@ -329,55 +321,47 @@
    "where": "story-board",
    "desc": "tap target 16px (<40) i.mp.h x3: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 30px (<40) button.dcard x1: \"Zarifa\n5\"",
+   "desc": "tap target 30px (<40) button.dcard x3: \"Ghulam\n8\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp x81: \"\"",
+   "desc": "tap target 16px (<40) i.mp x89: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-12.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-12.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "text 11.0px (<12px) in span.pp x1: \"🔮1\"",
+   "desc": "tap target 16px (<40) i.mp.h x1: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-13.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-12.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp x78: \"\"",
+   "desc": "tap target 16px (<40) i.mp x88: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-13.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-13.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 38px (<40) button.gchip x2: \"🥇\"",
+   "where": "story click #552 (i.mp)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 552 clicks (state kept changing)",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-story-board-13.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story click #295 (💧 Oasis 8)",
-   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 295 clicks (state kept changing)",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-story-noresult-14.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-story-noresult-14.png"
   },
   {
    "sev": "MINOR",
@@ -385,7 +369,7 @@
    "where": "title",
    "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-15.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-15.png"
   },
   {
    "sev": "MINOR",
@@ -393,7 +377,7 @@
    "where": "title",
    "desc": "tap target 26px (<40) i.ri x1: \"📜\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-15.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-15.png"
   },
   {
    "sev": "MINOR",
@@ -401,7 +385,7 @@
    "where": "title",
    "desc": "tap target 13px (<40) input x4: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-15.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-15.png"
   },
   {
    "sev": "MINOR",
@@ -409,7 +393,7 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Djinns (help)\" under div#modal \"Sands of Qamar Lead the \"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-title-15.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-15.png"
   },
   {
    "sev": "MINOR",
@@ -417,7 +401,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
   },
   {
    "sev": "MINOR",
@@ -425,7 +409,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 26px (<40) i.ri x1: \"📜\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
   },
   {
    "sev": "MINOR",
@@ -433,7 +417,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 13px (<40) input x2: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
   },
   {
    "sev": "MINOR",
@@ -441,7 +425,7 @@
    "where": "fuzz-screen",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Djinns (help)\" under div#modal \"Sands of Qamar Lead the \"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
   },
   {
    "sev": "MINOR",
@@ -449,7 +433,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 16px (<40) i.mp x90: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
   },
   {
    "sev": "MINOR",
@@ -457,7 +441,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 30px (<40) button.dcard x3: \"Nakhla\n8\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
   },
   {
    "sev": "MINOR",
@@ -465,7 +449,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 34px (<40) button.sp-b.glow x7: \"18🪙\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
   },
   {
    "sev": "MINOR",
@@ -473,9 +457,9 @@
    "where": "fuzz-screen",
    "desc": "tap target 34px (<40) button.sp-b.glow x5: \"18🪙\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-19.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-19.png"
   }
  ],
- "secs": 355,
+ "secs": 458,
  "tutorialIn": {}
 }

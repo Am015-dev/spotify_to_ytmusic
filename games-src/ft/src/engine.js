@@ -21,7 +21,7 @@ function tileName(t){return `${TILEDEF[t.k].n} ${tileCoord(t.i)}`}
 // ---------- setup ----------
 function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);const np=o.np||(o.seats?o.seats.length:2);
   const ex=Object.assign({artisans:false,sultan:false,thieves:false,promos:false},o.ex||{});if(np===5)ex.sultan=true;
-  G={v:1,sup:{palm:22,pal:10},rng:seed,seed,np,ex,tut:o.tut?1:0,round:1,phase:'bid',log:[],logN:0,q:null,over:null,winner:null,winText:'',turn:0,W:6,H:5,walls:{},
+  G={v:1,sup:{palm:22,pal:10},rng:seed,seed,np,ex,tut:o.tut?1:0,coach:o.coach?1:0,round:1,phase:'bid',log:[],logN:0,q:null,over:null,winner:null,winText:'',turn:0,W:6,H:5,walls:{},
     pl:[],board:[],market:[],rdeck:[],rdisc:[],djRow:[],djDeck:[],djDisc:[],bag:[],items:[],itemDisc:[],thRow:[],thDeck:[],
     bids:[],bidQueue:[],order:[],nextBid:[],turnIdx:0,cur:null,step:null,move:null,act:null,turnFx:{},endTrig:false,stats:{kills:0,djinns:0,moves:0}};
   const names=o.names||PNAMES;
