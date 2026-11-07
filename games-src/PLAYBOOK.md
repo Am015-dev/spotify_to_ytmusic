@@ -180,3 +180,9 @@ Every deployed game carries the 🧪 LAB (test mode only; `shell/LAB.md`): build
 - `build-all.py --approve-visual <slug>`: only after the owner approves that game's screens; re-records and pushes to the orphan branch `ui-baselines` (`scripts/baselines.sh pull|push`; files live in git-ignored `games-src/.baselines/`).
 - Masked: timers, dice, coach bubble, finger, pops; give any other volatile element `data-volatile`. Needs `npm i --no-save @playwright/test @axe-core/playwright` once per machine.
 - Recorded so far: rampart-and-vine only (mechanism proof). Never record a game unapproved.
+
+## qa-bot: automated playtest (W377)
+- `node games-src/scripts/qa-bot.js <slug> [--size phone|pc] [--seed N] [--phases tutorial,quick,story,fuzz]` plays the deployed `games/<slug>/` with real taps only: tutorial to its end (stuck = no step change 15 s, covered/missing spotlight), quick game and Story stage 1 to a result (soft-lock 60 s), 300-tap monkey fuzz, static checks per screen. Writes `games-src/qa/<slug>.json`.
+- Coached games (no forced-step tutor): if the page exposes `window.GXCOACH = {running, explained:[rule ids], done}` the tutorial phase plays it free-play with the quick-game legal-move player, taps coach bubbles' close buttons, and passes when `done` turns true (cap 6 min). Reports `explained` count; MAJOR only for a stuck screen or `done` never reached. Games with GXT use the old forced-step path unchanged.
+- `node games-src/scripts/qa-bot.js --report` joins them into `games-src/qa/QA-REPORT.md` (BLOCKER = cannot finish / JS error, MAJOR = soft-lock, no way out, unreadable, MINOR). Each bug carries a repro command + seed. Needs `npm i --no-save @playwright/test@1.56.1 playwright@1.56.1` in games-src; shots go to `$QA_SHOTS`, never the repo.
+- Run it on a new game before calling its tutorial/story done: the scenario tests jump to steps, the bot walks them from a fresh start like a player does.

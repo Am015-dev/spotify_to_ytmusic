@@ -138,7 +138,9 @@
     "cast": "frost",
     "personality": "No rival: just you against the season.",
     "aiLevel": "easy",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "The frost lets go. The valley is yours to grow.",
+    "taunt": "The frost holds on. Try again next thaw."
    },
    "setup": {
     "players": 1,
@@ -221,7 +223,9 @@
     "cast": "pip",
     "personality": "Cheerful, takes whatever looks nice right now.",
     "aiLevel": "easy",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Pip: You are really good at this! Teach me more?",
+    "taunt": "Pip: Ha! Beginner's luck... I mean, my valley grew!"
    },
    "setup": {
     "players": 2,
@@ -400,7 +404,9 @@
     "cast": "sorrel",
     "personality": "Builds huge habitats, careless with animals.",
     "aiLevel": "normal",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Sorrel: Fair and square. Your meadows are the better ones.",
+    "taunt": "Sorrel: The meadow chose me this time. Come back stronger."
    },
    "setup": {
     "players": 2,
@@ -480,7 +486,9 @@
     "cast": "linnet",
     "personality": "Quick and greedy for hawks.",
     "aiLevel": "normal",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Linnet: The birds liked your valley best. I heard them.",
+    "taunt": "Linnet: My hawks found more room than yours. Next time?"
    },
    "setup": {
     "players": 3,
@@ -658,7 +666,9 @@
     "cast": "snowline",
     "personality": "No rival: a short, hard season.",
     "aiLevel": "easy",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "The snowline creeps back up the peaks. Spring wins.",
+    "taunt": "The snow comes early. The season closes on you."
    },
    "setup": {
     "players": 1,
@@ -743,7 +753,9 @@
     "cast": "oake",
     "personality": "Slow, wise, plays the long game.",
     "aiLevel": "hard",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Oake: Old trees bow to a young ranger. Well grown.",
+    "taunt": "Oake: Patience grows forests. You will learn it."
    },
    "setup": {
     "players": 2,
@@ -834,7 +846,9 @@
     "cast": "linnet",
     "personality": "Quick and greedy for hawks.",
     "aiLevel": "hard",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Linnet: The birds liked your valley best. I heard them.",
+    "taunt": "Linnet: My hawks found more room than yours. Next time?"
    },
    "setup": {
     "players": 4,
@@ -988,5 +1002,48 @@
     }
    ]
   }
- ]
+ ],
+ "prologue": {
+  "guide": "ward",
+  "rival": "bram",
+  "note": "Coached first game: Rowan speaks the first time each rule matters (coach[id]); rules that never came up are listed at the end. Max 2 short lines each.",
+  "endTitle": "The valley stays wild",
+  "endText": "Rowan: That was a real game. Now the seasons are 20 turns long.",
+  "turns": 8,
+  "coach": {
+   "goal": "Bram wants this valley for timber. Out-grow his valley in 8 turns and it stays wild. Pick any tile with the animal under it.",
+   "place": "Tiles must touch your valley. Tap any glowing spot, then Place.",
+   "habitat": "Matching edges join land. Each terrain scores 1 point per tile in your biggest joined group.",
+   "rotate": "This tile has two lands. Tap Turn until the edges match your valley, then Place.",
+   "settle": "Animals only live on a tile that shows them. No good spot? Return it, no penalty.",
+   "bear": "Bears score in pairs: groups of exactly 2 touching bears. A third bear spoils the pair.",
+   "elk": "Elk score in straight lines. The longer the line, the more points.",
+   "salmon": "Salmon score in runs: a chain where each salmon touches at most 2 others.",
+   "hawk": "Hawks like to be alone: each hawk touching no other hawk scores.",
+   "fox": "A fox scores 1 point for each different animal next to it.",
+   "keystone": "A gold-rimmed keystone! Settling an animal there earns an acorn: 1 point at the end, or a favour now.",
+   "acornSpend": "You have an acorn. \"Acorn: free pick\" takes any tile with any animal; \"Acorn: replace\" swaps animals.",
+   "sweep3": "Three alike in the market. You may sweep them for fresh animals, once per turn, for free.",
+   "wipe4": "Four alike: the market clears them by itself and deals new animals.",
+   "rival": "Bram's turn. Watch the caption: he takes, places and settles just like you.",
+   "majority": "Bigger habitat than Bram in a terrain? That terrain pays you a bonus: +2 (a tie gives both +1).",
+   "final": "The thaw. Here is how your score adds up, rule by rule.",
+   "acornsEnd": "Each acorn you still hold is 1 point.",
+   "tiebreak": "A tie goes to whoever has more acorns left; still tied, you share the win.",
+   "good": "Nice move: +{n} from {card}.",
+   "poor": "That one scored nothing yet. Next time look for a spot that fits its card."
+  },
+  "later": "Things you will meet later"
+ },
+ "quick": {
+  "intro": [
+   "A new season in the valley. Grow the wildest one.",
+   "The thaw is here. Bears, elk and foxes need homes.",
+   "Rangers are out early this year. Grow faster."
+  ],
+  "win": "Your valley is the wildest at the thaw.",
+  "lose": "Their valley ran wilder this season.",
+  "tie": "Two valleys, equally wild.",
+  "solo": "The valley breathes again."
+ }
 }

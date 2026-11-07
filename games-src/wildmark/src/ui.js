@@ -7,6 +7,7 @@ function $(s, r) { return (r || document).querySelector(s); }
 function $$(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 try { UI.prefs = JSON.parse(localStorage.getItem('wm-prefs') || '{}') || {}; } catch (e) { UI.prefs = {}; }
+document.addEventListener('pointerdown', function () { if (G && !G.over && G.seats[G.cur] && G.seats[G.cur].ai) UI.aiQuick = true; }, true);   // tap during a rival turn: play it faster
 function savePrefs() { try { localStorage.setItem('wm-prefs', JSON.stringify(UI.prefs)); } catch (e) { } }
 function an(a) { return (/^[AEIOU]/.test(WM.ANI_NAME[a]) ? 'an ' : 'a ') + WM.ANI_NAME[a]; }
 function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, just above the instruction line (never over the score chips)
@@ -59,8 +60,10 @@ function newGame(cfg) {
   UI.cfg = cfg; UI.humans = cfg.humans; UI.view = 0; UI.lastHuman = 0; UI.ghost = null; UI.free = null; UI.wipe = null; UI.undo = null; UI.lit = null; UI.userPan = 0; UI.passed = -1;
   $('#start').hidden = true; $('#rs').hidden = true; try { GX.close(); } catch (e) { }
   fitView(true); render(); step(); save(); musicSync();
+  var q = window.CAMPAIGN && CAMPAIGN.quick; if (q && q.intro && UI.mode === 'quick' && !UI.fast) setTimeout(function () { toast(q.intro[Math.floor(Math.random() * q.intro.length)], 2600); }, 500);   // one-line flavour (text in campaign.json)
   return G;
 }
+function quickLine() { var q = window.CAMPAIGN && CAMPAIGN.quick; if (!q || UI.mode !== 'quick' || !G) return ''; var t = G.solo ? q.solo : G.winner === -2 ? q.tie : G.winner === 0 ? q.win : q.lose; return t ? '<p class="qline">' + esc(t) + '</p>' : ''; }
 function save() { if (!G || UI.mode !== 'quick' || G.over) { if (G && G.over && UI.mode === 'quick') try { localStorage.removeItem('wm-save'); } catch (e) { } return; } try { localStorage.setItem('wm-save', JSON.stringify({ G: G, cfg: UI.cfg })); } catch (e) { } }
 function loadSave() { try { var s = JSON.parse(localStorage.getItem('wm-save') || 'null'); return s && s.G && !s.G.over ? s : null; } catch (e) { return null; } }
 function resume() { var s = loadSave(); if (!s) return; G = s.G; UI.cfg = s.cfg; UI.humans = s.cfg.humans || 1; UI.mode = 'quick'; UI.view = meSeat(); UI.ghost = UI.free = UI.wipe = UI.undo = null; UI.camp = null; $('#start').hidden = true; fitView(true); render(); step(); musicSync(); }
@@ -72,32 +75,42 @@ function step() {
   if (G.seats[G.cur].ai) { UI.aiT = setTimeout(aiStep, UI.fast ? 30 : AIDELAY); return; }
   if (UI.humans > 1 && UI.passed !== G.cur && G.stage === 'pick') { showPass(); return; }
   UI.lastHuman = G.cur; if (UI.view !== G.cur) { UI.view = G.cur; fitView(); }
+  var bk = G.cur + ':' + G.seats[G.cur].done; if (!UI.fast && G.np > 1 && UI.humans === 1 && UI.mode !== 'tutorial' && G.stage === 'pick' && UI.banKey !== bk) { UI.banKey = bk; banner('Your turn'); }
   render(); if (typeof tutFix === 'function') tutFix();
 }
+// turn banner: "Your turn" / "<Rival>'s turn", one at a time, fades by itself
+function banner(t) { var e = $('#turnban'); if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); } e.textContent = t; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
+function terrText(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join('/'); }
+// the rival's turn, step by step (take -> place -> settle), each with a caption on the instruction bar; tap anywhere to speed it up
 function aiStep() {
   if (!G || G.over || !G.seats[G.cur].ai || UI.tutor) return;
+  var nm = G.seats[G.cur].name, seat = G.cur, slow = !UI.fast && UI.humans === 1 && UI.mode !== 'tutorial';
+  var D = function (ms) { return UI.fast ? 10 : Math.round(ms * (UI.aiQuick ? 0.35 : 1)); };
   var m = WM.AI.choose(G);
-  if (G.stage === 'pick') {
-    var col = m.t === 'take' ? [m.i, m.i] : m.t === 'free' ? [m.ti, m.ki] : null;
-    if (col) { $$('#mk .mt[data-i="' + col[0] + '"], #mk .mk[data-i="' + col[1] + '"]').forEach(function (e) { e.classList.add('flash'); }); }
-    var nm = G.seats[G.cur].name;
-    setTimeout(function () {
-      try { WM.apply(G, m); } catch (e) { console.error(e); return; }
-      if (m.t === 'wipe3') { toast(nm + ' swept three tokens.'); sfx('wipe'); }
-      else if (G.stage === 'tile') { var h = G.hold; m = WM.AI.choose(G); WM.apply(G, m); var m2 = WM.AI.choose(G); WM.apply(G, m2); UI.lastAI = { seat: G.last.seat, tok: h.tok, m2: m2 }; toast(nm + (m2.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.'), 1600); if (G.last.acorn) sfx('acorn'); else sfx('place'); }
-      // show the rival's move: their valley for a moment, with the new tile lit (skipped in fast/test mode, tutorial and hot-seat)
-      var ps = UI.lastAI && UI.lastAI.seat, pc = m && m.c;
-      if (!UI.fast && UI.humans === 1 && UI.mode !== 'tutorial' && ps != null && pc) {
-        UI.showAI = { seat: ps, text: nm + (m2.t === 'tok' ? ' placed ' + an(h.tok) : ' placed a tile') };
-        UI.view = ps; fitView(); render(); setTimeout(function () { if (G && UI.view === ps) pop(pc, nm + "'s new tile", 'hab'); }, 60);
-        UI.aiT = setTimeout(function () { UI.showAI = null; if (!G) return; UI.view = meSeat(); fitView(); render(); step(); }, Math.max(900, AIDELAY * 1.3));
-        return;
-      }
-      render(); step();
-    }, UI.fast ? 10 : Math.round(AIDELAY * 0.8));
-    return;
-  }
-  WM.apply(G, m); render(); step();
+  if (G.stage !== 'pick') { WM.apply(G, m); render(); step(); return; }
+  var key = seat + ':' + G.seats[seat].done;
+  if (slow && UI.banKey !== key) { UI.banKey = key; UI.aiQuick = false; $('#toast').classList.remove('on'); banner(nm + "'s turn"); }
+  var col = m.t === 'take' ? [m.i, m.i] : m.t === 'free' ? [m.ti, m.ki] : null;
+  if (slow && col) UI.showAI = { seat: UI.view, text: nm + ' takes the ' + terrText(G.market.tiles[col[0]]) + ' tile + ' + WM.ANI_NAME[G.market.toks[col[1]]] + (m.t === 'free' ? ' (acorn)' : '') };
+  if (slow) render();
+  if (col) $$('#mk .mt[data-i="' + col[0] + '"], #mk .mk[data-i="' + col[1] + '"]').forEach(function (e) { e.classList.add('flash'); });
+  UI.aiT = setTimeout(function () {
+    if (!G || G.over) return;
+    try { WM.apply(G, m); } catch (e) { console.error(e); return; }
+    if (m.t === 'wipe3' || m.t === 'wipe') { toast(nm + (m.t === 'wipe3' ? ' swept three matching animals.' : ' spent an acorn to replace animals.')); sfx('wipe'); UI.showAI = null; render(); step(); return; }
+    var h = G.hold, mp = WM.AI.choose(G);
+    if (!slow) { WM.apply(G, mp); var mq = WM.AI.choose(G); WM.apply(G, mq); toast(nm + (mq.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.'), 1600); sfx(G.last && G.last.acorn ? 'acorn' : 'place'); render(); step(); return; }
+    WM.apply(G, mp); UI.view = seat; UI.showAI = { seat: seat, text: nm + ' places the tile in their valley' }; fitView(); render(); sfx('place');
+    setTimeout(function () { if (G && UI.view === seat) pop(mp.c, nm + "'s new tile", 'hab'); }, 60);
+    UI.aiT = setTimeout(function () {
+      if (!G) return;
+      var env = G.seats[seat].env, s0 = WM.score(env, 0), m2 = WM.AI.choose(G); WM.apply(G, m2);
+      var s1 = WM.score(env, 0), best = null; WM.ANI.forEach(function (a) { var d = s1.ani[a] - s0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
+      UI.showAI = { seat: seat, text: m2.t === 'tok' ? nm + ' puts the ' + WM.ANI_NAME[h.tok] + ' on a tile' + (G.last && G.last.acorn ? ' (+1 acorn)' : '') : nm + ' returns the ' + WM.ANI_NAME[h.tok] };
+      render(); if (m2.t === 'tok') { pop(m2.c, best && best.d > 0 ? '+' + best.d + ' ' + cinfo(best.a).title : WM.ANI_NAME[h.tok], 'ani'); sfx(G.last && G.last.acorn ? 'acorn' : 'tok'); }
+      UI.aiT = setTimeout(function () { UI.showAI = null; if (!G) return; UI.view = meSeat(); fitView(); render(); step(); }, D(1000));
+    }, D(900));
+  }, D(slow ? 1100 : AIDELAY * 0.8));
 }
 function showPass() {
   var e = $('#pass'); e.hidden = false; e.innerHTML = '<div class="pbox"><h2>' + esc(G.seats[G.cur].name) + '</h2><p>Your turn. Pass the device.</p><button class="big" id="passB" type="button">I am ' + esc(G.seats[G.cur].name) + '</button></div>';
@@ -106,15 +119,18 @@ function showPass() {
 function act(m) {
   var before = G.seats[G.cur], sc0 = WM.score(before.env, before.acorns), at = null;
   WM.apply(G, m);
-  if (m.t === 'place') { UI.ghost = null; sfx('place'); var g = WM.score(before.env, before.acorns).habT - sc0.habT; if (g > 0) pop(m.c, '+' + g + ' habitat', 'hab'); }
+  if (m.t === 'place') { UI.ghost = null; sfx('place'); var sp = WM.score(before.env, before.acorns), g = sp.habT - sc0.habT; if (g > 0) { pop(m.c, '+' + g + ' habitat', 'hab'); var gt = WM.TER.filter(function (t) { return sp.hab[t] > sc0.hab[t]; })[0]; if (!before.ai && gt) toast('+' + g + ': your ' + WM.TER_NAME[gt] + ' grew to ' + sp.hab[gt] + ' joined tiles', 2600); } }
   if (m.t === 'tok' || m.t === 'back') {
     UI.undo = null; at = m.c;
+    if (UI.mode === 'quick' && !before.ai && (UI.prefs.coachN || 0) < 3) { UI.prefs.coachN = (UI.prefs.coachN || 0) + 1; savePrefs(); }
     if (m.t === 'tok') {
       var sc1 = WM.score(before.env, before.acorns), best = null;
       WM.ANI.forEach(function (a) { var d = sc1.ani[a] - sc0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
       var tot = sc1.aniT - sc0.aniT;
+      var ta = G.last && G.last.acorn ? ' +1 acorn (keystone).' : '', tk = before.env[m.c] && before.env[m.c].tok;
       if (tot > 0) { var info = {}; WM.scoreAnimal(before.env, best.a, info); UI.lit = { cells: info.lit, a: best.a, until: Date.now() + 1600 }; pop(m.c, '+' + tot + ' ' + cinfo(best.a).title, 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
       else if (tot < 0) { pop(m.c, tot + ' points', 'neg'); sfx('tok'); } else sfx('tok');
+      if (!before.ai && tk) toast(tot > 0 ? WM.ANI_NAME[best.a] + ' +' + tot + ': ' + cinfo(best.a).rule + ta : tot < 0 ? WM.ANI_NAME[tk] + ' ' + tot + ': it broke a pattern.' + ta : WM.ANI_NAME[tk] + ' settled, no points yet. ' + cinfo(tk).rule + ta, 3400);
       if (G.last && G.last.acorn) { setTimeout(function () { pop(m.c, '+1 acorn', 'acorn'); sfx('acorn'); }, 350); }
     } else sfx('tap');
     save();
@@ -127,7 +143,8 @@ function pop(c, text, cls) {   // floating points at a map cell (DOM, readable s
   // never stack unreadably: at most 2 live pops, a new one sits in its own row under the last one
   var live = [].slice.call($('#board').querySelectorAll('.pop')); while (live.length > 1) live.shift().remove();
   if (live.length) e.style.top = (parseFloat(live[0].style.top) + 40) + 'px';
-  $('#board').appendChild(e); setTimeout(function () { e.remove(); }, 1300);
+  $('#board').appendChild(e); var hw = e.offsetWidth / 2 + 6; e.style.left = Math.max(hw, Math.min(b.width - hw, x)) + 'px';   // never half off the board
+  setTimeout(function () { e.remove(); }, 1300);
 }
 function tutOK(x) { return typeof tutAct === 'function' ? tutAct(x) : true; }
 function myTurn() { return G && !G.over && !G.seats[G.cur].ai && UI.view === G.cur && $('#pass').hidden; }
@@ -174,8 +191,8 @@ function fitView(now) {
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
   // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
-  var wh = boardWH(), padT = G.np > 1 ? 106 : 62, padB = 56, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
-  var z = Math.max(0.3, Math.min(1.9, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
+  var wh = boardWH(), padT = (G.np > 1 ? 106 : 62) + (UI.mode === 'coach' ? 44 : 0), padB = 70, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
+  var z = Math.max(0.3, Math.min(2.5, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
   var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
   if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
   var f = Object.assign({}, UI.pan), t0 = performance.now(), D = 380;
@@ -219,6 +236,7 @@ function drawMap() {
   var wh = boardWH();
   $('#map').innerHTML = terrainDefs() + '<rect class="bgr" x="0" y="0" width="' + wh[0] + '" height="' + wh[1] + '" fill="transparent"/><g id="vp">' + out + '</g>';
   $('#map').setAttribute('viewBox', '0 0 ' + wh[0] + ' ' + wh[1]); applyPan();
+  $('#map').classList.toggle('dimtok', mine && G.stage === 'tok' && WM.tokSpots(env, G.hold.tok).length > 0);
 }
 function mkTile(t, s) { var w = s * SQ3, h = s * 2; return '<svg viewBox="' + (-w / 2 - 2) + ' ' + (-h / 2 - 2) + ' ' + (w + 4) + ' ' + (h + 4) + '" aria-hidden="true">' + terrainDefs() + tileSvg(t, 0, 0, s, t.t.length > 1 ? 1 : 0, { big: 1 }) + '</svg>'; }
 // pattern picture for an animal card (first set only): a small hex cluster showing a scoring shape, tokens drawn as on the map
@@ -248,7 +266,7 @@ function renderDock() {
     var t = G.market.tiles[i], k = G.market.toks[i], fr = UI.free, sel = fr && (fr.ti === i), selk = fr && fr.ki === i, w = UI.wipe && UI.wipe.indexOf(i) >= 0;
     h += '<div class="pair' + (mine && !UI.free && !UI.wipe ? ' live' : '') + '" data-i="' + i + '">';
     h += t ? '<button type="button" class="mt' + (sel ? ' sel' : '') + '" data-i="' + i + '" aria-label="' + esc(tileName(t)) + '"' + (mine && !UI.wipe ? '' : ' disabled') + '>' + mkTile(t, 30) + '</button>' : '<span class="mt gone"></span>';
-    h += k ? '<button type="button" class="mk' + (selk ? ' sel' : '') + (w ? ' wsel' : '') + '" data-i="' + i + '" aria-label="' + esc(WM.ANI_NAME[k]) + ' token"' + (mine ? '' : ' disabled') + '>' + mkTok(k) + '</button>' : '<span class="mk gone"></span>';
+    h += k ? '<button type="button" class="mk' + (selk ? ' sel' : '') + (w ? ' wsel' : '') + '" data-i="' + i + '" aria-label="' + esc(WM.ANI_NAME[k]) + ' token"' + (mine ? '' : ' disabled') + '>' + mkTok(k) + '<i>' + esc(WM.ANI_NAME[k]) + '</i></button>' : '<span class="mk gone"></span>';
     h += '</div>';
   }
   mk.innerHTML = h;
@@ -270,62 +288,70 @@ function renderDock() {
       a += '<span class="held">' + mkTok(G.hold.tok) + '</span><button type="button" class="ab" id="backB">Return token</button>';
     }
   }
+  if (myTurn() && UI.mode !== 'tutorial' && !UI.wipe && !UI.free && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
   $('#acts').innerHTML = a;
   $('#acorn').innerHTML = '<span class="acn" title="Acorns">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></span>';
 }
 function lineText() {
   if (!G) return '';
   if (G.over) return 'Season over';
+  if (UI.showAI && UI.view === UI.showAI.seat) return UI.showAI.text;
   var s = G.seats[G.cur];
   if (UI.view !== G.cur && !s.ai) return '';
-  if (UI.showAI && UI.view === UI.showAI.seat) return G.seats[UI.view].name + "'s valley: " + UI.showAI.text.replace(/^\S+ /, '');
   if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
   if (s.ai) return s.name + ' is choosing';
-  if (G.stage === 'pick') return UI.wipe ? 'Tap tokens to replace' : UI.free ? (UI.free.ti == null ? 'Pick any tile' : 'Now pick any token') : 'Pick a tile and token pair';
-  if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Turn it, then tap Place' : 'Tap Place (one terrain: no turning)') : 'Tap a glowing spot';
-  if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Place the ' + WM.ANI_NAME[G.hold.tok] + ' on a glowing tile' : 'No room: return the token';
+  if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Step 1 of 3: pick a tile + animal pair from the market';
+  if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Step 2 of 3: turn it if you like, then tap Place' : 'Step 2 of 3: tap Place to put the tile here') : 'Step 2 of 3: tap a glowing spot to place the tile';
+  if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Step 3 of 3: put the ' + WM.ANI_NAME[G.hold.tok] + ' on a glowing tile, or Return it' : 'Step 3 of 3: no tile shows a ' + WM.ANI_NAME[G.hold.tok] + ', so tap Return';
   return '';
 }
+// first-game coach: one extra plain line per step for the player's first 3 Quick-game turns, then it switches itself off
+var COACH = { pick: 'Each column is one choice: the tile on top and the animal under it come together.', tile: 'Tiles must touch your valley. Matching edges join terrain: 1 point per joined tile.', tok: 'Animals score by their card (the chips on top). A tile shows which animals it accepts.' };
+function coachText() { return G && !G.over && UI.mode === 'quick' && myTurn() && (UI.prefs.coachN || 0) < 3 && !UI.wipe && !UI.free ? COACH[G.stage] || '' : ''; }
 function renderTop() {
   var me = G.seats[UI.view], fin = G.over ? G.res : WM.final(G), sc = fin[UI.view], h = '';   // one honest score: live totals include the habitat bonuses (as the Scores drawer and result)
-  WM.ANI.forEach(function (a) { h += '<button type="button" class="cc" data-card="' + a + '" aria-label="' + esc(cinfo(a).title) + ' card, ' + sc.ani[a] + ' points">' + mkTok(a) + '<b>' + sc.ani[a] + '</b></button>'; });
+  WM.ANI.forEach(function (a) { h += '<button type="button" class="cc" data-card="' + a + '" aria-label="' + esc(WM.ANI_NAME[a] + ': ' + cinfo(a).title) + ' card, ' + sc.ani[a] + ' points"><span class="ccr">' + mkTok(a) + '<b>' + sc.ani[a] + '</b></span><i>' + esc(WM.ANI_NAME[a]) + '</i></button>'; });
   $('#cards').innerHTML = h;
   var sh = '';
   if (G.np > 1) G.seats.forEach(function (s, i) { var t = fin[i].total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '">' + esc(s.name) + ' <b>' + t + '</b></button>'; });
   $('#seats').innerHTML = sh; $('#seats').hidden = G.np < 2;
   var turn = Math.min(G.turns, G.seats[G.cur].done + 1);
   $('#barstat').innerHTML = '<span class="pill">Turn <b>' + turn + '/' + G.turns + '</b></span>' + (G.np > 1 ? '' : '<span class="pill">Score <b>' + sc.total + '</b></span>');
-  $('#line').textContent = lineText();
+  var lt = lineText(), sm = /^Step (\d) of 3: (.*)$/.exec(lt), co = coachText();
+  $('#line').innerHTML = sm ? '<b class="stepn" aria-label="Step ' + sm[1] + ' of 3">' + sm[1] + '<small>/3</small></b><span class="stept">' + esc(sm[2].charAt(0).toUpperCase() + sm[2].slice(1)) + (co ? '<span class="coach">' + esc(co) + '</span>' : '') + '</span>' : esc(lt);
+  var te = $('#toast'); if (te && te.classList.contains('on')) toastPlace(te);   // the step bar may have grown: keep the toast above it
   var lp = $('#logp'); if (lp) lp.innerHTML = '<h3>Season log</h3><ol>' + G.log.slice(-8).reverse().map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>';
 }
 function render() {
   if (!G) return;
   renderDock(); renderTop(); drawMap();
-  if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
+  if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() || UI.mode === 'quick' || UI.mode === 'coach' ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
   artApply();
+  if (typeof coachCheck === 'function') coachCheck();
 }
 UI.redraw = function () { if (G) render(); };
 // ---------------------------------------------------------------- drawers: scores, rules, cards
 function scoresHTML() {
   var sc = G.over ? G.res : WM.final(G), h = '<table class="st"><tr><th></th>' + G.seats.map(function (s) { return '<th>' + esc(s.name) + '</th>'; }).join('') + '</tr>';
-  WM.ANI.forEach(function (a) { h += '<tr><td>' + mkTok(a) + ' ' + esc(cinfo(a).title) + '</td>' + sc.map(function (x) { return '<td>' + x.ani[a] + '</td>'; }).join('') + '</tr>'; });
-  WM.TER.forEach(function (t) { h += '<tr><td><i class="sw" style="background:' + WM.TER_COL[t] + '"></i> ' + WM.TER_NAME[t] + '</td>' + sc.map(function (x) { return '<td>' + x.hab[t] + (x.bonus[t] ? ' <small>+' + x.bonus[t] + '</small>' : '') + '</td>'; }).join('') + '</tr>'; });
+  var best = function (vals) { var m = Math.max.apply(null, vals); return function (v) { return v === m && vals.filter(function (x) { return x === m; }).length < vals.length ? ' class="best"' : ''; }; };
+  WM.ANI.forEach(function (a) { var bf = best(sc.map(function (x) { return x.ani[a]; })); h += '<tr><td title="' + esc(cinfo(a).title + ': ' + cinfo(a).rule) + '">' + mkTok(a) + ' ' + esc(WM.ANI_NAME[a]) + '</td>' + sc.map(function (x) { return '<td' + bf(x.ani[a]) + '>' + x.ani[a] + '</td>'; }).join('') + '</tr>'; });
+  WM.TER.forEach(function (t) { var bt = best(sc.map(function (x) { return x.hab[t] + (x.bonus[t] || 0); })); h += '<tr><td><i class="sw" style="background:' + WM.TER_COL[t] + '"></i> ' + WM.TER_NAME[t] + '</td>' + sc.map(function (x) { return '<td' + bt(x.hab[t] + (x.bonus[t] || 0)) + '>' + x.hab[t] + (x.bonus[t] ? ' <small>+' + x.bonus[t] + '</small>' : '') + '</td>'; }).join('') + '</tr>'; });
   h += '<tr><td>Acorns</td>' + sc.map(function (x) { return '<td>' + x.acorns + '</td>'; }).join('') + '</tr>';
   h += '<tr class="tot"><td>Total</td>' + sc.map(function (x) { return '<td>' + x.total + '</td>'; }).join('') + '</tr></table>';
   return h + '<p class="note">' + (G.solo ? 'Solo: a habitat of 7 or more tiles earns 2 extra points.' : 'The largest habitat of each terrain earns a bonus (shown +).') + '</p>';
 }
 function cardsHTML() {
   var h = '<div class="cards">';
-  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(C.title) + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
+  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); var mine = G ? (G.over ? G.res : WM.final(G))[meSeat()].ani[a] : null; h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(WM.ANI_NAME[a]) + ': ' + esc(C.title) + (mine != null ? ' <span class="minep">you: ' + mine + '</span>' : '') + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
   return h + '</div>';
 }
-var RULES_HTML = '<h3>Goal</h3><p>Over 20 turns, grow a valley of habitat tiles and settle animals on them. Most points wins.</p>' +
-  '<h3>Your turn</h3><ol><li>Take one tile and the token under it from the market.</li><li>Place the tile next to your valley. Turn split tiles as you like.</li><li>Place the token on any empty tile that shows that animal, or return it.</li></ol>' +
+var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one tile and the animal under it.</li><li>Tap a glowing spot to add the tile to your valley.</li><li>Put the animal on a tile that shows it (or return it).</li><li>Animals score by their card; joined terrain scores too.</li><li>After 20 turns the most points wins.</li></ol></div>' +
   '<h3>Keystones and acorns</h3><p>Keystone tiles (gold rim) have one terrain. An animal on a keystone earns an acorn. Spend an acorn to take any tile with any token, or to replace any tokens in the market. Each acorn left is 1 point at the end.</p>' +
   '<h3>Crowded market</h3><p>Four matching tokens are replaced at once. With three matching tokens you may replace those three once per turn, for free.</p>' +
   '<h3>Scoring</h3><p>Each animal scores by its card (below). Each terrain scores 1 point per tile in your largest connected habitat of it (edges must match). The largest habitat of each terrain earns a bonus: 2 players 2 (tie 1), 3-4 players 3 for first and 1 for second. Solo: 2 for a habitat of 7+.</p>' +
   '<h3>Solo</h3><p>After each turn the rightmost tile and token left in the market are removed.</p>' +
-  '<h3>Ties</h3><p>Most acorns left wins a tie.</p>';
+  '<h3>Ties</h3><p>Most acorns left wins a tie.</p>' +
+  '<h3>Simplified on purpose</h3><ul><li>The animals on each tile and the starting tiles are our own balanced set.</li><li>Elk lines are counted longest first (rarely a point less than the best split).</li><li>Solo: the rightmost tile and animal leave each turn and the rest slide right.</li><li>Mixed-card point values (cards B, C, D) are our own tables.</li></ul>';
 // ---------------------------------------------------------------- large view: tap a placed tile (when it is not a target) or hold a market tile/token
 function tileText(t, tok) {
   var h = '<p><b>' + t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + '</b> tile' + (t.key ? ', a <b>keystone</b>: an animal placed here earns an acorn.' : (t.t.length > 1 ? '. Each half counts for its own terrain; edges must match to join a habitat.' : '.')) + '</p>';
@@ -367,8 +393,9 @@ function showResult() {
   if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
-  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + whyLine(sc, me) + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
-  try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
+  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
+  try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' || UI.mode === 'coach' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
+  if (typeof coachEnd === 'function') coachEnd();
 }
 // ---------------------------------------------------------------- title + setup
 function showTitle() {
@@ -417,6 +444,7 @@ document.addEventListener('click', function (e) {
   if (t.classList.contains('sg')) { var k = t.parentNode.dataset.k, v = t.dataset.v; UI.setup[k] = k === 'ai' || k === 'cards' ? v : +v; if (UI.setup.humans + UI.setup.opp > 4) UI.setup.opp = 4 - UI.setup.humans; if (UI.setup.humans + UI.setup.opp < 1) UI.setup.opp = 0; showTitle(); return; }
   if (t.classList.contains('tsz')) { UI.setup.opp = +t.dataset.n - 1; UI.setup.humans = 1; showTitle(); return; }
   if (t.classList.contains('cc')) { openCards(); return; }
+  if (t.id === 'whatB') { var bb = document.getElementById('bulbbtn'); if (bb) bb.click(); return; }
   if (t.classList.contains('seat')) { UI.view = +t.dataset.seat; render(); fitView(); return; }
   switch (id) {
     case 'storyB': storyOpen(); break;
@@ -445,7 +473,8 @@ document.addEventListener('click', function (e) {
 });
 document.addEventListener('keydown', function (e) { if (!G || !myTurn()) return; if (e.key === 'r' || e.key === 'R') rotate(); if (e.key === 'Enter' && UI.ghost) confirmPlace(); });
 function openCards() { GX.drawer('cardsd', 'Scoring cards', null, false); $('#cardsd .gx-drawer-body').innerHTML = cardsHTML(); artApply($('#cardsd')); GX.show('cardsd'); }
-function openRules() { var b = $('#rulesd .gx-drawer-body'); b.innerHTML = RULES_HTML + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); GX.show('rulesd'); }
+function fillRules() { var b = $('#rulesd .gx-drawer-body'); if (!b) return; b.innerHTML = RULES_HTML + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); b.scrollTop = 0; setTimeout(function () { b.scrollTop = 0; }, 0); }   // filled on every open (the drawer body is never empty, so an emptiness test left it blank)
+function openRules() { fillRules(); GX.show('rulesd'); }
 // ---------------------------------------------------------------- music (silent until files exist)
 function musicSync() { try { if (window.GXMUS) GXMUS.sync(); } catch (e) { } }
 // ---------------------------------------------------------------- boot
@@ -453,7 +482,7 @@ function boot() {
   GX.init({ key: 'wm' });
   var sb = document.createElement('div'); sb.id = 'scoresb'; GX.drawer('scored', 'Scores', sb, true);
   var rb = document.createElement('div'); GX.drawer('rulesd', 'How to play', rb, false);
-  GX.onShow = function (id) { if (id === 'scored') $('#scoresb').innerHTML = G ? scoresHTML() : '<p>No game yet.</p>'; if (id === 'rulesd' && !$('#rulesd .gx-drawer-body').innerHTML.trim()) openRules(); };
+  GX.onShow = function (id) { if (id === 'scored') $('#scoresb').innerHTML = G ? scoresHTML() : '<p>No game yet.</p>'; if (id === 'rulesd') fillRules(); };
   try {
     GX.settings({ id: 'setd', title: 'Menu',
       game: function (S) { var a = document.createElement('button'); a.type = 'button'; a.className = 'gx-sb'; a.textContent = 'Title screen'; a.onclick = function () { GX.close(); UI.sv = 'title'; showTitle(); }; var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'gx-sb'; b2.textContent = 'New game'; b2.onclick = function () { GX.close(); UI.sv = 'setup'; showTitle(); }; var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'gx-sb'; rs.textContent = 'Restart'; rs.onclick = function () { GX.close(); if (UI.mode === 'camp' && UI.camp) campStart(UI.camp); else if (UI.cfg && UI.mode === 'quick') newGame(Object.assign({}, UI.cfg, { seed: null })); else { UI.sv = 'setup'; showTitle(); } }; S.appendChild(GX.row('This game', [rs, b2, a])); },

@@ -1,0 +1,47 @@
+// Plays a Quick game (or Story chapter 1) to the result screen using ONLY real touch taps on visible, uncovered UI.
+//   node playable-test.js [mode=quick|story] [size=390x763] [shotsDir]      Exit code 1 on any problem.
+// The target of each tap is the control the game's own hint finger points at (hlpAdvice -> fingerEl); the tap is a touch at that element's centre
+// and is skipped (a problem is reported) if another element covers the centre.
+const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
+const fs=require('fs');const html=fs.readFileSync(__dirname+'/sands.html');
+const mode=process.argv[2]||'quick';const [W,H]=(process.argv[3]||'390x763').split('x').map(Number);const SH=process.argv[4]||'';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{if(probs.length<30)probs.push(m)};
+(async()=>{const b=await PW.chromium.launch();const mob=W<700;
+ const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:mob,hasTouch:true,serviceWorkers:'block'});
+ await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+ const p=await ctx.newPage();p.setDefaultTimeout(15000);
+ p.on('pageerror',e=>note('PAGE ERROR '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))note('console error '+m.text().slice(0,140))});
+ await p.goto('https://gns.test/');await sleep(900);await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('soq_tutoffer','1');localStorage.setItem('soq_fing','99')}catch(e){}});await p.reload();await sleep(900);
+ const shot=async n=>{if(SH){fs.mkdirSync(SH,{recursive:true});await sleep(350);await p.screenshot({path:`${SH}/${mode}-${n}-${W}.png`})}};
+ const tapEl=async sel=>{const c=await p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();if(!r.width)return null;const x=r.left+r.width/2,y=r.top+r.height/2;const t=document.elementFromPoint(x,y);return {x,y,ok:!!t&&(t===e||e.contains(t)||t.contains(e))}},sel);if(!c)return false;if(!c.ok)note('covered: '+sel);await p.touchscreen.tap(c.x,c.y);return true};
+ await shot('title');
+ if(mode==='story'){await tapEl('#modal [data-ui=story]');await sleep(900);
+   // the prologue (tutorial) is skipped by a finger tap on Skip; then the Story map
+   if(await p.evaluate(()=>typeof GXT!=='undefined'&&GXT.active())){const sk=await p.evaluate(()=>{const e=document.querySelector('.gxt-skip');const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});await p.touchscreen.tap(sk[0],sk[1]);await sleep(600)}
+   await p.evaluate(()=>{UI.modal='start';render()});await tapEl('#modal [data-ui=story]');await sleep(900);await shot('map')}
+ else{await tapEl('#modal [data-ui=quick]');await sleep(900)}
+ let last='',lastT=Date.now(),shots={},turns=0,sawRival=false,startedChapter=false;
+ for(let g=0;g<4000;g++){
+  const st=await p.evaluate(()=>({over:!!(G&&G.over),g:!!G&&!G.tut,modal:UI.modal,me:!!(G&&me()),ph:G&&G.phase+'/'+G.step,t:G&&G.turnIdx,gxc:!!document.querySelector('.gxc-ov,.gxc-scene,.gxc-map,[class*=gxc]:not(style)')}));
+  if(st.over&&(st.modal==='over'||!st.me)){await sleep(2600);await shot('result');break}
+  const sig=JSON.stringify(st)+(await p.evaluate(()=>G?G.logN:0));if(sig!==last){last=sig;lastT=Date.now()}else if(Date.now()-lastT>9000){note('stuck 9 s '+sig+' '+JSON.stringify(await p.evaluate(()=>{let m=null;try{m=hlpAdvice()}catch(e){m='ERR '+e.message}return {adv:m,mv:[...document.querySelectorAll('[data-mv]')].map(b=>b.dataset.mv+'|'+b.textContent.trim()),vm:G.pl&&validMoves(me()?me().i:0).slice(0,6)}})));await shot('stuck');break}
+  if(!st.g){ // story overlays: tap any visible primary button
+    if(await p.evaluate(()=>!!document.querySelector('.gxc-node.next')&&!document.querySelector('.gxc-sheet'))){await sleep(600);await tapEl('.gxc-node.next .gxc-disc');await sleep(700);continue}
+    const hit=await p.evaluate(()=>{const bs=[...document.querySelectorAll('[class*=gxc] button:not(.gxc-node):not(.gxc-back),[class*=gxc] [role=button]:not(.gxc-node),.gxc-go,.gxc-next')].filter(e=>{const r=e.getBoundingClientRect();if(!r.width||getComputedStyle(e).visibility==='hidden')return false;const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return t&&(t===e||e.contains(t))});
+      const pick=bs.find(e=>e.classList.contains('go'))||bs.find(e=>/start|play|next|continue|meet|begin|go|chapter/i.test(e.textContent))||bs[0];if(!pick)return null;const r=pick.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2,t:pick.textContent.trim().slice(0,20)}});
+    if(hit){await p.touchscreen.tap(hit.x,hit.y);await sleep(450)}else await sleep(300);continue}
+  if(!startedChapter){startedChapter=true;await sleep(500);await shot('first')}
+  if(!st.me){if(!sawRival&&st.ph.startsWith('turn')&&!shots.r){sawRival=true}await sleep(250);if(!shots.r&&await p.evaluate(()=>G.phase==='turn'&&!me())){shots.r=1;await sleep(500);await shot('rival')}continue}
+  if(st.modal&&st.modal!=='over'){const h=await p.evaluate(()=>{const e=document.querySelector('#modal .btn.go,#modal .btn');if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}});if(h){await p.touchscreen.tap(h.x,h.y);await sleep(300)}else await sleep(200);continue}
+  const tgt=await p.evaluate(()=>{let el=null;try{const m=hlpAdvice();if(UI.chz){const i=UI.chz.opts.findIndex(o=>same(o.m,m));el=document.querySelector('#chz [data-chz="'+(i<0?0:i)+'"]')}else if(m)el=fingerEl(m)}catch(e){}
+    if(!el)el=document.querySelector('#chz .chb')||[...document.querySelectorAll('#acts [data-mv]')].find(b=>!/"act":"undo"/.test(b.dataset.mv))||document.querySelector('#grid .glow')||document.querySelector('.sp-b.glow')||[...document.querySelectorAll('#acts button')].find(b=>/skip|done|end|sell/i.test(b.textContent)&&!b.disabled)||document.querySelector('#mkt .glow');
+    if(!el)return null;el.scrollIntoView({block:'nearest'});const r=el.getBoundingClientRect();const x=r.left+r.width/2,y=r.top+r.height/2;const t=document.elementFromPoint(x,y);return {x,y,ok:!!t&&(t===el||el.contains(t)||t.contains(el)),what:el.id||el.className}});
+  if(!tgt){await sleep(250);continue}
+  if(!tgt.ok){note('hint target covered '+tgt.what);}
+  await p.touchscreen.tap(tgt.x,tgt.y);turns++;await sleep(220);
+  if(turns===30&&!shots.s){shots.s=1;await shot('mid')}
+ }
+ const fin=await p.evaluate(()=>({over:!!(G&&G.over),win:G&&G.winner,pl:G&&G.pl.map(x=>x.nm)}));
+ if(!fin.over)note('game did not reach the result screen');
+ console.log(mode,W+'x'+H,'taps',turns,'result',JSON.stringify(fin),probs.length?'PROBLEMS':'PASS');probs.forEach(x=>console.log(' -',x));
+ await b.close();process.exit(probs.length?1:0)})();
