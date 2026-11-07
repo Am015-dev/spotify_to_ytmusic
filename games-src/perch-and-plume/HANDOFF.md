@@ -31,11 +31,10 @@ Tests: rules-test.js (node), smoke.js, play.js (real taps: full game, tutorial, 
 | `node hotseat-test.js` | PASS: pass screens, hidden hands, view follows the player to act |
 | `VIS_SLUGS="," build-all.py --quick perch-and-plume` | PASS: 9/9 scenarios (menu, story-scene, pp-board, pp-chain, pp-play, pp-eggs, pp-result, pp-story) |
 | `scenario-mutate.js perch-and-plume` | 38/40 mutants killed = 95% (survivors: two conditional "trade" steps, two look-only story scenarios) |
-| `ui-audit.spec.js` (phone + pc) | PC: A0 B0 C0 D0 E0 F0. Phone: A0 B0 C0 D0 E6 F0, see Known below |
+| `ui-audit.spec.js` (phone + pc, after merging the walker-wait fix from alex/brave-carson-rbpmlk) | phone A0 B0 C0 D0 E0 F0, PC A0 B0 C0 D0 E0 F0 |
 | asset loader | proven with 3 dummy webp files in a scratch site (bird card, seed token, portrait): files fill their slots at the slot aspect, the rest stay placeholders; dummies deleted, nothing under games/ |
 
 ## Known (not fixed)
-- ui-audit phone E6: on the "campaign" surface the audit lists the board's chip and 5 dice as visible and then taps them after its reopen step has put the story map over them. It needs the shared `?scn=menu` walker (gx-scenario.js), which opens and closes panels on its own timer after every page load, to coincide with the audit's taps. In a clean replay of the same surfaces the map's own buttons are listed and nothing is dead. The reference game cauldron-fair also fails this audit on phone (A0 B4 E2 F2, same run). Fix belongs in shared code: the walker should stop once a test drives the surfaces, or the audit should wait for it.
 - `register-assets.py` not run on this branch: it rewrites the one-line `next-wave/expected-assets.json` and conflicts with every other branch; its docstring asks the orchestrator to run it at merge time.
 - Playwright: the brief's 1.56.1 does not match the installed browser (chromium-1243); I used 1.63.0 (`npm install --no-save @playwright/test@1.63.0 playwright@1.63.0`), as the redline-rally worker did.
 
