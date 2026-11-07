@@ -35,7 +35,7 @@ const TUT_O_A=[[1,2,1],[2,0,2],[-1,0,0]];                              // Olive 
 const TUT_O=()=>TUT.part==='A'?TUT_O_A:TUT_O_B;                       // Olive's four takes: [source, glaze, rack index]
 function tutBuild(){if(TUT.part==='A')return tutBuildA();UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.modal=null;UI.lastHuman=null;UI.guideNote='';
   const _r=refresh;refresh=function(){};
-  try{newGame({np:2,seats:['human','ai'],lv:['normal','easy'],names:['Coral','Olive'],mode:'x'})}finally{refresh=_r}
+  try{newGame({np:2,seats:['human','ai'],lv:['normal','easy'],names:['Coral','Tamsin'],mode:'x'})}finally{refresh=_r}
   const take=c=>{const k=G.bag.indexOf(c);if(k<0)throw Error('tutor: the sack has no tile '+c);G.bag.splice(k,1)};
   for(const a of G.fac)G.bag.push(...a);
   G.fac=TUT_K.map(a=>{a.forEach(take);return a.slice()});
@@ -51,7 +51,7 @@ function tutBuild(){if(TUT.part==='A')return tutBuildA();UI.sel=null;UI.tgt=null
   TUT.t0=Date.now();refresh()}
 function tutBuildA(){UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.modal=null;UI.lastHuman=null;UI.guideNote='';
   const _r=refresh;refresh=function(){};
-  try{newGame({np:2,seats:['human','ai'],lv:['normal','easy'],names:['Coral','Olive'],mode:'x'})}finally{refresh=_r}
+  try{newGame({np:2,seats:['human','ai'],lv:['normal','easy'],names:['Coral','Tamsin'],mode:'x'})}finally{refresh=_r}
   const take=c=>{const k=G.bag.indexOf(c);if(k<0)throw Error('tutor: the sack has no tile '+c);G.bag.splice(k,1)};
   for(const a of G.fac)G.bag.push(...a);
   G.fac=TUT_KA.map(a=>{a.forEach(take);return a.slice()});
@@ -68,7 +68,53 @@ const tTile=(src,c)=>()=>{const a=src<0?G.ctr:G.fac[src];const k=a?a.indexOf(c):
 const tRack=r=>()=>bfQ(r<5?`[data-bfrow="${r}"] .bf-rack`:'.bf-fl');
 const tSel=(src,c)=>!!UI.sel&&UI.sel.src===src&&UI.sel.c===c&&!!bfQ('.bf-row.ok');
 const tWall=(r,c)=>()=>bfSlot(`w0_${r}_${c}`);
-function tutSteps(){return TUT.part==='A'?tutStepsA():tutStepsB()}
+// ---------------------------------------------------------------- the tutorial's story text (ONE data block: edit the words here). Voice: Mother Ochre, the guide; rival: Tamsin Reed.
+// Each beat = the story reason, then the action (the glow shows where), then the next beat reacts. See STORY.md.
+const TUT_TEXT={
+ a_goal:['Mother Ochre','Welcome, apprentice. You and Tamsin tile the Sun King\'s wall today. Most stars wins the commission.'],
+ a_kilns:['Fresh from the fire','Three kilns are fired, four tiles each. Take from one kiln, or later from the courtyard.'],
+ a_take:['Take the black pair','The king loves Obsidian. Grab the black pair: you take every Obsidian on that kiln.'],
+ a_place:['Give them a home','Row 2 holds exactly two tiles of one glaze. Set both there.'],
+ a_slide:['Good hands!','The tiles you left slid into the courtyard. Anyone may claim them.'],
+ a_olive1:['Tamsin grabs a kiln','Tamsin takes the red pair, eager as ever. Her spare Frost joins the courtyard.'],
+ a_middle:['Claim the Frost','Frost waits in the courtyard. Whoever claims first also carries the Sun token.'],
+ a_overflow:['A lesson in cracks','Row 1 holds one tile, so the second Frost cracks onto the floor. Try it.'],
+ a_floor:['Cracks cost stars','Cracked tiles cost −1, −1, −2, −2, −2, −3, −3 stars when the round ends.'],
+ a_sun:['The Sun token','It sits on your floor: one star lost, but you open the next round.'],
+ a_olive2:['Tamsin again','Tamsin fills row 3 with three Cobalt. Her spare Saffron slides to the courtyard.'],
+ a_keep:['Claim the Saffron','Saffron gleams in the courtyard. Take the pair.'],
+ a_keep2:['Half full is fine','Row 4 wants four tiles. Yours wait there, drying, for the next round.'],
+ a_tiling:['The kilns go cold','Tamsin takes the last tile. Now every full rack sends one tile to your wall.'],
+ a_wall0:['One star, alone','The first Frost lands alone on the wall: 1 star. Everyone starts small.'],
+ a_wall1:['Neighbours pay','Obsidian meets the Frost above it. A line of two scores 2 stars!'],
+ a_pen:['The cracks cost','Cracked Frost and the Sun token cost −2. Your round: 1 + 2 − 2 = 1 star.'],
+ a_end:['Well fired','Mother Ochre: "A round, done. Half-full racks keep their tiles. Now, the palace\'s final hour."'],
+ goal:['The final hour','Last round of the commission. You lead 21 to 12, and your wall is nearly done.'],
+ kilns:['Twenty tiles','Tamsin needs a miracle. You need a plan. Five kilns, four tiles each.'],
+ take1:['Palace red','Garnet is the palace\'s colour. Take the Garnet pair: every Garnet on that kiln.'],
+ take1b:['Seat them neatly','Row 2 holds two. Set both Garnets there.'],
+ slide:['Leftovers slide','The rest slid into the courtyard, for anyone to claim.'],
+ olive1:['Tamsin strikes','Tamsin takes both Obsidians. Her spare Frost slides to the courtyard.'],
+ middle:['Claim the Frost','Frost waits in the courtyard. Claim it, and the Sun token comes with it.'],
+ middle2:['One too many','Row 1 holds one tile, so the second Frost cracks onto the floor.'],
+ floor:['Cracks cost stars','Each floor space costs stars at round end: −1, −1, −2, −2…'],
+ sun:['The Sun token','The Sun token costs one star, but you open the next round.'],
+ olive2:['Tamsin again','Tamsin takes three Cobalt. The spare Saffron slides to the courtyard.'],
+ take2:['Four in one go','Four Garnets share one kiln. Claim all four.'],
+ take2b:['A perfect fit','Row 4 holds exactly four. Garnet already sits in rows 1 and 3, so they stay dark.'],
+ olive3:['Tamsin finishes','Tamsin takes four Frost. Only the courtyard still holds tiles.'],
+ last:['The last Cobalt','One Cobalt remains. Claim it.'],
+ last2:['Only one home','Rows 1 and 5 already show Cobalt, and rows 2 and 4 are full. Row 3 it is.'],
+ tiling:['The kilns go cold','Every full rack sends one tile to your wall. Row 3 waits for next time.'],
+ chain0:['Ten stars!','Frost closes a row of five and a column of five: 5 + 5 = 10 stars!'],
+ chain1:['Neighbours pay','This Garnet joins two across and two down: 2 + 2 = 4 stars.'],
+ chain2:['Alone, one star','This Garnet stands alone: 1 star. The other three go to the shard box.'],
+ floorpen:['The cracks cost','The cracked Frost and the Sun token cost −1 and −1.'],
+ bonus:['The wall is whole','A full row ends the game. Bonuses: row +2, column +7, whole glaze +10. All yours!'],
+ final:['The king\'s seal',()=>`${P(0).score} stars to Tamsin's ${P(1).score}. Mother Ochre: "The Sun King sets his seal on your wall." Ties go to the most full rows.`]
+};
+function tutStory(a){return a.map(s=>{const x=TUT_TEXT[s.id];if(x){s.title=x[0];s.say=x[1]}return s})}
+function tutSteps(){return tutStory(TUT.part==='A'?tutStepsA():tutStepsB())}
 function tutStepsA(){return [
   // CHAPTER 1: your first turn (a real round 1, empty boards)  |  CHAPTER 2: the middle, the floor, scoring a round
  {id:'a_goal',title:'This is a real game',say:'Set tiles onto your wall (the grid) to score. When the game ends, the most points wins.',target:tq('.bf-me'),wait:null,ready:()=>tYou()&&G.turn===0&&Date.now()-TUT.t0>2000},
@@ -147,8 +193,8 @@ function tutLeave(){tutRelease();UI.tut=0;UI.coach=TUT.coach;UI.sel=null;UI.tgt=
   try{GXH.hide()}catch(e){}window.__tutPh=0;phApply();bfApply();try{resetScene()}catch(e){}}
 function tutStart(o){if(typeof GXT==='undefined')return;const pro=o&&o.prologue?o:null;TUT.part=o&&o.part==='B'?'B':'A';const A=TUT.part==='A';const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:A?'Chapters 1-2 done':'You know the rules',
-    endText:A?'You took, placed and scored a real round. Chapters 3-4: bigger chains, end bonuses and winning.':(pro?'Take, place, tile, score, bonuses. Now the Story begins.':'Take, place, tile, score, bonuses. The lightbulb helps in real games.'),
+    endTitle:A?'Well fired':'The king\'s seal',
+    endText:A?'Mother Ochre: "Not bad for a first firing. Come, the palace\'s last hour pays the big stars."':(pro?'Mother Ochre: "You read the kilns like a master. Chapter one is waiting."':'Mother Ochre: "You read the kilns like a master. The lightbulb helps in real games."'),
     endButtons:A?(pro?[{id:'partB',label:'Next: chains and the end'}]:[{id:'partB',label:'Next: chains and the end'},{id:'play',label:'Just play'}]):(pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null),
     setup:tutSetup,
     onDone:r=>{const c=r&&r.choice;

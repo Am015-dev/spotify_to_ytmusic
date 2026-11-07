@@ -35,3 +35,14 @@ Every step id in backticks must be shown by the script; a rule with no id is NOT
 - [ ] Dropping tiles on the floor on purpose / "nothing fits" (the instruction line says "Nothing fits: tap the floor" in real games).
 - [ ] Tie-break shared win (stated in the final step, not played).
 - [ ] Variants: unmarked (grey) mosaic and prism tiles. They have their own rule cards under the lightbulb and are not part of the base game.
+
+## Story beats (by rule)
+Each step's story line is in `TUT_TEXT` (tutor.js) and listed in STORY.md. Voice: Mother Ochre; rival Tamsin Reed.
+- Goal / commission: `a_goal` "most stars wins the commission", `goal` "the final hour, you lead 21 to 12".
+- Take a colour: `a_take` "the king loves Obsidian"; `take1` "Garnet is the palace's colour".
+- Rows and one glaze: `a_place` "give them a home".
+- Slide to the courtyard: `a_slide` "good hands", `a_olive1` "Tamsin grabs a kiln".
+- Sun token and the floor: `a_middle`, `a_overflow` "a lesson in cracks", `a_floor` "cracks cost stars", `a_sun`.
+- Rows that wait: `a_keep2` "half full is fine".
+- Scoring: `a_wall0` "one star, alone", `a_wall1` "neighbours pay", `chain0` "ten stars!", `a_pen` "the cracks cost".
+- End and winner (climax): `bonus` "the wall is whole", `final` "the king's seal" with Mother Ochre's reaction.
