@@ -23,11 +23,13 @@ GAMES = {
     "cauldron-fair":    ("cauldron-fair",        "python3 build.py", "cauldron-fair.html"),
     "crown-city-smash": ("kot",                  "python3 build.py", "kot2.html"),
     "doorkick-dungeon": ("munch",                "python3 build.py", "doorkick.html"),
+    "emberclimb":       ("emberclimb",           "python3 build.py", "emberclimb.html"),
     "final-approach":   ("final-approach/game",  "python3 build.py", "final-approach.html"),
     "hollowbough":      ("hollowbough/game",     "python3 build.py", "hollowbough.html"),
     "kaiten-kitchen":   ("kaiten/game",          "python3 build.py", "kaiten.html"),
     "lantern-dive":     ("lantern-dive/game",    "python3 build.py", "lantern-dive.html"),
     "nebula-aces":      ("xw",                   "python3 build.py", "nebula.html"),
+    "redline-rally":    ("redline-rally",        "python3 build.py", "redline-rally.html"),
     "rampart-and-vine": ("carc/game/src",        "python3 build.py", "../rampart.html"),
     "sands-of-qamar":   ("ft/src",               "python3 build.py", "../sands.html"),
     "shipwreck-isle":   ("rc",                   "python3 build.py", "shipwreck.html"),
@@ -35,6 +37,7 @@ GAMES = {
     "sunglaze":         ("azul/game/src",        "python3 build.py", "../sunglaze.html"),
     "thornbound":       ("thornbound/game",      "python3 build.py", "thornbound.html"),
     "tidewake":         ("tidewake/game",        "python3 build.py", "tidewake.html"),
+    "twin-thrones":     ("twin-thrones",         "python3 build.py", "twin-thrones.html"),
 }
 
 # slug -> (dir relative to games-src with the game's own sweeps, [scripts]). Full run = the script's own default size (the gate); QUICK=1 makes it 4 games.
@@ -42,11 +45,13 @@ SWEEPS = {
     "cauldron-fair":    ("cauldron-fair",       ["sweep.js", "rotate-test.js"]),
     "crown-city-smash": ("kot",                 ["sweep.js"]),
     "doorkick-dungeon": ("munch",               ["sweep.js"]),
+    "emberclimb":       ("emberclimb",          ["sweep.js"]),
     "final-approach":   ("final-approach/game", ["sweep.js"]),
     "hollowbough":      ("hollowbough/game",    ["sweep.js"]),
     "kaiten-kitchen":   ("kaiten/game",         ["sweep.js"]),
     "lantern-dive":     ("lantern-dive/game",   ["sweep.js", "rotate-test.js"]),
     "nebula-aces":      ("xw",                  ["sweep.js"]),
+    "redline-rally":    ("redline-rally",       ["rules-test.js"]),
     "rampart-and-vine": ("carc/game",           ["sweep.js", "rotate-test.js"]),
     "sands-of-qamar":   ("ft",                  ["sweep.js", "rotate-test.js"]),
     "shipwreck-isle":   ("rc",                  ["sweep.js"]),
@@ -54,6 +59,7 @@ SWEEPS = {
     "sunglaze":         ("azul/game",           ["sweep.js", "rotate-test.js"]),
     "thornbound":       ("thornbound/game",     ["sweep.js"]),
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
+    "twin-thrones":     ("twin-thrones",        ["rules-test.js"]),
 }
 PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
 TIMES = []   # (slug, check, seconds)

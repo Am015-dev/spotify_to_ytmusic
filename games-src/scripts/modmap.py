@@ -24,11 +24,13 @@ GAMES = {
     "cauldron-fair":    ("Cauldron Fair",    "cauldron-fair",       "cauldron-fair"),
     "crown-city-smash": ("Crown City Smash", "kot",                 "kot"),
     "doorkick-dungeon": ("Doorkick Dungeon", "munch",               "munch"),
+    "emberclimb":       ("Emberclimb",       "emberclimb",          "emberclimb"),
     "final-approach":   ("Final Approach",   "final-approach/game", "final-approach"),
     "hollowbough":      ("Hollowbough",      "hollowbough/game",    "hollowbough"),
     "kaiten-kitchen":   ("Kaiten Kitchen",   "kaiten/game",         "kaiten"),
     "lantern-dive":     ("Lantern Dive",     "lantern-dive/game",   "lantern-dive"),
     "nebula-aces":      ("Nebula Aces",      "xw",                  "xw"),
+    "redline-rally":    ("Redline Rally",    "redline-rally",       "redline-rally"),
     "rampart-and-vine": ("Rampart and Vine", "carc/game/src",       "carc"),
     "sands-of-qamar":   ("Sands of Qamar",   "ft/src",              "ft"),
     "shipwreck-isle":   ("Shipwreck Isle",   "rc",                  "rc"),
@@ -36,6 +38,7 @@ GAMES = {
     "sunglaze":         ("Sunglaze",         "azul/game/src",       "azul"),
     "thornbound":       ("Thornbound",       "thornbound/game",     "thornbound"),
     "tidewake":         ("Tidewake",         "tidewake/game",       "tidewake"),
+    "twin-thrones":     ("Twin Thrones",     "twin-thrones",        "twin-thrones"),
     "mainhattan-nightrun": ("Mainhattan Nightrun", "nightrun/parts", "nightrun"),
 }
 MAP_DIR = {"mainhattan-nightrun": "nightrun"}   # where MODULES.md goes when not the build dir
