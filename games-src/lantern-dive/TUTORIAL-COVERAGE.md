@@ -36,3 +36,9 @@ broken job (win1, lost), 3 Second try: pings, last trick, following (ping2..win3
   - The logbook / Log drawer
   - Limit dives (dive 8, 12, 20, 21, 23, 27) and Descent boss curses (our own mode)
   Reason: each needs its own staged deal and 3-6 extra steps; time-boxed (110 min). A second tutorial run through the special dives is the next task.
+
+## Story beat per step (W390 prologue; guide Brack, rival Dag, crewmate Sumi)
+goal: bay nets tangled, one crew | cmd: "Captain's privilege" | take: Dag needs the nets cleared | mates: Dag grabs the first-trick job, "don't you dare win it" |
+flare: flare locker, calm water | ping: radio silence | readping: Sumi signals | lead: first trick | win1: Dag stares | lost: "Net snags!" (payoff of the lesson: a broken job) |
+ping2: second try, tell Dag the trick is his | lead2: lead low | win2: Dag cheers "Ha, thanks!" | done1: job done | last/lastx: Brack's logbook | follow: Dag leads Kelp |
+win3: Sumi grins | trump: Lanterns | win4: "Show-off!" says Sumi | won: "Nets free! Logbook signed. You're a diver now." then the end card points at the carved stones (chapter 1).
