@@ -17,6 +17,8 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html'); const TAG 
     for (let k = 0; k < 2; k++) { const g = page.locator('#mk .glow').first(); if (await g.count()) { await tap(g); await page.waitForTimeout(400); const a = page.locator('#tv .acts .btn').first(); if (await a.count()) await tap(a); await page.waitForTimeout(1200); } }
     const e = page.locator('#endB'); if (await e.count() && await e.isVisible()) await tap(e);
     await page.waitForTimeout(700); await shot('4rival'); await page.waitForTimeout(900); await shot('4rival2');
+    for (let i = 0; i < 40 && !(await page.evaluate(() => myTurn())); i++) await page.waitForTimeout(300);
+    await page.waitForTimeout(1200); await shot('6myturn'); const sg = page.locator('#store .tilebtn.glow').first(); if (await sg.count()) { await tap(sg); await page.waitForTimeout(500); await shot('6build'); }
     await page.goto(URL + '?scn=vb-result'); await page.waitForTimeout(2500); await shot('5result');
     console.log(name, 'errors', errs.length, errs.slice(0, 2).join(' | '));
     await ctx.close();

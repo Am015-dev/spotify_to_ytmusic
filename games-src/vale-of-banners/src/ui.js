@@ -190,7 +190,7 @@ function renderMarket() {
     G.depots[d].forEach(function (t, k) {
       if (!t) { tl.appendChild(h('div.hx.empty', { style: 'background:rgba(255,255,255,.08)', 'aria-hidden': 'true' })); return; }
       var lg = mt ? legalTakeFor(d, k) : [], b = h('button.tilebtn' + (lg.length ? '.glow' : ''), { type: 'button', id: 'mt-' + d + '-' + k, 'aria-label': VB.tileName(t) + ' in stall ' + d, onclick: function () { tapMarket(d, k); } }, [hexEl(t)]); labelled(b, t);
-      var best = pick(lg.slice()); if (best && best.w) b.appendChild(h('span.cost', { text: '+' + best.w }));
+      var best = pick(lg.slice()); if (best && best.w) b.appendChild(h('span.cost', { text: '👷' + best.w, title: 'Costs ' + best.w + ' worker' + (best.w > 1 ? 's' : '') }));
       tl.appendChild(b);
     });
     st.appendChild(tl);
@@ -224,7 +224,7 @@ function renderEstate(box, seat, s) {
     var hx = t ? hexEl(t) : hexEl(null, { col: c.col });
     if (!t && !m) hx.style.filter = 'saturate(.55) brightness(1.18)';
     b.appendChild(hx); b.appendChild(h('span.num' + (c.col === 'castle' || c.col === 'ship' || c.col === 'mine' ? '.lt' : ''), { text: c.num }));
-    if (m && m.w) b.appendChild(h('span.cost', { text: '+' + m.w }));
+    if (m && m.w) b.appendChild(h('span.cost', { text: '👷' + m.w }));
     if (!box) b.addEventListener('click', function () { tapCell(c.i); });
     es.appendChild(b);
   });
@@ -363,7 +363,7 @@ function tapStore(i) {
   if (myTurn() && top && top.t === 'discard') { showTile(t, [{ label: 'Drop this tile', fn: function () { doMove({ k: 'discard', s: i }); } }]); return; }
   var can = myTurn() && storeLegal(i);
   if (can && (UI.sel === i)) { UI.sel = null; render(); return; }
-  if (can) { UI.sel = i; render(); toast('Tap a glowing space'); return; }
+  if (can) { UI.sel = i; render(); return; }
   var c = VB.CELLS.filter(function (x) { return x.col === t.t && !p.estate[x.i]; });
   showTile(t, [], !c.length ? 'No free ' + VB.COLNAME[t.t] + ' space left on your estate.' : VB.placeTargets(p, t, 0).length ? 'Build it on a ' + VB.COLNAME[t.t] + ' space next to your land; the die must show that space\'s number.' : 'No ' + VB.COLNAME[t.t] + ' space touches your land yet.');
 }
