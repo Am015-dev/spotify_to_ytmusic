@@ -50,7 +50,8 @@ function quiltEl(seat, cls) {
     if (UI.newCells[seat + ':' + i]) c.classList.add('new');
     q.appendChild(c);
   }
-  if (artBg(q, 'quilt-frame')) { q.classList.add('art'); q.style.backgroundSize = '100% 100%'; }
+  if (UI.useQuiltFrame && artBg(q, 'quilt-frame')) { // W381: the temp/free frame draws a panel that does not line up with the 9x9 grid; off until real art
+    q.classList.add('art'); q.style.backgroundSize = '100% 100%'; }
   q.setAttribute('aria-label', nameOf(seat) + ' quilt: ' + swEmpty(board) + ' empty squares');
   return q;
 }
