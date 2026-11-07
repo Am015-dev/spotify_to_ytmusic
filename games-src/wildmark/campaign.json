@@ -56,6 +56,18 @@
    "portrait": "portrait-warden.webp",
    "emoji": "🔥",
    "color": "#a3402d"
+  },
+  "frost": {
+   "name": "The Frost",
+   "portrait": "portrait-frost.webp",
+   "emoji": "❄️",
+   "color": "#4f6fa3"
+  },
+  "snowline": {
+   "name": "The Snowline",
+   "portrait": "portrait-snowline.webp",
+   "emoji": "🏔️",
+   "color": "#8d8f9c"
   }
  },
  "acts": [
@@ -116,9 +128,9 @@
    ],
    "opponent": {
     "name": "The Frost",
-    "portrait": "portrait-ward.webp",
+    "portrait": "portrait-frost.webp",
     "emoji": "❄️",
-    "cast": "ward",
+    "cast": "frost",
     "personality": "No rival: just you against the season.",
     "aiLevel": "easy",
     "aiStyle": "standard"
@@ -632,9 +644,9 @@
    ],
    "opponent": {
     "name": "The Snowline",
-    "portrait": "portrait-ward.webp",
+    "portrait": "portrait-snowline.webp",
     "emoji": "🏔️",
-    "cast": "ward",
+    "cast": "snowline",
     "personality": "No rival: a short, hard season.",
     "aiLevel": "easy",
     "aiStyle": "standard"

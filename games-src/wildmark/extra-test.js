@@ -10,6 +10,19 @@ const URL = 'file://' + __dirname + '/wildmark.html';
     await p.goto(URL + '?fast=1'); await tap('#quickB'); await tap('.seg[data-k="humans"] .sg[data-v="2"]'); await tap('.seg[data-k="opp"] .sg[data-v="1"]'); await tap('#goB');
     for (let t = 0; t < 6; t++) { await p.waitForFunction(() => !document.getElementById('pass').hidden || (G.seats[G.cur].ai === null && G.stage === 'pick'), null, { timeout: 20000 }); if (await p.locator('#passB').isVisible()) { if (t === 1) await p.screenshot({ path: `shots/pass-${name}.png` }); await tap('#passB'); } const who = await p.evaluate(() => G.cur); await humanTurn(p, tap); ok(await p.evaluate(w => G.seats[w].done >= 1, who), name + ' hot-seat turn by seat ' + who); }
     ok(await p.evaluate(() => G.seats[0].done === 3 && G.seats[1].done === 3), name + ' hot-seat both humans played 3 turns');
+    // large view: tap a placed tile, hold a market tile; menu items
+    await p.waitForFunction(() => !G.seats[G.cur].ai && G.stage === 'pick' && document.getElementById('pass').hidden || !document.getElementById('pass').hidden);
+    if (await p.locator('#passB').isVisible()) await tap('#passB');
+    await tap('#map .hx'); await p.waitForTimeout(300); ok(await p.evaluate(() => GX.open === 'bigd' && /Accepts/.test(document.querySelector('#bigd').textContent)), name + ' tap a placed tile shows it large with text');
+    await p.evaluate(() => GX.close()); await p.waitForTimeout(250);
+    const bb = await p.locator('#mk .mt').first().boundingBox();
+    if (touch) { await p.dispatchEvent('#mk .mt >> nth=0', 'pointerdown', { pointerType: 'touch' }); await p.waitForTimeout(700); } else { await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await p.mouse.down(); await p.waitForTimeout(700); await p.mouse.up(); }
+    ok(await p.evaluate(() => GX.open === 'bigd' && G.stage === 'pick'), name + ' hold a market tile shows it large (no take)');
+    await p.evaluate(() => GX.close()); await p.waitForTimeout(250);
+    await tap('[data-gx="setd"]'); await p.waitForTimeout(300);
+    const menu = await p.evaluate(() => document.getElementById('setd').textContent);
+    ok(['Restart', 'Title screen', 'Rules', 'Tutorial', 'Sound', 'Music'].every(w => menu.includes(w)), name + ' menu has Restart, Title, Rules, Tutorial, Sound, Music');
+    await p.evaluate(() => GX.close());
     // boss twist
     const tw = await p.evaluate(() => { UI.fast = true; campStart(CAMPAIGN.chapters[2]); return [G.seats[1].acorns, G.seats[1].name, UI.mode]; });
     ok(tw[0] === 2 && tw[1] === 'Bram Hollowell' && tw[2] === 'camp', name + ' boss c3 twist: rival acorns ' + tw.join(','));

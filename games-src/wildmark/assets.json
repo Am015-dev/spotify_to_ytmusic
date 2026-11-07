@@ -299,6 +299,28 @@
    "prompt": "Bust portrait, head and shoulders, plain soft green background: a cold figure in an ash-grey hooded cloak holding a smouldering lantern."
   },
   {
+   "stem": "portrait-frost",
+   "kind": "portrait",
+   "w": 768,
+   "h": 768,
+   "ratio": "1:1",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Story portrait of frost",
+   "prompt": "Bust portrait, head and shoulders, plain soft green background: a winter spirit made of swirling frost and snowflakes, soft blue glow, no face details."
+  },
+  {
+   "stem": "portrait-snowline",
+   "kind": "portrait",
+   "w": 768,
+   "h": 768,
+   "ratio": "1:1",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Story portrait of snowline",
+   "prompt": "Bust portrait, head and shoulders, plain soft green background: a snowy mountain ridge personified as a calm white mountain goat silhouette against a pale sky."
+  },
+  {
    "stem": "card-bear-b",
    "kind": "card",
    "w": 600,
@@ -484,6 +506,17 @@
    "wave": 3,
    "slot": "#rs result panel after a loss",
    "prompt": "A quiet valley at dusk with soft rain, a lone fox looking at a distant ridge, calm and hopeful."
+  },
+  {
+   "stem": "icon-logo",
+   "kind": "icon",
+   "w": 256,
+   "h": 256,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 3,
+   "slot": "top bar logo (Wildmark crest)",
+   "prompt": "One hexagon-shaped wooden crest on plain white with a carved pine tree and mountain, centred, simple and bold."
   }
  ]
 }

@@ -1,0 +1,60 @@
+{
+ "cues": {
+  "menu": {
+   "prompt": "Gentle acoustic folk instrumental for a cozy nature board game: warm fingerpicked guitar, soft flute and light hand percussion, morning in a mountain valley, calm and inviting. 90 seconds, seamless loop. No vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "menu.mp3",
+   "files": [
+    "menu-a.mp3",
+    "menu-b.mp3"
+   ],
+   "length": "90 s seamless loop",
+   "slot": "menu"
+  },
+  "main": {
+   "prompt": "Gentle acoustic folk instrumental for a cozy nature board game: relaxed thinking music, light piano and mandolin over a soft pad, steady tempo, unobtrusive so players can concentrate. 2 minutes, seamless loop. No vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "main.mp3",
+   "files": [
+    "main-a.mp3",
+    "main-b.mp3"
+   ],
+   "length": "120 s seamless loop",
+   "slot": "main"
+  },
+  "victory": {
+   "prompt": "Gentle acoustic folk instrumental for a cozy nature board game: short bright fanfare on fiddle and acoustic guitar with a cheerful flute flourish, sunlit and triumphant. 8 to 12 seconds, ends cleanly. No vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "victory.mp3",
+   "files": [
+    "victory-a.mp3",
+    "victory-b.mp3"
+   ],
+   "length": "8-12 s, plays once",
+   "slot": "victory"
+  },
+  "defeat": {
+   "prompt": "Gentle acoustic folk instrumental for a cozy nature board game: short soft ending on solo cello and harp, gentle and hopeful rather than sad, like dusk rain. 6 to 10 seconds, ends cleanly. No vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "defeat.mp3",
+   "files": [
+    "defeat-a.mp3",
+    "defeat-b.mp3"
+   ],
+   "length": "6-10 s, plays once",
+   "slot": "defeat"
+  }
+ }
+}

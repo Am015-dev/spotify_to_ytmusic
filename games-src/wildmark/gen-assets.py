@@ -22,11 +22,13 @@ CARDS = {"bear": ("Twin Dens", "two brown bears resting side by side outside a d
 for a, (n, p) in CARDS.items(): add("card-%s-a" % a, "card", 600, 840, "5:7", False, 2, "scoring card %s (cards drawer, rules)" % n, "Portrait card illustration with a cream border: " + p + ".")
 MORE = {"sorrel": "a tall meadow keeper with a straw hat and a sheaf of grass", "quill": "a precise surveyor woman with round glasses, a long dark coat and a feather pen", "linnet": "a quick bird-watcher with binoculars and a blue scarf",
         "oake": "an ancient calm forester with bark-brown skin and moss in grey hair", "warden": "a cold figure in an ash-grey hooded cloak holding a smouldering lantern"}
+MORE.update({"frost": "a winter spirit made of swirling frost and snowflakes, soft blue glow, no face details", "snowline": "a snowy mountain ridge personified as a calm white mountain goat silhouette against a pale sky"})
 for c, p in MORE.items(): add("portrait-" + c, "portrait", 768, 768, "1:1", False, 2, "Story portrait of " + c, "Bust portrait, head and shoulders, plain soft green background: " + p + ".")
 for s, sub in (("b", "a variant scene"), ("c", "a second variant scene"), ("d", "a third variant scene")):
     for a, (n, p) in CARDS.items(): add("card-%s-%s" % (a, s), "card", 600, 840, "5:7", False, 2 if s == "b" else 3, "scoring card %s, set %s (next card sets)" % (n, s.upper()), "Portrait card illustration with a cream border, %s of %s." % (sub, p))
 add("result-win", "bg", 1600, 900, "16:9", False, 3, "#rs result panel after a win", "A sunlit valley full of animals: elk in a meadow, bears by a river, hawks overhead, golden evening light.")
 add("result-lose", "bg", 1600, 900, "16:9", False, 3, "#rs result panel after a loss", "A quiet valley at dusk with soft rain, a lone fox looking at a distant ridge, calm and hopeful.")
+add("icon-logo", "icon", 256, 256, "1:1", True, 3, "top bar logo (Wildmark crest)", "One hexagon-shaped wooden crest on plain white with a carved pine tree and mountain, centred, simple and bold.")
 json.dump({"style": STYLE, "items": I}, open(D / "assets.json", "w"), indent=1)
 out = D.parent / "next-wave" / "flow-2d" / "wildmark"; out.mkdir(parents=True, exist_ok=True)
 groups = collections.defaultdict(dict)

@@ -137,3 +137,6 @@ html body .gxc-lock{font-size:0!important;width:18px;height:18px;border-radius:5
   html body :is(.gxc-lab,.gxc-act b,.gxc-act small,.gx-set-nav .gx-chip,.gx-row-l small,.gxc-dim,.gxc-st-t,.gxc .gxc-ib){font-size:16px!important}
 }
 #start.hasart{background-color:#13201a}
+.bigv{text-align:center}.bigpic{display:flex;justify-content:center;margin:6px 0 10px}.bigpic svg{width:180px;height:180px}
+.bigv p{text-align:left}
+.ic.hasart svg{visibility:hidden}.ic{display:inline-block;width:26px;height:26px}

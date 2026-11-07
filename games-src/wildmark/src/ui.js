@@ -128,6 +128,8 @@ function onMarket(kind, i) {
 }
 function take(m) { UI.undo = WM.clone(G); sfx('tap'); WM.apply(G, m); UI.ghost = null; render(); fitView(); }
 function onCell(c, isSpot) {
+  var vx = G && G.seats[UI.view].env[c];
+  if (vx && !isSpot && (!myTurn() || G.stage === 'pick' || (G.stage === 'tile' && !(UI.ghost && UI.ghost.c === c)))) { showBig('tile', vx, vx.tok); return; }
   if (!myTurn()) return;
   if (G.stage === 'tile') {
     if (UI.ghost && UI.ghost.c === c) { rotate(); return; }
@@ -136,7 +138,7 @@ function onCell(c, isSpot) {
     UI.ghost = { c: c, rot: bestRot(c) }; sfx('tap'); render(); return;
   }
   if (G.stage === 'tok') {
-    var x = G.seats[G.cur].env[c]; if (!x || x.tok || x.a.indexOf(G.hold.tok) < 0) { toast(an(G.hold.tok).replace(/^a/, 'A') + ' needs an empty tile showing it.'); return; }
+    var x = G.seats[G.cur].env[c]; if (x && (x.tok || x.a.indexOf(G.hold.tok) < 0) && !isSpot) { showBig('tile', x, x.tok); return; } if (!x || x.tok || x.a.indexOf(G.hold.tok) < 0) { toast(an(G.hold.tok).replace(/^a/, 'A') + ' needs an empty tile showing it.'); return; }
     if (!tutOK({ what: 'tok', c: c })) return;
     act({ t: 'tok', c: c });
   }
@@ -286,6 +288,27 @@ var RULES_HTML = '<h3>Goal</h3><p>Over 20 turns, grow a valley of habitat tiles 
   '<h3>Scoring</h3><p>Each animal scores by its card (below). Each terrain scores 1 point per tile in your largest connected habitat of it (edges must match). The largest habitat of each terrain earns a bonus: 2 players 2 (tie 1), 3-4 players 3 for first and 1 for second. Solo: 2 for a habitat of 7+.</p>' +
   '<h3>Solo</h3><p>After each turn the rightmost tile and token left in the market are removed.</p>' +
   '<h3>Ties</h3><p>Most acorns left wins a tie.</p>';
+// ---------------------------------------------------------------- large view: tap a placed tile (when it is not a target) or hold a market tile/token
+function tileText(t, tok) {
+  var h = '<p><b>' + t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + '</b> tile' + (t.key ? ', a <b>keystone</b>: an animal placed here earns an acorn.' : (t.t.length > 1 ? '. Each half counts for its own terrain; edges must match to join a habitat.' : '.')) + '</p>';
+  h += '<p>Accepts: ' + t.a.map(function (a) { return WM.ANI_NAME[a]; }).join(', ') + '.</p>';
+  if (tok) h += '<p>Home to a <b>' + WM.ANI_NAME[tok] + '</b> (' + esc(WM.CARDS[tok].title) + ': ' + esc(WM.CARDS[tok].rule) + ')</p>';
+  return h;
+}
+function showBig(kind, obj, tok) {
+  var body = document.createElement('div'); body.className = 'bigv';
+  if (kind === 'tile') body.innerHTML = '<div class="bigpic">' + mkTile(obj, 60) + '</div>' + tileText(obj, tok);
+  else { var C = WM.CARDS[obj]; body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : '0 to 5 per fox') + '</p>'; }
+  GX.drawer('bigd', kind === 'tile' ? 'Habitat tile' : 'Animal token', body, false); GX.show('bigd');
+}
+(function wireHold() {
+  var t = null, held = false;
+  document.addEventListener('pointerdown', function (e) { var b = e.target.closest && e.target.closest('#mk .mt, #mk .mk'); if (!b || !G) return; held = false; clearTimeout(t);
+    t = setTimeout(function () { var i = +b.dataset.i; held = true; if (b.classList.contains('mt')) { if (G.market.tiles[i]) showBig('tile', G.market.tiles[i]); } else if (G.market.toks[i]) showBig('tok', G.market.toks[i]); }, 520); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { document.addEventListener(ev, function () { clearTimeout(t); }, true); });
+  document.addEventListener('click', function (e) { if (held && e.target.closest && e.target.closest('#mk')) { held = false; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+  document.addEventListener('contextmenu', function (e) { if (e.target.closest && e.target.closest('#mk')) e.preventDefault(); });
+})();
 // ---------------------------------------------------------------- result
 function showResult() {
   if (!G || !G.over || UI.resultShown === G.seed + ':' + G.logN) return; UI.resultShown = G.seed + ':' + G.logN;
@@ -366,7 +389,7 @@ function boot() {
   GX.onShow = function (id) { if (id === 'scored') $('#scoresb').innerHTML = G ? scoresHTML() : '<p>No game yet.</p>'; if (id === 'rulesd' && !$('#rulesd .gx-drawer-body').innerHTML.trim()) openRules(); };
   try {
     GX.settings({ id: 'setd', title: 'Menu',
-      game: function (S) { var a = document.createElement('button'); a.type = 'button'; a.className = 'gx-sb'; a.textContent = 'Title screen'; a.onclick = function () { GX.close(); UI.sv = 'title'; showTitle(); }; var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'gx-sb'; b2.textContent = 'New game'; b2.onclick = function () { GX.close(); UI.sv = 'setup'; showTitle(); }; S.appendChild(GX.row('This game', [a, b2])); },
+      game: function (S) { var a = document.createElement('button'); a.type = 'button'; a.className = 'gx-sb'; a.textContent = 'Title screen'; a.onclick = function () { GX.close(); UI.sv = 'title'; showTitle(); }; var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'gx-sb'; b2.textContent = 'New game'; b2.onclick = function () { GX.close(); UI.sv = 'setup'; showTitle(); }; var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'gx-sb'; rs.textContent = 'Restart'; rs.onclick = function () { GX.close(); if (UI.mode === 'camp' && UI.camp) campStart(UI.camp); else if (UI.cfg && UI.mode === 'quick') newGame(Object.assign({}, UI.cfg, { seed: null })); else { UI.sv = 'setup'; showTitle(); } }; S.appendChild(GX.row('This game', [rs, b2, a])); },
       sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(!UI.prefs.mute, function (v) { UI.prefs.mute = !v; savePrefs(); }))); if (window.GXMUS) { var m = document.createElement('button'); m.type = 'button'; m.className = 'gx-sb'; m.textContent = 'Music'; m.onclick = function () { GXMUS.open(); }; S.appendChild(GX.row('Music', [m])); } },
       help: function (S) { var r = document.createElement('button'); r.type = 'button'; r.className = 'gx-sb'; r.textContent = 'Rules'; r.onclick = function () { GX.close(); setTimeout(openRules, 50); }; var tu = document.createElement('button'); tu.type = 'button'; tu.className = 'gx-sb'; tu.textContent = 'Tutorial'; tu.onclick = function () { GX.close(); tutStart(); }; S.appendChild(GX.row('Read', [r, tu])); },
       about: { name: 'Wildmark', version: '1.0', text: 'Original names, rules text and art.' } });
