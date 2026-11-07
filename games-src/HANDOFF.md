@@ -5,6 +5,7 @@ Older notes (everything from "Nightrun TIMING" down, and all shelf-wide history)
 ## New games: pick only from the top ranked board games (owner, 7 Nov 2026: "I want top board games from now on")
 
 - Suggest and build new shelf games only from the current top of the overall board game rankings, not niche picks. Owner chooses from the list.
+- Never build from scratch (owner, 7 Nov 2026: "don't reinvent the wheel"): copy the closest finished shelf game (shell, campaign, tutorial, help, menu, loader, tests, shared mechanics) and adapt it; use permissively licensed open-source rules/AI code only with THIRD-PARTY.md. Wire every made asset (3D models, pictures, music, sprite sheets) before asking for new ones.
 
 ## Start here (31 Oct 2026, Nightrun)
 
