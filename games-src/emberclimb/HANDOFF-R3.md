@@ -38,3 +38,14 @@
    Credits: ASSETS.md bottom + Menu > About. **Deploy copy step:** `cp games-src/emberclimb/temp-art/*.webp games/emberclimb/media/` BEFORE build-all (build only requests stems whose file exists), then run
    `stamp-copyright.py`. Do not copy `CREDITS.md` / `credits.txt`. A Flow file with the same stem replaces any of them. Regenerate: `git clone --depth 1 https://github.com/game-icons/icons.git <dir>; node tools/temp-art.js <dir>`.
    Not yet drawn (code placeholder only): backgrounds, the 100+ card pictures, dice, fx, gems, card back, events.
+
+## Found -> fixed (W363)
+- Story intro/outro scenes: Skip button sat on top of Next on every scene. Cause: the game's old `.ghost` CSS rule (position:fixed, unused) matched the shared `.gxc-btn.ghost`. Renamed to `.ec-ghost`.
+- Audit A on PC for Menu tab chips (14.1px) and one row hint (14.4px) -> 16px at >= 1024 (game CSS override).
+- Result screen was a bare "New climb" button with no cause, deck or relics -> rebuilt (see Done 1); the Story result now uses the same screen.
+- Intent bubble showed only a skull for every debuff or junk move -> per-kind icons plus tap-to-explain.
+- Local test setup: Playwright 1.56.1 wants a browser build that is not installed; symlink `/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell` to the 1243 headless shell. A local `media/` folder makes the build ask for files the staging server does not serve (build-all then FAILs with 404s): do not leave one in `games-src/emberclimb/`.
+
+## Open
+- Audit (phone-s / phone / pc, A-F): Game surface 0 on all. Remaining items are all the shared Menu panel: tab chips flagged "dead button" (they scroll the panel, no DOM change) and "Music" label contrast 3.0:1 at phone-s. Shared kit, not fixed here. The earlier End-turn-on-guide-replay E item no longer appears now that the audit waits for the menu walk.
+- Real-tap runs: Quick defeat on phone (390x763) and Quick climb to a defeat on PC (1440x860) show the new result screen, tapping a deck card opens the large card. A Quick victory by tapping was not reached by the simple bot (it dies); the victory screen was checked through `?scn=ec-result` plus the Story run below.
