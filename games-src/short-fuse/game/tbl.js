@@ -163,14 +163,14 @@ function balance(root,tw,g){root.querySelectorAll('.stand').forEach(st=>{const n
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;
   const crew=document.getElementById('crew'),mine=document.getElementById('mine'),felt=document.getElementById('felt'),gear=document.getElementById('gear');
   document.documentElement.classList.toggle('short',window.innerHeight<640);
-  const land=W>H*1.15&&W>=600;tb.classList.toggle('land',land);
+  const land=W>H*1.15&&W>=600;const big=W>=900&&H>=700;tb.classList.toggle('land',land);
   const plate=window.innerHeight<640?20:24;
   const cs=[...crew.querySelectorAll('.sg')].map(s=>[...s.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length));
   const ms=[...mine.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length);
   const used0=[...tb.children].filter(e=>e!==felt&&e!==mine&&getComputedStyle(e).position!=='absolute'&&!e.hidden).reduce((a,e)=>a+e.offsetHeight,0);
-  const gh=gear.offsetHeight,cw=W-12;const maxM=land?52:60;
-  const crewFit=ch=>{if(land&&cs.length>1){const half=Math.ceil(cs.length/2);return Math.min(fitSize(cs.slice(0,half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:22,max:54,plate,seatGap:6}),fitSize(cs.slice(half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:22,max:54,plate,seatGap:6}))}
-    return fitSize(cs,cw,ch,{gap:3,ratio:1.3,min:22,max:land?54:56,plate,seatGap:6})};
+  const gh=gear.offsetHeight,cw=W-12;const maxM=big?92:land?52:60;
+  const crewFit=ch=>{if(land&&cs.length>1){const half=Math.ceil(cs.length/2);return Math.min(fitSize(cs.slice(0,half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:22,max:big?88:54,plate,seatGap:6}),fitSize(cs.slice(half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:22,max:big?88:54,plate,seatGap:6}))}
+    return fitSize(cs,cw,ch,{gap:3,ratio:1.3,min:22,max:big?88:land?54:56,plate,seatGap:6})};
   const setMine=tw=>{mine.style.setProperty('--tw',tw+'px');mine.style.setProperty('--th',Math.round(tw*1.32)+'px');balance(mine,tw,4)};
   let tm=0,t1=0;crew.classList.toggle('two',land&&cs.length>1);
   if(ms.length){mine.style.maxHeight='';mine.style.overflow='';
@@ -190,11 +190,11 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
 function renderOverlays(V){const ov=document.getElementById('over'),cv=document.getElementById('cover');if(!ov||!cv)return;
   const p=G.over?-1:passTo();
   if(UI.brief&&!G.over){const n=G.mission,M=MISSIONS[n];const chips=ruleChips(n).slice(0,4);cv.hidden=false;
-    const h=`<div class="card2 briefc"><div class="bn">${n}</div><h2>${esc(M.nm)}</h2><div class="bch">${chips.map(c=>`<span class="rc">${ico(c[0])}<b>${esc(c[1])}</b></span>`).join('')}</div><button class="big go" data-a="briefok">Go</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=paintHTML(h)}}
+    const h=`<div class="card2 briefc"><div class="bn">${n}</div><h2>${esc(M.nm)}</h2><p class="bflav">${esc(STORY.quick.flavour[n%STORY.quick.flavour.length])}</p><p class="bgoal">Cut all ${G.st.reduce((x,st)=>x+st.w.length,0)} wires together. The fuse has ${G.dial} steps.</p><div class="bch">${chips.map(c=>`<span class="rc">${ico(c[0])}<b>${esc(c[1])}</b></span>`).join('')}</div><button class="big go" data-a="briefok">Go</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=paintHTML(h)}}
   else if(p>=0){cv.hidden=false;const h=`<div class="card2 pass"><h2>${esc(nm(p))}</h2><button class="big go" data-a="take" data-seat="${p}">${ico('eye')}I am ${esc(nm(p))}</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=h}}
   else{cv.hidden=true;cv._s=''}
   if(G.over){if(UI.camp&&UI.campShown){ov.hidden=true}else{ov.hidden=false;const w=!!G.over.win;const next=G.mission<66?G.mission+1:null;const why=w?'':overWhy(G.over.why);
-    const h=`<div class="card2 end ${w?'win':'lose'}"><div class="endart" aria-hidden="true"></div><h2>${w?'DEFUSED!':'BOOM!'}</h2>${why?`<p>${esc(why)}</p>`:''}${isClient()?'<p>Wait for the host</p>':`<div class="row">${w&&next&&!UI.camp?`<button class="big go" data-a="next">${ico('fwd')}Next job</button>`:''}<button class="big${w&&next&&!UI.camp?'':' go'}" data-a="again">${ico('flip')}Again</button><button class="big" data-a="board">${ico('map')}Jobs</button></div>`}</div>`;
+    const h=`<div class="card2 end ${w?'win':'lose'}"><div class="endart" aria-hidden="true"></div><h2>${w?'DEFUSED!':'BOOM!'}</h2>${why?`<p>${esc(why)}</p>`:''}<p class="endline">${esc((w?STORY.quick.win:STORY.quick.lose)[G.mission%3])}</p><p class="endstat">${G.stats.turns||G.turn} turns · ${G.stats.miss||0} miss${(G.stats.miss||0)===1?'':'es'} · ${G.st.reduce((x,st)=>x+st.w.filter(q=>q.cut).length,0)}/${G.st.reduce((x,st)=>x+st.w.length,0)} wires cut</p>${isClient()?'<p>Wait for the host</p>':`<div class="row">${w&&next&&!UI.camp?`<button class="big go" data-a="next">${ico('fwd')}Next job</button>`:''}<button class="big${w&&next&&!UI.camp?'':' go'}" data-a="again">${ico('flip')}Again</button><button class="big" data-a="board">${ico('map')}Jobs</button></div>`}</div>`;
     if(ov._s!==h){ov._s=h;ov.innerHTML=h}}}
   else{ov.hidden=true;ov._s=''}}
 function paintHTML(h){return h}
