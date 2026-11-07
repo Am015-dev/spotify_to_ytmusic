@@ -25,6 +25,7 @@ function campInit() {
 function storyOpen() { if (typeof GXC === 'undefined') return; closeInsp(); if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else { $('#start').hidden = true; GXC.open(); } }
 UIACT.story = () => storyOpen();
 UIACT.tut = () => { try { GX.close(); } catch (e) { } tutStart(); };
+UIACT.start = () => UIACT.tut();   /* first launch: the primary button starts the coached first game */
 // ---------------------------------------------------------------- the guided first round
 // A real game with a fixed hand and market: you play a card, discover a ruin (idol + guardian), buy an item, see the research track, pass,
 // and watch the round end bring a Dread card home. Tamsin (the computer) only digs at camp sites, then passes. Nothing is saved.
