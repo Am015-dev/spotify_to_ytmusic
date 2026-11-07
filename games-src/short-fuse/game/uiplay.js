@@ -25,12 +25,12 @@ const PLAN=`(()=>{if(!G||!UI.started)return {k:'none'};if(G.over)return {k:'over
   if(UI.sel&&UI.sel.mode==='dual'&&UI.sel.tg.length){const t=[...document.querySelectorAll('#mine .tile.glow')][0];return t?{k:'tap',sel:'#mine .tile[data-s="'+t.dataset.s+'"][data-k="'+t.dataset.k+'"]'}:{k:'wait'}}
   const c=document.querySelector('#crew .tile.glow');return c?{k:'tap',sel:'#crew .tile[data-s="'+c.dataset.s+'"][data-k="'+c.dataset.k+'"]'}:{k:'wait'}})()`;
 // plays until the end card shows; returns {over, taps, covered:[...], steps}
-async function playToEnd(p,{touch=true,maxMs=240000,onTurn,log=[]}={}){const t0=Date.now();let taps=0,idle=0,last='';const seen={};
+async function playToEnd(p,{touch=true,maxMs=240000,onTurn,log=[],beforeTap}={}){const t0=Date.now();let taps=0,idle=0,last='';const seen={};
   while(Date.now()-t0<maxMs){
     const pl=await p.evaluate(PLAN);
     if(pl.k==='over'){await sleep(600);const o=await p.evaluate(()=>({win:!!G.over.win,why:G.over.why||'',card:!!document.querySelector('#over:not([hidden]) .end')}));return Object.assign(o,{over:true,taps,log})}
     if(pl.k==='brief'){if(await tapSel(p,'[data-a=briefok]',touch,log)){taps++;await sleep(500)}else await sleep(300);continue}
-    if(pl.k==='tap'){const ok=await tapSel(p,pl.sel,touch,log);if(ok){taps++;idle=0;await sleep(350)}else{idle++;await sleep(250)}
+    if(pl.k==='tap'){if(beforeTap)await beforeTap();const ok=await tapSel(p,pl.sel,touch,log);if(ok){taps++;idle=0;await sleep(350)}else{idle++;await sleep(250)}
       if(idle>40){log.push('stuck tapping '+pl.sel);return {over:false,stuck:pl.sel,taps,log}}continue}
     await sleep(250);idle++;const st=await p.evaluate(()=>G?G.logN+':'+G.turn+':'+(G.q?G.q.kind:''):'');if(st!==last){last=st;idle=0}if(idle>160){log.push('no progress');return {over:false,stuck:'wait',taps,log}}
   }

@@ -23,12 +23,21 @@ Other fixes: banner/pop/captions work in the tutorial too (same grammar as Quick
 
 ## Gate results (final, 7 Nov 2026)
 - `build-all.py --quick short-fuse` PASS; `game/rules-test.js` 101 passed (includes W391's merged stuck-hand fix); `game/playable-test.js` PASS (Quick game + Story stage 1 by touch taps at 390x763, no engine shortcuts);
-  `game/tutor-test.js` PASS at 390x763 and 1440x860 (whole guided prologue, elementFromPoint at every spotlight centre, coverage list matches the steps).
+  `game/coach-test.js` PASS at 390x763 and 1440x860 (replaces the forced-step tutor-test).
 - ui-audit (rules A-F, local build served with the painted media): before phone A11 B15 C1 E4 F1 | phone-s A19 B24 C1 F1 | pc A81 B16 E4 F1;
   after phone A0 B3 C0 D0 E0 F0 | phone-s A0 B11 C0 D0 E0 F0 | pc A0 B5 C0 D0 E0 F0. A, C, D, E, F are 0 everywhere.
   Remaining B (pixel contrast) are text at the very bottom of the painted drawers (the frame overlaps the last line of the Rules and Menu panels) and the name plates on the 375x553 board; not fixed.
 - `game/sweep.js`: the old 8-word status-line rule is now 22 words for the instruction band (two lines); two kit-help-bubble overlap flags remain at 375x553 (the unmodified build shows the same flags there).
 - Console errors: 0 (the game's own page errors; missing optional media in offline runs are filtered).
+
+## Addendum 4 (coached first game, 7 Nov 22:2x UTC)
+The forced-tap tutorial was replaced by a coached first game: a real 3-player job, every legal move allowed from turn 1, the computer crew plays its real moves, no forced taps.
+Brix (or Quill) speaks one non-blocking bubble at a time, just-in-time (rule first matters, after your hit/miss/solo, after a rival solo or hit, gear unlocked, yellow/red in hand, Twin Probe on turn 2).
+The end card walks through the scoring with your real numbers and lists "Things you'll meet later" for rules that never came up. `game/coach-test.js` plays it through the UI at 390x763 and 1440x860 (PASS).
+The old step-based tutorial code (`tutSteps` in tutor.js) is unused; its test was removed.
+
+## Rules (orchestrator note)
+The idle-round guard (four full rounds with no cut explode) is now stated in the help drawer. The "pretend to cut when everything is cut" ruling for job 44 is NOT implemented: the rulebook text was not reachable from this session.
 
 ## Not done / honest notes
 - Tutorial chapters (1 Your first turn, 2 Scoring, 3 Special cases, 4 Defused) are labelled and have story beats, but leaving restarts the staged job (the shell cannot save it): see TUTORIAL-COVERAGE.md.

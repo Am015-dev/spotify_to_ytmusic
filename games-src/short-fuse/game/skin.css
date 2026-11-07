@@ -155,3 +155,17 @@ div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
 #tb .plate b,#tb .plate em{background:#2a1a08!important;color:#fff6dc!important;padding:0 5px;border-radius:5px}
 #tb .plate .star{background:#2a1a08!important;color:#ffe066!important;padding:0 4px;border-radius:5px}
 #tb .plate b,#tb .plate em,#tb .plate .star{display:inline-block;line-height:15px;padding:0 5px}
+
+/* coached tutorial: one bubble, never blocks input */
+#coach{position:fixed;left:50%;transform:translateX(-50%);z-index:60;width:min(360px,calc(100vw - 16px));box-sizing:border-box;display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:14px;background:#fff6dc;color:#1c1408;border:2px solid #d98b2b;box-shadow:0 8px 22px rgba(0,0,0,.45);pointer-events:none;animation:gxh-in .2s ease-out both}
+#coach .cop{flex:none;width:40px;height:40px;border-radius:50%;border:2px solid #d98b2b;background:#d98b2b url(media/camp-brix.webp) center top/cover}
+#coach.co-quill{border-color:#8e3b5c}#coach.co-quill .cop{border-color:#8e3b5c;background-image:url(media/camp-quill.webp)}
+#coach .cob{flex:1;min-width:0}#coach .cot{font:800 14px/1.2 var(--fb);color:#7a3d00}#coach.co-quill .cot{color:#8e3b5c}#coach .cox{font:650 15px/1.3 var(--fb);color:#1c1408}
+#coach .coz{pointer-events:auto;flex:none;align-self:center;min-height:44px;min-width:56px;border:0;border-radius:12px;background:#b34a0a;color:#fff;font:800 13px var(--fb)}
+#coachskip{position:fixed;right:8px;top:54px;z-index:61;min-height:44px;padding:0 12px;border-radius:14px;border:2px solid #f3e6bf;background:#2a1a08;color:#f3e6bf;font:700 13px var(--fb)}
+.coscore{margin:6px auto;border-collapse:collapse;font:600 15px/1.3 var(--fb);color:#1c1408}.coscore th{text-align:left;padding:2px 10px 2px 0;font-weight:800}.coscore td{padding:2px 0}
+.colater{margin:6px 0;text-align:left;font:600 14px/1.3 var(--fb);color:#1c1408}.colater ul{margin:2px 0 0;padding-left:18px}
+#coachend .gxt-endc{max-height:calc(100vh - 24px);overflow:auto}
+@media (min-width:1024px){#coach .cox,#coach .cot,#coach .coz,#coachskip{font-size:16px}#coach{width:min(460px,calc(100vw - 16px))}}
+.hturn .hnote{margin:6px 0 2px;font-size:.95rem;line-height:1.3}
+@media (min-width:1024px){#tb .plate b,#tb .plate em,#tb .plate .star,.gx-bar .gx-ibtn span{font-size:16px!important}#say{font-size:16px}#tb .plate b,#tb .plate em,#tb .plate .star{line-height:19px}}

@@ -40,7 +40,7 @@ function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tu
   p.className='';p.innerHTML='<b>'+esc(big)+'</b><span>'+esc(why)+'</span>';void p.offsetWidth;p.className='on '+cls;clearTimeout(PL.pt);PL.pt=setTimeout(()=>{p.classList.remove('on');p.remove()},Math.max(900,1700/(UI.speed||1)))}
 // ---------- (b) the one instruction line, in plain words ----------
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(!G||G.over||UI.brief||!V||V.seat<0)return t;const me=V.seat,s=decider();if(UI.tut)return t;
-  if(V.q&&V.q.who===me&&V.q.kind==='infoStd')return 'First, show one of your wires: tap it. It tells the crew its number.';
+  if(V.q&&V.q.who===me&&V.q.kind==='infoStd')return 'Show a wire: tap one of yours.';
   if(V.legal&&s===me&&!(V.q&&V.q.who===me)){const sel=UI.sel;
     if(sel&&sel.mode==='dual'&&!sel.tool&&!sel.two){if(sel.tg.length&&sel.v==null)return 'Now tap one of your own numbers to say it.';if(sel.v!=null&&!sel.tg.length)return 'Now tap the crew wire you think matches.'}
     if(!sel&&t==='Tap a glowing wire')return 'Your turn: tap a glowing crew wire to guess it.';

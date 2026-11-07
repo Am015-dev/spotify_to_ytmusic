@@ -119,7 +119,7 @@ function tutStory(steps){const wires=()=>G.st.reduce((a,s)=>a+s.w.length,0);
 // ---------------------------------------------------------------- the kit hooks
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function tutStartOld(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:STORY.tut.endTitle,endText:o?STORY.tut.endText:STORY.tut.endTextPlain,
@@ -145,8 +145,8 @@ function tutOffer(){if(typeof GXT==='undefined'||!firstTime()||GXT.isDone(TUT_GA
 (function(){const o=plateTap;plateTap=function(s){if(tutOn()&&!GXT.act({type:'tap',what:'plate',s}))return;return o(s)}})();
 // the computer never moves by itself in the staged job, nothing is saved, no result is recorded, and the win/lose card is the kit's end card
 (function(){const o=schedule;schedule=function(){if(UI.tut)return;return o()}})();
-(function(){const o=saveNow;saveNow=function(){if(UI.tut)return;return o()}})();
-(function(){const o=recordResult;recordResult=function(){if(UI.tut)return;return o()}})();
-(function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
+(function(){const o=saveNow;saveNow=function(){if(UI.tut||UI.coach)return;return o()}})();
+(function(){const o=recordResult;recordResult=function(){if(UI.tut||UI.coach)return;return o()}})();
+(function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut||UI.coach){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
 // while the crew waits for its scripted move the status line says whose turn it is (the real "is thinking" would be a lie)
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(UI.tut&&G&&!G.over&&/ is thinking$| is choosing$/.test(t)){const s=decider();if(s>=0)return nm(s)+"'s turn"}return t}})();
