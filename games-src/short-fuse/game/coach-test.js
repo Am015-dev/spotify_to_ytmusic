@@ -21,8 +21,9 @@ const URL_=process.argv[2]||'http://localhost:8765/';const probs=[];const note=m
   if(!e){note(tag+' no end card');continue}
   if(multi)note(tag+' more than one bubble at once');if(blocking)note(tag+' a bubble blocked input');
   if(!/Guesses that hit/.test(e.score)||!/Fuse left/.test(e.score))note(tag+' scoring walk-through missing');
+  const gx=await p.evaluate(()=>({d:GXCOACH.done,r:GXCOACH.running,x:GXCOACH.explained.length}));if(!gx.d||gx.r||gx.x!==e.seen.length)note(tag+' GXCOACH wrong '+JSON.stringify(gx));
   if(e.saved)note(tag+' staged game was saved');if(!e.done)note(tag+' tutorial not remembered as done');
-  const rules=['goal','mine','crew','fuse','token','tokens2','point','hit','miss','solo','crew1','crew2','check','gear','probe','yellow','red'];
+  const rules=['goal','mine','crew','fuse','token','tokens2','point','hit','miss','solo','crew1','crew2','check','gear','probe','yellow','red','rmiss'];
   const doc=fs.readFileSync(path.join(__dirname,'..','TUTORIAL-COVERAGE.md'),'utf8');
   for(const id of rules){if(!doc.includes('`'+id+'`'))note(tag+' coverage doc lacks '+id);}
   const unseen=rules.filter(id=>!e.seen.includes(id));if(e.later.length!==unseen.length)note(tag+' later card ('+e.later.length+') does not list exactly the unexplained rules ('+unseen.join(',')+')');

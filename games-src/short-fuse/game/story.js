@@ -60,10 +60,11 @@ STORY.coach={
  gear:['brix','Gear unlocked','Rewind is ready: it turns the fuse back one step. Tap it on your turn. Gear works once.'],
  probe:['brix','Twin Probe','Your trick, once per job: point at two wires and say one number. It hits if either matches.'],
  yellow:['brix','Yellow wires','Quill loves yellow. A yellow only matches a yellow, and you must hold one to say "yellow".'],
+ rmiss:['quill','Even they slip','Ha! Your crew just burned a fuse step. Everyone misses sometimes. Watch the tokens it leaves.'],
  red:['quill','Never red','Never point at red or it blows. If red is all you hold, it reveals itself.'],
  winTitle:'The rig is silent',winText:'Every wire cut. Quill\'s brass key falls off the door. You are on the crew. Here is how it counted:',
  loseTitle:'The rig went off',loseText:'Brix dusts you off: "Everybody breathes. Again." Here is how it counted:'};
 STORY.later={goal:'The goal: cut every wire together before the fuse runs out.',mine:'Your stand is face up to you, sorted low to high.',crew:'The crew\'s wires are hidden from you, and yours from them.',fuse:'A miss burns a fuse step; none left, or a red wire, and it explodes.',
  token:'Everyone starts by showing one wire with a token.',tokens2:'Tokens are clues the whole crew shares.',point:'A turn: point at a crew wire, then name a number you hold.',hit:'A hit cuts both wires.',miss:'A miss burns the fuse and shows the true number on a token.',
  solo:'Solo cut: if you hold every wire left of a number, cut them alone.',crew1:'The computer crew can solo cut too.',crew2:'The computer crew guesses from tokens and sort order.',check:'When all four of a number are cut, a green check goes up.',
- gear:'Gear cards unlock when two of their number are cut, and work once.',probe:'Twin Probe: point at two wires, say one number, once per job.',yellow:'Yellow wires only match yellow, and you must hold one to say it.',red:'Never point at a red wire; a hand of only reds reveals itself.'};
+ gear:'Gear cards unlock when two of their number are cut, and work once.',probe:'Twin Probe: point at two wires, say one number, once per job.',yellow:'Yellow wires only match yellow, and you must hold one to say it.',red:'Never point at a red wire; a hand of only reds reveals itself.',rmiss:'A computer crewmate can miss too; the miss burns the fuse the same way.'};

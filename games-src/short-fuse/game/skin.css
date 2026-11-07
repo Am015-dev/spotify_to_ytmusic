@@ -169,3 +169,8 @@ div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
 @media (min-width:1024px){#coach .cox,#coach .cot,#coach .coz,#coachskip{font-size:16px}#coach{width:min(460px,calc(100vw - 16px))}}
 .hturn .hnote{margin:6px 0 2px;font-size:.95rem;line-height:1.3}
 @media (min-width:1024px){#tb .plate b,#tb .plate em,#tb .plate .star,.gx-bar .gx-ibtn span{font-size:16px!important}#say{font-size:16px}#tb .plate b,#tb .plate em,#tb .plate .star{line-height:19px}}
+/* round 2: drawer content stays above the painted frame; solid name plates */
+.gx-drawer .gx-drawer-body{margin-bottom:36px}
+#tb .plate{background-image:none!important;background-color:#2a1a08!important;border-radius:9px}
+#tb .plate{border-image:none!important;border:2px solid var(--sc,#888)!important;box-shadow:none}
+#tb .plate::before,#tb .plate::after{display:none!important}

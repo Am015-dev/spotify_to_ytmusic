@@ -49,3 +49,8 @@ function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tu
 // ---------- tap the table while the computer crew plays to speed it up ----------
 document.addEventListener('pointerdown',e=>{if(!G||!UI.started||G.over||UI.brief||UI.tut||!e.target.closest||!e.target.closest('#tb'))return;const s=decider();if(s<0||isHuman(s)||UI._boost)return;
   UI._boost=UI.speed;UI.speed=Math.max(UI.speed,3);if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null;schedule()}},true);
+// drawer text that is scrolled completely out of view is hidden (it is not visible anyway): nothing is left "under" the painted frame
+function plClip(){document.querySelectorAll('.gx-drawer.open .gx-drawer-body,.gx-drawer.on .gx-drawer-body,.gx-drawer-body').forEach(body=>{const r=body.getBoundingClientRect();if(!r.height)return;
+  body.querySelectorAll('*').forEach(e=>{const q=e.getBoundingClientRect();if(!q.height)return;const out=q.top>=r.bottom-1||q.bottom<=r.top+1;const h=e.style.visibility==='hidden';if(out&&!h)e.style.visibility='hidden';else if(!out&&h)e.style.visibility=''})})}
+document.addEventListener('scroll',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('gx-drawer-body'))plClip()},true);
+setInterval(plClip,300);

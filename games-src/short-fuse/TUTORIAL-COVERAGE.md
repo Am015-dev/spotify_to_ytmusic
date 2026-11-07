@@ -24,7 +24,8 @@ Words: `game/story.js` (`STORY.coach`, `STORY.later`). Proof: `game/coach-test.j
 | [x] Personal tool: the Twin Probe, once per job | `probe` | your second turn | "Your trick, once per job" |
 | [x] Yellow wires match only yellow; you must hold one to say it | `yellow` | your turn, while you hold the yellow | "Quill loves yellow" |
 | [x] Red wires: never point at one; a hand of only reds reveals itself | `red` | your turn, while you hold the red | Quill: "Never red" |
-| [x] The end and the scoring (guesses that hit, solo cuts, misses, fuse left, wires cut) | end card | when the bomb is defused or explodes | "The rig is silent" / "Everybody breathes. Again." |
+| [x] A computer crewmate can miss too (rival comment from Quill) | `rmiss` | when a rival misses | Quill: "Even they slip" |
+| [x] The end and the scoring (animated count-up) (guesses that hit, solo cuts, misses, fuse left, wires cut) | end card | when the bomb is defused or explodes | "The rig is silent" / "Everybody breathes. Again." |
 
 ## Not covered by doing (honest list)
 - Job-specific twists (timers, oxygen, constraint cards, hidden-info jobs, character powers other than the Twin Probe, the other 11 equipment cards): each job's brief card states its twist; Story mode adds one per chapter.

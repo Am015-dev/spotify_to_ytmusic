@@ -36,6 +36,10 @@ Brix (or Quill) speaks one non-blocking bubble at a time, just-in-time (rule fir
 The end card walks through the scoring with your real numbers and lists "Things you'll meet later" for rules that never came up. `game/coach-test.js` plays it through the UI at 390x763 and 1440x860 (PASS).
 The old step-based tutorial code (`tutSteps` in tutor.js) is unused; its test was removed.
 
+## Round 2 (W400b)
+- ui-audit final: phone A0 B0 C0 D0 E0 F0, phone-s A0 B0 C0 D0 E0 F0, pc A0 B0 C0 D0 E0 F0 (drawer text scrolled out of view is hidden so nothing sits under the painted frame; name plates are solid; the coach bubble is a card, not a second instruction line).
+- `window.GXCOACH = {running, explained:[ids], done}` is exposed by coach.js; the end card counts its numbers up; Quill comments when a computer crewmate misses (`rmiss`).
+
 ## Rules (orchestrator note)
 The idle-round guard (four full rounds with no cut explode) is now stated in the help drawer. The "pretend to cut when everything is cut" ruling for job 44 is NOT implemented: the rulebook text was not reachable from this session.
 
