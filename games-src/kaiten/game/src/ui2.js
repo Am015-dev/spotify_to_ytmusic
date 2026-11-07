@@ -151,7 +151,7 @@ function slotEl(s, sl, cmp) {
   }
   if (UI.fz) { box.className = 'sbox'; }
   else if (G.phase === 'pick' && p.picked) { cover(); if (!cmp) wrap.appendChild(h('span.st.rd', 'ready')); }
-  else if (G.phase === 'pick') { box.className = 'sbox empty' + (s === viewSeat() ? ' mine' : ''); box.textContent = '…'; box.setAttribute('aria-label', p.name + ' is choosing'); }
+  else if (G.phase === 'pick') { box.className = 'sbox empty' + (s === viewSeat() ? ' mine' : ''); { const pi = h('img.kkp3', { src: 'models/plate@512.webp', alt: '', draggable: 'false' }); pi.addEventListener('error', () => pi.remove()); box.appendChild(pi); } box.appendChild(h('span.kkp3t', '…')); box.setAttribute('aria-label', p.name + ' is choosing'); }
   else box.className = 'sbox';
   return wrap;
 }
