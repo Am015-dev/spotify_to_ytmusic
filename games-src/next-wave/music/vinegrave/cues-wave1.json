@@ -1,0 +1,81 @@
+{
+ "game": "vinegrave",
+ "note": "gx-music slots (src/ui3.js musicInit). Files go to games/vinegrave/music/<slot>-a.mp3 and -b.mp3; build.py picks up whatever exists.",
+ "cues": {
+  "tavern": {
+   "slot": "Menu / title",
+   "prompt": "Calm jungle-expedition title theme: marimba, soft hand drums, wooden flute and distant birdsong, warm and curious, 1920s adventure feel. 90 seconds, seamless loop. No vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "tavern.mp3",
+   "files": [
+    "tavern-a.mp3",
+    "tavern-b.mp3"
+   ],
+   "repo_target": "games/vinegrave/music/",
+   "length": "loop"
+  },
+  "main": {
+   "slot": "Expedition (in game)",
+   "prompt": "Light exploring loop for a thinking board game: plucked strings, kalimba, shaker and low hand drum, steady mid tempo, unobtrusive so players can concentrate. 120 seconds, seamless loop. No vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "main.mp3",
+   "files": [
+    "main-a.mp3",
+    "main-b.mp3"
+   ],
+   "repo_target": "games/vinegrave/music/",
+   "length": "loop"
+  },
+  "fight": {
+   "slot": "Boss stage",
+   "prompt": "Tense jungle chase loop for a boss stage: deep tribal-style drums, low brass swells, staccato strings, mysterious but not scary. 90 seconds, seamless loop. No vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "fight.mp3",
+   "files": [
+    "fight-a.mp3",
+    "fight-b.mp3"
+   ],
+   "repo_target": "games/vinegrave/music/",
+   "length": "loop"
+  },
+  "victory": {
+   "slot": "Victory",
+   "prompt": "Short triumphant expedition fanfare: bright brass and marimba run ending on a warm major chord, 6 to 8 seconds, no loop, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "victory.mp3",
+   "files": [
+    "victory-a.mp3",
+    "victory-b.mp3"
+   ],
+   "repo_target": "games/vinegrave/music/",
+   "length": "one-shot"
+  },
+  "defeat": {
+   "slot": "Defeat",
+   "prompt": "Short gentle defeat sting: soft descending marimba and a muted horn, wistful not sad, 5 to 6 seconds, no loop, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "defeat.mp3",
+   "files": [
+    "defeat-a.mp3",
+    "defeat-b.mp3"
+   ],
+   "repo_target": "games/vinegrave/music/",
+   "length": "one-shot"
+  }
+ }
+}

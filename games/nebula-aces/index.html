@@ -798,6 +798,7 @@ html.sk-tail .gxh-arr{width:12px;height:12px;border:0;background:url(media/ui-bu
 html.sk-tail .gxh-a-top .gxh-arr{transform:scaleY(-1)}
 html.sk-tail .gxh-a-left .gxh-arr{transform:rotate(90deg)}
 html.sk-tail .gxh-a-right .gxh-arr{transform:rotate(-90deg)}
+.na-back{display:none}html[data-naback] .na-back{display:inline-block;width:16px;height:22px;margin-right:6px;vertical-align:-5px;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.5);background:var(--na-back,none) center/cover}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -1006,8 +1007,8 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
-.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
-@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 
@@ -5574,7 +5575,7 @@ function renderRoster(){const el=$('roster');if(!el||!G)return;const me=soloSide
     <div class="pc-art">${art?`<img src="${art}" alt="" loading="lazy">`:SHIP_SIL}</div><div class="pc-type">${esc(T.n)} <span>· ${esc(FACTIONS[G.fac[s.side]].n)}</span></div>
     <div class="stats">${statSpans(s)}</div><div class="pc-text">
     <p class="bio small muted">${esc(pilotBio(s))}</p>${PILOTS[s.pilot].t?`<p class="ab">${esc(PILOTS[s.pilot].t)}</p>`:''}${s.ups.length?`<p class="ups">${s.ups.map(u=>`<span class="${u.gone?'gone':''}" title="${esc(UPGRADES[u.id].t)}">${esc(UPGRADES[u.id].n)}</span>`).join('')}</p>`:''}
-    ${s.dmg.filter(x=>x.up).map(x=>`<p class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}: ${esc(critPlain(x.c,s))}</p>`).join('')}${s.alive&&s.dmg.some(x=>!x.up)?`<p class="small muted">${s.dmg.filter(x=>!x.up).length} hull damage</p>`:''}${s.alive&&tok?`<p class="small">${tok}</p>`:''}</div></div>`}).join('')+'</div>').join('')}
+    ${s.dmg.filter(x=>x.up).map(x=>`<p class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}: ${esc(critPlain(x.c,s))}</p>`).join('')}${s.alive&&s.dmg.some(x=>!x.up)?`<p class="small muted"><i class="na-back" aria-hidden="true"></i>${s.dmg.filter(x=>!x.up).length} hull damage</p>`:''}${s.alive&&tok?`<p class="small">${tok}</p>`:''}</div></div>`}).join('')+'</div>').join('')}
 const SHIP_SIL='<svg viewBox="0 0 120 60" aria-hidden="true"><path d="M110 30L70 24L52 8H44L50 24L18 26L10 18H6L8 30L6 42H10L18 34L50 36L44 52H52L70 36Z" fill="currentColor" opacity=".5"/></svg>';
 function statSpans(s,short){const hp=s.hull-hullDmg(s);const ps=psOf(s),at=primary(s),ag=agility(s);const cur=(v,b)=>v!==b?` class="chg" title="base ${b}"`:'';const L=short?['PS','Atk','Agi','Hull','Shd']:['Skill','Attack','Agility','Hull','Shields'];
   return `<span class="ps${pulse(s,'ps')}" title="pilot skill: higher skill moves later and shoots first"><i>${L[0]}</i> <b${cur(ps,s.ps)}>${ps}</b></span><span class="a${pulse(s,'a')}" title="primary attack: attack dice rolled"><i>${L[1]}</i> <b${cur(at,s.atk)}>${at}</b></span><span class="g${pulse(s,'g')}" title="agility: defense dice rolled"><i>${L[2]}</i> <b${cur(ag,s.agi)}>${ag}</b></span><span class="h${pulse(s,'h')}" title="hull left"><i>${L[3]}</i> ${s.alive?hp:0}/${s.hull}</span><span class="s${pulse(s,'s')}" title="shields left: they soak damage before the hull"><i>${L[4]}</i> ${s.sh}/${s.shMax}</span>`}
@@ -6473,6 +6474,7 @@ const pre=(f,cb)=>{if(IMG_OK[f]!==undefined){cb&&IMG_OK[f]&&cb();return}IMG_OK[f
 const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 // ---- title / end art as CSS variables (the start and debrief panels paint a banner from them)
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
+  {const u=unl('cardback'),bf=u==='rift-crown'?'back-rift-crown':'back-default';pre(bf,()=>{R.style.setProperty('--na-back','url('+MEDIA+bf+'.webp)');R.dataset.naback='1'})}
   set('--na-title',phone()?'title-phone':'title');set('--na-end-win','end-win');set('--na-end-lose','end-lose');
   const t=unl('table')==='nebula7'?'table-nebula7':'arena-floor';pre(t,()=>{R.style.setProperty('--tbl-img','url('+MEDIA+t+'.webp)');if(tblWant!==t){tblWant=t;skin()}});
   pre(phone()?'table-default-phone':'table-default',()=>R.style.setProperty('--tbl-flat','url('+MEDIA+(phone()?'table-default-phone':'table-default')+'.webp)'))}

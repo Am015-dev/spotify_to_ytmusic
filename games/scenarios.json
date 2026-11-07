@@ -1149,6 +1149,14 @@
    "mut": 0
   },
   {
+   "id": "sg-guide",
+   "name": "Guide: switch it on and learn the rules",
+   "ask": "Does Guide do something you can see?",
+   "sizes": "pc",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -1328,6 +1336,146 @@
    "ask": "Can you read who won and why?",
    "sizes": "all",
    "group": "UI",
+   "mut": 0
+  }
+ ],
+ "vinegrave": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "vg-board",
+   "name": "Board: your first turn",
+   "ask": "Can you see the map, market and hand?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "vg-guardian",
+   "name": "Discover: a guardian wakes",
+   "ask": "Does the guardian show on the ruin?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "vg-overcome",
+   "name": "Overcome a guardian",
+   "ask": "Can you beat the guardian for 5 points?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "vg-market",
+   "name": "Market: buy an item",
+   "ask": "Can you read the prices and buy?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "vg-result",
+   "name": "Result: score breakdown",
+   "ask": "Can you read every score row?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "wildmark": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "wm-board",
+   "name": "Your turn: the market",
+   "ask": "Can you see the market and your valley?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "wm-place",
+   "name": "Place a tile",
+   "ask": "Do the spots glow and does Place work?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "wm-token",
+   "name": "Settle a token",
+   "ask": "Does the bear pair light and score?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "wm-sweep",
+   "name": "Three matching tokens",
+   "ask": "Is the Sweep button offered?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "wm-story",
+   "name": "Story: the region map",
+   "ask": "Can you open region 1?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  },
+  {
+   "id": "wm-boss",
+   "name": "Boss: Bram starts with acorns",
+   "ask": "Does the goal say Beat Bram?",
+   "sizes": "all",
+   "group": "Bosses",
+   "mut": 0
+  },
+  {
+   "id": "wm-cards",
+   "name": "Mixed animal cards",
+   "ask": "Do the cards show their new names?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "wm-result",
+   "name": "Season end: results",
+   "ask": "Can you read the score table?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
    "mut": 0
   }
  ]

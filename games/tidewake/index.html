@@ -655,7 +655,8 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
-.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 
@@ -1192,6 +1193,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
+    if (t && t.closest('.gx-drawer-head') && e.closest('.gx-drawer') && !e.closest('.gx-drawer-head')) return '';   // scrolled under the drawer's sticky head: clipped by the scroll, not covered
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
@@ -1214,7 +1216,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     for (var a = 0; a < rects.length; a++) for (var b = a + 1; b < rects.length; b++) { var A = rects[a], B = rects[b]; if (related(A.e, B.e)) continue;
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
-    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
+    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '> "' + (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 24) + '"'); });
     engineBad().forEach(add);
     return out;
   };
@@ -5651,7 +5653,7 @@ function outcomeHTML(K,seat,m,A){const S=K.ships[m.s],who=m.s===seat?'Your junk'
   if(A.coll)o.push(`<span class="warn-l">Two junks would end on one wake: both sink.</span>`);
   for(const x of A.others)o.push(x.coll?`<span class="warn-l">${nm(x.i)} also sails here and would crash.</span>`:x.st==='edge'||x.st==='mon'?`${nm(x.i)} also sails and would sink.`:`${nm(x.i)} also sails on.`);
   return o.join('<br>')}
-const cardBack=()=>`<svg class="cardart" viewBox="0 0 100 100"><rect x="3" y="3" width="94" height="94" rx="10" fill="#14606b" stroke="#e3b24b" stroke-width="3"/><path d="M20 62q10-12 20 0t20 0t20 0M20 44q10-12 20 0t20 0t20 0" fill="none" stroke="#e3b24b" stroke-width="3"/></svg>`;
+const cardBack=()=>window.TWBACK?`<img class="cardart" src="media/${window.TWBACK}.webp" alt="" draggable="false">`:`<svg class="cardart" viewBox="0 0 100 100"><rect x="3" y="3" width="94" height="94" rx="10" fill="#14606b" stroke="#e3b24b" stroke-width="3"/><path d="M20 62q10-12 20 0t20 0t20 0M20 44q10-12 20 0t20 0t20 0" fill="none" stroke="#e3b24b" stroke-width="3"/></svg>`;
 const gateArt=()=>`<svg class="cardart" viewBox="0 0 100 100"><rect x="3" y="3" width="94" height="94" rx="10" fill="#3b2a66" stroke="#e3b24b" stroke-width="3"/><circle cx="50" cy="50" r="24" fill="#6d3fd0" stroke="#35e0ff" stroke-width="5"/><circle cx="50" cy="50" r="12" fill="#c9b3ff"/></svg>`;
 const cannonArt=()=>`<svg class="cardart" viewBox="0 0 100 100"><rect x="3" y="3" width="94" height="94" rx="10" fill="#3a3f46" stroke="#e3b24b" stroke-width="3"/><rect x="22" y="40" width="50" height="20" rx="8" fill="#14171a" transform="rotate(-18 50 50)"/><circle cx="34" cy="68" r="10" fill="#7a5a14"/><circle cx="76" cy="38" r="5" fill="#ffb347"/></svg>`;
 function cardBtn(c,t,o){o=o||{};const sel=o.sel;const own=o.owner;
@@ -6646,6 +6648,7 @@ const pre=(f,cb)=>{if(IMG_OK[f]!==undefined){cb&&IMG_OK[f]&&cb();return}IMG_OK[f
 const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 const TBL={dawn:1,storm:1,lantern:1};
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
+  {const u=unl('cardback'),bf=u==='scales'||u==='night'?'back-'+u:'back-default';pre(bf,()=>{if(window.TWBACK!==bf){window.TWBACK=bf;try{if(window.G&&typeof render==='function')render()}catch(e){}}})}
   set('--tw-title',phone()?'title-phone':'title');set('--tw-end-win','end-win');set('--tw-end-lose','end-lose')}
 // ---- 3D table: a painted sheet under the board, over the wood (the unlocked table replaces the default); wood while loading and on Low
 let skinPl=null,skinFile='';

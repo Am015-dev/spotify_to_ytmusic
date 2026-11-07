@@ -1,0 +1,23 @@
+{
+ "wave": 1,
+ "ratio": "4:3",
+ "flow_aspect": "4:3",
+ "style": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "vinegrave 2D wave 1, ratio 4:3. Paste with Flow aspect 4:3; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "vinegrave",
+  "count": 10
+ },
+ "cards": {
+  "card-dread": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A creeping shadowy presence in a dark jungle clearing at dusk, two pale eyes glowing between hanging vines, cold teal mist, eerie and unsettling.",
+  "card-grant": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A sealed patron letter with a red wax seal and a small pouch of coins lying on a camp table beside a brass lantern, canvas tent and ferns behind.",
+  "card-trail": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A worn trail notebook and a pencil lying open on a mossy log, a faint hand-drawn path through ferns, a brass compass beside it, jungle camp behind.",
+  "site-c-spring": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A tranquil jungle camp location, Clear Spring, painted as a landscape tile with a clear place for an explorer to stop, warm light, lush foliage.",
+  "site-c-cliff": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A tranquil jungle camp location, Lookout Cliff, painted as a landscape tile with a clear place for an explorer to stop, warm light, lush foliage.",
+  "site-c-wreck": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A tranquil jungle camp location, Old Wreck, painted as a landscape tile with a clear place for an explorer to stop, warm light, lush foliage.",
+  "site-c-cove": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A tranquil jungle camp location, Pearl Cove, painted as a landscape tile with a clear place for an explorer to stop, warm light, lush foliage.",
+  "site-c-road": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A tranquil jungle camp location, Logging Road, painted as a landscape tile with a clear place for an explorer to stop, warm light, lush foliage.",
+  "site-hidden-1": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A face-down tile back showing a dense tangle of green leaves and vines completely covering an unseen ruin, symmetrical, no recognisable details.",
+  "site-hidden-2": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A face-down tile back showing a dense tangle of dark thorny vines with faint gold glints completely covering an unseen ruin, symmetrical, no recognisable details."
+ }
+}
