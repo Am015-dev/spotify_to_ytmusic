@@ -62,13 +62,13 @@ function showPass(s) {
   p.hidden = false;
 }
 function closeRes() { $('#rs').hidden = true; }
-function rows(i) { const s = VG.score(G, i); return [['Research track', s.research], ['Temple tiles', s.temple], ['Idols (3 each)', s.idols], ['Guardians (5 each)', s.guards], ['Card points', s.cards], ['Dread (-1 each)', s.fear], ['Total', s.total]]; }
+function rows(i) { const s = VG.score(G, i); return [['Research track', s.research], ['Temple tiles', s.temple], ['Idols (3 each)', s.idols], ['Empty shrine slots', s.slots], ['Guardians (5 each)', s.guards], ['Card points', s.cards], ['Dread (-1 each)', s.fear], ['Total', s.total]]; }
 function showResult() {
   if (!G || G.phase !== 'over') return; const r = $('#rs');
   const names = G.p.map(p => p.name).concat(G.rival ? [G.rival.name] : []), cols = G.p.map((p, i) => rows(i));
   const wn = G.winner === -1 ? 'A tie!' : G.winner === -2 ? G.rival.name + ' wins.' : (UI.humans.length === 1 && G.winner === UI.humans[0] ? 'You win!' : G.p[G.winner].name + ' wins.');
   let t = `<table><tr><th></th>${names.map(n => `<th>${esc(n.split(' ').find(w => w.length > 2 && !/^(Dr|Mr|Mrs|Ms|Prof)\.?$/.test(w)) || n)}</th>`).join('')}</tr>`;
-  rows(0).forEach((row, k) => { t += `<tr><td>${row[0]}</td>${cols.map(c => `<td>${k === 6 ? '<b>' + c[k][1] + '</b>' : c[k][1]}</td>`).join('')}${G.rival ? `<td>${k === 6 ? '<b>' + VG.rivalScore(G) + '</b>' : k === 0 ? V.GLASS_VP[Math.min(V.TOP, G.rival.rows)] : k === 4 ? G.rival.vp : '—'}</td>` : ''}</tr>`; });
+  rows(0).forEach((row, k) => { t += `<tr><td>${row[0]}</td>${cols.map(c => `<td>${k === 7 ? '<b>' + c[k][1] + '</b>' : c[k][1]}</td>`).join('')}${G.rival ? `<td>${k === 7 ? '<b>' + VG.rivalScore(G) + '</b>' : k === 0 ? V.GLASS_VP[Math.min(V.TOP, G.rival.rows)] : k === 5 ? G.rival.vp : '—'}</td>` : ''}</tr>`; });
   t += '</table>';
   const camp = UI.camp && typeof GXC !== 'undefined' && GXC.active();
   const iWon = UI.humans.length === 1 ? G.winner === UI.humans[0] : G.winner >= 0, def = camp ? UI.camp : null;
@@ -109,14 +109,15 @@ const RULES_HTML = `<div class="rules">
 <h3>The goal</h3><p>Explore the island for 5 rounds. The most points wins: research track, temple tiles, idols, guardians overcome and card points, minus 1 for every Dread card.</p>
 <h3>Your turn</h3><p>Do ONE main action, then the next explorer goes. When you cannot or do not want to act, pass: you are out until the next round. The round ends when everybody has passed.</p>
 <ul><li><b>Play a card</b> for its effect. Artifacts played from your hand cost 1 tablet. Dread cards do nothing.</li>
-<li><b>Dig</b>: send an explorer (you have 2) to a free site and pay its travel icons, then gain its loot. Each card you hold pays one travel icon (shown top right) and is discarded: a Jeep also pays a Boot; a Plane pays anything; 2 coins buy a Plane.</li>
+<li><b>Dig</b>: send an explorer (you have 2) to a free site and pay its travel icons, then gain its loot. Each card you hold pays one travel icon (shown top right) and is discarded: a Jeep or a Boat also pays a Boot (a Jeep and a Boat never pay each other); a Plane pays anything; 2 coins buy a Plane.</li>
 <li><b>Discover</b> a hidden ruin: pay 3 compasses (deep ruins: 6) plus its travel. Flip it, take an idol, gain its loot, and a <b>guardian wakes</b> there.</li>
 <li><b>Overcome</b> a guardian where your explorer stands: pay its cost, take it (5 points) and keep its boon for one free use later.</li>
 <li><b>Buy</b> from the market: items with coins (to the bottom of your deck), artifacts with compasses (they work at once).</li>
 <li><b>Research</b>: climb with your magnifier, or let the notebook follow it. Pay the row's cost, gain its bonus; the first magnifier to rows 2, 4, 6 and 7 also takes an extra reward. Only the magnifier enters the temple (earlier arrivals score more); there it buys temple tiles. Ties go to the first explorer into the temple.</li></ul>
-<h3>Free actions</h3><p>Any time on your turn: use a guardian's boon, or set one idol in a shrine for a one-time boon (idols score 3 either way).</p>
+<h3>Free actions</h3><p>Any time on your turn: use a guardian's boon, or set one idol in a shrine for a one-time boon (idols score 3 either way). Your board has 4 shrine slots worth 1, 1, 1 and 2 points while they stay empty: each idol you set fills the next slot and loses its points.</p>
 <h3>End of a round</h3><p>Explorers come home. An explorer still sharing a site with a guardian brings back a Dread card (when the 19 Dread cards run out: a fear tile, -2). Played cards go to your discard; you keep unplayed cards and draw up to 5. The market shifts: the item and the artifact beside the divide leave, and one more artifact slot opens.</p>
-<h3>Solo</h3><p>A rival expedition plays one card after each of your actions: it camps on sites, takes market cards, climbs research and hunts guardians. Beat its score.</p></div></div>`;
+<h3>Solo</h3><p>A rival expedition plays one card after each of your actions: it camps on sites, takes market cards, climbs research and hunts guardians. Beat its score.</p>
+<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own (discovering costs 3 compasses for a ruin, 6 for a deep ruin).</li><li>One idol a turn into a shrine; 4 shrine slots; a shrine gives its boon at once.</li><li>No assistants, no bonus tiles on research rows (only first-arrival rewards), no expansion material or alternate board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {
@@ -181,7 +182,7 @@ function helpInit() {
       'q-exile': { target: () => $('#qbox'), title: 'Exile a card', text: 'Removing Dread cards makes your deck stronger.', pic: P('exile') } },
     rules: [{ title: 'How a turn works', text: 'One action, then the next explorer: play a card, go to a site, or buy a card. Nothing to do? Pass.', pic: P('star') },
       { title: 'The goal', text: 'Five rounds. Points from research, temple, idols, guardians and cards. Dread costs 1 each.', pic: P('star') },
-      { title: 'Travel', text: 'Each card pays one travel icon. A Jeep pays a Boot too; a Plane pays anything; 2 coins buy a Plane.', pic: P('boot') },
+      { title: 'Travel', text: 'Each card pays one travel icon. A Jeep or Boat pays a Boot too; a Plane pays anything; 2 coins buy a Plane.', pic: P('boot') },
       { title: 'Discover', text: 'Three compasses and travel flip a hidden ruin: idol, loot, and a guardian wakes.', pic: P('compass') },
       { phase: 'guard', title: 'Overcome', text: 'Pay the guardian\'s cost while your explorer is there: 5 points and a one-time boon.', pic: P('guard') },
       { phase: 'idol', title: 'Shrines', text: 'One idol a turn into a shrine: an instant boon. It still scores 3.', pic: P('idol') }],

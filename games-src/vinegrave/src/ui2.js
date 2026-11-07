@@ -136,7 +136,7 @@ function moveCaption(m, s) {
   }
 }
 function snapS(s) { if (!G || s < 0 || !G.p[s]) return null; const p = G.p[s]; return { res: Object.assign({}, p.res), sc: VG.score(G, s) }; }
-const SC_WHY = { research: 'research', temple: 'temple tile', idols: 'idol', guards: 'guardian', cards: 'card points', fear: 'Dread card' };
+const SC_WHY = { research: 'research', temple: 'temple tile', idols: 'idol', slots: 'shrine slot', guards: 'guardian', cards: 'card points', fear: 'Dread card' };
 function diffText(s, b) {
   if (!b || !G || s < 0) return null; const a = snapS(s), res = [];
   V.RES.forEach(k => { const d = a.res[k] - b.res[k]; if (d) res.push((d > 0 ? '+' : '') + d + ' ' + V.RNAME[k] + (Math.abs(d) === 1 ? '' : 's')); });

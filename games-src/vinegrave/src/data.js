@@ -157,7 +157,7 @@
   // three stacks: 6 points for the left two cost parts, 6 for the right two, 11 for all three (parts: 2 tablets | 1 jewel | 2 arrowheads)
   var TEMPLE = [{ vp: 6, cost: { tablet: 2, jewel: 1 }, n: 8 }, { vp: 6, cost: { jewel: 1, arrow: 2 }, n: 8 }, { vp: 11, cost: { tablet: 2, jewel: 1, arrow: 2 }, n: 4 }];
   var TEMPLE_ARRIVE = [10, 8, 6, 4];   // magnifier points in the temple row, by order of arrival
-  var GUARD_VP = 5, IDOL_VP = 3, IDOL_USED_VP = 3, ROUNDS = 5, HAND = 5, ROW = 6, EXPL = 2;
+  var GUARD_VP = 5, IDOL_VP = 3, IDOL_USED_VP = 3, IDOL_SLOT_VP = [1, 1, 1, 2], ROUNDS = 5, HAND = 5, ROW = 6, EXPL = 2;
   var START = [{ coin: 2, compass: 0 }, { coin: 1, compass: 1 }, { coin: 2, compass: 1 }, { coin: 1, compass: 2 }];   // by turn order (rulebook)
   // ---- rival expedition (solo): one card per turn; each does the first thing it can. ----
   var RIVAL = [
@@ -192,6 +192,6 @@
   var VD = { RES: RES, RNAME: RNAME, TRAVEL: TRAVEL, TNAME: TNAME, CARDS: CARDS, ITEMS: I.map(function (r) { return r[0]; }), ARTS: A.map(function (r) { return r[0]; }),
     GUARD: GUARD, GUARDS: GU.map(function (r) { return r[0]; }), SITE: SITE, CAMP: CAMP, SLOT1: SLOT1, SLOT2: SLOT2, DISC: DISC, S1: S1.map(function (r) { return r[0]; }), S2: S2.map(function (r) { return r[0]; }),
     IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, FIRST: FIRST, DREAD_SUPPLY: DREAD_SUPPLY, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE,
-    GUARD_VP: GUARD_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, opText: opText, resText: resText };
+    GUARD_VP: GUARD_VP, IDOL_SLOT_VP: IDOL_SLOT_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, opText: opText, resText: resText };
   if (typeof module !== 'undefined' && module.exports) module.exports = VD; else root.VD = VD;
 })(typeof window !== 'undefined' ? window : this);
