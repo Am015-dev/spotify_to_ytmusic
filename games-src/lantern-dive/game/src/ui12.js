@@ -14,8 +14,9 @@
 //   [x] You are never forced to win a trick ................................................................ lead2
 //   [x] No card of the led colour: play anything; Lanterns are trumps and beat every colour ............. trump, win4
 //   [x] The dive ends the moment every job is done; cards left in hand do not matter ..................... won
+//   [x] The Last button (look at the previous trick) ............................................................ last, lastx
 //   [-] Not taught here (the lightbulb and the Rules drawer cover them): job-sharing dives, murky water, deep narcosis,
-//       the clock, predictions, the drone for two divers, the Last trick button.
+//       the clock, predictions, the drone for two divers. See TUTORIAL-COVERAGE.md.
 // The staged game: seat 0 = you (Commander, Lantern 4), seat 1 = Dag, seat 2 = Sumi. Jobs: you "Win the Lantern 3", Dag "Win the first trick" (data.js tutorial).
 // Attempt 1 ends on trick 1 on purpose: the player leads the Coral 9, wins, and breaks Dag's job. Attempt 2 (same deal, taken for you) is won in three tricks.
 const TUT_GAME = 'lantern-dive';
@@ -143,8 +144,12 @@ function tutSteps() {
       hold: () => true, ready: () => G.att === 2 && G.tricks.length === 1 && trickShown() },
     { id: 'done1', title: 'Job done', say: 'A green tick: Dag\'s job is done for good. Only a job that can still fail stays open.', target: tutJobChip(1), wait: null,
       ready: () => G.att === 2 && G.phase === 'play' && G.tricks.length === 1 && !UI.busy && !UI.fz && jobSt(1) > 0 && !!tutJobChip(1)() },
+    { id: 'last', title: 'Look back', say: 'Forgot what was played? Tap Last to see the previous trick again.', target: tq('#pile [data-a=last], .pbtn[data-a=last]'),
+      wait: { type: 'tap', match: a => a.what === 'last' }, ready: () => G.att === 2 && G.tricks.length === 1 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 2 && !UI.busy && !UI.fz && !!document.querySelector('.pbtn[data-a=last]') },
+    { id: 'lastx', title: 'Close it', say: 'Dag won it with Coral 7. Only the latest trick is kept. Tap the close button.', target: tq('#ppop [data-a=popx]'),
+      wait: { type: 'tap', match: a => a.what === 'popx' }, ready: () => !!document.querySelector('#ppop [data-a=popx]') && G.att === 2 && G.tricks.length === 1 },
     { id: 'follow', title: 'Follow the colour', say: 'Dag led Kelp. If you hold Kelp, you must play it. Tap your Kelp 3.', target: () => tutHandRect(tcard('K3')),
-      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('K3') }, ready: () => G.att === 2 && G.tricks.length === 1 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 2 && !UI.busy && !UI.fz },
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('K3') }, ready: () => G.att === 2 && G.tricks.length === 1 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 2 && !UI.busy && !UI.fz && !UI.pop },
     { id: 'win3', title: 'Who leads next', say: 'Sumi\'s Kelp 9 is the highest Kelp, so she wins and leads the next trick.', target: tutFelt, wait: null,
       hold: () => true, ready: () => G.att === 2 && G.tricks.length === 2 && trickShown() },
     { id: 'trump', title: 'Trumps!', say: 'Sumi led Tide. You have none, so play anything. A Lantern beats every colour: tap Lantern 3.', target: () => tutHandRect(tcard('L3')),
