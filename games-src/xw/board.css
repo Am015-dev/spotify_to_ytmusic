@@ -62,7 +62,7 @@ html.bf #tags .tag .tgl{display:none}
 @keyframes bfflip{from{transform:scaleY(0)}}
 /* top strip: the race */
 #bftop{position:absolute;top:4px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;font:700 13px/1 "Exo 2",sans-serif;color:#fff;background:rgba(6,6,20,.72);border-radius:999px;padding:5px 12px;white-space:nowrap}
-#bftop:empty{display:none}#bftop .y{color:#ffb86b}#bftop .e{color:#ff7a8c}#bftop .vs{opacity:.6;font-size:11px}
+#bftop:empty{display:none}#bftop .y{color:#ffb86b}#bftop .e{color:#ff7a8c}#bftop .vs{opacity:.75;font-size:13px}
 /* bottom bar: one line + the real buttons */
 #bfbar{position:absolute;left:0;right:0;bottom:0;padding:6px 10px calc(8px + var(--sab,0px));background:linear-gradient(180deg,rgba(5,4,15,0),rgba(5,4,15,.82) 30%,rgba(5,4,15,.95));pointer-events:none;display:flex;flex-direction:column;gap:6px;align-items:stretch}
 #bfbar[hidden]{display:none}
@@ -130,3 +130,6 @@ html.bf #tags .tag .tgl{display:none}
 #bfban span+span{font-size:14px;opacity:.9}
 
 .dlg.rules .turn5{background:rgba(255,200,107,.1);border:1px solid #ffc86b;border-radius:12px;padding:6px 14px 8px;margin-bottom:10px}.dlg.rules .turn5 h3{margin:4px 0}.dlg.rules .turn5 ol{margin:0;padding-left:20px;font-size:15px;line-height:1.35}
+/* readable: dark text on the orange start plates (white was 3.5:1) ; move-card swatches keep their aspect */
+.dlg.start .btn.primary,.dlg.start .btn.primary *,.dlg.start [data-gxt-open],.dlg.start [data-gxt-open] *{color:#2a0a00!important;text-shadow:none!important}
+html.sk-cards .mv.w,html.sk-cards .mv.g,html.sk-cards .mv.r{background-size:cover!important;background-position:center top!important}

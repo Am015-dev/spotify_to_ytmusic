@@ -5,7 +5,7 @@ const fs=require('fs');
 const MODE=process.argv[2]||'quick',[W,H]=(process.argv[3]||'390x763').split('x').map(Number);
 const URL=process.env.URL,SHOTS=process.env.SHOTS;if(SHOTS)fs.mkdirSync(SHOTS,{recursive:true});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const SEL=['[data-bf=brief]','.bfring.need','.bfm:not(.danger):not(.set)','[data-bf=fly]:not([disabled])','.bfact.rec','.bfact:not(.skip)','.bftgt','.bfm.w','#bfbtns [data-bfq=ok]','#bfbtns .btn.primary:not([disabled])','.bfspot.rec','[data-a=autoplace]'];
+const SEL=['[data-ph=x]','[data-bf=brief]','.bfring.need','.bfm:not(.danger):not(.set)','[data-bf=fly]:not([disabled])','.bfact.rec','.bfact:not(.skip)','.bftgt','.bfm.w','#bfbtns [data-bfq=ok]','#bfbtns .btn.primary:not([disabled])','.bfspot.rec','[data-a=autoplace]'];
 (async()=>{const b=await PW.chromium.launch({executablePath:process.env.CHROME||undefined,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const mob=W<700;const ctx=await b.newContext({viewport:{width:W,height:H},hasTouch:mob,isMobile:mob});const p=await ctx.newPage();p.setDefaultTimeout(20000);
  const errs=[];p.on('pageerror',e=>errs.push('PAGE '+e.message));p.on('console',m=>{const t=m.text();if(m.type()==='error'&&!/net::|Failed to load|favicon|fonts\.g/.test(t))errs.push('console '+t.slice(0,150))});

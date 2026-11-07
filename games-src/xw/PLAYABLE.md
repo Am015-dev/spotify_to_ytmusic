@@ -22,7 +22,19 @@ Fixed 5 of 10, partly 1, explained 4 (all in shared kit or 3D framing).
 ## Rival turns
 Each rival ship moves and shoots one at a time with a caption per step (existing pacing, 0.6-1.5 s per step, tap anywhere to speed up). New: the caption names the rival and the banner announces the turn.
 
-## Checks (all at the end of this branch)
-- `node tutor-test.js` 390x763 and 1440x860: 23 steps, wrong taps do nothing, elementFromPoint at each target, all coverage steps (`LORE.chapters`) shown.
-- `node playbot.js quick 390x763` and `story 390x763`: play to the result by taps only (the bot is a poor pilot; it reaches the result either way).
-- Quick gate and ui-audit: see the report in the DONE message.
+## Also fixed from the independent audit (ui-audit A-F, phone 390x763)
+Before: A0 B5 C15 D8 E3 F1 (phone-s A1 F1; pc A77). After: **A0 B2 C0 D8 E3 F0** (phone-s A0 F0).
+- F: two big orange buttons on the title. The Story button is now plain until the lesson is done.
+- A: the "vs" in the top score chip was 11 px, now 13 px.
+- B: Launch and the lesson button had white on orange at 3.5:1, now dark text on the plate.
+- C: the Rules drawer's move-card swatches were stretched, now cropped to fit.
+- Not zero, honestly: B2 = the chapter-map header over the painted road (shared campaign kit, read-only); D8 = untextured parts of the 3D ship and rock models (art, not UI); E3 = "Host" (needs a network and a name), a locked chapter (locked on purpose) and a tutorial "Next" the audit taps out of order. pc A77 = text under 16 px on a wide desktop: the desktop layout is the older dock and was not reworked here (the bar for this pass is the phone).
+
+## Story mode
+Story mode (10 chapters, 3 acts, 3 bosses) already had a cast, intro scenes and win outros in `campaign.json`; unchanged. A lost chapter shows the kit's result screen (boss taunt, retry, easier option); the kit has no separate loss scene.
+
+## Checks (all green at the end of this branch)
+- `node tutor-test.js` (all modes: 390x763, 375x553, 1440x860, rotate, leave and resume, skip, story prologue, launch offer): 0 problems; 23 steps; every coverage step in `LORE.chapters` shown; wrong taps change nothing; elementFromPoint at each target is the target.
+- `node playbot.js quick 390x763` and `story 390x763`: play to the result by taps only (the bot is a poor pilot; it reaches the result win or lose), 0 console errors.
+- `build-all.py --quick nebula-aces` PASS, `rules-test.js` PASS (includes W391's rules fixes, merged).
+- After shots (phone): `playable-shots/*.webp`.
