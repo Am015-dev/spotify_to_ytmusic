@@ -1,5 +1,5 @@
 /* Playable pass (W386): dice words, turn banner, steadier chips, readable lines. Every rule is additive. */
-.die[data-lab]::after{content:attr(data-lab);position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);padding:1px 6px 2px;border-radius:7px;background:#1a1320;color:#fff;font:900 12px/13px Nunito,sans-serif;letter-spacing:.04em;white-space:nowrap;pointer-events:none;z-index:2}
+.die[data-lab]::after{content:attr(data-lab);position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);padding:1px 6px 2px;border-radius:7px;background:#1a1320;color:#fff;font:900 13px/14px Nunito,sans-serif;letter-spacing:.04em;white-space:nowrap;pointer-events:none;z-index:2}
 .die.kept[data-lab]::after{background:#ffd23f;color:#1a1320}
 #dice .die{position:relative}
 html.ph #ob #dice{row-gap:16px}
@@ -15,3 +15,15 @@ ol.hat{margin:.2rem 0 .6rem 1.2rem;padding:0;font-weight:700}
 html.ph-p header.gx-bar .pchip.me b{padding-right:0}
 html.ph-p header.gx-bar .pchip b{letter-spacing:0}
 html.ph #bline{font-size:15px;white-space:normal;line-height:1.2;max-width:calc(100% - 16px)}
+/* the tutorial's top strip: 25 steps now, so the dots shrink and the Skip button keeps its own room (13px text, 32px tall) */
+.gxt-dots{gap:2px}.gxt-dots i{width:5px;height:5px}
+.gxt-prog{gap:6px;font-size:13px;min-width:0;flex:1 1 auto;overflow:hidden}
+.gxt-skip{font-size:13px;min-height:32px;margin-left:8px;white-space:nowrap}
+
+/* the guide's story beats (tutorial): portrait + 2 short lines on a solid card, above the kit, never takes taps */
+#ppbeat{position:fixed;left:50%;top:92px;z-index:2147483000;transform:translate(-50%,-12px);opacity:0;pointer-events:none;display:flex;gap:10px;align-items:center;width:min(360px,calc(100vw - 24px));box-sizing:border-box;padding:8px 12px 8px 8px;border:3px solid #1a1320;border-radius:14px;background:#fff7dd;box-shadow:4px 4px 0 #1a1320}
+#ppbeat img,#ppbeat i{flex:0 0 52px;width:52px;height:52px;border-radius:50%;border:3px solid var(--bc,#e8c547);background:#fff;object-fit:cover;font:normal 30px/46px sans-serif;text-align:center}
+#ppbeat b{display:block;font:900 14px/1.1 Nunito,sans-serif;color:#7a2a12;letter-spacing:.02em}
+#ppbeat span{display:block;margin-top:2px;font:800 14px/1.25 Nunito,sans-serif;color:#1a1320}
+#ppbeat.on{animation:ppIn 4.2s ease both}
+@keyframes ppIn{0%{opacity:0;transform:translate(-50%,-12px)}8%{opacity:1;transform:translate(-50%,0)}88%{opacity:1}100%{opacity:0}}

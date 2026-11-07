@@ -14,7 +14,7 @@
   // ---- 2) turn banner
   let key = '', hideT = 0;
   function banner() {
-    if (!(typeof G!=='undefined'&&G) || G.winner || UI.intro || quiet()) return;
+    if (!(typeof G!=='undefined'&&G) || G.winner || UI.intro || quiet() || (window.GX && GX.open) || /[?&]scn=/.test(location.search)) return;   // scenarios build one exact state: no transient overlay
     const k = G.gid + '/' + G.tid + '/' + G.active; if (k === key) return; key = k;
     let el = $('ccbanner'); if (!el) { el = document.createElement('div'); el.id = 'ccbanner'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el) }
     const p = cur(), me = typeof humanTurn === 'function' && humanTurn();
@@ -40,5 +40,15 @@
     return t;
   };
   window.ppAfter = function () { banner(); dieLabels(); if (typeof bfLine === 'function') bfLine() };
+  // ---- the guide's story beats in the tutorial: a speech card with the portrait (Dot Inkwell, the Clarion's reporter), never over a tap target for long
+  let beatT = 0;
+  window.ppBeat = function (head, text, ms) {
+    if (typeof TUT_STORY === 'undefined') return;
+    let el = $('ppbeat'); if (!el) { el = document.createElement('div'); el.id = 'ppbeat'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el) }
+    const g = TUT_STORY.guide;
+    el.style.setProperty('--bc', g.color);
+    el.innerHTML = `<img src="${g.img}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:'${g.emoji}'}))"><div>${head ? `<b>${esc(head)}</b>` : `<b>${esc(g.name)}</b>`}<span>${esc(text)}</span></div>`;
+    el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(beatT); beatT = setTimeout(() => el.classList.remove('on'), ms || (head ? 4200 : 2400));
+  };
   window.addEventListener('load', () => setTimeout(dieLabels, 300));
 })();

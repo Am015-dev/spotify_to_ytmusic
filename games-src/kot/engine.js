@@ -1,6 +1,6 @@
 /* ================= Crown City Smash engine ================= */
 let G=null;
-const UI={choice:null,roll:null,pick:null,busy:false,info:true,coach:-1,fx:{},banner:'',pending:false,n:DEFN,mon:0,xp:DEFX,evo:DEFEVO,rollAnim:0,speed:1,ex:{},lvl:'normal',hints:true,paused:false,stats:false};
+const UI={choice:null,roll:null,pick:null,busy:false,info:true,coach:-1,fx:{},banner:'',pending:false,n:DEFN,mon:0,xp:DEFX,evo:DEFEVO,rollAnim:0,speed:1,ex:{},lvl:'normal',hints:true,paused:false,stats:false,order:'auto'};
 /* effect counters for coverage tests (not part of the synced state) */
 const COV={};function cov(k){COV[k]=(COV[k]||0)+1}
 const _mathRandom=Math.random;
@@ -317,7 +317,12 @@ function resolveCore(p){
   steps.push(next=>{const woundedCity=R.hitList.some(h=>h.lost>0);if(inHand(p,43)>=0&&woundedCity&&!inCity(p.i)&&!bug)ask(p.i,evoName(43),'You wounded the city and did not move in. Play it to take another turn after this one?',[{k:'y',l:'Play it'},{k:'n',l:'Keep it'}],()=>'y',k=>{if(k==='y'){p.hand.splice(p.hand.indexOf(43),1);p.edisc.push(43);G.tf.jungle=true;cov('evo:43')}next()});else next()});
   steps.push(next=>exAfterResolve(p,R,next));
   steps.push(next=>{if(curseOn('k_false')){const n=new Set(G.dice.filter(d=>!d.t).map(d=>d.f)).size;if(n){hitSync(p,n,null,'fx');cov('curse:false');out.push(`poisoned gift: −${n}♥`)}}next()});
-  seq(steps,(f,next)=>{if(G.winner){next();return}f(next)},()=>finishResolve(R))}
+  const go=()=>seq(steps,(f,next)=>{if(G.winner){next();return}f(next)},()=>finishResolve(R));
+  // rulebook: "you can resolve your dice in any order". The order that changes play is hearts versus claws (heal first, or heal what a claw hit costs you):
+  // automatic (hearts, then claws) unless the player switched Dice order to Ask in the menu
+  if(!bug&&p.human&&UI.order==='ask'&&c.H>0&&c.C>0&&canHealDice(p)&&steps.length>=5)
+    ask(p.i,'Dice order','The rules let you resolve dice in any order. Which first?',[{k:'h',l:'♥ Hearts, then claws'},{k:'c',l:'Claws, then hearts'}],()=>'h',k=>{if(k==='c')steps.unshift(steps.splice(4,1)[0]);go()});
+  else go()}
 function finishResolve(R){const p=R.p;deaths();
   UI.banner=typeof storyBanner==='function'?storyBanner(R):`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (Brainjack)':''}: ${R.out.length?esc(R.out.join(' · ')):'nothing useful'}`;
   if(R.out.length)lg(p.i,`${mname(p)} resolves${R.bug?' the stolen dice':''}: ${R.out.join(', ')}.`);

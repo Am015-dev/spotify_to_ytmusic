@@ -146,6 +146,14 @@ function tutSteps(){
    ready:()=>myBuy()&&P(0).vp>=20},
  {id:'result',title:'The result',say:'The first to 20 ★ wins at once. You also win if every rival is K.O. (0 hearts). Tap Finish.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
    ready:()=>!!(G&&G.winner&&UI.stats&&document.querySelector('#modal:not(.hidden)'))});
+  // the story layer (tut-story.js): the words, Dot's reactions and the chapter beats; the rules and actions above are untouched
+  const FIRST={goal:1,rivals:2,done3:3,later:4}, LAST={end1:1,yield:2,end3:3,result:4};
+  const H=()=>({vp:P(0).vp,hp:Math.max(0,P(0).hp),rival:nm(1),card:G.market[0]!==undefined?CARDS[base(G.market[0])].n:'the card',cost:G.market[0]!==undefined?costOf(P(0),G.market[0]):0});
+  S.forEach(x=>{const t=TUT_STORY.steps[x.id];if(!t)return;
+    if(typeof t.say==='function'){const f=t.say;x.say=()=>f(H())}else x.say=t.say;
+    const react=t.react,first=FIRST[x.id],last=LAST[x.id],B=TUT_STORY.beats;
+    const oe=x.onEnter;x.onEnter=()=>{if(oe)oe();if(first&&typeof ppBeat==='function')ppBeat('Chapter '+first+' · '+B[first].name,B[first].intro)};
+    const od=x.onDone;x.onDone=()=>{if(od)od();if(typeof ppBeat!=='function')return;if(react&&!last)ppBeat(null,react);if(last&&x.id!=='result')ppBeat('Chapter '+last+' done',(react?react+' ':'')+B[last].outro)}});
   const CH={goal:1,keep:1,roll1:1,third:1,energy:1,roll2:1,done1:1,score1:1,shop:1,buy:1,end1:1,rivals:2,stay:2,bonus:2,done2:2,score2:2,sweep:2,end2:2,yield:2,done3:3,score3:3,end3:3,later:4,win20:4,result:4};
   S.forEach(x=>{if(CH[x.id])x.title=CH[x.id]+' · '+x.title});
   return S}
