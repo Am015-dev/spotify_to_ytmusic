@@ -1,0 +1,28 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1>Twin Thrones</h1><span class="gx-sp"></span>
+  <button class="gx-ibtn" data-gx="cardsd" aria-expanded="false" aria-label="All cards">Cards</button>
+  <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log">Log</button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="How to play">Rules</button>
+  <button class="gx-ibtn" id="menubtn" aria-label="Menu">Menu</button>
+</header>
+<div class="gx-main">
+  <main class="gx-board" id="board" aria-label="The duel"><div id="bd"></div></main>
+  <aside class="gx-dock" id="dock" aria-label="What to do now">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt" id="dt">Your move</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
+    <div class="gx-dock-body" id="dockbody"><div id="msg" aria-live="polite"></div><div id="sub"></div><div id="acts"></div></div>
+  </aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
+</div>
+</div>
+<div id="start"></div><div id="res" hidden></div><div id="toast" role="status"></div>
+<div id="rulesbox" hidden></div><div id="logbox" hidden></div><div id="cardsbox" hidden></div>
+<script src="shell.js"></script>
+<script src="assets.js"></script>
+<script src="art.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="ui.js"></script>
+</body></html>
