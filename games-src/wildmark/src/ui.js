@@ -290,7 +290,7 @@ function showResult() {
   if (!G || !G.over || UI.resultShown === G.seed + ':' + G.logN) return; UI.resultShown = G.seed + ':' + G.logN;
   sfx('end'); save(); musicSync(); $('#toast').classList.remove('on');
   var sc = G.res, me = 0, title;
-  if (G.solo) title = 'You scored ' + sc[0].total; else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
+  if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
   rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
@@ -303,14 +303,14 @@ function showTitle() {
   st.hidden = false;
   if (UI.sv === 'setup') {
     var seg = function (id, list, cur) { return '<div class="seg" data-k="' + id + '">' + list.map(function (o) { return '<button type="button" class="sg' + (o[0] === cur ? ' on' : '') + '" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>'; };
-    st.innerHTML = '<div class="tbox" data-art="title-bg"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
+    st.innerHTML = '<div class="tbox"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
       '<div class="lbl">Rival skill</div>' + seg('ai', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], c.ai) +
       '<div class="lbl">Players on this device</div>' + seg('humans', [[1, '1'], [2, '2'], [3, '3'], [4, '4']], c.humans) +
       '<p class="sum">' + esc(setupSum(c)) + '</p><button type="button" class="big" id="goB">Start</button><button type="button" class="ab" id="backT">Back</button></div>';
     return;
   }
   var p = window.GXC ? GXC.progress() : null, n = p && window.CAMPAIGN ? CAMPAIGN.chapters.filter(function (x) { return p.ch[x.id] && p.ch[x.id].beaten; }).length : 0;
-  st.innerHTML = '<div class="tbox" data-art="title-bg"><div class="crest" aria-hidden="true">' + mkTok('elk') + mkTok('fox') + mkTok('salmon') + '</div><h1 class="logo">Wildmark</h1><p class="tag">Grow a wild valley. Settle its animals.</p>' +
+  st.innerHTML = '<div class="tbox"><div class="crest" aria-hidden="true">' + mkTok('elk') + mkTok('fox') + mkTok('salmon') + '</div><h1 class="logo">Wildmark</h1><p class="tag">Grow a wild valley. Settle its animals.</p>' +
     '<button type="button" class="big" id="storyB">Story<small>' + (n ? n + ' of ' + CAMPAIGN.chapters.length + ' regions restored' : 'Restore three wild regions') + '</small></button>' +
     (sv ? '<button type="button" class="ab wide" id="resumeB">Resume game</button>' : '') +
     '<button type="button" class="ab wide" id="quickB">Quick game</button>' +

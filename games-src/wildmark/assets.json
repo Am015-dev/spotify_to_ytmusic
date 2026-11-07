@@ -9,7 +9,7 @@
    "ratio": "16:9",
    "alpha": false,
    "wave": 1,
-   "slot": "#start .tbox (title and setup panel)",
+   "slot": "#start (title and setup screen background, behind the panel)",
    "prompt": "A wide misty mountain valley at dawn: a river winding through pine forest, a golden meadow, a marsh with reeds, snowy peaks behind; an elk and a hawk small in the distance; calm empty sky in the upper middle."
   },
   {

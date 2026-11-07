@@ -6,7 +6,7 @@ STYLE = ("Flat 2D storybook illustration, gouache texture, soft natural light, m
          "clean shapes, gentle outlines, Pacific mountain forest mood, no text, no letters, no numbers, no logos.")
 I = []
 def add(stem, kind, w, h, ratio, alpha, wave, slot, prompt): I.append(dict(stem=stem, kind=kind, w=w, h=h, ratio=ratio, alpha=alpha, wave=wave, slot=slot, prompt=prompt))
-add("title-bg", "bg", 1920, 1080, "16:9", False, 1, "#start .tbox (title and setup panel)", "A wide misty mountain valley at dawn: a river winding through pine forest, a golden meadow, a marsh with reeds, snowy peaks behind; an elk and a hawk small in the distance; calm empty sky in the upper middle.")
+add("title-bg", "bg", 1920, 1080, "16:9", False, 1, "#start (title and setup screen background, behind the panel)", "A wide misty mountain valley at dawn: a river winding through pine forest, a golden meadow, a marsh with reeds, snowy peaks behind; an elk and a hawk small in the distance; calm empty sky in the upper middle.")
 add("table-bg", "board", 1920, 1080, "16:9", False, 1, "#board background behind the hex map", "Top-down view of a mossy forest floor with soft pine needles and faint lichen, very low contrast, even texture, darker at the edges, nothing in the centre.")
 TER = {"peak": "grey granite mountain slopes with snow patches and small rocks", "forest": "dense dark green conifer canopy seen from above", "meadow": "golden prairie grass with scattered wildflowers seen from above",
        "marsh": "teal wetland with reeds, lily pads and shallow pools seen from above", "river": "clear blue river water with soft ripples and pebbles seen from above"}

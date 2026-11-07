@@ -48,6 +48,18 @@
     checks: [{ kind: 'tap', sel: '#w3B', name: 'Sweep 3', state: function () { return G.used3; }, expect: function (b, a) { return !b && a || 'used3 ' + b + '->' + a; } }]
   });
   GXS.add({
+    id: 'wm-story', name: 'Story: the region map', ask: 'Can you open region 1?', seed: 2, when: booted,
+    setup: function () { try { GXT.markDone('wildmark'); } catch (e) { } GXC.open(); return wait(500); },
+    checks: [{ kind: 'visible', sel: '.gxc-node', name: 'a region node' },
+      { kind: 'fn', name: 'ten chapters, three bosses', fn: function () { var c = CAMPAIGN.chapters; return c.length === 10 && c.filter(function (x) { return x.boss; }).length === 3 || 'chapters ' + c.length; } }]
+  });
+  GXS.add({
+    id: 'wm-boss', name: 'Boss: Bram starts with acorns', ask: 'Does the goal say Beat Bram?', seed: 6, when: booted,
+    setup: function () { UI.fast = true; window.ANIM = false; try { GXH.setEnabled(false); } catch (e) { } campStart(CAMPAIGN.chapters[2]); return wait(700); },
+    checks: [{ kind: 'eq', name: 'boss acorns', a: function () { return G.seats[1].acorns; }, b: function () { return 2; } },
+      { kind: 'visible', sel: '#mk .mt[data-i="0"]', name: 'market' }, { kind: 'text', sel: '#seats .seat:nth-child(2)', re: /Bram/, name: 'boss seat chip' }]
+  });
+  GXS.add({
     id: 'wm-result', name: 'Season end: results', ask: 'Can you read the score table?', seed: 3, when: booted,
     setup: function () { begin({ np: 3, humans: 1, ai: 'normal', seed: 3 }); WM.forceEnd(G); step(); return wait(600); },
     checks: [{ kind: 'visible', sel: '#againB', name: 'Play again' }, { kind: 'visible', sel: '#rs .st', name: 'score table' },
