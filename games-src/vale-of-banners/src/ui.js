@@ -575,7 +575,6 @@ var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn
   '<li>Build: tap a tile in your storage, then a glowing space of its colour next to your land.</li>' +
   '<li>No good move? Take 2 workers; each worker turns a die up or down by 1.</li>' +
   '<li>Tap End turn. Most points after five seasons wins.</li></ol><h3>All the rules</h3>' +
-  '<p><b>Solo</b> (Quick game, 1 player): 1 silver, 2 workers, 3 goods, no limit on goods kinds, 25 rounds; you win only by filling all 37 spaces. <b>Teams</b> (4 players, 2 v 2): partners share silver, workers and goods; the team with more points wins.</p>' +
   '<p>Five seasons of five rounds. Every round each steward rolls <b>two dice</b>. On your turn use each die for one action:</p>' +
   '<ul><li><b>Take</b> a tile from the market stall with the die\'s number into your storage (3 spaces).</li>' +
   '<li><b>Build</b> a stored tile on an empty space of its colour that shows the die\'s number and touches your land.</li>' +
@@ -589,6 +588,8 @@ var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn
   '<li><b>Barge</b> (blue): take all goods from one stall and move up the banner track (turn order).</li></ul>' +
   '<h3>Scoring</h3><p>Fill a whole region: 1/3/6/10/15/21/28/36 points for 1-8 spaces, plus 10/8/6/4/2 for doing it in season 1-5. First to fill every space of one colour gets 5/6/7 points (2/3/4 players); the second gets 2/3/4. Each round one goods tile goes to the stall shown by the white die.</p>' +
   '<p>Game end: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, plus Lore scrolls. Most points wins; a tie goes to the fuller estate, then to the steward further back on the banner track.</p>' +
+  '<h3>Solo and teams</h3>' +
+  '<p><b>Solo</b> (Quick game, 1 player): 1 silver, 2 workers, 3 goods, no limit on goods kinds, 25 rounds; you win only by filling all 37 spaces. <b>Teams</b> (4 players, 2 v 2): partners share silver, workers and goods; the team with more points wins.</p>' +
   '<h3>Simplified on purpose</h3><ul><li>The estate map and its numbers are our own layout.</li><li>All tiles come from one shuffled pool into the six stalls; tile counts per kind are our own.</li><li>The 26 Lore tiles are our own.</li><li>A fourth kind of goods that does not fit your storage is lost.</li><li>Goods come from one bag for the start and every season.</li></ul></div>';
 function drawers() {
   var r = h('div', { html: RULES_HTML }); GX.drawer('rulesd', 'How to play', r);
