@@ -1,0 +1,20 @@
+{
+ "wave": 3,
+ "ratio": "1:1",
+ "flow_aspect": "1:1",
+ "style": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "stitchwise 2D wave 3, ratio 1:1. Paste with the Flow aspect given; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "stitchwise",
+  "count": 7
+ },
+ "cards": {
+  "portrait-fernsby": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. Bust portrait of Granny Fernsby, a stern elderly woman with white hair, a green shawl and a prize ribbon pinned to her chest, friendly storybook style, plain warm background.",
+  "portrait-marguerite": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. Bust portrait of Marguerite Bodkin, an elegant woman with a red velvet jacket, a gold needle brooch and a calm half-smile, friendly storybook style, plain warm background.",
+  "portrait-aurelia": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. Bust portrait of Queen Aurelia, a regal woman with a crown made of golden thimbles and a purple robe stitched with tiny patches, friendly storybook style, plain warm background.",
+  "fx-sparkle": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A single bright four-point golden sparkle with tiny sewing-thread curls. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "fx-stitch": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A single short curved line of cream running stitches with a needle and thread tail. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "icon-bonus": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A single small gold rosette ribbon. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "icon-leather": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A single small brown leather square with cream stitches. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
+ }
+}

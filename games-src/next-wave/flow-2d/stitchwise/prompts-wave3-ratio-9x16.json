@@ -1,0 +1,16 @@
+{
+ "wave": 3,
+ "ratio": "9:16",
+ "flow_aspect": "9:16",
+ "style": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "stitchwise 2D wave 3, ratio 9:16. Paste with the Flow aspect given; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "stitchwise",
+  "count": 3
+ },
+ "cards": {
+  "bg-map": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A painted map of a countryside with three fairgrounds, striped tents and bunting, winding paths between them, empty open areas for markers.",
+  "result-win": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A cheerful fairground at golden hour with bunting and a first-prize rosette on a quilt hung on a line, empty centre.",
+  "result-lose": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A quiet fairground at dusk with lanterns being lit and a half-finished quilt on a frame, calm and warm, empty centre."
+ }
+}

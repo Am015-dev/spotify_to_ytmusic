@@ -1006,95 +1006,34 @@
  "prologue": {
   "guide": "ward",
   "rival": "bram",
-  "note": "Tutorial text (tutor.js reads it by step id). Story reason first, then the action; the next step opens with the reaction. Max 2 short lines.",
-  "steps": {
-   "goal": [
-    "1 First turn",
-    "Rowan: The frost is breaking. Bram Hollowell wants this valley for timber. Make it wild again in 3 days and it stays wild."
-   ],
-   "cards": [
-    "1 First turn",
-    "Rowan: Each animal has its own way of living. Bears pair up, elk walk in lines. Their points show up here."
-   ],
-   "take": [
-    "1 First turn",
-    "Rowan: A bear is waking in the old forest. Take that forest tile, with the bear under it."
-   ],
-   "spot": [
-    "1 First turn",
-    "Rowan: Good. Now find it a home next to your valley."
-   ],
-   "ok": [
-    "1 First turn",
-    "Rowan: Right there by the river? Then set it down."
-   ],
-   "tok": [
-    "1 First turn",
-    "Rowan: The forest is ready. Let the bear in: it only goes on a tile that shows a bear."
-   ],
-   "acorn": [
-    "1 First turn",
-    "Rowan: See the gold rim? A keystone. The bear left you an acorn. Keep it: it is a point, or a favour later."
-   ],
-   "take2": [
-    "2 Scoring",
-    "Rowan: Day two. A second bear is wandering, lonely. Take its tile. Bears are happiest in pairs."
-   ],
-   "spot2": [
-    "2 Scoring",
-    "Rowan: Put it right beside your first bear, so they can find each other."
-   ],
-   "rot": [
-    "2 Scoring",
-    "Rowan: This tile has two lands. Turn it so the forest edges meet: joined land grows one big habitat."
-   ],
-   "ok2": [
-    "2 Scoring",
-    "Rowan: Each joined forest tile is a point at the thaw. Set it down."
-   ],
-   "tok2": [
-    "2 Scoring",
-    "Rowan: Now bring the second bear home. Watch the den light up!"
-   ],
-   "pair": [
-    "2 Scoring",
-    "Rowan: A den of two! +4. Bram cuts wood all day; you just made a family. More pairs score much more."
-   ],
-   "sweep": [
-    "3 Special moves",
-    "Rowan: Day three. Three elk crowd the market and nobody wants them. Sweep them away for fresh animals."
-   ],
-   "free": [
-    "3 Special moves",
-    "Rowan: Your acorn now: spend it to take any tile with any animal you like."
-   ],
-   "freet": [
-    "3 Special moves",
-    "Rowan: The river keystone. Bram dammed half the creek; let us give the water back."
-   ],
-   "freek": [
-    "3 Special moves",
-    "Rowan: And the fox, to keep an eye on everyone. Foxes love lots of different neighbours."
-   ],
-   "spot3": [
-    "3 Special moves",
-    "Rowan: Wherever you think the water should run. Then set it down."
-   ],
-   "ok3": [
-    "3 Special moves",
-    "Rowan: Set it down."
-   ],
-   "tok3": [
-    "3 Special moves",
-    "Rowan: Settle the fox, or send it back if it would spoil a pattern. Both are fine."
-   ],
-   "end": [
-    "4 Final score",
-    "Rowan: The thaw! Animals, joined land and acorns all count. Bram will not fence a valley this alive."
-   ]
-  },
+  "note": "Coached first game: Rowan speaks the first time each rule matters (coach[id]); rules that never came up are listed at the end. Max 2 short lines each.",
   "endTitle": "The valley stays wild",
-  "endText": "Rowan: Bram packed up his saws, for now. The real seasons are 20 turns long."
+  "endText": "Rowan: That was a real game. Now the seasons are 20 turns long.",
+  "turns": 8,
+  "coach": {
+   "goal": "Bram wants this valley for timber. Out-grow his valley in 8 turns and it stays wild. Pick any tile with the animal under it.",
+   "place": "Tiles must touch your valley. Tap any glowing spot, then Place.",
+   "habitat": "Matching edges join land. Each terrain scores 1 point per tile in your biggest joined group.",
+   "rotate": "This tile has two lands. Tap Turn until the edges match your valley, then Place.",
+   "settle": "Animals only live on a tile that shows them. No good spot? Return it, no penalty.",
+   "bear": "Bears score in pairs: groups of exactly 2 touching bears. A third bear spoils the pair.",
+   "elk": "Elk score in straight lines. The longer the line, the more points.",
+   "salmon": "Salmon score in runs: a chain where each salmon touches at most 2 others.",
+   "hawk": "Hawks like to be alone: each hawk touching no other hawk scores.",
+   "fox": "A fox scores 1 point for each different animal next to it.",
+   "keystone": "A gold-rimmed keystone! Settling an animal there earns an acorn: 1 point at the end, or a favour now.",
+   "acornSpend": "You have an acorn. Tap \"Use acorn\": a free pick takes any tile with any animal, or replace the animals on offer.",
+   "sweep3": "Three alike in the market. You may sweep them for fresh animals, once per turn, for free.",
+   "wipe4": "Four alike: the market clears them by itself and deals new animals.",
+   "rival": "Bram's turn. Watch the caption: he takes, places and settles just like you.",
+   "majority": "Bigger habitat than Bram in a terrain? That terrain pays you a bonus: +2 (a tie gives both +1).",
+   "final": "The thaw. Here is how your score adds up, rule by rule.",
+   "acornsEnd": "Each acorn you still hold is 1 point.",
+   "tiebreak": "A tie goes to whoever has more acorns left; still tied, you share the win.",
+   "good": "Nice move: +{n} from {card}.",
+   "poor": "That one scored nothing yet. Next time look for a spot that fits its card."
+  },
+  "later": "Things you will meet later"
  },
  "quick": {
   "intro": [

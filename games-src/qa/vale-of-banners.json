@@ -1,0 +1,224 @@
+{
+ "slug": "vale-of-banners",
+ "size": "phone",
+ "seed": 72403,
+ "when": "2026-11-07T22:43Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 0
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 1128
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 722
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#start.ov.hasart \"Vale of Banners Roll two\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases tutorial",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#start.ov.hasart \"Vale of Banners Roll two\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases quick",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-title-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#start.ov.hasart \"Quick game Players Solo \"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases quick",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-quick-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #1128 (×2)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1128 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases quick",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-quick-noresult-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.gx-ibtn \"Scores and players\" / button.gxc-ib \"Tutorial\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.gx-ibtn \"How to play\" / button.gxc-ib.gxc-score \"★ 0/30\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.gx-ibtn \"Menu\" / button.gxc-ib.gxc-score \"★ 0/30\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gx-ibtn \"Scores and players\" / button.gxc-ib \"Tutorial\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gx-ibtn \"How to play\" / button.gxc-ib.gxc-score \"★ 0/30\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gx-ibtn \"Menu\" / button.gxc-ib.gxc-score \"★ 0/30\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gxc-node.a3.locked \"7 🔒 The Silver Road\" / button.gxc-btn.go \"Play\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#mt-4-1.tilebtn.lab \"3 Pigs\" / div.hx.hasart",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#bl-0.tilebtn.glow.lab \"Keep\" / button.btn \"Take to storage (die 3)\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#bl-1.tilebtn.glow.lab \"Lore\" / button.btn \"Take to storage (die 3)\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#bl-2.tilebtn.glow.lab \"3 Geese\" / button.btn \"Take to storage (die 3)\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#bl-3.tilebtn.glow.lab \"Barge\" / button.btn \"Take to storage (die 3)\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#tv.ov \"Smuggler's Wink Lore til\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button#mt-1-0.tilebtn.lab \"Joiner\" under div#tv.ov \"Smuggler's Wink Lore til\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #722 (2)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 722 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-story-noresult-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#start.ov.hasart \"Vale of Banners Roll two\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-title-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.och \"3. Friend 1 0 pts\" / button.gx-x \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 40px (<40) button.gx-x x1: \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) button.gx-chip x5: \"Game\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 28px (<40) input x2: \"Master volume\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#gd-1.gbtn \"1 ×1\" / input \"Master volume\"",
+   "repro": "node games-src/scripts/qa-bot.js vale-of-banners --size phone --seed 72403 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots/vale-of-banners/phone-screen-fuzz-screen-18.png"
+  }
+ ],
+ "secs": 427
+}

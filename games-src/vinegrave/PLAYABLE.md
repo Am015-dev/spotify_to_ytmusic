@@ -51,6 +51,24 @@ Toasts now sit above the dock, so they never cover the instruction line.
 - ADDENDUM 2: rules-check fixed 2/2 (WRONG 1: a Boat pays a Boot; MISSING 1: empty shrine slots score 1/1/1/2). Each has rules-test cases named after the item. The 5 SIMPLIFIED items are listed in the rules drawer under "Simplified on purpose".
 - ADDENDUM 3: STORY.md (cast, 3 acts). The prologue text is in V.STORY (src/data.js). Every Story chapter now has a win and a loss line. Quick games open with a flavour line and end with a result line in the game's voice. The final count climbs.
 
+- Free CC0 art kit (orchestrator, 21:37): merged and installed (170 pictures), and every gate re-run with it. Desktop card pictures show in full, with the effect line under the picture instead of over it. The kit's Boot, Jeep, Plane, arrowhead and jewel icons are the same blank hexagon, less clear than the code-drawn shapes, so those 5 slots keep the code glyph (WEAK_ART in src/ui1.js; delete an entry when real art arrives). Phone cards still hide the card picture: it would be about 50x14 px there. The name is clearer, and a tap shows the big card with its picture. Solid backings were added behind the track numbers, site names and row labels that now sit over art.
+
+## Phone layout redo (owner bug report 21:53: "tiny everything, very badly organised")
+Before: map, market row, research track, hand and dock all on one 390x763 screen. Market cards were 58 px wide with icon-only effects, the track was a 56 px strip, and hand cards were 66 px (shot: playable-shots/layout-before-phone.webp).
+After (playable-shots/layout-after-{map,row,track}-phone.webp):
+- ONE big area at a time behind three 44 px tabs: **Map** (the default: sites fill the width, row labels on solid backing), **Market** (6 cards in a 3x2 grid, each about 120 px wide with name, picture and the plain effect in words), **Research** (full-width track with each row's cost and a one-line "how it works").
+  A gold dot marks a tab that holds something you can do now.
+- Your hand is a bottom tray: each card is 31% of the screen wide (more than 30%), showing its name, picture and plain effect. Swipe for the rest; tap a card for the big view.
+- Rival turns open the tab their move happens in (e.g. Market when Tamsin buys), then go back to the Map when your turn starts. Each tutorial step opens the tab its target is in.
+- Phone base text 14 px (cards, labels, chips); tabs, explorer chips, Pass and tags are at least 44 px tall. The instruction stays at most 2 lines.
+- Gate: build-all --quick PASS (the scenarios now open the Market / Research tab before checking). Tutorial-to-end PASS at 390x763 and 1440x860 (17 steps). Quick game by UI taps PASS at 390x763 (the tapper also uses the tabs). Smoke PASS. qa-bot phone (final, with the coached tutorial): 0 blockers, 0 majors, 21 minors (before: 0 / 0 / 48). An earlier run had 1 major: The one major is "stuck overlay without any button: div#iscrim" in the fuzz phase on tutorial step 2 (screenshot: big card open, "Play it" spotlit and tappable, Skip tutorial visible). Fixed: while the tutor is active the inspector scrim is click-through (the tutor blocks input itself).
+
+## ADDENDUM 4: a coached first game, not tap-tap
+- The tutorial is a real 2-round game against the real computer (easy). It has only 2 forced steps (Trail Notes, Play it); after that every legal move is allowed and the tutor draws nothing over the board.
+- Pell speaks just in time, in one non-blocking bubble with a ×. He explains a rule the first time it becomes an option or happens, comments on 2 of your moves (good move / tip, from the hard AI's reasoning), and explains the rival's first move and first pass.
+- After the game: 3 steps walk through the final scoring with your real numbers. The end card lists "Things you'll meet later" for every rule that did not come up, then starts a real game.
+- tut-test.js plays the coached game through the UI with free legal choices and asserts every rule id was explained in play or listed on the end card. Last run: phone 23/27 explained in play, pc 20/27, the rest listed on the end card. After the 2 forced steps the shared tutor steps aside (qa-bot drives tutor steps and cannot play a free game inside one). A second short tutor run starts at game end for the score walk-through and end card. During free play a "Leave tutorial" button sits next to Pass. Coverage table: TUTORIAL-COVERAGE.md.
+
 ## Remaining
 - Phone market cards still show effects as icons (no room for a sentence at 58 px); the name is readable and a tap opens the full text.
 - The vp badge on a phone market card can touch the cost icon on 4-coin cards.

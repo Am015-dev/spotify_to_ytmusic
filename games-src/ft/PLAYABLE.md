@@ -15,7 +15,7 @@ Method: screenshots at 390x763 and 1440x860 (title, tutorial steps, first turn, 
 | 7 | Result screen: a table, no reaction, the human named "Onyx". | A voice line (win and loss variants), "You" instead of the seat name. |
 | 8 | Help opened with a long rules wall. | Rules drawer starts with "How a turn works" in 5 short lines. |
 | 9 | Story map: the chapter title was squeezed to one letter per line on a phone (shared kit header). | Worked around in this game's css (title on its own row); the shared kit is untouched. |
-| 10 | Goods row cards show only a picture, no name; seat badges (people count) are small icons. | NOT fixed in this pass (needs a layout change of the market row that would push the board off the 390x763 screen); listed in remaining work. |
+| 10 | Goods row cards show only a picture, no name; seat badges (people count) are small icons. | W408: the goods row is 5 columns x 2 rows on a phone (picture over a 13px name, 16px on desktop), so every card is named; the board tiles shrink a little. Seat badges: not changed (the seat chips already use the 13px counters). |
 
 ## Tests added
 - `playable-test.js quick|story [WxH] [shotsDir]`: plays a Quick game / Story chapter 1 to the result by real touch taps on visible, uncovered UI only.
