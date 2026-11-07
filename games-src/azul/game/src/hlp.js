@@ -61,7 +61,7 @@ function hlpSuggest(){const pl=hlpPlan();if(!pl)return null;const why=hlpWhy(pl.
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'sunglaze',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.bf-row.ok .bf-rack,.bf-floor.ok .bf-fl,.bf-c.pick,.bf-k.can,.bf-pool.can,.bf-t.adv'})}
+  GXH.init({game:'sunglaze',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.bf-row.ok .bf-rack,.bf-floor.ok .bf-fl,.bf-c.pick,.bf-k.can,.bf-pool.can,.bf-t.adv,.gxc-act,.gxc-node'})}
 function hlpAfter(){if(typeof GXH==='undefined')return;hlpInit();
   const b=document.getElementById('bulbbtn');if(b&&b!==hlpAfter._b){hlpAfter._b=b}
   if(b)GXH.bulb({el:b,suggest:hlpSuggest,rulesFor:hlpPhase});

@@ -54,7 +54,9 @@ function cgCss(){if(document.getElementById('cg-css'))return;const s=document.cr
   +'@keyframes cg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){.cg-b{animation:none}}'
   +'@media (min-width:1024px){.cg-b,.cg-b b,.cg-later,.cg-x{font-size:16px}.cg-b{width:420px!important}}.cg-later{text-align:left;font-size:13px;font-weight:600;margin:0;padding-left:18px}.cg-later li{margin:2px 0}';
   document.head.appendChild(s)}
-function cgPlace(){const e=CG.el;if(!e)return;const W=innerWidth,H=innerHeight;const me=document.querySelector('.bf-me');const r=me&&me.getBoundingClientRect();
+function cgPlace(){const e=CG.el;if(!e)return;
+  const ov=document.querySelector('.gxc.gxc-map-on,.gxc.on,.gx-scrim.on,.gx-drawer.on,#modal:not([hidden]) *');e.style.visibility=ov?'hidden':'';if(ov)return;   // never over a menu, drawer or the Story map
+const W=innerWidth,H=innerHeight;const me=document.querySelector('.bf-me');const r=me&&me.getBoundingClientRect();
   const w=Math.min(W-16,r&&r.width>200?Math.max(300,Math.min(r.width,400)):360);e.style.width=w+'px';
   let left=r&&r.width>200?Math.min(r.left,W-w-8):(W-w)/2;e.style.left=Math.max(8,left)+'px';
   const h=e.getBoundingClientRect().height;
