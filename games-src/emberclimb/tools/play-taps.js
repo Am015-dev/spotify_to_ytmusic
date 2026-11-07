@@ -32,7 +32,7 @@ const MODE = process.argv[2] || 'both', SHOTS = path.join(__dirname, '..', 'shot
         else if (!cb) { const nx = await pg.$('.gxc-node.next'); if (nx) await T(nx); else await T('#story'); }
         continue;
       }
-      const sc = await byText('[class*="gxc-sc"] button, .gxc-scene-on button', /^(Next|Fight|Continue)\b/i); if (sc) { await T(sc); continue; }
+      const sc = await byText('button', /^Fight$/) || await byText('[class*="gxc"] button', /^(Next|Continue)$/); if (sc) { await T(sc); continue; }
       if (s.scr === 'over') { const b = await byText('button', /^(Story map|Next chapter|Map|Continue)/i); if (b) { await T(b); } continue; }
       if (s.scr === 'map') { await T('.node.glow'); continue; }
       if (s.scr === 'battle') {
