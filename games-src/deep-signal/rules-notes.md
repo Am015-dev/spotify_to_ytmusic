@@ -33,7 +33,7 @@ Co-operative trick taking for 2-5 players; everyone wins or loses together.
   of rules and growth, not copies).
 
 ## Rulebook cross-check (7 Nov 2026, addendum 2)
-Checked against an online rules summary (https://lehi-innovation.github.io/boardgame-rules/rules/the-crew-the-quest-for-planet-nine/)
+Checked against an online rules summary (lehi-innovation.github.io)
 and the published rulebook/FAQ search results (rulebook PDFs found online, rulespal FAQ):
 - Signals: once per mission, never during a trick, no trumps, top = highest / middle = only / bottom = lowest: matches.
 - Dead zone: card shown, position not given: matches (`'?'`). Disrupted communication for the first tricks: matches `late2`/`late3`.
