@@ -189,7 +189,7 @@
     else if (g.scr === 'shop') { txt = 'Tap an item, then Buy.'; ttl = 'Shop'; }
     else if (g.scr === 'event') { txt = 'Choose one.'; ttl = 'Event'; }
     else if (g.scr === 'over') { txt = g.won ? 'You won this climb.' : 'This climb is over.'; ttl = 'Result'; }
-    m.textContent = txt; t.textContent = ttl;
+    m.textContent = txt; t.textContent = ttl; var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
     if (g.scr !== 'over') a.appendChild(potRow());
     if (g.scr === 'battle' && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
     UI.endBtn = null;
@@ -435,7 +435,7 @@
   function bigCard(c) { var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); pk.addEventListener('pointerdown', function (e) { e.stopPropagation(); pk.remove(); }); pk.addEventListener('click', function () { pk.remove(); }); document.body.appendChild(pk); }
   function resultScr(r, done) {
     var g = G(), s = h('div', 'over res'); s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
-    s.appendChild(h('h1', '', g.won ? 'SUMMIT!' : 'FALLEN'));
+    s.appendChild(h('h1', '', g.won ? ((g.F || 9) >= 9 ? 'SUMMIT!' : 'CLIMB WON!') : 'FALLEN'));
     var bossId = g.boss, kid = g.won ? bossId : g.killer, kd = kid && D.ENEMIES[kid];
     var cause = h('div', 'cause');
     if (kd && (!g.won || g.floor >= g.F)) cause.appendChild(A('enemy-' + kid, '', { ph: '#6a3a2a', cls: 'cause-art' }));
