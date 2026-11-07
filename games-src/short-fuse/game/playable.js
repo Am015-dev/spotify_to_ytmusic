@@ -12,7 +12,7 @@ function plain(t){const me=plSeat();t=String(t||'');
   if(me<0)return t;const n=plEsc(nm(me));
   return t.replace(new RegExp("one of "+n+"'s wires",'g'),'one of your wires').replace(new RegExp("of "+n+"'s wires",'g'),'of your wires')
     .replace(new RegExp('^'+n+' (points|cuts|uses)','g'),(m,a)=>'You '+({points:'point',cuts:'cut',uses:'use'})[a]).replace(new RegExp('(; |, )'+n+' cuts','g'),'$1you cut')
-    .replace(new RegExp('^'+n+"'s",'g'),'Your').replace(new RegExp(n+"'s",'g'),'your').replace(new RegExp('\\b'+n+'\\b','g'),'you')}
+    .replace(/^You point(.*) and says/,'You point$1 and say').replace(new RegExp('^'+n+"'s",'g'),'Your').replace(new RegExp(n+"'s",'g'),'your').replace(new RegExp('\\b'+n+'\\b','g'),'you')}
 function plCut(){return G?G.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0):0}
 // ---------- (a) the banner ----------
 function plBanner(txt,col){const tb=document.getElementById('tb');if(!tb)return;let b=document.getElementById('turnb');if(!b){b=document.createElement('div');b.id='turnb';b.setAttribute('aria-hidden','true');tb.appendChild(b)}

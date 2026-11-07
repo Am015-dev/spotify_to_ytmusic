@@ -25,17 +25,17 @@ const STORY={
    crew1:[2,'brix','Crew turns','Watch: Teal used your token to cut your 3. Plum held the last 3s and cut them alone.'],
    wrong1:[2,'brix','A wrong guess','Quill\'s rigs punish guesses, so we practise failing. Tap Plum\'s second wire.'],
    wrong2:[2,'brix','Say a number','Say 2. It is really a 1, so this will miss.'],
-   wrongres:[2,'quill','Quill laughs',()=>{const t=G.st[2].w[tutIdx(2,3)].tok[0];return 'Tick, tick. The fuse burned a step, and a token shows the true number: a '+(t?t.v:1)+'.'}],
+   wrongres:[2,'quill','Tick, tick',()=>{const t=G.st[2].w[tutIdx(2,3)].tok[0];return 'Tick, tick. The fuse burned a step, and a token shows the true number: a '+(t?t.v:1)+'.'}],
    crew2:[2,'brix','Use the clue','Teal used that token to cut a 1, Plum cut the last. A green check marks a finished number.'],
    probe:[3,'brix','Twin Probe','Your trick: once per job, point at two wires and say one number. It hits if either matches.'],
    gear:[3,'brix','Gear','Rewind is ready. Tap it to turn the fuse back one step. Gear works once.'],
    yellow1:[3,'brix','Yellow wires','Quill loves yellow: a yellow only matches a yellow. You hold one, so tap Plum\'s last wire.'],
    yellow2:[3,'brix','Say yellow','Say your yellow wire. That is the only way a yellow ever matches.'],
-   red:[3,'quill','Quill warns','Never point at red or it blows. If red is all you hold, it reveals itself.'],
+   red:[3,'quill','Never red','Never point at red or it blows. If red is all you hold, it reveals itself.'],
    solo:[4,'brix','Solo cut','You hold every 2 left, so cut them alone. Tap one: both go, no risk.'],
    win:[4,'brix','Defused!','Every wire cut. The rig is silent, and Quill\'s brass key falls off the door. You are on the crew.']},
-  endTitle:'The rig is silent',endText:'Quill\'s key lies on the step. You know every rule now. Chapter 1 is next.',
-  endTextPlain:'Point, name, tokens, the fuse, gear, yellow, red. Real jobs add twists: the lightbulb explains them.'},
+  endTitle:'The rig is silent',endText:'Quill\'s key lies on the step. You know every rule. Chapter 1 is next.',
+  endTextPlain:'Quill\'s key lies on the step. You know every rule. Real jobs add twists: the lightbulb explains them.'},
  // Help: "How a turn works" in five short lines, before any detail
  turn:['<b>1.</b> On your turn, tap a crewmate\'s wire you want to guess.','<b>2.</b> Then tap one of YOUR numbers to say it. Your number must be one you hold.','<b>3.</b> Match: you both cut. Miss: the fuse burns one step.','<b>4.</b> Then the next player goes, clockwise. The computer crew plays step by step.','<b>5.</b> Cut every wire before the fuse runs out. Red wires blow up: never point at one.']
 };

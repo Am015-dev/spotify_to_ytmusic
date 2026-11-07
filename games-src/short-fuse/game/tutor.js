@@ -122,7 +122,7 @@ function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
 function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:STORY.tut.endTitle,endText:o?STORY.tut.endText:STORY.tut.endText+' '+STORY.tut.endTextPlain,
+    endTitle:STORY.tut.endTitle,endText:o?STORY.tut.endText:STORY.tut.endTextPlain,
     endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:tutNew,
     onDone:r=>{tutLeave();const c=r&&r.choice;
