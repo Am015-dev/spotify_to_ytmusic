@@ -221,5 +221,5 @@ html body .gx-drawer{transition:none}   /* panels appear at once: no half-slid f
 @keyframes wmban{0%{opacity:0;transform:translate(-50%,-50%) scale(.8)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.04)}30%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0}}
 /* the guide in tutorial bubbles: a code-drawn crest (green disc, gold ring) until a painted portrait exists */
 .gxt-bub .gxh-tt{display:flex;align-items:center;gap:8px}
-.gxt-bub .gxh-tt::before{content:'\1F9D1\200D\1F33E';flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:#3f7a4a;box-shadow:0 0 0 2px #e6b04f;display:inline-flex;align-items:center;justify-content:center;font-size:19px;line-height:1}
+.gxt-bub .gxh-tt::before{content:'';background:#3f7a4a url(media/portrait-rowan.webp) center/cover no-repeat;flex:0 0 auto;width:34px;height:34px;border-radius:50%;box-shadow:0 0 0 2px #e6b04f;display:inline-flex;align-items:center;justify-content:center;font-size:19px;line-height:1}
 .qline{margin:0 0 6px;text-align:center;font-size:16px;font-style:italic;color:#f3ead2}
