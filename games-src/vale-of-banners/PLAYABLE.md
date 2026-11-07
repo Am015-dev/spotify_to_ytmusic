@@ -34,6 +34,11 @@ rules-check MISSING 2/2 fixed in the engine with rules-test cases: solo mode (1 
 win only with all 37 spaces) and 2 v 2 teams (shared silver, workers, goods; team total wins; pool scores once). WRONG: 0 listed.
 SIMPLIFIED-ON-PURPOSE (5) are listed in the Rules drawer under "Simplified on purpose".
 
+## Free art kit
+Merged and tested with `free-art/install.py --force` (92 pictures): the title now has a painted scene, tiles show their pictures. Code only hides
+the emoji glyph when a picture exists; labels sit on the lower edge; the dim on not-playable tiles was lightened (opacity .6) so pictures stay
+readable. Gate re-run with the kit installed: same results as below.
+
 ## Proof (local, 390x763 unless noted)
 - build-all --quick PASS; rules-test PASS (28 + 300 AI games); smoke phone/landscape/pc PASS.
 - `node tut-end.js`: tutorial from fresh storage by tapping each spotlit centre (elementFromPoint = target) PASS at 390x763 and 1440x860; end card ->
