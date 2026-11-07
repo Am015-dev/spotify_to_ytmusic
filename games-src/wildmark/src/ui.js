@@ -60,8 +60,10 @@ function newGame(cfg) {
   UI.cfg = cfg; UI.humans = cfg.humans; UI.view = 0; UI.lastHuman = 0; UI.ghost = null; UI.free = null; UI.wipe = null; UI.undo = null; UI.lit = null; UI.userPan = 0; UI.passed = -1;
   $('#start').hidden = true; $('#rs').hidden = true; try { GX.close(); } catch (e) { }
   fitView(true); render(); step(); save(); musicSync();
+  var q = window.CAMPAIGN && CAMPAIGN.quick; if (q && q.intro && UI.mode === 'quick' && !UI.fast) setTimeout(function () { toast(q.intro[Math.floor(Math.random() * q.intro.length)], 2600); }, 500);   // one-line flavour (text in campaign.json)
   return G;
 }
+function quickLine() { var q = window.CAMPAIGN && CAMPAIGN.quick; if (!q || UI.mode !== 'quick' || !G) return ''; var t = G.solo ? q.solo : G.winner === -2 ? q.tie : G.winner === 0 ? q.win : q.lose; return t ? '<p class="qline">' + esc(t) + '</p>' : ''; }
 function save() { if (!G || UI.mode !== 'quick' || G.over) { if (G && G.over && UI.mode === 'quick') try { localStorage.removeItem('wm-save'); } catch (e) { } return; } try { localStorage.setItem('wm-save', JSON.stringify({ G: G, cfg: UI.cfg })); } catch (e) { } }
 function loadSave() { try { var s = JSON.parse(localStorage.getItem('wm-save') || 'null'); return s && s.G && !s.G.over ? s : null; } catch (e) { return null; } }
 function resume() { var s = loadSave(); if (!s) return; G = s.G; UI.cfg = s.cfg; UI.humans = s.cfg.humans || 1; UI.mode = 'quick'; UI.view = meSeat(); UI.ghost = UI.free = UI.wipe = UI.undo = null; UI.camp = null; $('#start').hidden = true; fitView(true); render(); step(); musicSync(); }
@@ -382,7 +384,7 @@ function showResult() {
   if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
-  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + whyLine(sc, me) + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
+  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + quickLine() + whyLine(sc, me) + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
   try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
 }
 // ---------------------------------------------------------------- title + setup

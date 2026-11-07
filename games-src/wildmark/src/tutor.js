@@ -19,7 +19,11 @@ function tcell(fn) { return function () { var c = fn(); if (!c) return null; var
 function tbear() { var env = G.seats[0].env; for (var c in env) if (env[c].tok === 'bear') return c; return null; }
 function tspotNear() { var b = tbear(); if (!b) return null; var sp = WM.spots(G.seats[0].env); var n = WM.nb(b).filter(function (x) { return sp.indexOf(x) >= 0; }); return n[0] || null; }
 function tpick() { return G && G.stage === 'pick' && !G.over && $('#pass').hidden; }
-function tutSteps() {
+function tutSteps() {   // the prologue's words live in campaign.json (prologue.steps[id] = [chapter, line]); these are the fallbacks
+  var P = window.CAMPAIGN && CAMPAIGN.prologue && CAMPAIGN.prologue.steps || {};
+  return tutStepsRaw().map(function (st) { var w = P[st.id]; if (w) { st.title = w[0]; st.say = w[1]; } return st; });
+}
+function tutStepsRaw() {
   return [
     { id: 'goal', title: '1 First turn · Welcome, ranger', say: 'Grow a valley for 20 turns. Animals in patterns and big habitats score. This practice lasts 3 turns.', target: tq('#map'), wait: null, ready: function () { return tpick() && G.seats[0].done === 0; } },
     { id: 'cards', title: '1 First turn · Animal cards', say: 'Each animal scores its own pattern. Your points per animal show here.', target: tq('#cards'), wait: null, ready: function () { return tpick(); } },
@@ -50,8 +54,8 @@ function tutStart(o) {
   if (!window.GXT) return; o = o && o.prologue ? o : null;
   var first = window.CAMPAIGN && CAMPAIGN.chapters[0];
   GXT.start({
-    game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && window.GXC), endTitle: 'You know the rules',
-    endText: o ? 'Take, place, settle, sweep, acorns. Now the Story begins.' : 'Take, place, settle, sweep, acorns. The lightbulb helps any time.',
+    game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && window.GXC), endTitle: (window.CAMPAIGN && CAMPAIGN.prologue && CAMPAIGN.prologue.endTitle) || 'You know the rules',
+    endText: ((window.CAMPAIGN && CAMPAIGN.prologue && CAMPAIGN.prologue.endText) || 'Take, place, settle, sweep, acorns.') + (o ? ' Now the Story begins.' : ''),
     endButtons: o && first ? [{ id: 'chapter', label: 'Start region 1' }] : null,
     setup: function () { try { GX.close(); } catch (e) { } if (window.GXC && GXC.close) try { GXC.close(); } catch (e) { } UI.mode = 'tutorial'; UI.tut = {}; UI.prefs.played = 1; savePrefs(); newGame({ np: 1, humans: 1, seed: TUT_SEED, turns: 3 }); UI.mode = 'tutorial'; tutFix(); },
     onDone: function (r) { tutLeave(); var c = r && r.choice; $('#rs').hidden = true; if (c === 'chapter' && first) { showTitle(); GXC.play(first.id); } else if (c === 'story' && window.GXC) { showTitle(); GXC.open(); } else { UI.sv = 'setup'; showTitle(); } },
