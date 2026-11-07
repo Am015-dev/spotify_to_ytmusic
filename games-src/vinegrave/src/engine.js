@@ -66,7 +66,7 @@
   function gain(p, g) { for (var k in g) p.res[k] = (p.res[k] || 0) + g[k]; }
   function card(id) { return V.CARDS[id]; }
   function cardCost(id) { var c = card(id); return c.t === 'item' ? { coin: c.cost } : { compass: c.cost }; }
-  var CAN = { boot: ['boot', 'car', 'plane'], car: ['car', 'plane'], ship: ['ship', 'plane'], plane: ['plane'] };   // which travel icons pay a need
+  var CAN = { boot: ['boot', 'car', 'ship', 'plane'], car: ['car', 'plane'], ship: ['ship', 'plane'], plane: ['plane'] };   // which travel icons pay a need
   var CVAL = function (id) { var c = card(id); return c.t === 'fear' ? 0 : c.t === 'basic' ? 1 : 2 + (c.cost || 0) * 0.3; };
   // cheapest way to pay travel icons from hand cards (+ planes bought with coins). Returns {cards:[hand idx], coins} or null.
   function payPlan(G, s, need, skip) {
@@ -244,7 +244,8 @@
     var cards = 0, fear = -2 * (p.fearTiles || 0); all.forEach(function (id) { var c = card(id); if (c.t === 'fear') fear--; else cards += c.vp || 0; });
     var ti = (G.templeOrder || []).indexOf(s), research = V.NOTE_VP[p.note] + (p.glass >= V.TOP && ti >= 0 ? V.TEMPLE_ARRIVE[Math.min(ti, 3)] : V.GLASS_VP[p.glass]), temple = p.temple.reduce(function (a, b) { return a + b; }, 0);
     var idols = p.idols.reduce(function (a, d) { return a + (d.used ? V.IDOL_USED_VP : V.IDOL_VP); }, 0), guards = p.guards.length * V.GUARD_VP;
-    return { research: research, temple: temple, idols: idols, guards: guards, cards: cards, fear: fear, total: research + temple + idols + guards + cards + fear };
+    var usedI = p.idols.filter(function (d) { return d.used; }).length, slots = V.IDOL_SLOT_VP.slice(usedI).reduce(function (a, b) { return a + b; }, 0);   /* empty shrine slots on your board keep their printed value (rules-check MISSING 1) */
+    return { research: research, temple: temple, idols: idols, slots: slots, guards: guards, cards: cards, fear: fear, total: research + temple + idols + slots + guards + cards + fear };
   }
   // ------------------------------------------------------------ rival expedition (solo)
   function rivalDeal(G) {

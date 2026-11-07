@@ -17,7 +17,12 @@ function artApply(root) {   // DOM: [data-art] elements get the picture as their
     e.style.backgroundImage = 'url(' + artUrl(s) + ')'; e.style.backgroundSize = artFit(s); e.style.backgroundRepeat = 'no-repeat'; e.style.backgroundPosition = 'center'; e.classList.add('hasart');
   });
 }
+/* READABLE rule: a temp picture that is less clear than the code-drawn shape stays OFF. Slots whose stem starts with one of these prefixes
+   show the code-drawn terrain/animal; real art for them is switched on by listing its stem (or prefix) in window.WM_REAL_ART. */
+ART.codeFirst = ['tok-', 'ter-', 'table-bg', 'icon-logo'];   // free-art kit (W376): cards, portraits and title art read well; tokens (muddy at 20-30px), terrain, table and logo stay code-drawn
+function artCodeFirst(s) { var real = window.WM_REAL_ART || []; return real.indexOf(s) < 0 && ART.codeFirst.some(function (p) { return s.indexOf(p) === 0 && real.indexOf(p) < 0; }); }
 function artLoad() {
+  ART.have = ART.have.filter(function (s) { return !artCodeFirst(s); });
   ART.have.forEach(function (s) { var im = new Image(); im.onload = function () { ART.img[s] = im; artApply(); if (window.UI && UI.redraw) UI.redraw(); }; im.src = artUrl(s); });
 }
 // ---- placeholders (code-drawn, in the palette). Animal icons are simple silhouettes; no letters inside pictures.
@@ -38,6 +43,14 @@ function tokenSvg(a, x, y, r, extra) {
   else s += '<g transform="scale(' + (r / 9).toFixed(3) + ')" fill="' + col + '" stroke="' + col + '">' + ICON[a] + '</g>';
   return s + '</g>';
 }
+// terrain textures, one 24x24 cell each: simple pictures a first-time player names at a glance (peaks, pines, wheat rows, reeds, waves)
+var TER_PAT = {
+  peak: '<path d="M0 20 L7 7 L14 20Z" fill="#6f7180"/><path d="M7 7 L4.6 11.4 L7 10.4 L9.4 11.4Z" fill="#f4f4f8"/><path d="M11 20 L17.5 9.5 L24 20Z" fill="#7c7e8c"/><path d="M17.5 9.5 L15.4 13 L17.5 12.2 L19.6 13Z" fill="#f4f4f8"/>',
+  forest: '<path d="M6 3 L10.5 11 L8.4 11 L11.5 17 L0.5 17 L3.6 11 L1.5 11Z" fill="#245a32"/><rect x="5.2" y="17" width="1.6" height="3" fill="#4a3220"/><path d="M18 9 L22 16 L20.2 16 L23 21.5 L13 21.5 L15.8 16 L14 16Z" fill="#245a32"/><rect x="17.2" y="21.5" width="1.6" height="2.5" fill="#4a3220"/>',
+  meadow: '<path d="M0 6 H24 M0 14 H24 M0 22 H24" stroke="#a8923a" stroke-width="2"/><path d="M5 4 v-3 M12 4 v-3 M19 4 v-3 M8.5 12 v-3 M15.5 12 v-3 M5 20 v-3 M12 20 v-3 M19 20 v-3" stroke="#8a7426" stroke-width="1.4" stroke-linecap="round"/>',
+  marsh: '<path d="M2 21 h9 M13 12 h9" stroke="#bfe3d8" stroke-width="1.4" opacity=".8"/><path d="M5 20 v-9 M8 20 v-7 M16 11 v-8 M19 11 v-6" stroke="#2c5a46" stroke-width="1.4"/><rect x="4" y="9" width="2" height="4" rx="1" fill="#6b4a2a"/><rect x="15" y="1.5" width="2" height="4" rx="1" fill="#6b4a2a"/>',
+  river: '<path d="M0 7 q3-3 6 0 t6 0 t6 0 t6 0 M0 17 q3-3 6 0 t6 0 t6 0 t6 0" stroke="#d6ecfb" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
+};
 // terrain fills: an SVG <defs> block with one pattern per terrain (art file or a code-drawn texture)
 function terrainDefs() {
   var d = '<defs>';
@@ -46,10 +59,7 @@ function terrainDefs() {
     d += '<pattern id="pt-' + t + '" patternUnits="userSpaceOnUse" width="' + (ART.img[st] ? 120 : 24) + '" height="' + (ART.img[st] ? 120 : 24) + '">';
     if (ART.img[st]) d += artSvg(st, 0, 0, 120, 120);
     else {
-      d += '<rect width="24" height="24" fill="' + c + '"/>';
-      d += t === 'peak' ? '<path d="M2 20 L8 9 L14 20Z M12 20 L17 12 L22 20Z" fill="rgba(255,255,255,.18)"/>' : t === 'forest' ? '<path d="M6 18 L9 8 L12 18Z M15 22 L18 12 L21 22Z" fill="rgba(0,0,0,.18)"/>' :
-        t === 'meadow' ? '<path d="M4 18 l2-5 M8 19 l1-6 M16 10 l2-5 M19 11 l1-6" stroke="rgba(90,70,10,.35)" stroke-width="1.2"/>' : t === 'marsh' ? '<path d="M3 15 h7 M13 8 h8 M6 21 h6" stroke="rgba(255,255,255,.28)" stroke-width="1.4"/><path d="M17 20 v-6 M19 20 v-5" stroke="rgba(20,60,40,.4)" stroke-width="1.2"/>' :
-        '<path d="M0 8 q6-4 12 0 t12 0 M0 18 q6-4 12 0 t12 0" stroke="rgba(255,255,255,.3)" stroke-width="1.5" fill="none"/>';
+      d += '<rect width="24" height="24" fill="' + c + '"/>' + (TER_PAT[t] || '');
     }
     d += '</pattern>';
   });

@@ -4,6 +4,7 @@ function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
   const ul = a => h('ul', ...a.map(t => h('li', t))), ol = a => h('ol', ...a.map(t => h('li', t)));
+  sec('How a turn works', ol(['Look at the line at the top: it says exactly what to do now.', 'Glowing cards are the ones you may play; dim cards are blocked.', 'Tap a glowing card. It slides to the table.', 'Each rival plays in turn, one card at a time, with a caption.', 'The highest card of the led colour wins the trick (a Lantern beats every colour); a caption says why.']));
   sec('The goal', h('p', 'You are a team of divers on a deep-sea expedition. Each dive lays out job cards. Every job is a condition on the tricks one diver wins. You win the dive together when every job is done, and you lose it together the moment one job cannot be done. Nobody may talk about their cards: you can only use the ping signal.'));
   sec('How a dive goes', ol(['Everybody is dealt a hand. The diver with Lantern 4 is the Commander.', 'Job cards are drawn until their numbers add up to the dive\'s difficulty (the number for your team size counts).', 'Jobs are taken: the Commander first, then clockwise, one job at a turn, until none are left.', 'Optionally, light the distress flare to pass cards (see below).', 'Divers may signal once (see below), then the tricks are played. The Commander leads the first trick; each trick is led by the winner of the one before.', 'When every job is done the dive is won. If one job can no longer be done, the attempt is lost: deal again.']));
   sec('The cards', h('p', '40 cards: four colours (Coral, Tide, Kelp, Sunstar) numbered 1 to 9, and four Lanterns numbered 1 to 4. The Lanterns are the trump suit. With 3 divers one diver has 14 cards and one card is never played; 4 divers play 10 tricks, 5 divers 8 tricks.'));
@@ -182,7 +183,7 @@ function showStart() { try { GX.close(); } catch (e) { } UI.dlg = null; try { dr
 // ---------- events ----------
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
-  if (!t) { if (UI.pop && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer,#rs')) closePop(); return; }
+  if (!t) { if (UI.pop && !tutOn() && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer,#rs')) closePop(); return; }
   const a = t.dataset.a, d = t.dataset;
   if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
@@ -205,8 +206,8 @@ document.addEventListener('click', ev => {
     case 'predict': { const m = myMoves().find(x => x.t === 'predict' && x.n === num(d.n)); if (m && canAct()) doMove(m); break; }
     case 'job': openJob(+d.i); break;
     case 'seat': { const vm = canAct() && G && G.phase === 'assign' && myMoves().find(x => x.t === 'vote' && x.f === +d.seat); if (vm) doMove(vm); else openSeat(+d.seat); break; }
-    case 'last': openLast(); break;
-    case 'popx': closePop(); break;
+    case 'last': if (tutOn() && !GXT.act({ type: 'tap', what: 'last' })) break; openLast(); break;
+    case 'popx': if (tutOn() && !GXT.act({ type: 'tap', what: 'popx' })) break; closePop(); break;
     case 'tipok': tipOk(); break;
     case 'result': UI.overShown = false; showResult(); break;
     case 'nextdive': nextDive(); break;
@@ -253,7 +254,7 @@ document.addEventListener('click', ev => {
     case 'emote': netEmote(d.v); break;
   }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); else if (UI.rsOpen && G && G.phase === 'over' && UI.overShown) closeRS(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop && !tutOn()) closePop(); else if (UI.pop) { }  else if (UI.rsOpen && G && G.phase === 'over' && UI.overShown) closeRS(); } });
 // ---------- phone mode ----------
 function applyPhone() {
   const q = /[?&]phone=(\d)/.exec(location.search); const vm = (window.GXV ? GXV.now() : { w: innerWidth, h: innerHeight }), w = vm.w, hh = vm.h, short = Math.min(w, hh);

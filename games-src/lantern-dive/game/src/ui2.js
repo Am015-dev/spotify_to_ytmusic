@@ -16,7 +16,7 @@ function actorSeat() {
 // ---- sizes: hand card width (CSS variable); the table's own geometry comes from tableGeo() once the hand has its height ----
 function layoutVars() {
   const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), vw = GXV.now(), land = ph && vw.w > vw.h;
-  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(62, Math.round(H * .092)))) : Math.max(60, Math.min(150, Math.round(H * (W >= 1000 ? .15 : .125))));
+  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(68, Math.round(H * .1)))) : Math.max(60, Math.min(150, Math.round(H * (W >= 1000 ? .15 : .125))));
   const short = ph && !land && vw.h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
   bd.classList.toggle('side', W > H * 1.45);
   document.documentElement.style.setProperty('--hw', hw + 'px');
@@ -358,6 +358,7 @@ function renderActs(v) {
   const pr = $('#prompt'), ac = $('#acts'); if (!pr || !ac) return;
   const M = actModel(v); pr.className = (M.cls || '') + (M.warn ? ' warn' : '');
   pr.textContent = M.p || '';
+  try { if (G.phase === 'play' && !UI.busy && UI.started) { const T = G.trick, tn = T.turn, vv = viewSeat(); cap(vv >= 0 && ctlSeat(tn) === vv ? 'Your turn' : pname(tn) + '\'s turn', vv >= 0 && ctlSeat(tn) === vv ? 'mine' : ''); } else if (!UI.busy) cap(''); } catch (e) { }
   const tr = $('#table'); if (tr) tr.classList.toggle('myturn', M.cls === 'mine');
   { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy ) && !(pl && pl.childNodes.length)); }
   ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';

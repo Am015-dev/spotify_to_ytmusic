@@ -1,0 +1,433 @@
+{
+ "slug": "twin-thrones",
+ "size": "phone",
+ "seed": 75885,
+ "when": "2026-11-07T21:21Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 1
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 523
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 431
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Cards\" under div#start \"Twin Thrones Two rival c\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#menubtn.gx-ibtn \"Menu\" under div#start \"Twin Thrones Two rival c\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 28px (<40) button.pill.vp x2: \"Computer\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 34px (<40) button.wt x7: \"Terraced Orchard\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 38px (<40) button.tok x5: \"Cit\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 28px (<40) span.pill.p-brown x1: \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 28px (<40) span.pill.p-red x1: \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 34px (<40) button.wt.built x1: \"Sky Tomb\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: div#c13.card.av.dim \"Hewing Camp W $1\" / button.gxt-b.pri \"Play a real game\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Cards\" under div#start \"Twin Thrones Two rival c\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-title-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#menubtn.gx-ibtn \"Menu\" under div#start \"Twin Thrones Two rival c\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-title-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 28px (<40) button.pill.vp x2: \"Computer\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 38px (<40) button.tok x5: \"Ope\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) button.wt x8: \"Merchant Road\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 28px (<40) span.pill.p-brown x1: \"3\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 28px (<40) span.pill.p-grey x2: \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 28px (<40) span.pill.p-blue x1: \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 28px (<40) span.pill.p-red x1: \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) button.wt x6: \"Merchant Road\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) button.wt.built x2: \"Terraced Orchard\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 28px (<40) span.pill.p-green x1: \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div#c4.card.av \"Timber Depot W $1 $3\" / button.btn.alt \"Sell +2$\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div#c6.card.av \"Mud Basin C free\" / button.btn \"Build · 1$\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.pill.vp.who \"Computer\" under div#zoom \"× Lookout 1 $1 Lookout W\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): span.pill.p-brown \"3\" under div#zoom \"× Lookout 1 $1 Lookout W\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #523 (Mas)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 523 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-quick-noresult-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.alt.on \"Normal\" / button.gxc-node.a1.boss \"🛡️ 🔒 The Warden's Gate\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.go.big \"Quick game\" / button.gxc-node.a2.locked \"4 🔒 Open Roads\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.alt.sm \"Story The Twin Crowns: 1\" / button.gxc-node.a2.locked \"4 🔒 Open Roads\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.alt.sm \"Watch\" / button.gxc-node.a2.boss \"👑 🔒 The Teal Throne\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.alt.sm \"Sound: on\" / button.gxc-node.a2.boss \"👑 🔒 The Teal Throne\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn.alt.on \"Normal\" / button.gxc-node.a1.boss \"🛡️ 🔒 The Warden's Gate\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn.go.big \"Quick game\" / button.gxc-node.a2.locked \"4 🔒 Open Roads\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn.alt.sm \"Story The Twin Crowns: 1\" / button.gxc-node.a2.locked \"4 🔒 Open Roads\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn.alt.sm \"Watch\" / button.gxc-node.a2.boss \"👑 🔒 The Teal Throne\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn.alt.sm \"Sound: on\" / button.gxc-node.a2.boss \"👑 🔒 The Teal Throne\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 28px (<40) button.pill.vp x2: \"Pell the Apprentice\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) button.wt x5: \"Beacon Isle\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 38px (<40) button.tok x5: \"Ope\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) button.wt x6: \"Beacon Isle\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 28px (<40) span.pill.p-yellow x1: \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) button.wt x8: \"Beacon Isle\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 28px (<40) span.pill.p-red x1: \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #431 (×)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 431 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-story-noresult-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Cards\" under div#start \"Twin Thrones Two rival c\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-title-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#menubtn.gx-ibtn \"Menu\" under div#start \"Twin Thrones Two rival c\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-title-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 28px (<40) button.pill.vp x2: \"Player 2\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) button.wt x3: \"Beacon Isle\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 38px (<40) button.tok x5: \"Fin\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) button.wt x3: \"Marble Barrow\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 38px (<40) button.tok x5: \"Mas\"",
+   "repro": "node games-src/scripts/qa-bot.js twin-thrones --size phone --seed 75885 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/twin-thrones/phone-screen-fuzz-screen-18.png"
+  }
+ ],
+ "secs": 439,
+ "tutorialIn": {}
+}
