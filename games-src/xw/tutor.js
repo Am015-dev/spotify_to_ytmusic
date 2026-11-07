@@ -95,7 +95,9 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
     onExit:()=>{tutLeave();UI.info=true;render()}})}
 // ---------------------------------------------------------------- the coached game: free play, the guide speaks when a rule first matters
 const NCH={shown:{},q:[],cur:null,on:false,o:null,first:null,tm:0};
-function coachReset(){NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
+// for external checks (qa-bot coached mode): running = the free-play part is on, explained = rule ids spoken so far, done = the result card was shown
+window.GXCOACH={get running(){return !!NCH.on},get explained(){return Object.keys(NCH.shown)},get done(){return !!NCH.finished},get rules(){return Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule)}};
+function coachReset(){NCH.finished=false;NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
 function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{GXT.markDone(TUT_GAME)}catch(e){}coachSay('goal');coachSay('fly0');render()}
 function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;NCH.q.push(id);coachPump()}
 function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;let e=document.getElementById('na-coach');
@@ -124,7 +126,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
   else if(k==='play'||k==='story'||k==='chapter'){const o=NCH.first;coachReset();tutLeave();lsPlayed();
     if(k==='chapter'&&o){GXC.play(o.id)}else if(k==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}else startGame('solo')}},true);
 // the end: the real numbers walked through, then what did not come up
-function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.done=Object.keys(NCH.shown);
+function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.finished=true;
   const mine=G.ships.filter(x=>x.side===0),foe=G.ships.filter(x=>x.side===1),won=G.winner==='P1';
   const hp=a=>a.filter(x=>x.alive).reduce((t,x)=>t+Math.max(0,x.hull-hullDmg(x))+x.sh,0);
   const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t+': '+LORE.coach[k].s));
