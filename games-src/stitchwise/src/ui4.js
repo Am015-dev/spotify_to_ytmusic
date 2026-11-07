@@ -23,18 +23,21 @@ function tutStart(o) { // W381 ADDENDUM 4: the tutorial is a coached first game 
   newGame('vs', { seed: 4242, ring: TUT_RING, first: 0, lvl: 'easy', name: 'Marden', save: false, coach: true });
   UI.prologue = !!(o && o.prologue); UI.flavor = ''; coachStart(); render();
 }
+window.GXCOACH = { running: false, explained: [], done: false };   // qa-bot / tests: the coached first game's state
+function coachSkipToMap() { try { if (typeof GXT !== 'undefined' && GXT.markDone) GXT.markDone(TUT_GAME); } catch (e) { } UI.seq++; clearTimeout(UI.tm.ai); UI.coach = null; UI.prologue = false; GXCOACH.running = false; G = null; UI.started = false; try { localStorage.removeItem('sw_save'); } catch (e) { } showStart(); if (typeof GXC !== 'undefined') GXC.open(); }
 function PRO() { return ((window.CAMPAIGN || {}).story || {}).prologue || {}; }
 // ---------- coach: the rest of the tutorial game (chapters 2-4). Aunt Wren notices each rule the first time it happens; the player keeps playing for real.
 function coachData() { return (window.CAMPAIGN || {}).story || {}; }
-function coachStart() { UI.coach = { seen: {}, qk: {}, q: [], line: '', ch: 1, fresh: 0, shown: [], buy: 0 }; coachSay('start', null, true); }
+function coachStart() { GXCOACH.running = true; GXCOACH.done = false; GXCOACH.explained = []; UI.coach = { seen: {}, qk: {}, q: [], line: '', ch: 1, fresh: 0, shown: [], buy: 0 }; coachSay('start', null, true); }
 function coachSay(key, vars, now) {
   var C = UI.coach; if (!C || C.seen[key] || C.qk[key]) return; var d = (coachData().coach || {})[key]; if (!d) return;
   var t = d[1].replace(/\{(\w+)\}/g, function (m, k) { return vars && vars[k] != null ? vars[k] : m; }); C.qk[key] = 1; var it = { k: key, ch: d[0], t: t };
   if (now) { C.q.unshift(it); coachNext(); } else { C.q.push(it); if (!C.line || C.fresh <= 0) coachNext(); }
 }
-function coachNext() { var C = UI.coach; if (!C || !C.q.length) return; var n = C.q.shift(); C.seen[n.k] = 1; C.line = n.t; C.ch = n.ch; C.fresh = 2; C.shown.push(n.k); coachRender(); }
+function coachNext() { var C = UI.coach; if (!C || !C.q.length) return; var n = C.q.shift(); C.seen[n.k] = 1; C.line = n.t; C.ch = n.ch; C.fresh = 2; C.shown.push(n.k); GXCOACH.explained.push(n.k); coachRender(); }
 function coachRender() {
   var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : UI.wide ? UI.flavor || '' : '';
+  var sk = $('#skipmap'); if (UI.coach && UI.prologue && G && !G.over) { if (!sk) { sk = h('button#skipmap.btn.alt.sm', { type: 'button', 'data-a': 'skipmap' }, 'Skip to map'); var db = $('#dockbody'); if (db) db.appendChild(sk); } } else if (sk) sk.remove();
   el.hidden = !txt || !G || G.over; if (el.hidden) return; el.innerHTML = '';
   var cast = ((window.CAMPAIGN || {}).cast || {}).wren || {}, chn = C ? (coachData().chapters || {})[C.ch] : '';
   el.appendChild(h('span.gface', { style: 'background:' + (C ? cast.color || '#3b7a8c' : '#a8432f'), 'aria-hidden': 'true' }, C ? (cast.emoji || '\u{1F9F5}') : '\u{1F380}')); var pim = C && artHas('portrait-wren') ? artImg('portrait-wren') : null; if (pim) { var gf = el.lastChild; gf.textContent = ''; pim.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover'; gf.appendChild(pim); }
@@ -67,7 +70,7 @@ function coachFinal(ban, w, A, B) { // the judging: the tutorial's climax line o
   if (!has('income_me', 'income_zero', 'income_opp')) miss.push(L.income); if (!has('leather_me', 'leather_opp')) miss.push(L.leather); if (!has('cant')) miss.push(L.cant);
   if (!has('again', 'again_opp', 'opp_slow')) miss.push(L.again); if (!has('bonus') && G.bonus != null) miss.push(L.bonus); if (!has('end_me', 'end_opp')) miss.push(L.end); if (A !== B) miss.push(L.tie);
   if (miss.length) { var card = h('div.rvlater', h('b', 'Things you\u2019ll meet later')); miss.filter(Boolean).forEach(function (t) { card.appendChild(h('div', '\u2022 ' + t)); }); ban.appendChild(card); }
-  C.later = miss.length; try { if (typeof GXT !== 'undefined' && GXT.markDone) GXT.markDone(TUT_GAME); } catch (e) { }
+  C.later = miss.length; GXCOACH.explained.push('final'); GXCOACH.done = true; GXCOACH.running = false; try { if (typeof GXT !== 'undefined' && GXT.markDone) GXT.markDone(TUT_GAME); } catch (e) { }
   var t = A === B ? f.tie : w === 0 ? f.win : f.lose; if (G.bonus == null) { C.seen.bonus = 1; C.shown.push('bonus'); t += ' ' + (f.nobonus || ''); }
   var wl = h('div.rvt3.wren', t), t2 = ban.querySelector('.rvt2'); if (t2 && t2.nextSibling) ban.insertBefore(wl, t2.nextSibling); else ban.appendChild(wl); ban.classList.add('coachban'); try { localStorage.setItem('sw_tutcov', JSON.stringify(Object.keys(C.seen))); } catch (e) { }
 }
