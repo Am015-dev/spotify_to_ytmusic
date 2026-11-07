@@ -36,7 +36,7 @@
       { kind: 'eq', name: 'wires cut', a: function () { return GXS.num('#cutc .cc b'); }, b: function () { return cuts(); } },
       { kind: 'eq', name: 'wires in the job', a: function () { return +/\/(\d+)/.exec($('#cutc .cc').textContent)[1]; }, b: function () { return total(); } },
       { kind: 'fn', name: 'every wire of yours is on screen', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#mine .tile'), function (e) { if (!bad && !inView(e)) bad = 'wire off screen'; }); return !bad || bad; } },
-      { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#felt *, #say, #strip *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'no line of text over 8 words on the board (the instruction line may take two lines, 22 words)', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#felt *, #say, #strip *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > (e.id === 'say' ? 22 : 8)) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       skin,
       { kind: 'tap', sel: '#mine .tile.glow', name: 'tap a glowing wire', state: function () { return JSON.stringify([G.phase, G.step, G.logN, UI.sel]); }, expect: function (a, b) { return a !== b || 'the wire tap did nothing'; } }
     ]

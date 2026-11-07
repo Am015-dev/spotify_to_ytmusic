@@ -235,3 +235,11 @@ No picture contains text. No publisher, designer or original-game name or logo i
 | fx-heal-sparkle.webp | DCSS tiles: gold_sparkles |
 | fx-poison-cloud.webp | DCSS tiles: cloud_poison_0 |
 | fx-fire-burst.webp | DCSS tiles: fireball |
+| intent-weak.webp | DCSS tiles: slow |
+| intent-vuln.webp | DCSS tiles: shatter |
+| intent-frail.webp | DCSS tiles: armor/buckler_2 |
+| intent-poison.webp | DCSS tiles: sting |
+| intent-burn.webp | DCSS tiles: fire/sticky_flame |
+| intent-slime.webp | DCSS tiles: acid_blob |
+| intent-daze.webp | DCSS tiles: confuse |
+| intent-unknown.webp | DCSS tiles: detect_creatures |
