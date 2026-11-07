@@ -138,7 +138,9 @@
     "cast": "frost",
     "personality": "No rival: just you against the season.",
     "aiLevel": "easy",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "The frost lets go. The valley is yours to grow.",
+    "taunt": "The frost holds on. Try again next thaw."
    },
    "setup": {
     "players": 1,
@@ -221,7 +223,9 @@
     "cast": "pip",
     "personality": "Cheerful, takes whatever looks nice right now.",
     "aiLevel": "easy",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Pip: You are really good at this! Teach me more?",
+    "taunt": "Pip: Ha! Beginner's luck... I mean, my valley grew!"
    },
    "setup": {
     "players": 2,
@@ -400,7 +404,9 @@
     "cast": "sorrel",
     "personality": "Builds huge habitats, careless with animals.",
     "aiLevel": "normal",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Sorrel: Fair and square. Your meadows are the better ones.",
+    "taunt": "Sorrel: The meadow chose me this time. Come back stronger."
    },
    "setup": {
     "players": 2,
@@ -480,7 +486,9 @@
     "cast": "linnet",
     "personality": "Quick and greedy for hawks.",
     "aiLevel": "normal",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Linnet: The birds liked your valley best. I heard them.",
+    "taunt": "Linnet: My hawks found more room than yours. Next time?"
    },
    "setup": {
     "players": 3,
@@ -658,7 +666,9 @@
     "cast": "snowline",
     "personality": "No rival: a short, hard season.",
     "aiLevel": "easy",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "The snowline creeps back up the peaks. Spring wins.",
+    "taunt": "The snow comes early. The season closes on you."
    },
    "setup": {
     "players": 1,
@@ -743,7 +753,9 @@
     "cast": "oake",
     "personality": "Slow, wise, plays the long game.",
     "aiLevel": "hard",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Oake: Old trees bow to a young ranger. Well grown.",
+    "taunt": "Oake: Patience grows forests. You will learn it."
    },
    "setup": {
     "players": 2,
@@ -834,7 +846,9 @@
     "cast": "linnet",
     "personality": "Quick and greedy for hawks.",
     "aiLevel": "hard",
-    "aiStyle": "standard"
+    "aiStyle": "standard",
+    "praise": "Linnet: The birds liked your valley best. I heard them.",
+    "taunt": "Linnet: My hawks found more room than yours. Next time?"
    },
    "setup": {
     "players": 4,
@@ -988,5 +1002,109 @@
     }
    ]
   }
- ]
+ ],
+ "prologue": {
+  "guide": "ward",
+  "rival": "bram",
+  "note": "Tutorial text (tutor.js reads it by step id). Story reason first, then the action; the next step opens with the reaction. Max 2 short lines.",
+  "steps": {
+   "goal": [
+    "1 First turn",
+    "Rowan: The frost is breaking. Bram Hollowell wants this valley for timber. Make it wild again in 3 days and it stays wild."
+   ],
+   "cards": [
+    "1 First turn",
+    "Rowan: Each animal has its own way of living. Bears pair up, elk walk in lines. Their points show up here."
+   ],
+   "take": [
+    "1 First turn",
+    "Rowan: A bear is waking in the old forest. Take that forest tile, with the bear under it."
+   ],
+   "spot": [
+    "1 First turn",
+    "Rowan: Good. Now find it a home next to your valley."
+   ],
+   "ok": [
+    "1 First turn",
+    "Rowan: Right there by the river? Then set it down."
+   ],
+   "tok": [
+    "1 First turn",
+    "Rowan: The forest is ready. Let the bear in: it only goes on a tile that shows a bear."
+   ],
+   "acorn": [
+    "1 First turn",
+    "Rowan: See the gold rim? A keystone. The bear left you an acorn. Keep it: it is a point, or a favour later."
+   ],
+   "take2": [
+    "2 Scoring",
+    "Rowan: Day two. A second bear is wandering, lonely. Take its tile. Bears are happiest in pairs."
+   ],
+   "spot2": [
+    "2 Scoring",
+    "Rowan: Put it right beside your first bear, so they can find each other."
+   ],
+   "rot": [
+    "2 Scoring",
+    "Rowan: This tile has two lands. Turn it so the forest edges meet: joined land grows one big habitat."
+   ],
+   "ok2": [
+    "2 Scoring",
+    "Rowan: Each joined forest tile is a point at the thaw. Set it down."
+   ],
+   "tok2": [
+    "2 Scoring",
+    "Rowan: Now bring the second bear home. Watch the den light up!"
+   ],
+   "pair": [
+    "2 Scoring",
+    "Rowan: A den of two! +4. Bram cuts wood all day; you just made a family. More pairs score much more."
+   ],
+   "sweep": [
+    "3 Special moves",
+    "Rowan: Day three. Three elk crowd the market and nobody wants them. Sweep them away for fresh animals."
+   ],
+   "free": [
+    "3 Special moves",
+    "Rowan: Your acorn now: spend it to take any tile with any animal you like."
+   ],
+   "freet": [
+    "3 Special moves",
+    "Rowan: The river keystone. Bram dammed half the creek; let us give the water back."
+   ],
+   "freek": [
+    "3 Special moves",
+    "Rowan: And the fox, to keep an eye on everyone. Foxes love lots of different neighbours."
+   ],
+   "spot3": [
+    "3 Special moves",
+    "Rowan: Wherever you think the water should run. Then set it down."
+   ],
+   "ok3": [
+    "3 Special moves",
+    "Rowan: Set it down."
+   ],
+   "tok3": [
+    "3 Special moves",
+    "Rowan: Settle the fox, or send it back if it would spoil a pattern. Both are fine."
+   ],
+   "end": [
+    "4 Final score",
+    "Rowan: The thaw! Animals, joined land and acorns all count. Bram will not fence a valley this alive."
+   ]
+  },
+  "endTitle": "The valley stays wild",
+  "endText": "Rowan: Bram packed up his saws, for now. The real seasons are 20 turns long."
+ },
+ "quick": {
+  "intro": [
+   "A new season in the valley. Grow the wildest one.",
+   "The thaw is here. Bears, elk and foxes need homes.",
+   "Rangers are out early this year. Grow faster."
+  ],
+  "win": "Your valley is the wildest at the thaw.",
+  "lose": "Their valley ran wilder this season.",
+  "tie": "Two valleys, equally wild.",
+  "solo": "The valley breathes again."
+ }
 }

@@ -1,0 +1,145 @@
+{
+ "slug": "wildmark",
+ "size": "phone",
+ "seed": 70782,
+ "when": "2026-11-07T21:30Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 1008
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 635
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "overlapping clickables: button#zoutB.zb \"−\" / button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "overlapping clickables: button#fitB.zb \"◉\" / button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores\" under h1.logo \"Wildmark\"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#zoutB.zb \"−\" under button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "overlapping clickables: button#zoutB.zb \"−\" / button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "overlapping clickables: button#fitB.zb \"◉\" / button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores\" under h1.logo \"Wildmark\"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#zoutB.zb \"−\" under button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "overlapping clickables: button#zoutB.zb \"−\" / button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "overlapping clickables: button#fitB.zb \"◉\" / button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores\" under h1.logo \"Wildmark\"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#zoutB.zb \"−\" under button#playB.big \"Play against 1 computer \"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "element outside viewport div.pop.hab x1 rect -5,367,140,395: \"Bram's new tile\"",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #1008 (×)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1008 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-quick-noresult-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #635 (g)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 635 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js wildmark --size phone --seed 70782 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/wildmark/phone-story-noresult-12.png"
+  }
+ ],
+ "secs": 370,
+ "tutorialIn": {}
+}
