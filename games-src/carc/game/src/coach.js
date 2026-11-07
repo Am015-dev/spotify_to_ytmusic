@@ -12,10 +12,9 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
   function ensureUI() {
     if (cb()) return cb();
     const d = document.createElement('div'); d.id = 'coach'; d.setAttribute('data-coach', '');
-    d.innerHTML = '<div class="cbub" hidden><img class="cpic" alt=""><div class="ctxt"><b></b><span></span></div><button type="button" class="cok">Got it</button></div><button type="button" class="cleave">Leave tutorial</button>';
+    d.innerHTML = '<div class="cbub" hidden><img class="cpic" alt=""><div class="ctxt"><b></b><span></span></div><button type="button" class="cok">Got it</button></div>';
     (document.getElementById('board') || document.body).appendChild(d);
     d.querySelector('.cok').addEventListener('click', e => { e.stopPropagation(); closeBubble(); });
-    d.querySelector('.cleave').addEventListener('click', e => { e.stopPropagation(); coachLeave(); });
     return d;
   }
   function showNext() {
