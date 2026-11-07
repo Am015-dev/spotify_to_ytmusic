@@ -16,7 +16,7 @@ const L = require('./lib.js'); const [url, W, H, SH] = [process.argv[2], +proces
     else if (await L.tapSel(p, '.gxc-btn', { text: '^\\s*(play|start|begin|go|fight|smash|let.?s)' })) a = 'play';
     else if (await L.tapSel(p, '.gxc-btn', { text: '^\\s*(skip|next|continue|ok|got it)' })) a = 'next';
     else if (await L.tapSel(p, '.gxc-scene', {})) a = 'scene';
-    else if (!inGame && await L.tapSel(p, '.gxc-node.open')) a = 'node';
+    else if (await L.tapSel(p, '.gxc-node.open')) a = 'node';
     if (a) { idle = 0; n++; if (!tapped.has(a)) { tapped.add(a); log.push(a) } } else { idle++; await L.sleep(250) }
     if (idle > 400) { await shot('stuck'); throw new Error('stuck; last=' + log.join('>')) }
     await L.sleep(120);
