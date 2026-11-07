@@ -154,9 +154,10 @@ function boardWH() { var b = $('#board'); return [b.clientWidth || 390, b.client
 function fitView(now) {
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
-  var wh = boardWH(), padT = 96, padB = 54, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
-  var z = Math.max(0.35, Math.min(1.9, Math.min((wh[0] - 16) / w, (wh[1] - padT - padB) / h)));
-  var t = { z: z, tx: wh[0] / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
+  // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
+  var wh = boardWH(), padT = G.np > 1 ? 106 : 62, padB = 56, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
+  var z = Math.max(0.3, Math.min(1.9, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
+  var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
   if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
   var f = Object.assign({}, UI.pan), t0 = performance.now(), D = 380;
   cancelAnimationFrame(UI.panT);

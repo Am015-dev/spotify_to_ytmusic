@@ -19,7 +19,7 @@ cards (set A), habitats with majority bonuses, solo mode. Branch `shelf/W343-wil
 |------|--------|
 | `node rules-test.js 240` (scoring cases + 240 AI games, 1-4 players, invariants every move) | PASS, 0 illegal/stuck; win rate hard 56% / normal 41% / easy 3% |
 | `node smoke.js` (title tap, 3 turns by taps, forced end, result; phone + PC) | PASS |
-| `node playthrough.js` (full 20-turn game, tutorial, Story c1 + c2 by real taps; phone + PC) | PASS, run twice |
+| `node playthrough.js` (full 20-turn game, tutorial, Story c1 + c2 by real taps; phone + PC) | PASS (3 runs; one earlier run caught the zoom-button overlap) |
 | `node extra-test.js` (hot-seat, boss/short-season/no-sweep twists, bear-pair pop; phone + PC) | PASS |
 | `VIS_SLUGS="," build-all.py --quick wildmark` (scenarios wm-board/place/token/sweep/story/boss/result + menu) | PASS |
 | `ui-audit.spec.js` phone + pc | A0 B0 C0 D0 E3 F0 (E3 = audit race, see below) |
@@ -37,6 +37,7 @@ How-to-play surface, so the audit lists the Menu's section chips and taps them a
 - Toast covered the result heading; "a Elk" -> toast cleared on the result, a/an fixed.
 - Phone top bar overflowed -> score pill hidden on phones (seat chips show scores).
 - PC text under 16 px in shared panels, map-disc contrast, 4 "big" title buttons -> overrides in skin.css only.
+- Late-game token target sat under the zoom buttons (phone, turn 17) -> auto-fit keeps clear of the zoom column and top chips.
 - Title art filled the menu panel (dummy-art test) -> title-bg is now the screen background behind the panel.
 
 ## Assets
