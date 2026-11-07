@@ -1,0 +1,95 @@
+{
+ "_readme": "Twin Thrones music, wave 1: 6 slots x 2 versions (a and b), no vocals. Drop the files as games/twin-thrones/music/<slot>-a.mp3 and <slot>-b.mp3 (slots: menu, age1, age2, age3, victory, defeat) and run build.py: games with files present are wired by src/sound.js through gameaudio.js + gx-music.js; no code change.",
+ "cues": {
+  "menu": {
+   "prompt": "Instrumental title music for a two-player card-drafting duel set in rival ancient cities: warm plucked lyre and frame drum, soft low strings pad, calm but expectant, 84 BPM, 3/4 feel, 16-bar loop that ends on a whole bar so it loops cleanly, no vocals, no spoken words, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "menu.mp3",
+   "files": [
+    "menu-a.mp3",
+    "menu-b.mp3"
+   ],
+   "mood": "calm, expectant, golden",
+   "bpm": 84,
+   "loop": true
+  },
+  "age1": {
+   "prompt": "Instrumental game music for the first age of a card duel: light hopeful bronze-age feel, hand drums, wooden flute melody, simple plucked bass, gently building, 92 BPM, 4/4, 4-bar intro then 16-bar loop that ends on a whole bar so it loops cleanly, no vocals, no spoken words, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "age1.mp3",
+   "files": [
+    "age1-a.mp3",
+    "age1-b.mp3"
+   ],
+   "mood": "hopeful, pastoral, curious",
+   "bpm": 92,
+   "loop": true
+  },
+  "age2": {
+   "prompt": "Instrumental game music for the second age of a card duel: busier and more confident, hand drums plus a plucked oud riff, bowed strings answer the flute, a sense of cities growing and rivalry, 100 BPM, 4/4, 4-bar intro then 16-bar loop that ends on a whole bar so it loops cleanly, no vocals, no spoken words, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "age2.mp3",
+   "files": [
+    "age2-a.mp3",
+    "age2-b.mp3"
+   ],
+   "mood": "confident, busy, rivalry",
+   "bpm": 100,
+   "loop": true
+  },
+  "age3": {
+   "prompt": "Instrumental game music for the final age of a card duel: tense and grand, low war drums, brass swells, driving string ostinato, the pawn is near the edge and every pick counts, 108 BPM, 4/4, 4-bar intro then 16-bar loop that ends on a whole bar so it loops cleanly, no vocals, no spoken words, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "age3.mp3",
+   "files": [
+    "age3-a.mp3",
+    "age3-b.mp3"
+   ],
+   "mood": "tense, grand, decisive",
+   "bpm": 108,
+   "loop": true
+  },
+  "victory": {
+   "prompt": "Short instrumental victory fanfare for a card duel: bright brass and bells rising to a held major chord, triumphant and warm, about 12 seconds, plays once and ends cleanly, no vocals, no spoken words, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "victory.mp3",
+   "files": [
+    "victory-a.mp3",
+    "victory-b.mp3"
+   ],
+   "mood": "triumphant, warm",
+   "bpm": 100,
+   "loop": false
+  },
+  "defeat": {
+   "prompt": "Short instrumental defeat piece for a card duel: slow low strings and a single lyre, bittersweet and dignified not comic, about 12 seconds, plays once and fades to silence, no vocals, no spoken words, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "defeat.mp3",
+   "files": [
+    "defeat-a.mp3",
+    "defeat-b.mp3"
+   ],
+   "mood": "bittersweet, dignified",
+   "bpm": 60,
+   "loop": false
+  }
+ }
+}

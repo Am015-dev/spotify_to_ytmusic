@@ -88,6 +88,10 @@ def main(argv):
     base = json.loads(BASELINE.read_text()) if BASELINE.exists() else {"sizes": {}, "layers": {}}
     fails, notes = [], []
 
+    # (e) the offline file lists must match the files on disk (a stale list = pictures/music missing when the player is offline); a note, build-all rewrites them on every deploy
+    r = subprocess.run([sys.executable, str(HERE / "offline-manifest.py"), "--check"], capture_output=True, text=True)
+    if r.returncode: notes.append("note: " + r.stdout.strip() + ". Fix: python3 games-src/scripts/offline-manifest.py (then commit the offline.json files)")
+
     # (a) big non-media tracked files
     for rel in files:
         if is_media(rel) or "next-wave" in pathlib.Path(rel).parts or pathlib.Path(rel).name == "assets.registry.json": continue   # next-wave/ (next-wave.py) and <game>/assets.registry.json (asset-registry.py, committed by the owner's process, games-src/ASSET-WIRING.md) are generated data; (expected-assets.json grows with every new asset)

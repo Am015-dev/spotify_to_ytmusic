@@ -7,6 +7,17 @@ Older notes (everything from "Nightrun TIMING" down, and all shelf-wide history)
 - Suggest and build new shelf games only from the current top of the overall board game rankings, not niche picks. Owner chooses from the list.
 - Never build from scratch (owner, 7 Nov 2026: "don't reinvent the wheel"): copy the closest finished shelf game (shell, campaign, tutorial, help, menu, loader, tests, shared mechanics) and adapt it; use permissively licensed open-source rules/AI code only with THIRD-PARTY.md. Wire every made asset (3D models, pictures, music, sprite sheets) before asking for new ones.
 
+## New games 7 Nov 2026 (three live, art to come)
+
+- Live: Redline Rally https://am015-dev.github.io/spotify_to_ytmusic/redline-rally/ (slug `redline-rally`, source `games-src/redline-rally/`)
+- Live: Emberclimb https://am015-dev.github.io/spotify_to_ytmusic/emberclimb/ (slug `emberclimb`, source `games-src/emberclimb/`)
+- Live: Twin Thrones https://am015-dev.github.io/spotify_to_ytmusic/twin-thrones/ (slug `twin-thrones`, source `games-src/twin-thrones/`)
+- Art plan (Google Flow prompts, sizes, track reference guides): `games-src/next-wave/NEW-GAMES-WAVES.md`. Track guides: `games-src/redline-rally/guides/*.svg`.
+- Drop-in steps for finished pictures (3 steps):
+  1. Save each picture as `<stem>.webp` or `<stem>.png` (the stem is in `games-src/<slug>/assets.json`) into `assets-inbox/<slug>/`.
+  2. Run `python3 games-src/scripts/ingest-assets.py --check --slug <slug>`, then without `--check`. Read the PASS/WARN lines.
+  3. Tell the orchestrator, so it runs the game's `register-assets.py` at merge and the one `build-all.py --deploy` call.
+
 ## Start here (31 Oct 2026, Nightrun)
 
 - Branch `alex/brave-carson-rbpmlk`, never main. Rules: games-src/nightrun/WORKER-RULES.md (rules 18-19), ASSET-POLICY.md.
