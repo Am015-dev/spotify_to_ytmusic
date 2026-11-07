@@ -18,6 +18,8 @@ function T(name,code,ui){const dom=new JSDOM(html,{runScripts:'dangerously',pret
 T('giving an item in play moves it to the rival (rules: trade or give items on the table)','const a=wear(0,"stompy");const mv=validMoves(0).find(m=>m.act==="giveitem"&&m.card===a&&m.tgt===1);if(!mv)return "no giveitem move";act(mv,0);return !P(0).eq.some(e=>e.id===a)&&P(1).eq.some(e=>e.id===a)');
 T('items in play cannot be given during a fight','const a=wear(0,"stompy");fightNow(0,"toads");return !validMoves(0).some(m=>m.act==="giveitem")');
 T('hand cards are not tradeable (only items in play)','give(0,"parrot");return !validMoves(0).some(m=>m.act==="giveitem")');
+T('trading swaps one item in play for one of theirs','const a=wear(0,"stompy");const b=wear(1,"swash");const mv=validMoves(0).find(m=>m.act==="trade"&&m.card===a&&m.tgt===1&&m.opt===b);if(!mv)return "no trade move";act(mv,0);return P(0).eq.some(e=>e.id===b)&&P(1).eq.some(e=>e.id===a)&&!P(0).eq.some(e=>e.id===a)');
+T('no trading during a fight','const a=wear(0,"stompy");wear(1,"swash");fightNow(0,"toads");return !validMoves(0).some(m=>m.act==="trade")');
 T('warrior wins ties','P(0).lvl=2;const w=inst("warrior");P(0).cls.push(w);fightNow(0,"toads");return winning(G.cb)&&sideStr(G.cb)===monStr(G.cb)');
 T('non-warrior loses ties','P(0).lvl=2;fightNow(0,"toads");return !winning(G.cb)');
 T('level-up card cannot give level 10','P(0).lvl=9;give(0,"l1");return !validMoves(0).some(m=>m.act==="play"&&m.tgt===0)&&validMoves(0).some(m=>m.act==="play"&&m.tgt===1)');

@@ -93,7 +93,7 @@ function netSend(m){if(!NET.room)return;const d={};['act','card','tgt','opt','ca
   if(d.act==='pass'&&G&&G.nw&&G.nw.ord.includes(NET.mySeat)&&!G.nw.passed.includes(NET.mySeat)){G.nw.passed.push(NET.mySeat);netPoint(-1)}}
 // every click on a net game page lands here (from uiAct)
 function netAct(m){if(!G)return;if(isClient()){if(NET.sent&&NET.sent.seq===NET.applied&&Date.now()-NET.sent.at<1500)return;NET.sent={seq:NET.applied,at:Date.now()};netSend(m);return}if(isHost())hostMove(NET.mySeat,m)}
-const NET_ACTS=['ready','kick','resurrect','loot','trouble','end','equip','unequip','drop','play','join','give','toss','ask','opt','pick','use','fight','pass','run','skip','shoo','bribe','berserk','turn','flight','charm','backstab','steal','sell','giveitem'];
+const NET_ACTS=['ready','kick','resurrect','loot','trouble','end','equip','unequip','drop','play','join','give','toss','ask','opt','pick','use','fight','pass','run','skip','shoo','bribe','berserk','turn','flight','charm','backstab','steal','sell','giveitem','trade'];
 function cleanMove(d){if(!d||typeof d!=='object'||typeof d.act!=='string'||!NET_ACTS.includes(d.act))return null;const m={act:d.act};
   const num=v=>typeof v==='number'&&Number.isInteger(v)&&v>=0&&v<100000;const tok=v=>num(v)||(typeof v==='string'&&/^[a-z]{1,8}$/.test(v));
   if(d.card!=null){if(!num(d.card))return null;m.card=d.card}
