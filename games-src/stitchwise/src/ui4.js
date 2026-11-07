@@ -39,7 +39,7 @@ function coachRender() {
   var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : UI.wide ? UI.flavor || '' : '';
   el.hidden = !txt || !G || G.over; if (el.hidden) return; el.innerHTML = '';
   var cast = ((window.CAMPAIGN || {}).cast || {}).wren || {}, chn = C ? (coachData().chapters || {})[C.ch] : '';
-  el.appendChild(h('span.gface', { style: 'background:' + (C ? cast.color || '#3b7a8c' : '#a8432f'), 'aria-hidden': 'true' }, C ? (cast.emoji || '\u{1F9F5}') : '\u{1F380}'));
+  el.appendChild(h('span.gface', { style: 'background:' + (C ? cast.color || '#3b7a8c' : '#a8432f'), 'aria-hidden': 'true' }, C ? (cast.emoji || '\u{1F9F5}') : '\u{1F380}')); var pim = C && artHas('portrait-wren') ? artImg('portrait-wren') : null; if (pim) { var gf = el.lastChild; gf.textContent = ''; pim.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover'; gf.appendChild(pim); }
   el.appendChild(h('span.gtx', C ? h('b', (cast.name || 'Aunt Wren') + (chn ? ' \u00B7 Ch. ' + C.ch + ' ' + chn : '')) : null, h('span', txt)));
 }
 function coachCheck() { // after every move: what just happened for the first time?
