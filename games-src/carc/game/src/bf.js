@@ -18,8 +18,8 @@ function capSet(t,ms,score,intro){UI.cap={t,score:!!score,intro:!!intro,until:Da
 function capNow(){return UI.cap&&Date.now()<UI.cap.until?UI.cap.t:''}
 const FEATW={C:'town',R:'road',M:'priory',F:'field'};
 function scoreCap(d,final){const F=G.fd[d.r];const ty=F?FEATW[F.ty]:'feature',n=F&&F.ty!=='M'?(F.tiles||[]).length:0;
-  const who=(d.win&&d.win.length?d.win:[d.by||0]).map(i=>seatName(P(i))).join(' and ');
-  const why=F&&F.ty==='F'?`field with ${d.pts/3|0} finished town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'priory ringed by 8 tiles':'open priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
+  const who=(d.win&&d.win.length?d.win:[d.by||0]).map(i=>seatName(P(i))).join(' & ');
+  const why=F&&F.ty==='F'?`field, ${d.pts/3|0} town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'priory ringed by 8 tiles':'open priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
   return `${who} +${d.pts}: ${why}`}
 // ---------- view: world units are 100 per tile; the world div is translated and scaled ----------
 const boardEl=()=>$('#board');
@@ -78,7 +78,7 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
   const byL={};for(const m of moves)(byL[m.l]=byL[m.l]||[]).push(m);
   for(const l in byL){const [wx,wy]=spotWorld(G.cur.k,+l),ms=byL[l];
     ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=pcHtml(FIGICON[m.k],p);
-      b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);b.addEventListener('click',()=>onFig(m));
+      b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);{const sg=TSEG[T.t][+l];const nm=sg?FEATW[sg.ty]:'';if(nm&&ms.length===1||nm&&i===0){const lb=document.createElement('span');lb.className='flab';lb.textContent=nm;b.appendChild(lb)}}b.addEventListener('click',()=>onFig(m));
       addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;UI.figs.push(b)})}
   placeOverlay()}
 // ---------- ghost finger (first game, and chapters that give hints): points at the move the computer would pick ----------
@@ -98,26 +98,27 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
     return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot">${p.human?'':'&#9881;'}</i><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</div>`}).join('');
-  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><b>${tilesLeft()}</b>`}
+  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><b>${tilesLeft()}</b><small>left</small>`}
 function bumpSeat(i){const e=document.querySelector(`.seat[data-i="${i}"]`);if(e){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
+function hname(t,p){const mine=P(p).human;return `<div class="hname"><b>${mine?'Your tile':esc(P(p).nm)+'’s tile'}</b><span>${esc(TT[t].n)}</span></div>`}
 function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
   if(G.over||!G.cur){h.innerHTML=`<div id="hinfo"><span class="big">Valley complete</span></div>`;return}
   const mine=myTurn(),c=PCOL[G.cur.p];
   if(G.step==='place'){const t=G.cur.t;
-    if(!UI.handKey||UI.handKey!==G.turn){UI.handKey=G.turn;UI.deg=UI.rot*90;h.innerHTML=`<button id="htile" style="--c:${c}" aria-label="Turn the tile"><div class="spin">${tileSvg(t,0)}</div><span class="rot">&#8635;</span></button>`;$('#htile').classList.add('nospin');$('#htile').addEventListener('click',()=>{if(myTurn('place'))rotate()});setTimeout(()=>$('#htile')&&$('#htile').classList.remove('nospin'),30)}
+    if(!UI.handKey||UI.handKey!==G.turn){UI.handKey=G.turn;UI.deg=UI.rot*90;h.innerHTML=`<button id="htile" style="--c:${c}" aria-label="Turn the tile"><div class="spin">${tileSvg(t,0)}</div><span class="rot">&#8635;</span></button>${hname(t,G.cur.p)}`;$('#htile').classList.add('nospin');$('#htile').addEventListener('click',()=>{if(myTurn('place'))rotate()});setTimeout(()=>$('#htile')&&$('#htile').classList.remove('nospin'),30)}
     const b=$('#htile');b.disabled=!myTurn('place');b.classList.toggle('mine',myTurn('place'));b.style.setProperty('--c',c);b.querySelector('.rot').hidden=!(myTurn('place')&&UI.rots.length>1);
     b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
   else if(G.step==='fig'){UI.handKey=null;
     if(myTurn()){h.innerHTML=`<button id="hskip">Skip</button>`;$('#hskip').addEventListener('click',()=>onSkip())}
-    else h.innerHTML=`<button id="htile" disabled style="--c:${c}">${tileSvg(G.tiles[G.cur.k].t,G.tiles[G.cur.k].r)}</button>`}}
+    else h.innerHTML=`<button id="htile" disabled style="--c:${c}">${tileSvg(G.tiles[G.cur.k].t,G.tiles[G.cur.k].r)}</button>${hname(G.tiles[G.cur.k].t,G.cur.p)}`}}
 function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
   if(sc){tn='Scoring';t=c}
   else if(G.over){tn='Game over';t='The valley is full. Counting the points…'}
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
-    if(me&&c&&UI.cap.intro)t=c;
-    else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Tap a glowing square to place your tile.':isRiver(G.cur.t)?'Carry the river on: tap a glowing square.':(UI.rots&&UI.rots.length>1?'Tap a glowing square to place your tile. Tap the tile to turn it.':'Tap a glowing square to place your tile.');
-    else if(me)t='Tap a circle to put a follower there, or tap Skip.';
-    else t=c||(G.step==='fig'?`${p.nm} is choosing where to put a follower…`:`${p.nm} is drawing a tile…`)}
+    if(me&&c&&UI.cap.intro&&G.step==='place')t=c;
+    else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Follow the river: tap a glow.':(UI.rots&&UI.rots.length>1?'Turn, then place: tap a glow.':'Place your tile: tap a glow.');
+    else if(me)t='Add a follower, or Skip.';
+    else t=c||(G.step==='fig'?`${p.nm} is choosing a follower spot…`:`${p.nm} is drawing a tile…`)}
   say(t,tn)}
 // ---------- turn bookkeeping ----------
 function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(key===UI.stepKey)return;UI.stepKey=key;
@@ -143,7 +144,7 @@ function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s)
 function aiNow(){if(UI.aiT){clearTimeout(UI.aiT);aiAct()}}
 // ---------- effects: scores light up the feature and fly to the seat chip ----------
 function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n=0;
-  for(const f of list){const rv=G&&G.cur&&!P(G.cur.p).human;if(f.t==='turn'&&!P(f.x).human)capSet(`${P(f.x).nm} draws a tile: ${TT[G.cur.t].n}`,1400);else if(f.t==='place'&&rv){const l=G.log[0];capSet(`${P(G.cur.p).nm} lays it next to the valley.`,1400)}else if(f.t==='fig'&&rv){const l=G.log[0];capSet(l?l.t.replace(/^[^ ]+ sets a/,P(G.cur.p).nm+' puts a').replace(/\.$/,'')+'.':'',1400)}}
+  for(const f of list){const rv=G&&G.cur&&!P(G.cur.p).human;if(f.t==='turn'&&!P(f.x).human)capSet(`${P(f.x).nm} draws a tile.`,1400);else if(f.t==='place'&&rv){const l=G.log[0];capSet(`${P(G.cur.p).nm} places the tile.`,1400)}else if(f.t==='fig'&&rv){const l=G.log[0];capSet(l&&/on the (\w+)\.$/.test(l.t)?`${P(G.cur.p).nm} claims the ${l.t.match(/on the (\w+)\.$/)[1]}.`:'',1400)}}
 
   for(const f of list){if(f.t==='place')sfx('place');else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
     else if(f.t==='score'){const d=f.x,delay=n++*520;setTimeout(()=>scorePop(d),delay)}}}
@@ -192,7 +193,7 @@ function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
 function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true);if(d)hlpAfter()}
 function showRules(){$('#modal').innerHTML=`<div class="scrim"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><ul><li>Draw a tile. Turn it, then lay it so every edge matches.</li><li>Then stand a follower on a road, town, priory or field, or skip.</li><li>Finish a road or town: its owner scores, the follower comes home.</li><li>A priory ringed by eight tiles scores 9.</li><li>At the end, farmers score 3 for each finished town beside their field.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=()=>{$('#modal').innerHTML=''}}
 // ---------- new game / continue ----------
-function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);if(!UI.camp&&!UI.tut&&typeof STORY!=='undefined'){const r=G.pl.find(p=>!p.human);if(r)capSet(STORY.quickIntro(r.nm),3200,false,true)}}
+function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);if(!UI.camp&&!UI.tut&&typeof STORY!=='undefined'){const r=G.pl.find(p=>!p.human);if(r)capSet(STORY.quickIntro(r.nm.split(' ')[0]),3200,false,true)}}
 function setupOpts(){const s=UI.setup,np=1+s.rivals,seats=[];for(let i=0;i<np;i++)seats.push(i?'ai':'human');return {np,seats,lv:seats.map(()=>s.lv),ex:{river:s.river,ic:s.ic,tb:s.tb}}}
 function resetUI(){UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
 function loadSaved(){const g=savedGame();if(!g)return;resetUI();G=g;UI.camp=null;UI.fxSeen=0;UI.fx.length=0;$('#modal').innerHTML='';UI.lastOpts=setupOpts();render();refit(false);schedAI()}

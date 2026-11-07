@@ -14,8 +14,8 @@ const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/6
 // tap the centre of an element only if it is visible and that point really belongs to it (not covered)
 async function tapUI(p, el, what) {
   const r = await el.evaluate(e => { const b = e.getBoundingClientRect(); if (b.width < 8 || b.height < 8) return null; const x = b.left + b.width / 2, y = b.top + b.height / 2;
-    if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return null; const t = document.elementFromPoint(x, y); return { x, y, ok: !!t && (t === e || e.contains(t) || t.contains(e)) }; });
-  if (!r) return false; if (!r.ok) { note('covered target: ' + what); return false; }
+    if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return null; const t = document.elementFromPoint(x, y); return { x, y, ok: !!t && getComputedStyle(e).visibility !== 'hidden' && (t === e || e.contains(t)) }; });
+  if (!r) return false; if (!r.ok) { if (what !== 'glow') note('covered target: ' + what); return false; }
   await p.touchscreen.tap(r.x, r.y); return true;
 }
 const seen = { cap: new Set(), pop: new Set(), banner: new Set() };
@@ -27,8 +27,8 @@ async function playToResult(p, tag, limitMs) {
   const t0 = Date.now(); let idle = 0, moves = 0;
   while (Date.now() - t0 < limitMs) {
     await watch(p);
-    if (process.env.DEBUG && (Date.now() - t0) % 7 < 3) console.log(JSON.stringify(await p.evaluate(() => ({ t: G.turn, st: G.step, cur: G.cur && G.cur.p, gl: document.querySelectorAll('.glow').length, fg: document.querySelectorAll('.fglow').length, ins: document.querySelector('#status .ins').textContent, modal: document.querySelector('#modal').innerText.slice(0, 40) }))));
-    if (await p.$('.card[aria-label=Result]')) return { ok: true, moves };
+    if (process.env.DEBUG && (Date.now() - t0) % 7 < 3) console.log(JSON.stringify(await p.evaluate(() => ({ t: G.turn, st: G.step, cur: G.cur && G.cur.p, gl: document.querySelectorAll('.glow').length, fg: document.querySelectorAll('.fglow').length, ins: document.querySelector('#status .ins').textContent, modal: document.querySelector('#modal').innerText.slice(0, 40), gl0: (() => { const g = document.querySelector('.glow'); if (!g) return null; const b = g.getBoundingClientRect(); const t = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), t && (t.tagName + '.' + t.className + '#' + t.id), UI.moved, g.style.visibility]; })() }))));
+    if (await p.$('.card[aria-label=Result], .gxc-res')) return { ok: true, moves };
     const tip = await p.$('.gxh-bub:not(.gxt-bub) .gxh-ok'); if (tip && await tip.isVisible()) { await tapUI(p, tip, 'tip ok'); await sleep(120); continue; }
     const glows = await p.$$('.glow');
     if (glows.length) { let done = false; const order = glows.map((g, i) => i).sort((a, b) => Math.abs(a - glows.length / 2) - Math.abs(b - glows.length / 2));

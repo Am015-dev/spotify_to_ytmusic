@@ -5,7 +5,7 @@ const STORY={
   guide:{name:'Old Tamsin',img:'media/camp-tamsin.webp',col:'#7a8a3c'},
   rival:{name:'Hob',img:'media/camp-hob.webp',col:'#b08a3e'},
   chapters:{1:'Your first turn',2:'Roads, scoring',3:'Special cases',4:'Ending the game'},
-  quickIntro:r=>`The deeds of Vinemoor are up for grabs. Out-build ${r}.`,
+  quickIntro:r=>`Out-build ${r}. Win the valley.`,
   quickWin:'The deeds of Vinemoor are yours. The valley will remember it.',
   quickLose:r=>`${r} takes the deeds this time. The valley is still waiting for a rematch.`,
   quickTie:'A tie! Even the old reeve cannot split these deeds.',
