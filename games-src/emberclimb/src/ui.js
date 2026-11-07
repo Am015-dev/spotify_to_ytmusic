@@ -498,6 +498,11 @@
   window.EC_FORCE_END = function () { var g = G(); if (!g) return; if (g.b) { g.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; }); } };
   window.EC_WIN_FIGHT = function () { var g = G(); g.b.en.forEach(function (e) { e.hp = 1; }); };
   window.EC_FORCE_RESULT = function (won) { var g = G(); g.scr = 'over'; g.won = won ? 1 : 0; g.b = null; render(); };
+  /* Menu jump chips (shared nav) only scroll; mark the chosen one so the tap visibly registers (E6) */
+  document.addEventListener('click', function (e) {
+    var c = e.target && e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (!c) return;
+    [].forEach.call(c.parentNode.children, function (x) { x.removeAttribute('aria-current'); }); c.setAttribute('aria-current', 'true');
+  });
   UI.start = start; UI.fit = function () { };
   UI.mode = 'title'; render();
 })();

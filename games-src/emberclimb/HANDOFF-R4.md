@@ -33,3 +33,15 @@ Top-5 #5 balance (floor-1 53 HP enemy, chapter 2 won first try): NOT done (needs
 
 ## Tests
 build-all --quick emberclimb PASS (11/11 scenarios); smoke, tutor-test, rules-test 100 games PASS; ui-audit phone A0 B0 C0 D0 E6 F0, phone-s A0 B1 C0 D0 E6 F0, pc A0 B0 C0 D0 E6 F0.
+
+## W373 polish (branch shelf/W373-emberclimb-polish, from W370; not deployed)
+Found -> fixed:
+- E6 (Menu jump chips dead, all sizes): the shared chips only call scrollIntoView, so no DOM change. Other games pass only because their Menu has >14 buttons and the audit stops at 14 (UA_MAX_BTN); Emberclimb's shorter Menu exposed it. Fix in src/ui.js: delegated click marks the chosen chip `aria-current` (+ highlight in head.html). Real taps 390x763: 6/6 chips hit, marked and scrolled.
+- Chips also overflowed the nav (About/Accessibility clipped or covered, tap landed outside): nav now bleeds 22px into the panel padding, chips flex:none, padding 4px, gap 3px.
+- B1 phone-s "Music" (and "Effects" on phone), contrast 3.01: text colour was already fine (#231a10 on cream); the audit read the dark scenario tag pill over rows that sit under the clipped sheet edge. Fix in head.html only: tighter section spacing, sheet bottom padding 10px (<1000px wide), extra tightening when taller than 650px, so no row straddles the tag. No generic class clash left (`.chip` is the game's own; the shared Menu uses `.gx-chip`).
+- Hex Acolyte HP 48-54 -> 40-44 (first fight relief for a human, per review).
+Audit now A-F all 0 on phone, phone-s, pc.
+Balance (200 seeds 7000+, headless, first-legal-play bot = validMoves()[0]; ai = aiMove bot), whole climb:
+- ch c2 (floors 2, iron-warden): first-legal 100%, ai 100% before and after. First fight alone 100%, hero loses 0-12 HP.
+- ch c3 (thorn-brute): first-legal 31%, ai 86% (already much harder than c2); c4: 96%/99%.
+- Gate NOT met: 70-85% for c2 needs enemy HP x2.0 (74%) or damage x2.5 (70%); that would make a human's first fight brutal and contradicts the review ("too strong"). Left c2 easy for bots; c3 is already harder. Owner decision needed: add an explicit dmgPct/hpPct step to c2 only if a stricter first chapter is wanted.

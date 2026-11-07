@@ -136,7 +136,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   var ENEMIES = {
     'mire-slug': { name: 'Mire Slug', hp: [11, 15], pat: [{ atk: 5 }, { atk: 3, weak: 1 }, { atk: 6 }], art: 'fat grey-green slug with eyestalks on a swamp log' },
     'gnawer': { name: 'Gnawer', hp: [10, 14], pat: [{ atk: 4 }, { atk: 4 }, { blk: 5, str: 1 }], art: 'oversized scruffy rat showing yellow teeth' },
-    'hex-acolyte': { name: 'Hex Acolyte', hp: [48, 54], pat: [{ str: 3 }, { atk: 6 }], ritual: 3, art: 'cultist in a feathered hood chanting by a candle' },
+    'hex-acolyte': { name: 'Hex Acolyte', hp: [40, 44], pat: [{ str: 3 }, { atk: 6 }], ritual: 3, art: 'cultist in a feathered hood chanting by a candle' },
     'gape-grub': { name: 'Gape Grub', hp: [40, 44], mode: 'rand', pat: [{ atk: 11 }, { str: 3, blk: 6 }, { atk: 7, blk: 5 }], art: 'wide-mouthed pale grub with a ring of teeth' },
     'rust-tick': { name: 'Rust Tick', hp: [10, 14], pat: [{ atk: 5 }, { weak: 2 }, { atk: 6 }], art: 'rust-coloured tick the size of a dog' },
     'bile-blob': { name: 'Bile Blob', hp: [28, 32], pat: [{ atk: 7, add: ['slimed', 1] }, { atk: 11 }, { add: ['slimed', 2] }], art: 'quivering yellow blob of acid with floating bones' },
