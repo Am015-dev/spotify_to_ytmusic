@@ -1,0 +1,85 @@
+{
+ "_note": "Superseded by finished 3D model sprites (W355). Do not generate.",
+ "items": {
+  "bomb-tick-a": {
+   "reason": "covered by the finished 3D bomb sprite (models/bomb@512.webp), which wobbles in the game",
+   "cards": "a round black cast-iron bomb with brass bands, a tangle of coloured wires and a short fuse, workshop prop. State: sitting still, the little timer needle at the left. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma magenta background (#FF00FF), no shadow, no floor, no gradient, no magenta on the subject, sharp edges. No text, letters or numbers.",
+   "meta": {
+    "element": "bomb: tick-a state",
+    "why": "State set for bomb: same camera, scale and baseline",
+    "pri": 1,
+    "ref": "games/short-fuse/models/bomb.webp",
+    "thumb": "short-fuse/models/bomb.webp",
+    "bg": "magenta",
+    "align": "centre",
+    "save_as": "bomb-tick-a.png",
+    "target": "games/short-fuse/media/poses/bomb-tick-a.webp",
+    "size": "1024x1024",
+    "ratio": "1:1",
+    "group": "bomb",
+    "tag": "poses",
+    "wave": "Wave 7"
+   }
+  },
+  "bomb-tick-b": {
+   "reason": "covered by the finished 3D bomb sprite (wobble)",
+   "cards": "a round black cast-iron bomb with brass bands, a tangle of coloured wires and a short fuse, workshop prop. State: sitting still, the little timer needle at the right and a faint red glow. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma magenta background (#FF00FF), no shadow, no floor, no gradient, no magenta on the subject, sharp edges. No text, letters or numbers.",
+   "meta": {
+    "element": "bomb: tick-b state",
+    "why": "State set for bomb: same camera, scale and baseline",
+    "pri": 1,
+    "ref": "games/short-fuse/models/bomb.webp",
+    "thumb": "short-fuse/models/bomb.webp",
+    "bg": "magenta",
+    "align": "centre",
+    "save_as": "bomb-tick-b.png",
+    "target": "games/short-fuse/media/poses/bomb-tick-b.webp",
+    "size": "1024x1024",
+    "ratio": "1:1",
+    "group": "bomb",
+    "tag": "poses",
+    "wave": "Wave 7"
+   }
+  },
+  "bomb-boom-1": {
+   "reason": "covered by the 3D bomb sprite boom animation",
+   "cards": "a round black cast-iron bomb with brass bands, a tangle of coloured wires and a short fuse, workshop prop. State: the casing bulging, a bright flash bursting from the seams. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma magenta background (#FF00FF), no shadow, no floor, no gradient, no magenta on the subject, sharp edges. No text, letters or numbers.",
+   "meta": {
+    "element": "bomb: boom-1 state",
+    "why": "State set for bomb: same camera, scale and baseline",
+    "pri": 1,
+    "ref": "games/short-fuse/models/bomb.webp",
+    "thumb": "short-fuse/models/bomb.webp",
+    "bg": "magenta",
+    "align": "centre",
+    "save_as": "bomb-boom-1.png",
+    "target": "games/short-fuse/media/poses/bomb-boom-1.webp",
+    "size": "1024x1024",
+    "ratio": "1:1",
+    "group": "bomb",
+    "tag": "poses",
+    "wave": "Wave 7"
+   }
+  },
+  "bomb-boom-2": {
+   "reason": "covered by the 3D bomb sprite boom animation",
+   "cards": "a round black cast-iron bomb with brass bands, a tangle of coloured wires and a short fuse, workshop prop. State: a big round orange-yellow explosion cloud with flying brass fragments. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma magenta background (#FF00FF), no shadow, no floor, no gradient, no magenta on the subject, sharp edges. No text, letters or numbers.",
+   "meta": {
+    "element": "bomb: boom-2 state",
+    "why": "State set for bomb: same camera, scale and baseline",
+    "pri": 1,
+    "ref": "games/short-fuse/models/bomb.webp",
+    "thumb": "short-fuse/models/bomb.webp",
+    "bg": "magenta",
+    "align": "centre",
+    "save_as": "bomb-boom-2.png",
+    "target": "games/short-fuse/media/poses/bomb-boom-2.webp",
+    "size": "1024x1024",
+    "ratio": "1:1",
+    "group": "bomb",
+    "tag": "poses",
+    "wave": "Wave 7"
+   }
+  }
+ }
+}

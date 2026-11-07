@@ -1,0 +1,30 @@
+{
+ "note": "Prompts not to be generated: a finished 3D model sprite already covers the item (W354).",
+ "cards": {
+  "bag-closed": {
+   "prompt": "a drawstring cloth bag of coloured fair chips, tied with a cord. State: standing upright, mouth tied shut, a little lumpy. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/bag.webp (3D bag swings in on draw)"
+  },
+  "bag-shake-a": {
+   "prompt": "a drawstring cloth bag of coloured fair chips, tied with a cord. State: tilted left, mid-shake, lumpy and wobbling, small motion lines. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/bag.webp (3D bag swings in on draw)"
+  },
+  "bag-shake-b": {
+   "prompt": "a drawstring cloth bag of coloured fair chips, tied with a cord. State: tilted right, mid-shake, lumpy and wobbling, small motion lines. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/bag.webp (3D bag swings in on draw)"
+  },
+  "bag-open": {
+   "prompt": "a drawstring cloth bag of coloured fair chips, tied with a cord. State: mouth open wide with one coloured chip popping up out of it. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/bag.webp (3D bag swings in on draw)"
+  },
+  "bag-empty": {
+   "prompt": "a drawstring cloth bag of coloured fair chips, tied with a cord. State: limp and flat, mouth open, completely empty. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/bag.webp (3D bag swings in on draw)"
+  }
+ }
+}

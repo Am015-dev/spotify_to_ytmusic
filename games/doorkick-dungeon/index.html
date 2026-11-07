@@ -199,8 +199,10 @@ h3{font-size:1.02rem}
 .empty{font:italic 500 1.2rem var(--note);color:var(--cream);text-align:center;padding:6px 10px;text-shadow:0 1px 0 #000}
 .empty.small{font-size:.9rem;color:var(--cream2)}
 .rollbox{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--cream);text-shadow:0 1px 0 #000}
-.rollbox .dwrap{width:38px;height:38px;flex:none}
+.rollbox .dwrap{width:38px;height:38px;flex:none;position:relative}
 .rollbox .die3{scale:.65;transform-origin:0 0}
+.die3sp{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;object-fit:contain;pointer-events:none;z-index:2;animation:die3sp .9s cubic-bezier(.2,.8,.3,1) both;filter:drop-shadow(0 4px 5px rgba(0,0,0,.45))}@keyframes die3sp{0%{transform:translateY(-70px) rotate(300deg) scale(1.1);opacity:1}60%{transform:translateY(0) rotate(0) scale(1);opacity:1}100%{transform:scale(.8);opacity:0}}
+@media (prefers-reduced-motion:reduce){.die3sp{display:none}}
 /* your area: a stitched leather mat */
 .mine{flex:none;padding:6px 12px 4px;--hw:clamp(62px,calc(21cqh/1.42),140px);display:grid;gap:4px}
 .mine.paper{color:var(--cream);background:radial-gradient(90% 140% at 50% 0%,rgba(255,190,120,.16),transparent 60%),var(--tex-leather),linear-gradient(#5a2d18,#2e150a);border:1px solid #0d0603;border-radius:14px;box-shadow:inset 0 0 0 5px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,220,170,.18),0 6px 0 rgba(0,0,0,0.35);position:relative}
@@ -1269,7 +1271,8 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
-.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 
@@ -6956,7 +6959,7 @@ const GA_DATA={sfx:{
 "tavern-a":"url:music/tavern-a.mp3",
 "tavern-b":"url:music/tavern-b.mp3",
 "main-a":"url:music/main-a.mp3",
-"main-b":"url:music/main-b.mp3",
+"main-b":"url:music/main-b.mp3","main-short-a":"url:music/main-short-a.mp3","main-short-b":"url:music/main-short-b.mp3",
 "fight-a":"url:music/fight-a.mp3",
 "fight-b":"url:music/fight-b.mp3",
 "victory-a":"url:music/victory-a.mp3",
@@ -7036,7 +7039,7 @@ function musicWant(){if(typeof G==='undefined'||!G)return ['tavern',0];
   return ['main',0]}
 // ---- music picker: each slot (tavern=Menu, main=Dungeon, fight, victory, defeat) has a saved choice: a, b, shuffle, off or classic
 const MSLOTS=[['tavern','Menu'],['main','Dungeon'],['fight','Fight'],['victory','Victory'],['defeat','Defeat']];
-const MTITLE={'tavern-a':'Menu loop A','tavern-b':'Menu loop B','main-a':'Tiptoe Through the Trapdoor','main-b':'The Curious Little Dungeon','fight-a':'Taiko and Tumble','fight-b':'Fiddle Fists and Bassoon Blows','victory-a':'Tavern of the Golden Stag','victory-b':'Fanfare for the Merry Company','defeat-a':"O Woe, My Broken Lute",'defeat-b':'Two Notes and a Shrug',classic:'Classic'};
+const MTITLE={'tavern-a':'Menu loop A','tavern-b':'Menu loop B','main-a':'Tiptoe Through the Trapdoor','main-b':'The Curious Little Dungeon','main-short-a':'Short dungeon loop A','main-short-b':'Short dungeon loop B','fight-a':'Taiko and Tumble','fight-b':'Fiddle Fists and Bassoon Blows','victory-a':'Tavern of the Golden Stag','victory-b':'Fanfare for the Merry Company','defeat-a':"O Woe, My Broken Lute",'defeat-b':'Two Notes and a Shrug',classic:'Classic'};
 const MDEF={tavern:'all',main:'all',fight:'all',victory:'b',defeat:'a'};
 SND.pick=Object.assign({},MDEF);try{Object.assign(SND.pick,JSON.parse(localStorage.getItem('dkd_mpick')||'{}'))}catch(e){}
 SND.res={};SND.wslot=null;SND.prev=null;SND.last=null;SND.since=0;
@@ -7627,7 +7630,7 @@ function fightNote(cb){const f=P(cb.who),h=cb.help>=0?P(cb.help):null,win=winnin
 function rollHTML(){const r=G.lastRoll;if(!r)return '';UI.rollAt=UI.rollAt||{};const rk=G.gid+':'+r.id;if(UI.rollAt[rk]==null)UI.rollAt[rk]=G.turn;
   // only this turn's roll, and inside a fight only a roll made in this fight (no stale dice)
   if(UI.rollAt[rk]!==G.turn||(G.cb&&!G.cb.runs))return '';const faces=[r.v,1,6,3,4,2];const PIP={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};const face=v=>[0,1,2,3,4,5,6,7,8].map(k=>PIP[v]&&PIP[v].includes(k)?'<b></b>':'<span></span>').join('');const tot=r.v+(r.mod||0);
-  const anim=UI.rolled!==r.id;UI.rolled=r.id;UI.arRes+=46;return `<div class="rollbox" aria-label="Last roll"><div class="dwrap"><div class="die3 ${anim?'roll':''}">${faces.map(v=>`<i>${face(v)}</i>`).join('')}</div></div><span class="small">${nmY(r.who)} rolled ${r.v}${r.mod?` ${r.mod>0?'+':'−'} ${Math.abs(r.mod)} = ${tot}`:''}${r.what==='slugs'?'':`: ${r.ok?'✓ made it':'✗ failed'} (needed ${r.need}+)`}</span></div>`}
+  const anim=UI.rolled!==r.id;UI.rolled=r.id;UI.arRes+=46;return `<div class="rollbox" aria-label="Last roll"><div class="dwrap">${anim?`<img class="die3sp" src="models/die${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()">`:''}<div class="die3 ${anim?'roll':''}">${faces.map(v=>`<i>${face(v)}</i>`).join('')}</div></div><span class="small">${nmY(r.who)} rolled ${r.v}${r.mod?` ${r.mod>0?'+':'−'} ${Math.abs(r.mod)} = ${tot}`:''}${r.what==='slugs'?'':`: ${r.ok?'✓ made it':'✗ failed'} (needed ${r.need}+)`}</span></div>`}
 function gchipHTML(id,cls){const c=cd(id);const ic=c.t==='race'?'🧬':c.t==='class'?'🎓':c.t==='curse'?'☁':c.slot==='head'?'🪖':c.slot==='foot'?'👢':c.slot==='armor'?'🛡':c.hands?'🗡':c.t==='item'?'🎒':'✦';const gs=c.t==='race'?'race':c.t==='class'?'class':c.t==='curse'?'curse':c.slot==='head'?'head':c.slot==='foot'?'feet':c.slot==='armor'?'body':c.hands?'hands':'';
   return `<button class="gchip ${c.d==='door'?'door':'tr'} ${c.t==='curse'?'curse ':''}${cls||''}" data-card="${id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${/eqoff/.test(cls||'')?' (carried, not worn)':''}"><span class="gi" data-s="${gs}" aria-hidden="true">${ic}</span>${esc(c.n)}${c.t==='item'&&c.b?` <b>+${c.b}</b>`:''}</button>`}
 function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><div class="empty">Watching the computer play. Press ⏸ to pause at any moment; tap a rival for their cards.</div></div>`;

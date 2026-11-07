@@ -1,11 +1,9 @@
 {
  "cards": {
-  "lancer-idle": "the Lancer starfighter exactly as in the reference: a nimble arrow-shaped light fighter with forward-swept wings and twin engines. State: hovering level, engines glowing softly. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "lancer-bank-left": "the Lancer starfighter exactly as in the reference: a nimble arrow-shaped light fighter with forward-swept wings and twin engines. State: banking hard to the left, one wing dipped. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "lancer-bank-right": "the Lancer starfighter exactly as in the reference: a nimble arrow-shaped light fighter with forward-swept wings and twin engines. State: banking hard to the right, one wing dipped. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "lancer-hit": "the Lancer starfighter exactly as in the reference: a nimble arrow-shaped light fighter with forward-swept wings and twin engines. State: hit by fire: sparks, a wing smoking, nose slightly tilted. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "lancer-wreck": "the Lancer starfighter exactly as in the reference: a nimble arrow-shaped light fighter with forward-swept wings and twin engines. State: breaking apart in a small explosion, fragments flying outward. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
-  "talon-idle": "the Talon starfighter exactly as in the reference: an angular heavy interceptor with a central cockpit pod and two vertical wing blades. State: hovering level, engines glowing softly. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "talon-bank-left": "the Talon starfighter exactly as in the reference: an angular heavy interceptor with a central cockpit pod and two vertical wing blades. State: banking hard to the left, one wing dipped. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "talon-bank-right": "the Talon starfighter exactly as in the reference: an angular heavy interceptor with a central cockpit pod and two vertical wing blades. State: banking hard to the right, one wing dipped. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "talon-hit": "the Talon starfighter exactly as in the reference: an angular heavy interceptor with a central cockpit pod and two vertical wing blades. State: hit by fire: sparks, a wing smoking, nose slightly tilted. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
@@ -33,22 +31,6 @@
  "notes": "Pose / expression set. One character = one reused description + the reference painting (meta.ref) + the same seed, same camera, same scale, centred, feet on one baseline. Background is flat chroma colour (meta.bg) so games-src/scripts/cutout.py can key it: save each as <name>.png in one folder per character, then python3 games-src/scripts/cutout.py <folder>/<char>-*.png --out <target folder> --size 512 --align <meta.align>  (writes transparent webp + contact-sheet.png). Check the contact sheet: all poses the same height, same feet line. Style block: use the one in \"style\" but ignore any background wording in it.",
  "wave": "Wave 7",
  "meta": {
-  "lancer-idle": {
-   "element": "the Lancer starfighter exactly as in the reference: idle state",
-   "why": "State set for lancer: same camera, scale and baseline",
-   "pri": 2,
-   "ref": "games/nebula-aces/models/na-lancer.webp",
-   "thumb": "nebula-aces/models/na-lancer.webp",
-   "bg": "green",
-   "align": "centre",
-   "save_as": "lancer-idle.png",
-   "target": "games/nebula-aces/media/poses/lancer-idle.webp",
-   "size": "1024x1024",
-   "ratio": "1:1",
-   "group": "lancer",
-   "tag": "poses",
-   "wave": "Wave 7"
-  },
   "lancer-bank-left": {
    "element": "the Lancer starfighter exactly as in the reference: bank-left state",
    "why": "State set for lancer: same camera, scale and baseline",
@@ -110,22 +92,6 @@
    "size": "1024x1024",
    "ratio": "1:1",
    "group": "lancer",
-   "tag": "poses",
-   "wave": "Wave 7"
-  },
-  "talon-idle": {
-   "element": "the Talon starfighter exactly as in the reference: idle state",
-   "why": "State set for talon: same camera, scale and baseline",
-   "pri": 2,
-   "ref": "games/nebula-aces/models/na-talon.webp",
-   "thumb": "nebula-aces/models/na-talon.webp",
-   "bg": "green",
-   "align": "centre",
-   "save_as": "talon-idle.png",
-   "target": "games/nebula-aces/media/poses/talon-idle.webp",
-   "size": "1024x1024",
-   "ratio": "1:1",
-   "group": "talon",
    "tag": "poses",
    "wave": "Wave 7"
   },
