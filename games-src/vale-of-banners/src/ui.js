@@ -526,8 +526,6 @@ function helpPhase() { var t = pend(); if (t) return 'p-' + t.t; if (UI.sel != n
 function helpInit() {
   try {
     GXH.init({ game: 'vale-of-banners', defaultOn: true, avoid: '#acts button,.glow,.och', steps: {
-      dice: { target: function () { return $('#dicerow'); }, title: 'Two dice', text: 'Each die is one action. Tap a glowing tile in a stall to take it.' },
-      build: { target: function () { return $('#es .glow') || $('#es'); }, title: 'Build', text: 'Glowing spaces match your die and touch your land.' },
       end: { target: function () { return $('#endB'); }, title: 'Done', text: 'Both dice used. Buy from the back lane or end your turn.' },
       'p-castle': { target: function () { return $('#mk'); }, title: 'Free action', text: 'Your Keep gives one free action: any number at all.' },
       'p-hall': { target: function () { return $('#store'); }, title: 'Chain!', text: 'Moot Hall: pick a stored tile and build it at once.' },
