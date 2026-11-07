@@ -26,9 +26,16 @@ Branch `shelf/W364-wildmark-fix` (from W360 art + brave-carson). Not deployed. T
 Also fixed on the way: token pop-up crashed for card sets without a point table (`a`/`st` undefined); setup summary
 precedence bug (always showed the multiplayer text).
 
-## Gate results
-See the DONE report for the numbers of the final run (build-all, rules-test, smoke, playthrough, extra-test, story-loss-test,
-ui-audit A-F, ai-gate).
+## Gate results (final run, 19:50 UTC, temp art installed)
+- `VIS_SLUGS="," build-all.py --quick wildmark`: PASS (11/11 scenarios incl. menu checks).
+- `node rules-test.js 240`: PASS (0 illegal, 0 stuck). `node smoke.js`: PASS phone + PC. `node extra-test.js`: PASS.
+- `node playthrough.js` (real taps/clicks): full Quick game to the result, tutorial, Story c1 + c2 won with 3 stars each, phone + PC: PASS.
+- `node story-loss-test.js` (new): c1 lost -> "Not this time" + Try again -> chapter restarts fresh, 0 page errors, phone + PC: PASS.
+- `node ai-gate.js 100`: hard/normal 100% vs the first-legal bot; **hard vs normal 64%** (92.9 vs 91.1); easy avg 71.0 vs normal 95.7: PASS.
+- ui-audit A-F: phone-s 0/0/0/0/0/0, pc 0/0/0/0/0/0, **phone A0 B2** C0 D0 E0 F0. The 2 B rows: (1) Menu "Speed" title contrast 2.41,
+  measured where the scenario harness's dark "Test: ..." badge sits (bottom-left, only with ?scn=); (2) Story map disc "4"
+  "busy background" at the 8% edge threshold (shared map node with its lock badge). Neither is visible as a problem in screenshots;
+  not fixed in time.
 
 ## Remaining
 - Real painted art (temp art is a placeholder set), tutorial spotlight seams and outro Skip/Back (shared shell), Online.

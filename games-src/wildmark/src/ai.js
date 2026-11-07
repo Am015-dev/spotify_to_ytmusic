@@ -20,37 +20,56 @@
     return best;
   }
   function habGain(env, c, t, before) { var g = 0; t.forEach(function (tt) { g += W.corridor(env, tt) - before[tt]; }); return g; }
+  var BW = 0.6, EASY_RANDOM = 0.4;   // hard: points per majority-bonus swing (2-player)
   W.AI = {
     plan: function (G, level) {
       W.curCards = G.cards;
-      var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', noise = lv === 'easy' ? 3.5 : lv === 'normal' ? 0.6 : 0;
+      var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', noise = lv === 'easy' ? 6 : lv === 'normal' ? 0.6 : 0;
       var pot = lv === 'easy' ? 0.15 : lv === 'normal' ? 0.45 : 0.6, rnd = function () { return W.rnd(G); };
       var bagTot = 0; for (var a in G.bag) bagTot += G.bag[a];
       var ctx = { bag: G.bag, bagTot: bagTot }, before = {}; W.TER.forEach(function (t) { before[t] = W.corridor(env, t); });
+      var riv = null; if (lv === 'hard' && G.np === 2) { var re = G.seats[1 - G.cur].env; riv = {}; W.TER.forEach(function (t) { riv[t] = W.corridor(re, t); }); }
+      var bw = BW;
+      function bon(m, r) { return m > r ? 2 : m === r && m > 0 ? 1 : 0; }
+      function habVal(env, T) {
+        var g = 0;
+        T.forEach(function (tt) {
+          var after = W.corridor(env, tt), d = after - before[tt];
+          g += d * (lv === 'easy' ? 0.7 : 1);
+          if (riv) g += bw * (bon(after, riv[tt]) - bon(riv[tt], after) - bon(before[tt], riv[tt]) + bon(riv[tt], before[tt]));
+        });
+        return g;
+      }
+      var kb = lv === 'hard' && !(s.done >= G.turns - 1) ? 3 : 1;
       var spots = W.spots(env), endGame = s.done >= G.turns - 1, best = null;
       function evalPair(tile, tok, cost) {
-        // best tile placement (corridor gain + slot value) then best token spot given that placement
-        var bt = null;
+        // best tile placement (corridor gain + slot value) then best token spot given that placement.
+        // token + slot parts do not depend on rotation, so they are computed once per spot.
+        var bt = null, rots = W.rots(tile);
         for (var i = 0; i < spots.length; i++) {
-          var c = spots[i], rots = W.rots(tile);
+          var c = spots[i];
+          env[c] = { id: tile.id, t: tile.t, a: tile.a, key: tile.key, rot: rots[0], tok: null };
+          var base = 0;
+          if (!endGame) base += pot * slotVal(env, c, ctx) * 0.6;
+          var tb = 0, tc = null;
+          W.tokSpots(env, tok).forEach(function (tc0) { var g = gainTok(env, tc0, tok) + (env[tc0].key ? kb : 0); if (!endGame) g -= pot * slotVal(env, tc0, ctx) * 0.5; if (tc === null || g > tb) { tb = g; tc = tc0; } });
+          if (tc !== null && tb < -0.5 && lv !== 'easy') tc = null;   // returning beats ruining a pattern
+          base += tc !== null ? tb : 0;
           for (var j = 0; j < rots.length; j++) {
-            env[c] = { id: tile.id, t: tile.t, a: tile.a, key: tile.key, rot: rots[j], tok: null };
-            var v = habGain(env, c, tile.t, before) * (lv === 'easy' ? 0.7 : 1);
-            if (!endGame) v += pot * slotVal(env, c, ctx) * 0.6;
-            // token: on this tile or elsewhere
-            var tb = 0, tc = null;
-            W.tokSpots(env, tok).forEach(function (tc0) { var g = gainTok(env, tc0, tok) + (env[tc0].key ? 1 : 0); if (!endGame) g -= pot * slotVal(env, tc0, ctx) * 0.5; if (tc === null || g > tb) { tb = g; tc = tc0; } });
-            if (tc !== null && tb < -0.5 && lv !== 'easy') tc = null;   // returning beats ruining a pattern
-            v += tc !== null ? tb : 0;
-            v += noise * (rnd() - 0.5) * 2;
-            delete env[c];
+            env[c].rot = rots[j];
+            var v = base + habVal(env, tile.t) + noise * (rnd() - 0.5) * 2;
             if (!bt || v > bt.v) bt = { v: v, c: c, rot: rots[j], tok: tc };
           }
+          delete env[c];
         }
         bt.v -= cost; return bt;
       }
-      var acornV = endGame ? 1 : (lv === 'hard' ? 2.6 : 2.2);
+      var acornV = endGame ? 1 : (lv === 'hard' ? 3.5 : 2.2);
       for (var i = 0; i < 4; i++) { var t = G.market.tiles[i], k = G.market.toks[i]; if (!t || !k) continue; var e = evalPair(t, k, 0); if (!best || e.v > best.v) best = Object.assign(e, { m: { t: 'take', i: i } }); }
+      if (lv === 'easy' && rnd() < EASY_RANDOM) {   // easy: sometimes just grabs a random pair
+        var ok = []; for (var r0 = 0; r0 < 4; r0++) if (G.market.tiles[r0] && G.market.toks[r0]) ok.push(r0);
+        var ri = ok[Math.floor(rnd() * ok.length)], er = evalPair(G.market.tiles[ri], G.market.toks[ri], 0); best = Object.assign(er, { m: { t: 'take', i: ri } });
+      }
       if (s.acorns > 0 && lv !== 'easy') {
         for (var a1 = 0; a1 < 4; a1++) for (var b1 = 0; b1 < 4; b1++) { if (a1 === b1 || !G.market.tiles[a1] || !G.market.toks[b1]) continue; var e2 = evalPair(G.market.tiles[a1], G.market.toks[b1], acornV); if (e2.v > best.v + 0.01) best = Object.assign(e2, { m: { t: 'free', ti: a1, ki: b1 } }); }
       }
@@ -64,7 +83,8 @@
           var p0 = W.AI.plan(G, lv); if (p0.v < 2) return { t: 'wipe3' };
           G._plan = p0; return p0.pick;
         }
-        var p = W.AI.plan(G, lv); G._plan = p; return p.pick;
+        var p = W.AI.plan(G, lv);
+        G._plan = p; return p.pick;
       }
       if (G.stage === 'tile') {
         var pl = G._plan;
