@@ -511,7 +511,7 @@ function doMove(m) {
   UI.busy = true; UI.sel = null;
   if (m.k === 'place') { UI.chain = m.die === 'x' ? UI.chain + 1 : 1; } else if (m.k === 'end') UI.chain = 0;
   if (L.tabs && isHuman(s) && (m.k === 'take' || m.k === 'buy' || m.k === 'grab') && !(typeof GXT !== 'undefined' && GXT.running())) UI.tab = 'estate';
-  try { if (UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.active() && isHuman(s)) GXT.act({ type: 'event', what: m.k }); } catch (e) { }
+  try { if (UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.active() && isHuman(s)) { GXT.act({ type: 'event', what: m.k }); if (GXT.active()) GXT.act({ type: 'tap', what: 'do-' + m.k }); } } catch (e) { }
   render();
   var chainNow = UI.chain;
   var seq = Promise.resolve();
@@ -779,7 +779,7 @@ function tutStart(o) {
   var st = function (k) { return function () { return $('#st-' + k); }; }, ec = function (f) { return function () { return $('#ec-' + f()); }; };
   var steps = [   /* only the very first action is spotlit (2 steps); then the game is free and Odo coaches */
     { id: 'take', title: '', say: '', target: function () { return $('#mt-' + UI.tut.stall + '-0'); }, wait: tapW('market', function (a) { return a.d === UI.tut.stall; }) },
-    { id: 'take2', title: '', say: '', target: tv, wait: ev('take') },
+    { id: 'take2', title: '', say: '', target: tv, wait: tapW('do-take') },
     { id: 'go', title: '', say: '', target: function () { return null; }, wait: null, onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } UI.tab = 'estate'; render(); coach('build'); schedule(); }, 0); } }
   ];
   steps.forEach(function (stp) {   /* story text: VSTORY.tut (src/story.js) */
