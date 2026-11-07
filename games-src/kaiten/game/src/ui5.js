@@ -4,15 +4,10 @@ function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
   sec('The goal', h('p', 'You are a diner at a conveyor-belt sushi bar. Collect plates over three rounds and score points for sets, pairs, ladders and races. The highest total after the third round wins. Ties go to the diner with more Custard Cups.'));
-  sec('How a round goes', h('ol', ...[
-    'Everyone is dealt a hand: 10 plates with 2 diners, 9 with 3, 8 with 4 and 7 with 5.',
-    'All diners secretly pick one plate from their hand at the same time. On your phone or computer: tap a dish on the belt to grab it (or drag it up onto the table). Press and hold a dish to read it first. With "One tap grabs" off in the menu, a tap lifts the dish and Serve confirms it.',
-    'When everyone has chosen, the covers lift together and the plates land on your counters.',
-    'Then every hand moves one seat on, around the table: your dishes ride off the belt to the next diner and the previous diner\'s hand rides in. You pick again from the hand you just received.',
-    'When the hands are empty the round is scored. Everything except Custard is cleared away and a new hand is dealt.'].map(t => h('li', t))));
+  sec('Hands and taps', h('p', 'Hand size: 10 plates with 2 diners, 9 with 3, 8 with 4, 7 with 5. Tap a dish on the belt to grab it, or press and hold to read it first. With "One tap grabs" off in the menu, a tap lifts the dish and Serve confirms it. When the hands are empty the round is scored, everything except Custard is cleared and a new hand is dealt.'));
   sec('Every plate', h('div', ...D.types.map(t => {
     const id = t.id; const rule = { tempura: 'pair', sashimi: 'set', dumpling: 'ladder', roll1: 'most', roll2: 'most', roll3: 'most', salmon: 'v2', squid: 'v3', egg: 'v1', wasabi: 'x3', chop: 'swap', pudding: 'dessert' }[id];
-    return h('div.rcard', cardDiv(id, 64), h('div.rt', h('b', t.name + (t.copies ? ' (' + t.copies + ')' : '')), h('div', t.text)));
+    return h('div.rcard', cardDiv(id, innerWidth >= 1024 ? 90 : 64), h('div.rt', h('b', t.name + (t.copies ? ' (' + t.copies + ')' : '')), h('div', t.text)));
   })));
   sec('Scoring a round', h('ul', ...[
     'Crispy Prawn: 5 points for every pair.', 'Fish Slice: 10 points for every set of three.', 'Steam Bun: 1, 3, 6, 10, 15 points for 1, 2, 3, 4, 5 or more buns.',
@@ -39,6 +34,13 @@ function buildRules() {
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
+  root.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are above.'));
+  root.insertBefore(h('div.kkturn', h('h3', 'How a turn works'), h('ol', ...KK.STORY.turn.map(t => h('li', t.replace(/^\d\.\s*/, ''))))), root.firstChild);
+  sec('What we simplified', h('ul', ...[
+    'Twin Sticks: your two dishes are put down in the best order automatically (Fire Paste first, then the best nigiri). You cannot choose the order.',
+    'A nigiri goes on your oldest unused Fire Paste. All pastes triple the same, so the score never changes.',
+    'A tie for fewest Custard Cups splits the 6-point loss, rounded down.',
+    'Story mode adds a twist to some boss meals (a head start or extra roll icons). Quick games never use twists.'].map(t => h('li', t))));
   return root;
 }
 const kkIc = n => { const i = new Image(); i.className = 'kki'; i.alt = ''; i.setAttribute('aria-hidden', 'true'); i.onerror = () => i.remove(); i.src = 'media/icon-' + n + '.webp'; return i; };   // painted counter icon; removes itself when the file is missing
@@ -78,9 +80,8 @@ function renderMenu() {
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, 'Pick the songs\u2026'));
   { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
-  if (!NET.on) { const tr = h('div.mrow'); tr.appendChild(tutNode('btn')); b.appendChild(tr); }
+  if (!NET.on) { const tr = h('div.mrow'); tr.appendChild(tutNode('btn', { first: false })); b.appendChild(tr); }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('span.tinyc', { html: sp }));
-  b.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are in How to play.'));
 }
 // ---------- start screens: painted title -> setup (diner cards) / online ----------
 // the four chefs who can join you (you are seat 0 with Mina's portrait). Default level = the character's temper; every level can be changed.
@@ -120,7 +121,7 @@ function titleEl() {
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,
       sv ? h('button.tbtn.go', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', (si => si ? 'your meal, round ' + si.round + ' of ' + D.rounds + ' · ' + si.np + ' diners' : 'your saved meal')(saveInfo()))) : null,
-      h('button.tbtn' + (sv || firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : 'Play'), h('span', 'against the computer chefs')),
+      h('button.tbtn' + (sv || firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : firstTime() ? 'Quick game' : 'Play'), h('span', 'against the computer chefs')),
       h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')))));
 }
@@ -135,7 +136,7 @@ function dinerCard(c, o) {
 }
 function setupEl() {
   const o = optObj(), ph = isPh(), open = !!UI.cfgOpen;
-  const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Who is at the counter?'));
+  const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Who is at the counter?'), h('p.kkflav', KK.STORY.quickIntro));
   const sum = h('div.ssum', h('div.sfaces', o.seats.map(c => h('span', { html: avatarC(c, 64) }))), h('span.sline', tableLine(o)), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
   const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Configure the table' : null },
     ph ? h('div.cfghead', h('b', 'Configure the table'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
