@@ -1,0 +1,526 @@
+[
+{
+"n": 1,
+"k": 1,
+"tok": [],
+"sp": null,
+"title": "First Dive",
+"log": "Our sub, the Lanternfish, slips under the waves. A faint signal pulses far below. Let's learn to work as one crew.",
+"rule": ""
+},
+{
+"n": 2,
+"k": 2,
+"tok": [],
+"sp": null,
+"title": "Two Lights",
+"log": "Two beacons to recover on this dive. Each one belongs to whoever claimed it.",
+"rule": ""
+},
+{
+"n": 3,
+"k": 2,
+"tok": [
+"1",
+"2"
+],
+"sp": null,
+"title": "In Order",
+"log": "The beacons must come home in order: first, then second.",
+"rule": ""
+},
+{
+"n": 4,
+"k": 3,
+"tok": [],
+"sp": null,
+"title": "Three Echoes",
+"log": "Three echoes from the reef. Share the work.",
+"rule": ""
+},
+{
+"n": 5,
+"k": 0,
+"tok": [],
+"sp": "notrick",
+"title": "The Fever Watch",
+"log": "One diver has caught a fever. They must stay out of every haul this dive.",
+"rule": "The captain picks one crew member who must win no tricks."
+},
+{
+"n": 6,
+"k": 3,
+"tok": [
+"1",
+"2"
+],
+"sp": null,
+"title": "Steady Hands",
+"log": "Order matters again, with a third task riding free.",
+"rule": ""
+},
+{
+"n": 7,
+"k": 3,
+"tok": [
+"O"
+],
+"sp": null,
+"title": "Last Word",
+"log": "Something must be saved for last: the task marked with the final seal.",
+"rule": ""
+},
+{
+"n": 8,
+"k": 3,
+"tok": [
+"1",
+"2",
+"3"
+],
+"sp": null,
+"title": "Count Down",
+"log": "Three numbered beacons: first, second, third. No shortcuts.",
+"rule": ""
+},
+{
+"n": 9,
+"k": 1,
+"tok": [],
+"sp": "sonar1",
+"title": "The Faint Ping",
+"log": "Only the weakest sonar can catch this ping. Sonar 1 must win a trick.",
+"rule": "Sonar 1 must win a trick."
+},
+{
+"n": 10,
+"k": 4,
+"tok": [],
+"sp": null,
+"title": "Four Lanterns",
+"log": "Four lanterns flicker in the kelp. Spread out.",
+"rule": ""
+},
+{
+"n": 11,
+"k": 1,
+"tok": [],
+"sp": "decide",
+"title": "Captain's Call",
+"log": "The captain chooses who carries this task. Speak up if you can do it.",
+"rule": "The captain asks who wants the tasks, then gives all of them to one crew member."
+},
+{
+"n": 12,
+"k": 4,
+"tok": [
+"O"
+],
+"sp": null,
+"title": "Final Seal",
+"log": "Four tasks, and the sealed one comes last.",
+"rule": ""
+},
+{
+"n": 13,
+"k": 0,
+"tok": [],
+"sp": "sonars",
+"title": "Every Ping Answers",
+"log": "The trench answers every ping. Each sonar card must win its own trick.",
+"rule": "Every sonar card must win a trick."
+},
+{
+"n": 14,
+"k": 4,
+"tok": [
+">",
+">>",
+">>>"
+],
+"sp": "dead",
+"title": "Static Shelf",
+"log": "A static shelf scrambles our signals: you see the card, not what it means.",
+"rule": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+},
+{
+"n": 15,
+"k": 4,
+"tok": [
+"1",
+"2",
+"3",
+"4"
+],
+"sp": null,
+"title": "By the Book",
+"log": "Four numbered beacons. By the book, one to four.",
+"rule": ""
+},
+{
+"n": 16,
+"k": 3,
+"tok": [
+"1"
+],
+"sp": "nocomm",
+"title": "The Hushed Trench",
+"log": "Silent running past the Warden's outpost. No signals at all.",
+"rule": "Silent running: no signals at all."
+},
+{
+"n": 17,
+"k": 2,
+"tok": [],
+"sp": "decide",
+"title": "Chosen Diver",
+"log": "The captain picks one diver to carry both tasks.",
+"rule": "The captain asks who wants the tasks, then gives all of them to one crew member."
+},
+{
+"n": 18,
+"k": 5,
+"tok": [],
+"sp": "late2",
+"title": "Jammed Relay",
+"log": "The relay is jammed: no signals until the second trick.",
+"rule": "Signals are jammed until trick 2."
+},
+{
+"n": 19,
+"k": 5,
+"tok": [
+"1"
+],
+"sp": null,
+"title": "Pressure Rising",
+"log": "Five tasks as the pressure rises; one must come first.",
+"rule": ""
+},
+{
+"n": 20,
+"k": 2,
+"tok": [],
+"sp": "onetrick",
+"title": "Lone Catch",
+"log": "One diver must make exactly one catch this dive.",
+"rule": "The captain picks one crew member who must win exactly one trick."
+},
+{
+"n": 21,
+"k": 5,
+"tok": [
+"1",
+"2"
+],
+"sp": null,
+"title": "Twin Beacons",
+"log": "Five tasks, two of them numbered.",
+"rule": ""
+},
+{
+"n": 22,
+"k": 4,
+"tok": [],
+"sp": "dist",
+"title": "Fair Shares",
+"log": "The captain hands out the tasks one by one, fairly.",
+"rule": "The captain hands out the tasks one by one, as evenly as possible."
+},
+{
+"n": 23,
+"k": 5,
+"tok": [
+">",
+">>"
+],
+"sp": null,
+"title": "Arrows in the Dark",
+"log": "Arrows mark which of two tasks comes before the other.",
+"rule": ""
+},
+{
+"n": 24,
+"k": 5,
+"tok": [],
+"sp": "dead",
+"title": "Dead Water",
+"log": "Dead water again: signals lose their meaning.",
+"rule": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+},
+{
+"n": 25,
+"k": 5,
+"tok": [
+"O"
+],
+"sp": "late3",
+"title": "Slow Burn",
+"log": "Signals jammed until the third trick, and a sealed task last.",
+"rule": "Signals are jammed until trick 3."
+},
+{
+"n": 26,
+"k": 2,
+"tok": [],
+"sp": "notrick",
+"title": "Out of the Loop",
+"log": "Another fever. Two tasks, and the patient wins no tricks.",
+"rule": "The captain picks one crew member who must win no tricks."
+},
+{
+"n": 27,
+"k": 6,
+"tok": [
+"1",
+"2",
+"3"
+],
+"sp": null,
+"title": "Three Steps Down",
+"log": "Three numbered steps down the slope.",
+"rule": ""
+},
+{
+"n": 28,
+"k": 6,
+"tok": [],
+"sp": "dist",
+"title": "Split the Haul",
+"log": "The captain splits six tasks between us.",
+"rule": "The captain hands out the tasks one by one, as evenly as possible."
+},
+{
+"n": 29,
+"k": 5,
+"tok": [
+">",
+">>",
+">>>",
+">>>>"
+],
+"sp": null,
+"title": "Follow the Arrows",
+"log": "Four arrows, four tasks in a row, with one free task between.",
+"rule": ""
+},
+{
+"n": 30,
+"k": 5,
+"tok": [],
+"sp": "sonar1",
+"title": "Smallest Voice",
+"log": "The faintest sonar must win a trick while five tasks wait.",
+"rule": "Sonar 1 must win a trick."
+},
+{
+"n": 31,
+"k": 6,
+"tok": [
+"1",
+"2",
+"O"
+],
+"sp": null,
+"title": "Bookends",
+"log": "First, second and the sealed last task.",
+"rule": ""
+},
+{
+"n": 32,
+"k": 6,
+"tok": [],
+"sp": "dead",
+"title": "The Murk",
+"log": "Thick murk: six tasks and no meaning in our signals.",
+"rule": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+},
+{
+"n": 33,
+"k": 5,
+"tok": [],
+"sp": "dist-dead",
+"title": "The Warden's Gate",
+"log": "The Warden blocks the gate. The captain hands out the tasks, and the static is back.",
+"rule": "The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+},
+{
+"n": 34,
+"k": 7,
+"tok": [],
+"sp": null,
+"title": "Into the Rift",
+"log": "Into the rift. Seven tasks, nothing else.",
+"rule": ""
+},
+{
+"n": 35,
+"k": 7,
+"tok": [
+"1",
+"2"
+],
+"sp": null,
+"title": "Clockwork",
+"log": "Two numbered tasks among seven.",
+"rule": ""
+},
+{
+"n": 36,
+"k": 3,
+"tok": [],
+"sp": "onetrick",
+"title": "One and Only",
+"log": "One diver makes exactly one catch, three tasks to do.",
+"rule": "The captain picks one crew member who must win exactly one trick."
+},
+{
+"n": 37,
+"k": 7,
+"tok": [],
+"sp": "late3",
+"title": "Long Silence",
+"log": "No signals until the third trick, seven tasks.",
+"rule": "Signals are jammed until trick 3."
+},
+{
+"n": 38,
+"k": 7,
+"tok": [
+"O"
+],
+"sp": null,
+"title": "The Last Lock",
+"log": "Seven tasks, the sealed one last.",
+"rule": ""
+},
+{
+"n": 39,
+"k": 7,
+"tok": [
+">",
+">>"
+],
+"sp": "dead",
+"title": "Shadow Arrows",
+"log": "Dead zone and two arrows.",
+"rule": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+},
+{
+"n": 40,
+"k": 8,
+"tok": [],
+"sp": "dist",
+"title": "Even Keel",
+"log": "The captain shares eight tasks evenly.",
+"rule": "The captain hands out the tasks one by one, as evenly as possible."
+},
+{
+"n": 41,
+"k": 5,
+"tok": [],
+"sp": "notrick",
+"title": "Quarantine",
+"log": "Quarantine: one diver wins no tricks while five tasks are done.",
+"rule": "The captain picks one crew member who must win no tricks."
+},
+{
+"n": 42,
+"k": 8,
+"tok": [
+"1",
+"2",
+"3"
+],
+"sp": null,
+"title": "Cascade",
+"log": "A cascade of three numbered tasks among eight.",
+"rule": ""
+},
+{
+"n": 43,
+"k": 8,
+"tok": [],
+"sp": null,
+"title": "Deep Bloom",
+"log": "Eight tasks in a blooming reef.",
+"rule": ""
+},
+{
+"n": 44,
+"k": 8,
+"tok": [],
+"sp": "dead-late2",
+"title": "Ghost Relay",
+"log": "Ghost relay: dead zone, and no signals before trick two.",
+"rule": "Dead zone: a signal shows the card but not whether it is highest, only or lowest. Signals are jammed until trick 2."
+},
+{
+"n": 45,
+"k": 8,
+"tok": [
+"1",
+"2",
+"3",
+"4",
+"5"
+],
+"sp": null,
+"title": "Five Seals",
+"log": "Five numbered seals, one after another.",
+"rule": ""
+},
+{
+"n": 46,
+"k": 8,
+"tok": [],
+"sp": "dist-dead",
+"title": "Blind Shares",
+"log": "The captain shares the tasks blind: the static returns.",
+"rule": "The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+},
+{
+"n": 47,
+"k": 9,
+"tok": [
+"O"
+],
+"sp": null,
+"title": "The Last Lantern",
+"log": "Nine tasks; the sealed one comes last.",
+"rule": ""
+},
+{
+"n": 48,
+"k": 3,
+"tok": [],
+"sp": "decide",
+"title": "The Captain's Wager",
+"log": "The captain bets everything on one diver: three tasks, one carrier.",
+"rule": "The captain asks who wants the tasks, then gives all of them to one crew member."
+},
+{
+"n": 49,
+"k": 9,
+"tok": [
+">",
+">>",
+">>>"
+],
+"sp": "dead",
+"title": "Riptide Arrows",
+"log": "Dead zone with three arrows.",
+"rule": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+},
+{
+"n": 50,
+"k": 7,
+"tok": [
+"O"
+],
+"sp": "nocomm",
+"title": "The Signal's Heart",
+"log": "The signal's heart. Silent running, seven tasks, the sealed one last.",
+"rule": "Silent running: no signals at all."
+}
+]
