@@ -53,7 +53,15 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
     ok(steps >= 5 && steps <= 8, 'tutorial has 5-8 steps (' + steps + ')');
     ok(!!(await pg.$('.gxt-end')), 'tutorial reached its end card'); await pg.screenshot({ path: path.join(OUT, `${tag}-end.png`) });
     await tap('[data-gxt-end=finish]', 'Finish this game'); await pg.waitForTimeout(500);
-    ok(await pg.evaluate(() => !!G && !G.over && !UI.tutorial && UI.started), 'tutorial ends inside a real game');
+    ok(await pg.evaluate(() => !!G && !G.over && !UI.tutorial && UI.started && !!UI.coach), 'chapter 1 ends inside the real guided game');
+    // chapters 2-4: the same game, played by taps to the judging; Aunt Wren's lines must cover every rule once
+    let shotG = false; for (let n = 0; n < 120; n++) { if (!(await humanTurn())) break; if (!shotG && await pg.evaluate(() => !!(UI.coach && UI.coach.line) && !$('#guide').hidden)) { shotG = true; await pg.screenshot({ path: path.join(OUT, `${tag}-guide.png`) }); } }
+    await pg.waitForSelector('#rs:not([hidden]) .rvban.on', { timeout: 60000 }).catch(() => ok(false, 'tutorial result reveal not shown'));
+    await pg.waitForTimeout(1200); await pg.screenshot({ path: path.join(OUT, `${tag}-result.png`) });
+    const cov = await pg.evaluate(() => UI.coach ? UI.coach.shown : []); console.log('coverage shown: ' + cov.join(','));
+    const need = [['start'], ['income_me', 'income_zero'], ['income_opp'], ['leather_me', 'leather_opp'], ['cant'], ['again', 'again_opp'], ['late'], ['end_me', 'end_opp'], ['bonus'], ['final']];
+    need.forEach(alts => ok(alts.some(k => cov.includes(k)), 'coverage step shown: ' + alts.join('|')));
+    ok(await pg.evaluate(() => !!document.querySelector('#rs .rvt3.wren')), 'judging climax line from Aunt Wren on the result');
   } else if (MODE === 'quick') {
     await pg.evaluate(() => { try { GXT.markDone('stitchwise'); } catch (e) { } });
     await tap('#start [data-a=quick]', 'Quick game'); await pg.waitForTimeout(300);

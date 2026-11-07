@@ -99,6 +99,7 @@ function render() {
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : UI.peek >= 0 ? nameOf(UI.peek) + ' is stitching' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
   var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }
+  try { if (typeof coachRender === 'function') coachRender(); } catch (e) { }
   try { if (typeof hlpRefresh === 'function') hlpRefresh(); } catch (e) { }
 }
 function patchShape(pid, cls, oc, cells) { var p = PATCHES[pid], c = cells || p.cells, w = 0, ht = 0; c.forEach(function (q) { if (q[0] > w) w = q[0]; if (q[1] > ht) ht = q[1]; }); var s = h('div.shape' + (cls ? '.' + cls : ''), { style: 'grid-template-columns:repeat(' + (w + 1) + ',' + oc + 'px);grid-template-rows:repeat(' + (ht + 1) + ',' + oc + 'px);--pc:' + pcol(pid) }), set = {}; c.forEach(function (q) { set[q[0] + ',' + q[1]] = 1; });

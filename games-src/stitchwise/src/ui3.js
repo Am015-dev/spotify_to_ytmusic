@@ -53,6 +53,7 @@ function rulesHtml() {
     '<h3>Leather patches</h3><p>Five brown spaces on the track each hold a free 1×1 leather patch. The first player to pass one sews it on immediately, anywhere empty.</p>' +
     '<h3>The 7×7 bonus</h3><p>The first player to fill a full 7×7 block of squares earns 7 bonus points.</p>' +
     '<h3>The end</h3><p>The game ends when both tokens reach the last space. Highest score wins; on a tie, whoever reached the end first.</p>' +
+    '<h3>Simplified on purpose</h3><ul><li>Seat 1 (you, in Story and the tutorial) starts; in a Quick game the first player is random.</li><li>A free leather patch is skipped if your quilt has no empty square left.</li><li>Patch costs, times and buttons are our own table; a few values may differ from printed sets.</li></ul>' +
     '<h3>Tips</h3><ul><li>Gaps of 1 or 2 squares are hard to fill later: keep the edges tidy.</li><li>Time is your real currency. A cheap patch that takes little time is often better than a big one.</li><li>Advance when you are short of buttons, or to get the next turn.</li></ul></div>';
 }
 function buildRules() { var w = h('div', { html: rulesHtml() }); var rb = h('button.btn.alt', { type: 'button', style: 'margin-top:8px' }, 'Replay the tutorial'); rb.onclick = function () { GX.close(); tutStart(); }; w.appendChild(rb); GX.drawer('rulesd', 'How to play', w); var dr = $('#rulesd .gx-drawer-body'); dr.innerHTML = ''; dr.appendChild(w); }
@@ -89,6 +90,7 @@ function showResult(o) {
     if (seqId !== UI.seq2) return; [0, 1].forEach(function (s) { cells[s].forEach(function (e) { e.classList.add('x'); }); setTotals(s, sc[s].empty); });
     var A = sc[0].total, B = sc[1].total, title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';
     ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); ban.innerHTML = '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : '');
+    var QS = ((window.CAMPAIGN || {}).story || {}).quick; if (UI.coach) coachFinal(ban, w, A, B); else if (!UI.camp && !hot && QS) ban.appendChild(h('div.rvt3.wren', (A === B ? QS.tie : w === 0 ? QS.win : QS.lose).replace('{name}', nameOf(1))));
     $$('.rvcol', c).forEach(function (e) { e.classList.add('done'); }); acts.textContent = ''; sfx('fanfare');
     if (w === 0 || hot) { for (var k = 0; k < 18; k++) c.appendChild(h('i.cf', { style: 'left:' + (Math.random() * 100) + '%;background:' + PAL[k % PAL.length] + ';animation-delay:' + (Math.random() * .6) + 's' })); } else sfx('thud');
     if (o.after) { var cb = h('button.btn.go.grow', { type: 'button' }, 'Continue'); cb.onclick = function () { o.after(); }; acts.appendChild(cb); cb.focus(); }

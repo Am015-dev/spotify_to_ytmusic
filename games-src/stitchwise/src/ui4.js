@@ -5,7 +5,7 @@ function tutAct(x) { if (!tutOn()) return true; var ev = x.what === 'drop' || x.
 function tq(sel) { return function () { return $(sel); }; }
 function tutSteps() {
   var mine = function () { return G && !G.over && isHuman(swWho(G)) && !UI.busy; };
-  return [ // W381: 6 steps, each one real action (tap / drag / tap), ends inside a real game
+  var steps = [ // W381: 6 steps, each one real action (tap / drag / tap), ends inside a real game
     { id: 'pick', title: 'Buy a patch', say: 'Buttons are your money (you have 5). Tap the glowing long strip: it costs 3.', target: function () { return $$('#offers .offer')[2]; }, wait: { type: 'tap', match: function (a) { return a.what === 'offer' && a.k === 2; } }, wrong: 'Tap the long strip on the right.', ready: mine },
     { id: 'drag', title: 'Place it', say: 'Drag it onto your quilt, or tap a square. Empty squares cost 2 points at the end.', target: tq('#quilt'), wait: { type: 'event', match: function (a) { return a.what === 'drop' && a.valid; } }, ready: function () { return UI.sel === 2 && !!$('#ghost'); }, side: 'top' },
     { id: 'sew', title: 'Sew it on', say: 'Tap Sew it on. You pay 3 buttons and your token moves 3 spaces.', target: tq('[data-a=sew]'), wait: { type: 'tap', match: function (a) { return a.what === 'buy'; } }, ready: function () { var s = $('[data-a=sew]'); return !!s && !s.disabled; } },
@@ -13,15 +13,54 @@ function tutSteps() {
     { id: 'adv', title: 'Advance', say: 'Short on buttons? Tap Advance: jump just past Marden and take 1 button per space.', target: tq('[data-a=adv]'), wait: { type: 'tap', match: function (a) { return a.what === 'adv'; } }, ready: mine, wrong: 'Tap Advance.' },
     { id: 'end', title: 'Gold spots pay', say: 'Passing a gold spot pays the buttons on your patches. Most points when both reach the end wins.', target: tq('#track'), wait: null, ready: function () { return !UI.busy; } }
   ];
+  var ST = ((window.CAMPAIGN || {}).story || {}).prologue; if (ST) steps.forEach(function (s) { var t = ST.steps[s.id]; if (t) { s.title = t[0]; s.say = t[1]; } });
+  return steps;
 }
 function tutStart(o) {
   try { clearTimeout(toast.t); $('#toast').classList.remove('on'); } catch (e) { }
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; var first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'), endTitle: 'You know the rules', endText: o ? 'Buy, place, advance, gold spots. Now the Story begins.' : 'Buy, place, advance, gold spots. Finish this game against Marden; the lightbulb explains anything new.',
-    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'finish', label: 'Finish this game' }, { id: 'title', label: 'Back to the title' }],
+  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'), endTitle: o ? 'You know the rules' : (PRO().endTitle || 'You know the rules'), endText: o ? 'Buy, place, advance, gold spots. Now the Story begins.' : (PRO().endText || 'Buy, place, advance, gold spots. Finish this game against Marden.'),
+    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'finish', label: (PRO().endButton || 'Finish this game') }, { id: 'title', label: 'Back to the title' }],
     setup: function () { try { GX.close(); } catch (e) { } $('#start').hidden = true; $('#rs').hidden = true; newGame('tutorial', { seed: 4242, ring: TUT_RING, first: 0 }); },
-    onDone: function (r) { var c = r && r.choice; if (c === 'finish' && G && !G.over) { UI.tutorial = false; UI.tutAi = false; UI.lvl = 'easy'; UI.names[1] = 'Marden'; render(); schedule(); return; } tutLeave(); if (c === 'chapter' && first) { showStart(); GXC.play(first.id); } else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); },
+    onDone: function (r) { var c = r && r.choice; if (c === 'finish' && G && !G.over) { UI.tutorial = false; UI.tutAi = false; UI.lvl = 'easy'; UI.names[1] = 'Marden'; coachStart(); render(); saveGame(); schedule(); return; } tutLeave(); if (c === 'chapter' && first) { showStart(); GXC.play(first.id); } else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); },
     onExit: function () { tutLeave(); showStart(); } });
+}
+function PRO() { return ((window.CAMPAIGN || {}).story || {}).prologue || {}; }
+// ---------- coach: the rest of the tutorial game (chapters 2-4). Aunt Wren notices each rule the first time it happens; the player keeps playing for real.
+function coachData() { return (window.CAMPAIGN || {}).story || {}; }
+function coachStart() { UI.coach = { seen: {}, qk: {}, q: [], line: '', ch: 2, fresh: 0, shown: [] }; coachSay('start', null, true); }
+function coachSay(key, vars, now) {
+  var C = UI.coach; if (!C || C.seen[key] || C.qk[key]) return; var d = (coachData().coach || {})[key]; if (!d) return;
+  var t = d[1].replace(/\{(\w+)\}/g, function (m, k) { return vars && vars[k] != null ? vars[k] : m; }); C.qk[key] = 1; var it = { k: key, ch: d[0], t: t };
+  if (now) { C.q.unshift(it); coachNext(); } else { C.q.push(it); if (!C.line || C.fresh <= 0) coachNext(); }
+}
+function coachNext() { var C = UI.coach; if (!C || !C.q.length) return; var n = C.q.shift(); C.seen[n.k] = 1; C.line = n.t; C.ch = n.ch; C.fresh = 2; C.shown.push(n.k); coachRender(); }
+function coachRender() {
+  var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : UI.flavor || '';
+  el.hidden = !txt || !G || G.over; if (el.hidden) return; el.innerHTML = '';
+  var cast = ((window.CAMPAIGN || {}).cast || {}).wren || {}, chn = C ? (coachData().chapters || {})[C.ch] : '';
+  el.appendChild(h('span.gface', { style: 'background:' + (C ? cast.color || '#3b7a8c' : '#a8432f'), 'aria-hidden': 'true' }, C ? (cast.emoji || '\u{1F9F5}') : '\u{1F380}'));
+  el.appendChild(h('span.gtx', C ? h('b', (cast.name || 'Aunt Wren') + (chn ? ' \u00B7 Ch. ' + C.ch + ' ' + chn : '')) : null, h('span', txt)));
+}
+function coachCheck() { // after every move: what just happened for the first time?
+  var C = UI.coach; if (!C || !G) return; C.fresh--;
+  (G.ev || []).forEach(function (e) {
+    if (e.k === 'move') SW.BTN_SPOTS.forEach(function (b) { if (b > e.from && b <= e.to) { if (e.s === 0) coachSay(G.inc[0] > 0 ? 'income_me' : 'income_zero', { n: G.inc[0] + ' button' + (G.inc[0] === 1 ? '' : 's') }); else coachSay('income_opp'); } });
+    if (e.k === 'place' && e.pid === 100 && e.s === 1) coachSay('leather_opp');
+    if (e.k === 'bonus') coachSay('bonus', { name: e.s === 0 ? 'You' : nameOf(e.s) });
+  });
+  if (!G.over) {
+    var w = swWho(G); if (G.pend && w === 0) coachSay('leather_me', null, true);
+    if (w === 0 && !G.pend && swOffer(G).some(function (pid) { return G.btn[0] < PATCHES[pid].cost; })) coachSay('cant');
+    if (G.pos[0] >= 40) coachSay('late');
+    if (G.pos[0] >= 53 && G.pos[1] < 53) coachSay('end_me', null, true); if (G.pos[1] >= 53 && G.pos[0] < 53) coachSay('end_opp', null, true);
+  }
+  if (C.q.length && C.fresh <= 0) coachNext(); coachRender();
+}
+function coachFinal(ban, w, A, B) { // the judging: the tutorial's climax line on the result banner
+  var C = UI.coach; if (!C) return; var f = coachData().final || {}; C.seen.final = 1; C.shown.push('final');
+  var t = A === B ? f.tie : w === 0 ? f.win : f.lose; if (G.bonus == null) { C.seen.bonus = 1; C.shown.push('bonus'); t += ' ' + (f.nobonus || ''); }
+  ban.appendChild(h('div.rvt3.wren', t)); try { localStorage.setItem('sw_tutcov', JSON.stringify(Object.keys(C.seen))); } catch (e) { }
 }
 function tutLeave() { UI.seq++; clearTimeout(UI.tm.ai); UI.tutorial = false; UI.tutAi = false; UI.started = false; UI.busy = 0; UI.sel = -1; try { GXH.hide(); } catch (e) { } G = null; $$('.flt,.coin').forEach(function (e) { e.remove(); }); }
 // ---------- story
@@ -42,6 +81,7 @@ function campResultNote(g) {
   else if (w !== 0) n.appendChild(h('div.rvtb', 'Lost by ' + (b.total - a.total) + ' point' + (b.total - a.total === 1 ? '' : 's') + '.'));
   else n.appendChild(h('div.rvtb', 'Won by ' + (a.total - b.total) + ' point' + (a.total - b.total === 1 ? '' : 's') + '.'));
   if (w !== 0) n.appendChild(h('div.rvtb', 'Stars are only earned on a win.'));
+  try { var cc = (window.CAMPAIGN.chapters || []).filter(function (c) { return c.id === UI.camp.id; })[0], cast = window.CAMPAIGN.cast || {}; if (w !== 0 && cc && cc.outroLose) cc.outroLose.forEach(function (l) { n.appendChild(h('div.rvtb.wren', (cast[l.who] ? cast[l.who].name : l.who) + ': ' + l.text)); }); } catch (e) { }
   if (best != null) n.appendChild(h('div.rvtb', 'Your best here: ' + best));
   var h2 = $('h2', box); if (h2 && h2.nextSibling) box.insertBefore(n, h2.nextSibling); else box.appendChild(n);
 }

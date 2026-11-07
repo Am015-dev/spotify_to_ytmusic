@@ -53,7 +53,7 @@ function confirmSew() { if (UI.sel < 0 || UI.busy) return; if (!ghostOk()) { sna
 function doAdvance() { if (UI.busy || G.over || G.pend || !isHuman(swWho(G))) return; if (!tutAct({ what: 'adv' })) return; UI.sel = -1; act({ t: 'adv' }); }
 function doLeather(x, y) { if (UI.busy || !tutAct({ what: 'leather' })) return; act({ t: 'leather', x: x, y: y }); }
 function act(m) {
-  if (!G || G.over) return; var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
+  if (!G || G.over) return; if (isHuman(swWho(G))) { UI.flavor = ''; var tb = $('#turnban'); if (tb) tb.classList.remove('on'); } var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
   var r = swApply(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed (' + r.why + ').'); render(); return; }
   var evs = G.ev.slice(); evs.forEach(function (e) { if (e.k === 'place') e.cells.forEach(function (c) { UI.newCells[e.s + ':' + (c[1] * 9 + c[0])] = 1; }); });
   UI.busy++; saveGame(); render(); playEvents(evs, before, function () { var fin = function () { UI.peek = -1; UI.cap = ''; UI.busy--; afterMove(); }; if (UI.peek >= 0 && amt(1)) later(sp(800), fin); else fin(); });
@@ -77,7 +77,7 @@ function incomeMoment(seat, spot, inc, i) { // coins fly from the button spot to
   floatText('+' + inc + ' button' + (inc === 1 ? '' : 's') + ': gold spot income', cell, '#ffe9a0', true); fxImg('fx-sparkle', a.left + a.width / 2, a.top + a.height / 2, 44);
 }
 function fxImg(stem, x, y, size) { var i = artImg(stem, 'fx'); if (!i) return; i.style.cssText = 'position:fixed;z-index:60;pointer-events:none;width:' + size + 'px;height:' + size + 'px;left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;animation:flt 1s ease-out forwards'; document.body.appendChild(i); setTimeout(function () { i.remove(); }, 1100); }
-function afterMove() { render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
+function afterMove() { if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
 function sp(ms) { return amt(UI.fast ? ms * .3 : ms); }
 function banner(txt, sub, opp) { var b = $('#turnban'); if (!b) { b = h('div#turnban'); document.body.appendChild(b); } var ms = amt(1100); if (!ms) return; b.className = opp ? 'opp' : ''; b.textContent = txt; if (sub) b.appendChild(h('small', sub)); void b.offsetWidth; b.classList.add('on'); clearTimeout(banner.t); banner.t = setTimeout(function () { b.classList.remove('on'); }, UI.fast ? 400 : ms); }
 function turnCheck() { // banner + plain line when the turn changes (or stays: the player further back plays again)
@@ -85,6 +85,7 @@ function turnCheck() { // banner + plain line when the turn changes (or stays: t
   if (hum) UI.fast = false;
   UI.again = hum && again ? (hot ? nameOf(w) + ' is still behind on the track, so plays again' : 'You are still behind on the track: play again') : '';
   if (!again) banner(nm, '', !hum && !hot); else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', '', !hum && !hot);
+  if (UI.coach) { if (UI.again) coachSay('again'); else if (!hum && again && !hot) coachSay('again_opp'); }
   UI.lastWho = w; if (prev !== UI.again) renderDock();
 }
 function schedule() {
@@ -105,7 +106,7 @@ function aiStep() { // the rival's turn, one visible step at a time (caption, fl
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
 // ---------- start / finish
 function newGame(mode, o) {
-  o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lastWho = -1; UI.again = ''; UI.peek = -1; UI.cap = ''; UI.fast = false; UI.lvl = o.lvl || UI.lvl;
+  o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lastWho = -1; UI.again = ''; UI.peek = -1; UI.cap = ''; UI.fast = false; UI.coach = null; var QS = ((window.CAMPAIGN || {}).story || {}).quick; UI.flavor = mode === 'vs' && !o.camp && QS && QS.intro ? QS.intro[o.lvl || UI.lvl] || '' : ''; UI.lvl = o.lvl || UI.lvl;
   var seed = o.seed != null ? o.seed : (Math.random() * 1e9) | 0; rngUI = swRng(seed + 17); UI.seed = seed;
   G = swNew({ seed: seed, first: o.first != null ? o.first : (UI.mode === 'hot' || UI.tutorial || UI.camp ? 0 : seed % 2), ring: o.ring });
   UI.names = UI.mode === 'hot' ? ['Player 1', 'Player 2'] : ['You', UI.camp ? UI.camp.opponent.name : (o.name || ({ easy: 'Poppy', normal: 'Marden', hard: 'Aurelia' }[UI.lvl] || 'Computer'))];
@@ -119,8 +120,8 @@ function applyTwist(t) {
   else if (t.id === 'torn-squares') { var c = [[0, 0], [8, 8], [4, 4], [8, 0], [0, 8]]; for (var i = 0; i < (t.param || 0); i++) G.board[0][c[i][1] * 9 + c[i][0]] = 99; }
   else if (t.id === 'boss-patched') { var d = [[0, 0], [8, 8], [0, 8], [8, 0]]; for (var j = 0; j < (t.param || 0); j++) G.board[1][d[j][1] * 9 + d[j][0]] = 100; }
 }
-function saveGame() { try { if (UI.tutorial || UI.camp || !G || G.over) { if (G && G.over) localStorage.removeItem('sw_save'); return; } localStorage.setItem('sw_save', JSON.stringify({ G: G, mode: UI.mode, lvl: UI.lvl, names: UI.names })); if (window.GNS && GNS.saved) GNS.saved('stitchwise', true); } catch (e) { } }
-function loadGame() { try { var s = JSON.parse(localStorage.getItem('sw_save')); if (!s || !s.G || s.G.over) return false; G = s.G; UI.mode = s.mode; UI.lvl = s.lvl; UI.names = s.names; UI.camp = null; UI.tutorial = false; UI.started = true; UI.sel = -1; UI.busy = 0; rngUI = swRng((G.seed || 1) + G.turns); $('#start').hidden = true; AIDELAY = GX.aiDelay(700); render(); schedule(); return true; } catch (e) { return false; } }
+function saveGame() { try { if (UI.tutorial || UI.camp || !G || G.over) { if (G && G.over) localStorage.removeItem('sw_save'); return; } localStorage.setItem('sw_save', JSON.stringify({ G: G, mode: UI.mode, lvl: UI.lvl, names: UI.names, coach: UI.coach || null })); if (window.GNS && GNS.saved) GNS.saved('stitchwise', true); } catch (e) { } }
+function loadGame() { try { var s = JSON.parse(localStorage.getItem('sw_save')); if (!s || !s.G || s.G.over) return false; G = s.G; UI.mode = s.mode; UI.lvl = s.lvl; UI.names = s.names; UI.coach = s.coach || null; UI.flavor = ''; UI.camp = null; UI.tutorial = false; UI.started = true; UI.sel = -1; UI.busy = 0; rngUI = swRng((G.seed || 1) + G.turns); $('#start').hidden = true; AIDELAY = GX.aiDelay(700); render(); schedule(); return true; } catch (e) { return false; } }
 function hasSave() { try { var s = JSON.parse(localStorage.getItem('sw_save')); return !!(s && s.G && !s.G.over); } catch (e) { return false; } }
 function metrics(g) { var a = swScore(g, 0), b = swScore(g, 1); return { won: swWinner(g) === 0, score: a.total, margin: a.total - b.total, empty: a.empty, bonus: g.bonus === 0 ? 1 : 0, income: g.inc[0], turns: g.turns }; }
 function finish() {

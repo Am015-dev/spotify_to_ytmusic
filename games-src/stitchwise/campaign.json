@@ -188,6 +188,12 @@
      "id": "poppy",
      "text": "Dame Poppy's portrait"
     }
+   ],
+   "outroLose": [
+    {
+     "who": "wren",
+     "text": "Dame Poppy won, but she is the kindest teacher at the fair. Fill the corners first and try again."
+    }
    ]
   },
   {
@@ -268,6 +274,12 @@
      "type": "portrait",
      "id": "tilly",
      "text": "Tilly's portrait"
+    }
+   ],
+   "outroLose": [
+    {
+     "who": "wren",
+     "text": "Tilly spent fast and got rich slow. Look for patches with buttons early, then try again."
     }
    ]
   },
@@ -356,6 +368,16 @@
      "id": "act2",
      "text": "The County Fair opens"
     }
+   ],
+   "outroLose": [
+    {
+     "who": "fernsby",
+     "text": "Not this year, child. Come back with a tidier quilt."
+    },
+    {
+     "who": "wren",
+     "text": "Granny Fernsby can be beaten. Fewer gaps, and Advance when you are short."
+    }
    ]
   },
   {
@@ -436,6 +458,12 @@
      "type": "portrait",
      "id": "odette",
      "text": "Odette's portrait"
+    }
+   ],
+   "outroLose": [
+    {
+     "who": "wren",
+     "text": "The county gate stays shut for now. Buy cheap, quick patches to get more turns."
     }
    ]
   },
@@ -521,6 +549,12 @@
      "type": "portrait",
      "id": "bram",
      "text": "Bram's portrait"
+    }
+   ],
+   "outroLose": [
+    {
+     "who": "wren",
+     "text": "The moths won this round. Keep your quilt tidy and the twist hurts less."
     }
    ]
   },
@@ -609,6 +643,16 @@
      "id": "act3",
      "text": "The Grand Fair opens"
     }
+   ],
+   "outroLose": [
+    {
+     "who": "marguerite",
+     "text": "The county ribbon stays with me."
+    },
+    {
+     "who": "wren",
+     "text": "She builds income early. Do the same, then try again."
+    }
    ]
   },
   {
@@ -684,7 +728,13 @@
     "maxStars": 2,
     "text": "The computer plays at normal strength and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [],
+   "outroLose": [
+    {
+     "who": "wren",
+     "text": "The grand gates are tough. Watch who is behind on the track before you buy big."
+    }
+   ]
   },
   {
    "id": "c8",
@@ -763,7 +813,13 @@
     "maxStars": 2,
     "text": "The computer plays at normal strength and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [],
+   "outroLose": [
+    {
+     "who": "wren",
+     "text": "A head start for them, a lesson for you. Win the race to the gold spots next time."
+    }
+   ]
   },
   {
    "id": "c9",
@@ -838,7 +894,17 @@
     "maxStars": 2,
     "text": "The computer plays at normal strength."
    },
-   "unlock": []
+   "unlock": [],
+   "outroLose": [
+    {
+     "who": "tobias",
+     "text": "Gaps, gaps, gaps. The tidy-quilt prize is mine."
+    },
+    {
+     "who": "wren",
+     "text": "Too many gaps for the tidy-quilt judge. Keep edges straight and try again."
+    }
+   ]
   },
   {
    "id": "c10",
@@ -925,7 +991,127 @@
      "id": "champion",
      "text": "Title: Grand Champion"
     }
+   ],
+   "outroLose": [
+    {
+     "who": "aurelia",
+     "text": "My crown stays on my head, little stitcher."
+    },
+    {
+     "who": "wren",
+     "text": "You came so far. One tidier quilt and that crown is yours."
+    }
    ]
   }
- ]
+ ],
+ "story": {
+  "guide": "wren",
+  "prologue": {
+   "rival": "Marden",
+   "steps": {
+    "pick": [
+     "Marden's challenge",
+     "Marden swears no newcomer wins a ribbon. Prove them wrong: buy the long strip, 3 buttons."
+    ],
+    "drag": [
+     "Lay it down",
+     "Lovely strip! Lay it on your quilt. Every empty square costs 2 at the judging."
+    ],
+    "sew": [
+     "Stitch it",
+     "Snug fit. Sew it on: 3 buttons paid, and your token walks 3 spaces."
+    ],
+    "opp": [
+     "The old fox moves",
+     "You are ahead on the track now, so Marden moves. Watch the old fox."
+    ],
+    "adv": [
+     "Short on buttons",
+     "Marden is done. Low on buttons? Advance past Marden: 1 button per space."
+    ],
+    "end": [
+     "Clink!",
+     "Buttons in your pocket. Play on to the judging; I will whisper as we go."
+    ]
+   },
+   "endTitle": "Chapter 1 stitched",
+   "endText": "Marden looks worried already. Play this fair to the judging; Aunt Wren will chime in.",
+   "endButton": "Play on to the judging"
+  },
+  "chapters": {
+   "2": "Pay day",
+   "3": "Fair surprises",
+   "4": "The judging"
+  },
+  "coach": {
+   "start": [
+    2,
+    "Chapter 2: buttons are your money AND your score. The gold spots on the track pay out."
+   ],
+   "income_me": [
+    2,
+    "Pay day! You passed a gold spot: every button printed on your patches paid you {n}."
+   ],
+   "income_zero": [
+    2,
+    "A gold spot, but your patches carry no buttons yet, so it paid 0. Buy patches with buttons!"
+   ],
+   "income_opp": [
+    2,
+    "Marden's patches just paid them. More buttons on your patches means a fatter pay day."
+   ],
+   "cant": [
+    3,
+    "Too dear for now! A patch you can't pay for stays dim. Advance to earn buttons."
+   ],
+   "again": [
+    3,
+    "Still behind Marden on the track, so you go again. Quick patches buy extra turns."
+   ],
+   "again_opp": [
+    3,
+    "Marden is still behind you, so Marden moves again. Big, slow patches give turns away."
+   ],
+   "leather_me": [
+    3,
+    "A leather scrap! You passed it first, so it is yours, free: put it on any empty square."
+   ],
+   "leather_opp": [
+    3,
+    "Marden passed a leather scrap first and sewed it on free. First to pass it gets it."
+   ],
+   "bonus": [
+    3,
+    "{name} filled a whole 7x7 block: the gold rosette, worth +7 at the judging!"
+   ],
+   "late": [
+    4,
+    "Chapter 4: the fair closes soon. Fill gaps now: each empty square costs 2."
+   ],
+   "end_me": [
+    4,
+    "You reached the last space! Marden plays out their last moves, then the judges come."
+   ],
+   "end_opp": [
+    4,
+    "Marden reached the last space and waits. You keep playing until you get there too."
+   ]
+  },
+  "final": {
+   "win": "Aunt Wren: Ten years I waited to see Marden lose a ribbon. Empty squares cost 2 each; you left fewer. Welcome to the fair!",
+   "lose": "Aunt Wren: Marden wins this one, but you learned every rule. Empty squares cost 2 each; fill more next time.",
+   "tie": "Aunt Wren: A dead heat! On a tie, whoever reached the end first takes the ribbon.",
+   "nobonus": "Nobody filled a 7x7 block, so the +7 rosette stayed on the judges' table."
+  },
+  "quick": {
+   "intro": {
+    "easy": "Poppy has brought cake and a sewing basket. Friendly match, ribbon at stake.",
+    "normal": "Marden has won this fair three years running and wants a fourth ribbon.",
+    "hard": "Aurelia, the county champion, never leaves a square empty. Good luck."
+   },
+   "win": "The judges pin the ribbon on your quilt.",
+   "lose": "The ribbon goes to {name}. Fewer gaps next time.",
+   "tie": "A dead heat. The ribbon goes to whoever finished first."
+  }
+ }
 }
