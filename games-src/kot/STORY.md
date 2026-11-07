@@ -17,7 +17,7 @@ A night in Crown City: a portal cracks open over the skyline and giant monsters 
 2. **The Harbor Wars**: bigger brawls, evolutions, a second city space on the water. (Ch 5-7, boss Glacyx)
 3. **Spire of the Crown**: stolen rolls, curses and the schemer who opened the portal, Cortexa. (Ch 8-10)
 
-## The tutorial is the prologue (W386)
+## The tutorial is the prologue (W386; now a coached free-play game, see TUTORIAL-COVERAGE.md)
 Four short chapters, one real game against Squidrik and Shroomhulk, ending at 20 stars and the result screen. Dot gives the story reason, the
 player does the action, Dot reacts. Chapter 1 *First turn* · 2 *Downtown* · 3 *Outside* · 4 *The crown*. Each opens with a beat card and closes with a payoff beat.
 Rival: Squidrik wants the front page. Climax: the winning roll, the result screen, and "KING OF CROWN CITY!"

@@ -60,19 +60,19 @@
     el.style.setProperty('--bc', g.color);
     el.innerHTML = `<img src="${g.img}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:'${g.emoji}'}))"><div><b>${esc(t.head || g.name)}</b><span>${esc(txt)}</span>${t.html || ''}</div><button type="button" data-pp-x aria-label="Dismiss">×</button>`;
     el.classList.add('on'); C.cur = t.id; (t.rules || []).forEach(r => C.rules[r] = 1); C.seen[t.id] = 1;
-    clearTimeout(C.hideT); if (!t.sticky) C.hideT = setTimeout(hideCoach, 11000);
+    clearTimeout(C.hideT); if (!t.sticky) C.hideT = setTimeout(hideCoach, 8000);
   }
   const HELP_ = () => ({ vp: P(0).vp, rival: mname(G.pl.find(p => !p.human) || G.pl[1]) });
   function finalCard() {
     if (C.ended) return; C.ended = true; C.rules.final = 1; C.rules.later = 1; COACH_LATER.forEach(l => C.rules[l[0]] = 'later');
-    const LS = { extra: 'four of a kind adds 1 ★ per extra die', noheal: 'no healing inside Downtown', start2: 'starting a turn in Downtown pays +2 ★', yield: 'yield when hit in Downtown', ko: '0 ♥ means knocked out; last one standing wins', claws: 'claws hit the other zone', hearts: 'hearts heal 1 each', energy: 'energy buys cards', pair: 'a pair scores nothing; three of a kind scores', enter: 'an empty Downtown pulls you in for +1 ★', win20: '20 ★ is checked when your turn ends', rivals: 'rivals play like you', cards: 'power cards', stop: 'you may stop rolling early' };
+    const LS = { extra: 'four of a kind adds 1 ★ per extra die', noheal: 'no healing inside Downtown', start2: 'starting a turn in Downtown pays +2 ★', yield: 'yield when hit in Downtown', ko: '0 ♥ means knocked out; last one standing wins', claws: 'claws hit the other zone', hearts: 'hearts heal 1 each', energy: 'energy buys cards', pair: 'a pair scores nothing; three of a kind scores', enter: 'an empty Downtown pulls you in for +1 ★', win20: '20 ★ is checked when your turn ends', rivals: 'rivals play like you', cards: 'power cards: tap to read, tap again to buy', types: 'PERMANENT cards stay, ONE-SHOT cards are used once', sweep: '♻ swaps the three cards for 2 ⚡', endturn: 'End turn keeps your saved ⚡', keep: 'tap dice to keep them, Roll for the rest', rekeep: 'kept dice can be rolled again', triple: 'three of a kind scores its number in ★', stop: 'you may stop rolling early' };
     const miss = []; COACH_TIPS.forEach(t => { if (!C.seen[t.id]) (t.rules || []).forEach(r => { if (LS[r]) { miss.push(LS[r]); C.rules[r] = 'later' } }) });
     C.later = miss;
     const me = G.pl.find(p => p.human), w = G.winner === 'draw' ? null : G.pl[+G.winner.slice(1) - 1];
     const rows = G.pl.slice().sort((a, b) => b.vp - a.vp).map(p => `${p === me ? 'You' : mname(p)}: ${p.vp} ★, ${Math.max(0, p.hp)} ♥, ${p.cards.length} card${p.cards.length === 1 ? '' : 's'}`).join(' · ');
     showCoach({ id: 'final', head: w === me ? 'KING OF CROWN CITY!' : 'Final scoring', sticky: true,
       say: `${w ? (w === me ? 'You won' : mname(w) + ' won') : 'Nobody won'} with ${w ? w.vp : 0} ★ (20 needed, or last standing). ${rows}.`,
-      html: `<small>Things you’ll meet later: ${miss.concat(COACH_LATER.map(l => l[1])).join('; ')}.</small><span class="pp-row"><button type="button" data-pp-play>Play a real game</button><button type="button" data-pp-story>Story mode</button></span>` });
+      html: `<small>Not met in this game (see Help): ${miss.slice(0, 4).concat(COACH_LATER.slice(0, 2).map(l => l[1])).join('; ')}.</small><span class="pp-row"><button type="button" data-pp-play>Play a real game</button><button type="button" data-pp-story>Story mode</button></span>` });
     try { GXT.markDone(TUT_GAME) } catch (e) { }
   }
   function coach() {

@@ -61,7 +61,7 @@ const TUT_BUY=['cosmic','plated','kiosk'], TUT_NEXT=['kidfan','train','sun','men
   const _sv=save;save=function(){if(G&&G.tut)return;return _sv.apply(this,arguments)};
   const _sg=suggestCard;suggestCard=function(p){if(G&&G.tut)return -1;return _sg.apply(this,arguments)};
   // the board's ghost finger and the help kit's bubbles stay quiet: the tutorial is the only teacher
-  const _bf=bfFinger;bfFinger=function(){if(tutOn()){const f=document.getElementById('bfinger');if(f)f.classList.remove('on');return}return _bf.apply(this,arguments)};
+  const _bf=bfFinger;bfFinger=function(){if(tutOn()||(G&&G.tut&&window.PPC&&PPC.on)){const f=document.getElementById('bfinger');if(f)f.classList.remove('on');return}return _bf.apply(this,arguments)};
   // the staged table is built inside newGame, before the first turn
   const _cs=campSetup;campSetup=function(){const r=_cs.apply(this,arguments);if(UI.tutNext)tutTable();return r};
 })();
@@ -165,7 +165,7 @@ function tutStart(o){   // coached first game (Addendum 4): a real game, free ch
   clearTimeout(UI.statsT);UI.info=false;UI.choice=null;UI.stats=false;UI.intro=false;UI.coach=-1;UI.adv=false;UI.paused=false;UI.pending=false;UI.busy=false;UI.camp=null;UI.campNext=false;UI.tutNext=true;
   const sv={n:UI.n,mon:UI.mon,xp:UI.xp,evo:UI.evo,ex:UI.ex,lvl:UI.lvl};UI.n=3;UI.mon=0;UI.xp='base';UI.evo=false;UI.ex={};UI.lvl='easy';
   try{setSeed(5);newGame('solo',3,0)}finally{Object.assign(UI,sv)}
-  UI.intro=false;if(G){G.tut=1;TUT.script=[]}render();if(typeof ppCoachStart==='function')ppCoachStart()}
+  TUT.hints=UI.hints;UI.hints=false;UI.intro=false;if(G){G.tut=1;TUT.script=[]}render();if(typeof ppCoachStart==='function')ppCoachStart()}
 function tutStartScripted(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:'You know the rules',endText:pro?'You played a whole game. Now the Story begins.':'You played a whole game, start to finish. Time for a real one.',

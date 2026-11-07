@@ -1,4 +1,30 @@
-# Tutorial coverage: Crown City Smash (W386, 7 Nov 2026)
+# Tutorial coverage: Crown City Smash (W386, 7 Nov 2026) - COACHED FIRST GAME
+
+The tutorial is a real game (you, Squidrik, Shroomhulk; fixed seed 5) with free choices from turn 1. No forced taps: Dot Inkwell, the Clarion's
+reporter, speaks once per rule the first time it matters (`tut-story.js` COACH_TIPS, shown by `playable.js`), one bubble at a time, never blocking input,
+dismissable with x; the first bubble has Skip tutorial. When the game ends the final card walks through the real numbers and lists "Things you'll meet later"
+(any rule that did not come up, plus Harbor, ties, options, extra turns). Proof: `playable/coached.js` starts it from the title, plays random legal moves through the UI at
+390x763 and 1440x860 and asserts every rule id below was explained or listed on the final card. The older scripted spotlight tutorial (steps below the table) is no longer started.
+
+| Rule id | Explained when |
+|---|---|
+| setup, goal, roll3 | first roll of your first turn |
+| faces | after the first roll (STAR / ENERGY / HEAL / HIT words on the dice) |
+| keep, rekeep | when you may reroll |
+| pair, triple | you hold two of a number |
+| extra | four of a kind |
+| energy / hearts / noheal / claws | the roll holds those dice (hearts in Downtown: no healing) |
+| stop | one roll left |
+| enter / start2 | you are in Downtown after a smash / start a turn there |
+| cards, types, sweep, endturn | first buy step |
+| rivals | a rival's first turn |
+| yield | the Stay or yield question |
+| ko, win20 | a monster is low on hearts / someone nears 20 stars |
+| final | the result: real scores walked through, later-card |
+| later (not played): harbor, tie, omen/expansions, extra turns | final card |
+
+---- older scripted version (kept for reference) ----
+
 
 The tutorial is one complete guided game against the real computer players (3 monsters, scripted dice): setup to the 20-star win and the
 result screen, in 4 chapters. Each step makes the player do the real action; **Skip** works at every step; progress is remembered, so a
