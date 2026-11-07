@@ -107,9 +107,12 @@ function renderStart() {
   if (UI.sv === 'online') { s.appendChild(onlineEl()); return; }
   s.appendChild(setupEl());
 }
+// tall phone: the painted portrait title (media/title-phone.webp); the landscape art stays the fallback
+function ttlSrc(land) { try { return matchMedia('(max-aspect-ratio:4/5)').matches ? 'media/title-phone.webp' : land; } catch (e) { return land; } }
+function ttlImg(land) { const im = h('img.ttl-bg', { src: ttlSrc(land), alt: '' }); im.addEventListener('error', () => { if (im.src.indexOf('title-phone') > -1) im.src = land; }); return im; }
 function titleEl() {
   // a saved meal comes first: Resume leads the buttons
-  const bg = KIT.ART.title ? h('img.ttl-bg', { src: KIT.ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain');
+  const bg = KIT.ART.title ? ttlImg(KIT.ART.title) : h('div.ttl-bg.ttl-plain');
   const sv = hasSave();
   return h('div.ttl', bg, h('div.ttl-in',
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Kaiten Kitchen')),

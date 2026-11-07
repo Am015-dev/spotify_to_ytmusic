@@ -1,0 +1,25 @@
+{
+ "note": "Prompts not to be generated: a finished 3D model sprite already covers the item (W354).",
+ "cards": {
+  "cloche-closed": {
+   "prompt": "a small brass serving cloche dome with a round knob handle on a round plate. State: closed over the plate. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/cloche.webp (3D cloche, already wired)"
+  },
+  "cloche-lift-a": {
+   "prompt": "a small brass serving cloche dome with a round knob handle on a round plate. State: lifted a little with a thin slit of steam and light. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/cloche.webp (3D cloche, already wired)"
+  },
+  "cloche-lift-b": {
+   "prompt": "a small brass serving cloche dome with a round knob handle on a round plate. State: lifted high, tilted, steam billowing. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/cloche.webp (3D cloche, already wired)"
+  },
+  "cloche-open": {
+   "prompt": "a small brass serving cloche dome with a round knob handle on a round plate. State: lifted away completely, the plate bare and steaming. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+   "from": "prompts-wave7.json",
+   "covered_by": "models/cloche.webp (3D cloche, already wired)"
+  }
+ }
+}
