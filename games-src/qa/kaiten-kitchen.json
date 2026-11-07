@@ -2,7 +2,7 @@
  "slug": "kaiten-kitchen",
  "size": "phone",
  "seed": 17064,
- "when": "2026-11-07T23:28Z",
+ "when": "2026-11-07T23:40Z",
  "tutorial": {
   "end": true,
   "coached": true,
@@ -41,7 +41,8 @@
   "clicks": 949
  },
  "story": {
-  "result": false
+  "result": "prologue",
+  "note": "Story opens with the coached prologue game (tested in the tutorial phase); no skip-to-map button"
  },
  "fuzz": {
   "taps": 300
@@ -94,22 +95,6 @@
    "desc": "inconclusive: no result screen within the 220 s cap / 949 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
    "shot": "/tmp/qa-shots/kaiten-kitchen/phone-quick-noresult-11.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "tap target 32px (<40) button.kx x1: \"×\"",
-   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases story",
-   "shot": "/tmp/qa-shots/kaiten-kitchen/phone-screen-story-map-12.png"
-  },
-  {
-   "sev": "BLOCKER",
-   "phase": "story",
-   "where": "story map",
-   "desc": "no stage 1 / start element on the Story map",
-   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases story",
-   "shot": "/tmp/qa-shots/kaiten-kitchen/phone-story-nomap-13.png"
   },
   {
    "sev": "MINOR",
@@ -216,5 +201,5 @@
    "shot": "/tmp/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-18.png"
   }
  ],
- "secs": 577
+ "secs": 5
 }
