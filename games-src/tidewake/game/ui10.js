@@ -10,10 +10,19 @@ window.TW_OSK=OSK;                                                 // tests read
 const OSK_RULES=['goal','reloc','roll','lay','sail','chain','collide','levmove','levsink','cannon','wave','gate','mael','swap','end','tie','more'];
 function tutOn(){return !!UI.tut&&OSK.on}
 function firstTime(){try{return !localStorage.getItem('tw_played')&&!localStorage.getItem('tw_offered')}catch(e){return true}}
-function tutBtn(cls){return typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart})}
+function tutBtn(cls){return typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart}).replace('Learn in 5 minutes','Play with Osk\'s help').replace('Short, one tap at a time, no reading','One real game, tips as you go').replace('Learn by doing, step by step','One real game with Osk\'s tips')}
 function tutHold(){return false}
 // ---------------------------------------------------------------- start / leave
-function tutStart(o){if(NET.on)return;OSK.prologue=!!(o&&o.prologue);try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
+// opened through the shared tutor kit: ONE intro step (tap Next) and its card (tap "Cast off") are the only forced taps; then the real game is free
+function tutStart(o){if(NET.on)return;const pro=!!(o&&o.prologue);
+  if(typeof GXT==='undefined'){oskBegin(pro);return}
+  GXT.start({game:TUT_GAME,story:false,steps:[{id:'goal',title:OSK_TEXT.goal[0],say:'Cobalt swears the Reach is his. Last junk afloat keeps the lantern.',target:()=>document.getElementById('board'),wait:null,
+      ready:()=>!!G&&UI.started}],
+    endTitle:'Your race begins',endText:'Play freely: every move is yours. Grandmother Osk speaks up when a rule first matters.',endButtons:[{id:'go',label:'Cast off'}],
+    setup:()=>oskBegin(pro),
+    onDone:()=>{OSK.said.goal=OSK.said.goal&&OSK.said.goal!=='queued'?OSK.said.goal:'intro';render()},
+    onExit:()=>{tutLeave();showStart()}})}
+function oskBegin(pro){OSK.prologue=pro;try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
   const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:1,wave:1,maelstrom:1,cannon:1};
   s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};
   UI.tut=1;OSK.starting=1;try{startGame(s,{seed:20261107})}finally{OSK.starting=0}oskRig();
@@ -47,8 +56,8 @@ function oskHide(){OSK.cur=null;const e=document.getElementById('osk');if(e)e.re
 function oskHTML(c){return `<div class="osk-p" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="#2c4a5e" stroke="#e3b24b" stroke-width="2"/><path d="M9 33c2-7 6-10 11-10s9 3 11 10" fill="#cfd8dc"/><circle cx="20" cy="16" r="7" fill="#f1c9a5"/><path d="M12 15c1-7 15-7 16 0-3-3-13-3-16 0z" fill="#eceff1"/><circle cx="31" cy="9" r="3.4" fill="#ffcf5a"/></svg><span>Osk</span></div><div class="osk-t"><b>${esc(c.title)}</b><span>${esc(c.line)}</span></div><button type="button" class="osk-x" data-osk="x" aria-label="Dismiss Osk's tip">&times;</button>`}
 function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||!OSK.on){if(e)e.remove();return}
   const host=PH.on?document.getElementById('ps'):(document.getElementById('main')||{}).parentNode;if(!host)return;
-  if(!e){e=document.createElement('div');e.id='osk';e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('aria-live','polite')}
-  if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',c.rival)}
+  if(!e){e=document.createElement('div');e.id='osk';e.className='osk-card';e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('aria-live','polite')}
+  if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',!!c.rival)}
   const ref=PH.on?host.firstChild:document.getElementById('main');if(e.parentNode!==host||(PH.on&&host.firstChild!==e))host.insertBefore(e,ref)}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-osk]');if(!b)return;e.stopPropagation();
   if(b.dataset.osk==='x'){oskHide();oskShowNext()}else oskWalkStep(b.dataset.osk)},true);
@@ -56,8 +65,9 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
  const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);if(OSK.on)try{oskPlace()}catch(e){}return r}}
 // ---------------------------------------------------------------- when each rule first matters (polled; reads the game, never changes it)
 function oskTick(){if(!OSK.on||!G||!UI.started){return}
+  if(typeof GXT!=='undefined'&&GXT.running&&GXT.running()){oskHide();return}
   const me=0,riv=1,S=G.ships[me],R=G.ships[riv];
-  if(G.phase==='setup'&&sideToAct()===me)oskSay('goal',null,{pri:0});
+  if(G.phase==='setup'&&sideToAct()===me&&!(typeof GXT!=='undefined'&&GXT.running&&GXT.running()))oskSay('goal',null,{pri:0});
   if(S.x!=null)oskSay('reloc',null,{pri:1});
   // new log lines since the last look
   const fresh=G.log.filter(l=>l.i>OSK.logI).reverse();OSK.logI=G.logN;
