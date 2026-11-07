@@ -27,12 +27,12 @@ var COOL = { 1: 3, 2: 1, 3: 0, 4: 0 };   /* heat cards returned from hand to eng
 /* Upgrade cards (optional "Upgrades" mode): drafted before the race, shuffled into your deck, played like a speed card. Card string = 'u:<id>'.
    sp = speed it adds, cool = extra heat cards returned from hand to engine when played, lim = corner limits raised this move, stress = stress cards added to your discard. */
 var UPG = {
-  coolant: { name: 'Coolant Line', sp: 1, cool: 2, lim: 0, stress: 0, txt: 'Speed 1. Cools 2 more heat.' },
-  pit: { name: 'Pit Crew', sp: 0, cool: 3, lim: 0, stress: 0, txt: 'Speed 0. Cools 3 heat.' },
-  grip: { name: 'Grip Tyres', sp: 2, cool: 0, lim: 1, stress: 0, txt: 'Speed 2. Corner limits +1 this move.' },
-  brakes: { name: 'Big Brakes', sp: 1, cool: 0, lim: 2, stress: 0, txt: 'Speed 1. Corner limits +2 this move.' },
-  rocket: { name: 'Rocket Pack', sp: 5, cool: 0, lim: 0, stress: 1, txt: 'Speed 5. Adds a stress card to your discard.' },
-  tuned: { name: 'Tuned Engine', sp: 3, cool: 1, lim: 0, stress: 0, txt: 'Speed 3. Cools 1 heat.' }
+  coolant: { sn: 'Cool', name: 'Coolant Line', sp: 1, cool: 2, lim: 0, stress: 0, txt: 'Speed 1. Cools 2 more heat.' },
+  pit: { sn: 'Pit', name: 'Pit Crew', sp: 0, cool: 3, lim: 0, stress: 0, txt: 'Speed 0. Cools 3 heat.' },
+  grip: { sn: 'Grip', name: 'Grip Tyres', sp: 2, cool: 0, lim: 1, stress: 0, txt: 'Speed 2. Corner limits +1 this move.' },
+  brakes: { sn: 'Brakes', name: 'Big Brakes', sp: 1, cool: 0, lim: 2, stress: 0, txt: 'Speed 1. Corner limits +2 this move.' },
+  rocket: { sn: 'Rocket', name: 'Rocket Pack', sp: 5, cool: 0, lim: 0, stress: 1, txt: 'Speed 5. Adds a stress card to your discard.' },
+  tuned: { sn: 'Tuned', name: 'Tuned Engine', sp: 3, cool: 1, lim: 0, stress: 0, txt: 'Speed 3. Cools 1 heat.' }
 };
 var UPG_IDS = ['coolant', 'pit', 'grip', 'brakes', 'rocket', 'tuned'], DRAFT_PICKS = 3, UPG_COPIES = 4;
 function upgId(x) { return x && x.charAt(1) === ':' && x.charAt(0) === 'u' ? x.slice(2) : null; }

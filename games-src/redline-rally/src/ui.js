@@ -24,24 +24,26 @@ function drawSetup() {
   chooser('#s-hum', [1, 2, 3].map(function (n) { return { v: n, h: n === 1 ? '1 (you)' : n + ' (pass-and-play)' }; }), 'hum');
   chooser('#s-upg', [{ v: false, h: 'Off' }, { v: true, h: 'On<small>Draft 3 upgrade cards first</small>' }], 'upg');
   chooser('#s-diff', ['easy', 'normal', 'hard'].map(function (d) { return { v: d, h: d[0].toUpperCase() + d.slice(1) }; }), 'diff');
-  $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title'));
+  var qk = $('#quick'); if (qk && !qk._set) { qk._set = 1; qk.open = innerHeight >= 880; } $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#storyLine').innerHTML = typeof campLine === 'function' ? campLine() : ''; $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title'));
 }
-function showTitle() { $('#title').hidden = false; $('#game').hidden = true; closeModal(); drawSetup(); }
+function showTitle() { try { GX.close(); } catch (e) { } $('#title').hidden = false; $('#game').hidden = true; closeModal(); drawSetup(); }
 function modal(html) { var m = $('#modal'); m.innerHTML = '<div class="sheet"><button class="xb" aria-label="Close" id="mx">✕</button>' + html + '</div>'; m.hidden = false; $('#mx').onclick = closeModal; m.onclick = function (e) { if (e.target === m) closeModal(); }; artApply(m); }
 function closeModal() { var m = $('#modal'); m.hidden = true; m.innerHTML = ''; m.onclick = null; }
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('#modal').hidden && !UI.lockModal) closeModal(); });
-function howTo() {
-  modal('<h2>How to play</h2><p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
+function rulesFill() {
+  var h = ('<p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
     '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. No heat left? You spin out: back behind the corner, gear 1, plus a stress card.</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces. It does not count as speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b>: gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the car in last place gets +1 move and +1 cooldown.</li></ul>' +
     '<h3>Cards</h3><ul><li>Speed 1, 2, 3, 4: three of each.</li><li>Stress (3): when played, flip your deck until a speed card shows and use it.</li><li>Heat (6 start in your engine): paying sends them to your discard pile. They clog your hand later and cannot be played.</li></ul>' +
     '<h3>Upgrades (optional)</h3><ul><li>Switch Upgrades on in setup. Before the race you pick 3 upgrade cards; they join your deck and are played like speed cards, each with a bonus (more cooling, higher corner limits, a big speed jump).</li></ul>' +
-    '<p>Brake and keep your heat, or push and burn it. Heat comes back around.</p><div id="howTut">' + tutBtn('ghostb', { launch: function () { closeModal(); tutStart(); } }) + '</div>');
+    '<p>Brake and keep your heat, or push and burn it. Heat comes back around.</p><div id="howTut">' + tutBtn('ghostb', { launch: function () { GX.close(); closeModal(); tutStart(); } }) + '</div>');
+  var d = $('#rulesbody'); d.innerHTML = h; artApply(d);
 }
+function howTo() { rulesFill(); GX.show('rulesd'); }
 
 /* ================= game start ================= */
 function startGame(o) {
-  var s = o || UI.set; UI.mode = o && o.tut ? 'tutorial' : ''; if (!(o && o.tut)) lsSet('rr_seen', '1');
-  G = newGame({ track: s.track, laps: s.laps, n: s.hum + s.opp, humans: s.hum, diff: s.diff, seed: o && o.seed, upg: !!s.upg });
+  var s = o || UI.set; UI.mode = o && o.tut ? 'tutorial' : ''; if (!(o && o.cmp)) UI.cmpDef = null; if (!(o && o.tut)) lsSet('rr_seen', '1');
+  G = newGame({ track: s.track, laps: s.laps, n: s.hum + s.opp, humans: s.hum, diff: s.diff, seed: o && o.seed, upg: !!s.upg, climit: s.climit, lowheat: s.lowheat, cmp: s.cmp });
   window.G = G; UI.seat = 0; UI.sel = []; UI.boost = false; UI.busy = false; UI.pops = [];
   UI.vis = G.cars.map(function (c) { return { p: c.pos, rot: 0, glow: 0 }; });
   UI.focus = 0; $('#title').hidden = true; $('#game').hidden = false; closeModal();
@@ -88,7 +90,7 @@ function curveInfo() {   /* what the selected cards would do at the next corner 
 }
 function nextCorner(pos) {
   var tk = T(G), N = tk.N;
-  for (var d = 1; d <= N; d++) { var lim = tk.corners[(pos + d) % N]; if (lim) return { d: d, limit: lim }; } return null;
+  for (var d = 1; d <= N; d++) { var lim = tk.corners[(pos + d) % N]; if (lim) return { d: d, limit: climit(G, lim) }; } return null;
 }
 function drawPlan() {
   var c = you(), p = $('#panel'), need = needCards(c, UI.gear), go = gearOpts(c);
@@ -98,7 +100,7 @@ function drawPlan() {
   h += '</div><div id="hand">';
   c.hand.forEach(function (x, j) { h += cardHtml(x, UI.sel.indexOf(j) >= 0, x === 'H', j); });
   h += '</div><div id="acts"><button class="bo' + (UI.boost ? ' on' : '') + '" id="boostB"' + (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1 ? ' disabled' : '') + '>Boost -1</button><button id="sugB">Suggest</button><button class="go" id="goB">Go!</button></div>';
-  h += '<div class="chips tray" id="tray" data-art="ui-engine-tray"><span><i class="ic f-heat" data-art="icon-heat"></i>Engine <b data-engine="G.cars.' + c.i + '.eng">' + c.eng + '</b></span><span><i class="ic f-heat" data-art="icon-heat"></i>In hand <b>' + c.hand.filter(function (x) { return x === 'H'; }).length + '</b></span><span><i class="ic f-stress" data-art="icon-stress"></i>Stress in hand <b>' + c.hand.filter(function (x) { return x === 'X'; }).length + '</b></span><span>Deck <b>' + c.deck.length + '</b></span><span>Discard <b>' + c.disc.length + '</b></span></div>';
+  h += '<div class="chips tray" id="tray" data-art="ui-engine-tray"><span><i class="ic f-heat" data-art="icon-heat"></i>Engine <b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span><i class="ic f-heat" data-art="icon-heat"></i>In hand <b>' + c.hand.filter(function (x) { return x === 'H'; }).length + '</b></span><span><i class="ic f-stress" data-art="icon-stress"></i>Stress in hand <b>' + c.hand.filter(function (x) { return x === 'X'; }).length + '</b></span><span>Deck <b>' + c.deck.length + '</b></span><span>Discard <b>' + c.disc.length + '</b></span></div>';
   p.innerHTML = h; artApply(p);
   p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.gear = +b.getAttribute('data-g'); UI.sel = UI.sel.slice(0, needCards(c, UI.gear)); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
@@ -115,7 +117,7 @@ function drawPlan() {
 function cardHtml(x, sel, dead, j) {
   var u = upgId(x), stem = u ? 'card-upgrade-' + u : x === 'H' ? 'card-heat' : x === 'X' ? 'card-stress' : 'card-speed-' + x, lbl = u ? UPG[u].name : x === 'H' ? 'Heat' : x === 'X' ? 'Stress' : 'Speed';
   var val = u ? String(UPG[u].sp) : x === 'H' ? '' : x === 'X' ? '?' : x;
-  if (u) return '<button class="cd U' + (sel ? ' sel' : '') + '" data-art="' + stem + '" data-i="' + j + '" aria-label="' + esc(UPG[u].name + ' speed ' + val + '. ' + UPG[u].txt) + '" title="' + esc(UPG[u].txt) + '"><span class="v">' + val + '</span><span class="t">' + esc(UPG[u].name) + '</span></button>';
+  if (u) return '<button class="cd U' + (sel ? ' sel' : '') + '" data-art="' + stem + '" data-i="' + j + '" aria-label="' + esc(UPG[u].name + ' speed ' + val + '. ' + UPG[u].txt) + '" title="' + esc(UPG[u].txt) + '"><span class="v">' + val + '</span><span class="t">' + esc(UPG[u].sn) + '</span></button>';
   return '<button class="cd ' + (x === 'H' ? 'H' : x === 'X' ? 'X' : 's' + x) + (sel ? ' sel' : '') + (dead ? ' dead' : '') + '" data-art="' + stem + '" data-i="' + j + '" aria-label="' + lbl + ' ' + (val || '') + '"><span class="v">' + val + '</span><span class="t">' + (x === 'H' ? 'Heat' : x === 'X' ? 'Stress' : '') + '</span></button>';
 }
 function suggest() {
@@ -176,7 +178,7 @@ async function playEvents(ev) {
 function showPlayed(e) {
   var h = '<div class="reveal">'; e.cards.forEach(function (x) {
     var stem = x.upg ? 'card-upgrade-' + x.upg : x.card === 'X' ? 'card-stress' : 'card-speed-' + x.card, v = x.v;
-    h += '<div class="cd ' + (x.upg ? 'U' : x.card === 'X' ? 'X' : 's' + x.card) + '" data-art="' + stem + '"><span class="v">' + (x.card === 'X' ? '+' + v : x.upg ? v : x.card) + '</span><span class="t">' + (x.upg ? esc(UPG[x.upg].name) : x.card === 'X' ? 'Stress' : '') + '</span></div>';
+    h += '<div class="cd ' + (x.upg ? 'U' : x.card === 'X' ? 'X' : 's' + x.card) + '" data-art="' + stem + '"><span class="v">' + (x.card === 'X' ? '+' + v : x.upg ? v : x.card) + '</span><span class="t">' + (x.upg ? esc(UPG[x.upg].sn) : x.card === 'X' ? 'Stress' : '') + '</span></div>';
   });
   h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
 }
@@ -190,6 +192,7 @@ function askSlip() {
 
 /* ================= result ================= */
 function showResult() {
+  if (typeof GXC !== 'undefined' && GXC.active && GXC.active() && UI.cmpDef) { var wc = G.cars[G.rank[0]]; sfx(wc.human ? 'win' : 'lose'); return GXC.finish(G); }
   UI.lockModal = true; var rows = '', me = G.cars.filter(function (c) { return c.human; });
   G.rank.forEach(function (ci, k) {
     var c = G.cars[ci], col = COLS[c.col].hex;
@@ -218,7 +221,7 @@ function laneOf(i) {   /* lane = rank among cars sharing the same physical space
 function snapCam() { var q = carXY(UI.focus, UI.vis[UI.focus].p); UI.cam.x = q.x; UI.cam.y = q.y; }
 function trackLayer(id) {
   if (trackCache[id]) return trackCache[id]; var tk = TK[id], c = document.createElement('canvas'); c.width = 1000; c.height = 600; var g = c.getContext('2d'); g.scale(0.5, 0.5);
-  var gr = g.createRadialGradient(1000, 600, 100, 1000, 600, 1300); gr.addColorStop(0, '#2c6a3e'); gr.addColorStop(1, '#1c4a2c'); g.fillStyle = gr; g.fillRect(0, 0, 2000, 1200);
+  var gr = g.createRadialGradient(1000, 600, 100, 1000, 600, 1300); gr.addColorStop(0, '#2c6a3e'); gr.addColorStop(1, '#245c37'); g.fillStyle = gr; g.fillRect(0, 0, 2000, 1200);
   g.lineJoin = 'round'; g.lineCap = 'round';
   function stroke(w, col, dash) { g.beginPath(); tk.dense.forEach(function (p, i) { if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.closePath(); g.lineWidth = w; g.strokeStyle = col; g.setLineDash(dash || []); g.stroke(); }
   stroke(150, '#e8e4d8'); stroke(138, '#c8352b', [34, 34]); stroke(124, '#33383f'); stroke(2, 'rgba(255,255,255,.35)', [22, 26]);
@@ -254,7 +257,7 @@ function frame(now) {
   tk.list.forEach(function (kk) {
     var q = tk.at(kk.idx * tk.seg), sx = q.x + Math.sin(q.a) * 98, sy = q.y - Math.cos(q.a) * 98;
     if (!artDraw(cx, 'ui-corner-sign', sx - 36, sy - 36, 72, 72, 'contain')) { cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(sx, sy, 34, 0, 7); cx.fill(); cx.lineWidth = 8; cx.strokeStyle = '#d8281d'; cx.stroke(); }
-    cx.fillStyle = '#111'; cx.font = '900 38px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(kk.limit, sx, sy + 2);
+    cx.fillStyle = '#111'; cx.font = '900 38px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(climit(G, kk.limit), sx, sy + 2);
   });
   artDraw(cx, 'ui-flag-checkered', tk.at(0).x - 40, tk.at(0).y - 150, 80, 60, 'contain');
   /* cars: back to front */
@@ -284,7 +287,10 @@ requestAnimationFrame(frame);
 function boot() {
   try { var s = JSON.parse(lsGet('rr_set') || 'null'); if (s) for (var k in s) UI.set[k] = s[k]; } catch (e) { }
   if (!TRACKDEFS[UI.set.track]) UI.set.track = 'sunline';
-  $('#playB').onclick = function () { startGame(); }; $('#howB').onclick = howTo; soundBoot();
+  GX.init({ key: 'rr' }); GX.drawer('rulesd', 'How to play', (function () { var d = document.createElement('div'); d.id = 'rulesbody'; return d; })());
+  GX.onShow = function (id) { if (id === 'rulesd') rulesFill(); }; rulesFill();
+  GX.onResize(function () { if (G && !$('#game').hidden) sizeCanvas(); });
+  $('#playB').onclick = function () { startGame(); }; $('#howB').onclick = howTo; $('#storyB').onclick = function () { campOpen(); }; soundBoot(); if (typeof helpBoot === 'function') helpBoot();
   $('#menuB').onclick = function () { modal('<h2>Menu</h2><div style="display:flex;flex-direction:column;gap:8px"><button class="ghostb" id="m1">How to play</button><button class="ghostb" id="m4">Guide: learn by doing</button><button class="ghostb" data-snd id="m5"></button><button class="ghostb" id="m2">Quit to title</button><button class="big" id="m3">Keep racing</button></div>'); $('#m1').onclick = howTo; $('#m4').onclick = function () { closeModal(); tutStart(); }; $('#m2').onclick = function () { showTitle(); }; $('#m3').onclick = closeModal; $('#m5').textContent = sndLabel(); $('#m5').onclick = function () { setSound(!SND.on); }; };
   var q = new URLSearchParams(location.search); if (q.get('seed')) UI.seedArg = +q.get('seed');
   artLoad(); showTitle();

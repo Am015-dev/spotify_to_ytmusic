@@ -21,11 +21,26 @@ function tutSteps() {
     { id: 'heat', title: 'Heat is your fuel', say: 'Brake and keep heat, or push and burn it. Gears 1 and 2 cool heat back. That is the game.', target: function () { return $('#tray'); }, ready: function () { return G && G.round >= 2 && !UI.busy && !!$('#tray'); }, wait: null, side: 'top' }
   ];
 }
-function tutStart() {
-  closeModal();
+function tutStart(o) {
+  closeModal(); UI.cmpDef = null; var after = o && o.then;
   GXT.start({
     game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'sunline', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },
     steps: tutSteps(), story: false, endTitle: 'You can race', endText: 'Brake to keep heat, push when it pays. See you on the grid.',
-    onDone: function () { UI.mode = ''; lsSet('rr_seen', '1'); showTitle(); }, onExit: function () { UI.mode = ''; lsSet('rr_seen', '1'); showTitle(); }
+    onDone: function () { UI.mode = ''; lsSet('rr_seen', '1'); showTitle(); if (after) after(); }, onExit: function () { UI.mode = ''; lsSet('rr_seen', '1'); showTitle(); }
   });
+}
+/* help drawer: rules cards through the shared help kit (lightbulb in the top bar: suggested move, "How does this work?" opens the cards) */
+function helpBoot() {
+  if (typeof GXH === 'undefined') return;
+  var R = [
+    { title: 'Gear and cards', text: 'Your gear is how many cards you play. Shift one gear free, or two gears for 1 heat. The cards add up to your speed.' },
+    { title: 'Corners', text: 'Each corner has a speed limit. Every point you go over costs 1 heat from your engine. No heat left means a spin-out.' },
+    { title: 'Heat', text: 'Heat you pay goes to your discard pile and comes back as dead cards in your hand. Gears 1 and 2 send heat back to the engine.' },
+    { title: 'Slipstream and boost', text: 'End next to or right behind a car to glide 2 more spaces. Boost: pay 1 heat to flip an extra speed card.' },
+    { title: 'Upgrades', text: 'With Upgrades on you draft 3 cards before the race. They are played like speed cards and add a bonus.' }
+  ];
+  GXH.init({ game: 'redline-rally', defaultOn: false, steps: {}, rules: R });
+  GXH.bulb({ el: '#bulbbtn', rulesFor: function () { return null; }, suggest: function () {
+    if (!G || G.phase !== 'plan' || !$('#sugB')) return null; return { target: function () { return $('#sugB'); }, why: 'Tap Suggest and the computer picks a gear and cards for you. Then tap Go.' };
+  } });
 }

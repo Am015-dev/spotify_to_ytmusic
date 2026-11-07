@@ -6,7 +6,7 @@ function isSpeed(c) { return c >= '1' && c <= '4'; }
 
 function newGame(o) {
   o = o || {}; var trk = TK[o.track || 'sunline'], n = Math.max(2, Math.min(6, o.n || 5));
-  var G = { v: 1, track: trk.id, laps: o.laps || 2, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, cars: [], round: 1, phase: 'plan', pend: null, order: [], ri: 0, adr: [], tick: 0, over: false, rank: [], diff: o.diff || 'normal', hot: o.humans > 1, upg: !!o.upg, drafting: false, pool: null };
+  var G = { v: 1, track: trk.id, laps: o.laps || 2, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, cars: [], round: 1, phase: 'plan', pend: null, order: [], ri: 0, adr: [], tick: 0, over: false, rank: [], diff: o.diff || 'normal', hot: o.humans > 1, upg: !!o.upg, drafting: false, pool: null, cl: o.climit || 0, cmp: o.cmp || null };
   var humans = Math.max(0, Math.min(n, o.humans == null ? 1 : o.humans));
   var di = []; for (var d = 0; d < DRIVERS.length; d++) di.push(d); shuffle(G, di);
   for (var i = 0; i < n; i++) {
@@ -19,6 +19,7 @@ function newGame(o) {
   var grid = []; for (i = 0; i < n; i++) grid.push(i); shuffle(G, grid);
   grid.forEach(function (ci, k) { G.cars[ci].pos = Math.ceil(n / 2) - 1 - Math.floor(k / 2); G.cars[ci].tie = k; });
   G.tick = n;
+  if (o.lowheat) G.cars.forEach(function (c) { if (c.human) { c.eng = ENGINE0 - 2; c.disc.push('H', 'H'); } });   /* campaign twist: you start with 4 heat, 2 heat cards already in the discard */
   if (G.upg) {   /* upgrade draft: humans pick first (the UI calls draftPick / draftDone), then the computer drivers, then the decks are shuffled and dealt */
     G.pool = {}; UPG_IDS.forEach(function (id) { G.pool[id] = UPG_COPIES; });
     if (humans > 0) { G.drafting = true; return G; }
@@ -44,6 +45,7 @@ function draftDone(G) {   /* computer picks, then every deck gets its upgrades, 
   G.cars.forEach(function (c) { c.deck = shuffle(G, c.deck.concat(c.upg.map(function (id) { return 'u:' + id; }))); c.hand = []; draw(G, c, HAND); });
 }
 function T(G) { return TK[G.track]; }
+function climit(G, l) { return Math.max(1, l + (G.cl || 0)); }   /* campaign twist: corner limits shifted for the whole chapter */
 function total(G) { return G.laps * T(G).N; }
 
 /* ---- deck handling ---- */
@@ -67,7 +69,7 @@ function avgSpeed(c) { var s = 0, n = 0; c.deck.concat(c.disc).forEach(function 
 function occ(G, p, except) { var N = T(G).N, k = 0; G.cars.forEach(function (c) { if (c !== except && c.pos % N === p % N) k++; }); return k; }
 function landing(G, c, target) { var t = target; while (t > c.pos && occ(G, t, c) >= 2) t--; return t; }
 function cornersIn(G, a, b) {   /* corner lines crossed moving from space a to space b */
-  var tk = T(G), out = []; for (var p = a + 1; p <= b; p++) { var lim = tk.corners[p % tk.N]; if (lim) out.push({ p: p, idx: p % tk.N, limit: lim }); } return out;
+  var tk = T(G), out = []; for (var p = a + 1; p <= b; p++) { var lim = tk.corners[p % tk.N]; if (lim) out.push({ p: p, idx: p % tk.N, limit: climit(G, lim) }); } return out;
 }
 function cornerCost(G, a, b, speed, lim) { var s = 0; cornersIn(G, a, b).forEach(function (k) { s += Math.max(0, speed - k.limit - (lim || 0)); }); return s; }
 function rankList(G) {   /* car ids, leader first */
