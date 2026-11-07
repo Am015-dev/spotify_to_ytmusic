@@ -1938,6 +1938,28 @@
    "prompt": "A single small icon of a golden star made of twigs. One single object centred on a flat plain white background, nothing else, no ground shadow."
   },
   {
+   "stem": "food-gs",
+   "kind": "token",
+   "w": 256,
+   "h": 256,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 2,
+   "slot": "Grub-or-seed die face (contain)",
+   "prompt": "A round wooden token split in two halves: a plump pink-brown grub on the left half and golden wheat seeds on the right half. One single object centred on a flat plain white background, nothing else, no ground shadow."
+  },
+  {
+   "stem": "food-any",
+   "kind": "icon",
+   "w": 256,
+   "h": 256,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 2,
+   "slot": "Any-food cost icon on bird cards (contain)",
+   "prompt": "A round wooden token with a small mixed pile of a seed, a berry and a tiny fish painted on it. One single object centred on a flat plain white background, nothing else, no ground shadow."
+  },
+  {
    "stem": "ui-tray",
    "kind": "ui",
    "w": 768,

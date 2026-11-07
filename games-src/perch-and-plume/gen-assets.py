@@ -56,6 +56,8 @@ for g in DATA['goals']:
     add("goal-" + g['id'], "icon", 256, 256, "1:1", True, 2, f"Round goal tile: {g['n']} (contain)", f"A round tile icon showing {g['n'].lower()} as a simple emblem." + WHITE)
 for n, d in [("bowl", "a neat woven cup-shaped nest"), ("cavity", "a round hole in a tree trunk"), ("ground", "a shallow scrape in sand with pebbles"), ("platform", "a flat stick platform"), ("star", "a golden star made of twigs")]:
     add("nest-" + n, "icon", 128, 128, "1:1", True, 2, f"{n} nest icon on bird cards (contain)", f"A single small icon of {d}." + WHITE)
+add("food-gs", "token", 256, 256, "1:1", True, 2, "Grub-or-seed die face (contain)", "A round wooden token split in two halves: a plump pink-brown grub on the left half and golden wheat seeds on the right half." + WHITE)
+add("food-any", "icon", 256, 256, "1:1", True, 2, "Any-food cost icon on bird cards (contain)", "A round wooden token with a small mixed pile of a seed, a berry and a tiny fish painted on it." + WHITE)
 add("ui-tray", "ui", 768, 256, "3:1", True, 2, "The face-up bird tray (contain)", "A long shallow wooden tray with three card-sized recesses in a row, seen from above." + WHITE)
 add("ui-cube", "icon", 128, 128, "1:1", True, 2, "Action cube left this round (contain)", "A single small painted wooden cube in warm amber." + WHITE)
 # ---- wave 3: polish

@@ -44,7 +44,7 @@ Style block (in front of every prompt): Flat 2D naturalist field-guide illustrat
 | bird-slate-jay | 512x512 | 1:1 | no | Bird card picture: Slate Jay (cover, square art box on the card) |
 | bird-gilded-jay | 512x512 | 1:1 | no | Bird card picture: Gilded Jay (cover, square art box on the card) |
 
-## Wave 2 (every remaining card and piece): 143 pictures
+## Wave 2 (every remaining card and piece): 145 pictures
 
 | stem | size | ratio | alpha | slot |
 |---|---|---|---|---|
@@ -189,6 +189,8 @@ Style block (in front of every prompt): Flat 2D naturalist field-guide illustrat
 | nest-ground | 128x128 | 1:1 | yes | ground nest icon on bird cards (contain) |
 | nest-platform | 128x128 | 1:1 | yes | platform nest icon on bird cards (contain) |
 | nest-star | 128x128 | 1:1 | yes | star nest icon on bird cards (contain) |
+| food-gs | 256x256 | 1:1 | yes | Grub-or-seed die face (contain) |
+| food-any | 256x256 | 1:1 | yes | Any-food cost icon on bird cards (contain) |
 | ui-tray | 768x256 | 3:1 | yes | The face-up bird tray (contain) |
 | ui-cube | 128x128 | 1:1 | yes | Action cube left this round (contain) |
 

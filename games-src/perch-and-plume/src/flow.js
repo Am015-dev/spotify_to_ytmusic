@@ -12,7 +12,7 @@ document.addEventListener('click', function (e) {
   if (a === 'zoom') { showCard(p.hand[i]); return; }
   if (a === 'die' && !(mine && Q && Q.h === 'die')) { toast('Feeder: ' + (G.feeder[i] === 'gs' ? 'grub or seed' : G.feeder[i]) + ' die. Your forest takes food from here.'); return; }
   if (a === 'deck' && !(mine && Q && Q.h === 'draw')) { toast('Deck: ' + G.deck.length + ' birds. Your wetland draws from here or the tray.'); return; }
-  if (a === 'tray' && G.tray[i] && !(mine && Q && Q.h === 'draw')) { var tb = B[G.tray[i]]; toast(tb.n + ': ' + tb.p + ' pts. ' + PP.power(tb.id).txt, 3600); return; }
+  if (a === 'tray' && G.tray[i] && !(mine && Q && Q.h === 'draw')) { showCard(G.tray[i]); return; }
   if (!mine) {   // not deciding: taps just show the card
     if (a === 'bird') showCard(p.board[h][c].id, p.board[h][c]);
     else if (a === 'hand') showCard(p.hand[i]);
