@@ -204,9 +204,19 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 @media (max-width:640px){#store{--hex:34px;gap:4px}.gbtn{padding:2px 4px;gap:2px}#goods{gap:4px}#goods .tip{font-size:13px}}
 #guide{position:fixed;left:50%;top:calc(var(--gx-bar-h, 56px) + 8px);transform:translate(-50%,-8px);z-index:120;pointer-events:none;opacity:0;display:flex;gap:10px;align-items:center;background:#fbf3df;color:#1d140a;border:2px solid #7a5c3e;border-radius:14px;padding:8px 12px;width:min(92vw,420px);box-shadow:0 8px 24px rgba(0,0,0,.45);transition:opacity .25s,transform .25s;font-size:15px;line-height:1.3}
 #guide.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:640px) and (orientation:portrait){#guide{top:calc(var(--gx-bar-h, 56px) + 108px)}}
 #guide .gp{flex:0 0 42px;height:42px;border-radius:50%;background:var(--pc);color:#fff;font-weight:900;font-size:20px;display:grid;place-items:center;border:3px solid #fff;box-shadow:0 0 0 2px var(--pc)}
 .voice{font-style:italic;font-weight:700;margin:6px 0}
 @media (max-width:640px){.gxt-dots{display:none}}
+#tabs{position:absolute;display:flex;gap:6px;height:44px;z-index:3}
+#tabs .tab{flex:1;min-height:44px;border-radius:10px;border:2px solid rgba(244,236,216,.35);background:rgba(20,14,10,.7);color:#f4ecd8;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
+#tabs .tab.on{background:#f4ecd8;color:#1d140a;border-color:#ffd23a}
+#tabs .tab.has{border-color:#ffd23a;box-shadow:0 0 0 2px rgba(255,210,58,.5),0 0 12px rgba(255,210,58,.6)}
+#rv{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px}
+#rv .rvh{background:rgba(20,14,10,.8);color:#f4ecd8;border-radius:10px;padding:6px 10px;font-weight:700;font-size:14px;text-align:center}
+#mk.big .stall{padding:6px 4px}#mk.big .sth .pip{font-size:16px}
+#mk.big .lane{grid-column:1/-1;flex-direction:row;justify-content:center;gap:8px}#mk.big .lane .sttiles{flex-direction:row;gap:8px}
+#mk.big .stall:not(.lane) .sttiles{display:flex;flex-direction:row;gap:6px;justify-content:center}
 .rules .howturn{margin:4px 0 10px;padding-left:22px}.rules .howturn li{margin:3px 0}
 @media (min-width:1024px){.tilebtn.lab .tlab{font-size:16px;line-height:19px;max-width:96px}.gx-row small,.gx-row-l small{font-size:16px!important}}
 .gxc-disc{text-shadow:0 1px 2px rgba(0,0,0,.75);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),transparent 55%)!important}
