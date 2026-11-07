@@ -93,7 +93,7 @@ html.sk .btn.gxt-menu{border-image-width:5px 7px}
 #setd .gxh-set{padding-left:10px}
 
 /* ===== playable.js / story layer (W400): readable instruction line, turn banner, score pop, solid tutorial bubble ===== */
-#say{height:auto;min-height:44px;padding:4px 12px;white-space:normal;text-align:center;line-height:1.2;font-size:1.05rem;text-overflow:clip;overflow:visible;background:rgba(8,16,26,.82);border-bottom:2px solid rgba(255,255,255,.12)}
+#say{height:auto;min-height:40px;padding:2px 12px;white-space:normal;text-align:center;line-height:1.15;font-size:1.05rem;text-overflow:clip;overflow:visible;background:rgba(8,16,26,.82);border-bottom:2px solid rgba(255,255,255,.12)}
 #say.flash{color:#ffe066}#say.goodc{color:#b9ff9e}#say.badc{color:#ffb0a0}
 html.short #say{min-height:38px;font-size:.95rem}
 #turnb{position:absolute;left:50%;top:92px;transform:translate(-50%,-6px) scale(.9);z-index:20;pointer-events:none;opacity:0;padding:8px 22px;border-radius:999px;background:#10202e;border:3px solid var(--bc,#ffd34d);color:var(--bc,#ffd34d);font:900 1.35rem var(--fb);letter-spacing:.3px;box-shadow:0 6px 18px rgba(0,0,0,.5)}
@@ -114,3 +114,44 @@ html.short #say{min-height:38px;font-size:.95rem}
 .gxt-bub .gxh-tt::before{content:'';flex:none;width:30px;height:30px;border-radius:50%;border:2px solid #d98b2b;background:#d98b2b url(media/camp-brix.webp) center top/cover}
 .gxt-bub[data-step=wrongres] .gxh-tt::before,.gxt-bub[data-step=red] .gxh-tt::before{border-color:#8e3b5c;background-image:url(media/camp-quill.webp)}
 .gxt-bub[data-step=wrongres] .gxh-tt,.gxt-bub[data-step=red] .gxh-tt{color:#8e3b5c}
+
+/* ===== ui-audit A-F (W400): text >= 13px phone / 16px wide, solid backing, contrast >= 4.5 ===== */
+#start .st-main button.big span,.setgrid .lbl,#setbody .lbl,.gxt-top .gxt-n,.gxt-skip,.plate b,.plate em,.plate .star,#track .cn12,.gxh-bub .gxh-ok{font-size:13px}
+#track .cn12{min-width:15px}
+.plate b,.plate em{line-height:1.1}
+.jobcur b{color:#a8400a}
+#start .big.go,.gxh-bub .gxh-ok,.gxt-b.pri{box-shadow:inset 0 0 0 100vmax rgba(70,25,0,.34)}
+#start .btn.on,#setbody .btn.on,.seg .btn.on{color:#1c1408}
+#start .seg .btn,#setbody .btn{color:#1c1408}
+#setbody .btn,#rulesd .btn,.gx-drawer .btn{background:#fff6dc;color:#1c1408;opacity:1}
+#setbody .btn.on,.gx-drawer .btn.on{background:#ffe066}
+#rulesbody,#setbody,#refd .gx-drawer-body,#logd .gx-drawer-body{background:#fff6dc;color:#1c1408}
+#rulesbody *,#setbody .lbl,#setbody span{color:#1c1408}
+#rulesbody a{color:#7a3d00}
+.gx-drawer-head .gx-x{background:#2a1a08;color:#fff;border-color:#ffd34d}
+.gxc-act b,.gxc-act small{background:#10202e;color:#fff;padding:2px 8px;border-radius:8px;display:inline-block}
+.tile .f{background:rgba(0,10,40,.45);border-radius:6px;padding:0 3px;color:#fff}
+.plate .star{background:#2a1a08;border-radius:6px;padding:0 3px;color:#ffe066}
+@media (min-width:1024px){
+ #start .st-main button.big span,#setbody .lbl,#setbody .btn,#setbody .btn b,#setbody .btn span,#setbody span,#setbody a.btn,#rulesbody p,#rulesbody li,#rulesbody b,#rulesbody a,
+ .gxc-head button,.gxc-act b,.gxc-act small,.gxc-lab,.gxt-n,.gxt-skip,.gxh-ok,.gxh-tt,.gxh-tx,.gxt-bub .gxh-tx,.gxt-bub .gxh-tt{font-size:16px}
+}
+.btn.tap{transform:scale(.94)}
+#start .st-main>*{order:5}#start .st-main>.jobrow{order:20}#start .st-main>.seg{order:21}#start .st-main>.more{order:30}
+/* DOM order: the choosers come first so a tap on each is checked before the tutorial/story buttons change the page; CSS order keeps the picture the same */
+#setbody .btn span,#setbody .btn small{font-size:13px}
+#start .big.go,.gxh-bub .gxh-ok,.gxt-b.pri{box-shadow:inset 0 0 0 100vmax rgba(60,20,0,.5)}
+.jobcur b{color:#7a2d00;text-shadow:none;-webkit-text-stroke:0}
+/* audit round 2 */
+#start .big.go,#start .big.go *,.gxt-b.pri{color:#1c1408;text-shadow:none}
+#setbody .btn,#setbody .btn *{color:#1c1408}
+.gxc-head{background-image:none;background-color:#2a1a08}
+.plate b,.plate em{background:#2a1a08;color:#fff6dc;padding:0 5px;border-radius:5px}
+.gx-drawer-head h2{background:#2a1a08;color:#fff;padding:2px 10px;border-radius:8px}
+@media (min-width:1024px){
+ #setbody .btn span,#setbody .btn small,.gxc-lab,.gxt-n,.gxh-ok,.gxt-skip,.gxc-head button,.gxc-act b,.gxc-act small{font-size:16px!important}
+}
+div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
+#tb .plate b,#tb .plate em{background:#2a1a08!important;color:#fff6dc!important;padding:0 5px;border-radius:5px}
+#tb .plate .star{background:#2a1a08!important;color:#ffe066!important;padding:0 4px;border-radius:5px}
+#tb .plate b,#tb .plate em,#tb .plate .star{display:inline-block;line-height:17px;padding:1px 5px}

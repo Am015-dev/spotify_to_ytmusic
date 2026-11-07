@@ -13,19 +13,21 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
   const seatsTxt=nh===0?'Watch':nh===1?'You + computers':nh+' players, one phone';
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back</button>':''}</div>
   <div class="st-body"><div class="st-main">
-   ${tutFirst?tutBtn('big go'):''}
-   <button class="${tutFirst?'btn wide':'big go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
-   <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
-   ${tutFirst?'':tutBtn('btn wide')}
-   ${saved?`<button class="btn wide" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
    <div class="seg" role="group" aria-label="Crew size">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
    <div class="seg" role="group" aria-label="Computer level">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>
+   ${tutFirst?tutBtn('big go'):''}
+   <button class="${tutFirst?'btn wide':'big go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':tutFirst?'Just play':'Play'}</button>
+   <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
+   ${tutFirst?'':tutBtn('btn wide')}
+   ${saved?`<button class="btn wide" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
    <details class="more"${more?' open data-full="1"':''}><summary>More</summary>${more?`
     <div class="seg"><button class="btn small${seatMode(s)==='solo'?' on':''}" data-a="preset" data-v="solo">${ico('user')}Solo</button><button class="btn small${seatMode(s)==='hot'?' on':''}" data-a="preset" data-v="hot">${ico('four')}One phone</button><button class="btn small${seatMode(s)==='watch'?' on':''}" data-a="preset" data-v="watch">${ico('eye')}Watch</button></div>
     ${onlineBlock()}<h2>${ico('map')} All jobs</h2>${jobs}`:''}</details>
   </div></div>`;paintIcons($('#start'))}
 document.addEventListener('toggle',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('more')){UI.moreOpen=e.target.open;if(e.target.open&&!e.target.dataset.full)renderStart()}},true);
+// a tap always shows something (the pressed button blinks), even when the choice did not change
+function flashBtn(a,v){const e=document.querySelector('#start [data-a="'+a+'"][data-v="'+v+'"]');if(e){e.classList.add('tap');setTimeout(()=>e.classList.remove('tap'),260)}}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
 function startJob(s){if(isClient())return;lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
@@ -73,8 +75,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'job':UI.setup.job=+b.dataset.n;fixSetup();renderStart();sfx('select');return;
   case 'jobprev':UI.setup.job=Math.max(1,UI.setup.job-1);fixSetup();renderStart();sfx('select');return;
   case 'jobnext':UI.setup.job=Math.min(66,UI.setup.job+1);fixSetup();renderStart();sfx('select');return;
-  case 'np':UI.setup.np=+b.dataset.v;fixSetup();renderStart();return;
-  case 'lv':UI.setup.lv=b.dataset.v;renderStart();return;
+  case 'np':UI.setup.np=+b.dataset.v;fixSetup();renderStart();sfx('select');flashBtn('np',b.dataset.v);return;
+  case 'lv':UI.setup.lv=b.dataset.v;renderStart();sfx('select');flashBtn('lv',b.dataset.v);return;
   case 'preset':preset(b.dataset.v);return;
   case 'story':storyOpen();return;
   case 'start':if(!isHost()&&tutOffer())return;startJob(UI.setup);return;

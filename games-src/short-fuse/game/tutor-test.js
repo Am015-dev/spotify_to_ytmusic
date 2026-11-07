@@ -27,7 +27,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});
   await p.reload();await sleep(900);
   // first visit: the title shows "New here? Learn in 5 minutes" as the first option
-  const first=await p.evaluate(()=>{showStart();const b=document.querySelector('#start .st-main > *');return b?{t:b.textContent,gxt:b.hasAttribute('data-gxt-open')}:null});
+  const first=await p.evaluate(()=>{showStart();const b=document.querySelector('#start [data-gxt-open]');return b?{t:b.textContent,gxt:b.hasAttribute('data-gxt-open')}:null});
   if(!first||!first.gxt||!/New here/.test(first.t))note(tag,'first menu option is not "New here? Learn in 5 minutes": '+JSON.stringify(first));
   // first-time players tapping Play are offered it (once)
   if(mode==='clean'&&W===390){const pb=await p.evaluate(()=>{const b=document.querySelector('#start [data-a=start]');const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});
