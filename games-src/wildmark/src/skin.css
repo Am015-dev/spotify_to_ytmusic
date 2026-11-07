@@ -196,3 +196,22 @@ html body .gxc-node:not(.boss) .gxc-disc{background-image:none}   /* flat disc: 
 @media (min-width:1000px){.ttop .tag{font-size:17px}.trow .ab{font-size:16px}.trow .ab small{font-size:16px}#logp,#logp h3{font-size:16px}}
 html body .gxc-node .gxc-lock{right:-15px;bottom:-11px}
 html body .gx-set .gx-sec{scroll-margin-top:70px}   /* section titles land below the sticky chip row (now 44 px chips) */
+/* ---- READABLE pass (see READABLE.md): plain table so green forest tiles never melt into it; labelled pictures; one instruction bar; legal = glow, rest = dim */
+.gx-board{background:radial-gradient(ellipse at 50% 40%,#3a3f45 0%,#24272b 80%)!important}
+.gx-board.hasart{background-image:none!important}
+#cards{right:72px;gap:4px}
+.cc{flex:1 1 0;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:3px 2px 2px;border-radius:12px;background:rgba(20,22,26,.9)}
+.cc .ccr{display:flex;align-items:center;gap:3px}
+.cc i{font-style:normal;font-size:13px;font-weight:700;line-height:1.1;color:#f3ead2;white-space:nowrap}
+.mk{flex-direction:column;height:auto!important;width:auto!important;min-width:52px;padding:2px 4px;gap:0}
+.mk i{font-style:normal;font-size:13px;font-weight:700;line-height:1.15;color:#f3ead2}
+.pair:not(.live) .mt:disabled,.pair:not(.live) .mk:disabled{opacity:.5}
+#line{left:8px;right:58px;transform:none;max-width:none;white-space:normal;text-align:center;border-radius:14px;line-height:1.25;padding:8px 12px;box-shadow:0 2px 10px rgba(0,0,0,.45)}
+#map .spot{fill:rgba(255,233,160,.22);stroke:#ffe9a0;stroke-width:3.5;stroke-dasharray:none}
+#map.dimtok .hx:not(.tgt){opacity:.4}
+#toast{max-width:min(92vw,520px);white-space:normal;text-align:center;line-height:1.3;background:#f6efdc;color:#1d2420}
+.howturn{background:rgba(243,234,210,.1);border:1px solid rgba(243,234,210,.25);border-radius:12px;padding:8px 12px;margin-bottom:12px}
+.howturn ol{margin:4px 0 0;padding-left:20px}
+.howturn li{font-size:15px;line-height:1.35}
+@media (max-width:999px){.cc svg{width:24px!important;height:24px!important}.cc b{font-size:15px}#toast{font-size:15px!important}#line{font-size:15px}}
+@media (min-width:1000px){#cards{right:auto}.cc{flex:0 0 auto;min-width:72px;padding:4px 8px}.cc i{font-size:14px}.mk i{font-size:14px}#line{left:50%;right:auto;transform:translateX(-50%);max-width:640px}}

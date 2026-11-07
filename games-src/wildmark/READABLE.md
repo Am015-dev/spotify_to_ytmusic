@@ -1,0 +1,27 @@
+# READABLE: the first-time-player recipe (proved on Wildmark)
+
+Owner feedback: "unplayable, unreadable, not easy to follow, the assets are super difficult to understand".
+Audits passed; eyes did not. Judge every rule below by a 390x763 screenshot you LOOK at as someone who never saw the game.
+Benchmarks: the old shelf games the owner likes (cauldron-fair, hollowbough) and good online versions of the same kind of game.
+
+1. **Temp glyphs off if code says it better.** Abstract icon art (game-icons style) means nothing to a player. Keep the slot, but
+   make code-drawn the default: a prefix list (`ART.codeFirst` in `src/art.js`) skips those temp files; real art is switched on by
+   naming its stem or prefix in `window.WM_REAL_ART`. Never delete a slot.
+2. **Terrain = flat colour + one picture pattern.** Waves for water, small pines for forest, snow-capped peaks for mountains,
+   field rows for fields, reeds with cattails for marsh. Bold enough to read on a 30px hex (`TER_PAT` in `src/art.js`).
+3. **Plain table.** No busy picture behind the board: a dark neutral (slate) background so green or blue tiles never melt into it.
+4. **Every animal/token has its name.** Silhouette on a light disc, its name under it at >= 13px wherever the player chooses it
+   (market) or reads its score (score chips). Results and score tables lead with the plain name ("Bear"), the card title is secondary.
+5. **One instruction bar, always visible, max 2 lines.** It says exactly what to do now, in verbs: "Your turn: take a tile + animal
+   from the market", "Tap a glowing spot to place the tile", "Put the Bear on a glowing tile, or Return it". Solid light backing.
+6. **Legal = glow, everything else = dim.** Spots: solid bright outline + soft fill (no dashed outlines). Token targets ring in gold
+   and all other tiles drop to 40% opacity. Market pairs that can't be taken right now drop to 50%.
+7. **Explain every score when it happens.** After each placement a plain toast: "+1: your Meadow grew to 2 joined tiles",
+   "Bear +4: Groups of exactly 2 bears...", or "Fox settled, no points yet. <the card's one sentence>". Plus the floating number.
+8. **Tutorial = 5-7 steps, each one an action.** Cut every "read this" step except one that points at the scoring cards. One turn:
+   take, place, confirm, settle, then the result. Powers (sweep, acorns) live in the help drawer, not the tutorial.
+9. **Help opens with "How a turn works" in 5 lines** (boxed, 15px) before any detail; scoring cards keep a small diagram + one sentence.
+10. **Phone first, then PC.** Board + choices fit 390x763 with no scroll; tap targets >= 44px; no game text < 14px (13px only for
+    labels under pictures). On PC let the fit-zoom go up (cap 2.5) so a small early valley isn't a speck in a big empty table.
+
+Proof shots (before/after, phone and PC): `games-src/wildmark/readable-shots/`.
