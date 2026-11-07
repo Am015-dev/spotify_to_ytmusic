@@ -461,7 +461,7 @@ function promptText() {
   if (UI.cards.length) return '';
   if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
-  if (p.ai) return p.name + ' is playing…';
+  if (p.ai) return UI.aiCap || p.name + ' is playing…';
   if (G.q) return qShort(G.q);
   const n = availW(p);
   const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
