@@ -43,3 +43,25 @@ const GLOSS_HTML='';
 function dirName(a){return ['north','east','south','west'][a]}
 const ARR_TXT={N:'north',E:'east',S:'south',W:'west'};
 function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='R'?(L.rd>0?'turn clockwise':'turn anticlockwise'):'swim '+ARR_TXT[a]}</td></tr>`).join('')+'<tr><td>6</td><td>stay; another leviathan rises</td></tr>'}
+// ---- Tutorial prologue: "The Lantern Race". Guide = Grandmother Osk (lantern keeper, same cast as Story mode), rival = Cobalt (the cocky newcomer who claims the Lantern Reach).
+// Every line: a story reason, then what to do (the glow shows where). All tutorial words live here (title <= 4 words, say <= 26 words).
+// A step's ch = the chapter it opens (1 Your first turn, 2 Rivals and leaving others' wake, 3 Leviathans and the wave, 4 The last junk afloat).
+const TUT_TEXT={
+ goal:['Osk: The lantern race','Cobalt swears the Lantern Reach is his. Outlast him, child: the last junk afloat keeps the lantern.'],
+ mark:['Pick your berth','Chapter 1. Cobalt has already sailed from the west. Put your junk on the glowing gold mark.'],
+ mark2:['Cast off','A fine berth, the wind is with you. Press the glowing button.'],
+ stir:['The sea stirs','Dice at dawn. A 6, 7 or 8 wakes the leviathans: each one swims or turns. Watch them go.'],
+ pick:['Lay your first current','Currents are your road across the chart. Pick the glowing tile.'],
+ turn:['Mind the edge!','Careful: that tile runs off the chart. Red cross means you sink. Turn it.'],
+ place:['Safe water','Green check, so the way is clear. Lay it and your junk follows the line.'],
+ sail:['Well sailed!','Your junk ran the line to its end. You drew back up to three tiles.'],
+ rivals:['Cobalt\'s wake','Chapter 2. Cobalt sails too. Never end on his wake: two junks on one line both sink.'],
+ chain:['Ride his current','Your tile joins Cobalt\'s line, so you sail across both. Cheeky! Lay it.'],
+ keep:['A Deck Cannon!','The tile pile gave you a cannon. Keep it: one shot destroys a leviathan about to sink you.'],
+ wave:['The Rogue Wave',()=>{const w=waveLine();return w?'Chapter 3. Hold on! The wave sweeps your row. You rolled '+w.r+' and it needs '+w.n+'+, so you ride it.':'Hold on! A Rogue Wave sweeps this row. Roll its strength or capsize.'}],
+ place3:['Cross the wave','Your path crosses the wave\'s row once more, so you roll again. Lay the tile.'],
+ cannon:['Fire the cannon!',()=>levName(4)+' blocks your bow and would sink you. Fire your Deck Cannon!'],
+ place4:['Open water','Gone! The sea is clear again. Lay a tile and sail on.'],
+ sunk:['Cobalt\'s luck runs out',()=>levName(7)+' swam onto Cobalt\'s current: tile gone, junk sunk. Press Continue.'],
+ win:['The lantern\'s yours','Chapter 4. Only your junk is left, so you win. Osk: "The lantern chose well." Real games add more captains.']
+};

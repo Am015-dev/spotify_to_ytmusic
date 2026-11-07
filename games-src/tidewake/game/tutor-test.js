@@ -2,7 +2,7 @@
 //   node tutor-test.js [sizes=390x763,375x553]        Exit code 1 on any problem.
 // Runs per size: one clean run; at the first size also: a run with rotations half way (portrait -> landscape -> portrait), a "leave and come back" run (reload mid-way),
 // Skip, the first-time offer when Play is tapped, a fresh-profile Story run (Chapter 0 -> "Start chapter 1") at both sizes, and one clean run on the real 3D board.
-// Checks per step: the bubble is short (say <= 20 words, title <= 4), inside the screen and never over the spotlight; the target is visible and not covered by the kit; a wrong tap
+// Checks per step: the bubble is short (say <= 26 words, title <= 4), inside the screen and never over the spotlight; the target is visible and not covered by the kit; a wrong tap
 // (outside the spotlight) does not advance and shakes the bubble; the right action advances; nothing stuck for 8 s; no page errors. At the end: the "You know the rules" card, the menu
 // shows "Tutorial ✓", the progress is remembered, a saved game that existed before is untouched, a normal game starts. Screenshots (390x763, 2D clean run): playtest/tutor-early.png,
 // tutor-mid.png, tutor-sinking.png, tutor-end.png.
@@ -76,7 +76,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         hasData:[...document.querySelectorAll('.gxt-bub,.gxt-cell,.gxt-top,.gxt-ring')].every(e=>e.hasAttribute('data-help'))}});
     const s=info.s,id=s.id;
     totals.steps++;
-    if(wc(info.say)>20)note(tag,id+': say over 20 words ('+wc(info.say)+')');
+    if(wc(info.say)>26)note(tag,id+': say over 26 words ('+wc(info.say)+')');
     if(info.title&&wc(info.title)>4)note(tag,id+': title over 4 words');
     if(!info.say)note(tag,id+': empty text');
     if(info.hs)note(tag,id+': page scrolls sideways');

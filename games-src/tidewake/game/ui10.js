@@ -67,7 +67,7 @@ function tutSteps(){const L=[
    ready:()=>!!G.over&&!UI.busy&&!!tfirst('#pc [data-a=sunkok]','#cards [data-a=sunkok]')()},
  {id:'win',title:'Last junk afloat',say:'Only your junk is left, so you win. Real games add more captains, tiles and leviathans.',target:tq('#board'),wait:null,
    ready:()=>!!G.over&&!UI.busy&&!UI.sunk.length&&overUp()}
-];return PH.on?L:L.filter(x=>x.id!=='mark2')}
+];L.forEach(st=>{const t=TUT_TEXT[st.id];if(t){st.title=t[0];st.say=t[1]}});return PH.on?L:L.filter(x=>x.id!=='mark2')}
 // ---------------------------------------------------------------- the staged game
 function tutNewGame(){
   try{GX.close()}catch(e){}
