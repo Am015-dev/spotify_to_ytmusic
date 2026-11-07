@@ -57,7 +57,6 @@ function campInit() {
   var mapOpen = GXC.open; GXC.open = function () { var r = mapOpen.apply(GXC, arguments); setTimeout(function () { var e = $('.gxc'); if (e) artBg(e, 'bg-map'); }, 60); return r; };
   GXC.init({ game: 'stitchwise', data: window.CAMPAIGN,
     portrait: function (who, size, c) { var stem = c && c.portrait ? c.portrait.replace(/\.webp$/, '') : null; if (stem && artHas(stem)) { var i = artImg(stem); if (i) { i.style.width = i.style.height = size + 'px'; i.style.borderRadius = '50%'; i.style.objectFit = 'cover'; return i; } } return null; },
-    headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); tutStart(); }); return [b]; },
     startChapter: campStart, isWon: function (g) { return swWinner(g) === 0 && (!UI.camp || UI.camp.goal.type !== 'custom' || metrics(g).empty <= 6 || UI.camp.id !== 'c9') && (UI.camp && UI.camp.goal.type === 'score' ? metrics(g).score >= UI.camp.goal.value : true); }, metrics: metrics,
     onExit: function () { UI.camp = null; G = null; UI.started = false; showStart(); }, scores: function (g) { return [swScore(g, 0).total, swScore(g, 1).total]; }, seats: function () { return [{ name: 'You', me: true }, { name: UI.names[1], ai: UI.lvl }]; } });
 }
@@ -93,6 +92,7 @@ document.addEventListener('click', function (e) { // mark the chosen menu sectio
 function boot() {
   try { GX.init({ key: 'sw' }); } catch (e) { console.error(e); }
   try { var gs = GX.show; GX.show = function () { try { GXH.hide(); } catch (e) { } return gs.apply(GX, arguments); }; } catch (e) { }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.querySelector('.gx-app.gx-dock-min') && G && UI.started) { try { GX.showDock(); } catch (x) { } } });
   buildMenu(); buildRules(); buildPatchList(); bindQuilt(); campInit(); hlpInit(); musInit(); try { if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) GX.offline({ sw: '../sw.js', scope: '../' }); } catch (e) { }
   try { GNS.achievements('stitchwise', [{ id: 'win', name: 'First ribbon', how: 'Win a game.', test: function (r) { return r.won; } }, { id: 'tidy', name: 'Not a gap', how: 'Finish a game with at most 3 empty squares.', test: function (r, st, raw) { return r.won && raw && raw.scores && raw.scores[0] > 20; } }]); } catch (e) { }
   var rf = function () { if (G && UI.started) render(); }; try { var bk = ''; GX.onResize(function (w, hh) { var k = w + 'x' + hh; if (k !== bk && G && UI.started) { bk = k; render(); } }); } catch (e) { } if (typeof GXV !== 'undefined') GXV.watch(function () { rf(); }); else window.addEventListener('resize', rf);

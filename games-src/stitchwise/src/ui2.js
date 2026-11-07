@@ -15,7 +15,7 @@ function selectOffer(k) {
   var s = swWho(G); if (G.over || UI.busy || !isHuman(s) || G.pend) return; var pid = swOffer(G)[k], p = PATCHES[pid]; if (pid == null) return;
   if (!tutAct({ what: 'offer', k: k })) return;
   if (UI.sel === k) { showPatch(pid); return; }
-  if (G.btn[s] < p.cost) { sfx('bad'); toast('You need ' + (p.cost - G.btn[s]) + ' more button' + (p.cost - G.btn[s] === 1 ? '' : 's') + ' for ' + p.name + '. Advance to earn some.'); UI.sel = -1; render(); showPatchSoft(pid, k); return; }
+  if (G.btn[s] < p.cost) { sfx('bad'); toast('You need ' + (p.cost - G.btn[s]) + ' more button' + (p.cost - G.btn[s] === 1 ? '' : 's') + ' for ' + p.name + '. Advance to earn some.'); UI.sel = -1; render(); showPatchSoft(pid, k); var ob = $$('#offers .offer')[k]; if (ob) { ob.classList.add('nope'); setTimeout(function () { ob.className = ob.className.replace(' nope', ''); }, 500); } return; }
   if (!swPlacements(G.board[s], p).length) { sfx('bad'); toast(p.name + ' does not fit anywhere on your quilt.'); return; }
   UI.sel = k; sfx('pick'); var bp = UI.tutorial ? null : bestPlacement(pid, s);
   if (bp) { UI.o = bp[0]; UI.gx = bp[1]; UI.gy = bp[2]; } else { UI.o = 0; var b = bbox(p.or[0]); UI.gx = Math.floor((9 - b[0]) / 2); UI.gy = Math.floor((9 - b[1]) / 2); }

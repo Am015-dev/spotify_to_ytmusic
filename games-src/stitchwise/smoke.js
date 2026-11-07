@@ -42,8 +42,8 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
     while (n < (FULL ? 200 : 3)) { const k = await turn(); if (k === 'over') break; kinds.push(k); n++; const e = await pg.evaluate(() => swCheck(G)); if (e) { ok(false, 'invariant ' + e); break; } if (n === 2) await pg.screenshot({ path: path.join(OUT, tag + '-mid.png') }); }
     ok(kinds.length > 0, 'played ' + kinds.length + ' turns: ' + kinds.slice(0, 12).join(','));
     if (!FULL) await pg.evaluate(() => { G.pos = [53, 53]; G.pend = null; G.pendQ = 0; G.over = true; G.ev = []; render(); schedule(); });
-    await pg.waitForSelector('#rs:not([hidden]) .win', { timeout: 20000 }); await pg.screenshot({ path: path.join(OUT, tag + '-result.png') });
-    const res = await pg.evaluate(() => ({ t: document.querySelector('#rs .win').textContent, a: swScore(G, 0).total, b: swScore(G, 1).total, shown: [...document.querySelectorAll('#rs .rsgrid b')].map(e => e.textContent).join('|') }));
+    await pg.waitForSelector('#rs:not([hidden]) .rvban.on .rvt1', { timeout: 30000 }); await pg.screenshot({ path: path.join(OUT, tag + '-result.png') });
+    const res = await pg.evaluate(() => ({ t: document.querySelector('#rs .rvt1').textContent, a: swScore(G, 0).total, b: swScore(G, 1).total, shown: [...document.querySelectorAll('#rs .rvt')].map(e => e.textContent).join('|') + '|' + document.querySelector('#rs .rvt2').textContent }));
     ok(/win/i.test(res.t) && res.shown.indexOf(String(res.a)) >= 0 && res.shown.indexOf(String(res.b)) >= 0, 'result screen shows both totals: ' + res.t + ' ' + res.a + ' v ' + res.b);
     await tapSel('#rs [data-a=again]'); await pg.waitForTimeout(300); ok(await pg.evaluate(() => !!G && !G.over && UI.started), 'Play again starts a new game');
     await pg.evaluate(() => { GX.show('rulesd'); }); await pg.waitForTimeout(250); ok(await pg.evaluate(() => document.querySelector('#rulesd').classList.contains('on')), 'rules drawer opens'); await pg.keyboard.press('Escape');
