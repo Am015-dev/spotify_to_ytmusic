@@ -49,7 +49,8 @@ function newGame(cfg) {
   var ai = [], names = [];
   for (var i = 0; i < cfg.np; i++) { ai.push(i < cfg.humans ? null : (cfg.lvBy && cfg.lvBy[i]) || cfg.ai); names.push(i < cfg.humans ? (cfg.humans > 1 ? 'Ranger ' + (i + 1) : 'You') : (cfg.names && cfg.names[i]) || WM.RIVALS[(i - cfg.humans) % WM.RIVALS.length]); }
   if (cfg.humans === 1) names[0] = 'You';
-  G = WM.newGame({ np: cfg.np, seed: cfg.seed, ai: ai, names: names, turns: cfg.turns, acorns: cfg.acorns, no3: cfg.no3 });
+  var cards = cfg.cards === 'mix' ? (function () { var o = {}; WM.ANI.forEach(function (a) { o[a] = 'abcd'[1 + Math.floor(Math.random() * 3)]; }); return o; })() : (cfg.cards && typeof cfg.cards === 'object' ? cfg.cards : null);
+  G = WM.newGame({ np: cfg.np, seed: cfg.seed, ai: ai, names: names, turns: cfg.turns, acorns: cfg.acorns, no3: cfg.no3, cards: cards });
   UI.cfg = cfg; UI.humans = cfg.humans; UI.view = 0; UI.lastHuman = 0; UI.ghost = null; UI.free = null; UI.wipe = null; UI.undo = null; UI.lit = null; UI.userPan = 0; UI.passed = -1;
   $('#start').hidden = true; $('#rs').hidden = true; try { GX.close(); } catch (e) { }
   fitView(true); render(); step(); save(); musicSync();
@@ -99,7 +100,7 @@ function act(m) {
       var sc1 = WM.score(before.env, before.acorns), best = null;
       WM.ANI.forEach(function (a) { var d = sc1.ani[a] - sc0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
       var tot = sc1.aniT - sc0.aniT;
-      if (tot > 0) { var info = {}; WM.scoreAnimal(before.env, best.a, info); UI.lit = { cells: info.lit, a: best.a, until: Date.now() + 1600 }; pop(m.c, '+' + tot + ' ' + WM.CARDS[best.a].title, 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
+      if (tot > 0) { var info = {}; WM.scoreAnimal(before.env, best.a, info); UI.lit = { cells: info.lit, a: best.a, until: Date.now() + 1600 }; pop(m.c, '+' + tot + ' ' + cinfo(best.a).title, 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
       else if (tot < 0) { pop(m.c, tot + ' points', 'neg'); sfx('tok'); } else sfx('tok');
       if (G.last && G.last.acorn) { setTimeout(function () { pop(m.c, '+1 acorn', 'acorn'); sfx('acorn'); }, 350); }
     } else sfx('tap');
@@ -205,6 +206,8 @@ function drawMap() {
 }
 function mkTile(t, s) { var w = s * SQ3, h = s * 2; return '<svg viewBox="' + (-w / 2 - 2) + ' ' + (-h / 2 - 2) + ' ' + (w + 4) + ' ' + (h + 4) + '" aria-hidden="true">' + terrainDefs() + tileSvg(t, 0, 0, s, t.t.length > 1 ? 1 : 0) + '</svg>'; }
 function mkTok(a) { return '<svg viewBox="-12 -12 24 24" aria-hidden="true">' + tokenSvg(a, 0, 0, 11) + '</svg>'; }
+function cset(a) { return G && G.cards && G.cards[a] || 'a'; }
+function cinfo(a) { return WM.cardInfo ? WM.cardInfo(a, cset(a)) : WM.CARDS[a]; }
 function tileName(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + ' tile' + (t.key ? ' (keystone)' : '') + ', accepts ' + t.a.map(function (a) { return WM.ANI_NAME[a]; }).join(', '); }
 function renderDock() {
   var mk = $('#mk'), mine = myTurn() && G.stage === 'pick', s = G.seats[G.cur], h = '';
@@ -251,7 +254,7 @@ function lineText() {
 }
 function renderTop() {
   var me = G.seats[UI.view], sc = WM.score(me.env, me.acorns), h = '';
-  WM.ANI.forEach(function (a) { h += '<button type="button" class="cc" data-card="' + a + '" aria-label="' + esc(WM.CARDS[a].title) + ' card, ' + sc.ani[a] + ' points">' + mkTok(a) + '<b>' + sc.ani[a] + '</b></button>'; });
+  WM.ANI.forEach(function (a) { h += '<button type="button" class="cc" data-card="' + a + '" aria-label="' + esc(cinfo(a).title) + ' card, ' + sc.ani[a] + ' points">' + mkTok(a) + '<b>' + sc.ani[a] + '</b></button>'; });
   $('#cards').innerHTML = h;
   var sh = '';
   if (G.np > 1) G.seats.forEach(function (s, i) { var t = WM.score(s.env, s.acorns).total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '">' + esc(s.name) + ' <b>' + t + '</b></button>'; });
@@ -270,7 +273,7 @@ UI.redraw = function () { if (G) render(); };
 // ---------------------------------------------------------------- drawers: scores, rules, cards
 function scoresHTML() {
   var sc = G.over ? G.res : WM.final(G), h = '<table class="st"><tr><th></th>' + G.seats.map(function (s) { return '<th>' + esc(s.name) + '</th>'; }).join('') + '</tr>';
-  WM.ANI.forEach(function (a) { h += '<tr><td>' + mkTok(a) + ' ' + esc(WM.CARDS[a].title) + '</td>' + sc.map(function (x) { return '<td>' + x.ani[a] + '</td>'; }).join('') + '</tr>'; });
+  WM.ANI.forEach(function (a) { h += '<tr><td>' + mkTok(a) + ' ' + esc(cinfo(a).title) + '</td>' + sc.map(function (x) { return '<td>' + x.ani[a] + '</td>'; }).join('') + '</tr>'; });
   WM.TER.forEach(function (t) { h += '<tr><td><i class="sw" style="background:' + WM.TER_COL[t] + '"></i> ' + WM.TER_NAME[t] + '</td>' + sc.map(function (x) { return '<td>' + x.hab[t] + (x.bonus[t] ? ' <small>+' + x.bonus[t] + '</small>' : '') + '</td>'; }).join('') + '</tr>'; });
   h += '<tr><td>Acorns</td>' + sc.map(function (x) { return '<td>' + x.acorns + '</td>'; }).join('') + '</tr>';
   h += '<tr class="tot"><td>Total</td>' + sc.map(function (x) { return '<td>' + x.total + '</td>'; }).join('') + '</tr></table>';
@@ -278,7 +281,7 @@ function scoresHTML() {
 }
 function cardsHTML() {
   var h = '<div class="cards">';
-  WM.ANI.forEach(function (a) { var C = WM.CARDS[a]; h += '<div class="card"><div class="cart" data-art="card-' + a + '-a">' + mkTok(a) + '</div><div><h3>' + esc(C.title) + '</h3><p>' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : '0 to 5 per fox') + '</p></div></div>'; });
+  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(C.title) + '</h3><p>' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
   return h + '</div>';
 }
 var RULES_HTML = '<h3>Goal</h3><p>Over 20 turns, grow a valley of habitat tiles and settle animals on them. Most points wins.</p>' +
@@ -292,13 +295,13 @@ var RULES_HTML = '<h3>Goal</h3><p>Over 20 turns, grow a valley of habitat tiles 
 function tileText(t, tok) {
   var h = '<p><b>' + t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + '</b> tile' + (t.key ? ', a <b>keystone</b>: an animal placed here earns an acorn.' : (t.t.length > 1 ? '. Each half counts for its own terrain; edges must match to join a habitat.' : '.')) + '</p>';
   h += '<p>Accepts: ' + t.a.map(function (a) { return WM.ANI_NAME[a]; }).join(', ') + '.</p>';
-  if (tok) h += '<p>Home to a <b>' + WM.ANI_NAME[tok] + '</b> (' + esc(WM.CARDS[tok].title) + ': ' + esc(WM.CARDS[tok].rule) + ')</p>';
+  if (tok) h += '<p>Home to a <b>' + WM.ANI_NAME[tok] + '</b> (' + esc(cinfo(tok).title) + ': ' + esc(cinfo(tok).rule) + ')</p>';
   return h;
 }
 function showBig(kind, obj, tok) {
   var body = document.createElement('div'); body.className = 'bigv';
   if (kind === 'tile') body.innerHTML = '<div class="bigpic">' + mkTile(obj, 60) + '</div>' + tileText(obj, tok);
-  else { var C = WM.CARDS[obj]; body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : '0 to 5 per fox') + '</p>'; }
+  else { var C = cinfo(obj); body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p>'; }
   GX.drawer('bigd', kind === 'tile' ? 'Habitat tile' : 'Animal token', body, false); GX.show('bigd');
 }
 (function wireHold() {
@@ -330,6 +333,7 @@ function showTitle() {
     st.innerHTML = '<div class="tbox"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
       '<div class="lbl">Rival skill</div>' + seg('ai', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], c.ai) +
       '<div class="lbl">Players on this device</div>' + seg('humans', [[1, '1'], [2, '2'], [3, '3'], [4, '4']], c.humans) +
+      '<div class="lbl">Animal cards</div>' + seg('cards', [['a', 'First set'], ['mix', 'Mixed B-D']], c.cards || 'a') +
       '<p class="sum">' + esc(setupSum(c)) + '</p><button type="button" class="big" id="goB">Start</button><button type="button" class="ab" id="backT">Back</button></div>';
     return;
   }
@@ -341,14 +345,14 @@ function showTitle() {
     (window.GXT ? GXT.menuHTML({ game: 'wildmark', first: !UI.prefs.played, cls: 'ab wide', launch: function () { tutStart(); } }) : '') +
     '<button type="button" class="ab wide" id="howB">How to play</button></div>';
 }
-function setupSum(c) { return c.opp === 0 && c.humans === 1 ? 'Solo: 20 turns, beat your best score.' : (c.humans > 1 ? c.humans + ' players on this device' : 'You') + (c.opp ? ' vs ' + c.opp + ' ' + c.ai + ' rival' + (c.opp > 1 ? 's' : '') : '') + ', 20 turns each.'; }
+function setupSum(c) { return (c.cards === 'mix' ? 'Mixed animal cards. ' : '') + c.opp === 0 && c.humans === 1 ? 'Solo: 20 turns, beat your best score.' : (c.humans > 1 ? c.humans + ' players on this device' : 'You') + (c.opp ? ' vs ' + c.opp + ' ' + c.ai + ' rival' + (c.opp > 1 ? 's' : '') : '') + ', 20 turns each.'; }
 // ---------------------------------------------------------------- events
 document.addEventListener('click', function (e) {
   var t = e.target.closest && e.target.closest('button'); if (!t) return;
   var id = t.id;
   if (t.classList.contains('mt')) return onMarket('t', +t.dataset.i);
   if (t.classList.contains('mk')) return onMarket('k', +t.dataset.i);
-  if (t.classList.contains('sg')) { var k = t.parentNode.dataset.k, v = t.dataset.v; UI.setup[k] = k === 'ai' ? v : +v; if (UI.setup.humans + UI.setup.opp > 4) UI.setup.opp = 4 - UI.setup.humans; if (UI.setup.humans + UI.setup.opp < 1) UI.setup.opp = 0; showTitle(); return; }
+  if (t.classList.contains('sg')) { var k = t.parentNode.dataset.k, v = t.dataset.v; UI.setup[k] = k === 'ai' || k === 'cards' ? v : +v; if (UI.setup.humans + UI.setup.opp > 4) UI.setup.opp = 4 - UI.setup.humans; if (UI.setup.humans + UI.setup.opp < 1) UI.setup.opp = 0; showTitle(); return; }
   if (t.classList.contains('cc')) { openCards(); return; }
   if (t.classList.contains('seat')) { UI.view = +t.dataset.seat; render(); fitView(); return; }
   switch (id) {
@@ -357,7 +361,7 @@ document.addEventListener('click', function (e) {
     case 'backT': UI.sv = 'title'; showTitle(); break;
     case 'howB': openRules(); break;
     case 'resumeB': resume(); break;
-    case 'goB': UI.sv = 'title'; UI.mode = 'quick'; UI.prefs.played = 1; savePrefs(); var c = UI.setup; newGame({ np: c.humans + c.opp, humans: c.humans, ai: c.ai }); break;
+    case 'goB': UI.sv = 'title'; UI.mode = 'quick'; UI.prefs.played = 1; savePrefs(); var c = UI.setup; newGame({ np: c.humans + c.opp, humans: c.humans, ai: c.ai, cards: c.cards || 'a' }); break;
     case 'againB': if (UI.mode === 'quick' && UI.cfg) newGame(Object.assign({}, UI.cfg, { seed: null })); else showTitle(); break;
     case 'titleB': UI.sv = 'title'; showTitle(); break;
     case 'campCont': $('#rs').hidden = true; try { GXC.finish(G); } catch (er) { console.error(er); } break;

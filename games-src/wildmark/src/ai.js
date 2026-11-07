@@ -22,6 +22,7 @@
   function habGain(env, c, t, before) { var g = 0; t.forEach(function (tt) { g += W.corridor(env, tt) - before[tt]; }); return g; }
   W.AI = {
     plan: function (G, level) {
+      W.curCards = G.cards;
       var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', noise = lv === 'easy' ? 3.5 : lv === 'normal' ? 0.6 : 0;
       var pot = lv === 'easy' ? 0.15 : lv === 'normal' ? 0.45 : 0.6, rnd = function () { return W.rnd(G); };
       var bagTot = 0; for (var a in G.bag) bagTot += G.bag[a];

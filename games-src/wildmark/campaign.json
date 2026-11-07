@@ -718,7 +718,7 @@
     },
     {
      "who": "ward",
-     "text": "No sweeping the market here: the old growth keeps what it is given."
+     "text": "No sweeping the market here: the old growth keeps what it is given. New animal cards here."
     }
    ],
    "outro": [
@@ -738,7 +738,14 @@
    },
    "setup": {
     "players": 2,
-    "seed": null
+    "seed": null,
+    "cards": {
+     "bear": "b",
+     "elk": "c",
+     "salmon": "b",
+     "hawk": "c",
+     "fox": "b"
+    }
    },
    "twist": {
     "id": "no-sweep",
@@ -802,7 +809,7 @@
     },
     {
      "who": "linnet",
-     "text": "No hard feelings if I take your hawks."
+     "text": "No hard feelings if I take your hawks. New animal cards here."
     }
    ],
    "outro": [
@@ -826,7 +833,14 @@
     "others": [
      "Sorrel",
      "Oake"
-    ]
+    ],
+    "cards": {
+     "bear": "c",
+     "elk": "b",
+     "salmon": "c",
+     "hawk": "b",
+     "fox": "c"
+    }
    },
    "twist": null,
    "goal": {
@@ -880,7 +894,7 @@
     },
     {
      "who": "ward",
-     "text": "The Warden is strong, rich in acorns, and nobody may sweep the market. Plan every turn."
+     "text": "The Warden is strong, rich in acorns, and nobody may sweep the market. New animal cards here."
     }
    ],
    "outro": [
@@ -906,7 +920,14 @@
    },
    "setup": {
     "players": 2,
-    "seed": null
+    "seed": null,
+    "cards": {
+     "bear": "d",
+     "elk": "d",
+     "salmon": "d",
+     "hawk": "d",
+     "fox": "d"
+    }
    },
    "twist": {
     "id": "boss-acorns",

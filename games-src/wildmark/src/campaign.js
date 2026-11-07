@@ -7,7 +7,7 @@ function campStart(def) {
   if (tw && tw.id === 'boss-acorns') for (i = 1; i < np; i++) acorns[i] = tw.param || 2;
   if (tw && tw.id === 'you-acorns') acorns[0] = tw.param || 1;
   UI.mode = 'camp'; UI.camp = def; UI.sv = 'title';
-  var g = newGame({ np: np, humans: 1, ai: op.aiLevel || 'normal', seed: s.seed != null ? s.seed : null, turns: tw && tw.id === 'short-season' ? tw.param : 20, acorns: acorns, no3: !!(tw && tw.id === 'no-sweep'), names: names });
+  var g = newGame({ cards: s.cards || null, np: np, humans: 1, ai: op.aiLevel || 'normal', seed: s.seed != null ? s.seed : null, turns: tw && tw.id === 'short-season' ? tw.param : 20, acorns: acorns, no3: !!(tw && tw.id === 'no-sweep'), names: names });
   UI.mode = 'camp';
   try { if (window.GXH) GXH.setEnabled(def.hints !== false); } catch (e) { }
   setTimeout(function () { toast('Goal: ' + def.goal.text + (tw && tw.text ? ' ' + tw.text : ''), 3600); }, 400);

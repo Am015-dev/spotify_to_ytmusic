@@ -29,7 +29,7 @@
     var np = Math.max(1, Math.min(4, o.np || 2)), seed = o.seed != null ? o.seed : Math.floor(Math.random() * 1e9);
     var G = { v: 1, seed: seed, rs: seed | 0, np: np, solo: np === 1, turns: o.turns || 20, cur: 0, phase: 'pick', stage: 'pick', round: 1, log: [], logN: 0,
       bag: { bear: 20, elk: 20, salmon: 20, hawk: 20, fox: 20 }, seats: [], market: { tiles: [], toks: [] }, hold: null, used3: false, over: false, winner: -1, res: null,
-      opts: { no3: !!o.no3, noAcornHuman: !!o.noAcornHuman }, tw: o.twist || null, lastScore: null };
+      opts: { no3: !!o.no3, noAcornHuman: !!o.noAcornHuman }, cards: o.cards || null, tw: o.twist || null, lastScore: null };
     var names = o.names || [];
     var st = shuffle(G, [0, 1, 2, 3, 4]);
     for (var s = 0; s < np; s++) {
@@ -41,6 +41,7 @@
     var pool = shuffle(G, clone(W.TILES)); G.supply = pool.slice(0, Math.min(pool.length, need));
     for (var i = 0; i < 4; i++) { G.market.tiles.push(G.supply.pop()); G.market.toks.push(drawTok(G)); }
     overpop(G);
+    W.curCards = G.cards;
     log(G, 'A new valley. ' + (G.solo ? 'Solo game.' : np + ' rangers.'));
     return G;
   };
@@ -59,6 +60,7 @@
   W.rots = function (tile) { return tile.t.length === 1 ? [0] : [0, 1, 2, 3, 4, 5]; };
   // ---------------------------------------------------------------- legal moves for the seat to act
   W.moves = function (G) {
+    W.curCards = G.cards;
     if (G.over) return [];
     var s = G.seats[G.cur], m = [];
     if (G.stage === 'pick') {
@@ -77,6 +79,7 @@
     return m;
   };
   W.apply = function (G, m) {
+    W.curCards = G.cards;
     var s = G.seats[G.cur], i;
     if (G.over) throw new Error('game over');
     if (G.stage === 'pick') {
@@ -142,7 +145,9 @@
     return out;
   }
   function tokAt(env, c, a) { return env[c] && env[c].tok === a; }
-  W.scoreAnimal = function (env, a, info) {
+  W.scoreAnimal = function (env, a, info, set) {
+    if (set === undefined || set === null) set = W.curCards ? W.curCards[a] : 'a';
+    if (set && set !== 'a' && W.scoreX) return W.scoreX(env, a, set, info);
     var C = W.CARDS[a], pts = C.pts, cells = [], c;
     for (c in env) if (env[c].tok === a) cells.push(c);
     var lit = [], v = 0;
@@ -175,9 +180,9 @@
     if (info) info.cells = best;
     return best.length;
   };
-  W.score = function (env, acorns) {
+  W.score = function (env, acorns, cards) {
     var r = { ani: {}, hab: {}, aniT: 0, habT: 0, acorns: acorns || 0 };
-    W.ANI.forEach(function (a) { r.ani[a] = W.scoreAnimal(env, a); r.aniT += r.ani[a]; });
+    W.ANI.forEach(function (a) { r.ani[a] = W.scoreAnimal(env, a, null, cards ? cards[a] : undefined); r.aniT += r.ani[a]; });
     W.TER.forEach(function (t) { r.hab[t] = W.corridor(env, t); r.habT += r.hab[t]; });
     r.total = r.aniT + r.habT + r.acorns; return r;
   };
@@ -202,7 +207,7 @@
     return b;
   };
   W.final = function (G) {
-    var sc = G.seats.map(function (s) { return W.score(s.env, s.acorns); }), bo = W.bonus(G, sc);
+    var sc = G.seats.map(function (s) { return W.score(s.env, s.acorns, G.cards); }), bo = W.bonus(G, sc);
     sc.forEach(function (s, i) { s.bonus = bo[i]; s.bonusT = 0; for (var t in bo[i]) s.bonusT += bo[i][t]; s.total += s.bonusT; });
     return sc;
   };

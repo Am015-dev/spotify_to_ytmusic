@@ -31,12 +31,27 @@ W.apply(G, { t: 'wipe3' }); ok(!W.moves(G).some(m => m.t === 'wipe3') || W.tripl
 G = W.newGame({ np: 1, seed: 2 }); G.market.tiles[0] = { id: 999, t: ['forest'], a: ['bear'], key: true }; G.bag[G.market.toks[0]]++; G.bag.bear--; G.market.toks[0] = 'bear';
 W.apply(G, { t: 'take', i: 0 }); const sp = W.spots(G.seats[0].env)[0]; W.apply(G, { t: 'place', c: sp, rot: 0 }); W.apply(G, { t: 'tok', c: sp }); ok(G.seats[0].acorns === 1, 'keystone acorn');
 ok(W.check(G).length === 0, 'invariants after keystone: ' + W.check(G));
+// card sets B-D
+global.window.WM = W; require('./src/cards.js');
+const S = (list, a, set) => W.scoreAnimal(env(list), a, null, set);
+ok(S([[0, 0, 'bear'], [1, 0, 'bear'], [2, 0, 'bear']], 'bear', 'b') === 10, 'bear B trio 10');
+ok(S([[0, 0, 'bear'], [3, 0, 'bear'], [4, 0, 'bear'], [7, 0, 'bear'], [8, 0, 'bear'], [9, 0, 'bear']], 'bear', 'c') === 2 + 5 + 8 + 3, 'bear C one of each +3');
+ok(S([[0, 0, 'bear'], [1, 0, 'bear'], [2, 0, 'bear'], [3, 0, 'bear']], 'bear', 'd') === 13, 'bear D four 13');
+ok(S([[0, 0, 'elk'], [1, 0, 'elk'], [0, 1, 'elk']], 'elk', 'b') === 9, 'elk B triangle 9');
+ok(S([[0, 0, 'elk'], [1, 0, 'elk'], [2, 0, 'elk'], [3, 0, 'elk'], [4, 0, 'elk']], 'elk', 'c') === 14, 'elk C group of 5 = 14');
+ok(S([[0, 0, 'salmon'], [1, 0, 'salmon'], [2, 0, 'salmon']], 'salmon', 'b') === 9, 'salmon B run 3 = 9');
+ok(S([[0, 0, 'salmon'], [1, 0, 'salmon']], 'salmon', 'c') === 0, 'salmon C run 2 = 0');
+ok(S([[0, 0, 'salmon'], [1, 0, 'salmon'], [0, 1, 'bear']], 'salmon', 'd') === 3, 'salmon D 2 + 1 neighbour');
+ok(S([[0, 0, 'hawk'], [1, 0], [2, 0, 'hawk']], 'hawk', 'c') === 3, 'hawk C one sight line 3');
+ok(S([[0, 0, 'hawk'], [1, 0, 'bear'], [2, 0, 'hawk']], 'hawk', 'd') === 4, 'hawk D pair with 1 kind 4');
+ok(S([[0, 0, 'fox'], [1, 0, 'bear'], [-1, 0, 'bear'], [0, 1, 'elk']], 'fox', 'c') === 2, 'fox C most common 2');
+ok(S([[0, 0, 'fox'], [1, 0, 'bear'], [-1, 0, 'bear']], 'fox', 'b') === 3, 'fox B one pair 3');
 // games
 const N = +(process.argv[2] || (process.env.QUICK ? 8 : 200)), t0 = Date.now(), tot = {}, wins = {};
 for (let g = 0; g < N; g++) {
   const np = 1 + (g % 4), lv = ['easy', 'normal', 'hard'][g % 3];
   const ai = []; for (let i = 0; i < np; i++) ai.push(i === 0 ? lv : ['easy', 'normal', 'hard'][(g + i) % 3]);
-  const G = W.newGame({ np, seed: 1000 + g, ai }); let steps = 0;
+  const cards = g % 2 ? null : Object.fromEntries(W.ANI.map((a, i) => [a, W.SETS[(g + i) % 4]])); const G = W.newGame({ np, seed: 1000 + g, ai, cards }); let steps = 0;
   while (!G.over && steps < 2000) {
     const mv = W.moves(G); if (!mv.length) { fail++; console.log('FAIL stuck', g, G.stage); break; }
     let m = W.AI.choose(G); if (g % 7 === 0 && Math.random() < 0.2) m = mv[Math.floor(Math.random() * mv.length)];

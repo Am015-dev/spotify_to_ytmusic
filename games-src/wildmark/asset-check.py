@@ -13,7 +13,7 @@ for t in data["ter"]: req.append(("terrain", t, "ter-" + t))
 for a in data["ani"] + ["acorn"]: req.append(("token", a, "tok-" + a))
 for a in data["cards"]: req.append(("scoring card (set A, in play)", a, "card-%s-a" % a))
 for a in data["cards"]:
-    for s in "bcd": req.append(("scoring card (set %s, next)" % s.upper(), a, "card-%s-%s" % (a, s)))
+    for s in "bcd": req.append(("scoring card (set %s, in play: Mixed + Story act 3)" % s.upper(), a, "card-%s-%s" % (a, s)))
 seen = set()
 for k, c in camp["cast"].items():
     st = c["portrait"].replace(".webp", ""); req.append(("character", k, st)); seen.add(st)

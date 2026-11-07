@@ -26,21 +26,21 @@ Habitat tiles: all 85 are drawn from their terrain textures (ter-*) and animal t
 | scoring card (set A, in play) | salmon | `card-salmon-a` | yes | yes |
 | scoring card (set A, in play) | hawk | `card-hawk-a` | yes | yes |
 | scoring card (set A, in play) | fox | `card-fox-a` | yes | yes |
-| scoring card (set B, next) | bear | `card-bear-b` | yes | yes |
-| scoring card (set C, next) | bear | `card-bear-c` | yes | yes |
-| scoring card (set D, next) | bear | `card-bear-d` | yes | yes |
-| scoring card (set B, next) | elk | `card-elk-b` | yes | yes |
-| scoring card (set C, next) | elk | `card-elk-c` | yes | yes |
-| scoring card (set D, next) | elk | `card-elk-d` | yes | yes |
-| scoring card (set B, next) | salmon | `card-salmon-b` | yes | yes |
-| scoring card (set C, next) | salmon | `card-salmon-c` | yes | yes |
-| scoring card (set D, next) | salmon | `card-salmon-d` | yes | yes |
-| scoring card (set B, next) | hawk | `card-hawk-b` | yes | yes |
-| scoring card (set C, next) | hawk | `card-hawk-c` | yes | yes |
-| scoring card (set D, next) | hawk | `card-hawk-d` | yes | yes |
-| scoring card (set B, next) | fox | `card-fox-b` | yes | yes |
-| scoring card (set C, next) | fox | `card-fox-c` | yes | yes |
-| scoring card (set D, next) | fox | `card-fox-d` | yes | yes |
+| scoring card (set B, in play: Mixed + Story act 3) | bear | `card-bear-b` | yes | yes |
+| scoring card (set C, in play: Mixed + Story act 3) | bear | `card-bear-c` | yes | yes |
+| scoring card (set D, in play: Mixed + Story act 3) | bear | `card-bear-d` | yes | yes |
+| scoring card (set B, in play: Mixed + Story act 3) | elk | `card-elk-b` | yes | yes |
+| scoring card (set C, in play: Mixed + Story act 3) | elk | `card-elk-c` | yes | yes |
+| scoring card (set D, in play: Mixed + Story act 3) | elk | `card-elk-d` | yes | yes |
+| scoring card (set B, in play: Mixed + Story act 3) | salmon | `card-salmon-b` | yes | yes |
+| scoring card (set C, in play: Mixed + Story act 3) | salmon | `card-salmon-c` | yes | yes |
+| scoring card (set D, in play: Mixed + Story act 3) | salmon | `card-salmon-d` | yes | yes |
+| scoring card (set B, in play: Mixed + Story act 3) | hawk | `card-hawk-b` | yes | yes |
+| scoring card (set C, in play: Mixed + Story act 3) | hawk | `card-hawk-c` | yes | yes |
+| scoring card (set D, in play: Mixed + Story act 3) | hawk | `card-hawk-d` | yes | yes |
+| scoring card (set B, in play: Mixed + Story act 3) | fox | `card-fox-b` | yes | yes |
+| scoring card (set C, in play: Mixed + Story act 3) | fox | `card-fox-c` | yes | yes |
+| scoring card (set D, in play: Mixed + Story act 3) | fox | `card-fox-d` | yes | yes |
 | character | ward | `portrait-rowan` | yes | yes |
 | character | you | `portrait-ranger` | yes | yes |
 | character | pip | `portrait-pip` | yes | yes |

@@ -21,6 +21,8 @@ change: a stronger rival, a short season, a scoring target or a market rule. Dat
 Act 1 keeps the coach and lightbulb tips on (`hints: true`); acts 2-3 turn the first-time bubbles off (the bulb still works).
 After 2 losses a chapter offers "Make it a bit easier" (`easier`: one AI level down, no twist; at most 2 stars).
 
+Act 3 swaps the animal cards: c8 sets B/C mixed, c9 C/B mixed, c10 all set D (`setup.cards`).
+
 ## Twists (only inside Story)
 - `boss-acorns` (param N): every rival seat starts with N acorns (free picks / replaces, and N points at the end).
 - `short-season` (param N): N turns per player; the tile supply is sized to match.
