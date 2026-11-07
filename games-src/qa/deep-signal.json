@@ -1,0 +1,456 @@
+{
+ "slug": "deep-signal",
+ "size": "phone",
+ "seed": 88962,
+ "when": "2026-11-07T21:34Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 396
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 195
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "overlapping clickables: button#sigB.btn \"\ud83d\udce1 Signal\" / button#tMenuB.btn \"Settings\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#helpB.ib.txt \"?\" under div#title.scr.on \"DEEP SIGNAL A crew of di\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-k.hasart \"2\" / div.cd.s-a.hasart \"3\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-t.hasart \"1\" / div.cd.s-a.hasart \"6\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-t.hasart \"7\" / div.cd.s-r.hasart \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-t.hasart \"9\" / div.cd.s-r.hasart \"2\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button#helpB.ib.txt \"?\" under div#pass.scr.on \"Pass the device to Diver\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): div.tcard.s-k.hasart \"2\" under div.sonar-ring",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): div.cd.s-k.hasart \"2\" under div#pass.scr.on \"Pass the device to Diver\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"1\" / div.cd.s-t.hasart \"5\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"4\" / div.cd.s-a.hasart \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"5\" / div.cd.s-a.hasart \"8\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"8\" / div.cd.s-r.hasart \"4\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"8\" / div.cd.s-t.hasart \"6\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"9\" / div.cd.s-a.hasart \"4\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-k.hasart \"5\" / div.cd.s-r.hasart \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-t.hasart \"3\" / div.cd.s-r.hasart \"4\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#helpB.ib.txt \"?\" / button.gxc-ib.gxc-score \"\u2605 0/150\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#menuB.ib \"\u2630\" / button.gxc-ib.gxc-score \"\u2605 0/150\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"8\" / button.gxc-node.a1.locked \"8 Mission 8: Count Down\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "overlapping clickables: button#sigB.btn \"\ud83d\udce1 Signal\" / button#tMenuB.btn \"Settings\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#helpB.ib.txt \"?\" under div#title.scr.on \"DEEP SIGNAL A crew of di\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button#sigB.btn \"\ud83d\udce1 Signal\" / button#startB.btn.pri.big \"Start dive\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button#helpB.ib.txt \"?\" under div#setup.scr.on \"Quick game Crew 2 3 4 5 \"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): div.cd.s-c.hasart \"4\" under div#zoom.on \"9 Amber 9 Follow suit if\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"2\" / div.cd.s-k.hasart \"3\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"3\" / div.cd.s-t.hasart \"2\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"5\" / div.cd.s-t.hasart \"4\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"6\" / div.cd.s-a.hasart \"2\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.btn \"\ud83d\udd25 Send a flare\" under div.cd.s-c.hasart \"3\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.cd.s-k.hasart \"3\" / div.cd.s-a.hasart \"4\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.cd.s-k.hasart \"8\" / div.cd.s-a.hasart \"8\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.cd.s-a.hasart \"2\" / div.cd.s-r.hasart \"1\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #396 (9)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 396 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-quick-noresult-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button#helpB.ib.txt \"?\" / button.gxc-ib.gxc-score \"\u2605 0/150\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-map-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button#menuB.ib \"\u2630\" / button.gxc-ib.gxc-score \"\u2605 0/150\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-map-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#helpB.ib.txt \"?\" / button.gxc-ib.gxc-score \"\u2605 0/150\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#menuB.ib \"\u2630\" / button.gxc-ib.gxc-score \"\u2605 0/150\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gxc-node.a1.locked \"9 Mission 9: The Faint P\" / button.gxc-btn.go \"Play\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"8\" / button.gxc-node.a1.locked \"8 Mission 8: Count Down\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-a.hasart \"4\" / button.gxc-node.a1.locked \"8 Mission 8: Count Down\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-a.hasart \"4\" / button.gxc-btn.ghost \"Close\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-a.hasart \"7\" / button.gxc-node.a1.locked \"9 Mission 9: The Faint P\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-c.hasart \"5\" / div.cd.s-a.hasart \"4\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-t.hasart \"4\" / div.cd.s-a.hasart \"6\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-t.hasart \"6\" / div.cd.s-a.hasart \"7\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-t.hasart \"7\" / div.cd.s-a.hasart \"9\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.cd.s-t.hasart \"8\" / div.cd.s-r.hasart \"4\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button#helpB.ib.txt \"?\" under div#zoom.on \"5 Coral 5 Follow suit if\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button.btn \"\ud83d\udd25 Send a flare\" under div.cd.s-c.hasart \"5\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #195 (Close)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 195 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-story-noresult-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "overlapping clickables: button#sigB.btn \"\ud83d\udce1 Signal\" / button#tMenuB.btn \"Settings\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#helpB.ib.txt \"?\" under div#title.scr.on \"DEEP SIGNAL A crew of di\"",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/deep-signal/phone-screen-title-1.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "story click #70 (7)",
+   "desc": "JS error: Maximum call stack size exceeded (seen in the first full run, seed 88962; not reproduced in the later quick+story re-run, so intermittent)",
+   "repro": "node games-src/scripts/qa-bot.js deep-signal --size phone --seed 88962 --phases story",
+   "shot": ""
+  }
+ ],
+ "secs": 16
+}
