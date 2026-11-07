@@ -244,7 +244,7 @@ def glow(w, h, color=(255, 210, 120), kind='burst', seed=''):
     """FX: soft radial glow with star rays / ring, transparent background."""
     r = random.Random(seed_of(seed)); S = 2
     cv = Image.new('RGBA', (w * S, h * S), (0, 0, 0, 0)); d = ImageDraw.Draw(cv); cx, cy = w * S / 2, h * S / 2; R = min(w, h) * S / 2
-    g = radial(w * S, h * S, color, (0, 0, 0), cx=.5, cy=.5, power=0.9).convert('L').point(lambda v: 255 - v)
+    g = radial(w * S, h * S, (255, 255, 255), (0, 0, 0), cx=.5, cy=.5, power=0.9).convert('L')
     layer = Image.new('RGBA', cv.size, color + (0,)); layer.putalpha(g.point(lambda v: int(v * 0.85))); cv.alpha_composite(layer)
     if kind in ('burst', 'sparkle'):
         n = 8 if kind == 'burst' else 4
