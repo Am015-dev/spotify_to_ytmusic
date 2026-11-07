@@ -32,3 +32,8 @@ Status of the earlier audit (AUDIT-RULES.md): of its 6 "fix before sign-off" ite
 - Exact wording of the 4 almanac sets and the 24 cards (original text not in repo); relied on the earlier audit's comparison.
 - Bonus die face distribution (see above), rat tails past space 27, and the Thick Skin plus Sunroot stacking are interpretations with no source.
 - Whether the rulebook says the rat stone distance is optional ("can") or mandatory: shelf keeps an optional stepper, so either reading is playable.
+
+## Fixed (W391)
+- WRONG purple upgrade removed the chip from the cauldron -> fixed: the old chip stays in the cauldron this round (flag sw) and goes to the supply at clean-up; tests "upgrade does not touch the current round...".
+- MISSING pass up actions -> fixed for the Lucky-seven moss slide (always optional); test "pass up an action". Gentle sigh and Trade wind already offered lower choices; green set 1 ruby count left automatic (declining a free ruby is never useful).
+- MISSING second droplet / test-tube variation: left (optional variant on the cauldron boards, needs board and UI changes).

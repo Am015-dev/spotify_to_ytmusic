@@ -50,7 +50,7 @@ var TT = (typeof TT !== 'undefined') ? TT : {};
   A('a2-measure-hall', 'Measure Hall', 2, 'green', 'S1 W1', { sci: 'scale', vp: 1, gives: 'ruler' }, 'a hall of standard weights and a carved ruler');
   A('a2-open-bazaar', 'Open Bazaar', 2, 'yellow', '$3', { choice: ['glass', 'papyrus'] }, 'a crowded bazaar with glass beads and rolled scrolls');
   A('a2-caravan-post', 'Caravan Post', 2, 'yellow', '$2 G1', { choice: ['wood', 'clay', 'stone'] }, 'a desert caravan resting at a post with loaded camels');
-  A('a2-customs-quay', 'Customs Quay', 2, 'yellow', 'S2', { price: ['glass', 'papyrus'] }, 'a toll gate on a quay with a ledger-keeper');
+  A('a2-customs-quay', 'Customs Quay', 2, 'yellow', '$4', { price: ['glass', 'papyrus'] }, 'a toll gate on a quay with a ledger-keeper');
   A('a2-brewhouse', 'Brewhouse', 2, 'yellow', '', { coin: 6, gives: 'barrel' }, 'giant barrels and a foamy vat in a brewhouse');
   A('a2-horse-yard', 'Horse Yard', 2, 'red', 'C1 W1', { shields: 1, from: 'horse', gives: 'saddle' }, 'riders breaking in horses in a training ring');
   A('a2-barracks', 'Great Barracks', 2, 'red', '$3', { shields: 1, from: 'sword' }, 'a long barracks hall with racks of shields');

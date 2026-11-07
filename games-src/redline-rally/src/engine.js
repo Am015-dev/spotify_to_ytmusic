@@ -6,7 +6,7 @@ function isSpeed(c) { return c >= '1' && c <= '4'; }
 
 function newGame(o) {
   o = o || {}; var trk = TK[o.track || 'sunline'], n = Math.max(2, Math.min(6, o.n || 5));
-  var G = { v: 1, track: trk.id, laps: o.laps || 2, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, cars: [], round: 1, phase: 'plan', pend: null, order: [], ri: 0, adr: [], tick: 0, over: false, rank: [], diff: o.diff || 'normal', hot: o.humans > 1, upg: !!o.upg, drafting: false, pool: null, cl: o.climit || 0, cmp: o.cmp || null };
+  var G = { v: 1, track: trk.id, laps: o.laps || 2, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, cars: [], round: 1, phase: 'plan', pend: null, order: [], ri: 0, adr: [], tick: 0, over: false, rank: [], finN: 0, diff: o.diff || 'normal', hot: o.humans > 1, upg: !!o.upg, drafting: false, pool: null, cl: o.climit || 0, cmp: o.cmp || null };
   var humans = Math.max(0, Math.min(n, o.humans == null ? 1 : o.humans));
   var di = []; for (var d = 0; d < DRIVERS.length; d++) di.push(d); shuffle(G, di);
   for (var i = 0; i < n; i++) {
@@ -69,11 +69,23 @@ function avgSpeed(c) { var s = 0, n = 0; c.deck.concat(c.disc).forEach(function 
 function occ(G, p, except) { var N = T(G).N, k = 0; G.cars.forEach(function (c) { if (c !== except && c.pos % N === p % N) k++; }); return k; }
 function landing(G, c, target) { var t = target; while (t > c.pos && occ(G, t, c) >= 2) t--; return t; }
 function cornersIn(G, a, b) {   /* corner lines crossed moving from space a to space b */
-  var tk = T(G), out = []; for (var p = a + 1; p <= b; p++) { var lim = tk.corners[p % tk.N]; if (lim) out.push({ p: p, idx: p % tk.N, limit: climit(G, lim) }); } return out;
+  var tk = T(G), out = []; for (var p = a + 1; p <= b && p <= total(G); p++) { var lim = tk.corners[p % tk.N]; if (lim) out.push({ p: p, idx: p % tk.N, limit: climit(G, lim) }); } return out;
 }
 function cornerCost(G, a, b, speed, lim) { var s = 0; cornersIn(G, a, b).forEach(function (k) { s += Math.max(0, speed - k.limit - (lim || 0)); }); return s; }
-function rankList(G) {   /* car ids, leader first */
-  return G.cars.map(function (c) { return c.i; }).sort(function (a, b) { var A = G.cars[a], B = G.cars[b]; return (B.pos - A.pos) || (A.tie - B.tie); });
+function rankList(G) {   /* car ids, best first: finishers in finishing order (same round: furthest past the line), then the rest by distance */
+  return G.cars.map(function (c) { return c.i; }).sort(function (a, b) { var A = G.cars[a], B = G.cars[b];
+    if (!!A.fin !== !!B.fin) return A.fin ? -1 : 1;
+    if (A.fin) return (A.fin - B.fin) || (B.pos - A.pos) || (A.tie - B.tie);
+    return (B.pos - A.pos) || (A.tie - B.tie); });
+}
+function racing(G) { return rankList(G).filter(function (i) { return !G.cars[i].fin; }); }
+function adrenalineFor(G) {   /* last car to move each round gets it; the last two when 5+ cars started (rulebook: counted from starting cars) */
+  var r = racing(G), k = G.cars.length >= 5 ? 2 : 1; return r.slice(Math.max(0, r.length - k));
+}
+function discardOptional(G, ci, idxs) {   /* replenish step: discard chosen non-heat, non-stress cards face up, then draw back to a full hand. Plan phase, once per round, before the plan */
+  var c = G.cars[ci]; if (G.phase !== 'plan' || c.plan || c.dsc === G.round) return 'phase';
+  var seen = {}; for (var i = 0; i < idxs.length; i++) { var j = idxs[i], x = c.hand[j]; if (x === undefined || seen[j] || x === 'H' || x === 'X') return 'card'; seen[j] = 1; }
+  c.dsc = G.round; c.disc = c.disc.concat(c.hand.filter(function (x, j) { return seen[j]; })); c.hand = c.hand.filter(function (x, j) { return !seen[j]; }); draw(G, c, HAND); return '';
 }
 function gearOpts(c) { var o = []; for (var g = 1; g <= GEARS; g++) { var d = Math.abs(g - c.gear); if (d <= 2 && (d < 2 || c.eng >= 1)) o.push({ g: g, cost: d === 2 ? 1 : 0 }); } return o; }
 function needCards(c, g) { var k = 0; c.hand.forEach(function (x) { if (x !== 'H') k++; }); return Math.min(g, k); }
@@ -91,12 +103,12 @@ function submitPlan(G, ci, plan) {
   c.hand = c.hand.filter(function (x, j) { return plan.idx.indexOf(j) < 0; });
   c.plan = { gear: plan.gear, cards: cards, boost: !!plan.boost }; return '';
 }
-function needPlans(G) { return G.cars.filter(function (c) { return c.human && !c.plan; }).map(function (c) { return c.i; }); }
+function needPlans(G) { return G.cars.filter(function (c) { return c.human && !c.plan && !c.fin; }).map(function (c) { return c.i; }); }
 
 /* ---- resolving a round ---- */
 function startResolve(G) {
-  G.phase = 'resolve'; G.order = rankList(G); G.ri = 0; G.adr = [];
-  if (G.cars.length >= 3) { var last = G.order[G.order.length - 1], lp = G.cars[last].pos; if (G.cars[G.order[0]].pos - lp >= 2) G.adr = [last]; }
+  G.cars.forEach(function (c) { if (c.fin && c.plan) { c.hand = c.hand.concat(c.plan.cards); c.plan = null; } });   /* a finished car does not play */
+  G.phase = 'resolve'; G.order = racing(G); G.ri = 0; G.adr = adrenalineFor(G);
 }
 function curCar(G) { return G.phase === 'resolve' && G.ri < G.order.length ? G.cars[G.order[G.ri]] : null; }
 
@@ -108,6 +120,11 @@ function resolveNext(G) {
   var c = G.cars[G.order[G.ri]];
   if (!c.plan) c.plan = aiPlan(G, c);
   var pl = c.plan, from = c.pos, cost;
+  if (pl.cards.length < pl.gear) {   /* not enough playable cards: play them all, fill with heat from the hand, do not move, back to gear 1 */
+    var fill = 0; for (var q = c.hand.length - 1; q >= 0 && pl.cards.length + fill < pl.gear; q--) if (c.hand[q] === 'H') { c.hand.splice(q, 1); c.disc.push('H'); fill++; }
+    c.disc = c.disc.concat(pl.cards); c.gear = 1; c.plan = null; c.pl2 = null; c.played = []; draw(G, c, HAND);
+    ev.push({ t: 'stall', car: c.i, cards: pl.cards.length, heat: fill }, { t: 'done', car: c.i }); G.ri++; return ev;
+  }
   /* 1 shift */
   if (pl.gear !== c.gear) { cost = Math.abs(pl.gear - c.gear) === 2 ? 1 : 0; c.eng -= cost; for (var i = 0; i < cost; i++) c.disc.push('H'); c.stats.heat += cost; ev.push({ t: 'shift', car: c.i, from: c.gear, to: pl.gear, cost: cost }); c.gear = pl.gear; }
   /* 2 cooldown: heat cards in hand go back to the engine */
@@ -127,7 +144,7 @@ function resolveNext(G) {
   var move = speed + adr, L0 = landing(G, c, from + move);
   c.pl2 = { speed: speed, from: from, L0: L0, lim: lim };
   /* 5 slipstream offer */
-  var L1 = landing(G, c, L0 + 2), N = T(G).N;
+  var L1 = L0 >= total(G) ? L0 : landing(G, c, L0 + 2), N = T(G).N;
   var near = L1 > L0 && G.cars.some(function (o) { return o !== c && (o.pos % N === L0 % N || o.pos % N === (L0 + 1) % N); });
   ev.push({ t: 'move', car: c.i, from: from, to: L0 });
   if (near) {
@@ -148,7 +165,9 @@ function finishMove(G, c, slip, evSoFar) {
     var k = ks[i], need = Math.max(0, speed - k.limit - (q.lim || 0));
     if (need > c.eng) {   /* spin out: stop behind this corner line, gear 1, stress card */
       var stop = k.p - 1; while (stop > from && occ(G, stop, c) >= 2) stop--; if (stop < from) stop = from;
-      c.pos = stop; c.gear = 1; c.hand.push('X'); c.stats.spins++; spun = true; c.tie = G.tick++;
+      var nst = c.gear >= 3 ? 2 : 1; for (var sk = 0; sk < nst; sk++) c.hand.push('X');
+      if (c.eng) { for (var hh = 0; hh < c.eng; hh++) c.disc.push('H'); c.stats.heat += c.eng; c.eng = 0; }   /* spin out pays ALL engine heat */
+      c.pos = stop; c.gear = 1; c.stats.spins++; spun = true; c.tie = G.tick++;
       ev.push({ t: 'spin', car: c.i, idx: k.idx, limit: k.limit, speed: speed, to: stop, from: L }); break;
     }
     if (need) { c.eng -= need; for (var h = 0; h < need; h++) c.disc.push('H'); c.stats.heat += need; }
@@ -157,12 +176,12 @@ function finishMove(G, c, slip, evSoFar) {
   if (!spun) { c.pos = L; if (L !== from) c.tie = G.tick++; }
   c.plan = null; c.pl2 = null; c.played = [];
   draw(G, c, HAND);
-  if (c.pos >= total(G)) ev.push({ t: 'finish', car: c.i });
+  if (c.pos >= total(G)) { c.fin = ++G.finN; ev.push({ t: 'finish', car: c.i }); }
   ev.push({ t: 'done', car: c.i }); G.ri++;
   return ev;
 }
 function endRound(G, ev) {
-  var fin = G.cars.some(function (c) { return c.pos >= total(G); });
+  var fin = G.cars.every(function (c) { return c.fin; });
   G.cars.forEach(function (c) { c.plan = null; });
   if (fin) { G.phase = 'over'; G.over = true; G.rank = rankList(G); ev.push({ t: 'over', rank: G.rank }); }
   else { G.round++; G.phase = 'plan'; G.order = []; G.ri = 0; ev.push({ t: 'round', round: G.round }); }
