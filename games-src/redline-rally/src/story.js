@@ -6,14 +6,14 @@ var STORY = {
   /* the five lines at the top of Help */
   turn: ['1. Pick a gear: it is how many cards you play.', '2. Tap that many cards. Their numbers add up to your speed.', '3. Press Go. Your car drives that many spaces.', '4. Corners have a speed limit. Go over it and you burn engine heat.', '5. Then every rival takes a turn, one car at a time.'],
   /* quick game */
-  quickIntro: ['Lights out. Brake smart, burn little, cross first.', 'Rain on the horizon. One clean lap wins it.', 'The grid is set. Heat is your fuel: spend it where it counts.'],
+  quickIntro: ['Lights out. Brake smart, burn little, cross first.', 'Rain is coming. One clean lap wins.', 'Heat is fuel. Spend it where it counts.'],
   quickWin: ['You took the flag with fuel to spare.', 'Chequered flag, and it is yours.'],
   quickLose: ['Not today. Brake earlier next time.', 'They got you at the line. Run it back?'],
   /* turn banner + plain instructions */
   yourTurn: 'Your turn',
-  planGear: 'Pick a gear: it is how many cards you play.',
-  planCards: function (n) { return 'Tap ' + n + ' card' + (n > 1 ? 's' : '') + ': their numbers add up to your speed.'; },
-  planGo: 'Happy with that? Press Go!',
+  planGear: 'Pick a gear, then tap cards.',
+  planCards: function (n) { return 'Tap ' + n + ' card' + (n > 1 ? 's' : '') + ': they add up to speed.'; },
+  planGo: 'Press Go!',
   /* tutorial: Prologue "The Sunline Seat". Each step: t = who speaks, s = the story reason + what to do (no "click"), r = the reaction shown next */
   tutTitle: 'Prologue: The Sunline Seat',
   chapters: ['Chapter 1: Your first turn', 'Chapter 2: The wet corner', 'Chapter 3: Heat is fuel', 'Chapter 4: Cool down, catch up', 'Chapter 5: Tuck in behind Kit', 'Chapter 6: The line'],
@@ -55,6 +55,6 @@ var STORY = {
   tutEndText: 'Gear, cards, corners, heat, slipstream, boost. Kit wants a rematch.',
   /* result lines in the game's voice (Quick game) */
   resultWin: 'Flag! Sunline is yours.',
-  resultLose: function (n) { return n + ' takes the flag. Brake earlier next time.'; }
+  resultLose: function (n) { return n + ' takes the flag.'; }
 };
 function pickLine(a) { return a[Math.floor(Math.random() * a.length)]; }

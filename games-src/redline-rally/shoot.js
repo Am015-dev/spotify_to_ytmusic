@@ -11,11 +11,11 @@ for(const [n,vp,t] of [['phone',{width:390,height:763},true],['pc',{width:1440,h
  await p.click('#goB');await p.waitForTimeout(1800);await p.screenshot({path:`${pre}-${n}-4play.png`});
  await p.waitForTimeout(5200);await p.screenshot({path:`${pre}-${n}-5rival.png`});
  await p.evaluate(()=>{window.AIDELAY=.05});
- for(let i=0;i<90;i++){const r=await p.evaluate(()=>!!document.querySelector('#modal .podium'));if(r)break;
+ for(let i=0;i<700;i++){const r=await p.evaluate(()=>!!document.querySelector('#modal .podium'));if(r)break;
   const ok=await p.evaluate(()=>{const g=document.querySelector('#goB');return g&&!g.disabled&&g.offsetParent});
-  if(ok){await p.click('#sugB').catch(()=>{});await p.waitForTimeout(80);await p.click('#goB').catch(()=>{})}
+  const vis=await p.evaluate(()=>{const g=document.querySelector('#goB');return g&&g.offsetParent&&!UI.busy});if(vis){await p.click('#sugB').catch(()=>{});await p.waitForTimeout(80);await p.click('#goB').catch(()=>{})}
   const sl=await p.$('#slipN');if(sl)await sl.click().catch(()=>{});
-  await p.waitForTimeout(400)}
+  await p.waitForTimeout(150)}
  await p.waitForTimeout(600);await p.screenshot({path:`${pre}-${n}-6result.png`});
  console.log(n,'errs',errs.join('|'));await c.close()}
 await b.close();process.exit(0)})();

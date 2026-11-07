@@ -108,7 +108,7 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 @media (max-height:600px){#msg{padding:3px 8px;min-height:26px;font-size:14px}.gb{min-height:38px}#acts button{min-height:40px}}
 
 /* ---- playable pass (W395): turn banner, readable cards, glow/dim, engine pips ---- */
-#banner{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:5;display:none;align-items:center;gap:8px;max-width:calc(100% - 16px);padding:7px 16px;border-radius:999px;background:#121826;border:2px solid var(--bc,#ffc23a);color:#fff;font-weight:900;font-size:17px;line-height:1.2;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.55);pointer-events:none}
+#banner{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:5;display:none;align-items:center;gap:8px;max-width:calc(100% - 16px);padding:7px 16px;border-radius:999px;background:#121826;border:2px solid var(--bc,#ffc23a);color:#fff;font-weight:900;font-size:17px;line-height:1.2;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.55)}
 #banner.on{display:flex;animation:bnIn .3s ease-out}
 #banner i{width:14px;height:14px;border-radius:50%;background:var(--bc,#ffc23a);flex:0 0 auto}
 #banner.round i{display:none}
@@ -138,5 +138,8 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 .turn5{margin:4px 0 10px 20px;padding:0}.turn5 li{margin:4px 0;font-size:16px}
 .podium .rl{margin:6px 8px 0;font-size:16px;line-height:1.35;color:#f1f4fa}
 @media (prefers-reduced-motion:reduce){.cd.glow,#acts .go.glow{animation:none}.cd.glow{box-shadow:0 0 0 2px #ffc23a}}
+.gxt-n{display:none}.gxt-dots i{width:5px;height:5px}
+@media (max-width:600px){#panel{min-height:228px}}
+@media (min-width:900px){:root{--cw:72px}#gears .gl,.cd .k,.cd .t,.gb small,.tray em,.who,#banner,.turn5 li{font-size:16px}#msg{font-size:18px}}
 </style>
 </head>
