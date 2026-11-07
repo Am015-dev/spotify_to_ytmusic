@@ -23,13 +23,14 @@ function opsHTML(ops) {
     return '';
   }).join('');
 }
+const CARD_GLYPH = { item: 'coin', art: 'compass', fear: 'guard' }, CARD_KIND = { item: 'Item', art: 'Artifact', fear: 'Dread' };
 function cardHTML(id, o) {
   o = o || {}; const c = V.CARDS[id], cost = c.t === 'item' ? c.cost + ' ' + ic('coin') : c.t === 'art' ? c.cost + ' ' + ic('compass') : '';
   const lab = c.name + (c.t === 'item' ? ', item, ' + c.cost + ' coins' : c.t === 'art' ? ', artifact, ' + c.cost + ' compasses' : '') + '. ' + c.text + ' Travel: ' + V.TNAME[c.tr] + '.';
   return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="ct"><span class="chip">${cost}</span>${ic(c.tr)}</span>
     <span class="cn">${esc(c.name)}</span>
-    <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true">${esc(c.name.split(' ').map(w => w[0]).join('').slice(0, 2))}</span></span>
+    <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true"><svg class="pg"><use href="#s-${CARD_GLYPH[c.t] || c.tr}"/></svg><span class="pn">${esc(c.name)}</span><span class="pt">${CARD_KIND[c.t] || 'Starter'}</span></span></span>
     ${c.vp ? `<span class="vp">${c.vp > 0 ? c.vp : c.vp}</span>` : ''}
     <span class="fx">${c.t === 'fear' ? '<span class="sm" style="color:#f6e6e6">no effect</span>' : opsHTML(c.ops)}</span></button>`;
 }
@@ -111,4 +112,4 @@ function qHTML(q) {
   if (q.h === 'site') return `<b>Dig without travel</b><span class="sm">Tap a glowing site on the map.</span>${mvBtn({ t: 'ans', v: null }, 'Skip', 'alt')}`;
   return '';
 }
-function toast(t, ms) { const e = $('#toast'); e.textContent = t; toast.n = (toast.n || 0) + 1; e.className = 'on t' + toast.n; clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2200); }
+function toast(t, ms) { const e = $('#toast'); e.textContent = t; try { const d = $('#dock').getBoundingClientRect(); if (d.width > 0) { e.style.top = (d.top + 4) + 'px'; e.style.left = (d.left + d.width / 2) + 'px'; e.style.maxWidth = Math.max(200, d.width - 24) + 'px'; } } catch (x) { } toast.n = (toast.n || 0) + 1; e.className = 'on t' + toast.n; clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2200); }
