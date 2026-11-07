@@ -121,3 +121,5 @@ button{font:inherit;color:inherit}
 }
 @media (min-width:1000px){#mk{grid-template-columns:1fr 1fr}.mt{height:100px}.mt svg{height:96px}.mk{width:60px;height:60px}.mk svg{width:56px;height:56px}}
 @media (max-width:999px){#barstat .pill+.pill{display:none}.gx-bar{gap:4px;padding:4px 6px}.gx-ibtn{min-width:44px;padding:4px 6px}}
+@media (min-width:1000px){.held svg{height:64px}}
+html.wm-coach #line{display:none}

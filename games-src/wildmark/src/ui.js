@@ -224,7 +224,7 @@ function renderDock() {
         if (me.acorns > 0) a += '<button type="button" class="ab" id="freeB">Acorn: free pick</button><button type="button" class="ab" id="wipeB">Acorn: replace</button>';
       }
     } else if (G.stage === 'tile') {
-      a += '<span class="held">' + mkTile(G.hold.tile, 18) + mkTok(G.hold.tok) + '</span>';
+      a += '<span class="held">' + mkTile(G.hold.tile, 24) + mkTok(G.hold.tok) + '</span>';
       if (UI.ghost) { if (G.hold.tile.t.length > 1) a += '<button type="button" class="ab" id="rotB" aria-label="Turn the tile">&#8635; Turn</button>'; a += '<button type="button" class="ab pri" id="okB">Place</button>'; }
       if (UI.undo) a += '<button type="button" class="ab" id="undoB">Back</button>';
     } else if (G.stage === 'tok') {

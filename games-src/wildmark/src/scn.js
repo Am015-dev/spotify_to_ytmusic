@@ -2,7 +2,7 @@
 (function () {
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof UI !== 'undefined' && !!window.GX && !!GX.app; };
-  function begin(o) { UI.fast = true; window.ANIM = false; UI.mode = 'quick'; return newGame(o); }
+  function begin(o) { UI.fast = true; window.ANIM = false; UI.mode = 'quick'; try { GXH.setEnabled(false); } catch (e) { } return newGame(o); }
   var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   GXS.boardOpen = function () { if (!booted()) return; try { GXH.setEnabled(true); } catch (e) { } UI.mode = 'quick'; newGame({ np: 2, humans: 1, ai: 'normal' }); };
   GXS.add({
