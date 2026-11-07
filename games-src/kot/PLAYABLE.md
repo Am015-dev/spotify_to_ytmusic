@@ -29,3 +29,8 @@ for the human's own result was not added. Monster names are not drawn over the 3
 - Round 2 (W386b): coached run PASS at 390x763 and 1440x860; rules test wired into build-all (`rules-test.js`, 7 cases); `window.GXCOACH={running,explained,done}` for qa-bot; guard OK after merging the base.
 - ui-audit after round 2 (phone / phone-s / pc): A 0/0/0, F 0/0/0 (player chips are tabs, one primary title button), C 0/1/0, D 2/4/2, E 1/0/1, B 23/19/31. NOT zero: B (contrast heuristics: mostly the 2D fallback board's SVG text, which the audit sees because headless Chrome has no WebGL, die numerals on cream faces, and shared story-map headings), D (a monster body colour and a 1px label sprite), E (the first-time hint 'Got it' and the news button count as dead), C (shared story-bar image drawn 2x).
 - Problem #10 (stacked first-turn tips) is improved: in the coached game the old hint bubbles and the board finger are off, so only Dot's bubble shows.
+
+## Round 3 (W386c)
+- The coached game is short: it ends at 6 stars (`G.goal`, real games stay at 20; rules test covers it). qa-bot tutorial phase: coached game finished (GXCOACH.done), 0 blockers, 0 majors.
+- ui-audit (phone / phone-s / pc): A 0/0/0, F 0/0/0; B 12/12/17, C 1/1/0, D 2/4/2, E 1/0/1 (NOT zero). Done this round: plates behind the fallback board's SVG text, dark numerals on cream dice, dark plates under story-map headings, lighter dark meshes. Left: some fallback-board labels the audit still measures low, the shared story bar image (drawn 2.3x), a monster body mesh, a 1px label sprite, the shared help kit's 'Got it'.
+- 1440x860 after-shots added to `playable-shots/` (desktop-*.webp).
