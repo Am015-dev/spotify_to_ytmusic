@@ -21,7 +21,7 @@ function selectOffer(k) {
   if (bp) { UI.o = bp[0]; UI.gx = bp[1]; UI.gy = bp[2]; } else { UI.o = 0; var b = bbox(p.or[0]); UI.gx = Math.floor((9 - b[0]) / 2); UI.gy = Math.floor((9 - b[1]) / 2); }
   render();
 }
-function showPatchSoft(pid, k) { var dt = $('#detail'); var p = PATCHES[pid]; if (dt) dt.innerHTML = '<b>' + p.name + '</b>: ' + p.n + ' squares, cost ' + p.cost + ', time ' + p.time + ', income ' + p.inc + '. Tap it again to see it large.'; UI.softK = k; }
+function showPatchSoft(pid, k) { var dt = $('#detail'); var p = PATCHES[pid]; if (dt) dt.innerHTML = '<b>' + p.name + '</b>: tap again to read it.'; UI.softK = k; }
 function cancelSel() { UI.sel = -1; render(); }
 function xform(f) { var p = curPatch(), c = curCells(); if (!p) return; var b0 = bbox(c), cx = UI.gx + b0[0] / 2, cy = UI.gy + b0[1] / 2, n = swNorm(c.map(f)), k = JSON.stringify(n), idx = -1; p.or.forEach(function (o, i) { if (JSON.stringify(o) === k) idx = i; }); if (idx < 0) return; UI.o = idx; var b = bbox(n); UI.gx = Math.round(cx - b[0] / 2); UI.gy = Math.round(cy - b[1] / 2); clampG(); sfx('rot'); }
 function rotate() { if (!tutAct({ what: 'rot' })) return; xform(function (q) { return [-q[1], q[0]]; }); snapNear(true); drawGhost(); renderDockLight(); }

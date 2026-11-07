@@ -36,7 +36,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
   }
   await pg.goto(base); await pg.waitForTimeout(500);
   if (!TUT && !STORY) {
-    await tapSel('[data-a=quick]'); await pg.waitForTimeout(150); await pg.click('text=Start the game'); await pg.waitForTimeout(300);
+    await tapSel('[data-a=quick]'); await pg.waitForTimeout(150); await pg.click('text=Normal computer'); await pg.waitForTimeout(300);
     ok(await pg.evaluate(() => !!G && UI.started), 'game started from the title');
     const kinds = []; let n = 0;
     while (n < (FULL ? 200 : 3)) { const k = await turn(); if (k === 'over') break; kinds.push(k); n++; const e = await pg.evaluate(() => swCheck(G)); if (e) { ok(false, 'invariant ' + e); break; } if (n === 2) await pg.screenshot({ path: path.join(OUT, tag + '-mid.png') }); }

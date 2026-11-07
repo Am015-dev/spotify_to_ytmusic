@@ -76,7 +76,7 @@ function placeTokens() { var t = $('#track'); if (!t) return; var top = G.stamp[
   [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', t); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (last[s] !== G.pos[s] && amt(1)) { k.style.transition = 'none'; at(k, last[s], s); void k.offsetWidth; k.style.transition = ''; } at(k, G.pos[s], s); }); }
 function trackInfo() {
   var s = swWho(G), me = s >= 0 ? s : 0, pos = G.pos[me], nb = null, nl = null; SW.BTN_SPOTS.forEach(function (b) { if (nb === null && b > pos) nb = b; }); SW.LEATHER_SPOTS.forEach(function (l, i) { if (nl === null && l > pos && G.leather[i] === null) nl = l; });
-  return 'Next button spot in ' + (nb == null ? '-' : nb - pos) + ' · next leather patch in ' + (nl == null ? '-' : nl - pos) + ' · ' + (SW.TRACK - pos) + ' time left';
+  return 'Button spot in ' + (nb == null ? '-' : nb - pos) + ' \u00B7 leather in ' + (nl == null ? '-' : nl - pos);
 }
 // ---------- render everything
 function render() {
@@ -110,7 +110,7 @@ function renderDock() {
   if (!hum) { pr.textContent = nameOf(s) + ' is choosing…'; return; }
   if (UI.sel >= 0) {
     var pid = off[UI.sel], p = PATCHES[pid], ok = ghostOk(); pr.textContent = 'Drag it onto your quilt';
-    dt.innerHTML = '<b>' + p.name + '</b>: ' + p.n + ' squares. Costs ' + p.cost + ' buttons, takes ' + p.time + ' time, earns ' + p.inc + ' button' + (p.inc === 1 ? '' : 's') + ' at each button spot.';
+    dt.innerHTML = '<b>' + p.name + '</b>: ' + p.n + ' squares, cost ' + p.cost + ', time ' + p.time;
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'rot', 'aria-label': 'Rotate' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/></svg>' }), 'Rotate'));
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'flip', 'aria-label': 'Flip' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M12 3v18M8 7L3 12l5 5zM16 7l5 5-5 5z"/></svg>' }), 'Flip'));
     ac.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'sew', disabled: ok ? null : 'disabled' }, 'Sew it on'));
@@ -119,6 +119,6 @@ function renderDock() {
     pr.textContent = 'Pick a patch, or advance your token';
     var st = swAdvSteps(G, s), o = nameOf(1 - s);
     ac.appendChild(h('button.btn.adv.grow', { type: 'button', 'data-a': 'adv', title: 'Move your token just ahead of ' + o + ' and take ' + st + ' button' + (st === 1 ? '' : 's') }, 'Advance +' + st + ' button' + (st === 1 ? '' : 's')));
-    dt.textContent = trackInfo() + '.';
+    dt.textContent = trackInfo();
   }
 }

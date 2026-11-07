@@ -16,14 +16,14 @@ function showStart(view) {
   try { GX.showDock && 0; } catch (e) { }
 }
 function renderSetup(st) {
-  var S = UI.setup || (UI.setup = { lvl: UI.lvl || 'normal', mode: 'vs' });
-  var card = h('div.card'); card.innerHTML = '<h2>Quick game</h2><p class="sub">33 patches, 9×9 quilts, 53 spaces of time.</p>';
-  var seg = function (vals, cur, cb) { var d = h('div.seg'); vals.forEach(function (v) { var b = h('button' + (v[0] === cur ? '.on' : ''), { type: 'button' }, v[1]); b.onclick = function () { cb(v[0]); renderSetup(st); }; d.appendChild(b); }); return d; };
-  card.appendChild(h('div.row', h('label', 'Who plays'), seg([['vs', 'You vs computer'], ['hot', 'Two players']], S.mode, function (v) { S.mode = v; })));
-  if (S.mode === 'vs') card.appendChild(h('div.row', h('label', 'Computer strength'), seg([['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], S.lvl, function (v) { S.lvl = v; })));
-  var go = h('button.btn.go', { type: 'button', style: 'width:100%;margin-top:6px' }, 'Start the game'); go.onclick = function () { UI.lvl = S.lvl; newGame(S.mode, { lvl: S.lvl }); };
-  var back = h('button.btn.alt', { type: 'button', style: 'width:100%;margin-top:8px' }, 'Back'); back.onclick = function () { showStart(); };
-  card.appendChild(go); card.appendChild(back); st.innerHTML = ''; st.appendChild(card);
+  var card = h('div.card'); card.innerHTML = '<h2>Quick game</h2><p class="sub">Pick your opponent. 33 patches, 9\u00D79 quilts, 53 spaces of time.</p>';
+  var m = h('div.menu'), opt = function (label, small, cls, f) { var b = h('button.btn' + cls, { type: 'button' }, label, h('small', small)); b.onclick = f; m.appendChild(b); };
+  opt('Easy computer', 'Gentle and a little careless: a good first match', '.go', function () { UI.lvl = 'easy'; newGame('vs', { lvl: 'easy' }); });
+  opt('Normal computer', 'Tidy quilts and sensible timing', '', function () { UI.lvl = 'normal'; newGame('vs', { lvl: 'normal' }); });
+  opt('Hard computer', 'Looks ahead at your replies. Beats a naive player about 9 in 10', '', function () { UI.lvl = 'hard'; newGame('vs', { lvl: 'hard' }); });
+  opt('Two players', 'Pass the screen: both quilts stay in the open', '.alt', function () { newGame('hot', {}); });
+  opt('Back', '', '.alt', function () { showStart(); });
+  card.appendChild(m); st.innerHTML = ''; st.appendChild(card);
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return; var a = t.dataset.a;
