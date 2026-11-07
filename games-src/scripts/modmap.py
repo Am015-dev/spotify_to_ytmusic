@@ -39,6 +39,7 @@ GAMES = {
     "thornbound":       ("Thornbound",       "thornbound/game",     "thornbound"),
     "tidewake":         ("Tidewake",         "tidewake/game",       "tidewake"),
     "twin-thrones":     ("Twin Thrones",     "twin-thrones",        "twin-thrones"),
+    "vinegrave":        ("Vinegrave",        "vinegrave",           "vinegrave"),
     "mainhattan-nightrun": ("Mainhattan Nightrun", "nightrun/parts", "nightrun"),
 }
 MAP_DIR = {"mainhattan-nightrun": "nightrun"}   # where MODULES.md goes when not the build dir

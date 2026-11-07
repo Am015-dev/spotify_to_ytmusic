@@ -56,7 +56,7 @@ function mvBtn(m, label, cls) { return `<button type="button" class="btn ${cls |
 function render() {
   if (!G) return; UI.mv = []; const L = legal(), q = G.q && myTurn() ? G.q : null, me = G.p[UI.view];
   const actor = VG.actor(G);
-  $('#barstat').textContent = G.phase === 'over' ? 'Game over' : 'Round ' + G.round + ' of ' + G.rounds;
+  $('#barstat').textContent = G.phase === 'over' ? 'Game over' : (UI.camp ? 'Stage ' + UI.camp.id.slice(1) + ' · ' : '') + 'Round ' + G.round + '/' + G.rounds;
   // opponents strip
   $('#opp').innerHTML = G.p.map((p, i) => `<button type="button" class="op${actor === i ? ' now' : ''}${p.passed ? ' passed' : ''}" data-gx="scored" aria-label="${esc(p.name)}: ${VG.score(G, i).total} points${p.passed ? ', passed' : ''}"><span class="dot" style="background:${HEX[i]}"></span><span>${esc(p.name)}</span><span class="vp">${VG.score(G, i).total}</span>${ic('star', 'points')}<span class="chip">${p.ex}<span class="ic" aria-label="explorers"><svg viewBox="0 0 20 28" style="color:${HEX[i]}"><use href="#s-meep"/></svg></span></span></button>`).join('')
     + (G.rival ? `<button type="button" class="op" data-gx="scored" aria-label="${esc(G.rival.name)}: ${VG.rivalScore(G)} points"><span class="dot" style="background:#888"></span><span>${esc(G.rival.name)}</span><span class="vp">${VG.rivalScore(G)}</span>${ic('star', 'points')}</button>` : '');

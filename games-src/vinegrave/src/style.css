@@ -152,3 +152,5 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sct td,.sct th{padding:4px;text-align:right;border-bottom:1px solid rgba(0,0,0,.1)}.sct td:first-child,.sct th:first-child{text-align:left}.sct{width:100%;border-collapse:collapse}
 .rules h3{margin:12px 0 4px}.rules p,.rules li{margin:4px 0}
 html.gx-reduce .fxcard,html.gx-reduce .site.flip{animation:none}
+/* taps and hit tests always land on the button itself, never on an icon inside it */
+.site *,.cd *,.op *,.tag *,#track *,.ic svg{pointer-events:none}

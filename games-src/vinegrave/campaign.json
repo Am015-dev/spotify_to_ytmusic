@@ -233,10 +233,10 @@
      }
     },
     {
-     "text": "Score 35 or more",
+     "text": "Score 33 or more",
      "test": {
       "k": "score",
-      "v": 35
+      "v": 33
      }
     }
    ],
@@ -308,10 +308,10 @@
      }
     },
     {
-     "text": "Score 35 or more",
+     "text": "Score 33 or more",
      "test": {
       "k": "score",
-      "v": 35
+      "v": 33
      }
     }
    ],
@@ -364,13 +364,13 @@
    "twist": null,
    "goal": {
     "type": "score",
-    "value": 40,
-    "text": "Win with 40 points or more."
+    "value": 35,
+    "text": "Win with 35 points or more."
    },
    "hints": false,
    "stars": [
     {
-     "text": "Win with 40+",
+     "text": "Win with 35+",
      "test": {
       "k": "won"
      }
@@ -383,10 +383,10 @@
      }
     },
     {
-     "text": "Score 50 or more",
+     "text": "Score 45 or more",
      "test": {
       "k": "score",
-      "v": 50
+      "v": 45
      }
     }
    ],
@@ -530,10 +530,10 @@
      }
     },
     {
-     "text": "Score 45 or more",
+     "text": "Score 40 or more",
      "test": {
       "k": "score",
-      "v": 45
+      "v": 40
      }
     },
     {
@@ -605,10 +605,10 @@
      }
     },
     {
-     "text": "Score 45 or more",
+     "text": "Score 40 or more",
      "test": {
       "k": "score",
-      "v": 45
+      "v": 40
      }
     },
     {
@@ -684,10 +684,10 @@
      }
     },
     {
-     "text": "Score 35 or more",
+     "text": "Score 33 or more",
      "test": {
       "k": "score",
-      "v": 35
+      "v": 33
      }
     },
     {
@@ -765,10 +765,10 @@
      }
     },
     {
-     "text": "Score 50 or more",
+     "text": "Score 45 or more",
      "test": {
       "k": "score",
-      "v": 50
+      "v": 45
      }
     }
    ],
@@ -850,10 +850,10 @@
      }
     },
     {
-     "text": "Score 55 or more",
+     "text": "Score 48 or more",
      "test": {
       "k": "score",
-      "v": 55
+      "v": 48
      }
     }
    ],

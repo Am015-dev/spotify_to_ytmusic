@@ -125,8 +125,7 @@ function helpInit() {
   if (!window.GXH) return;
   const P = (t) => () => `<svg viewBox="0 0 24 24" width="48" height="48"><use href="#s-${t}"/></svg>`;
   GXH.init({ game: 'vinegrave', defaultOn: true,
-    steps: { turn: { target: () => $('#map'), title: 'One action a turn', text: 'Tap anything that glows: a card, a site, the market or the research track.', pic: P('leaf') },
-      guard: { target: () => $('.site .gd'), title: 'A guardian wakes', text: 'Overcome it for 5 points, or flee at round end with a Dread card.', pic: P('guard') },
+    steps: { guard: { target: () => $('.site .gd'), title: 'A guardian wakes', text: 'Overcome it for 5 points, or flee at round end with a Dread card.', pic: P('guard') },
       idol: { target: () => $('#extra [data-a=idol]'), title: 'You found an idol', text: 'Keep it for 3 points, or set it in a shrine for a boon.', pic: P('idol') },
       'q-exile': { target: () => $('#qbox'), title: 'Exile a card', text: 'Removing Dread cards makes your deck stronger.', pic: P('exile') } },
     rules: [{ title: 'The goal', text: 'Five rounds. Points from research, temple, idols, guardians and cards. Dread costs 1 each.', pic: P('star') },
