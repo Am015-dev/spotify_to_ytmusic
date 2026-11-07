@@ -39,25 +39,25 @@ const TUT_REROLL=[3,0];
 const TUT_ME=[{s:2,t:'S'},{s:1,t:'S'}];
 const dialIx=(s,m)=>dialOf(s).findIndex(x=>x.s===m.s&&x.t===m.t&&(m.d==null||x.d===m.d));
 const tutRound=()=>Math.max(1,Math.min(2,G?G.round:1));
-{const o=rollN;rollN=function(faces,n){if(TUT.on&&G&&G.tut&&TUT.dice.length){const k=faces===ATK_FACES?'a':faces===DEF_FACES?'d':'';
+{const o=rollN;rollN=function(faces,n){if(TUT.on&&!TUT.free&&G&&G.tut&&TUT.dice.length){const k=faces===ATK_FACES?'a':faces===DEF_FACES?'d':'';
     if(k&&TUT.dice[0].k===k){const q=TUT.dice.shift().f.slice(0,n);while(q.length<n)q.push(faces[rnd(8)]);return q}}
   return o.apply(this,arguments)}}
-{const o=aiPlan;aiPlan=function(k){if(!(G&&G.tut&&k===1))return o.apply(this,arguments);
+{const o=aiPlan;aiPlan=function(k){if(!(G&&G.tut&&!TUT.free&&k===1))return o.apply(this,arguments);
     for(const s of alive().filter(x=>x.side===1)){const i=dialIx(s,TUT_FOE[tutRound()-1].m);if(i>=0)s.dial=i;else return o.apply(this,arguments)}}}
-{const o=aiAction;aiAction=function(s,acts){if(!(G&&G.tut&&s.side===1))return o.apply(this,arguments);const a=TUT_FOE[tutRound()-1].act;acts=acts||actionsFor(s);return a&&acts.some(x=>x.a===a)?[a]:['skip']}}
-{const o=suggestDial;suggestDial=function(s){if(G&&G.tut&&s.side===0){const i=dialIx(s,TUT_ME[tutRound()-1]);if(i>=0)return i}return o.apply(this,arguments)}}
+{const o=aiAction;aiAction=function(s,acts){if(!(G&&G.tut&&!TUT.free&&s.side===1))return o.apply(this,arguments);const a=TUT_FOE[tutRound()-1].act;acts=acts||actionsFor(s);return a&&acts.some(x=>x.a===a)?[a]:['skip']}}
+{const o=suggestDial;suggestDial=function(s){if(G&&G.tut&&!TUT.free&&s.side===0){const i=dialIx(s,TUT_ME[tutRound()-1]);if(i>=0)return i}return o.apply(this,arguments)}}
 {const o=rnd;rnd=function(n){if(TUT.on&&G&&G.tut&&TUT.force&&TUT.force.length&&n===8)return TUT.force.shift();return o.apply(this,arguments)}}
-{const o=applyAtkMod;applyAtkMod=function(k,sel){if(TUT.on&&G&&G.tut&&k==='tl'&&sel&&sel.length)TUT.force=TUT_REROLL.slice(0,sel.length);return o.apply(this,arguments)}}
+{const o=applyAtkMod;applyAtkMod=function(k,sel){if(TUT.on&&!TUT.free&&G&&G.tut&&k==='tl'&&sel&&sel.length)TUT.force=TUT_REROLL.slice(0,sel.length);return o.apply(this,arguments)}}
 {const o=save;save=function(){if(TUT.on&&G&&G.tut)return;return o.apply(this,arguments)}}
-{const o=guided;guided=function(){return tutOn()?false:o()}}
-{const o=coachKey;coachKey=function(){return tutOn()?null:o()}}
+{const o=guided;guided=function(){return tutOn()||TUT.coach?false:o()}}
+{const o=coachKey;coachKey=function(){return tutOn()||TUT.coach?null:o()}}
 function tutStage(){
   window.TUTPH=true;try{PHN.apply()}catch(e){}   // every step points at the board-first layer: desktop and tablets get it for the lesson
   try{boot3D()}catch(e){}
   if(typeof NET!=='undefined'&&NET.on)netLeave(true);
-  TUT.on=true;TUT.dice=TUT_DICE();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
+  TUT.on=true;TUT.free=true;TUT.dice=[];coachReset();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
   Object.assign(UI,{mode:'solo',camp:null,info:false,stats:false,rules:false,build:null,draft:{},pass:null,sel:null,sugCache:null,autoSetup:false,advOpen:false,hints:false,hold:null,holdK:[],paused:false,sumSeen:0});
-  newGame({fac:[0,1],players:[{human:true},{human:false,lvl:'hard'}],squads:TUT_SQ.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))),ex:{noRocks:true},seed:TUT.seed});
+  newGame({fac:[0,1],players:[{human:true},{human:false,lvl:'easy'}],squads:TUT_SQ.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))),ex:{noRocks:true},seed:TUT.seed});
   G.tut=1;G.rocks.push(Object.assign({},TUT_ROCK,{k:TUT_ROCK.k.slice()}));
   while(G.phase==='ask'&&G.q&&G.q.key==='deploy'&&G.round===0){const q=G.q;resolveAsk(q.opts[Math.floor(q.opts.length/2)].k);if(G.q&&G.q.kid===q.kid)break}
   const me=G.ships.find(s=>s.side===0),foe=G.ships.find(s=>s.side===1);
@@ -74,37 +74,11 @@ const tutPlan=()=>!!(G&&BF.on&&G.phase==='plan'&&planSide()>=0&&!UI.hold&&tutIdl
 const tutMyTurn=ph=>!!(G&&BF.on&&G.phase===ph&&G.cur==='s1'&&humanTurn()&&tutIdle());
 const tutHoldRes=who=>!!(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&UI.hold.R[who]==='s1');
 const tutIx=n=>{const s=ship('s1');return s?dialIx(s,TUT_ME[n]):-1};
-function tutSteps(){return [
- // ---- round 1: goal, plan, reveal, order, action, shot, dice, damage
- {id:'goal',title:'Your goal',say:'Destroy the enemy ship. Yours is at the bottom, theirs at the top.',target:shipRect('s2'),also:shipRect('s1'),wait:null,ready:()=>tutPlan()&&G.round===1},
- {id:'ship',title:'Plan in secret',say:'Everyone picks a move in secret first. Tap your ship to see its moves.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
- {id:'marks',title:'Red and rocks',say:'Red moves give a stress token. ! marks an asteroid: it hurts and skips your action.',target:tq('.bfm.danger'),also:tqAll('.bfm.danger,.bfm.r'),wait:null,ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm.danger')&&!!hv('.bfm.r')},
- {id:'dial',title:'Pick a maneuver',say:'Number is speed, arrow is direction, green is easy. Tap the green straight 2.',target:()=>hv('.bfm[data-bfm="'+tutIx(0)+'"]'),wait:{type:'tap',match:a=>a.what==='dial'&&a.i===tutIx(0)},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm[data-bfm="'+tutIx(0)+'"]')},
- {id:'fly',title:'Reveal the dials',say:'Dials stay secret until everyone is set. Tap Fly to reveal them.',target:tq('[data-bf=fly]'),wait:{type:'tap',match:a=>a.what==='fly'},ready:()=>tutPlan()&&!!hv('[data-bf=fly]:not([disabled])')},
- {id:'order',title:'Skill sets the order',say:'Lowest pilot skill flies first: Slate (3), then Kael (8). The highest shoots first.',target:shipRect('s1'),also:shipRect('s2'),wait:null,ready:()=>tutMyTurn('action')&&G.round===1},
- {id:'action',title:'One action',say:'After moving, a ship gets one action: focus, evade, lock, roll or boost. Tap Focus.',target:tq('.bfact[data-bfa="F"]'),wait:{type:'tap',match:a=>a.what==='action'&&a.a==='F'},ready:()=>tutMyTurn('action')&&!!hv('.bfact[data-bfa="F"]')},
- {id:'shoot',title:'Take your shot',say:()=>{try{const s=ship('s1'),w=weaponsFor(s)[0],t=w.targets[0],sd=shotDice(s,w,t,ship(t.id));return `In your arc at range ${t.rg}: you roll ${sd.atk} dice, it rolls ${sd.def}. Tap it.`}catch(e){return 'The enemy is in your arc. Tap it to shoot.'}},
-   target:tq('.bftgt'),wait:{type:'tap',match:a=>a.what==='fire'&&a.t==='s2'},ready:()=>tutMyTurn('target')&&!!hv('.bftgt')},
- {id:'dice',title:'Your attack dice',say:'Hit and crit deal damage. A focus result does nothing, unless you spend focus.',target:tq('#bfdice'),wait:null,ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&humanTurn()&&hv('#bfdice')&&tutIdle())},
- {id:'usefocus',title:'Spend your focus',say:'Your focus token turns the focus result into a hit.',target:tq('#bfbtns [data-act=amod][data-k=focus]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='focus'},ready:()=>!!hv('#bfbtns [data-act=amod][data-k=focus]')},
- {id:'roll',title:'Roll the defence',say:'Nothing else to improve. Tap Roll: the enemy then rolls its defence dice.',target:tq('#bfbtns [data-act=amod][data-k=done]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='done'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&G.atk.dice.length&&!G.atk.dice.includes('focus')&&hv('#bfbtns [data-act=amod][data-k=done]'))},
- {id:'res1',title:'Hits minus evades',say:'Each evade cancels one hit. Slate spent its evade token: one hit gets through.',target:tq('#bfdice'),wait:null,hold:c=>c==='res',ready:()=>tutHoldRes('a')&&!!hv('#bfdice'),onNext:()=>releaseHold()},
- {id:'defend',title:'Pilot power',say:'Slate fires back. Kael may turn one focus result into an evade. Tap it.',target:tq('#bfbtns [data-act=dmod][data-k=kael]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='dmod'&&a.k==='kael'},ready:()=>!!(G&&G.phase==='dmod'&&G.atk&&G.atk.d==='s1'&&humanTurn()&&hv('#bfbtns [data-act=dmod][data-k=kael]'))},
- {id:'res2',title:'Shields go first',say:'Damage strips shields before hull. Unused focus and evade tokens vanish at round end.',target:tq('#bfdice'),wait:null,hold:c=>c==='res',ready:()=>tutHoldRes('d')&&!!hv('#bfdice'),onNext:()=>releaseHold()},
- // ---- round 2: stress, target lock and the reroll, a point-blank shot, victory
- {id:'auto',title:'Round 2',say:'Tap Auto: the computer suggests a move for each ship. You can always choose your own.',target:tq('[data-bf=auto]'),wait:{type:'tap',match:a=>a.what==='auto'},ready:()=>tutPlan()&&G.round===2&&!!hv('[data-bf=auto]')},
- {id:'fly2',title:'Fly again',say:'Tap Fly. Slate has the lower skill, so it moves before you.',target:tq('[data-bf=fly]'),wait:{type:'tap',match:a=>a.what==='fly'},ready:()=>tutPlan()&&G.round===2&&!!hv('[data-bf=fly]:not([disabled])')},
- {id:'stress',title:'Red means stress',say:'Slate flew a red K-turn: stress token, no action, and it now faces away.',target:shipRect('s2'),also:shipRect('s1'),wait:null,ready:()=>tutMyTurn('action')&&G.round===2},
- {id:'lock',title:'Target lock',say:'A lock lets you reroll attack dice against that enemy. Tap Lock.',target:tq('.bfact[data-bfa="TL"]'),wait:{type:'tap',match:a=>a.what==='action'&&a.a==='TL'},ready:()=>tutMyTurn('action')&&!!hv('.bfact[data-bfa="TL"]')},
- {id:'shoot2',title:'Point blank',say:'Range 1 adds an attack die. Slate faces away, so it cannot shoot back. Tap it.',target:tq('.bftgt'),wait:{type:'tap',match:a=>a.what==='fire'&&a.t==='s2'},ready:()=>tutMyTurn('target')&&!!hv('.bftgt')},
- {id:'reroll',title:'Spend your lock',say:'Two blanks. Spend the lock to roll them again.',target:tq('#bfbtns [data-act=amod][data-k=tl]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='tl'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&hv('#bfbtns [data-act=amod][data-k=tl]'))},
- {id:'confirm',title:'Choose the dice',say:'The blank dice are ticked. Tap Reroll to roll just those.',target:tq('#bfbtns [data-bfq=ok]'),wait:{type:'tap',match:a=>a.what==='ask'&&a.k==='ok'},
-   ready:()=>{try{if(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'&&!G.atk.pre){const bl=G.atk.dice.map((f,i)=>f==='blank'?i:-1).filter(i=>i>=0);const sel=G.q.opts.filter(o=>/^☑/.test(o.l)).length;
-       if(sel<bl.length){const k='t'+bl[sel];if(G.q.opts.some(o=>o.k===k))uiAct({act:'ask',k});return false}G.atk.pre=1}}catch(e){}
-     return !!(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'&&G.atk.pre&&hv('#bfbtns [data-bfq=ok]'))}},
- {id:'roll2',title:'Roll and finish',say:'Better dice. Tap Roll to see if Slate survives.',target:tq('#bfbtns [data-act=amod][data-k=done]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='done'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&G.atk.rr&&G.atk.rr.some(Boolean)&&hv('#bfbtns [data-act=amod][data-k=done]'))},
- {id:'win',title:'Victory',say:'No enemy ships left. The battle ends when every ship on one side is destroyed. You won!',target:tq('#bftop'),wait:null,ready:()=>!!(G&&G.winner&&BF.on&&!UI.stats&&hv('#bftop')&&tutIdle())}
-]}
+function tutSteps(){return tutStory([
+ {id:'ship',title:'Plan in secret',say:'Touch your ship to see where it can fly.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
+ {id:'dial',title:'Pick a maneuver',say:'Any line you like. Green is easy, red strains the engines.',target:()=>hv('.bfm:not(.set)'),also:tqAll('.bfm:not(.set)'),wait:{type:'tap',match:a=>a.what==='dial'},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm:not(.set)')}
+])}
+function tutStory(steps){for(const st of steps){const L=LORE.tut[st.id];if(L){st.title=L.t;st.say=L.s}}return steps}
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
 // the games call this from their input handlers BEFORE applying the tap; false = not what the step asks
@@ -114,17 +88,53 @@ function storyOpen(){if(typeof GXC==='undefined')return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
 function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   tutClearOffer();
-  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:o?'Plan, fly, act, shoot, defend. Now the Story begins.':'Plan, fly, act, shoot, defend. Shields, hull, stress and locks come with you.',
-    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+  GXT.start({game:TUT_GAME,steps:tutSteps(),story:false,
+    endTitle:LORE.coachIntro.title,endText:LORE.coachIntro.text,endButtons:[{id:'free',label:LORE.coachIntro.btn}],
     setup:()=>{try{GX.close()}catch(e){}try{toggleMenu(false)}catch(e){}try{GXC.close()}catch(e){}try{GXH.hide()}catch(e){}tutStage()},
-    onDone:r=>{tutLeave();const c=r&&r.choice;lsPlayed();
-      if(c==='chapter'&&first){GXC.play(first.id)}
-      else if(c==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}
-      else startGame('solo')},
+    onDone:()=>{coachStart(o,first)},
     onExit:()=>{tutLeave();UI.info=true;render()}})}
+// ---------------------------------------------------------------- the coached game: free play, the guide speaks when a rule first matters
+const NCH={shown:{},q:[],cur:null,on:false,o:null,first:null,tm:0};
+function coachReset(){NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
+function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{GXT.markDone(TUT_GAME)}catch(e){}coachSay('goal');coachSay('fly0');render()}
+function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;NCH.q.push(id);coachPump()}
+function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;let e=document.getElementById('na-coach');
+  if(!e){e=document.createElement('div');e.id='na-coach';e.setAttribute('data-help','');e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e)}
+  e.className=(L.who==='slate'?'na-slate':'');e.innerHTML='<i class="na-por"></i><div class="na-ct"><b>'+L.t+'</b><span>'+L.s+'</span><button type="button" class="na-lv" data-na="leave">Leave lesson</button></div><button type="button" class="na-cx" data-na="dismiss" aria-label="Dismiss">\u2715</button>';e.hidden=false;
+  clearTimeout(NCH.tm);NCH.tm=setTimeout(coachHide,Math.max(5200,L.s.length*70))}
+function coachHide(){clearTimeout(NCH.tm);NCH.cur=null;const e=document.getElementById('na-coach');if(e)e.hidden=true;setTimeout(coachPump,350)}
+// rules that came up are explained at that moment; this runs after every render
+function coachTick(){if(!NCH.on||!G||!G.tut)return;const me=G.ships.find(x=>x.side===0);if(!me)return;
+  if(G.winner){coachEnd();return}
+  const ht=humanTurn(),ph=G.phase;
+  if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(BF.sel&&G.round>=2)coachSay('marks')}
+  if(G.round>=1&&(ph==='action'||ph==='activate'))coachSay('order');
+  if(ph==='action'&&ht){coachSay('action');try{if(actionsFor(me).some(a=>a.a==='TL'))coachSay('lock')}catch(e){}}
+  if(ph==='target'&&ht)coachSay('shoot');
+  if(G.atk&&ph==='amod'&&G.atk.a===me.id&&ht){coachSay('dice');try{if(atkMods().some(m=>/focus/i.test(m.k)))coachSay('usefocus')}catch(e){}}
+  if(G.atk&&ph==='dmod'&&G.atk.d===me.id&&ht){try{if(defMods().length)coachSay('defend')}catch(e){}}
+  if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'res1');if(R.dmg)coachSay('res2')}
+    if(R.dmg)coachSay('res2')}
+  if(G.ships.some(x=>x.alive&&x.stress>0))coachSay('stress');
+  if(G.round>=2)coachSay('endround')}
+{const o=render;render=function(){const r=o.apply(this,arguments);try{coachTick()}catch(e){console.error(e)}return r}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-na]');if(!b)return;const k=b.dataset.na;
+  if(k==='dismiss')coachHide();
+  else if(k==='leave'){tutLeave();lsPlayed();UI.info=true;render()}
+  else if(k==='play'||k==='story'||k==='chapter'){const o=NCH.first;coachReset();tutLeave();lsPlayed();
+    if(k==='chapter'&&o){GXC.play(o.id)}else if(k==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}else startGame('solo')}},true);
+// the end: the real numbers walked through, then what did not come up
+function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.done=Object.keys(NCH.shown);
+  const mine=G.ships.filter(x=>x.side===0),foe=G.ships.filter(x=>x.side===1),won=G.winner==='P1';
+  const hp=a=>a.filter(x=>x.alive).reduce((t,x)=>t+Math.max(0,x.hull-hullDmg(x))+x.sh,0);
+  const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t+': '+LORE.coach[k].s));
+  const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
+    +'<div class="gxt-ex"><b>Things you will meet later</b><ul class="na-later">'+later.map(t=>'<li>'+t+'</li>').join('')+'</ul></div>'
+    +'<div class="gxt-eb">'+(NCH.o&&NCH.first?'<button type="button" class="gxt-b pri" data-na="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-na="play">Play a real game</button><button type="button" class="gxt-b" data-na="story">Story mode</button>')+'</div></div>';
+  document.body.appendChild(d);TUT.coach=false}
 // leave the staged game: nothing of it is saved, the dice script and the pauses are cleared
-function tutLeave(){TUT.on=false;if(window.TUTPH){window.TUTPH=false;try{PHN.apply()}catch(e){}}TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
+function tutLeave(){TUT.on=false;TUT.free=false;TUT.coach=false;try{coachReset()}catch(e){}if(window.TUTPH){window.TUTPH=false;try{PHN.apply()}catch(e){}}TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
   UI.hold=null;UI.holdK=[];UI.stats=false;UI.draft={};try{GXH.hide()}catch(e){}if(G&&G.tut){G.tut=0}}
 function lsPlayed(){try{localStorage.setItem('na_played','1')}catch(e){}}
 // first-time players who tap Launch are offered the lesson first
