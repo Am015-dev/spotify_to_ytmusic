@@ -9,7 +9,7 @@
 const PW = (() => { try { return require('playwright'); } catch (e) { return require('/opt/node-tools/node_modules/playwright'); } })();
 const fs = require('fs'), path = require('path');
 const URL = process.env.URL || 'file://' + path.join(__dirname, 'rampart.html');
-const SIZES = (process.argv[2] || '390x763,375x553').split(',').map(s => s.split('x').map(Number));
+const SIZES = (process.argv[2] || '390x763,1440x860').split(',').map(s => s.split('x').map(Number));
 const SHOTS = path.join(__dirname, '..', 'playtest');
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -166,7 +166,7 @@ async function run(browser, W, H, mode) {
     await sleep(300);
     const e = await p.evaluate(() => { const c = document.querySelector('.gxt-end'); if (!c) return null; const r = c.querySelector('.gxt-endc').getBoundingClientRect(); return { t: c.querySelector('.gxt-et').textContent, x: c.querySelector('.gxt-ex').textContent, btns: [...c.querySelectorAll('[data-gxt-end]')].map(b => ({ t: b.textContent, k: b.dataset.gxtEnd, r: (() => { const q = b.getBoundingClientRect(); return [q.left, q.top, q.right, q.bottom, q.width, q.height]; })() })), inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; });
     if (!e) note(tag, 'no end card'); else {
-      if (!/know the rules/i.test(e.t)) note(tag, 'end card title: ' + e.t);
+      if (!/deeds are yours/i.test(e.t)) note(tag, 'end card title: ' + e.t);
       if (!e.inside) note(tag, 'end card outside the screen');
       for (const b of e.btns) if (b.r[5] < 40) note(tag, 'end button too small: ' + b.t);
       await shot('end');
@@ -212,7 +212,7 @@ async function run(browser, W, H, mode) {
 }
 
 (async () => {
-  const b = await PW.chromium.launch({ args: ['--no-sandbox'] });
+  const b = await PW.chromium.launch({ args: ['--no-sandbox'], executablePath: process.env.CHROME || undefined });
   const jobs = []; for (const [W, H] of SIZES) jobs.push([W, H, 'clean']);
   const [W0, H0] = SIZES[0]; for (const m of ['rotate', 'leave', 'skip', 'story']) jobs.push([W0, H0, m]); if (SIZES[1]) jobs.push([SIZES[1][0], SIZES[1][1], 'story']);
   const only = (process.env.MODES || '').split(',').filter(Boolean); if (only.length) for (let i = jobs.length - 1; i >= 0; i--) if (!only.includes(jobs[i][2])) jobs.splice(i, 1);
