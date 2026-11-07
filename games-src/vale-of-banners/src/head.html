@@ -183,5 +183,24 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 .card.rwin h2{color:#7a4410}.card.rwin h2::before{content:"\1F3C6  "}
 .card.rlose{border-top:10px solid #5b6770;filter:saturate(.8)}.card.rlose h2{color:#3a444c}
 .rtab td:last-child{font-weight:900}
+
+/* W379 playable pass: turn banner, labels, dim non-legal, captions */
+#tbanner{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.9);z-index:60;pointer-events:none;opacity:0;background:#1d140a;color:#fff;border:3px solid var(--sc,#c9a24a);border-left-width:14px;border-radius:14px;padding:12px 26px;font-size:26px;font-weight:900;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.55)}
+#tbanner.on{animation:tban 1.05s ease-out forwards}
+@keyframes tban{0%{opacity:0;transform:translate(-50%,-50%) scale(.85)}18%{opacity:1;transform:translate(-50%,-50%) scale(1)}78%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.03)}}
+.gx-reduce #tbanner.on{animation-duration:.01s}
+.tilebtn.lab .tlab{position:absolute;left:50%;bottom:-3px;transform:translateX(-50%);background:#1d140a;color:#fff;font-size:13px;line-height:16px;font-weight:800;padding:0 4px;border-radius:5px;white-space:nowrap;pointer-events:none;z-index:2;max-width:64px;overflow:hidden;text-overflow:ellipsis}
+.tilebtn.lab .hx .nn{display:none}
+.tilebtn.lab .cost{bottom:auto;top:-4px}
+.gx-myturn #mk .tilebtn:not(.glow),.gx-myturn #store .tilebtn:not(.glow){opacity:.42;filter:grayscale(.6)}
+.gx-selecting #mk{opacity:.45}
+.gx-selecting #es .cell:not(.glow):not(.built){opacity:.55}
+.tilebtn.aipick{outline:4px solid #fff;outline-offset:2px;border-radius:8px;animation:aip .5s ease-in-out infinite alternate;z-index:5}
+@keyframes aip{from{transform:scale(1)}to{transform:scale(1.12)}}
+.gx-dock-head.toasting #docktitle{visibility:hidden}
+#prompt{font-size:max(14px,var(--fs));font-weight:700;line-height:1.3;min-height:2.6em}
+.popn{background:#1d140a;color:#ffe27a;border:2px solid #ffe27a;border-radius:10px;padding:2px 10px;font-size:18px;text-shadow:none;transform:translateX(-50%)}
+@media (max-width:640px){#store{--hex:34px;gap:4px}.gbtn{padding:2px 4px;gap:2px}#goods{gap:4px}#goods .tip{font-size:13px}}
+.rules .howturn{margin:4px 0 10px;padding-left:22px}.rules .howturn li{margin:3px 0}
 </style>
 </head>
