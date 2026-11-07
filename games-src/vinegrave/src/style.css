@@ -264,3 +264,7 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 @media (max-width:999px){.cd .cn{word-break:normal;overflow-wrap:normal;hyphens:manual}.cd .vp{bottom:auto;top:calc(1.6em + 1px)}}
 @media (max-width:999px){.cd .vp{top:-1px;left:50%;right:auto;transform:translateX(-50%);border-radius:0 0 6px 6px;font-size:13px;line-height:14px;padding:0 4px}}
 .allrules summary{cursor:pointer;font-weight:800;padding:8px 0;min-height:44px;display:flex;align-items:center}
+.cd .ptx{display:none}
+@media (min-width:1000px){.cd .pic .ptx{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;position:absolute;left:3px;right:3px;bottom:3px;z-index:2;background:#fbf3df;color:#1f1505;border-radius:4px;font-size:16px;line-height:1.1;font-weight:700;padding:2px 3px;text-align:center}
+  .cd.fear .pic .ptx{background:#2a1010;color:#ffe6e0}.cd .pic .ph .pt{display:none}}
+@media (min-width:1000px){.cd .vp{z-index:3;bottom:auto;top:46px;right:6px}}

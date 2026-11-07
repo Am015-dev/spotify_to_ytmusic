@@ -20,6 +20,33 @@ plain one-line instruction, a caption per rival move).
 | 9 | Help opens on the full rules; there is no short "how a turn works" first. | help / rules drawer |
 | 10 | Result table: the third column header is cut to "Dr", no line says by how much you won or lost, and the rows (Research, Temple tiles, Card points) are not explained. | result |
 
-## After (what changed, how it was checked)
+## After (re-shot at the same sizes, critiqued again)
 
-Filled in at the end of the task.
+| # | Status | What changed (files) |
+|--:|---|---|
+| 1 | Fixed | Rival turns run in steps (ui2.js aiStep): dock title "Tamsin Reed's turn", a caption of the move ("Tamsin sends an explorer to Lookout Cliff to dig."), the target pulses orange for 0.9 s, then the move is applied with its animation and a pop, and the result stays 1 s before the next step. Tap anywhere on the board to speed up (turnWait/speedUp). |
+| 2 | Fixed | Turn banner (#tbanner) "Your turn" / "Tamsin Reed's turn" for 1.1 s every time the turn changes; the dock title is bold and coloured on your turn. |
+| 3 | Fixed | The instruction line names the real choices now: "One action: play a card, go to a site or buy a card. Tap what glows." (built from the legal moves, at most 2 lines). After your move it shows what you did. |
+| 4 | Fixed | On your turn every non-legal site, card and the track turns grey (grayscale, no opacity, so text keeps its contrast); only legal targets glow. |
+| 5 | Fixed | After every move (yours and the rival's): the card glides to where it goes (380 ms), sites/track bounce (420 ms), then a pop says what it gave, e.g. "+1 coin +1 compass" and "+3 points: idol" / "-1 point: Dread card". |
+| 6 | Fixed | Phone cards show their name at 13 px on a solid backing (2-3 lines, long words split with a soft hyphen); the squashed picture is hidden on phone (slot kept for real art; PC keeps it). PC cards add a plain one-line effect ("Gain 1 compass.") on a solid backing. Tapping still opens the big card. |
+| 7 | Fixed | Every map row has a label on phone and PC: "Camp: dig here for goods", "Ruins: explore for 3 compasses", "Deep ruins: explore for 6 compasses". |
+| 8 | Fixed | Tutorial is 7 steps and every step is one real action (tap Trail Notes, Play it, the hidden ruin, Discover, the Tin Lamp, Buy it, Pass); texts are 11-16 words; waiting for Tamsin is a ready() condition, not a page. Ends on a card whose button starts a real game. tut-test.js proves it. |
+| 9 | Fixed | Rules / How to play open with "How a turn works" in 5 short lines; the full rules sit behind "Show all the rules". The help cards start with the same summary. |
+| 10 | Fixed | Result: column headers use the first real name word (no "Dr"), the line says the margin ("You scored 32: 26 short." / "You won by 9."), rows say what they count ("Idols (3 each)", "Dread (-1 each)"). |
+
+Toasts now sit above the dock, so they never cover the instruction line.
+
+## Gate (final build)
+- `VIS_SLUGS="," build-all.py --quick vinegrave`: PASS (8/8 scenarios incl. the menu walker).
+- rules-test 200 AI games PASS; smoke phone + pc PASS (0 errors); playtest.js both PASS (its tutorial check now expects >= 7 steps).
+- tut-test.js (fresh storage, taps each spotlit centre, elementFromPoint is the target, end card starts a real game): PASS 390x763 and 1440x860, 7 steps, 0 errors.
+- tap-play.js (taps only on visible, uncovered UI; rivals sped up by tapping the board) at 390x763: Quick game to the result PASS (143 s), Story stage 1 from title -> Story -> map -> stage to the result PASS (119 s), 0 console/page errors.
+- ui-audit (staged build, local server): phone A0 B0 C0 D0 E0 F0; pc A0 B0 C0 D0 E0 F0; phone-s A0 B1 C0 D0 E0 F0.
+  The phone-s B1 is "Master volume" inside the shared Menu drawer (gx-kit), scrolled out of view at 375x553; the audit clamps a scrolled-out
+  text box to the drawer edge (same cause as the R4 note). Shared kit / audit spec, not this folder.
+
+## Remaining
+- Phone market cards still show effects as icons (no room for a sentence at 58 px); the name is readable and a tap opens the full text.
+- The vp badge on a phone market card can touch the cost icon on 4-coin cards.
+- Painted art is still owner work; temp glyphs are hidden on phone cards.

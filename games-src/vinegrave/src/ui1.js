@@ -30,7 +30,7 @@ function cardHTML(id, o) {
   return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="ct"><span class="chip">${cost}</span>${ic(c.tr)}</span>
     <span class="cn">${esc(c.name).split(' ').map(w => w.length > 7 ? w.slice(0, Math.ceil(w.length / 2)) + '&shy;' + w.slice(Math.ceil(w.length / 2)) : w).join(' ')}</span>
-    <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true"><svg class="pg"><use href="#s-${CARD_GLYPH[c.t] || c.tr}"/></svg><span class="pn">${esc(c.name)}</span><span class="pt">${CARD_KIND[c.t] || 'Starter'}</span></span></span>
+    <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true"><svg class="pg"><use href="#s-${CARD_GLYPH[c.t] || c.tr}"/></svg><span class="pn">${esc(c.name)}</span><span class="pt">${CARD_KIND[c.t] || 'Starter'}</span></span><span class="ptx">${esc(c.t === 'fear' ? 'No effect. -1 point.' : c.text)}</span></span>
     ${c.vp ? `<span class="vp">${c.vp > 0 ? c.vp : c.vp}</span>` : ''}
     <span class="fx">${c.t === 'fear' ? '<span class="sm" style="color:#f6e6e6">no effect</span>' : opsHTML(c.ops)}</span></button>`;
 }
