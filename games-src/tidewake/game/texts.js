@@ -46,22 +46,29 @@ function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='
 // ---- Tutorial prologue: "The Lantern Race". Guide = Grandmother Osk (lantern keeper, same cast as Story mode), rival = Cobalt (the cocky newcomer who claims the Lantern Reach).
 // Every line: a story reason, then what to do (the glow shows where). All tutorial words live here (title <= 4 words, say <= 26 words).
 // A step's ch = the chapter it opens (1 Your first turn, 2 Rivals and leaving others' wake, 3 Leviathans and the wave, 4 The last junk afloat).
-const TUT_TEXT={
- goal:['Osk: The lantern race','Cobalt swears the Lantern Reach is his. Outlast him, child: the last junk afloat keeps the lantern.'],
- mark:['Pick your berth','Chapter 1. Cobalt has already sailed from the west. Put your junk on the glowing gold mark.'],
- mark2:['Cast off','A fine berth, the wind is with you. Press the glowing button.'],
- stir:['The sea stirs','Dice at dawn. A 6, 7 or 8 wakes the leviathans: each one swims or turns. Watch them go.'],
- pick:['Lay your first current','Currents are your road across the chart. Pick the glowing tile.'],
- turn:['Mind the edge!','Careful: that tile runs off the chart. Red cross means you sink. Turn it.'],
- place:['Safe water','Green check, so the way is clear. Lay it and your junk follows the line.'],
- sail:['Well sailed!','Your junk ran the line to its end. You drew back up to three tiles.'],
- rivals:['Cobalt\'s wake','Chapter 2. Cobalt sails too. Never end on his wake: two junks on one line both sink.'],
- chain:['Ride his current','Your tile joins Cobalt\'s line, so you sail across both. Cheeky! Lay it.'],
- keep:['A Deck Cannon!','The tile pile gave you a cannon. Keep it: one shot destroys a leviathan about to sink you.'],
- wave:['The Rogue Wave',()=>{const w=waveLine();return w?'Chapter 3. Hold on! The wave sweeps your row. You rolled '+w.r+' and it needs '+w.n+'+, so you ride it.':'Hold on! A Rogue Wave sweeps this row. Roll its strength or capsize.'}],
- place3:['Cross the wave','Your path crosses the wave\'s row once more, so you roll again. Lay the tile.'],
- cannon:['Fire the cannon!',()=>levName(4)+' blocks your bow and would sink you. Fire your Deck Cannon!'],
- place4:['Open water','Gone! The sea is clear again. Lay a tile and sail on.'],
- sunk:['Cobalt\'s luck runs out',()=>levName(7)+' swam onto Cobalt\'s current: tile gone, junk sunk. Press Continue.'],
- win:['The lantern\'s yours','Chapter 4. Only your junk is left, so you win. Osk: "The lantern chose well." Real games add more captains.']
+// The coached first game ("The Lantern Race", ui10.js): what Grandmother Osk says the first time each rule matters. [title, line]; max 2 short lines each.
+// {me} {riv} {n} {why} are filled in from the real game. The ids are the rule ids in TUTORIAL-COVERAGE.md.
+const OSK_TEXT={
+ goal:['The Lantern Race','Cobalt swears the Reach is his. Last junk afloat keeps the lantern. Pick a gold mark.'],
+ reloc:['Your berth','If a leviathan blocks your start before you sail, move to another free mark on that edge.'],
+ roll:['Dice at dawn','Each turn starts with two dice. {n}: {wake}'],
+ lay:['Lay a current','Pick a tile, Turn it, Place it at your bow. SAFE floats; SINKS means off the chart.'],
+ sail:['Well sailed!','Your junk rode the current to its end. Now you draw back up to three tiles.'],
+ chain:['Cobalt moves','{riv} laid a current. You may ride his tiles too, joined to yours.'],
+ collide:['Mind his wake','Never end on the same line as another junk: two junks on one wake both sink.'],
+ levmove:['The deep stirs','A leviathan swims one square along an arrow, or turns. Arrows show where it can go.'],
+ levsink:['Leviathans bite','A leviathan entering your square sinks you. Keep your bow away from its arrows.'],
+ cannon:['A Deck Cannon!','Keep it. When a leviathan would sink you, fire it: the beast is gone for good.'],
+ wave:['Rogue Wave!','A junk in its band rolls a die: meet its strength or capsize. It grows as it rolls.'],
+ gate:['A Rift Gate','The violet tile is a Rift Gate. Lay it, or keep it to escape to a rolled square when you would sink.'],
+ mael:['The Maelstrom','It moves only on calm rolls and swallows any tile, junk or leviathan it enters.'],
+ swap:['Sink him, gain tiles','If your tile sinks Cobalt, you may swap tiles with his hand before you draw.'],
+ good:['Good move!','{why}'],
+ poor:['Careful','{why}'],
+ end:['The lantern','{why}'],
+ tie:['A shared fate','If the last junks sink together, nobody wins: it is a draw.'],
+ more:['Teams and solo','Bigger games add captains, teams that share a win, and a solo race.']
 };
+// rival comments (Osk on Cobalt's moves), picked in turn; {riv} {n}
+const OSK_RIVAL=['{riv} sailed {n} square(s). Watch where his line ends: never end on it.','{riv} hugs the middle: leviathans have fewer arrows to reach him there.','{riv} is getting bold. A tile that sinks him wins you the lantern.','{riv} turned his tile to dodge the edge. Turn yours too when you see SINKS.'];
+

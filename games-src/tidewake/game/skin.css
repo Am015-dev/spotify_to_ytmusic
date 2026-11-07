@@ -27,3 +27,18 @@ html.sk-nametag .otag.ship.me{font-size:12px}
 html.sk-frame #ov{z-index:6}
 html.sk .gx-bar .gx-ibtn,html.sk .gx-dock .gx-ibtn{border-image-width:4px}
 .gx-drawer details:not([open])>*:not(summary){display:none}
+/* Grandmother Osk, the coached first game (ui10.js): one tip at a time, in the panel flow (never over the board) */
+#osk{display:flex;align-items:flex-start;gap:10px;margin:6px 8px;padding:8px 8px 8px 10px;background:#fbf3df;color:#2a1d10;border:2px solid #c9952e;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.35);position:relative;z-index:2;animation:oskIn .3s ease-out}
+#osk.riv{border-color:#3d6fa8;background:#eef4fb}
+#osk .osk-p{flex:0 0 44px;text-align:center;font:700 13px/1.1 inherit;color:#5a3b10}
+#osk .osk-p svg{width:44px;height:44px;display:block}
+#osk.riv .osk-p span{color:#1e4a7a}
+#osk .osk-t{flex:1;font-size:15px;line-height:1.3}
+#osk .osk-t b{display:block;font-size:15px;color:#7a1f1f;margin-bottom:1px}
+#osk.riv .osk-t b{color:#1e4a7a}
+#osk .osk-x{flex:0 0 44px;width:44px;height:44px;border:0;background:transparent;color:#5a3b10;font-size:26px;line-height:1;cursor:pointer;border-radius:8px}
+#osk .osk-x:hover,#osk .osk-x:focus-visible{background:rgba(0,0,0,.08)}
+@keyframes oskIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.osk-walk .osk-step{font-size:14px;color:#5a3b10;margin-bottom:4px}
+.osk-later{text-align:left;margin:6px 0 10px;padding-left:18px;font-size:15px;line-height:1.35;max-height:52vh;overflow:auto}
+.osk-later li{margin:4px 0}
