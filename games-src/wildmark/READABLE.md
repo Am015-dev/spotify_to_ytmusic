@@ -4,7 +4,7 @@ Owner feedback: "unplayable, unreadable, not easy to follow, the assets are supe
 Audits passed; eyes did not. Judge every rule below by a 390x763 screenshot you LOOK at as someone who never saw the game.
 Benchmarks: the old shelf games the owner likes (cauldron-fair, hollowbough) and good online versions of the same kind of game.
 
-1. **Temp glyphs off if code says it better.** Abstract icon art (game-icons style) means nothing to a player. Keep the slot, but
+1. **Temp glyphs off if code says it better (judge each slot by eye).** Abstract icon art (game-icons style) means nothing to a player. Keep the slot, but
    make code-drawn the default: a prefix list (`ART.codeFirst` in `src/art.js`) skips those temp files; real art is switched on by
    naming its stem or prefix in `window.WM_REAL_ART`. Never delete a slot.
 2. **Terrain = flat colour + one picture pattern.** Waves for water, small pines for forest, snow-capped peaks for mountains,
