@@ -235,4 +235,13 @@ body.gxdrawer .gx-app,body.gxdrawer #start{visibility:hidden}
 .fx .chip.r-stone{clip-path:none;border-radius:6px}.fx .chip.r-glass{border-radius:6px}
 .gxc-act small,.gxc-act b{font-size:max(var(--fmin),14px)!important}
 .card.cov .glyph,.card.cov .fx,.card.cov .costs{display:none!important}
+/* the coach: one bubble, never blocks the board (only its buttons take taps) */
+#coach{position:fixed;left:8px;right:8px;top:118px;z-index:82;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 10px;border-radius:12px;background:#f3e7c9;color:#231a0a;border:2px solid #2c7a52;box-shadow:0 6px 20px rgba(0,0,0,.5);pointer-events:none;max-width:560px;margin:0 auto;font-size:max(14.5px,var(--fmin));line-height:1.3;font-weight:600}
+#coach[hidden]{display:none}
+#coach .ci{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:#2c7a52;color:#fff;border:2px solid #f2c230;display:inline-flex;align-items:center;justify-content:center;font-weight:900}
+#coach .ct{flex:1 1 auto;min-width:0}
+#coach button{pointer-events:auto;flex:0 0 auto;min-height:44px;min-width:44px;border:0;border-radius:10px;font:inherit;font-weight:800;cursor:pointer}
+#coach .cx{background:#d9ceb0;color:#231a0a;font-size:1.3rem}#coach .cn{background:#2c7a52;color:#fff;padding:0 14px}
+#res tr.hl td{background:#f2c230;color:#231a0a;font-weight:800}
+.gxt-endc.later{max-height:84vh;overflow:auto}.gxt-endc.later ul{text-align:left;margin:8px 0;padding-left:20px;font-size:max(14px,var(--fmin));line-height:1.35}
 </style></head>

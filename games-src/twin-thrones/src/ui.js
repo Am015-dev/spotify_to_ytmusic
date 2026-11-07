@@ -313,7 +313,7 @@ var TT_TEST = {};
     var G = U.G, p = E.sideToAct(G), prevUp = {}, pre = null, preHtml = '', snap = G.phase === 'play' ? snapState() : null;
     if (m.i != null) { pre = rectOf('c' + m.i); var c = BY[G.pyr[m.i].id]; preHtml = cardHtml(c, pre ? pre.width : 60); var ghostCol = c.col; }
     G.pyr.forEach(function (c) { prevUp[c.i] = c.up; });
-    if (U.tut && p === 0 && window.TT_TUTOR && TT_TUTOR.beforePlayerMove) TT_TUTOR.beforePlayerMove();
+    if (U.tut && p === 0 && window.TT_TUTOR && TT_TUTOR.beforePlayerMove) TT_TUTOR.beforePlayerMove(G, m);
     E.apply(G, m); U.sel = null; U.fingerDone = true; U.seq++;
     U.busy = true; var flips = []; G.pyr.forEach(function (c) { if (c.up && !prevUp[c.i] && !c.taken) flips.push(c.i); });
     G.ev.forEach(function (ev) { var l = lineOf(ev, G); if (l) { U.logs.push(l); G.log.push(l); } });
@@ -330,7 +330,7 @@ var TT_TEST = {};
     });
     if (G.ev.some(function (e) { return e.t === 'age'; })) $('pyr').querySelectorAll('.card').forEach(function (e) { e.classList.add('pop'); });
     if (G.over) return;
-    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); dock0Lock();
+    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
     narrate(items, function () { U.busy = false; after(); });
   }
   function dock0Lock() { $('acts').innerHTML = ''; var z = $('zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
@@ -344,12 +344,12 @@ var TT_TEST = {};
       setInstr(whoTag(p), 'rival', name(p) + ' is thinking...');
       U.aiTimer = setTimeout(function () {
         if (seq !== U.seq || U.G !== G) return;
-        var rng = function () { return E.rnd(G); }, lv = U.lvl, m = (U.tut && window.TT_TUTOR && !G.pend.length && G.phase === 'play') ? TT_TUTOR.aiMove(G) : AI.pick(G, lv, rng);
+        var rng = function () { return E.rnd(G); }, lv = U.lvl, m = AI.pick(G, lv, rng);
         if (!m) { U.busy = false; return; }
         narrate([{ tag: whoTag(p), kind: 'rival', text: intentLine(G, p, m), fn: function () { if (m.i != null) { var e = $('c' + m.i); if (e) e.classList.add('aipick'); } else if (m.t === 'pick') { var w = document.querySelector('[data-pick="' + m.w + '"]'); if (w) w.classList.add('aipick'); } } }],
           function () { if (seq !== U.seq || U.G !== G) return; U.busy = false; doMove(m); });
       }, stepMs());
-    } else { U.busy = false; render0(); }
+    } else { U.busy = false; render0(); if (U.tut && window.TT_TUTOR && TT_TUTOR.onTurn) TT_TUTOR.onTurn(G); }
   }
   function render0() { dock(); if (U.G.phase !== 'draft') { var P = $('pyr'); P.querySelectorAll('.card.av').forEach(function (e) { e.classList.toggle('dim', !canAct()); }); } else renderDraft(); strip(0); strip(1); }
 
@@ -372,6 +372,7 @@ var TT_TEST = {};
     try { localStorage.setItem('tt_seen', '1'); } catch (e) { } U.mode = mode; U.ai = [mode === 'watch', mode !== 'two']; U.G = E.newGame({ seed: seed }); U.camp = camp || null; U.finished = false; U.logs = []; var tw = camp && camp.twist; if (tw) { if (tw.id === 'extra-coins') U.G.players[1].coins += tw.param; if (tw.id === 'head-start') U.G.mil = -tw.param; } U.sel = null; U.fingerDone = false; U.busy = false; U.seq++; U.narr = false; U.lastSide = null; clearTimeout(U.nt); if (!U.tut) U.rivalName = null;
     $('start').hidden = true; $('res').hidden = true; buildBoard(); render();
     var fl = camp ? 'Goal: ' + camp.goal.text + (tw ? ' ' + tw.text : '') : FLAVOUR[Math.floor(Math.random() * FLAVOUR.length)];
+    if (U.tut) { after(); return; }
     banner(camp ? camp.title : 'The duel begins', 'info', camp ? 1400 : 1100); U.busy = true; narrate([{ tag: 'The duel', kind: 'info', text: fl, extra: camp ? 1500 : 500 }], function () { U.busy = false; after(); });
   }
   // the climax: totals count up row by row (tap anywhere on the table to jump to the end)
@@ -401,7 +402,7 @@ var TT_TEST = {};
     var h = '<h2>' + esc(head) + '</h2><p>' + esc(reasonText(G)) + '</p><p class="line">' + esc(resultLine(G)) + '</p>';
     if (G.final) { var a = G.final[0], b = G.final[1]; h += '<table><tr><th></th><th>' + esc(name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
       [['Civic', 'blue'], ['Science', 'green'], ['Trade', 'yellow'], ['Guilds', 'guild'], ['Wonders', 'wonder'], ['Tokens', 'token'], ['Coins', 'coins'], ['Conflict', 'mil'], ['Total', 'total']].forEach(function (k) { h += '<tr><td>' + k[0] + '</td><td class="cu" data-n="' + a[k[1]] + '">0</td><td class="cu" data-n="' + b[k[1]] + '">0</td></tr>'; }); h += '</table>'; }
-    h += '<button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button>'; r.innerHTML = h; countUp(r);
+    h += '<button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button>'; r.innerHTML = h; countUp(r); if (U.tut && window.TT_TUTOR && TT_TUTOR.onResult) TT_TUTOR.onResult(G);
   }
 
   // ---------- drawers
@@ -431,7 +432,7 @@ var TT_TEST = {};
       onExit: function () { U.camp = null; showStart(); },
       scores: function (G) { return [E.score(G, 0).total, E.score(G, 1).total]; },
       seats: function () { return [{ name: 'You', me: true }, { name: U.camp ? U.camp.opponent.name : 'Rival', ai: U.lvl }]; } });
-    var go0 = GXC.open; GXC.open = function () { try { if (window.TT_TUTOR && TT_TUTOR.cancel) TT_TUTOR.cancel(); if (window.GXT && GXT.running && GXT.running()) { GXT.stop(); U.tut = false; U.rivalName = null; } } catch (e) { } return go0.apply(this, arguments); };
+    var go0 = GXC.open; GXC.open = function () { try { if (window.TT_TUTOR && TT_TUTOR.cancel) TT_TUTOR.cancel(); if (window.GXT && GXT.running && GXT.running()) { GXT.stop(); U.tut = false; U.rivalName = null; } } catch (e) { } if (U.tut) showStart(); return go0.apply(this, arguments); };
   }
   function menuRender() {
     var b = $('menubody'); if (!b) return;
@@ -465,7 +466,7 @@ var TT_TEST = {};
       GX.close(); newGame(U.mode); return;
     }
     if (!U.G) return;
-    if (U.narr && U.skipNarr && (q('#instr') || q('#banner') || q('#pyr') || q('#bd'))) { U.skipNarr(); return; }
+    if (U.narr && U.skipNarr && !q('button') && (q('#instr') || q('#banner') || q('#pyr') || q('#bd'))) { U.skipNarr(); return; }
     if ((b = q('[data-city]'))) { showCity(+b.dataset.city); return; }
     if ((b = q('[data-tok]'))) { var d = BY[b.dataset.tok]; toast(d.nm + ': ' + d.text, 2600); return; }
     if ((b = q('[data-wonder]'))) { var w = BY[b.dataset.wonder]; toast(w.nm + ': ' + w.text, 2800); return; }

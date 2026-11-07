@@ -1,37 +1,29 @@
-# Tutorial coverage (W397): the prologue is ONE real game, four chapters, played against the real computer to the result screen
-Seed 5, stacked decks (bottom row of Age I, the two open cards of Age II, the last two cards of Age III). Between chapters the computer plays both seats quickly ("the years turn"): that is the only fast-forward; the player plays every lesson card.
-Driver: `tutorial-e2e.js` (taps the centre of each spotlit element at 390x763 and 1440x860, asserts every step id below was shown, the result screen is reached, 0 console errors).
-Resume: leaving keeps the chapter (`tt_tut_ch`); "Tutorial" then offers Continue chapter N or Start from chapter 1 (state is rebuilt from the same seed).
-Legend: DO = the player does it, SEE = shown/explained once, NO = not covered (honest).
+# Tutorial coverage (W397, ADDENDUM 4): a COACHED first game, not a tap list
+The tutorial is a real duel against the real computer (fixed seed 5, "easy", stacked decks so the bottom row of Age I, the open cards of Age II and a guild in Age III come up). Every move is a free choice from move 1.
+- ONE forced step only: take the glowing wonder (`first`). Then free play.
+- Guide Ione speaks just-in-time in ONE bubble at a time (never blocks the board, only its x takes taps, auto-hides after 9 s, queued if a second rule appears). Text: `campaign.json` -> `prologue.coach`.
+- Rules that never came up are listed on a "Things you'll meet later" card after the final scoring; the final scoring is walked through row by row with the player's real numbers (`prologue.walk`).
+- Driver: `tutorial-e2e.js p|d` plays the coached game with random legal moves through the UI at 390x763 and 1440x860 and asserts: forced steps <= 2, one bubble at a time, every rule below was explained in play OR listed on the later card, 0 console errors.
+Legend: PLAY = explained the first time it happens in play; LATER = on the later card if it did not come up; WALK = scoring walk.
 
-| Rule | How | Step id (story beat: Ione's reaction in the caption) |
+| Rule | When Ione says it | Id |
 |---|---|---|
-| 7 coins each at the start | SEE | `crowns` (the $7 pill) |
-| Wonder draft, 4 each of 8, alternating | DO | `draft` x4 ("Claimed! Pell frowns...") |
-| Draft order 1-2-2-1 / 2-1-1-2 | SEE | rival takes two in a row (captioned), not explained |
-| Pyramid: only uncovered (glowing) cards can be taken | SEE | `pyramid` |
-| Taking a card uncovers/flips the ones above | SEE+DO | `tension` ("Pell grabbed X"), flips captioned "Now free to take" |
-| Build a free card, effect (production) | DO | `take-free`, `build-free` ("Stone for the walls") |
-| Coin card pays at once (yellow) | DO | `take-inn`, `build-inn` ("+4 coins") |
-| Pay a coin cost | DO | `take-red`, `build-red` ($1) |
-| Red card: shield pushes the conflict pawn | DO | `build-red` ("The pawn marches toward Pell") |
-| Pawn track: 9 steps wins, marked spaces loot coins | SEE | `pawn` (not played to a loot or a win) |
-| Missing resource is bought: 2 coins + rival's production | DO | `take-buy`, `build-buy` ("Glass bought for coins") |
-| Science symbol, chain mark gained | DO | `build-buy` (wheel), `build-chain` (flask) |
-| Chain: matching later card is free | DO | `take-pair`/`build-pair`, `take-chain2`/`build-chain2` |
-| Sell for 2 coins (+1 per yellow card) | DO | `take-sell`, `sell` |
-| Take a card only to deny the rival | DO | `take-sell` text |
-| Raise a wonder with a card (cost, power) | DO | `take-wonder`, `wonder` ("The first wonder rises") |
-| Science pair gives a progress token; pick one | DO | `build-pair`, `token` |
-| Six different symbols win at once | SEE | `sci` (live count in the strip) |
-| Guild card scores from the richer city | DO | `take-guild`, `build-guild` |
-| Age change, who starts (the one behind on the track chooses; at a tie the player who took the last card chooses, W391 engine fix merged) | SEE | `years` text; the player is given the first move by the script (not the real chooser) |
-| Final scoring: civic, science, trade, guilds, wonders, tokens, coins, conflict | SEE (live) | `scoring` (count-up table) |
-| Most points wins; tie goes to civic points | SEE | `verdict` |
-| End by military or science | SEE | `pawn`, `sci` |
-| Can't afford -> sell instead | SEE | `sell` text; disabled buttons dim in the big card |
-| Yellow trade posts (cheaper buying) | NO | no staged card |
-| Seven-wonder cap, wonder powers: again / discard rival card / revive / library | NO | depend on the random wonder draft |
-| Individual progress-token effects, law token | NO | token text is on each token (tap it) |
-| Tie on points shared, tie-break details | NO | |
-Story beats: every chapter has an opening scene and a closing line (`campaign.json` -> `prologue.chapters`); the guide's reaction after each action is `prologue.steps.<id>.react`; Pell's quip when he takes the card you uncovered is `prologue.pell.freed`.
+| Wonder draft, 4 each, points + power | first wonder (forced step), draft turn | `first`, `draft` |
+| Pyramid: only glowing (uncovered) cards; taking uncovers/flips | first play turn | `pyramid` |
+| Look at what a card frees for the rival | when the rival takes a card you uncovered | `tension` |
+| Build a free card, production | you build for 0 | `free` |
+| Coin (yellow) cards pay at once | you build a card that gives coins | `coin` |
+| Paid cost, missing resources bought (2 + rival production) | you build and pay coins | `paid` |
+| Shield pushes the pawn, 9 wins | any shield card built | `shield` |
+| Loot at marked spaces | the pawn passes a marked space | `loot` |
+| Chain mark gained / chain build free | you build a card with a mark / by chain | `chain-mark`, `chain` |
+| Science symbols, pair, six win | you build a green card | `sci` |
+| Pair gives a progress token | the token choice appears | `pair` |
+| Sell: 2 coins + 1 per yellow; poor-move line if you sold a card you could build free | you sell | `sell` (`sell-poor`) |
+| Raise a wonder | you raise one | `wonder` |
+| Age change, who starts (behind on the track; at a tie the last-card taker, W391 fix) | Age II/III begins | `age` |
+| Guild scores at the end from the richer city | you build a purple card | `guild` |
+| Final scoring, rule by rule, tie-break | result screen walk (9 rows, your numbers) | WALK |
+| Yellow trade posts, seven-wonder cap, wonder powers, token effects, tie-break, science win, military win, draft order | not guaranteed to come up | LATER (`trade`, `cap`, `powers`, `tokens`, `tie`, `science`, `military`, `draftorder`) |
+Story beats: intro scene before the duel (3 lines), Ione's reaction lines are the coach bubbles, Pell's name on the rival; the scoring walk is the climax.
+Honest limits: a rule only counts as "explained in play" when the situation really occurs in that game; otherwise it is on the later card (the e2e prints how many of each).

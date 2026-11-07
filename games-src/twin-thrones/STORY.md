@@ -18,6 +18,5 @@ Original names only. Portraits are code-drawn (initial in a coloured disc, `cast
 2. **Open Roads** (4-6): traders, a general, a queen. Mind what you uncover (Maro), count shields (Kest), push the pawn back (Seren).
 3. **The Twin Throne** (7-10): rivals read two moves ahead; the Long Library (science); pawn or scrolls only; the twist: King Vael was never dead.
 
-## Prologue (the tutorial is a story)
-Four chapters, each opens with a story scene and closes with a payoff line, each step = story reason, one real action, a reaction caption (Ione or Pell):
-1 **The Crowns** (draft wonders) - 2 **First Turns** (Age I: free build, coins, shield, bought resource, chain mark, sell, uncover, wonder) - 3 **The Years Turn** (Age II: chain, pair, token, symbols) - 4 **The Last Card** (Age III: guild, the count, the verdict).
+## Prologue (the coached first game)
+A scene opens it (Ione, Pell, 3 lines). Then one real duel against Pell (easy) with free moves; Ione's just-in-time bubbles are her voice, the scoring walk is the climax, and the later card closes it. Text: `campaign.json` -> `prologue` (`intro`, `first`, `playon`, `coach`, `later`, `walk`).
