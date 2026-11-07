@@ -1,0 +1,115 @@
+// ui2: placement ghost (drag, rotate, flip, clean snap), moves, income moment, computer turns, game flow
+function curPatch() { if (!G || UI.sel < 0) return null; var id = swOffer(G)[UI.sel]; return id == null ? null : PATCHES[id]; }
+function curCells() { var p = curPatch(); return p ? p.or[UI.o] : null; }
+function bbox(c) { var w = 0, ht = 0; c.forEach(function (q) { if (q[0] > w) w = q[0]; if (q[1] > ht) ht = q[1]; }); return [w + 1, ht + 1]; }
+function ghostOk() { var c = curCells(); return !!c && swFits(G.board[viewSeat()], c, UI.gx, UI.gy); }
+function clampG() { var c = curCells(); if (!c) return; var b = bbox(c); UI.gx = Math.max(0, Math.min(9 - b[0], UI.gx)); UI.gy = Math.max(0, Math.min(9 - b[1], UI.gy)); }
+function drawGhost() {
+  var old = $('#ghost'); if (old) old.remove(); var q = $('#quilt'), p = curPatch(); if (!q || !p || G.over || G.pend) return; clampG(); var c = curCells(), b = bbox(c), ok = ghostOk(), set = {}; c.forEach(function (x) { set[x[0] + ',' + x[1]] = 1; });
+  var cs = UI.cs, g = h('div#ghost.' + (ok ? 'ok' : 'bad'), { style: 'left:' + UI.gx * cs + 'px;top:' + UI.gy * cs + 'px;grid-template-columns:repeat(' + b[0] + ',' + cs + 'px);grid-template-rows:repeat(' + b[1] + ',' + cs + 'px);--pc:' + pcol(p.id), 'aria-hidden': 'true' });
+  for (var y = 0; y < b[1]; y++) for (var x = 0; x < b[0]; x++) g.appendChild(h('div.gc' + (set[x + ',' + y] ? '' : '.hid')));
+  q.appendChild(g); var sew = $('[data-a=sew]'); if (sew) sew.disabled = !ok;
+}
+function bestPlacement(pid, seat) { return aiBestPlace(G.board[seat], PATCHES[pid]); }
+function selectOffer(k) {
+  var s = swWho(G); if (G.over || UI.busy || !isHuman(s) || G.pend) return; var pid = swOffer(G)[k], p = PATCHES[pid]; if (pid == null) return;
+  if (!tutAct({ what: 'offer', k: k })) return;
+  if (UI.sel === k) { showPatch(pid); return; }
+  if (G.btn[s] < p.cost) { sfx('bad'); toast('You need ' + (p.cost - G.btn[s]) + ' more button' + (p.cost - G.btn[s] === 1 ? '' : 's') + ' for ' + p.name + '. Advance to earn some.'); UI.sel = -1; render(); showPatchSoft(pid, k); return; }
+  if (!swPlacements(G.board[s], p).length) { sfx('bad'); toast(p.name + ' does not fit anywhere on your quilt.'); return; }
+  UI.sel = k; sfx('pick'); var bp = UI.tutorial ? null : bestPlacement(pid, s);
+  if (bp) { UI.o = bp[0]; UI.gx = bp[1]; UI.gy = bp[2]; } else { UI.o = 0; var b = bbox(p.or[0]); UI.gx = Math.floor((9 - b[0]) / 2); UI.gy = Math.floor((9 - b[1]) / 2); }
+  render();
+}
+function showPatchSoft(pid, k) { var dt = $('#detail'); var p = PATCHES[pid]; if (dt) dt.innerHTML = '<b>' + p.name + '</b>: ' + p.n + ' squares, cost ' + p.cost + ', time ' + p.time + ', income ' + p.inc + '. Tap it again to see it large.'; UI.softK = k; }
+function cancelSel() { UI.sel = -1; render(); }
+function xform(f) { var p = curPatch(), c = curCells(); if (!p) return; var b0 = bbox(c), cx = UI.gx + b0[0] / 2, cy = UI.gy + b0[1] / 2, n = swNorm(c.map(f)), k = JSON.stringify(n), idx = -1; p.or.forEach(function (o, i) { if (JSON.stringify(o) === k) idx = i; }); if (idx < 0) return; UI.o = idx; var b = bbox(n); UI.gx = Math.round(cx - b[0] / 2); UI.gy = Math.round(cy - b[1] / 2); clampG(); sfx('rot'); }
+function rotate() { if (!tutAct({ what: 'rot' })) return; xform(function (q) { return [-q[1], q[0]]; }); snapNear(true); drawGhost(); renderDockLight(); }
+function flip() { if (!tutAct({ what: 'flip' })) return; xform(function (q) { return [-q[0], q[1]]; }); snapNear(true); drawGhost(); renderDockLight(); }
+function renderDockLight() { var sew = $('[data-a=sew]'); if (sew) sew.disabled = !ghostOk(); }
+function snapNear(soft) { // nearest valid anchor for the current orientation (then any orientation if none)
+  var s = viewSeat(), p = curPatch(); if (!p) return false; if (ghostOk()) return true; var best = null, bd = 1e9;
+  var pl = swPlacements(G.board[s], p).filter(function (q) { return q[0] === UI.o; });
+  pl.forEach(function (q) { var d = Math.abs(q[1] - UI.gx) + Math.abs(q[2] - UI.gy); if (d < bd) { bd = d; best = q; } });
+  if (!best && !soft) { swPlacements(G.board[s], p).forEach(function (q) { var d = Math.abs(q[1] - UI.gx) + Math.abs(q[2] - UI.gy) + 3; if (d < bd) { bd = d; best = q; } }); }
+  if (best && (bd <= 4 || !soft)) { UI.o = best[0]; UI.gx = best[1]; UI.gy = best[2]; return true; } return false;
+}
+// pointer: press/drag anywhere on the quilt moves the patch; lift snaps it to the nearest square that fits
+function cellAt(ev) { var q = $('#quilt'); if (!q) return null; var r = q.getBoundingClientRect(), cs = UI.cs, x = ev.clientX - r.left - q.clientLeft, y = ev.clientY - r.top - q.clientTop; return [Math.floor(x / cs), Math.floor(y / cs)]; }
+var DR = { on: false, moved: false };
+function bindQuilt() {
+  var bd = $('#bd'); if (bd._b) return; bd._b = 1;
+  bd.addEventListener('pointerdown', function (ev) { var q = ev.target.closest && ev.target.closest('#quilt'); if (!q) return; if (G && G.pend && isHuman(swWho(G)) && !UI.busy) { var c = cellAt(ev); if (c && c[0] >= 0 && c[0] < 9 && c[1] >= 0 && c[1] < 9 && G.board[viewSeat()][c[1] * 9 + c[0]] === -1) doLeather(c[0], c[1]); return; }
+    if (UI.sel < 0 || UI.busy) { var c2 = cellAt(ev), pid = c2 && G.board[viewSeat()][c2[1] * 9 + c2[0]]; if (pid >= 0 && pid < 99) showPatch(pid); return; }
+    DR.on = true; DR.moved = false; DR.touch = ev.pointerType === 'touch'; try { q.setPointerCapture(ev.pointerId); } catch (e) { } dragTo(ev); ev.preventDefault(); });
+  bd.addEventListener('pointermove', function (ev) { if (!DR.on) return; DR.moved = true; dragTo(ev); });
+  var up = function (ev) { if (!DR.on) return; DR.on = false; var ok = ghostOk(); if (!ok) { snapNear(false); drawGhost(); } tutAct({ what: 'drop', valid: ghostOk() }); renderDockLight(); sfx('tick'); };
+  bd.addEventListener('pointerup', up); bd.addEventListener('pointercancel', up);
+}
+function dragTo(ev) { var c = cellAt(ev), cc = curCells(); if (!c || !cc) return; var b = bbox(cc); UI.gx = c[0] - Math.floor(b[0] / 2); UI.gy = c[1] - Math.floor(b[1] / 2) - (DR.touch ? 2 : 0); clampG(); var g = $('#ghost'); if (g) { var cs = UI.cs; g.style.left = UI.gx * cs + 'px'; g.style.top = UI.gy * cs + 'px'; var ok = ghostOk(); g.classList.toggle('ok', ok); g.classList.toggle('bad', !ok); } renderDockLight(); }
+document.addEventListener('keydown', function (e) { if (!G || UI.sel < 0 || GX.open || !UI.started) return; var k = e.key; if (k === 'r' || k === 'R') { rotate(); e.preventDefault(); } else if (k === 'f' || k === 'F') { flip(); e.preventDefault(); } else if (k === 'Enter') { confirmSew(); e.preventDefault(); } else if (k === 'Escape') { cancelSel(); } else if (k.indexOf('Arrow') === 0) { UI.gx += k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0; UI.gy += k === 'ArrowDown' ? 1 : k === 'ArrowUp' ? -1 : 0; clampG(); drawGhost(); e.preventDefault(); } });
+// ---------- moves
+function confirmSew() { if (UI.sel < 0 || UI.busy) return; if (!ghostOk()) { snapNear(false); drawGhost(); if (!ghostOk()) { sfx('bad'); return; } } if (!tutAct({ what: 'buy', k: UI.sel })) return; var m = { t: 'buy', k: UI.sel, o: UI.o, x: UI.gx, y: UI.gy }; UI.sel = -1; act(m); }
+function doAdvance() { if (UI.busy || G.over || G.pend || !isHuman(swWho(G))) return; if (!tutAct({ what: 'adv' })) return; UI.sel = -1; act({ t: 'adv' }); }
+function doLeather(x, y) { if (UI.busy || !tutAct({ what: 'leather' })) return; act({ t: 'leather', x: x, y: y }); }
+function act(m) {
+  if (!G || G.over) return; var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
+  var r = swApply(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed (' + r.why + ').'); render(); return; }
+  var evs = G.ev.slice(); evs.forEach(function (e) { if (e.k === 'place') e.cells.forEach(function (c) { UI.newCells[e.s + ':' + (c[1] * 9 + c[0])] = 1; }); });
+  UI.busy++; saveGame(); render(); playEvents(evs, before, function () { UI.busy--; afterMove(); });
+}
+function floatText(txt, el, color) { var r = el ? el.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 }; var f = h('div.flt', txt); f.style.left = (r.left + r.width / 2 - 18) + 'px'; f.style.top = (r.top) + 'px'; if (color) f.style.color = color; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1200); }
+function playEvents(evs, before, done) {
+  var t = 0, step = amt(380), spots = 0; if (!step) { evs.forEach(function (e) { if (e.k === 'bonus') toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!'); }); return done(); }
+  evs.forEach(function (e) {
+    if (e.k === 'place') { later(t, function () { sfx('place'); }); t += step * 1.2; }
+    if (e.k === 'move') {
+      var from = e.from, to = e.to; SW.BTN_SPOTS.forEach(function (b) { if (b > from && b <= to) { spots++; var tt = t + step * .6 * spots, seat = e.s, inc = G.inc[seat]; if (inc > 0) later(tt, function () { incomeMoment(seat, b, inc, spots); }); } });
+      if (e.gain) later(t, function () { sfx('adv'); floatText('+' + e.gain, $('.nb[data-seat="' + e.s + '"]') || null, '#ffe9a0'); }); t += step * .8 + step * .6 * spots;
+    }
+    if (e.k === 'bonus') { later(t, function () { sfx('bonus'); toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!', 2800); }); t += step; }
+  });
+  later(t + step * .5, done);
+}
+function incomeMoment(seat, spot, inc, i) { // coins fly from the button spot to the buttons counter
+  var cell = $('.tc[data-i="' + spot + '"]'), tgt = $('.nb[data-seat="' + seat + '"]'); if (!cell || !tgt) return; var a = cell.getBoundingClientRect(), b = tgt.getBoundingClientRect();
+  for (var k = 0; k < Math.min(inc, 6); k++) { (function (k) { setTimeout(function () { sfx('coin', k); var c = h('div.coin'); c.style.left = (a.left + a.width / 2 - 9) + 'px'; c.style.top = (a.top + a.height / 2 - 9) + 'px'; c.style.setProperty('--dx', (b.left + b.width / 2 - a.left - a.width / 2) + 'px'); c.style.setProperty('--dy', (b.top - a.top) + 'px'); document.body.appendChild(c); setTimeout(function () { c.remove(); tgt.classList.remove('bump'); void tgt.offsetWidth; tgt.classList.add('bump'); }, 800); }, k * 90); })(k); }
+  floatText('+' + inc + ' buttons', cell, '#ffe9a0');
+}
+function afterMove() { render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
+function schedule() {
+  clearTimeout(UI.tm.ai); if (!G) return; if (G.over) { return later(amt(500), finish); }
+  var s = swWho(G); if (UI.tutorial && !UI.tutAi) return; if (isHuman(s)) { if (typeof hlpPhaseUpdate === 'function') hlpPhaseUpdate(); return; }
+  UI.tm.ai = later(Math.max(120, AIDELAY), aiStep);
+}
+function aiStep() {
+  if (!G || G.over || UI.busy) return; var s = swWho(G); if (isHuman(s)) return; var m = aiMove(G, UI.tutorial ? 'simple' : lvlOf(s), rngUI);
+  if (m.t === 'buy' && amt(1)) { var o = $$('#offers .offer')[m.k]; if (o) { o.classList.add('flash'); sfx('pick'); } UI.busy++; later(amt(650), function () { UI.busy--; act(m); }); } else act(m);
+}
+// ---------- start / finish
+function newGame(mode, o) {
+  o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lvl = o.lvl || UI.lvl;
+  var seed = o.seed != null ? o.seed : (Math.random() * 1e9) | 0; rngUI = swRng(seed + 17); UI.seed = seed;
+  G = swNew({ seed: seed, first: o.first != null ? o.first : (UI.mode === 'hot' || UI.tutorial || UI.camp ? 0 : seed % 2), ring: o.ring });
+  UI.names = UI.mode === 'hot' ? ['Player 1', 'Player 2'] : ['You', UI.camp ? UI.camp.opponent.name : (o.name || ({ easy: 'Poppy', normal: 'Marden', hard: 'Aurelia' }[UI.lvl] || 'Computer'))];
+  if (UI.camp && UI.camp.twist) applyTwist(UI.camp.twist); if (o.setup) o.setup(G);
+  UI.started = true; $('#start').hidden = true; $('#rs').hidden = true; AIDELAY = GX.aiDelay(700); try { GX.close(); } catch (e) { }
+  if (!UI.tutorial && !UI.camp && o.save !== false) saveGame();
+  render(); if (!UI.tutorial) schedule(); try { if (typeof hlpPhaseUpdate === 'function') hlpPhaseUpdate(); } catch (e) { } try { GX.showDock(); } catch (e) { } return G;
+}
+function applyTwist(t) {
+  if (t.id === 'boss-buttons') G.btn[1] += t.param || 0;
+  else if (t.id === 'torn-squares') { var c = [[0, 0], [8, 8], [4, 4], [8, 0], [0, 8]]; for (var i = 0; i < (t.param || 0); i++) G.board[0][c[i][1] * 9 + c[i][0]] = 99; }
+  else if (t.id === 'boss-patched') { var d = [[0, 0], [8, 8], [0, 8], [8, 0]]; for (var j = 0; j < (t.param || 0); j++) G.board[1][d[j][1] * 9 + d[j][0]] = 100; }
+}
+function saveGame() { try { if (UI.tutorial || UI.camp || !G || G.over) { if (G && G.over) localStorage.removeItem('sw_save'); return; } localStorage.setItem('sw_save', JSON.stringify({ G: G, mode: UI.mode, lvl: UI.lvl, names: UI.names })); if (window.GNS && GNS.saved) GNS.saved('stitchwise', true); } catch (e) { } }
+function loadGame() { try { var s = JSON.parse(localStorage.getItem('sw_save')); if (!s || !s.G || s.G.over) return false; G = s.G; UI.mode = s.mode; UI.lvl = s.lvl; UI.names = s.names; UI.camp = null; UI.tutorial = false; UI.started = true; UI.sel = -1; UI.busy = 0; rngUI = swRng((G.seed || 1) + G.turns); $('#start').hidden = true; AIDELAY = GX.aiDelay(700); render(); schedule(); return true; } catch (e) { return false; } }
+function hasSave() { try { var s = JSON.parse(localStorage.getItem('sw_save')); return !!(s && s.G && !s.G.over); } catch (e) { return false; } }
+function metrics(g) { var a = swScore(g, 0), b = swScore(g, 1); return { won: swWinner(g) === 0, score: a.total, margin: a.total - b.total, empty: a.empty, bonus: g.bonus === 0 ? 1 : 0, income: g.inc[0], turns: g.turns }; }
+function finish() {
+  if (!G || !G.over || UI.finished === G) return; UI.finished = G; try { localStorage.removeItem('sw_save'); if (window.GNS && GNS.saved) GNS.saved('stitchwise', false); } catch (e) { }
+  var w = swWinner(G); sfx(w === 0 || UI.mode === 'hot' ? 'win' : 'lose');
+  if (UI.camp && typeof GXC !== 'undefined') { try { GXC.finish(G); } catch (e) { console.error(e); } return; }
+  if (!UI.tutorial) { try { if (window.GNS && GNS.result) GNS.result({ game: 'stitchwise', mode: UI.mode === 'hot' ? 'hot' : 'vs', level: UI.lvl, seats: [{ name: 'You', me: true }, { name: UI.names[1], ai: UI.mode === 'hot' ? undefined : UI.lvl }], winner: w, scores: [swScore(G, 0).total, swScore(G, 1).total], turns: G.turns }); } catch (e) { } }
+  showResult();
+}

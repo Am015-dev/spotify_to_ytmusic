@@ -1,0 +1,14 @@
+{
+ "wave": 1,
+ "ratio": "4:1",
+ "flow_aspect": "16:9",
+ "style": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "stitchwise 2D wave 1, ratio 4:1. Paste with the Flow aspect given; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "stitchwise",
+  "count": 1
+ },
+ "cards": {
+  "track-frame": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A long narrow strip of cream ribbon-trimmed felt with small stitched notches along it, seen from above, empty."
+ }
+}

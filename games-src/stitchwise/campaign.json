@@ -1,0 +1,931 @@
+{
+ "game": "stitchwise",
+ "title": "The Quilter's Year",
+ "version": 1,
+ "cast": {
+  "wren": {
+   "name": "Aunt Wren",
+   "portrait": "portrait-wren.webp",
+   "emoji": "🧵",
+   "color": "#3b7a8c"
+  },
+  "poppy": {
+   "name": "Dame Poppy",
+   "portrait": "portrait-poppy.webp",
+   "emoji": "🌼",
+   "color": "#d9a441"
+  },
+  "tilly": {
+   "name": "Tilly Thimble",
+   "portrait": "portrait-tilly.webp",
+   "emoji": "🪡",
+   "color": "#c0527a"
+  },
+  "fernsby": {
+   "name": "Granny Fernsby",
+   "portrait": "portrait-fernsby.webp",
+   "emoji": "👵",
+   "color": "#6b8e4e"
+  },
+  "odette": {
+   "name": "Odette Loom",
+   "portrait": "portrait-odette.webp",
+   "emoji": "🧶",
+   "color": "#7d5ba6"
+  },
+  "bram": {
+   "name": "Bram Seam",
+   "portrait": "portrait-bram.webp",
+   "emoji": "🧔",
+   "color": "#8a5a3c"
+  },
+  "marguerite": {
+   "name": "Marguerite Bodkin",
+   "portrait": "portrait-marguerite.webp",
+   "emoji": "👑",
+   "color": "#b0314a"
+  },
+  "ivo": {
+   "name": "Ivo Selvage",
+   "portrait": "portrait-ivo.webp",
+   "emoji": "🧣",
+   "color": "#2f6f9f"
+  },
+  "hester": {
+   "name": "Hester Pinwheel",
+   "portrait": "portrait-hester.webp",
+   "emoji": "🎡",
+   "color": "#d1642f"
+  },
+  "tobias": {
+   "name": "Tobias Quillon",
+   "portrait": "portrait-tobias.webp",
+   "emoji": "🪶",
+   "color": "#4a6a5a"
+  },
+  "aurelia": {
+   "name": "Queen Aurelia",
+   "portrait": "portrait-aurelia.webp",
+   "emoji": "🏆",
+   "color": "#8c2f8c"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "Parish Fair",
+   "blurb": "Learn the cloth."
+  },
+  {
+   "act": 2,
+   "title": "County Fair",
+   "blurb": "Tempo and income."
+  },
+  {
+   "act": 3,
+   "title": "Grand Fair",
+   "blurb": "Tidy to the last square."
+  }
+ ],
+ "twists": [
+  {
+   "id": "boss-buttons",
+   "where": "setup",
+   "how": "The boss seat starts with param extra buttons (G.btn[1] += param)."
+  },
+  {
+   "id": "torn-squares",
+   "where": "setup",
+   "how": "Your quilt starts with param torn squares: they cannot be covered and count as empty (board value 99)."
+  },
+  {
+   "id": "boss-patched",
+   "where": "setup",
+   "how": "The boss quilt starts with param leather squares already sewn on (board value 100)."
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "First Stitches",
+   "boss": false,
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Welcome to the Parish Fair, dear. A quilt is nine squares by nine. Fill it before the clock runs out."
+    },
+    {
+     "who": "wren",
+     "text": "Buy a patch with buttons, sew it on, and your time token walks forward."
+    },
+    {
+     "who": "poppy",
+     "text": "I will sit beside you. No hurry."
+    }
+   ],
+   "outro": [
+    {
+     "who": "wren",
+     "text": "Not a gap left behind. You have the eye for it."
+    }
+   ],
+   "opponent": {
+    "name": "Dame Poppy",
+    "portrait": "portrait-poppy.webp",
+    "emoji": "🌼",
+    "cast": "poppy",
+    "personality": "Kind and slow. Buys whatever fits first.",
+    "aiLevel": "easy",
+    "aiStyle": "quilter"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the game."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 0 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 0
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays gently and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "poppy",
+     "text": "Dame Poppy's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "Pennies and Patches",
+   "boss": false,
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Passing a button spot pays you for every button printed on your patches. Buy early, collect often."
+    },
+    {
+     "who": "tilly",
+     "text": "I only look at the cheap patches. Cheap is good!"
+    }
+   ],
+   "outro": [
+    {
+     "who": "wren",
+     "text": "Your little income is already humming."
+    }
+   ],
+   "opponent": {
+    "name": "Tilly Thimble",
+    "portrait": "portrait-tilly.webp",
+    "emoji": "🪡",
+    "cast": "tilly",
+    "personality": "Frugal. Never spends on big patches.",
+    "aiLevel": "easy",
+    "aiStyle": "quilter"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": null,
+   "goal": {
+    "type": "score",
+    "value": -5,
+    "text": "Finish with at least -5 points and win."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Finish with -5 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": -5
+     }
+    },
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Collect 6 or more income buttons",
+     "test": {
+      "k": "income",
+      "op": ">=",
+      "v": 6
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays gently and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "tilly",
+     "text": "Tilly's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "The Parish Champion",
+   "boss": true,
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Granny Fernsby has won the Parish ribbon for forty years."
+    },
+    {
+     "who": "fernsby",
+     "text": "Start with three extra buttons, do you? Cheeky. I will take the same."
+    }
+   ],
+   "outro": [
+    {
+     "who": "fernsby",
+     "text": "Well stitched, child. The county fair awaits."
+    }
+   ],
+   "opponent": {
+    "name": "Granny Fernsby",
+    "portrait": "portrait-fernsby.webp",
+    "emoji": "👵",
+    "cast": "fernsby",
+    "personality": "Wise and tidy. Leaves few gaps.",
+    "aiLevel": "normal",
+    "aiStyle": "quilter",
+    "taunt": "A neat try. Come back when your corners are tidier.",
+    "praise": "You sew like the old days. Go and win the county."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": {
+    "id": "boss-buttons",
+    "param": 3,
+    "text": "Boss rule: Granny Fernsby starts with 3 extra buttons."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win against the Parish Champion."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Fewer than 12 empty squares",
+     "test": {
+      "k": "empty",
+      "op": "<=",
+      "v": 11
+     }
+    },
+    {
+     "text": "Win by 8 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 8
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays gently and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "act",
+     "id": "act2",
+     "text": "The County Fair opens"
+    }
+   ]
+  },
+  {
+   "id": "c4",
+   "act": 2,
+   "title": "County Gate",
+   "boss": false,
+   "intro": [
+    {
+     "who": "wren",
+     "text": "County quilters watch the time track as closely as their cloth."
+    },
+    {
+     "who": "odette",
+     "text": "Fall behind and I will take every turn in a row."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odette",
+     "text": "Hm. You waited for the right moment."
+    }
+   ],
+   "opponent": {
+    "name": "Odette Loom",
+    "portrait": "portrait-odette.webp",
+    "emoji": "🧶",
+    "cast": "odette",
+    "personality": "Hungry for income. Buys patches with buttons on them.",
+    "aiLevel": "normal",
+    "aiStyle": "quilter"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": null,
+   "goal": {
+    "type": "margin",
+    "value": 5,
+    "text": "Win by 5 or more."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Win by 5 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 5
+     }
+    },
+    {
+     "text": "Score 10 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays gently and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "odette",
+     "text": "Odette's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c5",
+   "act": 2,
+   "title": "Moth Season",
+   "boss": false,
+   "intro": [
+    {
+     "who": "bram",
+     "text": "Moths got into your quilt. Three squares are chewed through. Sorry about that."
+    },
+    {
+     "who": "wren",
+     "text": "Torn squares cannot be covered. Plan around them."
+    }
+   ],
+   "outro": [
+    {
+     "who": "bram",
+     "text": "You made the holes look like a design."
+    }
+   ],
+   "opponent": {
+    "name": "Bram Seam",
+    "portrait": "portrait-bram.webp",
+    "emoji": "🧔",
+    "cast": "bram",
+    "personality": "Blunt. Strong at fitting awkward shapes.",
+    "aiLevel": "normal",
+    "aiStyle": "quilter"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": {
+    "id": "torn-squares",
+    "param": 3,
+    "text": "Twist: three squares of your quilt are torn and can never be covered."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win with 3 torn squares in your quilt."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 0 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 0
+     }
+    },
+    {
+     "text": "Take the 7x7 bonus",
+     "test": {
+      "k": "bonus",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays gently and the torn squares are gone."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "bram",
+     "text": "Bram's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c6",
+   "act": 2,
+   "title": "The County Champion",
+   "boss": true,
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Marguerite Bodkin keeps the county ribbon on her wall."
+    },
+    {
+     "who": "marguerite",
+     "text": "Four buttons to start. I do not need them, but I like winning easily."
+    }
+   ],
+   "outro": [
+    {
+     "who": "marguerite",
+     "text": "Hm! Take your ribbon. Grand Fair next month."
+    }
+   ],
+   "opponent": {
+    "name": "Marguerite Bodkin",
+    "portrait": "portrait-marguerite.webp",
+    "emoji": "👑",
+    "cast": "marguerite",
+    "personality": "Calm and precise. Rarely wastes time.",
+    "aiLevel": "normal",
+    "aiStyle": "quilter",
+    "taunt": "Pretty, but the ribbon stays with me.",
+    "praise": "That was a proper quilt. The Grand Fair is yours to try."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": {
+    "id": "boss-buttons",
+    "param": 4,
+    "text": "Boss rule: Marguerite starts with 4 extra buttons."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win against the County Champion."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 8 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 8
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays gently and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "act",
+     "id": "act3",
+     "text": "The Grand Fair opens"
+    }
+   ]
+  },
+  {
+   "id": "c7",
+   "act": 3,
+   "title": "Grand Gates",
+   "boss": false,
+   "intro": [
+    {
+     "who": "wren",
+     "text": "At the Grand Fair every quilter counts to the last square."
+    },
+    {
+     "who": "ivo",
+     "text": "I count better than you. Let us see."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ivo",
+     "text": "Well counted. Truly."
+    }
+   ],
+   "opponent": {
+    "name": "Ivo Selvage",
+    "portrait": "portrait-ivo.webp",
+    "emoji": "🧣",
+    "cast": "ivo",
+    "personality": "Counts every button. Hard to out-tempo.",
+    "aiLevel": "hard",
+    "aiStyle": "quilter"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win against a sharp counter."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 5 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 5
+     }
+    },
+    {
+     "text": "Fewer than 8 empty squares",
+     "test": {
+      "k": "empty",
+      "op": "<=",
+      "v": 7
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays at normal strength and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c8",
+   "act": 3,
+   "title": "Head Start",
+   "boss": false,
+   "intro": [
+    {
+     "who": "hester",
+     "text": "Three of my squares are already sewn. Call it a family tradition."
+    },
+    {
+     "who": "wren",
+     "text": "Out-fill her anyway. You have the better eye."
+    }
+   ],
+   "outro": [
+    {
+     "who": "hester",
+     "text": "Round and round I go. You were quicker."
+    }
+   ],
+   "opponent": {
+    "name": "Hester Pinwheel",
+    "portrait": "portrait-hester.webp",
+    "emoji": "🎡",
+    "cast": "hester",
+    "personality": "Cheerful but cunning. Loves big patches.",
+    "aiLevel": "hard",
+    "aiStyle": "quilter"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": {
+    "id": "boss-patched",
+    "param": 3,
+    "text": "Twist: Hester's quilt starts with 3 squares already sewn."
+   },
+   "goal": {
+    "type": "score",
+    "value": 5,
+    "text": "Win with at least 5 points."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 5 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 5
+     }
+    },
+    {
+     "text": "Win by 12 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 12
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays at normal strength and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c9",
+   "act": 3,
+   "title": "The Tidy Quilt",
+   "boss": false,
+   "intro": [
+    {
+     "who": "tobias",
+     "text": "I have never left more than six squares empty in my life."
+    },
+    {
+     "who": "wren",
+     "text": "Then neither should you tonight."
+    }
+   ],
+   "outro": [
+    {
+     "who": "tobias",
+     "text": "Seven squares and a smile. Fair play."
+    }
+   ],
+   "opponent": {
+    "name": "Tobias Quillon",
+    "portrait": "portrait-tobias.webp",
+    "emoji": "🪶",
+    "cast": "tobias",
+    "personality": "Quiet perfectionist. Fits everything.",
+    "aiLevel": "hard",
+    "aiStyle": "quilter"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": null,
+    "text": "Win with at most 6 empty squares."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "6 or fewer empty squares",
+     "test": {
+      "k": "empty",
+      "op": "<=",
+      "v": 6
+     }
+    },
+    {
+     "text": "Take the 7x7 bonus",
+     "test": {
+      "k": "bonus",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays at normal strength."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c10",
+   "act": 3,
+   "title": "The Queen of Quilts",
+   "boss": true,
+   "intro": [
+    {
+     "who": "wren",
+     "text": "Queen Aurelia has never lost at the Grand Fair."
+    },
+    {
+     "who": "aurelia",
+     "text": "Three buttons to begin, and the best eye in the land. Sit down, little quilter."
+    }
+   ],
+   "outro": [
+    {
+     "who": "aurelia",
+     "text": "A new champion. I shall frame this quilt."
+    }
+   ],
+   "opponent": {
+    "name": "Queen Aurelia",
+    "portrait": "portrait-aurelia.webp",
+    "emoji": "🏆",
+    "cast": "aurelia",
+    "personality": "Flawless. Fast and tidy.",
+    "aiLevel": "hard",
+    "aiStyle": "quilter",
+    "taunt": "Tidy, but a queen does not lose.",
+    "praise": "Grand Champion. The hall is yours."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "standard"
+   },
+   "twist": {
+    "id": "boss-buttons",
+    "param": 3,
+    "text": "Boss rule: Queen Aurelia starts with 3 extra buttons."
+   },
+   "goal": {
+    "type": "score",
+    "value": 10,
+    "text": "Win with at least 10 points."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 10 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 10
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The computer plays at normal strength and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "champion",
+     "text": "Title: Grand Champion"
+    }
+   ]
+  }
+ ]
+}

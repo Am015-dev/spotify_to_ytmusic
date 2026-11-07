@@ -31,6 +31,7 @@ GAMES = {
     "lantern-dive":     ("Lantern Dive",     "lantern-dive/game",   "lantern-dive"),
     "nebula-aces":      ("Nebula Aces",      "xw",                  "xw"),
     "redline-rally":    ("Redline Rally",    "redline-rally",       "redline-rally"),
+    "stitchwise":       ("Stitchwise",       "stitchwise",          "stitchwise"),
     "rampart-and-vine": ("Rampart and Vine", "carc/game/src",       "carc"),
     "sands-of-qamar":   ("Sands of Qamar",   "ft/src",              "ft"),
     "shipwreck-isle":   ("Shipwreck Isle",   "rc",                  "rc"),
