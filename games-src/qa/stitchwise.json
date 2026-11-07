@@ -1,0 +1,36 @@
+{
+ "slug": "stitchwise",
+ "size": "phone",
+ "seed": 90748,
+ "when": "2026-11-07T23:18Z",
+ "tutorial": {
+  "end": null,
+  "note": "no tutorial"
+ },
+ "quick": {
+  "result": null
+ },
+ "story": {
+  "result": null
+ },
+ "fuzz": {},
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Patches\" under div#start.ov \"Stitchwise A quilting du\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases tutorial",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "no tutorial entry on the title screen (no learn/guided/tutorial button): game has no staged tutorial",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases tutorial",
+   "shot": "/tmp/qa-shots/stitchwise/phone-tut-noentry-2.png"
+  }
+ ],
+ "secs": 8
+}
