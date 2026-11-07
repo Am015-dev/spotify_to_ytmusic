@@ -81,6 +81,7 @@ button{font:inherit;color:inherit}
 .sg.on{background:var(--wm-cream);color:var(--gx-ink);font-weight:800}
 .sum{font-size:16px;opacity:.9;margin:4px 0}
 .rbig{font-size:30px;margin:0}
+.why{margin:6px 0 10px;font-weight:600;font-size:15px;line-height:1.35}
 .rbtn{display:flex;flex-direction:column;gap:8px}
 .st{width:100%;border-collapse:collapse;font-size:16px}
 .st th,.st td{padding:4px 6px;border-bottom:1px solid rgba(128,128,128,.25);text-align:center;white-space:nowrap}
@@ -142,3 +143,28 @@ html body .gxc-lock{font-size:0!important;width:18px;height:18px;border-radius:5
 .ic.hasart svg{visibility:hidden}.ic{display:inline-block;width:26px;height:26px}
 html body .gxc-node .gxc-disc{background-image:none!important}
 @media (min-width:1000px){html body :is(.gxh-tt,.gxh-tx,.gxh-bd button,.gxt-say,.gxt-tt){font-size:16px!important}}
+/* title: a scene (painted picture, or the code-drawn valley under it), logo on top, actions at the bottom (shelf layout) */
+#start.front{flex-direction:column;justify-content:space-between;align-items:stretch;padding:max(14px,env(safe-area-inset-top)) 16px max(14px,env(safe-area-inset-bottom));background-position:center 35%!important}
+#start.front::after{content:'';position:absolute;inset:auto 0 0 0;height:58%;background:linear-gradient(to bottom,rgba(10,18,14,0),rgba(10,18,14,.82) 55%);pointer-events:none;z-index:0}
+.tscene{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+#start.hasart .tscene{display:none}
+.ttop,.tbot{position:relative;z-index:1;width:min(460px,100%);margin:0 auto}
+.ttop{display:flex;align-items:center;justify-content:center;gap:12px;text-align:left}
+.ttop .logo{font-size:40px;line-height:1;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 18px rgba(0,0,0,.35)}
+.ttop .tag{margin:4px 0 0;font-size:15px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.tlogo{width:56px;height:56px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(18,32,25,.55);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.tlogo.hasart .crest{display:none}.tlogo .crest svg{width:44px;height:44px}
+.tbot{display:flex;flex-direction:column;gap:10px}
+.tbot .big{min-height:64px;box-shadow:0 4px 0 #9c6a12,0 6px 16px rgba(0,0,0,.35)}
+.tbot .ab{background:rgba(18,32,25,.82);border-color:rgba(255,255,255,.3);backdrop-filter:blur(4px)}
+.tbot .tnew,.tbot .gxt-menu{background:#3f8f4e!important;border-color:transparent!important}
+.tsize{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.tsize span{margin-right:4px}
+.tsz{appearance:none;min-width:56px;min-height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(18,32,25,.82);font-weight:800;font-size:16px;cursor:pointer}
+.tsz.on{background:var(--wm-gold);color:#2a1c06;border-color:transparent}
+.trow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.trow .ab{min-height:50px;font-size:15px;line-height:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.trow .ab small{font-size:12px;font-weight:600;opacity:.85}
+@media (min-width:900px){.ttop .logo{font-size:56px}.tlogo{width:72px;height:72px}.tbot{width:460px}}
+@media (orientation:landscape) and (max-height:500px){#start.front{flex-direction:row;align-items:center;gap:20px}.ttop{flex-direction:column;text-align:center;width:auto}.tbot{width:min(420px,58%);gap:6px}.tbot .big{min-height:52px}.trow .ab{min-height:44px}}
+#start.front::before{content:'';position:absolute;inset:0 0 auto 0;height:30%;background:linear-gradient(to top,rgba(10,18,14,0),rgba(10,18,14,.7));pointer-events:none;z-index:0}

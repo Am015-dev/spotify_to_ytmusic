@@ -253,14 +253,14 @@ function lineText() {
   return '';
 }
 function renderTop() {
-  var me = G.seats[UI.view], sc = WM.score(me.env, me.acorns), h = '';
+  var me = G.seats[UI.view], fin = G.over ? G.res : WM.final(G), sc = fin[UI.view], h = '';   // one honest score: live totals include the habitat bonuses (as the Scores drawer and result)
   WM.ANI.forEach(function (a) { h += '<button type="button" class="cc" data-card="' + a + '" aria-label="' + esc(cinfo(a).title) + ' card, ' + sc.ani[a] + ' points">' + mkTok(a) + '<b>' + sc.ani[a] + '</b></button>'; });
   $('#cards').innerHTML = h;
   var sh = '';
-  if (G.np > 1) G.seats.forEach(function (s, i) { var t = WM.score(s.env, s.acorns).total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '">' + esc(s.name) + ' <b>' + t + '</b></button>'; });
+  if (G.np > 1) G.seats.forEach(function (s, i) { var t = fin[i].total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '">' + esc(s.name) + ' <b>' + t + '</b></button>'; });
   $('#seats').innerHTML = sh; $('#seats').hidden = G.np < 2;
   var turn = Math.min(G.turns, G.seats[G.cur].done + 1);
-  $('#barstat').innerHTML = '<span class="pill">Turn <b>' + turn + '/' + G.turns + '</b></span><span class="pill">Score <b>' + sc.total + '</b></span>';
+  $('#barstat').innerHTML = '<span class="pill">Turn <b>' + turn + '/' + G.turns + '</b></span>' + (G.np > 1 ? '' : '<span class="pill">Score <b>' + sc.total + '</b></span>');
   $('#line').textContent = lineText();
 }
 function render() {
@@ -301,7 +301,7 @@ function tileText(t, tok) {
 function showBig(kind, obj, tok) {
   var body = document.createElement('div'); body.className = 'bigv';
   if (kind === 'tile') body.innerHTML = '<div class="bigpic">' + mkTile(obj, 60) + '</div>' + tileText(obj, tok);
-  else { var C = cinfo(obj); body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p>'; }
+  else { var C = cinfo(obj); body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : obj === 'fox' && cset(obj) === 'a' ? '0 to 5 per fox' : 'Card ' + cset(obj).toUpperCase()) + '</p>'; }
   GX.drawer('bigd', kind === 'tile' ? 'Habitat tile' : 'Animal token', body, false); GX.show('bigd');
 }
 (function wireHold() {
@@ -313,6 +313,18 @@ function showBig(kind, obj, tok) {
   document.addEventListener('contextmenu', function (e) { if (e.target.closest && e.target.closest('#mk')) e.preventDefault(); });
 })();
 // ---------------------------------------------------------------- result
+function whyLine(sc, me) {   // one short line: why you won or lost (the biggest gap between you and the best rival)
+  if (G.solo || sc.length < 2) return '';
+  var riv = -1; sc.forEach(function (x, i) { if (i !== me && (riv < 0 || x.total > sc[riv].total)) riv = i; });
+  var a = sc[me], b = sc[riv], nm = G.seats[riv].name, parts = [
+    { k: 'animals', d: a.aniT - b.aniT, t: 'animal cards ' + a.aniT + ' vs ' + b.aniT },
+    { k: 'habitats', d: a.habT - b.habT, t: 'habitats ' + a.habT + ' vs ' + b.habT },
+    { k: 'bonus', d: a.bonusT - b.bonusT, t: 'habitat bonuses +' + a.bonusT + ' vs +' + b.bonusT },
+    { k: 'acorns', d: a.acorns - b.acorns, t: 'acorns ' + a.acorns + ' vs ' + b.acorns }];
+  var win = a.total >= b.total; parts.sort(function (x, y) { return win ? y.d - x.d : x.d - y.d; });
+  var p = parts[0]; if (!p.d) return '<p class="why">Neck and neck with ' + esc(nm) + ' in every column.</p>';
+  return '<p class="why">' + (win ? 'You beat ' + esc(nm) + ' on ' : esc(nm) + ' won on ') + p.t + (win ? '.' : ' (yours first).') + '</p>';
+}
 function showResult() {
   if (!G || !G.over || UI.resultShown === G.seed + ':' + G.logN) return; UI.resultShown = G.seed + ':' + G.logN;
   sfx('end'); save(); musicSync(); $('#toast').classList.remove('on');
@@ -320,14 +332,14 @@ function showResult() {
   if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
-  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
+  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + whyLine(sc, me) + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
   try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
 }
 // ---------------------------------------------------------------- title + setup
 function showTitle() {
   clearTimeout(UI.aiT); UI.mode = 'quick'; UI.camp = null; try { GX.close(); } catch (e) { } $('#rs').hidden = true; $('#pass').hidden = true;
   var st = $('#start'), sv = loadSave(), c = UI.setup || (UI.setup = { opp: 1, ai: 'normal', humans: 1 });
-  st.hidden = false;
+  st.hidden = false; st.classList.toggle('front', UI.sv !== 'setup');
   if (UI.sv === 'setup') {
     var seg = function (id, list, cur) { return '<div class="seg" data-k="' + id + '">' + list.map(function (o) { return '<button type="button" class="sg' + (o[0] === cur ? ' on' : '') + '" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>'; };
     st.innerHTML = '<div class="tbox"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
@@ -338,14 +350,29 @@ function showTitle() {
     return;
   }
   var p = window.GXC ? GXC.progress() : null, n = p && window.CAMPAIGN ? CAMPAIGN.chapters.filter(function (x) { return p.ch[x.id] && p.ch[x.id].beaten; }).length : 0;
-  st.innerHTML = '<div class="tbox"><div class="crest" aria-hidden="true">' + mkTok('elk') + mkTok('fox') + mkTok('salmon') + '</div><h1 class="logo">Wildmark</h1><p class="tag">Grow a wild valley. Settle its animals.</p>' +
-    '<button type="button" class="big" id="storyB">Story<small>' + (n ? n + ' of ' + CAMPAIGN.chapters.length + ' regions restored' : 'Restore three wild regions') + '</small></button>' +
-    (sv ? '<button type="button" class="ab wide" id="resumeB">Resume game</button>' : '') +
-    '<button type="button" class="ab wide" id="quickB">Quick game</button>' +
-    (window.GXT ? GXT.menuHTML({ game: 'wildmark', first: !UI.prefs.played, cls: 'ab wide', launch: function () { tutStart(); } }) : '') +
-    '<button type="button" class="ab wide" id="howB">How to play</button></div>';
+  var tb = c.opp + c.humans < 2 ? 1 : c.opp + c.humans;   // "Table for": 1 = solo, 2-4 = you + rivals
+  st.innerHTML = TITLE_SCENE + '<div class="ttop"><div class="tlogo" data-art="icon-logo" aria-hidden="true"><span class="crest">' + mkTok('elk') + '</span></div><div><h1 class="logo">Wildmark</h1><p class="tag">Grow a wild valley. Settle its animals.</p></div></div>' +
+    '<div class="tbot">' +
+    (window.GXT ? GXT.menuHTML({ game: 'wildmark', first: !UI.prefs.played, cls: 'ab wide tnew', launch: function () { tutStart(); } }) : '') +
+    (sv ? '<button type="button" class="ab wide tres" id="resumeB">Resume game</button>' : '') +
+    '<button type="button" class="big" id="playB">Play<small>' + (tb === 1 ? 'solo: beat your best valley' : 'against ' + (tb - 1) + ' computer ranger' + (tb > 2 ? 's' : '')) + '</small></button>' +
+    '<div class="tsize" role="group" aria-label="Table size"><span>Table for</span>' + [1, 2, 3, 4].map(function (k) { return '<button type="button" class="tsz' + (k === tb ? ' on' : '') + '" data-n="' + k + '" aria-pressed="' + (k === tb) + '">' + (k === 1 ? 'Solo' : k) + '</button>'; }).join('') + '</div>' +
+    '<div class="trow"><button type="button" class="ab" id="quickB">More options</button><button type="button" class="ab tstory" id="storyB">Story<small>' + (n ? n + '/' + CAMPAIGN.chapters.length + ' regions' : 'Ten chapters') + '</small></button><button type="button" class="ab" id="howB">How to play</button></div></div>';
 }
-function setupSum(c) { return (c.cards === 'mix' ? 'Mixed animal cards. ' : '') + c.opp === 0 && c.humans === 1 ? 'Solo: 20 turns, beat your best score.' : (c.humans > 1 ? c.humans + ' players on this device' : 'You') + (c.opp ? ' vs ' + c.opp + ' ' + c.ai + ' rival' + (c.opp > 1 ? 's' : '') : '') + ', 20 turns each.'; }
+// code-drawn title scene (shown under the painted title picture; it is the whole scene when no picture exists): dusk valley, river, pines, a hawk
+var TITLE_SCENE = '<svg class="tscene" viewBox="0 0 390 760" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>' +
+  '<linearGradient id="tsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a3b5a"/><stop offset=".45" stop-color="#c9875a"/><stop offset=".62" stop-color="#f1c27a"/></linearGradient>' +
+  '<linearGradient id="trv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6d79a"/><stop offset="1" stop-color="#5f9bb8"/></linearGradient></defs>' +
+  '<rect width="390" height="760" fill="url(#tsk)"/><circle cx="270" cy="300" r="46" fill="#fbe2a6" opacity=".9"/>' +
+  '<path d="M0 360 L60 290 L110 330 L170 250 L230 320 L290 270 L350 330 L390 300 V760 H0Z" fill="#6c6f8a"/>' +
+  '<path d="M0 400 L70 350 L140 390 L210 340 L280 395 L340 360 L390 380 V760 H0Z" fill="#4f6a5e"/>' +
+  '<path d="M0 470 Q100 420 200 455 T390 440 V760 H0Z" fill="#3c5a40"/>' +
+  '<path d="M180 455 Q215 520 160 580 Q100 650 190 760 H250 Q170 650 230 585 Q285 520 215 455Z" fill="url(#trv)" opacity=".85"/>' +
+  '<path d="M0 560 Q120 520 170 560 L150 760 H0Z M390 540 Q300 520 250 570 L270 760 H390Z" fill="#2c4a31"/>' +
+  [[30, 520, 1.3], [62, 540, 1], [330, 505, 1.4], [362, 530, 1.1], [300, 545, .9], [95, 575, .8]].map(function (t) { return '<g transform="translate(' + t[0] + ' ' + t[1] + ') scale(' + t[2] + ')"><path d="M0 -60 L18 -18 H8 L24 12 H-24 L-8 -18 H-18Z" fill="#1d3523"/><rect x="-3" y="12" width="6" height="10" fill="#3a2a1a"/></g>'; }).join('') +
+  '<path d="M120 200 q10 -8 20 0 q10 -8 20 0" fill="none" stroke="#2a2a30" stroke-width="3" stroke-linecap="round"/>' +
+  '<rect width="390" height="760" fill="url(#tsk)" opacity="0" /></svg>';
+function setupSum(c) { return (c.cards === 'mix' ? 'Mixed animal cards. ' : '') + (c.opp === 0 && c.humans === 1 ? 'Solo: 20 turns, beat your best score.' : (c.humans > 1 ? c.humans + ' players on this device' : 'You') + (c.opp ? ' vs ' + c.opp + ' ' + c.ai + ' rival' + (c.opp > 1 ? 's' : '') : '') + ', 20 turns each.'); }
 // ---------------------------------------------------------------- events
 document.addEventListener('click', function (e) {
   var t = e.target.closest && e.target.closest('button'); if (!t) return;
@@ -353,6 +380,7 @@ document.addEventListener('click', function (e) {
   if (t.classList.contains('mt')) return onMarket('t', +t.dataset.i);
   if (t.classList.contains('mk')) return onMarket('k', +t.dataset.i);
   if (t.classList.contains('sg')) { var k = t.parentNode.dataset.k, v = t.dataset.v; UI.setup[k] = k === 'ai' || k === 'cards' ? v : +v; if (UI.setup.humans + UI.setup.opp > 4) UI.setup.opp = 4 - UI.setup.humans; if (UI.setup.humans + UI.setup.opp < 1) UI.setup.opp = 0; showTitle(); return; }
+  if (t.classList.contains('tsz')) { UI.setup.opp = +t.dataset.n - 1; UI.setup.humans = 1; showTitle(); return; }
   if (t.classList.contains('cc')) { openCards(); return; }
   if (t.classList.contains('seat')) { UI.view = +t.dataset.seat; render(); fitView(); return; }
   switch (id) {
@@ -361,7 +389,7 @@ document.addEventListener('click', function (e) {
     case 'backT': UI.sv = 'title'; showTitle(); break;
     case 'howB': openRules(); break;
     case 'resumeB': resume(); break;
-    case 'goB': UI.sv = 'title'; UI.mode = 'quick'; UI.prefs.played = 1; savePrefs(); var c = UI.setup; newGame({ np: c.humans + c.opp, humans: c.humans, ai: c.ai, cards: c.cards || 'a' }); break;
+    case 'playB': UI.setup.humans = 1; case 'goB': UI.sv = 'title'; UI.mode = 'quick'; UI.prefs.played = 1; savePrefs(); var c = UI.setup; newGame({ np: c.humans + c.opp, humans: c.humans, ai: c.ai, cards: c.cards || 'a' }); break;
     case 'againB': if (UI.mode === 'quick' && UI.cfg) newGame(Object.assign({}, UI.cfg, { seed: null })); else showTitle(); break;
     case 'titleB': UI.sv = 'title'; showTitle(); break;
     case 'campCont': $('#rs').hidden = true; try { GXC.finish(G); } catch (er) { console.error(er); } break;
