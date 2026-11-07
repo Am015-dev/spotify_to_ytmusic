@@ -79,11 +79,11 @@ function renderMat(p, vs) {
 }
 function renderDock(p, vs, cur) {
   var Q = G.q, mine = myTurn();
-  var who = G.phase === 'over' ? 'Game over' : (isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name + "'s turn" : 'Your turn') : G.pl[cur].name + ' is playing') + ' · ' + G.pl[cur].cubes + ' actions left';
+  var who = G.phase === 'over' ? 'Game over' : 'Round ' + (G.round + 1) + ' of ' + G.rounds + ' · ' + (isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name : 'you') : G.pl[cur].name) + ' · ' + G.pl[cur].cubes + ' actions left';
   $('#dt').textContent = who;
   $('#prompt').textContent = promptText(mine);
   $('#acts').innerHTML = mine ? actsHTML() : '';
-  $('#foodrow').innerHTML = PP.FOODS.map(function (f) { return '<span class="fd' + (p.food[f] ? '' : ' zero') + '" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<span data-engine="G.pl.' + vs + '.food.' + f + '">' + p.food[f] + '</span></span>'; }).join('') +
+  $('#foodrow').innerHTML = PP.FOODS.map(function (f) { return '<span class="fd' + (p.food[f] ? '' : ' zero') + '" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<span data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</span></span>'; }).join('') +
     '<span class="fd" aria-label="bonus cards">★ ' + p.bonus.length + ' bonus</span>';
   var ok = {}; if (mine && !Q) PP.playable(G, vs).forEach(function (x) { ok[x.i] = 1; });
   $('#hand').innerHTML = p.hand.length ? p.hand.map(function (id, i) { return cardHTML(id, 'hand', null, 'data-a="hand" data-i="' + i + '" role="button" tabindex="0"').replace('class="bc ', 'class="bc' + (UI.sel === i ? ' sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + ' '); }).join('') : '<span class="empty">No birds in hand. Draw cards in the wetland.</span>';

@@ -10,6 +10,9 @@ document.addEventListener('click', function (e) {
   var mine = myTurn(), Q = G.q, p = G.pl[UI.view];
   sfx('tap');
   if (a === 'zoom') { showCard(p.hand[i]); return; }
+  if (a === 'die' && !(mine && Q && Q.h === 'die')) { toast('Feeder: ' + (G.feeder[i] === 'gs' ? 'grub or seed' : G.feeder[i]) + ' die. Your forest takes food from here.'); return; }
+  if (a === 'deck' && !(mine && Q && Q.h === 'draw')) { toast('Deck: ' + G.deck.length + ' birds. Your wetland draws from here or the tray.'); return; }
+  if (a === 'tray' && G.tray[i] && !(mine && Q && Q.h === 'draw')) { var tb = B[G.tray[i]]; toast(tb.n + ': ' + tb.p + ' pts. ' + PP.power(tb.id).txt, 3600); return; }
   if (!mine) {   // not deciding: taps just show the card
     if (a === 'bird') showCard(p.board[h][c].id, p.board[h][c]);
     else if (a === 'hand') showCard(p.hand[i]);
@@ -64,12 +67,19 @@ function human(m) {
   try { if (window.GX && GX.undo && GX.undo.snap) { } } catch (e) { }
   apply(m, s);
 }
+function setSlot(h, c, st) {   // redraw one bird on the shown board (used to reveal each power's result as that bird fires)
+  var el = $('.bc[data-a="bird"][data-h="' + h + '"][data-c="' + c + '"]'); if (!el || !st) return null;
+  el.outerHTML = cardHTML(st.id, 'slot', st, 'data-a="bird" data-h="' + h + '" data-c="' + c + '" role="button" tabindex="0"');
+  return $('.bc[data-a="bird"][data-h="' + h + '"][data-c="' + c + '"]');
+}
 function apply(m, s) {
+  var pre = PP.clone(G.pl[UI.view].board);
   var r = PP.performMove(G, m, s);
   if (!r.ok) { toast('Not allowed: ' + r.err); render(); return false; }
   var fx = G.fx.slice(); G.fx = [];
   if (isHuman(s)) UI.lastHuman = s;
   save(); render();
+  if (!UI.fast) fx.forEach(function (e) { if (e.k === 'pw' && e.seat === UI.view && pre[e.h] && pre[e.h][e.c] && pre[e.h][e.c].id === e.id) setSlot(e.h, e.c, pre[e.h][e.c]); });
   UI.busy = true;
   playFx(fx, s).then(function () { UI.busy = false; render(); pump(); });
   return true;
@@ -103,7 +113,7 @@ function playFx(list, actor) {
           return wait(aMs(350));
         }
         case 'pw': {
-          var el = slotEl(e.seat, e.h, e.c);
+          var el = mine ? (setSlot(e.h, e.c, G.pl[view].board[e.h][e.c]) || slotEl(e.seat, e.h, e.c)) : slotEl(e.seat, e.h, e.c);
           if (el && mine) { el.classList.remove('firing'); void el.offsetWidth; el.classList.add('firing'); }
           sfx(e.pink ? 'pink' : 'chirp');
           popAt(el, (e.pink ? 'Between turns: ' : '') + (mine ? '' : B[e.id].n + ': ') + e.txt);
@@ -179,3 +189,6 @@ function startGame(o) {
   pump();
 }
 function resume(s) { stopTimers(); G = s.G; UI.mode = s.mode || 'vs'; UI.camp = null; UI.view = Math.max(0, humans()[0] || 0); ['title', 'setup', 'result', 'pass'].forEach(function (id) { $('#' + id).hidden = true; }); render(); pump(); }
+
+// the shared Menu's section chips only scroll: mark the chosen one so the tap shows
+document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (!c) return; $$('.gx-set-nav .gx-chip').forEach(function (x) { if (x !== c) x.removeAttribute('data-on'); }); c.setAttribute('data-on', ''); });

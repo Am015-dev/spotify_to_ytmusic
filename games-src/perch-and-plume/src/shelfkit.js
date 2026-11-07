@@ -49,18 +49,18 @@ function helpInit() {
   try {
     GXH.init({ game: 'perch-and-plume', defaultOn: true, avoid: '.glow,#acts .btn',
       steps: {
-        act: { target: function () { return $('.ract[data-h="0"]'); }, title: 'One action a turn', text: 'Tap a row to use it, or tap a bird in your hand to play it.' },
-        play: { target: function () { return $('.slot.next.glow') || $('#mat'); }, title: 'Place your bird', text: 'Tap a glowing space. Spaces further right cost eggs.' },
-        die: { target: function () { return $('#feeder'); }, title: 'The birdfeeder', text: 'Tap a die to take that food. Empty feeder? All five dice roll again.' },
-        egg: { target: function () { return $('.bc[data-a="bird"].glow') || $('#mat'); }, title: 'Lay eggs', text: 'Tap a bird with room in its nest. Each egg is a point.' },
-        draw: { target: function () { return $('#tray'); }, title: 'Draw birds', text: 'Take a face-up bird from the tray, or a surprise from the deck.' },
-        bonus: { target: function () { return $('#acts'); }, title: 'A trade', text: 'This space lets you trade for one more. Say yes or no thanks.' },
-        power: { target: function () { return $('.bc.firing') || $('#hand'); }, title: 'A bird power', text: 'This bird asks you to choose. Tap a glowing card or Skip.' }
+        act: { target: function () { return $('.ract[data-h="0"]'); }, title: 'One action a turn', text: 'One action a turn: use a habitat row, or play a bird from your hand.' },
+        play: { target: function () { return $('.slot.next.glow') || $('#mat'); }, title: 'Place your bird', text: 'A bird goes in the leftmost free space. Spaces further right cost eggs.' },
+        die: { target: function () { return $('#feeder'); }, title: 'The birdfeeder', text: 'Each die is one food. An empty feeder rolls all five dice again.' },
+        egg: { target: function () { return $('.bc[data-a="bird"].glow') || $('#mat'); }, title: 'Lay eggs', text: 'Each egg is a point. A bird holds only as many eggs as its nest shows.' },
+        draw: { target: function () { return $('#tray'); }, title: 'Draw birds', text: 'The tray shows three birds; the deck is a surprise.' },
+        bonus: { target: function () { return $('#acts'); }, title: 'A trade', text: 'This space offers a trade for one more. Yes or no thanks.' },
+        power: { target: function () { return $('.bc.firing') || $('#hand'); }, title: 'A bird power', text: 'This bird asks for a decision. Skip is always allowed.' }
       },
       rules: RULES.map(function (r) { return { title: r[0], text: r[1].split('. ')[0].slice(0, 120) + '.' }; }).slice(0, 4)
         .concat([{ phase: 'act', title: 'Rows grow', text: 'More birds in a row means a bigger action, and every brown power in it fires.' },
           { phase: 'play', title: 'Paying for birds', text: 'Pay the food shown. Any two food can stand in for one.' },
-          { phase: 'die', title: 'Food dice', text: 'Take the food your birds in hand need.' },
+          { phase: 'die', title: 'Food dice', text: 'The food your birds in hand need is the best food.' },
           { phase: 'egg', title: 'Nests', text: 'Each bird holds as many eggs as its nest shows.' },
           { phase: 'draw', title: 'The tray', text: 'The tray refills at the end of your turn.' }]) });
     GXH.bulb({ el: '#bulbbtn', rulesFor: function () { return helpPhase() || 'act'; },

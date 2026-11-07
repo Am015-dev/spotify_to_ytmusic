@@ -56,7 +56,7 @@ svg{display:block}
 .ract.fire{animation:fire .7s ease}
 @keyframes fire{40%{background:var(--acc);color:var(--ink);transform:scale(1.06)}}
 .slot{border-radius:8px;border:2px dashed rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;color:var(--paper);font-size:var(--fs);min-width:0;min-height:0;background:rgba(0,0,0,.12);position:relative}
-.slot .ec{display:flex;align-items:center;gap:2px;font-weight:700}
+.slot .ec{display:flex;align-items:center;gap:2px;font-weight:700;background:rgba(20,26,18,.78);color:#fff8e6;border-radius:9px;padding:1px 6px}
 .slot .ec .egi{width:12px;height:15px}
 .slot.next{border-style:solid;border-color:rgba(255,255,255,.75)}
 /* ---- bird cards */
@@ -177,6 +177,12 @@ svg{display:block}
 .dr .minirow .rl{display:flex;align-items:center;font-weight:700;color:#fff;border-radius:6px;padding:2px 4px}
 .dr .minirow .slot{border-color:rgba(0,0,0,.25);background:rgba(0,0,0,.06)}
 .logl{font-size:var(--fs);padding:3px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+/* shared-kit gaps worked around here: 16 px text on wide screens, readable story discs, active settings chip */
+@media (min-width:1024px){.gx-drawer,.gx-drawer .gx-chip,.gx-drawer small,.gx-row-l small,.gx-drawer .gx-row-l{font-size:16px!important}}
+:root{--gxc-a1:#2f5a2a;--gxc-a2:#1f5566;--gxc-a3:#6a4a12}
+.gxc-lock{color:#fff!important;background:#1d1510;border-radius:50%;padding:1px;font-style:normal}
+.gx-set-nav .gx-chip[data-on]{background:var(--acc);color:var(--ink);font-weight:700}
+.gx-drawer .gx-x{background:var(--paper)}
 html.gx-noanim .firing,html.gx-noanim .popfx,html.gx-noanim .glow,html.gx-reduce .glow{animation:none}
 </style>
 </head>

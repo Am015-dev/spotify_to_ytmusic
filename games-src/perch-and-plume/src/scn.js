@@ -8,10 +8,11 @@
       prep: function (Gx) { PP.performMove(Gx, PPAI.setup(Gx, 0), 0); PP.performMove(Gx, PPAI.setup(Gx, 1), 1); Gx.cur = 0; Gx.first = 0; Gx.fx = []; if (prep) prep(Gx); } });
   }
   function take(Gx, id) { [Gx.deck, Gx.disc].forEach(function (a) { var k = a.indexOf(id); if (k >= 0) a.splice(k, 1); }); var t = Gx.tray.indexOf(id); if (t >= 0) Gx.tray[t] = Gx.deck.shift(); Gx.pl.forEach(function (p) { var k = p.hand.indexOf(id); if (k >= 0) p.hand.splice(k, 1); }); }
+  var NOTIPS = { 'gxh-perch-and-plume': '{"on":false,"seen":{}}' };
   var settled = function () { return !UI.busy && G && (G.phase === 'over' || PP.sideToAct(G) === 0); };
   GXS.boardOpen = function () { if (!booted()) return; begin(5); };
   GXS.add({
-    id: 'pp-board', name: 'Board: rows, feeder, hand', ask: 'Can you see rows, feeder and hand?', seed: 5, when: booted,
+    id: 'pp-board', name: 'Board: rows, feeder, hand', ask: 'Can you see rows, feeder and hand?', seed: 5, ls: NOTIPS, when: booted,
     setup: function () { begin(5); return GXS.wait(function () { return document.querySelector('.ract'); }); },
     checks: [
       { kind: 'visible', sel: '.ract[data-h="0"]', name: 'forest action' }, { kind: 'visible', sel: '.ract[data-h="2"]', name: 'wetland action' },
@@ -22,7 +23,7 @@
   });
   // the centrepiece: a full forest chains its brown powers right to left (cache, draw, lay ...)
   GXS.add({
-    id: 'pp-chain', name: 'Forest chain: powers fire', ask: 'Do the forest birds fire one by one?', seed: 8, when: booted,
+    id: 'pp-chain', name: 'Forest chain: powers fire', ask: 'Do the forest birds fire one by one?', seed: 8, ls: NOTIPS, when: booted,
     setup: function () {
       begin(8, function (Gx) {
         var me = Gx.pl[0], ids = PP.DATA.birds.filter(function (b) { return b.h.indexOf('F') >= 0 && (b.pw === 'cacheS' || b.pw === 'laySelf'); }).slice(0, 4).map(function (b) { return b.id; });
@@ -37,7 +38,7 @@
       idle: settled, verify: function (b, a) { return a.gain - b.gain >= 4 && a.cubes === b.cubes - 1 || 'gain ' + (a.gain - b.gain) + ' cubes ' + b.cubes + '->' + a.cubes; } }]
   });
   GXS.add({
-    id: 'pp-play', name: 'Play a bird from hand', ask: 'Tap a bird, a space, then Play.', seed: 11, when: booted,
+    id: 'pp-play', name: 'Play a bird from hand', ask: 'Tap a bird, a space, then Play.', seed: 11, ls: NOTIPS, when: booted,
     setup: function () {
       begin(11, function (Gx) { var me = Gx.pl[0], b = PP.DATA.birds.find(function (x) { return x.h.indexOf('F') >= 0 && x.c.length === 1 && x.c[0] === 'seed'; }); take(Gx, b.id); me.hand.unshift(b.id); me.food = { grub: 0, seed: 1, fish: 0, berry: 0, rodent: 0 }; });
       return GXS.wait(function () { return document.querySelector('#hand .bc.glow'); });
@@ -48,9 +49,9 @@
       idle: settled, verify: function (b, a) { return (a.hand === b.hand - 1 && a.forest === b.forest + 1 && a.food === b.food - 1) || JSON.stringify([b, a]); } }]
   });
   GXS.add({
-    id: 'pp-eggs', name: 'Lay eggs in the grassland', ask: 'Do eggs appear on your birds?', seed: 13, when: booted,
+    id: 'pp-eggs', name: 'Lay eggs in the grassland', ask: 'Do eggs appear on your birds?', seed: 13, ls: NOTIPS, when: booted,
     setup: function () {
-      begin(13, function (Gx) { var me = Gx.pl[0], ids = PP.DATA.birds.filter(function (b) { return b.h.indexOf('G') >= 0 && !b.pw && b.e >= 3; }).slice(0, 2).map(function (b) { return b.id; }); ids.forEach(function (id) { take(Gx, id); }); me.board[1] = ids.map(function (id) { return { id: id, eggs: 0, cache: 0, tuck: 0 }; }); });
+      begin(13, function (Gx) { var me = Gx.pl[0], ids = PP.DATA.birds.filter(function (b) { return b.h.indexOf('G') >= 0 && PP.power(b.id).col !== 'brown' && PP.power(b.id).col !== 'pink' && b.e >= 3; }).slice(0, 2).map(function (b) { return b.id; }); ids.forEach(function (id) { take(Gx, id); }); me.board[1] = ids.map(function (id) { return { id: id, eggs: 0, cache: 0, tuck: 0 }; }); });
       return GXS.wait(function () { return document.querySelector('.ract.glow'); });
     },
     mut: [{ name: 'eggs vanish', js: 'var _q=PP.performMove;PP.performMove=function(G2,m,s){var r=_q.apply(this,arguments);if(m.t==="egg")PP.birds(G2.pl[s]).forEach(function(x){x.s.eggs=0});return r}' }],
@@ -59,7 +60,7 @@
       idle: settled, verify: function (b, a) { return a.eggs - b.eggs === 3 || 'eggs +' + (a.eggs - b.eggs); } }]
   });
   GXS.add({
-    id: 'pp-result', name: 'End of the year: results', ask: 'Can you read the final scores?', seed: 3, when: booted,
+    id: 'pp-result', name: 'End of the year: results', ask: 'Can you read the final scores?', seed: 3, ls: NOTIPS, when: booted,
     setup: function () {
       begin(3); stopTimers(); var guard = 0;
       while (G.phase !== 'over' && guard++ < 3000) { var s = PP.sideToAct(G); PP.performMove(G, PPAI.choose(G, s, 'easy'), s); }
@@ -67,7 +68,7 @@
       return GXS.wait(function () { return !document.getElementById('result').hidden; });
     },
     checks: [{ kind: 'visible', sel: '#again', name: 'Play again' }, { kind: 'visible', sel: '.stand', name: 'score table' },
-      { kind: 'eq', name: 'your total', a: function () { return GXS.num('.stand [data-engine="G.final.0.total"]'); }, b: function () { return G.final[0].total; } }]
+      { kind: 'eq', name: 'your total', a: function () { return GXS.num('.stand [data-engine="G.final[0].total"]'); }, b: function () { return G.final[0].total; } }]
   });
   GXS.add({
     id: 'pp-story', name: 'Story map opens', ask: 'Does the story map show 3 acts?', seed: 2, when: booted,

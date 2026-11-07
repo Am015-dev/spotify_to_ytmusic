@@ -88,13 +88,21 @@ async function playOut(p, label, maxMs) {
       if (same > 120) { log(false, 'tutorial stuck at step ' + s.id); break; }
       const acted = await p.evaluate(() => {
         const c = GXT.current(); if (!c) return 'none';
-        const nb = [...document.querySelectorAll('button')].find(b => /^(next|got it|start|ok)\b/i.test(b.textContent.trim()) && b.closest('[data-help]') && b.offsetParent);
+        const nb = [...document.querySelectorAll('button')].find(b => /^(next|got it|start|ok|finish)\b/i.test(b.textContent.trim()) && b.closest('[data-help]') && b.offsetParent);
         if (!c.wait && nb) { nb.setAttribute('data-tut-tap', '1'); return 'next'; }
         return 'target';
       });
       if (acted === 'next') { await tap(p, '[data-tut-tap]').catch(() => { }); await p.evaluate(() => { const e = document.querySelector('[data-tut-tap]'); if (e) e.removeAttribute('data-tut-tap'); }); await p.waitForTimeout(250); continue; }
-      const r = await step(p).catch(e => 'err ' + e.message);
-      await p.waitForTimeout(r === 'wait' ? 200 : 250);
+      // tap what the spotlight asks for (a container -> its first glowing piece), like a newcomer following the bubble
+      const can = await p.evaluate(() => {
+        const c = GXT.current(); if (!c || !c.target || !myTurn() || (c.ready && !c.ready())) return false;
+        let t = c.target(); if (!t || !t.getBoundingClientRect) return false;
+        if (!t.matches('button,.bc,.die,.slot') ) t = t.querySelector('.glow') || t;
+        document.querySelectorAll('[data-tut-tap]').forEach(e => e.removeAttribute('data-tut-tap'));
+        t.setAttribute('data-tut-tap', '1'); return true;
+      });
+      if (can) await tap(p, '[data-tut-tap]').catch(() => { });
+      await p.waitForTimeout(can ? 300 : 250);
     }
     const end = await p.evaluate(() => !GXT.active() || /know the basics/i.test(document.body.innerText));
     log(end, 'tutorial reached its end card (' + steps + ' steps seen)');
@@ -105,15 +113,16 @@ async function playOut(p, label, maxMs) {
       await p.goto(URL); await p.waitForTimeout(600);
       await tap(p, '[data-t="story"]'); await p.waitForTimeout(600);
       // open the chapter through the map like a player: tap its node, then skip/continue through the intro and boss card
-      const opened = await p.evaluate(id => { const n = document.querySelector('.gxc [data-ch="' + id + '"],.gxc [data-id="' + id + '"]'); if (n) { n.setAttribute('data-tut-tap', '1'); return true; } return false; }, ch);
+      const opened = await p.evaluate(id => { const n = document.querySelector('.gxc-node[aria-label^="Chapter ' + id.slice(1) + ':"]'); if (n) { n.setAttribute('data-tut-tap', '1'); return true; } return false; }, ch);
       if (opened) await tap(p, '[data-tut-tap]'); else { log(false, 'story ' + ch + ': chapter node not found on the map'); continue; }
-      for (let k = 0; k < 8; k++) {
+      for (let k = 0; k < 24; k++) {
         await p.waitForTimeout(400);
         const btn = await p.evaluate(() => { if (G && UI.camp && document.querySelector('.gxc') && !document.querySelector('.gxc').offsetParent) return 'in'; const b = [...document.querySelectorAll('.gxc button')].find(x => /play|start|begin|skip|continue|next|let/i.test(x.textContent) && x.offsetParent); if (b) { b.setAttribute('data-tut-tap', '1'); return 'btn'; } return G && UI.camp ? 'in' : 'none'; });
+        if (k === 23) await p.screenshot({ path: `shots/play-${SIZE}-story-${ch}-stuck.png` });
         if (btn === 'in') break; if (btn === 'btn') { await tap(p, '[data-tut-tap]'); await p.evaluate(() => { const e = document.querySelector('[data-tut-tap]'); if (e) e.removeAttribute('data-tut-tap'); }); }
       }
       const r = await playOut(p, 'story ' + ch, 600000);
-      if (r === true) { await tap(p, '#again'); await p.waitForTimeout(1200); const gx = await p.evaluate(() => !!document.querySelector('.gxc') && /star|won|lost|try|again|chapter/i.test(document.querySelector('.gxc').innerText)); log(gx, 'story ' + ch + ': story result screen shows'); await p.screenshot({ path: `shots/play-${SIZE}-story-${ch}.png` }); }
+      if (r === true) { await tap(p, '#again'); await p.waitForTimeout(1200); const gx = await p.evaluate(() => !!document.querySelector('.gxc') && /star|won|lost|try|again|chapter/i.test(document.querySelector('.gxc').innerText)); const prog = await p.evaluate(() => JSON.stringify(GXC.progress().ch)); log(gx && prog.indexOf('"' + ch + '":{') >= 0, 'story ' + ch + ': story result screen shows and the attempt is saved ' + prog); await p.screenshot({ path: `shots/play-${SIZE}-story-${ch}.png` }); }
     }
   }
   log(errs.length === 0, 'no page or console errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
