@@ -48,6 +48,19 @@ How-to-play surface, so the audit lists the Menu's section chips and taps them a
   porting carc/tidewake code. Open-source search: no permissively licensed implementation found (one unlicensed Python
   prototype), nothing ported, no THIRD-PARTY.md needed.
 
+## Addenda 2-3 (web sources, B-D cards, temporary art)
+- Web search (GitHub + web, ~10 min): no permissively licensed implementation found; nothing ported, no THIRD-PARTY.md. Rules cross-checked
+  against an online rules reference: all base rules match (see rules-notes.md); B-D point tables are guessed (marked there).
+- Layout/flow follows the common online pattern for this kind of game: shared market row/column, own map centred with pan/zoom, the
+  current animal scores always visible, tap tile -> spot -> confirm -> token.
+- Card sets B-D implemented (src/cards.js, 12 scoring tests in rules-test.js, 'Mixed B-D' in Quick game setup, Story c8-c10).
+- Temporary free-licensed art: NOT done. FREE-ASSETS packs are not in the repo and the time/context budget went to B-D and the gates;
+  the 47 slots still show the code-drawn placeholders. Next worker: Kenney CC0 board-game pack -> tok-*/card frames.
+- Audit E3: proven to be the audit race. With one line changed in a temporary copy of ui-audit.spec.js (boot waits for `GXS.menuN`,
+  i.e. the ?scn=menu walk has finished) the same build scores E0 on phone and PC; the extra A/B items it then revealed (coach text
+  on PC, a map disc) are fixed. Proposed shared patch (scripts/ui-audit.spec.js line 196):
+  `await page.waitForFunction(() => window.GXS && GXS.menuList && GXS.menuN, null, { timeout: 60000 });`
+
 ## Found -> fixed (playing it myself)
 - Tutorial stuck on "any token" (target was the whole market) -> target the fox token.
 - Story portraits requested missing media/portrait-*.webp (10 404s) -> portrait hook returns a file only when it exists,
