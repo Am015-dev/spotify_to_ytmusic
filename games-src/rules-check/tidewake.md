@@ -30,3 +30,6 @@ Setup: 3-tile hands, monsters 6/6/6/5/5/4/4 for 2-8 players (the expansion tiles
 - Board size, tile multiset, monster layouts (see above): cannot be confirmed without a physical copy or the publisher PDF.
 - Solo and team variants are known only from search snippets.
 - No FAQ or errata was found.
+
+## W391
+- Nothing changed in the engine. Every item here is low or medium confidence with no stated source (board size, tile mix, monster layouts, portal/wave/whirlpool edge cases), so all are listed as unverified. The rules drawer already has an "Our guesses" section.
