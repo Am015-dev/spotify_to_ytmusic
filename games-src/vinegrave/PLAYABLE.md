@@ -41,7 +41,7 @@ Toasts now sit above the dock, so they never cover the instruction line.
 - `VIS_SLUGS="," build-all.py --quick vinegrave`: PASS (8/8 scenarios incl. the menu walker).
 - rules-test 200 AI games PASS; smoke phone + pc PASS (0 errors); playtest.js both PASS (its tutorial check now expects >= 7 steps).
 - tut-test.js (fresh storage, taps each spotlit centre, elementFromPoint is the target, end card starts a real game): PASS 390x763 and 1440x860, 7 steps, 0 errors.
-- tap-play.js (taps only on visible, uncovered UI; rivals sped up by tapping the board) at 390x763: Quick game to the result PASS (143 s), Story stage 1 from title -> Story -> map -> stage to the result PASS (119 s), 0 console/page errors.
+- tap-play.js (taps only on visible, uncovered UI; rivals sped up by tapping the board) at 390x763: Quick game to the result PASS (154 s), Story stage 1 from title -> Story -> map -> stage to the result PASS (96 s, won), 0 console/page errors.
 - ui-audit (staged build, local server): phone A0 B0 C0 D0 E0 F0; pc A0 B0 C0 D0 E0 F0; phone-s A0 B1 C0 D0 E0 F0.
   The phone-s B1 is "Master volume" inside the shared Menu drawer (gx-kit), scrolled out of view at 375x553; the audit clamps a scrolled-out
   text box to the drawer edge (same cause as the R4 note). Shared kit / audit spec, not this folder.
