@@ -1,0 +1,52 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22V3h12l-3 4 3 4H8" fill="#c0392b" stroke="#f4ecd8" stroke-width="1.4"/></svg><span class="tt">Vale of Banners</span></h1>
+  <span id="barstat"></span>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
+  <button class="gx-ibtn" data-gx="scored" aria-expanded="false" aria-label="Scores and players"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>Scores</span></button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="How to play"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v13"/></svg><span>Rules</span></button>
+  <button class="gx-ibtn" data-gx="setd" aria-expanded="false" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
+</header>
+<div class="gx-main">
+  <main class="gx-board" id="board" aria-label="The valley" data-art="bg-table"><div id="bd" data-board>
+    <div id="opp" role="group" aria-label="Players"></div>
+    <div id="mk" role="group" aria-label="Market stalls"></div>
+    <div id="es" role="group" aria-label="Your estate"></div>
+  </div></main>
+  <aside class="gx-dock" id="dock" aria-label="What to do now">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt" id="docktitle">Your turn</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
+    <div class="gx-dock-body" id="dockbody">
+      <div id="prompt" aria-live="polite"></div>
+      <div id="chainb"></div>
+      <div class="drow"><div class="drow" id="dicerow"></div><div class="drow" id="resrow"></div></div>
+      <div class="drow"><div id="store" aria-label="Storage"></div><div id="goods" aria-label="Goods"></div></div>
+      <div id="acts"></div>
+    </div>
+  </aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
+</div>
+</div>
+<div id="start" class="ov" data-art="bg-title"></div>
+<div id="tv" class="ov" hidden></div>
+<div id="rs" class="ov" hidden></div>
+<div id="toast" role="status"></div>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
+<script src="shell.js"></script>
+<script src="gx-kit.js"></script>
+<script src="gx-help.js"></script>
+<script src="gx-tutor.js"></script>
+<script src="gx-campaign.js"></script>
+<script src="campaign-data.js"></script>
+<script src="gameaudio.js"></script>
+<script src="gx-music.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="art.js"></script>
+<script src="story.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

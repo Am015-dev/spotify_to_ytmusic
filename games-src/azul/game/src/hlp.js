@@ -17,8 +17,7 @@ const HPIC={
   goal:()=>hSVG(`${[0,1,2,3,4].map(r=>[0,1,2,3,4].map(c=>`<rect x="${4+c*11.4}" y="${4+r*11.4}" width="10.4" height="10.4" rx="2" fill="#fffaf0" stroke="#cdb995"/>`).join('')).join('')}${[0,1,2,3,4].map(r=>[0,1,2,3,4].filter(c=>c<=r).map(c=>hT(((c-r)%5+5)%5,4+c*11.4,4+r*11.4,10.4)).join('')).join('')}`)
 };
 const HLP_STEPS={
-  pick:{target:()=>bfQ('.bf-k.can')||bfQ('.bf-pool.can'),title:'Take one colour',text:'Tap any tile. You take every tile of that colour from its kiln.',pic:HPIC.kiln},
-  rack:{target:()=>bfQ('.bf-row.ok .bf-rack')||bfQ('.bf-floor.ok .bf-fl'),title:'Choose a row',text:'Tap a glowing row. Tiles that do not fit fall to the floor.',pic:HPIC.racks},
+  /* pick/rack coach bubbles removed (W388): they covered the kilns and repeat the always-visible instruction line; the lightbulb rule cards still cover both */
   wall:{target:()=>bfQ('.bf-c.pick'),title:'Set a tile',text:'Tap a glowing wall space. It scores for the tiles it touches.',pic:HPIC.wall}
 };
 const HLP_RULES=[

@@ -1,0 +1,233 @@
+{
+ "slug": "kaiten-kitchen",
+ "size": "phone",
+ "seed": 17064,
+ "when": "2026-11-07T21:05Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 542
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 111
+ },
+ "fuzz": {
+  "taps": 167
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Diners and scores\" under div.ttl-in \"Kaiten Kitchen Grab a pl\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.grp.ok.tl \"3 1st +6\" / button.gxt-b.pri \"Play a real game\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.grp.ok.tl \"= 9\" / button.gxt-b.pri \"Play a real game\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.grp.shelf.tl \"1 +6\" / button.gxt-b \"Story mode\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Diners and scores\" under div.ttl-in \"Kaiten Kitchen Grab a pl\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-title-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Diners and scores\" under div#start \"‹ Who is at the counter?\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.grp.wait.waitf \"×3\" / button.btn.on \"Mina\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.grp.wait.land \"×2 need 1\" / button.btn.alt \"Mina\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.grp.ok \"= 9\" / button.btn.alt \"Taro\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.sh \"6 +3 Mina\" / button.btn.alt \"Mina\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.grp.wait \"×2 need 1\" / button.btn.alt \"Mina\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.grp.ok.land \"6 1st +6\" / button.btn.on \"Odile\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #542 (Taro)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 542 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-quick-noresult-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.sh \"0 Pip\" / button.btn.alt \"You\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #111 (Pip)",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 111 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-story-noresult-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Diners and scores\" under div.ttl-in \"Kaiten Kitchen Grab a pl\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-title-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-ibtn \"Log\" / button.gxc-ib \"Tutorial\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-ibtn \"How to play\" / button.gxc-ib.gxc-score \"★ 0/30\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-ibtn \"Menu\" / button.gxc-ib.gxc-score \"★ 0/30\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.sh \"0 You\" / button.gxc-node.a1.boss \"Kofi's Lunch Rush\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.hc.ent-deal \"●○\" / button.tbtn.story \"★ Story Ten chapters, th\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.hc.ent-deal \"●○○\" / button.tbtn.story \"★ Story Ten chapters, th\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.sh \"0 Mina\" / button.btn.on \"Mina\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.sh \"3 +3 Mina\" / button.btn.on \"Mina\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.grp.ok \"= 3\" / button.btn.on \"Mina\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.sh \"3 Mina\" / button.btn.on \"Mina\"",
+   "repro": "node games-src/scripts/qa-bot.js kaiten-kitchen --size phone --seed 17064 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/kaiten-kitchen/phone-screen-fuzz-screen-17.png"
+  }
+ ],
+ "secs": 402,
+ "tutorialIn": {}
+}

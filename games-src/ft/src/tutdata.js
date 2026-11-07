@@ -51,7 +51,7 @@ function tutBuild(){
   G.bidQueue=[{p:0,k:0},{p:1,k:0},{p:0,k:1},{p:1,k:1}];
   G.tut=1}
 function tutNew(){const keep=DEFSEED;setSeed(TUT_SEED);
-  try{newGame({np:2,seats:['human','ai'],lv:['normal','normal'],mode:'x',names:['You','Teal'],tut:true})}finally{DEFSEED=keep}
+  try{newGame({np:2,seats:['human','ai'],lv:['normal','normal'],mode:'x',names:['You','Farid'],tut:true})}finally{DEFSEED=keep}
   tutBuild();lg('The tutorial bazaar opens.','big')}
 // the scripted computer (null = let the normal computer decide)
 function tutAIMove(s){if(!G||!G.tut||G.q)return null;const vm=validMoves(s);

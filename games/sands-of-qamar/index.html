@@ -416,6 +416,24 @@ body:has(.gxh-bub.on) #line{visibility:hidden}
 .tile .tn{margin-top:16px;max-width:100%}
 @media (min-width:1024px){.tile .tn{margin-top:24px;max-width:100%}}
 @media (max-height:600px) and (max-width:420px){.tile .tn{display:none!important}}
+/* ---- readable turn layer (playable.js): banner, score pops, the guide's reactions; none of it takes a tap ---- */
+.plban{position:fixed;left:50%;top:132px;z-index:60;transform:translate(-50%,-14px) scale(.9);opacity:0;pointer-events:none;background:#fff6dc;color:#4d2616;border:2px solid #b0702a;border-radius:14px;padding:8px 20px;text-align:center;box-shadow:0 6px 18px rgba(60,20,5,.35);max-width:88vw}
+.plban b{display:block;font:800 24px/1.15 var(--ff-h)}.plban small{display:block;font:600 14px/1.25 var(--ff-b,system-ui);margin-top:2px}
+.plban.mine{background:#ffe9a8;border-color:#9a3a14}.plban.rival{background:#e4f4f2;border-color:#1c7c78}
+.plban.on{animation:plban 2.2s ease both}
+@keyframes plban{0%{opacity:0;transform:translate(-50%,-14px) scale(.9)}14%{opacity:1;transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-6px) scale(.98)}}
+.plpop{position:fixed;z-index:61;pointer-events:none;display:flex;gap:6px;align-items:center;max-width:92vw;padding:3px 10px;border-radius:999px;font:700 14px/1.2 var(--ff-b,system-ui);animation:plpop 2.3s ease both;box-shadow:0 3px 10px rgba(60,20,5,.3);white-space:nowrap}
+.plpop b{font-size:18px}.plpop span{overflow:hidden;text-overflow:ellipsis}
+.plpop.up{background:#fff6dc;color:#1f6a2a;border:2px solid #2e8b3c}.plpop.dn{background:#fff6dc;color:#9a2a14;border:2px solid #c9442c}
+@keyframes plpop{0%{opacity:0;transform:translateY(8px) scale(.85)}12%{opacity:1;transform:translateY(0) scale(1.05)}22%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+.plreact{position:fixed;left:50%;top:46px;z-index:2147482000;transform:translate(-50%,-8px);opacity:0;pointer-events:none;display:flex;gap:8px;align-items:center;background:#fff6dc;color:#3b1c0e;border:2px solid #b0702a;border-radius:14px;padding:6px 12px;max-width:92vw;font:600 14px/1.25 var(--ff-b,system-ui);box-shadow:0 5px 14px rgba(60,20,5,.4)}
+.plreact i{font-style:normal;font-size:26px;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9b0,#d9a24a);border:2px solid #8a5a1e;flex:none}
+.plreact.on{opacity:1;transform:translate(-50%,0);transition:opacity .25s,transform .25s}
+.mbox.over .voice{margin:4px 0 8px;text-align:center;font:600 15px/1.35 var(--ff-b,system-ui);color:#4d2616}
+.rules .turn5{background:#fff1cf;border:2px solid #b0702a;border-radius:12px;padding:8px 12px 8px 28px;margin:0 0 12px}.rules .turn5 li{margin:2px 0}
+.gxt-bub .gxh-tt{display:block;font:800 14px/1.2 var(--ff-h);color:#9a3a14;letter-spacing:.2px;margin:0 0 3px}
+/* the shared story-map header squeezed the title to one letter per line on a phone: the title gets its own row */
+.gxc-head{flex-wrap:wrap}.gxc-htitle{order:-1;flex:1 1 100%;font-size:20px}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -4494,8 +4512,8 @@ function payCost(p,c){p.el-=c.el;p.fk-=c.fk;G.bag.push(...Array(c.el).fill('elde
 function emptyTile(t){return !t.block&&t.camel==null&&t.tent==null&&!t.m.length&&!t.palm&&!t.pal}
 function djinnTargets(p,k){switch(k){
   case 'tamuz':return G.board.filter(emptyTile).map(t=>t.i);
-  case 'nuraya':return G.board.filter(t=>t.k==='village').map(t=>t.i);
-  case 'wahha':return G.board.filter(t=>t.k==='oasis').map(t=>t.i);
+  case 'nuraya':return SUP().pal<1?[]:G.board.filter(t=>t.k==='village').map(t=>t.i);
+  case 'wahha':return SUP().palm<1?[]:G.board.filter(t=>t.k==='oasis').map(t=>t.i);
   case 'jamal':return p.camels>0?G.board.filter(emptyTile).map(t=>t.i):[];
   case 'fath':return p.camels>0?G.board.filter(t=>!t.block&&t.camel==null&&t.tent==null&&t.m.length&&!t.palm&&!t.pal).map(t=>t.i):[];
   case 'suqra':return G.rdeck.length?[-1]:[];
@@ -4552,7 +4570,7 @@ function tileName(t){return `${TILEDEF[t.k].n} ${tileCoord(t.i)}`}
 // ---------- setup ----------
 function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);const np=o.np||(o.seats?o.seats.length:2);
   const ex=Object.assign({artisans:false,sultan:false,thieves:false,promos:false},o.ex||{});if(np===5)ex.sultan=true;
-  G={v:1,rng:seed,seed,np,ex,tut:o.tut?1:0,round:1,phase:'bid',log:[],logN:0,q:null,over:null,winner:null,winText:'',turn:0,W:6,H:5,walls:{},
+  G={v:1,sup:{palm:22,pal:10},rng:seed,seed,np,ex,tut:o.tut?1:0,round:1,phase:'bid',log:[],logN:0,q:null,over:null,winner:null,winText:'',turn:0,W:6,H:5,walls:{},
     pl:[],board:[],market:[],rdeck:[],rdisc:[],djRow:[],djDeck:[],djDisc:[],bag:[],items:[],itemDisc:[],thRow:[],thDeck:[],
     bids:[],bidQueue:[],order:[],nextBid:[],turnIdx:0,cur:null,step:null,move:null,act:null,turnFx:{},endTrig:false,stats:{kills:0,djinns:0,moves:0}};
   const names=o.names||PNAMES;
@@ -4601,7 +4619,9 @@ function doBid(m){const mk=G.bidQueue.shift();const p=P(mk.p);const pr=Math.min(
 // ---------- turns ----------
 function startTurn(){const mk=G.order[G.turnIdx];G.cur=mk.p;G.nextBid.push(mk);G.turn++;const p=P(mk.p);p.used={};p.itemUsed=0;G.turnFx={};G.move=null;G.act=null;G.step='move';
   lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){lg(`${p.nm} has no legal move and passes.`);G.step='sell'}}
-function endTurn(){if(G.q){G.pendingEnd=1;return}G.turnIdx++;G.move=null;G.act=null;G.step=null;if(G.turnIdx>=G.order.length)return endRound();startTurn()}
+function endTurn(){if(G.q){G.pendingEnd=1;return}G.turnIdx++;G.move=null;G.act=null;G.step=null;
+  if(G.endTrig&&!G.tut){lg('The last camel has been placed: the game ends now, at the end of that turn.','big');return finish()}   // end of that turn, not the round (two of three rule summaries; W391)
+if(G.turnIdx>=G.order.length)return endRound();startTurn()}
 function endRound(){refillMarket();refillDjinns();if(G.ex.thieves&&!G.thRow.length&&G.thDeck.length)G.thRow.push(G.thDeck.shift());
   if(G.tut){lg('The tutorial round is over: the game ends.','big');return finish()}
   if(G.endTrig){lg('The last camel has been placed: the game ends.','big');return finish()}
@@ -4637,7 +4657,7 @@ function claimTile(p,e,how){const t=G.board[e];if(t.camel!=null||t.tent!=null)re
   if(how==='auto'&&p.tent&&(!p.human||UI.sim)&&aiWantsTent(p,e))how='tent';
   if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e);return}
   if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e);
-  if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} has placed the last camel: the game ends after this round.`,'big')}}
+  if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} has placed the last camel: the game ends at the end of this turn.`,'big')}}
 QH.claim=d=>claimTile(P(d.p),d.e,d.how);
 function owner(t){return t.camel!=null?t.camel:t.tent!=null?t.tent:null}
 // ---------- tribe actions ----------
@@ -4676,7 +4696,8 @@ function tileMoves(p){const a=G.act;const t=G.board[a.tile];const o=[];
   case 'workshop':if(G.items.length){if(p.art>=1)o.push({act:'tile',work:'art'});if(p.fk>=2)o.push({act:'tile',work:'fk'})}break;
   case 'exchange':if(p.coins>=4)for(let j=0;j<G.market.length;j++)o.push({act:'tile',take:[j],ex:1});break}
   o.push({act:'tile',skip:1});return o}
-function placeMoves(p,t,what){const flag=what==='pal'?'burhan':'rawda';const o=[{act:'tile',place:t.i}];if(G.turnFx[flag])for(const j of nbr(t.i))if(!G.board[j].block)o.push({act:'tile',place:j});return o}
+function SUP(){return G.sup||(G.sup={palm:22,pal:10})}   // finite piece supply (22 palms, 10 palaces: counts believed, not sourced)
+function placeMoves(p,t,what){if(SUP()[what]<1)return [{act:'tile',skip:true}];const flag=what==='pal'?'burhan':'rawda';const o=[{act:'tile',place:t.i}];if(G.turnFx[flag])for(const j of nbr(t.i))if(!G.board[j].block)o.push({act:'tile',place:j});return o}
 function summonPays(p){const o=[];if(p.el>=2)o.push({el:2,fk:0});if(p.el>=1&&p.fk>=1)o.push({el:1,fk:1});return o}
 function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tileDone=true;G.step='sell';if(m.skip)return;
   if(m.place!=null){if(t.k==='village')placePalace(p,m.place);else placePalm(p,m.place);return}
@@ -4684,8 +4705,8 @@ function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tile
   if(m.thief){payCost(p,m.pay);G.thRow.splice(G.thRow.indexOf(m.thief),1);p.thieves.push({k:m.thief,turn:G.turn});lg(`🦹 ${p.nm} hires the ${THIEVES[m.thief].n}.`,'big');return}
   if(m.take){const cost=t.k==='small'?3:t.k==='large'?6:4;p.coins-=cost;const got=m.take.slice().sort((x,y)=>y-x).map(j=>G.market.splice(j,1)[0]);for(const r of got)gainCard(p,r,1);lg(`${p.nm} buys ${got.map(r=>RNAME[r]).join(' and ')} for ${cost} coins.`,'good');fx('res');return}
   if(m.work){if(m.work==='art'){p.art--;G.bag.push('artisan')}else{p.fk-=2;G.rdisc.push('fakir','fakir')}p.items.push(G.items.shift());lg(`${p.nm} commissions an item at the Workshop.`,'good');return}}
-function placePalace(p,i,viaDj){const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i);trig('palace',p.i)}
-function placePalm(p,i){const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i)}
+function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i);trig('palace',p.i)}
+function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i)}
 function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);trig('djinn',p.i,{k})}
 // ---------- goods sale (end of turn, optional) ----------
 function sellValue(n){return SETVP[Math.min(n,9)]}
@@ -4941,7 +4962,7 @@ function tutBuild(){
   G.bidQueue=[{p:0,k:0},{p:1,k:0},{p:0,k:1},{p:1,k:1}];
   G.tut=1}
 function tutNew(){const keep=DEFSEED;setSeed(TUT_SEED);
-  try{newGame({np:2,seats:['human','ai'],lv:['normal','normal'],mode:'x',names:['You','Teal'],tut:true})}finally{DEFSEED=keep}
+  try{newGame({np:2,seats:['human','ai'],lv:['normal','normal'],mode:'x',names:['You','Farid'],tut:true})}finally{DEFSEED=keep}
   tutBuild();lg('The tutorial bazaar opens.','big')}
 // the scripted computer (null = let the normal computer decide)
 function tutAIMove(s){if(!G||!G.tut||G.q)return null;const vm=validMoves(s);
@@ -4959,6 +4980,8 @@ function tutAIMove(s){if(!G||!G.tut||G.q)return null;const vm=validMoves(s);
 // ---------- the rules, in plain words ----------
 const RULES_HTML=`<div class="rules">
 <p>The old sultan is gone and the sultanate of Qamar is up for grabs. Shift its tribes from tile to tile, claim land with your camels, summon djinns and trade in the bazaar. <b>The most points at the end wins.</b></p>
+<h3>How a turn works</h3>
+<ol class="turn5"><li><b>Bid</b> coins for a turn-order spot: dearer plays earlier.</li><li><b>Lift</b> everyone from one tile and <b>drop</b> one person per tile as you walk.</li><li>The <b>last</b> person must land on its own colour: take all of that colour.</li><li><b>Act</b>: the tribe you took, then the tile you stopped on. An empty tile gets your camel.</li><li><b>Sell</b> goods if you like. Most points wins.</li></ol>
 <h3>1. Bid for turn order</h3>
 <p>Each round starts with a bid. In the order of the last round, each player puts a marker on a free spot of the turn-order track and pays its price: 0, 0, 0, 1, 3, 5, 8, 12 or 18 coins. Dearer spots play earlier. If two players sit on spots with the same price, the one who bid later plays first. With 2 players, each of you has two markers and so takes two turns a round.</p>
 <h3>2. Your turn: move, then act</h3>
@@ -5878,7 +5901,7 @@ function tutSteps(){
   const T1=TUT_ME.t1,T2=TUT_ME.t2,B=TUT_ME.bid;
   const p1=()=>T1.path[Math.min(2,dropsDone())];
   const p2=()=>T2.path[Math.min(2,dropsDone())];
-  return [
+  return tutStory([
  {id:'goal',title:'Win on points',say:'Most points at the end wins. Coins, tribes, land, goods and djinns all count.',target:tq('#seats'),wait:null,ready:()=>bidNow(0)},
  {id:'tribes',title:'Five tribes',say:'Every tile holds three people. Each colour is a tribe with its own power.',target:tTile(5),also:()=>[tTile(11)(),tTile(24)()],wait:null,ready:()=>bidNow(0)},
  {id:'bid1',title:'Bid for turn order',say:'Dearer spots play earlier, and coins are points. Tap the 5-coin spot.',target:spotBtn(B[0]),
@@ -5919,12 +5942,12 @@ function tutSteps(){
  {id:'others',title:'More tiles',say:'Grand Bazaar: 6 coins for 2 goods. Oasis: a palm tree, worth 3. Shrine: summon a djinn.',target:tTile(26),also:()=>[tTile(2)(),tTile(8)()],wait:null,ready:()=>!!G.over},
  {id:'shadows',title:'Shadows',say:"Red Shadows remove any person within that many steps, or a rival's Advisor or Sage.",target:tTile(13),wait:null,ready:()=>!!G.over},
  {id:'end',title:'How it ends',say:'A real game ends when someone places their last camel. Most points wins. You are ready!',target:tq('#seats'),wait:null,ready:()=>!!G.over}
-  ]}
+  ])}
 // ---------------------------------------------------------------- start, leave, Story prologue
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
 function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:o?'Bid, walk, take a tribe, claim land, sell goods. Now the Story begins.':'Bid, walk, take a tribe, claim land, sell goods. Djinns, Shadows and more: the lightbulb explains them.',
+    endTitle:LORE.endTitle,endText:o?LORE.endStory:LORE.endText,
     endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:()=>{try{GX.close()}catch(e){}tutQuiet();UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();tutNew();UI.snap=null;refresh()},
     onDone:r=>{tutLeave();const c=r&&r.choice;
@@ -6034,6 +6057,90 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b
 function paintInit(){paintBoot();if(typeof GX!=='undefined'){const os=GX.onShow;GX.onShow=id=>{if(os)os(id);if(id==='musicd'){const mb=$('#musicbody');if(mb)mb._sig=null;renderMusic()}}}
   setInterval(()=>{try{paintApply();musicSync()}catch(e){}},800);document.addEventListener('pointerdown',()=>setTimeout(()=>{try{musicSync()}catch(e){}},60),{capture:true})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paintInit);else paintInit();
+
+</script>
+<script>
+// ===================== all the story text of Sands of Qamar in one place (edit here; cast and arc: ../STORY.md) =====================
+// The tutorial is the PROLOGUE: Old Hadiya (guide) teaches a short real game against Farid the Water-Boy, who wants the throne to pay for his village's well.
+// say   = what the guide says while the glow shows where (a story reason, then the action, never "click here")
+// react = what she says right after the player does it (the payoff; shown for ~2.4 s as the next beat)
+const LORE={
+  guide:{key:'hadiya',name:'Hadiya',face:'🧓'}, rival:{name:'Farid',face:'🧒'},
+  chapters:{goal:{n:1,t:'Empty Throne'},lift:{n:2,t:'First Walk'},advisors:{n:3,t:'Rival Moves'},score:{n:4,t:'The Count'}},
+  tut:{
+    goal:{say:'The Sultan left no heir, child. Most points when the bazaar closes takes the throne: coins, tribes, land, goods, djinns.'},
+    tribes:{say:'Five tribes crowd the bazaar, three to a tile, each colour with its own gift. Farid the Water-Boy wants the throne for his village well.',react:'Farid grins. "I get the first walk!"'},
+    bid1:{say:'Who walks first? Dearer spots play earlier, but coins are points too. Take the 5-coin spot.',react:'Five coins down. Bold, child.'},
+    bid2:{say:'Two caravans each, so two markers. Put the second on the free 0-coin spot: cheap, but last.',react:'A thrifty second caravan.'},
+    order:{say:'The order is set: Farid, you, Farid, you. Same price? The later bidder goes first. Watch Farid walk.'},
+    sages:{say:'Farid walks his Sages to the Shrine, claims it, and trades two Sages for a djinn. Sages are 2 points each.',react:'Farid: "A djinn! Beat that."'},
+    lift:{say:'Your turn, child! These Traders are ripe for the taking. Lift everyone from the tile and walk them out.',react:'The Traders are in your hands.'},
+    drop:{say:n=>n<2?'Leave one person on each tile you cross: up, down, left or right, never straight back.':'The last walker must land on a tile of its own colour: Traders.',react:'The caravan arrives.'},
+    traders:{say:'All four Traders are yours: four goods. The tile is empty, so your camel claims it. Well walked!',react:'Four goods and a camel. The market notices.'},
+    buy:{say:'The Stall sells one of the first three goods for 3 coins. Take the Mystic: it never scores, but it fires up Masons.',react:'A Mystic in your purse, a secret for later.'},
+    sell1:{say:'Goods sell in sets of different kinds. Gather your four goods into one set.',react:'A fine, varied set.'},
+    sell2:{say:'Four different goods fetch 13 coins, and bigger sets pay far more. Cash them in!',react:'Thirteen coins. The throne feels closer!'},
+    advisors:{say:'Farid\'s Advisors plant a palm. Advisors score 1 each, plus 10 for every rival with fewer. Mind your numbers.',react:'Farid: "Advisors rule the court!"'},
+    lift2:{say:'The last walk, child. This tile holds two Advisors and a Mason. Lift them.',react:'Two Advisors and a Mason on the road.'},
+    dropA:{say:'You choose who to leave behind. Choose the tile, then pick the person to leave.',react:'Left a mark on the road.'},
+    dropB:{say:'Leave an Advisor here. Your last walker, the Mason, must reach a Mason tile.',react:'One Advisor stays, one marches on.'},
+    dropC:{say:n=>n<2?'Leave the other Advisor on the next tile, and keep walking.':'The Mason lands on a Mason tile. All four Masons are yours.',react:'The Masons are yours!'},
+    masons:{say:b=>'Each Mason earns 1 coin per blue tile around: '+b+' tiles. Spend your Mystic for a fifth Mason.',react:'Coins pour in. Farid gasps.'},
+    palace:{say:'A Hamlet raises a palace: 5 more points for whoever holds the tile. Your camel does.',react:'A palace rises on your land!'},
+    score:{say:(a,b)=>'The caravans are counted: you '+a+', Farid '+b+'. Coins, tiles, palaces, palms, Sages, Advisors, djinns and goods all count.',react:()=>'The count is done.'},
+    others:{say:'Three more gifts: Grand Bazaar, 6 coins for 2 goods. Oasis, a palm worth 3. Shrine, a djinn.'},
+    shadows:{say:'Beware the red Shadows: they remove any person within that many steps, or a rival\'s Advisor or Sage.'},
+    end:{say:'A real game ends when someone lays their last camel; most points wins. The bazaar is yours, child.'}
+  },
+  endTitle:'You know the rules',
+  endText:'Hadiya smiles: "Bid, walk, take a tribe, claim land, sell goods. You are ready, child."',
+  endStory:'Hadiya smiles: "Bid, walk, take a tribe, claim land, sell goods. Now the real caravans come."',
+  quickIntro:'The sultan\'s bazaar opens at dawn. Lead the tribes, rule the market.',
+  win:['The bazaar sings your name. The throne of Qamar is yours!','Your camels hold the best land. Qamar bows to you.'],
+  lose:['The rival\'s caravans were swifter today. The bazaar remembers; try again at dawn.','Close, but the throne slips away. One more walk across the sands?'],
+  turn:{you:'Your turn',bid:'Bid for turn order'}
+};
+
+</script>
+<script>
+// ===================== the readable-turn layer: banner, one-line captions, score pops, the guide's story in the tutorial, result voice =====================
+// Everything here only reads the game (G, G.log) and draws small see-through-to-taps overlays (pointer-events:none, data-help so the kit ignores them).
+const PL={seed:null,logN:0,tot:null,lastId:null,pops:0,banT:0,reactT:0};
+const plEl=(id,cls)=>{let e=document.getElementById(id);if(!e){e=document.createElement('div');e.id=id;e.className=cls||'';e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');document.body.appendChild(e)}return e};
+function plName(t){if(!G)return t;const hs=G.pl.filter(x=>x.human);if(hs.length===1){const nm=hs[0].nm;t=t.split(nm+"'s").join('Your').split(nm).join('You')}
+  const V={lifts:'lift',bids:'bid',ends:'end',takes:'take',keeps:'keep',claims:'claim',pitches:'pitch',buys:'buy',sells:'sell',summons:'summon',plants:'plant',raises:'raise',hires:'hire',sends:'send',uses:'use',has:'have',finds:'find',brings:'bring'};
+  return t.replace(/\bYou (lifts|bids|ends|takes|keeps|claims|pitches|buys|sells|summons|plants|raises|hires|sends|uses|has|finds|brings)\b/g,(m,v)=>'You '+V[v])}
+function plBanner(title,sub,cls){const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?2200:200)}
+function plPop(i,d,why){const s=typeof seatEl==='function'?seatEl(i):null;if(!s)return;const r=s.getBoundingClientRect();if(!r.width)return;
+  const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
+  e.innerHTML='<b>'+(d>0?'+':'−')+Math.abs(d)+'</b>'+(why?'<span>'+esc(why)+'</span>':'');document.body.appendChild(e);
+  const w=e.offsetWidth;e.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+'px';e.style.top=(r.bottom-2+(PL.pops++%3)*28)+'px';setTimeout(()=>{e.remove();PL.pops=Math.max(0,PL.pops-1)},ANIM?2300:100)}
+function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
+function plShort(t){return plName(String(t||'')).replace(/^[^\w—]+/,'').replace(/\.$/,'')}
+function plAfter(){if(!G){return}
+  if(PL.seed!==G.seed){PL.seed=G.seed;PL.logN=G.logN;PL.tot=null;if(!G.tut&&!G.over&&!(UI.camp))plBanner('Bid for turn order',LORE.quickIntro,'')}
+  else if(G.logN>PL.logN){const fresh=G.log.filter(e=>e.i>PL.logN).reverse();PL.logN=G.logN;if(!G.tut&&!G.over)for(const e of fresh){
+    if(e.c==='turn'){const m=/— (.+)'s turn —/.exec(e.t);const nm=m?m[1]:'';const mine=G.pl.some(p=>p.nm===nm&&p.human)&&G.pl.filter(p=>p.human).length===1;plBanner(mine?LORE.turn.you:nm+"'s turn",mine?'Tap a glowing tile to start':'Watch each step. Tap the board to speed up.',mine?'mine':'rival')}
+    else if(e.c==='round'&&G.round>1)plBanner(LORE.turn.bid,'Dearer spots play earlier','')}}
+  const tot=G.pl.map(p=>shownTotal(p));if(PL.tot&&PL.tot.length===tot.length&&!G.over)tot.forEach((v,i)=>{const d=v-PL.tot[i];if(d&&G.phase!=='bid'&&!(G.log[0]&&/ bids? /.test(G.log[0].t))){const e=G.log[0];plPop(i,d,e&&e.c!=='turn'?plShort(e.t):'')}});PL.tot=tot;
+  if(typeof tutOn==='function'&&tutOn()){const st=GXT.state();if(st&&st.shown&&st.id!==PL.lastId){const prev=PL.lastId;PL.lastId=st.id;const L=LORE.tut[prev];if(L&&L.react){const t=typeof L.react==='function'?L.react():L.react;const who=['sages','advisors'].includes(prev)?LORE.rival:LORE.guide;plSay(prev==='tribes'||prev==='sages'||prev==='advisors'?LORE.rival:LORE.guide,t)}}}
+  else PL.lastId=null}
+(function(){const o=render;render=function(){o.apply(this,arguments);try{plAfter()}catch(e){console.error(e)}}})();
+// the instruction line: the rival's turn is told step by step in plain words (the engine's own log line), the pick-who-stays popup says so
+(function(){const o=lineText;lineText=function(){const t=o();if(!G||G.over||online())return t;
+  if(me()&&UI.chz&&G.step==='move')return 'Pick who stays on this tile';
+  if(!me()&&!G.q&&!G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for/.test(e.t))return plShort(e.t)}
+  if(!me()&&G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for|tutorial/.test(e.t))return plShort(e.t)}
+  return t}})();
+// the result speaks in the game's voice
+(function(){const o=overHtml;overHtml=function(){let h=o();try{const mp=viewP();const won=mp&&G.over.win.includes(mp.i);const a=won?LORE.win:LORE.lose;const t=a[Math.abs(parseInt(G.seed,10)||G.logN||0)%a.length];h=h.replace('</h2>','</h2><p class="voice">'+esc(t)+'</p>');if(mp&&G.pl.filter(x=>x.human).length===1)h=h.split(mp.nm).join('You')}catch(e){}return h}})();
+// the tutorial as the prologue: the guide's and the rival's words replace the plain lessons (same ids, same targets, same waits)
+function tutStory(steps){return steps.map(s=>{const L=LORE.tut[s.id];if(!L)return s;const ch=LORE.chapters[s.id];const rival=['order','sages','advisors'].includes(s.id);const who=rival?LORE.rival:LORE.guide;
+  const say=()=>{const v=L.say;if(typeof v!=='function')return v;
+    if(s.id==='drop'||s.id==='dropC')return v(dropsDone());
+    if(s.id==='masons')return v(bluesAround(TUT_ME.t2.path[2][0]).length);
+    if(s.id==='score'){const sc=G.over?G.over.scores:[];const a=sc.find(x=>x.p===0),b=sc.find(x=>x.p===1);return v(a?a.s.total:0,b?b.s.total:0)}return ''};
+  return Object.assign({},s,{title:()=>ch?'Ch.'+ch.n+' '+ch.t:who.face+' '+who.name,say})})}
 
 </script>
 <script>window.GXLAB_CSS="/* GX LAB (test mode only; every rule is under #gxlab-* / .gxl-*, so the page is untouched when test mode is off) */\n#gxlab-bar{position:fixed;z-index:2147483640;top:max(2px,env(safe-area-inset-top));left:2px;display:flex;gap:3px;align-items:center;max-width:calc(100vw - 4px);font:700 12px/1 system-ui,-apple-system,sans-serif}\n#gxlab-bar.r{left:auto;right:2px;flex-direction:row-reverse}\n#gxlab-bar button,.gxl-panel button{font:700 12px/1 system-ui,-apple-system,sans-serif;color:#f4ead8;background:rgba(36,24,16,.86);border:1px solid #f0c05a;border-radius:9px;padding:0 8px;min-height:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}\n#gxlab-bar button.on{background:#f0c05a;color:#2a1b10}\n#gxlab-bar .gxl-r button{min-width:30px;padding:0 4px}\n#gxlab-bar .gxl-r button[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f}\n#gxlab-bar .gxl-r button[data-s=bad][aria-pressed=true]{background:#b3382c;border-color:#b3382c}\n#gxlab-bar .gxl-r{display:flex;gap:3px}\n.gxl-panel{position:fixed;z-index:2147483600;left:0;right:0;bottom:0;height:min(78vh,640px);display:flex;flex-direction:column;box-sizing:border-box;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.55);font:500 14px/1.35 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}\n.gxl-panel[hidden]{display:none}\n@media (min-width:700px){.gxl-panel{left:auto;top:0;width:380px;height:auto;border-radius:0;border-width:0 0 0 1.5px}}\n.gxl-h{display:flex;gap:6px;align-items:center;padding:8px 8px 6px 12px;border-bottom:1px solid #4a3326;flex:none}\n.gxl-h h2{margin:0;flex:1;min-width:0;font:800 15px/1.2 system-ui,sans-serif;color:#f0c05a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.gxl-panel button{min-height:40px}\n.gxl-tools{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px 0;flex:none}\n.gxl-tools button{flex:1 1 auto}\n.gxl-body{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 14px;flex:1;min-height:0}\n.gxl-g{font:800 11px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bca78c;margin:12px 0 4px}\n.gxl-row,.gxl-item{border:1px solid #4a3326;border-radius:11px;padding:8px 10px;margin:5px 0;background:rgba(255,255,255,.03)}\n.gxl-row{display:flex;gap:8px;align-items:center}\n.gxl-row .gxl-t{flex:1;min-width:0}\n.gxl-row b,.gxl-item .gxl-p{display:block;font:700 14px/1.25 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-row small,.gxl-ask{display:block;color:#9fd6ff;font:600 12px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-go{border-color:#f0c05a!important;background:rgba(240,192,90,.14)!important;color:#f0c05a!important;font-weight:800!important;min-width:58px}\n.gxl-go.here{background:#f0c05a!important;color:#2a1b10!important}\n.gxl-chip{min-width:44px;font-size:18px!important;padding:0!important;border-color:#4a3326!important;background:transparent!important}\n.gxl-rate{display:flex;gap:6px;margin-top:6px}\n.gxl-rate button{flex:1;padding:0 4px}\n.gxl-rate button[aria-pressed=true][data-s=ok]{background:#2f7d4f;border-color:#2f7d4f}\n.gxl-rate button[aria-pressed=true][data-s=bad]{background:#b3382c;border-color:#b3382c}\n.gxl-rate button[aria-pressed=true][data-s=skip]{background:#6b5a48;border-color:#6b5a48}\n.gxl-item .gxl-top{display:flex;gap:8px;align-items:center;margin-top:5px}\n.gxl-item .gxl-top .gxl-ask{flex:1}\n.gxl-note{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px system-ui,sans-serif}\n.gxl-ed{font:800 12px/1.2 system-ui,sans-serif;color:#bca78c;margin:10px 0 2px}\n.gxl-ed b{color:#f4ead8}\n.gxl-toast{position:fixed;z-index:2147483100;left:50%;bottom:90px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 13px system-ui,sans-serif;padding:8px 14px;border-radius:10px;pointer-events:none}\n.gxl-fb{position:fixed;z-index:2147483200;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:12px;padding:10px;display:grid;gap:8px}\n.gxl-fb textarea{width:100%;min-height:110px;box-sizing:border-box;background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px;font:12px system-ui}\n.gxl-fb button{min-height:40px;border-radius:10px;border:1.5px solid #f0c05a;background:transparent;color:#f4ead8;font:700 13px system-ui}\n";</script>
