@@ -6,7 +6,7 @@
     <button class="ib txt" id="helpB" type="button" aria-label="Rules">?</button>
     <button class="ib" data-gx="setd" id="menuB" type="button" aria-label="Menu">☰</button>
   </div>
-  <div class="gx-board" id="board">
+  <div class="gx-board" id="board" data-art="bg-table">
     <div id="seats"></div>
     <div id="pool"></div>
     <div id="trick"></div>
@@ -15,11 +15,11 @@
   </div>
   <div id="dock">
     <div id="msg" aria-live="polite"></div>
-    <div id="mine"><div id="mytasks"></div><button class="btn" id="sigB" type="button">📡 Signal</button><button class="btn" id="flareB" type="button">🔥 Flare</button></div>
+    <div id="mine"><div id="mytasks"></div><button class="btn" id="sigB" type="button"><span class="bi" data-art="icon-signal">📡</span> Signal</button><button class="btn" id="flareB" type="button"><span class="bi" data-art="icon-flare">🔥</span> Flare</button></div>
     <div id="hand"></div>
   </div>
 </div>
-<div class="scr on" id="title">
+<div class="scr on" id="title" data-art="bg-title">
   <div class="sonar-ring" data-art="logo-emblem"></div>
   <h1 class="logo">DEEP SIGNAL</h1>
   <p class="tag">A crew of divers, one deck of cards. Win the right cards for the right crew mate, dive after dive.</p>
@@ -37,7 +37,7 @@
   <button class="btn" id="setBack" type="button">Back</button>
 </div>
 <div id="zoom"><div class="zc"><div class="big" id="zbig"></div><p id="ztxt"></p><div class="row" id="zrow"></div></div></div>
-<div class="scr" id="res"><h2 id="resH"></h2><p id="resP"></p><div class="row" id="resRow" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"></div></div>
+<div class="scr" id="res" data-art="result-complete"><h2 id="resH"></h2><p id="resP"></p><div class="row" id="resRow" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"></div></div>
 <script src="gx-scenario.js"></script>
 <script src="scn.js"></script>
 <script src="shell.js"></script>

@@ -20,7 +20,7 @@ var ICON = {
 var SUITART = { c: 'card-coral', k: 'card-kelp', t: 'card-tide', a: 'card-amber', r: 'card-sonar' };
 function cardEl(c, cls) { var e = mk('div', 'cd s-' + c[0] + (cls ? ' ' + cls : ''), '<span class="rk">' + rankOf(c) + '</span><span class="ic">' + ICON[c[0]] + '</span>'); e.dataset.c = c; e.setAttribute('data-art', SUITART[c[0]]); e.setAttribute('role', 'img'); e.setAttribute('aria-label', cardName(c)); return e; }
 function miniEl(c, extra) { var e = mk('span', 'mini s-' + c[0], String(rankOf(c))); e.dataset.c = c; if (extra) e.insertAdjacentHTML('beforeend', extra); return e; }
-function tokHtml(t) { return t ? '<span class="tok">' + (t === 'O' ? 'Ω' : t) + '</span>' : ''; }
+function tokHtml(t) { return t ? '<span class="tok" data-art="' + (t === 'O' ? 'token-final' : t[0] === '>' ? 'token-relative' : 'token-order') + '">' + (t === 'O' ? 'Ω' : t) + '</span>' : ''; }
 // ---------------------------------------------------------------- sound (synth, mute-able)
 var SND = { on: ls('ds-snd') !== false, ctx: null };
 function sfx(k) {
@@ -56,7 +56,7 @@ function step() {
   if (G.result) return endMission();
   if (G.phase === 'play' && !G.trick.length && !UI.sigDone[G.tricks.length]) {
     UI.sigDone[G.tricks.length] = true; var any = false;
-    if (!UI.tut) for (var p = 1; p < G.n; p++) { if (p === G.dummy) continue; var c = AIX.commPick(G, p); if (c && performMove(G, { t: 'comm', c: c }, p)) { any = true; popAt(seatEl(p), '📡 ' + cardName(c)); sfx('ping'); } }
+    if (!UI.tut) for (var p = 1; p < G.n; p++) { if (p === G.dummy) continue; var c = AIX.commPick(G, p); if (c && performMove(G, { t: 'comm', c: c }, p)) { any = true; popAt(seatEl(p), '📡 ' + cardName(c)); pingFx(seatEl(p)); sfx('ping'); } }
     if (UI.tut && UI.tut.sig && G.tricks.length === 0) { var s1 = UI.tut.sig; performMove(G, { t: 'comm', c: s1.c }, s1.p); any = true; popAt(seatEl(s1.p), '📡 ' + cardName(s1.c)); }
     render(); if (any) return later(step, AIDELAY * 1.6);
   }
@@ -102,7 +102,7 @@ function trickDone(fr, seatP) {
 function onHandTap(c, e) {
   if (!G || UI.hold || G.result) return zoomCard(c);
   var me = G.turn === G.dummy && G.ctrl[G.dummy] === 0 ? G.dummy : 0;
-  if (UI.sigMode) { if (commPos(G, 0, c) && tutOk({ type: 'tap', what: 'signal', id: c })) { performMove(G, { t: 'comm', c: c }, 0); UI.sigMode = false; sfx('ping'); popAt(handCardEl(c), '📡 Signal sent'); render(); } else zoomCard(c); return; }
+  if (UI.sigMode) { if (commPos(G, 0, c) && tutOk({ type: 'tap', what: 'signal', id: c })) { performMove(G, { t: 'comm', c: c }, 0); UI.sigMode = false; sfx('ping'); popAt(handCardEl(c), '📡 Signal sent'); pingFx(handCardEl(c)); render(); } else zoomCard(c); return; }
   if (UI.flareMode) { if (c[0] !== 'r') doFlare(c); else zoomCard(c); return; }
   if (G.phase === 'play' && sideToAct(G) === 0 && legalCards(G, G.turn).indexOf(c) >= 0) { if (!tutOk({ type: 'tap', what: 'card', id: c })) return; apply({ t: 'play', c: c }, 0); return; }
   zoomCard(c);
@@ -138,12 +138,12 @@ function render(anim) {
     if (targets.indexOf(p) >= 0) e.classList.add('pick');
     var av = mk('div', 'av', p === G.dummy ? '🤖' : NAMES[p][0]); av.style.background = SEATCOL[p]; av.setAttribute('data-art', p === G.dummy ? 'portrait-drone' : 'portrait-' + NAMES[p].toLowerCase()); e.appendChild(av);
     e.appendChild(mk('div', 'nm', nm(p)));
-    e.appendChild(mk('div', 'st', (p === G.dummy ? '' : G.hands[p].length + '🂠 ') + '★' + G.won[p]));
-    if (G.cmd === p) e.appendChild(mk('span', 'cap', 'Captain'));
+    e.appendChild(mk('div', 'st', (p === G.dummy ? '' : '<span class="bk" data-art="card-back"></span>' + G.hands[p].length + ' ') + '<span class="bk tw" data-art="icon-trick">★</span>' + G.won[p]));
+    if (G.cmd === p) { var cp = mk('span', 'cap', 'Captain'); cp.setAttribute('data-art', 'token-captain'); e.appendChild(cp); }
     if (G.phase === 'ask' && G.answers[p] != null) e.appendChild(mk('span', 'badge' + (G.answers[p] ? '' : ' no'), G.answers[p] ? 'Yes' : 'No'));
     if (G.chosen === p && /notrick|onetrick/.test(G.mission.sp || '')) e.appendChild(mk('span', 'badge', /notrick/.test(G.mission.sp) ? '0 tricks' : '1 trick'));
     var tk = mk('div', 'tk'); G.tasks.forEach(function (t) { if (t.owner === p) tk.appendChild(miniEl(t.card, tokHtml(t.tok))).classList.toggle('done', !!t.done); });
-    if (G.comm[p]) { var sg = miniEl(G.comm[p].c, '<span class="pos">' + POSTXT[G.comm[p].pos].split(' ')[0] + '</span>'); sg.style.borderStyle = 'dashed'; tk.appendChild(sg); }
+    if (G.comm[p]) { var sg = miniEl(G.comm[p].c, '<span class="pos" data-art="token-signal">' + POSTXT[G.comm[p].pos].split(' ')[0] + '</span>'); sg.style.borderStyle = 'dashed'; tk.appendChild(sg); }
     if (p === G.dummy && G.ctrl[p] !== 0) G.hands[p].forEach(function (c) { tk.appendChild(miniEl(c)); });
     e.appendChild(tk); e.addEventListener('click', function () { onSeatTap(p); }); sq.appendChild(e);
     panelBottom = Math.max(panelBottom, e.offsetTop + e.offsetHeight);
@@ -174,7 +174,7 @@ function render(anim) {
   var fb = $('#flareB'); fb.disabled = !canFlare(G) || UI.hold || !!UI.tut; fb.style.display = G.tricks.length ? 'none' : '';
   drawHand();
   var tot = G.np <= 3 ? 13 : 40 / G.np;
-  $('#mtrick').textContent = (G.phase === 'play' || G.phase === 'over' ? 'Trick ' + Math.min(G.tricks.length + 1, tot) + ' of ' + tot + ' · ' : '') + (G.mission.k ? G.tasks.filter(function (t) { return t.done; }).length + '/' + G.mission.k + ' tasks' : 'Special rule') + (G.mission.rule ? ' · ' + shortRule() : '');
+  $('#mtrick').textContent = (G.phase === 'play' || G.phase === 'over' ? 'Trick ' + Math.min(G.tricks.length + (G.result ? 0 : 1), tot) + ' of ' + tot + ' · ' : '') + (G.mission.k ? G.tasks.filter(function (t) { return t.done; }).length + '/' + G.mission.k + ' tasks' : 'Special rule') + (G.mission.rule ? ' · ' + shortRule() : '');
   try { var ph = phaseId(); if (window.GXH && !(window.GXT && GXT.active()) && ph !== UI.lastPh) { UI.lastPh = ph; GXH.phase(ph); } } catch (e) { }
   musicSync();
 }
@@ -257,7 +257,7 @@ function zoomSeat(p) {
 // ---------------------------------------------------------------- end of a mission
 function endMission() {
   if (UI.ended) return; UI.ended = true; render(); var ok = G.result.ok, st = $('#stamp');
-  st.innerHTML = (ok ? 'MISSION COMPLETE' : 'MISSION LOST') + '<small>' + (ok ? 'Mission ' + G.mission.n + ' logged' : G.result.why) + '</small>'; st.className = ok ? '' : 'fail'; void st.offsetWidth; st.classList.add('on');
+  st.innerHTML = (ok ? 'MISSION COMPLETE' : 'MISSION LOST') + '<small>' + (ok ? 'Mission ' + G.mission.n + ' logged' : G.result.why) + '</small>'; st.className = ok ? '' : 'fail'; st.setAttribute('data-art', ok ? 'stamp-complete' : 'stamp-lost'); st.style.backgroundImage = ''; artApply(); void st.offsetWidth; st.classList.add('on');
   sfx(ok ? 'done' : 'fail'); musicSync();
   if (ok) { var lb = ls('ds-log') || {}; lb[G.mission.n] = 1; ls('ds-log', lb); }
   later(function () {
@@ -267,7 +267,8 @@ function endMission() {
   }, UI.fast ? 80 : 1900);
 }
 function showResult() {
-  var ok = G.result.ok; $('#resH').textContent = ok ? 'Mission ' + G.mission.n + ' complete' : 'Mission ' + G.mission.n + ' lost';
+  var ok = G.result.ok; var rs = $('#res'); rs.classList.remove('hasart'); rs.style.backgroundImage = ''; rs.setAttribute('data-art', ok ? 'result-complete' : 'result-lost'); artApply();
+  $('#resH').textContent = ok ? 'Mission ' + G.mission.n + ' complete' : 'Mission ' + G.mission.n + ' lost';
   $('#resP').textContent = ok ? 'Every task went to the right crew mate in ' + G.tricks.length + ' tricks.' + (G.flare ? ' (A flare was used.)' : '') : G.result.why + '.';
   var r = $('#resRow'); r.innerHTML = '';
   var b1 = mk('button', 'btn pri big', ok ? 'Next mission' : 'Try again'); b1.id = 'again'; b1.onclick = function () { startGame({ players: UI.players, mission: ok ? Math.min(50, G.mission.n + 1) : G.mission.n }); };
@@ -335,6 +336,7 @@ function campaignInit() {
       isWon: function (G) { return !!(G.result && G.result.ok); },
       metrics: function (G) { return { won: !!(G.result && G.result.ok), noflare: !G.flare || UI.flareFree, signals: G.sig.filter(function (s) { return s.p !== 0; }).length, tricks: G.tricks.length }; },
       onExit: showTitle,
+      portrait: function (who) { var c = (window.CAMPAIGN.cast || {})[who], f = c && c.portrait ? c.portrait.replace('.webp', '') : who; return artHas(f) ? 'media/' + f + '.webp' : null; },
       scores: function (G) { return [G.result && G.result.ok ? 1 : 0]; }, seats: function (G) { return [{ name: 'You', me: true }]; } });
   } catch (e) { console.warn(e); }
 }
@@ -355,6 +357,7 @@ function boot() {
   document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (c) c.classList.toggle('ds-hit'); });
   tutMenu();
 }
+function pingFx(el) { if (!el || UI.fast) return; var r = el.getBoundingClientRect(), f = mk('div', 'pingfx'); f.setAttribute('data-art', 'fx-ping'); f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + r.height / 2) + 'px'; document.body.appendChild(f); artApply(); setTimeout(function () { f.remove(); }, 900); }
 function nudge() { var m = $('#msg'); m.classList.remove('flash'); void m.offsetWidth; m.classList.add('flash'); setTimeout(function () { m.classList.remove('flash'); }, 700); }
 function tutMenu() { try { $('#tutSlot').innerHTML = GXT.menuHTML({ game: 'deep-signal', first: !ls('ds-played'), cls: 'btn', launch: function () { startTutorial(false); } }); } catch (e) { } }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
