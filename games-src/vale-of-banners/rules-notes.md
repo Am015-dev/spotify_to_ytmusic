@@ -24,3 +24,17 @@
 - Estate layout: our own map in the standard 37-space hexagon (keep 3, mine 3, lore 6, buildings 11, pasture 8, water 6).
 - Lore names and effects are our own set of 26 (16 rule-benders, 10 end-game scrolls).
 - A fourth goods kind arriving on a full goods shelf is lost.
+
+## Cross-check against the published rulebook (7 Nov 2026)
+Checked against a rules summary of the official rulebook (rulespal.com rulebook page, officialgamerules.org) and fixed:
+- Selling: 2 / 3 / 4 points per goods tile with 2 / 3 / 4 players (we had players + 1). Fixed.
+- Colour bonus: first 5 / 6 / 7 (2 / 3 / 4 players), second 2 / 3 / 4, later players nothing. Fixed (we had guessed 6/2, 7/4/1, 8/5/2).
+- Back lane size: 4 / 6 / 8 tiles for 2 / 3 / 4 players (we had 4 always). Stalls 2 / 3 / 4 tiles per number: matches. Fixed.
+- Tie-break: fewer empty estate spaces, then the player further back on the turn track (we had the higher one). Fixed.
+- Tile pool raised to 164 so 4 players never run the bag dry.
+- Confirmed unchanged: 1 silver, 1-4 workers by turn order, 3 random goods at start; 2 dice + white die for goods; 2 silver back lane;
+  region 1-36 by size + 10..2 by season; mines 1 silver per season end; 1 point per silver, per unsold goods, per 2 workers;
+  turn order by track with the top of a stack first; the 8 building effects; max 3 kinds of goods.
+- Lore tiles stay our own 26 (the published set is copyrighted text; ours bend similar kinds of rules).
+- No open-source implementation of this game with a usable licence was found (search of GitHub and the web: only a closed digital
+  edition, a hosted browser version and a solo module for the card game), so no third-party code is used.

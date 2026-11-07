@@ -54,6 +54,18 @@ Spending: hard ends with 3.6 silver / 2.8 workers, normal 6.8 / 5.9 (both count 
 9. Normal AI ended with ~9 unused workers -> worker value capped (now ~6).
 10. Tutorial piece was invisible behind the bubble on phone -> bubble sides set by the kit; verified by tap test.
 
+## Reused, and from where (orchestrator addenda 1-4)
+- Shell from the shelf, not rebuilt: shell.js, gx-kit (Menu/settings), gx-help, gx-tutor, gx-campaign, gx-music, gameaudio, gx-scenario,
+  shell/gx-campaign/help/tutor css. Build layout, campaign wiring and result flow follow cauldron-fair; picture-slot loader (art.js),
+  assets.json format and register-assets.py copied from redline-rally; smoke.js pattern from redline-rally.
+- Not copied from carc/kot: their engines are a different game (tile-laying meeples / dice monsters) and our own engine, dice UI and hex
+  estate were already written and tested (rules-test, real-tap play) before the addendum arrived; nothing of theirs was stronger here.
+- Web: no open-source engine with a usable licence exists (rules-notes.md), so no THIRD-PARTY.md. Rules cross-checked against the published
+  rulebook summary; 4 mismatches fixed (rules-notes.md). Layout pattern (market top / estate centre / your supply in the panel) matches the
+  usual browser versions' flow; no art, text or code taken.
+- Temporary art: 71 pictures from game-icons.net icons (CC BY 3.0, credits in ASSETS.md and Menu > About) on code-drawn tiles, in
+  temp-art/; copy into games/vale-of-banners/media/ at deploy. Kenney blocked (403); no fan or print-and-play pictures used.
+
 ## Missing / next
 - Art: all code-drawn placeholders (92 slots, Flow prompts ready: ASSETS.md, ASSET-CHECK 92/92/0). Music files not made (cues ready).
 - Online P2P not built (not in this brief). No undo. Estate on phone is ~36 px hexes (tap OK, could be bigger if the dock collapses).

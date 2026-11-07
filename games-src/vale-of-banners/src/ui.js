@@ -144,7 +144,7 @@ function renderMarket() {
     });
     st.appendChild(tl);
     var gd = h('div.stgoods' + (mt && top && top.t === 'ship' && G.goodsAt[d].length ? '.glow' : ''), { id: 'gs-' + d });
-    G.goodsAt[d].forEach(function (g) { gd.appendChild(h('span.gchip', { text: g, title: VB.GOODS[g], style: 'background-color:' + GCOL[g], 'data-art': 'goods-' + g })); });
+    G.goodsAt[d].forEach(function (g) { gd.appendChild(h('span.gchip', { text: g, title: VB.GOODS[g], style: 'background-color:' + GCOL[g] })); });
     if (mt && top && top.t === 'ship' && G.goodsAt[d].length) { gd.setAttribute('role', 'button'); gd.setAttribute('tabindex', '0'); gd.setAttribute('aria-label', 'Load goods from stall ' + d); gd.addEventListener('click', function () { doMove({ k: 'ship', v: d }); }); }
     st.appendChild(gd);
     mk.appendChild(st);
@@ -205,7 +205,7 @@ function renderDock() {
   var gt = VB.goodsTypes(p); if (!gt.length) gd.appendChild(h('span.tip', { text: 'No goods yet' }));
   gt.forEach(function (g) {
     var ok = mt && VB.validMoves(G).some(function (m) { return m.k === 'sell' && m.v === g; });
-    gd.appendChild(h('button.gbtn' + (ok ? '.glow' : ''), { type: 'button', id: 'gd-' + g, 'aria-label': p.goods[g] + ' ' + VB.GOODS[g] + ', needs a ' + g, onclick: function () { tapGoods(g); } }, [h('span.gchip', { text: g, style: 'background-color:' + GCOL[g], 'data-art': 'goods-' + g }), h('span', { text: '×' + p.goods[g] })]));
+    gd.appendChild(h('button.gbtn' + (ok ? '.glow' : ''), { type: 'button', id: 'gd-' + g, 'aria-label': p.goods[g] + ' ' + VB.GOODS[g] + ', needs a ' + g, onclick: function () { tapGoods(g); } }, [h('span.gchip', { text: g, style: 'background-color:' + GCOL[g] }), h('span', { text: '×' + p.goods[g] })]));
   });
   /* resources */
   var rr = $('#resrow'); rr.innerHTML = '';
@@ -515,7 +515,7 @@ function drawers() {
         S.appendChild(GX.row('Music', [GX.onoff(UI.music, function (v) { UI.music = v; try { localStorage.setItem('vob_music', v ? '1' : '0'); } catch (e) { } musSync(); }), h('button.btn.alt', { type: 'button', text: 'Songs', onclick: function () { try { GXMUS.open(); } catch (e) { } } })], (window.VB_MUSIC || []).length ? null : 'Songs arrive with the next update.'));
       },
       help: function (S) { try { var w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn alt' }); while (w.firstChild) S.appendChild(w.firstChild); } catch (e) { } },
-      about: { name: 'Vale of Banners', version: '1.0', text: 'An original dice-and-tiles estate game.' }
+      about: { name: 'Vale of Banners', version: '1.0', text: 'An original dice-and-tiles estate game. Temporary tile icons: game-icons.net (Delapouite, Lorc, Skoll, Willdabeast), CC BY 3.0.' }
     });
   } catch (e) { console.error(e); }
 }

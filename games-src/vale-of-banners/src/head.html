@@ -42,7 +42,7 @@ button{font:inherit;font-size:var(--fs)}
 /* hex tiles (DOM, clip-path) */
 .hx{width:var(--hex);height:calc(var(--hex) * 1.1547);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;cursor:pointer;border:0;padding:0;color:#2a2014;line-height:1;background-size:cover;background-position:center}
 .hx .gl{font-size:calc(var(--hex) * .42);filter:drop-shadow(0 1px 0 rgba(255,255,255,.4))}
-.hx .nn{font-size:var(--fs);font-weight:800}
+.hx .nn{font-size:var(--fs);font-weight:800;position:absolute;bottom:20%;left:50%;transform:translateX(-50%);background:#fbf6ea;color:#1d140a;border-radius:8px;padding:1px 4px;line-height:1.15;box-shadow:0 0 0 2px #fbf6ea}
 .hx.hasart .gl{opacity:0}
 .hx.empty{cursor:default}
 .tilebtn{background:none;border:0;padding:0;cursor:pointer;position:relative;display:block}

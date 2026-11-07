@@ -25,3 +25,22 @@ Music cues: `games-src/next-wave/music/vale-of-banners/cues-wave1.json`.
 2. Register once (orchestrator, at merge time): `python3 games-src/vale-of-banners/register-assets.py` (adds this game's rows to `games-src/next-wave/expected-assets.json`).
    Then run `python3 games-src/scripts/ingest-assets.py` (`--check` = dry run). It crops/resizes to size, writes `games/vale-of-banners/media/<stem>.webp` and runs the wiring and inbox reports.
 3. Read the PASS/WARN lines and the "needs wiring code" list, send one worker for any wiring, then ONE `build-all.py --deploy vale-of-banners` call; commit the new `media/` files with the deploy.
+
+## Temporary art (until the Flow pictures arrive)
+`temp-art/` holds 71 temporary pictures in the slots' stems: all tiles (keep, mine, barge, 8 buildings, 26 lore, 12 pastures, tile back),
+6 goods, worker / silver / points / die / 4 banner tokens, 7 icons. Each is our own code-drawn hex or disc in the game palette with one
+icon from game-icons.net on it. Re-make them: `git clone --depth 1 https://github.com/game-icons/icons.git <dir>` then
+`node tools/temp-art.js <dir>`. At deploy copy them in: `cp games-src/vale-of-banners/temp-art/*.webp games/vale-of-banners/media/`
+(skip any stem that already has a Flow picture). A Flow file with the same stem replaces each one with zero code changes.
+Boards, backgrounds, portraits, fx and result screens stay code-drawn (no free pack fitted in the time box).
+Kenney (CC0) was the first choice, but kenney.nl answers 403 to this machine, so nothing was taken from it.
+No pictures from print-and-play sheets, workshop mods or fan re-designs were used (none had an explicit reuse licence checked here).
+
+### Credits
+| files | source | author | licence |
+|---|---|---|---|
+| icons on tile-keep, tile-mine, tile-barge, tile-bld-hall/carp/chapel/mkt/mint/tower/store, tile-back, lore books/scrolls, pastures sheep/goose, goods wool/cloth, token-worker/silver/die/banners, icons | https://game-icons.net (repo https://github.com/game-icons/icons) | Delapouite | CC BY 3.0 https://creativecommons.org/licenses/by/3.0/ |
+| icons on tile-bld-inn, lore scroll/book/quill, goods cheese/honey/cider/salt, token-points, icon-season | same | Lorc | CC BY 3.0 |
+| icons on tile-pas-goat-*, tile-pas-pig-* | same | Skoll | CC BY 3.0 |
+| icon on one lore book | same | Willdabeast | CC BY 3.0 |
+The credit line is also in the game's Menu > About.
