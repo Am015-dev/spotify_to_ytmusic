@@ -30,6 +30,7 @@ const STORY={
     final:{ch:4,who:'guide',title:'The final count',say:'The valley is full. Open roads and towns pay 1 per tile; your farmer pays 3 for the walled town.'},
     winner:{ch:4,who:'guide',title:'The deeds are yours',say:null}
   },
+  prologue:{title:'Prologue',text:'Welcome, Garnet. Vinemoor is empty and Hob has his eye on it. Play one game with me first, and I will show you everything.'},
   tutEndTitle:'The deeds are yours',
   tutEndText:'Tamsin: "You build like a native, Garnet. Hob wants a rematch, and so does the valley."',
   tutEndStory:'Tamsin: "Now the real valley awaits. Hob is waiting at the first fence."'

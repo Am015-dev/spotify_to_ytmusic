@@ -101,7 +101,11 @@ function tutLeave(){UI.tut=false;UI.tutHold=false;UI.tutAuto=0;UI.aiT&&clearTime
 function tutStart(o){coachStart(o)}
 // Story starts with the tutorial (Chapter 0) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
+  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))prologueCard();else GXC.open()}
+// the story starts with a short scene, then the coached first game as the prologue (skippable)
+function prologueCard(){const g=STORY.guide;
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Prologue"><h2>${esc(STORY.prologue.title)}</h2><div class="cwalk"><img class="cpic" src="${g.img}" alt=""><div><b>${esc(g.name)}</b><p>${esc(STORY.prologue.text)}</p></div></div><button class="btn big" data-a="pgo">Play the prologue</button><button class="btn alt" data-a="pskip">Skip to the map</button></div></div>`;
+  const m=$('#modal');m.querySelector('[data-a=pgo]').onclick=()=>tutStart({prologue:true});m.querySelector('[data-a=pskip]').onclick=()=>{m.innerHTML='';GXC.open()}}
 // first-time players who tap Play are offered the tutorial once
 function tutOffer(){return !UI.offered&&tutFirst()}
 function showOffer(){UI.offered=true;
