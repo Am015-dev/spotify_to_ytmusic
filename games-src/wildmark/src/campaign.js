@@ -31,7 +31,7 @@ function campInit() {
   GXC.init({
     game: 'wildmark', data: window.CAMPAIGN,
     portrait: function (who, size, c) { var st = c && c.portrait ? c.portrait.replace(/\.webp$/, '') : ''; return st && ART.have.indexOf(st) >= 0 ? artUrl(st) : campPortraitNode(c); },   // only files that exist (no 404s), else a drawn silhouette
-    headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); tutStart(); }); return [b]; },
+    headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Tutorial: a coached game with Rowan'); b.addEventListener('click', function () { GXC.close(); tutStart(); }); return [b]; },
     endArt: { win: ART.have.indexOf('result-win') >= 0 ? artUrl('result-win') : null, lose: ART.have.indexOf('result-lose') >= 0 ? artUrl('result-lose') : null },
     startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
     onExit: function () { UI.camp = null; UI.mode = 'quick'; UI.sv = 'title'; showTitle(); },

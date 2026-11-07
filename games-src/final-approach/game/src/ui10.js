@@ -157,7 +157,7 @@ function hlpInit() {
 function hlpAfter() {
   hlpInit(); if (typeof GXH === 'undefined') return;
   const vis = id => { const e = document.getElementById(id); return !!(e && !e.hidden); };
-  const busy = !G || !UI.started || G.result || (typeof tutOn === 'function' && tutOn()) || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
+  const busy = !G || !UI.started || G.result || (typeof tutOn === 'function' && tutOn()) || !!(UI.fc && !UI.fc.ended) || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
   GXH.phase(busy ? null : hlpPhase());
 }
 setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
