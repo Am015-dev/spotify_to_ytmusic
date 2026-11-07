@@ -1,4 +1,4 @@
-// ===================== part 1: state, helpers, rendering (board, dock, hand, opponents, feeder, tray) =====================
+// ===================== render.js: state, helpers, rendering (board, dock, hand, opponents, feeder, tray) =====================
 var G = null;
 var UI = { mode: 'vs', view: 0, sel: null, pend: null, gsDie: null, busy: false, fxOn: false, camp: null, hints: true, fast: false, keep: null, timers: [], started: 0, lastHuman: 0 };
 var $ = function (s, r) { return (r || document).querySelector(s); };
