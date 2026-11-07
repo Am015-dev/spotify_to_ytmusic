@@ -30,3 +30,9 @@ Counts: 51 Kingdom Cards (17 per suit), 4 factions x 19 cards (14 basic, strengt
 - All Kingdom Card, Site and Tactic texts were checked only against the project's own cards.json/data.js text, not against the physical cards. Sampled cards behaved as their text says.
 - Rulebook FAQ/errata and the Rules Reference Sheet were never retrieved.
 - Whether the "tutorial" 1-round length exists in the published game (it is a project addition for the staged tutorial).
+
+## Fixed (W391)
+- MISSING acquired Kingdom Card may go on either board space, even when the other is empty -> fixed (the pick is offered whenever one space is occupied; the AI prefers the empty one); tests "acquired Kingdom Card may replace an occupied space..." and the updated Crone of Autumn test.
+- MISSING solo mode and advanced setup: left (large features; need new UI; documented gaps).
+- SIMPLIFIED items: one "Kept simple" line in the rules drawer.
+- Unverified (no source, nothing changed): starting hand size 6, trait icon mapping, Necropolis flow, Coin Council timing, Ruse per-clash limit.
