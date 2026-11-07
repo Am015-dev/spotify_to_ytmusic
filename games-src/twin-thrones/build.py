@@ -12,7 +12,7 @@ for it in man['items']:
         if os.path.exists(os.path.join(media, it['stem'] + '.' + ext)): have[it['stem']] = 'media/%s.%s' % (it['stem'], ext); break
 meta = {i['stem']: {'kind': i['kind'], 'w': i['w'], 'h': i['h']} for i in man['items']}
 ASSETS_JS = 'var TT_ASSETS = %s;\nvar TT_HAVE = %s;\n' % (json.dumps(meta, separators=(',', ':')), json.dumps(have, separators=(',', ':')))
-SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'assets.js': None, 'art.js': os.path.join(S, 'art.js'), 'data.js': os.path.join(S, 'data.js'), 'engine.js': os.path.join(S, 'engine.js'), 'ai.js': os.path.join(S, 'ai.js'), 'ui.js': os.path.join(S, 'ui.js')}
+SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'gx-scenario.js': os.path.join(SP, 'shell', 'gx-scenario.js'), 'scn.js': os.path.join(S, 'scn.js'), 'assets.js': None, 'art.js': os.path.join(S, 'art.js'), 'data.js': os.path.join(S, 'data.js'), 'engine.js': os.path.join(S, 'engine.js'), 'ai.js': os.path.join(S, 'ai.js'), 'ui.js': os.path.join(S, 'ui.js')}
 h = rd(os.path.join(S, 'head.html')).replace('/*SHELL_CSS*/', rd(os.path.join(SP, 'shell', 'shell.css')))
 body = rd(os.path.join(S, 'body.html'))
 for f, p in SRC.items():
