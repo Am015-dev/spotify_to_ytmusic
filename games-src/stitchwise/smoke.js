@@ -31,7 +31,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
       const offers = await pg.$$('#offers .offer'); await tap(offers[pick]); await pg.waitForSelector('#ghost', { timeout: 3000 });
       const q = await (await pg.$('#quilt')).boundingBox(); await drag(q.x + q.width * .2, q.y + q.height * .8, q.x + q.width * .55, q.y + q.height * .5);
       const valid = await pg.evaluate(() => ghostOk()); ok(valid, 'dropped patch snaps to a legal spot (' + tag + ')');
-      const before = await pg.evaluate(() => G.owned[0].length); await tapSel('[data-a=sew]'); await pg.waitForFunction(n => G.owned[0].length === n + 1, before, { timeout: 5000 }).catch(async e => { console.log('buy stuck', JSON.stringify(await pg.evaluate(() => ({ sel: UI.sel, ok: ghostOk(), busy: UI.busy, gx: UI.gx, gy: UI.gy, o: UI.o, dis: document.querySelector('[data-a=sew]') && document.querySelector('[data-a=sew]').disabled, pend: G.pend, tut: UI.tutorial })))); await pg.screenshot({ path: path.join(OUT, tag + '-stuck.png') }); throw e; }); return 'buy';
+      const before = await pg.evaluate(() => G.owned[0].length); await tapSel('[data-a=sew]'); await pg.waitForFunction(n => G.owned[0].length === n + 1, before, { timeout: 5000 }).catch(async e => { await pg.screenshot({ path: path.join(OUT, tag + '-buy-stuck.png') }); console.log('buy stuck', JSON.stringify(await pg.evaluate(() => ({ sel: UI.sel, ok: ghostOk(), busy: UI.busy, gx: UI.gx, gy: UI.gy, o: UI.o, dis: document.querySelector('[data-a=sew]') && document.querySelector('[data-a=sew]').disabled, pend: G.pend, tut: UI.tutorial })))); await pg.screenshot({ path: path.join(OUT, tag + '-stuck.png') }); throw e; }); return 'buy';
     }
     await tapSel('[data-a=adv]'); return 'adv';
   }

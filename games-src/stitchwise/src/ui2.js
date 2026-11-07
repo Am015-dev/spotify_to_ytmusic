@@ -83,8 +83,8 @@ function banner(txt, sub, opp) { var b = $('#turnban'); if (!b) { b = h('div#tur
 function turnCheck() { // banner + plain line when the turn changes (or stays: the player further back plays again)
   if (!G || G.over || G.pend) return; var w = swWho(G), hum = isHuman(w), hot = UI.mode === 'hot', nm = hot ? nameOf(w) + '\u2019s turn' : hum ? 'Your turn' : nameOf(w) + '\u2019s turn', again = w === UI.lastWho, prev = UI.again;
   if (hum) UI.fast = false;
-  UI.again = hum && again ? (hot ? nameOf(w) + ' is still behind on the track, so plays again' : 'You are still behind on the track, so you play again. Buy a patch or Advance') : '';
-  if (!again) banner(nm, hum ? 'Buy a patch or Advance' : 'Watch their move', !hum && !hot); else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', 'Further back on the track', !hum && !hot);
+  UI.again = hum && again ? (hot ? nameOf(w) + ' is still behind on the track, so plays again' : 'You are still behind on the track: play again') : '';
+  if (!again) banner(nm, '', !hum && !hot); else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', '', !hum && !hot);
   UI.lastWho = w; if (prev !== UI.again) renderDock();
 }
 function schedule() {

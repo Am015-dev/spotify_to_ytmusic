@@ -56,7 +56,7 @@ function quiltEl(seat, cls) {
 }
 function thumb(seat) { var c = document.createElement('canvas'); c.width = c.height = 90; c.className = 'thumb'; var x = c.getContext('2d'); x.fillStyle = '#f1e5c8'; x.fillRect(0, 0, 90, 90); for (var i = 0; i < 81; i++) { var p = G.board[seat][i]; if (p === -1) continue; x.fillStyle = p === 99 ? '#4d4032' : p === 100 ? '#8a5a3a' : pcol(p); x.fillRect((i % 9) * 10 + 0.5, ((i / 9) | 0) * 10 + 0.5, 9, 9); } return c; }
 function strip(seat) {
-  var sc = swScore(G, seat), w = swWho(G) === seat && !G.over;
+  var sc = swScore(G, seat), w = (UI.peek >= 0 ? UI.peek : swWho(G)) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'Score now ' + sc.total, 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
     h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), thumb(seat), h('b', nameOf(seat)),
     h('span.st', h('span.bt', { html: btnIc() + '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span>', title: 'Buttons' }), h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
@@ -93,7 +93,7 @@ function render() {
   if (!G) return; renderDock(); layout(); var vs = viewSeat(), os = 1 - vs, qc = $('#qcol'), sd = $('#side'); qc.innerHTML = ''; sd.innerHTML = '';
   var q = quiltEl(vs, 'me'); UI.newCells = {}; if (UI.mode !== 'hot' && vs !== 0) q.appendChild(h('div.qlabel', nameOf(vs) + '\u2019s quilt'));
   artBg($('#board'), 'bg-table');
-  var pills = h('div#pills', strip(vs), strip(os));
+  var ps = UI.peek >= 0 && UI.mode !== 'hot' ? 0 : vs, pills = h('div#pills', strip(ps), strip(1 - ps));
   if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); } else { qc.appendChild(pills); qc.appendChild(q); }
   var tr = renderTrack(); sd.appendChild(tr); if (UI.wide) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
   drawGhost();
@@ -107,7 +107,7 @@ function patchShape(pid, cls, oc, cells) { var p = PATCHES[pid], c = cells || p.
 function facts(p) { return '<span class="bt" title="Cost in buttons">' + btnIc() + p.cost + '</span><span class="bt" title="Time it takes">' + timeIc() + p.time + '</span><span class="bt" title="Buttons earned at each button spot">' + btnIc() + '×' + p.inc + '</span>'; }
 function offerFacts(p) { return '<span class="of oc"><b>' + p.cost + '</b><small>cost</small></span><span class="of ot"><b>' + p.time + '</b><small>time</small></span><span class="of oi"><b>+' + p.inc + '</b><small>earn</small></span>'; }
 function renderDock() {
-  var s = swWho(G), hum = !G.over && isHuman(s), off = swOffer(G), box = $('#offers'), pr = $('#prompt'), ac = $('#acts'), dt = $('#detail'), dh = $('.gx-dt');
+  var s = UI.peek >= 0 ? UI.peek : swWho(G), hum = !G.over && isHuman(s) && !(UI.peek >= 0), off = swOffer(G), box = $('#offers'), pr = $('#prompt'), ac = $('#acts'), dt = $('#detail'), dh = $('.gx-dt');
   box.innerHTML = ''; ac.innerHTML = ''; dt.innerHTML = ''; pr.classList.toggle('rv-cap', !G.over && !hum && UI.mode !== 'hot');
   off.forEach(function (pid, k) {
     var p = PATCHES[pid], aff = hum && !G.pend && G.btn[s] >= p.cost, fits = hum && !G.pend && swPlacements(G.board[s], p).length > 0, why = !hum ? '' : G.pend ? '' : !aff ? 'need ' + (p.cost - G.btn[s]) + ' more' : !fits ? 'no room' : '';
@@ -123,17 +123,17 @@ function renderDock() {
   box.style.display = '';
   if (!hum) { pr.textContent = UI.cap || (nameOf(s) + ' is thinking…'); return; }
   if (UI.sel >= 0) {
-    var pid = off[UI.sel], p = PATCHES[pid], ok = ghostOk(); pr.textContent = ok ? 'Good spot. Tap Sew it on (or drag to move it)' : 'Drag the patch onto your quilt, or tap a square';
-    dt.innerHTML = '<b>' + p.name + '</b>: ' + p.n + ' squares, cost ' + p.cost + ', time ' + p.time;
+    var pid = off[UI.sel], p = PATCHES[pid], ok = ghostOk(); pr.textContent = ok ? 'Good spot! Tap Sew it on' : 'Drag the patch onto your quilt';
+    if (UI.wide) dt.innerHTML = '<b>' + p.name + '</b>: ' + p.n + ' squares, cost ' + p.cost + ', time ' + p.time;
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'rot', 'aria-label': 'Rotate' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/></svg>' }), 'Rotate'));
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'flip', 'aria-label': 'Flip' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M12 3v18M8 7L3 12l5 5zM16 7l5 5-5 5z"/></svg>' }), 'Flip'));
     ac.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'sew', disabled: ok ? null : 'disabled' }, 'Sew it on'));
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'cancel', 'aria-label': 'Cancel' }, 'Cancel'));
   } else {
     var nCan = off.filter(function (pid) { var q = PATCHES[pid]; return G.btn[s] >= q.cost && swPlacements(G.board[s], q).length > 0; }).length;
-    pr.textContent = UI.again ? UI.again : nCan ? 'Tap a glowing patch to buy it, or tap Advance' : 'You can’t afford a patch: tap Advance to earn buttons';
+    pr.textContent = UI.again ? UI.again : nCan ? 'Tap a glowing patch, or tap Advance' : 'No patch you can buy: tap Advance';
     var st = swAdvSteps(G, s), o = nameOf(1 - s);
     ac.appendChild(h('button.btn.adv.grow', { type: 'button', 'data-a': 'adv', title: 'Move your token just ahead of ' + o + ' and take ' + st + ' button' + (st === 1 ? '' : 's') }, 'Advance +' + st + ' button' + (st === 1 ? '' : 's')));
-    dt.textContent = trackInfo();
+    if (UI.wide || !UI.camp) dt.textContent = trackInfo();
   }
 }

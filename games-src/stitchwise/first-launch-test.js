@@ -12,8 +12,9 @@ let fails = 0, n = 0; const ok = (c, m) => { n++; if (!c) { fails++; console.log
   const tut = await pg.$('#start button:has-text("Tutorial")'); ok(!!tut, 'Tutorial button on the title'); await tap(tut);
   await pg.waitForFunction(() => typeof GXT !== 'undefined' && GXT.active(), null, { timeout: 5000 }).then(() => ok(true, 'tutorial started'), () => ok(false, 'tutorial started'));
   ok(await pg.evaluate(() => !document.querySelector('#toast').classList.contains('on')), 'no toast on tutorial step 1');
-  let steps = 0; for (let i = 0; i < 40 && steps < 3; i++) { const nx = await pg.$('.gxt-bub button:has-text("Next"), .gxh-bub button:has-text("Next"), .gxt button:has-text("Next")'); if (!nx) { await pg.waitForTimeout(300); continue; } await tap(nx); steps++; }
-  ok(steps >= 1, 'tutorial advances with Next taps (' + steps + ')');
+  await pg.waitForTimeout(800); const s1 = await pg.evaluate(() => GXT.current() && GXT.current().id); ok(s1 === 'pick', 'step 1 asks for a real action (' + s1 + ')');
+  const off = (await pg.$$('#offers .offer'))[2]; if (off) await tap(off);
+  await pg.waitForFunction(() => GXT.current() && GXT.current().id !== 'pick', null, { timeout: 5000 }).then(() => ok(true, 'tapping the spotlit patch advances'), () => ok(false, 'tapping the spotlit patch advances'));
   const sk = await pg.$('button:has-text("Skip tutorial")'); if (sk) await tap(sk); await pg.waitForTimeout(600);
   ok(await pg.evaluate(() => !document.querySelector('#start').hidden), 'skipping the tutorial returns to the title');
   const bad = errs.filter(e => !/favicon|manifest/.test(e)); ok(bad.length === 0, 'no page errors or 404s ' + JSON.stringify(bad.slice(0, 2)));

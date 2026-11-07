@@ -206,9 +206,9 @@ html .gx-row .btn,html .gx-row-k .btn,html .gx-row-l small,html .gx-chip{font-si
 .gxc-lab{padding:4px 10px!important;box-shadow:none!important;border:1px solid #b99a60}
 
 /* W381 playable: readable offers, glow/dim, turn banner, captions */
-.offer .onm{font-size:13px;font-weight:800;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3a2a1a}
+.offer .onm{background:#fffaf0;padding:1px 5px;border-radius:5px;font-size:13px;font-weight:800;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3a2a1a}
 .offer .ofx{display:grid!important;grid-template-columns:repeat(3,1fr);gap:2px!important;width:100%;flex-wrap:nowrap!important}
-.offer .of{display:flex!important;flex-direction:column;align-items:center;gap:0!important;line-height:1}
+.offer .of{display:flex!important;flex-direction:column;align-items:center;gap:1px!important;line-height:1;background:#f4ead6;border-radius:6px;padding:2px 0}
 .offer .of b{font-size:17px;font-weight:800}
 .offer .of small{font-size:13px!important;font-weight:700;color:#5a4630}
 .offer .oc b{color:#8a5a00}.offer .ot b{color:#1d5f8a}.offer .oi b{color:#2b6b2b}
@@ -216,7 +216,7 @@ html .gx-row .btn,html .gx-row-k .btn,html .gx-row-l small,html .gx-chip{font-si
 @keyframes canp{50%{box-shadow:0 0 0 5px #f2c14e55,0 4px 18px #e0a52088}}
 .offer.no{opacity:.8}.offer.no.cant{opacity:.5}.offer.dim{opacity:.35;filter:saturate(.4)}
 .offer.cant::after{font-size:13px!important}
-#prompt{font-size:16px!important;line-height:1.25;min-height:40px;display:flex;align-items:center;background:#fff7e0;border-left:4px solid var(--gold,#e0a520);border-radius:8px;padding:4px 8px;color:#2a1d10}
+#prompt{font-size:16px!important;line-height:1.2;min-height:0;margin:2px 0 4px!important;display:flex;align-items:center;background:#fff7e0;border-left:4px solid var(--gold,#e0a520);border-radius:8px;padding:4px 8px;color:#2a1d10}
 #prompt.rv-cap{border-left-color:var(--opp,#c0533f);background:#fdecea}
 #turnban{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.85);z-index:80;pointer-events:none;padding:14px 28px;border-radius:16px;font:800 26px/1.1 Georgia,serif;color:#fff;background:#1f6f68;box-shadow:0 10px 40px #0008;opacity:0;transition:opacity .25s,transform .25s;text-align:center;white-space:nowrap}
 #turnban small{display:block;font:600 15px/1.3 system-ui,sans-serif;margin-top:4px;opacity:.95}
@@ -224,5 +224,7 @@ html .gx-row .btn,html .gx-row-k .btn,html .gx-row-l small,html .gx-chip{font-si
 .flt.r{transform:translateX(-50%);white-space:nowrap;font-size:16px;background:#2a1d10e6;padding:4px 10px;border-radius:10px;color:#ffe9a0;text-shadow:none}
 .qlabel{position:absolute;left:50%;top:-2px;transform:translate(-50%,-100%);background:#a8432f;color:#fff;font-weight:800;font-size:14px;padding:3px 12px;border-radius:10px 10px 0 0;white-space:nowrap;z-index:3}
 html.sm .offer .onm{display:none}
+#detail:empty{display:none}.offer{gap:2px!important;padding-top:4px!important}#goalline{padding-top:3px!important;padding-bottom:3px!important}
+@media (min-width:1024px){.offer .onm,.offer .of small{font-size:16px!important}.offer .of b{font-size:20px}.offer{max-width:170px}}
 </style>
 </head>
