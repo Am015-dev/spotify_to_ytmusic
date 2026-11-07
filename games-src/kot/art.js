@@ -153,8 +153,8 @@ function renderMap(){const svg=document.getElementById('map');if(!G){svg.innerHT
       s+=`<text x="${cx}" y="${y+198}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="${INK}">${extra.join(' · ')}</text>`;
       s+=`<text x="${cx}" y="${y+216}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="700" font-size="11.5" fill="${INK}" opacity=".7">${[...p.cards.map(c=>CARDS[base(c)].n),...p.evo.map(evoName)].slice(0,2).map(esc).join(', ')}${p.cards.length+p.evo.length>2?'…':''}</text>`}
     else s+=`<text x="${cx}" y="${y+170}" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="34" fill="#e63946" stroke="${INK}" stroke-width="2" letter-spacing="2">K.O.</text>`;
-    const f=UI.fx[k]||[];f.slice(-3).forEach((e,j)=>{const col={hurt:'#e63946',heal:'#2ec27e',star:'#f4a300',energy:'#2ec27e'}[e.c]||'#fff';
-      s+=`<g transform="translate(${x+w-8},${y+40+j*26}) rotate(${j%2?6:-6})"><text text-anchor="end" font-family="Bangers,Impact,sans-serif" font-size="22" fill="${col}" stroke="${INK}" stroke-width="4" paint-order="stroke">${esc(e.t)}</text></g>`});
+    const f=UI.fx[k]||[];f.slice(-2).forEach((e,j)=>{const col={hurt:'#e63946',heal:'#2ec27e',star:'#f4a300',energy:'#2ec27e'}[e.c]||'#fff';
+      s+=`<g transform="translate(${x+w-8},${y+86+j*24}) rotate(${j%2?6:-6})"><text text-anchor="end" font-family="Bangers,Impact,sans-serif" font-size="22" fill="${col}" stroke="${INK}" stroke-width="4" paint-order="stroke">${esc(e.t)}</text></g>`});
     s+=`</g>`});
   if(G.winner){const w=G.winner==='draw'?null:P(+G.winner.slice(1)-1);s+=`<g>${burst(500,230,190,'url(#glow)')}${w?`<g transform="translate(500,215) scale(1.5)">${monArt(w.m)}</g>`:''}<text x="500" y="345" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="#e63946" stroke="${INK}" stroke-width="3" paint-order="stroke" letter-spacing="2">${w?esc(mname(w).toUpperCase())+' WINS!':'NOBODY WINS'}</text></g>`}
   svg.innerHTML=s}

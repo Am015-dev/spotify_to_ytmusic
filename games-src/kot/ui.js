@@ -132,6 +132,7 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
    </div>${onlineBlock()}</details>
    <p class="small muted">The names, card text and art are original, for copyright reasons. The rules follow the published rulebook.</p></div>`}
 function rulesHTML(){return `<div>
+  <h3>How a turn works</h3><ol class="hat"><li>Roll the dice, up to 3 times.</li><li>Tap dice to keep them. Roll the rest.</li><li>Tap SMASH! to use the dice.</li><li>Buy a power card with ⚡, or skip.</li><li>Tap End turn.</li></ol>
   <h3>Your turn in 5 steps</h3><ol><li><b>Roll</b> all dice. Keep any dice you like and reroll the rest, up to twice. You can reroll dice you kept earlier.</li>
   <li><b>Resolve</b>: three of a kind of 1, 2 or 3 scores that many stars, and each extra matching die adds 1. Energy gives 1 each. Hearts heal 1 each, but only outside the city (max 10). Claws smash.</li>
   <li><b>City</b>: from the city (Downtown or the Harbor) your claws hit every monster outside. From outside, they hit every monster in the city. When smashed by dice, a city monster may <b>yield</b>. It still takes the damage, and the smasher moves in. If Downtown is empty, you must move in (+1 star). With 5–6 monsters, if Downtown is taken and the Harbor is empty, you move into the Harbor.</li>
@@ -152,7 +153,8 @@ function rulesHTML(){return `<div>
   <div class="acts"><button class="btn primary" data-gx="close">Got it</button></div></div>`}
 
 function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal();
-  if(window.GX&&GX.app&&G&&!G.winner&&!UI.info&&humanTurn()&&UI.dockTurn!==G.tid+':'+G.active){UI.dockTurn=G.tid+':'+G.active;GX.showDock()}}
+  if(window.GX&&GX.app&&G&&!G.winner&&!UI.info&&humanTurn()&&UI.dockTurn!==G.tid+':'+G.active){UI.dockTurn=G.tid+':'+G.active;GX.showDock()}
+  try{if(typeof ppAfter==='function')ppAfter()}catch(e){}}
 const SPEEDS=[['slow',1300],['normal',650],['fast',260]];
 function setSpeed(k){UI.speed=k;AIDELAY=SPEEDS[k][1];const b=document.getElementById('speedbtn');if(b)b.innerHTML='⏩ Speed: '+SPEEDS[k][0][0].toUpperCase()+SPEEDS[k][0].slice(1)+'<small>How fast the computer plays (tap to change)</small>';try{localStorage.setItem('ccs_speed',k)}catch(e){}}
 

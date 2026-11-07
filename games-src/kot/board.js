@@ -34,7 +34,8 @@ function bfBuild(){if($bf('bfx'))return;const fx=document.createElement('div');f
     menu.insertAdjacentHTML('afterbegin',rows.map(([g,t,s])=>`<button class="btn mrow" data-gx="${g}" data-bfm="1">${t}<small>${s}</small></button>`).join(''))}}
 // ---- the one line on the board ----
 function bfOut(){if(!G||G.winner||G.mode!=='solo')return false;const me=meSeat();return me>=0&&!G.pl[me].alive}
-function bfLineText(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.choice&&!$bf('choice').classList.contains('hidden'))return 'Choose here';if(bfOut())return 'You’re knocked out · watching the end';
+function bfLineText(){return typeof ppLine==='function'?ppLine(bfLineText0()):bfLineText0()}
+function bfLineText0(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.choice&&!$bf('choice').classList.contains('hidden'))return 'Choose here';if(bfOut())return 'You’re knocked out · watching the end';
   if(UI.intro||UI.choice)return '';
   if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn · tap to speed up`}
   if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;

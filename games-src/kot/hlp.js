@@ -50,6 +50,7 @@ const HLP_STEPS={
   buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Hold a card to read it, tap to buy. Or tap End turn to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
   watch:{target:()=>{const e=HLP_Q('#bline');return e&&e.getClientRects().length&&e.textContent?e:HLP_Q('#ptop')},title:'Others are playing',text:'Watch their dice. Tap the board to speed them up.',pic:()=>hlpIcons([HLP_CROWN],'',60)}};
 const HLP_RULES=[
+  {title:'How a turn works',text:'1  Roll the dice, up to 3 times.\n2  Tap dice to keep them. Roll the rest.\n3  Tap SMASH! to use the dice.\n4  Buy a power card with ⚡, or skip.\n5  Tap End turn.',pic:()=>hlpFaces(['1','2','3','E','C','H'],'')},
   {title:'Win the city',text:'First monster to 20 ★ wins. The last monster standing wins too.',pic:()=>hlpIcons([HLP_STAR,HLP_CROWN],'20 ★ wins')},
   {title:'Your turn',text:'Roll six dice, up to three times. Keep the good ones, roll the rest again.',pic:()=>hlpFaces(['1','2','3','E','C','H'],'')},
   {title:'The dice faces',text:'Three matching numbers score stars. ⚡ gives energy, claws hit rivals, hearts heal you.',pic:()=>hlpFaces(['3','E','C','H'],'')},

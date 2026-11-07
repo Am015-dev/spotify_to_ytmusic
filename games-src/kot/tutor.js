@@ -42,7 +42,10 @@ const TUT_SCRIPT=[
   ['C','C','H','E','E','1'],  // you in Downtown: claws, a heart that cannot heal, two energy
   ['C','C','C','1','2','H'],  // Squidrik: three claws
   ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
-  ['H','C','C','3','3','E']]; // you outside: a heart that heals, claws that hit Downtown
+  ['H','C','C','3','3','E'],  // you outside: a heart that heals, claws that hit Downtown
+  ['C','1','2','H','H','3'],  // Squidrik (now in Downtown): one claw
+  ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
+  ['3','3','3','3','C','C']]; // you, chapter 4: four 3s (3 stars + 1 for the extra die)
 const TUT_BUY=['cosmic','plated','kiosk'], TUT_NEXT=['kidfan','train','sun','mend'];   // cards for sale; then (popped in this order) what a refill and the sweep deal
 (function(){
   // the dice: only the real throws read the script (the computer's look-ahead calls faceOf too and must stay random)
@@ -134,13 +137,23 @@ function tutSteps(){
    ready:()=>myRoll()&&!inCity(0)&&G.rolls===2},
  {id:'score3',title:'Heal and hit',say:()=>'A heart healed you: '+Math.max(0,P(0).hp)+' ♥. Your claws hit '+nm(1)+' in Downtown.',target:tChips,wait:null,
    ready:()=>myBuy()&&!inCity(0)},
- {id:'finish',title:'How it ends',say:'The first monster to 20 ★ wins, or the last one standing. Now play a real game!',target:tChips,wait:null,ready:()=>myBuy()});
+ {id:'end3',title:'End your turn',say:'Tap End turn. The rivals play on while you watch.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+   ready:()=>myBuy()&&!inCity(0)&&P(0).vp<16},
+ {id:'later',title:'Four of a kind',say:()=>'Some turns later you have '+P(0).vp+' ★. Four 3s score 3 ★ plus 1 for the extra die. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+   onEnter:()=>{try{P(0).vp=16;refresh()}catch(e){}},
+   ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.f==='3').length===4&&!inCity(0)},
+ {id:'win20',title:'Reach 20 stars',say:()=>'You have '+P(0).vp+' ★. Reach 20 and end your turn to win. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+   ready:()=>myBuy()&&P(0).vp>=20},
+ {id:'result',title:'The result',say:'The first to 20 ★ wins at once. You also win if every rival is K.O. (0 hearts). Tap Finish.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
+   ready:()=>!!(G&&G.winner&&UI.stats&&document.querySelector('#modal:not(.hidden)'))});
+  const CH={goal:1,keep:1,roll1:1,third:1,energy:1,roll2:1,done1:1,score1:1,shop:1,buy:1,end1:1,rivals:2,stay:2,bonus:2,done2:2,score2:2,sweep:2,end2:2,yield:2,done3:3,score3:3,end3:3,later:4,win20:4,result:4};
+  S.forEach(x=>{if(CH[x.id])x.title=CH[x.id]+' · '+x.title});
   return S}
 // ---------------------------------------------------------------- start, leave, hooks
 function tutRelease(){TUT.hold=false;try{schedule()}catch(e){}}
 function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:pro?'Roll, keep, smash, hold Downtown, buy cards. Now the Story begins.':'Roll, keep, smash, hold Downtown, buy cards. Time for a real game.',
+    endTitle:'You know the rules',endText:pro?'You played a whole game. Now the Story begins.':'You played a whole game, start to finish. Time for a real one.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:tutSetup,
     onDone:r=>{tutLeave();const c=r&&r.choice;
