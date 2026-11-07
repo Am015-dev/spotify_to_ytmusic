@@ -15,13 +15,14 @@ const PICK = `(() => {
   const byText = (sel, re) => all(sel).find(e => re.test(e.textContent.trim()));
   let e = null, why = '';
   if (mode === 'coach' && document.querySelector('#coachend')) return { done: 'over' };
+  { const ce = all('#coachend [data-ce=chapter]')[0]; if (ce && mode === 'story') { e = ce; why = 'start chapter 1'; } }
   const rs = document.querySelector('#rs'), rsOpen = rs && !rs.hidden;
   const start = document.querySelector('#start'), startOpen = start && !start.hidden;
   const skip = all('[data-gxt-skip]')[0];
   // the tutorial prologue (Story, first time): leave it with Skip (a real button)
   if (skip && mode === 'story') { e = skip; why = 'skip tutorial'; }
   const endb = all('[data-gxt-end]')[0]; if (!e && endb) { e = endb; why = 'tutorial end'; }
-  if (!e && G && G.phase === 'over' && rsOpen && document.querySelector('#rs .win')) return { done: 'over' };
+  if (!e && G && G.phase === 'over' && rsOpen && document.querySelector('#rs .win') && (mode !== 'story' || UI.camp)) return { done: 'over' };
   if (!e && rsOpen) {
     const act = first('#rs [data-a=take]', '#rs [data-a=hotgo]'); if (act) { e = act; why = 'take'; }
     if (!e) { const c = first('#rs [data-a=rscont]:not(.off)'); if (c) { e = c; why = 'continue report'; } }
@@ -70,11 +71,11 @@ async function play(browser, name, mode) {
     if (!r.ok) { covered.add(name + ':' + r.why + ' under ' + r.under); await sleep(300); if (++idle > 60) break; continue; }
     await p.touchscreen.tap(r.cx, r.cy); taps++; if (log.length < 400) log.push(r.why); await sleep(r.why === 'draw' ? 700 : r.why === 'got it' ? 600 : 450);
   }
-  const cov = mode === 'coach' ? await p.evaluate(() => { const c = window.COACH; const all = c.ids.filter(i => i !== 'end'); const shown = new Set(c.shown); const later = new Set(c.later); return { shown: [...shown], later: [...later], missing: all.filter(i => !shown.has(i) && !later.has(i)), coachend: !!document.querySelector('#coachend') }; }).catch(() => null) : null;
+  const mode0 = mode; const cov = mode === 'coach' ? await p.evaluate(() => { const c = window.COACH; const all = c.ids.filter(i => i !== 'end'); const shown = new Set(c.shown); const later = new Set(c.later); return { shown: [...shown], later: [...later], missing: all.filter(i => !shown.has(i) && !later.has(i)), coachend: !!document.querySelector('#coachend') }; }).catch(() => null) : null;
   if (cov) { console.log('coach coverage', JSON.stringify(cov)); if (cov.missing.length || !cov.coachend) over = false; }
-  const res = await p.evaluate(() => G ? { phase: G.phase, over: !!document.querySelector('#coachend'), round: G.round, vp: G.players.map(x => x.vp), camp: !!UI.camp, winText: G.winText } : null).catch(() => null);
+  const res = await p.evaluate(mode0 => G ? { phase: G.phase, over: mode0 === 'coach' && !!document.querySelector('#coachend'), round: G.round, vp: G.players.map(x => x.vp), camp: !!UI.camp, winText: G.winText } : null, mode).catch(() => null);
   console.log(name, over ? 'REACHED RESULT' : 'NOT REACHED', JSON.stringify(res), 'taps', taps); console.log('  last steps:', log.slice(-12).join(' > '));
-  await ctx.close(); return over && res && (res.phase === 'over' || res.over);
+  await ctx.close(); return over && res && (res.phase === 'over' || res.over) && (name !== 'story' || res.camp);
 }
 (async () => {
   const b = await PW.chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });

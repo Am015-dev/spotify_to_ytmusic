@@ -94,7 +94,7 @@ setInterval(() => { try { rfScan(); instrBar(); turnBanner(); } catch (e) { } },
 // The guide speaks just-in-time, one bubble at a time, never blocking input; it can be dismissed. No spotlight, no forced taps.
 // Rules that did not come up are named on the "Things you'll meet later" card at the end. window.COACH.shown / .later feed the test. =====
 const COACH = window.COACH = { on: false, shown: [], later: [], q: [], cur: null, prologue: false, tm: 0, ids: [] };
-const coachBox = () => { let e = $('#coach'); if (!e) { e = h('div#coach', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(e); e.addEventListener('click', ev => { if (ev.target.closest('[data-cx=ok]')) coachNext(); else if (ev.target.closest('[data-cx=leave]')) coachLeave(); }); } return e; };
+const coachBox = () => { let e = $('#coach'); if (!e) { e = h('div#coach.coach', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(e); e.addEventListener('click', ev => { if (ev.target.closest('[data-cx=ok]')) coachNext(); else if (ev.target.closest('[data-cx=leave]')) coachLeave(); }); } return e; };
 const cMe = () => G && G.players[0];
 const COACH_RULES = [
   ['goal', () => G.phase !== 'over' && G.round === 1, 'The goal', 'Granny Hask: "Brew two practice days against Wynne. Most victory points wins. Play any move you like."'],
@@ -106,6 +106,7 @@ const COACH_RULES = [
   ['seven', () => G.phase === 'brew' && cMe().st === 'draw' && CF.whiteSum(cMe()) === CF.limitOf(G, cMe()), 'Exactly seven', 'Hask: "Seven is still safe. Any white chip now explodes the pot. Brave, or wise?"'],
   ['boom', () => cMe().boom && G.round === 1, 'Boom!', 'Hask: "Exploded! You pick points OR coins for the day and skip the bonus die. Stopping sooner is the cure."'],
   ['stopped', () => cMe().st === 'done' && !cMe().boom && G.round === 1 && G.phase === 'brew', 'Safe stop', 'Hask: "Good: you keep your space. Safe pots may roll the bonus die when the day is counted."'],
+  ['rival2', () => G.players[1] && G.players[1].st === 'done' && !G.players[1].boom && G.round === 1 && G.phase === 'brew', 'Wynne', 'Hask: "Wynne stopped early: a safe, smaller score. You may be bolder, or not."'],
   ['rival', () => G.players[1] && G.players[1].boom && G.round === 1, 'Wynne', 'Hask: "Wynne\'s pot exploded. That is the price of pushing your luck."'],
   ['report', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 1, 'Counting the day', 'Hask: "The fair counts each pot: coins, points, and a bonus die for safe pots."'],
   ['shop', () => cMe().q && cMe().q.h === 'shop', 'The stalls', 'Hask: "Spend coins: up to two chips, different colours. Each colour has a power. Press and hold a chip to read it."'],
@@ -115,6 +116,7 @@ const COACH_RULES = [
   ['peek', () => cMe().q && cMe().q.h === 'crow', 'Peek and pick', 'Hask: "A feather chip peeks ahead: place the chip, or send it back."'],
   ['d2count', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 2, 'Final count', 'Hask: "Last day rule: every 5 coins and every 2 rubies become 1 point."']
 ];
+Object.defineProperty(window, 'GXCOACH', { get: () => ({ running: !!COACH.on, explained: COACH.shown.filter(i => i !== 'end'), later: COACH.later, done: !!COACH.finished }), configurable: true });
 COACH.ids = COACH_RULES.map(r => r[0]).concat(['end']);
 const COACH_LATER = [['The purple book (days 3+) and the black chips', 'purple'], ['The other 22 fortune cards', 'cards'], ['Rat tails: trailing players start the stone ahead', 'rat'], ['Nine days, and ties go to the furthest last chip', 'ties']];
 function coachShow(id, title, text) {
@@ -135,7 +137,7 @@ function coachTick() {
 }
 setInterval(() => { try { coachTick(); } catch (e) { } }, 300);
 function coachEnd() {
-  const a = G.players[0], b = G.players[1]; COACH.shown.push('end'); coachNext(); COACH.q = [];
+  const a = G.players[0], b = G.players[1]; COACH.shown.push('end'); COACH.finished = 1; coachNext(); COACH.q = [];
   COACH.later = COACH.ids.filter(i => COACH.shown.indexOf(i) < 0 && i !== 'end');
   const lines = COACH_RULES.filter(r => COACH.later.indexOf(r[0]) >= 0).map(r => r[2]).concat(COACH_LATER.map(x => x[0]));
   const win = G.winner === 0 ? 'You win ' + a.vp + ' to ' + b.vp + '!' : G.winner < 0 ? 'A tie, ' + a.vp + ' each!' : b.name + ' wins ' + b.vp + ' to ' + a.vp + '.';
@@ -152,5 +154,5 @@ function coachFinish(choice) {
 function coachLeave() { coachClean(); tutLeave(); showStart(); }
 tutStart = function (o) {
   coachClean(); try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false;
-  newGame('tutorial'); Object.assign(COACH, { on: true, shown: [], later: [], q: [], cur: null, prologue: !!(o && o.prologue) });
+  newGame('tutorial'); Object.assign(COACH, { on: true, finished: 0, shown: [], later: [], q: [], cur: null, prologue: !!(o && o.prologue) });
 };
