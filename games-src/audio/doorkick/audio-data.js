@@ -30,7 +30,7 @@ const GA_DATA={sfx:{
 "tavern-a":"url:music/tavern-a.mp3",
 "tavern-b":"url:music/tavern-b.mp3",
 "main-a":"url:music/main-a.mp3",
-"main-b":"url:music/main-b.mp3",
+"main-b":"url:music/main-b.mp3","main-short-a":"url:music/main-short-a.mp3","main-short-b":"url:music/main-short-b.mp3",
 "fight-a":"url:music/fight-a.mp3",
 "fight-b":"url:music/fight-b.mp3",
 "victory-a":"url:music/victory-a.mp3",

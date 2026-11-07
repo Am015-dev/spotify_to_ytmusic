@@ -31,7 +31,7 @@ function backStack(label,n){return `<span class="dk" title="${esc(label)}"><i cl
 
 // ---- music: five slots (Menu, Game, Fight, Victory, Defeat), two tracks each; saved choice a / b / shuffle / off
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Fight'],['victory','Victory'],['defeat','Defeat']];
-const MTITLE={'tavern-a':'Island Menu Theme','tavern-b':'Gentle Shoreline','main-a':'Patient Sunrise','main-b':'Quiet Provision','fight-a':'Storm Rumble','fight-b':'Beast in the Dark','victory-a':'Harbor Horn Rising','victory-b':'Safe Return','defeat-a':'Fading Tide','defeat-b':'The Last Watch Ashore'};
+const MTITLE={'tavern-a':'Island Menu Theme','tavern-b':'Gentle Shoreline','tavern-short-a':'Short menu loop A','tavern-short-b':'Short menu loop B','main-a':'Patient Sunrise','main-b':'Quiet Provision','fight-a':'Storm Rumble','fight-b':'Beast in the Dark','victory-a':'Harbor Horn Rising','victory-b':'Safe Return','defeat-a':'Fading Tide','defeat-b':'The Last Watch Ashore'};
 const MDEF={tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'};
 const MUS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
 // 'all' = shuffle through every looping song (menu, game and fight tracks), a new one every ~2.5 min
