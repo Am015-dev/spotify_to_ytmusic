@@ -1,0 +1,60 @@
+{
+ "_readme": "Perch & Plume music cues, wave 1. Each cue has 2 versions (a and b). Save as games/perch-and-plume/music/<cue>-a.mp3 and <cue>-b.mp3; the build registers only files that exist, so no code change is needed. Slots: menu, main, fight loop; victory, defeat play once.",
+ "cues": {
+  "menu": {
+   "prompt": "Instrumental game music, no vocals, no spoken words, acoustic and gentle, mixed for a phone game. Slow 72 BPM pastoral title theme: fingerpicked acoustic guitar, soft flute and light birdsong-like woodwind trills, morning calm, 4-bar intro then 16-bar sections, ends on a whole bar so it loops cleanly. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "menu.mp3",
+   "bpm": 72,
+   "loop": true,
+   "length": "60-90 s loop"
+  },
+  "main": {
+   "prompt": "Instrumental game music, no vocals, no spoken words, acoustic and gentle, mixed for a phone game. Unhurried 90 BPM board-game loop: plucked strings, marimba, a light hand drum, curious and cosy like a naturalist sketching in a meadow, steady and unobtrusive, loops cleanly. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "main.mp3",
+   "bpm": 90,
+   "loop": true,
+   "length": "90-120 s loop"
+  },
+  "fight": {
+   "prompt": "Instrumental game music, no vocals, no spoken words, acoustic and gentle, mixed for a phone game. 100 BPM boss-chapter loop: the same pastoral palette with a tense low cello ostinato and brisk pizzicato, a friendly rivalry, loops cleanly. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "fight.mp3",
+   "bpm": 100,
+   "loop": true,
+   "length": "60-90 s loop"
+  },
+  "victory": {
+   "prompt": "Instrumental game music, no vocals, no spoken words, acoustic and gentle, mixed for a phone game. Short bright fanfare: flute and strings rising, a joyful birdsong flourish, ends warmly. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "victory.mp3",
+   "bpm": 110,
+   "loop": false,
+   "length": "6-10 s, plays once"
+  },
+  "defeat": {
+   "prompt": "Instrumental game music, no vocals, no spoken words, acoustic and gentle, mixed for a phone game. Short gentle sigh: soft solo clarinet descending over warm strings, kind not sad, ends quietly. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "defeat.mp3",
+   "bpm": 70,
+   "loop": false,
+   "length": "5-8 s, plays once"
+  }
+ }
+}

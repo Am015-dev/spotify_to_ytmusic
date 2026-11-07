@@ -1,0 +1,17 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"ds-board-phone.json",
+"ds-help-phone.json",
+"ds-play-phone.json",
+"ds-result-phone.json",
+"ds-signal-phone.json",
+"ds-stamp-phone.json",
+"ds-zoom-phone.json",
+"menu-phone.json",
+"story-scene-phone.json"
+]
+}
+}

@@ -1,0 +1,19 @@
+{
+ "wave": 3,
+ "ratio": "1:1",
+ "flow_aspect": "1:1",
+ "style": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "vinegrave 2D wave 3, ratio 1:1. Paste with Flow aspect 1:1; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "vinegrave",
+  "count": 6
+ },
+ "cards": {
+  "fx-discover": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A soft burst of golden light and drifting green leaves radiating outward, centred. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "fx-guardian": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A shattering ring of stone fragments and teal sparks radiating outward, centred. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "fx-idol": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A shimmering golden glow with sparkles and tiny jade shards, centred. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "icon-story": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. an open leather-bound journal with a feather bookmark. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "icon-quick": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. a pocket watch with a lightning-like swirl hint (no numbers). One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "icon-howto": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. a folded treasure map with a small question-mark-like curl made of vine (no letters). One single object centred on a flat plain white background, nothing else, no shadow on the ground."
+ }
+}

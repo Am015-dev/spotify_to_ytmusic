@@ -1,0 +1,18 @@
+{
+ "wave": 3,
+ "ratio": "16:10",
+ "flow_aspect": "16:9",
+ "style": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "vinegrave 2D wave 3, ratio 16:10. Paste with Flow aspect 16:9; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "vinegrave",
+  "count": 5
+ },
+ "cards": {
+  "result-win": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A triumphant golden sunrise over a cleared jungle temple with a glowing idol on the altar, warm light, celebratory, no figures.",
+  "result-lose": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A rainy dusk jungle with a half-collapsed temple swallowed by vines, abandoned camp and an extinguished lantern, melancholy teal tones.",
+  "map-act1": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. Top-down painted campaign region map of a sunny jungle coast with a beach, boats and a camp, calm open areas for markers.",
+  "map-act2": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. Top-down painted campaign region map of dense deep jungle with rivers, ruins and canopy, calm open areas for markers.",
+  "map-act3": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. Top-down painted campaign region map of misty temple highlands with terraces and a vine-choked temple on a peak, calm open areas for markers."
+ }
+}

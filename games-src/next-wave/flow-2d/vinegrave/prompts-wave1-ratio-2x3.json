@@ -1,0 +1,17 @@
+{
+ "wave": 1,
+ "ratio": "2:3",
+ "flow_aspect": "9:16",
+ "style": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "vinegrave 2D wave 1, ratio 2:3. Paste with Flow aspect 9:16; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "vinegrave",
+  "count": 4
+ },
+ "cards": {
+  "explorer-0": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A standing meeple-like explorer figure in a teal pith helmet and teal coat with satchel, simple rounded body, painted wooden game-piece look. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "explorer-1": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A standing meeple-like explorer figure in a amber pith helmet and amber coat with satchel, simple rounded body, painted wooden game-piece look. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "explorer-2": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A standing meeple-like explorer figure in a crimson pith helmet and crimson coat with satchel, simple rounded body, painted wooden game-piece look. One single object centred on a flat plain white background, nothing else, no shadow on the ground.",
+  "explorer-3": "Painterly 2D gouache illustration of a 1920s jungle expedition, hand-painted brush texture, warm greens, ochre and teal with soft diffuse light, gentle storybook shading, no 3D, no photo realism, no text, no letters, no numbers, no logos. A standing meeple-like explorer figure in a violet pith helmet and violet coat with satchel, simple rounded body, painted wooden game-piece look. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
+ }
+}
