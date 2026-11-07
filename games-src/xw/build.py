@@ -6,7 +6,7 @@ b=open('body.html').read()
 h=h.replace('<link rel="stylesheet" href="shell.css">','<style>\n'+open('../shell/shell.css').read()+'\n</style>')
 h=h.replace('<link rel="stylesheet" href="polish.css">','<style>\n'+open('polish.css').read()+'\n</style>')
 h=h.replace('</head>','<style>\n'+open('phone.css').read()+'\n'+open('board.css').read()+'\n'+open('../shell/gx-skin.css').read()+'\n'+open('skin.css').read()+'\n'+open('../shell/gx-campaign.css').read()+'\n'+open('../shell/gx-help.css').read()+'\n'+open('../shell/gx-tutor.css').read()+'\n</style>\n</head>')
-for f in ['gx-scenario.js','scn.js','gx-skin.js','perfhud.js','gameaudio.js','audio-data.js','trystero.min.js','netroom.js','three.min.js','gx-glb.js','geo.js','data.js','exp.js','engine.js','ai.js','sound.js','three3d.js','net.js','shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-music.js','story.js','guide.js','flow.js','ui.js','ui-ph.js','gx-campaign.js','camp.js','media.js','board.js','brief.js','hlp.js','tutor.js']:
+for f in ['gx-scenario.js','scn.js','gx-skin.js','perfhud.js','gameaudio.js','audio-data.js','trystero.min.js','netroom.js','three.min.js','gx-glb.js','geo.js','data.js','exp.js','engine.js','ai.js','sound.js','three3d.js','net.js','shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-music.js','story.js','guide.js','flow.js','ui.js','ui-ph.js','gx-campaign.js','camp.js','media.js','board.js','brief.js','hlp.js','lore.js','tutor.js']:
     tag=f'<script src="{f}"></script>'
     if tag not in b: continue
     if f=='camp.js':b=b.replace('<script src="camp.js"></script>','<script>\nwindow.CAMPAIGN = '+json.dumps(json.load(open('campaign.json',encoding='utf-8')),separators=(',',':'),ensure_ascii=False).replace('</','<\\/')+';\n</script>\n<script src="camp.js"></script>')
