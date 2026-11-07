@@ -2,23 +2,20 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
+Wired: 1366 paintings, 73 3D models. Still to wire: 123 paintings, 75 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
-| mainhattan-nightrun | 65 | 10 |
-| lantern-dive | 1 | 0 |
-| sands-of-qamar | 1 | 0 |
-| final-approach | 1 | 0 |
-| hollowbough | 0 | 7 |
-| crown-city-smash | 0 | 1 |
-| nebula-aces | 0 | 15 |
-| rampart-and-vine | 0 | 13 |
-| thornbound | 0 | 6 |
-| doorkick-dungeon | 0 | 9 |
+| mainhattan-nightrun | 123 | 10 |
 | short-fuse | 0 | 3 |
+| nebula-aces | 0 | 15 |
+| thornbound | 0 | 6 |
 | shipwreck-isle | 0 | 1 |
+| hollowbough | 0 | 7 |
 | sunglaze | 0 | 10 |
+| rampart-and-vine | 0 | 13 |
+| crown-city-smash | 0 | 1 |
+| doorkick-dungeon | 0 | 9 |
 
 ## mainhattan-nightrun
 
@@ -69,9 +66,67 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 | Wave 0 prompts-strip.json | `strip-shield-die` | Same character as the reference (Shield, riot cop) in every frame: identical design, colours, outfit, proporti |
 | Wave 0 prompts-strip.json | `strip-shield-jump` | Same character as the reference (Shield, riot cop) in every frame: identical design, colours, outfit, proporti |
 | Wave 0 prompts-strip.json | `strip-shield-shoot` | Same character as the reference (Shield, riot cop) in every frame: identical design, colours, outfit, proporti |
+| Wave 0 prompts-strip.json | `strip-ship-ebait-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ebait-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ebait-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
 | Wave 0 prompts-strip.json | `strip-ship-ecarrier-volley` | Same spaceship as the reference image in every frame: identical design, colours, weapons and painted style, si |
+| Wave 0 prompts-strip.json | `strip-ship-ecdrone-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ecdrone-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ecdrone-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-echarger-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-echarger-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-echarger-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ecrawler-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ecrawler-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ecrawler-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
 | Wave 0 prompts-strip.json | `strip-ship-ecruiser-volley` | Same spaceship as the reference image in every frame: identical design, colours, weapons and painted style, si |
+| Wave 0 prompts-strip.json | `strip-ship-ediver-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ediver-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ediver-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-edrone-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-edrone-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-edrone-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eflank-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eflank-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eflank-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-egate-flame` | Same object as the reference image in every frame: identical design, colours, weapons and painted style, side  |
+| Wave 0 prompts-strip.json | `strip-ship-egtank-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-egtank-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-egtank-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-egturret-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-egturret-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-egturret-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ehealer-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ehealer-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ehealer-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
 | Wave 0 prompts-strip.json | `strip-ship-ekamikaze-volley` | Same spaceship as the reference image in every frame: identical design, colours, weapons and painted style, si |
+| Wave 0 prompts-strip.json | `strip-ship-emine-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-emine-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-emine-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eminelayer-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eminelayer-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eminelayer-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eshielder-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eshielder-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eshielder-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-esniper-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-esniper-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-esniper-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-esplitter-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-esplitter-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-esplitter-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eswarm-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eswarm-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eswarm-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eturret-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eturret-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-eturret-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ezbomber-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ezbomber-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ezbomber-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ezdrone-death` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ezdrone-flame` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
+| Wave 0 prompts-strip.json | `strip-ship-ezdrone-volley` | Same ship as the reference image in every frame: identical design, colours, weapons and painted style, side vi |
 | Wave 0 prompts-strip.json | `strip-sniper-idle` | Same character as the reference (Sniper, rooftop marksman) in every frame: identical design, colours, outfit,  |
 | Wave 0 prompts-strip.json | `strip-sniper-jump` | Same character as the reference (Sniper, rooftop marksman) in every frame: identical design, colours, outfit,  |
 | Wave 0 prompts-strip.json | `strip-sniper-melee` | Same character as the reference (Sniper, rooftop marksman) in every frame: identical design, colours, outfit,  |
@@ -92,40 +147,9 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 | Wave 0 prompts-strip.json | `strip-wpn-wave-beam` | (card restored 2026-10-21 from the made strip; original prompt: build_fx_strips.py) |
 | Wave 0 prompts-strip.json | `strip-wpn-well-beam` | (card restored 2026-10-21 from the made strip; original prompt: build_fx_strips.py) |
 
-## lantern-dive
+## short-fuse
 
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
-
-## sands-of-qamar
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `ui-seat-chip` | a blank cream scoreboard plaque with a thin brown wooden border and a small rope loop on each side, centre emp |
-
-## final-approach
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 (16:9) | `ui-altbar` | a long narrow teal cockpit panel strip with rivets, empty, single object, centred, plain flat white background |
-
-## hollowbough
-
-3D: acorn, worker-badger, worker-hare, worker-hedgehog, worker-porcupine, worker-rabbit, worker-squirrel
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## crown-city-smash
-
-3D: brainjack-token
+3D: bomb-clockwork, bomb-dynamite, bomb-tower-clock
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
@@ -137,30 +161,9 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
 
-## rampart-and-vine
-
-3D: church-tower, piece-champ-axe, piece-champ-banner, piece-champ-knight, piece-hog-black, piece-hog-piglet, piece-hog-spotted, piece-mason-hammer, piece-mason-ladder, piece-mason-trowel, piece-meeple-farmer, piece-meeple-knight, piece-meeple-monk
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
 ## thornbound
 
 3D: banner-clans, banner-nobility, pawn-agent, pawn-knight, pawn-priest, stag-statue
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## doorkick-dungeon
-
-3D: bone-pile, boss-dread, boss-inferno, boss-pharaoh, boss-skygrif, boss-tentacles, boss-wyrm, coin-pile, torch
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## short-fuse
-
-3D: bomb-clockwork, bomb-dynamite, bomb-tower-clock
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
@@ -172,9 +175,37 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
 
+## hollowbough
+
+3D: acorn, worker-badger, worker-hare, worker-hedgehog, worker-porcupine, worker-rabbit, worker-squirrel
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
 ## sunglaze
 
 3D: tile-black-a, tile-black-b, tile-blue-a, tile-blue-b, tile-red-a, tile-red-b, tile-teal-a, tile-teal-b, tile-yellow-a, tile-yellow-b
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## rampart-and-vine
+
+3D: church-tower, piece-champ-axe, piece-champ-banner, piece-champ-knight, piece-hog-black, piece-hog-piglet, piece-hog-spotted, piece-mason-hammer, piece-mason-ladder, piece-mason-trowel, piece-meeple-farmer, piece-meeple-knight, piece-meeple-monk
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## crown-city-smash
+
+3D: brainjack-token
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## doorkick-dungeon
+
+3D: bone-pile, boss-dread, boss-inferno, boss-pharaoh, boss-skygrif, boss-tentacles, boss-wyrm, coin-pile, torch
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|

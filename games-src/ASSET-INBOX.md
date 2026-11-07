@@ -13,20 +13,26 @@ Class per expected file (heuristic scan of the game source, same scan as `wiring
 | cauldron-fair | 0 | 0 | 0 | 16 | 0 | 38 | 0 | 9 |
 | crown-city-smash | 0 | 0 | 0 | 20 | 0 | 66 | 0 | 14 |
 | doorkick-dungeon | 0 | 0 | 0 | 29 | 0 | 76 | 8 | 13 |
+| emberclimb | 0 | 0 | 221 | 0 | 0 | 0 | 0 | 0 |
 | final-approach | 0 | 0 | 0 | 16 | 0 | 34 | 0 | 12 |
 | hollowbough | 0 | 0 | 0 | 13 | 0 | 42 | 0 | 12 |
 | kaiten-kitchen | 0 | 0 | 0 | 17 | 0 | 33 | 0 | 10 |
 | lantern-dive | 0 | 0 | 5 | 14 | 0 | 44 | 0 | 10 |
-| mainhattan-nightrun | 61 | 0 | 16 | 18 | 0 | 50 | 0 | 10 |
+| mainhattan-nightrun | 307 | 0 | 0 | 15 | 9 | 41 | 0 | 10 |
 | nebula-aces | 0 | 0 | 0 | 13 | 0 | 54 | 0 | 15 |
 | rampart-and-vine | 0 | 0 | 0 | 16 | 0 | 47 | 0 | 19 |
+| redline-rally | 0 | 0 | 43 | 0 | 0 | 0 | 0 | 0 |
 | sands-of-qamar | 0 | 0 | 0 | 22 | 0 | 52 | 0 | 13 |
 | shipwreck-isle | 0 | 0 | 10 | 17 | 0 | 43 | 0 | 12 |
 | short-fuse | 0 | 0 | 0 | 20 | 0 | 34 | 0 | 10 |
 | sunglaze | 0 | 0 | 0 | 12 | 0 | 44 | 0 | 13 |
 | thornbound | 0 | 0 | 5 | 13 | 0 | 41 | 0 | 10 |
 | tidewake | 0 | 0 | 0 | 18 | 0 | 42 | 0 | 9 |
-| **Total** | 61 | 0 | 36 | 274 | 0 | 740 | 8 | 191 |
+| twin-thrones | 0 | 0 | 126 | 0 | 0 | 0 | 0 | 0 |
+| vale-of-banners | 0 | 0 | 0 | 92 | 0 | 0 | 0 | 0 |
+| vinegrave | 0 | 0 | 0 | 170 | 0 | 0 | 0 | 0 |
+| wildmark | 0 | 0 | 0 | 47 | 0 | 0 | 0 | 0 |
+| **Total** | 307 | 0 | 410 | 580 | 9 | 731 | 8 | 191 |
 
 Pictures = the 109-item to-make list plus wave 7 art (incl. boss clip). Poses = wave 7 pose sets (cut out to `media/poses/`). Music/sound items are sources for the audio tools (always a manual step). Mainhattan Overdrive is excluded.
 
@@ -35,19 +41,25 @@ Pictures = the 109-item to-make list plus wave 7 art (incl. boss clip). Poses = 
 - **cauldron-fair**; wiring (16): `gx-bar-plate`, `gx-drawer-head-plate`, `gxh-ok-button-plate`, `tlink-button-plate`, `ttl-bg-picture`, `event-boom-a`, `event-boom-b`, `event-boom-c`, `table-golden-ladle-stage`, `table-golden-ladle-stage-phone`, `table-night-fair`, `table-night-fair-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **crown-city-smash**; wiring (20): `btn-primary-button-plate`, `gx-bar-plate`, `gx-drawer-head-plate`, `gxh-ok-button-plate`, `newsbtn-button-plate`, `table-harbor-dawn`, `table-harbor-dawn-phone`, `table-spire-night`, `table-spire-night-phone`, `event-portal-opens`, `table-portal-suburbs`, `table-portal-suburbs-phone`, `back-harbor`, `back-spire`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `event-brass-beetle`, `event-evolution`
 - **doorkick-dungeon**; wiring (20): `btn-primary-button-plate`, `gx-app-plate`, `gx-bar-plate`, `gx-dock-plate`, `gxt-b-pri-button-plate`, `gxt-b-pulse-button-plate`, `modal-plate`, `event-door-kick`, `table-flooded-cellar`, `table-flooded-cellar-phone`, `event-curse`, `event-level-up`, `table-bone-crypt`, `table-bone-crypt-phone`, `table-dragon-hoard`, `table-dragon-hoard-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
+- **emberclimb**
 - **final-approach**; wiring (16): `gx-bar-plate`, `tlink-button-plate`, `ttl-bg-picture`, `event-go-around`, `event-touchdown`, `table-fog`, `table-fog-phone`, `table-snow`, `table-snow-phone`, `table-sunset`, `table-sunset-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `event-wind-shear`
 - **hollowbough**; wiring (13): `board-plate`, `chipb-button-plate`, `start-plate`, `event-first-snow`, `event-harvest-feast`, `table-autumn-hollow`, `table-autumn-hollow-phone`, `table-summer-brook`, `table-summer-brook-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **kaiten-kitchen**; wiring (17): `chipb-button-plate`, `chipb-seatb-button-plate`, `gx-bar-plate`, `tlink-button-plate`, `ttl-bg-dim-picture`, `ttl-bg-picture`, `belt-b`, `table-breakfast-counter`, `table-breakfast-counter-phone`, `table-rainy-evening`, `table-rainy-evening-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `event-golden-plate`, `event-lunch-rush`
 - **lantern-dive**; wiring (14): `gx-bar-plate`, `tlink-button-plate`, `ttl-bg-picture`, `camp-lampless-2`, `camp-maze-2`, `camp-undertow-2`, `table-reef-glow`, `table-reef-glow-phone`, `table-wreck-bridge`, `table-wreck-bridge-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
-- **mainhattan-nightrun**; wiring (18): `bemp-plate`, `bpause-plate`, `dailybtn-plate`, `diffbtn-plate`, `gabtn-plate`, `go-dim-plate`, `labbtn-plate`, `missing-picture-fx-bullet-needle-webp`, `missing-picture-fx-bullet-rocket-webp`, `missing-picture-fx-bullet-shell-webp`, `setbtn-plate`, `startbtn-plate`, `storybtn-plate`, `title-plate`, `wpbtn-plate`, `event-boss-warning`, `event-level-clear`, `event-new-record`
+- **mainhattan-nightrun**; wiring (15): `bemp-plate`, `bpause-plate`, `dailybtn-plate`, `diffbtn-plate`, `gabtn-plate`, `go-dim-plate`, `labbtn-plate`, `missing-picture-fx-bullet-needle-webp`, `missing-picture-fx-bullet-rocket-webp`, `missing-picture-fx-bullet-shell-webp`, `setbtn-plate`, `startbtn-plate`, `storybtn-plate`, `title-plate`, `wpbtn-plate`
 - **nebula-aces**; wiring (13): `gx-bar-plate`, `table-asteroid-belt`, `table-asteroid-belt-phone`, `table-red-rift`, `table-red-rift-phone`, `table-veil-station`, `table-veil-station-phone`, `back-red-streak`, `back-veil-station`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **rampart-and-vine**; wiring (16): `card-frame`, `scrim-plate`, `top-plate`, `table-castle-hall`, `table-castle-hall-phone`, `table-vineyard-dusk`, `table-vineyard-dusk-phone`, `tex-field-b`, `tex-field-c`, `tex-road-b`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `tex-hedge-b`, `tex-roof-b`
+- **redline-rally**
 - **sands-of-qamar**; wiring (22): `dcard-plate`, `gx-bar-plate`, `gx-drawer-head-plate`, `mi-plate`, `modal-plate`, `spot-plate`, `tile-blue-plate`, `tile-red-plate`, `tile-large-b`, `tile-oasis-b`, `tile-small-b`, `tile-village-b`, `table-dune-night`, `table-dune-night-phone`, `table-souk-dusk`, `table-souk-dusk-phone`, `tile-lake-b`, `tile-small-c`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **shipwreck-isle**; wiring (17): `gx-bar-plate`, `gxt-b-button-plate`, `gxt-b-pri-button-plate`, `scen-button-plate`, `char-soldier`, `camp-horizon-2`, `camp-horizon-3`, `camp-shroud-2`, `camp-shroud-3`, `camp-undertow-2`, `camp-undertow-3`, `table-jungle-clearing`, `table-jungle-clearing-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **short-fuse**; wiring (20): `gx-bar-plate`, `gx-drawer-head-plate`, `plate-mine-plate`, `plate-plate`, `rp-plate`, `start-plate`, `tb-plate`, `tile-crew-plate`, `tile-mine-plate`, `event-boom`, `event-defused`, `table-clock-tower`, `table-clock-tower-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `table-blueprint`, `table-blueprint-phone`, `wire-tile-frame-d`
 - **sunglaze**; wiring (12): `btn-sm-button-plate`, `table-kiln-hall`, `table-kiln-hall-phone`, `table-moon-courtyard`, `table-moon-courtyard-phone`, `back-black-kiln`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `tile-gloss-b`, `tile-gloss-c`
 - **thornbound**; wiring (13): `board-plate`, `gx-bar-plate`, `gx-drawer-head-plate`, `gxh-ok-button-plate`, `tbtn-button-plate`, `tbtn-story-button-plate`, `tkey-picture`, `event-coronation`, `event-uprising`, `table-ossuary`, `table-ossuary-phone`, `table-sinks-masquerade`, `table-sinks-masquerade-phone`
 - **tidewake**; wiring (18): `button-button-plate`, `gx-bar-plate`, `gx-drawer-head-plate`, `gxh-ok-button-plate`, `start-plate`, `event-leviathan`, `table-rift-night`, `table-rift-night-phone`, `tile-water-e`, `tile-water-f`, `tile-water-g`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `table-harbor-noon`, `table-harbor-noon-phone`, `tile-water-h`
+- **twin-thrones**
+- **vale-of-banners**; wiring (92): `tile-back`, `tile-keep`, `tile-mine`, `tile-barge`, `tile-bld-hall`, `tile-bld-carp`, `tile-bld-chapel`, `tile-bld-mkt`, `tile-bld-inn`, `tile-bld-mint`, `tile-bld-tower`, `tile-bld-store`, `tile-lore-k1`, `tile-lore-k2`, `tile-lore-k3`, `tile-lore-k4`, `tile-lore-k5`, `tile-lore-k6`, `tile-lore-k7`, `tile-lore-k8`, `tile-lore-k9`, `tile-lore-k10`, `tile-lore-k11`, `tile-lore-k12`, `tile-lore-k13`, `tile-lore-k14`, `tile-lore-k15`, `tile-lore-k16`, `tile-lore-k17`, `tile-lore-k18`, `tile-lore-k19`, `tile-lore-k20`, `tile-lore-k21`, `tile-lore-k22`, `tile-lore-k23`, `tile-lore-k24`, `tile-lore-k25`, `tile-lore-k26`, `tile-pas-sheep-2`, `tile-pas-sheep-3` ...
+- **vinegrave**; wiring (170): `card-dread`, `card-grant`, `card-trail`, `card-machete`, `card-canteen`, `card-rope`, `card-lamp`, `card-satchel`, `card-pickaxe`, `card-sextant`, `card-ledger`, `card-brush`, `card-tarp`, `card-camera`, `card-hammock`, `card-kettle`, `card-spyglass`, `card-jeepkey`, `card-chisel`, `card-scale`, `card-journal`, `card-flares`, `card-crate`, `card-radio`, `card-tent`, `card-dinghy`, `card-ropebridge`, `card-almanac`, `card-theodolite`, `card-mule`, `card-seaplane`, `card-lockbox`, `card-codebook`, `card-quiver`, `card-permit`, `card-mapcase`, `card-gramophone`, `card-airship`, `card-ember-mask`, `card-reed-flute` ...
+- **wildmark**; wiring (47): `title-bg`, `table-bg`, `ter-peak`, `ter-forest`, `ter-meadow`, `ter-marsh`, `ter-river`, `tok-bear`, `tok-elk`, `tok-salmon`, `tok-hawk`, `tok-fox`, `tok-acorn`, `portrait-ranger`, `portrait-rowan`, `portrait-pip`, `portrait-bram`, `card-bear-a`, `card-elk-a`, `card-salmon-a`, `card-hawk-a`, `card-fox-a`, `portrait-sorrel`, `portrait-quill`, `portrait-linnet`, `portrait-oake`, `portrait-warden`, `portrait-frost`, `portrait-snowline`, `card-bear-b`, `card-elk-b`, `card-salmon-b`, `card-hawk-b`, `card-fox-b`, `card-bear-c`, `card-elk-c`, `card-salmon-c`, `card-hawk-c`, `card-fox-c`, `card-bear-d` ...
 
 ## Where to wire (nearest loaded sibling in the game source, per game)
 
@@ -100,6 +112,23 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 - `event-*` (1: event-curse): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
 - `event-level-*` (1: event-level-up): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
 
+### emberclimb
+
+- `a-*` (13: a-strike, a-defend, a-zap, a-dualcast ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `bg-*` (9: bg-title, bg-map, bg-elite, bg-reward ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `s-*` (9: s-strike, s-defend, s-pinprick, s-cripple ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `w-*` (8: w-strike, w-defend, w-hammer, w-cleave ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `m-*` (8: m-strike, m-defend, m-eruption, m-vigilance ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `node-*` (7: node-monster, node-elite, node-rest, node-shop ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `die-*` (6: die-1, die-2, die-3, die-4 ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `intent-*` (5: intent-attack, intent-defend, intent-buff, intent-debuff ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `st-*` (5: st-str, st-vuln, st-weak, st-poison ...): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `hero-*` (4: hero-w, hero-s, hero-a, hero-m): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `frame-*` (4: frame-attack, frame-skill, frame-power, frame-status): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `bg-battle-*` (3: bg-battle-1, bg-battle-2, bg-battle-3): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `bg-boss-*` (3: bg-boss-mire-behemoth, bg-boss-ashen-wraith, bg-boss-gate-colossus): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+- `gem-*` (3: gem-common, gem-uncommon, gem-rare): no loaded sibling: add the load beside the first `media/` load, `games-src/emberclimb/src/ui.js:23`
+
 ### final-approach
 
 - `table-*` (3: table-fog, table-snow, table-sunset): copy the load of `table-default` at `games-src/final-approach/game/src/ui13.js:16`
@@ -129,18 +158,18 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 
 ### kaiten-kitchen
 
-- `ttl-bg-*` (2: ttl-bg-dim-picture, ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `table-breakfast-*` (2: table-breakfast-counter, table-breakfast-counter-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `table-rainy-*` (2: table-rainy-evening, table-rainy-evening-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/kaiten/game/head.html:475`
-- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/kaiten/game/head.html:475`
-- `chipb-button-*` (1: chipb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `chipb-seatb-*` (1: chipb-seatb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `belt-*` (1: belt-b): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `event-golden-*` (1: event-golden-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
-- `event-lunch-*` (1: event-lunch-rush): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `ttl-bg-*` (2: ttl-bg-dim-picture, ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `table-breakfast-*` (2: table-breakfast-counter, table-breakfast-counter-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `table-rainy-*` (2: table-rainy-evening, table-rainy-evening-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/kaiten/game/head.html:476`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/kaiten/game/head.html:476`
+- `chipb-button-*` (1: chipb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `chipb-seatb-*` (1: chipb-seatb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `belt-*` (1: belt-b): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `event-golden-*` (1: event-golden-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
+- `event-lunch-*` (1: event-lunch-rush): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:409`
 
 ### lantern-dive
 
@@ -162,14 +191,14 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 
 ### nebula-aces
 
-- `table-asteroid-*` (2: table-asteroid-belt, table-asteroid-belt-phone): copy the load of `table-default` at `games-src/xw/media.js:12`
-- `table-red-*` (2: table-red-rift, table-red-rift-phone): copy the load of `table-default` at `games-src/xw/media.js:12`
-- `table-veil-*` (2: table-veil-station, table-veil-station-phone): copy the load of `table-default` at `games-src/xw/media.js:12`
+- `table-asteroid-*` (2: table-asteroid-belt, table-asteroid-belt-phone): copy the load of `table-default` at `games-src/xw/media.js:13`
+- `table-red-*` (2: table-red-rift, table-red-rift-phone): copy the load of `table-default` at `games-src/xw/media.js:13`
+- `table-veil-*` (2: table-veil-station, table-veil-station-phone): copy the load of `table-default` at `games-src/xw/media.js:13`
 - `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/xw/camp.js:26`
 - `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/xw/camp.js:26`
 - `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/xw/camp.js:26`
-- `back-red-*` (1: back-red-streak): no loaded sibling: add the load beside the first `media/` load, `games-src/xw/camp.js:26`
-- `back-veil-*` (1: back-veil-station): no loaded sibling: add the load beside the first `media/` load, `games-src/xw/camp.js:26`
+- `back-red-*` (1: back-red-streak): copy the load of `back-default` at `games-src/xw/media.js:10`
+- `back-veil-*` (1: back-veil-station): copy the load of `back-default` at `games-src/xw/media.js:10`
 
 ### rampart-and-vine
 
@@ -184,6 +213,23 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 - `tex-road-*` (1: tex-road-b): no loaded sibling: add the load beside the first `media/` load, `games-src/carc/game/src/head.html:109`
 - `tex-hedge-*` (1: tex-hedge-b): no loaded sibling: add the load beside the first `media/` load, `games-src/carc/game/src/head.html:109`
 - `tex-roof-*` (1: tex-roof-b): no loaded sibling: add the load beside the first `media/` load, `games-src/carc/game/src/head.html:109`
+
+### redline-rally
+
+- `car-*` (6: car-crimson, car-azure, car-jade, car-amber ...): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `portrait-*` (6: portrait-kit, portrait-juno, portrait-dax, portrait-pia ...): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `card-upgrade-*` (6: card-upgrade-coolant, card-upgrade-pit, card-upgrade-grip, card-upgrade-brakes ...): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `icon-*` (5: icon-heat, icon-stress, icon-gear, icon-lap ...): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `card-speed-*` (4: card-speed-1, card-speed-2, card-speed-3, card-speed-4): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `card-*` (3: card-back, card-heat, card-stress): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `bg-*` (2: bg-title, bg-podium): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `track-*` (2: track-sunline, track-hairpin): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `ui-gear-*` (1: ui-gear-dial): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `ui-engine-*` (1: ui-engine-tray): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `ui-corner-*` (1: ui-corner-sign): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `ui-*` (1: ui-trophy): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `ui-flag-*` (1: ui-flag-checkered): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
+- `fx-heat-*` (1: fx-heat-flame): no loaded sibling: add the load beside the first `media/` load, `games-src/redline-rally/src/art.js:21`
 
 ### sands-of-qamar
 
@@ -209,8 +255,8 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 - `camp-shroud-*` (2: camp-shroud-2, camp-shroud-3): copy the load of `camp-ada` at `games-src/rc/campaign.json:12`
 - `camp-undertow-*` (2: camp-undertow-2, camp-undertow-3): copy the load of `camp-ada` at `games-src/rc/campaign.json:12`
 - `table-jungle-*` (2: table-jungle-clearing, table-jungle-clearing-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/rc/three3d.js:313`
-- `end-lose-*` (2: end-lose-b, end-lose-c): no loaded sibling: add the load beside the first `media/` load, `games-src/rc/three3d.js:313`
-- `end-win-*` (2: end-win-b, end-win-c): no loaded sibling: add the load beside the first `media/` load, `games-src/rc/three3d.js:313`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/rc/extras.js:20`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/rc/extras.js:20`
 - `hex-beach-*` (2: hex-beach-b, hex-beach-c): no loaded sibling: add the load beside the first `media/` load, `games-src/rc/three3d.js:313`
 - `hex-hills-*` (2: hex-hills-b, hex-hills-c): no loaded sibling: add the load beside the first `media/` load, `games-src/rc/three3d.js:313`
 - `hex-mountains-*` (2: hex-mountains-b, hex-mountains-c): no loaded sibling: add the load beside the first `media/` load, `games-src/rc/three3d.js:313`
@@ -238,13 +284,13 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 
 ### sunglaze
 
-- `table-kiln-*` (2: table-kiln-hall, table-kiln-hall-phone): copy the load of `table-default` at `games-src/azul/game/src/media.js:10`
-- `table-moon-*` (2: table-moon-courtyard, table-moon-courtyard-phone): copy the load of `table-default` at `games-src/azul/game/src/media.js:10`
+- `table-kiln-*` (2: table-kiln-hall, table-kiln-hall-phone): copy the load of `table-default` at `games-src/azul/game/src/media.js:11`
+- `table-moon-*` (2: table-moon-courtyard, table-moon-courtyard-phone): copy the load of `table-default` at `games-src/azul/game/src/media.js:11`
 - `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/azul/game/src/campaign.js:50`
 - `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/azul/game/src/campaign.js:50`
 - `tile-gloss-*` (2: tile-gloss-b, tile-gloss-c): copy the load of `tile-gloss` at `games-src/azul/game/src/art.js:37`
 - `btn-sm-*` (1: btn-sm-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/azul/game/src/art.js:34`
-- `back-black-*` (1: back-black-kiln): no loaded sibling: add the load beside the first `media/` load, `games-src/azul/game/src/art.js:34`
+- `back-black-*` (1: back-black-kiln): copy the load of `back-default` at `games-src/azul/game/src/media.js:10`
 
 ### thornbound
 
@@ -266,14 +312,80 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 ### tidewake
 
 - `tile-water-*` (4: tile-water-e, tile-water-f, tile-water-g, tile-water-h): copy the load of `tile-water-a` at `games-src/tidewake/game/build.py:66`
-- `table-rift-*` (2: table-rift-night, table-rift-night-phone): copy the load of `table-default` at `games-src/tidewake/game/media.js:15`
+- `table-rift-*` (2: table-rift-night, table-rift-night-phone): copy the load of `table-default` at `games-src/tidewake/game/media.js:16`
 - `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/tidewake/game/ui8.js:28`
 - `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/tidewake/game/ui8.js:28`
-- `table-harbor-*` (2: table-harbor-noon, table-harbor-noon-phone): copy the load of `table-default` at `games-src/tidewake/game/media.js:15`
+- `table-harbor-*` (2: table-harbor-noon, table-harbor-noon-phone): copy the load of `table-default` at `games-src/tidewake/game/media.js:16`
 - `button-button-*` (1: button-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`
 - `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`
 - `gx-drawer-*` (1: gx-drawer-head-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`
 - `gxh-ok-*` (1: gxh-ok-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`
 - `start-*` (1: start-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`
 - `event-*` (1: event-leviathan): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`
+
+### twin-thrones
+
+- `t-*` (10: t-agriculture, t-architecture, t-economy, t-law ...): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `a3-*` (9: a3-pantheon, a3-gardens, a3-palace, a3-obelisk ...): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `g-*` (7: g-merchants, g-shipowners, g-builders, g-magistrates ...): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `sci-*` (7: sci-wheel, sci-scale, sci-quill, sci-mortar ...): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `a2-*` (6: a2-sawpit, a2-glassblower, a2-podium, a2-herbarium ...): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `res-*` (5: res-wood, res-clay, res-stone, res-glass ...): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `back-*` (3: back-age1, back-age2, back-age3): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `a1-*` (3: a1-shrine, a1-bathhouse, a1-lookout): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `military-*` (2: military-board, military-pawn): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `city-board-*` (2: city-board-p1, city-board-p2): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `portrait-*` (2: portrait-p1, portrait-p2): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `a1-timber-*` (2: a1-timber-stand, a1-timber-depot): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `result-*` (2: result-victory, result-defeat): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+- `icon-*` (2: icon-shield, icon-vp): no loaded sibling: add the load beside the first `media/` load, `games-src/twin-thrones/src/ui.js:321`
+
+### vale-of-banners
+
+- `tile-lore-*` (26: tile-lore-k1, tile-lore-k2, tile-lore-k3, tile-lore-k4 ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `tile-pas-*` (12: tile-pas-sheep-2, tile-pas-sheep-3, tile-pas-sheep-4, tile-pas-goat-2 ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `tile-bld-*` (8: tile-bld-hall, tile-bld-carp, tile-bld-chapel, tile-bld-mkt ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `icon-*` (7: icon-workers, icon-silver, icon-points, icon-storage ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `goods-*` (6: goods-1, goods-2, goods-3, goods-4 ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `portrait-*` (6: portrait-wren, portrait-odo, portrait-cass, portrait-hask ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `tile-*` (4: tile-back, tile-keep, tile-mine, tile-barge): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `token-banner-*` (4: token-banner-0, token-banner-1, token-banner-2, token-banner-3): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `bg-*` (3: bg-title, bg-table, bg-map): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `boss-*` (3: boss-cass, boss-hask, boss-ivo): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `token-*` (3: token-worker, token-silver, token-points): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `board-*` (2: board-estate, board-market): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `ui-result-*` (2: ui-result-win, ui-result-lose): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+- `fx-*` (2: fx-chain, fx-coin): no loaded sibling: add the load beside the first `media/` load, `games-src/vale-of-banners/src/ui.js:603`
+
+### vinegrave
+
+- `card-*` (39: card-dread, card-grant, card-trail, card-machete ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `idol-*` (12: idol-owl, idol-frog, idol-sun, idol-snake ...): copy the load of `idol-ape` at `games-src/vinegrave/src/data.js:134`
+- `portrait-*` (8: portrait-pell, portrait-tamsin, portrait-okoro, portrait-quell ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `site-c-*` (5: site-c-spring, site-c-cliff, site-c-wreck, site-c-cove ...): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `res-*` (5: res-coin, res-compass, res-tablet, res-arrow ...): copy the load of `res-arrow` at `games-src/vinegrave/temp-art/temp-art.js:7`
+- `tr-*` (4: tr-boot, tr-car, tr-ship, tr-plane): copy the load of `tr-boot` at `games-src/vinegrave/temp-art/temp-art.js:7`
+- `explorer-*` (4: explorer-0, explorer-1, explorer-2, explorer-3): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `card-frame-*` (3: card-frame-item, card-frame-art, card-frame-fear): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `temple-*` (3: temple-11, temple-6, temple-2): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `fx-*` (3: fx-discover, fx-guardian, fx-idol): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `icon-*` (3: icon-story, icon-quick, icon-howto): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `map-*` (3: map-act1, map-act2, map-act3): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `site-hidden-*` (2: site-hidden-1, site-hidden-2): no loaded sibling: add the load beside the first `media/` load, `games-src/vinegrave/src/art.js:21`
+- `token-*` (2: token-notebook, token-glass): copy the load of `token-glass` at `games-src/vinegrave/temp-art/temp-art.js:7`
+
+### wildmark
+
+- `portrait-*` (11: portrait-ranger, portrait-rowan, portrait-pip, portrait-bram ...): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `tok-*` (6: tok-bear, tok-elk, tok-salmon, tok-hawk ...): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `ter-*` (5: ter-peak, ter-forest, ter-meadow, ter-marsh ...): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `card-bear-*` (4: card-bear-a, card-bear-b, card-bear-c, card-bear-d): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `card-elk-*` (4: card-elk-a, card-elk-b, card-elk-c, card-elk-d): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `card-salmon-*` (4: card-salmon-a, card-salmon-b, card-salmon-c, card-salmon-d): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `card-hawk-*` (4: card-hawk-a, card-hawk-b, card-hawk-c, card-hawk-d): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `card-fox-*` (4: card-fox-a, card-fox-b, card-fox-c, card-fox-d): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `result-*` (2: result-win, result-lose): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `title-*` (1: title-bg): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `table-*` (1: table-bg): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
+- `icon-*` (1: icon-logo): no loaded sibling: add the load beside the first `media/` load, `games-src/wildmark/src/art.js:7`
 

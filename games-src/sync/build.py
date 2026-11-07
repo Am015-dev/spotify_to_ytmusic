@@ -25,6 +25,9 @@ LIST = [('crown','Crown City Smash','crown-city-smash/index.html','covers/crown.
  ('redline','Redline Rally','redline-rally/index.html','covers/redline-rally.jpg'),
  ('emberclimb','Emberclimb','emberclimb/index.html','covers/emberclimb.jpg'),
  ('thrones','Twin Thrones','twin-thrones/index.html','covers/twin-thrones.jpg'),
+ ('wildmark','Wildmark','wildmark/index.html','covers/wildmark.jpg'),
+ ('vinegrave','Vinegrave','vinegrave/index.html','covers/vinegrave.jpg'),
+ ('vale','Vale of Banners','vale-of-banners/index.html','covers/vale-of-banners.jpg'),
  ('mainhattan','Mainhattan Nightrun','mainhattan-nightrun/index.html','covers/nightrun.jpg'),
  ('overdrive','Mainhattan Overdrive','mainhattan-overdrive/index.html','covers/overdrive.jpg')]
 games = []

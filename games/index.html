@@ -766,6 +766,18 @@ const GAMES=[
    blurb:'Build a city of wonders against one rival. Take cards from a pyramid that opens as you play, then build them, sell them for coins or turn them into wonders. Win by marching your army to their gates, by gathering six science symbols, or by scoring the most points after three ages.',
    stats:[['2','players'],['25','minutes'],['10+','ages'],['3','ages']],
    chips:['Preview','Vs computer · 3 levels','Hot-seat','Card drafting','3 ways to win']},
+  {id:'wildmark',cover:'covers/wildmark.jpg',name:'Wildmark',src:'wildmark/index.html',ribbon:'Habitat tile drafting',isNew:true,
+   blurb:'Grow a wild map one hex at a time. Take a tile and an animal token from the market, fit them into forests, rivers and meadows, and score the patterns your animals make. Story mode, a tutorial, solo play against rivals or friends on one device.',
+   stats:[['1–4','players'],['25','minutes'],['10+','ages'],['10','chapters']],
+   chips:['Preview','Story mode','Vs computer · 3 levels','Hot-seat','Tile drafting']},
+  {id:'vinegrave',cover:'covers/vinegrave.jpg',name:'Vinegrave',src:'vinegrave/index.html',ribbon:'Jungle expedition card game',isNew:true,
+   blurb:'Race across five rounds to dig up ruins, wake and beat their guardians, collect idols and buy artifacts. One action per turn, so every choice costs you something. Story mode with bosses, a guided first round, computer explorers or friends on one device.',
+   stats:[['1–4','players'],['40','minutes'],['12+','ages'],['10','chapters']],
+   chips:['Preview','Story mode','Vs computer · 3 levels','Hot-seat','Solo rival expedition']},
+  {id:'vale',cover:'covers/vale-of-banners.jpg',name:'Vale of Banners',src:'vale-of-banners/index.html',ribbon:'Dice-driven estate building',isNew:true,
+   blurb:'Build your estate over five seasons. Roll two dice each round, then take goods, raise buildings, sell cargo or hire workers to bend the dice. Chain free builds through the Moot Hall and keeps for big turns. Story mode, a tutorial and computer stewards.',
+   stats:[['1–4','players'],['45','minutes'],['12+','ages'],['10','chapters']],
+   chips:['Preview','Story mode','Vs computer · 3 levels','Hot-seat','Dice & workers']},
   {id:'mainhattan',kind:'video',cover:'covers/nightrun.jpg',name:'Mainhattan Nightrun',src:'mainhattan-nightrun/index.html',ribbon:'Arcade shooter',ref:false,
    blurb:'Fly a stolen-data courier over a neon Frankfurt in 2099. Your ship fires on the beat, so dash on the pulse to power up, read every telegraphed shot and ride five full-length songs from the Bankenviertel through night Athens to the Messe. Story, endless loops and a garage of upgrades.',
    stats:[['1','player'],['15','minutes'],['10+','ages'],['5','districts']],
@@ -778,9 +790,9 @@ const GAMES=[
 /* box look: colour and size (em) per game; deterministic */
 const LOOK={crown:{c:'#8c3f5e',W:14.6,H:11.8,D:3.4},nebula:{c:'#3c3a78',W:13.4,H:11.6,D:3.0},doorkick:{c:'#b5622a',W:13.8,H:11.0,D:3.6},shipwreck:{c:'#4f7a58',W:14.4,H:11.2,D:3.4},sands:{c:'#b8683c',W:13.6,H:11.6,D:3.0},
  sunglaze:{c:'#2a5fa8',W:14.4,H:11.4,D:3.4},rampart:{c:'#7a8a3c',W:13.6,H:11.0,D:3.0},shortfuse:{c:'#c9372c',W:14.2,H:10.8,D:3.0},tidewake:{c:'#2f6b66',W:14.6,H:11.2,D:2.8},hollowbough:{c:'#7a5a2c',W:14.4,H:11.8,D:3.2},
- thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},kaiten:{c:'#c2502e',W:13.2,H:10.6,D:3.0},lantern:{c:'#c99a2e',W:13.8,H:11.4,D:3.2},cauldron:{c:'#2e9c8f',W:14.2,H:11.0,D:3.4},approach:{c:'#7aa0c4',W:12.8,H:10.6,D:2.6},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4},redline:{c:'#2b4f8a',W:11.4,H:10.0,D:2.6},emberclimb:{c:'#8a3a22',W:11.2,H:10.2,D:2.6},twinthrones:{c:'#2f7a80',W:11.2,H:10.0,D:2.6}};
+ thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},kaiten:{c:'#c2502e',W:13.2,H:10.6,D:3.0},lantern:{c:'#c99a2e',W:13.8,H:11.4,D:3.2},cauldron:{c:'#2e9c8f',W:14.2,H:11.0,D:3.4},approach:{c:'#7aa0c4',W:12.8,H:10.6,D:2.6},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4},redline:{c:'#2b4f8a',W:11.4,H:10.0,D:2.6},emberclimb:{c:'#8a3a22',W:11.2,H:10.2,D:2.6},twinthrones:{c:'#2f7a80',W:11.2,H:10.0,D:2.6},wildmark:{c:'#3f7a3a',W:11.4,H:10.0,D:2.6},vinegrave:{c:'#6b4a22',W:11.2,H:10.2,D:2.6},vale:{c:'#8a6a2a',W:11.4,H:10.0,D:2.6}};
 /* board games only; video games (kind:'video') live on the TV */
-const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands','redline'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough','emberclimb'],['thornbound','kaiten',['lantern','spine'],'cauldron','approach','twinthrones']];
+const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands',['redline','wildmark']],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough',['emberclimb','vinegrave']],['thornbound','kaiten',['lantern','spine'],'cauldron','approach',['twinthrones','vale']]];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const $=(s,r=document)=>r.querySelector(s);
 const root=document.documentElement;
@@ -788,7 +800,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const clean=n=>n.replace(/\s*\(preview\)\s*$/,'');
 /* build status for the shelf filter: k = done | testing | progress | todo, st = has story mode */
 const STATUS={sunglaze:['done',1],cauldron:['done',1],doorkick:['done',1],thornbound:['done',1],lantern:['done',1],hollowbough:['done',1],tidewake:['done',1],
- kaiten:['done',1],approach:['done',1],shipwreck:['done',1],crown:['done',1],nebula:['done',1],shortfuse:['done',1],rampart:['done',1],sands:['done',1],redline:['testing',0],emberclimb:['testing',0],twinthrones:['testing',0]};
+ kaiten:['done',1],approach:['done',1],shipwreck:['done',1],crown:['done',1],nebula:['done',1],shortfuse:['done',1],rampart:['done',1],sands:['done',1],redline:['testing',0],emberclimb:['testing',0],twinthrones:['testing',0],wildmark:['testing',1],vinegrave:['testing',1],vale:['testing',1]};
 const stOf=g=>{const x=STATUS[g.id];return x?{k:x[0],st:!!x[1]}:null};
 const ST_LABEL={done:'Completed',testing:'Under testing',progress:'Being rebuilt',todo:'Story mode coming'};
 const isPrev=g=>{const x=stOf(g);return !!x&&x.k!=='done'};
