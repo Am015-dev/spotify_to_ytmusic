@@ -14,4 +14,6 @@ with 54 notches; table = navy knit with a stitched border. Title and result scre
 own fabric squares, spools and buttons scattered around an empty centre for the title; win adds the rosette, loss is dimmed.
 Story map = patchwork of green/yellow fabrics with a red running-stitch path between three rosettes.
 
-**Not changed (kept):** the 11 portraits. No CC0 character family fitting cosy quilters was reachable in time.
+**Portraits (round 2):** one family, Kenney Toon Characters 1. Each quilter is a recoloured SVG (shirt, and hair where it
+helps: Wren silver, Aurelia gold, Marguerite dark) cropped to a bust, framed in a cream stitched medallion on a pale wash of
+one of this kit's own fabrics, so portraits sit inside the same sewing-table world.

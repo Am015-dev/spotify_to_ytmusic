@@ -255,6 +255,138 @@ def save(stem, im):
     if not s['alpha']: im = im.convert('RGB')
     im.save(f'{H}/{stem}.webp', 'WEBP', quality=88, method=6)
 
+
+# ---------- portraits: Quaternius low-poly RPG characters (CC0) rendered to 2D (cache rpg/<name>-bust|full.png) ----------
+import colorsys
+def hue_swap(im, src_h, dst_h, width=.06, min_s=.45, sat_mul=1.0, val_mul=1.0):
+    """Recolour one clothing hue band (keeps shading; skin is spared by the saturation floor)."""
+    px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = px[x, y]
+            if a < 10: continue
+            h, sat, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            dh = min(abs(h - src_h), 1 - abs(h - src_h))
+            if dh < width and sat > min_s:
+                r2, g2, b2 = colorsys.hsv_to_rgb(dst_h, min(1, sat * sat_mul), min(1, v * val_mul)); px[x, y] = (int(r2 * 255), int(g2 * 255), int(b2 * 255), a)
+    return im
+CAST = {  # stem -> (model, recolour (src hue, dst hue, sat, val) or None, backdrop tint, hex tile behind)
+    'wren': ('ranger', None, (110, 170, 90), 'medieval_lumber'),
+    'odo': ('wizard', None, (90, 120, 190), 'medieval_house'),
+    'cass': ('rogue', (0.0, .58, 1.0, 1.35), (70, 140, 200), None),
+    'hask': ('warrior', None, (150, 150, 160), 'medieval_largeCastle'),
+    'marla': ('cleric', None, (200, 190, 120), 'medieval_farm'),
+    'ivo': ('monk', None, (130, 90, 170), 'medieval_blacksmith'),
+}
+def char(model, mode, rc):
+    im = ld(f'{C}/rpg/{model}-{mode}.png')
+    if rc: im = hue_swap(im, rc[0], rc[1], .035, .62, rc[2], rc[3])
+    im = ImageEnhance.Color(im).enhance(1.3); return ImageEnhance.Contrast(im).enhance(1.08)
+def backdrop(tint, tile, W=512, boss=False, seed=7):
+    bg = island(1200, 800, 1.3, seed, ruin=False).crop((300, 150, 900, 750)).resize((W, W), Image.LANCZOS)
+    bg = bg.filter(ImageFilter.GaussianBlur(5 if not boss else 3))
+    bg = Image.blend(bg, Image.new('RGBA', bg.size, tint + (255,)), .45 if not boss else .55)
+    if tile: place(bg, up(hx(tile), h=int(W * .5)), W * .76, W * .42, sh=True)
+    if boss: bg = ImageEnhance.Brightness(bg).enhance(.55)
+    g = Image.new('RGBA', (W, W)); ImageDraw.Draw(g).ellipse((W * .12, W * .1, W * .88, W * .86), fill=(255, 240, 210, 110 if not boss else 0))
+    if boss: ImageDraw.Draw(g).ellipse((W * .1, W * .05, W * .9, W * .9), fill=(230, 70, 40, 120))
+    bg.alpha_composite(g.filter(ImageFilter.GaussianBlur(W // 8)))
+    return bg
+def portrait(stem):
+    model, rc, tint, tile = CAST[stem]; W = 512; bg = backdrop(tint, tile)
+    c = char(model, 'bust', rc).resize((W, W), Image.LANCZOS); bg.alpha_composite(c, (0, int(W * .1)))
+    return vignette(bg, 120)
+BOSS = {'cass': 'tile-barge', 'hask': 'tile-keep', 'ivo': 'tile-bld-mint'}
+def boss(stem):
+    model, rc, tint, tile = CAST[stem]; W = 512; bg = backdrop(tint, None, boss=True, seed=9)
+    t = {'cass': barge, 'hask': lambda: building('tile-keep'), 'ivo': lambda: building('tile-bld-mint')}[stem]().resize((330, 330), Image.LANCZOS)
+    place(bg, t, W * .74, W * .40)
+    c = char(model, 'full', rc); c = c.crop(c.getbbox()); c = c.resize((int(c.width * 470 / c.height), 470), Image.LANCZOS)
+    sh = Image.new('RGBA', (W, W)); ImageDraw.Draw(sh).ellipse((W * .2, W * .9, W * .62, W * .99), fill=(0, 0, 0, 140)); bg.alpha_composite(sh.filter(ImageFilter.GaussianBlur(8)))
+    bg.alpha_composite(c, (int(W * .4 - c.width / 2), W - c.height - 10))
+    return vignette(bg, 170)
+
+# ---------- goods, tokens, icons, fx: flat vector in the hexagon pack's style (flat fill, darker rim), drawn at 4x ----------
+RIM = (110, 72, 40)
+def chip(S=512, face=(214, 170, 110)):
+    im = Image.new('RGBA', (S, S)); d = ImageDraw.Draw(im)
+    d.ellipse((30, 54, S - 30, S - 14), fill=(0, 0, 0, 70)); d.ellipse((24, 40, S - 24, S - 24), fill=tuple(int(c * .7) for c in face))
+    d.ellipse((24, 24, S - 24, S - 40), fill=face); d.ellipse((60, 58, S - 60, S - 74), outline=tuple(int(c * .82) for c in face), width=10)
+    return im, d
+def goods(n):
+    im, d = chip(); c = 256
+    if n == 1:   # wool: fluffy cream bundle
+        for (x, y, r) in ((200, 230, 70), (300, 220, 75), (250, 180, 70), (190, 300, 60), (310, 300, 62), (250, 300, 70)): d.ellipse((x - r, y - r, x + r, y + r), fill=(248, 244, 232), outline=(196, 186, 168), width=8)
+    elif n == 2:   # cheese wedge
+        d.polygon([(140, 320), (380, 320), (380, 220), (140, 260)], fill=(240, 196, 70), outline=(176, 130, 40)); d.polygon([(140, 260), (380, 220), (300, 160)], fill=(252, 220, 110), outline=(176, 130, 40))
+        for (x, y, r) in ((220, 290, 16), (310, 270, 12), (340, 300, 10)): d.ellipse((x - r, y - r, x + r, y + r), fill=(200, 150, 50))
+    elif n == 3:   # honey pot
+        d.rounded_rectangle((170, 200, 342, 360), 60, fill=(214, 140, 50), outline=RIM, width=8); d.rectangle((180, 170, 332, 210), fill=(190, 120, 40), outline=RIM, width=8)
+        d.polygon([(200, 210), (312, 210), (300, 260), (272, 250), (250, 280), (220, 250)], fill=(250, 190, 50))
+    elif n == 4:   # cider jug
+        d.ellipse((170, 210, 340, 370), fill=(196, 96, 50), outline=RIM, width=8); d.rectangle((220, 150, 290, 220), fill=(196, 96, 50), outline=RIM, width=8)
+        d.arc((290, 200, 380, 300), 270, 90, fill=RIM, width=18); d.rectangle((226, 130, 284, 156), fill=(160, 110, 60)); d.ellipse((210, 250, 300, 300), fill=(120, 170, 60))
+    elif n == 5:   # linen bolt
+        d.rounded_rectangle((150, 190, 362, 330), 30, fill=(236, 226, 200), outline=(170, 150, 120), width=8)
+        for x in range(180, 350, 30): d.line((x, 200, x, 320), fill=(214, 202, 172), width=6)
+        d.ellipse((120, 190, 190, 330), fill=(220, 208, 178), outline=(170, 150, 120), width=8); d.ellipse((140, 236, 170, 284), fill=(180, 160, 128))
+    elif n == 6:   # salt sack
+        d.polygon([(170, 360), (342, 360), (320, 210), (192, 210)], fill=(232, 220, 196), outline=(160, 140, 110)); d.polygon([(192, 210), (320, 210), (290, 170), (222, 170)], fill=(220, 206, 178), outline=(160, 140, 110))
+        d.line((200, 214, 312, 214), fill=(150, 100, 60), width=14); d.ellipse((228, 132, 284, 180), fill=(250, 250, 250), outline=(200, 200, 200), width=6)
+    return im.resize((128, 128), Image.LANCZOS)
+def meeple(d, cx, cy, s, col):
+    dk = tuple(int(c * .6) for c in col)
+    d.ellipse((cx - 50 * s, cy - 140 * s, cx + 50 * s, cy - 40 * s), fill=col, outline=dk, width=int(8 * s))
+    d.polygon([(cx - 130 * s, cy + 20 * s), (cx - 60 * s, cy - 50 * s), (cx + 60 * s, cy - 50 * s), (cx + 130 * s, cy + 20 * s), (cx + 60 * s, cy + 20 * s), (cx + 90 * s, cy + 150 * s), (cx + 10 * s, cy + 150 * s), (cx, cy + 90 * s), (cx - 10 * s, cy + 150 * s), (cx - 90 * s, cy + 150 * s), (cx - 60 * s, cy + 20 * s)], fill=col, outline=dk)
+def coin(d, cx, cy, r, col=(206, 210, 218), dk=(130, 134, 146)):
+    d.ellipse((cx - r, cy - r + r * .12, cx + r, cy + r + r * .12), fill=dk); d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=col, outline=dk, width=max(4, int(r * .08)))
+    d.ellipse((cx - r * .62, cy - r * .62, cx + r * .62, cy + r * .62), outline=dk, width=max(3, int(r * .06)))
+def star(d, cx, cy, r, col, dk):
+    pts = [(cx + (r if k % 2 == 0 else r * .45) * math.cos(math.radians(-90 + k * 36)), cy + (r if k % 2 == 0 else r * .45) * math.sin(math.radians(-90 + k * 36))) for k in range(10)]
+    d.polygon(pts, fill=col, outline=dk); d.line(pts + [pts[0]], fill=dk, width=max(4, int(r * .06)))
+def token(kind):
+    S = 512; im = Image.new('RGBA', (S, S)); d = ImageDraw.Draw(im)
+    if kind == 'worker': d.ellipse((120, 420, 392, 480), fill=(0, 0, 0, 70)); meeple(d, 256, 280, 1.3, (214, 170, 110))
+    elif kind == 'silver': coin(d, 256, 250, 190)
+    elif kind == 'points': d.ellipse((60, 60, 452, 452), fill=(36, 120, 70), outline=(20, 70, 40), width=14); star(d, 256, 262, 150, (246, 206, 80), (170, 120, 30))
+    elif kind == 'die':
+        d.rounded_rectangle((86, 100, 426, 440), 60, fill=(0, 0, 0, 60)); d.rounded_rectangle((76, 76, 436, 416), 60, fill=(248, 244, 232), outline=(170, 150, 120), width=12)
+        for (x, y) in ((166, 166), (256, 246), (346, 326)): d.ellipse((x - 34, y - 34, x + 34, y + 34), fill=(196, 52, 52))
+    return im.resize((128, 128), Image.LANCZOS)
+def icon(kind):
+    S = 384; im = Image.new('RGBA', (S, S)); d = ImageDraw.Draw(im); c = (192, 192)
+    if kind == 'workers': meeple(d, 150, 210, .9, (180, 140, 90)); meeple(d, 236, 230, .9, (214, 170, 110))
+    elif kind == 'silver': coin(d, 160, 200, 110); coin(d, 236, 170, 110)
+    elif kind == 'points': star(d, 192, 196, 160, (246, 206, 80), (170, 120, 30))
+    elif kind == 'storage':   # crate
+        d.rectangle((70, 110, 314, 320), fill=(196, 140, 80), outline=RIM, width=12); d.line((70, 110, 314, 320), fill=RIM, width=12); d.line((70, 215, 314, 215), fill=RIM, width=10)
+    elif kind == 'backlane':   # dirt path between two hedges
+        d.polygon([(150, 340), (234, 340), (214, 60), (170, 60)], fill=(206, 160, 100), outline=RIM)
+        for x in (90, 294): d.ellipse((x - 60, 120, x + 60, 340), fill=(40, 160, 90), outline=(20, 100, 50), width=10)
+    elif kind == 'season':   # sun over leaf
+        d.ellipse((92, 60, 292, 260), fill=(250, 196, 60), outline=(200, 140, 30), width=10)
+        d.polygon([(110, 330), (192, 210), (274, 330)], fill=(40, 160, 90), outline=(20, 100, 50))
+    elif kind == 'track':   # pennant on pole with dashes
+        d.rectangle((110, 60, 132, 340), fill=(120, 80, 50)); d.polygon([(132, 70), (310, 120), (132, 170)], fill=(196, 52, 52), outline=(130, 30, 30))
+        for x in range(160, 330, 50): d.rounded_rectangle((x, 300, x + 30, 320), 6, fill=(150, 105, 60))
+    return im.resize((96, 96), Image.LANCZOS)
+def fx(kind):
+    S = 1024; im = Image.new('RGBA', (S, S)); d = ImageDraw.Draw(im)
+    g = Image.new('RGBA', (S, S)); ImageDraw.Draw(g).ellipse((220, 220, 804, 804), fill=(255, 220, 120, 150)); im.alpha_composite(g.filter(ImageFilter.GaussianBlur(90)))
+    if kind == 'region':
+        for k in range(12):
+            a = math.radians(k * 30); d.polygon([(512 + 120 * math.cos(a - .12), 512 + 120 * math.sin(a - .12)), (512 + 440 * math.cos(a), 512 + 440 * math.sin(a)), (512 + 120 * math.cos(a + .12), 512 + 120 * math.sin(a + .12))], fill=(250, 210, 90) if k % 2 else (255, 240, 180))
+        d.polygon(hexpts(512, 512, 150), fill=(246, 206, 80), outline=(170, 120, 30)); d.line(hexpts(512, 512, 150) + [hexpts(512, 512, 150)[0]], fill=(170, 120, 30), width=14)
+    elif kind == 'chain':
+        pts = [(140 + t * 7.4, 620 - 260 * math.sin(math.pi * t / 100)) for t in range(101)]
+        d.line(pts, fill=(196, 52, 52), width=70, joint='curve'); d.line(pts, fill=(232, 96, 80), width=36, joint='curve')
+        for t in range(0, 101, 20): x, y = pts[t]; d.ellipse((x - 26, y - 26, x + 26, y + 26), fill=(246, 206, 80), outline=(170, 120, 30), width=6)
+    elif kind == 'coin':
+        coin(d, 512, 512, 220, (246, 206, 80), (170, 120, 30))
+        for (x, y, r) in ((240, 260, 70), (800, 300, 50), (760, 780, 64), (260, 760, 44)):
+            d.polygon([(x, y - r), (x + r * .25, y - r * .25), (x + r, y), (x + r * .25, y + r * .25), (x, y + r), (x - r * .25, y + r * .25), (x - r, y), (x - r * .25, y - r * .25)], fill=(255, 250, 220))
+    return im.resize((256, 256), Image.LANCZOS)
+
 PLAN = {}
 for k in SLOTS:
     if k in BUILD: PLAN[k] = (lambda k=k: building(k))
@@ -264,6 +396,13 @@ PLAN.update({'tile-back': back, 'tile-barge': barge, 'ui-tile-frame': frame, 'ui
              'token-banner-0': lambda: banner(0), 'token-banner-1': lambda: banner(1), 'token-banner-2': lambda: banner(2), 'token-banner-3': lambda: banner(3),
              'bg-title': lambda: scene('title'), 'bg-map': lambda: scene('map'), 'bg-table': table, 'ui-result-win': lambda: scene('win'),
              'ui-result-lose': lambda: scene('lose'), 'board-estate': board_estate, 'board-market': board_market})
+for k in CAST: PLAN['portrait-' + k] = (lambda k=k: portrait(k))
+for k in BOSS: PLAN['boss-' + k] = (lambda k=k: boss(k))
+for n in range(1, 7): PLAN[f'goods-{n}'] = (lambda n=n: goods(n))
+for k in ('worker', 'silver', 'points'): PLAN['token-' + k] = (lambda k=k: token(k))
+PLAN['die-white'] = lambda: token('die')
+for k in ('workers', 'silver', 'points', 'storage', 'backlane', 'season', 'track'): PLAN['icon-' + k] = (lambda k=k: icon(k))
+PLAN.update({'fx-region-complete': lambda: fx('region'), 'fx-chain': lambda: fx('chain'), 'fx-coin': lambda: fx('coin')})
 
 if __name__ == '__main__':
     only = sys.argv[sys.argv.index('--only') + 1] if '--only' in sys.argv else '.'

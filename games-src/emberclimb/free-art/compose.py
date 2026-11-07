@@ -128,7 +128,7 @@ ITEM = {'relic-ember-brand': 'fire_brand', 'relic-whetstone-ring': 'ring/steel',
         'pot-energy-vial': 'potion/yellow', 'pot-venom-vial': 'potion/emerald', 'pot-frost-gas': 'potion/cloudy', 'pot-healing-draught': 'potion/pink', 'pot-fortune-die': 'potion/golden',
         'node-monster': 'weapon/long_sword', 'node-elite': 'flying_skull', 'node-rest': 'cloud_fire_0', 'node-shop': 'shop_general', 'node-event': 'insubstantial_wisp',
         'node-treasure': 'chest', 'node-boss': 'statue_ancient_evil',
-        'intent-attack': 'weapon/long_sword', 'intent-attack-big': 'double_sword', 'intent-defend': 'armor/buckler_1', 'intent-buff': 'haste', 'intent-debuff': 'curse_skull', 'intent-sleep': 'ensorcelled_hibernation',
+        'intent-attack': 'weapon/long_sword', 'intent-attack-big': 'double_sword', 'intent-defend': 'armor/buckler_1', 'intent-buff': 'haste', 'intent-debuff': 'curse_skull', 'intent-sleep': 'ensorcelled_hibernation', 'intent-weak': 'slow', 'intent-vuln': 'shatter', 'intent-frail': 'armor/buckler_2', 'intent-poison': 'sting', 'intent-burn': 'fire/sticky_flame', 'intent-slime': 'acid_blob', 'intent-daze': 'confuse', 'intent-unknown': 'detect_creatures',
         'st-str': 'glove_4_gauntlets', 'st-vuln': 'shatter', 'st-weak': 'slow', 'st-poison': 'sting', 'st-frail': 'armor/buckler_2',
         'orb-L': 'orb_of_electricity', 'orb-F': 'orb_of_ice', 'orb-D': 'darkness', 'stance-w': 'berserker_rage', 'stance-c': 'ru_sacrifice_purity',
         'icon-energy': 'orb_of_fire', 'icon-remove': 'abjuration'}
@@ -209,7 +209,7 @@ def title():
     for _ in range(160):
         x, y = rnd.randrange(W), rnd.randrange(int(Hh * .6)); r = rnd.choice((2, 2, 4)); d.rectangle((x, y, x + r, y + r), fill=(255, 240, 210, rnd.randint(120, 255)))
     out.alpha_composite(glow(W, Hh, W // 2, int(Hh * .78), 600, (255, 110, 40), 160))
-    k = 4; s32 = 32 * k; top = int(Hh * .22); base = int(Hh * .80) // s32 * s32
+    k = 4; s32 = 32 * k; top = int(Hh * .40); base = int(Hh * .84) // s32 * s32
     tw = 3; x0 = W // 2 - tw * s32 // 2
     for y in range(top, base, s32):
         for i in range(tw): out.alpha_composite(ImageEnhance.Brightness(nn(spr(f'wall/stone_brick_{rnd.randint(1, 3)}'), k)).enhance(.36 + .08 * i), (x0 + i * s32, y))

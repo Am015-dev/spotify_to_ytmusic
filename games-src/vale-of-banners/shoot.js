@@ -14,7 +14,8 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html'); const TAG 
     await page.evaluate(() => { try { GXT.stop(); } catch (e) { } localStorage.clear(); }); await page.goto(URL); await page.waitForTimeout(500);
     await tap(page.locator('#quickB')); await page.waitForTimeout(300); await tap(page.locator('#goB')); await page.waitForTimeout(500); await shot('3banner'); await page.waitForTimeout(1000); await shot('3turn');
     // play first human turn: take first glowing tile, then end
-    for (let k = 0; k < 2; k++) { const g = page.locator('#mk .glow').first(); if (await g.count()) { await tap(g); await page.waitForTimeout(400); const a = page.locator('#tv .acts .btn').first(); if (await a.count()) await tap(a); await page.waitForTimeout(1200); } }
+    const mtab = async () => { const t = page.locator('#tab-market'); if (await t.count() && await t.isVisible()) { await tap(t); await page.waitForTimeout(400); } };
+    for (let k = 0; k < 2; k++) { await mtab(); if (k === 0) await shot('3market'); const g = page.locator('#mk .glow').first(); if (await g.count()) { await tap(g); await page.waitForTimeout(400); const a = page.locator('#tv .acts .btn').first(); if (await a.count()) await tap(a); await page.waitForTimeout(1200); } }
     const e = page.locator('#endB'); if (await e.count() && await e.isVisible()) await tap(e);
     await page.waitForTimeout(700); await shot('4rival'); await page.waitForTimeout(900); await shot('4rival2');
     for (let i = 0; i < 40 && !(await page.evaluate(() => myTurn())); i++) await page.waitForTimeout(300);
