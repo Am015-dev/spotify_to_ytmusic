@@ -59,4 +59,8 @@ Per-game rows (two picks, download link, licence quote, coverage, sheet) are in 
 ## Needs an owner decision
 
 - **Pixel Frog "Tiny Swords" (picked for rampart-and-vine):** licence allows personal and commercial use but says "You may not redistribute, resell, or repackage". The games ship as public files, so it needs a yes before use. The CC0 alternative is Kenney Tiny Town (same flat style the owner rejected).
-- **CC BY packs (game-icons.net, a racing HUD kit):** need a credits line in the game.
+- **CC BY packs: approved by the owner (7 Nov 2026) as interim art until the Google Flow images are generated.** They stay in, each with its credit line:
+  - game-icons.net (emberclimb, sands-of-qamar): "Icons made by {author}. Available on https://game-icons.net". Credit each icon's author (folder name in the archive) and licence CC BY 3.0.
+  - Racing HUD kit (redline-rally): credit the author named on the pack's page, licence CC BY 4.0.
+  - Put the lines in each game's credits screen and in `free-art/CREDITS.md`. Remove them when the Flow images replace the icons.
+- **Still open:** Pixel Frog Tiny Swords (no-redistribute clause). The owner's yes covered CC BY credit lines only, so it stays unused until they decide.
