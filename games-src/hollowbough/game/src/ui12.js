@@ -57,44 +57,61 @@ const myTurn = () => tutIdle() && HB.actor(G) === 0;
 const tapIs = tg => ({ type: 'tap', match: a => a.tg === (typeof tg === 'function' ? tg() : tg) });
 const sc0 = () => (G.over && G.over.scores[0]) || {};
 const cardTitle = k => UI.cards.length && UI.cards[0].kind === k ? UI.cards[0].title : '';
+const tsay = (id, ...a) => { const v = HBS.steps[id].say; return typeof v === 'function' ? v(...a) : v; };
+const tchip = id => (HBS.steps[id].ch ? 'Ch ' + HBS.steps[id].ch + ' · ' : '');
+// Hazel's reaction after the action (a chip over the board, ~2.3 s; the next step waits for it: one thing at a time)
+function tutReact(txt, ms) {
+  if (!txt) return; let e = document.getElementById('hbsay');
+  if (!e) { e = document.createElement('div'); e.id = 'hbsay'; e.setAttribute('role', 'status'); e.setAttribute('data-help', ''); document.body.appendChild(e); }
+  e.innerHTML = '<span class="pt" style="background:' + HBS.guide.color + '">' + HBS.guide.emoji + '</span><span class="tx"><b>' + HBS.guide.name + '</b> ' + txt + '</span>';
+  e.classList.add('on'); UI.reactUntil = Date.now() + (ms || 2300); clearTimeout(UI.reactTm); UI.reactTm = setTimeout(() => e.classList.remove('on'), ms || 2300);
+}
 function tutSteps() {
-  return [
-    { id: 'goal', title: 'Your goal', say: 'Build a woodland city. When everyone has passed, the most points wins. Scores show here.', target: tq('#bd .chips'), wait: null, ready: myTurn },
-    { id: 'places', title: 'Places for workers', say: 'Each place gives goods or cards. Every turn you send one worker to one place.', target: tutUnion('#bd .tile.t-basic, #bd .tile.t-forest'), wait: null, ready: myTurn },
-    { id: 'twig', title: 'Send a worker', say: 'Tap the Twig Heap. It gives 3 twigs.', target: tgEl('w:basic:4'), wait: tapIs('w:basic:4'), ready: () => myTurn() && !!tgEl('w:basic:4')() },
-    { id: 'stock', title: 'Your goods', say: () => 'Twigs, resin, pebbles and berries pay for cards. You hold ' + G.players[0].res.twig + ' twigs now.', target: tq('#bd .resrow'), wait: null,
+  const S = HBS.steps, L = [
+    { id: 'goal', title: () => 'Ch 1 · Hazel', say: tsay('goal'), target: tq('#bd .chips'), wait: null, ready: myTurn },
+    { id: 'places', title: S.places.title, say: tsay('places'), target: tutUnion('#bd .tile.t-basic, #bd .tile.t-forest'), wait: null, ready: myTurn },
+    { id: 'twig', title: S.twig.title, say: tsay('twig'), target: tgEl('w:basic:4'), wait: tapIs('w:basic:4'), ready: () => myTurn() && !!tgEl('w:basic:4')() },
+    { id: 'stock', title: S.stock.title, say: () => tsay('stock', G.players[0].res.twig), target: tq('#bd .resrow'), wait: null,
       ready: () => !!G && G.players[0].dep.length === 1 && !UI.cards.length },
-    { id: 'rival', title: 'One worker per place', say: () => pname(1) + ' took the Pebble Bank. A place without the Shared mark holds one worker only.', target: () => { const e = document.querySelector('#bd .tile[data-k="basic"][data-i="3"]'); return e && e.getBoundingClientRect().width ? e : null; }, wait: null,
+    { id: 'rival', title: S.rival.title, say: () => tsay('rival', pname(1)), target: () => { const e = document.querySelector('#bd .tile[data-k="basic"][data-i="3"]'); return e && e.getBoundingClientRect().width ? e : null; }, wait: null,
       ready: () => G.players[1].dep.length === 1 && myTurn() },
-    { id: 'resin', title: 'Your second worker', say: 'Tap the Resin Pool. It gives 2 resin.', target: tgEl('w:basic:6'), wait: tapIs('w:basic:6'), ready: () => myTurn() && !!tgEl('w:basic:6')() },
-    { id: 'hand', title: 'Your hand', say: 'These are your cards. Each shows its price in goods. Glowing cards are ones you can pay for.', target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
-    { id: 'build', title: 'Build from your hand', say: 'Tap the Allotment. Pay 2 twigs and 1 resin.', target: () => tutHandRect('p:hand:' + tutId('farm')), wait: tapIs(() => 'p:hand:' + tutId('farm')),
+    { id: 'resin', title: S.resin.title, say: tsay('resin'), target: tgEl('w:basic:6'), wait: tapIs('w:basic:6'), ready: () => myTurn() && !!tgEl('w:basic:6')() },
+    { id: 'hand', title: () => 'Ch 2 · Building', say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
+    { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('farm')), wait: tapIs(() => 'p:hand:' + tutId('farm')),
       ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
-    { id: 'city', title: 'Your city', say: () => 'Built cards live here, ' + G.players[0].city.length + ' of 15: that is the limit. The Allotment gave a berry.', target: tq('#bd .strip.city'), wait: null,
+    { id: 'city', title: S.city.title, say: () => tsay('city', G.players[0].city.length), target: tq('#bd .strip.city'), wait: null,
       ready: () => !!G && G.players[0].city.some(e => HB.cardKey(e.id) === 'farm') && !UI.cards.length },
-    { id: 'prep', title: 'Prepare for Spring', say: 'All workers are out. Prepare: they come home, you gain one, and the Allotment makes a berry.', target: tgEl('prep'), wait: tapIs('prep'),
+    { id: 'prep', title: S.prep.title, say: tsay('prep'), target: tgEl('prep'), wait: tapIs('prep'),
       ready: () => myTurn() && !!tgEl('prep')() },
-    { id: 'spring', title: 'A new season', say: () => 'Spring! You have ' + G.players[0].workers + ' workers and ' + G.players[0].res.berry + ' berries. Seasons go Winter, Spring, Summer, Autumn.', target: tq('#bd .resrow'), wait: null,
+    { id: 'spring', title: S.spring.title, say: () => tsay('spring', G.players[0].workers, G.players[0].res.berry), target: tq('#bd .resrow'), wait: null,
       ready: () => !!G && G.players[0].season === 1 && !UI.cards.length },
-    { id: 'berry', title: 'A shared place', say: 'Tap the Berry Patch. Shared places take many workers.', target: tgEl('w:basic:0'), wait: tapIs('w:basic:0'), ready: () => myTurn() && !!tgEl('w:basic:0')() },
-    { id: 'toad', title: 'Buy from the meadow', say: 'The meadow is open to everyone. Tap the Toad: critters cost berries.', target: () => { const id = tutToad(); return id == null ? null : tgEl('p:meadow:' + id)(); },
+    { id: 'berry', title: () => 'Ch 3 · Sharing', say: tsay('berry'), target: tgEl('w:basic:0'), wait: tapIs('w:basic:0'), ready: () => myTurn() && !!tgEl('w:basic:0')() },
+    { id: 'toad', title: S.toad.title, say: tsay('toad'), target: () => { const id = tutToad(); return id == null ? null : tgEl('p:meadow:' + id)(); },
       wait: { type: 'tap', match: a => /^p:meadow:/.test(a.tg || '') && HB.cardKey(+a.tg.split(':')[2]) === 'barge_toad' }, ready: () => myTurn() && tutToad() != null && !!tgEl('p:meadow:' + tutToad())() },
-    { id: 'free', title: 'A free critter', say: 'A critter plays free into its matching building. Tap Goodwife: your Allotment fits her.', target: () => tutHandRect('p:hand:' + tutId('wife')), wait: tapIs(() => 'p:hand:' + tutId('wife')),
+    { id: 'free', title: S.free.title, say: tsay('free'), target: () => tutHandRect('p:hand:' + tutId('wife')), wait: tapIs(() => 'p:hand:' + tutId('wife')),
       ready: () => myTurn() && !!tgEl('p:hand:' + tutId('wife'))() },
-    { id: 'event', title: 'Claim an event', say: 'You own three red buildings. Tap this flag: your worker claims the event for 3 points.', target: tgEl('w:bev:1'), wait: tapIs('w:bev:1'),
+    { id: 'event', title: S.event.title, say: tsay('event'), target: tgEl('w:bev:1'), wait: tapIs('w:bev:1'),
       ready: () => myTurn() && !!tgEl('w:bev:1')() },
-    { id: 'forest', title: 'Forest places', say: 'Forest cards pay more. Tap Bumper Bramble for 3 berries.', target: tgEl('w:forest:0'), wait: tapIs('w:forest:0'), ready: () => myTurn() && !!tgEl('w:forest:0')() },
-    { id: 'pass', title: 'Pass when done', say: 'Summer would bring more workers. Here, tap Pass twice to finish your game.', target: tgEl('pass'), wait: { type: 'tap', times: 2, match: a => a.tg === 'pass' },
+    { id: 'forest', title: S.forest.title, say: tsay('forest'), target: tgEl('w:forest:0'), wait: tapIs('w:forest:0'), ready: () => myTurn() && !!tgEl('w:forest:0')() },
+    { id: 'pass', title: () => 'Ch 4 · Winter ends', say: tsay('pass'), target: tgEl('pass'), wait: { type: 'tap', times: 2, match: a => a.tg === 'pass' },
       ready: () => myTurn() && !!tgEl('pass')() },
-    { id: 'score', title: 'Final score', say: () => { const s = sc0(); return 'Card points ' + s.cards + ', tokens ' + s.tokens + ', events ' + s.events + ': you score ' + s.total + '.'; }, target: tq('#pc .kv.tot'), wait: null,
+    { id: 'score', title: S.score.title, say: () => tsay('score', sc0()), target: tq('#pc .kv.tot'), wait: null,
       hold: c => c.kind === 'over-score', onNext: () => { UI._tutIn = 1; try { nextCard(); } finally { UI._tutIn = 0; } },
       ready: () => /^Final score: You/.test(cardTitle('over-score')) },
-    { id: 'rscore', title: 'The rival scores', say: () => { const s = G.over.scores[1]; return pname(1) + ' scores ' + s.total + ' the same way. Passing early leaves workers unused.'; }, target: tq('#pc .kv.tot'), wait: null,
+    { id: 'rscore', title: S.rscore.title, say: () => tsay('rscore', pname(1), G.over.scores[1].total), target: tq('#pc .kv.tot'), wait: null,
       hold: c => c.kind === 'over-score', onNext: () => { UI._tutIn = 1; try { nextCard(); } finally { UI._tutIn = 0; } },
       ready: () => new RegExp('^Final score: ' + pname(1)).test(cardTitle('over-score')) },
-    { id: 'end', title: 'Most points wins', say: () => { const o = G.over; return o.winner === 0 ? 'You win, ' + o.scores[0].total + ' to ' + o.scores[1].total + '. A real game plays all four seasons.' : 'Highest total wins. A real game plays all four seasons.'; },
+    { id: 'end', title: S.end.title, say: () => tsay('end', G.over.winner === 0, G.over.scores[0].total, G.over.scores[1].total),
       target: tq('#pc .kv.tot'), wait: null, hold: c => c.kind === 'over', ready: () => !!cardTitle('over') }
   ];
+  // reaction beat after each action, and the next step waits until it has been read
+  L.forEach(st => {
+    const r = HBS.steps[st.id].react, rd = st.ready; UI.tutLog = UI.tutLog || [];
+    st.onEnter = () => { UI.tutLog.push(st.id); };
+    if (r) st.onDone = () => { tutReact(r, st.id === 'resin' || st.id === 'forest' ? 3000 : 2300); };
+    st.ready = () => (!UI.reactUntil || Date.now() >= UI.reactUntil) && (!rd || rd());
+  });
+  return L;
 }
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c) { if (typeof GXT === 'undefined' || !GXT.active()) return false; const st = GXT.current(); return !!(st && st.hold && st.hold(c)); }
@@ -102,9 +119,9 @@ function storyOpen() { if (typeof GXC === 'undefined') return; if (typeof GXT !=
 function tutStart(o) {
   if (typeof GXT === 'undefined') return; const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'You know the rules', endText: pro ? 'Workers, goods, cards, events, seasons, passing, scoring. Now the Story begins.' : 'Workers, goods, cards, events, seasons, passing, scoring. The lightbulb explains the rest while you play.',
+    endTitle: HBS.end.title, endText: pro ? HBS.end.text + ' Now the Story begins.' : HBS.end.text + ' The lightbulb explains the rest while you play.',
     endButtons: pro && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
-    setup: () => { try { GX.close(); } catch (e) { } closePop(); UI.camp = null; UI.seed = TUT_SEED; newGame('tutorial'); },
+    setup: () => { try { GX.close(); } catch (e) { } closePop(); UI.camp = null; UI.reactUntil = 0; UI.tutLog = []; UI.seed = TUT_SEED; newGame('tutorial'); },
     onDone: r => { tutLeave(); const c = r && r.choice;
       if (c === 'chapter' && first) { GXC.play(first.id); }
       else if (c === 'story' && typeof GXC !== 'undefined') { campOpen(); }
