@@ -270,3 +270,13 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 @media (min-width:1000px){.cd .vp{z-index:3;bottom:auto;top:46px;right:6px}}
 /* the guide's code-drawn portrait in every tutorial bubble (until portrait art exists) */
 .gxt-bub .gxh-tt::before{content:'P';display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;margin-right:7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4f9a6a,#1f4a30);color:#fff3d6;border:2px solid #e8c36a;font-weight:800;font-size:14px;vertical-align:middle;flex:none}
+/* free art: the effect line sits under the picture, never over it */
+@media (min-width:1000px){.cd .pic .ptx,.cd>.ptx{display:-webkit-box;position:static;margin:2px 3px 0;font-size:16px;line-height:1.1;-webkit-line-clamp:2}.cd .pic{min-height:34px}}
+@media (min-width:1000px){.cd>.ptx{-webkit-box-orient:vertical;overflow:hidden;background:#fbf3df;color:#1f1505;border-radius:4px;font-weight:700;padding:1px 3px;text-align:center;flex:none}.cd.fear>.ptx{background:#2a1010;color:#ffe6e0}}
+/* free art behind text: solid backings (track numbers and costs, site names, row labels, effect lines) */
+#track .trow .rn{background:#1d140a;color:#fff3d6;border-radius:6px;padding:0 4px;min-width:1.4em;text-align:center}
+#track .trow .rp .chip{background:#1d140a;color:#fff3d6;border-radius:6px;padding:0 3px}
+#track .trow .rp .chip .num{color:#fff3d6}
+.site .nm{background:rgba(12,22,12,.9);border-radius:6px;padding:0 4px;left:6px!important;right:6px!important;text-shadow:none}
+.ter .tl{background:#0b1609!important;color:#fff3d6!important}
+@media (min-width:1000px){.cd>.ptx{-webkit-line-clamp:3;max-height:3.4em}}

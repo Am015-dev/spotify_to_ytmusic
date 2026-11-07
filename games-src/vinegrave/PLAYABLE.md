@@ -51,6 +51,8 @@ Toasts now sit above the dock, so they never cover the instruction line.
 - ADDENDUM 2: rules-check fixed 2/2 (WRONG 1: a Boat pays a Boot; MISSING 1: empty shrine slots score 1/1/1/2). Each has rules-test cases named after the item. The 5 SIMPLIFIED items are listed in the rules drawer under "Simplified on purpose".
 - ADDENDUM 3: STORY.md (cast, 3 acts). The prologue text is in V.STORY (src/data.js). Every Story chapter now has a win and a loss line. Quick games open with a flavour line and end with a result line in the game's voice. The final count climbs.
 
+- Free CC0 art kit (orchestrator, 21:37): merged and installed (170 pictures), and every gate re-run with it. Desktop card pictures show in full, with the effect line under the picture instead of over it. The kit's Boot, Jeep, Plane, arrowhead and jewel icons are the same blank hexagon, less clear than the code-drawn shapes, so those 5 slots keep the code glyph (WEAK_ART in src/ui1.js; delete an entry when real art arrives). Phone cards still hide the card picture: it would be about 50x14 px there. The name is clearer, and a tap shows the big card with its picture. Solid backings were added behind the track numbers, site names and row labels that now sit over art.
+
 ## Remaining
 - Phone market cards still show effects as icons (no room for a sentence at 58 px); the name is readable and a tap opens the full text.
 - The vp badge on a phone market card can touch the cost icon on 4-coin cards.
