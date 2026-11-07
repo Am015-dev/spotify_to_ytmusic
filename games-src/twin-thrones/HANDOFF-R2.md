@@ -24,3 +24,9 @@ Found -> fixed:
 - Dangerous bug caught on the way: hiding the board with `body:has(.gxc)` stayed on after the map closed (kit keeps the hidden node); selector is now `.gxc:not([hidden])`.
 Local audit: `ui-audit.spec.js` phone A0 B7 E3 F1, pc A2 B17 E2 F1; what is left is the shared story map (contrast), the shared tutorial bubble at PC (13.5 px), and the audit tapping the Tutorial menu button (it starts the tutorial, then F sees 2 instruction lines). Run `build-all.py --quick twin-thrones` for the real gate (it adds the fonts).
 Next: wonder tiles / tokens could open a card popup instead of a toast; story map art; music files; the deferred rules UNSURE costs.
+
+## Round 2c: computer opponent (review R2 scored it 3)
+Cause found: the old scorer sold half its cards (376 sells vs 380 builds in 30 games), hoarded coins (45-60 at the end) and ignored wonders (10 wonders in 30 games). Fixed in `src/ai.js`: weights in one `PRM` table (hill-climbed against the simple bot, then checked on fresh seeds), a card-count and wonder value, coins valued at 1 point per 3 up to 10 coins and little above, a penalty for selling a card it could build (larger when rich), science 5+ and pawn 7+ threats weigh hard on both sides (denial of the rival's science pair / military push comes from the existing denial term plus these), hard keeps the 3-ply search.
+Gate (headless, `node bench-ai.js 100 <level>`, bot = take-first-affordable, raising a wonder every 4th turn, else sell; seats alternate; fresh seeds not used for tuning):
+- Normal beats the bot 72% (target 55%+); Hard beats the bot 77% (target 70%+); end coins about 10 (was 45-60).
+- Hard beats Normal 63% over 200 games (126-74); rules-test 120 PASS; smoke PASS.
