@@ -14,11 +14,11 @@
     o = o || {}; var np = o.np || 2, seats = o.seats || [];
     var G = { v: 1, rng: (o.seed == null ? Math.floor(Math.random() * 1e9) : o.seed) >>> 0, np: np, round: 1, rounds: o.rounds || V.ROUNDS, turn: 0, first: 0, phase: 'play', q: null,
       p: [], sites: [], row: [], items: [], arts: [], s1: [], s2: [], guards: [], idols: [], temple: V.TEMPLE.map(function (t) { return t.n; }), log: [], ev: [], winner: null, twist: o.twist || null, planeCost: 2, rival: null, turns: 0 };
-    G.seed0 = G.rng;
+    G.seed0 = G.rng; G.dread = V.DREAD_SUPPLY - 2 * np; G.firstTaken = {};
     for (var i = 0; i < np; i++) {
       var st = V.START[i] || V.START[3], sd = seats[i] || {};
       var p = { name: sd.name || (i ? 'Explorer ' + (i + 1) : 'You'), ai: sd.ai || null, res: { coin: st.coin, compass: st.compass, tablet: 0, arrow: 0, jewel: 0 },
-        deck: shuf(G, ['dread', 'dread', 'grant', 'grant', 'trail', 'trail']), hand: [], play: [], disc: [], ex: V.EXPL, note: 0, glass: 0, guards: [], idols: [], temple: [], passed: false, idolTurn: false, exiled: [] };
+        deck: shuf(G, ['dread', 'dread', 'grant', 'grant', 'trail', 'trail']), hand: [], play: [], disc: [], ex: V.EXPL, note: 0, glass: 0, guards: [], idols: [], temple: [], passed: false, idolTurn: false, exiled: [], fearTiles: 0 };
       G.p.push(p);
     }
     G.items = shuf(G, V.ITEMS.slice()); G.arts = shuf(G, V.ARTS.slice()); G.s1 = shuf(G, V.S1.slice()); G.s2 = shuf(G, V.S2.slice()); G.guards = shuf(G, V.GUARDS.slice()); G.idols = shuf(G, V.IDOLS.slice());
@@ -39,7 +39,7 @@
     if (!t) return; var n = t.param || 1, opp = [];
     for (var i = 1; i < G.np; i++) opp.push(G.p[i]);
     if (t.id === 'rich') opp.forEach(function (p) { p.res.coin += n; p.res.compass += n; });
-    if (t.id === 'dread') for (var k = 0; k < n; k++) G.p[0].deck.push('dread');
+    if (t.id === 'dread') for (var k = 0; k < n; k++) takeDread(G, 0, 'deck');
     if (t.id === 'head') opp.forEach(function (p) { p.glass = n; p.note = Math.max(0, n - 1); });
     if (t.id === 'short') G.rounds = Math.max(2, n);
     if (t.id === 'woken') { var l1 = G.sites.filter(function (s) { return s.lvl === 1; }); for (var j = 0; j < Math.min(n, l1.length); j++) { l1[j].tile = G.s1.pop(); l1[j].guard = G.guards.pop(); } }
@@ -150,7 +150,7 @@
     if (k === 'g') { if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
     else { if (p.note < p.glass && p.note + 1 < V.TOP) { p.note++; arrive(G, s, p.note, 'notebook'); } else if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
   }
-  function arrive(G, s, row, what) { if (row === V.TOP && what === 'magnifier') { G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(s) < 0) G.templeOrder.push(s); } var b = V.TRACK[row].bonus; gain(G.p[s], b); log(G, s, nm(G, s) + '\'s ' + what + ' climbs to row ' + row + (row === V.TOP ? ' (the temple)' : '') + ': +' + V.resText(b) + '.', { k: 'research', row: row, what: what }); }
+  function arrive(G, s, row, what) { if (row === V.TOP && what === 'magnifier') { G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(s) < 0) G.templeOrder.push(s); } var b = V.TRACK[row].bonus; gain(G.p[s], b); if (what === 'magnifier' && V.FIRST[row] && !(G.firstTaken || {})[row]) { G.firstTaken = G.firstTaken || {}; G.firstTaken[row] = s + 1; gain(G.p[s], V.FIRST[row]); log(G, s, nm(G, s) + ' is first to row ' + row + ': extra ' + V.resText(V.FIRST[row]) + '.', { k: 'first', row: row }); } log(G, s, nm(G, s) + '\'s ' + what + ' climbs to row ' + row + (row === V.TOP ? ' (the temple)' : '') + ': +' + V.resText(b) + '.', { k: 'research', row: row, what: what }); }
   function digSite(G, s, i) {
     var x = G.sites[i], p = G.p[s], site = V.SITE[x.tile];
     x.occ = s; p.ex--; gain(p, site.rew);
@@ -196,7 +196,7 @@
   }
   function answer(G, s, v) {
     var q = G.q, p = G.p[s], rest = q.ops, main = q.main; G.q = null;
-    if (q.h === 'exile' && v) { var id = v.z === 'hand' ? p.hand.splice(v.i, 1)[0] : p.disc.splice(v.i, 1)[0]; p.exiled.push(id); log(G, s, nm(G, s) + ' exiles ' + card(id).name + '.', { k: 'exile', card: id }); }
+    if (q.h === 'exile' && v) { var id = v.z === 'hand' ? p.hand.splice(v.i, 1)[0] : p.disc.splice(v.i, 1)[0]; if (id === 'dread' && G.dread != null) G.dread++; else p.exiled.push(id); log(G, s, nm(G, s) + ' exiles ' + card(id).name + (id === 'dread' ? ' (back to the supply)' : '') + '.', { k: 'exile', card: id }); }
     if (q.h === 'or') { return runOps(G, s, q.d.opts[v].concat(rest), main); }
     if (q.h === 'buy' && v != null) {
       var bid = G.row[v], bc = card(bid), cost = cardCost(bid), k = Object.keys(cost)[0]; p.res[k] -= Math.max(0, cost[k] - q.d.o); G.row[v] = null; refillRow(G);
@@ -216,7 +216,7 @@
   }
   function endRound(G) {
     G.sites.forEach(function (x) {
-      if (x.occ >= 0) { var p = G.p[x.occ]; if (x.guard) { p.disc.push('dread'); log(G, x.occ, nm(G, x.occ) + ' flees ' + V.GUARD[x.guard].name + ' and takes a Dread card.', { k: 'fear' }); } p.ex++; }
+      if (x.occ >= 0) { var p = G.p[x.occ]; if (x.guard) { var tile = takeDread(G, x.occ, 'disc'); log(G, x.occ, nm(G, x.occ) + ' flees ' + V.GUARD[x.guard].name + (tile ? ' and takes a fear tile (-2): no Dread cards left.' : ' and takes a Dread card.'), { k: 'fear' }); } p.ex++; }
       x.occ = -1;
     });
     G.p.forEach(function (p) { p.disc = p.disc.concat(p.play); p.play = []; p.passed = false; p.idolTurn = false; });
@@ -229,6 +229,8 @@
     if (G.rival) rivalDeal(G);
     log(G, -1, 'Round ' + G.round + ' begins.', { k: 'round', round: G.round });
   }
+  // a Dread card from the supply (to the discard pile or deck); when the supply is empty, a fear tile (-2 points) instead. Returns true for a tile.
+  function takeDread(G, s, where) { var p = G.p[s]; if (G.dread == null) G.dread = 99; if (G.dread > 0) { G.dread--; p[where].push('dread'); return false; } p.fearTiles = (p.fearTiles || 0) + 1; return true; }
   function endGame(G) {
     G.phase = 'over'; var sc = G.p.map(function (p, i) { return score(G, i).total; });
     var all = sc.slice(); if (G.rival) all.push(rivalScore(G));
@@ -239,7 +241,7 @@
   }
   function score(G, s) {
     var p = G.p[s], all = p.deck.concat(p.hand, p.play, p.disc);
-    var cards = 0, fear = 0; all.forEach(function (id) { var c = card(id); if (c.t === 'fear') fear--; else cards += c.vp || 0; });
+    var cards = 0, fear = -2 * (p.fearTiles || 0); all.forEach(function (id) { var c = card(id); if (c.t === 'fear') fear--; else cards += c.vp || 0; });
     var ti = (G.templeOrder || []).indexOf(s), research = V.NOTE_VP[p.note] + (p.glass >= V.TOP && ti >= 0 ? V.TEMPLE_ARRIVE[Math.min(ti, 3)] : V.GLASS_VP[p.glass]), temple = p.temple.reduce(function (a, b) { return a + b; }, 0);
     var idols = p.idols.reduce(function (a, d) { return a + (d.used ? V.IDOL_USED_VP : V.IDOL_VP); }, 0), guards = p.guards.length * V.GUARD_VP;
     return { research: research, temple: temple, idols: idols, guards: guards, cards: cards, fear: fear, total: research + temple + idols + guards + cards + fear };
@@ -280,7 +282,7 @@
     });
     var seen = {}; G.row.concat(G.items, G.arts).forEach(function (id) { if (id && card(id).t !== 'basic' && card(id).t !== 'fear') { if (seen[id]) errs.push('dup ' + id); seen[id] = 1; } });
     G.p.forEach(function (p) { p.deck.concat(p.hand, p.play, p.disc, p.exiled).forEach(function (id) { var c = card(id); if (c.t === 'item' || c.t === 'art') { if (seen[id]) errs.push('dup owned ' + id); seen[id] = 1; } }); });
-    var gone = 0; if (G.rival) gone = 0;
+    if (G.dread != null) { var dn = G.dread; G.p.forEach(function (p) { p.deck.concat(p.hand, p.play, p.disc).forEach(function (id) { if (id === 'dread') dn++; }); }); if (dn !== V.DREAD_SUPPLY) errs.push('dread count ' + dn); }
     if (G.phase === 'play' && actor(G) >= 0 && !moves(G).length) errs.push('stuck: no moves');
     return errs;
   }

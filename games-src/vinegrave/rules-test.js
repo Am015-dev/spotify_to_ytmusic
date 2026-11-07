@@ -36,6 +36,12 @@ let fails = 0; const ok = (c, msg) => { if (!c) { fails++; console.log('FAIL', m
 }
 { const G = VG.newGame({ np: 1, seed: 6, solo: true }); ok(G.rival && G.rival.deck.length === 8, 'solo: rival deck of 8');
   const before = G.rival.deck.length; VG.apply(G, VG.moves(G).find(m => m.t === 'dig')); ok(G.rival.deck.length === before - 1, 'rival acts after my main action'); }
+{ const G = VG.newGame({ np: 2, seed: 11 }); const a = G.p[0], b = G.p[1]; a.res.tablet = 5; a.res.arrow = 5; b.res.tablet = 5; b.res.arrow = 5;
+  VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g')); VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g'));
+  const t0 = a.res.tablet; VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g')); ok(a.glass === 2 && a.res.tablet === t0 + 1, 'first magnifier to row 2 takes the extra tablet');
+  const tb = b.res.tablet; VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g')); ok(b.glass === 2 && b.res.tablet === tb, 'second arrival gets no first-arrival reward');
+  ok(G.dread === 19 - 4, 'Dread supply = 19 minus 2 per starting deck'); G.dread = 0; const x = G.sites[0]; x.occ = 0; x.guard = 'stone-ape'; a.ex = 1;
+  G.p.forEach(p => p.passed = true); G.p[G.turn].passed = false; VG.apply(G, { t: 'pass' }); ok(a.fearTiles === 1 && VG.score(G, 0).fear <= -4, 'empty Dread supply: a fear tile worth -2'); }
 // ---- full games
 const N = +process.argv[2] || 200; let stuck = 0, illegal = 0, errs = 0, games = 0; const tot = {}, len = [], wins = {};
 for (let g = 0; g < N; g++) {

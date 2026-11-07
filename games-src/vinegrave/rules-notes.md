@@ -38,8 +38,9 @@ at round end the item AND the artifact beside the moon-staff divide leave; tie-b
 Confirmed as built: 5 rounds, one main action then pass, keep or discard hand cards (we keep all: the rulebook calls discarding rarely
 useful), Dread for each explorer taken back from a guardian's site, guardians 5 points, bought items to the bottom of the deck, artifacts
 to the play area with a free use, artifacts from hand cost their tablet, 2 Dread in each starting deck.
-Still our own (not stated in the page we could read): exact travel/discover costs, empty-slot values, "first to a bonus space" extra
-bonuses (we give every arrival the row bonus), the Fear-card supply limit and -2 fear tiles, assistants, and every card's numbers.
+Now built: first-arrival research rewards (only the first magnifier on rows 2, 4, 6, 7; every arrival still gets the row bonus) and the
+19-card Dread supply (exiled Dread returns to it; when empty, a fear tile worth -2). Still our own: exact travel/discover costs, empty-slot
+values, the reward amounts, assistants (left out), and every card's numbers.
 No open-source implementation of this game exists (searched GitHub and the web), so no code or data was ported; THIRD-PARTY.md is not needed.
 Sources (facts only, nothing copied): rulespal.com rulebook summary (start resources, idols, temple, market, tie-break, Fear supply).
 Card COUNTS kept at the box's scale (35 items / 35 artifacts / 15 guardians / 16 site tiles split 10+8 here vs the box's mix); our cards,

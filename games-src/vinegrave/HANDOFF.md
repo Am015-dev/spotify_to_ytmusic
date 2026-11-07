@@ -38,8 +38,8 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
 - Picture loader proven with 3 dummy files (title-bg, card-trail, site-c-spring): drawn at slot aspect, 0 failed requests; files deleted.
 
 ## Addendum gates (orchestrator, 7 Nov)
-- AI gate (`node ai-gate.js 100`, 2 players, seats alternated, vs a bot taking the first legal non-pass action): Hard wins 100%
-  (avg 65.6 vs 25.1), Normal 92% (49.8 vs 24.3); Hard vs Normal head to head: Hard wins 75%. Hard looks one of its own turns ahead
+- AI gate (`node ai-gate.js 100`, 2 players, seats alternated, vs a bot taking the first legal non-pass action): Hard wins 96%
+  (avg 74.4 vs 30.6), Normal 85% (58.1 vs 29.6); Hard vs Normal head to head: Hard wins 80% (after the first-arrival and Dread-supply rules). Hard looks one of its own turns ahead
   for its 6 best moves (gather now, spend next turn). Spending: 4.2 (hard) / 6.0 (normal) resources left at the end in total, no hoarding.
   Fix that got there: the AI overvalued hand cards and idle explorers (dug 73 times vs the bot's 179, passed early 45 times in 20 games).
 - ASSET-CHECK.md (`python3 asset-check.py`): 148 picture ids required by rules, UI and campaign cast; 148 with a stem, 148 with a
@@ -78,4 +78,4 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
 ## Missing / weak
 - Art is placeholder (initials on gradients, SVG icons). AI is one-step greedy (no long plans); hard is only a bit stronger than normal.
 - No online mode, no undo, no reference drawer of every card (the card sheet explains any card you tap).
-- Not in yet: first-to-arrive research bonuses, Fear supply limit (-2 tiles), assistants. Tune the rival after human play.
+- Added late: first-arrival research rewards (rows 2, 4, 6, 7) and the 19-card Dread supply (then fear tiles, -2). Not in: assistants. Tune the rival after human play.
