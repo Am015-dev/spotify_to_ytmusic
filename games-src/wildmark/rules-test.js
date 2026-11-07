@@ -27,6 +27,18 @@ const b = W.bonus(Gm, sc); ok(b[0].peak === 2 && b[1].peak === 2 && b[2].peak ==
 // overpopulation: 4 same is wiped, 3 same offers wipe3
 let G = W.newGame({ np: 2, seed: 1 }); G.market.toks = ['elk', 'elk', 'elk', 'fox']; ok(W.moves(G).some(m => m.t === 'wipe3'), 'wipe3 offered');
 W.apply(G, { t: 'wipe3' }); ok(!W.moves(G).some(m => m.t === 'wipe3') || W.triple(G) === null || G.used3, 'wipe3 once');
+// rules-check WRONG 1 "market-pairs-stay": after a free pick (tile 0 + token 2) the other pairs keep their partners and slots
+{ const G2 = W.newGame({ np: 2, seed: 3, acorns: [1, 0] }); const t1 = G2.market.tiles[1].id, k1 = G2.market.toks[1], t3 = G2.market.tiles[3].id, k3 = G2.market.toks[3], k0 = G2.market.toks[0], t2 = G2.market.tiles[2].id;
+  W.apply(G2, { t: 'free', ti: 0, ki: 2 }); W.apply(G2, { t: 'place', c: W.spots(G2.seats[0].env)[0], rot: 0 }); W.apply(G2, { t: 'back' });
+  ok(G2.market.tiles[1].id === t1 && G2.market.toks[1] === k1 && G2.market.tiles[3].id === t3 && G2.market.toks[3] === k3, 'market-pairs-stay: untouched pairs keep slot and partner');
+  ok(G2.market.toks[0] === k0, 'market-pairs-stay: token 0 stays'); ok(G2.market.tiles[2].id === t2, 'market-pairs-stay: tile 2 stays');
+  ok(G2.market.tiles[0] && G2.market.toks[2], 'market-pairs-stay: taken slots refilled in place'); }
+// rules-check MISSING 1 "acorn-supply-25": 25 acorns in the supply; an empty supply gives no acorn; spent acorns go back
+{ const G3 = W.newGame({ np: 2, seed: 4, acorns: [1, 0] }); ok(G3.acornPool === 25, 'acorn-supply-25: starts at 25');
+  W.apply(G3, { t: 'free', ti: 0, ki: 1 }); ok(G3.acornPool === 26 && G3.seats[0].acorns === 0, 'acorn-supply-25: spent acorn returns to the supply');
+  const G4 = W.newGame({ np: 2, seed: 4 }); G4.acornPool = 0; G4.market.tiles[0] = { id: 999, t: ['forest'], a: ['bear'], key: true }; G4.bag[G4.market.toks[0]]++; G4.bag.bear--; G4.market.toks[0] = 'bear';
+  W.apply(G4, { t: 'take', i: 0 }); const sp = W.spots(G4.seats[0].env)[0]; W.apply(G4, { t: 'place', c: sp, rot: 0 }); W.apply(G4, { t: 'tok', c: sp });
+  ok(G4.seats[0].acorns === 0 && G4.acornPool === 0, 'acorn-supply-25: empty supply gives no acorn'); }
 // keystone gives an acorn
 G = W.newGame({ np: 1, seed: 2 }); G.market.tiles[0] = { id: 999, t: ['forest'], a: ['bear'], key: true }; G.bag[G.market.toks[0]]++; G.bag.bear--; G.market.toks[0] = 'bear';
 W.apply(G, { t: 'take', i: 0 }); const sp = W.spots(G.seats[0].env)[0]; W.apply(G, { t: 'place', c: sp, rot: 0 }); W.apply(G, { t: 'tok', c: sp }); ok(G.seats[0].acorns === 1, 'keystone acorn');
