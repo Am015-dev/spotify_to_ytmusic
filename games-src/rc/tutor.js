@@ -4,81 +4,10 @@
 // weather and a skill, the end. Each step spotlights ONE thing; only that thing answers; the step moves on only when the game reports that exact action (GXT.act).
 // The scenes of the day play by themselves, except the ones a step explains: tutClaimed() keeps those on screen until the step's Next.
 const TUT_GAME='shipwreck-isle',TUT_SEED=7,TUT_FOG=6;
-let TUT_STEPS=[];const TUT_KEEP={};
-const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!(G&&G.tut);
+const TUT_KEEP={};
+const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (below) replaced it
 // the staged deal: called by newGame before the first scene. Day 1 has no event card; day 2 turns over Chill Rain (a rain cloud and a threat).
 function tutDeal(){G.tut=1;G.res.food=1;G.tileDeck=[4,10,6,1,3,2,5,7,9,11];G.ev.threat=[null,null];G.ev.deck=['chillrain'].concat(G.ev.deck.filter(k=>k!=='chillrain'))}
-// ---------------------------------------------------------------- where each step points
-const tpt=(id,sz)=>()=>{try{const p=BF.tilePt(id);return p?{left:p.ox+p.x-sz/2,top:p.oy+p.y-sz/2,width:sz,height:sz}:null}catch(e){return null}};
-const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
-const tcur=()=>{try{const c=curPawn();return c&&c.id}catch(e){return null}};
-const tplan=r=>!!(G&&G.tut&&BF.on&&PHO.st==='plan2'&&!PHO.pop&&!UI.confirm&&!UI.modal&&G.round===r);
-// a job row in the pop-up of a place; the pop-up list scrolls, so the row is brought into view first
-function tutRow(type,pred){const pop=document.querySelector('#ppop');if(!pop||pop.hidden)return null;
-  for(const r of pop.querySelectorAll('.bfr[data-place]')){let o=null;try{o=JSON.parse(decodeURIComponent(r.dataset.place))}catch(e){}
-    if(!o||o.type!==type||(pred&&!pred(o)))continue;
-    const sc=pop.querySelector('.pp-b')||pop,a=sc.getBoundingClientRect(),b=r.getBoundingClientRect();
-    if(b.top<a.top+2||b.bottom>a.bottom-2){sc.scrollTop+=(b.top+b.bottom)/2-(a.top+a.bottom)/2}
-    const c=r.getBoundingClientRect();return c.width&&c.top>=a.top-1&&c.bottom<=a.bottom+1?r:null}
-  return null}
-// a scene of the day, on screen now
-const tbeat=pred=>()=>{try{if(!G||!G.tut||PHO.st!=='story')return false;const i=storyIdx();const b=i>=0&&UI.beats[i];return !!b&&!!pred(b)}catch(e){return false}};
-const bAct=(r,type)=>b=>b.kind==='act'&&b.round===r&&!!b.data&&b.data.type===type;
-const bKind=(r,k)=>b=>b.kind===k&&b.round===r;
-const tcamp=()=>tpt(G.camp.pos,64)();
-const tutNext=()=>{try{storyNext()}catch(e){}};
-// a scene that a step (this one or a later one) explains is held until its Next; the others play by themselves
-function tutClaimed(i){if(!tutOn())return false;const b=UI.beats[i];if(!b)return false;const n=Math.max(0,GXT.index());
-  for(let j=n;j<TUT_STEPS.length;j++){const s=TUT_STEPS[j];if(s.beat&&s.beat(b))return true}return false}
-// ---------------------------------------------------------------- the steps, in the order the rules come up
-function tutSteps(){return [
- {id:'goal',title:"Cook: our goal",say:"Our ship is gone. Light a fire and stack 15 wood by day 12. A ship will see it.",target:tcamp,wait:null,ready:()=>tplan(1)},
- {id:'lose',title:"Cook: what kills us",say:"Hunger and wounds kill. If anyone dies, or no ship comes by day 12, we are done.",target:tcamp,wait:null,ready:()=>tplan(1)},
- {id:'day',title:"Cook: a day",say:"Every day goes the same way: event card, camp supplies, our plan, the work, weather, night.",target:tq('#phlabel'),wait:null,ready:()=>tplan(1)},
- {id:'pawns',title:"Cook: who does what",say:"Carpenter builds, I cook and heal. Each of us has two pawns, one job each. Friday helps.",target:tq('#bf .pawnrow'),wait:null,ready:()=>tplan(1)},
- {id:'explore',title:"Cook: explore",say:"What lies beside the camp? Send the Carpenter to explore there, before nightfall.",target:tpt(11,56),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===11},ready:()=>tplan(1)&&tcur()==='c0_0'&&!G.plan.acts.length},
- {id:'dice',title:"Cook: the risk",say:"Alone he must roll three dice and might get hurt. Two pawns working together never roll.",target:tq('#bfchips .bfg[data-t="11"] .bfa'),wait:null,
-   ready:()=>tplan(1)&&!!document.querySelector('#bfchips .bfg[data-t="11"] .bfa')},
- {id:'second',title:"Cook: safe hands",say:"Don't gamble with our carpenter. Send the second Carpenter pawn there too: now it's sure.",target:tpt(11,56),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===11},ready:()=>tplan(1)&&tcur()==='c0_1'},
- {id:'camp1',title:"Cook: my turn",say:"Good, no dice. Now me: what can I do at camp?",target:()=>tcamp(),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===G.camp.pos},ready:()=>tplan(1)&&tcur()==='c1_0'},
- {id:'camp2',title:"Cook: tidy up",say:"Tidy the camp, earn determination ✊ for skills, and lift morale. Everyone sleeps better.",target:()=>tutRow('camp'),
-   wait:{type:'tap',match:a=>a.what==='place'&&a.kind==='camp'},ready:()=>G&&G.tut&&G.round===1&&!!PHO.pop&&!!tutRow('camp')},
- {id:'go1',title:"Cook: off we go",say:"Everyone has a job. Off we go. The day plays out one scene at a time.",target:tq('#bf .btn.go'),
-   wait:{type:'tap',match:a=>a.what==='go'},ready:()=>tplan(1)&&!planProblems().length&&!!document.querySelector('#bf .btn.go')},
- {id:'found',title:"Cook: new land",say:()=>{const t=tileAt(11);return t?'Carpenter is back: '+t.terr+' with '+t.src.join(' and ')+'. Tomorrow we can gather there.':'The Carpenter found new land.'},target:tpt(11,56),wait:null,
-   beat:bAct(1,'explore'),ready:tbeat(bAct(1,'explore')),onNext:tutNext},
- {id:'night1',title:"Cook: night",say:"Night falls. Everyone eats 1 food, and with no shelter each of us takes a wound.",target:tcamp,wait:null,
-   beat:bKind(1,'night'),ready:tbeat(bKind(1,'night')),onNext:tutNext},
- {id:'daysum1',title:"Cook: ouch",say:"Ouch. Each wound costs a life ♥; resting heals one. Tomorrow we build a shelter, I promise.",target:tcamp,wait:null,
-   beat:bKind(1,'daysum'),ready:tbeat(bKind(1,'daysum')),onNext:tutNext},
- {id:'event',title:"Cook: morning",say:()=>{const b=UI.beats[storyIdx()];const c=b&&b.data&&CARD[b.data.card];return 'Day two. '+(c?c.n:'The sky')+' rolls in: a rain cloud for tonight.'},target:tq('#bfcard'),wait:null,
-   beat:bKind(2,'event'),ready:()=>tbeat(bKind(2,'event'))()&&!!document.querySelector('#bfcard')},
- {id:'threat',title:"Cook: danger",say:"That card left a danger at camp. Handle it within two days or it strikes us.",target:tcamp,wait:null,
-   beat:bKind(2,'event'),ready:tbeat(bKind(2,'event')),onNext:tutNext},
- {id:'fog',title:"Cook: fog",say:"Fog hides this place. Work there needs one more pawn, and fog on the camp starves it.",target:tpt(TUT_FOG,56),wait:null,
-   onEnter:()=>{try{G.map[TUT_FOG].fog=1;UI.sel=null;refresh()}catch(e){}},ready:()=>tplan(2)},
- {id:'build1',title:"Cook: shelter",say:"Shelter first, so nights stop hurting. Carpenter, to the camp.",target:()=>tcamp(),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===G.camp.pos},ready:()=>tplan(2)&&tcur()==='c0_0'},
- {id:'build2',title:"Cook: the plan",say:"A shelter costs 2 wood and ends the night wounds. Choose it.",target:()=>tutRow('build',o=>o.tgt&&o.tgt.k==='shelter'),
-   wait:{type:'tap',match:a=>a.what==='place'&&a.kind==='build'&&a.tgt&&a.tgt.k==='shelter'},ready:()=>G&&G.tut&&G.round===2&&!!PHO.pop&&!!tutRow('build',o=>o.tgt&&o.tgt.k==='shelter')},
- {id:'gather1',title:"Cook: food",say:"We need food. I'll gather at the hills: choose that place.",target:tpt(11,56),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===11},ready:()=>tplan(2)&&tcur()==='c1_0'},
- {id:'gather2',title:"Cook: fishing",say:"Fishing is best: choose Fish, then my second pawn joins so it is sure.",target:()=>tutRow('gather',o=>o.tgt&&o.tgt.i===1),
-   wait:{type:'tap',match:a=>a.what==='place'&&a.kind==='gather'&&a.tgt&&a.tgt.i===1},ready:()=>G&&G.tut&&G.round===2&&!!PHO.pop&&!!tutRow('gather',o=>o.tgt&&o.tgt.i===1)},
- {id:'go2',title:"Cook: go",say:"Shelter and supper are planned. Let the day begin.",target:tq('#bf .btn.go'),
-   wait:{type:'tap',match:a=>a.what==='go'},ready:()=>tplan(2)&&!planProblems().length&&!!document.querySelector('#bf .btn.go')},
- {id:'weather',title:"Cook: rain",say:"Clouds above our roof ruin 1 food and 1 wood each. We have no roof, so brace.",target:tcamp,wait:null,
-   beat:bKind(2,'weather'),ready:tbeat(bKind(2,'weather'))},
- {id:'skill',title:"Cook: my skill",say:"Not tonight! Spend 3 determination ✊ and I wave off the rain cloud. Use my skill.",target:tq('#bf [data-ans="1"]'),
-   wait:{type:'tap',match:a=>a.what==='answer'&&a.i===1},ready:()=>PHO.st==='story'&&!!G.q&&/Moonshine/.test(G.q.title||'')&&!!document.querySelector('#bf [data-ans="1"]')},
- {id:'night2',title:"Cook: night",say:"Dry and safe: the shelter spared us every wound. Everyone eats 1 food.",target:tcamp,wait:null,
-   beat:bKind(2,'night'),ready:tbeat(bKind(2,'night')),onNext:tutNext},
- {id:'end',title:"Cook: the road",say:"Twelve days like this: fire plus 15 wood wins. A death or no rescue loses. Ready?",target:tcamp,wait:null,
-   beat:bKind(2,'daysum'),ready:tbeat(bKind(2,'daysum'))}
-]}
 // ---------------------------------------------------------------- the staged game starts and stops
 function tutBegin(){try{GX.close()}catch(e){}try{closeMenu()}catch(e){}
   TUT_KEEP.auto=UI.auto;TUT_KEEP.ghost=BF.ghostDone;UI.auto=false;UI.pause=false;BF.ghostDone=true;
@@ -96,64 +25,79 @@ function tutLeave(){clearTimeout(BF.autoT);BF.autoT=null;try{BF.cardClear()}catc
 // ---------------------------------------------------------------- COACHED FIRST GAME (flag ?coach=1, off by default; owner 7 Nov addendum 4)
 // A real game from turn 1 (all legal moves free; stacked seed and deck only make the cases come up). The Cook speaks just in time: one bubble at a time,
 // never blocks input, dismissible. Each rule is explained the first time it matters; the rest go on a "Things you'll meet later" card. No forced taps.
-const COACH_ON=(()=>{try{return new URLSearchParams(location.search).has('coach')}catch(e){return false}})();
-const COACH={timer:0,done:{},cur:null,t0:0,later:0};
+const COACH={timer:0,done:{},cur:null,later:0,pro:false,forced:{}};
 const cbeat=()=>{try{if(!G||PHO.st!=='story')return null;const i=storyIdx();return i>=0?UI.beats[i]:null}catch(e){return null}};
 const cplan=()=>!!(G&&(PHO.st==='plan'||PHO.st==='plan2')&&!PHO.pop&&!UI.modal);
 const cact=t=>{try{return G.plan.acts.find(a=>a.pw.length&&a.type===t)}catch(e){return null}};
+const ccard=k=>{try{return CARD[k].n}catch(e){return 'the card'}};
+const cwx=()=>{try{return (viewState()||G).lastWx||{}}catch(e){return {}}};
+// kind: 'rule' (first time it matters), 'move' (a good or poor choice, one line why), 'rival' (what the island just did to us)
 const COACH_RULES=[
  {id:'goal',when:()=>cplan()&&G.round===1,say:"Our ship is gone. Light a fire and stack 15 wood by day 12: a ship will see it. Pick a pawn, then a glowing place."},
  {id:'pawns',when:()=>cplan()&&G.round===1&&G.plan.acts.some(a=>a.pw.length),say:"Each pawn does one job. I cook and heal, the Carpenter builds, Friday helps."},
  {id:'dice',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length===1&&actNeed(a).roll),say:"One pawn alone rolls dice and can fail or get hurt. A second pawn makes it sure."},
- {id:'sure',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length>=2),say:"Two pawns: no dice, a sure thing. Good, keep the Carpenter safe."},
- {id:'explore',when:()=>cplan()&&!!cact('explore'),say:"Exploring finds new land; we can gather there tomorrow."},
+ {id:'sure',kind:'move',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length>=2),say:"Good move: two pawns, no dice. A sure thing."},
+ {id:'explore',when:()=>cplan()&&!!cact('explore'),say:"Exploring finds new land; we can gather there from tomorrow."},
  {id:'build',when:()=>cplan()&&!!cact('build'),say:"Building costs wood. A shelter costs 2 wood and ends night wounds."},
  {id:'gather',when:()=>cplan()&&!!cact('gather'),say:"Food and wood arrive after all the jobs are done, not before."},
  {id:'camp',when:()=>cplan()&&!!cact('camp'),say:"Tidying the camp earns determination ✊ for skills and lifts morale."},
- {id:'ready',when:()=>cplan()&&G.plan.acts.some(a=>a.pw.length)&&(()=>{try{return planProblems().length===0}catch(e){return false}})(),say:"Everyone has a job. Good plan. Tap Start day when you are ready."},
+ {id:'ready',kind:'move',when:()=>cplan()&&G.plan.acts.some(a=>a.pw.length)&&(()=>{try{return planProblems().length===0}catch(e){return false}})(),say:"Good plan: everyone has a job. Tap Start day when you are ready."},
+ {id:'noshelter',kind:'move',when:()=>cplan()&&G.round>=2&&!hasShelter()&&!cact('build'),say:"Poor move: no shelter and no build planned. Tonight everyone takes a wound."},
+ {id:'nofood',kind:'move',when:()=>cplan()&&G.round>=2&&food()<eatersNeed()&&!cact('gather')&&!cact('hunt'),say:"Poor move: food is short for tonight and nobody gathers. Hunger costs 2 wounds."},
  {id:'prod',when:()=>{const b=cbeat();return b&&b.kind==='prod'},say:"Each morning the camp's sources give 1 food or 1 wood."},
- {id:'event',when:()=>{const b=cbeat();return b&&b.kind==='event'},say:"A new event card each morning: it happens now, then waits as a threat."},
- {id:'threat',when:()=>{const b=cbeat();return b&&b.kind==='threat'||cplan()&&G.ev&&G.ev.threat&&G.ev.threat.some(Boolean)},say:"A threat sits at camp. Deal with it in time, or the card strikes."},
+ {id:'event',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='event'},say:()=>{const b=cbeat();return 'The island moves: “'+ccard(b&&b.data&&b.data.card)+'”. Its effect happens now, then it waits as a threat.'}},
+ {id:'threat',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='threat'||cplan()&&G.ev&&G.ev.threat&&G.ev.threat.some(Boolean)},say:"A threat sits at camp. Deal with it in time, or the card strikes."},
  {id:'morning',when:()=>{const b=cbeat();return b&&b.kind==='morning'},say:"Morale moves our determination each morning. Low morale costs wounds."},
- {id:'found',when:()=>{const b=cbeat();return b&&b.kind==='finds'},say:"The day's haul reaches camp. New land is now yours to use."},
+ {id:'found',when:()=>{const b=cbeat();return b&&b.kind==='finds'},say:"The day's haul reaches camp. New land is now ours to use."},
  {id:'fight',when:()=>{const b=cbeat();return b&&(b.kind==='fight'||b.kind==='adventure'||b.kind==='mystery')},say:"Adventures, mysteries and beasts are risky: weapons and dice decide."},
- {id:'weather',when:()=>{const b=cbeat();return b&&b.kind==='weather'},say:"Clouds above our roof ruin 1 food and 1 wood each. A roof protects us."},
+ {id:'weather',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='weather'},say:()=>{const w=cwx(),n=(w.rain||0)+(w.snow||0);return (n?'The weather brings '+n+' cloud'+(n>1?'s':'')+'. ':'The sky is calm. ')+'Clouds above our roof (level '+G.camp.roof+') ruin 1 food and 1 wood each.'}},
  {id:'night',when:()=>{const b=cbeat();return b&&b.kind==='night'},say:"Night: everyone eats 1 food (or takes 2 wounds). No shelter means a wound each."},
  {id:'wounds',when:()=>{const b=cbeat();return b&&b.kind==='daysum'},say:"Each wound costs a life ♥. Resting heals one. Build a shelter soon."},
- {id:'skill',when:()=>cplan()&&G.chars.some(c=>!c.npc&&c.det>=2),say:"We have determination ✊: open the Camp tab to use a skill, once per round."},
- {id:'fog',when:()=>cplan()&&G.map.some(m=>m.fog),say:"Fog hides a place: work there needs one more pawn."}
+ {id:'skill',when:()=>cplan()&&G.round>=2&&G.chars.some(c=>!c.npc&&c.det>=2),say:"We have determination ✊. Open the Camp tab and use a skill: once per round, and it can turn a bad roll."},
+ {id:'fog',when:()=>cplan()&&G.map.some(m=>m.fog),say:"Fog hides a place: work there needs one more pawn, and a fogged camp makes nothing."}
 ];
 const COACH_LATER=[
  ["Hunting","Hunt beasts for food and fur; your weapon level decides the fight."],["Resting","A rest job heals 1 wound."],
  ["Distance","Places two tiles from camp need one extra pawn."],["Items and inventions","Build inventions for lasting help; some become items."],
  ["Snow and storms","Winter clouds cost wood; a storm hits last."],["Healing at night","Pot, fire and rum can heal before sleep."],
  ["Moving camp","Move camp at night; it halves your roof and palisade."],["Other scenarios","Hexed Isle, Stranded Friend and Settlers add their own goals."]];
+const TUT_KEY='gxt-'+TUT_GAME;
+const coachMark=p=>{try{const o=JSON.parse(localStorage.getItem(TUT_KEY)||'{}');Object.assign(o,p);localStorage.setItem(TUT_KEY,JSON.stringify(o))}catch(e){}};
 function coachEl(){let e=document.getElementById('coachb');if(!e){e=document.createElement('div');e.id='coachb';e.setAttribute('role','status');document.body.appendChild(e);
-  e.addEventListener('click',ev=>{if(ev.target.closest('[data-coach=x]'))coachHide()})}return e}
+  e.addEventListener('click',ev=>{const b=ev.target.closest('[data-coach]');if(!b)return;const k=b.dataset.coach;if(k==='x')coachHide();else coachFinish(k)})}return e}
+function coachSkipEl(){let e=document.getElementById('coachskip');if(!e){e=document.createElement('button');e.id='coachskip';e.type='button';e.textContent='Skip tutorial';e.setAttribute('aria-label','Skip the tutorial and leave this game');document.body.appendChild(e);
+  e.addEventListener('click',()=>coachFinish('skip'))}return e}
 function coachHide(){const e=document.getElementById('coachb');if(e)e.hidden=true;COACH.cur=null}
-function coachShow(id,say){const e=coachEl();COACH.cur=id;COACH.shownAt=Date.now();e.hidden=false;e.dataset.rule=id;e.innerHTML='<b class="cn">Cook</b><span class="ct"></span><button type="button" data-coach="x" aria-label="Dismiss">✕</button>';e.querySelector('.ct').textContent=say}
+function coachShow(id,say,kind){const e=coachEl();COACH.cur=id;COACH.shownAt=Date.now();e.hidden=false;e.dataset.rule=id;e.dataset.kind=kind||'rule';e.innerHTML='<b class="cn">Cook</b><span class="ct"></span><button type="button" data-coach="x" aria-label="Dismiss">✕</button>';e.querySelector('.ct').textContent=say}
+// the end of the coached game: the final scoring walked through rule by rule with the player's real numbers, then what comes later
+function coachFinal(){const w=!!(G.over&&G.over.win);const alive=G.chars.filter(c=>!c.npc&&!c.dead).length,tot=G.chars.filter(c=>!c.npc).length;
+  const fire=has('fire'),pile=(G.sc&&G.sc.pile)||0;
+  const walk=[['Goal: fire',fire?'✓ lit':'✗ not lit'],['Goal: wood pile',pile+' of 15'],['Rescue window','days 10 to 12 (you ended on day '+G.round+')'],['Everyone alive',alive+' of '+tot+(alive<tot?': a death loses':'')],['Shelter',hasShelter()?'built (no night wounds)':'none (a wound each night)'],['Roof and palisade',G.camp.roof+' and '+G.camp.pal],['Food and wood left',food()+' and '+G.res.wood]];
+  const e=coachEl();COACH.cur='later';e.hidden=false;e.dataset.rule='later';e.dataset.kind='final';
+  const btns=COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':'<button type="button" class="cb" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>';
+  e.innerHTML='<b class="cn">Cook: '+(w?'rescued!':'we did not make it')+'</b><span class="ct">Here is how it scored, rule by rule:</span><ul class="walk">'+walk.map(x=>'<li><b>'+x[0]+':</b> '+x[1]+'</li>').join('')+'</ul><span class="ct">Things you’ll meet later:</span><ul>'+COACH_LATER.map(x=>'<li><b>'+x[0]+'.</b> '+x[1]+'</li>').join('')+'</ul><div class="cbs">'+btns+'</div>';
+  coachMark({done:1,open:0,step:0})}
+function coachFinish(k){coachStop();const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  if(k==='skip')coachMark({skipped:1,open:0});
+  tutLeave();
+  if(k==='chapter'&&first&&typeof GXC!=='undefined')GXC.play(first.id);
+  else if(k==='story'&&typeof GXC!=='undefined')campOpen();
+  else{openStart();if(k==='skip'&&COACH.pro&&typeof GXC!=='undefined')campOpen()}}
 function coachTick(){try{
   if(!G||!G.coach){coachStop();return}
-  if(G.over&&!COACH.done.later){COACH.done.later=1;COACH.later=1;const w=G.over.win;const left=COACH_LATER.map(x=>'<li><b>'+x[0]+'.</b> '+x[1]+'</li>').join('');
-    const e=coachEl();COACH.cur='later';e.hidden=false;e.dataset.rule='later';e.innerHTML='<b class="cn">Cook: '+(w?'rescued!':'we did not make it')+'</b><span class="ct">Day '+G.round+' of '+G.rounds+', food '+food()+', wood '+G.res.wood+'. Things you’ll meet later:</span><ul>'+left+'</ul><button type="button" data-coach="x" aria-label="Close">✕</button>';return}
-  if(COACH.cur&&Date.now()-COACH.shownAt>(COACH.cur==='later'?60000:9000))coachHide();
+  if(G.over){if(!COACH.done.later){COACH.done.later=1;coachFinal()}return}
+  // make the situations come up once: fog on a place and determination for a skill, from day 2
+  if(cplan()&&G.round>=2){if(!COACH.forced.fog&&!G.map.some(m=>m.fog)){COACH.forced.fog=1;try{G.map[TUT_FOG].fog=1;refresh()}catch(e){}}
+    if(!COACH.forced.det){COACH.forced.det=1;for(const c of G.chars)if(!c.npc)c.det=Math.max(c.det||0,3);try{refresh()}catch(e){}}}
+  if(COACH.cur&&Date.now()-COACH.shownAt>9000)coachHide();
   if(COACH.cur)return;
-  for(const r of COACH_RULES){if(COACH.done[r.id])continue;let ok=false;try{ok=!!r.when()}catch(e){}if(ok){COACH.done[r.id]=1;coachShow(r.id,r.say);return}}
+  for(const r of COACH_RULES){if(COACH.done[r.id])continue;let ok=false;try{ok=!!r.when()}catch(e){}if(ok){COACH.done[r.id]=1;let t=r.say;try{if(typeof t==='function')t=t()}catch(e){t=''}if(t){coachShow(r.id,t,r.kind);return}}}
  }catch(e){console.error(e)}}
-function coachStop(){clearInterval(COACH.timer);COACH.timer=0;coachHide()}
-function coachStart(){COACH.done={};COACH.cur=null;COACH.later=0;tutBegin();G.coach=1;clearInterval(COACH.timer);COACH.timer=setInterval(coachTick,600);coachTick()}
+function coachStop(){clearInterval(COACH.timer);COACH.timer=0;coachHide();const k=document.getElementById('coachskip');if(k)k.remove()}
+function coachStart(){COACH.done={};COACH.cur=null;COACH.later=0;COACH.forced={};tutBegin();G.coach=1;coachMark({open:1,done:0,skipped:0});coachSkipEl();clearInterval(COACH.timer);COACH.timer=setInterval(coachTick,600);coachTick()}
 window.COACHX={rules:COACH_RULES.map(r=>r.id),done:()=>Object.keys(COACH.done),state:COACH};
 
-function tutStart(o){if(typeof GXT==='undefined')return;if(COACH_ON&&!(o&&o.prologue))return coachStart();const pro=!!(o&&o.prologue);const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];TUT_STEPS=tutSteps();
-  GXT.start({game:TUT_GAME,steps:TUT_STEPS,story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:pro?'We survived two days. The ship’s log is open: now the Story begins.':'Jobs, dice, camp, weather, wounds, skills. A real game lasts 12 days.',
-    endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
-    setup:tutBegin,
-    onDone:r=>{tutLeave();const c=r&&r.choice;
-      if(c==='chapter'&&first&&typeof GXC!=='undefined')GXC.play(first.id);
-      else if(c==='story'&&typeof GXC!=='undefined')campOpen();
-      else openStart()},
-    onExit:()=>{tutLeave();openStart();if(pro&&typeof GXC!=='undefined')campOpen()}})}   // skipping the Story prologue goes on to the chapter map
+function tutStart(o){COACH.pro=!!(o&&o.prologue);coachStart()}
 // ---------------------------------------------------------------- menus: the title, the in-game menu, the chapter list, the first Play and the first Story tap
 const tutFirst=()=>{try{return typeof GXT!=='undefined'&&!GXT.status(TUT_GAME).seen&&!localStorage.getItem(SAVE)&&!localStorage.getItem('swi_ghost')&&!localStorage.getItem('swi_tutoffer')}catch(e){return false}};
 function tutBlock(pos){if(typeof GXT==='undefined')return '';const f=tutFirst();
@@ -174,18 +118,3 @@ function tutOffer(){if(!tutFirst()||document.querySelector('.tutoffer'))return f
     try{localStorage.setItem('swi_tutoffer','1')}catch(err){}
     if(b.dataset.tutoffer==='learn')tutStart();else{UI.guide.on=false;UI.cmpDef=null;beginGame()}});
   return true}
-// ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
-(function(){const o=on3DTile;on3DTile=function(id){
-  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'tile',id}))return;UI._tutIn=1;try{return o(id)}finally{UI._tutIn=0}}
-  return o(id)}})();
-// the second pawn of a castaway joins the same job by itself (the pair is taught once, on day 1)
-function tutJoin(type,tgt,alt){try{const c=curPawn();if(!c||c.c==null||!/_1$/.test(c.id))return;const e=place(c.id,type,tgt,alt);if(!e){sfx('place');UI.sel=null;wizPlaced();refresh()}}catch(e){console.warn('tutJoin',e)}}
-(function(){const o=doPlace;doPlace=function(type,tgt,alt){
-  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'place',kind:type,tgt,alt}))return;UI._tutIn=1;try{o(type,tgt,alt);tutJoin(type,tgt,alt)}finally{UI._tutIn=0}return}
-  return o(type,tgt,alt)}})();
-(function(){const o=tryStart;tryStart=function(force){
-  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'go'}))return;UI._tutIn=1;try{return o(force)}finally{UI._tutIn=0}}
-  return o(force)}})();
-(function(){const o=answer;answer=function(i){
-  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'answer',i}))return;UI._tutIn=1;try{return o(i)}finally{UI._tutIn=0}}
-  return o(i)}})();
