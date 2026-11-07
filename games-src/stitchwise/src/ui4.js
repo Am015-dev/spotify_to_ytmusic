@@ -42,6 +42,7 @@ function campStart(def) {
 // Story result: our own best score per stage (the shared kit keeps only stars), and the totals + tie-break line the kit screen lacks
 function campBest(g) { try { var id = UI.camp.id, b = JSON.parse(localStorage.getItem('sw_best') || '{}'), n = swScore(g, 0).total; if (b[id] == null || n > b[id]) b[id] = n; localStorage.setItem('sw_best', JSON.stringify(b)); } catch (e) { } }
 function campResultNote(g) {
+  try { GXH.hide(); setTimeout(function () { try { GXH.hide(); } catch (e) { } }, 700); } catch (e) { }
   var box = $('.gxc-res'); if (!box) return; var a = swScore(g, 0), b = swScore(g, 1), w = swWinner(g), best = null; try { best = (JSON.parse(localStorage.getItem('sw_best') || '{}'))[UI.camp.id]; } catch (e) { }
   var n = h('div.rvnote', h('div.rvsc', h('span', 'You'), h('b', String(a.total)), h('span.dash', '–'), h('b', String(b.total)), h('span', nameOf(1))));
   if (a.total === b.total) n.appendChild(h('div.rvtb', w === 0 ? 'Tied on points. You reached the end first, so you win the tie-break.' : 'Tied on points. ' + nameOf(w) + ' reached the end first and wins the tie-break, so this is a loss.'));
@@ -91,11 +92,12 @@ document.addEventListener('click', function (e) { // mark the chosen menu sectio
 }, true);
 function boot() {
   try { GX.init({ key: 'sw' }); } catch (e) { console.error(e); }
+  try { var gs = GX.show; GX.show = function () { try { GXH.hide(); } catch (e) { } return gs.apply(GX, arguments); }; } catch (e) { }
   buildMenu(); buildRules(); buildPatchList(); bindQuilt(); campInit(); hlpInit(); musInit(); try { if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) GX.offline({ sw: '../sw.js', scope: '../' }); } catch (e) { }
   try { GNS.achievements('stitchwise', [{ id: 'win', name: 'First ribbon', how: 'Win a game.', test: function (r) { return r.won; } }, { id: 'tidy', name: 'Not a gap', how: 'Finish a game with at most 3 empty squares.', test: function (r, st, raw) { return r.won && raw && raw.scores && raw.scores[0] > 20; } }]); } catch (e) { }
   var rf = function () { if (G && UI.started) render(); }; try { var bk = ''; GX.onResize(function (w, hh) { var k = w + 'x' + hh; if (k !== bk && G && UI.started) { bk = k; render(); } }); } catch (e) { } if (typeof GXV !== 'undefined') GXV.watch(function () { rf(); }); else window.addEventListener('resize', rf);
   if (window.GXS && GXS.on) return; // scenarios build their own state
   var first = false; try { first = !localStorage.getItem('sw_seen'); localStorage.setItem('sw_seen', '1'); } catch (e) { }
-  showStart(); if (first && typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) setTimeout(function () { if (!UI.started && !GXT.active() && !$('#start').hidden) { try { GXT.menuHTML; } catch (e) { } toast('New here? Tap the Tutorial button to learn in 3 minutes.', 4500); } }, 700);
+  showStart();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

@@ -70,7 +70,7 @@ function renderTrack() {
   for (var i = 0; i <= SW.TRACK; i++) { var rc = trackPos(i), cell = h('div.tc'); cell.dataset.i = i; cell.style.gridRow = rc[0] + 1; cell.style.gridColumn = rc[1] + 1;
     if (SW.BTN_SPOTS.indexOf(i) >= 0) { cell.classList.add('bspot'); cell.innerHTML = btnIc(); } else if (SW.LEATHER_SPOTS.indexOf(i) >= 0) { cell.classList.add('lspot'); var taken = G.leather[SW.LEATHER_SPOTS.indexOf(i)] !== null; cell.innerHTML = taken ? '<span style="opacity:.45">&#10003;</span>' : leaIc(); } else if (i === 0) cell.classList.add('tstart'); else if (i === 53) cell.classList.add('tend');
     if (rc[0] % 2) cell.classList.add('trv'); if (i < Math.min(G.pos[0], G.pos[1])) cell.classList.add('past'); t.appendChild(cell); }
-  artBg(t, 'track-frame'); t.style.backgroundSize = '100% 100%';
+  artBg(t, 'track-frame'); t.style.backgroundSize = 'cover';
   [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
   t.setAttribute('aria-label', 'Time track. ' + nameOf(0) + ' at ' + G.pos[0] + ' of 53, ' + nameOf(1) + ' at ' + G.pos[1] + '.');
   return t;
@@ -111,7 +111,7 @@ function renderDock() {
   off.forEach(function (pid, k) {
     var p = PATCHES[pid], aff = hum && !G.pend && G.btn[s] >= p.cost, fits = hum && !G.pend && swPlacements(G.board[s], p).length > 0, why = !hum ? '' : G.pend ? '' : !aff ? 'need ' + (p.cost - G.btn[s]) + ' more' : !fits ? 'no room' : '';
     var b = h('button.offer' + (UI.sel === k ? '.sel' : '') + (hum && !G.pend && (!aff || !fits) ? '.no.cant' : '') + (!hum ? '.no' : ''), { type: 'button', 'data-a': 'offer', 'data-k': k, 'data-why': why, 'aria-label': p.name + ': cost ' + p.cost + ' buttons, time ' + p.time + ', earns ' + p.inc + ' per button spot, ' + p.n + ' squares' });
-    if (artHas('ui-offer-card')) { artBg(b, 'ui-offer-card'); b.style.backgroundSize = '100% 100%'; b.style.borderColor = 'transparent'; }
+    if (artHas('ui-offer-card')) { artBg(b, 'ui-offer-card'); b.style.backgroundSize = 'cover'; b.style.borderColor = 'transparent'; }
     b.appendChild(patchShape(pid, '', p.n > 6 ? 12 : 14)); b.appendChild(h('div.meta', { html: facts(p) })); box.appendChild(b);
   });
   if (!off.length) box.appendChild(h('div', 'No patches left.'));

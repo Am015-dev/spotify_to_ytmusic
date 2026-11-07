@@ -12,7 +12,7 @@ function showStart(view) {
   m.appendChild(h('button.btn', { type: 'button', 'data-a': 'quick' }, 'Quick game', h('small', 'Against the computer or a friend on this screen')));
   if (typeof GXT !== 'undefined') { var w = h('div'); w.innerHTML = GXT.menuHTML({ game: 'stitchwise', first: firstTime(), cls: 'btn', launch: tutStart }); while (w.firstChild) m.appendChild(w.firstChild); }
   m.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'rules' }, 'How to play'));
-  card.appendChild(m); card.appendChild(h('p.sub', { style: 'margin-top:10px' }, 'Original game. Patches, names and art are our own.')); st.innerHTML = ''; st.appendChild(card);
+  card.appendChild(m); st.innerHTML = ''; st.appendChild(card);
   try { GX.showDock && 0; } catch (e) { }
 }
 function renderSetup(st) {
@@ -59,7 +59,7 @@ function buildRules() { var w = h('div', { html: rulesHtml() }); var rb = h('but
 function buildMenu() {
   var btn = function (txt, f, cls) { var b = h('button.btn.alt.sm' + (cls || ''), { type: 'button' }, txt); b.onclick = f; return b; };
   GX.settings({ id: 'setd', title: 'Menu',
-    game: function (S) { S.appendChild(GX.row('Game', [btn('Rules', function () { GX.show('rulesd'); }), btn('Tutorial', function () { GX.close(); tutStart(); }), btn('Restart', function () { var b = this; if (G && UI.started && !G.over && !UI.tutorial && !b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Tap again to restart'; setTimeout(function () { delete b.dataset.sure; b.textContent = 'Restart'; }, 3000); return; } restart(); }), btn('Title', function () { GX.close(); showStart(); })])); },
+    game: function (S) { S.appendChild(GX.row('This game', [btn('Rules', function () { GX.show('rulesd'); }), btn('Tutorial', function () { GX.close(); tutStart(); }), btn('Restart', function () { var b = this; if (G && UI.started && !G.over && !UI.tutorial && !b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Tap again to restart'; setTimeout(function () { delete b.dataset.sure; b.textContent = 'Restart'; }, 3000); return; } restart(); }), btn('Title', function () { GX.close(); showStart(); })])); },
     sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(UI.sound, function (v) { UI.sound = !!v; try { localStorage.setItem('sw_sound', v ? '1' : '0'); } catch (e) { } if (v) sfx('pick'); }))); if (window.SW_MUSIC && window.SW_MUSIC.length) S.appendChild(GX.row('Music', [btn('Music picker', function () { try { GXMUS.open(); } catch (e) { } })])); },
     help: function (S) { try { var w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) S.appendChild(w.firstChild); } catch (e) { } },
     about: { name: 'Stitchwise', version: '1.0', text: 'An original quilting duel. All names, patches and art are our own.' }, shelf: '../' });
