@@ -93,3 +93,4 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - 21:18 UTC owner: "More workers then" -> worker cap lifted for this round: 26 sessions. Every one of the 23 board games (Deep Signal dropped)
   has a worker on games-src/BRIEF-PLAYABLE.md (+ADDENDUM 1-3): W376 W378-W381 W383 (new, Opus), W386-W390 W392-W403 (old, Sonnet);
   W391 rules engine fixes for 9 games; W377 QA bot; W385 free CC0 art kit. Integrate only what passes qa-bot + rules + screenshot review.
+- Owner (7 Nov 21:25): "Less talking, more work. I have ADHD." Reports to the owner: max 3 short lines, results + links only.
