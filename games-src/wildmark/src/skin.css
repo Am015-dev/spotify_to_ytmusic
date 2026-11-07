@@ -210,8 +210,9 @@ html body .gx-set .gx-sec{scroll-margin-top:70px}   /* section titles land below
 #map .spot{fill:rgba(255,233,160,.22);stroke:#ffe9a0;stroke-width:3.5;stroke-dasharray:none}
 #map.dimtok .hx:not(.tgt){opacity:.4}
 #toast{max-width:min(92vw,520px);white-space:normal;text-align:center;line-height:1.3;background:#f6efdc;color:#1d2420}
-.howturn{background:rgba(243,234,210,.1);border:1px solid rgba(243,234,210,.25);border-radius:12px;padding:8px 12px;margin-bottom:12px}
+.howturn{background:rgba(0,0,0,.05);border-radius:12px;padding:8px 12px;margin-bottom:12px}
 .howturn ol{margin:4px 0 0;padding-left:20px}
-.howturn li{font-size:15px;line-height:1.35}
+.howturn li{font-size:16px;line-height:1.35}
 @media (max-width:999px){.cc svg{width:24px!important;height:24px!important}.cc b{font-size:15px}#toast{font-size:15px!important}#line{font-size:15px}}
-@media (min-width:1000px){#cards{right:auto}.cc{flex:0 0 auto;min-width:72px;padding:4px 8px}.cc i{font-size:14px}.mk i{font-size:14px}#line{left:50%;right:auto;transform:translateX(-50%);max-width:640px}}
+@media (min-width:1000px){#cards{right:auto}.cc{flex:0 0 auto;min-width:76px;padding:4px 8px}.cc i{font-size:16px}.mk i{font-size:16px}#line{left:50%;right:auto;transform:translateX(-50%);max-width:640px}}
+html body .gx-drawer{transition:none}   /* panels appear at once: no half-slid frame where text sits over the board */

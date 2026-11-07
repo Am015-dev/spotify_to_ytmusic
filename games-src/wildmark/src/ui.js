@@ -284,7 +284,7 @@ function lineText() {
   if (UI.showAI && UI.view === UI.showAI.seat) return G.seats[UI.view].name + "'s valley: " + UI.showAI.text.replace(/^\S+ /, '');
   if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
   if (s.ai) return s.name + ' is choosing';
-  if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Your turn: take a tile + animal from the market';
+  if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Your turn: pick a tile + animal from the market';
   if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Turn it if you like, then tap Place' : 'Tap Place to put the tile here') : 'Tap a glowing spot to place the tile';
   if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Put the ' + WM.ANI_NAME[G.hold.tok] + ' on a glowing tile, or Return it' : 'No tile shows a ' + WM.ANI_NAME[G.hold.tok] + ': tap Return';
   return '';
@@ -322,8 +322,7 @@ function cardsHTML() {
   WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(C.title) + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
   return h + '</div>';
 }
-var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one tile and the animal under it.</li><li>Tap a glowing spot to add the tile to your valley.</li><li>Put the animal on a tile that shows it (or return it).</li><li>Animals score by their card; joined terrain scores too.</li><li>After 20 turns the most points wins.</li></ol></div><h3>Goal</h3><p>Over 20 turns, grow a valley of habitat tiles and settle animals on them. Most points wins.</p>' +
-  '<h3>Your turn</h3><ol><li>Take one tile and the token under it from the market.</li><li>Place the tile next to your valley. Turn split tiles as you like.</li><li>Place the token on any empty tile that shows that animal, or return it.</li></ol>' +
+var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one tile and the animal under it.</li><li>Tap a glowing spot to add the tile to your valley.</li><li>Put the animal on a tile that shows it (or return it).</li><li>Animals score by their card; joined terrain scores too.</li><li>After 20 turns the most points wins.</li></ol></div>' +
   '<h3>Keystones and acorns</h3><p>Keystone tiles (gold rim) have one terrain. An animal on a keystone earns an acorn. Spend an acorn to take any tile with any token, or to replace any tokens in the market. Each acorn left is 1 point at the end.</p>' +
   '<h3>Crowded market</h3><p>Four matching tokens are replaced at once. With three matching tokens you may replace those three once per turn, for free.</p>' +
   '<h3>Scoring</h3><p>Each animal scores by its card (below). Each terrain scores 1 point per tile in your largest connected habitat of it (edges must match). The largest habitat of each terrain earns a bonus: 2 players 2 (tie 1), 3-4 players 3 for first and 1 for second. Solo: 2 for a habitat of 7+.</p>' +
@@ -448,7 +447,8 @@ document.addEventListener('click', function (e) {
 });
 document.addEventListener('keydown', function (e) { if (!G || !myTurn()) return; if (e.key === 'r' || e.key === 'R') rotate(); if (e.key === 'Enter' && UI.ghost) confirmPlace(); });
 function openCards() { GX.drawer('cardsd', 'Scoring cards', null, false); $('#cardsd .gx-drawer-body').innerHTML = cardsHTML(); artApply($('#cardsd')); GX.show('cardsd'); }
-function openRules() { var b = $('#rulesd .gx-drawer-body'); b.innerHTML = RULES_HTML + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); GX.show('rulesd'); }
+function fillRules() { var b = $('#rulesd .gx-drawer-body'); if (!b) return; b.innerHTML = RULES_HTML + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); }   // filled on every open (the drawer body is never empty, so an emptiness test left it blank)
+function openRules() { fillRules(); GX.show('rulesd'); }
 // ---------------------------------------------------------------- music (silent until files exist)
 function musicSync() { try { if (window.GXMUS) GXMUS.sync(); } catch (e) { } }
 // ---------------------------------------------------------------- boot
@@ -456,7 +456,7 @@ function boot() {
   GX.init({ key: 'wm' });
   var sb = document.createElement('div'); sb.id = 'scoresb'; GX.drawer('scored', 'Scores', sb, true);
   var rb = document.createElement('div'); GX.drawer('rulesd', 'How to play', rb, false);
-  GX.onShow = function (id) { if (id === 'scored') $('#scoresb').innerHTML = G ? scoresHTML() : '<p>No game yet.</p>'; if (id === 'rulesd' && !$('#rulesd .gx-drawer-body').innerHTML.trim()) openRules(); };
+  GX.onShow = function (id) { if (id === 'scored') $('#scoresb').innerHTML = G ? scoresHTML() : '<p>No game yet.</p>'; if (id === 'rulesd') fillRules(); };
   try {
     GX.settings({ id: 'setd', title: 'Menu',
       game: function (S) { var a = document.createElement('button'); a.type = 'button'; a.className = 'gx-sb'; a.textContent = 'Title screen'; a.onclick = function () { GX.close(); UI.sv = 'title'; showTitle(); }; var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'gx-sb'; b2.textContent = 'New game'; b2.onclick = function () { GX.close(); UI.sv = 'setup'; showTitle(); }; var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'gx-sb'; rs.textContent = 'Restart'; rs.onclick = function () { GX.close(); if (UI.mode === 'camp' && UI.camp) campStart(UI.camp); else if (UI.cfg && UI.mode === 'quick') newGame(Object.assign({}, UI.cfg, { seed: null })); else { UI.sv = 'setup'; showTitle(); } }; S.appendChild(GX.row('This game', [rs, b2, a])); },

@@ -12,7 +12,7 @@ Benchmarks: the old shelf games the owner likes (cauldron-fair, hollowbough) and
 3. **Plain table.** No busy picture behind the board: a dark neutral (slate) background so green or blue tiles never melt into it.
 4. **Every animal/token has its name.** Silhouette on a light disc, its name under it at >= 13px wherever the player chooses it
    (market) or reads its score (score chips). Results and score tables lead with the plain name ("Bear"), the card title is secondary.
-5. **One instruction bar, always visible, max 2 lines.** It says exactly what to do now, in verbs: "Your turn: take a tile + animal
+5. **One instruction bar, always visible, max 2 lines.** It says exactly what to do now, in verbs: "Your turn: pick a tile + animal
    from the market", "Tap a glowing spot to place the tile", "Put the Bear on a glowing tile, or Return it". Solid light backing.
 6. **Legal = glow, everything else = dim.** Spots: solid bright outline + soft fill (no dashed outlines). Token targets ring in gold
    and all other tiles drop to 40% opacity. Market pairs that can't be taken right now drop to 50%.
