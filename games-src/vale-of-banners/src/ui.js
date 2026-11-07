@@ -353,7 +353,7 @@ function tapMarket(d, k) {
   showTile(t, lg.length ? optionsFor(lg, 'Take to storage') : [], lg.length ? null : (myTurn() && !top ? (G.P[VB.actor(G)].store.length >= VB.cap(G.P[VB.actor(G)]) ? 'Storage is full: you would drop one. ' : '') + needNote(d, 'take') : null));
 }
 function tapBlack(k) {
-  var t = G.black[k]; if (!t) return; var ok = myTurn() && !pend() && VB.validMoves(G).some(function (m) { return m.k === 'buy' && m.slot === k; });
+  var t = G.black[k]; if (!t) return; if (!tutOk({ what: 'black', k: k })) return; var ok = myTurn() && !pend() && VB.validMoves(G).some(function (m) { return m.k === 'buy' && m.slot === k; });
   var p = G.P[VB.actor(G)] || me();
   showTile(t, ok ? [{ label: 'Buy for ' + VB.blackCost(p) + ' silver', fn: function () { doMove({ k: 'buy', slot: k }); } }] : [], ok ? 'The back lane needs no die. Once per turn.' : (p.bought ? 'You already bought this turn.' : 'Costs ' + VB.blackCost(p) + ' silver, once per turn, no die needed.'));
 }
@@ -434,7 +434,7 @@ function doMove(m) {
   if (UI.die != null && G.P[s].used[UI.die]) UI.die = null;
   UI.busy = true; UI.sel = null;
   if (m.k === 'place') { UI.chain = m.die === 'x' ? UI.chain + 1 : 1; } else if (m.k === 'end') UI.chain = 0;
-  try { if (UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.active()) GXT.act({ type: 'event', what: m.k }); } catch (e) { }
+  try { if (UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.active() && isHuman(s)) GXT.act({ type: 'event', what: m.k }); } catch (e) { }
   render();
   var chainNow = UI.chain;
   var seq = Promise.resolve();
@@ -633,19 +633,94 @@ function tutSetup() {
   G.bag.push(tl); p.store = [tl]; G.bag.pop();
   var sd = nb.num === 4 ? 2 : 4; G.depots[sd][0] = { id: 'tut2', t: 'mine' };
   p.dice = [sd, nb.num]; p.used = [false, false]; p.workers = 2;
-  G.order = [0, 1]; G.ti = 0; UI.tut = { stall: sd, cell: nb.i };
+  G.order = [0, 1]; G.ti = 0; UI.tut = { stall: sd, cell: nb.i, mc: 12 };
   G.bag = G.bag.filter(function (t) { return t.id !== 'tut1' && t.id !== 'tut2'; });
   render();
+}
+/* The tutorial is one real, short game (1 season = 5 rounds) against the real easy AI. Before each of your turns the table is
+   stacked (tiles moved between the bag and the stalls, your dice set) so every case comes up once. TUTORIAL-COVERAGE.md lists them. */
+function fromBag(f) { for (var i = 0; i < G.bag.length; i++) if (f(G.bag[i])) return G.bag.splice(i, 1)[0]; return null; }
+function putStall(d, k, f) { var t = fromBag(f); if (!t) return null; var old = G.depots[d][k]; if (old) G.bag.push(old); G.depots[d][k] = t; return t; }
+function adjTo(set, c) { return VB.CELLS[c].nb.some(function (n) { return set[n]; }); }
+function tutStack(n) {
+  var p = G.P[0], T = UI.tut; p.used = [false, false];
+  if (n === 2) { p.dice = [3, 5]; var kinds = Object.keys(p.goods).filter(function (g) { return +g !== 3; }).slice(0, 2), ng = { 3: 2 }; kinds.forEach(function (g) { ng[g] = p.goods[g]; }); p.goods = ng; }
+  if (n === 3) {
+    var land = {}; Object.keys(p.estate).forEach(function (k) { land[k] = 1; });
+    var kc = VB.placeTargets(p, { t: 'castle' }, 0)[0]; T.kc = kc; land[kc] = 1;
+    var hc = null, cc = null, cols = ['know', 'pas', 'ship'];
+    VB.placeTargets(Object.assign({}, p, { estate: Object.assign({}, p.estate, (function () { var o = {}; o[kc] = { t: 'castle' }; return o; })()) }), { t: 'bld', k: 'hall' }, 0).some(function (h1) {
+      var l2 = Object.assign({}, land); l2[h1] = 1;
+      for (var ci = 0; ci < cols.length; ci++) for (var i = 0; i < VB.CELLS.length; i++) { var c = VB.CELLS[i]; if (c.col === cols[ci] && !l2[i] && adjTo(l2, i) && c.num !== 2) { hc = h1; cc = i; return true; } }
+      return false; });
+    T.hc = hc; T.cc = cc; var kn = VB.CELLS[kc].num, x = kn === 1 ? 3 : 1; T.bend = x % 6 + 1; p.dice = [x, kn];
+    putStall(T.bend, 0, function (t) { return t.t === 'castle'; }); T.free = T.bend === 6 ? 5 : T.bend + 1;
+    putStall(T.free, 0, function (t) { return t.t === 'bld' && t.k === 'hall'; });
+    var col = VB.CELLS[cc].col; var bt = fromBag(function (t) { return t.t === col; }); if (bt) { if (G.black[0]) G.bag.push(G.black[0]); G.black[0] = bt; }
+    p.workers = Math.max(1, p.workers); p.silver = Math.max(2, p.silver); p.bought = false;
+  }
+  if (n === 4) { p.dice = [VB.CELLS[T.hc].num, VB.CELLS[T.mc].num]; }
+  if (n === 5) { p.dice = [4, 6]; putStall(4, 0, function (t) { return t.t === 'pas'; }); }
+  render();
+}
+function rivalThen(n) {   /* real rival turns (captions, banner), then stack your next turn */
+  return function () {
+    UI.tutAi = true;
+    return new Promise(function (res) {
+      schedule();
+      (function poll() {
+        if (!G || G.over) { UI.tutAi = false; res(); return; }
+        if (isHuman(VB.actor(G)) && !UI.busy) { UI.tutAi = false; if (n) tutStack(n); res(); return; }
+        setTimeout(poll, 250);
+      })();
+    });
+  };
 }
 function tutStart(o) {
   if (typeof GXT === 'undefined') return;
   $('#start').hidden = true;
-  GXT.start({ game: 'vale-of-banners', story: true, endTitle: 'You know the basics', endText: 'Take, build, end turn. Selling, workers and the back lane are in Rules and the hint bulb. Try a Quick game.', setup: tutSetup, steps: [
-    { id: 'take', title: 'Take a tile', say: 'Each die is one action. Tap the glowing tile: its stall number matches your first die.', target: function () { return $('#mt-' + UI.tut.stall + '-0'); }, wait: { type: 'tap', match: function (a) { return a.what === 'market' && a.d === UI.tut.stall; } } },
-    { id: 'take2', title: 'Into storage', say: 'Tap Take. The tile goes into your storage below.', target: function () { return $('#tv .btn'); }, wait: { type: 'event', match: function (a) { return a.what === 'take'; } } },
-    { id: 'pick', title: 'Build it', say: 'Tap the tile in your storage to build it with your other die.', target: function () { return $('#st-0'); }, wait: { type: 'tap', match: function (a) { return a.what === 'store'; } } },
-    { id: 'cell', title: 'Next to your land', say: 'Tap the glowing space: same colour, your die\'s number, touching your keep.', target: function () { return $('#ec-' + UI.tut.cell); }, wait: { type: 'tap', match: function (a) { return a.what === 'cell'; } } },
-    { id: 'end', title: 'End your turn', say: 'Both dice used. Tap End turn. Fill a whole colour region for big points.', target: function () { return $('#endB'); }, wait: { type: 'event', match: function (a) { return a.what === 'end'; } } }
+  var tapW = function (what, f) { return { type: 'tap', match: function (a) { return a.what === what && (!f || f(a)); } }; };
+  var ev = function (what) { return { type: 'event', match: function (a) { return a.what === what; } }; };
+  var tv = function () { return $('#tv .acts .btn'); }, my = function () { return myTurn(); };
+  var st = function (k) { return function () { return $('#st-' + k); }; }, ec = function (f) { return function () { return $('#ec-' + f()); }; };
+  GXT.start({ game: 'vale-of-banners', story: true, endTitle: 'You played a whole game', endText: 'Take, build, sell, workers, back lane, Keep, Moot Hall chain, Lore, Mine, regions and the final count. Now a real game.', setup: tutSetup, steps: [
+    /* Chapter 1: your first turn */
+    { id: 'hi', title: '1 · Your estate', say: 'Your home keep is in the middle. You start with 1 silver, some workers and 3 goods.', target: function () { return $('#ec-' + VB.HOME); }, wait: null },
+    { id: 'take', title: '1 · Take a tile', say: 'Each die is one action. Tap the glowing tile: its stall number matches your first die.', target: function () { return $('#mt-' + UI.tut.stall + '-0'); }, wait: tapW('market', function (a) { return a.d === UI.tut.stall; }) },
+    { id: 'take2', title: '1 · Into storage', say: 'Tap Take. The tile goes into your storage (3 spaces).', target: tv, wait: ev('take') },
+    { id: 'pick', title: '1 · Build it', say: 'Tap the Beacon Tower in your storage to build it with your other die.', target: st(0), wait: tapW('store') },
+    { id: 'cell', title: '1 · Next to your land', say: 'Tap the glowing space: same colour, your die\'s number, touching your keep. Beacon: +4 points.', target: ec(function () { return UI.tut.cell; }), wait: tapW('cell') },
+    { id: 'end', title: '1 · End your turn', say: 'Both dice used. Tap End turn. Then watch the rival play.', target: function () { return $('#endB'); }, wait: ev('end') },
+    /* Chapter 2: rival turn, goods and workers */
+    { id: 'white', title: '2 · Goods', say: 'Turn order follows the banner track. The white die put this round\'s goods on its stall.', target: function () { return $('#dicerow .die.white'); }, wait: null, ai: rivalThen(2), ready: my, pending: 'Odo is playing: watch the captions' },
+    { id: 'sell', title: '2 · Sell goods', say: 'You hold two goods marked 3 and rolled a 3. Tap them. (You keep at most 3 kinds.)', target: function () { return $('#gd-3'); }, wait: tapW('goods') },
+    { id: 'sell2', title: '2 · Sell', say: 'Tap Sell: 2 points per tile and 1 silver.', target: tv, wait: ev('sell') },
+    { id: 'wk', title: '2 · Workers', say: 'Any die can take 2 workers. Tap +2 workers.', target: function () { return $('#wk1'); }, wait: ev('workers') },
+    { id: 'end2', title: '2 · End turn', say: 'Tap End turn.', target: function () { return $('#endB'); }, wait: ev('end') },
+    /* Chapter 3: special tiles and actions */
+    { id: 'bend', title: '3 · Bend a die', say: 'Each worker turns a die up or down by 1 (6 and 1 touch). Tap the Keep marked with a worker.', target: function () { return $('#mt-' + UI.tut.bend + '-0'); }, wait: tapW('market'), ai: rivalThen(3), ready: my, pending: 'Odo is playing: watch the captions' },
+    { id: 'bend2', title: '3 · Pay a worker', say: 'Tap Take: one worker bends your die to match.', target: tv, wait: ev('take') },
+    { id: 'keep', title: '3 · A Keep', say: 'Tap the Keep in your storage.', target: st(1), wait: tapW('store') },
+    { id: 'keepc', title: '3 · Build the Keep', say: 'Tap the glowing space. A Keep gives one free extra action.', target: ec(function () { return UI.tut.kc; }), wait: tapW('cell') },
+    { id: 'free', title: '3 · Free action', say: 'Free action, any number: tap the Moot Hall in the market.', target: function () { return $('#mt-' + UI.tut.free + '-0'); }, wait: tapW('market') },
+    { id: 'free2', title: '3 · Take it free', say: 'Tap Take it.', target: tv, wait: ev('take') },
+    { id: 'buy', title: '3 · Back lane', say: 'Once per turn you may buy a back-lane tile for 2 silver, no die needed. Tap it.', target: function () { return $('#bl-0'); }, wait: tapW('black') },
+    { id: 'buy2', title: '3 · Buy', say: 'Tap Buy.', target: tv, wait: ev('buy') },
+    { id: 'end3', title: '3 · End turn', say: 'Tap End turn.', target: function () { return $('#endB'); }, wait: ev('end') },
+    /* Chapter 4: chains and scoring */
+    { id: 'hall', title: '4 · Moot Hall', say: 'Buildings act at once; never two of a kind in one quarter. Tap the Moot Hall.', target: st(1), wait: tapW('store'), ai: rivalThen(4), ready: my, pending: 'Odo is playing: watch the captions' },
+    { id: 'hallc', title: '4 · Build it', say: 'Tap the glowing space. Moot Hall: build again at once, any number.', target: ec(function () { return UI.tut.hc; }), wait: tapW('cell') },
+    { id: 'chain', title: '4 · Chain', say: 'Tap the tile you bought.', target: st(1), wait: tapW('store') },
+    { id: 'chainc', title: '4 · Free build', say: 'Tap the glowing space. Lore bends one rule for you for the rest of the game.', target: ec(function () { return UI.tut.cc; }), wait: tapW('cell') },
+    { id: 'mine', title: '4 · A Mine', say: 'Tap the Mine. Mines pay 1 silver at every season end.', target: st(0), wait: tapW('store') },
+    { id: 'minec', title: '4 · Fill a region', say: 'Tap the space. It fills a whole region: size points + the season bonus.', target: ec(function () { return UI.tut.mc; }), wait: tapW('cell') },
+    { id: 'end4', title: '4 · End turn', say: 'Tap End turn.', target: function () { return $('#endB'); }, wait: ev('end') },
+    /* Chapter 5: the last round and the end */
+    { id: 'pas', title: '5 · Pasture', say: 'Pastures score every animal of that kind in the meadow. Tap it.', target: function () { return $('#mt-4-0'); }, wait: tapW('market'), ai: rivalThen(5), ready: my, pending: 'Odo is playing: watch the captions' },
+    { id: 'pas2', title: '5 · Take', say: 'Tap Take. (A full storage makes you drop a tile.)', target: tv, wait: ev('take') },
+    { id: 'wk5', title: '5 · Workers', say: 'Tap +2 workers. At the end every 2 workers are a point.', target: function () { return $('#wk1'); }, wait: ev('workers') },
+    { id: 'end5', title: '5 · Last turn', say: 'Tap End turn. The season ends: mines pay, then the final count.', target: function () { return $('#endB'); }, wait: ev('end') },
+    { id: 'result', title: '5 · Final count', say: '+1 per silver, per goods, per 2 workers, Lore. Tie: fuller estate, then further back.', target: function () { return $('#rs .card'); }, wait: null, ai: rivalThen(0), ready: function () { return !!G && G.over && !$('#rs').hidden; }, pending: 'The season ends...' }
   ], onDone: function (r) {
     UI.mode = 'quick'; try { GXT.markDone('vale-of-banners'); } catch (e) { }
     if (r && r.choice === 'story') storyOpen(); else { UI.lastOpts = { n: 2, ai: 'easy' }; startGame(UI.lastOpts); }
