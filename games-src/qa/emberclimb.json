@@ -1,0 +1,161 @@
+{
+ "slug": "emberclimb",
+ "size": "phone",
+ "seed": 27157,
+ "when": "2026-11-07T21:00Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 1
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 601
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 382
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.chip.tap \"☰\" / button.x \"✕\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.chip.tap \"☰\" under button.x \"✕\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button#end.btn \"End turn\" under div.rules \"Walk up the map. Glowing\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "text 7.0px (<12px) in span.cl x12: \"Deal 6.\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #601 (How to play)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 601 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-quick-noresult-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.alt \"How to play\" / button.gxc-node.a3.locked \"7 🔒 Wraith Stair\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-story-map-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn.alt \"How to play\" / button.gxc-node.a3.locked \"7 🔒 Wraith Stair\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#mute.chip.tap \"🔊\" / button.gxc-btn.go \"Play\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gxc-node.a3.locked \"7 🔒 Wraith Stair\" / button.gxc-btn.go \"Play\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "text 7.0px (<12px) in span.cl x11: \"Deal 6.\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.chip.tap \"☰\" / button.x \"✕\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button.chip.tap \"☰\" under button.x \"✕\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button#end.btn \"End turn\" under div.grid \"Cinder Strike 1 ⚔6 Deal \"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #382 (Start)",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 382 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-story-noresult-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.chip.tap \"☰\" / button.x \"✕\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.chip.tap \"☰\" under button.x \"✕\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button#end.btn \"End turn\" under div.grid",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/emberclimb/phone-screen-fuzz-screen-18.png"
+  }
+ ],
+ "secs": 324,
+ "tutorialIn": {}
+}

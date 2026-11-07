@@ -39,7 +39,7 @@ function refreshInsp() {
     L.forEach(m => { if (m.t === 'boon' && m.k === I.x) add(m, 'Use the boon (free)'); });
   } else if (I.kind === 'idol') {
     const d = me.idols[I.x], id = V.IDOL[d.id];
-    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end, in a shrine or not. Set it in a shrine for a one-time boon now. One idol per turn, ${V.SLOTS} shrine slots.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
+    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end, in a shrine or not. Set it in a shrine for a one-time boon now: it fills your next empty shrine slot, which then loses its ${V.IDOL_SLOT_VP[me.idols.filter(d => d.used).length] || 0} point(s). One idol per turn, ${V.SLOTS} shrine slots.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
     L.forEach(m => { if (m.t === 'idol' && m.k === I.x) add(m, 'Shrine: ' + V.SHRINE[m.sh].text, ''); });
   }
   $('#insp').innerHTML = `<button type="button" class="ix" data-a="ix" aria-label="Close">×</button>` + h + (btns.length ? `<div class="ibtns">${btns.join('')}</div>` : '');
@@ -71,15 +71,16 @@ const UIACT = {};
 function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; return GXT.act(Object.assign({ type: 'tap' }, x)); }
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
-  if (!G) return; const s = VG.actor(G), r = VG.apply(G, m);
+  if (!G) return; const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
   if (!r.ok) { toast('That move is not allowed now.'); render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
   const delay = showEvents(s);
-  save(); render();
-  UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.min(delay, 900));
+  save(); render(); actFx(m, s, from, html, b);
+  if (!UI.fast && m.t !== 'ans' && !m.free) $('#prompt').textContent = moveCaption(m, s);
+  UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(650, Math.min(delay, 1200)));
 }
 function after() {
-  if (!G) return; render(); if (typeof myTurn === 'function' && myTurn() && !$('#fx').hidden) fxHide();
+  if (!G) return; render(); turnBanner(); if (typeof myTurn === 'function' && myTurn() && !$('#fx').hidden) fxHide();
   if (G.phase === 'over') { clearSave(); setTimeout(showResult, UI.fast ? 0 : 900); return; }
   const s = VG.actor(G);
   if (!isHuman(s)) { schedule(); return; }
@@ -92,12 +93,85 @@ function schedule() {
 }
 function aiStep() {
   if (!G || G.phase !== 'play') return; const s = VG.actor(G); if (isHuman(s)) return;
-  const m = (UI.mode === 'tutorial' && tutAI(s)) || VAI.choose(G, G.p[s].ai || 'normal');
-  const r = m ? VG.apply(G, m) : { ok: false };
-  if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); }
-  const d = showEvents(s); if (G.log.length && !d) toast(G.log[G.log.length - 1].t, 1600);
-  save(); render();
-  UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(d, 200));
+  const m = (UI.mode === 'tutorial' && tutAI(s)) || VAI.choose(G, G.p[s].ai || 'normal') || VG.moves(G).find(x => x.t === 'pass'), g0 = G;
+  const cap = m ? moveCaption(m, s) : '', el0 = m ? moveEl(m, s) : null;
+  UI.busy = true;
+  if (!UI.fast) { $('#docktitle').textContent = who(s) + '’s turn'; $('#prompt').textContent = cap; if (el0) el0.classList.add('aimark'); }
+  turnWait(UI.fast ? 0 : 900, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
+    if (G !== g0 || G.phase !== 'play' || VG.actor(G) !== s) { UI.busy = false; return; }
+    const b = snapS(s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '';
+    const r = m ? VG.apply(G, m) : { ok: false };
+    if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); }
+    const d = showEvents(s); save(); render();
+    if (!UI.fast) { $('#docktitle').textContent = who(s) + '’s turn'; $('#prompt').textContent = cap; actFx(m, s, from, html, b); }
+    turnWait(UI.fast ? 0 : Math.max(d, 1000), () => { UI.busy = false; after(); });   /* step 2: the result stays readable before the next step */
+  });
+}
+// ---------------------------------------------------------------- turn presentation (W378): banner, caption, target pulse, fly, score pop; tap to speed up
+function who(s) { return s === -2 ? (G.rival ? G.rival.name : 'Rival') : G.p[s].name; }
+function short(s) { const n = who(s); return n === 'You' ? 'You' : n.split(' ')[0]; }
+function moveEl(m, s) {
+  if (!m || !G) return null;
+  if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) return $(`.site[data-i="${m.s}"]`);
+  if (m.t === 'buy') return $(`#row .cd[data-r="${m.r}"]`);
+  if (m.t === 'res' || m.t === 'temple') return $('#track');
+  if (m.t === 'play' && s === UI.view) return $(`#hand .cd[data-i="${m.i}"]`);
+  if (s >= 0) return $('#opp').children[s] || null;
+  return null;
+}
+function moveCaption(m, s) {
+  const n = short(s), you = n === 'You', v = (a, b) => you ? a : b, p = s >= 0 ? G.p[s] : null;
+  switch (m.t) {
+    case 'play': { const c = p && V.CARDS[p.hand[m.i]]; return c ? `${n} ${v('play', 'plays')} ${c.name}. ${c.t === 'fear' ? '' : c.text}` : `${n} ${v('play', 'plays')} a card.`; }
+    case 'dig': return `${n} ${v('send', 'sends')} an explorer to ${siteName(G.sites[m.s])} to dig.`;
+    case 'disc': return `${n} ${v('explore', 'explores')} a hidden ruin!`;
+    case 'beat': return `${n} ${v('fight', 'fights')} the guardian at ${siteName(G.sites[m.s])}.`;
+    case 'buy': return `${n} ${v('buy', 'buys')} ${V.CARDS[G.row[m.r]].name} from the market.`;
+    case 'res': return `${n} ${v('climb', 'climbs')} the research track.`;
+    case 'temple': return `${n} ${v('take', 'takes')} a temple tile.`;
+    case 'pass': return `${n} ${v('pass', 'passes')}: done for this round.`;
+    case 'boon': return `${n} ${v('use', 'uses')} a guardian boon.`;
+    case 'idol': return `${n} ${v('set', 'sets')} an idol in a shrine.`;
+    default: return `${n} ${v('make', 'makes')} a choice.`;
+  }
+}
+function snapS(s) { if (!G || s < 0 || !G.p[s]) return null; const p = G.p[s]; return { res: Object.assign({}, p.res), sc: VG.score(G, s) }; }
+const SC_WHY = { research: 'research', temple: 'temple tile', idols: 'idol', slots: 'shrine slot', guards: 'guardian', cards: 'card points', fear: 'Dread card' };
+function diffText(s, b) {
+  if (!b || !G || s < 0) return null; const a = snapS(s), res = [];
+  V.RES.forEach(k => { const d = a.res[k] - b.res[k]; if (d) res.push((d > 0 ? '+' : '') + d + ' ' + V.RNAME[k] + (Math.abs(d) === 1 ? '' : 's')); });
+  const dv = a.sc.total - b.sc.total, why = Object.keys(SC_WHY).filter(k => a.sc[k] !== b.sc[k]).map(k => SC_WHY[k]);
+  return { vp: dv ? (dv > 0 ? '+' : '') + dv + (Math.abs(dv) === 1 ? ' point' : ' points') + (why.length ? ': ' + why.join(', ') : '') : '', res: res.slice(0, 3).join('  '), neg: dv < 0 };
+}
+function popAt(rect, t) {
+  if (!rect || !t || (!t.vp && !t.res)) return; const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : ''); e.setAttribute('aria-live', 'polite');
+  e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
+  document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
+  e.style.left = x + 'px'; e.style.top = y + 'px'; setTimeout(() => e.remove(), 1700);
+}
+function fly(from, html, to) {   /* a card glides from where it was to where it goes (380 ms) */
+  if (!from || !html || !to || reducedMo()) return; const g = document.createElement('div'); g.className = 'flyc'; g.innerHTML = html; const c = g.firstElementChild; if (!c) return;
+  g.style.cssText = `left:${from.left}px;top:${from.top}px;width:${from.width}px;height:${from.height}px`; c.style.width = '100%'; c.style.height = '100%'; c.classList.remove('glow', 'aimark'); document.body.appendChild(g);
+  const dx = to.left + to.width / 2 - (from.left + from.width / 2), dy = to.top + to.height / 2 - (from.top + from.height / 2);
+  try { g.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: `translate(${dx}px,${dy}px) scale(.45)`, opacity: .2 }], { duration: 380, easing: 'cubic-bezier(.4,.1,.3,1)', fill: 'forwards' }); } catch (x) { }
+  setTimeout(() => g.remove(), 420);
+}
+function reducedMo() { return document.documentElement.classList.contains('gx-reduce') || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
+function actFx(m, s, from, html, b) {   /* after a move: animate it, then pop what it gave */
+  if (UI.fast || !G || !m) return; const el = moveEl(m, s), tr = el && el.getBoundingClientRect();
+  if (m.t === 'buy' || m.t === 'play') { const dest = s === UI.view && m.t === 'buy' ? $('#hand') : s === UI.view ? $('#map') : $('#opp').children[s]; fly(from, html, dest && dest.getBoundingClientRect()); }
+  if (el && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat' || m.t === 'res' || m.t === 'temple')) { el.classList.remove('landed'); void el.offsetWidth; el.classList.add('landed'); }
+  const at = (m.t === 'play' || m.t === 'buy') ? (s === UI.view ? $('#myres') : $('#opp').children[s]) : el;
+  setTimeout(() => popAt((at && at.getBoundingClientRect()) || tr || from, diffText(s, b)), 260);
+}
+function turnWait(ms, fn) { clearTimeout(turnWait.t); turnWait.fn = fn; turnWait.t = setTimeout(() => { turnWait.fn = null; fn(); }, ms); }
+function speedUp() { if (!turnWait.fn || !G || myTurn()) return; const f = turnWait.fn; turnWait.fn = null; clearTimeout(turnWait.t); f(); }
+document.addEventListener('pointerdown', e => { if (turnWait.fn && G && !myTurn() && !(e.target.closest && e.target.closest('.gx-drawer,.gx-scrim,#insp,.gx-bar,.gxt-top,.gxt-end'))) speedUp(); }, true);
+function turnBanner() {
+  if (!G || G.phase !== 'play' || UI.fast) return; const s = VG.actor(G); if (s === UI.bannerFor) return; UI.bannerFor = s; if (s === -1) return;
+  const mine = isHuman(s), b = $('#tbanner'); if (!b) return;
+  b.textContent = mine ? (UI.humans.length > 1 ? who(s) + ', your turn' : 'Your turn') : who(s) + '’s turn'; b.className = 'on' + (mine ? ' me' : '');
+  clearTimeout(turnBanner.t); turnBanner.t = setTimeout(() => { b.className = ''; }, 1100);
 }
 // ---------------------------------------------------------------- events: the discovery, the guardian, the boon
 function showEvents(s) {
