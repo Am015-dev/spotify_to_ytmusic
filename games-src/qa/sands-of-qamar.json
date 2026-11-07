@@ -2,22 +2,19 @@
  "slug": "sands-of-qamar",
  "size": "phone",
  "seed": 20445,
- "when": "2026-11-07T22:32Z",
+ "when": "2026-11-07T23:04Z",
  "tutorial": {
-  "end": true,
-  "endButtons": 2
+  "end": null,
+  "note": "no tutorial"
  },
  "quick": {
   "result": "cap",
-  "clicks": 1080
+  "clicks": 1039
  },
  "story": {
-  "result": "cap",
-  "clicks": 552
+  "result": null
  },
- "fuzz": {
-  "taps": 300
- },
+ "fuzz": {},
  "bugs": [
   {
    "sev": "MINOR",
@@ -52,84 +49,12 @@
    "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-1.png"
   },
   {
-   "sev": "MINOR",
+   "sev": "MAJOR",
    "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "element outside viewport button.gx-ibtn x1 rect 358,5,400,39: \"\"",
+   "where": "title",
+   "desc": "no tutorial entry on the title screen (no learn/guided/tutorial button): game has no staged tutorial",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "tap target 34px (<40) button.gx-ibtn.gxh-bulb x1: \"Hint\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "tap target 16px (<40) i.mp x74: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "tap target 30px (<40) button.dcard x2: \"Wazira\n6\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "tap target 30px (<40) button.dcard.newc x1: \"Wahha\n8\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "overlapping clickables: div.tile.red.k-small \"🧺 Stall 6\" / button.gxt-b.pri \"Play a real game\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "overlapping clickables: i.mp / button.gxt-b.pri \"Play a real game\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "overlapping clickables: div.tile.blue.k-sacred \"🕌 Shrine 6\" / button.gxt-b.pri \"Play a real game\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "overlapping clickables: div.tile.blue.k-village \"🏘️ Hamlet 5 🐪 🏰\" / button.gxt-b.pri \"Play a real game\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases tutorial",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-tutorial-end-2.png"
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-tut-noentry-2.png"
   },
   {
    "sev": "MINOR",
@@ -175,7 +100,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 16px (<40) i.mp x87: \"\"",
+   "desc": "tap target 16px (<40) i.mp x84: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
    "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
   },
@@ -191,7 +116,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 30px (<40) button.dcard x3: \"Khanjar\n6\"",
+   "desc": "tap target 30px (<40) button.dcard x2: \"Nuraya\n6\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
    "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-4.png"
   },
@@ -199,7 +124,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 16px (<40) i.mp x89: \"\"",
+   "desc": "tap target 16px (<40) i.mp x83: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
    "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-5.png"
   },
@@ -207,15 +132,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 16px (<40) i.mp.h x1: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-5.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 16px (<40) i.mp x88: \"\"",
+   "desc": "tap target 16px (<40) i.mp x79: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
    "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-6.png"
   },
@@ -223,243 +140,42 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "text 11.0px (<12px) in span.pp x1: \"🔮1\"",
+   "desc": "tap target 13px (<40) i.mp.h x2: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 16px (<40) i.mp x77: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
    "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-7.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick click #1080 (🔮)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 1080 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "where": "quick-board",
+   "desc": "tap target 16px (<40) i.mp.h x2: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 30px (<40) button.dcard.newc x1: \"Jamal\n4\"",
+   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
+   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #1039 (i.mp)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1039 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases quick",
    "shot": "/tmp/qa-shots/sands-of-qamar/phone-quick-noresult-8.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "tap target 16px (<40) i.mp x90: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "tap target 30px (<40) button.dcard x3: \"Nakhla\n8\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "tap target 34px (<40) button.sp-b.glow x7: \"18🪙\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-map-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "element outside viewport button.gx-ibtn x1 rect 358,5,400,39: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp x74: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 30px (<40) button.dcard x2: \"Wazira\n6\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 30px (<40) button.dcard.newc x1: \"Wahha\n8\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp x87: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp.h x3: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 30px (<40) button.dcard x3: \"Ghulam\n8\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-11.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp x89: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-12.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp.h x1: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-12.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 16px (<40) i.mp x88: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-story-board-13.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story click #552 (i.mp)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 552 clicks (state kept changing)",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases story",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-story-noresult-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-15.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "tap target 26px (<40) i.ri x1: \"📜\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-15.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "tap target 13px (<40) input x4: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-15.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Djinns (help)\" under div#modal \"Sands of Qamar Lead the \"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-title-15.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 34px (<40) button.gx-ibtn x3: \"Djinns (help)\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 26px (<40) i.ri x1: \"📜\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 13px (<40) input x2: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Djinns (help)\" under div#modal \"Sands of Qamar Lead the \"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 16px (<40) i.mp x90: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 30px (<40) button.dcard x3: \"Nakhla\n8\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 34px (<40) button.sp-b.glow x7: \"18🪙\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 34px (<40) button.sp-b.glow x5: \"18🪙\"",
-   "repro": "node games-src/scripts/qa-bot.js sands-of-qamar --size phone --seed 20445 --phases fuzz",
-   "shot": "/tmp/qa-shots/sands-of-qamar/phone-screen-fuzz-screen-19.png"
   }
  ],
- "secs": 458,
- "tutorialIn": {}
+ "secs": 232
 }

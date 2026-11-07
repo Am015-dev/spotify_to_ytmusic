@@ -1,6 +1,9 @@
 // ===================== part 2: input, moves, the animated power chain, computer turns, hot-seat, save =====================
 var SAVE_KEY = 'pp-save';
 function tutGate(a) { return typeof tutAct === 'function' ? tutAct(a) : true; }
+document.addEventListener('click', function (e) {   // a tap while the rival plays speeds its steps up (x3) until your next turn
+  if (G && G.phase === 'play' && !isHuman(PP.sideToAct(G)) && humans().length) UI.speed = 3;
+}, true);
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return;
   var a = t.dataset.a, s = +t.dataset.s, h = +t.dataset.h, c = +t.dataset.c, i = +t.dataset.i;
@@ -97,19 +100,20 @@ function playFx(list, actor) {
   list.forEach(function (e) {
     chain = chain.then(function () {
       var mine = e.seat === view;
+      try { coachFx(e, mine); } catch (er) { }
       switch (e.k) {
         case 'action': {
           sfx('act');
           if (mine) { var b = $('.ract[data-h="' + e.h + '"]'); if (b) { b.classList.add('fire'); setTimeout(function () { b.classList.remove('fire'); }, 700); } return wait(aMs(300)); }
           var o = $('.opp[data-s="' + e.seat + '"]'); if (o) o.classList.add('pulse');
-          toast(G.pl[e.seat].name + ': ' + (e.h === 0 ? 'gains food' : e.h === 1 ? 'lays eggs' : 'draws cards') + ' (+' + e.n + ')', 1800);
-          return wait(aMs(500)).then(function () { if (o) o.classList.remove('pulse'); });
+          caption(G.pl[e.seat].name + ' uses the ' + HABN[e.h] + ': ' + (e.h === 0 ? '+' + e.n + ' food' : e.h === 1 ? '+' + e.n + (e.n === 1 ? ' egg' : ' eggs') : '+' + e.n + (e.n === 1 ? ' card' : ' cards')));
+          return wait(aMs(850)).then(function () { if (o) o.classList.remove('pulse'); });
         }
         case 'chainStart': {
-          if (!mine || e.n < 1) { if (e.n >= 2 && !mine) toast(G.pl[e.seat].name + "'s " + HABN[e.h] + ': ' + e.n + ' birds fire', 1800); return; }
+          if (!mine || e.n < 1) { if (e.n >= 2 && !mine) { caption(G.pl[e.seat].name + "'s " + HABN[e.h] + ': ' + e.n + ' birds use their powers'); return wait(aMs(700)); } return; }
           var row = $('.row[data-h="' + e.h + '"]');
           if (row && !UI.fast) { var rr = row.getBoundingClientRect(), d = document.createElement('div'); d.className = 'chainline'; d.style.cssText = 'left:' + rr.left + 'px;top:' + rr.top + 'px;width:' + rr.width + 'px;height:' + rr.height + 'px'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1250); }
-          if (e.n >= 2) toast(e.n + ' birds fire, right to left!', 1600);
+          if (e.n >= 1) caption('Your ' + HABN[e.h] + ' birds use their powers, right to left');
           return wait(aMs(350));
         }
         case 'pw': {
@@ -117,23 +121,25 @@ function playFx(list, actor) {
           if (el && mine) { el.classList.remove('firing'); void el.offsetWidth; el.classList.add('firing'); }
           sfx(e.pink ? 'pink' : 'chirp');
           popAt(el, (e.pink ? 'Between turns: ' : '') + (mine ? '' : B[e.id].n + ': ') + e.txt);
-          return wait(aMs(mine ? 700 : 320));
+          if (!mine) caption(G.pl[e.seat].name + "'s " + B[e.id].n + ': ' + e.txt);
+          return wait(aMs(mine ? 750 : 700));
         }
         case 'pwAsk': { var el2 = slotEl(e.seat, e.h, e.c); if (el2 && mine) el2.classList.add('firing'); return wait(aMs(250)); }
         case 'play': {
           sfx('play');
-          if (mine) { var s2 = slotEl(e.seat, e.h, e.c); popAt(s2, B[e.id].p + ' points'); return wait(aMs(450)); }
-          toast(G.pl[e.seat].name + ' plays ' + B[e.id].n + ' (' + HABN[e.h] + ')', 2200); return wait(aMs(500));
+          if (mine) { var s2 = slotEl(e.seat, e.h, e.c); if (s2) s2.classList.add('landed'); popAt(s2, '+' + B[e.id].p + (B[e.id].p === 1 ? ' point: ' : ' points: ') + B[e.id].n); return wait(aMs(650)); }
+          caption(G.pl[e.seat].name + ' plays ' + B[e.id].n + ' in the ' + HABN[e.h] + ' (+' + B[e.id].p + ')');
+          return reveal(e.id, G.pl[e.seat].name + ' plays', e.seat);
         }
-        case 'food': if (mine && e.die == null) popAt($('#foodrow'), '+' + e.n + ' ' + e.f); return wait(aMs(e.die != null ? 120 : 0));
-        case 'egg': if (mine) { popAt(slotEl(e.seat, e.h, e.c), '+1 egg'); sfx('egg'); } return wait(aMs(120));
+        case 'food': if (mine) popAt($('#foodrow'), '+' + (e.n || 1) + ' ' + e.f); else if (e.die != null) caption(G.pl[e.seat].name + ' takes ' + e.f + ' from the feeder'); return wait(aMs(e.die != null ? (mine ? 300 : 650) : 0));
+        case 'egg': if (mine) { popAt(slotEl(e.seat, e.h, e.c), '+1 egg = +1 point'); sfx('egg'); } return wait(aMs(mine ? 300 : 200));
         case 'roll': sfx('dice'); $$('.die').forEach(function (d) { d.classList.add('firing'); }); return wait(aMs(250));
         case 'goal': {
           var res = e.res, txt = 'Round ' + (e.r + 1) + ' goal (' + PP.GOL[res.gid].n + '): ' + res.pts.map(function (v, i) { return G.pl[i].name + ' ' + v; }).join(', ');
           toast(txt, 3600); sfx('goal'); return wait(aMs(900));
         }
         case 'round': toast('Round ' + (e.r + 1) + ': ' + G.cubes[e.r] + ' actions each. Goal: ' + PP.GOL[G.goals[e.r]].n, 3200); return wait(aMs(500));
-        case 'auto': { var o2 = $('.opp[data-s="' + e.seat + '"]'); if (o2) o2.classList.add('pulse'); toast(G.pl[e.seat].name + ' ' + e.txt, 2000); return wait(aMs(600)).then(function () { if (o2) o2.classList.remove('pulse'); }); }
+        case 'auto': { var o2 = $('.opp[data-s="' + e.seat + '"]'); if (o2) o2.classList.add('pulse'); caption(G.pl[e.seat].name + ' ' + e.txt); return wait(aMs(850)).then(function () { if (o2) o2.classList.remove('pulse'); }); }
         case 'bonusTrade': return;
         case 'over': return;
       }
@@ -142,13 +148,39 @@ function playFx(list, actor) {
   return chain;
 }
 // ---------------- the turn engine: computer moves, hot-seat hand-over, game over
-function aiDelay() { if (UI.fast) return 30; try { return GX.aiDelay ? GX.aiDelay(650) : 650; } catch (e) { return 650; } }
+function aiDelay() { if (UI.fast) return 30; var sp = UI.speed || 1; try { return Math.round((GX.aiDelay ? GX.aiDelay(850) : 850) / sp); } catch (e) { return 850; } }
+// one plain line saying what is happening now (rival steps), shown in the instruction bar and as a pill over the board
+function caption(t) { UI.cap = t; var p = $('#prompt'); if (p) p.textContent = t; if (!UI.fast) toast(t, Math.round(1700 / (UI.speed || 1))); }
+function dropEl(x) { if (x && x.parentNode) x.parentNode.removeChild(x); }
+// "Your turn" / "<Rival>'s turn" banner; the turn waits for it (~1 s), a tap skips it
+function turnBanner(s) {
+  if (UI.fast) { pump(); return; }
+  var me = isHuman(s), solo = humans().length <= 1, nm = me ? (solo ? 'Your turn' : G.pl[s].name + "'s turn") : G.pl[s].name + "'s turn";
+  $$('.turnban').forEach(dropEl);
+  var d = document.createElement('div'); d.className = 'turnban ' + (me ? 'me' : 'rv'); d.setAttribute('data-volatile', ''); d.setAttribute('role', 'status');
+  d.innerHTML = '<b>' + esc(nm) + '</b><span>' + esc(me ? G.pl[s].cubes + (G.pl[s].cubes === 1 ? ' action' : ' actions') + ' left this round' : 'Watch each step. Tap to speed up.') + '</span>';
+  document.body.appendChild(d); UI.busy = true;
+  UI.cap = me ? null : G.pl[s].name + ' is choosing an action.'; render();
+  var done = false, fin = function () { if (done) return; done = true; dropEl(d); UI.busy = false; pump(); };
+  d.addEventListener('click', fin);
+  var t = setTimeout(fin, aMs(me ? 950 : 1000)); UI.timers.push(t);
+}
+// the rival's played bird is shown large for a moment, then shrinks away
+function reveal(id, label, seat) {
+  if (UI.fast) return Promise.resolve();
+  var d = document.createElement('div'); d.className = 'reveal'; d.setAttribute('data-volatile', '');
+  d.innerHTML = '<div class="rvl">' + esc(label) + '</div>' + cardHTML(id, 'hand', null, '');
+  document.body.appendChild(d);
+  return wait(aMs(1100)).then(function () { d.classList.add('out'); return wait(aMs(350)); }).then(function () { dropEl(d); });
+}
 function pump() {
   clearTimeout(UI.pumpT);
   if (!G || UI.busy) return;
   if (G.phase === 'over') { gameOver(); return; }
   var s = PP.sideToAct(G);
   if (G.phase === 'setup') { if (isHuman(s)) { if (humans().length > 1 && s !== UI.view) { askPass(s, function () { showKeep(s); }); return; } UI.view = s; showKeep(s); return; } apply(PPAI.setup(G, s), s); return; }
+  var tk = s + ':' + G.round + ':' + G.pl[s].cubes;
+  if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; if (!isHuman(s)) UI.speed = 1; turnBanner(s); return; }
   if (isHuman(s)) {
     if (s !== UI.view) { if (humans().length > 1) { askPass(s, function () { UI.view = s; render(); }); return; } UI.view = s; }
     render(); try { GX.showDock(); } catch (e) { } return;
@@ -167,13 +199,13 @@ function askPass(s, then) { hideHelp();
   $('#passgo').onclick = function () { el.hidden = true; UI.passing = false; UI.view = s; then(); render(); };
 }
 function save() {
-  if (!G || UI.mode === 'tutorial' || (window.GXS && GXS.on)) return;
+  if (!G || UI.mode === 'tutorial' || UI.mode === 'tutfree' || (window.GXS && GXS.on)) return;
   try { localStorage.setItem(SAVE_KEY, JSON.stringify({ G: G, mode: UI.mode, camp: UI.camp ? UI.camp.id : null })); } catch (e) { }
   try { if (window.GNS) GNS.saved('perch-and-plume', G.phase !== 'over'); } catch (e) { }
 }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } try { if (window.GNS) GNS.saved('perch-and-plume', false); } catch (e) { } }
 function loadSave() { try { var s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); return s && s.G && s.G.phase !== 'over' && !s.camp ? s : null; } catch (e) { return null; } }
-function stopTimers() { clearTimeout(UI.pumpT); UI.timers.forEach(clearTimeout); UI.timers = []; UI.busy = false; }
+function stopTimers() { try { coachHide(); COACH.on = false; } catch (e) { } $$('.turnban,.reveal').forEach(dropEl); UI.turnKey = null; clearTimeout(UI.pumpT); UI.timers.forEach(clearTimeout); UI.timers = []; UI.busy = false; }
 // ---------------- start a game
 // o: {seats:[{name,kind,lvl}], mode, seed, twist, camp, hands, cubes, rounds, tutorial}
 function startGame(o) {

@@ -12,12 +12,15 @@
   "clicks": 1108
  },
  "quick": {
-  "result": null
+  "result": "cap",
+  "clicks": 611
  },
  "story": {
-  "result": null
+  "result": false
  },
- "fuzz": {},
+ "fuzz": {
+  "taps": 300
+ },
  "bugs": [
   {
    "sev": "MINOR",
@@ -82,7 +85,215 @@
    "desc": "coached game: GXCOACH.done never became true within 360 s (1108 clicks, 0 rules explained)",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases tutorial",
    "shot": "/tmp/qa-shots/short-fuse/phone-coach-notdone-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-title-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "tap target 34px (<40) summary x1: \"More\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-title-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-quick-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) summary x1: \"More\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-quick-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "text 11.2px (<12px) in em.nt x1: \"≠2\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-quick-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 36px (<40) button.chip.sm x2: \"Twin Probe\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-quick-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 36px (<40) button.chip.sm x1: \"Twin Probe\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-quick-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #611 (Wire C)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 611 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
+   "shot": "/tmp/qa-shots/short-fuse/phone-quick-noresult-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 9.0px (<12px) in span.en x1: \"Rewind\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-story-map-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 9.0px (<12px) in span.nd x1: \"2×2\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-story-map-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-story-map-13.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "story map",
+   "desc": "no stage 1 / start element on the Story map",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
+   "shot": "/tmp/qa-shots/short-fuse/phone-story-nomap-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "tap target 34px (<40) summary x1: \"More\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 9.0px (<12px) in span.en x1: \"Rewind\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 9.0px (<12px) in span.nd x1: \"2×2\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 38px (<40) button.gx-ibtn x4: \"Job card\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 8.8px (<12px) in em.nt x1: \"≠1\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.8px (<12px) in div.es x1: \"TOOL READY\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 8.8px (<12px) in em.nt x2: \"≠3\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) button.chip.sm x1: \"Twin Probe\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.jc.mk \"1.1 5.1\" / button#musbtn.btn \"Music off\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.tile.crew.back \"4\" / button.btn.small \"Pick songs\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.tile.crew.back \"Wire C\" / button.btn.small \"Pick songs\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.tile.crew.back \"Wire E\" / button.btn.small.on \"Very fast\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.tile.crew.back \"Wire B\" / button.btn.small \"Restart\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
+   "shot": "/tmp/qa-shots/short-fuse/phone-screen-fuzz-screen-19.png"
   }
  ],
- "secs": 364
+ "secs": 646
 }
