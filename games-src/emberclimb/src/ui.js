@@ -225,7 +225,7 @@
       else b.disabled = true;
       m.appendChild(b);
     });
-    var QI = (window.EC_STORY || {}).quick; if (QI && !UI.camp && g.at < 0 && !(window.GXT && GXT.active())) m.appendChild(h('div', 'storyline top', QI.intro[Math.abs(g.seed | 0) % QI.intro.length]));
+    var QI = (window.EC_STORY || {}).quick; if (QI && !UI.camp && g.at < 0 && !(window.GXT && GXT.active()) && UI.qIntro !== g.seed && UI.say) { UI.qIntro = g.seed; setTimeout(function () { UI.say(QI.intro[Math.abs(g.seed | 0) % QI.intro.length], 4200); }, 200); }
     app.appendChild(m);
   }
   // ---------- battle
