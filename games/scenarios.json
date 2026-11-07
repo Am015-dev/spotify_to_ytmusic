@@ -163,6 +163,80 @@
    "mut": 0
   }
  ],
+ "deep-signal": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ds-board",
+   "name": "Dive: hand, crew, tasks",
+   "ask": "Can you see your hand and crew?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "ds-play",
+   "name": "Play a glowing card",
+   "ask": "Tap a glowing card: does it play?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "ds-zoom",
+   "name": "Zoom a card",
+   "ask": "Tap a dim card: does it show large?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "ds-help",
+   "name": "Rules drawer",
+   "ask": "Do the rules read clearly?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ds-signal",
+   "name": "Send a signal",
+   "ask": "Signal, then tap a white card",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "ds-stamp",
+   "name": "Mission complete stamp",
+   "ask": "Does the stamp show clearly?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ds-result",
+   "name": "Result screen",
+   "ask": "Can you start the next mission?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
  "doorkick-dungeon": [
   {
    "id": "menu",
