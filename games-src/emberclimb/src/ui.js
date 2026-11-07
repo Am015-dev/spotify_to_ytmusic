@@ -42,12 +42,12 @@
     q.forEach(function (f) {
       var el = document.querySelector('[data-w="' + f.w + '"]');
       switch (f.k) {
-        case 'dmg': fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : String(f.n), 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
-        case 'hitme': popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n, 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
+        case 'dmg': fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hit'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : String(f.n), 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
+        case 'hitme': if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hurt'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n, 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
         case 'hp': break;
-        case 'blk': fxAt(f.w, 'fx-block-burst'); popAt(f.w, '+' + f.n + ' Blk', 'blk'); break;
-        case 'heal': fxAt(f.w, 'fx-heal-sparkle'); popAt(f.w, '+' + f.n, 'heal'); break;
-        case 'buff': popAt(f.w, f.x === 'str' ? '+' + f.n + ' Str' : f.x === 'nrg' ? '+' + f.n + ' Energy' : 'Power!', 'buf'); break;
+        case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); popAt(f.w, '+' + f.n + ' Blk', 'blk'); break;
+        case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); popAt(f.w, '+' + f.n, 'heal'); break;
+        case 'buff': if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX('buff'); popAt(f.w, f.x === 'str' ? '+' + f.n + ' Str' : f.x === 'nrg' ? '+' + f.n + ' Energy' : 'Power!', 'buf'); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
         case 'die': if (window.ANIM) { var d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
         case 'act': if (f.x === 'atk' && el && window.ANIM) { el.classList.add('lunge'); setTimeout(function () { el.classList.remove('lunge'); }, 480); } break;
@@ -58,6 +58,26 @@
     });
   }
   // ---------- card element
+  // the one number that matters on a card (shown big on the picture): damage, block or poison
+  function keyNum(e) {
+    var o = e.ops || [], i, k;
+    for (i = 0; i < o.length; i++) { k = o[i][0];
+      if (k === 'dmg' || k === 'all' || k === 'dmgx') return ['a', '⚔' + o[i][1]];
+      if (k === 'hit') return ['a', '⚔' + o[i][1] + '×' + o[i][2]];
+      if (k === 'blk') return ['b', '🛡' + o[i][1]];
+      if (k === 'poison' || k === 'poisonAll') return ['p', '☠' + o[i][1]];
+      if (k === 'shiv') return ['a', '🗡×' + o[i][1]]; }
+    return null;
+  }
+  // tap-hold on a hand card (about 0.45 s) shows the whole card big; the click that follows is swallowed
+  function holdPeek(el, c) {
+    var t = 0, x0 = 0, y0 = 0;
+    function stop() { if (t) { clearTimeout(t); t = 0; } }
+    el.addEventListener('pointerdown', function (ev) { x0 = ev.clientX; y0 = ev.clientY; stop(); t = setTimeout(function () { t = 0; UI.peeked = Date.now(); var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); var close = function (e2) { if (e2) { e2.stopPropagation(); } pk.remove(); }; pk.addEventListener('pointerdown', close); document.body.appendChild(pk); }, 450); });
+    el.addEventListener('pointermove', function (ev) { if (Math.abs(ev.clientX - x0) + Math.abs(ev.clientY - y0) > 12) stop(); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { el.addEventListener(n, stop); });
+    el.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
+  }
   function cardEl(c, o) {
     o = o || {}; var e = E.eff(c), d = D.CARDS[c.id];
     var el = h('div', 'card t-' + e.type + (d.rar === 'r' ? ' rare' : d.rar === 'u' ? ' unc' : ''));
@@ -65,6 +85,7 @@
     var ct = h('div', 'ct', e.name);
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
+    var kk = keyNum(e); if (kk) el.appendChild(h('div', 'ck k-' + kk[0], kk[1]));
     var cb = h('div', 'cb'); E.lines(e).forEach(function (l) { cb.appendChild(h('span', 'cl', l)); }); el.appendChild(cb);
     el.appendChild(A('gem-' + ({ s: 'common', c: 'common', u: 'uncommon', r: 'rare', z: 'common', k: 'common' })[d.rar], '', { cls: 'cfr', noph: 1 }));
     return el;
@@ -76,9 +97,13 @@
     if (g.scr === 'map') mapScr(); else if (g.scr === 'battle') battle(); else if (g.scr === 'reward') reward();
     else if (g.scr === 'rest') rest(); else if (g.scr === 'shop') shop(); else if (g.scr === 'event') event(); else if (g.scr === 'over') over();
     if (UI.ov) overlay();
-    E.save(); drain();
+    if (UI.lastScr !== g.scr) { if (g.scr === 'reward' || (g.scr === 'over' && g.won)) SFX('win'); else if (g.scr === 'over') SFX('lose'); UI.lastScr = g.scr; }
+    if (!window.EC_NOSAVE) E.save(); drain(); try { if (window.GXMUS) GXMUS.sync(); } catch (e) { }
   }
   UI.render = render;
+  function tutOk(a) { try { return !(window.GXT && GXT.active()) || GXT.act(a); } catch (e) { return true; } }
+  function muteBtn() { var b = on(h('button', 'chip tap', SND.on ? '🔊' : '🔇'), function () { SND.toggle(); render(); }); b.setAttribute('aria-label', SND.on ? 'Sound on: tap to mute' : 'Sound off: tap to unmute'); b.id = 'mute'; return b; }
+  function tutBtn() { try { var first = !GXT.status('emberclimb').seen && !localStorage.getItem('emberclimb.save'); var w = h('div'); w.innerHTML = GXT.menuHTML({ game: 'emberclimb', first: first, cls: 'btn alt', launch: function () { UI.ov = null; UI.tutStart(); } }); return w.firstChild; } catch (e) { return null; } }
   function title() {
     var s = h('div'); s.id = 'title';
     s.appendChild(A('bg-title', '', { cls: 'bg', kind: 'bg' }));
@@ -92,10 +117,10 @@
     });
     var mid = h('div', '', null, [hs, h('div', 'refline', D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
-    var row = h('div', 'row'); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
+    var row = h('div', 'row'); var tb = tutBtn(); if (tb) row.appendChild(tb); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
     var sv = null; try { sv = localStorage.getItem('emberclimb.save'); } catch (e) { }
     if (sv) { var ct = on(h('button', 'btn alt', 'Continue'), function () { if (E.load()) { UI.mode = 'game'; render(); resume(); } }); row.appendChild(ct); }
-    row.appendChild(on(h('button', 'btn alt', 'Rules'), function () { UI.ov = 'rules'; render(); }));
+    row.appendChild(on(h('button', 'btn alt', 'Rules'), function () { UI.ov = 'rules'; render(); })); row.appendChild(muteBtn());
     var wrap = h('div', '', null, [h('div', 'refline', UI.pick.length > 1 ? 'Two heroes, shared map. Pass the screen.' : 'Pick 1 hero, or 2 to play together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
     s.appendChild(wrap); app.appendChild(s);
     if (UI.ov) overlay();
@@ -113,6 +138,7 @@
     t.appendChild(p);
     t.appendChild(on(h('button', 'chip tap', '🎒 ' + g.relics.length), function () { UI.ov = 'relics'; render(); }));
     t.appendChild(on(h('button', 'chip tap', '🂠 ' + g.hs.reduce(function (a, x) { return a + x.deck.length; }, 0)), function () { UI.ov = 'deck'; render(); }));
+    t.appendChild(muteBtn());
     if (extra) t.appendChild(extra);
     return t;
   }
@@ -196,13 +222,14 @@
     } else ctl.appendChild(h('span', 'chip', 'Enemies act...'));
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
-    if (nn > 6) hand.style.setProperty('--cw', 'min(clamp(58px,min(17vw,15.5vh),124px),' + Math.floor(92 / nn * 1.15 * 3.6) / 3.6 + 'vw)');
+    if (nn > 6) hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor(92 / nn * 1.15 * 3.6) / 3.6 + 'vw)');
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), el = cardEl(c); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
-      el.setAttribute('data-c', i); on(el, function () { onCard(i); }); hand.appendChild(el);
+      el.setAttribute('data-c', i); holdPeek(el, c); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
     });
     st.appendChild(hand);
     app.appendChild(st);
+    var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }
   }
   function beginBattleUI() { UI.sel = -1; render(); }
   function flyCard(ci, ti, done) {
@@ -215,6 +242,7 @@
   }
   function onCard(i) {
     var g = G(); if (g.b.ph !== 'p' || UI.busy) return; var cur = g.hs[g.b.cur], c = cur.hand[i];
+    if (!tutOk({ type: 'tap', w: 'card', id: c.id })) return;
     if (!(E.canPlay(cur, c) && (E.eff(c).cost === 'X' || E.cost(cur, c) <= cur.en))) { UI.sel = i; render(); toast(E.eff(c).fl.indexOf('u') >= 0 ? 'Cannot play' : 'Not enough energy'); UI.sel = -1; return; }
     if (UI.sel !== i) { UI.sel = i; render(); return; }
     var al = g.b.en.map(function (e, k) { return e.dead ? -1 : k; }).filter(function (k) { return k >= 0; });
@@ -224,7 +252,7 @@
   function onEnemy(i) { var g = G(); if (g.b.ph === 'p' && UI.sel >= 0 && needTarget()) playIt(UI.sel, i); }
   function playIt(ci, ti) {
     var g = G(), mv = { t: 'play', h: g.b.cur, c: ci }; if (ti != null) mv.e = ti;
-    UI.busy = true; flyCard(ci, ti, function () {
+    SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
       UI.busy = false; UI.sel = -1; E.performMove(mv); render(); afterMove();
     });
   }
@@ -237,7 +265,7 @@
     render();
   }
   function endTurn() {
-    var g = G(); if (g.scr !== 'battle' || g.b.ph !== 'p' || UI.busy) return; UI.sel = -1;
+    var g = G(); if (g.scr !== 'battle' || g.b.ph !== 'p' || UI.busy) return; if (!tutOk({ type: 'tap', w: 'end' })) return; UI.sel = -1;
     E.performMove({ t: 'end' }); render();
     if (G().scr === 'battle' && G().b.ph === 'e') enemyPhase(); else render();
   }
@@ -262,7 +290,7 @@
     Object.keys(r.cards).forEach(function (hi) {
       if (r.took['c' + hi]) return; if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
       else s.appendChild(h('div', 'sub', 'Add one card to your deck'));
-      var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); on(c, function () { E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
+      var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
       s.appendChild(on(h('button', 'btn alt', 'Skip'), function () { E.performMove({ t: 'skip', h: +hi }); render(); }));
     });
     var lv = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); lv.id = 'leave'; s.appendChild(lv);
@@ -321,6 +349,7 @@
       ov = h('div', 'ov'); ov.appendChild(h('h2', '', 'How to climb', [on(h('button', 'x', '✕'), close)]));
       var r = h('div', 'rules');
       ['Walk up the map. Glowing rooms are your next step.', 'Fights: you draw 5 cards and have 3 energy each turn.', 'Tap a card once to lift it, again to play it. Pick a target if asked.', 'Enemies show what they will do next. Block cancels attacks.', 'Vulnerable: takes 50% more. Weak: deals 25% less. Poison: lose HP each turn.', 'Dice cards roll a d6: 1-2 low, 3-4 middle, 5-6 high result.', 'After a fight pick 1 of 3 new cards, or skip to keep your deck lean.', 'Campfires heal or upgrade a card. Shops sell cards, relics and potions.', 'Beat the boss at the top to win. Two heroes share the map and take turns.'].forEach(function (t) { r.appendChild(h('p', '', t)); });
+      var tb2 = tutBtn(); if (tb2) { tb2.style.margin = '10px 0'; r.appendChild(tb2); }
       ov.appendChild(r);
     } else if (UI.ov === 'relics') {
       ov = h('div', 'ov'); ov.appendChild(h('h2', '', 'Relics', [on(h('button', 'x', '✕'), close)]));
@@ -340,5 +369,6 @@
   window.EC_FORCE_END = function () { var g = G(); if (!g) return; if (g.b) { g.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; }); } };
   window.EC_WIN_FIGHT = function () { var g = G(); g.b.en.forEach(function (e) { e.hp = 1; }); };
   window.EC_FORCE_RESULT = function (won) { var g = G(); g.scr = 'over'; g.won = won ? 1 : 0; g.b = null; render(); };
+  UI.start = start;
   UI.mode = 'title'; render();
 })();

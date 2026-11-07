@@ -151,7 +151,7 @@
     if (e.dead) return;
     var d = dmgNum(h, base, card); if (st(e, 'vuln') > 0) d = Math.floor(d * 1.5); d = Math.max(0, d);
     var a = Math.min(e.blk, d); e.blk -= a; var real = d - a;
-    fx('dmg', 'e' + G.b.en.indexOf(e), d, a > 0 && real === 0 ? 'blocked' : '');
+    fx('dmg', 'e' + G.b.en.indexOf(e), d, a > 0 && real === 0 ? 'blocked' : (st(h, 'str') > 0 ? 'str' : ''));
     if (real > 0) {
       e.hp -= real; e.asleep = 0;
       if (h.pw.envenom) addSt(e, 'poison', h.pw.envenom);
@@ -243,6 +243,7 @@
     if (has('spark-core') && !G.hs.some(function (h) { return h.k === 'a'; })) { /* only the Automaton benefits */ }
     G.b.en.forEach(function (e) { if (has('bag-of-marbles')) addSt(e, 'vuln', 1); plan(e); });
     beginRound();
+    G.hs.forEach(function (h) { if (!h.dead && h.k === 'm' && has('prayer-beads')) h.hand.push(mk('calm-spark')); });
   }
   function beginRound() {
     G.b.turn++; G.b.ph = 'p'; G.b.cur = -1;
@@ -273,7 +274,7 @@
     var held = h.hand.length, keep = [];
     h.hand.forEach(function (c) {
       var fl = D.CARDS[c.id].fl;
-      if (fl.indexOf('b') >= 0) hurtHero(h, 2, true);
+      if (fl.indexOf('b') >= 0) { fx('hitme', 'h' + hi, 2, 'burn'); hurtHero(h, 2, true); }
       if (fl.indexOf('r') >= 0) hurtHero(h, held, true);
       if (fl.indexOf('d') >= 0) addSt(h, 'weak', 1);
       if (fl.indexOf('e') >= 0) h.exh.push(c); else h.disc.push(c);
@@ -315,7 +316,7 @@
         if (h.dead) break;
         var dm = it.atk + st(e, 'str'); if (st(e, 'weak') > 0) dm = Math.floor(dm * 0.75);
         if (st(h, 'vuln') > 0) dm = Math.floor(dm * 1.5); if (h.stance === 'w') dm *= 2; dm = Math.max(0, dm);
-        var a = Math.min(h.blk, dm); fx('hitme', 'h' + G.hs.indexOf(h), dm, a === dm ? 'blocked' : '');
+        var a = Math.min(h.blk, dm); fx('hitme', 'h' + G.hs.indexOf(h), dm, a === dm ? 'blocked' : (st(e, 'str') > 0 ? 'str' : ''));
         hurtHero(h, dm);
       }
     }

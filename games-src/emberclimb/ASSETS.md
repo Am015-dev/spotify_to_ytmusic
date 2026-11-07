@@ -8,12 +8,11 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 - Backgrounds are 9:16 and centre-cropped on wide screens. Keep the centre calm.
 
 ## Drop files in (3 steps, see PLAYBOOK "Finished pictures from the owner")
-1. Flow prompt files: `games-src/next-wave/flow-2d/emberclimb/prompts-wave<N>-ratio-<A>x<B>.json`; one file per wave and ratio, every stem is in exactly one file. Owner's step list: `games-src/next-wave/NEW-GAMES-WAVES.md`. Key the white background to transparent where `alpha` is true (ingest does it), save as `<stem>.webp` or `.png`.
+1. Generate a wave in Google Flow from the prompts file, key the white background to transparent where `alpha` is true, save as `<stem>.webp`.
 2. Put the files in `assets-inbox/emberclimb/` and run `python3 games-src/scripts/ingest-assets.py` (`--check` first = dry run).
 3. Tell the orchestrator; it runs the build-all deploy. The placeholders stay as fallback.
 
-
-## Wave 1 (first minute): 28 pictures
+## Wave 1 (54 pictures)
 
 | stem | kind | size | ratio | alpha | slot |
 |---|---|---|---|---|---|
@@ -27,26 +26,52 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | frame-attack | ui | 500x700 | 5:7 | yes | Overlay on every attack card (window: upper half, y 14%-53%) |
 | frame-skill | ui | 500x700 | 5:7 | yes | Overlay on every skill card (window: upper half, y 14%-53%) |
 | frame-power | ui | 500x700 | 5:7 | yes | Overlay on every power card (window: upper half, y 14%-53%) |
+| frame-status | ui | 500x700 | 5:7 | yes | Overlay on every status card (window: upper half, y 14%-53%) |
 | gem-common | ui | 500x700 | 5:7 | yes | Rarity badge overlay at the card bottom centre (common) |
+| gem-uncommon | ui | 500x700 | 5:7 | yes | Rarity badge overlay at the card bottom centre (uncommon) |
+| gem-rare | ui | 500x700 | 5:7 | yes | Rarity badge overlay at the card bottom centre (rare) |
 | card-back | card | 500x700 | 5:7 | no | Draw pile icon, card back |
 | w-strike | card | 512x384 | 4:3 | no | Card art window (Cinder Strike, warrior) |
 | w-defend | card | 512x384 | 4:3 | no | Card art window (Plate Guard, warrior) |
+| w-hammer | card | 512x384 | 4:3 | no | Card art window (Anvil Blow, warrior) |
 | s-strike | card | 512x384 | 4:3 | no | Card art window (Quick Cut, rogue) |
 | s-defend | card | 512x384 | 4:3 | no | Card art window (Cloak Guard, rogue) |
+| s-pinprick | card | 512x384 | 4:3 | no | Card art window (Pinprick, rogue) |
+| s-slip-away | card | 512x384 | 4:3 | no | Card art window (Slip Away, rogue) |
 | a-strike | card | 512x384 | 4:3 | no | Card art window (Piston Jab, automaton) |
 | a-defend | card | 512x384 | 4:3 | no | Card art window (Plating Shift, automaton) |
+| a-zap | card | 512x384 | 4:3 | no | Card art window (Spark Up, automaton) |
+| a-dualcast | card | 512x384 | 4:3 | no | Card art window (Twin Pulse, automaton) |
 | m-strike | card | 512x384 | 4:3 | no | Card art window (Open Palm, monk) |
 | m-defend | card | 512x384 | 4:3 | no | Card art window (Guarded Stance, monk) |
+| m-eruption | card | 512x384 | 4:3 | no | Card art window (Wrath Eruption, monk) |
+| m-vigilance | card | 512x384 | 4:3 | no | Card art window (Quiet Vigil, monk) |
+| shiv | card | 512x384 | 4:3 | no | Card art window (Shiv, status) |
 | enemy-mire-slug | portrait | 768x768 | 1:1 | yes | Battle enemy: Mire Slug |
 | enemy-gnawer | portrait | 768x768 | 1:1 | yes | Battle enemy: Gnawer |
+| enemy-hex-acolyte | portrait | 768x768 | 1:1 | yes | Battle enemy: Hex Acolyte |
+| enemy-gape-grub | portrait | 768x768 | 1:1 | yes | Battle enemy: Gape Grub |
+| enemy-rust-tick | portrait | 768x768 | 1:1 | yes | Battle enemy: Rust Tick |
+| relic-ember-brand | token | 256x256 | 1:1 | yes | Relic icon: Ember Brand |
+| relic-whetstone-ring | token | 256x256 | 1:1 | yes | Relic icon: Whetstone Ring |
+| relic-spark-core | token | 256x256 | 1:1 | yes | Relic icon: Spark Core |
+| relic-prayer-beads | token | 256x256 | 1:1 | yes | Relic icon: Prayer Beads |
 | node-monster | token | 256x256 | 1:1 | yes | Map node icon |
+| node-elite | token | 256x256 | 1:1 | yes | Map node icon |
 | node-rest | token | 256x256 | 1:1 | yes | Map node icon |
 | node-shop | token | 256x256 | 1:1 | yes | Map node icon |
+| node-event | token | 256x256 | 1:1 | yes | Map node icon |
+| node-treasure | token | 256x256 | 1:1 | yes | Map node icon |
+| node-boss | token | 256x256 | 1:1 | yes | Map node icon |
 | intent-attack | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
+| intent-attack-big | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
 | intent-defend | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
+| intent-buff | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
+| intent-debuff | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
+| intent-sleep | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
 | icon-energy | ui | 256x256 | 1:1 | yes | Energy orb behind the number |
 
-## Wave 2 (every remaining rules piece): 179 pictures
+## Wave 2 (154 pictures)
 
 | stem | kind | size | ratio | alpha | slot |
 |---|---|---|---|---|---|
@@ -60,10 +85,6 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | bg-rest | bg | 1080x1920 | 9:16 | no | Campfire screen |
 | bg-shop | bg | 1080x1920 | 9:16 | no | Shop screen |
 | bg-event | bg | 1080x1920 | 9:16 | no | Event screen |
-| frame-status | ui | 500x700 | 5:7 | yes | Overlay on every status card (window: upper half, y 14%-53%) |
-| gem-uncommon | ui | 500x700 | 5:7 | yes | Rarity badge overlay at the card bottom centre (uncommon) |
-| gem-rare | ui | 500x700 | 5:7 | yes | Rarity badge overlay at the card bottom centre (rare) |
-| w-hammer | card | 512x384 | 4:3 | no | Card art window (Anvil Blow, warrior) |
 | w-cleave | card | 512x384 | 4:3 | no | Card art window (Sweeping Arc, warrior) |
 | w-twin-slash | card | 512x384 | 4:3 | no | Card art window (Twin Slash, warrior) |
 | w-warm-up | card | 512x384 | 4:3 | no | Card art window (Warm Up, warrior) |
@@ -85,8 +106,6 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | w-colossus-slam | card | 512x384 | 4:3 | no | Card art window (Colossus Slam, warrior) |
 | w-double-down | card | 512x384 | 4:3 | no | Card art window (Double Down, warrior) |
 | w-final-gambit | card | 512x384 | 4:3 | no | Card art window (Final Gambit, warrior) |
-| s-pinprick | card | 512x384 | 4:3 | no | Card art window (Pinprick, rogue) |
-| s-slip-away | card | 512x384 | 4:3 | no | Card art window (Slip Away, rogue) |
 | s-blade-fan | card | 512x384 | 4:3 | no | Card art window (Blade Fan, rogue) |
 | s-toxic-vial | card | 512x384 | 4:3 | no | Card art window (Toxic Vial, rogue) |
 | s-quick-stab | card | 512x384 | 4:3 | no | Card art window (Gutter Stab, rogue) |
@@ -107,8 +126,6 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | s-afterimage | card | 512x384 | 4:3 | no | Card art window (Afterimage, rogue) |
 | s-final-flourish | card | 512x384 | 4:3 | no | Card art window (Final Flourish, rogue) |
 | s-plague-doctor | card | 512x384 | 4:3 | no | Card art window (Plague Brew, rogue) |
-| a-zap | card | 512x384 | 4:3 | no | Card art window (Spark Up, automaton) |
-| a-dualcast | card | 512x384 | 4:3 | no | Card art window (Twin Pulse, automaton) |
 | a-ball-lightning | card | 512x384 | 4:3 | no | Card art window (Ball Lightning, automaton) |
 | a-cool-circuit | card | 512x384 | 4:3 | no | Card art window (Cool Circuit, automaton) |
 | a-charge-up | card | 512x384 | 4:3 | no | Card art window (Charge Up, automaton) |
@@ -129,8 +146,6 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | a-meteor-strike | card | 512x384 | 4:3 | no | Card art window (Meteor Strike, automaton) |
 | a-hyperbeam | card | 512x384 | 4:3 | no | Card art window (Hyperbeam, automaton) |
 | a-reactor | card | 512x384 | 4:3 | no | Card art window (Mini Reactor, automaton) |
-| m-eruption | card | 512x384 | 4:3 | no | Card art window (Wrath Eruption, monk) |
-| m-vigilance | card | 512x384 | 4:3 | no | Card art window (Quiet Vigil, monk) |
 | m-palm-flurry | card | 512x384 | 4:3 | no | Card art window (Palm Flurry, monk) |
 | m-crush-joints | card | 512x384 | 4:3 | no | Card art window (Crush Joints, monk) |
 | m-pressure-point | card | 512x384 | 4:3 | no | Card art window (Pressure Point, monk) |
@@ -163,10 +178,7 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | regret | card | 512x384 | 4:3 | no | Card art window (Regret, curse) |
 | doubt | card | 512x384 | 4:3 | no | Card art window (Doubt, curse) |
 | injury | card | 512x384 | 4:3 | no | Card art window (Lingering Injury, curse) |
-| shiv | card | 512x384 | 4:3 | no | Card art window (Shiv, status) |
-| enemy-hex-acolyte | portrait | 768x768 | 1:1 | yes | Battle enemy: Hex Acolyte |
-| enemy-gape-grub | portrait | 768x768 | 1:1 | yes | Battle enemy: Gape Grub |
-| enemy-rust-tick | portrait | 768x768 | 1:1 | yes | Battle enemy: Rust Tick |
+| calm-spark | card | 512x384 | 4:3 | no | Card art window (Calm Spark, status) |
 | enemy-bile-blob | portrait | 768x768 | 1:1 | yes | Battle enemy: Bile Blob |
 | enemy-snare-vine | portrait | 768x768 | 1:1 | yes | Battle enemy: Snare Vine |
 | enemy-ash-imp | portrait | 768x768 | 1:1 | yes | Battle enemy: Ash Imp |
@@ -176,10 +188,6 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | enemy-mire-behemoth | portrait | 768x768 | 1:1 | yes | Battle enemy: Mire Behemoth (boss) |
 | enemy-ashen-wraith | portrait | 768x768 | 1:1 | yes | Battle enemy: Ashen Wraith (boss) |
 | enemy-gate-colossus | portrait | 768x768 | 1:1 | yes | Battle enemy: Gate Colossus (boss) |
-| relic-ember-brand | token | 256x256 | 1:1 | yes | Relic icon: Ember Brand |
-| relic-whetstone-ring | token | 256x256 | 1:1 | yes | Relic icon: Whetstone Ring |
-| relic-spark-core | token | 256x256 | 1:1 | yes | Relic icon: Spark Core |
-| relic-prayer-beads | token | 256x256 | 1:1 | yes | Relic icon: Prayer Beads |
 | relic-lucky-coin | token | 256x256 | 1:1 | yes | Relic icon: Lucky Coin |
 | relic-iron-bangle | token | 256x256 | 1:1 | yes | Relic icon: Iron Bangle |
 | relic-lantern | token | 256x256 | 1:1 | yes | Relic icon: Tin Lantern |
@@ -210,14 +218,6 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | event-stranded-caravan | card | 512x384 | 4:3 | no | Event screen picture: Stranded Caravan |
 | event-mirror-pool | card | 512x384 | 4:3 | no | Event screen picture: Mirror Pool |
 | event-back-alley-gambler | card | 512x384 | 4:3 | no | Event screen picture: Back Alley Gambler |
-| node-elite | token | 256x256 | 1:1 | yes | Map node icon |
-| node-event | token | 256x256 | 1:1 | yes | Map node icon |
-| node-treasure | token | 256x256 | 1:1 | yes | Map node icon |
-| node-boss | token | 256x256 | 1:1 | yes | Map node icon |
-| intent-attack-big | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
-| intent-buff | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
-| intent-debuff | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
-| intent-sleep | icon | 128x128 | 1:1 | yes | Enemy intent bubble |
 | st-str | icon | 128x128 | 1:1 | yes | Status chip icon |
 | st-vuln | icon | 128x128 | 1:1 | yes | Status chip icon |
 | st-weak | icon | 128x128 | 1:1 | yes | Status chip icon |
@@ -230,7 +230,7 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | stance-c | icon | 128x128 | 1:1 | yes | Monk stance badge |
 | icon-remove | icon | 128x128 | 1:1 | yes | Shop: remove a card |
 
-## Wave 3 (polish): 13 pictures
+## Wave 3 (13 pictures)
 
 | stem | kind | size | ratio | alpha | slot |
 |---|---|---|---|---|---|
@@ -246,6 +246,4 @@ Every picture is a named slot: drop `games/emberclimb/media/<stem>.webp` and it 
 | fx-block-burst | fx | 256x256 | 1:1 | yes | Effect over a target |
 | fx-heal-sparkle | fx | 256x256 | 1:1 | yes | Effect over a target |
 | fx-poison-cloud | fx | 256x256 | 1:1 | yes | Effect over a target |
-| fx-fire-burst | fx | 256x256 | 1:1 | yes | Effect over a target [no code slot yet: a wiring worker adds the hook after delivery] |
-
-Note (W334): `assets.json` and the prompt files were edited by hand after the first build; do not re-run the generator script over them (it would undo the wave split, the removed reserved upgrade backs and the wording fixes).
+| fx-fire-burst | fx | 256x256 | 1:1 | yes | Effect over a target |

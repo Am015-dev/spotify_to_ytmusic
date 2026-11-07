@@ -98,7 +98,7 @@
    "alpha": false,
    "wave": 2,
    "slot": "Boss: gate colossus",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a colossal stone gateway courtyard with glowing cracks in the walls, empty centre. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a colossal stone gateway courtyard with glowing runes in the walls, empty centre. No characters, no UI."
   },
   {
    "stem": "bg-reward",
@@ -219,7 +219,7 @@
    "alpha": true,
    "wave": 1,
    "slot": "Overlay on every attack card (window: upper half, y 14%-53%)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a red-orange ornate metal card frame with a sword motif, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain header strip above it, the window and the whole outside also flat plain white, no text. One single object centred on a flat plain white background."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a red-orange ornate metal card frame with a sword motif, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain title bar strip above it, the window and the whole outside also flat plain white, no text."
   },
   {
    "stem": "frame-skill",
@@ -230,7 +230,7 @@
    "alpha": true,
    "wave": 1,
    "slot": "Overlay on every skill card (window: upper half, y 14%-53%)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a blue steel ornate card frame with a shield motif, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain header strip above it, the window and the whole outside also flat plain white, no text. One single object centred on a flat plain white background."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a blue steel ornate card frame with a shield motif, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain title bar strip above it, the window and the whole outside also flat plain white, no text."
   },
   {
    "stem": "frame-power",
@@ -241,7 +241,7 @@
    "alpha": true,
    "wave": 1,
    "slot": "Overlay on every power card (window: upper half, y 14%-53%)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a violet crystalline ornate card frame with a star motif, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain header strip above it, the window and the whole outside also flat plain white, no text. One single object centred on a flat plain white background."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a violet crystalline ornate card frame with a star motif, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain title bar strip above it, the window and the whole outside also flat plain white, no text."
   },
   {
    "stem": "frame-status",
@@ -250,9 +250,9 @@
    "h": 700,
    "ratio": "5:7",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Overlay on every status card (window: upper half, y 14%-53%)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a plain grey cracked stone card frame, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain header strip above it, the window and the whole outside also flat plain white, no text. One single object centred on a flat plain white background."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a plain grey cracked stone card frame, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain title bar strip above it, the window and the whole outside also flat plain white, no text."
   },
   {
    "stem": "gem-common",
@@ -263,7 +263,7 @@
    "alpha": true,
    "wave": 1,
    "slot": "Rarity badge overlay at the card bottom centre (common)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Rarity badge for a card: a small plain grey rivet gem centred near the bottom edge of an otherwise empty portrait 5:7 canvas, everything else flat plain white. One single object centred on a flat plain white background."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Rarity badge for a card: a small plain grey rivet gem centred near the bottom edge of an otherwise empty portrait 5:7 canvas, everything else flat plain white."
   },
   {
    "stem": "gem-uncommon",
@@ -272,9 +272,9 @@
    "h": 700,
    "ratio": "5:7",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Rarity badge overlay at the card bottom centre (uncommon)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Rarity badge for a card: a small cut blue sapphire gem in a silver setting centred near the bottom edge of an otherwise empty portrait 5:7 canvas, everything else flat plain white. One single object centred on a flat plain white background."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Rarity badge for a card: a small cut blue sapphire gem in a silver setting centred near the bottom edge of an otherwise empty portrait 5:7 canvas, everything else flat plain white."
   },
   {
    "stem": "gem-rare",
@@ -283,9 +283,9 @@
    "h": 700,
    "ratio": "5:7",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Rarity badge overlay at the card bottom centre (rare)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Rarity badge for a card: a small radiant gold gem in an ornate gold setting centred near the bottom edge of an otherwise empty portrait 5:7 canvas, everything else flat plain white. One single object centred on a flat plain white background."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Rarity badge for a card: a small radiant gold gem in an ornate gold setting centred near the bottom edge of an otherwise empty portrait 5:7 canvas, everything else flat plain white."
   },
   {
    "stem": "card-back",
@@ -327,7 +327,7 @@
    "h": 384,
    "ratio": "4:3",
    "alpha": false,
-   "wave": 2,
+   "wave": 1,
    "slot": "Card art window (Anvil Blow, warrior)",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: huge hammer cracking an anvil-shaped rock. Full bleed, no border, no frame."
   },
@@ -591,7 +591,7 @@
    "h": 384,
    "ratio": "4:3",
    "alpha": false,
-   "wave": 2,
+   "wave": 1,
    "slot": "Card art window (Pinprick, rogue)",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: needle dart striking a shoulder. Full bleed, no border, no frame."
   },
@@ -602,7 +602,7 @@
    "h": 384,
    "ratio": "4:3",
    "alpha": false,
-   "wave": 2,
+   "wave": 1,
    "slot": "Card art window (Slip Away, rogue)",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: rogue vanishing in a puff of grey smoke. Full bleed, no border, no frame."
   },
@@ -855,7 +855,7 @@
    "h": 384,
    "ratio": "4:3",
    "alpha": false,
-   "wave": 2,
+   "wave": 1,
    "slot": "Card art window (Spark Up, automaton)",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: single blue spark leaping between coils. Full bleed, no border, no frame."
   },
@@ -866,7 +866,7 @@
    "h": 384,
    "ratio": "4:3",
    "alpha": false,
-   "wave": 2,
+   "wave": 1,
    "slot": "Card art window (Twin Pulse, automaton)",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: orb pulsing twice in a ring of rings. Full bleed, no border, no frame."
   },
@@ -1119,7 +1119,7 @@
    "h": 384,
    "ratio": "4:3",
    "alpha": false,
-   "wave": 2,
+   "wave": 1,
    "slot": "Card art window (Wrath Eruption, monk)",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: red flames bursting from a monk fist. Full bleed, no border, no frame."
   },
@@ -1130,7 +1130,7 @@
    "h": 384,
    "ratio": "4:3",
    "alpha": false,
-   "wave": 2,
+   "wave": 1,
    "slot": "Card art window (Quiet Vigil, monk)",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: monk sitting under a blue lotus glow. Full bleed, no border, no frame."
   },
@@ -1462,7 +1462,7 @@
    "alpha": false,
    "wave": 2,
    "slot": "Card art window (Regret, curse)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: faded sealed scroll left on a dark table. Full bleed, no border, no frame."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: faded letter left on a dark table. Full bleed, no border, no frame."
   },
   {
    "stem": "doubt",
@@ -1487,13 +1487,24 @@
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: old bruise on a shoulder. Full bleed, no border, no frame."
   },
   {
-   "stem": "shiv",
+   "stem": "calm-spark",
    "kind": "card",
    "w": 512,
    "h": 384,
    "ratio": "4:3",
    "alpha": false,
    "wave": 2,
+   "slot": "Card art window (Calm Spark, status)",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: small golden light cupped in two hands. Full bleed, no border, no frame."
+  },
+  {
+   "stem": "shiv",
+   "kind": "card",
+   "w": 512,
+   "h": 384,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 1,
    "slot": "Card art window (Shiv, status)",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: small improvised blade. Full bleed, no border, no frame."
   },
@@ -1526,7 +1537,7 @@
    "h": 768,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Battle enemy: Hex Acolyte",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of cultist in a feathered hood chanting by a candle, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -1537,7 +1548,7 @@
    "h": 768,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Battle enemy: Gape Grub",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of wide-mouthed pale grub with a ring of teeth, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -1548,7 +1559,7 @@
    "h": 768,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Battle enemy: Rust Tick",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of rust-coloured tick the size of a dog, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -1658,7 +1669,7 @@
    "h": 256,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Relic icon: Ember Brand",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Game item icon of iron brand glowing orange at the tip, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -1669,7 +1680,7 @@
    "h": 256,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Relic icon: Whetstone Ring",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Game item icon of silver ring with a tiny whetstone, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -1680,7 +1691,7 @@
    "h": 256,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Relic icon: Spark Core",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Game item icon of glass sphere with a trapped blue spark, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -1691,7 +1702,7 @@
    "h": 256,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Relic icon: Prayer Beads",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Game item icon of string of wooden prayer beads, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -1715,7 +1726,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Relic icon: Iron Bangle",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Game item icon of thick iron bracelet with a single notch, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Game item icon of thick iron bracelet with a rune notch, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
   {
    "stem": "relic-lantern",
@@ -2043,7 +2054,7 @@
    "h": 256,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Map node icon",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Round map marker icon: a horned skull with red glowing eyes, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -2076,9 +2087,9 @@
    "h": 256,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Map node icon",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Round map marker icon: a glowing wisp curling into a hook shape, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Round map marker icon: a glowing question-mark-shaped wisp (no real text), on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
   {
    "stem": "node-treasure",
@@ -2087,7 +2098,7 @@
    "h": 256,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Map node icon",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Round map marker icon: a closed ornate chest, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -2098,7 +2109,7 @@
    "h": 256,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Map node icon",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Round map marker icon: a spiked golden crown on a dark spire, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -2120,7 +2131,7 @@
    "h": 128,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Enemy intent bubble",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: two large red crossed swords with a spark, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -2142,7 +2153,7 @@
    "h": 128,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Enemy intent bubble",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a golden upward arrow with a glow, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -2153,7 +2164,7 @@
    "h": 128,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Enemy intent bubble",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a purple skull with a thin curse swirl, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
@@ -2164,9 +2175,9 @@
    "h": 128,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
+   "wave": 1,
    "slot": "Enemy intent bubble",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a blue sleeping moon with drifting zigzag puffs, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a blue sleeping moon with drifting zigzag puffs (no letters), on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
   {
    "stem": "st-str",
@@ -2418,7 +2429,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 3,
-   "slot": "Effect over a target [no code slot yet: a wiring worker adds the hook after delivery]",
+   "slot": "Effect over a target",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Effect sprite: a round orange fire burst, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   }
  ]
