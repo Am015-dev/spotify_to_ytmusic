@@ -138,10 +138,12 @@ function lookPanel() { if (typeof pxClearEnd === 'function') pxClearEnd(); const
     '.fa-react{position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:9990;pointer-events:none;display:flex;gap:10px;align-items:center;width:max-content;max-width:min(344px,calc(100vw - 20px));padding:8px 14px 8px 10px;border-radius:14px;background:#1b2230;color:#fff;border:2px solid #ffd46b;font-size:15px;line-height:1.3;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.5);animation:fa-rin .25s ease-out both}' +
     '.fa-react.out{opacity:0;transition:opacity .3s}@keyframes fa-rin{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}' +
     'html .gxh-bub .gxh-tx{font-size:14.5px;line-height:1.3}html .gxh-bub .gxh-tt{font-size:15px}' +
-    '.tlink b,.tlink span{display:block;text-align:center}.tlink b{font-size:16px}.tlink span{font-size:14px;margin-top:2px}' +
+    '.ttut b,.ttut span{display:block;text-align:center}.ttut b{font-size:16px}.ttut span{font-size:14px;margin-top:2px}' +
+    '.fa-coach{position:fixed;left:50%;top:56px;transform:translateX(-50%);z-index:9980;display:flex;gap:10px;align-items:center;width:max-content;max-width:min(352px,calc(100vw - 16px));padding:8px 6px 8px 10px;border-radius:14px;background:#1b2230;color:#fff;border:2px solid #ffd46b;box-shadow:0 8px 22px rgba(0,0,0,.5);pointer-events:none;transition:opacity .25s}.fa-coach.out{opacity:0}.fa-coach .t{font-size:15px;line-height:1.3;font-weight:700}.fa-coach .x{pointer-events:auto;flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:0;background:#334;color:#fff;font-size:24px;line-height:1}' +
+    '.fa-fin{position:fixed;inset:0;z-index:9995;background:rgba(8,12,20,.82);display:flex;align-items:center;justify-content:center;padding:12px}.fa-fin .fc{background:#f3ead4;color:#1f1a12;border-radius:16px;padding:16px;width:min(420px,100%);max-height:calc(100vh - 24px);overflow:auto;font-size:15px;line-height:1.35}.fa-fin h2{margin:8px 0 4px;font-size:22px}.fa-fin h3{margin:12px 0 4px;font-size:16px}.fa-fin ul{margin:0;padding:0;list-style:none}.fa-fin li{display:flex;gap:8px;padding:2px 0}.fa-fin li b{flex:0 0 18px}.fa-fin li.ok b{color:#1b7f3a}.fa-fin li.no b{color:#b3261e}.fa-fin .flat li{display:list-item;list-style:disc;margin-left:18px}.fa-fin .why{margin:8px 0 0;font-weight:700;color:#8a1c14}.fa-fin .fr{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.fa-fin .fb{flex:1 1 140px;min-height:48px;border-radius:12px;border:2px solid #7a5a1a;background:#fff;color:#1f1a12;font-size:16px;font-weight:800}.fa-fin .fb.pri{background:#e8892b;color:#1a1008}' +
     '.fa-por::before{content:attr(data-e)}.endb .ev{display:block;font-size:15px;line-height:1.3;font-weight:700;margin-top:4px;color:#ffe9c2}' +
     '.ttl .tag{background:rgba(10,18,30,.86);padding:4px 14px;border-radius:999px;color:#fff;text-shadow:none}.ttl .logo{background:rgba(10,18,30,.78);padding:4px 18px;border-radius:18px}' +
-    '@media (min-width:1024px){html .gxh-bub .gxh-tx,html .gxh-bub .gxh-tt,html .gxh-bub .gxh-ok,html .gxt-top .gxt-n,html .gxt-top .gxt-skip{font-size:16px}html .gxc-ib,html .gxc-path .gxc-act b,html .gxc-path .gxc-act small,html .gxc-path .gxc-node .gxc-lab{font-size:16px}}' +
+    '@media (min-width:1024px){.ttut span{font-size:16px}html .gxh-bub .gxh-tx,html .gxh-bub .gxh-tt,html .gxh-bub .gxh-ok,html .gxt-top .gxt-n,html .gxt-top .gxt-skip{font-size:16px}html .gxc-ib,html .gxc-path .gxc-act b,html .gxc-path .gxc-act small,html .gxc-path .gxc-node .gxc-lab{font-size:16px}}' +
     '.gxc-htitle b{color:#fff;text-shadow:0 1px 3px #000}.gxc-path .gxc-act{background:#2b2218;padding:6px 12px}.gxc-path .gxc-act b,.gxc-path .gxc-act small{color:#fff4dc}' +
     '@media (prefers-reduced-motion:reduce){.tbn,.fa-react{transition:none;animation:none}}';
   document.head.appendChild(st);
@@ -162,7 +164,7 @@ function tbTurn(delay) {
   const mine = tbHuman(s), hot = UI.mode === 'hot';
   TB.t2 = setTimeout(() => {
     if (!G || G.result || G.phase !== 'place' || G.pend || G.turn !== s) return;
-    if (document.querySelector('.gxh-bub')) { TB.key = ''; return; }
+    if (document.querySelector('.gxh-bub,.fa-coach')) { TB.key = ''; return; }
     if (mine) tbShow(hot ? name(s) + "'s turn" : 'Your turn', phPrompt(), 'me', 1700);
     else tbShow(name(s) + "'s turn", 'Tap to speed up', 'rv', 0);
   }, delay || 0);
@@ -170,8 +172,8 @@ function tbTurn(delay) {
 // the rival's move: a caption with the reason, then the next turn's banner
 // called by commit (ui3.js) after every applied move
 function tbAfter(seat, m) {
-  if (tutOn()) return;
   if (G.result) { tbHide(); return; }
+  if (UI.fc && !G.ai[seat] && m && m.t === 'place') { fcFeedback(UI.chip && UI.chip.text); return; }
   if (G.ai[seat] && m && m.t === 'place') { const chip = UI.chip && UI.chip.text; tbShow(name(seat) + ' used ' + slotName(m.to), chip || '', 'cap', 1500); tbTurn(1600); }
   else tbTurn(0);
 }

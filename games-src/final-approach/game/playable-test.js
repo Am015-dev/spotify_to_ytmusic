@@ -38,48 +38,35 @@ async function tapSel(c, sel, opt) {
 }
 const SHOT = async (c, n) => { if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await c.p.screenshot({ path: path.join(SHOTS, c.tag.split('x')[0] + '-' + n + '.png') }); } };
 
-// ------------------------------------------------------------------ the tutorial, to the end
-async function tutorial(browser, W, H, skipMode) {
+// ------------------------------------------------------------------ the coached first game, to the end (free legal moves through the UI; no scripted tap list)
+async function tutorial(browser, W, H, dismissMode) {
   const c = await mk(browser, W, H), { p, tag } = c, T = await p.evaluate(() => window.CAMPAIGN.tutorial);
-  const want = [...T.chapters.map(x => x.id), ...Object.keys(T.steps)], seen = [];
+  const core = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
   if (!(await tapSel(c, '#start .tbtn.story'))) { note(tag, 'no Play button'); return; }
-  await sleep(700);
-  let last = '', lastT = Date.now(), steps = 0;
-  for (let g = 0; g < 3000; g++) {
-    const st = await p.evaluate(() => GXT.state());
-    if (!st.active) break; if (st.phase === 'end') break;
-    const sig = [st.i, st.phase, st.count, st.shown].join('|'); if (sig !== last) { last = sig; lastT = Date.now(); } else if (Date.now() - lastT > 9000) { note(tag, 'stuck at step ' + st.i + ' ' + st.id); return; }
-    if (!st.shown) { await sleep(60); continue; }
-    const info = await p.evaluate(() => {
-      const s = GXT.state(), b = document.querySelector('.gxt-bub'), q = e => { if (!e) return null; const r = e.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; };
-      const h = s.hole, el = h ? document.elementFromPoint(h.cx, h.cy) : null, nb = b && b.querySelector('.gxt-next'), n = q(nb);
-      const ne = n ? document.elementFromPoint((n.l + n.r) / 2, (n.t + n.b) / 2) : null;
-      return { s, bub: q(b), say: b && b.querySelector('.gxh-tx').textContent, title: b && b.querySelector('.gxh-tt') && b.querySelector('.gxh-tt').textContent,
-        inBub: !!(el && el.closest('.gxt-bub,.fa-react')), kitCover: !!(el && el.closest('[data-help]')), under: el && (el.id || String(el.className && el.className.baseVal != null ? el.className.baseVal : el.className)), nextOk: !!(nb && ne && (ne === nb || nb.contains(ne))),
-        por: !!(b && b.querySelector('.fa-por')), w: innerWidth, hgt: innerHeight, sx: document.documentElement.scrollWidth > innerWidth + 1, skip: !!document.querySelector('.gxt-skip') };
-    });
-    const id = info.s.id; steps++; if (!seen.includes(id)) seen.push(id);
-    if (wc(info.say) > 22) note(tag, id + ': bubble text over 22 words'); if (!info.say) note(tag, id + ': empty bubble'); if (!info.por) note(tag, id + ': no speaker portrait in the bubble');
-    if (info.sx) note(tag, id + ': page scrolls sideways'); if (!info.skip) note(tag, id + ': no Skip button');
-    const b = info.bub, h = info.s.hole;
-    if (b && (b.l < -1 || b.t < -1 || b.r > info.w + 1 || b.b > info.hgt + 1)) note(tag, id + ': bubble outside the screen');
-    if (h && b && h.cx > b.l && h.cx < b.r && h.cy > b.t && h.cy < b.b) note(tag, id + ': bubble covers the target centre');
-    if (info.s.wait) { if (!h) note(tag, id + ': no target'); else if (info.inBub) note(tag, id + ': target centre is under the bubble'); else if (info.kitCover) note(tag, id + ': target centre covered by ' + info.under); }
-    else if (!info.nextOk) note(tag, id + ': Next button missing or covered');
-    if (skipMode && st.i >= 3) { if (!(await tapSel(c, '.gxt-skip'))) note(tag, 'Skip not tappable'); await sleep(600); const a = await p.evaluate(() => GXT.active()); if (a) note(tag, 'Skip did not leave the tutorial'); else lines.push('PASS tutorial skip ' + tag); await c.p.context().close(); return; }
-    if (id === 'ch2') await SHOT(c, 'tut-ch2'); if (id === 'radio') await SHOT(c, 'tut-radio'); if (id === 'ch1') await SHOT(c, 'tut-ch1');
-    let ok;
-    if (!info.s.wait) ok = await tapSel(c, '.gxt-next'); else { const hh = info.s.hole; await c.tap(hh.cx, hh.cy); ok = true; }
-    if (ok === 'covered' || !ok) note(tag, id + ': could not act (' + ok + ')');
-    await sleep(info.s.wait ? 520 : 320);
+  await sleep(900);
+  const first = await p.evaluate(() => !!document.querySelector('.fa-coach') && !!(UI.fc));
+  if (!first) note(tag, 'no coach bubble at the start');
+  let maxBub = 0, blocked = 0; const seenBub = new Set();
+  const watch = setInterval(async () => { try { const r = await p.evaluate(() => { const bs = [...document.querySelectorAll('.fa-coach')]; return { n: bs.length, ids: bs.map(b => b.dataset.coach), pe: bs.map(b => getComputedStyle(b).pointerEvents) }; }); maxBub = Math.max(maxBub, r.n); r.ids.forEach(i => seenBub.add(i)); if (r.pe.some(x => x !== 'none')) blocked++; } catch (e) { } }, 250);
+  if (dismissMode) {
+    const x = await tapSel(c, '.fa-coach .x'); await sleep(500);
+    const gone = await p.evaluate(() => !document.querySelector('.fa-coach:not(.out)') || document.querySelector('.fa-coach').dataset.coach !== 'intro');
+    clearInterval(watch); if (x !== true || !gone) note(tag, 'coach bubble could not be dismissed'); else lines.push('PASS coach bubble dismiss ' + tag); await c.p.context().close(); return;
   }
-  const end = await p.evaluate(() => { const e = document.querySelector('.gxt-end'); return e ? { t: e.textContent.slice(0, 160), pri: !!e.querySelector('.gxt-b.pri,.gxt-b') } : null; });
+  const r = await playByTaps(c, 'coached', 300000);
+  for (let i = 0; i < 40 && !(await p.evaluate(() => !!document.querySelector('.fa-fin'))); i++) await sleep(250);
+  clearInterval(watch);
   await SHOT(c, 'tut-end');
-  if (!end) note(tag, 'no end card after the last step'); else if (!/Green Wings|rules/i.test(end.t)) note(tag, 'end card text unexpected: ' + end.t);
-  const missing = want.filter(w => !seen.includes(w)); if (missing.length) note(tag, 'coverage steps never shown: ' + missing.join(','));
-  const done = await p.evaluate(() => GXT.isDone('final-approach'));
-  if (!done) note(tag, 'tutorial not marked done');
-  lines.push((probs.filter(x => x.startsWith(tag)).length ? 'FAIL' : 'PASS') + ' tutorial-to-end ' + tag + ' (' + seen.length + '/' + want.length + ' story steps shown)');
+  const fin = await p.evaluate(() => { const e = document.querySelector('.fa-fin'); return e ? { t: e.textContent, rows: e.querySelectorAll('ul.fchk li').length, later: e.querySelectorAll('ul.flat li').length, seen: Object.keys(UI.fc.seen), laterTxt: UI.fc.later || [] } : null; });
+  if (!r.done) note(tag, 'coached game did not reach the result');
+  if (!fin) { note(tag, 'no final check card after the result'); await c.p.context().close(); return; }
+  if (!fin.rows) note(tag, 'final check has no rule rows');
+  const seen = fin.seen.filter(k => core.includes(k)), unseen = core.filter(k => !fin.seen.includes(k));
+  const laterCovered = unseen.every(k => fin.laterTxt.some(t => t.length > 10) );
+  if (fin.laterTxt.length < unseen.length + T.later.length) note(tag, 'things-you-will-meet-later card misses unseen rules');
+  if (maxBub > 1) note(tag, 'more than one coach bubble at once (' + maxBub + ')'); if (blocked) note(tag, 'coach bubble blocked input');
+  if (seen.length < 7) note(tag, 'only ' + seen.length + ' rules explained in play: ' + seen.join(','));
+  lines.push((probs.filter(x => x.startsWith(tag)).length ? 'FAIL' : 'PASS') + ' coached-game-to-end ' + tag + ' (' + (r.res || '?') + '; ' + seen.length + '/' + core.length + ' rules explained in play, ' + unseen.length + ' moved to the later card: ' + unseen.join(',') + ')');
   await c.p.context().close();
 }
 

@@ -9,7 +9,7 @@ The old game already had a painted panel, a one-line prompt, glowing legal space
 |---|---|---|---|
 | 1 | Nothing announces whose turn it is; the player has to guess from tiny strips | Banner "Your turn" (blue) / "Ravi's turn" (orange) on every turn, with the instruction line inside it | fixed |
 | 2 | The rival's move was instant and unexplained (a 2.6 s chip on a slot only) | Rival turn in steps: banner "Ravi's turn, tap to speed up", 0.9 s thinking, the die animates, caption "Ravi used Flaps 1: Extends a flap." for 1.5 s, then "Your turn". Tap the board to skip the wait | fixed |
-| 3 | Tutorial was 23 click-here bubbles with no reason to act | Story prologue (check ride, Voss guides, Ravi flies with you, Inspector Pell doubts): 3 chapters with an opening beat, a story reason in every bubble, a reaction after key actions, a climax at the landing, speaker portrait in every bubble | fixed |
+| 3 | Tutorial was 23 click-here bubbles with no reason to act | Replaced by a coached first game (addendum 4): free play from turn 1, Voss explains each rule the first time it matters (one dismissable bubble at a time), one-line feedback on your moves, final check rule by rule with real numbers, "things you will meet later" card. Story prologue: check ride, Pell doubts | fixed |
 | 4 | Tutorial and results had no voice; loss was a bare "Mission failed" | Tower praise/taunt on every Story result card (all 15 chapters now have both), crew voice line under the Quick game result, story end card | fixed |
 | 5 | Landing-checklist chips at the bottom are icons plus bare numbers | Tried word labels under the chips: they collided with the numbers and pushed the Reroll button off a phone screen, so reverted. The chips keep their (i) explanation and the tutorial's `goal` step names the four lights; "Landing checklist" is spoken by Pell in the story | **not fixed**, needs a layout change of the dock (see Remaining) |
 | 6 | Title tagline 2.1-2.5:1 contrast over the painting | Solid dark pills behind logo and tagline | fixed |
@@ -20,7 +20,7 @@ The old game already had a painted panel, a one-line prompt, glowing legal space
 
 ## What was added (files)
 - `game/src/ui8.js`: turn banner, rival caption, tap to speed up, result voice line, styles. `game/src/ui3.js`: `commit` calls `tbAfter`.
-- `game/src/ui12.js`: chapters, story text, reactions, portrait in bubbles. `game/src/ui4.js`: Help. `game/src/ui1.js`: pace.
+- `game/src/ui12.js`: the coached first game (`fcPoll`, `fcSay`, `fcEnd`); `ui5.js`: tutorial entry on the title. `game/src/ui4.js`: Help. `game/src/ui1.js`: pace.
 - `campaign.json`: `tutorial` block, `cast.pell`, tower praise/taunt lines. `STORY.md`, `TUTORIAL-COVERAGE.md` (honest list of what the tutorial does not teach).
 - `game/playable-test.js`: taps only, never the engine. Tutorial to the end card at 390x763 and 1440x860 (asserts all 26 story ids shown, the target centre is the target and
   not under the bubble or the kit dim, bubble inside the screen and off the target centre, Next reachable, Skip works), a Quick game to the result, Story chapter 1 to the result.

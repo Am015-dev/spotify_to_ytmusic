@@ -1672,6 +1672,34 @@
     "Voss on the radio: \"Debrief, then again, Captain.\"",
     "Ravi: \"Shake it off. Fresh dice, fresh plan.\""
    ]
+  },
+  "coach": {
+   "intro": "Check ride, Captain. Pell bets two pilots can't land blind. You and {rival} win or crash as one. Plan aloud, never dice numbers, then roll.",
+   "seats": "Your dice are hidden from {rival}, his from you. Blue spaces are yours, orange his, grey anyone's.",
+   "goal": "Pell's four lights to land: runway clear, gear and flaps down, wings level, speed in the brakes. The strip at the bottom tracks them.",
+   "turns": "One die each, taking turns. Axis and engines must both be filled every round, or we lose.",
+   "axis": "Axis: the plane tips toward the higher die by the difference. A tilt of 3 is a spin and Pell wins.",
+   "radio": "A plane on the track is a collision. Radio clears the plane that many spaces ahead: yours counts from 1, {rival}'s from 2.",
+   "engines": "Engines: both dice add up. Past blue {aeroB} the plane moves one space, past orange {aeroO} two. It must end on the airport, not past it.",
+   "gear": "Landing gear takes 1-2, 3-4 or 5-6 in any order. Each gear lifts the blue marker.",
+   "flaps": "Flaps are {rival}'s: 1-2, 2-3, 4-5, 5-6 in order. Each flap lifts the orange marker.",
+   "brakes": "Brakes need exactly 2, then 4, then 6, in order. They count only in the last round.",
+   "coffee": "Coffee: any die earns a token. Spend tokens with the + and - buttons to nudge a die by one.",
+   "reroll": "A reroll token: either of you may spend it, even on the other's turn. Pick the dice to roll again, or keep them.",
+   "rounds": "Altitude falls each round. In the last round the plane stops: speed must fit the brakes.",
+   "final": "Landing round. No flying now: engine speed within the brake value, gear and flaps down, wings level."
+  },
+  "later": [
+   "Traffic die: some airports add planes each round (Story chapter 7).",
+   "Corridor tabs: some strips make the axis match a marker (chapter 9).",
+   "Fuel: a fuel space burns the die value; below 0 you lose (chapter 8).",
+   "Wind dial, trainee tokens, icy runway, the 60-second clock (chapters 11 to 15).",
+   "Crew cards, hand-over, flip side and cross-check (chapter 10).",
+   "A die that fits nowhere is thrown away and counts as your turn."
+  ],
+  "endText": {
+   "win": "Pell lowers his pen: \"...Passed.\" Green Wings stays open.",
+   "lose": "Pell smiles thinly: \"Not this time.\" Voss: \"Again, Captain. Everyone crashes once.\""
   }
  }
 }

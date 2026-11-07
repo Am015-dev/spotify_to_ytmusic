@@ -23,7 +23,7 @@ function titleEl() {
   const bg = ART.title ? ttlImg(ART.title) : h('div.ttl-bg.ttl-plain'), sv = hasSave();
   return h('div.ttl', bg, h('div.ttl-in', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Final Approach')), h('p.tag', 'Two seats. Eight dice. One runway.'),
     h('div.tbtns', h('button.tbtn.go.story', { 'data-a': window.CAMPAIGN && typeof campLine === 'function' ? 'camp' : 'play', type: 'button' }, h('b', 'Play'), typeof campLine === 'function' && window.CAMPAIGN ? h('span', campLine()) : null),
-      h('div.qrow', { role: 'group', 'aria-label': 'Quick game' }, h('span.qlbl', 'Quick game'), h('button.qseg', { 'data-a': 'play', type: 'button' }, 'Computer'), h('button.qseg', { 'data-a': 'online', type: 'button' }, 'Online'), sv ? h('button.qseg', { 'data-a': 'loadsave', type: 'button' }, 'Resume') : null), tutEl('tlink'))));
+      h('div.qrow', { role: 'group', 'aria-label': 'Quick game' }, h('span.qlbl', 'Quick game'), h('button.qseg', { 'data-a': 'play', type: 'button' }, 'Computer'), h('button.qseg', { 'data-a': 'online', type: 'button' }, 'Online'), sv ? h('button.qseg', { 'data-a': 'loadsave', type: 'button' }, 'Resume') : null), tutEl('ttut'))));
 }
 function roleCard(s) {
   const o = optObj(), c = D.crew[s], on = o.role === s;
