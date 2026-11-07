@@ -2,14 +2,14 @@
 var NAMES = ['You', 'Ines', 'Bram', 'Kito', 'Odile'], SEATCOL = ['#3fd0c9', '#3a8ee0', '#3fb36b', '#f0b429', '#e8577a'];
 var POSTXT = { top: '▲ highest', only: '● only', bot: '▼ lowest', '?': '? unknown' };
 var TOKTXT = { '1': 'must be done first', '2': 'must be done second', '3': 'must be done third', '4': 'must be done fourth', '5': 'must be done fifth', '>': 'before >> and >>>', '>>': 'after >, before >>>', '>>>': 'after > and >>', '>>>>': 'after all other arrows', 'O': 'must be the very last task' };
-var G = null, AIDELAY = 650, ANIM = true;
-var UI = { mode: 'quick', level: 'normal', sigMode: false, flareMode: 0, hold: false, sigDone: {}, timer: null, fast: /[?&]fast=1/.test(location.search), lastTricks: 0, players: 4, mission: 1, flareFree: false, ended: false };
+var G = null, AIDELAY = 650, ANIM = true, ME = 0;   // ME = the seat whose hand the screen shows (hot-seat: whoever holds the device)
+var UI = { mode: 'quick', level: 'normal', sigMode: false, flareMode: 0, hold: false, sigDone: {}, timer: null, fast: /[?&]fast=1/.test(location.search), lastTricks: 0, players: 4, mission: 1, flareFree: false, ended: false, humans: [0], hot: false, nh: 1 };
 if (UI.fast) AIDELAY = 60;
 var $ = function (s) { return document.querySelector(s); };
 function mk(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 function ls(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-function nm(p) { return p === G.dummy ? 'Drone' : NAMES[p]; }
-function isHuman(s) { return s === 0; }
+function nm(p) { return p === G.dummy ? 'Drone' : UI.hot && isHuman(p) ? 'Diver ' + (p + 1) : NAMES[p]; }
+function isHuman(s) { return UI.humans.indexOf(s) >= 0; }
 // ---------------------------------------------------------------- pictures (code-drawn placeholders; art slots fill them)
 var ICON = {
   c: '<svg viewBox="0 0 24 24"><path d="M12 22V12M12 12C9 9 6 10 5 6M12 12c3-3 6-2 7-6M12 15c-2-1-4 0-6-2M12 15c2-1 4 0 6-2" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>',
@@ -34,7 +34,7 @@ var MUSIC_ON = ls('ds-mus') !== false;
 function musicInit() {
   try { var m = {}; (window.DS_MUSIC || []).forEach(function (n) { m[n] = 'url:music/' + n + '.mp3'; }); if (window.GA) GA.init({ sfx: {}, music: m, key: 'ds' }); } catch (e) { }
   try { GXMUS.init({ key: 'ds', slots: [['menu', 'Menu'], ['dive', 'Dive'], ['tense', 'Last tricks'], ['victory', 'Mission complete'], ['defeat', 'Mission lost']], loops: ['menu', 'dive', 'tense'],
-    slot: function () { if (!G || $('#title').classList.contains('on')) return ['menu', 0]; if (G.result) return [G.result.ok ? 'victory' : 'defeat', 1]; var left = G.hands[0].length; return [left <= 2 ? 'tense' : 'dive', 0]; },
+    slot: function () { if (!G || $('#title').classList.contains('on')) return ['menu', 0]; if (G.result) return [G.result.ok ? 'victory' : 'defeat', 1]; var left = G.hands[ME].length; return [left <= 2 ? 'tense' : 'dive', 0]; },
     on: function () { return MUSIC_ON && (window.DS_MUSIC || []).length > 0; } }); } catch (e) { }
 }
 function musicSync() { try { GXMUS.sync(); } catch (e) { } }
@@ -44,8 +44,9 @@ function startGame(o) {
   if (o.mode === 'tut') { if (UI.fastSave == null) UI.fastSave = UI.fast; UI.fast = false; UI.aiSave = AIDELAY; AIDELAY = 650; }   // the staged game keeps real timing so every step is shown
   else { if (UI.fastSave != null) { UI.fast = UI.fastSave; AIDELAY = UI.aiSave; UI.fastSave = null; } try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } } UI.mode = o.mode || 'quick'; UI.level = o.level || 'normal'; UI.flareFree = !!o.flareFree; UI.sigDone = {}; UI.flareAsked = !!o.noFlareOffer; UI.sigMode = false; UI.flareMode = 0; UI.hold = false; UI.ended = false; UI.lastTricks = 0; UI.tut = o.tut || null;
   UI.players = o.players || UI.players; UI.mission = o.mission || UI.mission;
+  var nh = Math.max(1, Math.min(o.humans || 1, UI.players)); UI.humans = []; for (var hh = 0; hh < nh; hh++) UI.humans.push(hh); UI.hot = nh > 1; ME = 0; $('#pass').classList.remove('on');
   AIX.seed((o.seed || Date.now()) & 0xffff);
-  G = newGame({ players: UI.players, mission: UI.mission, seed: o.seed, deal: o.deal, taskCards: o.taskCards });
+  G = newGame({ players: UI.players, mission: UI.mission, seed: o.seed, deal: o.deal, taskCards: o.taskCards, names: UI.hot ? [0, 1, 2, 3, 4].map(function (i) { return isHuman(i) ? 'Diver ' + (i + 1) : NAMES[i]; }) : null });
   ['title', 'setup', 'res'].forEach(function (id) { $('#' + id).classList.remove('on'); }); closeZoom();
   var st = $('#stamp'); st.className = ''; st.innerHTML = '';
   $('#mname').textContent = 'Mission ' + G.mission.n + ': ' + (G.mission.title || '');
@@ -59,13 +60,19 @@ function step() {
   if (G.phase === 'play' && canFlare(G) && !UI.flareAsked && !UI.tut && !UI.flareMode) { flareOffer(); return; }   // the crew may send a flare before anyone signals
   if (G.phase === 'play' && !G.trick.length && !UI.sigDone[G.tricks.length]) {
     UI.sigDone[G.tricks.length] = true; var any = false;
-    if (!UI.tut) for (var p = 1; p < G.n; p++) { if (p === G.dummy) continue; var c = AIX.commPick(G, p); if (c && performMove(G, { t: 'comm', c: c }, p)) { any = true; popAt(seatEl(p), '📡 ' + cardName(c)); pingFx(seatEl(p)); sfx('ping'); } }
+    if (!UI.tut) for (var p = 0; p < G.n; p++) { if (p === G.dummy || isHuman(p)) continue; var c = AIX.commPick(G, p); if (c && performMove(G, { t: 'comm', c: c }, p)) { any = true; popAt(seatEl(p), '📡 ' + cardName(c)); pingFx(seatEl(p)); sfx('ping'); } }
     if (UI.tut && UI.tut.sig && G.tricks.length === 0) { var s1 = UI.tut.sig; performMove(G, { t: 'comm', c: s1.c }, s1.p); any = true; popAt(seatEl(s1.p), '📡 ' + cardName(s1.c)); }
     render(); if (any) return later(step, AIDELAY * 1.6);
   }
-  var s = sideToAct(G); render();
+  var s = sideToAct(G);
+  if (isHuman(s) && s !== ME) return showPass(s);
+  render();
   if (isHuman(s)) return;
   later(aiMove, G.phase === 'play' ? AIDELAY : AIDELAY * .8);
+}
+function showPass(s) {
+  closeZoom(); var ps = $('#pass'); $('#passH').textContent = 'Pass the device to ' + nm(s); $('#passB').textContent = 'I am ' + nm(s); ps.classList.add('on');
+  $('#passB').onclick = function () { ME = s; ps.classList.remove('on'); UI.lastPh = null; render(); step(); };
 }
 function aiMove() {
   if (!G || G.result || UI.hold) return; var s = sideToAct(G); if (isHuman(s)) return render();
@@ -74,7 +81,7 @@ function aiMove() {
 }
 function apply(mv, s) {
   var before = G.tricks.length, from = null;
-  if (mv.t === 'play') from = G.turn === 0 || (G.turn === G.dummy && G.ctrl[G.dummy] === 0) ? handCardEl(mv.c) : seatEl(G.turn);
+  if (mv.t === 'play') from = G.turn === ME || (G.turn === G.dummy && G.ctrl[G.dummy] === ME) ? handCardEl(mv.c) : seatEl(G.turn);
   if (mv.t === 'take') from = poolEl(mv.i);
   var fr = from ? from.getBoundingClientRect() : null, seatP = G.turn;
   if (!performMove(G, mv, s)) { render(); return false; }
@@ -91,7 +98,7 @@ function trickDone(fr, seatP) {
   var newly = G.tasks.filter(function (x) { return x.done && x.trick === G.tricks.length; });
   later(function () {
     var wc = t.cards.filter(function (x) { return x.p === t.winner; })[0]; var we = document.querySelector('#trick .cd[data-c="' + wc.c + '"]'); if (we) we.classList.add('win');
-    popAt(seatEl(t.winner), nm(t.winner) + (t.winner === 0 ? ' win' : ' wins'));
+    popAt(seatEl(t.winner), nm(t.winner) + (t.winner === ME && !UI.hot ? ' win' : ' wins'));
     var last = G.result && G.result.ok;
     newly.forEach(function (x) { var ce = document.querySelector('#trick .cd[data-c="' + x.card + '"]'); if (x.wonBy === x.owner) { sfx('task'); popAt(seatEl(x.owner), '✓ ' + cardName(x.card)); if (ce) ce.classList.add(last ? 'clutch' : 'got'); } else { sfx('fail'); if (ce) ce.classList.add('lostc'); } });
     if (last && !UI.fast) popAt($('#trick'), 'Final task home!');
@@ -106,21 +113,21 @@ function trickDone(fr, seatP) {
 // ---------------------------------------------------------------- player input
 function onHandTap(c, e) {
   if (!G || UI.hold || G.result) return zoomCard(c);
-  var me = G.turn === G.dummy && G.ctrl[G.dummy] === 0 ? G.dummy : 0;
-  if (UI.sigMode) { if (commPos(G, 0, c) && tutOk({ type: 'tap', what: 'signal', id: c })) { performMove(G, { t: 'comm', c: c }, 0); UI.sigMode = false; sfx('ping'); popAt(handCardEl(c), '📡 Signal sent'); pingFx(handCardEl(c)); render(); } else zoomCard(c); return; }
+  
+  if (UI.sigMode) { if (commPos(G, ME, c) && tutOk({ type: 'tap', what: 'signal', id: c })) { performMove(G, { t: 'comm', c: c }, ME); UI.sigMode = false; sfx('ping'); popAt(handCardEl(c), '📡 Signal sent'); pingFx(handCardEl(c)); render(); } else zoomCard(c); return; }
   if (UI.flareMode) { if (c[0] !== 'r') doFlare(c); else zoomCard(c); return; }
-  if (G.phase === 'play' && sideToAct(G) === 0 && legalCards(G, G.turn).indexOf(c) >= 0) { if (!tutOk({ type: 'tap', what: 'card', id: c })) return; apply({ t: 'play', c: c }, 0); return; }
+  if (G.phase === 'play' && sideToAct(G) === ME && legalCards(G, G.turn).indexOf(c) >= 0) { if (!tutOk({ type: 'tap', what: 'card', id: c })) return; apply({ t: 'play', c: c }, ME); return; }
   zoomCard(c);
 }
 function tutOk(a) { try { if (window.GXT && GXT.active()) return GXT.act(a); } catch (e) { } return true; }
 function onPoolTap(i) {
   if (!G) return; var t = G.pool[i];
-  if (G.phase === 'draft' && sideToAct(G) === 0 && !UI.hold) { if (!tutOk({ type: 'tap', what: 'task', id: t.card })) return; apply({ t: 'take', i: i }, 0); return; }
+  if (G.phase === 'draft' && sideToAct(G) === ME && !UI.hold) { if (!tutOk({ type: 'tap', what: 'task', id: t.card })) return; apply({ t: 'take', i: i }, ME); return; }
   zoomTask(t);
 }
 function onSeatTap(p) {
   if (!G) return;
-  if (G.phase === 'ask' && askWho(G) < 0 && G.cap === 0 && chooseTargets(G).indexOf(p) >= 0) { apply({ t: 'choose', p: p }, 0); return; }
+  if (G.phase === 'ask' && askWho(G) < 0 && G.cap === ME && chooseTargets(G).indexOf(p) >= 0) { apply({ t: 'choose', p: p }, ME); return; }
   zoomSeat(p);
 }
 function flareOffer() {
@@ -130,18 +137,18 @@ function flareOffer() {
   r.appendChild(d); r.appendChild(f); a.appendChild(r); a.style.top = ($('#pool').style.top || '140px'); a.classList.add('on'); $('#msg').textContent = 'Flare or dive on?';
 }
 function doFlare(c) {
-  var dir = UI.flareMode, picks = []; crew(G).forEach(function (p) { if (p === 0) picks[p] = c; else { var h = G.hands[p].filter(function (x) { return x[0] !== 'r'; }); picks[p] = h.sort(function (a, b) { return rankOf(a) - rankOf(b); })[0]; } });
-  UI.flareMode = 0; if (performMove(G, { t: 'flare', dir: dir, picks: picks }, 0)) { sfx('ping'); popAt($('#hand'), '🔥 Cards passed ' + (dir > 0 ? 'left' : 'right')); } render(); step();
+  var dir = UI.flareMode, picks = []; crew(G).forEach(function (p) { if (p === ME) picks[p] = c; else { var h = G.hands[p].filter(function (x) { return x[0] !== 'r'; }); picks[p] = h.sort(function (a, b) { return rankOf(a) - rankOf(b); })[0]; } });
+  UI.flareMode = 0; if (performMove(G, { t: 'flare', dir: dir, picks: picks }, ME)) { sfx('ping'); popAt($('#hand'), '🔥 Cards passed ' + (dir > 0 ? 'left' : 'right')); } render(); step();
 }
 // ---------------------------------------------------------------- rendering
-function seatEl(p) { return p === 0 ? $('#hand') : document.getElementById('seat' + p) || $('#board'); }
+function seatEl(p) { return p === ME ? $('#hand') : document.getElementById('seat' + p) || $('#board'); }
 function handCardEl(c) { return document.querySelector('#hand .cd[data-c="' + c + '"]'); }
 function poolEl(i) { return document.querySelectorAll('#pool .tcard')[i]; }
-function others() { var o = []; for (var i = 1; i < G.n; i++) o.push(i); return o; }
+function others() { var o = []; for (var i = 1; i < G.n; i++) o.push((ME + i) % G.n); return o; }
 function render(anim) {
   if (!G) return; var B = $('#board'), W = B.clientWidth, H = B.clientHeight, s = sideToAct(G), sq = $('#seats'); sq.innerHTML = '';
   var os = others(), k = os.length, sw = Math.min(W >= 1000 ? 150 : 96, Math.floor(W / k) - 6);
-  var choosing = G.phase === 'ask' && askWho(G) < 0 && G.cap === 0, targets = choosing ? chooseTargets(G) : [];
+  var choosing = G.phase === 'ask' && askWho(G) < 0 && G.cap === ME, targets = choosing ? chooseTargets(G) : [];
   var panelBottom = 0;
   os.forEach(function (p, i) {
     var e = mk('div', 'seat'); e.id = 'seat' + p; e.style.left = (W * (i + .5) / k) + 'px'; e.style.setProperty('--sw', sw + 'px');
@@ -154,8 +161,8 @@ function render(anim) {
     if (G.phase === 'ask' && G.answers[p] != null) e.appendChild(mk('span', 'badge' + (G.answers[p] ? '' : ' no'), G.answers[p] ? 'Yes' : 'No'));
     if (G.chosen === p && /notrick|onetrick/.test(G.mission.sp || '')) e.appendChild(mk('span', 'badge', /notrick/.test(G.mission.sp) ? '0 tricks' : '1 trick'));
     var tk = mk('div', 'tk'); G.tasks.forEach(function (t) { if (t.owner === p) tk.appendChild(miniEl(t.card, tokHtml(t.tok))).classList.toggle('done', !!t.done); });
-    if (G.comm[p]) { var sg = miniEl(G.comm[p].c, '<span class="pos" data-art="token-signal">' + POSTXT[G.comm[p].pos].split(' ')[0] + '</span>'); sg.style.borderStyle = 'dashed'; tk.appendChild(sg); }
-    if (p === G.dummy && G.ctrl[p] !== 0) G.hands[p].forEach(function (c) { tk.appendChild(miniEl(c)); });
+    if (G.comm[p]) { var sg = miniEl(G.comm[p].c, '<span class="pos"><i class="sgi" data-art="token-signal"></i>' + POSTXT[G.comm[p].pos].split(' ')[0] + '</span>'); sg.style.borderStyle = 'dashed'; tk.appendChild(sg); }
+    if (p === G.dummy && G.ctrl[p] !== ME) G.hands[p].forEach(function (c) { tk.appendChild(miniEl(c)); });
     e.appendChild(tk); e.addEventListener('click', function () { onSeatTap(p); }); sq.appendChild(e);
     panelBottom = Math.max(panelBottom, e.offsetTop + e.offsetHeight);
   });
@@ -164,7 +171,7 @@ function render(anim) {
   var pl = $('#pool'); pl.innerHTML = ''; pl.style.top = top + 'px';
   G.pool.forEach(function (t, i) { var e = mk('div', 'tcard s-' + t.card[0], '<span class="rk">' + rankOf(t.card) + '</span><span class="ic">' + ICON[t.card[0]] + '</span>' + tokHtml(t.tok)); e.dataset.c = t.card; e.setAttribute('data-art', 'task-' + SUITART[t.card[0]].slice(5));
     e.setAttribute('role', 'button'); e.setAttribute('aria-label', 'Task ' + cardName(t.card));
-    if (G.phase === 'draft' && s === 0 && !UI.hold) e.classList.add('legal'); e.addEventListener('click', function () { onPoolTap(i); }); holdZoom(e, function () { zoomTask(t); }); pl.appendChild(e); });
+    if (G.phase === 'draft' && s === ME && !UI.hold) e.classList.add('legal'); e.addEventListener('click', function () { onPoolTap(i); }); holdZoom(e, function () { zoomTask(t); }); pl.appendChild(e); });
   // trick
   var tr = $('#trick'); tr.innerHTML = ''; var cards = UI.showTrick ? UI.showTrick.cards : G.trick;
   cards.forEach(function (x) {
@@ -176,12 +183,12 @@ function render(anim) {
   askPanel(top);
   // dock: line, tasks, buttons, hand
   $('#msg').textContent = line(s);
-  var mt = $('#mytasks'); mt.innerHTML = ''; var mine = G.tasks.filter(function (t) { return t.owner === 0; });
+  var mt = $('#mytasks'); mt.innerHTML = ''; var mine = G.tasks.filter(function (t) { return t.owner === ME; });
   if (mine.length) mt.appendChild(mk('span', null, 'Yours:')); mine.forEach(function (t) { var m = miniEl(t.card, tokHtml(t.tok)); if (t.done) m.classList.add('done'); m.addEventListener('click', function () { zoomTask(t); }); mt.appendChild(m); });
-  if (G.chosen === 0 && /notrick|onetrick/.test(G.mission.sp || '')) mt.appendChild(mk('span', null, /notrick/.test(G.mission.sp) ? 'Win no tricks' : 'Win one trick'));
-  if (G.comm[0]) { var m0 = miniEl(G.comm[0].c, '<span class="pos">' + POSTXT[G.comm[0].pos].split(' ')[0] + '</span>'); m0.style.borderStyle = 'dashed'; mt.appendChild(m0); }
-  if (!mine.length && !G.comm[0] && G.cmd === 0) mt.appendChild(mk('span', null, 'You are the captain'));
-  var sb = $('#sigB'); sb.disabled = !canComm(G, 0) || UI.hold || !!UI.tut && !UI.tut.allowSig; sb.classList.toggle('pri', UI.sigMode); sb.style.display = (spHas(G, 'nocomm')) ? 'none' : '';
+  if (G.chosen === ME && /notrick|onetrick/.test(G.mission.sp || '')) mt.appendChild(mk('span', null, /notrick/.test(G.mission.sp) ? 'Win no tricks' : 'Win one trick'));
+  if (G.comm[ME]) { var m0 = miniEl(G.comm[ME].c, '<span class="pos">' + POSTXT[G.comm[ME].pos].split(' ')[0] + '</span>'); m0.style.borderStyle = 'dashed'; mt.appendChild(m0); }
+  if (!mine.length && !G.comm[ME] && G.cmd === ME) mt.appendChild(mk('span', null, 'You are the captain'));
+  var sb = $('#sigB'); sb.disabled = !canComm(G, ME) || UI.hold || !!UI.tut && !UI.tut.allowSig; sb.classList.toggle('pri', UI.sigMode); sb.style.display = (spHas(G, 'nocomm')) ? 'none' : '';
   var fb = $('#flareB'); fb.disabled = !canFlare(G) || UI.hold || !!UI.tut; fb.style.display = G.tricks.length ? 'none' : '';
   drawHand();
   var tot = G.np <= 3 ? 13 : 40 / G.np;
@@ -192,20 +199,20 @@ function render(anim) {
 function shortRule() { var s = G.mission.sp || ''; return s.split('-').map(function (x) { return { notrick: 'one diver wins nothing', onetrick: 'one diver wins one', decide: 'captain decides', dist: 'captain shares', dead: 'dead zone', nocomm: 'silence', late2: 'signals from trick 2', late3: 'signals from trick 3', sonar1: 'sonar 1 must win', sonars: 'every sonar wins' }[x] || x; }).join(', '); }
 function taskOfCard(c) { for (var i = 0; i < G.tasks.length; i++) if (G.tasks[i].card === c) return G.tasks[i]; return null; }
 function slot(p, W, cx, cy, cw, ch, k) {
-  if (p === 0) return { x: cx, y: cy + ch * .62 };
+  if (p === ME) return { x: cx, y: cy + ch * .62 };
   var i = others().indexOf(p), px = W * (i + .5) / k, dx = (px - cx) * .62; dx = Math.max(-(cw * 1.6), Math.min(cw * 1.6, dx));
   return { x: cx + dx, y: cy - ch * .5 - (k > 2 && (i === 0 || i === k - 1) ? -ch * .18 : 0) };
 }
 function drawHand() {
-  var hd = $('#hand'); hd.innerHTML = ''; var droneMine = G.dummy >= 0 && G.turn === G.dummy && G.ctrl[G.dummy] === 0 && G.phase === 'play';
-  var who = droneMine ? G.dummy : 0, h = G.hands[who], s = sideToAct(G); hd.classList.toggle('drone', droneMine);
+  var hd = $('#hand'); hd.innerHTML = ''; var droneMine = G.dummy >= 0 && G.turn === G.dummy && G.ctrl[G.dummy] === ME && G.phase === 'play';
+  var who = droneMine ? G.dummy : ME, h = G.hands[who], s = sideToAct(G); hd.classList.toggle('drone', droneMine);
   var W = hd.clientWidth || 360, cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 58, n = h.length;
   var stepX = n > 1 ? Math.min(cw + 6, (W - cw - 4) / (n - 1)) : 0, x0 = (W - (stepX * (n - 1) + cw)) / 2;
-  var legal = G.phase === 'play' && s === 0 && !UI.hold && !UI.sigMode && !UI.flareMode ? legalCards(G, G.turn) : [];
+  var legal = G.phase === 'play' && s === ME && !UI.hold && !UI.sigMode && !UI.flareMode ? legalCards(G, G.turn) : [];
   h.forEach(function (c, i) {
     var e = cardEl(c); e.style.left = (x0 + i * stepX) + 'px'; e.style.top = droneMine ? '14px' : '8px'; e.style.zIndex = i + 1;
     if (legal.indexOf(c) >= 0) e.classList.add('legal'); else if (legal.length) e.classList.add('dim');
-    if (UI.sigMode && commPos(G, 0, c)) e.classList.add('sigok');
+    if (UI.sigMode && commPos(G, ME, c)) e.classList.add('sigok');
     if (UI.flareMode && c[0] !== 'r') e.classList.add('sigok');
     var tk = taskOfCard(c); if (tk && !tk.done) { e.classList.add('task'); e.appendChild(mk('span', 'own', 'for ' + nm(tk.owner))); }
     e.setAttribute('role', 'button'); e.addEventListener('click', function (ev) { if (e._held) { e._held = false; return; } onHandTap(c, ev); }); holdZoom(e, function () { zoomCard(c); });
@@ -218,9 +225,9 @@ function line(s) {
   if (UI.hold) return 'Trick to ' + nm(UI.showTrick ? UI.showTrick.winner : G.lead);
   if (UI.sigMode) return 'Tap a white-glow card to signal it';
   if (UI.flareMode) return 'Tap a card to pass ' + (UI.flareMode > 0 ? 'left' : 'right');
-  if (G.phase === 'draft') return s === 0 ? 'Tap a task card to take it' : nm(G.draftTurn) + ' is choosing a task';
-  if (G.phase === 'ask') { var q = askWho(G); if (q === 0) return 'Answer the captain: yes or no'; if (q < 0) return G.cap === 0 ? 'Tap the crew mate who gets it' : 'The captain is deciding'; return nm(q) + ' is answering'; }
-  if (G.phase === 'play') { if (s !== 0) return nm(G.turn) + ' is playing'; var dr = G.turn === G.dummy ? 'Drone: ' : ''; return dr + (G.trick.length ? 'Follow suit: tap a glowing card' : 'Your lead: tap a glowing card'); }
+  if (G.phase === 'draft') return s === ME ? 'Tap a task card to take it' : nm(G.draftTurn) + ' is choosing a task';
+  if (G.phase === 'ask') { var q = askWho(G); if (q === ME) return 'Answer the captain: yes or no'; if (q < 0) return G.cap === ME ? 'Tap the crew mate who gets it' : 'The captain is deciding'; return nm(q) + ' is answering'; }
+  if (G.phase === 'play') { if (s !== ME) return nm(G.turn) + ' is playing'; var dr = G.turn === G.dummy ? 'Drone: ' : ''; return dr + (G.trick.length ? 'Follow suit: tap a glowing card' : 'Your lead: tap a glowing card'); }
   return '';
 }
 function askPanel(top) {
@@ -231,8 +238,8 @@ function askPanel(top) {
   a.appendChild(mk('p', null, txt));
   if (cards.length) { var r0 = mk('div', 'row'); cards.forEach(function (t) { var m = miniEl(t.card, tokHtml(t.tok)); m.addEventListener('click', function () { zoomTask(t); }); r0.appendChild(m); }); a.appendChild(r0); }
   var r = mk('div', 'row'); r.style.marginTop = '8px';
-  if (q === 0) { var y = mk('button', 'btn pri', 'Yes, me'), n = mk('button', 'btn', 'No'); y.onclick = function () { apply({ t: 'answer', p: 0, yes: true }, 0); }; n.onclick = function () { apply({ t: 'answer', p: 0, yes: false }, 0); }; r.appendChild(y); r.appendChild(n); }
-  else if (q < 0 && G.cap === 0) chooseTargets(G).forEach(function (p) { var b = mk('button', 'btn' + (G.answers[p] ? ' warm' : ''), (p === 0 ? 'Me' : nm(p)) + (G.answers[p] == null ? '' : G.answers[p] ? ' ✓' : ' ✗')); b.onclick = function () { apply({ t: 'choose', p: p }, 0); }; r.appendChild(b); });
+  if (q === ME) { var y = mk('button', 'btn pri', 'Yes, me'), n = mk('button', 'btn', 'No'); y.onclick = function () { apply({ t: 'answer', p: ME, yes: true }, ME); }; n.onclick = function () { apply({ t: 'answer', p: ME, yes: false }, ME); }; r.appendChild(y); r.appendChild(n); }
+  else if (q < 0 && G.cap === ME) chooseTargets(G).forEach(function (p) { var b = mk('button', 'btn' + (G.answers[p] ? ' warm' : ''), (p === ME ? 'Me' : nm(p)) + (G.answers[p] == null ? '' : G.answers[p] ? ' ✓' : ' ✗')); b.onclick = function () { apply({ t: 'choose', p: p }, ME); }; r.appendChild(b); });
   a.appendChild(r); a.style.top = top + 'px'; a.classList.add('on');
 }
 function popAt(el, text) { if (!el || UI.fast) return; var r = el.getBoundingClientRect(), b = $('#app').getBoundingClientRect(), p = mk('div', 'pop', text); p.style.left = (r.left + r.width / 2 - b.left) + 'px'; p.style.top = (r.top - b.top + 10) + 'px'; $('#app').appendChild(p); setTimeout(function () { p.remove(); }, 1300); }
@@ -251,8 +258,8 @@ function cardText(c) {
 }
 function zoomCard(c) {
   var btns = [];
-  if (G && G.phase === 'play' && sideToAct(G) === 0 && legalCards(G, G.turn).indexOf(c) >= 0 && !UI.hold) btns.push(['Play it', function () { onHandTap(c); }, true]);
-  if (G && canComm(G, 0) && commPos(G, 0, c) && G.hands[0].indexOf(c) >= 0 && !UI.tut) btns.push(['Signal: ' + POSTXT[isDead(G) ? '?' : commPos(G, 0, c)], function () { UI.sigMode = true; onHandTap(c); }]);
+  if (G && G.phase === 'play' && sideToAct(G) === ME && legalCards(G, G.turn).indexOf(c) >= 0 && !UI.hold) btns.push(['Play it', function () { onHandTap(c); }, true]);
+  if (G && canComm(G, ME) && commPos(G, ME, c) && G.hands[ME].indexOf(c) >= 0 && !UI.tut) btns.push(['Signal: ' + POSTXT[isDead(G) ? '?' : commPos(G, ME, c)], function () { UI.sigMode = true; onHandTap(c); }]);
   zoomShow(c, cardText(c), btns);
 }
 function zoomTask(t) {
@@ -282,7 +289,7 @@ function showResult() {
   $('#resH').textContent = ok ? 'Mission ' + G.mission.n + ' complete' : 'Mission ' + G.mission.n + ' lost';
   $('#resP').textContent = ok ? 'Every task went to the right crew mate in ' + G.tricks.length + ' tricks.' + (G.flare ? ' (A flare was used.)' : '') : G.result.why + '.';
   var r = $('#resRow'); r.innerHTML = '';
-  var b1 = mk('button', 'btn pri big', ok ? 'Next mission' : 'Try again'); b1.id = 'again'; b1.onclick = function () { startGame({ players: UI.players, mission: ok ? Math.min(50, G.mission.n + 1) : G.mission.n }); };
+  var b1 = mk('button', 'btn pri big', ok ? 'Next mission' : 'Try again'); b1.id = 'again'; b1.onclick = function () { startGame({ players: UI.players, mission: ok ? Math.min(50, G.mission.n + 1) : G.mission.n, humans: UI.humans.length, level: UI.level }); };
   var b2 = mk('button', 'btn', 'Change setup'); b2.onclick = showSetup; var b3 = mk('button', 'btn', 'Title'); b3.onclick = showTitle;
   r.appendChild(b1); r.appendChild(b2); r.appendChild(b3); $('#res').classList.add('on');
 }
@@ -291,15 +298,18 @@ function showTitle() { clearTimeout(UI.timer); try { if (window.GXT && GXT.activ
 function showSetup() {
   $('#title').classList.remove('on'); $('#res').classList.remove('on'); $('#setup').classList.add('on');
   var sg = $('#segP'); sg.innerHTML = ''; [2, 3, 4, 5].forEach(function (n) { var b = mk('button', n === UI.players ? 'on' : '', String(n)); b.setAttribute('aria-label', n + ' crew'); b.onclick = function () { UI.players = n; ls('ds-pl', n); showSetup(); }; sg.appendChild(b); });
+  UI.nh = Math.min(UI.nh || 1, UI.players);
+  var sh = $('#segH'); sh.innerHTML = ''; for (var hn = 1; hn <= UI.players; hn++) (function (hn) { var b = mk('button', hn === UI.nh ? 'on' : '', String(hn)); b.setAttribute('aria-label', hn + ' at this device'); b.onclick = function () { UI.nh = hn; showSetup(); }; sh.appendChild(b); })(hn);
+  var sl = $('#segL'); sl.innerHTML = ''; [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']].forEach(function (x) { var b = mk('button', x[0] === UI.qlevel ? 'on' : '', x[1]); b.onclick = function () { UI.qlevel = x[0]; ls('ds-lv', x[0]); showSetup(); }; sl.appendChild(b); });
   var m = DS_MISSIONS[UI.mission - 1]; $('#mNum').textContent = UI.mission; $('#mdesc').textContent = m.title + ': ' + m.log + (m.rule ? ' ' + m.rule : '') + (UI.players === 2 ? ' (2 crew: a drone plays face-up cards.)' : '');
   var lb = ls('ds-log') || {}, L = $('#logbook'); L.innerHTML = ''; for (var i = 1; i <= 50; i++) { var s = mk('span', lb[i] ? 'ok' : '', String(i)); L.appendChild(s); }
 }
 // ---------------------------------------------------------------- hint (bulb), coach bubbles, rules
-function phaseId() { if (!G || G.result || UI.hold) return null; var s = sideToAct(G); if (s !== 0) return null; if (G.phase === 'draft') return 'draft'; if (G.phase === 'ask') return 'ask'; if (G.phase === 'play') return G.trick.length ? 'follow' : 'lead'; return null; }
+function phaseId() { if (!G || G.result || UI.hold) return null; var s = sideToAct(G); if (s !== ME) return null; if (G.phase === 'draft') return 'draft'; if (G.phase === 'ask') return 'ask'; if (G.phase === 'play') return G.trick.length ? 'follow' : 'lead'; return null; }
 function suggest() {
-  if (!G || G.phase !== 'play' || sideToAct(G) !== 0 || UI.hold) { if (G && G.phase === 'draft' && sideToAct(G) === 0) { var i = AIX.draftPick(G, 0); return { target: function () { return poolEl(i); }, why: 'Your hand can win this task most easily.' }; } return null; }
+  if (!G || G.phase !== 'play' || sideToAct(G) !== ME || UI.hold) { if (G && G.phase === 'draft' && sideToAct(G) === ME) { var i = AIX.draftPick(G, G.draftTurn); return { target: function () { return poolEl(i); }, why: 'Your hand can win this task most easily.' }; } return null; }
   var c = AIX.choosePlay(G, G.turn, 'normal'), tk = taskOfCard(c), why = 'The crew simulation completes the mission most often with this card.';
-  if (tk && tk.owner === 0) why = 'This card is your task: play it when you can win it.'; else if (tk) why = 'Pass this task card to ' + nm(tk.owner) + ' while they can win.';
+  if (tk && tk.owner === ME) why = 'This card is your task: play it when you can win it.'; else if (tk) why = 'Pass this task card to ' + nm(tk.owner) + ' while they can win.';
   else if (!G.trick.length) why = 'A safe lead that keeps your crew on track.';
   return { target: function () { return handCardEl(c); }, why: why };
 }
@@ -331,7 +341,7 @@ function menuInit() {
     GX.init({ key: 'ds' });
     var b = function (label, f) { var x = mk('button', 'btn', label); x.type = 'button'; x.onclick = function () { GX.close(); f(); }; return x; };
     GX.settings({ id: 'setd', title: 'Menu',
-      game: function (S) { S.appendChild(GX.row('This game', [b('Rules', function () { GXH.rules(); }), b('Tutorial', function () { startTutorial(false); }), b('Restart', function () { if (G) startGame({ players: UI.players, mission: G.mission.n, mode: UI.mode === 'tut' ? 'quick' : UI.mode, level: UI.level }); }), b('Title', showTitle)])); },
+      game: function (S) { S.appendChild(GX.row('This game', [b('Rules', function () { GXH.rules(); }), b('Tutorial', function () { startTutorial(false); }), b('Restart', function () { if (G) startGame({ players: UI.players, mission: G.mission.n, mode: UI.mode === 'tut' ? 'quick' : UI.mode, level: UI.level, humans: UI.humans.length }); }), b('Title', showTitle)])); },
       sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(SND.on, function (v) { SND.on = v; ls('ds-snd', v); }))); S.appendChild(GX.row('Music', [GX.onoff(MUSIC_ON, function (v) { MUSIC_ON = v; ls('ds-mus', v); musicSync(); }), b('Pick music', function () { try { GXMUS.open(); } catch (e) { } })], (window.DS_MUSIC || []).length ? '' : 'Music files arrive later; silent for now.')); },
       help: function (S) { try { S.appendChild(GXH.settingsRow()); } catch (e) { } },
       about: { name: 'Deep Signal', version: '1.0', text: 'Original names, missions and art for the Game Night Shelf. Temporary icons: game-icons.net by Lorc and Delapouite, CC BY 3.0.' } });
@@ -345,7 +355,7 @@ function campaignInit() {
     GXC.init({ game: 'deep-signal', data: window.CAMPAIGN,
       startChapter: function (def) { if (def.setup.mission === 1 && !def.easy) return startTutorial(true); startGame({ players: def.setup.players || 4, mission: def.setup.mission, mode: 'campaign', level: def.opponent.aiLevel === 'hard' ? 'hard' : 'normal', flareFree: !!def.setup.flareFree }); },
       isWon: function (G) { return !!(G.result && G.result.ok); },
-      metrics: function (G) { return { won: !!(G.result && G.result.ok), noflare: !G.flare || UI.flareFree, signals: G.sig.filter(function (s) { return s.p !== 0; }).length, tricks: G.tricks.length }; },
+      metrics: function (G) { return { won: !!(G.result && G.result.ok), noflare: !G.flare || UI.flareFree, signals: G.sig.filter(function (s) { return !isHuman(s.p); }).length, tricks: G.tricks.length }; },
       onExit: showTitle,
       portrait: function (who) { var c = (window.CAMPAIGN.cast || {})[who], f = c && c.portrait ? c.portrait.replace('.webp', '') : who; return artHas(f) ? 'media/' + f + '.webp' : null; },
       scores: function (G) { return [G.result && G.result.ok ? 1 : 0]; }, seats: function (G) { return [{ name: 'You', me: true }]; } });
@@ -353,13 +363,13 @@ function campaignInit() {
 }
 // ---------------------------------------------------------------- boot
 function boot() {
-  UI.players = ls('ds-pl') || 4; menuInit(); helpInit(); campaignInit(); musicInit(); artLoad();
+  UI.players = ls('ds-pl') || 4; UI.qlevel = ls('ds-lv') || 'normal'; menuInit(); helpInit(); campaignInit(); musicInit(); artLoad();
   $('#storyB').onclick = function () { $('#title').classList.remove('on'); GXC.open(); };
   $('#quickB').onclick = showSetup; $('#howB').onclick = function () { GXH.rules(); };
-  $('#setBack').onclick = showTitle; $('#startB').onclick = function () { startGame({ players: UI.players, mission: UI.mission }); };
+  $('#setBack').onclick = showTitle; $('#startB').onclick = function () { startGame({ players: UI.players, mission: UI.mission, humans: UI.nh, level: UI.qlevel }); };
   $('#mMinus').onclick = function () { UI.mission = UI.mission > 1 ? UI.mission - 1 : 50; showSetup(); }; $('#mPlus').onclick = function () { UI.mission = UI.mission < 50 ? UI.mission + 1 : 1; showSetup(); };
   $('#helpB').onclick = function () { GXH.rules(phaseId() || undefined); };
-  $('#sigB').onclick = function () { if (!G || !canComm(G, 0)) return; if (!tutOk({ type: 'tap', what: 'sigB' })) return; UI.sigMode = !UI.sigMode; UI.flareMode = 0; render(); };
+  $('#sigB').onclick = function () { if (!G || !canComm(G, ME)) return; if (!tutOk({ type: 'tap', what: 'sigB' })) return; UI.sigMode = !UI.sigMode; UI.flareMode = 0; render(); };
   $('#flareB').onclick = function () { if (!G || !canFlare(G)) return; zoomShow(null, '<b>Flare</b><br>Everyone passes one card (not a sonar) to the same side. You lose the "No flare" star.', [['Pass left', function () { UI.flareMode = 1; render(); }, true], ['Pass right', function () { UI.flareMode = -1; render(); }]]); };
   $('#zoom').addEventListener('click', function (e) { if (e.target.id === 'zoom') closeZoom(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeZoom(); });

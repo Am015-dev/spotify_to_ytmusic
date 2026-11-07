@@ -24,7 +24,7 @@ function newGame(o) {
   o = o || {}; var np = Math.max(2, Math.min(5, o.players || 4)), md = o.missionDef || missionDef(o.mission || 1);
   var G = { v: 1, np: np, n: np === 2 ? 3 : np, dummy: np === 2 ? 2 : -1, seed: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, mission: JSON.parse(JSON.stringify(md)),
     hands: [], stacks: null, cmd: 0, ctrl: [], phase: 'draft', tasks: [], pool: [], draftTurn: 0, trick: [], lead: 0, turn: 0, tricks: [], won: [], comm: [], commUsed: [],
-    flare: null, result: null, done: [], chosen: -1, ask: null, answers: [], distLeft: [], log: [], sig: [], human: o.humans || [0], twist: o.twist || null, moves: 0 };
+    flare: null, result: null, done: [], chosen: -1, ask: null, answers: [], distLeft: [], names: o.names || null, log: [], sig: [], human: o.humans || [0], twist: o.twist || null, moves: 0 };
   G.seed0 = G.seed;
   var d = shuffle(G, deckAll()), i;
   for (i = 0; i < G.n; i++) { G.hands.push([]); G.won.push(0); G.comm.push(null); G.commUsed.push(false); G.ctrl.push(i); G.answers.push(null); }
@@ -47,7 +47,7 @@ function newGame(o) {
   log(G, 'Mission ' + G.mission.n + ': captain is ' + seatName(G, G.cmd));
   return G;
 }
-function seatName(G, p) { return p === G.dummy ? 'the drone' : (p === 0 ? 'You' : ['You', 'Ines', 'Bram', 'Kito', 'Odile'][p]); }
+function seatName(G, p) { return p === G.dummy ? 'the drone' : G.names && G.names[p] ? G.names[p] : (p === 0 ? 'You' : ['You', 'Ines', 'Bram', 'Kito', 'Odile'][p]); }
 function log(G, t) { G.log.push(t); if (G.log.length > 60) G.log.shift(); }
 function startPlay(G) { G.phase = 'play'; G.turn = G.lead = G.cmd; G.trick = []; }
 // who answers / decides right now (seat whose input is needed)

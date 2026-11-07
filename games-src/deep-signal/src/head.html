@@ -93,7 +93,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .seg button{min-width:44px;min-height:44px;border:0;background:#0f3250;font-weight:700}
 .seg button.on{background:var(--acc);color:#04212a}
-#tutSlot .btn{min-width:0!important;background:transparent;font-size:.95rem;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 18px;gap:2px;height:auto;line-height:1.2}
+#tutSlot .btn{min-width:0!important;max-width:150px;white-space:normal;background:transparent;font-size:.95rem;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 18px;gap:2px;height:auto;line-height:1.2}
 #tutSlot .btn span{display:none}
 #mdesc{max-width:440px;font-size:1rem;color:#d8eaf0;min-height:3em;margin:0}
 #zoom{position:fixed;inset:0;z-index:45;display:none;align-items:center;justify-content:center;background:rgba(2,8,16,.78)}
@@ -113,6 +113,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 @media (min-width:1024px){.seat{--sw:150px}.seat .av{width:46px;height:46px}.mini{width:40px;height:56px}#topbar{min-height:58px}}
 @media (orientation:landscape) and (max-height:500px){:root{--cw:46px;--ch:68px}.seat .av{display:none}}
 [data-art].hasart>.ic{display:none}
+.cd.hasart,.tcard.hasart{color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.7)!important}
+.av.hasart{color:transparent}
+.tcard.hasart .rk{background:rgba(6,24,42,.85);border-radius:0 0 8px 0}
 .gxc-node .gxc-disc{color:#fff!important;background:#173a5a!important;text-shadow:none!important}.gxc-node .gxc-lock{visibility:hidden}
 .gxc-node.won .gxc-disc{background:#1c6b4a!important}.gxc-node.next .gxc-disc,.gxc-node.open .gxc-disc{background:#0f5c66!important}
 @media (min-width:1024px){.gxc-lab,.gxc-act b,.gxc small,.gxc-dim,.gxc-twist span,.gxc-twist b,.gxc-stars span,.gxc-star{font-size:16px!important}}
@@ -121,6 +124,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .scr .trow .btn{min-width:0;background:transparent;font-size:.95rem;font-weight:600}
 #title.hasart,#res.hasart{background-size:cover}
 .bk{display:inline-block;width:12px;height:16px;border-radius:2px;background:#24507a;border:1px solid #9fc7e0;vertical-align:-3px;margin-right:2px}.bk.tw{width:auto;height:auto;background:none;border:0;color:var(--warm)}.bk.tw.hasart{width:16px;height:16px;color:transparent}
+.sgi{display:none;width:12px;height:12px;vertical-align:-1px;margin-right:2px}.sgi.hasart{display:inline-block}
 .bi.hasart{display:inline-block;width:1.2em;height:1.2em;color:transparent}
 .pingfx{position:fixed;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:3px solid var(--acc);pointer-events:none;z-index:50;animation:pingfx .9s ease-out forwards}.pingfx.hasart{border:0}
 @keyframes pingfx{to{transform:scale(9);opacity:0}}

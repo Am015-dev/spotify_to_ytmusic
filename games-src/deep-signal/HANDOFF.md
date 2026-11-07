@@ -74,12 +74,21 @@ Other crew sizes (60 each, 1-10 / 11-25): 2p 57% / 57%, 3p 87% / 77%, 5p 63% / 3
 - Open source: searched the web/GitHub for a permissive implementation of this game or a co-op trick-taking AI: none found with
   code + MIT/BSD/Apache/ISC licence (one academic MCTS report, no code/licence). Nothing ported; no THIRD-PARTY.md needed.
 - Rulebook cross-check: see rules-notes.md; one mismatch fixed (flare only before any signal, offered after the draft).
-- Temporary art: 18 CC BY 3.0 icons from game-icons.net (Lorc, Delapouite) in `temp-art/`, credits in ASSETS.md and Menu > About.
+- Temporary art: 37 pictures = CC BY 3.0 icons from game-icons.net (Lorc, Delapouite) in `temp-art/`, credits in ASSETS.md and Menu > About.
   Install at deploy: `python3 games-src/deep-signal/temp-art/install.py` then build. kenney.nl was blocked (HTTP 403 from the proxy);
   no fan-made versions with an explicit reuse licence were found in the time box, and no publisher scans were used.
 
+## Polish round (orchestrator 18:24)
+- Phone title F1 fixed (tutorial entry is a small button); ui-audit now A0 B0 C0 D0 E0 F0 on phone and PC, also with the temporary art installed.
+- Quick game: "At this device" 1..crew (hot-seat) and "Crew skill" Easy/Normal/Hard, plus the mission stepper (1-50).
+- Hot-seat: the Short Fuse pattern (device holder, pass screen that covers everything, each seat sees only its own hand) ported into
+  ui.js (`ME` = the seat holding the device). `hotseat-test.js`: 4 crew, 2 humans, real taps: PASS, 5 pass screens, 0 hand leaks.
+  The flare card for other humans is picked by the computer (simplification). Online play is not built.
+- Temporary art now also fills the 5 card faces, card back, 4 task cards, 6 crew portraits and the 3 order tokens (glyphs on code-drawn
+  shapes). Deploy step: `python3 games-src/deep-signal/temp-art/install.py` then build-all (never overwrites finished art).
+
 ## Not done / weak
-- Hot-seat and online play are not built (brief: optional). Difficulty picker is not exposed in Quick game (normal crew; Story act 2-3 hard).
+- Online play is not built.
 - `GXC.validate` reports "needs 9 or 10 chapters (has 50)": deliberate, the brief makes the 50-mission logbook the campaign.
 - Missions 26-50 are hard for the AI crew (21%); the original logbook is hard there too, but a smarter signal policy would help.
 - Art is code-drawn placeholders; music silent until files exist (gx-music slots wired, GA only registers files that exist).
