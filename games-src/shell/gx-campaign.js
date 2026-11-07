@@ -22,7 +22,7 @@
 
   // ------------------------------------------------------------------ validation (node-safe)
   var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
-  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter', 'relic'];
   function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
   GXC.validate = function (data) {
     var bad = [], add = function (m) { bad.push(m); };
