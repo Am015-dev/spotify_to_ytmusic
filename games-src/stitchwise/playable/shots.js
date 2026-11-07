@@ -9,7 +9,7 @@ const URL = process.env.URL || 'http://localhost:8765/stitchwise/index.html';
   pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
   const shot = n => pg.screenshot({ path: path.join(OUT, `${pre}-${w}-${n}.png`) });
   const click = async s => { const e = await pg.$(s); const bb = await e.boundingBox(); if (touch) await pg.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); else await pg.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); };
-  await pg.goto(URL); await pg.waitForTimeout(900); await shot('1title');
+  await pg.goto(URL); await pg.waitForTimeout(900); await shot('1title'); await click('[data-a=rules]'); await pg.waitForTimeout(600); await shot('1help'); await pg.reload(); await pg.waitForTimeout(700);
   // tutorial
   const tb = await pg.$('text=Tutorial'); if (tb) { await tb.click(); await pg.waitForTimeout(900); await shot('2tut1');
     for (let i = 2; i <= 3; i++) { const nx = await pg.$('.gxt-next'); if (nx) { const bb = await nx.boundingBox(); if (bb) { await pg.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); } } await pg.waitForTimeout(700); await shot('2tut' + i); }
