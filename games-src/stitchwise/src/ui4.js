@@ -21,7 +21,7 @@ function tutStart(o) { // W381 ADDENDUM 4: the tutorial is a coached first game 
   if (typeof GXT !== 'undefined' && GXT.active && GXT.active()) try { GXT.stop(); } catch (e) { }
   $('#start').hidden = true; $('#rs').hidden = true;
   newGame('vs', { seed: 4242, ring: TUT_RING, first: 0, lvl: 'easy', name: 'Marden', save: false, coach: true });
-  UI.prologue = !!(o && o.prologue); UI.flavor = ''; coachStart(); render(); saveGame();
+  UI.prologue = !!(o && o.prologue); UI.flavor = ''; coachStart(); render();
 }
 function PRO() { return ((window.CAMPAIGN || {}).story || {}).prologue || {}; }
 // ---------- coach: the rest of the tutorial game (chapters 2-4). Aunt Wren notices each rule the first time it happens; the player keeps playing for real.

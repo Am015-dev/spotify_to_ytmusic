@@ -13,7 +13,7 @@ plain words, recognition over recall, feedback for every action).
 | 4 | The instruction line was the same for every state and never said how. | FIXED. One always-visible line with a gold bar (red while the rival plays): "Tap a glowing patch, or tap Advance" → "Drag the patch onto your quilt" → "Good spot! Tap Sew it on"; "No patch you can buy: tap Advance"; "Free 1×1 patch! Tap any empty square". Max 2 lines, 16 px. Help-bulb auto popups are off by default (they repeated the line and covered the track; the bulb still works on tap). |
 | 5 | Nothing glowed or dimmed. | FIXED. Buyable cards have a pulsing gold ring; unaffordable ones dim; after picking, the other cards dim and the quilt glows. |
 | 6 | Score changes popped as a bare "+4". | FIXED. Pops carry the reason: "+4 buttons for advancing", "+3 buttons: gold spot income", "Sewn on: −3 buttons", "Free 1×1 patch". |
-| 7 | Tutorial: 13 steps, 9 of them read-and-Next, ended on the title. | FIXED. 6 steps, each a real action: tap the glowing strip, place it, Sew it on, Next + watch Marden's turn, tap Advance, Next. The end card offers **Finish this game** (continues the same game vs an easy Marden) or Back to the title. Proven by `playable/play.js <size> tut` (taps the centre of each spotlit element, elementFromPoint must be that element). |
+| 7 | Tutorial: 13 steps, 9 of them read-and-Next, ended on the title. | FIXED (final form, ADDENDUM 4): the tutorial is a **coached first game** against Marden: free choices from turn 1, no forced taps; Aunt Wren explains each rule the first time it matters (one dismissable line, never blocks input), reacts to your first buy and to Marden's moves, walks the final score through with your real numbers and lists rules not met on a "Things you'll meet later" card. Proven by `playable/play.js <size> tut` (random legal moves through the UI, PASS both sizes). |
 | 8 | Two turns in a row looked like a bug. | FIXED. Banner "Your turn again" and the line "You are still behind on the track: play again" (same for the rival: "Marden plays again"). |
 | 9 | Player pills said "+0 /spot". | FIXED. "income +0"; track hint says "Gold spot (income) in 5 · free patch in 20". |
 | 10 | Help opened on detail. | FIXED. How to play opens with "How a turn works" in 5 numbered lines, then the details. |
@@ -22,10 +22,7 @@ Also found and fixed on the way: in Story the goal line pushed Rotate / Sew it o
 the dock is now compact (track hint hidden in Story on phone, 1-line prompts), so the action row is always on screen.
 
 ## Addenda 1-3 and the free art kit
-- **ADDENDUM 1, tutorial = a real guided game:** chapter 1 *Your first turn* (6 spotlit action steps), then chapters 2 *Pay day*,
-  3 *Fair surprises*, 4 *The judging*: the same game played to the result screen, with Aunt Wren's line in the panel the first time
-  each rule happens. Checklist and honest gaps: `TUTORIAL-COVERAGE.md`. `playable/play.js <size> tut` plays the whole game by taps
-  and asserts every coverage line was shown (PASS 390x763 and 1440x860).
+- **ADDENDUM 1 + 4, tutorial = a coached real game:** see row 7 and `TUTORIAL-COVERAGE.md` (every rule explained during the game at both sizes; the later card held only the tie-break). The earlier spotlit chapter 1 was removed (0 forced steps).
 - **ADDENDUM 2, rules:** `rules-check/stitchwise.md` lists WRONG 0 / MISSING 0, so rules fixed 0/0. The 3 SIMPLIFIED items are now
   stated in How to play ("Simplified on purpose").
 - **ADDENDUM 3, narrative:** the tutorial is the story's prologue (guide Aunt Wren with her portrait when art exists, rival Marden with

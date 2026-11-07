@@ -24,9 +24,9 @@ let fails = 0, n = 0; const ok = (c, m) => { n++; if (!c) { fails++; console.log
   const snd = await pg.evaluate(() => UI.sound); const tg = await pg.$('#setd .gx-tg'); if (tg) { await tap(tg); ok(await pg.evaluate(s => UI.sound !== s, snd), 'Sound effects toggle works'); await tap(tg); }
   await tapText('#setd', 'Rules'); ok(await pg.evaluate(() => /How to play/.test(document.querySelector('#rulesd').innerText) && !document.querySelector('#rulesd').hidden), 'Menu > Rules opens How to play');
   await pg.keyboard.press('Escape'); await pg.waitForTimeout(400);
-  await openMenu(); await tapText('#setd', 'Tutorial'); await pg.waitForFunction(() => typeof GXT !== 'undefined' && GXT.active(), null, { timeout: 5000 }).then(() => ok(true, 'Menu > Tutorial starts'), () => ok(false, 'Menu > Tutorial starts'));
+  await openMenu(); await tapText('#setd', 'Tutorial'); await pg.waitForFunction(() => !!G && !!UI.coach && !G.over, null, { timeout: 5000 }).then(() => ok(true, 'Menu > Tutorial starts'), () => ok(false, 'Menu > Tutorial starts'));
   await pg.evaluate(() => { try { GXT.stop && GXT.stop(); } catch (e) { } }); const sk = await pg.$('.gxt-skip, button:has-text("Skip tutorial")'); if (sk) await tap(sk); await pg.waitForTimeout(500);
-  if (!(await pg.evaluate(() => !!G && UI.started && !UI.tutorial))) { await pg.evaluate(() => newGame('vs', { lvl: 'normal' })); }
+  if (!(await pg.evaluate(() => !!G && UI.started && !UI.tutorial && !UI.coach))) { await pg.evaluate(() => newGame('vs', { lvl: 'normal' })); }
   await openMenu(); await pg.evaluate(() => { window.__g = G; }); await tapText('#setd', 'Restart'); ok(await pg.evaluate(() => !!G && UI.started), 'first Restart tap keeps the game and asks to tap again'); ok(!!(await pg.$('#setd button:has-text("Tap again")')), 'Restart asks for confirmation');
   await tapText('#setd', 'Tap again'); ok(await pg.evaluate(() => !!G && G !== window.__g && UI.started), 'second Restart tap starts a fresh game');
   await openMenu(); await tapText('#setd', 'Title'); ok(await pg.evaluate(() => !document.querySelector('#start').hidden), 'Menu > Title shows the title screen');
