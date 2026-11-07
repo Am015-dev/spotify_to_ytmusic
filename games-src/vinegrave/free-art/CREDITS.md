@@ -1,190 +1,179 @@
 # Free art credits: vinegrave
 
-All pictures in this folder are composed by `compose.py` from CC0 material (no attribution required; logged anyway).
-No picture contains text. No publisher, designer or original-game name or logo is used.
+Cards, sites, frames, tokens, UI and backgrounds are flat vector SVG drawn by `vg.py` / `vg2.py` in this folder (our own
+work, released CC0) in the Kenney flat style. Guardians and idols are Kenney Animal Pack Redux heads (CC0 1.0, Kenney,
+https://opengameart.org/content/animal-pack-redux), recoloured. Portraits use Kenney Toon Characters 1 (CC0 1.0, Kenney,
+https://opengameart.org/content/toon-characters-1). No picture contains text. No publisher, designer or original-game name or logo is used.
 
-## Sources used
-
-| Source | Author | Licence | URL | Files |
-|---|---|---|---|---|
-| Kenney Animal Pack Redux | Kenney | CC0 1.0 | https://opengameart.org/content/animal-pack-redux | 39 |
-| Kenney Cartography Pack | Kenney | CC0 1.0 | https://opengameart.org/content/cartography-pack | 43 |
-| Kenney Board Game Icons | Kenney | CC0 1.0 | https://opengameart.org/content/board-game-icons | 110 |
-| Poly Haven textures (diffuse maps, 1k) | Poly Haven contributors (see per-texture page) | CC0 1.0 | https://polyhaven.com/textures | 133 |
-| Quaternius low-poly animals (OBJ rendered to 2D with three.js, recoloured) | Quaternius | CC0 1.0 | https://opengameart.org/content/5-low-poly-animals | 4 |
-
-## Poly Haven textures used (CC0, https://polyhaven.com/a/<name>)
-
-forest_ground_04, lichen_rock, rough_linen
-
-## Per file
-
-| File | Sources |
+| File | Source |
 |---|---|
-| board-map.webp | kenney-carto, kenney-icons, polyhaven |
-| card-airship.webp | kenney-carto, kenney-icons, polyhaven |
-| card-almanac.webp | kenney-icons, polyhaven |
-| card-ancestor-mask.webp | kenney-icons, polyhaven |
-| card-ash-urn.webp | kenney-icons, polyhaven |
-| card-back.webp | kenney-icons, polyhaven |
-| card-bat-wing-fan.webp | kenney-animals, kenney-icons, polyhaven |
-| card-bone-dice.webp | kenney-icons, polyhaven |
-| card-brush.webp | kenney-icons, polyhaven |
-| card-camera.webp | kenney-icons, polyhaven |
-| card-canteen.webp | kenney-icons, polyhaven |
-| card-chisel.webp | kenney-icons, polyhaven |
-| card-clay-cup.webp | kenney-icons, polyhaven |
-| card-codebook.webp | kenney-icons, polyhaven |
-| card-coral-throne.webp | kenney-icons, polyhaven |
-| card-crate.webp | kenney-carto, kenney-icons, polyhaven |
-| card-dinghy.webp | kenney-carto, kenney-icons, polyhaven |
-| card-dread.webp | kenney-icons, polyhaven |
-| card-ember-mask.webp | kenney-carto, kenney-icons, polyhaven |
-| card-feather-cloak.webp | kenney-animals, kenney-icons, polyhaven |
-| card-flares.webp | kenney-carto, kenney-icons, polyhaven |
-| card-frame-art.webp | kenney-icons, polyhaven |
-| card-frame-fear.webp | kenney-icons, polyhaven |
-| card-frame-item.webp | kenney-icons, polyhaven |
-| card-gilded-beetle.webp | kenney-animals, kenney-icons, polyhaven |
-| card-glyph-stone.webp | kenney-icons, polyhaven |
-| card-gold-mask.webp | kenney-icons, polyhaven |
-| card-gramophone.webp | kenney-icons, polyhaven |
-| card-grant.webp | kenney-icons, polyhaven |
-| card-hammock.webp | kenney-carto, kenney-icons, polyhaven |
-| card-jade-frog.webp | kenney-animals, kenney-icons, polyhaven |
-| card-jeepkey.webp | kenney-icons, polyhaven |
-| card-journal.webp | kenney-icons, polyhaven |
-| card-kettle.webp | kenney-icons, polyhaven |
-| card-lamp.webp | kenney-carto, kenney-icons, polyhaven |
-| card-lava-blade.webp | kenney-icons, polyhaven |
-| card-ledger.webp | kenney-icons, polyhaven |
-| card-lockbox.webp | kenney-carto, kenney-icons, polyhaven |
-| card-machete.webp | kenney-icons, polyhaven |
-| card-mapcase.webp | kenney-icons, polyhaven |
-| card-moon-comb.webp | kenney-icons, polyhaven |
-| card-moss-idol.webp | kenney-icons, polyhaven |
-| card-mule.webp | kenney-animals, kenney-icons, polyhaven |
-| card-obsidian-mirror.webp | kenney-icons, polyhaven |
-| card-old-codex.webp | kenney-icons, polyhaven |
-| card-owl-totem.webp | kenney-animals, kenney-icons, polyhaven |
-| card-permit.webp | kenney-icons, polyhaven |
-| card-pickaxe.webp | kenney-icons, polyhaven |
-| card-quiver.webp | kenney-icons, polyhaven |
-| card-radio.webp | kenney-icons, polyhaven |
-| card-rain-drum.webp | kenney-icons, polyhaven |
-| card-reed-flute.webp | kenney-icons, polyhaven |
-| card-root-sceptre.webp | kenney-carto, kenney-icons, polyhaven |
-| card-rope.webp | kenney-carto, kenney-icons, polyhaven |
-| card-ropebridge.webp | kenney-carto, kenney-icons, polyhaven |
-| card-satchel.webp | kenney-icons, polyhaven |
-| card-scale.webp | kenney-icons, polyhaven |
-| card-seaplane.webp | kenney-carto, kenney-icons, polyhaven |
-| card-serpent-ring.webp | kenney-animals, kenney-icons, polyhaven |
-| card-sextant.webp | kenney-icons, polyhaven |
-| card-sky-lens.webp | kenney-icons, polyhaven |
-| card-spirit-bowl.webp | kenney-icons, polyhaven |
-| card-spyglass.webp | kenney-icons, polyhaven |
-| card-star-chart.webp | kenney-icons, polyhaven |
-| card-stone-heart.webp | kenney-icons, polyhaven |
-| card-storm-horn.webp | kenney-icons, polyhaven |
-| card-sun-disc.webp | kenney-icons, polyhaven |
-| card-tarp.webp | kenney-carto, kenney-icons, polyhaven |
-| card-tent.webp | kenney-carto, kenney-icons, polyhaven |
-| card-theodolite.webp | kenney-icons, polyhaven |
-| card-thorn-key.webp | kenney-icons, polyhaven |
-| card-tide-shell.webp | kenney-carto, kenney-icons, polyhaven |
-| card-trail.webp | kenney-icons, polyhaven |
-| card-tusk-horn.webp | kenney-icons, polyhaven |
-| card-twin-idols.webp | kenney-icons, polyhaven |
-| card-vine-crown.webp | kenney-icons, polyhaven |
-| card-wind-chime.webp | kenney-icons, polyhaven |
-| card-world-seed.webp | kenney-icons, polyhaven |
-| explorer-0.webp | kenney-icons |
-| explorer-1.webp | kenney-icons |
-| explorer-2.webp | kenney-icons |
-| explorer-3.webp | kenney-icons |
-| guard-ash-jaguar.webp | polyhaven, quaternius |
-| guard-bone-heron.webp | kenney-animals, polyhaven |
-| guard-canopy-wyrm.webp | kenney-animals, polyhaven |
-| guard-ember-hound.webp | polyhaven, quaternius |
-| guard-glass-moth.webp | kenney-animals, polyhaven |
-| guard-howl-bat.webp | kenney-animals, polyhaven |
-| guard-mire-crawler.webp | kenney-animals, polyhaven |
-| guard-moss-golem.webp | kenney-animals, polyhaven |
-| guard-old-warden.webp | kenney-animals, polyhaven |
-| guard-rootback-boar.webp | kenney-animals, polyhaven |
-| guard-stone-ape.webp | kenney-animals, polyhaven |
-| guard-temple-cat.webp | polyhaven, quaternius |
-| guard-thunder-toad.webp | kenney-animals, polyhaven |
-| guard-tide-serpent.webp | kenney-animals, polyhaven |
-| guard-vine-widow.webp | kenney-animals, polyhaven |
-| icon-howto.webp | kenney-icons |
-| icon-quick.webp | kenney-icons |
-| icon-story.webp | kenney-icons |
-| idol-ape.webp | kenney-animals |
-| idol-bat.webp | kenney-animals |
-| idol-bird.webp | kenney-animals |
-| idol-boar.webp | kenney-animals |
-| idol-cat.webp | quaternius |
-| idol-fish.webp | kenney-animals |
-| idol-frog.webp | kenney-animals |
-| idol-moon.webp | kenney-icons |
-| idol-owl.webp | kenney-animals |
-| idol-snake.webp | kenney-animals |
-| idol-star.webp | kenney-icons |
-| idol-sun.webp | kenney-icons |
-| map-act1.webp | kenney-carto, kenney-icons, polyhaven |
-| map-act2.webp | kenney-carto, kenney-icons, polyhaven |
-| map-act3.webp | kenney-carto, kenney-icons, polyhaven |
-| portrait-mira.webp | kenney-animals, polyhaven |
-| portrait-okoro.webp | kenney-animals, polyhaven |
-| portrait-pell.webp | kenney-animals, polyhaven |
-| portrait-quell.webp | kenney-animals, polyhaven |
-| portrait-sallow.webp | kenney-animals, polyhaven |
-| portrait-tamsin.webp | kenney-animals, polyhaven |
-| portrait-vane.webp | kenney-animals, polyhaven |
-| portrait-warden.webp | kenney-animals, polyhaven |
-| res-arrow.webp | kenney-icons |
-| res-coin.webp | kenney-icons |
-| res-compass.webp | kenney-carto |
-| res-jewel.webp | kenney-icons |
-| res-tablet.webp | kenney-icons |
-| result-lose.webp | kenney-carto, kenney-icons, polyhaven |
-| result-win.webp | kenney-carto, kenney-icons, polyhaven |
-| shrine-slot.webp | kenney-icons |
-| site-bone-chapel.webp | kenney-animals, polyhaven |
-| site-broken-arch.webp | kenney-carto, polyhaven |
-| site-c-cliff.webp | kenney-carto, polyhaven |
-| site-c-cove.webp | kenney-carto, polyhaven |
-| site-c-road.webp | kenney-icons, polyhaven |
-| site-c-spring.webp | kenney-carto, polyhaven |
-| site-c-wreck.webp | kenney-carto, polyhaven |
-| site-crystal-vault.webp | kenney-carto, polyhaven |
-| site-drowned-hall.webp | kenney-carto, polyhaven |
-| site-echo-pit.webp | kenney-carto, polyhaven |
-| site-fern-steps.webp | kenney-carto, polyhaven |
-| site-frog-pool.webp | kenney-animals, polyhaven |
-| site-hidden-1.webp | kenney-icons, polyhaven |
-| site-hidden-2.webp | kenney-icons, polyhaven |
-| site-hollow-tree.webp | kenney-carto, polyhaven |
-| site-jade-court.webp | kenney-carto, polyhaven |
-| site-lava-stair.webp | kenney-carto, polyhaven |
-| site-moth-cave.webp | kenney-animals, polyhaven |
-| site-root-gate.webp | kenney-carto, polyhaven |
-| site-sky-altar.webp | kenney-carto, polyhaven |
-| site-snake-ford.webp | kenney-animals, polyhaven |
-| site-star-pool.webp | kenney-icons, polyhaven |
-| site-statue-row.webp | kenney-carto, polyhaven |
-| site-sunken-well.webp | kenney-icons, polyhaven |
-| site-thorn-palace.webp | kenney-icons, polyhaven |
-| temple-11.webp | kenney-carto |
-| temple-2.webp | kenney-carto |
-| temple-6.webp | kenney-carto |
-| title-bg.webp | kenney-carto, kenney-icons, polyhaven |
-| token-glass.webp | kenney-icons |
-| token-notebook.webp | kenney-icons |
-| tr-boot.webp | kenney-icons |
-| tr-car.webp | kenney-icons |
-| tr-plane.webp | kenney-icons |
-| tr-ship.webp | kenney-carto |
-| track-bg.webp | kenney-carto, polyhaven |
+| board-map.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-airship.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-almanac.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-ancestor-mask.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-ash-urn.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-back.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-bat-wing-fan.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-bone-dice.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-brush.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-camera.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-canteen.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-chisel.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-clay-cup.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-codebook.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-coral-throne.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-crate.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-dinghy.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-dread.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-ember-mask.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-feather-cloak.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-flares.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-frame-art.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-frame-fear.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-frame-item.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-gilded-beetle.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-glyph-stone.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-gold-mask.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-gramophone.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-grant.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-hammock.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-jade-frog.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-jeepkey.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-journal.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-kettle.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-lamp.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-lava-blade.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-ledger.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-lockbox.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-machete.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-mapcase.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-moon-comb.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-moss-idol.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-mule.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-obsidian-mirror.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-old-codex.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-owl-totem.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-permit.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-pickaxe.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-quiver.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-radio.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-rain-drum.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-reed-flute.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-root-sceptre.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-rope.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-ropebridge.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-satchel.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-scale.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-seaplane.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-serpent-ring.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-sextant.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-sky-lens.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-spirit-bowl.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-spyglass.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-star-chart.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-stone-heart.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-storm-horn.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-sun-disc.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-tarp.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-tent.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-theodolite.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-thorn-key.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-tide-shell.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-trail.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-tusk-horn.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-twin-idols.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-vine-crown.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-wind-chime.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| card-world-seed.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| explorer-0.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| explorer-1.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| explorer-2.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| explorer-3.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| fx-discover.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| fx-guardian.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| fx-idol.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| guard-ash-jaguar.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-bone-heron.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-canopy-wyrm.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-ember-hound.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-glass-moth.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-howl-bat.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-mire-crawler.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-moss-golem.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-old-warden.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-rootback-boar.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-stone-ape.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-temple-cat.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-thunder-toad.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-tide-serpent.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| guard-vine-widow.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| icon-howto.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| icon-quick.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| icon-story.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| idol-ape.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-bat.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-bird.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-boar.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-cat.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-fish.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-frog.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-moon.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-owl.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-snake.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-star.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| idol-sun.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| map-act1.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| map-act2.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| map-act3.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| portrait-mira.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-okoro.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-pell.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-quell.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-sallow.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-tamsin.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-vane.webp | Kenney Toon Characters 1 (CC0, https://opengameart.org/content/toon-characters-1), recoloured; Hexagon Pack prop (CC0) |
+| portrait-warden.webp | Kenney Animal Pack Redux (CC0, https://opengameart.org/content/animal-pack-redux), recoloured |
+| res-arrow.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| res-coin.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| res-compass.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| res-jewel.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| res-tablet.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| result-lose.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| result-win.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| shrine-slot.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-bone-chapel.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-broken-arch.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-c-cliff.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-c-cove.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-c-road.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-c-spring.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-c-wreck.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-crystal-vault.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-drowned-hall.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-echo-pit.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-fern-steps.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-frog-pool.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-hidden-1.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-hidden-2.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-hollow-tree.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-jade-court.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-lava-stair.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-moth-cave.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-root-gate.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-sky-altar.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-snake-ford.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-star-pool.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-statue-row.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-sunken-well.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| site-thorn-palace.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| temple-11.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| temple-2.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| temple-6.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| title-bg.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| token-glass.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| token-notebook.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| tr-boot.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| tr-car.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| tr-plane.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| tr-ship.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+| track-bg.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |

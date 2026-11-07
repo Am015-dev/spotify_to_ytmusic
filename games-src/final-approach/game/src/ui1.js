@@ -1,5 +1,5 @@
 // ===================== part 1: globals, helpers, prefs, text, view model =====================
-var ANIM = 1, AIDELAY = 650;
+var ANIM = 1, AIDELAY = 900;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, seat: 0, holder: -1, sel: -1, cof: 0, pop: null, busy: false, seq: 0, over: null, overShown: false, tm: null, rrm: [false, false, false, false],
   coach: { level: 'full', seen: {}, tip: '' }, prefs: { sound: true, music: true, gfx: 'auto', guide: 'full', diceShow: true }, hint: null, rt: null, lastPlace: null, seats: [0, 1], won: {}, ready: false };

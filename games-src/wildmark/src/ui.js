@@ -58,7 +58,7 @@ function newGame(cfg) {
   var cards = cfg.cards === 'mix' ? (function () { var o = {}; WM.ANI.forEach(function (a) { o[a] = 'abcd'[1 + Math.floor(Math.random() * 3)]; }); return o; })() : (cfg.cards && typeof cfg.cards === 'object' ? cfg.cards : null);
   G = WM.newGame({ np: cfg.np, seed: cfg.seed, ai: ai, names: names, turns: cfg.turns, acorns: cfg.acorns, no3: cfg.no3, cards: cards });
   UI.cfg = cfg; UI.humans = cfg.humans; UI.view = 0; UI.lastHuman = 0; UI.ghost = null; UI.free = null; UI.wipe = null; UI.undo = null; UI.lit = null; UI.userPan = 0; UI.passed = -1;
-  $('#start').hidden = true; $('#rs').hidden = true; try { GX.close(); } catch (e) { }
+  $('#start').hidden = true; document.documentElement.classList.remove('wm-title'); $('#rs').hidden = true; try { GX.close(); } catch (e) { }
   fitView(true); render(); step(); save(); musicSync();
   var q = window.CAMPAIGN && CAMPAIGN.quick; if (q && q.intro && UI.mode === 'quick' && !UI.fast) setTimeout(function () { toast(q.intro[Math.floor(Math.random() * q.intro.length)], 2600); }, 500);   // one-line flavour (text in campaign.json)
   return G;
@@ -122,6 +122,7 @@ function act(m) {
   if (m.t === 'place') { UI.ghost = null; sfx('place'); var sp = WM.score(before.env, before.acorns), g = sp.habT - sc0.habT; if (g > 0) { pop(m.c, '+' + g + ' habitat', 'hab'); var gt = WM.TER.filter(function (t) { return sp.hab[t] > sc0.hab[t]; })[0]; if (!before.ai && gt) toast('+' + g + ': your ' + WM.TER_NAME[gt] + ' grew to ' + sp.hab[gt] + ' joined tiles', 2600); } }
   if (m.t === 'tok' || m.t === 'back') {
     UI.undo = null; at = m.c;
+    if (UI.mode === 'quick' && !before.ai && (UI.prefs.coachN || 0) < 3) { UI.prefs.coachN = (UI.prefs.coachN || 0) + 1; savePrefs(); }
     if (m.t === 'tok') {
       var sc1 = WM.score(before.env, before.acorns), best = null;
       WM.ANI.forEach(function (a) { var d = sc1.ani[a] - sc0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
@@ -190,7 +191,7 @@ function fitView(now) {
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
   // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
-  var wh = boardWH(), padT = G.np > 1 ? 106 : 62, padB = 70, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
+  var wh = boardWH(), padT = (G.np > 1 ? 106 : 62) + (UI.mode === 'coach' ? 44 : 0), padB = 70, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
   var z = Math.max(0.3, Math.min(2.5, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
   var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
   if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
@@ -277,7 +278,7 @@ function renderDock() {
       else if (UI.free) a += '<span class="hint1">Any tile, then any token</span><button type="button" class="ab" id="cancelB">Cancel</button>';
       else {
         if (!G.used3 && !G.opts.no3 && WM.triple(G)) a += '<button type="button" class="ab" id="w3B">Sweep 3 ' + esc(WM.ANI_NAME[WM.triple(G)]) + '</button>';
-        if (me.acorns > 0) a += '<button type="button" class="ab" id="freeB">Acorn: free pick</button><button type="button" class="ab" id="wipeB">Acorn: replace</button>';
+        if (me.acorns > 0) a += UI.acornMenu ? '<button type="button" class="ab" id="freeB">Free pick</button><button type="button" class="ab" id="wipeB">Replace animals</button><button type="button" class="ab" id="acornX">Cancel</button>' : '<button type="button" class="ab" id="acornB">Use acorn (' + me.acorns + ')</button>';
       }
     } else if (G.stage === 'tile') {
       a += '<span class="held">' + mkTile(G.hold.tile, 24) + mkTok(G.hold.tok) + '</span>';
@@ -287,6 +288,8 @@ function renderDock() {
       a += '<span class="held">' + mkTok(G.hold.tok) + '</span><button type="button" class="ab" id="backB">Return token</button>';
     }
   }
+  if (G.stage !== 'pick') UI.acornMenu = false;
+  if (myTurn() && UI.mode !== 'tutorial' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
   $('#acts').innerHTML = a;
   $('#acorn').innerHTML = '<span class="acn" title="Acorns">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></span>';
 }
@@ -298,11 +301,14 @@ function lineText() {
   if (UI.view !== G.cur && !s.ai) return '';
   if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
   if (s.ai) return s.name + ' is choosing';
-  if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Your turn: pick a tile + animal from the market';
-  if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Turn it if you like, then tap Place' : 'Tap Place to put the tile here') : 'Tap a glowing spot to place the tile';
-  if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Put the ' + WM.ANI_NAME[G.hold.tok] + ' on a glowing tile, or Return it' : 'No tile shows a ' + WM.ANI_NAME[G.hold.tok] + ': tap Return';
+  if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Step 1 of 3: pick a tile + animal pair from the market';
+  if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Step 2 of 3: turn it if you like, then tap Place' : 'Step 2 of 3: tap Place to put the tile here') : 'Step 2 of 3: tap a glowing spot to place the tile';
+  if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Step 3 of 3: put the ' + WM.ANI_NAME[G.hold.tok] + ' on a glowing tile, or Return it' : 'Step 3 of 3: no tile shows a ' + WM.ANI_NAME[G.hold.tok] + ', so tap Return';
   return '';
 }
+// first-game coach: one extra plain line per step for the player's first 3 Quick-game turns, then it switches itself off
+var COACH = { pick: 'Each column is one choice: the tile on top and the animal under it come together.', tile: 'Tiles must touch your valley. Matching edges join terrain: 1 point per joined tile.', tok: 'Animals score by their card (the chips on top). A tile shows which animals it accepts.' };
+function coachText() { return G && !G.over && UI.mode === 'quick' && myTurn() && (UI.prefs.coachN || 0) < 3 && !UI.wipe && !UI.free ? COACH[G.stage] || '' : ''; }
 function renderTop() {
   var me = G.seats[UI.view], fin = G.over ? G.res : WM.final(G), sc = fin[UI.view], h = '';   // one honest score: live totals include the habitat bonuses (as the Scores drawer and result)
   WM.ANI.forEach(function (a) { h += '<button type="button" class="cc" data-card="' + a + '" aria-label="' + esc(WM.ANI_NAME[a] + ': ' + cinfo(a).title) + ' card, ' + sc.ani[a] + ' points"><span class="ccr">' + mkTok(a) + '<b>' + sc.ani[a] + '</b></span><i>' + esc(WM.ANI_NAME[a]) + '</i></button>'; });
@@ -312,28 +318,32 @@ function renderTop() {
   $('#seats').innerHTML = sh; $('#seats').hidden = G.np < 2;
   var turn = Math.min(G.turns, G.seats[G.cur].done + 1);
   $('#barstat').innerHTML = '<span class="pill">Turn <b>' + turn + '/' + G.turns + '</b></span>' + (G.np > 1 ? '' : '<span class="pill">Score <b>' + sc.total + '</b></span>');
-  $('#line').textContent = lineText();
+  var lt = lineText(), sm = /^Step (\d) of 3: (.*)$/.exec(lt), co = coachText();
+  $('#line').innerHTML = sm ? '<b class="stepn" aria-label="Step ' + sm[1] + ' of 3">' + sm[1] + '<small>/3</small></b><span class="stept">' + esc(sm[2].charAt(0).toUpperCase() + sm[2].slice(1)) + (co ? '<span class="coach">' + esc(co) + '</span>' : '') + '</span>' : esc(lt);
+  var te = $('#toast'); if (te && te.classList.contains('on')) toastPlace(te);   // the step bar may have grown: keep the toast above it
   var lp = $('#logp'); if (lp) lp.innerHTML = '<h3>Season log</h3><ol>' + G.log.slice(-8).reverse().map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>';
 }
 function render() {
   if (!G) return;
   renderDock(); renderTop(); drawMap();
-  if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
+  if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() || UI.mode === 'quick' || UI.mode === 'coach' ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
   artApply();
+  if (typeof coachCheck === 'function') coachCheck();
 }
 UI.redraw = function () { if (G) render(); };
 // ---------------------------------------------------------------- drawers: scores, rules, cards
 function scoresHTML() {
   var sc = G.over ? G.res : WM.final(G), h = '<table class="st"><tr><th></th>' + G.seats.map(function (s) { return '<th>' + esc(s.name) + '</th>'; }).join('') + '</tr>';
-  WM.ANI.forEach(function (a) { h += '<tr><td title="' + esc(cinfo(a).title + ': ' + cinfo(a).rule) + '">' + mkTok(a) + ' ' + esc(WM.ANI_NAME[a]) + '</td>' + sc.map(function (x) { return '<td>' + x.ani[a] + '</td>'; }).join('') + '</tr>'; });
-  WM.TER.forEach(function (t) { h += '<tr><td><i class="sw" style="background:' + WM.TER_COL[t] + '"></i> ' + WM.TER_NAME[t] + '</td>' + sc.map(function (x) { return '<td>' + x.hab[t] + (x.bonus[t] ? ' <small>+' + x.bonus[t] + '</small>' : '') + '</td>'; }).join('') + '</tr>'; });
+  var best = function (vals) { var m = Math.max.apply(null, vals); return function (v) { return v === m && vals.filter(function (x) { return x === m; }).length < vals.length ? ' class="best"' : ''; }; };
+  WM.ANI.forEach(function (a) { var bf = best(sc.map(function (x) { return x.ani[a]; })); h += '<tr><td title="' + esc(cinfo(a).title + ': ' + cinfo(a).rule) + '">' + mkTok(a) + ' ' + esc(WM.ANI_NAME[a]) + '</td>' + sc.map(function (x) { return '<td' + bf(x.ani[a]) + '>' + x.ani[a] + '</td>'; }).join('') + '</tr>'; });
+  WM.TER.forEach(function (t) { var bt = best(sc.map(function (x) { return x.hab[t] + (x.bonus[t] || 0); })); h += '<tr><td><i class="sw" style="background:' + WM.TER_COL[t] + '"></i> ' + WM.TER_NAME[t] + '</td>' + sc.map(function (x) { return '<td' + bt(x.hab[t] + (x.bonus[t] || 0)) + '>' + x.hab[t] + (x.bonus[t] ? ' <small>+' + x.bonus[t] + '</small>' : '') + '</td>'; }).join('') + '</tr>'; });
   h += '<tr><td>Acorns</td>' + sc.map(function (x) { return '<td>' + x.acorns + '</td>'; }).join('') + '</tr>';
   h += '<tr class="tot"><td>Total</td>' + sc.map(function (x) { return '<td>' + x.total + '</td>'; }).join('') + '</tr></table>';
   return h + '<p class="note">' + (G.solo ? 'Solo: a habitat of 7 or more tiles earns 2 extra points.' : 'The largest habitat of each terrain earns a bonus (shown +).') + '</p>';
 }
 function cardsHTML() {
   var h = '<div class="cards">';
-  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(C.title) + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
+  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); var mine = G ? (G.over ? G.res : WM.final(G))[meSeat()].ani[a] : null; h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(WM.ANI_NAME[a]) + ': ' + esc(C.title) + (mine != null ? ' <span class="minep">you: ' + mine + '</span>' : '') + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
   return h + '</div>';
 }
 var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one tile and the animal under it.</li><li>Tap a glowing spot to add the tile to your valley.</li><li>Put the animal on a tile that shows it (or return it).</li><li>Animals score by their card; joined terrain scores too.</li><li>After 20 turns the most points wins.</li></ol></div>' +
@@ -384,14 +394,15 @@ function showResult() {
   if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
-  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + quickLine() + whyLine(sc, me) + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
-  try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
+  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
+  try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' || UI.mode === 'coach' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
+  if (typeof coachEnd === 'function') coachEnd();
 }
 // ---------------------------------------------------------------- title + setup
 function showTitle() {
   clearTimeout(UI.aiT); UI.mode = 'quick'; UI.camp = null; try { GX.close(); } catch (e) { } $('#rs').hidden = true; $('#pass').hidden = true;
   var st = $('#start'), sv = loadSave(), c = UI.setup || (UI.setup = { opp: 1, ai: 'normal', humans: 1 });
-  st.hidden = false; st.classList.toggle('front', UI.sv !== 'setup');
+  st.hidden = false; st.classList.toggle('front', UI.sv !== 'setup'); document.documentElement.classList.add('wm-title');
   if (UI.sv === 'setup') {
     var seg = function (id, list, cur) { return '<div class="seg" data-k="' + id + '">' + list.map(function (o) { return '<button type="button" class="sg' + (o[0] === cur ? ' on' : '') + '" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>'; };
     st.innerHTML = '<div class="tbox"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
@@ -434,6 +445,7 @@ document.addEventListener('click', function (e) {
   if (t.classList.contains('sg')) { var k = t.parentNode.dataset.k, v = t.dataset.v; UI.setup[k] = k === 'ai' || k === 'cards' ? v : +v; if (UI.setup.humans + UI.setup.opp > 4) UI.setup.opp = 4 - UI.setup.humans; if (UI.setup.humans + UI.setup.opp < 1) UI.setup.opp = 0; showTitle(); return; }
   if (t.classList.contains('tsz')) { UI.setup.opp = +t.dataset.n - 1; UI.setup.humans = 1; showTitle(); return; }
   if (t.classList.contains('cc')) { openCards(); return; }
+  if (t.id === 'whatB') { var bb = document.getElementById('bulbbtn'); if (bb) bb.click(); return; }
   if (t.classList.contains('seat')) { UI.view = +t.dataset.seat; render(); fitView(); return; }
   switch (id) {
     case 'storyB': storyOpen(); break;
@@ -447,8 +459,10 @@ document.addEventListener('click', function (e) {
     case 'campCont': $('#rs').hidden = true; try { GXC.finish(G); } catch (er) { console.error(er); } break;
     case 'passB': $('#pass').hidden = true; UI.passed = G.cur; UI.view = G.cur; fitView(true); step(); break;
     case 'w3B': if (!tutOK({ what: 'w3' })) break; WM.apply(G, { t: 'wipe3' }); sfx('wipe'); toast('Three tokens swept away.'); render(); break;
-    case 'freeB': if (!tutOK({ what: 'freeB' })) break; UI.free = { ti: null, ki: null }; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
-    case 'wipeB': if (!tutOK({ what: 'wipeB' })) break; UI.wipe = []; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
+    case 'acornB': UI.acornMenu = true; render(); break;
+    case 'acornX': UI.acornMenu = false; render(); break;
+    case 'freeB': if (!tutOK({ what: 'freeB' })) break; UI.acornMenu = false; UI.free = { ti: null, ki: null }; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
+    case 'wipeB': if (!tutOK({ what: 'wipeB' })) break; UI.acornMenu = false; UI.wipe = []; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
     case 'wokB': if (!UI.wipe || !UI.wipe.length || !tutOK({ what: 'wok' })) break; WM.apply(G, { t: 'wipe', idx: UI.wipe.slice() }); UI.wipe = null; sfx('wipe'); render(); break;
     case 'cancelB': UI.free = null; UI.wipe = null; render(); break;
     case 'rotB': rotate(); break;
