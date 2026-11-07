@@ -9,7 +9,7 @@ No picture contains text. No publisher, designer or original-game name or logo i
 |---|---|---|---|
 | rough_linen, denim_fabric, brown_leather, knitted_fleece, kitchen_wood, wood_table_001 (diffuse, 1k) | Poly Haven | CC0 1.0 | https://polyhaven.com/a/<name> |
 | Prints, spools, buttons, rosettes, sparkle, stitch: drawn by compose.py (PIL vector) | this project | CC0 1.0 | games-src/stitchwise/free-art/compose.py |
-| Earlier kit (kept portraits only) | see git history of this file | CC0 1.0 | |
+| Toon Characters 1 (Female/Male person, Female/Male adventurer SVGs, recoloured) | Kenney | CC0 1.0 | https://opengameart.org/content/toon-characters-1 |
 
 ## Per file
 
@@ -57,17 +57,17 @@ No picture contains text. No publisher, designer or original-game name or logo i
 | fabric-31.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
 | fabric-32.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
 | fabric-33.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
-| portrait-wren.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-poppy.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-tilly.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-fernsby.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-odette.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-bram.webp | KEPT from previous kit: polyhaven, quaternius |
-| portrait-marguerite.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-ivo.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-hester.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-tobias.webp | KEPT from previous kit: polyhaven, quaternius |
-| portrait-aurelia.webp | KEPT from previous kit: polyhaven, quaternius |
+| portrait-wren.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-poppy.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-tilly.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-fernsby.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-odette.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-bram.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-marguerite.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-ivo.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-hester.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-tobias.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-aurelia.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
 | bonus-tile.webp | drawn in-script (flat vector) |
 | torn-square.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
 | bg-map.webp | this kit's fabrics (patchwork) + drawn stitch path, rosettes |
