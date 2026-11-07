@@ -16,7 +16,7 @@ Prompts: `games-src/next-wave/flow-2d/deep-signal/prompts-waveN-ratio-WxH.json` 
 3. Rebuild: `python3 games-src/scripts/build-all.py deep-signal`. build.py lists the files present; no code changes.
 
 ## Temporary pictures (until the Flow art arrives)
-18 icons rendered from game-icons.net by `temp-art/make.js` into `temp-art/<stem>.webp`; `python3 games-src/deep-signal/temp-art/install.py` copies them into `games/deep-signal/media/` (never over a finished picture).
+37 pictures (game-icons glyphs on code-drawn card, task, portrait and token shapes) rendered from game-icons.net by `temp-art/make.js` into `temp-art/<stem>.webp`; `python3 games-src/deep-signal/temp-art/install.py` copies them into `games/deep-signal/media/` (never over a finished picture).
 Licence: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), source https://game-icons.net via https://github.com/game-icons/icons; credit kept in the game (Menu > About).
 
 | stem | icon | author |
@@ -39,6 +39,25 @@ Licence: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), source https:
 | boss-warden | delapouite/lighthouse | Delapouite |
 | boss-swarm | lorc/tornado | Lorc |
 | boss-source | lorc/spiral-shell | Lorc |
+| card-coral | delapouite/coral | Delapouite |
+| card-kelp | lorc/curled-leaf | Lorc |
+| card-tide | lorc/wave-crest | Lorc |
+| card-amber | lorc/sun | Lorc |
+| card-sonar | lorc/radar-sweep | Lorc |
+| card-back | delapouite/periscope | Delapouite |
+| task-coral | delapouite/coral | Delapouite |
+| task-kelp | lorc/curled-leaf | Lorc |
+| task-tide | lorc/wave-crest | Lorc |
+| task-amber | lorc/sun | Lorc |
+| portrait-you | delapouite/diving-helmet | Delapouite |
+| portrait-ines | delapouite/captain-hat-profile | Delapouite |
+| portrait-bram | lorc/spanner | Lorc |
+| portrait-kito | delapouite/headphones | Delapouite |
+| portrait-odile | delapouite/stethoscope | Delapouite |
+| portrait-drone | delapouite/periscope | Delapouite |
+| token-final | lorc/anchor | Lorc |
+| token-order | code-drawn disc | own code |
+| token-relative | code-drawn disc | own code |
 
 Not used: print-and-play or workshop scans of the original cards (publisher art), and kenney.nl (blocked by the network proxy here).
 
