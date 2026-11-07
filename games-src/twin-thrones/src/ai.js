@@ -40,7 +40,7 @@
       if (G.pend[0].type === 'first') return M.filter(function (m) { return m.who === p; })[0];
       var best = M[0], bs = -1e9; M.forEach(function (m) { var g = tryApply(G, m); var v = g ? ev(g, p) + rng() * 0.01 : -1e9; if (v > bs) { bs = v; best = m; } }); return best;
     }
-    var dn = {}, S = E.mask(G), scored = [];
+    var dn = {}, S = E.mask(G), scored = [], hardG = [];
     M.forEach(function (m) {
       var g = tryApply(S, m); if (!g) return; settle(g, p);
       var v = ev(g, p);
@@ -50,11 +50,28 @@
         var worst = 1e9, R = E.validMoves(g);
         if (!R.length) worst = ev(g, p);
         R.forEach(function (r) { var g2 = tryApply(g, r); if (!g2) return; settle(g2, 1 - p); var u = ev(g2, p); if (u < worst) worst = u; });
-        v = 0.35 * v + 0.65 * worst + dn[m.i] * 0.35;
+        v = 0.35 * v + 0.65 * worst + dn[m.i] * 0.5; hardG[hardG.length] = [m, g];
       }
       scored.push([v + rng() * 0.05, m]);
     });
     scored.sort(function (a, b) { return b[0] - a[0]; });
+    if (level === 'hard' && scored.length > 1) {   // 3-ply on the best few: my move, their best reply, my best follow-up (still on the masked copy)
+      var top = scored.slice(0, 4);
+      top.forEach(function (sc) {
+        var g = null; hardG.forEach(function (h) { if (h[0] === sc[1]) g = h[1]; });
+        if (!g || g.over || E.sideToAct(g) !== 1 - p) return;
+        var worst = 1e9, R = E.validMoves(g);
+        R.forEach(function (r) {
+          var g2 = tryApply(g, r); if (!g2) return; settle(g2, 1 - p);
+          var u;
+          if (g2.over || E.sideToAct(g2) !== p) u = ev(g2, p);
+          else { u = -1e9; E.validMoves(g2).forEach(function (s2) { var g3 = tryApply(g2, s2); if (g3) { settle(g3, p); var w = ev(g3, p); if (w > u) u = w; } }); if (u === -1e9) u = ev(g2, p); }
+          if (u < worst) worst = u;
+        });
+        if (worst < 1e9) sc[0] = 0.5 * sc[0] + 0.5 * (worst + dn[sc[1].i] * 0.5);
+      });
+      top.sort(function (a, b) { return b[0] - a[0]; }); return top[0][1];
+    }
     return scored.length ? scored[0][1] : M[0];
   }
   var API = { pick: pick, ev: ev, wval: wval };
