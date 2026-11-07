@@ -1,0 +1,42 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18c4-1 7-4 9-9 1-2 3-4 6-4-1 3-1 6-3 8-2 3-6 5-12 5z" fill="#e3b75a" stroke="#f6eedb" stroke-width="1.2"/><path d="M3 21h18" stroke="#8fb36a" stroke-width="2"/></svg></span><span class="tt">Perch &amp; Plume</span></h1>
+  <span id="barstat"></span>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
+  <button class="gx-ibtn" id="goalsbtn" data-gx="goalsd" type="button" aria-expanded="false" aria-label="Goals and bonus cards"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg><span>Goals</span></button>
+  <button class="gx-ibtn" data-gx="logd" type="button" aria-expanded="false" aria-label="Log"><svg viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/></svg><span>Log</span></button>
+  <button class="gx-ibtn" id="rulesbtn" data-gx="rulesd" type="button" aria-expanded="false" aria-label="How to play"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v13"/></svg><span>Rules</span></button>
+  <button class="gx-ibtn" id="menubtn" data-gx="setd" type="button" aria-expanded="false" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
+</header>
+<div class="gx-main">
+  <main class="gx-board" id="board" aria-label="Your habitats"><div id="bd" data-board>
+    <div id="opps" role="group" aria-label="Other players"></div>
+    <div id="mid">
+      <div id="feeder" role="group" aria-label="Birdfeeder"></div>
+      <div id="tray" role="group" aria-label="Bird tray"></div>
+      <button id="deckb" type="button" class="deck" aria-label="Bird deck"></button>
+    </div>
+    <div id="mat" role="group" aria-label="Your three habitats"></div>
+  </div></main>
+  <aside class="gx-dock" id="dock" aria-label="What to do now">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt" id="dt">Your turn</span><button class="gx-ibtn" data-gx="dock" type="button" aria-label="Hide panel">&#8677;</button></div>
+    <div class="gx-dock-body" id="dockbody">
+      <div id="prompt" aria-live="polite"></div>
+      <div id="acts"></div>
+      <div id="foodrow" aria-label="Your food"></div>
+      <div id="hand" role="group" aria-label="Your hand"></div>
+    </div>
+  </aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock" type="button">&#9776; Panel</button>
+</div>
+</div>
+<div id="title" class="ovl" hidden></div>
+<div id="setup" class="ovl" hidden></div>
+<div id="pass" class="ovl" hidden></div>
+<div id="result" class="ovl" hidden></div>
+<div id="pop" class="pop" hidden></div>
+<div id="toast" aria-live="polite"></div>
+<!--SCRIPTS-->
+</body></html>
