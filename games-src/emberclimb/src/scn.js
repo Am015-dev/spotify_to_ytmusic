@@ -3,7 +3,7 @@
   if (!window.GXS) return;
   var booted = function () { return window.EC && EC.E && window.UI && UI.render; };
   var E = function () { return EC.E; }, G = function () { return EC.E.G(); };
-  function begin(heroes, seed) { UI.mode = 'game'; UI.sel = -1; window.ANIM = false; E().newGame({ heroes: heroes, seed: seed || 11 }); }
+  function begin(heroes, seed) { try { var sk = document.querySelector('[data-gxt-skip]'); if (sk) sk.click(); GX.close(); if (window.GXC) GXC.close(); } catch (e) { } window.EC_NOSAVE = 0; UI.camp = null; UI.mode = 'game'; UI.sel = -1; window.ANIM = false; E().newGame({ heroes: heroes, seed: seed || 11 }); }
   function fight(heroes, seed, one) {
     begin(heroes, seed); E().performMove({ t: 'go', n: E().validMoves()[0].n });
     if (one) { G().b.en = [G().b.en[0]]; }
@@ -35,5 +35,5 @@
   GXS.add({ id: 'ec-event', name: 'Event: make a choice', ask: 'Choose an option', seed: 10, when: booted,
     setup: function () { begin(['s'], 10); E().debug.event('ember-shrine'); UI.render(); }, checks: [{ kind: 'visible', sel: '.opts .btn', name: 'event option' }] });
   GXS.add({ id: 'ec-result', name: 'Result screen', ask: 'Can you start a new climb?', seed: 12, when: booted,
-    setup: function () { begin(['w'], 12); E().debug.over(true); UI.render(); }, checks: [{ kind: 'visible', sel: '#again', name: 'New climb button' }] });
+    setup: function () { begin(['w'], 12); E().debug.over(true); UI.render(); }, checks: [{ kind: 'visible', sel: '#again', name: 'Play again button' }] });
 })();

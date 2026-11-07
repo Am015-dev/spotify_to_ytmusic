@@ -4,7 +4,7 @@ Owner feedback: "unplayable, unreadable, not easy to follow, the assets are supe
 Audits passed; eyes did not. Judge every rule below by a 390x763 screenshot you LOOK at as someone who never saw the game.
 Benchmarks: the old shelf games the owner likes (cauldron-fair, hollowbough) and good online versions of the same kind of game.
 
-1. **Temp glyphs off if code says it better.** Abstract icon art (game-icons style) means nothing to a player. Keep the slot, but
+1. **Temp glyphs off if code says it better (judge each slot by eye).** Abstract icon art (game-icons style) means nothing to a player. Keep the slot, but
    make code-drawn the default: a prefix list (`ART.codeFirst` in `src/art.js`) skips those temp files; real art is switched on by
    naming its stem or prefix in `window.WM_REAL_ART`. Never delete a slot.
 2. **Terrain = flat colour + one picture pattern.** Waves for water, small pines for forest, snow-capped peaks for mountains,
@@ -12,15 +12,17 @@ Benchmarks: the old shelf games the owner likes (cauldron-fair, hollowbough) and
 3. **Plain table.** No busy picture behind the board: a dark neutral (slate) background so green or blue tiles never melt into it.
 4. **Every animal/token has its name.** Silhouette on a light disc, its name under it at >= 13px wherever the player chooses it
    (market) or reads its score (score chips). Results and score tables lead with the plain name ("Bear"), the card title is secondary.
-5. **One instruction bar, always visible, max 2 lines.** It says exactly what to do now, in verbs: "Your turn: pick a tile + animal
-   from the market", "Tap a glowing spot to place the tile", "Put the Bear on a glowing tile, or Return it". Solid light backing.
+5. **One instruction bar, always visible, max 2 lines.** It says exactly what to do now, in verbs: "Step 1 of 3: pick a tile + animal pair
+   from the market", "Step 2 of 3: tap a glowing spot", "Step 3 of 3: put the Bear on a glowing tile, or Return it", with a
+   big step-number badge. First Quick game: one coach line per step for 3 turns. A "What should I do?" button shows the best move.
 6. **Legal = glow, everything else = dim.** Spots: solid bright outline + soft fill (no dashed outlines). Token targets ring in gold
    and all other tiles drop to 40% opacity. Market pairs that can't be taken right now drop to 50%.
 7. **Explain every score when it happens.** After each placement a plain toast: "+1: your Meadow grew to 2 joined tiles",
    "Bear +4: Groups of exactly 2 bears...", or "Fox settled, no points yet. <the card's one sentence>". Plus the floating number.
-8. **Tutorial = a real short game in chapters, every rule once.** Owner addendum (20:45): not 5-7 clicks but a staged real game
-   (fixed seed, stacked market) in chapters (First turn, Scoring, Special moves, Final score). Each step is one real action on a spotlit,
-   uncovered target. Keep a TUTORIAL-COVERAGE.md checklist and a tutorial-to-end tap script (see `tutorial-end.js`).
+8. **The tutorial is a coached first game, not tap-tap.** Owner (22:01): forced spotlight steps are rejected. It is a real short game
+   (free choices; market stacked so key cases come up). The guide explains each rule the first time it matters, in one non-blocking,
+   dismissable bubble, and gives one-line verdicts on moves. The result screen walks through the score with the player's real numbers
+   and lists "things you will meet later". Keep TUTORIAL-COVERAGE.md and a script that plays it with random legal moves (`tutorial-end.js`).
 9. **Help opens with "How a turn works" in 5 lines** (boxed, 15px) before any detail; scoring cards keep a small diagram + one sentence.
 10. **Turns read like turns.** A "Your turn" / "<Rival>'s turn" banner; the rival plays step by step (take, place, settle),
     ~1 s per step with a caption on the instruction bar and a score pop; tap anywhere to speed it up.

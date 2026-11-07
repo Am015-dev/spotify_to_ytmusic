@@ -26,3 +26,12 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 @media (min-width:1024px){.btn,#acts button,#rivalbody,#rivalbody *,#logbody,#logbody *,#start .scard span,#start .scard small,#start .scard b,.gx-main .btn{font-size:16px!important}}
 .scount,.htog{font-size:13px!important}
 @media (min-width:700px){body:has(.gx-drawer.on) #start .scard{margin-left:12px;margin-right:auto}}
+/* ---- playable pass: Hazel's reaction chip, turn banner, rival caption (all pointer-events:none so they never cover a target) */
+#hbsay{position:fixed;left:50%;top:132px;transform:translate(-50%,-10px);width:min(92vw,420px);z-index:9998;display:flex;gap:10px;align-items:center;background:#fff8e6;color:#2a1f19;border:2px solid #5a3b1f;border-radius:14px;padding:8px 12px;font-size:15px;line-height:1.25;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#hbsay.on{opacity:1;transform:translate(-50%,0)}
+#hbsay .pt{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:24px;border:2px solid #2a1f19}
+#hbsay b{color:#6e3205;margin-right:4px}
+#hbturn{position:fixed;left:50%;top:92px;transform:translate(-50%,-14px) scale(.96);z-index:9997;padding:8px 22px;border-radius:999px;font-size:18px;font-weight:800;letter-spacing:.02em;background:#f3c64a;color:#3a2410;border:2px solid #5a3b1f;box-shadow:0 5px 14px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;white-space:nowrap}
+#hbturn.on{opacity:1;transform:translate(-50%,0) scale(1)}
+#hbturn.rv{background:#2f5e8e;color:#fff;border-color:#10253d}
+@media (min-width:1024px){.rules h3{font-size:17px}.rules p,.rules li{font-size:16px}}
