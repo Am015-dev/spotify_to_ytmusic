@@ -377,6 +377,19 @@ def bg_map():
     for (x, y) in (path[1], path[3], path[5]): drop(out, rosette(220), x, y)
     return out.convert('RGB')
 
+
+# ---- portraits: Kenney Toon Characters 1 (CC0), SVG recoloured per character and rendered (cache toonr/<name>.png) ----
+PORTRAIT_FABRIC = {'wren': 19, 'poppy': 3, 'tilly': 12, 'fernsby': 11, 'odette': 5, 'bram': 23, 'marguerite': 16, 'ivo': 2, 'hester': 18, 'tobias': 25, 'aurelia': 31}
+def portrait(name):
+    W = 512; f = fabric(PORTRAIT_FABRIC[name]).resize((W, W), Image.LANCZOS)
+    f = Image.blend(f, Image.new('RGB', (W, W), (245, 236, 214)), .55).convert('RGBA')
+    d = ImageDraw.Draw(f); d.ellipse((46, 40, W - 46, W - 52), fill=(250, 244, 230)); stitch_border(d, (14, 14, W - 14, W - 14), (190, 150, 110), 22, 14, 6)
+    ring = [(256 + 214 * math.cos(math.radians(a)), 250 + 214 * math.sin(math.radians(a))) for a in range(0, 361, 6)]
+    for k in range(0, len(ring) - 1, 2): d.line(ring[k] + ring[k + 1], fill=(200, 170, 130), width=6)
+    c = Image.open(f'{C}/toonr/{name}.png').convert('RGBA'); c = c.resize((int(c.width * W * .8 / c.height), int(W * .8)), Image.LANCZOS)
+    f.alpha_composite(c, ((W - c.width) // 2, W - c.height - 30))
+    return f.convert('RGB')
+
 def save(stem, im):
     s = SLOTS[stem]; w, h = s['w'], s['h']
     if im.size != (w, h): im = ImageOps.fit(im, (w, h), Image.LANCZOS)
@@ -389,6 +402,7 @@ PLAN.update({'token-me': lambda: spool('#2b8c8c'), 'token-opp': lambda: spool('#
              'torn-square': torn, 'fx-sparkle': sparkle, 'fx-stitch': fxstitch, 'ui-offer-card': offer_card, 'bg-table': bg_table,
              'quilt-frame': quilt_frame, 'track-frame': track_frame, 'bg-title': lambda: table_scene(1), 'result-win': lambda: table_scene(2, rosette_on=True),
              'result-lose': lambda: table_scene(4, dim=True), 'bg-map': bg_map})
+for _n in PORTRAIT_FABRIC: PLAN['portrait-' + _n] = (lambda n=_n: portrait(n))
 if __name__ == '__main__':
     only = sys.argv[sys.argv.index('--only') + 1] if '--only' in sys.argv else '.'
     done = [s for s in PLAN if re.search(only, s)]

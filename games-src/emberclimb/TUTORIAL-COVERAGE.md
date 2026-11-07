@@ -1,42 +1,44 @@
-# Emberclimb guided climb: rule coverage
+# Emberclimb coached first climb: rule coverage
 
-The tutorial is one real short climb (7 rooms, Warrior, fixed seed 7, staged hands) from setup to the result screen, against the real enemy AI.
-4 chapters; leaving saves the chapter and the next launch starts there (`emberclimb.tutch`). Source: `src/tutor.js`; proof: `node tools/tut-end.js`
-(plays every step at 390x763 and 1440x860 and fails if any step id below was not shown).
+The tutorial is a real short climb (Warrior, seed 7, a branching 6-floor map: fight, then treasure or fight, fight or ?, campfire or shop,
+elite or fight, boss; foes at 75% HP) with free choices. Only the first 2 steps are forced (read the intent; play Anvil Blow). After that the
+tutor kit stops and Warden Ashgrove, the coach, speaks one dismissable line at the top of the screen the first time each rule matters, reacts
+to good and poor plays, and never blocks input. At the end she walks through the real numbers (floors, HP, gold, deck, relics) and an end
+card lists every rule that did not come up under "Things you will meet later". Text: `src/story.js` (EC_STORY.coach), logic `src/tutor.js`.
 
-Chapters: 1 Your first fight · 2 Map, treasure, potions and a harder fight · 3 Campfire, shop, event · 4 Boss and the end.
+Proof: `node tools/tut-end.js` plays the coached climb at 390x763 and 1440x860 with random legal moves through the UI only and fails if more
+than 2 steps were forced, if the end card is missing, or if any rule below was neither explained during play nor listed on the end card.
 
-| Rule | Taught by (step id) | How |
+| Rule (coach key) | When the coach explains it | Story beat / line |
 |---|---|---|
-| [x] Setup: one hero, HP, 10-card starting deck, starting relic and gold | setup | seen (hero panel, top bar) |
-| [x] Lose: a hero at 0 HP ends the climb | setup | told |
-| [x] Enemy intent shows its next move | intent | seen |
-| [x] Draw 5 cards, 3 energy a turn, card cost | energy | seen |
-| [x] Two taps to play a card; targeted attack | attack | done |
-| [x] Vulnerable (target takes more damage) | attack, finish | done |
-| [x] Block soaks damage, gone at your next turn | block, enemyturn | done + seen |
-| [x] End turn; unplayed cards go to the used pile | end | done |
-| [x] Enemy turn, step by step | enemyturn | seen |
-| [x] Draw / used piles, reshuffle when the draw pile runs out | piles | seen |
-| [x] Card reward after a win, gold | reward | done |
-| [x] Map: glowing rooms are the next step; room types | map, map2, campfire, shopnode, event, boss | done |
-| [x] Treasure room gives a relic (lasting bonus) | relic | done |
-| [x] Enemy adds junk cards (Dazed: unplayable) | junkintent, junk | seen |
-| [x] Potions: free, one use, max 3 slots | potion | done |
-| [x] Poison: loses HP at end of your turn, ignores Block | poison, end2 | done + seen |
-| [x] Power cards last the whole fight; Strength adds damage | power | done |
-| [x] Weak (hits softer); Exhaust (card gone for this fight) | exhaust | done |
-| [x] Die cards: roll 1-6, low / middle / high result | die | done |
-| [x] Free play of a whole fight | win2, win3 | done |
-| [x] Skipping a card reward keeps the deck lean | skip | done |
-| [x] Campfire: rest heals, or smith upgrades a card | rest | done (rest) + told (smith) |
-| [x] Shop: buy with gold; card removal | shopitem, buy, shopleave | done (buy) + told (removal) |
-| [x] ? rooms are events with a choice | event, choose, evleave | done |
-| [x] Boss at the top; bosses repeat a pattern; Spikes | boss, spikes, win3 | done |
-| [x] Boss treasure: choose 1 of 3 relics (1 per hero + 1) | bossrelic | done |
-| [x] Win: beat the boss, result screen | leave4, result | done + seen |
-| [x] Other heroes' mechanics (poison and Shivs, orbs, stances) | heroes | told only; each Story chapter's first fight teaches its hero |
+| [x] intent | forced step 1 | "The summit ember is fading. Climb, Garrick! This Gnawer shows its next move." |
+| [x] vuln | forced step 2 (Anvil Blow), then on handover | "It is Vulnerable now: your next hit lands double." |
+| [x] energy | first turn of free play | "You hold 3 energy a turn..." |
+| [x] block | first turn an attack is coming and a Block card is in hand | "An attack is coming. Block cards soak damage..." |
+| [x] endturn | first time no card is playable | "No playable cards left: End turn..." |
+| [x] target | first fight with 2+ enemies | "tap the enemy you want to hit" |
+| [x] weak | first Weak on anyone | "Weak: each hit deals 3 less." |
+| [x] poison | first poison on an enemy | "1 HP per token at the end of the turn, through Block. It stays." |
+| [x] strength | first Strength on Garrick | "Strength adds to every hit" |
+| [x] power | first Power card in hand (Kindle is stacked in the draw pile) | "A Power card lasts the whole fight." |
+| [x] exhaust | first exhaust card in hand (Intimidating Roar is stacked) | "Exhaust cards vanish for the rest of this fight." |
+| [x] die | first die card in hand (Wild Swing is stacked) | "Die cards roll 1-6" |
+| [x] junk | first Dazed in hand or used pile | "Junk cards like Dazed can never be played." |
+| [x] piles | first reshuffle of the used pile | "Your draw pile ran dry..." |
+| [x] potion | first fight while carrying a potion (Venom Vial given) | "free to use, one use" |
+| [x] reward | first reward screen | "pick one card, or skip to keep it lean" |
+| [x] gold | gold above 110 | "Spend it at shops." |
+| [x] relic | first relic offered or gained | "a lasting bonus for the whole climb" |
+| [x] map | first map screen | "glowing rooms are your next step" |
+| [x] rest | first campfire | "rest to heal, or smith to upgrade one card" |
+| [x] shop | first shop | "tap an item, then Buy; pay to remove a card" |
+| [x] event | first ? room | "a choice with a price or a prize" |
+| [x] elite | first elite fight | "tougher than a normal foe, better loot" |
+| [x] boss | boss fight | "The boss repeats a pattern. On its Spikes turn, attacks hurt you: block instead." |
+| [x] lose | HP under half | "If your HP hits 0, the climb ends." |
 
-Not covered by doing (honest): Smith upgrade and card removal are told, not done; elite rooms are not visited; duo play (2 heroes) and the
-Rogue / Automaton / Monk mechanics are only named. Rules changed by the tabletop rules fix (Retain, Scry, Miracle, shared enemy die) are not in the
-Warrior guide; see the help drawer.
+Reactions: clean kill, double damage on a Vulnerable foe, fully blocked a hit (good); took 8+ damage with no Block, hit by Spikes, ended a
+turn with energy and playable cards left (poor). The finale is the real numbers, one line at a time, then the end card.
+
+Depending on the player's path, rules such as shop/rest, elite/fight or event come up in play or land on the end card; the test asserts
+each rule is in one of the two. Duo play and the Rogue / Automaton / Monk mechanics are taught by their Story chapters.
