@@ -57,7 +57,7 @@ function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netR
   if(typeof GFX!=='undefined'){GFX.after(root,snapS);GFX.clash(root)}const hd=root.querySelector('.hand');if(hd)hd.scrollLeft=hs;const od=root.querySelector('.opps');if(od)od.scrollLeft=os;const gd=root.querySelector('.gear');if(gd)gd.scrollLeft=gs;
   const sd=$('#side'),st=sd.scrollTop;setHTML(sd,promptHTML(me)+recentHTML());sd.scrollTop=st;
   $('#docktitle').textContent=dockTitle(me);
-  setHTML($('#dkLogBody'),logHTML());setHTML($('#dkOppBody'),oppsFullHTML(me));
+  setHTML($('#dkLogBody'),logHTML());{const hb=$('#dkHandBody');if(hb&&me>=0&&P(me).human)setHTML(hb,`<p class="small">Tap a card to read it and play it.</p><div class="hgrid">${P(me).hand.map(id=>cardHTML(id,{cls:'hgc'})).join('')||'<p>Your hand is empty.</p>'}</div>`)}setHTML($('#dkOppBody'),oppsFullHTML(me));
   // card details / card actions: a closable popup
   const cardOn=(UI.menu&&UI.menu.card!=null)||UI.zoom!=null;
   if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;setHTML($('#dkCardBody'),UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML());const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard')}
@@ -173,7 +173,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   case 'main':say='Get ready, then kick open the door.';acts=autoBtn(me,co)+btn({act:'kick'},'🚪 Kick open the door',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);tip=by('resurrect').length?'As a Cleric you can instead take the top door discard: tap a card to discard for it.':'';break;
   case 'after':say='No monster behind the door.';ol=['Look for trouble: fight a monster from your hand, or','Loot the room: draw a face-down door card.'];acts=btn({act:'loot'},'Loot the room (free card)','primary')+by('trouble').filter(m=>!riskyCard(me,m.card)).slice(0,1).map(m=>btn(m,`⚔ Fight ${esc(cname(m.card))} (Lv ${cd(m.card).lvl})`,'good')).join('')+sellBtn(vm,me);extra.push(co.low);break;
   case 'post':{const over=P(me).hand.length-handLimit(P(me));say='Tidy up, then end your turn.'+(over>0?` You hold ${over} card${plural(over)} too many and will give ${over===1?'it':'them'} away.`:'');acts=autoBtn(me,co)+btn({act:'end'},'End turn',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);break}
-  case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards but may keep only ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}: extra cards go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null&&UI.hints?`<button class="btn primary pulse" data-a="autocharity">✨ Give away the suggested card${ex>1?'s':''} (${ex})</button>`:'';break}
+  case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards but may keep only ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}: extra cards go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null?`<button class="btn primary pulse" data-a="autocharity">✨ Give away ${ex} extra card${ex>1?'s':''} for me</button>`:'';break}
   case 'combat':{const win=winning(cb);
     if(cb.stage==='act'){say=win?`You are winning, ${sideStr(cb)} to ${monStr(cb)}.`:`You are losing, ${sideStr(cb)} to ${monStr(cb)}.`;
       ol=win?['Add more one-shots for safety, or','Fight: others get one last chance to interfere.']:['Play one-shots or powers, ask someone to help, or','Run away: roll 5 or more on a die for each monster.'];
@@ -228,14 +228,13 @@ function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
   return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?(dkHero3d(w.nm,'win3d')||dkPortrait(w.nm,'winp')):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
-  const story=online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode<small>10 chapters, 3 bosses</small></button>${campLine()}`;
+  const story=online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode</button><p class="storysub">10 chapters, 3 bosses</p>${campLine()}`;
   const open=UI.quick===true||online;
   // one column: title, tagline, ONE big button (Story), Continue only with a save, then "Quick game" which opens the options (all segmented controls in one style); How to play and Music live in the top bar
   return `<div class="dlg paper start dk2"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2>Doorkick Dungeon</h2><p class="tagline">Kick doors. Fight monsters. Stab friends.</p>${story}
    ${saved&&!online?'<button class="btn" data-a="load">Continue saved game</button>':''}
    <button class="btn qrow${open?' on':''}" data-a="quick" aria-expanded="${open}">Quick game ${open?'▴':'▾'}</button>
-   ${open?`<div class="qopts"><h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${(UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
-   ${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>`}
+   ${open?`<div class="qopts">${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start: ${({F:'you vs the computer',hot:'friends on one device',ai:'watch the computer'})[UI.mode||'F']||'play'}</button>`}<h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${(UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
    ${online||UI.mode==='ai'?'':`<div class="seg"><button class="btn tgl ${UI.learn===true?'on':''}" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Teach me as I play</button></div>`}
 </div>`:''}
@@ -298,6 +297,7 @@ GX.init({key:'dkd'});
 if(typeof GXSK!=='undefined')GXSK.init({});
 GX.drawer('dkLog','Dungeon diary',$('#dkLogBody'));
 GX.drawer('dkOpp','Rivals: gear and cards',$('#dkOppBody'),true);
+GX.drawer('dkHand','Your cards',$('#dkHandBody'),true);
 GX.drawer('dkCard','Card',$('#dkCardBody'));
 GX.drawer('dkRules','How to play',$('#dkRulesBody'),true);$('#dkRulesBody').innerHTML=rulesHTML();
 GX.drawer('dkMenu','Menu',$('#dkMenuBody'));

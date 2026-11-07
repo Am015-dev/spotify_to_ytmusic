@@ -169,7 +169,7 @@ function bfLine(me){const s=sideToAct();if(!G||G.winner)return '';if(s<0)return 
     case 'main':return cardy?'Gear up, then kick the door!':'Kick the door!';
     case 'after':return vm.some(m=>m.act==='trouble'&&!bfHarm(m))?'Empty room: loot, or drag a monster in':'Empty room: tap Loot';
     case 'post':return cardy?'Gear up, then end your turn':'End your turn';
-    case 'charity':{const t=charityTargets(P(me));return t.length?'Too many cards: drag extras onto '+P(t[0]).nm:'Too many cards: drag extras to discard'}
+    case 'charity':{const t=charityTargets(P(me));return t.length?'Too many cards (keep 5): tap one, then tap '+P(t[0]).nm+', or use the button':'Too many cards (keep 5): tap one, then the discard pile, or use the button'}
     case 'combat':if(cb.stage==='act'&&(cb.who===me))return winning(cb)?'You’re winning! Tap Fight':'Losing! Add cards, get help, or run';
       return cardy?(cb.who===me?'Drag a card onto the fight':P(cb.who).nm+'’s fight: drag a card to meddle'):'Let the fight go on'}
   return ''}
