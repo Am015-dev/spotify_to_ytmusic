@@ -1,51 +1,39 @@
-// Plays the WHOLE guided tutorial game from fresh storage: taps the centre of each spotlit element (or Next on "see" steps) after
-// checking nothing covers it, asserts every step listed in TUTORIAL-COVERAGE.md was shown, then taps "Finish this game" and plays
-// the rest of the year by tapping only visible, uncovered UI until the result screen.   node tests/tutorial-end.js [phone|pc] [url]
+// The coached first game, played to the end: start the tutorial from fresh storage, then play it by choosing legal moves through
+// the UI (whatever glows; random among them, not a tap list), checking each tap target is uncovered. Asserts: no forced steps, the coach
+// bubble never sits on a glowing target, every rule in TUTORIAL-COVERAGE.md was explained during the game or listed in "Things you'll
+// meet later", the core rules were explained live, and the result screen walks the score rule by rule.   node tests/tutorial-end.js [phone|pc] [url]
 const { chromium } = require('playwright'); const fs = require('fs'), path = require('path');
 const SIZE = process.argv[2] || 'phone', URL = process.argv[3] || 'http://127.0.0.1:8765/perch-and-plume/';
 const VP = SIZE === 'pc' ? { width: 1440, height: 860 } : { width: 390, height: 763 }, TOUCH = SIZE !== 'pc';
 const COVER = fs.readFileSync(path.join(__dirname, '..', 'TUTORIAL-COVERAGE.md'), 'utf8');
-const WANT = [...new Set([...COVER.matchAll(/step `([a-z0-9]+)`/g)].map(m => m[1]))];
+const RULES = [...new Set([...COVER.matchAll(/rule `([a-zA-Z]+)`/g)].map(m => m[1]))];
+const CORE = ['welcome', 'food', 'feeder', 'chain', 'play', 'pay', 'eggs', 'nest', 'cards', 'tray', 'rival', 'goal', 'round', 'final', 'tie'];
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: VP, hasTouch: TOUCH, isMobile: TOUCH });
-  const p = await ctx.newPage(); const errs = []; let fails = 0;
+  const p = await ctx.newPage(); const errs = []; let fails = 0, taps = 0, overlap = 0;
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
   const ok = (c, m) => { if (!c) fails++; console.log((c ? 'PASS ' : 'FAIL ') + SIZE + ' ' + m); };
   const tapXY = async (x, y) => TOUCH ? p.touchscreen.tap(x, y) : p.mouse.click(x, y);
-  const uncovered = (x, y, box) => p.evaluate(([x, y, h]) => { const e = document.elementFromPoint(x, y); if (!e) return 'nothing';
-    if (e.closest('.gxt-top,.gxt-cell,.turnban,.reveal,#toast,.gxh-bub:not(.gxt-bub)')) return 'covered by ' + (e.className || e.tagName);
-    if (!h) return 'ok'; const r = e.getBoundingClientRect(); return (r.left >= h.left - 6 && r.top >= h.top - 6 && r.right <= h.left + h.width + 6 && r.bottom <= h.top + h.height + 6) ? 'ok' : 'outside ' + e.className; }, [x, y, box]);
   await p.goto(URL); await p.waitForTimeout(1000);
   const open = await p.$('[data-gxt-open]'); ok(!!open, 'tutorial button on the title (fresh storage)');
-  const r0 = await open.boundingBox(); await tapXY(r0.x + r0.width / 2, r0.y + r0.height / 2);
-  const shown = new Set(), seen = new Set(); let n = 0, t0 = Date.now(), lastKey = '', taps = 0;
-  while (Date.now() - t0 < 150000) {
+  const r0 = await open.boundingBox(); await tapXY(r0.x + r0.width / 2, r0.y + r0.height / 2); await p.waitForTimeout(1200);
+  // at most 2 guided taps for the very first action, then the end card's "Play on" and free play
+  let nSteps = 0, gTaps = 0; const g0 = Date.now();
+  while (Date.now() - g0 < 30000) {
     await p.waitForTimeout(250);
-    const end = await p.$('.gxt-end .gxt-b.pri'); if (end && await end.isVisible()) break;
-    const st = await p.evaluate(() => typeof GXT !== 'undefined' ? GXT.state() : { active: false });
-    if (!st.active) continue; n = st.n;
-    if (st.phase !== 'show' || !st.shown) continue;
-    shown.add(st.id);
-    const key = st.id + ':' + st.count; if (key === lastKey) { if (++taps > 8) { ok(false, 'stuck at ' + key); break; } } else { lastKey = key; taps = 0; }
-    if (!st.wait) {
-      if (st.hole && !seen.has(key + ':t')) { const hx = st.hole.cx != null ? st.hole.cx : st.hole.left + st.hole.width / 2, hy = st.hole.cy != null ? st.hole.cy : st.hole.top + st.hole.height / 2; const th = await p.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); if (!e) return 'nothing'; if (e.closest('.gxt-clear')) { const below = document.elementsFromPoint(x, y).find(z => !z.closest('.gxt-clear')); return below && below.closest('.gxt-top,.turnban,.reveal,#toast') ? 'covered by ' + below.className : 'ok'; } return e.closest('.gxt-top,.turnban,.reveal,#toast') ? 'covered by ' + (e.className || e.tagName) : 'ok'; }, [hx, hy]); ok(th === 'ok', `step ${st.i + 1}/${st.n} ${st.id} (see) spotlight target uncovered: ${th}`); seen.add(key + ':t'); }
-      const nx = await p.$('.gxt-next'); const r = nx && await nx.boundingBox(); if (!r) continue;
-      const cx = r.x + r.width / 2, cy = r.y + r.height / 2, hit = await uncovered(cx, cy, null);
-      if (!seen.has(key)) { ok(hit === 'ok', `step ${st.i + 1}/${st.n} ${st.id} (see) Next uncovered: ${hit}`); seen.add(key); }
-      await tapXY(cx, cy); await p.waitForTimeout(350); continue;
-    }
-    if (!st.hole) continue;
+    const end = await p.$('.gxt-end .gxt-b.pri'); if (end && await end.isVisible()) { await end.click(); break; }
+    const st = await p.evaluate(() => typeof GXT !== 'undefined' ? GXT.state() : { active: false }); if (!st.active) continue; nSteps = st.n;
+    if (st.phase !== 'show' || !st.shown || !st.hole) continue;
     const cx = st.hole.cx != null ? st.hole.cx : st.hole.left + st.hole.width / 2, cy = st.hole.cy != null ? st.hole.cy : st.hole.top + st.hole.height / 2;
-    const hit = await uncovered(cx, cy, st.hole);
-    if (!seen.has(key)) { ok(hit === 'ok', `step ${st.i + 1}/${st.n} ${st.id} (${st.count + 1}/${st.times}) target uncovered: ${hit}`); seen.add(key); }
-    await tapXY(cx, cy); await p.waitForTimeout(400);
+    const hit = await p.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e && !e.closest('.gxt-top,.gxt-cell,.turnban,.reveal,#toast') ? 'ok' : 'covered'; }, [cx, cy]);
+    if (hit !== 'ok') { ok(false, 'guided step ' + st.id + ' target covered'); break; }
+    await tapXY(cx, cy); gTaps++; await p.waitForTimeout(400);
   }
-  const end = await p.$('.gxt-end .gxt-b.pri'); ok(!!end && await end.isVisible(), `reached the guided part's end card (${n} steps)`);
-  const miss = WANT.filter(id => !shown.has(id)); ok(WANT.length > 0 && miss.length === 0, `every TUTORIAL-COVERAGE.md step was shown (${WANT.length} ids${miss.length ? ', missing ' + miss.join(',') : ''})`);
-  if (end) { await end.click(); await p.waitForTimeout(800); }
-  // the rest of the real game, by visible taps only
+  await p.waitForTimeout(600);
+  ok(nSteps <= 2 && gTaps <= 3, `only the first action is guided (${nSteps} steps, ${gTaps} taps), then free play`);
+  ok(await p.evaluate(() => UI.mode === 'tutfree' && COACH.on), 'the coached free game is running after the end card');
   let res = false, idle = Date.now(); const t1 = Date.now();
-  while (Date.now() - t1 < 240000) {
+  while (Date.now() - t1 < 300000) {
     const h = await p.evaluateHandle(() => {
       const vis = e => { if (!e || e.hidden) return false; for (let x = e; x; x = x.parentElement) { if (x.hidden || getComputedStyle(x).display === 'none') return false; } return e.getBoundingClientRect().width > 0; };
       const q = s => [...document.querySelectorAll(s)].filter(vis);
@@ -53,20 +41,29 @@ const WANT = [...new Set([...COVER.matchAll(/step `([a-z0-9]+)`/g)].map(m => m[1
       if (q('.turnban,.reveal').length) return null;
       const pop = document.getElementById('pop'); if (vis(pop)) return pop.querySelector('[data-a="popx"]');
       const acts = q('#acts button'); const pg = acts.find(b => b.dataset.a === 'playgo'); if (pg) return pg;
-      const g = q('.glow'); if (g.length) { const sl = g.find(e => e.matches('.slot')); if (sl) return sl; const hd = g.find(e => e.closest('#hand')); return hd || g[Math.floor(Math.random() * g.length)]; }
-      const mv = acts.filter(b => b.dataset.a === 'mv'); if (mv.length) return mv.find(b => /no thanks|skip/i.test(b.textContent)) || mv[0];
+      const g = q('.glow'); if (g.length) { const sl = g.find(e => e.matches('.slot')); if (sl) return sl; return g[Math.floor(Math.random() * g.length)]; }
+      const mv = acts.filter(b => b.dataset.a === 'mv'); if (mv.length) return mv[Math.floor(Math.random() * mv.length)];
       return q('.bonc')[0] || null;
     });
     const v = await h.jsonValue().catch(() => undefined); if (v === 'result') { res = true; break; }
+    overlap += await p.evaluate(() => { if (!document.querySelector('.coachb')) return 0; return [...document.querySelectorAll('.glow')].some(e => { const r = e.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > innerHeight) return false; const t = document.elementFromPoint(r.left + r.width / 2, Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2))); return !!(t && t.closest('.coachb')); }) ? 1 : 0; });
     const el = h.asElement();
-    if (el) { const r = await el.boundingBox(); if (r) { const x = r.x + r.width / 2, y = r.y + Math.min(r.height / 2, 30);
-      if (await el.evaluate((e, [x, y]) => { const t = document.elementFromPoint(x, y); return e.isConnected && !!t && (t === e || e.contains(t)); }, [x, y])) { await tapXY(x, y); idle = Date.now(); await p.waitForTimeout(150); continue; } } }
-    if (Date.now() - idle > 20000) break;
+    if (el) { await el.scrollIntoViewIfNeeded().catch(() => { }); const r = await el.boundingBox(); if (r) { const x = r.x + r.width / 2, y = r.y + Math.min(r.height / 2, 30);
+      if (await el.evaluate((e, [x, y]) => { const t = document.elementFromPoint(x, y); return e.isConnected && !!t && (t === e || e.contains(t)); }, [x, y])) { await tapXY(x, y); taps++; idle = Date.now(); await p.waitForTimeout(150); continue; } } }
+    if (Date.now() - idle > 25000) break;
     await p.waitForTimeout(200);
   }
-  const txt = res ? await p.evaluate(() => document.getElementById('result').innerText.slice(0, 80).replace(/\s+/g, ' ')) : '';
-  ok(res, 'the guided game was played to the result screen' + (txt ? ' (' + txt + ')' : ''));
-  if (res) await p.screenshot({ path: `shots/tutorial-${SIZE}-result.png` });
+  ok(res, `the coached game was played to the result screen by ${taps} free UI taps`);
+  ok(overlap === 0, 'the coach bubble never sat on a glowing target (' + overlap + ' samples)');
+  const st = await p.evaluate(() => ({ done: Object.keys(COACH.done), later: (document.querySelector('.later') || { dataset: {} }).dataset.later || '', walk: document.querySelectorAll('.walk li').length, all: coachRules() }));
+  const later = st.later ? st.later.split(',') : [];
+  const miss = RULES.filter(r => st.done.indexOf(r) < 0 && later.indexOf(r) < 0);
+  ok(RULES.length >= 20 && miss.length === 0, `every coverage rule explained in play or listed under "Things you'll meet later" (${RULES.length} rules; live ${st.done.filter(r => RULES.includes(r)).length}, later ${later.length}${miss.length ? '; missing ' + miss.join(',') : ''})`);
+  const coreMiss = CORE.filter(r => st.done.indexOf(r) < 0); ok(coreMiss.length === 0, 'core rules explained live' + (coreMiss.length ? ': missing ' + coreMiss.join(',') : ''));
+  ok(RULES.every(r => st.all.includes(r)) && st.all.every(r => RULES.includes(r)), 'TUTORIAL-COVERAGE.md and the coach rule list match');
+  ok(st.walk >= 7, 'the result screen walks the score rule by rule (' + st.walk + ' lines)');
+  if (later.length) console.log('     later: ' + later.join(','));
+  if (res) await p.screenshot({ path: `shots/tutorial-${SIZE}-result.png`, fullPage: true });
   ok(errs.length === 0, 'console errors ' + errs.length + ' ' + errs.slice(0, 2).join(' | '));
   await b.close(); process.exit(fails ? 1 : 0);
 })();

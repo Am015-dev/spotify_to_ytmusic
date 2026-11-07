@@ -91,7 +91,7 @@ function gameOver() { hideHelp();
   var line = winners.length > 1 ? 'A tie at the top!' : isHuman(winners[0]) ? (humans().length > 1 ? G.pl[winners[0]].name + ' wins the year!' : 'You win the year!') : G.pl[winners[0]].name + ' wins the year.';
   var goalHTML = '', voice = '';
   var iWon = winners.indexOf(me) >= 0, sayB = function (w) { var c = (STORY.cast[w[0]] || { name: (window.CAMPAIGN && CAMPAIGN.cast[w[0]] || {}).name || w[0], color: (window.CAMPAIGN && CAMPAIGN.cast[w[0]] || {}).color || '#4f7a45' }); return '<div class="saybox">' + faceHTML(w[0], c) + '<span class="saytx"><b>' + esc(c.name) + '</b>' + esc(w[1]) + '</span></div>'; };
-  if (UI.mode === 'tutfree') voice = '<p class="voice">' + esc(iWon ? STORY.tutResult.win : STORY.tutResult.lose) + '</p>';
+  if (UI.mode === 'tutfree') voice = '<p class="voice">' + esc(iWon ? STORY.tutResult.win : STORY.tutResult.lose) + '</p>' + coachResultHTML(sc, me);
   else if (!UI.camp) voice = '<p class="voice">' + esc(winners.length > 1 ? STORY.quickResult.tie : iWon || humans().length > 1 ? STORY.quickResult.win : STORY.quickResult.lose) + '</p>';
   if (UI.camp && UI.camp.goal) {   // story: say plainly whether the chapter goal was met, with the count, and what the stars need
     var gr = campGoalLive(G, UI.camp), gm = campMetrics(G), gwin = campIsWon(G, UI.camp);

@@ -100,6 +100,7 @@ function playFx(list, actor) {
   list.forEach(function (e) {
     chain = chain.then(function () {
       var mine = e.seat === view;
+      try { coachFx(e, mine); } catch (er) { }
       switch (e.k) {
         case 'action': {
           sfx('act');
@@ -204,7 +205,7 @@ function save() {
 }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } try { if (window.GNS) GNS.saved('perch-and-plume', false); } catch (e) { } }
 function loadSave() { try { var s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); return s && s.G && s.G.phase !== 'over' && !s.camp ? s : null; } catch (e) { return null; } }
-function stopTimers() { $$('.turnban,.reveal').forEach(dropEl); UI.turnKey = null; clearTimeout(UI.pumpT); UI.timers.forEach(clearTimeout); UI.timers = []; UI.busy = false; }
+function stopTimers() { try { coachHide(); COACH.on = false; } catch (e) { } $$('.turnban,.reveal').forEach(dropEl); UI.turnKey = null; clearTimeout(UI.pumpT); UI.timers.forEach(clearTimeout); UI.timers = []; UI.busy = false; }
 // ---------------- start a game
 // o: {seats:[{name,kind,lvl}], mode, seed, twist, camp, hands, cubes, rounds, tutorial}
 function startGame(o) {

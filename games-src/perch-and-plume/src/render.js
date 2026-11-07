@@ -39,6 +39,7 @@ function render() {
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
   glow();
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
+  try { coachState(); } catch (e) { }
 }
 // live chapter goal: always visible during a story chapter, with the count and a tick once met
 var GOAL_LABEL = { forest: 'Forest birds', eggs: 'Eggs', birds: 'Birds played', goals: 'Round-goal points', bonus: 'Bonus points', score: 'Score', margin: 'Lead over the best rival' };
