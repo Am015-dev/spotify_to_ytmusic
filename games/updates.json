@@ -1,5 +1,38 @@
 [
  {
+  "date": "2026-11-07",
+  "game": "twin-thrones",
+  "title": "new game: Twin Thrones, a two-player card game of rival kingdoms",
+  "items": [
+   "New game: Twin Thrones, a card game of two rival kingdoms. Play against the computer on easy, normal or hard, or two players on one device",
+   "Watch a computer-only game too; the rules are complete from start to finish",
+   "Art coming soon: the pictures are placeholders for now"
+  ],
+  "check": "Open Twin Thrones and start a game against the computer on easy"
+ },
+ {
+  "date": "2026-11-07",
+  "game": "emberclimb",
+  "title": "new game: Emberclimb, a deck-building tower climb",
+  "items": [
+   "New game: Emberclimb, a deck-building tower climb. Pick one of 4 heroes and climb a branching map of monster, elite, shop, event and rest rooms to the boss",
+   "Play alone or hot-seat with a second hero on the same device; each hero has its own deck, HP and turn",
+   "Act 1 only for now, with 3 bosses. Art coming soon: the pictures are placeholders for now"
+  ],
+  "check": "Open Emberclimb, choose a hero and play one floor of the map"
+ },
+ {
+  "date": "2026-11-07",
+  "game": "redline-rally",
+  "title": "new game: Redline Rally, a top-down 2D racing game",
+  "items": [
+   "New game: Redline Rally, a top-down racing game on a sunset track. Pick a track, the number of laps and 1 to 5 rivals, then race on easy, normal or hard",
+   "Play pass-and-play with 1 to 3 people on one device; corners show a preview of the speed you can take them at, and slipstreams and boost help you pass",
+   "Art coming soon: the pictures are placeholders for now"
+  ],
+  "check": "Open Redline Rally from the shelf, pick a track and race one lap"
+ },
+ {
   "date": "2026-10-14",
   "game": "rampart-and-vine",
   "title": "desktop menu and board readable: rows fit their art, 16px text, zoomed valley",
