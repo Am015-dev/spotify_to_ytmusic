@@ -18,7 +18,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  if(mode==='story'){await tap('#modal summary');await sleep(400);await tap('#modal [data-a=story]');await sleep(1500);if(await tap('.gxt-skip'))await sleep(1500)} else{await tap('#modal [data-a=start]');await sleep(600);await tap('.tutoffer [data-tutoffer=play]');await sleep(1500)}
  const t0=Date.now();let last='',stall=0,over=null;
  while(Date.now()-t0<540000){
-   over=await p.evaluate(()=>G&&G.over?{win:!!G.over.win,round:G.round,msg:String(G.over.why||G.over.msg||'')}:null);
+   over=await p.evaluate(()=>{const r=document.querySelector('.gxc-res-on');if(r&&r.getBoundingClientRect().width)return {win:/won/.test(r.className),round:G?G.round:null,res:1};return G&&G.over?{win:!!G.over.win,round:G.round}:null});
    if(over)break;
    let did=null;
    for(const sel of ['.gxh-bub .gxh-ok','#modal button:not([data-a=new]):not([data-a=rules]):not([data-a=cards]):not([data-a=close])','.bf-opts .opt','.gxc-node.open.next','.gxc-btn.go,.gxc-btn.pri,.gxc-btn:not(.ghost)','#bf [data-a=go][data-force]','#bf [data-a=next]','#bf [data-a=suggest]','#bf [data-a=go]']){
@@ -31,7 +31,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    const sig=await p.evaluate(()=>[G&&G.round,PHO.st,UI.shown,UI.beats&&UI.beats.length,G&&G.logN].join());
    if(sig===last&&!did){stall++;if(stall>40){log.push('STUCK '+sig);break}}else stall=0;last=sig;
    await sleep(did?250:400)}
- const info=await p.evaluate(()=>({over:G&&G.over?{win:!!G.over.win}:null,round:G&&G.round,cmp:G&&G.cmp&&G.cmp.id,dead:G&&G.chars.filter(c=>c.dead).length}));
+ const info=over?{over:{win:over.win},round:over.round,res:over.res}:await p.evaluate(()=>({over:G&&G.over?{win:!!G.over.win}:null,round:G&&G.round,cmp:G&&G.cmp&&G.cmp.id,dead:G&&G.chars.filter(c=>c.dead).length}));
  const shotDir=path.join(__dirname,'playtest');fs.mkdirSync(shotDir,{recursive:true});
  await sleep(1500);await p.screenshot({path:path.join(process.env.TMPDIR||'/tmp','swi-result-'+mode+'-'+W+'.png')});
  const resShown=await p.evaluate(()=>!!document.querySelector('#bf [data-a=next],#modal button,.bf-opts')||!!(G&&G.over));
