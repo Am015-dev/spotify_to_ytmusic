@@ -193,6 +193,10 @@ function bfScore(i,v){const el=bfQ(`[data-bfsc="${i}"]`);if(el)el.textContent='�
 function bfBanner(t,sub){const tb=BF.tbl;if(!tb)return;const d=document.createElement('div');d.className='bf-ban';d.innerHTML=`<b>${esc(t)}</b>${sub?`<small>${esc(sub)}</small>`:''}`;tb.appendChild(d);
   if(!bfAnimOK()){d.remove();return}
   bfTrack(d.animate([{opacity:0,transform:'translateY(-50%) scale(.7)'},{opacity:1,transform:'translateY(-50%) scale(1.05)',offset:.18},{opacity:1,transform:'translateY(-50%) scale(1)',offset:.8},{opacity:0,transform:'translateY(-50%) scale(1)'}],{duration:bfD(1500),fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
+// W388: a short pill says whose turn it is (solid backing, top of the table, never over the kilns' tiles)
+function bfTurn(t,cls){const tb=BF.fl;if(!tb||!t)return;tb.querySelectorAll('.bf-turn').forEach(e=>e.remove());const d=document.createElement('div');d.className='bf-turn'+(cls?' '+cls:'');d.setAttribute('role','status');d.textContent=t;tb.appendChild(d);
+  if(!bfAnimOK()){setTimeout(()=>d.remove(),900);return}
+  bfTrack(d.animate([{opacity:0,transform:'translate(-50%,-14px) scale(.85)'},{opacity:1,transform:'translate(-50%,0) scale(1.04)',offset:.2},{opacity:1,transform:'translate(-50%,0) scale(1)',offset:.8},{opacity:0,transform:'translate(-50%,0) scale(1)'}],{duration:bfD(1200),fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
 // one idea at a time, in two short lines at most, above the action (guided game only, each once)
 const BF_TIPS={nofit:'Red ✗ colours fit no row.',slide:'Leftovers slid to the middle.',tiling:'Full rows slide onto the wall!',chain:'Touching tiles score more!',
   floor:'Extra tiles break: minus points.',sun:'☀ costs 1, but you start next.',bonus:'Full column +7 at the end!',
@@ -211,12 +215,12 @@ function bfFx(f){if(!G)return;bfSync();const x=f.x;let e=null;
 const bfHold=()=>BF.on&&(BF.busy||BF.q.length>0);
 async function bfRun(){if(BF.busy)return;BF.busy=true;const gk=BF.gk;clearTimeout(BF.idleT);BF.fingerOn=false;bfFinger(null);
   try{while(BF.q.length&&BF.gk===gk){const e=BF.q.shift();try{await bfStep(e)}catch(err){BF.errs.push(String(err&&err.message||err));BF.q.length=0;break}}}
-  finally{BF.busy=false;BF.rv=null;BF.fast=false;BF.say='';BF.actor=-1;BF.hide.clear();if(BF.fl)BF.fl.innerHTML='';BF.anims.length=0;if(G&&BF.gk===gk)BF.disp=bfClone(G);bfDraw();try{schedule()}catch(e){}}}
+  finally{BF.busy=false;BF.rv=null;BF.fast=false;BF.say='';BF.actor=-1;BF.hide.clear();if(BF.fl)BF.fl.innerHTML='';BF.anims.length=0;if(G&&BF.gk===gk)BF.disp=bfClone(G);bfDraw();try{if(G&&!G.over&&G.phase==='offer'&&!UI.tut){const s=sideToAct(),q=s>=0&&P(s);if(q&&q.human&&!NET.on&&BF.lastRival){BF.lastRival=0;bfTurn(G.pl.filter(z=>z.human).length>1?q.nm+"'s turn":'Your turn','me')}}}catch(e){}try{schedule()}catch(e){}}}
 async function bfStep(e){const S=BF.disp;
   if(e.t==='take')return bfTake(e.x);
   if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
   if(e.t==='wall')return bfWall(e.x);
-  if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length))await bfFloors();
+  if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length)){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut&&TUT.part==='A')await tutPause('r1end')}
     S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
     bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(1500,500+S.fac.length*4*45));return}
@@ -225,6 +229,7 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   const m={src:x.src,c:x.c,j:(x.nj||x.c===PRISM)?1:0,line:x.line};const pre=x.src<0?'c':'f'+x.src;const picked=[],rest=[];
   a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
   const focus=x.p===bfFocus(),pl=P(x.p);BF.actor=x.p;
+  if(!focus||!pl||!pl.human||NET.on){BF.lastRival=1;bfTurn(pl.nm+"'s turn",'rv');await bfWait(700)}
   if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw()}
   // 1. the tiles lift (the player's own selection is already up)
   let lifted=false;for(const o of picked){const el=bfEl(o.key);if(el&&!el.classList.contains('up')){el.classList.add('up');lifted=true}}
