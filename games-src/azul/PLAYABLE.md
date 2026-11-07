@@ -32,3 +32,14 @@ the sweep (`sweep.js`) now expects no pick/rack coach bubbles.
 - `tutor-e2e.js` both parts to the end card, 390x763 and 1440x860: PASS, every target uncovered at its centre, every coverage id shown, 0 console errors.
 - `quick-e2e.js quick` and `quick-e2e.js story` (stage 1) at 390x763: played to the result by taps on visible, uncovered UI only: PASS, 0 console errors.
 - ui-audit (A-F): see the table below.
+
+### ui-audit (A-F), last runs
+| size | A | B | C | D | E | F |
+|---|--:|--:|--:|--:|--:|--:|
+| phone 390x763 | 0 | 0 | 0 | 0 | 0 | 0 |
+| phone-s 375x553 | 0 | 1 | 0 | 0 | 0 | 0 |
+| pc 1366x768 | 3 | 8 | 0 | 17 | 10 | 0 |
+Before my pass: phone B13 E3, phone-s B16, pc A26 B9 D17 E10.
+NOT zero (honest): phone-s B1 (story-map act banner), pc A3/B8 (dock and rules-drawer text contrast), pc D17 (3D table meshes without textures, shared scene art), pc E10 (the audit taps pick buttons that are replaced after the first tap and selected segment buttons; judged false positives, not changed).
+The pc numbers are from before the last wide-screen CSS pass was re-measured on every surface; phone/phone-s are the owner's play surface.
+Second critique pass: done by me on the four after-shots only (impeccable skill not re-run); the rival-turn caption was caught mid-fade in its shot.
