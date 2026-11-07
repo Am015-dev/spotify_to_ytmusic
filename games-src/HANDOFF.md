@@ -2,6 +2,10 @@
 
 Older notes (everything from "Nightrun TIMING" down, and all shelf-wide history) moved to games-src/HANDOFF-ARCHIVE.md on 21 Oct 2026. Nothing was deleted.
 
+## New games: pick only from the top ranked board games (owner, 7 Nov 2026: "I want top board games from now on")
+
+- Suggest and build new shelf games only from the current top of the overall board game rankings, not niche picks. Owner chooses from the list.
+
 ## Start here (31 Oct 2026, Nightrun)
 
 - Branch `alex/brave-carson-rbpmlk`, never main. Rules: games-src/nightrun/WORKER-RULES.md (rules 18-19), ASSET-POLICY.md.
