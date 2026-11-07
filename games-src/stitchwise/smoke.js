@@ -65,7 +65,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
       await pg.waitForFunction(id => { const c = GXT.current && GXT.current(); return !GXT.active() || !c || c.id !== id; }, st.id, { timeout: 15000 }).catch(() => { ok(false, 'tutorial stuck on ' + st.id); });
       if (fails) { await pg.screenshot({ path: path.join(OUT, tag + '-tut-stuck.png') }); break; }
     }
-    ok(steps >= 12, 'tutorial walked ' + steps + ' steps');
+    ok(steps >= 6, 'tutorial walked ' + steps + ' steps');
   }
   if (STORY) {
     await pg.evaluate(() => { try { GXT.markDone('stitchwise'); } catch (e) { } }); await tapSel('[data-a=story]'); await pg.waitForTimeout(500); await pg.screenshot({ path: path.join(OUT, tag + '-map.png') });

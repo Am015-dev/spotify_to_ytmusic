@@ -204,5 +204,25 @@ html .gx-row .btn,html .gx-row-k .btn,html .gx-row-l small,html .gx-chip{font-si
 @media (min-width:1024px){.gx-bar span,#barprompt,#tinfo,.oppmini small{font-size:16px!important}}
 @media (max-height:500px){.rvhead{display:none}.rv{padding:6px}.rvtally{font-size:.78rem;gap:0}.rvtally .ic{width:13px;height:13px}.rvt1{font-size:1.4rem}.rvt2{font-size:.95rem}.rvban.on{margin:4px 0 0}.rvacts{margin-top:4px;min-height:40px}.rvname{font-size:.85rem}.rvsum{font-size:.95rem}.rvsum b{font-size:1.05rem}.rvcols{gap:6px}}
 .gxc-lab{padding:4px 10px!important;box-shadow:none!important;border:1px solid #b99a60}
+
+/* W381 playable: readable offers, glow/dim, turn banner, captions */
+.offer .onm{font-size:13px;font-weight:800;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3a2a1a}
+.offer .ofx{display:grid!important;grid-template-columns:repeat(3,1fr);gap:2px!important;width:100%;flex-wrap:nowrap!important}
+.offer .of{display:flex!important;flex-direction:column;align-items:center;gap:0!important;line-height:1}
+.offer .of b{font-size:17px;font-weight:800}
+.offer .of small{font-size:13px!important;font-weight:700;color:#5a4630}
+.offer .oc b{color:#8a5a00}.offer .ot b{color:#1d5f8a}.offer .oi b{color:#2b6b2b}
+.offer.can{border:3px solid var(--gold,#e0a520);box-shadow:0 0 0 3px #f2c14e88,0 4px 14px #e0a52066;animation:canp 1.6s ease-in-out infinite}
+@keyframes canp{50%{box-shadow:0 0 0 5px #f2c14e55,0 4px 18px #e0a52088}}
+.offer.no{opacity:.8}.offer.no.cant{opacity:.5}.offer.dim{opacity:.35;filter:saturate(.4)}
+.offer.cant::after{font-size:13px!important}
+#prompt{font-size:16px!important;line-height:1.25;min-height:40px;display:flex;align-items:center;background:#fff7e0;border-left:4px solid var(--gold,#e0a520);border-radius:8px;padding:4px 8px;color:#2a1d10}
+#prompt.rv-cap{border-left-color:var(--opp,#c0533f);background:#fdecea}
+#turnban{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.85);z-index:80;pointer-events:none;padding:14px 28px;border-radius:16px;font:800 26px/1.1 Georgia,serif;color:#fff;background:#1f6f68;box-shadow:0 10px 40px #0008;opacity:0;transition:opacity .25s,transform .25s;text-align:center;white-space:nowrap}
+#turnban small{display:block;font:600 15px/1.3 system-ui,sans-serif;margin-top:4px;opacity:.95}
+#turnban.opp{background:#a8432f}#turnban.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.flt.r{transform:translateX(-50%);white-space:nowrap;font-size:16px;background:#2a1d10e6;padding:4px 10px;border-radius:10px;color:#ffe9a0;text-shadow:none}
+.qlabel{position:absolute;left:50%;top:-2px;transform:translate(-50%,-100%);background:#a8432f;color:#fff;font-weight:800;font-size:14px;padding:3px 12px;border-radius:10px 10px 0 0;white-space:nowrap;z-index:3}
+html.sm .offer .onm{display:none}
 </style>
 </head>

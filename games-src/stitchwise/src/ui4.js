@@ -5,29 +5,22 @@ function tutAct(x) { if (!tutOn()) return true; var ev = x.what === 'drop' || x.
 function tq(sel) { return function () { return $(sel); }; }
 function tutSteps() {
   var mine = function () { return G && !G.over && isHuman(swWho(G)) && !UI.busy; };
-  return [
-    { id: 'board', title: 'Your quilt', say: 'This is your quilt: 9 by 9 squares. Every empty square costs you 2 points at the end.', target: tq('#quilt'), wait: null, ready: function () { return !!$('#quilt'); } },
-    { id: 'buttons', title: 'Buttons', say: 'Buttons are your money and your score. You start with 5.', target: function () { return $('.pstrip:last-child') || $('.pstrip'); }, wait: null },
-    { id: 'offers', title: 'Three patches', say: 'Each turn you may buy one of these three patches. The cost is the button number.', target: tq('#offers'), wait: null },
-    { id: 'pick', title: 'Pick a patch', say: 'Tap the long strip: it costs 3 buttons and earns 1 button at every button spot.', target: function () { return $$('#offers .offer')[2]; }, wait: { type: 'tap', match: function (a) { return a.what === 'offer' && a.k === 2; } }, wrong: 'Tap the long strip on the right.', ready: mine },
-    { id: 'drag', title: 'Place it', say: 'Drag it onto your quilt, or tap a square. It snaps to the grid. Try the Rotate button too.', target: tq('#quilt'), wait: { type: 'event', match: function (a) { return a.what === 'drop' && a.valid; } }, ready: function () { return UI.sel === 2 && !!$('#ghost'); }, side: 'top' },
-    { id: 'sew', title: 'Sew it on', say: 'Happy with the spot? Tap Sew it on. You pay 3 buttons.', target: tq('[data-a=sew]'), wait: { type: 'tap', match: function (a) { return a.what === 'buy'; } }, ready: function () { var s = $('[data-a=sew]'); return !!s && !s.disabled; } },
-    { id: 'time', title: 'Time passes', say: 'Sewing costs time: your token moved 3 spaces. Whoever is further back on the track plays next.', target: tq('#track'), wait: null, ready: function () { return G.owned[0].length === 1 && !UI.busy; } },
-    { id: 'opp', title: 'Their turn', say: 'Marden plays now. Watch the track, then it is your turn again.', target: tq('#track'), wait: null, ai: function () { UI.tutAi = true; schedule(); return new Promise(function (res) { (function lp() { if (!G || G.over || (isHuman(swWho(G)) && !UI.busy)) { UI.tutAi = false; return res(); } setTimeout(lp, 150); })(); }); } },
-    { id: 'adv', title: 'Advance', say: 'Short on buttons? Advance: your token jumps just past theirs and you take 1 button per space.', target: tq('[data-a=adv]'), wait: { type: 'tap', match: function (a) { return a.what === 'adv'; } }, ready: mine, wrong: 'Tap Advance.' },
-    { id: 'income', title: 'Button spots', say: 'The gold spots on the track pay you the buttons printed on your patches. Pass one to collect.', target: tq('#track'), wait: null, ready: function () { return !UI.busy; } },
-    { id: 'leather', title: 'Leather patches', say: 'The brown spots hold free 1 by 1 leather patches. Pass one first and you sew it on at once.', target: tq('#track'), wait: null },
-    { id: 'bonus', title: 'The 7 by 7 bonus', say: 'Fill a full 7 by 7 block on your quilt before your rival and you earn 7 bonus points.', target: tq('#quilt'), wait: null },
-    { id: 'end', title: 'Ready to stitch', say: 'When both tokens reach the end, buttons minus 2 per empty square decides it. Go win a fair!', target: tq('#track'), wait: null }
+  return [ // W381: 6 steps, each one real action (tap / drag / tap), ends inside a real game
+    { id: 'pick', title: 'Buy a patch', say: 'Buttons are your money (you have 5). Tap the glowing long strip: it costs 3.', target: function () { return $$('#offers .offer')[2]; }, wait: { type: 'tap', match: function (a) { return a.what === 'offer' && a.k === 2; } }, wrong: 'Tap the long strip on the right.', ready: mine },
+    { id: 'drag', title: 'Place it', say: 'Drag it onto your quilt, or tap a square. Empty squares cost 2 points at the end.', target: tq('#quilt'), wait: { type: 'event', match: function (a) { return a.what === 'drop' && a.valid; } }, ready: function () { return UI.sel === 2 && !!$('#ghost'); }, side: 'top' },
+    { id: 'sew', title: 'Sew it on', say: 'Tap Sew it on. You pay 3 buttons and your token moves 3 spaces.', target: tq('[data-a=sew]'), wait: { type: 'tap', match: function (a) { return a.what === 'buy'; } }, ready: function () { var s = $('[data-a=sew]'); return !!s && !s.disabled; } },
+    { id: 'opp', title: 'Marden\u2019s turn', say: 'Whoever is further back on the track plays next. Tap Next and watch Marden.', target: tq('#track'), wait: null, ready: function () { return G.owned[0].length === 1 && !UI.busy; }, ai: function () { UI.tutAi = true; schedule(); return new Promise(function (res) { (function lp() { if (!G || G.over || (isHuman(swWho(G)) && !UI.busy)) { UI.tutAi = false; return res(); } setTimeout(lp, 150); })(); }); } },
+    { id: 'adv', title: 'Advance', say: 'Short on buttons? Tap Advance: jump just past Marden and take 1 button per space.', target: tq('[data-a=adv]'), wait: { type: 'tap', match: function (a) { return a.what === 'adv'; } }, ready: mine, wrong: 'Tap Advance.' },
+    { id: 'end', title: 'Gold spots pay', say: 'Passing a gold spot pays the buttons on your patches. Most points when both reach the end wins.', target: tq('#track'), wait: null, ready: function () { return !UI.busy; } }
   ];
 }
 function tutStart(o) {
   try { clearTimeout(toast.t); $('#toast').classList.remove('on'); } catch (e) { }
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; var first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'), endTitle: 'You know the rules', endText: o ? 'Buy, place, advance, button spots. Now the Story begins.' : 'Buy, place, advance, button spots. The lightbulb explains anything new.',
-    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'), endTitle: 'You know the rules', endText: o ? 'Buy, place, advance, gold spots. Now the Story begins.' : 'Buy, place, advance, gold spots. Finish this game against Marden; the lightbulb explains anything new.',
+    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'finish', label: 'Finish this game' }, { id: 'title', label: 'Back to the title' }],
     setup: function () { try { GX.close(); } catch (e) { } $('#start').hidden = true; $('#rs').hidden = true; newGame('tutorial', { seed: 4242, ring: TUT_RING, first: 0 }); },
-    onDone: function (r) { tutLeave(); var c = r && r.choice; if (c === 'chapter' && first) { showStart(); GXC.play(first.id); } else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); },
+    onDone: function (r) { var c = r && r.choice; if (c === 'finish' && G && !G.over) { UI.tutorial = false; UI.tutAi = false; UI.lvl = 'easy'; UI.names[1] = 'Marden'; render(); schedule(); return; } tutLeave(); if (c === 'chapter' && first) { showStart(); GXC.play(first.id); } else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); },
     onExit: function () { tutLeave(); showStart(); } });
 }
 function tutLeave() { UI.seq++; clearTimeout(UI.tm.ai); UI.tutorial = false; UI.tutAi = false; UI.started = false; UI.busy = 0; UI.sel = -1; try { GXH.hide(); } catch (e) { } G = null; $$('.flt,.coin').forEach(function (e) { e.remove(); }); }
@@ -72,7 +65,7 @@ function hlpRefresh() { hlpPhaseUpdate(); }
 function svgPatch(c) { return '<svg viewBox="0 0 60 40" width="60" height="40"><rect x="6" y="6" width="16" height="16" fill="' + c + '"/><rect x="22" y="6" width="16" height="16" fill="' + c + '"/><rect x="6" y="22" width="16" height="16" fill="' + c + '"/></svg>'; }
 function hlpInit() {
   if (typeof GXH === 'undefined') return;
-  GXH.init({ game: 'stitchwise', defaultOn: true, avoid: '.offer,#acts button,#quilt',
+  GXH.init({ game: 'stitchwise', defaultOn: false, avoid: '.offer,#acts button,#quilt',
     steps: { choose: { target: function () { return $('#offers'); }, title: 'Choose a patch', text: 'Tap one of three patches to buy it, or Advance to earn buttons.' }, place: { target: function () { return $('#quilt'); }, title: 'Place it', text: 'Drag it on your quilt, rotate if needed, then Sew it on.' }, leather: { target: function () { return $('#quilt'); }, title: 'Free leather patch', text: 'Tap any empty square for your free 1 by 1 patch.' } },
     rules: [{ title: 'Buy or advance', text: 'Buy a patch with buttons, or advance your token to earn buttons.', pic: svgPatch('#c0527a') }, { title: 'Time decides turns', text: 'The token further back plays. Big patches take more time.', pic: svgPatch('#2a8a80') }, { title: 'Button spots', text: 'Passing a gold spot pays the buttons printed on your patches.', pic: svgPatch('#e0a82e') }, { title: 'Score', text: 'Buttons plus 7 bonus, minus 2 per empty square.', pic: svgPatch('#4a86b8') }] });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: function () { return hlpPhase() || 'choose'; } });
