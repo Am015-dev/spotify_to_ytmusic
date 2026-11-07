@@ -36,7 +36,7 @@ function coachSay(key, vars, now) {
 }
 function coachNext() { var C = UI.coach; if (!C || !C.q.length) return; var n = C.q.shift(); C.seen[n.k] = 1; C.line = n.t; C.ch = n.ch; C.fresh = 2; C.shown.push(n.k); coachRender(); }
 function coachRender() {
-  var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : UI.flavor || '';
+  var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : UI.wide ? UI.flavor || '' : '';
   el.hidden = !txt || !G || G.over; if (el.hidden) return; el.innerHTML = '';
   var cast = ((window.CAMPAIGN || {}).cast || {}).wren || {}, chn = C ? (coachData().chapters || {})[C.ch] : '';
   el.appendChild(h('span.gface', { style: 'background:' + (C ? cast.color || '#3b7a8c' : '#a8432f'), 'aria-hidden': 'true' }, C ? (cast.emoji || '\u{1F9F5}') : '\u{1F380}'));
