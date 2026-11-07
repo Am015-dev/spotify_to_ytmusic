@@ -3,10 +3,12 @@
 //  - shelf pages, manifest, icons, covers: network first (3 s), the cached copy when offline or slow
 //  - games the player chose to keep (cached by sync.html, every file listed in <game>/offline.json): cache first; Range requests (audio, video) are answered from the cached file as 206; only html/json are quietly refreshed
 //  - a game that was not downloaded and there is no network: a friendly page instead of the browser error
-//  - cross-origin requests are never touched or stored
+//  - cross-origin requests are never touched or stored, except Google web fonts and CDN scripts such as three.js (fonts.*, cdn.jsdelivr.net, unpkg, cdnjs): cache first, stored on first use and by sync.html, so text and 3D games look the same offline
 const VER = 'v2';
 const SHELF = 'gns-shelf-' + VER;
 const GAMES = 'gns-games-' + VER;
+const EXTRA = /^(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com|code\.jquery\.com)$/;
+const FONTS = 'gns-fonts-' + VER;   // web fonts and CDN scripts the kept games ask for; stored by sync.html and on first use
 const SLUGS = ['crown-city-smash', 'nebula-aces', 'doorkick-dungeon', 'shipwreck-isle', 'sands-of-qamar', 'sunglaze', 'rampart-and-vine', 'short-fuse', 'tidewake', 'hollowbough', 'thornbound', 'kaiten-kitchen', 'lantern-dive', 'cauldron-fair', 'final-approach', 'redline-rally', 'emberclimb', 'twin-thrones', 'mainhattan-nightrun', 'mainhattan-overdrive'];
 const PRECACHE = ['./', 'index.html', 'classic.html', 'sync.html', 'suggest.html', 'reference.html', 'privacy.html', 'terms.html', 'credits.html', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png', 'room/plant.webp', 'room/room-back-day.webp', 'room/room-back-night.webp', 'room/room-front-day.webp', 'room/room-front-night.webp', 'room/suitcase.webp', 'room/velour.webp', 'room/wood.webp'];
 const BASE = new URL('./', self.registration.scope).pathname;
@@ -29,7 +31,7 @@ self.addEventListener('activate', e => {
       const dst = await caches.open(GAMES);
       for (const n of gOld) { const src = await caches.open(n); for (const rq of await src.keys()) { if (!(await dst.match(rq))) { const r = await src.match(rq); if (r) await dst.put(rq, r); } } }
     }
-    await Promise.all(names.filter(n => n.startsWith('gns-') && n !== SHELF && n !== GAMES).map(n => caches.delete(n)));
+    await Promise.all(names.filter(n => n.startsWith('gns-') && n !== SHELF && n !== GAMES && n !== FONTS).map(n => caches.delete(n)));
     await self.clients.claim();
   })());
 });
@@ -48,9 +50,18 @@ async function networkFirst(req, cacheName, k) {
   return Promise.race([net, wait(3000).then(() => hit)]).catch(() => hit);
 }
 
+async function fontReq(req) {
+  const cache = await caches.open(FONTS);
+  const hit = await cache.match(req.url);
+  if (hit) return hit;
+  try { const r = await fetch(req); if (r && (r.ok || r.type === 'opaque')) cache.put(req.url, r.clone()).catch(() => { }); return r; }
+  catch (_) { return new Response('', { status: 504, statusText: 'Offline' }); }   // the page falls back to its system fonts
+}
+
 async function cacheFirst(req, k) {
   const cache = await caches.open(GAMES);
-  const hit = await cache.match(k);
+  // exact key first; then ignore cache-busting queries (?v=...) and encoded vs plain names
+  const hit = (await cache.match(k)) || (await cache.match(k, { ignoreSearch: true })) || (await cache.match(k.replace(/[^/]+$/, m => { try { return encodeURIComponent(decodeURIComponent(m)); } catch (_) { return m; } })));
   if (!hit) return null;
   if (!/(\.(html|json)|\/)$/.test(k)) return hit;   // media, models, scripts: kept as downloaded (reading and comparing megabytes on every request would be slow)
   const old = hit.clone().text().catch(() => null);
@@ -92,6 +103,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const u = new URL(req.url);
+  if (EXTRA.test(u.hostname)) { e.respondWith(fontReq(req)); return; }
   if (u.origin !== self.location.origin || !u.pathname.startsWith(BASE)) return;
   if (req.headers.has('range') && !isGame(u)) return;
   if (req.cache === 'no-store') return;   // the shelf's own "check the list" must see the network
