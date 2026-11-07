@@ -22,3 +22,12 @@ a 25-step tutorial); the pass fixes what a newcomer could not read.
 ## What was proven
 Gates and results are in the commit message and the report; scripts: `tutor-test.js` (tutorial to the end, both sizes, elementFromPoint, wrong taps),
 `play-ui.js` (Quick game and Story stage 1 played to the result by touch taps on visible uncovered UI only).
+
+## Gate results (7 Nov, local staged build, 390x763 / 1440x860)
+- `build-all --quick shipwreck-isle`: PASS (scenario si-board now reads the new supplies strip). rules-test: 28 pass, 0 fail (2 new rulebook cases).
+- `tutor-test.js` clean run: 25 of 25 steps seen, end card reached, elementFromPoint and wrong-tap checks, at 390x763 AND 1440x860 (PASS).
+  Still failing in the same script: "leave" (reopening a half-done tutorial offers no restart/exit) and, in the story run, "Story opens the chapter map / Tutorial replay button after the tutorial". Known gaps, not fixed.
+- `play-ui.js quick`: PASS to a result (lost, day 8, 112 taps). `play-ui.js story`: PASS (chapter 1 rescued, day 3, 51 taps). Only touch taps on visible uncovered UI, 0 console errors.
+- ui-audit (local server): phone A0 B8 C0 D0 E2 F0; phone-s A0 B14 C1 D0 E0 F0; pc A0 B6 C0 D0 E4 F0. **Not zero**: B (text on busy painted backgrounds: title offer, Rules drawer, More panel, campaign header) and E (state-toggle buttons in the More panel read as dead) sit on shared shell surfaces; C1 on phone-s unlooked at.
+- Shots (phone, `playable-shots/`): title, first-turn, island-turn (event scene), day-summary, island-weather. The game-over screen itself was not captured.
+- Rules: 2/2 differences found vs the rulebook fixed (Soldier Fortify cost 3, Defence plan puts the beast on top of the hunting deck). rules-check file (W384) listed 1 WRONG; the second was found by reading the rulebook.
