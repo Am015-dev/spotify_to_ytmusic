@@ -30,7 +30,7 @@ function campInit() {
   if (!window.GXC || !window.CAMPAIGN) return;
   GXC.init({
     game: 'wildmark', data: window.CAMPAIGN,
-    portrait: function (who, size, c) { var st = c && c.portrait ? c.portrait.replace(/\.webp$/, '') : ''; return st && ART.have.indexOf(st) >= 0 ? artUrl(st) : null; },   // only files that exist: no 404s, else the emoji
+    portrait: function (who, size, c) { var st = c && c.portrait ? c.portrait.replace(/\.webp$/, '') : ''; return st && ART.have.indexOf(st) >= 0 ? artUrl(st) : campPortraitNode(c); },   // only files that exist (no 404s), else a drawn silhouette
     headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); tutStart(); }); return [b]; },
     startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
     onExit: function () { UI.camp = null; UI.mode = 'quick'; UI.sv = 'title'; showTitle(); },
@@ -38,3 +38,12 @@ function campInit() {
     seats: function (g) { return g.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }); }
   });
 }
+// code-drawn placeholder portrait (until portrait-<cast>.webp exists): a head-and-shoulders silhouette on the cast colour, no text
+function campPortraitNode(c) {
+  var col = (c && c.color) || '#3f7a4a', ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
+  s.setAttribute('viewBox', '0 0 40 40'); s.setAttribute('class', 'wm-pt'); s.setAttribute('aria-hidden', 'true');
+  s.innerHTML = '<circle cx="20" cy="20" r="20" fill="' + col + '"/><circle cx="20" cy="16" r="7" fill="#f3ead2"/><path d="M7 36 C9 26 31 26 33 36 Z" fill="#f3ead2"/>';
+  return s;
+}
+// menu section chips: show which section was picked (the shared chips only scroll)
+document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (!b) return; [].forEach.call(b.parentNode.children, function (x) { x.setAttribute('aria-current', x === b ? 'true' : 'false'); }); }, true);
