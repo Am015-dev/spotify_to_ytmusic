@@ -29,6 +29,7 @@ function newGame(o) {
   var d = shuffle(G, deckAll()), i;
   for (i = 0; i < G.n; i++) { G.hands.push([]); G.won.push(0); G.comm.push(null); G.commUsed.push(false); G.ctrl.push(i); G.answers.push(null); }
   if (G.dummy >= 0) { G.hands[0] = d.slice(0, 13); G.hands[1] = d.slice(13, 26); var dd = d.slice(26); G.stacks = []; for (i = 0; i < 7; i++) G.stacks.push([dd[2 * i], dd[2 * i + 1]]); G.hands[2] = G.stacks.map(function (s) { return s[1]; }); }
+  else if (o.deal) { for (i = 0; i < G.n; i++) G.hands[i] = o.deal[i].slice(); }
   else { for (i = 0; i < d.length; i++) G.hands[i % G.n].push(d[i]); }
   G.hands.forEach(sortHand);
   for (i = 0; i < G.n; i++) if (G.hands[i].indexOf('r4') >= 0) G.cmd = i;

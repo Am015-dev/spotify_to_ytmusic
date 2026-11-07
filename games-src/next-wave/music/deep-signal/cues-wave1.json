@@ -1,0 +1,36 @@
+{
+ "game": "deep-signal",
+ "note": "Files go to games/deep-signal/music/<slot>-a.mp3 and <slot>-b.mp3 (gx-music slots).",
+ "cues": [
+  {
+   "slot": "menu",
+   "loop": true,
+   "len": "1:30",
+   "prompt": "Calm ambient underwater theme, slow warm synth pads, soft sonar pings, distant whale-like swells, hopeful, 70 bpm."
+  },
+  {
+   "slot": "dive",
+   "loop": true,
+   "len": "2:00",
+   "prompt": "Focused puzzle-thinking music, light marimba and muted plucks over deep pads, gentle pulse, curious, 90 bpm."
+  },
+  {
+   "slot": "tense",
+   "loop": true,
+   "len": "1:00",
+   "prompt": "The last tricks: same palette as the dive theme with a ticking pulse, low strings rising, tense but not scary, 100 bpm."
+  },
+  {
+   "slot": "victory",
+   "loop": false,
+   "len": "0:08",
+   "prompt": "Short triumphant sting, bright brass and chimes resolving upward, like surfacing into sunlight."
+  },
+  {
+   "slot": "defeat",
+   "loop": false,
+   "len": "0:06",
+   "prompt": "Short gentle sting of a missed chance, descending soft piano with a muffled sonar ping, not harsh."
+  }
+ ]
+}
