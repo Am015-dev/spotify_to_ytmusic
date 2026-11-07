@@ -18,10 +18,13 @@ Benchmarks: the old shelf games the owner likes (cauldron-fair, hollowbough) and
    and all other tiles drop to 40% opacity. Market pairs that can't be taken right now drop to 50%.
 7. **Explain every score when it happens.** After each placement a plain toast: "+1: your Meadow grew to 2 joined tiles",
    "Bear +4: Groups of exactly 2 bears...", or "Fox settled, no points yet. <the card's one sentence>". Plus the floating number.
-8. **Tutorial = 5-7 steps, each one an action.** Cut every "read this" step except one that points at the scoring cards. One turn:
-   take, place, confirm, settle, then the result. Powers (sweep, acorns) live in the help drawer, not the tutorial.
+8. **Tutorial = a real short game in chapters, every rule once.** Owner addendum (20:45): not 5-7 clicks but a staged real game
+   (fixed seed, stacked market) in chapters (First turn, Scoring, Special moves, Final score). Each step is one real action on a spotlit,
+   uncovered target. Keep a TUTORIAL-COVERAGE.md checklist and a tutorial-to-end tap script (see `tutorial-end.js`).
 9. **Help opens with "How a turn works" in 5 lines** (boxed, 15px) before any detail; scoring cards keep a small diagram + one sentence.
-10. **Phone first, then PC.** Board + choices fit 390x763 with no scroll; tap targets >= 44px; no game text < 14px (13px only for
+10. **Turns read like turns.** A "Your turn" / "<Rival>'s turn" banner; the rival plays step by step (take, place, settle),
+    ~1 s per step with a caption on the instruction bar and a score pop; tap anywhere to speed it up.
+11. **Phone first, then PC.** Board + choices fit 390x763 with no scroll; tap targets >= 44px; no game text < 14px (13px only for
     labels under pictures). On PC let the fit-zoom go up (cap 2.5) so a small early valley isn't a speck in a big empty table.
 
 Proof shots (before/after, phone and PC): `games-src/wildmark/readable-shots/`.

@@ -7,6 +7,7 @@ function $(s, r) { return (r || document).querySelector(s); }
 function $$(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 try { UI.prefs = JSON.parse(localStorage.getItem('wm-prefs') || '{}') || {}; } catch (e) { UI.prefs = {}; }
+document.addEventListener('pointerdown', function () { if (G && !G.over && G.seats[G.cur] && G.seats[G.cur].ai) UI.aiQuick = true; }, true);   // tap during a rival turn: play it faster
 function savePrefs() { try { localStorage.setItem('wm-prefs', JSON.stringify(UI.prefs)); } catch (e) { } }
 function an(a) { return (/^[AEIOU]/.test(WM.ANI_NAME[a]) ? 'an ' : 'a ') + WM.ANI_NAME[a]; }
 function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, just above the instruction line (never over the score chips)
@@ -72,32 +73,42 @@ function step() {
   if (G.seats[G.cur].ai) { UI.aiT = setTimeout(aiStep, UI.fast ? 30 : AIDELAY); return; }
   if (UI.humans > 1 && UI.passed !== G.cur && G.stage === 'pick') { showPass(); return; }
   UI.lastHuman = G.cur; if (UI.view !== G.cur) { UI.view = G.cur; fitView(); }
+  var bk = G.cur + ':' + G.seats[G.cur].done; if (!UI.fast && G.np > 1 && UI.humans === 1 && UI.mode !== 'tutorial' && G.stage === 'pick' && UI.banKey !== bk) { UI.banKey = bk; banner('Your turn'); }
   render(); if (typeof tutFix === 'function') tutFix();
 }
+// turn banner: "Your turn" / "<Rival>'s turn", one at a time, fades by itself
+function banner(t) { var e = $('#turnban'); if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); } e.textContent = t; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
+function terrText(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join('/'); }
+// the rival's turn, step by step (take -> place -> settle), each with a caption on the instruction bar; tap anywhere to speed it up
 function aiStep() {
   if (!G || G.over || !G.seats[G.cur].ai || UI.tutor) return;
+  var nm = G.seats[G.cur].name, seat = G.cur, slow = !UI.fast && UI.humans === 1 && UI.mode !== 'tutorial';
+  var D = function (ms) { return UI.fast ? 10 : Math.round(ms * (UI.aiQuick ? 0.35 : 1)); };
   var m = WM.AI.choose(G);
-  if (G.stage === 'pick') {
-    var col = m.t === 'take' ? [m.i, m.i] : m.t === 'free' ? [m.ti, m.ki] : null;
-    if (col) { $$('#mk .mt[data-i="' + col[0] + '"], #mk .mk[data-i="' + col[1] + '"]').forEach(function (e) { e.classList.add('flash'); }); }
-    var nm = G.seats[G.cur].name;
-    setTimeout(function () {
-      try { WM.apply(G, m); } catch (e) { console.error(e); return; }
-      if (m.t === 'wipe3') { toast(nm + ' swept three tokens.'); sfx('wipe'); }
-      else if (G.stage === 'tile') { var h = G.hold; m = WM.AI.choose(G); WM.apply(G, m); var m2 = WM.AI.choose(G); WM.apply(G, m2); UI.lastAI = { seat: G.last.seat, tok: h.tok, m2: m2 }; toast(nm + (m2.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.'), 1600); if (G.last.acorn) sfx('acorn'); else sfx('place'); }
-      // show the rival's move: their valley for a moment, with the new tile lit (skipped in fast/test mode, tutorial and hot-seat)
-      var ps = UI.lastAI && UI.lastAI.seat, pc = m && m.c;
-      if (!UI.fast && UI.humans === 1 && UI.mode !== 'tutorial' && ps != null && pc) {
-        UI.showAI = { seat: ps, text: nm + (m2.t === 'tok' ? ' placed ' + an(h.tok) : ' placed a tile') };
-        UI.view = ps; fitView(); render(); setTimeout(function () { if (G && UI.view === ps) pop(pc, nm + "'s new tile", 'hab'); }, 60);
-        UI.aiT = setTimeout(function () { UI.showAI = null; if (!G) return; UI.view = meSeat(); fitView(); render(); step(); }, Math.max(900, AIDELAY * 1.3));
-        return;
-      }
-      render(); step();
-    }, UI.fast ? 10 : Math.round(AIDELAY * 0.8));
-    return;
-  }
-  WM.apply(G, m); render(); step();
+  if (G.stage !== 'pick') { WM.apply(G, m); render(); step(); return; }
+  var key = seat + ':' + G.seats[seat].done;
+  if (slow && UI.banKey !== key) { UI.banKey = key; UI.aiQuick = false; $('#toast').classList.remove('on'); banner(nm + "'s turn"); }
+  var col = m.t === 'take' ? [m.i, m.i] : m.t === 'free' ? [m.ti, m.ki] : null;
+  if (slow && col) UI.showAI = { seat: UI.view, text: nm + ' takes the ' + terrText(G.market.tiles[col[0]]) + ' tile + ' + WM.ANI_NAME[G.market.toks[col[1]]] + (m.t === 'free' ? ' (acorn)' : '') };
+  if (slow) render();
+  if (col) $$('#mk .mt[data-i="' + col[0] + '"], #mk .mk[data-i="' + col[1] + '"]').forEach(function (e) { e.classList.add('flash'); });
+  UI.aiT = setTimeout(function () {
+    if (!G || G.over) return;
+    try { WM.apply(G, m); } catch (e) { console.error(e); return; }
+    if (m.t === 'wipe3' || m.t === 'wipe') { toast(nm + (m.t === 'wipe3' ? ' swept three matching animals.' : ' spent an acorn to replace animals.')); sfx('wipe'); UI.showAI = null; render(); step(); return; }
+    var h = G.hold, mp = WM.AI.choose(G);
+    if (!slow) { WM.apply(G, mp); var mq = WM.AI.choose(G); WM.apply(G, mq); toast(nm + (mq.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.'), 1600); sfx(G.last && G.last.acorn ? 'acorn' : 'place'); render(); step(); return; }
+    WM.apply(G, mp); UI.view = seat; UI.showAI = { seat: seat, text: nm + ' places the tile in their valley' }; fitView(); render(); sfx('place');
+    setTimeout(function () { if (G && UI.view === seat) pop(mp.c, nm + "'s new tile", 'hab'); }, 60);
+    UI.aiT = setTimeout(function () {
+      if (!G) return;
+      var env = G.seats[seat].env, s0 = WM.score(env, 0), m2 = WM.AI.choose(G); WM.apply(G, m2);
+      var s1 = WM.score(env, 0), best = null; WM.ANI.forEach(function (a) { var d = s1.ani[a] - s0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
+      UI.showAI = { seat: seat, text: m2.t === 'tok' ? nm + ' puts the ' + WM.ANI_NAME[h.tok] + ' on a tile' + (G.last && G.last.acorn ? ' (+1 acorn)' : '') : nm + ' returns the ' + WM.ANI_NAME[h.tok] };
+      render(); if (m2.t === 'tok') { pop(m2.c, best && best.d > 0 ? '+' + best.d + ' ' + cinfo(best.a).title : WM.ANI_NAME[h.tok], 'ani'); sfx(G.last && G.last.acorn ? 'acorn' : 'tok'); }
+      UI.aiT = setTimeout(function () { UI.showAI = null; if (!G) return; UI.view = meSeat(); fitView(); render(); step(); }, D(1000));
+    }, D(900));
+  }, D(slow ? 1100 : AIDELAY * 0.8));
 }
 function showPass() {
   var e = $('#pass'); e.hidden = false; e.innerHTML = '<div class="pbox"><h2>' + esc(G.seats[G.cur].name) + '</h2><p>Your turn. Pass the device.</p><button class="big" id="passB" type="button">I am ' + esc(G.seats[G.cur].name) + '</button></div>';
@@ -280,9 +291,9 @@ function renderDock() {
 function lineText() {
   if (!G) return '';
   if (G.over) return 'Season over';
+  if (UI.showAI && UI.view === UI.showAI.seat) return UI.showAI.text;
   var s = G.seats[G.cur];
   if (UI.view !== G.cur && !s.ai) return '';
-  if (UI.showAI && UI.view === UI.showAI.seat) return G.seats[UI.view].name + "'s valley: " + UI.showAI.text.replace(/^\S+ /, '');
   if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
   if (s.ai) return s.name + ' is choosing';
   if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Your turn: pick a tile + animal from the market';
@@ -328,7 +339,8 @@ var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one
   '<h3>Crowded market</h3><p>Four matching tokens are replaced at once. With three matching tokens you may replace those three once per turn, for free.</p>' +
   '<h3>Scoring</h3><p>Each animal scores by its card (below). Each terrain scores 1 point per tile in your largest connected habitat of it (edges must match). The largest habitat of each terrain earns a bonus: 2 players 2 (tie 1), 3-4 players 3 for first and 1 for second. Solo: 2 for a habitat of 7+.</p>' +
   '<h3>Solo</h3><p>After each turn the rightmost tile and token left in the market are removed.</p>' +
-  '<h3>Ties</h3><p>Most acorns left wins a tie.</p>';
+  '<h3>Ties</h3><p>Most acorns left wins a tie.</p>' +
+  '<h3>Simplified on purpose</h3><ul><li>The animals on each tile and the starting tiles are our own balanced set.</li><li>Elk lines are counted longest first (rarely a point less than the best split).</li><li>Solo: the rightmost tile and animal leave each turn and the rest slide right.</li><li>Mixed-card point values (cards B, C, D) are our own tables.</li></ul>';
 // ---------------------------------------------------------------- large view: tap a placed tile (when it is not a target) or hold a market tile/token
 function tileText(t, tok) {
   var h = '<p><b>' + t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + '</b> tile' + (t.key ? ', a <b>keystone</b>: an animal placed here earns an acorn.' : (t.t.length > 1 ? '. Each half counts for its own terrain; edges must match to join a habitat.' : '.')) + '</p>';
