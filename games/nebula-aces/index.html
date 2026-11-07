@@ -647,7 +647,7 @@ html.bf #tags .tag .tgl{display:none}
 @keyframes bfflip{from{transform:scaleY(0)}}
 /* top strip: the race */
 #bftop{position:absolute;top:4px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;font:700 13px/1 "Exo 2",sans-serif;color:#fff;background:rgba(6,6,20,.72);border-radius:999px;padding:5px 12px;white-space:nowrap}
-#bftop:empty{display:none}#bftop .y{color:#ffb86b}#bftop .e{color:#ff7a8c}#bftop .vs{opacity:.6;font-size:11px}
+#bftop:empty{display:none}#bftop .y{color:#ffb86b}#bftop .e{color:#ff7a8c}#bftop .vs{opacity:.75;font-size:13px}
 /* bottom bar: one line + the real buttons */
 #bfbar{position:absolute;left:0;right:0;bottom:0;padding:6px 10px calc(8px + var(--sab,0px));background:linear-gradient(180deg,rgba(5,4,15,0),rgba(5,4,15,.82) 30%,rgba(5,4,15,.95));pointer-events:none;display:flex;flex-direction:column;gap:6px;align-items:stretch}
 #bfbar[hidden]{display:none}
@@ -708,6 +708,26 @@ html.bf #tags .tag .tgl{display:none}
 #bftop,#bfhint{pointer-events:auto}
 #bffing{font-size:0}#bffing::before{content:"👆";font-size:38px}
 #tags .tag{pointer-events:auto}
+
+/* tutorial speaker portrait (code-drawn disc, art when media/ has it) */
+.gxt-bub .gxh-bd::before{content:"";flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:2px solid #7a2236;background:#3a6ea5 url(media/camp-brecken.webp) center/cover no-repeat}
+.gxt-bub.na-slate .gxh-bd::before{border-color:#b0413e;background-color:#7d8590;background-image:url(media/camp-drill.webp)}
+#bfban span+span{font-size:14px;opacity:.9}
+
+.dlg.rules .turn5{background:rgba(255,200,107,.1);border:1px solid #ffc86b;border-radius:12px;padding:6px 14px 8px;margin-bottom:10px}.dlg.rules .turn5 h3{margin:4px 0}.dlg.rules .turn5 ol{margin:0;padding-left:20px;font-size:15px;line-height:1.35}
+/* readable: dark text on the orange start plates (white was 3.5:1) ; move-card swatches keep their aspect */
+.dlg.start .btn.primary,.dlg.start .btn.primary *,.dlg.start [data-gxt-open],.dlg.start [data-gxt-open] *{color:#2a0a00!important;text-shadow:none!important}
+html.sk-cards .mv.w,html.sk-cards .mv.g,html.sk-cards .mv.r{background-size:cover!important;background-position:center top!important}
+
+/* coached game: one non-blocking bubble under the top bar */
+#na-coach{position:fixed;z-index:60;left:8px;right:8px;top:50px;max-width:480px;margin:0 auto;display:flex;gap:10px;align-items:flex-start;background:#f6e7bd;color:#2a1608;border:2px solid #7a2236;border-radius:14px;padding:8px 10px;box-shadow:0 4px 14px rgba(0,0,0,.5);pointer-events:none}
+#na-coach[hidden]{display:none}
+#na-coach .na-por{flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:2px solid #7a2236;background:#3a6ea5 url(media/camp-brecken.webp) center/cover no-repeat}
+#na-coach.na-slate .na-por{border-color:#b0413e;background-color:#7d8590;background-image:url(media/camp-drill.webp)}
+#na-coach .na-ct{flex:1;min-width:0}#na-coach b{display:block;font:800 14px/1.2 "Exo 2",sans-serif}#na-coach span{display:block;font:600 14px/1.3 "Exo 2",sans-serif}
+#na-coach .na-cx{pointer-events:auto;flex:0 0 44px;height:44px;margin:-6px -6px 0 0;border:0;background:transparent;color:#7a2236;font:800 20px/1 sans-serif}
+.na-later{margin:4px 0 0;padding-left:18px;text-align:left;font-size:14px;line-height:1.3}
+#na-coach .na-lv{pointer-events:auto;display:block;margin-top:2px;padding:6px 0;border:0;background:transparent;color:#7a2236;font:700 14px/1 "Exo 2",sans-serif;text-decoration:underline}
 
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
@@ -2430,7 +2450,8 @@ var RULES_HTML=`<p>Each round has four steps. The step bar shows where you are.<
 <h3>2. Move</h3><p>Ships reveal and fly their maneuvers from the <b>lowest pilot skill up</b>, so skilled pilots react to what they see. After moving, each ship takes one action: focus, evade, target lock, barrel roll or boost. Bumping into a ship stops you short and skips your action; flying through an asteroid rolls a damage die and skips your action; leaving the battlefield destroys you.</p>
 <h3>3. Combat</h3><p>From the <b>highest pilot skill down</b>, each ship may attack one enemy in its firing arc at range 1-3. Roll attack dice equal to the weapon value (+1 at range 1); the defender rolls agility (+1 at range 3 or when an asteroid is in the way). Focus turns focus results into hits or evades; a target lock lets you reroll. Each evade cancels a hit (hits before crits). Damage strips shields first, then hull; crits are dealt face up with lasting effects.</p>
 <h3>4. End</h3><p>Unused focus and evade tokens are removed; target locks stay.</p>
-<p>Destroy every enemy ship to win. Pilot skill ties: the side with initiative (fewer squad points) moves and fires first.</p>
+<p>Destroy every enemy ship to win. Pilot skill ties: the side with initiative (fewer squad points; on equal points the second-named side) moves and fires first.</p>
+<p><b>Kept simple:</b> asteroids go on fixed grid spots, ships deploy from set positions facing the enemy, a barrel roll slides in five steps, a battle ends after 100 rounds, and the computer picks the weakest maneuver for your stressed ship.</p>
 <p><b>Controls:</b> drag the view to orbit, right-drag or two fingers to pan, wheel or pinch to zoom, T for top-down, Enter for the highlighted button, 1-9 for listed choices, S to skip.</p>`;
 
 </script>
@@ -2852,12 +2873,9 @@ function addShip(side,e){const P=PILOTS[e.p],T=SHIPS[P.ship];const id='s'+(G.shi
     flags:{},bumped:false,rockHit:false,fired:false,moved:false,cost:pilotCost(e)};
   for(const u of s.ups){const U=UPGRADES[u.id];if(U&&U.onAdd)U.onAdd(s)}
   G.ships.push(s)}
-// [R9] the lower squad total has initiative; on a tie one player rolls an attack die: hit/crit, that player chooses; otherwise the other player chooses
+// [R9] the lower squad total has initiative; on a tie the second-named side has it (core rulebook; no die roll)
 function rollInitiative(k){if(G.pts[0]!==G.pts[1]){G.init=G.pts[0]<G.pts[1]?0:1;lg(-1,`${sideName(G.init)} has the lower squad total and so has initiative.`);return k()}
-  const f=ATK_FACES[rnd(8)],ch=f==='hit'||f==='crit'?0:1;lg(-1,`The squads tie at ${G.pts[0]} points: ${sideName(0)} rolls ${f}, so ${sideName(ch)} chooses who has initiative.`);
-  const set=w=>{G.init=w;lg(-1,`${sideName(w)} has initiative.`);k()};
-  if(isHuman(ch))return ask(ch,'init','Initiative','The squads are tied. With initiative your ships move first and fire first on pilot-skill ties, and you win if both last ships are destroyed together.',[{k:'me',l:'Take initiative'},{k:'opp',l:'Give it to the opponent'}],a=>set(a==='me'?ch:1-ch));
-  set(ch)}// the computer takes it: firing first on ties is worth more than moving first
+  G.init=1;lg(-1,`The squads tie at ${G.pts[0]} points: ${sideName(1)} (the second-named side) has initiative.`);return k()}// the computer takes it: firing first on ties is worth more than moving first
 function rockShape(){const o={x:0,y:0,r:22+rnd(18),n:7+rnd(3),rot:rnd(628)/100,k:[]};for(let i=0;i<o.n;i++)o.k.push(.72+rnd(29)/100);return o}
 function rockLegal(o){const P=rockPoly(o);if(P.some(p=>Math.min(p.x,p.y,MAT-p.x,MAT-p.y)<=2*RANGE))return false;// [R7] beyond range 2 of every edge
   return !G.rocks.some(q=>{const Q=rockPoly(q);let d=1e9;for(const p of P)d=Math.min(d,polyPointDist(p,Q));for(const p of Q)d=Math.min(d,polyPointDist(p,P));return d<RANGE})}// and beyond range 1 of each other [tournament rule]
@@ -2925,9 +2943,9 @@ function executeMove(s,m,done){const b=B(s),p0={x:s.x,y:s.y,h:s.h},L=m.s===0?0:t
   // obstacles: the template or the final base overlapping a rock [R7]
   const tp=m.s===0?[]:tplPoints(p0,b,m,4),baseP=corners(s,b);const touched=[];
   for(const o of G.rocks){const R=rockPoly(o);const on=polyOverlap(baseP,R);const thru=!on&&tp.some(p=>polyPointDist(p,R)<=TPL_W/2);if(on||thru)touched.push({o,on,d:len(sub(o,p0))})}
-  touched.sort((a,b)=>a.d-b.d);// resolve the asteroid nearest the start first; one die per asteroid [R7]
-  for(const t of touched){if(!s.alive)break;s.rockHit=true;const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)} ${t.on?'lands on':'flies through'} an asteroid: rolls ${f}.`);fx('rock',{id:s.id,f});
-    if(f==='hit')dealDamage(s,1,0,null);else if(f==='crit')dealDamage(s,0,1,null);if(t.on)s.flags.noAtk=true}
+  touched.sort((a,b)=>a.d-b.d);// resolve the asteroid nearest the start first; one die per maneuver [R7]
+  if(touched.length&&s.alive){const t=touched[0];s.rockHit=true;const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)} ${touched.some(x=>x.on)?'lands on':'flies through'} an asteroid: rolls ${f}.`);fx('rock',{id:s.id,f});// one die per maneuver, however many asteroids it overlaps
+    if(f==='hit')dealDamage(s,1,0,null);else if(f==='crit')dealDamage(s,0,1,null);if(touched.some(x=>x.on))s.flags.noAtk=true}
   if((bumpedInto||touched.length)&&crit(s,'stunned')&&s.alive){lg(s.side,`${sname(s)}'s concussed pilot takes 1 damage from the jolt.`);dealDamage(s,1,0,null)}
   if(s.alive)exAfterMove(s,m,bumpedInto,tp);
   done()}
@@ -5599,7 +5617,7 @@ function renderModal(){const el=$('modal');let h=typeof netModalHTML==='function
 const bothHuman=()=>G&&isHuman(0)&&isHuman(1)&&!(typeof NET!=='undefined'&&NET.on);// online games never show the pass-the-device screen
 function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-start="${UI.mode}">Launch ▶</button>`}</div>${typeof tutBtn==='function'?`<div class="row">${tutBtn('btn'+(tutFirst()?' primary':''))}</div>`:''}<p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
   <p class="small">First time? Take the lesson above, or just press <b>Launch</b>: the defaults are a good first battle. Everything below is optional.</p>
-  ${typeof GXC!=='undefined'&&window.CAMPAIGN&&!NET.on?`<div class="row"><button class="btn primary" data-a="story">📖 Story mode<small>${esc(typeof campLine==='function'?campLine():'')}</small></button></div>`:''}
+  ${typeof GXC!=='undefined'&&window.CAMPAIGN&&!NET.on?`<div class="row"><button class="btn${typeof tutFirst==='function'&&tutFirst()?'':' primary'}" data-a="story">📖 Story mode<small>${esc(typeof campLine==='function'?campLine():'')}</small></button></div>`:''}
   ${campOK&&UI.mode==='solo'&&camp.i>0&&camp.i<SORTIES.length?`<div class="row"><button class="btn" data-a="sortie" data-k="${camp.i}">▶ Continue the campaign<small>Sortie ${camp.i+1}: ${esc(SORTIES[camp.i].title)}</small></button></div>`:''}
   <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['hot','Two players, one screen'],['ai','Watch the computer']].map(([k,l])=>`<button class="btn ${UI.mode===k?'on':''}" data-mode="${k}">${l}</button>`).join('')}</div>
   <h3>🌐 Play online</h3>${typeof onlineBlock==='function'?onlineBlock():''}
@@ -5610,7 +5628,7 @@ function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fa
   ${UI.size==='custom'?`<div class="row">${[0,1].map(k=>{const sq=UI.squads&&UI.squads[k];return `<button class="btn" data-a="build" data-k="${k}">✎ ${k?'Opponent':'Your'} squad<small>${sq&&sq.length?`${sq.length} ships · ${squadCost(sq)} pts`:'not built yet (random)'}</small></button>`}).join('')}</div>`:''}
   <div class="acts">${NET.on?'<button class="btn primary" data-a="netopen">🌐 Back to the lobby</button>':`<button class="btn primary" data-start="${UI.mode}">Launch</button>`}${saved&&!NET.on?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
 const CREDITS_HTML=`<section class="credits-audio"><h3>Credits</h3><p>Names, card text and art are original.</p><h4>Audio</h4><ul><li>Art and music by Am015-dev</li></ul><p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>`;
-function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2>${RULES_HTML}${CREDITS_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
+function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2><div class="turn5"><h3>How a turn works</h3><ol><li><b>Plan:</b> tap your ship, then tap where it flies.</li><li><b>Fly:</b> tap Fly. Every ship moves, lowest pilot skill first.</li><li><b>Act:</b> pick one action, like Focus, after you move.</li><li><b>Shoot:</b> tap a glowing enemy. Highest skill fires first.</li><li><b>Dice:</b> hits minus evades is damage; shields go first.</li></ol></div>${RULES_HTML}<h3>Simplified on purpose</h3><p>Asteroids are placed for you (6 of them, spaced apart). Ships start facing the enemy from set spots. The barrel-roll slide is offered in 5 steps. A battle with no winner after 100 rounds goes to the side that destroyed more points.</p>${CREDITS_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
 function nextSortieBtn(){if(!G||G.sortie==null||soloSide()!==0)return '';const won=G.winner==='P1';const i=won?G.sortie+1:G.sortie;
   if(won&&i>=SORTIES.length)return '';return `<button class="btn" data-a="sortie" data-k="${i}">${won?'Next sortie ▶':'Fly it again ↻'}<small>${won?esc(SORTIES[i].title):esc(SORTIES[G.sortie].title)}</small></button>`}
 function debriefHTML(){finishAtk();const me=soloSide();const so=G.sortie!=null?SORTIES[G.sortie]:null;const won=me>=0&&G.winner==='P'+(me+1);const lost=me>=0&&G.winner&&G.winner!=='draw'&&!won;
@@ -5951,7 +5969,7 @@ PHN.guided=()=>typeof guided==='function'&&guided();
 
   // ------------------------------------------------------------------ validation (node-safe)
   var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
-  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter', 'relic'];
   function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
   GXC.validate = function (data) {
     var bad = [], add = function (m) { bad.push(m); };
@@ -6610,10 +6628,12 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   if(!play){R.classList.remove('bf-sheet');clear();BF.key='';bar.hidden=true;top.innerHTML='';top._h='';fing.hidden=true;return}bar.hidden=false;
   maybeRelease();
   // my ship had nobody to shoot: say so on the board, with the fix
-  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} can only shoot forward. Pick a 🎯 move.</span>`,2600)}}}
+  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} can only shoot forward. Pick a 🎯 move.</span>`,1500);BF.noshotT=1}}}
   // the round summary between rounds is a board banner here, not a page of text
   if(sumPending()){UI.sumSeen=G.round-1;banner(`<b>Round ${G.round}</b>`,1100)}
-  const k=ctx();if(k!=='plan')BF.sel=null;if(k!=='sub'&&k!=='action')BF.sub=null;
+  const k=ctx();if(BF.noshotT&&ban&&['dice','res','target','plan'].includes(k)){ban.hidden=true;BF.noshotT=0}
+  turnBanner(k);
+  if(k!=='plan')BF.sel=null;if(k!=='sub'&&k!=='action')BF.sub=null;
   if(k==='res'||k==='note')autoHold(k);
   const s=G.cur&&ship(G.cur);
   const key=[k,G.round,G.phase,G.cur,G.q&&G.q.kid,BF.sel,BF.sub&&BF.sub.a,k==='plan'?JSON.stringify(UI.draft):'',G.atk&&[G.atk.step,(G.atk.dice||[]).join(),(G.atk.def||[]).join(),G.atk.rr&&JSON.stringify(G.atk.rr)].join('/'),UI.hold&&UI.hold.kind,alive().length,PHN.pop&&PHN.pop.kind].join('|');
@@ -6624,12 +6644,19 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   BF.fingT=null;
   if(k==='brief')briefUI();else if(k==='setup')setupUI();else if(k==='plan')planUI();else if(k==='action'||k==='sub')actionUI(s);else if(k==='target')targetUI(s);
   else if(k==='dice')diceUI();else if(k==='res')resUI();else if(k==='note')noteUI();else if(k==='over')overUI();else if(k==='ask')askUI();else if(k==='fly')setHint('');else watchUI(s)}
+// "whose turn, doing what": one short banner each time the turn changes hands (the lesson has its own bubbles)
+function turnBanner(k){if(typeof tutOn==='function'&&tutOn())return;if(!G||G.winner||G.round<1||UI.hold||BF.wave)return;const s=G.cur&&ship(G.cur);let id='',h='';const T=LORE.turn;
+  if(k==='plan'){id='p'+G.round;h=`<b>${T.plan[0].replace('{r}',G.round)}</b><span>${T.plan[1]}</span>`}
+  else if((k==='action'||k==='sub')&&s){id='a'+G.round+G.cur;h=`<b>${T.mine}</b><span>${esc(shortName(s))} flew. Now pick an action.</span>`}
+  else if(k==='target'&&s){id='t'+G.round+G.cur;h=`<b>${T.mine}: ${T.combat}</b><span>${esc(shortName(s))} can shoot. Pick a target.</span>`}
+  else if(k==='watch'&&s&&!mineS(s)){id='w'+G.round+G.phase+G.cur;h=`<b>${T.rival}</b><span>${esc(shortName(s))} ${G.step===3?'takes aim':'moves'}</span>`}
+  if(!id||id===BF.tbId)return;BF.tbId=id;banner(h,1100);BF.noshotT=0}
 function topLine(k){if(!G||G.round<1){top.innerHTML='';top._h='';return}const k0=me();const hp=side=>alive().filter(s=>s.side===side).reduce((a,s)=>a+Math.max(0,s.hull-hullDmg(s))+s.sh,0);
   const n=side=>alive().filter(s=>s.side===side).length;const h=`<span class="y">You <b>${n(k0)}</b>✈ ♥${hp(k0)}</span><span class="vs">vs</span><span class="e">Enemy <b>${n(1-k0)}</b>✈ ♥${hp(1-k0)}</span>`;if(top._h!==h){top._h=h;top.innerHTML=h}}
 // ---- the guided first game: a ghost finger shows the one thing to tap ----
 function finger(el){BF.fing=guided()&&el?el:null}
 // ---- screens ----
-function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length;setHint('');banner(`<b>Destroy ${foe===1?'the enemy ship':foe===2?'both enemy ships':'all '+foe+' enemy ships'}</b><span>Your ship${G.ships.filter(s=>s.side===k0).length>1?'s are':' is'} at the bottom</span>`,1e9);
+function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length;setHint('');banner(`<b>Destroy ${foe===1?'the enemy ship':foe===2?'both enemy ships':'all '+foe+' enemy ships'}</b><span>${LORE.quick.intro} Your ship${G.ships.filter(s=>s.side===k0).length>1?'s are':' is'} at the bottom.</span>`,1e9);
   setBtns(`<button class="btn" data-bf="briefset" aria-label="Place the asteroids and your ship yourself">Set up myself</button><button class="btn primary big" data-bf="brief">Start ▶</button>`);finger(btns.querySelector('.primary'))}
 function setupUI(){const q=G.q;const rock=q.key==='rock';setHint(rock?'Tap a square to place a rock':'Tap a spot for your ship');
   const rk=recOpt(q).o.k;q.opts.forEach((o,i)=>{if(!o.p)return;const it=item(rock?'':'✈','bfspot'+(o.k===rk?' rec':''),{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true});if(o.k===rk)finger(it.el)});
@@ -6695,10 +6722,10 @@ function resUI(){const R=UI.hold.R;{const el=document.createElement('div');el.cl
   const d=ship(R.d);if(d&&R.dmg)sfx(R.dead?'boom':'hull')}
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
 function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(typeof tutHold==='function'&&tutHold(k))return;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
-function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);banner(`<b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${esc(w)}</span>`,1e9);setHint('');
+function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(G.seed|0)%a.length];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)} (round ${G.round}). Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span>`,1e9)};setHint('');
   setBtns(`<button class="btn" data-bf="stats">Debrief</button><button class="btn primary big" data-a="new">Play again</button>`)}
 function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach((o,i)=>{if(!o.p)return;any=true;item('◎','bfm w',{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true})});setBtns('')}
-function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Enemy turn: ${esc(shortName(s))} aims`:`⏳ Enemy turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
+function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Rival’s turn: ${esc(shortName(s))} takes aim`:`⏳ Rival’s turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
   setHint(t);setBtns(UI.paused?`<button class="btn primary" data-a="pause">▶ Resume</button>`:'')}
 // ---- taps ----
 function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
@@ -6966,6 +6993,72 @@ function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;if(document.hid
 
 </script>
 <script>
+// ===================== story text: ONE data file (edit the words here, nothing else needs to change) =====================
+// Cast: Marshal Brecken (guide, camp-brecken), Slate (the rival raider in the tutorial, camp-drill art), Kael Varro (you).
+// Bubble rules: title <= 4 words, say <= 20 words, warm and punchy, a story reason first, then what to do (the glow shows where).
+const LORE={
+  guide:{name:'Brecken',art:'camp-brecken.webp',emoji:'🎖️'},rival:{name:'Slate',art:'camp-drill.webp',emoji:'🎯'},
+  // tutorial prologue "Convoy Run": chapters open with a title line, the payoff comes with the next step's first words
+  tut:{
+    goal:{t:'Ch 1 · Scramble',s:'Slate is raiding our convoy. Smash his ship before it reaches the freighters. Yours is at the bottom.'},
+    ship:{t:'Brecken: Plan first',s:'Pilots plan in secret, Varro. Slate is doing it right now. Touch your ship to see where it can fly.'},
+    marks:{t:'Brecken: Red and rocks',s:'Red moves strain the engines: stress token. A ! marks paths through the rock, which hurts and skips your action.'},
+    dial:{t:'Brecken: Choose a line',s:'Number is speed, arrow is direction, green is easy. Fly the green straight 2 to meet him head on.'},
+    fly:{t:'Brecken: Dials are secret',s:'Neither of you can peek. When you are set, reveal the dials and let the ships move together.'},
+    order:{t:'Ch 2 · First Contact',s:'Slate shows his hand! Lowest skill moves first: Slate (3), then you (8). Highest shoots first, so you do.'},
+    action:{t:'Brecken: One action',s:'After flying, every ship gets one action. Sharpen your aim with a focus token before you fire.'},
+    shoot:{t:'Brecken: Fire!',s:'Slate is in your sights! Take the shot.',f:(rg,a,d)=>`Slate is in your sights! Range ${rg}: you roll ${a} dice, he rolls ${d}. Take the shot.`},
+    dice:{t:'Brecken: Read the dice',s:'Hits and crits hurt him. A focus face does nothing, unless you spend your focus token.'},
+    usefocus:{t:'Brecken: Spend focus',s:'There it is. Your focus token turns that focus face into a hit.'},
+    roll:{t:'Brecken: Now roll',s:'That is all we can improve. Now Slate rolls his defence dice. Let it fly.'},
+    res1:{t:'Slate: Not so fast',s:'Not so fast! I spent my evade token: each evade cancels one hit. Only one gets through.'},
+    defend:{t:'Brecken: Pilot power',s:'He is firing back! Kael’s gift: turn one focus result into an evade. Use it now.'},
+    res2:{t:'Brecken: Shields first',s:'Hits strip shields before hull. Unused focus and evade tokens vanish at the round end. Round two!'},
+    auto:{t:'Ch 3 · Point Blank',s:'Slate is rattled. Let the computer suggest a move for each ship; you can always choose your own.'},
+    fly2:{t:'Brecken: Fly again',s:'Slate has the lower skill, so he moves before you. Reveal the dials.'},
+    stress:{t:'Slate: Panic turn',s:'Whoa! That red K-turn gave me a stress token. No action for me, and I am facing away!'},
+    lock:{t:'Brecken: Target lock',s:'He cannot shoot back. Lock on: a lock lets you reroll attack dice against him.'},
+    shoot2:{t:'Brecken: Point blank',s:'Range 1 adds an attack die, and he is facing away. Take the shot.'},
+    reroll:{t:'Brecken: Reroll blanks',s:'Two blanks. Spend your lock to roll them again.'},
+    confirm:{t:'Brecken: Choose dice',s:'The blank dice are ticked. Reroll just those.'},
+    roll2:{t:'Brecken: Finish him',s:'Better dice! Roll and see if Slate survives.'},
+    win:{t:'Ch 4 · Convoy Saved',s:'The convoy is safe! A battle ends when one side has no ships left. Well flown, Varro.'}},
+  tutEnd:{title:'You know the rules',text:'Convoy saved. Plan, fly, act, shoot, defend. Shields, hull, stress and locks come with you.',textStory:'Convoy saved. Plan, fly, act, shoot, defend. The Armada will not stop at one raider: chapter 1 awaits.'},
+  chapters:[{n:1,name:'Scramble',steps:['goal','ship','marks','dial','fly']},{n:2,name:'First Contact',steps:['order','action','shoot','dice','usefocus','roll','res1','defend','res2']},
+    {n:3,name:'Point Blank',steps:['auto','fly2','stress','lock','shoot2','reroll','confirm','roll2']},{n:4,name:'Convoy Saved',steps:['win']}],
+  // quick game: a line of flavour before the first turn and a result line in the game's voice
+  quick:{intro:'The Armada hits the convoy lane. Clear the way.',win:['The raiders break and run. The convoy slips through.','Clean flying: the lane is clear.'],lose:['Your wing is gone. The convoy scatters.','The Armada owns the lane today.'],draw:'Both wings are spent. The lane stays quiet.'},
+  turn:{plan:['Round {r}: plan','Choose a move for each of your ships.'],mine:'Your turn',rival:'Rival’s turn',combat:'Combat'}};
+
+// coached first game (free play): the guide speaks the first time a rule matters. rule:true = counted in TUTORIAL-COVERAGE.md and listed on the end card if it never came up
+LORE.coachIntro={title:'Your move, pilot',text:'From here you fly free: every legal move is yours. Brecken speaks up when a rule matters.',btn:'Fly free'};
+LORE.coachEnd={win:'Convoy saved! Well flown, Varro.',lose:'The convoy is lost, but you learned the ropes.'};
+LORE.laterAlways=['Barrel roll and boost: sideways and bonus moves, in the action ring.','Bumping into a ship stops you short and skips your action.','Flying off the mat destroys your ship.','Torpedoes: spend a target lock for a big shot at range 2-3.','Tied pilot skill: the side with fewer squad points acts first.'];
+LORE.coach={
+  goal:{rule:1,t:'Brecken: Your goal',s:'Slate is raiding our convoy. Destroy his ship; yours is at the bottom.'},
+  fly0:{t:'Brecken: Free flight',s:'Your move is set. Plan, then reveal the dials with Fly. I will call out rules as they matter.'},
+  fly:{rule:1,t:'Brecken: Dials are secret',s:'Neither of you can peek. Reveal the dials with Fly and the ships move together.'},
+  marks:{rule:1,t:'Brecken: Red and rocks',s:'Red moves strain the engines: a stress token. A ! marks paths through a rock: it hurts and skips your action.'},
+  order:{rule:1,t:'Brecken: Who goes first',s:'Lowest pilot skill moves first: Slate (3), then you (8). The highest shoots first, so you do.'},
+  action:{rule:1,t:'Brecken: One action',s:'After flying, every ship gets one action. Focus sharpens your next shot.'},
+  lock:{rule:1,t:'Brecken: Target lock',s:'A lock lets you reroll attack dice against that enemy. Take it if you want a surer shot.'},
+  shoot:{rule:1,t:'Brecken: In your sights',s:'Pick a glowing enemy in your arc. Range 1 adds an attack die; range 3 adds a defence die.'},
+  dice:{rule:1,t:'Brecken: Read the dice',s:'Hits and crits hurt him. A focus face does nothing, unless you spend your focus token.'},
+  usefocus:{rule:1,t:'Brecken: Spend focus',s:'Your focus token turns a focus face into a hit. Spend it before you roll.'},
+  res1:{rule:1,t:'Brecken: Hits minus evades',s:'Each evade cancels one hit. Defence dice and evade tokens are how a ship dodges.'},
+  defend:{rule:1,t:'Brecken: Pilot power',s:'Kael can turn one focus result into an evade. Use it when you defend.'},
+  res2:{rule:1,t:'Brecken: Shields first',s:'Damage strips shields before hull. Crits are dealt face up with lasting effects.'},
+  goodshot:{t:'Brecken: Nice shot',s:'That hit landed. Stay in his arc and keep the pressure on.'},
+  gothit:{t:'Slate: Got you!',s:'Ouch. Keep out of his front arc, or use an evade token before he shoots.'},
+  stress:{rule:1,t:'Brecken: Stress',s:'A stressed ship can not act, and can not fly red until it flies a green move.',who:'brecken'},
+  endround:{rule:1,t:'Brecken: Round end',s:'At the end of each round unused focus and evade tokens vanish. Target locks stay.'}};
+// the speaker's portrait on a tutorial bubble: the title starts with the speaker's name
+(function(){if(typeof MutationObserver==='undefined'||!document.body)return;
+  new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;const b=n.matches&&n.matches('.gxt-bub')?n:(n.querySelector&&n.querySelector('.gxt-bub'));if(!b)continue;
+    const t=(b.querySelector('.gxh-tt')||{}).textContent||'';b.classList.toggle('na-slate',/^Slate/.test(t))}}).observe(document.body,{childList:true,subtree:true})})();
+
+</script>
+<script>
 // ===================== tutorial (shell/gx-tutor.js): a staged one-battle game that teaches every rule by doing it once =====================
 // RULES CHECKLIST (from the rules drawer, RULES_HTML in data.js, and rules-notes.md). Each line names the step that teaches it.
 //  goal: destroy every enemy ship ........................................ goal, win
@@ -7007,25 +7100,25 @@ const TUT_REROLL=[3,0];
 const TUT_ME=[{s:2,t:'S'},{s:1,t:'S'}];
 const dialIx=(s,m)=>dialOf(s).findIndex(x=>x.s===m.s&&x.t===m.t&&(m.d==null||x.d===m.d));
 const tutRound=()=>Math.max(1,Math.min(2,G?G.round:1));
-{const o=rollN;rollN=function(faces,n){if(TUT.on&&G&&G.tut&&TUT.dice.length){const k=faces===ATK_FACES?'a':faces===DEF_FACES?'d':'';
+{const o=rollN;rollN=function(faces,n){if(TUT.on&&!TUT.free&&G&&G.tut&&TUT.dice.length){const k=faces===ATK_FACES?'a':faces===DEF_FACES?'d':'';
     if(k&&TUT.dice[0].k===k){const q=TUT.dice.shift().f.slice(0,n);while(q.length<n)q.push(faces[rnd(8)]);return q}}
   return o.apply(this,arguments)}}
-{const o=aiPlan;aiPlan=function(k){if(!(G&&G.tut&&k===1))return o.apply(this,arguments);
+{const o=aiPlan;aiPlan=function(k){if(!(G&&G.tut&&!TUT.free&&k===1))return o.apply(this,arguments);
     for(const s of alive().filter(x=>x.side===1)){const i=dialIx(s,TUT_FOE[tutRound()-1].m);if(i>=0)s.dial=i;else return o.apply(this,arguments)}}}
-{const o=aiAction;aiAction=function(s,acts){if(!(G&&G.tut&&s.side===1))return o.apply(this,arguments);const a=TUT_FOE[tutRound()-1].act;acts=acts||actionsFor(s);return a&&acts.some(x=>x.a===a)?[a]:['skip']}}
-{const o=suggestDial;suggestDial=function(s){if(G&&G.tut&&s.side===0){const i=dialIx(s,TUT_ME[tutRound()-1]);if(i>=0)return i}return o.apply(this,arguments)}}
+{const o=aiAction;aiAction=function(s,acts){if(!(G&&G.tut&&!TUT.free&&s.side===1))return o.apply(this,arguments);const a=TUT_FOE[tutRound()-1].act;acts=acts||actionsFor(s);return a&&acts.some(x=>x.a===a)?[a]:['skip']}}
+{const o=suggestDial;suggestDial=function(s){if(G&&G.tut&&!TUT.free&&s.side===0){const i=dialIx(s,TUT_ME[tutRound()-1]);if(i>=0)return i}return o.apply(this,arguments)}}
 {const o=rnd;rnd=function(n){if(TUT.on&&G&&G.tut&&TUT.force&&TUT.force.length&&n===8)return TUT.force.shift();return o.apply(this,arguments)}}
-{const o=applyAtkMod;applyAtkMod=function(k,sel){if(TUT.on&&G&&G.tut&&k==='tl'&&sel&&sel.length)TUT.force=TUT_REROLL.slice(0,sel.length);return o.apply(this,arguments)}}
+{const o=applyAtkMod;applyAtkMod=function(k,sel){if(TUT.on&&!TUT.free&&G&&G.tut&&k==='tl'&&sel&&sel.length)TUT.force=TUT_REROLL.slice(0,sel.length);return o.apply(this,arguments)}}
 {const o=save;save=function(){if(TUT.on&&G&&G.tut)return;return o.apply(this,arguments)}}
-{const o=guided;guided=function(){return tutOn()?false:o()}}
-{const o=coachKey;coachKey=function(){return tutOn()?null:o()}}
+{const o=guided;guided=function(){return tutOn()||TUT.coach?false:o()}}
+{const o=coachKey;coachKey=function(){return tutOn()||TUT.coach?null:o()}}
 function tutStage(){
   window.TUTPH=true;try{PHN.apply()}catch(e){}   // every step points at the board-first layer: desktop and tablets get it for the lesson
   try{boot3D()}catch(e){}
   if(typeof NET!=='undefined'&&NET.on)netLeave(true);
-  TUT.on=true;TUT.dice=TUT_DICE();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
+  TUT.on=true;TUT.free=true;TUT.dice=[];coachReset();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
   Object.assign(UI,{mode:'solo',camp:null,info:false,stats:false,rules:false,build:null,draft:{},pass:null,sel:null,sugCache:null,autoSetup:false,advOpen:false,hints:false,hold:null,holdK:[],paused:false,sumSeen:0});
-  newGame({fac:[0,1],players:[{human:true},{human:false,lvl:'hard'}],squads:TUT_SQ.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))),ex:{noRocks:true},seed:TUT.seed});
+  newGame({fac:[0,1],players:[{human:true},{human:false,lvl:'easy'}],squads:TUT_SQ.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))),ex:{noRocks:true},seed:TUT.seed});
   G.tut=1;G.rocks.push(Object.assign({},TUT_ROCK,{k:TUT_ROCK.k.slice()}));
   while(G.phase==='ask'&&G.q&&G.q.key==='deploy'&&G.round===0){const q=G.q;resolveAsk(q.opts[Math.floor(q.opts.length/2)].k);if(G.q&&G.q.kid===q.kid)break}
   const me=G.ships.find(s=>s.side===0),foe=G.ships.find(s=>s.side===1);
@@ -7042,37 +7135,11 @@ const tutPlan=()=>!!(G&&BF.on&&G.phase==='plan'&&planSide()>=0&&!UI.hold&&tutIdl
 const tutMyTurn=ph=>!!(G&&BF.on&&G.phase===ph&&G.cur==='s1'&&humanTurn()&&tutIdle());
 const tutHoldRes=who=>!!(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&UI.hold.R[who]==='s1');
 const tutIx=n=>{const s=ship('s1');return s?dialIx(s,TUT_ME[n]):-1};
-function tutSteps(){return [
- // ---- round 1: goal, plan, reveal, order, action, shot, dice, damage
- {id:'goal',title:'Your goal',say:'Destroy the enemy ship. Yours is at the bottom, theirs at the top.',target:shipRect('s2'),also:shipRect('s1'),wait:null,ready:()=>tutPlan()&&G.round===1},
- {id:'ship',title:'Plan in secret',say:'Everyone picks a move in secret first. Tap your ship to see its moves.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
- {id:'marks',title:'Red and rocks',say:'Red moves give a stress token. ! marks an asteroid: it hurts and skips your action.',target:tq('.bfm.danger'),also:tqAll('.bfm.danger,.bfm.r'),wait:null,ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm.danger')&&!!hv('.bfm.r')},
- {id:'dial',title:'Pick a maneuver',say:'Number is speed, arrow is direction, green is easy. Tap the green straight 2.',target:()=>hv('.bfm[data-bfm="'+tutIx(0)+'"]'),wait:{type:'tap',match:a=>a.what==='dial'&&a.i===tutIx(0)},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm[data-bfm="'+tutIx(0)+'"]')},
- {id:'fly',title:'Reveal the dials',say:'Dials stay secret until everyone is set. Tap Fly to reveal them.',target:tq('[data-bf=fly]'),wait:{type:'tap',match:a=>a.what==='fly'},ready:()=>tutPlan()&&!!hv('[data-bf=fly]:not([disabled])')},
- {id:'order',title:'Skill sets the order',say:'Lowest pilot skill flies first: Slate (3), then Kael (8). The highest shoots first.',target:shipRect('s1'),also:shipRect('s2'),wait:null,ready:()=>tutMyTurn('action')&&G.round===1},
- {id:'action',title:'One action',say:'After moving, a ship gets one action: focus, evade, lock, roll or boost. Tap Focus.',target:tq('.bfact[data-bfa="F"]'),wait:{type:'tap',match:a=>a.what==='action'&&a.a==='F'},ready:()=>tutMyTurn('action')&&!!hv('.bfact[data-bfa="F"]')},
- {id:'shoot',title:'Take your shot',say:()=>{try{const s=ship('s1'),w=weaponsFor(s)[0],t=w.targets[0],sd=shotDice(s,w,t,ship(t.id));return `In your arc at range ${t.rg}: you roll ${sd.atk} dice, it rolls ${sd.def}. Tap it.`}catch(e){return 'The enemy is in your arc. Tap it to shoot.'}},
-   target:tq('.bftgt'),wait:{type:'tap',match:a=>a.what==='fire'&&a.t==='s2'},ready:()=>tutMyTurn('target')&&!!hv('.bftgt')},
- {id:'dice',title:'Your attack dice',say:'Hit and crit deal damage. A focus result does nothing, unless you spend focus.',target:tq('#bfdice'),wait:null,ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&humanTurn()&&hv('#bfdice')&&tutIdle())},
- {id:'usefocus',title:'Spend your focus',say:'Your focus token turns the focus result into a hit.',target:tq('#bfbtns [data-act=amod][data-k=focus]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='focus'},ready:()=>!!hv('#bfbtns [data-act=amod][data-k=focus]')},
- {id:'roll',title:'Roll the defence',say:'Nothing else to improve. Tap Roll: the enemy then rolls its defence dice.',target:tq('#bfbtns [data-act=amod][data-k=done]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='done'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&G.atk.dice.length&&!G.atk.dice.includes('focus')&&hv('#bfbtns [data-act=amod][data-k=done]'))},
- {id:'res1',title:'Hits minus evades',say:'Each evade cancels one hit. Slate spent its evade token: one hit gets through.',target:tq('#bfdice'),wait:null,hold:c=>c==='res',ready:()=>tutHoldRes('a')&&!!hv('#bfdice'),onNext:()=>releaseHold()},
- {id:'defend',title:'Pilot power',say:'Slate fires back. Kael may turn one focus result into an evade. Tap it.',target:tq('#bfbtns [data-act=dmod][data-k=kael]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='dmod'&&a.k==='kael'},ready:()=>!!(G&&G.phase==='dmod'&&G.atk&&G.atk.d==='s1'&&humanTurn()&&hv('#bfbtns [data-act=dmod][data-k=kael]'))},
- {id:'res2',title:'Shields go first',say:'Damage strips shields before hull. Unused focus and evade tokens vanish at round end.',target:tq('#bfdice'),wait:null,hold:c=>c==='res',ready:()=>tutHoldRes('d')&&!!hv('#bfdice'),onNext:()=>releaseHold()},
- // ---- round 2: stress, target lock and the reroll, a point-blank shot, victory
- {id:'auto',title:'Round 2',say:'Tap Auto: the computer suggests a move for each ship. You can always choose your own.',target:tq('[data-bf=auto]'),wait:{type:'tap',match:a=>a.what==='auto'},ready:()=>tutPlan()&&G.round===2&&!!hv('[data-bf=auto]')},
- {id:'fly2',title:'Fly again',say:'Tap Fly. Slate has the lower skill, so it moves before you.',target:tq('[data-bf=fly]'),wait:{type:'tap',match:a=>a.what==='fly'},ready:()=>tutPlan()&&G.round===2&&!!hv('[data-bf=fly]:not([disabled])')},
- {id:'stress',title:'Red means stress',say:'Slate flew a red K-turn: stress token, no action, and it now faces away.',target:shipRect('s2'),also:shipRect('s1'),wait:null,ready:()=>tutMyTurn('action')&&G.round===2},
- {id:'lock',title:'Target lock',say:'A lock lets you reroll attack dice against that enemy. Tap Lock.',target:tq('.bfact[data-bfa="TL"]'),wait:{type:'tap',match:a=>a.what==='action'&&a.a==='TL'},ready:()=>tutMyTurn('action')&&!!hv('.bfact[data-bfa="TL"]')},
- {id:'shoot2',title:'Point blank',say:'Range 1 adds an attack die. Slate faces away, so it cannot shoot back. Tap it.',target:tq('.bftgt'),wait:{type:'tap',match:a=>a.what==='fire'&&a.t==='s2'},ready:()=>tutMyTurn('target')&&!!hv('.bftgt')},
- {id:'reroll',title:'Spend your lock',say:'Two blanks. Spend the lock to roll them again.',target:tq('#bfbtns [data-act=amod][data-k=tl]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='tl'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&hv('#bfbtns [data-act=amod][data-k=tl]'))},
- {id:'confirm',title:'Choose the dice',say:'The blank dice are ticked. Tap Reroll to roll just those.',target:tq('#bfbtns [data-bfq=ok]'),wait:{type:'tap',match:a=>a.what==='ask'&&a.k==='ok'},
-   ready:()=>{try{if(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'&&!G.atk.pre){const bl=G.atk.dice.map((f,i)=>f==='blank'?i:-1).filter(i=>i>=0);const sel=G.q.opts.filter(o=>/^☑/.test(o.l)).length;
-       if(sel<bl.length){const k='t'+bl[sel];if(G.q.opts.some(o=>o.k===k))uiAct({act:'ask',k});return false}G.atk.pre=1}}catch(e){}
-     return !!(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'&&G.atk.pre&&hv('#bfbtns [data-bfq=ok]'))}},
- {id:'roll2',title:'Roll and finish',say:'Better dice. Tap Roll to see if Slate survives.',target:tq('#bfbtns [data-act=amod][data-k=done]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='done'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&G.atk.rr&&G.atk.rr.some(Boolean)&&hv('#bfbtns [data-act=amod][data-k=done]'))},
- {id:'win',title:'Victory',say:'No enemy ships left. The battle ends when every ship on one side is destroyed. You won!',target:tq('#bftop'),wait:null,ready:()=>!!(G&&G.winner&&BF.on&&!UI.stats&&hv('#bftop')&&tutIdle())}
-]}
+function tutSteps(){return tutStory([
+ {id:'ship',title:'Plan in secret',say:'Touch your ship to see where it can fly.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
+ {id:'dial',title:'Pick a maneuver',say:'Any line you like. Green is easy, red strains the engines.',target:()=>hv('.bfm:not(.set)'),also:tqAll('.bfm:not(.set)'),wait:{type:'tap',match:a=>a.what==='dial'},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm:not(.set)')}
+])}
+function tutStory(steps){for(const st of steps){const L=LORE.tut[st.id];if(L){st.title=L.t;st.say=L.s}}return steps}
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
 // the games call this from their input handlers BEFORE applying the tap; false = not what the step asks
@@ -7082,17 +7149,53 @@ function storyOpen(){if(typeof GXC==='undefined')return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
 function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   tutClearOffer();
-  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:o?'Plan, fly, act, shoot, defend. Now the Story begins.':'Plan, fly, act, shoot, defend. Shields, hull, stress and locks come with you.',
-    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+  GXT.start({game:TUT_GAME,steps:tutSteps(),story:false,
+    endTitle:LORE.coachIntro.title,endText:LORE.coachIntro.text,endButtons:[{id:'free',label:LORE.coachIntro.btn}],
     setup:()=>{try{GX.close()}catch(e){}try{toggleMenu(false)}catch(e){}try{GXC.close()}catch(e){}try{GXH.hide()}catch(e){}tutStage()},
-    onDone:r=>{tutLeave();const c=r&&r.choice;lsPlayed();
-      if(c==='chapter'&&first){GXC.play(first.id)}
-      else if(c==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}
-      else startGame('solo')},
+    onDone:()=>{coachStart(o,first)},
     onExit:()=>{tutLeave();UI.info=true;render()}})}
+// ---------------------------------------------------------------- the coached game: free play, the guide speaks when a rule first matters
+const NCH={shown:{},q:[],cur:null,on:false,o:null,first:null,tm:0};
+function coachReset(){NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
+function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{GXT.markDone(TUT_GAME)}catch(e){}coachSay('goal');coachSay('fly0');render()}
+function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;NCH.q.push(id);coachPump()}
+function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;let e=document.getElementById('na-coach');
+  if(!e){e=document.createElement('div');e.id='na-coach';e.setAttribute('data-help','');e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e)}
+  e.className=(L.who==='slate'?'na-slate':'');e.innerHTML='<i class="na-por"></i><div class="na-ct"><b>'+L.t+'</b><span>'+L.s+'</span><button type="button" class="na-lv" data-na="leave">Leave lesson</button></div><button type="button" class="na-cx" data-na="dismiss" aria-label="Dismiss">\u2715</button>';e.hidden=false;
+  clearTimeout(NCH.tm);NCH.tm=setTimeout(coachHide,Math.max(5200,L.s.length*70))}
+function coachHide(){clearTimeout(NCH.tm);NCH.cur=null;const e=document.getElementById('na-coach');if(e)e.hidden=true;setTimeout(coachPump,350)}
+// rules that came up are explained at that moment; this runs after every render
+function coachTick(){if(!NCH.on||!G||!G.tut)return;const me=G.ships.find(x=>x.side===0);if(!me)return;
+  if(G.winner){coachEnd();return}
+  const ht=humanTurn(),ph=G.phase;
+  if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(BF.sel&&G.round>=2)coachSay('marks')}
+  if(G.round>=1&&(ph==='action'||ph==='activate'))coachSay('order');
+  if(ph==='action'&&ht){coachSay('action');try{if(actionsFor(me).some(a=>a.a==='TL'))coachSay('lock')}catch(e){}}
+  if(ph==='target'&&ht)coachSay('shoot');
+  if(G.atk&&ph==='amod'&&G.atk.a===me.id&&ht){coachSay('dice');try{if(atkMods().some(m=>/focus/i.test(m.k)))coachSay('usefocus')}catch(e){}}
+  if(G.atk&&ph==='dmod'&&G.atk.d===me.id&&ht){try{if(defMods().length)coachSay('defend')}catch(e){}}
+  if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'res1');if(R.dmg)coachSay('res2')}
+    if(R.dmg)coachSay('res2')}
+  if(G.ships.some(x=>x.alive&&x.stress>0))coachSay('stress');
+  if(G.round>=2)coachSay('endround')}
+{const o=render;render=function(){const r=o.apply(this,arguments);try{coachTick()}catch(e){console.error(e)}return r}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-na]');if(!b)return;const k=b.dataset.na;
+  if(k==='dismiss')coachHide();
+  else if(k==='leave'){tutLeave();lsPlayed();UI.info=true;render()}
+  else if(k==='play'||k==='story'||k==='chapter'){const o=NCH.first;coachReset();tutLeave();lsPlayed();
+    if(k==='chapter'&&o){GXC.play(o.id)}else if(k==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}else startGame('solo')}},true);
+// the end: the real numbers walked through, then what did not come up
+function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.done=Object.keys(NCH.shown);
+  const mine=G.ships.filter(x=>x.side===0),foe=G.ships.filter(x=>x.side===1),won=G.winner==='P1';
+  const hp=a=>a.filter(x=>x.alive).reduce((t,x)=>t+Math.max(0,x.hull-hullDmg(x))+x.sh,0);
+  const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t+': '+LORE.coach[k].s));
+  const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
+    +'<div class="gxt-ex"><b>Things you will meet later</b><ul class="na-later">'+later.map(t=>'<li>'+t+'</li>').join('')+'</ul></div>'
+    +'<div class="gxt-eb">'+(NCH.o&&NCH.first?'<button type="button" class="gxt-b pri" data-na="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-na="play">Play a real game</button><button type="button" class="gxt-b" data-na="story">Story mode</button>')+'</div></div>';
+  document.body.appendChild(d);TUT.coach=false}
 // leave the staged game: nothing of it is saved, the dice script and the pauses are cleared
-function tutLeave(){TUT.on=false;if(window.TUTPH){window.TUTPH=false;try{PHN.apply()}catch(e){}}TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
+function tutLeave(){TUT.on=false;TUT.free=false;TUT.coach=false;try{coachReset()}catch(e){}if(window.TUTPH){window.TUTPH=false;try{PHN.apply()}catch(e){}}TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
   UI.hold=null;UI.holdK=[];UI.stats=false;UI.draft={};try{GXH.hide()}catch(e){}if(G&&G.tut){G.tut=0}}
 function lsPlayed(){try{localStorage.setItem('na_played','1')}catch(e){}}
 // first-time players who tap Launch are offered the lesson first
