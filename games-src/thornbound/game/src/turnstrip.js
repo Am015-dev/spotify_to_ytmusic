@@ -9,6 +9,7 @@ const css=document.createElement('style');css.textContent=`
 #tbturn .tbt-chip.wt{background:#2a2036;color:#f6ecd2;border-color:#8a7aa0}
 #tbturn .tbt-line{flex:1 1 auto;min-width:0;color:#f8efd6;font:600 15px/1.25 'EB Garamond',Georgia,serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #tbturn .tbt-face{flex:0 0 auto;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:var(--c,#8e5bb5);border:2px solid #f0c860}
+#tbturn .tbt-skip{flex:0 0 auto;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #8a7aa0;background:transparent;color:#f6ecd2;font:700 14px 'EB Garamond',Georgia,serif}
 #tbturn.voice{background:#2a1838}
 #tbturn.pulse .tbt-chip{animation:tbtp .45s ease-out}
 @keyframes tbtp{0%{transform:scale(.8);opacity:.3}100%{transform:scale(1);opacity:1}}
@@ -20,7 +21,8 @@ html.tb-dim .tb-loc:not(.glow){opacity:.45;transition:opacity .25s}
 @media (prefers-reduced-motion:reduce){#tbturn.pulse .tbt-chip{animation:none}}
 `;document.head.appendChild(css);
 let el=null;const strip=()=>{if(el&&el.isConnected)return el;const rv=document.getElementById('rivals');if(!rv)return null;el=document.createElement('div');el.id='tbturn';el.setAttribute('role','status');el.setAttribute('aria-live','polite');rv.parentNode.insertBefore(el,rv.nextSibling);
-  el.addEventListener('click',()=>{if(vNow){nextVoice();return}if(UI._tbHold){UI._tbHold=0;paint();return}speedUp()});return el};
+  el.addEventListener('click',ev=>{if(ev.target.closest&&ev.target.closest('.tbt-skip')){skipTut();return}if(vNow){nextVoice();return}if(UI._tbHold){UI._tbHold=0;paint();return}speedUp()});return el};
+function skipTut(){try{GXT.markDone('thornbound')}catch(e){}const pro=UI.coachPro;UI.coachOn=0;clearVoice();tutLeave();if(pro&&typeof GXC!=='undefined'){showStart();GXC.open()}else{UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()}}
 function speedUp(){if(!G||UI.card||G.over)return;const w=whoActs();if(w.ai.length&&viewSeatForQ()==null){clearTimeout(_pumpT);aiStep(w);pump()}}
 const poss=n=>String(n)+(/s$/i.test(n)?'\u2019':'\u2019s');
 const esc2=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -41,6 +43,7 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
       const t=line||(typeof promptText==='function'?promptText(G.q,s)+'.':'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+esc2(t)+'</span>'}
     else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));html='<span class="tbt-chip rv">'+esc2(poss(shortName(a)))+' turn</span><span class="tbt-line">'+esc2(ST().wait?ST().wait.replace('{n}',shortName(a)):'Waiting for '+shortName(a)+'...')+'</span>'}
       else{key='w';html='<span class="tbt-chip wt">Wait</span><span class="tbt-line">Waiting for the other players.</span>'}}}
+  if(coachOn()&&!G.over)html+='<button class="tbt-skip" data-gxt-skip type="button" aria-label="Skip tutorial">Skip tutorial</button>';
   if(e.dataset.key!==key){e.dataset.key=key;e.className=cls+' pulse';e.innerHTML=html;try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}
   else{try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}}
 window.tbPaint=paint;window.tbVoice=voice;
@@ -108,7 +111,9 @@ function tbEnd(){UI._tbEnd=1;if(TBCOACH.seen.indexOf('round')<0)TBCOACH.seen.pus
    '<h3 style="color:#f0c860">Things you will meet later</h3><ul>'+(C.later||[]).map(x=>'<li>'+esc2(x)+'</li>').join('')+'</ul><p style="display:flex;gap:10px;flex-wrap:wrap">'+(first?'<button class="btn pri" data-e="chapter" style="min-height:48px;padding:0 18px;font:700 16px inherit">Start chapter 1</button>':'')+'<button class="btn" data-e="menu" style="min-height:48px;padding:0 18px;font:700 16px inherit">Back to the menu</button></p></div>';
   document.body.appendChild(box);
   box.addEventListener('click',e=>{const b=e.target.closest('[data-e]');if(!b)return;box.remove();tutLeave();UI.coachOn=0;if(b.dataset.e==='chapter'&&first&&typeof GXC!=='undefined'){showStart();GXC.play(first.id)}else{UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()}})}
-// start: no spotlight steps; the real tutorial game with free play (the Court is still scripted by the fixed seed)
-tutStart=function(o){const pro=!!(o&&o.prologue);TBCOACH.seen=[];lastSig='';UI._tbEnd=0;const old=document.getElementById('tbcend');if(old)old.remove();
+// start of the coached game (called by tutStart in ui12.js)
+window.tbCoachStart=function(o){const pro=!!(o&&o.prologue);TBCOACH.seen=[];lastSig='';UI._tbEnd=0;const old=document.getElementById('tbcend');if(old)old.remove();
   try{GX.close()}catch(e){}hideStart();hideGloss();closePop(true);newGame('tutorial');UI.coachOn=1;UI.coachPro=pro;clearVoice();renderAll()};
+// for qa-bot: the coached game's state
+window.GXCOACH={get running(){try{return coachOn()&&!G.over&&!UI._tbEnd}catch(e){return false}},get explained(){return TBCOACH.seen.slice()},get done(){try{return !!UI._tbEnd||GXT.isDone('thornbound')}catch(e){return false}}};
 })();
