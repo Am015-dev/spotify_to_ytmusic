@@ -218,9 +218,9 @@ async function bfStep(e){const S=BF.disp;
   if(e.t==='take')return bfTake(e.x);
   if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
   if(e.t==='wall')return bfWall(e.x);
-  if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length)){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut&&TUT.part==='A')await tutPause('r1end')}
+  if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length)){if(UI.tut)await tutPause('floor');await bfFloors();}
     S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
-    bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
+    bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');if(UI.cg)try{cgRound()}catch(er){}sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(1500,500+S.fac.length*4*45));return}
   if(e.t==='win'){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut)await tutPause('bonus');await bfBonus();if(UI.tut)await tutPause('final');sfx('win');return}}
 async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!a)throw Error('take: no source');
@@ -278,7 +278,7 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
     const v=Math.max(1,Math.round((i+1)*x.pts/run.length));if(run.length>1&&i<run.length-1)bfPop('+'+v,bfR(el),'good cnt');sfx('wall',Math.min(8,i+1));if(i<run.length-1)await bfWait(step)}
   bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3){bfBanner(x.pts>=6?'Great chain! +'+x.pts:'Chain +'+x.pts,'');const me=bfQ('.bf-me');if(me){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
   await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
-  if(UI.tut)await tutPause('wall'+x.r);
+  if(UI.tut)await tutPause('wall'+x.r,x);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
 function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
   const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
