@@ -44,10 +44,11 @@ function tutStart(o) {
   const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 700);
   closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
-  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0 }; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
+  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0 }; window.GXCOACH = { running: true, explained: [], done: false }; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
 }
 // leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
 function tutLeave() {
+  if (window.GXCOACH && !window.GXCOACH.done) window.GXCOACH.running = false;
   clearInterval(UI.fcT); UI.fc = null; document.querySelectorAll('.fa-coach,.fa-fin').forEach(e => e.remove());
   clearTimeout(UI.tm); UI.seq++; UI.started = false; UI.sel = -1; UI.cof = 0; if (UI._aid) { AIDELAY = UI._aid; UI._aid = 0; }
   try { hideRecap(); } catch (e) { } try { GXH.hide(); } catch (e) { } try { if (typeof pxClearEnd === 'function') pxClearEnd(); } catch (e) { }
@@ -107,7 +108,7 @@ function tsReact(text, who) {
 // text lives in campaign.json tutorial.coach. Each rule is said the first time it matters; rules that never came up go to "Things you'll meet later" at the end.
 const FC_CORE = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
 function fcSay(id) {
-  const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || F.seen[id]) return; F.seen[id] = true; F.queue.push({ id, text: T.coach[id] }); fcPump();
+  const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || F.seen[id]) return; F.seen[id] = true; try { window.GXCOACH.explained.push(id); } catch (e) { } F.queue.push({ id, text: T.coach[id] }); fcPump();
 }
 function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } }, 250); setTimeout(fcPump, 450); }
 function fcPump() {
@@ -131,7 +132,7 @@ function fcPoll() {
 // the end: the landing check rule by rule with the real numbers, then what did not come up
 function fcEnd() {
   const F = UI.fc, T = TS(); if (!F || !T || !G || !G.result) return; const win = !!G.result.win;
-  clearInterval(UI.fcT); try { GXT.markDone(TUT_GAME); } catch (e) { }
+  clearInterval(UI.fcT); try { GXT.markDone(TUT_GAME); } catch (e) { } window.GXCOACH = Object.assign(window.GXCOACH || { explained: Object.keys(F.seen) }, { running: false, done: true });
   const later = FC_CORE.filter(k => !F.seen[k]).map(k => tsFill(T.coach[k])).concat(T.later); F.later = later;
   const rows = landList().map(r => h('li.' + (r[0] === true ? 'ok' : 'no'), h('b', r[0] === true ? '✓' : '✗'), h('span', r[1])));
   const btn = (id, label, pri) => { const b = h('button.fb' + (pri ? '.pri' : ''), { type: 'button', 'data-fin': id }, label); return b; };
