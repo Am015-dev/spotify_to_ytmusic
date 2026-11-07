@@ -66,3 +66,15 @@ Installed with `free-art/install.py --force` for every test above. Found -> fixe
 pictures and the rule text, so it is no longer drawn (card pictures now show sword / shield / etc. with full text). Title subtitle got a
 solid backing (contrast 4.24 -> pass on the new title art). Note for the art owner: the Warrior's portrait (hero-w) in the free kit is a
 green crocodile face that looks like the Gnawer enemy.
+
+## Addendum 4: a coached first climb, not tap-tap
+The forced 46-step guide is gone. `src/tutor.js` now runs a real short climb (Warrior, seed 7, branching 6-floor map: fight, treasure or
+fight, fight or ?, campfire or shop, elite or fight, boss; foes 75% HP). Only 2 steps are forced (read the intent, play Anvil Blow); then the
+tutor kit stops and Warden Ashgrove coaches: one dismissable line at the top (tap to dismiss, never blocks input) the first time each of the
+25 rules matters, reactions to good plays (kill, double damage on Vulnerable, fully blocked) and poor ones (big unblocked hit, Spikes, energy
+left over), a finale with the real numbers, and an end card listing the rules that did not come up ("Things you will meet later") with Play a
+real game / Title. In Story chapter 1 the same climb is the chapter; Skip there keeps playing it. Coach text: `src/story.js` (coach).
+Test: `node tools/tut-end.js` plays it with random legal moves through the UI at both sizes (2 forced steps; 19-22 of 25 rules explained in
+play, the rest on the end card; any rule missing from both fails).
+Found -> fixed: in Story mode any redraw after the chapter result (sound toggle, menu) blanked the screen (found by qa-bot); the result
+now survives redraws. Intent badges are 40 px tap targets.
