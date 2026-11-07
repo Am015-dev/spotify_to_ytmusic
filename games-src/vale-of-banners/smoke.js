@@ -5,7 +5,7 @@ const URL = process.argv[2] || 'file://' + path.join(__dirname, 'vale-of-banners
 const TURNS = process.env.FULL ? 999 : 3;
 (async () => {
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] }); let fails = 0;
-  for (const [name, vp, touch] of [['phone', { width: 390, height: 763 }, true], ['pc', { width: 1440, height: 860 }, false]]) {
+  for (const [name, vp, touch] of [['phone', { width: 390, height: 763 }, true], ['land', { width: 844, height: 390 }, true], ['pc', { width: 1440, height: 860 }, false]]) {
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }), page = await ctx.newPage(), errs = [];
     page.on('pageerror', e => errs.push(String(e))); page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(400);

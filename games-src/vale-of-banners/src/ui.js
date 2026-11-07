@@ -582,7 +582,7 @@ function tutSetup() {
 function tutStart(o) {
   if (typeof GXT === 'undefined') return;
   $('#start').hidden = true;
-  GXT.start({ game: 'vale-of-banners', story: true, setup: tutSetup, steps: [
+  GXT.start({ game: 'vale-of-banners', story: true, endTitle: 'You know the basics', endText: 'Take, build, end turn. Selling, workers and the back lane are in Rules and the hint bulb. Try a Quick game.', setup: tutSetup, steps: [
     { id: 'hi', title: 'Welcome, steward', say: 'This is your estate. Your home keep sits in the middle.', target: function () { return $('#ec-' + VB.HOME); }, wait: null },
     { id: 'dice', title: 'Two dice', say: 'Every round you roll two dice. Each die is one action.', target: function () { return $('#dicerow'); }, wait: null },
     { id: 'take', title: 'Take a tile', say: 'Tap the glowing tile in the stall matching your first die.', target: function () { return $('#mt-' + UI.tut.stall + '-0'); }, wait: { type: 'tap', match: function (a) { return a.what === 'market' && a.d === UI.tut.stall; } } },
@@ -591,7 +591,7 @@ function tutStart(o) {
     { id: 'cell', title: 'Next to your land', say: 'Its space must touch your land and match your second die.', target: function () { return $('#ec-' + UI.tut.cell); }, wait: { type: 'tap', match: function (a) { return a.what === 'cell'; } } },
     { id: 'score', title: 'Regions score', say: 'Fill a whole region of one colour for big points. Earlier seasons pay more.', target: function () { return $('#es'); }, wait: null },
     { id: 'end', title: 'End your turn', say: 'Both dice used. Tap End turn.', target: function () { return $('#endB'); }, wait: { type: 'event', match: function (a) { return a.what === 'end'; } } },
-    { id: 'more', title: 'You are ready', say: 'Workers bend dice by one. Keeps and Moot Halls let you chain builds. Good luck!', target: function () { return $('#dock'); }, wait: null }
+    { id: 'more', title: 'You are ready', say: 'Next to learn: sell goods, bend a die with workers, buy from the back lane, chain builds with a Keep or Moot Hall. The hint bulb and Rules explain each one.', target: function () { return $('#dock'); }, wait: null }
   ], onDone: function (r) {
     UI.mode = 'quick'; try { GXT.markDone('vale-of-banners'); } catch (e) { }
     if (r && r.choice === 'story') storyOpen(); else { UI.lastOpts = { n: 2, ai: 'easy' }; startGame(UI.lastOpts); }
