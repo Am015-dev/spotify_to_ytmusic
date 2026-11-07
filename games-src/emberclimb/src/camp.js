@@ -11,6 +11,7 @@
     if (def.easy && o.hpPct) o.hpPct = Math.min(o.hpPct, 80);
     E.newGame(o); UI.mode = 'game'; UI.sel = -1; UI.render();
   }
+  UI.campStart = start;
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
     game: 'emberclimb', artBase: 'media/', data: window.CAMPAIGN,
