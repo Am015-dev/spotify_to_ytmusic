@@ -7,7 +7,7 @@ def art_have():
 def audio_js():
     # sound effects stay embedded; the songs are separate files in games/shipwreck-isle/music/ (GA fetches them when first wanted)
     t=open(SRC['audio-data.js']).read();t=t[:t.index('},music:{')]
-    names=[s+'-'+v for s in ('tavern','main','fight','victory','defeat') for v in 'ab']
+    names=[s+'-'+v for s in ('tavern','main','fight','victory','defeat','tavern-short') for v in 'ab']
     return t+'},music:{'+','.join('"%s":"url:music/%s.mp3"'%(n,n) for n in names)+'}};\n'
 h=open('head.html').read();b=open('body.html').read()
 T='../node_modules/three/build/three.min.js'

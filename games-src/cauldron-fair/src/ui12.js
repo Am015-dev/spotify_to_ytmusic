@@ -37,7 +37,7 @@ function endBanner() {
 }
 // ---- music: five slots (Menu, Game, Last day, Victory, Defeat), two tracks each, saved choice a / b / shuffle / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last day'], ['victory', 'Victory'], ['defeat', 'Defeat']];
-const MTITLE = { 'tavern-a': 'Potion Steam Waltz', 'tavern-b': 'Six Bells Over Kettlemoor', 'main-a': 'Cauldron Clockwork', 'main-b': 'Tiny Risky Potions', 'fight-a': 'Push the Pot', 'fight-b': 'Tremolo Gambit', 'victory-a': 'Fireworks Over the Fairground', 'victory-b': 'Brass and Confetti', 'defeat-a': 'Pfft!', 'defeat-b': 'The Slow Leak Waltz' };
+const MTITLE = { 'tavern-a': 'Potion Steam Waltz', 'tavern-b': 'Six Bells Over Kettlemoor','tavern-short-a': 'Short menu loop A','tavern-short-b': 'Short menu loop B', 'main-a': 'Cauldron Clockwork', 'main-b': 'Tiny Risky Potions', 'fight-a': 'Push the Pot', 'fight-b': 'Tremolo Gambit', 'victory-a': 'Fireworks Over the Fairground', 'victory-b': 'Brass and Confetti', 'defeat-a': 'Pfft!', 'defeat-b': 'The Slow Leak Waltz' };
 const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, game and last-day tracks), a new one every ~2.5 min

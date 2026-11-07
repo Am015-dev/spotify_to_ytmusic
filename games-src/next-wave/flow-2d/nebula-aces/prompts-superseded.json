@@ -1,0 +1,43 @@
+{
+ "cards": {
+  "lancer-idle": "the Lancer starfighter exactly as in the reference: a nimble arrow-shaped light fighter with forward-swept wings and twin engines. State: hovering level, engines glowing softly. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+  "talon-idle": "the Talon starfighter exactly as in the reference: an angular heavy interceptor with a central cockpit pod and two vertical wing blades. State: hovering level, engines glowing softly. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers."
+ },
+ "meta": {
+  "lancer-idle": {
+   "element": "the Lancer starfighter exactly as in the reference: idle state",
+   "why": "State set for lancer: same camera, scale and baseline",
+   "pri": 2,
+   "ref": "games/nebula-aces/models/na-lancer.webp",
+   "thumb": "nebula-aces/models/na-lancer.webp",
+   "bg": "green",
+   "align": "centre",
+   "save_as": "lancer-idle.png",
+   "target": "games/nebula-aces/media/poses/lancer-idle.webp",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "group": "lancer",
+   "tag": "poses",
+   "wave": "Wave 7",
+   "from": "prompts-wave7.json"
+  },
+  "talon-idle": {
+   "element": "the Talon starfighter exactly as in the reference: idle state",
+   "why": "State set for talon: same camera, scale and baseline",
+   "pri": 2,
+   "ref": "games/nebula-aces/models/na-talon.webp",
+   "thumb": "nebula-aces/models/na-talon.webp",
+   "bg": "green",
+   "align": "centre",
+   "save_as": "talon-idle.png",
+   "target": "games/nebula-aces/media/poses/talon-idle.webp",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "group": "talon",
+   "tag": "poses",
+   "wave": "Wave 7",
+   "from": "prompts-wave7.json"
+  }
+ },
+ "note": "Superseded: a finished 3D model sprite (games/nebula-aces/models/*.webp) already shows this exact view. Do not generate."
+}
