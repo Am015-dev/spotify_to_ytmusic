@@ -41,3 +41,4 @@ html.ph #bline{font-size:15px;white-space:normal;line-height:1.2;max-width:calc(
 #ppcoach .pp-row{display:flex;gap:8px;margin-top:6px}
 #ppcoach .pp-row button{pointer-events:auto;min-height:36px;padding:4px 12px;border-radius:10px;border:2px solid #1a1320;background:#ff7a21;color:#fff;font:900 14px/1 Nunito,sans-serif;cursor:pointer}
 #ppcoach.on{pointer-events:none}
+html.ph .pchip em,html.ph-p header.gx-bar .pchip span em{font-size:13px}
