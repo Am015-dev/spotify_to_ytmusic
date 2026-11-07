@@ -165,4 +165,20 @@ h1,h2,.btn,.ct,.cname{font-family:'Cinzel',Georgia,serif}h1{margin:0;font-size:c
 }
 
 .gxt-menu{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;line-height:1.2}.gxt-menu b,.gxt-menu span{display:block;font-size:max(13px,1em)}.gxt-menu span{font-weight:400;opacity:.85}
+.item.picked{border-color:var(--ember);box-shadow:0 0 12px rgba(242,135,43,.6)}
+.shopdet{display:flex;flex-direction:column;align-items:center;gap:8px}
+.shopdet .card{--cw:min(48vw,190px)}.shopdet .card .cb,.shopdet .card .cb .cl{display:block;font-size:max(13px,.09*var(--cw))}
+@media (max-width:700px){
+  .heropan .art{display:none}
+  .heropan{min-height:0;padding:4px 8px}
+  .hand{height:calc(var(--cw)*1.62 + 8px)}
+  .hand .card{height:calc(var(--cw)*1.62)}
+  .card .cart{height:calc(var(--cw)*.62)}
+  .card .ck{bottom:calc(var(--cw)*.82)}
+}
+.card .ct{display:block;text-align:left;line-height:1.05;max-height:none!important;flex:none}
+.hand.dense .card{margin:0 calc(var(--cw)*-.125)}
+.hand.dense .card .ct{padding-right:calc(var(--cw)*.04)}
+.stc:empty{display:none}
+@media (max-width:700px){.heropan{padding:2px 8px!important}.heropan .inf{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center}}
 </style></head>

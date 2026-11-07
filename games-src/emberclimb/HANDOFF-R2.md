@@ -33,6 +33,8 @@ Found -> fixed (played at 390x763 and 1440x860 with real taps for title / Story 
 - Title: Story / Quick game / How to play (Quick game = hero pick, 1 or 2 heroes).
 - Results: `build-all.py --quick` scenarios 11/14, only the 3 visual snapshot rows missing (expected); independent audit (`ui-audit.spec.js`) result in the worker report.
 
+Review R2 items (independent review 6.0): hand on live phone fight (dense hands of 6+ cards overlap instead of shrinking, taller cards 1.62x, 13 px names, hero portrait hidden and panel compact on phones; checked on the fight screen at 390x763); tapping a hero now switches the selection (solo), a separate "+ Second hero" toggle makes a duo; shop: tap shows the item (card face or relic / potion text) with a Buy button at the top, purchase only on Buy (scenario ec-shop updated to tap then Buy).
+
 Not done / next (honest):
 - Shell chrome of the old games (`shell.js` board shell with dock, `gx-kit.js` menu with settings/stats, `gx-menu.css` title layout, `gx-help.js` help drawer) is NOT adopted; this game keeps its own title, menu and a plain rules overlay. Adopting it means moving the DOM into `.gx-app/.gx-board`; needs its own round.
 - Audit E may still flag the Sound toggle and "How to play" as dead buttons (both do change the DOM when tapped manually); the kit's tutor "Next" button is flagged on the campaign guide surface (shared kit).

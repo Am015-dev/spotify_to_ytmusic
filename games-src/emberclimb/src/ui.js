@@ -129,13 +129,13 @@
     ['w', 's', 'a', 'm'].forEach(function (k) {
       var H = D.H[k], b = h('button', 'hero' + (UI.pick.indexOf(k) >= 0 ? ' sel' : ''), null, [A('hero-' + k, H.name.split(' ')[0], { ph: TONE[k] }), h('b', '', H.name.split(' ')[0]), h('i', '', H.role)]);
       b.setAttribute('data-hero', k);
-      on(b, function () { var i = UI.pick.indexOf(k); if (i >= 0) { if (UI.pick.length > 1) UI.pick.splice(i, 1); } else { UI.pick.push(k); if (UI.pick.length > 2) UI.pick.shift(); } render(); });
+      on(b, function () { if (!UI.duo) { UI.pick = [k]; } else { var i = UI.pick.indexOf(k); if (i >= 0) { if (UI.pick.length > 1) UI.pick.splice(i, 1); } else { UI.pick.push(k); if (UI.pick.length > 2) UI.pick.shift(); } } render(); });
       hs.appendChild(b);
     });
     var mid = h('div', '', null, [hs, h('div', 'refline', D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
-    var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
-    var wrap = h('div', '', null, [h('div', 'refline', UI.pick.length > 1 ? 'Two heroes, shared map. Pass the screen.' : 'Pick 1 hero, or 2 to play together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
+    var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
+    var wrap = h('div', '', null, [h('div', 'refline', UI.duo ? 'Two heroes, shared map. Pass the screen. Tap to pick both.' : 'Tap a hero to pick them. Use + Second hero to play together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
     s.appendChild(wrap); app.appendChild(s);
     if (UI.ov) overlay();
   }
@@ -235,7 +235,7 @@
     } else ctl.appendChild(h('span', 'chip', 'Enemies act...'));
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
-    if (nn > 6) hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor(92 / nn * 1.15 * 3.6) / 3.6 + 'vw)');
+    if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), el = cardEl(c); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
       el.setAttribute('data-c', i); holdPeek(el, c); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
@@ -332,10 +332,19 @@
       var nm = x.t === 'card' ? D.CARDS[x.id].name : x.t === 'relic' ? D.RELICS[x.id].name : D.POTIONS[x.id].name;
       var art = x.t === 'card' ? A(x.id, nm, { ph: TONE[D.CARDS[x.id].hero] }) : x.t === 'relic' ? A('relic-' + x.id, nm, { ph: '#8a6a2a' }) : A('pot-' + x.id, nm, { ph: '#5a8a5a' });
       var b = h('button', 'item' + (x.sold ? ' sold' : '') + (g.gold < x.p ? ' poor' : ''), null, [art, h('span', '', nm), h('span', 'price', '● ' + x.p)]);
-      on(b, function () { if (!E.performMove({ t: 'buy', i: i })) toast(g.gold < x.p ? 'Not enough gold' : 'No room'); render(); }); it.appendChild(b);
+      if (UI.shopSel === i) b.classList.add('picked');
+      on(b, function () { UI.shopSel = i; render(); }); it.appendChild(b);
     });
     var rm = on(h('button', 'item' + (g.shop.removed ? ' sold' : ''), null, [A('icon-remove', '✂', { ph: '#7a3a3a' }), h('span', '', 'Remove a card'), h('span', 'price', '● ' + g.shop.rm)]), function () { if (g.gold < g.shop.rm) { toast('Not enough gold'); return; } UI.ov = 'remove'; render(); });
-    it.appendChild(rm); s.appendChild(it); s.appendChild(on(h('button', 'btn', 'Leave'), function () { E.performMove({ t: 'leave' }); render(); }));
+    it.appendChild(rm); s.appendChild(it);
+    var sx = g.shop.items[UI.shopSel];
+    if (sx && !sx.sold) {
+      var nm2 = sx.t === 'card' ? D.CARDS[sx.id].name : sx.t === 'relic' ? D.RELICS[sx.id].name : D.POTIONS[sx.id].name, dt = h('div', 'shopdet');
+      if (sx.t === 'card') { var ce = cardEl({ id: sx.id, u: 0 }); ce.classList.add('big'); dt.appendChild(ce); }
+      else dt.appendChild(h('div', 'refline', nm2 + ': ' + (sx.t === 'relic' ? D.RELICS[sx.id].t : D.POTIONS[sx.id].t)));
+      var bb = on(h('button', 'btn' + (g.gold < sx.p ? ' alt' : ''), 'Buy ' + nm2 + ' (● ' + sx.p + ')'), function () { if (!E.performMove({ t: 'buy', i: UI.shopSel })) toast(g.gold < sx.p ? 'Not enough gold' : 'No room'); else UI.shopSel = -1; render(); }); bb.id = 'buy';
+      dt.appendChild(bb); s.insertBefore(dt, it);
+    } else s.insertBefore(h('div', 'sub', 'Tap an item to see what it does.'), it); s.appendChild(on(h('button', 'btn', 'Leave'), function () { UI.shopSel = -1; E.performMove({ t: 'leave' }); render(); }));
     app.appendChild(topbar()); app.appendChild(s);
   }
   function event() {
