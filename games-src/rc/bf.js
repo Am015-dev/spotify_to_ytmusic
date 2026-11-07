@@ -234,4 +234,4 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   BF.ghostPlace()};
 })();
 
-;document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#musbtn,#speedbtn,.gxh-set button');if(t){t.toggleAttribute('data-p');setTimeout(()=>t.removeAttribute('data-p'),900)}},true);
+;document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#musbtn,#speedbtn,.gxh-set button');if(t&&!t.querySelector('.tapf')){const f=document.createElement('i');f.className='tapf';f.setAttribute('aria-hidden','true');t.appendChild(f);setTimeout(()=>f.remove(),700)}},true);
