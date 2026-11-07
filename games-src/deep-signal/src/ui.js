@@ -118,7 +118,7 @@ function onHandTap(c, e) {
   
   if (UI.sigMode) { if (commPos(G, ME, c) && tutOk({ type: 'tap', what: 'signal', id: c })) { performMove(G, { t: 'comm', c: c }, ME); UI.sigMode = false; sfx('ping'); popAt(handCardEl(c), '📡 Signal sent'); pingFx(handCardEl(c)); render(); } else zoomCard(c); return; }
   if (UI.flareMode) { if (c[0] !== 'r') doFlare(c); else zoomCard(c); return; }
-  if (askPending()) { nudge(); return; }
+  if (askPending()) { nudge(); zoomCard(c); return; }
   if (G.phase === 'play' && sideToAct(G) === ME && legalCards(G, G.turn).indexOf(c) >= 0) { if (UI.tut && UI.tut.only && c !== UI.tut.only || !tutOk({ type: 'tap', what: 'card', id: c })) { nudge(); popAt(handCardEl(c), UI.tut && UI.tut.only ? 'Tap the glowing ' + cardName(UI.tut.only) : 'Not yet'); sfx('tap'); return; } apply({ t: 'play', c: c }, ME); return; }
   zoomCard(c);
 }
@@ -217,9 +217,10 @@ function slot(p, W, cx, cy, cw, ch, k) {
 function drawHand() {
   var hd = $('#hand'); hd.innerHTML = ''; var droneMine = G.dummy >= 0 && G.turn === G.dummy && G.ctrl[G.dummy] === ME && G.phase === 'play';
   var who = droneMine ? G.dummy : ME, h = G.hands[who], s = sideToAct(G); hd.classList.toggle('drone', droneMine);
+  hd.onclick = function (ev) { if (ev.target === hd) nudge(); };
   var W = hd.clientWidth || 360, cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 58, n = h.length;
-  var fit = function (m) { return m > 1 ? Math.min(cw + 6, (W - cw - 8) / (m - 1)) : 0; }, rows = n > 1 && fit(n) < 46 ? 2 : 1, per = Math.ceil(n / rows), rowOff = Math.round(cw * 0.9);
-  var y0 = droneMine ? 14 : 8; hd.style.height = (y0 + 6 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ch')) + (rows - 1) * rowOff) + 'px'; hd.classList.toggle('two', rows > 1);
+  var fit = function (m) { return m > 1 ? Math.min(cw + 6, (W - cw - 8) / (m - 1)) : 0; }, rows = n > 1 && fit(n) < 46 || UI.twoG === G && n > 1 ? 2 : 1, per = Math.ceil(n / rows), rowOff = Math.round(cw * 0.9);
+  var y0 = droneMine ? 14 : 8; hd.style.height = (y0 + 6 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ch')) + (rows - 1) * rowOff) + 'px'; hd.classList.toggle('two', rows > 1); if (rows > 1 && !droneMine) UI.twoG = G;   // stays two rows for the mission: the hand never jumps
   var legal = G.phase === 'play' && s === ME && !UI.hold && !UI.sigMode && !UI.flareMode && !askPending() ? legalCards(G, G.turn) : [];
   if (UI.tut && UI.tut.only && legal.indexOf(UI.tut.only) >= 0) legal = [UI.tut.only];
   h.forEach(function (c, i) {
@@ -229,7 +230,7 @@ function drawHand() {
     if (UI.sigMode && commPos(G, ME, c)) e.classList.add('sigok');
     if (UI.flareMode && c[0] !== 'r') e.classList.add('sigok');
     var tk = taskOfCard(c); if (tk && !tk.done) { e.classList.add('task'); e.appendChild(mk('span', 'own', tk.owner === ME && !UI.hot ? 'yours' : 'for ' + nm(tk.owner))); }
-    e.setAttribute('role', 'button'); e.addEventListener('click', function (ev) { if (e._held) { e._held = false; return; } onHandTap(c, ev); }); holdZoom(e, function () { zoomCard(c); });
+    e.setAttribute('role', 'button'); e.addEventListener('click', function (ev) { if (e._held) { e._held = false; return; } e.setAttribute('data-tap', '1'); onHandTap(c, ev); }); holdZoom(e, function () { zoomCard(c); });
     hd.appendChild(e);
   });
 }
@@ -336,11 +337,11 @@ function suggest() {
 function rp(cards, extra) { return '<div class="rpic">' + cards.map(function (c) { return typeof c === 'string' && /^[ckta r]\d/.test(c) ? miniEl(c).outerHTML : c; }).join('') + (extra || '') + '</div>'; }
 function rlab(t) { return '<span class="lab">' + t + '</span>'; }
 var RULES = [
-  { phase: ['lead', 'follow', 'draft'], title: 'The goal', text: 'Every task card must be won by its owner: they win the trick that holds it. Then the mission is complete.', pic: function () { return rp([miniEl('c7', tokHtml('1')).outerHTML, rlab('→ won by its owner = ✓')]); } },
+  { phase: ['lead', 'follow', 'draft'], title: 'The goal', text: 'Every task card must be won by its owner: they win the trick that holds it. Then the mission is complete.', pic: function () { return rp(['c7', rlab('task: its owner must win it')]); } },
   { phase: ['follow', 'lead'], title: 'Follow suit', text: 'The leader plays any card. Others must play the same colour if they can. Highest of that colour wins. No card of that colour? Play any card.', pic: function () { return rp(['c4', 'c9', 'c2', rlab('Coral 9 wins')]); } },
   { phase: ['follow', 'lead'], title: 'Sonar cards', text: 'Sonar 1-4 beat every colour. The captain holds Sonar 4 and leads the first trick.', pic: function () { return rp(['a9', 'r1', rlab('Sonar 1 beats Amber 9')]); } },
   { phase: 'draft', title: 'Taking tasks', text: 'Before play, starting with the captain, each diver takes one task card in turn until none are left. Take tasks your hand can win: high cards and sonars.', pic: function () { return rp([miniEl('k8').outerHTML, rlab('tap a task card to take it')]); } },
-  { phase: 'draft', title: 'Order marks', text: '1-5: those tasks must be done in that exact order. Arrows (>, >>, >>>): in arrow order. Ω: the very last task. Unmarked tasks can come any time.', pic: function () { return rp([miniEl('t5', tokHtml('1')).outerHTML, miniEl('a3', tokHtml('2')).outerHTML, miniEl('k6', tokHtml('O')).outerHTML, rlab('1st, 2nd, last')]); } },
+  { phase: 'draft', title: 'Order marks', text: '1-5: those tasks must be done in that exact order. Arrows (>, >>, >>>): in arrow order. Ω: the very last task. Unmarked tasks can come any time.', pic: function () { return rp(['<span class="tag">1</span>', '<span class="tag">2</span>', '<span class="tag">Ω</span>', rlab('first, second, last')]); } },
   { phase: 'lead', title: 'Signals', text: 'Once per mission, before a trick, show one colour card to the crew and say if it is your ▲ highest, ● only or ▼ lowest of that colour. Sonars cannot be signalled.', pic: function () { return rp(['<span class="tag">▲ highest</span>', '<span class="tag">● only</span>', '<span class="tag">▼ lowest</span>']); } },
   { phase: 'lead', title: 'Flare', text: 'Before the first trick the crew may send one flare: everyone passes one colour card left or right. It costs the No flare star.', pic: function () { return rp([rlab('🔥 flare'), miniEl('t2').outerHTML, rlab('→ next diver')]); } },
   { phase: 'follow', title: 'Winning the trick', text: 'The winner leads the next trick. A task card won by the wrong diver, or out of order, ends the mission.', pic: function () { return rp(['k3', 'k9', rlab('Kelp 9 wins, leads next')]); } },
