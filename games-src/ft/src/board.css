@@ -227,5 +227,5 @@ html.land .mcard:not(.empty){justify-content:flex-start;gap:6px;padding:0 6px}ht
 @media (min-width:1024px){.mcard .mn{font-size:16px}}
 .coach,.ce-box{box-sizing:border-box}
 /* W408b: audit A on desktop (16px minimum) and C (art keeps its aspect) */
-@media (min-width:1024px){.mbox .lede,.mbox .seg button,.exs .chk b,.seatrow b,.seatrow .btn,.acts .btn b,.acts .btn span,#seats .sch .ss,.gxc-lab,.gxc-ib,.gxc-act b,.gxc-act small{font-size:16px!important}}
+@media (min-width:1024px){.mbox .lede,.mbox .seg button,.exs .chk b,.seatrow b,.seatrow .btn,.acts .btn b,.acts .btn span,.mbox .acts .btn,.exd summary b,#seats .sch .ss,.gxc-lab,.gxc-ib,.gxc-act b,.gxc-act small{font-size:16px!important}}
 .gxc-path{background-size:cover!important}
