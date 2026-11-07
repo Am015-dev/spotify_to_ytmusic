@@ -102,7 +102,7 @@ function renderDock(L, q, me, actor) {
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = 1; });
   $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q })).join('') : '<span class="sm">No cards left in your hand.</span>';
   const ps = L.find(m => m.t === 'pass');
-  $('#acts').innerHTML = (mine && !q && ps ? mvBtn(ps, 'Pass (end my round)', 'alt') : '') + (over ? '<button type="button" class="btn go" data-a="showres">See the result</button>' : '') + (UI.coachFree && !over ? '<button type="button" class="btn alt" data-a="tutleave">Leave tutorial</button>' : '');
+  $('#acts').innerHTML = (mine && !q && ps ? mvBtn(ps, 'Pass (end my round)', 'alt') : '') + (over ? '<button type="button" class="btn go" data-a="showres">See the result</button>' : '') + (UI.coachFree && UI.mode === 'tutorial' && !over ? '<button type="button" class="btn alt" data-a="tutleave">Leave tutorial</button>' : '');
   // guardians and idols you hold (free actions)
   let ex = '';
   me.guards.forEach((g, k) => { ex += `<button type="button" class="tag" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}">${ic('guard', 'guardian')}<span>${g.used ? 'used' : 'Boon'}</span></button>`; });
