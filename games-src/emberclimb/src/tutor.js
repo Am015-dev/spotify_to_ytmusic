@@ -26,7 +26,7 @@
       { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'That hit is coming. Tap Plate Guard twice to gain Block, which absorbs damage this turn.', wait: tap('w-defend'), ready: battleP },
       { id: 'end', title: 'End your turn', target: function () { var b = document.getElementById('end'); if (b) b.disabled = false; return b; }, say: 'Out of energy? End your turn. The enemy acts and your Block takes the hit.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
       { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Vulnerable enemies take 50% more damage. Tap Cinder Strike twice to finish it.', wait: tap('w-strike'), ready: function () { return battleP() && g().b.turn >= 2 && cardEl('w-strike'); } },
-      { id: 'reward', title: 'Pick a reward', target: function () { return document.querySelector('.picks'); }, say: 'Each win lets you add one card to your deck. Tap a card you like. A sharper deck climbs higher.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: function () { return g().scr === 'reward' && document.querySelector('.picks .card'); } }
+      { id: 'reward', title: 'Pick a reward', target: function () { return document.querySelector('.picks .card'); }, say: 'Each win lets you add one card to your deck. Tap a card you like. A sharper deck climbs higher.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: function () { return g().scr === 'reward' && document.querySelector('.picks .card'); } }
     ];
   }
   function finish(play, done) {

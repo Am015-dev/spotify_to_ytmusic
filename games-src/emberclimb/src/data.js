@@ -145,6 +145,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'thorn-brute': { name: 'Thorn Brute', hp: [80, 86], pat: [{ str: 2 }, { atk: 14 }, { atk: 8, vuln: 2 }], onSkill: 2, elite: 1, art: 'bark-skinned hulking brute with thorns and a horned skull' },
     'sleeper-statue': { name: 'Sleeper Statue', hp: [78, 84], sleep: 3, pat: [{ atk: 16 }, { atk: 16 }, { weak: 2, vuln: 1 }], elite: 1, art: 'mossy stone statue of a seated giant with one eye opening' },
     'iron-warden': { name: 'Iron Warden', hp: [36, 40], pat: [{ atk: 9 }, { add: ['dazed', 2] }, { atk: 6, blk: 6 }], elite: 1, art: 'tall slim iron sentry with a lantern head' },
+    'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], boss: 1, img: 'iron-warden', art: 'iron sentry captain in spiked plate with a lantern helm' },
     'mire-behemoth': { name: 'Mire Behemoth', hp: [132, 140], pat: [{ atk: 9, add: ['slimed', 2] }, { blk: 12, str: 2 }, { atk: 22 }, { atk: 7, hits: 2 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
     'ashen-wraith': { name: 'Ashen Wraith', hp: [124, 130], pat: [{ add: ['burn', 1], atk: 6 }, { atk: 5, hits: 2 }, { blk: 10, str: 2 }, { atk: 6, hits: 3 }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
     'gate-colossus': { name: 'Gate Colossus', hp: [138, 146], pat: [{ atk: 9, hits: 2 }, { blk: 16 }, { atk: 24, vuln: 2 }, { str: 3, blk: 8 }], boss: 1, art: 'colossal armoured stone guardian shaped like a castle gate' }

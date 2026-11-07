@@ -148,8 +148,10 @@
     if (h.stance === 'w') d *= 2; if (st(h, 'weak') > 0) d = Math.floor(d * 0.75);
     return d;
   }
+  var SPK_CARD = null;
   function hitEnemy(h, e, base, card) {
     if (e.dead) return;
+    if (e.spk > 0 && card && card.type === 'A' && SPK_CARD !== card) { SPK_CARD = card; fx('hitme', 'h' + G.hs.indexOf(h), e.spk, 'spikes'); hurtHero(h, e.spk); if (G.scr !== 'battle' || h.dead) return; }
     var d = dmgNum(h, base, card); if (st(e, 'vuln') > 0) d = Math.floor(d * 1.5); d = Math.max(0, d);
     var a = Math.min(e.blk, d); e.blk -= a; var real = d - a;
     fx('dmg', 'e' + G.b.en.indexOf(e), d, a > 0 && real === 0 ? 'blocked' : (st(h, 'str') > 0 ? 'str' : ''));
@@ -220,7 +222,7 @@
   // ---------- battle flow
   function mkEnemy(id) {
     var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); if (G.hs.length > 1) hp = Math.round(hp * 2); if (G.ehp && G.ehp !== 100) hp = Math.round(hp * G.ehp / 100);
-    return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0 };
+    return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0, spk: 0 };
   }
   function plan(e) {
     var d = D.ENEMIES[e.id], step;
@@ -307,6 +309,7 @@
     var hs = aliveHs(), h = G.hs[it.tg]; if (!h || h.dead) h = hs[0]; if (!h) return;
     var ei = 'e' + G.b.en.indexOf(e); G.lastHit = e.id;
     fx('act', ei, 0, it.atk ? 'atk' : 'cast', G.hs.indexOf(h));
+    e.spk = 0; if (it.spikes) { e.spk = it.spikes; fx('buff', ei, it.spikes, 'spikes'); }
     if (it.str) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }
     if (it.blk) { e.blk += it.blk; fx('blk', ei, it.blk); }
     if (it.weak) addSt(h, 'weak', it.weak); if (it.vuln) addSt(h, 'vuln', it.vuln); if (it.frail) addSt(h, 'frail', it.frail);

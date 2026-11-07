@@ -1,7 +1,7 @@
 // Story chapter run options (shared by the game and the balance check): node camp-cfg.js [runs=100]
 const CH = [
   null,
-  { heroes: ['w'], floors: 2, boss: 'iron-warden', relic: 'iron-bangle' },
+  { heroes: ['w'], floors: 2, boss: 'warden-captain', relic: 'iron-bangle' },
   { heroes: ['s'], floors: 3, boss: 'thorn-brute', relic: 'bag-of-marbles' },
   { heroes: ['a'], floors: 4, boss: 'sleeper-statue', relic: 'candle-stub' },
   { heroes: ['m'], floors: 5, boss: 'sleeper-statue', relic: 'lantern', hpPct: 110 },

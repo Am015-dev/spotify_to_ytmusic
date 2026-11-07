@@ -42,12 +42,12 @@
     q.forEach(function (f) {
       var el = document.querySelector('[data-w="' + f.w + '"]');
       switch (f.k) {
-        case 'dmg': fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hit'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : String(f.n), 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
-        case 'hitme': if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hurt'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n, 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
+        case 'dmg': fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hit'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n + (f.x === 'poison' ? ' poison' : UI.lastName ? ' ' + UI.lastName : ''), 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
+        case 'hitme': if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hurt'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n + (f.x === 'spikes' ? ' spikes' : f.x === 'burn' ? ' burn' : ''), 'dmg'); if (f.x === 'spikes') toast('Spikes! Attacking it cost you ' + f.n + ' HP'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
         case 'hp': break;
         case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); popAt(f.w, '+' + f.n + ' Blk', 'blk'); break;
         case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); popAt(f.w, '+' + f.n, 'heal'); break;
-        case 'buff': if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX('buff'); popAt(f.w, f.x === 'str' ? '+' + f.n + ' Str' : f.x === 'nrg' ? '+' + f.n + ' Energy' : 'Power!', 'buf'); break;
+        case 'buff': if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX('buff'); popAt(f.w, f.x === 'str' ? '+' + f.n + ' Strength' : f.x === 'spikes' ? 'Spikes ' + f.n : f.x === 'nrg' ? '+' + f.n + ' Energy' : 'Power!', 'buf'); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
         case 'die': if (window.ANIM) { var d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
         case 'act': if (f.x === 'atk' && el && window.ANIM) { el.classList.add('lunge'); setTimeout(function () { el.classList.remove('lunge'); }, 480); } break;
@@ -81,7 +81,7 @@
   function cardEl(c, o) {
     o = o || {}; var e = E.eff(c), d = D.CARDS[c.id];
     var el = h('div', 'card t-' + e.type + (d.rar === 'r' ? ' rare' : d.rar === 'u' ? ' unc' : ''));
-    var art = h('div', 'cart'); art.appendChild(A(c.id, '', { ph: TONE[d.hero] })); art.appendChild(A('frame-' + ({ A: 'attack', S: 'skill', P: 'power', X: 'status' })[e.type], '', { cls: 'cfr', noph: 1 }));
+    var art = h('div', 'cart'), ca = A(c.id, '', { ph: TONE[d.hero] }), cph = ca.querySelector('.ph'); if (cph) { cph.textContent = ''; cph.appendChild(svgIc(({ A: 'atk', S: 'blk', P: 'str', X: 'unk' })[e.type] || 'unk')); } art.appendChild(ca);
     var ct = h('div', 'ct', e.name); art.appendChild(h('span', 'cty', ({ A: 'Attack', S: 'Skill', P: 'Power', X: 'Status' })[e.type] || ''));
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
@@ -180,8 +180,13 @@
     var txt = '', ttl = 'Your move';
     if (g.scr === 'map') { txt = 'Pick a glowing room.'; ttl = 'Climb'; }
     else if (g.scr === 'battle') {
-      var b = g.b; ttl = 'Fight'; if (b.ph !== 'p') txt = 'Enemies act...';
-      else if (UI.sel >= 0 && needTarget()) txt = 'Tap an enemy to hit it.'; else if (UI.sel >= 0) txt = 'Tap the lifted card again to play it.'; else txt = 'Tap a card to lift it. Out of energy? End turn.';
+      var b = g.b, ch = g.hs[b.cur >= 0 ? b.cur : 0]; ttl = b.ph === 'p' ? 'Your turn' : 'Enemy turn';
+      var anyOk = b.ph === 'p' && ch.hand.some(function (c) { return E.canPlay(ch, c) && (E.cost(ch, c) <= ch.en || E.eff(c).cost === 'X'); });
+      if (b.ph !== 'p') txt = UI.cap || 'The enemy is acting. Tap to speed up.';
+      else if (UI.sel >= 0 && needTarget()) txt = 'Now tap the glowing enemy to play ' + E.eff(ch.hand[UI.sel]).name + '.';
+      else if (UI.sel >= 0) txt = 'Tap ' + E.eff(ch.hand[UI.sel]).name + ' again to play it.';
+      else if (anyOk) txt = 'Tap a glowing card to pick it. You have ' + ch.en + ' energy.';
+      else txt = 'No more cards you can play. Tap End turn.';
       if (b.ph === 'p' && UI.endBtn) a.appendChild(UI.endBtn);
     }
     else if (g.scr === 'reward') { txt = 'Pick a card to add, or skip.'; ttl = 'Reward'; }
@@ -232,22 +237,24 @@
   var CARDK = { burn: 'burn', slimed: 'slime', dazed: 'daze' };
   function intentParts(e) {
     var it = e.intent, g = G(), P = []; if (!it) return [{ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: this enemy has not shown its next move.' }];
-    if (it.sleep) return [{ k: 'sleep', s: 'intent-sleep', t: 'zzz', say: 'Asleep: it does nothing for ' + e.asleep + ' more turn' + (e.asleep === 1 ? '' : 's') + ' unless you hurt it.' }];
+    if (it.sleep) return [{ k: 'sleep', s: 'intent-sleep', t: 'Asleep', cap: 'sleeps', say: 'Asleep: it does nothing for ' + e.asleep + ' more turn' + (e.asleep === 1 ? '' : 's') + ' unless you hurt it.' }];
     if (it.atk) {
       var h0 = g.hs[it.tg] || g.hs[0], d = it.atk + (e.st.str || 0); if (e.st.weak > 0) d = Math.floor(d * 0.75); if (h0.st.vuln > 0) d = Math.floor(d * 1.5); if (h0.stance === 'w') d *= 2; d = Math.max(0, d);
       var n = it.hits || 1, t = n > 1 ? d + 'x' + n : String(d); if (g.hs.length > 1) t += ' → ' + D.H[h0.k].name.split(' ')[0];
-      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: t, say: 'Attack: hits ' + (n > 1 ? n + ' times for ' + d + ' each' : 'for ' + d) + ' damage (Block soaks it first).' });
+      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: 'attacks for ' + (n > 1 ? d + ' x ' + n : d), say: 'Attack: hits ' + (n > 1 ? n + ' times for ' + d + ' each' : 'for ' + d) + ' damage (Block soaks it first).' });
     }
-    if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: String(it.blk), say: 'Block: it gains ' + it.blk + ' Block, so your attacks do less.' });
-    if (it.str) P.push({ k: 'str', s: 'intent-buff', t: '+' + it.str, say: 'Buff: it gains ' + it.str + ' Strength, so every later attack hits harder.' });
-    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: String(it.weak), say: 'Weak: your attacks deal 25% less for ' + it.weak + ' turns.' });
-    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: String(it.vuln), say: 'Vulnerable: you take 50% more attack damage for ' + it.vuln + ' turns.' });
-    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: String(it.frail), say: 'Frail: your Block is 25% weaker for ' + it.frail + ' turns.' });
-    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: String(it.poison), say: 'Poison: you lose ' + it.poison + ' HP at the start of each turn, falling by 1 each time.' });
-    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1], say: 'Junk: adds ' + it.add[1] + ' ' + cn + ' to your discard pile. It clogs your deck.' }); }
+    if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + it.blk, cap: 'raises ' + it.blk + ' Block', say: 'Block: it gains ' + it.blk + ' Block, so your attacks do less.' });
+    if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: it gains ' + it.str + ' Strength, so every later attack hits harder.' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: your attacks deal 25% less for ' + it.weak + ' turns.' });
+    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take 50% more attack damage for ' + it.vuln + ' turns.' });
+    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker for ' + it.frail + ' turns.' });
+    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: you lose ' + it.poison + ' HP at the start of each turn, falling by 1 each time.' });
+    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your deck', say: 'Junk: adds ' + it.add[1] + ' ' + cn + ' to your discard pile. It clogs your deck.' }); }
+    if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: until its next move, every attack card you play on it hurts you for ' + it.spikes + '. Use skills or block that turn.' });
     if (!P.length) P.push({ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: it is up to something. Watch out.' });
     return P;
   }
+  UI.intentParts = intentParts;
   function intentBox(e) {
     var P = intentParts(e), main = P[0].k, cls = main === 'atk' ? 'atk' : main === 'blk' ? 'def' : (main === 'str' || main === 'sleep' || main === 'unk') ? 'buf' : 'deb';
     var b = h('button', 'intent ' + cls); b.type = 'button'; b.setAttribute('aria-label', 'Enemy intent: ' + P.map(function (p) { return p.say; }).join(' '));
@@ -263,7 +270,7 @@
     t.addEventListener('click', function () { t.remove(); }); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) t.remove(); }, 9000);
   };
   function stChips(o) {
-    var w = h('div', 'stc'); [['str', 'Str'], ['vuln', 'Vuln'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { if (o.st[p[0]]) w.appendChild(h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + o.st[p[0]])])); });
+    var w = h('div', 'stc'); [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { if (o.st[p[0]]) w.appendChild(h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + o.st[p[0]])])); });
     return w;
   }
   function needTarget() { var g = G(), h0 = g.hs[g.b.cur], c = h0.hand[UI.sel]; return c && E.eff(c).tgt; }
@@ -277,7 +284,8 @@
       var x = h('div', 'en' + (e.dead ? ' dead' : '') + (tgtMode && !e.dead ? ' glow' : ''));
       x.setAttribute('data-w', 'e' + i);
       if (!e.dead) x.appendChild(intentBox(e));
-      x.appendChild(A('enemy-' + e.id, d.name, { ph: '#6a3a2a' }));
+      x.appendChild(A('enemy-' + (d.img || e.id), d.name, { ph: '#6a3a2a' })); if (e.spk) x.appendChild(h('div', 'spkchip', 'Spikes ' + e.spk));
+      if (b.ph === 'e' && UI.actor === i) x.classList.add('acting');
       if (e.blk) x.appendChild(h('div', 'blkchip', '🛡' + e.blk));
       x.appendChild(h('div', 'nm', d.name));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
@@ -298,13 +306,13 @@
       var pw = Object.keys(hh.pw); if (pw.length) inf.appendChild(h('div', 'stc', null, pw.map(function (k) { return h('span', '', k + ' ' + hh.pw[k]); })));
       p.appendChild(inf); mid.appendChild(p);
     });
-    var en0 = h('div', 'energy', null, [A('icon-energy', '', { noph: 1 }), h('span', '', String(b.ph === 'p' ? cur.en : 0))]); en0.setAttribute('aria-label', 'Energy'); mid.appendChild(en0);
+    var en0 = h('div', 'energy', null, [A('icon-energy', '', { noph: 1 }), h('span', '', String(b.ph === 'p' ? cur.en : 0)), h('em', 'enl', 'Energy')]); en0.setAttribute('aria-label', 'Energy'); mid.appendChild(en0);
     st.appendChild(mid);
     // controls row (piles left, end turn right), then the hand
     var anyOk0 = (b.ph === 'p' ? cur.hand : []).some(function (c) { return E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'); });
     var ctl = h('div', 'ctl');
     if (b.ph === 'p') {
-      ctl.appendChild(h('div', 'piles', null, [on(h('button', 'chip', '↓ ' + cur.draw.length, [A('card-back', '', { noph: 1, cls: 'cbk' })]), function () { UI.ov = 'draw'; render(); }), on(h('button', 'chip', '↺ ' + cur.disc.length), function () { UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
+      ctl.appendChild(h('div', 'piles', null, [on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { UI.ov = 'draw'; render(); }), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
       var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; try { if (window.GXT && GXT.active()) eb.disabled = true; } catch (e) { }
     }
     st.appendChild(ctl);
@@ -314,11 +322,12 @@
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), el = cardEl(c); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
       el.setAttribute('data-c', i); holdPeek(el, c); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
     });
+    if (UI.sel >= 0) hand.classList.add('hassel');
     st.appendChild(hand);
     app.appendChild(st);
     var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }
   }
-  function beginBattleUI() { UI.sel = -1; render(); }
+  function beginBattleUI() { UI.sel = -1; render(); banner('Your turn', 'you'); }
   function flyCard(ci, ti, done) {
     var cel = document.querySelector('.hand [data-c="' + ci + '"]'), tel = ti != null ? document.querySelector('[data-w="e' + ti + '"]') : document.querySelector('.mid');
     if (!window.ANIM || !cel || !tel || !cel.animate) return done();
@@ -339,7 +348,7 @@
   function onEnemy(i) { var g = G(); if (g.b.ph === 'p' && UI.sel >= 0 && needTarget()) playIt(UI.sel, i); }
   function playIt(ci, ti) {
     var g = G(), mv = { t: 'play', h: g.b.cur, c: ci }; if (ti != null) mv.e = ti;
-    SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
+    UI.lastName = E.eff(g.hs[g.b.cur].hand[ci]).name; SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
       UI.busy = false; UI.sel = -1; E.performMove(mv); render(); afterMove();
     });
   }
@@ -356,14 +365,33 @@
     E.performMove({ t: 'end' }); render();
     if (G().scr === 'battle' && G().b.ph === 'e') enemyPhase(); else render();
   }
+  // big centre banner: whose turn it is (tap anywhere to dismiss early)
+  function banner(txt, cls) {
+    var o = document.querySelector('.turnban'); if (o) o.remove(); if (!window.ANIM) return;
+    var d = h('div', 'turnban ' + (cls || ''), null, [h('b', '', txt)]); d.setAttribute('role', 'status'); document.body.appendChild(d);
+    setTimeout(function () { if (d.parentNode) d.remove(); }, UI.fast ? 450 : 1000);
+  }
+  UI.banner = banner;
+  // enemy turn, one thing at a time: banner, then for each enemy: it glows + caption of what it does (wait), it acts (animation + pops), result caption (wait). Tap anywhere to speed up.
+  function wt(ms) { return UI.fast ? Math.round(ms / 3) : ms; }
   function enemyPhase() {
     if (!window.ANIM) { E.settle(); render(); return; }
-    UI.busy = true;
+    UI.busy = true; UI.fast = false; UI.cap = ''; UI.actor = -1;
+    var spd = function () { UI.fast = true; }; document.addEventListener('pointerdown', spd, true);
+    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') banner('Your turn', 'you'); };
+    banner('Enemy turn', 'foe'); UI.cap = 'Enemy turn: watch what each enemy does.'; render();
     (function loop() {
-      var g = G(); if (!g || g.scr !== 'battle' || !g.b || g.b.ph !== 'e') { UI.busy = false; render(); return; }
-      var more = E.step(); render();
-      if (!more && G().scr === 'battle' && G().b.ph === 'e') { }
-      setTimeout(loop, window.AIDELAY);
+      var g = G(); if (!g || g.scr !== 'battle' || !g.b || g.b.ph !== 'e') return done();
+      var ei = g.b.ei, e = g.b.en[ei];
+      if (!e || e.dead) { E.step(); return setTimeout(loop, 30); }
+      var nm = D.ENEMIES[e.id].name, P = intentParts(e), hh = g.hs[(e.intent && e.intent.tg) || 0] || g.hs[0], hp0 = hh.hp, bk0 = hh.blk;
+      UI.actor = ei; UI.cap = nm + ' ' + P.map(function (p) { return p.cap || p.t; }).join(' and ') + '.'; render();
+      setTimeout(function () {
+        E.step(); var g2 = G(); render();
+        var lost = hp0 - hh.hp, soak = Math.max(0, Math.min(bk0, bk0 - hh.blk));
+        if (g2.scr === 'battle' && (lost > 0 || soak > 0)) { UI.cap = (lost > 0 ? 'You lost ' + lost + ' HP' : 'No damage') + (soak > 0 ? ' (' + soak + ' blocked by your Block).' : '.'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = UI.cap; }
+        setTimeout(loop, wt(lost > 0 || soak > 0 ? 900 : 500));
+      }, wt(800));
     })();
   }
   // ---------- other screens

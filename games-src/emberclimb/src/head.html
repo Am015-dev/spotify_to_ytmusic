@@ -250,4 +250,22 @@ html body .hand .card.sel{transform:translate(var(--sx,0px),calc(var(--cw)*-1.7)
   .pcinfo .rl .art{width:40px;height:40px;flex:none;border-radius:10px}
   .pcinfo .rl span b{display:block;color:inherit}
 }
+
+/* W383 playable: turn banner, acting enemy, energy label, readable intents and chips, selection dims the rest */
+.turnban{position:fixed;left:0;right:0;top:34%;z-index:90;display:flex;justify-content:center;pointer-events:none;animation:banin .3s ease-out}
+.turnban b{font:700 clamp(26px,7vw,44px)/1.1 Cinzel,serif;color:#fff;padding:12px 34px;border-radius:14px;background:rgba(20,10,4,.92);border:2px solid #f2872b;box-shadow:0 8px 30px #000a;letter-spacing:.04em}
+.turnban.foe b{border-color:#ff6a55;color:#ffd9d2}.turnban.you b{border-color:#7dff9a;color:#e6ffe9}
+@keyframes banin{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.turnban{animation:none}}
+.en.acting{filter:drop-shadow(0 0 14px #ff6a55);transform:scale(1.04);transition:transform .25s}
+.spkchip{position:absolute;top:30%;left:-6px;background:#5a1d14;color:#ffe2dc;border:1px solid #ff8b7a;border-radius:8px;padding:1px 6px;font-size:14px;font-weight:700;z-index:3}
+.energy .enl{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font:700 13px/1 'Alegreya Sans',sans-serif;font-style:normal;color:#ffe9a0;background:rgba(20,10,4,.85);padding:2px 5px;border-radius:6px;white-space:nowrap;z-index:2}
+.intent{font-size:15px!important;white-space:nowrap;padding:3px 10px}
+.en .nm{color:#fff!important;font-size:15px!important;font-weight:700;background:rgba(0,0,0,.55);border-radius:6px;padding:0 6px}
+.stc span{font-size:14px!important}
+.hand.hassel .card:not(.sel){opacity:.45;filter:grayscale(.5)}
+.hand .card.no{filter:grayscale(1) brightness(.55)!important;opacity:.7}
+.cart .ph .ico{width:46%;height:46%;margin:auto;color:#fff8;display:block}
+.cart .art:not(.has) .ph{display:flex;align-items:center;justify-content:center}
+.gxh-rx{white-space:pre-line;text-align:left}
 </style></head>
