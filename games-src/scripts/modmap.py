@@ -41,6 +41,7 @@ GAMES = {
     "thornbound":       ("Thornbound",       "thornbound/game",     "thornbound"),
     "tidewake":         ("Tidewake",         "tidewake/game",       "tidewake"),
     "twin-thrones":     ("Twin Thrones",     "twin-thrones",        "twin-thrones"),
+    "vale-of-banners":  ("Vale of Banners",  "vale-of-banners",     "vale-of-banners"),
     "wildmark":         ("Wildmark",         "wildmark",            "wildmark"),
     "vinegrave":        ("Vinegrave",        "vinegrave",           "vinegrave"),
     "mainhattan-nightrun": ("Mainhattan Nightrun", "nightrun/parts", "nightrun"),

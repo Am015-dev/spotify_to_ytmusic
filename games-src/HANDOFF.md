@@ -90,3 +90,7 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Source map (which published game + rulebook each shelf game adapts) is kept PRIVATELY in the owner's Google Drive doc
   "Game Night Shelf - private source map" (id 1Dbj_snxeJzQe1jWMjxpRqW_-FBCp-Zl3lWRViIfDTgY). Never copy names into the repo;
   the orchestrator passes titles + rulebook URLs to workers in their prompts only.
+- 21:18 UTC owner: "More workers then" -> worker cap lifted for this round: 26 sessions. Every one of the 23 board games (Deep Signal dropped)
+  has a worker on games-src/BRIEF-PLAYABLE.md (+ADDENDUM 1-3): W376 W378-W381 W383 (new, Opus), W386-W390 W392-W403 (old, Sonnet);
+  W391 rules engine fixes for 9 games; W377 QA bot; W385 free CC0 art kit. Integrate only what passes qa-bot + rules + screenshot review.
+- Owner (7 Nov 21:25): "Less talking, more work. I have ADHD." Reports to the owner: max 3 short lines, results + links only.

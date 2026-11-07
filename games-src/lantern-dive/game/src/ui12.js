@@ -14,8 +14,9 @@
 //   [x] You are never forced to win a trick ................................................................ lead2
 //   [x] No card of the led colour: play anything; Lanterns are trumps and beat every colour ............. trump, win4
 //   [x] The dive ends the moment every job is done; cards left in hand do not matter ..................... won
+//   [x] The Last button (look at the previous trick) ............................................................ last, lastx
 //   [-] Not taught here (the lightbulb and the Rules drawer cover them): job-sharing dives, murky water, deep narcosis,
-//       the clock, predictions, the drone for two divers, the Last trick button.
+//       the clock, predictions, the drone for two divers. See TUTORIAL-COVERAGE.md.
 // The staged game: seat 0 = you (Commander, Lantern 4), seat 1 = Dag, seat 2 = Sumi. Jobs: you "Win the Lantern 3", Dag "Win the first trick" (data.js tutorial).
 // Attempt 1 ends on trick 1 on purpose: the player leads the Coral 9, wins, and breaks Dag's job. Attempt 2 (same deal, taken for you) is won in three tricks.
 const TUT_GAME = 'lantern-dive';
@@ -115,43 +116,47 @@ const cn2 = c => D.cardName(c);
 function lastTrickLine() { const k = G.tricks[G.tricks.length - 1]; return k; }
 function tutSteps() {
   return [
-    { id: 'goal', title: 'One crew', say: 'You, Dag and Sumi win or lose together. Each job card is a task for one diver.', target: tutBox('#pool .jcard'), wait: null,
+    { id: 'goal', title: 'Saltmere Bay', say: 'Brack here. The bay nets are tangled. You, Dag and Sumi dive as one crew; each job is one diver\'s.', target: tutBox('#pool .jcard'), wait: null,
       ready: () => G && G.phase === 'assign' && G.att === 1 && iMustAct() && !UI.busy && !!document.querySelector('#pool .jcard') },
-    { id: 'cmd', title: 'You are Commander', say: 'You hold Lantern 4, so you are the Commander. The Commander picks a job first.', target: () => tutHandRect(tcard('L4')), wait: null,
+    { id: 'cmd', title: 'Commander', say: 'Lantern 4 makes you Commander. Brack: "Captain\'s privilege. You pick first."', target: () => tutHandRect(tcard('L4')), wait: null,
       ready: () => G && G.phase === 'assign' && !UI.busy && !!tutHandRect(tcard('L4')) },
-    { id: 'take', title: 'Take a job', say: 'Tap the "Lantern 3" job: win that card. You hold Lantern 3 and 4, so it is safe.', target: tq('#pool [data-key="job0"]'),
+    { id: 'take', title: 'Pick a job', say: 'Dag needs the nets cleared. Take the Lantern 3 job: you hold Lantern 3 and 4, so it\'s safe.', target: tq('#pool [data-key="job0"]'),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'take' && a.mv.i === 0 }, ready: () => G && G.phase === 'assign' && iMustAct() && !UI.busy },
-    { id: 'mates', title: 'Dag takes one', say: 'Dag took "The first trick": he must win trick 1. Both jobs must be done to win.', target: tutJobChip(1), wait: null,
+    { id: 'mates', title: 'Dag steps up', say: 'Dag grabs the first-trick job: "Don\'t you dare win it!" Both jobs must be done to win.', target: tutJobChip(1), wait: null,
       ready: () => G && G.phase === 'distress' && G.tasks[1].owner === 1 && !UI.busy && !!tutJobChip(1)() },
-    { id: 'flare', title: 'Distress flare', say: 'Optional: after a lost try, divers can swap cards. Not now: tap No flare.', target: tq('#acts [data-a=dist][data-on=false]'),
+    { id: 'flare', title: 'Flare locker', say: 'The distress flare swaps cards after a lost try. Calm water today, so leave it.', target: tq('#acts [data-a=dist][data-on=false]'),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'dist' && !a.mv.on }, ready: () => G && G.phase === 'distress' && iMustAct() && !UI.busy },
-    { id: 'ping', title: 'No talking!', say: 'Cards stay secret. Your only message is a ping: show one colour card. Tap the ping on Coral 9.', target: tutSpot(tcard('C9')),
+    { id: 'ping', title: 'Radio silence', say: 'No talking about cards down here. One silent ping per dive: show your Coral 9.', target: tutSpot(tcard('C9')),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'ping' && a.mv.c === tcard('C9') }, ready: () => G && G.att === 1 && G.phase === 'signal' && iMustAct() && !UI.busy && !!tutSpot(tcard('C9'))() },
-    { id: 'readping', title: 'Read the pings', say: 'Sumi shows her Kelp 9, her highest Kelp. Everyone pings once per dive, between tricks.', target: tutSeat(2), wait: null,
+    { id: 'readping', title: 'Sumi signals', say: 'Sumi pings her Kelp 9, her highest Kelp. Everyone pings once, between tricks.', target: tutSeat(2), wait: null,
       ready: () => G && G.att === 1 && G.phase === 'play' && !UI.busy && G.pings.some(p => p.seat === 2) && !!tutSeat(2)() },
-    { id: 'lead', title: 'Lead a card', say: 'You lead the first trick. Everyone must follow its colour. Tap your Coral 9.', target: () => tutHandRect(tcard('C9')),
+    { id: 'lead', title: 'First trick', say: 'The Commander leads and everyone must follow its colour. Lead your Coral 9.', target: () => tutHandRect(tcard('C9')),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('C9') }, ready: () => G.att === 1 && myTurnLead() },
-    { id: 'win1', title: 'Highest card wins', say: () => 'Coral was led, so all played Coral. The highest Coral wins: your 9 beats ' + otherVals() + '.', target: tutFelt, wait: null,
+    { id: 'win1', title: 'Highest wins', say: () => 'Coral was led, so the highest Coral takes it: your 9 beats ' + otherVals() + '. Dag stares.', target: tutFelt, wait: null,
       hold: () => true, ready: () => G.att === 1 && trickShown() },
-    { id: 'lost', title: 'A job broke', say: 'Dag needed to win the first trick, but you did. One broken job loses the dive for all.', target: tutJobChip(1), wait: null,
+    { id: 'lost', title: 'Net snags!', say: 'Oh no, Dag needed that trick and you took it. One broken job sinks the dive. Dive again!', target: tutJobChip(1), wait: null,
       onNext: () => nextAttempt(true), ready: () => G && G.phase === 'over' && !G.result.ok && !UI.busy && !UI.fz && !!tutJobChip(1)() },
-    { id: 'ping2', title: 'Tell Dag', say: 'Same cards. This time let Dag win. Ping your lowest Coral, the 2.', target: tutSpot(tcard('C2')),
+    { id: 'ping2', title: 'Second try', say: 'Same cards, new plan. Ping your lowest Coral, the 2: tell Dag the trick is his.', target: tutSpot(tcard('C2')),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'ping' && a.mv.c === tcard('C2') }, ready: () => G && G.att === 2 && G.phase === 'signal' && iMustAct() && !UI.busy && !!tutSpot(tcard('C2'))() },
-    { id: 'lead2', title: 'Lead low', say: 'You never have to win. Lead your Coral 2 and let Dag take the trick.', target: () => tutHandRect(tcard('C2')),
+    { id: 'lead2', title: 'Lead low', say: 'You are never forced to win. Lead Coral 2 and let Dag take it.', target: () => tutHandRect(tcard('C2')),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('C2') }, ready: () => G.att === 2 && G.tricks.length === 0 && myTurnLead() },
-    { id: 'win2', title: 'Dag wins', say: 'Dag\'s Coral 7 is the highest Coral. Whoever wins a trick leads the next one.', target: tutFelt, wait: null,
+    { id: 'win2', title: 'Dag cheers', say: 'Dag\'s Coral 7 is highest: "Ha, thanks!" Whoever wins a trick leads the next.', target: tutFelt, wait: null,
       hold: () => true, ready: () => G.att === 2 && G.tricks.length === 1 && trickShown() },
-    { id: 'done1', title: 'Job done', say: 'A green tick: Dag\'s job is done for good. Only a job that can still fail stays open.', target: tutJobChip(1), wait: null,
+    { id: 'done1', title: 'Job done', say: 'Green tick: Dag\'s job is done for good. Jobs that can still fail stay open.', target: tutJobChip(1), wait: null,
       ready: () => G.att === 2 && G.phase === 'play' && G.tricks.length === 1 && !UI.busy && !UI.fz && jobSt(1) > 0 && !!tutJobChip(1)() },
-    { id: 'follow', title: 'Follow the colour', say: 'Dag led Kelp. If you hold Kelp, you must play it. Tap your Kelp 3.', target: () => tutHandRect(tcard('K3')),
-      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('K3') }, ready: () => G.att === 2 && G.tricks.length === 1 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 2 && !UI.busy && !UI.fz },
-    { id: 'win3', title: 'Who leads next', say: 'Sumi\'s Kelp 9 is the highest Kelp, so she wins and leads the next trick.', target: tutFelt, wait: null,
+    { id: 'last', title: 'Rewind', say: 'Forgot a card? Brack keeps the logbook: look at the previous trick again.', target: tq('#pile [data-a=last], .pbtn[data-a=last]'),
+      wait: { type: 'tap', match: a => a.what === 'last' }, ready: () => G.att === 2 && G.tricks.length === 1 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 2 && !UI.busy && !UI.fz && !!document.querySelector('.pbtn[data-a=last]') },
+    { id: 'lastx', title: 'Back to it', say: 'Dag won it with Coral 7. Only the latest trick is kept. Close the log.', target: tq('#ppop [data-a=popx]'),
+      wait: { type: 'tap', match: a => a.what === 'popx' }, ready: () => !!document.querySelector('#ppop [data-a=popx]') && G.att === 2 && G.tricks.length === 1 },
+    { id: 'follow', title: 'Follow the colour', say: 'Dag leads Kelp. If you hold Kelp you must follow: play your Kelp 3.', target: () => tutHandRect(tcard('K3')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('K3') }, ready: () => G.att === 2 && G.tricks.length === 1 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 2 && !UI.busy && !UI.fz && !UI.pop },
+    { id: 'win3', title: 'Sumi leads next', say: 'Sumi\'s Kelp 9 is the highest Kelp, so she wins and leads next. She grins.', target: tutFelt, wait: null,
       hold: () => true, ready: () => G.att === 2 && G.tricks.length === 2 && trickShown() },
-    { id: 'trump', title: 'Trumps!', say: 'Sumi led Tide. You have none, so play anything. A Lantern beats every colour: tap Lantern 3.', target: () => tutHandRect(tcard('L3')),
+    { id: 'trump', title: 'Lanterns!', say: 'Sumi leads Tide and you hold none: play anything. A Lantern beats every colour. Play Lantern 3.', target: () => tutHandRect(tcard('L3')),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('L3') }, ready: () => G.att === 2 && G.tricks.length === 2 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 1 && !UI.busy && !UI.fz },
-    { id: 'win4', title: 'Lantern wins', say: 'Your Lantern 3 beats Sumi\'s Tide 8. A higher Lantern would have won instead.', target: tutFelt, wait: null,
+    { id: 'win4', title: 'Lantern wins', say: 'Your Lantern 3 beats her Tide 8. A higher Lantern would win. "Show-off!" says Sumi.', target: tutFelt, wait: null,
       hold: () => true, ready: () => G.att === 2 && G.tricks.length === 3 && trickShown() },
-    { id: 'won', title: 'Dive won!', say: 'Both jobs are done, so the dive ends now and the crew wins. Cards left over do not matter.', target: tutJobChip(0), also: tutJobChip(1), wait: null,
+    { id: 'won', title: 'Nets free!', say: 'Both jobs done, so the dive ends and the crew wins. Brack: "Logbook signed. You\'re a diver now."', target: tutJobChip(0), also: tutJobChip(1), wait: null,
       ready: () => G && G.phase === 'over' && G.result && G.result.ok && !UI.busy && !UI.fz }
   ];
 }
@@ -164,7 +169,7 @@ function tutStart(o) {
   GXT.start({
     game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'You know the rules',
-    endText: o ? 'Jobs, the Commander, pings, tricks, trumps. Now the Story begins.' : 'Jobs, the Commander, pings, tricks, trumps. Murky water, clocks and the drone are in the Rules and the lightbulb.',
+    endText: o ? 'Brack signs your logbook. Two carved stones were hauled up this morning. Now the Story begins.' : 'Brack signs your logbook: you are a diver. Murky water, clocks and the drone are in the Rules and the lightbulb.',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
     setup: () => { try { GX.close(); } catch (e) { } try { GXC.close(); } catch (e) { } closePop(true); newGame('tutorial'); },
     onDone: r => {

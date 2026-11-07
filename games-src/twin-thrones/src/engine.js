@@ -145,8 +145,8 @@ var TT = (typeof TT !== 'undefined') ? TT : {};
   }
   function endAge(G) {
     if (G.age >= 3) { finish(G); return; }
-    // the player who is behind on the military track picks who starts; at a tie the player who did not take the last card picks
-    var chooser = G.mil > 0 ? 1 : G.mil < 0 ? 0 : other(G.lastTaker);
+    // the player who is behind on the military track picks who starts; at a tie the player who took the last card picks (W391)
+    var chooser = G.mil > 0 ? 1 : G.mil < 0 ? 0 : G.lastTaker;
     startAge(G, G.age + 1);
     G.pend.push({ type: 'first', pl: chooser });
   }
