@@ -16,8 +16,7 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
    <div class="seg" role="group" aria-label="Crew size">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
    <div class="seg" role="group" aria-label="Computer level">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>
-   ${tutFirst?tutBtn('big go'):''}
-   <button class="${tutFirst?'btn wide':'big go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':tutFirst?'Just play':'Play'}</button>
+      <button class="big go" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':tutFirst?'Play your first game':'Play'}</button>
    <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
    ${tutFirst?'':tutBtn('btn wide')}
    ${saved?`<button class="btn wide" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
@@ -79,7 +78,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'lv':UI.setup.lv=b.dataset.v;renderStart();sfx('select');flashBtn('lv',b.dataset.v);return;
   case 'preset':preset(b.dataset.v);return;
   case 'story':storyOpen();return;
-  case 'start':if(!isHost()&&tutOffer())return;startJob(UI.setup);return;
+  case 'start':if(!isHost()&&firstTime()&&typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME)){tutStart();return}startJob(UI.setup);return;
   case 'offeryes':tutStart();return;
   case 'offerno':{const d=document.getElementById('offer');if(d)d.remove();startJob(UI.setup);return}
   case 'resume':resumeSaved();return;

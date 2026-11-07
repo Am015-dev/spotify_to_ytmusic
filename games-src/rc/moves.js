@@ -42,7 +42,7 @@ function useSkill(ci,k){const why=skillWhy(ci,k);if(why)return why;const c=P(ci)
   case 'recon':{const top=G.tileDeck.slice(0,3);ask(ci,'Scout Ahead: which tile goes on top?',top.map(n=>({l:`Tile ${n}: ${TILES.find(t=>t.no===n).terr}${TILES.find(t=>t.no===n).src.length?' ('+TILES.find(t=>t.no===n).src.join(', ')+')':''}`,frames:[{f:'fn',k:'tileTop',n}]})),{kind:'tiles',force:1});break}
   case 'track':{const k2=G.hunt[0];ask(ci,`Tracker: the next beast is ${cname(k2)} (strength ${BEAST[k2].str}).`,[{l:'Leave it on top',frames:[]},{l:'Put it at the bottom',ops:[['huntTopBottom']]}],{kind:'track',force:1,beast:k2});break}
   case 'fortify':{const o=[{l:'Weapon +1',ops:[['weapon',1]]}];if(hasShelter())o.unshift({l:'Palisade +1',ops:[['pal',1]]});ask(ci,'Fortify',o,{kind:'fortify'});break}
-  case 'drive':{const k2=G.beast.shift();G.hunt.push(k2);shuffle(G.hunt);lg('Another beast is driven into the hunting grounds.');break}}
+  case 'drive':{const k2=G.beast.shift();G.hunt.unshift(k2);lg('Another beast is driven to the top of the hunting grounds.');break}}
   run();R();return null}
 FN.keepDisc=fr=>{G.own.push({k:fr.k1,fut:false});if(fr.k2)G.discs.push(fr.k2);lg(`Kept: ${discName(fr.k1)}.`,'good')};
 FN.tileTop=fr=>{const i=G.tileDeck.indexOf(fr.n);G.tileDeck.splice(i,1);G.tileDeck.unshift(fr.n);lg(`Tile ${fr.n} will be the next one found.`)};

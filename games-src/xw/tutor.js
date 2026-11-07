@@ -154,3 +154,6 @@ function tutMenu(){const m=document.getElementById('more');if(!m||typeof GXT==='
 {const o=toggleMenu;toggleMenu=function(open){try{tutMenu()}catch(e){}return o.apply(this,arguments)}}
 try{tutMenu()}catch(e){}
 {const o=startGame;startGame=function(){if(!TUT.on)lsPlayed();return o.apply(this,arguments)}}
+
+// press feedback on every button (a short flash): the player sees the tap landed, even when the effect is on the 3D board
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(!b)return;b.classList.add('na-tap');setTimeout(()=>b.classList.remove('na-tap'),350)},true);
