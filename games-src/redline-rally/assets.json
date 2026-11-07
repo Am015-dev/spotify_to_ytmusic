@@ -10,7 +10,7 @@
    "alpha": false,
    "wave": 1,
    "slot": "Title screen background (cover)",
-   "prompt": "A dramatic sunset view of a racing circuit seen from above at a steep angle, a pack of colourful race cars thundering down a wide straight toward the viewer, long golden shadows, a calm empty sky strip at the top for the logo."
+   "prompt": "A dramatic sunset view of a racing circuit seen from above at a steep angle, a pack of colourful race cars thundering down a wide straight toward the viewer, long golden shadows, a calm empty sky strip at the top across the top."
   },
   {
    "stem": "track-sunline",
@@ -120,7 +120,7 @@
    "alpha": false,
    "wave": 1,
    "slot": "Speed card 1 face (cover; the value is drawn by the game)",
-   "prompt": "A card illustration: a lone snail-slow road marker cone on a quiet lane, increasing intensity of speed. Leave the top-left corner area calm so a big number can be placed there later."
+   "prompt": "A card illustration: a lone snail-slow road marker cone on a quiet lane. Leave the top-left corner area calm for a later overlay."
   },
   {
    "stem": "card-speed-2",
@@ -131,7 +131,7 @@
    "alpha": false,
    "wave": 1,
    "slot": "Speed card 2 face (cover; the value is drawn by the game)",
-   "prompt": "A card illustration: a gentle country road winding past a single windmill, increasing intensity of speed. Leave the top-left corner area calm so a big number can be placed there later."
+   "prompt": "A card illustration: a gentle country road winding past a single windmill. Leave the top-left corner area calm for a later overlay."
   },
   {
    "stem": "card-speed-3",
@@ -142,7 +142,7 @@
    "alpha": false,
    "wave": 1,
    "slot": "Speed card 3 face (cover; the value is drawn by the game)",
-   "prompt": "A card illustration: a brisk open road with motion lines and a flag fluttering, increasing intensity of speed. Leave the top-left corner area calm so a big number can be placed there later."
+   "prompt": "A card illustration: a brisk open road with motion lines and a flag fluttering. Leave the top-left corner area calm for a later overlay."
   },
   {
    "stem": "card-speed-4",
@@ -153,7 +153,7 @@
    "alpha": false,
    "wave": 1,
    "slot": "Speed card 4 face (cover; the value is drawn by the game)",
-   "prompt": "A card illustration: a blazing straight with a rocket-fast streak and flames behind a car silhouette, increasing intensity of speed. Leave the top-left corner area calm so a big number can be placed there later."
+   "prompt": "A card illustration: a blazing straight with a rocket-fast streak and flames behind a car silhouette. Leave the top-left corner area calm for a later overlay."
   },
   {
    "stem": "card-heat",
@@ -255,47 +255,14 @@
    "prompt": "Head-and-shoulders portrait of a fearless woman with a shaved side, a lightning-bolt scar on her eyebrow and a wide smile, wearing a race suit with a collar, bright flat backdrop."
   },
   {
-   "stem": "card-upgrade-back-engine",
-   "kind": "card",
-   "w": 500,
-   "h": 700,
-   "ratio": "5:7",
-   "alpha": false,
-   "wave": 2,
-   "slot": "Upgrade deck back: engine (not used by the base rules; reserved)",
-   "prompt": "The back of a card: a cream field with a bold teal border and in the centre a polished engine with a small turbo drawn as a clean emblem."
-  },
-  {
-   "stem": "card-upgrade-back-tyres",
-   "kind": "card",
-   "w": 500,
-   "h": 700,
-   "ratio": "5:7",
-   "alpha": false,
-   "wave": 2,
-   "slot": "Upgrade deck back: tyres (not used by the base rules; reserved)",
-   "prompt": "The back of a card: a cream field with a bold teal border and in the centre a stack of three fresh racing tyres drawn as a clean emblem."
-  },
-  {
-   "stem": "card-upgrade-back-aero",
-   "kind": "card",
-   "w": 500,
-   "h": 700,
-   "ratio": "5:7",
-   "alpha": false,
-   "wave": 2,
-   "slot": "Upgrade deck back: aero (not used by the base rules; reserved)",
-   "prompt": "The back of a card: a cream field with a bold teal border and in the centre a swooping rear wing and front splitter drawn as a clean emblem."
-  },
-  {
    "stem": "ui-engine-tray",
    "kind": "ui",
    "w": 512,
    "h": 192,
    "ratio": "8:3",
    "alpha": true,
-   "wave": 2,
-   "slot": "Engine tray behind the heat counter (contain)",
+   "wave": 3,
+   "slot": "Engine tray behind the heat counter (contain) [no code slot yet: a wiring worker adds the hook after delivery]",
    "prompt": "A shallow metal tray with six round recesses in two rows, each recess glowing faintly orange. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   },
   {
@@ -316,8 +283,8 @@
    "h": 128,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
-   "slot": "Stress icon (contain)",
+   "wave": 3,
+   "slot": "Stress icon (contain) [no code slot yet: a wiring worker adds the hook after delivery]",
    "prompt": "A single violet zigzag lightning bolt inside a small circle. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   },
   {
@@ -327,8 +294,8 @@
    "h": 128,
    "ratio": "1:1",
    "alpha": true,
-   "wave": 2,
-   "slot": "Gear icon (contain)",
+   "wave": 3,
+   "slot": "Gear icon (contain) [no code slot yet: a wiring worker adds the hook after delivery]",
    "prompt": "A single chunky steel cog wheel with eight teeth. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   },
   {
@@ -427,7 +394,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 3,
-   "slot": "Lap counter icon (reserved)",
+   "slot": "Lap counter icon [no code slot yet: a wiring worker adds the hook after delivery]",
    "prompt": "A single looping arrow forming a circle with a tiny flag. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   },
   {
@@ -438,7 +405,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 3,
-   "slot": "Race position icon (reserved)",
+   "slot": "Race position icon [no code slot yet: a wiring worker adds the hook after delivery]",
    "prompt": "A single small podium with three steps. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   }
  ]

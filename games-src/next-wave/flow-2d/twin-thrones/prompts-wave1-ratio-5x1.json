@@ -1,0 +1,15 @@
+{
+ "wave": 1,
+ "ratio": "5:1",
+ "flow_aspect": "16:9",
+ "style": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame.",
+ "notes": "twin-thrones 2D wave 1, ratio 5:1. Paste with Flow aspect 16:9; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "twin-thrones",
+  "count": 2
+ },
+ "cards": {
+  "city-board-p1": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. A teal-banner themed city strip: a long carved wooden ledge with a tiny skyline of teal-roofed houses on the horizon",
+  "city-board-p2": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. An ochre-banner themed city strip: a long carved stone ledge with a tiny skyline of ochre-roofed houses on the horizon"
+ }
+}

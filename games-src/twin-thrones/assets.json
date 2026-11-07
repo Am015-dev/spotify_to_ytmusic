@@ -43,7 +43,7 @@
    "alpha": true,
    "wave": 1,
    "slot": "The conflict pawn",
-   "prompt": "A gold-and-bronze war standard pawn on a round base One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A gold-and-bronze war standard pawn on a round base. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "coin",
@@ -54,7 +54,7 @@
    "alpha": true,
    "wave": 1,
    "slot": "Coin icon next to coin counts",
-   "prompt": "A single thick gold coin with a simple sun relief One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A single thick gold coin with a simple sun relief. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "back-age1",
@@ -1077,7 +1077,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: Fertile Fields",
-   "prompt": "A round bronze medallion token showing golden wheat fields with a plough ox One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing golden wheat fields with a plough ox. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-architecture",
@@ -1088,7 +1088,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: Master Builders",
-   "prompt": "A round bronze medallion token showing a drafting compass over a stone blueprint One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing a drafting compass over a stone blueprint. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-economy",
@@ -1099,7 +1099,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: Open Trade",
-   "prompt": "A round bronze medallion token showing two merchants shaking hands over a scale One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing two merchants shaking hands over a scale. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-law",
@@ -1110,7 +1110,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: Code of Law",
-   "prompt": "A round bronze medallion token showing a stone tablet with a balance carved on it One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing a stone tablet with a balance carved on it. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-masonry",
@@ -1121,7 +1121,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: Fine Masonry",
-   "prompt": "A round bronze medallion token showing a mason fitting a carved cornerstone One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing a mason fitting a carved cornerstone. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-mathematics",
@@ -1132,7 +1132,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: Number Lore",
-   "prompt": "A round bronze medallion token showing an abacus beside a counting board One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing an abacus beside a counting board. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-philosophy",
@@ -1143,7 +1143,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: Deep Thought",
-   "prompt": "A round bronze medallion token showing a bearded thinker under an olive tree One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing a bearded thinker under an olive tree. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-strategy",
@@ -1154,7 +1154,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: War Doctrine",
-   "prompt": "A round bronze medallion token showing a general's map table with carved figures One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing a general's map table with carved figures. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-theology",
@@ -1165,7 +1165,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: Sacred Rites",
-   "prompt": "A round bronze medallion token showing priests raising a flame at a hilltop altar One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing priests raising a flame at a hilltop altar. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "t-urbanism",
@@ -1176,7 +1176,7 @@
    "alpha": true,
    "wave": 2,
    "slot": "Progress token: City Planning",
-   "prompt": "A round bronze medallion token showing a grid-plan town seen from above with new roofs One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze medallion token showing a grid-plan town seen from above with new roofs. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "result-victory",
@@ -1209,7 +1209,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Resource icon: wood",
-   "prompt": "An icon of a neat bundle of three logs One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a neat bundle of three logs. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "res-clay",
@@ -1220,7 +1220,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Resource icon: clay",
-   "prompt": "An icon of a lump of red clay with a thumbprint One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a lump of red clay with a thumbprint. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "res-stone",
@@ -1231,7 +1231,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Resource icon: stone",
-   "prompt": "An icon of a squared grey stone block One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a squared grey stone block. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "res-glass",
@@ -1242,7 +1242,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Resource icon: glass",
-   "prompt": "An icon of a small blue glass flask One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a small blue glass flask. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "res-papyrus",
@@ -1253,7 +1253,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Resource icon: papyrus",
-   "prompt": "An icon of a rolled papyrus scroll tied with string One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a rolled papyrus scroll tied with string. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "sci-wheel",
@@ -1264,7 +1264,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Science symbol: wheel",
-   "prompt": "An icon of a spoked cart wheel One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a spoked cart wheel. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "sci-scale",
@@ -1275,7 +1275,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Science symbol: scale",
-   "prompt": "An icon of a small balance scale One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a small balance scale. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "sci-quill",
@@ -1286,7 +1286,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Science symbol: quill",
-   "prompt": "An icon of a feather quill and inkpot One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a feather quill and inkpot. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "sci-mortar",
@@ -1297,7 +1297,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Science symbol: mortar",
-   "prompt": "An icon of a mortar with a pestle One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a mortar with a pestle. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "sci-sundial",
@@ -1308,7 +1308,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Science symbol: sundial",
-   "prompt": "An icon of a stone sundial One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a stone sundial. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "sci-globe",
@@ -1319,7 +1319,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Science symbol: globe",
-   "prompt": "An icon of a small armillary globe One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a small armillary globe. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "sci-law",
@@ -1330,7 +1330,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Science symbol: law",
-   "prompt": "An icon of a stone tablet with a carved scale One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "An icon of a stone tablet with a carved scale. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "icon-shield",
@@ -1341,7 +1341,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Shield (military) icon",
-   "prompt": "A round bronze war shield with a red boss One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A round bronze war shield with a red boss. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "icon-vp",
@@ -1352,7 +1352,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Victory point icon",
-   "prompt": "A gold laurel wreath star One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A gold laurel wreath star. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "fx-lift-dust",
@@ -1363,7 +1363,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Dust puff when a card lifts",
-   "prompt": "A soft puff of warm sand-coloured dust One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A soft puff of warm sand-coloured dust. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "fx-coin-burst",
@@ -1374,7 +1374,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Coin burst when coins are won",
-   "prompt": "A small fan of flying gold coins One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A small fan of flying gold coins. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   },
   {
    "stem": "fx-pawn-glow",
@@ -1385,7 +1385,7 @@
    "alpha": true,
    "wave": 3,
    "slot": "Glow behind the sliding pawn",
-   "prompt": "A soft golden radial glow with tiny sparks One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+   "prompt": "A soft golden radial glow with tiny sparks. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
   }
  ]
 }

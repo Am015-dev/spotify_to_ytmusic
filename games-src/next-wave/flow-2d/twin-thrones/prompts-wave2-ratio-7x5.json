@@ -1,4 +1,13 @@
 {
+ "wave": 2,
+ "ratio": "7:5",
+ "flow_aspect": "4:3",
+ "style": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame.",
+ "notes": "twin-thrones 2D wave 2, ratio 7:5. Paste with Flow aspect 4:3; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "twin-thrones",
+  "count": 12
+ },
  "cards": {
   "w-bronze-titan": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. Picture for a wonder card: a colossal bronze giant straddling a harbour mouth. Fill the whole wide frame, monumental scale, strong focal subject in the middle.",
   "w-sky-tomb": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. Picture for a wonder card: a huge stepped stone pyramid at sunset. Fill the whole wide frame, monumental scale, strong focal subject in the middle.",

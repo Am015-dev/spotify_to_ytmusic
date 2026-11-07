@@ -1,0 +1,16 @@
+{
+ "wave": 2,
+ "ratio": "5:7",
+ "flow_aspect": "3:4",
+ "style": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark.",
+ "notes": "emberclimb 2D wave 2, ratio 5:7. Paste with Flow aspect 3:4; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "emberclimb",
+  "count": 3
+ },
+ "cards": {
+  "frame-status": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card frame overlay, a plain grey cracked stone card frame, portrait 5:7 rectangle, a large empty rectangular window in the upper half and a plain header strip above it, the window and the whole outside also flat plain white, no text. One single object centred on a flat plain white background.",
+  "gem-uncommon": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Rarity badge for a card: a small cut blue sapphire gem in a silver setting centred near the bottom edge of an otherwise empty portrait 5:7 canvas, everything else flat plain white. One single object centred on a flat plain white background.",
+  "gem-rare": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Rarity badge for a card: a small radiant gold gem in an ornate gold setting centred near the bottom edge of an otherwise empty portrait 5:7 canvas, everything else flat plain white. One single object centred on a flat plain white background."
+ }
+}

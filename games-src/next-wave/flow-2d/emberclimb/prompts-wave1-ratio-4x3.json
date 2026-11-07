@@ -1,0 +1,21 @@
+{
+ "wave": 1,
+ "ratio": "4:3",
+ "flow_aspect": "4:3",
+ "style": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark.",
+ "notes": "emberclimb 2D wave 1, ratio 4:3. Paste with Flow aspect 4:3; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "emberclimb",
+  "count": 8
+ },
+ "cards": {
+  "w-strike": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: plain sword cut trailing orange sparks. Full bleed, no border, no frame.",
+  "w-defend": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: dented round shield raised against flames. Full bleed, no border, no frame.",
+  "s-strike": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: short dagger slash in dim light. Full bleed, no border, no frame.",
+  "s-defend": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: dark cloak swirled across the body. Full bleed, no border, no frame.",
+  "a-strike": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: brass piston arm punching forward. Full bleed, no border, no frame.",
+  "a-defend": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: metal plates sliding shut. Full bleed, no border, no frame.",
+  "m-strike": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: flat palm strike with a ripple of air. Full bleed, no border, no frame.",
+  "m-defend": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Card illustration, wide 4:3, one dramatic focal subject: monk arms crossed in defence. Full bleed, no border, no frame."
+ }
+}
