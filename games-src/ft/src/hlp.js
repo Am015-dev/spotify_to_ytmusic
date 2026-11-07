@@ -98,7 +98,7 @@ const HLP_RULES=[
  {phase:'qThief',title:'Read each button',text:'Each button says what you receive. You get only one.',pic:()=>hpics([['chip','Prize'],'>',['tap']])}
 ];
 // ---------------------------------------------------------------- phases
-function hlpBusy(){return !G||G.over||G.tut||UI.modal||GX.open||UI.chz||UI.autoOn||!me()}
+function hlpBusy(){return !G||G.over||G.tut||G.coach||UI.modal||GX.open||UI.chz||UI.autoOn||!me()}
 // the phase the player is deciding in (null when there is nothing to decide on the board)
 function hlpPhase(){try{if(hlpBusy())return null;const hp=me();
   if(G.q)return {claim:'qClaim',item:'qItem',djinn:'qDjinn',flute:'qFlute',kill:'qKill',thief:'qThief'}[G.q.kind]||null;
