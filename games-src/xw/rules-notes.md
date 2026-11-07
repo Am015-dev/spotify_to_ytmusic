@@ -37,7 +37,7 @@ The original publisher's official PDFs and the board-game catalogue site were bl
    - Ships go in descending pilot skill, and each may attack once.
    - Ships with equal pilot skill fire simultaneously: a ship destroyed by an equal-skill attacker still fires.
 4. **End:** unused focus and evade tokens are removed. Target locks and stress stay.
-- **[R9] Initiative:** the side with fewer squad points has it. On a tie one player rolls an attack die: on a hit or crit that player chooses who has initiative, otherwise the other player chooses (asked of a human; the computer takes it). Later tournament rules let the lower side choose; this uses the 2012 rule.
+- **[R9] Initiative:** the side with fewer squad points has it. On a tie the second-named side has it (core rulebook; W391 fix, no die roll).
 - **Winning:** destroy every enemy ship. If both sides' last ships are destroyed at the same time, the side with initiative wins [confirmed, 1e rulebook].
 - **Round limit:** 1e has none (tournaments use a clock). A safety cap of 100 rounds stops a game that can't end; it is then decided on points destroyed. No test game has come near it.
 
@@ -56,7 +56,7 @@ The original publisher's official PDFs and the board-game catalogue site were bl
 - **[R6] Edge:** any part of the base outside the play area destroys the ship.
 - **[R7] Asteroids:**
   - There are 6 asteroids, placed during setup (above).
-  - If the template or the final base overlaps an asteroid, the ship skips its action and rolls 1 attack die per asteroid: a hit deals 1 damage, a crit deals 1 critical.
+  - If the template or the final base overlaps an asteroid, the ship skips its action and rolls ONE attack die per maneuver (not per asteroid; W391): a hit deals 1 damage, a crit deals 1 critical.
   - A ship whose base is on an asteroid can't attack.
   - An attack whose line crosses an asteroid is obstructed: +1 defence die.
 
