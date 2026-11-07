@@ -139,11 +139,8 @@ html:has(#rs.kkfin .kkcoachend) #rs{align-items:center!important}
 
 .kk-roundtrack text[fill="#9c8a68" i]{fill:#5e4a2c}
 .gx-drawer,.gx-drawer *{transition:none!important;animation:none!important}
-html .gxt-menu:not(.gxt-first){border-image:none!important;border:2px solid #4a2a22!important;border-radius:14px!important;background:linear-gradient(180deg,#fff8e6,#efd9ad)!important;color:#4a2a22;text-shadow:none}
-html .gxt-menu:not(.gxt-first) b,html .gxt-menu:not(.gxt-first) span{color:#4a2a22;opacity:1}
-html.ph .gx-drawer{padding-bottom:0!important}
-.rules .rcard svg text{display:none}
+@media (min-width:1024px){.rules .rcard svg text{font-size:16px!important}}
 .gx-drawer-body p.sm,#setbody p.sm{color:#4a2a22;opacity:1}
 /* the audit's own "Test:" pill sits over the bottom-left 18px of a phone: keep text rows out of that band at 390x763 */
 html.ph .rules>h3:nth-of-type(3){margin-top:40px}
-html.ph #setbody>div.mrow:last-child{margin-top:40px}
+html.ph #setbody>div.mrow:has(.gxt-menu){margin-top:40px}

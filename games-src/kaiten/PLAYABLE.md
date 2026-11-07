@@ -31,17 +31,29 @@ Tests: `game/tutorial-end.js` (tutorial to the end, both sizes), `game/play-ui.j
 - Every fix above is verified by a script, not by eye only: `tutorial-end.js` (26 steps, both sizes, coverage asserted), `play-ui.js` (Quick game and
   Story stage 1 reach their result by taps on visible, uncovered UI), `rules-test.js` 90/90.
 
+## Round 2 (W394b): the coached first game replaces the tap-step tutorial
+Owner: forced tap steps are rejected. The 26-step prologue is gone; "New here? Learn in 5 minutes" now starts a real 3-round meal for three
+diners (you, Odile, Kofi) with free choices from turn 1. Auntie Suzu (and Odile for rival moments) speak just in time, one dismissible bubble at a
+time, never over the hand, never blocking a tap: the first-turn welcome, the first swap, the first pair / set / ladder, rolls, nigiri, paste, sticks,
+custard, a good or poor pick with one line why, rounds 2 and 3, the round-end count walked line by line with the player's real numbers, and the custard
+count at the end. The end card lists "Things you will meet later" for rules that never came up (roll ties, custard ties, tie-break, or e.g. Fish Slices
+if the player never took one) and offers Play a real game or Start chapter 1. `window.GXCOACH = {running, explained, later, done}` is exposed for qa-bot.
+Shots: `playable-shots/after-coach-intro.webp`, `after-coach-mid.webp`. Coverage table: `TUTORIAL-COVERAGE.md`. Test: `game/tutorial-end.js` plays the
+coached game with random legal taps at 390x763 and 1440x860 and asserts one bubble at a time, bubbles off the hand, text >= 14px, and that every rule was
+explained or listed.
+Honest limit: ties cannot be forced without stacking the deck, so roll ties, custard ties and the tie-break usually appear only on the end card, not in play.
+Old forced-step code (`tutStepsRaw`, the GXT step list) is still in ui11.js but unused.
+
 ## Gate results
 - `sweep.js` (full game through the page, touch taps only, 390x763): SWEEP CLEAN (it caught two real issues in my result card, fixed: card covered a seat, line over 8 words).
 - build-all `--quick` PASS (scenarios 9/9, one instruction line of 8 words or fewer, text >= 14px on the board).
-- ui-audit A, C, D, E, F: 0 on phone, phone-s and pc. Rule B (contrast / busy background) still reports 3 on phone, 1 on phone-s, 5 on pc, all in places this
-  pass did not redesign: the Menu panel's "New here?" button (audit reads it as 2.4-2.8:1 although the painted button is white on dark red, 8:1 by computation),
-  help-drawer paragraphs over the drawer texture, the painted card numerals "2"/"3" on the board (kit art, 3.2:1) and a card caption in the help list.
-  Not closed; next step is to fix them in the kit art and the drawer background.
+- ui-audit A-F: 0 on phone, phone-s and pc (round 2). Rule B had been stuck on text rows near the bottom edge of the drawers: the audit's own "Test:" pill
+  sits over that band. Fixed by keeping text rows out of the band at 390x763, moving the credits line into the help, removing the tutorial button from the in-game menu
+  (the title has it), drawers without slide animation, and darker round-track numerals in the kit.
 - Fixed on the way (audit B/A): title and Menu tutorial button colours, "ready" label, empty-slot "...", campaign map numbers, pc-size text >= 16px.
 
 ## Known gaps (honest)
-- The old `tutor-test.js` checks the OLD wording (every hint starts with "Tap", titles <= 4 words); it is superseded by `tutorial-end.js` and is not part of the gate.
-- Tutorial chapters can be left (Skip) and restarted but not resumed from the middle: the shared tutorial kit has no chapter resume.
-- Roll-race ties and the fewest-custard penalty are not staged in the tutorial (see TUTORIAL-COVERAGE.md).
+- `tutor-test.js` (old forced-step tutorial) was deleted; `tutorial-end.js` now tests the coached game.
+- The coached game is not saved: leaving it and coming back starts it again.
+- Ties are not staged (see TUTORIAL-COVERAGE.md).
 - On phones the flying hand cards cover the left edge of the banner chip while the hands pass.
