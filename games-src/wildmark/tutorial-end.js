@@ -1,42 +1,45 @@
-// Tutorial to the end, by real taps: fresh storage, open the tutorial from the title, tap the centre of each spotlit target (asserting
-// elementFromPoint there IS the target, not something covering it) or the Next button, until the end card. Phone 390x763 and PC 1440x860.
-// Asserts every step id listed in TUTORIAL-COVERAGE.md was shown. Usage: node tutorial-end.js [page url]   (default: the local build)
+// Coached first game to the end, by real taps: fresh storage, open the tutorial from the title, then play ANY legal move through the UI
+// (a random legal pair, a glowing spot, a glowing tile or Return) until the result screen. Each tap goes to the centre of a visible target and
+// elementFromPoint there must be the target (Rowan's bubble never blocks play). At the end every rule in COACH_RULES (TUTORIAL-COVERAGE.md)
+// must have been explained during the game or listed in "Things you will meet later". Phone 390x763 and PC 1440x860.
+// Usage: node tutorial-end.js [page url] [seed]   (default: the local build)
 const { chromium } = require('playwright');
 const EXE = require('fs').existsSync('/opt/pw-browsers/chromium') ? { executablePath: '/opt/pw-browsers/chromium' } : {};
 const URL = process.argv[2] || 'file://' + __dirname + '/wildmark.html';
-const WANT = ['goal', 'cards', 'take', 'spot', 'ok', 'tok', 'acorn', 'take2', 'spot2', 'rot', 'ok2', 'tok2', 'pair', 'sweep', 'free', 'freet', 'freek', 'spot3', 'ok3', 'tok3', 'end'];
+let rnd = +(process.argv[3] || 7); const R = n => { rnd = (rnd * 16807) % 2147483647; return rnd % n; };
 (async () => {
   const b = await chromium.launch(EXE); let allOk = true;
   for (const [name, vp, touch] of [['phone', { width: 390, height: 763 }, true], ['pc', { width: 1440, height: 860 }, false]]) {
-    const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }), p = await ctx.newPage(), errs = [], seen = [], covered = [];
+    const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }), p = await ctx.newPage(), errs = [], blocked = [];
     p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });
     await p.goto(URL); await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } }); await p.goto(URL); await p.waitForTimeout(900);
-    const tapXY = async (x, y) => { if (touch) await p.touchscreen.tap(x, y); else await p.mouse.click(x, y); };
     const first = p.locator('#start button').first(); if (touch) await first.tap(); else await first.click();
-    let ended = false;
-    for (let g = 0; g < 400 && !ended; g++) {
-      await p.waitForTimeout(250);
-      const st = await p.evaluate(() => {
-        const S = window.GXT && GXT.state ? GXT.state() : null, cur = window.GXT && GXT.current ? GXT.current() : null;
-        const endCard = [...document.querySelectorAll('button')].find(x => x.offsetWidth && /^(Play|Start region|Done|Finish|Close)/.test(x.textContent.trim()) && x.closest('.gxt-end, .gxt-dlg, [class*=gxt]'));
-        const nx = document.querySelector('.gxt-next'); const vis = e => e && e.getBoundingClientRect().width > 0;
-        let tgt = null; try { tgt = cur && cur.target ? cur.target() : null; } catch (e) { }
-        const r = tgt && tgt.getBoundingClientRect(), cx = r ? r.left + r.width / 2 : 0, cy = r ? r.top + r.height / 2 : 0;
-        const hit = r ? document.elementFromPoint(cx, cy) : null;
-        return { id: cur && cur.id, running: !!(window.GXT && GXT.running()), next: vis(nx) ? (() => { const q = nx.getBoundingClientRect(); return [q.left + q.width / 2, q.top + q.height / 2]; })() : null,
-          wait: !!(cur && cur.wait), xy: r && r.width ? [cx, cy] : null, clear: !!(hit && tgt && (hit === tgt || tgt.contains(hit) || hit.closest('.gxt-clear'))), endBtn: !!endCard, over: !!(window.G && G.over) };
-      });
-      if (st.id && seen[seen.length - 1] !== st.id) seen.push(st.id);
-      if (!st.running) { ended = true; break; }
-      if (st.next) { await tapXY(st.next[0], st.next[1]); await p.waitForTimeout(250); continue; }
-      if (st.wait && st.xy) { if (!st.clear && covered.indexOf(st.id) < 0) covered.push(st.id); await tapXY(st.xy[0], st.xy[1]); await p.waitForTimeout(300); continue; }
-      const endB = p.locator('.gxt-end button, .gxt-dlg button').first();
-      if (await endB.count() && await endB.isVisible().catch(() => false)) { ended = true; break; }
+    // tap the centre of the i-th visible element matching sel, after checking nothing covers it
+    const tapSel = async (sel, pick) => {
+      const xy = await p.evaluate(([sel, pick]) => {
+        const els = [...document.querySelectorAll(sel)].filter(e => { const r = e.getBoundingClientRect(); return r.width > 4 && r.height > 4 && !e.disabled; });
+        if (!els.length) return null; const e = els[pick % els.length], r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+        const h = document.elementFromPoint(x, y); return { x, y, ok: !!h && (h === e || e.contains(h) || h.closest(sel) === e) };
+      }, [sel, pick]);
+      if (!xy) return false; if (!xy.ok) blocked.push(sel);
+      if (touch) await p.touchscreen.tap(xy.x, xy.y); else await p.mouse.click(xy.x, xy.y); await p.waitForTimeout(220); return true;
+    };
+    let turns = 0;
+    for (let g = 0; g < 700; g++) {
+      const st = await p.evaluate(() => ({ rs: !document.getElementById('rs').hidden, mine: !!window.G && myTurn(), stage: G && G.stage, mode: UI.mode, ghost: !!UI.ghost }));
+      if (st.rs) break;
+      if (!st.mine) { await p.waitForTimeout(350); continue; }
+      if (st.stage === 'pick') { if (!(await tapSel('#mk .mt:not([disabled])', R(4)))) await p.waitForTimeout(200); }
+      else if (st.stage === 'tile') { if (!st.ghost) await tapSel('#map .spot', R(9)); else { if (R(3) === 0) await tapSel('#rotB', 0); await tapSel('#okB', 0); } }
+      else if (st.stage === 'tok') { const n = await p.locator('#map .tgt').count(); if (n && R(5)) await tapSel('#map .tgt', R(n)); else await tapSel('#backB', 0); turns++; }
     }
-    const missing = WANT.filter(id => seen.indexOf(id) < 0), endCard = await p.locator('.gxt-end button, .gxt-dlg button, [class*=gxt] button').count();
-    const pass = ended && !missing.length && !covered.length && !errs.length;
+    await p.waitForTimeout(800);
+    const res = await p.evaluate(() => ({ over: !!(window.G && G.over), rs: !document.getElementById('rs').hidden, cov: window.WM_COACH || null, rules: window.COACH_RULES, done: (() => { try { return GXT.isDone('wildmark'); } catch (e) { return false; } })(), final: !!document.querySelector('#rs .cfinal') }));
+    const cov = res.cov || { explained: [], later: [] }, missing = (res.rules || []).filter(id => cov.explained.indexOf(id) < 0 && cov.later.indexOf(id) < 0);
+    const pass = res.over && res.rs && res.final && res.done && !missing.length && !blocked.length && !errs.length;
     if (!pass) allOk = false;
-    console.log((pass ? 'PASS' : 'FAIL') + ' tutorial-to-end ' + name + ': steps seen ' + seen.length + '/' + WANT.length + (missing.length ? ' missing ' + missing.join(',') : '') + (covered.length ? ' covered targets ' + covered.join(',') : '') + (errs.length ? ' errors ' + errs.slice(0, 2).join(' | ') : '') + ' end card ' + (endCard > 0));
+    console.log((pass ? 'PASS' : 'FAIL') + ' coached-game-to-end ' + name + ': ' + turns + ' turns by legal UI taps, explained ' + cov.explained.length + '/' + (res.rules || []).length + ', listed for later ' + cov.later.length +
+      (cov.later.length ? ' (' + cov.later.join(',') + ')' : '') + (missing.length ? ' MISSING ' + missing.join(',') : '') + (blocked.length ? ' BLOCKED ' + blocked.slice(0, 3).join(',') : '') + (errs.length ? ' errors ' + errs.slice(0, 2).join(' | ') : '') + ' walk-through ' + res.final + ' tutorial done ' + res.done);
     await ctx.close();
   }
   await b.close(); process.exit(allOk ? 0 : 1);

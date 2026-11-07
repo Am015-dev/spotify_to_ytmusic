@@ -1,0 +1,53 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="9" height="9" rx="1.5" fill="#c0527a"/><rect x="13" y="2" width="9" height="9" rx="1.5" fill="#e0a82e"/><rect x="2" y="13" width="9" height="9" rx="1.5" fill="#2a8a80"/><rect x="13" y="13" width="9" height="9" rx="1.5" fill="#4a86b8"/><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="#fbf4e4" stroke-width="1.4" stroke-dasharray="2 2"/></svg></span><span class="tt">Stitchwise</span></h1>
+  <div id="barprompt"></div>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
+  <button class="gx-ibtn" data-gx="patchd" aria-expanded="false" aria-label="All patches" title="All patches"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg><span>Patches</span></button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v13"/></svg><span>Rules</span></button>
+  <button class="gx-ibtn" data-gx="setd" aria-expanded="false" aria-label="Menu" title="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
+</header>
+<div class="gx-main">
+  <main class="gx-board" id="board" aria-label="Your quilt and the time track"><div id="bd" data-board>
+    <div id="qcol"></div>
+    <div id="side"></div>
+  </div></main>
+  <aside class="gx-dock" id="dock" aria-label="What to do now">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt">Your turn</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
+    <div class="gx-dock-body" id="dockbody">
+      <div id="guide" hidden></div>
+      <div id="goalline" hidden></div>
+      <div id="prompt" aria-live="polite"></div>
+      <div id="offers"></div>
+      <div id="detail"></div>
+      <div id="acts"></div>
+    </div>
+  </aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
+</div>
+</div>
+<div id="start" class="ov" hidden></div>
+<div id="rs" class="ov" hidden></div>
+<div id="toast" role="status"></div>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
+<script src="shell.js"></script>
+<script src="gx-kit.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
+<script src="gx-tutor.js"></script>
+<script src="gx-campaign.js"></script>
+<script src="campaign-data.js"></script>
+<script src="gx-music.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="art.js"></script>
+<script src="ui1.js"></script>
+<script src="ui2.js"></script>
+<script src="ui3.js"></script>
+<script src="ui4.js"></script>
+</body>
+</html>
