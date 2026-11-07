@@ -42,30 +42,33 @@ const CG_RULES={goal:'Tile the palace wall; most stars wins',kilns:'Kilns hold f
 const CG_LATER=['players','shard','nofit','variants'];       // can never come up in this 2-player staged game: always on the end card unless seen
 const CG={said:{},q:[],cur:null,shownAt:0,el:null,timer:null,moves:0,lastPraise:-9,t:0};
 window.__cg=CG;
+window.GXCOACH={running:false,explained:[],done:false};   // read by scripts/qa-bot.js (coached-game driver)
+const cgSync=()=>{const g=window.GXCOACH;g.explained=Object.keys(CG.said).filter(k=>CG.said[k])};
 const cgName=c=>TNAME[c]||'tile';
 const cgPl=(n,w)=>n+' '+w+(n===1?'':'s');
 function cgCss(){if(document.getElementById('cg-css'))return;const s=document.createElement('style');s.id='cg-css';
-  s.textContent='.cg-b{position:fixed;z-index:60;box-sizing:border-box;pointer-events:none;display:flex;gap:6px;align-items:flex-start;padding:8px 6px 8px 12px;border-radius:14px;background:#fff1cf;color:#3a1d12;border:2px solid #b98a3e;box-shadow:0 6px 18px rgba(0,0,0,.45);font:600 14px/1.3 var(--ff,system-ui,sans-serif);animation:cg-in .2s ease-out both}'
-  +'.cg-b b{display:block;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#7a1f31;margin-bottom:1px}.cg-b .cg-t{flex:1;min-width:0}'
+  s.textContent='.cg-b{position:fixed;z-index:60;box-sizing:border-box;pointer-events:none;display:flex;gap:6px;align-items:flex-start;padding:6px 4px 6px 12px;border-radius:14px;background:#fff1cf;color:#3a1d12;border:2px solid #b98a3e;box-shadow:0 6px 18px rgba(0,0,0,.45);font:600 13.5px/1.28 var(--ff,system-ui,sans-serif);animation:cg-in .2s ease-out both}'
+  +'.cg-b b{display:block;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7a1f31;margin-bottom:1px}.cg-b .cg-t{flex:1;min-width:0}'
   +'.cg-x{pointer-events:auto;flex:none;width:44px;height:44px;margin:-8px -2px -8px 0;border:0;background:transparent;color:#7a1f31;font:800 22px/1 var(--ff,system-ui);cursor:pointer}'
   +'.cg-b.pr{background:#e8f6e0;border-color:#5b9a43}.cg-b.po{background:#fff0e0;border-color:#d08a3a}'
   +'@keyframes cg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){.cg-b{animation:none}}'
-  +'.cg-later{text-align:left;font-size:13px;font-weight:600;margin:0;padding-left:18px}.cg-later li{margin:2px 0}';
+  +'@media (min-width:1024px){.cg-b,.cg-b b,.cg-later,.cg-x{font-size:16px}.cg-b{width:420px!important}}.cg-later{text-align:left;font-size:13px;font-weight:600;margin:0;padding-left:18px}.cg-later li{margin:2px 0}';
   document.head.appendChild(s)}
 function cgPlace(){const e=CG.el;if(!e)return;const W=innerWidth,H=innerHeight;const me=document.querySelector('.bf-me');const r=me&&me.getBoundingClientRect();
   const w=Math.min(W-16,r&&r.width>200?Math.max(300,Math.min(r.width,400)):360);e.style.width=w+'px';
   let left=r&&r.width>200?Math.min(r.left,W-w-8):(W-w)/2;e.style.left=Math.max(8,left)+'px';
   const h=e.getBoundingClientRect().height;
-  if(r&&r.height>60&&r.top-h-8>44){e.style.top=Math.round(r.top-h-6)+'px'}else e.style.top='40px'}
+  const hn=document.querySelector('.bf-hint');const hr=hn&&hn.getBoundingClientRect();const anchor=hr&&hr.height>8&&hr.top>100?hr.top:(r&&r.height>60?r.top:0);   // sit above the instruction line, never on it
+  if(anchor&&anchor-h-6>44){e.style.top=Math.round(anchor-h-4)+'px'}else e.style.top='40px'}
 function cgHide(){clearTimeout(CG.timer);CG.timer=null;if(CG.el){CG.el.remove();CG.el=null}CG.cur=null;clearInterval(CG.pi);CG.pi=null;setTimeout(cgNext,250)}
 function cgNext(){if(CG.cur||!UI.cg||!CG.q.length)return;const n=CG.q.shift();cgShow(n.text,n.o,true)}
 // say(id, text, opts): a rule lesson is spoken once (said[id]); opts.kind = 'pr' (good move) | 'po' (poor move); opts.hold = the board waits (round-end beats)
-function cgSay(id,text,o){o=o||{};if(!UI.cg||!text)return false;if(id&&CG.said[id]&&!o.again)return false;if(id)CG.said[id]=(CG.said[id]||0)+1;
+function cgSay(id,text,o){o=o||{};if(!UI.cg||!text)return false;if(id&&CG.said[id]&&!o.again)return false;if(id)CG.said[id]=(CG.said[id]||0)+1;cgSync();
   if(CG.cur&&Date.now()-CG.shownAt>3200&&!o.hold){cgShow(text,o,true);return true}   // never two at once: a stale one is replaced, a fresh one makes this wait
   if(CG.cur){if(CG.q.length>=2)CG.q.shift();CG.q.push({text,o});return true}
   cgShow(text,o,true);return true}
 function cgShow(text,o,force){o=o||{};cgCss();clearTimeout(CG.timer);if(CG.el)CG.el.remove();
-  const e=document.createElement('div');e.className='cg-b'+(o.kind?' '+o.kind:'');e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('data-cg','1');
+  const e=document.createElement('div');e.className='cg-b cg-coach'+(o.kind?' '+o.kind:'');e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('data-cg','1');
   e.innerHTML='<div class="cg-t"><b>'+(o.who||'Mother Ochre')+'</b>'+text.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div><button type="button" class="cg-x" aria-label="Dismiss the guide">&times;</button>';
   e.querySelector('.cg-x').addEventListener('click',ev=>{ev.stopPropagation();cgHide()});
   document.body.appendChild(e);CG.el=e;CG.cur=text;CG.shownAt=Date.now();cgPlace();clearInterval(CG.pi);CG.pi=setInterval(cgPlace,400);
@@ -126,7 +129,7 @@ function cgBeat(name,x){const p=P(0);const R=G.rsum&&G.rsum[0];
 function tutPause(name,x){return new Promise(res=>{if(!UI.tut||!tutOn()){res();return}
   let b=null;try{b=cgBeat(name,x)}catch(e){console.error('tutor beat',e)}
   if(!b){res();return}
-  CG.said[b.id]=(CG.said[b.id]||0)+1;for(const k of b.also||[])CG.said[k]=CG.said[k]||1;
+  CG.said[b.id]=(CG.said[b.id]||0)+1;for(const k of b.also||[])CG.said[k]=CG.said[k]||1;cgSync();
   CG.q.length=0;cgShow(b.text,{hold:true,kind:'pr'});
   let done=false;const fin=()=>{if(done)return;done=true;clearTimeout(tm);document.removeEventListener('pointerdown',onp,true);TUT.res=null;TUT.at=null;res();if(name==='final')setTimeout(()=>{if(tutOn())cgEnd()},bfD(500))};
   const onp=ev=>{if(ev.target&&ev.target.closest&&ev.target.closest('.cg-b'))return;if(Date.now()-CG.shownAt>900)fin()};
@@ -140,15 +143,15 @@ function cgRound(){if(!tutOn())return;const p=P(0);
 // ---------------------------------------------------------------- the end card: what was never met, then the choices
 function cgEnd(){const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Tutorial finished');
   const later=Object.keys(CG_RULES).filter(k=>!CG.said[k]);const pro=TUT.pro;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
-  const btn=[];if(pro&&first)btn.push(['chapter','Start chapter 1']);btn.push(['play',pro&&first?'Just play':'Play a real game']);btn.push(['again','Play the guide again']);
-  window.__cgEnd={later:later.slice(),said:Object.assign({},CG.said)};
+  const btn=[];if(pro&&first)btn.push(['chapter','Start chapter 1']);if(pro)btn.push(['map','Story map']);btn.push(['play',pro?'Just play':'Play a real game']);btn.push(['again','Play the guide again']);
+  window.__cgEnd={later:later.slice(),said:Object.assign({},CG.said)};cgSync();window.GXCOACH.done=true;
   d.innerHTML='<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">&#10003;</div><div class="gxt-et">Well fired</div><div class="gxt-ex">Mother Ochre: "You read the kilns like a master."'+(later.length?' Things you\'ll meet later:':'')+'</div>'
     +(later.length?'<ul class="cg-later">'+later.map(k=>'<li>'+CG_RULES[k]+'</li>').join('')+'</ul>':'')
     +'<div class="gxt-eb">'+btn.map((b,i)=>'<button type="button" class="gxt-b'+(i?'':' pri')+'" data-cg-end="'+b[0]+'">'+b[1]+'</button>').join('')+'</div></div>';
   d.addEventListener('click',e=>{const b=e.target.closest('[data-cg-end]');if(!b)return;const c=b.dataset.cgEnd;d.remove();
     try{GXT.markDone(TUT_GAME)}catch(er){}tutLeave();
     if(c==='again'){tutStart({prologue:pro});return}
-    if(c==='chapter'&&first){openStart();GXC.play(first.id)}else openStart()});
+    if(c==='chapter'&&first){openStart();GXC.play(first.id)}else if(c==='map'&&typeof campOpen==='function')campOpen();else openStart()});
   document.body.appendChild(d)}
 
 // ---------------------------------------------------------------- start, leave, story
@@ -156,14 +159,14 @@ function tutSetup(){try{GX.close()}catch(e){}try{GXH.hide()}catch(e){}
   clearTimeout(aiTimer);aiTimer=null;TUT.at=null;TUT.res=null;TUT.coach=UI.coach;UI.coach=false;UI.tut=1;UI.cg=1;UI.pause=false;
   const m=document.getElementById('modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}
   window.__tutPh=1;phApply();bfApply();                                  // the board-first table, on any screen
-  tutBuild();cgOpen()}
-function tutLeave(){tutRelease();UI.tut=0;UI.cg=0;UI.coach=TUT.coach;UI.sel=null;UI.tgt=null;UI.adv=null;clearTimeout(aiTimer);aiTimer=null;
+  tutBuild();cgOpen();Object.assign(window.GXCOACH,{running:true,done:false,explained:[]})}
+function tutLeave(){window.GXCOACH.running=false;tutRelease();UI.tut=0;UI.cg=0;UI.coach=TUT.coach;UI.sel=null;UI.tgt=null;UI.adv=null;clearTimeout(aiTimer);aiTimer=null;
   cgHide();CG.q.length=0;document.querySelectorAll('.gxt-top[data-cg],.gxt-end[aria-label="Tutorial finished"]').forEach(e=>e.remove());
   try{bfSpeedUp()}catch(e){}BF.q.length=0;BF.gk='';BF.disp=null;BF.resHide=false;BF.menu=false;BF.peek=null;G=null;
   try{GXH.hide()}catch(e){}window.__tutPh=0;phApply();bfApply();try{resetScene()}catch(e){}}
 function cgStrip(){document.querySelectorAll('.gxt-top[data-cg]').forEach(e=>e.remove());const t=document.createElement('div');t.className='gxt-top';t.setAttribute('data-cg','1');t.setAttribute('data-help','');
-  t.innerHTML='<span>Coached game: play any move</span><button type="button" class="gxt-skip" data-cg-skip>Leave tutorial</button>';
-  t.style.height='34px';t.querySelector('button').addEventListener('click',()=>{try{GXT.markDone(TUT_GAME)}catch(e){}tutLeave();openStart()});document.body.appendChild(t)}
+  t.innerHTML='<span>Coached game: play any move</span><button type="button" class="gxt-skip" data-cg-skip>'+(TUT.pro?'Skip to map':'Leave tutorial')+'</button>';
+  t.style.height='34px';t.querySelector('button').addEventListener('click',()=>{try{GXT.markDone(TUT_GAME)}catch(e){}const pro=TUT.pro;tutLeave();if(pro&&typeof campOpen==='function')campOpen();else openStart()});document.body.appendChild(t)}
 function tutStart(o){if(typeof GXT==='undefined')return;TUT.pro=o&&o.prologue?o:null;tutSetup();cgStrip()}
 function tutLaunch(){tutStart()}
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map

@@ -28,6 +28,7 @@ for(const [W,H] of SIZES){const desk=W>800,tag=W+'x'+H;
  for(let it=0;it<1500&&!ended;it++){
   const s=await p.evaluate(()=>{const e=document.querySelector('.gxt-end[aria-label="Tutorial finished"]');const bs=document.querySelectorAll('.cg-b');let pe=0;bs.forEach(x=>{if(getComputedStyle(x).pointerEvents!=='none')pe++});
    return {end:!!e,bubbles:bs.length,pe,has:typeof G!=='undefined'&&!!G,cur:typeof G!=='undefined'&&G?sideToAct():-9,phase:typeof G!=='undefined'&&G?G.phase:'',sel:!!UI.sel,hold:typeof bfHold==='function'&&bfHold(),sig:typeof G!=='undefined'&&G?G.turn+'/'+G.round+'/'+G.phase+(UI.sel?'s':''):''}});
+  if(process.env.SHOTS&&(s.bubbles||s.end)){const tx=await p.evaluate(()=>{const b=document.querySelector('.cg-b');return b?b.textContent.slice(0,30):(document.querySelector('.gxt-end')?'END':'')});if(tx&&tx!==(globalThis.__lt||'')&&(globalThis.__n=(globalThis.__n||0)+1)<=14){globalThis.__lt=tx;fs.mkdirSync(process.env.SHOTS,{recursive:true});await p.screenshot({path:process.env.SHOTS+'/'+tag+'-'+String(globalThis.__n).padStart(2,'0')+'.png'})}}
   if(s.bubbles>1)twoBubbles++;if(s.pe>0)intercept++;
   if(s.end){ended=true;break}
   if(s.sig!==lastSig){lastSig=s.sig;stuck=Date.now()}
@@ -35,9 +36,9 @@ for(const [W,H] of SIZES){const desk=W>800,tag=W+'x'+H;
   if(!s.has||s.cur!==0||s.phase!=='offer'||s.hold){await sleep(120);continue}
   if(!s.sel){
    const k=await p.evaluate(()=>{const m=validMoves(0);const mv=m[Math.floor(Math.random()*m.length)];const a=mv.src<0?G.ctr:G.fac[mv.src];const idx=a.indexOf(mv.c);window.__mv=mv;return (mv.src<0?'c':'f'+mv.src)+'_'+idx});
-   const r=await tapSel(`.bf-t[data-k="${k}"]`);if(r!==true){if(r){covered++;console.log('  covered: '+r)}await sleep(200)}else await sleep(300);continue}
+   const r=await tapSel(`.bf-t[data-k="${k}"]`);if(r!==true){if(r){const ck=k+'|'+(s.sig||'');globalThis.__ck=globalThis.__ck||{};globalThis.__ck[ck]=(globalThis.__ck[ck]||0)+1;if(globalThis.__ck[ck]===6){covered++;console.log('  covered (persistent): '+r+' '+k)}}await sleep(200)}else await sleep(300);continue}
   const line=await p.evaluate(()=>{const ms=movesFor(UI.sel);const mv=ms.find(x=>x.line===window.__mv.line)||ms[Math.floor(Math.random()*ms.length)];return mv.line});
-  const r=await tapSel(line<5?`[data-bfrow="${line}"] .bf-rack`:'.bf-fl');if(r===true){moves++;await sleep(350)}else{if(r)covered++;await sleep(200)}
+  const r=await tapSel(line<5?`[data-bfrow="${line}"] .bf-rack`:'.bf-fl');if(r===true){moves++;await sleep(350)}else{if(r){const ck='row'+line+'|'+s.sig;globalThis.__ck=globalThis.__ck||{};globalThis.__ck[ck]=(globalThis.__ck[ck]||0)+1;if(globalThis.__ck[ck]===6){covered++;console.log('  covered (persistent): '+r+' row '+line)}}await sleep(200)}
  }
  await sleep(300);
  P(ended,tag+' coached game played to the end card with random legal UI taps ('+moves+' moves)');
