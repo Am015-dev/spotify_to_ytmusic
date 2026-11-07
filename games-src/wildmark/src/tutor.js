@@ -87,7 +87,7 @@ function coachEnd() {   // after the result is drawn: the tutorial counts as don
   var pro = UI.coachPrologue; UI.mode = 'quick'; UI.cfg = { np: 2, humans: 1, ai: 'normal', turns: 20 };
   if (pro && window.GXC && CAMPAIGN.chapters[0]) { var t = $('#titleB'); if (t) { t.textContent = 'Start the story'; t.id = 'coachStory'; } }
 }
-function storyOpen() { if (window.GXC) GXC.open(); }   // Story opens its map; the coached first game is the map's Tutorial button (and the title's New here?)
+function storyOpen() { if (!window.GXC) return; $('#start').hidden = true; GXC.open(); }   // the title steps aside so its buttons never sit under the map   // Story opens its map; the coached first game is the map's Tutorial button (and the title's New here?)
 function tutLeave() { UI.mode = 'quick'; UI.tutor = false; }
 function tutStart(o) {
   try { GX.close(); } catch (e) { } if (window.GXC && GXC.close) try { GXC.close(); } catch (e) { }
