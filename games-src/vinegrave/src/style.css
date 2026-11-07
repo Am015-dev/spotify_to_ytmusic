@@ -189,7 +189,7 @@ body:has(> .gxc:not([hidden])) .gx-app,body:has(> .gxc:not([hidden])) #start{vis
 @keyframes gdpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 html.gx-reduce .site .gd{animation:none}
 @media (max-width:999px){.cd .pic .ph{justify-content:center;padding:1px}.cd .pic .ph .pg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:86%;width:auto;max-height:none;opacity:.3}
-  .cd .pic .ph .pn{position:relative;font-size:10.5px;color:#1f1505;text-shadow:0 0 3px rgba(255,255,255,.8)}.cd.fear .pic .ph .pn{color:#ffe6e0;text-shadow:0 0 3px #000}.cd .pic .ph .pt{display:none}}
+  .cd .pic .ph .pn{position:relative;font-size:13px;line-height:1;letter-spacing:-.03em;color:#1f1505;text-shadow:0 0 3px rgba(255,255,255,.8)}.cd.fear .pic .ph .pn{color:#ffe6e0;text-shadow:0 0 3px #000}.cd .pic .ph .pt{display:none}}
 
 /* R4: result screen banner, stars and the cast's line */
 .rbox .rban{margin:0;font-size:clamp(30px,8vw,44px);font-weight:900;letter-spacing:.02em;color:#ffd36a;text-shadow:0 3px 0 #5a3a0a,0 0 24px rgba(255,211,106,.6);animation:rban .6s cubic-bezier(.2,1.5,.4,1) both}
@@ -223,3 +223,5 @@ html.gx-reduce .fxcard .rays,html.gx-reduce .site.burst{animation:none}
 .gx-set-nav{display:flex!important;flex-wrap:wrap;gap:6px}.gx-set-nav .gx-chip{flex:0 0 auto;width:auto!important;min-width:0;white-space:nowrap;padding-left:10px;padding-right:10px}
 .gxh-finger{margin-top:34px;margin-left:18px}
 .gx-bar h1{flex:0 0 auto;overflow:visible}.gx-bar h1 .ic{flex:0 0 auto}#barstat{margin-left:8px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media (min-width:1000px){.ter .tl{font-size:16px}.cd .pic .ph .pt{font-size:16px;letter-spacing:.04em}}
+@media (max-width:999px){.cd .pic .ph .pg{opacity:.14}.cd .pic .ph .pn{background:rgba(255,248,230,.72);border-radius:4px;padding:1px 2px}.cd.fear .pic .ph .pn{background:rgba(20,6,6,.7)}}

@@ -25,7 +25,7 @@ function showTitle() {
   clearTimeout(schedule.t); closeInsp(); UI.camp = null; const st = $('#start'), o = UI.opts, sv = hasSave(), first = !UI.prefs.played;
   st.innerHTML = `<div class="tbox">
     <h1 class="logo">Vinegrave</h1><p class="tag2">Dig the ruins. Wake the guardians. Reach the temple.</p>
-    ${first ? '<button type="button" class="tbtn primary" data-a="tut">Learn to play</button><button type="button" class="tsb" data-a="quick">Play now<small>skip the guided round</small></button>'
+    ${first ? '<button type="button" class="tbtn primary" data-a="tut">Learn to play</button><button type="button" class="tsb" data-a="quick">Start a game<small>skip the guided round</small></button>'
       : '<button type="button" class="tbtn primary" data-a="quick">Play</button>' + (sv ? '<button type="button" class="tsb" data-a="loadsave">Continue<small>your saved expedition</small></button>' : '<button type="button" class="tsb" data-a="tut">Guided round<small>learn or refresh the rules</small></button>')}
     <div class="lbl">Rivals</div>
     <div class="seg">${[[1, '1'], [2, '2'], [3, '3'], [0, 'Solo']].map(([v, l]) => `<button type="button" class="chipb${o.opp === v ? ' on' : ''}" data-a="opt" data-k="opp" data-v="${v}" aria-pressed="${o.opp === v}">${l}</button>`).join('')}</div>
@@ -87,7 +87,7 @@ function showResult() {
   r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}" data-art="${G.winner === 0 ? 'result-win' : 'result-lose'}"><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}${t}
     <div class="trow2">${btns}</div>
     <div class="trow2"><button type="button" class="tsb" data-a="look">Look at the island</button>${def ? (cWon ? '' : '<button type="button" class="tsb" data-a="campfin">Story map</button>') : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div>`;
-  r.hidden = false; musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }
+  r.hidden = false; $('#toast').classList.remove('on'); musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }
   if (def && m) campBest(def.id, m.score);
   if (!UI.resDone && UI.mode !== 'tutorial' && !camp && window.GNS && GNS.result) { UI.resDone = true; try { GNS.result({ game: 'vinegrave', mode: UI.mode === 'hot' ? 'hot' : UI.mode === 'solo' ? 'solo' : 'vs', level: UI.opts.lvl, seats: G.p.map((p, i) => ({ name: p.name, me: UI.humans.indexOf(i) >= 0, ai: p.ai || undefined })), winner: G.winner, scores: G.p.map((p, i) => VG.score(G, i).total), turns: G.turns }); } catch (e) { } }
 }
