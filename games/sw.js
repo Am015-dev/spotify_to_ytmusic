@@ -9,7 +9,7 @@ const SHELF = 'gns-shelf-' + VER;
 const GAMES = 'gns-games-' + VER;
 const EXTRA = /^(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com|code\.jquery\.com)$/;
 const FONTS = 'gns-fonts-' + VER;   // web fonts and CDN scripts the kept games ask for; stored by sync.html and on first use
-const SLUGS = ['crown-city-smash', 'nebula-aces', 'doorkick-dungeon', 'shipwreck-isle', 'sands-of-qamar', 'sunglaze', 'rampart-and-vine', 'short-fuse', 'tidewake', 'hollowbough', 'thornbound', 'kaiten-kitchen', 'lantern-dive', 'cauldron-fair', 'final-approach', 'redline-rally', 'emberclimb', 'twin-thrones', 'mainhattan-nightrun', 'mainhattan-overdrive'];
+const SLUGS = ['crown-city-smash', 'nebula-aces', 'doorkick-dungeon', 'shipwreck-isle', 'sands-of-qamar', 'sunglaze', 'rampart-and-vine', 'short-fuse', 'tidewake', 'hollowbough', 'thornbound', 'kaiten-kitchen', 'lantern-dive', 'cauldron-fair', 'final-approach', 'redline-rally', 'emberclimb', 'twin-thrones', 'stitchwise', 'deep-signal', 'mainhattan-nightrun', 'mainhattan-overdrive'];
 const PRECACHE = ['./', 'index.html', 'classic.html', 'sync.html', 'suggest.html', 'reference.html', 'privacy.html', 'terms.html', 'credits.html', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png', 'room/plant.webp', 'room/room-back-day.webp', 'room/room-back-night.webp', 'room/room-front-day.webp', 'room/room-front-night.webp', 'room/suitcase.webp', 'room/velour.webp', 'room/wood.webp'];
 const BASE = new URL('./', self.registration.scope).pathname;
 
