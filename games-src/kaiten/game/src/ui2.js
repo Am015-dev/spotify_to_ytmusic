@@ -15,7 +15,9 @@ function renderBar() {
   // fz.scoring: the engine has already scored this round and dealt the next, but the last reveal is still on screen
   const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, RN = G.len || D.rounds;
   s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand + (G.len ? '' : ' · most points after round 3 wins'));
+  barTwoLines();
 }
+function barTwoLines() { const s = $('#barstat'); if (s && isPh() && s.textContent.indexOf(' \u00b7 ') > 0 && !s.querySelector('br')) { const a = s.textContent.split(' \u00b7 '); s.replaceChildren(h('b', a[0]), h('br'), a[1].replace('/', ' of ')); } }
 function bankedOf(s) {
   const fzEnd = UI.fz && UI.fz.tables && (UI.fz.roundEnd || UI.fz.scoring);   // that round is already in G.rs: don't count it twice
   const list = fzEnd ? G.rs.slice(0, -1) : G.rs;
@@ -220,26 +222,35 @@ function zeroTag(v, ty) {
 }
 // ---------- the dock ----------
 function promptText() {
-  // one short line (8 words at most): the board shows the rest
+  // banner|text: "Your turn|Tap the dish you want." (wording: story.js). The board shows the rest.
   if (!G) return '';
+  if (UI.fz && UI.fz.msg) return UI.fz.msg;   // the step captions of the reveal and the hand pass (ui8)
   if (tutOn()) return '';   // the tutorial bubbles speak
-  if (UI.fz && UI.fz.msg) return UI.fz.msg;
   if (G.phase === 'over' && (!UI.fz || UI.fz.crown)) return winLine();
   const v = viewSeat();
-  if (UI.fz && UI.fz.say) return UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Everyone has chosen…') : UI.fz.roundEnd ? 'Round over!' : 'Hands pass along the belt';
+  if (UI.fz && UI.fz.say) return UI.fz.slots ? sayT('cover') : UI.fz.roundEnd ? sayT('roundEnd') : sayT('pass');
   if (UI.cards.length && UI.cards[0].kind === 'pass') return 'Pass the device to ' + pname(UI.cards[0].seat) + '.';
-  if (UI.busy) return 'Hands pass along the belt';
+  if (UI.busy) return sayT('pass');
   if (watching()) return 'The chefs are choosing…';
   if (hotSeat() && v < 0) return 'Pass the device on.';
-  const pend = KK.pending(G).filter(s => s !== v).map(pname);
-  if (v >= 0 && G.players[v].picked) return pend.length ? 'Waiting for ' + (pend.length > 1 ? pend.length + ' diners' : pend[0]) + '…' : 'Reveal!';
+  if (v >= 0 && G.players[v].picked) return sayT('wait');
   if (v >= 0) {
     const nm = hotSeat() ? pname(v) + ': ' : '';
-    if (UI.twin) return nm + (UI.sel.length ? 'Now tap a second dish' : 'Twin Sticks: tap two dishes');
-    if (UI.sel.length && UI.prefs.grab1 === false) return nm + (UI.prefs.tap2 ? 'Tap it again to serve' : 'Press Serve to grab it');
-    return nm + 'Tap a dish to grab it';
+    if (UI.twin) return nm ? nm + (UI.sel.length ? 'Now tap a second dish' : 'Twin Sticks: tap two dishes') : sayT(UI.sel.length ? 'twin2' : 'twin');
+    if (UI.sel.length && UI.prefs.grab1 === false) return nm ? nm + (UI.prefs.tap2 ? 'Tap it again to serve' : 'Press Serve to grab it') : sayT('tap2');
+    return nm ? nm + 'Tap a dish to grab it' : sayT('mine');
   }
   return '';
+}
+// the banner chip + one instruction line (two lines at most); the hand glows only while it is your turn
+function decoratePrompt() {
+  const pr = $('#prompt'); if (!pr) return; const t = pr.textContent, i = t.indexOf('|');
+  const mine = canPick() && viewSeat() >= 0 && !UI.busy && !(UI.fz && UI.fz.msg);
+  document.documentElement.classList.toggle('kkmy', !!(G && UI.started && mine && !tutOn()));
+  if (i < 0) { pr.classList.remove('kk2'); return; }
+  const b = t.slice(0, i), x = t.slice(i + 1), sig = b + '|' + x;
+  pr.className = (mine ? 'mine ' : '') + 'kk2' + (/^Your/.test(b) ? ' kyou' : ' krival');
+  if (pr.dataset.sig !== sig || !pr.querySelector('.kb')) { pr.dataset.sig = sig; pr.replaceChildren(h('b.kb', b), h('span.kt', x)); if (b !== (decoratePrompt.last || '') && ANIM) { pr.classList.remove('kpop'); void pr.offsetWidth; pr.classList.add('kpop'); } decoratePrompt.last = b; }
 }
 function placePrompt() {
   const p = $('#prompt'); if (!p) return;
@@ -247,7 +258,7 @@ function placePrompt() {
   if (tgt && p.parentNode !== tgt) tgt.appendChild(p);
 }
 function renderDock() {
-  const pr = $('#prompt'); if (pr) { const t = promptText(); pr.textContent = t; const v = viewSeat(); pr.className = canPick() && v >= 0 ? 'mine' : ''; }
+  const pr = $('#prompt'); if (pr) { const t = promptText(); pr.textContent = t; const v = viewSeat(); pr.className = canPick() && v >= 0 ? 'mine' : ''; try { decoratePrompt(); } catch (e) { console.error(e); } }
   renderLabActs();
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
   // round track

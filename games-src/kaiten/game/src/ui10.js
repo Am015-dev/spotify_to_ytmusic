@@ -33,7 +33,7 @@ function hlpPhase() {
   if (UI.rsOpen) return document.querySelector('#rs [data-a=rsnext]') ? 'tally' : null;
   if (G.phase !== 'pick' || !canPick() || UI.drag) return null;
   if (UI.twin) return 'twin2';
-  return hlpSticks() && G.players[viewSeat()].hand.length >= 2 ? 'twin' : 'pick';
+  return hlpSticks() && G.players[viewSeat()].hand.length >= 2 ? 'twin' : null;   // the plain pick is explained by the always-visible instruction line (ui13)
 }
 const hlpCap = (t, n) => { const w = t.split(/\s+/); return w.length <= n ? t : w.slice(0, n).join(' ').replace(/[,;:]$/, '') + '.'; };
 function hlpWhy(v, mv) {
