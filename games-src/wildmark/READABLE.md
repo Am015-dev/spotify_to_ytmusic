@@ -33,3 +33,7 @@ Gate notes (W376): ui-audit A, C, D, E, F = 0 on phone, phone-s and pc. B still 
 lines in How to play). The live build flags the same kind of thing (phone B2), so this is the shared drawer, not the game:
 the panel walker leaves drawers scrolled to a spot where a heading sits across the drawer edge. The fix belongs in the shell.
 The tutor "Learn in 5 minutes" label is shell text too (the tutorial is now about 1 minute).
+Addenda (W376, 21:10-21:30): rules-check WRONG (market pairs re-paired) and MISSING (25-acorn supply) fixed in engine.js with
+rules-test cases `market-pairs-stay` and `acorn-supply-25`; SIMPLIFIED items listed in the help drawer. Turn banners and a step-by-step
+rival turn added. Tutorial restored to the full 21-step staged game, now in 4 chapters; `tutorial-end.js` PASS at both sizes.
+Quick game and Story stage 1 played to the result by UI taps at 390x763: PASS. ADDENDUM 3 (story-driven tutorial) not done.
