@@ -7,6 +7,7 @@ const pre=(f,cb)=>{if(IMG_OK[f]!==undefined){cb&&IMG_OK[f]&&cb();return}IMG_OK[f
 const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 const TBL={dawn:1,storm:1,lantern:1};
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
+  {const u=unl('cardback'),bf=u==='scales'||u==='night'?'back-'+u:'back-default';pre(bf,()=>{if(window.TWBACK!==bf){window.TWBACK=bf;try{if(window.G&&typeof render==='function')render()}catch(e){}}})}
   set('--tw-title',phone()?'title-phone':'title');set('--tw-end-win','end-win');set('--tw-end-lose','end-lose')}
 // ---- 3D table: a painted sheet under the board, over the wood (the unlocked table replaces the default); wood while loading and on Low
 let skinPl=null,skinFile='';
