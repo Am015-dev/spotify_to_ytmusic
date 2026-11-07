@@ -46,6 +46,7 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
 - Reuse: shell, build layout, title/Story/tutorial/help wiring follow cauldron-fair (shell kits inlined from games-src/shell);
   art loader + register-assets.py from redline-rally. Emberclimb/hollowbough were not copied: my deck/market/worker-spot code was
   already written and tested (rules-test, playtest) before the reuse addendum arrived; nothing weaker was left to replace.
+- Temporary art: 38 slots from game-icons.net (CC BY 3.0) via `temp-art/temp-art.js` -> assets-inbox (credits in temp-art/CREDITS.md, ASSETS.md, Menu > About).
 - Web: no open-source implementation exists (GitHub/web search), so nothing ported and no THIRD-PARTY.md. Rules cross-checked
   against a published rulebook summary; 7 mismatches fixed (see rules-notes.md). Layout follows the common digital pattern:
   board centre, market row along the board, hand + actions at the bottom (phone) / right (desktop), tap for a large card view.

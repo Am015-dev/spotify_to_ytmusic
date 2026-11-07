@@ -41,3 +41,6 @@ to the play area with a free use, artifacts from hand cost their tablet, 2 Dread
 Still our own (not stated in the page we could read): exact travel/discover costs, empty-slot values, "first to a bonus space" extra
 bonuses (we give every arrival the row bonus), the Fear-card supply limit and -2 fear tiles, assistants, and every card's numbers.
 No open-source implementation of this game exists (searched GitHub and the web), so no code or data was ported; THIRD-PARTY.md is not needed.
+Sources (facts only, nothing copied): rulespal.com rulebook summary (start resources, idols, temple, market, tie-break, Fear supply).
+Card COUNTS kept at the box's scale (35 items / 35 artifacts / 15 guardians / 16 site tiles split 10+8 here vs the box's mix); our cards,
+costs and effects are original, so print-and-play / workshop card lists were not needed for per-card numbers.
