@@ -76,6 +76,50 @@ function play(G, maxSteps = 4000) {
   }
 })();
 // ---- full games
+// ---- rules-check fixes (games-src/rules-check/perch-and-plume.md), one case per MISSING item
+const strip = (G, id) => { [G.deck, G.disc].forEach(a => { const k = a.indexOf(id); if (k >= 0) a.splice(k, 1); }); const t = G.tray.indexOf(id); if (t >= 0) G.tray[t] = null; G.pl.forEach(q => { const h = q.hand.indexOf(id); if (h >= 0) q.hand.splice(h, 1); }); };
+const fresh = (seed, o) => { const G = PP.newGame(Object.assign({ seats: seats(2, 'normal'), seed }, o || {})); while (G.q && G.q.h === 'setup') PP.performMove(G, AI.setup(G, G.q.seat), G.q.seat); return G; };
+const drive = (G, seat, n = 40) => { const fx = []; while (n-- > 0 && PP.sideToAct(G) === seat && G.q) { const m = AI.choose(G, seat, 'normal'); PP.performMove(G, m, seat); fx.push(...G.fx); G.fx = []; } return fx; };
+(function missing_feeder_power_rerolls() {
+  const gb = PP.DATA.birds.find(b => b.h.includes('F') && PP.power(b.id).k === 'gainF'), want = PP.power(gb.id).x[0];
+  const other = PP.FACES.find(f => f !== want && f !== 'gs' && !(f === 'grub' || f === 'seed') === false ? false : f !== want && f !== 'gs');
+  const G = fresh(21), s = G.cur, p = G.pl[s]; strip(G, gb.id); p.board[0] = [{ id: gb.id, eggs: 0, cache: 0, tuck: 0 }];
+  G.feeder = [other, other, other, other, other, other].slice(0, 5); G.fx = [];
+  const before = p.food[want]; PP.performMove(G, { t: 'act', a: 'food' }, s); const fx = G.fx.slice(); G.fx = []; fx.push(...drive(G, s));
+  const pw = fx.findIndex(e => e.k === 'pw' && e.id === gb.id), roll = fx.findIndex((e, i) => e.k === 'roll');
+  ok(pw >= 0 && roll >= 0 && fx.slice(0, pw + 1).some(e => e.k === 'roll'), 'MISSING feeder: a gainF power rerolls an all-same feeder that lacks its food (fx ' + fx.map(e => e.k).join(',') + ')');
+  // empty feeder before a power: thrown back in
+  const G2 = fresh(22), s2 = G2.cur, p2 = G2.pl[s2]; strip(G2, gb.id); p2.board[0] = [{ id: gb.id, eggs: 0, cache: 0, tuck: 0 }];
+  G2.feeder = [want]; G2.fx = []; PP.performMove(G2, { t: 'act', a: 'food' }, s2); drive(G2, s2);
+  ok(G2.feeder.length > 0, 'MISSING feeder: an emptied feeder is rerolled (feeder ' + G2.feeder.join(',') + ')');
+})();
+(function missing_second_bird_triggers_pink() {
+  const wp = PP.DATA.birds.find(b => PP.power(b.id).k === 'wPlay' && b.h.length > 1), hab = 'FGW'.indexOf(PP.power(wp.id).x[0]);
+  const pk = PP.DATA.birds.find(b => PP.power(b.id).k === 'pTuck' && 'FGW'.indexOf(PP.power(b.id).x[0]) === hab);
+  const two = PP.DATA.birds.find(b => b.h.includes('FGW'[hab]) && b.id !== wp.id && b.id !== (pk && pk.id) && (!b.pw || PP.power(b.id).col === 'brown'));
+  if (!pk || !two) { ok(true, 'skip'); return; }
+  const G = fresh(23), s = G.cur, o = 1 - s, p = G.pl[s]; [wp.id, pk.id, two.id].forEach(id => strip(G, id));
+  const eg = PP.DATA.birds.find(b => b.h.includes('F') && ![wp.id, pk.id, two.id].includes(b.id) && b.e >= 3); strip(G, eg.id);
+  p.board = [[{ id: eg.id, eggs: 3, cache: 0, tuck: 0 }], [], []]; p.hand = [wp.id, two.id]; PP.FOODS.forEach(f => p.food[f] = 5);
+  const ph = wp.h.includes('FGW'[hab]) ? hab : 'FGW'.indexOf(wp.h[0]);
+  G.pl[o].board[0] = []; G.pl[o].board[1] = []; G.pl[o].board[2] = []; G.pl[o].board[PP.HABS ? 'FGW'.indexOf(pk.h[0]) : 0] = [{ id: pk.id, eggs: 0, cache: 0, tuck: 0 }];
+  G.pl[o].pink = false;
+  const m1 = PP.validMoves(G, s).find(m => m.t === 'play' && m.i === 0 && m.h !== hab); /* first bird in its other habitat: only the second play can trigger the pink */ const r = m1 ? PP.performMove(G, m1, s) : { ok: false }; G.fx = [];
+  const m2 = G.q && G.q.h === 'play2' ? PP.validMoves(G, s).find(m => m.t === 'play') : null;
+  ok(r.ok && !!m2, 'MISSING pink: the play-a-second-bird power offers a second play (q ' + (G.q && G.q.h) + ')');
+  if (!m2) return;
+  const tuckBefore = PP.birds(G.pl[o]).reduce((a, x) => a + x.s.tuck, 0), deckBefore = G.deck.length;
+  const before = G.work.filter(w => w.k === 'pink').length;
+  PP.performMove(G, m2, s);
+  const queued = G.work.filter(w => w.k === 'pink' && w.seat === o).length > before || PP.birds(G.pl[o]).reduce((a, x) => a + x.s.tuck, 0) > tuckBefore || (G.q && G.q.seat === o);
+  ok(queued, 'MISSING pink: a bird played by a second-bird power triggers the other player\'s pink power');
+})();
+(function missing_blue_goals_random_first() {
+  const G = fresh(24, { goalSide: 'blue' }); ok(G.goalSide === 'blue', 'MISSING blue goals: setup option stored');
+  const r = PP.placeGoal(G, 0); ok(r.pts.every((v, i) => v === Math.min(r.cnt[i], 5)), 'MISSING blue goals: 1 point per item, max 5 (' + JSON.stringify(r) + ')');
+  const firsts = new Set(); for (let sd = 1; sd < 30; sd++) firsts.add(PP.newGame({ seats: seats(3, 'normal'), seed: sd, first: 'random' }).first);
+  ok(firsts.size > 1, 'MISSING random first: first player varies with first:"random" (' + [...firsts].join(',') + ')');
+})();
 const t0 = Date.now(); let done = 0, turns = 0, scores = [], wins = { easy: 0, normal: 0, hard: 0 }, mixes = 0;
 for (let g = 0; g < N; g++) {
   const n = 1 + (g % 5), auto = n === 2 && g % 10 === 1, lv = ['easy', 'normal', 'hard'][g % 3];

@@ -2,102 +2,110 @@
  "slug": "final-approach",
  "size": "phone",
  "seed": 48774,
- "when": "2026-11-07T21:32Z",
+ "when": "2026-11-07T23:23Z",
  "tutorial": {
-  "end": false,
-  "stuck": "cannot open"
+  "end": null,
+  "note": "no tutorial"
  },
  "quick": {
   "result": "cap",
-  "clicks": 62
+  "clicks": 527
  },
  "story": {
   "result": null,
   "note": "no Story button on the title"
  },
  "fuzz": {
-  "taps": 300
+  "taps": 210
  },
  "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight briefing\" under div.ttl-in \"Final Approach Two seats\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "no tutorial entry on the title screen (no learn/guided/tutorial button): game has no staged tutorial",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-tut-noentry-2.png"
+  },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight briefing\" under div.ttl-in \"Final Approach Two seats\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-title-2.png"
-  },
-  {
-   "sev": "BLOCKER",
-   "phase": "quick",
-   "where": "tutorial step 16/23 [rr3] \"Tap the die you want to roll again. Ravi keeps his dice.\"",
-   "desc": "STUCK >15 s: wait=tap, hole=null, top at centre=null, watch-pill=true, wrong taps=0",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-tut-stuck-16-3.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 28px (<40) div.w.altw x1: \"0 ft\nYou first\"",
+   "desc": "tap target 28px (<40) div.w.altw x1: \"1000 ft\nRavi first\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-quick-board-9.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 27px (<40) span.ck.no x3: \"Plane level: not yet\"",
+   "desc": "tap target 27px (<40) span.ck.ok x2: \"Plane level: yes\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-quick-board-9.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 27px (<40) span.ck.ok x3: \"On the airport: yes\"",
+   "desc": "tap target 30px (<40) span.ck.no x4: \"2\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-quick-board-9.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 28px (<40) div.w.altw x1: \"6000 ft\nYou first\"",
+   "desc": "tap target 27px (<40) span.ck.ok x3: \"Plane level: yes\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-quick-board-10.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 27px (<40) span.ck.ok x1: \"Plane level: yes\"",
+   "desc": "tap target 30px (<40) span.ck.no x3: \"2\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-quick-board-10.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.slot.p.nov \"Axis, any die, pilot\" / div.goalb \"Seven rounds. End the la\"",
+   "desc": "tap target 27px (<40) span.ck.ok x5: \"Plane level: yes\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-quick-board-10.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.slot.c.nov \"Axis, any die, co-pilot\" / div.goalb \"Seven rounds. End the la\"",
+   "desc": "tap target 30px (<40) span.ck.no x1: \"2\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-quick-board-10.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick click #62 (Plane level: yes)",
-   "desc": "inconclusive: no result screen within the 150 s cap / 62 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "where": "quick click #527 (1)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 527 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-quick-noresult-11.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-quick-noresult-8.png"
   },
   {
    "sev": "MINOR",
@@ -105,7 +113,7 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight briefing\" under div.ttl-in \"Final Approach Two seats\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-title-12.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-title-9.png"
   },
   {
    "sev": "MINOR",
@@ -113,7 +121,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 28px (<40) div.w.altw x1: \"1000 ft\nRavi first\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-13.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-10.png"
   },
   {
    "sev": "MINOR",
@@ -121,7 +129,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 27px (<40) span.ck.ok x2: \"Plane level: yes\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-13.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-10.png"
   },
   {
    "sev": "MINOR",
@@ -129,80 +137,24 @@
    "where": "fuzz-screen",
    "desc": "tap target 30px (<40) span.ck.no x4: \"2\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-13.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.slot.p.hasv \"1-2 ✓\" / summary \"Free, peer to peer\"",
+   "desc": "tap target 27px (<40) span.ck.ok x3: \"Plane level: yes\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-14.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-11.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.slot.p.hasv \"3-4 ✓\" / summary \"Free, peer to peer\"",
+   "desc": "tap target 30px (<40) span.ck.no x3: \"2\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.slot.p.hasv \"5-6\" / summary \"Free, peer to peer\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.slot.c.hasv \"1-2 ✓\" / summary \"Free, peer to peer\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.slot.c.hasv \"2-3\" / summary \"Free, peer to peer\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.slot.c.hasv \"4-5\" / summary \"Free, peer to peer\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight briefing\" under div#start \"‹ Play online Host a fli\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-fuzz-screen-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "title",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight briefing\" under div.ttl-in \"Final Approach Two seats\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-screen-title-1.png"
-  },
-  {
-   "sev": "BLOCKER",
-   "phase": "tutorial",
-   "where": "title",
-   "desc": "a tutorial/guided entry is visible but tapping it does not start the gx-tutor tutorial",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/final-approach/phone-tut-noopen-2.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-11.png"
   }
  ],
- "secs": 3
+ "secs": 297
 }

@@ -32,7 +32,7 @@ const TUT_GAME = 'vinegrave', TUT_SITE = 5;   // the first level-1 ruin (travel:
 const tq = sel => () => { const e = typeof sel === 'function' ? sel() : $(sel); return e && e.getBoundingClientRect().width ? e : null; };
 const tinsp = txt => () => [...document.querySelectorAll('#insp .btn')].find(b => b.textContent.indexOf(txt) === 0) || null;
 const tmine = () => !!(G && UI.mode === 'tutorial' && myTurn() && !UI.busy && $('#fx').hidden);
-function tutAI(s) { if (s !== 1) return null; const ms = VG.moves(G); return ms.find(m => m.t === 'dig' && G.sites[m.s].lvl === 0) || ms.find(m => m.t === 'pass'); }
+function tutAI() { return null; }   /* coached game: Tamsin is the real (easy) computer */
 function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up once (TUTORIAL-COVERAGE.md) */
   try { GX.close(); } catch (e) { } closeRes(); UI.fast = false;
   startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 2 });
@@ -46,40 +46,97 @@ function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up o
 }
 const TS = id => { const t = V.STORY.tut[id]; return { title: t[0], say: t[1] }; };
 const tglow = sel => () => { const e = [...document.querySelectorAll(sel)].find(x => x.getBoundingClientRect().width); return e || null; };
-function tutSteps() {   /* the prologue: Pell's story reason in every bubble, one real action per step, a whole short game to the final count */
-  const st = (id, o) => Object.assign({ id }, TS(id), o);
+// ---------------------------------------------------------------- the coached first game (ADDENDUM 4): 2 forced taps, then free play with Pell's tips
+const CO = { seen: {}, q: [], cur: null, t: 0, fb: 0 };
+const coachOn = () => !!(G && UI.mode === 'tutorial' && UI.coachFree);
+function coachSay(id, text) {   /* one bubble at a time; never blocks input; × dismisses */
+  if (!coachOn()) return; if (!id) CO.q = CO.q.filter(x => x.id);   /* rule lines win over move feedback */ if (id && (CO.seen[id] || CO.q.some(x => x.id === id))) return;
+  CO.q.push({ id, text: text || V.STORY.coach[id] }); coachPump();
+}
+function coachPump() {
+  if (CO.cur || !CO.q.length) return; const it = CO.q.shift(); CO.cur = it; if (it.id) CO.seen[it.id] = 1;
+  let e = $('#coach'); if (!e) { e = document.createElement('div'); e.id = 'coach'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
+  e.innerHTML = `<span class="cpor" aria-hidden="true">${esc(V.STORY.guide.mark)}</span><span class="ctx"><b>${esc(V.STORY.guide.short)}</b> ${esc(it.text)}</span><button type="button" class="cx" aria-label="Dismiss tip">×</button>`;
+  e.className = 'on'; e.querySelector('.cx').onclick = coachHide;
+  try { const d = $('#dock').getBoundingClientRect(), b = $('#board').getBoundingClientRect(), ph = innerWidth < 1000;   /* phone: just above the hand tray; desktop: top of the board */
+    e.style.top = (ph ? Math.max(60, d.top - e.offsetHeight - 8) : b.top + 8) + 'px'; e.style.left = (ph ? innerWidth / 2 : b.left + b.width / 2) + 'px'; } catch (x) { }
+  clearTimeout(CO.t); CO.t = setTimeout(coachHide, CO.q.length > 1 ? 2600 : Math.max(3400, it.text.length * 55));   /* a backlog moves faster */
+}
+function coachHide() { clearTimeout(CO.t); const e = $('#coach'); if (e) e.className = ''; CO.cur = null; setTimeout(coachPump, 350); }
+function coachCheck(L) {   /* called from render: explain a rule the first time it is a real option for you */
+  if (!coachOn() || !myTurn() || UI.busy) return; const t = {}; L.forEach(m => { t[m.t] = 1; });
+  const me = G.p[UI.view];
+  if (t.dig || t.disc) coachSay('travel');
+  if (t.dig) coachSay('dig');
+  if (t.disc) coachSay('discover');
+  if (L.some(m => m.t === 'disc' && G.sites[m.s].lvl === 2)) coachSay('deep');
+  if (L.some(m => (m.t === 'dig' || m.t === 'disc') && (VG.payPlan(G, UI.view, G.sites[m.s].cost) || {}).coins)) coachSay('plane');
+  if (t.idol) { coachSay('shrine'); coachSay('slots'); }
+  if (t.beat) coachSay('overcome');
+  if (t.boon) coachSay('boon');
+  if (L.some(m => m.t === 'res' && m.k === 'g')) coachSay('research');
+  if (L.some(m => m.t === 'res' && m.k === 'n')) coachSay('notebook');
+  if (t.temple) coachSay('temple');
+  if (L.some(m => m.t === 'buy' && V.CARDS[G.row[m.r]].t === 'item')) coachSay('buyitem');
+  if (L.some(m => m.t === 'buy' && V.CARDS[G.row[m.r]].t === 'art')) coachSay('buyart');
+  if (G.q && G.q.h === 'exile') coachSay('exile');
+  if (me.idols.length) coachSay('idol');
+}
+function coachEvent(e, s) {   /* events: guardian wakes, round end, fleeing, the rival's moves */
+  if (!coachOn()) return;
+  if (e.k === 'guardian') coachSay('guardian'); if (e.k === 'round') coachSay('roundend'); if (e.k === 'fear') coachSay('fear');
+  if (e.k === 'idolfind' && s === UI.view) coachSay('idol');
+}
+function coachRival(m) { if (!coachOn()) return; coachSay('rival'); if (m && m.t === 'pass') coachSay('pass'); }
+function coachMove(m, best) {   /* one line why, for a strong or a weaker move (first few times) */
+  if (!coachOn() || !best || m.free || m.t === 'ans' || CO.fb >= 2 || CO.q.length > 1) return; CO.fb++;
+  const same = VG.same ? VG.same(m, best) : JSON.stringify(m) === JSON.stringify(best);
+  let why = ''; try { why = VAI.why(G, best) || ''; } catch (x) { }
+  if (same) coachSay(null, V.STORY.coachGood + (why || 'that was the strongest option.'));
+  else if (best.t !== 'pass') coachSay(null, V.STORY.coachTip + 'next time consider this: ' + (why || 'look at what each glowing thing gives.'));
+}
+const COVER = () => Object.keys(V.STORY.coach);
+window.coachReport = () => { const all = COVER(), seen = all.filter(id => CO.seen[id]); return { all, seen, later: all.filter(id => !CO.seen[id]) }; };
+function coachScoreStart() {   /* game over in the coached game: a second tutor run walks the score and shows the end card */
+  if (typeof GXT === 'undefined' || !UI.coachFree) return; UI.coachFree = false; coachHide();
+  const steps = tutSteps().filter(x => /^score/.test(x.id)), c = Object.assign({}, TUTCFG, { steps, setup: () => { } });
+  TUTCFG = c; GXT.start(c);
+}
+function tutSteps() {
+  const sc = () => { const a = VG.score(G, 0), b = VG.score(G, 1); return [a, b]; };
+  const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs table')) || $('#opp');
   return [
-    st('hand', { target: tq(() => $('#hand .cd[data-id="trail"]')), wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() }),
-    st('play', { target: tq(tinsp('Play it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()) }),
-    st('ruin', { target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && G.p[1].ex < 2 }),
-    st('disc', { target: tq(tinsp('Discover')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }, ready: () => !!(UI.insp && tinsp('Discover')()) }),
-    st('idol', { target: tq('#extra [data-a=idol]'), wait: { type: 'tap', match: a => a.what === 'idol' }, ready: () => tmine() && !!G.sites[TUT_SITE].guard && !!$('#extra [data-a=idol]') && G.p[1].ex < 1 }),
-    st('shrine', { target: tq(tinsp('Shrine: 3 coins')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'idol' }, ready: () => !!(UI.insp && tinsp('Shrine: 3 coins')()) }),
-    st('beat', { target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && !UI.insp }),
-    st('over', { target: tq(tinsp('Overcome')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'beat' }, ready: () => !!(UI.insp && tinsp('Overcome')()) }),
-    st('boon', { target: tq('#extra [data-a=guard]'), wait: { type: 'tap', match: a => a.what === 'guard' }, ready: () => tmine() && G.p[0].guards.length > 0 && !!$('#extra [data-a=guard]') }),
-    st('useboon', { target: tq(tinsp('Use the boon')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'boon' }, ready: () => !!(UI.insp && tinsp('Use the boon')()) }),
-    st('market', { target: tq('#row .cd[data-r="0"]'), wait: { type: 'tap', match: a => a.what === 'row' && a.x === 0 }, ready: () => tmine() && !UI.insp }),
-    st('buy', { target: tq(tinsp('Buy it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }, ready: () => !!(UI.insp && tinsp('Buy it')()) }),
-    st('pass', { target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() && G.round === 1 }),
-    st('dig', { target: tq(tglow('#map .site.l0.glow, #map .site.glow')), wait: { type: 'tap', match: a => a.what === 'site' }, ready: () => tmine() && G.round === 2 && !!tglow('#map .site.glow')() }),
-    st('digit', { target: tq(() => tinsp('Dig here')() || tinsp('Discover')()), wait: { type: 'tap', match: a => a.what === 'mv' && (a.m.t === 'dig' || a.m.t === 'disc') }, ready: () => !!(UI.insp && (tinsp('Dig here')() || tinsp('Discover')())) }),
-    st('pass2', { target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() && G.round === 2 }),
-    st('score', { say: () => { const a = VG.score(G, 0).total, b = VG.score(G, 1).total; return `You ${a}, Tamsin ${b}. ` + (a >= b ? V.STORY.endWin : V.STORY.endLose); },
-      target: tq('#rs table'), wait: null, ready: () => !!(G && G.phase === 'over' && $('#rs table') && !$('#rs').hidden) })
+    { id: 'hand', title: 'Ch 1 · Landfall', say: 'The boat is gone and Tamsin is ashore. Trail Notes point inland: start with it.', target: tq(() => $('#hand .cd[data-id="trail"]')),
+      wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
+    { id: 'play', title: 'Ch 1 · Landfall', say: 'Playing it gives +1 compass. That is your one action. After this, the island is yours to explore.', target: tq(tinsp('Play it')),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()), onEnter: () => { CO.seen.play = 1; } },
+    { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
+      onEnter: () => { UI.coachFree = true; setTimeout(() => { try { GXT.stop(); } catch (x) { } render(); }, 0); } },   /* the tutor steps aside: free play, Pell coaches */
+    { id: 'score1', title: 'Ch 2 · The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research: you ${a.research}, Tamsin ${b.research}. Temple tiles: ${a.temple} vs ${b.temple}. Higher on the track, more points.`; },
+      target: tq(scoreTarget), wait: null, ready: () => true },
+    { id: 'score2', title: 'Ch 2 · The count', say: () => { const [a, b] = sc(); return `Idols ${a.idols} vs ${b.idols}, empty shrine slots ${a.slots} vs ${b.slots}, guardians ${a.guards} vs ${b.guards}.`; }, target: tq(scoreTarget), wait: null, ready: () => true },
+    { id: 'score3', title: 'Ch 2 · The count', say: () => { const [a, b] = sc(); CO.seen.tiebreak = CO.seen.rounds = 1; const r = window.coachReport();
+        TUTCFG.endText = (a.total >= b.total ? V.STORY.endWin : V.STORY.endLose) + (r.later.length ? ' Things you’ll meet later: ' + r.later.map(id => V.STORY.coach[id]).join(' ') : '') + ' A full game is 5 rounds.';
+        return `Cards ${a.cards} vs ${b.cards}, Dread ${a.fear} vs ${b.fear}. Total: you ${a.total}, Tamsin ${b.total}. Ties go to the first into the temple.`; }, target: tq(scoreTarget), wait: null, ready: () => true }
   ];
 }
+let TUTCFG = null;
 function tutStart(o) {
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; closeInsp();
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters[0];
-  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+  CO.seen = {}; CO.q = []; CO.cur = null; CO.fb = 0;
+  UI.coachFree = false;
+  TUTCFG = { game: TUT_GAME, steps: tutSteps().filter(x => !/^score/.test(x.id)), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'Prologue complete', endText: o ? 'Pell: "You played a whole expedition. Now the coast, and Tamsin, are waiting."' : 'Pell: "A whole expedition, start to count. A real game is 5 rounds. The lightbulb helps any time."',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start stage 1' }] : null,
     setup: tutSetup,
-    onDone: r => { const c = r && r.choice; clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp();
+    onDone: r => { const c = r && r.choice; coachEnd(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp();
       if (c === 'chapter' && first) GXC.play(first.id); else if (c === 'story') { $('#start').hidden = true; GXC.open(); } else if (c === 'play') UIACT.quick(); else showTitle(); },
-    onExit: () => { clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); } });
+    onExit: () => { coachEnd(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); } };
+  GXT.start(TUTCFG);
 }
+function coachEnd() { document.body.classList.remove('vg-coached'); UI.coachFree = false; CO.q = []; coachHide(); }
+UIACT.tutleave = () => { coachEnd(); try { GXT.markDone(TUT_GAME); } catch (x) { } clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); };
 // ---------------------------------------------------------------- the Story map fits the screen (no scrolling: every stage visible at once)
 // gx-campaign lays the stages out 74 px apart (about 900 px for 10 stages); here the rows are pulled closer so the whole map fits the
 // viewport. Text sizes are untouched; only the vertical positions, the path height and the painted road scale.
