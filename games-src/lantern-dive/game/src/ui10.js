@@ -35,7 +35,7 @@ function placeFinger() {
   f.classList.add('go');
 }
 // a detail callout (seat, job, last trick) never blocks the table: any touch elsewhere closes it and goes through
-document.addEventListener('pointerdown', e => { if (UI.pop && e.target.closest && !e.target.closest('#ppop')) closePop(); }, true);
+document.addEventListener('pointerdown', e => { if (UI.pop && !tutOn() && e.target.closest && !e.target.closest('#ppop')) closePop(); }, true);
 // ---- drag a card from the hand onto the table to play it ----
 (function () {
   let Dg = null;

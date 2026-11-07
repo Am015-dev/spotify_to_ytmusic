@@ -28,7 +28,7 @@
     o = o || {};
     var np = Math.max(1, Math.min(4, o.np || 2)), seed = o.seed != null ? o.seed : Math.floor(Math.random() * 1e9);
     var G = { v: 1, seed: seed, rs: seed | 0, np: np, solo: np === 1, turns: o.turns || 20, cur: 0, phase: 'pick', stage: 'pick', round: 1, log: [], logN: 0,
-      bag: { bear: 20, elk: 20, salmon: 20, hawk: 20, fox: 20 }, seats: [], market: { tiles: [], toks: [] }, hold: null, used3: false, over: false, winner: -1, res: null,
+      bag: { bear: 20, elk: 20, salmon: 20, hawk: 20, fox: 20 }, seats: [], market: { tiles: [], toks: [] }, hold: null, used3: false, acornPool: 25, over: false, winner: -1, res: null,
       opts: { no3: !!o.no3, noAcornHuman: !!o.noAcornHuman }, cards: o.cards || null, tw: o.twist || null, lastScore: null };
     var names = o.names || [];
     var st = shuffle(G, [0, 1, 2, 3, 4]);
@@ -90,14 +90,14 @@
       }
       if (m.t === 'wipe') {
         if (s.acorns < 1 || !m.idx || !m.idx.length) throw new Error('no acorn');
-        s.acorns--; var back = [];
+        s.acorns--; if (G.acornPool != null) G.acornPool++; var back = [];
         m.idx.forEach(function (j) { back.push(G.market.toks[j]); G.market.toks[j] = drawTok(G); }); back.forEach(function (a) { if (a) G.bag[a]++; });
         log(G, s.name + ' spent an acorn to replace ' + m.idx.length + ' token' + (m.idx.length > 1 ? 's' : '') + '.'); overpop(G); return G;
       }
       if (m.t === 'take' || m.t === 'free') {
         var ti = m.t === 'take' ? m.i : m.ti, ki = m.t === 'take' ? m.i : m.ki;
         if (!G.market.tiles[ti] || !G.market.toks[ki]) throw new Error('empty slot');
-        if (m.t === 'free') { if (s.acorns < 1 || ti === ki) throw new Error('free pick needs an acorn'); s.acorns--; }
+        if (m.t === 'free') { if (s.acorns < 1 || ti === ki) throw new Error('free pick needs an acorn'); s.acorns--; if (G.acornPool != null) G.acornPool++; }
         G.hold = { tile: G.market.tiles[ti], tok: G.market.toks[ki], ti: ti, ki: ki, free: m.t === 'free' };
         G.market.tiles[ti] = null; G.market.toks[ki] = null; G.stage = 'tile'; return G;
       }
@@ -112,7 +112,7 @@
       var tok = G.hold.tok, gain = 0;
       if (m.t === 'tok') {
         var c = s.env[m.c]; if (!c || c.tok || c.a.indexOf(tok) < 0) throw new Error('bad token spot');
-        c.tok = tok; if (c.key) { s.acorns++; gain = 1; }
+        c.tok = tok; if (c.key && (G.acornPool == null || G.acornPool > 0)) { s.acorns++; gain = 1; if (G.acornPool != null) G.acornPool--; }   // rules: the supply holds 25 acorns
         log(G, s.name + ' placed ' + an(tok) + (gain ? ' on a keystone and gained an acorn.' : '.'));
       } else if (m.t === 'back') { G.bag[tok]++; log(G, s.name + ' returned ' + an(tok) + ' token.'); }
       else throw new Error('bad token move');
@@ -127,8 +127,8 @@
       for (var i = 3; i >= 0; i--) if (G.market.tiles[i]) { G.market.tiles[i] = null; break; }
       for (i = 3; i >= 0; i--) if (G.market.toks[i]) { G.bag[G.market.toks[i]]++; G.market.toks[i] = null; break; }
     }
-    // slide remaining pairs right and refill from the left (keeps column order readable)
-    ['tiles', 'toks'].forEach(function (f) { var l = G.market[f].filter(function (x) { return x; }); while (l.length < 4) l.unshift(null); G.market[f] = l; });
+    // rules: market items never move; the taken tile and token are refilled in place (solo keeps its documented slide toward the far end)
+    if (G.solo) ['tiles', 'toks'].forEach(function (f) { var l = G.market[f].filter(function (x) { return x; }); while (l.length < 4) l.unshift(null); G.market[f] = l; });
     for (i = 0; i < 4; i++) { if (!G.market.tiles[i]) G.market.tiles[i] = G.supply.length ? G.supply.pop() : null; if (!G.market.toks[i]) G.market.toks[i] = drawTok(G); }
     overpop(G);
     if (G.seats.every(function (x) { return x.done >= G.turns; })) { finish(G); return; }
