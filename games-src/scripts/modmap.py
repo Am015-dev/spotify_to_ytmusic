@@ -32,6 +32,7 @@ GAMES = {
     "nebula-aces":      ("Nebula Aces",      "xw",                  "xw"),
     "redline-rally":    ("Redline Rally",    "redline-rally",       "redline-rally"),
     "stitchwise":       ("Stitchwise",       "stitchwise",          "stitchwise"),
+    "deep-signal":      ("Deep Signal",      "deep-signal",         "deep-signal"),
     "rampart-and-vine": ("Rampart and Vine", "carc/game/src",       "carc"),
     "sands-of-qamar":   ("Sands of Qamar",   "ft/src",              "ft"),
     "shipwreck-isle":   ("Shipwreck Isle",   "rc",                  "rc"),

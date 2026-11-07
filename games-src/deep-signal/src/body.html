@@ -1,0 +1,59 @@
+<body>
+<div class="gx-app" id="app">
+  <div id="topbar">
+    <div id="mchip"><b id="mname">Deep Signal</b><span id="mtrick"></span></div>
+    <button class="gx-ibtn gxh-bulb ib" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
+    <button class="ib txt" id="helpB" type="button" aria-label="Rules">?</button>
+    <button class="ib" data-gx="setd" id="menuB" type="button" aria-label="Menu">☰</button>
+  </div>
+  <div class="gx-board" id="board" data-art="bg-table">
+    <div id="seats"></div>
+    <div id="pool"></div>
+    <div id="trick"></div>
+    <div id="askp"></div>
+    <div id="stamp"></div>
+  </div>
+  <div id="dock">
+    <div id="msg" aria-live="polite"></div>
+    <div id="mine"><div id="mytasks"></div><button class="btn" id="sigB" type="button"><span class="bi" data-art="icon-signal">📡</span> Signal</button><button class="btn" id="flareB" type="button"><span class="bi" data-art="icon-flare">🔥</span> Flare</button></div>
+    <div id="hand"></div>
+  </div>
+</div>
+<div class="scr on" id="title" data-art="bg-title">
+  <div class="sonar-ring" data-art="logo-emblem"></div>
+  <h1 class="logo">DEEP SIGNAL</h1>
+  <p class="tag">A crew of divers, one deck of cards. Win the right cards for the right crew mate, dive after dive.</p>
+  <button class="btn pri big" id="storyB" type="button">Story: the Logbook</button>
+  <div class="trow"><span id="tutSlot"></span><button class="btn" id="quickB" type="button">Quick game</button><button class="btn" id="howB" type="button">How to play</button><button class="btn" data-gx="setd" type="button" id="tMenuB">Settings</button></div>
+</div>
+<div class="scr" id="setup">
+  <h2 style="margin:0">Quick game</h2>
+  <div class="setrow"><label>Crew</label><div class="seg" id="segP"></div></div>
+  <div class="setrow"><label>At this device</label><div class="seg" id="segH"></div></div>
+  <div class="setrow"><label>Crew skill</label><div class="seg" id="segL"></div></div>
+  <div class="setrow"><label>Mission</label><button class="ib" id="mMinus" type="button" aria-label="Previous mission">−</button><b id="mNum" style="font-size:1.3rem;min-width:3ch">1</b><button class="ib" id="mPlus" type="button" aria-label="Next mission">+</button></div>
+  <p id="mdesc"></p>
+  <div class="lb" id="logbook"></div>
+  <button class="btn pri big" id="startB" type="button">Start dive</button>
+  <button class="btn" id="setBack" type="button">Back</button>
+</div>
+<div class="scr" id="pass"><div class="sonar-ring"></div><h2 id="passH" style="margin:0">Pass the device</h2><p class="tag">Hand it over; everyone else looks away. Your cards stay hidden until you tap.</p><button class="btn pri big" id="passB" type="button">I am ready</button></div>
+<div id="zoom"><div class="zc"><div class="big" id="zbig"></div><p id="ztxt"></p><div class="row" id="zrow"></div></div></div>
+<div class="scr" id="res" data-art="result-complete"><h2 id="resH"></h2><p id="resP"></p><div class="row" id="resRow" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"></div></div>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
+<script src="shell.js"></script>
+<script src="gx-kit.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
+<script src="gx-tutor.js"></script>
+<script src="gameaudio.js"></script>
+<script src="gx-music.js"></script>
+<script src="gx-campaign.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="art.js"></script>
+<script src="ui.js"></script>
+<script src="tutor.js"></script>
+</body></html>
