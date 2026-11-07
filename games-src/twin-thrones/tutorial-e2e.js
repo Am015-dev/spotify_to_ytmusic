@@ -56,7 +56,7 @@ const which = process.argv[2]||'p';
     if (await pg.locator('#coach [data-cn]').count()) { log.push('walk'); await LIB.T(pg,touch,pg.locator('#coach [data-cn]').first()); await pg.waitForTimeout(200); continue; }
     if (await pg.locator('#res:not([hidden])').count()) { await pg.waitForTimeout(300); continue; }
     if ((await LIB.dt(pg)) !== 'Your move') { await pg.waitForTimeout(120); continue; }
-    if (await pg.locator('.wcard.go').count()) { await LIB.T(pg,touch,pg.locator('.wcard.go').nth(Math.floor(Math.random()*2))); continue; }
+    if (await pg.locator('.wcard.go').count()) { await LIB.T(pg,touch,pg.locator('.wcard.go').nth(Math.floor(Math.random()*await pg.locator('.wcard.go').count()))).catch(()=>{}); continue; }
     if (await pg.locator('[data-first]').count()) { await LIB.T(pg,touch,pg.locator('[data-first]').first()); continue; }
     if (await pg.locator('.picker .tk').count()) { await LIB.T(pg,touch,pg.locator('.picker .tk').first()); continue; }
     const av = pg.locator('#pyr .card.av:not(.dim)');
