@@ -1,0 +1,950 @@
+{
+ "game": "wildmark",
+ "title": "The Three Regions",
+ "version": 1,
+ "cast": {
+  "ward": {
+   "name": "Ward Elder Rowan",
+   "portrait": "portrait-rowan.webp",
+   "emoji": "🧑‍🌾",
+   "color": "#3f7a4a"
+  },
+  "you": {
+   "name": "You",
+   "portrait": "portrait-ranger.webp",
+   "emoji": "🧭",
+   "color": "#e6b04f"
+  },
+  "pip": {
+   "name": "Pip",
+   "portrait": "portrait-pip.webp",
+   "emoji": "🌱",
+   "color": "#7fb069"
+  },
+  "bram": {
+   "name": "Bram Hollowell",
+   "portrait": "portrait-bram.webp",
+   "emoji": "🪵",
+   "color": "#7a4e2d"
+  },
+  "sorrel": {
+   "name": "Sorrel",
+   "portrait": "portrait-sorrel.webp",
+   "emoji": "🌾",
+   "color": "#c9b45a"
+  },
+  "quill": {
+   "name": "Sable Quill",
+   "portrait": "portrait-quill.webp",
+   "emoji": "🪶",
+   "color": "#4f6fa3"
+  },
+  "linnet": {
+   "name": "Linnet",
+   "portrait": "portrait-linnet.webp",
+   "emoji": "🐦",
+   "color": "#5f9c8a"
+  },
+  "oake": {
+   "name": "Oake",
+   "portrait": "portrait-oake.webp",
+   "emoji": "🌳",
+   "color": "#3a5d3a"
+  },
+  "warden": {
+   "name": "The Ash Warden",
+   "portrait": "portrait-warden.webp",
+   "emoji": "🔥",
+   "color": "#a3402d"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "The Thawing Valley",
+   "blurb": "Learn to grow a valley."
+  },
+  {
+   "act": 2,
+   "title": "The Mistwood",
+   "blurb": "Bigger habitats, sharper rivals."
+  },
+  {
+   "act": 3,
+   "title": "The High Cascades",
+   "blurb": "Short summers and the Ash Warden."
+  }
+ ],
+ "twists": [
+  {
+   "id": "boss-acorns",
+   "where": "setup",
+   "how": "Every rival seat starts with param acorns."
+  },
+  {
+   "id": "short-season",
+   "where": "setup",
+   "how": "The game lasts param turns per player (tile supply sized to match)."
+  },
+  {
+   "id": "no-sweep",
+   "where": "rules",
+   "how": "Nobody may use the free sweep of three matching tokens (four still sweep themselves)."
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "First Tracks",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ward",
+     "text": "The Thawing Valley lost its wild things in the long frost. Let's start small."
+    },
+    {
+     "who": "ward",
+     "text": "Grow your own valley alone this time. Pairs of bears, lines of elk. Aim for 50 points."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ward",
+     "text": "Fresh tracks in the snow. The valley remembers how to live."
+    }
+   ],
+   "opponent": {
+    "name": "The Frost",
+    "portrait": "portrait-ward.webp",
+    "emoji": "❄️",
+    "cast": "ward",
+    "personality": "No rival: just you against the season.",
+    "aiLevel": "easy",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 1,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "score",
+    "value": 50,
+    "winNotNeeded": true,
+    "text": "Score at least 50 points."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Score 50 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Score 65 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 65
+     }
+    },
+    {
+     "text": "Keep 2 acorns",
+     "test": {
+      "k": "acorns",
+      "op": ">=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Same calm valley; the goal stays, every tip stays on."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "ward",
+     "text": "Rowan's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "A Neighbour's Fence",
+   "boss": false,
+   "intro": [
+    {
+     "who": "pip",
+     "text": "Hi! I'm restoring the next hollow. Shall we see whose valley grows better?"
+    },
+    {
+     "who": "ward",
+     "text": "Pip takes what is closest. Watch the market and plan two turns ahead."
+    }
+   ],
+   "outro": [
+    {
+     "who": "pip",
+     "text": "Your hawks look so proud up there. Teach me sometime?"
+    }
+   ],
+   "opponent": {
+    "name": "Pip",
+    "portrait": "portrait-pip.webp",
+    "emoji": "🌱",
+    "cast": "pip",
+    "personality": "Cheerful, takes whatever looks nice right now.",
+    "aiLevel": "easy",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat Pip."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 60 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 60
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Pip plays gently."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "pip",
+     "text": "Pip's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "The Hollowell Claim",
+   "boss": true,
+   "intro": [
+    {
+     "who": "bram",
+     "text": "This valley was my family's before the frost. I'll not hand it to a newcomer."
+    },
+    {
+     "who": "ward",
+     "text": "Bram hoards acorns. Get some of your own: keystones!"
+    }
+   ],
+   "outro": [
+    {
+     "who": "bram",
+     "text": "Fair is fair. The valley is yours to tend. I'll be watching."
+    },
+    {
+     "who": "ward",
+     "text": "The Thawing Valley breathes again. The Mistwood calls next."
+    }
+   ],
+   "opponent": {
+    "name": "Bram Hollowell",
+    "portrait": "portrait-bram.webp",
+    "emoji": "🪵",
+    "cast": "bram",
+    "personality": "Stubborn and careful. Starts with a pocket of acorns.",
+    "aiLevel": "easy",
+    "aiStyle": "standard",
+    "taunt": "Back to the frost with you, newcomer.",
+    "praise": "Hm. You know your bears. The claim is yours."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null
+   },
+   "twist": {
+    "id": "boss-acorns",
+    "param": 2,
+    "text": "Boss rule: Bram starts with 2 acorns."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat Bram."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 70 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 70
+     }
+    },
+    {
+     "text": "A habitat of 7 or more",
+     "test": {
+      "k": "biggest",
+      "op": ">=",
+      "v": 7
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Bram plays gently and starts with no acorns."
+   },
+   "unlock": [
+    {
+     "type": "act",
+     "id": "2",
+     "text": "Act 2: The Mistwood"
+    },
+    {
+     "type": "portrait",
+     "id": "bram",
+     "text": "Bram's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c4",
+   "act": 2,
+   "title": "Into the Mist",
+   "boss": false,
+   "intro": [
+    {
+     "who": "sorrel",
+     "text": "The Mistwood is thick. My meadows spread fast. Keep up, if you can."
+    },
+    {
+     "who": "ward",
+     "text": "Habitats pay too: big connected forests and rivers win bonuses."
+    }
+   ],
+   "outro": [
+    {
+     "who": "sorrel",
+     "text": "Your rivers run further than mine. Well grown."
+    }
+   ],
+   "opponent": {
+    "name": "Sorrel",
+    "portrait": "portrait-sorrel.webp",
+    "emoji": "🌾",
+    "cast": "sorrel",
+    "personality": "Builds huge habitats, careless with animals.",
+    "aiLevel": "normal",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat Sorrel."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Habitats worth 30 or more",
+     "test": {
+      "k": "habitat",
+      "op": ">=",
+      "v": 30
+     }
+    },
+    {
+     "text": "Score 80 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 80
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Sorrel plays gently."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "sorrel",
+     "text": "Sorrel's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c5",
+   "act": 2,
+   "title": "Three at the Spring",
+   "boss": false,
+   "intro": [
+    {
+     "who": "linnet",
+     "text": "Three rangers, one spring, one market. It gets crowded."
+    },
+    {
+     "who": "ward",
+     "text": "With more rivals the best pairs vanish fast. Acorns let you choose freely."
+    }
+   ],
+   "outro": [
+    {
+     "who": "linnet",
+     "text": "You read the market like birdsong."
+    }
+   ],
+   "opponent": {
+    "name": "Linnet",
+    "portrait": "portrait-linnet.webp",
+    "emoji": "🐦",
+    "cast": "linnet",
+    "personality": "Quick and greedy for hawks.",
+    "aiLevel": "normal",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 3,
+    "seed": null,
+    "others": [
+     "Oake"
+    ]
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat both rivals."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 80 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 80
+     }
+    },
+    {
+     "text": "Every animal scores",
+     "test": {
+      "k": "kinds",
+      "op": ">=",
+      "v": 5
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Both rivals play gently."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "linnet",
+     "text": "Linnet's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c6",
+   "act": 2,
+   "title": "The Quill Survey",
+   "boss": true,
+   "intro": [
+    {
+     "who": "quill",
+     "text": "I survey valleys for a living. Yours will rank second, as they all do."
+    },
+    {
+     "who": "ward",
+     "text": "Quill never wastes a turn and keeps spare acorns. Beat her surveyed perfection."
+    }
+   ],
+   "outro": [
+    {
+     "who": "quill",
+     "text": "First rank. I will have to correct my maps."
+    },
+    {
+     "who": "ward",
+     "text": "The Mistwood is clear. Only the High Cascades remain, and the Warden there."
+    }
+   ],
+   "opponent": {
+    "name": "Sable Quill",
+    "portrait": "portrait-quill.webp",
+    "emoji": "🪶",
+    "cast": "quill",
+    "personality": "Precise and patient. Plans the market three turns ahead.",
+    "aiLevel": "hard",
+    "aiStyle": "standard",
+    "taunt": "Second rank, as predicted.",
+    "praise": "Remarkable. I misjudged you."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null
+   },
+   "twist": {
+    "id": "boss-acorns",
+    "param": 2,
+    "text": "Boss rule: Quill starts with 2 acorns."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat Sable Quill."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 85 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 85
+     }
+    },
+    {
+     "text": "Win by 8 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 8
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Quill plays at normal strength with no acorns."
+   },
+   "unlock": [
+    {
+     "type": "act",
+     "id": "3",
+     "text": "Act 3: The High Cascades"
+    },
+    {
+     "type": "portrait",
+     "id": "quill",
+     "text": "Quill's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c7",
+   "act": 3,
+   "title": "Short Thaw",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ward",
+     "text": "Up in the Cascades the summer is short. Only 16 turns before the snow returns."
+    },
+    {
+     "who": "ward",
+     "text": "Alone again. Every token counts. Reach 60."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ward",
+     "text": "Even a short summer can be full of life."
+    }
+   ],
+   "opponent": {
+    "name": "The Snowline",
+    "portrait": "portrait-ward.webp",
+    "emoji": "🏔️",
+    "cast": "ward",
+    "personality": "No rival: a short, hard season.",
+    "aiLevel": "easy",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 1,
+    "seed": null
+   },
+   "twist": {
+    "id": "short-season",
+    "param": 16,
+    "text": "Rule: the season lasts 16 turns."
+   },
+   "goal": {
+    "type": "score",
+    "value": 60,
+    "winNotNeeded": true,
+    "text": "Score at least 60 points in 16 turns."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Score 60 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 60
+     }
+    },
+    {
+     "text": "Score 70 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 70
+     }
+    },
+    {
+     "text": "Animals worth 40 or more",
+     "test": {
+      "k": "animals",
+      "op": ">=",
+      "v": 40
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": {
+     "id": "short-season",
+     "param": 18,
+     "text": "Rule: the season lasts 18 turns."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Two more turns of summer."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c8",
+   "act": 3,
+   "title": "Oake's Old Growth",
+   "boss": false,
+   "intro": [
+    {
+     "who": "oake",
+     "text": "These forests are older than your grandmother's grandmother. Prove you deserve them."
+    },
+    {
+     "who": "ward",
+     "text": "No sweeping the market here: the old growth keeps what it is given."
+    }
+   ],
+   "outro": [
+    {
+     "who": "oake",
+     "text": "The old trees approve. So do I."
+    }
+   ],
+   "opponent": {
+    "name": "Oake",
+    "portrait": "portrait-oake.webp",
+    "emoji": "🌳",
+    "cast": "oake",
+    "personality": "Slow, wise, plays the long game.",
+    "aiLevel": "hard",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null
+   },
+   "twist": {
+    "id": "no-sweep",
+    "param": null,
+    "text": "Rule: nobody may sweep three tokens."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat Oake."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 85 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 85
+     }
+    },
+    {
+     "text": "Keep 2 acorns",
+     "test": {
+      "k": "acorns",
+      "op": ">=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Oake plays at normal strength."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "oake",
+     "text": "Oake's portrait"
+    }
+   ]
+  },
+  {
+   "id": "c9",
+   "act": 3,
+   "title": "Council of Rangers",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ward",
+     "text": "Every ranger of the Cascades meets at the falls. Four valleys, one market."
+    },
+    {
+     "who": "linnet",
+     "text": "No hard feelings if I take your hawks."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ward",
+     "text": "The council will follow your lead against the Warden."
+    }
+   ],
+   "opponent": {
+    "name": "Linnet",
+    "portrait": "portrait-linnet.webp",
+    "emoji": "🐦",
+    "cast": "linnet",
+    "personality": "Quick and greedy for hawks.",
+    "aiLevel": "hard",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 4,
+    "seed": null,
+    "others": [
+     "Sorrel",
+     "Oake"
+    ]
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat all three rivals."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 85 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 85
+     }
+    },
+    {
+     "text": "Win by 5 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 5
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play at normal strength."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c10",
+   "act": 3,
+   "title": "The Ash Warden",
+   "boss": true,
+   "intro": [
+    {
+     "who": "warden",
+     "text": "I burned these slopes to keep them tidy. Wild things are untidy."
+    },
+    {
+     "who": "ward",
+     "text": "The Warden is strong, rich in acorns, and nobody may sweep the market. Plan every turn."
+    }
+   ],
+   "outro": [
+    {
+     "who": "warden",
+     "text": "Green again... perhaps untidy is better."
+    },
+    {
+     "who": "ward",
+     "text": "Three regions restored. You are a true ranger of the wild."
+    }
+   ],
+   "opponent": {
+    "name": "The Ash Warden",
+    "portrait": "portrait-warden.webp",
+    "emoji": "🔥",
+    "cast": "warden",
+    "personality": "Cold and exact. Starts with acorns; forbids sweeping.",
+    "aiLevel": "hard",
+    "aiStyle": "standard",
+    "taunt": "Ash settles on another failed ranger.",
+    "praise": "The fire is out. The valley is yours."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null
+   },
+   "twist": {
+    "id": "boss-acorns",
+    "param": 3,
+    "text": "Boss rule: the Warden starts with 3 acorns."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat the Ash Warden."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 90 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 90
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The Warden plays at normal strength with no acorns."
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "ranger",
+     "text": "Title: Ranger of the Wild"
+    }
+   ]
+  }
+ ]
+}

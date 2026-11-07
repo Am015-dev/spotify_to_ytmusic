@@ -1,0 +1,39 @@
+/* Wildmark Story (shell/gx-campaign.js): campaign.json chapters -> real games with a twist. Twists live here only; the normal rules never change.
+   Twists: boss-acorns (rival seats start with param acorns), short-season (param turns each), no-sweep (nobody may sweep three tokens),
+   rival-head (rivals start with param acorns AND you start with none spent... see CAMPAIGN-DESIGN.md). */
+function campStart(def) {
+  var s = def.setup || {}, op = def.opponent || {}, np = s.players || 2, tw = def.twist || null, acorns = [], names = [];
+  for (var i = 0; i < np; i++) { acorns.push(0); names.push(i === 0 ? 'You' : i === 1 ? op.name : (s.others && s.others[i - 2]) || WM.RIVALS[(i + 1) % WM.RIVALS.length]); }
+  if (tw && tw.id === 'boss-acorns') for (i = 1; i < np; i++) acorns[i] = tw.param || 2;
+  if (tw && tw.id === 'you-acorns') acorns[0] = tw.param || 1;
+  UI.mode = 'camp'; UI.camp = def; UI.sv = 'title';
+  var g = newGame({ np: np, humans: 1, ai: op.aiLevel || 'normal', seed: s.seed != null ? s.seed : null, turns: tw && tw.id === 'short-season' ? tw.param : 20, acorns: acorns, no3: !!(tw && tw.id === 'no-sweep'), names: names });
+  UI.mode = 'camp';
+  try { if (window.GXH) GXH.setEnabled(def.hints !== false); } catch (e) { }
+  setTimeout(function () { toast('Goal: ' + def.goal.text + (tw && tw.text ? ' ' + tw.text : ''), 3600); }, 400);
+  return g;
+}
+function campMetrics(g) {
+  var sc = g.res || WM.final(g), me = sc[0], other = sc.slice(1).reduce(function (m, x) { return Math.max(m, x.total); }, 0), big = 0;
+  WM.TER.forEach(function (t) { big = Math.max(big, me.hab[t]); });
+  var pairs = 0; WM.ANI.forEach(function (a) { if (me.ani[a] > 0) pairs++; });
+  return { won: g.solo ? true : g.winner === 0, score: me.total, margin: me.total - other, acorns: me.acorns, habitat: me.habT, animals: me.aniT, biggest: big, kinds: pairs };
+}
+function campIsWon(g, def) {
+  var m = campMetrics(g), goal = def.goal || { type: 'win' };
+  if (goal.type === 'score') return m.score >= goal.value && (goal.winNotNeeded || m.won);
+  if (goal.type === 'margin') return m.won && m.margin >= goal.value;
+  if (goal.type === 'custom' && goal.key) return m[goal.key] >= goal.value && (goal.winNotNeeded || m.won);
+  return g.winner === 0;
+}
+function campInit() {
+  if (!window.GXC || !window.CAMPAIGN) return;
+  GXC.init({
+    game: 'wildmark', artBase: 'media/', data: window.CAMPAIGN,
+    headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); tutStart(); }); return [b]; },
+    startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    onExit: function () { UI.camp = null; UI.mode = 'quick'; UI.sv = 'title'; showTitle(); },
+    scores: function (g) { return (g.res || WM.final(g)).map(function (x) { return x.total; }); },
+    seats: function (g) { return g.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }); }
+  });
+}
