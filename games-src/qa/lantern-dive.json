@@ -1,0 +1,297 @@
+{
+ "slug": "lantern-dive",
+ "size": "phone",
+ "seed": 56802,
+ "when": "2026-11-07T21:07Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 310
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 83
+ },
+ "fuzz": {
+  "taps": 250
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 350,0,394,44: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"All jobs\" under div.ttl-in \"Lantern Dive Dive togeth\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 350,0,394,44: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.pbtn \"Last\" / button.gxt-b \"Story mode\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.hc \"Coral 6\" / button.hc.r2 \"Sunstar 2\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.hc \"Coral 9\" / button.hc.r2 \"Sunstar 4\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.hc \"Kelp 5\" / button.hc.r2 \"Sunstar 7\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.hc \"Kelp 8\" / button.hc.r2 \"Sunstar 9\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.hc \"Sunstar 1\" / button.hc.r2 \"Lantern 4\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 350,0,394,44: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-title-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"All jobs\" under div.ttl-in \"Lantern Dive Dive togeth\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-title-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 350,0,394,44: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"All jobs\" under div#start \"‹ Plan the dive Dive 1: \"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #310 (Coral 1 + Kelp 7)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 310 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-quick-noresult-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 350,0,394,44: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-story-map-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 350,0,394,44: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.hc \"Coral 6\" / button.hc.r2 \"Sunstar 2\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.hc \"Coral 9\" / button.hc.r2 \"Sunstar 4\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.hc \"Kelp 5\" / button.hc.r2 \"Sunstar 7\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.hc \"Kelp 8\" / button.hc.r2 \"Sunstar 9\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.hc \"Sunstar 1\" / button.hc.r2 \"Lantern 4\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #83 (Nerea 10 2)",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 83 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-story-noresult-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 350,0,394,44: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"All jobs\" under div.ttl-in \"Lantern Dive Dive togeth\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-title-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 350,0,394,44: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.jcard.glow \"Lantern 3\" / summary \"Free, peer to peer\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.jcard.glow \"The first trick\" / summary \"Free, peer to peer\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"All jobs\" under div#start \"‹ Play online Host a div\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.me.act \"You 0\" / button.tbtn.go.story \"Play Story Ten chapters,\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.hc \"Coral 6\" / button.tbtn.go.story \"Play Story Ten chapters,\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.hc \"Coral 9\" / button.tbtn.go.story \"Play Story Ten chapters,\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.hc \"Kelp 3\" / button.tbtn.go.story \"Play Story Ten chapters,\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.hc \"Kelp 5\" / button.tbtn.go.story \"Play Story Ten chapters,\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.hc \"Kelp 8\" / button.tbtn.go.story \"Play Story Ten chapters,\"",
+   "repro": "node games-src/scripts/qa-bot.js lantern-dive --size phone --seed 56802 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/lantern-dive/phone-screen-fuzz-screen-19.png"
+  }
+ ],
+ "secs": 365,
+ "tutorialIn": {}
+}
