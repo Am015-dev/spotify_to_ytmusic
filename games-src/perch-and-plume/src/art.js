@@ -76,6 +76,6 @@ function nestSVG(n) {
   else s += '<path d="M20 4 L25 15 L37 15 L27 23 L31 35 L20 28 L9 35 L13 23 L3 15 L15 15Z" fill="#d9a63a" stroke="#7a5a1c" stroke-width="1.5"/>';
   return s + '</svg>';
 }
-function foodIcon(f, cls) { return ART.have['food-' + f] ? artHTML('food-' + f, 'fi ' + (cls || '')) : '<span class="fi ' + (cls || '') + '" data-food="' + f + '">' + foodSVG(f) + '</span>'; }
+function foodIcon(f, cls) { return false && ART.have['food-' + f] ? artHTML('food-' + f, 'fi ' + (cls || '')) : '<span class="fi ' + (cls || '') + '" data-food="' + f + '">' + foodSVG(f) + '</span>'; }
 function eggIcon(cls) { return ART.have['token-egg'] ? artHTML('token-egg', 'egi ' + (cls || '')) : '<span class="egi ' + (cls || '') + '">' + eggSVG() + '</span>'; }
 function nestIcon(n) { return ART.have['nest-' + n] ? artHTML('nest-' + n, 'nsi') : '<span class="nsi" title="' + n + ' nest">' + nestSVG(n) + '</span>'; }

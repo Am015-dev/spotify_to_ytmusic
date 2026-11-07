@@ -109,7 +109,7 @@ async function playOut(p, label, maxMs) {
       if (can) await tap(p, '[data-tut-tap]').catch(() => { });
       await p.waitForTimeout(can ? 300 : 250);
     }
-    const end = await p.evaluate(() => !GXT.active() || /know the basics/i.test(document.body.innerText));
+    const end = await p.evaluate(() => !GXT.active() || /know (the basics|how a turn works)/i.test(document.body.innerText));
     log(end, 'tutorial reached its end card (' + steps + ' steps seen)');
     await p.screenshot({ path: `shots/play-${SIZE}-tutorial-end.png` });
   }

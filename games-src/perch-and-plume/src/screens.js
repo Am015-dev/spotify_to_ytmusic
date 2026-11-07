@@ -117,7 +117,7 @@ var RULES = [
 ];
 function rulesBody() {
   var d = document.createElement('div'); d.className = 'dr';
-  d.innerHTML = RULES.map(function (r) { return '<h3>' + r[0] + '</h3><p>' + r[1] + '</p>'; }).join('') +
+  d.innerHTML = '<h3>How a turn works</h3><ol class="howturn"><li>On your turn you do ONE thing.</li><li>Play a bird from your hand into a row (pay the food on the card).</li><li>Or tap a row button: forest = food, grassland = eggs, wetland = cards.</li><li>Every bird in that row then uses its power, right to left.</li><li>After 4 rounds, most points wins: birds, eggs, goals, bonus cards.</li></ol>' + RULES.map(function (r) { return '<h3>' + r[0] + '</h3><p>' + r[1] + '</p>'; }).join('') +
     '<h3>Row actions by birds in the row</h3><p>Forest food: 1, 1+trade, 2, 2+trade, 3, 3+trade. Grassland eggs: 2, 2+trade, 3, 3+trade, 4, 4+trade. Wetland cards: 1, 1+trade, 2, 2+trade, 3, 3+trade.</p>' +
     '<div class="tmenu" style="margin:10px 0"><button type="button" class="btn" id="rtut">Play the tutorial</button><button type="button" class="btn" id="rref">All cards</button></div>';
   setTimeout(function () { var t = $('#rtut', d); if (t) t.onclick = function () { GX.close(); tutStart(); }; var r = $('#rref', d); if (r) r.onclick = function () { GX.close(); try { GX.refOpen(); } catch (e) { } }; }, 0);

@@ -10,7 +10,7 @@ function humans() { return G ? G.pl.map(function (p, i) { return p.kind === 'hum
 function myTurn() { if (!G || G.phase === 'over') return false; var s = PP.sideToAct(G); return isHuman(s) && s === UI.view && !UI.busy && !UI.passing; }
 function q() { return G && G.q; }
 function toast(t, ms) { var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
-function aMs(ms) { if (UI.fast) return 0; try { return GX.animMs ? GX.animMs(ms) : ms; } catch (e) { return ms; } }
+function aMs(ms) { if (UI.fast) return 0; var sp = UI.speed || 1; try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
 function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodIcon('any'); var p = s.split('|'); return p.length > 1 ? p.map(function (f) { return foodIcon(f); }).join('<i>/</i>') : foodIcon(s); }).join(b.c.some(function (s) { return s.indexOf('|') >= 0; }) ? '' : '<i>+</i>'); }
 // a bird card: size 'slot' (on the board: picture, points, eggs/cache/tuck) | 'hand' (name, cost, habitats) | 'tray'
 function cardHTML(id, size, st, attrs) {
@@ -63,14 +63,14 @@ function renderOpps(cur) {
     if (i === UI.view) return;
     var sc = PP.scoreOf(G, i).total;
     h += '<button type="button" class="opp' + (i === cur && G.phase !== 'over' ? ' cur' : '') + '" data-a="opp" data-s="' + i + '" aria-label="' + esc(p.name) + ': ' + sc + ' points, ' + p.cubes + ' actions left">' +
-      '<span class="pt">' + portraitHTML(p.face || 'p' + i) + '</span><span><b>' + esc(p.name) + '</b> ' + sc + '★ · ' + p.cubes + '▣</span></button>';
+      '<span class="pt">' + portraitHTML(p.face || 'p' + i) + '</span><span><b>' + esc(p.name) + '</b> ' + sc + ' pts · ' + p.cubes + ' left</span></button>';
   });
   $('#opps').innerHTML = h || '<span style="color:#f6eedb;font-size:var(--fs);align-self:center;opacity:.8">Solo year: beat your best score</span>';
 }
 function portraitHTML(face) { var st = 'portrait-' + face; return ART.items[st] ? artHTML(st) : '<span class="art ph">' + placeholder('portrait-' + face) + '</span>'; }
 function renderMid() {
   var f = '';
-  for (var i = 0; i < 5; i++) { var d = G.feeder[i]; f += d ? '<button type="button" class="die" data-a="die" data-i="' + i + '" aria-label="' + (d === 'gs' ? 'grub or seed' : d) + ' die">' + foodIcon(d) + '</button>' : '<span class="die gone"></span>'; }
+  for (var i = 0; i < 5; i++) { var d = G.feeder[i]; f += d ? '<button type="button" class="die" data-a="die" data-i="' + i + '" aria-label="' + (d === 'gs' ? 'grub or seed' : d) + ' die">' + foodIcon(d) + '<small>' + (d === 'gs' ? 'either' : d) + '</small></button>' : '<span class="die gone"></span>'; }
   $('#feeder').innerHTML = f;
   $('#tray').innerHTML = G.tray.map(function (id, i) { return id ? '<div class="tcard">' + cardHTML(id, 'tray', null, 'data-a="tray" data-i="' + i + '" role="button" tabindex="0"') + '</div>' : '<div class="tcard"></div>'; }).join('');
   $('#deckb').innerHTML = '<span>Deck</span><span>' + G.deck.length + '</span>';
@@ -100,7 +100,7 @@ function renderDock(p, vs, cur) {
   $('#dt').textContent = who;
   $('#prompt').textContent = promptText(mine);
   $('#acts').innerHTML = mine ? actsHTML() : '';
-  $('#foodrow').innerHTML = PP.FOODS.map(function (f) { return '<span class="fd' + (p.food[f] ? '' : ' zero') + '" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<span data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</span></span>'; }).join('') +
+  $('#foodrow').innerHTML = PP.FOODS.map(function (f) { return '<span class="fd' + (p.food[f] ? '' : ' zero') + '" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<span data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</span><small>' + f + '</small></span>'; }).join('') +
     '<span class="fd" aria-label="bonus cards">★ ' + p.bonus.length + ' bonus</span>';
   var ok = {}; if (mine && !Q) PP.playable(G, vs).forEach(function (x) { ok[x.i] = 1; });
   $('#hand').innerHTML = p.hand.length ? p.hand.map(function (id, i) { return cardHTML(id, 'hand', null, 'data-a="hand" data-i="' + i + '" role="button" tabindex="0"').replace('class="bc ', 'class="bc' + (UI.sel === i ? ' sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + ' '); }).join('') : '<span class="empty">No birds in hand. Draw cards in the wetland.</span>';
@@ -108,16 +108,18 @@ function renderDock(p, vs, cur) {
 function promptText(mine) {
   if (!G) return '';
   if (G.phase === 'over') return 'The year is over.';
+  if (!mine && UI.cap) return UI.cap;
+  if (!mine && isHuman(UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat) && humans().length <= 1) return UI.animSeat === UI.view && UI.busy ? 'Your birds are at work, one by one.' : 'Your turn is starting.';
   if (!mine) return UI.busy ? (UI.animSeat === UI.view ? 'Your birds are at work, one by one.' : G.pl[UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat].name + ' is playing.') : 'Watch ' + G.pl[PP.sideToAct(G)].name + '.';
   var Q = G.q;
   if (UI.pend) return 'Play ' + B[G.pl[UI.view].hand[UI.pend.i]].n + '?';
   if (UI.gsDie != null) return 'Grub or seed?';
-  if (!Q) return UI.sel != null ? 'Tap a glowing slot to play it.' : 'Pick a row, or play a bird.';
+  if (!Q) return UI.sel != null ? 'Tap the glowing space in a row to put this bird there.' : 'Tap a glowing row button (food, eggs or cards), or a glowing bird in your hand.';
   var n = Q.d && Q.d.n;
   switch (Q.h) {
-    case 'die': return 'Take food from the feeder (' + n + ' left).';
-    case 'egg': return 'Lay eggs: tap a bird (' + n + ' left).';
-    case 'draw': return 'Draw a bird: tray or deck (' + n + ' left).';
+    case 'die': return 'Tap a glowing food die in the feeder to take it (' + n + ' left).';
+    case 'egg': return 'Tap a glowing bird on your board to lay an egg on it (' + n + ' left).';
+    case 'draw': return 'Tap a glowing bird in the tray, or the deck, to take a card (' + n + ' left).';
     case 'bonus': return Q.d.kind === 'card' ? 'Discard a card for 1 more food?' : Q.d.kind === 'food' ? 'Pay 1 food for 1 more egg?' : 'Pay 1 egg for 1 more card?';
     case 'pwTuck': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': tuck a card?';
     case 'pwTrade': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': spend an egg?';
@@ -149,6 +151,7 @@ function bonusTiers(bc) { return typeof bc.sc === 'string' ? bc.sc + ' point' + 
 // glowing legal targets (only while the shown seat decides)
 function glow() {
   $$('.glow').forEach(function (e) { e.classList.remove('glow'); });
+  document.body.classList.toggle('focus', !!(myTurn() && G && (G.q || UI.sel != null) && !UI.pend && UI.gsDie == null));
   if (!myTurn()) return;
   var Q = G.q, p = G.pl[UI.view], add = function (sel) { $$(sel).forEach(function (e) { e.classList.add('glow'); }); };
   if (UI.pend || UI.gsDie != null) return;

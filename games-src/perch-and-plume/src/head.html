@@ -234,5 +234,31 @@ body:has(#title:not([hidden])) #barstat{display:none}
 .gx-drawer .gx-x{background:var(--paper)}
 .gx-drawer{transition:none!important}
 html.gx-noanim .firing,html.gx-noanim .popfx,html.gx-noanim .glow,html.gx-reduce .glow{animation:none}
+
+/* playable pass: turn banner, rival reveal, focus dimming, worded food */
+.turnban{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:80;min-width:min(86vw,420px);padding:16px 24px;border-radius:16px;text-align:center;display:flex;flex-direction:column;gap:4px;box-shadow:0 12px 40px rgba(0,0,0,.55);animation:banin .32s ease-out;cursor:pointer}
+.turnban b{font-size:28px;line-height:1.15}
+.turnban span{font-size:15px;font-weight:700}
+.turnban.me{background:#f2c35b;color:#2a1d05}
+.turnban.rv{background:#24382c;color:#f6eedb;border:2px solid #f6eedb}
+@keyframes banin{from{opacity:0;transform:translate(-50%,-30%) scale(.9)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.reveal{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);z-index:79;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;animation:revin .35s ease-out;transition:transform .35s ease-in,opacity .35s ease-in}
+.reveal .rvl{background:#24382c;color:#f6eedb;font-weight:700;font-size:16px;padding:6px 14px;border-radius:12px}
+.reveal .bc{width:170px!important;max-width:none;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.reveal.out{opacity:0;transform:translate(-50%,-140%) scale(.4)}
+@keyframes revin{from{opacity:0;transform:translate(-50%,-20%) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+body.focus .ract:not(.glow),body.focus #hand .bc:not(.glow),body.focus .die:not(.glow),body.focus .bc[data-a="tray"]:not(.glow),body.focus #deckb:not(.glow),body.focus .bc[data-a="bird"]:not(.glow){filter:brightness(.55) saturate(.45);transition:filter .25s}
+.bc.landed{animation:landin .42s ease-out}
+@keyframes landin{from{transform:translateY(-40px) scale(1.15);opacity:.3}to{transform:none;opacity:1}}
+.die{flex-direction:column;gap:0;height:auto!important;min-height:44px;padding:3px 2px!important;width:48px!important}
+.die .fi{width:26px!important;height:26px!important;flex:none}
+.die small{font-size:13px;line-height:1.05;font-weight:700;color:#2a2418;white-space:nowrap}
+.fd small{font-size:13px;font-weight:700;margin-left:1px}
+#prompt{font-size:16px;background:#f2c35b;color:#2a1d05;padding:6px 10px;border-radius:10px;line-height:1.3;flex:none}
+#foodrow,#acts{flex:none}
+@media (max-width:999px){#feeder{grid-template-columns:repeat(3,54px)}}
+.die{width:auto!important}
+.howturn{margin:4px 0 10px 20px;padding:0}
+.howturn li{margin:3px 0}
 </style>
 </head>
