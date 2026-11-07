@@ -105,6 +105,7 @@ function scoresEl() {
 function logEl() { const d = document.createElement('div'); d.className = 'loglist'; d.innerHTML = G ? G.log.slice(-80).reverse().map(l => `<div>${esc(l.t)}</div>`).join('') : ''; return d; }
 const RULES_HTML = `<div class="rules">
 <h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer plays.</li><li><b>Play a card</b> from your hand for its goods (coins, compasses).</li><li><b>Go to a site</b>: pay its travel icons with cards. Dig at a camp, or explore a ruin with compasses.</li><li><b>Buy a card</b> from the market: items cost coins, artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds the most points wins.</li></ol>
+<p><button type="button" class="btn" data-a="morerules" aria-expanded="false">Show all the rules</button></p><div class="allrules" hidden>
 <h3>The goal</h3><p>Explore the island for 5 rounds. The most points wins: research track, temple tiles, idols, guardians overcome and card points, minus 1 for every Dread card.</p>
 <h3>Your turn</h3><p>Do ONE main action, then the next explorer goes. When you cannot or do not want to act, pass: you are out until the next round. The round ends when everybody has passed.</p>
 <ul><li><b>Play a card</b> for its effect. Artifacts played from your hand cost 1 tablet. Dread cards do nothing.</li>
@@ -115,7 +116,7 @@ const RULES_HTML = `<div class="rules">
 <li><b>Research</b>: climb with your magnifier, or let the notebook follow it. Pay the row's cost, gain its bonus; the first magnifier to rows 2, 4, 6 and 7 also takes an extra reward. Only the magnifier enters the temple (earlier arrivals score more); there it buys temple tiles. Ties go to the first explorer into the temple.</li></ul>
 <h3>Free actions</h3><p>Any time on your turn: use a guardian's boon, or set one idol in a shrine for a one-time boon (idols score 3 either way).</p>
 <h3>End of a round</h3><p>Explorers come home. An explorer still sharing a site with a guardian brings back a Dread card (when the 19 Dread cards run out: a fear tile, -2). Played cards go to your discard; you keep unplayed cards and draw up to 5. The market shifts: the item and the artifact beside the divide leave, and one more artifact slot opens.</p>
-<h3>Solo</h3><p>A rival expedition plays one card after each of your actions: it camps on sites, takes market cards, climbs research and hunts guardians. Beat its score.</p></div>`;
+<h3>Solo</h3><p>A rival expedition plays one card after each of your actions: it camps on sites, takes market cards, climbs research and hunts guardians. Beat its score.</p></div></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {
@@ -139,6 +140,7 @@ function refInit() {
     inGame: it => !!G && it.pic && it.pic.card && (G.row.indexOf(it.pic.card) >= 0 || G.p.some(p => p.hand.concat(p.deck, p.disc, p.play).indexOf(it.pic.card) >= 0)) });
 }
 function cardsOpen(id) { closeInsp(); try { if (id) GX.refOpen(id); else GX.show('refd'); } catch (e) { } }
+UIACT.morerules = t => { const d = t.closest('.rules') && t.closest('.rules').querySelector('.allrules'); if (!d) return; d.hidden = !d.hidden; t.setAttribute('aria-expanded', String(!d.hidden)); t.textContent = d.hidden ? 'Show all the rules' : 'Hide the full rules'; };
 UIACT.cards = t => cardsOpen(t.dataset.id ? 'c-' + t.dataset.id : null);
 function drawers() {
   GX.drawer('scored', 'Scores', scoresEl()); GX.drawer('logd', 'Log', logEl()); GX.drawer('rulesd', 'How to play', rulesEl());

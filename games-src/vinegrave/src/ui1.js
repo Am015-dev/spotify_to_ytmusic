@@ -29,7 +29,7 @@ function cardHTML(id, o) {
   const lab = c.name + (c.t === 'item' ? ', item, ' + c.cost + (c.cost === 1 ? ' coin' : ' coins') : c.t === 'art' ? ', artifact, ' + c.cost + (c.cost === 1 ? ' compass' : ' compasses') : '') + '. ' + c.text + ' Travel: ' + V.TNAME[c.tr] + '.';
   return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="ct"><span class="chip">${cost}</span>${ic(c.tr)}</span>
-    <span class="cn">${esc(c.name)}</span>
+    <span class="cn">${esc(c.name).split(' ').map(w => w.length > 7 ? w.slice(0, Math.ceil(w.length / 2)) + '&shy;' + w.slice(Math.ceil(w.length / 2)) : w).join(' ')}</span>
     <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true"><svg class="pg"><use href="#s-${CARD_GLYPH[c.t] || c.tr}"/></svg><span class="pn">${esc(c.name)}</span><span class="pt">${CARD_KIND[c.t] || 'Starter'}</span></span></span>
     ${c.vp ? `<span class="vp">${c.vp > 0 ? c.vp : c.vp}</span>` : ''}
     <span class="fx">${c.t === 'fear' ? '<span class="sm" style="color:#f6e6e6">no effect</span>' : opsHTML(c.ops)}</span></button>`;
@@ -116,4 +116,4 @@ function qHTML(q) {
   if (q.h === 'site') return `<b>Dig without travel</b><span class="sm">Tap a glowing site on the map.</span>${mvBtn({ t: 'ans', v: null }, 'Skip', 'alt')}`;
   return '';
 }
-function toast(t, ms) { const e = $('#toast'); e.textContent = t; try { const d = $('#dock').getBoundingClientRect(); if (d.width > 0) { e.style.top = (d.top + 4) + 'px'; e.style.left = (d.left + d.width / 2) + 'px'; e.style.maxWidth = Math.max(200, d.width - 24) + 'px'; } } catch (x) { } toast.n = (toast.n || 0) + 1; e.className = 'on t' + toast.n; clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2200); }
+function toast(t, ms) { const e = $('#toast'); e.textContent = t; try { const d = $('#dock').getBoundingClientRect(); if (d.width > 0) { e.style.top = Math.max(60, d.top - (e.offsetHeight || 40) - 6) + 'px'; e.style.left = (d.left + d.width / 2) + 'px'; e.style.maxWidth = Math.max(200, d.width - 24) + 'px'; } } catch (x) { } toast.n = (toast.n || 0) + 1; e.className = 'on t' + toast.n; clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2200); }
