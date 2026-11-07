@@ -109,7 +109,21 @@ html.ph.ph-p #labmid #prompt.kk2{position:relative;z-index:70}
 .gxc-disc{background-image:none!important;text-shadow:none!important}
 .tbtn.gxt-first,html.sk .tbtn.gxt-first{border-image:none;border:3px solid #4a2a22;border-radius:18px;background:linear-gradient(180deg,#b8321d,#8f2412);color:#fff;text-shadow:none;filter:none;box-shadow:0 4px 0 #5b3221}
 .tbtn.gxt-first span{opacity:1;color:#fff}
-html .gxt-menu.gxt-first{background:linear-gradient(180deg,#b8321d,#8f2412)!important;color:#fff!important}
-html .gxt-menu.gxt-first span,html .gxt-menu.gxt-first b{color:#fff!important}
+html .gxt-menu.gxt-first{background:linear-gradient(180deg,#b8321d,#8f2412)!important;color:#fff}
+html .gxt-menu.gxt-first span,html .gxt-menu.gxt-first b{color:#fff}
 html:has(.gx-drawer.on) #kkguide{display:none}
 html.sk .gxt-menu.gxt-first,html .gxt-menu.gxt-first{border-image:none!important;border:3px solid #4a2a22!important;border-radius:14px!important}
+button[data-gxt-open],html.sk button[data-gxt-open]{border-image:none!important;border:3px solid #4a2a22!important;border-radius:14px!important;background:linear-gradient(180deg,#b8321d,#8f2412)!important;color:#fff;text-shadow:none;filter:none}
+html button[data-gxt-open] b,html button[data-gxt-open] span{color:#fff;opacity:1}
+.rcard{background:#fff3d6;border-radius:12px;padding:4px}
+.ctr .none{color:#4a2a22}
+.gxc-htitle b{color:#fff3d6!important}
+.gxc-head{background:rgba(42,23,16,.94)!important}
+.rules p,.rules li{background:#fff8e6}
+@media (min-width:1024px){
+  .sh .av .sc,#belt .hc .gn,#beltFrom,#beltTo,.ctr .grp .bg,.ctr .grp .hn,.slot .sbox .kkp3t,.gx-bar .gx-ibtn span,.seat .sh .nm,.slot .st,.gxc-node .gxc-lab,.gxc-act small,.gxc-act b,.gxc-ib,.gxc-head .gxc-ib{font-size:16px!important}
+}
+.kkflav{margin:0;flex-basis:100%;font-size:15px;font-weight:700;color:#4a2a22;line-height:1.25}
+.shead{flex-wrap:wrap}
+.ctr .none{background:#fff3d6;padding:1px 8px;border-radius:8px}
+.rules p{padding:4px 8px;border-radius:8px}

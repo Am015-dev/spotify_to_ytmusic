@@ -23,3 +23,24 @@ Tests: `game/tutorial-end.js` (tutorial to the end, both sizes), `game/play-ui.j
 - Card faces keep the existing painted art and 13px names (two lines, bold) so ten cards fit two rows at 390px; a bigger card would need scrolling.
 - Chapter loss variant: the campaign has win outros and boss `taunt` / `praise` lines; there is no separate loss outro text (retry is offered with the taunt).
 - Rules check (`rules-check/kaiten-kitchen.md`): WRONG 0, MISSING 0, SIMPLIFIED 4: all four now listed in the help drawer under "What we simplified". Rules fixed 0/0.
+
+## After (re-shot at 390x763, `playable-shots/after-*.webp`: title, first turn, rival turn, result)
+- First turn: banner "YOUR TURN" + "Tap a dish to take it." on a solid backing, hand glowing, header "Round 1/3, Turn 1 of 10".
+- Rival turn: "ODILE'S TURN | Odile serves Fire Paste." with the covers lifting one diner at a time; score pop on the dish ("+2 nigiri").
+- Result: card with the game's voice line, every diner's total, Play again / Menu.
+- Every fix above is verified by a script, not by eye only: `tutorial-end.js` (26 steps, both sizes, coverage asserted), `play-ui.js` (Quick game and
+  Story stage 1 reach their result by taps on visible, uncovered UI), `rules-test.js` 90/90.
+
+## Gate results
+- build-all `--quick` PASS (scenarios 9/9, one instruction line of 8 words or fewer, text >= 14px on the board).
+- ui-audit A, C, D, E, F: 0 on phone, phone-s and pc. Rule B (contrast / busy background) still reports 3 on phone, 1 on phone-s, 5 on pc, all in places this
+  pass did not redesign: the Menu panel's "New here?" button (audit reads it as 2.4-2.8:1 although the painted button is white on dark red, 8:1 by computation),
+  help-drawer paragraphs over the drawer texture, the painted card numerals "2"/"3" on the board (kit art, 3.2:1) and a card caption in the help list.
+  Not closed; next step is to fix them in the kit art and the drawer background.
+- Fixed on the way (audit B/A): title and Menu tutorial button colours, "ready" label, empty-slot "...", campaign map numbers, pc-size text >= 16px.
+
+## Known gaps (honest)
+- The old `tutor-test.js` checks the OLD wording (every hint starts with "Tap", titles <= 4 words); it is superseded by `tutorial-end.js` and is not part of the gate.
+- Tutorial chapters can be left (Skip) and restarted but not resumed from the middle: the shared tutorial kit has no chapter resume.
+- Roll-race ties and the fewest-custard penalty are not staged in the tutorial (see TUTORIAL-COVERAGE.md).
+- On phones the flying hand cards cover the left edge of the banner chip while the hands pass.

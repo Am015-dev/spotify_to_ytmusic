@@ -32,7 +32,6 @@ function newGame(mode, o) {
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
   placePrompt(); render(); sndMusic(); schedule();
-  try { if (mode !== 'tutorial' && !UI.camp && !o.camp) guideSay(KK.STORY.quickIntro, 3400); } catch (e) { }
 }
 // ---------- the turn driver ----------
 function schedule() {
