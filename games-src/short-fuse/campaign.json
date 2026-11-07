@@ -112,7 +112,9 @@
         "cast": "rig",
         "personality": "A plywood practice board. Patient, predictable and very forgiving.",
         "aiLevel": "easy",
-        "aiStyle": "practice"
+        "aiStyle": "practice",
+        "praise": "Clean run. The Rig has nothing left to teach you.",
+        "taunt": "Plywood wins this one. The fuse burned, so read the tokens and go again."
       },
       "setup": {
         "mission": 1,
@@ -197,7 +199,9 @@
         "cast": "rig",
         "personality": "Now with two yellow wires hidden in the blues.",
         "aiLevel": "easy",
-        "aiStyle": "practice"
+        "aiStyle": "practice",
+        "praise": "Yellow means careful, and you were. Nicely done.",
+        "taunt": "A yellow wire fooled the crew. Remember: say 'yellow' only if you hold one."
       },
       "setup": {
         "mission": 2,
@@ -290,7 +294,9 @@
         "cast": "rig",
         "personality": "Hides a single red wire among forty blues. Still patient, now dangerous.",
         "aiLevel": "easy",
-        "aiStyle": "practice"
+        "aiStyle": "practice",
+        "praise": "You never touched the red one. That is the whole job.",
+        "taunt": "Boom. The red wire does not forgive. Point anywhere else."
       },
       "setup": {
         "mission": 3,
@@ -384,8 +390,8 @@
         "personality": "The full practice rig with decoy markers. Stern examiner, fair marker.",
         "aiLevel": "easy",
         "aiStyle": "decoys",
-        "taunt": "Rig wins this round. Reset the board and read the markers again.",
-        "praise": "Every wire safe. Welcome to the crew, properly this time."
+        "taunt": "The exam rig held. Brix says: 'Again. Everyone breathes first.'",
+        "praise": "Graduation. Brix tips his helmet: you are on the crew."
       },
       "setup": {
         "mission": 8,
@@ -483,7 +489,9 @@
         "cast": "quill",
         "personality": "A showman who builds puzzles, not just bombs. Polite, smug, loves a riddle.",
         "aiLevel": "normal",
-        "aiStyle": "trickster"
+        "aiStyle": "trickster",
+        "praise": "You beat the Painted Device. Quill leaves a note: 'Impressive. Briefly.'",
+        "taunt": "The painted device wins. Quill's brass key glints. 'Do try again.'"
       },
       "setup": {
         "mission": 11,
@@ -576,7 +584,9 @@
         "cast": "quill",
         "personality": "Turns the crew's trust into a weapon. Enjoys watching you second-guess.",
         "aiLevel": "normal",
-        "aiStyle": "deceiver"
+        "aiStyle": "deceiver",
+        "praise": "You spotted the fibber. Quill's note: 'I would have lied better.'",
+        "taunt": "Someone's tokens fooled you. Quill sends a postcard: 'Trust, but count.'"
       },
       "setup": {
         "mission": 17,
@@ -670,8 +680,8 @@
         "personality": "A crewmate under the Clockmaker's spell. Quiet, helpful-looking, bound by a secret rule.",
         "aiLevel": "normal",
         "aiStyle": "saboteur",
-        "taunt": "You trusted the wrong hands. The Clockmaker sends his regards.",
-        "praise": "Caught. I'm sorry, foreman. He said it was only a game."
+        "taunt": "The Weak Link slipped through. Quill hums a ticking tune.",
+        "praise": "Found the Weak Link. Quill sighs: 'Fine. I will find a better one.'"
       },
       "setup": {
         "mission": 34,
@@ -769,7 +779,9 @@
         "cast": "quill",
         "personality": "Obsessed with the hour of seven. Generous on the surface, strict about order.",
         "aiLevel": "hard",
-        "aiStyle": "timekeeper"
+        "aiStyle": "timekeeper",
+        "praise": "Seven o'clock, and the lobby is silent. Quill is listening.",
+        "taunt": "The tower bell tolls on your fuse. Quill claps once. 'Again.'"
       },
       "setup": {
         "mission": 46,
@@ -862,7 +874,9 @@
         "cast": "quill",
         "personality": "Takes away what you can see and makes you trust what you can't.",
         "aiLevel": "hard",
-        "aiStyle": "blindfold"
+        "aiStyle": "blindfold",
+        "praise": "You cut around the blind spot. Quill taps the glass: 'Hm.'",
+        "taunt": "The blind spot got you. Quill: 'Everyone has one.'"
       },
       "setup": {
         "mission": 38,
@@ -964,8 +978,8 @@
         "personality": "At his most theatrical. Every finished value changes the rules under your feet.",
         "aiLevel": "hard",
         "aiStyle": "shifting-rules",
-        "taunt": "Tick, tock, boom. Come back when you can keep time, little crew.",
-        "praise": "My masterpiece, undone by a demolition crew. I suppose that is a kind of art."
+        "taunt": "The masterpiece strikes twelve. Quill bows. 'Try the stairs again.'",
+        "praise": "The masterpiece is silent. Quill removes his hat. You win, together."
       },
       "setup": {
         "mission": 57,
