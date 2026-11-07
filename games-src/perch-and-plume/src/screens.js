@@ -4,7 +4,7 @@ var CFG = { n: 2, kinds: ['human', 'ai', 'ai', 'ai', 'ai'], lvl: 'normal' };
 try { var c0 = JSON.parse(localStorage.getItem('pp-cfg') || 'null'); if (c0 && c0.n) CFG = c0; } catch (e) { }
 function firstTime() { try { return !localStorage.getItem('pp-played'); } catch (e) { return true; } }
 function tutBtn() { try { return typeof GXT !== 'undefined' ? GXT.menuHTML({ game: 'perch-and-plume', first: firstTime(), cls: 'btn', launch: tutStart }) : ''; } catch (e) { return ''; } }
-function showTitle() {
+function showTitle() { hideHelp();
   stopTimers(); UI.camp = null; G = G && G.phase !== 'over' && UI.mode !== 'tutorial' ? G : G;
   try { GX.close(); } catch (e) { }
   var el = $('#title'), sv = loadSave(), tut = tutBtn();
@@ -21,7 +21,7 @@ function showTitle() {
   musicSync();
 }
 function openStory() { if (window.GXC && window.CAMPAIGN) { $('#title').hidden = true; GXC.open(); } else toast('Story is not available.'); }
-function showConfig() {
+function showConfig() { hideHelp();
   var el = $('#setup');
   function draw() {
     var h = '<h2>Quick game</h2><div class="cfg"><div class="lab">Players</div><div class="seg">' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" class="btn' + (CFG.n === n ? ' on' : '') + '" data-n="' + n + '">' + n + '</button>'; }).join('') + '</div>';
@@ -47,7 +47,7 @@ function quickStart() {
   startGame({ seats: seats, mode: seats.some(function (s, k) { return k && s.kind === 'human'; }) ? 'hot' : CFG.n === 1 ? 'solo' : 'vs' });
 }
 // ---------------- the starting hand: keep 5 in total (birds + food), pick 1 of 2 bonus cards
-function showKeep(s) {
+function showKeep(s) { hideHelp();
   var p = G.pl[s], off = p.offer, el = $('#setup');
   if (!UI.keep || UI.keep.s !== s) { var sug = PPAI.setup(G, s); UI.keep = { s: s, birds: sug.birds.slice(), food: sug.food.slice(), bonus: sug.bonus }; }
   var K = UI.keep;
@@ -68,7 +68,7 @@ function showKeep(s) {
   draw();
 }
 // ---------------- game over
-function gameOver() {
+function gameOver() { hideHelp();
   if (UI.overShown === G) return; UI.overShown = G;
   clearSave(); musicSync(); sfx('end');
   try { localStorage.setItem('pp-played', '1'); } catch (e) { }

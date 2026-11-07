@@ -138,11 +138,11 @@
         tot += value(G2, seat, lvl, known);
       }
       var v = tot / sims;
-      if (lvl === 'easy') v += (Math.random() - .5) * 7;
+      if (lvl === 'easy') v += (Math.random() - .5) * 12;
       else if (lvl === 'normal') v += (Math.random() - .5) * .8;
       return { m: m, v: v };
     }).sort(function (a, b) { return b.v - a.v; });
-    if (lvl === 'easy' && scored.length > 2 && Math.random() < .4) return scored[1 + Math.floor(Math.random() * Math.min(2, scored.length - 1))].m;
+    if (lvl === 'easy' && scored.length > 2 && Math.random() < .5) return scored[1 + Math.floor(Math.random() * Math.min(4, scored.length - 1))].m;
     return scored[0].m;
   }
   // why (<= 15 words) for the hint bulb

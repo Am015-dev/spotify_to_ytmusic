@@ -26,8 +26,8 @@ plays one strong strategy. The year ends at the County Notebook, held nine years
   you start with 2 fewer food (`lean-start`). c7 boss: Delphine starts with a feeder bird already in her forest (`boss-bird`) and you must win by 5.
 - **Act 3, Autumn on the High Meadows** (hard AI). c8 plain win vs hard Corvin. c9 solo against the Rival Flock (automa, hard). c10 final:
   3 players, Lord Quill starts with 3 extra birds in hand (`boss-cards`).
-- Calibration (node, 20 seeded 2-player games): easy vs hard averages about 60 to 63 points; hard vs hard about 62 each; the
-  rules-test mix of all levels averages 57. Score stars (45, 55, 60, 65) follow these numbers.
+- Calibration (node, 20-24 seeded 2-player games, seats swapped): easy vs normal averages 50 to 67; normal vs hard 63 to 65;
+  the rules-test mix of all levels averages 56. Score stars (45, 55, 60, 65) follow these numbers; c1's 30-point goal sits well under easy's average.
 - After 2 losses a chapter offers "a bit easier": one AI level down, no twist, at most 2 stars.
 
 ## Twists (setup only)

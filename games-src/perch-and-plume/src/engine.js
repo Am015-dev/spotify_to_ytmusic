@@ -296,7 +296,7 @@
       laySelf: 'Lay 1 egg on this bird.',
       layNest: 'Lay 1 egg on each of your birds with a ' + NESTN[x[0]] + ' nest.',
       draw1: 'Draw 1 card from the deck.',
-      hunt: 'Look at the top card of the deck. If its wingspan is under ' + x[0] + ' cm, tuck it behind this bird. If not, discard it.',
+      hunt: 'Look at the top card of the deck. If its wings are under ' + x[0] + ' cm across, tuck it behind this bird. If not, discard it.',
       huntDie: 'Roll all dice not in the birdfeeder. If any shows ' + FN[x[0]] + ', cache 1 ' + FN[x[0]] + ' on this bird.',
       allFood: 'Every player gains 1 ' + FN[x[0]] + ' from the supply.',
       allDraw: 'Every player draws 1 card from the deck.',

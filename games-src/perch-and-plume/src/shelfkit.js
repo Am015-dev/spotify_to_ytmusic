@@ -30,9 +30,12 @@ function musicSync() { if (MUS_ON) try { GXMUS.sync(); } catch (e) { } }
 // ---------------- help kit: first-time bubbles per phase + the hint bulb (from the computer's own choice)
 function helpPhase() {
   if (!G || !myTurn() || (typeof tutOn === 'function' && tutOn())) return null;
+  if (panelUp()) return null;   // never over a drawer, the story map or a full-screen panel
   var Q = G.q; if (UI.sel != null && !Q) return 'play';
   if (!Q) return 'act'; return { die: 'die', egg: 'egg', draw: 'draw', bonus: 'bonus', pwTuck: 'power', pwTrade: 'power', play2: 'play', bonusPick: null }[Q.h] || null;
 }
+function panelUp() { var m = document.querySelector('.gxc'); return !!((window.GX && GX.open) || (m && !m.hidden) || !$('#title').hidden || !$('#setup').hidden || !$('#result').hidden || !$('#pass').hidden || !$('#pop').hidden); }
+function hideHelp() { try { if (window.GXH) GXH.hide(); } catch (e) { } }
 function moveTarget(m) {
   if (!m) return null;
   if (m.t === 'act') return $('.ract[data-h="' + ['food', 'eggs', 'cards'].indexOf(m.a) + '"]');
@@ -104,6 +107,8 @@ function campInit() {
 function boot() {
   try { GX.init({ key: 'pp' }); } catch (e) { }
   bootDrawers(); campInit(); helpInit(); musicInit();
+  try { var go = GXC.open; GXC.open = function () { hideHelp(); return go.apply(this, arguments); }; } catch (e) { }
+  try { var gs = GX.show; GX.show = function () { hideHelp(); return gs.apply(this, arguments); }; } catch (e) { }
   try { if (GX.onResize) GX.onResize(function () { if (G) render(); }); } catch (e) { }
   try { if (window.GNS && GNS.achievements) GNS.achievements('perch-and-plume', [
     { id: 'win', name: 'Field champion', how: 'Win a game against the computer.', test: function (r) { return r.won && r.mode === 'vs'; } },

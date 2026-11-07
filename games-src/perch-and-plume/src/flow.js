@@ -80,8 +80,8 @@ function apply(m, s) {
   if (isHuman(s)) UI.lastHuman = s;
   save(); render();
   if (!UI.fast) fx.forEach(function (e) { if (e.k === 'pw' && e.seat === UI.view && pre[e.h] && pre[e.h][e.c] && pre[e.h][e.c].id === e.id) setSlot(e.h, e.c, pre[e.h][e.c]); });
-  UI.busy = true;
-  playFx(fx, s).then(function () { UI.busy = false; render(); pump(); });
+  UI.busy = true; UI.animSeat = s; $('#prompt').textContent = promptText(false);
+  playFx(fx, s).then(function () { UI.busy = false; UI.animSeat = null; render(); pump(); });
   return true;
 }
 // ---------------- the fx queue: each brown power fires bird by bird, right to left
@@ -160,7 +160,7 @@ function pump() {
     apply(m, s);
   }, aiDelay());
 }
-function askPass(s, then) {
+function askPass(s, then) { hideHelp();
   UI.passing = true; var el = $('#pass');
   el.innerHTML = '<h2>Pass to ' + esc(G.pl[s].name) + '</h2><p>Hand the device over. Your cards stay hidden until you tap.</p><div class="tmenu"><button type="button" class="btn big" id="passgo">I am ' + esc(G.pl[s].name) + '</button></div>';
   el.hidden = false; render();

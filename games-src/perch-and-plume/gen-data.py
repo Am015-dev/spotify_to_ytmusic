@@ -4,7 +4,7 @@
 import json, pathlib, random
 D = pathlib.Path(__file__).resolve().parent
 R = random.Random(342)
-# (base, habitats, diet pool, nest, egg range, wingspan range, power pool, points bias)
+# (base, habitats, diet pool, nest, egg range, wing size range, power pool, points bias)
 BASES = [
  ("Warbler", "F", ["grub"], "bowl", (2, 4), (18, 24), ["tuckDraw", "laySelf", "draw1", "pEgg", None], 0),
  ("Woodpecker", "F", ["grub", "seed"], "cavity", (2, 4), (38, 50), ["cacheS:seed", "gainF:grub", "laySelf", None], 1),
@@ -78,8 +78,8 @@ for b in birds:
     b["id"] = b["n"].lower().replace(" ", "-")
 assert len({b["id"] for b in birds}) == len(birds)
 BONUS = [
- ("small-wings", "Little Wings", "Birds with a wingspan under 30 cm", {"t": "ws", "lt": 30}, [[4, 3], [6, 7]]),
- ("big-wings", "Broad Wings", "Birds with a wingspan over 65 cm", {"t": "ws", "gt": 65}, [[4, 3], [6, 7]]),
+ ("small-wings", "Little Wings", "Birds with wings under 30 cm across", {"t": "ws", "lt": 30}, [[4, 3], [6, 7]]),
+ ("big-wings", "Broad Wings", "Birds with wings over 65 cm across", {"t": "ws", "gt": 65}, [[4, 3], [6, 7]]),
  ("bowl-keeper", "Bowl Keeper", "Bowl-nest birds holding at least 1 egg", {"t": "nestEgg", "n": "bowl"}, "1"),
  ("hollow-keeper", "Hollow Keeper", "Cavity-nest birds holding at least 1 egg", {"t": "nestEgg", "n": "cavity"}, "1"),
  ("ground-keeper", "Ground Keeper", "Ground-nest birds holding at least 1 egg", {"t": "nestEgg", "n": "ground"}, "1"),

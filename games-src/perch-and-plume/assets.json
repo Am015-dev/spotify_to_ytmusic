@@ -1561,7 +1561,7 @@
    "alpha": false,
    "wave": 2,
    "slot": "Bonus card picture: Little Wings (cover)",
-   "prompt": "A small painted vignette for a naturalist's bonus goal: birds with a wingspan under 30 cm, shown as a tidy arrangement of field-guide sketches."
+   "prompt": "A small painted vignette for a naturalist's bonus goal: birds with wings under 30 cm across, shown as a tidy arrangement of field-guide sketches."
   },
   {
    "stem": "bonus-big-wings",
@@ -1572,7 +1572,7 @@
    "alpha": false,
    "wave": 2,
    "slot": "Bonus card picture: Broad Wings (cover)",
-   "prompt": "A small painted vignette for a naturalist's bonus goal: birds with a wingspan over 65 cm, shown as a tidy arrangement of field-guide sketches."
+   "prompt": "A small painted vignette for a naturalist's bonus goal: birds with wings over 65 cm across, shown as a tidy arrangement of field-guide sketches."
   },
   {
    "stem": "bonus-bowl-keeper",

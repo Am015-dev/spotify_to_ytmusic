@@ -20,7 +20,7 @@ A bird-collecting engine-building card game for 1-5 players (solo against an aut
 - Final score: bird points + bonus cards + round goals + 1 per egg + 1 per cached food + 1 per tucked card. Tie: most leftover food.
 
 ## Guessed / simplified (say so to the owner)
-- Roster: 120 original birds built from 40 species types (`gen-data.py`); costs 1-3 food, points 0-9, egg limits 1-6, wingspans,
+- Roster: 120 original birds built from 40 species types (`gen-data.py`); costs 1-3 food, points 0-9, egg limits 1-6, wing sizes,
   nests (bowl, cavity, ground, platform, star = any). Powers are from a set of 26 types true to the design's colours, not copies of real cards.
 - Goals: 12 original goal tiles, green-side (competitive) scoring only; solo with no rival uses 1 point per item up to 5.
 - Bonus cards: 18 original ones with tiered or per-bird scoring.

@@ -21,8 +21,23 @@ Bird-collecting engine-builder for 1-5 players (solo vs the Rival Flock). Branch
 shelfkit.js (sound, music, help, story, boot), tutor.js, scn.js, head.html, body.html. `build.py` -> perch-and-plume.html.
 Tests: rules-test.js (node), smoke.js, play.js (real taps: full game, tutorial, story c1-c2), shot.js (screens).
 
-## Tests (latest)
-See the bottom table (kept up to date at each push).
+## Tests (latest, 7 Nov 2026)
+| test | result |
+|---|---|
+| `node rules-test.js 240` | PASS: 13 rule checks + 240/240 AI games (1-5 players, automa, all levels), 0 illegal moves, 0 invariant breaks, 0 stalls; avg 56.5 |
+| AI duels (20-24 games, seats swapped) | easy 50.5 vs normal 67.1 (normal wins 16/20); normal 62.8 vs hard 64.7 (hard wins 14/24) |
+| `node smoke.js` | PASS phone 390x763 + PC 1440x860: title tap, 3 turns by tapping, forced end, result screen, 0 errors |
+| `node play.js phone all` / `pc all` | PASS: full 3-player game to the result (80-101 real taps), solo vs the Rival Flock, tutorial 13/13 steps to its end card, Story c1 won and saved, c2 played to the story result (a loss, recorded) |
+| `node hotseat-test.js` | PASS: pass screens, hidden hands, view follows the player to act |
+| `VIS_SLUGS="," build-all.py --quick perch-and-plume` | PASS: 9/9 scenarios (menu, story-scene, pp-board, pp-chain, pp-play, pp-eggs, pp-result, pp-story) |
+| `scenario-mutate.js perch-and-plume` | 38/40 mutants killed = 95% (survivors: two conditional "trade" steps, two look-only story scenarios) |
+| `ui-audit.spec.js` (phone + pc) | PC: A0 B0 C0 D0 E0 F0. Phone: A0 B0 C0 D0 E6 F0, see Known below |
+| asset loader | proven with 3 dummy webp files in a scratch site (bird card, seed token, portrait): files fill their slots at the slot aspect, the rest stay placeholders; dummies deleted, nothing under games/ |
+
+## Known (not fixed)
+- ui-audit phone E6: on the "campaign" surface the audit lists the board's chip and 5 dice as visible and then taps them after its reopen step has put the story map over them. It needs the shared `?scn=menu` walker (gx-scenario.js), which opens and closes panels on its own timer after every page load, to coincide with the audit's taps. In a clean replay of the same surfaces the map's own buttons are listed and nothing is dead. The reference game cauldron-fair also fails this audit on phone (A0 B4 E2 F2, same run). Fix belongs in shared code: the walker should stop once a test drives the surfaces, or the audit should wait for it.
+- `register-assets.py` not run on this branch: it rewrites the one-line `next-wave/expected-assets.json` and conflicts with every other branch; its docstring asks the orchestrator to run it at merge time.
+- Playwright: the brief's 1.56.1 does not match the installed browser (chromium-1243); I used 1.63.0 (`npm install --no-save @playwright/test@1.63.0 playwright@1.63.0`), as the redline-rally worker did.
 
 ## Found -> fixed (playing it myself)
 1. Hard AI drew cards 274 of 520 turns and lost to easy (cards valued even when never playable) -> hand and food only count as far as the turns left can use them; hard now averages 62 vs 40 before.
@@ -35,9 +50,15 @@ See the bottom table (kept up to date at each push).
 8. Board had 3 instruction-like lines (dock title "Your turn", prompt, coach bubble) -> dock title is "Round n of 4 · you · n actions left", bubble texts are explanations.
 9. Eggs scenario used a bird filter that matched nothing -> birds without brown/pink powers.
 10. guard.py: numbered ui files not recognised -> named files in an explicit build list; game added to modmap.GAMES.
+11. The first-time coach bubble stayed on top of drawers and the story map (covered their text and buttons) -> hidden whenever a drawer, the map or a full-screen panel opens, and none starts while one is up.
+12. Back on the story map always went to the title, even when opened from a running game's Menu -> it returns to the game.
+13. Easy computer scored about 60 (too strong for newcomers and story act 1) -> more noise and looser picks: about 50 now.
+14. During your own chain the panel already said "Watch Fern." -> "Your birds are at work, one by one." until the chain ends.
+15. Feeder dice, tray birds and the deck did nothing when tapped outside a decision -> a short line explains what they are.
+16. Wide screens: settings, story map and coach text under 16 px; low-contrast story discs and "free" labels -> fixed in this game's CSS (shared files untouched).
 
 ## Missing / next
 - Real art (184 slots, prompts ready) and music files.
 - Online play (not in the brief); undo; recap strip.
 - The Rival Flock is a simplified automa (deck of 8 action cards per round), see rules-notes "Guessed".
-- AI: normal beats hard in the mixed-level sample (17 vs 4 wins); hard plays 2 sims per row action but is not clearly stronger yet.
+- AI: hard is only slightly stronger than normal (14/24); a deeper look-ahead would widen the gap.

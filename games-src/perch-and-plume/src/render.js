@@ -36,7 +36,6 @@ function render() {
   if (!G) return;
   var vs = UI.view, p = G.pl[vs], cur = PP.sideToAct(G);
   $('#barstat').textContent = G.phase === 'over' ? 'Final' : 'Round ' + (G.round + 1) + '/' + G.rounds;
-  $('#barstat').setAttribute('data-engine', 'G.round');
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); fitMat();
   glow();
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
@@ -91,7 +90,7 @@ function renderDock(p, vs, cur) {
 function promptText(mine) {
   if (!G) return '';
   if (G.phase === 'over') return 'The year is over.';
-  if (!mine) return UI.busy ? '' : 'Watch ' + G.pl[PP.sideToAct(G)].name + '.';
+  if (!mine) return UI.busy ? (UI.animSeat === UI.view ? 'Your birds are at work, one by one.' : G.pl[UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat].name + ' is playing.') : 'Watch ' + G.pl[PP.sideToAct(G)].name + '.';
   var Q = G.q;
   if (UI.pend) return 'Play ' + B[G.pl[UI.view].hand[UI.pend.i]].n + '?';
   if (UI.gsDie != null) return 'Grub or seed?';
@@ -157,10 +156,10 @@ function fitMat() {   // slots keep a card-like shape: width from the row height
   m.style.setProperty('--sw', Math.max(40, Math.floor(Math.min(w, rowH * .78))) + 'px');
 }
 // big card view
-function showCard(id, st, extra) {
+function showCard(id, st, extra) { hideHelp();
   var b = B[id], pw = PP.power(id), el = $('#pop');
   el.innerHTML = '<div class="card" role="dialog" aria-label="' + esc(b.n) + '"><div class="bigpic">' + artHTML('bird-' + id) + '</div><h3>' + esc(b.n) + '</h3>' +
-    '<div class="facts"><b>' + b.p + ' points</b><span>Cost: ' + costHTML(b) + '</span><span>' + nestIcon(b.nest) + ' ' + b.nest + ' nest, holds ' + b.e + ' eggs</span><span>Wingspan ' + b.ws + ' cm</span><span>Lives in: ' + b.h.split('').map(function (x) { return HABN['FGW'.indexOf(x)]; }).join(', ') + '</span></div>' +
+    '<div class="facts"><b>' + b.p + ' points</b><span>Cost: ' + costHTML(b) + '</span><span>' + nestIcon(b.nest) + ' ' + b.nest + ' nest, holds ' + b.e + ' eggs</span><span>Wings ' + b.ws + ' cm across</span><span>Lives in: ' + b.h.split('').map(function (x) { return HABN['FGW'.indexOf(x)]; }).join(', ') + '</span></div>' +
     '<div class="pw ' + (pw.col || 'none') + '"><b>' + (pw.col === 'brown' ? 'When activated (brown): ' : pw.col === 'pink' ? 'Between turns (pink): ' : pw.col === 'white' ? '' : '') + '</b>' + esc(pw.txt) + '</div>' +
     (st ? '<div class="facts">' + (st.eggs ? st.eggs + ' egg' + (st.eggs > 1 ? 's' : '') + ' · ' : '') + (st.cache ? st.cache + ' cached food · ' : '') + (st.tuck ? st.tuck + ' tucked cards' : '') + '</div>' : '') +
     '<div class="acts">' + (extra || '') + '<button type="button" class="btn pri" data-a="popx">Close</button></div></div>';

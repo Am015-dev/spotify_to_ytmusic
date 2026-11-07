@@ -74,6 +74,11 @@ async function playOut(p, label, maxMs) {
     await playOut(p, 'quick game 3 players', 600000);
     await p.screenshot({ path: `shots/play-${SIZE}-result.png` });
   }
+  if (WHAT === 'solo' || WHAT === 'all') {
+    await p.goto(URL); await p.waitForTimeout(600);
+    await tap(p, '[data-t="quick"]'); await tap(p, '[data-n="1"]'); await tap(p, '[data-go]');
+    await playOut(p, 'solo game vs the Rival Flock', 600000);
+  }
   if (WHAT === 'tutorial' || WHAT === 'all') {
     await p.goto(URL); await p.waitForTimeout(600);
     await p.evaluate(() => { localStorage.removeItem('pp-played'); localStorage.removeItem('gxt-perch-and-plume'); });
