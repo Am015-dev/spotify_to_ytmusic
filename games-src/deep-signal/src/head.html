@@ -186,15 +186,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 #capt{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:12;max-width:94%;width:max-content;background:rgba(3,14,26,.94);border:1px solid var(--line);color:#fff;font-size:.95rem;font-weight:700;padding:6px 12px;border-radius:12px;text-align:center;pointer-events:none;opacity:0;transition:opacity .25s}
 #capt.on{opacity:1;animation:dscap .35s ease}
 @keyframes dscap{from{transform:translate(-50%,8px)}to{transform:translate(-50%,0)}}
-.cd .sn,.tcard .sn{position:absolute;left:5px;top:calc(var(--cw)*.46);font-size:13px;font-weight:800;line-height:1;letter-spacing:.01em;text-shadow:0 1px 2px rgba(0,0,0,.8)}
-.cd.s-a .sn,.tcard.s-a .sn{color:#2b1a00;text-shadow:none}
+.cd .sn,.tcard .sn{position:absolute;left:5px;top:calc(var(--cw)*.46);font-size:max(13px,calc(var(--cw)*.2));font-weight:800;line-height:1;letter-spacing:.01em;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.cd .sn,.tcard .sn{color:#fff!important;background:rgba(3,14,26,.72);padding:1px 4px 2px;border-radius:5px;left:3px;text-shadow:none!important}
 .tcard .sn{top:calc(var(--cw)*.5)}
 #msg{font-size:1.06rem;color:#fff}
 .seat .st{display:flex;flex-direction:column;line-height:1.2;color:#cfe3ec}
 #board.land .seat .st{flex-direction:row;gap:6px}
-#trick .cd .who{font-size:13px;top:-22px}
-#hand.two .cd .own{top:calc(var(--cw)*.9 - 14px);font-size:13px;line-height:1.15}
+#trick .cd .who{font-size:.87rem;top:-22px}
+#hand.two .cd .own{top:calc(var(--cw)*.9 - 15px);font-size:.87rem;line-height:1.08}
 .seat.turn{box-shadow:0 0 0 3px var(--acc),0 0 22px rgba(63,208,201,.55)}
-@media (min-width:1200px) and (min-height:760px){:root{--cw:96px;--ch:142px}.cd .sn,.tcard .sn{font-size:15px}}
+@media (min-width:1200px) and (min-height:760px){:root{--cw:96px;--ch:142px}}
+.gxh-rx{white-space:pre-line}
 </style>
 </head>
