@@ -1,84 +1,80 @@
 # Free art credits: stitchwise
 
-All pictures in this folder are composed by `compose.py` from CC0 material (no attribution required; logged anyway).
+Composed by `compose.py` (see ART-DIRECTION.md). All sources CC0 (no attribution required; logged anyway).
 No picture contains text. No publisher, designer or original-game name or logo is used.
 
-## Sources used
+## Sources
 
-| Source | Author | Licence | URL | Files |
-|---|---|---|---|---|
-| Kenney Animal Pack Redux | Kenney | CC0 1.0 | https://opengameart.org/content/animal-pack-redux | 9 |
-| Kenney Cartography Pack | Kenney | CC0 1.0 | https://opengameart.org/content/cartography-pack | 5 |
-| Kenney Board Game Icons | Kenney | CC0 1.0 | https://opengameart.org/content/board-game-icons | 11 |
-| Poly Haven textures (diffuse maps, 1k) | Poly Haven contributors (see per-texture page) | CC0 1.0 | https://polyhaven.com/textures | 55 |
-| Quaternius low-poly animals (OBJ rendered to 2D with three.js, recoloured) | Quaternius | CC0 1.0 | https://opengameart.org/content/5-low-poly-animals | 4 |
-
-## Poly Haven textures used (CC0, https://polyhaven.com/a/<name>)
-
-brown_leather, denim_fabric, fabric_leather_01, floral_jacquard, flour, gingham_check, hessian_230, knitted_fleece, rough_linen, velour_velvet, wool_boucle
+| Source | Author | Licence | URL |
+|---|---|---|---|
+| rough_linen, denim_fabric, brown_leather, knitted_fleece, kitchen_wood, wood_table_001 (diffuse, 1k) | Poly Haven | CC0 1.0 | https://polyhaven.com/a/<name> |
+| Prints, spools, buttons, rosettes, sparkle, stitch: drawn by compose.py (PIL vector) | this project | CC0 1.0 | games-src/stitchwise/free-art/compose.py |
+| Toon Characters 1 (Female/Male person, Female/Male adventurer SVGs, recoloured) | Kenney | CC0 1.0 | https://opengameart.org/content/toon-characters-1 |
 
 ## Per file
 
 | File | Sources |
 |---|---|
-| bg-map.webp | kenney-carto, kenney-icons, polyhaven |
-| bg-table.webp | polyhaven |
-| bg-title.webp | kenney-carto, kenney-icons, polyhaven |
-| bonus-tile.webp | polyhaven |
-| fabric-01.webp | polyhaven |
-| fabric-02.webp | polyhaven |
-| fabric-03.webp | polyhaven |
-| fabric-04.webp | polyhaven |
-| fabric-05.webp | polyhaven |
-| fabric-06.webp | polyhaven |
-| fabric-07.webp | polyhaven |
-| fabric-08.webp | polyhaven |
-| fabric-09.webp | polyhaven |
-| fabric-10.webp | polyhaven |
-| fabric-11.webp | polyhaven |
-| fabric-12.webp | polyhaven |
-| fabric-13.webp | polyhaven |
-| fabric-14.webp | polyhaven |
-| fabric-15.webp | polyhaven |
-| fabric-16.webp | polyhaven |
-| fabric-17.webp | polyhaven |
-| fabric-18.webp | polyhaven |
-| fabric-19.webp | polyhaven |
-| fabric-20.webp | polyhaven |
-| fabric-21.webp | polyhaven |
-| fabric-22.webp | polyhaven |
-| fabric-23.webp | polyhaven |
-| fabric-24.webp | polyhaven |
-| fabric-25.webp | polyhaven |
-| fabric-26.webp | polyhaven |
-| fabric-27.webp | polyhaven |
-| fabric-28.webp | polyhaven |
-| fabric-29.webp | polyhaven |
-| fabric-30.webp | polyhaven |
-| fabric-31.webp | polyhaven |
-| fabric-32.webp | polyhaven |
-| fabric-33.webp | polyhaven |
-| icon-bonus.webp | kenney-icons |
-| icon-button.webp | kenney-icons |
-| icon-hourglass.webp | kenney-icons |
-| icon-leather.webp | kenney-icons |
-| patch-leather.webp | polyhaven |
-| portrait-aurelia.webp | polyhaven, quaternius |
-| portrait-bram.webp | polyhaven, quaternius |
-| portrait-fernsby.webp | kenney-animals, polyhaven |
-| portrait-hester.webp | kenney-animals, polyhaven |
-| portrait-ivo.webp | kenney-animals, polyhaven |
-| portrait-marguerite.webp | kenney-animals, polyhaven |
-| portrait-odette.webp | kenney-animals, polyhaven |
-| portrait-poppy.webp | kenney-animals, polyhaven |
-| portrait-tilly.webp | kenney-animals, polyhaven |
-| portrait-tobias.webp | polyhaven, quaternius |
-| portrait-wren.webp | kenney-animals, polyhaven |
-| quilt-frame.webp | kenney-icons, polyhaven |
-| result-lose.webp | kenney-carto, kenney-icons, polyhaven |
-| result-win.webp | kenney-carto, kenney-icons, polyhaven |
-| token-me.webp | kenney-animals |
-| token-opp.webp | quaternius |
-| torn-square.webp | polyhaven |
-| track-frame.webp | kenney-carto, kenney-icons, polyhaven |
-| ui-offer-card.webp | kenney-icons, polyhaven |
+| bg-title.webp | Poly Haven wood_table_001; this kit's fabrics, spools, buttons, rosette |
+| bg-table.webp | Poly Haven knitted_fleece (recoloured navy) + drawn stitching |
+| quilt-frame.webp | Poly Haven kitchen_wood, rough_linen + drawn grid/notches |
+| track-frame.webp | Poly Haven kitchen_wood, rough_linen + drawn grid/notches |
+| token-me.webp | drawn in-script (flat vector) |
+| token-opp.webp | drawn in-script (flat vector) |
+| icon-button.webp | drawn in-script (flat vector) |
+| icon-hourglass.webp | drawn in-script (flat vector) |
+| patch-leather.webp | Poly Haven brown_leather + drawn stitching |
+| fabric-01.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-02.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-03.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-04.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-05.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-06.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-07.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-08.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-09.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-10.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-11.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-12.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-13.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-14.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-15.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-16.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-17.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-18.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-19.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-20.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-21.webp | Poly Haven denim_fabric + drawn top-stitching |
+| fabric-22.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-23.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-24.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-25.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-26.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-27.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-28.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-29.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-30.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-31.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-32.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| fabric-33.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| portrait-wren.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-poppy.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-tilly.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-fernsby.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-odette.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-bram.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-marguerite.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-ivo.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-hester.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-tobias.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| portrait-aurelia.webp | Kenney Toon Characters 1 (SVG recoloured, rendered) on this kit's fabric |
+| bonus-tile.webp | drawn in-script (flat vector) |
+| torn-square.webp | Poly Haven rough_linen (thread detail) + seamless print drawn in-script |
+| bg-map.webp | this kit's fabrics (patchwork) + drawn stitch path, rosettes |
+| result-win.webp | Poly Haven wood_table_001; this kit's fabrics, spools, buttons, rosette |
+| result-lose.webp | Poly Haven wood_table_001; this kit's fabrics, spools, buttons, rosette |
+| fx-sparkle.webp | drawn in-script (flat vector) |
+| fx-stitch.webp | drawn in-script (flat vector) |
+| icon-bonus.webp | drawn in-script (flat vector) |
+| icon-leather.webp | Poly Haven brown_leather + drawn stitching |
+| ui-offer-card.webp | Poly Haven rough_linen + drawn tag/stitching |
