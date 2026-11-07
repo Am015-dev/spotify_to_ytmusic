@@ -60,12 +60,9 @@ function addShip(side,e){const P=PILOTS[e.p],T=SHIPS[P.ship];const id='s'+(G.shi
     flags:{},bumped:false,rockHit:false,fired:false,moved:false,cost:pilotCost(e)};
   for(const u of s.ups){const U=UPGRADES[u.id];if(U&&U.onAdd)U.onAdd(s)}
   G.ships.push(s)}
-// [R9] the lower squad total has initiative; on a tie one player rolls an attack die: hit/crit, that player chooses; otherwise the other player chooses
+// [R9] the lower squad total has initiative; on a tie the second-named side has it (core rulebook; no die roll)
 function rollInitiative(k){if(G.pts[0]!==G.pts[1]){G.init=G.pts[0]<G.pts[1]?0:1;lg(-1,`${sideName(G.init)} has the lower squad total and so has initiative.`);return k()}
-  const f=ATK_FACES[rnd(8)],ch=f==='hit'||f==='crit'?0:1;lg(-1,`The squads tie at ${G.pts[0]} points: ${sideName(0)} rolls ${f}, so ${sideName(ch)} chooses who has initiative.`);
-  const set=w=>{G.init=w;lg(-1,`${sideName(w)} has initiative.`);k()};
-  if(isHuman(ch))return ask(ch,'init','Initiative','The squads are tied. With initiative your ships move first and fire first on pilot-skill ties, and you win if both last ships are destroyed together.',[{k:'me',l:'Take initiative'},{k:'opp',l:'Give it to the opponent'}],a=>set(a==='me'?ch:1-ch));
-  set(ch)}// the computer takes it: firing first on ties is worth more than moving first
+  G.init=1;lg(-1,`The squads tie at ${G.pts[0]} points: ${sideName(1)} (the second-named side) has initiative.`);return k()}// the computer takes it: firing first on ties is worth more than moving first
 function rockShape(){const o={x:0,y:0,r:22+rnd(18),n:7+rnd(3),rot:rnd(628)/100,k:[]};for(let i=0;i<o.n;i++)o.k.push(.72+rnd(29)/100);return o}
 function rockLegal(o){const P=rockPoly(o);if(P.some(p=>Math.min(p.x,p.y,MAT-p.x,MAT-p.y)<=2*RANGE))return false;// [R7] beyond range 2 of every edge
   return !G.rocks.some(q=>{const Q=rockPoly(q);let d=1e9;for(const p of P)d=Math.min(d,polyPointDist(p,Q));for(const p of Q)d=Math.min(d,polyPointDist(p,P));return d<RANGE})}// and beyond range 1 of each other [tournament rule]
@@ -133,9 +130,9 @@ function executeMove(s,m,done){const b=B(s),p0={x:s.x,y:s.y,h:s.h},L=m.s===0?0:t
   // obstacles: the template or the final base overlapping a rock [R7]
   const tp=m.s===0?[]:tplPoints(p0,b,m,4),baseP=corners(s,b);const touched=[];
   for(const o of G.rocks){const R=rockPoly(o);const on=polyOverlap(baseP,R);const thru=!on&&tp.some(p=>polyPointDist(p,R)<=TPL_W/2);if(on||thru)touched.push({o,on,d:len(sub(o,p0))})}
-  touched.sort((a,b)=>a.d-b.d);// resolve the asteroid nearest the start first; one die per asteroid [R7]
-  for(const t of touched){if(!s.alive)break;s.rockHit=true;const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)} ${t.on?'lands on':'flies through'} an asteroid: rolls ${f}.`);fx('rock',{id:s.id,f});
-    if(f==='hit')dealDamage(s,1,0,null);else if(f==='crit')dealDamage(s,0,1,null);if(t.on)s.flags.noAtk=true}
+  touched.sort((a,b)=>a.d-b.d);// resolve the asteroid nearest the start first; one die per maneuver [R7]
+  if(touched.length&&s.alive){const t=touched[0];s.rockHit=true;const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)} ${touched.some(x=>x.on)?'lands on':'flies through'} an asteroid: rolls ${f}.`);fx('rock',{id:s.id,f});// one die per maneuver, however many asteroids it overlaps
+    if(f==='hit')dealDamage(s,1,0,null);else if(f==='crit')dealDamage(s,0,1,null);if(touched.some(x=>x.on))s.flags.noAtk=true}
   if((bumpedInto||touched.length)&&crit(s,'stunned')&&s.alive){lg(s.side,`${sname(s)}'s concussed pilot takes 1 damage from the jolt.`);dealDamage(s,1,0,null)}
   if(s.alive)exAfterMove(s,m,bumpedInto,tp);
   done()}

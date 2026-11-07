@@ -35,7 +35,7 @@ function rulesFill() {
     '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. No heat left? You spin out: back behind the corner, gear 1, plus a stress card.</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces. It does not count as speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b>: gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the car in last place gets +1 move and +1 cooldown.</li></ul>' +
     '<h3>Cards</h3><ul><li>Speed 1, 2, 3, 4: three of each.</li><li>Stress (3): when played, flip your deck until a speed card shows and use it.</li><li>Heat (6 start in your engine): paying sends them to your discard pile. They clog your hand later and cannot be played.</li></ul>' +
     '<h3>Upgrades (optional)</h3><ul><li>Switch Upgrades on in setup. Before the race you pick 3 upgrade cards; they join your deck and are played like speed cards, each with a bonus (more cooling, higher corner limits, a big speed jump).</li></ul>' +
-    '<p>Brake and keep your heat, or push and burn it. Heat comes back around.</p><div id="howTut">' + tutBtn('ghostb', { launch: function () { GX.close(); closeModal(); tutStart(); } }) + '</div>');
+    '<p>Kept simple: stress cards come from an unlimited reserve, the starting upgrade cards are left out, and cooldown is taken when you shift gear.</p><p>Brake and keep your heat, or push and burn it. Heat comes back around.</p><div id="howTut">' + tutBtn('ghostb', { launch: function () { GX.close(); closeModal(); tutStart(); } }) + '</div>');
   var d = $('#rulesbody'); d.innerHTML = h; artApply(d);
 }
 function howTo() { rulesFill(); GX.show('rulesd'); }
@@ -83,7 +83,7 @@ function planFor(ci) {
 function curveInfo() {   /* what the selected cards would do at the next corner */
   var c = you(), sp = 0, nx = 0, ul = 0; UI.sel.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { sp += UPG[u].sp; ul += UPG[u].lim; } else if (x === 'X') nx++; else sp += +x; });
   var avg = avgSpeed(c), spEst = sp + nx * avg + (UI.boost ? avg : 0), shown = Math.round(spEst);
-  var adr = G.cars.length >= 3 && rankList(G)[G.cars.length - 1] === c.i && G.cars[rankList(G)[0]].pos - c.pos >= 2 ? 1 : 0;
+  var adr = adrenalineFor(G).indexOf(c.i) >= 0 ? 1 : 0;
   var L = c.pos + shown + adr, ks = cornersIn(G, c.pos, L), cost = (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) + (UI.boost ? 1 : 0);
   var burn = 0; ks.forEach(function (k) { burn += Math.max(0, shown - k.limit - ul); });
   return { sp: shown, uncertain: nx > 0 || UI.boost, burn: burn, spin: burn > c.eng - cost, ks: ks, cost: cost, next: nextCorner(c.pos), adr: adr };
