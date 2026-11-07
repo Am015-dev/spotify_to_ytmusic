@@ -15,7 +15,7 @@ var STORY = {
     egg: { say: 'Put each egg on a bird with room in its nest. Every egg is 1 point.', react: 'Three eggs, three points. A full nest is a happy nest.' },
     draw: { ch: 'Prologue 4 · Rumours at the reeds', say: 'Pip is whispering about rare birds at the wetland. Your wetland row brings new cards.', react: null },
     tray: { say: 'Pick a bird you can see in the tray, or gamble on the deck. The tray refills after you.', react: 'A fine find. Pip is already jealous.' },
-    goals: { ch: 'Prologue 5 · The evening count', say: 'At dusk the round goal is judged: whoever has the most of it scores the most.', react: null },
+    goals: { ch: 'Prologue 5 · The evening count', say: 'At dusk the round goal is judged. Tonight: most birds in your grassland. Most wins the most points.', react: null },
     score: { say: 'At year\'s end: birds + eggs + goals + bonus card + cached food + tucked cards. A tie? Most food left wins.', react: null },
     finish: { say: 'The light is going. Use your last actions your own way, and beat Pip to the count.', react: 'Let\'s see whose notebook is fuller!' }
   },

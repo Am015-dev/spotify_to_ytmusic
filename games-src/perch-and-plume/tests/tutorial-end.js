@@ -28,6 +28,7 @@ const WANT = [...new Set([...COVER.matchAll(/step `([a-z0-9]+)`/g)].map(m => m[1
     shown.add(st.id);
     const key = st.id + ':' + st.count; if (key === lastKey) { if (++taps > 8) { ok(false, 'stuck at ' + key); break; } } else { lastKey = key; taps = 0; }
     if (!st.wait) {
+      if (st.hole && !seen.has(key + ':t')) { const hx = st.hole.cx != null ? st.hole.cx : st.hole.left + st.hole.width / 2, hy = st.hole.cy != null ? st.hole.cy : st.hole.top + st.hole.height / 2; const th = await p.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); if (!e) return 'nothing'; if (e.closest('.gxt-clear')) { const below = document.elementsFromPoint(x, y).find(z => !z.closest('.gxt-clear')); return below && below.closest('.gxt-top,.turnban,.reveal,#toast') ? 'covered by ' + below.className : 'ok'; } return e.closest('.gxt-top,.turnban,.reveal,#toast') ? 'covered by ' + (e.className || e.tagName) : 'ok'; }, [hx, hy]); ok(th === 'ok', `step ${st.i + 1}/${st.n} ${st.id} (see) spotlight target uncovered: ${th}`); seen.add(key + ':t'); }
       const nx = await p.$('.gxt-next'); const r = nx && await nx.boundingBox(); if (!r) continue;
       const cx = r.x + r.width / 2, cy = r.y + r.height / 2, hit = await uncovered(cx, cy, null);
       if (!seen.has(key)) { ok(hit === 'ok', `step ${st.i + 1}/${st.n} ${st.id} (see) Next uncovered: ${hit}`); seen.add(key); }
