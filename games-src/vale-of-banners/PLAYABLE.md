@@ -23,6 +23,12 @@ Second critique on the after-shots: the turn is now a readable sequence (banner 
 the rival turn reads as captions. Still weak: the title is a plain card (no title art in temp-art), the estate colours are only explained by the
 instruction line, and the market on phone is dense (12 tiles + back lane) though every tile is now named.
 
+## Story (ADDENDUM 3)
+Tutorial = story prologue: Old Odo guides, Tobin Reed is the rival for the spring charter; each step has a story reason, Odo reacts in a
+portrait bubble after the action; chapters Prologue / Market day / The keep / The moot / Harvest eve; the final count is the climax (count-up +
+win/loss line). Quick game: Odo's flavour line at the start, a result line in the Vale's voice. Story: chapter intros/win outros/boss lines
+(campaign.json) + a loss outro per chapter (src/story.js). STORY.md has the cast and 3-act arc.
+
 ## Rules (ADDENDUM 2)
 rules-check MISSING 2/2 fixed in the engine with rules-test cases: solo mode (1 silver, 2 workers, 3 goods, no goods-kind limit, 25 rounds,
 win only with all 37 spaces) and 2 v 2 teams (shared silver, workers, goods; team total wins; pool scores once). WRONG: 0 listed.
@@ -33,6 +39,10 @@ SIMPLIFIED-ON-PURPOSE (5) are listed in the Rules drawer under "Simplified on pu
 - `node tut-end.js`: tutorial from fresh storage by tapping each spotlit centre (elementFromPoint = target) PASS at 390x763 and 1440x860; end card ->
   real game; Skip returns to the title.
 - `node play-ui.js`: Quick game and Story chapter 1 played to the result by tapping only visible, uncovered UI PASS.
-- ui-audit A-F: phone 0, phone-s 0, pc 0 (fixed on the way: PC tile labels 16px, PC menu notes 16px, story-map disc contrast).
+- ui-audit A-F (final build): phone-s 0, pc 0, phone A0 B2 C0 D0 E0 F0. The 2 phone B items: Rules drawer "Buildings" 2.81:1 (the audit
+  measures it off-screen; not reproducible by hand, same finding the previous worker could not trace) and the "3 Goats" market label scored
+  "busy" (0.95, marginal; my crop of that spot shows another surface over the board). Turn banner and Odo's bubbles are switched off under
+  ?scn= so the audit measures the still board.
+- Note: the turn banner never showed in the first commits (an id helper bug); fixed in the story commit, now visible (shots/after-phone-3banner.png).
 - Test setup: temp art linked as media (not committed); Playwright browser shim outside the repo (PLAYWRIGHT_BROWSERS_PATH) because the
   installed 1.56.1 expects build 1194.

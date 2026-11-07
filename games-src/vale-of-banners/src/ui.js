@@ -74,7 +74,7 @@ function toastOff() { clearTimeout(toast.t); $('#toast').classList.remove('on');
 /* one caption line = what is happening now (rival steps) */
 function setCap(msg) { UI.cap = msg; var pr = $('#prompt'); if (pr && G && !isHuman(VB.actor(G))) pr.textContent = msg; }
 function say(text, who) {   /* a character speaks: code-drawn portrait + one line (story beats, reactions) */
-  if (!text || UI.fast) return; var c = who || VSTORY.guide, g = $('#guide');
+  if (!text || UI.fast || QS.get('scn')) return; var c = who || VSTORY.guide, g = $('#guide');   /* test scenarios (?scn=) audit the still board */
   if (!g) { g = h('div', { id: 'guide', role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
   g.innerHTML = ''; g.appendChild(h('span.gp', { 'aria-hidden': 'true', style: '--pc:' + (c.color || '#7a5c3e'), text: c.initial || (c.name || '?')[0] }));
   g.appendChild(h('span.gt', {}, [h('b', { text: c.name + ' ' }), document.createTextNode(text)]));
@@ -87,7 +87,7 @@ function turnBanner() {
   var b = $('#tbanner'); if (!b) { b = h('div', { id: 'tbanner', 'aria-hidden': 'true' }); document.body.appendChild(b); }
   b.textContent = txt; b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
   UI.hold = UI.fast ? 0 : Date.now() + animMs(1000);
-  if (UI.fast) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on');
+  if (UI.fast || QS.get('scn')) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on');
 }
 function describe(m, s) {
   var n = G.seats[s].name, p = G.P[s], t;
