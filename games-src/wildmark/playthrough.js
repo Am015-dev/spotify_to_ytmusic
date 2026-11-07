@@ -38,8 +38,8 @@ const URL = 'file://' + __dirname + '/wildmark.html';
         await p.evaluate(() => { UI.sv = 'title'; showTitle(); });
         await tap('#storyB'); await p.waitForTimeout(400);
         await p.screenshot({ path: `shots/map-${name}.png` });
-        await p.evaluate(i => GXC.play(i), id); await p.waitForTimeout(300);
-        for (let k = 0; k < 6; k++) { const s = p.locator('.gxc button:visible').filter({ hasText: /skip|start|play|begin|continue|let/i }).first(); if (!(await s.count())) break; touch ? await s.tap() : await s.click(); await p.waitForTimeout(300); if (await p.evaluate(() => !!(window.G && UI.mode === 'camp' && document.querySelector('.gxc') == null || (window.G && UI.mode === 'camp' && G.seats[0].done === 0 && !document.querySelector('.gxc:not([hidden])'))))) break; }
+        await p.evaluate(i => GXC.play(i), id); await p.waitForTimeout(300); await p.locator('.gxc button:visible').filter({ hasText: /skip|start|fight/i }).first().waitFor({ timeout: 5000 }).catch(() => {});
+        for (let k = 0; k < 6; k++) { const s = p.locator('.gxc button:visible').filter({ hasText: /skip|start|play|begin|continue|let|fight/i }).first(); if (!(await s.count())) break; touch ? await s.tap() : await s.click(); await p.waitForTimeout(300); if (await p.evaluate(() => !!(window.G && UI.mode === 'camp' && document.querySelector('.gxc') == null || (window.G && UI.mode === 'camp' && G.seats[0].done === 0 && !document.querySelector('.gxc:not([hidden])'))))) break; }
         await p.waitForFunction(() => UI.mode === 'camp' && G && !G.over, null, { timeout: 10000 });
         await p.screenshot({ path: `shots/story-${id}-${name}.png` });
         for (let t = 0; t < 20; t++) await humanTurn(p, tap, true);

@@ -43,7 +43,13 @@ function campInit() {
 function campPortraitNode(c) {
   var col = (c && c.color) || '#3f7a4a', ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
   s.setAttribute('viewBox', '0 0 40 40'); s.setAttribute('class', 'wm-pt'); s.setAttribute('aria-hidden', 'true');
-  s.innerHTML = '<circle cx="20" cy="20" r="20" fill="' + col + '"/><circle cx="20" cy="16" r="7" fill="#f3ead2"/><path d="M7 36 C9 26 31 26 33 36 Z" fill="#f3ead2"/>';
+  // no painted portrait yet: a finished-looking crest (character colour, gold ring, their emblem animal, initial on a ribbon), never a grey silhouette
+  var stem = c && c.portrait ? c.portrait.replace(/\.webp$/, '').replace('portrait-', '') : '', EMB = { rowan: 'elk', ranger: 'fox', pip: 'salmon', bram: 'bear', sorrel: 'elk', quill: 'hawk', linnet: 'hawk', oake: 'bear', warden: 'fox', frost: 'salmon', snowline: 'hawk' };
+  var nm = (c && c.name) || '?', ini = nm.replace(/^(The|Ward|Elder)\s+/g, '').replace(/^(The|Ward|Elder)\s+/g, '').charAt(0).toUpperCase(), uid = 'wmp' + (campPortraitNode.n = (campPortraitNode.n || 0) + 1);
+  s.innerHTML = '<defs><radialGradient id="' + uid + '" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient></defs>' +
+    '<circle cx="20" cy="20" r="19.5" fill="#f2d27a"/><circle cx="20" cy="20" r="17.3" fill="' + col + '"/><circle cx="20" cy="20" r="17.3" fill="url(#' + uid + ')"/>' +
+    (EMB[stem] && typeof tokenSvg === 'function' ? tokenSvg(EMB[stem], 20, 17, 10) : '') +
+    '<path d="M8 29 h24 l-2.5 3.5 l2.5 3.5 h-24 l2.5 -3.5Z" fill="#2a1c06" opacity=".85"/><text x="20" y="34.3" text-anchor="middle" font-size="7" font-weight="800" fill="#f3ead2" font-family="Georgia,serif">' + ini + '</text>';
   return s;
 }
 // menu section chips: show which section was picked (the shared chips only scroll)
