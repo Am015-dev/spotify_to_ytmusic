@@ -59,6 +59,40 @@ window.EC_STORY = {
     },
     end: { title: 'The ember lives', text: 'You beat the Gatekeeper\'s captain and kept the summit open. The real climb starts now.' }
   },
+  // coached first climb (the tutorial): one line the first time each rule matters; keys are the rules in TUTORIAL-COVERAGE.md
+  coach: {
+    start: 'The summit ember is fading and the Gatekeeper wants it sealed. Climb, Garrick. I will talk when it matters.',
+    rules: {
+      energy: 'You hold 3 energy a turn. A card costs the number in its corner.',
+      intent: 'Above each enemy: its next move. Plan around it.',
+      block: 'An attack is coming. Block cards soak damage until your next turn.',
+      endturn: 'No playable cards left: End turn. The enemy then acts step by step.',
+      target: 'Several enemies: after lifting an attack, tap the enemy you want to hit.',
+      vuln: 'Vulnerable: the next hit on it deals double.',
+      weak: 'Weak: each hit deals 3 less.',
+      poison: 'Poison: 1 HP per token at the end of the turn, through Block. It stays.',
+      strength: 'Strength adds to every hit you make this fight.',
+      power: 'A Power card lasts the whole fight. Play it early.',
+      exhaust: 'Exhaust cards vanish for the rest of this fight once played.',
+      die: 'Die cards roll 1-6: low, middle or high result.',
+      junk: 'Junk cards like Dazed can never be played. They just clog your hand.',
+      piles: 'Your draw pile ran dry: your used cards were shuffled back in.',
+      potion: 'You carry a potion: free to use, one use. Tap it in the dock.',
+      reward: 'Each win: pick one card for your deck, or skip to keep it lean.',
+      gold: 'Gold piles up. Spend it at shops.',
+      relic: 'A relic: a lasting bonus for the whole climb.',
+      map: 'Your path: glowing rooms are your next step. Pick one.',
+      rest: 'Campfire: rest to heal, or smith to upgrade one card.',
+      shop: 'A shop: tap an item to read it, then Buy. You can also pay to remove a card.',
+      event: 'A ? room: a choice with a price or a prize.',
+      elite: 'An elite: tougher than a normal foe, better loot.',
+      boss: 'The boss repeats a pattern. On its Spikes turn, attacks hurt you: block instead.',
+      lose: 'If your HP hits 0, the climb ends.'
+    },
+    good: { kill: 'Clean kill!', double: 'Double damage on a Vulnerable foe. Nicely done.', blocked: 'Fully blocked. That is how a warden fights.' },
+    poor: { hurt: 'Ouch. A Block card would have soaked some of that.', spikes: 'Spikes bit you. On its Spikes turn, block instead.', leftover: 'You ended with energy left. Spend it all next time.' },
+    end: { title: 'You climbed the tower', later: 'Things you will meet later', play: 'Play a real game', title2: 'Title' }
+  },
   // Story mode scenes per chapter (id from campaign.json): intro (2-3 lines), win and loss outros, boss lines before and after
   chapters: {
     c1: { intro: [['guide', 'A new climber. The Gatekeeper wants this tower sealed, and only climbers keep the gate open.'], ['guide', 'Let me show you how we fight here.']], win: [['guide', 'You kept the gate open tonight. Now the real road.']], lose: [['guide', 'Everyone falls once. Get up.']] },

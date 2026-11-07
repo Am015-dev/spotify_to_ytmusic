@@ -43,7 +43,7 @@
       var el = document.querySelector('[data-w="' + f.w + '"]');
       switch (f.k) {
         case 'dmg': fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hit'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n + (f.x === 'poison' ? ' poison' : UI.lastName ? ' ' + UI.lastName : ''), 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
-        case 'hitme': if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hurt'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n + (f.x === 'spikes' ? ' spikes' : f.x === 'burn' ? ' burn' : ''), 'dmg'); if (f.x === 'spikes') toast('Spikes! Attacking it cost you ' + f.n + ' HP'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
+        case 'hitme': if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hurt'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n + (f.x === 'spikes' ? ' spikes' : f.x === 'burn' ? ' burn' : ''), 'dmg'); if (f.x === 'spikes') { toast('Spikes! Attacking it cost you ' + f.n + ' HP'); try { UI.coachReact && UI.coachReact('poor', 'spikes'); } catch (e) { } } if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
         case 'hp': break;
         case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); popAt(f.w, '+' + f.n + ' Blk', 'blk'); break;
         case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); popAt(f.w, '+' + f.n, 'heal'); break;
@@ -367,7 +367,8 @@
   function playIt(ci, ti) {
     var g = G(), mv = { t: 'play', h: g.b.cur, c: ci }; if (ti != null) mv.e = ti;
     UI.lastName = E.eff(g.hs[g.b.cur].hand[ci]).name; SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
-      UI.busy = false; UI.sel = -1; E.performMove(mv); render(); afterMove();
+      UI.busy = false; UI.sel = -1; var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead; E.performMove(mv); render(); afterMove();
+      try { if (UI.coachReact && tg) { if (!wasD && tg.dead) UI.coachReact('good', 'kill'); else if (wasV) UI.coachReact('good', 'double'); } } catch (e) { }
     });
   }
   function afterMove() { var g = G(); if (g.scr !== 'battle') { render(); } }
@@ -380,6 +381,7 @@
   }
   function endTurn() {
     var g = G(); if (g.scr !== 'battle' || g.b.ph !== 'p' || UI.busy) return; if (!tutOk({ type: 'tap', w: 'end' })) return; UI.sel = -1;
+    try { var hh0 = g.hs[g.b.cur]; if (UI.coachReact && hh0 && hh0.en > 0 && hh0.hand.some(function (c) { return E.canPlay(hh0, c) && E.cost(hh0, c) <= hh0.en && E.eff(c).type !== 'X'; })) UI.coachReact('poor', 'leftover'); UI.hp0 = hh0.hp; UI.bk0 = hh0.blk; } catch (e) { }
     E.performMove({ t: 'end' }); render();
     if (G().scr === 'battle' && G().b.ph === 'e') enemyPhase(); else render();
   }
@@ -396,7 +398,7 @@
     if (!window.ANIM) { E.settle(); render(); return; }
     UI.busy = true; UI.fast = false; UI.cap = ''; UI.actor = -1;
     var spd = function () { UI.fast = true; }; document.addEventListener('pointerdown', spd, true);
-    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') banner('Your turn', 'you'); };
+    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); try { var gq = G(), hq = gq.hs[0]; if (UI.coachReact && gq.scr === 'battle' && UI.hp0 != null) { var lost = UI.hp0 - hq.hp; if (lost >= 8 && UI.bk0 === 0) UI.coachReact('poor', 'hurt'); else if (lost === 0 && UI.bk0 > 0) UI.coachReact('good', 'blocked'); } } catch (e) { } var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') banner('Your turn', 'you'); };
     banner('Enemy turn', 'foe'); UI.cap = 'Enemy turn: watch what each enemy does.'; render();
     (function loop() {
       var g = G(); if (!g || g.scr !== 'battle' || !g.b || g.b.ph !== 'e') return done();
@@ -521,7 +523,7 @@
   };
   function over() {
     var g = G();
-    if (UI.camp) { var s0 = h('div', 'over'); if (!UI.fin) { UI.fin = 1; setTimeout(function () { window.EC_NOSAVE = 0; try { GXC.finish(G()); } catch (e) { } }, 500); } app.appendChild(s0); return; }
+    if (UI.camp && !(UI.coach && UI.coach.on)) { var s0 = h('div', 'over'); if (!UI.fin) { UI.fin = 1; setTimeout(function () { window.EC_NOSAVE = 0; try { GXC.finish(G()); } catch (e) { } }, 500); } app.appendChild(s0); return; }
     resultScr(null, function (pick) { if (pick === 'again') UI.restart(); else { E.clear(); UI.mode = 'title'; render(); } });
   }
   function overlay() {
