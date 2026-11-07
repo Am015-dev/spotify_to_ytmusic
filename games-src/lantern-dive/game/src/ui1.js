@@ -80,7 +80,10 @@ function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return n
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
 function loadPrefs() { try { const p = JSON.parse(lsGet('ld_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed != null) AIDELAY = p.speed; } catch (e) { } }
 function savePrefs() { lsSet('ld_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
-const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, UI.fastT ? 60 : ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+// the caption bar over the table: one plain sentence per step ("Nerea plays Kelp 4"); tap it to speed the step up
+function cap(t, kind, sub) { const el = document.getElementById('cap'); if (!el) return; if (!t) { el.classList.remove('on', 'tap'); return; } el.className = 'on' + (kind ? ' ' + kind : '') + (UI.busy ? ' tap' : ''); el.textContent = t; if (sub) { const s = document.createElement('small'); s.textContent = sub; el.appendChild(s); } }
+document.addEventListener('pointerdown', e => { if (UI.busy && e.target && e.target.closest && e.target.closest('#cap,#felt')) UI.fastT = true; }, true);
 // ---- the logbook: progress saved on this device ----
 const Prog = {
   d: null,
