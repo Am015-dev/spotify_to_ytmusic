@@ -91,12 +91,12 @@ function hlpSuggest(){const h=hlpPlan();if(!h)return null;const m=h.move;
   return {target:()=>(UI.figs||[]).find(b=>b.isConnected&&b._m.k===m.k&&b._m.l===m.l)||null,why:h.why}}
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
-function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
+// the turn strip already says what to do while placing, so those first-time bubbles start as seen (the lightbulb still works in every phase); only follower bubbles explain
+function hlpQuiet(){try{const k='gxh-rampart-and-vine';const o=JSON.parse(localStorage.getItem(k)||'null')||{on:true,seen:{}};o.seen=o.seen||{};for(const id of ['place','river','bonus','nofig'])o.seen[id]=1;localStorage.setItem(k,JSON.stringify(o))}catch(e){}}
+function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;hlpQuiet();
   GXH.init({game:'rampart-and-vine',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,top:()=>{const t=$('#top');return t?Math.ceil(t.getBoundingClientRect().bottom)+4:6},
     avoid:'.glow,.fglow,#htile.mine,#hskip,#status'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
-  setInterval(()=>{try{GXH.phase(coachPhase())}catch(e){}},500)}
-// the turn strip already says what to do while placing; coach bubbles only explain followers
-function coachPhase(){const p=hlpPhase();return p==='place'||p==='river'||p==='bonus'||p==='nofig'?null:p}
-function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;try{GXH.phase(coachPhase())}catch(e){}}
+  setInterval(()=>{try{GXH.phase(hlpPhase())}catch(e){}},500)}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;try{GXH.phase(hlpPhase())}catch(e){}}
 hlpInit();
