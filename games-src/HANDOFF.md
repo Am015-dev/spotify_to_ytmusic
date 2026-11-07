@@ -87,3 +87,6 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
   shelf/W366-vale-fix, shelf/W373-emberclimb-polish (menu E/B fixed; ch.2 balance gate unmet).
 - Live today: 14 old games with wired 3D/pictures/music (19:34), cauldron-fair (20:11), offline fix (18:08).
 - Owner does art himself (refused: publisher/TTS scans; custom-art loader and upload page were cancelled by the owner).
+- Source map (which published game + rulebook each shelf game adapts) is kept PRIVATELY in the owner's Google Drive doc
+  "Game Night Shelf - private source map" (id 1Dbj_snxeJzQe1jWMjxpRqW_-FBCp-Zl3lWRViIfDTgY). Never copy names into the repo;
+  the orchestrator passes titles + rulebook URLs to workers in their prompts only.
