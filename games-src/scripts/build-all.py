@@ -39,6 +39,7 @@ GAMES = {
     "tidewake":         ("tidewake/game",        "python3 build.py", "tidewake.html"),
     "twin-thrones":     ("twin-thrones",         "python3 build.py", "twin-thrones.html"),
     "wildmark":         ("wildmark",             "python3 build.py", "wildmark.html"),
+    "vinegrave":        ("vinegrave",            "python3 build.py", "vinegrave.html"),
 }
 
 # slug -> (dir relative to games-src with the game's own sweeps, [scripts]). Full run = the script's own default size (the gate); QUICK=1 makes it 4 games.
@@ -62,6 +63,7 @@ SWEEPS = {
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
     "twin-thrones":     ("twin-thrones",        ["rules-test.js"]),
     "wildmark":         ("wildmark",            ["rules-test.js"]),
+    "vinegrave":        ("vinegrave",           ["rules-test.js"]),
 }
 PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
 TIMES = []   # (slug, check, seconds)
