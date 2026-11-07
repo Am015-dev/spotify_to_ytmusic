@@ -7,8 +7,8 @@ Method: screenshots at 390x763 and 1440x860 of title, tutorial, first turn, riva
 ## The 10 worst problems (before) and what changed
 | # | Problem (before) | Fix (after) |
 |---|---|---|
-| 1 | The only turn signal was a small dark pill ("Place your tile", "Cobalt plays a tile"): no clear "whose turn", easy to miss | Turn strip under the top bar: a coloured banner "Your turn" / "<Rival>'s turn" and ONE instruction line in plain words (14 px, max 2 lines, solid backing) |
-| 2 | The rival's turn was a few silent moves with the same pill; nothing said what it drew, where it put it or what it claimed | Every rival step has a caption (draws a tile: <name>, lays it next to the valley, puts a follower on the road, scoring) at about 1 s a step; tap the board to speed up |
+| 1 | The only turn signal was a small dark pill ("Place your tile", "Cobalt plays a tile"): no clear "whose turn", easy to miss | Turn strip under the top bar: a coloured banner "Your turn" / "<Rival>'s turn" and ONE instruction line (at most 6 words, the UI-BAR rule 5 limit with the banner: "Place your tile: tap a glow.", 14 px, solid backing) |
+| 2 | The rival's turn was a few silent moves with the same pill; nothing said what it drew, where it put it or what it claimed | Every rival step has a caption, queued so each is read in turn (draws a tile, places the tile, claims the road, scoring), about 1 s a step; the tile it holds is named at the bottom; tap the board to speed up |
 | 3 | Score pops were a bare "+4" with no reason, and the header named the wrong player | Pop says what scored ("+4 town"), the strip says "You +4: finished town, 2 tiles" under a "Scoring" banner; end scoring says "unfinished road, 3 tiles", "field with 2 finished towns" |
 | 4 | The first-turn coach bubble repeated the instruction and sat on top of a glowing square | Place/river/mason bubbles removed (the strip says it); only follower bubbles remain |
 | 5 | Score chips and names at 12-13 px, names hidden for the rival on phones | Chips 14 px; banner names the rival in full |
@@ -16,9 +16,16 @@ Method: screenshots at 390x763 and 1440x860 of title, tutorial, first turn, riva
 | 7 | Follower spots were identical circles | Each spot carries a label: road, town, priory, field (13 px, solid backing) |
 | 8 | "70" next to a picture meant nothing | "70 left" |
 | 9 | Result card showed bare numbers | Names and scores, plus a line in the game's voice (win, loss, tie) |
-| 10 | Tutorial was a list of "tap here" tips, tutorial button third on the title | Story prologue: Old Tamsin portrait on every bubble, chapters, Hob as rival, story reasons and payoffs, coverage list; a first-time player sees the tutorial button first |
+| 10 | Tutorial was a list of "tap here" tips, tutorial button third on the title | Story prologue: Old Tamsin portrait on every bubble, chapters, Hob as rival, story reasons and payoffs, coverage list; a first-time player sees the tutorial button first (Play stays the one big button) |
 
 Also: Help opens with "How a turn works" (5 short lines) and a "House rules" card stating the simplified items from the rules check.
+
+## Gate results (22:35 UTC)
+- `build-all --quick rampart-and-vine`: PASS (scenarios 11/11, including ui-bar rules and axe contrast).
+- `tutor-test.js` 390x763 and 1440x860: 19 steps, wrong taps, spotlight not covered, rotate/leave/skip/story runs: 0 problems.
+- `playable-test.js both`: Quick game and Story chapter 1 played to the result by taps only: PASS, 0 console errors.
+- ui-audit (phone, phone-s, pc) before: A2/0/24 B14/20/12 C10 E3/0/1 F1; after: see the last section.
+- rules fixed 0/0 (rules check found nothing WRONG; the one MISSING item is an expansion we do not have).
 
 ## Remaining (honest)
 - The tutorial game cannot teach River, Taverns, Merchants, ties, banners and the can't-place rule (see TUTORIAL-COVERAGE.md).
