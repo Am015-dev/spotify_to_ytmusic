@@ -33,7 +33,7 @@ const tutToad = () => G.meadow.find(id => id >= 0 && HB.cardKey(id) === 'barge_t
 (function () {
   const o = HB.AI.choose;
   HB.AI.choose = function (g, seat, level) {
-    if (UI.cfg && UI.cfg.tutorial && g === G && seat === 1) {
+    if (UI.cfg && UI.cfg.tutorial && !UI.cfg.coached && g === G && seat === 1) {
       const p = g.players[1], mv = HB.moves(g, 1), key = (p.season === 0 ? 'w' : 's') + p.dep.length;
       const basic = k => mv.find(m => m.type === 'worker' && m.k === 'basic' && D.basic[m.i].key === k);
       const want = { w0: () => basic('basic_pebble_bank'), w1: () => basic('basic_kindling_glen'), w2: () => mv.find(m => m.type === 'prepare'),
@@ -117,16 +117,9 @@ function tutSteps() {
 function tutHold(c) { if (typeof GXT === 'undefined' || !GXT.active()) return false; const st = GXT.current(); return !!(st && st.hold && st.hold(c)); }
 function storyOpen() { if (typeof GXC === 'undefined') return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
 function tutStart(o) {
-  if (typeof GXT === 'undefined') return; const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: HBS.end.title, endText: pro ? HBS.end.text + ' Now the Story begins.' : HBS.end.text + ' The lightbulb explains the rest while you play.',
-    endButtons: pro && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
-    setup: () => { try { GX.close(); } catch (e) { } closePop(); UI.camp = null; UI.reactUntil = 0; UI.tutLog = []; UI.seed = TUT_SEED; newGame('tutorial'); },
-    onDone: r => { tutLeave(); const c = r && r.choice;
-      if (c === 'chapter' && first) { GXC.play(first.id); }
-      else if (c === 'story' && typeof GXC !== 'undefined') { campOpen(); }
-      else { showStart(); } },
-    onExit: () => { tutLeave(); showStart(); } });
+  const pro = !!(o && o.prologue);
+  try { GX.close(); } catch (e) { } closePop(); UI.camp = null; UI.reactUntil = 0; UI.tutLog = []; UI.coachDone = {}; UI.coachUntil = 0; UI.coachT0 = Date.now(); UI.coachPro = pro; UI.seed = TUT_SEED;
+  newGame('tutorial');
 }
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave() { clearTimeout(UI.tm); clearTimeout(UI.tr); UI.started = false; UI.cards = []; UI.sel = null; UI.cfg = null; G = null; fxClear(); try { GXH.hide(); } catch (e) { } try { const f = $('#finger'); if (f) f.hidden = true; } catch (e) { }
@@ -150,3 +143,70 @@ function tutOffer(go) {
 })();
 (function () { const o = doUndo; doUndo = function () { if (tutOn()) return; return o.apply(this, arguments); }; })();
 (function () { const o = nextCard; nextCard = function () { if (tutOn() && !UI._tutIn && UI.cards.length && UI.cards[0].kind !== 'pass') return; return o.apply(this, arguments); }; })();
+// ===================== part 14: the coached first game (replaces the forced tap-by-tap tutorial) =====================
+// A real game, all legal moves allowed, on a stacked deal (seed 4242, tutStage). Hazel speaks just-in-time: one chip at a time, never blocks input,
+// tap it to dismiss. Each rule in COACH is explained the first time it becomes relevant; the rules that never came up are listed on
+// "Things you'll meet later" at the end. The final score is walked through with the player's real numbers. Not saved, not counted.
+const COACH = [
+  { id: 'goal', when: () => true, say: () => 'The thaw is here and the Elderheart Oak needs a steward. Most points when we have both passed wins it. Start anywhere: the Twig Heap is a safe first pick.', later: 'Goal: most points when everyone has passed.' },
+  { id: 'places', when: (p, r) => myTurnC() && p.dep.length === 0 && Date.now() - UI.coachT0 > 4000, say: () => 'Each turn you send one worker to one place. Basic places give goods, the forest gives more, and cards are bought from the meadow.', later: 'Each turn: one worker to one place.' },
+  { id: 'stock', when: (p) => p.dep.length >= 1, say: p => 'Twigs, resin, pebbles and berries pay for buildings and critters. You hold ' + p.res.twig + ' twigs, ' + p.res.resin + ' resin, ' + p.res.pebble + ' pebbles and ' + p.res.berry + ' berries.', later: 'Goods pay for cards.' },
+  { id: 'rival', when: (p, r) => r.dep.length >= 1 && p.dep.length >= 1, say: (p, r) => r.name + ' sent a worker. A place without the Shared mark holds one worker only, so it is closed to you this season.', later: 'A place without the Shared mark holds one worker.' },
+  { id: 'hand', when: (p) => myTurnC() && p.hand.length > 0 && p.dep.length >= 1, say: () => 'Your hand holds plans: each shows its price, glowing ones you can afford. Build one by paying its price. Your city holds 15 buildings and your hand 8 cards.', later: 'Hand limit 8, city limit 15; glowing cards are affordable.' },
+  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Production buildings pay again every season.', later: 'Buildings stay in your city; production pays each season.' },
+  { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'wife') && p.city.some(e => HB.cardKey(e.id) === 'farm') && myTurnC(), say: () => 'The Goodwife loves your Allotment: a critter moves into its matching building for free. Try her from your hand.', later: 'A critter moves into its matching building free.' },
+  { id: 'meadow', when: (p) => myTurnC() && p.dep.length >= 2 && p.res.berry >= 1, say: () => 'The meadow is open to everyone. Critters cost berries; bought cards join your hand and the meadow refills.', later: 'The meadow of 8 is open to everyone; critters cost berries.' },
+  { id: 'event', when: (p) => myTurnC() && p.season >= 1, say: () => 'Flags are events: the first to hold the right buildings claims one for three points. Only one claimer, so be quick.', later: 'Events: right buildings, first to claim, 3 points.' },
+  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: () => 'Every worker is out. Prepare for Season: they all come home, you gain one more, and production pays.', later: 'Prepare for Season: workers home, +1 worker, production.' },
+  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! Seasons run Winter, Spring, Summer, Autumn. You have ' + p.workers + ' workers now. Summer draws cards, Autumn brings bonus workers.', later: 'Seasons: Winter, Spring, Summer (draw), Autumn (bonus workers).' },
+  { id: 'shared', when: (p) => myTurnC() && p.season >= 1, say: () => 'Shared places take many workers: even rivals share the Berry Patch.', later: 'Shared places take many workers.' },
+  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => 'The forest pays more goods than the basic places, but each spot holds one worker.', later: 'Forest places pay more.' },
+  { id: 'pass', when: (p) => !p.passed && myTurnC() && (p.season >= 2 || (p.season >= 1 && p.workers - p.dep.length === 0)), say: () => 'When you are done, Pass. The game ends when everyone has passed, and workers left unused are wasted points.', later: 'Pass ends your game; unused workers are wasted.' }
+];
+// rules that need a situation we cannot count on: told at the end
+const COACH_LATER = [
+  { id: 'inn', later: 'The Inn and Post Office are open places: you play the rival\'s open card and they get a point.' },
+  { id: 'haven', later: 'The Haven turns two discarded cards into one good.' },
+  { id: 'longroad', later: 'The Long Road is a journey for Autumn only.' },
+  { id: 'special', later: 'Special events need particular buildings and cost goods.' },
+  { id: 'tie', later: 'Tie-break: most events, then most leftover goods.' }
+];
+const myTurnC = () => !!G && UI.started && G.phase !== 'over' && !UI.cards.length && !UI.animBusy && HB.actor(G) === 0;
+function coachChip(txt, ms) {
+  let e = document.getElementById('hbsay');
+  if (!e) { e = document.createElement('div'); e.id = 'hbsay'; e.setAttribute('role', 'status'); e.setAttribute('data-help', ''); document.body.appendChild(e); }
+  e.innerHTML = '<span class="pt" style="background:' + HBS.guide.color + '">' + HBS.guide.emoji + '</span><span class="tx"><b>' + HBS.guide.name + '</b> ' + txt + '</span>';
+    UI.coachShown = Date.now(); e.classList.add('on'); UI.coachUntil = Date.now() + ms; clearTimeout(UI.coachTm); UI.coachTm = setTimeout(() => { e.classList.remove('on'); }, ms);
+}
+function coachSay(id, txt, ms) { UI.tutLog = UI.tutLog || []; if (!UI.tutLog.includes(id)) UI.tutLog.push(id); coachChip(txt, ms || 6500); }
+function coachTick() {
+  if (!UI.cfg || !UI.cfg.coached || !G || !UI.started) return;
+  const p = G.players[0], r = G.players[1], now = Date.now(), cd = UI.coachDone = UI.coachDone || {};
+  UI.coachT0 = UI.coachT0 || now;
+  try {
+    // the end: walk through the score with the real numbers, one chip per score card, then the "later" card
+    if (G.phase === 'over' && G.over) {
+      const t = UI.cards.length ? UI.cards[0] : null, s0 = G.over.scores[0], s1 = G.over.scores[1];
+      if (t && t.kind === 'over-score' && /^Final score: You/.test(t.title) && !cd.score) { cd.score = 1; coachSay('score', 'The count: cards ' + (s0.cards != null ? s0.cards : '?') + ', tokens ' + (s0.tokens != null ? s0.tokens : '?') + ', events ' + (s0.events != null ? s0.events : '?') + (s0.bonus != null ? ', bonuses ' + s0.bonus : '') + '. You score ' + s0.total + '. Every point is a home.', 9000); }
+      else if (t && t.kind === 'over-score' && !/^Final score: You/.test(t.title) && !cd.rscore) { cd.rscore = 1; coachSay('rscore', r.name + ' scores ' + s1.total + ' the same way. The higher total wins; a tie goes to most events, then most leftover goods.', 9000); }
+      else if (t && t.kind === 'over' && !cd.end) { cd.end = 1; coachSay('end', G.over.winner === 0 ? 'The Oak bows to you, ' + s0.total + ' to ' + s1.total + '. A real game plays all four seasons.' : 'The Oak picks the higher total. A real game plays all four seasons.', 9000); setTimeout(coachLater, 2600); }
+      return;
+    }
+    if (now < (UI.coachUntil || 0) + 400) return;   // one chip at a time
+    for (const c of COACH) { if (cd[c.id] || !c.when(p, r)) continue; cd[c.id] = 1; coachSay(c.id, c.say(p, r)); break; }
+  } catch (e) { console.warn('coach', e); }
+}
+function coachLater() {
+  if (document.querySelector('.hb-later')) return;
+  const left = COACH.filter(c => !(UI.coachDone || {})[c.id]).concat(COACH_LATER);
+  const d = document.createElement('div'); d.className = 'gxt-end hb-later'; d.setAttribute('data-help', ''); d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', 'Things you will meet later');
+  const pro = !!UI.coachPro, first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  d.innerHTML = '<div class="gxt-endc" style="max-height:86vh;overflow:auto"><div class="gxt-et">Things you\'ll meet later</div><div class="gxt-ex"><ul style="text-align:left;margin:6px 0 10px 18px;padding:0;font-size:14px;line-height:1.35">' + left.map(c => '<li data-rule="' + c.id + '">' + c.later + '</li>').join('') + '</ul>' + HBS.end.text + '</div><div class="gxt-eb">' + (pro && first ? '<button type="button" class="gxt-b pri" data-later="chapter">Start chapter 1</button><button type="button" class="gxt-b" data-later="menu">Menu</button>' : '<button type="button" class="gxt-b pri" data-later="menu">Done</button>') + '</div></div>';
+  d.addEventListener('click', e => { const b = e.target.closest('[data-later]'); if (!b) return; d.remove(); try { GXT.markDone(TUT_GAME); } catch (x) { } const c = b.dataset.later; tutLeave(); if (c === 'chapter' && first && typeof GXC !== 'undefined') GXC.play(first.id); else showStart(); });
+  UI.tutLog = UI.tutLog || []; UI.tutLog.push('later'); UI.laterList = left.map(c => c.id);
+  document.body.appendChild(d);
+}
+// the chip never takes a tap (it must not cover a target); any tap on the board dismisses it after 2.5 s
+document.addEventListener('pointerdown', () => { const e = document.getElementById('hbsay'); if (e && e.classList.contains('on') && Date.now() > (UI.coachShown || 0) + 2500) { e.classList.remove('on'); UI.coachUntil = 0; } }, true);
+(function () { const o = render; render = function () { const r = o.apply(this, arguments); coachTick(); return r; }; })();
+setInterval(() => { try { coachTick(); } catch (e) { } }, 800);
