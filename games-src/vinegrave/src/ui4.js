@@ -87,7 +87,14 @@ function coachEvent(e, s) {   /* events: guardian wakes, round end, fleeing, the
   if (e.k === 'guardian') coachSay('guardian'); if (e.k === 'round') coachSay('roundend'); if (e.k === 'fear') coachSay('fear');
   if (e.k === 'idolfind' && s === UI.view) coachSay('idol');
 }
-function coachRival(m) { if (!coachOn()) return; coachSay('rival'); if (m && m.t === 'pass') coachSay('pass'); }
+function coachRival(m) {   /* a short lesson on every rival move */
+  if (!coachOn() || !m) return; coachSay('rival'); if (m.t === 'pass') { coachSay('pass'); return; }
+  const L = { dig: 'Tamsin dug a camp: that site is closed to you until the round ends.', disc: 'Tamsin explored a ruin: an idol for her, and a guardian now sits with her explorer.',
+    beat: 'Tamsin overcame a guardian: 5 points and a boon for her.', buy: 'Tamsin bought from the market: a new card slides in.', play: 'Tamsin played a card for its goods.',
+    res: 'Tamsin climbed the research track: those rows score at the end.', temple: 'Tamsin bought a temple tile: big points.', boon: 'Tamsin used a guardian boon.', idol: 'Tamsin set an idol in a shrine for a boon.' };
+  if (L[m.t]) coachSay(null, L[m.t]);
+}
+window.GXCOACH = { get running() { return !!(G && UI.mode === 'tutorial' && UI.coachFree); }, get explained() { return Object.keys(CO.seen).filter(id => CO.seen[id]); }, get done() { return typeof GXT !== 'undefined' && GXT.isDone(TUT_GAME); } };
 function coachMove(m, best) {   /* one line why, for a strong or a weaker move (first few times) */
   if (!coachOn() || !best || m.free || m.t === 'ans' || CO.fb >= 2 || CO.q.length > 1) return; CO.fb++;
   const same = VG.same ? VG.same(m, best) : JSON.stringify(m) === JSON.stringify(best);
