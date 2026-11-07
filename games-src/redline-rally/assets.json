@@ -262,7 +262,7 @@
    "ratio": "8:3",
    "alpha": true,
    "wave": 3,
-   "slot": "Engine tray behind the heat counter (contain) [no code slot yet: a wiring worker adds the hook after delivery]",
+   "slot": "Engine tray behind the heat and stress counts in the hand panel (stretched to the row)",
    "prompt": "A shallow metal tray with six round recesses in two rows, each recess glowing faintly orange. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   },
   {
@@ -284,7 +284,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 3,
-   "slot": "Stress icon (contain) [no code slot yet: a wiring worker adds the hook after delivery]",
+   "slot": "Stress icon beside the stress count (contain)",
    "prompt": "A single violet zigzag lightning bolt inside a small circle. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   },
   {
@@ -295,7 +295,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 3,
-   "slot": "Gear icon (contain) [no code slot yet: a wiring worker adds the hook after delivery]",
+   "slot": "Gear icon beside the gear buttons (contain)",
    "prompt": "A single chunky steel cog wheel with eight teeth. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   },
   {
@@ -394,7 +394,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 3,
-   "slot": "Lap counter icon [no code slot yet: a wiring worker adds the hook after delivery]",
+   "slot": "Lap icon in the top bar (contain)",
    "prompt": "A single looping arrow forming a circle with a tiny flag. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   },
   {
@@ -405,8 +405,74 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 3,
-   "slot": "Race position icon [no code slot yet: a wiring worker adds the hook after delivery]",
+   "slot": "Race position icon in the top bar (contain)",
    "prompt": "A single small podium with three steps. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
+  },
+  {
+   "stem": "card-upgrade-coolant",
+   "kind": "card",
+   "w": 500,
+   "h": 700,
+   "ratio": "5:7",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Upgrade card face: Coolant Line (cover; speed number and name are drawn by the game, keep the top-left corner and the bottom strip calm)",
+   "prompt": "A card illustration: a bold coil of frosty blue cooling pipes with a bright snowflake valve, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name."
+  },
+  {
+   "stem": "card-upgrade-pit",
+   "kind": "card",
+   "w": 500,
+   "h": 700,
+   "ratio": "5:7",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Upgrade card face: Pit Crew (cover; speed number and name are drawn by the game, keep the top-left corner and the bottom strip calm)",
+   "prompt": "A card illustration: three mechanics in matching overalls leaping into action around a car with a lollipop sign, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name."
+  },
+  {
+   "stem": "card-upgrade-grip",
+   "kind": "card",
+   "w": 500,
+   "h": 700,
+   "ratio": "5:7",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Upgrade card face: Grip Tyres (cover; speed number and name are drawn by the game, keep the top-left corner and the bottom strip calm)",
+   "prompt": "A card illustration: a close-up of one fat racing tyre with a deep tread pattern gripping a curve, dust spraying, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name."
+  },
+  {
+   "stem": "card-upgrade-brakes",
+   "kind": "card",
+   "w": 500,
+   "h": 700,
+   "ratio": "5:7",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Upgrade card face: Big Brakes (cover; speed number and name are drawn by the game, keep the top-left corner and the bottom strip calm)",
+   "prompt": "A card illustration: a large glowing red brake disc with a gold caliper clamping it, tiny sparks, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name."
+  },
+  {
+   "stem": "card-upgrade-rocket",
+   "kind": "card",
+   "w": 500,
+   "h": 700,
+   "ratio": "5:7",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Upgrade card face: Rocket Pack (cover; speed number and name are drawn by the game, keep the top-left corner and the bottom strip calm)",
+   "prompt": "A card illustration: a small rocket engine strapped to the back of a race car, a long orange flame trailing behind, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name."
+  },
+  {
+   "stem": "card-upgrade-tuned",
+   "kind": "card",
+   "w": 500,
+   "h": 700,
+   "ratio": "5:7",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Upgrade card face: Tuned Engine (cover; speed number and name are drawn by the game, keep the top-left corner and the bottom strip calm)",
+   "prompt": "A card illustration: a polished engine with a shiny turbo, little wrench and gauges around it, on a teal and cream background. Leave the top-left corner area calm so a big number can sit on it, and keep the bottom fifth of the card calm for a name."
   }
  ]
 }

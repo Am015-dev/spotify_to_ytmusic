@@ -10,25 +10,35 @@
     <div class="row" id="s-opp"></div>
     <div class="lbl">Players on this device</div>
     <div class="row" id="s-hum"></div>
+    <div class="lbl">Upgrades</div>
+    <div class="row" id="s-upg"></div>
     <div class="lbl">Rival skill</div>
     <div class="row" id="s-diff"></div>
+    <div id="tutSlot"></div>
     <button class="big" id="playB">Play</button>
-    <button class="ghostb" id="howB">How to play</button>
+    <div class="row"><button class="ghostb" id="howB">How to play</button><button class="ghostb" data-snd id="sndT" aria-label="Sound"></button></div>
   </div>
 </div>
 <div id="game" class="screen" hidden>
-  <div id="topbar"><div class="grow"><span class="pill">Lap <b id="tLap">1/2</b></span><span class="pill">Place <b id="tPos">1/5</b></span><span class="pill" id="tTrk"></span></div><button id="menuB" aria-label="Menu">Menu</button></div>
+  <div id="topbar"><div class="grow"><span class="pill"><i class="ic hud f-lap" data-art="icon-lap"></i>Lap <b id="tLap">1/2</b></span><span class="pill"><i class="ic hud f-place" data-art="icon-place"></i>Place <b id="tPos">1/5</b></span><span class="pill" id="tTrk"></span></div><button id="sndB" data-snd aria-label="Sound"></button><button id="menuB" aria-label="Menu">Menu</button></div>
   <div id="cvw"><canvas id="cv"></canvas></div>
   <div id="msg" aria-live="polite"></div>
   <div id="panel"></div>
 </div>
 <div id="modal" hidden></div>
 <script src="gx-scenario.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
+<script src="gx-tutor.js"></script>
+<script src="gameaudio.js"></script>
+<script src="gx-music.js"></script>
 <script src="scn.js"></script>
 <script src="data.js"></script>
 <script src="track.js"></script>
 <script src="engine.js"></script>
 <script src="ai.js"></script>
 <script src="art.js"></script>
+<script src="sound.js"></script>
 <script src="ui.js"></script>
+<script src="tutor.js"></script>
 </body></html>
