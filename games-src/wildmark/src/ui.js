@@ -58,7 +58,7 @@ function newGame(cfg) {
   var cards = cfg.cards === 'mix' ? (function () { var o = {}; WM.ANI.forEach(function (a) { o[a] = 'abcd'[1 + Math.floor(Math.random() * 3)]; }); return o; })() : (cfg.cards && typeof cfg.cards === 'object' ? cfg.cards : null);
   G = WM.newGame({ np: cfg.np, seed: cfg.seed, ai: ai, names: names, turns: cfg.turns, acorns: cfg.acorns, no3: cfg.no3, cards: cards });
   UI.cfg = cfg; UI.humans = cfg.humans; UI.view = 0; UI.lastHuman = 0; UI.ghost = null; UI.free = null; UI.wipe = null; UI.undo = null; UI.lit = null; UI.userPan = 0; UI.passed = -1;
-  $('#start').hidden = true; $('#rs').hidden = true; try { GX.close(); } catch (e) { }
+  $('#start').hidden = true; document.documentElement.classList.remove('wm-title'); $('#rs').hidden = true; try { GX.close(); } catch (e) { }
   fitView(true); render(); step(); save(); musicSync();
   var q = window.CAMPAIGN && CAMPAIGN.quick; if (q && q.intro && UI.mode === 'quick' && !UI.fast) setTimeout(function () { toast(q.intro[Math.floor(Math.random() * q.intro.length)], 2600); }, 500);   // one-line flavour (text in campaign.json)
   return G;
@@ -278,7 +278,7 @@ function renderDock() {
       else if (UI.free) a += '<span class="hint1">Any tile, then any token</span><button type="button" class="ab" id="cancelB">Cancel</button>';
       else {
         if (!G.used3 && !G.opts.no3 && WM.triple(G)) a += '<button type="button" class="ab" id="w3B">Sweep 3 ' + esc(WM.ANI_NAME[WM.triple(G)]) + '</button>';
-        if (me.acorns > 0) a += '<button type="button" class="ab" id="freeB">Acorn: free pick</button><button type="button" class="ab" id="wipeB">Acorn: replace</button>';
+        if (me.acorns > 0) a += UI.acornMenu ? '<button type="button" class="ab" id="freeB">Free pick</button><button type="button" class="ab" id="wipeB">Replace animals</button><button type="button" class="ab" id="acornX">Cancel</button>' : '<button type="button" class="ab" id="acornB">Use acorn (' + me.acorns + ')</button>';
       }
     } else if (G.stage === 'tile') {
       a += '<span class="held">' + mkTile(G.hold.tile, 24) + mkTok(G.hold.tok) + '</span>';
@@ -288,7 +288,8 @@ function renderDock() {
       a += '<span class="held">' + mkTok(G.hold.tok) + '</span><button type="button" class="ab" id="backB">Return token</button>';
     }
   }
-  if (myTurn() && UI.mode !== 'tutorial' && !UI.wipe && !UI.free && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
+  if (G.stage !== 'pick') UI.acornMenu = false;
+  if (myTurn() && UI.mode !== 'tutorial' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
   $('#acts').innerHTML = a;
   $('#acorn').innerHTML = '<span class="acn" title="Acorns">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></span>';
 }
@@ -401,7 +402,7 @@ function showResult() {
 function showTitle() {
   clearTimeout(UI.aiT); UI.mode = 'quick'; UI.camp = null; try { GX.close(); } catch (e) { } $('#rs').hidden = true; $('#pass').hidden = true;
   var st = $('#start'), sv = loadSave(), c = UI.setup || (UI.setup = { opp: 1, ai: 'normal', humans: 1 });
-  st.hidden = false; st.classList.toggle('front', UI.sv !== 'setup');
+  st.hidden = false; st.classList.toggle('front', UI.sv !== 'setup'); document.documentElement.classList.add('wm-title');
   if (UI.sv === 'setup') {
     var seg = function (id, list, cur) { return '<div class="seg" data-k="' + id + '">' + list.map(function (o) { return '<button type="button" class="sg' + (o[0] === cur ? ' on' : '') + '" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>'; };
     st.innerHTML = '<div class="tbox"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
@@ -458,8 +459,10 @@ document.addEventListener('click', function (e) {
     case 'campCont': $('#rs').hidden = true; try { GXC.finish(G); } catch (er) { console.error(er); } break;
     case 'passB': $('#pass').hidden = true; UI.passed = G.cur; UI.view = G.cur; fitView(true); step(); break;
     case 'w3B': if (!tutOK({ what: 'w3' })) break; WM.apply(G, { t: 'wipe3' }); sfx('wipe'); toast('Three tokens swept away.'); render(); break;
-    case 'freeB': if (!tutOK({ what: 'freeB' })) break; UI.free = { ti: null, ki: null }; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
-    case 'wipeB': if (!tutOK({ what: 'wipeB' })) break; UI.wipe = []; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
+    case 'acornB': UI.acornMenu = true; render(); break;
+    case 'acornX': UI.acornMenu = false; render(); break;
+    case 'freeB': if (!tutOK({ what: 'freeB' })) break; UI.acornMenu = false; UI.free = { ti: null, ki: null }; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
+    case 'wipeB': if (!tutOK({ what: 'wipeB' })) break; UI.acornMenu = false; UI.wipe = []; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
     case 'wokB': if (!UI.wipe || !UI.wipe.length || !tutOK({ what: 'wok' })) break; WM.apply(G, { t: 'wipe', idx: UI.wipe.slice() }); UI.wipe = null; sfx('wipe'); render(); break;
     case 'cancelB': UI.free = null; UI.wipe = null; render(); break;
     case 'rotB': rotate(); break;
