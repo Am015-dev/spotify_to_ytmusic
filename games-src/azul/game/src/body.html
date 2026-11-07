@@ -34,8 +34,8 @@
 <div class="gx-main">
   <main class="gx-board"><div class="view"><canvas id="c3" aria-label="The courtyard table in 3D. Tap a glowing tile to pick its glaze, then a glowing rack. Drag to tilt, scroll to zoom, double-click to reset."></canvas><div id="map2d" hidden></div><div id="chip" aria-hidden="true"></div></div></main>
   <aside class="gx-dock" aria-label="What to do now">
-    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Sunglaze</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel"><svg class="ic" aria-hidden="true"><use href="#i-resize"/></svg></button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel"><svg class="ic" aria-hidden="true"><use href="#i-hide"/></svg></button></div>
     <div id="dockmsg" hidden role="status"></div><div id="ph-z" aria-live="polite"><div id="ph-st"></div><div id="ph-pop" class="ph-card" hidden></div><div id="ph-card" class="ph-card" hidden></div></div><div class="gx-dock-body" id="dockbody" aria-live="polite"></div>
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Sunglaze</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel"><svg class="ic" aria-hidden="true"><use href="#i-resize"/></svg></button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel"><svg class="ic" aria-hidden="true"><use href="#i-hide"/></svg></button></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg> Panel</button>
 </div>
@@ -54,10 +54,10 @@
   <button class="gx-ibtn perfb" data-perfhud="show" aria-pressed="false" title="Show frame rate and frame time">Show speed</button>
   <button class="gx-ibtn perfb" data-perfhud="test" title="Measure each graphics level and recommend one">Test speed</button>
 </div></div></section>
-<section class="gx-drawer wide" id="plrd" role="dialog" aria-label="Players"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-players"/></svg> Players and scores</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="plrbody"></div></section>
-<section class="gx-drawer" id="logd" role="dialog" aria-label="Log"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg> Log</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="logbody"></div></section>
-<section class="gx-drawer wide" id="refd" role="dialog" aria-label="Tile list"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-tiles"/></svg> Tiles, tokens and scoring</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="refbody"></div></section>
-<section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="Rules"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-rules"/></svg> How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
+<section class="gx-drawer wide" id="plrd" role="dialog" aria-label="Players"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-players"/></svg> Players and scores</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="plrbody"></div><div class="sgz-fade" aria-hidden="true"></div></section>
+<section class="gx-drawer" id="logd" role="dialog" aria-label="Log"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg> Log</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="logbody"></div><div class="sgz-fade" aria-hidden="true"></div></section>
+<section class="gx-drawer wide" id="refd" role="dialog" aria-label="Tile list"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-tiles"/></svg> Tiles, tokens and scoring</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="refbody"></div><div class="sgz-fade" aria-hidden="true"></div></section>
+<section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="Rules"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-rules"/></svg> How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div><div class="sgz-fade" aria-hidden="true"></div></section>
 <div id="modal" hidden></div>
 <div id="defs"></div>
 <script src="gx-scenario.js"></script>
