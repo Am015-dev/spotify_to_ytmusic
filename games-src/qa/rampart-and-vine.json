@@ -1,0 +1,129 @@
+{
+ "slug": "rampart-and-vine",
+ "size": "phone",
+ "seed": 58851,
+ "when": "2026-11-07T21:12Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 151
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 95
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "tap target 37px (<40) button.opt x9: \"1 rival\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#menubtn \"Menu\" under div.scrim \"Rampart & Vine Build the\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-title-1.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "tutorial",
+   "where": "tutorial step 19/19 [winner] \"You win 20 to 2! Real games have more tiles, and m\"",
+   "desc": "spotlight target covered: top at centre is div.gxt-top \"19/19 Skip tutorial\", target is div#seats \"20 6 ⚙ 2 6\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-tut-19-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "tap target 37px (<40) button.opt x9: \"1 rival\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-title-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#menubtn \"Menu\" under div.scrim \"Rampart & Vine Build the\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-title-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button#menubtn \"Menu\" under div.scrim \"New here? Learn the rule\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 31px (<40) button.glow x13: \"Place tile here\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #151 (Place tile here)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 151 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-quick-noresult-9.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "tutorial step 19/19 [winner] \"You win 20 to 2! Real games have more tiles, and m\"",
+   "desc": "spotlight target covered: top at centre is div.gxt-top \"19/19 Skip tutorial\", target is div#seats \"20 6 ⚙ 2 6\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-tut-19-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #95 (Place tile here)",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 95 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-story-noresult-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "tap target 37px (<40) button.opt x9: \"1 rival\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-title-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#menubtn \"Menu\" under div.scrim \"Rampart & Vine Build the\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-title-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.fglow \"Place follower here\" / button.fglow \"Place champion here\"",
+   "repro": "node games-src/scripts/qa-bot.js rampart-and-vine --size phone --seed 58851 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/rampart-and-vine/phone-screen-fuzz-screen-17.png"
+  }
+ ],
+ "secs": 347,
+ "tutorialIn": {}
+}

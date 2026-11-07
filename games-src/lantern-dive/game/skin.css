@@ -58,3 +58,8 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}
 .seat .nm,.me .nm{font-size:16px}
 }
 @media (min-width:1024px){.gxh-bub{max-width:min(400px,calc(100vw - 16px))}.gxh-bub .gxh-tt,.gxh-bub .gxh-tx,.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font-size:16px}}
+/* W390: story map readability (the shared campaign kit wraps "The Drowned Road" mid-word and clips the act banner text) */
+html .gxc-htitle{overflow-wrap:normal;word-break:normal;font-size:17px;hyphens:none}
+html .gxc-act{height:52px;margin-top:0;padding:2px 0}html .gxc-act small{line-height:1.15;padding:0 14px}
+/* W390: the hint bubble and pointing finger never sit on top of an open drawer (they hid the rules text); seat names get a solid plate */
+body:has(.gx-drawer.on) .gxh-bub:not(.gxt-bub),body:has(.gx-drawer.on) .gxh-ring:not(.gxt-ring),body:has(.gx-drawer.on) .gxh-finger,body:has(.gx-drawer.on) #finger{display:none!important}

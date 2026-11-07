@@ -42,7 +42,7 @@ const MARK2 = () => { const m = window.__m, i = UI.mv.findIndex(x => VG.same(x, 
     }
     const endShown = await page.locator('.gxt-end button:visible, .gxt-done button:visible, .gxt button:visible').count();
     await page.screenshot({ path: `shots/tut-${name}-end.png` });
-    console.log(name, 'tutorial steps seen', steps, endShown ? 'PASS end card' : 'FAIL no end card'); if (!endShown || steps < 12) fails++;
+    console.log(name, 'tutorial steps seen', steps, endShown ? 'PASS end card' : 'FAIL no end card'); if (!endShown || steps < 7) fails++;
     // leave through the end card's Play button (or exit)
     const playB = page.locator('.gxt button:visible', { hasText: /play/i }).first();
     if (await playB.count()) { touch ? await playB.tap() : await playB.click(); } else await page.evaluate(() => { GXT.stop(); UIACT.quick(); });

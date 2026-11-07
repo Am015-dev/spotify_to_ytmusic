@@ -459,8 +459,8 @@ function H(G, p, m) {
     case 'p4': {
       if (m.from === '' && m.to === '') { p.q = null; break; }
       const u = d.opts.find(x => x.from === m.from && x.to === m.to); if (!u) return 'bad upgrade';
-      const i = p.pot.findIndex(c => ck(c) === u.from); if (i < 0 || G.supply[u.to] < 1) return 'cannot upgrade';
-      const old = p.pot.splice(i, 1)[0]; putBack(G, old); const nc = take(G, u.to); p.newChips.push(nc); ev(G, { t: 'gainChip', seat: p.seat, chip: { i: nc.i, c: nc.c, v: nc.v } });
+      const i = p.pot.findIndex(c => ck(c) === u.from && !c.sw); if (i < 0 || G.supply[u.to] < 1) return 'cannot upgrade';
+      const old = p.pot[i]; old.sw = 1; const nc = take(G, u.to); p.newChips.push(nc); ev(G, { t: 'gainChip', seat: p.seat, chip: { i: nc.i, c: nc.c, v: nc.v } });
       lg(G, nm(G, p) + ' swaps a ' + nameOf(u.from) + ' for a ' + nameOf(u.to) + '.'); p.q = null; break;
     }
     case 'de': {
@@ -624,7 +624,7 @@ function runActs(G, p) {
     if (a === 'g3') {
       p.acts.shift(); if (whiteSum(p) === 7) {
         const s = p.pot.filter(c => c.c === 'G').reduce((x, c) => x + c.v, 0), l = p.pot[p.pot.length - 1], np2 = Math.min(LASTC, l.pos + s);
-        if (np2 !== l.pos && D.RUBY[p.res.space] && !D.RUBY[Math.min(np2 + 1, SPOON)]) { ask(G, p, 'g3', { s, to: np2 }); return false; }   // sliding would lose the ruby on this space: may be declined
+        if (np2 !== l.pos) { ask(G, p, 'g3', { s, to: np2 }); return false; }   // the rulebook allows passing up any action: sliding is always optional
         slideLast(G, p, s);
       }
       continue;
@@ -642,7 +642,7 @@ function runActs(G, p) {
       p.acts.shift(); const n = count(p.pot, 'P'); const opts = [];
       const levels = [];
       if (n >= 1) levels.push([1, 2]); if (n >= 2) levels.push([2, 4]); if (n >= 3) levels.push([1, 4]);
-      for (const [fv, tv] of levels) for (const c of ['G', 'B', 'R', 'Y']) { if (D.COLORS[c].vals.indexOf(fv) >= 0 && p.pot.some(x => x.c === c && x.v === fv) && G.supply[c + tv] > 0 && !opts.some(o => o.from === c + fv && o.to === c + tv)) opts.push({ from: c + fv, to: c + tv }); }
+      for (const [fv, tv] of levels) for (const c of ['G', 'B', 'R', 'Y']) { if (D.COLORS[c].vals.indexOf(fv) >= 0 && p.pot.some(x => x.c === c && x.v === fv && !x.sw) && G.supply[c + tv] > 0 && !opts.some(o => o.from === c + fv && o.to === c + tv)) opts.push({ from: c + fv, to: c + tv }); }
       if (opts.length) { ask(G, p, 'p4', { opts }); return false; } continue;
     }
     p.acts.shift();
@@ -667,6 +667,7 @@ function cleanup(G) {
     if (G.round === lastOf(G)) p.last9 = p.res.pos;
     G.hist.push({ round: G.round, seat: p.seat, gain: p.vp - p.res.vp0, rgain: p.rubies - p.res.ru0, space: p.res.space, coins: p.res.coins, vp: p.res.vp, boom: p.boom, prot: p.prot, mode: p.res.mode, bought: p.res.bought, die: p.res.die, chips: p.res.chips, white: p.res.white, after: p.vp, fortune: G.fcard });
     for (const c of p.pot) delete c.pos;
+    p.pot = p.pot.filter(function (c) { if (c.sw) { delete c.sw; putBack(G, c); return false; } return true; });   // an upgraded chip goes back to the supply now
     p.bag = p.bag.concat(p.pot, p.hold, p.newChips); p.pot = []; p.hold = []; p.newChips = []; p.rat = 0; p.q = null;
   }
   if (G.round >= lastOf(G)) { finish(G); return; }

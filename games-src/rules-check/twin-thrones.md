@@ -27,3 +27,8 @@ WRONG 2, MISSING 0, SIMPLIFIED 0 (plus 6 UNSURE card costs, listed separately)
 - Exact resource costs listed as UNSURE above (and the three Age III red/yellow cost sets) could not be checked online.
 - Whether the first player of age I is random or fixed in the published rules (code: random).
 - Whether the start-of-age tie rule matches the printed rulebook or the errata; sources disagree.
+
+## Fixed (W391)
+- WRONG tie chooser at age end -> fixed: at a centred military pawn the player who took the last card chooses (stated source: the check's sources agree); test "tie-chooser-is-player-who-took-last-card".
+- WRONG trade-post card cost -> fixed: Customs Quay now costs 4 coins; test "trade-post-card-costs-4-coins".
+- UNSURE costs (Open Bazaar, Lookout, Archery Range, Sky Obelisk/Grand Fountain, Age II/III costs): unverified, left unchanged (low confidence, no source).
