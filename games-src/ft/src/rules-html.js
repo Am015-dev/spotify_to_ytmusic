@@ -1,6 +1,8 @@
 // ---------- the rules, in plain words ----------
 const RULES_HTML=`<div class="rules">
 <p>The old sultan is gone and the sultanate of Qamar is up for grabs. Shift its tribes from tile to tile, claim land with your camels, summon djinns and trade in the bazaar. <b>The most points at the end wins.</b></p>
+<h3>How a turn works</h3>
+<ol class="turn5"><li><b>Bid</b> coins for a turn-order spot: dearer plays earlier.</li><li><b>Lift</b> everyone from one tile and <b>drop</b> one person per tile as you walk.</li><li>The <b>last</b> person must land on its own colour: take all of that colour.</li><li><b>Act</b>: the tribe you took, then the tile you stopped on. An empty tile gets your camel.</li><li><b>Sell</b> goods if you like. Most points wins.</li></ol>
 <h3>1. Bid for turn order</h3>
 <p>Each round starts with a bid. In the order of the last round, each player puts a marker on a free spot of the turn-order track and pays its price: 0, 0, 0, 1, 3, 5, 8, 12 or 18 coins. Dearer spots play earlier. If two players sit on spots with the same price, the one who bid later plays first. With 2 players, each of you has two markers and so takes two turns a round.</p>
 <h3>2. Your turn: move, then act</h3>
