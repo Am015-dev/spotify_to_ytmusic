@@ -33,3 +33,8 @@ Counts: WRONG 1 (med), MISSING 1, SIMPLIFIED 5 (a further 12 reading choices are
 - Jobs 9-66 mission setups, equipment texts, constraint and challenge texts: audited by the previous worker from card scans, not re-checked here.
 - The audio-driven jobs (19, 30, 42, 54, 66) come from machine transcripts of moderate accuracy. Confidence low.
 - Dial arithmetic: rulebook text does not state the count; two independent implementations and card art agree. Confidence med.
+
+## Fixed (W391)
+- WRONG hand with no legal cut explodes the bomb in every job -> fixed: only jobs 9, 16 and 36 explode; other jobs skip the turn with no fuse step. Test "RULE no-legal-cut".
+- WRONG four idle rounds explode the bomb (invented) -> kept on purpose as a digital safeguard so a game cannot run forever; now stated in the rules drawer ("Kept simple"). Not a rulebook rule.
+- MISSING Damper at a forced oxygen skip: already offered in the code (QH.stuckDamper). The "pretend to cut when everything is cut" ruling is left (needs a new action and UI).
