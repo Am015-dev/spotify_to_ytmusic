@@ -219,3 +219,23 @@ html.ph .opp.seat .lb{font-size:13px!important;opacity:1}
 .gxc-htitle{order:-1;flex:1 0 100%!important;overflow-wrap:normal!important}
 .gxc-head .gxc-ib{flex:1 1 auto}
 .gxc-act small{display:none}
+/* W389: phone hand = a scrolling strip of readable chips (name 13px, bonus big) instead of a fan whose names are clipped to 7px */
+html.ph .mine .hand{justify-content:flex-start!important;overflow:auto!important;scrollbar-width:none;gap:6px!important;padding:12px 8px 4px!important;scroll-snap-type:none}
+html.ph .mine .hand .card{--w:calc((100vw - 28px)/3)!important;width:calc((100vw - 28px)/3)!important;flex:none!important;rotate:none!important;translate:none!important;margin-left:0!important}
+html.ph .mine .hand .card+.card,html.ph .mine .hand .card:not(:last-child){margin-left:0!important}
+html.ph .mine .hand .card.play,html.ph .mine .hand .card.sug{translate:0 -6px!important}
+html.ph .mine .hand .card .cn,html.ph .mine .hand .card:not(:last-child) .cn{font-size:13px!important;line-height:1.1!important;width:100%!important;max-width:100%!important;white-space:normal!important;overflow:visible!important;padding:3px 3px!important;letter-spacing:0!important;text-align:center;text-overflow:clip!important}
+html.ph .mine .hand .card .aw .tag{font-size:14px!important;font-weight:800}
+html.ph .mine .hand .card .aw .gold{font-size:13px!important}
+html.ph .mine .hand .card .kind,html.ph .mine .hand .card .cx{display:none!important}
+html.ph .pile .stack .dn{font-size:13px!important;letter-spacing:0!important;text-transform:lowercase!important;bottom:2%!important;display:block}
+html.ph .pile .stack .dn::first-letter{text-transform:uppercase}
+html.ph .pile .stack .n{font-size:13px!important}
+html.ph .mine .hand .card .cn{display:block!important}
+html.ph .mine .hand .card .aw{display:block!important}
+html.ph .mine .hand.tight .card:not(:last-child) :is(.gold,.aw,.tag){display:revert!important}
+/* W389: no stretched pictures (audit C): fit by cover */
+html.ph .tbl,html.baked.ph .tbl{background-size:cover!important;background-position:center!important}
+html.ph .tbl>section.mine,html.ph .mine{background-size:cover!important;background-position:center!important}
+.pbk>i{background-size:cover!important}
+.pbk>img,.pbk img{object-fit:cover}

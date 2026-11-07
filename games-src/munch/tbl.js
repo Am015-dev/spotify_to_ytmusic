@@ -10,9 +10,9 @@ function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;co
   const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<MS,step=sc?MS:Math.min(w*.8,need);
   if(w!==w0){hd.style.setProperty('--hw',w.toFixed(1)+'px')}
   hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');hd.style.setProperty('--vis',(step-2).toFixed(1)+'px');
-  hd.classList.toggle('scrolls',sc);hd.classList.toggle('tight',step<44);
+  hd.classList.toggle('scrolls',n*104>hd.clientWidth);hd.classList.remove('tight');   /* W389: the phone hand is a strip of readable chips (skin.css), it scrolls when it does not fit */
   // each name sits on the visible strip of its card (the next card covers the rest): shrink the type until no word is cut
-  cs.forEach((c,k)=>{const n=c.querySelector('.cn');if(!n)return;n.style.fontSize='';if(k===cs.length-1)return;let fs=parseFloat(getComputedStyle(n).fontSize)||8;for(let i=0;i<10&&n.scrollWidth>n.clientWidth+.5&&fs>5.5;i++){fs-=.5;n.style.fontSize=fs+'px'}})}
+  cs.forEach((c,k)=>{const n=c.querySelector('.cn');if(!n)return;n.style.fontSize='';return;let fs=parseFloat(getComputedStyle(n).fontSize)||8;for(let i=0;i<10&&n.scrollWidth>n.clientWidth+.5&&fs>5.5;i++){fs-=.5;n.style.fontSize=fs+'px'}})}
 // bring an element into view inside its OWN sideways scroller (the hand, the gear row) and nothing else: scrollIntoView also scrolls the clipped
 // (overflow:hidden) table board sideways, which pushed the hand, the rival chips and the glow targets off the screen
 function dkReveal(e){for(let p=e&&e.parentElement;p&&p!==document.body;p=p.parentElement){const o=getComputedStyle(p).overflowX;if((o==='auto'||o==='scroll')&&p.scrollWidth>p.clientWidth+1){const r=e.getBoundingClientRect(),q=p.getBoundingClientRect();p.scrollLeft+=(r.left+r.width/2)-(q.left+q.width/2);return}}}
