@@ -1,0 +1,18 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"story-scene-phone.json",
+"wm-board-phone.json",
+"wm-boss-phone.json",
+"wm-cards-phone.json",
+"wm-place-phone.json",
+"wm-result-phone.json",
+"wm-story-phone.json",
+"wm-sweep-phone.json",
+"wm-token-phone.json"
+]
+}
+}

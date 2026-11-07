@@ -1,0 +1,15 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"story-scene-phone.json",
+"vg-board-phone.json",
+"vg-guardian-phone.json",
+"vg-market-phone.json",
+"vg-overcome-phone.json",
+"vg-result-phone.json"
+]
+}
+}
