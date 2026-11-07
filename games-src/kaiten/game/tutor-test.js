@@ -131,7 +131,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   // ---- the end
   const fin=await state();
   if(fin.active&&fin.phase==='end'){const o=await p.evaluate(()=>({n:GXT.state().n,totals:G.final&&G.final.totals,chips:G.players.map((q,i)=>{const e=document.querySelector('#tbl .seat[data-seat="'+i+'"] .av .sc');return e?+e.textContent:null}),saved:!!localStorage.getItem('kk_save'),rounds:G.rs.length,len:G.len}));
-    if(o.n<12||o.n>25)note(tag,'step count '+o.n+' is outside 12-25');if(!o.totals||o.chips.join()!==o.totals.join())note(tag,'score chips '+o.chips+' != engine '+o.totals);if(o.saved)note(tag,'the tutorial saved a game');if(o.rounds!==1||o.len!==1)note(tag,'tutorial is not one round');
+    if(o.n<12||o.n>30)note(tag,'step count '+o.n+' is outside 12-30');if(!o.totals||o.chips.join()!==o.totals.join())note(tag,'score chips '+o.chips+' != engine '+o.totals);if(o.saved)note(tag,'the tutorial saved a game');if(o.rounds!==1||o.len!==1)note(tag,'tutorial is not one round');
     if(mode==='clean'&&seenIds.length!==o.n)note(tag,'saw '+seenIds.length+' of '+o.n+' steps')}
   if(!fin.active||fin.phase!=='end')note(tag,'the tutorial did not reach the end card ('+JSON.stringify({a:fin.active,ph:fin.phase,i:fin.i,id:fin.id})+') seen '+seenIds.join(','));
   else if(mode==='story'){

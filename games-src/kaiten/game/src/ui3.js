@@ -32,6 +32,7 @@ function newGame(mode, o) {
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
   placePrompt(); render(); sndMusic(); schedule();
+  try { if (mode !== 'tutorial' && !UI.camp && !o.camp) guideSay(KK.STORY.quickIntro, 3400); } catch (e) { }
 }
 // ---------- the turn driver ----------
 function schedule() {
@@ -152,7 +153,7 @@ const keyOfCard = c => { const k = c.key; return ICONS[k] ? 'roll' : NIG[k] ? (c
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playResolve(q[0], q[1]); } }
 async function playResolve(evs, preHand) {
   if (UI.busy) { UI.rq.push([evs, preHand]); return; }
-  const tok = UI.seq; UI.busy = true; closePop();
+  const tok = UI.seq; UI.busy = true; closePop(); guideHide();
   const rv = evs.find(e => e.t === 'reveal'), ps = evs.find(e => e.t === 'pass'), sc = evs.find(e => e.t === 'score'), ge = evs.find(e => e.t === 'gameEnd');
   const v = viewSeat(), np = G.np, block = !NET.on;
   try {
@@ -167,6 +168,8 @@ async function playResolve(evs, preHand) {
     UI.sel = []; UI.twin = false; UI.rec = null;
     UI.fast = false; render(); await wait(300); if (tok !== UI.seq) return;
     // 2: the covers lift together, big, in the middle of the table (ui8: the reveal stage); without it, in the seats
+    try { UI.fz.news0 = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.fz.news0 = null; }
+    UI.fz.msg = sayT('cover'); renderDock();
     UI.fz.say = 'Reveal! ' + rv.picks.map(p => pname(p.seat) + ': ' + p.cards.map(c => TY[c.key].name).join(' + ')).join(' · ');
     const gains = (() => { try { const a = liveScores(before), b = liveScores(T); return b.map((x, s) => x.total - a[s].total); } catch (e) { return null; } })();
     if (ANIM && stageOK()) { try { await stageReveal(rv.picks, tok, gains); } catch (e) { console.error(e); stageClear(); } }
@@ -179,10 +182,11 @@ async function playResolve(evs, preHand) {
     // 3: plates land on the counters
     const land = new Set(); rv.picks.forEach(p => p.cards.forEach(c => land.add(p.seat + '|' + keyOfCard(c)))); UI.land = land;
     try { UI.news = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.news = null; }
-    UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
+    UI.fz.msg = sayT(sc ? 'roundEnd' : 'land'); UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
     if (sc) { UI.fz.roundEnd = true; UI.fz.hand = []; UI.fz.backN = 0; }
     render(); stageClear(); snd('clink'); try { scorePops(before, T); } catch (e) { } await wait(800); if (tok !== UI.seq) return;
     if (ps) {
+      UI.fz.msg = sayT('pass'); renderDock();
       // 4: every hand moves one seat on, visibly: your dishes ride the belt off to the next diner, the next hand rides in
       if (ANIM) { try { await passAlong(ps.sizes); } catch (e) { console.error(e); } }
       UI.fz = null; UI.enter = v >= 0 ? 'pass' : ''; render(); passDone();

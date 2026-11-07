@@ -66,7 +66,7 @@ const trayStarts = k => () => { const s = document.querySelector('#tbl .seat.me'
 const tutDone = () => !!(G && G.phase === 'over' && UI.tutOver && UI.rsInfo && UI.rsInfo.done);
 const RS = seat => G.rs[0][seat];   // round-1 score lines: 0 = you, 1 = the chef
 const pickStep = (id, t, title, say, extra) => Object.assign({ id, title, say, target: () => beltCard(myPick(t)[0])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(t)[0] }, ready: () => turnIs(t) && UI.sel.length === 0 && !UI.twin }, extra || {});
-function tutSteps() {
+function tutStepsRaw() {
   return [
     { id: 'goal', title: 'Your goal', say: 'Collect dishes that score points. After the last round the highest total wins. Today: one short round.', target: tq('#tbl .seat.me .av'), wait: null, ready: () => turnIs(1) },
     { id: 'chef', title: 'The chef', say: () => pname(1) + ' is a computer. They play by the same rules and choose at the same time as you.', target: tq('#tbl .seat:not(.me) .sh'), wait: null, ready: () => turnIs(1) },
@@ -86,11 +86,26 @@ function tutSteps() {
     pickStep('custard', 10, 'Custard Cup', 'Custard scores only at the game end. Most cups gets 6. Tap it.'),
     { id: 'scoreSets', title: 'Sets scored', say: () => 'Prawn pair ' + RS(0).tempura + ', Fish Slice set ' + RS(0).sashimi + ', one Steam Bun ' + RS(0).dumpling + '. A lone dish scores nothing.', target: tq('#tbl .seat.me .ctr'), wait: null, ready: tutDone, pending: 'Counting the round' },
     { id: 'scoreRoll', title: 'Roll race', say: () => 'Your ' + RS(0).icons + ' icons beat the chef\'s ' + RS(1).icons + ': you get ' + RS(0).maki + ', they get ' + RS(1).maki + '.', target: myTray('roll'), wait: null, ready: tutDone },
-    { id: 'scoreNigiri', title: 'Nigiri and paste', say: () => 'Nigiri score 1 to 3 points. Your Moon Nigiri on Fire Paste scored ' + (RS(0).nigiri + RS(0).wasabi) + '.', target: trayStarts('pn-'), wait: null, ready: tutDone },
-    { id: 'scoreChef', title: 'The chef scored', say: () => pname(1) + ' got ' + RS(1).total + '. Their lone Fish Slice scored nothing. Same rules for everyone.', target: tq('#tbl .seat:not(.me)'), wait: null, ready: tutDone },
+    { id: 'scoreNigiri', title: 'Nigiri and paste', say: () => 'Your Moon Nigiri on Fire Paste scored ' + (RS(0).nigiri + RS(0).wasabi) + '. Nigiri alone: 1 to 3.', target: trayStarts('pn-'), wait: null, ready: tutDone },
+    { id: 'scoreChef', title: 'The chef scored', say: () => pname(1) + ' got ' + RS(1).total + '. Her lone Fish Slice scored nothing.', target: tq('#tbl .seat:not(.me)'), wait: null, ready: tutDone },
     { id: 'scoreCustard', title: 'Custard counts', say: 'Custard scores once, at the very end: most cups +6, fewest −6 (not with two diners).', target: tq('#tbl .seat.me .grp.shelf'), wait: null, ready: tutDone },
-    { id: 'end', title: 'The meal ends', say: () => 'Real meals last three rounds. Highest total wins; ties go to more Custard Cups. You win ' + G.final.totals[0] + ' to ' + G.final.totals[1] + '!', target: tq('#tbl .seat.me .av'), wait: null, ready: tutDone }
+    { id: 'end', title: 'The meal ends', say: () => 'You win ' + G.final.totals[0] + ' to ' + G.final.totals[1] + '! Real meals last 3 rounds. Ties go to more custard.', target: tq('#tbl .seat.me .av'), wait: null, ready: tutDone }
   ];
+}
+// the story layer: every step is a reason (story.js), then the action; chapters open with a beat and pay off in the next one
+function tutSteps() {
+  const raw = tutStepsRaw(), T = KK.STORY.tut, C = KK.STORY.chapters, P = KK.STORY.payoff, DYN = { scoreSets: 1, scoreRoll: 1, scoreNigiri: 1, scoreChef: 1, end: 1 };
+  raw.forEach(st => { const t = T[st.id]; if (!t) return; st.title = t.t; if (!DYN[st.id]) st.say = t.s; });
+  const beat = (id, before, tgt, pay) => { const nx = raw.find(x => x.id === before); return { id, title: C[id].title, say: C[id].open, target: tgt, wait: null, ready: nx.ready, chapter: true }; };
+  const out = [];
+  raw.forEach(st => {
+    if (st.id === 'goal') out.push(beat('c1', 'goal', tq('#belt')));
+    if (st.id === 'paste') out.push(beat('c2', 'paste', tq('#belt'), 'c1'));
+    if (st.id === 'fish3') out.push(beat('c3', 'fish3', tq('#belt'), 'c2'));
+    if (st.id === 'scoreSets') out.push(beat('c4', 'scoreSets', tq('#tbl .seat.me .ctr'), 'c3'));
+    out.push(st);
+  });
+  return out;
 }
 // ---------------------------------------------------------------- the kit hooks
 function tutLeave() {
@@ -105,7 +120,7 @@ function tutStart(o) {
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'You know the rules',
-    endText: o ? 'Pick, pass, sets, rolls, paste, sticks and custard. Now the Story begins.' : 'Pick, pass, sets, rolls, paste, sticks and custard. A real meal has three rounds: the lightbulb helps.',
+    endText: o ? 'Auntie Suzu: "Odile owes you a custard. Now the Story begins."' : 'Auntie Suzu: "Odile owes you a custard. A real meal has three rounds. The lightbulb helps."',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
     setup: () => { try { GX.close(); } catch (e) { } try { closePop(); } catch (e) { } closeRS(); newGame('tutorial', { np: 2, seats: [2] }); },
     onDone: r => { tutLeave(); const c = r && r.choice;
@@ -116,10 +131,10 @@ function tutStart(o) {
 }
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
 { const o = tapHand; tapHand = function (i) {
-  if (tutOn() && G && canPick()) { const id = G.players[viewSeat()].hand[i]; if (!GXT.act({ type: 'tap', what: 'pick', id, i })) return; }
+  if (tutOn() && G && canPick()) { const id = G.players[viewSeat()].hand[i], sid = GXT.state().id; if (!GXT.act({ type: 'tap', what: 'pick', id, i })) return; const r = KK.STORY.tut[sid] && KK.STORY.tut[sid].r; if (r) setTimeout(() => guideSay(r, 3000), 700); }
   return o.apply(this, arguments); }; }
 { const o = toggleTwin; toggleTwin = function () {
-  if (tutOn() && !UI.twin && !GXT.act({ type: 'tap', what: 'twin' })) return;
+  if (tutOn() && !UI.twin) { const sid = GXT.state().id; if (!GXT.act({ type: 'tap', what: 'twin' })) return; const r = KK.STORY.tut[sid] && KK.STORY.tut[sid].r; if (r) guideSay(r, 2600); }
   return o.apply(this, arguments); }; }
 // the final score pad is not shown in the tutorial: the table stays under the steps, and the end card closes it
 { const o = showFinal; showFinal = function () {
