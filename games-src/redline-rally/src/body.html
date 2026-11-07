@@ -1,0 +1,34 @@
+<body>
+<div id="title" class="screen">
+  <div class="tbox">
+    <h1 class="logo">Redline Rally<small>CARD-DRIVEN RACING</small></h1>
+    <div class="lbl">Track</div>
+    <div class="row" id="s-track"></div>
+    <div class="lbl">Laps</div>
+    <div class="row" id="s-laps"></div>
+    <div class="lbl">Rival drivers</div>
+    <div class="row" id="s-opp"></div>
+    <div class="lbl">Players on this device</div>
+    <div class="row" id="s-hum"></div>
+    <div class="lbl">Rival skill</div>
+    <div class="row" id="s-diff"></div>
+    <button class="big" id="playB">Play</button>
+    <button class="ghostb" id="howB">How to play</button>
+  </div>
+</div>
+<div id="game" class="screen" hidden>
+  <div id="topbar"><div class="grow"><span class="pill">Lap <b id="tLap">1/2</b></span><span class="pill">Place <b id="tPos">1/5</b></span><span class="pill" id="tTrk"></span></div><button id="menuB" aria-label="Menu">Menu</button></div>
+  <div id="cvw"><canvas id="cv"></canvas></div>
+  <div id="msg" aria-live="polite"></div>
+  <div id="panel"></div>
+</div>
+<div id="modal" hidden></div>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
+<script src="data.js"></script>
+<script src="track.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="art.js"></script>
+<script src="ui.js"></script>
+</body></html>
