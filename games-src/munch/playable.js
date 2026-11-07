@@ -30,12 +30,12 @@
   document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest('#pbCap');if(c){c.classList.remove('on');if(typeof UI!=='undefined')UI.hold=0;if(typeof schedule==='function'){clearTimeout(aiTimer);aiTimer=null;schedule()}}},true);
 
   // tutorial chapters: a small pill under the progress bar ("Chapter 2 of 4: Your first fight")
-  const CH=[['Set up your hero',['goal','elf','powers','bucket','ready','sellbtn','sellpick','sellconfirm']],['Your first fight',['kick','potion','run','bad','end1']],['Rivals and special cases',['curse','meddle','rivals','kick2','trouble','help','who','fight','win','charity']],['Ending the game',['last','finalfight','finale']]];
+  const CH=[['Set up',['goal','elf','powers','bucket','ready','sellbtn','sellpick','sellconfirm']],['First fight',['kick','potion','run','bad','end1']],['Rivals, special cases',['curse','meddle','rivals','kick2','trouble','help','who','fight','win','charity']],['Ending the game',['last','finalfight','finale']]];
   setInterval(()=>{let e=document.getElementById('pbChap');let on=false,txt='';
-    try{if(typeof GXT!=='undefined'&&GXT.active()){const st=GXT.state();if(st&&st.phase==='show'){const k=CH.findIndex(c=>c[1].includes(st.id));if(k>=0){on=true;txt='Chapter '+(k+1)+' of '+CH.length+': '+CH[k][0]}}}}catch(x){}
+    try{if(typeof GXT!=='undefined'&&GXT.active()){const st=GXT.state();if(st&&st.phase==='show'){const k=CH.findIndex(c=>c[1].includes(st.id));if(k>=0){on=true;txt='Ch '+(k+1)+'/'+CH.length+' \u00b7 '+CH[k][0]}}}}catch(x){}
     if(!on){if(e)e.remove();return}
     if(!e){e=document.createElement('div');e.id='pbChap';e.className='pbchap';document.body.appendChild(e)}if(e.textContent!==txt)e.textContent=txt;
-    const top=document.querySelector('.gxt-top');const r=top?top.getBoundingClientRect():{bottom:44};e.style.top=(r.bottom+2)+'px'},400);
+    const top=document.querySelector('.gxt-top');const nn=document.querySelector('.gxt-n');const r=top?top.getBoundingClientRect():{top:0,height:34};const nr=nn?nn.getBoundingClientRect():{right:40};e.style.top=(r.top+(r.height-24)/2)+'px';e.style.left=(nr.right+8)+'px'},400);
 
   // phone: a "My cards" pill above the hand opens a big, readable list of the hand (the fanned hand cuts names off)
   function handPill(){let b=document.getElementById('pbHand');
