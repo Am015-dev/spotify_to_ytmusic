@@ -20,7 +20,7 @@ async function run(b,W,H,skipMode,story){const tag=W+'x'+H+(skipMode?' skip':'')
     if(!st.shown){note(tag,'forced step '+k+' never shown');break}
     if(skipMode&&k===1){const sk=await find('.gxt-skip');if(!sk){note(tag,'no Skip');break}await tap(sk[0],sk[1]);await sleep(600);
       const o=await p.evaluate(()=>({run:GXT.running(),start:!!document.querySelector('#modal .dlg.start')}));if(o.run||!o.start)note(tag,'Skip did not return to the title');await ctx.close();return}
-    const el=await p.evaluate(()=>{const s=GXT.state();return s.hole?[s.hole.cx,s.hole.cy]:null});await tap(el[0],el[1]);await sleep(500)}
+    for(let tries=0;tries<5;tries++){const i0=await p.evaluate(()=>GXT.state().i+'|'+GXT.state().phase);const el=await p.evaluate(()=>{const s=GXT.state();return s.hole?[s.hole.cx,s.hole.cy]:null});if(!el){await sleep(300);continue}await tap(el[0],el[1]);await sleep(700);const i1=await p.evaluate(()=>GXT.state().i+'|'+GXT.state().phase);if(i1!==i0||!(await p.evaluate(()=>GXT.running())))break}}
   // the interstitial card
   let ok=false;for(let t=0;t<40;t++){const e=await find('[data-gxt-end=free]');if(e){await tap(e[0],e[1]);ok=true;break}await sleep(150)}
   if(!ok){note(tag,'no "Fly free" card after the forced steps');await ctx.close();return}await sleep(700);
@@ -37,6 +37,7 @@ async function run(b,W,H,skipMode,story){const tag=W+'x'+H+(skipMode?' skip':'')
   if(!over){note(tag,'no end card');await ctx.close();return}
   await sleep(400);
   const e=await p.evaluate(()=>{const d=document.getElementById('na-coachend');const r=d.querySelector('.gxt-endc').getBoundingClientRect();return {txt:d.textContent,btns:[...d.querySelectorAll('[data-na]')].map(b=>b.dataset.na),inside:r.left>=-1&&r.right<=innerWidth+1&&r.top>=-1&&r.bottom<=innerHeight+1,later:[...d.querySelectorAll('.na-later li')].map(l=>l.textContent),shown:Object.keys(NCH.shown),rules:Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule).map(k=>({k,t:LORE.coach[k].t,s:LORE.coach[k].s}))}});
+  const gc=await p.evaluate(()=>({done:GXCOACH.done,run:GXCOACH.running,n:GXCOACH.explained.length,rules:GXCOACH.rules.length}));if(!gc.done||gc.run||gc.n<8)note(tag,'GXCOACH wrong at the end '+JSON.stringify(gc));
   if(!/Your numbers/.test(e.txt)||!/Rounds:/.test(e.txt))note(tag,'end card does not walk the numbers');if(!e.inside)note(tag,'end card outside the screen');
   for(const r of e.rules){if(!e.shown.includes(r.k)&&!e.later.some(l=>l.includes(r.s)))note(tag,'rule "'+r.k+'" neither explained nor listed under things you will meet later')}
   if(maxVis>1)note(tag,'more than one coach bubble at once');
