@@ -336,3 +336,4 @@ body.vg-coached .gxt-ring,body.vg-coached .gxt-bub,body.vg-coached .gxt-fin,body
 #coach .cpor{flex:none;width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#4f9a6a,#1f4a30);color:#fff3d6;border:2px solid #e8c36a;font-weight:800}
 #coach .ctx{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 #coach .cx{flex:none;width:44px;height:44px;border-radius:10px;border:0;background:transparent;font-size:24px;color:#22190d}
+body:has(.gxt-cell) #iscrim{pointer-events:none}   /* the tutor blocks input itself; the scrim is not a second overlay */
