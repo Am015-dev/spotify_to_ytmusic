@@ -77,3 +77,13 @@ The 7 SIMPLIFIED items are listed in the Rules drawer under "Simplified on purpo
 - `tests/tutorial-end.js` now also checks that every "see" step's target is uncovered. That check fails on the old build and passes now.
 - Phone: tutorial reaches its end; BLOCKER 0, MAJOR 0, MINOR 68. PC: tutorial reaches its end; BLOCKER 0, MAJOR 0, MINOR 38. The MINORs are mostly the bot's own overlap and tap-size notes on cards and dice.
 - Its random-tap Quick game and Story runs hit the time cap ("inconclusive", MINOR) because the turns now play out step by step. The scripted UI-only players (`tests/ui-play.js`) reach both result screens.
+
+## Coached first game (ADDENDUM 4): replaces the 14 forced steps
+- The tutorial is a real 2-round game against Pip.
+- Only the very first action is guided: 2 spotlight steps (Forest button, then 2 dice), then an end card with "Play on". After that every legal move is free.
+- Aunt Ottilie explains each of 23 rules the first time it matters (`src/coach.js`, text in `STORY.coach`). She also comments on a good or poor move and on Pip's first moves.
+- One bubble at a time; it sits in the panel above the instruction bar, so it never covers the board; the x dismisses it.
+- The result screen walks the real score rule by rule, then lists the rules that didn't come up under "Things you'll meet later".
+- `tests/tutorial-end.js phone|pc` checks all of this by playing any glowing legal move. Results: 2 guided steps / 3 taps; the coach bubble never sat on a glowing target; all 23 rules were explained live (20) or listed under later (3: usually white, choice, emptyHand); the core rules were explained live; the score walk has 7 lines; 0 errors.
+- Base-branch note: `games-src/scripts/guard.py` crashes on origin (`games-src/stitchwise/` holds only `free-art/`, no `build.py`), so `build-all.py` stops before building. I ran the same build-all from a scratch copy with only the guard step skipped: PASS. Running the scenarios directly against a plain server fails the font check only because that server has no shelf font files; build-all's staging server serves them.
+- QA bot on the coached-game build (free art, --scale 2): phone BLOCKER 0 / MAJOR 0 / MINOR 67, PC BLOCKER 0 / MAJOR 0 / MINOR 37. The tutorial reaches its end on both. Its random-tap quick and story runs still hit the time cap (MINOR); `tests/ui-play.js` reaches both result screens.
