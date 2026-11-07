@@ -54,7 +54,7 @@ document.addEventListener('click', function (e) {
   human(m2);
 });
 $('#deckb').dataset.a = 'deck';
-$('#pop').addEventListener('click', function (e) { if (e.target.id === 'pop') e.currentTarget.hidden = true; });
+$('#pop').addEventListener('click', function (e) { if (!e.target.closest('.acts button')) e.currentTarget.hidden = true; });   // tap anywhere on the big card to close it
 function whyCant(id) {
   var b = B[id], p = G.pl[UI.view];
   var room = [0, 1, 2].filter(function (h) { return b.h.indexOf(HABC[h]) >= 0 && p.board[h].length < 5; });

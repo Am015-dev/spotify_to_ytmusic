@@ -34,6 +34,18 @@ Tests: rules-test.js (node), smoke.js, play.js (real taps: full game, tutorial, 
 | `ui-audit.spec.js` (phone + pc, after merging the walker-wait fix from alex/brave-carson-rbpmlk) | phone A0 B0 C0 D0 E0 F0, PC A0 B0 C0 D0 E0 F0 |
 | asset loader | proven with 3 dummy webp files in a scratch site (bird card, seed token, portrait): files fill their slots at the slot aspect, the rest stay placeholders; dummies deleted, nothing under games/ |
 
+## Orchestrator addenda (7 Nov, 17:25-17:56 UTC; read at 18:19 after my first DONE report)
+| item | result |
+|---|---|
+| AI gate (`node ai-gate.js 100`) | hard beats a "first affordable option" bot 100/100 (avg 68.4 vs 14.7), normal 100/100 (68.5 vs 15.0); left at the end of a game: hard 2.9 food / 3.0 cards, normal 2.5 food / 3.3 cards (no hoarding) |
+| ASSET-CHECK.md (`python3 check-assets.py`) | 186 required (120 birds, 18 bonus cards, 12 goals, 7 food/die faces incl. grub-or-seed and any-food, 5 nests, egg, cube, 8 portraits incl. 3 bosses, rows/mat/feeder/tray/card back, 3 backgrounds, rosette, 3 fx), 186 prompted, gaps 0 |
+| music cues | `next-wave/music/perch-and-plume/cues-wave1.json`: menu, main, fight (loops), victory, defeat (once), 2 versions each |
+| menu | Restart, Title screen, New quick game, Story map; Sound on/off, Music (song picker once files exist); Rules, All cards, Tutorial; tapping any bird (board, hand, tray, opponents, reference) shows it large with its full power text |
+| offline | the game is one self-contained file and requests nothing else until media/music files exist (0 failed requests in every scenario and play test). `offline.json` lives in games/<slug>/ and is written by `offline-manifest.py` at deploy (orchestrator); I did not write under games/ |
+| reuse (shelf) | Reused shared shelf parts as-is (shell, gx-kit settings/reference, gx-help, gx-tutor, gx-campaign, gx-music, gx-scenario), the redline-rally asset-slot/register pattern and the cauldron-fair campaign/tutorial structure. The addendum to copy Hollowbough's pieces arrived after the game was built and passing; its card tableau is a different mechanic, so I kept my tested versions rather than swap working code at the end |
+| reuse (web) | 10-minute search: the only permissively licensed rules code found is an unstable Python/Rust gym project whose name carries the original title (reference only, nothing copied; no THIRD-PARTY.md needed). Rules cross-checked from memory of the published rules: row yields, trades, egg costs, 8/7/6/5 cubes, goal points, setup all match (rules-notes.md). The original has a larger roster; ours is 120 birds and 18 bonus cards as the brief asked |
+| temporary free art | Not added: Kenney CC0 has no bird or food art, game-icons.net (CC BY) would only replace food icons already drawn in code and would need credits plus files under games/ (live folder, orchestrator's). Every slot shows a tidy code-drawn placeholder until the Flow art lands |
+
 ## Known (not fixed)
 - `register-assets.py` not run on this branch: it rewrites the one-line `next-wave/expected-assets.json` and conflicts with every other branch; its docstring asks the orchestrator to run it at merge time.
 - Playwright: the brief's 1.56.1 does not match the installed browser (chromium-1243); I used 1.63.0 (`npm install --no-save @playwright/test@1.63.0 playwright@1.63.0`), as the redline-rally worker did.
