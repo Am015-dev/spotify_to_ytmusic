@@ -39,7 +39,7 @@ async function drive(p,name,maxMs){const t0=Date.now();let idle=0,last='';const 
     const c=await b.newContext({viewport:{width:390,height:763},hasTouch:true,isMobile:true});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
     await p.goto(url);await p.waitForTimeout(1500);
     try{await p.evaluate(()=>{localStorage.setItem('tw_played','1');localStorage.setItem('tw_offered','1');localStorage.setItem('gxt-tidewake','{"done":1}')});await p.reload();await p.waitForTimeout(1500)}catch(e){}
-    if(mode==='quick'){const pl=p.getByText('Play now: you vs 2 computers');await pl.tap();await p.waitForTimeout(800)}
+    if(mode==='quick'){const pl=p.getByText('Quick game: you vs 2 computers');await pl.tap();await p.waitForTimeout(800)}
     else{await p.locator('button:has-text("Story")').first().tap();await p.waitForTimeout(1500);
       await p.locator('.gxc-node.next, .gxc-node.open').first().tap();await p.waitForTimeout(1200);
       // intro scenes (portrait + lines): tap the visible primary buttons until the board is up

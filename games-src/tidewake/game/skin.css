@@ -42,3 +42,17 @@ html.sk .gx-bar .gx-ibtn,html.sk .gx-dock .gx-ibtn{border-image-width:4px}
 .osk-walk .osk-step{font-size:14px;color:#5a3b10;margin-bottom:4px}
 .osk-later{text-align:left;margin:6px 0 10px;padding-left:18px;font-size:15px;line-height:1.35;max-height:52vh;overflow:auto}
 .osk-later li{margin:4px 0}
+/* desktop type scale (audit rule A: text >= 16px at >= 1024 wide): the game's own small sizes, raised */
+@media (min-width:1024px){
+ .startpick .btn,.startpick span,.prompt summary.tiny,.gx-drawer .btn,.gx-drawer .btn b,.gx-drawer .btn span,.gx-drawer .lbl,.gx-drawer .tiny,#start .seg button,#start .tiny,#start .tiny b,#start label.opt small,
+ .gx-bar .gx-ibtn span,#barstat .lg,#road .rs,.gxc-lab,.gxc-act b,.gxc-act small,.gxh-tt,.gxh-tx{font-size:16px!important}
+ .gx-bar .gx-ibtn span,.gx-dock-head .gx-ibtn{color:#241604!important;text-shadow:none!important}
+ .startpick{background:#fbf3df;border-radius:8px;padding:4px}
+}
+/* contrast (audit rule B): solid backing behind drawer text and the Story map act labels */
+#rulesbody p,#rulesbody li,#rulesbody h3{background:#fbf3df;color:#2a1d10!important;border-radius:6px;padding:2px 6px;text-shadow:none!important}
+.gx-drawer .btn{background:#fbf3df!important;color:#2a1d10!important;text-shadow:none!important;background-image:none!important}
+.gx-drawer .btn.on,.gx-drawer .btn.pri{background:#7a1f1f!important;color:#fff4dc!important}
+.gxc-act b,.gxc-act small{background:rgba(14,22,30,.88);color:#ffe7a3!important;padding:1px 8px;border-radius:6px;text-shadow:none!important}
+.gx-drawer .btn:disabled{opacity:1!important;color:#5e4e30!important;background:#ece3cc!important;border-style:dashed}
+@media (min-width:1024px){#storybtn small{font-size:16px!important}}
