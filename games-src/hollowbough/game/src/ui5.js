@@ -1,6 +1,8 @@
 // ===================== part 5: game flow (new game, turn driver, AI, one-card-at-a-time queue, save/load) =====================
 const SAVEKEY = 'hb_save1';
 function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(UI.tt); UI.tt = setTimeout(() => e.classList.remove('on'), 2600); }
+function turnBanner(txt, rv) { const e = document.getElementById('hbturn') || (() => { const d = document.createElement('div'); d.id = 'hbturn'; d.setAttribute('role', 'status'); document.body.appendChild(d); return d; })();
+  e.textContent = txt; e.classList.toggle('rv', !!rv); e.classList.add('on'); clearTimeout(UI.tbt); UI.tbt = setTimeout(() => e.classList.remove('on'), 1100); }
 function setSeed(n) { UI.seed = n >>> 0; }
 function setAiSeed(n) { UI.aiSeed = n; }
 const DEF = { np: 2, level: 'normal', solo: 1 };
@@ -30,6 +32,7 @@ function newGame(mode, o) {
   closePop(); fxClear(); try { GX.close(); } catch (e) { }
   kitNewGame();
   render(); schedule();
+  if (!o.camp && (mode === 'vs' || mode === 'hot') && ANIM) toast(HBS.quick.intro);   // quick game: a one-line flavour intro in the game's voice
   return G;
 }
 function kitNewGame() { GX.undo.clear(); recapSeats(); UI.t0 = Date.now(); UI.resultDone = false; UI.earned = null; }
@@ -67,7 +70,7 @@ function schedule() {
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', 'Your hand stays hidden until you tap.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
-  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
+  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; if (ANIM && !(UI.cfg && UI.cfg.tutorial) && UI.bannerFor !== 'h:' + a + ':' + G.turn) { UI.bannerFor = 'h:' + a + ':' + G.turn; turnBanner(hotSeat() ? p.name + "'s turn" : HBS.turn.you); } snd('turn', { vol: .6 }); GX.buzz(15); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) placeFinger(); }, 40);
 }
 function aiStep() {
@@ -76,9 +79,12 @@ function aiStep() {
   let m;
   try { m = HB.AI.choose(G, a); } catch (e) { m = HB.moves(G, a)[0]; console.error('AI error', e); }
   const tok = UI.animTok = (UI.animTok || 0) + 1;
-  const go = src => { if (tok !== UI.animTok) return; UI.animBusy = false; aiApply(m, a, src); };
+  const go = src => { if (tok !== UI.animTok) return; UI.animBusy = false; UI.aiCap = ''; render(); aiApply(m, a, src); };
   if (!ANIM) { go(null); return; }
-  UI.animBusy = true; aiFly(m, a, go);
+  // one thing at a time: banner (first rival step of a turn run), caption saying what the rival is about to do, a beat, then the move flies
+  if (UI.bannerFor !== a + ':' + G.turn) { UI.bannerFor = a + ':' + G.turn; if (!(UI.cfg && UI.cfg.tutorial)) turnBanner(HBS.turn.rival(p.name), true); }
+  UI.animBusy = true; UI.aiCap = p.name + ': ' + String(m.label || 'plays').split(' - ')[0].replace(/^[^:]*:\s*/, ''); render();
+  UI.tm = setTimeout(() => { if (tok !== UI.animTok) return; aiFly(m, a, go); }, Math.round(AIDELAY * .9));
 }
 // the computer's move: a worker flies to its place, a card flies to its city (about 0.6 s), then the move happens
 function aiFly(m, a, done) {
@@ -136,7 +142,7 @@ function queueOver() {
   if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
   const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
   UI.cards.push({
-    kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: 'The game is over',
+    kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: (UI.cfg && UI.cfg.tutorial) || G.grim || ov.tie || campOn() ? 'The game is over' : (G.players[ov.winner].ai ? HBS.quick.lose : HBS.quick.win),
     body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
     buttons: NET.on ? netOverButtons() : campOn() ? [{ label: 'Continue the story', a: 'campfin' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }] : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
