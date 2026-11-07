@@ -22,6 +22,7 @@
     var tot = 0, a; for (a in G.bag) tot += G.bag[a]; if (!tot) return null;
     var x = Math.floor(rnd(G) * tot); for (a in G.bag) { if (x < G.bag[a]) { G.bag[a]--; return a; } x -= G.bag[a]; } return null;
   }
+  function an(a) { return (/^[AEIOU]/.test(W.ANI_NAME[a]) ? 'an ' : 'a ') + W.ANI_NAME[a]; }
   function log(G, s) { G.log.push(s); if (G.log.length > 60) G.log.shift(); G.logN = (G.logN || 0) + 1; }
   W.newGame = function (o) {
     o = o || {};
@@ -109,8 +110,8 @@
       if (m.t === 'tok') {
         var c = s.env[m.c]; if (!c || c.tok || c.a.indexOf(tok) < 0) throw new Error('bad token spot');
         c.tok = tok; if (c.key) { s.acorns++; gain = 1; }
-        log(G, s.name + ' placed a ' + W.ANI_NAME[tok] + (gain ? ' on a keystone and gained an acorn.' : '.'));
-      } else if (m.t === 'back') { G.bag[tok]++; log(G, s.name + ' returned a ' + W.ANI_NAME[tok] + ' token.'); }
+        log(G, s.name + ' placed ' + an(tok) + (gain ? ' on a keystone and gained an acorn.' : '.'));
+      } else if (m.t === 'back') { G.bag[tok]++; log(G, s.name + ' returned ' + an(tok) + ' token.'); }
       else throw new Error('bad token move');
       G.last = { seat: G.cur, tile: G.hold.at, tok: m.t === 'tok' ? m.c : null, acorn: gain };
       endTurn(G); return G;

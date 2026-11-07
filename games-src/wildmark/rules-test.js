@@ -32,7 +32,7 @@ G = W.newGame({ np: 1, seed: 2 }); G.market.tiles[0] = { id: 999, t: ['forest'],
 W.apply(G, { t: 'take', i: 0 }); const sp = W.spots(G.seats[0].env)[0]; W.apply(G, { t: 'place', c: sp, rot: 0 }); W.apply(G, { t: 'tok', c: sp }); ok(G.seats[0].acorns === 1, 'keystone acorn');
 ok(W.check(G).length === 0, 'invariants after keystone: ' + W.check(G));
 // games
-const N = +(process.argv[2] || 200), t0 = Date.now(), tot = {}, wins = {};
+const N = +(process.argv[2] || (process.env.QUICK ? 8 : 200)), t0 = Date.now(), tot = {}, wins = {};
 for (let g = 0; g < N; g++) {
   const np = 1 + (g % 4), lv = ['easy', 'normal', 'hard'][g % 3];
   const ai = []; for (let i = 0; i < np; i++) ai.push(i === 0 ? lv : ['easy', 'normal', 'hard'][(g + i) % 3]);

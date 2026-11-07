@@ -8,6 +8,7 @@ function $$(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 try { UI.prefs = JSON.parse(localStorage.getItem('wm-prefs') || '{}') || {}; } catch (e) { UI.prefs = {}; }
 function savePrefs() { try { localStorage.setItem('wm-prefs', JSON.stringify(UI.prefs)); } catch (e) { } }
+function an(a) { return (/^[AEIOU]/.test(WM.ANI_NAME[a]) ? 'an ' : 'a ') + WM.ANI_NAME[a]; }
 function toast(t, ms) { var e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 // ---------------------------------------------------------------- sound (synth; music slots via gx-music when files exist)
 var SND = { ctx: null };
@@ -77,7 +78,7 @@ function aiStep() {
     setTimeout(function () {
       try { WM.apply(G, m); } catch (e) { console.error(e); return; }
       if (m.t === 'wipe3') { toast(nm + ' swept three tokens.'); sfx('wipe'); }
-      else if (G.stage === 'tile') { var h = G.hold; m = WM.AI.choose(G); WM.apply(G, m); var m2 = WM.AI.choose(G); WM.apply(G, m2); UI.lastAI = { seat: G.last.seat, tok: h.tok, m2: m2 }; toast(nm + (m2.t === 'tok' ? ' placed a ' + WM.ANI_NAME[h.tok] + '.' : ' returned a ' + WM.ANI_NAME[h.tok] + '.'), 1600); if (G.last.acorn) sfx('acorn'); else sfx('place'); }
+      else if (G.stage === 'tile') { var h = G.hold; m = WM.AI.choose(G); WM.apply(G, m); var m2 = WM.AI.choose(G); WM.apply(G, m2); UI.lastAI = { seat: G.last.seat, tok: h.tok, m2: m2 }; toast(nm + (m2.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.'), 1600); if (G.last.acorn) sfx('acorn'); else sfx('place'); }
       render(); step();
     }, UI.fast ? 10 : Math.round(AIDELAY * 0.8));
     return;
@@ -135,7 +136,7 @@ function onCell(c, isSpot) {
     UI.ghost = { c: c, rot: bestRot(c) }; sfx('tap'); render(); return;
   }
   if (G.stage === 'tok') {
-    var x = G.seats[G.cur].env[c]; if (!x || x.tok || x.a.indexOf(G.hold.tok) < 0) { toast('A ' + WM.ANI_NAME[G.hold.tok] + ' needs an empty tile showing it.'); return; }
+    var x = G.seats[G.cur].env[c]; if (!x || x.tok || x.a.indexOf(G.hold.tok) < 0) { toast(an(G.hold.tok).replace(/^a/, 'A') + ' needs an empty tile showing it.'); return; }
     if (!tutOK({ what: 'tok', c: c })) return;
     act({ t: 'tok', c: c });
   }
@@ -287,7 +288,7 @@ var RULES_HTML = '<h3>Goal</h3><p>Over 20 turns, grow a valley of habitat tiles 
 // ---------------------------------------------------------------- result
 function showResult() {
   if (!G || !G.over || UI.resultShown === G.seed + ':' + G.logN) return; UI.resultShown = G.seed + ':' + G.logN;
-  sfx('end'); save(); musicSync();
+  sfx('end'); save(); musicSync(); $('#toast').classList.remove('on');
   var sc = G.res, me = 0, title;
   if (G.solo) title = 'You scored ' + sc[0].total; else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;

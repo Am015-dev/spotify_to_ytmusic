@@ -29,7 +29,8 @@ function campIsWon(g, def) {
 function campInit() {
   if (!window.GXC || !window.CAMPAIGN) return;
   GXC.init({
-    game: 'wildmark', artBase: 'media/', data: window.CAMPAIGN,
+    game: 'wildmark', data: window.CAMPAIGN,
+    portrait: function (who, size, c) { var st = c && c.portrait ? c.portrait.replace(/\.webp$/, '') : ''; return st && ART.have.indexOf(st) >= 0 ? artUrl(st) : null; },   // only files that exist: no 404s, else the emoji
     headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); tutStart(); }); return [b]; },
     startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
     onExit: function () { UI.camp = null; UI.mode = 'quick'; UI.sv = 'title'; showTitle(); },
