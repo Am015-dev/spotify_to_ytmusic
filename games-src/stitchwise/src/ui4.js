@@ -22,6 +22,7 @@ function tutSteps() {
   ];
 }
 function tutStart(o) {
+  try { clearTimeout(toast.t); $('#toast').classList.remove('on'); } catch (e) { }
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; var first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'), endTitle: 'You know the rules', endText: o ? 'Buy, place, advance, button spots. Now the Story begins.' : 'Buy, place, advance, button spots. The lightbulb explains anything new.',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
@@ -35,7 +36,20 @@ function storyOpen() { if (typeof GXC === 'undefined') return; if (typeof GXT !=
 function campLine() { try { if (typeof GXC === 'undefined' || !window.CAMPAIGN) return ''; var p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(function (c) { return p.ch[c.id] && p.ch[c.id].beaten; }).length; return n ? n + ' of ' + ch.length + ' stages done' : ''; } catch (e) { return ''; } }
 function campStart(def) {
   var op = def.opponent || {}; $('#start').hidden = true; UI.lvl = op.aiLevel || 'normal'; var g = newGame('story', { camp: def, lvl: UI.lvl, seed: def.setup && def.setup.seed != null ? def.setup.seed : null, first: 0 });
-  later(400, function () { toast('Goal: ' + def.goal.text + (def.twist ? ' ' + def.twist.text : ''), 4200); }); return g;
+  return g;
+}
+
+// Story result: our own best score per stage (the shared kit keeps only stars), and the totals + tie-break line the kit screen lacks
+function campBest(g) { try { var id = UI.camp.id, b = JSON.parse(localStorage.getItem('sw_best') || '{}'), n = swScore(g, 0).total; if (b[id] == null || n > b[id]) b[id] = n; localStorage.setItem('sw_best', JSON.stringify(b)); } catch (e) { } }
+function campResultNote(g) {
+  var box = $('.gxc-res'); if (!box) return; var a = swScore(g, 0), b = swScore(g, 1), w = swWinner(g), best = null; try { best = (JSON.parse(localStorage.getItem('sw_best') || '{}'))[UI.camp.id]; } catch (e) { }
+  var n = h('div.rvnote', h('div.rvsc', h('span', 'You'), h('b', String(a.total)), h('span.dash', '–'), h('b', String(b.total)), h('span', nameOf(1))));
+  if (a.total === b.total) n.appendChild(h('div.rvtb', w === 0 ? 'Tied on points. You reached the end first, so you win the tie-break.' : 'Tied on points. ' + nameOf(w) + ' reached the end first and wins the tie-break, so this is a loss.'));
+  else if (w !== 0) n.appendChild(h('div.rvtb', 'Lost by ' + (b.total - a.total) + ' point' + (b.total - a.total === 1 ? '' : 's') + '.'));
+  else n.appendChild(h('div.rvtb', 'Won by ' + (a.total - b.total) + ' point' + (a.total - b.total === 1 ? '' : 's') + '.'));
+  if (w !== 0) n.appendChild(h('div.rvtb', 'Stars are only earned on a win.'));
+  if (best != null) n.appendChild(h('div.rvtb', 'Your best here: ' + best));
+  var h2 = $('h2', box); if (h2 && h2.nextSibling) box.insertBefore(n, h2.nextSibling); else box.appendChild(n);
 }
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;

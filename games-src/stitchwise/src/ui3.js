@@ -59,22 +59,48 @@ function buildRules() { var w = h('div', { html: rulesHtml() }); var rb = h('but
 function buildMenu() {
   var btn = function (txt, f, cls) { var b = h('button.btn.alt.sm' + (cls || ''), { type: 'button' }, txt); b.onclick = f; return b; };
   GX.settings({ id: 'setd', title: 'Menu',
-    game: function (S) { S.appendChild(GX.row('Game', [btn('Rules', function () { GX.show('rulesd'); }), btn('Tutorial', function () { GX.close(); tutStart(); }), btn('Restart', restart), btn('Title', function () { GX.close(); showStart(); })])); },
-    sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(UI.sound, function (v) { UI.sound = !!v; try { localStorage.setItem('sw_sound', v ? '1' : '0'); } catch (e) { } if (v) sfx('pick'); }))); S.appendChild(GX.row('Music', [btn('Music picker', function () { try { GXMUS.open(); } catch (e) { toast('No music files yet'); } })], 'Silent until the music files are added')); },
+    game: function (S) { S.appendChild(GX.row('Game', [btn('Rules', function () { GX.show('rulesd'); }), btn('Tutorial', function () { GX.close(); tutStart(); }), btn('Restart', function () { var b = this; if (G && UI.started && !G.over && !UI.tutorial && !b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Tap again to restart'; setTimeout(function () { delete b.dataset.sure; b.textContent = 'Restart'; }, 3000); return; } restart(); }), btn('Title', function () { GX.close(); showStart(); })])); },
+    sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(UI.sound, function (v) { UI.sound = !!v; try { localStorage.setItem('sw_sound', v ? '1' : '0'); } catch (e) { } if (v) sfx('pick'); }))); if (window.SW_MUSIC && window.SW_MUSIC.length) S.appendChild(GX.row('Music', [btn('Music picker', function () { try { GXMUS.open(); } catch (e) { } })])); },
     help: function (S) { try { var w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) S.appendChild(w.firstChild); } catch (e) { } },
     about: { name: 'Stitchwise', version: '1.0', text: 'An original quilting duel. All names, patches and art are our own.' }, shelf: '../' });
 }
 function restart() { GX.close(); if (UI.tutorial) { tutStart(); return; } if (UI.camp && typeof GXC !== 'undefined') { var id = UI.camp.id; GXC.play(id); return; } newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: UI.lvl }); }
 // ---------- result
 function bonusTileHtml() { var i = artImg('bonus-tile', 'ic'); if (!i) return ''; i.width = i.height = 22; return i.outerHTML + ' '; }
-function showResult() {
-  var rs = $('#rs'); rs.hidden = false; var a = swScore(G, 0), b = swScore(G, 1), w = swWinner(G), hot = UI.mode === 'hot'; artBg(rs, w === 0 ? 'result-win' : 'result-lose');
-  var title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';
-  var c = h('div.card'); c.appendChild(h('div.win', title));
-  c.appendChild(h('div.rsgrid', { html: '<span class="h"></span><span class="h">' + nameOf(0) + '</span><span class="h">' + nameOf(1) + '</span>' +
-    '<span>Buttons</span><b>' + a.btn + '</b><b>' + b.btn + '</b><span>' + bonusTileHtml() + '7\u00D77 bonus</span><b>' + (a.bonus ? '+7' : '0') + '</b><b>' + (b.bonus ? '+7' : '0') + '</b><span>Empty squares</span><b>' + a.empty + ' (-' + a.pen + ')</b><b>' + b.empty + ' (-' + b.pen + ')</b><span><b>Total</b></span><b>' + a.total + '</b><b>' + b.total + '</b>' }));
-  if (a.total === b.total) c.appendChild(h('p.sub', 'Tied on points: the player who reached the end first wins.'));
-  var row = h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:10px' });
-  row.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'again' }, 'Play again')); row.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'look' }, 'Look at the quilts')); row.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title'));
-  c.appendChild(row); rs.innerHTML = ''; rs.appendChild(c); UI.rsShown = true;
+function emptyIdx(seat) { var r = []; G.board[seat].forEach(function (p, i) { if (p === -1 || p === 99) r.push(i); }); return r; }
+function tieText(w) { return 'Tied on points: ' + nameOf(w) + ' reached the end first and wins the tie-break.'; }
+// the end of the game: both quilts side by side, empty squares counted down (-2 each), bonus, then the winner banner
+function showResult(o) {
+  o = o || {}; try { GXH.hide(); } catch (e) { } var rs = $('#rs'); rs.hidden = false; rs.className = 'ov rsv'; var sc = [swScore(G, 0), swScore(G, 1)], w = swWinner(G), hot = UI.mode === 'hot';
+  artBg(rs, 'bg-title'); var saved = UI.cs, saveNew = UI.newCells; UI.newCells = {}; var wide = innerWidth >= 700;
+  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 215 : 260)) / 9)));
+  var c = h('div.rv'), cols = h('div.rvcols'), cells = [], tot = [], pen = [];
+  [0, 1].forEach(function (s) {
+    var q = quiltEl(s, 'rvq'); q.removeAttribute('id'); q.style.setProperty('--cs', UI.cs + 'px'); q.style.backgroundImage = 'none'; q.classList.remove('art');
+    var qs = $$('.qc', q), emp = emptyIdx(s).map(function (i) { return qs[i]; }); emp.forEach(function (e) { e.classList.add('emp'); }); cells.push(emp);
+    var bt = h('b.rvn', '0'), tt = h('b.rvt', String(sc[s].btn + (sc[s].bonus ? 7 : 0))); tot.push(tt); pen.push(bt);
+    cols.appendChild(h('div.rvcol' + (w === s ? '.win' : ''), { 'data-seat': s }, h('div.rvname', h('span.dot', { style: 'background:' + (s === 0 ? 'var(--me)' : 'var(--opp)') }), nameOf(s)), q,
+      h('div.rvtally', h('div', { html: btnIc() + ' Buttons <b>' + sc[s].btn + '</b>' }), h('div', { html: bonusIc() + ' 7×7 bonus <b>' + (sc[s].bonus ? '+7' : '0') + '</b>' }), h('div.rvpen', 'Empty ', h('b.rvec', '0'), ' × -2 = ', bt), h('div.rvsum', 'Total ', tt))));
+  });
+  c.appendChild(h('div.rvhead', 'The quilts are done')); c.appendChild(cols); var ban = h('div.rvban'); c.appendChild(ban); var acts = h('div.rvacts'); c.appendChild(acts);
+  rs.innerHTML = ''; rs.appendChild(c); UI.rsShown = true; UI.cs = saved; UI.newCells = saveNew; var seqId = ++UI.seq2;
+  var setTotals = function (s, n) { $('.rvec', $$('.rvcol', c)[s]).textContent = n; pen[s].textContent = n ? '-' + n * 2 : '0'; tot[s].textContent = sc[s].btn + (sc[s].bonus ? 7 : 0) - n * 2; };
+  var finishUp = function () {
+    if (seqId !== UI.seq2) return; [0, 1].forEach(function (s) { cells[s].forEach(function (e) { e.classList.add('x'); }); setTotals(s, sc[s].empty); });
+    var A = sc[0].total, B = sc[1].total, title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';
+    ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); ban.innerHTML = '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : '');
+    $$('.rvcol', c).forEach(function (e) { e.classList.add('done'); }); acts.textContent = ''; sfx('fanfare');
+    if (w === 0 || hot) { for (var k = 0; k < 18; k++) c.appendChild(h('i.cf', { style: 'left:' + (Math.random() * 100) + '%;background:' + PAL[k % PAL.length] + ';animation-delay:' + (Math.random() * .6) + 's' })); } else sfx('thud');
+    if (o.after) { var cb = h('button.btn.go.grow', { type: 'button' }, 'Continue'); cb.onclick = function () { o.after(); }; acts.appendChild(cb); cb.focus(); }
+    else { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'again' }, 'Play again')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title')); }
+  };
+  var mx = Math.max(sc[0].empty, sc[1].empty), step = amt(1) ? Math.max(28, Math.min(110, Math.floor(2600 / Math.max(1, mx)))) : 0;
+  if (!step || o.instant) { finishUp(); return; }
+  var n = 0, skip = h('button.btn.alt.sm.rvskip', { type: 'button' }, 'Skip'); skip.onclick = function () { n = 1e9; }; acts.appendChild(skip);
+  var tick = function () {
+    if (seqId !== UI.seq2) return; if (n >= mx) { setTimeout(finishUp, amt(250)); return; }
+    [0, 1].forEach(function (s) { if (n < cells[s].length) { cells[s][n].classList.add('x'); setTotals(s, n + 1); } }); sfx('tick'); n++; setTimeout(tick, step);
+  };
+  setTimeout(tick, amt(500));
 }
+

@@ -32,9 +32,9 @@
     setup: function () { game(); showPatch(swOffer(G)[0]); },
     checks: [{ kind: 'visible', sel: '#bigd.on .big .facts', name: 'big patch facts' }, { kind: 'text', sel: '#bigd.on .big p', re: /squares/i, name: 'full text' }] });
   GXS.add({ id: 'sw-result', name: 'Result screen', ask: 'Does the result add up?', seed: 11, when: booted,
-    setup: function () { game(); G.pos = [53, 53]; G.over = true; G.btn = [30, 12]; G.stamp = [10, 11]; UI.mode = 'vs'; showResult(); },
-    checks: [{ kind: 'visible', sel: '#rs .win', name: 'winner line' }, { kind: 'visible', sel: '#rs [data-a=again]', name: 'Play again' },
-      { kind: 'fn', name: 'winner line matches the engine', fn: function () { var w = swWinner(G), t = document.querySelector('#rs .win').textContent; return (w === 0 ? /You win/.test(t) : /wins/.test(t)) || t; } }],
+    setup: function () { game(); G.pos = [53, 53]; G.over = true; G.btn = [30, 12]; G.stamp = [10, 11]; UI.mode = 'vs'; showResult({ instant: true }); },
+    checks: [{ kind: 'visible', sel: '#rs .rvt1', name: 'winner line' }, { kind: 'fn', name: 'both quilts side by side with totals that match the engine', fn: function () { var t = [].map.call(document.querySelectorAll('#rs .rvt'), function (e) { return +e.textContent; }); return document.querySelectorAll('#rs .rvq').length === 2 && t[0] === swScore(G, 0).total && t[1] === swScore(G, 1).total || t.join(','); } }, { kind: 'visible', sel: '#rs [data-a=again]', name: 'Play again' },
+      { kind: 'fn', name: 'winner line matches the engine', fn: function () { var w = swWinner(G), t = document.querySelector('#rs .rvt1').textContent; return (w === 0 ? /You win/.test(t) : /wins/.test(t)) || t; } }],
     mut: [{ name: 'winner flips', js: 'swWinner=function(){return 1}' }] });
   GXS.add({ id: 'sw-torn', name: 'Torn squares twist', ask: 'See 3 torn squares in your quilt?', seed: 11, when: booted,
     setup: function () { game({ setup: function (g) { applyTwist({ id: 'torn-squares', param: 3 }); } }); },

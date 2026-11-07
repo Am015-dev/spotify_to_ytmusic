@@ -85,10 +85,27 @@ def cloth(w, h, base, line):
     for k in range(60, w, 120): d.line([k, 0, k, h], fill=line, width=2)
     for k in range(60, h, 120): d.line([0, k, w, k], fill=line, width=2)
     return im.filter(ImageFilter.GaussianBlur(0.6))
+def quilt_bg(w, h, q=135):
+    im = Image.new("RGB", (w, h)); rnd = random.Random(7)
+    fabs = [fabric(i, q) for i in range(0, 33, 2)]
+    for y in range(0, h, q):
+        for x in range(0, w, q):
+            t = rnd.choice(fabs).copy()
+            if rnd.random() < .5: t = t.transpose(Image.ROTATE_90)
+            im.paste(t, (x, y))
+    d = ImageDraw.Draw(im)
+    for k in range(0, w, q):
+        for yy in range(0, h, 14): d.line([k, yy, k, yy + 7], fill=(250, 240, 214), width=3)
+    for k in range(0, h, q):
+        for xx in range(0, w, 14): d.line([xx, k, xx + 7, k], fill=(250, 240, 214), width=3)
+    dark = Image.new("RGB", (w, h), (24, 20, 34)); mask = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(mask).ellipse([-w * .25, h * .1, w * 1.25, h * .9], fill=120); mask = mask.filter(ImageFilter.GaussianBlur(160))
+    im = Image.composite(im, dark, mask.point(lambda v: min(255, 70 + v * 2)))
+    return Image.blend(im, dark, .35)
 for i in range(33): save(fabric(i), "fabric-%02d" % (i + 1))
 save(circle_token((42, 138, 128, 255)), "token-me", 85); save(circle_token((200, 85, 61, 255)), "token-opp", 85); save(button(), "icon-button", 85); save(hourglass(), "icon-hourglass", 85)
 save(leather(), "patch-leather"); save(rosette(), "bonus-tile"); save(rosette(128), "icon-bonus", 85); save(torn(), "torn-square"); save(sparkle(), "fx-sparkle", 85); save(stitch(), "fx-stitch", 85); save(card(), "ui-offer-card", 85)
 lea = leather(128).resize((128, 128)); save(lea, "icon-leather", 85)
 save(frame(900, 900, grid=9), "quilt-frame", 82); save(frame(1600, 400, (150, 110, 70), (246, 232, 200), grid=0), "track-frame", 82)
-save(cloth(1080, 1920, (36, 54, 78), (48, 68, 94)), "bg-table", 75); save(cloth(1080, 1920, (40, 60, 90), (56, 78, 108)), "bg-title", 75)
+save(cloth(1080, 1920, (36, 54, 78), (48, 68, 94)), "bg-table", 75); save(quilt_bg(1080, 1920), "bg-title", 78)
 print(len(list(OUT.glob("*.webp"))), "files,", sum(f.stat().st_size for f in OUT.glob("*.webp")) // 1024, "KB")

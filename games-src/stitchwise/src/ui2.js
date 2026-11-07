@@ -4,7 +4,7 @@ function curCells() { var p = curPatch(); return p ? p.or[UI.o] : null; }
 function bbox(c) { var w = 0, ht = 0; c.forEach(function (q) { if (q[0] > w) w = q[0]; if (q[1] > ht) ht = q[1]; }); return [w + 1, ht + 1]; }
 function ghostOk() { var c = curCells(); return !!c && swFits(G.board[viewSeat()], c, UI.gx, UI.gy); }
 function clampG() { var c = curCells(); if (!c) return; var b = bbox(c); UI.gx = Math.max(0, Math.min(9 - b[0], UI.gx)); UI.gy = Math.max(0, Math.min(9 - b[1], UI.gy)); }
-function drawGhost() {
+function drawGhost() { try { markLanding(); } catch (e) { }
   var old = $('#ghost'); if (old) old.remove(); var q = $('#quilt'), p = curPatch(); if (!q || !p || G.over || G.pend) return; clampG(); var c = curCells(), b = bbox(c), ok = ghostOk(), set = {}; c.forEach(function (x) { set[x[0] + ',' + x[1]] = 1; });
   var cs = UI.cs, g = h('div#ghost.' + (ok ? 'ok' : 'bad'), { style: 'left:' + UI.gx * cs + 'px;top:' + UI.gy * cs + 'px;grid-template-columns:repeat(' + b[0] + ',' + cs + 'px);grid-template-rows:repeat(' + b[1] + ',' + cs + 'px);--pc:' + pcol(p.id), 'aria-hidden': 'true' });
   for (var y = 0; y < b[1]; y++) for (var x = 0; x < b[0]; x++) g.appendChild(h('div.gc' + (set[x + ',' + y] ? '' : '.hid')));
@@ -94,7 +94,7 @@ function newGame(mode, o) {
   G = swNew({ seed: seed, first: o.first != null ? o.first : (UI.mode === 'hot' || UI.tutorial || UI.camp ? 0 : seed % 2), ring: o.ring });
   UI.names = UI.mode === 'hot' ? ['Player 1', 'Player 2'] : ['You', UI.camp ? UI.camp.opponent.name : (o.name || ({ easy: 'Poppy', normal: 'Marden', hard: 'Aurelia' }[UI.lvl] || 'Computer'))];
   if (UI.camp && UI.camp.twist) applyTwist(UI.camp.twist); if (o.setup) o.setup(G);
-  UI.started = true; $('#start').hidden = true; $('#rs').hidden = true; AIDELAY = GX.aiDelay(700); try { GX.close(); } catch (e) { }
+  UI.started = true; $('#start').hidden = true; $('#rs').hidden = true; try { clearTimeout(toast.t); $('#toast').classList.remove('on'); } catch (e) { } AIDELAY = GX.aiDelay(700); try { GX.close(); } catch (e) { }
   if (!UI.tutorial && !UI.camp && o.save !== false) saveGame();
   render(); if (!UI.tutorial) schedule(); try { if (typeof hlpPhaseUpdate === 'function') hlpPhaseUpdate(); } catch (e) { } try { GX.showDock(); } catch (e) { } return G;
 }
@@ -109,8 +109,8 @@ function hasSave() { try { var s = JSON.parse(localStorage.getItem('sw_save')); 
 function metrics(g) { var a = swScore(g, 0), b = swScore(g, 1); return { won: swWinner(g) === 0, score: a.total, margin: a.total - b.total, empty: a.empty, bonus: g.bonus === 0 ? 1 : 0, income: g.inc[0], turns: g.turns }; }
 function finish() {
   if (!G || !G.over || UI.finished === G) return; UI.finished = G; try { localStorage.removeItem('sw_save'); if (window.GNS && GNS.saved) GNS.saved('stitchwise', false); } catch (e) { }
-  var w = swWinner(G); sfx(w === 0 || UI.mode === 'hot' ? 'win' : 'lose');
-  if (UI.camp && typeof GXC !== 'undefined') { try { GXC.finish(G); } catch (e) { console.error(e); } return; }
+  var w = swWinner(G);
+  if (UI.camp && typeof GXC !== 'undefined') { var g0 = G; showResult({ after: function () { $('#rs').hidden = true; try { campBest(g0); GXC.finish(g0); campResultNote(g0); } catch (e) { console.error(e); } } }); return; }
   if (!UI.tutorial) { try { if (window.GNS && GNS.result) GNS.result({ game: 'stitchwise', mode: UI.mode === 'hot' ? 'hot' : 'vs', level: UI.lvl, seats: [{ name: 'You', me: true }, { name: UI.names[1], ai: UI.mode === 'hot' ? undefined : UI.lvl }], winner: w, scores: [swScore(G, 0).total, swScore(G, 1).total], turns: G.turns }); } catch (e) { } }
   showResult();
 }

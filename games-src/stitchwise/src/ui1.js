@@ -4,7 +4,7 @@ function h(sel) { var p = sel.split('.'), tg = (p[0] || 'div').split('#'), e = d
 var PAL = ['#c0527a', '#e0a82e', '#2a8a80', '#4a86b8', '#c8553d', '#6b8e4e', '#8a5ba6', '#d98a3d', '#3f6fa0', '#b0486a', '#5a9a6a'];
 function pcol(pid) { return PAL[pid % PAL.length]; } function ppat(pid) { return 'p' + ((pid * 7) % 5); }
 var G = null, AIDELAY = 700, rngUI = Math.random;
-var UI = { started: false, mode: 'vs', lvl: 'normal', sel: -1, o: 0, gx: 0, gy: 0, busy: 0, camp: null, seq: 0, newCells: {}, names: ['You', 'Computer'], tm: {}, sound: true, tutorial: false, lastInc: null, wide: false };
+var UI = { started: false, mode: 'vs', lvl: 'normal', sel: -1, o: 0, gx: 0, gy: 0, busy: 0, camp: null, seq: 0, seq2: 0, newCells: {}, names: ['You', 'Computer'], tm: {}, sound: true, tutorial: false, lastInc: null, wide: false };
 try { UI.sound = localStorage.getItem('sw_sound') !== '0'; } catch (e) { }
 var SVG_BTN = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#e0a82e" stroke="#7a5410" stroke-width="1.4"/><circle cx="10" cy="10" r="5.6" fill="none" stroke="#7a5410" stroke-width="1"/><circle cx="8" cy="8.4" r="1" fill="#5a3a08"/><circle cx="12" cy="8.4" r="1" fill="#5a3a08"/><circle cx="8" cy="11.6" r="1" fill="#5a3a08"/><circle cx="12" cy="11.6" r="1" fill="#5a3a08"/></svg>';
 var SVG_TIME = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 2h10M5 18h10M6 2c0 5 8 5 8 8s-8 3-8 8M14 2c0 5-8 5-8 8s8 3 8 8" fill="none" stroke="#3a2a18" stroke-width="1.6" stroke-linecap="round"/><path d="M7.5 15.5h5L10 12.5z" fill="#c8553d"/></svg>';
@@ -17,6 +17,8 @@ function timeIc() { var i = artImg('icon-hourglass', 'ic'); return i ? i.outerHT
 var AC = null;
 function tone(f, d, type, vol, at) { if (!UI.sound) return; try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); var o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime + (at || 0), v = (vol == null ? .12 : vol) * (GX.pref('sfx') == null ? 1 : GX.pref('sfx')) * (GX.pref('master') == null ? 1 : GX.pref('master')); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d + .02); } catch (e) { } }
 var SFX = { pick: function () { tone(520, .08, 'triangle'); }, tick: function () { tone(700, .05, 'square', .05); }, place: function () { tone(160, .14, 'sine', .22); tone(880, .12, 'triangle', .1, .06); tone(1320, .12, 'triangle', .08, .12); }, coin: function (i) { tone(1100 + (i || 0) * 90, .1, 'triangle', .1); tone(1650 + (i || 0) * 90, .12, 'triangle', .08, .06); }, adv: function () { tone(300, .18, 'sawtooth', .05); tone(450, .18, 'sawtooth', .04, .08); }, bad: function () { tone(140, .18, 'square', .08); }, rot: function () { tone(620, .05, 'triangle', .07); }, win: function () { [523, 659, 784, 1046].forEach(function (f, i) { tone(f, .22, 'triangle', .12, i * .13); }); }, lose: function () { [440, 392, 330].forEach(function (f, i) { tone(f, .26, 'sine', .1, i * .16); }); }, bonus: function () { [784, 988, 1175, 1568].forEach(function (f, i) { tone(f, .2, 'triangle', .1, i * .09); }); } };
+SFX.fanfare = function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, .22, 'triangle', .14, i * .12); }); tone(1047, .6, 'sine', .1, .5); tone(1568, .5, 'triangle', .06, .55); };
+SFX.thud = function () { tone(110, .16, 'sine', .2); };
 function sfx(n, a) { try { SFX[n](a); } catch (e) { } }
 function toast(t, ms) { var e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 function amt(ms) { return GX.animMs ? GX.animMs(ms) : ms; }
@@ -30,7 +32,7 @@ function lvlOf(s) { return UI.mode === 'hot' ? 'human' : (UI.camp ? UI.camp.oppo
 function layout() {
   document.documentElement.classList.toggle('sm', innerHeight < 640); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
   var cs;
-  if (wide) cs = Math.floor(Math.min((H - 20 - 12) / 9, (W * 0.55) / 9)); else cs = Math.floor(Math.min((W - 16 - 10) / 9, (H - 12 - 46 - 56 - 22 - 10) / 9));
+  if (wide) cs = Math.floor(Math.min((H - 20 - 12) / 9, (W * 0.55) / 9)); else cs = Math.floor(Math.min((W - 16 - 10) / 9, (H - 12 - 46 - 56 - 22 - 26) / 9));
   cs = Math.max(18, Math.min(72, cs)); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
   var tw = wide ? Math.max(190, Math.min(520, W - 9 * cs - 70)) : Math.min(W - 16, 560); var tr = $('#track'); if (tr) tr.style.width = tw + 'px';
 }
@@ -52,22 +54,22 @@ function quiltEl(seat, cls) {
   q.setAttribute('aria-label', nameOf(seat) + ' quilt: ' + swEmpty(board) + ' empty squares');
   return q;
 }
-function thumb(seat) { var c = document.createElement('canvas'); c.width = c.height = 46; var x = c.getContext('2d'); x.fillStyle = '#f1e5c8'; x.fillRect(0, 0, 46, 46); for (var i = 0; i < 81; i++) { var p = G.board[seat][i]; if (p === -1) continue; x.fillStyle = p === 99 ? '#4d4032' : p === 100 ? '#8a5a3a' : pcol(p); x.fillRect((i % 9) * 5 + 0.5, ((i / 9) | 0) * 5 + 0.5, 5, 5); } return c; }
+function thumb(seat) { var c = document.createElement('canvas'); c.width = c.height = 90; c.className = 'thumb'; var x = c.getContext('2d'); x.fillStyle = '#f1e5c8'; x.fillRect(0, 0, 90, 90); for (var i = 0; i < 81; i++) { var p = G.board[seat][i]; if (p === -1) continue; x.fillStyle = p === 99 ? '#4d4032' : p === 100 ? '#8a5a3a' : pcol(p); x.fillRect((i % 9) * 10 + 0.5, ((i / 9) | 0) * 10 + 0.5, 9, 9); } return c; }
 function strip(seat) {
   var sc = swScore(G, seat), w = swWho(G) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'Score now ' + sc.total, 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
-    h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), h('b', nameOf(seat)),
+    h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), thumb(seat), h('b', nameOf(seat)),
     h('span.st', h('span.bt', { html: btnIc() + '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span>', title: 'Buttons' }), h('span.bt', { html: '+' + G.inc[seat] + '<small>/spot</small>', title: 'Buttons earned each time a button spot is passed' }), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
 }
 // ---------- track
-function trackCols() { return UI.wide ? 9 : 27; }
+function trackCols() { return UI.wide ? 9 : 18; }
 function trackPos(i) { var cols = trackCols(), r = (i / cols) | 0, c = i % cols; if (r % 2) c = cols - 1 - c; return [r, c]; }
 function renderTrack() {
   var cols = trackCols(), rows = Math.ceil(54 / cols), t = $('#track'); if (!t) { t = h('div#track', { role: 'img' }); }
   t.innerHTML = ''; t.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)'; t.style.gridTemplateRows = 'repeat(' + rows + ',auto)';
   for (var i = 0; i <= SW.TRACK; i++) { var rc = trackPos(i), cell = h('div.tc'); cell.dataset.i = i; cell.style.gridRow = rc[0] + 1; cell.style.gridColumn = rc[1] + 1;
     if (SW.BTN_SPOTS.indexOf(i) >= 0) { cell.classList.add('bspot'); cell.innerHTML = btnIc(); } else if (SW.LEATHER_SPOTS.indexOf(i) >= 0) { cell.classList.add('lspot'); var taken = G.leather[SW.LEATHER_SPOTS.indexOf(i)] !== null; cell.innerHTML = taken ? '<span style="opacity:.45">&#10003;</span>' : leaIc(); } else if (i === 0) cell.classList.add('tstart'); else if (i === 53) cell.classList.add('tend');
-    if (i < Math.min(G.pos[0], G.pos[1])) cell.classList.add('past'); t.appendChild(cell); }
+    if (rc[0] % 2) cell.classList.add('trv'); if (i < Math.min(G.pos[0], G.pos[1])) cell.classList.add('past'); t.appendChild(cell); }
   artBg(t, 'track-frame'); t.style.backgroundSize = '100% 100%';
   [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
   t.setAttribute('aria-label', 'Time track. ' + nameOf(0) + ' at ' + G.pos[0] + ' of 53, ' + nameOf(1) + ' at ' + G.pos[1] + '.');
@@ -76,6 +78,12 @@ function renderTrack() {
 function placeTokens() { var t = $('#track'); if (!t) return; var top = G.stamp[0] > G.stamp[1] ? 0 : 1, last = UI.tokPos || G.pos.slice(); UI.tokPos = G.pos.slice();
   function at(k, cellI, s) { var c = $('.tc[data-i="' + cellI + '"]', t); if (!k || !c) return; k.style.left = (c.offsetLeft + c.offsetWidth / 2 - 8 + (G.pos[0] === G.pos[1] ? (s === 0 ? -5 : 5) : 0)) + 'px'; k.style.top = (c.offsetTop + c.offsetHeight / 2 - 8) + 'px'; }
   [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', t); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (last[s] !== G.pos[s] && amt(1)) { k.style.transition = 'none'; at(k, last[s], s); void k.offsetWidth; k.style.transition = ''; } at(k, G.pos[s], s); }); }
+function markLanding() {
+  var t = $('#track'); if (!t || !G) return; $$('.tc.land,.tc.next', t).forEach(function (e) { e.classList.remove('land', 'next'); }); var s = swWho(G); if (s < 0) s = 0; var pos = G.pos[s], nx = null;
+  SW.BTN_SPOTS.concat(SW.LEATHER_SPOTS.filter(function (l, i) { return G.leather[i] === null; })).forEach(function (b) { if (b > pos && (nx === null || b < nx)) nx = b; });
+  var c = nx != null && $('.tc[data-i="' + nx + '"]', t); if (c) c.classList.add('next');
+  var p = curPatch(); if (p) { var l = $('.tc[data-i="' + Math.min(SW.TRACK, pos + p.time) + '"]', t); if (l) l.classList.add('land'); }
+}
 function trackInfo() {
   var s = swWho(G), me = s >= 0 ? s : 0, pos = G.pos[me], nb = null, nl = null; SW.BTN_SPOTS.forEach(function (b) { if (nb === null && b > pos) nb = b; }); SW.LEATHER_SPOTS.forEach(function (l, i) { if (nl === null && l > pos && G.leather[i] === null) nl = l; });
   return 'Button spot in ' + (nb == null ? '-' : nb - pos) + ' \u00B7 leather in ' + (nl == null ? '-' : nl - pos);
@@ -87,9 +95,10 @@ function render() {
   artBg($('#board'), 'bg-table');
   var pills = h('div#pills', strip(vs), strip(os));
   if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); } else { qc.appendChild(pills); qc.appendChild(q); }
-  var tr = renderTrack(); sd.appendChild(tr); if (UI.wide) sd.appendChild(h('div#tinfo', trackInfo())); placeTokens();
+  var tr = renderTrack(); sd.appendChild(tr); if (UI.wide) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
+  var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }
   try { if (typeof hlpRefresh === 'function') hlpRefresh(); } catch (e) { }
 }
 function patchShape(pid, cls, oc, cells) { var p = PATCHES[pid], c = cells || p.cells, w = 0, ht = 0; c.forEach(function (q) { if (q[0] > w) w = q[0]; if (q[1] > ht) ht = q[1]; }); var s = h('div.shape' + (cls ? '.' + cls : ''), { style: 'grid-template-columns:repeat(' + (w + 1) + ',' + oc + 'px);grid-template-rows:repeat(' + (ht + 1) + ',' + oc + 'px);--pc:' + pcol(pid) }), set = {}; c.forEach(function (q) { set[q[0] + ',' + q[1]] = 1; });
