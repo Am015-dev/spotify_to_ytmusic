@@ -10,7 +10,7 @@ const URL_=process.argv[2]||'http://localhost:8765/';const probs=[];const note=m
   const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:touch,hasTouch:true});const p=await ctx.newPage();
   p.on('pageerror',e=>note(tag+' PAGE ERROR '+e.message));p.on('console',m=>{const t=m.text();if(m.type()==='error'&&!/Failed to load|net::|favicon|Fetch API/.test(t))note(tag+' console error '+t.slice(0,150))});
   await p.goto(URL_);await sleep(1200);await p.evaluate(()=>localStorage.clear());await p.reload();await sleep(1200);
-  if(!await tapSel(p,'#start [data-gxt-open]',touch,probs)){note(tag+' no tutorial button');continue}await sleep(1200);
+  if(!await tapSel(p,'#start [data-a=start]',touch,probs)){note(tag+' no tutorial button');continue}await sleep(1200);
   let multi=0,blocking=0,seenIds=new Set();
   const watch=setInterval(async()=>{try{const s=await p.evaluate(()=>({n:document.querySelectorAll('#coach').length,pe:document.getElementById('coach')?getComputedStyle(document.getElementById('coach')).pointerEvents:'none',id:document.getElementById('coach')&&document.getElementById('coach').dataset.step,fs:document.getElementById('coach')?parseFloat(getComputedStyle(document.querySelector('#coach .cox')).fontSize):99}));
     if(s.n>1)multi++;if(s.pe!=='none')blocking++;if(s.id)seenIds.add(s.id);if(s.fs<14)note(tag+' coach text under 14px')}catch(e){}},150);

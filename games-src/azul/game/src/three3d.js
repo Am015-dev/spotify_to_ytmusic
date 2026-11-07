@@ -136,12 +136,13 @@ function makeEnv(){const r=V3.r;const es=new THREE.Scene();const geo=new THREE.S
   panel(16,16,0xfff0d0,9,-22,42,26);panel(30,8,0xdfeaff,2.2,26,26,-30);panel(8,30,0xfff4e4,1.8,-40,18,-18);panel(40,5,0xffe2b0,1.4,0,14,46);
   // arcade openings: dark columns between bright arches on the horizon
   for(let i=0;i<10;i++){const a=i/10*Math.PI*2;panel(3,9,0x5a3a26,.4,Math.cos(a)*54,4,Math.sin(a)*54)}
-  const pm=new THREE.PMREMGenerator(r);const rt=pm.fromScene(es,.02);pm.dispose();V3.envTex=rt.texture}
+  const pm=new THREE.PMREMGenerator(r);const rt=pm.fromScene(es,.02);pm.dispose();V3.envTex=rt.texture;
+  es.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});es.clear()}   // the lighting-only scene is baked into envTex: nothing of it stays in the scene graph
 // ---------- HDR post pipeline (High): MSAA scene target, bright pass, two-level blur bloom, ACES, grade, vignette, dither ----------
 const PQ_VS='varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}';
 function initPost(){const r=V3.r;if(!r.capabilities.isWebGL2)return;try{
   const mk=(ms)=>new THREE.WebGLRenderTarget(4,4,{type:THREE.HalfFloatType,samples:ms||0,depthBuffer:!!ms});V3.rt={s:mk(4),a:mk(),b:mk(),c:mk(),d:mk()};
-  V3.fsS=new THREE.Scene();V3.fsC=new THREE.OrthographicCamera(-1,1,1,-1,0,1);V3.fsQ=new THREE.Mesh(new THREE.PlaneGeometry(2,2));V3.fsQ.frustumCulled=false;V3.fsS.add(V3.fsQ);
+  V3.fsS=new THREE.Scene();V3.fsS.name='postfx';V3.fsC=new THREE.OrthographicCamera(-1,1,1,-1,0,1);V3.fsQ=new THREE.Mesh(new THREE.PlaneGeometry(2,2));V3.fsQ.frustumCulled=false;V3.fsS.add(V3.fsQ);
   const sm=(fs,u)=>new THREE.ShaderMaterial({uniforms:u,vertexShader:PQ_VS,fragmentShader:fs,depthTest:false,depthWrite:false});
   V3.mBright=sm('uniform sampler2D tIn;uniform float uTh;varying vec2 vUv;void main(){vec3 c=texture2D(tIn,vUv).rgb;float l=max(max(c.r,c.g),c.b);gl_FragColor=vec4(c*smoothstep(uTh,uTh*1.8,l),1.);}',{tIn:{value:null},uTh:{value:1.5}});
   V3.mBlur=sm('uniform sampler2D tIn;uniform vec2 uDir;varying vec2 vUv;void main(){vec3 s=texture2D(tIn,vUv).rgb*.227;s+=(texture2D(tIn,vUv+uDir*1.385).rgb+texture2D(tIn,vUv-uDir*1.385).rgb)*.316;s+=(texture2D(tIn,vUv+uDir*3.23).rgb+texture2D(tIn,vUv-uDir*3.23).rgb)*.07;gl_FragColor=vec4(s,1.);}',{tIn:{value:null},uDir:{value:new THREE.Vector2()}});
@@ -226,7 +227,7 @@ const lathe=(pts,seg)=>new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0]
 function clayMat(){if(!V3.clayM)V3.clayM=emat(new THREE.MeshStandardMaterial({map:V3.T.clayC,roughnessMap:V3.T.clayR,normalMap:V3.T.clayN,roughness:1,envMapIntensity:.7}));return V3.clayM}
 // potted lemon shrubs around the table: lathe pots, instanced leaves and fruit
 function potMesh(i){const g=new THREE.Group();const R=rng(60+i);const pot=new THREE.Mesh(lathe([[0,0],[.62,0],[.66,.06],[.82,.5],[.9,.95],[.86,1.05],[1.0,1.12],[1.02,1.22],[.9,1.25],[.84,1.18],[0,1.18]],28),clayMat());pot.castShadow=pot.receiveShadow=true;g.add(pot);
-  const soil=new THREE.Mesh(new THREE.CircleGeometry(.84,20),mat(new THREE.MeshStandardMaterial({color:0x3a2616,roughness:1})));soil.rotation.x=-Math.PI/2;soil.position.y=1.16;g.add(soil);
+  const soil=new THREE.Mesh(new THREE.CircleGeometry(.84,20),mat(new THREE.MeshStandardMaterial({color:0x58391f,roughness:1})));soil.rotation.x=-Math.PI/2;soil.position.y=1.16;g.add(soil);
   const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.05,.08,1,6),mat(new THREE.MeshStandardMaterial({color:0x5a3f28,roughness:.9})));trunk.position.y=1.6;g.add(trunk);
   const lg=new THREE.SphereGeometry(.16,6,4);lg.scale(1,.28,.55);const N=150;const leaves=new THREE.InstancedMesh(lg,mat(new THREE.MeshStandardMaterial({roughness:.55,envMapIntensity:.6})),N);
   const m4=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler(),v=new THREE.Vector3(),s=new THREE.Vector3(1,1,1),c=new THREE.Color();

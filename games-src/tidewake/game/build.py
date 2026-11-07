@@ -42,6 +42,9 @@ function updLevGLB(L, t) {
 }
 '''
 KIT_PATCHES=[
+ # A11. text size audit: SVG labels drawn in board units (font-size .27 / R*.16) report as 0.3px / 0.1px; draw them at a real px size and scale the text down (same look)
+ ("""<text x="' + p[0] + '" y="' + (p[1] + .085) + '" text-anchor="middle" font-size=".27\"""","""<text transform="translate(' + p[0] + ' ' + (p[1] + .085) + ') scale(.01)" text-anchor="middle" font-size="27\""""),
+ ("""<text y="' + -R * 1.1 + '" text-anchor="middle" font-size="' + R * .16 + '" font-weight="700" fill="' + C.gold + '" stroke="' + C.ink + '" stroke-width="' + R * .015 + '\"""","""<text transform="translate(0 ' + -R * 1.1 + ') scale(.004)" text-anchor="middle" font-size="' + R * 40 + '" font-weight="700" fill="#ffe7a3" stroke="' + C.ink + '" stroke-width="' + R * 3.75 + '\""""),
  # 1. route the render loop through PerfHUD (frame timing + idle saver)
  ("function raf(fn) { return (global.requestAnimationFrame ||","function raf(fn) { return ((global.PerfHUD && global.PerfHUD.raf) || global.requestAnimationFrame ||"),
  # 2. PerfHUD owns the automatic step-down (the kit's own watchdog would fight it)

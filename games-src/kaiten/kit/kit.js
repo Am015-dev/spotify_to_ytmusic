@@ -612,7 +612,7 @@ function roundMarkerSVG(n, state, o) {
   if (state === 'current') s += `<circle r="20.5" fill="url(#kk-glow)"/>`;
   s += `<circle cx="1" cy="1.8" r="17" fill="#2a120c" opacity=".28"/><circle r="17" fill="${c}" stroke="${INK}" stroke-width="1.8"/><circle r="17" fill="url(#kk-lit)"/><circle r="12.6" fill="#fffaf0" stroke="${INK}" stroke-width="1.2"/>`;
   if (state === 'done') s += `<path d="M-6.5 .5L-2 5L7 -5.5" fill="none" stroke="#3f9a4a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>`;
-  else s += `<text x="0" y="6.2" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="17" fill="${state === 'todo' ? '#9c8a68' : INK}">${n}</text>`;
+  else s += `<text x="0" y="6.2" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="17" fill="${state === 'todo' ? '#5e4a2c' : INK}">${n}</text>`;
   return s + '</svg>';
 }
 function roundTrackSVG(cur, o) {

@@ -21,7 +21,7 @@ function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];const has=C
   let h=`<table class="dial" role="grid" aria-label="Maneuver dial: rows are speeds, columns are directions"><thead><tr><th class="sp">speed</th>${COLS.map((c,i)=>`<th class="cw">${has[i]?COLW[i]:''}</th>`).join('')}</tr></thead><tbody>`;
   for(let sp=5;sp>=1;sp--){let row='';let any=false;for(const [t,dd,ic] of COLS){const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);
       if(i<0){row+='<td></td>';continue}any=true;const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;
-      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}">${ic}<small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}</button></td>`}
+      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}"><b class="mvic">${ic}</b><small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}</button></td>`}
     if(any)h+=`<tr><th>${sp}</th>${row}</tr>`}
   return h+'</tbody></table>'}
 // the result line for the player reading it: "You win/lose: …" in a solo or online game, the neutral line in hot-seat or watch

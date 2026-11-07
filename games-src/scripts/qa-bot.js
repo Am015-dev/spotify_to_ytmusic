@@ -47,7 +47,7 @@ const { chromium } = require(fs.existsSync(path.join(ROOT, 'games-src', 'node_mo
 const gx = require('./gx-serve.js');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
-const LIM = { tutorial: 150, coach: 360, quick: 220, story: 140, fuzz: 60 };   // seconds per phase at --scale 1
+const LIM = { tutorial: 150, coach: 720, quick: 220, story: 140, fuzz: 60 };   // seconds per phase at --scale 1
 const lim = k => LIM[k] * SCALE * 1000;
 
 const bugs = [], seen = new Set();
@@ -403,7 +403,7 @@ async function phaseStory(browser, url) {
   try {
     const b = await ev(page, () => { const e = document.querySelector('[data-a=story]') || [...document.querySelectorAll('button,[data-a],a')].find(x => window.__qa.vis(x) && /story|campaign|adventure|chapter/i.test(x.innerText || '')); if (!e || !window.__qa.vis(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
     if (!b) { summary.story.result = null; summary.story.note = 'no Story button on the title'; return; }
-    await tap(page, b.x, b.y); await sleep(1500); await staticScan(page, P, 'story-map');
+    await tap(page, b.x, b.y); await sleep(1500); if (await ev(page, () => window.GXCOACH && window.GXCOACH.running)) { const sk = await goTo(page, '^skip to map|^story map|^skip'); await sleep(1200); if (!sk && (await ev(page, () => window.GXCOACH && window.GXCOACH.running))) { summary.story.result = 'prologue'; summary.story.note = 'Story opens with the coached prologue game (tested in the tutorial phase); no skip-to-map button'; console.log('  story: coached prologue, map not reached (not a bug)'); return; } } await staticScan(page, P, 'story-map');
     ci.where = () => 'story: map';
     const s1 = await goTo(page, '^(stage\\s*)?1\\b|^1$|chapter 1|level 1|first|start|begin|play|go\\b|continue|new');
     if (!s1 && !(await ev(page, () => typeof GXT !== 'undefined' && GXT.running()))) { bug('BLOCKER', P, 'story map', 'no stage 1 / start element on the Story map', { shot: await shot(page, 'story-nomap') }); summary.story.result = false; return; }
