@@ -153,4 +153,57 @@ body:has(.gxc:not([hidden])) .gx-app{visibility:hidden}
 .gx-drawer-head h2,.gx-x{color:#f3e7c9}.gx-x{background:#33484c}
 .chip.r-free{background:#2f6a3a;padding:0 6px}
 body.gxdrawer .gx-app,body.gxdrawer #start{visibility:hidden}
+
+/* ---- W397 playable pass: turn line, banner, drawn resource shapes, readable cards ---- */
+#instr{flex:0 0 auto;display:flex;align-items:center;gap:8px;min-height:36px;padding:4px 8px;border-radius:10px;background:#0c171b;border:2px solid #f2c230;color:#fff;font-size:max(14px,var(--fmin));font-weight:700;line-height:1.15}
+#instr[data-k=rival]{border-color:#ff8a7a}#instr[data-k=info]{border-color:#7fd0ff}
+#instr .tg{flex:0 0 auto;padding:2px 8px;border-radius:7px;background:#f2c230;color:#231a05;font-size:max(13px,var(--fmin));font-weight:800;white-space:nowrap}
+#instr[data-k=rival] .tg{background:#ff8a7a;color:#2a0a05}#instr[data-k=info] .tg{background:#7fd0ff;color:#04202e}
+#instr .tx{flex:1 1 auto;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#banner{display:none;position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:75;pointer-events:none;padding:14px 28px;border-radius:16px;font-size:clamp(1.5rem,6vw,2.4rem);font-weight:900;letter-spacing:.02em;color:#231a05;background:#f2c230;border:3px solid #fff;box-shadow:0 8px 30px rgba(0,0,0,.6);white-space:nowrap}
+#banner.k-rival{background:#ff8a7a;color:#2a0a05}#banner.k-info{background:#7fd0ff;color:#04202e}
+@keyframes bann{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}30%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+#toast{bottom:auto;top:62px;max-width:92vw;text-align:center;font-size:max(14px,var(--fmin))}
+/* resource shapes: wood = log, clay = brick, stone = rock, glass = drop, papyrus = scroll, coin = disc; the number is the amount */
+.chip{border-radius:5px;min-width:max(22px,calc(var(--cw)*.24));height:max(22px,calc(var(--cw)*.24));font-size:max(13px,var(--fmin),calc(var(--cw)*.14));padding:0 3px}
+.chip>b{position:relative;text-shadow:0 1px 1px rgba(0,0,0,.45)}
+.chip.r-wood{border-radius:9px;background:linear-gradient(#a06a35 0 30%,#6e4519 30% 36%,#a06a35 36% 64%,#6e4519 64% 70%,#a06a35 70%)}
+.chip.r-clay{border-radius:2px;background:linear-gradient(90deg,#c9603a 0 48%,#7a321a 48% 52%,#c9603a 52%)}
+.chip.r-stone{border-radius:0;clip-path:polygon(25% 4%,75% 4%,100% 50%,75% 96%,25% 96%,0 50%);background:#7a7f86;color:#fff;border:0}
+.chip.r-glass{border-radius:50% 50% 50% 50%/65% 65% 35% 35%;background:#2a9fd0;color:#fff}
+.chip.r-papyrus{border-radius:3px;background:linear-gradient(90deg,#8a6b2a 0 12%,#e8cf7e 12% 88%,#8a6b2a 88%);color:#2b2013;text-shadow:none}
+.chip.r-coin{border-radius:50%;background:#e8b923;color:#3a2800;text-shadow:none;border:2px solid #9a7408}
+.chip.wd{padding:0 7px;gap:4px;font-size:max(14px,var(--fmin))}
+.chip.r-stone.wd{clip-path:none;border-radius:6px;background:#6d727a}
+.card .glyph{top:24%;bottom:36%}.card .glyph .sfx{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:max(13px,var(--fmin));font-weight:800;line-height:1.05;color:#231a0a;text-transform:capitalize}
+.card.av{box-shadow:0 0 0 3px #f2c230,0 0 14px 3px rgba(242,194,48,.75),0 2px 4px rgba(0,0,0,.45);animation:avglow 1.6s ease-in-out infinite}
+@keyframes avglow{50%{box-shadow:0 0 0 3px #fff2a8,0 0 20px 6px rgba(242,194,48,.95),0 2px 4px rgba(0,0,0,.45)}}
+.card.cov:not(.down):not(.taken){filter:brightness(.62) saturate(.7)}
+.card.newfree{animation:newfree .7s ease 2}
+@keyframes newfree{50%{transform:translateY(-8px) scale(1.12)}}
+.card.dim{opacity:.7}
+.tokrow{gap:4px;min-height:44px}
+.tok{flex:1 1 0;min-width:0;width:auto;height:44px;border-radius:9px;border-width:2px;background:#46563a;font-size:max(13px,var(--fmin));line-height:1.05;padding:2px 3px;white-space:normal;display:flex;align-items:center;justify-content:center;text-align:center}
+.tok.mini{flex:0 1 auto;height:30px;width:auto;max-width:118px;padding:2px 6px;font-size:max(13px,var(--fmin))}
+.tok span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#draft{align-content:start;gap:8px;grid-template-columns:repeat(2,1fr)}
+#draft .dnote{grid-column:1/-1;margin:2px 2px 0;font-size:max(14px,var(--fmin));line-height:1.3;opacity:.95}
+.wcard{min-height:150px;padding:8px;background:#27414a}.wcard b{font-size:max(15px,var(--fmin));margin-bottom:3px}.wcard small{font-size:max(14px,var(--fmin));line-height:1.25;opacity:1}
+.wcard .costs{flex-wrap:wrap;gap:4px;--cw:70px}.wcard.go{box-shadow:0 0 0 2px #f2c230;animation:pulse 1.2s infinite}
+.wcard.aipick{box-shadow:0 0 0 3px #ff8a7a;transform:scale(1.03)}
+.strip .wt{font-size:max(13px,var(--fmin))}
+.zinfo p{font-size:max(14px,var(--fmin))}
+#res .cu{font-variant-numeric:tabular-nums}#res .line{max-width:34ch;font-size:max(15px,var(--fmin));font-style:italic;color:#ffe9a8}
+#msg{font-size:max(14px,var(--fmin))}#sub{font-size:max(14px,var(--fmin))}
+#bd.drafting #mil,#bd.drafting #tokrow{display:none}
+.card.sm .fx{display:none}.card.sm .glyph{top:27%;bottom:30%}
+#draft{grid-template-columns:repeat(2,1fr);align-content:stretch;gap:6px;padding:4px 2px}
+.wcard{min-height:0;padding:6px 8px}
+.card.sm .band{font-size:13px;letter-spacing:-.045em;padding:2px 1px 2px 2px;overflow-wrap:normal;word-break:normal;hyphens:none}
+.card .costs{background:rgba(43,32,19,.2);border-top:1px solid rgba(43,32,19,.35);left:0;right:0;bottom:0;padding:2px 0}
+.card.sm .glyph .sfx{font-size:14px}
+/* the guide speaks from the tutorial bubble: a code-drawn portrait next to her name */
+.gxt-bub .gxh-tt{display:flex;align-items:center;gap:8px;font-size:max(14px,var(--fmin));font-weight:800}
+.gxt-bub .gxh-tt::before{content:"I";flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:#2c7a52;color:#fff;border:2px solid #f2c230;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:16px}
+.gxt-bub .gxh-tx{font-size:max(14.5px,var(--fmin));line-height:1.3}
 </style></head>
