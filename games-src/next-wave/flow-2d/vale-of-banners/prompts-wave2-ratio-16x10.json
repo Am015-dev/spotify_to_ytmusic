@@ -1,0 +1,14 @@
+{
+ "wave": 2,
+ "ratio": "16:10",
+ "flow_aspect": "16:9",
+ "style": "Painted flat 2D storybook illustration, soft gouache texture, clean bold shapes with gentle shading, a warm medieval-valley palette of parchment cream, river blue, meadow green, keep-stone green, saffron and crimson banners, thin warm brown outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "vale-of-banners 2D wave 2, ratio 16:10. Paste with Flow aspect 16:9; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "vale-of-banners",
+  "count": 1
+ },
+ "cards": {
+  "bg-map": "Painted flat 2D storybook illustration, soft gouache texture, clean bold shapes with gentle shading, a warm medieval-valley palette of parchment cream, river blue, meadow green, keep-stone green, saffron and crimson banners, thin warm brown outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A storybook parchment map of the whole valley, river bending through the middle, small drawn keeps, mills, bridges, forests, a mountain mine in the north and a harbour in the south, empty ribbon banners along the road for stops, no labels, no letters."
+ }
+}

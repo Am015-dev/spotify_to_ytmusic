@@ -63,6 +63,8 @@ async function rulesCheck(p,ctx,ph){
 async function coachBubble(p,ctx,ph){
   const hs=await p.evaluate(ph=>({on:GXH.enabled(),cur:hlpPhase()}),ph);
   if(hs.cur!==ph)return;p.cb=p.cb||{};
+  // W388: pick/rack coach bubbles were removed (they covered the kilns; the instruction line says the same). Only the grey-wall bubble remains.
+  if(ph!=='wall'){const b=await p.evaluate(()=>!!document.querySelector('.gxh-bub.on[data-phase]'));await chk(!b,'no coach bubble over the kilns for '+ph,ctx,ph,p);return}
   if(!hs.on){const b=await p.evaluate(()=>!!document.querySelector('.gxh-bub.on[data-phase]'));await chk(!b,'tips off: no coach bubble',ctx,ph,p);return}
   if(p.cb[ph]){await sleep(450);const b=await p.evaluate(()=>!!document.querySelector('.gxh-bub.on[data-phase]'));await chk(!b,'bubble shows once per phase',ctx,'bubble again for '+ph,p);return}
   p.cb[ph]=1;

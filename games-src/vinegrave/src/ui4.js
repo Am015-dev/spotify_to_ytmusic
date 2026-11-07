@@ -33,41 +33,47 @@ const tq = sel => () => { const e = typeof sel === 'function' ? sel() : $(sel); 
 const tinsp = txt => () => [...document.querySelectorAll('#insp .btn')].find(b => b.textContent.indexOf(txt) === 0) || null;
 const tmine = () => !!(G && UI.mode === 'tutorial' && myTurn() && !UI.busy && $('#fx').hidden);
 function tutAI(s) { if (s !== 1) return null; const ms = VG.moves(G); return ms.find(m => m.t === 'dig' && G.sites[m.s].lvl === 0) || ms.find(m => m.t === 'pass'); }
-function tutSetup() {
+function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up once (TUTORIAL-COVERAGE.md) */
   try { GX.close(); } catch (e) { } closeRes(); UI.fast = false;
-  startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'] });
+  startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 2 });
   const me = G.p[0], tm = G.p[1];
-  const back = me.hand.concat(me.deck); me.hand = ['trail', 'dread', 'grant', 'dread', 'trail']; me.deck = ['grant'];
-  me.res = { coin: 2, compass: 2, tablet: 0, arrow: 0, jewel: 0 };
+  me.hand = ['trail', 'dread', 'grant', 'dread', 'trail']; me.deck = ['grant'];
+  me.res = { coin: 2, compass: 2, tablet: 1, arrow: 0, jewel: 1 };
   tm.hand = ['dread', 'grant', 'dread', 'trail', 'grant']; tm.deck = ['trail'];
+  const gi = G.guards.indexOf('glass-moth'); if (gi >= 0) { G.guards.splice(gi, 1); G.guards.push('glass-moth'); }
   const li = G.items.indexOf('lamp'); if (li >= 0) { G.items[li] = G.row[0]; G.row[0] = 'lamp'; } else { const ri = G.row.indexOf('lamp'); if (ri > 0) { G.row[ri] = G.row[0]; G.row[0] = 'lamp'; } }
   G.turn = 0; G.first = 0; render();
 }
-function tutSteps() {
+const TS = id => { const t = V.STORY.tut[id]; return { title: t[0], say: t[1] }; };
+const tglow = sel => () => { const e = [...document.querySelectorAll(sel)].find(x => x.getBoundingClientRect().width); return e || null; };
+function tutSteps() {   /* the prologue: Pell's story reason in every bubble, one real action per step, a whole short game to the final count */
+  const st = (id, o) => Object.assign({ id }, TS(id), o);
   return [
-    { id: 'goal', title: 'Welcome to Vinegrave', say: 'Explore for 5 rounds; most points wins. You start at -2: your deck holds two Dread cards, -1 point each until you exile them. This practice is one round against Tamsin.', target: tq('#map'), wait: null, ready: () => tmine() },
-    { id: 'hand', title: 'Your cards', say: 'Play a card for its effect, or spend it to pay travel. Tap Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
-      wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() },
-    { id: 'play', title: 'Play it', say: 'Trail Notes gives a compass. One main action ends your turn.', target: tq(tinsp('Play it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()) },
-    { id: 'watch', title: 'Tamsin\'s turn', say: 'Tamsin sent an explorer to a camp site. Now you have 3 compasses.', target: tq('#opp'), wait: null, ready: () => tmine() && G.p[1].ex < 2 },
-    { id: 'ruin', title: 'A hidden ruin', say: '3 compasses and 2 Boots discover it. Tap the hidden ruin.', target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)),
-      wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() },
-    { id: 'disc', title: 'Discover it', say: 'Your two Dread cards pay the Boots. Tap Discover.', target: tq(tinsp('Discover')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }, ready: () => !!(UI.insp && tinsp('Discover')()) },
-    { id: 'guard', title: 'A guardian wakes!', say: 'You took loot and an idol, but a guardian now shares the ruin with your explorer.', target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: null, ready: () => tmine() && !!G.sites[TUT_SITE].guard },
-    { id: 'idol', title: 'Your idol', say: 'Idols score 3 points. Set one in a shrine for a free boon.', target: tq('#extra [data-a=idol]'), wait: null, ready: () => tmine() && !!$('#extra [data-a=idol]') },
-    { id: 'market', title: 'The market', say: 'Items cost coins; artifacts cost compasses. Tap the Tin Lamp.', target: tq('#row .cd[data-r="0"]'), wait: { type: 'tap', match: a => a.what === 'row' && a.x === 0 }, ready: () => tmine() },
-    { id: 'buy', title: 'Buy it', say: 'Bought items go under your deck. Tap Buy it.', target: tq(tinsp('Buy it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }, ready: () => !!(UI.insp && tinsp('Buy it')()) },
-    { id: 'track', title: 'Research', say: 'Climb this track with tablets, arrowheads and jewels for points. The top is the temple.', target: tq('#track'), wait: null, ready: () => tmine() },
-    { id: 'pass', title: 'Pass', say: 'Done for this round? Pass. The round ends when all have passed.', target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() },
-    { id: 'fear', title: 'Fleeing costs', say: 'Your explorer fled the guardian: a Dread card joins your deck. Overcome guardians to avoid it.', target: tq('#myres'), wait: null, ready: () => !!(G && G.round === 2 && !UI.busy) },
-    { id: 'end', title: 'Ready to explore', say: 'Guardians give 5 points and a boon. A full game lasts 5 rounds. Good luck!', target: tq('#map'), wait: null, ready: () => !!(G && G.round === 2) }
+    st('hand', { target: tq(() => $('#hand .cd[data-id="trail"]')), wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() }),
+    st('play', { target: tq(tinsp('Play it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()) }),
+    st('ruin', { target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && G.p[1].ex < 2 }),
+    st('disc', { target: tq(tinsp('Discover')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }, ready: () => !!(UI.insp && tinsp('Discover')()) }),
+    st('idol', { target: tq('#extra [data-a=idol]'), wait: { type: 'tap', match: a => a.what === 'idol' }, ready: () => tmine() && !!G.sites[TUT_SITE].guard && !!$('#extra [data-a=idol]') && G.p[1].ex < 1 }),
+    st('shrine', { target: tq(tinsp('Shrine: 3 coins')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'idol' }, ready: () => !!(UI.insp && tinsp('Shrine: 3 coins')()) }),
+    st('beat', { target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && !UI.insp }),
+    st('over', { target: tq(tinsp('Overcome')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'beat' }, ready: () => !!(UI.insp && tinsp('Overcome')()) }),
+    st('boon', { target: tq('#extra [data-a=guard]'), wait: { type: 'tap', match: a => a.what === 'guard' }, ready: () => tmine() && G.p[0].guards.length > 0 && !!$('#extra [data-a=guard]') }),
+    st('useboon', { target: tq(tinsp('Use the boon')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'boon' }, ready: () => !!(UI.insp && tinsp('Use the boon')()) }),
+    st('market', { target: tq('#row .cd[data-r="0"]'), wait: { type: 'tap', match: a => a.what === 'row' && a.x === 0 }, ready: () => tmine() && !UI.insp }),
+    st('buy', { target: tq(tinsp('Buy it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }, ready: () => !!(UI.insp && tinsp('Buy it')()) }),
+    st('pass', { target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() && G.round === 1 }),
+    st('dig', { target: tq(tglow('#map .site.l0.glow, #map .site.glow')), wait: { type: 'tap', match: a => a.what === 'site' }, ready: () => tmine() && G.round === 2 && !!tglow('#map .site.glow')() }),
+    st('digit', { target: tq(() => tinsp('Dig here')() || tinsp('Discover')()), wait: { type: 'tap', match: a => a.what === 'mv' && (a.m.t === 'dig' || a.m.t === 'disc') }, ready: () => !!(UI.insp && (tinsp('Dig here')() || tinsp('Discover')())) }),
+    st('pass2', { target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() && G.round === 2 }),
+    st('score', { say: () => { const a = VG.score(G, 0).total, b = VG.score(G, 1).total; return `You ${a}, Tamsin ${b}. ` + (a >= b ? V.STORY.endWin : V.STORY.endLose); },
+      target: tq('#rs table'), wait: null, ready: () => !!(G && G.phase === 'over' && $('#rs table') && !$('#rs').hidden) })
   ];
 }
 function tutStart(o) {
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; closeInsp();
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters[0];
   GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'You know the basics', endText: o ? 'Dig, discover, buy, research, pass. Now the Story begins.' : 'Dig, discover, buy, research, pass. The lightbulb helps any time.',
+    endTitle: 'Prologue complete', endText: o ? 'Pell: "You played a whole expedition. Now the coast, and Tamsin, are waiting."' : 'Pell: "A whole expedition, start to count. A real game is 5 rounds. The lightbulb helps any time."',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start stage 1' }] : null,
     setup: tutSetup,
     onDone: r => { const c = r && r.choice; clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp();

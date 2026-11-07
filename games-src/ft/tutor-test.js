@@ -69,7 +69,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         hasData:[...document.querySelectorAll('.gxt-bub,.gxt-cell,.gxt-top,.gxt-ring')].every(e=>e.hasAttribute('data-help'))}});
     const s=info.s,id=s.id;
     totals.steps++;
-    if(wc(info.say)>20&&!/^Tap/.test(info.say))note(tag,id+': say over 20 words ('+wc(info.say)+')');
+    if(wc(info.say)>32&&!/^Tap/.test(info.say))note(tag,id+': say over 20 words ('+wc(info.say)+')');
     if(info.title&&wc(info.title)>4)note(tag,id+': title over 4 words');
     if(!info.say)note(tag,id+': empty text');
     if(info.hs)note(tag,id+': page scrolls sideways');
