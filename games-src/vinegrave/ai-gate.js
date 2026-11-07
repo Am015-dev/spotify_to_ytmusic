@@ -16,4 +16,6 @@ function run(lvl) {
   return { lvl, winPct: Math.round(100 * wins / N), ties, avgScore: (sc[0] / N).toFixed(1), botScore: (sc[1] / N).toFixed(1), resLeftAtEnd: (left / N).toFixed(1) };
 }
 const r = ['hard', 'normal'].map(run); r.forEach(x => console.log(JSON.stringify(x)));
-const ok = r[0].winPct >= 70 && r[1].winPct >= 55; console.log(ok ? 'PASS ai-gate' : 'FAIL ai-gate'); process.exit(ok ? 0 : 1);
+const ok = r[0].winPct >= 70 && r[1].winPct >= 55; console.log(ok ? 'PASS ai-gate' : 'FAIL ai-gate'); process.exitCode = ok ? 0 : 1;
+// head to head: hard vs normal (2 players, seats alternated)
+if (process.argv[3] !== 'nohh') { let w = 0, n = +process.argv[2] || 100; for (let g = 0; g < n; g++) { const hs = g % 2, G = VG.newGame({ np: 2, seed: 8000 + g }); let k = 0; while (G.phase === 'play' && k++ < 4000) { const s = VG.actor(G); VG.apply(G, VAI.choose(G, s === hs ? 'hard' : 'normal')); } if (G.winner === hs) w++; } console.log('hard vs normal head-to-head: hard wins ' + Math.round(100 * w / n) + '%'); }

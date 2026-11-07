@@ -45,6 +45,18 @@
       out.push({ m: m, d: d });
     });
     if (!out.length) return ms[ms.length - 1];
+    // hard: look one of my own turns further for the 6 best candidates (gather now, spend next turn)
+    if (lvl === 'hard' && !inner && depth === 0) {
+      out.sort(function (a, b) { return b.d - a.d; });
+      out.slice(0, 6).forEach(function (o) {
+        if (o.m.t === 'pass') return;
+        var H = VG.clone(G); VG.apply(H, o.m); settle(H, s, lvl, 1);
+        if (H.phase !== 'play' || H.p[s].passed) return;
+        H.q = null; H.turn = s; var v1 = value(H, s, lvl), m2 = best(H, s, lvl, 1, true); if (!m2 || m2.t === 'pass') return;
+        var H2 = VG.clone(H); if (!VG.apply(H2, m2).ok) return; settle(H2, s, lvl, 2);
+        o.d += 0.5 * Math.max(0, value(H2, s, lvl) - v1);
+      });
+    }
     var noise = lvl === 'easy' ? 1.6 : lvl === 'normal' ? 0.25 : 0;
     if (!inner && noise) { var rr = function () { return VG.rng(G) - 0.5; }; out.forEach(function (o) { o.d += rr() * noise * 2; }); }
     out.sort(function (a, b) { return b.d - a.d; });

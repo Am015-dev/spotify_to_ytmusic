@@ -92,7 +92,30 @@ const RULES_HTML = `<div class="rules">
 <h3>Free actions</h3><p>Any time on your turn: use a guardian's boon, or set one idol in a shrine for a one-time boon (idols score 3 either way).</p>
 <h3>End of a round</h3><p>Explorers come home. An explorer still sharing a site with a guardian brings back a Dread card. Played cards go to your discard; you keep unplayed cards and draw up to 5. The market shifts: the item and the artifact beside the divide leave, and one more artifact slot opens.</p>
 <h3>Solo</h3><p>A rival expedition plays one card after each of your actions: it camps on sites, takes market cards, climbs research and hunts guardians. Beat its score.</p></div>`;
-function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + (window.GXT ? '<p><button type="button" class="btn go" data-a="tut">Play the guided round</button></p>' : ''); return d; }
+function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
+// card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
+function refInit() {
+  if (!GX.reference) return;
+  const cardItem = id => { const c = V.CARDS[id]; return { id: 'c-' + id, name: c.name, text: c.text + (c.t !== 'fear' ? ' Travel: ' + V.TNAME[c.tr] + '.' : ' Travel: Boot.'), count: c.t === 'item' || c.t === 'art' ? 1 : (id === 'dread' ? 19 : 2), tags: [c.t === 'item' ? 'Item' : c.t === 'art' ? 'Artifact' : c.t === 'fear' ? 'Dread' : 'Starting card', V.TNAME[c.tr]], meta: (c.t === 'item' ? c.cost + ' coins' : c.t === 'art' ? c.cost + ' compasses' : 'start deck') + ' · ' + (c.vp || 0) + ' points', pic: { card: id } }; };
+  const S = [
+    { id: 'items', title: 'Items', items: V.ITEMS.map(cardItem) },
+    { id: 'arts', title: 'Artifacts', items: V.ARTS.map(cardItem) },
+    { id: 'basic', title: 'Starting cards', items: ['grant', 'trail', 'dread'].map(cardItem) },
+    { id: 'guards', title: 'Guardians', items: V.GUARDS.map(g => ({ id: 'g-' + g, name: V.GUARD[g].name, text: 'Overcome: pay ' + V.resText(V.GUARD[g].cost) + '. ' + V.GUARD[g].text, tags: ['Guardian'], meta: '5 points', pic: { guard: g } })) },
+    { id: 'ruins', title: 'Ruins', items: V.S1.concat(V.S2).map(t => ({ id: 's-' + t, name: V.SITE[t].name, text: 'Dig: gain ' + V.resText(V.SITE[t].rew) + '.', tags: ['Level ' + V.SITE[t].lvl], meta: 'Discover for ' + V.DISC[V.SITE[t].lvl] + ' compasses', pic: { site: t } })) },
+    { id: 'camp', title: 'Camp sites', items: V.CAMP.map(c => ({ id: 's-' + c.id, name: c.name, text: 'Dig: gain ' + V.resText(c.rew) + '. Travel: ' + c.cost.map(t => V.TNAME[t]).join(' + ') + '.', tags: ['Camp'], meta: 'always open', pic: { site: c.id } })) },
+    { id: 'idols', title: 'Idols', items: V.IDOLS.map(i => ({ id: 'i-' + i, name: V.IDOL[i].name, text: 'Found when you discover a ruin: gain ' + V.resText(V.IDOL[i].gift) + '. Worth 3 points.', tags: ['Idol'], meta: '3 points', pic: { idol: i } })) }
+  ];
+  GX.reference(S, { id: 'refd', title: 'All cards', label: 'Cards', button: false,
+    picture: (it, big) => { const w = big ? 150 : 52, P = it.pic;
+      if (P.card) return `<div style="width:${w}px;--cw:${w}px">${cardHTML(P.card, {})}</div>`;
+      const st = P.guard ? 'guard-' + P.guard : P.site ? 'site-' + P.site : P.idol, sym = P.guard ? 'guard' : P.site ? 'leaf' : 'idol';
+      const d = document.createElement('div'); d.style.cssText = `width:${w}px;height:${w}px;border-radius:12px;background:#3c5a3f;display:flex;align-items:center;justify-content:center`; d.setAttribute('data-art', st);
+      d.innerHTML = `<svg width="60%" height="60%" aria-hidden="true"><use href="#s-${sym}"/></svg>`; setTimeout(() => { if (typeof artApply === 'function') artApply(d.parentNode || document); }, 0); return d; },
+    inGame: it => !!G && it.pic && it.pic.card && (G.row.indexOf(it.pic.card) >= 0 || G.p.some(p => p.hand.concat(p.deck, p.disc, p.play).indexOf(it.pic.card) >= 0)) });
+}
+function cardsOpen(id) { closeInsp(); try { if (id) GX.refOpen(id); else GX.show('refd'); } catch (e) { } }
+UIACT.cards = t => cardsOpen(t.dataset.id ? 'c-' + t.dataset.id : null);
 function drawers() {
   GX.drawer('scored', 'Scores', scoresEl()); GX.drawer('logd', 'Log', logEl()); GX.drawer('rulesd', 'How to play', rulesEl());
   GX.onShow = id => { if (id === 'scored') GX.drawer('scored', 'Scores', scoresEl()); if (id === 'logd') GX.drawer('logd', 'Log', logEl()); closeInsp(); };
@@ -102,7 +125,7 @@ function menu() {
   GX.settings({ id: 'setd', title: 'Menu',
     game: S => { S.appendChild(GX.row('This game', [b('Restart', restartGame), b('Title', showTitle), b('Story map', storyOpen)])); },
     sound: S => { S.appendChild(GX.row('Sound effects', GX.onoff(UI.prefs.sound !== false, v => { UI.prefs.sound = v; savePrefs(); }))); S.appendChild(GX.row('Music', [GX.onoff(UI.prefs.music !== false, v => { UI.prefs.music = v; savePrefs(); musicSync(); }), b('Pick songs', () => { try { GXMUS.open(); } catch (e) { } })])); },
-    help: S => { S.appendChild(GX.row('Learn', [b('Rules', () => setTimeout(() => GX.show('rulesd'), 50)), b('Tutorial', () => tutStart())])); if (window.GXH) { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'gx-row', btnClass: 'btn' }); S.appendChild(w); } },
+    help: S => { S.appendChild(GX.row('Learn', [b('Rules', () => setTimeout(() => GX.show('rulesd'), 50)), b('Tutorial', () => tutStart()), b('All cards', () => setTimeout(() => cardsOpen(), 50))])); if (window.GXH) { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'gx-row', btnClass: 'btn' }); S.appendChild(w); } },
     about: { name: 'Vinegrave', version: '1.0', text: 'An original jungle-expedition game for the Game Night Shelf. Temporary icons made by Lorc, Delapouite and Caro Asercion, game-icons.net, CC BY 3.0.' } });
 }
 // Restart: the same kind of game again (a Story stage restarts that stage)

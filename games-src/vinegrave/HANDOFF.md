@@ -22,7 +22,13 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
 - `node playtest.js both`: like a player with real taps, per size: tutorial offered + played to its end card, a whole game to the result,
   Story stages 1 and 2 started and 4 turns each: PASS, 0 errors.
 - build-all --quick: PASS (5 ?scn= scenarios in src/scn.js: vg-board, vg-guardian, vg-overcome, vg-market, vg-result).
-- ui-audit.spec.js (local staging via scripts/gx-serve.js, phone + pc): phone A0 B0 C0 D0 E5 F1, pc A0 B0 C0 D0 E3 F1.
+- Story map now fits the screen (rows pulled closer, text unchanged; no scrolling at 390x763 and 1440x860; very short screens keep a scroll).
+- ui-audit.spec.js (local staging via scripts/gx-serve.js, phone + pc): A0 B0 on both; E5 phone / E4 pc, all on the "panel Menu" surface.
+  Logged cause (copy of the spec printing what each tap hits): when the audit lists that surface's buttons, the page's own menu walker
+  (gx-scenario menuPass, started by ?scn=menu) has the Story map open; the first tap (Back) closes it and the remaining saved map-node
+  positions land on Menu text. With the audit's boot() also waiting for `GXS.menuN` (walker finished) the same build gives
+  **phone A0 B0 E0, pc A0 B0 E0**. Proposed one-line shared fix in scripts/ui-audit.spec.js boot():
+  `await page.waitForFunction(() => GXS.menuN >= 1, null, { timeout: 60000 }).catch(() => {});`
   Every remaining E is a Story-map button tapped on the "panel Menu" surface: the `?scn=menu` page runs the shared menu walker
   (gx-scenario menuPass), which opens the Story map and scrolls it (the map is a fixed 898 px tall in gx-campaign) while the audit
   taps coordinates it saved earlier. The same buttons all pass on the audit's own "campaign" surface (checked with a logging copy
@@ -32,11 +38,14 @@ Build: `python3 build.py` (inlines games-src/shell kits; never copies them). Gat
 - Picture loader proven with 3 dummy files (title-bg, card-trail, site-c-spring): drawn at slot aspect, 0 failed requests; files deleted.
 
 ## Addendum gates (orchestrator, 7 Nov)
-- AI gate (`node ai-gate.js 100`, 2 players, seats alternated, vs a bot taking the first legal non-pass action): Hard wins 97%
-  (avg 52.0 vs 24.3), Normal 92% (49.8 vs 24.3). Spending: about 6 resources left at the end in total (~1 of each type), no hoarding.
+- AI gate (`node ai-gate.js 100`, 2 players, seats alternated, vs a bot taking the first legal non-pass action): Hard wins 100%
+  (avg 65.6 vs 25.1), Normal 92% (49.8 vs 24.3); Hard vs Normal head to head: Hard wins 75%. Hard looks one of its own turns ahead
+  for its 6 best moves (gather now, spend next turn). Spending: 4.2 (hard) / 6.0 (normal) resources left at the end in total, no hoarding.
   Fix that got there: the AI overvalued hand cards and idle explorers (dug 73 times vs the bot's 179, passed early 45 times in 20 games).
 - ASSET-CHECK.md (`python3 asset-check.py`): 148 picture ids required by rules, UI and campaign cast; 148 with a stem, 148 with a
   Flow prompt, gaps 0. Music cues for the 5 gx-music slots: `next-wave/music/vinegrave/cues-wave1.json`.
+- Card reference: 'All cards' (gx-kit reference drawer, 123 entries: items, artifacts, starting cards, guardians, ruins, camp sites, idols;
+  search, chips, large view with full text) from the Rules drawer, Menu > Help and every card sheet. Tapping a site shows its guardian large.
 - Menu: Restart, Title, Story map (Game); Sound effects + Music on/off + Pick songs (Sound); Rules, Tutorial (Help). Tapping any card
   (hand or market) opens it large with its full text, cost, travel icon and points.
 - Offline: the game loads only index.html (+ media/*.webp and music/*.mp3 that exist; build.py lists only existing files).

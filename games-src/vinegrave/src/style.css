@@ -171,3 +171,4 @@ body:has(> .gxc:not([hidden])) .gx-app,body:has(> .gxc:not([hidden])) #start{vis
 #setd .gx-row-l small{display:none}
 @media (min-width:1000px){.gx-bar .gx-ibtn span{font-size:16px}}
 .site .occ.hasart svg{visibility:hidden}
+.rules h3,.gx-drawer-body h3{color:#22190d}

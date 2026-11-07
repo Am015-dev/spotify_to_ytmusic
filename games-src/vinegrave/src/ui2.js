@@ -10,7 +10,7 @@ function refreshInsp() {
     h += `<p>Travel: ${x.cost.map(t => ic(t) + ' ' + V.TNAME[t]).join(' + ')}</p>`;
     h += hid ? `<p>Discover: pay ${V.DISC[x.lvl]} ${ic('compass')} + travel. You find an idol, dig its loot, and a guardian wakes.</p>` : `<p>Dig: gain ${resHTML(V.SITE[x.tile].rew)}</p>`;
     if (x.occ !== -1) h += `<p>${esc(x.occ === -2 ? G.rival.name : G.p[x.occ].name)} is here this round.</p>`;
-    if (x.guard) { const gd = V.GUARD[x.guard]; h += `<p><b>${esc(gd.name)}</b> guards it. Overcome: pay ${resHTML(gd.cost)} → 5 ${ic('star', 'points')} and a boon: ${esc(V.opText(gd.boon))}. Still here at round end? The explorer on it takes a Dread card.</p>`; }
+    if (x.guard) { const gd = V.GUARD[x.guard]; h += `<div class="fxcard" style="animation:none;padding:6px;display:inline-block"><div class="por" data-art="guard-${x.guard}" style="width:96px;height:96px"><svg><use href="#s-guard"/></svg></div></div><p><b>${esc(gd.name)}</b> guards it. Overcome: pay ${resHTML(gd.cost)} → 5 ${ic('star', 'points')} and a boon: ${esc(V.opText(gd.boon))}. Still here at round end? The explorer on it takes a Dread card.</p>`; }
     h += '</div></div>';
     L.forEach(m => {
       if (m.s !== I.x) return; const pl = (m.t === 'dig' || m.t === 'disc') ? VG.payPlan(G, UI.view, x.cost) : null;
@@ -23,7 +23,7 @@ function refreshInsp() {
     const id = I.kind === 'row' ? G.row[I.x] : me.hand[I.x]; if (!id) return closeInsp(); const c = V.CARDS[id];
     h += `<h3>${esc(c.name)}</h3><div class="irow"><div class="big">${cardHTML(id, {})}</div><div><p><b>${c.t === 'item' ? 'Item' : c.t === 'art' ? 'Artifact' : c.t === 'fear' ? 'Dread (fear)' : 'Starting card'}</b>${c.t === 'item' ? ' · costs ' + c.cost + ' ' + ic('coin') : c.t === 'art' ? ' · costs ' + c.cost + ' ' + ic('compass') : ''}</p><p>${esc(c.text)}</p>`;
     h += `<p class="sm">Or discard it to pay one ${ic(c.tr)} ${V.TNAME[c.tr]} of travel.${c.vp ? ' Worth ' + c.vp + ' points at the end.' : ''}</p>`;
-    if (c.t === 'item') h += '<p class="sm">Bought items go to the bottom of your deck.</p>'; if (c.t === 'art') h += '<p class="sm">Artifacts work at once when bought. Played later from your hand they cost 1 tablet.</p>';
+    h += `<p><button type="button" class="btn alt" data-a="cards" data-id="${id}">See it among all cards</button></p>`; if (c.t === 'item') h += '<p class="sm">Bought items go to the bottom of your deck.</p>'; if (c.t === 'art') h += '<p class="sm">Artifacts work at once when bought. Played later from your hand they cost 1 tablet.</p>';
     h += '</div></div>';
     L.forEach(m => { if (I.kind === 'row' && m.t === 'buy' && m.r === I.x) add(m, 'Buy it'); if (I.kind === 'hand' && m.t === 'play' && m.i === I.x) add(m, 'Play it' + (c.t === 'art' ? ' (1 tablet)' : '')); });
     if (q && q.h === 'buy' && I.kind === 'row') VG.moves(G).forEach(m => { if (m.v === I.x) add(m, 'Buy it ' + q.d.o + ' cheaper'); });

@@ -74,9 +74,23 @@ function tutStart(o) {
       if (c === 'chapter' && first) GXC.play(first.id); else if (c === 'story') { $('#start').hidden = true; GXC.open(); } else if (c === 'play') UIACT.quick(); else showTitle(); },
     onExit: () => { clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); } });
 }
+// ---------------------------------------------------------------- the Story map fits the screen (no scrolling: every stage visible at once)
+// gx-campaign lays the stages out 74 px apart (about 900 px for 10 stages); here the rows are pulled closer so the whole map fits the
+// viewport. Text sizes are untouched; only the vertical positions, the path height and the painted road scale.
+function fitMap() {
+  const path = document.querySelector('.gxc-path'); if (!path) return;
+  const map = path.closest('.gxc-map') || path.parentElement; if (!map) return;
+  const H0 = +(path.dataset.h0 || parseFloat(path.style.height) || 0); if (!H0) return; path.dataset.h0 = H0;
+  const r = map.getBoundingClientRect(), avail = Math.max(300, (window.innerHeight || 700) - r.top - 8);
+  const f = Math.min(1, Math.max(0.72, avail / H0)); if (path.dataset.f && Math.abs(+path.dataset.f - f) < 0.01) return; path.dataset.f = f;
+  [...path.children].forEach(c => { if (c.tagName.toLowerCase() === 'svg') { c.style.height = (H0 * f) + 'px'; return; } const t0 = +(c.dataset.t0 || parseFloat(c.style.top)); if (isNaN(t0)) return; c.dataset.t0 = t0; c.style.top = (t0 * f) + 'px'; });
+  path.style.height = (H0 * f) + 'px';
+}
+new MutationObserver(() => { if (document.querySelector('.gxc-path')) fitMap(); }).observe(document.body, { childList: true, subtree: true });
+window.addEventListener('resize', () => fitMap());
 // ---------------------------------------------------------------- boot
 function boot() {
-  GX.init({ key: 'vg' }); drawers(); menu(); helpInit(); campInit(); musicInit();
+  GX.init({ key: 'vg' }); drawers(); refInit(); menu(); helpInit(); campInit(); musicInit();
   if (typeof artLoad === 'function') artLoad();
   if (window.GNS && GNS.achievements) try { GNS.achievements('vinegrave', [{ id: 'win', name: 'Expedition leader', how: 'Win a game against computer explorers.', test: r => r.won && r.mode === 'vs' }, { id: 'sixty', name: 'Temple scholar', how: 'Score 60 or more.', test: r => r.score >= 60 }]); } catch (e) { }
   if (window.GXV) GXV.watch(() => { if (G) render(); });
