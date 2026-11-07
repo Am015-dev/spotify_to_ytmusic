@@ -223,3 +223,20 @@ html body .gx-drawer{transition:none}   /* panels appear at once: no half-slid f
 .gxt-bub .gxh-tt{display:flex;align-items:center;gap:8px}
 .gxt-bub .gxh-tt::before{content:'';background:#3f7a4a url(media/portrait-rowan.webp) center/cover no-repeat;flex:0 0 auto;width:34px;height:34px;border-radius:50%;box-shadow:0 0 0 2px #e6b04f;display:inline-flex;align-items:center;justify-content:center;font-size:19px;line-height:1}
 .qline{margin:0 0 6px;text-align:center;font-size:16px;font-style:italic;color:#f3ead2}
+
+/* ---- full-game pass (owner 7 Nov): numbered step bar, first-game coach, What should I do?, result breakdown */
+#line{display:flex;align-items:center;gap:10px;text-align:left;font-size:16px;padding:8px 12px 8px 8px}
+#line .stepn{flex:0 0 auto;display:inline-flex;align-items:baseline;justify-content:center;min-width:46px;height:40px;line-height:40px;border-radius:12px;background:#2f5e3a;color:#fff;font-size:22px;font-weight:800}
+#line .stepn small{font-size:14px;opacity:.85}
+#line .stept{flex:1 1 auto;min-width:0}
+#line .coach{display:block;font-size:14px;font-weight:600;color:#3b4a40;margin-top:2px}
+.ab.whatB{background:#f6efdc;color:#1d2420;font-weight:800;border-color:#e6b04f}
+.minep{font-size:14px;font-weight:700;background:#2f5e3a;color:#fff;border-radius:99px;padding:1px 8px;margin-left:4px;white-space:nowrap}
+#rs .st tr{animation:wmrow .35s ease-out both}
+#rs .st tr:nth-child(2){animation-delay:.15s}#rs .st tr:nth-child(3){animation-delay:.3s}#rs .st tr:nth-child(4){animation-delay:.45s}#rs .st tr:nth-child(5){animation-delay:.6s}#rs .st tr:nth-child(6){animation-delay:.75s}
+#rs .st tr:nth-child(7){animation-delay:.9s}#rs .st tr:nth-child(8){animation-delay:1.05s}#rs .st tr:nth-child(9){animation-delay:1.2s}#rs .st tr:nth-child(10){animation-delay:1.35s}#rs .st tr:nth-child(11){animation-delay:1.5s}
+#rs .st tr:nth-child(12){animation-delay:1.65s}#rs .st tr:nth-child(13){animation-delay:1.8s}#rs .st tr:nth-child(14){animation-delay:2s}
+@keyframes wmrow{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.st td.best{color:#ffd88a;font-weight:800}
+@media (min-width:1000px){#line{font-size:18px}}
+@media (prefers-reduced-motion:reduce){#rs .st tr{animation:none}}
