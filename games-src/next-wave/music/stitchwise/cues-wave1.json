@@ -1,0 +1,36 @@
+{
+ "game": "stitchwise",
+ "wave": 1,
+ "slots": [
+  {
+   "slot": "tavern",
+   "file": "music/tavern-a.mp3",
+   "use": "Title and Story map",
+   "cue": "Warm acoustic folk, fingerpicked guitar and soft fiddle, relaxed 88 bpm, cosy quilting circle, loopable, no vocals"
+  },
+  {
+   "slot": "main",
+   "file": "music/main-a.mp3",
+   "use": "During a game",
+   "cue": "Gentle pizzicato strings and light marimba, thoughtful and tidy, 96 bpm, loopable, no vocals"
+  },
+  {
+   "slot": "fight",
+   "file": "music/fight-a.mp3",
+   "use": "Last third of the time track and boss stages",
+   "cue": "Same palette as main but brisker, 116 bpm, hand claps and woodblock, loopable, no vocals"
+  },
+  {
+   "slot": "victory",
+   "file": "music/victory-a.mp3",
+   "use": "Win result (plays once)",
+   "cue": "Bright short fanfare of brass band and glockenspiel, 8 seconds, no vocals"
+  },
+  {
+   "slot": "defeat",
+   "file": "music/defeat-a.mp3",
+   "use": "Loss result (plays once)",
+   "cue": "Gentle wistful solo accordion, 8 seconds, hopeful ending, no vocals"
+  }
+ ]
+}

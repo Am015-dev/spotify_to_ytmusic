@@ -43,6 +43,7 @@ GAMES = {
     "twin-thrones":     ("Twin Thrones",     "twin-thrones",        "twin-thrones"),
     "vale-of-banners":  ("Vale of Banners",  "vale-of-banners",     "vale-of-banners"),
     "wildmark":         ("Wildmark",         "wildmark",            "wildmark"),
+    "stitchwise":       ("Stitchwise",       "stitchwise",          "stitchwise"),
     "vinegrave":        ("Vinegrave",        "vinegrave",           "vinegrave"),
     "mainhattan-nightrun": ("Mainhattan Nightrun", "nightrun/parts", "nightrun"),
 }
