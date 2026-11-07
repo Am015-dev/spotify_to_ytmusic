@@ -25,5 +25,6 @@
     scores: function (G) { return [G.floor || 0]; },
     seats: function () { return [{ name: 'You', me: true }]; }
   });
+  GXC.result = function (r) { return UI.showResult(r).then(function (p) { return p === 'again' ? 'retry' : p === 'next' ? 'next' : 'map'; }); };   // our own result screen (cause, floors, deck, relics, stars)
   var open0 = GXC.open; GXC.open = function () { try { var sk = document.querySelector('[data-gxt-skip]'); if (sk) sk.click(); } catch (e) { } return open0.apply(this, arguments); };   // opening Story while a guide runs ends the guide
 })();

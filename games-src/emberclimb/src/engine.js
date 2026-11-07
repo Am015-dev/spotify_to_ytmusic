@@ -140,7 +140,7 @@
   function killHero(h) {
     if (has('phoenix-ash') && !G.revived) { G.revived = 1; h.hp = Math.max(1, Math.floor(h.mhp * 0.3)); fx('revive', 'h' + G.hs.indexOf(h), h.hp); return; }
     h.dead = 1; fx('dead', 'h' + G.hs.indexOf(h), 0);
-    if (!aliveHs().length) { G.scr = 'over'; G.won = 0; G.b = null; return; }
+    if (!aliveHs().length) { G.killer = G.lastHit || 'self'; G.killIn = G.b ? G.b.kind : ''; G.scr = 'over'; G.won = 0; G.b = null; return; }
     if (G.b && G.b.cur === G.hs.indexOf(h) && G.b.ph === 'p') nextHeroOrEnemy();
   }
   function dmgNum(h, base, card) {
@@ -305,7 +305,7 @@
     var it = e.intent, d = D.ENEMIES[e.id]; if (!it) return;
     if (it.sleep) { e.asleep--; fx('act', 'e' + G.b.en.indexOf(e), 0, 'sleep'); plan(e); return; }
     var hs = aliveHs(), h = G.hs[it.tg]; if (!h || h.dead) h = hs[0]; if (!h) return;
-    var ei = 'e' + G.b.en.indexOf(e);
+    var ei = 'e' + G.b.en.indexOf(e); G.lastHit = e.id;
     fx('act', ei, 0, it.atk ? 'atk' : 'cast', G.hs.indexOf(h));
     if (it.str) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }
     if (it.blk) { e.blk += it.blk; fx('blk', ei, it.blk); }
@@ -354,8 +354,9 @@
     }
     return out;
   }
-  function pickRelics(rar, n) { var l = Object.keys(D.RELICS).filter(function (k) { return D.RELICS[k].rar === rar && !has(k); }); shuffle(l); return l.slice(0, n); }
-  function pickRelic(rars) { var l = Object.keys(D.RELICS).filter(function (k) { return rars.indexOf(D.RELICS[k].rar) >= 0 && !has(k); }); return l.length ? l[ri(l.length)] : null; }
+  var LOCK = [];   // relic ids kept out of the random pool until a Story chapter unlocks them (set by the UI)
+  function pickRelics(rar, n) { var l = Object.keys(D.RELICS).filter(function (k) { return D.RELICS[k].rar === rar && !has(k) && LOCK.indexOf(k) < 0; }); shuffle(l); return l.slice(0, n); }
+  function pickRelic(rars) { var l = Object.keys(D.RELICS).filter(function (k) { return rars.indexOf(D.RELICS[k].rar) >= 0 && !has(k) && LOCK.indexOf(k) < 0; }); return l.length ? l[ri(l.length)] : null; }
   function gainRelic(id) {
     if (!id || has(id)) return; G.relics.push(id);
     if (id === 'lucky-coin') G.gold += 25; if (id === 'oak-heart') G.hs.forEach(function (h) { h.mhp += 8; h.hp += 8; }); if (id === 'pocket-satchel') G.pslots++;
@@ -496,6 +497,7 @@
   function clear() { try { localStorage.removeItem('emberclimb.save'); } catch (e) { } }
   function begin() { G.fights = 0; }
   EC.E = {
+    lock: function (a) { LOCK = a || []; },
     newGame: function (o) { var g = newGame(o); g.fights = 0; return g; }, G: function () { return G; }, set: function (g) { G = g; },
     validMoves: validMoves, performMove: performMove, step: step, settle: settle, sideToAct: sideToAct, checkInvariants: checkInvariants,
     eff: eff, lines: lines, canPlay: canPlay, cost: cost, reachable: reachable, save: save, load: load, clear: clear, has: has,

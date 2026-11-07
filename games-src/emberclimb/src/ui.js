@@ -29,7 +29,7 @@
   var TONE = { w: '#a8431f', s: '#2f7a46', a: '#2f6fa8', m: '#a8861c', n: '#777', z: '#555' };
   // ---------- helpers
   function G() { return E.G(); }
-  function toast(t) { var d = h('div', 'toast', t); document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1400); }
+  function toast(t, ms) { var d = h('div', 'toast', t); if (ms) d.style.animationDuration = ms + 'ms'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, ms || 1400); }
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
@@ -130,6 +130,14 @@
     try { if (!window.GXC || !GXC.data || !GXC.data()) return true; return GXC.unlocked().some(function (u) { return u.id === HNEED[k][0]; }); } catch (e) { return true; }
   }
   UI.heroOpen = heroOpen;
+  // Story relic unlocks: these relics stay out of the random pool (rewards, shop, events) until their chapter is beaten (campaign.json unlock type 'relic'); ?unlock=all opens all
+  var RLOCK = ['clover-dice', 'gold-tooth', 'smoking-censer', 'tin-flute', 'healing-moss', 'gale-cloak', 'whetstone-ring', 'phoenix-ash'];
+  function lockedRelics() {
+    if (/unlock=all/.test(Q)) return [];
+    try { if (!window.GXC || !GXC.data || !GXC.data()) return []; var u = GXC.unlocked(); return RLOCK.filter(function (id) { return !u.some(function (x) { return x.type === 'relic' && x.id === id; }); }); } catch (e) { return []; }
+  }
+  UI.lockedRelics = lockedRelics;
+  var ng0 = E.newGame; E.newGame = function (o) { E.lock(lockedRelics()); return ng0.call(E, o); };
   function quick() {
     var s = h('div'); s.id = 'title';
     s.appendChild(A('bg-title', '', { cls: 'bg', kind: 'bg' }));
@@ -205,18 +213,54 @@
     app.appendChild(m);
   }
   // ---------- battle
-  function intentOf(e) {
-    var it = e.intent, g = G(); if (!it) return { c: 'buf', t: '', g: '?' };
-    if (it.sleep) return { c: 'buf', t: 'zzz', g: GLY.sleep, s: 'intent-sleep' };
+  // intent icons: one code-drawn picture per intent / debuff kind (named stems in assets.json so art can replace them); tap an intent to read it
+  var ICO = {
+    atk: '<path d="M4 20 16 8l1.5 1.5L5.5 21.5zM15 5l5-1-1 5-2-1z"/>', blk: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>',
+    str: '<path d="M12 3l7 8h-4.5v10h-5V11H5z"/>', weak: '<path d="M12 21l-7-8h4.5V3h5v10H19z"/>',
+    vuln: '<circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M11 2h2v6h-2zM11 16h2v6h-2zM2 11h6v2H2zM16 11h6v2h-6z"/>',
+    frail: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 2"/><path d="M12 5l-2 5 3 2-2 6" fill="none" stroke="currentColor" stroke-width="2"/>',
+    poison: '<path d="M12 2c4 5 7 8 7 12a7 7 0 0 1-14 0c0-4 3-7 7-12z"/>', burn: '<path d="M12 2c1 4 7 6 7 13a7 7 0 0 1-14 0c0-3 1-5 3-7 0 2 1 3 2 3 0-3 1-6 2-9z"/>',
+    slime: '<path d="M4 17c0-6 3-10 8-10s8 4 8 10c0 3-2 4-3 2-1 3-3 3-4 0-1 3-3 3-4 0-1 2-5 2-5-2z"/>',
+    daze: '<path d="M12 12c0-2 3-2 3 0s-5 3-5-1c0-5 8-5 8 1 0 7-11 6-11-2" fill="none" stroke="currentColor" stroke-width="2.2"/>',
+    sleep: '<path d="M4 6h8L4 14h8v2H3v-2l7-8H4zM14 13h6l-6 6h6v2h-8v-2l5-5h-3z"/>', unk: '<path d="M9 8c0-4 7-4 7 0 0 3-4 3-4 6h-2c0-4 4-4 4-6s-3-2-3 0zM10 17h3v3h-3z"/>'
+  };
+  function svgIc(k) { var d = document.createElement('span'); d.className = 'ico'; d.innerHTML = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true">' + (ICO[k] || ICO.unk) + '</svg>'; return d; }
+  UI.svgIc = svgIc;
+  // art slot with a code-drawn picture as its placeholder
+  function IA(stem, k) { var e = A(stem, '', { ph: 'transparent' }); var ph = e.querySelector('.ph'); if (ph) { ph.textContent = ''; ph.appendChild(svgIc(k)); } return e; }
+  var CARDK = { burn: 'burn', slimed: 'slime', dazed: 'daze' };
+  function intentParts(e) {
+    var it = e.intent, g = G(), P = []; if (!it) return [{ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: this enemy has not shown its next move.' }];
+    if (it.sleep) return [{ k: 'sleep', s: 'intent-sleep', t: 'zzz', say: 'Asleep: it does nothing for ' + e.asleep + ' more turn' + (e.asleep === 1 ? '' : 's') + ' unless you hurt it.' }];
     if (it.atk) {
       var h0 = g.hs[it.tg] || g.hs[0], d = it.atk + (e.st.str || 0); if (e.st.weak > 0) d = Math.floor(d * 0.75); if (h0.st.vuln > 0) d = Math.floor(d * 1.5); if (h0.stance === 'w') d *= 2; d = Math.max(0, d);
-      var t = (it.hits > 1 ? d + 'x' + it.hits : String(d)); if (g.hs.length > 1) t += ' → ' + D.H[h0.k].name.split(' ')[0];
-      return { c: 'atk', t: t, g: GLY.atk, s: d * (it.hits || 1) >= 20 ? 'intent-attack-big' : 'intent-attack' };
+      var n = it.hits || 1, t = n > 1 ? d + 'x' + n : String(d); if (g.hs.length > 1) t += ' → ' + D.H[h0.k].name.split(' ')[0];
+      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: t, say: 'Attack: hits ' + (n > 1 ? n + ' times for ' + d + ' each' : 'for ' + d) + ' damage (Block soaks it first).' });
     }
-    if (it.weak || it.vuln || it.frail || it.add) return { c: 'deb', t: '', g: GLY.deb, s: 'intent-debuff' };
-    if (it.blk && !it.str) return { c: 'def', t: String(it.blk), g: GLY.def, s: 'intent-defend' };
-    return { c: 'buf', t: '', g: GLY.buf, s: 'intent-buff' };
+    if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: String(it.blk), say: 'Block: it gains ' + it.blk + ' Block, so your attacks do less.' });
+    if (it.str) P.push({ k: 'str', s: 'intent-buff', t: '+' + it.str, say: 'Buff: it gains ' + it.str + ' Strength, so every later attack hits harder.' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: String(it.weak), say: 'Weak: your attacks deal 25% less for ' + it.weak + ' turns.' });
+    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: String(it.vuln), say: 'Vulnerable: you take 50% more attack damage for ' + it.vuln + ' turns.' });
+    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: String(it.frail), say: 'Frail: your Block is 25% weaker for ' + it.frail + ' turns.' });
+    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: String(it.poison), say: 'Poison: you lose ' + it.poison + ' HP at the start of each turn, falling by 1 each time.' });
+    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1], say: 'Junk: adds ' + it.add[1] + ' ' + cn + ' to your discard pile. It clogs your deck.' }); }
+    if (!P.length) P.push({ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: it is up to something. Watch out.' });
+    return P;
   }
+  function intentBox(e) {
+    var P = intentParts(e), main = P[0].k, cls = main === 'atk' ? 'atk' : main === 'blk' ? 'def' : (main === 'str' || main === 'sleep' || main === 'unk') ? 'buf' : 'deb';
+    var b = h('button', 'intent ' + cls); b.type = 'button'; b.setAttribute('aria-label', 'Enemy intent: ' + P.map(function (p) { return p.say; }).join(' '));
+    P.forEach(function (p) { b.appendChild(IA(p.s, p.k)); if (p.t) b.appendChild(h('span', '', p.t)); });
+    on(b, function () { UI.explain(P); });
+    return b;
+  }
+  UI.explain = function (P) {
+    var old = document.querySelector('.itip'); if (old) old.remove();
+    var t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.appendChild(h('b', '', 'Enemy intent'));
+    P.forEach(function (p) { var r = h('div', 'irow', null, [IA(p.s, p.k), h('span', '', p.say)]); t.appendChild(r); });
+    t.appendChild(h('i', '', 'Tap to close'));
+    t.addEventListener('click', function () { t.remove(); }); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) t.remove(); }, 9000);
+  };
   function stChips(o) {
     var w = h('div', 'stc'); [['str', 'Str'], ['vuln', 'Vuln'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { if (o.st[p[0]]) w.appendChild(h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + o.st[p[0]])])); });
     return w;
@@ -228,10 +272,10 @@
     var st = h('div'); st.id = 'stage'; st.setAttribute('data-board', '1'); st.appendChild(A(b.kind === 'b' ? 'bg-boss-' + g.boss : b.kind === 'e' ? 'bg-elite' : 'bg-battle-' + (1 + ((g.floor - 1) % 3)), '', { cls: 'bg', kind: 'bg' }));
     var en = h('div', 'enemies'), tgtMode = b.ph === 'p' && UI.sel >= 0 && needTarget();
     b.en.forEach(function (e, i) {
-      var d = D.ENEMIES[e.id], it = e.dead ? null : intentOf(e);
+      var d = D.ENEMIES[e.id];
       var x = h('div', 'en' + (e.dead ? ' dead' : '') + (tgtMode && !e.dead ? ' glow' : ''));
       x.setAttribute('data-w', 'e' + i);
-      if (it) x.appendChild(h('div', 'intent ' + it.c, null, [A(it.s || 'intent-buff', it.g, { ph: 'transparent' }), h('span', '', it.t)]));
+      if (!e.dead) x.appendChild(intentBox(e));
       x.appendChild(A('enemy-' + e.id, d.name, { ph: '#6a3a2a' }));
       if (e.blk) x.appendChild(h('div', 'blkchip', '🛡' + e.blk));
       x.appendChild(h('div', 'nm', d.name));
@@ -386,12 +430,50 @@
     }
     hud(); app.appendChild(s);
   }
-  function over() {
-    var g = G(), s = h('div', 'over'); if (UI.camp) { if (!UI.fin) { UI.fin = 1; setTimeout(function () { window.EC_NOSAVE = 0; try { GXC.finish(G()); } catch (e) { } }, 500); } app.appendChild(s); return; } s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
+  // ---------- result screens (defeat + victory): cause, floors, deck (tap = large card), relics, Story stars; used for Quick and Story
+  function bigCard(c) { var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); pk.addEventListener('pointerdown', function (e) { e.stopPropagation(); pk.remove(); }); pk.addEventListener('click', function () { pk.remove(); }); document.body.appendChild(pk); }
+  function resultScr(r, done) {
+    var g = G(), s = h('div', 'over res'); s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
     s.appendChild(h('h1', '', g.won ? 'SUMMIT!' : 'FALLEN'));
-    s.appendChild(h('div', 'sub', g.won ? 'The tower boss is down.' : 'You reached floor ' + g.floor + '.'));
-    s.appendChild(h('div', 'chip', 'Deck ' + g.hs.reduce(function (a, x) { return a + x.deck.length; }, 0) + '  Relics ' + g.relics.length + '  Gold ' + g.gold));
-    var b = on(h('button', 'btn', 'New climb'), function () { E.clear(); UI.mode = 'title'; render(); }); b.id = 'again'; s.appendChild(b); app.appendChild(s);
+    var bossId = g.boss, kid = g.won ? bossId : g.killer, kd = kid && D.ENEMIES[kid];
+    var cause = h('div', 'cause');
+    if (kd) cause.appendChild(A('enemy-' + kid, '', { ph: '#6a3a2a', cls: 'cause-art' }));
+    cause.appendChild(h('div', 'sub', g.won ? 'Final boss down: ' + (D.ENEMIES[bossId] ? D.ENEMIES[bossId].name : 'the tower boss') + '.' : (kd ? 'Felled by ' + kd.name + (g.killIn === 'b' ? ' (boss)' : g.killIn === 'e' ? ' (elite)' : '') + '.' : 'Your own cards finished you.')));
+    s.appendChild(cause);
+    var tot = g.hs.reduce(function (a, x) { return a + x.deck.length; }, 0);
+    s.appendChild(h('div', 'chip rstat', 'Floors ' + Math.min(g.floor, g.F) + ' / ' + g.F + '   Deck ' + tot + '   Relics ' + g.relics.length + '   Gold ' + g.gold));
+    if (r) {
+      var sr = h('div', 'rstars'); for (var i = 0; i < 3; i++) sr.appendChild(h('span', i < r.stars ? 'on' : '', '★'));
+      s.appendChild(h('div', 'storyline', null, [sr, h('span', '', (r.def.title || 'Story') + (r.won ? ' · best ' + (r.best || r.stars) + ' of ' + (r.def.maxStars || 3) + ' stars' : ' · not cleared yet'))]));
+      (r.def.stars || []).forEach(function (st, i) { s.appendChild(h('div', 'rstar' + (i < r.stars ? ' on' : ''), (i < r.stars ? '★ ' : '☆ ') + st.text)); });
+      (r.unlocks || []).forEach(function (u) { s.appendChild(h('div', 'runl', 'Unlocked: ' + u.text)); });
+    }
+    var dk = h('div', 'rsec'); dk.appendChild(h('b', '', 'Final deck (tap a card)'));
+    var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
+    dk.appendChild(gr); s.appendChild(dk);
+    var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics (tap for text)'));
+    var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { toast(D.RELICS[id].name + ': ' + D.RELICS[id].t, 3200); }); t.setAttribute('aria-label', D.RELICS[id].name); rr.appendChild(t); });
+    rl.appendChild(rr); s.appendChild(rl);
+    var bt = h('div', 'rbtns');
+    var again = on(h('button', 'btn', 'Play again'), function () { done('again'); }); again.id = 'again'; bt.appendChild(again);
+    if (r) { var mp = on(h('button', 'btn alt', 'Story map'), function () { done('map'); }); mp.id = 'rmap'; bt.appendChild(mp); }
+    if (r && r.won) { var nx = on(h('button', 'btn', 'Next chapter'), function () { done('next'); }); nx.id = 'rnext'; bt.insertBefore(nx, bt.firstChild); }
+    var tt = on(h('button', 'btn alt', 'Title'), function () { done('title'); }); tt.id = 'rtitle'; bt.appendChild(tt);
+    s.appendChild(bt); app.appendChild(s);
+  }
+  UI.showResult = function (r) {
+    return new Promise(function (resolve) {
+      var g = G(); if (!g) return resolve('map');
+      app.innerHTML = ''; resultScr(r, function (pick) {
+        if (pick === 'title') { try { UI.campExit(); } catch (e) { } return; }
+        resolve(pick);
+      });
+    });
+  };
+  function over() {
+    var g = G();
+    if (UI.camp) { var s0 = h('div', 'over'); if (!UI.fin) { UI.fin = 1; setTimeout(function () { window.EC_NOSAVE = 0; try { GXC.finish(G()); } catch (e) { } }, 500); } app.appendChild(s0); return; }
+    resultScr(null, function (pick) { if (pick === 'again') UI.restart(); else { E.clear(); UI.mode = 'title'; render(); } });
   }
   function overlay() {
     var g = G(), ov = null;

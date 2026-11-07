@@ -207,6 +207,11 @@
      "type": "portrait",
      "id": "hero-s",
      "text": "Rogue joins the Quick game"
+    },
+    {
+     "type": "relic",
+     "id": "clover-dice",
+     "text": "Clover Dice can now turn up in any climb"
     }
    ]
   },
@@ -294,6 +299,11 @@
      "type": "portrait",
      "id": "hero-a",
      "text": "Automaton joins the Quick game"
+    },
+    {
+     "type": "relic",
+     "id": "gold-tooth",
+     "text": "Gold Tooth can now turn up in any climb"
     }
    ]
   },
@@ -379,6 +389,11 @@
      "type": "portrait",
      "id": "hero-m",
      "text": "Monk joins the Quick game"
+    },
+    {
+     "type": "relic",
+     "id": "smoking-censer",
+     "text": "Smoking Censer can now turn up in any climb"
     }
    ]
   },
@@ -464,7 +479,13 @@
     "maxStars": 2,
     "text": "Enemies have less HP and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [
+    {
+     "type": "relic",
+     "id": "tin-flute",
+     "text": "Tin Flute can now turn up in any climb"
+    }
+   ]
   },
   {
    "id": "c6",
@@ -546,7 +567,13 @@
     "maxStars": 2,
     "text": "Enemies have less HP and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [
+    {
+     "type": "relic",
+     "id": "healing-moss",
+     "text": "Healing Moss can now turn up in any climb"
+    }
+   ]
   },
   {
    "id": "c7",
@@ -630,7 +657,13 @@
     "maxStars": 2,
     "text": "Enemies have less HP and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [
+    {
+     "type": "relic",
+     "id": "gale-cloak",
+     "text": "Gale Cloak can now turn up in any climb"
+    }
+   ]
   },
   {
    "id": "c8",
@@ -714,7 +747,13 @@
     "maxStars": 2,
     "text": "Enemies have less HP and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [
+    {
+     "type": "relic",
+     "id": "whetstone-ring",
+     "text": "Whetstone Ring can now turn up in any climb"
+    }
+   ]
   },
   {
    "id": "c9",
@@ -800,7 +839,13 @@
     "maxStars": 2,
     "text": "Enemies have less HP and the boss rule is off."
    },
-   "unlock": []
+   "unlock": [
+    {
+     "type": "relic",
+     "id": "phoenix-ash",
+     "text": "Phoenix Ash can now turn up in any climb"
+    }
+   ]
   }
  ]
 }

@@ -35,5 +35,5 @@
   GXS.add({ id: 'ec-event', name: 'Event: make a choice', ask: 'Choose an option', seed: 10, when: booted,
     setup: function () { begin(['s'], 10); E().debug.event('ember-shrine'); UI.render(); }, checks: [{ kind: 'visible', sel: '.opts .btn', name: 'event option' }] });
   GXS.add({ id: 'ec-result', name: 'Result screen', ask: 'Can you start a new climb?', seed: 12, when: booted,
-    setup: function () { begin(['w'], 12); E().debug.over(true); UI.render(); }, checks: [{ kind: 'visible', sel: '#again', name: 'New climb button' }] });
+    setup: function () { begin(['w'], 12); E().debug.over(true); UI.render(); }, checks: [{ kind: 'visible', sel: '#again', name: 'Play again button' }] });
 })();

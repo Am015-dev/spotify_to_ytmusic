@@ -66,7 +66,7 @@
         if (gt) { var sp = gt.querySelector('span'); if (sp) sp.remove(); S.appendChild(GX.row('Tutorial', gt)); }
         try { S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); } catch (e) { }
       },
-      about: { name: 'Emberclimb', version: '1.0', text: 'An original card-climbing roguelike. Names, text and art are our own.' }
+      about: { name: 'Emberclimb', version: '1.0', text: 'An original card-climbing roguelike. Names and text are our own. Temporary pictures use glyphs from game-icons.net (artists Lorc, Delapouite, Carl Olsen, Sbed, Lucas, Caro Asercion and others), CC BY 3.0, creativecommons.org/licenses/by/3.0, until the finished art arrives.' }
     });
   };
   boot();
