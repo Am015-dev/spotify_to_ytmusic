@@ -25,3 +25,8 @@ Benchmarks: the old shelf games the owner likes (cauldron-fair, hollowbough) and
     labels under pictures). On PC let the fit-zoom go up (cap 2.5) so a small early valley isn't a speck in a big empty table.
 
 Proof shots (before/after, phone and PC): `games-src/wildmark/readable-shots/`.
+
+Gate notes (W376): ui-audit A, C, D, E, F = 0 on phone, phone-s and pc. B still flags 1-2 drawer headings ("Speed" in Menu,
+lines in How to play). The live build flags the same kind of thing (phone B2), so this is the shared drawer, not the game:
+the panel walker leaves drawers scrolled to a spot where a heading sits across the drawer edge. The fix belongs in the shell.
+The tutor "Learn in 5 minutes" label is shell text too (the tutorial is now about 1 minute).

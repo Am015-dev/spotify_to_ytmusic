@@ -129,7 +129,8 @@ function pop(c, text, cls) {   // floating points at a map cell (DOM, readable s
   // never stack unreadably: at most 2 live pops, a new one sits in its own row under the last one
   var live = [].slice.call($('#board').querySelectorAll('.pop')); while (live.length > 1) live.shift().remove();
   if (live.length) e.style.top = (parseFloat(live[0].style.top) + 40) + 'px';
-  $('#board').appendChild(e); setTimeout(function () { e.remove(); }, 1300);
+  $('#board').appendChild(e); var hw = e.offsetWidth / 2 + 6; e.style.left = Math.max(hw, Math.min(b.width - hw, x)) + 'px';   // never half off the board
+  setTimeout(function () { e.remove(); }, 1300);
 }
 function tutOK(x) { return typeof tutAct === 'function' ? tutAct(x) : true; }
 function myTurn() { return G && !G.over && !G.seats[G.cur].ai && UI.view === G.cur && $('#pass').hidden; }
@@ -447,7 +448,7 @@ document.addEventListener('click', function (e) {
 });
 document.addEventListener('keydown', function (e) { if (!G || !myTurn()) return; if (e.key === 'r' || e.key === 'R') rotate(); if (e.key === 'Enter' && UI.ghost) confirmPlace(); });
 function openCards() { GX.drawer('cardsd', 'Scoring cards', null, false); $('#cardsd .gx-drawer-body').innerHTML = cardsHTML(); artApply($('#cardsd')); GX.show('cardsd'); }
-function fillRules() { var b = $('#rulesd .gx-drawer-body'); if (!b) return; b.innerHTML = RULES_HTML + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); }   // filled on every open (the drawer body is never empty, so an emptiness test left it blank)
+function fillRules() { var b = $('#rulesd .gx-drawer-body'); if (!b) return; b.innerHTML = RULES_HTML + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); b.scrollTop = 0; setTimeout(function () { b.scrollTop = 0; }, 0); }   // filled on every open (the drawer body is never empty, so an emptiness test left it blank)
 function openRules() { fillRules(); GX.show('rulesd'); }
 // ---------------------------------------------------------------- music (silent until files exist)
 function musicSync() { try { if (window.GXMUS) GXMUS.sync(); } catch (e) { } }
