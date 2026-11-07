@@ -22,6 +22,18 @@ let fails = 0; const ok = (c, msg) => { if (!c) { fails++; console.log('FAIL', m
   VG.apply(G, { t: 'pass' }); ok(G.round === 2 && p.ex === 2, 'round ends when all passed; explorers return');
   ok(V.CARDS[G.row[3]].t === 'item' && V.CARDS[G.row[4]].t === 'art', 'round 2 row: 4 items + 2 artifacts');
 }
+// ---- rules-check items (games-src/rules-check/vinegrave.md)
+{ const G = VG.newGame({ np: 2, seed: 5 }); const p = G.p[0]; p.res.coin = 0; p.hand = ['dread', 'dread', 'dread', 'dread', 'dread'];
+  p.hand[0] = Object.keys(V.CARDS).find(id => V.CARDS[id].tr === 'ship' && V.CARDS[id].t !== 'fear') || p.hand[0];
+  const shipOnly = [p.hand[0]]; p.hand = shipOnly.concat(['grant']).slice(0, 1);
+  ok(!!VG.payPlan(G, 0, ['boot']), 'WRONG 1: a Boat card pays a Boot');
+  ok(!VG.payPlan(G, 0, ['car']), 'WRONG 1: a Boat card still cannot pay a Jeep');
+}
+{ const G = VG.newGame({ np: 2, seed: 6 }); const p = G.p[0]; const base = VG.score(G, 0);
+  ok(base.slots === V.IDOL_SLOT_VP.reduce((a, b) => a + b, 0), 'MISSING 1: empty shrine slots score their printed value at the start');
+  p.idols = [{ id: V.IDOLS[0], used: false }]; ok(VG.score(G, 0).idols === 3 && VG.score(G, 0).slots === base.slots, 'MISSING 1: an idol you keep scores 3, slots stay empty');
+  p.idols[0].used = true; ok(VG.score(G, 0).slots === base.slots - V.IDOL_SLOT_VP[0] && VG.score(G, 0).idols === 3, 'MISSING 1: a set idol fills a slot and loses its printed value');
+}
 { const G = VG.newGame({ np: 2, seed: 4 }); const p = G.p[0]; p.res.compass = 3; p.hand = ['dread', 'dread', 'grant', 'grant', 'trail'];
   const d = VG.moves(G).find(m => m.t === 'disc' && G.sites[m.s].cost.every(c => c === 'boot')); VG.apply(G, d);
   const dreads0 = p.disc.concat(p.deck, p.hand, p.play).filter(c => c === 'dread').length;

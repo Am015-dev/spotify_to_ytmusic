@@ -1,0 +1,254 @@
+{
+ "slug": "nebula-aces",
+ "size": "phone",
+ "seed": 89623,
+ "when": "2026-11-07T21:30Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 189
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 114
+ },
+ "fuzz": {
+  "taps": 57
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 11.0px (<12px) in span.vs x1: \"vs\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "element outside viewport button.gx-ibtn.gxh-bulb x1 rect 286,-4,338,48: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #0 (button.btn \"Host\")",
+   "desc": "console.error: WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) button.btn.ghost x1: \"✕\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.btn.gx-tb \"Squads\" under div#modal \"🌐 Online battle ✕ Invit\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button#phcam.btn.gx-tb.ph-cam \"Camera: focus, zoom, who\" under div#modal \"🌐 Online battle ✕ Invit\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #2",
+   "desc": "console.error: WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #10",
+   "desc": "console.error: WebSocket connection to 'wss://relay.agorist.space/' failed: Error during WebSocket handshake: Unexpected response code: 502",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #17 (button.btn.gx-gear \"More controls\")",
+   "desc": "console.error: WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #19 (button.btn.primary \"📖 Story mode Ten chapte\")",
+   "desc": "console.error: WebSocket connection to 'wss://relay.agorist.space/' failed: Error during WebSocket handshake: Unexpected response code: 502",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #29",
+   "desc": "console.error: WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #34",
+   "desc": "console.error: WebSocket connection to 'wss://relay.agorist.space/' failed: Error during WebSocket handshake: Unexpected response code: 502",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #39",
+   "desc": "console.error: WebSocket connection to 'wss://relay.agorist.space/' failed: Error during WebSocket handshake: Unexpected response code: 502",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text overflows its box (visible) in button.btn.primary x1: \"C4\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) button.ph.next x4: \"Plan\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #45",
+   "desc": "console.error: WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #45",
+   "desc": "console.error: WebSocket connection to 'wss://relay.agorist.space/' failed: Error during WebSocket handshake: Unexpected response code: 502",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #46 (button.btn \"A1\")",
+   "desc": "console.error: WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "text 11.0px (<12px) in span.vs x1: \"vs\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-quick-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.bfring.need \"Kael Varro: plan its mov\" under button.btn \"On\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-quick-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 40px (<40) button.bfspot x1: \"B5\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button#sndbtn.btn \"Sound\" / button.bfspot \"B5\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.btn \"🎼 Songs\" / button.bfspot.rec \"C4\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "text 11.5px (<12px) in div.bfleg x1: \"● easy ● hard · 🎯 enemy ahead\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #189 (More controls)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 189 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-quick-noresult-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 11.0px (<12px) in span.vs x1: \"vs\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-story-map-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "text 11.0px (<12px) in span.vs x1: \"vs\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-story-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "element outside viewport b x1 rect 125,256,421,373: \"No enemy ahead\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "element outside viewport span x1 rect 125,381,421,452: \"Kael Varro can only shoo\"",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #114 (Camera: focus, zoom, whole mat)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 114 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js nebula-aces --size phone --seed 89623 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/nebula-aces/phone-story-noresult-12.png"
+  }
+ ],
+ "secs": 378,
+ "tutorialIn": {}
+}
