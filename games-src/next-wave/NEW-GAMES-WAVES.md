@@ -14,6 +14,8 @@ Do not over-invest in art: generate each wave in one Flow session, drop the file
 
 Folder: `games-src/next-wave/flow-2d/redline-rally/`. Drop into `assets-inbox/redline-rally/`.
 
+**Flow references:** for the two track pictures (`track-sunline`, `track-hairpin`), attach `games-src/redline-rally/guides/track-sunline.svg` and `games-src/redline-rally/guides/track-hairpin.svg` in Flow as layout references (export each to png first if Flow does not take svg).
+
 | wave | count | prompt file to paste | Flow aspect | exact size(s) |
 |---|---:|---|---|---|
 | 1 | 1 | `prompts-wave1-ratio-16x5.json` | 16:9 (target 16:5) | 512x160 (ui) |
@@ -71,6 +73,6 @@ Folder: `games-src/next-wave/flow-2d/twin-thrones/`. Drop into `assets-inbox/twi
 - Redline Rally: `ui-engine-tray`, `icon-stress`, `icon-gear`, `icon-lap`, `icon-place` and Emberclimb `fx-fire-burst` have no code slot yet (all wave 3): a wiring worker must add them before delivery is visible. The 3 reserved upgrade-deck backs were removed (not in the base rules).
 - Twin Thrones: its `ui.js` is being rebuilt by another worker, so its slots were checked against data and `assets.json` only (all 73 cards, 12 wonders, 10 tokens, 7 science, 5 resources have a stem), not against the new UI code; check each stem is requested once that file lands.
 - Wide strips (Twin Thrones `military-board` 15:2, `city-board-*` 5:1; Redline `ui-gear-dial` 16:5, `ui-engine-tray` 8:3) are generated at 16:9 and cropped by ingest: look at the crop.
-- `ingest-assets.py` still prints "WIRING NEEDED" for these three games even though the page loads by stem (false alarm: its scan does not know their loaders).
-- Alpha pictures need `scipy` for keying (`pip install scipy`) on the machine that runs ingest.
+- `ingest-assets.py` treats every stem listed in a game's `games-src/<slug>/assets.json` as wired (the page loads it by stem), so these three games no longer show a false "WIRING NEEDED".
+- Alpha pictures key with `scipy` (`pip install scipy`) when it is installed; without it ingest prints one `keying path:` line and uses a plain near-white threshold instead (edges need a look; pose sets then lose the shared feet line).
 - Emberclimb frames and rarity gems (`frame-*`, `gem-*`) must keep the empty window at y 14%-53% and everything else white; check them first.
