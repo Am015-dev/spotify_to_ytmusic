@@ -35,6 +35,7 @@ const HLP_STEPS={
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
+ {title:'How a turn works',text:'Five short steps, every turn.',pic:()=>'<ol class="turn5"><li>Draw a tile. It waits at the bottom.</li><li>Turn it. Tap a glowing square to lay it.</li><li>Put a follower on a road, town, priory or field, or skip.</li><li>A finished road or town scores. Followers go home.</li><li>Your rival does the same, step by step. Most points wins.</li></ol>'},
  {title:'The goal',text:'Build a valley tile by tile. Finished roads and towns score points. Most points wins.',pic:()=>hpics([['road'],['town'],'>',['pts','Winner','+9']])},
  {title:'Every turn',text:'Place a tile so its edges match. Then claim a road, town or field with a follower, or skip.',pic:()=>hpics([['town','Tile'],'>',['meeple','Follower']])},
  {phase:'place',title:'Match the edges',text:'Lay the tile so touching edges match: road to road, town to town, field to field.',pic:()=>hpics([['road','Road'],['road','Road'],'>',['town','Town'],['townT','Town']])},
@@ -53,7 +54,8 @@ const HLP_RULES=[
  {phase:'figx',title:'The hog',text:'Place a hog in a field where your farmer stands. Each finished town beside it scores 4, not 3.',pic:()=>hpics([['hog','Hog'],'>',['pts','Per town','+4']])},
  {phase:'figx',title:'Only with your own',text:'Both need your own follower on that same road, town or field first.',pic:()=>hpics([['meeple','Yours'],['mason','Mason']])},
  {phase:'nofig',title:'Nothing free',text:'Every road, town and field on this tile already has a follower. Tap Skip.',pic:()=>hpics([['lock'],'>',['skip','Skip']])},
- {phase:'nofig',title:'Followers come back',text:'Close a feature and its followers return. You start with seven.',pic:()=>hpics([['meeple','Waiting'],'>',['home','Home']])}
+ {phase:'nofig',title:'Followers come back',text:'Close a feature and its followers return. You start with seven.',pic:()=>hpics([['meeple','Waiting'],'>',['home','Home']])},
+ {title:'House rules',text:'The first seat always starts. The mason’s extra turn counts even when its tile finishes the feature. Tile art follows common open sets.',pic:()=>hpics([['tap','Seat 1 starts']])}
 ];
 // ---------------------------------------------------------------- the advice: the normal computer's own pick
 const HLPS={key:'',plan:null};
@@ -93,6 +95,8 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'rampart-and-vine',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,top:()=>{const t=$('#top');return t?Math.ceil(t.getBoundingClientRect().bottom)+4:6},
     avoid:'.glow,.fglow,#htile.mine,#hskip,#status'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
-  setInterval(()=>{try{GXH.phase(hlpPhase())}catch(e){}},500)}
-function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;try{GXH.phase(hlpPhase())}catch(e){}}
+  setInterval(()=>{try{GXH.phase(coachPhase())}catch(e){}},500)}
+// the turn strip already says what to do while placing; coach bubbles only explain followers
+function coachPhase(){const p=hlpPhase();return p==='place'||p==='river'||p==='bonus'||p==='nofig'?null:p}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;try{GXH.phase(coachPhase())}catch(e){}}
 hlpInit();

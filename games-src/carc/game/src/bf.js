@@ -4,13 +4,23 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const PCOL=['#c8372d','#2d62b8','#e2ae22','#3b8a45','#34323b','#a064c0'];
 const MINC=30,MAXC=118;// cell size in screen pixels
 const FIGICON={f:'meeple',big:'champ',bld:'mason',pig:'hog'};
+AIDELAY=Math.max(AIDELAY,950);   // rival steps are shown one at a time with a caption; tap the board to speed up
 Object.assign(UI,{rot:0,deg:0,turn:-1,stepKey:'',user:false,hint:null,aiT:0,tl:{},mp:{},fxSeen:0,view:{s:.4,x:0,y:0},camp:null,first:false,moved:false,
   legal:[],rots:[],figs:[],ov:[],setup:{rivals:1,lv:'normal',river:false,ic:false,tb:false},tween:0,overT:0,lastKey:null,humanTurns:0});
 try{UI.first=localStorage.getItem('rv_seen')!=='1';UI.speed=localStorage.getItem('rv_fast')==='1'?3:1}catch(e){}
 const human=()=>G&&G.pl.some(p=>p.human);
 const myTurn=step=>{if(!G||G.over||!G.cur)return false;const s=sideToAct();return s>=0&&P(s).human&&(!step||G.step===step)};
 const seatName=p=>p.human&&G.pl.filter(q=>q.human).length===1?'You':p.nm;
-function say(t){const el=$('#status');el.textContent=t;el.classList.toggle('mine',myTurn())}
+function say(t,tn){const el=$('#status');const p=G&&G.cur&&!G.over?P(G.cur.p):null;el.style.setProperty('--c',p?PCOL[p.i]:'#e0a83a');
+  el.innerHTML=(tn?`<b class="tn"><i class="tdot"></i>${esc(tn)}</b>`:'')+`<span class="ins">${esc(t)}</span>`;el.classList.toggle('mine',myTurn())}
+// rival steps: a short caption per step (what it drew, where it put it, what it claimed, what it scored), shown ~1.4 s each
+function capSet(t,ms,score,intro){UI.cap={t,score:!!score,intro:!!intro,until:Date.now()+(ms||1500)};clearTimeout(UI.capT);UI.capT=setTimeout(()=>{if(G&&!G.over)renderStatus()},(ms||1500)+30)}
+function capNow(){return UI.cap&&Date.now()<UI.cap.until?UI.cap.t:''}
+const FEATW={C:'town',R:'road',M:'priory',F:'field'};
+function scoreCap(d,final){const F=G.fd[d.r];const ty=F?FEATW[F.ty]:'feature',n=F&&F.ty!=='M'?(F.tiles||[]).length:0;
+  const who=(d.win&&d.win.length?d.win:[d.by||0]).map(i=>seatName(P(i))).join(' and ');
+  const why=F&&F.ty==='F'?`field with ${d.pts/3|0} finished town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'priory ringed by 8 tiles':'open priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
+  return `${who} +${d.pts}: ${why}`}
 // ---------- view: world units are 100 per tile; the world div is translated and scaled ----------
 const boardEl=()=>$('#board');
 function measure(){const r=boardEl().getBoundingClientRect();return {W:r.width,H:r.height,L:r.left,T:r.top}}
@@ -100,12 +110,15 @@ function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
   else if(G.step==='fig'){UI.handKey=null;
     if(myTurn()){h.innerHTML=`<button id="hskip">Skip</button>`;$('#hskip').addEventListener('click',()=>onSkip())}
     else h.innerHTML=`<button id="htile" disabled style="--c:${c}">${tileSvg(G.tiles[G.cur.k].t,G.tiles[G.cur.k].r)}</button>`}}
-function renderStatus(){let t='';
-  if(G.over)t='Game over';
-  else if(myTurn('place'))t=G.cur.bonus?'Extra turn! Place your tile':isRiver(G.cur.t)?'Carry the river on':'Place your tile';
-  else if(myTurn('fig'))t='Place a follower, or skip';
-  else if(G.cur)t=`${seatName(P(G.cur.p))==='You'?'You':P(G.cur.p).nm} ${G.step==='fig'?'sets a follower':'plays a tile'}`;
-  say(t)}
+function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
+  if(sc){tn='Scoring';t=c}
+  else if(G.over){tn='Game over';t='The valley is full. Counting the points…'}
+  else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
+    if(me&&c&&UI.cap.intro)t=c;
+    else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Tap a glowing square to place your tile.':isRiver(G.cur.t)?'Carry the river on: tap a glowing square.':(UI.rots&&UI.rots.length>1?'Tap a glowing square to place your tile. Tap the tile to turn it.':'Tap a glowing square to place your tile.');
+    else if(me)t='Tap a circle to put a follower there, or tap Skip.';
+    else t=c||(G.step==='fig'?`${p.nm} is choosing where to put a follower…`:`${p.nm} is drawing a tile…`)}
+  say(t,tn)}
 // ---------- turn bookkeeping ----------
 function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(key===UI.stepKey)return;UI.stepKey=key;
   if(myTurn('place')){UI.legal=legalPlacements(G.cur.t);UI.rots=[...new Set(UI.legal.map(g=>g.r))].sort();UI.hint=null;
@@ -130,14 +143,16 @@ function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s)
 function aiNow(){if(UI.aiT){clearTimeout(UI.aiT);aiAct()}}
 // ---------- effects: scores light up the feature and fly to the seat chip ----------
 function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n=0;
+  for(const f of list){const rv=G&&G.cur&&!P(G.cur.p).human;if(f.t==='turn'&&!P(f.x).human)capSet(`${P(f.x).nm} draws a tile: ${TT[G.cur.t].n}`,1400);else if(f.t==='place'&&rv){const l=G.log[0];capSet(`${P(G.cur.p).nm} lays it next to the valley.`,1400)}else if(f.t==='fig'&&rv){const l=G.log[0];capSet(l?l.t.replace(/^[^ ]+ sets a/,P(G.cur.p).nm+' puts a').replace(/\.$/,'')+'.':'',1400)}}
+
   for(const f of list){if(f.t==='place')sfx('place');else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
     else if(f.t==='score'){const d=f.x,delay=n++*520;setTimeout(()=>scorePop(d),delay)}}}
 function featCells(r){const F=G.fd[r];if(!F)return [];if(F.ty==='M')return [[F.x,F.y]];return (F.tiles||[]).map(unkey)}
-function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.length)return;sfx('score');
+function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.length)return;sfx('score');try{capSet(scoreCap(d,final),final?900:1900,true);renderStatus()}catch(e){}
   for(const [x,y] of cells){const e=UI.tl[key(x,y)];if(e){e.classList.remove('lit');void e.offsetWidth;e.classList.add('lit')}}
   const cx=cells.reduce((a,c)=>a+c[0],0)/cells.length+.5,cy=cells.reduce((a,c)=>a+c[1],0)/cells.length+.5;
   const w=d.win.length?d.win:[d.by||0];
-  w.forEach((i,j)=>{const e=document.createElement('div');e.className='pop';e.style.setProperty('--c',PCOL[i]);e.textContent='+'+d.pts;addOv(e,cx*100,cy*100,{dy:-j*26});placeOverlay();
+  w.forEach((i,j)=>{const e=document.createElement('div');e.className='pop';e.style.setProperty('--c',PCOL[i]);{const F=G.fd[d.r];e.innerHTML='+'+d.pts+'<small>'+(F?FEATW[F.ty]:'')+'</small>'}addOv(e,cx*100,cy*100,{dy:-j*26});placeOverlay();
     const chip=document.querySelector(`.seat[data-i="${i}"]`),b=boardEl().getBoundingClientRect();
     setTimeout(()=>{const o=e._o;if(chip){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
     setTimeout(()=>e.remove(),final?1900:1700)})}
@@ -152,15 +167,16 @@ function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(
   setTimeout(()=>{if(!G||!G.over)return;if(UI.camp&&typeof campFinish==='function'){campFinish();return}showResult()},UI.reduce?300:wait)}
 function showResult(){const win=G.over.win,me=G.pl.find(p=>p.human);const iWon=me&&win.includes(me.i)&&win.length===1;
   const title=!human()?G.winText:win.length>1?'A tie!':iWon?'You win!':P(win[0]).nm+' wins';
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Result"><h2>${esc(title)}</h2><div class="rescore">${G.pl.map(p=>`<span style="--c:${PCOL[p.i]}"><i></i>${p.score}</span>`).join('')}</div><button class="btn big" data-a="again">Play again</button><button class="btn alt" data-a="menu">Menu</button></div></div>`;
+  const rv=G.pl.find(p=>!p.human),line=UI.camp||typeof STORY==='undefined'||!me?'':(win.length>1?STORY.quickTie:iWon?STORY.quickWin:STORY.quickLose(rv?rv.nm:'The rival'));
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Result"><h2>${esc(title)}</h2>${line?`<p class="sub">${esc(line)}</p>`:''}<div class="rescore">${G.pl.map(p=>`<span style="--c:${PCOL[p.i]}"><i></i>${esc(seatName(p))} ${p.score}</span>`).join('')}</div><button class="btn big" data-a="again">Play again</button><button class="btn alt" data-a="menu">Menu</button></div></div>`;
   $('#modal').querySelector('[data-a=again]').onclick=()=>beginGame(UI.lastOpts);$('#modal').querySelector('[data-a=menu]').onclick=()=>showStart()}
 // ---------- start screen, menu, rules ----------
 function savedGame(){try{const g=JSON.parse(localStorage.getItem(SAVE));return g&&g.v===1&&!g.over?g:null}catch(e){return null}}
 function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame();
   const chips=(k,vals)=>vals.map(v=>`<button class="opt" data-k="${k}" data-v="${v[0]}" aria-pressed="${o[k]===v[0]}">${v[1]}</button>`).join('');
   const tg=(k,t)=>`<button class="opt" data-t="${k}" aria-pressed="${!!o[k]}">${t}</button>`;
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">Build the valley. Claim it.</p><button class="btn big" data-a="play">Play vs computer</button>
-    <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}${tutBtn('btn alt')}
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">Build the valley. Claim it.</p>${tutFirst()?tutBtn('btn big'):''}<button class="btn ${tutFirst()?'alt':'big'}" data-a="play">Play vs computer</button>
+    <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}${tutFirst()?'':tutBtn('btn alt')}
     <div class="opts">${chips('rivals',[[1,'1 rival'],[2,'2 rivals'],[3,'3 rivals']])}</div><div class="opts">${chips('lv',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}</div>
     <div class="opts">${tg('river','River')}${tg('ic','Taverns')}${tg('tb','Merchants')}</div></div></div>`;
   const m=$('#modal');m.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.dataset.k)o[b.dataset.k]=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v;else o[b.dataset.t]=!o[b.dataset.t];showStart()});
@@ -176,7 +192,7 @@ function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
 function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true);if(d)hlpAfter()}
 function showRules(){$('#modal').innerHTML=`<div class="scrim"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><ul><li>Draw a tile. Turn it, then lay it so every edge matches.</li><li>Then stand a follower on a road, town, priory or field, or skip.</li><li>Finish a road or town: its owner scores, the follower comes home.</li><li>A priory ringed by eight tiles scores 9.</li><li>At the end, farmers score 3 for each finished town beside their field.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=()=>{$('#modal').innerHTML=''}}
 // ---------- new game / continue ----------
-function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false)}
+function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);if(!UI.camp&&!UI.tut&&typeof STORY!=='undefined'){const r=G.pl.find(p=>!p.human);if(r)capSet(STORY.quickIntro(r.nm),3200,false,true)}}
 function setupOpts(){const s=UI.setup,np=1+s.rivals,seats=[];for(let i=0;i<np;i++)seats.push(i?'ai':'human');return {np,seats,lv:seats.map(()=>s.lv),ex:{river:s.river,ic:s.ic,tb:s.tb}}}
 function resetUI(){UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
 function loadSaved(){const g=savedGame();if(!g)return;resetUI();G=g;UI.camp=null;UI.fxSeen=0;UI.fx.length=0;$('#modal').innerHTML='';UI.lastOpts=setupOpts();render();refit(false);schedAI()}

@@ -60,3 +60,17 @@ html.sk .menu .srow>span:first-child{flex:1 1 auto}
 html.sk .menu .opt{min-height:38px;font:700 14px/1 var(--ff);padding:0}
 @media(min-width:1024px){html.sk .menu button,html.sk .menu .srow,html.sk .menu .srow span,html.sk .menu .opt,html.sk .menu .gxt-menu b,html.sk .menu .gxt-menu span{font-size:16px}
 #hand{align-self:center;width:fit-content;margin:0 auto 10px;padding:10px 44px;min-height:0}#htile{width:132px;height:132px}}
+/* ---- playable pass: turn strip (banner + one instruction line), readable chips ---- */
+#status,html.sk #status{top:6px;left:50%;transform:translateX(-50%);width:calc(100% - 16px);max-width:460px;padding:7px 12px 8px;border-radius:14px;background:rgba(40,27,18,.94);color:#fff3dc;border:2px solid var(--c,#e0a83a);box-shadow:0 3px 10px rgba(0,0,0,.45);white-space:normal;text-align:left;display:block;font-size:14px;line-height:1.25;font-weight:600}
+#status.mine,html.sk #status.mine{background:rgba(40,27,18,.94);box-shadow:0 0 0 2px #ffd99a,0 3px 10px rgba(0,0,0,.45)}
+#status .tn{display:flex;align-items:center;gap:7px;font:800 16px/1.2 var(--ff-h,var(--ff));letter-spacing:.02em;color:#ffe2a6;margin-bottom:2px}
+#status .tdot{width:12px;height:12px;border-radius:50%;background:var(--c);border:2px solid #fff3dc;flex:0 0 auto}
+#status .ins{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px}
+.pop small{display:block;font:800 12px/1 var(--ff);text-align:center;background:rgba(40,27,18,.85);color:#fff3dc;border-radius:6px;padding:2px 5px;margin-top:2px;text-shadow:none}
+html.sk .seat .nm,html.sk .seat .fl{font-size:14px}html.sk .seat b{font-size:1.15rem}
+@media(min-width:1024px){html.sk #status .tn{font-size:18px}html.sk #status .ins{font-size:16px}}
+.turn5{margin:6px 0 0;padding-left:1.4em;text-align:left;font-size:15px;line-height:1.35;color:#3a2410}.turn5 li{margin:3px 0}
+/* story tutorial: guide / rival portrait + chapter label on every bubble */
+.gxt-bub .gxh-bd{display:flex;align-items:flex-start;gap:10px}
+.gxt-bub .gxh-bd::before{content:"";flex:0 0 auto;width:48px;height:48px;border-radius:50%;border:3px solid #7a8a3c;background-size:cover;background-position:center 20%;background-color:#e8d9b5}
+.gxt-bub .gxh-tt::before{display:block;font:800 13px/1.3 var(--ff);letter-spacing:.06em;color:#6b3a1c;margin-bottom:2px}
