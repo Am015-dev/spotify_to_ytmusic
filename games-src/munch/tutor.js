@@ -42,6 +42,7 @@ function tutDeal(){
 function tutStackTreasure(){const take=key=>{const i=G.tr.findIndex(id=>G.C[id]===key);return i>=0?G.tr.splice(i,1)[0]:null};
   const order=['jerkin','snooze','sour','pile','shiv'].map(take).filter(x=>x!=null);   // pushed last = drawn first: shiv (first draw), pile, sour, snooze, jerkin
   for(const id of order)G.tr.push(id)}
+function tutLastSetup(){if(G.tutLast)return;G.tutLast=1;P(0).lvl=9;const id=G.door.find(x=>{const c=cd(x);return c.t==='monster'&&c.lvl<=3&&!c.sp&&!(c.bad||[]).some(o=>o[0]==='die')});if(id!=null){G.door.splice(G.door.indexOf(id),1);G.door.push(id)}render()}
 function tutTop(key){const i=G.door.findIndex(id=>G.C[id]===key);if(i<0)return false;const id=G.door.splice(i,1)[0];G.door.push(id);return true}
 // the die: find a generator state whose next d6 is v (rnd() adds 0x6D2B79F5 to G.rng first)
 function tutRoll(v){for(let r=1;r<5000;r++){let t=r+0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);if(1+Math.floor(((t^t>>>14)>>>0)/4294967296*6)===v){G.rng=r;return true}}return false}
@@ -135,8 +136,12 @@ function tutSteps(){
  {id:'charity',title:'Too many cards',say:'You may keep 5 cards. Give the extras to the lowest-level hero: tap the Halfling, then Morwen.',target:tchip(1),also:()=>tcard('halfling'),pick:tpick('halfling'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='halfling'&&a.z==='p1'},from:()=>tcard('halfling'),
    ready:()=>G.phase==='charity'&&tmine()&&BF.pick==null&&!!tcard('halfling')&&!!tchip(1)()},
- {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins, and the last level needs a monster kill. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .top'),wait:null,
-   ready:()=>G.active!==0&&!G.winner}
+ {id:'last',title:'The last level',say:'Time skip: you are level 9 now. The final level only comes from killing a monster. Kick the door!',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
+   ready:()=>G.phase==='main'&&G.active===0&&G.turn>2&&tmine()&&!G.winner&&!!document.querySelector('.bfdoor')&&(tutLastSetup(),true)},
+ {id:'finalfight',title:'Win the game',say:()=>{const [a,b]=nowStr();return 'A weak monster: you '+a+', it '+b+'. Beat it and you reach level 10. Tap Fight!'},target:tstable('.fbtns .fightb'),
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='fight'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&P(0).lvl>=9&&!!document.querySelector('.fbtns .fightb')},
+ {id:'finale',title:'You win!',say:()=>'Level 10 from a monster kill ends the game. The result shows everyone\u2019s level. You know the rules!',target:tq('#modal .dlg.end','.mine .top'),wait:null,
+   ready:()=>!!G.winner}
   ]}
 // ---------------------------------------------------------------- the kit hooks
 function tutSetup(){try{GX.close()}catch(e){}

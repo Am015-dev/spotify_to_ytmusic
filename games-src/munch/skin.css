@@ -205,3 +205,4 @@ html:not(.ph) #prompt .tip{font-size:16px}
 .pbpop small{display:block;margin-top:6px;padding:4px 10px;border-radius:8px;background:#1c1410f2;color:#fff;font:600 14px/1.25 system-ui,sans-serif}
 @keyframes pbpop{0%{opacity:0;transform:translate(-50%,-30%) scale(.5)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}28%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-90%) scale(1)}}
 @media (prefers-reduced-motion:reduce){.pbbanner.go,.pbpop{animation-duration:.01s}}
+.howturn{background:#fff3d6;border:2px solid #b8862b;border-radius:10px;padding:6px 12px;margin-bottom:10px;color:#2b1a0a}.howturn li{font-size:15px;line-height:1.35;margin:4px 0}.howturn h3{margin:4px 0}

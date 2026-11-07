@@ -1,5 +1,12 @@
 // the in-game rules, written in our own words
 const RULES_HTML=`
+<div class="howturn"><h3>How a turn works</h3><ol>
+<li><b>Gear up:</b> tap glowing cards to play them on your hero.</li>
+<li><b>Kick the door:</b> tap the big door to reveal a card.</li>
+<li><b>Monster?</b> Fight it: your level + gear must beat its number. Or run away (roll 5 or 6).</li>
+<li><b>No monster?</b> Loot the room for a free card, or put a monster from your hand in.</li>
+<li><b>End turn:</b> keep 5 cards or fewer. Win a fight, gain a level. First to level 10 wins.</li></ol></div>
+<h3>The full rules</h3>
 <p><b>Goal.</b> Be the first hero to reach <b>level 10</b>. You can only gain that last level by killing a monster (a few special cards are exceptions).</p>
 <p><b>Start.</b> Everyone is a level 1 human with no class and gets 4 door cards and 4 treasure cards. Before the first turn you may play any races, classes and items from your hand.</p>
 <h3>Your turn</h3>
