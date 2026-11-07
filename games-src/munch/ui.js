@@ -67,6 +67,7 @@ function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netR
   setHTML($('#modal'),m);$('#modal').hidden=!m;modalArt(G.winner&&m?(musicWant()[0]==='victory'?'win':'lose'):'');$('#modal').classList.toggle('opaque',UI.pass!=null&&!G.winner);
   // a human decision is pending: make sure the dock is open (once per new decision)
   const need=me>=0&&s===me&&P(me).human&&!G.winner?JSON.stringify([G.turn,G.phase,G.q&&G.q.kind,G.cb&&G.cb.stage]):'';if(need&&need!==UI.needKey)GX.showDock();UI.needKey=need;
+  if(typeof pbAfter==='function'){try{pbAfter()}catch(e){}}
   $('#live').textContent=UI.toast&&UI.toast.until>Date.now()?'Ouch! '+UI.toast.t:(G.log[0]?G.log[0].t:'');
   // expire toasts and barks
   const ex=[UI.toast&&UI.toast.until].concat(Object.values(UI.bark||{}).map(b=>b.until)).filter(t=>t&&t>Date.now());clearTimeout(UI.tt);if(ex.length)UI.tt=setTimeout(expireFx,Math.min(...ex)-Date.now()+60)}
@@ -227,16 +228,17 @@ function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
   return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?(dkHero3d(w.nm,'win3d')||dkPortrait(w.nm,'winp')):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
-  const story=online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`;
+  const story=online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode<small>10 chapters, 3 bosses</small></button>${campLine()}`;
   const open=UI.quick===true||online;
   // one column: title, tagline, ONE big button (Story), Continue only with a save, then "Quick game" which opens the options (all segmented controls in one style); How to play and Music live in the top bar
   return `<div class="dlg paper start dk2"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2>Doorkick Dungeon</h2><p class="tagline">Kick doors. Fight monsters. Stab friends.</p>${story}
    ${saved&&!online?'<button class="btn" data-a="load">Continue saved game</button>':''}
    <button class="btn qrow${open?' on':''}" data-a="quick" aria-expanded="${open}">Quick game ${open?'▴':'▾'}</button>
    ${open?`<div class="qopts"><h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${(UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
+   ${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>`}
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
    ${online||UI.mode==='ai'?'':`<div class="seg"><button class="btn tgl ${UI.learn===true?'on':''}" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Teach me as I play</button></div>`}
-   ${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>`}</div>`:''}
+</div>`:''}
    ${typeof tutBtn==='function'?tutBtn('btn'):''}${!net&&typeof onlineBlock==='function'&&!online?onlineBlock():''}</div>`}
 function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
    <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'normal')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
