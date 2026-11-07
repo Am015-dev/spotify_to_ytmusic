@@ -3,6 +3,7 @@
    in one line, and walks through the final score with the player's real numbers. Rules that never came up are listed at the end.
    Words: campaign.json prologue.coach[id]. Coverage list: TUTORIAL-COVERAGE.md. Proof: tutorial-end.js (plays any legal moves by UI taps). */
 var TUT_GAME = 'wildmark', TUT_SEED = 11;
+window.GXCOACH = { running: false, explained: [], done: false };   // read by the QA bot's coached mode
 var COACH_RULES = ['goal', 'place', 'habitat', 'rotate', 'settle', 'bear', 'elk', 'salmon', 'hawk', 'fox', 'keystone', 'acornSpend', 'sweep3', 'wipe4', 'rival', 'majority', 'final', 'acornsEnd', 'tiebreak'];
 function tutOn() { return false; }   // no forced steps any more: every legal move is allowed
 function tutAct() { return true; }
@@ -14,7 +15,7 @@ function coachSay(id, vars, force) {
   if (COACH_RULES.indexOf(id) >= 0) C.seen[id] = 1;
   var b = $('#coachb'); if (!b) { b = document.createElement('div'); b.id = 'coachb'; b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); $('#board').appendChild(b); }
   b.innerHTML = '<i class="cface" aria-hidden="true"></i><p><b>Rowan</b> ' + esc(t) + '</p><button type="button" class="cx" id="coachX" aria-label="Dismiss">&times;</button>';
-  b.dataset.rule = id; b.hidden = false; C.shown.push(id); window.WM_COACH = { explained: Object.keys(C.seen), shown: C.shown.slice(), later: C.later || [] };
+  b.dataset.rule = id; b.hidden = false; C.shown.push(id); window.GXCOACH.explained = Object.keys(C.seen); window.WM_COACH = { explained: Object.keys(C.seen), shown: C.shown.slice(), later: C.later || [] };
   return true;
 }
 function coachHide() { var b = $('#coachb'); if (b) b.hidden = true; }
@@ -72,6 +73,7 @@ function coachFinalHTML() {
   ['final', 'acornsEnd', 'tiebreak', 'majority'].forEach(function (id) { C.seen[id] = 1; });
   var later = COACH_RULES.filter(function (id) { return !C.seen[id]; }); C.later = later;
   window.WM_COACH = { explained: Object.keys(C.seen), shown: C.shown.slice(), later: later };
+  window.GXCOACH = { running: false, explained: Object.keys(C.seen), later: later, done: true };
   var h = '<div class="cfinal"><p class="ch"><i class="cface" aria-hidden="true"></i><b>Rowan</b> ' + esc(coachLine('final')) + '</p><ol>';
   h += '<li>Animals by their cards: ' + WM.ANI.map(function (a) { return WM.ANI_NAME[a] + ' ' + r.ani[a]; }).join(', ') + ' = <b>' + r.aniT + '</b></li>';
   h += '<li>Biggest joined habitat per terrain: <b>' + hb + '</b>, plus <b>' + tb + '</b> bonus for beating ' + esc(G.seats[1].name) + ' in a terrain (+2, a tie +1).</li>';
@@ -94,6 +96,7 @@ function tutStart(o) {
   UI.coachPrologue = !!(o && o.prologue); UI.prefs.played = 1; savePrefs();
   UI.coach = { seen: {}, shown: [], fixed: {}, done: 0, ani: 0, aniBy: {}, hab: 0, w4: 0, fb: 0 };
   WM.ANI.forEach(function (a) { UI.coach.aniBy[a] = 0; });
+  window.GXCOACH = { running: true, explained: [], done: false };
   UI.mode = 'coach'; newGame({ np: 2, humans: 1, ai: 'easy', seed: TUT_SEED, turns: P.turns || 8, names: [null, 'Bram'] }); UI.mode = 'coach';
   tutFix(); coachCheck();
 }
