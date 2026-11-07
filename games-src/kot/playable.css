@@ -60,3 +60,11 @@ html.sk #pacts .btn.primary .bl,html.sk #pacts .btn .bl{text-shadow:0 0 3px #000
  html .gxc-lab,html .gxh-tt,html .gxh-tx,html .gx-ibtn,html .gxc-act b,html .gxc-act small{font-size:16px!important}
  html svg#map text{font-size:16px}
 }
+@media (min-width:1024px){html .dlg .acts .btn span,html .dlg .acts .btn small{font-size:16px}}
+/* audit round 3: text over painted art gets a solid backing or a hard shadow */
+#ppcoach .pp-row button{background:#8f2d00}
+html.sk .dlg .acts .btn.primary{text-shadow:0 0 3px #4a1500,0 0 3px #4a1500,0 1px 2px #000}
+html.sk #pacts .btn.primary,html.sk #pacts .btn{text-shadow:0 0 3px #000,0 0 3px #000}
+html.ph-p header.gx-bar .pchip b{background:rgba(255,253,245,.92);border-radius:4px;padding-left:2px;padding-right:2px}
+html.ph-p header.gx-bar .pchip span{gap:0;letter-spacing:-1.2px}
+html.ph-p header.gx-bar .pchip span em{background:rgba(255,253,245,.92);border-radius:3px;padding:0}

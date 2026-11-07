@@ -351,7 +351,7 @@ function buildWorld(){const sc=V3.scene;const TX=V3.tex;
   for(let k=0;k<5;k++){const a=k/5*Math.PI*2;const sp=mesh(new THREE.ConeGeometry(.13,.44,12),gold,Math.cos(a)*.52,.24,Math.sin(a)*.52,crown);mesh(new THREE.SphereGeometry(.08,16,12),ruby,0,.25,0,sp);mesh(new THREE.OctahedronGeometry(.07),ruby,Math.cos(a+.63)*.57,-.07,Math.sin(a+.63)*.57,crown)}
   // DOWNTOWN marquee on two posts
   const mq=new THREE.Group();mq.position.set(0,0,-4.6);sc.add(mq);V3.marquee=mq;
-  const frameM=std(0x2a1a34,{roughness:.4,metalness:.3});
+  const frameM=std(0x4a3560,{roughness:.4,metalness:.3});
   mesh(roundedBox(6.2,1.7,.36,2,.12),frameM,0,8.75,0,mq);[-2.6,2.6].forEach(x=>mesh(new THREE.CylinderGeometry(.12,.16,8,12),frameM,x,4,-.1,mq));
   V3.dtSign=mesh(new THREE.PlaneGeometry(5.9,1.45),new THREE.MeshBasicMaterial({map:null,color:new THREE.Color(1.3,1.3,1.3)}),0,8.75,.19,mq,true);
   const bulbs=new THREE.InstancedMesh(new THREE.SphereGeometry(.07,8,6),glowMat(0xffe6a0,3),30);for(let i=0;i<30;i++){const t=i/30;const per=2*(6.0+1.5);let d=t*per,x,y;if(d<6){x=-3+d;y=.75}else if(d<7.5){x=3;y=.75-(d-6)}else if(d<13.5){x=3-(d-7.5);y=-.75}else{x=-3;y=-.75+(d-13.5)}bulbs.setMatrixAt(i,M4(x,8.75+y,.2))}mq.add(bulbs);V3.mqBulbs=bulbs;
@@ -359,9 +359,9 @@ function buildWorld(){const sc=V3.scene;const TX=V3.tex;
   const hb=new THREE.Group();hb.position.set(12.5,0,-6.5);sc.add(hb);V3.harbor=hb;
   const wn=waterNormal();V3.wn=wn;
   V3.water=mesh(new THREE.PlaneGeometry(9,8),hero(new THREE.MeshPhysicalMaterial({color:0x1d6f8a,roughness:.08,metalness:.05,normalMap:wn,normalScale:new THREE.Vector2(.55,.55),clearcoat:.4,envMapIntensity:1.4})),0,.2,0,hb,true);V3.water.rotation.x=-Math.PI/2;V3.water.receiveShadow=true;
-  mesh(new THREE.PlaneGeometry(9.6,8.6),std(0x0d2530),0,.02,0,hb,true).rotation.x=-Math.PI/2;
+  mesh(new THREE.PlaneGeometry(9.6,8.6),std(0x1d4a5c),0,.02,0,hb,true).rotation.x=-Math.PI/2;
   const quay=std(0x8c7d88,{roughness:.8,map:TX.paint});[[0,-4.15,9.8,.5],[0,4.15,9.8,.5],[-4.65,0,.5,8.8],[4.65,0,.5,8.8]].forEach(([x,z,w,d])=>mesh(roundedBox(w,.55,d,2,.08),quay,x,.26,z,hb));
-  const pk=plankTex();const wood=std(0xffffff,{map:pk.map,normalMap:pk.n,roughness:.75});const dark=std(0x3a2418,{roughness:.8});
+  const pk=plankTex();const wood=std(0xffffff,{map:pk.map,normalMap:pk.n,roughness:.75});const dark=std(0x6a4630,{roughness:.8});
   const deck=mesh(new THREE.CylinderGeometry(2.7,2.7,.16,48),[dark,wood,dark],0,.62,0,hb);deck.receiveShadow=true;
   for(let k=0;k<10;k++){const a=k/10*Math.PI*2;mesh(new THREE.CylinderGeometry(.13,.13,.9,10),dark,Math.cos(a)*2.62,.3,Math.sin(a)*2.62,hb)}
   const rope=mesh(new THREE.TorusGeometry(2.66,.045,6,64),std(0xcaa878,{roughness:.9}),0,.66,0,hb);rope.rotation.x=Math.PI/2;
@@ -369,13 +369,13 @@ function buildWorld(){const sc=V3.scene;const TX=V3.tex;
   const tug=new THREE.Group();tug.position.set(-2.6,.22,2.6);tug.rotation.y=.7;hb.add(tug);V3.tug=tug;
   const hs=new THREE.Shape();hs.moveTo(-.9,-.35);hs.lineTo(.6,-.35);hs.quadraticCurveTo(1.05,-.3,1.05,0);hs.quadraticCurveTo(1.05,.3,.6,.35);hs.lineTo(-.9,.35);hs.quadraticCurveTo(-1,.0,-.9,-.35);
   const hull=mesh(new THREE.ExtrudeGeometry(hs,{depth:.32,bevelEnabled:true,bevelThickness:.06,bevelSize:.05,bevelSegments:3}),vinyl(0xd8343f,{vertexColors:false}),0,-.05,0,tug);hull.rotation.x=-Math.PI/2;
-  mesh(roundedBox(.6,.36,.5,2,.06),vinyl(0xf3eee4,{vertexColors:false}),-.2,.45,0,tug);mesh(new THREE.CylinderGeometry(.08,.1,.4,12),vinyl(0x2a1a34,{vertexColors:false}),-.3,.8,0,tug);
+  mesh(roundedBox(.6,.36,.5,2,.06),vinyl(0xf3eee4,{vertexColors:false}),-.2,.45,0,tug);mesh(new THREE.CylinderGeometry(.08,.1,.4,12),vinyl(0x4a3560,{vertexColors:false}),-.3,.8,0,tug);
   V3.hsign=sprite(signTex('HARBOR','#43c8ff','#e9fbff'),0,4.3,-2.5,3.6,.9,hb);V3.hsign.material.color.setScalar(1.5);
   // the city: merged facades, roofs, trims, rooftop props and neon (a few draw calls)
   buildCity();
   // street lamps around the plaza (instanced poles and warm bulbs)
   const lamps=[];for(let k=0;k<26;k++){const a=k/26*Math.PI*2+.06;const x=Math.cos(a)*12.35,z=Math.sin(a)*12.35;if(z>6&&Math.abs(x)<7)continue;if(Math.abs(x-12.5)<5.2&&Math.abs(z+6.5)<4.8)continue;lamps.push([x,z])}
-  const pole=new THREE.InstancedMesh(new THREE.CylinderGeometry(.05,.08,2.2,8),std(0x2a2230,{metalness:.6,roughness:.4}),lamps.length);pole.castShadow=true;
+  const pole=new THREE.InstancedMesh(new THREE.CylinderGeometry(.05,.08,2.2,8),std(0x50465e,{metalness:.6,roughness:.4}),lamps.length);pole.castShadow=true;
   const bulb=new THREE.InstancedMesh(new THREE.SphereGeometry(.16,12,10),glowMat(0xffc878,1.7),lamps.length);
   lamps.forEach(([x,z],i)=>{pole.setMatrixAt(i,M4(x,1.1,z));bulb.setMatrixAt(i,M4(x,2.25,z))});sc.add(pole,bulb);
   const pool=new THREE.InstancedMesh(new THREE.CircleGeometry(1.6,24),new THREE.MeshBasicMaterial({map:TX.glow,color:new THREE.Color(.55,.34,.16),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}),lamps.length);
