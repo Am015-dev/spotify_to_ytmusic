@@ -229,3 +229,30 @@ html.land .mcard:not(.empty){justify-content:flex-start;gap:6px;padding:0 6px}ht
 /* W408b: audit A on desktop (16px minimum) and C (art keeps its aspect) */
 @media (min-width:1024px){.mbox .lede,.mbox .seg button,.exs .chk b,.seatrow b,.seatrow .btn,.acts .btn b,.acts .btn span,.mbox .acts .btn,.exd summary b,#seats .sch .ss,.gxc-lab,.gxc-ib,.gxc-act b,.gxc-act small{font-size:16px!important}}
 .gxc-path{background-size:cover!important}
+/* W408c: setup rows are real segmented buttons, "More ways" is a button, nothing is rendered while collapsed */
+.mbox .exsum{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.mbox .seatrow{flex-wrap:wrap}.mbox .seatrow .seg{flex:0 1 auto}.mbox .seatrow .seg button{padding:0 10px}
+/* W408c audit B: solid panels behind text and icons that sat on painted art, 4.5:1 minimum */
+.mbox .lede{color:#4a2410}
+html.sk .mbox .btn.go,html.sk .mbox .seg button.on{filter:brightness(.8) saturate(1.1)}
+.gx-drawer .muted,#djbody .muted{color:#3b1c0e}
+.cgrid .card p{background:#fff6dc;color:#3b1c0e;border-radius:8px;padding:6px 8px}
+html.sk-pl .card.dj h4{background:linear-gradient(rgba(42,18,80,.92),rgba(42,18,80,.92)),url(media/ui-djinn-bar.webp) center/cover no-repeat,#2a1250!important;color:#fff2c8!important}
+.card.dj h4 small{color:#fff2c8!important}
+.rules ol{background:#fff6dc;color:#3b1c0e;border-radius:10px;padding:10px 10px 10px 30px}
+.gx-drawer .btn i.ri{background:#fff6dc;color:#3b1c0e;border-radius:8px;padding:2px 5px;display:inline-grid;place-items:center}
+html.sk .gx-drawer-body>button.btn{border-image:none;border:2px solid #b0702a;border-radius:12px;background:#fff6dc;color:#3b1c0e;padding:6px 14px}
+.gxc-act b,.gxc-act small{background:#fff6dc!important;color:#3b1c0e!important;padding:2px 8px;border-radius:8px}
+.gxc-lab{background:#fff6dc!important;color:#3b1c0e!important;padding:1px 6px;border-radius:6px}
+html.sk-pl .dcard .dv{color:#3b1c0e}
+.tile .tv{background:#ffd75a;color:#2b1306;border-radius:12px;min-width:20px;text-align:center}
+.mcard .mn{background:#fff6dc}
+.spot small.ord{background:#fff6dc;color:#3b1c0e;border-radius:6px;padding:0 4px}
+/* W408c second pass */
+.mbox .exsum,.mbox .exsum b,.mbox .exsum span{font-size:16px!important}
+.cgrid .card h4,.cgrid .card.dj h4{background:#2a1250!important;color:#fff2c8!important}
+.dcard .dv{background:#fff6dc!important;color:#3b1c0e!important}.dcard .dv::before{display:none!important}
+html.sk .gx-drawer-body>button.btn,html.sk .gx-drawer-body>button.btn.go{background:#fff6dc!important;border-image:none!important;color:#3b1c0e!important;filter:none}
+.gx-drawer .btn i.ri{background:#fff6dc!important;background-image:none!important;font-size:18px!important;width:auto;height:auto}
+.gxc-act small{color:#2b1306!important}.gxc-lab{display:inline-block}
+.mcard .mn{display:block;width:calc(100% - 4px);text-align:center;padding:0 1px;line-height:1.15;overflow:hidden}
