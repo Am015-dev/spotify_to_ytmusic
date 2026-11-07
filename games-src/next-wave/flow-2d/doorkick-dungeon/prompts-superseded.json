@@ -1,0 +1,10 @@
+{
+ "note": "Prompts not to be generated: a finished 3D model sprite already covers the item (W354).",
+ "cards": {
+  "event-door-kick": {
+   "prompt": "a heavy dungeon door bursting open off its hinges from a kick with flying splinters and dust, a glow behind, no text, letters or numbers",
+   "from": "prompts-wave7-43.json",
+   "covered_by": "models/door.webp (3D door kick burst)"
+  }
+ }
+}
