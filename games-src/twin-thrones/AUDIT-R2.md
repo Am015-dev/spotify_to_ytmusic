@@ -1,0 +1,312 @@
+# AUDIT-R2: twin-thrones
+
+Read-only independent audit (W340). No game file was changed; the build was run locally and served from a local static copy.
+
+## Checks run
+
+- Sizes: phone 390x763 (2x), phone-s 375x553 (2x), PC 1440x860.
+- Independent UI audit: `games-src/scripts/ui-audit.spec.js`, rules A-F on the title, board, panel and menu surfaces (rule C and D: no failures).
+- Scenario tests: `games-src/scripts/scenarios.spec.js`, 4 `?scn=` scenarios (menu, tt-select, tt-board, tt-result) x 3 sizes = 12 tests.
+
+## Result
+
+- Audit: 181 failing checks across the 3 sizes (149 unique checks).
+- Scenario tests: 12 of 12 failed (142 failing checks inside them).
+
+## Failing checks (audit)
+
+- **A text size** | screen: `board` | element: `div#bd>div#s1.strip>button.pill` `"Computer" 12.8px (min 13)` | measured: "Computer" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#s1.strip>span.pill` `"$9" 12.8px (min 13)` | measured: "$9" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#s1.strip>span.pill` `"3 pts" 12.8px (min 13)` | measured: "3 pts" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span#tg-6.tg` `"5$" 8.8px (min 13)` | measured: "5$" 8.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span#tg-3.tg` `"2$" 8.8px (min 13)` | measured: "2$" 8.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span#tg3.tg` `"2$" 8.8px (min 13)` | measured: "2$" 8.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span#tg6.tg` `"5$" 8.8px (min 13)` | measured: "5$" 8.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span.nm` `"Computer" 9.6px (min 13)` | measured: "Computer" 9.6px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span.nm` `"You" 9.6px (min 13)` | measured: "You" 9.6px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c0.card>div.band` `"Stake Fence" 8.4px (min 13)` | measured: "Stake Fence" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c1.card>div.band` `"Open Stage" 8.4px (min 13)` | measured: "Open Stage" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c5.card>div.band` `"Stone Depot" 8.4px (min 13)` | measured: "Stone Depot" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c6.card>div.band` `"Scribe Room" 8.4px (min 13)` | measured: "Scribe Room" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c7.card>div.band` `"Weights Hall" 8.4px (min 13)` | measured: "Weights Hall" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c8.card>div.band` `"Clay Depot" 8.4px (min 13)` | measured: "Clay Depot" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c14.card>div.band` `"Brick Cut" 8.4px (min 13)` | measured: "Brick Cut" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c14.card>div.fx>span.bdg` `"C" 9.1px (min 13)` | measured: "C" 9.1px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c14.card>div.costs>span.chip` `"$1" 7.8px (min 13)` | measured: "$1" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c15.card>div.band` `"Roadside Inn" 8.4px (min 13)` | measured: "Roadside Inn" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c15.card>div.fx>span.bdg` `"$4" 9.1px (min 13)` | measured: "$4" 9.1px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c15.card>div.costs>span.chip` `"free" 7.8px (min 13)` | measured: "free" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c16.card>div.band` `"Reed Press" 8.4px (min 13)` | measured: "Reed Press" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c16.card>div.fx>span.bdg` `"P" 9.1px (min 13)` | measured: "P" 9.1px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c16.card>div.costs>span.chip` `"$1" 7.8px (min 13)` | measured: "$1" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c17.card>div.band` `"Mud Basin" 8.4px (min 13)` | measured: "Mud Basin" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c17.card>div.fx>span.bdg` `"C" 9.1px (min 13)` | measured: "C" 9.1px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c17.card>div.costs>span.chip` `"free" 7.8px (min 13)` | measured: "free" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#pyr>div#c19.card>div.band` `"Rock Face" 8.4px (min 13)` | measured: "Rock Face" 8.4px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c19.card>div.fx>span.bdg` `"S" 9.1px (min 13)` | measured: "S" 9.1px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#c19.card>div.costs>span.chip` `"free" 7.8px (min 13)` | measured: "free" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone
+- **A text size** | screen: `board` | element: `div#bd>div#s0.strip>button.pill` `"You" 12.8px (min 13)` | measured: "You" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#s0.strip>span.pill` `"$7" 12.8px (min 13)` | measured: "$7" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#s0.strip>span.pill` `"2 pts" 12.8px (min 13)` | measured: "2 pts" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **A text size** | screen: `board` | element: `aside#dock.gx-dock>div#dockbody.gx-dock-body>div#sub` `"Build it, sell it for coins," 12.8px (min 13)` | measured: "Build it, sell it for coins," 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone, phone-s
+- **B text contrast / busy background** | screen: `board` | element: `div#pyr>div#c5.card>div.band` `"Stone Depot" contrast 2.19:1 (<4.5)` | measured: "Stone Depot" contrast 2.19:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#pyr>div#c8.card>div.band` `"Clay Depot" contrast 2.19:1 (<4.5)` | measured: "Clay Depot" contrast 2.19:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#pyr>div#c15.card>div.band` `"Roadside Inn" contrast 2.19:1 (<4.5)` | measured: "Roadside Inn" contrast 2.19:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#c15.card>div.fx>span.bdg` `"$4" contrast 2.59:1 (<4.5)` | measured: "$4" contrast 2.59:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#pyr>div#c16.card>div.band` `"Reed Press" contrast 3.25:1 (<4.5)` | measured: "Reed Press" contrast 3.25:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#bd>div#s1.strip>span.pill` `"$9" contrast 3.45:1 (<4.5)` | measured: "$9" contrast 3.45:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#bd>div#s0.strip>span.pill` `"$7" contrast 3.45:1 (<4.5)` | measured: "$7" contrast 3.45:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#pyr>div#c6.card>div.band` `"Scribe Room" contrast 3.51:1 (<4.5)` | measured: "Scribe Room" contrast 3.51:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#pyr>div#c7.card>div.band` `"Weights Hall" contrast 3.51:1 (<4.5)` | measured: "Weights Hall" contrast 3.51:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone, phone-s, pc
+- **B text contrast / busy background** | screen: `board` | element: `div#c14.card>div.costs>span.chip` `"$1" busy background (edges 21%, lum spread 0.27)` | measured: "$1" busy background (edges 21%, lum spread 0.27) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone
+- **E dead button** | screen: `start` | element: `div#start>div#lvls.seg>button.btn` `dead button: normal` | measured: dead button: normal | pass: a real tap changes the DOM or navigates within 1.5 s | sizes: phone, pc
+- **E dead button** | screen: `panel How to play` | element: `div#start>div#lvls.seg>button.btn` `dead button: easy` | measured: dead button: easy | pass: a real tap changes the DOM or navigates within 1.5 s | sizes: phone
+- **E dead button** | screen: `panel How to play` | element: `div#start>div#lvls.seg>button.btn` `dead button: hard` | measured: dead button: hard | pass: a real tap changes the DOM or navigates within 1.5 s | sizes: phone
+- **E dead button** | screen: `panel How to play` | element: `div#start>button.btn` `dead button: Play vs computer` | measured: dead button: Play vs computer | pass: a real tap changes the DOM or navigates within 1.5 s | sizes: phone
+- **E dead button** | screen: `panel How to play` | element: `div#start>button.btn` `dead button: Two players, one device` | measured: dead button: Two players, one device | pass: a real tap changes the DOM or navigates within 1.5 s | sizes: phone
+- **E dead button** | screen: `panel How to play` | element: `div#start>button.btn` `dead button: Watch two computers` | measured: dead button: Watch two computers | pass: a real tap changes the DOM or navigates within 1.5 s | sizes: phone
+- **E dead button** | screen: `panel How to play` | element: `div#start>button.btn` `dead button: How to play` | measured: dead button: How to play | pass: a real tap changes the DOM or navigates within 1.5 s | sizes: phone
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#s1.strip>button.pill` `"Computer" 12.8px (min 13)` | measured: "Computer" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#s1.strip>span.pill` `"$9" 12.8px (min 13)` | measured: "$9" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#s1.strip>span.pill` `"3 pts" 12.8px (min 13)` | measured: "3 pts" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#mil>span#tg-6.tg` `"5$" 8.8px (min 13)` | measured: "5$" 8.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#mil>span#tg-3.tg` `"2$" 8.8px (min 13)` | measured: "2$" 8.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#mil>span#tg3.tg` `"2$" 8.8px (min 13)` | measured: "2$" 8.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#mil>span#tg6.tg` `"5$" 8.8px (min 13)` | measured: "5$" 8.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#mil>span.nm` `"Computer" 9.6px (min 13)` | measured: "Computer" 9.6px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#mil>span.nm` `"You" 9.6px (min 13)` | measured: "You" 9.6px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c0.card>div.band` `"Stake Fence" 7.8px (min 13)` | measured: "Stake Fence" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c1.card>div.band` `"Open Stage" 7.8px (min 13)` | measured: "Open Stage" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c5.card>div.band` `"Stone Depot" 7.8px (min 13)` | measured: "Stone Depot" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c6.card>div.band` `"Scribe Room" 7.8px (min 13)` | measured: "Scribe Room" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c7.card>div.band` `"Weights Hall" 7.8px (min 13)` | measured: "Weights Hall" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c8.card>div.band` `"Clay Depot" 7.8px (min 13)` | measured: "Clay Depot" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c14.card>div.band` `"Brick Cut" 7.8px (min 13)` | measured: "Brick Cut" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c14.card>div.fx>span.bdg` `"C" 8.3px (min 13)` | measured: "C" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c14.card>div.costs>span.chip` `"$1" 7.2px (min 13)` | measured: "$1" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c15.card>div.band` `"Roadside Inn" 7.8px (min 13)` | measured: "Roadside Inn" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c15.card>div.fx>span.bdg` `"$4" 8.3px (min 13)` | measured: "$4" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c15.card>div.costs>span.chip` `"free" 7.2px (min 13)` | measured: "free" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c16.card>div.band` `"Reed Press" 7.8px (min 13)` | measured: "Reed Press" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c16.card>div.fx>span.bdg` `"P" 8.3px (min 13)` | measured: "P" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c16.card>div.costs>span.chip` `"$1" 7.2px (min 13)` | measured: "$1" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c17.card>div.band` `"Mud Basin" 7.8px (min 13)` | measured: "Mud Basin" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c17.card>div.fx>span.bdg` `"C" 8.3px (min 13)` | measured: "C" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c17.card>div.costs>span.chip` `"free" 7.2px (min 13)` | measured: "free" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#pyr>div#c19.card>div.band` `"Rock Face" 7.8px (min 13)` | measured: "Rock Face" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c19.card>div.fx>span.bdg` `"S" 8.3px (min 13)` | measured: "S" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#c19.card>div.costs>span.chip` `"free" 7.2px (min 13)` | measured: "free" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#s0.strip>button.pill` `"You" 12.8px (min 13)` | measured: "You" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `div#bd>div#s0.strip>span.pill` `"$7" 12.8px (min 13)` | measured: "$7" 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `panel menubtn` | element: `aside#dock.gx-dock>div#dockbody.gx-dock-body>div#sub` `"Build it, sell it for coins," 12.8px (min 13)` | measured: "Build it, sell it for coins," 12.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c0.card>div.band` `"Stake Fence" 7.8px (min 13)` | measured: "Stake Fence" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c1.card>div.band` `"Open Stage" 7.8px (min 13)` | measured: "Open Stage" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c5.card>div.band` `"Stone Depot" 7.8px (min 13)` | measured: "Stone Depot" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c6.card>div.band` `"Scribe Room" 7.8px (min 13)` | measured: "Scribe Room" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c7.card>div.band` `"Weights Hall" 7.8px (min 13)` | measured: "Weights Hall" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c8.card>div.band` `"Clay Depot" 7.8px (min 13)` | measured: "Clay Depot" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c14.card>div.band` `"Brick Cut" 7.8px (min 13)` | measured: "Brick Cut" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c14.card>div.fx>span.bdg` `"C" 8.3px (min 13)` | measured: "C" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c14.card>div.costs>span.chip` `"$1" 7.2px (min 13)` | measured: "$1" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c15.card>div.band` `"Roadside Inn" 7.8px (min 13)` | measured: "Roadside Inn" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c15.card>div.fx>span.bdg` `"$4" 8.3px (min 13)` | measured: "$4" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c15.card>div.costs>span.chip` `"free" 7.2px (min 13)` | measured: "free" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c16.card>div.band` `"Reed Press" 7.8px (min 13)` | measured: "Reed Press" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c16.card>div.fx>span.bdg` `"P" 8.3px (min 13)` | measured: "P" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c16.card>div.costs>span.chip` `"$1" 7.2px (min 13)` | measured: "$1" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c17.card>div.band` `"Mud Basin" 7.8px (min 13)` | measured: "Mud Basin" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c17.card>div.fx>span.bdg` `"C" 8.3px (min 13)` | measured: "C" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c17.card>div.costs>span.chip` `"free" 7.2px (min 13)` | measured: "free" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#pyr>div#c19.card>div.band` `"Rock Face" 7.8px (min 13)` | measured: "Rock Face" 7.8px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c19.card>div.fx>span.bdg` `"S" 8.3px (min 13)` | measured: "S" 8.3px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#c19.card>div.costs>span.chip` `"free" 7.2px (min 13)` | measured: "free" 7.2px (min 13) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#pyr>div#c5.card>div.band` `"Stone Depot" contrast 2.19:1 (<4.5)` | measured: "Stone Depot" contrast 2.19:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#pyr>div#c8.card>div.band` `"Clay Depot" contrast 2.19:1 (<4.5)` | measured: "Clay Depot" contrast 2.19:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#pyr>div#c15.card>div.band` `"Roadside Inn" contrast 2.19:1 (<4.5)` | measured: "Roadside Inn" contrast 2.19:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#c15.card>div.fx>span.bdg` `"$4" contrast 2.59:1 (<4.5)` | measured: "$4" contrast 2.59:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#pyr>div#c16.card>div.band` `"Reed Press" contrast 3.25:1 (<4.5)` | measured: "Reed Press" contrast 3.25:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#bd>div#s1.strip>span.pill` `"$9" contrast 3.45:1 (<4.5)` | measured: "$9" contrast 3.45:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#bd>div#s0.strip>span.pill` `"$7" contrast 3.45:1 (<4.5)` | measured: "$7" contrast 3.45:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#pyr>div#c6.card>div.band` `"Scribe Room" contrast 3.51:1 (<4.5)` | measured: "Scribe Room" contrast 3.51:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#pyr>div#c7.card>div.band` `"Weights Hall" contrast 3.51:1 (<4.5)` | measured: "Weights Hall" contrast 3.51:1 (<4.5) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#c14.card>div.costs>span.chip` `"$1" busy background (edges 14%, lum spread 0.26)` | measured: "$1" busy background (edges 14%, lum spread 0.26) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `panel menubtn` | element: `div#c16.card>div.costs>span.chip` `"$1" busy background (edges 14%, lum spread 0.26)` | measured: "$1" busy background (edges 14%, lum spread 0.26) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `board` | element: `div#c14.card>div.costs>span.chip` `"$1" busy background (edges 14%, lum spread 0.26)` | measured: "$1" busy background (edges 14%, lum spread 0.26) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **B text contrast / busy background** | screen: `board` | element: `div#c16.card>div.costs>span.chip` `"$1" busy background (edges 14%, lum spread 0.26)` | measured: "$1" busy background (edges 14%, lum spread 0.26) | pass: contrast >= 4.5:1 for the text, or a flat backing so the text is not over a busy background | sizes: phone-s
+- **A text size** | screen: `board` | element: `div#bd>div#s1.strip>button.pill` `"Computer" 12.8px (min 16)` | measured: "Computer" 12.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#s1.strip>span.pill` `"$9" 12.8px (min 16)` | measured: "$9" 12.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#s1.strip>span.pill` `"3 pts" 12.8px (min 16)` | measured: "3 pts" 12.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span#tg-6.tg` `"5$" 8.8px (min 16)` | measured: "5$" 8.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span#tg-3.tg` `"2$" 8.8px (min 16)` | measured: "2$" 8.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span#tg3.tg` `"2$" 8.8px (min 16)` | measured: "2$" 8.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span#tg6.tg` `"5$" 8.8px (min 16)` | measured: "5$" 8.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span.nm` `"Computer" 9.6px (min 16)` | measured: "Computer" 9.6px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#mil>span.nm` `"You" 9.6px (min 16)` | measured: "You" 9.6px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c0.card>div.band` `"Stake Fence" 16px (min 16)` | measured: "Stake Fence" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c1.card>div.band` `"Open Stage" 16px (min 16)` | measured: "Open Stage" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c5.card>div.band` `"Stone Depot" 16px (min 16)` | measured: "Stone Depot" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c6.card>div.band` `"Scribe Room" 16px (min 16)` | measured: "Scribe Room" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c7.card>div.band` `"Weights Hall" 16px (min 16)` | measured: "Weights Hall" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c8.card>div.band` `"Clay Depot" 16px (min 16)` | measured: "Clay Depot" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c14.card>div.band` `"Brick Cut" 16px (min 16)` | measured: "Brick Cut" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#c14.card>div.costs>span.chip` `"$1" 14.8px (min 16)` | measured: "$1" 14.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c15.card>div.band` `"Roadside Inn" 16px (min 16)` | measured: "Roadside Inn" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#c15.card>div.costs>span.chip` `"free" 14.8px (min 16)` | measured: "free" 14.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c16.card>div.band` `"Reed Press" 16px (min 16)` | measured: "Reed Press" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#c16.card>div.costs>span.chip` `"$1" 14.8px (min 16)` | measured: "$1" 14.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c17.card>div.band` `"Mud Basin" 16px (min 16)` | measured: "Mud Basin" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#c17.card>div.costs>span.chip` `"free" 14.8px (min 16)` | measured: "free" 14.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#pyr>div#c19.card>div.band` `"Rock Face" 16px (min 16)` | measured: "Rock Face" 16px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#c19.card>div.costs>span.chip` `"free" 14.8px (min 16)` | measured: "free" 14.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#s0.strip>button.pill` `"You" 12.8px (min 16)` | measured: "You" 12.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#s0.strip>span.pill` `"$7" 12.8px (min 16)` | measured: "$7" 12.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `div#bd>div#s0.strip>span.pill` `"2 pts" 12.8px (min 16)` | measured: "2 pts" 12.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `aside#dock.gx-dock>div#dockbody.gx-dock-body>div#msg` `"Tap a glowing card" 15.2px (min 16)` | measured: "Tap a glowing card" 15.2px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **A text size** | screen: `board` | element: `aside#dock.gx-dock>div#dockbody.gx-dock-body>div#sub` `"Build it, sell it for coins," 12.8px (min 16)` | measured: "Build it, sell it for coins," 12.8px (min 16) | pass: font >= 13px on phone sizes, >= 16px at PC width | sizes: pc
+- **E dead button** | screen: `panel How to play` | element: `div#s1.strip>div.wrow>button.wt` `dead button: Stone Riddle` | measured: dead button: Stone Riddle | pass: a real tap changes the DOM or navigates within 1.5 s | sizes: pc
+
+## Failing checks (scenarios)
+
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: every font a loaded shelf face: N=34 [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Twin Thrones" <h1> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Cards" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Log" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Rules" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Menu" <button#menubtn.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Your move" <span#dt.gx-dt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "⇥" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Two rival cities, one " <p> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "easy" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "normal" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "hard" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Play vs computer" <button.btn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Two players, one devic" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Watch two computers" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Terraced Orchard" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Merchant Road" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Bronze Titan" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Stone Riddle" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Dee" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone 390x763) | element/measured: text under 11px: "Sac" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone 390x763) | element/measured: text under 11px: "Terraced Orchard" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone 390x763) | element/measured: text under 11px: "Merchant Road" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone 390x763) | element/measured: text under 11px: "Bronze Titan" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone 390x763) | element/measured: text under 11px: "Stone Riddle" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone 390x763) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone 390x763) | element/measured: text under 11px: "Dee" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone 390x763) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone 390x763) | element/measured: text under 11px: "Sac" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone 390x763) | element/measured: text under 11px: "Marble Barrow" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone 390x763) | element/measured: text under 11px: "Thunder Idol" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone 390x763) | element/measured: text under 11px: "Stone Riddle" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone 390x763) | element/measured: text under 11px: "Terraced Orchard" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone 390x763) | element/measured: text under 11px: "War" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone 390x763) | element/measured: text under 11px: "Fin" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone 390x763) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone 390x763) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **toast overlap (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: Sell button covered by #toast | pass: control not covered by the toast
+- **toast overlap (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: Build button covered by #toast | pass: control not covered by the toast
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: text under 11px: "Merchant Road" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: text under 11px: "Terraced Orchard" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: text under 11px: "Sky Tomb" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: text under 11px: "Archive of Dust" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: text under 11px: "Cod" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: text under 11px: "War" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: text under 11px: "Fer" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone 390x763) | element/measured: text under 11px: "Num" (8.8px) <span> | pass: text >= 11px
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: every font a loaded shelf face: N=34 [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Twin Thrones" <h1> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Cards" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Log" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Rules" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Menu" <button#menubtn.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Your move" <span#dt.gx-dt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "⇥" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Two rival cities, one " <p> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "easy" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "normal" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "hard" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Play vs computer" <button.btn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Two players, one devic" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Watch two computers" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Dee" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Sac" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "Fin" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "5$" (8.8px) <span#tg-6.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "2$" (8.8px) <span#tg-3.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (phone-s 375x553) | element/measured: text under 11px: "2$" (8.8px) <span#tg3.tg> | pass: text >= 11px
+- **toast overlap (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: your city covered by #toast | pass: control not covered by the toast
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: text under 11px: "Dee" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: text under 11px: "Sac" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: text under 11px: "Fin" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: text under 11px: "5$" (8.8px) <span#tg-6.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: text under 11px: "2$" (8.8px) <span#tg-3.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (phone-s 375x553) | element/measured: text under 11px: "2$" (8.8px) <span#tg3.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone-s 375x553) | element/measured: text under 11px: "War" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone-s 375x553) | element/measured: text under 11px: "Fin" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone-s 375x553) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone-s 375x553) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone-s 375x553) | element/measured: text under 11px: "Mas" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone-s 375x553) | element/measured: text under 11px: "5$" (8.8px) <span#tg-6.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone-s 375x553) | element/measured: text under 11px: "2$" (8.8px) <span#tg-3.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (phone-s 375x553) | element/measured: text under 11px: "2$" (8.8px) <span#tg3.tg> | pass: text >= 11px
+- **toast overlap (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: cost line covered by #toast | pass: control not covered by the toast
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: text under 11px: "Cod" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: text under 11px: "War" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: text under 11px: "Fer" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: text under 11px: "Num" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: text under 11px: "Sac" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: text under 11px: "5$" (8.8px) <span#tg-6.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: text under 11px: "2$" (8.8px) <span#tg-3.tg> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (phone-s 375x553) | element/measured: text under 11px: "2$" (8.8px) <span#tg3.tg> | pass: text >= 11px
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: every font a loaded shelf face: N=34 [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Twin Thrones" <h1> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Cards" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Log" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Rules" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Menu" <button#menubtn.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Your move" <span#dt.gx-dt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "⇥" <button.gx-ibtn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Two rival cities, one " <p> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "easy" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "normal" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "hard" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Play vs computer" <button.btn> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Two players, one devic" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **font check (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: [title] font "system-ui" is not a shelf face (Cinzel / Alegreya Sans): "Watch two computers" <button.btn.alt> | pass: font loaded from Cinzel / Alegreya Sans (@font-face present)
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "Terraced Orchard" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "Merchant Road" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "Bronze Titan" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "Stone Riddle" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "Dee" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=menu` (PC 1440x860) | element/measured: text under 11px: "Sac" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (PC 1440x860) | element/measured: text under 11px: "Terraced Orchard" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (PC 1440x860) | element/measured: text under 11px: "Merchant Road" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (PC 1440x860) | element/measured: text under 11px: "Bronze Titan" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (PC 1440x860) | element/measured: text under 11px: "Stone Riddle" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (PC 1440x860) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (PC 1440x860) | element/measured: text under 11px: "Dee" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (PC 1440x860) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-board` (PC 1440x860) | element/measured: text under 11px: "Sac" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (PC 1440x860) | element/measured: text under 11px: "Marble Barrow" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (PC 1440x860) | element/measured: text under 11px: "Thunder Idol" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (PC 1440x860) | element/measured: text under 11px: "Stone Riddle" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (PC 1440x860) | element/measured: text under 11px: "Terraced Orchard" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (PC 1440x860) | element/measured: text under 11px: "War" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (PC 1440x860) | element/measured: text under 11px: "Fin" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (PC 1440x860) | element/measured: text under 11px: "Cit" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-result` (PC 1440x860) | element/measured: text under 11px: "Ope" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (PC 1440x860) | element/measured: text under 11px: "Merchant Road" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (PC 1440x860) | element/measured: text under 11px: "Terraced Orchard" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (PC 1440x860) | element/measured: text under 11px: "Sky Tomb" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (PC 1440x860) | element/measured: text under 11px: "Archive of Dust" (9.9px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (PC 1440x860) | element/measured: text under 11px: "Cod" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (PC 1440x860) | element/measured: text under 11px: "War" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (PC 1440x860) | element/measured: text under 11px: "Fer" (8.8px) <span> | pass: text >= 11px
+- **text size (scenario)** | scenario: `?scn=tt-select` (PC 1440x860) | element/measured: text under 11px: "Num" (8.8px) <span> | pass: text >= 11px
+

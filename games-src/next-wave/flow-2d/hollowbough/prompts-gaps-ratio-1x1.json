@@ -1,0 +1,25 @@
+{
+  "cards": {
+    "haven": "Hand-painted woodland gouache illustration for a cosy forest-critter game, warm autumn earth colours, soft rim light, matte paper texture, no text a snug burrow barter hall tucked under tree roots, shelves of woven baskets and stacked pebbles, a small round table where two field mice trade, no text, letters or numbers"
+  },
+  "style": "Hand-painted woodland gouache illustration for a cosy forest-critter game, warm autumn earth colours, soft rim light, matte paper texture, no text",
+  "notes": "W347 gap prompts",
+  "wave": "W347",
+  "meta": {
+    "haven": {
+      "element": "Painting: haven",
+      "why": "Barter Burrow place (one per game) is drawn by the code, so it needs a painted card-style picture; no file or manifest entry existed",
+      "pri": 3,
+      "ref": "",
+      "thumb": "",
+      "bg": "",
+      "align": "",
+      "save_as": "haven.png",
+      "target": "games-src/hollowbough/art/haven.webp",
+      "size": "1024x1024",
+      "ratio": "1:1",
+      "tag": "art",
+      "wave": "W347"
+    }
+  }
+}
