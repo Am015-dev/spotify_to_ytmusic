@@ -19,7 +19,7 @@ function artApply(root) {   // DOM: [data-art] elements get the picture as their
 }
 /* READABLE rule: a temp picture that is less clear than the code-drawn shape stays OFF. Slots whose stem starts with one of these prefixes
    show the code-drawn terrain/animal; real art for them is switched on by listing its stem (or prefix) in window.WM_REAL_ART. */
-ART.codeFirst = ['tok-', 'ter-', 'table-bg', 'card-'];
+ART.codeFirst = ['tok-', 'ter-', 'table-bg', 'icon-logo'];   // free-art kit (W376): cards, portraits and title art read well; tokens (muddy at 20-30px), terrain, table and logo stay code-drawn
 function artCodeFirst(s) { var real = window.WM_REAL_ART || []; return real.indexOf(s) < 0 && ART.codeFirst.some(function (p) { return s.indexOf(p) === 0 && real.indexOf(p) < 0; }); }
 function artLoad() {
   ART.have = ART.have.filter(function (s) { return !artCodeFirst(s); });

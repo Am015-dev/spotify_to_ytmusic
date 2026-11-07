@@ -1,4 +1,23 @@
-<body><div id="app"></div>
+<body>
+<div id="tscr" hidden></div>
+<div id="game" class="gx-app" hidden>
+  <header class="gx-bar">
+    <h1>Emberclimb</h1>
+    <span id="hud" class="hud"></span>
+    <span class="gx-sp"></span>
+    <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: how does this work?" title="Hint"></button>
+    <button class="gx-ibtn" id="rulesB" type="button" aria-label="Rules"><span>Rules</span></button>
+    <button class="gx-ibtn" data-gx="setd" aria-expanded="false" aria-label="Menu"><span>Menu</span></button>
+  </header>
+  <div class="gx-main">
+    <main class="gx-board"><div id="app"></div></main>
+    <aside class="gx-dock" aria-label="What to do now">
+      <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Your move</span></div>
+      <div class="gx-dock-body"><div id="dockmsg" aria-live="polite"></div><div id="dockact"></div></div>
+    </aside>
+    <button class="gx-ibtn gx-reopen" data-gx="dock" type="button">&#9776; Panel</button>
+  </div>
+</div>
 <script>
 /*GXSCN*/
 </script>
@@ -16,6 +35,9 @@
 </script>
 <script>
 /*UI*/
+</script>
+<script>
+/*HELP*/
 </script>
 <script>
 /*TUTOR*/

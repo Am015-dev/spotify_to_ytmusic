@@ -56,7 +56,7 @@ Object.keys(D.EVENTS).forEach(function (id) { var e = D.EVENTS[id]; add('event-'
   add(n[0], 'token', 256, 256, '1:1', true, n[2], 'Map node icon', STYLE + ' Round map marker icon: ' + n[1] + ', ' + WH + '.');
 });
 // ---- intents, status, orbs, stances, small icons
-[['intent-attack', 'a single red sword pointing down'], ['intent-attack-big', 'two large red crossed swords with a spark'], ['intent-defend', 'a blue shield'], ['intent-buff', 'a golden upward arrow with a glow'], ['intent-debuff', 'a purple skull with a thin curse swirl'], ['intent-sleep', 'a blue sleeping moon with drifting zigzag puffs (no letters)']].forEach(function (n) {
+[['intent-attack', 'a single red sword pointing down'], ['intent-attack-big', 'two large red crossed swords with a spark'], ['intent-defend', 'a blue shield'], ['intent-buff', 'a golden upward arrow with a glow'], ['intent-debuff', 'a purple skull with a thin curse swirl'], ['intent-weak', 'a purple downward arrow over a drooping sword'], ['intent-vuln', 'a red crosshair target ring'], ['intent-frail', 'a cracked dashed-outline blue shield'], ['intent-poison', 'a green poison droplet'], ['intent-burn', 'an orange flame'], ['intent-slime', 'a green slime blob with drips'], ['intent-daze', 'a yellow swirl of dizzy stars'], ['intent-unknown', 'a grey question mark in a dark bubble'], ['intent-sleep', 'a blue sleeping moon with drifting zigzag puffs (no letters)']].forEach(function (n) {
   add(n[0], 'icon', 128, 128, '1:1', true, 1, 'Enemy intent bubble', STYLE + ' Bold simple game icon: ' + n[1] + ', ' + WH + '.');
 });
 [['st-str', 'a clenched red fist'], ['st-vuln', 'a cracked orange shield'], ['st-weak', 'a drooping grey sword'], ['st-poison', 'a green droplet with a skull shape'], ['st-frail', 'a blue shield with a long crack']].forEach(function (n) { add(n[0], 'icon', 128, 128, '1:1', true, 2, 'Status chip icon', STYLE + ' Bold simple status icon: ' + n[1] + ', ' + WH + '.'); });
@@ -88,6 +88,7 @@ var md = ['# Emberclimb assets (2D only)', '', 'Every picture is a named slot: d
   sel.forEach(function (x) { md.push('| ' + x.stem + ' | ' + x.kind + ' | ' + x.w + 'x' + x.h + ' | ' + x.ratio + ' | ' + (x.alpha ? 'yes' : 'no') + ' | ' + x.slot + ' |'); });
   md.push('');
 });
+var crp = path.join(__dirname, '..', 'temp-art', 'CREDITS.md'); if (fs.existsSync(crp)) md.push('', fs.readFileSync(crp, 'utf8'));
 fs.writeFileSync(path.join(out, 'ASSETS.md'), md.join('\n'));
 var cnt = [1, 2, 3].map(function (w) { return items.filter(function (x) { return x.wave === w; }).length; });
 console.log('items', items.length, 'wave1/2/3', cnt.join('/'));
