@@ -1,6 +1,5 @@
 {
  "cards": {
-  "lantern-lit": "the brass diving lantern exactly as in the reference: a round-glass storm lantern with a ring handle. State: burning at full brightness, a warm golden glow. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "lantern-dim": "the brass diving lantern exactly as in the reference: a round-glass storm lantern with a ring handle. State: burning low, a small orange flame, weak glow. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "lantern-flicker": "the brass diving lantern exactly as in the reference: a round-glass storm lantern with a ring handle. State: flickering, flame stretched and leaning, glow uneven. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
   "lantern-out": "the brass diving lantern exactly as in the reference: a round-glass storm lantern with a ring handle. State: dark, no flame, a thin curl of smoke. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, same object exactly as the reference painting; reuse this exact description and the same seed for every state. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
@@ -12,22 +11,6 @@
  "notes": "Pose / expression set. One character = one reused description + the reference painting (meta.ref) + the same seed, same camera, same scale, centred, feet on one baseline. Background is flat chroma colour (meta.bg) so games-src/scripts/cutout.py can key it: save each as <name>.png in one folder per character, then python3 games-src/scripts/cutout.py <folder>/<char>-*.png --out <target folder> --size 512 --align <meta.align>  (writes transparent webp + contact-sheet.png). Check the contact sheet: all poses the same height, same feet line. Style block: use the one in \"style\" but ignore any background wording in it. Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
  "wave": "Wave 7",
  "meta": {
-  "lantern-lit": {
-   "element": "the brass diving lantern exactly as in the reference: lit state",
-   "why": "State set for lantern: same camera, scale and baseline",
-   "pri": 1,
-   "ref": "games/lantern-dive/models/lantern.webp",
-   "thumb": "lantern-dive/models/lantern.webp",
-   "bg": "green",
-   "align": "feet",
-   "save_as": "lantern-lit.png",
-   "target": "games/lantern-dive/media/poses/lantern-lit.webp",
-   "size": "1024x1024",
-   "ratio": "1:1",
-   "group": "lantern",
-   "tag": "poses",
-   "wave": "Wave 7"
-  },
   "lantern-dim": {
    "element": "the brass diving lantern exactly as in the reference: dim state",
    "why": "State set for lantern: same camera, scale and baseline",
