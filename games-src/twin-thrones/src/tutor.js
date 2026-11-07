@@ -44,12 +44,12 @@
   steps.splice(6, 0, { id: 'pawn3', title: 'The conflict pawn', say: 'The pawn moved. Reach step 9 and you win at once. Steps 3 and 6 make your rival lose coins.', target: function () { return $('mil'); }, wait: null, ready: function () { return mine() && U.G.mil !== 0; } });
   // remember which cards were freed by each player move, so the computer takes one
   var oldAct = GXT.act;
-  function start() {
-    var before = [];
+  function start(o) {
+    var before = []; T.then = o && o.then || null;
     GXT.start({ game: GAME, steps: steps, story: false, endTitle: 'You know the duel', endText: 'Take cards, mind what you free, build, sell, raise wonders and push the pawn. Time for a real game.',
       setup: function () { setup(); },
-      onDone: function () { U.tut = false; UI.newGame('cpu'); },
-      onExit: function () { U.tut = false; UI.showStart(); } });
+      onDone: function () { U.tut = false; if (T.then) { var f = T.then; T.then = null; f(); } else UI.newGame('cpu'); },
+      onExit: function () { U.tut = false; if (T.then) { var f = T.then; T.then = null; f(); } else UI.showStart(); } });
   }
   window.TT_TUTOR = { start: start, aiMove: aiMove, steps: steps };
   // after each of the player's tutorial moves, note which cards just became free

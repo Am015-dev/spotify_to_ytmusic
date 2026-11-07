@@ -11,3 +11,16 @@ Changed (all in this game's folder + its music cue file):
 Tests: rules-test 200 PASS; smoke.js PASS phone and PC (0 console errors); tutorial driven end to end on phone by taps (0 errors); `build-all.py --quick twin-thrones` see report line.
 Not done / next: zoom has no keyboard focus trap; tutor text is English only; sounds are plain synth (replace by recorded samples through GA if wanted); the 'Tutorial' tap in an unfinished game restarts to the fixed seed, not the live game.
 Orchestrator: deploy `build-all.py --deploy twin-thrones` then stamp-copyright; shell files untouched.
+
+## Round 2b (owner corrections + audit W340)
+Found -> fixed:
+- Title had no Story / Quick game / How to play structure -> new title: one big "Quick game", Story (shared campaign kit, 10 chapters in 3 acts, `campaign.json`, `CAMPAIGN-DESIGN.md`), Tutorial (first on first launch), Two players, Watch, How to play, Sound.
+- No stages -> `GXC.init` wired like cauldron-fair; chapter 1 plays the guided first game, then the duel; stars, boss cards, twists (extra coins, pawn head start), result screen via `GXC.finish`; Tutorial button on the map.
+- Audit A (text size): every font now >= 13 px on phone and >= 16 px at 1000 px+ (`--fmin`); audit A = 0 on phone and the board at PC (kit-owned story-map and tutorial-bubble text at PC still 13-14 px).
+- Audit B: yellow/grey card bands dark ink, darker coin/vp/green/clay/stone chips; drawers dark; story map override colours.
+- Audit E: level buttons re-render (visible change); start screen and board are hidden while a drawer is open (no dead covered buttons); toast clears and repeats so wonder/token taps always change the DOM.
+- Scenarios: card names wrap instead of clipping, military labels moved off the pawn row, toast no longer covers wonder tiles; local result 6 of 6 scenarios pass at phone and pc; the shared `menu` scenario fails only on "font is not a shelf face" because this local run lacks the fonts that build-all.py injects.
+- Full games played by real taps (phone 390x763 and PC 1440x860, several seeds) reach the result screen; story chapter 1 -> tutorial -> duel -> stars verified.
+- Dangerous bug caught on the way: hiding the board with `body:has(.gxc)` stayed on after the map closed (kit keeps the hidden node); selector is now `.gxc:not([hidden])`.
+Local audit: `ui-audit.spec.js` phone A0 B7 E3 F1, pc A2 B17 E2 F1; what is left is the shared story map (contrast), the shared tutorial bubble at PC (13.5 px), and the audit tapping the Tutorial menu button (it starts the tutorial, then F sees 2 instruction lines). Run `build-all.py --quick twin-thrones` for the real gate (it adds the fonts).
+Next: wonder tiles / tokens could open a card popup instead of a toast; story map art; music files; the deferred rules UNSURE costs.
