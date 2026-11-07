@@ -28,6 +28,7 @@ LIST = [('crown','Crown City Smash','crown-city-smash/index.html','covers/crown.
  ('wildmark','Wildmark','wildmark/index.html','covers/wildmark.jpg'),
  ('vinegrave','Vinegrave','vinegrave/index.html','covers/vinegrave.jpg'),
  ('vale','Vale of Banners','vale-of-banners/index.html','covers/vale-of-banners.jpg'),
+ ('perch','Perch & Plume','perch-and-plume/index.html','covers/perch-and-plume.jpg'),
  ('mainhattan','Mainhattan Nightrun','mainhattan-nightrun/index.html','covers/nightrun.jpg'),
  ('overdrive','Mainhattan Overdrive','mainhattan-overdrive/index.html','covers/overdrive.jpg')]
 games = []
