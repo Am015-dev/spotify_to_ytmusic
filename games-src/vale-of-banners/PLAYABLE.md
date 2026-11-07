@@ -15,13 +15,18 @@ dice-and-estate euros present a turn (turn banner, highlighted legal moves, riva
 | 6 | Rival actions are near-instant toasts (~0.6 s), there is no step caption you can read, no way to slow or speed up; rival builds are invisible (only a toast). | FIXED: rival plays step by step: the tile it picks pulses white for ~0.8 s with a caption ("Azure takes Moot Hall from stall 1", "Azure built Keep", "Azure: +3 region filled", "Azure ends the turn"); tap anywhere speeds the rest of that turn to ~0.16 s/step; never instant. |
 | 7 | Score pops are small and vague ("+3 region done!" in a 12px pop) and vanish fast. | FIXED: score pops are 18px gold-on-dark pills that stay 1.7 s, plain reasons ("+3 region filled", "+2 goods sold", "+4 animals in the meadow"); each pop holds the sequence 0.55-0.9 s. |
 | 8 | Dock counters are bare emoji + number (coin 1, worker 2, star 0, flag 0) and storage is three empty dashed boxes; "3 x2" goods chips are unlabeled. | PARTLY: counter labels under the chips pushed the estate down by 30px on phone, so reverted; chips keep tap-to-explain (toast + aria-label). Goods chips made compact so storage + goods fit on one row and the estate stays large. |
-| 9 | Tutorial bubble on phone covers the market rows it talks about; the first step is a "Next" lecture, 9 steps. | FIXED: 5 steps, every one a real action (take, Take, pick stored tile, build on the glowing space, End turn), no lecture steps; ends in a real game. Bubble placement is the shared kit's (it sits below the spotlit tile); proven uncovered by elementFromPoint. |
+| 9 | Tutorial bubble on phone covers the market rows it talks about; the first step is a "Next" lecture, 9 steps. | FIXED: the tutorial is now one whole real game (5 rounds vs the real AI, 5 chapters, 32 steps), every step a real action or a short 'see' step; ends on the result screen, then a real game. Coverage list: TUTORIAL-COVERAGE.md. Proven by tut-end.js (both sizes, elementFromPoint at every target). |
 | 10 | Help opens on a dense rules page; there is no "how a turn works" summary up front. | FIXED: Rules opens with "How a turn works" in 5 short lines, then all the rules. |
 
 ## After (shots/after-*.png; 4 phone shots in playable-shots/)
 Second critique on the after-shots: the turn is now a readable sequence (banner -> one instruction -> glowing targets -> animation -> pop);
 the rival turn reads as captions. Still weak: the title is a plain card (no title art in temp-art), the estate colours are only explained by the
 instruction line, and the market on phone is dense (12 tiles + back lane) though every tile is now named.
+
+## Rules (ADDENDUM 2)
+rules-check MISSING 2/2 fixed in the engine with rules-test cases: solo mode (1 silver, 2 workers, 3 goods, no goods-kind limit, 25 rounds,
+win only with all 37 spaces) and 2 v 2 teams (shared silver, workers, goods; team total wins; pool scores once). WRONG: 0 listed.
+SIMPLIFIED-ON-PURPOSE (5) are listed in the Rules drawer under "Simplified on purpose".
 
 ## Proof (local, 390x763 unless noted)
 - build-all --quick PASS; rules-test PASS (28 + 300 AI games); smoke phone/landscape/pc PASS.
