@@ -80,6 +80,10 @@ Loader proven with 3 dummy files (tok-bear, ter-forest, title-bg drawn, 0 missin
 `register-assets.py` works but was NOT committed into `next-wave/expected-assets.json` (one-line file, every branch
 conflicts): run it at merge time.
 
+## Temporary art (deploy step)
+- `games-src/wildmark/temp-art/` = 47 temporary pictures (game-icons.net, CC BY 3.0, credits in ASSETS.md and Menu > About).
+  Before `build-all.py --deploy wildmark`: `cp games-src/wildmark/temp-art/*.webp games/wildmark/media/`. Flow pictures later replace them by stem.
+
 ## Missing / next
 - Scoring card sets B-D (slots exist, rules not implemented); online play; real art and music; balance of the Story
   targets checked only with the normal AI as stand-in player (c1 50+ is easy, c2 vs easy Pip is close for a weak player).
