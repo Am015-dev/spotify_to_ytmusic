@@ -6878,7 +6878,7 @@ function renderPanel(){
   ro.innerHTML=G.phase==='roll'?`Rerolls left: ${Array.from({length:Math.max(G.rolls,rerollsOf(p))},(_,k)=>`<span class="pip ${k<G.rolls?'':'used'}"></span>`).join('')}`:'<span class="muted small">Dice resolved.</span>';
   pv.innerHTML=G.phase==='roll'&&G.dice.length?`<b>${humanTurn()?'If you resolve now':'These dice give'}:</b> ${esc(scoreDice(p,G.dice).text)}.${humanTurn()?pairNote(G.dice):''}`:'';
   const buyPh=humanTurn()&&G.phase==="buy";const sg=buyPh?suggestCard(p):-1;
-  document.getElementById('market').innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);return `<div class="pc ${C.t} ${k===sg?'sugg':''}"><div class="hd"><span class="nm">${esc(C.n)}</span><span class="cost" aria-label="costs ${c} energy">${c}</span></div><div class="art" aria-hidden="true">${cardIcon(id)}</div><span class="ty">${chipOf(C)}${C.kw?' · '+C.kw.toUpperCase():''}</span><p>${esc(C.x)}</p>${buyPh?`<button class="btn buy ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'}>${esc(buyLabel(p,k))}</button>`:''}</div>`}).join('')+`<p class="small muted" style="grid-column:1/-1;margin:.2rem 0 0">${G.deck.length} cards in the deck. <b>ONE-SHOT</b> cards happen at once. <b>PERMANENT</b> cards stay with you. <b>SAVE FOR LATER</b> cards wait until their moment (you get a pop-up).</p>`;
+  document.getElementById('market').innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);return `<div class="pc ${C.t} ${k===sg?'sugg':''}"><div class="hd"><span class="nm">${esc(C.n)}</span><span class="cost" aria-label="costs ${c} energy">${c}</span></div><div class="art" aria-hidden="true">${cardIcon(id)}</div><span class="ty">${chipOf(C)}${C.kw?' · '+C.kw.toUpperCase():''}</span><p>${esc(C.x)}</p>${buyPh?`<button class="btn buy ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'}>${esc(buyLabel(p,k))}</button>`:''}</div>`}).join('')+`<p class="small muted" style="grid-column:1/-1;margin:.2rem 0 0"><i class="cc-back" aria-hidden="true"></i>${G.deck.length} cards in the deck. <b>ONE-SHOT</b> cards happen at once. <b>PERMANENT</b> cards stay with you. <b>SAVE FOR LATER</b> cards wait until their moment (you get a pop-up).</p>`;
   renderBuyMini(p,buyPh,sg);
   const who2=me||p;
   const tk=who2.tok||{};const list=[...who2.cards.map(id=>{const C=CARDS[base(id)];const b=base(id);return `<div class="mc ${C.t}">${cardPic(id,'cthumb')}<b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}${b==='smoke'?` (${tk.smoke} puffs)`:''}${b==='cell'?` (${tk.cell} energy on it)`:''}${b==='mimic'&&tk.mim?` (copying ${esc(CN(tk.mim.id))})`:''}${(tk.ufo||[]).includes(id)?' 🐚':''}<br>${esc(C.x)}</div>`}),
@@ -7127,7 +7127,7 @@ function phTiles(){const el=$ph('pshop');if(!el)return;if(!phShopOK()||!G.market
   el.innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)],c=costOf(p,id),ok=canBuy(p,k);return `<button class="ptile ${k===sg?'sugg':''} ${ok?'ok':'no'}" data-shop="${k}" aria-label="${esc(C.n)}, costs ${c} energy${k===sg?', recommended':''}${ok?'':', not affordable'}. Tap to open the shop."><span class="cost">${c}</span><b>${esc(C.n)}</b>${k===sg?'<i class="star">★</i>':''}</button>`}).join('')}
 function phShopBody(){const me=meSeat();const buyPh=phShopOK();const pl=buyPh||me<0?cur():G.pl[me];const sg=buyPh?suggestCard(pl):-1;
   const adv=buyPh&&sg>=0?advise():null;
-  let h=`<p class="pcx-sub">${buyPh?`You have <b>${pl.en} ⚡</b>. ${sg>=0?'The starred card is our pick.':'Nothing here is a great buy: saving ⚡ is fine.'}`:`${G.deck.length} cards in the deck. You can buy in step 4 of your turn.`}</p>`;
+  let h=`<p class="pcx-sub">${buyPh?`You have <b>${pl.en} ⚡</b>. ${sg>=0?'The starred card is our pick.':'Nothing here is a great buy: saving ⚡ is fine.'}`:`<i class="cc-back" aria-hidden="true"></i>${G.deck.length} cards in the deck. You can buy in step 4 of your turn.`}</p>`;
   h+=G.market.map((id,k)=>{const C=CARDS[base(id)],c=costOf(pl,id),ok=buyPh&&canBuy(pl,k);
     return `<div class="pcard ${C.t} ${k===sg?'sugg':''}"><div class="pcc"><span class="cost" aria-label="costs ${c} energy">${c}</span><span class="art" aria-hidden="true">${cardIcon(id)}</span></div><div class="pct"><b>${k===sg?'<em class="rec">★ Recommended</em> ':''}${esc(C.n)}</b><span class="ty">${chipOf(C)}${C.kw?' · '+esc(C.kw.toUpperCase()):''}</span><p>${esc(C.x)}</p>${k===sg&&adv?`<p class="why"><b>Why:</b> ${esc(adv.w.replace(C.x,'').trim()||adv.w)}</p>`:''}</div>${buyPh?`<button class="btn buy ${ok?'primary':''}" data-card="${k}" ${ok?'':'disabled'} aria-label="${ok?'Buy':'Cannot buy'} ${esc(C.n)}">${esc(buyLabel(pl,k))}</button>`:''}</div>`}).join('');return h}
 // ---- one pop-up at a time: shop, monster info, the result line ----
@@ -7703,9 +7703,11 @@ const unl=t=>{try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u
 const pre=(f,cb)=>{if(IMG_OK[f]!==undefined){cb&&IMG_OK[f]&&cb();return}IMG_OK[f]=0;const i=new Image();i.onload=()=>{IMG_OK[f]=1;cb&&cb()};i.src=MEDIA+f+'.webp'};
 const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
-  set('--cc-title',phone()?'title-phone':'title');const tf=tableFile();if(tf)set('--cc-table',tf);else R.style.removeProperty('--cc-table');set('--cc-end-win','end-win');set('--cc-end-lose','end-lose')}
+  set('--cc-title',phone()?'title-phone':'title');const tf=tableFile();if(tf)set('--cc-table',tf);else R.style.removeProperty('--cc-table');const bk=backFile();if(bk){pre(bk,()=>{R.style.setProperty('--cc-back','url('+MEDIA+bk+'.webp)');R.dataset.ccback='1'})}set('--cc-end-win','end-win');set('--cc-end-lose','end-lose')}
 // ---- table skins: the campaign unlocks Harbor Night and Spire Gold paint a map under the plaza (the built city stays around it); nothing for the default
 let skinPl=null,skinFile='';
+// card back: the campaign unlocks Brass Beetle and Bulletin; the deck line shows the painted back once one is unlocked
+function backFile(){const u=unl('cardback');return u==='brass-beetle'||u==='bulletin'?'back-'+u:null}
 function tableFile(){const u=unl('table');return u==='harbor-night'||u==='spire-gold'?'table-'+u:null}
 function skin(){if(typeof V3==='undefined'||!V3.on||!V3.scene||typeof THREE==='undefined')return;const f=tableFile();
   if(!f){if(skinPl)skinPl.visible=false;return}
@@ -7720,6 +7722,7 @@ const _sh=window.statsHTML;if(typeof _sh==='function')statsHTML=function(){retur
 const st=document.createElement('style');st.textContent=
 '.cc-hero{height:130px;margin:-14px -16px 6px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,rgba(255,250,240,0) 45%,#fffaf0),var(--cc-title,none) center/cover}'+
 '.cc-endart{height:120px;margin:-14px -16px 6px;border-radius:14px 14px 0 0;background:var(--cc-end-win,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}'+
+'.cc-back{display:none}html[data-ccback] .cc-back{display:inline-block;width:20px;height:28px;margin-right:6px;vertical-align:middle;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.4);background:var(--cc-back,none) center/cover}'+
 '.cc-endart.lose{background:var(--cc-end-lose,none) center/cover}'+
 '@media (max-width:700px){.cc-endart{height:84px}}'+
 'body:not(.three) .gx-board{background:linear-gradient(rgba(27,15,46,.25),rgba(27,15,46,.25)),var(--cc-table,none) center/cover,radial-gradient(ellipse at 50% 20%,#4a1f6a,#1b0f2e 70%)}';
