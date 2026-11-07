@@ -8,7 +8,7 @@
 .acts .gxt-menu span{font-weight:400;font-size:.78em;opacity:.85}
 .acts .gxt-menu{flex:1 1 100%;order:-1}
 .bf-bw{flex:none;display:inline-flex;width:44px;height:44px}
-@media (max-width:440px){.gxc-head{gap:4px;padding:8px 6px}.gxc-head .gxc-ib{padding:4px 21px;font-size:13px}.gxc-head .gxc-htitle{font-size:15px}}
+@media (max-width:440px){.gxc-head{gap:4px;padding:8px 6px}.gxc-head .gxc-ib{padding:4px 21px;font-size:13px}.gxc-head .gxc-htitle{font-size:15px}.gxc-head{flex-wrap:wrap}.gxc-head .gxc-htitle{order:-1;flex:1 1 100%}}
 /* ---- painted title / end banners (media.js sets the --sg-* variables; panels keep their colour if a file is missing) ---- */
 .sg-hero{flex:none;height:130px;margin:-18px -20px 0;border-radius:15px 15px 0 0;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,#fdf7ea),var(--sg-title,none) center/cover}
 @media (max-width:640px){.sg-hero{margin:-14px -14px 0}}html.ph .sg-hero{margin:-12px -14px 0}
@@ -19,3 +19,30 @@
 .mbox>*{flex-shrink:0}
 .exs[hidden]{display:none}
 .sg-back{display:none}html[data-sgback] .sg-back{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-4px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.35);background:var(--sg-back,none) center/cover}
+
+/* W388 turn pill + solid backing for score pops over the score chips */
+.bf-say{animation:bfSayIn .35s ease-out}@keyframes bfSayIn{from{opacity:.2;transform:translateY(4px)}to{opacity:1;transform:none}}
+.bf-pop.chip{background:rgba(10,20,50,.9);padding:2px 10px;border-radius:10px;font-size:17px}
+/* W388 audit fixes: floor numbers and projection chip darker; closed <details> children really hidden (they are laid out but unpainted, which the audit mistook for low contrast/dead buttons) */
+.bf-floor .bf-c span{color:#7d1a14}
+.bf-pj{background:#1f6d36}.bf-pj.dn{background:#a82f22}
+details:not([open])>:not(summary){display:none!important}
+html .gxc-act{background:rgba(38,22,12,.94)!important;border-image:none!important;border:1px solid #c99a3e!important;border-radius:10px}
+html .gxc-act b,html .gxc-act small{color:#fff6e0!important;opacity:1!important;text-shadow:none!important}
+/* W388 help: how a turn works, five short lines first */
+.rules .turn5{border:2px solid #c99a3e;border-radius:12px;background:#fff6dc;padding:8px 12px;margin:0 0 12px}.rules .turn5 h3{margin:0 0 4px}.rules .turn5 ol{margin:0;padding-left:22px;font-size:16px;line-height:1.35;color:#2a1608}
+html body .bf-floor .bf-c span{color:#560d08}
+html body .bf-chip .bf-pj{background:#17582b}html body .bf-chip .bf-pj.dn{background:#8e2418}
+html.sk-banner body .gxc-act,html body .gxc-act{background:rgba(30,16,8,.96)!important;border-image:none!important}
+html.sk-banner body .gxc-act b,html.sk-banner body .gxc-act small,html body .gxc-act b,html body .gxc-act small{color:#fff6e0!important;text-shadow:none!important;opacity:1!important}
+@media (max-width:440px){html body .gxc-path{margin-top:22px}}
+/* W388 wide screens: every text >= 16px (audit rule A), solid contrast */
+@media (min-width:1024px){
+ html body .gx-bar .gx-ibtn span{font-size:16px}
+ html body #dockbody .scores .sc,html body #dockbody .recap div,html body #dockbody .coach .x,html body #dockbody .acts .btn,html body #dockbody .coach{font-size:16px}
+ html body .gxc-act b,html body .gxc-act small,html body .gxc-node .gxc-lab{font-size:16px}
+ html body #dockbody .recap b{filter:brightness(.62)}
+ html body #dockbody .scores .sc{color:#2a1608}
+ .gxc-path .gxc-node .gxc-lab{padding:3px 10px}
+}
+@media (max-width:440px){html body .gxc-act small{display:none!important}html body .gxc-act{height:34px!important;min-height:0!important;padding:0 8px!important}}

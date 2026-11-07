@@ -1,0 +1,104 @@
+{
+ "slug": "redline-rally",
+ "size": "phone",
+ "seed": 73371,
+ "when": "2026-11-07T21:30Z",
+ "tutorial": {
+  "end": false,
+  "stuck": "step 3/7 push"
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 48
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 16
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "element outside viewport button.gx-ibtn x1 rect 348,4,392,48: \"Menu\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #48 (Go!)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 48 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-quick-noresult-7.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "tutorial step 3/7 [push] \"A corner is ahead with limit 5. Go fast: tap the 4 and the 3.\"",
+   "desc": "STUCK >15 s: wait=tap x2 (count 1), hole=[4,598,384,79], top at centre=button.cd.s3.sel \"3\", watch-pill=false, wrong taps=0",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-tut-stuck-3-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #16 (1)",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 16 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-story-noresult-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#storyB.ghostb \"Story chapters Nine chap\" / button.gxc-node.a2.locked \"4 🔒 Midseason Sprint\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-screen-fuzz-screen-21.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#quickT.qh.qt \"Quick game options\" / button.gxc-node.a2.boss \"🌬️ 🔒 Hairpin Showdown\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-screen-fuzz-screen-21.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#sndT.ghostb \"♪ Off\" / button.gxc-node.a2.boss \"🌬️ 🔒 Hairpin Showdown\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-screen-fuzz-screen-21.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gxc-node.a3.locked \"8 🔒 Championship Round \" / button.gxc-btn.ghost \"Close\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-screen-fuzz-screen-21.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "tutorial step 3/7 [push]",
+   "desc": "the bot's tap at the spotlight centre was rejected as a wrong action (1x): spotlight does not match what the step accepts",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-tut-wrong-3-2.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "tutorial",
+   "where": "tutorial step 3/7 [push] \"A corner is ahead with limit 5. Go fast: tap the 4 and the 3.\"",
+   "desc": "STUCK >15 s: wait=tap x2 (count 0), hole=[4,598,384,79], top at centre=button.cd.s3 \"3\", watch-pill=false, wrong taps=11",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/redline-rally/phone-tut-stuck-3-13.png"
+  }
+ ],
+ "secs": 35
+}
