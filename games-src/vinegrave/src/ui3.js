@@ -8,6 +8,7 @@ function startGame(mode, o) {
     else seats.push(i === 0 ? { name: 'You' } : { name: (o.names && o.names[i - 1]) || RIVALS[(i - 1) % 3], ai: (o.lvBy && o.lvBy[i]) || o.lvl || 'normal' });
   }
   G = VG.newGame({ np, seats, seed: o.seed, solo: !!o.solo, rivalLevel: o.rivalLevel || o.lvl, rivalName: o.rivalName, twist: o.twist || null, rounds: o.rounds });
+  if (mode !== 'tutorial') UI.coachFree = false;   /* the coach belongs to the tutorial game only */
   UI.mode = mode; UI.humans = seats.map((s, i) => s.ai ? -1 : i).filter(i => i >= 0); UI.view = UI.humans[0] || 0; UI.camp = o.camp || null;
   UI.prefs.played = UI.prefs.played || mode !== 'tutorial'; savePrefs();
   enterGame();
