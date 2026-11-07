@@ -39,7 +39,7 @@ function musSync() { try { GXMUS.sync(); } catch (e) { } }
 
 /* ---------------- helpers ---------------- */
 var GLYPH = { castle: '🏰', mine: '⛏️', know: '📜', ship: '⛵', hall: '🏛️', carp: '🪚', chapel: '🔔', mkt: '🎪', inn: '🍺', mint: '🪙', tower: '🗼', store: '🌾', sheep: '🐑', goat: '🐐', pig: '🐖', goose: '🪿' };
-var GCOL = ['', '#f2efe6', '#f3d27a', '#e8a33a', '#c9604a', '#a9c6e8', '#d8d8d8'];
+var GCOL = ['', '#f7f4ec', '#f6dc92', '#f3c27e', '#f0b0a0', '#c7dbf2', '#e6e6e6'];
 function glyph(t) { return t.t === 'bld' || t.t === 'pas' ? GLYPH[t.k] : GLYPH[t.t]; }
 function hexEl(t, opt) {
   opt = opt || {}; var col = t ? VB.COLHEX[t.t] : (opt.col ? VB.COLHEX[opt.col] : '#ccc');
@@ -47,7 +47,7 @@ function hexEl(t, opt) {
   if (t) {
     var stem = VB.tileStem(t); e.setAttribute('data-art', stem);
     if (ART.img[stem]) { e.style.backgroundImage = 'url(media/' + stem + '.webp)'; e.classList.add('hasart'); }
-    e.appendChild(h('span.gl', { text: glyph(t), 'aria-hidden': 'true' }));
+    e.appendChild(h('span.gl', { 'data-g': glyph(t), 'aria-hidden': 'true' }));
     if (t.t === 'pas') e.appendChild(h('span.nn', { text: '×' + t.n }));
   }
   return e;
@@ -171,8 +171,8 @@ function renderEstate(box, seat, s) {
     var xy = cellXY(c, S, W, HH), t = p.estate[c.i], m = tg[c.i];
     var b = h('button.cell' + (t ? '.built' : '') + (m ? '.glow' : ''), { type: 'button', id: box ? null : 'ec-' + c.i, style: 'left:' + xy.x + 'px;top:' + xy.y + 'px', 'aria-label': (t ? VB.tileName(t) : 'Empty ' + VB.COLNAME[c.col] + ' space ' + c.num) + (m ? ', build here' : '') });
     var hx = t ? hexEl(t) : hexEl(null, { col: c.col });
-    if (!t) hx.style.opacity = m ? '1' : '.55';
-    b.appendChild(hx); b.appendChild(h('span.num', { text: c.num }));
+    if (!t && !m) hx.style.filter = 'saturate(.55) brightness(1.18)';
+    b.appendChild(hx); b.appendChild(h('span.num' + (c.col === 'castle' || c.col === 'ship' || c.col === 'mine' ? '.lt' : ''), { text: c.num }));
     if (m && m.w) b.appendChild(h('span.cost', { text: '+' + m.w + '👷' }));
     if (!box) b.addEventListener('click', function () { tapCell(c.i); });
     es.appendChild(b);
@@ -453,8 +453,8 @@ function showTitle() {
   var c = h('div.tcard');
   c.appendChild(h('h1', { text: 'Vale of Banners' }));
   c.appendChild(h('p.sub', { text: 'Roll two dice, build your estate, raise your banner over the valley.' }));
-  c.appendChild(h('button.btn.big', { type: 'button', id: 'storyB', text: '📖 Story', onclick: storyOpen }));
-  c.appendChild(h('button.btn', { type: 'button', id: 'playB', text: 'Quick game', onclick: showSetup }));
+  c.appendChild(h('button.big.btn', { type: 'button', id: 'storyB', text: '📖 Story', onclick: storyOpen }));
+  c.appendChild(h('button.btn.sec', { type: 'button', id: 'quickB', text: 'Quick game', onclick: showSetup }));
   if (hasSave()) c.appendChild(h('button.btn.alt', { type: 'button', id: 'resumeB', text: 'Continue saved game', onclick: resume }));
   c.appendChild(h('button.btn.alt', { type: 'button', id: 'tutB', text: (tutDone() ? 'Tutorial' : 'Tutorial (start here)'), onclick: function () { tutStart(); } }));
   c.appendChild(h('button.btn.alt', { type: 'button', id: 'howB', text: 'How to play', onclick: function () { GX.show('rulesd'); } }));
@@ -617,6 +617,13 @@ function boot() {
   GX.onResize(function () { if (G) render(); });
   addEventListener('resize', function () { if (G) render(); });
   try { artLoad(); } catch (e) { }
+  /* Story map: a tap on any chapter or head button always answers (locked chapters say why) */
+  document.addEventListener('click', function (e) {
+    var n = e.target.closest && e.target.closest('.gxc-node,.gxc-ib'); if (!n) return;
+    var lab = n.getAttribute('aria-label') || n.textContent || ''; n.setAttribute('data-tapped', '1');
+    setTimeout(function () { var m = [].slice.call(document.querySelectorAll('.gxc-node,.gxc-ib')).filter(function (x) { return x.getAttribute('aria-label') === lab || x.textContent === n.textContent; })[0]; if (m) m.setAttribute('data-tapped', String(Date.now() % 100000)); }, 80);
+    setTimeout(function () { toast(/lock/i.test(lab) || n.disabled || n.classList.contains('locked') ? 'Win the chapter before to open this one' : lab.split(',')[0].trim()); }, 30);
+  }, true);
   document.addEventListener('pointerdown', function () { try { GA.unlock(); } catch (e) { } musSync(); }, { once: true });
   if (window.GXS && GXS.on) return;   /* a scenario builds its own state */
   G = null; showTitle();

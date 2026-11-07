@@ -10,7 +10,7 @@ const TURNS = process.env.FULL ? 999 : 3;
     page.on('pageerror', e => errs.push(String(e))); page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(400);
     const tap = async loc => { if (touch) await loc.tap(); else await loc.click(); };
-    await tap(page.locator('#playB')); await tap(page.locator('#goB'));
+    await tap(page.locator('#quickB')); await tap(page.locator('#goB'));
     let turns = 0, acts = 0, stuck = 0;
     while (turns < TURNS && acts < 4000) {
       const st = await page.evaluate(() => ({ over: G.over, mine: !G.over && G.seats[VB.actor(G)].human && !UI.busy, tv: !document.getElementById('tv').hidden, turn: G.turn }));
