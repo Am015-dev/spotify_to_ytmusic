@@ -27,14 +27,10 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});
   await p.reload();await sleep(1000);
   await p.evaluate(()=>{AIDELAY=0;try{setGfx('low')}catch(e){}});
-  // first visit: the title shows "New here? Learn in 5 minutes" as the FIRST option
-  const first=await p.evaluate(()=>{const b=document.querySelector('#modal .mbox [data-gxt-open]');const f=document.querySelector('#modal .mbox button');return b?{t:b.textContent,first:f===b}:null});
-  if(!first||!/New here/.test(first.t)||!/Learn in 5 minutes/.test(first.t))note(tag,'first menu option is not "New here? Learn in 5 minutes": '+JSON.stringify(first));
-  else if(!first.first)note(tag,'the tutorial button is not the first option of the title');
-  // start it with a finger: from the title menu, or via Story (Chapter 0)
-  const sel=mode==='story'?'#modal [data-a=story]':'#modal [data-gxt-open]';
-  const tb=await p.evaluate(sel=>{const b=document.querySelector(sel);const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},sel);
-  await p.touchscreen.tap(tb[0],tb[1]);await sleep(900);
+  // first visit: Play offers "New here? Learn in 5 minutes" / "Play anyway" (checked in offer()); start the tutorial with a finger
+  const tapSel=async sel=>{const pt=await p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},sel);if(!pt){note(tag,'no '+sel);return false}await p.touchscreen.tap(pt[0],pt[1]);return true};
+  if(mode==='story'){await tapSel('#modal [data-a=story]')}else{await tapSel('#modal [data-a=start]');await sleep(500);await tapSel('.tutoffer [data-tutoffer=learn]')}
+  await sleep(900);
   const state=()=>p.evaluate(()=>GXT.state());
   const shot=async(n)=>{if(W===390&&H===763&&mode==='clean'){fs.mkdirSync(SHOTS,{recursive:true});await sleep(500);await p.screenshot({path:path.join(SHOTS,'tutor-'+n+'.png')})}};
   let lastSig='',lastT=Date.now(),rotated=0,left=false,seenIds=[];

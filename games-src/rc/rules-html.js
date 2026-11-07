@@ -1,5 +1,11 @@
 // ---------- How to play (an original summary of the rules as this game applies them) ----------
 const RULES_HTML=`<h2>How to play</h2>
+<h3>How a turn works</h3>
+<ol class="turn5"><li><b>The island acts.</b> An event card, morale and the camp's food and wood arrive. Read each scene, then tap Continue.</li>
+<li><b>You plan.</b> Tap a pawn, then a glowing place on the island to send it to work there.</li>
+<li><b>Two pawns are safe.</b> One pawn rolls dice and can fail or get hurt; two pawns never roll.</li>
+<li><b>Tap Start day.</b> The jobs play out one by one: you see each result as it happens.</li>
+<li><b>Weather and night.</b> Everyone eats 1 food. Without a shelter everyone is wounded. Survive until rescue.</li></ol>
 <p>You are castaways on a wild island. Everyone wins or loses together. Finish the scenario's goal before the last round ends, and keep every castaway alive: if anyone dies (Friday aside), you all lose.</p>
 <h3>A round, in six phases</h3>
 <ol><li><b>Event</b> (not in round 1). Draw an event card: its effect happens now, and the card becomes a <b>threat</b> in the right-hand slot. The older threat slides left; a threat pushed off the left slot fires its <i>if ignored</i> effect. Cards with a book icon trigger the scenario's book effect; the others put a "?" marker on the build, gather or explore action.</li>
