@@ -47,7 +47,7 @@ const { chromium } = require(fs.existsSync(path.join(ROOT, 'games-src', 'node_mo
 const gx = require('./gx-serve.js');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
-const LIM = { tutorial: 150, quick: 220, story: 140, fuzz: 60 };   // seconds per phase at --scale 1
+const LIM = { tutorial: 150, coach: 360, quick: 220, story: 140, fuzz: 60 };   // seconds per phase at --scale 1
 const lim = k => LIM[k] * SCALE * 1000;
 
 const bugs = [], seen = new Set();
@@ -275,11 +275,26 @@ async function driveTutorial(page, ci, P, ms, sumObj) {   // taps through a runn
     }
     return { reached, stuckCount, lastI };
 }
+async function phaseCoached(page, ci, P) {   // coached free-play first game (window.GXCOACH = {running, explained:[ids], done}); real taps only
+  console.log('  coached game detected (GXCOACH)'); summary.tutorial.coached = true; const T = lim('coach');
+  const started = await ev(page, () => { const e = document.querySelector('[data-a=start]'); if (!e || !window.__qa.vis(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+  if (started) await tap(page, started.x, started.y); else if (!(await ev(page, () => window.GXCOACH && window.GXCOACH.running))) await goTo(page, '^(learn|new here|first game|coached|guided|vs\\.?\\s*(the\\s*)?(computer|cpu|ai|bot)|solo|single|1 player|play|start|begin|new game|new run|quick|battle|deal|enter)');
+  await sleep(1500);
+  const b0 = bugs.length, opt = { minClicks: 4, coach: true, prefer: '^(start|play|begin|new game|deal|vs|quick)' };
+  const r = await playBot(page, ci, P, T, opt);
+  for (const b of bugs.slice(b0)) if (b.sev === 'BLOCKER') b.sev = 'MAJOR';   // coached path: a stuck screen is MAJOR, not BLOCKER
+  const st = await ev(page, () => { const c = window.GXCOACH; return c ? { done: !!c.done, n: (c.explained || []).length, ids: (c.explained || []).slice(0, 40) } : null; }) || { done: false, n: opt.coachN || 0, ids: [] };
+  summary.tutorial.explained = st.n; summary.tutorial.explainedIds = st.ids; summary.tutorial.bubblesClosed = opt.bubbles || 0; summary.tutorial.clicks = r.clicks;
+  summary.tutorial.end = !!st.done;
+  console.log(`  coach: done ${st.done}, explained ${st.n}, bubbles closed ${opt.bubbles || 0}, clicks ${r.clicks}`);
+  if (!st.done) { if (r.soft || r.reason === 'nocand') summary.tutorial.stuck = r.reason; else bug('MAJOR', P, ci.where(), `coached game: GXCOACH.done never became true within ${Math.round(T / 1000)} s (${r.clicks} clicks, ${st.n} rules explained)`, { shot: await shot(page, 'coach-notdone') }); }
+}
 async function phaseTutorial(browser, url) {
   console.log('[tutorial]'); const ci = {}; ci.where = () => 'tutorial'; const t0 = Date.now();
   const page = await freshPage(browser, url, 'tutorial', ci); const P = 'tutorial';
   try {
     await staticScan(page, P, 'title');
+    if (await ev(page, () => typeof window.GXCOACH === 'object' && window.GXCOACH !== null)) { await phaseCoached(page, ci, P); return; }
     const hasGxt = await ev(page, () => typeof GXT !== 'undefined');
     if (!hasGxt) { bug('MAJOR', P, 'title', 'no gx-tutor kit in this build (no tutorial)'); summary.tutorial.end = null; return; }
     if (!(await openTutorial(page))) {
@@ -309,6 +324,12 @@ async function playBot(page, ci, P, ms, opt) {   // returns {result, clicks, sof
   let noCand = 0, lastScreenCheck = 0;
   while (Date.now() - t0 < ms) {
     await drainErrs(page, P, ci.where());
+    if (opt.coach) {   // coached free-play: done flag ends the run; coach bubbles are dismissed by tapping their close button
+      const cs = await ev(page, () => { const c = window.GXCOACH; return c ? { done: !!c.done, n: (c.explained || []).length } : null; });
+      if (cs) { opt.coachN = cs.n; if (cs.done) { res.result = true; res.coachDone = true; res.clicks = clicks; return res; } }
+      const cb = await ev(page, () => { const b = [...document.querySelectorAll('[class*=coach i] button,[class*=coach i] [class*=close i],[class*=coach i] [class*=gx-x i],[class*=coach i] [data-close],[class*=coach i] [aria-label*=close i],[class*=coach i] [data-a=close]')].find(x => window.__qa.vis(x)); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+      if (cb) { await tap(page, cb.x, cb.y); opt.bubbles = (opt.bubbles || 0) + 1; await sleep(250); continue; }
+    }
     if (await ev(page, () => typeof GXT !== 'undefined' && GXT.running() && GXT.state().phase !== 'end')) { opt.tutDone = (opt.tutDone || 0) + 1; if (opt.tutDone <= 3) { await driveTutorial(page, ci, P, 110000, summary.tutorialIn = summary.tutorialIn || {}); lastChange = Date.now(); continue; } }
     const sg = await ev(page, () => window.__qa.sig()); if (sg === null) { await sleep(300); continue; }
     if (opt.lastPick) { const st = (opt.stats = opt.stats || {})[opt.lastPick] = (opt.stats[opt.lastPick] || { n: 0, ch: 0 }); st.n++; if (sg !== lastSig && !(await ev(page, () => !!window.__qa.bigOverlay()))) st.ch++; opt.lastPick = null; }   // opening an info sheet is no progress
@@ -324,7 +345,7 @@ async function playBot(page, ci, P, ms, opt) {   // returns {result, clicks, sof
     }
     // result screen?
     const txt = await ev(page, () => window.__qa.visText());
-    if (clicks >= opt.minClicks && txt && RESULT_RX.test(txt) && !/Learn in|New here\?/.test(txt.slice(0, 40))) {
+    if (!opt.coach && clicks >= opt.minClicks && txt && RESULT_RX.test(txt) && !/Learn in|New here\?/.test(txt.slice(0, 40))) {
       await sleep(900);
       const again = await ev(page, () => RESULT_RX.test(window.__qa.visText())); if (again) { res.result = true; res.clicks = clicks; res.text = (txt.match(RESULT_RX) || [])[0]; return res; }
     }

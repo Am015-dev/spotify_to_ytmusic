@@ -1,0 +1,14 @@
+{
+ "wave": 3,
+ "ratio": "5:4",
+ "flow_aspect": "4:3",
+ "style": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "stitchwise 2D wave 3, ratio 5:4. Paste with the Flow aspect given; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "stitchwise",
+  "count": 1
+ },
+ "cards": {
+  "ui-offer-card": "Flat 2D hand-stitched quilting illustration, soft woven cotton textures, a warm palette of teal, rose, mustard, cream and deep navy, thin dark stitched outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A single cream paper tag card with a stitched border and a small hole with string at the top. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
+ }
+}
