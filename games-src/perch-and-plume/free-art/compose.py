@@ -1,40 +1,66 @@
 #!/usr/bin/env python3
-"""Compose perch-and-plume free-kit pictures. Usage: FREEKIT_CACHE=/path python3 compose.py [sheet.png]"""
-import sys, os, json
-H = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, H + '/../../free-kit')
-import generic
-from kit import *
-G = lambda n: ('g', n)
-SPECIES = {'warbler': 'q_bird', 'woodpecker': 'parrot', 'nuthatch': 'q_bird', 'owl': 'owl', 'jay': 'q_bird', 'thrush': 'q_bird', 'tanager': 'parrot', 'kinglet': 'q_chick',
-           'treecreeper': 'q_bird', 'vireo': 'q_bird', 'lark': 'q_chick', 'pipit': 'q_chick', 'bunting': 'q_chick', 'quail': 'chicken', 'kestrel': 'q_eagle', 'harrier': 'q_eagle',
-           'meadowlark': 'q_chick', 'finch': 'q_bird', 'shrike': 'q_eagle', 'dove': 'q_bird', 'heron': 'duck', 'rail': 'chicken', 'grebe': 'duck', 'teal': 'duck', 'plover': 'q_chick',
-           'kingfisher': 'q_bird', 'bittern': 'duck', 'sandpiper': 'q_bird'}
-COL = {'copper': (200, 110, 50), 'tidal': (50, 150, 160), 'hazel': (150, 105, 60), 'fern': (80, 150, 80), 'marsh': (110, 130, 70), 'briar': (130, 60, 50), 'rust': (190, 90, 50),
-       'ember': (220, 70, 40), 'gilded': (225, 180, 60), 'lantern': (240, 180, 70), 'slate': (100, 115, 140), 'moss': (90, 140, 70), 'velvet': (130, 70, 150), 'hollow': (130, 120, 105),
-       'dawn': (240, 140, 150), 'larch': (150, 170, 70), 'sun': (250, 210, 60), 'cinder': (80, 80, 85), 'pebble': (150, 150, 145), 'silver': (200, 205, 215), 'dusk': (80, 80, 150),
-       'umber': (110, 75, 45), 'amber': (225, 150, 40), 'rush': (150, 160, 90), 'cobalt': (50, 90, 190), 'saffron': (245, 170, 40), 'opal': (150, 215, 215), 'pine': (50, 100, 70),
-       'russet': (170, 80, 50), 'sedge': (130, 140, 80), 'sorrel': (190, 70, 60), 'mist': (170, 190, 205), 'bramble': (110, 60, 90), 'wisp': (210, 215, 220), 'willow': (120, 150, 120),
-       'nettle': (90, 150, 90), 'storm': (60, 75, 120), 'ashen': (130, 130, 135), 'clover': (80, 160, 90), 'quill': (170, 150, 110), 'cobble': (140, 130, 120), 'wren': (150, 110, 80)}
-HAB = {'warbler': (110, 150, 100), 'woodpecker': (95, 130, 90), 'nuthatch': (95, 130, 90), 'owl': (90, 105, 140), 'heron': (80, 140, 150), 'grebe': (80, 140, 150), 'teal': (80, 140, 150), 'rail': (90, 140, 130),
-       'bittern': (90, 140, 130), 'plover': (190, 170, 100), 'sandpiper': (190, 170, 100), 'lark': (190, 170, 90), 'pipit': (190, 170, 90), 'bunting': (190, 170, 90), 'quail': (190, 165, 95), 'meadowlark': (190, 170, 90)}
-def special(it, T):
-    s = it['stem']
-    if s.startswith('bird-'):
-        _, c, sp = s.split('-', 2); a = SPECIES.get(sp, 'q_bird'); col = COL.get(c, (150, 130, 100)); st = HAB.get(sp, (110, 150, 120))
-        ground = 'damp_sand' if st[2] > 130 and sp in ('heron', 'grebe', 'teal', 'rail', 'bittern') else ('aerial_grass_rock' if st[0] > 150 else 'forest_ground_04')
-        sub = lambda: tint(animal(a, seed_of(s) & 1), col, .85)
-        out = card(it['w'], it['h'], sub, 'rough_linen', (236, 226, 200), st, None, glyph(['shield', 'flag_triangle', 'award', 'hexagon_tile'][seed_of(sp) % 4], (255, 246, 220)), seed=s, ground=T(ground), scale=.95)
-        return out, ['polyhaven', 'quaternius' if a.startswith('q_') else 'kenney-animals', 'kenney-icons']
-CFG = dict(
-    stage=(110, 150, 110), stages=[(110, 150, 110), (150, 130, 90), (90, 140, 150), (170, 150, 90)], tex='rough_linen', paper=(236, 226, 200), ground='aerial_grass_rock', table='brown_planks_03',
-    bands=[(70, 120, 80), (160, 110, 50), (60, 100, 140)], badges=['flag_triangle', 'shield', 'award'], chars=['owl', 'parrot', 'chicken', 'duck', 'penguin', 'rabbit', 'goat', 'bear'],
-    pool=[G('hexagon_tile'), G('award'), G('token'), G('pouch')], special=special, card_ground=True,
-    kw=[(r'food-grub|grub', ('a', 'snake')), (r'seed|wheat', G('resource_wheat')), (r'fish', ('a', 'q_fish')), (r'berry|apple', G('resource_apple')), (r'rodent|mouse', ('a', 'rabbit')),
-        (r'egg', G('token')), (r'nest', ('c', 'campfire')), (r'feeder', ('c', 'well')), (r'trophy', G('crown_a')), (r'tray|cube', G('d6')), (r'back', G('card')),
-        (r'goal|birds', ('a', 'q_bird')), (r'eggs', G('token')), (r'row-forest', ('c', 'treePines')), (r'row-grass', ('c', 'bush')), (r'row-wet', ('c', 'lake')), (r'bonus|keeper|saver|picker', ('a', 'owl')),
-        (r'angler|mouser|digger', ('a', 'q_cat')), (r'chain|pop|spark', G('token'))],
-    scene=dict(sky=[((190, 215, 235), (250, 235, 200)), ((250, 200, 150), (255, 240, 205))], ground='aerial_grass_rock', mid='forest_ground_04', midtint=(110, 150, 110), haze=(235, 240, 235),
-               props=[(('c', 'treePines', (30, 55, 35)), .12, .78, .28), (('c', 'treePineTall', (30, 55, 35)), .3, .74, .2), (('c', 'lake', (50, 80, 100)), .75, .84, .14), (('a', 'q_bird'), .6, .3, .1), (('a', 'q_bird'), .35, .22, .08)]),
-    fxcol=(255, 235, 150))
-if __name__ == '__main__':
-    generic.main('perch-and-plume', 'perch-and-plume', H, json.load(open(H + '/../assets.json'))['items'], CFG, sys.argv[1] if len(sys.argv) > 1 else None)
+"""Build every perch-and-plume free-art slot (see ART-DIRECTION.md).
+Birds + UI: flat-vector SVG (birds.py, ui.py) rendered by render.js (Chromium). Portraits: Kenney Toon Characters 1
+via ../../wildmark/free-art/compose.py (needs PACKS like wildmark). Usage: PACKS=<dir> python3 compose.py <outdir> [--only birds|ui|portraits]"""
+import os, sys, json, subprocess, importlib.util
+from PIL import Image
+HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
+import birds, ui
+
+OUT = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else HERE
+ONLY = sys.argv[sys.argv.index('--only') + 1] if '--only' in sys.argv else None
+TMP = os.path.join(OUT, '_svg'); os.makedirs(TMP, exist_ok=True)
+items = json.load(open(os.path.join(HERE, '..', 'assets.json')))['items']
+size = {i['stem']: (i['w'], i['h'], bool(i.get('alpha'))) for i in items}
+
+def job(stem, svgtext):
+    w, h, a = size[stem]; f = os.path.join(TMP, stem + '.svg'); open(f, 'w').write(svgtext)
+    return [f, os.path.join(TMP, stem + '.png'), w, h, 1 if a else 0]
+
+jobs = []
+for stem in size:
+    p = stem.split('-', 1)
+    if stem.startswith('bird-') and ONLY in (None, 'birds'):
+        _, var, sp = stem.split('-', 2); jobs.append(job(stem, birds.bird_svg(sp, var)))
+    if ONLY not in (None, 'ui') or stem.startswith('bird-') or stem.startswith('portrait-'): continue
+    if p[0] == 'food': jobs.append(job(stem, ui.food(p[1])))
+    elif stem == 'token-egg': jobs.append(job(stem, ui.egg()))
+    elif p[0] == 'nest': jobs.append(job(stem, ui.nest(p[1])))
+    elif p[0] == 'goal': jobs.append(job(stem, ui.goal(p[1])))
+    elif p[0] == 'bonus': jobs.append(job(stem, ui.bonus(p[1])))
+    elif stem == 'card-back': jobs.append(job(stem, ui.card_back()))
+    elif stem == 'ui-feeder': jobs.append(job(stem, ui.feeder()))
+    elif stem == 'ui-tray': jobs.append(job(stem, ui.tray()))
+    elif stem == 'ui-cube': jobs.append(job(stem, ui.cube()))
+    elif stem == 'ui-trophy': jobs.append(job(stem, ui.trophy()))
+    elif p[0] == 'fx': jobs.append(job(stem, ui.fx(p[1])))
+    elif p[0] == 'row': jobs.append(job(stem, ui.row(p[1])))
+    elif stem == 'board-mat': jobs.append(job(stem, ui.mat()))
+    elif stem == 'bg-map': jobs.append(job(stem, ui.mapbg()))
+    elif stem == 'bg-title':
+        jobs.append(job(stem, ui.landscape(1080, 1920, [('jay', 120, 820, 340, 'mist', 'branch'), ('meadowlark', 640, 960, 340, 'sun', 'post'), ('kingfisher', 420, 1300, 360, 'opal', 'reed')])))
+    elif stem == 'bg-result':
+        jobs.append(job(stem, ui.landscape(1080, 1920, [('owl', 360, 1000, 380, 'dusk', 'branch')], evening=True, seed=5)))
+    elif stem not in size: pass
+json.dump(jobs, open(os.path.join(TMP, 'list.json'), 'w'))
+if jobs: subprocess.run(['node', os.path.join(HERE, 'render.js'), os.path.join(TMP, 'list.json')], check=True)
+for svgf, png, w, h, a in jobs:
+    stem = os.path.basename(png)[:-4]; im = Image.open(png); im = im.convert('RGBA' if a else 'RGB')
+    im.save(os.path.join(OUT, stem + '.webp'), quality=88, method=6)
+
+if ONLY in (None, 'portraits'):
+    spec = importlib.util.spec_from_file_location('wm', os.path.join(HERE, '..', '..', 'wildmark', 'free-art', 'compose.py'))
+    wm = importlib.util.module_from_spec(spec); sys.argv = sys.argv[:1]; spec.loader.exec_module(wm)
+    P = {  # kind, swaps, background, prop
+        'ottilie': ('fp', wm.skin('light', True) + wm.hair('#E4E2DE', True) + wm.shirt('#6A8A5A'), '#cfe0bf', 'tree_round'),
+        'pip': ('ma', wm.skin('light') + wm.hair('#6A4028') + wm.shirt('#3F8A4F'), '#d8e6c0', 'pine'),
+        'mags': ('fa', wm.skin('tan') + wm.hair('#C8603A') + wm.shirt('#D8A040'), '#f0e2b4', None),
+        'tobias': ('mp', wm.skin('brown', True) + wm.hair('#2A2420', True) + wm.shirt('#4A6A8A'), '#c8dce6', None),
+        'corvin': ('ma', wm.skin('light') + wm.hair('#1E1E24') + wm.shirt('#2A2A32'), '#b8b8c4', 'rock_big'),
+        'delphine': ('fa', wm.skin('brown') + wm.hair('#2A1E18') + wm.shirt('#3A6AB0'), '#bcd6e6', None),
+        'barnaby': ('mp', wm.skin('light', True) + wm.hair('#F2F0EA', True) + wm.shirt('#8A6A44'), '#e0d4b4', 'logpile'),
+        'you': ('fp', wm.skin('tan', True) + wm.hair('#5A3A26', True) + wm.shirt('#4F8A6A'), '#d4e4c8', 'pine'),
+    }
+    for n, (k, sw, bg, prop) in P.items():
+        wm.portrait(k, sw, bg, prop).resize((512, 512), Image.LANCZOS).save(os.path.join(OUT, f'portrait-{n}.webp'), quality=88, method=6)
+print('pass compose perch-and-plume', len(jobs) + (8 if ONLY in (None, 'portraits') else 0))
