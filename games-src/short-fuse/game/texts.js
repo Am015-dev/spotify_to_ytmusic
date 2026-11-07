@@ -160,6 +160,7 @@ const RULES_HTML=`
 <li><b>Info tokens</b> show a wire's number. Some jobs use other tokens: even/odd, counts ("x2 on this stand"), or false tokens ("NOT this").</li>
 <li><b>Validation tokens</b>: when all four of a value are cut, a green check goes on the track.</li>
 <li><b>Announcements:</b> some gear makes the crew answer out loud (a Sweep: "yes, I hold a 7"). The page shows every announcement in the dock and in What we know.</li></ul>
+<h3>Kept simple</h3><p>A hand with no legal cut skips its turn (only jobs 9, 16 and 36 blow the bomb). If the crew makes no progress for four rounds, the bomb goes off so a game cannot run forever. When only red wires remain, they are revealed for you. Earlier answers stay visible on the page.</p>
 <h3>No free talk</h3><p>You may not tell crewmates what you hold. The page enforces that: the only ways to share are the moves themselves, the tokens and the answers the rules ask for.</p>
 <h3>The fuse</h3><p>It starts with one step per player (some jobs start lower) and can never go above 6. A miss burns one step; at zero the bomb explodes.</p>
 <h3>Equipment</h3><p>From job 3, one gear card per player lies on the board, locked. Each card unlocks the moment two wires of its number are cut (double cards: all four). It then works once. "Any time" cards may be used even when it is not your turn (not in the middle of a question). "Your turn" cards are part of your action. Open <b>Gear</b> to read them all.</p>

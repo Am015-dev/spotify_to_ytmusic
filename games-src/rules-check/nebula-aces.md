@@ -39,3 +39,9 @@ Counts: WRONG 2, MISSING 1, SIMPLIFIED 5
 - Pilot and upgrade point costs and pilot abilities for the 10 core pilots and 57 expansion pilots: spot-checked ~8 against memory only (all matched). Med for core, low for waves 1-3.
 - Whether the damage-deck wording for "wounded pilot" matches the original text (ignore pilot ability and talents). Med.
 - Whether rolling one die vs one per asteroid was changed by later official clarification. Low.
+
+## Fixed (W391)
+- WRONG one die per asteroid -> fixed (one attack die per maneuver); test "one-die-per-maneuver-not-per-asteroid" (xw/rules-test.js).
+- WRONG tied squad totals use a die roll -> fixed (second-named side has initiative); test "tied-squads-second-faction-has-initiative".
+- MISSING scenario missions: left (optional content, new setup and victory screens, not engine-only).
+- SIMPLIFIED items now have one "Kept simple" line in the rules drawer.
