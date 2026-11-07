@@ -6,7 +6,7 @@
 
 offline.json = {"v":1,"files":[{"p":"index.html","bytes":N},...],"optional":[{p,bytes}],"total":core bytes,"optionalTotal":bytes}
   files    = core: what the game needs to look and sound right (the shelf downloads these)
-  optional = files the game never draws today (Nightrun: media/*.webp not listed in media/ready.json)
+  optional = always empty now (kept so older shelf pages still read the file)
 Excluded: dev/test leftovers (cards.html, preview.html, painted.html, *.md, *.map, *.bak, test*), the game's own sw.js, offline.json.
 Paths are relative to the game folder. Run by build-all.py after a deploy. No AI is used.
 """
@@ -25,7 +25,7 @@ def is_dev(rel):
     n = rel.rsplit("/", 1)[-1].lower()
     return n in DEV_NAMES or n.endswith(DEV_EXT) or n.startswith("test") or n.startswith(".")
 
-def build(slug):
+def build(slug, check=False):
     root = GAMES / slug
     if not (root / "index.html").is_file(): return None
     files = []
@@ -36,21 +36,26 @@ def build(slug):
             if is_dev(rel): continue
             files.append((rel, os.path.getsize(root / rel)))
     files.sort(key=lambda x: (x[0] != "index.html", x[0]))
-    core, opt = files, []
-    ready = root / "media" / "ready.json"
-    if slug == "mainhattan-nightrun" and ready.is_file():
-        ok = set(json.loads(ready.read_text(encoding="utf-8")))
-        # media/*.webp in the top folder that ready.json does not list are placeholders the game never draws
-        # (media/placeholders.json, assets-index.json stay core: the game fetches them at boot)
-        core = [(p, b) for p, b in files if not (p.startswith("media/") and p.count("/") == 1 and p.endswith(".webp") and p[6:] not in ok)]
-        opt = [x for x in files if x not in set(core)]
+    core, opt = files, []   # everything on disk is core: a game may load any of it (Nightrun's unlisted placeholders are only ~7 MB)
     j = lambda L: [{"p": p, "bytes": b} for p, b in L]
     out = {"v": 1, "files": j(core), "optional": j(opt), "total": sum(b for _, b in core), "optionalTotal": sum(b for _, b in opt)}
-    (root / "offline.json").write_text(json.dumps(out, separators=(",", ":")) + "\n", encoding="utf-8")
+    text = json.dumps(out, separators=(",", ":")) + "\n"
+    if check:   # --check: report only, write nothing
+        old = (root / "offline.json").read_text(encoding="utf-8") if (root / "offline.json").is_file() else ""
+        return out if old != text else None
+    (root / "offline.json").write_text(text, encoding="utf-8")
     return out
 
 if __name__ == "__main__":
-    want = sys.argv[1:] or slugs()
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    check = "--check" in sys.argv   # exit 1 when any offline.json differs from what is on disk (stale list = files missing offline)
+    want = args or slugs()
+    stale = []
     for s in want:
-        o = build(s)
-        if o: print(f"{s:22} {len(o['files']):4} files {o['total']/1e6:7.1f} MB core, {len(o['optional'])} optional {o['optionalTotal']/1e6:.1f} MB")
+        o = build(s, check)
+        if check:
+            if o: stale.append(s)
+        elif o: print(f"{s:22} {len(o['files']):4} files {o['total']/1e6:7.1f} MB")
+    if check:
+        print("offline.json stale: " + (", ".join(stale) if stale else "none"))
+        sys.exit(1 if stale else 0)

@@ -73,13 +73,14 @@
       var H = D.H[k], h = { k: k, hp: H.hp, mhp: H.hp, deck: H.start.map(function (id) { return mk(id); }), dead: 0 };
       G.hs.push(h); G.relics.push(H.relic);
     });
-    G.boss = D.ENC.boss[ri(3)][0];
+    G.boss = D.ENC.boss[ri(3)][0]; if (opt.boss) G.boss = opt.boss;
+    G.F = opt.floors || 9; G.ehp = opt.hpPct || 100; if (opt.relic && G.relics.indexOf(opt.relic) < 0) G.relics.push(opt.relic);
     genMap(); resetCombat();
     return G;
   }
   function resetCombat() { G.hs.forEach(function (h) { h.draw = []; h.hand = []; h.disc = []; h.exh = []; h.en = 0; h.blk = 0; h.st = {}; h.orbs = []; h.stance = 'n'; h.pw = {}; }); }
   function genMap() {
-    var W = 4, F = 9, nodes = {}, paths = [];
+    var W = 4, F = G.F || 9, nodes = {}, paths = [];
     var starts = shuffle([0, 1, 2, 3]).slice(0, 3);
     starts.push(ri(4));
     starts.forEach(function (c) {
@@ -96,7 +97,7 @@
     keys.forEach(function (k, i) { idOf[k] = i; });
     keys.forEach(function (k) {
       var n = nodes[k], f = n.f;
-      if (f === 1) n.t = 'm'; else if (f === 5) n.t = 't'; else if (f === 9) n.t = 'r';
+      if (f === 1) n.t = 'm'; else if (f === 5 && F >= 7) n.t = 't'; else if (f === F && F >= 3) n.t = 'r';
       else {
         var w = [['m', 45], ['v', 22], ['s', f >= 3 ? 7 : 0], ['r', f >= 4 && f <= 8 ? 12 : 0], ['e', f >= 3 ? 14 : 0]], tot = 0; w.forEach(function (x) { tot += x[1]; });
         var r = ri(tot); for (var i = 0; i < w.length; i++) { r -= w[i][1]; if (r < 0) { n.t = w[i][0]; break; } }
@@ -104,7 +105,7 @@
       arr.push({ id: idOf[k], f: f, c: n.c, t: n.t, nx: n.nx.map(function (x) { return idOf[x]; }) });
     });
     var bid = arr.length; arr.forEach(function (n) { if (n.f === F) n.nx = [bid]; });
-    arr.push({ id: bid, f: 10, c: 1.5, t: 'b', nx: [] });
+    arr.push({ id: bid, f: F + 1, c: 1.5, t: 'b', nx: [] });
     G.map = arr;
   }
   function reachable() {
@@ -151,7 +152,7 @@
     if (e.dead) return;
     var d = dmgNum(h, base, card); if (st(e, 'vuln') > 0) d = Math.floor(d * 1.5); d = Math.max(0, d);
     var a = Math.min(e.blk, d); e.blk -= a; var real = d - a;
-    fx('dmg', 'e' + G.b.en.indexOf(e), d, a > 0 && real === 0 ? 'blocked' : '');
+    fx('dmg', 'e' + G.b.en.indexOf(e), d, a > 0 && real === 0 ? 'blocked' : (st(h, 'str') > 0 ? 'str' : ''));
     if (real > 0) {
       e.hp -= real; e.asleep = 0;
       if (h.pw.envenom) addSt(e, 'poison', h.pw.envenom);
@@ -218,7 +219,7 @@
   }
   // ---------- battle flow
   function mkEnemy(id) {
-    var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); if (G.hs.length > 1) hp = Math.round(hp * 2);
+    var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); if (G.hs.length > 1) hp = Math.round(hp * 2); if (G.ehp && G.ehp !== 100) hp = Math.round(hp * G.ehp / 100);
     return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0 };
   }
   function plan(e) {
@@ -243,6 +244,7 @@
     if (has('spark-core') && !G.hs.some(function (h) { return h.k === 'a'; })) { /* only the Automaton benefits */ }
     G.b.en.forEach(function (e) { if (has('bag-of-marbles')) addSt(e, 'vuln', 1); plan(e); });
     beginRound();
+    G.hs.forEach(function (h) { if (!h.dead && h.k === 'm' && has('prayer-beads')) h.hand.push(mk('calm-spark')); });
   }
   function beginRound() {
     G.b.turn++; G.b.ph = 'p'; G.b.cur = -1;
@@ -273,7 +275,7 @@
     var held = h.hand.length, keep = [];
     h.hand.forEach(function (c) {
       var fl = D.CARDS[c.id].fl;
-      if (fl.indexOf('b') >= 0) hurtHero(h, 2, true);
+      if (fl.indexOf('b') >= 0) { fx('hitme', 'h' + hi, 2, 'burn'); hurtHero(h, 2, true); }
       if (fl.indexOf('r') >= 0) hurtHero(h, held, true);
       if (fl.indexOf('d') >= 0) addSt(h, 'weak', 1);
       if (fl.indexOf('e') >= 0) h.exh.push(c); else h.disc.push(c);
@@ -315,7 +317,7 @@
         if (h.dead) break;
         var dm = it.atk + st(e, 'str'); if (st(e, 'weak') > 0) dm = Math.floor(dm * 0.75);
         if (st(h, 'vuln') > 0) dm = Math.floor(dm * 1.5); if (h.stance === 'w') dm *= 2; dm = Math.max(0, dm);
-        var a = Math.min(h.blk, dm); fx('hitme', 'h' + G.hs.indexOf(h), dm, a === dm ? 'blocked' : '');
+        var a = Math.min(h.blk, dm); fx('hitme', 'h' + G.hs.indexOf(h), dm, a === dm ? 'blocked' : (st(e, 'str') > 0 ? 'str' : ''));
         hurtHero(h, dm);
       }
     }

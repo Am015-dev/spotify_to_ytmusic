@@ -17,7 +17,14 @@
   "diver3": "diver3",
   "diver4": "diver4",
   "table": "table",
-  "title": "title"
+  "title": "title",
+  "camp-shallows": "camp-shallows",
+  "camp-sand": "camp-sand",
+  "camp-power": "camp-power",
+  "camp-tablet": "camp-tablet",
+  "camp-hum": "camp-hum",
+  "camp-shelves": "camp-shelves",
+  "camp-road": "camp-road"
  },
  "size": {
   "emb0": [
