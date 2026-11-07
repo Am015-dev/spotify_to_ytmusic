@@ -14,6 +14,7 @@ const seatName=p=>p.human&&G.pl.filter(q=>q.human).length===1?'You':p.nm;
 function say(t,tn){const el=$('#status');const p=G&&G.cur&&!G.over?P(G.cur.p):null;el.style.setProperty('--c',p?PCOL[p.i]:'#e0a83a');
   el.innerHTML=(tn?`<b class="tn"><i class="tdot"></i>${esc(tn)}</b>`:'')+`<span class="ins">${esc(t)}</span>`;el.classList.toggle('mine',myTurn())}
 // rival steps: a short caption per step (what it drew, where it put it, what it claimed, what it scored), shown ~1.4 s each
+function lastFig(){for(const e of G.log.slice(0,8)){const m=e.t.match(/^(.+?) sets a .*on the (\w+)\.$/);if(m)return {nm:m[1],ty:m[2],p:G.pl.findIndex(p=>p.nm===m[1])}}return null}
 function capSet(t,ms,score,intro){UI.capQ=UI.capQ||[];UI.capQ.push({t,ms:Math.round((ms||1500)/(UI.speed||1)),score:!!score,intro:!!intro});if(!UI.capCur)capNext()}
 function capNext(){const n=(UI.capQ||[]).shift();clearTimeout(UI.capT);if(!n){UI.cap=null;UI.capCur=0;if(G)try{renderStatus()}catch(e){}return}
   UI.cap={t:n.t,score:n.score,intro:n.intro,until:Date.now()+n.ms};UI.capCur=1;if(G&&G.cur)try{renderStatus()}catch(e){}UI.capT=setTimeout(capNext,n.ms)}
@@ -133,8 +134,8 @@ function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(
   else{UI.legal=[];UI.hint=null;UI.hintFig=null;if(G.step==='place'){UI.user=false;refit(true)}}}
 // ---------- the main render ----------
 function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500);hlpAfter()}
-function save(){if(UI.tut)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
-function refresh(){if(UI.sim||!G)return;render();save();playFx();if(G.over)finishUp();else schedAI()}
+function save(){if(UI.tut||UI.coach)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
+function refresh(){if(UI.sim||!G)return;render();save();playFx();if(UI.coach)try{coachTick()}catch(e){console.error(e)}if(G.over)finishUp();else schedAI()}
 // ---------- actions ----------
 function rotate(){if(!myTurn('place')||UI.rots.length<2){return}if(!tutGate({what:'rotate'}))return;const i=UI.rots.indexOf(UI.rot),n=UI.rots[(i+1)%UI.rots.length];UI.deg+=((n-UI.rot+4)%4||4)*90;UI.rot=n;sfx('click');renderGlows();updateGhost();placeOverlay();ensureGlowVisible();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
 function onGlow(x,y){if(UI.moved||!myTurn('place'))return;const m={act:'place',x,y,r:UI.rot};if(!isLegal(m,sideToAct()))return;if(!tutGate({what:'place',x,y}))return;UI.hint=null;UI.humanTurns++;performMove(m,sideToAct())}
@@ -147,7 +148,7 @@ function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s)
 function aiNow(){if(UI.capQ&&UI.capQ.length)UI.capQ.length=0;if(UI.aiT){clearTimeout(UI.aiT);aiAct()}}
 // ---------- effects: scores light up the feature and fly to the seat chip ----------
 function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n=0;
-  for(const f of list){const rv=G&&G.cur&&!P(G.cur.p).human;if(f.t==='turn'&&!P(f.x).human)capSet(`${P(f.x).nm} draws a tile.`,900);else if(f.t==='place'&&rv){const l=G.log[0];capSet(`${P(G.cur.p).nm} places the tile.`,900)}else if(f.t==='fig'&&rv){const l=G.log[0];capSet(l&&/on the (\w+)\.$/.test(l.t)?`${P(G.cur.p).nm} claims the ${l.t.match(/on the (\w+)\.$/)[1]}.`:'',900)}}
+  for(const f of list){if(UI.coach)try{coachFx(f)}catch(e){console.error(e)}const rv=G&&G.cur&&!P(G.cur.p).human;if(f.t==='turn'&&!P(f.x).human)capSet(`${P(f.x).nm} draws a tile.`,900);else if(f.t==='place'&&rv){const l=G.log[0];capSet(`${P(G.cur.p).nm} places the tile.`,900)}else if(f.t==='fig'){const lf=lastFig();if(lf&&lf.p>=0&&!P(lf.p).human)capSet(`${lf.nm} claims the ${lf.ty}.`,900)}}
 
   for(const f of list){if(f.t==='place')sfx('place');else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
     else if(f.t==='score'){const d=f.x,delay=n++*520;try{capSet(scoreCap(d,false),1500,true)}catch(e){}setTimeout(()=>scorePop(d),delay)}}}
@@ -165,7 +166,7 @@ function finalPops(){const fs=finalScores();let n=0;const dets=fs.det.filter(d=>
   for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),400+n*380);n++}
   return n}
 function tutFinalPops(){if(UI.tut)finalPops()}
-function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.tut)return;sfx('win');
+function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.coach){const n=finalPops();setTimeout(()=>{try{coachEnd()}catch(e){console.error(e)}},Math.min(4200,1200+n*380));return}if(UI.tut)return;sfx('win');
   const n=finalPops();
   const wait=Math.min(4200,900+n*380+900);
   setTimeout(()=>{if(!G||!G.over)return;if(UI.camp&&typeof campFinish==='function'){campFinish();return}showResult()},UI.reduce?300:wait)}

@@ -108,3 +108,16 @@ html.sk .gxc-path .gxc-lab,html.sk .gxc-path .gxc-act small,html.sk .gxc-path .g
 @media(max-width:400px){html.sk .seat{padding:3px 7px 3px 5px;gap:3px}html.sk #top{gap:4px}html.sk .seat .dot{width:14px;height:14px}}
 @media(max-width:380px){#left small{display:none}}
 #modal .card .opt{min-height:40px}
+/* coached first game */
+#coach{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+#coach .cbub{pointer-events:none;display:flex;align-items:center;gap:10px;width:100%;max-width:520px;background:#f6ead2;color:#2a1608;border:3px solid var(--cc,#7a8a3c);border-radius:14px;padding:8px 10px;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#coach .cbub[hidden]{display:none}
+#coach .cbub.cin{animation:cinup .35s ease-out}@keyframes cinup{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+#coach .cpic,.cwalk .cpic{flex:0 0 auto;width:48px;height:48px;border-radius:50%;border:3px solid #7a8a3c;object-fit:cover;object-position:center 20%;background:#e8d9b5}
+#coach .ctxt{flex:1 1 auto;display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
+#coach .ctxt b{font:800 14px/1.2 var(--ff)}#coach .ctxt span{font:600 14px/1.3 var(--ff);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#coach .cok{pointer-events:auto;flex:0 0 auto;min-height:44px;padding:0 14px;border-radius:10px;border:2px solid #7a3a1a;background:#b5532f;color:#fff8ec;font:800 14px var(--ff)}
+#coach .cleave{pointer-events:auto;align-self:flex-start;min-height:40px;padding:0 12px;border-radius:10px;border:2px solid #b5883a;background:#281b12;color:#fff3dc;font:700 14px var(--ff)}
+.coachcard{text-align:left}.cwalk{display:flex;gap:12px;align-items:flex-start;margin:6px 0 10px}.cwalk p{margin:4px 0 0;font:600 17px/1.4 var(--ff);color:#2a1608}.cwalk b{font:800 15px var(--ff);color:#2a1608}
+.cstep{font:700 14px var(--ff);color:#3a2410;margin-bottom:8px}.clater{margin:8px 0 12px;padding-left:1.2em;font:600 15px/1.4 var(--ff);color:#2a1608}.clater li{margin:4px 0}
+@media(min-width:1024px){#coach .ctxt span,#coach .ctxt b,#coach .cok,#coach .cleave{font-size:16px}.cstep{font-size:16px}}

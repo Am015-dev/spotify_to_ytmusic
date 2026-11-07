@@ -1,51 +1,37 @@
-# Tutorial coverage: Rampart & Vine
+# Tutorial coverage: Rampart & Vine (coached first game, ADDENDUM 4)
 
-The tutorial is the PROLOGUE of the story: one complete, fixed 11-tile game (stacked deck, seed 7) played from setup to the final
-count and result against the real computer rival (named Hob in the tutorial). Old Tamsin (guide, portrait on every bubble) gives the
-story reason, the player does the real action (the step only advances when it is done), then Tamsin or Hob reacts. Chapters are
-shown on the first step of each chapter; the kit remembers the step, so the player can leave (Skip tutorial) and resume.
-All text lives in `game/src/story.js` (`STORY.tut`). Proof: `game/tutor-test.js` (all 19 steps, 390x763 and 1440x860, wrong taps, spotlight
-not covered) and `game/playable-test.js` (quick game and story chapter 1 by taps).
+The tutorial is now a COACHED FIRST GAME: a real game against the real AI (Hob) with free legal moves from turn 1 and no forced taps (the brief allows two).
+A fixed 30-tile deck (`COACH_DECK` in `game/src/coach.js`) only makes sure a banner town, roads, towns and priories come up. Old Tamsin (guide) and Hob (rival) speak
+just in time: one small bubble at a time, taps pass through it, Got it / auto-dismiss, "Leave tutorial" always visible. Each rule is explained the first time it matters
+(`window.GXCOACH = {running, explained:[ids], done, later:[ids]}`). At the end the score is walked through rule by rule with the player's real numbers, then a
+"Things you will meet later" card lists the rules that did not come up. Text: `game/src/story.js` (`STORY.coach`, `coachEnd`, `coachLater`).
+Proof: `game/coach-test.js` plays the coached game to the end with random legal moves through the UI at 390x763 and 1440x860 and asserts the core rules were explained and
+every other rule was explained or is on the later card.
 
-| Chapter | Step id | Rule taught (by doing or seeing) | Story beat |
+| Rule | Coach id | When it is explained (in play) | Fallback |
 |---|---|---|---|
-| 1 Your first turn | goal | [x] goal, most points wins; the valley starts with one tile | "Vinemoor has no owner. Whoever builds the best valley gets the deeds. Hob wants them too." |
-| 1 | turn | [x] draw a tile, turn it | "Hob is already measuring the land. Turn your tile." |
-| 1 | place1 | [x] edges must match (road to road) | "Lay it where the road runs on." |
-| 1 | fig_road | [x] follower on a road; you start with seven | "A follower makes it yours." |
-| 1 | computer | [x] the rival's turn; a feature with a follower is taken (one owner only) | Hob takes a turn |
-| 2 Roads, scoring | place2 | [x] closing a road | "Finished roads pay a point per tile." |
-| 2 | fig_priory | [x] follower on a priory | "Eight tiles around it will pay 9." |
-| 2 | road_done | [x] finished road scores 1 per tile; the follower goes home | payoff: "four points... Hob frowns." |
-| 2 | place3 | [x] town meets town | "Close the wall before Hob can take it." |
-| 2 | fig_town | [x] follower on a town | "Claim it before it closes." |
-| 2 | town_done | [x] finished town scores 2 per tile; follower returns | payoff: "Hob grumbles." |
-| 3 Special cases | place4 | [x] priory needs all eight neighbours | "Keep building around it." |
-| 3 | fig_farmer | [x] a follower in a field is a farmer; 3 per finished town at the end; farmers stay | "A follower lying in a field is a farmer." |
-| 3 | place5 | [x] no follower needed every turn | "No follower is needed." |
-| 3 | place6 | [x] completing the ring | "The monks are ready to ring the bell." |
-| 3 | skip | [x] skipping the follower | "Save your follower for later." |
-| 4 Ending the game | priory_done | [x] priory ringed by eight tiles scores 9 | "The bell rings." |
-| 4 | final | [x] end: open roads and towns 1 per tile, farmers 3 per finished town (animated count-up, tile by tile) | climax: "The valley is full." |
-| 4 | winner | [x] most points wins; result screen | "The deeds are yours." |
+| goal, most points wins | goal | your first placement turn (Tamsin) | |
+| turn the tile, edges must match | match | first placement turn | |
+| town banner: +2 per banner | banner | the first time you hold a banner tile (the deck gives you one early) | later card |
+| follower: road, town, priory, field; seven; skip | follower | first time you may place one | |
+| follower on a road / town / priory / field (farmer) | claim_road / claim_town / claim_priory / claim_field | when you place that kind of follower, with its scoring | |
+| one owner per feature | one_owner | when Hob first claims something (Hob speaks) | |
+| finished road 1 per tile, follower goes home | score_road | when your road finishes, with the real numbers | later card |
+| finished town 2 per tile + 2 per banner | score_town | when your town finishes | later card |
+| priory 9 when ringed (else 1 + neighbours) | score_priory | when it scores | later card |
+| majority: most followers wins, others get nothing | majority | when a feature you had a follower in is won by Hob | later card |
+| tie: all tied players score in full | tie | when it happens | later card |
+| rival scores | rival_score | Hob's first score (Hob speaks) | |
+| tile that fits nowhere is set aside | discard | when it happens | later card |
+| no followers left | nofig | when you run out | |
+| game end: last tile, unfinished features 1 per tile, farmers 3 per finished town | last, then the score walk | last two tiles, then roads, towns, priories, fields, total, each with your real numbers | |
+| River, Taverns & Basilicas (inns, basilica, large follower), Merchants & Masons (goods, mason, hog) | (not in play) | "Things you will meet later" card at the end, and the lightbulb | card |
 
-## Not taught by doing in the tutorial (honest list)
-These are explained in the lightbulb / Help drawer ("How a turn works", then rule cards) and by the coach bubbles in real games, but the
-tutorial game does not contain them (it is a fixed 11-tile valley with no spare tiles):
-- [ ] town banners (+2 each); incomplete priory scoring (1 + neighbours); incomplete town scoring detail
-- [ ] ties and majority fights (several followers on one feature, tied players all score)
-- [ ] a tile that fits nowhere is set aside and another is drawn
-- [ ] end trigger detail (last tile) and tie-break (a tie is shared)
-- [ ] The Riverlands (river start), Taverns & Basilicas (inns, cathedral, large follower, 0 when unfinished), Merchants & Masons (goods tokens, mason extra turn, hog +1 per town)
-These need extra staged tiles; next step would be a second optional chapter ("Special tiles") with a stacked deck that contains them.
+Honest limits: because play is free, ties, majority fights and unplaceable tiles may not come up in a given game; they are then on the later card, not taught by doing.
+The expansions are never in the coached game (base rules only). Story prologue: Story launches the same coached game (Chapter 0) and ends with "Start chapter 1".
 
 ## Rules check (games-src/rules-check/rampart-and-vine.md)
-WRONG 0, MISSING 1 (garden/abbot tiles belong to an expansion we do not have), SIMPLIFIED 4. Nothing to fix in the engine
-(W391 added no commits for this game). The simplified items are stated in the Help drawer card "House rules" (first seat always starts;
-builder extra turn counts even when its tile finishes the feature; tile art follows common open sets).
+WRONG 0, MISSING 1 (garden/abbot tiles belong to an expansion we do not have), SIMPLIFIED 4 (stated in the Help card "House rules"). Nothing to fix in the engine.
 
-## ADDENDUM 4 (coached first game): NOT done
-The tutorial is still the forced-step story prologue above (19 steps, scripted rival, every move gated). Turning it into a coached free-play game
-(free legal moves from turn 1, just-in-time guide bubbles, max 2 forced steps, "Things you'll meet later" card, scripted-free test) needs
-a rewrite of tutor.js (remove tutGate/scripted AI, event-driven coach lines from engine fx, coverage tracker) and was not started: it did not fit the time left.
-QA bot (phone) on this build: 0 blockers, 0 majors (the step 19/19 target under the top strip is fixed).
+## History
+The earlier 19-step forced-tap prologue (tutor.js, scripted rival) is no longer launched; its code stays in tutor.js unused.
