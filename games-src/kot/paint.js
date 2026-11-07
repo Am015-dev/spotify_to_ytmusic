@@ -6,9 +6,11 @@ const unl=t=>{try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u
 const pre=(f,cb)=>{if(IMG_OK[f]!==undefined){cb&&IMG_OK[f]&&cb();return}IMG_OK[f]=0;const i=new Image();i.onload=()=>{IMG_OK[f]=1;cb&&cb()};i.src=MEDIA+f+'.webp'};
 const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
-  set('--cc-title',phone()?'title-phone':'title');const tf=tableFile();if(tf)set('--cc-table',tf);else R.style.removeProperty('--cc-table');set('--cc-end-win','end-win');set('--cc-end-lose','end-lose')}
+  set('--cc-title',phone()?'title-phone':'title');const tf=tableFile();if(tf)set('--cc-table',tf);else R.style.removeProperty('--cc-table');const bk=backFile();if(bk){pre(bk,()=>{R.style.setProperty('--cc-back','url('+MEDIA+bk+'.webp)');R.dataset.ccback='1'})}set('--cc-end-win','end-win');set('--cc-end-lose','end-lose')}
 // ---- table skins: the campaign unlocks Harbor Night and Spire Gold paint a map under the plaza (the built city stays around it); nothing for the default
 let skinPl=null,skinFile='';
+// card back: the campaign unlocks Brass Beetle and Bulletin; the deck line shows the painted back once one is unlocked
+function backFile(){const u=unl('cardback');return u==='brass-beetle'||u==='bulletin'?'back-'+u:null}
 function tableFile(){const u=unl('table');return u==='harbor-night'||u==='spire-gold'?'table-'+u:null}
 function skin(){if(typeof V3==='undefined'||!V3.on||!V3.scene||typeof THREE==='undefined')return;const f=tableFile();
   if(!f){if(skinPl)skinPl.visible=false;return}
@@ -23,6 +25,7 @@ const _sh=window.statsHTML;if(typeof _sh==='function')statsHTML=function(){retur
 const st=document.createElement('style');st.textContent=
 '.cc-hero{height:130px;margin:-14px -16px 6px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,rgba(255,250,240,0) 45%,#fffaf0),var(--cc-title,none) center/cover}'+
 '.cc-endart{height:120px;margin:-14px -16px 6px;border-radius:14px 14px 0 0;background:var(--cc-end-win,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}'+
+'.cc-back{display:none}html[data-ccback] .cc-back{display:inline-block;width:20px;height:28px;margin-right:6px;vertical-align:middle;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.4);background:var(--cc-back,none) center/cover}'+
 '.cc-endart.lose{background:var(--cc-end-lose,none) center/cover}'+
 '@media (max-width:700px){.cc-endart{height:84px}}'+
 'body:not(.three) .gx-board{background:linear-gradient(rgba(27,15,46,.25),rgba(27,15,46,.25)),var(--cc-table,none) center/cover,radial-gradient(ellipse at 50% 20%,#4a1f6a,#1b0f2e 70%)}';
