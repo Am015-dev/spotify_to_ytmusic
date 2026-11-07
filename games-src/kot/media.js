@@ -84,8 +84,48 @@
       grp.scale.setScalar(k);grp.position.y=-box.min.y*k;
       const wrap=new THREE.Group();wrap.add(grp);return wrap});
   }
+  /* Alpha video on the standee (voltusk-idle.webm loops; voltusk-attack.webm plays on a smash, then back to idle).
+     Used only on High/Medium, without prefers-reduced-motion and when media.json lists the clips; otherwise the built 3D figure stays.
+     Muted, plays only while the board is on screen and the tab is visible. Returns {update(dt,q,ko),attack(),busy()} or null. */
+  const ANIMS=M.anims||[],RM=(()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}})();
+  function anim(m,fig,canvas){
+    const n=CUT[m];if(m!==0||RM||/[?&](old3d|anim)=[01]/.test(location.search)&&(/[?&]old3d=1/.test(location.search)||/[?&]anim=0/.test(location.search))||ANIMS.indexOf(n+'-idle.webm')<0||ANIMS.indexOf(n+'-attack.webm')<0||typeof THREE==='undefined')return null;
+    let vis=true;try{if(canvas&&window.IntersectionObserver)new IntersectionObserver(e=>{vis=e[e.length-1].isIntersecting}).observe(canvas)}catch(e){}
+    const S={mode:'idle',want:false,ready:false,shown:false,dead:false,atkT:0,pl:null,v:{}},H=3.3;
+    function mk(kind){
+      const v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.setAttribute('playsinline','');v.loop=kind==='idle';v.preload='auto';
+      v.src=BASE+n+'-'+kind+'.webm';
+      const t=new THREE.VideoTexture(v);t.colorSpace=THREE.SRGBColorSpace;t.generateMipmaps=false;t.minFilter=THREE.LinearFilter;
+      v.addEventListener('error',()=>{S.dead=true});
+      if(kind==='idle')v.addEventListener('playing',()=>{S.ready=true});
+      return {v,t}}
+    function ensure(){
+      if(S.pl||S.dead)return;
+      S.v.idle=mk('idle');
+      const mat=new THREE.MeshBasicMaterial({map:S.v.idle.t,transparent:true,alphaTest:.04,toneMapped:false,side:THREE.DoubleSide});
+      const pl=new THREE.Mesh(new THREE.PlaneGeometry(H,H),mat);pl.position.y=H*.5-.08;pl.userData.vplane=1;pl.visible=false;pl.renderOrder=2;fig.add(pl);S.pl=pl}
+    function pause(){for(const k in S.v)try{S.v[k].v.pause()}catch(e){}}
+    function setMode(k){
+      S.mode=k;const o=S.v[k];if(!o||S.dead)return;S.pl.material.map=o.t;S.pl.material.needsUpdate=true;
+      o.v.currentTime=0;if(k==='attack')o.v.playbackRate=1.9;const pr=o.v.play();if(pr&&pr.catch)pr.catch(()=>{S.dead=true})}
+    function showFig(on){ // on=true: the video replaces the built/3D figure (their visibility is remembered and restored)
+      S.shown=on;S.pl.visible=on;
+      fig.children.forEach(c=>{if(c===S.pl)return;if(on){if(c.userData.vv===undefined){c.userData.vv=c.visible;c.visible=false}}else if(c.userData.vv!==undefined){c.visible=c.userData.vv;c.userData.vv=undefined}})}
+    return {
+      busy:()=>S.shown&&S.want,
+      attack(){if(!S.want||!S.shown||S.dead)return;if(!S.v.attack)S.v.attack=mk('attack');S.atkT=2.1;setMode('attack')},
+      update(dt,q,ko){
+        const want=q!=='low'&&!ko&&!document.hidden&&vis&&!S.dead;S.want=want;
+        if(!want){if(S.pl&&S.shown&&(q==='low'||ko||S.dead))showFig(false);pause();return}
+        ensure();if(!S.pl)return;
+        if(S.mode==='attack'){S.atkT-=dt;const a=S.v.attack;if(S.atkT<=0||(a&&a.v.ended)){setMode('idle')}}
+        const cur=S.v[S.mode];
+        if(cur&&cur.v.paused&&!cur.v.ended){const pr=cur.v.play();if(pr&&pr.catch)pr.catch(()=>{})}
+        if(!S.shown&&S.ready)showFig(true);
+        else if(S.shown){S.pl.visible=true;fig.children.forEach(c=>{if(c!==S.pl&&c.userData.vv===undefined&&c.visible){c.userData.vv=true;c.visible=false}})} // a model that finished loading later
+      }}}
   window.CCMedia={
-    has,play,
+    has,play,anim,
     model:m=>{if(/[?&]old3d=1/.test(location.search))return null;return (M.models||[]).indexOf(CUT[m])>=0?'models/'+CUT[m]+'.glb':null},
     loadGLB,
     avatar:m=>{const f='cut-'+CUT[m]+'.webp';return (M.avatars||[]).indexOf(f)>=0?f:null}, // transparent character for the player bars

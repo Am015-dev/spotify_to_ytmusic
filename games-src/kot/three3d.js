@@ -563,7 +563,7 @@ function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[
   const mats=[];g.traverse(o=>{if(o.isMesh&&o.material&&(o.material.isMeshPhysicalMaterial||o.material.isMeshStandardMaterial)&&!mats.includes(o.material)){o.material=o.material.clone();mats.push(o.material);o.material.userData.c0=o.material.color.clone();o.material.userData.e0=o.material.emissive.clone()}});
   {const gf=window.CCMedia&&CCMedia.model(m);if(gf)CCMedia.loadGLB(gf,m).then(obj=>{const old=g.children.slice();obj.traverse(x=>{if(x.isMesh&&x.material){x.material.userData.c0=x.material.color.clone();x.material.userData.e0=x.material.emissive.clone();mats.push(x.material)}});if(V3.r)applyEnv(obj);g.add(obj);old.forEach(x=>x.visible=false)}).catch(e=>console.warn('model',gf,e))} // the Flow character as a real 3D model; the built one stays if it cannot load
   if(m===7){g.userData.clamede=true;if(V3.glbLate)glbClampede(g,mats)}
-  R.traverse(o=>{if(o.material&&o.material.isMeshStandardMaterial)o.material.userData.hero=true});if(V3.r)applyEnv(R);R.scale.setScalar(MS);R.userData.s=MS;return {g:R,fig:g,anim,mats,phase:Math.random()*6}}
+  R.traverse(o=>{if(o.material&&o.material.isMeshStandardMaterial)o.material.userData.hero=true});if(V3.r)applyEnv(R);R.scale.setScalar(MS);R.userData.s=MS;return {g:R,fig:g,anim,mats,va:window.CCMedia&&CCMedia.anim?CCMedia.anim(m,g,V3.r&&V3.r.domElement):null,phase:Math.random()*6}}
 // airbrushed shading baked into vertex colours: darker toward the feet and in the undersides, like a painted vinyl toy
 function airbrush(g){g.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(g.matrixWorld).invert();const v=new THREE.Vector3(),n=new THREE.Vector3(),nm=new THREE.Matrix3();
   g.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;const m=new THREE.Matrix4().multiplyMatrices(inv,o.matrixWorld);nm.getNormalMatrix(m);const P=o.geometry.attributes.position,N=o.geometry.attributes.normal;const c=new Float32Array(P.count*3);
@@ -691,6 +691,7 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);V3.frames=(V3.frames
     if(o.ko!==undefined){o.ko=Math.min(1,o.ko+dt*1.5);const e=1-Math.pow(1-o.ko,3);o.fig.rotation.z=e*Math.PI/2*.92;o.fig.position.y=.14+e*.45;g.position.y=Math.max(.2,g.position.y);o.mats.forEach(m=>m.color.lerp(_ko,.05))}
     else{const tgt=V3.cam.position;const want=Math.atan2(tgt.x-g.position.x,tgt.z-g.position.z)*.8;g.rotation.y+=(want-g.rotation.y)*.1}
     {const st=o.fig.children[o.fig.children.length-1],cp=V3.cam.position;if(st&&st.userData.standee){const dx=cp.x-g.position.x,dz=cp.z-g.position.z,e=Math.atan2(cp.y-g.position.y,Math.hypot(dx,dz));st.rotation.x=-Math.max(0,Math.min(1.2,e*.9))}}
+    if(o.va){try{o.va.update(dt,V3.q,o.ko!==undefined);if(o.va.busy())busy=true}catch(e){o.va=null;console.warn('anim',e)}} // Voltusk alpha-video idle/attack (media.js), High/Medium only
     if(o.shakeT>0){o.shakeT-=dt;g.position.x+=Math.sin(t*60)*.03}
     if(o.flash>0){o.flash-=dt*2;const f=Math.max(0,o.flash);o.mats.forEach(m=>m.emissive.copy(m.userData.e0).lerp(_red,f))}
     else if(o.berserk){const r=.25+Math.sin(t*8)*.2;o.mats.forEach(m=>m.emissive.setRGB(r,0,0));o.wasB=1}else if(o.wasB||o.flash!==undefined){o.wasB=0;o.flash=undefined;o.mats.forEach(m=>m.emissive.copy(m.userData.e0))}

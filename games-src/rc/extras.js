@@ -9,7 +9,25 @@ function artImg(kind,key,cls){const n=kind+'-'+key;if(!kind||!key||!artOk(n))ret
 function artBy(kind,key){return key?artImg(kind,key):''}
 // a small stack of card backs with a count, for the deck list
 function backStack(label,n){return `<span class="dk" title="${esc(label)}"><i class="cb" aria-hidden="true"></i><b>${n}</b><em>${esc(label)}</em></span>`}
-(function(){const R=document.documentElement;R.style.setProperty('--back-img','url('+MEDIA+'back-default.webp)')})();
+// card back: the default, or the one the campaign unlocked (cross, lifeboat); title and result-screen paintings (media/title*.webp, end-win/lose.webp) show only once loaded
+(function(){const R=document.documentElement,OK={};
+  const unl=t=>{try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}};
+  const pre=(f,cb)=>{if(OK[f]!==undefined){if(OK[f]&&cb)cb();return}OK[f]=0;const i=new Image();i.onload=()=>{OK[f]=1;cb&&cb()};i.src=MEDIA+f+'.webp'};
+  const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
+  function art(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
+    const cb=unl('cardback'),bf=cb==='cross'||cb==='lifeboat'?'back-'+cb:'back-default';
+    pre(bf,()=>R.style.setProperty('--back-img','url('+MEDIA+bf+'.webp)'));
+    set('--swi-title',phone()?'title-phone':'title');set('--swi-end-win','end-win');set('--swi-end-lose','end-lose')}
+  R.style.setProperty('--back-img','url('+MEDIA+'back-default.webp)');art();setInterval(()=>{try{art()}catch(e){}},1500);
+  const st=document.createElement('style');st.textContent=
+   '#modal .mbox.start{background:linear-gradient(180deg,rgba(241,230,200,.1) 0,rgba(241,230,200,.5) 150px,rgba(241,230,200,.86) 420px),var(--swi-title,none) center top/cover no-repeat,var(--paper,#f1e6c8)}'+
+   '#modal .mbox.start h2,#modal .mbox.start .lede{text-shadow:0 1px 6px rgba(241,230,200,.9)}'+
+   '.swi-endart{height:120px;margin:-14px -14px 8px;border-radius:12px 12px 0 0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(241,230,200,.97)),var(--swi-end-win,none) center/cover}'+
+   '.swi-endart.lose{background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(241,230,200,.97)),var(--swi-end-lose,none) center/cover}'+
+   '@media (max-width:700px){.swi-endart{height:70px;margin:-12px -12px 4px}}';
+  document.head.appendChild(st);
+  if(typeof overHtml==='function'){const _oh=overHtml;overHtml=function(){const r=_oh.apply(this,arguments);return r.replace('<div class="mbox">','<div class="mbox"><div class="swi-endart '+(G&&G.over&&G.over.win?'win':'lose')+'" aria-hidden="true"></div>')}}
+})();
 
 // ---- music: five slots (Menu, Game, Fight, Victory, Defeat), two tracks each; saved choice a / b / shuffle / off
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Fight'],['victory','Victory'],['defeat','Defeat']];
