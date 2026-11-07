@@ -1,0 +1,905 @@
+{
+ "game": "perch-and-plume",
+ "title": "A Naturalist's Year",
+ "version": 1,
+ "cast": {
+  "ottilie": {
+   "name": "Aunt Ottilie",
+   "portrait": "portrait-ottilie.webp",
+   "emoji": "🧓",
+   "color": "#4f7a45"
+  },
+  "pip": {
+   "name": "Pip",
+   "portrait": "portrait-pip.webp",
+   "emoji": "🔭",
+   "color": "#c9a443"
+  },
+  "mags": {
+   "name": "Mags",
+   "portrait": "portrait-mags.webp",
+   "emoji": "👒",
+   "color": "#b8423a"
+  },
+  "tobias": {
+   "name": "Tobias",
+   "portrait": "portrait-tobias.webp",
+   "emoji": "📷",
+   "color": "#3f8193"
+  },
+  "corvin": {
+   "name": "Corvin Ashdown",
+   "portrait": "portrait-corvin.webp",
+   "emoji": "🐦‍⬛",
+   "color": "#2a2a33"
+  },
+  "delphine": {
+   "name": "Delphine Reedly",
+   "portrait": "portrait-delphine.webp",
+   "emoji": "🎣",
+   "color": "#2f6f8f"
+  },
+  "barnaby": {
+   "name": "Lord Barnaby Quill",
+   "portrait": "portrait-barnaby.webp",
+   "emoji": "🧐",
+   "color": "#7a5a32"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "Spring in the Larchwood",
+   "blurb": "Learn the rows and start your engine."
+  },
+  {
+   "act": 2,
+   "title": "Summer on the Saltmarsh",
+   "blurb": "Sharper rivals and round goals that matter."
+  },
+  {
+   "act": 3,
+   "title": "Autumn on the High Meadows",
+   "blurb": "The best collectors, playing their best."
+  }
+ ],
+ "twists": [
+  {
+   "id": "boss-eggs",
+   "where": "setup",
+   "how": "the boss starts param points ahead"
+  },
+  {
+   "id": "boss-bird",
+   "where": "setup",
+   "how": "the boss starts with a feeder bird in the forest"
+  },
+  {
+   "id": "boss-cards",
+   "where": "setup",
+   "how": "the boss starts with param extra birds in hand"
+  },
+  {
+   "id": "boss-food",
+   "where": "setup",
+   "how": "the boss starts with param extra food"
+  },
+  {
+   "id": "lean-start",
+   "where": "setup",
+   "how": "you start with param fewer food"
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "First Feathers",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "Spring in the Larchwood! Your field notebook is empty. Let's fill it."
+    },
+    {
+     "who": "ottilie",
+     "text": "Use a row each turn, play birds, and let their powers work for you."
+    },
+    {
+     "who": "pip",
+     "text": "I'm Pip! I'll keep you company. I'm still learning too."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ottilie",
+     "text": "Thirty points in your first year. The larches approve."
+    }
+   ],
+   "opponent": {
+    "name": "Pip",
+    "portrait": "portrait-pip.webp",
+    "emoji": "🔭",
+    "cast": "pip",
+    "personality": "Cheerful. Plays whatever he holds.",
+    "aiLevel": "easy",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": null,
+   "goal": {
+    "type": "score",
+    "value": 30,
+    "winNotNeeded": true,
+    "text": "Score 30 points or more (winning not needed)."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 45 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 45
+     }
+    },
+    {
+     "text": "Win the year",
+     "test": {
+      "k": "won"
+     }
+    }
+   ],
+   "hints": true,
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "A Busy Forest",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "A full forest feeds the whole notebook. More birds there means more food."
+    },
+    {
+     "who": "pip",
+     "text": "I'll race you to the birdfeeder!"
+    }
+   ],
+   "outro": [
+    {
+     "who": "ottilie",
+     "text": "Listen to that canopy chatter. Your engine is growing."
+    }
+   ],
+   "opponent": {
+    "name": "Pip",
+    "portrait": "portrait-pip.webp",
+    "emoji": "🔭",
+    "cast": "pip",
+    "personality": "Cheerful. Grabs the dice he likes.",
+    "aiLevel": "easy",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "k": "forest",
+    "value": 3,
+    "winNotNeeded": true,
+    "text": "End with 3 or more birds in your forest."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 45 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 45
+     }
+    },
+    {
+     "text": "Win the year",
+     "test": {
+      "k": "won"
+     }
+    }
+   ],
+   "hints": true,
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "Corvin's Egg Hoard",
+   "boss": true,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "Corvin Ashdown collects eggs the way a magpie collects spoons."
+    },
+    {
+     "who": "corvin",
+     "text": "Four eggs in my basket before you even begin. Do try to keep up."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ottilie",
+     "text": "You beat Corvin at his own game. The marsh is calling us next."
+    }
+   ],
+   "opponent": {
+    "name": "Corvin Ashdown",
+    "portrait": "portrait-corvin.webp",
+    "emoji": "🐦‍⬛",
+    "cast": "corvin",
+    "personality": "Sly and greedy. Lays eggs every chance he gets.",
+    "aiLevel": "easy",
+    "aiStyle": "standard",
+    "taunt": "My basket overflows, as always.",
+    "praise": "Hmph. Your nests were fuller than mine."
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": {
+    "id": "boss-eggs",
+    "param": 4,
+    "text": "Boss rule: Corvin starts 4 points ahead."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the year."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Lay 12 or more eggs",
+     "test": {
+      "k": "eggs",
+      "op": ">=",
+      "v": 12
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "hints": true,
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "corvin",
+     "text": "Corvin Ashdown's portrait"
+    },
+    {
+     "type": "act",
+     "id": "2",
+     "text": "Act 2: Summer on the Saltmarsh"
+    }
+   ]
+  },
+  {
+   "id": "c4",
+   "act": 2,
+   "title": "Reed Beds",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "Summer on the Saltmarsh. Fish, reeds and long evenings."
+    },
+    {
+     "who": "mags",
+     "text": "Thirty years of sorting post taught me patience, dear. And counting."
+    }
+   ],
+   "outro": [
+    {
+     "who": "mags",
+     "text": "Well delivered! You'd have made a fine postmistress."
+    }
+   ],
+   "opponent": {
+    "name": "Mags",
+    "portrait": "portrait-mags.webp",
+    "emoji": "👒",
+    "cast": "mags",
+    "personality": "Patient and tidy. Chases the round goals.",
+    "aiLevel": "normal",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the year."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 55 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 55
+     }
+    },
+    {
+     "text": "Earn 10+ goal points",
+     "test": {
+      "k": "goals",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "hints": false,
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c5",
+   "act": 2,
+   "title": "Three at the Shore",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "The shore is crowded today. Two rivals, one birdfeeder."
+    },
+    {
+     "who": "tobias",
+     "text": "Mind if I join? I only want photos. Mostly."
+    }
+   ],
+   "outro": [
+    {
+     "who": "tobias",
+     "text": "Got a great shot of you winning. Framing it."
+    }
+   ],
+   "opponent": {
+    "name": "Mags",
+    "portrait": "portrait-mags.webp",
+    "emoji": "👒",
+    "cast": "mags",
+    "personality": "Patient and tidy.",
+    "aiLevel": "normal",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 3,
+    "extra": [
+     {
+      "name": "Tobias",
+      "face": "tobias",
+      "lvl": "normal"
+     }
+    ]
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win against both rivals."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 55 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 55
+     }
+    },
+    {
+     "text": "Win by 5 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 5
+     }
+    }
+   ],
+   "hints": false,
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c6",
+   "act": 2,
+   "title": "A Lean Season",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "A storm spoiled our stores. You start with less food this time."
+    },
+    {
+     "who": "tobias",
+     "text": "Bad light, bad luck. Let's see what you can do."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ottilie",
+     "text": "Even a lean season can sing if you plan it well."
+    }
+   ],
+   "opponent": {
+    "name": "Tobias",
+    "portrait": "portrait-tobias.webp",
+    "emoji": "📷",
+    "cast": "tobias",
+    "personality": "Calm. Collects big birds slowly.",
+    "aiLevel": "normal",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": {
+    "id": "lean-start",
+    "param": 2,
+    "text": "Twist: you start with 2 fewer food."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the year."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 50 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Play 10 or more birds",
+     "test": {
+      "k": "birds",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "hints": false,
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c7",
+   "act": 2,
+   "title": "Delphine's Fish Run",
+   "boss": true,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "Delphine Reedly runs the marsh like a fishing fleet."
+    },
+    {
+     "who": "delphine",
+     "text": "My forest already has a feeder bird working. You'll need more than luck."
+    }
+   ],
+   "outro": [
+    {
+     "who": "delphine",
+     "text": "The tide turned. Fair winds, naturalist."
+    },
+    {
+     "who": "ottilie",
+     "text": "Autumn now. The high meadows, and Lord Quill's collection."
+    }
+   ],
+   "opponent": {
+    "name": "Delphine Reedly",
+    "portrait": "portrait-delphine.webp",
+    "emoji": "🎣",
+    "cast": "delphine",
+    "personality": "Efficient. Builds a food engine early.",
+    "aiLevel": "normal",
+    "aiStyle": "standard",
+    "taunt": "The marsh rewards the prepared.",
+    "praise": "You out-fished me. Well done."
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": {
+    "id": "boss-bird",
+    "param": 1,
+    "text": "Boss rule: Delphine starts with a feeder bird in her forest."
+   },
+   "goal": {
+    "type": "margin",
+    "value": 5,
+    "text": "Win by 5 points or more."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 60 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 60
+     }
+    },
+    {
+     "text": "Win by 15 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 15
+     }
+    }
+   ],
+   "hints": false,
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "delphine",
+     "text": "Delphine Reedly's portrait"
+    },
+    {
+     "type": "act",
+     "id": "3",
+     "text": "Act 3: Autumn on the High Meadows"
+    }
+   ]
+  },
+  {
+   "id": "c8",
+   "act": 3,
+   "title": "Wind on the Heath",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "Autumn on the High Meadows. The rivals play their best now."
+    },
+    {
+     "who": "corvin",
+     "text": "I've learned a few tricks since spring. Have you?"
+    }
+   ],
+   "outro": [
+    {
+     "who": "corvin",
+     "text": "Again? Fine. But Lord Quill won't be so kind."
+    }
+   ],
+   "opponent": {
+    "name": "Corvin Ashdown",
+    "portrait": "portrait-corvin.webp",
+    "emoji": "🐦‍⬛",
+    "cast": "corvin",
+    "personality": "Sly. Plans every egg.",
+    "aiLevel": "hard",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the year."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 60 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 60
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "hints": false,
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c9",
+   "act": 3,
+   "title": "The Rival Flock",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "No people today: just the Rival Flock, wild birds that take dice and race you for goals."
+    },
+    {
+     "who": "ottilie",
+     "text": "Beat their count over the whole year."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ottilie",
+     "text": "Even the wild flock bowed to your notebook."
+    }
+   ],
+   "opponent": {
+    "name": "Tobias",
+    "portrait": "portrait-tobias.webp",
+    "emoji": "📷",
+    "cast": "tobias",
+    "personality": "The wild flock: steady, takes dice, lays eggs.",
+    "aiLevel": "hard",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "solo": true
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Beat the Rival Flock."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 60 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 60
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "hints": false,
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c10",
+   "act": 3,
+   "title": "The Quill Collection",
+   "boss": true,
+   "intro": [
+    {
+     "who": "ottilie",
+     "text": "Lord Barnaby Quill has won the County Notebook nine years running."
+    },
+    {
+     "who": "barnaby",
+     "text": "Three extra birds in hand, a seat at my table, and Mags keeping score. Charming."
+    },
+    {
+     "who": "mags",
+     "text": "I'm only here for the cake, dear."
+    }
+   ],
+   "outro": [
+    {
+     "who": "barnaby",
+     "text": "Extraordinary. The County Notebook is yours."
+    },
+    {
+     "who": "ottilie",
+     "text": "A full year, three regions, one remarkable naturalist. I'm so proud."
+    }
+   ],
+   "opponent": {
+    "name": "Lord Barnaby Quill",
+    "portrait": "portrait-barnaby.webp",
+    "emoji": "🧐",
+    "cast": "barnaby",
+    "personality": "Grand and exacting. Hunts bonus cards.",
+    "aiLevel": "hard",
+    "aiStyle": "standard",
+    "taunt": "Nine years and counting, young one.",
+    "praise": "Ten years was greedy. Well earned."
+   },
+   "setup": {
+    "players": 3,
+    "extra": [
+     {
+      "name": "Mags",
+      "face": "mags",
+      "lvl": "hard"
+     }
+    ]
+   },
+   "twist": {
+    "id": "boss-cards",
+    "param": 3,
+    "text": "Boss rule: Lord Quill starts with 3 extra birds in hand."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the County Notebook."
+   },
+   "stars": [
+    {
+     "text": "Meet the goal",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 65 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 65
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "hints": false,
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals play more gently and the boss rule is off."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "barnaby",
+     "text": "Lord Barnaby Quill's portrait"
+    }
+   ]
+  }
+ ]
+}
