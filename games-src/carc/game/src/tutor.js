@@ -97,14 +97,8 @@ function tutSetup(){try{GXC.close()}catch(e){}closeMenu();UI.camp=null;UI.tut=tr
 // leave the staged game: nothing of it was saved, and the board goes quiet behind the menu
 function tutLeave(){UI.tut=false;UI.tutHold=false;UI.tutAuto=0;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;UI.endShown=false;G=null;UI.lastOpts=null;
   try{resetUI()}catch(e){}for(const e of document.querySelectorAll('#world .glow'))e.remove();try{GXH.hide()}catch(e){}UI.lastOpts=setupOpts();const g=$('#ghost');if(g)g.remove()}
-function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
-  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),setup:tutSetup,
-    endTitle:STORY.tutEndTitle,
-    endText:pro?STORY.tutEndStory:STORY.tutEndText,
-    endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
-    onDone:r=>{const c=r&&r.choice;tutLeave();
-      if(c==='chapter'&&first)GXC.play(first.id);else if(c==='story')campOpen();else showStart()},
-    onExit:()=>{tutLeave();showStart()}})}
+// the tutorial is the coached first game (coach.js); the forced-step GXT version is retired
+function tutStart(o){coachStart(o)}
 // Story starts with the tutorial (Chapter 0) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}

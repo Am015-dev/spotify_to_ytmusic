@@ -93,7 +93,7 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
     if (quiet) { try { tutLeave(); } catch (e) { } return; }
     try { tutLeave(); } catch (e) { } showStart();
   };
-  window.tutStart = function (o) {
+  window.coachStart = function (o) {
     const pro = !!(o && o.prologue); try { GXC.close(); } catch (e) { }
     closeMenu(); UI.camp = null; UI.tut = false; UI.coach = true; UI.coachPro = pro; queue = []; cur = null;
     GXCOACH.explained = []; GXCOACH.done = false; GXCOACH.running = true; GXCOACH.later = [];
