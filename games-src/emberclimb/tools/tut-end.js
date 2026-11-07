@@ -33,7 +33,7 @@ const { chromium } = require('playwright'), { serve, sleep, tap } = require('./t
     console.log(name, 'steps:', seen.join(' > '));
     console.log(name, 'coverage', seen.length + '/' + want.length);
     await sleep(500);
-    const endc = await pg.evaluate(() => document.body.innerText.includes('You can climb now')); if (!endc) { bad++; console.log('FAIL', name, 'no end card'); }
+    const endc = await pg.evaluate(() => !!document.querySelector('.gxt-end')); if (!endc) { bad++; console.log('FAIL', name, 'no end card'); }
     else { await T('[data-gxt-end="play"]'); await sleep(500); const q = await pg.$('#play'); if (!q) { bad++; console.log('FAIL', name, 'end did not open a real game'); } }
     if (errs.length) { bad++; console.log('FAIL', name, 'errors', errs.slice(0, 2).join(' | ')); }
     // skip works

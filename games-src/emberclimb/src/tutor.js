@@ -97,7 +97,37 @@
       { ch: 3, id: 'result', title: 'Climb won', target: function () { return $('.over h1, .over h2, #app h1, #app h2'); }, side: 'bottom', say: 'Boss down: you win the climb. Stars and unlocks come in Story mode.', wait: null, ready: scr('over') },
       { ch: 3, id: 'heroes', title: 'More heroes', target: function () { return $('.over h1, .over h2, #app h1, #app h2'); }, side: 'bottom', say: 'Rogue: poison and Shivs. Automaton: orbs. Monk: stances. Each Story chapter teaches its hero.', wait: null, ready: scr('over') }
     ];
-    return S.filter(function (s) { return s.ch >= (ch || 0); });
+    return story(S).filter(function (s) { return s.ch >= (ch || 0); });
+  }
+  // ---- story layer (text in src/story.js): guide voice on every step, a reaction after each action, chapter intro and payoff beats, a count-up climax
+  var PRO = (window.EC_STORY || {}).prologue || { chapters: [], steps: {} }, CAST = (window.EC_STORY || {}).cast || { guide: { name: 'Guide', emoji: '🔥' } };
+  UI.say = function (text, ms, who) {
+    var old = document.querySelector('.ec-say'); if (old) old.remove(); if (!text) return null;
+    var c = CAST[who || 'guide'] || CAST.guide, d = document.createElement('div'); d.className = 'ec-say'; d.setAttribute('role', 'status'); d.setAttribute('data-help', '');
+    var pic = window.EC_A ? EC_A('cast-' + (who || 'guide'), c.emoji || '', { kind: 'portrait', ph: c.color || '#a8431f' }) : document.createElement('div'); d.appendChild(pic);
+    var t = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'); b.textContent = c.name; sp.textContent = text; t.appendChild(b); t.appendChild(sp); d.appendChild(t);
+    document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, ms || 2800); return sp;
+  };
+  function climax() {
+    var G = g(), floors = G.floor || 0, gold = G.gold || 0, sp = UI.say('Floors 0 · Gold 0', 5200); if (!sp) return; var t0 = Date.now();
+    (function tick() { var k = Math.min(1, (Date.now() - t0) / 1400); sp.textContent = 'Floors climbed ' + Math.round(floors * k) + ' · Gold ' + Math.round(gold * k) + (k >= 1 ? '. ' + (PRO.chapters[3] || {}).outro : ''); if (k < 1) requestAnimationFrame(tick); })();
+  }
+  function story(S) {
+    var out = [], prev = null;
+    S.forEach(function (st) {
+      var cs = PRO.chapters[st.ch];
+      if (!prev || prev.ch !== st.ch) {   // chapter opening beat
+        var pc = prev; out.push({ ch: st.ch, id: 'intro' + (st.ch + 1), title: cs ? cs.title.replace(/^Prologue \d+: /, '') : 'Chapter', say: cs ? cs.intro : '', wait: null,
+          target: st.ch === 0 ? function () { return document.querySelector('.en') || document.querySelector('#stage'); } : function () { return document.querySelector('.node.glow'); },
+          ready: st.ready, onEnter: function () { var o = pc && PRO.chapters[pc.ch]; if (o && o.outro) UI.say(o.outro, 3000); } });
+      }
+      var tx = PRO.steps[st.id];
+      if (tx) { st.say = tx.say; st.title = st.title && /^Ch \d/.test(st.title) ? st.title.replace(/^Ch \d: /, '') : st.title; }
+      var p = prev, enter = st.onEnter;
+      st.onEnter = function () { if (enter) enter(); var r = p && PRO.steps[p.id] && PRO.steps[p.id].react; if (r && !(p.ch !== st.ch)) UI.say(r); if (st.id === 'result') climax(); };
+      out.push(st); prev = st;
+    });
+    return out;
   }
   function finish(play, done) {
     window.EC_NOSAVE = 0; UI.ov = null; if (done) saveCh(0);
@@ -112,7 +142,7 @@
   UI.tutStart = function (fromCh) {
     if (!window.GXT) return;
     var ch = fromCh != null ? fromCh : loadCh();
-    GXT.start({ game: 'emberclimb', setup: function () { stage(ch); }, steps: steps(ch), story: false, endTitle: 'You can climb now', endText: 'You played a whole climb: fights, rewards, rooms and a boss. Good luck.',
+    GXT.start({ game: 'emberclimb', setup: function () { stage(ch); }, steps: steps(ch), story: false, endTitle: (PRO.end || {}).title || 'You can climb now', endText: (PRO.end || {}).text || 'You played a whole climb.',
       onDone: function (r) { finish(!r || r.choice !== 'menu', true); }, onExit: function () { finish(false, false); } });
     try { if (GXT.active()) UI.render(); } catch (e) { }
   };

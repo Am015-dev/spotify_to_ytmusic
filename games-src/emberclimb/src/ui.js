@@ -87,7 +87,7 @@
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
     var kk = keyNum(e); if (kk) el.appendChild(h('div', 'ck k-' + kk[0], kk[1]));
     var cb = h('div', 'cb'); E.lines(e).forEach(function (l) { cb.appendChild(h('span', 'cl', l)); }); el.appendChild(cb);
-    el.appendChild(A('gem-' + ({ s: 'common', c: 'common', u: 'uncommon', r: 'rare', z: 'common', k: 'common' })[d.rar], '', { cls: 'cfr', noph: 1 }));
+    // (the full-card gem/frame overlays are not drawn: they covered the card picture and its rule text)
     return el;
   }
   // ---------- screens
@@ -101,6 +101,7 @@
     if (UI.ov) overlay();
     dock(g);
     if (UI.lastScr !== g.scr) { if (g.scr === 'reward' || (g.scr === 'over' && g.won)) SFX('win'); else if (g.scr === 'over') SFX('lose'); UI.lastScr = g.scr; }
+    if (UI.camp && UI.bossLine && g.scr === 'reward' && g.map[g.at] && g.map[g.at].t === 'b' && UI.bossPost !== g.at + ':' + g.floor && !(window.GXT && GXT.active())) { UI.bossPost = g.at + ':' + g.floor; UI.bossLine('post'); }
     tutEvt();
     try { document.body.classList.toggle('ec-free', !!(UI.tutFree && UI.tutFree())); } catch (e) { }
     if (!window.EC_NOSAVE) E.save(); drain(); try { if (window.GXMUS) GXMUS.sync(); } catch (e) { }
@@ -220,10 +221,11 @@
       var p = pos(n), ok = rc.indexOf(n.id) >= 0;
       var b = h('button', 'node t-' + n.t + (ok ? ' glow' : '') + (n.vis ? ' vis' : '') + (g.at === n.id ? ' here' : ''), null, [A(NODEN[n.t], NODEG[n.t], { ph: '#3a2a20' })]);
       b.style.left = p.x + '%'; b.style.top = p.y + '%'; b.setAttribute('aria-label', D.NODES[n.t]);
-      if (ok) on(b, function () { E.performMove({ t: 'go', n: n.id }); UI.sel = -1; render(); if (G().scr === 'battle') beginBattleUI(); });
+      if (ok) on(b, function () { var go = function () { E.performMove({ t: 'go', n: n.id }); UI.sel = -1; render(); if (G().scr === 'battle') beginBattleUI(); }; if (n.t === 'b' && UI.camp && UI.bossLine && !(window.GXT && GXT.active())) UI.bossLine('pre').then(go); else go(); });
       else b.disabled = true;
       m.appendChild(b);
     });
+    var QI = (window.EC_STORY || {}).quick; if (QI && !UI.camp && g.at < 0 && !(window.GXT && GXT.active())) m.appendChild(h('div', 'storyline top', QI.intro[Math.abs(g.seed | 0) % QI.intro.length]));
     app.appendChild(m);
   }
   // ---------- battle
@@ -486,6 +488,7 @@
     var full = g.floor >= g.F; if (g.won && !full) { kd = null; }
     cause.appendChild(h('div', 'sub', g.won ? (full ? 'Final boss down: ' + (D.ENEMIES[bossId] ? D.ENEMIES[bossId].name : 'the tower boss') + '.' : 'The guided fight is won.') : (kd ? 'Felled by ' + kd.name + (g.killIn === 'b' ? ' (boss)' : g.killIn === 'e' ? ' (elite)' : '') + '.' : 'Your own cards finished you.')));
     s.appendChild(cause);
+    var QS = (window.EC_STORY || {}).quick; if (QS && !UI.camp && !window.EC_NOSAVE) s.appendChild(h('div', 'storyline', g.won ? QS.won : QS.lost));
     var tot = g.hs.reduce(function (a, x) { return a + x.deck.length; }, 0);
     s.appendChild(h('div', 'chip rstat', 'Floors ' + Math.min(g.floor, g.F) + ' / ' + g.F + '   Deck ' + tot + '   Relics ' + g.relics.length + '   Gold ' + g.gold));
     if (r) {
