@@ -8,7 +8,7 @@ Starting point: the old live game the owner likes (art, 3D bag, music) was kept 
 | 1 | Nothing says whose turn it is: rivals only show "waiting"/"finished" in a small pill | Turn banner slides in ("Day 1 · Your turn to brew", "Odo's turn to brew", "Counting up") |
 | 2 | On a phone the prompt line and panel head are hidden (display:none); the instruction was only a tip popup you dismiss | One always-visible instruction bar above the controls, plain words, max 2 lines, 15px, solid backing ("YOUR TURN  White 3 of 7. Draw another chip, or Stop to keep your space.") |
 | 3 | Rivals finish their brew before you have drawn; you never see their chips | Rival feed: each rival draw/flask/boom/stop appears one chip at a time (about 1 s each, tap to skip), with avatar and chip |
-| 4 | Tutorial text was a list of "do this" hints | Tutorial is the prologue "The Night Before": Granny Hask (portrait) gives the story reason, you act, she reacts; four named chapters |
+| 4 | Tutorial was forced tap steps | Coached first game: free play, just-in-time Hask bubbles (see TUTORIAL-COVERAGE.md), no spotlight |
 | 5 | No record of what the tutorial teaches | TUTORIAL-COVERAGE.md (rule -> step -> story beat) and an honest "not covered" list |
 | 6 | A lost Story chapter ended with the win text | Every chapter has its own loss outro (src/story-data.js) |
 | 7 | Quick game had no voice | A flavour line on day 1 and a result line in the game's voice |

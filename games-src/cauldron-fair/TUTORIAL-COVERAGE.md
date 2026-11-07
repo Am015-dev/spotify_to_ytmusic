@@ -1,5 +1,7 @@
 # Cauldron Fair: tutorial coverage
 
+**UPDATE (addendum 4): the tutorial is now a COACHED FIRST GAME.** No forced taps or spotlight: the player plays the same real two-day game with free choices from turn 1 (fixed seed and stacked bags only make sure cases come up). Granny Hask speaks just-in-time, one bubble at a time, never blocking input, dismissible ("Got it", "Leave tutorial"). Bubble ids (src/turnlayer.js COACH_RULES): goal, fortune, draw, spiral, whites, flask, seven, boom, stopped, rival, report, shop, rubies, day2, lastday, peek, d2count, end. A bubble only shows while its situation is still true; any that did not come up are named on the end card ("Things you'll meet later", with the player's real final numbers). `coach-test.js` plays the game by tapping legal moves through the UI at 390x763 and 1440x860 and asserts every bubble id was either shown or listed on the end card. The step ids in the table below are the old forced-step names, kept as the rule list.
+
 The tutorial ("The Night Before") is ONE real guided game against the real computer (Wynne), cut to two days (day 1 full brew + shop, day 2 the last day) with a fixed seed so each case comes up on cue. Nothing is saved. It cannot cover a 9-day game; the rules that only appear on later days are listed under "Not covered".
 Story beat = Granny Hask's line that gives the reason; the step then makes the player do the action. Wording: `src/story-data.js`. The script `tutor-test.js` checks that every step below was shown.
 

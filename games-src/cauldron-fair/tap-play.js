@@ -14,6 +14,7 @@ const PICK = `(() => {
   const first = (...sels) => { for (const s of sels) { const e = all(s)[0]; if (e) return e; } return null; };
   const byText = (sel, re) => all(sel).find(e => re.test(e.textContent.trim()));
   let e = null, why = '';
+  if (mode === 'coach' && document.querySelector('#coachend')) return { done: 'over' };
   const rs = document.querySelector('#rs'), rsOpen = rs && !rs.hidden;
   const start = document.querySelector('#start'), startOpen = start && !start.hidden;
   const skip = all('[data-gxt-skip]')[0];
@@ -28,6 +29,7 @@ const PICK = `(() => {
     if (!e) { e = first('#rs .dec [data-a=mv]', '#rs [data-a=mv]'); why = 'report choice'; }
   }
   const gxc = document.querySelector('.gxc-ov:not([hidden]), #gxc:not([hidden]), [class*=gxc-ov]:not([hidden])');
+  const cok = all('#coach [data-cx=ok]')[0]; if (!e && cok) { e = cok; why = 'got it'; }
   if (!e && !rsOpen && !startOpen) {
     const tip = first('#pc [data-a=tipok]', '#pc [data-a=take]', '.gxh-ok'); if (tip) { e = tip; why = 'tip'; }
     if (!e) {
@@ -55,7 +57,7 @@ async function play(browser, name, mode) {
   p.on('pageerror', e => errs.push(name + ' pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load/.test(m.text())) errs.push(name + ' console ' + m.text().slice(0, 160)); });
   await p.goto('https://gns.test/?phone=1'); await sleep(900); await p.evaluate(m => { try { localStorage.clear(); } catch (e) { } window.__tapmode = m; }, mode);
   // title screen: tap Play (quick) or Story (story)
-  const first = mode === 'story' ? 'text=Story' : '[data-a=play]';
+  const first = mode === 'story' ? 'text=Story' : mode === 'coach' ? '#start [data-gxt-open]' : '[data-a=play]';
   const box = await p.locator(first).first().boundingBox(); await p.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2); await sleep(700);
   let over = false, idle = 0, log = [];
   const t0 = Date.now();
@@ -66,17 +68,20 @@ async function play(browser, name, mode) {
  console.log('state', await p.evaluate(() => JSON.stringify({ G: !!G, ph: G && G.phase, r: G && G.round, rs: !document.querySelector('#rs').hidden, q: G && G.players[0].q, st: G && G.players[0].st, txt: document.body.innerText.slice(0, 200) })).catch(e => String(e))); break; } await sleep(250); continue; }
     idle = 0;
     if (!r.ok) { covered.add(name + ':' + r.why + ' under ' + r.under); await sleep(300); if (++idle > 60) break; continue; }
-    await p.touchscreen.tap(r.cx, r.cy); taps++; if (log.length < 400) log.push(r.why); await sleep(r.why === 'draw' ? 700 : 450);
+    await p.touchscreen.tap(r.cx, r.cy); taps++; if (log.length < 400) log.push(r.why); await sleep(r.why === 'draw' ? 700 : r.why === 'got it' ? 600 : 450);
   }
-  const res = await p.evaluate(() => G ? { phase: G.phase, round: G.round, vp: G.players.map(x => x.vp), camp: !!UI.camp, winText: G.winText } : null).catch(() => null);
+  const cov = mode === 'coach' ? await p.evaluate(() => { const c = window.COACH; const all = c.ids.filter(i => i !== 'end'); const shown = new Set(c.shown); const later = new Set(c.later); return { shown: [...shown], later: [...later], missing: all.filter(i => !shown.has(i) && !later.has(i)), coachend: !!document.querySelector('#coachend') }; }).catch(() => null) : null;
+  if (cov) { console.log('coach coverage', JSON.stringify(cov)); if (cov.missing.length || !cov.coachend) over = false; }
+  const res = await p.evaluate(() => G ? { phase: G.phase, over: !!document.querySelector('#coachend'), round: G.round, vp: G.players.map(x => x.vp), camp: !!UI.camp, winText: G.winText } : null).catch(() => null);
   console.log(name, over ? 'REACHED RESULT' : 'NOT REACHED', JSON.stringify(res), 'taps', taps); console.log('  last steps:', log.slice(-12).join(' > '));
-  await ctx.close(); return over && res && res.phase === 'over';
+  await ctx.close(); return over && res && (res.phase === 'over' || res.over);
 }
 (async () => {
   const b = await PW.chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   let ok = true;
-  if (which !== 'story') ok = (await play(b, 'quick', 'quick')) && ok;
-  if (which !== 'quick') ok = (await play(b, 'story', 'story')) && ok;
+  if (which === 'coach') ok = (await play(b, 'coach', 'coach')) && ok;
+  if (which !== 'story' && which !== 'coach') ok = (await play(b, 'quick', 'quick')) && ok;
+  if (which !== 'quick' && which !== 'coach') ok = (await play(b, 'story', 'story')) && ok;
   console.log('covered taps:', JSON.stringify([...covered].slice(0, 10))); console.log('errors:', JSON.stringify(errs.slice(0, 6)));
   console.log(ok && !errs.length && !covered.size ? 'TAP-PLAY PASS' : 'TAP-PLAY FAIL'); await b.close(); process.exit(ok && !errs.length ? 0 : 1);
 })();

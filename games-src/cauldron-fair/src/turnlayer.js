@@ -90,3 +90,67 @@ setInterval(() => { try { rfScan(); instrBar(); turnBanner(); } catch (e) { } },
 (function () {
   const sf = showFinal; showFinal = function () { const r = sf.apply(this, arguments); try { if (!UI.camp && UI.mode !== 'tutorial' && G) { const v = viewSeat(), w = $('#rs .win > div'); if (w && !w.querySelector('.rsvoice')) { const line = G.winners.length > 1 ? STORY.quickTie : v >= 0 && G.winners.indexOf(v) >= 0 ? STORY.quickWin : STORY.quickLose; w.appendChild(h('div.rsvoice', line)); } } } catch (e) { console.error(e); } return r; };
 })();
+// ===================== the coached first game (replaces the forced tap steps): a real two-day game with free choices from turn 1.
+// The guide speaks just-in-time, one bubble at a time, never blocking input; it can be dismissed. No spotlight, no forced taps.
+// Rules that did not come up are named on the "Things you'll meet later" card at the end. window.COACH.shown / .later feed the test. =====
+const COACH = window.COACH = { on: false, shown: [], later: [], q: [], cur: null, prologue: false, tm: 0, ids: [] };
+const coachBox = () => { let e = $('#coach'); if (!e) { e = h('div#coach', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(e); e.addEventListener('click', ev => { if (ev.target.closest('[data-cx=ok]')) coachNext(); else if (ev.target.closest('[data-cx=leave]')) coachLeave(); }); } return e; };
+const cMe = () => G && G.players[0];
+const COACH_RULES = [
+  ['goal', () => G.phase !== 'over' && G.round === 1, 'The goal', 'Granny Hask: "Brew two practice days against Wynne. Most victory points wins. Play any move you like."'],
+  ['fortune', () => cMe().q && cMe().q.h === 'pick', 'Fortune card', 'Hask: "Each day the fair draws a fortune. Purple happens now: pick whichever reward you fancy."'],
+  ['draw', () => G.phase === 'brew' && cMe().st === 'draw' && !cMe().q && cMe().pot.length === 0 && G.round === 1, 'Your bag', 'Hask: "Tap the bag to pull a chip. It walks as many spaces along the spiral as its number."'],
+  ['spiral', () => G.phase === 'brew' && cMe().pot.length >= 1 && G.round === 1, 'The spiral', () => 'Hask: "Your chip stands on space ' + cMe().pot[cMe().pot.length - 1].pos + '. Stop now and you keep that space\'s coins and points."'],
+  ['whites', () => cMe().pot.some(c => c.c === 'W'), 'White Fizzpods', () => 'Hask: "White chips fill the meter: ' + CF.whiteSum(cMe()) + ' of ' + CF.limitOf(G, cMe()) + '. Go over and the pot explodes."'],
+  ['flask', () => G.phase === 'brew' && cMe().flask !== false && CF.whiteSum(cMe()) >= 4 && cMe().st === 'draw', 'The flask', 'Hask: "Getting hot? The flask puts your last white chip back in the bag, once a day."'],
+  ['seven', () => G.phase === 'brew' && cMe().st === 'draw' && CF.whiteSum(cMe()) === CF.limitOf(G, cMe()), 'Exactly seven', 'Hask: "Seven is still safe. Any white chip now explodes the pot. Brave, or wise?"'],
+  ['boom', () => cMe().boom && G.round === 1, 'Boom!', 'Hask: "Exploded! You pick points OR coins for the day and skip the bonus die. Stopping sooner is the cure."'],
+  ['stopped', () => cMe().st === 'done' && !cMe().boom && G.round === 1 && G.phase === 'brew', 'Safe stop', 'Hask: "Good: you keep your space. Safe pots may roll the bonus die when the day is counted."'],
+  ['rival', () => G.players[1] && G.players[1].boom && G.round === 1, 'Wynne', 'Hask: "Wynne\'s pot exploded. That is the price of pushing your luck."'],
+  ['report', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 1, 'Counting the day', 'Hask: "The fair counts each pot: coins, points, and a bonus die for safe pots."'],
+  ['shop', () => cMe().q && cMe().q.h === 'shop', 'The stalls', 'Hask: "Spend coins: up to two chips, different colours. Each colour has a power. Press and hold a chip to read it."'],
+  ['rubies', () => cMe().q && cMe().q.h === 'shop' && cMe().rubies >= 2, 'Rubies', 'Hask: "Two rubies move your droplet on, or refill a used flask. Your next brew starts further along."'],
+  ['day2', () => G.round === 2 && G.phase === 'brew', 'The last day', 'Hask: "Day two is the last: blue fortune cards last all day, and the rat stone helps whoever trails."'],
+  ['lastday', () => G.round === LASTD() && G.phase === 'brew' && cMe().st === 'draw', 'Secret choice', 'Hask: "Today you and Wynne pick Draw or Stop in secret, then reveal together. No shop today."'],
+  ['peek', () => cMe().q && cMe().q.h === 'crow', 'Peek and pick', 'Hask: "A feather chip peeks ahead: place the chip, or send it back."'],
+  ['d2count', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 2, 'Final count', 'Hask: "Last day rule: every 5 coins and every 2 rubies become 1 point."']
+];
+COACH.ids = COACH_RULES.map(r => r[0]).concat(['end']);
+const COACH_LATER = [['The purple book (days 3+) and the black chips', 'purple'], ['The other 22 fortune cards', 'cards'], ['Rat tails: trailing players start the stone ahead', 'rat'], ['Nine days, and ties go to the furthest last chip', 'ties']];
+function coachShow(id, title, text) {
+  const b = coachBox(), t = typeof text === 'function' ? text() : text;
+  b.innerHTML = '<img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><div class="cxb"><b>' + title.replace(/</g, '&lt;') + '</b><span>' + t.replace(/</g, '&lt;') + '</span></div><div class="cxr"><button type="button" data-cx="ok">Got it</button><button type="button" data-cx="leave" class="lv">Leave tutorial</button></div>';
+  b.className = 'on' + (UI.rsOpen ? ' top' : ''); COACH.cur = id; COACH.shown.push(id); clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, 9000);
+}
+function coachNext() { clearTimeout(COACH.tm); const b = coachBox(); COACH.cur = null; b.className = ''; let n = COACH.q.shift(); while (n && !(() => { try { return n[3](); } catch (e) { return false; } })()) n = COACH.q.shift(); if (n) setTimeout(() => { if (COACH.on && !COACH.cur) coachShow(n[0], n[1], n[2]); }, 250); }
+function coachTick() {
+  { const b = $('#coach'); if (b) b.classList.toggle('top', !!(typeof UI !== 'undefined' && UI.rsOpen)); }
+  if (!COACH.on || !G || UI.mode !== 'tutorial') return;
+  if (G.phase === 'over' && UI.rsMode === 'final') { if (COACH.shown.indexOf('end') < 0 && !$('#coachend')) coachEnd(); return; }
+  for (const [id, when, title, text] of COACH_RULES) {
+    if (COACH.shown.indexOf(id) >= 0 || COACH.q.some(q => q[0] === id)) continue;
+    let ok = false; try { ok = !!when(); } catch (e) { }
+    if (ok) { if (!COACH.cur) coachShow(id, title, text); else COACH.q.push([id, title, text, when]); break; }
+  }
+}
+setInterval(() => { try { coachTick(); } catch (e) { } }, 300);
+function coachEnd() {
+  const a = G.players[0], b = G.players[1]; COACH.shown.push('end'); coachNext(); COACH.q = [];
+  COACH.later = COACH.ids.filter(i => COACH.shown.indexOf(i) < 0 && i !== 'end');
+  const lines = COACH_RULES.filter(r => COACH.later.indexOf(r[0]) >= 0).map(r => r[2]).concat(COACH_LATER.map(x => x[0]));
+  const win = G.winner === 0 ? 'You win ' + a.vp + ' to ' + b.vp + '!' : G.winner < 0 ? 'A tie, ' + a.vp + ' each!' : b.name + ' wins ' + b.vp + ' to ' + a.vp + '.';
+  const d = h('div#coachend', { role: 'dialog', 'aria-label': 'Tutorial finished' });
+  d.innerHTML = '<div class="ce"><img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><h3>' + win + '</h3><p>Final count with your numbers: you made ' + a.vp + ' points and hold ' + a.rubies + ' rubies. Last day, every 5 coins and every 2 rubies were worth 1 point. ' + b.name + ' made ' + b.vp + '.</p><h4>Things you\'ll meet later</h4><ul>' + lines.map(l => '<li>' + l.replace(/</g, '&lt;') + '</li>').join('') + '</ul><p>Hask: "Tomorrow it is for real."</p><div class="cb">' + (COACH.prologue ? '<button type="button" data-ce="chapter">Start chapter 1</button>' : '') + '<button type="button" data-ce="play">Play a game</button></div></div>';
+  document.body.appendChild(d); d.addEventListener('click', ev => { const k = ev.target.closest('[data-ce]'); if (k) coachFinish(k.dataset.ce); });
+}
+function coachClean() { COACH.on = false; clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; ['#coach', '#coachend'].forEach(s => { const e = $(s); if (e) e.remove(); }); }
+function coachFinish(choice) {
+  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  coachClean(); try { GXT.markDone(TUT_GAME); } catch (e) { } tutLeave();
+  if (choice === 'chapter' && first && typeof GXC !== 'undefined') { showStart(); GXC.play(first.id); } else { UI.sv = 'setup'; UI.cfgOpen = false; showStart(); UI.sv = 'setup'; renderStart(); }
+}
+function coachLeave() { coachClean(); tutLeave(); showStart(); }
+tutStart = function (o) {
+  coachClean(); try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false;
+  newGame('tutorial'); Object.assign(COACH, { on: true, shown: [], later: [], q: [], cur: null, prologue: !!(o && o.prologue) });
+};
