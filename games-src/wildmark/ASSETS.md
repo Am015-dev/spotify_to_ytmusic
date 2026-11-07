@@ -18,3 +18,19 @@ Prompt files (Google Flow, 2D only, no text in pictures): `games-src/next-wave/f
 2. Run `python3 games-src/scripts/ingest-assets.py` (it converts to WebP at the slot size and writes `games/wildmark/media/<stem>.webp`).
    The slots must be registered once: `python3 games-src/wildmark/register-assets.py` (orchestrator, at merge time).
 3. Rebuild (`python3 games-src/scripts/build-all.py wildmark`): `build.py` lists the files present and the page uses them.
+
+## Temporary art (until the Flow pictures arrive)
+`temp-art/` holds all 47 slot pictures in the slots' stems (5 terrain fills, 6 animal tokens incl. acorn, 20 scoring cards
+(5 animals x sets A-D), 11 story portraits, 4 backgrounds/result panels, the top-bar crest). Each is our own code-drawn
+disc, card, medallion or fill in the game palette with one icon from game-icons.net on it. Re-make them:
+`git clone --depth 1 --filter=blob:none --sparse https://github.com/game-icons/icons.git <dir>`, then
+`(cd <dir> && git sparse-checkout set delapouite lorc)` and `node tools/temp-art.js <dir>`.
+At deploy copy them in: `cp games-src/wildmark/temp-art/*.webp games/wildmark/media/` (a Flow file with the same stem replaces each one).
+No pictures from publisher art, scans, print-and-play sheets or fan art were used.
+
+### Credits (temporary art)
+| files | source | author | licence |
+|---|---|---|---|
+| icons on terrain fills (lorc mountaintop, pine-tree, wheat; delapouite reed, river, forest), tokens bear/hawk/fox/acorn (delapouite bear-head; lorc hawk-emblem, fox-head, acorn), card icons, portrait icons (lorc hood, oak, sprout, beard, curled-leaf, feather, bird-twitter, tree-branch, stone-tower, snowflake-1, mountains), backgrounds (lorc crown, waves, mountains; delapouite forest, river), crest (lorc pine-tree) | https://game-icons.net (repo https://github.com/game-icons/icons) | Delapouite, Lorc | CC BY 3.0 https://creativecommons.org/licenses/by/3.0/ |
+| icons on tok-elk (lorc stag-head), tok-salmon (lorc fish-corpse) | same | Lorc | CC BY 3.0 |
+The credit line is also in the game's Menu > About.
