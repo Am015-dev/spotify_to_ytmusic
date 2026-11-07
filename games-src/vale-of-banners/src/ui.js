@@ -78,7 +78,44 @@ function say(text, who) {   /* a character speaks: code-drawn portrait + one lin
   if (!g) { g = h('div', { id: 'guide', role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
   g.innerHTML = ''; g.appendChild(h('span.gp', { 'aria-hidden': 'true', style: '--pc:' + (c.color || '#7a5c3e'), text: c.initial || (c.name || '?')[0] }));
   g.appendChild(h('span.gt', {}, [h('b', { text: c.name + ' ' }), document.createTextNode(text)]));
-  g.classList.remove('on'); void g.offsetWidth; g.classList.add('on'); clearTimeout(say.t); say.t = setTimeout(function () { g.classList.remove('on'); }, 3000);
+  g.appendChild(h('button.gx', { type: 'button', 'aria-label': 'Dismiss', text: '×', onclick: function () { g.classList.remove('on'); clearTimeout(say.t); if (UI.cBusy) { clearTimeout(UI.cT); UI.cBusy = false; coachPump(); } } }));
+  g.classList.remove('on'); void g.offsetWidth; g.classList.add('on'); clearTimeout(say.t); say.t = setTimeout(function () { g.classList.remove('on'); }, UI.mode === 'tutorial' ? 5200 : 3000);
+}
+/* ---- coached first game: Odo explains each rule the first time it matters (one bubble at a time, never blocking) ---- */
+function coach(id, text) {
+  if (UI.mode !== 'tutorial' || !G) return; UI.seen = UI.seen || {}; if (id && UI.seen[id]) return; if (id) UI.seen[id] = 1;
+  UI.cq = UI.cq || []; UI.cq.push(text || (VSTORY.coach[id] && VSTORY.coach[id].say)); UI.coachLog = (UI.coachLog || 0) + 1; coachPump();
+}
+function coachPump() {
+  if (UI.cBusy || !UI.cq || !UI.cq.length) return; var t = UI.cq.shift(); if (!t) return coachPump();
+  UI.cBusy = true; say(t); UI.cT = setTimeout(function () { UI.cBusy = false; coachPump(); }, UI.fast ? 0 : 5400);
+}
+function coachCheck(m, s, evs) {   /* after a move (m by seat s, events evs) and at turn starts (m null) */
+  if (UI.mode !== 'tutorial' || !G || (typeof GXT !== 'undefined' && GXT.running())) return;
+  var me0 = isHuman(s), p = G.P[0], top = pend(), vm = !G.over && isHuman(VB.actor(G)) ? VB.validMoves(G) : [];
+  (evs || []).forEach(function (ev) {
+    if (ev.e === 'score' && ev.why === 'region') { if (ev.p === 0) coach('region'); else { coach('rv-region', VSTORY.coachRival.region); UI.seen.region || coach('region'); } }
+    if (ev.e === 'score' && ev.why === 'colour') coach('colour');
+    if (ev.e === 'sell' && ev.p !== 0) coach('rv-sell', VSTORY.coachRival.sell);
+    if (ev.e === 'place' && ev.p === 0) { var t = ev.tile; if (t.t === 'bld') coach('bld'); if (t.t === 'know') coach('lore'); if (t.t === 'mine') coach('mine'); if (t.t === 'pas') coach('pas'); if (ev.chain) coach('good-chain', VSTORY.coachGood.chain); }
+    if (ev.e === 'place' && ev.p !== 0 && ev.chain) coach('rv-chain', VSTORY.coachRival.chain);
+  });
+  if (m && me0 && m.k === 'workers' && UI.wasBuild) coach('poor-workers', VSTORY.coachPoor.workers);
+  if (m && me0 && m.k === 'workers') coach('workers');
+  if (top && isHuman(VB.actor(G))) { if (top.t === 'castle') coach('keep'); if (top.t === 'hall') coach('hall'); if (top.t === 'ship') coach('barge'); if (top.t === 'discard') coach('discard'); }
+  if (!G.over && !isHuman(VB.actor(G))) coach('rival');
+  if (vm.length && !top) {
+    var pp = G.P[VB.actor(G)];
+    if (vm.some(function (x) { return x.k === 'place'; })) coach('build');
+    if (vm.some(function (x) { return x.k === 'sell'; })) coach('sell');
+    if (vm.some(function (x) { return x.k === 'take' && x.w > 0; })) coach('bend');
+    if (vm.some(function (x) { return x.k === 'buy'; })) coach('back');
+    if (VB.goodsTypes(pp).length >= 3) coach('kinds');
+    if (G.round >= 1) coach('white');
+    if (pp.used[0] && pp.used[1]) coach('end');
+    if (vm.some(function (x) { return x.k === 'take' && G.depots[x.v][x.slot] && G.depots[x.v][x.slot].t === 'pas'; })) coach('pas');
+  }
+  if (G.over) coach('season');
 }
 function stepMs() { return UI.fast ? 0 : UI.quick ? 160 : animMs(800); }
 function turnBanner() {
@@ -103,7 +140,7 @@ function describe(m, s) {
   return n + ' is choosing...';
 }
 function aiPlay(m) {
-  var s = VB.actor(G); setCap(describe(m, s)); if (L.tabs && (m.k === 'take' || m.k === 'grab' || m.k === 'buy') && UI.tab !== 'market' && UI.mode !== 'tutorial') { UI.tab = 'market'; render(); }
+  var s = VB.actor(G); setCap(describe(m, s)); if (L.tabs && (m.k === 'take' || m.k === 'grab' || m.k === 'buy') && UI.tab !== 'market') { UI.tab = 'market'; render(); }
   var id = (m.k === 'take' || m.k === 'grab') ? 'mt-' + m.v + '-' + m.slot : m.k === 'buy' ? 'bl-' + m.slot : null, el = id && document.getElementById(id);
   if (el) el.classList.add('aipick');
   UI.busy = true;
@@ -257,7 +294,7 @@ function renderEstate(box, seat, s) {
   if (box) { es.style.width = W + 'px'; es.style.height = HH + 'px'; es.style.setProperty('--hex', Math.floor(S * 1.732 - 2) + 'px'); }
   VB.CELLS.forEach(function (c) {
     var xy = cellXY(c, S, W, HH), t = p.estate[c.i], m = tg[c.i];
-    var b = h('button.cell' + (t ? '.built' : '') + (m ? '.glow' : ''), { type: 'button', id: box ? null : 'ec-' + c.i, style: 'left:' + xy.x + 'px;top:' + xy.y + 'px', 'aria-label': (t ? VB.tileName(t) : 'Empty ' + VB.COLNAME[c.col] + ' space ' + c.num) + (m ? ', build here' : '') });
+    var b = h((box ? 'div.cell' : 'button.cell') + (t ? '.built' : '') + (m ? '.glow' : ''), { type: box ? null : 'button', id: box ? null : 'ec-' + c.i, style: 'left:' + xy.x + 'px;top:' + xy.y + 'px', 'aria-label': (t ? VB.tileName(t) : 'Empty ' + VB.COLNAME[c.col] + ' space ' + c.num) + (m ? ', build here' : '') });
     var hx = t ? hexEl(t) : hexEl(null, { col: c.col });
     if (!t && !m) hx.style.filter = 'saturate(.55) brightness(1.18)';
     b.appendChild(hx); b.appendChild(h('span.num' + (c.col === 'castle' || c.col === 'ship' || c.col === 'mine' ? '.lt' : ''), { text: c.num }));
@@ -467,13 +504,13 @@ function ribbon(a, b) {
 var WHY = { region: 'region filled', colour: 'all spaces of a colour', animals: 'animals in the meadow', goods: 'goods sold', tower: 'beacon tower', lore: 'lore bonus' };
 function doMove(m) {
   if (!m || UI.busy) return;
-  var s = VB.actor(G), src = srcFor(m, s), prevCell = UI.lastCell;
+  var s = VB.actor(G), src = srcFor(m, s), prevCell = UI.lastCell; UI.wasBuild = isHuman(s) && VB.validMoves(G).some(function (x) { return x.k === 'place'; });
   try { if (isHuman(s) && GX.undo) { } } catch (e) { }
   var r = VB.performMove(G, m); if (!r.ok) { sfx('bad'); toast('Not allowed'); render(); return; }
   if (UI.die != null && G.P[s].used[UI.die]) UI.die = null;
   UI.busy = true; UI.sel = null;
   if (m.k === 'place') { UI.chain = m.die === 'x' ? UI.chain + 1 : 1; } else if (m.k === 'end') UI.chain = 0;
-  if (L.tabs && isHuman(s) && (m.k === 'take' || m.k === 'buy' || m.k === 'grab') && !(UI.mode === 'tutorial')) UI.tab = 'estate';
+  if (L.tabs && isHuman(s) && (m.k === 'take' || m.k === 'buy' || m.k === 'grab') && !(typeof GXT !== 'undefined' && GXT.running())) UI.tab = 'estate';
   try { if (UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.active() && isHuman(s)) GXT.act({ type: 'event', what: m.k }); } catch (e) { }
   render();
   var chainNow = UI.chain;
@@ -498,7 +535,7 @@ function doMove(m) {
   seq.then(function () {
     UI.busy = false;
     if (m.k === 'end') onTurnChange();
-    save(); render(); schedule();
+    save(); render(); schedule(); try { coachCheck(m, s, r.ev); } catch (e) { }
     if (G.over) setTimeout(gameOver, animMs(500));
   });
 }
@@ -507,7 +544,7 @@ function onTurnChange() {
   if (G.turn % G.n === 0 && G.ti === 0) { sfx('dice'); toast((G.round === 0 ? VB.PHASES[G.phase] + ' begins! ' : '') + 'Round ' + (G.round + 1) + ': new dice', 1600); }
   var humans = G.seats.filter(function (s) { return s.human; }).length;
   if (humans > 1 && isHuman(a) && UI.lastHuman !== a) toast('Pass to ' + G.seats[a].name, 2000);
-  if (isHuman(a)) { UI.lastHuman = a; UI.quick = false; UI.cap = ''; if (L.tabs && UI.mode !== 'tutorial') UI.tab = 'estate'; }
+  if (isHuman(a)) { UI.lastHuman = a; UI.quick = false; UI.cap = ''; if (L.tabs) UI.tab = 'estate'; if (UI.mode === 'tutorial' && G.round >= 1 && G.round <= 4 && UI.stacked !== G.round) { UI.stacked = G.round; try { tutStack(G.round + 1); } catch (e) { } } }
   turnBanner();
 }
 function schedule() {
@@ -534,7 +571,7 @@ function startGame(o) {
 function resume() { try { G = JSON.parse(localStorage.getItem('vob_save')); } catch (e) { G = null; } if (!G) return showTitle(); UI.mode = 'quick'; UI.camp = false; UI.busy = false; $('#start').hidden = true; render(); musSync(); schedule(); }
 function gameOver() { try { localStorage.removeItem('vob_save'); } catch (e) { } musSync(); showResult(); }
 function showResult() {
-  var rs = $('#rs'); toastOff(); rs.innerHTML = ''; var c = h('div.card', { role: 'dialog', 'aria-label': 'Result' });
+  var rs = $('#rs'); toastOff(); rs.innerHTML = ''; UI.cq = []; clearTimeout(UI.cT); UI.cBusy = false; var gd0 = $('#guide'); if (gd0) gd0.classList.remove('on'); var c = h('div.card', { role: 'dialog', 'aria-label': 'Result' });
   var w = G.winner, you = G.seats.filter(function (s) { return s.human; }).length === 1, won = G.teams ? w % 2 === 0 : w === 0; c.classList.add(won || !you ? 'rwin' : 'rlose'); setTimeout(function () { sfx(won ? 'score' : 'bad'); }, 150);
   c.appendChild(h('div', { 'data-art': won && you ? 'ui-result-win' : 'ui-result-lose', style: 'height:8px' }));
   c.appendChild(h('h2', { text: G.solo ? (won ? 'Estate complete: you win!' : 'Estate not complete: ' + G.soloFilled + ' of 37 spaces') : G.teams ? (won ? 'Your team wins ' + G.teamVP[0] + ' to ' + G.teamVP[1] + '!' : G.seats[1].name + ' and ' + G.seats[3].name + ' win ' + G.teamVP[1] + ' to ' + G.teamVP[0]) : you ? (w === 0 ? 'Your banner flies highest!' : G.seats[w].name + ' wins the valley') : G.seats[w].name + ' wins!' }));
@@ -543,6 +580,16 @@ function showResult() {
   c.appendChild(tb); countUp(tb);
   var p0 = G.P[0]; var pl = function (n, a, b) { return n + ' ' + (n === 1 ? a : b); };
   c.appendChild(h('p.tip', { text: 'You finished ' + pl(p0.stat.regions, 'region', 'regions') + ', sold ' + pl(p0.stat.sales, 'time', 'times') + ' and chained ' + pl(p0.stat.chain, 'build', 'builds') + '.' }));
+  if (UI.mode === 'tutorial') {   /* the final count, rule by rule with your real numbers, then what you have not met yet */
+    var e0 = G.P[0].end || {}, ul0 = h('ul.walk');
+    [['Built during the game', G.P[0].vpPlay], ['Silver: 1 point each (' + G.P[0].silver + ')', e0.silver], ['Unsold goods: 1 point per crate', e0.goods], ['Workers: 1 point per 2 (' + G.P[0].workers + ' workers)', e0.workers], ['Lore end scrolls', e0.lore]].forEach(function (x) { ul0.appendChild(h('li', { text: x[0] + ': ' + (x[1] || 0) })); });
+    ul0.appendChild(h('li', { text: 'Total: ' + G.P[0].vp + '. Ties go to the fuller estate, then to the steward further back on the banner track.' }));
+    c.appendChild(h('h3', { text: 'How your score was counted' })); c.appendChild(ul0); UI.seen = UI.seen || {}; UI.seen.final = 1; UI.seen.tie = 1;
+    var lat = Object.keys(VSTORY.coach).filter(function (k) { return !UI.seen[k]; }); UI.later = lat;
+    if (lat.length) { c.appendChild(h('h3', { text: VSTORY.laterTitle })); var ul1 = h('ul.walk'); lat.forEach(function (k) { ul1.appendChild(h('li', { text: VSTORY.coach[k].later })); }); c.appendChild(ul1); }
+    c.appendChild(h('p.voice', {}, [h('b', { text: VSTORY.guide.name + ': ' }), document.createTextNode(won ? VSTORY.tut.result.win : VSTORY.tut.result.lose)]));
+    try { GXT.markDone('vale-of-banners'); } catch (e) { }
+  }
   var vline = UI.mode === 'tutorial' ? null : G.solo ? (won ? VSTORY.soloWin : VSTORY.soloLose) : UI.camp ? null : (won ? VSTORY.quickWin : VSTORY.quickLose);
   if (vline) c.appendChild(h('p.voice', { text: vline }));
   var cd = null; try { cd = UI.camp && GXC.active(); } catch (e) { }
@@ -555,6 +602,7 @@ function showResult() {
   }
   var ac = h('div.acts', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:10px' });
   if (UI.camp && typeof GXC !== 'undefined' && GXC.active()) ac.appendChild(h('button.btn', { type: 'button', id: 'campfin', text: 'Continue the story', onclick: function () { rs.hidden = true; try { GXC.finish(G); } catch (e) { console.error(e); } } }));
+  else if (UI.mode === 'tutorial') { ac.appendChild(h('button.btn', { type: 'button', id: 'realB', text: 'Play a real game', onclick: function () { UI.mode = 'quick'; UI.lastOpts = { n: 2, ai: 'easy' }; startGame(UI.lastOpts); } })); }
   else ac.appendChild(h('button.btn', { type: 'button', id: 'again', text: 'Play again', onclick: function () { startGame(UI.lastOpts || {}); } }));
   ac.appendChild(h('button.btn.alt', { type: 'button', id: 'lookB', text: 'Look at the board', onclick: function () { rs.hidden = true; } }));
   if (!UI.camp) ac.appendChild(h('button.btn.alt', { type: 'button', id: 'titleB', text: 'Title', onclick: showTitle }));
@@ -670,6 +718,7 @@ function helpInit() {
 /* ---------------- tutorial: a staged first game ---------------- */
 function tutDone() { try { return GXT.isDone('vale-of-banners'); } catch (e) { return false; } }
 function tutSetup() {
+  UI.seen = {}; UI.cq = []; UI.cBusy = false; UI.coachLog = 0; UI.stacked = 0;
   startGame({ n: 2, seed: 77, phases: 1, ai: 'easy', mode: 'tutorial', names: { 1: VSTORY.rival.name } });
   var p = G.P[0], home = VB.CELLS[VB.HOME];
   /* a pasture space next to home; the stored sheep fits it; die 1 = that number; die 2 matches a stall holding a Moot Hall */
@@ -704,7 +753,7 @@ function tutStack(n) {
     var col = VB.CELLS[cc].col; var bt = fromBag(function (t) { return t.t === col; }); if (bt) { if (G.black[0]) G.bag.push(G.black[0]); G.black[0] = bt; }
     p.workers = Math.max(1, p.workers); p.silver = Math.max(2, p.silver); p.bought = false;
   }
-  if (n === 4) { p.dice = [VB.CELLS[T.hc].num, VB.CELLS[T.mc].num]; }
+  if (n === 4 && T.hc != null) { p.dice = [VB.CELLS[T.hc].num, VB.CELLS[T.mc].num]; }
   if (n === 5) { p.dice = [4, 6]; putStall(4, 0, function (t) { return t.t === 'pas'; }); }
   render();
 }
@@ -728,53 +777,19 @@ function tutStart(o) {
   var ev = function (what) { return { type: 'event', match: function (a) { return a.what === what; } }; };
   var tv = function () { return $('#tv .acts .btn'); }, my = function () { return myTurn(); };
   var st = function (k) { return function () { return $('#st-' + k); }; }, ec = function (f) { return function () { return $('#ec-' + f()); }; };
-  var steps = [
-    /* Chapter 1: your first turn */
-    { id: 'hi', title: '1 · Your estate', say: 'Your home keep is in the middle. You start with 1 silver, some workers and 3 goods.', target: function () { return $('#ec-' + VB.HOME); }, wait: null },
-    { id: 'take', title: '1 · Take a tile', say: 'Each die is one action. Tap the glowing tile: its stall number matches your first die.', target: function () { return $('#mt-' + UI.tut.stall + '-0'); }, wait: tapW('market', function (a) { return a.d === UI.tut.stall; }) },
-    { id: 'take2', title: '1 · Into storage', say: 'Tap Take. The tile goes into your storage (3 spaces).', target: tv, wait: ev('take') },
-    { id: 'pick', title: '1 · Build it', say: 'Tap the Beacon Tower in your storage to build it with your other die.', target: st(0), wait: tapW('store') },
-    { id: 'cell', title: '1 · Next to your land', say: 'Tap the glowing space: same colour, your die\'s number, touching your keep. Beacon: +4 points.', target: ec(function () { return UI.tut.cell; }), wait: tapW('cell') },
-    { id: 'end', title: '1 · End your turn', say: 'Both dice used. Tap End turn. Then watch the rival play.', target: function () { return $('#endB'); }, wait: ev('end') },
-    /* Chapter 2: rival turn, goods and workers */
-    { id: 'white', title: '2 · Goods', say: 'Turn order follows the banner track. The white die put this round\'s goods on its stall.', target: function () { return $('#dicerow .die.white'); }, wait: null, ai: rivalThen(2), ready: my, pending: 'Odo is playing: watch the captions' },
-    { id: 'sell', title: '2 · Sell goods', say: 'You hold two goods marked 3 and rolled a 3. Tap them. (You keep at most 3 kinds.)', target: function () { return $('#gd-3'); }, wait: tapW('goods') },
-    { id: 'sell2', title: '2 · Sell', say: 'Tap Sell: 2 points per tile and 1 silver.', target: tv, wait: ev('sell') },
-    { id: 'wk', title: '2 · Workers', say: 'Any die can take 2 workers. Tap +2 workers.', target: function () { return $('#wk1'); }, wait: ev('workers') },
-    { id: 'end2', title: '2 · End turn', say: 'Tap End turn.', target: function () { return $('#endB'); }, wait: ev('end') },
-    /* Chapter 3: special tiles and actions */
-    { id: 'bend', title: '3 · Bend a die', say: 'Each worker turns a die up or down by 1 (6 and 1 touch). Tap the Keep marked with a worker.', target: function () { return $('#mt-' + UI.tut.bend + '-0'); }, wait: tapW('market'), ai: rivalThen(3), ready: my, pending: 'Odo is playing: watch the captions' },
-    { id: 'bend2', title: '3 · Pay a worker', say: 'Tap Take: one worker bends your die to match.', target: tv, wait: ev('take') },
-    { id: 'keep', title: '3 · A Keep', say: 'Tap the Keep in your storage.', target: st(1), wait: tapW('store') },
-    { id: 'keepc', title: '3 · Build the Keep', say: 'Tap the glowing space. A Keep gives one free extra action.', target: ec(function () { return UI.tut.kc; }), wait: tapW('cell') },
-    { id: 'free', title: '3 · Free action', say: 'Free action, any number: tap the Moot Hall in the market.', target: function () { return $('#mt-' + UI.tut.free + '-0'); }, wait: tapW('market') },
-    { id: 'free2', title: '3 · Take it free', say: 'Tap Take it.', target: tv, wait: ev('take') },
-    { id: 'buy', title: '3 · Back lane', say: 'Once per turn you may buy a back-lane tile for 2 silver, no die needed. Tap it.', target: function () { return $('#bl-0'); }, wait: tapW('black') },
-    { id: 'buy2', title: '3 · Buy', say: 'Tap Buy.', target: tv, wait: ev('buy') },
-    { id: 'end3', title: '3 · End turn', say: 'Tap End turn.', target: function () { return $('#endB'); }, wait: ev('end') },
-    /* Chapter 4: chains and scoring */
-    { id: 'hall', title: '4 · Moot Hall', say: 'Buildings act at once; never two of a kind in one quarter. Tap the Moot Hall.', target: st(1), wait: tapW('store'), ai: rivalThen(4), ready: my, pending: 'Odo is playing: watch the captions' },
-    { id: 'hallc', title: '4 · Build it', say: 'Tap the glowing space. Moot Hall: build again at once, any number.', target: ec(function () { return UI.tut.hc; }), wait: tapW('cell') },
-    { id: 'chain', title: '4 · Chain', say: 'Tap the tile you bought.', target: st(1), wait: tapW('store') },
-    { id: 'chainc', title: '4 · Free build', say: 'Tap the glowing space. Lore bends one rule for you for the rest of the game.', target: ec(function () { return UI.tut.cc; }), wait: tapW('cell') },
-    { id: 'mine', title: '4 · A Mine', say: 'Tap the Mine. Mines pay 1 silver at every season end.', target: st(0), wait: tapW('store') },
-    { id: 'minec', title: '4 · Fill a region', say: 'Tap the space. It fills a whole region: size points + the season bonus.', target: ec(function () { return UI.tut.mc; }), wait: tapW('cell') },
-    { id: 'end4', title: '4 · End turn', say: 'Tap End turn.', target: function () { return $('#endB'); }, wait: ev('end') },
-    /* Chapter 5: the last round and the end */
-    { id: 'pas', title: '5 · Pasture', say: 'Pastures score every animal of that kind in the meadow. Tap it.', target: function () { return $('#mt-4-0'); }, wait: tapW('market'), ai: rivalThen(5), ready: my, pending: 'Odo is playing: watch the captions' },
-    { id: 'pas2', title: '5 · Take', say: 'Tap Take. (A full storage makes you drop a tile.)', target: tv, wait: ev('take') },
-    { id: 'wk5', title: '5 · Workers', say: 'Tap +2 workers. At the end every 2 workers are a point.', target: function () { return $('#wk1'); }, wait: ev('workers') },
-    { id: 'end5', title: '5 · Last turn', say: 'Tap End turn. The season ends: mines pay, then the final count.', target: function () { return $('#endB'); }, wait: ev('end') },
-    { id: 'result', title: '5 · Final count', say: '', target: function () { return $('#rs .card'); }, wait: null, ai: rivalThen(0), ready: function () { return !!G && G.over && !$('#rs').hidden; }, pending: 'The bells ring for the harvest moot...' }
+  var steps = [   /* only the very first action is spotlit (2 steps); then the game is free and Odo coaches */
+    { id: 'take', title: '', say: '', target: function () { return $('#mt-' + UI.tut.stall + '-0'); }, wait: tapW('market', function (a) { return a.d === UI.tut.stall; }) },
+    { id: 'take2', title: '', say: '', target: tv, wait: ev('take') },
+    { id: 'go', title: '', say: '', target: function () { return null; }, wait: null, onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } UI.tab = 'estate'; render(); coach('build'); schedule(); }, 0); } }
   ];
   steps.forEach(function (stp) {   /* story text: VSTORY.tut (src/story.js) */
-    var tx = VSTORY.tut[stp.id]; if (!tx) return; stp.title = tx.t; stp.say = tx.say;
+    var tx = VSTORY.tut[stp.id]; if (!tx || stp.id === 'go') return; stp.title = tx.t; stp.say = tx.say;
     if (stp.pending) stp.pending = VSTORY.rival.name + ' is at work: watch the captions';
     if (stp.id === 'result') stp.pending = 'The bells ring for the harvest moot...';
     var mkStep = ['take', 'take2', 'bend', 'bend2', 'free', 'free2', 'buy', 'buy2', 'pas', 'pas2'].indexOf(stp.id) >= 0, en0 = stp.onEnter;
     stp.onEnter = function () { UI.tab = mkStep ? 'market' : 'estate'; if (G) render(); if (en0) en0(); };
     stp.ready = (function (r0) { return function () { if (G && L.tabs && UI.tab !== (mkStep ? 'market' : 'estate') && !G.over) { UI.tab = mkStep ? 'market' : 'estate'; render(); } return r0 ? r0() : true; }; })(stp.ready);
-    stp.onDone = function () { var r = tx.react; if (stp.id === 'result') r = G && G.winner === 0 ? tx.win : tx.lose; if (r) say(r); };
+    stp.onDone = function () { var r = tx.react; if (r) say(r); };
   });
   GXT.start({ game: 'vale-of-banners', story: true, endTitle: VSTORY.endTitle, endText: VSTORY.endText, setup: tutSetup, steps: steps, onDone: function (r) {
     UI.mode = 'quick'; try { GXT.markDone('vale-of-banners'); } catch (e) { }
