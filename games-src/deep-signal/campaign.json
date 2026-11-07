@@ -1,0 +1,4072 @@
+{
+ "game": "deep-signal",
+ "title": "The Logbook of the Lanternfish",
+ "version": 1,
+ "cast": {
+  "cap": {
+   "name": "Captain Ines",
+   "portrait": "portrait-ines.webp",
+   "emoji": "🧭",
+   "color": "#3a8ee0"
+  },
+  "bram": {
+   "name": "Bram",
+   "portrait": "portrait-bram.webp",
+   "emoji": "🔧",
+   "color": "#3fb36b"
+  },
+  "kito": {
+   "name": "Kito",
+   "portrait": "portrait-kito.webp",
+   "emoji": "📡",
+   "color": "#f0b429"
+  },
+  "odile": {
+   "name": "Odile",
+   "portrait": "portrait-odile.webp",
+   "emoji": "🩺",
+   "color": "#e8577a"
+  },
+  "warden": {
+   "name": "The Warden",
+   "portrait": "boss-warden.webp",
+   "emoji": "🗼",
+   "color": "#5d6b7a"
+  },
+  "swarm": {
+   "name": "Gatekeeper Swarm",
+   "portrait": "boss-swarm.webp",
+   "emoji": "✨",
+   "color": "#2bb5b0"
+  },
+  "source": {
+   "name": "The Source",
+   "portrait": "boss-source.webp",
+   "emoji": "🌀",
+   "color": "#8f6be8"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "The Shallows",
+   "blurb": "Learn to dive as one crew."
+  },
+  {
+   "act": 2,
+   "title": "The Warden's Gate",
+   "blurb": "Bigger hauls, stranger rules."
+  },
+  {
+   "act": 3,
+   "title": "The Signal's Heart",
+   "blurb": "The deepest water, the hardest dives."
+  }
+ ],
+ "twists": [
+  {
+   "id": "notrick",
+   "where": "setup",
+   "how": "The captain picks one crew member who must win no tricks."
+  },
+  {
+   "id": "onetrick",
+   "where": "setup",
+   "how": "The captain picks one crew member who must win exactly one trick."
+  },
+  {
+   "id": "decide",
+   "where": "setup",
+   "how": "The captain asks who wants the tasks, then gives all of them to one crew member."
+  },
+  {
+   "id": "dist",
+   "where": "setup",
+   "how": "The captain hands out the tasks one by one, as evenly as possible."
+  },
+  {
+   "id": "dead",
+   "where": "setup",
+   "how": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+  },
+  {
+   "id": "nocomm",
+   "where": "setup",
+   "how": "Silent running: no signals at all."
+  },
+  {
+   "id": "late2",
+   "where": "setup",
+   "how": "Signals are jammed until trick 2."
+  },
+  {
+   "id": "late3",
+   "where": "setup",
+   "how": "Signals are jammed until trick 3."
+  },
+  {
+   "id": "sonar1",
+   "where": "setup",
+   "how": "Sonar 1 must win a trick."
+  },
+  {
+   "id": "sonars",
+   "where": "setup",
+   "how": "Every sonar card must win a trick."
+  }
+ ],
+ "chapters": [
+  {
+   "id": "m1",
+   "act": 1,
+   "title": "Mission 1: First Dive",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Our sub, the Lanternfish, slips under the waves. A faint signal pulses far below. Let's learn to work as one c"
+    },
+    {
+     "who": "cap",
+     "text": "This first dive is a guided one. Follow the glowing hints."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "First beacon home. The Lanternfish's lamps catch something below: a pulse, steady as a heartbeat."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 1,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 1,
+    "text": "Complete the one task."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 1,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m2",
+   "act": 1,
+   "title": "Mission 2: Two Lights",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Two beacons to recover on this dive. Each one belongs to whoever claimed it."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Two lights recovered. Ines logs the pulse: it repeats every forty seconds, from deeper than our charts go."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 2,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 2,
+    "text": "Complete all 2 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 2,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m3",
+   "act": 1,
+   "title": "Mission 3: In Order",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The beacons must come home in order: first, then second."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Kito swears the pulse changed pitch when we surfaced the last beacon. Bram says it's the hull creaking."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 3,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 3,
+    "text": "Complete all 2 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 3,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m4",
+   "act": 1,
+   "title": "Mission 4: Three Echoes",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Three echoes from the reef. Share the work."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The old survey map ends here. Past this ridge the seabed is just a blank page marked 'unsounded'."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 4,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 4,
+    "text": "Complete all 3 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 4,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m5",
+   "act": 1,
+   "title": "Mission 5: The Fever Watch",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "One diver has caught a fever. They must stay out of every haul this dive."
+    },
+    {
+     "who": "kito",
+     "text": "The captain picks one crew member who must win no tricks."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "We dropped a marker buoy on the ridge. Whatever sends that pulse, we'll find our way back to it."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 5,
+    "seed": null
+   },
+   "twist": {
+    "id": "notrick",
+    "param": null,
+    "text": "The captain picks one crew member who must win no tricks."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 5,
+    "text": "Meet the mission rule. The captain picks one crew member who must win no tricks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "notrick",
+     "param": null,
+     "text": "The captain picks one crew member who must win no tricks."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 5,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m6",
+   "act": 1,
+   "title": "Mission 6: Steady Hands",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Order matters again, with a third task riding free."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "A dead research probe drifts past, its lamp still blinking. Its last log mentions the same pulse."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 6,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 6,
+    "text": "Complete all 3 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 6,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m7",
+   "act": 1,
+   "title": "Mission 7: Last Word",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Something must be saved for last: the task marked with the final seal."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Odile cracked the probe's memory: three more beacons were lost along this trench. We'll recover them."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 7,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 7,
+    "text": "Complete all 3 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 7,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m8",
+   "act": 1,
+   "title": "Mission 8: Count Down",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Three numbered beacons: first, second, third. No shortcuts."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The pulse is clearer now. Ines thinks it is not a signal at all, but an answer."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 8,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 8,
+    "text": "Complete all 3 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 8,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m9",
+   "act": 1,
+   "title": "Mission 9: The Faint Ping",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Only the weakest sonar can catch this ping. Sonar 1 must win a trick."
+    },
+    {
+     "who": "kito",
+     "text": "Sonar 1 must win a trick."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Strange lights in the dark: a field of glowing jellies parts around our hull and closes behind us."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 9,
+    "seed": null
+   },
+   "twist": {
+    "id": "sonar1",
+    "param": null,
+    "text": "Sonar 1 must win a trick."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 9,
+    "text": "Complete the one task. Sonar 1 must win a trick."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "sonar1",
+     "param": null,
+     "text": "Sonar 1 must win a trick."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 9,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m10",
+   "act": 1,
+   "title": "Mission 10: Four Lanterns",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Four lanterns flicker in the kelp. Spread out."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Ten dives logged. The crew is fast now; nobody wastes a signal. The trench mouth opens below."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 10,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 10,
+    "text": "Complete all 4 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 10,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m11",
+   "act": 1,
+   "title": "Mission 11: Captain's Call",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The captain chooses who carries this task. Speak up if you can do it."
+    },
+    {
+     "who": "kito",
+     "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Cold water floods the outer lockers. Bram fixes it with tape and stubbornness. We dive on."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 11,
+    "seed": null
+   },
+   "twist": {
+    "id": "decide",
+    "param": null,
+    "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 11,
+    "text": "Complete the one task. The captain asks who wants the tasks, then gives all of them to one crew member."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "decide",
+     "param": null,
+     "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 11,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m12",
+   "act": 1,
+   "title": "Mission 12: Final Seal",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Four tasks, and the sealed one comes last."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The beacons down here are older, crusted with coral. Someone placed them long before us."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 12,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 12,
+    "text": "Complete all 4 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 12,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m13",
+   "act": 1,
+   "title": "Mission 13: Every Ping Answers",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The trench answers every ping. Each sonar card must win its own trick."
+    },
+    {
+     "who": "kito",
+     "text": "Every sonar card must win a trick."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "A second pulse joins the first, out of step. Kito calls it a duet. Ines calls it a warning."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 13,
+    "seed": null
+   },
+   "twist": {
+    "id": "sonars",
+    "param": null,
+    "text": "Every sonar card must win a trick."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 13,
+    "text": "Meet the mission rule. Every sonar card must win a trick."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "sonars",
+     "param": null,
+     "text": "Every sonar card must win a trick."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 13,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m14",
+   "act": 1,
+   "title": "Mission 14: Static Shelf",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "A static shelf scrambles our signals: you see the card, not what it means."
+    },
+    {
+     "who": "kito",
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Sonar paints a wall ahead, a ridge of black stone carved too straight to be natural."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 14,
+    "seed": null
+   },
+   "twist": {
+    "id": "dead",
+    "param": null,
+    "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 14,
+    "text": "Complete all 4 tasks. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dead",
+     "param": null,
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 14,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m15",
+   "act": 1,
+   "title": "Mission 15: By the Book",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Four numbered beacons. By the book, one to four."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "We found a gate in the wall, shut tight. Something large circles on the other side."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "normal",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 15,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 15,
+    "text": "Complete all 4 tasks."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 15,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m16",
+   "act": 1,
+   "title": "Mission 16: The Hushed Trench",
+   "boss": true,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Silent running past the Warden's outpost. No signals at all."
+    },
+    {
+     "who": "kito",
+     "text": "Silent running: no signals at all."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The Warden of the Trench blocks the gate. Every sonar ping we send comes back louder."
+    }
+   ],
+   "opponent": {
+    "name": "The Warden of the Trench",
+    "emoji": "🗼",
+    "cast": "warden",
+    "personality": "An old automated outpost that silences every radio near it.",
+    "aiLevel": "normal",
+    "aiStyle": "crew",
+    "taunt": "Your signals die in my water.",
+    "praise": "You passed in silence. Impressive."
+   },
+   "setup": {
+    "players": 4,
+    "mission": 16,
+    "seed": null
+   },
+   "twist": {
+    "id": "nocomm",
+    "param": null,
+    "text": "Silent running: no signals at all."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 16,
+    "text": "Complete all 3 tasks. Silent running: no signals at all."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "nocomm",
+     "param": null,
+     "text": "Silent running: no signals at all."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 16,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "warden",
+     "text": "The Warden of the Trench portrait"
+    }
+   ]
+  },
+  {
+   "id": "m17",
+   "act": 2,
+   "title": "Mission 17: Chosen Diver",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The captain picks one diver to carry both tasks."
+    },
+    {
+     "who": "kito",
+     "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Past the Warden, the water is warm. Act two: the hidden basin, and whatever built that gate."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 17,
+    "seed": null
+   },
+   "twist": {
+    "id": "decide",
+    "param": null,
+    "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 17,
+    "text": "Complete all 2 tasks. The captain asks who wants the tasks, then gives all of them to one crew member."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "decide",
+     "param": null,
+     "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 17,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m18",
+   "act": 2,
+   "title": "Mission 18: Jammed Relay",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The relay is jammed: no signals until the second trick."
+    },
+    {
+     "who": "kito",
+     "text": "Signals are jammed until trick 2."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Bioluminescent reefs line the basin floor like city streets. The pulse leads straight down them."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 18,
+    "seed": null
+   },
+   "twist": {
+    "id": "late2",
+    "param": null,
+    "text": "Signals are jammed until trick 2."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 18,
+    "text": "Complete all 5 tasks. Signals are jammed until trick 2."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "late2",
+     "param": null,
+     "text": "Signals are jammed until trick 2."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 18,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m19",
+   "act": 2,
+   "title": "Mission 19: Pressure Rising",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Five tasks as the pressure rises; one must come first."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "We recovered a beacon shaped like a shell. Odile hums along with its tone without noticing."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 19,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 19,
+    "text": "Complete all 5 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 19,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m20",
+   "act": 2,
+   "title": "Mission 20: Lone Catch",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "One diver must make exactly one catch this dive."
+    },
+    {
+     "who": "kito",
+     "text": "The captain picks one crew member who must win exactly one trick."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The basin has currents that run in circles. Twice we nearly lost the drone. Twice we got it back."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 20,
+    "seed": null
+   },
+   "twist": {
+    "id": "onetrick",
+    "param": null,
+    "text": "The captain picks one crew member who must win exactly one trick."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 20,
+    "text": "Complete all 2 tasks. The captain picks one crew member who must win exactly one trick."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "onetrick",
+     "param": null,
+     "text": "The captain picks one crew member who must win exactly one trick."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 20,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m21",
+   "act": 2,
+   "title": "Mission 21: Twin Beacons",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Five tasks, two of them numbered."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Ines found carvings near a beacon: the same task marks we use, one to five, in someone else's hand."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 21,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 21,
+    "text": "Complete all 5 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 21,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m22",
+   "act": 2,
+   "title": "Mission 22: Fair Shares",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The captain hands out the tasks one by one, fairly."
+    },
+    {
+     "who": "kito",
+     "text": "The captain hands out the tasks one by one, as evenly as possible."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Our lamps flicker every time the pulse peaks. Bram reroutes power. Nobody likes the silence after."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 22,
+    "seed": null
+   },
+   "twist": {
+    "id": "dist",
+    "param": null,
+    "text": "The captain hands out the tasks one by one, as evenly as possible."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 22,
+    "text": "Complete all 4 tasks. The captain hands out the tasks one by one, as evenly as possible."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dist",
+     "param": null,
+     "text": "The captain hands out the tasks one by one, as evenly as possible."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 22,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m23",
+   "act": 2,
+   "title": "Mission 23: Arrows in the Dark",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Arrows mark which of two tasks comes before the other."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The relay buoy is jammed. For a while we dive with no word from the surface. We trust each other."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 23,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 23,
+    "text": "Complete all 5 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 23,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m24",
+   "act": 2,
+   "title": "Mission 24: Dead Water",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Dead water again: signals lose their meaning."
+    },
+    {
+     "who": "kito",
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Halfway through the basin. Kito marks the map: twenty-three beacons home, none lost on the way."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 24,
+    "seed": null
+   },
+   "twist": {
+    "id": "dead",
+    "param": null,
+    "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 24,
+    "text": "Complete all 5 tasks. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dead",
+     "param": null,
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 24,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m25",
+   "act": 2,
+   "title": "Mission 25: Slow Burn",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Signals jammed until the third trick, and a sealed task last."
+    },
+    {
+     "who": "kito",
+     "text": "Signals are jammed until trick 3."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "A swarm of tiny lights follows the Lanternfish, copying our signals back to us, a beat late."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 25,
+    "seed": null
+   },
+   "twist": {
+    "id": "late3",
+    "param": null,
+    "text": "Signals are jammed until trick 3."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 25,
+    "text": "Complete all 5 tasks. Signals are jammed until trick 3."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "late3",
+     "param": null,
+     "text": "Signals are jammed until trick 3."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 25,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m26",
+   "act": 2,
+   "title": "Mission 26: Out of the Loop",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Another fever. Two tasks, and the patient wins no tricks."
+    },
+    {
+     "who": "kito",
+     "text": "The captain picks one crew member who must win no tricks."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The swarm learns fast. It mimics our pings well enough to fool the drone. Signals must be sure now."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 26,
+    "seed": null
+   },
+   "twist": {
+    "id": "notrick",
+    "param": null,
+    "text": "The captain picks one crew member who must win no tricks."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 26,
+    "text": "Complete all 2 tasks. The captain picks one crew member who must win no tricks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "notrick",
+     "param": null,
+     "text": "The captain picks one crew member who must win no tricks."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 26,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m27",
+   "act": 2,
+   "title": "Mission 27: Three Steps Down",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Three numbered steps down the slope."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Odile names the swarm 'the Choir'. Ines asks her not to name things that might want to eat us."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 27,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 27,
+    "text": "Complete all 6 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 27,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m28",
+   "act": 2,
+   "title": "Mission 28: Split the Haul",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The captain splits six tasks between us."
+    },
+    {
+     "who": "kito",
+     "text": "The captain hands out the tasks one by one, as evenly as possible."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Below the reefs, a dead zone: our sonar shows nothing at all. We dive by memory and order marks."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 28,
+    "seed": null
+   },
+   "twist": {
+    "id": "dist",
+    "param": null,
+    "text": "The captain hands out the tasks one by one, as evenly as possible."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 28,
+    "text": "Complete all 6 tasks. The captain hands out the tasks one by one, as evenly as possible."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dist",
+     "param": null,
+     "text": "The captain hands out the tasks one by one, as evenly as possible."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 28,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m29",
+   "act": 2,
+   "title": "Mission 29: Follow the Arrows",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Four arrows, four tasks in a row, with one free task between."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "We came out of the dead zone with every task done. Bram says that's the best crew he's served with."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 29,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 29,
+    "text": "Complete all 5 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 29,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m30",
+   "act": 2,
+   "title": "Mission 30: Smallest Voice",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The faintest sonar must win a trick while five tasks wait."
+    },
+    {
+     "who": "kito",
+     "text": "Sonar 1 must win a trick."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The Choir has gathered at a narrow pass, thousands strong, humming the pulse back at the deep."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 30,
+    "seed": null
+   },
+   "twist": {
+    "id": "sonar1",
+    "param": null,
+    "text": "Sonar 1 must win a trick."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 30,
+    "text": "Complete all 5 tasks. Sonar 1 must win a trick."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "sonar1",
+     "param": null,
+     "text": "Sonar 1 must win a trick."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 30,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m31",
+   "act": 2,
+   "title": "Mission 31: Bookends",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "First, second and the sealed last task."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Ines thinks the Choir guards the way down. Kito thinks it is waiting to see if we are worthy."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 31,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 31,
+    "text": "Complete all 6 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 31,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m32",
+   "act": 2,
+   "title": "Mission 32: The Murk",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Thick murk: six tasks and no meaning in our signals."
+    },
+    {
+     "who": "kito",
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "One more beacon before the pass. The pulse is so strong now we feel it in our teeth."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 32,
+    "seed": null
+   },
+   "twist": {
+    "id": "dead",
+    "param": null,
+    "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 32,
+    "text": "Complete all 6 tasks. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dead",
+     "param": null,
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 32,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m33",
+   "act": 2,
+   "title": "Mission 33: The Warden's Gate",
+   "boss": true,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The Warden blocks the gate. The captain hands out the tasks, and the static is back."
+    },
+    {
+     "who": "kito",
+     "text": "The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not "
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The Gatekeeper Swarm closes the pass. Every card must land exactly; one mistake and it swallows the light."
+    }
+   ],
+   "opponent": {
+    "name": "The Gatekeeper Swarm",
+    "emoji": "✨",
+    "cast": "swarm",
+    "personality": "A cloud of glowing drones that scrambles every message.",
+    "aiLevel": "hard",
+    "aiStyle": "crew",
+    "taunt": "The gate stays shut.",
+    "praise": "The swarm parts. Go on."
+   },
+   "setup": {
+    "players": 4,
+    "mission": 33,
+    "seed": null
+   },
+   "twist": {
+    "id": "dist",
+    "param": null,
+    "text": "The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 33,
+    "text": "Complete all 5 tasks. The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dist",
+     "param": null,
+     "text": "The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 33,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "swarm",
+     "text": "The Gatekeeper Swarm portrait"
+    }
+   ]
+  },
+  {
+   "id": "m34",
+   "act": 3,
+   "title": "Mission 34: Into the Rift",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Into the rift. Seven tasks, nothing else."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The Swarm parted. Act three: the abyss, where the pulse begins."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 34,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 34,
+    "text": "Complete all 7 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 34,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m35",
+   "act": 3,
+   "title": "Mission 35: Clockwork",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Two numbered tasks among seven."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "No reefs here, no swarm, only black water and the slow climb of the depth gauge."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 35,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 35,
+    "text": "Complete all 7 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 35,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m36",
+   "act": 3,
+   "title": "Mission 36: One and Only",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "One diver makes exactly one catch, three tasks to do."
+    },
+    {
+     "who": "kito",
+     "text": "The captain picks one crew member who must win exactly one trick."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "A beacon older than any we've found, its tone low and patient. Ines records it twice to be sure."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 36,
+    "seed": null
+   },
+   "twist": {
+    "id": "onetrick",
+    "param": null,
+    "text": "The captain picks one crew member who must win exactly one trick."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 36,
+    "text": "Complete all 3 tasks. The captain picks one crew member who must win exactly one trick."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "onetrick",
+     "param": null,
+     "text": "The captain picks one crew member who must win exactly one trick."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 36,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m37",
+   "act": 3,
+   "title": "Mission 37: Long Silence",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "No signals until the third trick, seven tasks."
+    },
+    {
+     "who": "kito",
+     "text": "Signals are jammed until trick 3."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Pressure alarms sing for an hour. Bram keeps them company with bad jokes. We hold together."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 37,
+    "seed": null
+   },
+   "twist": {
+    "id": "late3",
+    "param": null,
+    "text": "Signals are jammed until trick 3."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 37,
+    "text": "Complete all 7 tasks. Signals are jammed until trick 3."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "late3",
+     "param": null,
+     "text": "Signals are jammed until trick 3."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 37,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m38",
+   "act": 3,
+   "title": "Mission 38: The Last Lock",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Seven tasks, the sealed one last."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The pulse slows down when we work as one crew. Kito noticed first. Now we all feel it."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 38,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 38,
+    "text": "Complete all 7 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 38,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m39",
+   "act": 3,
+   "title": "Mission 39: Shadow Arrows",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Dead zone and two arrows."
+    },
+    {
+     "who": "kito",
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "We pass a field of wrecked submarines, none of them ours, none of them human-made."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 39,
+    "seed": null
+   },
+   "twist": {
+    "id": "dead",
+    "param": null,
+    "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 39,
+    "text": "Complete all 7 tasks. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dead",
+     "param": null,
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 39,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m40",
+   "act": 3,
+   "title": "Mission 40: Even Keel",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The captain shares eight tasks evenly."
+    },
+    {
+     "who": "kito",
+     "text": "The captain hands out the tasks one by one, as evenly as possible."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Odile reads the wrecks: each one turned back at the same depth. We keep going."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 40,
+    "seed": null
+   },
+   "twist": {
+    "id": "dist",
+    "param": null,
+    "text": "The captain hands out the tasks one by one, as evenly as possible."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 40,
+    "text": "Complete all 8 tasks. The captain hands out the tasks one by one, as evenly as possible."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dist",
+     "param": null,
+     "text": "The captain hands out the tasks one by one, as evenly as possible."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 40,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m41",
+   "act": 3,
+   "title": "Mission 41: Quarantine",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Quarantine: one diver wins no tricks while five tasks are done."
+    },
+    {
+     "who": "kito",
+     "text": "The captain picks one crew member who must win no tricks."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Silence again: no signals allowed in this stretch of the abyss. We plan with our eyes."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 41,
+    "seed": null
+   },
+   "twist": {
+    "id": "notrick",
+    "param": null,
+    "text": "The captain picks one crew member who must win no tricks."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 41,
+    "text": "Complete all 5 tasks. The captain picks one crew member who must win no tricks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "notrick",
+     "param": null,
+     "text": "The captain picks one crew member who must win no tricks."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 41,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m42",
+   "act": 3,
+   "title": "Mission 42: Cascade",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "A cascade of three numbered tasks among eight."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The drone's lamp died for a minute. When it came back it was glowing the pulse's colour."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 42,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 42,
+    "text": "Complete all 8 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 42,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m43",
+   "act": 3,
+   "title": "Mission 43: Deep Bloom",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Eight tasks in a blooming reef."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Forty-three dives. The beacons form a trail, and the trail forms a word nobody can read yet."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 43,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 43,
+    "text": "Complete all 8 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 43,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m44",
+   "act": 3,
+   "title": "Mission 44: Ghost Relay",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Ghost relay: dead zone, and no signals before trick two."
+    },
+    {
+     "who": "kito",
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest. Signals are jammed until tri"
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Ines finally reads it. It is not a word. It is our crew's own signal pattern, played back."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 44,
+    "seed": null
+   },
+   "twist": {
+    "id": "dead",
+    "param": null,
+    "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest. Signals are jammed until trick 2."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 44,
+    "text": "Complete all 8 tasks. Dead zone: a signal shows the card but not whether it is highest, only or lowest. Signals are jammed until trick 2."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dead",
+     "param": null,
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest. Signals are jammed until trick 2."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 44,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m45",
+   "act": 3,
+   "title": "Mission 45: Five Seals",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Five numbered seals, one after another."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The deep is listening, and it has been learning from us since the first dive."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 45,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 45,
+    "text": "Complete all 8 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 45,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m46",
+   "act": 3,
+   "title": "Mission 46: Blind Shares",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The captain shares the tasks blind: the static returns."
+    },
+    {
+     "who": "kito",
+     "text": "The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not "
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "A great dark shape below, bigger than the Lanternfish, unmoving, glowing in time with the pulse."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 46,
+    "seed": null
+   },
+   "twist": {
+    "id": "dist",
+    "param": null,
+    "text": "The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 46,
+    "text": "Complete all 8 tasks. The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dist",
+     "param": null,
+     "text": "The captain hands out the tasks one by one, as evenly as possible. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 46,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m47",
+   "act": 3,
+   "title": "Mission 47: The Last Lantern",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Nine tasks; the sealed one comes last."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "We sent a sonar ping. The shape answered with one of its own. A greeting, or a test."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 47,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": 47,
+    "text": "Complete all 9 tasks."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {
+     "players": 4,
+     "mission": 47,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m48",
+   "act": 3,
+   "title": "Mission 48: The Captain's Wager",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The captain bets everything on one diver: three tasks, one carrier."
+    },
+    {
+     "who": "kito",
+     "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The last beacons ring the shape like a crown. Every sonar must win its trick now."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 48,
+    "seed": null
+   },
+   "twist": {
+    "id": "decide",
+    "param": null,
+    "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 48,
+    "text": "Complete all 3 tasks. The captain asks who wants the tasks, then gives all of them to one crew member."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "decide",
+     "param": null,
+     "text": "The captain asks who wants the tasks, then gives all of them to one crew member."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 48,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m49",
+   "act": 3,
+   "title": "Mission 49: Riptide Arrows",
+   "boss": false,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "Dead zone with three arrows."
+    },
+    {
+     "who": "kito",
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "Final approach. Every crew mate has a job, and every job comes in order."
+    }
+   ],
+   "opponent": {
+    "name": "The deep sea (co-op: you all win or lose together)",
+    "emoji": "🧭",
+    "cast": "cap",
+    "personality": "Deep water and a faint signal.",
+    "aiLevel": "hard",
+    "aiStyle": "crew"
+   },
+   "setup": {
+    "players": 4,
+    "mission": 49,
+    "seed": null
+   },
+   "twist": {
+    "id": "dead",
+    "param": null,
+    "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 49,
+    "text": "Complete all 9 tasks. Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "dead",
+     "param": null,
+     "text": "Dead zone: a signal shows the card but not whether it is highest, only or lowest."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 49,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": []
+  },
+  {
+   "id": "m50",
+   "act": 3,
+   "title": "Mission 50: The Signal's Heart",
+   "boss": true,
+   "intro": [
+    {
+     "who": "cap",
+     "text": "The signal's heart. Silent running, seven tasks, the sealed one last."
+    },
+    {
+     "who": "kito",
+     "text": "Silent running: no signals at all."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cap",
+     "text": "The Source falls silent, then answers in our pattern. Contact made. The Lanternfish crew goes home as legends."
+    }
+   ],
+   "opponent": {
+    "name": "The Source",
+    "emoji": "🌀",
+    "cast": "source",
+    "personality": "The signal itself: patient, vast, and listening.",
+    "aiLevel": "hard",
+    "aiStyle": "crew",
+    "taunt": "Not yet. Come deeper.",
+    "praise": "You found me. Listen closely now."
+   },
+   "setup": {
+    "players": 4,
+    "mission": 50,
+    "seed": null
+   },
+   "twist": {
+    "id": "nocomm",
+    "param": null,
+    "text": "Silent running: no signals at all."
+   },
+   "goal": {
+    "type": "mission",
+    "value": 50,
+    "text": "Complete all 7 tasks. Silent running: no signals at all."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Complete the mission",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No flare used",
+     "test": {
+      "k": "noflare"
+     }
+    },
+    {
+     "text": "Two or fewer crew signals",
+     "test": {
+      "k": "signals",
+      "op": "<=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "nocomm",
+     "param": null,
+     "text": "Silent running: no signals at all."
+    },
+    "setup": {
+     "players": 4,
+     "mission": 50,
+     "flareFree": true
+    },
+    "maxStars": 2,
+    "text": "Your crew thinks harder and the first flare is free."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "source",
+     "text": "The Source portrait"
+    }
+   ]
+  }
+ ]
+}
