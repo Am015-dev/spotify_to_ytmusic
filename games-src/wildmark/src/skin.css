@@ -183,3 +183,7 @@ html body .gxc-node .gxc-disc{background-image:none!important}
 /* the shared chapter-result star row also carries the class "big": keep Wildmark's gold .big button look off it (stars in a row) */
 .gxc-stars.big{display:inline-flex;flex-direction:row;background:none;border-radius:0;min-height:0;padding:0;box-shadow:none;gap:6px;align-self:center}
 .gxc-stars.big .gxc-st{text-shadow:0 1px 0 #9c6a12,0 0 12px rgba(242,185,59,.55)}
+/* menu section chips: full labels, 44 px tall, wrap instead of squeezing */
+html body .gx-chips{flex-wrap:wrap;overflow:visible}
+html body .gx-chip{flex:none;min-height:44px;padding:2px 14px;white-space:nowrap}
+.pat{display:block;width:120px;height:auto;max-height:96px;margin:6px 0}

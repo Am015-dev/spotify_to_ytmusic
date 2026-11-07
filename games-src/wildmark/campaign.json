@@ -102,6 +102,11 @@
    "id": "no-sweep",
    "where": "rules",
    "how": "Nobody may use the free sweep of three matching tokens (four still sweep themselves)."
+  },
+  {
+   "id": "you-acorns",
+   "where": "setup",
+   "how": "You start with param acorns (a gentle head start)."
   }
  ],
  "chapters": [
@@ -200,7 +205,7 @@
     },
     {
      "who": "ward",
-     "text": "Pip takes what is closest. Watch the market and plan two turns ahead."
+     "text": "Pip takes what is closest. You start with 2 acorns: spend one when the pair you need is split up."
     }
    ],
    "outro": [
@@ -222,7 +227,11 @@
     "players": 2,
     "seed": null
    },
-   "twist": null,
+   "twist": {
+    "id": "you-acorns",
+    "param": 2,
+    "text": "Head start: you begin with 2 acorns (spend one to take any tile with any token)."
+   },
    "goal": {
     "type": "win",
     "value": null,

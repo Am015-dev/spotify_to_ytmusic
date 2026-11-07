@@ -41,6 +41,7 @@ function tileSvg(tile, x, y, s, rot, opt) {
   if (opt.tok) out += tokenSvg(opt.tok, x, y, s * 0.46);
   else if (!opt.noSlots) {   // the animals this tile accepts: small discs
     var n = tile.a.length, rr = s * (n === 1 ? 0.3 : 0.22), off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.27, 0], [0.27, 0]] : [[-0.27, 0.16], [0.27, 0.16], [0, -0.3]];
+    if (opt.big) { rr = s * (n === 1 ? 0.44 : n === 2 ? 0.33 : 0.29); off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.37, 0], [0.37, 0]] : [[-0.34, 0.22], [0.34, 0.22], [0, -0.38]]; }   // market/preview: readable animal icons
     tile.a.forEach(function (a, i) { out += tokenSvg(a, x + off[i][0] * s, y + off[i][1] * s, rr, ' sm'); });
   }
   return out;
@@ -219,7 +220,24 @@ function drawMap() {
   $('#map').innerHTML = terrainDefs() + '<rect class="bgr" x="0" y="0" width="' + wh[0] + '" height="' + wh[1] + '" fill="transparent"/><g id="vp">' + out + '</g>';
   $('#map').setAttribute('viewBox', '0 0 ' + wh[0] + ' ' + wh[1]); applyPan();
 }
-function mkTile(t, s) { var w = s * SQ3, h = s * 2; return '<svg viewBox="' + (-w / 2 - 2) + ' ' + (-h / 2 - 2) + ' ' + (w + 4) + ' ' + (h + 4) + '" aria-hidden="true">' + terrainDefs() + tileSvg(t, 0, 0, s, t.t.length > 1 ? 1 : 0) + '</svg>'; }
+function mkTile(t, s) { var w = s * SQ3, h = s * 2; return '<svg viewBox="' + (-w / 2 - 2) + ' ' + (-h / 2 - 2) + ' ' + (w + 4) + ' ' + (h + 4) + '" aria-hidden="true">' + terrainDefs() + tileSvg(t, 0, 0, s, t.t.length > 1 ? 1 : 0, { big: 1 }) + '</svg>'; }
+// pattern picture for an animal card (first set only): a small hex cluster showing a scoring shape, tokens drawn as on the map
+var PAT = {
+  bear: [[0, 0, 'bear'], [1, 0, 'bear'], [-1, 1, 0], [0, 1, 0], [2, -1, 0], [1, -1, 0]],
+  elk: [[-1, 0, 'elk'], [0, 0, 'elk'], [1, 0, 'elk'], [-1, 1, 0], [0, -1, 0], [1, -1, 0]],
+  salmon: [[-1, 0, 'salmon'], [0, 0, 'salmon'], [0, 1, 'salmon'], [1, 1, 'salmon'], [1, -1, 0], [-1, 1, 0]],
+  hawk: [[-1, 0, 'hawk'], [1, -1, 'hawk'], [0, 1, 'hawk'], [0, 0, 0], [1, 0, 0], [-1, 1, 0]],
+  fox: [[0, 0, 'fox'], [1, 0, 'bear'], [0, -1, 'elk'], [-1, 1, 'salmon'], [-1, 0, 0], [1, -1, 0], [0, 1, 0]]
+};
+function patSvg(a) {
+  if (cset(a) !== 'a' || !PAT[a]) return '';
+  var s = 13, out = '', xs = [], ys = [];
+  PAT[a].forEach(function (c) { var x = s * SQ3 * (c[0] + c[1] / 2), y = s * 1.5 * c[1]; xs.push(x); ys.push(y);
+    out += '<polygon points="' + poly(x, y, s - 0.6, [0, 1, 2, 3, 4, 5]) + '" fill="' + (c[2] ? 'rgba(243,234,210,.9)' : 'rgba(120,140,110,.22)') + '" stroke="rgba(20,30,20,.55)" stroke-width="1"/>';
+    if (c[2]) out += tokenSvg(c[2], x, y, s * 0.62); });
+  var x0 = Math.min.apply(null, xs) - s, x1 = Math.max.apply(null, xs) + s, y0 = Math.min.apply(null, ys) - s, y1 = Math.max.apply(null, ys) + s;
+  return '<svg class="pat" viewBox="' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' ' + (x1 - x0).toFixed(1) + ' ' + (y1 - y0).toFixed(1) + '" role="img" aria-label="Example: a scoring ' + esc(cinfo(a).title) + ' shape">' + out + '</svg>';
+}
 function mkTok(a) { return '<svg viewBox="-12 -12 24 24" aria-hidden="true">' + tokenSvg(a, 0, 0, 11) + '</svg>'; }
 function cset(a) { return G && G.cards && G.cards[a] || 'a'; }
 function cinfo(a) { return WM.cardInfo ? WM.cardInfo(a, cset(a)) : WM.CARDS[a]; }
@@ -298,7 +316,7 @@ function scoresHTML() {
 }
 function cardsHTML() {
   var h = '<div class="cards">';
-  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(C.title) + '</h3><p>' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
+  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(C.title) + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
   return h + '</div>';
 }
 var RULES_HTML = '<h3>Goal</h3><p>Over 20 turns, grow a valley of habitat tiles and settle animals on them. Most points wins.</p>' +
@@ -318,7 +336,7 @@ function tileText(t, tok) {
 function showBig(kind, obj, tok) {
   var body = document.createElement('div'); body.className = 'bigv';
   if (kind === 'tile') body.innerHTML = '<div class="bigpic">' + mkTile(obj, 60) + '</div>' + tileText(obj, tok);
-  else { var C = cinfo(obj); body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p><p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : obj === 'fox' && cset(obj) === 'a' ? '0 to 5 per fox' : 'Card ' + cset(obj).toUpperCase()) + '</p>'; }
+  else { var C = cinfo(obj); body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p>' + patSvg(obj) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : obj === 'fox' && cset(obj) === 'a' ? '0 to 5 per fox' : 'Card ' + cset(obj).toUpperCase()) + '</p>'; }
   GX.drawer('bigd', kind === 'tile' ? 'Habitat tile' : 'Animal token', body, false); GX.show('bigd');
 }
 (function wireHold() {
