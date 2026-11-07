@@ -27,6 +27,8 @@ Candidate moves are scored by board fit (small pockets and ragged edges penalise
 - `node rules-test.js 100`: data (33 distinct connected shapes), advance/income/tie/leather/overlap/7x7 rules, 500 AI games, gates.
 - `node smoke.js [WxH] [--full] [--tut] [--story] [--anim]`: real-input (touch via CDP on phones, mouse on PC): title tap, quick game, real drag of the ghost then Sew, 3 turns, forced end, result totals match the engine, Play again, rules drawer. `--full` = a whole game to the result. `--tut` walks the 13 tutorial steps. `--story` plays Story stage 1 to its result and checks saved progress.
 - `?scn=` scenarios (`src/scn.js`): sw-board, sw-place, sw-advance, sw-income, sw-leather, sw-zoom, sw-result, sw-torn (+ shared menu, story-scene). `build-all.py --quick stitchwise` PASS (11 scenarios).
+- `build-all.py --full stitchwise`: PASS (build, 6 phone-check scenarios incl. rotations, all scenarios, rules-test sweep). `scenario-mutate.js stitchwise`: 34/35 killed = 97% (behaviour mutants 17/20); survivors are look-only scenarios (menu, story-scene, sw-zoom).
+- Played with real taps/clicks to the result screen, twice per size: 390x763 (plain + with animations on), 375x553, 844x390, 1440x860 (each `smoke.js <size> --full` PASS, 15-17 checks), plus Story stage 1 to its result screen and the tutorial (13 steps) at 390x763.
 - `art-test.js`: loader proof with 3 dummy webp files (made and deleted locally, never committed): bg-title, fabric-01 and a portrait fill their slots, others keep placeholders.
 - UI audit (`scripts/ui-audit.spec.js`, phone + pc): C, D, F = 0. Remaining A/B/E rows are in shared surfaces only (see Known).
 
@@ -40,6 +42,9 @@ Candidate moves are scored by board fit (small pockets and ragged edges penalise
 7. A tap right after a drag (< 300 ms) produced no click in the synthetic touch driver -> test waits 0.9 s after a drag; real hands are slower. Sew also works with the keyboard.
 8. Tutorial "Their turn" step waited on a Next button that appears only after the scripted AI turn -> test polls for it.
 9. Scenarios: leather scenario passed two leather spaces (needed one), sw.js 404 on localhost -> guarded like Hollowbough.
+11. Phone check: tapping an already-selected segment was a "dead tap" -> setup is now one tap per opponent (Easy / Normal / Hard / Two players). Dock lines longer than 8 words shortened.
+12. Landscape phone 844x390: the dock sheet covered the board and cut off Sew it on -> a side-column dock for short wide screens.
+13. Scenario mutants: advance and place assertions now check the exact payment and time (mutation score 87% -> 97%).
 10. Audit: teal buttons 4.16:1 -> darker teal; small text floors 13 px phone / 16 px wide.
 
 ## Known / not done

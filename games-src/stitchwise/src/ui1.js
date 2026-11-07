@@ -28,9 +28,9 @@ function lvlOf(s) { return UI.mode === 'hot' ? 'human' : (UI.camp ? UI.camp.oppo
 function layout() {
   document.documentElement.classList.toggle('sm', innerHeight < 640); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
   var cs;
-  if (wide) cs = Math.floor(Math.min((H - 20 - 52 - 10) / 9, (W * 0.5) / 9)); else cs = Math.floor(Math.min((W - 16 - 10) / 9, (H - 12 - 46 - 56 - 22 - 10) / 9));
+  if (wide) cs = Math.floor(Math.min((H - 20 - 12) / 9, (W * 0.55) / 9)); else cs = Math.floor(Math.min((W - 16 - 10) / 9, (H - 12 - 46 - 56 - 22 - 10) / 9));
   cs = Math.max(18, Math.min(72, cs)); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
-  var tw = wide ? Math.max(260, Math.min(520, W - 9 * cs - 80)) : Math.min(W - 16, 560); var tr = $('#track'); if (tr) tr.style.width = tw + 'px';
+  var tw = wide ? Math.max(190, Math.min(520, W - 9 * cs - 70)) : Math.min(W - 16, 560); var tr = $('#track'); if (tr) tr.style.width = tw + 'px';
 }
 // ---------- quilt
 function patchBoxes(board) { var bx = {}; for (var i = 0; i < 81; i++) { var p = board[i]; if (p < 0 || p > 98) continue; var x = i % 9, y = (i / 9) | 0, b = bx[p] || (bx[p] = [9, 9, 0, 0]); if (x < b[0]) b[0] = x; if (y < b[1]) b[1] = y; if (x > b[2]) b[2] = x; if (y > b[3]) b[3] = y; } return bx; }

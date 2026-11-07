@@ -132,5 +132,13 @@ html.sm .btn{min-height:44px}html.sm .offer.cant::after{display:none}
 .menu .btn.go,.btn.go{background:#1d6f66;color:#fff}
 .menu .btn.alt,.menu .btn{color:#2a2118}.menu .btn.go{color:#fff}
 html .gx-row .btn,html .gx-row-k .btn,html .gx-row-l small,html .gx-chip{font-size:max(var(--fs),1em)!important}
+@media (max-height:520px) and (min-width:640px){
+.gx-main{grid-template-columns:minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important}
+.gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0!important}
+.gx-dock{max-height:none!important;border-radius:0!important}
+.gx-app.gx-dock-min .gx-dock{visibility:hidden!important}.gx-app.gx-dock-min .gx-dock-body{display:block!important}
+.gx-grab{display:none!important}.gx-app.gx-dock-min .gx-ibtn.gx-reopen{display:inline-flex!important}
+#detail{display:none}
+}
 </style>
 </head>
