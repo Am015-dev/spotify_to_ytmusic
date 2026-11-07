@@ -1,0 +1,16 @@
+{
+ "wave": 1,
+ "ratio": "16:10",
+ "flow_aspect": "16:9",
+ "style": "Painted flat 2D storybook illustration, soft gouache texture, clean bold shapes with gentle shading, a warm medieval-valley palette of parchment cream, river blue, meadow green, keep-stone green, saffron and crimson banners, thin warm brown outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "vale-of-banners 2D wave 1, ratio 16:10. Paste with Flow aspect 16:9; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "vale-of-banners",
+  "count": 3
+ },
+ "cards": {
+  "board-market": "Painted flat 2D storybook illustration, soft gouache texture, clean bold shapes with gentle shading, a warm medieval-valley palette of parchment cream, river blue, meadow green, keep-stone green, saffron and crimson banners, thin warm brown outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. Top-down view of a village market square laid out as a wooden board: six empty round-cornered stalls with striped awnings in a ring around a cobbled centre, and a narrow shadowy back lane with a hooded stall along the bottom edge, parchment border, empty stalls, no goods, no numbers.",
+  "bg-title": "Painted flat 2D storybook illustration, soft gouache texture, clean bold shapes with gentle shading, a warm medieval-valley palette of parchment cream, river blue, meadow green, keep-stone green, saffron and crimson banners, thin warm brown outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A wide green valley at dawn with a winding river, several stone keeps on hills each flying a crimson banner, golden sunrise light, thatched villages and sheep on the meadows, calm sky across the top.",
+  "bg-table": "Painted flat 2D storybook illustration, soft gouache texture, clean bold shapes with gentle shading, a warm medieval-valley palette of parchment cream, river blue, meadow green, keep-stone green, saffron and crimson banners, thin warm brown outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A seamless warm oak wooden table surface seen from above, visible grain and gentle wear, evenly lit, completely empty, no objects."
+ }
+}

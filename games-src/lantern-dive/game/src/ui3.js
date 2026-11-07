@@ -229,7 +229,7 @@ async function playEvs(evs) {
     try { newsFrom(evs); } catch (e) { console.error(e); }
     // job cards still lying on the table: remember where they are, so they can fly to the seat that takes them
     const flights = []; for (const e of take) { const el = document.querySelector('[data-key="job' + e.i + '"]'); if (el) flights.push({ i: e.i, seat: e.seat, r: el.getBoundingClientRect(), node: el.cloneNode(true) }); }
-    if (pls.length) snd('play');
+    if (pls.length) { snd('play'); try { const me = viewSeat(); cap(pls.map(p => (p.seat === me ? 'You play ' : pname(p.seat) + ' plays ') + cname(p.c)).join(' · '), ''); } catch (e) { } }
     if (pg.length) { snd('ping'); UI.pxPing = pg[0].seat; }
     if (sw) { snd('pass'); try { animatePass(); } catch (e) { } }
     if (take.length) snd('take');
@@ -237,16 +237,18 @@ async function playEvs(evs) {
       UI.holdJobs = new Set(jb.map(j => j.i));      // the stamps land only after the cards have been swept
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
       render(); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
-      UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 900 : 0); if (tok !== UI.seq) return;
+      UI.fz.win = true; render(); snd('trick');
+      try { const me = viewSeat(), wn = tr.w === me ? 'You win' : pname(tr.w) + ' wins', wcs = suitOf(tr.wc); cap(wn + ' the trick with ' + cname(tr.wc), 'good', wcs === 4 ? 'The Lantern beats every colour.' : (tr.plays.some(p => suitOf(p.c) === 4) ? '' : 'Highest card of the led colour wins.')); } catch (e) { }
+      await wait(ANIM ? 1100 : 0); if (tok !== UI.seq) return;
       await tutHoldWait(); if (tok !== UI.seq) return;
-      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1', 'plus'); await wait(520); if (tok !== UI.seq) return;
-      UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(700); if (tok !== UI.seq) return; }
+      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1 trick', 'plus'); await wait(520); if (tok !== UI.seq) return;
+      UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } try { const j = jb.find(x => x.st < 0) || jb[0], d = TASKS[G.tasks[j.i].id], who = G.tasks[j.i].owner; cap((j.st > 0 ? 'Job done: ' : 'Job broken: ') + d.s, j.st > 0 ? 'good' : 'bad', (who === viewSeat() ? 'Your job' : pname(who) + '\'s job') + (j.st < 0 ? ' - the crew must dive again.' : ' - one step closer.')); } catch (e) { } await wait(1300); if (tok !== UI.seq) return; }
     } else {
-      render(); flyJobs(flights); await wait(pls.length ? 420 : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
+      render(); flyJobs(flights); await wait(pls.length ? (pls.some(p => p.s !== viewSeat()) ? 900 : 420) : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
       if (jb.length) { for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
     }
   } catch (e) { console.error(e); UI.fz = null; }
-  UI.busy = false; UI.fz = null; UI.holdJobs = null;
+  UI.busy = false; UI.fz = null; UI.holdJobs = null; UI.fastT = false; cap('');
   try { render(); } catch (e) { console.error(e); }
   if (G && G.phase === 'over') { schedule(); drainQ(); return; }
   schedule(); drainQ(); if (NET.on && isHost()) netPush(true);
