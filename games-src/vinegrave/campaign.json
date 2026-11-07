@@ -131,7 +131,9 @@
     "cast": "tamsin",
     "personality": "Eager, grabs whatever is closest.",
     "aiLevel": "easy",
-    "aiStyle": "greedy"
+    "aiStyle": "greedy",
+    "praise": "Fine. You read the coast better than me. Next time the ruin is mine.",
+    "taunt": "Ha! Beat you to the shore. Pell says try again, and so do I."
    },
    "setup": {
     "players": 2
@@ -206,7 +208,9 @@
     "cast": "tamsin",
     "personality": "Loves discovering new ruins.",
     "aiLevel": "easy",
-    "aiStyle": "explorer"
+    "aiStyle": "explorer",
+    "praise": "You went under the roots and came back richer. Annoying.",
+    "taunt": "The roots kept you busy and I kept the idols. Again?"
    },
    "setup": {
     "players": 2
@@ -356,7 +360,9 @@
     "cast": "okoro",
     "personality": "Methodical, climbs the research track.",
     "aiLevel": "normal",
-    "aiStyle": "scholar"
+    "aiStyle": "scholar",
+    "praise": "Your notes beat my library. I shall have to read faster.",
+    "taunt": "Theory wins, explorer. Study the track and come back."
    },
    "setup": {
     "players": 2
@@ -431,7 +437,9 @@
     "cast": "mira",
     "personality": "Sharp cartographer, digs far and fast.",
     "aiLevel": "normal",
-    "aiStyle": "explorer"
+    "aiStyle": "explorer",
+    "praise": "Three camps and you held them all. Well played.",
+    "taunt": "I was in every camp before you. Pack faster."
    },
    "setup": {
     "players": 3
@@ -506,7 +514,9 @@
     "cast": "mira",
     "personality": "Never wastes a step.",
     "aiLevel": "normal",
-    "aiStyle": "explorer"
+    "aiStyle": "explorer",
+    "praise": "You walked through the storm like it was drizzle.",
+    "taunt": "The storm sent you home early. I stayed out."
    },
    "setup": {
     "players": 2
@@ -660,7 +670,9 @@
     "cast": "mira",
     "personality": "At her best: fast and precise.",
     "aiLevel": "hard",
-    "aiStyle": "explorer"
+    "aiStyle": "explorer",
+    "praise": "You beat the rains. The highlands are open to you.",
+    "taunt": "The rains caught you. They always catch the slow."
    },
    "setup": {
     "players": 2
@@ -733,7 +745,9 @@
     "cast": "warden",
     "personality": "An ancient stone guardian watches a rival crew.",
     "aiLevel": "hard",
-    "aiStyle": "rival"
+    "aiStyle": "rival",
+    "praise": "The Warden bows. The path to the temple is yours.",
+    "taunt": "The Warden keeps his secrets. Prove you deserve them."
    },
    "setup": {
     "players": 1,

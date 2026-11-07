@@ -40,6 +40,7 @@ GAMES = {
     "thornbound":       ("thornbound/game",      "python3 build.py", "thornbound.html"),
     "tidewake":         ("tidewake/game",        "python3 build.py", "tidewake.html"),
     "twin-thrones":     ("twin-thrones",         "python3 build.py", "twin-thrones.html"),
+    "vale-of-banners":  ("vale-of-banners",      "python3 build.py", "vale-of-banners.html"),
     "wildmark":         ("wildmark",             "python3 build.py", "wildmark.html"),
     "vinegrave":        ("vinegrave",            "python3 build.py", "vinegrave.html"),
 }
@@ -66,6 +67,7 @@ SWEEPS = {
     "thornbound":       ("thornbound/game",     ["sweep.js"]),
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
     "twin-thrones":     ("twin-thrones",        ["rules-test.js"]),
+    "vale-of-banners":  ("vale-of-banners",     ["rules-test.js"]),
     "wildmark":         ("wildmark",            ["rules-test.js"]),
     "vinegrave":        ("vinegrave",           ["rules-test.js"]),
 }

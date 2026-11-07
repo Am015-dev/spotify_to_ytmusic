@@ -189,3 +189,21 @@ body:has(.gxh-bub.on) #line{visibility:hidden}
 .tile .tn{margin-top:16px;max-width:100%}
 @media (min-width:1024px){.tile .tn{margin-top:24px;max-width:100%}}
 @media (max-height:600px) and (max-width:420px){.tile .tn{display:none!important}}
+/* ---- readable turn layer (playable.js): banner, score pops, the guide's reactions; none of it takes a tap ---- */
+.plban{position:fixed;left:50%;top:132px;z-index:60;transform:translate(-50%,-14px) scale(.9);opacity:0;pointer-events:none;background:#fff6dc;color:#4d2616;border:2px solid #b0702a;border-radius:14px;padding:8px 20px;text-align:center;box-shadow:0 6px 18px rgba(60,20,5,.35);max-width:88vw}
+.plban b{display:block;font:800 24px/1.15 var(--ff-h)}.plban small{display:block;font:600 14px/1.25 var(--ff-b,system-ui);margin-top:2px}
+.plban.mine{background:#ffe9a8;border-color:#9a3a14}.plban.rival{background:#e4f4f2;border-color:#1c7c78}
+.plban.on{animation:plban 2.2s ease both}
+@keyframes plban{0%{opacity:0;transform:translate(-50%,-14px) scale(.9)}14%{opacity:1;transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-6px) scale(.98)}}
+.plpop{position:fixed;z-index:61;pointer-events:none;display:flex;gap:6px;align-items:center;max-width:92vw;padding:3px 10px;border-radius:999px;font:700 14px/1.2 var(--ff-b,system-ui);animation:plpop 2.3s ease both;box-shadow:0 3px 10px rgba(60,20,5,.3);white-space:nowrap}
+.plpop b{font-size:18px}.plpop span{overflow:hidden;text-overflow:ellipsis}
+.plpop.up{background:#fff6dc;color:#1f6a2a;border:2px solid #2e8b3c}.plpop.dn{background:#fff6dc;color:#9a2a14;border:2px solid #c9442c}
+@keyframes plpop{0%{opacity:0;transform:translateY(8px) scale(.85)}12%{opacity:1;transform:translateY(0) scale(1.05)}22%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+.plreact{position:fixed;left:50%;top:46px;z-index:2147482000;transform:translate(-50%,-8px);opacity:0;pointer-events:none;display:flex;gap:8px;align-items:center;background:#fff6dc;color:#3b1c0e;border:2px solid #b0702a;border-radius:14px;padding:6px 12px;max-width:92vw;font:600 14px/1.25 var(--ff-b,system-ui);box-shadow:0 5px 14px rgba(60,20,5,.4)}
+.plreact i{font-style:normal;font-size:26px;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9b0,#d9a24a);border:2px solid #8a5a1e;flex:none}
+.plreact.on{opacity:1;transform:translate(-50%,0);transition:opacity .25s,transform .25s}
+.mbox.over .voice{margin:4px 0 8px;text-align:center;font:600 15px/1.35 var(--ff-b,system-ui);color:#4d2616}
+.rules .turn5{background:#fff1cf;border:2px solid #b0702a;border-radius:12px;padding:8px 12px 8px 28px;margin:0 0 12px}.rules .turn5 li{margin:2px 0}
+.gxt-bub .gxh-tt{display:block;font:800 14px/1.2 var(--ff-h);color:#9a3a14;letter-spacing:.2px;margin:0 0 3px}
+/* the shared story-map header squeezed the title to one letter per line on a phone: the title gets its own row */
+.gxc-head{flex-wrap:wrap}.gxc-htitle{order:-1;flex:1 1 100%;font-size:20px}
