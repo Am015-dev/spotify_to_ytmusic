@@ -86,5 +86,6 @@
   window.ppCoachStop = function () { C.on = false; hideCoach() };
   // for qa-bot: running = the coached game is on; explained = rule ids explained so far (or listed on the final card); done = the final card was shown
   Object.defineProperty(window, 'GXCOACH', { configurable: true, get: () => ({ running: !!(C.on && typeof G !== 'undefined' && G && G.tut && !G.winner), explained: Object.keys(C.rules), done: !!C.ended }) });
+  document.addEventListener('keydown', e => { const t = e.target; if ((e.key === 'Enter' || e.key === ' ') && t && t.classList && t.classList.contains('pchip')) { e.preventDefault(); t.click() } });   // player chips are tabs (a div), keyboard works like a button
   window.addEventListener('load', () => setTimeout(dieLabels, 300));
 })();

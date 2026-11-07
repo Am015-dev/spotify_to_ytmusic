@@ -109,7 +109,7 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
    <p class="lede">Giant monsters brawl for Crown City. First to <b>20 ★</b> wins.</p>
    <div class="acts" style="margin:.5rem 0">
-    ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn big'):''}
+    ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn'):''}
     <button class="btn primary big" data-start="solo">▶ Play now (recommended)<small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
     ${typeof campStartBtn==='function'?campStartBtn():''}
     ${typeof tutBtn==='function'&&!tutFirst()?tutBtn('btn'):''}

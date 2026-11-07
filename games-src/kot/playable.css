@@ -42,3 +42,21 @@ html.ph #bline{font-size:15px;white-space:normal;line-height:1.2;max-width:calc(
 #ppcoach .pp-row button{pointer-events:auto;min-height:36px;padding:4px 12px;border-radius:10px;border:2px solid #1a1320;background:#ff7a21;color:#fff;font:900 14px/1 Nunito,sans-serif;cursor:pointer}
 #ppcoach.on{pointer-events:none}
 html.ph .pchip em,html.ph-p header.gx-bar .pchip span em{font-size:13px}
+
+.pchip{cursor:pointer;font-family:Nunito,sans-serif;-webkit-tap-highlight-color:transparent}
+/* title: the tutorial offer is a secondary button, Play now is the one big primary */
+.menu .gxt-menu.tutmini,.dlg .gxt-menu,.dlg [data-gxt-open]{font-size:16px}
+.dlg .gxt-menu.gxt-first{font-size:16px}
+/* contrast: the big orange button carries white text, so the orange is darker (>= 4.5:1) */
+.dlg .btn.primary.big,.dlg [data-start="solo"]{background-color:#a82f05}
+.dlg .btn.primary.big small,.dlg [data-start="solo"] small{color:#fff}
+/* desktop: shared kit text is 16px or more */
+@media (min-width:1024px){.gxc-lab,.gxh-tt,.gxh-tx,.gxc-act b,.gxc-act small,.gx-ibtn,.dlg .small,details.custom summary span,.acts .btn small{font-size:16px}}
+/* audit round 2: title button texts >= 14px with a dark backing, desktop kit text 16px, desktop SVG board text 16px */
+html .dlg .acts .btn span,html .dlg .acts .btn small{font-size:14px}
+html.sk .dlg .acts .btn.primary span,html.sk .dlg .acts .btn.primary small{background:rgba(70,20,0,.72);border-radius:6px;padding:1px 6px;display:inline-block}
+html.sk #pacts .btn.primary .bl,html.sk #pacts .btn .bl{text-shadow:0 0 3px #000,0 1px 2px #000}
+@media (min-width:1024px){
+ html .gxc-lab,html .gxh-tt,html .gxh-tx,html .gx-ibtn,html .gxc-act b,html .gxc-act small{font-size:16px!important}
+ html svg#map text{font-size:16px}
+}
