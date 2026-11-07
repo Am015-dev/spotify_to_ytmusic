@@ -1,0 +1,272 @@
+{
+ "slug": "doorkick-dungeon",
+ "size": "phone",
+ "seed": 38472,
+ "when": "2026-11-07T21:29Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 697
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 0
+ },
+ "fuzz": {
+  "taps": 275
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Dungeon diary\" under div#modal.modal.art-title \"Doorkick Dungeon Kick do\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-title-25.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Dungeon diary\" under div#modal.modal.art-title \"Doorkick Dungeon Kick do\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-quick-board-26.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #697 (Quick game ▴)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 697 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-quick-noresult-28.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 11.0px (<12px) in small.lb x4: \"str\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 8.0px (<12px) in span.dn x2: \"DOOR\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 0.0px (<12px) in small x1: \"Lv\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 7.0px (<12px) in span.cn x1: \"Rummaging Rod\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "text 6.0px (<12px) in span.gold x1: \"1100\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.card.door.t-race \"Elf: +1 to run away. Go \" / button.card.door.t-enh \"Gargantuan: +10 to a mon\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.card.door.t-enh \"Gargantuan: +10 to a mon\" / button.card.door.t-monster \"Litigation Lizards: Neve\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.card.door.t-monster \"Litigation Lizards: Neve\" / button.card.door.t-curse \"Rotten Luck: Lose a leve\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.card.door.t-curse \"Rotten Luck: Lose a leve\" / button.card.tr.t-item \"Brave Bucket:\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.card.tr.t-item \"Brave Bucket:\" / button.card.tr.t-item \"Swashbuckler Shield:\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.card.tr.t-item \"Swashbuckler Shield:\" / button.card.tr.t-oneshot \"Fizzing Doom Potion: +5 \"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-story-map-29.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "tutorial step 20/24 [who] \"Lizards 6, you 2: you lose. Ask a rival to join you. Tap Help.\"",
+   "desc": "STUCK >15 s: wait=tap, hole=null, top at centre=null, watch-pill=true, wrong taps=0",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-tut-stuck-20-30.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "tutorial step 20/24 [who]",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 0 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-story-noresult-36.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Dungeon diary\" under div#modal.modal.art-title \"Doorkick Dungeon Kick do\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-title-37.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Dungeon diary\" under div#modal.modal.art-title \"Doorkick Dungeon Kick do\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-fuzz-screen-38.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.btn.primary.bigb \"Story mode: 10 chapters,\" / button.gxc-node.a2.boss \"Morwen's List\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-fuzz-screen-39.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Dungeon diary\" under div#modal.modal.art-title \"Doorkick Dungeon Kick do\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 11.0px (<12px) in small.lb x4: \"str\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 8.0px (<12px) in span.dn x2: \"DOOR\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 7.0px (<12px) in span.cn x7: \"Litigation Lizards\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 5.0px (<12px) in small x1: \"LV\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 7.9px (<12px) in span.kind x1: \"RACE\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 9.9px (<12px) in span.cx x1: \"-1 to run away. Once per turn,\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 8.0px (<12px) in span.tag x5: \"+2\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "text 6.0px (<12px) in span.gold x5: \"400\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 37px (<40) button.card.door x1: \"Litigation Lizards\n6\nLV\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "tap target 37px (<40) button.card.tr x1: \"Treasure Pile!\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-end",
+   "desc": "overlapping clickables: button.gchip.door \"Elf\" / button.gxt-b \"Story mode\"",
+   "repro": "node games-src/scripts/qa-bot.js doorkick-dungeon --size phone --seed 38472 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/doorkick-dungeon/phone-screen-tutorial-end-2.png"
+  }
+ ],
+ "secs": 41
+}

@@ -1,0 +1,222 @@
+{
+ "slug": "shipwreck-isle",
+ "size": "phone",
+ "seed": 87329,
+ "when": "2026-11-07T21:30Z",
+ "tutorial": {
+  "end": null,
+  "note": "no tutorial"
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 149
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 92
+ },
+ "fuzz": {
+  "taps": 138
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#modal \"Shipwreck Isle Survive t\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-title-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 20px (<40) span x1: \"Day 1 of 12 begins\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 20px (<40) span x1: \"Carpenter still has a pa\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.btn \"Castaways, skills and it\" / button.gx-ibtn \"Zoom in on the island\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #149 (Start day ▶)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 149 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-quick-noresult-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#modal \"Shipwreck Isle Survive t\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 20px (<40) span x1: \"Survive until rescue com\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 20px (<40) span x1: \"Carpenter still has a pa\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn \"Castaways, skills and it\" / button.gx-ibtn \"Zoom in on the island\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #92 (Start day ▶)",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 92 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-story-noresult-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#modal \"Shipwreck Isle Survive t\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-title-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.5px (<12px) in div.rk x1: \"RECOMMENDED JOB\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.btn.go \"✔ Give Carpenter this jo\" / button.btn",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pw.on \"1. Carpenter …\" / button.btn.ghost \"◀ Back\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pw \"2. Carpenter …\" / button.btn.ghost \"✨ Plan for me\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pw \"3. Cook …\" / button.btn.go.dim \"Next: check ▶\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#modal \"Shipwreck Isle Survive t\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pw.on \"1. Carpenter …\" / summary \"🌐 Play online with frie\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pw \"2. Carpenter …\" / summary \"🌐 Play online with frie\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pw \"3. Cook …\" / summary \"🌐 Play online with frie\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 20px (<40) span x1: \"Ada on the Rock\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #134",
+   "desc": "HTTP 404: /shipwreck-isle/art/item-bible.webp",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz tap #134",
+   "desc": "console.error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases fuzz"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#modal \"Shipwreck Isle Survive t\"",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "no tutorial entry on the title screen (no learn/guided/tutorial button): game has no staged tutorial",
+   "repro": "node games-src/scripts/qa-bot.js shipwreck-isle --size phone --seed 87329 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/shipwreck-isle/phone-tut-noentry-2.png"
+  }
+ ],
+ "secs": 26
+}
