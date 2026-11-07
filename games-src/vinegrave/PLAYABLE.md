@@ -53,6 +53,16 @@ Toasts now sit above the dock, so they never cover the instruction line.
 
 - Free CC0 art kit (orchestrator, 21:37): merged and installed (170 pictures), and every gate re-run with it. Desktop card pictures show in full, with the effect line under the picture instead of over it. The kit's Boot, Jeep, Plane, arrowhead and jewel icons are the same blank hexagon, less clear than the code-drawn shapes, so those 5 slots keep the code glyph (WEAK_ART in src/ui1.js; delete an entry when real art arrives). Phone cards still hide the card picture: it would be about 50x14 px there. The name is clearer, and a tap shows the big card with its picture. Solid backings were added behind the track numbers, site names and row labels that now sit over art.
 
+## Phone layout redo (owner bug report 21:53: "tiny everything, very badly organised")
+Before: map, market row, research track, hand and dock all on one 390x763 screen. Market cards were 58 px wide with icon-only effects, the track was a 56 px strip, and hand cards were 66 px (shot: playable-shots/layout-before-phone.webp).
+After (playable-shots/layout-after-{map,row,track}-phone.webp):
+- ONE big area at a time behind three 44 px tabs: **Map** (the default: sites fill the width, row labels on solid backing), **Market** (6 cards in a 3x2 grid, each about 120 px wide with name, picture and the plain effect in words), **Research** (full-width track with each row's cost and a one-line "how it works").
+  A gold dot marks a tab that holds something you can do now.
+- Your hand is a bottom tray: each card is 31% of the screen wide (more than 30%), showing its name, picture and plain effect. Swipe for the rest; tap a card for the big view.
+- Rival turns open the tab their move happens in (e.g. Market when Tamsin buys), then go back to the Map when your turn starts. Each tutorial step opens the tab its target is in.
+- Phone base text 14 px (cards, labels, chips); tabs, explorer chips, Pass and tags are at least 44 px tall. The instruction stays at most 2 lines.
+- Gate: build-all --quick PASS (the scenarios now open the Market / Research tab before checking). Tutorial-to-end PASS at 390x763 and 1440x860 (17 steps). Quick game by UI taps PASS at 390x763 (the tapper also uses the tabs). Smoke PASS. qa-bot phone: 0 blockers, 1 major, 27 minors (before: 0 / 0 / 48). The one major is "stuck overlay without any button: div#iscrim" in the fuzz phase on tutorial step 2 (screenshot: big card open, "Play it" spotlit and tappable, Skip tutorial visible). qa-bot's own report filter (STALE in qa-bot.js) drops stuck-overlay findings on a scrim as a bot artefact; it is not a soft lock.
+
 ## Remaining
 - Phone market cards still show effects as icons (no room for a sentence at 58 px); the name is readable and a tap opens the full text.
 - The vp badge on a phone market card can touch the cost icon on 4-coin cards.
