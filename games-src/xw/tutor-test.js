@@ -6,7 +6,7 @@
 // the kit; a wrong tap (outside the spotlight) does not advance and shakes the bubble; the right action advances; nothing stuck for 8 s; no page errors.
 // At the end: the "You know the rules" card, a real game from it, the menu shows "Tutorial ✓", the progress is remembered, nothing saved. Screenshots (390x763):
 // playtest/tutor-start.png, tutor-dice.png, tutor-stress.png, tutor-end.png.
-const PW=require('/opt/node22/lib/node_modules/playwright');
+const PW=(()=>{try{return require('/opt/node22/lib/node_modules/playwright')}catch(e){return require('../node_modules/playwright')}})();
 const fs=require('fs'),path=require('path');
 const FILE=path.resolve(process.env.FILE||path.join(__dirname,'nebula.html'));
 const URL_BASE=process.env.URL||('file://'+FILE);
@@ -153,6 +153,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   const fin=await state();
   if(!fin.active||fin.phase!=='end')note(tag,'the tutorial did not reach the end card ('+JSON.stringify({a:fin.active,ph:fin.phase,i:fin.i,id:fin.id})+') seen '+seenIds.join(','));
   else if(seenIds.length<22)note(tag,'only '+seenIds.length+' steps seen');
+  if(fin.active&&fin.phase==='end'){const want=await p.evaluate(()=>LORE.chapters.flatMap(c=>c.steps));const miss=want.filter(i=>!seenIds.includes(i));if(miss.length)note(tag,'coverage steps never shown: '+miss.join(','))}
   if(fin.active&&fin.phase==='end'&&mode==='story'){
     await sleep(300);
     const e=await p.evaluate(()=>{const c=document.querySelector('.gxt-end');return c&&[...c.querySelectorAll('[data-gxt-end]')].map(b=>({t:b.textContent,k:b.dataset.gxtEnd,r:(()=>{const q=b.getBoundingClientRect();return [q.left,q.top,q.right,q.bottom]})()}))});
@@ -202,9 +203,9 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   await ctx.close()}
 const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(once.has(k))return false;once.add(k);return true};
 
-(async()=>{const b=await PW.chromium.launch({args:ARGS});
+(async()=>{const b=await PW.chromium.launch({args:ARGS,executablePath:process.env.CHROME||undefined});
   const jobs=[];for(const [W,H] of SIZES){jobs.push([W,H,'clean']);}
-  jobs.push([1280,800,'desk']);const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);jobs.push([W0,H0,'offer']);
+  jobs.push((process.env.DESK||'1440x860').split('x').map(Number).concat('desk'));const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);jobs.push([W0,H0,'offer']);
   const only=process.env.ONLY;
   for(const j of jobs){if(only&&!only.split(',').includes(j[2]))continue;guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();

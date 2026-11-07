@@ -74,7 +74,7 @@ const tutPlan=()=>!!(G&&BF.on&&G.phase==='plan'&&planSide()>=0&&!UI.hold&&tutIdl
 const tutMyTurn=ph=>!!(G&&BF.on&&G.phase===ph&&G.cur==='s1'&&humanTurn()&&tutIdle());
 const tutHoldRes=who=>!!(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&UI.hold.R[who]==='s1');
 const tutIx=n=>{const s=ship('s1');return s?dialIx(s,TUT_ME[n]):-1};
-function tutSteps(){return [
+function tutSteps(){return tutStory([
  // ---- round 1: goal, plan, reveal, order, action, shot, dice, damage
  {id:'goal',title:'Your goal',say:'Destroy the enemy ship. Yours is at the bottom, theirs at the top.',target:shipRect('s2'),also:shipRect('s1'),wait:null,ready:()=>tutPlan()&&G.round===1},
  {id:'ship',title:'Plan in secret',say:'Everyone picks a move in secret first. Tap your ship to see its moves.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
@@ -104,7 +104,9 @@ function tutSteps(){return [
      return !!(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'&&G.atk.pre&&hv('#bfbtns [data-bfq=ok]'))}},
  {id:'roll2',title:'Roll and finish',say:'Better dice. Tap Roll to see if Slate survives.',target:tq('#bfbtns [data-act=amod][data-k=done]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='done'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&G.atk.rr&&G.atk.rr.some(Boolean)&&hv('#bfbtns [data-act=amod][data-k=done]'))},
  {id:'win',title:'Victory',say:'No enemy ships left. The battle ends when every ship on one side is destroyed. You won!',target:tq('#bftop'),wait:null,ready:()=>!!(G&&G.winner&&BF.on&&!UI.stats&&hv('#bftop')&&tutIdle())}
-]}
+])}
+// story voice: every step's words come from lore.js (a warm line with a reason, then the action)
+function tutStory(steps){for(const st of steps){const L=LORE.tut[st.id];if(!L)continue;st.title=L.t;st.say=L.f?()=>{try{const s=ship('s1'),w=weaponsFor(s)[0],t=w.targets[0],sd=shotDice(s,w,t,ship(t.id));return L.f(t.rg,sd.atk,sd.def)}catch(e){return L.s}}:L.s}return steps}
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
 // the games call this from their input handlers BEFORE applying the tap; false = not what the step asks
@@ -115,7 +117,7 @@ function storyOpen(){if(typeof GXC==='undefined')return;
 function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   tutClearOffer();
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:o?'Plan, fly, act, shoot, defend. Now the Story begins.':'Plan, fly, act, shoot, defend. Shields, hull, stress and locks come with you.',
+    endTitle:LORE.tutEnd.title,endText:o?LORE.tutEnd.textStory:LORE.tutEnd.text,
     endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:()=>{try{GX.close()}catch(e){}try{toggleMenu(false)}catch(e){}try{GXC.close()}catch(e){}try{GXH.hide()}catch(e){}tutStage()},
     onDone:r=>{tutLeave();const c=r&&r.choice;lsPlayed();

@@ -123,3 +123,10 @@ html.bf #tags .tag .tgl{display:none}
 #bftop,#bfhint{pointer-events:auto}
 #bffing{font-size:0}#bffing::before{content:"👆";font-size:38px}
 #tags .tag{pointer-events:auto}
+
+/* tutorial speaker portrait (code-drawn disc, art when media/ has it) */
+.gxt-bub .gxh-bd::before{content:"";flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:2px solid #7a2236;background:#3a6ea5 url(media/camp-brecken.webp) center/cover no-repeat}
+.gxt-bub.na-slate .gxh-bd::before{border-color:#b0413e;background-color:#7d8590;background-image:url(media/camp-drill.webp)}
+#bfban span+span{font-size:14px;opacity:.9}
+
+.dlg.rules .turn5{background:rgba(255,200,107,.1);border:1px solid #ffc86b;border-radius:12px;padding:6px 14px 8px;margin-bottom:10px}.dlg.rules .turn5 h3{margin:4px 0}.dlg.rules .turn5 ol{margin:0;padding-left:20px;font-size:15px;line-height:1.35}
