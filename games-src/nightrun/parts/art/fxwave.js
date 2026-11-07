@@ -17,8 +17,12 @@ FXW.pic=k=>{try{const n=FXW.name(k);return ART.rd&&ART.rd.has(n+'.webp')&&ART.bm
 FXW.add=(k,x,y,w,rot,al,solid)=>{if(!FXW.pic(k))return false;const o=ART.sp(FXW.name(k),w);if(!o)return false;
   ctx.save();if(!solid)ctx.globalCompositeOperation='lighter';ART.put(o,x,y,rot,al);ctx.restore();return true;};
 /* player shots: b.wid (set in g.js WP.mod) names the weapon. Called inside the additive bullet loop of render(). */
+/* W356: the weapon's looping beam sheet (wpn-<id>/beam: arc, laser, orbit, storm, wave, well) is the shot picture when decoded; false = the caller draws the still. One owner, called by FXW.bullet (hud/c.js) and Pure.shots (render/pure.js). w = world width, ang = shot angle */
+FXW.beam=(b,w,ang)=>{const bk=RET.sprites&&b.wid&&'wpn-'+b.wid+'/beam',m=bk&&ART.ANIM.s[bk];if(!m||!ART.anim(bk))return false;
+  ctx.save();ctx.translate(b.x,b.y);ctx.rotate(ang);const ok=ART.drawAnim(ctx,bk,G.t+(b.x%97)*.01,0,0,w*1.4/m[2],false,.9);ctx.restore();if(ok)FXW.stat.bullet++;return ok;};
 FXW.bullet=b=>{if(!b.wid)return false;const k='w-'+b.wid+'-bullet';if(!FXW.pic(k))return false;
   const L=b.len||(b.big?22:b.pn!=null?28:20),w=Math.max(22,Math.min(130,L*1.4+(b.th||3)*2)),ang=((b.vx||b.vy)?Math.atan2(b.vy,b.vx):0)+(FXW.SPIN[b.wid]?G.t*9:0);
+  if(FXW.beam(b,w,ang))return true;
   const o=ART.sp(FXW.name(k),w);if(!o)return false;const solid=FXW.SOLID[b.wid];
   if(solid)ctx.globalCompositeOperation='source-over';ART.put(o,b.x+(FXW.SPIN[b.wid]?0:Math.cos(ang)*w*.25),b.y+(FXW.SPIN[b.wid]?0:Math.sin(ang)*w*.25),ang,.85);if(solid)ctx.globalCompositeOperation='lighter';
   FXW.stat.bullet++;return true;};
