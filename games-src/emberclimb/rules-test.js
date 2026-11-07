@@ -34,7 +34,7 @@ let a = G.hs[0]; ok(a.orbs.length === 1 && a.orbs[0].k === 'L', 'spark core: sta
 a.hand = [E.mk('a-zap'), E.mk('a-zap'), E.mk('a-zap'), E.mk('a-zap')]; a.en = 9; for (let i = 0; i < 4; i++) E.performMove({ t: 'play', h: 0, c: 0 });
 ok(a.orbs.length === 3, 'only 3 orb slots: the oldest orb is evoked when full');
 E.newGame({ heroes: ['m'], seed: 6 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G(); const m = G.hs[0];
-ok(m.stance === 'c', 'prayer beads: start in calm'); m.hand = [E.mk('m-eruption')]; m.en = 3; const en0 = m.en;
+ok(m.stance === 'c', 'prayer beads: start in calm'); ok(m.hand.some(c => c.id === 'calm-spark'), 'prayer beads: a Calm Spark starts in hand'); m.hand = [E.mk('m-eruption')]; m.en = 3; const en0 = m.en;
 E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(m.stance === 'w' && m.en === en0 - 2 + 2, 'leaving calm gives 2 energy, eruption enters wrath');
 m.hand = [E.mk('m-strike')]; m.en = 1; const ee = G.b.en[0]; ee.hp = ee.mhp = 99; ee.blk = 0; ee.st = {}; E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(99 - ee.hp === 12, 'wrath doubles damage dealt');
 // co-op rotation

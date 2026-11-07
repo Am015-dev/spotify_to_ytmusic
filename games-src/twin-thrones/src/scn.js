@@ -3,7 +3,7 @@
   if (!window.GXS) return;
   var booted = function () { return typeof TT_TEST !== 'undefined' && TT_TEST.newGame && TT_TEST.E; };
   var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
-  function begin(seed, steps) { window.AIDELAY = 0; TT_TEST.newGame('cpu', seed); TT_TEST.toPlay(steps || 0); }
+  function begin(seed, steps) { window.AIDELAY = 0; TT_TEST.newGame('cpu', seed); TT_TEST.toPlay(steps || 0); var t = document.getElementById('toast'); if (t) t.style.display = 'none'; }
   GXS.boardOpen = function () { if (booted()) begin(5, 0); };
   GXS.add({
     id: 'tt-board', name: 'Duel: the pyramid', ask: 'Can you see which cards you can take?', seed: 5, when: booted,

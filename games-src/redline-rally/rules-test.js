@@ -15,7 +15,7 @@ function playAll(o){ var G=newGame(o), guard=0, bad=[];
 }`);
 let stuck = 0, bad = [], rounds = [], wins = {}, spins = 0, heat = 0, slips = 0, boosts = 0, n = 0;
 for (let i = 0; i < games; i++) {
-  const o = { track: i % 2 ? 'hairpin' : 'sunline', laps: 1 + (i % 3), n: 2 + (i % 5), humans: 0, seed: i + 1, diff: ['easy', 'normal', 'hard'][i % 3] };
+  const o = { track: i % 2 ? 'hairpin' : 'sunline', laps: 1 + (i % 3), n: 2 + (i % 5), humans: 0, seed: i + 1, diff: ['easy', 'normal', 'hard'][i % 3], upg: i % 3 !== 0 };
   ctx.__o = o; const r = run('playAll(__o)');
   if (r.stuck) stuck++; if (r.bad.length) bad.push(r.bad[0]);
   const G = r.G; rounds.push(G.round); n++;

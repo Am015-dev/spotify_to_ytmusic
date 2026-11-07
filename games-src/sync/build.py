@@ -22,6 +22,9 @@ LIST = [('crown','Crown City Smash','crown-city-smash/index.html','covers/crown.
  ('lantern','Lantern Dive (preview)','lantern-dive/index.html','covers/lantern.jpg'),
  ('cauldron','Cauldron Fair (preview)','cauldron-fair/index.html','covers/cauldron.jpg'),
  ('approach','Final Approach (preview)','final-approach/index.html','covers/approach.jpg'),
+ ('redline','Redline Rally','redline-rally/index.html','covers/redline-rally.jpg'),
+ ('emberclimb','Emberclimb','emberclimb/index.html','covers/emberclimb.jpg'),
+ ('thrones','Twin Thrones','twin-thrones/index.html','covers/twin-thrones.jpg'),
  ('mainhattan','Mainhattan Nightrun','mainhattan-nightrun/index.html','covers/nightrun.jpg'),
  ('overdrive','Mainhattan Overdrive','mainhattan-overdrive/index.html','covers/overdrive.jpg')]
 games = []
