@@ -52,7 +52,14 @@ const tutMp=p=>()=>Object.values(UI.mp).find(e=>e.isConnected&&e.style.getProper
 const tutP=(n,st)=>!!G&&G.turn===n&&myTurn(st);
 const tutAfter=(n,pts)=>!!G&&G.turn===n&&G.step==='place'&&G.cur.p===1&&P(0).score===pts;
 // ---------------------------------------------------------------- the steps
-function tutSteps(){
+function tutSteps(){return tutStory(tutSteps0())}
+function tutStory(L){tutStyle();return L.map(st=>{const t=STORY.tut[st.id];if(t){st.title=t.title;if(t.say!=null)st.say=t.say}return st})}
+function tutStyle(){if(document.getElementById('tutcast'))return;const o=[];let lastCh=0;
+  for(const id in STORY.tut){const t=STORY.tut[id],c=STORY[t.who];const sel=`.gxt-bub[data-step="${id}"]`;
+    o.push(`${sel} .gxh-bd::before{background-image:url(${c.img});border-color:${c.col}}`);
+    if(t.ch!==lastCh){lastCh=t.ch;o.push(`${sel} .gxh-tt::before{content:"CHAPTER ${t.ch}: ${STORY.chapters[t.ch].toUpperCase()}"}`)}}
+  const e=document.createElement('style');e.id='tutcast';e.textContent=o.join('\n');document.head.appendChild(e)}
+function tutSteps0(){
   const placeW=n=>({type:'tap',match:a=>a.what==='place'&&a.x===tutT(n)[1]&&a.y===tutT(n)[2]});
   const figW=n=>({type:'tap',match:a=>a.what==='fig'&&a.k==='f'&&a.l===tutSegOf(n)});
   const hold=()=>{UI.tutHold=true},release=()=>{UI.tutHold=false;schedAI()};
@@ -82,25 +89,23 @@ function tutSteps(){
  {id:'priory_done',title:'Priory scored',say:'Eight tiles around it: 9 points! Your follower comes home.',target:tutCellsFn(RING),wait:null,onEnter:()=>{UI.user=false;refit(true)},ready:()=>!!G&&G.over&&P(0).sc.priory===9},
  {id:'final',title:'Final scoring',say:'Valley full! Your farmer scores 3 for the finished town. Unfinished roads and towns score 1 per tile.',target:tutCellsFn(['-2,-1']),also:tutCellsFn(['0,-1']),wait:null,
    onEnter:()=>tutFinalPops(),ready:()=>!!G&&G.over},
- {id:'winner',title:'Most points wins',say:()=>'You win '+P(0).score+' to '+P(1).score+'! Real games have more tiles, and more rivals if you like.',target:()=>document.querySelector('#seats'),wait:null,ready:()=>!!G&&G.over}
+ {id:'winner',title:'Most points wins',say:()=>'You win '+P(0).score+' to '+P(1).score+'! The deeds of Vinemoor go to Garnet, and Hob wants a rematch.',target:()=>UI.tl['0,0'],wait:null,ready:()=>!!G&&G.over}
   ]}
 // ---------------------------------------------------------------- start, leave
 function tutSetup(){try{GXC.close()}catch(e){}closeMenu();UI.camp=null;UI.tut=true;UI.tutHold=false;UI.tutAuto=0;
-  beginGame({np:2,seats:['human','ai'],lv:['normal','normal'],ex:{},seed:7,stack:TUT_TURNS.map(t=>t[0])})}
+  beginGame({np:2,seats:['human','ai'],lv:['normal','normal'],ex:{},seed:7,stack:TUT_TURNS.map(t=>t[0])});if(G&&G.pl[1]){G.pl[1].nm=STORY.rival.name;render()}}
 // leave the staged game: nothing of it was saved, and the board goes quiet behind the menu
 function tutLeave(){UI.tut=false;UI.tutHold=false;UI.tutAuto=0;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;UI.endShown=false;G=null;UI.lastOpts=null;
   try{resetUI()}catch(e){}for(const e of document.querySelectorAll('#world .glow'))e.remove();try{GXH.hide()}catch(e){}UI.lastOpts=setupOpts();const g=$('#ghost');if(g)g.remove()}
-function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
-  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),setup:tutSetup,
-    endTitle:'You know the rules',
-    endText:pro?'Tiles, followers, roads, towns, priories, farmers. Now the story begins.':'Tiles, followers, roads, towns, priories, farmers. The lightbulb explains River, Taverns and Merchants.',
-    endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
-    onDone:r=>{const c=r&&r.choice;tutLeave();
-      if(c==='chapter'&&first)GXC.play(first.id);else if(c==='story')campOpen();else showStart()},
-    onExit:()=>{tutLeave();showStart()}})}
+// the tutorial is the coached first game (coach.js); the forced-step GXT version is retired
+function tutStart(o){coachStart(o)}
 // Story starts with the tutorial (Chapter 0) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
+  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))prologueCard();else GXC.open()}
+// the story starts with a short scene, then the coached first game as the prologue (skippable)
+function prologueCard(){const g=STORY.guide;
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Prologue"><h2>${esc(STORY.prologue.title)}</h2><div class="cwalk"><img class="cpic" src="${g.img}" alt=""><div><b>${esc(g.name)}</b><p>${esc(STORY.prologue.text)}</p></div></div><button class="btn big" data-a="pgo">Play the prologue</button><button class="btn alt" data-a="pskip">Skip to the map</button></div></div>`;
+  const m=$('#modal');m.querySelector('[data-a=pgo]').onclick=()=>tutStart({prologue:true});m.querySelector('[data-a=pskip]').onclick=()=>{m.innerHTML='';GXC.open()}}
 // first-time players who tap Play are offered the tutorial once
 function tutOffer(){return !UI.offered&&tutFirst()}
 function showOffer(){UI.offered=true;
