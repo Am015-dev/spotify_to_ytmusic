@@ -28,7 +28,7 @@
       { kind: 'tap', sel: '.picks .card', name: 'pick a card', state: function () { return G().hs[0].deck.length; }, expect: function (b, a) { return a === b + 1; } }] });
   GXS.add({ id: 'ec-shop', name: 'Shop: buy something', ask: 'Can you buy an item?', seed: 8, when: booted,
     setup: function () { begin(['m'], 8); E().debug.shop(); UI.render(); },
-    checks: [{ kind: 'visible', sel: '.items .item', name: 'shop item' }, { kind: 'tap', sel: '.items .item:not(.sold)', name: 'buy an item', state: function () { return G().gold; }, expect: function (b, a) { return a < b; } }] });
+    checks: [{ kind: 'visible', sel: '.items .item', name: 'shop item' }, { kind: 'play', name: 'buy an item (tap, then Buy)', snap: function () { return { gold: G().gold }; }, steps: [{ sel: '.items .item:not(.sold)', until: function () { return !!document.querySelector('#buy'); }, max: 1 }, { sel: '#buy', after: 400 }], idle: function () { return true; }, verify: function (b, a) { return a.gold < b.gold || 'gold did not drop'; } }] });
   GXS.add({ id: 'ec-rest', name: 'Campfire: heal or smith', ask: 'Rest or upgrade', seed: 9, when: booted,
     setup: function () { begin(['w'], 9); E().debug.rest(); UI.render(); },
     checks: [{ kind: 'visible', sel: '#rest-heal', name: 'Rest button' }, { kind: 'tap', sel: '#rest-heal', name: 'rest', state: function () { return G().hs[0].hp; }, expect: function (b, a) { return a > b; } }] });

@@ -72,12 +72,36 @@ class Out:
     def say(s, lvl, slug, name, msg):
         print(f'{lvl:5} {slug}/{name}: {msg}'); s.lines.append((lvl, slug, name, msg))
 
+_PATH_SAID = []
+def say_path(text):
+    """One line per run saying which keying path ran (scipy cutout.py or the PIL near-white fallback)."""
+    if not _PATH_SAID: _PATH_SAID.append(text); print(f'  keying path: {text}')
+
+def scipy_ok():
+    try: import scipy.ndimage; return True
+    except Exception: return False
+
+def assets_json_stems(slug):
+    """Stems in games-src/<slug>/assets.json: the game's own art loader reads media/<stem>.webp for each, so they count as wired."""
+    p = f'games-src/{slug}/assets.json'
+    if not os.path.exists(p): return set()
+    try: return {i['stem'] for i in json.load(open(p, encoding='utf-8')).get('items', []) if i.get('stem')}
+    except (OSError, ValueError, KeyError, TypeError): return set()
+
+def white_key(im):
+    """PIL-only fallback for a flat near-white background (no scipy): min channel >= 250 -> transparent, <= 222 opaque, linear between."""
+    rgb = np.array(im.convert('RGB'))
+    a = np.clip((250 - rgb.min(axis=2).astype(np.int16)) / 28.0, 0, 1) * 255
+    return Image.fromarray(np.dstack([rgb, a.astype(np.uint8)]))
+
 def key_image(im, why):
-    """Flat background -> transparent through cutout.py. Returns (RGBA, note) or (im, note) when it cannot."""
+    """Flat background -> transparent through cutout.py (scipy). Without scipy: PIL near-white key. Returns (RGBA, note)."""
     try:
         co = load_mod('cutout', 'cutout.py')
     except Exception as e:                      # scipy/numpy missing
-        return im, f'cannot key ({type(e).__name__}); pip install scipy'
+        say_path('PIL near-white threshold (scipy not installed: pip install scipy for the full key)')
+        return white_key(im), f'keyed near-white, PIL fallback ({type(e).__name__})'
+    say_path('scipy cutout.py (full key)')
     out, info = co.matte(im.convert('RGB'), key='auto')
     return out, f"keyed {info['kind']} background"
 
@@ -152,6 +176,15 @@ def main():
             for fp, it, f in items: out.say('PASS', slug, f, f'(check) pose of {ch}: would be cut out into {dest}/{it["stem"]}.webp')
             continue
         os.makedirs(dest, exist_ok=True)
+        if not scipy_ok():                      # no scipy: each pose keyed alone with the PIL fallback (no shared feet line)
+            say_path('PIL near-white threshold (scipy not installed: pose sets are not aligned to one feet line)')
+            for fp, it, f in items:
+                im = Image.open(fp); im.load(); im = white_key(im.convert('RGBA'))
+                fit_save(im, it, dims(it, *im.size) or (512, 512), os.path.join(dest, it['stem'] + '.webp'), False, True)
+                move_done(fp); st = out.stat[slug]; st['warn'] += 1
+                out.say('WARN', slug, f, f'-> {dest}/{it["stem"]}.webp [pose of {ch}, PIL key, feet line not shared]')
+                if it['stem'] not in st['names']: st['names'].append(it['stem'])
+            continue
         # cutout.py names the output after the input file, so stage copies under the published names
         stage = os.path.join(INBOX, slug, '.stage-' + ch); os.makedirs(stage, exist_ok=True)
         for fp, it, f in items: shutil.copy(fp, os.path.join(stage, it['stem'] + os.path.splitext(fp)[1].lower()))
@@ -240,10 +273,12 @@ def summary(out, a):
         ir = load_mod('inbox_report', 'inbox-report.py')
     for slug, st in sorted(out.stat.items()):
         wired, need, n3d = [], [], 0
+        own = assets_json_stems(slug)
         for n in st['names']:
             it = next((x for x in ir.MAN if x['slug'] == slug and x['stem'] == n), None) if not a.no_wiring else None
             if it and it['kind'] == 'model3d': n3d += 1; continue
             c = ir.classify(it) if it else None
+            if n in own: c = 'auto'      # listed in games-src/<slug>/assets.json: the game's art loader reads media/<stem>.webp for it
             if c is None and it is None and not a.no_wiring:    # nightrun-manifest-only names: its placeholder pipeline loads them
                 c = 'auto' if slug == 'mainhattan-nightrun' else 'wiring'
             (wired if c == 'auto' else need).append(n)

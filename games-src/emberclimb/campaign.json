@@ -1,0 +1,786 @@
+{
+ "game": "emberclimb",
+ "title": "The Ember Tower",
+ "version": 1,
+ "cast": {
+  "guide": {
+   "name": "Warden Ashgrove",
+   "emoji": "\ud83d\udd25",
+   "color": "#c8472b"
+  },
+  "rival": {
+   "name": "The Gatekeeper",
+   "emoji": "\ud83d\udeaa",
+   "color": "#7a6a5a"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "The Mire Road",
+   "blurb": "Learn to read intents, block and build a deck."
+  },
+  {
+   "act": 2,
+   "title": "The Ash Stair",
+   "blurb": "Longer climbs and sturdier foes."
+  },
+  {
+   "act": 3,
+   "title": "The Cinder Gate",
+   "blurb": "Everything you know, against the strongest guardians."
+  }
+ ],
+ "twists": [
+  {
+   "id": "start-relic",
+   "where": "setup",
+   "how": "the hero starts with the relic named in param (a passive relic id)"
+  },
+  {
+   "id": "tough-foes",
+   "where": "setup",
+   "how": "every enemy has param percent of its normal HP"
+  },
+  {
+   "id": "short-climb",
+   "where": "setup",
+   "how": "the map has param floors before the boss"
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "First Ember",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Welcome, climber. I will show you the tower one move at a time."
+    },
+    {
+     "who": "guide",
+     "text": "Read what the enemy plans, block or strike, then pick a reward."
+    },
+    {
+     "who": "guide",
+     "text": "Ready? Tap the glowing thing."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "You read the intents. That is the whole art. Onward."
+    }
+   ],
+   "hints": true,
+   "opponent": {
+    "name": "Gnawer",
+    "emoji": "\ud83d\udc00",
+    "cast": "guide",
+    "personality": "A small rat. It only bites.",
+    "aiLevel": "easy",
+    "aiStyle": "plain"
+   },
+   "setup": {
+    "tutorial": true
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": null,
+    "text": "Finish the guided first fight."
+   },
+   "stars": [
+    {
+     "text": "Finish the guide",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Take no damage",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 100
+     }
+    },
+    {
+     "text": "Skip nothing",
+     "test": {
+      "k": "won"
+     }
+    }
+   ],
+   "unlock": [],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The guide repeats more slowly."
+   }
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "Mire Road",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Garrick takes the Mire Road. Beat the Iron Warden at the end of a short climb."
+    },
+    {
+     "who": "guide",
+     "text": "Every card you play costs energy, so spend all three."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "The warden falls. Take a moment, then climb again."
+    }
+   ],
+   "hints": true,
+   "opponent": {
+    "name": "Iron Warden",
+    "emoji": "\ud83d\udc79",
+    "cast": "guide",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "easy",
+    "aiStyle": "intents"
+   },
+   "setup": {
+    "heroes": [
+     "w"
+    ],
+    "floors": 2,
+    "boss": "iron-warden",
+    "relic": "iron-bangle"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Iron Warden with Garrick."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "Thorn Gate",
+   "boss": true,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Sable's blades are quick but thin. Poison does the work for you."
+    },
+    {
+     "who": "guide",
+     "text": "Pick rewards that fit your hero's trick."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "The brute is down. Act one is yours."
+    }
+   ],
+   "hints": true,
+   "opponent": {
+    "name": "Thorn Brute",
+    "emoji": "\ud83d\udc80",
+    "cast": "rival",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "easy",
+    "aiStyle": "intents",
+    "taunt": "You will not pass.",
+    "praise": "Well climbed."
+   },
+   "setup": {
+    "heroes": [
+     "s"
+    ],
+    "floors": 3,
+    "boss": "thorn-brute",
+    "relic": "bag-of-marbles"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Thorn Brute with Sable."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c4",
+   "act": 2,
+   "title": "Ash Stair",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Cog-9 channels orbs. Fill the row and the oldest one fires."
+    },
+    {
+     "who": "guide",
+     "text": "Watch the block you gain, it vanishes each turn."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "Orbs and iron, well played."
+    }
+   ],
+   "hints": false,
+   "opponent": {
+    "name": "Sleeper Statue",
+    "emoji": "\ud83d\udc79",
+    "cast": "guide",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "normal",
+    "aiStyle": "intents"
+   },
+   "setup": {
+    "heroes": [
+     "a"
+    ],
+    "floors": 4,
+    "boss": "sleeper-statue",
+    "relic": "candle-stub"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Sleeper Statue with Cog-9."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c5",
+   "act": 2,
+   "title": "Quiet Hall",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Ione's stances change everything. Wrath hits twice as hard and costs you twice as much."
+    },
+    {
+     "who": "guide",
+     "text": "Leave Wrath with a Calm card before the enemy swings."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "Calm and Wrath in balance. The stair opens."
+    }
+   ],
+   "hints": false,
+   "opponent": {
+    "name": "Sleeper Statue",
+    "emoji": "\ud83d\udc79",
+    "cast": "guide",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "normal",
+    "aiStyle": "intents"
+   },
+   "setup": {
+    "heroes": [
+     "m"
+    ],
+    "floors": 5,
+    "boss": "sleeper-statue",
+    "relic": "lantern",
+    "hpPct": 110
+   },
+   "twist": {
+    "id": "tough-foes",
+    "param": 110,
+    "text": "Boss rule: foes have 110% of their normal HP."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Sleeper Statue with Ione."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c6",
+   "act": 2,
+   "title": "Behemoth's Mire",
+   "boss": true,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Garrick again, deeper in. The Mire Behemoth smothers decks in slime."
+    },
+    {
+     "who": "guide",
+     "text": "Rest rooms heal. Use them before the boss."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "The mire quiets. Act two is beaten."
+    }
+   ],
+   "hints": false,
+   "opponent": {
+    "name": "Mire Behemoth",
+    "emoji": "\ud83d\udc80",
+    "cast": "rival",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "normal",
+    "aiStyle": "intents",
+    "taunt": "You will not pass.",
+    "praise": "Well climbed."
+   },
+   "setup": {
+    "heroes": [
+     "w"
+    ],
+    "floors": 6,
+    "boss": "mire-behemoth",
+    "relic": "tin-flute",
+    "hpPct": 85
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Mire Behemoth with Garrick."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c7",
+   "act": 3,
+   "title": "Wraith Stair",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "The Ashen Wraith burns what you hold. Play your hand, do not hoard it."
+    },
+    {
+     "who": "guide",
+     "text": "Burn cards hurt at turn end. Plan around them."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "The candles gutter out. One more act."
+    }
+   ],
+   "hints": false,
+   "opponent": {
+    "name": "Ashen Wraith",
+    "emoji": "\ud83d\udc79",
+    "cast": "guide",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "hard",
+    "aiStyle": "intents"
+   },
+   "setup": {
+    "heroes": [
+     "s"
+    ],
+    "floors": 6,
+    "boss": "ashen-wraith",
+    "relic": "smoking-censer",
+    "hpPct": 110
+   },
+   "twist": {
+    "id": "tough-foes",
+    "param": 110,
+    "text": "Boss rule: foes have 110% of their normal HP."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Ashen Wraith with Sable."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c8",
+   "act": 3,
+   "title": "Hall of Gears",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "A long climb for Cog-9. Build before the Wraith waits at the top."
+    },
+    {
+     "who": "guide",
+     "text": "Eight rooms before the boss. Pick your rests."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "Clockwork and thunder. Only the Gate remains."
+    }
+   ],
+   "hints": false,
+   "opponent": {
+    "name": "Ashen Wraith",
+    "emoji": "\ud83d\udc79",
+    "cast": "guide",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "hard",
+    "aiStyle": "intents"
+   },
+   "setup": {
+    "heroes": [
+     "a"
+    ],
+    "floors": 8,
+    "boss": "ashen-wraith",
+    "relic": "iron-bangle",
+    "hpPct": 105
+   },
+   "twist": {
+    "id": "tough-foes",
+    "param": 105,
+    "text": "Boss rule: foes have 105% of their normal HP."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Ashen Wraith with Cog-9."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c9",
+   "act": 3,
+   "title": "The Cinder Gate",
+   "boss": true,
+   "intro": [
+    {
+     "who": "rival",
+     "text": "None climb the Cinder Gate. Show me your best deck, Ione."
+    },
+    {
+     "who": "rival",
+     "text": "One climb. One boss. No second chance."
+    }
+   ],
+   "outro": [
+    {
+     "who": "rival",
+     "text": "The Gate opens. You climbed it all."
+    }
+   ],
+   "hints": false,
+   "opponent": {
+    "name": "Gate Colossus",
+    "emoji": "\ud83d\udc80",
+    "cast": "rival",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "hard",
+    "aiStyle": "intents",
+    "taunt": "You will not pass.",
+    "praise": "Well climbed."
+   },
+   "setup": {
+    "heroes": [
+     "m"
+    ],
+    "floors": 9,
+    "boss": "gate-colossus",
+    "relic": "dawnstone",
+    "hpPct": 110
+   },
+   "twist": {
+    "id": "tough-foes",
+    "param": 110,
+    "text": "Boss rule: foes have 110% of their normal HP."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Gate Colossus with Ione."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
+  }
+ ]
+}

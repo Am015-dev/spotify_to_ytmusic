@@ -299,7 +299,7 @@ if(typeof module!=='undefined')module.exports=QR;
 <script>
 (()=>{
 'use strict';
-const GAMES=[{"id":"crown","name":"Crown City Smash","src":"crown-city-smash/index.html","cover":"covers/crown.jpg","bytes":1962533},{"id":"nebula","name":"Nebula Aces","src":"nebula-aces/index.html","cover":"covers/nebula.jpg","bytes":1949786},{"id":"doorkick","name":"Doorkick Dungeon","src":"doorkick-dungeon/index.html","cover":"covers/doorkick.jpg","bytes":2877915},{"id":"shipwreck","name":"Shipwreck Isle","src":"shipwreck-isle/index.html","cover":"covers/shipwreck.jpg","bytes":2211614},{"id":"sands","name":"Sands of Qamar","src":"sands-of-qamar/index.html","cover":"covers/sands.jpg","bytes":842786},{"id":"sunglaze","name":"Sunglaze","src":"sunglaze/index.html","cover":"covers/sunglaze.jpg","bytes":1644835},{"id":"rampart","name":"Rampart & Vine","src":"rampart-and-vine/index.html","cover":"covers/rampart.jpg","bytes":612943},{"id":"shortfuse","name":"Short Fuse (preview)","src":"short-fuse/index.html","cover":"covers/short-fuse.jpg","bytes":1998111},{"id":"tidewake","name":"Tidewake (preview)","src":"tidewake/index.html","cover":"covers/tidewake.jpg","bytes":1898023},{"id":"hollowbough","name":"Hollowbough (preview)","src":"hollowbough/index.html","cover":"covers/hollowbough.jpg","bytes":2535729},{"id":"thornbound","name":"The Thornbound Throne (preview)","src":"thornbound/index.html","cover":"covers/thornbound.jpg","bytes":2098893},{"id":"kaiten","name":"Kaiten Kitchen (preview)","src":"kaiten-kitchen/index.html","cover":"covers/kaiten.jpg","bytes":2701561},{"id":"lantern","name":"Lantern Dive (preview)","src":"lantern-dive/index.html","cover":"covers/lantern.jpg","bytes":2146765},{"id":"cauldron","name":"Cauldron Fair (preview)","src":"cauldron-fair/index.html","cover":"covers/cauldron.jpg","bytes":2398042},{"id":"approach","name":"Final Approach (preview)","src":"final-approach/index.html","cover":"covers/approach.jpg","bytes":2657939},{"id":"mainhattan","name":"Mainhattan Nightrun","src":"mainhattan-nightrun/index.html","cover":"covers/nightrun.jpg","bytes":1842667},{"id":"overdrive","name":"Mainhattan Overdrive","src":"mainhattan-overdrive/index.html","cover":"covers/overdrive.jpg","bytes":3391751}];
+const GAMES=[{"id":"crown","name":"Crown City Smash","src":"crown-city-smash/index.html","cover":"covers/crown.jpg","bytes":1962533},{"id":"nebula","name":"Nebula Aces","src":"nebula-aces/index.html","cover":"covers/nebula.jpg","bytes":1949786},{"id":"doorkick","name":"Doorkick Dungeon","src":"doorkick-dungeon/index.html","cover":"covers/doorkick.jpg","bytes":2877915},{"id":"shipwreck","name":"Shipwreck Isle","src":"shipwreck-isle/index.html","cover":"covers/shipwreck.jpg","bytes":2211614},{"id":"sands","name":"Sands of Qamar","src":"sands-of-qamar/index.html","cover":"covers/sands.jpg","bytes":842786},{"id":"sunglaze","name":"Sunglaze","src":"sunglaze/index.html","cover":"covers/sunglaze.jpg","bytes":1644835},{"id":"rampart","name":"Rampart & Vine","src":"rampart-and-vine/index.html","cover":"covers/rampart.jpg","bytes":612943},{"id":"shortfuse","name":"Short Fuse (preview)","src":"short-fuse/index.html","cover":"covers/short-fuse.jpg","bytes":1998111},{"id":"tidewake","name":"Tidewake (preview)","src":"tidewake/index.html","cover":"covers/tidewake.jpg","bytes":1898023},{"id":"hollowbough","name":"Hollowbough (preview)","src":"hollowbough/index.html","cover":"covers/hollowbough.jpg","bytes":2535729},{"id":"thornbound","name":"The Thornbound Throne (preview)","src":"thornbound/index.html","cover":"covers/thornbound.jpg","bytes":2098893},{"id":"kaiten","name":"Kaiten Kitchen (preview)","src":"kaiten-kitchen/index.html","cover":"covers/kaiten.jpg","bytes":2701561},{"id":"lantern","name":"Lantern Dive (preview)","src":"lantern-dive/index.html","cover":"covers/lantern.jpg","bytes":2146765},{"id":"cauldron","name":"Cauldron Fair (preview)","src":"cauldron-fair/index.html","cover":"covers/cauldron.jpg","bytes":2398042},{"id":"approach","name":"Final Approach (preview)","src":"final-approach/index.html","cover":"covers/approach.jpg","bytes":2657939},{"id":"redline","name":"Redline Rally","src":"redline-rally/index.html","cover":"covers/redline-rally.jpg","bytes":219106},{"id":"emberclimb","name":"Emberclimb","src":"emberclimb/index.html","cover":"covers/emberclimb.jpg","bytes":406709},{"id":"thrones","name":"Twin Thrones","src":"twin-thrones/index.html","cover":"covers/twin-thrones.jpg","bytes":254552},{"id":"mainhattan","name":"Mainhattan Nightrun","src":"mainhattan-nightrun/index.html","cover":"covers/nightrun.jpg","bytes":2417465},{"id":"overdrive","name":"Mainhattan Overdrive","src":"mainhattan-overdrive/index.html","cover":"covers/overdrive.jpg","bytes":3459870}];
 const $=id=>document.getElementById(id);
 const SHELF_CACHE='gns-shelf-v2',GAME_CACHE='gns-games-v2'; // keep in step with VER in sw.js
 const BACKUP_KEY='gns_backup_last';
@@ -316,7 +316,8 @@ function owner(k){if(k.startsWith('gns'))return 'shelf';for(const [p,id] of PREF
 // ---------- online / offline ----------
 function setNet(){const on=navigator.onLine!==false;$('net').classList.toggle('off',!on);$('nettxt').textContent=on?'Online':'Offline: stored games still work';
   for(const id of ['send','recv'])$(id).disabled=!on||!p2pOK();updateButtons()}
-addEventListener('online',setNet);addEventListener('offline',setNet);
+addEventListener('online',()=>{setNet();for(const g of GAMES){const s=state[g.id];if(s&&s.wanted&&s.part&&!s.busy)download(g)}}); // a stalled download carries on by itself when the connection returns
+addEventListener('offline',setNet);
 const p2pOK=()=>typeof NetRoom!=='undefined'&&NetRoom.available();
 
 // ---------- service worker ----------
@@ -327,7 +328,8 @@ const state={}; // id -> {have:bool (complete),part:bool,size,got,files,missing,
 const MAN={}; // id -> offline.json (every file the game loads; core files only are downloaded)
 const abs=u=>new URL(u,location.href).href;
 const HAVE_CACHES='caches' in window;
-const BIG=100e6,CONC=4;
+const BIG=100e6,CONC=3;
+const FONT_CACHE='gns-fonts-v2'; // Google web fonts + CDN scripts (three.js) the games use; sw.js serves them from here when offline
 const gbase=g=>abs(g.src.replace(/[^/]*$/,'')),furl=(g,p)=>gbase(g)+p,murl=g=>gbase(g)+'offline.json';
 const fresh=g=>state[g.id]||(state[g.id]={have:false,part:false,size:null,got:0,files:0,missing:0,busy:false,pct:0,err:'',txt:''});
 async function manifest(g,net){ // cache first (offline); with net=true the network copy wins when online
@@ -341,12 +343,12 @@ function render(){
   const ul=$('games');ul.innerHTML='';
   for(const g of GAMES){const s=fresh(g),m=MAN[g.id]&&MAN[g.id].m,tot=m?m.total:g.bytes;
     const li=document.createElement('li');li.className='g';li.dataset.id=g.id;
-    const st=s.busy?s.txt||'Starting…':s.err?s.err:s.have?'On this device · complete · '+fmt(s.size):s.part?s.missing+' file'+(s.missing===1?'':'s')+' missing, retry · '+fmt(s.got)+' of '+fmt(tot)+' stored':'About '+fmt(tot)+(m?' · '+m.files.length+' files':'');
+    const st=s.busy?s.txt||'Starting…':s.err?s.err:s.have?'Ready offline · all '+s.files+' files · '+fmt(s.size):s.part?s.missing+' of '+s.files+' file'+(s.files===1?'':'s')+' not stored yet · '+fmt(s.got)+' of '+fmt(tot)+' · not ready offline':'About '+fmt(tot)+(m?' · '+m.files.length+' files':'');
     const big=!s.have&&!s.busy&&tot>BIG;
     li.innerHTML='<img alt="" width="52" height="52" loading="lazy" src="'+esc(g.cover)+'"><div><div class="nm">'+esc(g.name)+'</div><div class="st'+(s.have&&!s.busy?' ok':'')+(s.err||(s.part&&!s.busy)?' bad':'')+'">'+esc(st)+'</div>'+(big?'<div class="st bad">Large download ('+fmt(tot)+'). Use Wi-Fi and keep this page open.</div>':'')+'</div>'+
       '<button type="button" class="sw" role="switch" aria-checked="'+(s.have||s.busy)+'" aria-label="Keep '+esc(g.name)+' on this device"'+(HAVE_CACHES?'':' disabled')+'><span>Keep</span><span class="trk"></span></button>'+
-      (s.busy?'<div class="meter"><b style="width:'+s.pct+'%"></b></div>':'')+(s.part&&!s.busy?'<button type="button" class="btn rm" aria-label="Remove the partial download of '+esc(g.name)+'">Remove</button>':'');
-    li.querySelector('.sw').onclick=()=>toggle(g);const rb=li.querySelector('.rm');if(rb)rb.onclick=()=>remove(g);ul.appendChild(li)}
+      (s.busy?'<div class="meter"><b style="width:'+s.pct+'%"></b></div>':'')+(s.part&&!s.busy?'<button type="button" class="btn rt" aria-label="Retry the download of '+esc(g.name)+'">Retry</button><button type="button" class="btn rm" aria-label="Remove the partial download of '+esc(g.name)+'">Remove</button>':'');
+    li.querySelector('.sw').onclick=()=>toggle(g);const rb=li.querySelector('.rm');if(rb)rb.onclick=()=>remove(g);const rt=li.querySelector('.rt');if(rt)rt.onclick=()=>{if(navigator.onLine===false){s.err='You are offline. Try again when connected.';render();return}download(g)};ul.appendChild(li)}
   updateButtons();
 }
 function updateButtons(){const all=GAMES.every(g=>state[g.id]&&state[g.id].have),none=GAMES.every(g=>!(state[g.id]&&(state[g.id].have||state[g.id].part))),busy=GAMES.some(g=>state[g.id]&&state[g.id].busy),off=navigator.onLine===false;
@@ -361,8 +363,11 @@ async function scan(){
       if(m){const k=count(g,m,set);Object.assign(s,{files:m.files.length,got:k.got,size:m.total,missing:m.files.length-k.n,have:k.n===m.files.length&&set.has(furl(g,'index.html')),part:false});s.part=!s.have&&(k.n>0||set.has(murl(g)))}
       else{const r=set.has(abs(g.src));s.have=false;s.part=r;s.missing=r?1:0;s.got=0;s.size=null;if(r){const rr=await c.match(abs(g.src));s.got=+(rr&&rr.headers.get('x-gns-size'))||0}} // old single-file download: no manifest to check against, offer the full pack
     }))}catch(e){}
-  render();usage();
+  render();usage();extras();
 }
+let extrasDone=false;async function extras(){ // games kept before fonts / CDN scripts were stored: fetch those once while online (best effort)
+  if(extrasDone||navigator.onLine===false||!HAVE_CACHES)return;extrasDone=true;
+  try{const c=await caches.open(GAME_CACHE);for(const g of GAMES){const s=state[g.id];if(s&&s.have&&!s.busy){await manifest(g);await fontsFor(g,c);await cdnFor(g,c)}}}catch(e){}}
 async function usage(){
   const el=$('stor');let txt='';
   const used=GAMES.reduce((a,g)=>a+((state[g.id]&&(state[g.id].have||state[g.id].part)&&state[g.id].got)||0),0),n=GAMES.filter(g=>state[g.id]&&state[g.id].have).length;
@@ -377,14 +382,36 @@ async function cacheShelf(){ // covers and shelf pages, so the shelf opens offli
     await Promise.all(urls.map(async u=>{const k=abs(u);const key=k.endsWith('/')?k+'index.html':k;try{if(await c.match(key))return;const r=await fetch(u);if(r.ok)await c.put(key,r)}catch(e){}}))}catch(e){}}
 function progress(g,s,doneF,doneB,total,nf){const p=total?Math.min(99,Math.floor(doneB/total*100)):0;s.pct=p;s.txt='Downloading · '+doneF+' of '+nf+' files · '+fmt(doneB)+' of '+fmt(total);
   const li=document.querySelector('[data-id="'+g.id+'"]');if(li){const b=li.querySelector('.meter b'),t=li.querySelector('.st');if(b)b.style.width=p+'%';if(t)t.textContent=s.txt}}
-async function fetchOne(g,c,f){ // 3 tries; a full disk stops the whole download
-  for(let a=0;a<3;a++){
-    try{const r=await fetch(furl(g,f.p),{cache:'reload'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();if(!b.size&&f.bytes)throw new Error('empty');
-      await c.put(furl(g,f.p),new Response(b,{status:200,headers:{'content-type':r.headers.get('content-type')||b.type||'application/octet-stream','x-gns-size':String(b.size)}}));return true}
-    catch(e){if(e&&e.name==='QuotaExceededError')throw e;if(navigator.onLine===false)return false;await sleep(300*(a+1))}}
-  return false}
+async function fetchOne(g,c,f){ // 4 tries with growing pauses; a cut-off body is never kept; a full disk stops the whole download
+  let why='';
+  for(let a=0;a<4;a++){
+    try{const r=await fetch(furl(g,f.p),{cache:'reload'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();if(!b.size&&f.bytes)throw new Error('empty');const cl=+r.headers.get('content-length');if(cl&&!r.headers.get('content-encoding')&&b.size!==cl)throw new Error('cut off: '+b.size+' of '+cl); // a body shorter than the server said is never kept
+      await c.put(furl(g,f.p),new Response(b,{status:200,headers:{'content-type':r.headers.get('content-type')||b.type||'application/octet-stream','x-gns-size':String(b.size)}}));return ''}
+    catch(e){if(e&&e.name==='QuotaExceededError')throw e;why=e&&e.message||'failed';if(navigator.onLine===false)return why;await sleep(400*(a+1)*(a+1))}}
+  return why}
+const CDN=/^https:\/\/(cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com|code\.jquery\.com)\//;
+async function cdnFor(g,c){ // scripts a game loads from a CDN (three.js and its addons): stored with everything they import, so the game starts offline (best effort)
+  try{const f=await caches.open(FONT_CACHE),r=await c.match(furl(g,'index.html'));if(!r)return;let html=await r.text();const m=MAN[g.id]&&MAN[g.id].m;
+    let srcs=html;if(m)for(const x of m.files)if(/\.js$/.test(x.p)&&x.bytes<3e6){const rr=await c.match(furl(g,x.p));if(rr)srcs+='\n'+await rr.text()}
+    const q=new Set(),map={};
+    for(const im of html.matchAll(/<script type="importmap">(.*?)<\/script>/gs))try{Object.assign(map,JSON.parse(im[1]).imports||{})}catch(e){}
+    for(const u of srcs.matchAll(/https:\/\/(?:cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com|code\.jquery\.com)\/[^"'\s<>)\\`]+\.(?:js|mjs|css)\b/g))if(!/transcoders/.test(u[0]))q.add(u[0]);
+    for(const [k,v] of Object.entries(map)){if(CDN.test(v)&&!k.endsWith('/'))q.add(v);if(k.endsWith('/')&&CDN.test(v))for(const mm of srcs.matchAll(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'[\\w./-]+\\.js','g')))q.add(v+mm[0].slice(k.length))}
+    const seen=new Set(),todo=[...q];
+    while(todo.length&&seen.size<200){const u=todo.pop();if(seen.has(u))continue;seen.add(u);
+      let rr=await f.match(u);if(!rr){const n=await fetch(u);if(!n.ok)continue;await f.put(u,n.clone());rr=n}
+      if(/\.m?js$/.test(u.split('?')[0])){const js=await rr.clone().text();
+        for(const mm of js.matchAll(/(?:\bfrom\s*|\bimport\s*\(?\s*|^\s*import\s*)['"]([^'"]+)['"]/gm)){const s=mm[1];
+          if(/^\.{1,2}\//.test(s))todo.push(new URL(s,u).href);else if(map[s]&&CDN.test(map[s]))todo.push(map[s])}}}
+  }catch(e){}}
+async function fontsFor(g,c){ // web fonts a game asks for from another site: stored too, so text looks the same offline (best effort, never blocks "ready")
+  try{const f=await caches.open(FONT_CACHE),r=await c.match(furl(g,'index.html'));if(!r)return;const html=await r.text();
+    const sheets=[...new Set([...html.matchAll(/https:\/\/fonts\.googleapis\.com\/css2?[^"'<>)\s\\]*/g)].map(m=>m[0].replace(/&amp;/g,'&')))];
+    for(const u of sheets){let css=await f.match(u);if(!css){const rr=await fetch(u);if(!rr.ok)continue;await f.put(u,rr.clone());css=rr}
+      for(const m of (await css.clone().text()).matchAll(/url\((https:\/\/fonts\.gstatic\.com[^)]+)\)/g)){if(!(await f.match(m[1]))){try{const fr=await fetch(m[1]);if(fr.ok)await f.put(m[1],fr)}catch(e){}}}}}catch(e){}}
+let wake=null;async function keepAwake(on){try{if(on&&navigator.wakeLock&&!wake){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>{wake=null})}else if(!on&&wake){await wake.release();wake=null}}catch(e){wake=null}}
 async function download(g,quiet){
-  const s=fresh(g);if(s.busy)return;Object.assign(s,{busy:true,pct:0,err:'',txt:'Checking files…'});render();
+  const s=fresh(g);if(s.busy)return;Object.assign(s,{busy:true,wanted:true,pct:0,err:'',txt:'Checking files…',failed:[]});render();keepAwake(true);
   try{
     const m=await manifest(g,true);if(!m)throw new Error('nomanifest');
     const c=await caches.open(GAME_CACHE),set=await cachedSet(),files=m.files.slice().sort((a,b)=>(b.p==='index.html')-(a.p==='index.html'));
@@ -393,20 +420,26 @@ async function download(g,quiet){
     await c.put(murl(g),new Response(MAN[g.id].raw,{status:200,headers:{'content-type':'application/json','x-gns-size':String(MAN[g.id].raw.length)}}));
     progress(g,s,doneF,doneB,m.total,files.length);
     let i=0,quota=false;
-    const worker=async()=>{while(i<todo.length&&!quota){const f=todo[i++];try{if(await fetchOne(g,c,f)){doneF++;doneB+=f.bytes;progress(g,s,doneF,doneB,m.total,files.length)}}catch(e){quota=true}}};
-    await Promise.all(Array.from({length:CONC},worker));
+    const fails=[];
+    const run=async(list,n)=>{i=0;const worker=async()=>{while(i<list.length&&!quota){const f=list[i++];try{const why=await fetchOne(g,c,f);if(!why){doneF++;doneB+=f.bytes;progress(g,s,doneF,doneB,m.total,files.length)}else fails.push({f,why})}catch(e){quota=true}}};
+      await Promise.all(Array.from({length:n},worker))};
+    await run(todo,CONC);
+    for(let pass=0;pass<2&&fails.length&&!quota&&navigator.onLine!==false;pass++){const again=fails.splice(0).map(x=>x.f);s.txt='Retrying '+again.length+' file'+(again.length===1?'':'s')+'…';await sleep(1500);await run(again,1)} // slow second pass for what failed
+    s.failed=fails.map(x=>x.f.p+' ('+x.why+')');
     const k=count(g,m,await cachedSet()),miss=files.length-k.n; // verify: re-count what is really stored
-    Object.assign(s,{busy:false,files:files.length,got:k.got,size:m.total,missing:miss,have:miss===0,part:miss>0,pct:100,err:miss?(quota?'Not enough storage. ':'')+miss+' file'+(miss===1?'':'s')+' missing, retry':''});
+    Object.assign(s,{busy:false,files:files.length,got:k.got,size:m.total,missing:miss,have:miss===0,part:miss>0,pct:100,err:''});
+    if(miss&&quota)s.err='Not enough storage on this device. Free some space, then tap Retry.';
+    if(!miss){await fontsFor(g,c);await cdnFor(g,c)}
     persist();cacheShelf();
-  }catch(e){Object.assign(s,{busy:false,have:false,err:e&&e.message==='nomanifest'?'Could not read the file list. Try again when connected.':navigator.onLine===false?'You are offline. Try again when connected.':'Download failed. Try again.'})}
-  render();usage();
+  }catch(e){keepAwake(false);Object.assign(s,{busy:false,have:false,err:e&&e.message==='nomanifest'?'Could not read the file list. Try again when connected.':navigator.onLine===false?'You are offline. Try again when connected.':'Download failed. Try again.'})}
+  keepAwake(GAMES.some(x=>state[x.id]&&state[x.id].busy));render();usage();
 }
 async function remove(g){const s=fresh(g);try{const c=await caches.open(GAME_CACHE),m=await manifest(g);
   if(m)await Promise.all(m.files.concat(m.optional||[]).map(f=>c.delete(furl(g,f.p))));await c.delete(murl(g));await c.delete(abs(g.src))}catch(e){}
   Object.assign(s,{have:false,part:false,size:null,got:0,missing:0,err:''});render();usage()}
 function toggle(g){const s=fresh(g);if(s.busy)return;if(s.have)remove(g);else{if(navigator.onLine===false){s.err='You are offline. Try again when connected.';render();return}
   const m=MAN[g.id]&&MAN[g.id].m,need=m?m.total-s.got:g.bytes;
-  if(need>BIG&&!confirm(g.name+' is a large download ('+fmt(need)+'). Use Wi-Fi and keep this page open until it says complete. Continue?'))return;download(g)}}
+  if(need>BIG&&!confirm(g.name+' is a large download ('+fmt(need)+'). Use Wi-Fi and keep this page open until it says Ready offline. Continue?'))return;download(g)}}
 $('dlall').onclick=async()=>{msgOff('');persist();const todo=GAMES.filter(g=>!state[g.id].have),need=todo.reduce((a,g)=>{const m=MAN[g.id]&&MAN[g.id].m;return a+(m?m.total-state[g.id].got:g.bytes)},0);
   if(need>BIG&&!confirm('Download all will fetch about '+fmt(need)+'. Use Wi-Fi and keep this page open. Continue?'))return;
   for(const g of todo)await download(g);const f=GAMES.filter(g=>!state[g.id].have).length;msgOff(f?f+' could not be completed. Tap retry.':'All games are stored on this device.',f?'err':'ok')};

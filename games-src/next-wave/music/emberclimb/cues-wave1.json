@@ -1,0 +1,71 @@
+{
+ "_readme": "Emberclimb music cues, wave 1. Each cue has 2 versions (a and b). Save as games/emberclimb/music/<cue>-a.mp3 and <cue>-b.mp3 (menu-a.mp3 ...); the game registers only the files that exist, so no code change is needed. No vocals. Slots: menu, map, fight, boss loop; victory, defeat play once.",
+ "cues": {
+  "menu": {
+   "prompt": "Instrumental fantasy game menu theme, no vocals, no spoken words, slow 70 BPM, warm cello and low harp, a distant ember-crackle texture, hopeful but weary, sparse and calm, 4-bar intro then 16-bar sections, ends on a whole bar so it loops cleanly, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "menu.mp3",
+   "bpm": 70,
+   "loop": true,
+   "length": "60-90 s loop"
+  },
+  "map": {
+   "prompt": "Instrumental fantasy exploration theme for climbing a tower, no vocals, no spoken words, 90 BPM, plucked strings and soft hand drums, mysterious and steady, light wind pad, understated so it can play for minutes, 4-bar intro then 16-bar sections, loops cleanly, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "map.mp3",
+   "bpm": 90,
+   "loop": true,
+   "length": "90 s loop"
+  },
+  "fight": {
+   "prompt": "Instrumental fantasy card-battle theme, no vocals, no spoken words, 120 BPM, driving low strings ostinato, war drums on beats 1 and 3, brass stabs now and then, tense but fair, 4-bar intro then 16-bar sections, loops cleanly, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "fight.mp3",
+   "bpm": 120,
+   "loop": true,
+   "length": "90 s loop"
+  },
+  "boss": {
+   "prompt": "Instrumental fantasy boss battle theme, no vocals, no spoken words, 140 BPM, heavy taiko and low brass, urgent staccato strings, rising choir-free synth pad, huge and threatening, 4-bar intro then 16-bar sections, loops cleanly, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "boss.mp3",
+   "bpm": 140,
+   "loop": true,
+   "length": "90 s loop"
+  },
+  "victory": {
+   "prompt": "Short instrumental fantasy victory fanfare, no vocals, no spoken words, 100 BPM, bright horns and harp arpeggio resolving to a warm major chord, triumphant, plays once, ends clean with a short tail. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "victory.mp3",
+   "bpm": 100,
+   "loop": false,
+   "length": "8-12 s, plays once"
+  },
+  "defeat": {
+   "prompt": "Short instrumental fantasy defeat sting, no vocals, no spoken words, 60 BPM, low cello and a fading bell, somber and quiet, descending to a minor chord, plays once, ends clean with a short tail. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "defeat.mp3",
+   "bpm": 60,
+   "loop": false,
+   "length": "8-12 s, plays once"
+  }
+ }
+}

@@ -12,8 +12,8 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   var H = {
     w: { k: 'w', name: 'Garrick Cinderplate', role: 'Ember Warrior', hp: 80, mech: 'Strength: every point adds damage to all attacks.', art: 'broad-shouldered armoured warrior with a glowing ember-forged greatsword', relic: 'ember-brand', start: ['w-strike', 'w-strike', 'w-strike', 'w-strike', 'w-strike', 'w-defend', 'w-defend', 'w-defend', 'w-defend', 'w-hammer'], col: '#c8472b' },
     s: { k: 's', name: 'Sable Quillfinger', role: 'Venom Rogue', hp: 70, mech: 'Poison and Shivs: stack poison, flood the table with 0-cost shivs.', art: 'hooded lithe rogue with throwing knives and a vial of green venom', relic: 'whetstone-ring', start: ['s-strike', 's-strike', 's-strike', 's-strike', 's-defend', 's-defend', 's-defend', 's-defend', 's-defend', 's-pinprick', 's-slip-away'], col: '#3f9b5a' },
-    a: { k: 'a', name: 'Cog-9', role: 'Orb Automaton', hp: 75, mech: 'Orbs: channel Lightning, Frost and Dark; evoke them for big effects.', art: 'friendly brass clockwork automaton with three glowing orbs orbiting its chest', relic: 'spark-core', start: ['a-strike', 'a-strike', 'a-strike', 'a-strike', 'a-defend', 'a-defend', 'a-defend', 'a-defend', 'a-zap', 'a-dualcast'], col: '#3d8fd0' },
-    m: { k: 'm', name: 'Ione Stillwater', role: 'Stance Monk', hp: 72, mech: 'Stances: Wrath doubles damage dealt and taken; Calm gives energy on exit.', art: 'serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves', relic: 'prayer-beads', start: ['m-strike', 'm-strike', 'm-strike', 'm-strike', 'm-defend', 'm-defend', 'm-defend', 'm-defend', 'm-eruption', 'm-vigilance'], col: '#c9a227' }
+    a: { k: 'a', name: 'Cog-9', role: 'Orb Automaton', hp: 72, mech: 'Orbs: channel Lightning, Frost and Dark; evoke them for big effects.', art: 'friendly brass clockwork automaton with three glowing orbs orbiting its chest', relic: 'spark-core', start: ['a-strike', 'a-strike', 'a-strike', 'a-strike', 'a-defend', 'a-defend', 'a-defend', 'a-defend', 'a-zap', 'a-dualcast'], col: '#3d8fd0' },
+    m: { k: 'm', name: 'Ione Stillwater', role: 'Stance Monk', hp: 76, mech: 'Stances: Wrath doubles damage dealt and taken; Calm gives energy on exit.', art: 'serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves', relic: 'prayer-beads', start: ['m-strike', 'm-strike', 'm-strike', 'm-strike', 'm-defend', 'm-defend', 'm-defend', 'm-defend', 'm-eruption', 'm-vigilance'], col: '#c9a227' }
   };
   // ---------- Warrior
   c('w-strike', 'w', 'Cinder Strike', 'A', 's', 1, [['dmg', 6]], 'plain sword cut trailing orange sparks');
@@ -46,7 +46,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   c('s-pinprick', 's', 'Pinprick', 'A', 's', 0, [['dmg', 3], ['weak', 1]], 'needle dart striking a shoulder');
   c('s-slip-away', 's', 'Slip Away', 'S', 's', 1, [['blk', 8]], 'rogue vanishing in a puff of grey smoke');
   c('s-blade-fan', 's', 'Blade Fan', 'S', 'c', 1, [['shiv', 3]], 'three throwing knives fanned in one hand');
-  c('s-toxic-vial', 's', 'Toxic Vial', 'S', 'c', 1, [['poison', 6]], 'glass vial of bubbling green venom');
+  c('s-toxic-vial', 's', 'Toxic Vial', 'S', 'c', 1, [['poison', 5]], 'glass vial of bubbling green venom');
   c('s-quick-stab', 's', 'Gutter Stab', 'A', 'c', 1, [['dmg', 9]], 'upward stab from an alley shadow');
   c('s-dodge-roll', 's', 'Dodge Roll', 'S', 'c', 0, [['blk', 4], ['draw', 1]], 'rogue tumbling under a swinging club');
   c('s-hidden-knives', 's', 'Hidden Knives', 'S', 'c', 1, [['shiv', 2], ['blk', 4]], 'knives tucked inside a coat lining');
@@ -73,7 +73,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   c('a-ball-lightning', 'a', 'Ball Lightning', 'A', 'c', 1, [['dmg', 7], ['chan', 'L']], 'crackling sphere of lightning thrown');
   c('a-cool-circuit', 'a', 'Cool Circuit', 'S', 'c', 1, [['chan', 'F'], ['draw', 1]], 'frosted circuit board with ice crystals');
   c('a-charge-up', 'a', 'Charge Up', 'S', 'c', 1, [['blk', 5], ['chan', 'L']], 'dynamo winding up with sparks');
-  c('a-barrier-pulse', 'a', 'Barrier Pulse', 'S', 'c', 1, [['blk', 8]], 'hexagonal energy barrier');
+  c('a-barrier-pulse', 'a', 'Barrier Pulse', 'S', 'c', 1, [['blk', 7]], 'hexagonal energy barrier');
   c('a-beam-cell', 'a', 'Beam Cell', 'A', 'c', 0, [['dmg', 3], ['chan', 'L']], 'tiny cell firing a thin beam');
   c('a-sweeping-beam', 'a', 'Sweeping Beam', 'A', 'c', 1, [['all', 6], ['draw', 1]], 'laser fan sweeping across a hall');
   c('a-overclock', 'a', 'Overclock', 'S', 'c', 0, [['draw', 2], ['add', 'burn', 1, 'disc']], 'gears glowing red-hot and smoking');
@@ -81,13 +81,13 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   c('a-compile-strike', 'a', 'Compile Strike', 'A', 'c', 1, [['dmg', 6], ['chan', 'F']], 'cold blue gauntlet punch');
   c('a-capacitor', 'a', 'Capacitor Bank', 'P', 'u', 1, [['power', 'slots', 2]], 'row of glass capacitor jars');
   c('a-defrag', 'a', 'Focus Lattice', 'P', 'u', 1, [['power', 'focus', 1]], 'glowing lattice of crystal lines');
-  c('a-glacier', 'a', 'Glacier Core', 'S', 'u', 2, [['blk', 7], ['chan', 'F'], ['chan', 'F']], 'two ice orbs wrapped in frost');
+  c('a-glacier', 'a', 'Glacier Core', 'S', 'u', 2, [['blk', 6], ['chan', 'F'], ['chan', 'F']], 'two ice orbs wrapped in frost');
   c('a-darkness', 'a', 'Dark Matter', 'S', 'u', 1, [['chan', 'D']], 'swirling violet-black orb');
   c('a-tempest', 'a', 'Storm Array', 'S', 'u', 'X', [['chanX', 'L']], 'ring of lightning orbs overhead');
   c('a-multicast', 'a', 'Multicast', 'S', 'u', 'X', [['evokeX']], 'orb bursting into many copies');
-  c('a-core-breach', 'a', 'Core Breach', 'A', 'u', 2, [['all', 12]], 'overloaded reactor core exploding outward');
+  c('a-core-breach', 'a', 'Core Breach', 'A', 'u', 2, [['all', 10]], 'overloaded reactor core exploding outward');
   c('a-biased-core', 'a', 'Biased Core', 'P', 'r', 1, [['power', 'focus', 3]], 'brass brain core with bright wires');
-  c('a-meteor-strike', 'a', 'Meteor Strike', 'A', 'r', 3, [['dmg', 30], ['chan', 'L'], ['chan', 'L'], ['chan', 'L']], 'fiery meteor slamming down on a robot hand');
+  c('a-meteor-strike', 'a', 'Meteor Strike', 'A', 'r', 3, [['dmg', 24], ['chan', 'L'], ['chan', 'L'], ['chan', 'L']], 'fiery meteor slamming down on a robot hand');
   c('a-hyperbeam', 'a', 'Hyperbeam', 'A', 'r', 2, [['all', 26], ['focus', -3]], 'enormous white beam from a chest cannon');
   c('a-reactor', 'a', 'Mini Reactor', 'P', 'r', 2, [['power', 'reactor', 1]], 'tiny glowing reactor in a glass jar');
   // ---------- Monk
@@ -95,16 +95,16 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   c('m-defend', 'm', 'Guarded Stance', 'S', 's', 1, [['blk', 5]], 'monk arms crossed in defence');
   c('m-eruption', 'm', 'Wrath Eruption', 'A', 's', 2, [['dmg', 9], ['stance', 'w']], 'red flames bursting from a monk fist');
   c('m-vigilance', 'm', 'Quiet Vigil', 'S', 's', 2, [['blk', 8], ['stance', 'c']], 'monk sitting under a blue lotus glow');
-  c('m-palm-flurry', 'm', 'Palm Flurry', 'A', 'c', 0, [['dmg', 4]], 'many blurred hands striking');
+  c('m-palm-flurry', 'm', 'Palm Flurry', 'A', 'c', 0, [['dmg', 5], ['draw', 1]], 'many blurred hands striking');
   c('m-crush-joints', 'm', 'Crush Joints', 'A', 'c', 1, [['dmg', 8], ['vuln', 1]], 'precise elbow strike to an armoured joint');
-  c('m-pressure-point', 'm', 'Pressure Point', 'S', 'c', 0, [['poison', 6]], 'fingertip pressed on a glowing nerve spot');
+  c('m-pressure-point', 'm', 'Pressure Point', 'S', 'c', 0, [['poison', 8]], 'fingertip pressed on a glowing nerve spot');
   c('m-still-water', 'm', 'Still Water', 'S', 'c', 1, [['stance', 'c'], ['blk', 4]], 'perfectly calm pond with a single ripple');
   c('m-sash-whip', 'm', 'Sash Whip', 'A', 'c', 1, [['dmg', 8], ['weak', 1]], 'silk sash cracking like a whip');
   c('m-cut-through', 'm', 'Cut Through', 'A', 'c', 1, [['dmg', 7], ['blk', 2]], 'blade of air slicing a bamboo stalk');
   c('m-empty-fist', 'm', 'Empty Fist', 'A', 'c', 1, [['dmg', 9], ['stance', 'n']], 'open empty hand over a plain stone');
   c('m-bow', 'm', 'Deep Bow', 'S', 'c', 0, [['blk', 4]], 'monk bowing low at a shrine gate');
-  c('m-third-eye', 'm', 'Third Eye', 'S', 'c', 1, [['blk', 7]], 'glowing eye painted on a forehead');
-  c('m-inner-peace', 'm', 'Inner Peace', 'S', 'u', 1, [['draw', 2], ['stance', 'c']], 'monk meditating on a floating stone');
+  c('m-third-eye', 'm', 'Third Eye', 'S', 'c', 1, [['blk', 7], ['draw', 1]], 'glowing eye painted on a forehead');
+  c('m-inner-peace', 'm', 'Inner Peace', 'S', 'u', 1, [['draw', 3], ['stance', 'c']], 'monk meditating on a floating stone');
   c('m-wheel-kick', 'm', 'Wheel Kick', 'A', 'u', 2, [['dmg', 15], ['draw', 2]], 'spinning high kick trailing a circle');
   c('m-rushdown', 'm', 'Rushdown', 'P', 'u', 1, [['power', 'rush', 2]], 'red wind rushing around a crouched monk');
   c('m-mental-fort', 'm', 'Mental Fortress', 'P', 'u', 1, [['power', 'mental', 4]], 'translucent fortress rising from meditation');
@@ -129,6 +129,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   c('regret', 'z', 'Regret', 'X', 'k', -1, [], 'faded letter left on a dark table', 'ur');
   c('doubt', 'z', 'Doubt', 'X', 'k', -1, [], 'cracked mirror showing a worried face', 'ud');
   c('injury', 'z', 'Lingering Injury', 'X', 'k', -1, [], 'old bruise on a shoulder', 'u');
+  c('calm-spark', 'z', 'Calm Spark', 'S', 'z', 0, [['nrg', 1]], 'small golden light cupped in two hands', 'x');
   c('shiv', 'z', 'Shiv', 'A', 'z', 0, [['dmg', 4]], 'small improvised blade', 'x');
   // flags: u=unplayable x=exhaust e=ethereal(exhaust at end of turn) b=burn(2 hp at end of turn if held) r=regret d=doubt
 
@@ -159,7 +160,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'ember-brand': { name: 'Ember Brand', t: 'Heal 6 after each fight.', rar: 's', art: 'iron brand glowing orange at the tip' },
     'whetstone-ring': { name: 'Whetstone Ring', t: 'Draw 2 extra on turn 1.', rar: 's', art: 'silver ring with a tiny whetstone' },
     'spark-core': { name: 'Spark Core', t: 'Start fights with a Lightning orb.', rar: 's', art: 'glass sphere with a trapped blue spark' },
-    'prayer-beads': { name: 'Prayer Beads', t: 'Start fights in Calm.', rar: 's', art: 'string of wooden prayer beads' },
+    'prayer-beads': { name: 'Prayer Beads', t: 'Start fights in Calm with a Calm Spark.', rar: 's', art: 'string of wooden prayer beads' },
     'lucky-coin': { name: 'Lucky Coin', t: '+25 gold now.', rar: 'c', art: 'chipped gold coin balanced on its edge' },
     'iron-bangle': { name: 'Iron Bangle', t: 'Start fights with 4 Block.', rar: 'c', art: 'thick iron bracelet with a rune notch' },
     'lantern': { name: 'Tin Lantern', t: '+1 energy on turn 1.', rar: 'c', art: 'small dented tin lantern lit from within' },
