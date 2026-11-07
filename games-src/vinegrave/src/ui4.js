@@ -43,31 +43,24 @@ function tutSetup() {
   const li = G.items.indexOf('lamp'); if (li >= 0) { G.items[li] = G.row[0]; G.row[0] = 'lamp'; } else { const ri = G.row.indexOf('lamp'); if (ri > 0) { G.row[ri] = G.row[0]; G.row[0] = 'lamp'; } }
   G.turn = 0; G.first = 0; render();
 }
-function tutSteps() {
+function tutSteps() {   /* 7 steps, each one real action (W378: no read-and-Next pages) */
   return [
-    { id: 'goal', title: 'Welcome to Vinegrave', say: 'Explore for 5 rounds; most points wins. You start at -2: your deck holds two Dread cards, -1 point each until you exile them. This practice is one round against Tamsin.', target: tq('#map'), wait: null, ready: () => tmine() },
-    { id: 'hand', title: 'Your cards', say: 'Play a card for its effect, or spend it to pay travel. Tap Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
+    { id: 'hand', title: 'Your cards', say: 'Most points after 5 rounds wins. Each turn you do ONE action. Tap Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() },
-    { id: 'play', title: 'Play it', say: 'Trail Notes gives a compass. One main action ends your turn.', target: tq(tinsp('Play it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()) },
-    { id: 'watch', title: 'Tamsin\'s turn', say: 'Tamsin sent an explorer to a camp site. Now you have 3 compasses.', target: tq('#opp'), wait: null, ready: () => tmine() && G.p[1].ex < 2 },
-    { id: 'ruin', title: 'A hidden ruin', say: '3 compasses and 2 Boots discover it. Tap the hidden ruin.', target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)),
-      wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() },
-    { id: 'disc', title: 'Discover it', say: 'Your two Dread cards pay the Boots. Tap Discover.', target: tq(tinsp('Discover')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }, ready: () => !!(UI.insp && tinsp('Discover')()) },
-    { id: 'guard', title: 'A guardian wakes!', say: 'You took loot and an idol, but a guardian now shares the ruin with your explorer.', target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: null, ready: () => tmine() && !!G.sites[TUT_SITE].guard },
-    { id: 'idol', title: 'Your idol', say: 'Idols score 3 points. Set one in a shrine for a free boon.', target: tq('#extra [data-a=idol]'), wait: null, ready: () => tmine() && !!$('#extra [data-a=idol]') },
-    { id: 'market', title: 'The market', say: 'Items cost coins; artifacts cost compasses. Tap the Tin Lamp.', target: tq('#row .cd[data-r="0"]'), wait: { type: 'tap', match: a => a.what === 'row' && a.x === 0 }, ready: () => tmine() },
-    { id: 'buy', title: 'Buy it', say: 'Bought items go under your deck. Tap Buy it.', target: tq(tinsp('Buy it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }, ready: () => !!(UI.insp && tinsp('Buy it')()) },
-    { id: 'track', title: 'Research', say: 'Climb this track with tablets, arrowheads and jewels for points. The top is the temple.', target: tq('#track'), wait: null, ready: () => tmine() },
-    { id: 'pass', title: 'Pass', say: 'Done for this round? Pass. The round ends when all have passed.', target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() },
-    { id: 'fear', title: 'Fleeing costs', say: 'Your explorer fled the guardian: a Dread card joins your deck. Overcome guardians to avoid it.', target: tq('#myres'), wait: null, ready: () => !!(G && G.round === 2 && !UI.busy) },
-    { id: 'end', title: 'Ready to explore', say: 'Guardians give 5 points and a boon. A full game lasts 5 rounds. Good luck!', target: tq('#map'), wait: null, ready: () => !!(G && G.round === 2) }
+    { id: 'play', title: 'Play it', say: 'It gives 1 compass. That is your action, then Tamsin plays. Tap Play it.', target: tq(tinsp('Play it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()) },
+    { id: 'ruin', title: 'A hidden ruin', say: 'Tamsin went to a camp. Your 3 compasses can explore a ruin. Tap the hidden ruin.', target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)),
+      wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && G.p[1].ex < 2 },
+    { id: 'disc', title: 'Explore it', say: 'Its travel is 2 Boots: two of your cards pay it. Tap Discover.', target: tq(tinsp('Discover')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }, ready: () => !!(UI.insp && tinsp('Discover')()) },
+    { id: 'market', title: 'The market', say: 'You found an idol (+3 points) and woke a guardian. Now shop: tap the Tin Lamp.', target: tq('#row .cd[data-r="0"]'), wait: { type: 'tap', match: a => a.what === 'row' && a.x === 0 }, ready: () => tmine() && !!G.sites[TUT_SITE].guard },
+    { id: 'buy', title: 'Buy it', say: 'Items cost coins and join your deck. Tap Buy it.', target: tq(tinsp('Buy it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }, ready: () => !!(UI.insp && tinsp('Buy it')()) },
+    { id: 'pass', title: 'Pass', say: 'Done for this round? Tap Pass. The round ends when everyone has passed.', target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() }
   ];
 }
 function tutStart(o) {
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; closeInsp();
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters[0];
   GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'You know the basics', endText: o ? 'Dig, discover, buy, research, pass. Now the Story begins.' : 'Dig, discover, buy, research, pass. The lightbulb helps any time.',
+    endTitle: 'You know the basics', endText: o ? 'Play a card, go to a site, buy a card, or pass. Beat guardians for 5 points. Now the Story begins.' : 'Play a card, go to a site, buy a card, or pass. Beat guardians for 5 points. The lightbulb helps any time.',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start stage 1' }] : null,
     setup: tutSetup,
     onDone: r => { const c = r && r.choice; clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp();

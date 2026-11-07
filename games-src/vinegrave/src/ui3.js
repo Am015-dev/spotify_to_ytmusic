@@ -18,7 +18,7 @@ function enterGame() {
   $('#start').hidden = true; $('#rs').hidden = true; $('#pass').hidden = true; UI.started = true;
   try { GX.close(); } catch (e) { }
   if (window.GX && GX.undo) try { GX.undo.clear(); } catch (e) { }
-  render(); musicSync();
+  render(); musicSync(); UI.bannerFor = null; turnBanner();
   const s = VG.actor(G); if (!isHuman(s)) schedule(); else if (s !== UI.view && UI.humans.length > 1) showPass(s);
 }
 function showTitle() {
@@ -62,12 +62,12 @@ function showPass(s) {
   p.hidden = false;
 }
 function closeRes() { $('#rs').hidden = true; }
-function rows(i) { const s = VG.score(G, i); return [['Research', s.research], ['Temple tiles', s.temple], ['Idols', s.idols], ['Guardians', s.guards], ['Card points', s.cards], ['Dread', s.fear], ['Total', s.total]]; }
+function rows(i) { const s = VG.score(G, i); return [['Research track', s.research], ['Temple tiles', s.temple], ['Idols (3 each)', s.idols], ['Guardians (5 each)', s.guards], ['Card points', s.cards], ['Dread (-1 each)', s.fear], ['Total', s.total]]; }
 function showResult() {
   if (!G || G.phase !== 'over') return; const r = $('#rs');
   const names = G.p.map(p => p.name).concat(G.rival ? [G.rival.name] : []), cols = G.p.map((p, i) => rows(i));
   const wn = G.winner === -1 ? 'A tie!' : G.winner === -2 ? G.rival.name + ' wins.' : (UI.humans.length === 1 && G.winner === UI.humans[0] ? 'You win!' : G.p[G.winner].name + ' wins.');
-  let t = `<table><tr><th></th>${names.map(n => `<th>${esc(n.split(' ')[0])}</th>`).join('')}</tr>`;
+  let t = `<table><tr><th></th>${names.map(n => `<th>${esc(n.split(' ').find(w => w.length > 2 && !/^(Dr|Mr|Mrs|Ms|Prof)\.?$/.test(w)) || n)}</th>`).join('')}</tr>`;
   rows(0).forEach((row, k) => { t += `<tr><td>${row[0]}</td>${cols.map(c => `<td>${k === 6 ? '<b>' + c[k][1] + '</b>' : c[k][1]}</td>`).join('')}${G.rival ? `<td>${k === 6 ? '<b>' + VG.rivalScore(G) + '</b>' : k === 0 ? V.GLASS_VP[Math.min(V.TOP, G.rival.rows)] : k === 4 ? G.rival.vp : '—'}</td>` : ''}</tr>`; });
   t += '</table>';
   const camp = UI.camp && typeof GXC !== 'undefined' && GXC.active();
@@ -81,7 +81,9 @@ function showResult() {
     if (q) line = `<p class="rquote"><b>${esc(op.name)}:</b> “${esc(q)}”</p>`;
   }
   const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : 'Defeat';
-  const sub = def && !cWon ? (G.winner === 0 ? 'You won the game but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again: the stage stays open.' : esc(wn);
+  const tots = G.p.map((p, i) => VG.score(G, i).total).concat(G.rival ? [VG.rivalScore(G)] : []), myT = tots[UI.humans[0] || 0], best = Math.max.apply(null, tots.filter((x, i) => i !== (UI.humans[0] || 0)));
+  const margin = UI.humans.length === 1 && tots.length > 1 ? (myT > best ? ` You won by ${myT - best}.` : myT < best ? ` You scored ${myT}: ${best - myT} short.` : '') : '';
+  const sub = def && !cWon ? (G.winner === 0 ? 'You won the game but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again: the stage stays open.' : esc(wn) + margin;
   const btns = def ? (cWon ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="campretry">Try again</button>')
     : '<button type="button" class="tbtn" data-a="again">Play again</button>';
   r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}" data-art="${G.winner === 0 ? 'result-win' : 'result-lose'}"><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}${t}
@@ -102,6 +104,7 @@ function scoresEl() {
 }
 function logEl() { const d = document.createElement('div'); d.className = 'loglist'; d.innerHTML = G ? G.log.slice(-80).reverse().map(l => `<div>${esc(l.t)}</div>`).join('') : ''; return d; }
 const RULES_HTML = `<div class="rules">
+<h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer plays.</li><li><b>Play a card</b> from your hand for its goods (coins, compasses).</li><li><b>Go to a site</b>: pay its travel icons with cards. Dig at a camp, or explore a ruin with compasses.</li><li><b>Buy a card</b> from the market: items cost coins, artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds the most points wins.</li></ol>
 <h3>The goal</h3><p>Explore the island for 5 rounds. The most points wins: research track, temple tiles, idols, guardians overcome and card points, minus 1 for every Dread card.</p>
 <h3>Your turn</h3><p>Do ONE main action, then the next explorer goes. When you cannot or do not want to act, pass: you are out until the next round. The round ends when everybody has passed.</p>
 <ul><li><b>Play a card</b> for its effect. Artifacts played from your hand cost 1 tablet. Dread cards do nothing.</li>
@@ -174,7 +177,8 @@ function helpInit() {
     steps: { guard: { target: () => $('.site .gd'), title: 'A guardian wakes', text: 'Overcome it for 5 points, or flee at round end with a Dread card.', pic: P('guard') },
       idol: { target: () => $('#extra [data-a=idol]'), title: 'You found an idol', text: 'Worth 3 points. Set it in a shrine for a boon too.', pic: P('idol') },
       'q-exile': { target: () => $('#qbox'), title: 'Exile a card', text: 'Removing Dread cards makes your deck stronger.', pic: P('exile') } },
-    rules: [{ title: 'The goal', text: 'Five rounds. Points from research, temple, idols, guardians and cards. Dread costs 1 each.', pic: P('star') },
+    rules: [{ title: 'How a turn works', text: 'One action, then the next explorer: play a card, go to a site, or buy a card. Nothing to do? Pass.', pic: P('star') },
+      { title: 'The goal', text: 'Five rounds. Points from research, temple, idols, guardians and cards. Dread costs 1 each.', pic: P('star') },
       { title: 'Travel', text: 'Each card pays one travel icon. A Jeep pays a Boot too; a Plane pays anything; 2 coins buy a Plane.', pic: P('boot') },
       { title: 'Discover', text: 'Three compasses and travel flip a hidden ruin: idol, loot, and a guardian wakes.', pic: P('compass') },
       { phase: 'guard', title: 'Overcome', text: 'Pay the guardian\'s cost while your explorer is there: 5 points and a one-time boon.', pic: P('guard') },

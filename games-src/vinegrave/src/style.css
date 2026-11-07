@@ -238,3 +238,23 @@ body:has(.gx-drawer.on) #toast,body:has(.gxc-res-on) #toast{display:none}
 .gxc-lock{font-size:0!important;width:18px;height:18px;background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='10' width='16' height='12' rx='2' fill='%23e8b93a' stroke='%233a2a12' stroke-width='2'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='%233a2a12' stroke-width='2.4'/%3E%3C/svg%3E")}
 .gxc-node .gxc-disc{background-image:none!important}
 body:has(#fx:not([hidden])) #toast{display:none}
+/* ---- W378 playable pass: turn banner, focus (legal glows, the rest dims), rival target pulse, landing, score pop, readable names ---- */
+#tbanner{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.85);z-index:72;pointer-events:none;opacity:0;padding:12px 28px;border-radius:16px;background:#2b1d10;color:#ffe9b8;border:3px solid #c98a2e;font:800 26px/1.1 var(--gx-font,Georgia,serif);box-shadow:0 10px 30px rgba(0,0,0,.6);white-space:nowrap;transition:opacity .2s,transform .25s}
+#tbanner.on{opacity:1;transform:translate(-50%,-50%) scale(1)}#tbanner.me{background:#f3ead2;color:#22190d;border-color:#ffd36a}
+body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick #hand .cd:not(.glow),body.vg-pick #track:not(.glow){opacity:.5;filter:saturate(.35) brightness(.85)}
+.site,.cd,#track{transition:opacity .25s,filter .25s}
+.aimark{outline:4px solid #ff9a3c;outline-offset:2px;animation:aimark .6s ease-in-out infinite alternate;z-index:5}
+@keyframes aimark{from{box-shadow:0 0 0 0 rgba(255,154,60,.9)}to{box-shadow:0 0 0 8px rgba(255,154,60,0)}}
+.landed{animation:landed .42s cubic-bezier(.3,1.6,.5,1)}@keyframes landed{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.vpop{position:fixed;z-index:73;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 12px;border-radius:12px;background:#1d2a14;color:#fff;border:2px solid #ffd36a;box-shadow:0 6px 18px rgba(0,0,0,.55);font-size:15px;font-weight:700;white-space:nowrap;animation:vpop 1.7s ease-out forwards}
+.vpop b{color:#ffd36a;font-size:18px}.vpop.neg{border-color:#e46a5a}.vpop.neg b{color:#ffb3a8}
+@keyframes vpop{0%{opacity:0;transform:translateY(10px) scale(.8)}12%{opacity:1;transform:translateY(0) scale(1.05)}20%{transform:scale(1)}75%{opacity:1;transform:translateY(-18px)}100%{opacity:0;transform:translateY(-30px)}}
+.flyc{position:fixed;z-index:71;pointer-events:none}
+.gx-dock #docktitle{font-size:16px;font-weight:800}.gx-dock.mine #docktitle,#dock.mine #docktitle{color:#7a3d00}
+#prompt{font-size:15px;line-height:1.25}
+.gx-reduce .aimark,.gx-reduce .landed,.gx-reduce .vpop{animation:none}
+@media (max-width:999px){
+  .ter{position:relative}.ter .tl{display:block;position:absolute;left:50%;top:auto;bottom:100%;transform:translateX(-50%);margin-bottom:1px;white-space:nowrap;font-size:13px;line-height:16px;padding:0 8px;border-radius:8px;background:#13220f;color:#f3e6bf;font-weight:700;z-index:3}
+  .cd .cn{display:block!important;order:0;font:700 13px/1.05 var(--gx-font,Georgia,serif);white-space:normal;overflow:hidden;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;padding:1px 2px;margin:0 2px;background:#fbf3df;color:#1f1505;border-radius:4px;letter-spacing:-.02em;word-break:break-word;min-height:0}
+  .cd.fear .cn{background:#2a1010;color:#ffe6e0}
+}

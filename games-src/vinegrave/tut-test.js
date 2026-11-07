@@ -20,7 +20,7 @@ const OUT = process.argv[2] || null;
       if (!st || !st.active) { ok = false; console.log(name, 'FAIL tutorial not active'); break; }
       if (st.phase === 'end') break;
       if (!st.shown) { await page.waitForTimeout(150); continue; }
-      if (st.i !== last) { last = st.i; steps++; if (steps <= 3 || st.id === 'turn') await shot('b-tut' + steps); }
+      if (st.i !== last) { last = st.i; steps++; await page.waitForTimeout(350); if (steps <= 3) await shot('b-tut' + steps); }
       if (!st.wait) { const n = page.locator('.gxt-next'); await n.waitFor({ timeout: 4000 }); const r = await n.boundingBox(); await tapAt(r.x + r.width / 2, r.y + r.height / 2); }
       else {
         const h = st.hole; const hit = await page.evaluate(([x, y, i]) => { const e = document.elementFromPoint(x, y); const c = GXT.current(); const t = c && c.target && c.target(); return !!(t && t.contains && e && (t === e || t.contains(e))); }, [h.cx, h.cy]);

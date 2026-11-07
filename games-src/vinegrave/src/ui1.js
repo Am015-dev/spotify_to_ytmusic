@@ -65,7 +65,7 @@ function render() {
   const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = 1; });
   if (q && q.h === 'site') VG.moves(G).forEach(m => { if (m.v != null) gS[m.v] = 1; });
   const ter = lv => G.sites.map((x, i) => x.lvl === lv ? siteHTML(x, i, gS[i]) : '').join('');
-  $('#map').innerHTML = `<div class="ter t2"><span class="tl">Deep ruins</span>${ter(2)}</div><div class="ter t1"><span class="tl">Ruins</span>${ter(1)}</div><div class="ter t0"><span class="tl">Camp</span>${ter(0)}</div>`;
+  $('#map').innerHTML = `<div class="ter t2"><span class="tl">Deep ruins: explore for ${V.DISC[2]} compasses</span>${ter(2)}</div><div class="ter t1"><span class="tl">Ruins: explore for ${V.DISC[1]} compasses</span>${ter(1)}</div><div class="ter t0"><span class="tl">Camp: dig here for goods</span>${ter(0)}</div>`;
   // research track
   const trG = L.some(m => m.t === 'res' || m.t === 'temple');
   let tr = ''; for (let r = V.TOP; r >= 0; r--) {
@@ -84,8 +84,10 @@ function render() {
 }
 function renderDock(L, q, me, actor) {
   const over = G.phase === 'over', mine = myTurn();
-  $('#docktitle').textContent = over ? 'Expedition over' : mine ? (G.p.length > 1 && UI.humans.length > 1 ? me.name + ', your turn' : 'Your turn') : (actor === -1 ? '' : G.p[actor].name + ' is thinking…');
-  $('#prompt').textContent = over ? 'The expedition is over.' : !mine ? 'Watch the other explorers.' : q ? qPrompt(q) : promptLine(L);
+  $('#docktitle').textContent = over ? 'Expedition over' : mine ? (G.p.length > 1 && UI.humans.length > 1 ? me.name + ', your turn' : 'Your turn') : (actor < 0 ? 'Round end' : G.p[actor].name + '\u2019s turn');
+  $('#dock').classList.toggle('mine', !!mine && !over);
+  document.body.classList.toggle('vg-pick', !!mine && !over && !q && L.some(m => m.t !== 'pass' && !m.free));
+  $('#prompt').textContent = over ? 'The expedition is over.' : !mine ? (actor < 0 ? 'The round is ending.' : G.p[actor].name + ' is choosing. Tap to speed up.') : q ? qPrompt(q) : promptLine(L);
   $('#myres').innerHTML = V.RES.map(k => `<span class="chip"><span class="num">${me.res[k]}</span>${ic(k)}</span>`).join('') + `<span class="chip"><span class="num">${me.ex}</span><span class="ic" aria-label="explorers ready"><svg viewBox="0 0 20 28" style="color:${HEX[UI.view]}"><use href="#s-meep"/></svg></span></span><span class="chip sm">Deck ${me.deck.length} · Discard ${me.disc.length}</span>`;
   const qb = $('#qbox');
   if (q) { qb.hidden = false; qb.innerHTML = qHTML(q); } else { qb.hidden = true; qb.innerHTML = ''; }
@@ -100,8 +102,10 @@ function renderDock(L, q, me, actor) {
   $('#extra').innerHTML = ex;
 }
 function promptLine(L) {
-  if (L.length === 1) return 'Nothing left to do: pass.';
-  return 'Pick one action: tap a glowing thing.';
+  if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do: tap Pass to end your round.';
+  const k = {}, bits = []; L.forEach(m => { k[m.t] = 1; });
+  if (k.play) bits.push('play a card'); if (k.dig || k.disc || k.beat) bits.push('go to a site'); if (k.buy) bits.push('buy a card'); if (k.res || k.temple) bits.push('research');
+  return 'One action: ' + (bits.length > 1 ? bits.slice(0, -1).join(', ') + ' or ' + bits[bits.length - 1] : bits[0]) + '. Tap what glows.';
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Pick a card to buy cheaper.', site: 'Pick a site to dig for free.' }[q.h] || 'Choose.'; }
 function qHTML(q) {
