@@ -60,8 +60,8 @@ chs = []
 for m in full:
     n = m['n']; act = 1 if n <= 16 else 2 if n <= 33 else 3; boss = n in BOSS; lvl = 'normal' if act == 1 else 'hard'
     if boss: name, cid, pers, taunt, praise = BOSS[n]
-    else: name, cid, pers, taunt, praise = 'The trench', 'cap', 'Deep water and a faint signal.', None, None
-    goal = 'Complete all %d tasks.' % m['k'] if m['k'] else 'Meet the mission rule.'
+    else: name, cid, pers, taunt, praise = 'The deep sea (co-op: you all win or lose together)', 'cap', 'Deep water and a faint signal.', None, None
+    goal = ('Complete the one task.' if m['k'] == 1 else 'Complete all %d tasks.' % m['k']) if m['k'] else 'Meet the mission rule.'
     op = {'name': name, 'emoji': cast[cid]['emoji'], 'cast': cid, 'personality': pers, 'aiLevel': lvl, 'aiStyle': 'crew'}
     if boss: op['taunt'] = taunt; op['praise'] = praise
     lines = [{'who': 'cap', 'text': m['log'][:110]}]

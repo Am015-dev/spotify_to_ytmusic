@@ -147,7 +147,7 @@ function playCard(G, c) {
   newly.sort(function (a, b) { return tokRank(a.tok) - tokRank(b.tok); });
   newly.forEach(function (t) { G.done.push(G.tasks.indexOf(t)); });
   var why = null;
-  newly.forEach(function (t) { if (!why && t.wonBy !== t.owner) why = cardName(t.card) + ' was won by ' + seatName(G, t.wonBy) + ', not ' + seatName(G, t.owner); });
+  newly.forEach(function (t) { if (!why && t.wonBy !== t.owner) why = cardName(t.card) + ' was won by ' + seatName(G, t.wonBy).replace(/^You$/, 'you') + ', not ' + seatName(G, t.owner).replace(/^You$/, 'you'); });
   if (!why) why = orderProblem(G);
   if (!why && G.chosen >= 0 && /notrick/.test(G.mission.sp || '') && w === G.chosen) why = seatName(G, w) + ' had to win no tricks';
   if (!why && G.chosen >= 0 && /onetrick/.test(G.mission.sp || '') && G.won[G.chosen] > 1) why = seatName(G, G.chosen) + ' had to win exactly one trick';
