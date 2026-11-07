@@ -1,6 +1,6 @@
 # Free art packs, part B (6 games, 2 picks each)
 
-Checked 7 Nov 2026, 22:20 to 22:45 UTC. Every pick was downloaded through the proxy into its own dir under `/tmp/claude-0/s/work/<slug>/<pack>/`, unzipped, and the licence text read. Packs are NOT copied into the repo. Sheets are built from real extracted files (cells upscaled with nearest-neighbour only when tiny).
+Checked 7 Nov 2026, 22:20 to 22:45 UTC. Every pick was downloaded through the proxy into its own dir under `/tmp/scratch/s/work/<slug>/<pack>/`, unzipped, and the licence text read. Packs are NOT copied into the repo. Sheets are built from real extracted files (cells upscaled with nearest-neighbour only when tiny).
 
 Coverage method: 6 slot types per game = card faces, tokens/pieces, board/map, portraits, backgrounds, icons/UI. Coverage % = slot types the pack fills in one consistent style / 6 (half-credit where the pack gives only part of a slot). Honest summary: no free pack covers everything; the best practical route is one hero pack per game plus a public-domain illustration set for portraits and backgrounds.
 

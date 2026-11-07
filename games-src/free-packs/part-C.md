@@ -31,6 +31,6 @@ Checked 7 Nov 2026 (UTC). Every pick below was downloaded through the proxy, unz
 
 ## Reproduction notes (nothing of this is in the repo)
 
-- Packs downloaded with `itch2.sh` to `/tmp/claude-0/s/work/<pack>/`, rendered with `/tmp/claude-0/s/lib/render.js` (three.js 0.160 GLTFLoader, 320 px, transparent background).
+- Packs downloaded with `itch2.sh` to `/tmp/scratch/s/work/<pack>/`, rendered with `/tmp/scratch/s/lib/render.js` (three.js 0.160 GLTFLoader, 320 px, transparent background).
 - Character renders show the rig's T-pose; use the packs' animation files to pose them before using them as portraits.
 - Quaternius pages list only the free "Standard" portion of each kit; full versions are paid and were not used.

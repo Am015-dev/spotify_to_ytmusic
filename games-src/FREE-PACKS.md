@@ -35,7 +35,26 @@ Reading guide
 
 Per-game rows (two picks, download link, licence quote, coverage, sheet) are in the part files. Best pick per game:
 
-PARTS_SUMMARY
+| Game | Best pack | Licence | Coverage | Sheet |
+|---|---|---|---|---|
+| cauldron-fair | Quaternius Fantasy Props MegaKit (2nd: Koehler botanical plates, 3 verified) | CC0 | ~35% | free-packs/cauldron-fair-sheet.webp |
+| crown-city-smash | KayKit City Builder Bits (2nd: Quaternius Animated Monsters) | CC0 | ~35% | free-packs/crown-city-smash-sheet.webp |
+| doorkick-dungeon | KayKit Adventurers + Skeletons (2nd: Quaternius Fantasy Props) | CC0 | ~30% | free-packs/doorkick-dungeon-sheet.webp |
+| final-approach | KayKit Board Game Bits (2nd: wide-body jet model + landing pad) | CC0 | ~40% | free-packs/final-approach-sheet.webp |
+| hollowbough | KayKit Forest Nature Pack (2nd: Audubon bird plates) | CC0 / public domain | ~30% | free-packs/hollowbough-sheet.webp |
+| kaiten-kitchen | Hiroshige fish prints, Met Open Access (2nd: ViNk Sushi Pack, pixel) | CC0 (Met isPublicDomain) / CC0 | ~30% | free-packs/kaiten-kitchen-sheet.webp |
+| lantern-dive | Haeckel plates, Commons (2nd: underwater sprites, clashes) | Public domain | ~33% | free-packs/lantern-dive-sheet.webp |
+| nebula-aces | Foozle Void Fleet packs (2nd: HoloUI frames and icons) | CC0 | ~50% | free-packs/nebula-aces-sheet.webp |
+| redline-rally | Kenney Racing Pack (same flat style as now; 2nd: racing HUD kit) | CC0 / CC BY 4.0 | ~35% | free-packs/redline-rally-sheet.webp |
+| deep-signal | Haeckel plates (2nd: pixel playing cards, too small) | Public domain | ~40% | free-packs/deep-signal-sheet.webp |
+| rampart-and-vine | Pixel Frog Tiny Swords (2nd: Kenney Tiny Town) | No-redistribute custom / CC0 | ~70% | free-packs/rampart-and-vine-sheet.webp |
+| sands-of-qamar | Dulac plates, Commons (2nd: game-icons.net) | Public domain / CC BY 3.0 | ~40% | free-packs/sands-of-qamar-sheet.webp |
+| shipwreck-isle | KayKit Resource Bits + RPG Tools Bits (2nd: Quaternius 3D Card Kit) | CC0 | ~42% | free-packs/shipwreck-isle-sheet.webp |
+| short-fuse | KayKit RPG Tools Bits + Adventurers (2nd: Quaternius Props, look unverified) | CC0 | ~33% | free-packs/short-fuse-sheet.webp |
+| sunglaze | KayKit Board Game Bits (2nd: Grammar of Ornament scans) | CC0 / public domain | ~33% | free-packs/sunglaze-sheet.webp |
+| thornbound | KayKit Medieval Hexagon + Adventurers + Skeletons (2nd: Quaternius 3D Card Kit) | CC0 | ~50% | free-packs/thornbound-sheet.webp |
+| tidewake | KayKit Medieval Hexagon (no ships or monsters; 2nd: Quaternius Card Kit) | CC0 | ~33% | free-packs/tidewake-sheet.webp |
+| twin-thrones | KayKit Medieval Hexagon + Board Game Bits (2nd: Quaternius Card Kit) | CC0 | ~33% | free-packs/twin-thrones-sheet.webp |
 
 ## Needs an owner decision
 
