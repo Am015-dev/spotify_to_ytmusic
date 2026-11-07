@@ -42,8 +42,8 @@ function payCost(p,c){p.el-=c.el;p.fk-=c.fk;G.bag.push(...Array(c.el).fill('elde
 function emptyTile(t){return !t.block&&t.camel==null&&t.tent==null&&!t.m.length&&!t.palm&&!t.pal}
 function djinnTargets(p,k){switch(k){
   case 'tamuz':return G.board.filter(emptyTile).map(t=>t.i);
-  case 'nuraya':return G.board.filter(t=>t.k==='village').map(t=>t.i);
-  case 'wahha':return G.board.filter(t=>t.k==='oasis').map(t=>t.i);
+  case 'nuraya':return SUP().pal<1?[]:G.board.filter(t=>t.k==='village').map(t=>t.i);
+  case 'wahha':return SUP().palm<1?[]:G.board.filter(t=>t.k==='oasis').map(t=>t.i);
   case 'jamal':return p.camels>0?G.board.filter(emptyTile).map(t=>t.i):[];
   case 'fath':return p.camels>0?G.board.filter(t=>!t.block&&t.camel==null&&t.tent==null&&t.m.length&&!t.palm&&!t.pal).map(t=>t.i):[];
   case 'suqra':return G.rdeck.length?[-1]:[];
