@@ -484,7 +484,7 @@ function startGame(o) {
   o = o || {}; clearTimeout(UI.aiT);
   var n = o.n || 2, seats = [];
   for (var i = 0; i < n; i++) seats.push(i === 0 ? { name: o.myName || 'You', human: true } : { name: (o.names && o.names[i]) || VB.SEATNAME[i], human: !!(o.hot && o.hot[i]), ai: o.ai || 'normal', style: o.style || null });
-  G = VB.newGame({ n: n, seed: o.seed, phases: o.phases || 5, seats: seats, bonus: o.bonus, noBlack: o.noBlack });
+  G = VB.newGame({ n: n, teams: !!o.teams, seed: o.seed, phases: o.phases || 5, seats: seats, bonus: o.bonus, noBlack: o.noBlack });
   UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1;
   $('#start').hidden = true; $('#rs').hidden = true; $('#tv').hidden = true;
   try { GXH.setEnabled(o.hints !== false && (UI.mode !== 'story' || !!o.hints)); } catch (e) { }
@@ -494,9 +494,9 @@ function resume() { try { G = JSON.parse(localStorage.getItem('vob_save')); } ca
 function gameOver() { try { localStorage.removeItem('vob_save'); } catch (e) { } musSync(); showResult(); }
 function showResult() {
   var rs = $('#rs'); toastOff(); rs.innerHTML = ''; var c = h('div.card', { role: 'dialog', 'aria-label': 'Result' });
-  var w = G.winner, you = G.seats.filter(function (s) { return s.human; }).length === 1; c.classList.add(w === 0 || !you ? 'rwin' : 'rlose'); setTimeout(function () { sfx(w === 0 ? 'score' : 'bad'); }, 150);
-  c.appendChild(h('div', { 'data-art': w === 0 && you ? 'ui-result-win' : 'ui-result-lose', style: 'height:8px' }));
-  c.appendChild(h('h2', { text: you ? (w === 0 ? 'Your banner flies highest!' : G.seats[w].name + ' wins the valley') : G.seats[w].name + ' wins!' }));
+  var w = G.winner, you = G.seats.filter(function (s) { return s.human; }).length === 1, won = G.teams ? w % 2 === 0 : w === 0; c.classList.add(won || !you ? 'rwin' : 'rlose'); setTimeout(function () { sfx(won ? 'score' : 'bad'); }, 150);
+  c.appendChild(h('div', { 'data-art': won && you ? 'ui-result-win' : 'ui-result-lose', style: 'height:8px' }));
+  c.appendChild(h('h2', { text: G.solo ? (won ? 'Estate complete: you win!' : 'Estate not complete: ' + G.soloFilled + ' of 37 spaces') : G.teams ? (won ? 'Your team wins ' + G.teamVP[0] + ' to ' + G.teamVP[1] + '!' : G.seats[1].name + ' and ' + G.seats[3].name + ' win ' + G.teamVP[1] + ' to ' + G.teamVP[0]) : you ? (w === 0 ? 'Your banner flies highest!' : G.seats[w].name + ' wins the valley') : G.seats[w].name + ' wins!' }));
   var tb = h('table'); tb.appendChild(h('tr', {}, ['', 'Board', 'Silver', 'Workers', 'Goods', 'Lore', 'Total'].map(function (x) { return h('th', { text: x }); })));
   G.rank.forEach(function (s) { var p = G.P[s], e = p.end || { silver: 0, workers: 0, goods: 0, lore: 0 }; tb.appendChild(h('tr', {}, [G.seats[s].name, p.vpPlay, e.silver, e.workers, e.goods, e.lore, p.vp].map(function (x) { return h('td', { text: String(x) }); }))); });
   c.appendChild(tb);
@@ -515,11 +515,11 @@ function showResult() {
   ac.appendChild(h('button.btn.alt', { type: 'button', id: 'lookB', text: 'Look at the board', onclick: function () { rs.hidden = true; } }));
   if (!UI.camp) ac.appendChild(h('button.btn.alt', { type: 'button', id: 'titleB', text: 'Title', onclick: showTitle }));
   c.appendChild(ac); rs.appendChild(c); rs.hidden = false; try { artApply(rs); } catch (e) { }
-  try { if (!UI.camp && window.GNS && GNS.result) GNS.result({ game: 'vale-of-banners', mode: 'quick', won: w === 0, score: p0.vp }); } catch (e) { }
+  try { if (!UI.camp && window.GNS && GNS.result) GNS.result({ game: 'vale-of-banners', mode: 'quick', won: won, score: p0.vp }); } catch (e) { }
 }
 
 /* ---------------- title + quick setup ---------------- */
-var SET = { n: 2, ai: 'normal', hot: 0 };
+var SET = { n: 2, ai: 'normal', hot: 0, teams: 0 };
 function showTitle() {
   clearTimeout(UI.aiT); try { GXT.stop(); } catch (e) { } try { GXC.close(); } catch (e) { } GX.close && GX.close();
   var st = $('#start'); st.innerHTML = ''; st.hidden = false; $('#rs').hidden = true; $('#tv').hidden = true;
@@ -541,14 +541,17 @@ function showSetup() {
     opts.forEach(function (o) { s.appendChild(h('button' + (cur === o[0] ? '.on' : ''), { type: 'button', text: o[1], 'aria-pressed': cur === o[0] ? 'true' : 'false', onclick: function () { set(o[0]); showSetup(); } })); });
     r.appendChild(s); return r;
   }
-  c.appendChild(seg('Players', [[2, '2'], [3, '3'], [4, '4']], SET.n, function (v) { SET.n = v; SET.hot = Math.min(SET.hot, v - 1); }));
-  c.appendChild(seg('Computer stewards', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], SET.ai, function (v) { SET.ai = v; }));
-  var hs = [[0, 'None']]; for (var i = 1; i < SET.n; i++) hs.push([i, String(i)]);
-  c.appendChild(seg('Friends on this device', hs, SET.hot, function (v) { SET.hot = v; }));
-  c.appendChild(h('p.tip', { text: SET.hot ? 'Pass the device when it says so. Everything on the table is open.' : 'You against ' + (SET.n - 1) + ' computer steward' + (SET.n > 2 ? 's' : '') + '.' }));
+  c.appendChild(seg('Players', [[1, 'Solo'], [2, '2'], [3, '3'], [4, '4']], SET.n, function (v) { SET.n = v; SET.hot = Math.max(0, Math.min(SET.hot, v - 1)); }));
+  if (SET.n > 1) {
+    c.appendChild(seg('Computer stewards', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], SET.ai, function (v) { SET.ai = v; }));
+    var hs = [[0, 'None']]; for (var i = 1; i < SET.n; i++) hs.push([i, String(i)]);
+    c.appendChild(seg('Friends on this device', hs, SET.hot, function (v) { SET.hot = v; }));
+    if (SET.n === 4) c.appendChild(seg('Teams', [[0, 'Each alone'], [1, '2 v 2']], SET.teams, function (v) { SET.teams = v; }));
+  }
+  c.appendChild(h('p.tip', { text: SET.n === 1 ? 'Solo: 25 rounds. Fill all 37 spaces of your estate to win. No limit on goods kinds.' : SET.n === 4 && SET.teams ? 'You and Saffron against Azure and Violet. Partners share silver, workers and goods; team points add up.' : SET.hot ? 'Pass the device when it says so. Everything on the table is open.' : 'You against ' + (SET.n - 1) + ' computer steward' + (SET.n > 2 ? 's' : '') + '.' }));
   c.appendChild(h('button.btn.big', { type: 'button', id: 'goB', text: 'Start', onclick: function () {
     var hot = {}, names = {}; for (var k = 1; k <= SET.hot; k++) { hot[k] = true; names[k] = 'Friend ' + k; }
-    UI.lastOpts = { n: SET.n, ai: SET.ai, hot: hot, names: names }; startGame(UI.lastOpts);
+    UI.lastOpts = { n: SET.n, ai: SET.ai, hot: hot, names: names, teams: SET.n === 4 && !!SET.teams }; startGame(UI.lastOpts);
   } }));
   c.appendChild(h('button.btn.alt', { type: 'button', id: 'backB', text: 'Back', onclick: showTitle }));
   st.appendChild(c);
@@ -561,6 +564,7 @@ var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn
   '<li>Build: tap a tile in your storage, then a glowing space of its colour next to your land.</li>' +
   '<li>No good move? Take 2 workers; each worker turns a die up or down by 1.</li>' +
   '<li>Tap End turn. Most points after five seasons wins.</li></ol><h3>All the rules</h3>' +
+  '<p><b>Solo</b> (Quick game, 1 player): 1 silver, 2 workers, 3 goods, no limit on goods kinds, 25 rounds; you win only by filling all 37 spaces. <b>Teams</b> (4 players, 2 v 2): partners share silver, workers and goods; the team with more points wins.</p>' +
   '<p>Five seasons of five rounds. Every round each steward rolls <b>two dice</b>. On your turn use each die for one action:</p>' +
   '<ul><li><b>Take</b> a tile from the market stall with the die\'s number into your storage (3 spaces).</li>' +
   '<li><b>Build</b> a stored tile on an empty space of its colour that shows the die\'s number and touches your land.</li>' +
@@ -573,7 +577,8 @@ var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn
   '<li><b>Pasture</b> (light green): score every animal of that kind in that meadow.</li>' +
   '<li><b>Barge</b> (blue): take all goods from one stall and move up the banner track (turn order).</li></ul>' +
   '<h3>Scoring</h3><p>Fill a whole region: 1/3/6/10/15/21/28/36 points for 1-8 spaces, plus 10/8/6/4/2 for doing it in season 1-5. First to fill every space of one colour gets 5/6/7 points (2/3/4 players); the second gets 2/3/4. Each round one goods tile goes to the stall shown by the white die.</p>' +
-  '<p>Game end: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, plus Lore scrolls. Most points wins; a tie goes to the fuller estate, then to the steward further back on the banner track.</p></div>';
+  '<p>Game end: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, plus Lore scrolls. Most points wins; a tie goes to the fuller estate, then to the steward further back on the banner track.</p>' +
+  '<h3>Simplified on purpose</h3><ul><li>The estate map and its numbers are our own layout.</li><li>All tiles come from one shuffled pool into the six stalls; tile counts per kind are our own.</li><li>The 26 Lore tiles are our own.</li><li>A fourth kind of goods that does not fit your storage is lost.</li><li>Goods come from one bag for the start and every season.</li></ul></div>';
 function drawers() {
   var r = h('div', { html: RULES_HTML }); GX.drawer('rulesd', 'How to play', r);
   var tr = h('button.btn.alt', { type: 'button', text: 'Play the tutorial', style: 'margin-top:8px', onclick: function () { GX.close(); tutStart(); } }); r.appendChild(tr);

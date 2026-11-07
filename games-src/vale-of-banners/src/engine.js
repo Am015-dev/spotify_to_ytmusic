@@ -30,10 +30,10 @@
   /* ---------- setup ---------- */
   V.newGame = function (o) {
     o = o || {};
-    var n = Math.max(2, Math.min(4, o.n || 2));
+    var n = o.n === 1 ? 1 : Math.max(2, Math.min(4, o.n || 2)), teams = !!o.teams && n === 4;
     var G = { v: 1, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, n: n, nPhases: o.phases || 5, phase: 0, round: 0,
       seats: [], P: [], depots: {}, goodsAt: {}, black: [], bag: [], gbag: [], rg: [], white: 1, order: [], ti: 0, pend: [], arrc: 0,
-      colTaken: {}, over: false, log: [], noBlack: !!o.noBlack, turn: 0, seq: 0, winner: null };
+      colTaken: {}, over: false, log: [], noBlack: !!o.noBlack, turn: 0, seq: 0, winner: null, solo: n === 1, teams: teams };
     G.seed0 = G.rs;
     for (var i = 0; i < n; i++) {
       var s = (o.seats && o.seats[i]) || {};
@@ -46,10 +46,16 @@
     for (i = 0; i < n; i++) {
       var p = { estate: {}, store: [], goods: {}, silver: 1, workers: 0, vp: 0, dice: [0, 0], used: [true, true], bought: false, sold: 0, know: {}, pos: 0, arr: 0, regDone: {}, colDone: {}, stat: { regions: 0, sales: 0, chain: 0 } };
       p.estate[V.HOME] = { id: 'home' + i, t: 'castle', home: true };
+      if (n === 1) p.nolim = true;   /* solo: no limit on goods kinds */
       for (k = 0; k < 3; k++) addGoods(p, G.gbag.pop());
       G.P.push(p);
     }
     first.forEach(function (seat, k) { G.P[seat].workers = k + 1; G.P[seat].arr = n - k; });
+    if (n === 1) G.P[0].workers = 2;   /* solo: 1 silver, 2 workers, 3 goods */
+    if (teams) [[0, 2], [1, 3]].forEach(function (tm) {   /* 2 v 2: partners share one pool of silver, workers and goods */
+      var a = G.P[tm[0]], b = G.P[tm[1]]; a.silver += b.silver; a.workers += b.workers; a.nolim = b.nolim = true;
+      Object.keys(b.goods).forEach(function (g) { a.goods[g] = (a.goods[g] || 0) + b.goods[g]; });
+      b.silver = a.silver; b.workers = a.workers; b.goods = JSON.parse(JSON.stringify(a.goods)); a.nolim = b.nolim = false; });
     var b = o.bonus || {};   /* campaign twists: {seat:{silver, workers, vp}} */
     Object.keys(b).forEach(function (s) { var p = G.P[+s]; if (!p) return; p.silver += b[s].silver || 0; p.workers = Math.max(0, p.workers + (b[s].workers || 0)); p.vp += b[s].vp || 0; if (b[s].first) { p.arr = 99; } });
     G.arrc = 100;
@@ -58,11 +64,11 @@
   };
   function addGoods(p, g) {
     if (p.goods[g]) { p.goods[g]++; return true; }
-    if (Object.keys(p.goods).filter(function (k) { return p.goods[k] > 0; }).length >= 3) return false;
+    if (!p.nolim && Object.keys(p.goods).filter(function (k) { return p.goods[k] > 0; }).length >= 3) return false;
     p.goods[g] = 1; return true;
   }
-  V.depotSize = function (G) { return G.n === 2 ? 2 : G.n === 3 ? 3 : 4; };
-  V.blackSize = function (G) { return G.n === 2 ? 4 : G.n === 3 ? 6 : 8; };
+  V.depotSize = function (G) { return G.n <= 2 ? 2 : G.n === 3 ? 3 : 4; };
+  V.blackSize = function (G) { return G.n <= 2 ? 4 : G.n === 3 ? 6 : 8; };
   function startPhase(G) {
     for (var d = 1; d <= 6; d++) { G.depots[d] = []; G.goodsAt[d] = []; for (var k = 0; k < V.depotSize(G); k++) G.depots[d].push(G.bag.length ? G.bag.pop() : null); }
     G.black = []; for (k = 0; k < V.blackSize(G); k++) G.black.push(G.bag.length && !G.noBlack ? G.bag.pop() : null);
@@ -150,7 +156,22 @@
   V.legal = function (G, m) { return V.validMoves(G).some(function (x) { return V.same(x, m); }); };
 
   /* performMove: returns {ok, ev:[...]} ; ev drive the animations */
+  V.TEAMS = [[0, 2], [1, 3]];
+  V.teamOf = function (G, s) { return G.teams ? s % 2 : s; };
+  function pool(p) { return { silver: p.silver, workers: p.workers, goods: JSON.parse(JSON.stringify(p.goods)) }; }
+  function teamSync(G, before) {   /* partners share: new pool = old + both partners' changes */
+    V.TEAMS.forEach(function (tm) {
+      var a = G.P[tm[0]], b = G.P[tm[1]], o = before[tm[0]], ob = before[tm[1]];
+      var sil = o.silver + (a.silver - o.silver) + (b.silver - ob.silver), wk = o.workers + (a.workers - o.workers) + (b.workers - ob.workers), gd = {};
+      [1, 2, 3, 4, 5, 6].forEach(function (g) { var v = (o.goods[g] || 0) + ((a.goods[g] || 0) - (o.goods[g] || 0)) + ((b.goods[g] || 0) - (ob.goods[g] || 0)); if (v > 0) gd[g] = v; });
+      a.silver = b.silver = sil; a.workers = b.workers = wk; a.goods = gd; b.goods = JSON.parse(JSON.stringify(gd));
+    });
+  }
   V.performMove = function (G, m) {
+    if (!G.teams) return move1(G, m);
+    var before = G.P.map(pool), r = move1(G, m); if (r.ok) teamSync(G, before); return r;
+  };
+  function move1(G, m) {
     if (!V.legal(G, m)) return { ok: false, why: 'illegal' };
     var s = V.actor(G), p = G.P[s], ev = [], t;
     G.seq++;
@@ -199,7 +220,7 @@
     G.log.push({ k: 'move', p: s, m: m });
     if (G.log.length > 400) G.log.splice(0, G.log.length - 400);
     return { ok: true, ev: ev };
-  };
+  }
   function autoPop(G) {   /* drop optional questions that cannot be answered */
     while (G.pend.length) {
       var p = G.P[V.actor(G)], top = G.pend[G.pend.length - 1], mv = pendMoves(G, p, top);
@@ -221,7 +242,7 @@
     /* colour complete */
     if (!p.colDone[c.col] && CELLS.every(function (x) { return x.col !== c.col || p.estate[x.i]; })) {
       p.colDone[c.col] = true; var rank = G.colTaken[c.col] || 0; G.colTaken[c.col] = rank + 1;
-      var tb = V.COLOUR_BONUS[G.n]; score(G, s, tb[rank] || 0, 'colour', ci, ev);
+      var tb = V.COLOUR_BONUS[Math.max(2, G.n)]; score(G, s, tb[rank] || 0, 'colour', ci, ev);
     }
     switch (t.t) {
       case 'castle': G.pend.push({ t: 'castle' }); break;
@@ -248,7 +269,7 @@
         break;
     }
   }
-  V.saleVP = function (G, p, cnt) { return cnt * G.n + (p.know['saleVP'] ? cnt : 0); };
+  V.saleVP = function (G, p, cnt) { return cnt * Math.max(2, G.n) + (p.know['saleVP'] ? cnt : 0); };
   function sell(G, s, g, ev) {
     var p = G.P[s], cnt = p.goods[g] || 0; if (!cnt) return;
     p.goods[g] = 0; delete p.goods[g]; p.sold += cnt; p.stat.sales++;
@@ -284,10 +305,14 @@
   };
   function finalScore(G) {
     G.over = true;
-    G.P.forEach(function (p) { var b = V.endBreakdown(G, p); p.end = b; p.vpPlay = p.vp; p.vp += b.silver + b.workers + b.goods + b.lore; });
+    G.P.forEach(function (p, i) { var b = V.endBreakdown(G, p); if (G.teams && i >= 2) { b.silver = 0; b.workers = 0; b.goods = 0; }   /* the shared pool counts once per team */
+      p.end = b; p.vpPlay = p.vp; p.vp += b.silver + b.workers + b.goods + b.lore; });
+    if (G.solo) {   /* solo: you win by filling all 37 spaces of your estate */
+      G.rank = [0]; G.soloFilled = V.estateFilled(G.P[0]); G.winner = G.soloFilled >= CELLS.length ? 0 : -1; G.log.push({ k: 'over', winner: G.winner }); return; }
+    if (G.teams) G.teamVP = V.TEAMS.map(function (tm) { return G.P[tm[0]].vp + G.P[tm[1]].vp; });
     var best = -1; G.rank = [];
     for (var i = 0; i < G.n; i++) G.rank.push(i);
-    G.rank.sort(function (a, b) { return (G.P[b].vp - G.P[a].vp) || (V.estateFilled(G.P[b]) - V.estateFilled(G.P[a])) || (G.P[a].pos - G.P[b].pos) || (G.P[a].arr - G.P[b].arr); });   /* tie: fewer empty spaces, then the one further back on the track */
+    G.rank.sort(function (a, b) { return (G.teams ? G.teamVP[b % 2] - G.teamVP[a % 2] : 0) || (G.P[b].vp - G.P[a].vp) || (V.estateFilled(G.P[b]) - V.estateFilled(G.P[a])) || (G.P[a].pos - G.P[b].pos) || (G.P[a].arr - G.P[b].arr); });   /* tie: fewer empty spaces, then the one further back on the track */
     G.winner = G.rank[0];
     G.log.push({ k: 'over', winner: G.winner });
   }

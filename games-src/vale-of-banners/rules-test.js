@@ -65,6 +65,27 @@ const nbOf = (i, col) => C[i].nb.map(n => C[n]).find(c => !col || c.col === col)
   ok(b.silver === 3 && b.workers === 2 && b.goods === 2 && b.lore === 4, 'end breakdown'); }
 // 14 tile pool + data counts
 ok(VB.KNOW.length === 26 && VB.BLDKEYS.length === 8 && VB.CELLS.length === 37, '26 lore, 8 buildings, 37 spaces');
+// rules-check MISSING newGame solo: 1 silver, 2 workers, 3 goods, no goods-kind limit, 25 rounds, win only by filling all 37 spaces
+{ const G = VB.newGame({ n: 1, seed: 21, seats: [{ human: true }] }), p = G.P[0];
+  ok(G.n === 1 && G.solo && p.silver === 1 && p.workers === 2 && Object.values(p.goods).reduce((a, b) => a + b, 0) === 3, 'MISSING newGame solo: start 1 silver, 2 workers, 3 goods');
+  p.goods = { 1: 1, 2: 1, 3: 1 }; G.depots[1] = []; G.goodsAt = { 1: [4, 5], 2: [], 3: [], 4: [], 5: [], 6: [] }; p.store = [{ id: 'sb', t: 'ship' }];
+  const sh = VB.CELLS.find(c => c.col === 'ship' && c.nb.includes(VB.HOME)) || null;
+  if (sh) { p.dice = [sh.num, 1]; p.used = [false, false]; G.goodsAt[1] = [4, 5]; G.order = [0]; G.ti = 0; G.pend = [];
+    VB.performMove(G, { k: 'place', die: 0, v: sh.num, s: 0, cell: sh.i, w: 0 }); const sm = VB.validMoves(G).find(m => m.k === 'ship' && m.v === 1); if (sm) VB.performMove(G, sm); }
+  ok(!sh || Object.keys(p.goods).length === 5, 'MISSING newGame solo: no limit on goods kinds');
+  let g2 = VB.newGame({ n: 1, seed: 22, seats: [{ human: true }] }), rounds = 0, last = -1, i = 0;
+  while (!g2.over && i++ < 6000) { if (g2.round !== last) { rounds++; last = g2.round; } VB.performMove(g2, VB.aiMove(g2)); }
+  ok(g2.over && rounds === 25, 'MISSING newGame solo: 25 rounds (' + rounds + ')');
+  ok(g2.winner === (VB.estateFilled(g2.P[0]) >= 37 ? 0 : -1), 'MISSING newGame solo: win only with all 37 spaces filled');
+  const g3 = VB.clone(g2); VB.CELLS.forEach(c => { if (!g3.P[0].estate[c.i]) g3.P[0].estate[c.i] = { id: 'f' + c.i, t: c.col }; }); g3.over = false; VB.forceEnd(g3);
+  ok(g3.winner === 0, 'MISSING newGame solo: a full estate wins'); }
+// rules-check MISSING newGame team: 2 v 2, partners share workers, silver and goods; team total decides
+{ const G = VB.newGame({ n: 4, teams: true, seed: 31 }), a = G.P[0], b = G.P[2];
+  ok(G.teams && a.silver === b.silver && a.workers === b.workers && JSON.stringify(a.goods) === JSON.stringify(b.goods), 'MISSING newGame team: partners start with one shared pool');
+  let i = 0, shared = true; while (!G.over && i++ < 20000) { VB.performMove(G, VB.aiMove(G)); if (G.P[0].silver !== G.P[2].silver || G.P[1].workers !== G.P[3].workers || JSON.stringify(G.P[1].goods) !== JSON.stringify(G.P[3].goods)) shared = false; }
+  ok(G.over && shared, 'MISSING newGame team: silver, workers and goods stay shared all game');
+  const w = G.winner % 2; ok(G.teamVP[w] >= G.teamVP[1 - w], 'MISSING newGame team: the team with more points wins');
+  ok(G.P[2].end.silver === 0 && G.P[3].end.goods === 0, 'MISSING newGame team: the shared pool scores once per team'); }
 // 15 AI games: every level, 2-4 players, invariants after every move
 const N = process.env.QUICK ? 40 : 300; let stuck = 0, bad = 0, done = 0, lens = [];
 for (let g = 0; g < N; g++) {

@@ -42,7 +42,7 @@
     for (var col in V.COLCOUNT) {
       if (p.colDone[col]) continue; var f = 0, n = V.COLCOUNT[col];
       for (var k in p.estate) if (V.CELLS[k].col === col) f++;
-      var bonus = (V.COLOUR_BONUS[G.n][G.colTaken[col] || 0] || 0); v += Math.pow(f / n, 3) * bonus * 0.6;
+      var bonus = (V.COLOUR_BONUS[Math.max(2, G.n)][G.colTaken[col] || 0] || 0); v += Math.pow(f / n, 3) * bonus * 0.6;
     }
     /* each built tile keeps a little value (frontier to build from) and lore keeps paying */
     var built = V.estateFilled(p); v += built * (1.2 + 2 * r);
