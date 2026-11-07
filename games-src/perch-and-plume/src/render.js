@@ -27,7 +27,7 @@ function cardHTML(id, size, st, attrs) {
   } else if (size === 'tray') {
     h += '';
   } else {
-    h += '<div class="nm">' + esc(b.n) + '</div><div class="cost">' + costHTML(b) + '</div>' + (size === 'hand' ? '<div class="pwt ' + col + '">' + esc(pw.txt || 'No power.') + '</div>' : '') + '<div class="habs">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + nestIcon(b.nest) + '<em>' + b.e + ' eggs</em></div>';
+    h += '<div class="nm">' + esc(b.n) + '</div><div class="cost">' + costHTML(b) + '</div>' + (size === 'hand' ? '<div class="pwt ' + col + '">' + esc(pw.txt || 'No power.') + '</div>' : '') + '<div class="habs">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + nestIcon(b.nest) + '</div>';
   }
   return h + '</div>';
 }

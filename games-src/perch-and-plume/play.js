@@ -5,11 +5,11 @@ const { chromium } = require('playwright');
 const path = require('path'), fs = require('fs');
 const SIZE = process.argv[2] || 'phone', WHAT = process.argv[3] || 'all';
 const URL = process.argv[4] || 'file://' + path.join(__dirname, 'perch-and-plume.html');
-const VP = SIZE === 'pc' ? { width: 1440, height: 860 } : { width: 390, height: 763 }, TOUCH = SIZE !== 'pc';
+const VP = SIZE === 'pc' ? { width: 1440, height: 860 } : SIZE === 'land' ? { width: 844, height: 390 } : { width: 390, height: 763 }, TOUCH = SIZE !== 'pc';
 let fails = 0; const log = (ok, m) => { if (!ok) fails++; console.log((ok ? 'PASS ' : 'FAIL ') + SIZE + ' ' + m); };
 async function tap(p, sel) {
   const el = typeof sel === 'string' ? await p.$(sel) : sel; if (!el) throw new Error('no element ' + sel);
-  await el.scrollIntoViewIfNeeded().catch(() => { });
+  if (!(await el.evaluate(e => !!e.closest('.gxc')).catch(() => false))) await el.scrollIntoViewIfNeeded().catch(() => { });   // story sheets are not scrolled: a real player taps what is on screen
   if (TOUCH) await el.tap({ timeout: 5000 }); else await el.click({ timeout: 5000 });
 }
 // one step of the human: returns 'done' | 'wait' | 'acted'
