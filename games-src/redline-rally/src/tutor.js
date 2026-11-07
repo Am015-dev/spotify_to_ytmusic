@@ -22,7 +22,7 @@ var TUT_CH = [
   { round: 6, pos: 28, gear: 3, eng: 5, hand: ['2', '1', '4', '4', '3', '3', '1'], top: ['3'], kit: -8, juno: -10 }
 ];
 function tutStageRound(r) {   /* called when the plan for round r is about to be shown (tutorial only) */
-  var ch = TUT_CH[Math.min(r, 6) - 1]; if (!ch || !G) return;
+  var ch = TUT_CH[Math.min(r, 6) - 1]; if (!ch || !G || G.cars[0].fin) return;
   var c = G.cars[0], kit = G.cars[1], jn = G.cars[2], N = T(G).N;
   if (UI.tutAbs) { c.pos = ch.pos; c.gear = ch.gear; UI.tutAbs = false; G.round = ch.round; }
   /* heat accounting: engine heat + heat cards = 6 */
