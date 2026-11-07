@@ -32,6 +32,7 @@ Tests: `game/tutorial-end.js` (tutorial to the end, both sizes), `game/play-ui.j
   Story stage 1 reach their result by taps on visible, uncovered UI), `rules-test.js` 90/90.
 
 ## Gate results
+- `sweep.js` (full game through the page, touch taps only, 390x763): SWEEP CLEAN (it caught two real issues in my result card, fixed: card covered a seat, line over 8 words).
 - build-all `--quick` PASS (scenarios 9/9, one instruction line of 8 words or fewer, text >= 14px on the board).
 - ui-audit A, C, D, E, F: 0 on phone, phone-s and pc. Rule B (contrast / busy background) still reports 3 on phone, 1 on phone-s, 5 on pc, all in places this
   pass did not redesign: the Menu panel's "New here?" button (audit reads it as 2.4-2.8:1 although the painted button is white on dark red, 8:1 by computation),

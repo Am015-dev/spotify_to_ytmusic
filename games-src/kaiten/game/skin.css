@@ -88,7 +88,8 @@ html .gxh-bub .gxh-tx{font-size:15px!important;line-height:1.25!important}
 html .gxh-bub .gxh-tt{font-size:16px!important}
 html .gxt-bub .gxh-tx{padding-right:0!important}
 /* result card */
-#rs.kkfin .rsbox.bar{flex-direction:column;align-items:center;gap:10px;background:#fff3d6;border:3px solid #4a2a22;border-radius:16px;padding:12px;width:min(350px,calc(100vw - 20px));pointer-events:auto;box-shadow:0 14px 44px rgba(0,0,0,.55)}
+#rs.kkfin{align-items:flex-end!important;padding-bottom:8px!important}
+#rs.kkfin .rsbox.bar{flex-flow:row wrap;align-items:center;justify-content:center;gap:8px;background:#fff3d6;border:3px solid #4a2a22;border-radius:16px;padding:12px;width:min(350px,calc(100vw - 20px));pointer-events:auto;box-shadow:0 14px 44px rgba(0,0,0,.55)}
 #rs.kkfin .rsbox.bar .btn{min-height:50px;min-width:120px;font-size:18px}
 .kkres{width:100%;color:#3a1f17}
 .kkr1{display:flex;gap:10px;align-items:center}
@@ -127,3 +128,8 @@ html button[data-gxt-open] b,html button[data-gxt-open] span{color:#fff;opacity:
 .shead{flex-wrap:wrap}
 .ctr .none{background:#fff3d6;padding:1px 8px;border-radius:8px}
 .rules p{padding:4px 8px;border-radius:8px}
+
+#rs.kkfin .kkres{flex-basis:100%}
+#rs.kkfin .rsbox.bar .btn{flex:1 1 0;min-width:0;min-height:48px}
+.kkrs{flex-direction:column}
+.kkrs li{padding:2px 10px}

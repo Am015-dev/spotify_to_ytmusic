@@ -6,7 +6,7 @@ KK.STORY = {
   rivalId: 'odile',
   // one line in the game's own voice when a Quick game starts and ends
   quickIntro: 'Welcome to the Turning Plate. The belt rolls!',
-  quickResult: { win: 'You cleared the belt. Auntie Suzu would be proud.', lose: '%R took the Golden Plate this time. Same belt tomorrow?', tie: 'A dead heat. The belt keeps turning.' },
+  quickResult: { win: 'You cleared the belt. Auntie Suzu is proud.', lose: '%R takes the Golden Plate. Same belt tomorrow?', tie: 'A dead heat. The belt keeps turning.' },
   // Help opens with these five lines
   turn: ['1. Everyone looks at their own hand of plates.', '2. Pick ONE plate. Everybody picks at the same time.', '3. The covers lift, one diner after another, and each plate lands on its owner\'s counter.', '4. Your points pop up with the reason.', '5. Your leftover hand slides to the next diner, theirs comes to you. Repeat until the hands are empty.'],
   // the live-turn instruction line (banner | text, 8 words at most together: gate rule 5); %N = next diner, %R = a rival
