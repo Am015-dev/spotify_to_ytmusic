@@ -163,7 +163,8 @@
     ],
     "floors": 2,
     "boss": "warden-captain",
-    "relic": "iron-bangle"
+    "relic": "iron-bangle",
+    "hpPct": 106
    },
    "twist": null,
    "goal": {

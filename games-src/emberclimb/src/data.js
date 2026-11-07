@@ -9,11 +9,13 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     var d = { id: id, hero: hero, name: name, type: type, rar: rar, cost: cost, ops: ops, art: art, fl: fl || '' };
     d.tgt = needsTarget(ops); CARDS[id] = d; ORDER.push(id);
   }
+  // Scale: tabletop rules that are pure numbers x SCALE (the shelf keeps video-game-sized HP and damage). Caps follow the tabletop.
+  var SCALE = 3, CAPS = { str: 8, blk: 60, en: 6, shiv: 5, poison: 30, deb: 3, mir: 5 }, EHP = { 1: 1, 2: 1.6 };
   var H = {
     w: { k: 'w', name: 'Garrick Cinderplate', role: 'Ember Warrior', hp: 80, mech: 'Strength: every point adds damage to all attacks.', art: 'broad-shouldered armoured warrior with a glowing ember-forged greatsword', relic: 'ember-brand', start: ['w-strike', 'w-strike', 'w-strike', 'w-strike', 'w-strike', 'w-defend', 'w-defend', 'w-defend', 'w-defend', 'w-hammer'], col: '#c8472b' },
-    s: { k: 's', name: 'Sable Quillfinger', role: 'Venom Rogue', hp: 70, mech: 'Poison and Shivs: stack poison, flood the table with 0-cost shivs.', art: 'hooded lithe rogue with throwing knives and a vial of green venom', relic: 'whetstone-ring', start: ['s-strike', 's-strike', 's-strike', 's-strike', 's-defend', 's-defend', 's-defend', 's-defend', 's-defend', 's-pinprick', 's-slip-away'], col: '#3f9b5a' },
-    a: { k: 'a', name: 'Cog-9', role: 'Orb Automaton', hp: 72, mech: 'Orbs: channel Lightning, Frost and Dark; evoke them for big effects.', art: 'friendly brass clockwork automaton with three glowing orbs orbiting its chest', relic: 'spark-core', start: ['a-strike', 'a-strike', 'a-strike', 'a-strike', 'a-defend', 'a-defend', 'a-defend', 'a-defend', 'a-zap', 'a-dualcast'], col: '#3d8fd0' },
-    m: { k: 'm', name: 'Ione Stillwater', role: 'Stance Monk', hp: 76, mech: 'Stances: Wrath doubles damage dealt and taken; Calm gives energy on exit.', art: 'serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves', relic: 'prayer-beads', start: ['m-strike', 'm-strike', 'm-strike', 'm-strike', 'm-defend', 'm-defend', 'm-defend', 'm-defend', 'm-eruption', 'm-vigilance'], col: '#c9a227' }
+    s: { k: 's', name: 'Sable Quillfinger', role: 'Venom Rogue', hp: 70, mech: 'Poison and Shivs: stack poison, flood the table with 0-cost shivs.', art: 'hooded lithe rogue with throwing knives and a vial of green venom', relic: 'whetstone-ring', start: ['s-strike', 's-strike', 's-strike', 's-strike', 's-strike', 's-defend', 's-defend', 's-defend', 's-defend', 's-defend', 's-pinprick', 's-slip-away'], col: '#3f9b5a' },
+    a: { k: 'a', name: 'Cog-9', role: 'Orb Automaton', hp: 75, mech: 'Orbs: channel Lightning, Frost and Dark; evoke them for big effects.', art: 'friendly brass clockwork automaton with three glowing orbs orbiting its chest', relic: 'spark-core', start: ['a-strike', 'a-strike', 'a-strike', 'a-strike', 'a-defend', 'a-defend', 'a-defend', 'a-defend', 'a-zap', 'a-dualcast'], col: '#3d8fd0' },
+    m: { k: 'm', name: 'Ione Stillwater', role: 'Stance Monk', hp: 72, mech: 'Stances: Wrath adds 3 damage per hit; Calm gives energy on exit.', art: 'serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves', relic: 'prayer-beads', start: ['m-strike', 'm-strike', 'm-strike', 'm-strike', 'm-defend', 'm-defend', 'm-defend', 'm-defend', 'm-eruption', 'm-vigilance'], col: '#c9a227' }
   };
   // ---------- Warrior
   c('w-strike', 'w', 'Cinder Strike', 'A', 's', 1, [['dmg', 6]], 'plain sword cut trailing orange sparks');
@@ -46,25 +48,25 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   c('s-pinprick', 's', 'Pinprick', 'A', 's', 0, [['dmg', 3], ['weak', 1]], 'needle dart striking a shoulder');
   c('s-slip-away', 's', 'Slip Away', 'S', 's', 1, [['blk', 8]], 'rogue vanishing in a puff of grey smoke');
   c('s-blade-fan', 's', 'Blade Fan', 'S', 'c', 1, [['shiv', 3]], 'three throwing knives fanned in one hand');
-  c('s-toxic-vial', 's', 'Toxic Vial', 'S', 'c', 1, [['poison', 5]], 'glass vial of bubbling green venom');
+  c('s-toxic-vial', 's', 'Toxic Vial', 'S', 'c', 1, [['poison', 3]], 'glass vial of bubbling green venom');
   c('s-quick-stab', 's', 'Gutter Stab', 'A', 'c', 1, [['dmg', 9]], 'upward stab from an alley shadow');
   c('s-dodge-roll', 's', 'Dodge Roll', 'S', 'c', 0, [['blk', 4], ['draw', 1]], 'rogue tumbling under a swinging club');
   c('s-hidden-knives', 's', 'Hidden Knives', 'S', 'c', 1, [['shiv', 2], ['blk', 4]], 'knives tucked inside a coat lining');
   c('s-dagger-spray', 's', 'Dagger Spray', 'A', 'c', 1, [['all', 4], ['all', 4]], 'burst of daggers flying outward');
   c('s-cripple', 's', 'Hamstring', 'S', 'c', 1, [['weak', 2], ['vuln', 1]], 'rope snare around an ogre leg');
   c('s-lucky-pick', 's', 'Lucky Pick', 'S', 'c', 1, [['blk', 6], ['roll', [], [['draw', 1]], [['draw', 2], ['nrg', 1]]]], 'pickpocket hand flipping a die and a coin');
-  c('s-snap-cut', 's', 'Barbed Cut', 'A', 'c', 1, [['dmg', 6], ['poison', 3]], 'barbed blade dripping green');
+  c('s-snap-cut', 's', 'Barbed Cut', 'A', 'c', 1, [['dmg', 6], ['poison', 2]], 'barbed blade dripping green');
   c('s-catalyst', 's', 'Catalyst', 'S', 'u', 1, [['dblPoison']], 'green flask thrown into a green cauldron', 'x');
-  c('s-noxious', 's', 'Noxious Haze', 'P', 'u', 1, [['power', 'noxious', 2]], 'sickly green mist curling around boots');
+  c('s-noxious', 's', 'Noxious Haze', 'P', 'u', 1, [['power', 'noxious', 1]], 'sickly green mist curling around boots');
   c('s-envenom', 's', 'Coat Blades', 'P', 'u', 2, [['power', 'envenom', 1]], 'brush painting venom onto a dagger');
   c('s-knife-rain', 's', 'Knife Rain', 'S', 'u', 2, [['shiv', 5]], 'a downpour of tiny knives from above');
   c('s-backstab', 's', 'Backstab', 'A', 'u', 0, [['dmg', 11]], 'rogue behind a distracted guard', 'x');
-  c('s-choking-cloud', 's', 'Choking Cloud', 'S', 'u', 2, [['poisonAll', 5]], 'billowing poison cloud over a crowd', 'x');
+  c('s-choking-cloud', 's', 'Choking Cloud', 'S', 'u', 2, [['poisonAll', 2]], 'billowing poison cloud over a crowd', 'x');
   c('s-needle-rain', 's', 'Needle Volley', 'A', 'u', 2, [['hit', 3, 4]], 'three needles in a straight row');
-  c('s-venom-storm', 's', 'Venom Storm', 'S', 'r', 2, [['poisonAll', 8]], 'swirling emerald storm of droplets');
+  c('s-venom-storm', 's', 'Venom Storm', 'S', 'r', 2, [['poisonAll', 3]], 'swirling emerald storm of droplets');
   c('s-afterimage', 's', 'Afterimage', 'P', 'r', 1, [['power', 'afterimg', 1]], 'ghostly echo of the rogue trailing behind');
   c('s-final-flourish', 's', 'Final Flourish', 'A', 'r', 2, [['dmg', 28]], 'dramatic bow with a single bright blade', 'x');
-  c('s-plague-doctor', 's', 'Plague Brew', 'S', 'r', 2, [['poison', 8], ['dblPoison']], 'beaked mask above a seething black cauldron');
+  c('s-plague-doctor', 's', 'Plague Brew', 'S', 'r', 2, [['poison', 4], ['dblPoison']], 'beaked mask above a seething black cauldron');
   // ---------- Automaton
   c('a-strike', 'a', 'Piston Jab', 'A', 's', 1, [['dmg', 6]], 'brass piston arm punching forward');
   c('a-defend', 'a', 'Plating Shift', 'S', 's', 1, [['blk', 5]], 'metal plates sliding shut');
@@ -93,17 +95,17 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   // ---------- Monk
   c('m-strike', 'm', 'Open Palm', 'A', 's', 1, [['dmg', 6]], 'flat palm strike with a ripple of air');
   c('m-defend', 'm', 'Guarded Stance', 'S', 's', 1, [['blk', 5]], 'monk arms crossed in defence');
-  c('m-eruption', 'm', 'Wrath Eruption', 'A', 's', 2, [['dmg', 9], ['stance', 'w']], 'red flames bursting from a monk fist');
-  c('m-vigilance', 'm', 'Quiet Vigil', 'S', 's', 2, [['blk', 8], ['stance', 'c']], 'monk sitting under a blue lotus glow');
+  c('m-eruption', 'm', 'Wrath Eruption', 'A', 's', 2, [['dmg', 12], ['stance', 'w']], 'red flames bursting from a monk fist');
+  c('m-vigilance', 'm', 'Quiet Vigil', 'S', 's', 2, [['blk', 11], ['stance', 'c']], 'monk sitting under a blue lotus glow');
   c('m-palm-flurry', 'm', 'Palm Flurry', 'A', 'c', 0, [['dmg', 5], ['draw', 1]], 'many blurred hands striking');
   c('m-crush-joints', 'm', 'Crush Joints', 'A', 'c', 1, [['dmg', 8], ['vuln', 1]], 'precise elbow strike to an armoured joint');
-  c('m-pressure-point', 'm', 'Pressure Point', 'S', 'c', 0, [['poison', 8]], 'fingertip pressed on a glowing nerve spot');
+  c('m-pressure-point', 'm', 'Pressure Point', 'S', 'c', 0, [['poison', 3]], 'fingertip pressed on a glowing nerve spot');
   c('m-still-water', 'm', 'Still Water', 'S', 'c', 1, [['stance', 'c'], ['blk', 4]], 'perfectly calm pond with a single ripple');
   c('m-sash-whip', 'm', 'Sash Whip', 'A', 'c', 1, [['dmg', 8], ['weak', 1]], 'silk sash cracking like a whip');
   c('m-cut-through', 'm', 'Cut Through', 'A', 'c', 1, [['dmg', 7], ['blk', 2]], 'blade of air slicing a bamboo stalk');
   c('m-empty-fist', 'm', 'Empty Fist', 'A', 'c', 1, [['dmg', 9], ['stance', 'n']], 'open empty hand over a plain stone');
-  c('m-bow', 'm', 'Deep Bow', 'S', 'c', 0, [['blk', 4]], 'monk bowing low at a shrine gate');
-  c('m-third-eye', 'm', 'Third Eye', 'S', 'c', 1, [['blk', 7], ['draw', 1]], 'glowing eye painted on a forehead');
+  c('m-bow', 'm', 'Deep Bow', 'S', 'c', 0, [['blk', 4], ['scry', 2]], 'monk bowing low at a shrine gate');
+  c('m-third-eye', 'm', 'Third Eye', 'S', 'c', 1, [['blk', 7], ['scry', 3]], 'glowing eye painted on a forehead');
   c('m-inner-peace', 'm', 'Inner Peace', 'S', 'u', 1, [['draw', 3], ['stance', 'c']], 'monk meditating on a floating stone');
   c('m-wheel-kick', 'm', 'Wheel Kick', 'A', 'u', 2, [['dmg', 15], ['draw', 2]], 'spinning high kick trailing a circle');
   c('m-rushdown', 'm', 'Rushdown', 'P', 'u', 1, [['power', 'rush', 2]], 'red wind rushing around a crouched monk');
@@ -112,14 +114,14 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   c('m-windmill', 'm', 'Windmill Strike', 'A', 'u', 1, [['all', 6]], 'monk spinning with arms out like a windmill');
   c('m-roll-with-it', 'm', 'Roll With It', 'S', 'u', 1, [['roll', [['blk', 6]], [['blk', 10]], [['blk', 14], ['stance', 'c']]]], 'monk tumbling softly as a die lands nearby');
   c('m-sky-hammer', 'm', 'Sky Hammer', 'A', 'r', 3, [['hit', 4, 6]], 'four heavenly hammer-shaped lights falling');
-  c('m-zen-burst', 'm', 'Zen Burst', 'S', 'r', 0, [['nrg', 2], ['stance', 'c']], 'blinding golden burst behind a calm monk', 'x');
+  c('m-zen-burst', 'm', 'Zen Burst', 'S', 'r', 0, [['mir', 2], ['stance', 'c']], 'blinding golden burst behind a calm monk', 'x');
   c('m-deva-form', 'm', 'Deva Form', 'P', 'r', 3, [['power', 'deva', 1]], 'monk ascending with golden multi-armed halo');
-  c('m-judgment', 'm', 'Final Verdict', 'A', 'r', 1, [['dmg', 30]], 'a single glowing sword of light over a scale', 'x');
+  c('m-judgment', 'm', 'Final Verdict', 'A', 'r', 1, [['dmg', 30]], 'a single glowing sword of light over a scale', 'xt');
   // ---------- Neutral (shop, events)
   c('n-bandage', 'n', 'Bandage Up', 'S', 'c', 0, [['heal', 4]], 'cloth bandage rolled around an arm', 'x');
   c('n-good-instincts', 'n', 'Good Instincts', 'S', 'c', 0, [['blk', 6]], 'eyes opening wide in a dark corridor', 'x');
   c('n-finesse', 'n', 'Finesse', 'S', 'c', 0, [['blk', 2], ['draw', 1]], 'light-footed step over a rope');
-  c('n-panic-button', 'n', 'Panic Button', 'S', 'u', 0, [['blk', 30]], 'big red button under a glass cover', 'x');
+  c('n-panic-button', 'n', 'Panic Button', 'S', 'u', 0, [['blk', 30]], 'big red button under a glass cover', 'xt');
   c('n-hand-of-greed', 'n', 'Hand of Greed', 'A', 'u', 2, [['dmg', 20]], 'golden clenched hand with coins', '');
   // ---------- Statuses and curses (unplayable junk)
   c('wound', 'z', 'Wound', 'X', 'z', -1, [], 'torn bandage with a red stain', 'u');
@@ -130,24 +132,24 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   c('doubt', 'z', 'Doubt', 'X', 'k', -1, [], 'cracked mirror showing a worried face', 'ud');
   c('injury', 'z', 'Lingering Injury', 'X', 'k', -1, [], 'old bruise on a shoulder', 'u');
   c('calm-spark', 'z', 'Calm Spark', 'S', 'z', 0, [['nrg', 1]], 'small golden light cupped in two hands', 'x');
-  c('shiv', 'z', 'Shiv', 'A', 'z', 0, [['dmg', 4]], 'small improvised blade', 'x');
-  // flags: u=unplayable x=exhaust e=ethereal(exhaust at end of turn) b=burn(2 hp at end of turn if held) r=regret d=doubt
+  c('shiv', 'z', 'Shiv', 'A', 'z', 0, [['dmg', 3]], 'small improvised blade', 'x');
+  // flags: t=retain (stays in hand at end of turn) u=unplayable x=exhaust e=ethereal(exhaust at end of turn) b=burn(2 hp at end of turn if held) r=regret d=doubt
 
   var ENEMIES = {
     'mire-slug': { name: 'Mire Slug', hp: [11, 15], pat: [{ atk: 5 }, { atk: 3, weak: 1 }, { atk: 6 }], art: 'fat grey-green slug with eyestalks on a swamp log' },
     'gnawer': { name: 'Gnawer', hp: [10, 14], pat: [{ atk: 4 }, { atk: 4 }, { blk: 5, str: 1 }], art: 'oversized scruffy rat showing yellow teeth' },
     'hex-acolyte': { name: 'Hex Acolyte', hp: [40, 44], pat: [{ str: 3 }, { atk: 6 }], ritual: 3, art: 'cultist in a feathered hood chanting by a candle' },
-    'gape-grub': { name: 'Gape Grub', hp: [40, 44], mode: 'rand', pat: [{ atk: 11 }, { str: 3, blk: 6 }, { atk: 7, blk: 5 }], art: 'wide-mouthed pale grub with a ring of teeth' },
-    'rust-tick': { name: 'Rust Tick', hp: [10, 14], pat: [{ atk: 5 }, { weak: 2 }, { atk: 6 }], art: 'rust-coloured tick the size of a dog' },
+    'gape-grub': { name: 'Gape Grub', hp: [40, 44], pat: [{ die: [{ str: 3, blk: 6 }, { atk: 7, blk: 5 }, { atk: 11 }] }], art: 'wide-mouthed pale grub with a ring of teeth' },
+    'rust-tick': { name: 'Rust Tick', hp: [10, 14], pat: [{ atk: 5 }, { die: [{ weak: 2 }, { atk: 4, weak: 1 }, { atk: 7 }] }, { atk: 6 }], art: 'rust-coloured tick the size of a dog' },
     'bile-blob': { name: 'Bile Blob', hp: [28, 32], pat: [{ atk: 7, add: ['slimed', 1] }, { atk: 11 }, { add: ['slimed', 2] }], art: 'quivering yellow blob of acid with floating bones' },
-    'snare-vine': { name: 'Snare Vine', hp: [22, 26], pat: [{ vuln: 2 }, { atk: 8 }, { atk: 4, blk: 6 }], art: 'thorny vine bundle with a grasping tendril' },
+    'snare-vine': { name: 'Snare Vine', hp: [22, 26], pat: [{ vuln: 2 }, { die: [{ atk: 4, blk: 6 }, { atk: 8 }, { atk: 11 }] }], art: 'thorny vine bundle with a grasping tendril' },
     'ash-imp': { name: 'Ash Imp', hp: [16, 20], pat: [{ atk: 3, hits: 3 }, { atk: 3, hits: 3 }, { blk: 6, str: 1 }], art: 'small black imp with ember eyes and bat wings' },
     'thorn-brute': { name: 'Thorn Brute', hp: [80, 86], pat: [{ str: 2 }, { atk: 14 }, { atk: 8, vuln: 2 }], onSkill: 2, elite: 1, art: 'bark-skinned hulking brute with thorns and a horned skull' },
     'sleeper-statue': { name: 'Sleeper Statue', hp: [78, 84], sleep: 3, pat: [{ atk: 16 }, { atk: 16 }, { weak: 2, vuln: 1 }], elite: 1, art: 'mossy stone statue of a seated giant with one eye opening' },
     'iron-warden': { name: 'Iron Warden', hp: [36, 40], pat: [{ atk: 9 }, { add: ['dazed', 2] }, { atk: 6, blk: 6 }], elite: 1, art: 'tall slim iron sentry with a lantern head' },
     'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], boss: 1, img: 'iron-warden', art: 'iron sentry captain in spiked plate with a lantern helm' },
-    'mire-behemoth': { name: 'Mire Behemoth', hp: [132, 140], pat: [{ atk: 9, add: ['slimed', 2] }, { blk: 12, str: 2 }, { atk: 22 }, { atk: 7, hits: 2 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
-    'ashen-wraith': { name: 'Ashen Wraith', hp: [124, 130], pat: [{ add: ['burn', 1], atk: 6 }, { atk: 5, hits: 2 }, { blk: 10, str: 2 }, { atk: 6, hits: 3 }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
+    'mire-behemoth': { name: 'Mire Behemoth', hp: [132, 140], pat: [{ atk: 9, add: ['slimed', 2] }, { blk: 12, str: 2 }, { atk: 22 }, { atk: 7, hits: 2, all: 1 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
+    'ashen-wraith': { name: 'Ashen Wraith', hp: [124, 130], pat: [{ add: ['burn', 1], atk: 6, all: 1 }, { die: [{ blk: 10, str: 2 }, { atk: 5, hits: 2 }, { atk: 6, hits: 3 }] }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
     'gate-colossus': { name: 'Gate Colossus', hp: [138, 146], pat: [{ atk: 9, hits: 2 }, { blk: 16 }, { atk: 24, vuln: 2 }, { str: 3, blk: 8 }], boss: 1, art: 'colossal armoured stone guardian shaped like a castle gate' }
   };
   var ENC = {
@@ -161,7 +163,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'ember-brand': { name: 'Ember Brand', t: 'Heal 6 after each fight.', rar: 's', art: 'iron brand glowing orange at the tip' },
     'whetstone-ring': { name: 'Whetstone Ring', t: 'Draw 2 extra on turn 1.', rar: 's', art: 'silver ring with a tiny whetstone' },
     'spark-core': { name: 'Spark Core', t: 'Start fights with a Lightning orb.', rar: 's', art: 'glass sphere with a trapped blue spark' },
-    'prayer-beads': { name: 'Prayer Beads', t: 'Start fights in Calm with a Calm Spark.', rar: 's', art: 'string of wooden prayer beads' },
+    'prayer-beads': { name: 'Prayer Beads', t: 'Start fights with 1 Miracle: spend for +1 energy.', rar: 's', art: 'string of wooden prayer beads' },
     'lucky-coin': { name: 'Lucky Coin', t: '+25 gold now.', rar: 'c', art: 'chipped gold coin balanced on its edge' },
     'iron-bangle': { name: 'Iron Bangle', t: 'Start fights with 4 Block.', rar: 'c', art: 'thick iron bracelet with a rune notch' },
     'lantern': { name: 'Tin Lantern', t: '+1 energy on turn 1.', rar: 'c', art: 'small dented tin lantern lit from within' },
@@ -184,7 +186,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'strength-tonic': { name: 'Strength Tonic', t: 'Gain 2 Strength.', art: 'thick red tonic in a tall bottle' },
     'swift-draught': { name: 'Swift Draught', t: 'Draw 3 cards.', art: 'silver-blue swirling potion with wings' },
     'energy-vial': { name: 'Energy Vial', t: 'Gain 2 energy.', art: 'yellow glowing vial with lightning shape' },
-    'venom-vial': { name: 'Venom Vial', t: 'Poison an enemy 10.', tgt: 1, art: 'skull-stoppered green vial' },
+    'venom-vial': { name: 'Venom Vial', t: 'Poison an enemy 4.', tgt: 1, art: 'skull-stoppered green vial' },
     'frost-gas': { name: 'Frost Gas', t: 'All enemies Weak 3.', art: 'pale blue misty bottle' },
     'healing-draught': { name: 'Healing Draught', t: 'Heal 20.', art: 'rosy pink potion in a heart-shaped flask' },
     'fortune-die': { name: 'Fortune Die', t: 'Next 2 dice rolls show 6.', art: 'golden die floating inside a glass bottle' }
@@ -198,6 +200,6 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'back-alley-gambler': { name: 'Back Alley Gambler', q: 'A grin and a pair of dice.', art: 'hooded gambler at a barrel table with dice', o: [{ t: 'Bet 30 gold, roll', roll: [{ gold: -30 }, { gold: -30 }, { gold: 0 }, { gold: 0 }, { gold: 60 }, { gold: 90 }], cost: 30 }, { t: 'Walk away', do: {} }] }
   };
   var NODES = { m: 'Monster', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Treasure', b: 'Boss' };
-  EC.D = { CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget };
+  EC.D = { SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget };
   if (typeof module !== 'undefined') module.exports = EC;
 })();

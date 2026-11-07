@@ -101,10 +101,13 @@
     if (UI.ov) overlay();
     dock(g);
     if (UI.lastScr !== g.scr) { if (g.scr === 'reward' || (g.scr === 'over' && g.won)) SFX('win'); else if (g.scr === 'over') SFX('lose'); UI.lastScr = g.scr; }
+    try { if (window.GXT && GXT.active()) { var tk = g.rw && g.rw.took || {}; GXT.act({ type: 'event', w: 'scr', scr: g.scr, ph: g.b && g.b.ph, pots: (g.pots || []).filter(Boolean).length, relic: !!tk.relic, took0: !!tk.c0, shopSel: UI.shopSel == null ? -1 : UI.shopSel, bought: !!(g.shop && g.shop.items.some(function (x) { return x.sold; })), evres: !!(g.evn && g.evn.res) }); } } catch (e) { }
+    try { document.body.classList.toggle('ec-free', !!(UI.tutFree && UI.tutFree())); } catch (e) { }
     if (!window.EC_NOSAVE) E.save(); drain(); try { if (window.GXMUS) GXMUS.sync(); } catch (e) { }
   }
   UI.render = render;
-  function tutOk(a) { try { var ok = !(window.GXT && GXT.active()) || GXT.act(a); if (!ok) { toast('Do the glowing step first'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = 'Do the glowing step first.'; } return ok; } catch (e) { return true; } }
+  setInterval(function () { try { document.body.classList.toggle('ec-free', !!(UI.tutFree && UI.tutFree())); } catch (e) { } }, 200);   // guide free-play steps hide the bubble (the dock line instructs)
+  function tutOk(a) { try { if (UI.tutFree && UI.tutFree()) return true; var ok = !(window.GXT && GXT.active()) || GXT.act(a); if (!ok) { toast('Do the glowing step first'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = 'Do the glowing step first.'; } return ok; } catch (e) { return true; } }
   function muteBtn() { var b = on(h('button', 'chip tap', SND.on ? '🔊' : '🔇'), function () { SND.toggle(); toast(SND.on ? 'Sound on' : 'Sound off'); render(); }); b.setAttribute('aria-label', SND.on ? 'Sound on: tap to mute' : 'Sound off: tap to unmute'); b.id = 'mute'; return b; }
   function tutBtn(cls) { try { var first = !GXT.status('emberclimb').seen && !localStorage.getItem('emberclimb.save'); var w = h('div'); w.innerHTML = GXT.menuHTML({ game: 'emberclimb', first: first, cls: cls || 'btn alt', launch: function () { UI.ov = null; UI.tutStart(); } }); return w.firstChild; } catch (e) { return null; } }
   function title() {
@@ -240,16 +243,16 @@
     var it = e.intent, g = G(), P = []; if (!it) return [{ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: this enemy has not shown its next move.' }];
     if (it.sleep) return [{ k: 'sleep', s: 'intent-sleep', t: 'Asleep', cap: 'sleeps', say: 'Asleep: it does nothing for ' + e.asleep + ' more turn' + (e.asleep === 1 ? '' : 's') + ' unless you hurt it.' }];
     if (it.atk) {
-      var h0 = g.hs[it.tg] || g.hs[0], d = it.atk + (e.st.str || 0); if (e.st.weak > 0) d = Math.floor(d * 0.75); if (h0.st.vuln > 0) d = Math.floor(d * 1.5); if (h0.stance === 'w') d *= 2; d = Math.max(0, d);
-      var n = it.hits || 1, t = n > 1 ? d + 'x' + n : String(d); if (g.hs.length > 1) t += ' → ' + D.H[h0.k].name.split(' ')[0];
+      var h0 = g.hs[it.tg] || g.hs[0], d; try { d = E.previewHit(g.b.en.indexOf(e), g.hs.indexOf(h0)); } catch (x) { d = it.atk; } if (d == null || isNaN(d)) d = it.atk;
+      var n = it.hits || 1, t = n > 1 ? d + 'x' + n : String(d); if (it.all) t += ' all'; if (g.hs.length > 1 && !it.all) t += ' → ' + D.H[h0.k].name.split(' ')[0];
       P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: 'attacks for ' + (n > 1 ? d + ' x ' + n : d), say: 'Attack: hits ' + (n > 1 ? n + ' times for ' + d + ' each' : 'for ' + d) + ' damage (Block soaks it first).' });
     }
     if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + it.blk, cap: 'raises ' + it.blk + ' Block', say: 'Block: it gains ' + it.blk + ' Block, so your attacks do less.' });
     if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: it gains ' + it.str + ' Strength, so every later attack hits harder.' });
-    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: your attacks deal 25% less for ' + it.weak + ' turns.' });
-    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take 50% more attack damage for ' + it.vuln + ' turns.' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: each of your hits deals 3 less. One Weak is used up per attack (max 3).' });
+    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take double damage from a hit. One is used up per attack (max 3).' });
     if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker for ' + it.frail + ' turns.' });
-    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: you lose ' + it.poison + ' HP at the start of each turn, falling by 1 each time.' });
+    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: lose 1 HP per poison at the end of the turn, ignoring Block. It stays.' });
     if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your deck', say: 'Junk: adds ' + it.add[1] + ' ' + cn + ' to your discard pile. It clogs your deck.' }); }
     if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: until its next move, every attack card you play on it hurts you for ' + it.spikes + '. Use skills or block that turn.' });
     if (!P.length) P.push({ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: it is up to something. Watch out.' });
@@ -325,6 +328,14 @@
     });
     if (UI.sel >= 0) hand.classList.add('hassel');
     st.appendChild(hand);
+    if (b.ph === 'p' && cur.mir > 0) { var mb = on(h('button', 'chip mir', 'Miracle x' + cur.mir + ': +1 energy'), function () { if (UI.busy) return; E.performMove({ t: 'mir' }); render(); }); mb.id = 'mir'; ctl.appendChild(mb); }
+    if (b.ph === 'p' && b.scry) {   // Scry: see the top cards of your draw pile, tap the ones to discard, then Done
+      var sh = g.hs[b.scry.h], top = sh.draw.slice(-b.scry.n).reverse(); UI.scryOut = UI.scryOut || {};
+      var so = h('div', 'ov scry'); so.appendChild(h('h2', '', 'Scry: tap cards to discard'));
+      var sg = h('div', 'grid'); top.forEach(function (c, k) { var ce = cardEl(c); if (UI.scryOut[k]) ce.classList.add('no'); on(ce, function () { UI.scryOut[k] = !UI.scryOut[k]; render(); }); sg.appendChild(ce); }); so.appendChild(sg);
+      var sd = on(h('button', 'btn', 'Done'), function () { var keep = []; top.forEach(function (c, k) { if (!UI.scryOut[k]) keep.push(k); }); UI.scryOut = {}; E.performMove({ t: 'scry', keep: keep }); render(); }); sd.id = 'scry-done'; so.appendChild(sd);
+      st.appendChild(so);
+    }
     app.appendChild(st);
     var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }
   }
@@ -402,7 +413,7 @@
     s.appendChild(h('h2', '', r.treasure ? 'Treasure!' : 'Victory!'));
     s.appendChild(h('div', 'chip', '● +' + r.gold + ' gold'));
     if (r.pot && !r.took.pot) { var pb = on(h('button', 'item', null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', D.POTIONS[r.pot].name)]), function () { E.performMove({ t: 'takepot' }); render(); }); pb.style.width = '140px'; s.appendChild(pb); }
-    if (r.relics && !r.took.relic) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id) return; var b = on(h('button', 'item', null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', D.RELICS[id].name), h('span', '', D.RELICS[id].t)]), function () { E.performMove({ t: 'relic', i: i }); render(); }); b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
+    if (r.relics && !r.took.relic) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id || r.took['r' + i]) return; var b = on(h('button', 'item', null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', D.RELICS[id].name), h('span', '', D.RELICS[id].t)]), function () { E.performMove({ t: 'relic', i: i }); render(); }); b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
     Object.keys(r.cards).forEach(function (hi) {
       if (r.took['c' + hi]) return; if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
       else s.appendChild(h('div', 'sub', 'Add one card to your deck'));
@@ -422,7 +433,7 @@
     var hi = g.rest.todo[0], hh = g.hs[hi], H = D.H[hh.k];
     s.appendChild(h('h2', '', 'Campfire'));
     if (g.hs.length > 1) s.appendChild(h('div', 'chip', H.name));
-    var amt = Math.floor(hh.mhp * 0.3) + (E.has('healing-moss') ? 10 : 0);
+    var amt = 3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0);
     var b1 = on(h('button', 'btn', 'Rest: heal ' + amt), function () { E.performMove({ t: 'heal', h: hi }); UI.ov = null; render(); }); b1.id = 'rest-heal';
     var b2 = on(h('button', 'btn alt', 'Smith: upgrade a card'), function () { UI.ov = 'smith'; render(); }); b2.id = 'rest-smith';
     s.appendChild(b1); s.appendChild(b2); hud(); app.appendChild(s);
@@ -447,13 +458,13 @@
       else dt.appendChild(h('div', 'refline', nm2 + ': ' + (sx.t === 'relic' ? D.RELICS[sx.id].t : D.POTIONS[sx.id].t)));
       var bb = on(h('button', 'btn' + (g.gold < sx.p ? ' alt' : ''), 'Buy ' + nm2 + ' (● ' + sx.p + ')'), function () { if (!E.performMove({ t: 'buy', i: UI.shopSel })) toast(g.gold < sx.p ? 'Not enough gold' : 'No room'); else UI.shopSel = -1; render(); }); bb.id = 'buy';
       dt.appendChild(bb); s.insertBefore(dt, it);
-    } else s.insertBefore(h('div', 'sub', 'Tap an item to see what it does.'), it); s.appendChild(on(h('button', 'btn', 'Leave'), function () { UI.shopSel = -1; E.performMove({ t: 'leave' }); render(); }));
+    } else s.insertBefore(h('div', 'sub', 'Tap an item to see what it does.'), it); var slv = on(h('button', 'btn', 'Leave'), function () { UI.shopSel = -1; E.performMove({ t: 'leave' }); render(); }); slv.id = 'shop-leave'; s.appendChild(slv);
     hud(); app.appendChild(s);
   }
   function event() {
     var g = G(), ev = D.EVENTS[g.evn.id], s = h('div', 'reward'); s.appendChild(A('bg-event', '', { cls: 'bg', kind: 'bg' }));
     s.appendChild(h('h2', '', ev.name)); s.appendChild(A('event-' + g.evn.id, ev.name, { cls: 'evart', ph: '#4a3a5a', kind: 'card' }));
-    if (g.evn.res) { s.appendChild(h('div', 'sub', g.evn.res)); s.appendChild(on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); })); }
+    if (g.evn.res) { s.appendChild(h('div', 'sub', g.evn.res)); var evl = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); evl.id = 'ev-leave'; s.appendChild(evl); }
     else {
       s.appendChild(h('div', 'sub', ev.q)); var o = h('div', 'opts');
       ev.o.forEach(function (x, i) { var b = on(h('button', 'btn alt', x.t), function () { E.performMove({ t: 'opt', i: i }); if (G().evn.pend) UI.ov = 'evpick'; render(); }); if (x.cost && g.gold < x.cost) b.disabled = true; o.appendChild(b); }); s.appendChild(o);
