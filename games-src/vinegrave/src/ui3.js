@@ -100,11 +100,13 @@ function drawers() {
 function menu() {
   const b = (label, fn, cls) => { const e = document.createElement('button'); e.type = 'button'; e.className = 'btn ' + (cls || ''); e.textContent = label; e.addEventListener('click', () => { GX.close(); fn(); }); return e; };
   GX.settings({ id: 'setd', title: 'Menu',
-    game: S => { S.appendChild(GX.row('This game', [b('Title screen', showTitle), b('New game', () => UIACT.quick()), b('Story map', storyOpen)])); },
+    game: S => { S.appendChild(GX.row('This game', [b('Restart', restartGame), b('Title', showTitle), b('Story map', storyOpen)])); },
     sound: S => { S.appendChild(GX.row('Sound effects', GX.onoff(UI.prefs.sound !== false, v => { UI.prefs.sound = v; savePrefs(); }))); S.appendChild(GX.row('Music', [GX.onoff(UI.prefs.music !== false, v => { UI.prefs.music = v; savePrefs(); musicSync(); }), b('Pick songs', () => { try { GXMUS.open(); } catch (e) { } })])); },
-    help: S => { S.appendChild(GX.row('Learn', [b('Guided round', () => tutStart()), b('Rules', () => setTimeout(() => GX.show('rulesd'), 50))])); if (window.GXH) { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'gx-row', btnClass: 'btn' }); S.appendChild(w); } },
+    help: S => { S.appendChild(GX.row('Learn', [b('Rules', () => setTimeout(() => GX.show('rulesd'), 50)), b('Tutorial', () => tutStart())])); if (window.GXH) { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'gx-row', btnClass: 'btn' }); S.appendChild(w); } },
     about: { name: 'Vinegrave', version: '1.0', text: 'An original jungle-expedition game for the Game Night Shelf.' } });
 }
+// Restart: the same kind of game again (a Story stage restarts that stage)
+function restartGame() { if (UI.camp && typeof GXC !== 'undefined') { const id = UI.camp.id; closeRes(); try { GXC.play(id); } catch (e) { UIACT.quick(); } return; } if (G && UI.mode === 'hot') return startGame('hot', { np: G.np }); closeRes(); UIACT.quick(); }
 // ---------------------------------------------------------------- help kit (coach bubbles + lightbulb)
 function helpPhase() {
   if (!G || UI.mode === 'tutorial' || !myTurn()) return null;

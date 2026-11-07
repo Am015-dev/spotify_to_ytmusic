@@ -43,7 +43,7 @@ function siteHTML(x, i, glow) {
     <span class="nm">${esc(hid ? '' : nm)}</span>
     <span class="cost">${x.cost.map(t => ic(t)).join('')}</span>
     ${x.guard ? `<span class="gd" data-art="guard-${x.guard}"><svg aria-hidden="true"><use href="#s-guard"/></svg></span>` : ''}
-    ${occ ? `<span class="occ">${meep(x.occ)}</span>` : ''}
+    ${occ ? `<span class="occ"${x.occ >= 0 ? ` data-art="explorer-${x.occ}"` : ''}>${meep(x.occ)}</span>` : ''}
     <span class="rew">${hid ? `<span class="chip"><span class="num">${V.DISC[x.lvl]}</span>${ic('compass')}</span>` : resHTML(V.SITE[x.tile].rew)}</span></button>`;
 }
 // ---------------------------------------------------------------- legal moves for the human who acts now
@@ -74,7 +74,7 @@ function render() {
   const tb = $('#track'); tb.innerHTML = tr; tb.classList.toggle('glow', trG); tb.dataset.a = 'track';
   // market row
   const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = 1; }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
-  $('#row').innerHTML = G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r] }) : '<span class="cd back" aria-hidden="true"></span>').join('');
+  $('#row').innerHTML = G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r] }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('');
   // dock
   renderDock(L, q, me, actor);
   if (typeof artApply === 'function') artApply();

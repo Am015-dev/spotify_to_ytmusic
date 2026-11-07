@@ -170,3 +170,4 @@ html.gx-reduce .fxcard,html.gx-reduce .site.flip{animation:none}
 body:has(> .gxc:not([hidden])) .gx-app,body:has(> .gxc:not([hidden])) #start{visibility:hidden}
 #setd .gx-row-l small{display:none}
 @media (min-width:1000px){.gx-bar .gx-ibtn span{font-size:16px}}
+.site .occ.hasart svg{visibility:hidden}
