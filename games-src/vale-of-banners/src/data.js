@@ -11,7 +11,7 @@ var VB = (typeof VB !== 'undefined') ? VB : {};
   V.COLHEX = { castle: '#2f5d3a', mine: '#7b7f86', know: '#e3c64a', bld: '#c9a273', pas: '#8fbf5a', ship: '#4f86c6' };
   V.REGION_PTS = [0, 1, 3, 6, 10, 15, 21, 28, 36];
   V.PHASE_BONUS = [10, 8, 6, 4, 2];
-  V.COLOUR_BONUS = { 2: [6, 2], 3: [7, 4, 1], 4: [8, 5, 2, 0] };
+  V.COLOUR_BONUS = { 2: [5, 2], 3: [6, 3, 0], 4: [7, 4, 0, 0] };
   V.PHASES = ['Spring', 'Summer', 'Harvest', 'Autumn', 'Frost'];
   V.ANIMALS = { sheep: 'Sheep', goat: 'Goats', pig: 'Pigs', goose: 'Geese' };
   V.GOODS = ['', 'Wool', 'Cheese', 'Honey', 'Cider', 'Linen', 'Salt'];
@@ -60,15 +60,15 @@ var VB = (typeof VB !== 'undefined') ? VB : {};
   V.MINE = { name: 'Mine', text: 'At the end of every season, take 1 silver.' };
   V.SHIP = { name: 'Barge', text: 'Take all goods from one market stall, and move 1 step up the banner track.' };
   V.PAS = { name: 'Pasture', text: 'Score the animals of this kind in this meadow (this tile included).' };
-  /* Tile pool (148): 10 keeps, 10 mines, 26 lore, 48 buildings (6 each), 36 pastures (4 kinds x 2/3/4 animals x 3), 18 barges */
+  /* Tile pool (164, enough for 4 players x 5 seasons): 12 keeps, 12 mines, 26 lore, 56 buildings (7 each), 36 pastures (4 kinds x 2/3/4 animals x 3), 22 barges */
   V.pool = function () {
     var t = [], id = 0, i, k;
-    for (i = 0; i < 10; i++) t.push({ id: 't' + (id++), t: 'castle' });
-    for (i = 0; i < 10; i++) t.push({ id: 't' + (id++), t: 'mine' });
+    for (i = 0; i < 12; i++) t.push({ id: 't' + (id++), t: 'castle' });
+    for (i = 0; i < 12; i++) t.push({ id: 't' + (id++), t: 'mine' });
     V.KNOW.forEach(function (kn) { t.push({ id: 't' + (id++), t: 'know', k: kn.id }); });
-    V.BLDKEYS.forEach(function (b) { for (i = 0; i < 6; i++) t.push({ id: 't' + (id++), t: 'bld', k: b }); });
+    V.BLDKEYS.forEach(function (b) { for (i = 0; i < 7; i++) t.push({ id: 't' + (id++), t: 'bld', k: b }); });
     Object.keys(V.ANIMALS).forEach(function (a) { [2, 3, 4].forEach(function (n) { for (k = 0; k < 3; k++) t.push({ id: 't' + (id++), t: 'pas', k: a, n: n }); }); });
-    for (i = 0; i < 18; i++) t.push({ id: 't' + (id++), t: 'ship' });
+    for (i = 0; i < 22; i++) t.push({ id: 't' + (id++), t: 'ship' });
     return t;
   };
   V.tileName = function (x) {

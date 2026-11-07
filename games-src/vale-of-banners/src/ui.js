@@ -79,7 +79,7 @@ function layout() {
   var b = $('#bd'), W = b.clientWidth, H = b.clientHeight; if (!W || !H) return;
   var oppH = 46, pad = 6, n = G ? VB.depotSize(G) : 2;
   var wide = W > H * 1.15;
-  var mk = $('#mk'), es = $('#es'), opp = $('#opp'); mk.classList.toggle('ph', !wide);
+  var mk = $('#mk'), es = $('#es'), opp = $('#opp'); mk.classList.toggle('ph', !wide); var two = !wide && n > 2; mk.classList.toggle('two', two);
   opp.style.cssText = 'left:' + pad + 'px;top:' + pad + 'px;right:' + pad + 'px;height:' + (oppH - 6) + 'px';
   if (wide) {   /* market as a 2-column block on the left, estate on the right */
     var mw = Math.min(W * 0.42, 420), cols = 4, rows = 2;
@@ -88,10 +88,9 @@ function layout() {
     var ew = W - mw - pad * 3, eh = H - oppH - pad;
     L.ex = mw + pad * 2; L.ey = oppH; L.ew = ew; L.eh = eh;
   } else {
-    var cw = Math.floor((W - pad * 2 - 5 * 4) / 6), hexP = Math.max(26, Math.min(46, cw - 10, Math.floor((H - oppH) * 0.4 / (n * 1.2 + 2.2))));
-    var stallH = 26 + n * (hexP * 1.1547 + 3) + 24, maxMk = (H - oppH) * 0.42;
-    if (stallH > maxMk) { hexP = Math.max(24, Math.floor((maxMk - 50) / n / 1.19)); stallH = 26 + n * (hexP * 1.1547 + 3) + 24; }
-    mk.style.cssText = 'left:' + pad + 'px;top:' + oppH + 'px;right:' + pad + 'px;grid-template-columns:repeat(6,1fr);--hex:' + hexP + 'px';
+    var rowsT = two ? Math.ceil(n / 2) : n, cw = Math.floor((W - pad * 2 - 5 * 4) / 6), hexP = Math.max(24, Math.min(46, Math.floor((two ? cw / 2 - 3 : cw - 10)), Math.floor((H - oppH) * 0.4 / (rowsT * 1.2 + 2.2))));
+    var stallH = 26 + rowsT * (hexP * 1.1547 + 3) + 24;
+    mk.style.cssText = 'left:' + pad + 'px;top:' + oppH + 'px;right:' + pad + 'px;grid-template-columns:repeat(6,1fr);--hex:' + hexP + 'px'; mk.classList.toggle('small', hexP < 34);
     L.ex = pad; L.ey = oppH + stallH + 6; L.ew = W - pad * 2; L.eh = H - L.ey - pad;
   }
   /* estate hex size: pointy-top, 7 columns, 7 rows => width = 7*sqrt3*s, height = 11*s */
@@ -140,7 +139,7 @@ function renderMarket() {
     G.depots[d].forEach(function (t, k) {
       if (!t) { tl.appendChild(h('div.hx.empty', { style: 'background:rgba(255,255,255,.08)', 'aria-hidden': 'true' })); return; }
       var lg = mt ? legalTakeFor(d, k) : [], b = h('button.tilebtn' + (lg.length ? '.glow' : ''), { type: 'button', id: 'mt-' + d + '-' + k, 'aria-label': VB.tileName(t) + ' in stall ' + d, onclick: function () { tapMarket(d, k); } }, [hexEl(t)]);
-      var best = pick(lg.slice()); if (best && best.w) b.appendChild(h('span.cost', { text: '+' + best.w + '👷' }));
+      var best = pick(lg.slice()); if (best && best.w) b.appendChild(h('span.cost', { text: '+' + best.w }));
       tl.appendChild(b);
     });
     st.appendChild(tl);
@@ -173,7 +172,7 @@ function renderEstate(box, seat, s) {
     var hx = t ? hexEl(t) : hexEl(null, { col: c.col });
     if (!t && !m) hx.style.filter = 'saturate(.55) brightness(1.18)';
     b.appendChild(hx); b.appendChild(h('span.num' + (c.col === 'castle' || c.col === 'ship' || c.col === 'mine' ? '.lt' : ''), { text: c.num }));
-    if (m && m.w) b.appendChild(h('span.cost', { text: '+' + m.w + '👷' }));
+    if (m && m.w) b.appendChild(h('span.cost', { text: '+' + m.w }));
     if (!box) b.addEventListener('click', function () { tapCell(c.i); });
     es.appendChild(b);
   });
@@ -486,7 +485,7 @@ var RULES_HTML = '<div class="rules">' +
   '<p>Five seasons of five rounds. Every round each steward rolls <b>two dice</b>. On your turn use each die for one action:</p>' +
   '<ul><li><b>Take</b> a tile from the market stall with the die\'s number into your storage (3 spaces).</li>' +
   '<li><b>Build</b> a stored tile on an empty space of its colour that shows the die\'s number and touches your land.</li>' +
-  '<li><b>Sell</b> all your goods of the die\'s number: points per tile (players + 1) and 1 silver.</li>' +
+  '<li><b>Sell</b> all your goods of the die\'s number: points per tile (2/3/4 with 2/3/4 players) and 1 silver.</li>' +
   '<li><b>Workers</b>: take 2 workers with any die.</li></ul>' +
   '<p>Each <b>worker</b> turns a die up or down by 1 (6 and 1 are neighbours). Once per turn you may <b>buy</b> a tile from the back lane for 2 silver, with no die.</p>' +
   '<h3>Tiles</h3><ul><li><b>Keep</b> (dark green): one free extra action with any number.</li><li><b>Mine</b> (grey): 1 silver at the end of every season.</li>' +
@@ -494,8 +493,8 @@ var RULES_HTML = '<div class="rules">' +
   '<li><b>Buildings</b> (tan): an instant effect; never two of the same kind in one quarter. The <b>Moot Hall</b> lets you build again at once: chain several tiles in one turn!</li>' +
   '<li><b>Pasture</b> (light green): score every animal of that kind in that meadow.</li>' +
   '<li><b>Barge</b> (blue): take all goods from one stall and move up the banner track (turn order).</li></ul>' +
-  '<h3>Scoring</h3><p>Fill a whole region: 1/3/6/10/15/21/28/36 points for 1-8 spaces, plus 10/8/6/4/2 for doing it in season 1-5. First to fill every space of one colour gets a bonus (second gets less). Each round one goods tile goes to the stall shown by the white die.</p>' +
-  '<p>Game end: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, plus Lore scrolls. Most points wins; a tie goes to the higher banner.</p></div>';
+  '<h3>Scoring</h3><p>Fill a whole region: 1/3/6/10/15/21/28/36 points for 1-8 spaces, plus 10/8/6/4/2 for doing it in season 1-5. First to fill every space of one colour gets 5/6/7 points (2/3/4 players); the second gets 2/3/4. Each round one goods tile goes to the stall shown by the white die.</p>' +
+  '<p>Game end: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, plus Lore scrolls. Most points wins; a tie goes to the fuller estate, then to the steward further back on the banner track.</p></div>';
 function drawers() {
   var r = h('div', { html: RULES_HTML }); GX.drawer('rulesd', 'How to play', r);
   var tr = h('button.btn.alt', { type: 'button', text: 'Play the tutorial', style: 'margin-top:8px', onclick: function () { GX.close(); tutStart(); } }); r.appendChild(tr);

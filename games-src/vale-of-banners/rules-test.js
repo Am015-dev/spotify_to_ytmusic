@@ -21,7 +21,7 @@ const nbOf = (i, col) => C[i].nb.map(n => C[n]).find(c => !col || c.col === col)
 // 4 sell: points (players+1) per tile + 1 silver; die must match
 { const G = fresh(), p = P0(G); p.goods = { 3: 2 }; p.dice = [3, 5]; p.used = [false, false]; const vp = p.vp, sil = p.silver; p.workers = 0;
   ok(!VB.validMoves(G).some(m => m.k === 'sell' && m.die === 1), 'sell needs a matching die');
-  VB.performMove(G, { k: 'sell', die: 0, v: 3, w: 0 }); ok(p.vp === vp + 6 && p.silver === sil + 1 && !p.goods[3], 'sale pays 3 per tile in 2p + 1 silver'); }
+  VB.performMove(G, { k: 'sell', die: 0, v: 3, w: 0 }); ok(p.vp === vp + 4 && p.silver === sil + 1 && !p.goods[3], 'sale pays 2 per tile in 2p + 1 silver'); }
 // 5 region complete scores size + season bonus; colour bonus
 { const G = fresh(), p = P0(G); const reg = VB.REGIONS.find(r => r.col === 'castle'); reg.cells.forEach(i => { if (i !== home) p.estate[i] = undefined; });
   const others = reg.cells.filter(i => i !== home); others.slice(0, -1).forEach(i => { p.estate[i] = { id: 'c' + i, t: 'castle' }; }); Object.keys(p.estate).forEach(k => { if (!p.estate[k]) delete p.estate[k]; });
