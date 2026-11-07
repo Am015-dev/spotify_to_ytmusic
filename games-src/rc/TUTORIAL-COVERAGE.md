@@ -57,3 +57,11 @@ stacked fire + pile; both need new `tutDeal` stacking and new step ids in `tutor
 | gather1 / gather2 | We need food; fishing is best | gather |
 | weather / skill | Not tonight! I wave off the rain cloud | weather, skill |
 | night2 / end | Dry and safe; twelve days like this | night with shelter, ending |
+
+## Coached first game (addendum 4; flag `?coach=1`, OFF by default; code in `tutor.js` `COACH_RULES`)
+A real game with free legal moves on the staged seed; the Cook speaks one dismissible bubble at a time when a rule first matters; no forced taps;
+at the end a "Things you'll meet later" card (hunting, resting, distance, inventions, snow/storms, night healing, moving camp, other scenarios)
+with the player's real day / food / wood. Test: `coach-test.js` (plays by tapping a pawn, a glowing place, the plan helper, Start day, Continue; asserts goal,
+pawns, production, night explained, >= 10 rules, one bubble at a time, the end card). Result at 390x763: PASS, 19 of 20 rules explained in the played game
+(prod goal pawns dice fight found weather event morning threat sure build night gather ready wounds explore camp + later card); `skill` and `fog` did not come up.
+Not done: good/poor-move feedback lines beyond "ready", rival-move comments, and making it the default tutorial (the 25-step one stays until the owner chooses).
