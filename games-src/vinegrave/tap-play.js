@@ -29,6 +29,7 @@ const WHAT = process.argv[2] || 'both', [W, H] = (process.argv[3] || '390x763').
       if (!st.mine) { await tapEl(vis('#map').first()); await page.waitForTimeout(250); continue; }   // rival turn: tap to speed up
       // a question (exile / choose / free buy / free dig): tap its first glowing card or answer button, else Skip
       if (await vis('#qbox').count()) { const q = vis('#qbox .cd.glow, #qbox .btn.go'); if (await q.count()) await tapEl(q.first()); else await tapEl(vis('#qbox .btn').last()); await page.waitForTimeout(300); continue; }
+      if (turns % 3 === 1) { const tb = vis('#vtabs button.has:not(.on)'); if (await tb.count()) { await tapEl(tb.first()); await page.waitForTimeout(250); } }   // phone: visit another tab that has a dot
       const g = vis('#map .site.glow, #row .cd.glow, #hand .cd.glow'), n = await g.count(); let done = false;
       for (let k = 0; k < Math.min(n, 4) && !done; k++) {
         const pick = g.nth((turns + k * 3) % n); if (!(await tapEl(pick))) continue;

@@ -68,6 +68,7 @@ document.addEventListener('click', e => {
 $('#iscrim').addEventListener('click', () => { if (typeof GXT !== 'undefined' && GXT.active()) return; closeInsp(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.insp) closeInsp(); });
 const UIACT = {};
+UIACT.tab = t => { showTab(t.dataset.t); UI.autoTab = false; render(); };
 function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; return GXT.act(Object.assign({ type: 'tap' }, x)); }
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
@@ -96,7 +97,7 @@ function aiStep() {
   const m = (UI.mode === 'tutorial' && tutAI(s)) || VAI.choose(G, G.p[s].ai || 'normal') || VG.moves(G).find(x => x.t === 'pass'), g0 = G;
   const cap = m ? moveCaption(m, s) : '', el0 = m ? moveEl(m, s) : null;
   UI.busy = true;
-  if (!UI.fast) { $('#docktitle').textContent = who(s) + '’s turn'; $('#prompt').textContent = cap; if (el0) el0.classList.add('aimark'); }
+  if (!UI.fast) { $('#docktitle').textContent = who(s) + '’s turn'; $('#prompt').textContent = cap; const tt = tabOf(el0); if (tt && tt !== UI.tab) { showTab(tt); UI.autoTab = true; } if (el0) el0.classList.add('aimark'); }
   turnWait(UI.fast ? 0 : 900, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
     if (G !== g0 || G.phase !== 'play' || VG.actor(G) !== s) { UI.busy = false; return; }
     const b = snapS(s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '';
@@ -170,6 +171,7 @@ document.addEventListener('pointerdown', e => { if (turnWait.fn && G && !myTurn(
 function turnBanner() {
   if (!G || G.phase !== 'play' || UI.fast) return; const s = VG.actor(G); if (s === UI.bannerFor) return; UI.bannerFor = s; if (s === -1) return;
   const mine = isHuman(s), b = $('#tbanner'); if (!b) return;
+  if (mine && UI.autoTab) { UI.autoTab = false; showTab('map'); render(); }
   b.textContent = mine ? (UI.humans.length > 1 ? who(s) + ', your turn' : 'Your turn') : who(s) + '’s turn'; b.className = 'on' + (mine ? ' me' : '');
   clearTimeout(turnBanner.t); turnBanner.t = setTimeout(() => { b.className = ''; }, 1100);
 }

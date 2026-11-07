@@ -47,22 +47,22 @@ function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up o
 const TS = id => { const t = V.STORY.tut[id]; return { title: t[0], say: t[1] }; };
 const tglow = sel => () => { const e = [...document.querySelectorAll(sel)].find(x => x.getBoundingClientRect().width); return e || null; };
 function tutSteps() {   /* the prologue: Pell's story reason in every bubble, one real action per step, a whole short game to the final count */
-  const st = (id, o) => Object.assign({ id }, TS(id), o);
+  const st = (id, o) => { const r = Object.assign({ id }, TS(id), o); if (o.tab) { const t0 = r.target; r.target = () => { showTab(o.tab); return t0(); }; } return r; };   /* phone: open the tab that holds the target */
   return [
     st('hand', { target: tq(() => $('#hand .cd[data-id="trail"]')), wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() }),
     st('play', { target: tq(tinsp('Play it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()) }),
-    st('ruin', { target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && G.p[1].ex < 2 }),
+    st('ruin', { tab: 'map', target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && G.p[1].ex < 2 }),
     st('disc', { target: tq(tinsp('Discover')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }, ready: () => !!(UI.insp && tinsp('Discover')()) }),
     st('idol', { target: tq('#extra [data-a=idol]'), wait: { type: 'tap', match: a => a.what === 'idol' }, ready: () => tmine() && !!G.sites[TUT_SITE].guard && !!$('#extra [data-a=idol]') && G.p[1].ex < 1 }),
     st('shrine', { target: tq(tinsp('Shrine: 3 coins')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'idol' }, ready: () => !!(UI.insp && tinsp('Shrine: 3 coins')()) }),
-    st('beat', { target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && !UI.insp }),
+    st('beat', { tab: 'map', target: tq(() => $(`.site[data-i="${TUT_SITE}"]`)), wait: { type: 'tap', match: a => a.what === 'site' && a.x === TUT_SITE }, ready: () => tmine() && !UI.insp }),
     st('over', { target: tq(tinsp('Overcome')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'beat' }, ready: () => !!(UI.insp && tinsp('Overcome')()) }),
     st('boon', { target: tq('#extra [data-a=guard]'), wait: { type: 'tap', match: a => a.what === 'guard' }, ready: () => tmine() && G.p[0].guards.length > 0 && !!$('#extra [data-a=guard]') }),
     st('useboon', { target: tq(tinsp('Use the boon')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'boon' }, ready: () => !!(UI.insp && tinsp('Use the boon')()) }),
-    st('market', { target: tq('#row .cd[data-r="0"]'), wait: { type: 'tap', match: a => a.what === 'row' && a.x === 0 }, ready: () => tmine() && !UI.insp }),
+    st('market', { tab: 'row', target: tq('#row .cd[data-r="0"]'), wait: { type: 'tap', match: a => a.what === 'row' && a.x === 0 }, ready: () => tmine() && !UI.insp }),
     st('buy', { target: tq(tinsp('Buy it')), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }, ready: () => !!(UI.insp && tinsp('Buy it')()) }),
     st('pass', { target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() && G.round === 1 }),
-    st('dig', { target: tq(tglow('#map .site.l0.glow, #map .site.glow')), wait: { type: 'tap', match: a => a.what === 'site' }, ready: () => tmine() && G.round === 2 && !!tglow('#map .site.glow')() }),
+    st('dig', { tab: 'map', target: tq(tglow('#map .site.l0.glow, #map .site.glow')), wait: { type: 'tap', match: a => a.what === 'site' }, ready: () => tmine() && G.round === 2 && !!tglow('#map .site.glow')() }),
     st('digit', { target: tq(() => tinsp('Dig here')() || tinsp('Discover')()), wait: { type: 'tap', match: a => a.what === 'mv' && (a.m.t === 'dig' || a.m.t === 'disc') }, ready: () => !!(UI.insp && (tinsp('Dig here')() || tinsp('Discover')())) }),
     st('pass2', { target: tq('#acts .btn'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' }, ready: () => tmine() && G.round === 2 }),
     st('score', { say: () => { const a = VG.score(G, 0).total, b = VG.score(G, 1).total; return `You ${a}, Tamsin ${b}. ` + (a >= b ? V.STORY.endWin : V.STORY.endLose); },

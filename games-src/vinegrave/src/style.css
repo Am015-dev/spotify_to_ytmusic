@@ -280,3 +280,52 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 .site .nm{background:rgba(12,22,12,.9);border-radius:6px;padding:0 4px;left:6px!important;right:6px!important;text-shadow:none}
 .ter .tl{background:#0b1609!important;color:#fff3d6!important}
 @media (min-width:1000px){.cd>.ptx{-webkit-line-clamp:3;max-height:3.4em}}
+/* ===== W378 phone layout (owner, 21:53): ONE main area at a time. Tabs Map / Market / Research; the hand is a bottom tray of big cards ===== */
+#vtabs{display:none}
+@media (max-width:999px){
+  :root{--fs:14px}
+  #vtabs{display:flex;gap:6px;flex:0 0 auto}
+  #vtabs button{flex:1;min-height:44px;border-radius:12px;border:2px solid #3d5f48;background:#13221a;color:#f3e6bf;font:800 15px/1 var(--gx-font,Georgia,serif);position:relative}
+  #vtabs button.on{background:#f3ead2;color:#22190d;border-color:#e2a63b}
+  #vtabs button.has::after{content:'';position:absolute;top:6px;right:8px;width:10px;height:10px;border-radius:50%;background:#ffd36a;box-shadow:0 0 0 2px #22190d}
+  #opp .op{min-height:44px}
+  body[data-vtab="map"] #track,body[data-vtab="map"] #rowwrap{display:none!important}
+  body[data-vtab="row"] #mapw{display:none!important}
+  body[data-vtab="track"] #map,body[data-vtab="track"] #rowwrap{display:none!important}
+  body[data-vtab="track"] #track{width:100%;flex:1 1 auto}
+  body[data-vtab="track"] #track .trow{font-size:16px;min-height:0}
+  body[data-vtab="track"] #track .trow .rn{font-size:16px}
+  body[data-vtab="row"] #rowwrap{flex:1 1 auto;min-height:0;overflow:auto}
+  body[data-vtab="row"] #row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:start;width:100%}
+  body[data-vtab="row"] #row .cd{width:auto;height:auto;min-height:150px}
+  .cd .ptx{display:none}
+  body[data-vtab="row"] #row .cd>.ptx,#hand .cd>.ptx{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin:2px 4px;padding:2px 3px;border-radius:4px;background:#fbf3df;color:#1f1505;font-size:14px;line-height:1.15;font-weight:700;text-align:center}
+  body[data-vtab="row"] #row .cd.fear>.ptx,#hand .cd.fear>.ptx{background:#2a1010;color:#ffe6e0}
+  body[data-vtab="row"] #row .cd .fx,#hand .cd .fx{display:none}
+  .cd .cn{font-size:14px!important}
+  #hand{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;gap:8px;padding:2px 2px 6px;min-height:0;scrollbar-width:thin}
+  #hand .cd{flex:0 0 31vw;width:31vw;height:auto;min-height:118px;scroll-snap-align:start}
+  #hand .cd .cn{-webkit-line-clamp:2!important}
+  #acts .btn,#extra .tag{min-height:44px}
+  #myres .chip{font-size:14px}
+  .ter .tl{font-size:14px!important;line-height:18px}
+  .site{min-height:44px}
+}
+@media (max-width:999px){
+  body[data-vtab="map"] #map{display:flex;flex-direction:column;justify-content:space-around;width:100%}
+  body[data-vtab="map"] .ter{gap:6px}
+  body[data-vtab="map"] .site{flex:0 1 calc((100% - 24px) / 5);width:auto;height:auto;aspect-ratio:1.1;max-height:84px}
+  #hand .cd .pic,body[data-vtab="row"] #row .cd .pic{display:block!important;flex:1 1 30px;min-height:30px}
+}
+@media (max-width:999px){
+  body[data-vtab="track"] #track .trow .rp{display:flex;gap:4px;align-items:center;font-size:15px;margin-left:auto}
+  body[data-vtab="track"] #track .trow .mk i{width:14px;height:14px}
+  body[data-vtab="track"] #track::before{content:'Climb a row: pay its cost. Higher rows score more. Tap for details.';display:block;font:700 14px/1.2 var(--gx-font,Georgia,serif);color:#fff3d6;background:#1d140a;border-radius:8px;padding:4px 8px;margin:2px 2px 4px}
+  body[data-vtab="track"] #track{flex-direction:column}
+  body[data-vtab="row"] #rowwrap{overflow:hidden}
+  body[data-vtab="row"] #row{height:100%;grid-template-rows:repeat(2,minmax(0,1fr))}
+  body[data-vtab="row"] #row .cd{min-height:0}
+  body[data-vtab="row"] #row .cd .pic{flex:1 1 20px;min-height:0}
+  body[data-vtab="row"] #row .cd>.ptx{-webkit-line-clamp:3}
+}
+@media (max-width:999px){body[data-vtab="map"] #map{padding-top:22px;gap:26px;justify-content:flex-start}}

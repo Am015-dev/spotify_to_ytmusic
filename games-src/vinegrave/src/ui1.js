@@ -1,7 +1,7 @@
 // ===================== part 1: state, drawing helpers, render =====================
 const V = VD, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let G = null;
-const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, hints: true, tut: null };
+const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, hints: true, tut: null, tab: 'map' };
 const COL = ['var(--p0)', 'var(--p1)', 'var(--p2)', 'var(--p3)'], HEX = ['#2bb3a6', '#e9a22a', '#d6493b', '#9a6ad6'];
 const SAVEKEY = 'vinegrave-save', PREFKEY = 'vinegrave-prefs';
 try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catch (e) { UI.prefs = {}; }
@@ -79,6 +79,10 @@ function render() {
   // market row
   const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = 1; }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
   $('#row').innerHTML = G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r] }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('');
+  // phone tabs: one big area at a time (map / market / research); a dot marks a tab holding something you can do now
+  const hasT = { map: Object.keys(gS).length > 0, row: Object.keys(gR).length > 0, track: trG };
+  document.querySelectorAll('#vtabs [data-t]').forEach(b => { const t = b.dataset.t; b.classList.toggle('on', UI.tab === t); b.classList.toggle('has', !!hasT[t] && myTurn()); b.setAttribute('aria-selected', String(UI.tab === t)); });
+  document.body.dataset.vtab = UI.tab;
   // dock
   renderDock(L, q, me, actor);
   if (typeof artApply === 'function') artApply();
@@ -104,6 +108,8 @@ function renderDock(L, q, me, actor) {
   me.idols.forEach((d, k) => { ex += `<button type="button" class="tag" data-a="idol" data-k="${k}" aria-label="${esc(V.IDOL[d.id].name)}${d.used ? ', in a shrine' : ''}"><span class="ic" data-art="${d.id}"><svg><use href="#s-idol"/></svg></span><span>${d.used ? 'set' : 'Idol'}</span></button>`; });
   $('#extra').innerHTML = ex;
 }
+function showTab(t) { if (!t || UI.tab === t) return; UI.tab = t; document.body.dataset.vtab = t; document.querySelectorAll('#vtabs [data-t]').forEach(b => { b.classList.toggle('on', b.dataset.t === t); b.setAttribute('aria-selected', String(b.dataset.t === t)); }); }
+const tabOf = el => !el ? null : el.closest('#rowwrap') ? 'row' : el.closest('#track') || el.id === 'track' ? 'track' : el.closest('#map') ? 'map' : null;
 function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do: tap Pass to end your round.';
   const k = {}, bits = []; L.forEach(m => { k[m.t] = 1; });
