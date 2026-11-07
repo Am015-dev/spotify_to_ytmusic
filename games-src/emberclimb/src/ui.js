@@ -515,14 +515,15 @@
   UI.showResult = function (r) {
     return new Promise(function (resolve) {
       var g = G(); if (!g) return resolve('map');
-      app.innerHTML = ''; resultScr(r, function (pick) {
+      var dn = function (pick) { UI.lastRes = null;
         if (pick === 'title') { try { UI.campExit(); } catch (e) { } return; }
         resolve(pick);
-      });
+      }; UI.lastRes = { r: r, done: dn }; app.innerHTML = ''; resultScr(r, dn);
     });
   };
   function over() {
     var g = G();
+    if (UI.camp && UI.lastRes) { resultScr(UI.lastRes.r, UI.lastRes.done); return; }   // a redraw (sound toggle, menu) keeps the chapter result on screen
     if (UI.camp && !(UI.coach && UI.coach.on)) { var s0 = h('div', 'over'); if (!UI.fin) { UI.fin = 1; setTimeout(function () { window.EC_NOSAVE = 0; try { GXC.finish(G()); } catch (e) { } }, 500); } app.appendChild(s0); return; }
     resultScr(null, function (pick) { if (pick === 'again') UI.restart(); else { E.clear(); UI.mode = 'title'; render(); } });
   }

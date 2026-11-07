@@ -2,10 +2,10 @@
 (function () {
   var E = EC.E;
   function pct(G) { var a = 0, m = 0; G.hs.forEach(function (h) { a += Math.max(0, h.hp); m += h.mhp; }); return m ? Math.round(100 * a / m) : 0; }
-  function exitCamp() { UI.camp = null; UI.fin = 0; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; UI.ov = null; UI.render(); }
+  function exitCamp() { UI.lastRes = null; UI.camp = null; UI.fin = 0; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; UI.ov = null; UI.render(); }
   UI.campExit = exitCamp;
   function start(def) {
-    UI.camp = def; UI.fin = 0; UI.ov = null; UI.sub = ''; window.EC_NOSAVE = 1;
+    UI.lastRes = null; UI.camp = def; UI.fin = 0; UI.ov = null; UI.sub = ''; window.EC_NOSAVE = 1;
     if (def.setup && def.setup.tutorial) { UI.tutStart(); return; }
     var o = JSON.parse(JSON.stringify(def.setup || {}));
     if (def.easy && o.hpPct) o.hpPct = Math.min(o.hpPct, 80);
