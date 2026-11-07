@@ -17,7 +17,7 @@ All words live in two data files: `lore.js` (tutorial prologue, quick-game lines
 - **Lord Castigan** (`castigan`)
 - **Slate** (tutorial rival, Armada raider, art camp-drill): brash, brags, panics when the plan goes wrong.
 
-## Prologue: Convoy Run (the tutorial, 4 chapters)
+## Prologue: Convoy Run (the tutorial: a coached free-play game)
 Marshal Brecken coaches Kael Varro over the radio while the Armada raider Slate dives on the convoy. Ch 1 Scramble (plan and reveal), Ch 2 First Contact (order, action, shot, defence), Ch 3 Point Blank (stress, target lock, reroll), Ch 4 Convoy Saved (the battle ends). Slate speaks at the evade and stress beats; his portrait replaces Brecken's on those bubbles.
 
 ## Story arc (3 acts, 10 chapters)

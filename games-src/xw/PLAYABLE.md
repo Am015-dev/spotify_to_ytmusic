@@ -1,5 +1,7 @@
 # Nebula Aces: playable pass (W396, 7 Nov 2026)
 
+**Update 22:20 UTC, ADDENDUM 4: the lesson is now a coached game, not forced taps.** Two forced steps (ship, maneuver), then free play with real dice against an easy AI; Brecken/Slate speak in one dismissible, non-blocking bubble when a rule first matters; the end card walks the real numbers and lists "Things you will meet later". See TUTORIAL-COVERAGE.md. The old 23-step spotlight script was replaced by a test that plays the coached game with any legal UI move at 390x763 and 1440x860. Missions (rules item left open): not done, no verified source for the objectives.
+
 Method: the first minute was played from fresh storage with `playbot.js` (taps only visible, uncovered UI) and the lesson with `tutor-test.js`, at 390x763 and 1440x860, screenshots looked at as a newcomer. This game already had a board-first phone layer, a one-line hint under the board and a 23-step lesson, so the work was framing, story and clarity, not a rebuild. Old art, 3D and music are untouched.
 
 ## The 10 worst problems of the first minute, and what happened
