@@ -1,0 +1,831 @@
+{
+ "game": "twin-thrones",
+ "title": "Crowns",
+ "version": 1,
+ "cast": {
+  "guide": {
+   "name": "Scribe Ione",
+   "emoji": "📜",
+   "color": "#2c7a52"
+  },
+  "pell": {
+   "name": "Pell the Apprentice",
+   "emoji": "🧑‍🌾",
+   "color": "#6a8f3a"
+  },
+  "orrin": {
+   "name": "Orrin of the Quarry",
+   "emoji": "⛏️",
+   "color": "#8a5a2b"
+  },
+  "brannoc": {
+   "name": "Warden Brannoc",
+   "emoji": "🛡️",
+   "color": "#a32"
+  },
+  "maro": {
+   "name": "Maro the Trader",
+   "emoji": "💰",
+   "color": "#b8860b"
+  },
+  "seren": {
+   "name": "Queen Seren",
+   "emoji": "👑",
+   "color": "#3b6fb5"
+  },
+  "kest": {
+   "name": "General Kest",
+   "emoji": "⚔️",
+   "color": "#a32"
+  },
+  "sevra": {
+   "name": "Sevra the Sage",
+   "emoji": "🔭",
+   "color": "#2d7a47"
+  },
+  "vael": {
+   "name": "King Vael",
+   "emoji": "🏛️",
+   "color": "#7b4aa8"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "The Pyramid",
+   "blurb": "Learn to build."
+  },
+  {
+   "act": 2,
+   "title": "Open Roads",
+   "blurb": "Rivals who plan."
+  },
+  {
+   "act": 3,
+   "title": "The Twin Throne",
+   "blurb": "Two moves ahead."
+  }
+ ],
+ "twists": [
+  {
+   "id": "extra-coins",
+   "where": "setup",
+   "how": "boss seat starts with +N coins (N = param)"
+  },
+  {
+   "id": "head-start",
+   "where": "setup",
+   "how": "conflict pawn starts N steps toward the player's capital"
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "First Duel",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Welcome to Twin Thrones. Two cities, one pyramid of cards."
+    },
+    {
+     "who": "guide",
+     "text": "I will walk you through your first duel step by step."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "You read the pyramid well."
+    }
+   ],
+   "opponent": {
+    "name": "Pell the Apprentice",
+    "emoji": "🧑‍🌾",
+    "cast": "pell",
+    "personality": "Gentle and careless. Sells cards he should build.",
+    "aiLevel": "easy",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the duel."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 40 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 40
+     }
+    },
+    {
+     "text": "Win by 8 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 8
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "Coins and Cards",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Coins buy missing resources, so trade posts matter."
+    },
+    {
+     "who": "guide",
+     "text": "Score 40 points or more to show you can build a city."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "A fine, full treasury."
+    }
+   ],
+   "opponent": {
+    "name": "Orrin of the Quarry",
+    "emoji": "⛏️",
+    "cast": "orrin",
+    "personality": "Loves stone and wonders.",
+    "aiLevel": "easy",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": null,
+   "goal": {
+    "type": "score",
+    "value": 40,
+    "text": "Win with at least 40 points."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 40 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 40
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "The Warden's Gate",
+   "boss": true,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Warden Brannoc holds the gate. He starts with extra coins."
+    },
+    {
+     "who": "brannoc",
+     "text": "No city passes my wall."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "The gate is open. Act two awaits."
+    }
+   ],
+   "opponent": {
+    "name": "Warden Brannoc",
+    "emoji": "🛡️",
+    "cast": "brannoc",
+    "personality": "Stubborn. Builds red cards and pushes the pawn.",
+    "aiLevel": "easy",
+    "aiStyle": "standard",
+    "taunt": "Back to your wall, builder.",
+    "praise": "Well built. The gate is yours."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": {
+    "id": "extra-coins",
+    "param": 5,
+    "text": "Boss rule: Warden Brannoc starts with 5 extra coins."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the duel."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 45 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 45
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c4",
+   "act": 2,
+   "title": "Open Roads",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Act two. The rivals plan ahead now."
+    },
+    {
+     "who": "maro",
+     "text": "Every card you free is a gift to me."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "You mind what you uncover."
+    }
+   ],
+   "opponent": {
+    "name": "Maro the Trader",
+    "emoji": "💰",
+    "cast": "maro",
+    "personality": "Hoards coins and denies your best card.",
+    "aiLevel": "normal",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the duel."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 50 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c5",
+   "act": 2,
+   "title": "The Pawn Holds",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Armies matter. Finish with the conflict pawn on your side of the track."
+    },
+    {
+     "who": "guide",
+     "text": "The pawn only counts if it ends on your side."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "Well marched."
+    }
+   ],
+   "opponent": {
+    "name": "General Kest",
+    "emoji": "⚔️",
+    "cast": "kest",
+    "personality": "Loves shields, hates being pushed.",
+    "aiLevel": "normal",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": null,
+    "text": "Win with the conflict pawn on your side of the track."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 50 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c6",
+   "act": 2,
+   "title": "The Teal Throne",
+   "boss": true,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Queen Seren has the pawn two steps toward your capital."
+    },
+    {
+     "who": "seren",
+     "text": "My army is already at your door."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "The throne yields. One age left."
+    }
+   ],
+   "opponent": {
+    "name": "Queen Seren",
+    "emoji": "👑",
+    "cast": "seren",
+    "personality": "Calm and exact. Counts every coin.",
+    "aiLevel": "normal",
+    "aiStyle": "standard",
+    "taunt": "Your city falls short, challenger.",
+    "praise": "Well dueled. The throne is yours."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": {
+    "id": "head-start",
+    "param": 2,
+    "text": "Boss rule: the conflict pawn starts 2 steps toward your capital."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the duel."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 55 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 55
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c7",
+   "act": 3,
+   "title": "Hard Ground",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Act three. The rivals read the board two moves ahead."
+    },
+    {
+     "who": "guide",
+     "text": "Take your time: look at what each card uncovers."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "You out-thought them."
+    }
+   ],
+   "opponent": {
+    "name": "Orrin the Unbowed",
+    "emoji": "⛏️",
+    "cast": "orrin",
+    "personality": "Plans two moves ahead.",
+    "aiLevel": "hard",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the duel."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 55 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 55
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c8",
+   "act": 3,
+   "title": "The Long Library",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Six different science symbols win at once. Watch the shelves."
+    },
+    {
+     "who": "guide",
+     "text": "Science symbols and tokens can end the game early."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "Knowledge is power."
+    }
+   ],
+   "opponent": {
+    "name": "Sevra the Sage",
+    "emoji": "🔭",
+    "cast": "sevra",
+    "personality": "Collects science and takes tokens.",
+    "aiLevel": "hard",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the duel."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 60 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 60
+     }
+    },
+    {
+     "text": "Win by 10 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 10
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c9",
+   "act": 3,
+   "title": "Banners and Scrolls",
+   "boss": false,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "Win by the pawn or by science: no points race this time."
+    },
+    {
+     "who": "guide",
+     "text": "Points do not count here: push the pawn or collect symbols."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "A swift, clean victory."
+    }
+   ],
+   "opponent": {
+    "name": "General Kest",
+    "emoji": "⚔️",
+    "cast": "kest",
+    "personality": "Pushes the pawn without rest.",
+    "aiLevel": "hard",
+    "aiStyle": "standard"
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": null,
+    "text": "Win by military or science supremacy."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 60 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 60
+     }
+    },
+    {
+     "text": "Win by 12 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 12
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  },
+  {
+   "id": "c10",
+   "act": 3,
+   "title": "The Twin King",
+   "boss": true,
+   "intro": [
+    {
+     "who": "guide",
+     "text": "King Vael has held both thrones for years. He starts rich."
+    },
+    {
+     "who": "vael",
+     "text": "Two thrones, one king. Kneel."
+    }
+   ],
+   "outro": [
+    {
+     "who": "guide",
+     "text": "Both thrones are yours."
+    }
+   ],
+   "opponent": {
+    "name": "King Vael",
+    "emoji": "🏛️",
+    "cast": "vael",
+    "personality": "Cold, exact and rich.",
+    "aiLevel": "hard",
+    "aiStyle": "standard",
+    "taunt": "Two thrones, one king.",
+    "praise": "Magnificent. Rule well."
+   },
+   "setup": {
+    "players": 2,
+    "seed": null,
+    "variant": "basic"
+   },
+   "twist": {
+    "id": "extra-coins",
+    "param": 8,
+    "text": "Boss rule: King Vael starts with 8 extra coins."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Win the duel."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Score 60 or more",
+     "test": {
+      "k": "score",
+      "op": ">=",
+      "v": 60
+     }
+    },
+    {
+     "text": "Win by 12 or more",
+     "test": {
+      "k": "margin",
+      "op": ">=",
+      "v": 12
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rival plays gently and the boss rule is off."
+   }
+  }
+ ]
+}

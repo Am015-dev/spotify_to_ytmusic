@@ -193,7 +193,7 @@ for (const slug of SLUGS) test.describe(slug, () => {
     page.on('pageerror', e => errs.push(e.message));
     await page.addInitScript(HOOK);
     const url = `${BASE}/${slug}/?scn=menu`;
-    const boot = async () => { await page.goto(url, { waitUntil: 'load', timeout: 45000 }); await page.waitForFunction(() => window.GXS && GXS.menuList, null, { timeout: 30000 }); await page.waitForTimeout(1500); };
+    const boot = async () => { await page.goto(url, { waitUntil: 'load', timeout: 45000 }); await page.waitForFunction(() => window.GXS && GXS.menuList, null, { timeout: 30000 }); await page.waitForFunction(() => GXS.menuN, null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(1500); };
     await boot();
     const names = ['start'].concat(await page.evaluate(() => GXS.menuList().map(s => s.name).filter(n => n !== 'title')));
     res.surfaces = names;

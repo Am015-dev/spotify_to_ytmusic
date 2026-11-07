@@ -319,6 +319,14 @@
    "mut": 0
   },
   {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  },
+  {
    "id": "ec-map",
    "name": "Map: pick a room",
    "ask": "Can you see the glowing rooms?",
@@ -842,6 +850,14 @@
    "ask": "Is every menu clean and readable?",
    "sizes": "all",
    "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
    "mut": 0
   },
   {

@@ -66,3 +66,12 @@ Style block (in front of every prompt): Flat 2D vector game art, top-down view, 
 Fit rules: `bg` and `board` kinds are cover (cropped to fill), everything else is contain (never stretched). Card values, corner limits and names are drawn by the game on top, so no text or numbers inside any picture.
 
 Note (W334): `assets.json` and the prompt files were edited by hand after the first build; do not re-run the generator script over them (it would undo the wave split, the removed reserved upgrade backs and the wording fixes).
+
+## Round 2 (HUD slots wired, Upgrades mode)
+
+The five slots that were reserved are now drawn in the HUD, through the same loader (drop `media/<stem>.webp`, no code change):
+`ui-engine-tray` (behind the heat / stress / deck counts, stretched to the row), `icon-heat` and `icon-stress` (beside the counts), `icon-gear` (above the gear label), `icon-lap` and `icon-place` (top bar pills).
+
+Upgrade card faces (wave 2, ratio 5:7, prompts in `next-wave/flow-2d/redline-rally/prompts-wave2-ratio-5x7.json`; the value and name are drawn by the game):
+`card-upgrade-coolant`, `card-upgrade-pit`, `card-upgrade-grip`, `card-upgrade-brakes`, `card-upgrade-rocket`, `card-upgrade-tuned`.
+Music: `next-wave/music/redline-rally/cues-wave1.json` (menu, game, tense, victory, defeat; a and b), files go to `games/redline-rally/music/<slot>-<a|b>.mp3`.
