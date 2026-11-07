@@ -42,7 +42,7 @@ function bfLineText0(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI
     if(G.rolls<=0||!nk)return 'No rolls left: tap SMASH';
     if(!G.dice.some(d=>d.k))return 'Tap dice to keep them, then Roll';
     return `Roll the other ${nk}, or tap SMASH`}
-  if(G.phase==='buy'&&!G.bug&&p.vp>=20)return '20★ reached: End turn to win';
+  if(G.phase==='buy'&&!G.bug&&p.vp>=GOAL())return GOAL()+'★ reached: End turn to win';
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
     const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or End turn':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: End turn'}
   return ''}
@@ -167,7 +167,7 @@ function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfS
  const _pa=phActs;phActs=function(){_pa.apply(this,arguments);const pa=$bf('pacts');if(!pa||!G||!humanTurn())return;
    const r=pa.querySelector('[data-act="reroll"]');if(r&&G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;r.innerHTML=`<span class="bl">🎲 Roll</span><small class="pips">${Array.from({length:Math.max(G.rolls,rerollsOf(cur()))},(_,k)=>`<i class="${k<G.rolls?'':'used'}"></i>`).join('')}</small>`;r.setAttribute('aria-label',`Roll the ${nk} unkept dice, ${G.rolls} rolls left`)}
    const d=pa.querySelector('[data-act="resolve"]');if(d)d.innerHTML='<span class="bl">✔ Done</span><small>use these dice</small>';
-   const e=pa.querySelector('[data-act="end"]');if(e&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;e.innerHTML=`<span class="bl">✔ ${G.bug?'Finish turn':'Done'}</span><small>${win?'end your turn to win':'end your turn'}</small>`}
+   const e=pa.querySelector('[data-act="end"]');if(e&&G.phase==='buy'){const win=!G.bug&&cur().vp>=GOAL();e.innerHTML=`<span class="bl">✔ ${G.bug?'Finish turn':'Done'}</span><small>${win?'end your turn to win':'end your turn'}</small>`}
    const s=pa.querySelector('[data-act="sweep"]');if(s&&G.phase==='buy'){s.innerHTML='<span class="bl">♻</span><small>new · 2⚡</small>';s.setAttribute('aria-label','Throw these 3 cards away and deal 3 new ones, 2 energy')}};
  const _res=resolve;resolve=function(){if(G&&G.phase==='roll')try{bfCapture()}catch(e){}return _res.apply(this,arguments)};
  const _f3=fx3D;fx3D=function(k,e){if(BF.cap&&BF.cap.live&&bfNow()-BF.cap.t<5000)return bfPlay(k,e,_f3);_f3(k,e);bfNarrate(k,e);

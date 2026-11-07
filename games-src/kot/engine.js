@@ -502,13 +502,14 @@ function deaths(){G.pl.forEach(q=>{if(q.alive&&q.hp>maxhp(q))q.hp=maxhp(q)});let
   if(G.bayOn&&alive().length<=4){G.bayOn=false;lg(-1,'Only four monsters remain: the Harbor closes.');
     if(G.bay>=0){const b=G.bay;G.bay=-1;if(G.city===-1){G.city=b;lg(b,`${mname(P(b))} moves from the Harbor to Downtown.`)}else{lg(b,`${mname(P(b))} is washed out of the Harbor.`);const q=P(b);G.bay=b;leaveCity(q,'close')}}}
   checkWin(false)}
-const winAt=p=>has(p,'c_astro')?17:20;
+const GOAL=()=>(typeof G!=='undefined'&&G&&G.goal)||20;   // the coached tutorial game is a short one (G.goal=10)
+const winAt=p=>has(p,'c_astro')?Math.min(17,GOAL()):GOAL();
 function checkWin(final){
   if(G.winner)return true;const a=alive();
   if(a.length===0){G.winner='draw';G.winText='Everyone falls: the city wins, nobody is crowned.';G.phase='over';lg(-1,G.winText);return true}
   if(a.length===1){G.winner='P'+(a[0].i+1);G.winText=`Last standing: ${mname(a[0])} is the only monster left and takes the crown!`;G.phase='over';lg(a[0].i,G.winText);return true}
   const ast=a.find(p=>has(p,'c_astro')&&p.vp>=17);if(ast){G.winner='P'+(ast.i+1);G.winText=`Space Helmet: ${mname(ast)} reaches ${ast.vp} stars (only 17 needed) and is crowned!`;G.phase='over';cov('cost:astro');lg(ast.i,G.winText);return true}
-  if(final){const w=a.filter(p=>p.vp>=20);if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`${mname(w[0])} reaches ${w[0].vp} stars (20 needed) and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
+  if(final){const w=a.filter(p=>p.vp>=GOAL());if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`${mname(w[0])} reaches ${w[0].vp} stars (${GOAL()} needed) and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
   return false}
 
 /* ---------- Curses: the Omen Die ---------- */

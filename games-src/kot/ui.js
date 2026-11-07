@@ -38,7 +38,7 @@ function renderPanel(){
     acts+=`<div class="emotes">${EMOTES.map(e=>`<button class="btn mini" data-emo="${e}" aria-label="send ${e}">${e}</button>`).join('')}</div>`}
   pt.innerHTML=`${G.winner?'':stepBar()}<div class="who" style="color:${MONS[p.m].c};-webkit-text-stroke:1.2px #1a1320">${who}${humanTurn()?' · your turn':''}</div>${head?`<div class="head">${head}</div>`:''}${topTip}`;
   pa.innerHTML=acts;pm.innerHTML=msg;
-  document.getElementById('docktitle').textContent=G.winner?'Game over':`R${G.turn} · ${humanTurn()?'Your turn':mname(p)} · ${STEPS[(G.step||1)-1]} · 20★ wins`;
+  document.getElementById('docktitle').textContent=G.winner?'Game over':`R${G.turn} · ${humanTurn()?'Your turn':mname(p)} · ${STEPS[(G.step||1)-1]} · ${GOAL()}★ wins`;
   document.getElementById('dicewrap').classList.toggle('off',G.phase==='buy'||!G.dice.length&&G.phase!=='roll');
   const canClick=humanTurn()&&G.phase==='roll';
   const spin=UI.rollAnim!==G.rollId&&ANIM;UI.rollAnim=G.rollId;
@@ -110,7 +110,7 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
    <p class="lede">Giant monsters brawl for Crown City. First to <b>20 ★</b> wins.</p>
    <div class="acts" style="margin:.5rem 0">
     ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn'):''}
-    <button class="btn primary big" data-start="solo">▶ Play now (recommended)<small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
+    <button class="btn primary big" data-start="solo"><span>▶ Play now (recommended)</span><small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
     ${typeof campStartBtn==='function'?campStartBtn():''}
     ${typeof tutBtn==='function'&&!tutFirst()?tutBtn('btn'):''}
     ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}

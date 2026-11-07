@@ -478,7 +478,7 @@ function puffGeo(img){const GW=84,GH=Math.max(24,Math.round(GW*img.height/img.wi
   for(let y=0;y<GH-1;y++)for(let x=0;x<GW-1;x++){const a=y*GW+x,b=a+1,c=a+GW,e=c+1;if(!(inn[a]&&inn[b]&&inn[c]&&inn[e]))continue;
     idx.push(mapF[a],mapF[c],mapF[b],mapF[b],mapF[c],mapF[e]);idx.push(mapB[a],mapB[b],mapB[c],mapB[b],mapB[e],mapB[c])}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();return g}
-function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[m].c);const body=vinyl(C);const belly=vinyl(C.clone().offsetHSL(0,-.1,.14));const dark=vinyl(0x241a2c,{roughness:.35});const white=vinyl(0xfff6e8,{roughness:.3,clearcoat:.8});const anim={};
+function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[m].c);const body=vinyl(C);const belly=vinyl(C.clone().offsetHSL(0,-.1,.14));const dark=vinyl(0x4a3a5c,{roughness:.35});const white=vinyl(0xfff6e8,{roughness:.3,clearcoat:.8});const anim={};
   switch(m){
   case 0:{mesh(new THREE.SphereGeometry(1,48,36),body,0,1.2,0,g).scale.set(1.15,.95,1.2);
     mesh(new THREE.SphereGeometry(.8,32,24),belly,0,.98,.52,g).scale.set(1,.8,.7);

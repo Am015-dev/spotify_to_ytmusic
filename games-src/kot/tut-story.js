@@ -10,7 +10,7 @@ const TUT_STORY = {
     3: { name: 'Outside', intro: 'Out in the streets you heal, and your claws find the monster in Downtown.', outro: 'Squidrik’s bleeding and you’re healthy. The rookie is climbing.' },
     4: { name: 'The crown', intro: 'Many turns later, the whole city is watching. One big roll from the crown.', outro: 'KING OF CROWN CITY! Tomorrow’s headline just wrote itself.' } },
   steps: {
-    goal:   { say: 'The Clarion wants a headline: be first to 20 ★. Squidrik is after it too.' },
+    goal:   { say: 'The Clarion wants a headline: be first to 10 ★ in this short game. Squidrik is after it too.' },
     keep:   { say: 'Two 3s! Squidrik hates a pair. Keep both: they stay put when you roll.', react: 'Locked in. Nobody takes those.' },
     roll1:  { say: 'Now throw the rest. Squidrik is watching, so make it count.', react: 'Dice in the air…' },
     third:  { say: 'A third 3! Three of a kind pays 3 ★. Keep it too.', react: 'Three 3s: stars in the bank.' },
@@ -33,8 +33,8 @@ const TUT_STORY = {
     score3: { say: g => `A heart healed you to ${g.hp} ♥, and your claws hit ${g.rival} in Downtown.` },
     end3:   { say: 'Squidrik still sits in Downtown. Pass the turn and let the night go on.', react: 'And the night rolls on…' },
     later:  { say: g => `You’ve ${g.vp} ★ now. Four 3s pay 3 ★ plus 1 for the extra die. SMASH!`, react: 'Four 3s! Twenty ★ in sight!' },
-    win20:  { say: g => `${g.vp} ★ is the crown. End your turn with 20 and it’s yours.`, react: 'Squidrik’s face says it all.' },
-    result: { say: 'First to 20 ★ wins at once, or the last monster standing. Take a bow.' } },
+    win20:  { say: g => `${g.vp} ★ is the crown. End your turn with 10 and it’s yours.`, react: 'Squidrik’s face says it all.' },
+    result: { say: 'First to the goal wins at once (10 ★ here, 20 in a real game), or the last monster standing. Take a bow.' } },
 };
 
 // ===== Coached first game (Addendum 4): the player plays freely from turn 1; Dot speaks once, just in time, one bubble at a time (never blocks input, tap x to dismiss).
@@ -42,7 +42,7 @@ const TUT_STORY = {
 const me_ = () => G.pl.findIndex(p => p.human), myTurn_ = () => G.active === me_() && !G.winner && !UI.intro && !UI.choice;
 const cnt_ = () => { const c = {}; G.dice.forEach(d => { c[d.f] = (c[d.f] || 0) + 1 }); return c };
 const COACH_TIPS = [
-  { id: 'goal', rules: ['setup', 'goal', 'roll3'], say: 'Welcome, rookie! First to 20 ★ wins, or the last monster standing. Each turn you roll six dice, up to three times.', when: () => myTurn_() && G.phase === 'roll' && G.dice.length },
+  { id: 'goal', rules: ['setup', 'goal', 'roll3'], say: 'Welcome, rookie! This short game ends at 10 ★ (real games: 20), or the last monster standing. Each turn: roll six dice, up to three times.', when: () => myTurn_() && G.phase === 'roll' && G.dice.length },
   { id: 'faces', rules: ['faces'], say: 'Each die says what it does: STAR dice score in sets, ENERGY buys cards, HEAL mends you, HIT smashes rivals.', when: () => myTurn_() && G.phase === 'roll' && G.dice.length && G.rolls <= 2 },
   { id: 'keep', rules: ['keep', 'rekeep'], say: 'Tap dice to keep them, then Roll for the rest. Kept dice can be tapped again to roll them too.', when: () => myTurn_() && G.phase === 'roll' && G.rolls >= 1 && G.dice.length },
   { id: 'pair', rules: ['pair', 'triple'], say: 'A pair of numbers scores nothing. Three of a kind scores that number in ★. Chase the third!', when: () => myTurn_() && G.phase === 'roll' && ['1', '2', '3'].some(f => cnt_()[f] === 2) },
@@ -56,12 +56,12 @@ const COACH_TIPS = [
   { id: 'buy', rules: ['cards', 'types', 'sweep', 'endturn'], say: 'Power cards: tap one to read it, tap again to buy. PERMANENT stays, ONE-SHOT is used once. ♻ swaps the three for 2 ⚡. Then End turn.', when: () => myTurn_() && G.phase === 'buy' },
   { id: 'rivals', rules: ['rivals'], say: g => `${g.rival} plays too: it rolls, keeps, smashes and buys like you. Watch the caption at the top.`, when: () => !G.winner && G.active !== me_() && !UI.intro },
   { id: 'yield', rules: ['yield'], say: 'Hit in Downtown? Stay and keep earning 2 ★ a turn, or yield: you leave, and the attacker moves in.', when: () => UI.choice && /Stay or yield/.test(UI.choice.title) },
-  { id: 'ko', rules: ['ko'], say: 'At 0 ♥ a monster is knocked out. Last one standing wins, even below 20 ★.', when: () => G.pl.some(p => p.alive && p.hp <= 3) },
-  { id: 'near', rules: ['win20'], say: 'Nearly there! End a turn holding 20 ★ and you win. The check happens when your turn ends.', when: () => G.pl.some(p => p.vp >= 15) && !G.winner },
+  { id: 'ko', rules: ['ko'], say: 'At 0 ♥ a monster is knocked out. Last one standing wins, even below the star goal.', when: () => G.pl.some(p => p.alive && p.hp <= 3) },
+  { id: 'near', rules: ['win20'], say: 'Nearly there! End a turn holding the star goal and you win. The check happens when your turn ends.', when: () => G.pl.some(p => p.vp >= GOAL() - 4) && !G.winner },
 ];
 // rules this short game may not show: said on the card at the end
 const COACH_LATER = [
   ['harbor', 'Harbor: with 5-6 monsters a second city space opens on the water.'],
-  ['tie', 'Ties: if two monsters hit 20 ★ in one turn, the one whose turn it is wins.'],
+  ['tie', 'Ties: if two monsters hit the goal in one turn, the one whose turn it is wins.'],
   ['omen', 'Options: evolutions, curses and the Omen die, Brainjack, costumes, Tower and Berserk dice. Switch them on in Customise; the lightbulb explains each.'],
   ['extra-turn', 'Some cards give an extra turn right after yours.']];

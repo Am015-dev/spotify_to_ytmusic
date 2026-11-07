@@ -71,7 +71,7 @@
     const me = G.pl.find(p => p.human), w = G.winner === 'draw' ? null : G.pl[+G.winner.slice(1) - 1];
     const rows = G.pl.slice().sort((a, b) => b.vp - a.vp).map(p => `${p === me ? 'You' : mname(p)}: ${p.vp} ★, ${Math.max(0, p.hp)} ♥, ${p.cards.length} card${p.cards.length === 1 ? '' : 's'}`).join(' · ');
     showCoach({ id: 'final', head: w === me ? 'KING OF CROWN CITY!' : 'Final scoring', sticky: true,
-      say: `${w ? (w === me ? 'You won' : mname(w) + ' won') : 'Nobody won'} with ${w ? w.vp : 0} ★ (20 needed, or last standing). ${rows}.`,
+      say: `${w ? (w === me ? 'You won' : mname(w) + ' won') : 'Nobody won'} with ${w ? w.vp : 0} ★ (${GOAL()} needed, or last standing). ${rows}.`,
       html: `<small>Not met in this game (see Help): ${miss.slice(0, 4).concat(COACH_LATER.slice(0, 2).map(l => l[1])).join('; ')}.</small><span class="pp-row"><button type="button" data-pp-play>Play a real game</button><button type="button" data-pp-story>Story mode</button></span>` });
     try { GXT.markDone(TUT_GAME) } catch (e) { }
   }

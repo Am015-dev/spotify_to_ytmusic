@@ -23,4 +23,6 @@ let pass = 0, fail = 0; const T = (n, ok, i) => { if (ok) pass++; else fail++; c
   T('Ask me: no claws rolled -> no question', !w.eval('!!(UI.choice&&UI.choice.title==="Dice order")'), {}) }
 { const w = mk(); w.eval(`UI.order='ask';G.city=0`); roll(w);
   T('Ask me: monster in Downtown cannot heal -> no question', !w.eval('!!(UI.choice&&UI.choice.title==="Dice order")'), {}) }
+{ const w = mk(); w.eval(`G.goal=10;G.pl[0].human=false;G.pl[1].vp=10;G.active=1;checkWin(true)`); const win = w.eval('G.winner'); const w2 = mk(); w2.eval(`G.pl[1].vp=10;G.active=1;checkWin(true)`);
+  T('coached short game: goal 10 wins at 10 stars, a normal game does not', win === 'P2' && !w2.eval('G.winner'), { win, normal: w2.eval('G.winner') }) }
 console.log(`${fail ? 'FAIL' : 'PASS'} rules-test ${pass} ok, ${fail} failed`); process.exit(fail ? 1 : 0);
