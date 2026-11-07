@@ -49,3 +49,8 @@
 ## Open
 - Audit (phone-s / phone / pc, A-F): Game surface 0 on all. Remaining items are all the shared Menu panel: tab chips flagged "dead button" (they scroll the panel, no DOM change) and "Music" label contrast 3.0:1 at phone-s. Shared kit, not fixed here. The earlier End-turn-on-guide-replay E item no longer appears now that the audit waits for the menu walk.
 - Real-tap runs: Quick defeat on phone (390x763) and Quick climb to a defeat on PC (1440x860) show the new result screen, tapping a deck card opens the large card. A Quick victory by tapping was not reached by the simple bot (it dies); the victory screen was checked through `?scn=ec-result` plus the Story run below.
+
+## Results (W363)
+- `build-all.py --quick emberclimb` (VIS_SLUGS=","): PASS. smoke.js, tutor-test.js, rules-test.js: PASS.
+- `ui-audit.spec.js`: phone A0 B0 C0 D0 E6 F0, phone-s A0 B1 C0 D0 E0 F0, pc A0 B0 C0 D0 E6 F0. All remaining items are the shared Menu panel (tab chips "dead", "Music" contrast); the game surfaces are clean.
+- Story chapter 1 -> 2 played with real touch taps at 390x763: guide (7 steps) -> end card -> result screen (3 stars) -> Next chapter -> intro -> climb -> Iron Warden down -> result; chapter 2 beaten, hero Rogue and relic Clover Dice unlocked.
