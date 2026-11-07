@@ -69,6 +69,7 @@ function flyAI(seat) {
   } catch (e) { }
 }
 function commit(seat, mv) {
+  try { coachPicked(seat, mv); } catch (e) { }
   if (!G || G.phase !== 'pick') return false;
   const v = viewSeat(), preHand = v >= 0 ? G.players[v].hand.slice() : null, wasHolder = UI.holder;
   const r = KK.apply(G, seat, { pick: mv.pick });
@@ -168,7 +169,7 @@ async function playResolve(evs, preHand) {
     UI.fast = false; render(); await wait(300); if (tok !== UI.seq) return;
     // 2: the covers lift together, big, in the middle of the table (ui8: the reveal stage); without it, in the seats
     try { UI.fz.news0 = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.fz.news0 = null; }
-    UI.fz.msg = sayT('cover'); renderDock();
+    UI.fz.msg = sayT('cover'); renderDock(); try { coachMove(); } catch (e) { }
     UI.fz.say = 'Reveal! ' + rv.picks.map(p => pname(p.seat) + ': ' + p.cards.map(c => TY[c.key].name).join(' + ')).join(' · ');
     const gains = (() => { try { const a = liveScores(before), b = liveScores(T); return b.map((x, s) => x.total - a[s].total); } catch (e) { return null; } })();
     if (ANIM && stageOK()) { try { await stageReveal(rv.picks, tok, gains); } catch (e) { console.error(e); stageClear(); } }
@@ -232,7 +233,7 @@ function save() {
   try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
 }
 // autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
-function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over' || UI.mode === 'tutorial') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
+function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over' || UI.mode === 'tutorial' || UI.mode === 'coached') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
 function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;

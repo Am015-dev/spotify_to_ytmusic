@@ -60,5 +60,33 @@ KK.STORY = {
     c3: 'A set, a race and a ladder. Not bad at all.',
     c4: 'The count is done. Now you are ready for real meals.'
   },
-  result: { win: 'The Turning Plate cheers for you.', lose: 'The belt turns on. There is always the next meal.' }
+  result: { win: 'The Turning Plate cheers for you.', lose: 'The belt turns on. There is always the next meal.' },
+  // the COACHED first game (replaces the tap-step prologue): Suzu speaks just-in-time, one bubble at a time, never blocking input.
+  // ids = the rules in ../TUTORIAL-COVERAGE.md. %n = a number, %r = the rival. who: s = Suzu, o = the rival.
+  coach: {
+    intro: { w: 's', t: 'Odile bet a custard you cannot win, Mina. Pick any dish you like!' },
+    pass: { w: 's', t: 'Picks flip together, then your leftovers ride the belt to the next diner.' },
+    pair: { w: 's', t: 'Crispy Prawns score 5 per PAIR. You have %n: one more makes a pair.' },
+    pair2: { w: 's', t: 'A pair of prawns: 5 points. Every extra pair scores again.' },
+    fish: { w: 's', t: 'Fish Slices score 10 per SET of three. One or two score nothing.' },
+    bun: { w: 's', t: 'Steam Buns climb: 1, 3, 6, 10, then 15 for five. Stack them!' },
+    roll: { w: 's', t: 'Seaweed Rolls race: most icons this round wins 6, second wins 3.' },
+    nigiri: { w: 's', t: 'Nigiri score 1 to 3 points on their own: Sun 1, Sunset 2, Moon 3.' },
+    paste: { w: 's', t: 'Fire Paste triples the NEXT nigiri you serve. Paste first, nigiri after!' },
+    pasteNigiri: { w: 's', t: 'Nigiri on Fire Paste: tripled! That is the best trick on the belt.' },
+    sticks: { w: 's', t: 'Twin Sticks: keep them, then tap the glowing sticks to take two dishes.' },
+    custard: { w: 's', t: 'Custard Cups pay only at the very end: most +6, fewest -6.' },
+    rival: { w: 'o', t: 'Fire Paste for me. My next nigiri triples. Watch your plates, Mina!' },
+    rival2: { w: 'o', t: 'Rolls are mine this round. You will have to race me!' },
+    good: { w: 's', t: 'Lovely pick! The green +N on a plate is what it scores right now.' },
+    poor: { w: 's', t: 'Hmm. %n was worth more right now. Check the green +N before you pick.' },
+    rounds: { w: 's', t: 'Round 2: a new hand. Custard Cups stay, everything else is cleared.' },
+    round3: { w: 's', t: 'Last round! Custard gets counted right after it.' },
+    walk: { w: 's', t: 'Round scored. Let us count it together, rule by rule.' },
+    makiTie: { w: 's', t: 'A roll tie! Tied for most split 6 (rounded down), nobody gets second.' },
+    custardEnd: { w: 's', t: 'Custard: most cups +6, fewest -6, ties split. Counted once, at the end.' },
+    penalty: { w: 's', t: 'With three diners, the fewest cups LOSES 6. Two diners never lose.' },
+    custardTie: { w: 's', t: 'Custard ties split the points, rounded down.' },
+    tieBreak: { w: 's', t: 'Equal totals? More Custard Cups wins the meal.' }
+  }
 };

@@ -116,18 +116,94 @@ function tutLeave() {
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen() { if (typeof GXC === 'undefined' || !window.CAMPAIGN) return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
 function tutStart(o) {
-  if (typeof GXT === 'undefined') return; const pro = !!(o && o.prologue); o = pro ? o : null;
-  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'You know the rules',
-    endText: o ? 'Auntie Suzu: "Odile owes you a custard. Now the Story begins."' : 'Auntie Suzu: "Odile owes you a custard. A real meal has three rounds. The lightbulb helps."',
-    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
-    setup: () => { try { GX.close(); } catch (e) { } try { closePop(); } catch (e) { } closeRS(); newGame('tutorial', { np: 2, seats: [2] }); },
-    onDone: r => { tutLeave(); const c = r && r.choice;
-      if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
-      else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); campOpen(); }
-      else { showStart(); UI.sv = 'setup'; renderStart(); } },
-    onExit: () => { tutLeave(); showStart(); if (pro && typeof GXC !== 'undefined') campOpen(); } });
+  const pro = !!(o && o.prologue); const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  try { GX.close(); } catch (e) { } try { closePop(); } catch (e) { } closeRS();
+  newGame('coached', { np: 3, seats: [2, 3], level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'] });
+  coachBegin(pro, first);
+}
+// ================= the COACHED first game: a real 3-round game, free choices from turn 1; Suzu (and the rival) speak just in time =================
+// One bubble at a time, never blocks input (only the x takes taps), dismissible. Rules that never came up are listed on the end card ("Things you'll meet later").
+window.GXCOACH = { running: false, explained: [], later: [], done: false };
+const COACH = { q: [], cur: null, seen: {}, on: false, pro: false, first: null, iv: 0, tm: 0, rounds: {}, poorN: 0, pick: null };
+const COACH_ALL = ['intro', 'pass', 'pair', 'fish', 'bun', 'roll', 'nigiri', 'paste', 'pasteNigiri', 'sticks', 'custard', 'rival', 'rounds', 'walk', 'makiTie', 'custardEnd', 'penalty', 'custardTie', 'tieBreak'];
+const coachOn = () => COACH.on && UI.mode === 'coached' && !!G;
+function coachBegin(pro, first) {
+  clearInterval(COACH.iv); clearTimeout(COACH.tm);
+  Object.assign(COACH, { q: [], cur: null, seen: {}, on: true, pro, first, rounds: {}, poorN: 0, pick: null });
+  Object.assign(window.GXCOACH, { running: true, explained: [], later: [], done: false });
+  COACH.iv = setInterval(coachPoll, 450); coachSay('intro');
+}
+function coachStop() { COACH.on = false; clearInterval(COACH.iv); clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; window.GXCOACH.running = false; guideHide(); }
+function coachSay(id, n) {
+  if (COACH.seen[id] || !KK.STORY.coach[id]) return; COACH.seen[id] = 1; window.GXCOACH.explained.push(id);
+  const c = KK.STORY.coach[id]; COACH.q.push({ id, t: c.t.replace(/%n/g, n == null ? '' : n).replace(/%r/g, rivalName()), w: c.w }); coachPump();
+}
+function rivalName() { return G ? pname(1) : 'Odile'; }
+function coachPump() {
+  if (COACH.cur || !COACH.q.length) return; const m = COACH.q.shift(); COACH.cur = m;
+  let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
+  const who = m.w === 'o' ? { name: pname(1), color: '#e0a31c', portrait: 'camp-odile.webp' } : null;
+  const kx = h('button.kx', { type: 'button', 'aria-label': 'Dismiss' }, '\u00d7'); kx.addEventListener('click', () => coachNext());
+  g.replaceChildren(portraitEl(who, 40), h('div.kgt', h('b', (who || KK.STORY.guide).name), h('span', m.t)), kx); g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
+  clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, Math.max(5200, m.t.length * 75));
+}
+function coachNext() { clearTimeout(COACH.tm); COACH.cur = null; const g = $('#kkguide'); if (g) g.classList.remove('on'); setTimeout(coachPump, 350); }
+// situations: checked every ~0.5 s while nobody is mid-animation
+function coachPoll() {
+  if (!coachOn() || UI.busy || UI.fz || UI.rsOpen || UI.cards.length) return;
+  const v = viewSeat(); if (v < 0) return; const me = G.players[v], C = KK.tableCounts(me.table);
+  const all = G.players.flatMap(p => p.table.map(e => tkey(e.id))), handKeys = me.hand.map(tkey);
+  if (G.round === 1 && G.turn >= 2) coachSay('pass');
+  if (C.tempura >= 1) coachSay('pair', C.tempura % 2 ? C.tempura : 0), C.tempura >= 2 && coachSay('pair2');
+  if (C.sashimi >= 1) coachSay('fish');
+  if (C.dumpling >= 1) coachSay('bun');
+  if (all.some(k => ICONS[k])) coachSay('roll');
+  if (all.some(k => NIG[k])) coachSay('nigiri');
+  if (C.wasabi >= 1 || handKeys.includes('wasabi')) coachSay('paste');
+  if (G.used.wasabiNigiri) coachSay('pasteNigiri');
+  if (C.chop >= 1 || handKeys.includes('chop')) coachSay('sticks');
+  if (all.includes('pudding') || handKeys.includes('pudding')) coachSay('custard');
+  const rv = G.players.filter((p, s) => s !== v);
+  if (rv.some(p => KK.tableCounts(p.table).wasabi >= 1)) coachSay('rival');
+  else if (rv.some(p => KK.tableCounts(p.table).icons >= 3) && C.icons < 3) coachSay('rival2');
+  if (G.round === 2) coachSay('rounds'); if (G.round === 3) coachSay('round3');
+}
+// the player's own pick: remember what the best alternative was (called before the move is applied)
+function coachPicked(seat, mv) {
+  if (!coachOn() || seat !== viewSeat()) return;
+  try { const mine = gainOf(seat, mv.ids); let best = -1, bi = null; for (const m of KK.moves(G, seat)) { if (m.pick.length !== mv.pick.length) continue; const g = gainOf(seat, m.ids); if (g > best) { best = g; bi = m; } } COACH.pick = { mine, best, name: bi ? TY[tkey(bi.ids[0])].name : '' }; } catch (e) { COACH.pick = null; }
+}
+function coachMove() {
+  if (!coachOn() || !COACH.pick) return; const k = COACH.pick; COACH.pick = null;
+  if (k.mine >= 5) coachSay('good'); else if (k.best - k.mine >= 4 && COACH.poorN < 2) { COACH.poorN++; COACH.seen.poor = 0; coachSay('poor', k.name); }
+}
+// after the round tally: Suzu walks the real numbers, one line at a time
+function coachWalk(sc) {
+  if (!coachOn() || !sc) return; const a = sc.seats[viewSeat()], b = sc.seats.find((x, i) => i !== viewSeat()), nm = rivalName();
+  if (!COACH.seen.walk) { coachSay('walk'); KK.STORY.coach.walkL = null; }
+  const lines = ['Prawn pairs +' + a.tempura + ', Fish sets +' + a.sashimi + ', Buns +' + a.dumpling + '.', 'Roll race: your ' + a.icons + ' icons ' + (a.maki ? 'won +' + a.maki : 'won nothing') + '. ' + nm + ' had ' + b.icons + '.', 'Nigiri +' + a.nigiri + (a.wasabi ? ', Fire Paste bonus +' + a.wasabi : '') + '. Round total: ' + a.total + ' (' + nm + ' ' + b.total + ').'];
+  lines.forEach((t, i) => COACH.q.push({ id: 'walk' + i, t, w: 's' })); coachPump();
+  if (G.used.makiTie) coachSay('makiTie');
+}
+function coachEnd() {
+  const F = G.final, v = viewSeat(); coachSay('custardEnd');
+  if (G.np > 2 && Math.min(...F.pudding) !== Math.max(...F.pudding)) coachSay('penalty');
+  { const mx = Math.max(...F.pudding), mn = Math.min(...F.pudding), n = x => F.pudding.filter(c => c === x).length; if (mx > 0 && (n(mx) > 1 || (mn !== mx && n(mn) > 1))) coachSay('custardTie'); }
+  if (G.used.tieBreak) coachSay('tieBreak'); if (G.used.makiTie) coachSay('makiTie');
+  window.GXCOACH.later = COACH_ALL.filter(k => !COACH.seen[k]); window.GXCOACH.done = true; window.GXCOACH.running = false;
+  clearInterval(COACH.iv); try { GXT.markDone(TUT_GAME); lsSet('kk_done', '1'); } catch (e) { }
+  const rs = $('#rs'); rs.hidden = false; UI.rsOpen = true;
+  const win = (G.winners || []).indexOf(v) >= 0, tot = F.totals, order = G.players.map((p, s) => s).sort((x, y) => tot[y] - tot[x]);
+  const lat = window.GXCOACH.later;
+  const btns = [h('button.btn.go', { type: 'button', 'data-a': 'coachplay' }, 'Play a real game')];
+  if (COACH.pro && COACH.first) btns.unshift(h('button.btn.go', { type: 'button', 'data-a': 'coachchapter' }, 'Start chapter 1')); else if (window.CAMPAIGN) btns.push(h('button.btn.alt', { type: 'button', 'data-a': 'coachstory' }, 'Story mode'));
+  rs.replaceChildren(h('div.rsbox.bar.kkcoachend', h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', win ? 'You know the rules, Mina!' : 'You know the rules!'), h('span', win ? 'Odile owes you a custard.' : 'Odile keeps the custard. For now.'))),
+    h('ol.kkrs', ...order.map(s => h('li' + ((G.winners || []).indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v ? ' (you)' : '')), h('span.p', tot[s] + ' pts')))),
+    lat.length ? h('div.kklater', h('b', 'Things you will meet later'), h('ul', ...lat.map(k => h('li', KK.STORY.coach[k].t)))) : null), ...btns));
+  rs.classList.add('kkfin'); rs.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => {
+    coachStop(); rs.hidden = true; rs.innerHTML = ''; rs.classList.remove('kkfin'); UI.rsOpen = false; const a = b.dataset.a;
+    const done = () => { if (a === 'coachchapter' && COACH.first) { showStart(); GXC.play(COACH.first.id); } else if (a === 'coachstory' && typeof GXC !== 'undefined') { showStart(); campOpen(); } else { showStart(); UI.sv = 'setup'; renderStart(); } };
+    UI.started = false; clearTimeout(UI.tm); UI.seq++; G = null; done(); }));
 }
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
 { const o = tapHand; tapHand = function (i) {
@@ -138,5 +214,6 @@ function tutStart(o) {
   return o.apply(this, arguments); }; }
 // the final score pad is not shown in the tutorial: the table stays under the steps, and the end card closes it
 { const o = showFinal; showFinal = function () {
+  if (UI.mode === 'coached') { UI.overShown = true; try { renderDock(); markWinners(); } catch (e) { } coachEnd(); return; }
   if (UI.mode === 'tutorial') { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.overShown = true; UI.tutOver = true; try { renderDock(); markWinners(); } catch (e) { } return; }
   return o.apply(this, arguments); }; }

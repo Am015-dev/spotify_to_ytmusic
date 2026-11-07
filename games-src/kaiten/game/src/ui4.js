@@ -116,7 +116,7 @@ function showRound(sc, ge) {
   (async () => {
     let done = false; try { done = await runTally(sc, last, tok); } catch (e) { console.error(e); done = true; }
     if (!done || tok !== UI.seq || !UI.rsOpen) return;
-    UI.rsInfo.done = true; F.msg = null;
+    UI.rsInfo.done = true; F.msg = null; try { if (!last) coachWalk(sc); } catch (e) { }
     if (last) {
       F.crown = true; markWinners();
       if (campOn()) { renderDock(); await tw(1500); if (tok === UI.seq && UI.rsOpen) afterRound(ge); }

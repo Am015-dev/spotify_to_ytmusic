@@ -10,12 +10,11 @@
 | Kofi | Roll-race fan, boss of act 1 | quick, competitive |
 | Taro | Three-year champion of the Golden Plate, boss of act 3 | silent, exact |
 
-## Prologue (the tutorial, "The Staff Lunch")
-Four chapters in one real one-round game against Odile (fixed deal, real rules, real scoring):
-1. The first plate: Suzu welcomes Mina; Odile has bet a custard. Pick, reveal together, hands swap. Payoff: "A pair! Prawns are happy."
-2. Sets and sauce: Fire Paste and nigiri (3 becomes 9), Twin Sticks. Payoff: "Nine points from one plate!"
-3. The big three: Fish Slice set of three, roll race, bun ladder, custard cup. Payoff: "A full set. 10 points!"
-4. The count: every counter is counted aloud (sets, roll race, nigiri, rival, custard); Suzu's closing line: "Odile owes you a custard."
+## Prologue (the tutorial, "The Staff Lunch", a coached first game)
+A real three-round meal for three diners with free choices; Suzu coaches just in time, Odile (rival) comments when she does something worth learning.
+Beats: the custard bet (intro), the first swap, the first pair / set / ladder, a roll race, paste and nigiri, twin sticks, custard, round 2 and 3,
+the round-end count walked rule by rule with the player's real numbers, and the end card "You know the rules, Mina! Odile owes you a custard."
+(or "Odile keeps the custard. For now."). Story mode players continue with "Start chapter 1".
 
 ## Story mode (3 acts, 10 chapters, in `campaign.json`)
 - Act 1, The Lunch Belt (c1-c4): Pip teaches plates, Kofi's roll race, boss Kofi (twist: roll fever).
