@@ -189,7 +189,34 @@
   function resText(r) { return Object.keys(r).map(function (k) { return r[k] + ' ' + RNAME[k] + (r[k] > 1 ? (k === 'compass' ? 'es' : 's') : ''); }).join(' + '); }
   Object.keys(CARDS).forEach(function (k) { var c = CARDS[k]; if (!c.text) c.text = opText(c.ops).replace(/^./, function (m) { return m.toUpperCase(); }) + '.'; });
   Object.keys(GUARD).forEach(function (k) { var g = GUARD[k]; g.text = 'Boon: ' + opText(g.boon) + '.'; });
-  var VD = { RES: RES, RNAME: RNAME, TRAVEL: TRAVEL, TNAME: TNAME, CARDS: CARDS, ITEMS: I.map(function (r) { return r[0]; }), ARTS: A.map(function (r) { return r[0]; }),
+
+  // ---- STORY: every narrative line of the guided prologue and Quick games in one place (Story chapters live in campaign.json). See STORY.md.
+  var STORY = {
+    guide: { name: 'Pell Ardent', short: 'Pell', mark: 'P' }, rival: { name: 'Tamsin Reed', why: 'wants the temple map for her museum' },
+    tut: {
+      hand: ['Ch 1 · Landfall', 'The boat is gone and Tamsin is already ashore. Trail Notes will point us inland.'],
+      play: ['Ch 1 · Landfall', 'One action a turn, then Tamsin moves. Play it: +1 compass.'],
+      ruin: ['Ch 2 · The ruin', 'Tamsin grabbed a camp. Fine: 3 compasses find what she can’t. That hidden ruin.'],
+      disc: ['Ch 2 · The ruin', 'Your two Dread cards pay the two Boots. Fear is good for something!'],
+      idol: ['Ch 2 · The ruin', 'An idol, 3 points! And something stirs. Idols can wake a shrine: free.'],
+      shrine: ['Ch 2 · The ruin', 'The shrine gives 3 coins. Its slot was worth 1 point; the coins buy more.'],
+      beat: ['Ch 2 · The guardian', 'The Glass Moth guards our ruin. You carry a tablet and a jewel: face it.'],
+      over: ['Ch 2 · The guardian', 'Pay its price and it’s ours: 5 points and a boon to use later.'],
+      boon: ['Ch 3 · Supplies', 'Tamed! Its boon is free, any time. Use it now.'],
+      useboon: ['Ch 3 · Supplies', 'The Moth lights the research track: your magnifier climbs a row.'],
+      market: ['Ch 3 · Supplies', 'Research pays at the end. Now shop: Tamsin is out of explorers.'],
+      buy: ['Ch 3 · Supplies', 'Items cost coins and sleep under your deck until you draw them.'],
+      pass: ['Ch 3 · Supplies', 'Nothing left worth a move. Pass: when all pass, the round ends.'],
+      dig: ['Ch 4 · Last light', 'New day: explorers home, fresh hand, market shifted. Last round! Dig a camp.'],
+      digit: ['Ch 4 · Last light', 'Pay its travel with a card and haul the loot home.'],
+      pass2: ['Ch 4 · Last light', 'The light is going. Pass, and we count the finds.'],
+      score: ['Ch 4 · The count', '']
+    },
+    endWin: 'You beat Tamsin to the temple trail. The island is waiting.', endLose: 'Tamsin edged it, but now you know the island. Rematch?',
+    quick: { intro: ['Fresh footprints on the beach: someone landed before you.', 'Storm clouds over the vines. Five rounds before the rain.', 'A rival crew hums at their campfire. Outdig them.'],
+      win: 'The island remembers your name.', lose: 'The vines close behind you. Come back stronger.' }
+  };
+  var VD = { STORY: STORY, RES: RES, RNAME: RNAME, TRAVEL: TRAVEL, TNAME: TNAME, CARDS: CARDS, ITEMS: I.map(function (r) { return r[0]; }), ARTS: A.map(function (r) { return r[0]; }),
     GUARD: GUARD, GUARDS: GU.map(function (r) { return r[0]; }), SITE: SITE, CAMP: CAMP, SLOT1: SLOT1, SLOT2: SLOT2, DISC: DISC, S1: S1.map(function (r) { return r[0]; }), S2: S2.map(function (r) { return r[0]; }),
     IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, FIRST: FIRST, DREAD_SUPPLY: DREAD_SUPPLY, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE,
     GUARD_VP: GUARD_VP, IDOL_SLOT_VP: IDOL_SLOT_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, opText: opText, resText: resText };

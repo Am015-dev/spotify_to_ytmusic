@@ -14,13 +14,13 @@ const OUT = process.argv[2] || null;
     await page.waitForSelector('#start .tbtn'); await page.waitForTimeout(400); await shot('a-title');
     const first = page.locator('#start .tbtn').first(); const lbl = (await first.textContent()).trim();
     const bb = await first.boundingBox(); await tapAt(bb.x + bb.width / 2, bb.y + bb.height / 2);
-    let last = -1, steps = 0, ok = true, t0 = Date.now();
+    let last = -1, steps = 0, ok = true, t0 = Date.now(); const seen = [];
     while (Date.now() - t0 < 150000) {
       const st = await page.evaluate(() => window.GXT && GXT.state());
       if (!st || !st.active) { ok = false; console.log(name, 'FAIL tutorial not active'); break; }
       if (st.phase === 'end') break;
       if (!st.shown) { await page.waitForTimeout(150); continue; }
-      if (st.i !== last) { last = st.i; steps++; await page.waitForTimeout(350); if (steps <= 3) await shot('b-tut' + steps); }
+      if (st.i !== last) { last = st.i; steps++; seen.push(st.id); await page.waitForTimeout(350); if (steps <= 3 || ['shrine', 'over', 'dig', 'score'].includes(st.id)) await shot('b-tut' + steps + '-' + st.id); }
       if (!st.wait) { const n = page.locator('.gxt-next'); await n.waitFor({ timeout: 4000 }); const r = await n.boundingBox(); await tapAt(r.x + r.width / 2, r.y + r.height / 2); }
       else {
         const h = st.hole; const hit = await page.evaluate(([x, y, i]) => { const e = document.elementFromPoint(x, y); const c = GXT.current(); const t = c && c.target && c.target(); return !!(t && t.contains && e && (t === e || t.contains(e))); }, [h.cx, h.cy]);
@@ -30,6 +30,9 @@ const OUT = process.argv[2] || null;
       await page.waitForFunction(i => { const s = GXT.state(); return !s.active || s.phase === 'end' || s.i !== i || !s.shown; }, st.i, { timeout: 25000 }).catch(() => { ok = false; console.log(name, 'FAIL step', st.id, 'did not advance'); });
       if (!ok) break;
     }
+    const want = await page.evaluate(() => tutSteps().map(x => x.id));   // every coverage step (TUTORIAL-COVERAGE.md) must have been shown, in order
+    if (ok && want.join() !== seen.join()) { ok = false; console.log(name, 'FAIL steps shown', seen.join(','), 'want', want.join(',')); }
+    if (ok && !seen.includes('score')) { ok = false; console.log(name, 'FAIL never reached the final count'); }
     const end = await page.locator('.gxt-end button.pri').first();
     if (ok && await end.count()) {
       await page.waitForTimeout(300); await shot('c-tutend');

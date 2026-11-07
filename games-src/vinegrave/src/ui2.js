@@ -39,7 +39,7 @@ function refreshInsp() {
     L.forEach(m => { if (m.t === 'boon' && m.k === I.x) add(m, 'Use the boon (free)'); });
   } else if (I.kind === 'idol') {
     const d = me.idols[I.x], id = V.IDOL[d.id];
-    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end, in a shrine or not. Set it in a shrine for a one-time boon now. One idol per turn, ${V.SLOTS} shrine slots.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
+    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end, in a shrine or not. Set it in a shrine for a one-time boon now: it fills your next empty shrine slot, which then loses its ${V.IDOL_SLOT_VP[me.idols.filter(d => d.used).length] || 0} point(s). One idol per turn, ${V.SLOTS} shrine slots.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
     L.forEach(m => { if (m.t === 'idol' && m.k === I.x) add(m, 'Shrine: ' + V.SHRINE[m.sh].text, ''); });
   }
   $('#insp').innerHTML = `<button type="button" class="ix" data-a="ix" aria-label="Close">×</button>` + h + (btns.length ? `<div class="ibtns">${btns.join('')}</div>` : '');

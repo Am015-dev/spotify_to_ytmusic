@@ -268,3 +268,5 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 @media (min-width:1000px){.cd .pic .ptx{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;position:absolute;left:3px;right:3px;bottom:3px;z-index:2;background:#fbf3df;color:#1f1505;border-radius:4px;font-size:16px;line-height:1.1;font-weight:700;padding:2px 3px;text-align:center}
   .cd.fear .pic .ptx{background:#2a1010;color:#ffe6e0}.cd .pic .ph .pt{display:none}}
 @media (min-width:1000px){.cd .vp{z-index:3;bottom:auto;top:46px;right:6px}}
+/* the guide's code-drawn portrait in every tutorial bubble (until portrait art exists) */
+.gxt-bub .gxh-tt::before{content:'P';display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;margin-right:7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4f9a6a,#1f4a30);color:#fff3d6;border:2px solid #e8c36a;font-weight:800;font-size:14px;vertical-align:middle;flex:none}
