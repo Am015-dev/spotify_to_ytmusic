@@ -146,7 +146,8 @@ body:has(#title:not([hidden])) #barstat{display:none}
 .btn .fi{width:22px;height:22px}
 #foodrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:var(--fs)}
 #foodrow .fd{display:inline-flex;align-items:center;gap:3px;font-weight:700}
-#foodrow .fd.zero{opacity:.45}
+#foodrow .fd.zero{opacity:1;color:#5e5442}
+.fd.zero .fi{opacity:.45;filter:grayscale(1)}
 #foodrow .fd .fi{width:24px;height:24px}
 #hand{display:flex;gap:6px;overflow-x:auto;padding:8px 2px 4px;scrollbar-width:none;min-height:248px}
 #hand::-webkit-scrollbar{display:none}
@@ -252,11 +253,14 @@ body.focus .ract:not(.glow),body.focus #hand .bc:not(.glow),body.focus .die:not(
 @keyframes landin{from{transform:translateY(-40px) scale(1.15);opacity:.3}to{transform:none;opacity:1}}
 .die{flex-direction:column;gap:0;height:auto!important;min-height:44px;padding:3px 2px!important;width:48px!important}
 .die .fi{width:26px!important;height:26px!important;flex:none}
-.die small{font-size:13px;line-height:1.05;font-weight:700;color:#2a2418;white-space:nowrap}
-.fd small{font-size:13px;font-weight:700;margin-left:1px}
+.die small{font-size:14px;line-height:1.05;font-weight:700;color:#2a2418;white-space:nowrap}
+.fd small{font-size:14px;font-weight:700;margin-left:1px}
+@media (min-width:1000px){.die small,.fd small{font-size:16px}}
+.ract span{background:rgba(16,28,20,.92);color:#f6eedb;border-radius:6px;padding:0 5px}
+@media (max-height:640px){.ract{flex-direction:row;flex-wrap:wrap;gap:0 4px;min-height:0;height:100%;max-height:100%;overflow:hidden;line-height:1}.ract b{font-size:var(--fs)}.ract span{background:none;padding:0}}
 #prompt{font-size:16px;background:#f2c35b;color:#2a1d05;padding:6px 10px;border-radius:10px;line-height:1.3;flex:none}
 #foodrow,#acts{flex:none}
-@media (max-width:999px){#feeder{grid-template-columns:repeat(3,54px)}}
+@media (max-width:999px){#feeder{grid-template-columns:repeat(3,56px)}}
 .die{width:auto!important}
 .howturn{margin:4px 0 10px 20px;padding:0}
 .howturn li{margin:3px 0}
