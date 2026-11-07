@@ -33,3 +33,7 @@ Counts: WRONG 0, MISSING 1, SIMPLIFIED 4
 - Exact composition of the river set (which of the 10 non-end tiles are curves, straights, crossings). Total of 12 matches; per-type list low.
 - Edition drift: a 2025 reprint reportedly rewords incomplete tavern/cathedral scoring; not verifiable (notes already flag it).
 - Rules for the AI levels are not rules; not checked.
+
+## W391
+- MISSING builder extra turn when the placed tile completes the feature: sources disagree, no verdict, left as is (generous reading). Garden tiles belong to an abbot expansion that is not part of this game; no engine change.
+- SIMPLIFIED: see the rules drawer.

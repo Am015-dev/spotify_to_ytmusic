@@ -245,9 +245,9 @@ function refillRoad(discards){const road=G.road;
 function ringMark(seat,kc){if(holdsHQ(seat,'upr_hq2')){const c=KCD(kc).suit,mk=G.cmk[c][seat];if(mk[0]<2){mk[0]++;stat('hq:upr_hq2');lg(nm(seat)+' places a marker on the '+councilName(c)+' (Underground Ring).',seat)}}}
 function acquireKC(seat,kc,occ,o){o=o||{};if(!G.klimbo.includes(kc))G.klimbo.push(kc);ringMark(seat,kc);const meta=KCD(kc),P=G.pl[seat];
   if(meta.place==='board'){const slots=o.slot!=null?[o.slot]:[0,1];const empty=slots.filter(j=>!P.ks[j]);
-    if(empty.length){placeOnSlot(seat,kc,occ,empty[0]);return}
+    if(empty.length===slots.length){placeOnSlot(seat,kc,occ,empty[0]);return}   // both free: no choice
     if(slots.length===1){placeOnSlot(seat,kc,occ,slots[0]);return}
-    askPick(seat,'slot','Where do you keep '+kname(kc)+'? The Kingdom Card you replace is discarded and its occupier returns to your hand.',slots.map(j=>({k:'sl'+j,slot:j,label:'Replace '+kname(P.ks[j].kc)+' (occupied by '+cname(P.ks[j].occ)+')'})),'slot',{seat,kc,occ})}
+    askPick(seat,'slot','Where do you keep '+kname(kc)+'? A Kingdom Card you replace is discarded and its occupier returns to your hand.',slots.map(j=>({k:'sl'+j,slot:j,label:P.ks[j]?'Replace '+kname(P.ks[j].kc)+' (occupied by '+cname(P.ks[j].occ)+')':'Use the empty space'})),'slot',{seat,kc,occ})}   // either space may be chosen, even when the other is empty
   else now('kcBold',{seat,kc,occ})}
 PICKH.slot=(seat,opt,d)=>placeOnSlot(d.seat,d.kc,d.occ,opt.slot);
 function placeOnSlot(seat,kc,occ,j){const P=G.pl[seat],old=P.ks[j];removeFrom(G.klimbo,kc);
