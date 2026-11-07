@@ -182,7 +182,7 @@ PICK.castle=(S,seat,q,mv,lv)=>{let b=null,bs=0.9;for(const m of mv){if(m.skip)co
 PICK.wilderness=(S,seat,q,mv,lv)=>{let b=null,bs=0.6;for(const m of mv){if(m.skip)continue;const s=journeyScore(S,seat,{id:m.id},lv)+0.4;if(s>bs){bs=s;b=m}}return b||mv.find(m=>m.skip)};
 PICK.harvest=(S,seat,q,mv)=>mv.find(m=>m.yes);
 PICK.bidRes=null;
-PICK.slot=(S,seat,q,mv)=>{let b=null,bs=1e9;for(const m of mv){const kc=S.pl[seat].ks[m.slot].kc;const v=kcv(kc);if(v<bs){bs=v;b=m}}return b};
+PICK.slot=(S,seat,q,mv)=>{let b=null,bs=1e9;for(const m of mv){const e=S.pl[seat].ks[m.slot];const v=e?kcv(e.kc):-1;if(v<bs){bs=v;b=m}}return b};
 PICK.statue=(S,seat,q,mv)=>mv.find(m=>!!m.yes);
 PICK.burnTactic=(S,seat,q,mv)=>mv.slice().sort((a,b)=>(S.pl[seat].tac[b.i].ex?1:0)-(S.pl[seat].tac[a.i].ex?1:0))[0];
 PICK.gleaners=(S,seat,q,mv)=>mv.filter(m=>!m.skip).sort((a,b)=>kcv(b.kc)-kcv(a.kc))[0];
