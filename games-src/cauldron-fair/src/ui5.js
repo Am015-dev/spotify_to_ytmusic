@@ -4,7 +4,7 @@ function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
   const li = a => a.map(t => h('li', t));
-  sec('Turn in one minute', h('ol', ...li([
+  sec('How a turn works', h('ol', ...li([
     'Draw chips from your bag one by one. Each lands that many spaces along the dotted path in your cauldron.',
     'The white chips must add up to 7 or less. Over 7 and the cauldron explodes.',
     'Stop whenever you like. Your last chip decides your space: the big number is coins, the small brown badge is victory points.',
