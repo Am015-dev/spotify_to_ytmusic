@@ -4,7 +4,7 @@ var UI = { sel: [], gear: 1, boost: false, busy: false, seat: 0, cam: { x: 0, y:
 window.ANIM = true; window.AIDELAY = 1;
 var $ = function (s) { return document.querySelector(s); };
 function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
-function wait(ms) { return new Promise(function (r) { setTimeout(r, (UI.fast || window.ANIM === false) ? Math.min(ms, 8) : ms * (window.AIDELAY || 1) * (UI.skipStep ? 0.12 : 1)); }); }
+function wait(ms) { return new Promise(function (r) { setTimeout(r, (UI.fast || window.ANIM === false) ? Math.min(ms, 8) : ms * (window.AIDELAY || 1) * (UI.pace || 1) * (UI.skipStep ? 0.12 : 1)); }); }
 function setSeed(n) { if (G) G.rs = n >>> 0; }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
@@ -160,7 +160,7 @@ function commit() {
   $('#panel').innerHTML = '<div class="reveal"><div class="cd back" data-art="card-back"></div><div class="cd back" data-art="card-back"></div></div>'; artApply($('#panel'));
   var nx = needPlans(G)[0]; if (nx != null) planFor(nx); else startRound();
 }
-function startRound() { UI.busy = true; UI.skipStep = false; startResolve(G); runResolve(); }
+function startRound() { UI.busy = true; UI.skipStep = false; UI.pace = G.round > 2 && UI.mode !== 'tutorial' ? 0.6 : 1; startResolve(G); runResolve(); }
 
 /* ================= resolving, with animation ================= */
 function setMsg(t, cls) { var m = $('#msg'); m.textContent = t; m.className = cls || ''; }
