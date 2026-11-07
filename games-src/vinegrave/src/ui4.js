@@ -94,7 +94,7 @@ function coachRival(m) {   /* a short lesson on every rival move */
     res: 'Tamsin climbed the research track: those rows score at the end.', temple: 'Tamsin bought a temple tile: big points.', boon: 'Tamsin used a guardian boon.', idol: 'Tamsin set an idol in a shrine for a boon.' };
   if (L[m.t]) coachSay(null, L[m.t]);
 }
-window.GXCOACH = { get running() { return !!(G && UI.mode === 'tutorial' && UI.coachFree); }, get explained() { return Object.keys(CO.seen).filter(id => CO.seen[id]); }, get done() { return typeof GXT !== 'undefined' && GXT.isDone(TUT_GAME); } };
+window.GXCOACH = { get running() { return !!(G && UI.mode === 'tutorial' && UI.coachFree); }, get explained() { return Object.keys(CO.seen).filter(id => CO.seen[id]); }, get done() { return !!CO.over || (typeof GXT !== 'undefined' && GXT.isDone(TUT_GAME)); } };
 function coachMove(m, best) {   /* one line why, for a strong or a weaker move (first few times) */
   if (!coachOn() || !best || m.free || m.t === 'ans' || CO.fb >= 2 || CO.q.length > 1) return; CO.fb++;
   const same = VG.same ? VG.same(m, best) : JSON.stringify(m) === JSON.stringify(best);
@@ -105,7 +105,7 @@ function coachMove(m, best) {   /* one line why, for a strong or a weaker move (
 const COVER = () => Object.keys(V.STORY.coach);
 window.coachReport = () => { const all = COVER(), seen = all.filter(id => CO.seen[id]); return { all, seen, later: all.filter(id => !CO.seen[id]) }; };
 function coachScoreStart() {   /* game over in the coached game: a second tutor run walks the score and shows the end card */
-  if (typeof GXT === 'undefined' || !UI.coachFree) return; UI.coachFree = false; coachHide();
+  if (typeof GXT === 'undefined' || !UI.coachFree) return; UI.coachFree = false; CO.over = true; coachHide();
   const steps = tutSteps().filter(x => /^score/.test(x.id)), c = Object.assign({}, TUTCFG, { steps, setup: () => { } });
   TUTCFG = c; GXT.start(c);
 }
@@ -131,7 +131,7 @@ let TUTCFG = null;
 function tutStart(o) {
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null; closeInsp();
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters[0];
-  CO.seen = {}; CO.q = []; CO.cur = null; CO.fb = 0;
+  CO.seen = {}; CO.q = []; CO.cur = null; CO.fb = 0; CO.over = false;
   UI.coachFree = false;
   TUTCFG = { game: TUT_GAME, steps: tutSteps().filter(x => !/^score/.test(x.id)), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'Prologue complete', endText: o ? 'Pell: "You played a whole expedition. Now the coast, and Tamsin, are waiting."' : 'Pell: "A whole expedition, start to count. A real game is 5 rounds. The lightbulb helps any time."',
