@@ -19,6 +19,8 @@
       else if (k === 'poison' || k === 'poisonAll' || k === 'shiv' || k === 'heal') { o[1] += (k === 'poisonAll' ? 3 : 2); done = true; }
       else if (k === 'str' || k === 'draw' || k === 'nrg' || k === 'vuln' || k === 'weak' || k === 'weakAll') { o[1] += 1; done = true; }
       else if (k === 'power') { o[2] += (o[1] === 'plated' || o[1] === 'mental' ? 2 : 1); done = true; }
+      else if (k === 'chanX') { o[2] = (o[2] || 0) + 1; done = true; }
+      else if (k === 'evokeX') { o[1] = (o[1] || 0) + 1; done = true; }
       else if (k === 'roll') { o = ['roll', o[1].map(go2), o[2].map(go2), o[3].map(go2)]; }
       return o;
     }
@@ -42,8 +44,8 @@
         case 'poison': return 'Poison ' + o[1] + '.'; case 'poisonAll': return 'ALL Poison ' + o[1] + '.'; case 'dblPoison': return 'Double its Poison.';
         case 'draw': return 'Draw ' + o[1] + '.'; case 'nrg': return 'Gain ' + o[1] + ' energy.'; case 'heal': return 'Heal ' + o[1] + '.'; case 'loss': return 'Lose ' + o[1] + ' HP.';
         case 'shiv': return 'Add ' + o[1] + ' Shivs.'; case 'add': return 'Add ' + o[2] + ' ' + D.CARDS[o[1]].name + '.';
-        case 'chan': return 'Channel ' + ({ L: 'Lightning', F: 'Frost', D: 'Dark' })[o[1]] + '.'; case 'chanX': return 'Channel X Lightning.';
-        case 'evoke2': return 'Evoke first orb twice.'; case 'evokeX': return 'Evoke first orb X times.'; case 'focus': return 'Focus ' + o[1] + '.';
+        case 'chan': return 'Channel ' + ({ L: 'Lightning', F: 'Frost', D: 'Dark' })[o[1]] + '.'; case 'chanX': return 'Channel X' + (o[2] ? '+' + o[2] : '') + ' Lightning.';
+        case 'evoke2': return 'Evoke first orb twice.'; case 'evokeX': return 'Evoke first orb X' + (o[1] ? '+' + o[1] : '') + ' times.'; case 'focus': return 'Focus ' + o[1] + '.';
         case 'stance': return ({ w: 'Enter Wrath.', c: 'Enter Calm.', n: 'Leave your stance.' })[o[1]];
         case 'power': return ({ ritual: 'Each turn end: +' + o[2] + ' Strength.', plated: 'Each turn end: +' + o[2] + ' Block.', noxious: 'Each turn start: ALL Poison ' + o[2] + '.', envenom: 'Unblocked attacks Poison ' + o[2] + '.', focus: 'Gain ' + o[2] + ' Focus.', slots: '+' + o[2] + ' orb slots.', reactor: 'Each turn start: Channel Lightning.', afterimg: 'Each card played: ' + o[2] + ' Block.', rush: 'Enter Wrath: draw ' + o[2] + '.', mental: 'Change stance: ' + o[2] + ' Block.', deva: '+' + o[2] + ' energy each turn.' })[o[1]];
         case 'roll': return null;
@@ -57,7 +59,7 @@
     if (e.fl.indexOf('x') >= 0 && e.type !== 'P') out.push('Exhaust.');
     if (e.fl.indexOf('u') >= 0) out.push('Unplayable.');
     if (e.fl.indexOf('b') >= 0) out.push('End of turn in hand: lose 2 HP.');
-    if (e.fl.indexOf('r') >= 0) out.push('End of turn in hand: lose HP per card held.');
+    if (e.fl.indexOf('r') >= 0) out.push('Held at end: 1 HP per card.');
     if (e.fl.indexOf('d') >= 0) out.push('End of turn in hand: Weak 1.');
     if (e.fl.indexOf('e') >= 0) out.push('Exhausts at turn end.');
     return out;
@@ -203,9 +205,9 @@
         case 'shiv': addCard(h, 'shiv', o[1], 'hand'); break;
         case 'add': addCard(h, o[1], o[2], o[3]); break;
         case 'chan': chan(h, o[1]); break;
-        case 'chanX': for (var j = 0; j < X; j++) chan(h, 'L'); break;
+        case 'chanX': for (var j = 0; j < X + (o[2] || 0); j++) chan(h, 'L'); break;
         case 'evoke2': if (h.orbs[0]) { evoke(h, false); evoke(h, true); } break;
-        case 'evokeX': for (var m = 0; m < X; m++) evoke(h, true); break;
+        case 'evokeX': for (var m = 0; m < X + (o[1] || 0); m++) evoke(h, true); break;
         case 'focus': h.pw.focus = (h.pw.focus || 0) + o[1]; break;
         case 'stance': setStance(h, o[1]); break;
         case 'power': h.pw[o[1]] = (h.pw[o[1]] || 0) + o[2]; fx('buff', hi, o[2], 'power'); break;
@@ -216,7 +218,7 @@
   }
   // ---------- battle flow
   function mkEnemy(id) {
-    var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); if (G.hs.length > 1) hp = Math.round(hp * 1.7);
+    var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); if (G.hs.length > 1) hp = Math.round(hp * 2);
     return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0 };
   }
   function plan(e) {
@@ -391,7 +393,7 @@
     if (!alive().length) winBattle();
   }
   function enterNode(id) {
-    var n = G.map[id]; G.at = id; G.floor = n.f; G.fights = G.fights || 0;
+    var n = G.map[id]; n.vis = 1; G.at = id; G.floor = n.f; G.fights = G.fights || 0;
     if (n.t === 'm' || n.t === 'e' || n.t === 'b') startBattle(n.t);
     else if (n.t === 'r') { G.rest = { todo: G.hs.map(function (h, i) { return h.dead ? -1 : i; }).filter(function (i) { return i >= 0; }) }; G.scr = 'rest'; }
     else if (n.t === 't') { G.rw = { gold: 0, cards: {}, relics: [pickRelic('cu')], took: {}, treasure: 1 }; G.rw.gold = 20 + ri(30); G.gold += G.rw.gold; G.scr = 'reward'; }
@@ -494,6 +496,14 @@
     newGame: function (o) { var g = newGame(o); g.fights = 0; return g; }, G: function () { return G; }, set: function (g) { G = g; },
     validMoves: validMoves, performMove: performMove, step: step, settle: settle, sideToAct: sideToAct, checkInvariants: checkInvariants,
     eff: eff, lines: lines, canPlay: canPlay, cost: cost, reachable: reachable, save: save, load: load, clear: clear, has: has,
+    debug: {
+      win: function () { if (G.b) { G.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; }); winBattle(); } },
+      shop: function () { G.at = G.map.filter(function (n) { return n.f === 3; })[0].id; G.floor = 3; G.gold = 400; genShop(); },
+      rest: function () { G.rest = { todo: G.hs.map(function (h, i) { return i; }) }; G.scr = 'rest'; G.hs.forEach(function (h) { h.hp = Math.floor(h.mhp * 0.5); }); },
+      event: function (id) { G.evn = { id: id, res: null }; G.scr = 'event'; },
+      over: function (w) { G.scr = 'over'; G.won = w ? 1 : 0; G.b = null; },
+      treasure: function () { G.rw = { gold: 30, cards: {}, relics: [pickRelic('cu')], took: {}, treasure: 1 }; G.gold += 30; G.scr = 'reward'; }
+    },
     setSeed: function (s) { if (G) G.rs = s | 0; }, mk: mk
   };
   if (typeof module !== 'undefined') module.exports = EC;

@@ -1,0 +1,39 @@
+// Emberclimb scenarios (shell/gx-scenario.js): ?scn=<id> builds ONE state directly. setup() runs after boot.
+(function () {
+  if (!window.GXS) return;
+  var booted = function () { return window.EC && EC.E && window.UI && UI.render; };
+  var E = function () { return EC.E; }, G = function () { return EC.E.G(); };
+  function begin(heroes, seed) { UI.mode = 'game'; UI.sel = -1; window.ANIM = false; E().newGame({ heroes: heroes, seed: seed || 11 }); }
+  function fight(heroes, seed, one) {
+    begin(heroes, seed); E().performMove({ t: 'go', n: E().validMoves()[0].n });
+    if (one) { G().b.en = [G().b.en[0]]; }
+    UI.render();
+  }
+  var snapBattle = function () { var g = G(), h = g.hs[0]; return { hand: h.hand.length, en: h.en, ph: g.b ? g.b.ph : '', turn: g.b ? g.b.turn : 0, scr: g.scr }; };
+  GXS.boardOpen = function () { fight(['w'], 11); };
+  GXS.add({ id: 'ec-map', name: 'Map: pick a room', ask: 'Can you see the glowing rooms?', seed: 3, when: booted,
+    setup: function () { begin(['w'], 3); UI.render(); },
+    checks: [{ kind: 'visible', sel: '.node.glow', name: 'glowing room' },
+      { kind: 'tap', sel: '.node.glow', name: 'enter a room', state: function () { return G().scr; }, expect: function (b, a) { return a === 'battle' || a !== b; } }] });
+  GXS.add({ id: 'ec-fight', name: 'Fight: play a card', ask: 'Tap a card twice to play it', seed: 5, when: booted,
+    setup: function () { fight(['w'], 5, true); },
+    checks: [{ kind: 'visible', sel: '#end', name: 'End turn button' }, { kind: 'visible', sel: '.hand .card', name: 'a card in hand' },
+      { kind: 'play', name: 'play a card', snap: snapBattle, steps: [{ sel: '.hand .card.ok', until: function () { return !!document.querySelector('.hand .card.sel'); }, max: 1 }, { sel: '.hand .card.sel', after: 500 }], idle: function () { return !UI.busy; }, verify: function (b, a) { return (a.hand < b.hand || a.scr !== 'battle') ? true : 'card was not played'; } },
+      { kind: 'tap', sel: '#end', name: 'End turn', state: snapBattle, expect: function (b, a) { return a.ph === 'e' || a.turn > b.turn || a.scr !== 'battle'; } }] });
+  GXS.add({ id: 'ec-fight-two', name: 'Fight: two heroes', ask: 'Do both heroes show?', seed: 6, when: booted,
+    setup: function () { fight(['s', 'm'], 6); }, checks: [{ kind: 'visible', sel: '.heropan', name: 'hero panel' }, { kind: 'visible', sel: '#end', name: 'End turn button' }] });
+  GXS.add({ id: 'ec-reward', name: 'Reward: pick a card', ask: 'Pick one of three cards', seed: 7, when: booted,
+    setup: function () { fight(['a'], 7); E().debug.win(); UI.render(); },
+    checks: [{ kind: 'visible', sel: '.picks .card', name: 'reward card' },
+      { kind: 'tap', sel: '.picks .card', name: 'pick a card', state: function () { return G().hs[0].deck.length; }, expect: function (b, a) { return a === b + 1; } }] });
+  GXS.add({ id: 'ec-shop', name: 'Shop: buy something', ask: 'Can you buy an item?', seed: 8, when: booted,
+    setup: function () { begin(['m'], 8); E().debug.shop(); UI.render(); },
+    checks: [{ kind: 'visible', sel: '.items .item', name: 'shop item' }, { kind: 'tap', sel: '.items .item:not(.sold)', name: 'buy an item', state: function () { return G().gold; }, expect: function (b, a) { return a < b; } }] });
+  GXS.add({ id: 'ec-rest', name: 'Campfire: heal or smith', ask: 'Rest or upgrade', seed: 9, when: booted,
+    setup: function () { begin(['w'], 9); E().debug.rest(); UI.render(); },
+    checks: [{ kind: 'visible', sel: '#rest-heal', name: 'Rest button' }, { kind: 'tap', sel: '#rest-heal', name: 'rest', state: function () { return G().hs[0].hp; }, expect: function (b, a) { return a > b; } }] });
+  GXS.add({ id: 'ec-event', name: 'Event: make a choice', ask: 'Choose an option', seed: 10, when: booted,
+    setup: function () { begin(['s'], 10); E().debug.event('ember-shrine'); UI.render(); }, checks: [{ kind: 'visible', sel: '.opts .btn', name: 'event option' }] });
+  GXS.add({ id: 'ec-result', name: 'Result screen', ask: 'Can you start a new climb?', seed: 12, when: booted,
+    setup: function () { begin(['w'], 12); E().debug.over(true); UI.render(); }, checks: [{ kind: 'visible', sel: '#again', name: 'New climb button' }] });
+})();

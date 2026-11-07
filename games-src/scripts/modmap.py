@@ -24,6 +24,7 @@ GAMES = {
     "cauldron-fair":    ("Cauldron Fair",    "cauldron-fair",       "cauldron-fair"),
     "crown-city-smash": ("Crown City Smash", "kot",                 "kot"),
     "doorkick-dungeon": ("Doorkick Dungeon", "munch",               "munch"),
+    "emberclimb":       ("Emberclimb",       "emberclimb",          "emberclimb"),
     "final-approach":   ("Final Approach",   "final-approach/game", "final-approach"),
     "hollowbough":      ("Hollowbough",      "hollowbough/game",    "hollowbough"),
     "kaiten-kitchen":   ("Kaiten Kitchen",   "kaiten/game",         "kaiten"),
