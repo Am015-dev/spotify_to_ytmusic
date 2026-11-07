@@ -15,7 +15,7 @@ async function game(p,tag,maxMs){const t0=Date.now();let last='',lastT=Date.now(
     if(st.sig!==last){last=st.sig;lastT=Date.now()}
     if(Date.now()-lastT>30000){note(tag+': stuck 30 s in phase '+st.ph+' turn '+st.turn);await p.screenshot({path:SHOT+'/stuck-'+tag+'.png'});return {ok:false}}
     // one thing at a time: the order a newcomer would try
-    const r=await tapSel(p,['.gxh-ok','.gx-drawer.open [data-a="close"]','#dkCard [data-a="close"]','#modal .btn.primary:not([data-start])','[data-a="autocharity"]','.fbtns .fightb','[data-a="autoplay"]','.fbtns .runb','[data-a="bfkick"]','#prompt .btn.primary','#prompt .acts button','#prompt .opt','#prompt button']);
+    const r=await tapSel(p,['.gxh-ok','.gx-drawer.on .gx-x','.gx-drawer.on [data-a="close"]','#dkCard [data-a="close"]','#modal .btn.primary:not([data-start])','[data-a="autocharity"]','.fbtns .fightb','[data-a="autoplay"]','.fbtns .runb','[data-a="bfkick"]','#prompt .btn.primary','#prompt .acts button','#prompt .opt','#prompt button']);
     if(r){taps++;if(taps%40===1&&shots<3){shots++;await p.screenshot({path:SHOT+'/play-'+tag+'-'+shots+'.png'})}}
     await sleep(r?350:250)}
   note(tag+': no result within '+Math.round(maxMs/1000)+' s');return {ok:false}}
@@ -37,7 +37,7 @@ async function fresh(b){const ctx=await b.newContext({viewport:{width:W,height:H
     for(let k=0;k<6;k++){const sk=await tapSel(p,['.gxt-skip','.gxt-end [data-gxt-dlg=exit]']);if(sk){await sleep(600);continue}break}
     await sleep(600);
     let started=false;for(let k=0;k<14&&!started;k++){started=await p.evaluate(()=>!!G&&!G.tut&&G.phase==='setup'&&!!UI.cmp);if(started)break;
-      const t=await tapSel(p,['.gxc-node.open.next','.gxc-btn.go','.gxc-chap-go','.gxc-card:not(.locked) .gxc-btn','[data-gxc-play]','.gxc-btn.ghost','.gxc-btn']);await sleep(700)}
+      const t=await tapSel(p,['.gxc-btn.go','.gxc-node.open.next','.gxc-chap-go','.gxc-card:not(.locked) .gxc-btn','[data-gxc-play]','.gxc-btn.ghost','.gxc-btn']);await sleep(700)}
     if(!started){note('story: could not start stage 1 by taps');await p.screenshot({path:SHOT+'/story-start-fail.png'})}
     else{const g=await game(p,'story',420000);console.log('story',g.ok?'PASS':'FAIL',JSON.stringify(g));if(g.ok)await p.screenshot({path:SHOT+'/result-story.png'})}
     await ctx.close()}

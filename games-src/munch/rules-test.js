@@ -1,7 +1,7 @@
 // scenario tests: each builds a tiny position and checks one rule from rules.md
 const {JSDOM}=require('jsdom');const fs=require('fs');const html=fs.readFileSync('doorkick.html','utf8');
 let pass=0,fail=0;const out=[];
-function T(name,code,ui){const dom=new JSDOM(html,{runScripts:'dangerously',url:'http://localhost/'});const w=dom.window;const errs=[];w.console.error=(...a)=>errs.push(a.join(' '));
+function T(name,code,ui){const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/',beforeParse(w){w.matchMedia=w.matchMedia||(q=>({matches:false,media:q,addEventListener(){},removeEventListener(){},addListener(){},removeListener(){}}))}});const w=dom.window;const errs=[];w.console.error=(...a)=>errs.push(a.join(' '));
   // ui=true keeps the real render(), so a test can look at the dock and click its buttons
   w.eval(ui?'ANIM=0;AIDELAY=0;schedule=function(){};setSeed(5);newGame("hot",4);UI.lastSeat=0;UI.pass=null':'ANIM=0;AIDELAY=0;render=function(){};schedule=function(){};refresh=function(){};setSeed(5);newGame("hot",4)');
   // helpers inside the page: give(seat,key) moves a card instance of key into a zone; fresh() clears hands
@@ -15,6 +15,9 @@ function T(name,code,ui){const dom=new JSDOM(html,{runScripts:'dangerously',url:
   w.eval('clearAll()');let ok=false,msg='';try{const r=w.eval('(function(){'+code+'})()');ok=r===true;msg=r===true?'':'returned '+JSON.stringify(r)}catch(e){msg=String(e.message||e)}
   const inv=w.eval('checkInvariants()');if(inv.length&&!/no legal move/.test(inv[0])){ok=false;msg+=' INV '+inv[0]}if(errs.length){ok=false;msg+=' ERR '+errs[0]}
   if(ok)pass++;else{fail++;out.push('FAIL '+name+': '+msg)}w.close()}
+T('giving an item in play moves it to the rival (rules: trade or give items on the table)','const a=wear(0,"stompy");const mv=validMoves(0).find(m=>m.act==="giveitem"&&m.card===a&&m.tgt===1);if(!mv)return "no giveitem move";act(mv,0);return !P(0).eq.some(e=>e.id===a)&&P(1).eq.some(e=>e.id===a)');
+T('items in play cannot be given during a fight','const a=wear(0,"stompy");fightNow(0,"toads");return !validMoves(0).some(m=>m.act==="giveitem")');
+T('hand cards are not tradeable (only items in play)','give(0,"parrot");return !validMoves(0).some(m=>m.act==="giveitem")');
 T('warrior wins ties','P(0).lvl=2;const w=inst("warrior");P(0).cls.push(w);fightNow(0,"toads");return winning(G.cb)&&sideStr(G.cb)===monStr(G.cb)');
 T('non-warrior loses ties','P(0).lvl=2;fightNow(0,"toads");return !winning(G.cb)');
 T('level-up card cannot give level 10','P(0).lvl=9;give(0,"l1");return !validMoves(0).some(m=>m.act==="play"&&m.tgt===0)&&validMoves(0).some(m=>m.act==="play"&&m.tgt===1)');

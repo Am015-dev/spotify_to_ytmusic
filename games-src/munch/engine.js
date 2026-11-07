@@ -365,6 +365,7 @@ function equipMoves(p){const mv=[];for(const e of p.eq){if(e.on)mv.push({act:'un
 function calmMoves(p){const mv=equipMoves(p);if(sellable(p).length&&maxSell(p)>=R.SELL&&p.lvl<R.WIN-1)mv.push({act:'sell'});
   if(isCls(p,'thief')&&p.hand.length)for(const o of alive())if(o!==p)for(const e of o.eq)if(!cd(e.id).big)mv.push({act:'steal',card:e.id,tgt:o.i});
   if(p.hire!=null)mv.push({act:'drop',card:p.hire});
+  for(const x of p.eq)for(const o of alive())if(o!==p)mv.push({act:'giveitem',card:x.id,tgt:o.i});   // rules sheet: items on the table may be traded or given away at any time outside a fight (gifts only; the AI never offers one)
   return mv}
 function sellable(p){return p.hand.concat(p.eq.map(e=>e.id)).filter(id=>cd(id).g!=null&&(cd(id).t==='item'||cd(id).t==='oneshot'))}
 function maxSell(p){const ids=sellable(p);let t=ids.reduce((a,id)=>a+(cd(id).g||0),0);if(isRace(p,'halfling')&&!p.halfT&&ids.length)t+=Math.max(...ids.map(id=>cd(id).g||0));return t}
@@ -430,6 +431,7 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   case 'charm':{const n=p.hand.length;while(p.hand.length)discard(p.hand.pop());const mm=cb.mons.splice(m.tgt,1)[0];cb.used['c'+s]=1;cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});
     lg(s,`${p.nm} discards ${n} card${n===1?'':'s'} and charms ${cname(mm.id)}: it wanders off and leaves its treasure.`);if(!checkEmpty())reopen();break}
   case 'backstab':spend(p,m.card);note(m.tgt,s,'stab');cb.used['s'+s+'_'+m.tgt]=1;cb.pb-=2;lg(s,`${p.nm} backstabs ${P(m.tgt).nm} (-2).`);after(s);break;
+  case 'giveitem':{const x=p.eq.find(q=>q.id===m.card),t=P(m.tgt);p.eq.splice(p.eq.indexOf(x),1);if(x.cheat!=null)discard(x.cheat);const nx={id:m.card,on:false};t.eq.push(nx);if(!equipWhy(t,m.card))nx.on=true;fixBig(p);fixBig(t);lg(s,`${p.nm} gives ${cname(m.card)} to ${t.nm}.`);break}
   case 'steal':{spend(p,p.hand.slice().sort((a,b)=>cardValue(p,a)-cardValue(p,b))[0]);const v=P(m.tgt);const r=d6()+persMod(p,'die');G.stole=true;G.lastRoll={v:r,mod:0,need:R.THEFT,who:s,ok:r>=R.THEFT,id:(G.lastRoll?G.lastRoll.id:0)+1,what:'steal'};
     if(r>=R.THEFT){const e=v.eq.find(e=>e.id===m.card);v.eq.splice(v.eq.indexOf(e),1);if(e.cheat!=null)discard(e.cheat);p.eq.push({id:m.card,on:false});lg(s,`${p.nm} rolls ${r} and steals ${cname(m.card)} from ${v.nm}!`);fixBig(p)}else{loseLv(p,1);lg(s,`${p.nm} rolls ${r}, gets caught stealing from ${v.nm} and is whacked down a level.`)}break}
   }
