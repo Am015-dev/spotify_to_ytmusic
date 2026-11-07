@@ -142,7 +142,7 @@ ART.ANIM=__ANIM__;
    bottom edge of the cell; no per-state or per-content correction (crouch, dash, land and jump cells carry their own pose). Sheets without body keep cell height = game height. ?bodyscale=0 = the old rule (RET.bodyscale is set in streetfeel.js: RET does not exist yet here) */
 ART.bsc=(m,h)=>h/(RET.bodyscale&&m[6]?m[6]:m[3]);
 ART.as={};ART.aDone=false;ART.aP=0;ART.aT=0;                // aDone / aP / aT: set by ART.aframe (a one-shot reached its end; progress 0..1 and seconds inside the frame)
-ART.LOOPA=new Set(['idle','run','flame','glow','loop','spin','hover']);   // every other act is a one-shot: it stops on its last frame
+ART.LOOPA=new Set(['idle','run','flame','glow','loop','spin','hover','beam']);   // every other act is a one-shot: it stops on its last frame
 ART.VS={};ART.VB={};     // tinted copies of enemy-ship sheets (foeart.js): meta and strip, kept out of ART.ANIM.s / ART.rd so the listed-sheet counts stay the real files
 ART.aS=key=>{let o=ART.as[key];if(o!==undefined)return o;const m=ART.ANIM.s[key]||ART.VS[key];if(!m)return ART.as[key]=null;   // per-sheet record, built once: cumulative frame end times (smoothing.json holds at the sheet fps)
   const act=key.slice(key.lastIndexOf('/')+1),hd=ART.ANIM.sm.holds[act],n=m[0],cum=new Float32Array(n);let s=0;for(let i=0;i<n;i++){s+=(hd&&hd.length===n?hd[i]:1)/m[1];cum[i]=s;}

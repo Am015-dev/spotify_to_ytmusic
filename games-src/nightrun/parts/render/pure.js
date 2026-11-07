@@ -83,7 +83,7 @@ const PURL=window.PURL={K:90/520,get PK(){return wcv!==cv?2.1:1.3;},   // W215/W
   pic(n,x,y,w,ang,hk){const v=/~([owc])$/.exec(n),b=v?(ART.bm[n]||this.hot(n.slice(0,-2),v[1])):ART.bm[n];if(!b&&v)return false;if(!b){if(b===undefined)ART.load(n);return false;}const h=w*b.height/b.width*(hk||1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;},
   shots(){const ph=wcv!==cv,g=ph?1.4:1;   // W302: phone player shots 1.4x and thicker (owner: 'player bullets are not visible at all'); still under the enemy shots (drawn first)
     for(const b of G.pb){if(b.y<12)continue;const fa=Math.min(b.x>W*.7?1-(b.x-W*.7)/(W*.3):1,1-(Math.hypot(b.x-P.x,b.y-P.y)-W*.55)/(W*.25));if(fa<.05)continue;ctx.globalAlpha=Math.min(1,fa);const a=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0,wn=b.wid&&!this.WARM.test(b.wid)?'fx-w-'+b.wid+'-bullet':null;   // player shots keep the cool hues (cyan / white / violet); enemy shots own lime to orange
-      if(wn&&this.pic(wn,b.x,b.y,44*g,a))continue;
+      if(wn&&(FXW.beam(b,44*g,a)||this.pic(wn,b.x,b.y,44*g,a)))continue;
       const n=b.hv?'fx-shot-hv':b.ec?'fx-shot-ec':'fx-shot-std',w=(b.hv?52:b.ec?40:(b.len||(b.big?22:20))*2.4*(b.pf?1.3:1))*g;
       const bb=ART.bm[n],tk=bb?(bb.width+2*Math.round(bb.height*.35))/bb.width:1;   // W329: tracer = glow + streak in one picture, drawn at the scale that keeps the streak where it was
       if((this.pic(n+'~c',b.x,b.y,w*tk,a,ph?2.4:1.7)||this.pic(n,b.x,b.y,w,a,ph?2.4:1.7))&&n==='fx-shot-std')this.pic(n,b.x,b.y,w*.8,a,ph?1.4:1);}   // body thicker, then the core again additively   // the thin standard streak twice (additive): bright enough to read at game size
