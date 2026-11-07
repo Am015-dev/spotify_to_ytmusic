@@ -41,3 +41,19 @@ a tutorial; the win / lose result is only explained (step `end`), not played. Ru
 
 Next work (in order): a third chapter that plays rounds 3-4 with a hunt and a distant place; a chapter 4 that ends on a won result with a
 stacked fire + pile; both need new `tutDeal` stacking and new step ids in `tutor.js`.
+
+## Story beats (Cook is the guide; prologue of the Story, see STORY.md)
+| Step | Story reason (the Cook says) | Rule taught |
+|---|---|---|
+| goal | Our ship is gone; fire and 15 wood so a ship sees us | goal |
+| lose | Hunger and wounds kill | how you lose |
+| pawns | I cook and heal, Carpenter builds | pawns, roles |
+| explore | What lies beside the camp? | explore |
+| second | Don't gamble with our carpenter | dice vs sure |
+| camp2 | Tidy up: everyone sleeps better | arrange camp, determination, morale |
+| night1 / daysum1 | Ouch. Tomorrow we build a shelter, I promise | night, wounds |
+| event / threat | Day two: a rain cloud rolls in; a danger at camp | event card, threat |
+| build1 / build2 | Shelter first so nights stop hurting | build, shelter |
+| gather1 / gather2 | We need food; fishing is best | gather |
+| weather / skill | Not tonight! I wave off the rain cloud | weather, skill |
+| night2 / end | Dry and safe; twelve days like this | night with shelter, ending |
