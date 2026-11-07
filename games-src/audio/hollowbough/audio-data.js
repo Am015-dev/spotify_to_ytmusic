@@ -18,7 +18,7 @@ const GA_DATA={sfx:{
 "error":"SUQzBAAAAAAAIlRTU0UAAAAOAAADTGF2ZjYxLjEuMTAwAAAAAAAAAAAAAAD/+0DAAAAAAAAAAAAAAAAAAAAAAABJbmZvAAAADwAAAAUAAAPFAFlZWVlZWVlZWVlZWVlZWVlZWVmDg4ODg4ODg4ODg4ODg4ODg4ODg6ysrKysrKysrKysrKysrKysrKys1tbW1tbW1tbW1tbW1tbW1tbW1tb//////////////////////////wAAAABMYXZjNjEuMy4AAAAAAAAAAAAAAAAkAkAAAAAAAAADxbpV7SwAAAAAAP/7MMQAAAcMZWFUwoABGRQuZx6wAAABwABAsABuJZ/Y4EAEAaEw/Xr73v8y3yE1EwHAMDh8XP/IHADAMDi53/xACAY8EwfB9//+U8P9AAH9gAACCGAABOh9VaqDkELgBlYPLuWfn4h1sldcM0DQnUO2U3SSyGgby1Evvx3Od1Pvve720eayG/LW7r/NKBr/KDjBURKs2WxAADQAu//7MsQEAAhgPW+dhgAxGAmstrJgAlaLSlMA4VqCljPtDNFOtbgxUkOoS07hyJYIiLXac9a7qh4wYfHAUAhItHvEp3qLCh4zSo8+/ZSZw6LKYUtRJISUuAA8QuRShXTQp1wogjYt8ymBmeUNOYdHpfSBJwMSWWpLX+GzM5+cDQGngKIgaH+DJ1QdLArxCGujnREDRY8CqGVyZPG4W/T/+zLEA4AIgP1gGYaAAQkS7meSgADDgyJ3ry/zEKzvegMBmi1Ywb/6H+g6jT/yXL5uEgHJ/+1ZuRwtn/+FwCrjnNzyaf//5o00ZAe5fT/+GC4gFAH/yBAxEiapdG0KBQBptChjGOd/MwiHu7kCg0XIOJPNHiofBOOJ2ZSTTZeBpSjHQecNHFWtM0MUDVrO37L86o8GqoSHK4wgAVMA//syxAQACJw9ZaYxgAEHjapo9IzgExSOAQBcBpiJJgVFyAeIB3AePn6keiSydLjfu9kaZAwSCgNPaBQWB2aQHTJp2VfpkVxVfe8OCqw87rDLVA1uggA06ATUS4mro/lKh1ipoUlBUKmwJWmmhxZoBM3VUof//+yhVjHVCg0HRLPV5VywVxFPCIGlHmgqGpXzsRSwah3aPFBzy5CmJ//7MMQEg8d0XxgN5MGA+48iAZYYkEJHzUOJj0kpbuvCGoE+U247UkPbQU8pxln3iCEMhEYenvtMoCADBwuD5QEBwIF3rP//Uafh8sLXLchAL8g1OASBERXTgEFLNIpOajjVW0SpzSOUSI4xxJJyJGnIzjHVtVXlE6DIaETwVhpT9ERT0Nd+ukxBTUUzLjEwMKqqqqqqqqqqqqqqqg==",
 },music:{
 "tavern-a":"url:music/tavern-a.mp3",
-"tavern-b":"url:music/tavern-b.mp3",
+"tavern-b":"url:music/tavern-b.mp3","tavern-short-a":"url:music/tavern-short-a.mp3","tavern-short-b":"url:music/tavern-short-b.mp3",
 "main-a":"url:music/main-a.mp3",
 "main-b":"url:music/main-b.mp3",
 "fight-a":"url:music/fight-a.mp3",
