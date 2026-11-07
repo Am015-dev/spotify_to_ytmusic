@@ -358,7 +358,7 @@ function boot() {
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeZoom(); });
   window.addEventListener('resize', function () { if (G) render(); });
   ['#board', '#hand', '#dock'].forEach(function (sel) { $(sel).addEventListener('click', function (e) { if (e.target === e.currentTarget || e.target.id === 'trick' || e.target.id === 'seats' || e.target.id === 'mine') nudge(); }); });
-  document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (c) c.classList.toggle('ds-hit'); });
+  document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.gx-set-nav .gx-chip'); if (c) { c.classList.toggle('ds-hit'); c.dataset.hit = (+c.dataset.hit || 0) + 1; } });
   tutMenu();
 }
 function pingFx(el) { if (!el || UI.fast) return; var r = el.getBoundingClientRect(), f = mk('div', 'pingfx'); f.setAttribute('data-art', 'fx-ping'); f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + r.height / 2) + 'px'; document.body.appendChild(f); artApply(); setTimeout(function () { f.remove(); }, 900); }
