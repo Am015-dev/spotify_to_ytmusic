@@ -228,7 +228,7 @@ document.addEventListener('click', ev => {
     case 'setme': setMe(+d.c); renderStart(); break;
     case 'gfx': setGfx && setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
-    case 'start': newGame(d.m, optObj()); break;
+    case 'start': if (d.m === 'vs' && firstTime() && typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME) && typeof tutStart === 'function') { tutStart(); break; } newGame(d.m, optObj()); break;   // a first-time player's Play is the coached first game
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;

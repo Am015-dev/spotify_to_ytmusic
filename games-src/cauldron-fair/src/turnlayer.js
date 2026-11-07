@@ -151,7 +151,7 @@ function coachFinish(choice) {
   coachClean(); try { GXT.markDone(TUT_GAME); } catch (e) { } tutLeave();
   if (choice === 'chapter' && first && typeof GXC !== 'undefined') { showStart(); GXC.play(first.id); } else { UI.sv = 'setup'; UI.cfgOpen = false; showStart(); UI.sv = 'setup'; renderStart(); }
 }
-function coachLeave() { coachClean(); tutLeave(); showStart(); }
+function coachLeave() { coachClean(); try { GXT.markDone(TUT_GAME); } catch (e) { } tutLeave(); showStart(); }
 tutStart = function (o) {
   coachClean(); try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false;
   newGame('tutorial'); Object.assign(COACH, { on: true, finished: 0, shown: [], later: [], q: [], cur: null, prologue: !!(o && o.prologue) });

@@ -29,6 +29,8 @@ const PICK = `(() => {
     if (!e) { e = first('#rs .dec [data-a=mv]', '#rs [data-a=mv]'); why = 'report choice'; }
   }
   const gxc = document.querySelector('.gxc-ov:not([hidden]), #gxc:not([hidden]), [class*=gxc-ov]:not([hidden])');
+  { const lv = all('#coach [data-cx=leave]')[0]; if (mode === 'quick' && lv) { e = lv; why = 'leave tutorial'; } }
+  { const pl = all('#coachend [data-ce=play]')[0]; if (mode === 'quick' && pl) { e = pl; why = 'play a game'; } }
   const cok = all('#coach [data-cx=ok]')[0]; if (!e && cok) { e = cok; why = 'got it'; }
   if (!e && !rsOpen && !startOpen) {
     const tip = first('#pc [data-a=tipok]', '#pc [data-a=take]', '.gxh-ok'); if (tip) { e = tip; why = 'tip'; }
@@ -44,7 +46,8 @@ const PICK = `(() => {
   // story overlays and the start screen
   if (!e) { const o = all('.gxc-btn.go,.gxc-btn,.gxc-scene button,.gxc-sheet button,[class*=gxc] button').filter(b => !b.closest('.gxc-nodes')).filter(b => /^(Next|Continue|Play|Start|Begin|Let|Go|Brew|Ready|Close|OK|Got it|Again|Back to)/i.test(b.textContent.trim()) && !/Back$/.test(b.textContent.trim()))[0]; if (o) { e = o; why = 'story: ' + o.textContent.trim().slice(0, 18); } }
   if (!e) { const n = all('.gxc-node.a')[0]; if (n && mode === 'story') { e = n; why = 'chapter node'; } }
-  if (!e && startOpen) { const s = mode === 'story' ? first('#start [data-a=story]') : byText('#start button', /Start the fair/); if (s) { e = s; why = 'start'; } }
+  if (!e && startOpen) { const s = mode === 'story' ? first('#start [data-a=story]') : (byText('#start button', /Start the fair/) || first('#start [data-a=start]')); if (s) { e = s; why = 'start'; } }
+  if (!e) { const bk = all('button').find(b => /^\s*Back to your cauldron/i.test(b.textContent)); if (bk) { e = bk; why = 'back to my cauldron'; } }
   if (!e) return { wait: 1 };
   const r = e.getBoundingClientRect(); const cx = Math.round(r.left + r.width / 2), cy = Math.round(Math.min(Math.max(r.top + r.height / 2, 2), innerHeight - 2));
   const top = document.elementFromPoint(cx, cy);
