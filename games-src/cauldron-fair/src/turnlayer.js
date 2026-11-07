@@ -44,7 +44,7 @@ function instrInfo() {
 }
 function instrBar() {
   let e = $('#instr'); if (!e) { e = h('div#instr', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(e); }
-  const i = instrInfo(); if (!i) { e.hidden = true; return; }
+  const i = instrInfo(); document.documentElement.classList.toggle('hasinstr', !!i); if (!i) { e.hidden = true; return; }
   e.hidden = false; e.className = i.rival ? 'rv' : '';
   const html = '<b>' + i.who.replace(/</g, '&lt;') + '</b><span>' + i.text.replace(/</g, '&lt;') + '</span>'; if (e.dataset.h !== html) { e.dataset.h = html; e.innerHTML = html; }
   const db = $('#dockbody'), pd = $('#promptDock'), vis = pd && pd.getBoundingClientRect().width > 0;
