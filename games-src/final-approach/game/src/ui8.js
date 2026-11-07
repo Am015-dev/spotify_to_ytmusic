@@ -121,8 +121,10 @@ function phPost() {
 function showEndBoard() {
   const f = fxLayer(); if (!f || !G || !G.result) return; try { render(); } catch (e) { }   // the Fly again / Next airport buttons come with the banner
   $$('#fx .endb').forEach(e => e.remove());
-  f.appendChild(h('button.endb.' + (G.result.win ? 'win' : 'lose'), { type: 'button', 'data-a': 'lookpanel', 'aria-label': endWords() + '. Tap to look at the panel.' }, h('b', endWords())));
+  f.appendChild(h('button.endb.' + (G.result.win ? 'win' : 'lose'), { type: 'button', 'data-a': 'lookpanel', 'aria-label': endWords() + '. ' + endVoice() + ' Tap to look at the panel.' }, h('b', endWords()), h('span.ev', endVoice())));
 }
+// one line of the crew's voice under the result (campaign.json tutorial.voice), picked by the round count so it varies
+function endVoice() { try { const v = window.CAMPAIGN.tutorial.voice[G.result.win ? 'win' : 'lose']; return v[(G.round + (G.pl.pos | 0)) % v.length]; } catch (e) { return ''; } }
 function lookPanel() { if (typeof pxClearEnd === 'function') pxClearEnd(); const b = $('#fx .endb'); if (b) b.classList.add('small'); render(); }
 // ---------- playable layer: turn banner, the rival's caption, tap to speed up (owner, 7 Nov 2026). TEST: ../playable-test.js ----------
 // Every turn is a short sequence: banner ("Your turn" / "<Rival>'s turn") -> one instruction line (phPrompt) -> glowing targets -> the move animates -> a caption says why.
@@ -136,6 +138,10 @@ function lookPanel() { if (typeof pxClearEnd === 'function') pxClearEnd(); const
     '.fa-react{position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:9990;pointer-events:none;display:flex;gap:10px;align-items:center;width:max-content;max-width:min(344px,calc(100vw - 20px));padding:8px 14px 8px 10px;border-radius:14px;background:#1b2230;color:#fff;border:2px solid #ffd46b;font-size:15px;line-height:1.3;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.5);animation:fa-rin .25s ease-out both}' +
     '.fa-react.out{opacity:0;transition:opacity .3s}@keyframes fa-rin{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}' +
     'html .gxh-bub .gxh-tx{font-size:14.5px;line-height:1.3}html .gxh-bub .gxh-tt{font-size:15px}' +
+    '.fa-por::before{content:attr(data-e)}.endb .ev{display:block;font-size:15px;line-height:1.3;font-weight:700;margin-top:4px;color:#ffe9c2}' +
+    '.ttl .tag{background:rgba(10,18,30,.86);padding:4px 14px;border-radius:999px;color:#fff;text-shadow:none}.ttl .logo{background:rgba(10,18,30,.78);padding:4px 18px;border-radius:18px}' +
+    '@media (min-width:1024px){html .gxh-bub .gxh-tx,html .gxh-bub .gxh-tt,html .gxh-bub .gxh-ok,html .gxt-top .gxt-n,html .gxt-top .gxt-skip{font-size:16px}html .gxc-ib,html .gxc-path .gxc-act b,html .gxc-path .gxc-act small,html .gxc-path .gxc-node .gxc-lab{font-size:16px}}' +
+    '.gxc-htitle b{color:#fff;text-shadow:0 1px 3px #000}.gxc-path .gxc-act{background:#2b2218;padding:6px 12px}.gxc-path .gxc-act b,.gxc-path .gxc-act small{color:#fff4dc}' +
     '@media (prefers-reduced-motion:reduce){.tbn,.fa-react{transition:none;animation:none}}';
   document.head.appendChild(st);
 })();

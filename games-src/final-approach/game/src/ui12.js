@@ -135,7 +135,7 @@ function tsFill(t) {
 function tsPortrait(who) {
   const c = tsCast(who), e = h('span.fa-por', { 'aria-hidden': 'true' }); e.style.setProperty('--fa-pc', c.color || '#2f4f7a');
   if (c.portrait) e.style.backgroundImage = 'url(media/' + c.portrait + ')';
-  e.textContent = c.emoji || '';   // the emoji sits under the painting until it loads (or stays when there is none)
+  e.setAttribute('data-e', c.emoji || '');   // the emoji is drawn by CSS (not a text node): it sits under the painting until it loads
   return e;
 }
 function tsReact(text, who) {

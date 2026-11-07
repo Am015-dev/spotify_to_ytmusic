@@ -130,7 +130,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Level wings at the end. That is how it starts, Captain.",
+    "taunt": "She tipped too far. Ravi and I will set her level again."
    },
    "setup": {
     "players": 2,
@@ -209,7 +211,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Right speed, right space. The runway is yours.",
+    "taunt": "Too fast, or too slow. The engines need both of you."
    },
    "setup": {
     "players": 2,
@@ -288,7 +292,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Path clear. The radio did its job.",
+    "taunt": "A plane on the path ends the flight. Count the spaces first."
    },
    "setup": {
     "players": 2,
@@ -367,7 +373,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Wheels and flaps, both down. Nicely done.",
+    "taunt": "Something stayed up. Check gear and flaps before the last round."
    },
    "setup": {
     "players": 2,
@@ -446,7 +454,9 @@
     "name": "Port Alder Tower",
     "personality": "Calm dawn approach, a few parked planes on the river path.",
     "aiLevel": "hard",
-    "aiStyle": "calm"
+    "aiStyle": "calm",
+    "praise": "Brakes set in order. Smooth stop.",
+    "taunt": "The brakes were not ready. Two, then four, then six."
    },
    "setup": {
     "players": 2,
@@ -624,7 +634,9 @@
     "name": "Foxmere Approach",
     "personality": "Polite but busy: the traffic die keeps adding planes.",
     "aiLevel": "hard",
-    "aiStyle": "traffic"
+    "aiStyle": "traffic",
+    "praise": "Runway is yours, Kestrel. Thanks for sorting the queue.",
+    "taunt": "Traffic got the better of you. Clear the queue early next time."
    },
    "setup": {
     "players": 2,
@@ -716,7 +728,9 @@
     "name": "Lake Orrin Tower",
     "personality": "A quiet night tower over a long lake. The fuel gauge is the real danger.",
     "aiLevel": "hard",
-    "aiStyle": "fuel"
+    "aiStyle": "fuel",
+    "praise": "Kestrel, tanks look healthy. Good night to you.",
+    "taunt": "Fuel ran thin. Watch the gauge before the last round."
    },
    "setup": {
     "players": 2,
@@ -911,7 +925,9 @@
     "name": "Castlemoor Tower",
     "personality": "A gentle dusk tower among spires, with a fuel gauge and two tabs.",
     "aiLevel": "normal",
-    "aiStyle": "abilities"
+    "aiStyle": "abilities",
+    "praise": "Dusk landing, clean and quiet. Welcome to Castlemoor.",
+    "taunt": "The spires were close tonight. Try again, calmly."
    },
    "setup": {
     "players": 2,
@@ -1011,7 +1027,9 @@
     "name": "Foxmere Approach",
     "personality": "Fog, stacked traffic and a nervous trainee on the flight deck.",
     "aiLevel": "normal",
-    "aiStyle": "fog-trainee"
+    "aiStyle": "fog-trainee",
+    "praise": "Out of the fog and on the ground. Well flown.",
+    "taunt": "Fog ate the plan. Hold, wait, and trust your crewmate."
    },
    "setup": {
     "players": 2,
@@ -1206,7 +1224,9 @@
     "name": "Twin Spires Tower",
     "personality": "Night storms between two glass towers; tabs swing from side to side.",
     "aiLevel": "normal",
-    "aiStyle": "storm-corridor"
+    "aiStyle": "storm-corridor",
+    "praise": "Between the storms and down. Not many manage that.",
+    "taunt": "The storm tabs swung against you. Read them again."
    },
    "setup": {
     "players": 2,
@@ -1298,7 +1318,9 @@
     "name": "Palmreach (no reply)",
     "personality": "A silent tower, warm rain and a tail wind that keeps adding speed.",
     "aiLevel": "normal",
-    "aiStyle": "tailwind"
+    "aiStyle": "tailwind",
+    "praise": "Rain on the runway and you stopped it anyway. Remarkable.",
+    "taunt": "The tail wind pushed you past. Next time, count it in."
    },
    "setup": {
     "players": 2,
@@ -1638,6 +1660,18 @@
   "end": {
    "title": "You know the rules",
    "text": "Pell lowers his pen: \"Fine. Green Wings stays open.\" Axis, engines, radio, gear, flaps, brakes, coffee, rerolls: flight school is yours."
+  },
+  "voice": {
+   "win": [
+    "Ravi: \"Down and stopped. Together, Captain.\"",
+    "Voss on the radio: \"That is how it is done.\"",
+    "Ravi: \"Pell can put his pen away.\""
+   ],
+   "lose": [
+    "Ravi: \"We read it wrong. Next one is ours.\"",
+    "Voss on the radio: \"Debrief, then again, Captain.\"",
+    "Ravi: \"Shake it off. Fresh dice, fresh plan.\""
+   ]
   }
  }
 }

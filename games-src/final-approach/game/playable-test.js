@@ -120,7 +120,7 @@ async function quick(browser, W, H) {
   await p.evaluate(() => { localStorage.setItem('fa_offer', '1'); localStorage.setItem('fa_prefs', JSON.stringify({ speed: 150, won: { g1: 1 } })); }); await p.reload(); await sleep(900);
   if (!(await tapSel(c, '#start button', { text: 'Computer' }))) { note(tag, 'quick: no Computer button'); return; }
   await sleep(900);
-  const r = await playByTaps(c, 'quick', 240000); await SHOT(c, 'quick-result');
+  const r = await playByTaps(c, 'quick', 240000); await sleep(3000); await SHOT(c, 'quick-result');
   lines.push((r.done ? 'PASS' : 'FAIL') + ' quick game to result ' + tag + ' (' + (r.res || '?') + ', ' + r.moves + ' taps)');
   if (r.done && !r.turnBanner) note(tag, 'quick: the "Your turn" banner was never seen'); if (r.done && !r.rivalCap) note(tag, 'quick: no rival caption was seen');
   await c.p.context().close();
@@ -132,7 +132,7 @@ async function story(browser, W, H) {
   if (!(await tapSel(c, '#start button', { text: 'Computer' }))) { note(tag, 'story: no Computer button'); return; } await sleep(900);
   const intro = await p.evaluate(() => { const e = document.querySelector('.gxc-sc-text'); return e ? e.textContent : ''; });
   if (!intro) note(tag, 'story: no intro scene text'); await SHOT(c, 'story-intro');
-  const r = await playByTaps(c, 'story', 240000); await SHOT(c, 'story-result');
+  const r = await playByTaps(c, 'story', 240000); await sleep(3000); await SHOT(c, 'story-result');
   lines.push((r.done ? 'PASS' : 'FAIL') + ' story chapter 1 to result ' + tag + ' (' + (r.res || '?') + ', ' + r.moves + ' taps)');
   await c.p.context().close();
 }
