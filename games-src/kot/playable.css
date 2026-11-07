@@ -27,3 +27,17 @@ html.ph #bline{font-size:15px;white-space:normal;line-height:1.2;max-width:calc(
 #ppbeat span{display:block;margin-top:2px;font:800 14px/1.25 Nunito,sans-serif;color:#1a1320}
 #ppbeat.on{animation:ppIn 4.2s ease both}
 @keyframes ppIn{0%{opacity:0;transform:translate(-50%,-12px)}8%{opacity:1;transform:translate(-50%,0)}88%{opacity:1}100%{opacity:0}}
+
+/* coached first game: one speech bubble, never blocks play (only its own buttons take taps) */
+#ppcoach{position:fixed;left:50%;top:96px;z-index:2147483000;transform:translate(-50%,-10px);opacity:0;pointer-events:none;display:flex;gap:10px;align-items:flex-start;width:min(380px,calc(100vw - 20px));box-sizing:border-box;padding:8px 8px 8px 8px;border:3px solid #1a1320;border-radius:14px;background:#fff7dd;box-shadow:4px 4px 0 #1a1320;transition:opacity .25s,transform .25s}
+#ppcoach.on{opacity:1;transform:translate(-50%,0)}
+#ppcoach img,#ppcoach>i{flex:0 0 48px;width:48px;height:48px;border-radius:50%;border:3px solid var(--bc,#e8c547);background:#fff;object-fit:cover;font:normal 28px/42px sans-serif;text-align:center}
+#ppcoach>div{flex:1;min-width:0}
+#ppcoach b{display:block;font:900 14px/1.1 Nunito,sans-serif;color:#7a2a12}
+#ppcoach span{display:block;margin-top:2px;font:800 14px/1.25 Nunito,sans-serif;color:#1a1320}
+#ppcoach small{display:block;margin-top:4px;font:700 13px/1.25 Nunito,sans-serif;color:#4a3a2a}
+#ppcoach [data-pp-x]{pointer-events:auto;flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:2px solid #1a1320;background:#fff;color:#1a1320;font:900 18px/1 Nunito,sans-serif;cursor:pointer;padding:0}
+#ppcoach.on [data-pp-play],#ppcoach.on [data-pp-story],#ppcoach.on [data-pp-skip]{pointer-events:auto}
+#ppcoach .pp-row{display:flex;gap:8px;margin-top:6px}
+#ppcoach .pp-row button{pointer-events:auto;min-height:36px;padding:4px 12px;border-radius:10px;border:2px solid #1a1320;background:#ff7a21;color:#fff;font:900 14px/1 Nunito,sans-serif;cursor:pointer}
+#ppcoach.on{pointer-events:none}

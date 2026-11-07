@@ -159,7 +159,14 @@ function tutSteps(){
   return S}
 // ---------------------------------------------------------------- start, leave, hooks
 function tutRelease(){TUT.hold=false;try{schedule()}catch(e){}}
-function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function tutStart(o){   // coached first game (Addendum 4): a real game, free choices from turn 1, Dot speaks just in time (playable.js, tut-story.js)
+  try{localStorage.setItem('gxt-'+TUT_GAME,JSON.stringify({open:true,step:1,seen:true}))}catch(e){}
+  try{GXH.hide()}catch(e){}try{if(GX.open)GX.close()}catch(e){}try{if(typeof GXC!=='undefined'&&GXC.close)GXC.close()}catch(e){}
+  clearTimeout(UI.statsT);UI.info=false;UI.choice=null;UI.stats=false;UI.intro=false;UI.coach=-1;UI.adv=false;UI.paused=false;UI.pending=false;UI.busy=false;UI.camp=null;UI.campNext=false;UI.tutNext=true;
+  const sv={n:UI.n,mon:UI.mon,xp:UI.xp,evo:UI.evo,ex:UI.ex,lvl:UI.lvl};UI.n=3;UI.mon=0;UI.xp='base';UI.evo=false;UI.ex={};UI.lvl='easy';
+  try{setSeed(5);newGame('solo',3,0)}finally{Object.assign(UI,sv)}
+  UI.intro=false;if(G){G.tut=1;TUT.script=[]}render();if(typeof ppCoachStart==='function')ppCoachStart()}
+function tutStartScripted(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:'You know the rules',endText:pro?'You played a whole game. Now the Story begins.':'You played a whole game, start to finish. Time for a real one.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
@@ -178,7 +185,7 @@ function tutSetup(){document.documentElement.classList.add('gxt-on');try{GXH.hid
   try{newGame('solo',3,0)}finally{Object.assign(UI,sv)}
   UI.intro=false;if(G){G.tut=1}render()}
 // leave the staged game: nothing of it was saved, the board goes quiet behind the menu
-function tutLeave(){document.documentElement.classList.remove('gxt-on');if(TUT.hints!==undefined){UI.hints=TUT.hints;TUT.hints=undefined}TUT.hold=false;TUT.script=[];clearTimeout(UI.statsT);UI.pending=false;UI.busy=false;UI.choice=null;UI.intro=false;
+function tutLeave(){try{if(typeof ppCoachStop==='function')ppCoachStop()}catch(e){}document.documentElement.classList.remove('gxt-on');if(TUT.hints!==undefined){UI.hints=TUT.hints;TUT.hints=undefined}TUT.hold=false;TUT.script=[];clearTimeout(UI.statsT);UI.pending=false;UI.busy=false;UI.choice=null;UI.intro=false;
   try{GXH.hide()}catch(e){}try{const f=document.getElementById('bfinger');if(f)f.classList.remove('on')}catch(e){}
   G=null;UI.info=true;try{if(typeof BF!=='undefined')BF.sel=-1}catch(e){}render();tutMenus()}
 function tutMenus(){const s=document.getElementById('gxtset');if(s)s.innerHTML=tutBtn('btn mrow');

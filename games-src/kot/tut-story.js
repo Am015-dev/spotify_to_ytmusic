@@ -36,3 +36,32 @@ const TUT_STORY = {
     win20:  { say: g => `${g.vp} ★ is the crown. End your turn with 20 and it’s yours.`, react: 'Squidrik’s face says it all.' },
     result: { say: 'First to 20 ★ wins at once, or the last monster standing. Take a bow.' } },
 };
+
+// ===== Coached first game (Addendum 4): the player plays freely from turn 1; Dot speaks once, just in time, one bubble at a time (never blocks input, tap x to dismiss).
+// `rules` are the TUTORIAL-COVERAGE.md ids this tip explains. `when()` runs after every render during the coached game. Words stay <= 22.
+const me_ = () => G.pl.findIndex(p => p.human), myTurn_ = () => G.active === me_() && !G.winner && !UI.intro && !UI.choice;
+const cnt_ = () => { const c = {}; G.dice.forEach(d => { c[d.f] = (c[d.f] || 0) + 1 }); return c };
+const COACH_TIPS = [
+  { id: 'goal', rules: ['setup', 'goal', 'roll3'], say: 'Welcome, rookie! First to 20 ★ wins, or the last monster standing. Each turn you roll six dice, up to three times.', when: () => myTurn_() && G.phase === 'roll' && G.dice.length },
+  { id: 'faces', rules: ['faces'], say: 'Each die says what it does: STAR dice score in sets, ENERGY buys cards, HEAL mends you, HIT smashes rivals.', when: () => myTurn_() && G.phase === 'roll' && G.dice.length && G.rolls <= 2 },
+  { id: 'keep', rules: ['keep', 'rekeep'], say: 'Tap dice to keep them, then Roll for the rest. Kept dice can be tapped again to roll them too.', when: () => myTurn_() && G.phase === 'roll' && G.rolls >= 1 && G.dice.length },
+  { id: 'pair', rules: ['pair', 'triple'], say: 'A pair of numbers scores nothing. Three of a kind scores that number in ★. Chase the third!', when: () => myTurn_() && G.phase === 'roll' && ['1', '2', '3'].some(f => cnt_()[f] === 2) },
+  { id: 'extra', rules: ['extra'], say: 'Four of a kind! Every extra matching die adds 1 ★ on top.', when: () => myTurn_() && G.phase === 'roll' && ['1', '2', '3'].some(f => cnt_()[f] >= 4) },
+  { id: 'energy', rules: ['energy'], say: 'Energy dice give 1 ⚡ each. Spend ⚡ on power cards in the buy step. Unspent ⚡ is saved for later.', when: () => myTurn_() && G.phase === 'roll' && cnt_().E },
+  { id: 'hearts', rules: ['hearts', 'noheal'], say: () => inCity(me_()) ? 'Hearts do nothing in Downtown: no healing there. Leave to heal.' : 'Heart dice heal 1 ♥ each, up to 10. You can’t heal inside Downtown.', when: () => myTurn_() && G.phase === 'roll' && cnt_().H },
+  { id: 'claws', rules: ['claws'], say: () => inCity(me_()) ? 'From Downtown your claws hit every rival outside.' : 'From outside, your claws hit the monster in Downtown. If it’s empty, nobody is hit.', when: () => myTurn_() && G.phase === 'roll' && cnt_().C },
+  { id: 'stop', rules: ['stop'], say: 'Happy with these dice? You may stop early: tap SMASH! to use them.', when: () => myTurn_() && G.phase === 'roll' && G.rolls <= 1 && G.dice.length },
+  { id: 'enter', rules: ['enter'], say: 'Downtown was empty, so you moved in: +1 ★. In the city you score more, but everyone outside hits you.', when: () => myTurn_() && G.phase === 'buy' && inCity(me_()) },
+  { id: 'start2', rules: ['start2'], say: 'Starting a turn in Downtown pays +2 ★. That’s the reward for holding the city.', when: () => myTurn_() && G.phase === 'roll' && G.rolls === 2 && inCity(me_()) && G.tid > 2 },
+  { id: 'buy', rules: ['cards', 'types', 'sweep', 'endturn'], say: 'Power cards: tap one to read it, tap again to buy. PERMANENT stays, ONE-SHOT is used once. ♻ swaps the three for 2 ⚡. Then End turn.', when: () => myTurn_() && G.phase === 'buy' },
+  { id: 'rivals', rules: ['rivals'], say: g => `${g.rival} plays too: it rolls, keeps, smashes and buys like you. Watch the caption at the top.`, when: () => !G.winner && G.active !== me_() && !UI.intro },
+  { id: 'yield', rules: ['yield'], say: 'Hit in Downtown? Stay and keep earning 2 ★ a turn, or yield: you leave, and the attacker moves in.', when: () => UI.choice && /Stay or yield/.test(UI.choice.title) },
+  { id: 'ko', rules: ['ko'], say: 'At 0 ♥ a monster is knocked out. Last one standing wins, even below 20 ★.', when: () => G.pl.some(p => p.alive && p.hp <= 3) },
+  { id: 'near', rules: ['win20'], say: 'Nearly there! End a turn holding 20 ★ and you win. The check happens when your turn ends.', when: () => G.pl.some(p => p.vp >= 15) && !G.winner },
+];
+// rules this short game may not show: said on the card at the end
+const COACH_LATER = [
+  ['harbor', 'Harbor: with 5-6 monsters a second city space opens on the water.'],
+  ['tie', 'Ties: if two monsters hit 20 ★ in one turn, the one whose turn it is wins.'],
+  ['omen', 'Options: evolutions, curses and the Omen die, Brainjack, costumes, Tower and Berserk dice. Switch them on in Customise; the lightbulb explains each.'],
+  ['extra-turn', 'Some cards give an extra turn right after yours.']];
