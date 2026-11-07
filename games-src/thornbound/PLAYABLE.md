@@ -26,3 +26,6 @@ Rules check: WRONG 0, MISSING 3, SIMPLIFIED 6. Fixed: 1/3 by the engine worker (
   Not zero, not fixed here: A/C on the Story map (shared campaign shell fonts and topbar art), B/E in the Menu and How-to-play panels (summary contrast, "dead button" flags on settings toggles). These are shell/panel items outside this task's scope; listed for the orchestrator.
 - First-time help bubbles are now off by default (the strip already says what to do); the lightbulb still gives a hint on demand.
 - Shots: playable-shots/ (title, first turn, rival turn, result; phone).
+
+## Addendum 4: coached first game
+Tutorial is now free play with just-in-time guide lines (coach-test.js PASS at 390x763 and 1440x860, finger-test PASS). Gap: build-all --quick could not run after the last base merge because guard.py fails on games-src/stitchwise/build.py (missing on the base branch, not this game); it passed before the coached change. Solo mode and advanced setup (earlier trigger, hard stop passed) were not built.

@@ -1,4 +1,8 @@
-# Tutorial coverage (the prologue: one real round, fixed seed, against the real AI, ends on the result)
+# Tutorial coverage: a COACHED first game (free legal moves, one real round, fixed seed, real AI). No forced tap steps; the guide speaks the first time a rule matters (`coach` in game/src/story.js, ids below), never more than one bubble, tap the strip to dismiss.
+# Proven by game/coach-test.js: plays free legal moves at 390x763 and 1440x860 and asserts every id below was explained and the end card (with 'Things you will meet later') shows. The old spotlight steps (ui12.js tutSteps, tutor-test.js) are retired.
+Coach ids: welcome, goal, bid, bids, kc, herald, place, supp, order, clash, claim, score, round (round is told on the end card).
+
+(Older table, step ids are now coach ids:)
 Steps are ids in `game/src/ui12.js` (`tutSteps`); story text in `game/src/story.js` (`tut`, `chapters`). Ticked = taught by doing or seeing it once.
 
 | Rule | Step | Story beat |
