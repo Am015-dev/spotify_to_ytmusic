@@ -1,4 +1,4 @@
-// Rules test (W386): "you can resolve your dice in any order" (rules check, MISSING). Usage: NODE_PATH=... node rules-test-w386.js [kot2.html]
+// Rules test (W386): "you can resolve your dice in any order" (rules check, MISSING). Usage: NODE_PATH=... node rules-test.js [kot2.html]
 // Dice order: Automatic keeps hearts before claws (no question); Ask me asks when hearts and claws were both rolled and the heart can heal.
 const { JSDOM } = require('jsdom'); const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(path.resolve(process.argv[2] || path.join(__dirname, 'kot2.html')), 'utf8');
@@ -23,4 +23,4 @@ let pass = 0, fail = 0; const T = (n, ok, i) => { if (ok) pass++; else fail++; c
   T('Ask me: no claws rolled -> no question', !w.eval('!!(UI.choice&&UI.choice.title==="Dice order")'), {}) }
 { const w = mk(); w.eval(`UI.order='ask';G.city=0`); roll(w);
   T('Ask me: monster in Downtown cannot heal -> no question', !w.eval('!!(UI.choice&&UI.choice.title==="Dice order")'), {}) }
-console.log(`${fail ? 'FAIL' : 'PASS'} rules-test-w386 ${pass} ok, ${fail} failed`); process.exit(fail ? 1 : 0);
+console.log(`${fail ? 'FAIL' : 'PASS'} rules-test ${pass} ok, ${fail} failed`); process.exit(fail ? 1 : 0);

@@ -48,7 +48,7 @@ GAMES = {
 # slug -> (dir relative to games-src with the game's own sweeps, [scripts]). Full run = the script's own default size (the gate); QUICK=1 makes it 4 games.
 SWEEPS = {
     "cauldron-fair":    ("cauldron-fair",       ["sweep.js", "rotate-test.js"]),
-    "crown-city-smash": ("kot",                 ["sweep.js"]),
+    "crown-city-smash": ("kot",                 ["rules-test.js", "sweep.js"]),
     "doorkick-dungeon": ("munch",               ["sweep.js"]),
     "emberclimb":       ("emberclimb",          ["sweep.js"]),
     "final-approach":   ("final-approach/game", ["sweep.js"]),

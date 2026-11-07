@@ -84,5 +84,7 @@
   window.ppCoachStart = function () { C.on = true; C.seen = {}; C.rules = {}; C.ended = false; hideCoach();
     const el = $('ppcoach'); setTimeout(() => { if (C.on && !C.cur && G && G.tut) { const t = COACH_TIPS[0]; if (t.when()) showCoach(Object.assign({}, t, { html: '<span class="pp-row"><button type="button" data-pp-skip>Skip tutorial</button></span>' })) } }, 400) };
   window.ppCoachStop = function () { C.on = false; hideCoach() };
+  // for qa-bot: running = the coached game is on; explained = rule ids explained so far (or listed on the final card); done = the final card was shown
+  Object.defineProperty(window, 'GXCOACH', { configurable: true, get: () => ({ running: !!(C.on && typeof G !== 'undefined' && G && G.tut && !G.winner), explained: Object.keys(C.rules), done: !!C.ended }) });
   window.addEventListener('load', () => setTimeout(dieLabels, 300));
 })();
