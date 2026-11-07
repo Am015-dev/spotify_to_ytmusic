@@ -354,6 +354,7 @@ function clawStep(p,R,done){const c=R.c,inT=R.inT;let claws=c.C;const rolled=cla
   if(rolled&&has(p,'scorch'))for(const j of neighbours(p.i)){items.push({q:P(j),a:has(p,'scorch'),src:p,kind:'fx',fire:true});cov('card:scorch')}
   if(!items.length){if(c.C||amt)R.out.push('claws hit nobody');done();return}
   snd('smash');
+  try{if(typeof V3!=='undefined'&&V3.mons&&V3.mons[p.i]&&V3.mons[p.i].va)V3.mons[p.i].va.attack()}catch(e){} // Voltusk plays its attack clip
   hitAll(items,res=>{
     const lostBy={};res.forEach(r=>{if(r.it.kind==='claw'){lostBy[r.q.i]=(lostBy[r.q.i]||0)+r.lost}});
     R.out.push(`smashes ${tg.map(q=>mname(q)+' −'+(lostBy[q.i]||0)).join(', ')||'nobody'}`);

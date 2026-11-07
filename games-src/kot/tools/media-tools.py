@@ -98,19 +98,32 @@ def compress(src, key):
     else: print("WARNING: still over 1.5 MB at the highest compression")
     write_manifest(); print("wrote", dst)
 
+def copy_anims():
+    import shutil
+    src = Path(__file__).resolve().parents[2] / "anims" / "crown-city-smash"
+    MEDIA.mkdir(parents=True, exist_ok=True)
+    for f in sorted(src.glob("*.webm")): shutil.copy2(f, MEDIA / f.name)  # alpha clips (Voltusk idle + attack), played on the 3D standee by media.js
+    print("anims copied")
+
 def write_manifest():
     MEDIA.mkdir(parents=True, exist_ok=True)
     clips = [k for k in CLIPS if (MEDIA / (k + ".mp4")).exists()]
     try: cuts = json.loads((MEDIA / "media.json").read_text()).get("cutouts", [])  # kept as is: board figures from pictures are switched on/off by hand in media.json
     except Exception: cuts = []
     pics = [f"camp-{n}.webp" for n in CAST if (OUT / f"camp-{n}.webp").exists()]
-    (MEDIA / "media.json").write_text(json.dumps({"clips": clips, "portraits": pics, "cutouts": cuts, "avatars": [f"cut-{n}.webp" for n in CAST if (OUT / f"cut-{n}.webp").exists()],
-                                                      "models": [n for n in CAST if (OUT / "models" / f"{n}.glb").exists()]}) + "\n")
+    try: old = json.loads((MEDIA / "media.json").read_text())
+    except Exception: old = {}
+    new = {"clips": clips, "portraits": pics, "cutouts": cuts, "avatars": [f"cut-{n}.webp" for n in CAST if (OUT / f"cut-{n}.webp").exists()],
+           "models": [n for n in CAST if (OUT / "models" / f"{n}.glb").exists()]}
+    old.update(new)  # other keys (cards, anims) are kept
+    old["anims"] = sorted(f.name for f in MEDIA.glob("*-idle.webm")) + sorted(f.name for f in MEDIA.glob("*-attack.webm"))  # copy_anims() puts them here
+    (MEDIA / "media.json").write_text(json.dumps(old) + "\n")
     print("media.json:", len(clips), "clips,", len(pics), "portraits")
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    if a[:1] == ["grid"] and len(a) == 2: split_grid(a[1])
+    if a[:1] == ["anims"]: copy_anims(); write_manifest()
+    elif a[:1] == ["grid"] and len(a) == 2: split_grid(a[1])
     elif a[:1] == ["video"] and len(a) == 3: compress(a[1], a[2])
     elif a[:1] == ["cutouts"]: make_cutouts()
     elif a[:1] == ["manifest"]: write_manifest()
