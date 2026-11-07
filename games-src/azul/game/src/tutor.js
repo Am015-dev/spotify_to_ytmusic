@@ -95,7 +95,7 @@ function tutStepsA(){return [
  {id:'a_tiling',title:'The round is over',say:'Olive took the last tile. Kilns and middle are empty, so each full row sends one tile to the wall.',target:tq('.bf-me'),wait:null,
    ai:()=>tutWait(()=>tIdle()&&sideToAct()===1).then(()=>tutOlive(2)),onNext:tutRelease,ready:()=>TUT.at==='tiling'},
  {id:'a_wall0',title:'Alone scores one',say:'This Frost touches no other tile, so it scores 1 point. Rows fill from the top down.',target:tWall(0,4),wait:null,onNext:tutRelease,ready:()=>TUT.at==='wall0'},
- {id:'a_wall1',title:'Touching tiles score',say:'This Obsidian touches the Frost above it: a line of two tiles scores 2 points.',target:tWall(1,4),wait:null,onNext:tutRelease,ready:()=>TUT.at==='wall1'},
+ {id:'a_wall1',title:'Touching tiles score',say:'This Obsidian touches the Frost above it: a line of two tiles scores 2 points.',target:tWall(1,4),also:tWall(0,4),wait:null,onNext:tutRelease,ready:()=>TUT.at==='wall1'},
  {id:'a_pen',title:'Pay for the floor',say:'The Frost and the Sun token cost −1 and −1. Your round: 1 + 2 − 2 = 1 point.',target:tq('.bf-floor'),wait:null,onNext:tutRelease,ready:()=>TUT.at==='floor'},
  {id:'a_end',title:'Round one is scored',say:'Next rounds repeat this. Row 4 keeps its two tiles. Next: bigger chains, end bonuses and winning.',target:tq('.bf-me'),wait:null,onNext:tutRelease,ready:()=>TUT.at==='r1end'}
 ]}

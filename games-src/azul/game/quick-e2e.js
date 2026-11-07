@@ -13,7 +13,7 @@ const tapXY=async(x,y)=>desk?p.mouse.click(x,y):p.touchscreen.tap(x,y);
 const tapSel=async sel=>{const r=await p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const b=e.getBoundingClientRect();if(b.width<2||b.height<2)return null;const x=b.left+b.width/2,y=b.top+b.height/2;const h=document.elementFromPoint(x,y);return h&&(h===e||e.contains(h)||h.contains(e))?{x,y}:{x,y,covered:h&&(h.id||h.className)}},sel);
  if(!r)return false;if(r.covered){return 'covered:'+r.covered}await tapXY(r.x,r.y);return true};
 const shot=async n=>{if(SH){fs.mkdirSync(SH,{recursive:true});await p.screenshot({path:SH+'/'+n+'.png'})}};
-await p.goto('https://gns.test/'+(desk?'':'?phone=1'));await sleep(800);await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('sgz_offer','1')}catch(e){}});await p.reload();await sleep(1500);
+await p.goto('https://gns.test/'+(desk?'':'?phone=1'));await sleep(800);await p.evaluate(m=>{try{localStorage.clear();localStorage.setItem('sgz_offer','1');if(m==='story')localStorage.setItem('gxt-sunglaze','{"done":1}')}catch(e){}},mode);await p.reload();await sleep(1500);
 await p.evaluate(()=>{window.bfD=ms=>ms*.3});
 await shot('01-title');
 const clickText=async(sel,re)=>{const i=await p.evaluate(([s,r])=>{const re=new RegExp(r,'i');const l=[...document.querySelectorAll(s)].filter(e=>{const b=e.getBoundingClientRect();return b.width>2&&re.test(e.textContent)});if(!l.length)return -1;l[0].setAttribute('data-e2e','1');return 1},[sel,re]);if(i<0)return false;const r=await tapSel('[data-e2e="1"]');await p.evaluate(()=>document.querySelectorAll('[data-e2e]').forEach(e=>e.removeAttribute('data-e2e')));return r===true};
@@ -29,7 +29,7 @@ for(let it=0;it<900;it++){
  if(Date.now()-stuckSince>45000){P(false,'stuck '+sig);await shot('stuck');break}
  // try dialogs first (visible buttons in modal/overlays)
  if(!s.has||s.modal){
-  if(await clickText('#modal button, .gxt-end button, .gxc button, button','^(Just play|Play(?!ers)|Enter the courtyard|Start|Begin|Continue|Stage|Chapter|Go|OK|Got it|Start chapter|Fight)')){await sleep(700);continue}
+  if(await clickText('#modal button, .gxt-end button, .gxc button, button','^(Just play|Next|Play(?!ers)|Enter the courtyard|Start|Begin|Continue|Stage|Chapter|Go|OK|Got it|Start chapter|Fight)')){await sleep(700);continue}
   // story chapter map: first available node
   const n=await p.evaluate(()=>{const e=document.querySelector('.gxc-node:not(.locked), [data-gxc-play], .gxc-stage:not(.locked)');if(e){e.setAttribute('data-e2e','1');return 1}return 0});if(n){await tapSel('[data-e2e="1"]');await p.evaluate(()=>document.querySelectorAll('[data-e2e]').forEach(e=>e.removeAttribute('data-e2e')));await sleep(700);continue}
  }

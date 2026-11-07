@@ -8,7 +8,7 @@
 .acts .gxt-menu span{font-weight:400;font-size:.78em;opacity:.85}
 .acts .gxt-menu{flex:1 1 100%;order:-1}
 .bf-bw{flex:none;display:inline-flex;width:44px;height:44px}
-@media (max-width:440px){.gxc-head{gap:4px;padding:8px 6px}.gxc-head .gxc-ib{padding:4px 21px;font-size:13px}.gxc-head .gxc-htitle{font-size:15px}}
+@media (max-width:440px){.gxc-head{gap:4px;padding:8px 6px}.gxc-head .gxc-ib{padding:4px 21px;font-size:13px}.gxc-head .gxc-htitle{font-size:15px}.gxc-head{flex-wrap:wrap}.gxc-head .gxc-htitle{order:-1;flex:1 1 100%}}
 /* ---- painted title / end banners (media.js sets the --sg-* variables; panels keep their colour if a file is missing) ---- */
 .sg-hero{flex:none;height:130px;margin:-18px -20px 0;border-radius:15px 15px 0 0;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,#fdf7ea),var(--sg-title,none) center/cover}
 @media (max-width:640px){.sg-hero{margin:-14px -14px 0}}html.ph .sg-hero{margin:-12px -14px 0}
@@ -21,6 +21,13 @@
 .sg-back{display:none}html[data-sgback] .sg-back{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-4px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.35);background:var(--sg-back,none) center/cover}
 
 /* W388 turn pill + solid backing for score pops over the score chips */
-.bf-turn{position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:21;pointer-events:none;padding:6px 18px;border-radius:999px;background:#0e1c44;color:#ffe9b0;font:800 20px var(--ff);box-shadow:0 0 0 2px #c99a3e,0 6px 16px rgba(0,0,0,.5);white-space:nowrap}
-.bf-turn.me{background:#8b2a1a;color:#fff}
+.bf-say{animation:bfSayIn .35s ease-out}@keyframes bfSayIn{from{opacity:.2;transform:translateY(4px)}to{opacity:1;transform:none}}
 .bf-pop.chip{background:rgba(10,20,50,.9);padding:2px 10px;border-radius:10px;font-size:17px}
+/* W388 audit fixes: floor numbers and projection chip darker; closed <details> children really hidden (they are laid out but unpainted, which the audit mistook for low contrast/dead buttons) */
+.bf-floor .bf-c span{color:#7d1a14}
+.bf-pj{background:#1f6d36}.bf-pj.dn{background:#a82f22}
+details:not([open])>:not(summary){display:none!important}
+html .gxc-act{background:rgba(38,22,12,.94)!important;border-image:none!important;border:1px solid #c99a3e!important;border-radius:10px}
+html .gxc-act b,html .gxc-act small{color:#fff6e0!important;opacity:1!important;text-shadow:none!important}
+/* W388 help: how a turn works, five short lines first */
+.rules .turn5{border:2px solid #c99a3e;border-radius:12px;background:#fff6dc;padding:8px 12px;margin:0 0 12px}.rules .turn5 h3{margin:0 0 4px}.rules .turn5 ol{margin:0;padding-left:22px;font-size:16px;line-height:1.35;color:#2a1608}
