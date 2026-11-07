@@ -15,3 +15,22 @@ Branch `shelf/W336-redline`. Built file `redline-rally.html` is NOT committed (o
 ## Not done / next
 Music files and the 6 upgrade pictures need generating; a Music picker drawer would need the shell; no scenario for the draft screen yet; the guide has no drag/rotation test (tap-only).
 Merge note: `next-wave/expected-assets.json` is one long line; if another branch registers too, re-run `register-assets.py` after merging instead of hand-merging.
+
+## Round 2b (owner correction: play it, shelf structure, audit)
+**Found while playing -> fixed**
+- Title was a different layout from the old games (no Story, no first-launch guide order, page scrolled, heading cut off at the top) -> rebuilt as Play / Story chapters / Guide / Quick game options (collapsed on phones) / How to play / Sound; scrollable box starts at the top.
+- No shelf shell (bar, board, dock, closable drawers) -> in-game screen is now `gx-app` with `shell.js` + `shell.css`: top bar (Lap, Place, hint bulb, Rules, Sound, Menu), board, dock with the status line and the gear / hand / Go panel; Rules is a drawer (it was a one-off popup).
+- On phones the Rules / Sound / Menu buttons were pushed out of the bar -> title hidden under 600 px, tighter buttons.
+- First click on Rules showed an empty drawer -> content is filled on every open.
+- Duplicated "How to play" heading in the drawer -> removed.
+- Result screen in a chapter never reached the campaign -> `GXC.finish(G)`; stale slipstream buttons stay in the panel after the last move (harmless, hidden by the result screen).
+- Upgrade card names under 13 px, white-on-orange buttons 3.3:1, PC text under 16 px, `data-engine="G.cars.0.eng"` threw, track-name pill clipped -> short names at 13 px, darker button gradients, 16 px text at PC width, `G.cars[0].eng`, pill hidden on phones.
+- Quick game options used a native details element whose closed contents still counted as "covered text" in the scenario audit -> own collapsible (hidden attribute).
+- World edge colour of the track fallback did not match the board -> same green.
+
+**New structure (same as the old shelf games)**: shell layout (above); Story = shared `gx-campaign.js` map with `campaign.json` (9 chapters, 3 acts, 3 bosses, twists, stars, easier offer, saved progress) + `CAMPAIGN-DESIGN.md`; guide = `gx-tutor.js` (first option on first launch, and the Story button runs it first on a first visit, then opens the map); help = `gx-help.js` bulb (Suggest hint, 5 rules cards, "How does this work?") + Rules drawer.
+
+**Tests added**: `story-test.js` (map -> chapter 1 and 2 played on real DOM clicks on phone and PC, progress saved, back to the title, 0 errors); `r2-test.js` (guide, upgrades, HUD slots); `look.js` (screenshots for a human look).
+**Not done / next**: chapters 3-9 were not played end to end (only 1-2 by test); the Grand Final low-heat and hairpin tight-limit twists are covered by the rules test only through options, not a played chapter; hints flag per chapter is not used (the hint bulb is always on); portraits are emoji (no cast art yet); music picker drawer; the title does not show a Continue button (a race is never saved).
+
+**Independent audit (scripts/ui-audit.spec.js, staged build, phone / phone-s / pc)**: A0 C0 D0 E0 F0 on all three; B1 (the lock emoji on locked chapters, drawn by the shared campaign kit, 1.8:1; the other 6 kit disc items were fixed with a dark disc override in head.html). `build-all.py --quick redline-rally` PASS (6/6 scenarios). E fix: the dock's "resize" button changed the layout mid-audit so later taps hit the canvas; the grab handle (not a button) still resizes. `story-test.js`, `r2-test.js`, `rules-test.js` PASS.

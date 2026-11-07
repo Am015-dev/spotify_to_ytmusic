@@ -24,7 +24,7 @@ function drawSetup() {
   chooser('#s-hum', [1, 2, 3].map(function (n) { return { v: n, h: n === 1 ? '1 (you)' : n + ' (pass-and-play)' }; }), 'hum');
   chooser('#s-upg', [{ v: false, h: 'Off' }, { v: true, h: 'On<small>Draft 3 upgrade cards first</small>' }], 'upg');
   chooser('#s-diff', ['easy', 'normal', 'hard'].map(function (d) { return { v: d, h: d[0].toUpperCase() + d.slice(1) }; }), 'diff');
-  var qk = $('#quick'); if (qk && !qk._set) { qk._set = 1; qk.open = innerHeight >= 880; } $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#storyLine').innerHTML = typeof campLine === 'function' ? campLine() : ''; $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title'));
+  var qt = $('#quickT'); if (qt && !qt._set) { qt._set = 1; var op = innerHeight >= 880; $('#quickBody').hidden = !op; qt.setAttribute('aria-expanded', op ? 'true' : 'false'); qt.onclick = function () { var h = !$('#quickBody').hidden; $('#quickBody').hidden = h; qt.setAttribute('aria-expanded', h ? 'false' : 'true'); }; } $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#storyLine').innerHTML = typeof campLine === 'function' ? campLine() : ''; $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title'));
 }
 function showTitle() { try { GX.close(); } catch (e) { } $('#title').hidden = false; $('#game').hidden = true; closeModal(); drawSetup(); }
 function modal(html) { var m = $('#modal'); m.innerHTML = '<div class="sheet"><button class="xb" aria-label="Close" id="mx">✕</button>' + html + '</div>'; m.hidden = false; $('#mx').onclick = closeModal; m.onclick = function (e) { if (e.target === m) closeModal(); }; artApply(m); }
@@ -112,6 +112,7 @@ function drawPlan() {
   if (!ready) setMsg(need === 0 ? 'No playable cards: tap Go.' : 'Pick ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : ''));
   else { var ci = curveInfo(); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0] + ')'; setMsg(ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': corner is safe' : ci.next ? sp + ': clear road, corner in ' + ci.next.d : sp + ': clear road', ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
   if (!ready && need === 0) $('#goB').disabled = false;
+  var dt = $('#dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · gear ' + UI.gear + ' · ' + UI.sel.length + '/' + need + ' cards';
   hud();
 }
 function cardHtml(x, sel, dead, j) {

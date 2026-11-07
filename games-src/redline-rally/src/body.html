@@ -6,7 +6,7 @@
     <button class="big" id="playB">Play &#9654;</button>
     <button class="ghostb" id="storyB">Story chapters<span id="storyLine"></span></button>
     <div id="tutSlot"></div>
-    <details class="quick" id="quick"><summary class="qh">Quick game options</summary>
+    <div class="quick" id="quick"><button type="button" class="qh qt" id="quickT" aria-expanded="false">Quick game options</button><div id="quickBody" hidden>
     <div class="lbl">Track</div>
     <div class="row" id="s-track"></div>
     <div class="lbl">Laps</div>
@@ -19,7 +19,7 @@
     <div class="row" id="s-upg"></div>
     <div class="lbl">Rival skill</div>
     <div class="row" id="s-diff"></div>
-    </details>
+    </div></div>
     <div class="row"><button class="ghostb" id="howB">How to play</button><button class="ghostb" data-snd id="sndT" aria-label="Sound"></button></div>
   </div>
 </div>
@@ -36,7 +36,7 @@
   <div class="gx-main">
     <main class="gx-board"><div id="cvw"><canvas id="cv"></canvas></div></main>
     <aside class="gx-dock" aria-label="What to do now">
-      <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Your move</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel">&#8645;</button></div>
+      <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Your move</span></div>
       <div class="gx-dock-body"><div id="msg" aria-live="polite"></div><div id="panel"></div></div>
     </aside>
     <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
