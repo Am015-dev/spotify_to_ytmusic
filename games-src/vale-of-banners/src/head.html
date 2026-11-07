@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 22V3h12l-3 4 3 4H8' fill='%23c0392b' stroke='%23f4ecd8'/%3E%3C/svg%3E">
 <style>
 /*SHELL_CSS*/
-:root{--gx-bg:#1d2a1f;--gx-bar:#16201a;--gx-panel:#f4ecd8;--gx-ink:#2a2014;--gx-accent:#d9a21b;--fs:13px;--fs2:15px;--hex:46px;--gx-sheet-h:36dvh;
+:root{--gx-bg:#1d2a1f;--gx-bar:#16201a;--gx-panel:#f4ecd8;--gx-ink:#2a2014;--gx-accent:#d9a21b;--fs:13px;--fs2:15px;--hex:46px;--gx-sheet-h:40dvh;
   --parch:#f4ecd8;--parch2:#e9dcbc;--ink:#2a2014;--river:#4f86c6;--meadow:#8fbf5a;--keep:#2f5d3a;--saffron:#d9a21b;--crimson:#c0392b}
 @media (min-width:1024px){:root{--fs:16px;--fs2:18px}}
 html,body{margin:0;height:100%;background:var(--gx-bg);color:#f4ecd8;font-size:var(--fs);overflow:hidden;-webkit-tap-highlight-color:transparent}
@@ -36,6 +36,8 @@ button{font:inherit;font-size:var(--fs)}
 .sttiles{display:flex;flex-direction:column;gap:3px;align-items:center}
 .stgoods{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;min-height:20px}
 .gchip{min-width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs);font-weight:800;color:#2a2014;border:1px solid rgba(0,0,0,.35);background-size:contain;background-repeat:no-repeat;background-position:center}
+#mk.ph .lane{grid-column:1/-1;flex-direction:row;justify-content:center;gap:8px}
+#mk.ph .lane .sttiles{flex-direction:row;gap:6px}
 /* hex tiles (DOM, clip-path) */
 .hx{width:var(--hex);height:calc(var(--hex) * 1.1547);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;cursor:pointer;border:0;padding:0;color:#2a2014;line-height:1;background-size:cover;background-position:center}
 .hx .gl{font-size:calc(var(--hex) * .42);filter:drop-shadow(0 1px 0 rgba(255,255,255,.4))}
@@ -64,7 +66,8 @@ button{font:inherit;font-size:var(--fs)}
 .och b{font-size:var(--fs)}
 .och .ban{width:12px;height:22px;clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%)}
 /* dock */
-#dockbody{padding:6px 10px 10px;display:flex;flex-direction:column;gap:8px}
+#dockbody{padding:4px 10px 10px;display:flex;flex-direction:column;gap:6px}
+@media (max-width:999px){#store{--hex:40px}.gx-dock-head{padding:2px 8px 0}.res{font-size:var(--fs);padding:2px 6px}.die{width:44px;height:44px}}
 #prompt{font-weight:700;font-size:var(--fs2);line-height:1.25}
 #chainb{display:none;background:linear-gradient(90deg,#d9a21b,#f6d36b);color:#2a2014;border-radius:8px;padding:4px 8px;font-weight:800}
 #chainb.on{display:block;animation:pop .4s ease}
