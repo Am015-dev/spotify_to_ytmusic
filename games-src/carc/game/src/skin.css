@@ -107,3 +107,4 @@ html.sk .gxc-path .gxc-lab,html.sk .gxc-path .gxc-act small,html.sk .gxc-path .g
 
 @media(max-width:400px){html.sk .seat{padding:3px 7px 3px 5px;gap:3px}html.sk #top{gap:4px}html.sk .seat .dot{width:14px;height:14px}}
 @media(max-width:380px){#left small{display:none}}
+#modal .card .opt{min-height:40px}

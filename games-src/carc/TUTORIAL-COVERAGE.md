@@ -43,3 +43,9 @@ These need extra staged tiles; next step would be a second optional chapter ("Sp
 WRONG 0, MISSING 1 (garden/abbot tiles belong to an expansion we do not have), SIMPLIFIED 4. Nothing to fix in the engine
 (W391 added no commits for this game). The simplified items are stated in the Help drawer card "House rules" (first seat always starts;
 builder extra turn counts even when its tile finishes the feature; tile art follows common open sets).
+
+## ADDENDUM 4 (coached first game): NOT done
+The tutorial is still the forced-step story prologue above (19 steps, scripted rival, every move gated). Turning it into a coached free-play game
+(free legal moves from turn 1, just-in-time guide bubbles, max 2 forced steps, "Things you'll meet later" card, scripted-free test) needs
+a rewrite of tutor.js (remove tutGate/scripted AI, event-driven coach lines from engine fx, coverage tracker) and was not started: it did not fit the time left.
+QA bot (phone) on this build: 0 blockers, 0 majors (the step 19/19 target under the top strip is fixed).

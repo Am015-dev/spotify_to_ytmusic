@@ -89,7 +89,7 @@ function tutSteps0(){
  {id:'priory_done',title:'Priory scored',say:'Eight tiles around it: 9 points! Your follower comes home.',target:tutCellsFn(RING),wait:null,onEnter:()=>{UI.user=false;refit(true)},ready:()=>!!G&&G.over&&P(0).sc.priory===9},
  {id:'final',title:'Final scoring',say:'Valley full! Your farmer scores 3 for the finished town. Unfinished roads and towns score 1 per tile.',target:tutCellsFn(['-2,-1']),also:tutCellsFn(['0,-1']),wait:null,
    onEnter:()=>tutFinalPops(),ready:()=>!!G&&G.over},
- {id:'winner',title:'Most points wins',say:()=>'You win '+P(0).score+' to '+P(1).score+'! The deeds of Vinemoor go to Garnet, and Hob wants a rematch.',target:()=>document.querySelector('#seats'),wait:null,ready:()=>!!G&&G.over}
+ {id:'winner',title:'Most points wins',say:()=>'You win '+P(0).score+' to '+P(1).score+'! The deeds of Vinemoor go to Garnet, and Hob wants a rematch.',target:()=>UI.tl['0,0'],wait:null,ready:()=>!!G&&G.over}
   ]}
 // ---------------------------------------------------------------- start, leave
 function tutSetup(){try{GXC.close()}catch(e){}closeMenu();UI.camp=null;UI.tut=true;UI.tutHold=false;UI.tutAuto=0;
