@@ -65,7 +65,7 @@ button{font:inherit;font-size:var(--fs)}
 .regline{position:absolute;pointer-events:none}
 /* opponents strip */
 #opp{position:absolute;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.och{flex:0 0 auto;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);border:2px solid transparent;border-radius:10px;padding:2px 8px;min-height:40px;color:#f4ecd8;cursor:pointer;font-size:var(--fs)}
+.och{flex:0 0 auto;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);border:2px solid transparent;border-radius:10px;padding:2px 8px;min-height:44px;color:#f4ecd8;cursor:pointer;font-size:var(--fs)}
 .och.now{border-color:#ffd23a}
 .och b{font-size:var(--fs)}
 .och .ban{width:12px;height:22px;clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%)}
@@ -144,5 +144,44 @@ html body .gxc-disc,html body .gxc-pt-e,html body .gxc-lock{color:#fff!important
 html body .gxc-lock{font-size:0!important}
 html body .gxc-lock::before{content:'\1F512';font-size:16px}
 html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
+
+/* ---- W366 phone shell: bar fits 390, 44px targets, landscape side dock, toast lane in the dock head ---- */
+:root{--gx-bar-h:48px}
+.gx-bar{overflow:visible;padding-left:8px;padding-right:8px;gap:4px}
+.gx-bar h1{flex:0 0 auto}
+#barstat{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.gx-bar h1 .tt{display:none}.gx-bar .gx-ibtn span{display:none}.gx-bar .gx-ibtn{padding:4px;min-width:44px}.gx-bar .gx-sp{flex:1 1 0;min-width:0}.gx-bar{gap:3px}}
+.tilebtn{min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
+.cell{width:calc(var(--hex) + 2px);height:max(44px,calc(var(--hex) * 1.1547))}
+.cell .hx{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+@media (max-width:999px){
+  #store{--hex:38px}.gx-dock-head{padding:3px 8px 0;min-height:24px}.gx-dock-head [data-gx="dock"]{display:none}
+  .gx-app.gx-dock-min .gx-dock{max-height:none}.gx-reopen{display:none!important}
+  #dockbody{padding:2px 10px 8px;gap:4px}#prompt{font-size:var(--fs)}.die.white{width:44px;height:44px}.res{padding:2px 6px;min-height:36px}
+  .gx-dock{max-height:var(--gx-sheet-h,40dvh)}
+}
+@media (max-width:999px) and (orientation:landscape) and (max-height:560px){
+  :root{--gx-dock-w:clamp(250px,34vw,330px);--gx-bar-h:44px}
+  .gx-main{grid-template-columns:minmax(0,1fr) var(--gx-dock-w)!important;grid-template-rows:minmax(0,1fr)!important}
+  .gx-dock{max-height:none!important;border-radius:0!important}
+  .gx-dock-head [data-gx="dock"]{display:none}.gx-grab{display:none}
+  .gx-bar{min-height:44px;padding-top:calc(2px + env(safe-area-inset-top,0px));padding-bottom:2px}
+  .gx-bar h1 .tt{display:none}.gx-bar .gx-ibtn span{display:none}
+  #dockbody{overflow:auto}
+  #mk:not(.ph) .lane{grid-column:span 2}.stall{padding:2px 1px;gap:1px}.stgoods{min-height:0}.sth{font-size:13px}
+}
+#toast{top:auto;left:auto;transform:none;border-radius:8px;text-align:center;display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:#2a2014;border:1px solid #d9a21b;max-width:none;padding:2px 8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:45}
+#toast:not(.on){visibility:hidden}
+.gx-dock-head .gx-dt.goals{overflow:visible;white-space:normal}
+.gchips{display:flex;gap:4px;flex-wrap:wrap}
+.gchip{font-size:13px;font-weight:800;line-height:1.1;padding:3px 7px;border-radius:999px;background:rgba(42,32,20,.1);border:1px solid rgba(42,32,20,.3);color:#2a2014;white-space:nowrap}
+.gchip.main{border-color:#7a4410}.gchip.ok{background:#2f5d3a;color:#fff;border-color:#2f5d3a}
+@media (min-width:1000px){.gchip{font-size:16px}}
+.gx-set-nav>*{flex:0 0 auto;white-space:nowrap;padding-left:12px;padding-right:12px}
+@media (min-width:1024px){html body .gx-drawer :is(p,span,label,button,small,li,td,th,a,div,i,b,select,input){font-size:max(16px,1em)}}
+.card.rwin{border-top:10px solid #d9a21b;background:linear-gradient(#fff3c4,var(--parch) 90px);animation:pop .5s ease}
+.card.rwin h2{color:#7a4410}.card.rwin h2::before{content:"\1F3C6  "}
+.card.rlose{border-top:10px solid #5b6770;filter:saturate(.8)}.card.rlose h2{color:#3a444c}
+.rtab td:last-child{font-weight:900}
 </style>
 </head>

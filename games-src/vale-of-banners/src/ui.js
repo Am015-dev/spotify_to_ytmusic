@@ -52,7 +52,20 @@ function hexEl(t, opt) {
   }
   return e;
 }
-function toast(msg, ms) { var t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); }, ms || 1800); }
+function toast(msg, ms) {   /* toast lane = the dock title row: it never covers score chips or the board */
+  var t = $('#toast'), hd = document.querySelector('.gx-dock-head'), r = hd && hd.getBoundingClientRect();
+  if (r && r.width) { t.style.left = (r.left + 4) + 'px'; t.style.top = (r.top + 1) + 'px'; t.style.width = (r.width - 8) + 'px'; t.style.height = Math.max(26, r.height - 2) + 'px'; }
+  t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); }, ms || 1800);
+}
+function countUp(tb) {   /* totals tick up from 0 so the result lands as a beat (instant with fast / reduced motion) */
+  if (UI.fast || document.documentElement.classList.contains('gx-reduce')) return;
+  [].slice.call(tb.querySelectorAll('td:last-child')).forEach(function (td) { var n = +td.textContent, t0 = Date.now(); td.textContent = '0'; (function f() { var k = Math.min(1, (Date.now() - t0) / 900); td.textContent = String(Math.round(n * k)); if (k < 1) requestAnimationFrame(f); })(); });
+}
+function toastPos() {
+  var t = $('#toast'), hd = document.querySelector('.gx-dock-head'), r = hd && hd.getBoundingClientRect();
+  if (r && r.width) { t.style.left = (r.left + 4) + 'px'; t.style.top = (r.top + 1) + 'px'; t.style.width = (r.width - 8) + 'px'; t.style.height = Math.max(26, r.height - 2) + 'px'; }
+}
+function toastOff() { clearTimeout(toast.t); $('#toast').classList.remove('on'); }
 function me() { return G.P[UI.view]; }
 function isHuman(s) { return G.seats[s] && G.seats[s].human; }
 function myTurn() { return G && !G.over && isHuman(VB.actor(G)) && !UI.busy && !tvOpen(); }
@@ -77,7 +90,7 @@ function movesWhere(f) { return VB.validMoves(G).filter(function (m) { return f(
 var L = {};
 function layout() {
   var b = $('#bd'), W = b.clientWidth, H = b.clientHeight; if (!W || !H) return;
-  var oppH = 46, pad = 6, n = G ? VB.depotSize(G) : 2;
+  var oppH = H < 420 ? 44 : 50, pad = 6, n = G ? VB.depotSize(G) : 2;
   var wide = W > H * 1.15;
   var mk = $('#mk'), es = $('#es'), opp = $('#opp'); mk.classList.toggle('ph', !wide); var two = !wide && n > 2; mk.classList.toggle('two', two);
   opp.style.cssText = 'left:' + pad + 'px;top:' + pad + 'px;right:' + pad + 'px;height:' + (oppH - 6) + 'px';
@@ -111,6 +124,7 @@ function render() {
   if (!G) return;
   layout(); renderBar(); renderOpp(); renderMarket(); fitEstate(); renderEstate(); renderDock(); renderScores();
   try { artApply(); } catch (e) { }
+  toastPos();
   try { GXH.phase(myTurn() && !UI.camp || myTurn() ? helpPhase() : null); } catch (e) { }
 }
 function renderBar() {
@@ -180,7 +194,9 @@ function renderEstate(box, seat, s) {
 function renderDock() {
   var a = VB.actor(G), p = G.over ? me() : G.P[isHuman(a) ? a : UI.view], top = pend(), mt = myTurn();
   if (!G.over && isHuman(a)) UI.view = a;
-  $('#docktitle').textContent = G.over ? 'Game over' : isHuman(a) ? (G.seats.filter(function (s) { return s.human; }).length > 1 ? G.seats[a].name + ': your turn' : 'Your turn') : G.seats[a].name + ' is playing';
+  var gc = !G.over && goalChips(), dt = $('#docktitle');
+  if (gc) { dt.innerHTML = ''; dt.appendChild(gc); dt.classList.add('goals'); } else dt.classList.remove('goals');
+  if (!gc) dt.textContent = G.over ? 'Game over' : isHuman(a) ? (G.seats.filter(function (s) { return s.human; }).length > 1 ? G.seats[a].name + ': your turn' : 'Your turn') : G.seats[a].name + ' is playing';
   $('#prompt').textContent = promptText();
   var cb = $('#chainb'); if (UI.chain > 1 && mt) { cb.textContent = 'Chain ×' + UI.chain + '! Keep building'; cb.classList.add('on'); } else cb.classList.remove('on');
   /* dice */
@@ -209,10 +225,12 @@ function renderDock() {
   });
   /* resources */
   var rr = $('#resrow'); rr.innerHTML = '';
-  rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'data-engine': 'silver' }, [h('i', { text: '🪙' }), String(p.silver)]));
-  rr.appendChild(h('span.res', { id: 'r-workers', title: 'Workers' }, [h('i', { text: '👷' }), String(p.workers)]));
-  rr.appendChild(h('span.res', { id: 'r-vp', title: 'Points' }, [h('i', { text: '⭐' }), String(p.vp)]));
-  rr.appendChild(h('span.res', { title: 'Banner track' }, [h('i', { text: '🚩' }), String(p.pos)]));
+  var RESTIP = { silver: 'Silver coins: buy from the back lane; each is a point at the end.', workers: 'Workers: spend to bend a die up or down by one.', vp: 'Victory points scored so far.', pos: 'Banner track: barges move your banner along it for bonuses.' };
+  function resTap(k) { return function () { toast(RESTIP[k], 2600); }; }
+  rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'aria-label': RESTIP.silver, onclick: resTap('silver'), 'data-engine': 'silver' }, [h('i', { text: '🪙' }), String(p.silver)]));
+  rr.appendChild(h('span.res', { id: 'r-workers', title: 'Workers', 'aria-label': RESTIP.workers, onclick: resTap('workers') }, [h('i', { text: '👷' }), String(p.workers)]));
+  rr.appendChild(h('span.res', { id: 'r-vp', title: 'Points', 'aria-label': RESTIP.vp, onclick: resTap('vp') }, [h('i', { text: '⭐' }), String(p.vp)]));
+  rr.appendChild(h('span.res', { title: 'Banner track', 'aria-label': RESTIP.pos, onclick: resTap('pos') }, [h('i', { text: '🚩' }), String(p.pos)]));
   /* actions */
   var ac = $('#acts'); ac.innerHTML = '';
   if (G.over) { ac.appendChild(h('button.btn', { type: 'button', id: 'resB', text: 'See the result', onclick: showResult })); return; }
@@ -242,7 +260,7 @@ function promptText() {
 }
 function renderScores() {
   var b = $('#scorebody'); if (!b) return; b.innerHTML = '';
-  var tb = h('table'); tb.appendChild(h('tr', {}, ['Player', 'Points', 'Silver', 'Workers', 'Land', 'Track'].map(function (x) { return h('th', { text: x }); })));
+  var tb = h('table.rtab'); tb.appendChild(h('tr', {}, ['Player', 'Points', 'Silver', 'Workers', 'Land', 'Track'].map(function (x) { return h('th', { text: x }); })));
   G.order.forEach(function (s) { var p = G.P[s]; tb.appendChild(h('tr', {}, [G.seats[s].name, p.vp, p.silver, p.workers, VB.estateFilled(p) + '/37', p.pos].map(function (x) { return h('td', { text: String(x) }); }))); });
   b.appendChild(tb);
   b.appendChild(h('p.tip', { text: 'Turn order follows the banner track: Barges move you up. Coming goods this season: ' + (G.rg.filter(Boolean).map(function (g) { return VB.GOODS[g]; }).join(', ') || 'none') + '.' }));
@@ -336,7 +354,7 @@ function showSeat(s) {
   if (lore.length) d.appendChild(h('p', { text: 'Lore: ' + lore.join(', ') }));
   var box = h('div.minies'); d.appendChild(box);
   var w = Math.min(460, innerWidth - 60); renderEstate(box, s, w / (7 * 1.732 + 0.4));
-  GX.drawer('seatd', G.seats[s].name + "'s estate"); GX.show('seatd');
+  GX.drawer('seatd', s === 0 && G.seats[0].human ? 'Your estate' : G.seats[s].name + (/s$/i.test(G.seats[s].name) ? "' estate" : "'s estate")); GX.show('seatd');
 }
 
 /* ---------------- moves, animation ---------------- */
@@ -422,19 +440,27 @@ function startGame(o) {
   UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1;
   $('#start').hidden = true; $('#rs').hidden = true; $('#tv').hidden = true;
   try { GXH.setEnabled(o.hints !== false && (UI.mode !== 'story' || !!o.hints)); } catch (e) { }
-  save(); render(); musSync(); sfx('dice'); toast(VB.PHASES[0] + ' begins: roll the dice!', 1600); schedule();
+  save(); render(); musSync(); sfx('dice'); toast(VB.PHASES[0] + ' begins: new dice for everyone', 1600); schedule();
 }
 function resume() { try { G = JSON.parse(localStorage.getItem('vob_save')); } catch (e) { G = null; } if (!G) return showTitle(); UI.mode = 'quick'; UI.camp = false; UI.busy = false; $('#start').hidden = true; render(); musSync(); schedule(); }
 function gameOver() { try { localStorage.removeItem('vob_save'); } catch (e) { } musSync(); showResult(); }
 function showResult() {
-  var rs = $('#rs'); rs.innerHTML = ''; var c = h('div.card', { role: 'dialog', 'aria-label': 'Result' });
-  var w = G.winner, you = G.seats.filter(function (s) { return s.human; }).length === 1;
+  var rs = $('#rs'); toastOff(); rs.innerHTML = ''; var c = h('div.card', { role: 'dialog', 'aria-label': 'Result' });
+  var w = G.winner, you = G.seats.filter(function (s) { return s.human; }).length === 1; c.classList.add(w === 0 || !you ? 'rwin' : 'rlose'); setTimeout(function () { sfx(w === 0 ? 'score' : 'bad'); }, 150);
   c.appendChild(h('div', { 'data-art': w === 0 && you ? 'ui-result-win' : 'ui-result-lose', style: 'height:8px' }));
   c.appendChild(h('h2', { text: you ? (w === 0 ? 'Your banner flies highest!' : G.seats[w].name + ' wins the valley') : G.seats[w].name + ' wins!' }));
-  var tb = h('table'); tb.appendChild(h('tr', {}, ['', 'Play', 'Silver', 'Workers', 'Goods', 'Lore', 'Total'].map(function (x) { return h('th', { text: x }); })));
+  var tb = h('table'); tb.appendChild(h('tr', {}, ['', 'Board', 'Silver', 'Workers', 'Goods', 'Lore', 'Total'].map(function (x) { return h('th', { text: x }); })));
   G.rank.forEach(function (s) { var p = G.P[s], e = p.end || { silver: 0, workers: 0, goods: 0, lore: 0 }; tb.appendChild(h('tr', {}, [G.seats[s].name, p.vpPlay, e.silver, e.workers, e.goods, e.lore, p.vp].map(function (x) { return h('td', { text: String(x) }); }))); });
   c.appendChild(tb);
-  var p0 = G.P[0]; c.appendChild(h('p.tip', { text: 'You finished ' + p0.stat.regions + ' regions, sold ' + p0.stat.sales + ' times and chained ' + p0.stat.chain + ' builds.' }));
+  var p0 = G.P[0]; var pl = function (n, a, b) { return n + ' ' + (n === 1 ? a : b); };
+  c.appendChild(h('p.tip', { text: 'You finished ' + pl(p0.stat.regions, 'region', 'regions') + ', sold ' + pl(p0.stat.sales, 'time', 'times') + ' and chained ' + pl(p0.stat.chain, 'build', 'builds') + '.' }));
+  var cd = null; try { cd = UI.camp && GXC.active(); } catch (e) { }
+  if (cd) {   /* Story: say which goal decided the chapter and which star goals were met */
+    var M = metrics(G), ok0 = false; try { ok0 = !!GXC.isWonNow ? GXC.isWonNow(G, cd) : (M.won && testOk(cd.stars[0].test, M)); } catch (e) { }
+    c.appendChild(h('p', { style: 'font-weight:800;margin:8px 0 2px', text: ok0 ? 'Chapter won: ' + cd.goal.text.replace(/\.$/, '') + ' ✓' : 'Chapter lost: ' + cd.goal.text.replace(/\.$/, '') + ' ✗  (you must win the game; stars count only when you win)' }));
+    var ul = h('ul', { style: 'margin:2px 0;padding-left:20px' }); cd.stars.forEach(function (st, i) { var g = testOk(st.test, M); ul.appendChild(h('li', { text: (g ? '★ ' : '☆ ') + st.text + (g ? ' - met' : ' - not met') + (i === 0 ? ' (the chapter goal)' : '') })); });
+    c.appendChild(ul);
+  }
   var ac = h('div.acts', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:10px' });
   if (UI.camp && typeof GXC !== 'undefined' && GXC.active()) ac.appendChild(h('button.btn', { type: 'button', id: 'campfin', text: 'Continue the story', onclick: function () { rs.hidden = true; try { GXC.finish(G); } catch (e) { console.error(e); } } }));
   else ac.appendChild(h('button.btn', { type: 'button', id: 'again', text: 'Play again', onclick: function () { startGame(UI.lastOpts || {}); } }));
@@ -506,7 +532,7 @@ function drawers() {
       game: function (S) {
         S.appendChild(GX.row('This game', [
           h('button.btn.alt', { type: 'button', text: 'Rules', onclick: function () { GX.show('rulesd'); } }),
-          h('button.btn.alt', { type: 'button', text: 'Tutorial', onclick: function () { GX.close(); tutStart(); } }),
+          h('button.btn.alt', { type: 'button', text: 'Tutorial', onclick: function (e) { var b = e.currentTarget; if (G && !G.over && !b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Leave this game? Tap again'; return; } GX.close(); tutStart(); } }),
           h('button.btn.alt', { type: 'button', text: 'Restart', onclick: function () { GX.close(); if (UI.camp && GXC.active()) { var d = GXC.active(); startChapter(d); } else startGame(UI.lastOpts || {}); } }),
           h('button.btn.alt', { type: 'button', text: 'Title', onclick: function () { GX.close(); showTitle(); } })]));
       },
@@ -589,16 +615,31 @@ function startChapter(def) {
 }
 function metrics(G) {
   var p = G.P[0], best = 0; G.P.forEach(function (q, i) { if (i) best = Math.max(best, q.vp); });
-  return { won: G.winner === 0, score: p.vp, margin: p.vp - best, regions: p.stat.regions, land: VB.estateFilled(p), sales: p.stat.sales, chain: p.stat.chain, silver: p.silver };
+  return { won: G.winner === 0, score: p.vp, margin: p.vp - best, regions: p.stat.regions, land: VB.estateFilled(p), sales: p.stat.sales, chain: p.stat.chain, silver: p.silver, winSales: G.winner === 0 ? p.stat.sales : 0, winChain: G.winner === 0 ? p.stat.chain : 0 };
 }
 function testOk(t, M) { if (!t) return true; var v = M[t.k], op = t.op || '>=', x = t.v; if (x == null) return !!v; return op === '>=' ? v >= x : op === '<=' ? v <= x : op === '>' ? v > x : op === '<' ? v < x : v === x; }
+
+/* live chapter goals: chips in the dock title row (Story only), with counters */
+var GSHORT = { won: 'Win', sales: 'Sold', land: 'Built', score: 'Score', chain: 'Chain', regions: 'Regions', margin: 'Lead', winSales: 'Sold', winChain: 'Chain' };
+function goalChips() {
+  var d = null; try { d = UI.camp && GXC.active(); } catch (e) { } if (!d || !G) return null;
+  var M = metrics(G), wrap = h('span.gchips', { 'aria-label': 'Chapter goals' });
+  d.stars.forEach(function (s, i) {
+    var t = s.test, cur = M[t.k], ok = testOk(t, M), lab = GSHORT[t.k] || 'Goal', txt;
+    if (t.k === 'won') txt = ok ? 'Winning' : 'Behind'; else { txt = lab + ' ' + Math.max(cur, t.k === 'margin' ? -99 : 0) + '/' + t.v; if (t.k === 'winSales' || t.k === 'winChain') { M = metrics(G); txt = lab + ' ' + (t.k === 'winSales' ? M.sales : M.chain) + '/' + t.v + ' + win'; } }
+    var okNow = (t.k === 'winSales' || t.k === 'winChain') ? (M[t.k === 'winSales' ? 'sales' : 'chain'] >= t.v && M.margin > 0) : ok;
+    wrap.appendChild(h('span.gchip' + (okNow ? '.ok' : '') + (i === 0 ? '.main' : ''), { title: (i === 0 ? 'Chapter goal: ' : 'Star goal: ') + s.text, text: (okNow ? '✓ ' : (i === 0 ? '◆ ' : '☆ ')) + txt }));
+  });
+  return wrap;
+}
 function storyInit() {
   try {
     GXC.init({
       game: 'vale-of-banners', data: window.CAMPAIGN, startChapter: startChapter,
       isWon: function (G, def) { var M = metrics(G), g = def.goal || {}; var base = g.winNotNeeded ? true : M.won;
-        if (g.type === 'score') return M.won && M.score >= g.value; if (g.type === 'margin') return M.margin >= g.value;
-        if (g.type === 'custom') return base && testOk(def.stars[0].test, M); return base && testOk(def.stars[0].test, M); },
+        /* ONE rule for every chapter: you must win the game AND meet the chapter goal (= first star) */
+        if (g.type === 'score') return M.won && M.score >= g.value; if (g.type === 'margin') return M.won && M.margin >= g.value;
+        return M.won && testOk(def.stars[0].test, M); },
       metrics: metrics,
       portrait: function (who) { var st = String(who || ''); if (st.indexOf('portrait-') !== 0 && st.indexOf('boss-') !== 0) st = 'portrait-' + st; return ART.img[st] ? 'media/' + st + '.webp' : null; },
       onExit: function () { showTitle(); },
