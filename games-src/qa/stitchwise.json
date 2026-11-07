@@ -8,12 +8,15 @@
   "note": "no tutorial"
  },
  "quick": {
-  "result": null
+  "result": "cap",
+  "clicks": 1210
  },
  "story": {
-  "result": null
+  "result": false
  },
- "fuzz": {},
+ "fuzz": {
+  "taps": 300
+ },
  "bugs": [
   {
    "sev": "MINOR",
@@ -30,7 +33,151 @@
    "desc": "no tutorial entry on the title screen (no learn/guided/tutorial button): game has no staged tutorial",
    "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases tutorial",
    "shot": "/tmp/qa-shots/stitchwise/phone-tut-noentry-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Patches\" under div#start.ov \"Stitchwise A quilting du\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases quick",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-title-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Patches\" under div#start.ov \"Quick game Pick your opp\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases quick",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-quick-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #1210 (Player 1 1 income +5)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1210 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases quick",
+   "shot": "/tmp/qa-shots/stitchwise/phone-quick-noresult-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "tap target 26px (<40) button.gx-x.gclose x1: \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-map-9.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "story map",
+   "desc": "no stage 1 / start element on the Story map",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-story-nomap-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Patches\" under div#start.ov \"Stitchwise A quilting du\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-title-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 26px (<40) button.gx-x.gclose x1: \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pstrip \"Marden 2 income +1\" / button.gx-x \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) button.gx-chip x6: \"Game\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 28px (<40) input x3: \"Master volume\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.offer.can \"Wave Patch 3 cost 2 time\" / button.gx-sb \"Slow\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.offer.can \"Ruler Strip 4 cost 2 tim\" / button.gx-sb \"Normal\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.offer.can \"Hook Patch 4 cost 6 time\" / button.gx-sb \"Off\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-chip \"Game\" / button.btn.alt.sm \"Rules\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "element outside viewport button.gx-sb x3 rect 43,-43,100,1: \"Slow\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-ibtn \"Patches\" / button.gx-sb \"Fast\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.btn.adv.grow \"Advance +1 button\" / a.gx-chip \"Credits & licences\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-chip \"Game\" / button.gx-sb \"Slow\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-15.png"
   }
  ],
- "secs": 8
+ "secs": 286
 }
