@@ -124,3 +124,55 @@ function showEndBoard() {
   f.appendChild(h('button.endb.' + (G.result.win ? 'win' : 'lose'), { type: 'button', 'data-a': 'lookpanel', 'aria-label': endWords() + '. Tap to look at the panel.' }, h('b', endWords())));
 }
 function lookPanel() { if (typeof pxClearEnd === 'function') pxClearEnd(); const b = $('#fx .endb'); if (b) b.classList.add('small'); render(); }
+// ---------- playable layer: turn banner, the rival's caption, tap to speed up (owner, 7 Nov 2026). TEST: ../playable-test.js ----------
+// Every turn is a short sequence: banner ("Your turn" / "<Rival>'s turn") -> one instruction line (phPrompt) -> glowing targets -> the move animates -> a caption says why.
+(function () {
+  const st = document.createElement('style');
+  st.textContent = '.tbn{position:absolute;left:0;right:0;margin:0 auto;width:max-content;top:6px;transform:translateY(-14px);z-index:12;pointer-events:none;opacity:0;min-width:150px;max-width:calc(100% - 24px);text-align:center;padding:6px 16px;border-radius:14px;color:#fff;border:2px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.45);transition:opacity .22s,transform .22s}' +
+    '.tbn.in{opacity:1;transform:none}.tbn.out{opacity:0;transform:translateY(-14px)}' +
+    '.tbn b{display:block;font-size:19px;line-height:1.2;font-weight:900}.tbn span{display:block;font-size:14px;line-height:1.25;font-weight:700;margin-top:1px}' +
+    '.tbn.me{background:#1d4f9a}.tbn.rv{background:#a24a0b}.tbn.cap{background:#1b2230}' +
+    '.fa-por{flex:0 0 40px;width:40px;height:40px;border-radius:50%;border:2px solid var(--fa-pc,#2f4f7a);background:var(--fa-pc,#2f4f7a) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;overflow:hidden}' +
+    '.fa-react{position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:9990;pointer-events:none;display:flex;gap:10px;align-items:center;width:max-content;max-width:min(344px,calc(100vw - 20px));padding:8px 14px 8px 10px;border-radius:14px;background:#1b2230;color:#fff;border:2px solid #ffd46b;font-size:15px;line-height:1.3;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.5);animation:fa-rin .25s ease-out both}' +
+    '.fa-react.out{opacity:0;transition:opacity .3s}@keyframes fa-rin{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}' +
+    'html .gxh-bub .gxh-tx{font-size:14.5px;line-height:1.3}html .gxh-bub .gxh-tt{font-size:15px}' +
+    '@media (prefers-reduced-motion:reduce){.tbn,.fa-react{transition:none;animation:none}}';
+  document.head.appendChild(st);
+})();
+const TB = { t: 0, t2: 0, key: '' };
+function tbShow(title, sub, cls, ms) {
+  const f = fxLayer(); if (!f) return; let e = f.querySelector('.tbn'); if (!e) { e = h('div.tbn', { 'aria-hidden': 'true' }); f.appendChild(e); }
+  e.className = 'tbn ' + cls; e.innerHTML = ''; e.appendChild(h('b', title)); if (sub) e.appendChild(h('span', sub));
+  void e.offsetWidth; e.classList.add('in'); clearTimeout(TB.t); if (ms) TB.t = setTimeout(() => e.classList.add('out'), ms);
+}
+function tbHide() { clearTimeout(TB.t); clearTimeout(TB.t2); const e = $('#fx .tbn'); if (e) e.classList.add('out'); }
+const tbHuman = s => !G.ai[s] && mayAct(s);
+function tbTurn(delay) {
+  clearTimeout(TB.t2);
+  if (!G || G.result || !UI.started || G.phase !== 'place' || G.pend) return;
+  const s = G.turn, key = G.round + '|' + s + '|' + Object.keys(G.slots).length;
+  if (key === TB.key) return; TB.key = key;
+  const mine = tbHuman(s), hot = UI.mode === 'hot';
+  TB.t2 = setTimeout(() => {
+    if (!G || G.result || G.phase !== 'place' || G.pend || G.turn !== s) return;
+    if (document.querySelector('.gxh-bub')) { TB.key = ''; return; }
+    if (mine) tbShow(hot ? name(s) + "'s turn" : 'Your turn', phPrompt(), 'me', 1700);
+    else tbShow(name(s) + "'s turn", 'Tap to speed up', 'rv', 0);
+  }, delay || 0);
+}
+// the rival's move: a caption with the reason, then the next turn's banner
+// called by commit (ui3.js) after every applied move
+function tbAfter(seat, m) {
+  if (tutOn()) return;
+  if (G.result) { tbHide(); return; }
+  if (G.ai[seat] && m && m.t === 'place') { const chip = UI.chip && UI.chip.text; tbShow(name(seat) + ' used ' + slotName(m.to), chip || '', 'cap', 1500); tbTurn(1600); }
+  else tbTurn(0);
+}
+// tap anywhere on the board while the computer is thinking: it moves now
+document.addEventListener('pointerdown', e => {
+  try {
+    if (!G || !UI.started || G.result || UI.mode === 'net' || !e.target.closest || !e.target.closest('#bd') || tutOn()) return;
+    if (!FA.pending(G).some(s => G.ai[s]) || !UI.tm) return;
+    const a = AIDELAY; AIDELAY = 60; try { schedule(); } finally { AIDELAY = a; }
+  } catch (er) { }
+}, true);

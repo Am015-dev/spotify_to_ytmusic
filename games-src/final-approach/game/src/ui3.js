@@ -33,6 +33,7 @@ function commit(seat, m) {
   sfxFor(m, was); UI.sel = -1; UI.cof = 0; UI.hint = null; if (m.t === 'rrpick') UI.rrm = [false, false, false, false];
   if (G.round !== was.round) { UI.rt = G.mods.real ? { left: 60000, last: 0 } : null; UI.sel = -1; }
   saveGame(); if (typeof netPush === 'function') netPush(); coachTick(); render(); schedule();
+  try { tbAfter(seat, m); } catch (e) { console.warn('tb', e); }   // turn banner + the rival's caption (part 14)
   return true;
 }
 function sfxFor(m, was) {

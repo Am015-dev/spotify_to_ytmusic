@@ -42,7 +42,7 @@ const planeAt = () => G.planes.findIndex(n => n > 0) + 1;
 const placeStep = (id, title, say, round, n, d, k, extra) => Object.assign({ id, title, say, target: tSlot(k), also: tDie(0, d), from: tDie(0, d),
   wait: { type: 'drag', match: a => a.what === 'slot' && a.ok && a.k === k }, ready: () => myMove(round, n) && tutPick(d) }, extra || {});
 function tutSteps() {
-  return [
+  return tutStory([
     { id: 'plane', title: 'Land together', say: () => 'You and ' + rival() + ' fly one plane. Reach the airport, then land. You win or crash together.', target: tq('#pz .w.appr'), wait: null, ready: () => G && G.phase === 'brief' },
     { id: 'goal', title: 'Landing checklist', say: 'To land: no planes ahead, gear and flaps down, axis level, speed within the brakes.', target: tq('#goal'), wait: null, ready: () => G && G.phase === 'brief' },
     { id: 'seats', title: 'Hidden dice', say: () => 'You are the blue Pilot: only you see your dice. ' + rival() + ', the orange Co-pilot, hides his.', target: tq('#pz .tray.p'), also: tq('#pz .tray.c'), wait: null, ready: () => G && G.phase === 'brief' },
@@ -72,14 +72,14 @@ function tutSteps() {
     { id: 'flaps', title: 'The Co-pilot’s job', say: () => 'Flaps are ' + rival() + '’s: four spaces, in order. Each flap or gear lifts a speed marker.', target: tSlot('fl3'), wait: null, ready: () => myMove(1, 6) && !!G.slots.fl3 },
     placeStep('engines2', 'Landing speed', () => 'The plane stops now. Speed is your ' + dv(3) + ' plus ' + rival() + '’s ' + G.slots.en1.v + ' = ' + (dv(3) + G.slots.en1.v) + ', within the brakes ' + FA.brakeVal(G) + '.', 1, 6, 3, 'en0'),
     { id: 'landed', title: 'Landed!', say: 'Track clear, gear and flaps down, axis level, speed within the brakes. You landed together.', target: tq('#pz .w.appr'), wait: null, ready: () => !!(G && G.result && G.result.win) }
-  ];
+  ]);
 }
 // ---------------------------------------------------------------- the kit hooks
 function tutStart(o) {
   if (typeof GXT === 'undefined') return;
   const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'You know the rules', endText: pro ? 'Axis, engines, radio, gear, flaps, brakes, coffee, rerolls. Now flight school begins.' : 'Axis, engines, radio, gear, flaps, brakes, coffee, rerolls. Real flights add fuel, wind and more.',
+    endTitle: (TS() && TS().end.title) || 'You know the rules', endText: TS() ? TS().end.text : pro ? 'Axis, engines, radio, gear, flaps, brakes, coffee, rerolls. Now flight school begins.' : 'Axis, engines, radio, gear, flaps, brakes, coffee, rerolls. Real flights add fuel, wind and more.',
     endButtons: pro && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
     setup: () => { try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 450);
       closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true }); },
@@ -122,4 +122,50 @@ function tutOffer() {
     if (tutOn()) { if (!GXT.act({ type: 'tap', what: 'act', a, c: t && t.dataset && t.dataset.c != null ? +t.dataset.c : 0 })) return; if (a === 'rr') UI.rrAsk = true; }
     return o(a, t);
   };
+})();
+// ---------------------------------------------------------------- the tutorial as a story
+const TS = () => (window.CAMPAIGN && window.CAMPAIGN.tutorial) || null;
+function tsCast(id) { const C = window.CAMPAIGN.cast; return C[id] || C.chief; }
+function tsFill(t) {
+  const d = i => (G && G.dice && G.dice[0][i]) ? G.dice[0][i].v : '?', en1 = G && G.slots && G.slots.en1 ? G.slots.en1.v : '?';
+  const x = { rival: name(1), d0: d(0), d1: d(1), d2: d(2), d3: d(3), en1, ax1: G && G.slots && G.slots.ax1 ? G.slots.ax1.v : '?', planeAt: G ? planeAt() : '?',
+    sumE: typeof en1 === 'number' ? en1 + d(1) : '?', aeroB: G ? G.pl.aeroB : '?', aeroO: G ? G.pl.aeroO : '?', tilt: G ? Math.abs(G.pl.axis) : '?', tdir: G && G.pl.axis < 0 ? 'left' : 'right', brake: G ? FA.brakeVal(G) : '?' };
+  return String(t).replace(/\{(\w+)\}/g, (m, k) => x[k] != null ? String(x[k]) : m);
+}
+function tsPortrait(who) {
+  const c = tsCast(who), e = h('span.fa-por', { 'aria-hidden': 'true' }); e.style.setProperty('--fa-pc', c.color || '#2f4f7a');
+  if (c.portrait) e.style.backgroundImage = 'url(media/' + c.portrait + ')';
+  e.textContent = c.emoji || '';   // the emoji sits under the painting until it loads (or stays when there is none)
+  return e;
+}
+function tsReact(text, who) {
+  $$('.fa-react').forEach(e => e.remove());
+  const e = h('div.fa-react', { 'aria-hidden': 'true' }, tsPortrait(who || 'chief'), h('span', text)); document.body.appendChild(e);
+  setTimeout(() => e.classList.add('out'), 2300); setTimeout(() => { try { e.remove(); } catch (er) { } }, 2700);
+}
+// adds the chapter openers and the story text (campaign.json "tutorial") to the staged-flight steps; every step keeps its action
+function tutStory(steps) {
+  const T = TS(); if (!T) return steps; const out = [];
+  steps.forEach(s => {
+    const ch = T.chapters.find(c => c.before === s.id);
+    if (ch) out.push({ id: ch.id, title: ch.title.replace(/^Chapter \d: /, ''), say: ch.beat.join(' '), target: tq('#pz .w.appr'), wait: null, chap: ch.title,
+      ready: () => !!G && !G.result && G.round === ch.round && (ch.n == null ? G.phase === 'brief' && !G.ready[0] : myMove(ch.round, ch.n)) });
+    const d = T.steps[s.id];
+    if (d) {
+      if (d.title) s.title = d.title;
+      if (d.say) { const t = d.say; s.say = () => tsFill(t); }
+      if (d.react) { const od = s.onDone; s.onDone = () => { if (od) od(); tsReact(tsFill(d.react), d.who); }; }
+    }
+    out.push(s);
+  });
+  return out;
+}
+// the speaker's portrait sits in every tutorial bubble
+(function () {
+  const ob = new MutationObserver(() => {
+    const b = document.querySelector('.gxt-bub:not([data-por])'); if (!b) return; b.setAttribute('data-por', '1');
+    const T = TS(), id = b.dataset.step; if (!T) return;
+    const ch = T.chapters.find(c => c.id === id), who = ch ? ch.who : 'chief', bd = b.querySelector('.gxh-bd'); if (bd) bd.insertBefore(tsPortrait(who), bd.firstChild);
+  });
+  ob.observe(document.body, { childList: true, subtree: true });
 })();
