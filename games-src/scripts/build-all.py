@@ -38,6 +38,7 @@ GAMES = {
     "thornbound":       ("thornbound/game",      "python3 build.py", "thornbound.html"),
     "tidewake":         ("tidewake/game",        "python3 build.py", "tidewake.html"),
     "twin-thrones":     ("twin-thrones",         "python3 build.py", "twin-thrones.html"),
+    "vinegrave":        ("vinegrave",            "python3 build.py", "vinegrave.html"),
     "wildmark":         ("wildmark",             "python3 build.py", "wildmark.html"),
 }
 
@@ -61,6 +62,7 @@ SWEEPS = {
     "thornbound":       ("thornbound/game",     ["sweep.js"]),
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
     "twin-thrones":     ("twin-thrones",        ["rules-test.js"]),
+    "vinegrave":        ("vinegrave",           ["rules-test.js"]),
     "wildmark":         ("wildmark",            ["rules-test.js"]),
 }
 PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
