@@ -1,9 +1,9 @@
 // Real-input smoke + playthrough: node smoke.js [WxH] [--full] [--anim] [--story] [--tut]
 // Taps the real buttons (touch on phones, mouse on desktop). Default: title -> quick game -> 3 turns -> forced end -> result.
-// --full: plays a whole game to the result screen. --story: story map + stage 1 played to its result. --tut: walks the tutorial.
+// --story2: Story stage 1 lost on purpose, retry, won, stage 2: result screens, scores, stars. --full: plays a whole game to the result screen. --story: story map + stage 1 played to its result. --tut: walks the tutorial.
 const { chromium } = require('playwright'); const path = require('path'), fs = require('fs');
-const A = process.argv.slice(2), sz = (A.find(a => /^\d+x\d+$/.test(a)) || '390x763').split('x').map(Number), FULL = A.includes('--full'), STORY = A.includes('--story'), TUT = A.includes('--tut'), ANIM = A.includes('--anim');
-const OUT = path.join(__dirname, 'shots'); fs.mkdirSync(OUT, { recursive: true }); let fails = 0; const log = [];
+const A = process.argv.slice(2), sz = (A.find(a => /^\d+x\d+$/.test(a)) || '390x763').split('x').map(Number), FULL = A.includes('--full'), STORY = A.includes('--story'), TUT = A.includes('--tut'), STORY2 = A.includes('--story2'), ANIM = A.includes('--anim');
+const OUT = path.join(__dirname, 'shots'); fs.mkdirSync(OUT, { recursive: true }); let fails = 0, BAD = false; const log = [];
 const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.push(m); };
 (async () => {
   const b = await chromium.launch({ executablePath: process.env.PW_CHROME || '/opt/pw-browsers/chromium', args: ['--no-sandbox'] }); const touch = sz[0] < 900;
@@ -25,6 +25,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
   async function turn() { // one human turn by real taps; returns what was done
     await waitMe(); if (await pg.evaluate(() => G.over)) return 'over';
     if (await pg.evaluate(() => !!G.pend)) { const c = await pg.evaluate(() => G.board[0].findIndex(v => v === -1)); const cells = await pg.$$('#quilt .qc'); await tap(cells[c]); return 'leather'; }
+    if (BAD) { await tapSel('[data-a=adv]'); return 'adv'; }
     const pick = await pg.evaluate(() => { const m = aiMove(G, 'hard', () => .5); return m.t === 'buy' ? m.k : -1; });
     if (pick >= 0) {
       const offers = await pg.$$('#offers .offer'); await tap(offers[pick]); await pg.waitForSelector('#ghost', { timeout: 3000 });
@@ -35,7 +36,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
     await tapSel('[data-a=adv]'); return 'adv';
   }
   await pg.goto(base); await pg.waitForTimeout(500);
-  if (!TUT && !STORY) {
+  if (!TUT && !STORY && !STORY2) {
     await tapSel('[data-a=quick]'); await pg.waitForTimeout(150); await pg.click('text=Normal computer'); await pg.waitForTimeout(300);
     ok(await pg.evaluate(() => !!G && UI.started), 'game started from the title');
     const kinds = []; let n = 0;
@@ -77,6 +78,43 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
     await pg.waitForTimeout(2500); await pg.screenshot({ path: path.join(OUT, tag + '-story-c1.png') });
     const pr = await pg.evaluate(() => GXC.progress()); ok(pr && pr.ch && pr.ch.c1 && pr.ch.c1.tries >= 1, 'story progress saved after stage 1: ' + JSON.stringify(pr && pr.ch && pr.ch.c1));
   }
+  if (STORY2) {   // Story stage 1 LOST on purpose (only Advance), retry, stage 1 WON, stage 2 played: result screens, scores, stars
+    await pg.evaluate(() => { try { GXT.markDone('stitchwise'); } catch (e) { } }); await tapSel('[data-a=story]'); await pg.waitForTimeout(500);
+    const startStage = async id => {
+      await pg.evaluate(i => GXC.play(i), id);
+      for (let i = 0; i < 14; i++) {
+        if (await pg.evaluate(() => !!G && UI.started && !!UI.camp && !G.over)) break;
+        const sk = await pg.$('.gxc button:has-text("Skip"), .gxc button:has-text("Next"), .gxc button:has-text("Start"), .gxc button:has-text("Play"), .gxc button:has-text("Begin"), .gxc button:has-text("Let"), .gxc button:has-text("Try again")'); if (sk) await tap(sk); await pg.waitForTimeout(500);
+      }
+      ok(await pg.evaluate(() => !!UI.camp), 'story stage ' + id + ' started');
+    };
+    const playOut = async () => { let n = 0; while (n++ < 200) { const k = await turn(); if (k === 'over') break; } };
+    const toResult = async label => {
+      await pg.waitForSelector('#rs:not([hidden]) .rvban.on', { timeout: 30000 }); const rv = await pg.evaluate(() => ({ t: document.querySelector('#rs .rvt1').textContent, s: document.querySelector('#rs .rvt2').textContent, a: swScore(G, 0).total, b: swScore(G, 1).total, w: swWinner(G) }));
+      ok(rv.s.indexOf(rv.a + ' – ' + rv.b) >= 0, label + ': reveal banner shows both scores: ' + rv.s); await pg.screenshot({ path: path.join(OUT, tag + '-' + label + '-reveal.png') });
+      await tapSel('#rs .rvacts .btn.go'); await pg.waitForSelector('.gxc-res', { timeout: 8000 }); await pg.waitForTimeout(900);
+      const r = await pg.evaluate(() => { const st = [...document.querySelectorAll('.gxc-res .gxc-stars.big .gxc-st')].map(e => { const b = e.getBoundingClientRect(); return { y: Math.round(b.y), on: e.classList.contains('on') }; }); return { h2: document.querySelector('.gxc-res h2').textContent, sc: (document.querySelector('.rvsc') || { innerText: '' }).innerText.replace(/\s+/g, ' '), note: (document.querySelector('.rvnote') || { innerText: '' }).innerText.replace(/\s+/g, ' '), st, lis: document.querySelectorAll('.gxc-res .gxc-slist li.on').length, btns: [...document.querySelectorAll('.gxc-res .gxc-btn')].map(e => e.textContent) }; });
+      ok(r.sc.indexOf(String(rv.a)) >= 0 && r.sc.indexOf(String(rv.b)) >= 0, label + ': Story result shows both scores: ' + r.sc);
+      ok(r.st.length === 3 && r.st.every(s => s.y === r.st[0].y), label + ': stars sit in one row ' + JSON.stringify(r.st.map(s => s.y)));
+      ok(r.st.filter(s => s.on).length === r.lis, label + ': stars on = goals met (' + r.lis + ')');
+      await pg.screenshot({ path: path.join(OUT, tag + '-' + label + '-result.png') }); return { rv, r };
+    };
+    BAD = true; await startStage('c1'); await playOut(); BAD = false;
+    const L = await toResult('lose'); ok(L.rv.w !== 0 && /Not this time/.test(L.r.h2) && L.r.btns.indexOf('Try again') >= 0 && /Lost by|tie-break/.test(L.r.note), 'loss: message "' + L.r.h2 + '", ' + L.r.note.slice(0, 80) + ', retry offered');
+    await tapSel('.gxc-res .gxc-btn.go'); await pg.waitForTimeout(600);   // Try again
+    for (let i = 0; i < 14; i++) { if (await pg.evaluate(() => !!G && UI.started && !!UI.camp && !G.over)) break; const sk = await pg.$('.gxc button:has-text("Skip"), .gxc button:has-text("Next"), .gxc button:has-text("Start"), .gxc button:has-text("Play"), .gxc button:has-text("Begin"), .gxc button:has-text("Let")'); if (sk) await tap(sk); await pg.waitForTimeout(500); }
+    ok(await pg.evaluate(() => !!UI.camp && !G.over), 'retry after a loss starts a fresh game'); await playOut();
+    const W = await toResult('win1'); ok(/won|defeated/i.test(W.r.h2) || W.rv.w !== 0, 'stage 1 retry result: ' + W.r.h2 + ' ' + W.r.sc);
+    await pg.evaluate(() => { var b = document.querySelector('.gxc-res .gxc-btn'); b && b.click(); }); await pg.waitForTimeout(800);
+    await pg.evaluate(() => { try { GXC.close(); } catch (e) { } });
+    const p1 = await pg.evaluate(() => GXC.progress().ch.c1); const best = await pg.evaluate(() => JSON.parse(localStorage.getItem('sw_best') || '{}').c1);
+    ok(best != null, 'best score saved for stage 1: ' + best + ' (stars ' + (p1 && p1.stars) + ')');
+    await pg.evaluate(() => { try { GXC.open(); } catch (e) { } }); await pg.waitForTimeout(400);
+    const open2 = await pg.evaluate(() => { var c = GXC.progress().ch; return !!(c.c1 && c.c1.beaten); });
+    if (open2) { await startStage('c2'); await playOut(); const S2 = await toResult('stage2'); ok(true, 'stage 2 played: ' + S2.r.h2 + ' ' + S2.r.sc + ' stars ' + S2.r.st.filter(s => s.on).length); }
+    else ok(true, 'stage 1 not won on retry (hint-quality play lost); stage 2 locked, skipped');
+  }
   const bad = errs.filter(e => !/favicon|manifest/.test(e)); ok(bad.length === 0, 'no page errors ' + JSON.stringify(bad.slice(0, 3)));
+  if (process.env.V) console.log(log.filter(l => /story|loss|retry|stars|Story|best|stage/.test(l)).join('\n'));
   console.log((fails ? 'FAIL ' : 'PASS ') + 'smoke ' + tag + ' (' + log.length + ' checks)'); await b.close(); process.exit(fails ? 1 : 0);
 })().catch(e => { console.log('FAIL smoke crashed:', e.message); process.exit(1); });

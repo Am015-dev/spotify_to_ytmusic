@@ -73,7 +73,7 @@ function tieText(w) { return 'Tied on points: ' + nameOf(w) + ' reached the end 
 function showResult(o) {
   o = o || {}; try { GXH.hide(); } catch (e) { } var rs = $('#rs'); rs.hidden = false; rs.className = 'ov rsv'; var sc = [swScore(G, 0), swScore(G, 1)], w = swWinner(G), hot = UI.mode === 'hot';
   artBg(rs, 'bg-title'); var saved = UI.cs, saveNew = UI.newCells; UI.newCells = {}; var wide = innerWidth >= 700;
-  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 215 : 260)) / 9)));
+  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 236 : 260)) / 9)));
   var c = h('div.rv'), cols = h('div.rvcols'), cells = [], tot = [], pen = [];
   [0, 1].forEach(function (s) {
     var q = quiltEl(s, 'rvq'); q.removeAttribute('id'); q.style.setProperty('--cs', UI.cs + 'px'); q.style.backgroundImage = 'none'; q.classList.remove('art');
