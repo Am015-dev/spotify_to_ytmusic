@@ -62,7 +62,7 @@
       help: function (S) {
         var row = [btn('How to play', function () { GX.close(); GXH.rules(phase()); }, 'm-rules')];
         S.appendChild(GX.row('Read', row));
-        var gt = null; try { var w = document.createElement('div'); w.innerHTML = GXT.menuHTML({ game: 'emberclimb', first: false, cls: 'gx-sb', launch: function () { GX.close(); UI.ov = null; UI.tutStart(); } }); gt = w.firstChild; } catch (e) { }
+        var gt = null; try { var w = document.createElement('div'); w.innerHTML = GXT.menuHTML({ game: 'emberclimb', first: false, cls: 'gx-sb', launch: function () { GX.close(); UI.ov = null; setTimeout(function () { UI.tutStart(); }, 350); } }); gt = w.firstChild; } catch (e) { }
         if (gt) { var sp = gt.querySelector('span'); if (sp) sp.remove(); S.appendChild(GX.row('Tutorial', gt)); }
         try { S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); } catch (e) { }
       },

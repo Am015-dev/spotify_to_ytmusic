@@ -24,7 +24,7 @@
       { id: 'energy', title: 'Your energy', target: function () { return document.querySelector('.energy'); }, say: 'You get 3 energy every turn. A card costs the number in its corner. Spend it wisely.', wait: null, ready: battleP },
       { id: 'attack', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Blow twice: lift it, then play it. It hits hard and makes the enemy Vulnerable.', wait: tap('w-hammer'), ready: battleP },
       { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'That hit is coming. Tap Plate Guard twice to gain Block, which absorbs damage this turn.', wait: tap('w-defend'), ready: battleP },
-      { id: 'end', title: 'End your turn', target: function () { return document.getElementById('end'); }, say: 'Out of energy? End your turn. The enemy acts and your Block takes the hit.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
+      { id: 'end', title: 'End your turn', target: function () { var b = document.getElementById('end'); if (b) b.disabled = false; return b; }, say: 'Out of energy? End your turn. The enemy acts and your Block takes the hit.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
       { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Vulnerable enemies take 50% more damage. Tap Cinder Strike twice to finish it.', wait: tap('w-strike'), ready: function () { return battleP() && g().b.turn >= 2 && cardEl('w-strike'); } },
       { id: 'reward', title: 'Pick a reward', target: function () { return document.querySelector('.picks'); }, say: 'Each win lets you add one card to your deck. Tap a card you like. A sharper deck climbs higher.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: function () { return g().scr === 'reward' && document.querySelector('.picks .card'); } }
     ];
@@ -43,6 +43,7 @@
     if (!window.GXT) return;
     GXT.start({ game: 'emberclimb', setup: stage, steps: steps(), story: false, endTitle: 'You can climb now', endText: 'Read the intents, block or attack, pick cards that build a deck. Good luck.',
       onDone: function (r) { finish(!r || r.choice !== 'menu', true); }, onExit: function () { finish(false, false); } });
+    try { if (GXT.active()) UI.render(); } catch (e) { }   // the staged fight was drawn before the guide was active: redraw so End turn waits for its step
   };
   window.EC_TUT_STEPS = steps;
 })();
