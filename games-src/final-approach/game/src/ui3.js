@@ -27,12 +27,13 @@ function commit(seat, m) {
   if (!G || G.result) return false;
   const was = { round: G.round, phase: G.phase, slots: Object.assign({}, G.slots), axis: G.pl.axis, pos: G.pl.pos, planes: FA.planesOnTrack(G), sw: JSON.stringify(G.pl.sw) };
   UI.lastPlace = m.t === 'place' ? { seat, to: m.to, d: m.d } : null;
-  let chip = null; if (m.t === 'place' && G.ai[seat]) { try { chip = aiChip(m, seat); } catch (e) { } }
+  let chip = null; if (m.t === 'place' && (G.ai[seat] || (UI.fc && !UI.fc.ended))) { try { chip = aiChip(m, seat); } catch (e) { } }
   const r = FA.performMove(G, m, seat); if (!r.ok) { if (mayAct(seat)) toast(r.error); return false; }
   if (chip) showChip(m.to, chip);
   sfxFor(m, was); UI.sel = -1; UI.cof = 0; UI.hint = null; if (m.t === 'rrpick') UI.rrm = [false, false, false, false];
   if (G.round !== was.round) { UI.rt = G.mods.real ? { left: 60000, last: 0 } : null; UI.sel = -1; }
   saveGame(); if (typeof netPush === 'function') netPush(); coachTick(); render(); schedule();
+  try { tbAfter(seat, m); } catch (e) { console.warn('tb', e); }   // turn banner + the rival's caption (part 14)
   return true;
 }
 function sfxFor(m, was) {
