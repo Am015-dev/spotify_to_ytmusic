@@ -47,7 +47,7 @@ const { chromium } = require(fs.existsSync(path.join(ROOT, 'games-src', 'node_mo
 const gx = require('./gx-serve.js');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
-const LIM = { tutorial: 150, coach: 360, quick: 220, story: 140, fuzz: 60 };   // seconds per phase at --scale 1
+const LIM = { tutorial: 150, coach: 720, quick: 220, story: 140, fuzz: 60 };   // seconds per phase at --scale 1
 const lim = k => LIM[k] * SCALE * 1000;
 
 const bugs = [], seen = new Set();
