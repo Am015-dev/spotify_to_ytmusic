@@ -26,6 +26,7 @@ Tested with the temporary art installed locally (temp-art.js -> webp in games/vi
 - build-all --quick vinegrave PASS; rules-test PASS (200 AI games); smoke phone + pc PASS (reached result, 0 errors).
 - AI gate: Hard 96% (74.4 vs 30.6), Normal 85% vs bot, PASS; Hard vs Normal head to head: Hard wins 80% over 100 games (re-run).
 - Story stage 1 (real taps 390x763 + 844x390, clicks 1440x860; moves played by script, result buttons tapped): loss -> "Stage lost" + goal + Try again restarts stage 1 and records the loss; win -> stars shown = stars stored (3/3), best score saved; 0 page errors (24/24 checks).
+- Real input, fresh storage: title has one primary button; guided round followed by taps to its end card (phone); a full Quick game vs Normal by taps/clicks (tap a glowing thing, then its action button) reached the result on 390x763, 844x390 and 1440x860, 0 page/console errors (a naive tapper loses 24-68 / 27-89 / 23-62).
 - Guardian moment at normal speed (phone): card shows with rays + shake + roar, closes after 1.7 s, it is your turn with the card gone.
 - ui-audit (local server, temporary art present): phone A0 B0 C0 D0 E0 F0; pc A0 B0 C0 D0 E0 F0; phone-s A0 B3 C0 D0 E0 F0.
   The 3 phone-s B hits ("a hidden ruin..." in How to play, "Master volume" in Menu, Story map node "8") are text scrolled out of view inside
