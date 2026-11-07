@@ -12,11 +12,9 @@ Where the words live: tutorial lines in `game/src/tutor.js` block `TUT_TEXT` (on
 2. **The Guild Kilns**: columns, prism tiles, a master's head start. The guild decides who may tile the palace.
 3. **The Sun Palace**: the king's wall goes to the best glazier alive; the Black Kiln wants it too.
 
-## Tutorial = prologue ("The commission")
-Part A, a real round 1: Mother Ochre welcomes you, you and Tamsin compete for the Sun King's commission (most stars wins). Each step gives a story reason, then the action, then the next beat reacts ("Good hands!", "Tamsin grabs a kiln", "Neighbours pay"). Ends on "Well fired".
-Part B, the final hour: you lead 21 to 12; the climax is the count-up (chains, floor, bonuses) and "The king's seal".
-Chapter beats: A opens "Welcome, apprentice" and pays off at "Well fired"; B opens "The final hour" and pays off at "The king's seal". Both end cards are in Mother Ochre's voice.
-After Part B in the Story prologue the button leads straight to chapter 1, "The First Kiln".
+## Tutorial = prologue ("The commission", a coached first game)
+One real game, free play from the first tap (no forced taps). Mother Ochre speaks in one small bubble at a time: "Welcome, apprentice" opens it, she explains each rule when it first matters, reacts to good and poor moves, and Tamsin's turns get a line ("Tamsin plays"). Round-end and final scoring use the player's real numbers; the end card "Well fired" lists rules that never came up. Words live in `game/src/tutor.js` (`cgBefore`, `cgBeat`, `cgOpen`).
+In the Story prologue the end card's first button leads straight to chapter 1, "The First Kiln".
 
 ## Not done (honest)
 - Story chapter outros have ONE variant (win); loss variants and boss pre/post taunts beyond `taunt` / `praise` in `campaign.json` were not written in this pass.

@@ -19,6 +19,9 @@ flat sea, with a soft vignette. Defeat = same island in ruins, desaturated.
 
 **Palette:** pack green #27AE60, sand #F2E4C4, dirt #C0844A, river #4696D2, seat colours crimson/azure/saffron/violet.
 
-**Not changed this round (kept from earlier kit):** portraits and boss portraits, goods tokens, worker/silver/points/die
-tokens, 96 px icons, fx sprites. No CC0 medieval character family at portrait size was reachable; goods need a
-food/craft pack (next round: Kenney Food Kit renders).
+**Portraits / bosses (round 2):** Quaternius low-poly RPG characters rendered from three-quarter view (Wren = ranger,
+Odo = wizard, Cass = rogue recoloured blue, Haskel = warrior, Marla = cleric, Ivo = monk), on a blurred, colour-washed
+hex island with one pack tile that tells their trade. Bosses: full figure, darkened ember-lit backdrop, their signature tile.
+
+**Goods, tokens, icons, fx (round 2):** flat vector in the hexagon pack's look (flat fills, darker rim, same palette):
+goods on a wooden chip (wool, cheese, honey, cider, linen, salt), meeple worker, silver coin, star points, white die.
