@@ -90,7 +90,7 @@ function coachTick(){try{
   // make the situations come up once: fog on a place and determination for a skill, from day 2
   if(cplan()&&G.round>=2){if(!COACH.forced.fog&&!G.map.some(m=>m.fog)){COACH.forced.fog=1;try{G.map[TUT_FOG].fog=1;refresh()}catch(e){}}
     if(!COACH.forced.det){COACH.forced.det=1;for(const c of G.chars)if(!c.npc)c.det=Math.max(c.det||0,3);try{refresh()}catch(e){}}}
-  if(!COACH.done.later&&cplan()&&G.round>=4&&Object.keys(COACH.done).length>=14){COACH.done.later=1;coachFinal();return}
+  if(!COACH.done.later&&cplan()&&G.round>=4&&COACH.done.fog&&COACH.done.skill&&COACH.done.ready&&Object.keys(COACH.done).length>=14){COACH.done.later=1;coachFinal();return}
   if(COACH.cur&&Date.now()-COACH.shownAt>9000)coachHide();
   if(COACH.cur)return;
   for(const r of COACH_RULES){if(COACH.done[r.id])continue;let ok=false;try{ok=!!r.when()}catch(e){}if(ok){COACH.done[r.id]=1;let t=r.say;try{if(typeof t==='function')t=t()}catch(e){t=''}if(t){coachShow(r.id,t,r.kind);return}}}

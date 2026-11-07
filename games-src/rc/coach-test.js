@@ -41,7 +41,7 @@ const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));const sleep=ms
  if(r.done.length<10)probs.push('only '+r.done.length+' rules explained: '+r.done.join());
  const walk=await p.evaluate(()=>document.querySelectorAll('#coachb .walk li').length);if(walk<5)probs.push('final scoring walk has '+walk+' lines');const kinds=await p.evaluate(()=>Object.keys(COACHX.state.done));if(!['noshelter','nofood','sure','ready'].some(k=>kinds.includes(k)))probs.push('no move feedback line shown');if(!['event','weather','threat'].some(k=>kinds.includes(k)))probs.push('no rival comment shown');
  if(maxBub>1)probs.push('more than one bubble at once');
- if(!r.over)probs.push('game did not reach its end');
+ if(!await p.evaluate(()=>GXCOACH.done))probs.push('GXCOACH.done never became true');
  if(errs.length)probs.push('errors '+errs.slice(0,2).join('|'));
  console.log(`coach ${W}x${H}: ${probs.length?'FAIL '+probs.join('; '):'PASS'} explained ${r.done.length}/${r.all.length}: ${r.done.join(',')}`);
  await br.close();process.exit(probs.length?1:0)})();
