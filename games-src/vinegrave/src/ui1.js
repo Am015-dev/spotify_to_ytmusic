@@ -8,7 +8,10 @@ try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catc
 function savePrefs() { try { localStorage.setItem(PREFKEY, JSON.stringify(UI.prefs)); } catch (e) { } }
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const RICON = { coin: 'coin', compass: 'compass', tablet: 'tablet', arrow: 'arrow', jewel: 'jewel' };
-function ic(k, label) { const art = RICON[k] ? 'res-' + k : (V.TRAVEL.indexOf(k) >= 0 ? 'tr-' + k : ''); return `<i class="ic" ${art ? 'data-art="' + art + '"' : ''} role="img" aria-label="${esc(label || V.RNAME[k] || V.TNAME[k] || k)}"><svg><use href="#s-${k}"/></svg></i>`; }
+// Free-kit pictures for these slots are the same blank hexagon, less clear than the code-drawn boot / jeep / plane / arrowhead / jewel:
+// keep the code glyph (the slot names stay in assets.json; delete an entry here when its real art arrives).
+const WEAK_ART = { 'tr-boot': 1, 'tr-car': 1, 'tr-plane': 1, 'res-arrow': 1, 'res-jewel': 1 };
+function ic(k, label) { let art = RICON[k] ? 'res-' + k : (V.TRAVEL.indexOf(k) >= 0 ? 'tr-' + k : ''); if (WEAK_ART[art]) art = ''; return `<i class="ic" ${art ? 'data-art="' + art + '"' : ''} role="img" aria-label="${esc(label || V.RNAME[k] || V.TNAME[k] || k)}"><svg><use href="#s-${k}"/></svg></i>`; }
 function resHTML(r) { return Object.keys(r).map(k => `<span class="chip"><span class="num">${r[k]}</span>${ic(k)}</span>`).join(''); }
 function opsHTML(ops) {
   return (ops || []).map(o => {
@@ -30,7 +33,7 @@ function cardHTML(id, o) {
   return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="ct"><span class="chip">${cost}</span>${ic(c.tr)}</span>
     <span class="cn">${esc(c.name).split(' ').map(w => w.length > 7 ? w.slice(0, Math.ceil(w.length / 2)) + '&shy;' + w.slice(Math.ceil(w.length / 2)) : w).join(' ')}</span>
-    <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true"><svg class="pg"><use href="#s-${CARD_GLYPH[c.t] || c.tr}"/></svg><span class="pn">${esc(c.name)}</span><span class="pt">${CARD_KIND[c.t] || 'Starter'}</span></span><span class="ptx">${esc(c.t === 'fear' ? 'No effect. -1 point.' : c.text)}</span></span>
+    <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true"><svg class="pg"><use href="#s-${CARD_GLYPH[c.t] || c.tr}"/></svg><span class="pn">${esc(c.name)}</span><span class="pt">${CARD_KIND[c.t] || 'Starter'}</span></span></span><span class="ptx">${esc(c.t === 'fear' ? 'No effect. -1 point.' : c.text)}</span>
     ${c.vp ? `<span class="vp">${c.vp > 0 ? c.vp : c.vp}</span>` : ''}
     <span class="fx">${c.t === 'fear' ? '<span class="sm" style="color:#f6e6e6">no effect</span>' : opsHTML(c.ops)}</span></button>`;
 }
