@@ -19,3 +19,6 @@ Owner: "Tutorials in most games are not covering a real game and not all rules a
 - Coverage: list every rule of the game (from rules-notes.md and the rulebook: setup, each action type, every scoring rule, every card/tile type or effect family, special cases such as ties, empty market, can't-place, bonuses, end trigger and tie-break). Each must be taught in the tutorial by doing or seeing it once. Write the list as a checklist in games-src/<DIR>/TUTORIAL-COVERAGE.md with the step that teaches each rule; no unticked rule.
 - The tutorial-to-end script must play this whole guided game to the result screen at both sizes and assert every coverage step was shown.
 - If time runs short, prioritise: playable first turn + rival turn + scoring + end; note the rest as not covered in TUTORIAL-COVERAGE.md (honestly).
+
+## ADDENDUM 2 (20:55 UTC): fix the rules
+The rulebook check is merged: games-src/rules-check/<slug>.md (and SUMMARY.md) on origin/alex/brave-carson-rbpmlk. Fix every WRONG and MISSING item for your game in the engine (not in the UI), each with a rules-test case named after the item; SIMPLIFIED-ON-PURPOSE items stay but must be stated in the help drawer. Update TUTORIAL-COVERAGE.md if a fixed rule changes what the tutorial teaches. Report "rules fixed n/total" in your DONE line.
