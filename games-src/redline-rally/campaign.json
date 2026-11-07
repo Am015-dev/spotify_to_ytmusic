@@ -1,0 +1,827 @@
+{
+ "game": "redline-rally",
+ "title": "The Redline Season",
+ "version": 1,
+ "cast": {
+  "coach": {
+   "name": "Coach Mara",
+   "emoji": "🧑‍🔧",
+   "color": "#3b7a8c"
+  },
+  "kit": {
+   "name": "Kit Marlow",
+   "emoji": "🏁",
+   "color": "#d83a3a"
+  },
+  "juno": {
+   "name": "Juno Vega",
+   "emoji": "🧢",
+   "color": "#2f7be0"
+  },
+  "dax": {
+   "name": "Dax Orrin",
+   "emoji": "🪖",
+   "color": "#59626e"
+  },
+  "pia": {
+   "name": "Pia Rask",
+   "emoji": "🌬️",
+   "color": "#8a52d6"
+  },
+  "oto": {
+   "name": "Oto Lind",
+   "emoji": "🧊",
+   "color": "#2ea86b"
+  },
+  "bex": {
+   "name": "Bex Hollis",
+   "emoji": "⚡",
+   "color": "#e8a824"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "Warm-up Laps",
+   "blurb": "Learn gears, cards and heat."
+  },
+  {
+   "act": 2,
+   "title": "Midseason",
+   "blurb": "Slipstreams, upgrades and hairpins."
+  },
+  {
+   "act": 3,
+   "title": "The Championship",
+   "blurb": "Hard rivals, one final."
+  }
+ ],
+ "twists": [
+  {
+   "id": "upgrades",
+   "where": "setup",
+   "how": "Upgrades mode on: you draft 3 upgrade cards"
+  },
+  {
+   "id": "tight",
+   "where": "setup",
+   "how": "every corner limit shifted by param (min 1)"
+  },
+  {
+   "id": "lowheat",
+   "where": "setup",
+   "how": "your engine starts with 6 minus param heat, the rest in the discard"
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "Pit Lane Lesson",
+   "boss": false,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "Welcome to the garage. First lesson: gear, cards, heat."
+    },
+    {
+     "who": "coach",
+     "text": "A short guide first, then your first race."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "You read the road well. On to the corners."
+    }
+   ],
+   "opponent": {
+    "name": "Kit Marlow",
+    "emoji": "🏁",
+    "cast": "kit",
+    "personality": "Smooth and patient.",
+    "aiLevel": "easy",
+    "aiStyle": "patient"
+   },
+   "setup": {
+    "players": 1,
+    "track": "sunline",
+    "laps": 1,
+    "opp": 1,
+    "diff": "easy",
+    "upg": false,
+    "seed": null,
+    "tutorial": true
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": 2,
+    "text": "Finish in the top 2."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Finish the race",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Burn 6 heat or less",
+     "test": {
+      "k": "heat",
+      "op": "<=",
+      "v": 6
+     }
+    },
+    {
+     "text": "No spin-outs",
+     "test": {
+      "k": "spins",
+      "op": "<=",
+      "v": 0
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Your rival drives gently."
+   }
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "Corner Sense",
+   "boss": false,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "Corners punish speed: every point over the limit costs heat."
+    },
+    {
+     "who": "coach",
+     "text": "Watch the red number before you push."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "Smart braking wins races."
+    }
+   ],
+   "opponent": {
+    "name": "Juno Vega",
+    "emoji": "🧢",
+    "cast": "juno",
+    "personality": "Late on the brakes.",
+    "aiLevel": "easy",
+    "aiStyle": "greedy"
+   },
+   "setup": {
+    "players": 1,
+    "track": "hairpin",
+    "laps": 1,
+    "opp": 2,
+    "diff": "easy",
+    "upg": false,
+    "seed": null,
+    "tutorial": false
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": 2,
+    "text": "Finish in the top 2."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Finish in the top 2",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Burn 8 heat or less",
+     "test": {
+      "k": "heat",
+      "op": "<=",
+      "v": 8
+     }
+    },
+    {
+     "text": "No spin-outs",
+     "test": {
+      "k": "spins",
+      "op": "<=",
+      "v": 0
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals drive gently."
+   }
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "Sunline Opener",
+   "boss": true,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "First real race. Dax hates traffic, so stay out of his way."
+    },
+    {
+     "who": "coach",
+     "text": "Win it and the season is yours to chase."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "A win! Now the season gets serious."
+    }
+   ],
+   "opponent": {
+    "name": "Dax Orrin",
+    "emoji": "🪖",
+    "cast": "dax",
+    "personality": "Hates traffic, drives alone.",
+    "aiLevel": "easy",
+    "aiStyle": "solo",
+    "taunt": "Stay behind me, rookie.",
+    "praise": "Clean win. Respect."
+   },
+   "setup": {
+    "players": 1,
+    "track": "sunline",
+    "laps": 2,
+    "opp": 3,
+    "diff": "easy",
+    "upg": false,
+    "seed": null,
+    "tutorial": false
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": 1,
+    "text": "Win the race."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win the race",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Burn 14 heat or less",
+     "test": {
+      "k": "heat",
+      "op": "<=",
+      "v": 14
+     }
+    },
+    {
+     "text": "No spin-outs",
+     "test": {
+      "k": "spins",
+      "op": "<=",
+      "v": 0
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Dax drives gently."
+   },
+   "unlock": [
+    {
+     "type": "act",
+     "id": "act2",
+     "text": "Act 2 opens"
+    }
+   ]
+  },
+  {
+   "id": "c4",
+   "act": 2,
+   "title": "Midseason Sprint",
+   "boss": false,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "Normal rivals now. They plan their own cards, just like you."
+    },
+    {
+     "who": "coach",
+     "text": "Use slipstream: ending behind a car buys two free spaces."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "Nice slipstreaming."
+    }
+   ],
+   "opponent": {
+    "name": "Pia Rask",
+    "emoji": "🌬️",
+    "cast": "pia",
+    "personality": "Lives in the slipstream.",
+    "aiLevel": "normal",
+    "aiStyle": "draft"
+   },
+   "setup": {
+    "players": 1,
+    "track": "sunline",
+    "laps": 2,
+    "opp": 3,
+    "diff": "normal",
+    "upg": false,
+    "seed": null,
+    "tutorial": false
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": 3,
+    "text": "Finish in the top 3."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Finish in the top 3",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Use a slipstream 2 times",
+     "test": {
+      "k": "slips",
+      "op": ">=",
+      "v": 2
+     }
+    },
+    {
+     "text": "Win the race",
+     "test": {
+      "k": "place",
+      "op": "<=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals drive gently."
+   }
+  },
+  {
+   "id": "c5",
+   "act": 2,
+   "title": "Upgrade Day",
+   "boss": false,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "The garage has parts today: you draft three upgrade cards."
+    },
+    {
+     "who": "coach",
+     "text": "Pick what fits how you drive."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "Good parts, good drive."
+    }
+   ],
+   "opponent": {
+    "name": "Oto Lind",
+    "emoji": "🧊",
+    "cast": "oto",
+    "personality": "Cold engine, calm head.",
+    "aiLevel": "normal",
+    "aiStyle": "cool"
+   },
+   "setup": {
+    "players": 1,
+    "track": "hairpin",
+    "laps": 2,
+    "opp": 3,
+    "diff": "normal",
+    "upg": true,
+    "seed": null,
+    "tutorial": false
+   },
+   "twist": {
+    "id": "upgrades",
+    "param": 3,
+    "text": "Rule: draft 3 upgrade cards before the race."
+   },
+   "goal": {
+    "type": "custom",
+    "value": 3,
+    "text": "Finish in the top 3."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Finish in the top 3",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Burn 16 heat or less",
+     "test": {
+      "k": "heat",
+      "op": "<=",
+      "v": 16
+     }
+    },
+    {
+     "text": "Win the race",
+     "test": {
+      "k": "place",
+      "op": "<=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "upg": false
+    },
+    "maxStars": 2,
+    "text": "Rivals drive gently and upgrades are optional."
+   }
+  },
+  {
+   "id": "c6",
+   "act": 2,
+   "title": "Hairpin Showdown",
+   "boss": true,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "Pia owns the hairpins. Corner limits are one lower today."
+    },
+    {
+     "who": "coach",
+     "text": "Brake early, push on the straights."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "You tamed the hairpins."
+    }
+   ],
+   "opponent": {
+    "name": "Pia Rask",
+    "emoji": "🌬️",
+    "cast": "pia",
+    "personality": "Lives in the slipstream.",
+    "aiLevel": "normal",
+    "aiStyle": "draft",
+    "taunt": "Catch me if you can.",
+    "praise": "You drove it perfectly."
+   },
+   "setup": {
+    "players": 1,
+    "track": "hairpin",
+    "laps": 2,
+    "opp": 4,
+    "diff": "normal",
+    "upg": false,
+    "seed": null,
+    "tutorial": false
+   },
+   "twist": {
+    "id": "tight",
+    "param": -1,
+    "text": "Boss rule: every corner limit is 1 lower."
+   },
+   "goal": {
+    "type": "custom",
+    "value": 1,
+    "text": "Win the race."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the race",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No spin-outs",
+     "test": {
+      "k": "spins",
+      "op": "<=",
+      "v": 0
+     }
+    },
+    {
+     "text": "Burn 18 heat or less",
+     "test": {
+      "k": "heat",
+      "op": "<=",
+      "v": 18
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Pia drives gently and corners are normal."
+   },
+   "unlock": [
+    {
+     "type": "act",
+     "id": "act3",
+     "text": "Act 3 opens"
+    }
+   ]
+  },
+  {
+   "id": "c7",
+   "act": 3,
+   "title": "Championship Round 1",
+   "boss": false,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "Hard rivals now. They will not wait for you."
+    },
+    {
+     "who": "coach",
+     "text": "Plan your heat across the whole race."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "One round down."
+    }
+   ],
+   "opponent": {
+    "name": "Juno Vega",
+    "emoji": "🧢",
+    "cast": "juno",
+    "personality": "Late on the brakes.",
+    "aiLevel": "hard",
+    "aiStyle": "greedy"
+   },
+   "setup": {
+    "players": 1,
+    "track": "sunline",
+    "laps": 2,
+    "opp": 4,
+    "diff": "hard",
+    "upg": false,
+    "seed": null,
+    "tutorial": false
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "value": 2,
+    "text": "Finish in the top 2."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Finish in the top 2",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Win the race",
+     "test": {
+      "k": "place",
+      "op": "<=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Burn 18 heat or less",
+     "test": {
+      "k": "heat",
+      "op": "<=",
+      "v": 18
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "The rivals drive gently."
+   }
+  },
+  {
+   "id": "c8",
+   "act": 3,
+   "title": "Championship Round 2",
+   "boss": false,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "Same rivals, tighter track, with upgrade parts."
+    },
+    {
+     "who": "coach",
+     "text": "Cool your engine when you can."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "Almost there."
+    }
+   ],
+   "opponent": {
+    "name": "Oto Lind",
+    "emoji": "🧊",
+    "cast": "oto",
+    "personality": "Cold engine, calm head.",
+    "aiLevel": "hard",
+    "aiStyle": "cool"
+   },
+   "setup": {
+    "players": 1,
+    "track": "hairpin",
+    "laps": 2,
+    "opp": 4,
+    "diff": "hard",
+    "upg": true,
+    "seed": null,
+    "tutorial": false
+   },
+   "twist": {
+    "id": "upgrades",
+    "param": 3,
+    "text": "Rule: draft 3 upgrade cards before the race."
+   },
+   "goal": {
+    "type": "custom",
+    "value": 2,
+    "text": "Finish in the top 2."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Finish in the top 2",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Win the race",
+     "test": {
+      "k": "place",
+      "op": "<=",
+      "v": 1
+     }
+    },
+    {
+     "text": "No spin-outs",
+     "test": {
+      "k": "spins",
+      "op": "<=",
+      "v": 0
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {
+     "upg": false
+    },
+    "maxStars": 2,
+    "text": "The rivals drive at normal skill."
+   }
+  },
+  {
+   "id": "c9",
+   "act": 3,
+   "title": "The Grand Final",
+   "boss": true,
+   "intro": [
+    {
+     "who": "coach",
+     "text": "Bex drives all gas and no fear. You start with only 4 heat."
+    },
+    {
+     "who": "coach",
+     "text": "One race. Everything you learned."
+    }
+   ],
+   "outro": [
+    {
+     "who": "coach",
+     "text": "Champion! The season is yours."
+    }
+   ],
+   "opponent": {
+    "name": "Bex Hollis",
+    "emoji": "⚡",
+    "cast": "bex",
+    "personality": "All gas, no fear.",
+    "aiLevel": "hard",
+    "aiStyle": "aggressive",
+    "taunt": "Brake? I do not know the word.",
+    "praise": "That was a drive. Champion."
+   },
+   "setup": {
+    "players": 1,
+    "track": "sunline",
+    "laps": 3,
+    "opp": 5,
+    "diff": "hard",
+    "upg": false,
+    "seed": null,
+    "tutorial": false
+   },
+   "twist": {
+    "id": "lowheat",
+    "param": 2,
+    "text": "Boss rule: you start with 4 heat instead of 6."
+   },
+   "goal": {
+    "type": "custom",
+    "value": 1,
+    "text": "Win the race."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the race",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "No spin-outs",
+     "test": {
+      "k": "spins",
+      "op": "<=",
+      "v": 0
+     }
+    },
+    {
+     "text": "Burn 24 heat or less",
+     "test": {
+      "k": "heat",
+      "op": "<=",
+      "v": 24
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Bex drives at normal skill and you keep all 6 heat."
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "champion",
+     "text": "Champion title"
+    }
+   ]
+  }
+ ]
+}

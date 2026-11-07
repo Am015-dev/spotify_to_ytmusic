@@ -1,0 +1,64 @@
+{
+ "cues": {
+  "menu": {
+   "prompt": "Instrumental retro racing-game menu music, 108 BPM, 4/4, bright analog synth arpeggios over a punchy drum machine groove and a warm slap bass, sunny and confident, 4-bar intro then 16-bar loop, ends on a whole bar so it loops cleanly. No vocals, no spoken words, no original game or brand names, instrumental only, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "menu.mp3",
+   "bpm": 108,
+   "loop": true,
+   "length": "about 60 s seamless loop",
+   "mood": "confident, sunny, anticipation on the starting grid"
+  },
+  "game": {
+   "prompt": "Instrumental racing-game race music, 128 BPM, 4/4, driving four-on-the-floor kick from the first bar, pulsing sixteenth-note bass synth, crisp hi-hats, bright lead hook that stays out of the way, focused and energetic, 4-bar intro then 16-bar sections, ends on a whole bar so it loops cleanly. No vocals, no spoken words, no original game or brand names, instrumental only, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "game.mp3",
+   "bpm": 128,
+   "loop": true,
+   "length": "about 75 s seamless loop",
+   "mood": "driving, focused, steady momentum"
+  },
+  "tense": {
+   "prompt": "Instrumental racing-game final-lap music, 140 BPM, 4/4, same family as the race track but faster and tighter: urgent staccato strings and synth stabs, rising risers every 4 bars, heavy kick and snare, no calm moments, 8-bar loop, ends on a whole bar so it loops cleanly. No vocals, no spoken words, no original game or brand names, instrumental only, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "tense.mp3",
+   "bpm": 140,
+   "loop": true,
+   "length": "about 45 s seamless loop",
+   "mood": "urgent, rising pressure, final laps"
+  },
+  "victory": {
+   "prompt": "Short instrumental victory fanfare for a racing game, 120 BPM, brass and synth fanfare rising to a big final chord with cymbal crash and a few confetti sparkles, joyful and triumphant, plays once, ends with a clean finish. No vocals, no spoken words, no original game or brand names, instrumental only, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "victory.mp3",
+   "bpm": 120,
+   "loop": false,
+   "length": "8 to 12 s, plays once",
+   "mood": "triumphant, celebratory"
+  },
+  "defeat": {
+   "prompt": "Short instrumental defeat sting for a racing game, 90 BPM, a soft descending minor-key synth and muted brass phrase with a slowing engine-wind-down feel, gentle and good-natured, not tragic, plays once, ends with a clean finish. No vocals, no spoken words, no original game or brand names, instrumental only, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "defeat.mp3",
+   "bpm": 90,
+   "loop": false,
+   "length": "8 to 12 s, plays once",
+   "mood": "deflated but warm, a gracious loser"
+  }
+ }
+}
