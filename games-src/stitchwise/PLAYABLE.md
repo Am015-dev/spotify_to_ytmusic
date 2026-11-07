@@ -21,11 +21,26 @@ plain words, recognition over recall, feedback for every action).
 Also found and fixed on the way: in Story the goal line pushed Rotate / Sew it on below the screen at 390x763 (smoke `--story2` caught it):
 the dock is now compact (track hint hidden in Story on phone, 1-line prompts), so the action row is always on screen.
 
-## Gate (local build with temp art, served over http)
+## Addenda 1-3 and the free art kit
+- **ADDENDUM 1, tutorial = a real guided game:** chapter 1 *Your first turn* (6 spotlit action steps), then chapters 2 *Pay day*,
+  3 *Fair surprises*, 4 *The judging*: the same game played to the result screen, with Aunt Wren's line in the panel the first time
+  each rule happens. Checklist and honest gaps: `TUTORIAL-COVERAGE.md`. `playable/play.js <size> tut` plays the whole game by taps
+  and asserts every coverage line was shown (PASS 390x763 and 1440x860).
+- **ADDENDUM 2, rules:** `rules-check/stitchwise.md` lists WRONG 0 / MISSING 0, so rules fixed 0/0. The 3 SIMPLIFIED items are now
+  stated in How to play ("Simplified on purpose").
+- **ADDENDUM 3, narrative:** the tutorial is the story's prologue (guide Aunt Wren with her portrait when art exists, rival Marden with
+  a reason; every step has a story reason + reaction; the judging has Aunt Wren's verdict). Story chapters keep their intros/outros and
+  now have loss outros (`outroLose`, bosses speak); Quick game has a flavour intro per opponent and a result line. All text in
+  `campaign.json` (`story` + chapters). Cast and arc: `STORY.md`.
+- **Free art kit (installed with --force for the tests):** the `quilt-frame` picture draws a cream panel that does not line up with
+  the 9x9 grid, so that slot is switched off (code frame is clearer; slot kept for real art). Text over the busy table and the light
+  map got solid backing (player pills, track hint, opponent quilt panel, Story map header). Every other free picture is shown.
+
+## Gate (local build, run without and with the free art kit, served over http)
 - `build-all.py --quick stitchwise` PASS (11/11 scenarios). `rules-test.js 100` PASS.
 - `playable/play.js` (fresh storage, animations ON, only centre taps on visible, uncovered UI): tutorial-to-end PASS 390x763 and 1440x860;
-  Quick game to the result PASS 390x763; Story stage 1 (map → Play → intro → game → reveal → Story result) PASS 390x763. 0 console errors.
-- ui-audit A-F: phone 0/0/0/0/0/0, phone-s 0/0/0/0/0/0, pc 0/0/0/0/0/0.
+  tutorial = whole guided game to the result with all coverage lines; Quick game to the result PASS 390x763; Story stage 1 (map → Play → intro → game → reveal → Story result) PASS 390x763. 0 console errors.
+- ui-audit A-F: phone 0/0/0/0/0/0, phone-s 0/0/0/0/0/0, pc 0/0/0/0/0/0 (without and with the free art).
 - Existing tests still PASS: smoke (390x763, 375x553 --full, 1440x860 --full, --tut, --story2 at 390x763 / 844x390 / 1440x860), menu-test, first-launch-test (updated: step 1 is now an action).
 
 ## Notes / not done
