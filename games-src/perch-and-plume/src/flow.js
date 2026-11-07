@@ -198,7 +198,7 @@ function askPass(s, then) { hideHelp();
   $('#passgo').onclick = function () { el.hidden = true; UI.passing = false; UI.view = s; then(); render(); };
 }
 function save() {
-  if (!G || UI.mode === 'tutorial' || (window.GXS && GXS.on)) return;
+  if (!G || UI.mode === 'tutorial' || UI.mode === 'tutfree' || (window.GXS && GXS.on)) return;
   try { localStorage.setItem(SAVE_KEY, JSON.stringify({ G: G, mode: UI.mode, camp: UI.camp ? UI.camp.id : null })); } catch (e) { }
   try { if (window.GNS) GNS.saved('perch-and-plume', G.phase !== 'over'); } catch (e) { }
 }

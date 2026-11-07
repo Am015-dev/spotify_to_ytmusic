@@ -45,6 +45,7 @@ function showConfig() { hideHelp();
 }
 // Restart: the same players and settings from a fresh deal (story chapters restart the chapter)
 function restartGame() {
+  if (UI.mode === 'tutfree') { quickStart(); return; }   // after the guided year, Play again is a real quick game
   if (!G || UI.mode === 'tutorial') { tutStart(); return; }
   if (UI.camp) { campStart(UI.camp); return; }
   startGame({ seats: G.pl.map(function (p) { return { name: p.name, kind: p.kind, lvl: p.lvl, face: p.face }; }), mode: UI.mode });
@@ -84,7 +85,7 @@ function gameOver() { hideHelp();
   try { localStorage.setItem('pp-played', '1'); } catch (e) { }
   if (UI.mode === 'tutorial') return;
   var me = humans()[0] || 0, sc = G.final, win = G.winner, winners = Array.isArray(win) ? win : [win];
-  try { if (window.GNS && UI.mode !== 'tutorial') GNS.result({ game: 'perch-and-plume', mode: UI.camp ? 'campaign' : UI.mode, level: (G.pl.find(function (p) { return p.kind !== 'human'; }) || {}).lvl, seats: G.pl.map(function (p, i) { return { name: p.name, me: i === me, ai: p.kind !== 'human' ? p.lvl : undefined }; }), winner: Array.isArray(win) ? win : win, scores: sc.map(function (s) { return s.total; }), turns: G.turn, ms: Date.now() - UI.started }); } catch (e) { }
+  try { if (window.GNS && UI.mode !== 'tutorial' && UI.mode !== 'tutfree') GNS.result({ game: 'perch-and-plume', mode: UI.camp ? 'campaign' : UI.mode, level: (G.pl.find(function (p) { return p.kind !== 'human'; }) || {}).lvl, seats: G.pl.map(function (p, i) { return { name: p.name, me: i === me, ai: p.kind !== 'human' ? p.lvl : undefined }; }), winner: Array.isArray(win) ? win : win, scores: sc.map(function (s) { return s.total; }), turns: G.turn, ms: Date.now() - UI.started }); } catch (e) { }
   var gwin, el = $('#result'), order = sc.map(function (s, i) { return i; }).sort(function (a, b) { return sc[b].total - sc[a].total; });
   var line = winners.length > 1 ? 'A tie at the top!' : isHuman(winners[0]) ? (humans().length > 1 ? G.pl[winners[0]].name + ' wins the year!' : 'You win the year!') : G.pl[winners[0]].name + ' wins the year.';
   var goalHTML = '';

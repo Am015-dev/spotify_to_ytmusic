@@ -43,15 +43,24 @@ var tmine = function () { return G && myTurn() && !UI.busy; };
 function tutSteps() {
   var T = TUT.ids;
   var handOf = function (id) { return function () { var i = G.pl[0].hand.indexOf(id); return i >= 0 ? document.querySelector('#hand .bc[data-i="' + i + '"]') : null; }; };
-  // 7 steps, each one real tap on the exact spotlit element; the step only advances when that tap is done
+  // One real, short game (1 round of 8 actions vs Pip) in 5 chapters. Action steps advance only when the exact spotlit element is
+  // tapped; "see" steps (Next) explain a rule the board is showing right then. Coverage list: TUTORIAL-COVERAGE.md (ids = step ids).
+  var pt = function (t) { return function () { return tmine() && t(); }; };
   return [
-    { id: 'forest', title: 'Gain food', say: 'On your turn you do ONE thing. Tap the green Forest button to gain food.', target: tq('.ract[data-h="0"]'), wait: { type: 'tap', match: function (a) { return a.what === 'ract' && a.h === 0; } }, ready: tmine },
-    { id: 'die', title: 'Take food', say: 'Tap a glowing food die. Your 2 forest birds let you take 2.', target: tq('.die.glow'), wait: { type: 'tap', match: function (a) { return a.what === 'die'; }, times: 2 }, ready: function () { return tmine() && G.q && G.q.h === 'die'; } },
-    { id: 'select', title: 'Play a bird', say: 'Next turn: play a bird. Tap the glowing bird in your hand.', target: handOf(T.play), wait: { type: 'tap', match: function (a) { return a.what === 'hand' && a.id === T.play; } }, ready: function () { return tmine() && !G.q && G.pl[0].hand.indexOf(T.play) >= 0; } },
-    { id: 'slot', title: 'Where it lives', say: 'Tap the glowing space in the yellow Grassland row.', target: tq('.row[data-h="1"] .slot.next'), wait: { type: 'tap', match: function (a) { return a.what === 'slot' && a.h === 1; } } },
-    { id: 'pay', title: 'Pay for it', say: 'Tap Play to pay its food and 1 egg. Its points are now yours.', target: tq('#acts [data-a="playgo"]'), wait: { type: 'tap', match: function (a) { return a.what === 'playgo'; } } },
-    { id: 'eggs', title: 'Lay eggs', say: 'Tap the yellow Grassland button to lay eggs. Every egg is 1 point.', target: tq('.ract[data-h="1"]'), wait: { type: 'tap', match: function (a) { return a.what === 'ract' && a.h === 1; } }, ready: function () { return tmine() && !G.q; } },
-    { id: 'egg', title: 'Place eggs', say: 'Tap a glowing bird to put an egg on it.', target: tq('.bc[data-a="bird"].glow'), wait: { type: 'tap', match: function (a) { return a.what === 'bird' && a.t === 'egg'; }, times: 3 }, ready: function () { return tmine() && G.q && G.q.h === 'egg'; } }
+    { id: 'setup', title: '1 First turn \u00b7 Your start', say: 'Every year starts with 5 things to keep (birds and food) and 1 secret bonus card. We picked them for you: your birds are below.', target: tq('#hand'), wait: null, ready: tmine },
+    { id: 'forest', title: '1 First turn \u00b7 Gain food', say: 'On your turn you do ONE thing. Tap the green Forest button to gain food.', target: tq('.ract[data-h="0"]'), wait: { type: 'tap', match: function (a) { return a.what === 'ract' && a.h === 0; } }, ready: tmine },
+    { id: 'die', title: '1 First turn \u00b7 The feeder', say: 'Tap a glowing food die. Your 2 forest birds let you take 2. An empty feeder is rolled again.', target: tq('.die.glow'), wait: { type: 'tap', match: function (a) { return a.what === 'die'; }, times: 2 }, ready: function () { return tmine() && G.q && G.q.h === 'die'; } },
+    { id: 'chain', title: '1 First turn \u00b7 Bird powers', say: 'After a row action, each bird in that row uses its brown power, right to left. That is your engine.', target: tq('.row[data-h="0"]'), wait: null, ready: function () { return tmine() && !G.q; } },
+    { id: 'select', title: '2 Play a bird \u00b7 Pick it', say: 'Playing a bird is the other kind of turn. Tap the glowing bird in your hand.', target: handOf(T.play), wait: { type: 'tap', match: function (a) { return a.what === 'hand' && a.id === T.play; } }, ready: function () { return tmine() && !G.q && G.pl[0].hand.indexOf(T.play) >= 0; } },
+    { id: 'slot', title: '2 Play a bird \u00b7 Where', say: 'A bird goes in the leftmost free space of a row it lives in. Tap the glowing grassland space.', target: tq('.row[data-h="1"] .slot.next'), wait: { type: 'tap', match: function (a) { return a.what === 'slot' && a.h === 1; } } },
+    { id: 'pay', title: '2 Play a bird \u00b7 Pay', say: 'Pay the food on the card (any 2 food can stand in for 1) plus the egg cost of the space. Tap Play.', target: tq('#acts [data-a="playgo"]'), wait: { type: 'tap', match: function (a) { return a.what === 'playgo'; } } },
+    { id: 'eggs', title: '3 Eggs \u00b7 Lay eggs', say: 'More birds in a row = a bigger action. Tap the yellow Grassland button to lay eggs.', target: tq('.ract[data-h="1"]'), wait: { type: 'tap', match: function (a) { return a.what === 'ract' && a.h === 1; } }, ready: function () { return tmine() && !G.q; } },
+    { id: 'egg', title: '3 Eggs \u00b7 Nests', say: 'Tap a glowing bird to put an egg on it. A bird holds only as many eggs as its nest. Each egg is 1 point.', target: tq('.bc[data-a="bird"].glow'), wait: { type: 'tap', match: function (a) { return a.what === 'bird' && a.t === 'egg'; }, times: 3 }, ready: function () { return tmine() && G.q && G.q.h === 'egg'; } },
+    { id: 'draw', title: '4 Cards \u00b7 Draw birds', say: 'Tap the blue Wetland button to draw new birds.', target: tq('.ract[data-h="2"]'), wait: { type: 'tap', match: function (a) { return a.what === 'ract' && a.h === 2; } }, ready: function () { return tmine() && !G.q; } },
+    { id: 'tray', title: '4 Cards \u00b7 Tray or deck', say: 'Take a face-up bird from the tray (or a surprise from the deck). The tray refills after your turn.', target: tq('.bc[data-a="tray"].glow'), wait: { type: 'tap', match: function (a) { return a.what === 'tray' || a.what === 'deck'; } }, ready: function () { return tmine() && G.q && G.q.h === 'draw'; } },
+    { id: 'goals', title: '5 Scoring \u00b7 Round goal', say: 'When a round ends, its goal is scored: most items wins the most points. This one is shown here.', target: tq('#goalsbtn'), wait: null, ready: tmine },
+    { id: 'score', title: '5 Scoring \u00b7 The end', say: 'The year ends after the last round. You score birds + eggs + goals + bonus card + cached food + tucked cards. A tie goes to the most food left.', target: tq('#foodrow'), wait: null, ready: tmine },
+    { id: 'finish', title: '5 Scoring \u00b7 Finish the year', say: 'Your last actions are yours to choose. Pip now plays for real. Play to the end and see the final score.', target: tq('#mat'), wait: null, ready: tmine }
   ];
 }
 function tutStart() {
@@ -63,7 +72,7 @@ function tutStart() {
   GXT.start({ game: 'perch-and-plume', story: true,
     setup: function () { var T = TUT.ids; startGame({ seats: [{ name: 'You', kind: 'human', face: 'you' }, { name: 'Pip', kind: 'ai', lvl: 'easy', face: 'pip' }], mode: 'tutorial', tutorial: true, seed: 42, rounds: 1, cubes: [8], hands: { 0: [T.play, T.h2, T.h3, null, null].filter(Boolean) }, first: 0, goals: ['birds-G'], prep: tutPrep }); },
     steps: tutSteps(),
-    endTitle: 'You know how a turn works', endText: 'Each turn: play a bird, or tap a row for food, eggs or cards. The blue Wetland row draws new birds. 4 rounds, most points wins.',
-    onDone: function (r) { try { localStorage.setItem('pp-played', '1'); } catch (e) { } stopTimers(); if (r && r.choice === 'story') openStory(); else quickStart(); },
+    endTitle: 'Now finish this year', endText: 'Use your last actions: play a bird, or tap a row for food, eggs or cards. Then the round goal is scored and the final score shows.', endButtons: [{ id: 'finish', label: 'Finish this game' }, { id: 'story', label: 'Skip to the story' }],
+    onDone: function (r) { try { localStorage.setItem('pp-played', '1'); } catch (e) { } if (r && r.choice === 'story') { stopTimers(); openStory(); return; } UI.mode = 'tutfree'; UI.turnKey = null; render(); pump(); },
     onExit: function () { stopTimers(); showTitle(); } });
 }

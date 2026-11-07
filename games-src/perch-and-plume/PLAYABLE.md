@@ -19,6 +19,7 @@ world, recognition over recall, minimal visible text.
 | 4 | Food dice and counters are abstract icon glyphs (a swirl, a red cluster, a rat head) with no words; you can't tell seed from grub. | **Fixed.** The temp icon glyphs are dropped for the code-drawn food shapes (slot kept for real art), and every die and every counter carries its word: "seed", "fish", "berry", "grub", "rodent", "either". |
 | 5 | A coach bubble ("One action a turn ... Got it") pops up over the rows on the first turn and on the first draw, covering what you need to tap. | **Fixed.** First-time coach bubbles are off by default (the tutorial, the instruction bar and the glow carry it); still switchable in Menu. |
 | 6 | Tutorial: 13 steps, 5 of them "Next" lectures; spotlights on whole areas (the mat, the feeder, the tray) instead of the thing to tap; it ends on the Quick-game settings page, not a game. | **Fixed.** 7 steps, each one real tap on the exact element (forest button, a glowing die x2, the bird in hand, the grassland space, Play, the grassland button, a glowing bird x3); the step advances only when that tap is done; Skip works; "Play" on the end card starts a real game at once. Proven by `tests/tutorial-end.js` at 390x763 and 1440x860 (elementFromPoint at each target's centre is the target). |
+| 6b | (ADDENDUM 1) The tutorial was not a real game and skipped rules. | **Fixed.** The tutorial is now one real, short game (1 round, 8 actions vs Pip) in 5 chapters with 14 guided steps: 10 taps on exact targets, plus "see" steps that explain what the board shows at that moment. Then "Finish this game": Pip plays with the real AI, you use your last actions, the round goal is scored and the result screen shows. Every rule and the step that teaches it: `TUTORIAL-COVERAGE.md` (6 items honestly marked not covered). `tests/tutorial-end.js` plays all of it to the result screen at both sizes. |
 | 7 | No reason with points: "4 points" pops without saying from what. | **Fixed.** Pops say why: "+4 points: Dusk Vireo", "+1 egg = +1 point", "+1 seed"; your bird slides into its space (420 ms) when played. |
 | 8 | Rival chip reads "Fern 0★ · 8▣" (two private symbols). | **Fixed.** "Fern 0 pts · 8 left". |
 | 9 | Rules drawer opens with long paragraphs. | **Fixed.** Help opens with "How a turn works" in 5 short lines, then the details. |
@@ -44,10 +45,17 @@ hand's power text is 13 px on phones (the audit's floor for that size, same as b
 | `VIS_SLUGS="," build-all.py --quick perch-and-plume` | PASS (9/9 scenarios, axe clean) |
 | `node rules-test.js 120` | PASS 120/120 |
 | `node smoke.js <served url>` | PASS phone + PC, 0 errors |
-| `tests/tutorial-end.js phone` / `pc` | PASS: 7/7 steps, every target uncovered at its centre, end card, "Play" starts a real game, 0 errors |
+| `tests/tutorial-end.js phone` / `pc` | PASS: 14/14 guided steps (every target and Next uncovered at its centre), all TUTORIAL-COVERAGE.md ids shown, then the rest of the year played by visible taps to the result screen, 0 errors |
 | `tests/ui-play.js phone all` (taps only visible, uncovered UI; no engine calls to choose) | PASS: Quick game vs 1 computer to the result (~200 taps), Story chapter 1 to its result ("Goal met!"), 0 covered targets, 0 errors |
 | `ui-audit.spec.js` | phone A0 B0 C0 D0 E0 F0; PC A0 B0 C0 D0 E0 F0; phone-s A0 **B3** C0 D0 E0 F0 |
 
 phone-s B3, explained: two are the audit's own "Test:" tag (bottom-left, 10 px dark pill) sitting under the drawer/menu text line
 that happens to land there (same pair of colours, 2.82:1, in both; the base build had B4 here); the third is the shared campaign
 map's chapter disc "6" at 4.49:1 (shared kit, read-only for this task). Our own board, title and result have no B.
+
+## Rules check (ADDENDUM 2): games-src/rules-check/perch-and-plume.md
+WRONG 0, MISSING 3, and all 3 are fixed in the engine. Each has a rules-test case named after it; each case fails on the old engine and passes now:
+- `MISSING feeder`: powers that take from the feeder (gainF, cacheF, wFeeder) now reroll an empty feeder, and an all-same feeder that lacks the wanted food; a feeder emptied by a power is thrown back in.
+- `MISSING pink`: a bird played by a "play a second bird" power now triggers other players' pink powers.
+- `MISSING blue goals` / `random first`: setup options "Round goals: 1 point each, max 5" (blue side) and "Who starts: Random" on the Quick game screen.
+The 7 SIMPLIFIED items are listed in the Rules drawer under "Simplified on purpose". The tutorial is unchanged by these fixes.
