@@ -214,3 +214,11 @@ Style block (in front of every prompt): Painterly 2D gouache illustration of a 1
 3. Tell the orchestrator; it runs the ingest report, wiring, then `build-all.py --deploy vinegrave`. The orchestrator also runs `python3 games-src/vinegrave/register-assets.py` once at merge time to add the slots to `next-wave/expected-assets.json`.
 
 Fit rules: `bg` and `board` kinds are cover (cropped to fill), everything else is contain (never stretched).
+
+## Temporary art (until the Flow pictures arrive)
+38 slots (resource and travel icons, research tokens, all 15 guardians, all 12 idols) have temporary pictures made from game-icons.net
+glyphs (CC BY 3.0; per-file list with authors: `temp-art/CREDITS.md`). They are not in the repo as pictures and never in games/ from this branch:
+`node games-src/vinegrave/temp-art/temp-art.js` renders them into `assets-inbox/vinegrave/` (PNG), then `python3 games-src/scripts/ingest-assets.py`
+puts them in `games/vinegrave/media/` at deploy. A later Flow file with the same stem simply replaces each one.
+Credit line to keep in the shelf credits: "Icons made by Lorc, Delapouite and Caro Asercion. Available on https://game-icons.net, CC BY 3.0."
+Not used: Tabletop Simulator workshop / print-and-play pictures (scans of the publisher's art); no fan art with an explicit reuse licence found.
