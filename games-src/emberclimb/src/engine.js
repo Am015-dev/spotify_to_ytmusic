@@ -412,6 +412,7 @@
     G.shop = { items: items, rm: 75, removed: 0 }; G.scr = 'shop';
   }
   function leaveNode() {
+    if (G.at < 0) G.at = G.map.filter(function (n) { return n.f === 1; })[0].id;
     G.rw = null; G.shop = null; G.evn = null; G.rest = null;
     if (G.map[G.at].t === 'b') { G.scr = 'over'; G.won = 1; return; }
     G.scr = 'map';
@@ -499,10 +500,10 @@
     debug: {
       win: function () { if (G.b) { G.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; }); winBattle(); } },
       shop: function () { G.at = G.map.filter(function (n) { return n.f === 3; })[0].id; G.floor = 3; G.gold = 400; genShop(); },
-      rest: function () { G.rest = { todo: G.hs.map(function (h, i) { return i; }) }; G.scr = 'rest'; G.hs.forEach(function (h) { h.hp = Math.floor(h.mhp * 0.5); }); },
-      event: function (id) { G.evn = { id: id, res: null }; G.scr = 'event'; },
+      rest: function () { G.at = G.map.filter(function (n) { return n.f === 9; })[0].id; G.rest = { todo: G.hs.map(function (h, i) { return i; }) }; G.scr = 'rest'; G.hs.forEach(function (h) { h.hp = Math.floor(h.mhp * 0.5); }); },
+      event: function (id) { G.at = G.map.filter(function (n) { return n.f === 4; })[0].id; G.evn = { id: id, res: null }; G.scr = 'event'; },
       over: function (w) { G.scr = 'over'; G.won = w ? 1 : 0; G.b = null; },
-      treasure: function () { G.rw = { gold: 30, cards: {}, relics: [pickRelic('cu')], took: {}, treasure: 1 }; G.gold += 30; G.scr = 'reward'; }
+      treasure: function () { G.at = G.map.filter(function (n) { return n.f === 5; })[0].id; G.rw = { gold: 30, cards: {}, relics: [pickRelic('cu')], took: {}, treasure: 1 }; G.gold += 30; G.scr = 'reward'; }
     },
     setSeed: function (s) { if (G) G.rs = s | 0; }, mk: mk
   };

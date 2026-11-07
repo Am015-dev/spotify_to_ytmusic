@@ -24,3 +24,10 @@ Loader proven with 3 dummy files (hero portrait, card art, background) and the d
 - Placeholder cards show tiny text on phone (readable after a tap-lift); real art + a bigger lifted card is the next UI polish.
 - Frame / gem overlays assume the card art window at y 14%-53%.
 - Wire card-back, orb/stance/fx art are already slots; nothing else needs code when files arrive.
+
+## Test results (7 Nov 2026)
+- `rules-test.js 300`: targeted checks PASS, 300 bot games, 0 stuck, 0 invariant errors, 0 crashes.
+- `smoke.js`: real taps from the title, 3 turns, forced result screen: PASS at 390x763 touch and 1440x860 mouse, no console errors.
+- `build-all.py --quick emberclimb`: guard ok, build ok, 10 of 12 Playwright tests pass (9 scenarios + menu + ui-audit). The 2 failing are `visual.spec.js` title/board: "A snapshot doesn't exist" (baselines are recorded only by `--approve-visual` after the owner approves the screens, so not run). The orchestrator decides.
+- Container note: `games-src/node_modules` had no matching browser build; I ran `npm install --no-save @playwright/test@1.63.0 playwright@1.63.0` in games-src (not committed, package.json untouched) so build-all's Playwright matches /opt/pw-browsers.
+- `phone-check` is skipped by --quick (plays the game); not run.

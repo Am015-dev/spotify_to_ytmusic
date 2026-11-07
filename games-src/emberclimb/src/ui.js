@@ -16,7 +16,7 @@
     if (o.ph) e.style.setProperty('--ph', o.ph);
     e.appendChild(h('div', 'ph', label == null ? '' : label));
     if (PROBE[stem] === 1) { e.style.backgroundImage = 'url(media/' + stem + '.webp)'; e.classList.add('has'); }
-    else if (PROBE[stem] === undefined) {
+    else if (PROBE[stem] === undefined && (window.MEDIA_PRESENT || []).indexOf(stem) >= 0) {
       PROBE[stem] = 0; var im = new Image();
       im.onload = function () { PROBE[stem] = 1; document.querySelectorAll('[data-stem="' + stem + '"]').forEach(function (n) { n.style.backgroundImage = 'url(media/' + stem + '.webp)'; n.classList.add('has'); }); };
       im.onerror = function () { PROBE[stem] = -1; };
@@ -61,7 +61,7 @@
   function cardEl(c, o) {
     o = o || {}; var e = E.eff(c), d = D.CARDS[c.id];
     var el = h('div', 'card t-' + e.type + (d.rar === 'r' ? ' rare' : d.rar === 'u' ? ' unc' : ''));
-    var art = h('div', 'cart'); art.appendChild(A(c.id, d.name, { ph: TONE[d.hero] })); art.appendChild(A('frame-' + ({ A: 'attack', S: 'skill', P: 'power', X: 'status' })[e.type], '', { cls: 'cfr', noph: 1 }));
+    var art = h('div', 'cart'); art.appendChild(A(c.id, '', { ph: TONE[d.hero] })); art.appendChild(A('frame-' + ({ A: 'attack', S: 'skill', P: 'power', X: 'status' })[e.type], '', { cls: 'cfr', noph: 1 }));
     var ct = h('div', 'ct', e.name);
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
@@ -156,7 +156,7 @@
   function needTarget() { var g = G(), h0 = g.hs[g.b.cur], c = h0.hand[UI.sel]; return c && E.eff(c).tgt; }
   function battle() {
     var g = G(), b = g.b, cur = g.hs[b.cur >= 0 ? b.cur : 0];
-    app.appendChild(topbar(h('span', 'chip', 'Turn ' + b.turn)));
+    app.appendChild(topbar());
     var st = h('div'); st.id = 'stage'; st.setAttribute('data-board', '1'); st.appendChild(A(b.kind === 'b' ? 'bg-boss-' + g.boss : b.kind === 'e' ? 'bg-elite' : 'bg-battle-' + (1 + ((g.floor - 1) % 3)), '', { cls: 'bg', kind: 'bg' }));
     var en = h('div', 'enemies'), tgtMode = b.ph === 'p' && UI.sel >= 0 && needTarget();
     b.en.forEach(function (e, i) {
@@ -191,7 +191,7 @@
     var anyOk0 = (b.ph === 'p' ? cur.hand : []).some(function (c) { return E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'); });
     var ctl = h('div', 'ctl');
     if (b.ph === 'p') {
-      ctl.appendChild(h('div', 'piles', null, [on(h('button', 'chip', '↓ ' + cur.draw.length, [A('card-back', '', { noph: 1, cls: 'cbk' })]), function () { UI.ov = 'draw'; render(); }), on(h('button', 'chip', '↺ ' + cur.disc.length), function () { UI.ov = 'disc'; render(); })]));
+      ctl.appendChild(h('div', 'piles', null, [on(h('button', 'chip', '↓ ' + cur.draw.length, [A('card-back', '', { noph: 1, cls: 'cbk' })]), function () { UI.ov = 'draw'; render(); }), on(h('button', 'chip', '↺ ' + cur.disc.length), function () { UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
       var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; ctl.appendChild(eb);
     } else ctl.appendChild(h('span', 'chip', 'Enemies act...'));
     st.appendChild(ctl);
