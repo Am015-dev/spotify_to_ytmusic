@@ -1,6 +1,6 @@
 // ===================== part 3: title, quick-game setup, starting hand, result, drawers, menu =====================
 var NAMES = ['Fern', 'Rowan', 'Hazel', 'Linnet', 'Bram'], FACES = ['pip', 'mags', 'tobias', 'pip', 'mags'];
-var CFG = { n: 2, kinds: ['human', 'ai', 'ai', 'ai', 'ai'], lvl: 'normal' };
+var CFG = { n: 2, kinds: ['human', 'ai', 'ai', 'ai', 'ai'], lvl: 'normal', side: 'green', first: 'you' };
 try { var c0 = JSON.parse(localStorage.getItem('pp-cfg') || 'null'); if (c0 && c0.n) CFG = c0; } catch (e) { }
 function firstTime() { try { return !localStorage.getItem('pp-played'); } catch (e) { return true; } }
 function tutBtn() { try { return typeof GXT !== 'undefined' ? GXT.menuHTML({ game: 'perch-and-plume', first: firstTime(), cls: 'btn', launch: tutStart }) : ''; } catch (e) { return ''; } }
@@ -28,12 +28,16 @@ function showConfig() { hideHelp();
     if (CFG.n === 1) h += '<p style="text-align:left">Solo: you play against the Rival Flock, a simple deck-driven rival that grabs dice, lays eggs and races you for the round goals.</p>';
     h += '<div class="seatrow"><span class="nm">You</span><span>always a person</span></div>';
     for (var i = 1; i < CFG.n; i++) h += '<div class="seatrow"><span class="nm">' + NAMES[i - 1] + '</span><div class="seg">' + ['ai', 'human'].map(function (k) { return '<button type="button" class="btn' + (CFG.kinds[i] === k ? ' on' : '') + '" data-k="' + i + ':' + k + '">' + (k === 'ai' ? 'Computer' : 'Person (pass the device)') + '</button>'; }).join('') + '</div></div>';
-    h += '<div class="lab">Computer skill</div><div class="seg">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button type="button" class="btn' + (CFG.lvl === l ? ' on' : '') + '" data-l="' + l + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div></div>';
+    h += '<div class="lab">Computer skill</div><div class="seg">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button type="button" class="btn' + (CFG.lvl === l ? ' on' : '') + '" data-l="' + l + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div>' +
+      '<div class="lab">Round goals</div><div class="seg">' + [['green', 'Race (most wins)'], ['blue', '1 point each, max 5']].map(function (o) { return '<button type="button" class="btn' + ((CFG.side || 'green') === o[0] ? ' on' : '') + '" data-side="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="lab">Who starts</div><div class="seg">' + [['you', 'You'], ['random', 'Random']].map(function (o) { return '<button type="button" class="btn' + ((CFG.first || 'you') === o[0] ? ' on' : '') + '" data-first="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div></div>';
     h += '<div class="tmenu"><button type="button" class="btn big primary" data-go="1">Start the year</button><button type="button" class="btn" data-back="1">Back</button></div>';
     el.innerHTML = h;
     $$('[data-n]', el).forEach(function (b) { b.onclick = function () { CFG.n = +b.dataset.n; draw(); }; });
     $$('[data-k]', el).forEach(function (b) { b.onclick = function () { var x = b.dataset.k.split(':'); CFG.kinds[+x[0]] = x[1]; draw(); }; });
     $$('[data-l]', el).forEach(function (b) { b.onclick = function () { CFG.lvl = b.dataset.l; draw(); }; });
+    $$('[data-side]', el).forEach(function (b) { b.onclick = function () { CFG.side = b.dataset.side; draw(); }; });
+    $$('[data-first]', el).forEach(function (b) { b.onclick = function () { CFG.first = b.dataset.first; draw(); }; });
     $('[data-back]', el).onclick = function () { el.hidden = true; showTitle(); };
     $('[data-go]', el).onclick = function () { try { localStorage.setItem('pp-cfg', JSON.stringify(CFG)); } catch (e) { } quickStart(); };
   }
@@ -50,7 +54,7 @@ function quickStart() {
   if (CFG.n === 1) seats.push({ name: 'Rival Flock', kind: 'automa', lvl: CFG.lvl, face: 'corvin' });
   for (var i = 1; i < CFG.n; i++) seats.push({ name: NAMES[i - 1], kind: CFG.kinds[i] === 'human' ? 'human' : 'ai', lvl: CFG.lvl, face: FACES[i - 1] });
   if (seats.filter(function (s) { return s.kind === 'human'; }).length > 1) seats[0].name = 'Player 1';
-  startGame({ seats: seats, mode: seats.some(function (s, k) { return k && s.kind === 'human'; }) ? 'hot' : CFG.n === 1 ? 'solo' : 'vs' });
+  startGame({ seats: seats, mode: seats.some(function (s, k) { return k && s.kind === 'human'; }) ? 'hot' : CFG.n === 1 ? 'solo' : 'vs', goalSide: CFG.side === 'blue' ? 'blue' : 'green', first: CFG.first === 'random' ? 'random' : 0 });
 }
 // ---------------- the starting hand: keep 5 in total (birds + food), pick 1 of 2 bonus cards
 function showKeep(s) { hideHelp();
@@ -118,6 +122,7 @@ var RULES = [
 function rulesBody() {
   var d = document.createElement('div'); d.className = 'dr';
   d.innerHTML = '<h3>How a turn works</h3><ol class="howturn"><li>On your turn you do ONE thing.</li><li>Play a bird from your hand into a row (pay the food on the card).</li><li>Or tap a row button: forest = food, grassland = eggs, wetland = cards.</li><li>Every bird in that row then uses its power, right to left.</li><li>After 4 rounds, most points wins: birds, eggs, goals, bonus cards.</li></ol>' + RULES.map(function (r) { return '<h3>' + r[0] + '</h3><p>' + r[1] + '</p>'; }).join('') +
+    '<h3>Simplified on purpose</h3><ul><li>Food and eggs you pay for a bird are picked for you (cheapest first).</li><li>The solo Rival Flock is this game\'s own simple deck.</li><li>120 birds, 18 bonus cards and 12 goals, all original.</li><li>A row\'s trade (card for food, food for egg, egg for card) is offered before the row\'s gain, not after.</li><li>Row yields: forest and wetland 1,1,2,2,3,3; grassland 2,2,3,3,4,4; a trade on every second space.</li><li>The 4 round goals never repeat a family.</li><li>When the feeder dice all match and a power wants a food that is not there, the dice are rerolled for you.</li></ul>' +
     '<h3>Row actions by birds in the row</h3><p>Forest food: 1, 1+trade, 2, 2+trade, 3, 3+trade. Grassland eggs: 2, 2+trade, 3, 3+trade, 4, 4+trade. Wetland cards: 1, 1+trade, 2, 2+trade, 3, 3+trade.</p>' +
     '<div class="tmenu" style="margin:10px 0"><button type="button" class="btn" id="rtut">Play the tutorial</button><button type="button" class="btn" id="rref">All cards</button></div>';
   setTimeout(function () { var t = $('#rtut', d); if (t) t.onclick = function () { GX.close(); tutStart(); }; var r = $('#rref', d); if (r) r.onclick = function () { GX.close(); try { GX.refOpen(); } catch (e) { } }; }, 0);

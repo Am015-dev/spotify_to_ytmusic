@@ -54,7 +54,8 @@
       if (fixed) fixed.forEach(function (id) { var k = G.deck.indexOf(id); if (k >= 0) G.deck.splice(k, 1); });
       p.offer = { birds: fixed ? fixed.slice() : G.deck.splice(0, 5), food: FOODS.slice(), bonus: G.bdeck.splice(0, 2) };
     });
-    G.first = opts.first || 0;
+    G.first = opts.first === 'random' ? Math.floor(rnd(G) * G.pl.length) : (opts.first || 0);
+    G.goalSide = opts.goalSide === 'blue' ? 'blue' : 'green';
     if (G.pl.every(function (p) { return p.ready; })) startRound(G); else setupQ(G);
     return G;
   }
@@ -180,7 +181,7 @@
       var each = Math.floor(sum / tie.length); tie.forEach(function (i) { pts[i] = each; });
       pos += tie.length;
     }
-    if (G.pl.length === 1) pts[0] = Math.min(cnt[0], 5);   // solo without a rival: 1 point per item, at most 5
+    if (G.pl.length === 1 || G.goalSide === 'blue') pts = cnt.map(function (c) { return Math.min(c, 5); });   // blue side (and solo without a rival): 1 point per item, at most 5   // solo without a rival: 1 point per item, at most 5
     return { gid: gid, cnt: cnt, pts: pts };
   }
   function endRound(G) {
@@ -318,7 +319,9 @@
   function brown(G, t) {
     var p = G.pl[t.seat], s = cell(G, t.seat, t.h, t.c); if (!s) return;
     var pw = power(s.id), x = pw.x, ev = { k: 'pw', seat: t.seat, h: t.h, c: t.c, id: s.id, txt: '' };
-    var take = function (f) { var i = G.feeder.findIndex(function (d) { return d === f || (d === 'gs' && (f === 'grub' || f === 'seed')); }); if (i < 0) return false; G.feeder.splice(i, 1); return true; };
+    var has = function (f) { return G.feeder.some(function (d) { return d === f || (d === 'gs' && (f === 'grub' || f === 'seed')); }); };
+    var prep = function (f) { if (!G.feeder.length || (allSame(G) && !has(f))) rollAll(G); };
+    var take = function (f) { prep(f); var i = G.feeder.findIndex(function (d) { return d === f || (d === 'gs' && (f === 'grub' || f === 'seed')); }); if (i < 0) return false; G.feeder.splice(i, 1); if (!G.feeder.length) rollAll(G); return true; };
     switch (pw.k) {
       case 'gainF': if (take(x[0])) { p.food[x[0]]++; ev.txt = '+1 ' + x[0]; ev.f = x[0]; } else ev.txt = 'no ' + x[0] + ' in the feeder'; break;
       case 'gainS': p.food[x[0]]++; ev.txt = '+1 ' + x[0]; ev.f = x[0]; break;
@@ -351,7 +354,7 @@
       case 'wLaySelf': { var n = Math.min(+x[0], B[s.id].e - s.eggs); s.eggs += n; ev.txt = '+' + n + ' eggs'; ev.egg = n; break; }
       case 'wLayNest': { var m = 0; birds(p).forEach(function (y) { if (nestIs(y.b, x[0]) && y.s.eggs < y.b.e) { y.s.eggs++; m++; } }); ev.txt = '+' + m + ' eggs'; ev.egg = m; break; }
       case 'wBonus': G.work.unshift({ k: 'bonusPick', seat: t.seat }); ev.txt = 'draws 2 bonus cards'; break;
-      case 'wFeeder': { var k2 = 0; for (var j = G.feeder.length - 1; j >= 0; j--) if (G.feeder[j] === x[0] || (G.feeder[j] === 'gs' && (x[0] === 'grub' || x[0] === 'seed'))) { G.feeder.splice(j, 1); k2++; } p.food[x[0]] += k2; ev.txt = '+' + k2 + ' ' + x[0]; ev.f = x[0]; break; }
+      case 'wFeeder': { if (!G.feeder.length || (allSame(G) && !G.feeder.some(function (d) { return d === x[0] || (d === 'gs' && (x[0] === 'grub' || x[0] === 'seed')); }))) rollAll(G); var k2 = 0; for (var j = G.feeder.length - 1; j >= 0; j--) if (G.feeder[j] === x[0] || (G.feeder[j] === 'gs' && (x[0] === 'grub' || x[0] === 'seed'))) { G.feeder.splice(j, 1); k2++; } p.food[x[0]] += k2; if (!G.feeder.length) rollAll(G); ev.txt = '+' + k2 + ' ' + x[0]; ev.f = x[0]; break; }
       case 'wPlay': {
         var hab = 'FGW'.indexOf(x[0]);
         if (playable(G, t.seat, hab).length) { G.q = { seat: t.seat, h: 'play2', d: { hab: hab } }; fx(G, ev); ev.txt = 'may play another bird'; log(G, nameOf(G, t.seat) + ': ' + B[s.id].n + ' lets them play a second bird.'); return; }
@@ -569,7 +572,7 @@
     var tasks = [];
     if (power(id).col === 'white') tasks.push({ k: 'white', seat: seat, h: m.h, c: col });
     G.work = tasks.concat(G.work);
-    if (onlyHab == null) queuePinks(G, seat, 'play', m.h);
+    queuePinks(G, seat, 'play', m.h);   // any bird played, however it came into play
     return { ok: true };
   }
 
