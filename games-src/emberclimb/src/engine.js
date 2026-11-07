@@ -73,13 +73,14 @@
       var H = D.H[k], h = { k: k, hp: H.hp, mhp: H.hp, deck: H.start.map(function (id) { return mk(id); }), dead: 0 };
       G.hs.push(h); G.relics.push(H.relic);
     });
-    G.boss = D.ENC.boss[ri(3)][0];
+    G.boss = D.ENC.boss[ri(3)][0]; if (opt.boss) G.boss = opt.boss;
+    G.F = opt.floors || 9; G.ehp = opt.hpPct || 100; if (opt.relic && G.relics.indexOf(opt.relic) < 0) G.relics.push(opt.relic);
     genMap(); resetCombat();
     return G;
   }
   function resetCombat() { G.hs.forEach(function (h) { h.draw = []; h.hand = []; h.disc = []; h.exh = []; h.en = 0; h.blk = 0; h.st = {}; h.orbs = []; h.stance = 'n'; h.pw = {}; }); }
   function genMap() {
-    var W = 4, F = 9, nodes = {}, paths = [];
+    var W = 4, F = G.F || 9, nodes = {}, paths = [];
     var starts = shuffle([0, 1, 2, 3]).slice(0, 3);
     starts.push(ri(4));
     starts.forEach(function (c) {
@@ -96,7 +97,7 @@
     keys.forEach(function (k, i) { idOf[k] = i; });
     keys.forEach(function (k) {
       var n = nodes[k], f = n.f;
-      if (f === 1) n.t = 'm'; else if (f === 5) n.t = 't'; else if (f === 9) n.t = 'r';
+      if (f === 1) n.t = 'm'; else if (f === 5 && F >= 7) n.t = 't'; else if (f === F && F >= 3) n.t = 'r';
       else {
         var w = [['m', 45], ['v', 22], ['s', f >= 3 ? 7 : 0], ['r', f >= 4 && f <= 8 ? 12 : 0], ['e', f >= 3 ? 14 : 0]], tot = 0; w.forEach(function (x) { tot += x[1]; });
         var r = ri(tot); for (var i = 0; i < w.length; i++) { r -= w[i][1]; if (r < 0) { n.t = w[i][0]; break; } }
@@ -104,7 +105,7 @@
       arr.push({ id: idOf[k], f: f, c: n.c, t: n.t, nx: n.nx.map(function (x) { return idOf[x]; }) });
     });
     var bid = arr.length; arr.forEach(function (n) { if (n.f === F) n.nx = [bid]; });
-    arr.push({ id: bid, f: 10, c: 1.5, t: 'b', nx: [] });
+    arr.push({ id: bid, f: F + 1, c: 1.5, t: 'b', nx: [] });
     G.map = arr;
   }
   function reachable() {
@@ -218,7 +219,7 @@
   }
   // ---------- battle flow
   function mkEnemy(id) {
-    var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); if (G.hs.length > 1) hp = Math.round(hp * 2);
+    var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); if (G.hs.length > 1) hp = Math.round(hp * 2); if (G.ehp && G.ehp !== 100) hp = Math.round(hp * G.ehp / 100);
     return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0 };
   }
   function plan(e) {

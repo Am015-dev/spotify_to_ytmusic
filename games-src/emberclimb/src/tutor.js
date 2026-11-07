@@ -29,14 +29,20 @@
       { id: 'reward', title: 'Pick a reward', target: function () { return document.querySelector('.picks'); }, say: 'Each win lets you add one card to your deck. Tap a card you like. A sharper deck climbs higher.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: function () { return g().scr === 'reward' && document.querySelector('.picks .card'); } }
     ];
   }
-  function finish(play) {
-    window.EC_NOSAVE = 0; UI.ov = null; UI.mode = 'title';
-    if (play) { UI.start(); } else UI.render();
+  function finish(play, done) {
+    window.EC_NOSAVE = 0; UI.ov = null;
+    if (UI.camp) {
+      var def = UI.camp;
+      if (done && def.id !== 'guide') { window.EC_NOSAVE = 0; var G = g(); G.won = 1; try { GXC.finish(G); } catch (e) { UI.campExit(); } return; }
+      UI.campExit(); try { GXC.open(); } catch (e) { } return;
+    }
+    UI.mode = 'title'; UI.sub = '';
+    if (play) { UI.pick = ['w']; UI.sub = 'quick'; UI.render(); } else UI.render();
   }
   UI.tutStart = function () {
     if (!window.GXT) return;
     GXT.start({ game: 'emberclimb', setup: stage, steps: steps(), story: false, endTitle: 'You can climb now', endText: 'Read the intents, block or attack, pick cards that build a deck. Good luck.',
-      onDone: function (r) { finish(!r || r.choice !== 'menu'); }, onExit: function () { finish(false); } });
+      onDone: function (r) { finish(!r || r.choice !== 'menu', true); }, onExit: function () { finish(false, false); } });
   };
   window.EC_TUT_STEPS = steps;
 })();

@@ -11,7 +11,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   for (const [name, vp, touch] of [['phone', { width: 390, height: 763 }, true], ['pc', { width: 1440, height: 860 }, false]]) {
     const ctx = await br.newContext({ viewport: vp, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1 }); const pg = await ctx.newPage(), errs = [];
     pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error' && !/404/.test(m.text())) errs.push(m.text()); });
-    await pg.goto(base + 'emberclimb.html?anim=0'); await pg.waitForSelector('#play');
+    await pg.goto(base + 'emberclimb.html?anim=0'); await pg.waitForSelector('#title');
     const tapEl = async el => { const b = await el.boundingBox(); const x = b.x + b.width / 2, y = b.y + b.height / 2; if (touch) await pg.touchscreen.tap(x, y); else await pg.mouse.click(x, y); await sleep(120); };
     const first = await pg.$('.gxt-menu.gxt-first'); if (!first) fail(name + ': guide not offered first on a first launch');
     await tapEl(await pg.$('.gxt-menu')); await sleep(600);
@@ -34,11 +34,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await sleep(600); const endc = await pg.evaluate(() => document.body.innerText.includes('You can climb now')); if (!endc) fail(name + ': no end card');
     if (errs.length) fail(name + ' errors: ' + errs.slice(0, 3).join(' | '));
     // hand text size check on a normal fight
-    await pg.goto(base + 'emberclimb.html?anim=0'); await pg.waitForSelector('#play'); await pg.evaluate(() => { try { GXT.reset('emberclimb'); } catch (e) { } });
-    await tapEl(await pg.$('#play')); await tapEl(await pg.$('.node.glow')); await sleep(300);
+    await pg.goto(base + 'emberclimb.html?anim=0'); await pg.waitForSelector('#title'); await pg.evaluate(() => { try { GXT.reset('emberclimb'); } catch (e) { } });
+    await pg.evaluate(() => { UI.sub = 'quick'; UI.render(); }); await tapEl(await pg.$('#play')); await tapEl(await pg.$('.node.glow')); await sleep(300);
     const m = await pg.evaluate(() => { const c = document.querySelector('.hand .card'); const f = s => parseFloat(getComputedStyle(c.querySelector(s)).fontSize); const hr = document.querySelector('.hand').getBoundingClientRect(); const last = [...document.querySelectorAll('.hand .card')].pop().getBoundingClientRect(); const fst = document.querySelector('.hand .card').getBoundingClientRect(); return { name: f('.ct'), cost: c.querySelector('.cx') ? f('.cx') : 99, key: c.querySelector('.ck') ? f('.ck') : 99, inL: fst.left, inR: last.right, w: innerWidth, bottom: hr.bottom, h: innerHeight }; });
     console.log(name, 'hand font px', JSON.stringify(m));
-    if (m.name < 11 || m.cost < 11 || m.key < 11) fail(name + ': hand text under 11px'); if (m.inL < 0 || m.inR > m.w || m.bottom > m.h + 1) fail(name + ': hand outside screen');
+    if (m.name < 13 || m.cost < 13 || m.key < 13) fail(name + ': hand text under 11px'); if (m.inL < 0 || m.inR > m.w || m.bottom > m.h + 1) fail(name + ': hand outside screen');
     await pg.screenshot({ path: `shots/${name}-fight2.png` }); await ctx.close();
   }
   await br.close(); srv.close(); console.log(bad ? 'TUTOR TEST FAIL' : 'TUTOR TEST PASS'); process.exit(bad ? 1 : 0);

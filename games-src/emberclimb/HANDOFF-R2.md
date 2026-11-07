@@ -20,6 +20,24 @@
 5. **First-game guide** (`src/tutor.js`, shared `gx-tutor.js`, `gx-viewport.js`, help + tutor css inlined by `build.py`): 7 steps (intent, energy, attack, block, end turn, finish, pick a reward). Offered as the first button on a first launch and from Rules; staged fight is never saved (`EC_NOSAVE`).
 6. **Sound** (`src/sound.js`): synthesized card play / hit / hurt / block / buff / heal / win / lose, mute toggle in the top bar and title (saved). Music through `gameaudio.js` + `gx-music.js`, slots menu, map, fight, boss, victory, defeat; silent until `games/emberclimb/music/<slot>-<a|b>.mp3` exist (build lists present files, so no 404s). Cues: `games-src/next-wave/music/emberclimb/cues-wave1.json` (6 cues x versions a and b).
 
+
+## Round 2b (orchestrator correction + audit W340)
+Found -> fixed (played at 390x763 and 1440x860 with real taps for title / Story / tutorial; full climbs driven through the real render path, 2 per size, no errors):
+- Audit A (text size): hand cards showed 6-8 px text on phone -> hand cards use `--hw`, name 13 px (16 px PC), cost and key number >= 13 px, card body text only on the lifted card; HP bars 13 px; chips and titles 16 px at PC width; placeholder labels first name only.
+- Audit B (contrast): card title bars darkened, HP bar fill darkened, placeholder labels get a flat dark backing.
+- Audit F (title buttons): the title now has exactly one big primary button (Guide on a first launch, Story afterwards); Quick game and How to play are small. Top bar is at most 4 buttons (empty potion slots are no longer buttons; Relics, Deck, Sound, How to play and Leave moved into a Menu).
+- Lifted card went off-screen at the left edge and covered its neighbours' names -> shifted inside the screen and lifted higher.
+- Title tutorial button text overlapped (b/span) -> stacked layout.
+- Dead end: no way to leave a fight -> Menu > Leave run / Leave chapter.
+- Story mode (shared `gx-campaign.js` + css, `campaign.json`, `CAMPAIGN-DESIGN.md`, `src/camp.js`): 9 chapters in 3 acts, chapter 1 is the guided first fight, hero + starting relic + short map + guardian per chapter, stars, easier offer, saved progress by the kit. Engine options `floors`, `boss`, `relic`, `hpPct`. Bot win rates per chapter in CAMPAIGN-DESIGN.md.
+- Title: Story / Quick game / How to play (Quick game = hero pick, 1 or 2 heroes).
+- Results: `build-all.py --quick` scenarios 11/14, only the 3 visual snapshot rows missing (expected); independent audit (`ui-audit.spec.js`) result in the worker report.
+
+Not done / next (honest):
+- Shell chrome of the old games (`shell.js` board shell with dock, `gx-kit.js` menu with settings/stats, `gx-menu.css` title layout, `gx-help.js` help drawer) is NOT adopted; this game keeps its own title, menu and a plain rules overlay. Adopting it means moving the DOM into `.gx-app/.gx-board`; needs its own round.
+- Audit E may still flag the Sound toggle and "How to play" as dead buttons (both do change the DOM when tapped manually); the kit's tutor "Next" button is flagged on the campaign guide surface (shared kit).
+- Campaign unlocks (portraits, card backs) are empty; no painted cast portraits (emoji used).
+
 ## Tests
 - `node rules-test.js 300`: PASS. `node bal.js 200`: table above.
 - `NODE_PATH=/opt/node-tools/node_modules node smoke.js`: PASS (phone + PC).
