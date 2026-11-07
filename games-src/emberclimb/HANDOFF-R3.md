@@ -21,3 +21,20 @@
 - `ui-audit.spec.js` phone / phone-s / pc: A0 B0 C0 D0 F0, **E1 each**: "dead button: End turn" on the "Replay the guide" surface (guide fight; the guide kit blocks taps off-target, so the audit sees no change). Fix tried: disable End turn until its step + redraw after the guide starts; still flagged, needs a look at how the guide surface is entered (shared `gx-tutor.js` blocks input before the game handler runs).
 - `build-all.py --quick emberclimb` (VIS_SLUGS=","): scenarios 11/11 PASS; smoke.js, tutor-test.js, rules-test.js PASS.
 - Not done: played Story ch1 -> ch2 by hand with real taps after the last change (smoke and tutor tests do tap through title, Quick climb, guide); PC menu items only checked by screenshot and the audit.
+
+# W363 polish (branch shelf/W363-emberclimb-polish, from W358 + alex/brave-carson-rbpmlk, not deployed)
+
+## Done
+1. **Result screens** (`ui.js` `resultScr`, `UI.showResult`; used by Quick and Story; camp.js overrides `GXC.result` so Story shows the same screen):
+   what killed you (`G.killer` set in engine `killHero`, with `G.killIn` fight kind) or the final boss, floors reached / total, final deck list grouped with counts
+   (tap a card = large card, tap again closes), relics row (tap = name + text), Story chapter stars + star lines + unlock lines, buttons Play again (`#again`) / Next chapter (`#rnext`, won only) / Story map (`#rmap`) / Title (`#rtitle`).
+2. **Enemy intents** (`ui.js` `intentParts`, `intentBox`, `UI.explain`): one code-drawn SVG icon per kind (attack with number, big attack, block, buff/strength, weak, vulnerable, frail, poison,
+   burn, slime, daze, sleep, unknown), several icons when a move does several things; tap an intent = panel with one plain sentence per part. New stems in `assets.json` (+ Flow prompts, `tools/gen-assets.js`):
+   `intent-weak intent-vuln intent-frail intent-poison intent-burn intent-slime intent-daze intent-unknown` (the old `intent-*` stems stay).
+3. **Relic unlocks**: `campaign.json` chapters 2-9 each unlock one relic (type `relic`: clover-dice, gold-tooth, smoking-censer, tin-flute, healing-moss, gale-cloak, whetstone-ring, phoenix-ash).
+   Locked relics stay out of the random pool (rewards, shop, events) via `E.lock()`, set from `UI.lockedRelics()` before every `newGame`; `?unlock=all` opens all; start relics of chapters are unaffected.
+   Shared change: `'relic'` added to the allowed unlock types in `shell/gx-campaign.js` (additive; goes out with the next build-all).
+4. **Temporary art**: `tools/temp-art.js` (game-icons.net glyphs, CC BY 3.0, on code-drawn shapes) -> `temp-art/*.webp`, 85 slots (intents, statuses, orbs, stances, nodes, 19 relics, 9 potions, 4 heroes, 14 enemies, 2 cast, 4 card frames).
+   Credits: ASSETS.md bottom + Menu > About. **Deploy copy step:** `cp games-src/emberclimb/temp-art/*.webp games/emberclimb/media/` BEFORE build-all (build only requests stems whose file exists), then run
+   `stamp-copyright.py`. Do not copy `CREDITS.md` / `credits.txt`. A Flow file with the same stem replaces any of them. Regenerate: `git clone --depth 1 https://github.com/game-icons/icons.git <dir>; node tools/temp-art.js <dir>`.
+   Not yet drawn (code placeholder only): backgrounds, the 100+ card pictures, dice, fx, gems, card back, events.
