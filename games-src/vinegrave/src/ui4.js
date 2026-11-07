@@ -81,9 +81,16 @@ function boot() {
   if (window.GNS && GNS.achievements) try { GNS.achievements('vinegrave', [{ id: 'win', name: 'Expedition leader', how: 'Win a game against computer explorers.', test: r => r.won && r.mode === 'vs' }, { id: 'sixty', name: 'Temple scholar', how: 'Score 60 or more.', test: r => r.score >= 60 }]); } catch (e) { }
   if (window.GXV) GXV.watch(() => { if (G) render(); });
   const q = new URLSearchParams(location.search); UI.fast = q.get('fast') === '1';
+  // the Story map's locked stages and header buttons answer every tap (a short note), never a dead tap
+  document.addEventListener('click', e => { const n = e.target.closest && e.target.closest('.gxc-node.locked,.gxc-head .gxc-ib'); if (!n) return; if (n.classList.contains('locked')) { e.stopPropagation(); e.preventDefault(); }
+    toast(n.classList.contains('locked') ? 'Win the stage before it to open this one.' : /star/i.test(n.getAttribute('aria-label') || n.textContent) ? 'Win stages to earn stars and unlock portraits.' : /back/i.test(n.textContent) ? 'Back to the title.' : 'One moment…', 1800); }, true);
+  // Escape leaves the guided round
+  document.addEventListener('keydown', e => { if (e.key !== 'Escape') return;
+    if (typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial') { try { GXT.stop(); } catch (x) { } clearTimeout(schedule.t); G = null; UI.mode = 'vs'; showTitle(); return; }
+    const ov = document.querySelector('body > .gxc:not([hidden])'); if (ov && !(typeof GXC !== 'undefined' && GXC.active())) { try { GXC.close(); } catch (x) { } if (!G || G.phase !== 'play') showTitle(); } });
   if (window.GXS && GXS.on) { showTitle(); return; }
   showTitle();
-  if (!UI.prefs.played && typeof GXT !== 'undefined' && !GXT.status(TUT_GAME).seen) setTimeout(() => { if (!G && !$('#start').hidden) tutStart(); }, 600);
+
 }
 window.UI = UI; Object.defineProperty(window, 'G', { get: () => G, configurable: true });
 boot();

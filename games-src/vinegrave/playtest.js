@@ -23,8 +23,9 @@ const MARK2 = () => { const m = window.__m, i = UI.mv.findIndex(x => VG.same(x, 
     const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded().catch(() => { }); touch ? await l.tap() : await l.click(); };
     await page.goto(S.url, { waitUntil: 'load' }); await page.waitForTimeout(1200);
     // ---- 1) first launch offers the tutorial: play it through
+    const offer = await page.locator('#start .tbtn.primary[data-a=tut]').count(); if (offer) await tap('#start .tbtn.primary'); await page.waitForTimeout(900);
     const tut = await page.evaluate(() => typeof GXT !== 'undefined' && GXT.active());
-    console.log(name, tut ? 'PASS tutorial offered on first launch' : 'FAIL no tutorial on first launch'); if (!tut) fails++;
+    console.log(name, offer && tut ? 'PASS tutorial offered on first launch and started' : 'FAIL tutorial offer'); if (!tut || !offer) fails++;
     let steps = 0, lastId = '';
     for (let k = 0; k < 120 && await page.evaluate(() => GXT.active()); k++) {
       const st = await page.evaluate(() => { const c = GXT.current && GXT.current(); return c ? { id: c.id || (c.step && c.step.id), wait: c.wait || (c.step && c.step.wait) } : null; });

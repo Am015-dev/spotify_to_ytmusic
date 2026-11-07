@@ -145,7 +145,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
 .flash{animation:flash .9s ease 2}
 @keyframes flash{50%{box-shadow:0 0 0 4px #fff,0 0 20px 6px rgba(255,255,255,.7)}}
-#toast{position:fixed;left:50%;top:calc(var(--gx-bar-h) + 54px);transform:translateX(-50%);z-index:46;background:rgba(10,20,14,.92);color:#fff;border-radius:12px;padding:8px 14px;max-width:min(420px,92vw);opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
+#toast{position:fixed;left:50%;top:calc(var(--gx-bar-h) + 54px);transform:translateX(-50%);z-index:70;background:rgba(10,20,14,.92);color:#fff;border-radius:12px;padding:8px 14px;max-width:min(420px,92vw);opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
 #toast.on{opacity:1}
 .loglist{display:flex;flex-direction:column;gap:4px}
 .loglist div{padding:3px 0;border-bottom:1px solid rgba(0,0,0,.08)}
@@ -154,3 +154,19 @@ button{font:inherit;color:inherit;cursor:pointer}
 html.gx-reduce .fxcard,html.gx-reduce .site.flip{animation:none}
 /* taps and hit tests always land on the button itself, never on an icon inside it */
 .site *,.cd *,.op *,.tag *,#track *,.ic svg{pointer-events:none}
+/* audit fixes: drawers above the title overlay; readable story map discs; desktop text floor 16 px for shared panels */
+.gx-scrim{z-index:54}.gx-drawer{z-index:55}
+.gxc-node .gxc-disc{background-color:#f3ead2!important;background-image:none!important;color:#22190d!important;text-shadow:none!important}
+.gxc-node.locked .gxc-disc{filter:none!important;opacity:1!important}
+.gxc-lock{color:#22190d;background:#f3ead2;border-radius:50%;filter:none!important}
+.cd .pic .ph{color:#2a1d08;text-shadow:0 1px 0 rgba(255,255,255,.55)}
+.cd.fear .pic .ph{color:#ffd9d0;text-shadow:0 1px 2px #000}
+.trow .rn{color:#fff3cf}
+@media (min-width:1000px){
+  .gxh-tt,.gxh-tx,.gxh-bd,.gxh-bd *,.gxt *,.lbl,.tsb small,.gx-chip,.gx-row-l,.gx-row-l small,.gx-set *,.gxc *,.gx-drawer-body *,#insp *,.sm{font-size:max(16px,1em)!important}
+  .gxc .gxc-st{font-size:16px!important}
+}
+/* while the Story map / scenes cover the screen, the game behind is hidden (no taps can reach it) */
+body:has(> .gxc:not([hidden])) .gx-app,body:has(> .gxc:not([hidden])) #start{visibility:hidden}
+#setd .gx-row-l small{display:none}
+@media (min-width:1000px){.gx-bar .gx-ibtn span{font-size:16px}}
