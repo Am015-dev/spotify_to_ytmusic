@@ -17,14 +17,15 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  // title -> start
  if(mode==='story'){await tap('#modal summary');await sleep(400);await tap('#modal [data-a=story]');await sleep(1500);if(await tap('.gxt-skip'))await sleep(1500)} else{await tap('#modal [data-a=start]');await sleep(600);await tap('.tutoffer [data-tutoffer=play]');await sleep(1500)}
  const t0=Date.now();let last='',stall=0,over=null;
- while(Date.now()-t0<540000){
+ while(Date.now()-t0<(+process.env.MAXMS||540000)){
    over=await p.evaluate(()=>{const r=document.querySelector('.gxc-res-on');if(r&&r.getBoundingClientRect().width)return {win:/won/.test(r.className),round:G?G.round:null,res:1};return G&&G.over?{win:!!G.over.win,round:G.round}:null});
    if(over)break;
    let did=null;
-   for(const sel of ['.gxh-bub .gxh-ok','#modal button:not([data-a=new]):not([data-a=rules]):not([data-a=cards]):not([data-a=close])','.bf-opts .opt','.gxc-node.open.next','.gxc-btn.go,.gxc-btn.pri,.gxc-btn:not(.ghost)','#bf [data-a=go][data-force]','#bf [data-a=next]','#bf [data-a=suggest]','#bf [data-a=go]']){
+   for(const sel of ['.gxh-bub .gxh-ok','#modal button:not([data-a=new]):not([data-a=rules]):not([data-a=cards]):not([data-a=close])','.bf-opts .opt','.gxc-btn.go,.gxc-btn.pri,.gxc-btn:not(.ghost)','.gxc-node.open.next','#bf [data-a=go][data-force]','#bf [data-a=next]','#bf [data-a=suggest]','#bf [data-a=go]']){
      if(sel==='#bf [data-a=suggest]'){const need=await p.evaluate(()=>PHO.st==='plan'||PHO.st==='plan2');if(!need)continue;
         const idle=await p.evaluate(()=>{try{return planProblems().length>0}catch(e){return false}});if(!idle)continue}
      const r=await tap(sel);if(r){did=sel+' '+r;break}}
+   if(process.env.DBG&&taps%5===0)console.log(taps,did,await p.evaluate(()=>[!!G,G&&G.round,PHO.st,document.querySelector('.gxc-res-on')?'res':'',[...document.querySelectorAll('[class*=gxc-]')].filter(e=>e.getBoundingClientRect().width).map(e=>e.className).slice(0,4).join('/')].join('|')));
    if(!did){ // a question that wants a glowing place on the island
      const g=await p.evaluate(()=>{const e=document.querySelector('#bfglow>*');if(!e)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});
      if(g){await p.touchscreen.tap(g[0],g[1]);taps++;did='glow'}}
