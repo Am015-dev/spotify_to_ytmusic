@@ -45,7 +45,9 @@ function storySay(who, text, ms) {
   var c = STORY.cast[who] || { name: who, color: '#4f7a45', mark: (who || '?')[0].toUpperCase() };
   $$('.saycard').forEach(function (x) { if (x.parentNode) x.parentNode.removeChild(x); });
   var d = document.createElement('div'); d.className = 'saycard'; d.setAttribute('data-volatile', ''); d.setAttribute('role', 'status');
-  d.innerHTML = '<span class="sayface" style="background:' + c.color + '">' + esc(c.mark) + '</span><span class="saytx"><b>' + esc(c.name) + '</b>' + esc(text) + '</span>';
+  d.innerHTML = faceHTML(who, c) + '<span class="saytx"><b>' + esc(c.name) + '</b>' + esc(text) + '</span>';
   document.body.appendChild(d);
   setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, ms || 2600);
 }
+// the speaker's portrait: the picture when it exists (free art or real art), else a coloured disc with an initial
+function faceHTML(who, c) { var st = 'portrait-' + who; return '<span class="sayface" style="background:' + (c.color || '#4f7a45') + '">' + (typeof ART !== 'undefined' && ART.have && ART.have[st] ? artHTML(st, 'sayimg') : esc(c.mark || (c.name || '?')[0])) + '</span>'; }

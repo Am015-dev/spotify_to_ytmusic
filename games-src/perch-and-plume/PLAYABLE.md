@@ -65,3 +65,9 @@ The 7 SIMPLIFIED items are listed in the Rules drawer under "Simplified on purpo
 - Story mode: chapter intros and win outros come from `campaign.json`. Each chapter now also has a loss line from its speaker, and bosses get last words after a win; both show on the result screen.
 - Quick game: a flavour line at the start and a result line in the game's voice.
 - All the text is in `src/story.js`; the cast and the 3-act arc are in `STORY.md`; the beats are listed next to their rules in `TUTORIAL-COVERAGE.md`.
+
+## Free CC0 art kit (merged, tested installed)
+- Every test above was re-run with the kit installed (186 pictures).
+- Birds use their pictures, and food dice and counters use the free icons with their word under them (clearer than the code drawing, so the earlier switch-off is removed).
+- Story speaking cards and result lines use the portraits.
+- The title text and the tutorial button over the new title picture now sit on a solid backing, so the audit is back to phone 0 / PC 0 / phone-s B3.
