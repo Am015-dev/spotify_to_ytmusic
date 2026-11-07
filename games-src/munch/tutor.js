@@ -78,7 +78,7 @@ const mv=a=>`#prompt [data-mv*='"act":"${a}"']`;
 function tcardEl(key){const id=myId(key);return id==null?null:document.querySelector(`.mine .hand [data-card="${id}"]`)}
 // the visible strip of a hand card (its neighbour overlaps it); the hand scrolls the card into view first
 function tcard(key){const e=tcardEl(key);if(!tvis(e))return null;let r=e.getBoundingClientRect();if(r.left<4||r.right>innerWidth-4){try{dkReveal(e)}catch(x){}r=e.getBoundingClientRect()}return hslice(e)}
-const tclear=()=>!document.getElementById('bfrev')&&!BF.kicking&&UI.pass==null&&!GX.open&&document.getElementById('modal').hidden&&!BF.drag;
+const tclear=()=>!document.getElementById('bfrev')&&!BF.kicking&&UI.pass==null&&!GX.open&&document.getElementById('modal').hidden&&!(BF.drag&&BF.down);
 const tmine=()=>!!G&&!G.winner&&sideToAct()===0&&!G.q&&tclear();
 const nowStr=()=>{const cb=G.cb;return cb?[sideStr(cb),monStr(cb)]:[0,0]};
 const tpick=key=>()=>myId(key);
