@@ -309,6 +309,80 @@
    "mut": 0
   }
  ],
+ "emberclimb": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ec-map",
+   "name": "Map: pick a room",
+   "ask": "Can you see the glowing rooms?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "ec-fight",
+   "name": "Fight: play a card",
+   "ask": "Tap a card twice to play it",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "ec-fight-two",
+   "name": "Fight: two heroes",
+   "ask": "Do both heroes show?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ec-reward",
+   "name": "Reward: pick a card",
+   "ask": "Pick one of three cards",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "ec-shop",
+   "name": "Shop: buy something",
+   "ask": "Can you buy an item?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ec-rest",
+   "name": "Campfire: heal or smith",
+   "ask": "Rest or upgrade",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ec-event",
+   "name": "Event: make a choice",
+   "ask": "Choose an option",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ec-result",
+   "name": "Result screen",
+   "ask": "Can you start a new climb?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  }
+ ],
  "final-approach": [
   {
    "id": "menu",
@@ -761,6 +835,40 @@
    "mut": 0
   }
  ],
+ "redline-rally": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "rr-board",
+   "name": "Race: pick gear and cards",
+   "ask": "Can you see your hand and Go?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "rr-corner",
+   "name": "Corner: brake or push",
+   "ask": "Does the corner warning show?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "rr-result",
+   "name": "Podium: results",
+   "ask": "Can you read the standings?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  }
+ ],
  "sands-of-qamar": [
   {
    "id": "menu",
@@ -1170,6 +1278,40 @@
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
    "group": "Story",
+   "mut": 0
+  }
+ ],
+ "twin-thrones": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "tt-board",
+   "name": "Duel: the pyramid",
+   "ask": "Can you see which cards you can take?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "tt-select",
+   "name": "Card chosen: build or sell",
+   "ask": "Do you see Build, Sell and the cost?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "tt-result",
+   "name": "Result: how the duel ended",
+   "ask": "Can you read who won and why?",
+   "sizes": "all",
+   "group": "UI",
    "mut": 0
   }
  ]

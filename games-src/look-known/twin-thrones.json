@@ -1,0 +1,25 @@
+{
+"phone": {
+"look": [],
+"axe": [
+[
+"tt-result-phone.json",
+"color-contrast",
+"#c16 > .band",
+"Roadside Inn"
+],
+[
+"tt-result-phone.json",
+"color-contrast",
+"#c18 > .band",
+"Timber Depot"
+]
+],
+"axe_pages": [
+"menu-phone.json",
+"tt-board-phone.json",
+"tt-result-phone.json",
+"tt-select-phone.json"
+]
+}
+}

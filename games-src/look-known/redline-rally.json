@@ -1,0 +1,12 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"rr-board-phone.json",
+"rr-corner-phone.json",
+"rr-result-phone.json"
+]
+}
+}

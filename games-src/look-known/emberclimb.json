@@ -1,0 +1,17 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"ec-event-phone.json",
+"ec-fight-phone.json",
+"ec-fight-two-phone.json",
+"ec-map-phone.json",
+"ec-rest-phone.json",
+"ec-result-phone.json",
+"ec-reward-phone.json",
+"ec-shop-phone.json",
+"menu-phone.json"
+]
+}
+}

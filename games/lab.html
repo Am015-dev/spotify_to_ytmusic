@@ -109,7 +109,7 @@ main{padding:12px 16px 40px;display:grid;gap:10px;max-width:900px;margin:0 auto}
 <script>
 (function(){
 var L=GXLAB,$=function(s){return document.querySelector(s)},esc=L.esc,F='all',SC={},UP=[];
-var NAMES={"crown-city-smash": "Crown City Smash", "nebula-aces": "Nebula Aces", "doorkick-dungeon": "Doorkick Dungeon", "shipwreck-isle": "Shipwreck Isle", "sands-of-qamar": "Sands of Qamar", "sunglaze": "Sunglaze", "rampart-and-vine": "Rampart & Vine", "short-fuse": "Short Fuse", "tidewake": "Tidewake", "hollowbough": "Hollowbough", "thornbound": "The Thornbound Throne", "kaiten-kitchen": "Kaiten Kitchen", "lantern-dive": "Lantern Dive", "cauldron-fair": "Cauldron Fair", "final-approach": "Final Approach"};
+var NAMES={"crown-city-smash": "Crown City Smash", "nebula-aces": "Nebula Aces", "doorkick-dungeon": "Doorkick Dungeon", "shipwreck-isle": "Shipwreck Isle", "sands-of-qamar": "Sands of Qamar", "sunglaze": "Sunglaze", "rampart-and-vine": "Rampart & Vine", "short-fuse": "Short Fuse", "tidewake": "Tidewake", "hollowbough": "Hollowbough", "thornbound": "The Thornbound Throne", "kaiten-kitchen": "Kaiten Kitchen", "lantern-dive": "Lantern Dive", "cauldron-fair": "Cauldron Fair", "final-approach": "Final Approach", "redline-rally": "Redline Rally", "emberclimb": "Emberclimb", "twin-thrones": "Twin Thrones"};
 function scenList(slug){return SC[slug]||[]}
 function counts(slug){var l=scenList(slug),c={ok:0,bad:0,skip:0,n:l.length};l.forEach(function(d){var s=L.scnRes(slug,d.id).s;if(s)c[s]++});return c}
 function toast(m){var t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true},1600)}
