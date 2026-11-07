@@ -22,7 +22,7 @@
   V.evalSeat = function (G, s) {
     var p = G.P[s], r = rem(G), st = STYLE[G.seats[s].style] || null, v = p.vp;
     if (G.over) { return p.vp * 1 + (G.winner === s ? 5 : 0); }
-    v += p.silver * (1 + (st && st.silver || 0)) + Math.min(p.workers, 5) * 0.55 + Math.max(0, p.workers - 5) * 0.12;
+    v += p.silver * (1 + (st && st.silver || 0)) + Math.min(p.workers, 4) * (0.5 + 0.15 * r) + Math.max(0, p.workers - 4) * 0.08;
     var gsum = 0; V.goodsTypes(p).forEach(function (g) { gsum += p.goods[g]; });
     v += gsum * ((G.n + 1) * (0.55 + (st && st.goods || 0)) + 0.3) * (r > 0.04 ? 1 : 0.4);
     /* stored tiles: worth something only if they can still go somewhere and there is time */
