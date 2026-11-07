@@ -7,6 +7,7 @@ const pre=(f,cb)=>{if(IMG_OK[f]!==undefined){cb&&IMG_OK[f]&&cb();return}IMG_OK[f
 const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 // ---- title / end art as CSS variables (the start and debrief panels paint a banner from them)
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
+  {const u=unl('cardback'),bf=u==='rift-crown'?'back-rift-crown':'back-default';pre(bf,()=>{R.style.setProperty('--na-back','url('+MEDIA+bf+'.webp)');R.dataset.naback='1'})}
   set('--na-title',phone()?'title-phone':'title');set('--na-end-win','end-win');set('--na-end-lose','end-lose');
   const t=unl('table')==='nebula7'?'table-nebula7':'arena-floor';pre(t,()=>{R.style.setProperty('--tbl-img','url('+MEDIA+t+'.webp)');if(tblWant!==t){tblWant=t;skin()}});
   pre(phone()?'table-default-phone':'table-default',()=>R.style.setProperty('--tbl-flat','url('+MEDIA+(phone()?'table-default-phone':'table-default')+'.webp)'))}
