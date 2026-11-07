@@ -33,6 +33,7 @@ const only = process.argv[2];
       if (await T('#store .tilebtn.glow', 300)) continue;
       if (await T('#mk .stall:not(.lane) .tilebtn.glow', 350)) continue;
       if (await T('#mk .stgoods.glow, #goods .gbtn.glow', 350)) continue;
+      if (await T('#tabs .tab.has', 400)) continue;
       if (await T('#acts .btn', 450)) continue;
       await page.waitForTimeout(200);
     }
