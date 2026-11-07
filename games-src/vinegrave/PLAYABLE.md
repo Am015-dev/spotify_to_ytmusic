@@ -63,6 +63,12 @@ After (playable-shots/layout-after-{map,row,track}-phone.webp):
 - Phone base text 14 px (cards, labels, chips); tabs, explorer chips, Pass and tags are at least 44 px tall. The instruction stays at most 2 lines.
 - Gate: build-all --quick PASS (the scenarios now open the Market / Research tab before checking). Tutorial-to-end PASS at 390x763 and 1440x860 (17 steps). Quick game by UI taps PASS at 390x763 (the tapper also uses the tabs). Smoke PASS. qa-bot phone: 0 blockers, 1 major, 27 minors (before: 0 / 0 / 48). The one major is "stuck overlay without any button: div#iscrim" in the fuzz phase on tutorial step 2 (screenshot: big card open, "Play it" spotlit and tappable, Skip tutorial visible). qa-bot's own report filter (STALE in qa-bot.js) drops stuck-overlay findings on a scrim as a bot artefact; it is not a soft lock.
 
+## ADDENDUM 4: a coached first game, not tap-tap
+- The tutorial is a real 2-round game against the real computer (easy). It has only 2 forced steps (Trail Notes, Play it); after that every legal move is allowed and the tutor draws nothing over the board.
+- Pell speaks just in time, in one non-blocking bubble with a ×. He explains a rule the first time it becomes an option or happens, comments on 2 of your moves (good move / tip, from the hard AI's reasoning), and explains the rival's first move and first pass.
+- After the game: 3 steps walk through the final scoring with your real numbers. The end card lists "Things you'll meet later" for every rule that did not come up, then starts a real game.
+- tut-test.js plays the coached game through the UI with free legal choices and asserts every rule id was explained in play or listed on the end card. Run: phone 17/27 explained in play, pc 14/27, the rest listed. Coverage table: TUTORIAL-COVERAGE.md.
+
 ## Remaining
 - Phone market cards still show effects as icons (no room for a sentence at 58 px); the name is readable and a tap opens the full text.
 - The vp badge on a phone market card can touch the cost icon on 4-coin cards.

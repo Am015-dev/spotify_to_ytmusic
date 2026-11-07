@@ -88,6 +88,7 @@ function render() {
   if (typeof artApply === 'function') artApply();
   if (window.GXH) try { GXH.phase(helpPhase()); } catch (e) { }
   if (UI.insp) refreshInsp();
+  if (UI.mode === 'tutorial' && typeof coachCheck === 'function') coachCheck(L);
 }
 function renderDock(L, q, me, actor) {
   const over = G.phase === 'over', mine = myTurn();

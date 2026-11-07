@@ -329,3 +329,10 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
   body[data-vtab="row"] #row .cd>.ptx{-webkit-line-clamp:3}
 }
 @media (max-width:999px){body[data-vtab="map"] #map{padding-top:22px;gap:26px;justify-content:flex-start}}
+/* coached first game: the tutor draws nothing over the board during free play; Pell's tip bubble never blocks input */
+body.vg-coached .gxt-ring,body.vg-coached .gxt-bub,body.vg-coached .gxt-fin,body.vg-coached .gxt-pill,body.vg-coached .gxt-cell{display:none!important}
+#coach{position:fixed;left:50%;top:70px;transform:translate(-50%,8px);z-index:96;width:min(420px,calc(100vw - 16px));display:flex;align-items:center;gap:8px;padding:6px 6px 6px 10px;border-radius:14px;background:#f3ead2;color:#22190d;border:2px solid #e2a63b;box-shadow:0 8px 22px rgba(0,0,0,.5);font-size:15px;line-height:1.25;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#coach.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#coach .cpor{flex:none;width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#4f9a6a,#1f4a30);color:#fff3d6;border:2px solid #e8c36a;font-weight:800}
+#coach .ctx{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#coach .cx{flex:none;width:44px;height:44px;border-radius:10px;border:0;background:transparent;font-size:24px;color:#22190d}
