@@ -155,7 +155,7 @@ function bootDrawers() {
         var c = document.createElement('button'); c.className = 'btn'; c.type = 'button'; c.textContent = 'All cards'; c.onclick = function () { GX.close(); try { GX.refOpen(); } catch (e) { } };
         var t = document.createElement('button'); t.className = 'btn'; t.type = 'button'; t.textContent = 'Tutorial'; t.onclick = function () { GX.close(); tutStart(); };
         S.appendChild(GX.row('Read', [r, c, t])); try { if (window.GXH) S.appendChild(GXH.settingsRow()); } catch (e) { } },
-      about: { name: 'Perch & Plume', version: '1.0', text: 'Original birds, names and art placeholders.' } });
+      about: { name: 'Perch & Plume', version: '1.0', text: 'Original birds and names. Food, egg and cube icons: game-icons.net by Lorc and Delapouite, CC BY 3.0.' } });
   } catch (e) { }
   try {
     GX.reference([

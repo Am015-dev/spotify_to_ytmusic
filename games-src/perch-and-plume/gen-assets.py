@@ -86,6 +86,16 @@ L += ["## How to drop the finished pictures in (3 steps)", "",
       "1. Generate each wave in Google Flow with `games-src/next-wave/flow-2d/perch-and-plume/prompts-waveN-ratio-WxH.json` (one file per wave and aspect ratio). Save each picture as `<stem>.png` (or .webp).",
       "2. Put the files in `assets-inbox/perch-and-plume/` and run `python3 games-src/scripts/ingest-assets.py` (`--check` first = dry run). It writes `games/perch-and-plume/media/<stem>.webp` (PLAYBOOK \"Finished pictures from the owner\").",
       "3. Rebuild (`python3 games-src/scripts/build-all.py --quick perch-and-plume`): the build lists the present files and the page draws them in their slots (cover or contain, never stretched).", "",
-      "Registration for the asset inbox: `python3 games-src/perch-and-plume/register-assets.py` (orchestrator, at merge time)."]
+      "Registration for the asset inbox: `python3 games-src/perch-and-plume/register-assets.py` (orchestrator, at merge time).", "",
+      "## Credits: temporary free-licensed pictures (until the Flow art replaces them)", "",
+      "All from game-icons.net, licence CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), recoloured and set on a round token by us (render script in the worker's notes; source icons are single-colour SVGs). Credit also shown in the Menu > About line.", "",
+      "| file (games/perch-and-plume/media/) | icon | author | source |", "|---|---|---|---|",
+      "| food-grub.webp | Caterpillar | Delapouite | https://game-icons.net/1x1/delapouite/caterpillar.html |",
+      "| food-seed.webp | Wheat | Lorc | https://game-icons.net/1x1/lorc/wheat.html |",
+      "| food-fish.webp | Tropical fish | Delapouite | https://game-icons.net/1x1/delapouite/tropical-fish.html |",
+      "| food-berry.webp | Raspberry | Delapouite | https://game-icons.net/1x1/delapouite/raspberry.html |",
+      "| food-rodent.webp | Rat | Delapouite | https://game-icons.net/1x1/delapouite/rat.html |",
+      "| token-egg.webp | Egg clutch | Lorc | https://game-icons.net/1x1/lorc/egg-clutch.html |",
+      "| ui-cube.webp | Cube | Delapouite | https://game-icons.net/1x1/delapouite/cube.html |"]
 (D / "ASSETS.md").write_text("\n".join(L) + "\n")
 print("assets", len(I), {w: sum(1 for i in I if i['wave'] == w) for w in (1, 2, 3)})

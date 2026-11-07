@@ -4,7 +4,7 @@ Made by `check-assets.py` (re-run after changing the roster, campaign or assets)
 
 | required | in assets.json | prompted | delivered | gaps |
 |---|---|---|---|---|
-| 186 | 186 | 186 | 0 | 0 |
+| 186 | 186 | 186 | 7 | 0 |
 
 ## By group
 

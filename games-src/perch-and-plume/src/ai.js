@@ -7,6 +7,7 @@
   var PP = root.PP || require('./engine.js');
   var B = PP.B, FOODS = PP.FOODS;
   var PWV = { gainF: .75, gainS: .9, cacheS: 1, cacheF: .8, tuckDraw: .9, tuckEgg: 1.1, tuckFood: 1, flock: 1, laySelf: .9, layNest: 1.4, draw1: .55, hunt: .5, huntDie: .45, allFood: .6, allDraw: .4, trade: .5 };
+  var AIW = { eng: .6, row: .25, kk: 2.5 };   // hard's tuned weights (tuned by ai-gate duels)
   function turnsLeft(G, seat) { var t = G.pl[seat].cubes; for (var r = G.round + 1; r < G.rounds; r++) t += G.cubes[r]; return t; }
   function need(G, seat) {   // how much each food is wanted by the birds in hand (missing food weighs more)
     var p = G.pl[seat], w = { grub: .2, seed: .2, fish: .2, berry: .2, rodent: .2 };
@@ -30,14 +31,14 @@
     var fv = []; FOODS.forEach(function (f) { for (var k = 0; k < p.food[f]; k++) fv.push(.4 + Math.min(.6, nd[f] * .25) / (k + 1)); });
     fv.sort(function (a, b) { return b - a; }).forEach(function (x, k) { v += x * wR * (k < 6 ? 1 : .2); });
     var hv = p.hand.map(function (id) { return known && known.indexOf(id) < 0 ? .9 : cardVal(G, seat, id, T) + .2; }).sort(function (a, b) { return b - a; });
-    var kk = Math.max(1, Math.floor(T / 3.5));
+    var kk = Math.max(1, Math.floor(T / (lvl === 'hard' ? AIW.kk : 3.5)));
     hv.forEach(function (x, k) { v += x * wR * (k < kk ? 1 : .12); });
     // brown engine: each row is used about a third of the remaining turns
-    PP.birds(p).forEach(function (x) { var pw = PP.power(x.s.id); if (pw.col === 'brown') { var pv = PWV[pw.k] || .5; if (pw.k === 'laySelf' && x.s.eggs >= x.b.e) pv = .1; v += pv * T * .3; } if (pw.col === 'pink') v += .35 * Math.min(T, 8); });
+    PP.birds(p).forEach(function (x) { var pw = PP.power(x.s.id); if (pw.col === 'brown') { var pv = PWV[pw.k] || .5; if (pw.k === 'laySelf' && x.s.eggs >= x.b.e) pv = .1; v += pv * T * (lvl === 'hard' ? AIW.eng : .3); } if (pw.col === 'pink') v += .35 * Math.min(T, 8); });
     // row strength: a longer row gives a bigger action
-    [0, 1, 2].forEach(function (h) { var y = PP.rowYield(p, h); v += (y.n - (h === 1 ? 2 : 1)) * T * .12; });
+    [0, 1, 2].forEach(function (h) { var y = PP.rowYield(p, h); v += (y.n - (h === 1 ? 2 : 1)) * T * (lvl === 'hard' ? AIW.row : .12); });
     // round goal (current round, weighted by how close the scoring is)
-    if (G.goals[G.round] && lvl !== 'easy') { var res = PP.placeGoal(G, G.round); v += (res.pts[seat] || 0) * (lvl === 'hard' ? .9 : .6) * (p.cubes <= 2 ? 1 : .7); }
+    if (G.goals[G.round] && lvl === 'hard') { var res = PP.placeGoal(G, G.round); v += (res.pts[seat] || 0) * (lvl === 'hard' ? .9 : .6) * (p.cubes <= 2 ? 1 : .7); }
     // egg room matters while there is time to fill it
     v += Math.min(PP.eggSpace(p), 6) * .08 * wR;
     return v;
@@ -130,7 +131,7 @@
     });
     var known = G.pl[seat].hand.concat(G.tray.filter(Boolean));
     var scored = cands.map(function (m) {
-      var sims = lvl === 'hard' && m.t === 'act' ? 2 : 1, tot = 0;
+      var sims = lvl === 'hard' ? (m.t === 'act' ? 4 : 3) : 1, tot = 0;
       for (var k = 0; k < sims; k++) {
         var G2 = PP.clone(G); scramble(G2);
         var r = PP.performMove(G2, m, seat); if (!r.ok) return { m: m, v: -1e9 };
@@ -139,9 +140,10 @@
       }
       var v = tot / sims;
       if (lvl === 'easy') v += (Math.random() - .5) * 12;
-      else if (lvl === 'normal') v += (Math.random() - .5) * .8;
+      else if (lvl === 'normal') v += (Math.random() - .5) * 3;
       return { m: m, v: v };
     }).sort(function (a, b) { return b.v - a.v; });
+    if (lvl === 'normal' && scored.length > 1 && Math.random() < .3) return scored[1].m;   // normal: a fair player who sometimes takes the second-best move
     if (lvl === 'easy' && scored.length > 2 && Math.random() < .5) return scored[1 + Math.floor(Math.random() * Math.min(4, scored.length - 1))].m;
     return scored[0].m;
   }
@@ -156,7 +158,7 @@
     if (m.t === 'deck') return 'Nothing in the tray fits; try the deck.';
     return 'A sensible choice right now.';
   }
-  var AI = { choose: choose, sub: sub, value: value, setup: setup, why: why, turnsLeft: turnsLeft };
+  var AI = { W: AIW, choose: choose, sub: sub, value: value, setup: setup, why: why, turnsLeft: turnsLeft };
   root.PPAI = AI;
   if (typeof module !== 'undefined') module.exports = AI;
 })(typeof window !== 'undefined' ? window : globalThis);

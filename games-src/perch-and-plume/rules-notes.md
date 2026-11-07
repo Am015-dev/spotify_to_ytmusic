@@ -27,3 +27,19 @@ A bird-collecting engine-building card game for 1-5 players (solo against an aut
 - Rival Flock (solo): a shuffled deck of 8 action cards per round (add the top deck bird to its flock, take a die, lay eggs,
   take the first tray bird); goal count = marks from its cards. A simplification of an automa, not a copy.
 - Payment and egg sources are chosen automatically (cheapest food first; eggs from the fullest nests); "Other food" cycles the payment.
+
+## Cross-check against the online rulebook (7 Nov 2026)
+Sources (read only, nothing copied): the extracted text of the official base rulebook and an online rules summary (URLs not written here because they carry the original title).
+| rule | rulebook | ours |
+|---|---|---|
+| actions per round | 8, 7, 6, 5 cubes | same |
+| egg cost to play | column 1 free, columns 2-3: 1 egg, columns 4-5: 2 eggs | same (`EGGCOST`) |
+| trades on bonus spaces | forest: discard 1 card for +1 food; grassland: pay 1 food for +1 egg; wetland: discard 1 egg for +1 card; at most 1 | same |
+| any 2 food = 1 food | only when playing a bird | same (`payOptions` is used only for playing) |
+| tray | refill empty spaces at the end of your turn; at round end discard all 3 and refill | same |
+| birdfeeder | empty: reroll all 5; all remaining dice the same face: you may reroll | same |
+| green goals | 4/1/0, 5/2/1, 6/3/2, 7/4/3; ties add the places and divide rounded down; 0 items scores nothing | same |
+| setup | 5 birds, 5 food (1 each), 2 bonus; keep up to 5 birds discarding 1 food per bird kept; keep 1 bonus | same |
+| scoring and tie | birds, bonus, goals, eggs, cached food, tucked cards; tie = most unused food | same |
+| row yields per column | shown only in the player-mat art (forest 1,1,2,2,3,3; grassland 2,2,3,3,4,4; wetland 1,1,2,2,3,3, bonus on the 2nd/4th/6th space) | same, from the mat as remembered; not stated in the text |
+| roster | 170 birds, 26 bonus cards; costs up to 3 food; points 0-9; egg limits 0-6 | 120 birds and 18 bonus cards (the brief's size); costs 1-3; points 0-9; egg limits 1-6; power colours brown / white / pink and their trigger timing match |

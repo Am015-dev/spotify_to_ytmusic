@@ -37,14 +37,16 @@ Tests: rules-test.js (node), smoke.js, play.js (real taps: full game, tutorial, 
 ## Orchestrator addenda (7 Nov, 17:25-17:56 UTC; read at 18:19 after my first DONE report)
 | item | result |
 |---|---|
-| AI gate (`node ai-gate.js 100`) | hard beats a "first affordable option" bot 100/100 (avg 68.4 vs 14.7), normal 100/100 (68.5 vs 15.0); left at the end of a game: hard 2.9 food / 3.0 cards, normal 2.5 food / 3.3 cards (no hoarding) |
+| AI gate (`node ai-gate.js 100`) | PASS: hard beats a "first affordable option" bot 100/100 (73.9 vs 14.4), normal 100/100 (64.5 vs 15.3), hard beats normal 66/100. Left at game end: hard 2.5 food / 3.0 cards, normal 3.4 / 4.1 (no hoarding). Hard uses tuned weights (`AIW` in ai.js: engine .6, row strength .25, card horizon 2.5) and 3-4 samples per candidate; normal ignores round goals and takes its second-best move 30% of the time |
 | ASSET-CHECK.md (`python3 check-assets.py`) | 186 required (120 birds, 18 bonus cards, 12 goals, 7 food/die faces incl. grub-or-seed and any-food, 5 nests, egg, cube, 8 portraits incl. 3 bosses, rows/mat/feeder/tray/card back, 3 backgrounds, rosette, 3 fx), 186 prompted, gaps 0 |
 | music cues | `next-wave/music/perch-and-plume/cues-wave1.json`: menu, main, fight (loops), victory, defeat (once), 2 versions each |
 | menu | Restart, Title screen, New quick game, Story map; Sound on/off, Music (song picker once files exist); Rules, All cards, Tutorial; tapping any bird (board, hand, tray, opponents, reference) shows it large with its full power text |
 | offline | the game is one self-contained file and requests nothing else until media/music files exist (0 failed requests in every scenario and play test). `offline.json` lives in games/<slug>/ and is written by `offline-manifest.py` at deploy (orchestrator); I did not write under games/ |
 | reuse (shelf) | Reused shared shelf parts as-is (shell, gx-kit settings/reference, gx-help, gx-tutor, gx-campaign, gx-music, gx-scenario), the redline-rally asset-slot/register pattern and the cauldron-fair campaign/tutorial structure. The addendum to copy Hollowbough's pieces arrived after the game was built and passing; its card tableau is a different mechanic, so I kept my tested versions rather than swap working code at the end |
-| reuse (web) | 10-minute search: the only permissively licensed rules code found is an unstable Python/Rust gym project whose name carries the original title (reference only, nothing copied; no THIRD-PARTY.md needed). Rules cross-checked from memory of the published rules: row yields, trades, egg costs, 8/7/6/5 cubes, goal points, setup all match (rules-notes.md). The original has a larger roster; ours is 120 birds and 18 bonus cards as the brief asked |
-| temporary free art | Not added: Kenney CC0 has no bird or food art, game-icons.net (CC BY) would only replace food icons already drawn in code and would need credits plus files under games/ (live folder, orchestrator's). Every slot shows a tidy code-drawn placeholder until the Flow art lands |
+| reuse (web) + rules check | 10-minute search: the only permissively licensed rules code found is an unstable Python/Rust gym project whose name carries the original title (reference only, nothing copied; no THIRD-PARTY.md needed). Base rules cross-checked against the extracted official rulebook text and an online summary: every rule matches (table in rules-notes.md); roster is 120 birds / 18 bonus cards as briefed |
+| temporary free art | 7 game-icons.net icons (CC BY 3.0, Lorc and Delapouite) rendered as tokens into games/perch-and-plume/media/: food-grub, food-seed, food-fish, food-berry, food-rodent, token-egg, ui-cube; credits in ASSETS.md and the Menu About line. Kenney CC0 has no bird art; birds keep code-drawn placeholders until Flow art |
+
+Note: now that media files exist, run smoke.js / play.js against a served URL (e.g. the gx-serve.js staging server: `node smoke.js http://127.0.0.1:PORT/perch-and-plume/`); file:// has no media/ folder next to the page.
 
 ## Known (not fixed)
 - `register-assets.py` not run on this branch: it rewrites the one-line `next-wave/expected-assets.json` and conflicts with every other branch; its docstring asks the orchestrator to run it at merge time.
@@ -63,6 +65,7 @@ Tests: rules-test.js (node), smoke.js, play.js (real taps: full game, tutorial, 
 10. guard.py: numbered ui files not recognised -> named files in an explicit build list; game added to modmap.GAMES.
 11. The first-time coach bubble stayed on top of drawers and the story map (covered their text and buttons) -> hidden whenever a drawer, the map or a full-screen panel opens, and none starts while one is up.
 12. Back on the story map always went to the title, even when opened from a running game's Menu -> it returns to the game.
+17. A delivered food/egg picture inside a card's cost line jumped to the card's top-left corner (the card-picture CSS rule also matched small icons) -> the rule is limited to the card's picture box.
 13. Easy computer scored about 60 (too strong for newcomers and story act 1) -> more noise and looser picks: about 50 now.
 14. During your own chain the panel already said "Watch Fern." -> "Your birds are at work, one by one." until the chain ends.
 15. Feeder dice, tray birds and the deck did nothing when tapped outside a decision -> a short line explains what they are.

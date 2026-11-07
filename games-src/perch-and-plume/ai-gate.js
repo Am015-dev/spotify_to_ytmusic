@@ -18,4 +18,6 @@ function run(lvl) {
   return w / N;
 }
 const h = run('hard'), n = run('normal');
-console.log((h >= .7 && n >= .55 ? 'PASS' : 'FAIL') + ' ai-gate: hard ' + Math.round(h * 100) + '% (need 70), normal ' + Math.round(n * 100) + '% (need 55)');
+let hw = 0; for (let g = 0; g < N; g++) { const st = [{ name: 'H', kind: 'ai', lvl: 'hard' }, { name: 'N', kind: 'ai', lvl: 'normal' }]; if (g % 2) st.reverse(); const G = PP.newGame({ seats: st, seed: 9100 + g }); let k = 0; while (G.phase !== 'over' && k++ < 4000) { const s = PP.sideToAct(G); PP.performMove(G, AI.choose(G, s, G.pl[s].lvl), s); } const a = G.pl.findIndex(p => p.name === 'H'); if (G.final[a].total > G.final[1 - a].total) hw++; }
+console.log('hard vs normal: hard wins ' + hw + '/' + N + ' = ' + Math.round(100 * hw / N) + '%');
+console.log((h >= .7 && n >= .55 && hw / N >= .65 ? 'PASS' : 'FAIL') + ' ai-gate: hard ' + Math.round(h * 100) + '% (need 70), normal ' + Math.round(n * 100) + '% (need 55), hard vs normal ' + Math.round(100 * hw / N) + '% (need 65)');

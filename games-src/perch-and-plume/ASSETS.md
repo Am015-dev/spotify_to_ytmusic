@@ -212,3 +212,17 @@ Style block (in front of every prompt): Flat 2D naturalist field-guide illustrat
 3. Rebuild (`python3 games-src/scripts/build-all.py --quick perch-and-plume`): the build lists the present files and the page draws them in their slots (cover or contain, never stretched).
 
 Registration for the asset inbox: `python3 games-src/perch-and-plume/register-assets.py` (orchestrator, at merge time).
+
+## Credits: temporary free-licensed pictures (until the Flow art replaces them)
+
+All from game-icons.net, licence CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), recoloured and set on a round token by us (render script in the worker's notes; source icons are single-colour SVGs). Credit also shown in the Menu > About line.
+
+| file (games/perch-and-plume/media/) | icon | author | source |
+|---|---|---|---|
+| food-grub.webp | Caterpillar | Delapouite | https://game-icons.net/1x1/delapouite/caterpillar.html |
+| food-seed.webp | Wheat | Lorc | https://game-icons.net/1x1/lorc/wheat.html |
+| food-fish.webp | Tropical fish | Delapouite | https://game-icons.net/1x1/delapouite/tropical-fish.html |
+| food-berry.webp | Raspberry | Delapouite | https://game-icons.net/1x1/delapouite/raspberry.html |
+| food-rodent.webp | Rat | Delapouite | https://game-icons.net/1x1/delapouite/rat.html |
+| token-egg.webp | Egg clutch | Lorc | https://game-icons.net/1x1/lorc/egg-clutch.html |
+| ui-cube.webp | Cube | Delapouite | https://game-icons.net/1x1/delapouite/cube.html |
