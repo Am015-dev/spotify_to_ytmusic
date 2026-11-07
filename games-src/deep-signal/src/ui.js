@@ -150,7 +150,7 @@ function poolEl(i) { return document.querySelectorAll('#pool .tcard')[i]; }
 function others() { var o = []; for (var i = 1; i < G.n; i++) o.push((ME + i) % G.n); return o; }
 function render(anim) {
   if (!G) return; var B = $('#board'), W = B.clientWidth, H = B.clientHeight, s = sideToAct(G), sq = $('#seats'); sq.innerHTML = '';
-  var os = others(), k = os.length, sw = Math.min(W >= 1000 ? 190 : 96, Math.floor(W / k) - 6);
+  var os = others(), k = os.length, land = innerHeight < 500 && W > 600, sw = land ? Math.min(280, Math.floor(W / k) - 8) : Math.min(W >= 1000 ? 190 : 96, Math.floor(W / k) - 6); B.classList.toggle('land', land);
   var choosing = G.phase === 'ask' && askWho(G) < 0 && G.cap === ME, targets = choosing ? chooseTargets(G) : [];
   var panelBottom = 0;
   os.forEach(function (p, i) {
@@ -165,7 +165,7 @@ function render(anim) {
     if (G.chosen === p && /notrick|onetrick/.test(G.mission.sp || '')) e.appendChild(mk('span', 'badge', /notrick/.test(G.mission.sp) ? '0 tricks' : '1 trick'));
     var tk = mk('div', 'tk'); G.tasks.forEach(function (t) { if (t.owner === p) tk.appendChild(miniEl(t.card, tokHtml(t.tok))).classList.toggle('done', !!t.done); });
     e.appendChild(tk);
-    if (G.comm[p]) { var sr = mk('div', 'sgrow'); sr.appendChild(mk('span', 'sgl', '📡 ' + POSTXT[G.comm[p].pos])); sr.appendChild(miniEl(G.comm[p].c)); e.appendChild(sr); } e.addEventListener('click', function () { onSeatTap(p); }); sq.appendChild(e);
+    if (G.comm[p]) { var sr = mk('div', 'sgrow'); sr.appendChild(mk('span', 'sgl', '📡 ' + (land ? POSTXT[G.comm[p].pos].split(' ')[0] : POSTXT[G.comm[p].pos]))); sr.appendChild(miniEl(G.comm[p].c)); e.appendChild(sr); } e.addEventListener('click', function () { onSeatTap(p); }); sq.appendChild(e);
     panelBottom = Math.max(panelBottom, e.offsetTop + e.offsetHeight);
   });
   var dr = $('#drone'); dr.innerHTML = ''; dr.style.display = G.dummy >= 0 ? '' : 'none';
@@ -210,6 +210,7 @@ function render(anim) {
 function shortRule() { var s = G.mission.sp || ''; return s.split('-').map(function (x) { return { notrick: 'one diver wins nothing', onetrick: 'one diver wins one', decide: 'captain decides', dist: 'captain shares', dead: 'dead zone', nocomm: 'silence', late2: 'signals from trick 2', late3: 'signals from trick 3', sonar1: 'sonar 1 must win', sonars: 'every sonar wins' }[x] || x; }).join(', '); }
 function taskOfCard(c) { for (var i = 0; i < G.tasks.length; i++) if (G.tasks[i].card === c) return G.tasks[i]; return null; }
 function slot(p, W, cx, cy, cw, ch, k) {
+  if ($('#board').classList.contains('land')) { var od = others().concat([ME]), ix = od.indexOf(p); return { x: cx + (ix - (od.length - 1) / 2) * (cw + 16), y: cy + 8 }; }
   if (p === ME) return { x: cx, y: cy + ch * .62 };
   var i = others().indexOf(p), px = W * (i + .5) / k, dx = (px - cx) * .62; dx = Math.max(-(cw * 1.6), Math.min(cw * 1.6, dx));
   return { x: cx + dx, y: cy - ch * .5 - (k > 2 && (i === 0 || i === k - 1) ? -ch * .18 : 0) };
@@ -219,7 +220,7 @@ function drawHand() {
   var who = droneMine ? G.dummy : ME, h = G.hands[who], s = sideToAct(G); hd.classList.toggle('drone', droneMine);
   hd.onclick = function (ev) { if (ev.target === hd) nudge(); };
   var W = hd.clientWidth || 360, cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 58, n = h.length;
-  var fit = function (m) { return m > 1 ? Math.min(cw + 6, (W - cw - 8) / (m - 1)) : 0; }, rows = n > 1 && fit(n) < 46 || UI.twoG === G && n > 1 ? 2 : 1, per = Math.ceil(n / rows), rowOff = Math.round(cw * 0.9);
+  var fit = function (m) { return m > 1 ? Math.min(cw + 6, (W - cw - 8) / (m - 1)) : 0; }, rows = n > 1 && fit(n) < 46 || UI.twoG === G && n > 1 && !droneMine ? 2 : 1, per = Math.ceil(n / rows), rowOff = Math.round(cw * 0.9);
   var y0 = droneMine ? 14 : 8; hd.style.height = (y0 + 6 + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ch')) + (rows - 1) * rowOff) + 'px'; hd.classList.toggle('two', rows > 1); if (rows > 1 && !droneMine) UI.twoG = G;   // stays two rows for the mission: the hand never jumps
   var legal = G.phase === 'play' && s === ME && !UI.hold && !UI.sigMode && !UI.flareMode && !askPending() ? legalCards(G, G.turn) : [];
   if (UI.tut && UI.tut.only && legal.indexOf(UI.tut.only) >= 0) legal = [UI.tut.only];

@@ -168,5 +168,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rreplay figure.bad .mini{box-shadow:0 0 0 3px #ff6b6b}
 .rreplay figure.win .mini{box-shadow:0 0 0 3px var(--warm)}
 #title #tutSlot .btn{font-size:16px;width:min(274px,36vw);box-sizing:border-box}
+#board.land .seat{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:nowrap;white-space:nowrap;top:4px;padding:3px 6px}
+#board.land .seat .tk,#board.land .seat .sgrow{margin-top:0}
+#board.land .seat .sgrow{display:inline-flex;flex-wrap:nowrap;padding:1px 4px}#board.land .seat .nm{overflow:visible;flex:none}#board.land .seat .st{flex:none}
+#board.land .seat .mini{width:24px;height:34px;font-size:.87rem}
+#board.land .seat .mini .tok{top:-7px;right:-8px;min-width:18px;height:18px}
+#board.land #drone{padding:2px 6px 4px}#board.land #drone .dl{display:inline;margin-right:8px}#board.land #drone .drow{display:inline-flex}
+#board.land #drone .stk{min-height:38px;min-width:34px}#board.land #drone .mini{width:26px;height:36px}#board.land #drone .stk.deep::before,#board.land #drone .stk.empty::after{width:26px;height:36px}
 </style>
 </head>
