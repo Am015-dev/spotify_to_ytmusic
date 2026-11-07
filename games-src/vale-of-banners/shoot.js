@@ -12,7 +12,7 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html'); const TAG 
     await tap(page.locator('#tutB')); await page.waitForTimeout(900); await shot('2tut1');
     for (let i = 2; i <= 3; i++) { const t = page.locator('.gxt-spot-target, .gxt-target, .gxt-next').first(); if (await t.count()) await tap(t).catch(() => { }); await page.waitForTimeout(900); await shot('2tut' + i); }
     await page.evaluate(() => { try { GXT.stop(); } catch (e) { } localStorage.clear(); }); await page.goto(URL); await page.waitForTimeout(500);
-    await tap(page.locator('#quickB')); await page.waitForTimeout(300); await tap(page.locator('#goB')); await page.waitForTimeout(1500); await shot('3turn');
+    await tap(page.locator('#quickB')); await page.waitForTimeout(300); await tap(page.locator('#goB')); await page.waitForTimeout(500); await shot('3banner'); await page.waitForTimeout(1000); await shot('3turn');
     // play first human turn: take first glowing tile, then end
     for (let k = 0; k < 2; k++) { const g = page.locator('#mk .glow').first(); if (await g.count()) { await tap(g); await page.waitForTimeout(400); const a = page.locator('#tv .acts .btn').first(); if (await a.count()) await tap(a); await page.waitForTimeout(1200); } }
     const e = page.locator('#endB'); if (await e.count() && await e.isVisible()) await tap(e);
