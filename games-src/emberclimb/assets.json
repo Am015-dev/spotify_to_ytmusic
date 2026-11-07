@@ -2169,6 +2169,94 @@
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a purple skull with a thin curse swirl, on a flat plain white background, one single object centred with generous margin, no ground shadow."
   },
   {
+   "stem": "intent-weak",
+   "kind": "icon",
+   "w": 128,
+   "h": 128,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 1,
+   "slot": "Enemy intent bubble",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a purple downward arrow over a drooping sword, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
+   "stem": "intent-vuln",
+   "kind": "icon",
+   "w": 128,
+   "h": 128,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 1,
+   "slot": "Enemy intent bubble",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a red crosshair target ring, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
+   "stem": "intent-frail",
+   "kind": "icon",
+   "w": 128,
+   "h": 128,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 1,
+   "slot": "Enemy intent bubble",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a cracked dashed-outline blue shield, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
+   "stem": "intent-poison",
+   "kind": "icon",
+   "w": 128,
+   "h": 128,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 1,
+   "slot": "Enemy intent bubble",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a green poison droplet, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
+   "stem": "intent-burn",
+   "kind": "icon",
+   "w": 128,
+   "h": 128,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 1,
+   "slot": "Enemy intent bubble",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: an orange flame, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
+   "stem": "intent-slime",
+   "kind": "icon",
+   "w": 128,
+   "h": 128,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 1,
+   "slot": "Enemy intent bubble",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a green slime blob with drips, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
+   "stem": "intent-daze",
+   "kind": "icon",
+   "w": 128,
+   "h": 128,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 1,
+   "slot": "Enemy intent bubble",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a yellow swirl of dizzy stars, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
+   "stem": "intent-unknown",
+   "kind": "icon",
+   "w": 128,
+   "h": 128,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 1,
+   "slot": "Enemy intent bubble",
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Bold simple game icon: a grey question mark in a dark bubble, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
    "stem": "intent-sleep",
    "kind": "icon",
    "w": 128,
