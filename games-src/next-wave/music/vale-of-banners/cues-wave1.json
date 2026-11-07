@@ -1,0 +1,53 @@
+{
+ "_readme": "Vale of Banners wave 1 music, one cue per slot. Instrumental only.",
+ "cues": {
+  "title": {
+   "prompt": "Medieval pastoral instrumental game music, lute, recorder and frame drum, warm and light, no vocals, no spoken words, mixed for a phone game. Title theme: a gentle dawn melody on recorder over soft lute arpeggios, 80 BPM, hopeful and welcoming, 16-bar loop that ends on a whole bar.",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "title.mp3",
+   "bpm": 80,
+   "loop": true
+  },
+  "main": {
+   "prompt": "Medieval pastoral instrumental game music, lute, recorder and frame drum, warm and light, no vocals, no spoken words, mixed for a phone game. Main play loop: a relaxed walking lute groove with light frame drum, a playful recorder tune, 96 BPM, calm and thinking-friendly, 32-bar loop that ends on a whole bar so it loops cleanly.",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "main.mp3",
+   "bpm": 96,
+   "loop": true
+  },
+  "finale": {
+   "prompt": "Medieval pastoral instrumental game music, lute, recorder and frame drum, warm and light, no vocals, no spoken words, mixed for a phone game. Finale loop for the last season: the same tune family, fuller with layered lutes, hand drums and a rising recorder line, 108 BPM, tense but cheerful, 16-bar loop ending on a whole bar.",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "finale.mp3",
+   "bpm": 108,
+   "loop": true
+  },
+  "victory": {
+   "prompt": "Medieval pastoral instrumental game music, lute, recorder and frame drum, warm and light, no vocals, no spoken words, mixed for a phone game. Short victory sting: a bright lute flourish and recorder fanfare with a festive drum roll, 100 BPM, 4 bars, ends on a clear major chord.",
+   "versions": [
+    "a"
+   ],
+   "save_as": "victory.mp3",
+   "bpm": 100,
+   "loop": false
+  },
+  "defeat": {
+   "prompt": "Medieval pastoral instrumental game music, lute, recorder and frame drum, warm and light, no vocals, no spoken words, mixed for a phone game. Short defeat sting: a slow wistful recorder phrase over a soft low lute, 70 BPM, 4 bars, gentle, ends on an unresolved minor chord.",
+   "versions": [
+    "a"
+   ],
+   "save_as": "defeat.mp3",
+   "bpm": 70,
+   "loop": false
+  }
+ }
+}
