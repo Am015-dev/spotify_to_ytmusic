@@ -34,3 +34,11 @@ Also: Help opens with "How a turn works" (5 short lines) and a "House rules" car
 - Story outros play only after a win (shared kit); no loss variants.
 - The first commit on this branch (c6dc4f71) carries model attribution trailers that CLAUDE.md forbids (added by mistake from the harness template); it was pushed
   before I noticed and force-push is forbidden: squash at merge, or the owner may rewrite that commit. Later commits are clean.
+
+## Round 2 (23:00 UTC): coached first game and audit zero
+- The 19-step forced-tap tutorial is replaced by a coached first game (`game/src/coach.js`, text in `story.js`): free play from turn 1, no forced taps, one non-blocking
+  bubble at a time (Tamsin teaches, Hob comments), a score walk with the player's real numbers and a "Things you will meet later" card. `window.GXCOACH = {running, explained, done, later}`.
+  Rule-by-rule table and honest limits (ties, majority and unplaceable tiles only when they happen): `TUTORIAL-COVERAGE.md`. Proof: `game/coach-test.js` (random legal moves through the UI, both sizes).
+- ui-audit A-F is 0 on phone, phone-s and pc (was A0/0/1 B5/8/4 C9/10/10 E0/0/1): solid backings behind text, painted menu rows drawn with `cover` instead of stretched,
+  tutorial/campaign header buttons solid, the music panel made compact so nothing sits below the fold, contrast overlays on the big buttons.
+- `build-all --quick`, coach-test (390x763 and 1440x860), playable-test (Quick and Story by taps): PASS.
