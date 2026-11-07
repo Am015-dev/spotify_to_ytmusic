@@ -267,5 +267,15 @@ body.focus .ract:not(.glow),body.focus #hand .bc:not(.glow),body.focus .die:not(
 .die{width:auto!important}
 .howturn{margin:4px 0 10px 20px;padding:0}
 .howturn li{margin:3px 0}
+
+.saycard{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--gx-bar-h, 52px) + 54px);z-index:66;pointer-events:none;display:flex;gap:10px;align-items:center;width:min(92vw,460px);background:#fbf3df;color:#2a2418;border:2px solid #4f7a45;border-radius:14px;padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45);animation:banin2 .3s ease-out}
+@keyframes banin2{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
+.sayface{flex:none;width:38px;height:38px;border-radius:50%;color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.saytx{font-size:15px;line-height:1.3;font-weight:600}
+.saytx b{display:block;font-size:14px;color:#4f7a45}
+.saybox{display:flex;gap:10px;align-items:center;text-align:left;background:#fbf3df;color:#2a2418;border-radius:14px;padding:8px 12px;margin:8px 0}
+.saybox .saytx b{color:#4f7a45}
+p.voice{font-size:16px;font-style:italic;margin:6px 0 10px}
+.gxt-bub .gxh-tt::before{content:'O';display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#4f7a45;color:#fff;font-weight:700;margin-right:8px;vertical-align:middle;font-style:normal}
 </style>
 </head>

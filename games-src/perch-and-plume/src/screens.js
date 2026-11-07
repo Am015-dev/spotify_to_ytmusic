@@ -55,6 +55,7 @@ function quickStart() {
   if (CFG.n === 1) seats.push({ name: 'Rival Flock', kind: 'automa', lvl: CFG.lvl, face: 'corvin' });
   for (var i = 1; i < CFG.n; i++) seats.push({ name: NAMES[i - 1], kind: CFG.kinds[i] === 'human' ? 'human' : 'ai', lvl: CFG.lvl, face: FACES[i - 1] });
   if (seats.filter(function (s) { return s.kind === 'human'; }).length > 1) seats[0].name = 'Player 1';
+  setTimeout(function () { var L = STORY.quickIntro; toast(L[Math.floor(Math.random() * L.length)], 2600); }, 300);
   startGame({ seats: seats, mode: seats.some(function (s, k) { return k && s.kind === 'human'; }) ? 'hot' : CFG.n === 1 ? 'solo' : 'vs', goalSide: CFG.side === 'blue' ? 'blue' : 'green', first: CFG.first === 'random' ? 'random' : 0 });
 }
 // ---------------- the starting hand: keep 5 in total (birds + food), pick 1 of 2 bonus cards
@@ -88,15 +89,19 @@ function gameOver() { hideHelp();
   try { if (window.GNS && UI.mode !== 'tutorial' && UI.mode !== 'tutfree') GNS.result({ game: 'perch-and-plume', mode: UI.camp ? 'campaign' : UI.mode, level: (G.pl.find(function (p) { return p.kind !== 'human'; }) || {}).lvl, seats: G.pl.map(function (p, i) { return { name: p.name, me: i === me, ai: p.kind !== 'human' ? p.lvl : undefined }; }), winner: Array.isArray(win) ? win : win, scores: sc.map(function (s) { return s.total; }), turns: G.turn, ms: Date.now() - UI.started }); } catch (e) { }
   var gwin, el = $('#result'), order = sc.map(function (s, i) { return i; }).sort(function (a, b) { return sc[b].total - sc[a].total; });
   var line = winners.length > 1 ? 'A tie at the top!' : isHuman(winners[0]) ? (humans().length > 1 ? G.pl[winners[0]].name + ' wins the year!' : 'You win the year!') : G.pl[winners[0]].name + ' wins the year.';
-  var goalHTML = '';
+  var goalHTML = '', voice = '';
+  var iWon = winners.indexOf(me) >= 0, sayB = function (w) { var c = (STORY.cast[w[0]] || { name: (window.CAMPAIGN && CAMPAIGN.cast[w[0]] || {}).name || w[0], color: (window.CAMPAIGN && CAMPAIGN.cast[w[0]] || {}).color || '#4f7a45' }); return '<div class="saybox"><span class="sayface" style="background:' + c.color + '">' + esc((c.name || '?')[0]) + '</span><span class="saytx"><b>' + esc(c.name) + '</b>' + esc(w[1]) + '</span></div>'; };
+  if (UI.mode === 'tutfree') voice = '<p class="voice">' + esc(iWon ? STORY.tutResult.win : STORY.tutResult.lose) + '</p>';
+  else if (!UI.camp) voice = '<p class="voice">' + esc(winners.length > 1 ? STORY.quickResult.tie : iWon || humans().length > 1 ? STORY.quickResult.win : STORY.quickResult.lose) + '</p>';
   if (UI.camp && UI.camp.goal) {   // story: say plainly whether the chapter goal was met, with the count, and what the stars need
     var gr = campGoalLive(G, UI.camp), gm = campMetrics(G), gwin = campIsWon(G, UI.camp);
     var sl = (UI.camp.stars || []).map(function (st, i) { var ok = i === 0 ? gwin : (gwin && GXC.testStar(st.test, gm)); return '<li class="' + (ok ? 'on' : '') + '"><i>\u2605</i> ' + esc(st.text) + '</li>'; }).join('');
     goalHTML = '<div class="goalres ' + (gwin ? 'met' : 'miss') + '"><b>' + (gwin ? 'Chapter goal met!' : 'Chapter goal missed') + '</b><span>' + esc(UI.camp.goal.text) + (gr.need != null ? ' You had ' + gr.cur + '.' : '') + '</span>' +
       (gwin ? '' : '<span>' + (win === 0 || winners.indexOf(me) >= 0 ? 'You won the year, but this chapter is only cleared when its goal is met. Try again!' : 'Try again: the goal is shown at the top of the board.') + '</span>') +
       '<ul class="goalstars">' + sl + '</ul>' + (gwin ? '' : '<small>Stars are earned once the goal is met.</small>') + '</div>';
+    var cid = UI.camp.id; if (!gwin && STORY.lose[cid]) voice = sayB(STORY.lose[cid]); else if (gwin && STORY.bossWin[cid]) voice = sayB(STORY.bossWin[cid]);
   }
-  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Food</th><th>Tucked</th><th>Total</th></tr>' +
+  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + voice + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Food</th><th>Tucked</th><th>Total</th></tr>' +
     order.map(function (i) { var s = sc[i]; return '<tr class="' + (winners.indexOf(i) >= 0 ? 'win' : '') + '"><td>' + esc(G.pl[i].name) + '</td><td>' + s.birds + '</td><td>' + s.bonus + '</td><td>' + s.goals + '</td><td>' + s.eggs + '</td><td>' + s.cache + '</td><td>' + s.tuck + (s.lead ? '+' + s.lead : '') + '</td><td><b data-engine="G.final[' + i + '].total">' + s.total + '</b></td></tr>'; }).join('') + '</table>';
   h += '<p>Birds = card points. Food = food cached on birds. Ties go to the most food left over.</p><div class="tmenu">' +
     (UI.camp ? '<button type="button" class="btn big primary" id="again">Continue the story</button>' : '<button type="button" class="btn big primary" id="again">Play again</button><button type="button" class="btn" id="totitle">Title screen</button>') + '</div>';
@@ -105,6 +110,7 @@ function gameOver() { hideHelp();
     el.hidden = false; $('#toast').innerHTML = '';
     $('#again').onclick = function () { el.hidden = true; if (UI.camp) { try { GXC.finish(G); } catch (e) { showTitle(); } } else quickStart(); };
     var tt = $('#totitle'); if (tt) tt.onclick = function () { el.hidden = true; showTitle(); };
+    if (UI.mode === 'tutfree' && !UI.fast) $$('.stand b[data-engine]', el).forEach(function (bb) { var v = +bb.textContent, t0 = Date.now(); bb.textContent = '0'; var iv = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / 1100); bb.textContent = Math.round(v * k); if (k >= 1) clearInterval(iv); }, 40); });   // the prologue's climax: the totals count up
   }, aMs(700));
 }
 // ---------------- drawers: rules, goals, log, opponent board

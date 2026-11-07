@@ -59,3 +59,9 @@ WRONG 0, MISSING 3, and all 3 are fixed in the engine. Each has a rules-test cas
 - `MISSING pink`: a bird played by a "play a second bird" power now triggers other players' pink powers.
 - `MISSING blue goals` / `random first`: setup options "Round goals: 1 point each, max 5" (blue side) and "Who starts: Random" on the Quick game screen.
 The 7 SIMPLIFIED items are listed in the Rules drawer under "Simplified on purpose". The tutorial is unchanged by these fixes.
+
+## Narrative (ADDENDUM 3)
+- The tutorial is the story's prologue. Aunt Ottilie is the guide (portrait mark on every bubble) and Pip is the rival who wants to fill his notebook first. It has 5 chapters, from "Dawn in the Larchwood" to "The evening count". Each step gives a story reason in 2 short lines; after each action Ottilie reacts in a speaking card that never blocks a tap. The climax is the evening count: totals count up and Ottilie reacts to a win or a loss.
+- Story mode: chapter intros and win outros come from `campaign.json`. Each chapter now also has a loss line from its speaker, and bosses get last words after a win; both show on the result screen.
+- Quick game: a flavour line at the start and a result line in the game's voice.
+- All the text is in `src/story.js`; the cast and the 3-act arc are in `STORY.md`; the beats are listed next to their rules in `TUTORIAL-COVERAGE.md`.

@@ -61,7 +61,13 @@ function tutSteps() {
     { id: 'goals', title: '5 Scoring \u00b7 Round goal', say: 'When a round ends, its goal is scored: most items wins the most points. This one is shown here.', target: tq('#goalsbtn'), wait: null, ready: tmine },
     { id: 'score', title: '5 Scoring \u00b7 The end', say: 'The year ends after the last round. You score birds + eggs + goals + bonus card + cached food + tucked cards. A tie goes to the most food left.', target: tq('#foodrow'), wait: null, ready: tmine },
     { id: 'finish', title: '5 Scoring \u00b7 Finish the year', say: 'Your last actions are yours to choose. Pip now plays for real. Play to the end and see the final score.', target: tq('#mat'), wait: null, ready: tmine }
-  ];
+  ].map(function (st) {   // the prologue's words live in story.js (STORY.tut); the step keeps its target and wait
+    var t = STORY.tut[st.id] || {}, ch = 0;
+    if (t.say) st.say = t.say;
+    st.title = t.ch ? 'Ottilie \u00b7 ' + t.ch.replace(/^Prologue (\d) \u00b7 /, '$1 ') : 'Aunt Ottilie';
+    if (t.react) st.onDone = function () { storySay('ottilie', t.react); };
+    return st;
+  });
 }
 function tutStart() {
   if (typeof GXT === 'undefined') { showConfig(); return; }
@@ -72,7 +78,7 @@ function tutStart() {
   GXT.start({ game: 'perch-and-plume', story: true,
     setup: function () { var T = TUT.ids; startGame({ seats: [{ name: 'You', kind: 'human', face: 'you' }, { name: 'Pip', kind: 'ai', lvl: 'easy', face: 'pip' }], mode: 'tutorial', tutorial: true, seed: 42, rounds: 1, cubes: [8], hands: { 0: [T.play, T.h2, T.h3, null, null].filter(Boolean) }, first: 0, goals: ['birds-G'], prep: tutPrep }); },
     steps: tutSteps(),
-    endTitle: 'Now finish this year', endText: 'Use your last actions: play a bird, or tap a row for food, eggs or cards. Then the round goal is scored and the final score shows.', endButtons: [{ id: 'finish', label: 'Finish this game' }, { id: 'story', label: 'Skip to the story' }],
+    endTitle: STORY.tutEnd.title, endText: STORY.tutEnd.text, endButtons: [{ id: 'finish', label: 'Finish this game' }, { id: 'story', label: 'Skip to the story' }],
     onDone: function (r) { try { localStorage.setItem('pp-played', '1'); } catch (e) { } if (r && r.choice === 'story') { stopTimers(); openStory(); return; } UI.mode = 'tutfree'; UI.turnKey = null; render(); pump(); },
     onExit: function () { stopTimers(); showTitle(); } });
 }
