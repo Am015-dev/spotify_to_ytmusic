@@ -1,0 +1,81 @@
+{
+ "slug": "thornbound",
+ "size": "phone",
+ "seed": 66958,
+ "when": "2026-11-07T21:19Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 2
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 403
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 158
+ },
+ "fuzz": {
+  "taps": 270
+ },
+ "bugs": [
+  {
+   "sev": "BLOCKER",
+   "phase": "tutorial",
+   "where": "tutorial step 7/19 [herald] \"Your Herald marks a location. Tap Cairn Field, whe\"",
+   "desc": "spotlight target covered: top at centre is circle, target is circle",
+   "repro": "node games-src/scripts/qa-bot.js thornbound --size phone --seed 66958 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/thornbound/phone-tut-7-2.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "tutorial",
+   "where": "tutorial step 16/19 [claim] \"You won the Tablelands! Tap Cairn Field: your Hera\"",
+   "desc": "spotlight target covered: top at centre is circle, target is circle",
+   "repro": "node games-src/scripts/qa-bot.js thornbound --size phone --seed 66958 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/thornbound/phone-tut-16-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #403 (6)",
+   "desc": "inconclusive: no result screen within the 150 s cap / 403 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js thornbound --size phone --seed 66958 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/thornbound/phone-quick-noresult-10.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "tutorial step 7/19 [herald] \"Your Herald marks a location. Tap Cairn Field, whe\"",
+   "desc": "spotlight target covered: top at centre is circle, target is circle",
+   "repro": "node games-src/scripts/qa-bot.js thornbound --size phone --seed 66958 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/thornbound/phone-tut-7-12.png"
+  },
+  {
+   "sev": "BLOCKER",
+   "phase": "story",
+   "where": "tutorial step 16/19 [claim] \"You won the Tablelands! Tap Cairn Field: your Hera\"",
+   "desc": "spotlight target covered: top at centre is circle, target is circle",
+   "repro": "node games-src/scripts/qa-bot.js thornbound --size phone --seed 66958 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/thornbound/phone-tut-16-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #158 (6)",
+   "desc": "inconclusive: story stage 1 reached no result within the 100 s cap / 158 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js thornbound --size phone --seed 66958 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/thornbound/phone-story-noresult-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) summary x1: \"Play online (free, peer \"",
+   "repro": "node games-src/scripts/qa-bot.js thornbound --size phone --seed 66958 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/thornbound/phone-screen-fuzz-screen-20.png"
+  }
+ ],
+ "secs": 363,
+ "tutorialIn": {}
+}
