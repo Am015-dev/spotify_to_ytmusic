@@ -79,7 +79,7 @@ function coachPages(){const sc=G.over.scores;const A=sc.find(x=>x.p===0),B=sc.fi
    {t:'The count',h:hd+row('Total',a.total,b.total,esc(plName(G.winText)))}];
   const later=Object.keys(LORE.coach).filter(id=>!COACH.seen[id]).map(id=>'<li>'+esc(LORE.coach[id].later)+'</li>').concat(LORE.coachLater.map(x=>'<li>'+esc(x)+'</li>')).join('');
   pages.push({t:"Things you'll meet later",h:'<ul class="ce-l">'+later+'</ul>',last:1});return pages}
-function coachFinal(){coachHide();if(UI.modal)UI.modal=null;let o=document.getElementById('coachend');
+function coachFinal(){COACH.done=true;coachHide();if(UI.modal)UI.modal=null;let o=document.getElementById('coachend');
   if(!o){const pages=coachPages();COACH.pages=pages;COACH.pg=0;o=document.createElement('div');o.id='coachend';o.className='coachend';o.setAttribute('data-help','');document.body.appendChild(o);
     o.addEventListener('click',e=>{const b=e.target.closest('[data-ce]');if(!b)return;const k=b.dataset.ce;
       if(k==='next'){COACH.pg++;coachDraw()}else if(k==='back'){COACH.pg--;coachDraw()}
@@ -90,3 +90,6 @@ function coachDraw(){const o=document.getElementById('coachend');if(!o||!COACH.p
   o.innerHTML='<div class="ce-box"><h2>'+esc(pg.t)+'</h2>'+voice+pg.h+'<div class="ce-a">'+(i>0?'<button class="btn" data-ce="back">Back</button>':'')+btns+'</div><small class="ce-d">'+(i+1)+' / '+P_.length+'</small></div>'}
 (function(){const o=render;render=function(){o.apply(this,arguments);try{coachAfter()}catch(e){console.error(e)}}})();
 setInterval(()=>{try{if(G&&G.coach&&!G.over)coachAfter()}catch(e){}},700);
+
+// for the QA bot's coached driver: running while the coached game is on, explained = rule ids told so far, done once the final count was reached
+window.GXCOACH={get running(){return !!(G&&G.coach&&!G.over)},get explained(){return Object.keys(COACH.seen)},get done(){return !!COACH.done}};

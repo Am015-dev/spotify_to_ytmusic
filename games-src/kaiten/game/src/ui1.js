@@ -181,3 +181,8 @@ function newsEl() {
   n.lines.forEach((l, i) => box.appendChild(h('div.nl', i ? null : h('span.nh', n.round !== G.round ? 'Last turn of round ' + n.round + ': ' : 'Last turn: '), h('span.nn', { style: 'color:' + pcol(l.s).c }, pname(l.s)), ' ', h('span.nd' + (l.d > 0 ? '.up' : l.d < 0 ? '.down' : ''), l.d > 0 ? '+' + l.d : l.d < 0 ? '−' + -l.d : '±0'), ' ' + l.served + (l.why.length ? ' · ' + l.why.join(', ') : '') + (l.notes.length ? ' · ' + l.notes.join('; ') : ''))));
   return box;
 }
+// ---- story wording (story.js) used by the turn line
+const ST = KK.STORY;
+const nextNm = () => { const v = viewSeat(); return G ? pname(((v >= 0 ? v : 0) + 1) % G.np) : ''; };
+const rivalNm = () => { if (!G) return ''; const v = viewSeat(), pend = KK.pending(G).filter(s => s !== v); const s = pend.length ? pend[0] : (v === 0 ? 1 : 0); return pname(s % G.np); };
+function sayT(k) { return (ST.say[k] || '').replace(/%N/g, nextNm()).replace(/%R/g, rivalNm()); }

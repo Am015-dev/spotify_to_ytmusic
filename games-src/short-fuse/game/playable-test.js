@@ -9,7 +9,7 @@ const probs=[];const note=(m)=>{if(probs.length<40)probs.push(m)};
 (async()=>{const b=await PW.chromium.launch();const touch=W<800;
   const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:touch,hasTouch:true,deviceScaleFactor:1});const p=await ctx.newPage();
   p.on('pageerror',e=>note('PAGE ERROR '+e.message));p.on('console',m=>{const t=m.text();if(m.type()==='error'&&!/Failed to load|net::|favicon|Fetch API/.test(t))note('console error '+t.slice(0,160))});
-  await p.goto(URL_);await sleep(1200);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(1200);
+  await p.goto(URL_);await sleep(1200);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.evaluate(()=>{localStorage.setItem('gxt-short-fuse',JSON.stringify({done:1}))});await p.reload();await sleep(1200);
   const tap=async(sel,what)=>{const ok=await tapSel(p,sel,true,probs);if(!ok)note('could not tap '+(what||sel));return ok};
   // ---- 1) Quick game
   if(!await tap('#start [data-a=start]','Play'))return fin();await sleep(500);

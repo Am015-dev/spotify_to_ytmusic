@@ -16,8 +16,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{i
  const shot=async n=>{if(SH){fs.mkdirSync(SH,{recursive:true});await sleep(350);await p.screenshot({path:`${SH}/${mode}-${n}-${W}.png`})}};
  const tapEl=async sel=>{const c=await p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();if(!r.width)return null;const x=r.left+r.width/2,y=r.top+r.height/2;const t=document.elementFromPoint(x,y);return {x,y,ok:!!t&&(t===e||e.contains(t)||t.contains(e))}},sel);if(!c)return false;if(!c.ok)note('covered: '+sel);await p.touchscreen.tap(c.x,c.y);return true};
  await shot('title');
- await tapEl('#modal [data-gxt-open]');await sleep(900);
- if(await p.evaluate(()=>!G||!G.coach)){await tapEl('.gxt-dlg [data-gxt-start],.gxt-dlg button');await sleep(700)}
+ await tapEl('#modal [data-coach-entry]');await sleep(900);
  if(await p.evaluate(()=>!G||!G.coach))note('the coached game did not start from the title menu');
  let last='',lastT=Date.now(),shots={},turns=0,sawRival=false,startedChapter=false;
  for(let g=0;g<4000;g++){
