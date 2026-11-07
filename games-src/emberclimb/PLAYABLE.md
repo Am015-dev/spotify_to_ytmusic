@@ -50,3 +50,31 @@ rules-notes.md). Shelf numbers stay 3x the tabletop scale (`D.SCALE = 3`: Weak -
 (tap cards to discard, Done), Miracle button (+1 energy), multi-relic rewards. SIMPLIFIED items are stated in Help > "Simplified on purpose".
 Balance after (`node bal.js 200`): Warrior 39%, Rogue 47%, Automaton 51%, Monk 36%; chapter 2 first-legal 83%, ai 95%.
 Known: duo runs became easy (enemy HP x1.6 table is an approximation); 3-act mode (`opt.acts`) exists in the engine but Quick game still plays 1 act.
+
+## Addendum 3: story everywhere
+All story text is in `src/story.js` (cast, prologue, Story scenes, boss lines, Quick game lines); STORY.md has the cast and the 3-act arc.
+- Tutorial = prologue: guide Warden Ashgrove (portrait slot cast-guide) against the Gatekeeper, who wants the summit gate sealed. Every step
+  gives a story reason plus the action in at most 2 lines; after each action Ashgrove reacts in a speech card (portrait + line, never blocks
+  taps); each of the 4 chapters opens with a story beat (intro1-4) and closes with a payoff line; the ending counts floors and gold up, then
+  the end card "The ember lives". Story beats sit next to their rules in TUTORIAL-COVERAGE.md. tut-end: 46/46 steps PASS on both sizes.
+- Story mode: chapter intros (who, stakes, twist rule) and win outros come from story.js; loss outros (with a tip) play before the result;
+  the boss speaks before the fight (scene with Fight) and after it falls.
+- Quick game: Ashgrove says one flavour line when the map opens; the result screen ends with a line in the game's voice.
+
+## Free art kit
+Installed with `free-art/install.py --force` for every test above. Found -> fixed: the full-card "gem" overlay image covered the new card
+pictures and the rule text, so it is no longer drawn (card pictures now show sword / shield / etc. with full text). Title subtitle got a
+solid backing (contrast 4.24 -> pass on the new title art). Note for the art owner: the Warrior's portrait (hero-w) in the free kit is a
+green crocodile face that looks like the Gnawer enemy.
+
+## Addendum 4: a coached first climb, not tap-tap
+The forced 46-step guide is gone. `src/tutor.js` now runs a real short climb (Warrior, seed 7, branching 6-floor map: fight, treasure or
+fight, fight or ?, campfire or shop, elite or fight, boss; foes 75% HP). Only 2 steps are forced (read the intent, play Anvil Blow); then the
+tutor kit stops and Warden Ashgrove coaches: one dismissable line at the top (tap to dismiss, never blocks input) the first time each of the
+25 rules matters, reactions to good plays (kill, double damage on Vulnerable, fully blocked) and poor ones (big unblocked hit, Spikes, energy
+left over), a finale with the real numbers, and an end card listing the rules that did not come up ("Things you will meet later") with Play a
+real game / Title. In Story chapter 1 the same climb is the chapter; Skip there keeps playing it. Coach text: `src/story.js` (coach).
+Test: `node tools/tut-end.js` plays it with random legal moves through the UI at both sizes (2 forced steps; 19-22 of 25 rules explained in
+play, the rest on the end card; any rule missing from both fails).
+Found -> fixed: in Story mode any redraw after the chapter result (sound toggle, menu) blanked the screen (found by qa-bot); the result
+now survives redraws. Intent badges are 40 px tap targets.

@@ -11,6 +11,7 @@ No picture contains text. No publisher, designer or original-game name or logo i
 | Pirate Pack (ships, dinghies) | Kenney | CC0 1.0 | https://opengameart.org/content/pirate-pack-190 |
 | Farm Animals (Sheep, Pig, Llama, Horse OBJ; rendered to 2D with three.js) | Quaternius | CC0 1.0 | https://opengameart.org/content/farm-animals |
 | Animals Pack (Chick OBJ, used as the goose; rendered) | Quaternius | CC0 1.0 | https://opengameart.org/content/animals-pack |
+| Low Poly RPG Characters (Warrior, Ranger, Rogue, Cleric, Wizard, Monk OBJ; rendered with three.js) | Quaternius | CC0 1.0 | https://opengameart.org/content/lowpoly-rpg-characters |
 | brown_planks_03 texture (table only) | Poly Haven | CC0 1.0 | https://polyhaven.com/a/brown_planks_03 |
 | Earlier kit (kept files only): Kenney Animal Pack Redux, Cartography Pack, Board Game Icons; Poly Haven | Kenney, Poly Haven | CC0 1.0 | see git history of this file |
 
@@ -68,45 +69,45 @@ No picture contains text. No publisher, designer or original-game name or logo i
 | tile-pas-goose-2.webp | Kenney Hexagon Pack; Quaternius Farm Animals / Animals Pack (rendered) |
 | tile-pas-goose-3.webp | Kenney Hexagon Pack; Quaternius Farm Animals / Animals Pack (rendered) |
 | tile-pas-goose-4.webp | Kenney Hexagon Pack; Quaternius Farm Animals / Animals Pack (rendered) |
-| goods-1.webp | KEPT from previous kit: kenney-icons |
-| goods-2.webp | KEPT from previous kit: kenney-icons |
-| goods-3.webp | KEPT from previous kit: kenney-icons |
-| goods-4.webp | KEPT from previous kit: kenney-icons |
-| goods-5.webp | KEPT from previous kit: kenney-icons |
-| goods-6.webp | KEPT from previous kit: kenney-icons |
+| goods-1.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| goods-2.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| goods-3.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| goods-4.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| goods-5.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| goods-6.webp | drawn in-script (flat vector, hexagon-pack palette) |
 | board-estate.webp | Poly Haven brown_planks_03; Kenney Hexagon Pack; drawn in-script (mat, hex slots) |
 | board-market.webp | Poly Haven brown_planks_03; Kenney Hexagon Pack; drawn in-script (mat, hex slots) |
 | bg-title.webp | Kenney Hexagon Pack |
 | bg-table.webp | Poly Haven brown_planks_03 |
 | bg-map.webp | Kenney Hexagon Pack |
-| portrait-wren.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-odo.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-cass.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-hask.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-marla.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| portrait-ivo.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| boss-cass.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| boss-hask.webp | KEPT from previous kit: kenney-animals, polyhaven |
-| boss-ivo.webp | KEPT from previous kit: kenney-animals, polyhaven |
+| portrait-wren.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
+| portrait-odo.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
+| portrait-cass.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
+| portrait-hask.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
+| portrait-marla.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
+| portrait-ivo.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
+| boss-cass.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
+| boss-hask.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
+| boss-ivo.webp | Quaternius Low Poly RPG Characters (rendered, recoloured); Kenney Hexagon Pack backdrop |
 | token-banner-0.webp | drawn in-script (flat vector, pack palette) |
 | token-banner-1.webp | drawn in-script (flat vector, pack palette) |
 | token-banner-2.webp | drawn in-script (flat vector, pack palette) |
 | token-banner-3.webp | drawn in-script (flat vector, pack palette) |
-| token-worker.webp | KEPT from previous kit: kenney-icons |
-| token-silver.webp | KEPT from previous kit: kenney-icons |
-| token-points.webp | KEPT from previous kit: kenney-icons |
-| die-white.webp | KEPT from previous kit: kenney-icons |
-| icon-workers.webp | KEPT from previous kit: kenney-icons |
-| icon-silver.webp | KEPT from previous kit: kenney-icons |
-| icon-points.webp | KEPT from previous kit: kenney-icons |
-| icon-storage.webp | KEPT from previous kit: kenney-carto |
-| icon-backlane.webp | KEPT from previous kit: kenney-carto |
-| icon-season.webp | KEPT from previous kit: kenney-icons |
-| icon-track.webp | KEPT from previous kit: kenney-icons |
+| token-worker.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| token-silver.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| token-points.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| die-white.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| icon-workers.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| icon-silver.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| icon-points.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| icon-storage.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| icon-backlane.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| icon-season.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| icon-track.webp | drawn in-script (flat vector, hexagon-pack palette) |
 | ui-tile-frame.webp | drawn in-script (flat vector, pack palette) |
 | ui-result-win.webp | Kenney Hexagon Pack; drawn in-script (banners) |
 | ui-result-lose.webp | Kenney Hexagon Pack |
 | ui-scroll.webp | drawn in-script (flat vector, pack palette) |
-| fx-region-complete.webp | KEPT from previous kit: ? |
-| fx-chain.webp | KEPT from previous kit: ? |
-| fx-coin.webp | KEPT from previous kit: ? |
+| fx-region-complete.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| fx-chain.webp | drawn in-script (flat vector, hexagon-pack palette) |
+| fx-coin.webp | drawn in-script (flat vector, hexagon-pack palette) |
