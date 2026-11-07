@@ -1,4 +1,13 @@
 {
+ "wave": 3,
+ "ratio": "16:9",
+ "flow_aspect": "16:9",
+ "style": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame.",
+ "notes": "twin-thrones 2D wave 3, ratio 16:9. Paste with Flow aspect 16:9; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "twin-thrones",
+  "count": 2
+ },
  "cards": {
   "result-victory": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. A triumphant throne room with a golden sunbeam, confetti of petals, banners raised, calm centre",
   "result-defeat": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. A quiet empty throne room at dusk, long shadows, a single fallen banner, calm centre"

@@ -1,5 +1,13 @@
 {
+ "wave": 3,
  "ratio": "9:16",
+ "flow_aspect": "9:16",
+ "style": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos.",
+ "notes": "redline-rally 2D wave 3, ratio 9:16. Paste with Flow aspect 9:16; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "redline-rally",
+  "count": 1
+ },
  "cards": {
   "bg-podium": "Flat 2D vector game art, top-down view, clean bold shapes with soft cel shading, a warm sunset racing palette of orange, teal, cream and deep navy, thin dark outlines, no 3D, no photo realism, no text, no letters, no numbers, no logos. A cheerful top-down view of a three-step podium on a red carpet with confetti and streamers, spotlights from the corners, a calm centre."
  }

@@ -1,0 +1,16 @@
+{
+ "wave": 1,
+ "ratio": "9:16",
+ "flow_aspect": "9:16",
+ "style": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark.",
+ "notes": "emberclimb 2D wave 1, ratio 9:16. Paste with Flow aspect 9:16; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "emberclimb",
+  "count": 3
+ },
+ "cards": {
+  "bg-title": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a lone glowing tower of dark stone rising into an ember-lit stormy sky, tiny campfire at its foot, a winding path leading up, empty sky area in the upper third. No characters, no UI.",
+  "bg-map": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a vertical parchment-and-slate map of a mountain climb, faded paths and ink-stained clouds, calm empty centre where nodes sit. No characters, no UI.",
+  "bg-battle-1": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a torchlit mossy dungeon hall seen head-on, stone floor and two pillars, empty centre for combatants. No characters, no UI."
+ }
+}

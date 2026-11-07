@@ -1,0 +1,18 @@
+{
+ "wave": 1,
+ "ratio": "1:1",
+ "flow_aspect": "1:1",
+ "style": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame.",
+ "notes": "twin-thrones 2D wave 1, ratio 1:1. Paste with Flow aspect 1:1; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "twin-thrones",
+  "count": 5
+ },
+ "cards": {
+  "table-bg": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. A dark teal carved stone table surface seen from above with faint gold inlay patterns and worn edges, empty in the middle",
+  "military-pawn": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. A gold-and-bronze war standard pawn on a round base. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out.",
+  "coin": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. A single thick gold coin with a simple sun relief. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out.",
+  "portrait-p1": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. A confident young ruler with a teal cloak and a thin gold circlet, head and shoulders, calm expression",
+  "portrait-p2": "Flat 2D hand-painted storybook illustration, bold clean ink outlines, warm gouache texture, limited palette of terracotta, teal, ochre and ivory, soft light from the top left, an ancient sun-baked fantasy kingdom, strictly two-dimensional, no 3D render, no photograph, no text, no letters, no numbers, no border, no frame. A sharp-eyed rival ruler with an ochre cloak and a bronze crown, head and shoulders, cunning smile"
+ }
+}

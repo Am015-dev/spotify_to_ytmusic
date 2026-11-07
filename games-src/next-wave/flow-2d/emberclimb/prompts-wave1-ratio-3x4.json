@@ -1,0 +1,17 @@
+{
+ "wave": 1,
+ "ratio": "3:4",
+ "flow_aspect": "3:4",
+ "style": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark.",
+ "notes": "emberclimb 2D wave 1, ratio 3:4. Paste with Flow aspect 3:4; the ingest script crops/resizes to the exact size. Save each result as <stem>.webp or .png. No text in any picture.",
+ "meta": {
+  "game": "emberclimb",
+  "count": 4
+ },
+ "cards": {
+  "hero-w": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Full-body character portrait of broad-shouldered armoured warrior with a glowing ember-forged greatsword, heroic three-quarter pose, on a flat plain white background, one single object centred with generous margin, no ground shadow.",
+  "hero-s": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Full-body character portrait of hooded lithe rogue with throwing knives and a vial of green venom, heroic three-quarter pose, on a flat plain white background, one single object centred with generous margin, no ground shadow.",
+  "hero-a": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Full-body character portrait of friendly brass clockwork automaton with three glowing orbs orbiting its chest, heroic three-quarter pose, on a flat plain white background, one single object centred with generous margin, no ground shadow.",
+  "hero-m": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Full-body character portrait of serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves, heroic three-quarter pose, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+ }
+}
