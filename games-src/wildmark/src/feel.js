@@ -127,7 +127,7 @@ var WMF = (function () {
   window.render = function () { var r = render0.apply(this, arguments); try { F.rollAll($('#board')); } catch (e) { } return r; };
   render = window.render;
   var step0 = window.step;
-  window.step = function () { if (G && G.over && !UI.beatDone) { UI.beatDone = true; F.beat('Season over', 'Counting every valley'); } if (G && !G.over) UI.beatDone = false; return step0.apply(this, arguments); };
+  window.step = function () { if (G && G.over && !UI.beatDone) { UI.beatDone = true; F.thump($('#seats') || $('#barstat')); } if (G && !G.over) UI.beatDone = false; return step0.apply(this, arguments); };
   step = window.step;
   var newGame0 = window.newGame;
   window.newGame = function () { F.rollReset(); return newGame0.apply(this, arguments); };

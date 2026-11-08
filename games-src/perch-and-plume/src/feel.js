@@ -135,9 +135,9 @@ var PPF = (function () {
       }
       case 'chainStart': if (mine && e.n >= 2) return cam.focus($('.row[data-h="' + e.h + '"]'), 200, 1.15); return;
       case 'egg': if (mine) { var b = $('.bc[data-a="bird"][data-h="' + e.h + '"][data-c="' + e.c + '"]'); if (b) setTimeout(function () { F.points(b, myScore(), '+1'); }, F.ms(150)); } return;
-      case 'round': return F.beat('Round ' + (e.r + 1), G.cubes[e.r] + ' actions each');
-      case 'goal': return F.beat('Round goal', G.pl.map(function (p, i) { return (isHuman(i) && humans().length === 1 ? 'You' : p.name) + ' ' + e.res.pts[i]; }).join(' · '), 1500);
-      case 'over': return F.beat('The year is over', 'Counting the points', 1300);
+      case 'round': return F.thump($('#trk'));   // the game's own message says the round; the beat is wordless (one message at a time)
+      case 'goal': return F.thump($('.sline') || $('#opps'));
+      case 'over': return F.thump($('.sline') || $('#opps'));
     }
   }
   // after every render: drag marks, counters roll, held hand card pulses

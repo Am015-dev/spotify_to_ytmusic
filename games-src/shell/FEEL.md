@@ -59,7 +59,8 @@ mouse drag-pan on empty board and double-click 1x/1.6x on PC. `cam.focus(el, hol
 - `GXF.points(fromEl, scoreEl, '+3')`: the number flies into the score, which pulses; a coin tick plays.
 - Counters roll: mark numbers `data-gxf-roll="<stable key>"` in your render and call `GXF.rollAll(root)` after it
   (wrap `render`); call `GXF.rollReset()` on a new game.
-- `GXF.beat('Round 2', '8 actions each')` (Promise, ~1.3 s, tap skips) for round or game end.
+- Round or game end: `GXF.thump(el)` (chord + buzz + pulse, no words) when the game already shows its own message;
+  `GXF.beat(title, sub)` only when nothing else says it (stays >= 4 s + 1 s per 10 words, tap skips; one message at a time).
 - The rival: animate each step at readable speed (flight 500-560 ms, then hop), the camera leaning in on its move.
 All lengths go through `GXF.ms()` = kit animation speed; 0 when reduced motion or animations are off.
 

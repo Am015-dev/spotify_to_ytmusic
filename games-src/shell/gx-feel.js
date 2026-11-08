@@ -7,7 +7,7 @@
 //   GXF.camera(vp, content)  pinch / wheel / drag-pan zoom on a DOM board; .glideTo(el), .focus(el, ms), .reset()
 //   GXF.fly(from, to, opt)   a piece flies along an arc (Promise);  GXF.hop(el), GXF.pulse(el), GXF.shake(el)
 //   GXF.points(from, to, txt) "+3" flies into the score, the score bumps;  GXF.roll(el, to) / GXF.rollAll(root)
-//   GXF.beat(title, sub)     a short round-end banner (Promise);  GXF.tick(kind) = sound + vibration for one moment
+//   GXF.beat(title, sub)     a round-end banner (>= 4 s, tap skips);  GXF.thump(el) a wordless beat;  GXF.tick(kind) = sound + vibration for one moment
 //   GXF.keys(map)            keyboard shortcuts (ignored while typing or while a drawer is open)
 (function (root) {
   'use strict';
@@ -238,8 +238,11 @@
   };
   F.rollReset = function () { LAST = {}; };
   // a short beat between rounds: a banner slides in, holds, leaves. Resolves when gone (tap skips).
+  // Text stays readable (shelf rule): at least 4 s plus 1 s per 10 words, tap skips. Prefer a wordless beat (GXF.thump) when the
+  // game already says the same thing in its own message: one message on screen at a time.
   F.beat = function (title, sub, ms) {
-    var d = F.ms(ms || 1300); F.tick('beat'); if (!d) return Promise.resolve();
+    var words = ((title || '') + ' ' + (sub || '')).split(/\s+/).filter(Boolean).length;
+    var d = F.ms(ms || 1300) ? Math.max(ms || 0, 4000 + Math.ceil(words / 10) * 1000) : 0; F.tick('beat'); if (!d) return Promise.resolve();
     var b = doc.createElement('div'); b.className = 'gxf-beat'; b.setAttribute('role', 'status');
     b.innerHTML = '<b></b>' + (sub ? '<span></span>' : ''); b.firstChild.textContent = title; if (sub) b.lastChild.textContent = sub;
     layer().appendChild(b);
@@ -248,6 +251,9 @@
       b.addEventListener('pointerdown', fin); requestAnimationFrame(function () { b.classList.add('on'); }); setTimeout(fin, d);
     });
   };
+
+  // a wordless beat: chord + buzz + a pulse on the element that changed (round tracker, score)
+  F.thump = function (el) { F.tick('beat'); F.pulse(el); return wait(F.ms(450)); };
 
   // ------------------------------------------------------------------ camera for DOM boards
   // GXF.camera(viewport, content, opt): transform-based zoom on `content` inside `viewport`.
