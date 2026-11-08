@@ -177,7 +177,7 @@ function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefin
 function tutOffer(){if(typeof GXT==='undefined'||UI.tut||NET.on||!firstTime())return false;
   try{localStorage.setItem('sgz_offer','1')}catch(e){}
   const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A guide plays one game with you. Each rule, right when it matters.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn" data-a="learn">Learn to play</button><button type="button" class="gxt-b" data-offer="play" data-a="play">Play now</button></div></div>';
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A guide plays one game with you. Each rule, right when it matters.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn" data-a="learn">Learn to play</button><button type="button" class="gxt-b sg-link" data-offer="play" data-a="play">Play now</button></div></div>';
   d.addEventListener('click',e=>{const b=e.target.closest('[data-offer]');if(!b)return;d.remove();if(b.dataset.offer==='learn')tutStart();else beginGame()});
   document.body.appendChild(d);return true}
 // ---------------------------------------------------------------- the coach watches every move (before it is applied); input is never blocked

@@ -132,3 +132,13 @@ span.tag{font-size:14px!important}
   span.tag{font-size:16px!important}
 }
 @media (min-width:1024px){html body .gxc-path .gxc-act small{font-size:16px!important}}
+/* W466 / D5 fix list: rack numbers in the arrow cell, floor label "Broken tiles", offer "Play now" as a link, lighter scrim */
+#bf .bf-ar{clip-path:none;background:none;opacity:1;display:grid;place-items:center;width:calc(var(--cs)*.5);min-width:16px}
+#bf .bf-rn{font:900 14px/1 var(--ff);color:#7a4a1e}
+@media (min-width:1024px){#bf .bf-rn{font-size:16px}}
+#bf .bf-floor .bf-c span{color:#7a1f1f}#bf .bf-floor .bf-c{background:#fbe9e4}
+#bf .bf-fll{font-style:normal;color:#7a1f1f;white-space:nowrap}
+.gxt-end{background:rgba(5,3,6,.25)!important}
+.gxt-b.sg-link{background:none!important;border:0!important;box-shadow:none!important;text-decoration:underline;color:#6b1a28!important;min-height:44px;font-weight:700}
+#bf .bf-fll{white-space:normal;max-width:4.6em;line-height:1.05;text-align:center}
+#bf .bf-floor:has(.bf-bd.fbd) .bf-fll{margin-right:38px}

@@ -121,7 +121,7 @@ function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='star
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   const lvAll=o.lv[1]||'normal';
   const seats=Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('');
-  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, tile your wall. Most stars wins.</p>
+  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, score the most stars.</p>
    <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>${NET.on?'':'<div class="acts"><button class="btn" data-a="tutorial">Learn to play</button></div>'}
    ${saved&&!NET.on?`<div class="acts"><button class="btn" data-ui="continue">Continue saved game</button></div>`:''}
    <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>
