@@ -99,3 +99,10 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 ## Lesson (8 Nov 00:25): bot gates are not "ready"
 Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still found all three unplayable: unreadable cards, no idea what to do, how points come in, or when a turn ends. Before telling the owner any game is ready, the orchestrator must look at the phone shots as a first-time player (title, turn 1, a card, scoring), and Addendum 5 plus the turn tracker must be in. Never report ready on bot results alone.
 - Owner (8 Nov 2026): NO emails. The Python package CI runs on main only; never add workflows that run on the games branch or worker branches and can fail.
+- Owner (8 Nov 2026): never leave workers hanging. Every brief ends with a DONE trigger to the orchestrator, and the orchestrator sweeps list_sessions every 20 min (send_later) to merge finished work and unblock stuck workers.
+
+## Owner, 8 Nov 2026 ~02:40 UTC: owner is asleep
+- No messages to the owner until morning. Keep sweeping every 20 min, merge, review, deploy.
+- A game goes live only after: reviewer PASS (all 10 >= 7), logic-test PASS, asset-usage gate, build PASS, live 0 errors,
+  and the orchestrator has looked at the phone shots and played it once by touch at machine speed.
+- Morning report: one short list of games ready to play (link each), and what is still not ready and why.

@@ -135,7 +135,10 @@ const occCount=s=>G.pl[s].ks.filter(x=>x&&x.occ!=null).length;
 function cardLbl(id){const e=eff(id);return cname(id)+' ('+e.s+')'}
 // ---------------------------------------------------------------- setup
 const newRM=()=>({masonry:[],tempests:-1,lanes:[],mandate:[],lock:{}});
-TB.newGame=function(o){o=o||{};const pls=o.players||[];const np=pls.length;if(np<2||np>4)throw new Error('The Thornbound Throne is for 2 to 4 players (solo mode is not built yet).');
+TB.newGame=function(o){o=o||{};let pls=o.players||[];
+  // Solo (1 player): a duel against the Sim, a computer seat with its own faction. The Sim has no hand of its own to read; it plays as the AI seat. (The solo rulebook's Ambition/Scheme/Forge decks are not published in a readable form, so this Sim uses the standard 2-player rules.)
+  if(pls.length===1){const mine=pls[0].faction,other=D.FACTIONS.find(f=>f!==mine&&f!=='nobility')||D.FACTIONS.find(f=>f!==mine);pls=[pls[0],{faction:other,name:'Sim',ai:'hard',sim:true}];o=Object.assign({},o,{players:pls,order:o.order&&o.order.length===1?[0,1]:o.order})}
+  const np=pls.length;if(np<2||np>4)throw new Error('The Thornbound Throne is for 1 (against the Sim) to 4 players.');
   const seed=o.seed!=null?(o.seed>>>0):Math.floor(Math.random()*2147483647);const len=LEN[o.length]?o.length:'standard';
   G={v:1,seed,rng:seed,np,len,rounds:LEN[len],round:0,phase:'setup',step:'',order:[],pl:[],reg:[],council:{relics:[],secrets:[],oaths:[]},cmk:{relics:[],secrets:[],oaths:[]},
     lost:[],burned:[],kburn:[],limbo:[],klimbo:[],road:[0,0,0,0],kdeck:[],kdisc:[],fav:{h:-1,u:3},cmod:{},rm:newRM(),used:{},cord:[],clash:null,peek:{},loc:[],bstr:[],bq:[],taken:false,infl:[],
