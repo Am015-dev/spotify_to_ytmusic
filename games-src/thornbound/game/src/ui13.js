@@ -12,7 +12,8 @@ const PX=(function(){
     load('back-'+id,()=>{curB=id;TBKit.setBack('media/back-'+id+'.webp')})}
   // table: the candlelit court (phone version in portrait), or an unlocked table, behind the map
   function tableApply(){R.dataset.gfx=UI.lowGfx?'low':'high';
-    const id=unl('table')||'court',ph=id==='court'&&matchMedia('(orientation:portrait)').matches,f=ph?'table-court-phone':'table-'+id;
+    let rt='court';try{if(typeof G!=='undefined'&&G&&UI.started&&!G.over&&G.rounds>1){if(G.round>=G.rounds)rt='throne-hall';else if(G.round>Math.floor(G.rounds/2))rt='lantern-night'}}catch(e){}
+    const id=unl('table')||rt,ph=id==='court'&&matchMedia('(orientation:portrait)').matches,f=ph?'table-court-phone':'table-'+id;
     if(f===curT)return;load(f,()=>{curT=f;R.style.setProperty('--tbl-img','url(media/'+f+'.webp)');R.dataset.timg='1'})}
   // painted kingdom map (map.webp / map-phone.webp), used when present; locations stay on top
   let curM='';
@@ -39,3 +40,23 @@ const PX=(function(){
   ['back-default','back-court','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
   return {tick};
 })();
+
+// ---------------------------------------------------------------- owner art in normal play: rival card backs and the story cast on the title
+// face-down rival bids show that faction's painted back (TB_BACK, ui1.js); a back switches on only after its file loaded
+const TBBK={on:{}};
+function tbBacks(){if(/jsdom/i.test(navigator.userAgent||'')||UI.lowGfx||typeof G==='undefined'||!G)return;
+  for(const p of G.pl){const k=FK[p.fac],f=TB_BACK[k];if(!f||TBBK.on[k]!==undefined)continue;TBBK.on[k]=0;
+    const im=new Image();im.onload=()=>{TBBK.on[k]=1;document.documentElement.classList.add('tb-bk-'+k)};im.src='media/'+f+'.webp'}}
+// the Story button shows the road ahead: the guide, then each chapter's rival on a chapter disc (done, open, locked, boss)
+function tbCastRow(){const b=document.querySelector('#start .tbtn.story');if(!b||b.querySelector('.castrow')||UI.lowGfx||!window.CAMPAIGN)return;
+  let pr={ch:{}};try{pr=GXC.progress()}catch(e){}
+  const ch=window.CAMPAIGN.chapters||[],seen=new Set(),items=[{p:'camp-ysolde.webp',st:'done'}];let open=false;
+  ch.forEach(c=>{const o=c.opponent||{},f=o.portrait;if(!f||seen.has(f))return;seen.add(f);const won=pr.ch&&pr.ch[c.id]&&pr.ch[c.id].beaten;
+    const st=won?'done':(!open?(open=true,'open'):(c.boss?'boss':'locked'));items.push({p:f,st})});
+  const row=document.createElement('span');row.className='castrow';row.setAttribute('aria-hidden','true');
+  row.innerHTML=items.map(it=>'<i class="cr cr-'+it.st+'"><img src="media/'+it.p+'" alt="" draggable="false" onerror="this.parentNode.remove()"></i>').join('');
+  b.appendChild(row)}
+(function(){const o=renderStart;renderStart=function(){const r=o.apply(this,arguments);try{tbCastRow()}catch(e){}return r}})();
+(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{tbBacks()}catch(e){}return r}})();
+// the snap: a short vibrate tick when a card lands on its spot (tap or drag), where the device has one
+(function(){const o=commitCard;commitCard=function(){try{if(navigator.vibrate)navigator.vibrate(14)}catch(e){}return o.apply(this,arguments)}})();

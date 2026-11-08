@@ -3,7 +3,8 @@ const PW=require('playwright');const fs=require('fs');
 const html=fs.readFileSync(__dirname+'/thornbound.html');const [W,H]=(process.argv[2]||'390x844').split('x').map(Number);
 const out=process.argv[3]||(__dirname+'/../playable-shots/feel');const ph=W<700;fs.mkdirSync(out,{recursive:true});
 (async()=>{const b=await PW.chromium.launch();const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:ph,hasTouch:ph,deviceScaleFactor:1});
-await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+const GAME=__dirname+'/../../../games/thornbound';   // the deployed media/models/music, so the shots show the owner art
+await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();if(u.pathname==='/'||u.pathname==='/index.html')return r.fulfill({status:200,contentType:'text/html',body:html});const f=GAME+decodeURIComponent(u.pathname);if(u.pathname.indexOf('..')<0&&fs.existsSync(f)&&fs.statSync(f).isFile())return r.fulfill({status:200,body:fs.readFileSync(f)});return r.abort()});
 const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push('PE '+e.message));
 const shot=async n=>{await p.waitForTimeout(500);await p.screenshot({path:`${out}/${n}-${W}.png`});console.log('shot',n)};
 await p.goto('https://gns.test/'+(ph?'?phone=1':''));await p.waitForTimeout(1500);
