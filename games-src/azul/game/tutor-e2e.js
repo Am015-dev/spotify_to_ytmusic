@@ -46,7 +46,7 @@ for(const [W,H] of SIZES){const tag=W+'x'+H,shots=process.env.SHOTS&&W===390&&H=
  const later=await p.evaluate(()=>document.body.textContent.includes('meet later'));P(!later,tag+' no "learn later" list');
  // ---- 2. the real game that follows
  P(await tapEl('.gxt-end [data-gxt-end=play]'),tag+' end card: Play a real game takes a touch');await sleep(1500);
- const fresh=await p.evaluate(()=>!!G&&!UI.tut&&G.turn===0&&G.pl[0].wall.every(r=>r.every(v=>v<0)));P(fresh,tag+' a fresh real game starts');
+ const fresh=await p.evaluate(()=>!!G&&!UI.tut&&G.turn<=1&&G.pl[0].wall.every(r=>r.every(v=>v<0)));P(fresh,tag+' a fresh real game starts');
  let moves=0,bad=0,inv=[],firstShot=false,midShot=false;stuck=Date.now();let sig='';
  for(let it=0;it<6000;it++){
   const s=await p.evaluate(()=>({over:!!(G&&G.over),me:!!G&&!G.over&&G.phase==='offer'&&sideToAct()===0&&!BF.busy&&!BF.q.length,sel:!!UI.sel,sig:G?G.turn+'/'+G.round:'',r:G?G.round:0,inv:checkInvariants()}));

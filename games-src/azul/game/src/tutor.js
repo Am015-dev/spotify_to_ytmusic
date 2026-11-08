@@ -54,7 +54,7 @@ function tutSteps(){
     S('rows','Rack 2 holds two tiles of one colour. Tap it.',move(1)),
     S('slide','The leftover tiles slid to the middle. Tap the middle.',Object.assign(look(()=>tq('[data-bfsrc="-1"]'),rivalTurn),rival(0))),
     S('rival','Tamsin took four snowflakes. Now tap a red in kiln 3.',pick(2,2)),
-    S('blocked','Rack 3 is shut: its wall row has red. Tap rack 4.',Object.assign(move(3),rival(1))),
+    S('blocked','Rack 3 is shut: its wall row has red. Tap rack 4.',Object.assign(move(3),rival(1),{side:'bottom'})),
     S('middle','Tap a yellow in the middle. First one there gets the Sun.',pick(-1,1)),
     S('sun','Tap rack 3. The Sun token goes on your floor.',move(2)),
     S('keep','Rack 3 is not full. It keeps its tiles for later.',Object.assign(look(tRack(2),rivalTurn),rival(2))),
