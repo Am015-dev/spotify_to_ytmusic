@@ -136,7 +136,7 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Sunglaze https://am015-dev.github.io/spotify_to_ytmusic/sunglaze/ (R9 PASS 07:23, live 07:29, feel-audit live all pass)
 - Thornbound https://am015-dev.github.io/spotify_to_ytmusic/thornbound/ (R4 PASS 07:36, live 07:48, feel-audit live all pass)
 - Doorkick Dungeon https://am015-dev.github.io/spotify_to_ytmusic/doorkick-dungeon/ (R7 PASS 07:47, live 08:00, feel-audit live all pass)
-- Shipwreck Isle https://am015-dev.github.io/spotify_to_ytmusic/shipwreck-isle/ (R6 PASS 07:55, live 08:15, feel-audit live all pass; Learn wins by Suggest 4/4)
+- (REJECTED by owner 10:15: "unplayable, spreadsheet") Shipwreck Isle https://am015-dev.github.io/spotify_to_ytmusic/shipwreck-isle/ (R6 PASS 07:55, live 08:15, feel-audit live all pass; Learn wins by Suggest 4/4)
 - Cauldron Fair https://am015-dev.github.io/spotify_to_ytmusic/cauldron-fair/ (R5 PASS 07:46, live 08:39, feel-audit live all pass)
 - Nebula Aces https://am015-dev.github.io/spotify_to_ytmusic/nebula-aces/ (R3 PASS 08:45, live 09:00, feel-audit live all pass)
 - (REJECTED by owner 10:00, rebuilding W483) Twin Thrones https://am015-dev.github.io/spotify_to_ytmusic/twin-thrones/
@@ -155,3 +155,10 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 Owner: "Stop spending so much time, your review is horrible, none of the games is playable and understandable."
 All workers and reviewers interrupted; sweep and leftover DONE triggers deleted. Nothing runs. Do not restart the
 fleet. Next work only on the owner's word: one game at a time, judged by the owner's own phone play, not by reviewer scores.
+- 10:15 owner: Shipwreck Isle "unplayable, does not feel like a game, a spreadsheet". Rejected list so far: Hollowbough, Twin Thrones, Shipwreck Isle.
+
+## 10:12 owner: continue, lean, use references
+Plan: REF session (Sonnet, session_01RR7mnav4DFPVkBnCbhLMfS) writes games-src/REFERENCE-UI.md (how top phone board-game
+apps lay out each genre). W482 hollowbough + W483 twin resumed, time-capped, shots only, no deploy. Then waves of 3 games
+(Sonnet, Opus only after a failed try), each copying the REFERENCE-UI genre rules. No reviewer fleet. Owner sees phone
+shots per game before anything goes live. No 20-min sweep loop.
