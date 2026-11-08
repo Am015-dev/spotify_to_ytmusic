@@ -15,7 +15,7 @@ Old rules: `games-src/RULES-ARCHIVE.md`.
 - Nightrun RELEASE (owner, 31 Oct): make it playable and sellable at $5. Freeze lifted for WORKER-RULES.md 19; rules 15-18 stay.
 
 ## How we work (owner, 14 Oct 2026: "you waste way too many tokens and deliver shit results")
-- Workers: owner (20 Oct 2026) wants at least 5 workers + 1 reviewer at once on Nightrun, models chosen by task (see Cheapest model line).
+- Workers: owner wants at least 5 workers + 1 reviewer at once on Nightrun, models chosen by task (see Cheapest model line).
 - One task = ~30 min and ONE deliverable, fully briefed up front (games-src/BRIEF-TEMPLATE.md). Then 5 report lines and stop.
   No idle workers, no self-wake-ups, no follow-up messages except the owner's new bug reports.
 - Model by task complexity (owner, 20 Oct 2026), always set it: HAIKU = mechanical, checklist, no judgement (run tests, bisect by flag,
