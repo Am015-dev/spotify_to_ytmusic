@@ -163,3 +163,7 @@ apps lay out each genre). W482 hollowbough + W483 twin resumed, time-capped, sho
 (Sonnet, Opus only after a failed try), each copying the REFERENCE-UI genre rules. No reviewer fleet. Owner sees phone
 shots per game before anything goes live. No 20-min sweep loop.
 - Deep Signal = old name of Lantern Dive (owner). Never work on deep-signal; it is not a separate game.
+
+## 10:40 OWNER: twin-thrones + hollowbough "unplayable", asked if compared with benchmark (no).
+- New gate for every game: store screenshots of the official phone app (local only, never committed/named), side-by-side vs ours at 390x844, worker plays full game by touch as a new player. No "ready" without vs-benchmark shot + orchestrator playing it by touch.
+- W482 hollowbough, W483 twin, W484 stitchwise (new, session_01RR7mnaHNL8z2uvUgNj528c), W468 shipwreck all briefed 10:40.
