@@ -39,6 +39,14 @@ html body .hand .card .cart{height:calc(var(--cw)*.72)!important}html body .hand
 #tscr .heroes .hero,#tscr .refline,#tscr .sub{background:rgba(16,11,8,.88)!important;border-radius:12px}
 #tscr .refline{padding:8px 14px;color:#f6ead8!important}
 .res,.rcard,.rsec{background-color:rgba(16,11,8,.9)}
+/* R1: result deck as small card faces; dim the busy picture behind result and hero picker */
+.rcard{display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:4px!important}.rcard .rart{width:100%;aspect-ratio:1;border-radius:6px;background-size:cover}
+.res .panelbg{filter:brightness(.38) blur(2px)}#tscr .bg{filter:brightness(.55)}
+.res .rsec,.res .cause,.res .rstat,.res .storyline{background:rgba(16,11,8,.9)!important;border-radius:12px;padding:10px 14px}
+/* R1 learn step 1: no hairline seams between the spotlight's dim cells */
+.gxt-cell{box-shadow:0 0 0 1px var(--gxt-dim)}
+/* R1 PC: a bigger fight, End turn beside the hand */
+@media (min-width:1024px){html body .en .art{width:min(100%,calc(var(--cw)*3))!important}html body .en{max-width:260px!important}.ctl{display:flex;align-items:center;justify-content:space-between;gap:16px}.w4endpc{min-width:180px;min-height:56px;font-size:20px!important}}
 /* end W420 owner art */
 
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}

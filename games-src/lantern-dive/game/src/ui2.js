@@ -16,7 +16,7 @@ function actorSeat() {
 // ---- sizes: hand card width (CSS variable); the table's own geometry comes from tableGeo() once the hand has its height ----
 function layoutVars() {
   const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), vw = GXV.now(), land = ph && vw.w > vw.h;
-  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(68, Math.round(H * .1)))) : Math.max(60, Math.min(150, Math.round(H * (W >= 1000 ? .15 : .125))));
+  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(64, Math.round(H * .1)))) : Math.max(60, Math.min(150, Math.round(H * (W >= 1000 ? .15 : .125))));
   const short = ph && !land && vw.h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
   bd.classList.toggle('side', W > H * 1.45);
   document.documentElement.style.setProperty('--hw', hw + 'px');
@@ -80,10 +80,11 @@ function seatEl(s, act, mk) {
   const b = h('button.seat' + (act === s ? '.act' : '') + (vote ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
   const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: cmdHTML(17), title: 'Commander' }));
   const t = pingTok(s, 18); if (t) { t.classList.add('pk'); av.append(t); }
-  b.append(h('span.top', av, h('span.nm', p.name)), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b>', title: p.hand.length + ' cards left' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b>', title: won + ' tricks won' })));
+  b.append(h('span.top', av, h('span.nm', p.name)), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b><span class="bl">' + (p.hand.length === 1 ? 'card' : 'cards') + '</span>', title: p.hand.length + ' cards left' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b><span class="bl">' + (won === 1 ? 'trick' : 'tricks') + '</span>', title: won + ' tricks won' })));
   const sh = shownEl(s); if (sh) b.append(h('span.pg', sh));
   const js = jobs(s), jb = h('span.jobs'); js.slice(0, 2).forEach(i => jb.append(jobChip(i, { opp: 1 }))); if (js.length > 2) jb.append(h('span.jc.more', '+' + (js.length - 2)));
   b.append(jb);
+  if (act === s && G.phase === 'play' && p.ai && !UI.busy && !UI.fz) b.append(h('span.thk', 'Thinking…'));
   return b;
 }
 function droneEl(s, act, mk) {
@@ -117,23 +118,25 @@ function tableGeo() {
   const side = !!(bd && bd.classList.contains('side')), small = !side && H < 420, boss = !!(G.boss && G.phase !== 'assign');
   const drone = G.players.findIndex(p => p.helper);
   const compact = side || small;
-  const av = side ? 28 : (small ? 28 : 32), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
-  const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : Math.round(Math.min(90, W * .23)), seatH = side ? (wideT ? 112 : 76) : (small ? 100 : 116);
+  const av = side ? 28 : (small ? 28 : 30), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
+  const row3 = !side && !small && k === 3 && drone < 0 && H >= 470;   // W479: three rivals share one row on top; the trick gets the whole width
+  const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : (row3 ? Math.min(300, Math.floor((W - 16 - 12) / 3)) : Math.round(Math.min(100, W * .26))), seatH = side ? (wideT ? 112 : 76) : (row3 ? (ph ? 150 : 118) : (small ? 100 : 116));
   const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : 54;
-  const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, seats: [], slots: [] };
+  const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, row3, seats: [], slots: [] };
   const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
   geo.dw = dw; geo.droneW = droneW; geo.dh = 44 + Math.round(dw * 1.4) + 14;
   // trick area
   let top, zl = 0, zr = W;
   if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
   const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2, cx = side ? (zl + zr) / 2 : W / 2;
-  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : (W >= 1100 ? 176 : 112);
-  if (!side && k >= 3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
+  let cw = Math.floor(zoneH / (side || (row3 && !ph) ? 3.8 : 4.4)); const cwMax = ph ? 88 : (W >= 1100 ? 176 : 112);
+  if (!side && k >= 3 && !row3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
+  if (row3) cw = Math.min(cw, Math.floor((W / 2 - 6) / 1.6));
   if (side) cw = Math.min(cw, Math.floor((zr - zl) / 4.6));
   cw = Math.max(30, Math.min(cwMax, cw)); const ch = Math.round(cw * 1.4);
-  geo.pl = side ? zl : ((k >= 3 || drone >= 0) ? seatW + 8 : 6); geo.pr = side ? zr : ((k >= 3 || drone >= 0) ? W - seatW - 8 : W - 6);
+  geo.pl = side ? zl : ((k >= 3 && !row3 || drone >= 0) ? seatW + 8 : 6); geo.pr = side ? zr : ((k >= 3 && !row3 || drone >= 0) ? W - seatW - 8 : W - 6);
   geo.cw = cw; geo.ch = ch; geo.cx = cx; geo.cy = cy; geo.top = top; geo.zoneH = zoneH;
-  const rx = Math.round(cw * (side ? 1.5 : 1.05)), ry = Math.round(ch * (side ? .86 : 1.0));
+  const rx = Math.round(cw * (side ? 1.5 : 1.05)), ry = Math.round(ch * (side ? .86 : (row3 && !ph ? .84 : 1.0)));
   for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry)]); }
   // seats: i = 1..k clockwise from you (left side first, then the top, then the right side)
   const L = seatW / 2 + 5, R = W - seatW / 2 - 5, mid = cy - seatH / 2 + 8;
@@ -158,6 +161,7 @@ function seatSpots(geo, list) {
     list.forEach((s, i) => { if (i === droneIdx) out[i] = sp(W / 2, y0, W - 8); else out[i] = sp(i < droneIdx ? L : R, mid, seatW); });
     return out;
   }
+  if (geo.row3) { list.forEach((s2, i) => { out[i] = sp(W / 2 + (i - 1) * (seatW + 8), y0, seatW); }); return out; }
   if (kk === 2) { out[0] = sp(W * .24, y0); out[1] = sp(W * .76, y0); }
   else if (kk === 3) { out[0] = sp(L, mid); out[1] = sp(W / 2, y0); out[2] = sp(R, mid); }
   else { out[0] = sp(L, mid + 18); out[1] = sp(W * .31, y0); out[2] = sp(W * .69, y0); out[3] = sp(R, mid + 18); }
@@ -207,7 +211,7 @@ function renderFelt(v) {
     const s = (from + rel) % n, [x, y] = geo.slots[rel];
     const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.winner' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px;width:' + geo.cw + 'px;height:' + geo.ch + 'px' });
     const pl = shown.find(p => p.s === s);
-    if (pl) { const tc = h('div.tc', { 'data-px': 'card', 'data-id': pl.c, 'data-pk': 't:' + pl.c, 'data-seat': s, role: 'img', 'aria-label': pname(s) + ' played ' + cname(pl.c) }); tc.append(cardN(pl.c, 80)); slot.append(tc); }
+    if (pl) { const tc = h('div.tc', { 'data-px': 'card', 'data-id': pl.c, 'data-pk': 't:' + pl.c, 'data-seat': s, role: 'img', 'aria-label': pname(s) + ' played ' + cname(pl.c) }); tc.append(cardN(pl.c, 80)); slot.append(tc, h('span.pln', pname(s))); }
     if (winS === s) { const lan = UI.fz.plays.some(p => p.s === s && suitOf(p.c) === 4); slot.append(h('span.wtag', pname(s) === 'You' ? 'You win!' : pname(s) + ' wins', lan ? h('i', '★') : null)); }
     slots.append(slot);
   }
@@ -226,7 +230,7 @@ function renderMine(v) {
   const s = v >= 0 ? v : 0, p = G.players[s], act = (G.phase === 'play' && G.trick ? G.trick.turn : actorSeat()), cm = s === G.cap, mk = seatMarks();
   const me = h('button.me' + (act === s ? '.act' : '') + (mk.vote.has(s) ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': 'Your seat' });
   const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: cmdHTML(18) }));
-  me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.bdgs', h('span.bdg.t', { html: TRICK_ICO + '<b>' + tricksWon()[s] + '</b>', title: tricksWon()[s] + ' tricks won' }))));
+  me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.bdgs', h('span.bdg.t', { html: TRICK_ICO + '<b>' + tricksWon()[s] + '</b><span class="bl">' + (tricksWon()[s] === 1 ? 'trick' : 'tricks') + '</span>', title: tricksWon()[s] + ' tricks won' }))));
   box.append(me);
   const t = pingTok(s, 30); if (t) box.append(t);
   if (G.comm === 'narc') box.append(h('span.pbtn.pool', { html: KIT.pingSVG({ size: 22 }) + '<b>' + G.pool + '</b>' }));
@@ -276,7 +280,7 @@ function renderHand(v) {
   const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = short ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
-  const rowStep = Math.round(ch * .64), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
+  const rowStep = Math.round(ch * .78), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
   box.classList.toggle('two', rows === 2); box.style.setProperty('--rs', rowStep + 'px');
   box.style.height = Math.round(padTop + ch + (rows === 2 ? rowStep : 0) + 4) + 'px'; box.style.minHeight = box.style.height;
   btns.forEach((b, i) => {
@@ -357,8 +361,8 @@ function actModel(v) {
 function renderActs(v) {
   const pr = $('#prompt'), ac = $('#acts'); if (!pr || !ac) return;
   const M = actModel(v); pr.className = (M.cls || '') + (M.warn ? ' warn' : '');
+  if (UI.warn && Date.now() < UI.warn.until) { M.p = UI.warn.t; M.warn = 1; pr.className = (M.cls || '') + ' warn'; }
   pr.textContent = M.p || '';
-  try { if (G.phase === 'play' && !UI.busy && UI.started) { const T = G.trick, tn = T.turn, vv = viewSeat(); cap(vv >= 0 && ctlSeat(tn) === vv ? 'Your turn' : pname(tn) + '\'s turn', vv >= 0 && ctlSeat(tn) === vv ? 'mine' : ''); } else if (!UI.busy) cap(''); } catch (e) { }
   const tr = $('#table'); if (tr) tr.classList.toggle('myturn', M.cls === 'mine');
   { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy ) && !(pl && pl.childNodes.length)); }
   ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';

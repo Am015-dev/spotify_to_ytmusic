@@ -16,9 +16,11 @@ function texApply(){TEXSET={};let any=false;
   if(typeof G!=='undefined'&&G&&typeof UI!=='undefined'){try{for(const k in UI.tl){const T=G.tiles[k];if(T)UI.tl[k].innerHTML=tileSvg(T.t,T.r)}UI.handKey=null;if(G.cur&&!G.over){renderHand();renderGlows()}}catch(e){}}}
 // pieces: painted figure on a player-coloured disc (seat chips keep the drawn icons: they are tiny and need the colour)
 const PCF={meeple:'models/piece-meeple@512',champ:'models/piece-champ@512',mason:'models/piece-mason@512',hog:'models/piece-hog@512'};   // 3D renders of the follower models (transparent, 3/4 view); the player colour is the disc behind them
+const PCG={};   // owner .glb follower models drawn once to a sprite (gx-glbsprite.js); the @512 render above is the fallback on weak devices
+Object.keys(PCF).forEach(n=>{try{GXSPR.use('models/piece-'+n,{size:256}).then(u=>{if(!u)return;PCG[n]=u;document.querySelectorAll('img[src*="piece-'+n+'@512"]').forEach(i=>{i.src=u})})}catch(e){}});
 const COLN=['red','blue','yellow','green'];   // seats 0-3 have a painted piece in their own colour; seats 4-5 keep the model sprite on a disc
 function pcHtml(n,seat){const pf='piece-'+n+'-'+COLN[seat];if(PAINT_ON&&seat!==undefined&&PIMG[pf]===1)return`<span class="pc pp"><img src="${MEDIA}${pf}.webp" alt="" draggable="false"></span>`;
-  return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${PCF[n]}.webp" alt="" draggable="false"></span>`:ico(n)}
+  return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${PCG[n]||PCF[n]+'.webp'}" alt="" draggable="false"></span>`:ico(n)}
 function fi(n,seat){const pf='piece-'+n+'-'+COLN[seat];return PAINT_ON&&PIMG[pf]===1?`<img class="fi" src="${MEDIA}${pf}.webp" alt="" draggable="false">`:ico(n)}
 const TABLES=['harvest','riverbank','sable-hall'],BACKS=['tavern','raven'];
 function paintApply(){

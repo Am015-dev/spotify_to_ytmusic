@@ -230,3 +230,8 @@ html #hinfo .big,html.sk #hinfo .big{color:#fff3dc!important;font-weight:800;tex
 #status .tpic{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:50% 18%;background:#f6ead2;border:2px solid var(--c);margin:-4px 2px -4px 0;flex:0 0 auto}
 [data-gxt-open] span{font-size:14px!important}
 .fglow.wait{visibility:hidden;pointer-events:none}
+/* DESIGN-FIX 2: legal spots read at a glance (solid warm outline, light fill, slow pulse) */
+.glow::after{border-color:#ffd76a;background:rgba(255,215,106,.22);animation-duration:1.4s}
+/* DESIGN-FIX 5: the held tile is bigger on phones */
+@media (max-width:699px) and (min-height:700px){#htile{width:108px;height:108px}}
+#rules .raim,.drawer .raim{font:800 18px/1.3 var(--ff);margin:0 0 8px;color:#2a1608}

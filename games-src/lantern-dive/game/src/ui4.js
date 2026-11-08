@@ -53,7 +53,7 @@ function hintFor(d) {
   if (k === 'cmp') return 'Count the tricks each diver wins. Ties do not count as more or fewer.';
   if (k === 'cards') return 'You win a card by winning the trick it is in.';
   if (k === 'with') return 'The card you play to win the trick has to be a colour card of that number.';
-  if (k === 'pos') return 'The first trick is the first one played; the last is the final one of the dive.';
+  if (k === 'pos') return 'The first trick is the first one played. The last is the final one.';
   if (k === 'pred') return 'Aim for exactly your number of tricks at the end.';
   if (k === 'subx') return 'Lanterns you win count: every Lantern in a trick you win.';
   if (k === 'avoidc' || k === 'avoidv' || k === 'avoidsub') return 'Cards in tricks you win count as won, even the ones other divers played.';
@@ -87,7 +87,7 @@ function showResult() {
   const box = h('div.rsbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': ok ? 'Dive complete' : 'Dive failed' });
   box.append(ok ? h('div.win', h('span', { html: KIT.iconSVG('star', 34) }), h('span', 'Dive complete!')) : h('div.lose', h('span', { html: KIT.iconSVG('cross', 30) }), h('span', 'The dive failed.')));
   if (!ok && R.why) box.append(h('p', R.why));
-  if (ok && G.tricks.length < G.ntr && G.mission.id !== 27) box.append(h('p.sm', 'Every job was done after trick ' + G.tricks.length + ', so the dive ended at once. Cards still in hand do not matter.'));
+  if (ok && G.tricks.length < G.ntr && G.mission.id !== 27) box.append(h('p.sm', 'Every job was done after trick ' + G.tricks.length + '. The dive ended at once. Cards in hand do not matter.'));
   box.append(h('p.sm', diveLabel() + (UI.mode === 'descent' ? '' : ' · attempt ' + G.att) + (G.distress ? ' · distress flare lit (+1)' : '')));
   // done = tick; broken = cross + which trick, card and diver broke it; never broken (the dive stopped for another reason) = "not finished"
   G.tasks.forEach((t, i) => {

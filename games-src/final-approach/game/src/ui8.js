@@ -3,7 +3,7 @@
 function phPrompt() {
   if (!G) return '';
   if (UI.flash && UI.flash.until > Date.now()) return UI.flash.t;
-  if (G.result) return endWords();
+  if (G.result) return document.querySelector('#fx .endb') ? '' : endWords();   // the end banner already says it: say it once
   const v = actSeat(), pend = FA.pending(G), mine = typeof v === 'number' && v >= 0 && mayAct(v);
   if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : 'Tap Roll to start.') : 'Crew getting ready.';
   if (G.pend) {
@@ -164,7 +164,7 @@ function tbShow(title, sub, cls, ms) {
 function tbHide() { clearTimeout(TB.t); clearTimeout(TB.t2); const e = $('#fx .tbn'); if (e) e.classList.add('out'); }
 const tbHuman = s => !G.ai[s] && mayAct(s);
 function tbTurn(delay) {
-  clearTimeout(TB.t2);
+  clearTimeout(TB.t2); if (UI.fc && !UI.fc.ended) return;   // the coach speaks in Learn to play
   if (!G || G.result || !UI.started || G.phase !== 'place' || G.pend) return;
   const s = G.turn, key = G.round + '|' + s + '|' + Object.keys(G.slots).length;
   if (key === TB.key) return; TB.key = key;
@@ -180,8 +180,9 @@ function tbTurn(delay) {
 // called by commit (ui3.js) after every applied move
 function tbAfter(seat, m) {
   if (G.result) { tbHide(); return; }
-  if (UI.fc && !G.ai[seat] && m && m.t === 'place') { fcFeedback(UI.chip && UI.chip.text); return; }
-  if (G.ai[seat] && m && m.t === 'place') { const chip = UI.chip && UI.chip.text; tbShow(name(seat) + ' used ' + slotName(m.to), chip || '', 'cap', 1500); tbTurn(1600); }
+  if (UI.fc && !UI.fc.ended) return;   // Learn to play: the coach is the one voice
+  if (G.ai[seat] && m && m.t === 'place') { UI.chip = null; clearTimeout(UI.chipT); document.querySelectorAll('#pz .rchip').forEach(e => e.remove());   // one message at a time
+    tbShow(name(seat) + ' used ' + slotName(m.to), UI.lastWhy || '', 'cap', 4500); tbTurn(4600); }   // readable: 4 s + 1 s per 10 words
   else tbTurn(0);
 }
 // tap anywhere on the board while the computer is thinking: it moves now

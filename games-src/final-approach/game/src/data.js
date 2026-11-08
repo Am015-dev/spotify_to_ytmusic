@@ -58,7 +58,7 @@ FA.DATA = {
     {"id":"t2","lad":2,"ap":"pad","col":"green","trk":"tut-a","alt":"tu","mods":[],"ab":0,"title":"Speed and the runway","text":"Add the engines: fly the approach and stop on the airport."},
     {"id":"t3","lad":3,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Clear the way","text":"Add the radio: send planes away before you reach them."},
     {"id":"t4","lad":4,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Wheels and flaps","text":"Add landing gear and flaps: both must be down to land."},
-    {"id":"tt","lad":0,"ap":"pad","col":"green","trk":"tut-d","alt":"gy","mods":[],"ab":0,"title":"Tutorial flight","text":"A short, easy flight: the last four rounds, one new control each round."},
+    {"id":"tt","lad":0,"ap":"pad","col":"green","trk":"tut-d","alt":"gy","mods":[],"ab":0,"title":"Tutorial flight","text":"A short, easy flight: four rounds, one new control each."},
     {"id":"t5","lad":5,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Brakes","text":"Add the brakes: they set how fast you may touch down."}
   ],
   airports: {
@@ -98,26 +98,26 @@ FA.DATA = {
     {"id":"b3","ap":"cls","col":"black","trk":"cls-b","alt":"rb","mods":["kero","real"],"ab":2,"title":"Only Eight Pilots","text":"The most dangerous airport on the map. The weather is clear, but only eight pilots are cleared to land here. Add your name to the list."}
   ],
   mods: {
-    "traffic": {"name":"Busy Sky","text":"When a round starts on a space with dice icons, roll the traffic die once per icon. Each roll adds a plane that many spaces ahead (counting your space as 1), at most to the airport."},
-    "turns": {"name":"Tight Corridor","text":"A space that shows a corridor tab only lets you fly on while the axis is in one of the tab's marked positions. It is checked on every space you leave, but not when you stand still. On the strip a tab reads C (level), L1/L2 (tilted 1 or 2 toward the Pilot, left) or R1/R2 (toward the Co-pilot, right)."},
-    "kero": {"name":"Fuel Watch","text":"Start at 20. Anyone may put a die of any value on the fuel space to burn that many units. A round with no die there burns 6 at the end. Below 0 you are out of fuel and lose."},
-    "leak": {"name":"Fuel Leak","text":"No fuel space. Every round, when both engine dice are down, you burn the difference between them plus 1. Below 0 you lose."},
-    "wind": {"name":"Tail Wind","text":"A wind dial adds to your engine total every round, even the last. It starts at +3. After the axis is set each round, turn the dial by the axis tilt."},
-    "intern": {"name":"Trainee","text":"Put any die on your trainee space to take the next token from your side and place it as a die of that value right away (not on Concentration, no coffee). The die must differ from the token. Train all six before you land."},
-    "ice": {"name":"Icy Runway","text":"The brakes become a four-column track (2, 3, 4, 5). The pilot (upper half) and either crew (lower half) must put dice showing the column number into the next column in the same round. All four must be done, and the last-round speed must be no more than the brake value reached."},
-    "real": {"name":"Against the Clock","text":"Each round has a 60-second timer that starts after the roll. When it runs out, unplaced dice are ignored. If both axis and both engine dice are not down, you lose."}
+    "traffic": {"name":"Busy Sky","text":"Some spaces show dice icons. Roll the traffic die once per icon. Each roll adds a plane that many spaces ahead. Your own space counts as 1."},
+    "turns": {"name":"Tight Corridor","text":"A corridor tab limits the axis. You may fly on only when the axis matches the tab. It is checked on each space you leave. C is level. L1 or L2 tilt left. R1 or R2 tilt right."},
+    "kero": {"name":"Fuel Watch","text":"Fuel starts at 20. A die on the fuel space burns its value. No die there burns 6 at round end. Below 0 you lose."},
+    "leak": {"name":"Fuel Leak","text":"There is no fuel space. When both engine dice are down, burn their difference plus 1. Below 0 you lose."},
+    "wind": {"name":"Tail Wind","text":"A wind dial adds to your engine total. It starts at +3. Each round the axis tilt turns the dial."},
+    "intern": {"name":"Trainee","text":"A die on your trainee space takes the next token. Place the token at once as a die. The die must differ from the token. Train all six before you land."},
+    "ice": {"name":"Icy Runway","text":"The brakes become four columns: 2, 3, 4, 5. Fill both spaces of the next column in one round. Pilot takes the top, anyone the bottom. All four must be done to land."},
+    "real": {"name":"Against the Clock","text":"Each round has a 60-second timer after the roll. When it ends, unplaced dice are lost. Missing axis or engine dice lose the game."}
   },
   abilities: {
-    "antic": {"name":"Second Look","text":"Each round, before placing a die, the first player may reroll one of their dice."},
-    "adapt": {"name":"Flip Side","text":"Once per game each player may turn one of their unplaced dice to its opposite face (1 to 6, 2 to 5, 3 to 4)."},
-    "mastery": {"name":"Twin Thrust","text":"When both engine dice show the same value you gain a reroll token, if one is left in the box."},
-    "control": {"name":"Steady Hands","text":"When both axis dice show the same value you gain a coffee token, if one is left."},
-    "sync": {"name":"Cross-Check","text":"Once a round, after you have a die on the landing gear and one on the flaps, roll the traffic die. The co-pilot places it on any empty space of either colour as an extra action."},
-    "together": {"name":"Hand-Over","text":"Once a round either player may put an unplaced die here, and the other must too. Swap the two values, then take the dice back."}
+    "antic": {"name":"Second Look","text":"Each round the first player may reroll one die. Do it before placing."},
+    "adapt": {"name":"Flip Side","text":"Once per game, flip one unplaced die to its opposite face."},
+    "mastery": {"name":"Twin Thrust","text":"Equal engine dice earn a reroll token, if one is left."},
+    "control": {"name":"Steady Hands","text":"Equal axis dice earn a coffee token, if one is left."},
+    "sync": {"name":"Cross-Check","text":"Once a round, after a gear die and a flap die, roll the traffic die. The co-pilot places it as an extra die."},
+    "together": {"name":"Hand-Over","text":"Once a round, each of you puts a die here. Swap the values, then take them back."}
   },
   crew: [
-    {"id":0,"role":"Pilot","name":"Captain Ines Marlow","short":"Ines","color":"#2f6fd0","story":"Ines has flown the night mail for twenty years and still checks every switch twice. She keeps the wheels and the brakes and trusts a steady hand.","enjoy":"Choose the Pilot if you enjoy keeping the plane level and braking at the very end."},
-    {"id":1,"role":"Co-pilot","name":"First Officer Ravi Okoro","short":"Ravi","color":"#e07a1f","story":"Ravi trained on gliders and talks to every tower as if it were an old friend. He runs the flaps and has two voices on the radio.","enjoy":"Choose the Co-pilot if you enjoy clearing traffic and timing the flaps."}
+    {"id":0,"role":"Pilot","name":"Captain Ines Marlow","short":"Ines","color":"#2f6fd0","story":"Ines has flown night mail for twenty years. She runs gear and brakes.","enjoy":"Pick the Pilot to keep her level and brake at the end."},
+    {"id":1,"role":"Co-pilot","name":"First Officer Ravi Okoro","short":"Ravi","color":"#e07a1f","story":"Ravi learned on gliders. He runs the flaps and two radios.","enjoy":"Pick the Co-pilot to clear traffic and time the flaps."}
   ]
 };
 if (typeof module === 'object' && module.exports) module.exports = FA.DATA;
