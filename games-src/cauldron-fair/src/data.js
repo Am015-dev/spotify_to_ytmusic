@@ -13,7 +13,7 @@ var RUBY = COINS.map(function (_, i) { return RUBY_AT.indexOf(i) >= 0 ? 1 : 0; }
 // ---- chips. Colour letters: W white, O orange, G green, B blue, R red, Y yellow, P purple, K black.
 // supply = how many chips of that (colour,value) exist in the box.
 var COLORS = {
-  W: { id: 'W', name: 'Fizzpod', plural: 'Fizzpods', css: '#f4efe2', ink: '#5b3a24', vals: [1, 2, 3], blurb: 'Explosive. Too many and the pot blows.' },
+  W: { id: 'W', name: 'Fizzpod', plural: 'Fizzpods', css: '#f4efe2', ink: '#5b3a24', vals: [1, 2, 3], blurb: 'Explosive. Too many and the pot explodes.' },
   O: { id: 'O', name: 'Marrow', plural: 'Marrows', css: '#f08a22', ink: '#fff', vals: [1] },
   G: { id: 'G', name: 'Mossback', plural: 'Mossbacks', css: '#3fa04a', ink: '#fff', vals: [1, 2, 4] },
   B: { id: 'B', name: 'Wren Feather', plural: 'Wren Feathers', css: '#3b82d6', ink: '#fff', vals: [1, 2, 4] },
@@ -30,7 +30,7 @@ var BOOK_ROUND = { O: 1, K: 1, G: 1, B: 1, R: 1, Y: 2, P: 3 };   // the first ro
 // ---- ingredient books. price = cost of the 1-chip, 2-chip, 4-chip (a single number: only a 1-chip exists).
 // eff = engine handler key. title/text are our own wording.
 var BOOKS = {
-  O: { 0: { price: [3], eff: 'none', title: 'Plain filler', text: 'No power. It just fills one space. The cheapest chip in the shop.' } },
+  O: { 0: { price: [3], eff: 'none', title: 'Plain filler', text: 'No power. It fills one space. The cheapest chip.' } },
   K: {
     0: { price: [10], eff: 'black', title: 'Moth count', text: 'When everyone has stopped, compare black chips. You need at least one. Two players: tie your rival, droplet one space. Beat your rival: droplet and a ruby. Three or four: beat one neighbour, droplet one space. Beat both neighbours: droplet and a ruby.' }
   },
@@ -73,21 +73,21 @@ var FORTUNE = [
   { id: 'spilled', kind: 'blue', name: 'Spilled Brew', text: 'If your pot explodes, the player on your left takes any 2-chip.' },
   { id: 'doover', kind: 'blue', name: 'Do-Over', text: 'Right after your 5th chip, you may tip them all back. Then start the round again. Once.' },
   { id: 'twice', kind: 'blue', name: 'Twice Rolled', text: 'Roll the bonus die today? Roll it twice and take both.' },
-  { id: 'thick', kind: 'blue', name: 'Thick Skin', text: 'The explosion limit is 9 this round instead of 7.' },
-  { id: 'marrowfair', kind: 'blue', name: 'Marrow Fair', text: 'This round every orange chip moves 1 extra space.' },
+  { id: 'thick', kind: 'blue', name: 'Thick Skin', text: 'The limit is 9 today instead of 7.' },
+  { id: 'marrowfair', kind: 'blue', name: 'Marrow Fair', text: 'Today every orange chip moves 1 extra space.' },
   { id: 'peek', kind: 'blue', name: 'Peek and Pick', text: 'Stop safely? Draw up to 5 chips and place one of them.' },
   { id: 'glint', kind: 'blue', name: 'Ruby Glint', text: 'Scoring space shows a ruby? Score 2 VP, even after exploding.' },
-  { id: 'spring', kind: 'blue', name: 'Spring Water', text: 'At the end of the round every flask is refilled for free.' },
+  { id: 'spring', kind: 'blue', name: 'Spring Water', text: 'At the end of the day every flask refills free.' },
   { id: 'froth', kind: 'blue', name: 'Frothing Pot', text: 'Today you may put your first white chip back in the bag.' },
   { id: 'spark', kind: 'blue', name: 'Red Spark', text: 'If your scoring space shows a ruby, take 1 extra ruby.' },
-  { id: 'pick', kind: 'purple', name: 'Pedlar\'s Pick', text: 'Take a black chip, or any 2-chip, or 3 rubies.' },
+  { id: 'pick', kind: 'purple', name: 'Pedlar\'s Pick', text: 'Take a black chip, any 2-chip, or 3 rubies.' },
   { id: 'slide', kind: 'purple', name: 'A Little Slide', text: 'Move your droplet forward one space.' },
   { id: 'swap', kind: 'purple', name: 'Swap Stall', text: 'You may trade 1 ruby for any 1-chip except purple and black.' },
-  { id: 'alms', kind: 'purple', name: 'Kind Alms', text: 'The player or players with the fewest rubies take 1 ruby.' },
+  { id: 'alms', kind: 'purple', name: 'Kind Alms', text: 'Each player with the fewest rubies takes 1 ruby.' },
   { id: 'underdog', kind: 'purple', name: 'Underdog Gift', text: 'Whoever has the fewest points takes a green 1.' },
-  { id: 'clear', kind: 'purple', name: 'Clear the Pods', text: 'Score 4 VP, or take one white 1 out of your bag.' },
+  { id: 'clear', kind: 'purple', name: 'Clear the Pods', text: 'Score 4 points, or take a white 1 out of your bag.' },
   { id: 'swarm', kind: 'purple', name: 'Rat Swarm', text: 'Count your rat tails again. Move your rat stone that much further.' },
-  { id: 'dip', kind: 'purple', name: 'Lucky Dip', text: 'Everyone draws 5 chips. The lowest total takes a blue 2, everyone else takes a ruby. Chips go back.' },
+  { id: 'dip', kind: 'purple', name: 'Lucky Dip', text: 'Everyone draws 5 chips. The lowest total takes a blue 2. The rest take a ruby. Chips go back.' },
   { id: 'bribe', kind: 'purple', name: 'Rat Bribe', text: 'Move your rat stone back 1 to 3 spaces. Take that many rubies.' },
   { id: 'bounty', kind: 'purple', name: 'Rat Bounty', text: 'Take any 4-chip. Or score 1 VP per rat tail behind the leader.' },
   { id: 'fork', kind: 'purple', name: 'Fork in the Road', text: 'Move your droplet 2 spaces, or take a purple chip.' },
