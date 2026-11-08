@@ -44,12 +44,12 @@ async function tutorial(browser, W, H, dismissMode) {
   const core = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
   if (!(await tapSel(c, '#start .ttut'))) { note(tag, 'no Learn to play button'); return; }
   await sleep(900);
-  const first = await p.evaluate(() => !!document.querySelector('.fa-coach') && !!(UI.fc));
+  const first = await p.evaluate(() => !!document.querySelector('.fa-coach,.fa-goal') && !!(UI.fc));
   if (!first) note(tag, 'no coach bubble at the start');
   let maxBub = 0, blocked = 0; const seenBub = new Set();
   const watch = setInterval(async () => { try { const r = await p.evaluate(() => { const bs = [...document.querySelectorAll('.fa-coach')]; return { n: bs.length, ids: bs.map(b => b.dataset.coach), pe: bs.map(b => getComputedStyle(b).pointerEvents) }; }); maxBub = Math.max(maxBub, r.n); r.ids.forEach(i => seenBub.add(i)); if (r.pe.some(x => x !== 'none')) blocked++; } catch (e) { } }, 250);
   if (dismissMode) {
-    const x = await tapSel(c, '.fa-coach .x'); await sleep(500);
+    await tapSel(c, '.fa-goal [data-ro=go]'); await sleep(900); const x = await tapSel(c, '.fa-coach .x'); await sleep(500);
     const gone = await p.evaluate(() => !document.querySelector('.fa-coach:not(.out)') || document.querySelector('.fa-coach').dataset.coach !== 'intro');
     clearInterval(watch); if (x !== true || !gone) note(tag, 'coach bubble could not be dismissed'); else lines.push('PASS coach bubble dismiss ' + tag); await c.p.context().close(); return;
   }
@@ -86,7 +86,7 @@ async function playByTaps(c, label, maxMs) {
     const sig = JSON.stringify([s.legal, s.dice, s.sel, s.ready, moves]); if (sig !== lastSig) { lastSig = sig; lastT = Date.now(); } else if (Date.now() - lastT > 12000) { note(tag, label + ': stuck 12 s ' + sig + ' ' + (await p.evaluate(() => JSON.stringify(window.G ? { ph: G.phase, t: G.turn, pend: G.pend && G.pend.h, r: G.round } : {}))) + ' buttons: ' + (await p.evaluate(() => [...document.querySelectorAll('button')].filter(b => b.offsetWidth).map(b => b.textContent.trim().slice(0, 14)).join('|')))); return { done: false, moves }; }
     // overlays first (coach cards, story cards)
     let acted = false;
-    for (const sel of ['.gxc-btn.go', '.gxh-ok', '[data-a=gotit]', '.gxc-btn.pri']) { if (await tapSel(c, sel) === true) { acted = true; await sleep(350); break; } }
+    for (const sel of ['.gxc-btn.go', '.gxh-ok', '[data-a=gotit]', '.gxc-btn.pri', '.fa-ro [data-ro=go]']) { if (await tapSel(c, sel) === true) { acted = true; await sleep(350); break; } }
     if (acted) continue;
     if (await tapSel(c, '[data-a=rrpick]') === true) { moves++; await sleep(700); continue; }
     if (s.ready) { if (await tapSel(c, '[data-a=ready]') === true) { moves++; await sleep(500); } continue; }
