@@ -1,0 +1,1021 @@
+{
+ "slug": "vinegrave",
+ "when": "2026-11-08T02:37Z",
+ "secs": 30,
+ "totalSecs": 121,
+ "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
+ "checks": {
+  "a": {
+   "status": "FAIL",
+   "count": 11,
+   "detail": [
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "P Pell Short of the right icon? 2 coins buy a Plane, and a Plane pays any icon. ×",
+     "words": 19,
+     "shownMs": 500,
+     "neededMs": 5900,
+     "cls": "on"
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 750,
+     "texts": [
+      "P Pell Each site shows travel icons. Each card you",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 500,
+     "texts": [
+      "P Pell Camps glow: send an explorer there and dig ",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 2000,
+     "texts": [
+      "P Pell 3 compasses! A hidden ruin can be explored ",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Fresh footprints on the beach: someone landed befo",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 500,
+     "texts": [
+      "P Pell Each site shows travel icons. Each card you",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 749,
+     "texts": [
+      "P Pell Camps glow: send an explorer there and dig ",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 750,
+     "texts": [
+      "P Pell 3 compasses! A hidden ruin can be explored ",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 500,
+     "texts": [
+      "P Pell Short of the right icon? 2 coins buy a Plan",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 2250,
+     "texts": [
+      "A rival crew hums at their campfire. Outdig them.",
+      "You passed: you sit out until everyone has passed "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Round 2 begins. The market shifts.",
+      "You passed: you sit out until everyone has passed "
+     ]
+    }
+   ]
+  },
+  "b": {
+   "status": "FAIL",
+   "count": 11,
+   "detail": [
+    {
+     "session": "phone/play",
+     "text": "Ch 1 · Landfall The boat is gone and Tamsin is ashore. Trail Notes point inland: start with it.",
+     "ms": 1250,
+     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "A rival crew hums at their campfire. Outdig them.",
+     "ms": 2750,
+     "cls": "on t1",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You passed: you sit out until everyone has passed and the round ends. Next: Tamsin Reed plays.",
+     "ms": 3750,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 2 begins. The market shifts.",
+     "ms": 2000,
+     "cls": "on t2",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Turn over: you used your one action (play Patron Letter). Okay move. Slightly better: buy Oilcloth Tarp. Next: Tamsin Reed plays.",
+     "ms": 3500,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Ch 1 · Landfall The boat is gone and Tamsin is ashore. Trail Notes point inland: start with it.",
+     "ms": 1250,
+     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-top on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "A rival crew hums at their campfire. Outdig them.",
+     "ms": 2750,
+     "cls": "on t1",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Turn over: you used your one action (dig at Pearl Cove). Okay move. Slightly better: buy Oilcloth Tarp. Next: Tamsin Reed plays.",
+     "ms": 3758,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Turn over: you used your one action (play Patron Letter). Okay move. Slightly better: buy Oilcloth Tarp. Next: Tamsin Reed plays.",
+     "ms": 3750,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Turn over: you used your one action (play Trail Notes). Okay move. Slightly better: buy Jungle Hammock. Next: Tamsin Reed plays.",
+     "ms": 2261,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You passed: you sit out until everyone has passed and the round ends. Next: Tamsin Reed plays.",
+     "ms": 3750,
+     "cls": "on",
+     "tag": "div"
+    }
+   ]
+  },
+  "c": {
+   "status": "FAIL",
+   "count": 24,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "One action: play a card, go to a site, buy a card or research.",
+     "words": 14,
+     "at": 3005,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "You passed: you sit out until everyone has passed and the round ends.",
+     "words": 13,
+     "at": 8013,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "One action: play a card, go to a site or buy a card.",
+     "words": 13,
+     "at": 13004,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Your magnifier climbs first; your notebook may follow but never pass it, and never enters the temple.",
+     "words": 17,
+     "at": 15007,
+     "where": "p.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Each row costs what it shows and gives a bonus; the first magnifier to some rows takes an extra reward.",
+     "words": 20,
+     "at": 15007,
+     "where": "p.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Points: notebook / magnifier (in the temple the magnifier scores 10/8/6/4 by order of arrival).",
+     "words": 15,
+     "at": 15009,
+     "where": "p.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "At the temple you buy tiles: 6 pts for 2 tablets + 1 jewel (8 left); 6 pts for 1 jewel + 2 arrowheads (8 left); 11 pts for 2 tablets + 1 jewel + 2 arrowheads (4 left).",
+     "words": 39,
+     "at": 15009,
+     "where": "p.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "One action: play a card, go to a site, buy a card or research.",
+     "words": 14,
+     "at": 3009,
+     "where": "div."
+    },
+    {
+     "session": "phone/play",
+     "text": "One action: play a card, go to a site or buy a card.",
+     "words": 13,
+     "at": 5010,
+     "where": "div."
+    },
+    {
+     "session": "phone/play",
+     "text": "You passed: you sit out until everyone has passed and the round ends.",
+     "words": 13,
+     "at": 9009,
+     "where": "b."
+    },
+    {
+     "session": "pc/learn",
+     "text": "One action: play a card, go to a site, buy a card or research.",
+     "words": 14,
+     "at": 3010,
+     "where": "div."
+    },
+    {
+     "session": "pc/learn",
+     "text": "You passed: you sit out until everyone has passed and the round ends.",
+     "words": 13,
+     "at": 7009,
+     "where": "b."
+    },
+    {
+     "session": "pc/learn",
+     "text": "2 in the box · start deck · 0 points · Starting cards",
+     "words": 13,
+     "at": 16012,
+     "where": "p.gx-ref-m"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Your magnifier climbs first; your notebook may follow but never pass it, and never enters the temple.",
+     "words": 17,
+     "at": 27010,
+     "where": "p.sm"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Each row costs what it shows and gives a bonus; the first magnifier to some rows takes an extra reward.",
+     "words": 20,
+     "at": 27010,
+     "where": "p.sm"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Points: notebook / magnifier (in the temple the magnifier scores 10/8/6/4 by order of arrival).",
+     "words": 15,
+     "at": 27012,
+     "where": "p.sm"
+    },
+    {
+     "session": "pc/learn",
+     "text": "At the temple you buy tiles: 6 pts for 2 tablets + 1 jewel (8 left); 6 pts for 1 jewel + 2 arrowheads (8 left); 11 pts for 2 tablets + 1 jewel + 2 arrowheads (4 left).",
+     "words": 39,
+     "at": 27012,
+     "where": "p.sm"
+    },
+    {
+     "session": "pc/play",
+     "text": "One action: play a card, go to a site, buy a card or research.",
+     "words": 14,
+     "at": 3009,
+     "where": "div."
+    },
+    {
+     "session": "pc/play",
+     "text": "One action: play a card, go to a site or buy a card.",
+     "words": 13,
+     "at": 5006,
+     "where": "div."
+    },
+    {
+     "session": "pc/play",
+     "text": "You passed: you sit out until everyone has passed and the round ends.",
+     "words": 13,
+     "at": 21007,
+     "where": "b."
+    },
+    {
+     "session": "pc/play",
+     "text": "Your magnifier climbs first; your notebook may follow but never pass it, and never enters the temple.",
+     "words": 17,
+     "at": 28007,
+     "where": "p.sm"
+    },
+    {
+     "session": "pc/play",
+     "text": "Each row costs what it shows and gives a bonus; the first magnifier to some rows takes an extra reward.",
+     "words": 20,
+     "at": 28007,
+     "where": "p.sm"
+    },
+    {
+     "session": "pc/play",
+     "text": "Points: notebook / magnifier (in the temple the magnifier scores 10/8/6/4 by order of arrival).",
+     "words": 15,
+     "at": 28007,
+     "where": "p.sm"
+    },
+    {
+     "session": "pc/play",
+     "text": "At the temple you buy tiles: 6 pts for 2 tablets + 1 jewel (8 left); 6 pts for 1 jewel + 2 arrowheads (8 left); 11 pts for 2 tablets + 1 jewel + 2 arrowheads (4 left).",
+     "words": 39,
+     "at": 28007,
+     "where": "p.sm"
+    }
+   ]
+  },
+  "d": {
+   "status": "FAIL",
+   "count": 68,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "skip the guided round",
+     "px": 13,
+     "at": 1008,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Rivals",
+     "px": 13,
+     "at": 1008,
+     "where": "div.lbl"
+    },
+    {
+     "session": "phone/learn",
+     "text": "3 regions, 10 stages",
+     "px": 13,
+     "at": 1008,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Guided first round",
+     "px": 13,
+     "at": 1008,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Round 1/1",
+     "px": 13,
+     "at": 3004,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Track 0 · Idols 5 · Cards -2",
+     "px": 13,
+     "at": 3004,
+     "where": "small.sb"
+    },
+    {
+     "session": "phone/learn",
+     "text": "1 action left",
+     "px": 13,
+     "at": 3005,
+     "where": "span.tok.on"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gain 1 compass.",
+     "px": 13,
+     "at": 3005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "No effect. -1 point.",
+     "px": 13,
+     "at": 3005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "-1",
+     "px": 13,
+     "at": 3005,
+     "where": "span.vp"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gain 1 coin.",
+     "px": 13,
+     "at": 3005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "The boat is gone and Tamsin is ashore. Trail Notes point inl",
+     "px": 13.5,
+     "at": 3008,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "waiting",
+     "px": 13,
+     "at": 4005,
+     "where": "span.tok"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Game over",
+     "px": 13,
+     "at": 9006,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Round 1/5",
+     "px": 13,
+     "at": 13004,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "You get: -2 coins, +1 arrowhead",
+     "px": 13,
+     "at": 14005,
+     "where": "span.pv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "leads",
+     "px": 13,
+     "at": 18005,
+     "where": "span.ld"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Track 0 · Idols 5 · Cards -1",
+     "px": 13,
+     "at": 18005,
+     "where": "small.sb"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gain 2 compasses, then draw 1 card.",
+     "px": 13,
+     "at": 18005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "1",
+     "px": 13,
+     "at": 18005,
+     "where": "span.vp"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gain 2 tablets.",
+     "px": 13,
+     "at": 18005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "2",
+     "px": 13,
+     "at": 18005,
+     "where": "span.vp"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gain 1 arrowhead.",
+     "px": 13,
+     "at": 18005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Exile a card, then gain 1 compass.",
+     "px": 13,
+     "at": 18005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Draw 1 card, then gain 1 coin.",
+     "px": 13,
+     "at": 18005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Free research step (notebook), then free research step (note",
+     "px": 13,
+     "at": 18005,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "3",
+     "px": 13,
+     "at": 18005,
+     "where": "span.vp"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Free research step (notebook), then draw 1 card.",
+     "px": 13,
+     "at": 23007,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Round 2/5",
+     "px": 13,
+     "at": 28013,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Free research step (magnifier), then gain 1 tablet.",
+     "px": 13,
+     "at": 28013,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gain 2 tablets + 1 compass.",
+     "px": 13,
+     "at": 28013,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Track 1 · Idols 5 · Cards 1",
+     "px": 13,
+     "at": 30012,
+     "where": "small.sb"
+    },
+    {
+     "session": "phone/learn",
+     "text": "No goods now: it sets up later turns",
+     "px": 13,
+     "at": 30013,
+     "where": "span.pv"
+    },
+    {
+     "session": "phone/play",
+     "text": "skip the guided round",
+     "px": 13,
+     "at": 1005,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "Rivals",
+     "px": 13,
+     "at": 1005,
+     "where": "div.lbl"
+    },
+    {
+     "session": "phone/play",
+     "text": "3 regions, 10 stages",
+     "px": 13,
+     "at": 1005,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "Guided first round",
+     "px": 13,
+     "at": 1005,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1/1",
+     "px": 13,
+     "at": 3008,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Track 0 · Idols 5 · Cards -2",
+     "px": 13,
+     "at": 3008,
+     "where": "small.sb"
+    },
+    {
+     "session": "phone/play",
+     "text": "1 action left",
+     "px": 13,
+     "at": 3009,
+     "where": "span.tok.on"
+    },
+    {
+     "session": "phone/play",
+     "text": "Gain 1 compass.",
+     "px": 13,
+     "at": 3010,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "No effect. -1 point.",
+     "px": 13,
+     "at": 3010,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "-1",
+     "px": 13,
+     "at": 3010,
+     "where": "span.vp"
+    },
+    {
+     "session": "phone/play",
+     "text": "Gain 1 coin.",
+     "px": 13,
+     "at": 3010,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "The boat is gone and Tamsin is ashore. Trail Notes point inl",
+     "px": 13.5,
+     "at": 3015,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1/5",
+     "px": 13,
+     "at": 5009,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "You get: +1 coin",
+     "px": 13,
+     "at": 5010,
+     "where": "span.pv"
+    },
+    {
+     "session": "phone/play",
+     "text": "Draw 1 card, then gain 1 coin.",
+     "px": 13,
+     "at": 8007,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "Gain 4 compasses.",
+     "px": 13,
+     "at": 8007,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "2",
+     "px": 13,
+     "at": 8007,
+     "where": "span.vp"
+    },
+    {
+     "session": "phone/play",
+     "text": "Gain 2 coins + 1 tablet.",
+     "px": 13,
+     "at": 8007,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "1",
+     "px": 13,
+     "at": 8007,
+     "where": "span.vp"
+    },
+    {
+     "session": "phone/play",
+     "text": "Buy an artifact 2 cheaper.",
+     "px": 13,
+     "at": 8007,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "Dig at a site with no travel cost.",
+     "px": 13,
+     "at": 8007,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "Gain 2 jewels.",
+     "px": 13,
+     "at": 8007,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "waiting",
+     "px": 13,
+     "at": 9007,
+     "where": "span.tok"
+    },
+    {
+     "session": "phone/play",
+     "text": "Gain 1 tablet.",
+     "px": 13,
+     "at": 10004,
+     "where": "span.ptx"
+    },
+    {
+     "session": "phone/play",
+     "text": "leads",
+     "px": 13,
+     "at": 21006,
+     "where": "span.ld"
+    },
+    {
+     "session": "phone/play",
+     "text": "Track 0 · Idols 5 · Cards -1",
+     "px": 13,
+     "at": 21006,
+     "where": "small.sb"
+    },
+    {
+     "session": "phone/play",
+     "text": "Dig at a site with no travel cost, then gain 1 coin.",
+     "px": 13,
+     "at": 21007,
+     "where": "span.ptx"
+    }
+   ]
+  },
+  "e": {
+   "status": "FAIL",
+   "count": 9,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "k": "Free research step (notebook), then free|×",
+     "at": 5886,
+     "a": "Free research step (notebook), then free",
+     "b": "×",
+     "ra": [
+      272,
+      479,
+      338,
+      13
+     ],
+     "rb": [
+      346,
+      479,
+      12,
+      24
+     ]
+    },
+    {
+     "session": "phone/learn",
+     "k": "Gain 2 compasses, then draw 1 card.|Gain 2 tablets.",
+     "at": 24630,
+     "a": "Gain 2 compasses, then draw 1 card.",
+     "b": "Gain 2 tablets.",
+     "ra": [
+      15,
+      305,
+      182,
+      13
+     ],
+     "rb": [
+      158,
+      305,
+      73,
+      13
+     ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Pay 2 coins, then gain 1 jewel OR gain 2|−",
+     "at": 5427,
+     "a": "Pay 2 coins, then gain 1 jewel OR gain 2",
+     "b": "−",
+     "ra": [
+      401,
+      858,
+      97,
+      69
+     ],
+     "rb": [
+      403,
+      898,
+      8,
+      16
+     ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Pay 2 coins, then gain 1 jewel OR gain 2|2",
+     "at": 5427,
+     "a": "Pay 2 coins, then gain 1 jewel OR gain 2",
+     "b": "2",
+     "ra": [
+      401,
+      858,
+      97,
+      69
+     ],
+     "rb": [
+      414,
+      898,
+      8,
+      16
+     ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Pay 2 coins, then gain 1 jewel OR gain 2|→",
+     "at": 5427,
+     "a": "Pay 2 coins, then gain 1 jewel OR gain 2",
+     "b": "→",
+     "ra": [
+      401,
+      858,
+      97,
+      69
+     ],
+     "rb": [
+      445,
+      898,
+      15,
+      16
+     ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Gain 2 compasses, then draw 1 card.|2",
+     "at": 5427,
+     "a": "Gain 2 compasses, then draw 1 card.",
+     "b": "2",
+     "ra": [
+      653,
+      858,
+      73,
+      69
+     ],
+     "rb": [
+      661,
+      899,
+      8,
+      16
+     ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Pay 1 coin, then gain 1 jewel OR gain 1 |−",
+     "at": 17997,
+     "a": "Pay 1 coin, then gain 1 jewel OR gain 1 ",
+     "b": "−",
+     "ra": [
+      762,
+      858,
+      97,
+      51
+     ],
+     "rb": [
+      764,
+      898,
+      8,
+      16
+     ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Pay 1 coin, then gain 1 jewel OR gain 1 |→",
+     "at": 17997,
+     "a": "Pay 1 coin, then gain 1 jewel OR gain 1 ",
+     "b": "→",
+     "ra": [
+      762,
+      858,
+      97,
+      51
+     ],
+     "rb": [
+      804,
+      898,
+      15,
+      16
+     ]
+    },
+    {
+     "session": "pc/play",
+     "k": "Gain 2 coins OR gain 2 compasses.|2",
+     "at": 12674,
+     "a": "Gain 2 coins OR gain 2 compasses.",
+     "b": "2",
+     "ra": [
+      401,
+      858,
+      97,
+      51
+     ],
+     "rb": [
+      417,
+      899,
+      8,
+      16
+     ]
+    }
+   ]
+  }
+ },
+ "notes": [],
+ "sessions": [
+  {
+   "size": "phone",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 99,
+   "clicks": 103,
+   "endedBy": "result",
+   "tutorialEnded": 5,
+   "hintsOff": true,
+   "messagesSeen": 12
+  },
+  {
+   "size": "phone",
+   "mode": "play",
+   "secs": 30,
+   "turns": 111,
+   "clicks": 113,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 5
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 93,
+   "clicks": 100,
+   "endedBy": "result",
+   "tutorialEnded": 5,
+   "hintsOff": true,
+   "messagesSeen": 12
+  },
+  {
+   "size": "pc",
+   "mode": "play",
+   "secs": 30,
+   "turns": 109,
+   "clicks": 118,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 6
+  }
+ ]
+}
