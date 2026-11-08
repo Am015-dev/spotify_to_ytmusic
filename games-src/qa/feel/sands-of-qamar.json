@@ -1,8 +1,8 @@
 {
  "slug": "sands-of-qamar",
- "when": "2026-11-08T05:12Z",
- "secs": 120,
- "totalSecs": 481,
+ "when": "2026-11-08T05:17Z",
+ "secs": 60,
+ "totalSecs": 241,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -39,20 +39,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 120,
-   "turns": 266,
-   "clicks": 426,
-   "endedBy": "result",
+   "secs": 60,
+   "turns": 121,
+   "clicks": 218,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 18
+   "messagesSeen": 14
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 120,
-   "turns": 307,
-   "clicks": 487,
+   "secs": 60,
+   "turns": 142,
+   "clicks": 227,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -61,20 +61,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 120,
-   "turns": 89,
-   "clicks": 465,
+   "secs": 60,
+   "turns": 66,
+   "clicks": 225,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 2
+   "messagesSeen": 4
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 120,
-   "turns": 54,
-   "clicks": 357,
+   "secs": 60,
+   "turns": 43,
+   "clicks": 240,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
