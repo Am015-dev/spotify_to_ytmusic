@@ -311,7 +311,7 @@ var TT_TEST = {};
       msg.textContent = c.nm; sub.textContent = describe(c) + '. Cost: ' + (bi.chain ? 'free by chain' : bi.coins + ' coin' + (bi.coins === 1 ? '' : 's') + (bi.trade ? ' (' + bi.trade + ' for trade)' : ''));
       instr(p, 'Choose: Build it, Sell it for coins, or use it for a Wonder.');
     } else {
-      msg.textContent = 'Tap a glowing card'; sub.textContent = ''; instr(p, U.hintsOn ? 'Tap a glowing card. The star is best.' : 'Tap a glowing card.');
+      msg.textContent = 'Tap a glowing card'; sub.textContent = ''; instr(p, U.hintsOn ? 'Tap a glowing card. The star is best.' : 'Tap or drag a glowing card.');
     }
   }
   // ---------- zoom: the tapped card big, every detail, and the three ways to use it
@@ -581,6 +581,42 @@ var TT_TEST = {};
       U.sel = i; U.fingerDone = true; SND.play('tick'); renderPyr(); dock(); liftDust(i); return;
     }
   });
+  // ---------- drag a glowing card onto Build / Sell / a wonder (tap still opens the big card)
+  var DR = null;
+  function dropZones(i) {
+    var G = U.G, p = E.sideToAct(G), c = BY[G.pyr[i].id], bi = E.buildInfo(G, p, c), M = E.validMoves(G), z = [];
+    var ok = function (t, w) { return M.some(function (m) { return m.t === t && m.i === i && (w == null || m.w === w); }); };
+    z.push({ m: { t: 'build', i: i }, ok: ok('build'), h: '<b>Build</b><small>' + (!ok('build') ? 'not enough coins' : bi.chain || !bi.coins ? 'free' : 'pay ' + plural(bi.coins, 'coin')) + '</small>' });
+    z.push({ m: { t: 'discard', i: i }, ok: true, h: '<b>Sell</b><small>get ' + plural(E.discardGain(G, p), 'coin') + '</small>' });
+    G.players[p].wonders.forEach(function (w) { if (w.card || G.built >= 7) return; z.push({ m: { t: 'wonder', i: i, w: w.id }, ok: ok('wonder', w.id), st: BY[w.id].stem, h: '<b>' + esc(BY[w.id].nm) + '</b><small>' + (ok('wonder', w.id) ? 'build wonder' : 'too costly') + '</small>' }); });
+    return z;
+  }
+  document.addEventListener('pointerdown', function (ev) {
+    var b = ev.target.closest && ev.target.closest('#pyr .card.av'); if (!b || !canAct() || U.G.pend.length || U.G.phase !== 'play' || U.tut) return;
+    DR = { i: +b.id.slice(1), el: b, x: ev.clientX, y: ev.clientY, on: false, id: ev.pointerId };
+  });
+  document.addEventListener('pointermove', function (ev) {
+    if (!DR || ev.pointerId !== DR.id) return;
+    if (!DR.on) {
+      if (Math.abs(ev.clientX - DR.x) + Math.abs(ev.clientY - DR.y) < 10) return;
+      DR.on = true; closeZoom(); var r = DR.el.getBoundingClientRect(), g = DR.el.cloneNode(true); g.id = 'dragc'; g.classList.remove('sel'); g.style.cssText += ';position:fixed;left:' + r.left + 'px;top:' + r.top + 'px;z-index:80;pointer-events:none;transform:scale(1.15) rotate(-3deg)'; document.body.appendChild(g);
+      DR.g = g; DR.dx = ev.clientX - r.left; DR.dy = ev.clientY - r.top; DR.el.style.opacity = '.25';
+      var t = document.createElement('div'); t.id = 'tray'; DR.z = dropZones(DR.i);
+      t.innerHTML = '<p>Drop the card here</p><div class="tz">' + DR.z.map(function (z, k) { return '<div class="dz' + (z.ok ? ' ok' : ' no') + '" data-dz="' + k + '">' + (z.st ? slot(z.st, 'dzart') : '') + z.h + '</div>'; }).join('') + '</div>';
+      document.body.appendChild(t); fillArt(t); DR.t = t; SND.play('tick');
+    }
+    ev.preventDefault(); DR.g.style.left = (ev.clientX - DR.dx) + 'px'; DR.g.style.top = (ev.clientY - DR.dy) + 'px';
+    var hit = document.elementFromPoint(ev.clientX, ev.clientY), dz = hit && hit.closest && hit.closest('.dz'), k = dz ? +dz.dataset.dz : -1;
+    if (k !== DR.k) { DR.t.querySelectorAll('.dz').forEach(function (e) { e.classList.toggle('hov', +e.dataset.dz === k); }); DR.k = k; if (k >= 0 && DR.z[k].ok) { try { navigator.vibrate && navigator.vibrate(8); } catch (e) { } } }
+  }, { passive: false });
+  function endDrag(ev) {
+    if (!DR || ev.pointerId !== DR.id) return; var d = DR; DR = null; if (!d.on) return;
+    U.dragJust = Date.now(); var k = d.k, z = k >= 0 ? d.z[k] : null;
+    d.g.remove(); d.t.remove(); d.el.style.opacity = '';
+    if (z && z.ok && ev.type === 'pointerup') { try { navigator.vibrate && navigator.vibrate(20); } catch (e) { } if (window.GXT && GXT.act({ type: 'tap', kind: 'act', a: z.m.t, w: z.m.w || null }) === false) return; U.sel = d.i; step(z.m); }
+  }
+  document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
+  document.addEventListener('click', function (ev) { if (U.dragJust && Date.now() - U.dragJust < 400) { ev.stopPropagation(); ev.preventDefault(); } }, true);
   document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card') && e.target.classList.contains('av')) { e.preventDefault(); e.target.click(); } });
   window.addEventListener('resize', function () { if (U.G && U.G.phase !== 'draft' && !U.G.over) renderPyr(); });
   if (window.GX) GX.onResize(function () { if (U.G && U.G.phase !== 'draft' && $('pyr').children.length) renderPyr(); });
