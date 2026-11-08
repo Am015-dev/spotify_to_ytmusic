@@ -64,3 +64,14 @@ readable. Gate re-run with the kit installed: same results as below.
 - Note: the turn banner never showed in the first commits (an id helper bug); fixed in the story commit, now visible (shots/after-phone-3banner.png).
 - Test setup: temp art linked as media (not committed); Playwright browser shim outside the repo (PLAYWRIGHT_BROWSERS_PATH) because the
   installed 1.56.1 expects build 1194.
+
+## Turn flow and visible scoring (W421, owner: "not easy to understand what I have to do, how I collect points, when my turn ends and why")
+- Turn tracker on top of the board: "Round 2 of 5 · Your turn · 2 dice left: [4] [6]"; dice are tokens that get struck out when spent; the top bar keeps only the season.
+- Beat cards (tap to skip): "Turn over: you used both dice" + a good / okay / poor rating against the greedy best action at each step ("Stronger was: build Keep with a 3");
+  "Azure's turn is over"; "Round 2 of 5 done · white die 5: a Honey crate goes to stall 5"; season end (mines paid, new region bonus). Then the banner "Your turn: you rolled 3 and 5".
+- One instruction that names the die: "Use your 4: take a tile from stall 4, or build a stored tile on a 4-space. Or tap your 6."
+- Previews: a selected storage tile (or a selected die alone) lights every legal space with a badge: gold +N = points now (region, animals, beacon), 2/4 = region progress; a star marks the best spot.
+  Market: a ★ Best badge on the best pick for you (AI evaluation); the tile card says best / nearly as good / worth less.
+- Score chips under the tracker: you vs rival, ★ leads, points by source (regions, goods, animals, ...). Region pops say why: "+11 region filled (size 1: 1 + spring bonus 10)".
+- Coached game: 1 season of 3 rounds (engine option `rounds`); Odo explains the preview badges and the turn-over card the first time they show.
+- Shots: playable-shots/v3-{phone,pc}-{1yourturn,2preview,3market,4turnover,5rival,6roundend,7result}.webp (`node shoot-v3.js`).

@@ -1,0 +1,2 @@
+bear.jpg = grizzly plate (Ursus ferox) from the 1845 quadrupeds volume; salmon.jpg = Chinook salmon adult male plate
+hawk.jpg = Red-tailed Hawk plate (Birds of America)
