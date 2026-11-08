@@ -5,16 +5,17 @@ var PHN={on:false,land:false,bs:0,pop:null,popSig:'',armed:null,ctx:'',focusOn:f
 const R=document.documentElement;
 const SVG=d=>`<svg class="ico" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const IC={focus:SVG('<circle cx="10" cy="10" r="3.2"/><circle cx="10" cy="10" r="7.2"/><path d="M10 1.5v3M10 15.5v3M1.5 10h3M15.5 10h3"/>'),plus:SVG('<path d="M10 4v12M4 10h12"/>'),minus:SVG('<path d="M4 10h12"/>'),fit:SVG('<path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/>')};
-const forced=()=>{if(window.TUTPH)return true;const m=/[?&]phone=([01])/.exec(location.search||'');return m?m[1]==='1':null};
+// owner round 2 (8 Nov): every screen size plays on the board-first layer (the old button-grid dock only with ?phone=0)
+const forced=()=>{if(window.TUTPH)return true;const m=/[?&]phone=([01])/.exec(location.search||'');return m?m[1]==='1':true};
 // inside the shelf's full-screen iframe the shelf already pads by the insets (and env() reads 0 there): count them exactly once
 const framed=()=>{try{return window.self!==window.top}catch(e){return true}};
 function insets(){if(framed()&&!/[?&]safe=/.test(location.search||''))return {t:0,r:0,b:0,l:0};const m=/[?&]safe=([\d.]+),([\d.]+),([\d.]+),([\d.]+)/.exec(location.search||'');if(m)return {t:+m[1],r:+m[2],b:+m[3],l:+m[4]};
   try{const d=document.createElement('div');d.style.cssText='position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(d);const c=getComputedStyle(d);const r={t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0};d.remove();return r}catch(e){return {t:0,r:0,b:0,l:0}}}
 function apply(){const w=innerWidth,h=innerHeight,short=Math.min(w,h);let coarse=false;try{coarse=matchMedia('(pointer:coarse)').matches}catch(e){}
-  const f=forced();const on=f!=null?f:(short<=500||(coarse&&short<=600));const land=w>h;const was=PHN.on;
+  const f=forced();const on=f!=null?f:(short<=500||(coarse&&short<=600));const big=short>600;const land=w>h&&!big;R.classList.toggle('ph-big',on&&big);const was=PHN.on;
   R.classList.toggle('ph',on);R.classList.toggle('ph-l',on&&land);R.classList.toggle('ph-p',on&&!land);PHN.on=on;PHN.land=land;
   if(on){const sf=insets();const BAR=44,BARV=48,ROW=46,PANEL=210;const aw=w-sf.l-sf.r;let bs=land?Math.min(h-sf.t-sf.b,aw-BARV-300):Math.min(aw,h-sf.t-sf.b-BAR-ROW-PANEL);
-    if(!land)bs=Math.max(bs,Math.round(aw*.75));bs=Math.max(200,Math.floor(bs));PHN.bs=bs;
+    if(!land&&!big)bs=Math.max(bs,Math.round(aw*.75));bs=Math.max(200,Math.floor(bs));PHN.bs=bs;
     const st=R.style;st.setProperty('--bs',bs+'px');st.setProperty('--sat',sf.t+'px');st.setProperty('--sar',sf.r+'px');st.setProperty('--sab',sf.b+'px');st.setProperty('--sal',sf.l+'px')}
   else{['--bs','--sat','--sar','--sab','--sal'].forEach(k=>R.style.removeProperty(k))}
   if(on&&!was)PHN.build();if(on)PHN.placeCtl();
