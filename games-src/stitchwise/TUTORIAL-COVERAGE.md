@@ -1,3 +1,15 @@
+# Stitchwise tutorial coverage (R1 fix: every rule by touch, no jumps)
+
+"Learn: your first game" is one continuous practice fair (`tutStart`/`t2Setup` in `src/ui4.js`). Its setup is fixed before turn 1 and
+never changes behind the player's back: tokens on 36/37, an old practice quilt with 3 gold gaps (an L gap, a 1x1 gap, a Z gap).
+10 rules, one line and one lit target each, wrong taps refused: 1 buy (only the 3 after the spool) - 2 rotate - 3 place (drag into
+the gap; Sew stays off until it fits) - 4 pay (Sew it on, 4 buttons) - 5 time and who goes next (watch Marden) - 6 advance - 7 income
+(pass the gold spot) - 8 leather (pass it, tap the 1x1 gap) - 9 the 7x7 bonus (buy, flip, drag, sew: +7) - 10 end (advance to 53),
+then the score card with the real numbers (you about +23, Marden +15). Marden only advances in the practice fair.
+Proof: `node tut-walk.js 390x844 --full` and `375x667 --full` (real touch; Sew before placing is refused; then a full real game).
+
+---
+
 # Stitchwise tutorial coverage (W491: guided first game, replaces the coached half-game below)
 
 "Learn: your first game" is now a guided first game (`tutStart` in `src/ui4.js`). Every step is one line of 12 words or fewer and

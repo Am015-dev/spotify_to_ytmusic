@@ -42,7 +42,7 @@ function quiltEl(seat, cls) {
   var board = G.board[seat], q = h('div#quilt.' + cls), bx = patchBoxes(board), cs = UI.cs || 36;
   for (var i = 0; i < 81; i++) {
     var p = board[i], x = i % 9, y = (i / 9) | 0, c = h('div.qc'); c.dataset.x = x; c.dataset.y = y;
-    if (p === 99) { c.classList.add('torn'); if (artHas('torn-square')) artBg(c, 'torn-square'); } else if (p === 100) { c.classList.add('lea'); if (artHas('patch-leather')) { artBg(c, 'patch-leather'); c.style.backgroundSize = 'cover'; } } else if (p >= 0) {
+    if (p === 99) { c.classList.add('torn'); if (artHas('torn-square')) artBg(c, 'torn-square'); } else if (p === 101) { c.classList.add('old'); c.style.setProperty('--pc', pcol(((i * 7) + ((i / 9) | 0) * 3) % 33)); } else if (p === 100) { c.classList.add('lea'); if (artHas('patch-leather')) { artBg(c, 'patch-leather'); c.style.backgroundSize = 'cover'; } } else if (p >= 0) {
       c.classList.add('f', ppat(p)); c.style.setProperty('--pc', pcol(p));
       if (x === 0 || board[i - 1] !== p) c.classList.add('eL'); if (x === 8 || board[i + 1] !== p) c.classList.add('eR'); if (y === 0 || board[i - 9] !== p) c.classList.add('eT'); if (y === 8 || board[i + 9] !== p) c.classList.add('eB');
       if (artHas(fabricStem(p))) { var b = bx[p], sz = Math.max(b[2] - b[0] + 1, b[3] - b[1] + 1) * cs; c.style.backgroundImage = 'url(media/' + fabricStem(p) + '.webp)'; c.style.backgroundSize = sz + 'px ' + sz + 'px'; c.style.backgroundPosition = (-(x - b[0]) * cs) + 'px ' + (-(y - b[1]) * cs) + 'px'; c.classList.add('img'); }
@@ -55,7 +55,7 @@ function quiltEl(seat, cls) {
   q.setAttribute('aria-label', nameOf(seat) + ' quilt: ' + swEmpty(board) + ' empty squares');
   return q;
 }
-function thumb(seat) { var c = document.createElement('canvas'); c.width = c.height = 90; c.className = 'thumb'; var x = c.getContext('2d'); x.fillStyle = '#f1e5c8'; x.fillRect(0, 0, 90, 90); for (var i = 0; i < 81; i++) { var p = G.board[seat][i]; if (p === -1) continue; x.fillStyle = p === 99 ? '#4d4032' : p === 100 ? '#8a5a3a' : pcol(p); x.fillRect((i % 9) * 10 + 0.5, ((i / 9) | 0) * 10 + 0.5, 9, 9); } return c; }
+function thumb(seat) { var c = document.createElement('canvas'); c.width = c.height = 90; c.className = 'thumb'; var x = c.getContext('2d'); x.fillStyle = '#f1e5c8'; x.fillRect(0, 0, 90, 90); for (var i = 0; i < 81; i++) { var p = G.board[seat][i]; if (p === -1) continue; x.fillStyle = p === 99 ? '#4d4032' : p === 100 ? '#8a5a3a' : p === 101 ? '#b8a27e' : pcol(p); x.fillRect((i % 9) * 10 + 0.5, ((i / 9) | 0) * 10 + 0.5, 9, 9); } return c; }
 function strip(seat) {
   var sc = swScore(G, seat), w = (UI.peek >= 0 ? UI.peek : swWho(G)) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'If it ended now: ' + sc.total + ' points', 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
@@ -159,7 +159,7 @@ function renderDock() {
     var can = hum && !G.pend && aff && fits, val = hintsOn() && hum && !G.pend && aff && fits ? patchValue(s, pid).net : null;
     var b = h('button.offer' + (UI.sel === k ? '.sel' : '') + (hum && !G.pend && (!aff || !fits) ? '.no.cant' : '') + (!hum ? '.no' : '') + (can && UI.sel < 0 ? '.can' : '') + (UI.sel >= 0 && UI.sel !== k ? '.dim' : ''), { type: 'button', 'data-a': 'offer', 'data-k': k, 'data-why': why, 'aria-label': p.name + ': cost ' + p.cost + ' buttons, time ' + p.time + ', earns ' + p.inc + ' per button spot, ' + p.n + ' squares' });
     if (artHas('ui-offer-card')) { artBg(b, 'ui-offer-card'); b.style.backgroundImage = 'linear-gradient(#fffaf0e6,#fffaf0e6),' + b.style.backgroundImage; b.style.backgroundSize = 'cover'; }
-    if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); var bb = bbox(p.cells), sm = document.documentElement.classList.contains('sm'), wd = innerWidth >= 1024; var ph = !sm && !wd && !UI.wide; /* W484: phone portrait: big pieces (box ~100x72, cells up to 26px, tap target is the whole card) */ b.appendChild(patchShape(pid, '', ph ? Math.max(13, Math.min(26, Math.floor(100 / (bb[0] + 1)), Math.floor(54 / (bb[1] + 1)))) : Math.max(9, Math.min(sm ? 12 : wd ? 30 : 18, Math.floor((sm ? 60 : wd ? 170 : 96) / bb[0]), Math.floor((sm ? 44 : wd ? 96 : 40) / bb[1]))))); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
+    if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); var bb = bbox(p.cells), sm = document.documentElement.classList.contains('sm'), wd = innerWidth >= 1024; var ph = !sm && !wd && !UI.wide; /* W484: phone portrait: big pieces (box ~100x72, cells up to 26px, tap target is the whole card) */ b.appendChild(patchShape(pid, '', ph ? Math.max(11, Math.min(20, Math.floor(84 / (bb[0] + 1)), Math.floor(36 / (bb[1] + 1)))) : Math.max(9, Math.min(sm ? 12 : wd ? 30 : 18, Math.floor((sm ? 60 : wd ? 170 : 96) / bb[0]), Math.floor((sm ? 44 : wd ? 96 : 40) / bb[1]))))); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
   });
   if (hum && !G.pend && UI.sel < 0 && !G.owned[s].length && !UI.tutorial) { var cans = $$('.offer.can', box); if (cans.length) { var bk = cans.reduce(function (a, c) { return patchValue(s, off[+c.dataset.k]).net > patchValue(s, off[+a.dataset.k]).net ? c : a; }); bk.appendChild(h('span.hand', { 'aria-hidden': 'true' }, h('i', '\u261D\uFE0F'), h('b', 'Tap'))); } } /* W484: a hand on the very first turn */
   var vs = $$('.offer[data-val]', box); if (vs.length) { var bst = vs.reduce(function (a, b) { return +b.dataset.val > +a.dataset.val ? b : a; }); bst.appendChild(h('span.badge', 'Best ' + sgn(+bst.dataset.val))); }
@@ -168,7 +168,7 @@ function renderDock() {
   pr.classList.remove('w484q'); dh.textContent = hum && !G.pend && UI.sel >= 0 && !UI.coach ? 'Drag it on your quilt. Red = no room.' : hum && !G.pend && UI.sel < 0 && !UI.coach ? 'Goal: fill your quilt. Most points wins.' : turnTracker(s); /* W484: the goal in plain words on your turn */
   if (G.pend) { pr.textContent = hum ? 'Free 1×1 patch! Tap any empty square on your quilt' : nameOf(s) + ' sews a free 1×1 patch'; if (hum) { box.style.display = 'none'; dt.textContent = 'You passed a leather space on the track. The 1×1 patch is yours, sew it anywhere.'; } return; }
   box.style.display = '';
-  if (!hum) { pr.textContent = UI.cap || (nameOf(s) + ' is thinking…'); return; }
+  if (!hum) { pr.textContent = UI.cap || (nameOf(s) + ' is thinking…'); if (!UI.fast) pr.appendChild(h('small.skipn', ' Tap to skip')); return; }
   if (UI.sel >= 0) {
     var pid = off[UI.sel], p = PATCHES[pid], ok = ghostOk(), pv = patchValue(s, pid), gc = ok ? (curCells() || []).map(function (c) { return (UI.gy + c[1]) * 9 + UI.gx + c[0]; }) : [];
     pr.textContent = hintsOn() ? (ok ? 'Sew it on: ' : 'Drag it onto your quilt: ') + 'worth ' + sgn(pv.net) : ok ? 'Good spot! Tap Sew it on' : 'Drag the patch onto your quilt';

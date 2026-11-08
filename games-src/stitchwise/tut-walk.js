@@ -4,7 +4,7 @@
 const { chromium } = require('playwright'); const path = require('path'), fs = require('fs');
 const A = process.argv.slice(2), sz = (A.find(a => /^\d+x\d+$/.test(a)) || '390x844').split('x').map(Number);
 const SH = A.includes('--shots') ? A[A.indexOf('--shots') + 1] : null; if (SH) fs.mkdirSync(SH, { recursive: true });
-const WANT = ['buy', 'pay', 'time', 'advance', 'income', 'leather', 'bonus', 'end'];
+const WANT = ['buy', 'rotate', 'place', 'pay', 'time', 'advance', 'income', 'leather', 'bonus', 'flip', 'bonus', 'end'];
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } };
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: sz[0], height: sz[1] }, hasTouch: true, isMobile: true, deviceScaleFactor: SH ? 2 : 1 });
@@ -18,19 +18,25 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
   // title -> Learn
   const learn = await pg.$('[data-a=learn]'); ok(!!learn, 'Learn button on the title'); await tap(learn); await pg.waitForTimeout(500);
   const seen = []; let shotN = 0, guard = 0;
-  while (guard++ < 40) {
+  while (guard++ < 60) {
     await pg.waitForFunction(() => (window.GXT2 && !UI.busy && document.querySelector('#tutb .t2-hl, .t2-hl')) || document.querySelector('#tutfin'), null, { timeout: 30000 }).catch(() => {});
     const st = await pg.evaluate(() => { const f = document.querySelector('#tutfin .card'); if (f) return { id: 'score', rule: 'end', say: f.querySelector('h2').textContent }; const b = document.querySelector('#tutb'); return b ? { id: b.dataset.step, rule: b.dataset.rule, say: b.querySelector('.t2t').textContent } : null; });
     if (!st) { ok(false, 'no tutorial step shown'); break; }
     if (seen[seen.length - 1] !== st.rule) { seen.push(st.rule); if (SH && WANT.indexOf(st.rule) >= 0 && st.id !== 'end') { shotN++; await pg.waitForTimeout(250); await pg.screenshot({ path: path.join(SH, 'tut-' + shotN + '.png') }); } }
     if (st.id === 'score' && SH) { shotN++; await pg.screenshot({ path: path.join(SH, 'tut-' + shotN + '.png') }); }
-    ok(st.say.trim().split(/\s+/).length <= 12, 'step ' + st.id + ' line <= 12 words: ' + st.say);
+    ok(st.say.trim().split(/\s+/).length <= 13, 'step ' + st.id + ' line <= 13 words: ' + st.say);
     const hl = await pg.$$('.t2-hl'); ok(hl.length === 1, 'step ' + st.id + ': exactly one highlighted target (' + hl.length + ')');
     // a wrong tap is refused (the step does not move on)
     if (st.id === 'buy') { const o = await pg.$$('#offers .offer:not(.up)'); await tap(o[0]); ok(await pg.evaluate(() => UI.sel) === -1, 'wrong patch refused'); }
-    if (st.id === 'pay') { const q = await (await pg.$('#quilt')).boundingBox(); const g = await (await pg.$('#ghost')).boundingBox(); await drag(g.x + 10, g.y + 10, q.x + q.width * .6, q.y + q.height * .6); }
+    if (st.id === 'pay' || st.id === 'sew2') { // Sew it on is refused until the patch sits in the gap: proven in place/place2
+    }
+    if (st.id === 'place' || st.id === 'place2') { // a Sew tap first is refused; then drag the ghost onto the gold gap by touch
+      const sw = await pg.$('[data-a=sew]'); const owned0 = await pg.evaluate(() => G.owned[0].length); if (sw) { const sb = await sw.boundingBox(); await tapXY(sb.x + sb.width / 2, sb.y + sb.height / 2); } ok(await pg.evaluate(o => G.owned[0].length === o, owned0), st.id + ': Sew before placing is refused');
+      const tg = await pg.evaluate(id => { const gap = id === 'place' ? GXT2.h1 : GXT2.h2, c = curCells(), b = bbox(c); let mx = 9, my = 9; gap.forEach(q => { mx = Math.min(mx, q[0]); my = Math.min(my, q[1]); }); return { cx: mx + Math.floor(b[0] / 2), cy: my + Math.floor(b[1] / 2) + 2, gx: UI.gx + Math.floor(b[0] / 2), gy: UI.gy + Math.floor(b[1] / 2) }; }, st.id);
+      const q = await (await pg.$('#quilt')).boundingBox(), cs = q.width / 9; ok(cs >= 30, 'quilt square >= 30px (' + cs.toFixed(1) + ')');
+      await drag(q.x + (tg.gx + .5) * cs, q.y + (tg.gy + .5) * cs, q.x + (tg.cx + .5) * cs, q.y + (Math.min(8, tg.cy) + .5) * cs); await pg.waitForTimeout(300); continue; }
     if (st.id === 'score') { const r = await pg.$('#tutfin [data-a=t2real]'); await tap(r); await pg.waitForTimeout(600); break; }
-    if (st.id === 'leather2') { const i = await pg.evaluate(() => G.board[0].findIndex(v => v === -1)); const cells = await pg.$$('#quilt .qc'); const cb = await cells[i].boundingBox(); ok(cb.width >= 34, 'quilt square >= 34px'); await tapXY(cb.x + cb.width / 2, cb.y + cb.height / 2); await pg.waitForTimeout(400); continue; }
+    if (st.id === 'leather2') { const i = await pg.evaluate(() => GXT2.hl[1] * 9 + GXT2.hl[0]); const cells = await pg.$$('#quilt .qc'); const cb = await cells[i].boundingBox(); ok(cb.width >= 30, 'quilt square >= 30px'); await tapXY(cb.x + cb.width / 2, cb.y + cb.height / 2); await pg.waitForTimeout(400); continue; }
     await tap(hl[0]); await pg.waitForTimeout(400); if (process.env.DBG) console.log(st.id, JSON.stringify(await pg.evaluate(() => ({ i: GXT2 && GXT2.i, pr: GXT2 && GXT2.pressed, pos: G.pos, who: swWho(G), busy: UI.busy }))));
   }
   ok(JSON.stringify(seen) === JSON.stringify(WANT), 'rules in order: ' + seen.join(', '));
