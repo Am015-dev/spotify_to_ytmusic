@@ -11,6 +11,7 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
     await p.addInitScript(() => { window.AIDELAY = .12; });
     await p.goto(url, { waitUntil: 'load' }); await p.waitForTimeout(400);
     await p.click('#tutSlot button');
+    await p.waitForSelector('#tutGo', { timeout: 5000 }); await p.click('#tutGo');   // Learn to play first screen: how you win
     const tap = async (sel) => {
       const r = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e || !e.getClientRects().length || e.disabled) return null; const q = e.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, h = document.elementFromPoint(x, y); return { x, y, hit: !!(h && (h === e || e.contains(h))) }; }, sel);
       if (!r) return false; if (!r.hit) { problems.push('covered ' + sel); return false; } await p.mouse.click(r.x, r.y); return true;

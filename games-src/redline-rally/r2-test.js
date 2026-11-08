@@ -15,6 +15,7 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
     await tap('#sndT'); ok((await page.locator('#sndT').textContent()).includes('Off'), name + ' mute toggle off'); await tap('#sndT');
     // ---- guide
     await tap('#tutSlot .gxt-menu');
+    await page.waitForSelector('#tutGo', { timeout: 5000 }); await tap('#tutGo');   // Learn to play first screen
     const seen = []; let stuck = 0;
     for (let n = 0; n < 40; n++) {
       const st = await page.evaluate(() => { const c = GXT.current && GXT.current(); return { act: GXT.active(), id: c && c.id, phase: GXT.state && GXT.state().phase }; });

@@ -138,7 +138,12 @@ function tutSteps() {   /* only the very first action is forced (2 steps); the r
     { id: 'cards', title: 'Coach Mara', say: 'Tap any two cards. Their numbers add up to your speed.', target: function () { return $('#hand'); }, wait: { type: 'tap', times: 2, match: function (a) { return a.what === 'card'; } }, wrong: 'Tap two cards.', side: 'top', onDone: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } COACH.on = true; coachPlan(you(), null); drawPlan(); }, 30); } }
   ];
 }
-function tutStart(o) {
+function tutStart(o) {   /* first screen of Learn to play: how you win in one sentence, three bullets, then drive */
+  UI.lockModal = true;
+  modal('<h2>Win: cross the line first after one lap.</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 2 means you play 2 cards.</li><li><b>Cards add up.</b> Their numbers are how far you drive.</li><li><b>Corners have a limit.</b> Go faster and you burn heat.</li></ul><p class="lede">Coach Mara shows you one tap at a time.</p><button class="big" id="tutGo" style="width:100%">Let\'s drive</button>');
+  $('#mx').hidden = true; $('#tutGo').onclick = function () { UI.lockModal = false; tutBegin(o); };
+}
+function tutBegin(o) {
   closeModal(); UI.cmpDef = null; o = o || {}; COACH.seen = {}; COACH.q = []; COACH.cur = null; COACH.later = null; COACH.laterShown = false;
   GXT.start({
     game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'practice', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },
