@@ -4,8 +4,10 @@
 // Aunt Ottilie explains each rule the first time it matters (rule ids = TUTORIAL-COVERAGE.md), says one line on a good or poor move,
 // and on what Pip does. One bubble at a time, never blocks a tap (only its x button takes taps), dismissable. Text: story.js STORY.coach.
 var COACH = { on: false, done: {}, q: [], cur: null, t: 0, flags: {}, point: null, turnKey: null };
+// the shelf's coached-game hook (qa-bot and tests read it): running, rule ids explained so far, done once the score walk-through shows
+window.GXCOACH = { get running() { return coachOn() && G.phase !== 'over'; }, get explained() { return Object.keys(COACH.done); }, get done() { return !!COACH.finished; } };
 function coachOn() { return COACH.on && G && UI.mode === 'tutfree'; }
-function coachReset() { COACH.on = true; COACH.done = {}; COACH.q = []; COACH.flags = {}; COACH.point = null; COACH.turnKey = null; COACH.turn = 0; coachHide(); }
+function coachReset() { COACH.on = true; COACH.done = {}; COACH.q = []; COACH.flags = {}; COACH.point = null; COACH.turnKey = null; COACH.turn = 0; COACH.finished = false; COACH.learned = {}; coachHide(); }
 function coachHide() { clearTimeout(COACH.t); if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur); COACH.cur = null; }
 // explain a rule once (id from STORY.coach), or say a one-off line (id starting with '!')
 function coach(id, extra, sticky) {
@@ -92,7 +94,7 @@ function coachRules() { return Object.keys(STORY.coach); }
 // end of the coached game: the score walked through rule by rule with the real numbers, then "Things you'll meet later"
 function coachResultHTML(sc, me) {
   var s = sc[me], p = G.pl[me], nb = PP.birds(p).length, eggs = PP.birds(p).reduce(function (a, x) { return a + x.s.eggs; }, 0);
-  ['final', 'tie'].forEach(function (k) { COACH.done[k] = 1; });
+  ['final', 'tie'].forEach(function (k) { COACH.done[k] = 1; }); COACH.finished = true;
   var rows = [
     ['Birds', s.birds, 'the points printed on your ' + nb + ' bird' + (nb === 1 ? '' : 's')],
     ['Eggs', s.eggs, eggs + ' egg' + (eggs === 1 ? '' : 's') + ', 1 point each'],
