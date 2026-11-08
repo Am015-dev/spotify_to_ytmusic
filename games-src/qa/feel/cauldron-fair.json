@@ -1,8 +1,8 @@
 {
  "slug": "cauldron-fair",
- "when": "2026-11-08T06:15Z",
+ "when": "2026-11-08T07:06Z",
  "secs": 120,
- "totalSecs": 384,
+ "totalSecs": 397,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -37,19 +37,19 @@
    "size": "phone",
    "mode": "learn",
    "secs": 120,
-   "turns": 400,
-   "clicks": 444,
+   "turns": 361,
+   "clicks": 414,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 9
+   "messagesSeen": 11
   },
   {
    "size": "phone",
    "mode": "play",
    "secs": 120,
-   "turns": 428,
-   "clicks": 471,
+   "turns": 320,
+   "clicks": 363,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -59,19 +59,19 @@
    "size": "pc",
    "mode": "learn",
    "secs": 120,
-   "turns": 315,
-   "clicks": 398,
+   "turns": 263,
+   "clicks": 357,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 10
+   "messagesSeen": 11
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 24,
-   "turns": 56,
-   "clicks": 83,
+   "secs": 36,
+   "turns": 89,
+   "clicks": 120,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
