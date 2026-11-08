@@ -104,11 +104,11 @@ function finishMove(e,c){const t=G.board[e];const p=P(G.cur);const n=t.m.filter(
   if(['small','large','exchange'].includes(t.k))trig('market',p.i)}
 // taking control: a camel (or, with Crafters, the tent)
 function claimTile(p,e,how){const t=G.board[e];if(t.camel!=null||t.tent!=null)return;
-  if(how==='auto'&&p.tent&&p.human&&!UI.sim){ask(p.i,`Claim ${tileName(t)} with a camel or your tent?`,[{l:'🐪 A camel',h:'claim',d:{p:p.i,e,how:'camel'}},{l:'⛺ The tent (scores its tile and each red tile around it)',h:'claim',d:{p:p.i,e,how:'tent'}}],{kind:'claim'});return}
+  if(how==='auto'&&p.tent&&p.human&&!UI.sim){ask(p.i,`Claim ${tileName(t)} with a camel or your tent?`,[{l:'🐪 A camel',h:'claim',d:{p:p.i,e,how:'camel'}},{l:'⛺ The tent (its tile plus 1 per nearby red tile)',h:'claim',d:{p:p.i,e,how:'tent'}}],{kind:'claim'});return}
   if(how==='auto'&&p.tent&&(!p.human||UI.sim)&&aiWantsTent(p,e))how='tent';
   if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e);return}
   if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e);
-  if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} has placed the last camel: the game ends once every player has played this turn.`,'big')}}
+  if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} placed the last camel. The round finishes, then the game ends.`,'big')}}
 QH.claim=d=>claimTile(P(d.p),d.e,d.how);
 function owner(t){return t.camel!=null?t.camel:t.tent!=null?t.tent:null}
 // ---------- tribe actions ----------
@@ -158,7 +158,7 @@ function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tile
   if(m.work){if(m.work==='art'){p.art--;G.bag.push('artisan')}else{p.fk-=2;G.rdisc.push('fakir','fakir')}p.items.push(G.items.shift());lg(`${p.nm} commissions an item at the Workshop.`,'good');return}}
 function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i);trig('palace',p.i)}
 function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i)}
-function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);trig('djinn',p.i,{k})}
+function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);if(!UI.sim&&UI.fx.length)UI.fx[UI.fx.length-1].h=p.human?1:0;trig('djinn',p.i,{k})}
 // ---------- goods sale (end of turn, optional) ----------
 function sellValue(n){return SETVP[Math.min(n,9)]}
 function sellMoves(p){const kinds=[...new Set(p.res)];const o=[];// offer selling the n kinds you hold most copies of (the dock also lets you choose kinds)

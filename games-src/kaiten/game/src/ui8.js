@@ -65,6 +65,7 @@ function peekShow(b) {
 function peekHide() { const p = $('#peek'); if (p) p.hidden = true; for (const e of $$('#belt .hc.peeked')) e.classList.remove('peeked'); }
 function pxCardOf(b) { return PX.on && b && b.dataset.id != null ? PX.objs.get('h:' + b.dataset.id) : null; }
 function dragStart(s, e) {
+  buzz(6);
   const b = s.b, r = b.getBoundingClientRect(), id = +b.dataset.id;
   const c = h('div#dragc'); c.style.cssText = 'left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px';
   c.appendChild(cardNode(tkey(id), Math.round(r.width))); document.body.appendChild(c);

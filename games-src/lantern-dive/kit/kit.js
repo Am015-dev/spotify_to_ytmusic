@@ -61,7 +61,7 @@ function cardSVG(id, o) {
   const num = lan ? GOLD : c.dk, nfs = w * .3;
   let top = '';
   const corner = rot => `<g transform="${rot ? `rotate(180 ${f(w / 2)} ${f(h / 2)})` : ''}"><text x="${f(w * .15)}" y="${f(w * .36)}" font-family="${FONT}" font-weight="900" font-size="${f(nfs)}" fill="${num}" stroke="${lan ? INK : '#fff'}" stroke-width="${f(w * .02)}" paint-order="stroke" text-anchor="start">${v}</text>${emb(s, w * .1, w * .41, w * .2)}</g>`;
-  top += corner(false) + corner(true);
+  top += corner(false);   // W479: the number once, top-left (the mirrored corner read as a second number)
   let body = (o.part === 'top' ? '' : mat) + (o.part ? '' : mid) + (o.part === 'mat' ? '' : top);
   if (o.part === 'mat') body = mat;
   let shade = o.dim ? `<rect width="${w}" height="${h}" rx="${f(r)}" fill="#0b1f3a" opacity=".42"/>` : '';

@@ -20,7 +20,7 @@ var SFX = { pick: function () { tone(520, .08, 'triangle'); }, tick: function ()
 SFX.fanfare = function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, .22, 'triangle', .14, i * .12); }); tone(1047, .6, 'sine', .1, .5); tone(1568, .5, 'triangle', .06, .55); };
 SFX.thud = function () { tone(110, .16, 'sine', .2); };
 function sfx(n, a) { try { SFX[n](a); } catch (e) { } }
-function toast(t, ms) { var e = $('#toast'); if (!e) return; if (G && UI.started && !G.over && !hintsOn() && !$('#start:not([hidden])')) return; e.textContent = t; e.classList.add('on'); e.onclick = function () { e.classList.remove('on'); }; clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, Math.max(ms || 0, 4000 + 100 * t.split(/\s+/).length)); } // W470: stays >= 4 s + 1 s per 10 words, tap closes
+function toast(t, ms) { var e = $('#toast'); if (!e) return; if (UI.coach && $('#guide:not([hidden])')) return; /* W470: one message at a time: the coach bubble wins */ if (G && UI.started && !G.over && !hintsOn() && !$('#start:not([hidden])')) return; e.textContent = t; e.classList.add('on'); e.onclick = function () { e.classList.remove('on'); }; clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, Math.max(ms || 0, 4000 + 100 * t.split(/\s+/).length)); } // W470: stays >= 4 s + 1 s per 10 words, tap closes
 function amt(ms) { return GX.animMs ? GX.animMs(ms) : ms; }
 function later(ms, f) { var q = UI.seq; return setTimeout(function () { if (q === UI.seq) f(); }, ms); }
 // ---------- who is who
@@ -60,7 +60,7 @@ function strip(seat) {
   var sc = swScore(G, seat), w = (UI.peek >= 0 ? UI.peek : swWho(G)) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'Score now ' + sc.total, 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
     h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), thumb(seat), h('b', nameOf(seat) + (sc.total > swScore(G, 1 - seat).total ? ' \u2605' : ''), h('span.pts', ' ' + sc.total + ' pts')),
-    h('span.st', h('span.bt', { html: '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span> buttons \u00B7', title: 'Buttons' }), false ? h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }) : null, h('span.bt.emp', { title: 'Empty squares (gaps), -2 each' }, sc.empty + ' gaps'), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
+    h('span.st', h('span.bt', { html: '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span> buttons \u00B7', title: 'Buttons' }), false ? h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }) : null, h('span.bt.emp', { title: 'Empty squares (gaps), -2 each' }, sc.empty + ' empty'), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
 }
 // ---------- track
 function trackCols() { return UI.wide ? 9 : 18; }
@@ -77,8 +77,13 @@ function renderTrack() {
   return t;
 }
 function placeTokens() { var t = $('#track'); if (!t) return; var top = G.stamp[0] > G.stamp[1] ? 0 : 1, last = UI.tokPos || G.pos.slice(); UI.tokPos = G.pos.slice();
-  function at(k, cellI, s) { var c = $('.tc[data-i="' + cellI + '"]', t); if (!k || !c) return; k.style.left = (c.offsetLeft + c.offsetWidth / 2 - 8 + (G.pos[0] === G.pos[1] ? (s === 0 ? -5 : 5) : 0)) + 'px'; k.style.top = (c.offsetTop + c.offsetHeight / 2 - 8) + 'px'; }
-  [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', t); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (last[s] !== G.pos[s] && amt(1)) { k.style.transition = 'none'; at(k, last[s], s); void k.offsetWidth; k.style.transition = ''; } at(k, G.pos[s], s); }); }
+  function at(k, cellI, s) { var c = $('.tc[data-i="' + cellI + '"]', t); if (!k || !c) return; var hw = (k.offsetWidth || 20) / 2; k.style.left = (c.offsetLeft + c.offsetWidth / 2 - hw + (G.pos[0] === G.pos[1] ? (s === 0 ? -6 : 6) : 0)) + 'px'; k.style.top = (c.offsetTop + c.offsetHeight / 2 - hw) + 'px'; }
+  // W470: tokens walk space by space (sp(150) per space) instead of jumping
+  var W = UI.walks = UI.walks || {}, now = Date.now(), stp = Math.max(40, sp(150));
+  [0, 1].forEach(function (s) { if (last[s] < G.pos[s] && amt(1)) W[s] = { from: W[s] ? curW(s) : last[s], to: G.pos[s], t0: now }; });
+  function curW(s) { var w = W[s]; if (!w) return G.pos[s]; var n = w.from + Math.floor((Date.now() - w.t0) / stp); if (n >= w.to || w.to !== G.pos[s]) { delete W[s]; return G.pos[s]; } return n; }
+  function tick() { var tt = $('#track'); if (!tt) return; var more = false; [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', tt); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (W[s]) { k.style.transition = 'left .12s, top .12s'; more = true; } at(k, curW(s), s); if (W[s] && !k._st) { k._st = 1; } }); if (more) { clearTimeout(UI.tm.walk); UI.tm.walk = setTimeout(tick, stp); } }
+  tick(); }
 function markLanding() {
   var t = $('#track'); if (!t || !G) return; $$('.tc.land,.tc.next', t).forEach(function (e) { e.classList.remove('land', 'next'); }); var s = swWho(G); if (s < 0) s = 0; var pos = G.pos[s], nx = null;
   SW.BTN_SPOTS.concat(SW.LEATHER_SPOTS.filter(function (l, i) { return G.leather[i] === null; })).forEach(function (b) { if (b > pos && (nx === null || b < nx)) nx = b; });
@@ -96,7 +101,8 @@ function render() {
   artBg($('#board'), 'bg-table');
   var ps = UI.peek >= 0 && UI.mode !== 'hot' ? 0 : vs, pills = h('div#pills', strip(ps), strip(1 - ps)), sbar = scoreBar();
   if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); if (hintsOn()) sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(q); }
-  var tr = renderTrack(); sd.appendChild(tr); if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
+  var tr = renderTrack(); sd.appendChild(tr);
+  if (UI.wide && !(UI.wide && hintsOn())) { var mcs = Math.max(14, Math.min(30, Math.floor(((innerHeight - 330) / 9)))), sv = UI.cs, svn = UI.newCells; UI.cs = mcs; UI.newCells = {}; var oq = quiltEl(os, 'opp'); UI.cs = sv; UI.newCells = svn; oq.removeAttribute('id'); oq.className = 'oppq'; oq.style.setProperty('--cs', mcs + 'px'); oq.style.backgroundImage = 'none'; oq.setAttribute('data-a', 'strip'); oq.setAttribute('data-seat', os); oq.setAttribute('role', 'button'); oq.setAttribute('aria-label', nameOf(os) + ' quilt, tap to enlarge'); sd.appendChild(h('div.oppwrap', h('span', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), oq)); } if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : UI.peek >= 0 ? nameOf(UI.peek) + ' is stitching' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
   var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }
@@ -107,7 +113,7 @@ function patchShape(pid, cls, oc, cells) { var p = PATCHES[pid], c = cells || p.
   for (var y = 0; y <= ht; y++) for (var x = 0; x <= w; x++) { var e = h('i.sc' + (set[x + ',' + y] ? '' : '.e')); e.style.width = e.style.height = oc + 'px'; if (set[x + ',' + y] && artHas(fabricStem(pid))) { var sz = Math.max(w + 1, ht + 1) * oc; e.style.backgroundImage = 'url(media/' + fabricStem(pid) + '.webp)'; e.style.backgroundSize = sz + 'px ' + sz + 'px'; e.style.backgroundPosition = (-x * oc) + 'px ' + (-y * oc) + 'px'; } s.appendChild(e); }
   return s; }
 function facts(p) { return '<span class="bt" title="Cost in buttons">' + btnIc() + p.cost + '</span><span class="bt" title="Time it takes">' + timeIc() + p.time + '</span><span class="bt" title="Buttons earned at each button spot">' + btnIc() + '×' + p.inc + '</span>'; }
-function offerFacts(p) { return '<span class="of oc"><b>' + p.cost + '</b><small>cost</small></span><span class="of ot"><b>' + p.time + '</b><small>time</small></span><span class="of oi"><b>+' + p.inc + '</b><small>earn</small></span>'; }
+function offerFacts(p) { return '<span class="of oc" title="Price in buttons">' + btnIc() + '<b>' + p.cost + '</b></span><span class="of ot" title="Time: spaces you move">' + timeIc() + '<b>' + p.time + '</b></span><span class="of oi" title="Buttons it pays at each gold spot"><b>+' + p.inc + '</b>' + btnIc() + '</span>'; }
 // W381c: see how you score. Value of a patch for a seat = 2 per square covered (each empty square costs 2) - its button cost + its buttons x gold spots still ahead.
 // W381 Addendum 7: Play is clean by default; Hints (top-bar toggle, off by default) or the Learn-to-play game show previews, badges and ratings.
 UI.hints = (function () { try { return localStorage.getItem('sw_hints') === '1'; } catch (e) { return false; } })();
@@ -124,9 +130,11 @@ function scoreBar() { // always visible: you vs the rival, leader marked
   [0, 1].forEach(function (s) { var c = sc[s]; bar.appendChild(h('span.sb' + (lead === s ? '.lead' : ''), h('b', (lead === s ? '\u2605 ' : '') + nameOf(s) + ' ' + sgn(c.total)), h('small', '(' + c.btn + ' \u2212 ' + c.empty + '\u00D72' + (c.bonus ? ' + 7' : '') + ')'))); });
   return bar; }
 function turnTracker(s) { // whose turn and why (the token further back moves), spaces left
-  if (G.over) return 'Game over'; var o = 1 - s, left = SW.TRACK - G.pos[s], nm = 'Turn: ' + (UI.mode !== 'hot' && isHuman(s) ? 'you' : nameOf(s));
-  var why = G.pend ? 'free patch' : G.pos[s] < G.pos[o] ? 'behind by ' + (G.pos[o] - G.pos[s]) : G.pos[o] >= SW.TRACK ? 'rival finished' : 'tied, on top';
-  return nm + ' \u00B7 ' + why + ' \u00B7 ' + left + ' left'; }
+  if (G.over) return 'Game over'; var o = 1 - s, me = UI.mode !== 'hot' && isHuman(s), nm = me ? 'You' : nameOf(s), d = G.pos[o] - G.pos[s], sp = function (n) { return n + ' space' + (n === 1 ? '' : 's'); };
+  if (G.pend) return nm + (me ? ' get' : ' gets') + ' a free 1\u00D71 patch';
+  if (G.pos[o] >= SW.TRACK) return nm + (me ? ' go' : ' goes') + ': ' + nameOf(o) + ' has finished';
+  if (d > 0) return nm + (me ? ' are ' : ' is ') + sp(d) + ' behind, so ' + (me ? 'you go' : 'goes') + ' next';
+  return 'Level: ' + (me ? 'you' : nameOf(s)) + ' landed on top, so ' + (me ? 'you go' : 'goes') + ' next'; }
 function rateMove(m) { // compare the human's move with the best value on offer (the solver's yardstick)
   var s = swWho(G), off = swOffer(G), opts = [];
   off.forEach(function (pid, k) { var p = PATCHES[pid]; if (G.btn[s] >= p.cost && swPlacements(G.board[s], p).length) opts.push({ k: k, name: p.name, v: patchValue(s, pid).net }); });
@@ -142,7 +150,7 @@ function renderDock() {
     var can = hum && !G.pend && aff && fits, val = hintsOn() && hum && !G.pend && aff && fits ? patchValue(s, pid).net : null;
     var b = h('button.offer' + (UI.sel === k ? '.sel' : '') + (hum && !G.pend && (!aff || !fits) ? '.no.cant' : '') + (!hum ? '.no' : '') + (can && UI.sel < 0 ? '.can' : '') + (UI.sel >= 0 && UI.sel !== k ? '.dim' : ''), { type: 'button', 'data-a': 'offer', 'data-k': k, 'data-why': why, 'aria-label': p.name + ': cost ' + p.cost + ' buttons, time ' + p.time + ', earns ' + p.inc + ' per button spot, ' + p.n + ' squares' });
     if (artHas('ui-offer-card')) { artBg(b, 'ui-offer-card'); b.style.backgroundImage = 'linear-gradient(#fffaf0e6,#fffaf0e6),' + b.style.backgroundImage; b.style.backgroundSize = 'cover'; }
-    if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); var bb = bbox(p.cells), sm = document.documentElement.classList.contains('sm'), wd = innerWidth >= 1024; b.appendChild(patchShape(pid, '', Math.max(9, Math.min(sm ? 12 : wd ? 28 : 22, Math.floor((sm ? 60 : wd ? 112 : 100) / bb[0]), Math.floor((sm ? 44 : wd ? 76 : 58) / bb[1]))))); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
+    if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); var bb = bbox(p.cells), sm = document.documentElement.classList.contains('sm'), wd = innerWidth >= 1024; b.appendChild(patchShape(pid, '', Math.max(9, Math.min(sm ? 12 : wd ? 30 : 22, Math.floor((sm ? 60 : wd ? 170 : 100) / bb[0]), Math.floor((sm ? 44 : wd ? 100 : 58) / bb[1]))))); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
   });
   var vs = $$('.offer[data-val]', box); if (vs.length) { var bst = vs.reduce(function (a, b) { return +b.dataset.val > +a.dataset.val ? b : a; }); bst.appendChild(h('span.badge', 'Best ' + sgn(+bst.dataset.val))); }
   if (!off.length) box.appendChild(h('div', 'No patches left.'));
@@ -184,7 +192,7 @@ function setHints(on) { UI.hints = !!on; try { localStorage.setItem('sw_hints', 
 function showGoal() { // one card before turn 1 in Play: the aim in one sentence, 3 ways to score
   UI.goal = true; clearTimeout(UI.tm.ai); UI.seq++; var ov = h('div#goalcard.ov', { role: 'dialog', 'aria-label': 'Goal' }), c = h('div.gcard');
   c.appendChild(h('h2', 'Win with the most points when time runs out.'));
-  var ul = h('ul'); ['Each empty square on your quilt costs 2 points.', 'Every button you keep is 1 point.', 'Fill a 7\u00D77 block first: +7 points.'].forEach(function (t) { ul.appendChild(h('li', t)); }); c.appendChild(ul);
+  var ul = h('ul'); ['Score = your buttons, minus 2 for each empty square.', 'Cover squares with patches. Buttons pay for them.', 'Fill a 7\u00D77 block first: +7 points.'].forEach(function (t, i) { var li = h('li', t); if (i === 2 && typeof bonusTileHtml === 'function') li.insertAdjacentHTML('afterbegin', bonusTileHtml()); ul.appendChild(li); }); c.appendChild(ul);
   var b = h('button.btn.go.grow', { type: 'button', 'data-a': 'goalok' }, 'Start'); c.appendChild(b); ov.appendChild(c); document.body.appendChild(ov);
 }
 function closeGoal() { var g = $('#goalcard'); if (g) g.remove(); UI.goal = false; schedule(); }

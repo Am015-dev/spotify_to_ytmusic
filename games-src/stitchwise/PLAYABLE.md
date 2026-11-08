@@ -72,3 +72,11 @@ the dock is now compact (track hint hidden in Story on phone, 1-line prompts), s
   Quick game is `data-a="start"`; the coached Learn game reports as a running tutorial (GXT.running) so drivers find it.
   Coach lines and value detail cut to <= 12 words per sentence; phone text >= 14px; pill tap in Learn shows no toast;
   no turn banner at all. Learn to play finishes by touch, no Skip: `playable/play.js 390x844 tut` and `1440x900 tut` PASS.
+- Reviewer R2 fix list (W470c): turn line in words ("You are 3 spaces behind, so you go next"); bigger track (cells 24-26 px,
+  16 px icons, 20 px tokens); score explained on the Goal card and first Learn line ("buttons minus 2 for each empty square");
+  pills "6 buttons · 47 empty"; patch cards show a button icon + price, an hourglass + time, "+N" + button for income;
+  rival turn swaps in their quilt while they buy (2.2 s), the patch flies onto it, holds 2 s; PC shows the rival's real quilt
+  under the track (one table scene); result drops the per-square -2 chips; owner/free art now loads in a played game: cast
+  portraits on the title, bg-map behind Quick game setup, result-win/lose banner, bonus rosette on the Goal card.
+  feel-audit a-e 0; ui-audit phone B1 (shared kit Vibration text, came with the base shell update), pc E1 (a player pill).
+- W470d: tokens walk the track space by space; PC dock holds three big patch cards (art first, 24 px icons + 22 px numbers), pills no longer clip; in Learn a toast never stacks on the coach bubble. feel-audit a-e 0; Learn tut PASS both sizes.

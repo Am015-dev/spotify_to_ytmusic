@@ -26,36 +26,36 @@ function hAnyGlow(){const b=boardEl().getBoundingClientRect(),cx=b.left+b.width/
   for(const g of document.querySelectorAll('#world .glow')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect(),d=Math.hypot(r.left+r.width/2-cx,r.top+r.height/2-cy);if(d<bd){bd=d;best=g}}return best}
 function hFig(f){return()=>{const l=(UI.figs||[]).filter(b=>b.isConnected&&f(b._m));return l[0]||null}}
 const HLP_STEPS={
- place:{target:hAnyGlow,title:'Tip',text:'Tap a glow. Tap the tile to turn.',pic:()=>HP.tap()},
- river:{target:hAnyGlow,title:'Follow the river',text:'Carry the river on. Tap a glow.',pic:()=>HP.river()},
- bonus:{target:hAnyGlow,title:'Tip',text:'Mason bonus tile. Tap a glow.',pic:()=>HP.mason()},
+ place:{target:hAnyGlow,title:'Tip',text:'Tap a glowing square. Tap your tile to turn it.',pic:()=>HP.tap()},
+ river:{target:hAnyGlow,title:'Follow the river',text:'Continue the river. Tap a glowing square.',pic:()=>HP.river()},
+ bonus:{target:hAnyGlow,title:'Tip',text:'Extra tile from your mason. Tap a glowing square.',pic:()=>HP.mason()},
  fig:{target:hFig(m=>true),title:'Claim with a follower',text:'Tap a circle to claim it, or Skip.',pic:()=>HP.meeple()},
  figx:{target:hFig(m=>m.k==='bld'||m.k==='pig'),title:'Mason or hog',text:'Add your mason or hog. Tap a circle.',pic:()=>HP.mason()},
  nofig:{target:hq('#hskip'),title:'Nothing to claim',text:'Nothing free to claim. Tap Skip.',pic:()=>HP.skip()}
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
- {title:'How a turn works',text:'Five short steps, every turn.',pic:()=>'<ol class="turn5"><li>Draw a tile. It waits at the bottom.</li><li>Turn it. Tap a glowing square to lay it.</li><li>Put a follower on a road, town, priory or field, or skip.</li><li>A finished road or town scores. Followers go home.</li><li>Your rival does the same, step by step. Most points wins.</li></ol>'},
+ {title:'How a turn works',text:'Five short steps, every turn.',pic:()=>'<ol class="turn5"><li>Draw a tile. It waits at the bottom.</li><li>Turn it. Tap a glowing square to lay it.</li><li>Put a follower on a road, town, priory or field, or skip.</li><li>A finished road or town scores. Followers go home.</li><li>Your rival takes a turn. Most points wins.</li></ol>'},
  {title:'The goal',text:'Build a valley tile by tile. Finished roads and towns score points. Most points wins.',pic:()=>hpics([['road'],['town'],'>',['pts','Winner','+9']])},
  {title:'Every turn',text:'Place a tile so its edges match. Then claim a road, town or field with a follower, or skip.',pic:()=>hpics([['town','Tile'],'>',['meeple','Follower']])},
  {phase:'place',title:'Match the edges',text:'Lay the tile so touching edges match: road to road, town to town, field to field.',pic:()=>hpics([['road','Road'],['road','Road'],'>',['town','Town'],['townT','Town']])},
  {phase:'place',title:'Turn it first',text:'Tap your tile at the bottom to turn it. Glowing squares show where it fits.',pic:()=>hpics([['town'],['turn'],['townT']])},
- {phase:'place',title:'Closed means points',text:'A road or town scores when nothing is left open. Longer ones are worth more.',pic:()=>hpics([['gate','Closed town'],'>',['pts','Scores','+8']])},
- {phase:'bonus',title:'Extra turn',text:'Your mason’s road or town just grew, so you draw and place another tile.',pic:()=>hpics([['mason','Mason'],'>',['town','Tile']])},
+ {phase:'place',title:'Finished means points',text:'A road or town scores when it is finished. Longer ones score more.',pic:()=>hpics([['gate','Closed town'],'>',['pts','Scores','+8']])},
+ {phase:'bonus',title:'Extra turn',text:'Your mason’s road or town grew. Draw and place another tile.',pic:()=>hpics([['mason','Mason'],'>',['town','Tile']])},
  {phase:'bonus',title:'Place it as usual',text:'Tap a glowing square. Then you may claim with a follower, as always.',pic:()=>hpics([['tap'],'>',['meeple']])},
- {phase:'river',title:'Follow the river',text:'River tiles come first. Each one must carry the river on from the last tile.',pic:()=>hpics([['river'],['river'],['riverB']])},
+ {phase:'river',title:'Follow the river',text:'River tiles come first. Each river tile must continue the river.',pic:()=>hpics([['river'],['river'],['riverB']])},
  {phase:'river',title:'No double turns',text:'The river may not turn the same way twice in a row.',pic:()=>hpics([['riverB','Turn'],['riverB2','Other way']])},
- {phase:'river',title:'Then the valley',text:'After the last river tile, normal tiles begin and you build outward.',pic:()=>hpics([['river'],'>',['town']])},
+ {phase:'river',title:'Then the valley',text:'After the last river tile, you play normal tiles.',pic:()=>hpics([['river'],'>',['town']])},
  {phase:'fig',title:'Claim with a follower',text:'Tap a glowing circle to put a follower on that road, town, priory or field.',pic:()=>hpics([['meeple','Follower'],'>',['road','Road']])},
  {phase:'fig',title:'One owner only',text:'You cannot claim a road, town or field that already has a follower anywhere along it.',pic:()=>hpics([['meeple','Taken'],['lock']])},
  {phase:'fig',title:'Scored followers go home',text:'When it closes, the owner scores and the follower returns, ready to use again.',pic:()=>hpics([['pts','Score','+6'],'>',['home','Home']])},
  {phase:'fig',title:'Farmers wait',text:'A farmer in a field stays until the end. It scores 3 for each finished town beside it.',pic:()=>hpics([['meeple','Farmer'],'>',['pts','Per town','+3']])},
- {phase:'figx',title:'The mason',text:'Place a mason on a road or town you already hold. Each tile that grows it gives an extra turn.',pic:()=>hpics([['mason','Mason'],'>',['road']])},
+ {phase:'figx',title:'The mason',text:'Put a mason on your own road or town. Each tile added gives an extra turn.',pic:()=>hpics([['mason','Mason'],'>',['road']])},
  {phase:'figx',title:'The hog',text:'Place a hog in a field where your farmer stands. Each finished town beside it scores 4, not 3.',pic:()=>hpics([['hog','Hog'],'>',['pts','Per town','+4']])},
  {phase:'figx',title:'Only with your own',text:'Both need your own follower on that same road, town or field first.',pic:()=>hpics([['meeple','Yours'],['mason','Mason']])},
  {phase:'nofig',title:'Nothing free',text:'Every road, town and field on this tile already has a follower. Tap Skip.',pic:()=>hpics([['lock'],'>',['skip','Skip']])},
  {phase:'nofig',title:'Followers come back',text:'Close a feature and its followers return. You start with seven.',pic:()=>hpics([['meeple','Waiting'],'>',['home','Home']])},
- {title:'House rules',text:'The first seat always starts. The mason’s extra turn counts even when its tile finishes the feature. Tile art follows common open sets.',pic:()=>hpics([['tap','Seat 1 starts']])}
+ {title:'House rules',text:'The first player always starts. A mason’s extra turn counts even if that tile finishes the road or town.',pic:()=>hpics([['tap','Seat 1 starts']])}
 ];
 // ---------------------------------------------------------------- the advice: the normal computer's own pick
 const HLPS={key:'',plan:null};
@@ -71,13 +71,13 @@ function hlpWhyPlace(pl,s){for(const w of pl.why||[]){
     if(w.k==='priory')return 'Surrounds your priory: +9 points.'}
   if(pl.bonus)return 'Your mason earns an extra turn here.';
   if(pl.figOpt)return `A good spot to claim a ${FEAT[pl.figOpt.g.ty]}.`;
-  return 'The safest spot: it keeps your options open.'}
+  return 'A safe spot. It keeps your choices open.'}
 function hlpWhyFig(m,s){if(m.act==='skip')return 'Nothing here is worth a follower. Skip.';
   const ty=TSEG[G.tiles[G.cur.k].t][m.l].ty;
   if(m.k==='bld')return 'Mason here: each tile that grows it gives an extra turn.';
   if(m.k==='pig')return 'Hog here: each finished town beside it scores 4, not 3.';
   if(m.k==='big')return `Your champion counts as two on this ${FEAT[ty]}.`;
-  return ty==='F'?'Send a farmer into this field. It pays at the end.':ty==='M'?'Put a follower on this priory.':`Claim this ${FEAT[ty]} with a follower.`}
+  return ty==='F'?'Put a farmer in this field. It scores at the end.':ty==='M'?'Put a follower on this priory.':`Claim this ${FEAT[ty]} with a follower.`}
 // bring the suggested square into view (turn the tile, pan the map) so the glow, finger and bulb all land on it
 function hlpTurnTo(r){UI.deg+=((r-UI.rot+4)%4||4)*90;UI.rot=r;renderGlows();updateGhost();placeOverlay();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
 function hlpSuggest(){const h=hlpPlan();if(!h)return null;const m=h.move;
