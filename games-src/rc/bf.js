@@ -27,7 +27,7 @@ function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q(
   // the labels loop moves the chips and the finger with the camera
   if(typeof placeLabels==='function'){const pl0=placeLabels;placeLabels=function(){pl0.apply(this,arguments);if(BF.on)BF.place()}}
   // short messages go to the status line, never into the hidden dock
-  if(typeof toast==='function'){const t0=toast;toast=function(t,ms,keep){if(BF.on){const s=/^✨ Every pawn/.test(t||'')?'Plan ready. Check it, then start.':brief(t);BF.say(s,Math.min(ms||3200,3800))}else t0.apply(this,arguments)}}}
+  if(typeof toast==='function'){const t0=toast;toast=function(t,ms,keep){if(BF.on){const s=/^✨ Every pawn/.test(t||'')?'Plan ready. Check it, then start.':brief(t);BF.say(s,ms)}else t0.apply(this,arguments)}}}
 // ---------- geometry ----------
 function tilePt(id){const ov=q('#bfov');if(!ov)return null;const r0=ov.getBoundingClientRect();
   if(typeof V3!=='undefined'&&V3.on&&V3.cam&&V3.r&&typeof MAP!=='undefined'&&MAP[id]){const p=hexPos(MAP[id].q,MAP[id].r);const v=new THREE.Vector3(p.x,HEXH,p.z);V3.cam.updateMatrixWorld();v.project(V3.cam);
@@ -74,7 +74,9 @@ BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=n
   const st=PHO.st;if(st==='story'){const i=storyIdx();if(i<0)return '';const last=i>=UI.beats.length-1;if(last&&humanQ())return posQ()?'Tap a glowing space':brief(G.q.title);return w8(capFor(i))}
   if(st==='plan'||st==='plan2')return w8(planCap(st));if(st==='over')return G.over&&G.over.win?'Rescued!':'Lost on the island';
   if(allAI())return UI.pause?'Paused':'The computer is playing';return 'The castaways are working'};
-BF.say=function(t,ms){BF.msg={t:w8(t),until:Date.now()+(ms||3000)};BF.paint();clearTimeout(BF.msgT);BF.msgT=setTimeout(()=>{BF.msg=null;BF.paint()},(ms||3000)+30)};
+// owner 8 Nov: a message stays at least 4 s plus 1 s per 10 words, so it can be read before it goes
+const readMs=(t,ms)=>Math.max(ms||0,4000+1000*Math.ceil(String(t||'').split(/\s+/).filter(Boolean).length/10));
+BF.say=function(t,ms){t=w8(t);ms=readMs(t,ms);BF.msg={t,until:Date.now()+ms};BF.paint();clearTimeout(BF.msgT);BF.msgT=setTimeout(()=>{BF.msg=null;BF.paint()},ms+30)};
 // whose turn it is: a small banner above the one instruction line (owner 7 Nov: "if I cannot understand it in a minute it is unplayable")
 function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you','Your turn: plan the day'];if(st==='over')return ['end','Game over'];
   if(st==='story'){const i=storyIdx();if(i<0)return ['isl',''];const last=i>=UI.beats.length-1;if(last&&humanQ())return ['you','Your choice'];const k=UI.beats[i].kind;
@@ -184,7 +186,7 @@ BF.ghostPlace=function(){const gh=q('#bfgh');if(!gh)return;let s=null;try{s=ghos
 BF.info=function(){const d=GX.drawer('detd','Details',null);fillInfo();GX.show('detd');return d};
 function fillInfo(){const d=document.getElementById('detd');if(!d)return;const b=d.querySelector('.gx-drawer-body');let h='';
   try{const i=storyIdx();if(i>=0){const el=q('#story .scene');if(el){const c=el.cloneNode(true);c.querySelectorAll('.sctl,.opts,.phead,.gtip,.qk,.qmore').forEach(x=>x.remove());h=`<div class="detscene">${c.innerHTML}</div>`}}
-    else if(planOpen()){h=`<div class="detscene">${goalCard()}${wzNeeds()}</div>`}else h='<p class="muted">Nothing to show right now.</p>'}catch(e){h='<p class="muted">Nothing to show right now.</p>'}
+    else if(planOpen()){h=`<div class="detscene">${wzNeeds()}</div>`}else h='<p class="muted">Nothing to show right now.</p>'}catch(e){h='<p class="muted">Nothing to show right now.</p>'}
   if(b.dataset.h!==h){b.dataset.h=h;b.innerHTML=h}}
 // ---------- the pop-up for a tapped place: only jobs this pawn can do ----------
 BF.tilePop=function(id){const cur=curPawn();if(!cur)return null;const rec=recPlan().map[cur.id];const rows=legalRows(id,cur);const camp=id===G.camp.pos;let h='';
@@ -244,3 +246,18 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#musbtn,#speedbtn,#sndbtn,.gxh-set button');if(!t)return;
     t.setAttribute('data-tapn',String((+t.getAttribute('data-tapn')||0)+1));setTimeout(sw,80);
     if(t.dataset.gxh==='reset'&&!t.dataset.rs){t.dataset.rs=1;const o=t.textContent;t.textContent='Tips reset ✓';setTimeout(()=>{t.textContent=o;delete t.dataset.rs},1800)}},true)})();
+
+// drag the real pawn onto a glowing place (owner 8 Nov: "drag the real piece, legal spots glow, it snaps with a vibrate tick").
+// A plain tap still works as before; a drag picks the pawn up, the nearest glowing place lights up, and the drop opens that place.
+(function(){let d=null,swallow=0;const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}};
+  const near=(x,y)=>{let best=null,bd=60;for(const g of document.querySelectorAll('#bfglow .bfgl')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect();const dx=r.left+r.width/2-x,dy=r.top+r.height/2-y,dd=Math.hypot(dx,dy);if(dd<bd){bd=dd;best=g}}return best};
+  document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#bf .bfpw');if(!b||!BF.on||PHO.st!=='plan2')return;d={b,x:e.clientX,y:e.clientY,id:e.pointerId,on:false,el:null,hot:null}},true);
+  document.addEventListener('pointermove',e=>{if(!d||e.pointerId!==d.id)return;if(!d.on){if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<14)return;d.on=true;
+      if(!d.b.classList.contains('on'))d.b.click();const el=d.b.cloneNode(true);el.removeAttribute('data-pawn');el.className+=' bfdrag';el.setAttribute('aria-hidden','true');document.body.appendChild(el);d.el=el;buzz()}
+    d.el.style.transform=`translate(${e.clientX-28}px,${e.clientY-60}px) scale(1.15)`;const h=near(e.clientX,e.clientY);if(h!==d.hot){if(d.hot)d.hot.classList.remove('hot');if(h){h.classList.add('hot');buzz()}d.hot=h}},true);
+  const up=e=>{if(!d||e.pointerId!==d.id)return;const dd=d;d=null;if(!dd.on)return;if(dd.el)dd.el.remove();swallow=Date.now()+400;const g=near(e.clientX,e.clientY);if(dd.hot)dd.hot.classList.remove('hot');
+    if(g&&e.type==='pointerup'){const id=+g.dataset.t;buzz();g.classList.add('snap');setTimeout(()=>g.classList.remove('snap'),400);if(typeof on3DTile==='function')on3DTile(id);else PHO.tile(id)}};
+  document.addEventListener('pointerup',up,true);document.addEventListener('pointercancel',up,true);
+  document.addEventListener('click',e=>{if(Date.now()<swallow){swallow=0;e.stopPropagation();e.preventDefault()}},true);
+  // a small tick when a job lands in the plan, however it was placed
+  let n=-1;setInterval(()=>{try{if(!BF.on||!G||!G.plan)return;const k=G.plan.acts.reduce((s,a)=>s+a.pw.length,0);if(n>=0&&k>n)buzz();n=k}catch(e){}},200)})();
