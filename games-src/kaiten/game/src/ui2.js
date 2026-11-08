@@ -2,6 +2,7 @@
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) UI.focus = v; return UI.focus || 0; }
 function render() {
+  document.documentElement.classList.toggle('kkend', !!(G && UI.started && G.phase === 'over'));   // game over: the trays show their own (dimmed) dish art, never empty outlines
   if (!G || !UI.started) return;
   renderBar(); renderTable(); renderBelt(); renderDock();
   try { renderDrawers(); } catch (e) { }
@@ -104,7 +105,7 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   const gl = gs.list.slice(); if (isMe && twinReady()) gl.sort((x, y) => (y.k === 'chop') - (x.k === 'chop'));   // the glowing Twin Sticks come first, never scrolled out of the tray
   for (const g of gl) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
   if (pcs[s] || !isPh()) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // phones: the custard spot appears with the first cup (the dock lists custard)
-  if (!gs.list.length && !pcs[s]) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);
+  if (!gs.list.length && !pcs[s] && !(s === viewSeat() && (G.players[s].picked || UI.busy))) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);   // your tray drops the label once your dish is on its way
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
   return el;
