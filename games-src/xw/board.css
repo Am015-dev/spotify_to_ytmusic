@@ -264,3 +264,15 @@ html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info::before{content:"";display:block
 #ppop .pp-more>summary::-webkit-details-marker{display:none}
 /* the dock is see-through while the ship drawer is up: it must not swallow taps meant for the board and its buttons */
 html.ph.ph-p.ph-info:not(.ph-big) .gx-dock{pointer-events:none!important}html.ph.ph-p.ph-info:not(.ph-big) #ppop{pointer-events:auto!important}
+
+/* fire step: a plain-words label over the best target; defence/attack modifier buttons carry a one-line explanation */
+.bftlab{position:absolute;left:0;top:0;z-index:3;pointer-events:none;white-space:nowrap;padding:6px 12px;border-radius:12px;background:rgba(40,6,14,.92);border:2px solid #ffc86b;color:#fff;font:800 14px/1.1 "Exo 2",sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+#bfl>.bftlab{z-index:3}
+#bfbtns .btn small.msub{display:block;margin-top:2px;font:600 11px/1.15 "Exo 2",sans-serif;opacity:.85;white-space:normal}
+html.ph #bfbtns .btn small.msub{font-size:11px}
+/* maneuver dial: a compact grid above the bottom bar (every option visible, nothing under the buttons, the ship stays clear) */
+#bfdial{bottom:calc(var(--dbar,122px) + var(--sab,0px));height:auto;width:min(352px,94vw);left:50%}
+#bfdial .dface{position:relative;inset:auto;border-radius:16px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px;justify-items:center;background:rgba(8,6,24,.9);border:2px solid rgba(255,255,255,.2);touch-action:manipulation;cursor:pointer}
+#bfdial .dface::before,#bfdial .dhub{display:none}
+#bfdial .ditem{position:static;margin:0;width:56px;height:44px;border-radius:12px;transform:none!important}
+#bfdial .dwin{bottom:calc(100% + 6px)}
