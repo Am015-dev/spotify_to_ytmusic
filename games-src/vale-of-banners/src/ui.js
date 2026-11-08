@@ -366,7 +366,7 @@ function autoZoom() {   /* small phones: when build spaces glow and would be und
   var need = 46 / (L.s * 1.732); if (need <= 1.02) return;
   var gl = [].slice.call(document.querySelectorAll('#es .cell.glow')), drag = !!(FEEL.drag && FEEL.drag.on);
   if (!gl.length || !myTurn()) { if (UI.autoZ) { UI.autoZ = null; if (!drag) camReset(true); } return; }
-  var key = gl.map(function (e) { return e.getAttribute('data-ci'); }).join(','); if (UI.autoZ === key) return;
+  var key = gl.map(function (e) { return e.getAttribute('data-ci'); }).join(','); if (UI.autoZ === key) { var er = $('#es').getBoundingClientRect(); if (gl.every(function (e) { var r = e.getBoundingClientRect(), x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2; return x > er.left && x < er.right && y > er.top && y < er.bottom; })) return; }   /* same spaces, but re-centre if one drifted out of view */
   if (FEEL.cam.z > 1.02 && !UI.autoZ) return;   /* the player zoomed by hand: leave it */
   var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
   gl.forEach(function (e) { var xy = cellXY(VB.CELLS[+e.getAttribute('data-ci')], L.s, L.ew, L.eh); x0 = Math.min(x0, xy.x); x1 = Math.max(x1, xy.x); y0 = Math.min(y0, xy.y); y1 = Math.max(y1, xy.y); });
@@ -718,7 +718,7 @@ function doMove(m) {
         if (ev.p !== UI.view) { setCap(G.seats[ev.p].name + ' builds ' + aName(ev.tile) + (ev.chain ? ', for free' : '')); return rivalPeek(ev); }
         var dst = 'ec-' + ev.cell, el = document.getElementById(dst); if (el) el.style.visibility = 'hidden';
         if (ev.chain && prevCell != null) ribbon(rectOf('ec-' + prevCell), rectOf(dst));
-        var z0 = FEEL.cam.z; if (L.tabs && !UI.autoZ && z0 <= 1.02) UI.autoZ = 'anim';   /* an animation zoom is not a hand zoom: autoZoom may undo it */
+        var z0 = FEEL.cam.z; if (L.tabs && (UI.autoZ || z0 <= 1.02)) UI.autoZ = 'anim';   /* an animation zoom is not a hand zoom: autoZoom may undo it */
         return (L.tabs ? camTo(ev.cell, Math.max(z0, 1.3)) : camTo(ev.cell)).then(function () { if (!src) src = rectOf('st-0'); return fly(src, rectOf(dst), ev.tile); }).then(function () { buzz(10); if (el) { el.style.visibility = ''; el.animate && el.animate([{ transform: 'translate(-50%,-50%) scale(1.25)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: animMs(260) || 1 }); } if (ev.chain && chainNow > 1) popAt(rectOf(dst), 'Chain of ' + chainNow); if (L.tabs && z0 <= 1.01) setTimeout(function () { if (!(FEEL.drag && FEEL.drag.on)) camReset(true); }, animMs(700)); });
       }
       if (ev.e === 'score') { sfx('score'); var rr = ev.cell != null && ev.p === UI.view ? rectOf('ec-' + ev.cell) : rectOf('r-vp'); if (ev.p !== UI.view) { var pc = UI.peekCell && ev.cell != null ? UI.peekCell.getBoundingClientRect() : null, oc = document.querySelector('.och[data-seat="' + ev.p + '"]'); rr = pc || (oc && oc.getBoundingClientRect()); } var why = '+' + ev.n + ' ' + (WHY[ev.why] || 'points'); if (ev.why === 'region' && ev.cell != null && hints()) { var bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; why += ' (' + (ev.n - bz) + ' size + ' + bz + ' early)'; } if (ev.why === 'region' && ev.cell != null) flashRegion(ev.cell, ev.p); popAt(rr, why); if (ev.p !== UI.view) setCap(G.seats[ev.p].name + ': ' + why); return Promise.all([flyPts(rr, scoreEl(ev.p), '+' + ev.n), wait(UI.quick ? 80 : animMs(ev.why === 'region' ? 900 : 550))]).then(function () { renderOpp(); }); }
