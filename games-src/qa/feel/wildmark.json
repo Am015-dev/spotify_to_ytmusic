@@ -1,165 +1,877 @@
 {
  "slug": "wildmark",
- "when": "2026-11-08T02:37Z",
- "secs": 30,
- "totalSecs": 121,
+ "when": "2026-11-08T09:22Z",
+ "secs": 180,
+ "totalSecs": 722,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 4,
+   "count": 6,
    "detail": [
     {
-     "kind": "two-at-once",
+     "kind": "too-short",
      "session": "phone/learn",
-     "ms": 493,
-     "texts": [
-      "Rowan Salmon score in runs: a chain where each sal",
-      "One terrain: no need to turn it."
-     ]
+     "text": "⚠ +2 this turn: Fox sees a new kind of animal (1 → 3 points, +2). Poor move. Best was the Bear column for up to +6.",
+     "words": 27,
+     "shownMs": 250,
+     "neededMs": 6700,
+     "cls": "vd poor"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "⚠ +1 this turn: Fox sees a new kind of animal (0 → 1 points, +1). Poor move. Best was the Elk column for up to +4. The hint liked the Salmon column for later tu",
+     "words": 36,
+     "shownMs": 250,
+     "neededMs": 7600,
+     "cls": "vd poor"
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "⚠ +1 this turn: river grows to 2 (+1). Poor move.",
-      "Rowan Bram's turn. Watch the caption: he takes, pl"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "⚠ +1 this turn: river grows to 2 (+1). Poor move.",
+      "⚠ No points this turn. Poor move. Best was the Sal",
       "Best fit for your patterns and habitats. How does "
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
+     "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "Rowan Bears score in pairs: groups of exactly 2 to",
-      "One terrain: no need to turn it."
+      "⚠ +1 this turn: meadow grows to 2 (+1). Poor move.",
+      "Rowan Three alike in the market. You may sweep the"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 500,
+     "texts": [
+      "● +1 this turn: Fox sees a new kind of animal (0 →",
+      "Rowan Four alike: the market clears them by itself"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/play",
+     "ms": 1499,
+     "texts": [
+      "Bram +4: Salmon run, peak",
+      "Any tile, then any token"
      ]
     }
    ]
   },
   "b": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
+   "status": "FAIL",
+   "count": 68,
+   "detail": [
+    {
+     "session": "phone/play",
+     "text": "You: no points this turn",
+     "ms": 1254,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +5: Salmon run, peak",
+     "ms": 1208,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You: no points this turn",
+     "ms": 1748,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +6: Salmon run, river",
+     "ms": 3250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You: no points this turn",
+     "ms": 503,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 1000,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 5750,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 750,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You +4: Elk line, meadow",
+     "ms": 1764,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +5: lone Hawk, peak",
+     "ms": 4500,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +5: lone Hawk, peak",
+     "ms": 4249,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You +4: Salmon run, river",
+     "ms": 1755,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +4: peak, river",
+     "ms": 1458,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +4: peak, river",
+     "ms": 3248,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You: no points this turn",
+     "ms": 1763,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +4: Fox neighbours, peak",
+     "ms": 3750,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You +2: Salmon run",
+     "ms": 1751,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +5: Elk line, Fox neighbours",
+     "ms": 5434,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You +2: Elk line",
+     "ms": 1755,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +6: Elk line, forest",
+     "ms": 4490,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You +2: forest",
+     "ms": 1754,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +5: Bear pair, peak",
+     "ms": 7505,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You +3: Fox neighbours, acorn",
+     "ms": 2007,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +5: lone Hawk, meadow",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +5: lone Hawk, meadow",
+     "ms": 3746,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +5: lone Hawk, meadow",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You +2: Elk line",
+     "ms": 750,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram +4: Elk line",
+     "ms": 6004,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You +5: Bear pair, Fox neighbours",
+     "ms": 1250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You +2: river",
+     "ms": 749,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: Elk line, river",
+     "ms": 2460,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You: no points this turn",
+     "ms": 750,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 1995,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 8244,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 1546,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 1767,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You +2: lone Hawk",
+     "ms": 1764,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: lone Hawk, meadow",
+     "ms": 1499,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: lone Hawk, meadow",
+     "ms": 1250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You +5: Bear pair, acorn",
+     "ms": 1751,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +6: Elk line, forest",
+     "ms": 5444,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You +3: Fox neighbours, river",
+     "ms": 1782,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: Salmon run, river",
+     "ms": 3228,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: Salmon run, river",
+     "ms": 6241,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You +1: Fox neighbours",
+     "ms": 1751,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: Fox neighbours, meadow",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: Fox neighbours, meadow",
+     "ms": 717,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: Fox neighbours, meadow",
+     "ms": 2246,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You: no points this turn",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Any tile, then any token",
+     "ms": 250,
+     "cls": "hint1",
+     "tag": "span"
+    },
+    {
+     "session": "pc/play",
+     "text": "Any tile, then any token",
+     "ms": 250,
+     "cls": "hint1",
+     "tag": "span"
+    },
+    {
+     "session": "pc/play",
+     "text": "Any tile, then any token",
+     "ms": 1000,
+     "cls": "hint1",
+     "tag": "span"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 3211,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 1745,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +4: Salmon run, peak",
+     "ms": 2463,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You: no points this turn",
+     "ms": 2000,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bram +5: Elk line, acorn",
+     "ms": 5446,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You: no points this turn",
+     "ms": 1757,
+     "cls": "",
+     "tag": "div"
+    }
+   ]
   },
   "c": {
    "status": "FAIL",
-   "count": 20,
+   "count": 60,
    "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Foxes: you have no foxes yet = 0 points (1 point per different animal next to each fox)",
-     "words": 18,
-     "at": 9003,
-     "where": "p.wl.me"
-    },
     {
      "session": "phone/learn",
      "text": "Salmon: you have no runs yet = 0 points (runs of 1-7 = 2, 5, 8, 12, 16, 20, 25)",
      "words": 20,
-     "at": 12002,
+     "at": 8252,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Foxes: you have no foxes yet = 0 points (1 point per different animal next to each fox)",
+     "words": 18,
+     "at": 11251,
      "where": "p.wl.me"
     },
     {
      "session": "phone/learn",
      "text": "Bears: you have no pairs yet = 0 points (pairs 1, 2, 3, 4 = 4, 11, 19, 27)",
      "words": 19,
-     "at": 16003,
+     "at": 13252,
      "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Foxes: Bram has no foxes yet = 0 points (1 point per different animal next to each fox)",
+     "words": 18,
+     "at": 25252,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Each half counts for its own terrain; edges must match to join a habitat.",
+     "words": 14,
+     "at": 27252,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Salmon: Bram has no runs yet = 0 points (runs of 1-7 = 2, 5, 8, 12, 16, 20, 25)",
+     "words": 20,
+     "at": 39252,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "1: 2 · 2: 5 · 3: 8 · 4: 12 · 5: 16 · 6: 20 · 7+: 25",
+     "words": 20,
+     "at": 40253,
+     "where": "p.pts"
     },
     {
      "session": "phone/learn",
      "text": "Bears: Bram has no pairs yet = 0 points (pairs 1, 2, 3, 4 = 4, 11, 19, 27)",
      "words": 19,
-     "at": 19002,
+     "at": 42252,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Hawks: Bram has no lone hawks yet = 0 points (lone hawks 1-8 = 2, 5, 8, 11, 14, 18, 22, 26)",
+     "words": 22,
+     "at": 45252,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Hawks: you have no lone hawks yet = 0 points (lone hawks 1-8 = 2, 5, 8, 11, 14, 18, 22, 26)",
+     "words": 22,
+     "at": 49252,
      "where": "p.wl.me"
     },
     {
      "session": "phone/learn",
      "text": "Elk: Bram has no elk yet = 0 points (lines of 1, 2, 3, 4 = 2, 5, 9, 13)",
      "words": 20,
-     "at": 25002,
+     "at": 53252,
      "where": "p.wl.me"
     },
     {
      "session": "phone/learn",
-     "text": "Hawks: Bram has 1 lone hawk = 2 points (lone hawks 1-8 = 2, 5, 8, 11, 14, 18, 22, 26)",
+     "text": "Elk: you have no elk yet = 0 points (lines of 1, 2, 3, 4 = 2, 5, 9, 13)",
+     "words": 20,
+     "at": 57252,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "+1 this turn: Fox sees a new kind of animal (0 → 1 points, +1).",
+     "words": 15,
+     "at": 82251,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Salmon: Bram has a run of 1 = 2 points (runs of 1-7 = 2, 5, 8, 12, 16, 20, 25)",
      "words": 21,
-     "at": 27001,
+     "at": 91252,
      "where": "p.wl.me"
     },
     {
      "session": "phone/learn",
-     "text": "Each half counts for its own terrain; edges must match to join a habitat.",
+     "text": "Home to a (Curious Fox: Each fox: 1 point per different animal next to it.)",
+     "words": 15,
+     "at": 92252,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "+2 this turn: Fox sees a new kind of animal (1 → 3 points, +2).",
+     "words": 15,
+     "at": 116251,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Foxes: you have 2 foxes next to 2 + 1 kinds = 3 points (1 point per different animal next to each fox)",
+     "words": 23,
+     "at": 122252,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "+5 this turn: Elk line of 1 (0 → 2 points, +2), Fox sees a new kind of animal (3 → 4 points, +1), peak grows to 2 (+1), forest grows to 2 (+1).",
+     "words": 34,
+     "at": 133252,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Elk line of 1 (0 → 2 points, +2), Fox sees a new kind of animal (3 → 4 points, +1)",
+     "words": 21,
+     "at": 133252,
+     "where": "div.pop.ani"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Animals by their cards: Bear 0, Elk 2, Salmon 0, Hawk 0, Fox 4 =",
+     "words": 15,
+     "at": 136252,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Biggest joined habitat per terrain: , plus bonus for beating Bram in a terrain (+2, a tie +1).",
+     "words": 18,
+     "at": 136252,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "A tie goes to whoever has more acorns left; still tied, you share the win.",
+     "words": 15,
+     "at": 136252,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Salmon score in runs: a chain where each salmon touches at most 2 others.",
      "words": 14,
-     "at": 30008,
+     "at": 136252,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Settling an animal there earns an acorn: 1 point at the end, or a favour now.",
+     "words": 16,
+     "at": 136252,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Tap \"Use acorn\": a free pick takes any tile with any animal, or replace the animals on offer.",
+     "words": 18,
+     "at": 136252,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Home to a (Fox Favourite: Each fox: 1 point per animal of the most common kind next to it (not foxes).)",
+     "words": 21,
+     "at": 154252,
      "where": "p."
     },
     {
      "session": "phone/play",
      "text": "score by their card: bears in pairs, elk in lines, salmon in runs, lone hawks, foxes next to different animals.",
      "words": 20,
-     "at": 2002,
+     "at": 2001,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": ": each terrain scores 1 point per tile in your largest joined area, +2 if yours is the biggest.",
      "words": 19,
-     "at": 2002,
+     "at": 2004,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": "Each turn: take a tile with its animal, add the tile, place the animal.",
      "words": 14,
-     "at": 2002,
+     "at": 2004,
      "where": "p.g2"
     },
     {
      "session": "phone/play",
      "text": "Each half counts for its own terrain; edges must match to join a habitat.",
      "words": 14,
-     "at": 5009,
+     "at": 12004,
      "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "Home to a (River Runs: Chains of salmon, each touching at most 2 salmon.)",
+     "words": 14,
+     "at": 28002,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "Home to a (Curious Fox: Each fox: 1 point per different animal next to it.)",
+     "words": 15,
+     "at": 124004,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Settling an animal there earns an acorn: 1 point at the end, or a favour now.",
+     "words": 16,
+     "at": 11002,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "1: 2 · 2: 5 · 3: 8 · 4: 12 · 5: 16 · 6: 20 · 7+: 25",
+     "words": 20,
+     "at": 11004,
+     "where": "p.pts"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Elk: Bram has a line of 1 = 2 points (lines of 1, 2, 3, 4 = 2, 5, 9, 13)",
+     "words": 21,
+     "at": 20003,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Bears: Bram has no pairs yet = 0 points (pairs 1, 2, 3, 4 = 4, 11, 19, 27)",
+     "words": 19,
+     "at": 22006,
+     "where": "p.wl.me"
     },
     {
      "session": "pc/learn",
      "text": "Elk: you have no elk yet = 0 points (lines of 1, 2, 3, 4 = 2, 5, 9, 13)",
      "words": 20,
-     "at": 14002,
+     "at": 25003,
      "where": "p.wl.me"
     },
     {
      "session": "pc/learn",
      "text": "Hawks: you have no lone hawks yet = 0 points (lone hawks 1-8 = 2, 5, 8, 11, 14, 18, 22, 26)",
      "words": 22,
-     "at": 22006,
+     "at": 26003,
      "where": "p.wl.me"
     },
     {
      "session": "pc/learn",
      "text": "Each half counts for its own terrain; edges must match to join a habitat.",
      "words": 14,
-     "at": 23002,
+     "at": 39002,
      "where": "p."
     },
     {
      "session": "pc/learn",
-     "text": "Salmon: Bram has no runs yet = 0 points (runs of 1-7 = 2, 5, 8, 12, 16, 20, 25)",
-     "words": 20,
-     "at": 25002,
+     "text": "Foxes: Bram has no foxes yet = 0 points (1 point per different animal next to each fox)",
+     "words": 18,
+     "at": 44002,
      "where": "p.wl.me"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Hawks: Bram has no lone hawks yet = 0 points (lone hawks 1-8 = 2, 5, 8, 11, 14, 18, 22, 26)",
+     "words": 22,
+     "at": 45002,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Bonus: the biggest area of a terrain earns +2 (a tie +1 each).",
+     "words": 13,
+     "at": 53004,
+     "where": "p.note"
+    },
+    {
+     "session": "pc/learn",
+     "text": "+1 this turn: Fox sees a new kind of animal (0 → 1 points, +1).",
+     "words": 15,
+     "at": 63005,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Bears: you have no pairs yet = 0 points (pairs 1, 2, 3, 4 = 4, 11, 19, 27)",
+     "words": 19,
+     "at": 69002,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "pc/learn",
+     "text": "+3 this turn: Fox sees a new kind of animal (1 → 3 points, +2), marsh grows to 2 (+1).",
+     "words": 20,
+     "at": 70002,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Foxes: Bram has a fox next to 2 kinds = 2 points (1 point per different animal next to each fox)",
+     "words": 21,
+     "at": 91002,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Foxes: you have 2 foxes next to 2 + 1 kinds = 3 points",
+     "words": 14,
+     "at": 91002,
+     "where": "p.wl.riv"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Home to a (Curious Fox: Each fox: 1 point per different animal next to it.)",
+     "words": 15,
+     "at": 94005,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Salmon: you have no runs yet = 0 points (runs of 1-7 = 2, 5, 8, 12, 16, 20, 25)",
+     "words": 20,
+     "at": 95046,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "pc/learn",
+     "text": "+4 this turn: Salmon run of 1 (0 → 2 points, +2), Fox sees a new kind of animal (3 → 4 points, +1), keystone acorn (+1).",
+     "words": 27,
+     "at": 112016,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Animals by their cards: Bear 0, Elk 0, Salmon 2, Hawk 0, Fox 4 =",
+     "words": 15,
+     "at": 115005,
+     "where": "li."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Biggest joined habitat per terrain: , plus bonus for beating Bram in a terrain (+2, a tie +1).",
+     "words": 18,
+     "at": 115005,
+     "where": "li."
+    },
+    {
+     "session": "pc/learn",
+     "text": "A tie goes to whoever has more acorns left; still tied, you share the win.",
+     "words": 15,
+     "at": 115005,
+     "where": "li."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Home to a (River Runs: Chains of salmon, each touching at most 2 salmon.)",
+     "words": 14,
+     "at": 149003,
+     "where": "p."
     },
     {
      "session": "pc/play",
@@ -186,191 +898,29 @@
      "session": "pc/play",
      "text": "Each half counts for its own terrain; edges must match to join a habitat.",
      "words": 14,
-     "at": 5001,
+     "at": 5005,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "Home to a (River Runs: Chains of salmon, each touching at most 2 salmon.)",
      "words": 14,
-     "at": 8001,
+     "at": 30002,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Home to a (Curious Fox: Each fox: 1 point per different animal next to it.)",
+     "words": 15,
+     "at": 143002,
      "where": "p."
     }
    ]
   },
   "d": {
-   "status": "FAIL",
-   "count": 24,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Ten chapters",
-     "px": 13,
-     "at": 1003,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "0",
-     "px": 13,
-     "at": 2043,
-     "where": "span.rv"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Bear",
-     "px": 13,
-     "at": 2043,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Elk",
-     "px": 13,
-     "at": 2043,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Salmon",
-     "px": 13,
-     "at": 2043,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Hawk",
-     "px": 13,
-     "at": 2043,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Fox",
-     "px": 13,
-     "at": 2043,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Largest area",
-     "px": 13,
-     "at": 2043,
-     "where": "span.tl"
-    },
-    {
-     "session": "phone/learn",
-     "text": "you",
-     "px": 13,
-     "at": 2043,
-     "where": "b.me"
-    },
-    {
-     "session": "phone/learn",
-     "text": "·",
-     "px": 13,
-     "at": 2043,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Bram",
-     "px": 13,
-     "at": 2043,
-     "where": "b.riv"
-    },
-    {
-     "session": "phone/learn",
-     "text": "1",
-     "px": 13,
-     "at": 2043,
-     "where": "span.rv"
-    },
-    {
-     "session": "phone/learn",
-     "text": "up to +2",
-     "px": 13,
-     "at": 2044,
-     "where": "span.gain"
-    },
-    {
-     "session": "phone/learn",
-     "text": "up to +3",
-     "px": 13,
-     "at": 2044,
-     "where": "span.gain"
-    },
-    {
-     "session": "phone/learn",
-     "text": "up to +4",
-     "px": 13,
-     "at": 2044,
-     "where": "span.gain.best"
-    },
-    {
-     "session": "phone/learn",
-     "text": "2",
-     "px": 13,
-     "at": 19002,
-     "where": "span.rv.lead"
-    },
-    {
-     "session": "phone/learn",
-     "text": "no points",
-     "px": 13,
-     "at": 20004,
-     "where": "span.gain.nil"
-    },
-    {
-     "session": "phone/learn",
-     "text": "up to +1",
-     "px": 13,
-     "at": 20004,
-     "where": "span.gain"
-    },
-    {
-     "session": "phone/learn",
-     "text": "up to +5",
-     "px": 13,
-     "at": 20004,
-     "where": "span.gain.best"
-    },
-    {
-     "session": "phone/play",
-     "text": "Ten chapters",
-     "px": 13,
-     "at": 1002,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "Salmon",
-     "px": 13,
-     "at": 2002,
-     "where": "i."
-    },
-    {
-     "session": "phone/play",
-     "text": "Bear",
-     "px": 13,
-     "at": 2002,
-     "where": "i."
-    },
-    {
-     "session": "phone/play",
-     "text": "Fox",
-     "px": 13,
-     "at": 22001,
-     "where": "i."
-    },
-    {
-     "session": "phone/play",
-     "text": "Elk",
-     "px": 13,
-     "at": 23001,
-     "where": "i."
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
    "status": "PASS",
@@ -386,46 +936,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 101,
-   "clicks": 101,
-   "endedBy": "time",
+   "secs": 180,
+   "turns": 681,
+   "clicks": 738,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 18
+   "messagesSeen": 58
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 30,
-   "turns": 108,
-   "clicks": 115,
+   "secs": 180,
+   "turns": 690,
+   "clicks": 768,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 0
+   "messagesSeen": 30
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 74,
-   "clicks": 84,
-   "endedBy": "time",
+   "secs": 180,
+   "turns": 718,
+   "clicks": 764,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 6
+   "messagesSeen": 70
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 111,
-   "clicks": 125,
+   "secs": 180,
+   "turns": 726,
+   "clicks": 820,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 0
+   "messagesSeen": 38
   }
  ]
 }
