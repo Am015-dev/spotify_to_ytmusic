@@ -219,3 +219,6 @@ html.sk.ph .btn.gx-gear{border-width:10px;border-image-width:10px;padding:0}
 html.sk .dlg h4{padding-left:8px;padding-right:8px}
 html.sk.ph .btn.gx-gear:not(.sm):not(.ghost){border-width:10px;border-image-width:10px;padding:0}
 html.sk.ph .btn#phcam{border-width:10px;border-image-width:10px;padding:0}
+/* owner rule (8 Nov): no phone text under 14 px. Ship tags, the score strip, maneuver cards and the legend */
+html.ph #tags .tag,html.ph #tags .tag *,html.ph #bftop,html.ph #bftop *,html.ph .bfleg,html.ph .bfleg *,html.ph .ph-chip i.you,html.ph .bfm,html.ph .bfm *,html.ph .bfd-h i{font-size:14px!important}
+html.ph .bfm em.st{top:-8px;right:-7px}
