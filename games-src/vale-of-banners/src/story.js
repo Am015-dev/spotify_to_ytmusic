@@ -41,6 +41,8 @@ window.VSTORY = {
 
   /* coached first game (tutorial): each rule is explained the first time it matters; unseen ones go on the "later" card */
   coach: {
+    preview: { say: 'See the numbers on the glowing spaces? Gold +N is what that space scores right now; 2/4 means its region gets closer to full. The star is my pick.', later: 'Glowing spaces show what a build scores now (+N) or how full its region gets (2/4); the star marks the best spot.' },
+    turnover: { say: 'Two dice, two actions: that is a whole turn. The card tells you how your moves compared with the best ones on the table.', later: 'A turn is two actions, one per die; the turn-over card rates your moves.' },
     build:   { say: 'That tile wants a home: same colour, a die\'s number, touching your land. The glow shows where.', later: 'Build: a stored tile goes on an empty space of its colour with a die\'s number, touching your land.' },
     end:     { say: 'Both dice spent. End your turn (the back lane can still sell you a tile for silver).', later: 'End your turn when both dice are used.' },
     rival:   { say: 'Tobin\'s turn. The banner track decides who goes first each round. Watch what he takes.', later: 'Turn order follows the banner track.' },

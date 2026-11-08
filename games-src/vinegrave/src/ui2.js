@@ -3,7 +3,7 @@ function openInsp(kind, x) { UI.insp = { kind, x }; refreshInsp(); $('#insp').hi
 function closeInsp() { UI.insp = null; $('#insp').hidden = true; $('#iscrim').hidden = true; }
 function refreshInsp() {
   const I = UI.insp; if (!I || !G) return closeInsp(); const L = legal(), q = G.q && myTurn() ? G.q : null, me = G.p[UI.view]; let h = '';
-  const btns = []; const add = (m, label, cls) => btns.push(mvBtn(m, label, cls || 'go'));
+  const btns = []; const add = (m, label, cls) => { const pv = previewText(m); btns.push(mvBtn(m, label + (pv ? `<span class="pv">${esc(pv)}</span>` : ''), cls || 'go')); };
   if (I.kind === 'site') {
     const x = G.sites[I.x], hid = !x.tile;
     h += `<h3>${esc(siteName(x))}</h3><div class="irow"><div class="big"><div class="site l${x.lvl}${hid ? ' hid' : ''}" style="width:120px;height:104px"><span class="pic" data-art="${hid ? 'site-hidden-' + x.lvl : 'site-' + x.tile}"><span class="ph"><svg><use href="#s-${hid ? 'compass' : 'leaf'}"/></svg></span></span></div></div><div>`;
@@ -72,11 +72,14 @@ UIACT.tab = t => { showTab(t.dataset.t); UI.autoTab = false; render(); };
 function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; if (UI.coachFree) return true;   /* coached game: every legal move is allowed */ return GXT.act(Object.assign({ type: 'tap' }, x)); }
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
-  if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null; const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
+  if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null;
+  const human = isHuman(VG.actor(G)), evb = human && !m.free && m.t !== 'ans' && m.t !== 'pass' ? evalMoves().slice() : null, main = human && !m.free && m.t !== 'ans';
+  let rating = null, lbl = ''; try { rating = evb ? rateMove(m, evb) : null; lbl = main ? shortLabel(m) : ''; } catch (x) { }   /* before the move: hand indices still match */ const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
   if (!r.ok) { toast('That move is not allowed now.'); render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
   const delay = showEvents(s);
   save(); render(); actFx(m, s, from, html, b); if (best) coachMove(m, best);
+  if (main && !(G.q && myTurn())) try { turnOver(m, rating, lbl); } catch (x) { }
   if (!UI.fast && m.t !== 'ans' && !m.free) $('#prompt').textContent = moveCaption(m, s);
   UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(650, Math.min(delay, 1200)));
 }
@@ -214,3 +217,50 @@ function save() { if (!G || UI.mode === 'tutorial' || UI.camp) return; try { loc
 function clearSave() { try { localStorage.removeItem(SAVEKEY); if (window.GNS && GNS.saved) GNS.saved('vinegrave', false); } catch (e) { } }
 function hasSave() { try { return !!localStorage.getItem(SAVEKEY); } catch (e) { return false; } }
 function loadSave() { try { const o = JSON.parse(localStorage.getItem(SAVEKEY)); if (!o || !o.G) return false; G = o.G; UI.mode = o.mode; UI.humans = o.humans; UI.view = o.view; UI.camp = null; enterGame(); return true; } catch (e) { return false; } }
+// ---------------------------------------------------------------- W378c: see how you score (previews, best-value badges, turn rating, "Turn over: why")
+function diffOn(c, s) {
+  const a = c.p[s], b = G.p[s], res = [];
+  V.RES.forEach(k => { const d = a.res[k] - b.res[k]; if (d) res.push((d > 0 ? '+' : '') + d + ' ' + V.RNAME[k] + (Math.abs(d) === 1 ? '' : 's')); });
+  const sa = VG.score(c, s), sb = VG.score(G, s), vp = sa.total - sb.total, why = Object.keys(SC_WHY).filter(k => sa[k] !== sb[k]).map(k => SC_WHY[k]);
+  const rs = (a.glass - b.glass) + (a.note - b.note);
+  return { res, vp, why, rs };
+}
+function evalMoves() {   /* every main move you can make now, simulated on a copy: what it yields and how strong it is */
+  if (!G || G.phase !== 'play' || !myTurn() || G.q) return [];
+  const s = VG.actor(G), me = G.p[s], key = G.turns + ':' + G.round + ':' + JSON.stringify(me.res) + me.hand.join() + G.row.join() + me.ex;
+  if (evalMoves.k === key) return evalMoves.v; const out = [];
+  VG.moves(G).forEach(m => { if (m.free || m.t === 'pass' || m.t === 'ans') return; try { const c = VG.clone(G), r = VG.apply(c, m); if (!r || !r.ok) return; out.push({ m, v: VAI.value(c, s, 'hard'), d: diffOn(c, s) }); } catch (x) { } });
+  out.sort((x, y) => y.v - x.v); evalMoves.k = key; evalMoves.v = out; return out;
+}
+const sameMv = (a, b) => !!a && !!b && (VG.same ? VG.same(a, b) : JSON.stringify(a) === JSON.stringify(b));
+function previewText(m) {
+  const e = evalMoves().find(x => sameMv(x.m, m)); if (!e) return '';
+  const p = []; if (e.d.vp) p.push((e.d.vp > 0 ? '+' : '') + e.d.vp + (Math.abs(e.d.vp) === 1 ? ' point' : ' points') + (e.d.why.length ? ' (' + e.d.why.join(', ') + ')' : ''));
+  if (e.d.rs > 0) p.push('+' + e.d.rs + ' research step' + (e.d.rs > 1 ? 's' : '')); p.push(...e.d.res.slice(0, 3));
+  return p.length ? 'You get: ' + p.join(', ') : 'No goods now: it sets up later turns';
+}
+function shortLabel(m) {
+  const me = G.p[UI.view];
+  switch (m.t) { case 'play': return 'play ' + V.CARDS[me.hand[m.i]].name; case 'dig': return 'dig at ' + siteName(G.sites[m.s]); case 'disc': return 'explore a hidden ruin';
+    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + V.CARDS[G.row[m.r]].name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; default: return 'pass'; }
+}
+function bestBadges() {   /* gold badges: the strongest site and the strongest market card for you right now */
+  document.querySelectorAll('[data-badge]').forEach(e => e.removeAttribute('data-badge'));
+  const ev = evalMoves(); if (!ev.length) return;
+  const top = ev[0], site = ev.find(x => x.m.s != null && /dig|disc|beat/.test(x.m.t)), buy = ev.find(x => x.m.t === 'buy');
+  const mark = (x, t) => { if (!x) return; const el = moveEl(x.m, UI.view); if (el && !el.dataset.badge) el.dataset.badge = t; };
+  mark(top, 'Best'); mark(site, 'Best site'); mark(buy, 'Best buy');
+}
+function rateMove(m, ev) {   /* good / okay / poor, compared with the strongest move */
+  if (!ev || !ev.length) return null; const i = ev.findIndex(x => sameMv(x.m, m)), best = ev[0];
+  if (i === 0) return { k: 'good', t: 'Good move: the strongest option this turn.' };
+  const gap = i < 0 ? 99 : best.v - ev[i].v;
+  return gap <= 2.5 || i === 1 ? { k: 'okay', t: 'Okay move. Slightly better: ' + shortLabel(best.m) + '.' } : { k: 'poor', t: 'Weak move. Much better was: ' + shortLabel(best.m) + '.' };
+}
+function turnOver(m, rating, lbl) {   /* "Turn over: why" card, non-blocking */
+  if (UI.fast || !G || G.phase === 'over' || (typeof GXT !== 'undefined' && GXT.running && GXT.running())) return; let e = $('#turnover'); if (!e) { e = document.createElement('div'); e.id = 'turnover'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
+  const why = m.t === 'pass' ? 'You passed: you sit out until everyone has passed and the round ends.' : 'Turn over: you used your one action (' + (lbl || 'your move') + ').';
+  e.innerHTML = `<b>${esc(why)}</b>${rating ? `<span class="rt ${rating.k}">${esc(rating.t)}</span>` : ''}<span class="nx">${esc(G.phase === 'over' ? 'The expedition is over.' : 'Next: ' + (VG.actor(G) >= 0 && !myTurn() && G.p[VG.actor(G)] ? G.p[VG.actor(G)].name + ' plays.' : VG.actor(G) === -2 ? 'the rival expedition plays.' : 'your turn again.'))}</span>`;
+  try { const d = $('#dock').getBoundingClientRect(), ph = innerWidth < 1000; e.style.top = (ph ? Math.max(60, d.top - e.offsetHeight - 8) : 64) + 'px'; e.style.left = (ph ? innerWidth / 2 : d.left + d.width / 2) + 'px'; } catch (x) { }
+  e.className = 'on'; clearTimeout(turnOver.t); turnOver.t = setTimeout(() => { e.className = ''; }, 3600); e.onclick = () => { e.className = ''; };
+}
