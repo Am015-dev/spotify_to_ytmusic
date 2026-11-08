@@ -9,6 +9,10 @@ const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DD=TB.DATA;
 const FK={nobility:'gilded',clans:'heath',uprising:'lantern',gathering:'choir'};
+// each faction's leader portrait (owner art, media/camp-*.webp): the same faces as the Basic-card fallback in ui13.js
+const TB_LEAD={gilded:'camp-halvard',heath:'camp-ysolde',lantern:'camp-rook',choir:'camp-orlen'};
+// each faction's painted card back (owner art): shown on that rival's face-down bid
+const TB_BACK={gilded:'back-court',heath:'back-default',lantern:'back-council-seal',choir:'back-moth-wing'};
 const FIDS=['nobility','clans','uprising','gathering'];
 const fk=seat=>FK[G.pl[seat].fac];
 const kf=seat=>TBKit.FACTIONS[fk(seat)];

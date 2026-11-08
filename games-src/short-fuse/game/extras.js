@@ -17,7 +17,9 @@ function backApply(){const R=document.documentElement,id=unl('cardback')||'defau
   if(id===backCur)return;backCur=id;R.style.setProperty('--back-img','url('+MEDIA+'back-'+id+'.webp)')}
 // ---- tables: painted workbench behind the board (the CSS teal stays while it loads and if the file is missing)
 const tblSeen={};let tblCur='';
-function tableApply(){const R=document.documentElement,id=unl('table')||'workbench';
+// the table follows where the job happens (owner art for each place); a table won in Story mode wins
+const jobTable=()=>{if(typeof G==='undefined'||!G||!UI.started||!G.mission||G.mission>66)return 'workbench';const m=G.mission;return m<=8?'workbench':m<=33?'clockface':'tower-floor'};
+function tableApply(){const R=document.documentElement,id=unl('table')||jobTable();
   if(LOWGFX){R.removeAttribute('data-timg');tblCur='';return}
   const f='table-'+id+(id==='workbench'&&innerHeight>innerWidth?'-phone':'');if(f===tblCur)return;   // the phone workbench when held upright
   const go=()=>{tblCur=f;R.style.setProperty('--tbl-img','url('+MEDIA+f+'.webp)');R.dataset.timg='1'};
