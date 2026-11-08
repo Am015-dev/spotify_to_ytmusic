@@ -188,6 +188,10 @@ function stgScreen(R, v, me, myq, hotShared, hotPriv, play) {
   return { box, ds, kind };
 }
 // ---------- the market stall ----------
+// what each stall's chip does, in plain words short enough for a 375px phone (tap a chip for the full text)
+const STALL_DO = { none: 'No power, cheapest', black: 'Most moths: droplet', g1: 'In last 2: a ruby', g2: 'In last 2: free chip', g3: 'Whites at 7: slide on', g4: 'In last 2: buy droplet',
+  b1: 'Peek, then pick one', b2: 'Shields next chips', b3: 'On a ruby: +1 ruby', b4: 'On a ruby: points', r1: '+1 after an orange', r2: 'Set aside, add later', r3: 'After a white: jumps', r4: 'White 1s move 2',
+  y1: 'After a white: undo it', y2: 'Next chip moves ×2', y3: 'Raises your limit', y4: 'Moves extra spaces', p1: 'Points at the count', p2: 'Trade in for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };
 function marketEl(p, q) {
   const wrap = h('div.mkt'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
   const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
@@ -197,7 +201,7 @@ function marketEl(p, q) {
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
     const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c])));
-    st.appendChild(h('div.sdo', bk ? bk.title : ''));   // what the chip does, in a few words (long-press or tap it for the full text)
+    st.appendChild(h('div.sdo', bk ? (STALL_DO[bk.eff] || bk.title) : ''));   // what the chip does, in a few words (long-press or tap it for the full text)
     const row = h('div.toks');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
@@ -247,6 +251,7 @@ function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the drople
   const sz = Math.max(6, Math.max(x1 - x0, y1 - y0) + 3), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, vx = cx - sz / 2, vy = cy - sz / 2;
   const svg = KIT.potSVG({ pot: [], droplet: p.droplet + S.sel.drop, rat: 0, space: null, boom: false, mini: false, uid: 'rb', label: 'Your cauldron', size: 400 }).replace(/viewBox="[^"]*" width="\d+" height="\d+"/, 'viewBox="' + vx.toFixed(2) + ' ' + vy.toFixed(2) + ' ' + sz.toFixed(2) + ' ' + sz.toFixed(2) + '"');
   const wrap = h('div.rboard'); wrap.appendChild(h('div.rtop', rubyGems(p, S.cost), h('b.rcost', { html: S.cost ? ico('ruby', 20) : '' }, S.cost ? '−' + S.cost : '')));
+  wrap.appendChild(h('div.rhelp', 'Spend ' + D.rubySpend + ' rubies: tap a glowing drop to start one space further, or tap the flask to refill it. Or keep them.'));
   const pot = h('div.rpot', { html: svg });
   for (let k = 0; k <= S.mx; k++) {
     const q = pts[p.droplet + k]; if (!q) break; const key = S.keyFor(k, S.sel.flask); if (!key) continue; const here = k === S.sel.drop;
@@ -255,7 +260,7 @@ function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the drople
   }
   wrap.appendChild(pot);
   const fk = S.flaskKey();
-  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend)),
-    h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop))));
+  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend), h('em.rlb', p.flask ? 'Flask full' : S.sel.flask ? 'Refilled' : 'Refill flask')),
+    h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop), h('em.rlb', 'Start space'))));
   return wrap;
 }

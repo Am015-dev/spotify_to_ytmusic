@@ -98,7 +98,7 @@ async function run(browser, W, H, mode) {
     }
     if (!s.wait) { if (!info.next || !info.nextOk) note(tag, id + ': the Next button is missing or covered'); }
     // screenshots at 390x763
-    if (!/^Tap (the glowing|Next)/.test(info.say)) { if (id === 'spiral') await shot('early'); if (id === 'flask') await shot('flask'); if (id === 'shops1') await shot('shop'); if (id === 'peek') await shot('peek'); }
+    if (!/^Tap (the glowing|Next)/.test(info.say)) { if (id === 'keep') await shot('early'); if (id === 'flask') await shot('flask'); if (id === 'shops') await shot('shop'); if (id === 'peek') await shot('peek'); }
     // rotations
     if (mode === 'rotate' && rotated === 0 && s.id === 'whites') { rotated = 1; await p.setViewportSize({ width: H, height: W }); await p.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(1000);
       const r = await state(); if (!r.shown || !r.hole) note(tag, 'after rotating to landscape the step is not on screen'); else await p.screenshot({ path: TMP + '/tutor_rot_land.png' }); continue; }

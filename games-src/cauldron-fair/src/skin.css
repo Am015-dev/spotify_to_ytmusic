@@ -222,3 +222,18 @@ html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:b
 @media (max-height:760px){.stall .sdo{display:none}.mkt .sinfo{font-size:13px;max-height:2.6em;padding:2px 8px}}
 .tsegs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px}
 @media (max-height:500px){.tsegs .tseg+.tseg{display:none}}   /* short landscape: rival levels stay in More options */
+/* R3 fix: the ruby screen says in words what each option does; the shop keeps its short stall lines on small phones */
+.rboard .rhelp{grid-column:1/-1;font-size:15px;line-height:1.3;color:#fff6df;background:rgba(40,24,10,.82);border:1px solid rgba(255,240,210,.35);border-radius:10px;padding:5px 10px;text-align:center}
+.rbt.big{flex-direction:column;height:auto;min-height:78px;padding:4px 8px}.rbt .rlb,.rdp .rlb{display:block;font-style:normal;font-size:13px;font-weight:800;color:#fff6df;white-space:nowrap}
+.rdp{display:inline-flex;flex-direction:column;align-items:center}
+.rboard{grid-template-rows:auto auto minmax(0,1fr) auto}
+@media (orientation:landscape) and (max-height:520px){.rboard{grid-template-rows:auto auto minmax(0,1fr)}.rside{grid-row:3}.rpot{grid-row:3}.rboard .rhelp{font-size:13px;padding:2px 8px}}
+#fortchip{min-height:44px;border-radius:22px;box-sizing:border-box}
+/* R3 fix (375x667 shop): rows size to their content, so a price is never cut under the next awning; the short stall line stays; the list scrolls if it must */
+@media (max-height:760px) and (orientation:portrait){
+  .mkt .stalls{grid-auto-rows:auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start}
+  .stall .sdo{display:block;font-size:12px;min-height:14px;margin:-1px 0 0}
+  html.sk-stall .stall{border-width:26px 12px 8px;border-image-width:26px 12px 8px}
+  .stall .toks{padding-bottom:2px}
+  .tok{min-height:50px;padding:1px 2px}.tok svg.chip{width:36px;height:36px}.tok .pc{margin-top:-6px}
+}

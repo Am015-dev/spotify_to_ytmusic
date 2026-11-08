@@ -55,7 +55,8 @@ function sugMark(box, p, q, legal) {
       box.querySelectorAll('.stalls .tok').forEach(b => { const i = left.indexOf(b.dataset.k); if (i >= 0 && !b.disabled) { left.splice(i, 1); b.classList.add('sug'); } });
       return;
     }
-    let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m; const js = JSON.stringify(stripM ? stripM(m) : m);
+    let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m;
+    if (UI.mode === 'tutorial') { const want = q.h === 'y1' ? legal.find(x => x.yes) : q.h === 'crow' ? legal.find(x => x.idx >= 0 && p.hold[x.idx] && p.hold[x.idx].c !== 'W') : null; if (want) m = want; }   // the tutorial's ask and the best tag always agree const js = JSON.stringify(stripM ? stripM(m) : m);
     const i = legal.findIndex(x => JSON.stringify(stripM ? stripM(x) : x) === js); if (i < 0) return;
     const b = box.querySelector('[data-a=mv][data-i="' + i + '"]'); if (b) b.classList.add('sug');
   } catch (e) {}
