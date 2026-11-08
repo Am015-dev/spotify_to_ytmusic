@@ -96,7 +96,15 @@ function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you'
 function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
   // resources as tokens: the owner's icon, a big number, the name under it (owner 8 Nov: "a spreadsheet")
   const tk=(bad,ic,n,nm)=>`<span class="tk ${bad?'bad':''}">${ic.length>2?`<img src="media/icon-res-${ic}.webp" alt="">`:`<i>${ic}</i>`}<b>${n}</b><small>${nm}</small></span>`;
-  return tk(false,'📅',o.d+'/'+o.r,'Day')+tk(o.f<o.need,'food',o.f,'Food · eat '+o.need)+tk(false,'wood',o.w,'Wood')+tk(o.low<=3,'❤',o.low,'Life')+tk(!o.sh,'shelter',o.sh?'✓':'✗','Shelter')}
+  let pc=null;try{withView(()=>{pc=goalPace()})}catch(e){}
+  return tk(false,'📅',o.d+'/'+o.r,'Day')+tk(o.f<o.need,'food',o.f,'Food · eat '+o.need)+tk(false,'wood',o.w,'Wood')+tk(o.low<=3,'❤',o.low,'Life')+tk(!o.sh,'shelter',o.sh?'✓':'✗','Shelter')+(pc?tk(pc.behind,'🔥',pc.pile+'/15','Pile'):'')+(pc&&pc.behind?`<span class="pace" role="alert">⚠ ${E(pc.text)}</span>`:'')}
+// R3 review: say during play when the rescue goal is behind schedule (Marooned: fire, then a 15-wood pile by day 10-12). Targets come from
+// easy-sim.js: winning games average pile 6 by day 6, 10 by day 9; losing games are 2-3 behind that.
+const PACE_T={5:4,6:5,7:6,8:7,9:9,10:11,11:13,12:15};
+function goalPace(day){if(!G||G.scen!=='marooned'||G.over||!G.sc)return null;const d=Math.min(G.rounds,day||G.round),pile=G.sc.pile|0,fire=!!(G.inv&&G.inv.built&&G.inv.built.fire);
+  if(!fire&&d>=4)return {pile,behind:true,text:`No fire yet, day ${d}: build the fire first`};
+  const t=PACE_T[d];if(t&&pile<t&&pile<15)return {pile,behind:true,text:`Pile ${pile}/15, day ${d}: build faster (aim for ${t})`};
+  return {pile,behind:false,text:''}}
 BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
@@ -186,7 +194,13 @@ BF.rain=function(pos,r,s,storm){const ov=q('#bfov');if(!ov||!BF.on)return;const 
 // ---------- the event / weather card flips onto the board ----------
 const CARDICON={event:'🎴',threat:'⏳',adventure:'🧭',mystery:'❓',fight:'⚔️'};const TYICON={book:'📖',build:'🔨',explore:'🧭',gather:'🌿',wreck:'⚓'};
 BF.cardClear=function(){const c=q('#bfcard');if(c)c.remove()};
-BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b||!ov||!BF.on)return;const k=b.kind;if(!['event','threat','adventure','mystery','fight','weather'].includes(k))return;const d=b.data||{};
+// R3 review: the day's summary is one card and one tap: what changed, the goal's pace, and tomorrow's event card (already drawn)
+BF.sumCard=function(i,ov){const b=UI.beats[i];let ch=[],pc=null,nx='';try{const x=daySumData(i);ch=x.A&&x.B?deltas(x.A,x.B).slice(0,7):[]}catch(e){}
+  try{withView(()=>{pc=goalPace(b.data.round+1)})}catch(e){}
+  try{for(let k=i+1;k<UI.beats.length;k++){const z=UI.beats[k];if(z.kind==='event'&&z.data&&z.data.card!=null&&CARD[z.data.card]&&!z.data.late){const c=CARD[z.data.card];const t=opsText(c.ev)||'';nx=`<span class="bfnx"><b>Tomorrow:</b> ${E(c.n)}${t?': '+E(w12(t.replace(/;.*$/,'')).replace(/[.\s]+$/,'')):''}${c.th?', then it stays as a threat':''}.</span>`;break}}}catch(e){}
+  const el=document.createElement('div');el.id='bfcard';el.className='bfcard daysum';el.setAttribute('role','status');
+  el.innerHTML=`<div class="in"><div class="fr"><span class="bftt">Day ${b.data.round} is over</span><span class="bfch">${ch.length?ch.map(x=>`<em class="${x.c}">${x.t}</em>`).join(' '):'<em>Nothing changed.</em>'}</span>${pc&&pc.behind?`<span class="bfpace">⚠ ${E(pc.text)}</span>`:pc?`<span class="bfok">🔥 Pile ${pc.pile}/15: on track for the rescue</span>`:''}${nx}</div></div>`;ov.appendChild(el)};
+BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b||!ov||!BF.on)return;const k=b.kind;if(k==='daysum'){BF.sumCard(i,ov);return}if(!['event','threat','adventure','mystery','fight','weather'].includes(k))return;const d=b.data||{};
   let ic=CARDICON[k]||'🎴',cls=k,pos=G.camp.pos;
   try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?'⛈️':r?'🌧️'.repeat(Math.min(3,r)):s?'❄️'.repeat(Math.min(3,s)):'☀️';BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
     else if(d.card!=null&&CARD[d.card]){const c=CARD[d.card];const ti=c.icon&&TYICON[c.icon];ic=(CARDICON[k]||'🎴')+(ti?ti:'')}}catch(e){}

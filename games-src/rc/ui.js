@@ -144,7 +144,8 @@ const LOSS_TIP={hunger:'Plan food every day: the 🍖 priority says how much you
 function overHtml(){const w=G.over.win;const st=G.stats;const lc=w?null:lossCauses();const top=lc?lc.by.filter(([k])=>k!=='?').slice(0,4):[];
   const tips=[...new Set(top.map(([k])=>LOSS_TIP[k]).filter(Boolean))].slice(0,2);
   const why=lc?`<div class="over-why"><b>What went wrong</b><ul>${lc.dies?`<li>${esc(lc.dies.who)} died${lc.dies.why?' from '+esc(lc.dies.why):''} on day ${G.round}.</li>`:''}${top.length?`<li>Wounds this game: ${top.map(([k,n])=>`${esc(k)} ${n}`).join(' · ')}.</li>`:''}${tips.map(t=>`<li>💡 ${esc(t)}</li>`).join('')}${G.diff!=='easy'?'<li>💡 The Easier setting adds the dog and 4 starting items.</li>':''}</ul></div>`:'';
-  return `<div class="mbox"><h2>${w?'🏆 Rescued!':'☠ Lost on the island'}</h2><p class="big">${esc(G.over.why)}</p><p class="story">${esc(endLine())}</p>${why}<p class="small">Day ${G.round} of ${G.rounds} · places explored ${st.explored} · things made ${st.built} · fights ${st.fights} · wounds taken ${st.wounds}</p><div class="mb">${typeof netOn==='function'&&netOn()?netOverBtns():`${w?'':'<button class="btn go" data-a="retry">↻ Try again (same island)</button><button class="btn" data-a="retry" data-easy="1">Try it on Easier</button>'}<button class="btn ${w?'go':''}" data-a="new">New game</button><button class="btn" data-a="overok">Look at the island</button>`}</div></div>`}
+  const pace=!w&&G.scen==='marooned'&&G.sc&&/Time ran out/.test(G.over.why)?`<p class="over-pace">🔥 Signal pile ${G.sc.pile}/15${G.inv.built.fire?'':', no fire'}. Put wood on the pile every day once the fire burns.</p>`:'';
+  return `<div class="mbox over"><h2>${w?'🏆 Rescued!':'☠ Lost on the island'}</h2><p class="big">${esc(G.over.why)}</p>${pace}<p class="story">${esc(endLine())}</p>${why}<p class="small">Day ${G.round} of ${G.rounds} · places explored ${st.explored} · things made ${st.built} · fights ${st.fights} · wounds taken ${st.wounds}</p><div class="mb">${typeof netOn==='function'&&netOn()?netOverBtns():`${w?'':'<button class="btn go" data-a="retry">↻ Try again (same island)</button>'+(G.diff!=='easy'?'<button class="btn" data-a="retry" data-easy="1">Try it on Easier</button>':'')}<button class="btn ${w?'go':''}" data-a="new">New game</button><button class="btn" data-a="overok">Look at the island</button>`}</div></div>`}
 function retryGame(easy){const o=G;const s=UI.setup;s.scen=o.scen;s.chars=o.chars.filter(c=>!c.npc).map(c=>c.k);s.ai={};o.chars.forEach(c=>{if(!c.human)s.ai[c.k]=true});if(easy){s.diff='easy';s.items=4;s.dog=true;s.friday=true}
   const old=DEFSEED;DEFSEED=o.seed;try{beginGame()}finally{DEFSEED=old}}
 function toggleMenu(){const m=$('#moremenu'),b=$('.menub');if(!m)return;const on=!m.classList.contains('open');m.classList.toggle('open',on);if(b)b.setAttribute('aria-expanded',on)}
@@ -233,9 +234,9 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   switch(d.a){
   case 'go':tryStart(!!d.force);return;
   case 'goback':UI.confirm=null;render();return;
-  case 'next':storyNext();return;case 'skip':storySkip();return;
+  case 'next':storyJump();return;case 'skip':storySkip();return;
   case 'auto':UI.auto=!UI.auto;try{localStorage.setItem('swi_auto',UI.auto?'1':'0')}catch(e){}render();return;
-  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
+  case 'suggest':{const m=(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G&&G.tut)?suggestCore(true):suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
   case 'pnext':setPStep(pstep()+1);render();return;case 'pback':setPStep(pstep()-1);render();return;
   case 'pick':UI.ps.pick=!UI.ps.pick;render();return;
   case 'pskip':{const c=curPawn();if(c&&c.c==null)UI.ps.skip.push(c.id);UI.sel=null;wizPlaced();render();return}

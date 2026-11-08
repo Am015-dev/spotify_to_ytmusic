@@ -101,3 +101,9 @@ with the player's real day / food / wood. Test: `coach-test.js` (plays by tappin
 pawns, production, night explained, >= 10 rules, one bubble at a time, the end card). Result at 390x763: PASS, 19 of 20 rules explained in the played game
 (prod goal pawns dice fight found weather event morning threat sure build night gather ready wounds explore camp + later card); `skill` and `fog` did not come up.
 Not done: good/poor-move feedback lines beyond "ready", rival-move comments, and making it the default tutorial (the 25-step one stays until the owner chooses).
+
+## R3 fix (8 Nov): a real roll and a real adventure card, by doing
+Learn to play (guide.js) now has 59 steps over 3 days. Day 2's event card stays on screen while three steps point at it (event, its "?" token,
+the threat it leaves). Day 3: the Carpenter explores alone (x1-x3), ✨ fills the other pawns' jobs (x4, keeps the placed ones), Start day, then
+the `roll` step holds the first scene with real dice and `advc` holds the adventure card that the "?" token draws; `end` sits on the day 3 summary.
+guide-test: 56/59 steps (one, sure and x3 are optional branches), 26/26 rules, at 390x844 and 375x667.

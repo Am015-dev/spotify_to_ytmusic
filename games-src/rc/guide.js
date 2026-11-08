@@ -19,6 +19,9 @@ const gRow=(type,k)=>{for(const e of document.querySelectorAll('#ppop .bfr[data-
 const gAct=(type,k)=>{try{return G.plan.acts.find(a=>a.pw.length&&a.type===type&&(k==null||a.tgt&&a.tgt.k===k))||null}catch(e){return null}};
 const gCamp=()=>{try{return G.camp.pos}catch(e){return -1}};
 const gExp=()=>{if(GUIDE.exp!=null)return GUIDE.exp;try{const c=gCamp();for(const e of document.querySelectorAll('#bfglow .bfgl')){const t=+e.dataset.t;if(t!==c&&!tileAt(t)){GUIDE.exp=t;return t}}}catch(e){}return null};
+// day 3's real roll: another unknown place next to the camp (one pawn there rolls), and the scene that shows a roll
+const gExp2=()=>{if(GUIDE.exp2!=null&&!tileAt(GUIDE.exp2))return GUIDE.exp2;try{const c=gCamp();let best=null;for(const e of document.querySelectorAll('#bfglow .bfgl')){const t=+e.dataset.t;if(t===c||tileAt(t))continue;const n=actNeed({type:'explore',tgt:t,pw:[]}).need;if(best==null||n<best.n)best={t,n}}if(best){GUIDE.exp2=best.t;return best.t}}catch(e){}return null};
+const gDiceBeat=()=>{try{const i=storyIdx();const b=UI.beats[i];return !!(b&&b.kind==='act'&&b.data&&b.data.dice)}catch(e){return false}};
 const gPicked=id=>{try{return UI.sel===id||(gPawn(id)||{}).classList.contains('on')}catch(e){return false}};
 // kind: 'info' = tap the highlight to go on (the tap does nothing else); 'pass' = the tap also does its normal job; 'act' = done when the game state says so.
 // beat: the step waits for that scene and holds it on screen. Every line: one sentence, 12 words or fewer.
@@ -50,9 +53,9 @@ const GUIDE_STEPS=[
  {id:'eat',day:1,rule:'night',beat:'night',kind:'info',say:'Night: each castaway eats 1 food, or takes 2 wounds.',tgt:()=>gRes(2)},
  {id:'outside',day:1,rule:'night',beat:'night',kind:'info',say:'No shelter? Everyone takes 1 wound sleeping outside.',tgt:()=>gRes(5)},
  {id:'wounds',day:1,rule:'wounds',beat:'daysum',kind:'info',say:'Wounds use up life. Life at zero means death.',tgt:()=>gRes(4)},
- {id:'event',day:2,rule:'event',beat:'event',kind:'act',say:'An event card. Its effect happens right now.',tgt:gNext,done:()=>gBeat()!=='event'},
- {id:'adv',day:2,rule:'adventure',when:()=>gDay()===2&&(!!gBeat()||gPlan()),kind:'info',say:'Its ? token: the next explore draws an adventure card.',tgt:()=>null},
- {id:'threat',day:2,rule:'threat',when:()=>gDay()===2&&(!!gBeat()||gPlan()),kind:'info',say:'Then it waits as a threat. Deal with it, or it strikes.',tgt:()=>null},
+ {id:'event',day:2,rule:'event',beat:'event',kind:'info',say:'An event card. Its effect happens right now.',tgt:()=>gdq('#bfcard')},
+ {id:'adv',day:2,rule:'adventure',beat:'event',kind:'info',say:'Its ? token: the next explore draws an adventure card.',tgt:()=>gdq('#bfcard')},
+ {id:'threat',day:2,rule:'threat',beat:'event',kind:'info',say:'Then this card waits as a threat. Deal with it in time.',tgt:()=>gdq('#bfcard')},
  {id:'morale',day:2,rule:'morale',when:()=>gDay()===2,kind:'info',say:'Morale: high morale gives determination, low takes it.',tgt:()=>null},
  {id:'t1',day:2,rule:'threat',when:gPlan,kind:'pass',say:'Tap the Carpenter.',tgt:()=>gPawn('c0_0'),done:()=>gPicked('c0_0')},
  {id:'t2',day:2,rule:'threat',when:gPlan,kind:'act',say:'Tap the camp. Threats are handled there.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
@@ -74,7 +77,14 @@ const GUIDE_STEPS=[
  {id:'c1',day:3,rule:'camp',when:gPlan,kind:'pass',say:'Tap the Carpenter’s second pawn.',tgt:()=>gPawn('c0_1'),done:()=>gPicked('c0_1')},
  {id:'c2',day:3,rule:'camp',when:gPlan,kind:'act',say:'Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
  {id:'c3',day:3,rule:'camp',when:gPlan,kind:'act',say:'Tidy the camp: 2 determination and morale up.',tgt:()=>gRow('camp'),done:()=>!!gAct('camp')},
- {id:'end',day:3,rule:'real',when:gPlan,kind:'info',say:'That is every rule. Give the rest jobs and play on!',tgt:()=>null}
+ {id:'x1',day:3,rule:'roll',when:gPlan,kind:'pass',say:'Now a real roll. Tap the Carpenter.',tgt:()=>gPawn('c0_0'),done:()=>gPicked('c0_0')},
+ {id:'x2',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap this unknown place. Go alone: one pawn rolls.',tgt:()=>gGlow(gExp2()),done:()=>gPop()===gExp2()||!!gAct('explore')},
+ {id:'x3',day:3,rule:'roll',when:gPlan,skip:()=>!!gAct('explore'),kind:'act',say:'Explore alone. The ? token adds an adventure card.',tgt:()=>gRow('explore'),done:()=>!!gAct('explore')},
+ {id:'x4',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap ✨ to give the other pawns jobs.',tgt:()=>gdq('#bf [data-a=suggest]'),done:()=>{try{return !planProblems().length}catch(e){return false}}},
+ {id:'go3',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap Start day and watch the dice.',tgt:()=>gdq('#bf [data-a=go]'),done:()=>!gPlan()},
+ {id:'roll',day:3,rule:'roll',beat:'act',when:gDiceBeat,kind:'info',say:'The dice: ✔ success, 🩸 a wound, ❓ an adventure.',tgt:()=>null},
+ {id:'advc',day:3,rule:'adventure',beat:'adventure',kind:'info',say:'The ? token drew this adventure card. It happens now.',tgt:()=>gdq('#bfcard')},
+ {id:'end',day:3,rule:'real',beat:'daysum',kind:'info',say:'That is every rule. Play on, or start a real game!',tgt:()=>null}
 ];
 const GUIDE_RULES=[...new Set(GUIDE_STEPS.map(s=>s.rule))];
 window.GXGUIDE={get running(){return GUIDE.on},get step(){const s=GUIDE_STEPS[GUIDE.i];return s?s.id:null},get seen(){return GUIDE.seen.slice()},rules:GUIDE_RULES,steps:GUIDE_STEPS.map(s=>({id:s.id,rule:s.rule,say:s.say})),get done(){return GUIDE.done}};
@@ -85,13 +95,13 @@ const gCur=()=>GUIDE.on?GUIDE_STEPS[GUIDE.i]:null;
 const GORD={dawn:0,event:1,threat:1,morning:2,prod:3,plan:4,go:5,act:5,adventure:5,mystery:5,fight:5,finds:6,weather:7,night:8,daysum:9};
 function gDay(){try{if(PHO.st==='story'){for(let i=storyIdx();i>=0;i--){const b=UI.beats[i];if(b&&b.kind==='dawn'&&b.data)return b.data.round}}return G.round}catch(e){return 0}}
 const gNow=()=>gPlan()?'plan':gBeat();
-function gReady(s){if(!s||!G||G.over)return false;if(UI.modal)return false;if(gDay()!==s.day)return false;if(s.beat)return gBeat()===s.beat;if(s.when){let ok=false;try{ok=!!s.when()}catch(e){}if(!ok)return false}return true}
+function gReady(s){if(!s||!G||G.over)return false;if(UI.modal)return false;if(gDay()!==s.day)return false;if(s.beat)return gBeat()===s.beat&&(!s.when||!!s.when());if(s.when){let ok=false;try{ok=!!s.when()}catch(e){}if(!ok)return false}return true}
 // a scene step whose scene has already gone by (or never shows, like calm weather) is passed over
 function gPassed(s){if(!s.beat||GUIDE.shown===s.id)return false;const d=gDay();if(d>s.day)return true;const n=gNow();return d===s.day&&n!=null&&GORD[n]!=null&&GORD[n]>GORD[s.beat]}
 function gTarget(s){let el=null;try{el=s.tgt&&s.tgt()}catch(e){el=null}if(el&&el.getBoundingClientRect){const r=el.getBoundingClientRect();if(r.width>2&&r.height>2&&!(el.closest&&el.closest('[hidden]')))return el}return null}
 // the scene a step explains waits on screen until the step is done (bf.js asks tutClaimed before auto-advancing a scene)
 function tutClaimed(i){if(!GUIDE.on)return false;const s=gCur();if(!s)return false;if(GUIDE.shown===s.id)return true;
-  try{const k=UI.beats[i]&&UI.beats[i].kind;if(s.day!==gDay())return false;if(s.beat)return k===s.beat||GORD[k]!=null&&GORD[k]>GORD[s.beat]&&false;return s.kind==='info'&&!s.when}catch(e){return false}}
+  try{const k=UI.beats[i]&&UI.beats[i].kind;if(s.day!==gDay())return false;if(s.beat)return k===s.beat&&(!s.when||!!s.when());return s.kind==='info'&&!s.when}catch(e){return false}}
 function gAdvance(){try{if(typeof V3!=='undefined'){V3.pts&&V3.pts.clear();V3.drag=null;V3.pinch=null}}catch(e){}const s=gCur();if(s&&!GUIDE.seen.includes(s.id))GUIDE.seen.push(s.id);GUIDE.i++;GUIDE.shown=null;GUIDE.tapped=false;gHide();
   if(GUIDE.i>=GUIDE_STEPS.length)gFinish();else setTimeout(gTick,30)}
 function gHide(){const e=gdq('#coachb');if(e&&e.classList.contains('guide')){e.hidden=true;e.classList.remove('guide')}const r=gdq('#tutring');if(r)r.hidden=true;document.body.classList.remove('guiding')}

@@ -21,7 +21,7 @@ PHO.apply=function(){const R=document.documentElement;const was=PHO.on,wasL=PHO.
   let bw,bh,rail=0;
   if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.max(aw*.75,Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-296)))}
   R.classList.toggle('ph-l',PHO.land);R.classList.toggle('ph-p',!PHO.land);
-  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--bhb',PHO.land?Math.floor(bh):Math.max(Math.round(aw*.9),Math.min(Math.round(aw*1.6),h-I.t-I.b-BAR-64-158)));set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
+  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--bhb',PHO.land?Math.floor(bh):Math.max(Math.round(aw*.9),Math.min(Math.round(aw*1.6),h-I.t-I.b-BAR-64-186)));set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
   if(app)app.classList.remove('gx-dock-min','gx-sheet-full');
   // the chip sits in the bar (portrait) or in the view row under the bar (landscape rail)
   const chip=q('#phchip'),bar=q('.gx-bar'),pv=q('#phview');

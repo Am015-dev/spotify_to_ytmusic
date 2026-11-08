@@ -18,7 +18,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  await tap('#modal [data-a=start]');await sleep(600);await tap('.tutoffer [data-tutoffer=learn]');await sleep(1500);
  if(!await p.evaluate(()=>GXGUIDE.running))probs.push('guided game did not start');
  const order=[],says={};let wrongDone=false,shotN=0,stall=0,last='';const t0=Date.now();
- while(Date.now()-t0<300000){
+ while(Date.now()-t0<(+process.env.TMAX||600000)){
   const s=await p.evaluate(()=>{const b=document.querySelector('#coachb.guide:not([hidden])');const r=document.querySelector('#tutring:not([hidden])');const rr=r&&r.getBoundingClientRect();
     return {fin:!!document.querySelector('#coachb.guide[data-kind=final]:not([hidden])'),step:b&&b.dataset.step,rule:b&&b.dataset.rule,say:b&&(b.querySelector('.ct')||{}).textContent,ring:rr&&[rr.left+rr.width/2,rr.top+rr.height/2],st:PHO.st,over:!!(G&&G.over)}});
   if(s.fin)break;if(s.over){probs.push('game over during the tutorial');break}

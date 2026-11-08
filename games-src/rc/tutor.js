@@ -13,9 +13,9 @@ const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (be
 // Easy island is a real challenge (owner review G6: the old kind deal won every time with life never under 8): full adventure and mystery decks,
 // an event deck of the milder cards with newGame's book / "?" split (Easy: 4 + 8, so adventures come up every game), the friendly tile order
 // (mountains for the fire come early), no weather dice. Knobs: harsh (swap out the N harshest), wx 2 + rain/snow (gentle weather table).
-// Measured (adv-test FIRST=easy: ✨ plan + the advisor's pick on every choice, 80 games): 39 rescued (49%), 4-11 adventure cards a game; the rest miss the rescue.
-var EASYK=typeof EASYK!=='undefined'?EASYK:{harsh:0,tiles:1,res:4,wx:0,mild:14,beasts:1};
-function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;if(EASYK.tiles)G.tileDeck=[4,5,10,6,3,1,2,7,9,11];if(EASYK.res){G.res.food=Math.max(EASYK.res,G.res.food);G.res.wood=Math.max(EASYK.res,G.res.wood)}if(!EASYK.wx)G.wxT={};else if(EASYK.wx===2){G.wxT={};for(let r=EASYK.rain||4;r<=12;r++)G.wxT[r]=r>=EASYK.snow?['rain','snow']:['rain']}
+// Measured (easy-sim.js, 80 games, ✨ plan every day): ✨ pick on every choice 56 rescued (70%), first option on every choice 47 (59%). The pile starts at 3 (wreck timber).
+var EASYK=typeof EASYK!=='undefined'?EASYK:{harsh:0,tiles:1,res:4,wx:0,mild:14,beasts:1,pile:3};
+function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;if(EASYK.pile&&G.sc&&!G.sc.pile){G.sc.pile=EASYK.pile;G.easyPile=EASYK.pile;lg('Easy island: timber from the wreck starts the signal pile at '+EASYK.pile+'/15.','good')}if(EASYK.tiles)G.tileDeck=[4,5,10,6,3,1,2,7,9,11];if(EASYK.res){G.res.food=Math.max(EASYK.res,G.res.food);G.res.wood=Math.max(EASYK.res,G.res.wood)}if(!EASYK.wx)G.wxT={};else if(EASYK.wx===2){G.wxT={};for(let r=EASYK.rain||4;r<=12;r++)G.wxT[r]=r>=EASYK.snow?['rain','snow']:['rain']}
   const harm=k=>{try{return opsValue(CARD[k].ev||[])+opsValue(CARD[k].te||[])}catch(e){return 0}};const book=k=>CARD[k].icon==='book';
   const harsh=new Set([...new Set(EVENTS.map(e=>e.k))].sort((a,b)=>harm(a)-harm(b)).slice(0,EASYK.harsh));
   const spare=shuffle([...new Set(EVENTS.map(e=>e.k))].filter(k=>!harsh.has(k)&&!G.ev.deck.includes(k)));
