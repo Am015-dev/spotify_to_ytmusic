@@ -29,7 +29,10 @@ document.addEventListener('toggle',e=>{if(e.target&&e.target.classList&&e.target
 function flashBtn(a,v){const e=document.querySelector('#start [data-a="'+a+'"][data-v="'+v+'"]');if(e){e.classList.add('tap');setTimeout(()=>e.classList.remove('tap'),260)}}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
-function startJob(s){if(isClient())return;lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
+function startJob(s){if(isClient())return;
+  // gentle first jobs: until the player flips the bulb themselves, hints (the odds badges) are on for jobs 1-3 and off from job 4
+  if(lsGet('sf_hints',-1)===-1){UI.hints=(+s.job||1)<=3;try{scBulb()}catch(e){}}
+  lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
   if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
   if(!plan&&!s.camp)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names});UI.lastSetup=s.camp?UI.lastSetup:s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars&&s.chars[i]){chars[i]=s.chars[i];any=1}

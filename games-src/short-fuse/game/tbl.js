@@ -180,7 +180,7 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
     setMine(pick);tm=pick}
   const used=used0+(ms.length?mine.offsetHeight:0);
   const ch=Math.max(40,H-used-gh);t1=crewFit(ch);
-  for(let i=0;i<24;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',Math.round(t1*1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=22)break;t1-=1}
+  for(let i=0;i<60;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',Math.round(t1*1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=22)break;t1-=1}
   // still too tall at the smallest crew tile (short landscape, 4+ players): my stand gives up height until the crew fits, so no crew wire hides under it
   if(ms.length&&land&&crew.scrollHeight>crew.clientHeight+1){mine.classList.add('mrow');setMine(tm);balance(crew,t1,3)}   // first: my name plate moves beside my stand
   while(ms.length&&tm>24&&crew.scrollHeight>crew.clientHeight+1){tm-=2;setMine(tm);balance(crew,t1,3)}
@@ -323,3 +323,11 @@ if(window.GXV)GXV.watch(()=>{try{layoutTable()}catch(e){}});
 else (function(){let t=null,t2=null;const go=()=>{try{layoutTable()}catch(e){}};const deb=()=>{clearTimeout(t);clearTimeout(t2);t=setTimeout(go,60);t2=setTimeout(go,420)};
   window.addEventListener('resize',deb);window.addEventListener('orientationchange',deb);if(window.visualViewport)window.visualViewport.addEventListener('resize',deb);
   const init=()=>{const b=document.getElementById('tb');if(b&&window.ResizeObserver)new ResizeObserver(deb).observe(b)};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();
+// anything that grows after a layout (my stand gaining a row, a token, the score or preview strip) can leave crew wires under my stand:
+// every refresh checks, synchronously (tiles never move after they are drawn), and lays the table out again when the crew no longer fits.
+// The same overflow right after a relayout means it cannot fit better: no relayout loop.
+TBL.fit=function(){const c=document.getElementById('crew');if(!c||!G||!UI.started)return;const over=()=>c.scrollHeight>c.clientHeight+1;if(!over()){TBL.fitSig=null;return}
+  const sig=()=>c.scrollHeight+'/'+c.clientHeight+'/'+c.querySelectorAll('.tile').length+'/'+innerWidth+'x'+innerHeight;if(sig()===TBL.fitSig)return;layoutTable();TBL.fitSig=over()?sig():null};
+(function(){const o=refresh;refresh=function(){const r=o.apply(this,arguments);try{TBL.fit()}catch(e){}return r}})();
+// some crew changes land outside refresh (late token and flip renders): a light check twice a second catches an overflow that persists
+setInterval(()=>{const c=document.getElementById('crew');if(!c||!G||!UI.started||c.scrollHeight<=c.clientHeight+1){TBL.over0=0;return}if(!TBL.over0){TBL.over0=1;return}TBL.over0=0;try{TBL.fit()}catch(e){}},500);

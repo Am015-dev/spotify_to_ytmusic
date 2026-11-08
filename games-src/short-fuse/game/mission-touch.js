@@ -1,8 +1,9 @@
-// mission-touch.js: a new player plays one full job by touch on a phone (only taps on what glows or on overlay buttons; it follows the hint advisor, as with the bulb on), from the start menu
+// mission-touch.js: a new player plays one full job by touch on a phone (only taps on what glows or on overlay buttons). MODE=new (default): it reads only the screen (the odds badges that are on by default in jobs 1-3); MODE=advisor follows the hint advisor, from the start menu
 // to the result card. Fails on page errors, a status line over 8 words, or a job that never ends.  node mission-touch.js [WxH=390x844] [job=1] [shotsDir]
 const { chromium } = require('playwright');
 const path = require('path');
 const gx = require('../../scripts/gx-serve.js');
+const MODE = process.env.MODE || 'new';   // new = reads the screen (odds badges); advisor = follows the hint advisor
 const [W, H] = (process.argv[2] || '390x844').split('x').map(Number), JOB = +(process.argv[3] || 1), SHOTS = process.argv[4] || '';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
@@ -13,6 +14,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const p = await ctx.newPage(); const bad = new Set(), errs = [];
   p.on('pageerror', e => errs.push(String(e.message).slice(0, 160)));
   await p.goto(URL); await sleep(900);
+  await p.evaluate(m => { window.__mode = m }, MODE);
   await p.evaluate(j => { localStorage.clear(); try { GXT.markDone('short-fuse') } catch (e) { } UI.setup = UI.setup || defaultSetup(); startJob({ job: j, np: 3, seats: ['human', 'ai', 'ai'], lv: 'normal', names: DEFNAMES.slice(), chars: [], captain: 0, seed: 21 }); }, JOB);
   await sleep(800);
   const pick = () => p.evaluate(() => {
@@ -21,8 +23,14 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     const ov = [...document.querySelectorAll('#over .big,#cover .big,#over button,#cover button')].find(vis); if (ov && !G.over) return { ...c(ov), k: 'overlay' };
     if (G.over) return { k: 'over' };
     const me = UI.V ? UI.V.seat : -1; if (decider() !== me) return { k: 'wait' };
-    // a new player with hints switched on (the bulb): follow the advised wire when there is one
-    try { const pl = hlpPlan(), e = pl && hlpEl(pl.to); if (e && vis(e)) return { ...c(e), k: 'tile' }; } catch (x) { }
+    if (window.__mode === 'advisor') { try { const pl = hlpPlan(), e = pl && hlpEl(pl.to); if (e && vis(e)) return { ...c(e), k: 'tile' }; } catch (x) { } }
+    else {   // a new player who only reads what is on screen: the starred odds badge (hints default on in jobs 1-3), then the number that badge is for
+      const star = [...document.querySelectorAll('#crew .tile.glow .pvb.best,#crew .tile.glow .pvb')].map(b => b.closest('.tile')).find(vis);
+      if (!UI.sel && star) return { ...c(star), k: 'tile' };
+      if (UI.sel && UI.sel.mode === 'dual' && UI.sel.tg.length === 1 && UI.sel.v == null) { try { const V = UI.V, W = wwk(V), t = UI.sel.tg[0]; let best = null;
+        for (const e of document.querySelectorAll('#mine .tile.glow')) { if (!vis(e)) continue; const sl = G.st[+e.dataset.s].w[+e.dataset.k]; const v = cv(sl.id); const pr = scOdds(V, W, t.st, t.k, v); if (pr != null && (!best || pr > best.p)) best = { p: pr, e }; }
+        if (best) return { ...c(best.e), k: 'tile' }; } catch (x) { } }
+    }
     const g = [...document.querySelectorAll('#tb .tile.glow,#tb .plate.glow,#tb .chip.glow')].filter(vis);
     if (!g.length) return { k: 'none' };
     const crew = g.filter(e => e.classList.contains('crew')), known = crew.filter(e => e.querySelector('.tok,.tk,i.t'));
@@ -45,7 +53,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   if (!r.over) bad.add('job never ended'); if (!r.card) bad.add('no result card');
   for (const e of errs) bad.add('page error ' + e);
   await b.close();
-  console.log(W + 'x' + H + ' job ' + JOB + ' by touch: ' + taps + ' taps, ' + (r.win ? 'WON' : 'lost: ' + r.why));
+  console.log(W + 'x' + H + ' job ' + JOB + ' by touch (' + MODE + '): ' + taps + ' taps, ' + (r.win ? 'WON' : 'lost: ' + r.why));
   console.log(bad.size ? 'MISSION FAIL\n  ' + [...bad].join('\n  ') : 'MISSION PASS: 0 errors');
   process.exit(bad.size ? 1 : 0);
 })();

@@ -91,7 +91,8 @@ function scPaint(){const sc=document.getElementById('sc'),pv=document.getElement
     else{const pr=scPreview(V);if(pr){ph=pr.h;cls='pre '+pr.cls}
       else{const b=scBest(V);if(b&&b.m&&b.p!=null&&(!UI.sel)){ph=`<b>Best now</b> ${esc(scMoveText(V,b.m))}: ${b.m.a==='solo'?'cannot miss':scPct(b.p)+' hit'}. <button type="button" class="wsd" data-wsd>What should I do?</button>`;cls='pre mid'}
       else if(!UI.sel&&V.legal&&decider()===V.seat&&!G.q){ph='<button type="button" class="wsd" data-wsd>What should I do?</button>';cls='pre mid'}}}}
-  pv.hidden=!ph;const sig=cls+'|'+ph;if(sig!==SC.pvh){SC.pvh=sig;pv.className=cls;pv.innerHTML=ph}}
+  const hh=()=>(pv.hidden?0:pv.offsetHeight)+(sc.hidden?0:sc.offsetHeight);const h0=SC.h0==null?-1:SC.h0;pv.hidden=!ph;const sig=cls+'|'+ph;if(sig!==SC.pvh){SC.pvh=sig;pv.className=cls;pv.innerHTML=ph}
+  const h1=hh();SC.h0=h1;if(h1!==h0&&!SC.relay){SC.relay=1;try{layoutTable()}catch(e){}SC.relay=0}}   // a strip (score or preview) took or gave back table height: size the stands again
 function scEndCard(){if(!G||!G.over||UI.tut||SC.endShown===G.over)return;SC.endShown=G.over}
 (function(){const o=refresh;refresh=function(){o();try{if(!G||!UI.started)return;scEnsure();if(SC.g!==G)scReset();
   // a skipped turn has no move: say why the turn is over
