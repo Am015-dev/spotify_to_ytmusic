@@ -131,18 +131,22 @@ function hlpWhy(m, v) {
 }
 const hlpDie = (v, d) => document.querySelector(d === 'p' ? '#pz .die[data-d="p"]' : '#pz .die[data-s="' + v + '"][data-d="' + d + '"]');
 // one plan for the glow, the finger and the bulb: { to: element getter, from: element getter | null, why }
-function hlpPlan() {
+function hlpPlan(opt) {
   if (!G || G.result || UI.dragging) return null;
-  const v = actSeat(); if (typeof v !== 'number' || v < 0 || !myTurn()) return null;
+  const v = actSeat(); if (typeof v !== 'number' || v < 0) return null;
+  const rrNow = !!(G.pend && G.pend.h === 'rr' && !G.pend.d.m[v]); if (!rrNow && !myTurn()) return null;
   let m = null; try { m = FA.AI.move(G, v, 'normal', { noMC: true }); } catch (e) { return null; }
   if (!m) return null;
-  const why = capW(hlpWhy(m, v), 15); if (!why) return null;
+  if (m.t === 'rrpick') { const ds = m.m.map((x, i) => x ? i : -1).filter(i => i >= 0); const vs = ds.map(i => G.dice[v][i].v).join(' and ');
+    return { m, why: ds.length ? 'Roll your ' + vs + ' again: they fit no open job. Then tap Reroll.' : 'Every die fits a job: keep them all.', to: () => document.querySelector('#acts [data-a=rrpick]'), from: null, rr: ds }; }
+  const why = capW(hlpWhy(m, v), 15) || 'This is the safest job for that die now.';
   const sel = typeof UI.sel === 'number' ? UI.sel : -1;
   if (m.t === 'say') { const q = '#says [data-a=say][data-c="' + m.c + '"]'; return (e => e && e.getBoundingClientRect().width > 0)(document.querySelector(q)) ? { m, why, to: () => document.querySelector(q), from: null } : null; }
   if (m.t === 'ready') return { m, why, to: () => document.querySelector('#acts [data-a=ready]'), from: null };
   if (m.t === 'rr') return G.pend ? null : { m, why, to: () => document.querySelector('#acts [data-a=rr]'), from: null };
   if (m.t === 'toss') { if (!hlpDie(v, m.d)) return null; return sel === m.d && document.querySelector('#acts [data-a=toss]') ? { m, why, to: () => document.querySelector('#acts [data-a=toss]'), from: null } : { m, why, to: () => hlpDie(v, m.d), from: null }; }
-  if (m.t !== 'place' || m.c || typeof m.d === 'undefined') return null;   // a coffee move needs two taps the finger cannot show: rules cards only
+  if (m.t !== 'place' || typeof m.d === 'undefined') return null;
+  if (m.c && !opt) return null;   // a coffee move needs extra taps the finger cannot show: only the "What should I do?" answer names it
   if (!hlpDie(v, m.d) || !document.querySelector('#pz .slot[data-slot="' + m.to + '"]')) return null;
   return { m, why, to: () => document.querySelector('#pz .slot[data-slot="' + m.to + '"]'), from: sel === m.d ? null : () => hlpDie(v, m.d) };
 }
@@ -165,6 +169,9 @@ setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
 function hintsSync() { const b = $('#bulbbtn'); if (!b) return; const on = !!UI.prefs.hints; b.classList.toggle('hon', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', on ? 'Hints on (tap to turn off)' : 'Hints off (tap to turn on)'); b.title = on ? 'Hints on' : 'Hints off'; }
 document.addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('#bulbbtn'); if (b) { e.stopPropagation(); e.preventDefault(); UI.prefs.hints = !UI.prefs.hints; savePrefs(); UI.cpt = null; UI.askWhy = null; hintsSync(); if (G && UI.started) render(); return; }
-  const a = e.target.closest && e.target.closest('[data-a=ask]'); if (a) { e.stopPropagation(); e.preventDefault(); const p = hlpPlan(); if (p && p.m) { UI.cpt = p.m.t === 'place' ? { k: p.m.to, d: p.m.d } : null; UI.askWhy = (p.m.t === 'place' ? 'Try your ' + (p.m.d === 'p' ? '' : G.dice[actSeat()][p.m.d].v + ' on ') + slotName(p.m.to) + ': ' : '') + p.why; } else UI.askWhy = null; render(); }
+  const a = e.target.closest && e.target.closest('[data-a=ask]'); if (a) { e.stopPropagation(); e.preventDefault(); const p = hlpPlan(true); if (p && p.m) { UI.cpt = p.m.t === 'place' ? { k: p.m.to, d: p.m.d } : null; if (p.rr) { UI.rrm = [0, 1, 2, 3].map(i => p.rr.includes(i)); }
+    const cf = p.m.t === 'place' && p.m.c ? ' with ' + Math.abs(p.m.c) + ' coffee (' + (p.m.c > 0 ? '+' : '-') + Math.abs(p.m.c) + ')' : '';
+    UI.askWhy = (p.m.t === 'place' ? 'Try your ' + (p.m.d === 'p' ? '' : G.dice[actSeat()][p.m.d].v + cf + ' on ') + slotName(p.m.to) + ': ' : '') + p.why; }
+    else UI.askWhy = 'Any open job is fine: no move is clearly better.'; render(); }
 }, true);
 setTimeout(hintsSync, 300);

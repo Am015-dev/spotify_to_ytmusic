@@ -249,9 +249,9 @@ function ftAfter() {
   const v = actSeat(), sel = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.result && (UI.sel === 'p' || (typeof UI.sel === 'number' && UI.sel >= 0));
   let pv = $('#fprev'); if (!pv && db) { pv = h('div#fprev', { 'aria-live': 'polite' }); const pd = $('#promptDock'); if (pd && pd.nextSibling) db.insertBefore(pv, pd.nextSibling); else db.appendChild(pv); }
   if (pv) { const k = sel && hintsMode() ? previewKey(v) : null; pv.hidden = !k && !UI.askWhy; pv.textContent = k ? previewText(k, v) : UI.askWhy || ''; pv.classList.toggle('bad', !!k && /crash|ends|spin|too fast/i.test(pv.textContent)); }
-  // Hints on: the "What should I do?" button joins the actions on your turn (Addendum 7)
-  const ac = $('#acts'), mineNow = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.pend && G.turn === v && !G.result;
-  if (ac && UI.prefs.hints && mineNow && !(UI.fc && !UI.fc.ended) && !ac.querySelector('[data-a=ask]')) ac.appendChild(h('button.btn.ask', { type: 'button', 'data-a': 'ask' }, 'What should I do?'));
+  // the "What should I do?" button joins the actions on every turn of yours (R6: always, not only with Hints on)
+  const ac = $('#acts'), mineNow = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.result && (G.pend ? G.pend.h === 'rr' && !G.pend.d.m[v] : G.turn === v);
+  if (ac && mineNow && !(UI.fc && !UI.fc.ended) && !(typeof tutOn === 'function' && tutOn()) && !ac.querySelector('[data-a=ask]')) ac.appendChild(h('button.btn.ask', { type: 'button', 'data-a': 'ask' }, 'What should I do?'));
   $$('#pz .slot[data-slot]').forEach(e => { const k = e.dataset.slot; if (!FA.SLOT[k]) return; const why = sel && !e.classList.contains('legal') ? whyNot(k, v) : '';
     e.title = why || slotNeedLong(k); e.classList.toggle('nofit', !!why); e.classList.toggle('cpt', !!(UI.cpt && UI.cpt.k === k)); });
   $$('#pz .die[data-s="0"]').forEach(e => e.classList.toggle('cpt', !!(UI.cpt && String(UI.cpt.d) === e.dataset.d && UI.sel !== UI.cpt.d)));

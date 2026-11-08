@@ -20,10 +20,10 @@ function tutEl(cls) { const w = document.createElement('div'); w.innerHTML = typ
 function ttlSrc(land) { try { return matchMedia('(max-aspect-ratio:4/5)').matches ? 'media/title-phone.webp' : land; } catch (e) { return land; } }
 function ttlImg(land) { const im = h('img.ttl-bg', { src: ttlSrc(land), alt: '' }); im.addEventListener('error', () => { if (im.src.indexOf('title-phone') > -1) im.src = land; }); return im; }
 function titleEl() {
-  const bg = ART.title ? ttlImg(ART.title) : h('div.ttl-bg.ttl-plain'), sv = hasSave();
+  const bg = ART.title ? ttlImg(ART.title) : h('div.ttl-bg.ttl-plain'), sv = hasSave(), tutNew = typeof GXT !== 'undefined' && !GXT.isDone('final-approach');   // a new player sees "New here? Learn in 5 minutes" first, above Play
   return h('div.ttl', bg, h('div.ttl-in', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Final Approach')), h('p.tag', 'Two seats. Eight dice. One runway.'),
-    h('div.tbtns', h('button.tbtn.go.story', { 'data-a': window.CAMPAIGN && typeof campLine === 'function' ? 'camp' : 'play', type: 'button' }, h('b', 'Play'), typeof campLine === 'function' && window.CAMPAIGN ? h('span', campLine()) : null),
-      h('div.qrow', { role: 'group', 'aria-label': 'Quick game' }, h('span.qlbl', 'Quick game'), h('button.qseg', { 'data-a': 'play', type: 'button' }, 'Computer'), h('button.qseg', { 'data-a': 'online', type: 'button' }, 'Online'), sv ? h('button.qseg', { 'data-a': 'loadsave', type: 'button' }, 'Resume') : null), tutEl('ttut'))));
+    h('div.tbtns', tutNew ? tutEl('ttut') : null, h('button.tbtn.go.story', { 'data-a': window.CAMPAIGN && typeof campLine === 'function' ? 'camp' : 'play', type: 'button' }, h('b', 'Play'), typeof campLine === 'function' && window.CAMPAIGN ? h('span', campLine()) : null),
+      h('div.qrow', { role: 'group', 'aria-label': 'Quick game' }, h('span.qlbl', 'Quick game'), h('button.qseg', { 'data-a': 'play', type: 'button' }, 'Computer'), h('button.qseg', { 'data-a': 'online', type: 'button' }, 'Online'), sv ? h('button.qseg', { 'data-a': 'loadsave', type: 'button' }, 'Resume') : null), tutNew ? null : tutEl('ttut'))));
 }
 function roleCard(s) {
   const o = optObj(), c = D.crew[s], on = o.role === s;

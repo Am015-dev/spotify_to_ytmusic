@@ -115,6 +115,14 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       else{const rb=await p.evaluate(()=>{const b=document.querySelector('[data-gxt-dlg=restart]');const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});await p.touchscreen.tap(rb[0],rb[1]);await sleep(600);        const r2=await state();if(!r2.active||r2.i!==0)note(tag,'restart did not start at step 0 ('+JSON.stringify({a:r2.active,i:r2.i})+')');lastSig='';lastT=Date.now();seenIds=[]}
       continue}
     // ---- do exactly what the step asks
+    if(!s.wait&&s.i===s.n-1){   // the last step, like a real player: look at the landing for a while (the end scene plays), tap the highlight, then Finish by touch
+      await sleep(3500);for(let k=0;k<3;k++){await p.touchscreen.tap(h.cx,h.cy);await sleep(350)}await sleep(1800);
+      const nb=await p.evaluate(()=>{const e=document.querySelector('.gxt-bub .gxt-next');if(!e)return null;const r=e.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,t=document.elementFromPoint(x,y);return {x,y,top:!!t&&(t===e||e.contains(t)),txt:e.textContent,under:t&&(t.id||t.className||t.tagName)}});
+      if(!nb)note(tag,'last step: no Finish button');else{if(!nb.top)note(tag,'last step: Finish is covered by '+nb.under);if(nb.txt!=='Finish')note(tag,'last step button says '+nb.txt);
+        await p.touchscreen.tap(nb.x,nb.y);await sleep(900);
+        const ec=await p.evaluate(()=>{const c=document.querySelector('.gxt-end .gxt-endc');if(!c)return null;const b=c.querySelector('[data-gxt-end]'),r=b.getBoundingClientRect(),t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {top:!!t&&(t===b||b.contains(t)),under:t&&(t.id||t.className||t.tagName)}});
+        if(!ec)note(tag,'Finish (by touch) did not show the end card');else if(!ec.top)note(tag,'the end card is covered by '+ec.under)}
+      continue}
     if(!s.wait){const nx=info.next;await p.touchscreen.tap((nx.left+nx.right)/2,(nx.top+nx.bottom)/2)}
     else{
       await sleep(650);   // a human never taps within 0.6 s of a new bubble (the kit ignores that as the tail of the last gesture)

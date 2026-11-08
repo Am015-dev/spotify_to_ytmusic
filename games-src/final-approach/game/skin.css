@@ -36,3 +36,4 @@ html.sk .gxh-a-top .gxh-arr{top:-14px;transform:rotate(-110deg)}
 html.sk .gxh-a-bottom .gxh-arr{bottom:-14px;transform:rotate(70deg)}
 html.sk .gxh-a-left .gxh-arr{left:-17px;transform:rotate(160deg)}
 html.sk .gxh-a-right .gxh-arr{right:-17px;transform:rotate(-20deg)}
+html:root{--gxt-z:10000}   /* the tutorial layer sits above every game overlay (end scene, round card, skip) */
