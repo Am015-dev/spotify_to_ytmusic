@@ -240,7 +240,8 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
   const focus=x.p===bfFocus(),pl=P(x.p);BF.actor=x.p;
   if(!focus||!pl||!pl.human||NET.on){BF.lastRival=1;bfTurn(pl.nm+"'s turn");await bfWait(700)}
-  if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw()}
+  if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw();
+    const se=bfQ(`[data-bfsrc="${x.src}"]`);if(se&&bfAnimOK()){se.classList.add('rv-src');await bfWait(450)}}   // W466: show which kiln the rival takes from
   // 1. the tiles lift (the player's own selection is already up)
   let lifted=false;for(const o of picked){const el=bfEl(o.key);if(el&&!el.classList.contains('up')){el.classList.add('up');lifted=true}}
   for(const o of rest){const el=bfEl(o.key);if(el&&x.src>=0)el.classList.add('nud')}
@@ -257,7 +258,7 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   if(x.src<0)rest.forEach((o,i)=>bfFlip(bfEl('c_'+i),o.r));else ctrOld.forEach((r,k)=>bfFlip(bfEl('c_'+k),r));
   // 3. fly: chosen tiles to the rack (or to a rival's chip), the rest slides to the middle
   const chip=bfChipR(x.p);const fl=[];sfx('take');
-  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,focus&&o.to?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:140),dur:focus?600:760,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to)})));
+  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,focus&&o.to?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:140),dur:focus?600:820,lift:focus?42:90,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to);else if(!focus){const ce=bfQ(`[data-bfchip="${x.p}"]`);if(ce){ce.classList.remove('hit');void ce.offsetWidth;ce.classList.add('hit')}}})));
   rest.forEach((o,i)=>{if(!restTo[i])return;fl.push(bfFly(o.t,o.r,bfR(bfSlot(restTo[i])),{delay:200+i*60,dur:520,lift:12}).then(()=>{bfShow(restTo[i]);const el=bfEl(restTo[i]);if(el&&bfAnimOK())el.animate([{transform:'scale(1.25)'},{transform:'scale(.92)'},{transform:'scale(1)'}],{duration:bfD(260)});sfx('place')}))});
   if(hadSun)fl.push(bfFly(SUN,sunR,focus?bfR(bfSlot(sunKey)):chip,{dur:600,lift:60}).then(()=>bfShow(sunKey)));
   await Promise.all(fl);BF.hide.clear();sfx('place');
@@ -391,7 +392,7 @@ function bfOvHTML(){if(!G)return '';
       <div class="bf-btns">${isClient()?'':'<button class="bf-go" data-a="new">Play again</button>'}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
   return ''}
 function bfDraw(o){o=o||{};if(!BF.on)return;bfEnsure();if(!G||!BF.disp){BF.root.classList.add('empty');BF.top.innerHTML='';BF.tbl.innerHTML='';BF.me.innerHTML='';BF.hint.innerHTML='';BF.ov.hidden=true;bfFinger(null);return}
-  BF.root.classList.remove('empty');bfSizes();const S=BF.disp,live=!BF.busy,hp=live?me():null;const f=bfFocus();const fp=S.pl[f]||S.pl[0];
+  BF.root.classList.remove('empty');if(!BF.busy)BF.root.classList.remove('tapfx');bfSizes();const S=BF.disp,live=!BF.busy,hp=live?me():null;const f=bfFocus();const fp=S.pl[f]||S.pl[0];
   BF.top.innerHTML=bfTopHTML(S);BF.tbl.innerHTML=bfTableHTML(S,hp,o);if(BF.rv&&BF.busy)bfRival();BF.hint.innerHTML=bfHintHTML(S,hp);BF.me.innerHTML=bfBoardHTML(S,fp,hp);
   BF.me.style.setProperty('--pc',PCOL[fp.i]);BF.me.classList.toggle('turn',!!hp);
   const ov=bfOvHTML();BF.ov.innerHTML=ov;BF.ov.hidden=!ov;
@@ -416,11 +417,11 @@ function bfGuide(hp){clearTimeout(BF.idleT);
 function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
 function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return;const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
-  if(BF.busy){bfSpeedUp();return}
+  if(BF.busy){bfSpeedUp();BF.root.classList.toggle('tapfx');return}   // W466: a tap during the rival's move speeds it up (and shows it: the line gets a fast-forward mark)
   if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
   if(t.closest('.bf-ov')){if(G&&G.over){BF.resHide=true;bfDraw()}return}
   const chip=t.closest('[data-bfchip]');if(chip){BF.peek=+chip.dataset.bfchip;sfx('click');bfDraw();return}
-  if(!G||G.over)return;const hp=me();if(!hp)return;BF.fingerOn=false;
+  if(!G||G.over)return;const hp=me();if(!hp){bfShake(BF.hint);return}BF.fingerOn=false;   // W466: not your turn: the line nudges ("Tamsin is choosing")
   if(G.phase==='wall'){const c=t.closest('[data-bfcell]');if(c){const [r,cc]=c.dataset.bfcell.split(',').map(Number);const m=validMoves(hp.i).find(m=>m.r===r&&m.c===cc);if(m)return go(m)}sfx('bad');BF.fingerOn=true;bfDraw();return}
   if(G.phase!=='offer')return;
   let tile=t.closest('[data-k]');
@@ -480,3 +481,5 @@ function sgShortDom(root){if(!root||typeof sgShortS!=='function')return;const tw
   for(const n of ns){const t=n.nodeValue;if(!t||t.trim().split(/\s+/).length<=12)continue;const u=t.split(/(?<=[.!?…])(\s+)/).map(x=>/^\s+$/.test(x)?x:sgShortS(x)).join('');if(u!==t)n.nodeValue=u}}
 {const _rd=renderDock;renderDock=function(){const r=_rd.apply(this,arguments);try{sgShortDom(document.querySelector('.gx-dock'))}catch(e){}return r};
  const _rp=renderPopups;renderPopups=function(){const r=_rp.apply(this,arguments);try{for(const id of ['logbody','plrd','refd','rulesd'])sgShortDom(document.getElementById(id))}catch(e){}return r}}
+// W466: never stuck: if events wait in the queue with nothing on screen to start them (e.g. a cover closed without a redraw), play them
+setInterval(()=>{try{if(BF.on&&G&&!BF.busy&&BF.q.length&&!UI.modal)bfRun()}catch(e){}},400);

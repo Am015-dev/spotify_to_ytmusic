@@ -175,7 +175,8 @@ function tutLaunch(){tutStart()}
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}
 // first-time players tapping Begin are offered the tutorial once
-function tutOffer(){if(typeof GXT==='undefined'||UI.tut||NET.on||!firstTime())return false;
+function tutOffer(){return false;   // W466 polish: the title's Learn to play button replaces this pop-up (one cover before the first move)
+  if(typeof GXT==='undefined'||UI.tut||NET.on||!firstTime())return false;
   try{localStorage.setItem('sgz_offer','1')}catch(e){}
   const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
   d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A guide plays one game with you. Each rule, right when it matters.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn" data-a="learn">Learn to play</button><button type="button" class="gxt-b sg-link" data-offer="play" data-a="play">Play now</button></div></div>';

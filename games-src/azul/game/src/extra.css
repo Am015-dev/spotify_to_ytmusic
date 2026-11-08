@@ -155,3 +155,20 @@ span.tag{font-size:14px!important}
 #bf .bf-sack{position:absolute;right:10px;top:calc(var(--sat,0px) + 52px);z-index:5;background:rgba(10,20,50,.72);border-radius:14px;padding:3px 8px 3px 4px}
 @media (min-width:1024px){#bf .bf-sack{top:calc(var(--sat,0px) + 66px)}}
 .cg-b .cg-pic{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;align-self:flex-start;margin-top:2px;box-shadow:0 0 0 2px #b98a3e}
+/* W466 polish: PC table painting fills the whole screen (no flat navy half) */
+html.bf-land #bf{background:linear-gradient(rgba(10,18,44,.28),rgba(10,18,44,.28)),var(--sg-table,#13234d) center/cover no-repeat}
+html.bf-land #bf .bf-table::before{background:none;box-shadow:none}
+html.bf-land #bf .bf-line .bf-say{background:rgba(10,20,50,.72);padding:4px 14px;border-radius:14px}
+/* phone wall: bigger cells, clear guide motifs (placed tiles stay framed and shadowed) */
+#bf .bf-wall .bf-c{width:calc(var(--cs)*1.1);height:calc(var(--cs)*1.1)}
+#bf .bf-rack .bf-c{width:calc(var(--cs)*.9);height:calc(var(--cs)*.9)}
+#bf .bf-row{align-items:center}
+#bf .bf-c .pr{inset:5%;opacity:.8;filter:saturate(.75)}
+#bf .bf-wall .bf-c>.bf-t{box-shadow:0 2px 4px rgba(0,0,0,.45)}
+/* rival turn: the kiln it takes from glows; its chip pulses as the tiles arrive */
+#bf .rv-src{animation:rvSrc .9s ease-in-out infinite;border-radius:50%}
+@keyframes rvSrc{0%,100%{box-shadow:0 0 0 0 rgba(255,214,90,0)}50%{box-shadow:0 0 0 6px rgba(255,214,90,.9),0 0 28px 8px rgba(255,190,60,.7)}}
+#bf .bf-chip.hit{animation:chipHit .45s ease-out}
+@keyframes chipHit{40%{transform:scale(1.12)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){#bf .rv-src,#bf .bf-chip.hit{animation:none}#bf .rv-src{box-shadow:0 0 0 5px #ffd65a}}
+#bf.tapfx .bf-say::after,#bf .bf-say.fastm::after{content:' ⏩';font-size:.9em}
