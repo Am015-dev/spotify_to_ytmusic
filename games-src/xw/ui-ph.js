@@ -148,6 +148,9 @@ function phRender(){if(!PHN.on)return;PHN.build();const dock=document.querySelec
   if(PHN.armed){const b=document.querySelector(`#prompt [data-hov="${PHN.armed}"]`);if(b)b.classList.add('armed')}
   // focus follows the decision while it is on; it returns to the whole mat when you are not deciding any more
   if(PHN.focusOn){if(!G||G.winner||!(planSide()>=0||humanTurn())){PHN.focus(false,true)}else{const k=fkey();if(k!==PHN.fkey){PHN.fkey=k;frame(focusPts(),8)}}}
+  // phone portrait (R5 review): with focus off, the camera fits both squads (not the whole mat) and refits after ships move
+  else if(G&&!G.winner&&G.round>=1&&R.classList.contains('ph-p')&&!R.classList.contains('ph-big')&&typeof V3!=='undefined'&&V3.on){const al=G.ships.filter(x=>x.alive);const k=al.map(x=>x.id+':'+Math.round(x.x/20)+','+Math.round(x.y/20)).join('|');
+    if(k!==PHN.akey){PHN.akey=k;const pts=[];for(const x of al){const r=B(x)*1.8;for(const [dx,dy] of [[-r,-r],[r,-r],[r,r],[-r,r]])pts.push(W(x.x+dx,x.y+dy,0))}if(pts.length)frame(pts,10)}}
   syncCtl();const v=typeof V3!=='undefined'&&V3.on;R.classList.toggle('ph-3d',v)}
 const _render=render;render=function(){_render();try{phRender()}catch(e){console.error(e)}};
 // ---- events (capture phase, so they run before the game's own delegated handlers) ----

@@ -65,7 +65,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
   const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Pick an option.');
   return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span></div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy?'':phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?phCrews():phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
   if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
@@ -91,6 +91,10 @@ function openGoal(){const o=document.getElementById('twgoal');if(o){o.remove();r
 document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('[data-goal]');if(g){e.stopPropagation();g.setAttribute('aria-expanded',g.getAttribute('aria-expanded')==='true'?'false':'true');openGoal()}},true);
 // what the rival did this turn: lines are added and stay until your turn (nothing is animated away before it can be read)
 function phRivalFeed(){const L=UI.rivLines||[];if(!L.length)return '';return `<ol class="ps-riv">${L.slice(-5).map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`}
+// captain cards: every crew with its colour, name, afloat or sunk and tiles in hand (fills the strip on rival turns and at the start)
+function phCrews(){if(!G||!UI.started||!PH.on)return '';const me=youSeat();
+  return `<div class="ps-crews">${G.order.map(i=>{const S=G.ships[i],h=(G.hands[i]||[]).length,now=(UI.busy&&UI.curTurn===i)||(!UI.busy&&sideToAct()===i);
+    return `<div class="crew${S.alive?'':' sunk'}${now?' now':''}"><i style="background:${colOf(i).sail}"></i><b>${i===me&&me>=0&&!hotSeat()?'You':esc(nm(i))}</b><span>${S.alive?(G.phase==='setup'&&S.x==null?'Choosing a start':'Afloat · '+h+' tile'+(h===1?'':'s')):'Sunk'}</span></div>`}).join('')}</div>`}
 // the goal and the race, always on screen: who is still afloat
 function phGoal(){if(!G||!UI.started||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
   if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal" data-goal>${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
