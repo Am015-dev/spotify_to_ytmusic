@@ -22,7 +22,7 @@ document.addEventListener('click', function (e) {
     else if (a === 'tray' && G.tray[i]) showCard(G.tray[i]);
     return;
   }
-  if (a === 'cancel') { if (!tutGate({ type: 'tap', what: 'cancel' })) return; UI.sel = null; UI.pend = null; UI.gsDie = null; render(); return; }
+  if (a === 'cancel') { if (!tutGate({ type: 'tap', what: 'cancel' })) return; UI.sel = null; UI.pend = null; UI.gsDie = null; UI.pickBird = false; render(); return; }
   if (a === 'mv') { var m = JSON.parse(t.dataset.m); if (!tutGate(Object.assign({ type: 'tap', what: 'mv' }, m))) return; UI.gsDie = null; human(m); return; }
   if (a === 'playgo') { if (!tutGate({ type: 'tap', what: 'playgo' })) return; var inf = PP.playInfo(G, UI.view, p.hand[UI.pend.i], UI.pend.h, Q && Q.h === 'play2' ? Q.d.hab : null); var mv = { t: 'play', i: UI.pend.i, id: p.hand[UI.pend.i], h: UI.pend.h, pay: inf.pays[UI.pend.k % inf.pays.length] }; UI.pend = null; UI.sel = null; human(mv); return; }
   if (a === 'paycycle') { UI.pend.k++; render(); return; }
@@ -68,6 +68,7 @@ function whyCant(id) {
 function human(m) {
   var s = UI.view, Q = G.q;
   try { if (window.GX && GX.undo && GX.undo.snap) { } } catch (e) { }
+  try { rateChoice(m); } catch (e) { }
   apply(m, s);
 }
 function setSlot(h, c, st) {   // redraw one bird on the shown board (used to reveal each power's result as that bird fires)
@@ -84,7 +85,7 @@ function apply(m, s) {
   save(); render();
   if (!UI.fast) fx.forEach(function (e) { if (e.k === 'pw' && e.seat === UI.view && pre[e.h] && pre[e.h][e.c] && pre[e.h][e.c].id === e.id) setSlot(e.h, e.c, pre[e.h][e.c]); });
   UI.busy = true; UI.animSeat = s; $('#prompt').textContent = promptText(false);
-  playFx(fx, s).then(function () { UI.busy = false; UI.animSeat = null; render(); pump(); });
+  playFx(fx, s).then(function () { UI.busy = false; UI.animSeat = null; try { rateEnd(); } catch (e) { } render(); pump(); });
   return true;
 }
 // ---------------- the fx queue: each brown power fires bird by bird, right to left
