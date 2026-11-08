@@ -286,7 +286,7 @@ var L = {};
 function layout() {
   var b = $('#bd'), W = b.clientWidth, H = b.clientHeight; if (!W || !H) return;
   var oppH = (H < 420 ? 84 : innerWidth >= 1024 ? 102 : 92) - (hints() ? 0 : innerWidth >= 1024 ? 18 : 14), pad = 6, n = G ? VB.depotSize(G) : 2;
-  var wide = W > H * 1.15;
+  var wide = W > H * 1.15 && !portraitPhone();   /* a tall dock must not flip a portrait phone into the landscape layout */
   var mk = $('#mk'), es = $('#es'), opp = $('#opp'); mk.classList.toggle('ph', !wide); if (!UI.tab) UI.tab = 'estate'; if (wide || !phoneTabs()) { L.tabs = false; mk.style.display = ''; es.style.display = ''; var t1 = $('#tabs'); if (t1) t1.remove(); var r1 = $('#rv'); if (r1) r1.style.display = 'none'; mk.classList.remove('big'); } var two = !wide && n > 2; mk.classList.toggle('two', two);
   opp.style.cssText = 'left:' + pad + 'px;top:' + pad + 'px;right:' + pad + 'px;height:' + (oppH - 6) + 'px';
   if (wide) {   /* market as a 2-column block on the left, estate on the right */
@@ -316,20 +316,22 @@ function layout() {
 }
 function fitMarket() {   /* phone tabs: shrink the stalls (or lay the six stalls in one row) until the market sits fully above the dock */
   var mk = $('#mk'); if (!L.tabs || UI.tab !== 'market' || mk.style.display === 'none') { mk.classList.remove('six'); return; }
-  var limit = L.ey + L.eh, hx = parseInt(mk.style.getPropertyValue('--hex'), 10) || 44, best = null;
+  var bdT = $('#bd').getBoundingClientRect().top, dk = $('#dock'), dkT = dk && dk.offsetHeight ? dk.getBoundingClientRect().top - bdT - 6 : 1e9;
+  var limit = Math.min(L.ey + L.eh, dkT), hx = parseInt(mk.style.getPropertyValue('--hex'), 10) || 44, best = null;
   function bottom() { return mk.getBoundingClientRect().top - $('#bd').getBoundingClientRect().top + mk.scrollHeight; }
   [false, true].forEach(function (six) {
     if (best && best.fit) return;
-    mk.classList.toggle('six', six); mk.style.gridTemplateColumns = six ? 'repeat(6,1fr)' : 'repeat(3,1fr)';
+    mk.classList.toggle('six', six); mk.style.gridTemplateColumns = six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = six ? '3px' : '6px';
     var h0 = hx; mk.style.setProperty('--hex', h0 + 'px');
     while (bottom() > limit && h0 > 30) { h0 -= 2; mk.style.setProperty('--hex', h0 + 'px'); }
     var r = { six: six, hex: h0, fit: bottom() <= limit };
     if (!best || (r.fit && !best.fit) || (r.fit === best.fit && r.hex > best.hex)) best = r;
   });
-  mk.classList.toggle('six', best.six); mk.style.gridTemplateColumns = best.six ? 'repeat(6,1fr)' : 'repeat(3,1fr)'; mk.style.setProperty('--hex', best.hex + 'px');
+  mk.classList.toggle('six', best.six); mk.style.gridTemplateColumns = best.six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = best.six ? '3px' : '6px'; mk.style.setProperty('--hex', best.hex + 'px');
   L.mkFit = best;
 }
-function phoneTabs() { var b = $('#bd'); return b.clientWidth <= 640 && b.clientWidth <= b.clientHeight * 1.15; }
+function portraitPhone() { return innerWidth <= 640 && innerHeight > innerWidth; }
+function phoneTabs() { var b = $('#bd'); return b.clientWidth <= 640 && (portraitPhone() || b.clientWidth <= b.clientHeight * 1.15); }
 function ensureTabs(y, pad) {
   var t = $('#tabs'); if (!t) { t = h('div', { id: 'tabs', role: 'tablist' }); $('#bd').appendChild(t); }
   t.style.cssText = 'left:' + pad + 'px;right:' + pad + 'px;top:' + y + 'px';
@@ -349,7 +351,7 @@ function renderRival() {
   var S = Math.min(w / (7 * 1.732 + 0.4), hh / 11.1); renderEstate(box, s, S);
 }
 function fitEstate() {   /* phone: the estate takes what the market leaves */
-  var b = $('#bd'), mk = $('#mk'), W = b.clientWidth, H = b.clientHeight; if (W > H * 1.15) return;
+  var b = $('#bd'), mk = $('#mk'), W = b.clientWidth, H = b.clientHeight; if (W > H * 1.15 && !portraitPhone()) return;
   if (phoneTabs()) { L.s = Math.max(12, Math.min(L.ew / (7 * 1.732 + 0.4), L.eh / 11.1)); $('#es').style.cssText = (UI.tab === 'estate' ? '' : 'display:none;') + 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 + 1) + 'px'; return; }
   L.tabs = false; var t0 = $('#tabs'); if (t0) t0.remove(); var r0 = $('#rv'); if (r0) r0.style.display = 'none'; mk.classList.remove('big'); $('#es').style.display = '';
   L.ey = mk.offsetTop + mk.offsetHeight + 4; L.eh = Math.max(80, H - L.ey - 4);
@@ -362,7 +364,7 @@ function cellXY(c, s, w, hgt) { var x = s * 1.732 * (c.q + c.r / 2), y = s * 1.5
 function render() {
   if (!G) return;
   document.body.classList.toggle('gx-myturn', !!myTurn()); document.body.classList.toggle('gx-selecting', UI.sel != null && !!myTurn());
-  layout(); renderBar(); renderOpp(); renderMarket(); fitMarket(); fitEstate(); renderEstate(); renderDock(); renderScores();
+  layout(); renderBar(); renderOpp(); renderMarket(); fitMarket(); fitEstate(); renderEstate(); renderDock(); renderScores(); fitMarket();   /* again: the dock may have grown */
   if (L.tabs) { ensureTabs(parseInt($('#tabs').style.top, 10) || 50, 6); renderRival(); }
   try { artApply(); } catch (e) { }
   toastPos();
@@ -503,7 +505,8 @@ function renderDock() {
   }
   var seen = {};
   [0, 1].forEach(function (i) { if (p.used[i] || seen[p.dice[i]]) return; seen[p.dice[i]] = 1; ac.appendChild(h('button.btn.alt', { type: 'button', id: 'wk' + i, text: p.dice[i] + ' → ' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers', 'aria-label': 'Swap your ' + p.dice[i] + ' for ' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers', onclick: function () { doMove(pick(VB.validMoves(G).filter(function (m) { return m.k === 'workers' && m.die === i; }))); } })); });
-  if (p.used[0] && p.used[1]) ac.appendChild(h('button.btn', { type: 'button', id: 'endB', text: 'End turn', onclick: function () { doMove({ k: 'end' }); } }));
+  if (p.used[0] && p.used[1]) { var eb = h('button.btn', { type: 'button', id: 'endB', text: 'End turn', onclick: function () { doMove({ k: 'end' }); } }); ac.appendChild(eb);
+    requestAnimationFrame(function () { try { var r = eb.getBoundingClientRect(); if (r.bottom > innerHeight || r.top < 0) eb.scrollIntoView({ block: 'nearest' }); } catch (e) { } }); }   /* small phones: the dock body scrolls; never leave End turn below the fold */
 }
 function storeLegal(i) {
   var top = pend();

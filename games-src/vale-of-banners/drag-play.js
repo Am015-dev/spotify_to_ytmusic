@@ -4,7 +4,7 @@ const { chromium } = require('playwright'); const path = require('path');
 const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1';
 (async () => {
   const b = await chromium.launch(); let fails = 0;
-  for (const [name, vp, touch] of [['phone-touch', { width: 390, height: 844 }, true], ['phone-s-touch', { width: 375, height: 667 }, true], ['pc-mouse', { width: 1440, height: 900 }, false]]) {
+  for (const [name, vp, touch] of [['phone-touch', { width: 390, height: 844 }, true], ['phone-s-touch', { width: 375, height: 667 }, true], ['pc-mouse', { width: 1440, height: 900 }, false]].filter(x => !process.env.ONLY || x[0] === process.env.ONLY)) {
     const SHOT = process.env.SHOTS && name === 'phone-touch' ? path.join(__dirname, 'playable-shots', 'gameplay') : null, shots = {}; if (SHOT) require('fs').mkdirSync(SHOT, { recursive: true });
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }), page = await ctx.newPage(), errs = [];
     const cdp = touch ? await ctx.newCDPSession(page) : null; let tp = { x: 0, y: 0 };
@@ -46,7 +46,7 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1'
       if (ok && plan.k !== 'worker') { await page.waitForFunction(() => !UI.busy, null, { timeout: 5000 }).catch(() => { }); await page.waitForTimeout(plan.k === 'combo' ? 120 : 0); await page.waitForFunction(() => !UI.busy, null, { timeout: 5000 }).catch(() => { }); const seq1 = await page.evaluate(() => G.seq); if (seq1 === seq0) { drags[plan.k]--; missed++; ok = false; } else if (plan.k === 'combo' && seq1 - seq0 < 2) { combo1++; } }
       if (!ok || plan.k === 'tap') {
         const order = ['#endB', '#es .glow', '#store .glow', '#mk .stgoods.glow', '#goods .glow', '#mk .tilebtn.glow', '#tabs .tab.has', '#acts .btn.alt'].map(x => x + ' >> visible=true');
-        let did = false; for (const s of order) { const l = page.locator(s); if (await l.count()) { await tapSel(l.first()); taps++; did = true; break; } }
+        let did = false; for (const s of order) { const l = page.locator(s); if (await l.count()) { if (process.env.DBG && taps > 300 && taps < 306) console.log(name, 'tap', s, plan.k, await page.evaluate(() => JSON.stringify({ tab: UI.tab, pend: pend(), dice: G.P[VB.actor(G)].dice, used: G.P[VB.actor(G)].used, fit: L.mkFit, vm: VB.validMoves(G).slice(0, 4) }))); await tapSel(l.first()); taps++; did = true; break; } }
         if (!did) { console.log(name, 'FAIL nothing to do', plan.k); fails++; break; }
       }
       await page.waitForTimeout(20);

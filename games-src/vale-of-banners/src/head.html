@@ -150,6 +150,8 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 .gx-bar{overflow:visible;padding-left:8px;padding-right:8px;gap:4px}
 .gx-bar h1{flex:0 0 auto}
 #barstat{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.gx-app>*{min-width:0}.gx-bar{min-width:0;max-width:100vw}   /* the bar scrolls; it must never widen the page (tutorial adds the hint bulb) */
+@media (max-width:400px){.gx-bar{gap:2px;padding-left:6px;padding-right:6px}}
 @media (max-width:640px){.gx-bar h1 .tt{display:none}.gx-bar .gx-ibtn span{display:none}.gx-bar .gx-ibtn{padding:4px;min-width:44px}.gx-bar .gx-sp{flex:1 1 0;min-width:0}.gx-bar{gap:3px}}
 .tilebtn{min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
 .cell{width:calc(var(--hex) + 2px);height:max(44px,calc(var(--hex) * 1.1547))}
@@ -220,7 +222,7 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 #mk.big .stall{padding:6px 4px}#mk.big .sth .pip{font-size:16px}
 #mk.big .lane{grid-column:1/-1;flex-direction:row;justify-content:center;gap:8px}#mk.big .lane .sttiles{flex-direction:row;gap:8px}
 #mk.big .stall:not(.lane) .sttiles{display:flex;flex-direction:row;gap:6px;justify-content:center}
-#mk.big.six .stall:not(.lane) .sttiles{flex-direction:column;gap:3px}#mk.big.six .stall{padding:2px 1px;gap:1px}#mk.big.six .sth{line-height:1}#mk.big.six .stgoods{min-height:0}#mk.big.six .lane{padding:2px 4px}
+#mk.big.six .stall:not(.lane) .sttiles{flex-direction:column;gap:3px}#mk.big.six .stall{padding:2px 1px;gap:1px}#mk.big.six .sth{line-height:1}#mk.big.six .stall:not(.lane){position:relative}#mk.big.six .sth{align-self:flex-start;margin-left:2px}#mk.big.six .stgoods{min-height:0;position:absolute;top:2px;right:1px;max-width:calc(100% - 26px);justify-content:flex-end;z-index:3}#mk.big.six .stgoods:not(.glow){pointer-events:none}#mk.big.six .gchip{font-size:12px!important;min-width:16px;height:18px;line-height:18px;padding:0 3px}#mk.big.six .lane{padding:2px 4px}
 .rules .howturn{margin:4px 0 10px;padding-left:22px}.rules .howturn li{margin:3px 0}
 @media (min-width:1024px){.tilebtn.lab .tlab{font-size:16px;line-height:19px;max-width:96px}.gx-row small,.gx-row-l small{font-size:16px!important}}
 .gxc-disc{text-shadow:0 1px 2px rgba(0,0,0,.75);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),transparent 55%)!important}
