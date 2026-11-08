@@ -28,3 +28,11 @@ Also: legal cards glow with a pulsing gold ring, covered cards lose colour (not 
 - Rules fixes (ADDENDUM 2) are W391's, in the engine: `origin/shelf/W391-rules-fixes` (commit 1a6ecbe0: tie chooser = last-card taker, Customs Quay costs 4 coins, rules-test cases) is merged into this branch before the final gate; this worker did not edit the engine, rules or data files. Fixed 2 of 2 WRONG items (by W391); the 6 UNSURE card costs are unverified and unchanged.
 - The Age II start in the tutorial gives the player the first move by script (the real rule is "the player behind on the pawn chooses"), explained in the `years` step.
 - No new art; all pictures are still code-drawn (slots kept).
+
+## Round 3 (W397c): know where you stand
+- **Turn tracker** (top right of the instruction line): "Age 1 of 3 / 19 cards left" (draft: "pick 3 of 8"); whose turn is the pill on the left. It turns into a **danger line** when it matters: "Pawn 3 steps from your city", "Rival has 4 of 6 symbols" (red) or the same chances for you (green).
+- **Score bar** (always on the board, tap for the legend): Civic / Sci / War / Won / Coin points and the total for you and the rival, the leader marked (gold, star, underlined category).
+- **Preview** on the big card: each button says what it would do on a copy of the game ("+3 pts · -2 coins", "pawn +1", "science pair: pick a token", "+1 stone each turn").
+- **Points pop with the reason** ("+3 points for Open Stage (civic card)"), a **star** on the computer's best-value glowing card, and a one-line **rating after each of your turns** ("Good move: the best choice here." / "Okay move: selling X was a bit better." / "Poor move: ... was clearly better.").
+- **Guided game for bots and people**: while the coached game runs, the token and wonder pills and the score bar are dimmed and not tappable so the glowing card is the obvious target (class `ttguided`, not `coach*`).
+- Painted art (free-art/install.py --force, not committed): text sits on solid plates; ui-audit A-F 0 on phone, phone-s and pc with the art installed.
