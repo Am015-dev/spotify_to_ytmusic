@@ -1,558 +1,29 @@
 {
  "slug": "rampart-and-vine",
- "when": "2026-11-08T02:31Z",
- "secs": 30,
- "totalSecs": 72,
+ "when": "2026-11-08T04:08Z",
+ "secs": 120,
+ "totalSecs": 263,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 7,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Cobalt’s turn Cobalt draws a tile.",
-     "words": 6,
-     "shownMs": 250,
-     "neededMs": 4600,
-     "cls": ""
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Cobalt’s turn Cobalt places the tile.",
-     "words": 6,
-     "shownMs": 750,
-     "neededMs": 4600,
-     "cls": ""
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Cobalt’s turn Cobalt draws a tile.",
-     "words": 6,
-     "shownMs": 250,
-     "neededMs": 4600,
-     "cls": ""
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Cobalt’s turn Cobalt places the tile.",
-     "words": 6,
-     "shownMs": 250,
-     "neededMs": 4600,
-     "cls": ""
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Hob’s turn Hob places the tile.",
-     "words": 6,
-     "shownMs": 500,
-     "neededMs": 4600,
-     "cls": ""
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/play",
-     "text": "Cobalt’s turn Cobalt draws a tile.",
-     "words": 6,
-     "shownMs": 250,
-     "neededMs": 4600,
-     "cls": ""
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/play",
-     "text": "Cobalt’s turn Cobalt is drawing a tile…",
-     "words": 7,
-     "shownMs": 250,
-     "neededMs": 4700,
-     "cls": ""
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
-   "status": "FAIL",
-   "count": 9,
-   "detail": [
-    {
-     "session": "phone/play",
-     "text": "Your turn Turn, then place: tap a glow.",
-     "ms": 250,
-     "cls": "mine",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Your turn Add a follower, or Skip.",
-     "ms": 250,
-     "cls": "mine",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Claim with a follower Tap a circle to claim it, or Skip. Got it",
-     "ms": 250,
-     "cls": "gxh-bub gxh-a-top on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Your turn Place your tile: tap a glow.",
-     "ms": 250,
-     "cls": "mine",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Your turn Add a follower, or Skip.",
-     "ms": 501,
-     "cls": "mine",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Cobalt’s turn Cobalt draws a tile.",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Cobalt’s turn Cobalt draws a tile.",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Cobalt’s turn Cobalt is drawing a tile…",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Cobalt’s turn Cobalt places the tile.",
-     "ms": 501,
-     "cls": "",
-     "tag": "div"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 13,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Build it tile by tile, claim it with followers, and most points wins the deeds.",
-     "words": 15,
-     "at": 3001,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "When the road is closed at both ends it scores 1 per tile, and your follower walks home.",
-     "words": 18,
-     "at": 21004,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Then stand a follower on a road, town, priory or field, or skip.",
-     "words": 13,
-     "at": 24001,
-     "where": "li."
-    },
-    {
-     "session": "phone/learn",
-     "text": "At the end, farmers score 3 for each finished town beside their field.",
-     "words": 13,
-     "at": 24001,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "Then stand a follower on a road, town, priory or field, or skip.",
-     "words": 13,
-     "at": 5001,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "At the end, farmers score 3 for each finished town beside their field.",
-     "words": 13,
-     "at": 5001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Build it tile by tile, claim it with followers, and most points wins the deeds.",
-     "words": 15,
-     "at": 3001,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "A road, town or field with a follower on it is taken: you can add tiles, but not claim it.",
-     "words": 20,
-     "at": 10001,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Close the walls and it scores 2 per tile, plus 2 per banner.",
-     "words": 13,
-     "at": 13001,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Then stand a follower on a road, town, priory or field, or skip.",
-     "words": 13,
-     "at": 13001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "At the end, farmers score 3 for each finished town beside their field.",
-     "words": 13,
-     "at": 13001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "When the road is closed at both ends it scores 1 per tile, and your follower walks home.",
-     "words": 18,
-     "at": 17002,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "He stays until the end, then scores 3 for each finished town beside the field.",
-     "words": 15,
-     "at": 30002,
-     "where": "span."
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
-   "status": "FAIL",
-   "count": 44,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Short, one tap at a time, no reading",
-     "px": 13,
-     "at": 1001,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "29",
-     "px": 13.5,
-     "at": 3001,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "left",
-     "px": 13,
-     "at": 3001,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "↻",
-     "px": 0,
-     "at": 3001,
-     "where": "span.rot"
-    },
-    {
-     "session": "phone/learn",
-     "text": "28",
-     "px": 13.5,
-     "at": 8001,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "106",
-     "px": 13.5,
-     "at": 10001,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "105",
-     "px": 13.5,
-     "at": 11001,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Music: on",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "⇄ Shuffle all songs",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Lute of the Meadow Fair",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Hearthlight Jig",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "⇄ Shuffle",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "⇄ All songs",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Off",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "▶ Preview",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip.prev"
-    },
-    {
-     "session": "phone/learn",
-     "text": "playing now",
-     "px": 13.5,
-     "at": 12001,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "The Mason's Morning",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Lute and Limewash",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Keep of Hours",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Ramshackle Round",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "The Jester's Triumph",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Crown of Green Fields",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Wistful Vale",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Fading to Grey",
-     "px": 13,
-     "at": 12001,
-     "where": "button.mchip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "104",
-     "px": 13.5,
-     "at": 13001,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "103",
-     "px": 13.5,
-     "at": 14002,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Learn by doing, step by step",
-     "px": 13,
-     "at": 14003,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "102",
-     "px": 13.5,
-     "at": 16002,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "101",
-     "px": 13.5,
-     "at": 17013,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "100",
-     "px": 13.5,
-     "at": 18009,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "road",
-     "px": 13,
-     "at": 20003,
-     "where": "span.flab"
-    },
-    {
-     "session": "phone/learn",
-     "text": "field",
-     "px": 13,
-     "at": 20003,
-     "where": "span.flab"
-    },
-    {
-     "session": "phone/learn",
-     "text": "99",
-     "px": 13.5,
-     "at": 21004,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "98",
-     "px": 13.5,
-     "at": 23001,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "97",
-     "px": 13.5,
-     "at": 26009,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "96",
-     "px": 13.5,
-     "at": 28011,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "Short, one tap at a time, no reading",
-     "px": 13,
-     "at": 1002,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "70",
-     "px": 13.5,
-     "at": 4003,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "left",
-     "px": 13,
-     "at": 4003,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "town",
-     "px": 13,
-     "at": 4003,
-     "where": "span.flab"
-    },
-    {
-     "session": "phone/play",
-     "text": "road",
-     "px": 13,
-     "at": 4003,
-     "where": "span.flab"
-    },
-    {
-     "session": "phone/play",
-     "text": "field",
-     "px": 13,
-     "at": 4003,
-     "where": "span.flab"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap a circle to claim it, or Skip.",
-     "px": 13.5,
-     "at": 4003,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/play",
-     "text": "Got it",
-     "px": 13,
-     "at": 4003,
-     "where": "button.gxh-ok"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
    "status": "PASS",
@@ -568,46 +39,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 64,
-   "clicks": 75,
+   "secs": 120,
+   "turns": 332,
+   "clicks": 429,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 35
+   "messagesSeen": 0
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 6,
-   "turns": 5,
-   "clicks": 6,
+   "secs": 9,
+   "turns": 8,
+   "clicks": 8,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 3
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 73,
-   "clicks": 82,
+   "secs": 120,
+   "turns": 340,
+   "clicks": 435,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 34
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 6,
-   "turns": 6,
-   "clicks": 7,
+   "secs": 13,
+   "turns": 16,
+   "clicks": 23,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 6
+   "messagesSeen": 0
   }
  ]
 }
