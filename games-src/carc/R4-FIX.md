@@ -14,3 +14,7 @@
 Not done: majority and ties are still told, not shown on the board.
 
 Test: `touch-games.js` plays full games by touch like a sensible new player (takes the normal computer's spot 35% of the time, otherwise a random glow; claims roads, towns and priories, never farms).
+
+## Gates (8 Nov 2026)
+- Logic 71/71; guard ok; tut-walk PASS at 390x844 and 375x667 (24 steps); rotate CLEAN; quick sweep 2 games, 0 failures.
+- Touch games vs Easy, to the result card, 0 errors: 390x844 (35% good spots) won 3/3 (33-27, 43-23, 39-33); 375x667 (15% good spots) won 2/4 (21-50, 40-36, 25-30, 32-22). End count 3.1-3.2 s every game.
