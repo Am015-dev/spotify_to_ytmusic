@@ -46,7 +46,7 @@ function phHint(){if(UI.res&&UI.res.text){const w=String(UI.res.text).split(/\s+
 var tipOn=function(){try{return GXH.enabled()&&!GXH.seen('start')}catch(e){return false}};
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
   if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-msg"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
-  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
+  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div>${phRivalFeed()||`<div class="ps-hint">${phHint()}</div>`}`}
   if(d<0)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
@@ -54,7 +54,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   if(!dh)return `<div class="ps-main"><div class="ps-msg">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-hint">${phHint()}</div>`;
   if(G.q)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
   if(G.phase==='setup'){const best='';
-    return `<div class="ps-main"><div class="ps-msg">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()?'':'<ol class="ps-intro introcard"><li><b>Goal:</b> be the last junk afloat.</li><li><b>Each turn:</b> the dice may wake the leviathans, then you lay one current tile at your bow and sail along it.</li><li><b>You sink</b> off the chart\'s edge, on a leviathan, or sharing a wake with another junk.</li></ol>'}`}
+    return `<div class="ps-main"><div class="ps-msg">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()||UI.tut?'':'<ol class="ps-intro introcard"><li><b>Goal:</b> be the last junk afloat.</li><li><b>Each turn:</b> the dice may wake the leviathans, then you lay one current tile at your bow and sail along it.</li><li><b>You sink</b> off the chart\'s edge, on a leviathan, or sharing a wake with another junk.</li></ol>'}`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
@@ -65,7 +65,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
   const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Pick an option.');
   return `<div class="ps-banner">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span></div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-hint">${PH.toast?esc(PH.toast):hint}</div>`}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+phFeed()):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy?'':phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
   if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
@@ -82,15 +82,24 @@ function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const c
   if(safeNow)return 'Pick, turn, then Place.';
   if(safeTurn)return 'Press Turn to find a safe route.';
   return 'Every tile sinks you.'}
+// the goal in one sentence + 3 bullets (Learn to play first screen, Goal card, title)
+const TW_GOAL=['Be the last junk still afloat.','Lay a tile, sail its line.','Edge or leviathan sinks you.','Two junks meet: both sink.'];
+function goalCardHTML(){return `<div class="gxt-endc twgoal"><div class="gxt-et">${TW_GOAL[0]}</div><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul><div class="gxt-eb"><button type="button" class="gxt-b pri" data-goalok>Got it</button></div></div>`}
+function openGoal(){const o=document.getElementById('twgoal');if(o){o.remove();return}const d=document.createElement('div');d.id='twgoal';d.className='gxt-end';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Goal');d.innerHTML=goalCardHTML();document.body.appendChild(d);
+  const close=()=>{d.remove();document.removeEventListener('keydown',k)},k=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',k);
+  d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-goalok]')){e.stopPropagation();close()}});const b=d.querySelector('[data-goalok]');try{b.focus()}catch(e){}}
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('[data-goal]');if(g){e.stopPropagation();openGoal()}},true);
+// what the rival did this turn: lines are added and stay until your turn (nothing is animated away before it can be read)
+function phRivalFeed(){const L=UI.rivLines||[];if(!L.length)return '';return `<ol class="ps-riv">${L.slice(-5).map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`}
 // the goal and the race, always on screen: who is still afloat
-function phGoal(){if(!G||!UI.started||UI.busy||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
-  if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal">${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
+function phGoal(){if(!G||!UI.started||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
+  if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal" data-goal>${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
   const lab=i=>`<i style="background:${colOf(i).sail}"></i>${i===me&&me>=0&&!hotSeat()?'You':esc(nm(i))}`;const up=G.order.filter(i=>G.ships[i].alive),dn=G.order.filter(i=>!G.ships[i].alive);
-  return `<div class="ps-goal">Last junk afloat wins. <b>Afloat:</b>${up.map(lab).join('')}${dn.length?` &middot; <b>Sunk:</b><s>${dn.map(lab).join('')}</s>`:''}</div>`}
+  return `<button type="button" class="ps-goal" data-goal aria-label="Goal: be the last junk still afloat. Tap for the rules in short."><span class="gl">Goal: last junk afloat</span><span class="race">${up.map(lab).join('')}${dn.length?`<s>${dn.map(lab).join('')}</s>`:''}</span></button>`}
 // what happened since your last move, in order, so nothing changes off-screen (the replay can be skipped or missed)
 function phFeed(){if(!G||!UI.started||UI.busy||G.over||G.phase==='setup'||UI.myLogI==null)return '';
   const L=G.log.filter(l=>l.i>UI.myLogI&&!/^Turn \d+/.test(l.t)&&!/ draws? /.test(l.t)).reverse();if(!L.length)return '';
-  const keep=L.slice(-6),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
+  if(innerHeight<760)return '';const keep=L.slice(-4),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
   return `<div class="ps-feed"><h5>Since your last move</h5><ol>${keep.map(l=>`<li class="${l.c==='bad'?'bad':l.c==='big'?'big':''}">${you(l.t)}</li>`).join('')}</ol>${more?`<p class="tiny">${more} earlier line${more>1?'s':''} in the Log.</p>`:''}</div>`}
 // ---------- the pop-up: tiles / info / start marks (lives in the free zone next to the board, never over it) ----------
 function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';const multi=hotSeat()||humans().length>1;
