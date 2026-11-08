@@ -134,6 +134,7 @@ function turnBanner() {
   var txt = isHuman(a) ? (hu > 1 ? G.seats[a].name + ', your turn' : 'Your turn') : G.seats[a].name + '\'s turn';
   var b = $('#tbanner'); if (!b) { b = h('div', { id: 'tbanner', 'aria-hidden': 'true' }); document.body.appendChild(b); }
   b.innerHTML = ''; b.appendChild(h('span', { text: txt })); b.appendChild(h('span.rds', {}, G.P[a].dice.map(function (v) { return h('span.rd', { text: v }); }))); b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
+  try { var orr = $('#opp').getBoundingClientRect(); if (orr.height) { b.style.top = Math.round(orr.top + orr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* sit over the rival strip: never over a glowing target */
   UI.hold = UI.fast ? 0 : Date.now() + animMs(isHuman(a) ? 900 : 500);
   if (UI.fast || QS.get('scn')) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice'); rollDice(b, G.P[a].dice);
 }
@@ -334,8 +335,8 @@ function fitMarket() {   /* phone tabs: shrink the stalls (or lay the six stalls
     mk.classList.toggle('six', six); mk.style.gridTemplateColumns = six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = six ? '3px' : '6px';
     var h0 = hx; mk.style.setProperty('--hex', h0 + 'px');
     while (bottom() > limit && h0 > 30) { h0 -= 2; mk.style.setProperty('--hex', h0 + 'px'); }
-    var r = { six: six, hex: h0, fit: bottom() <= limit };
-    if (!best || (r.fit && !best.fit) || (r.fit === best.fit && r.hex > best.hex)) best = r;
+    var r = { six: six, hex: h0, b: bottom() }; r.fit = r.b <= limit;
+    if (!best || (r.fit && !best.fit) || (r.fit && best.fit && r.hex > best.hex) || (!r.fit && !best.fit && r.b < best.b)) best = r;   /* nothing fits: take the shorter layout */
   });
   mk.classList.toggle('six', best.six); mk.style.gridTemplateColumns = best.six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = best.six ? '3px' : '6px'; mk.style.setProperty('--hex', best.hex + 'px');
   L.mkFit = best;
@@ -369,7 +370,9 @@ function autoZoom() {   /* small phones: when build spaces glow and would be und
   if (FEEL.cam.z > 1.02 && !UI.autoZ) return;   /* the player zoomed by hand: leave it */
   var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
   gl.forEach(function (e) { var xy = cellXY(VB.CELLS[+e.getAttribute('data-ci')], L.s, L.ew, L.eh); x0 = Math.min(x0, xy.x); x1 = Math.max(x1, xy.x); y0 = Math.min(y0, xy.y); y1 = Math.max(y1, xy.y); });
-  var c = FEEL.cam; c.z = Math.min(2.6, need); c.x = L.ew / 2 - (x0 + x1) / 2 * c.z; c.y = L.eh / 2 - (y0 + y1) / 2 * c.z; camClamp(); camApply(null, !drag); UI.autoZ = key;
+  var zf = Math.min((L.ew - 56) / Math.max(1, x1 - x0), (L.eh - 56) / Math.max(1, y1 - y0)), zz = Math.max(1, Math.min(2.6, need, zf));   /* never zoom a glowing space out of view */
+  if (zz <= 1.02) { if (UI.autoZ) { UI.autoZ = null; if (!drag) camReset(true); } UI.autoZ = key; return; }
+  var c = FEEL.cam; c.z = zz; c.x = L.ew / 2 - (x0 + x1) / 2 * c.z; c.y = L.eh / 2 - (y0 + y1) / 2 * c.z; camClamp(); camApply(null, !drag); UI.autoZ = key;
 }
 function fitEstate() {   /* phone: the estate takes what the market leaves */
   var b = $('#bd'), mk = $('#mk'), W = b.clientWidth, H = b.clientHeight; if (W > H * 1.15 && !portraitPhone()) return;
@@ -483,7 +486,7 @@ function renderDock() {
   var gc = !G.over && goalChips(), dt = $('#docktitle');
   if (gc) { dt.innerHTML = ''; dt.appendChild(gc); dt.classList.add('goals'); } else dt.classList.remove('goals');
   if (!gc) dt.textContent = G.over ? 'Game over' : isHuman(a) ? 'Your move' : G.seats[a].name + '\'s turn · tap to speed up';
-  $('#prompt').textContent = UI.note || promptText();
+  var pr0 = $('#prompt'); pr0.textContent = UI.note || promptText(); pr0.classList.remove('full'); pr0.onclick = function () { pr0.classList.toggle('full'); };   /* short phones clamp the line: tap to read it all */
   var cb = $('#chainb'); if (UI.chain > 1 && mt) { cb.textContent = 'Chain of ' + UI.chain + '. Build again'; cb.classList.add('on'); } else cb.classList.remove('on');
   /* dice */
   var dr = $('#dicerow'); dr.innerHTML = ''; var theirs = !G.over && !isHuman(a);
@@ -715,7 +718,8 @@ function doMove(m) {
         if (ev.p !== UI.view) { setCap(G.seats[ev.p].name + ' builds ' + aName(ev.tile) + (ev.chain ? ', for free' : '')); return rivalPeek(ev); }
         var dst = 'ec-' + ev.cell, el = document.getElementById(dst); if (el) el.style.visibility = 'hidden';
         if (ev.chain && prevCell != null) ribbon(rectOf('ec-' + prevCell), rectOf(dst));
-        var z0 = FEEL.cam.z; return (L.tabs ? camTo(ev.cell, Math.max(z0, 1.3)) : camTo(ev.cell)).then(function () { if (!src) src = rectOf('st-0'); return fly(src, rectOf(dst), ev.tile); }).then(function () { buzz(10); if (el) { el.style.visibility = ''; el.animate && el.animate([{ transform: 'translate(-50%,-50%) scale(1.25)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: animMs(260) || 1 }); } if (ev.chain && chainNow > 1) popAt(rectOf(dst), 'Chain of ' + chainNow); if (L.tabs && z0 <= 1.01) setTimeout(function () { if (!(FEEL.drag && FEEL.drag.on)) camReset(true); }, animMs(700)); });
+        var z0 = FEEL.cam.z; if (L.tabs && !UI.autoZ && z0 <= 1.02) UI.autoZ = 'anim';   /* an animation zoom is not a hand zoom: autoZoom may undo it */
+        return (L.tabs ? camTo(ev.cell, Math.max(z0, 1.3)) : camTo(ev.cell)).then(function () { if (!src) src = rectOf('st-0'); return fly(src, rectOf(dst), ev.tile); }).then(function () { buzz(10); if (el) { el.style.visibility = ''; el.animate && el.animate([{ transform: 'translate(-50%,-50%) scale(1.25)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: animMs(260) || 1 }); } if (ev.chain && chainNow > 1) popAt(rectOf(dst), 'Chain of ' + chainNow); if (L.tabs && z0 <= 1.01) setTimeout(function () { if (!(FEEL.drag && FEEL.drag.on)) camReset(true); }, animMs(700)); });
       }
       if (ev.e === 'score') { sfx('score'); var rr = ev.cell != null && ev.p === UI.view ? rectOf('ec-' + ev.cell) : rectOf('r-vp'); if (ev.p !== UI.view) { var pc = UI.peekCell && ev.cell != null ? UI.peekCell.getBoundingClientRect() : null, oc = document.querySelector('.och[data-seat="' + ev.p + '"]'); rr = pc || (oc && oc.getBoundingClientRect()); } var why = '+' + ev.n + ' ' + (WHY[ev.why] || 'points'); if (ev.why === 'region' && ev.cell != null && hints()) { var bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; why += ' (' + (ev.n - bz) + ' size + ' + bz + ' early)'; } if (ev.why === 'region' && ev.cell != null) flashRegion(ev.cell, ev.p); popAt(rr, why); if (ev.p !== UI.view) setCap(G.seats[ev.p].name + ': ' + why); return Promise.all([flyPts(rr, scoreEl(ev.p), '+' + ev.n), wait(UI.quick ? 80 : animMs(ev.why === 'region' ? 900 : 550))]).then(function () { renderOpp(); }); }
       if (ev.e === 'sell') { sfx('sell'); return wait(animMs(200)); }
