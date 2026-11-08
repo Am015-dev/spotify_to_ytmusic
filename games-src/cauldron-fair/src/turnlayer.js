@@ -34,10 +34,10 @@ function instrInfo() {
   const v = viewSeat(); if (v < 0 || hotSeat() || UI.pass != null) return null;
   const me = G.players[v], wait = G.players.filter(p => p.seat !== v && ((G.phase === 'brew' && (p.st === 'draw')) || (G.phase !== 'brew' && p.q))).map(p => p.name);
   if (G.phase === 'brew' && me.st === 'draw' && !me.lock && !me.q) {
-    if (G.round === LASTD()) return { who: 'YOUR TURN', text: 'Last day: pick Draw or Stop in secret. Everyone reveals together.' };
+    if (G.round === LASTD()) return { who: 'YOUR TURN', text: 'Last day! Draw or Stop. All reveal together.' };
     if (!me.pot.length) return { who: 'YOUR TURN', text: 'Tap the bag to draw your first chip.' };
     const ws = CF.whiteSum(me), lim = CF.limitOf(G, me), safe = lim - ws;
-    return { who: 'YOUR TURN', text: safe <= 0 ? 'The pot is full of white (' + ws + '/' + lim + '). Another white chip explodes it. Draw, or Stop and score.' : 'White ' + ws + ' of ' + lim + '. Draw another chip, or Stop to keep your space.' };
+    return { who: 'YOUR TURN', text: safe <= 0 ? 'Whites ' + ws + '/' + lim + ': one more white explodes. Draw or Stop?' : 'Whites ' + ws + '/' + lim + '. Draw, or Stop to keep this space.' };
   }
   if (me.q && !EVAL_Q[me.q.h]) { const t = promptInfo().text; return { who: 'YOUR TURN', text: t || 'Make your choice.' }; }
   if (G.phase === 'brew') { if (me.lock) return { who: 'WAITING', text: 'You decided. Waiting for ' + (wait.join(' and ') || 'everyone') + '.', rival: 1 }; return { who: wait.length ? wait[0].toUpperCase() + '\'S TURN' : 'DAY ENDS', text: (me.boom ? 'Your pot exploded. ' : 'You stopped. ') + (wait.length ? 'Watch ' + wait.join(' and ') + ' draw, one chip at a time.' : 'Counting the day.'), rival: 1 }; }
@@ -54,6 +54,7 @@ function instrBar() {
   if (!isPh() && db) { if (e.parentElement !== db) db.prepend(e); e.classList.add('indock'); e.style.bottom = ''; return; }   // W471: on desktop it is the first line of the panel, not floating over it
   if (e.parentElement !== document.body) { document.body.appendChild(e); e.classList.remove('indock'); }
   const top = db ? db.getBoundingClientRect().top : innerHeight - 200; e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
+  { const ih = Math.ceil(e.getBoundingClientRect().height) + 8; if (UI.instrH !== ih) { UI.instrH = ih; document.documentElement.style.setProperty('--instrh', ih + 'px'); } }   // the board keeps its bottom ring clear of the bar
 }
 // ---- the turn banner: slides in when the turn changes hands
 let TB = { key: '', tm: 0 };

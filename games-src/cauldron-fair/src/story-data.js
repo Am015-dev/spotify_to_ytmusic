@@ -30,7 +30,7 @@ const STORY = {
     seven: ['Seven is safe', 'The flask works once a day; draw again, 7 is safe.'],
     push: ['Push your luck', 'At 7 one more white explodes the pot; risk it.'],
     report: ['The bonus die', 'Only the furthest pot that did not explode rolls the die.'],
-    die: ['Die faces', 'The die gives points, a ruby, a droplet step, or Marrow.'],
+    die: ['Die faces', 'Die: points, a ruby, a droplet step, or a free orange chip.'],
     ruby: ['Ruby spaces', 'A ruby on your score space earns you one ruby.'],
     choose: ['Boom!', 'An exploded pot scores points or coins, not both: take coins.'],
     shops1: ['Mossback', 'Mossback earns a ruby as one of your last two chips.'],

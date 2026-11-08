@@ -138,7 +138,8 @@ function titleEl() {
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,   // W471: on a first visit Learn to play is the one big primary button
       h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
-      h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
+      h('div.tsegs', h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
+      (() => { const o = optObj(), cur = o.seats.every(c => (o.lvBy[c] || TEMPER[c]) === o.lvBy[o.seats[0]]) ? o.lvBy[o.seats[0]] : ''; return h('div.tseg', h('span.lbl', 'Rivals'), ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (cur === v ? '.on' : ''), { 'data-a': 'lvall', 'data-v': v, type: 'button', 'aria-pressed': cur === v ? 'true' : 'false', 'aria-label': 'Computer makers play ' + v }, v))); })()),
       h('div.tsec',
         h('button.tsb', { 'data-a': 'play', type: 'button' }, 'More options'),
         h('button.tsb', { 'data-a': 'story', type: 'button' }, '\u2728 Story'),
@@ -182,6 +183,8 @@ function onlineEl() {
 }
 function showStart() { try { GX.close(); } catch (e) { } UI.sv = 'title'; UI.cfgOpen = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } closeRS(true); Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; renderStart(); }
 // ---------- events ----------
+// G6 fix: a tap on Start day answers at once (pressed look + 'Starting…'), so nobody taps it twice while the day report gets ready
+function pressFb(t) { try { if (t.classList.contains('busy')) return; t.classList.add('busy'); t.setAttribute('aria-busy', 'true'); const b = t.querySelector('b') || t; const was = b.textContent; b.textContent = was.replace(/^Start day/, 'Starting day'); setTimeout(() => { if (t.isConnected && t.classList.contains('busy')) { t.classList.remove('busy'); t.removeAttribute('aria-busy'); b.textContent = was; } }, 2500); } catch (e) { } }
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]');
   if (!t) { if (ev.target.closest('#cwrap,#caul') && G && G.phase === 'brew' && focusSeat() !== viewSeat()) { UI.fastAI = true; return; }
@@ -219,9 +222,9 @@ document.addEventListener('click', ev => {
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': if (!tutAct({ what: 'rscont' })) break; repContinue(); break;
     case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; shopToggle(d.k); break;
-    case 'shopbuy': if (!tutAct({ what: 'shopbuy' })) break; shopBuy(); break;
+    case 'shopbuy': if (!tutAct({ what: 'shopbuy' })) break; pressFb(t); shopBuy(); break;
     case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; rubySelect(d.k); break;
-    case 'rubygo': if (!tutAct({ what: 'rubygo' })) break; rubyGo(); break;
+    case 'rubygo': if (!tutAct({ what: 'rubygo' })) break; pressFb(t); rubyGo(); break;
     case 'shopclear': UI.shopSel = []; renderReport(); break;
     case 'take': takeDevice(); break;
     case 'tipok': tipOk(); break;
@@ -242,6 +245,7 @@ document.addEventListener('click', ev => {
     case 'menu': showStart(); break;
     case 'start': newGame(d.m, optObj()); break;   // W471: Play is always a clean game; Learn to play is the coached one
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
+    case 'lvall': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); [0, 1, 2, 3].forEach(c => { if (c !== o.me) o.lvBy[c] = d.v; }); renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
     case 'drawer': GX.show(d.v); break;
