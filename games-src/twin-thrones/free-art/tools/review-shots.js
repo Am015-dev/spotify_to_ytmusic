@@ -20,7 +20,7 @@ const T = async (pg, loc) => { await loc.scrollIntoViewIfNeeded().catch(() => {}
     if (await av.count()) {
       if (turns >= 6 && !got.p && !(await pg.locator('#zoom:not([hidden])').count())) { got.p = 1; await pg.waitForTimeout(400); await pg.screenshot({ path: `${out}/${n}-3pyramid.png` }); }
       if (!(await pg.locator('#zoom:not([hidden])').count())) { await T(pg, av.first()); await pg.waitForTimeout(150); }
-      const bb = pg.locator('#zoom [data-a="build"]:not([disabled])'); if (await bb.count()) await T(pg, bb.first()); else { const sl = pg.locator('#zoom [data-a="sell"]'); if (await sl.count()) await T(pg, sl.first()); }
+      const bb = pg.locator('#zoom [data-a="build"]:not([disabled])'); if (await bb.count()) await T(pg, bb.first()); else { const sl = pg.locator('#zoom [data-a="discard"]'); if (await sl.count()) await T(pg, sl.first()); }
       turns++;
     }
     await pg.waitForTimeout(150);

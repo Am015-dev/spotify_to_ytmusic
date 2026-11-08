@@ -45,7 +45,7 @@ CARDS = {  # stem: (objs, az, el)
  'a2-judges-hall': [GRASS, o(B('home_A','blue'), (0,0,0), 0, 1)],
  'a2-hero-monument': [GRASS, o(B('tower_B','blue'), (0,0,0), 0, 1)],
  'a2-sun-temple': [GRASS, o(B('church','yellow'), (0,0,0), 0, 1)],
- 'a2-water-arch': [WATER, o(N('building_bridge_A'), (0,0,0), 0, 1.0), o(D('waterlily_B'), (.7,0,.8), 0, 1.1)],
+ 'a2-water-arch': [GRASS, o(N('building_bridge_B'), (0,0,0), 90, 1.0), o(P('bucket_water'), (.6,0,1.0), 0, 1.0)],
  'a2-podium': [GRASS, o(P('crate_B_big'), (0,0,0), 0, 1.6), o(P('flag_blue'), (-.9,0,.5), 0, 2.0), o(P('flag_blue'), (.9,0,.5), 0, 2.0)],
  'a2-star-gazers': [GRASS, o(B('tower_A','green'), (0,0,0), 0, 1)],
  'a2-chart-room': [GRASS, o(B('home_A','green'), (0,0,0), 90, 1), o(P('crate_long_C'), (1.0,0,1.0), 0, 1.0)],
@@ -173,11 +173,11 @@ for r in range(-10, 11):
         x, _, z = hexpos(q, r)
         if not any(abs(t['p'][0]-x) < .1 and abs(t['p'][2]-z) < .1 for t in isl): water.append(o(T('hex_water'), (x, 0, z), 0, 1, True))
 SPECS.append({'id': 'scene-title', 'w': 2400, 'h': 1350, 'objs': water + isl, 'az': 0, 'el': 40, 'margin': .03})
-dec2 = [(0,0,B('castle','blue'),0,1.2,0), (-3,1,P('flag_blue'),0,3.0,0), (3,1,P('flag_blue'),0,3.0,0), (-2,-2,D('trees_B_large'),0,1.0,0), (2,-2,D('trees_B_medium'),0,1.0,0), (-4,-1,D('hills_A_trees'),0,1.0,0), (4,-1,D('mountain_B_grass'),0,1.0,0), (-2,3,B('home_A','blue'),0,1.0,0), (2,3,B('windmill','blue'),0,1.0,0), (0,3,P('crate_long_A'),0,1.4,0)]
+dec2 = [(-3,0,B('castle','blue'),0,1.2,0), (-4,1,P('flag_blue'),0,3.0,0), (3,0,P('flag_blue'),0,3.0,0), (4,1,P('flag_blue'),0,3.0,0), (-2,-2,D('trees_B_large'),0,1.0,0), (3,-2,D('trees_B_medium'),0,1.0,0), (-4,-1,D('hills_A_trees'),0,1.0,0), (4,-1,D('mountain_B_grass'),0,1.0,0), (-3,3,B('home_A','blue'),0,1.0,0), (3,3,B('windmill','blue'),0,1.0,0)]
 isl2 = island(3, lambda r: 5 - abs(r), dec2)
 water2 = [o(T('hex_water'), hexpos(q, r), 0, 1, True) for r in range(-10, 11) for q in range(-16, 17) if not any(abs(t['p'][0]-hexpos(q, r)[0]) < .1 and abs(t['p'][2]-hexpos(q, r)[2]) < .1 for t in isl2)]
 SPECS.append({'id': 'scene-victory', 'w': 2400, 'h': 1350, 'objs': water2 + isl2, 'az': 0, 'el': 40, 'margin': .03})
-dec3 = [(0,0,N('building_destroyed'),0,1.4,0), (-3,1,N('building_destroyed'),0,1.0,0), (3,1,P('flag_red'),0,3.0,0), (-2,-2,D('trees_B_cut'),0,1.5,0), (2,-2,D('tree_single_A_cut'),0,1.5,0), (-4,-1,D('rock_single_C'),0,1.5,0), (4,-1,D('rock_single_A'),0,1.5,0), (2,3,N('building_destroyed'),0,1.0,0), (-2,3,P('barrel'),0,1.6,0), (0,3,P('crate_open'),0,1.6,0)]
+dec3 = [(-3,0,N('building_destroyed'),0,1.4,0), (-4,1,N('building_destroyed'),0,1.0,0), (3,1,P('flag_red'),0,3.0,0), (-2,-2,D('trees_B_cut'),0,1.5,0), (2,-2,D('tree_single_A_cut'),0,1.5,0), (-4,-1,D('rock_single_C'),0,1.5,0), (4,-1,D('rock_single_A'),0,1.5,0), (2,3,N('building_destroyed'),0,1.0,0), (-3,3,P('barrel'),0,1.6,0), (3,3,P('crate_open'),0,1.6,0)]
 isl3 = island(3, lambda r: 5 - abs(r), dec3)
 water3 = [o(T('hex_water'), hexpos(q, r), 0, 1, True) for r in range(-10, 11) for q in range(-16, 17) if not any(abs(t['p'][0]-hexpos(q, r)[0]) < .1 and abs(t['p'][2]-hexpos(q, r)[2]) < .1 for t in isl3)]
 SPECS.append({'id': 'scene-defeat', 'w': 2400, 'h': 1350, 'objs': water3 + isl3, 'az': 0, 'el': 40, 'margin': .03})
