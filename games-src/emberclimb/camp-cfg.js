@@ -7,7 +7,7 @@ const CH = [
   { heroes: ['m'], floors: 5, boss: 'sleeper-statue', relic: 'lantern', hpPct: 110 },
   { heroes: ['w'], floors: 6, boss: 'mire-behemoth', relic: 'tin-flute', hpPct: 85 },
   { heroes: ['s'], floors: 6, boss: 'ashen-wraith', relic: 'smoking-censer', hpPct: 110 },
-  { heroes: ['a'], floors: 8, boss: 'ashen-wraith', relic: 'iron-bangle', hpPct: 106 },
+  { heroes: ["a"], floors: 8, boss: "ashen-wraith", relic: "iron-bangle", hpPct: 105 },
   { heroes: ['m'], floors: 9, boss: 'gate-colossus', relic: 'dawnstone', hpPct: 110 }
 ];
 if (typeof module !== 'undefined') module.exports = CH;
