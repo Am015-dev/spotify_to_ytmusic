@@ -314,6 +314,13 @@ function step(G, opts) {
   const m = choose(G, a, null, opts); const r = HB.apply(G, m); if (!r.ok) throw new Error('AI chose an illegal move: ' + JSON.stringify(m) + ' ' + r.error);
   return m;
 }
-HB.AI = { choose, step, world, V, mkRng, seedOf, quickQ, chooseEasy, chooseNormal, chooseHard };
+// every legal move of a seat scored by the same evaluation the computer uses: [{ m, v, W }] (W = the position after the move), for badges, previews and ratings
+function rank(G, seat) {
+  const ms = HB.moves(G, seat), rng = mkRng(seedOf(G, seat) ^ 0x5bd1);
+  const W0 = world(G, seat, rng), wm = HB.moves(W0, seat);
+  if (wm.length !== ms.length || ms.length > 60) return [];
+  return rankMoves(W0, seat, wm).map((r, i) => ({ m: ms[i], v: r.v, W: r.W }));
+}
+HB.AI = { choose, step, rank, world, V, mkRng, seedOf, quickQ, chooseEasy, chooseNormal, chooseHard };
 if (typeof module === 'object' && module.exports) module.exports = HB.AI;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
