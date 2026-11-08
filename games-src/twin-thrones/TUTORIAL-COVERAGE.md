@@ -1,5 +1,5 @@
 # Tutorial coverage (W397, ADDENDUM 4): a COACHED first game, not a tap list
-The tutorial is a real duel against the real computer (fixed seed 5, "easy", stacked decks so the bottom row of Age I, the open cards of Age II and a guild in Age III come up). Every move is a free choice from move 1.
+The tutorial is a SHORT real duel against the real computer (fixed seed 5, "easy"): Age I is the full pyramid, Ages II and III are small pyramids (9 and 5 cards) so it fits one sitting and the cards stay big; stacked decks make the bottom row of Age I, the open cards of Age II and a guild in Age III come up. The four story chapters (The Crowns, First Turns, The Years Turn, The Last Card) frame draft, Age I, II and III as coach beats. `window.GXCOACH = {running, explained, done}` is exposed. Every move is a free choice from move 1.
 - ONE forced step only: take the glowing wonder (`first`). Then free play.
 - Guide Ione speaks just-in-time in ONE bubble at a time (never blocks the board, only its x takes taps, auto-hides after 9 s, queued if a second rule appears). Text: `campaign.json` -> `prologue.coach`.
 - Rules that never came up are listed on a "Things you'll meet later" card after the final scoring; the final scoring is walked through row by row with the player's real numbers (`prologue.walk`).

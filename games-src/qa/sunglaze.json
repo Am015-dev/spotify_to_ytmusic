@@ -2,7 +2,7 @@
  "slug": "sunglaze",
  "size": "phone",
  "seed": 5634,
- "when": "2026-11-07T22:55Z",
+ "when": "2026-11-07T23:42Z",
  "tutorial": {
   "end": true,
   "coached": true,
@@ -29,15 +29,15 @@
    "win"
   ],
   "bubblesClosed": 14,
-  "clicks": 83
+  "clicks": 87
  },
  "quick": {
   "result": "cap",
-  "clicks": 1040
+  "clicks": 1017
  },
  "story": {
   "result": "cap",
-  "clicks": 680
+  "clicks": 683
  },
  "fuzz": {
   "taps": 300
@@ -71,7 +71,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 30px (<40) i.bf-t x18: \"\"",
+   "desc": "tap target 30px (<40) i.bf-t x16: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases tutorial",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-tutorial-board-3.png"
   },
@@ -79,7 +79,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 34px (<40) div.bf-floor x1: \"−3\n−3\nfloor\n−8\"",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"floor\n−14\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases tutorial",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-tutorial-board-3.png"
   },
@@ -87,7 +87,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 30px (<40) i.bf-t.cr x4: \"\"",
+   "desc": "tap target 30px (<40) i.bf-t.cr x6: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases tutorial",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-tutorial-board-3.png"
   },
@@ -95,7 +95,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★21\n−4\"",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"You\n☀\n★21\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-6.png"
   },
@@ -103,15 +103,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 36px (<40) button.bf-chip x1: \"Tamsin\n☀\n★12\n+4\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-6.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 35px (<40) i.bf-t x14: \"Cobalt\"",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Tamsin\n★12\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-6.png"
   },
@@ -127,6 +119,14 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
+   "desc": "tap target 30px (<40) i.bf-t x17: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
    "desc": "tap target 34px (<40) div.bf-floor x1: \"floor\n−14\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-6.png"
@@ -135,7 +135,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 30px (<40) i.bf-t.cr x7: \"\"",
+   "desc": "tap target 30px (<40) i.bf-t.cr x6: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-6.png"
   },
@@ -143,23 +143,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: div.bf-pool.can / i.bf-t \"Cobalt\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-6.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "clickable covered by another element (not tappable): div.bf-pool.can under use",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-6.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★36\"",
+   "desc": "tap target 36px (<40) button.bf-chip x2: \"You\n★0\n+1\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-7.png"
   },
@@ -167,7 +151,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 36px (<40) button.bf-chip x1: \"Tamsin\n★16\"",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Indigo\n★0\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-7.png"
   },
@@ -175,7 +159,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 35px (<40) i.bf-t.sun x1: \"\"",
+   "desc": "tap target 31px (<40) i.bf-t x27: \"Frost\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-7.png"
   },
@@ -183,7 +167,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 30px (<40) i.bf-t x13: \"\"",
+   "desc": "tap target 29px (<40) i.bf-t.sun x1: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-7.png"
   },
@@ -207,7 +191,39 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n☀\n★21\n−4\"",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Garnet\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Obsidian\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Frost\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 36px (<40) button.bf-chip x2: \"You\n☀\n★0\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-8.png"
   },
@@ -215,7 +231,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 36px (<40) button.bf-chip x1: \"Tamsin\n★12\n+9\"",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Indigo\n★0\n+2\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-8.png"
   },
@@ -223,7 +239,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 35px (<40) i.bf-t x22: \"Cobalt\"",
+   "desc": "tap target 29px (<40) i.bf-t x11: \"Cobalt\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-8.png"
   },
@@ -247,15 +263,15 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: div.bf-pool.can / i.bf-t \"Saffron\"",
+   "desc": "clickable covered by another element (not tappable): div.bf-pool under use",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-quick-board-8.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick click #1040 (Obsidian)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 1040 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "where": "quick click #1017 (Olive ★4)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1017 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases quick",
    "shot": "/tmp/qa-shots/sunglaze/phone-quick-noresult-9.png"
   },
@@ -271,7 +287,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 36px (<40) button.bf-chip x1: \"You\n☀\n★0\"",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"You\n★0\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-12.png"
   },
@@ -279,7 +295,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Olive\n★0\"",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Olive\n☀\n★0\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-12.png"
   },
@@ -287,7 +303,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 31px (<40) i.bf-t x15: \"Cobalt\"",
+   "desc": "tap target 31px (<40) i.bf-t x11: \"Cobalt\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-12.png"
   },
@@ -303,7 +319,15 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 34px (<40) div.bf-floor x1: \"−1\n−2\n−2\n−2\n−3\n−3\nfloor\n\"",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−2\n−2\n−3\n−3\nfloor\n−4\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 30px (<40) i.bf-t.cr x3: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-12.png"
   },
@@ -335,7 +359,23 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★0\"",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Obsidian\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): div.bf-pool under use",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Olive\n★0\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
   },
@@ -343,7 +383,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 36px (<40) button.bf-chip x1: \"Olive\n★6\n+4\"",
+   "desc": "tap target 37px (<40) i.bf-t x22: \"Frost\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
   },
@@ -351,7 +391,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 37px (<40) i.bf-t x19: \"Frost\"",
+   "desc": "tap target 33px (<40) i.bf-t.sun x1: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
   },
@@ -359,47 +399,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 34px (<40) i.bf-t.nud x2: \"Frost\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 35px (<40) i.bf-t.sun x1: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 34px (<40) div.bf-row.dim x4: \"✗\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 34px (<40) div.bf-row.ok x1: \"Rack 3\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 34px (<40) div.bf-floor.ok x1: \"−1\n−2\n−2\n−2\n−3\n−3\nfloor\n\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 30px (<40) i.bf-t.cr x1: \"\"",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−1\n−1\n−2\n−2\n−2\n−3\n−3\nflo\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
   },
@@ -415,7 +415,15 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 36px (<40) button.bf-chip x1: \"You\n★0\"",
+   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Frost\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★0\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-14.png"
   },
@@ -423,7 +431,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Olive\n☀\n★6\n+4\"",
+   "desc": "tap target 36px (<40) button.bf-chip x1: \"Olive\n☀\n★0\n+3\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-14.png"
   },
@@ -431,7 +439,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 35px (<40) i.bf-t x12: \"Cobalt\"",
+   "desc": "tap target 35px (<40) i.bf-t.nofit x1: \"Frost\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-14.png"
   },
@@ -439,7 +447,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 34px (<40) div.bf-floor x1: \"−3\n−3\nfloor\n−8\"",
+   "desc": "tap target 30px (<40) i.bf-t x5: \"\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-14.png"
   },
@@ -447,15 +455,31 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 30px (<40) i.bf-t.cr x5: \"\"",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−2\n−3\n−3\nfloor\n−6\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-14.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story click #680 (−2 −2 −3 −3 floor −4)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 680 clicks (state kept changing)",
+   "where": "story-board",
+   "desc": "tap target 30px (<40) i.bf-t.cr x4: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bf-pool.can / i.bf-t.nofit \"Frost\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-story-board-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #683 (div.bf-row)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 683 clicks (state kept changing)",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases story",
    "shot": "/tmp/qa-shots/sunglaze/phone-story-noresult-15.png"
   },
@@ -631,39 +655,7 @@
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★0\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-19.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 36px (<40) button.bf-chip x1: \"Olive\n★0\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-19.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 37px (<40) i.bf-t x20: \"Cobalt\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-19.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): button.bf-ib \"Menu\" under div#modal \"Tile the king’s palace w\"",
-   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
-   "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-19.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 36px (<40) button.bf-chip x1: \"You\n★0\"",
+   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"You\n★21\n−4\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-20.png"
   },
@@ -671,7 +663,7 @@
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 36px (<40) button.bf-chip.cur x1: \"Olive\n★0\"",
+   "desc": "tap target 37px (<40) i.bf-t x27: \"Frost\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-20.png"
   },
@@ -679,10 +671,42 @@
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: div.bf-pool / i.bf-t \"Garnet\"",
+   "desc": "tap target 34px (<40) div.bf-floor x1: \"−2\n−2\n−3\n−3\nfloor\n−4\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 30px (<40) i.bf-t.cr x3: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-pool.can / i.bf-t.sun",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-pool.can / i.bf-t \"Cobalt\"",
+   "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
+   "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bf-pool.can / i.bf-t \"Saffron\"",
    "repro": "node games-src/scripts/qa-bot.js sunglaze --size phone --seed 5634 --phases fuzz",
    "shot": "/tmp/qa-shots/sunglaze/phone-screen-fuzz-screen-20.png"
   }
  ],
- "secs": 452
+ "secs": 451
 }

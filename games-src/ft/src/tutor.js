@@ -6,7 +6,8 @@ const TUT_GAME='sands-of-qamar';
 const tutOn=()=>false;                 // no spotlight tutorial any more
 const tutHeld=()=>false;
 function firstTime(){try{if(typeof GXT==='undefined'||GXT.status(TUT_GAME).seen)return false;if(FING.n>0)return false;if(localStorage.getItem(SAVE))return false}catch(e){}return true}
-const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart});
+const tutBtn=cls=>{if(typeof GXT==='undefined')return '';let done=false;try{done=GXT.isDone(TUT_GAME)}catch(e){}const first=firstTime();
+  return `<button type="button" class="${cls} gxt-menu ${first?'gxt-first':''}" data-ui="tutgo" data-coach-entry><b>${done?'Coached game ✓':'New here? Learn by playing'}</b><span>${done?'Play it again with Hadiya':'A short real game, rules explained as you play'}</span></button>`};
 function tutMenuFill(){const el=document.getElementById('gxtmenu');if(el)el.innerHTML=tutBtn('btn')}
 function tutOffer(next){if(typeof GXT==='undefined'||online())return false;let seen='1';try{seen=localStorage.getItem('soq_tutoffer')}catch(e){}
   if(seen||!firstTime())return false;try{localStorage.setItem('soq_tutoffer','1')}catch(e){}UI.offerNext=next;UI.modal='offer';render();return true}

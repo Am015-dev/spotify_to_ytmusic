@@ -14,9 +14,9 @@ function tutStart(o){const pro=!!(o&&o.prologue);try{const d=document.getElement
   UI.started=true;
   newGame({np:3,mission:67,seats:['human','ai','ai'],level:'easy',names:DEFNAMES.slice(0,3),realtime:false,captain:0,seed:7});
   tutRebuild();UI.holder=0;UI.prev=snap();coAddSkip();coPush('goal');coPush('mine');coPush('crew');coPush('fuse');refresh()}
-function coAddSkip(){let b=document.getElementById('coachskip');if(!b){b=document.createElement('button');b.id='coachskip';b.type='button';b.setAttribute('data-help','');b.textContent='Skip tutorial';b.addEventListener('click',()=>coExit(false));document.body.appendChild(b)}}
+function coAddSkip(){let b=document.getElementById('coachskip');if(!b){b=document.createElement('button');b.id='coachskip';b.type='button';b.setAttribute('data-help','');b.textContent=UI.coach&&UI.coach.pro?'Skip to map':'Skip tutorial';b.addEventListener('click',()=>coExit(false));document.body.appendChild(b)}}
 function coClear(){clearTimeout(CO.t);CO.cur=null;for(const id of ['coach','coachskip','coachend']){const e=document.getElementById(id);if(e)e.remove()}}
-function coExit(done){const pro=UI.coach&&UI.coach.pro;coClear();if(done||true){try{GXT.markDone(TUT_GAME)}catch(e){}}
+function coExit(done){const pro=UI.coach&&UI.coach.pro;if(UI.coach){CO.last=Object.keys(UI.coach.seen)}CO.done=true;coClear();if(done||true){try{GXT.markDone(TUT_GAME)}catch(e){}}
   UI.coach=null;tutLeave();showStart();if(pro&&!done&&typeof GXC!=='undefined')GXC.open()}
 // ---- the one bubble ----
 function coPush(id,front){const c=UI.coach;if(!c||c.seen[id]||c.q.includes(id)||c.curId===id)return;const t=STORY.coach[id];if(!t)return;if(front)c.q.unshift(id);else c.q.push(id);if(!c.curId)coNext()}

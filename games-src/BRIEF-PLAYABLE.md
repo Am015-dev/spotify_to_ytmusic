@@ -38,3 +38,13 @@ Owner on Wildmark: "The tutorial is not a game, it's tap tap, very bad. The game
 - Spotlight/forced taps only for the very first action (max 2 forced steps), then free play.
 - Every rule in TUTORIAL-COVERAGE.md is explained the first time it becomes relevant during that game; rules that did not come up are explained in a short "Things you'll meet later" card at the end. The final scoring is walked through rule by rule with the player's real numbers.
 - The tutorial-to-end script plays the coached game by choosing legal moves through the UI (any legal move, not a scripted tap list) and asserts every coverage rule was explained.
+
+## Addendum 5 (owner, 7 Nov 23:52): you must SEE how you score
+Owner on Wildmark: "very difficult to know how the gamer collects points, which is good or bad decision".
+Every game needs, before it counts as ready:
+- a live preview of the points a move would add, on hover or tap, before you commit ("+3 Bear pair"), with the pattern highlighted;
+- a points pop after each move that says why;
+- an always-visible score breakdown, yours vs the rival's, with the leader marked;
+- choice badges in markets and hands showing the best gain;
+- one line after each turn rating the move good, okay or poor, and saying why, compared with the solver's best move.
+- Owner on Vale (8 Nov 00:12): "not easy to understand what I have to do, how I collect points, when my turn ends and why". Add a permanent turn tracker (round x of y, whose turn, actions or dice left shown as spendable tokens), a "Turn over: why" card when the turn ends, and one plain next-step line that names the exact action.

@@ -6,7 +6,7 @@ Marks: **[H]** means a house interpretation, where the card text or the online i
 
 ## Turn
 1. **Roll.** Up to 3 rolls (the first roll plus 2 rerolls). Keep dice and reroll the others; dice kept earlier can be rerolled.
-2. **Resolve**, in this order:
+2. **Resolve**. The rulebook lets you resolve dice in any order. [H] Automatic order is below; the menu's **Dice order: Ask me** lets you pick hearts-then-claws or claws-then-hearts when you rolled both:
    - Other monsters' meddling after your last roll: Ice Lock, Pom-Poms, Mind Peek, Witch Hat, Puppet Master and Numbing Stare.
    - Then the **Brainjack** window.
    - Then the Omen Die (curses) and Muddled Senses.

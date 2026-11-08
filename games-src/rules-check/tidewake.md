@@ -33,3 +33,9 @@ Setup: 3-tile hands, monsters 6/6/6/5/5/4/4 for 2-8 players (the expansion tiles
 
 ## W391
 - Nothing changed in the engine. Every item here is low or medium confidence with no stated source (board size, tile mix, monster layouts, portal/wave/whirlpool edge cases), so all are listed as unverified. The rules drawer already has an "Our guesses" section.
+
+## W402 recheck against the published base rulebook page (7 Nov, 22:15 UTC)
+The page confirms: 56 tiles, hand of 3, 10 monsters, start counts 6/5/4 by player count, 6/7/8 wakes them, ascending corner number with gold tie-break, one die each (1-5 arrow, 6 = place a new one),
+minimum 3 refilled by the next player without a move roll, off-board removal, tile destroyed and ship sunk, monster next to the active ship destroys it, monster onto monster destroys the stationary one,
+no voluntary self-elimination. All of this already matches the engine; nothing was changed (rules-test 38/38). The page gives no board size and does not describe the expansion pieces, so the
+board-size and expansion items stay SIMPLIFIED / unverified as listed above.

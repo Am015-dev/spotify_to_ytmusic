@@ -41,8 +41,32 @@ html.sk-banner body .gxc-act b,html.sk-banner body .gxc-act small,html body .gxc
  html body .gx-bar .gx-ibtn span{font-size:16px}
  html body #dockbody .scores .sc,html body #dockbody .recap div,html body #dockbody .coach .x,html body #dockbody .acts .btn,html body #dockbody .coach{font-size:16px}
  html body .gxc-act b,html body .gxc-act small,html body .gxc-node .gxc-lab{font-size:16px}
- html body #dockbody .recap b{filter:brightness(.62)}
+ html body #dockbody .recap b{filter:none}
  html body #dockbody .scores .sc{color:#2a1608}
  .gxc-path .gxc-node .gxc-lab{padding:3px 10px}
 }
 @media (max-width:440px){html body .gxc-act small{display:none!important}html body .gxc-act{height:34px!important;min-height:0!important;padding:0 8px!important}}
+
+/* W407c: campaign map contrast and size (ui-audit A/B), sunglaze-owned overrides of the shared kit */
+html body .gxc-act{background:#26160c!important}
+html body .gxc-act b{font-size:15px}
+@media (min-width:1024px){html body .gxc-act small{font-size:16px!important;line-height:1.15;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;max-width:100%}html body .gxc-act{height:46px!important;transform:translateY(-4px)}html body .gxc-act b{line-height:1.1}}
+html:not(.sk) body .gxc-disc{background-image:none!important}
+html body .gxc-node.a1 .gxc-disc{background-color:#2f6a2c!important;color:#fff8ec!important}
+html body .gxc-node.a2 .gxc-disc{background-color:#8a5413!important;color:#fff8ec!important}
+html body .gxc-node.a3 .gxc-disc{background-color:#8e3b46!important;color:#fff8ec!important}
+html body .gxc-node .gxc-lab{background:#f3e6c8!important;opacity:1!important;color:#3a2610!important}
+@media (min-width:1024px){html body .gxc-act b{font-size:16px!important}}
+html body .gx-drawer{border-bottom-width:0!important}   /* bottom sheet flush with the screen edge: no frame strip below the scroller */
+
+/* every drawer ends in a soft fade footer inside its frame: no half-clipped text line sits on its bottom edge */
+.sgz-fade{position:absolute;left:0;right:0;bottom:0;height:56px;z-index:3;background:linear-gradient(rgba(251,244,230,0),#fbf4e6 72%);pointer-events:auto;border-radius:0 0 var(--gx-radius,12px) var(--gx-radius,12px)}
+html body .gx-drawer-body{padding-bottom:70px}
+@media (max-width:999px){.sgz-fade{height:76px}html body .gx-drawer-body{padding-bottom:90px}}
+html body .gxc-act{z-index:4!important}
+html body .gxc-node.locked .gxc-disc{opacity:1!important;filter:none!important;background-color:#6e6256!important;color:#fff8ec!important}
+.seg button.flash{animation:sgz-flash .35s ease-out}@keyframes sgz-flash{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.seg button.flash{animation:none}}
+@media (min-width:1000px){html body .gx-app.gx-dock-min .gx-dock,html body .gx-app.gx-dock-min .gx-dock *{visibility:hidden!important;pointer-events:none!important}}   /* a hidden side panel hides every control in it */
+html.sk body .gxc-node.open .gxc-disc{color:#2b1608!important;text-shadow:none!important}   /* skin art: the open node's copper centre needs a dark digit */
+.gx-dock .gx-dock-head{order:-1}   /* the dock head sits last in the DOM (so a hidden-panel tap cannot orphan the pick list) but first on screen */

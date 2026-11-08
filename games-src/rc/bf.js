@@ -18,7 +18,7 @@ const FINGER='<u class="rg"></u><span class="fg">👆</span>';
 function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q('.gx-board'),view=q('.gx-board .view');if(!app||!board)return;
   const tray=document.createElement('div');tray.id='bf';tray.setAttribute('role','region');tray.setAttribute('aria-label','Your move');app.appendChild(tray);
   const ov=document.createElement('div');ov.id='bfov';ov.innerHTML='<div id="bfglow"></div><div id="bfchips"></div>';(view||board).appendChild(ov);
-  const pp=q('#ppop');if(pp)board.appendChild(pp);
+  const rs=document.createElement('div');rs.id='bfres';rs.setAttribute('role','status');rs.setAttribute('aria-label','Shared supplies');board.appendChild(rs);const pp=q('#ppop');if(pp)board.appendChild(pp);
   const pv=q('#phview');const bz=document.createElement('div');bz.id='bfzoom';board.appendChild(bz);if(pv)for(const b of [...pv.querySelectorAll('[data-ph=in],[data-ph=out],[data-ph=camp]')])bz.appendChild(b);
   if(pv&&!pv.querySelector('.bf-i')){const i=document.createElement('button');i.className='gx-ibtn bf-i';i.dataset.bf='info';i.setAttribute('aria-label','Details');i.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/></svg>';pv.appendChild(i)}
   const gh=document.createElement('div');gh.id='bfgh';gh.hidden=true;gh.setAttribute('aria-hidden','true');gh.innerHTML='<div class="f">'+FINGER+'</div>';document.body.appendChild(gh);
@@ -75,11 +75,22 @@ BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=n
   if(st==='plan'||st==='plan2')return w8(planCap(st));if(st==='over')return G.over&&G.over.win?'Rescued!':'Lost on the island';
   if(allAI())return UI.pause?'Paused':'The computer is playing';return 'The castaways are working'};
 BF.say=function(t,ms){BF.msg={t:w8(t),until:Date.now()+(ms||3000)};BF.paint();clearTimeout(BF.msgT);BF.msgT=setTimeout(()=>{BF.msg=null;BF.paint()},(ms||3000)+30)};
-BF.paint=function(){const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();if(lb.textContent!==s)lb.textContent=s};
+// whose turn it is: a small banner above the one instruction line (owner 7 Nov: "if I cannot understand it in a minute it is unplayable")
+function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you','Your turn: plan the day'];if(st==='over')return ['end','Game over'];
+  if(st==='story'){const i=storyIdx();if(i<0)return ['isl',''];const last=i>=UI.beats.length-1;if(last&&humanQ())return ['you','Your choice'];const k=UI.beats[i].kind;
+    if(['go','act','finds','adventure','mystery','fight'].includes(k))return ['you','Your castaways at work'];
+    if(['event','threat','morning','weather','night','daysum'].includes(k))return ['isl','The island’s turn: '+({event:'event card',threat:'threat',morning:'morale',weather:'weather',night:'night',daysum:'day summary'})[k]];
+    return ['isl','A new day']}
+  return ['isl','The island’s turn']}
+function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
+  const c=(bad,t)=>`<span class="${bad?'bad':''}">${t}</span>`;
+  return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,`🍖 Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,`🪵 Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,'🏠 Shelter'):c(true,'No shelter'))}
+BF.paint=function(){const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
+  lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
 function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=pawnLabel(p);
-  return `<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button>`}
+  return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:''}</em></span>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
     if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${E(o.l)}</button>`).join('')}</div>`}
@@ -94,14 +105,14 @@ function trayHtml(st){
 function actPos(a){let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:G.camp.pos}
 function chipsFor(st){const out=[];
   if(st==='plan'||st==='plan2'){for(const a of G.plan.acts){if(!a.pw.length)continue;const n=actNeed(a);const k=a.pw.length;const risk=k<n.need?'warn':(n.roll&&k<n.max)?'dice':'sure';
-    out.push({pos:actPos(a),a,risk,badge:risk==='warn'?`+${n.need-k}`:risk==='dice'?'🎲':'✔',rm:a.pw[a.pw.length-1],cur:UI.lastAct===a.id,done:false})}return out}
+    out.push({pos:actPos(a),a,risk,badge:risk==='warn'?`needs +${n.need-k}`:risk==='dice'?'🎲 risky':'✔ sure',rm:a.pw[a.pw.length-1],cur:UI.lastAct===a.id,done:false})}return out}
   if(st==='story'){const i=storyIdx();if(i<0)return out;const b=UI.beats[i];if(!['go','act','finds'].includes(b.kind))return out;const s=beatState(i);if(!s||!s.plan)return out;
     for(const a of s.plan.acts){if(!a.pw.length)continue;const here=b.kind==='act'&&b.data.id===a.id;out.push({pos:(()=>{let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:s.camp.pos})(),a,risk:'sure',badge:a.done&&!here?'✓':'',rm:null,cur:here,done:!!a.done&&!here})}return out}
   return out}
 function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chipsFor(st);
   const sig=JSON.stringify(cs.map(c=>[c.pos,c.a.id,c.a.type,c.a.pw,c.risk,c.cur,c.done]))+st;if(host.dataset.s===sig)return;host.dataset.s=sig;
   const g={};cs.forEach((c,j)=>{(g[c.pos]=g[c.pos]||[]).push([c,j])});
-  host.innerHTML=Object.keys(g).map(pos=>`<div class="bfg" data-t="${pos}" data-below="${+pos===G.camp.pos?1:0}">${g[pos].map(([c,j])=>{const dots=c.a.pw.map(pid=>`<i style="--pc:${pcol(pid)}"></i>`).join('');const inner=`<s>${AI(c.a.type)}</s><span class="dots">${dots}</span>${c.badge?`<em>${c.badge}</em>`:''}`;
+  host.innerHTML=Object.keys(g).map(pos=>`<div class="bfg" data-t="${pos}" data-below="${+pos===G.camp.pos?1:0}">${g[pos].map(([c,j])=>{const dots=c.a.pw.map(pid=>`<i style="--pc:${pcol(pid)}"></i>`).join('');const inner=`<s>${AI(c.a.type)}</s><b class="bfw">${E((TNAME[c.a.type]||c.a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</b><span class="dots">${dots}</span>${c.badge?`<em>${c.badge}</em>`:''}`;
     const cls=`bfa ${c.risk} ${c.cur?'cur':''} ${c.done?'done':''}`;const lab=`${E(actLabel(c.a))}${c.rm?' (tap to take back)':''}`;
     return c.rm?`<button class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" data-rm="${c.rm}" aria-label="${lab}">${inner}</button>`:`<div class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" title="${lab}">${inner}</div>`}).join('')}</div>`).join('');
   BF.place()}
@@ -111,7 +122,7 @@ BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){cons
   BF.ghostPlace()};
 // ---------- floating scores, dice, results ----------
 BF.pop=function(id,html,cls,delay,k){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(id);if(!p)return;const el=document.createElement('div');el.className='bfpop '+(cls||'');el.style.setProperty('--d',(delay||0)+'ms');
-  el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(60,Math.min(p.h-12,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
+  el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-12,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
 function deltas(A,B){const o=[];if(!A||!B)return o;
   for(const k of ['food','pfood','wood','fur']){const a=A.res[k],z=B.res[k];if(z!==a)o.push({t:`${z>a?'+':''}${z-a}${RICON[k]}`,c:z>a?'good':'bad',fly:RICON[k],up:z>a})}
   B.chars.forEach((c,j)=>{const x=A.chars[j];if(!x||(c.npc&&G.scen!=='stranded'))return;const d=lifeOf(B,c)-lifeOf(A,x);if(d)o.push({t:`<i style="background:${PCOL[c.i%6]}"></i>${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})});
@@ -222,3 +233,14 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   if(st==='over'&&bd){const r=bd.getBoundingClientRect();const top=Math.round(r.top+r.height*.28);R.style.setProperty('--dz-t',top+'px');R.style.setProperty('--dz-l','0px');R.style.setProperty('--dz-w',innerWidth+'px');R.style.setProperty('--dz-h',(innerHeight-top)+'px')}
   BF.ghostPlace()};
 })();
+
+
+// toggles are real switches: role=switch + aria-checked follow the state, and every tap leaves a visible trace (Reset tips says so)
+(function(){const sw=()=>{try{const m=document.getElementById('musbtn'),s=document.getElementById('speedbtn'),n=document.getElementById('sndbtn');
+  const set=(e,v)=>{if(!e)return;if(e.getAttribute('role')!=='switch')e.setAttribute('role','switch');if(e.getAttribute('aria-checked')!==String(v))e.setAttribute('aria-checked',String(v))};
+  set(m,typeof musicOn==='function'?!!musicOn():false);set(s,!!(typeof UI!=='undefined'&&UI.quick));set(n,!(typeof UI!=='undefined'&&UI.mute));
+  for(const t of document.querySelectorAll('.gxh-set [data-gxh=tips]')){if(t.getAttribute('role')!=='radio')t.setAttribute('role','radio');if(t.getAttribute('aria-checked')!==String(t.getAttribute('aria-pressed')==='true'))t.setAttribute('aria-checked',String(t.getAttribute('aria-pressed')==='true'))}}catch(e){}};
+  setInterval(sw,500);
+  document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#musbtn,#speedbtn,#sndbtn,.gxh-set button');if(!t)return;
+    t.setAttribute('data-tapn',String((+t.getAttribute('data-tapn')||0)+1));setTimeout(sw,80);
+    if(t.dataset.gxh==='reset'&&!t.dataset.rs){t.dataset.rs=1;const o=t.textContent;t.textContent='Tips reset ✓';setTimeout(()=>{t.textContent=o;delete t.dataset.rs},1800)}},true)})();

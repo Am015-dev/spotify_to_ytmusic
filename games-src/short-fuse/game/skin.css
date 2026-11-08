@@ -174,3 +174,6 @@ div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
 #tb .plate{background-image:none!important;background-color:#2a1a08!important;border-radius:9px}
 #tb .plate{border-image:none!important;border:2px solid var(--sc,#888)!important;box-shadow:none}
 #tb .plate::before,#tb .plate::after{display:none!important}
+/* qa-bot minors: readable gear text, 40px+ tap targets */
+.eqk .en,.eqk .nd{font-size:12px!important}
+.chip.sm,.gx-bar .gx-ibtn,.st-main summary{min-height:44px}
