@@ -390,7 +390,7 @@ function chipEl(s, n) {
   e.style.borderColor = pcolor(s).c;
   const nm = pname(s), short = n >= 4 ? '' : n === 3 ? nm.slice(0, 5) : nm.slice(0, 8);
   e.appendChild(h('span.cn', pawn(s, 18), short ? h('b', short) : null, p && p.passed ? h('i', 'out') : null, p ? h('span.cs', HBKit.season(SEAS[p.season], 16)) : null));
-  e.appendChild(h('span.cl', h('span.cp', '★' + pts), h('span', '▢' + cards), (p && n <= 3) ? h('span', '⚑' + availW(p)) : null));
+  e.appendChild(h('span.cl', h('span.cp', '★' + pts + (!grim && G.players.length > 1 && pts > 0 && G.players.every((q, i) => i === s || score(i).total < pts) ? ' ♛' : '')), h('span', '▢' + cards), (p && n <= 3) ? h('span', '⚑' + availW(p)) : null));
   return e;
 }
 // ---- action row: Prepare / Pass / Undo, or (when something needs choosing) the choices as chips

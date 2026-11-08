@@ -2,19 +2,20 @@
 
 Browser board games, live from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Branch `alex/brave-carson-rbpmlk`,
 never main. Next steps: `games-src/HANDOFF.md`. How-to: `games-src/PLAYBOOK.md`. UI standard: `games-src/UI-BAR.md`.
-Old rules and lessons (read only when needed): `games-src/RULES-ARCHIVE.md`.
+Old rules: `games-src/RULES-ARCHIVE.md`.
 
 ## Hard rules
 - Never write an original game's, publisher's or designer's name in the repo or on the site. No model names, no Co-Authored-By,
   Claude-Session or other AI attribution in files, commits or PRs.
 - Don't edit Mainhattan Overdrive. Nightrun belongs to this orchestrator. Ticket to Ride is on hold.
+- Never replace/unwire owner art (assets-inbox/<game>); free art fills empty slots only.
 - Before pushing: `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push; `git add` explicit paths only.
 - If a command is blocked, stop and tell the owner. Never ask a worker question you could decide yourself; never wait.
 - Screenshots vs benchmarks (URLs); no visual deploy unless every critic row >= 7 and the orchestrator saw the shots.
 - Nightrun RELEASE (owner, 31 Oct): make it playable and sellable at $5. Freeze lifted for WORKER-RULES.md 19; rules 15-18 stay.
 
 ## How we work (owner, 14 Oct 2026: "you waste way too many tokens and deliver shit results")
-- Workers: owner (20 Oct 2026) wants at least 5 workers + 1 reviewer at once on Nightrun, models chosen by task (see Cheapest model line). Never 15 in parallel.
+- Workers: owner wants at least 5 workers + 1 reviewer at once on Nightrun, models chosen by task (see Cheapest model line).
 - One task = ~30 min and ONE deliverable, fully briefed up front (games-src/BRIEF-TEMPLATE.md). Then 5 report lines and stop.
   No idle workers, no self-wake-ups, no follow-up messages except the owner's new bug reports.
 - Model by task complexity (owner, 20 Oct 2026), always set it: HAIKU = mechanical, checklist, no judgement (run tests, bisect by flag,
@@ -30,4 +31,4 @@ Old rules and lessons (read only when needed): `games-src/RULES-ARCHIVE.md`.
 - Read less: start from `games-src/scripts/find.sh --maps` and the game's MODULES.md; read only the line ranges you change; never
   read built html, x.js or joined ui.js. Edit the file that owns the function.
 - Prove a change on one game, owner says yes, then roll out. Shared/shell changes deploy all games in ONE build-all call.
-- Run `games-src/scripts/stamp-copyright.py` on deployed files. Live deploys that pass their checks are pre-approved.
+- Stamp deployed files (stamp-copyright.py). Live deploys that pass their checks are pre-approved.

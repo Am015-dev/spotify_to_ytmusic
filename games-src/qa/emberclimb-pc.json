@@ -1,0 +1,70 @@
+{
+ "slug": "emberclimb",
+ "size": "pc",
+ "seed": 27157,
+ "when": "2026-11-08T00:32Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 0
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 800
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 123
+ },
+ "fuzz": {},
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button#drawpile.chip \"Draw 5\" under span.cl \"Gain 5 Block.\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size pc --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/qa-shots/emberclimb/pc-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #800 (Hits 13 Block 5)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 800 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size pc --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/qa-shots/emberclimb/pc-quick-noresult-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#mute.chip.tap \"🔊\" / button.gxc-btn.go \"Play\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size pc --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/emberclimb/pc-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gxc-node.a3.locked \"8 🔒 Hall of Gears\" / button.gxc-btn.ghost \"Close\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size pc --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/qa-shots/emberclimb/pc-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #123 (Block 6 Strength +3)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 123 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size pc --seed 27157 --phases story",
+   "shot": ""
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "fuzz",
+   "where": "bot",
+   "desc": "phase crashed: browser.newContext: Target page, context or browser has been closed",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size pc --seed 27157 --phases fuzz"
+  }
+ ],
+ "secs": 373,
+ "tutorialIn": {}
+}
