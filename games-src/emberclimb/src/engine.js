@@ -190,6 +190,7 @@
       e.hp -= real; e.asleep = 0;
       if (h.pw.envenom) addPoison(e, h.pw.envenom);
       if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); }
+      phaseCheck(e);
     }
   }
   function losePoisonKill(e) { if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } }
@@ -208,7 +209,7 @@
   }
   function hitRaw(e, d) {
     if (e.dead || d <= 0) return; var a = Math.min(e.blk, d); e.blk -= a; var real = d - a; fx('dmg', 'e' + G.b.en.indexOf(e), d, '');
-    if (real > 0) { e.hp -= real; e.asleep = 0; if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } }
+    if (real > 0) { e.hp -= real; e.asleep = 0; if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } phaseCheck(e); }
   }
   function setStance(h, s) {
     if (h.stance === s) return; if (h.stance === 'c') gainEn(h, 2); h.stance = s; fx('stance', 'h' + G.hs.indexOf(h), 0, s);
@@ -258,25 +259,33 @@
     return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0, spk: 0, row: 0 };
   }
   function plan(e) {
-    var d = D.ENEMIES[e.id], step;
+    var d = D.ENEMIES[e.id], step, pat = (e.ph2 && d.pat2) || d.pat;
     if (e.asleep > 0) { e.intent = { sleep: 1 }; return; }
-    if (d.mode === 'rand') { var k; do { k = ri(d.pat.length); } while (k === e.i && d.pat.length > 1); e.i = k; }
-    else e.i = (e.i + 1) % d.pat.length;
-    step = d.pat[e.i]; var dn = 0;
+    if (d.mode === 'rand') { var k; do { k = ri(pat.length); } while (k === e.i && pat.length > 1); e.i = k; }
+    else e.i = (e.i + 1) % pat.length;
+    step = pat[e.i]; var dn = 0;
     if (step.die) { dn = G.b.die || 1; step = step.die[dn <= 2 ? 0 : dn <= 4 ? 1 : 2]; }
     e.intent = JSON.parse(JSON.stringify(step)); if (dn) e.intent.die = dn;
     var tg = e.row; if (!G.hs[tg] || G.hs[tg].dead) tg = G.hs.indexOf(aliveHs()[0]); e.intent.tg = tg;
+  }
+  // boss phase 2: at half HP a boss with a second pattern changes phase once; its next move is re-planned at once so the new intent shows
+  function phaseCheck(e) {
+    var d = D.ENEMIES[e.id]; if (!d || !d.pat2 || e.ph2 || e.dead || e.hp > e.mhp / 2) return;
+    e.ph2 = 1; e.i = -1; plan(e); fx('phase', 'e' + G.b.en.indexOf(e), 0, e.id);
   }
   function startBattle(kind) {
     var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights < 3 ? P.weak : P.strong);
     var ids = pool[ri(pool.length)].slice();
     if (kind !== 'e' && kind !== 'b') {   // an Encounter room has one enemy per hero: trim a bigger group, top a smaller one up from another group of the same pool
-      while (ids.length > G.hs.length) ids.pop();
+      var cap = G.hs.length + (kind === 'm' && G.fights >= 3 && D.STRONGX ? D.STRONGX : 0);   // G3 r2 balance: later Encounter rooms keep one extra foe
+      while (ids.length > cap) ids.pop();
       for (var gt = 0; ids.length < G.hs.length && gt < 20; gt++) { var og = pool[ri(pool.length)]; if (og[0]) ids.push(og[0]); }
     }
     resetCombat();
     G.b = { en: ids.map(mkEnemy), turn: 0, ph: 'p', cur: 0, kind: kind, die: 0, scry: null };
     G.b.en.forEach(function (e, i) { e.row = i % G.hs.length; });
+    // G3 r2 balance: the later Encounter rooms of an act (after the first 3 fights) have tougher foes (x D.STRONGHP HP), so floors 4-9 are not trivial
+    if (kind === 'm' && G.fights >= 3 && D.STRONGHP) G.b.en.forEach(function (e) { e.hp = e.mhp = Math.round(e.mhp * D.STRONGHP); });
     G.scr = 'battle'; G.fights++;
     G.hs.forEach(function (h) {
       if (h.dead) return;
@@ -335,7 +344,7 @@
   }
   // tabletop poison: at the end of the heroes' turn each poisoned enemy loses 1 HP per token (ignores Block); tokens stay until it dies
   function tickPoison() {
-    alive().forEach(function (e) { var p = e.st.poison || 0; if (p > 0) { e.hp -= p; fx('dmg', 'e' + G.b.en.indexOf(e), p, 'poison'); losePoisonKill(e); } });
+    alive().forEach(function (e) { var p = e.st.poison || 0; if (p > 0) { e.hp -= p; fx('dmg', 'e' + G.b.en.indexOf(e), p, 'poison'); losePoisonKill(e); phaseCheck(e); } });
     if (!alive().length) winBattle();
   }
   // one enemy acts per call; returns true while enemy phase continues
@@ -542,6 +551,7 @@
     return m;
   }
   function performMove(mv) {
+    if (G && mv && mv.t === 'toss') { if (!G.pots[mv.p]) return false; G.pots.splice(mv.p, 1); return true; }   // discard a potion (any screen); kept out of validMoves so bots never throw potions away
     if (!G) return false; var ok = validMoves().some(function (v) { return JSON.stringify(v) === JSON.stringify(mv); }); if (!ok) return false;
     switch (mv.t) {
       case 'go': enterNode(mv.n); break;

@@ -98,6 +98,7 @@
         case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); numAt(f.w, f.n, 'blk', 'Block'); break;
         case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); numAt(f.w, f.n, 'heal', 'HP'); break;
         case 'buff': if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX('buff'); popAt(f.w, f.x === 'str' ? '+' + f.n + ' Strength' : f.x === 'spikes' ? 'Spikes ' + f.n : f.x === 'nrg' ? '+' + f.n + ' Energy' : 'Power!', 'buf'); break;
+        case 'phase': (function () { var ed = D.ENEMIES[f.x] || {}, o0 = document.querySelector('.ec-phase'); if (o0) o0.remove(); var d = h('div', 'ec-phase', null, [h('b', '', 'Phase 2'), h('span', '', ed.name + ' ' + (ed.ph2 || 'changes its moves') + '. Watch its new intent!')]); d.setAttribute('role', 'status'); document.body.appendChild(d); SFX('crit'); shakeEl(el, 120); setTimeout(function () { if (d.parentNode) d.remove(); }, 2600); })(); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
         case 'die': if (window.ANIM) { var d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
         case 'act': if (f.x === 'atk' && el && window.ANIM) { el.classList.add('lunge'); setTimeout(function () { el.classList.remove('lunge'); }, 480); } break;
@@ -184,6 +185,7 @@
     if (g.scr === 'map') mapScr(); else if (g.scr === 'battle') battle(); else if (g.scr === 'reward') reward();
     else if (g.scr === 'rest') rest(); else if (g.scr === 'shop') shop(); else if (g.scr === 'event') event(); else if (g.scr === 'over') over();
     if (UI.ov) overlay();
+    if (UI.potSel == null) UI.potSel = -1; potPop();
     dock(g);
     if (UI.lastScr !== g.scr) { if (g.scr === 'reward' || (g.scr === 'over' && g.won)) SFX('win'); else if (g.scr === 'over') SFX('lose'); UI.lastScr = g.scr; }
     if (UI.camp && UI.bossLine && g.scr === 'reward' && g.map[g.at] && g.map[g.at].t === 'b' && UI.bossPost !== g.at + ':' + g.floor && !(window.GXT && GXT.active())) { UI.bossPost = g.at + ':' + g.floor; UI.bossLine('post'); }
@@ -269,7 +271,7 @@
     for (var i = 0; i < g.pslots; i++) (function (i) {
       var id = g.pots[i];
       if (!id) { p.appendChild(h('span', 'pot', '')); return; }
-      var b = h('button', 'pot full', null, [A('pot-' + id, D.POTIONS[id].name, { ph: '#5a8a5a' })]); b.setAttribute('aria-label', D.POTIONS[id].name); on(b, function () { usePot(i); }); p.appendChild(b);
+      var b = h('button', 'pot full', null, [A('pot-' + id, D.POTIONS[id].name, { ph: '#5a8a5a' })]); b.setAttribute('aria-label', D.POTIONS[id].name); if (UI.potSel === i) b.classList.add('sel'); on(b, function () { UI.potSel = UI.potSel === i ? -1 : i; render(); }); p.appendChild(b);
     })(i);
     return p;
   }
@@ -434,7 +436,7 @@
       x.appendChild(A('enemy-' + (d.img || e.id), d.name, { ph: '#6a3a2a' })); if (e.spk) x.appendChild(h('div', 'spkchip', 'Spikes ' + e.spk));
       if (b.ph === 'e' && UI.actor === i) x.classList.add('acting');
       if (e.blk) x.appendChild(h('div', 'blkchip', '🛡' + e.blk));
-      x.appendChild(h('div', 'nm', d.name));
+      x.appendChild(h('div', 'nm', d.name + (e.ph2 ? ' · Phase 2' : '')));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
       if (SG && e.blk) x.querySelector('.bar').appendChild(h('span', 'w485shield', String(e.blk)));
       x.appendChild(stChips(e));
@@ -594,10 +596,23 @@
     });
   }
   function afterMove() { var g = G(); if (g.scr !== 'battle') { render(); } }
-  function usePot(i) {
+  // potion menu: what it does, then Drink (on a chosen foe if it targets) or Discard
+  function potPop() {
+    var g = G(), i = UI.potSel, id = g && g.pots[i]; var o0 = document.querySelector('.ec-potpop'); if (o0) o0.remove(); if (!id) { UI.potSel = -1; return; }
+    var P = D.POTIONS[id], inFight = g.scr === 'battle' && g.b && g.b.ph === 'p' && !UI.busy, d = h('div', 'ec-potpop'); d.setAttribute('role', 'dialog');
+    d.appendChild(h('b', '', P.name)); d.appendChild(h('span', '', P.t)); var row = h('div', 'row');
+    if (inFight && P.tgt) g.b.en.forEach(function (e, k) { if (e.dead) return; var b = on(h('button', 'btn potdrink', 'Drink on ' + D.ENEMIES[e.id].name), function () { UI.potSel = -1; usePot(i, k); }); row.appendChild(b); });
+    else if (inFight) row.appendChild(on(h('button', 'btn potdrink', 'Drink'), function () { UI.potSel = -1; usePot(i); }));
+    else row.appendChild(h('span', 'potnote', 'Drink it during a fight.'));
+    row.appendChild(on(h('button', 'btn alt potdisc', 'Discard'), function () { UI.potSel = -1; E.performMove({ t: 'toss', p: i }); render(); }));
+    row.appendChild(on(h('button', 'btn alt potclose', 'Close'), function () { UI.potSel = -1; render(); }));
+    d.appendChild(row); document.body.appendChild(d);
+  }
+  UI.potPop = potPop;
+  function usePot(i, k) {
     var g = G(); if (g.scr !== 'battle' || g.b.ph !== 'p') { toast('Use in a fight'); return; }
     var id = g.pots[i];
-    if (D.POTIONS[id].tgt) { var al = g.b.en.map(function (e, k) { return e.dead ? -1 : k; }).filter(function (k) { return k >= 0; }); E.performMove({ t: 'pot', p: i, e: al[0] }); }
+    if (D.POTIONS[id].tgt) { var al = g.b.en.map(function (e, k) { return e.dead ? -1 : k; }).filter(function (k) { return k >= 0; }); E.performMove({ t: 'pot', p: i, e: k != null && al.indexOf(k) >= 0 ? k : al[0] }); }
     else E.performMove({ t: 'pot', p: i });
     render();
   }
@@ -672,9 +687,18 @@
     if (/"(draw|nrg|scry|mir)"/.test(s)) return 'draw';
     return 'utility';
   }
-  function deckPicker(title, hi, filter, cb) {
-    var g = G(), ov = h('div', 'ov'); ov.appendChild(h('h2', '', title, [on(h('button', 'x', '✕'), function () { UI.ov = null; render(); })]));
-    var gr = h('div', 'grid'); g.hs[hi].deck.forEach(function (c, i) { if (!filter(c)) return; var el = cardEl(c); on(el, function () { cb(i); }); gr.appendChild(el); });
+  // deck picker; with up=1 a tap shows the card before and after the upgrade, and nothing changes until Upgrade is tapped
+  function deckPicker(title, hi, filter, cb, up) {
+    var g = G(), ov = h('div', 'ov'); ov.appendChild(h('h2', '', title, [on(h('button', 'x', '✕'), function () { UI.ov = null; UI.pickSel = -1; render(); })]));
+    var ps = UI.pickSel != null ? UI.pickSel : -1, pc = up && ps >= 0 ? g.hs[hi].deck[ps] : null;
+    if (up) {
+      var pv = h('div', 'ec-upv');
+      if (pc) { var a0 = cardEl(pc), a1 = cardEl({ id: pc.id, u: 1 }); pv.appendChild(a0); pv.appendChild(h('span', 'arr', '→')); pv.appendChild(a1);
+        var ok = on(h('button', 'btn', 'Upgrade ' + D.CARDS[pc.id].name), function () { UI.pickSel = -1; cb(ps); }); ok.id = 'upg-ok'; pv.appendChild(ok); }
+      else pv.appendChild(h('div', 'sub', 'Tap a card to see it upgraded.'));
+      ov.appendChild(pv);
+    }
+    var gr = h('div', 'grid'); g.hs[hi].deck.forEach(function (c, i) { if (!filter(c)) return; var el = cardEl(c); if (up && i === ps) el.classList.add('sel'); on(el, function () { if (up) { UI.pickSel = i; render(); } else cb(i); }); gr.appendChild(el); });
     ov.appendChild(gr); return ov;
   }
   function rest() {
@@ -694,11 +718,12 @@
     g.shop.items.forEach(function (x, i) {
       var nm = x.t === 'card' ? D.CARDS[x.id].name : x.t === 'relic' ? D.RELICS[x.id].name : D.POTIONS[x.id].name;
       var art = x.t === 'card' ? A(x.id, nm, { ph: TONE[D.CARDS[x.id].hero] }) : x.t === 'relic' ? A('relic-' + x.id, nm, { ph: '#8a6a2a' }) : A('pot-' + x.id, nm, { ph: '#5a8a5a' });
-      var b = h('button', 'item' + (x.sold ? ' sold' : '') + (g.gold < x.p ? ' poor' : ''), null, [art, h('span', '', nm), h('span', 'price', '● ' + x.p)]);
+      var ds = x.t === 'card' ? E.lines(E.eff({ id: x.id, u: 0 })).join(' ') : x.t === 'relic' ? D.RELICS[x.id].t : D.POTIONS[x.id].t, ty = x.t === 'card' ? ({ A: 'Attack', S: 'Skill', P: 'Power' })[D.CARDS[x.id].type] || 'Card' : x.t === 'relic' ? 'Relic' : 'Potion';
+      var b = h('button', 'item shoptile t-' + x.t + (x.sold ? ' sold' : '') + (g.gold < x.p ? ' poor' : ''), null, [art, h('b', 'stn', nm), h('i', 'sty', ty + (x.t === 'card' ? ' · cost ' + D.CARDS[x.id].cost : '')), h('span', 'sds', x.sold ? 'Sold' : ds), h('span', 'price', '● ' + x.p)]); b.setAttribute('aria-label', nm + ', ' + ty + ', ' + ds + ', ' + x.p + ' gold');
       if (UI.shopSel === i) b.classList.add('picked');
       on(b, function () { UI.shopSel = i; render(); }); it.appendChild(b);
     });
-    var rm = on(h('button', 'item' + (g.shop.removed ? ' sold' : ''), null, [A('icon-remove', '✂', { ph: '#7a3a3a' }), h('span', '', 'Remove a card'), h('span', 'price', '● ' + g.shop.rm)]), function () { if (g.gold < g.shop.rm) { toast('Not enough gold'); return; } UI.ov = 'remove'; render(); });
+    var rm = on(h('button', 'item shoptile t-rm' + (g.shop.removed ? ' sold' : ''), null, [A('icon-remove', '✂', { ph: '#7a3a3a' }), h('b', 'stn', 'Remove a card'), h('i', 'sty', 'Service'), h('span', 'sds', g.shop.removed ? 'Done' : 'Take one card out of your deck.'), h('span', 'price', '● ' + g.shop.rm)]), function () { if (g.gold < g.shop.rm) { toast('Not enough gold'); return; } UI.ov = 'remove'; render(); });
     it.appendChild(rm); s.appendChild(it);
     var sx = g.shop.items[UI.shopSel];
     if (sx && !sx.sold) {
@@ -779,9 +804,9 @@
       ov = h('div', 'ov'); ov.appendChild(h('h2', '', UI.ov === 'deck' ? 'Your deck' : UI.ov === 'draw' ? 'Draw pile' : 'Discard pile', [on(h('button', 'x', '✕'), close)]));
       var gg = h('div', 'grid'), cards = []; if (UI.ov === 'deck') g.hs.forEach(function (x) { cards = cards.concat(x.deck); }); else { var cu = g.hs[g.b.cur]; cards = UI.ov === 'draw' ? cu.draw.slice().sort(function (a, b) { return a.id < b.id ? -1 : 1; }) : cu.disc; }
       cards.forEach(function (c) { gg.appendChild(cardEl(c)); }); ov.appendChild(gg);
-    } else if (UI.ov === 'smith') { var hi = g.rest.todo[0]; ov = deckPicker('Upgrade which card?', hi, function (c) { return !c.u && D.CARDS[c.id].ops.length && D.CARDS[c.id].hero !== 'z'; }, function (i) { E.performMove({ t: 'upg', h: hi, c: i }); UI.ov = null; render(); }); }
+    } else if (UI.ov === 'smith') { var hi = g.rest.todo[0]; ov = deckPicker('Upgrade which card?', hi, function (c) { return !c.u && D.CARDS[c.id].ops.length && D.CARDS[c.id].hero !== 'z'; }, function (i) { E.performMove({ t: 'upg', h: hi, c: i }); UI.ov = null; render(); toast('Upgraded ' + D.CARDS[G().hs[hi].deck[i].id].name + '+', 2200); }, 1); }
     else if (UI.ov === 'remove') { ov = h('div', 'ov'); ov.appendChild(h('h2', '', 'Remove which card?', [on(h('button', 'x', '✕'), close)])); var gr2 = h('div', 'grid'); g.hs.forEach(function (x, hi) { x.deck.forEach(function (c, i) { var el = cardEl(c); on(el, function () { E.performMove({ t: 'remove', h: hi, c: i }); UI.ov = null; render(); }); gr2.appendChild(el); }); }); ov.appendChild(gr2); }
-    else if (UI.ov === 'evpick') { ov = deckPicker(g.evn.pend === 'rem' ? 'Remove which card?' : 'Upgrade which card?', 0, function (c) { return g.evn.pend === 'rem' || (!c.u && D.CARDS[c.id].ops.length); }, function (i) { E.performMove({ t: 'evpick', c: i }); UI.ov = null; render(); }); }
+    else if (UI.ov === 'evpick') { ov = deckPicker(g.evn.pend === 'rem' ? 'Remove which card?' : 'Upgrade which card?', 0, function (c) { return g.evn.pend === 'rem' || (!c.u && D.CARDS[c.id].ops.length); }, function (i) { E.performMove({ t: 'evpick', c: i }); UI.ov = null; render(); }, g.evn.pend !== 'rem' && g.evn.pend !== 'xform'); }
     if (ov) { ov.addEventListener('click', function (e) { if (e.target === ov) close(); }); app.appendChild(ov); }
   }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && UI.ov) { UI.ov = null; render(); } });

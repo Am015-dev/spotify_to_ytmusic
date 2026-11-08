@@ -105,3 +105,8 @@ Re-checked against the tabletop rulebook text (online copy): Campfire Rest heals
 (x SCALE = 3); a Weak attacker on a Vulnerable target cancels both; one token used per whole attack; card / enemy text resolves top to bottom.
 All match the engine, so the numbers stay. Fixed: an enemy's debuff now lands after its own hit (logic rule 68); start-of-fight Block
 (Iron Bangle) lasts through round 1 (logic rule 67). In-game text now says what each status does ("Vulnerable 1: takes double damage").
+G3 round 2 (8 Nov 2026), shelf choices on top of the tabletop numbers, each one knob in data.js:
+- D.STRONGX = 1: after the first 3 fights of an act, an Encounter room keeps one extra foe (tabletop: one per hero), so floors 4-9 are not trivial.
+- Act-1 boss HP 118-124 (was 132-140). Bosses get a second pattern at half HP (pat2, banner "Phase 2" + new intent); the tabletop act-1 boss splits.
+- bench-newplayer.js (test bot, 30% random plays, default 3-act Quick game, Warrior, 300 runs): floors 1-3 cleared 95%, act-1 boss reached 76%,
+  beaten 28% (round start: 95 / 81 / 26). Test bot with no misplays: 99 / 89 / 59.

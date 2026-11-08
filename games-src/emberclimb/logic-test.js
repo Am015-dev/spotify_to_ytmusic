@@ -137,5 +137,12 @@ rule(67, () => { E.newGame({ heroes: ['w'], seed: 67 }); const g0 = E.G(); g0.re
 rule(68, () => { const g = F(['w'], 68); const h = g.hs[0]; h.hand.forEach(c => { c.id = 'w-defend'; }); g.b.en[0].intent = { atk: 8, vuln: 2, tg: 0 }; h.blk = 10; const pv = E.previewHit(0, 0);
   E.performMove({ t: 'end' }); g.b.ph === 'e' && E.step(); return [[8, 999, 2], [pv, h.hp, h.st.vuln || 0]]; });
 
+// boss phase 2: at half HP the boss switches to its second pattern once, and its shown intent is re-planned from it
+rule(69, () => { E.newGame({ heroes: ['w'], seed: 69 }); E.debug.boss(); const g = E.G(), e = g.b.en[0], d = D.ENEMIES[e.id]; g.hs[0].hp = g.hs[0].mhp = 999; e.blk = 0; e.st = {}; e.hp = Math.floor(e.mhp / 2) + 3;
+  g.hs[0].hand.push(E.mk('w-strike')); g.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: g.hs[0].hand.length - 1, e: 0 }); const it = J(Object.assign({}, e.intent, { tg: undefined, die: undefined }));
+  return [[true, 1, true], [!!d.pat2, e.ph2, d.pat2.some(p => J(p) === it)]]; });
+// potion Discard: removes the potion on any screen, and is never offered to bots as a move
+rule(70, () => { E.newGame({ heroes: ['w'], seed: 70 }); const g = E.G(); g.pots = ['fire-flask', 'block-brew']; const ok = E.performMove({ t: 'toss', p: 0 }); return [[true, ['block-brew'], false], [ok, g.pots, E.validMoves().some(m => m.t === 'toss')]]; });
+
 console.log('RULES passing ' + pass + ' / ' + total + (fails.length ? '   failing: ' + fails.join(',') : ''));
 process.exit(fails.length ? 1 : 0);

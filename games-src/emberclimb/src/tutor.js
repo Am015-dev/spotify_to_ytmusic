@@ -106,40 +106,25 @@
   function node(t) { return function () { return $('#map .node.t-' + t); }; }
   function goldEl() { var xs = document.querySelectorAll('.reward .chip'); for (var i = 0; i < xs.length; i++) if (/gold/.test(xs[i].textContent)) return xs[i]; return null; }
   // Every core rule in order, one line of 12 words or fewer, one highlighted tap each. ids = the rule keys tools/tut-walk.js checks.
-  var RULES = ['goal', 'intent', 'energy', 'draw', 'vuln', 'vulnx2', 'block', 'endturn', 'discard', 'blockreset', 'pattern', 'strength', 'exhaust', 'weak', 'potion', 'keywords', 'finish', 'gold', 'reward', 'deck', 'map', 'rest', 'shop', 'event', 'elite', 'boss', 'acts', 'go'];
+  var RULES = ['intent', 'energy', 'vuln', 'block', 'endturn', 'pattern', 'strength', 'exhaust', 'potion', 'finish', 'reward', 'leave', 'map', 'go'];   // G3 r2: mostly doing steps, 4 Next-only lines
   function steps() {
     var tap = function (id, n) { return { type: 'tap', times: n || 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
     var info = function (id, target, say, ready, side) { return { id: id, title: 'Warden Ashgrove', target: target, say: say, wait: null, ready: ready || battleP, side: side }; };
     var en = function () { return $('.en'); }, intent = function () { return $('.en .intent') || $('.en'); };
     return [
-      info('goal', en, 'Goal: climb the tower and beat the boss at the top.'),
-      info('intent', intent, 'This icon shows its next move: a bite for 5.'),
-      info('energy', function () { return $('.energy') || $('#end'); }, 'You get 3 energy every turn. Cards cost energy.'),
-      info('draw', function () { return $('.hand'); }, 'You draw 5 cards at the start of every turn.', null, 'top'),
-      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Blow twice: 8 damage and Vulnerable.', wait: tap('w-hammer'), ready: battleP },
-      info('vulnx2', en, 'Vulnerable: it takes double damage from your hits.'),
-      { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'Tap Plate Guard twice. Block stops the bite.', wait: tap('w-defend'), ready: battleP },
-      { id: 'endturn', title: 'End turn', target: function () { return $('#end'); }, endOk: 1, onEnter: function () { setTimeout(function () { UI.render(); }, 30); }, say: 'Energy spent. Tap End turn, then the foe acts.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
-      info('discard', function () { return $('#discpile'); }, 'Your leftover cards went to the discard pile.', turn2),
-      info('blockreset', function () { return $('.heropan') || $('.hfig'); }, 'Your Block is gone. Block lasts one turn only.', turn2),
-      info('pattern', intent, 'Foes repeat a pattern. Next it bites and makes you Weak.', turn2),
+      info('intent', intent, 'Goal: beat the boss on top. This icon is its next move.'),
+      info('energy', function () { return $('.energy') || $('#end'); }, 'Each turn: 3 energy and 5 new cards. Cards cost energy.'),
+      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Blow twice. Vulnerable: it takes double damage.', wait: tap('w-hammer'), ready: battleP },
+      { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'Tap Plate Guard twice. Block soaks hits, this turn only.', wait: tap('w-defend'), ready: battleP },
+      { id: 'endturn', title: 'End turn', target: function () { return $('#end'); }, endOk: 1, onEnter: function () { setTimeout(function () { UI.render(); }, 30); }, say: 'Tap End turn. Leftover cards go to the discard pile.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
+      info('pattern', intent, 'Foes repeat a pattern. Next: a bite that makes you Weak.', turn2),
       { id: 'strength', title: 'Power', target: function () { return cardEl('w-kindle'); }, say: 'Tap Kindle twice. Strength adds 2 to every hit.', wait: tap('w-kindle'), ready: turn2 },
-      { id: 'exhaust', title: 'Exhaust', target: function () { return cardEl('w-roar'); }, say: 'Tap the Roar twice. Exhaust cards leave for this fight.', wait: tap('w-roar'), ready: turn2 },
-      info('weak', en, 'Weak: each of its hits deals 3 less damage.', turn2),
-      { id: 'potion', title: 'Potion', target: function () { return $('.pot.full'); }, say: 'Tap the potion. Poison hurts every turn, through Block.', wait: { type: 'event', match: function (a) { return a.pots === 0; } }, ready: turn2 },
-      info('keywords', function () { return $('#drawpile'); }, 'Ethereal cards fade at turn end. Retain cards stay in hand.', turn2),
+      { id: 'exhaust', title: 'Weak', target: function () { return cardEl('w-roar'); }, say: 'Tap the Roar twice. Weak foes hit 3 less. Roar exhausts.', wait: tap('w-roar'), ready: turn2 },
+      { id: 'potion', title: 'Potion', target: function () { return $('.ec-potpop .potdrink') || $('.pot.full'); }, say: 'Tap the potion, then Drink. Poison hurts through Block.', wait: { type: 'event', match: function (a) { return a.pots === 0; } }, ready: turn2 },
       { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2 },
-      info('gold', goldEl, 'Each win gives gold. Spend it at shops.', scr('reward')),
-      { id: 'reward', title: 'Card reward', target: function () { return $('.picks .card') && $('.picks .card').parentNode; }, say: 'Pick 1 of 3 cards, or Skip to keep it lean.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: scr('reward') },
-      info('deck', function () { return $('#leave'); }, 'Your deck grew to 11 cards. Upgrades make cards stronger.', scr('reward')),
+      { id: 'reward', title: 'Card reward', target: function () { return $('.picks .card') && $('.picks .card').parentNode; }, say: 'Gold won! Pick 1 of 3 cards for your deck.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: scr('reward') },
       { id: 'leave', title: 'Onward', target: function () { return $('#leave'); }, say: 'Tap Continue to climb.', wait: { type: 'event', match: function (a) { return a.scr === 'map'; } }, ready: scr('reward') },
-      info('map', function () { return $('#map'); }, 'Paths branch. Each row is one floor higher.', scr('map')),
-      info('rest', node('r'), 'Campfire: rest to heal, or upgrade one card.', scr('map')),
-      info('shop', node('s'), 'Shop: buy cards, relics, potions, or remove a card.', scr('map')),
-      info('event', node('v'), 'Question mark: an event with a choice to make.', scr('map')),
-      info('elite', node('e'), 'Elite: a tough foe that drops a relic.', scr('map')),
-      info('boss', node('b'), 'The act boss waits on top. Beat it, pick a relic.', scr('map')),
-      info('acts', node('b'), 'A full run is three acts, each with its own boss.', scr('map')),
+      info('map', function () { return $('#map'); }, 'Rooms: fights, elites, rest, shop, events. The boss waits on top.', scr('map')),
       { id: 'go', title: 'Your climb', target: function () { return $('#map .node.glow'); }, also: function () { return [].slice.call(document.querySelectorAll('#map .node.glow')).slice(1); }, say: 'Tap a glowing room. The run is yours now.', wait: { type: 'event', match: function (a) { return a.scr !== 'map'; } }, ready: scr('map') },
       { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
         onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; ['intent', 'vuln', 'energy', 'block', 'endturn', 'weak', 'poison', 'strength', 'power', 'exhaust', 'potion', 'reward', 'gold', 'map', 'rest', 'shop', 'event', 'elite', 'boss', 'acts', 'relic'].forEach(function (k) { C.seen[k] = 1; }); UI.render(); }, 60); } }

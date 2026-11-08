@@ -27,7 +27,7 @@ const OUT = path.join(__dirname, '..', 'playable-shots', 'w494'); fs.mkdirSync(O
     if (s.scr === 'over') { result = 'lost on floor ' + s.floor + ' (act ' + s.act + ')'; break; }
     { const gb = await pg.$('.ec-goal button'); if (gb && await gb.isVisible()) { await T(gb); continue; } }
     if (s.mode === 'title') { if (await pg.$('#play')) await T('#play'); else { const q = await byText('#title button', /^Quick game/); if (q) await T(q); } continue; }
-    if (s.ov === 'smith' || s.ov === 'remove' || s.ov === 'evpick') { const c = await pg.$('.ov .grid .card'); if (c) await T(c); continue; }
+    if (s.ov === 'smith' || s.ov === 'remove' || s.ov === 'evpick') { const ok = await pg.$('#upg-ok'); if (ok) { await T(ok); continue; } const c = await pg.$('.ov .grid .card'); if (c) await T(c); continue; }   // upgrade: pick, see the preview, confirm
     if (s.ov) { const x = await pg.$('.ov .x'); if (x) await T(x); continue; }
     if (s.scr === 'map') {
       const pref = (s.hp < s.mhp * 0.55 ? ['r', 'v', 's', 't', 'm', 'e', 'b'] : ['s', 'r', 'v', 't', 'e', 'm', 'b']).sort((a, b) => (met[a] ? 1 : 0) - (met[b] ? 1 : 0));
@@ -37,7 +37,8 @@ const OUT = path.join(__dirname, '..', 'playable-shots', 'w494'); fs.mkdirSync(O
     if (s.scr === 'battle') {
       if (s.kind === 'b') await snap('boss');
       if (s.ph !== 'p' || s.busy) continue;
-      if (s.pots && s.hp < s.mhp * 0.5 && await pg.$('.pot.full')) { await T('.pot.full'); continue; }
+      if (await pg.$('.ec-potpop .potdrink')) { await T('.ec-potpop .potdrink'); continue; }
+      if (s.pots && s.hp < s.mhp * 0.5 && await pg.$('.pot.full')) { await T('.pot.full'); continue; }   // potion: tap it, then Drink
       const ok = await pg.$('.hand .card.ok');
       if (ok) { await T(ok); await sleep(200); if (await pg.$('.en.glow')) await T('.en.glow'); else { const sel = await pg.$('.hand .card.sel'); if (sel) await T(sel); } await sleep(300); }
       else await T('#end');

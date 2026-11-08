@@ -147,10 +147,10 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'thorn-brute': { name: 'Thorn Brute', hp: [80, 86], pat: [{ str: 2 }, { atk: 14 }, { atk: 8, vuln: 2 }], onSkill: 2, elite: 1, art: 'bark-skinned hulking brute with thorns and a horned skull' },
     'sleeper-statue': { name: 'Sleeper Statue', hp: [78, 84], sleep: 3, pat: [{ atk: 16 }, { atk: 16 }, { weak: 2, vuln: 1 }], elite: 1, art: 'mossy stone statue of a seated giant with one eye opening' },
     'iron-warden': { name: 'Iron Warden', hp: [36, 40], pat: [{ atk: 9 }, { add: ['dazed', 2] }, { atk: 6, blk: 6 }], elite: 1, art: 'tall slim iron sentry with a lantern head' },
-    'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], boss: 1, art: 'iron sentry captain in spiked plate with a lantern helm' },
-    'mire-behemoth': { name: 'Mire Behemoth', hp: [132, 140], pat: [{ atk: 9, add: ['slimed', 2] }, { blk: 12, str: 2 }, { atk: 22 }, { atk: 7, hits: 2, all: 1 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
-    'ashen-wraith': { name: 'Ashen Wraith', hp: [124, 130], pat: [{ add: ['burn', 1], atk: 6, all: 1 }, { die: [{ blk: 10, str: 2 }, { atk: 5, hits: 2 }, { atk: 6, hits: 3 }] }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
-    'gate-colossus': { name: 'Gate Wyrm', hp: [138, 146], pat: [{ atk: 9, hits: 2 }, { blk: 16 }, { atk: 24, vuln: 2 }, { str: 3, blk: 8 }], boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
+    'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], pat2: [{ atk: 8, hits: 2 }, { blk: 8, str: 2 }], ph2: 'cracks its plate and fights wild', boss: 1, art: 'iron sentry captain in spiked plate with a lantern helm' },
+    'mire-behemoth': { name: 'Mire Behemoth', hp: [118, 124], pat: [{ atk: 9, add: ['slimed', 2] }, { blk: 12, str: 2 }, { atk: 22 }, { atk: 7, hits: 2, all: 1 }], pat2: [{ atk: 12, add: ['slimed', 1] }, { atk: 6, hits: 3 }, { blk: 10, str: 2 }], ph2: 'splits its hide and lashes out', boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
+    'ashen-wraith': { name: 'Ashen Wraith', hp: [124, 130], pat: [{ add: ['burn', 1], atk: 6, all: 1 }, { die: [{ blk: 10, str: 2 }, { atk: 5, hits: 2 }, { atk: 6, hits: 3 }] }], pat2: [{ atk: 5, hits: 3, add: ['burn', 1] }, { blk: 12, str: 2 }], ph2: 'flares up, all six candles blazing', boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
+    'gate-colossus': { name: 'Gate Wyrm', hp: [138, 146], pat: [{ atk: 9, hits: 2 }, { blk: 16 }, { atk: 24, vuln: 2 }, { str: 3, blk: 8 }], pat2: [{ atk: 12, hits: 2 }, { str: 3, blk: 12 }, { atk: 28, vuln: 2 }], ph2: 'tears free of the gate', boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
     // act 2 (Ash Stair) and act 3 (Cinder Gate) encounter decks, act 4 = the optional final act
     'cinder-hound': { name: 'Cinder Hound', hp: [30, 34], pat: [{ atk: 5, hits: 2 }, { atk: 8, add: ['burn', 1] }, { blk: 6, str: 1 }], act: 2, art: 'lean black hound with ember-cracked skin and smoking jaws' },
     'ash-wisp': { name: 'Ash Wisp', hp: [20, 24], pat: [{ atk: 4, frail: 2 }, { atk: 7 }, { die: [{ blk: 8 }, { atk: 6, frail: 1 }, { atk: 10 }] }], act: 2, art: 'floating grey wisp of ash with two coal eyes' },
@@ -159,7 +159,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'grave-knight': { name: 'Grave Knight', hp: [44, 48], pat: [{ atk: 10 }, { blk: 12 }, { atk: 7, hits: 2 }], act: 3, art: 'rusted skeleton knight with a cracked tower shield' },
     'bone-caller': { name: 'Bone Caller', hp: [30, 34], pat: [{ atk: 6, add: ['wound', 1] }, { die: [{ str: 2 }, { atk: 9 }, { atk: 5, hits: 3 }] }], act: 3, art: 'hunched necromancer rattling a staff of bones' },
     'tomb-king': { name: 'Tomb King', hp: [120, 128], pat: [{ atk: 12, frail: 2 }, { blk: 14, str: 2 }, { atk: 7, hits: 3 }, { atk: 8, add: ['dazed', 2] }], elite: 1, act: 3, art: 'bandaged king rising from a stone sarcophagus in dust' },
-    'ember-tyrant': { name: 'Ember Tyrant', hp: [210, 220], pat: [{ atk: 10, all: 1, add: ['burn', 2] }, { str: 3, blk: 20 }, { atk: 8, hits: 3 }, { atk: 30, vuln: 2 }], boss: 1, act: 4, art: 'horned fire demon striding out of a burning archway' }
+    'ember-tyrant': { name: 'Ember Tyrant', hp: [210, 220], pat: [{ atk: 10, all: 1, add: ['burn', 2] }, { str: 3, blk: 20 }, { atk: 8, hits: 3 }, { atk: 30, vuln: 2 }], pat2: [{ atk: 12, all: 1, add: ['burn', 2] }, { atk: 9, hits: 3 }, { str: 4, blk: 24 }], ph2: 'erupts in a pillar of fire', boss: 1, act: 4, art: 'horned fire demon striding out of a burning archway' }
   };
   var ENC = {
     weak: [['mire-slug', 'gnawer'], ['rust-tick', 'rust-tick'], ['gape-grub'], ['hex-acolyte']],
@@ -223,6 +223,6 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'back-alley-gambler': { name: 'Back Alley Gambler', q: 'A grin and a pair of dice.', art: 'hooded gambler at a barrel table with dice', o: [{ t: 'Bet 30 gold, roll', roll: [{ gold: -30 }, { gold: -30 }, { gold: 0 }, { gold: 0 }, { gold: 60 }, { gold: 90 }], cost: 30 }, { t: 'Walk away', do: {} }] }
   };
   var NODES = { m: 'Monster', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Treasure', b: 'Boss' };
-  EC.D = { SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget };
+  EC.D = { STRONGX: 1, STRONGHP: 1, SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget };
   if (typeof module !== 'undefined') module.exports = EC;
 })();
