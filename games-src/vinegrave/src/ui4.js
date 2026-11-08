@@ -90,7 +90,7 @@ function coachEvent(e, s) {   /* events: guardian wakes, round end, fleeing, the
   if (e.k === 'idolfind' && s === UI.view) coachSay('idol');
 }
 function coachRival(m) {   /* a short lesson on every rival move */
-  if (!coachOn() || !m) return; coachSay('rival'); if (m.t === 'pass') { coachSay('pass'); return; }
+  if (!coachOn() || !m || !G || G.phase !== 'play') return; coachSay('rival'); if (m.t === 'pass') { coachSay('pass'); return; }
   const L = { dig: 'Tamsin dug a camp. It is closed to you this round.', disc: 'Tamsin explored a ruin. She gets an idol, and a guardian wakes.',
     beat: 'Tamsin overcame a guardian: 5 points and a boon.', buy: 'Tamsin bought a card. A new one slides in.', play: 'Tamsin played a card.',
     res: 'Tamsin climbed the research track. Those rows score at the end.', temple: 'Tamsin bought a temple tile for big points.', boon: 'Tamsin used a guardian boon.', idol: 'Tamsin set an idol in a shrine for a boon.' };
@@ -107,7 +107,8 @@ function coachMove(m, best) {   /* one line why, for a strong or a weaker move (
 const COVER = () => Object.keys(V.STORY.coach);
 window.coachReport = () => { const all = COVER(), seen = all.filter(id => CO.seen[id]); return { all, seen, later: all.filter(id => !CO.seen[id]) }; };
 function coachScoreStart() {   /* game over in the coached game: a second tutor run walks the score and shows the end card */
-  if (typeof GXT === 'undefined' || !UI.coachFree) return; UI.coachFree = false; CO.over = true; coachHide();
+  if (typeof GXT === 'undefined' || !UI.coachFree) return; CO.q = []; if (CO.cur) { setTimeout(coachScoreStart, 400); return; }   /* Pell finishes his line first */
+  UI.coachFree = false; CO.over = true; coachHide();
   const steps = tutSteps().filter(x => /^score/.test(x.id)), c = Object.assign({}, TUTCFG, { steps, setup: () => { } });
   TUTCFG = c; GXT.start(c);
 }

@@ -66,7 +66,7 @@ UIACT.iam = () => { UI.view = VG.actor(G); $('#pass').hidden = true; render(); }
 function showGoal() {   /* one card before turn 1: how you win in one sentence, three ways to score */
   const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
   const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
-  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><p class="gk">How to win</p><p class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Have the most points after ' + G.rounds + ' rounds.'}</p>
+  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
     <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track. Higher rows score more.</span></li><li>${ic('idol', 'idol')}<span>Explore ruins. Idols are 3 points, guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards with points. Dread cards cost 1.</span></li></ul>
     <p class="gf">${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
   g.hidden = false; UI.busy = true; render();
@@ -96,16 +96,17 @@ function showResult() {
   P.sort((a, b) => (b.i === G.winner) - (a.i === G.winner) || b.sc.total - a.sc.total);
   const me = UI.humans[0] || 0, myT = VG.score(G, me).total, best = Math.max.apply(null, P.filter(x => x.i !== me).map(x => x.sc.total).concat([0]));
   const wn = G.winner === -1 ? 'A tie!' : G.winner === -2 ? short(-2) + ' wins.' : (UI.humans.length === 1 && G.winner === me ? 'You win!' : short(G.winner) + ' wins.');
-  const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : 'Defeat';
+  const tied = P.length > 1 && P[1].sc.total === P[0].sc.total, tb = tied && G.winner !== -1 ? `Tie on ${P[0].sc.total}. ${G.winner === me ? 'You win' : short(G.winner) + ' wins'} the tiebreak.` : '';
+  const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : tied && myT === P[0].sc.total ? 'Close loss' : 'Defeat';
   const sub = def && !cWon ? (G.winner === 0 ? 'You won, but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again.'
-    : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} points.` : myT < best ? `${esc(wn)} You were ${best - myT} points short.` : esc(wn)) : esc(wn);
+    : tb ? tb + ' First into the temple wins ties.' : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} points.` : myT < best ? `${esc(wn)} You were ${best - myT} points short.` : esc(wn)) : esc(wn);
   const blk = (x, k) => `<div class="rp${k === 0 ? ' first' : ''}"><div class="rph"><span class="crest" style="--pc:${x.i >= 0 ? HEX[x.i] : '#9a9486'}"></span><span class="rpn">${esc(x.name)}</span><span class="rpt"><b data-n="${x.sc.total}">${x.sc.total}</b> points</span></div>
     <div class="rcats">${CATS.filter(c => x.sc[c[0]]).map(c => `<span class="rcat${x.sc[c[0]] < 0 ? ' neg' : ''}">${ic(c[1], c[2])}<b data-n="${x.sc[c[0]]}">${x.sc[c[0]]}</b><small>${c[2]}</small></span>`).join('') || '<span class="rcat"><small>No points yet</small></span>'}</div></div>`;
   const btns = def ? (cWon ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="campretry">Try again</button>')
     : '<button type="button" class="tbtn" data-a="again">Play again</button>';
-  r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}"><div class="rart" data-art="${cWon ? 'result-win' : 'result-lose'}" aria-hidden="true"></div><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}<div class="rplayers">${P.map(blk).join('')}</div>
-    <div class="trow2">${btns}</div>
-    <div class="trow2"><button type="button" class="tsb" data-a="look">See the island</button>${def ? (cWon ? '' : '<button type="button" class="tsb" data-a="campfin">Story map</button>') : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div>`;
+  r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}${P.length > 2 ? ' many' : ''}"><div class="rart" data-art="${cWon ? 'result-win' : 'result-lose'}" aria-hidden="true"></div><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}<div class="rplayers">${P.map(blk).join('')}</div>
+    <div class="rbtns"><div class="trow2">${btns}</div>
+    <div class="trow2"><button type="button" class="tsb" data-a="look">See the island</button>${def ? (cWon ? '' : '<button type="button" class="tsb" data-a="campfin">Story map</button>') : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div></div>`;
   if (!def && UI.mode !== 'tutorial') { const fl = document.createElement('p'); fl.className = 'rquote'; fl.textContent = cWon ? V.STORY.quick.win : V.STORY.quick.lose; const w = r.querySelector('.win'); if (w) w.after(fl); }
   if (!UI.fast && !reducedMo()) r.querySelectorAll('[data-n]').forEach((b, k) => { const n = +b.dataset.n; if (!isFinite(n)) return; b.textContent = '0'; const t0 = performance.now() + 300 + k * 60; const tick = t => { const f = Math.max(0, Math.min(1, (t - t0) / 1000)); b.textContent = String(Math.round(n * (1 - Math.pow(1 - f, 3)))); if (f < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });   /* every number counts up */
   r.hidden = false; if (typeof artApply === 'function') artApply(r); $('#toast').classList.remove('on'); musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }

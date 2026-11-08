@@ -79,9 +79,9 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 #track.sel{border-color:#fff}
 #track .tcs{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:3px}
 .tc{display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:7px;background:rgba(239,226,192,.1);min-height:44px;padding:2px 0 3px;position:relative}
-.tc .tn{display:none}
-.tc .tp{font-weight:900;font-size:16px;line-height:18px}
-.tc.top{background:rgba(217,164,65,.35)}.tc.top .tp::before{content:'★ ';color:var(--glow)}
+.tc .tp{display:none}
+.tc .tn{font-weight:900;font-size:16px;line-height:18px}
+.tc.top{background:rgba(217,164,65,.35)}.tc.top .tn{color:var(--glow)}
 .tc .tm{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;min-height:12px}
 .tc .tm i{width:12px;height:12px;display:block;background:var(--pc);border:2px solid #fff3d6}
 .tc .tm i.mg{border-radius:50%}
@@ -93,7 +93,7 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 #row .cd .ef{display:none}
 #row .cd .cn{-webkit-line-clamp:3}
 @media (max-width:999px){#row .cd .cn{display:none}:root{--mpic:clamp(40px,7.4vh,72px)}}
-@media (max-width:999px){#track .tl,#row .tl{display:block;justify-self:auto;align-self:flex-start;font-size:14px;padding:0 8px;line-height:18px}#track .tl{align-self:center}}
+@media (max-width:999px){.tl .lx{display:none}#track .tl,#row .tl{display:block;justify-self:auto;align-self:flex-start;font-size:14px;padding:0 8px;line-height:18px}#track .tl{align-self:center}}
 /* ---------- cards ---------- */
 .cd{position:relative;width:var(--cw,100%);display:flex;flex-direction:column;align-items:stretch;padding:3px 3px 4px;border-radius:9px;border:2px solid var(--vg-ink);background:var(--vg-paper);color:var(--vg-ink);text-align:center;
   box-shadow:inset 0 0 0 1px rgba(42,29,14,.35),0 2px 5px rgba(0,0,0,.45);transition:transform .18s,filter .25s,box-shadow .2s;min-width:0}
@@ -118,7 +118,7 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 /* ---------- your tray ---------- */
 #dockbody{display:flex!important;flex-direction:column;gap:6px;padding:7px 8px calc(8px + env(safe-area-inset-bottom,0px))}
 #promptrow{display:flex;align-items:center;gap:6px;min-height:44px}
-#prompt{flex:1;min-width:0;margin:0;font-weight:700;font-size:15px;line-height:1.25;max-width:34em}
+#prompt{flex:1;min-width:0;margin:0;font-weight:700;font-size:15px;line-height:1.25;max-width:22em}
 #dock.mine #prompt{color:#5a2c00}
 #pacts{display:flex;gap:6px;flex:none}
 .btn{min-height:44px;border-radius:12px;border:2px solid #7a6440;background:#fff7e2;color:#22190d;padding:6px 14px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:15px}
@@ -169,7 +169,7 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 }
 /* ---------- PC: map left, market right, the tray under both ---------- */
 @media (min-width:1000px){
-  :root{--siteh:min(150px,14.5vh);--mpic:min(104px,11vh)}
+  :root{--siteh:min(150px,14.5vh);--mpic:min(100px,10.5vh)}
   #bd{grid-template-columns:minmax(0,1fr) minmax(330px,28vw);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"opp opp" "map row" "track row";padding:10px 16px;gap:10px 16px}
   .tl{display:inline-block}
   .ter{grid-template-rows:auto minmax(0,1fr);gap:3px}
@@ -182,11 +182,12 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
   .site .occ{width:32px;height:44px}
   .site .gd{top:30%;bottom:26%}
   #track{flex-direction:row;align-items:center;gap:10px;padding:6px 10px}
-  #track .tl{background:none;padding:0;flex:none;text-align:left;white-space:normal;width:7.5em}
+  #track .tl{background:none;padding:0;flex:none;text-align:left;white-space:nowrap}
   #track .tcs{flex:1}
-  .tc{min-height:52px}.tc .tp{font-size:18px}.tc .tm i{width:14px;height:14px}
+  .tc{min-height:52px}.tc .tn{font-size:18px}.tc .tm i{width:14px;height:14px}
   #row{background:rgba(14,10,4,.55);border-radius:14px;padding:8px;justify-content:flex-start;gap:8px}
-  #row .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  #row .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  #row .tl{white-space:normal;text-align:center}
   #row .cd .ef{display:block}
   .cd .cn{font-size:16px}.cd .ef{font-size:16px}.cd .cost{font-size:17px;line-height:24px}.cd .tr{width:26px;height:26px}.cd .vp{font-size:16px;top:36px}
   #dockbody{display:grid!important;grid-template-columns:minmax(360px,440px) minmax(0,1fr);grid-template-areas:"pr hand" "q hand" "my hand" "ex hand";align-items:start;column-gap:18px;row-gap:6px;padding:10px 16px 12px}
@@ -349,3 +350,16 @@ body:has(.gxt-cell) #iscrim{pointer-events:none}   /* the tutor blocks input its
 }
 [data-badge]{position:relative}[data-badge]::after{content:attr(data-badge);position:absolute;left:50%;top:-8px;transform:translateX(-50%);z-index:6;background:#ffd36a;color:#22190d;border:2px solid #22190d;border-radius:8px;padding:0 5px;font:800 14px/17px var(--gx-font,Georgia,serif);white-space:nowrap}
 html.gx-reduce .site .gd,html.gx-reduce .pawn.glow,html.gx-reduce #map.pawnsel .site.glow{animation:none}
+
+/* craft floor: focus rings, selection, numerals, the temple star is drawn */
+:focus-visible{outline:3px solid #ffd36a;outline-offset:2px}
+.site:focus-visible,.cd:focus-visible,.pawn:focus-visible,#track:focus-visible{outline:3px solid #fff;outline-offset:2px}
+::selection{background:#d9a441;color:#1d1405}
+.op .pts b,.rc .rv b,.tc .tn,.cd .cost,.site .rew b{font-variant-numeric:tabular-nums}
+.tc .tn .star{width:18px;height:18px;display:block}
+.gbox .gl{margin:0}
+
+@media (max-width:999px){.op .crest{display:none}.op{gap:5px;padding:3px 7px}}
+
+.rbtns{position:sticky;bottom:-18px;margin:0 -18px -18px;padding:10px 18px 18px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(rgba(10,22,15,0),rgba(10,22,15,.96) 22%);z-index:2}
+.rbox.many .rart{display:none}

@@ -188,7 +188,7 @@
       if (o.x) return 'exile a card';
       if (o.r) return 'free research step (' + (o.r === 'g' ? 'magnifier' : 'notebook') + ')';
       if (o.b) return 'buy ' + (o.b === 'i' ? 'an item' : 'an artifact') + ' ' + o.o + ' cheaper';
-      if (o.fd) return 'dig at a site with no travel cost';
+      if (o.fd) return 'dig at any free site with no travel';
       if (o.or) return o.or.map(function (x) { return x.length ? opText(x) : 'nothing'; }).join(' OR ');
       return '';
     }).join(', then ');

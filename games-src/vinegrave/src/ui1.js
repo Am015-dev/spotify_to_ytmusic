@@ -22,7 +22,8 @@ function effShort(c) {   /* a card's effect in 1-4 words for the card face ("+1 
   if (c.t === 'fear') return 'No effect';
   const one = o => o.g ? Object.keys(o.g).map(k => '+' + o.g[k] + ' ' + rw(k, o.g[k]).replace('arrowhead', 'arrow')).join(' ') : o.p ? 'trade' : o.d ? 'draw ' + o.d : o.x ? 'exile' : o.r ? 'research' : o.b ? 'cheap buy' : o.fd ? 'free dig' : o.or ? 'choose' : '';
   const ops = (c.ops || []).map(one).filter(Boolean); if (ops.indexOf('trade') >= 0) return 'Trade'; if (ops.indexOf('choose') >= 0) return 'Choose one';
-  return ops.slice(0, 2).join(', ');
+  const u = []; ops.forEach(o => { const f = u.find(x => x.o === o); if (f) f.n++; else u.push({ o, n: 1 }); });
+  return u.slice(0, 2).map(x => x.n > 1 ? x.o + ' twice' : x.o).join(', ');
 }
 const CARD_GLYPH = { item: 'coin', art: 'compass', fear: 'guard' };
 function cardHTML(id, o) {
@@ -90,12 +91,12 @@ function render() {
   let tr = ''; for (let r = 0; r <= V.TOP; r++) {
     const mk = G.p.map((p, i) => (p.glass === r ? `<i class="mg" style="--pc:${HEX[i]}" title="${esc(p.name)}: magnifier"></i>` : '') + (p.note === r ? `<i class="nb" style="--pc:${HEX[i]}" title="${esc(p.name)}: notebook"></i>` : '')).join('') + (G.rival && Math.min(V.TOP, G.rival.rows) === r ? '<i class="mg" style="--pc:#9a9486"></i>' : '');
     const nx = myTurn() && (L.some(m => m.t === 'res' && m.k === 'g') && me.glass + 1 === r || L.some(m => m.t === 'res' && m.k === 'n') && me.note + 1 === r);
-    tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '★' : r}</span><span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
+    tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}</span><span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
   }
-  const tb = $('#track'); tb.innerHTML = `<span class="tl">Research · climb for points</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
+  const tb = $('#track'); tb.innerHTML = `<span class="tl">Research</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
   // market
   const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = 1; }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
-  $('#row').innerHTML = `<span class="tl">Market · items cost coins, artifacts compasses</span><div class="cards">` + G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r], sel: S.k === 'row' && S.x === r }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('') + '</div>';
+  $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · coins or compasses</span></span><div class="cards">` + G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r], sel: S.k === 'row' && S.x === r }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('') + '</div>';
   renderTray(L, q, me, actor);
   document.body.classList.toggle('vg-mine', myTurn() && G.phase === 'play');
   if (typeof artApply === 'function') artApply();
@@ -139,25 +140,28 @@ function selInfo(S) {
   const me = G.p[UI.view], ms = movesFor(S.k, S.x);
   if (S.k === 'pawn') return { t: 'Drag your explorer onto a glowing site.' };
   if (S.k === 'hand') { const c = V.CARDS[me.hand[S.x]]; if (!c) return { t: '' };
-    if (ms[0]) return { t: c.name + ': ' + c.text + ' Tap again or drag it up.', go: ms[0], label: 'Play' };
-    return { t: c.name + ': ' + (c.t === 'fear' ? 'no effect. Use it to pay travel.' : c.t === 'art' ? 'playing it needs 1 tablet.' : c.text) }; }
+    if (ms[0]) return { t: c.name + '. ' + c.text + ' Tap again or drag it up.', go: ms[0], label: 'Play' };
+    return { t: c.name + '. ' + (c.t === 'fear' ? 'No effect. Use it to pay travel.' : c.t === 'art' ? 'Playing it needs 1 tablet.' : c.text) }; }
   if (S.k === 'row') { const id = G.row[S.x]; if (!id) return { t: '' }; const c = V.CARDS[id], cw = c.cost + ' ' + (c.t === 'item' ? rw('coin', c.cost) : rw('compass', c.cost));
-    return ms[0] ? { t: c.name + ' (' + cw + '): ' + c.text + ' Tap again to buy.', go: ms[0], label: 'Buy' } : { t: c.name + ': ' + c.text + ' You need ' + cw + '.' }; }
+    return ms[0] ? { t: c.name + ', ' + cw + '. ' + c.text + ' Tap again to buy.', go: ms[0], label: 'Buy' } : { t: c.name + '. ' + c.text + ' You need ' + cw + '.' }; }
   if (S.k === 'site') { const x = G.sites[S.x], m = ms[0];
-    if (!m) return { t: siteName(x) + ': ' + (x.tile ? 'dig for ' + resWords(V.SITE[x.tile].rew) + '. ' : '') + whyNotSite(x) };
-    if (m.t === 'beat') { const gd = V.GUARD[x.guard]; return { t: 'Fight the ' + gd.name + ': pay ' + resWords(gd.cost) + '. Win 5 points and a boon.', go: m, label: 'Fight' }; }
+    if (!m) return { t: siteName(x) + '. ' + (x.tile ? 'Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' : '') + whyNotSite(x) };
+    if (m.t === 'beat') { const gd = V.GUARD[x.guard]; return { t: 'Fight the ' + gd.name + '. Pay ' + resWords(gd.cost) + '. Win 5 points and a boon.', go: m, label: 'Fight' }; }
     const pay = payWords(VG.payPlan(G, UI.view, x.cost));
     if (m.t === 'disc') return { t: 'Explore this ruin for ' + V.DISC[x.lvl] + ' compasses. ' + pay + ' A guardian wakes!', go: m, label: 'Explore' };
-    return { t: siteName(x) + ': dig for ' + resWords(V.SITE[x.tile].rew) + '. ' + pay, go: m, label: 'Dig' }; }
+    return { t: siteName(x) + '. Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' + pay, go: m, label: 'Dig' }; }
   if (S.k === 'track') { if (!ms.length) return { t: 'Research: you cannot pay the next row yet.' }; return ms.length === 1 ? { t: trackLine(ms[0]) + ' Tap again to climb.', go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
   return { t: '' };
 }
-function payWords(pl) { if (!pl) return ''; const me = G.p[UI.view], cards = pl.cards.map(i => V.CARDS[me.hand[i]].name); if (pl.coins) cards.push(pl.coins + ' coins for a Plane'); return cards.length ? 'You pay with ' + cards.join(' and ') + '.' : 'No travel to pay.'; }
+function payWords(pl) {
+  if (!pl) return ''; const me = G.p[UI.view], cards = pl.cards.map(i => V.CARDS[me.hand[i]].name), list = cards.length > 1 ? cards.slice(0, -1).join(', ') + ' and ' + cards[cards.length - 1] : cards[0];
+  return (cards.length ? 'You pay with ' + list + '.' : '') + (pl.coins ? (cards.length ? ' Plus ' : 'You pay ') + pl.coins + ' coins for a Plane.' : '') || 'No travel to pay.';
+}
 function trackLine(m) {
   const me = G.p[UI.view];
-  if (m.t === 'temple') { const t = V.TEMPLE[m.k]; return 'Temple tile: pay ' + resWords(t.cost) + ' for ' + t.vp + ' points.'; }
+  if (m.t === 'temple') { const t = V.TEMPLE[m.k]; return 'Temple tile, ' + t.vp + ' points. Pay ' + resWords(t.cost) + '.'; }
   const row = (m.k === 'g' ? me.glass : me.note) + 1, T = V.TRACK[row];
-  return (m.k === 'g' ? 'Magnifier' : 'Notebook') + ' to row ' + (row === V.TOP ? 'the temple' : row) + ': pay ' + resWords(T.cost) + (Object.keys(T.bonus).length ? ', get ' + resWords(T.bonus) : '') + '.';
+  return (m.k === 'g' ? 'Magnifier' : 'Notebook') + ' to row ' + (row === V.TOP ? 'the temple' : row) + '. Pay ' + resWords(T.cost) + '.' + (Object.keys(T.bonus).length ? ' Get ' + resWords(T.bonus) + '.' : '');
 }
 function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) return ''; return `<div class="qchoices">${ms.map(m => mvBtn(m, esc(trackLine(m)), 'go')).join('')}</div>`; }
 function promptLine(L) {

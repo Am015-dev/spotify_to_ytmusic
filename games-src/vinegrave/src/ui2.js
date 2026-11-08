@@ -26,7 +26,7 @@ function refreshInsp() {
   } else if (I.kind === 'track') {
     h += `<h3>Research track</h3><p>Your magnifier climbs first. Your notebook follows, never past it.</p><p>Each row costs what it shows and gives a bonus.</p><p>The top row is the temple. There you buy temple tiles.</p><table class="sct"><tr><th>Row</th><th>Cost</th><th>Bonus</th><th>Points</th></tr>`;
     for (let r = V.TOP; r >= 1; r--) h += `<tr><td>${r === V.TOP ? 'Temple' : r}${me.glass === r ? ' (you)' : ''}</td><td>${resHTML(V.TRACK[r].cost)}</td><td>${resHTML(V.TRACK[r].bonus)}${V.FIRST[r] && !(G.firstTaken && G.firstTaken[r]) ? ' <span class="sm">first: </span>' + resHTML(V.FIRST[r]) : ''}</td><td>${V.GLASS_VP[r]}</td></tr>`;
-    h += `</table><p class="sm">Points shown are for the magnifier.</p><p class="sm">Temple tiles: ${V.TEMPLE.map((t, k) => t.vp + ' points (' + G.temple[k] + ' left)').join(', ')}.</p>`;
+    h += `</table><p class="sm">Points shown are for the magnifier.</p><p class="sm">Temple tiles left:</p>${V.TEMPLE.map((t, k) => `<p class="sm">${t.vp} points: ${G.temple[k]} left</p>`).join('')}`;
     L.forEach(m => { if (m.t === 'res' || m.t === 'temple') add(m, esc(trackLine(m))); });
   } else if (I.kind === 'guard') {
     const g = me.guards[I.x], gd = V.GUARD[g.id];
@@ -48,7 +48,7 @@ function whyNotSite(x) {
   return 'You cannot pay this travel. 2 coins buy a Plane.';
 }
 // ---------------------------------------------------------------- input: tap selects (it lifts, the line says what it does), tap again does it; or drag it
-function act(m) { if (!m) return; if (!tutAct({ what: 'mv', m })) return; UI.sel = null; closeInsp(); doMove(m); }
+function act(m) { if (!m) return; if (!tutAct({ what: 'mv', m })) return; UI.sel = null; try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } closeInsp(); doMove(m); }
 function pick(k, x, id) {
   if (!G) return;
   if (k === 'guard' || k === 'idol') { if (!tutAct({ what: k, x })) return; sfx.play('tap'); openInsp(k, x); return; }
