@@ -14,8 +14,9 @@
   UI.say = function (text, ms, who) {
     var old = $('.ec-say'); if (!text) { if (old) old.remove(); return null; }
     // one message at a time: a bubble that has not been on screen long enough is never replaced; the new line waits its turn
-    if (old && Date.now() < (+old.getAttribute('data-until') || 0)) { C.q.push({ key: 'say', text: text, ms: ms }); return null; }
-    if (old) old.remove(); document.querySelectorAll('.toast').forEach(function (n) { n.remove(); });
+    var tw = document.querySelector('.toast');   // a toast still being read is never removed: the bubble waits (R1: relic toast cut after 250 ms)
+    if ((old && Date.now() < (+old.getAttribute('data-until') || 0)) || (tw && Date.now() < (+tw.getAttribute('data-until') || 0))) { C.q.unshift({ key: 'say', text: text, ms: ms }); return null; }
+    if (old) old.remove(); if (tw) tw.remove();
     var c = (ST.cast || {})[who || 'guide'] || { name: 'Warden Ashgrove', emoji: '🔥', color: '#a8431f' }, d = document.createElement('div'); d.className = 'ec-say'; d.setAttribute('role', 'status');
     var pic = window.EC_A ? EC_A('cast-' + (who || 'guide'), c.emoji || '', { kind: 'portrait', ph: c.color || '#a8431f' }) : document.createElement('div'); d.appendChild(pic);
     var t = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'); b.textContent = c.name; sp.textContent = text; t.appendChild(b); t.appendChild(sp); d.appendChild(t);
