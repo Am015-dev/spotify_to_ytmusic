@@ -48,12 +48,13 @@ async function game(b,W,H){const kind='coached';const touch=W<600;const probs=[]
     else{idle++;await sleep(300);if(idle>60){probs.push('stuck: '+JSON.stringify(s).slice(0,120));break}}
   }
   await sleep(300);
-  const fin=await p.evaluate(()=>({later:!!document.querySelector('.hb-later'),log:UI.tutLog||[],left:UI.laterList||[],rules:COACH.map(c=>c.id).concat(COACH_LATER.map(c=>c.id)),over:!!(G&&G.phase==='over'),res:G&&G.over?G.over.scores.map(x=>x.total):null}));
+  const fin=await p.evaluate(()=>({later:!!document.querySelector('.hb-later'),log:UI.tutLog||[],left:UI.laterList||[],fb:UI.fbLog||[],rules:COACH.map(c=>c.id).concat(COACH_LATER.map(c=>c.id)),over:!!(G&&G.phase==='over'),res:G&&G.over?G.over.scores.map(x=>x.total):null}));
   if(!fin.later)probs.push('no later card');
   const miss=fin.rules.filter(i=>!fin.log.includes(i)&&!fin.left.includes(i));if(miss.length)probs.push('rules neither explained nor listed: '+miss.join(','));
+  if(!fin.fb.length)probs.push('no good/poor move feedback spoke');
   if(!fin.log.includes('score')||!fin.log.includes('rscore'))probs.push('score walk-through missing');
   const lb=await p.$('[data-later]');if(lb){await lb.click();await sleep(500)}
   const done=await p.evaluate(()=>GXT.isDone('hollowbough'));if(!done)probs.push('tutorial not saved as done');
-  console.log((probs.length?'FAIL ':'PASS ')+'tutorial-to-end '+W+'x'+H+' coached free play taps='+taps+' chips='+seenChip.size+' explained='+fin.log.filter(i=>fin.rules.includes(i)).length+'/'+fin.rules.length+' later='+fin.left.length+' scores='+JSON.stringify(fin.res)+' '+Math.round((Date.now()-t0)/1000)+'s '+probs.slice(0,4).join(' | '));
+  console.log((probs.length?'FAIL ':'PASS ')+'tutorial-to-end '+W+'x'+H+' coached free play taps='+taps+' chips='+seenChip.size+' explained='+fin.log.filter(i=>fin.rules.includes(i)).length+'/'+fin.rules.length+' later='+fin.left.length+' feedback='+fin.fb.length+' scores='+JSON.stringify(fin.res)+' '+Math.round((Date.now()-t0)/1000)+'s '+probs.slice(0,4).join(' | '));
   await ctx.close();return probs.length}
 (async()=>{const b=await PW.chromium.launch();let bad=0;for(const [W,H] of SIZES)bad+=await game(b,W,H);await b.close();process.exit(bad?1:0)})();

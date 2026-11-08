@@ -189,11 +189,10 @@ async function staticScan(page, phase, name, skipSel) {
 
 // ------------------------------------------------------------------ phase 1: tutorial
 async function openTutorial(page) {
-  const coached = () => ev(page, () => !!(window.UI && UI.cfg && UI.cfg.coached && window.G));   // coached free-play tutorial (no spotlight kit): hollowbough
   const has = await ev(page, () => typeof GXT !== 'undefined' && GXT.running && GXT.running());
-  if (has || await coached()) return true;
+  if (has) return true;
   for (let tries = 0; tries < 3; tries++) {
-    const b = await ev(page, () => { const e = [...document.querySelectorAll('[data-gxt-open],[data-a=tut],[data-a=tutorial],button,[data-a]')].find(x => window.__qa.vis(x) && (x.matches('[data-gxt-open],[data-a=tut],[data-a=tutorial]') || /^(learn|new here|tutorial|guided|how to play|first game)/i.test((x.innerText || '').trim()))); if (!e) return null; try { e.scrollIntoView({ block: 'center' }); } catch (x) { } const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+    const b = await ev(page, () => { const e = [...document.querySelectorAll('[data-gxt-open],[data-a=tut],[data-a=tutorial],button,[data-a]')].find(x => window.__qa.vis(x) && (x.matches('[data-gxt-open],[data-a=tut],[data-a=tutorial]') || /^(learn|new here|tutorial|guided|how to play|first game)/i.test((x.innerText || '').trim()))); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
     if (!b) { // maybe behind a menu button
       const m = await ev(page, () => { const e = [...document.querySelectorAll('button,[data-a]')].find(x => window.__qa.vis(x) && /^(menu|more|help|how|learn|rules)/i.test((x.innerText || '').trim()) && !x.matches('[data-gx]')); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
       if (!m) return false; await tap(page, m.x, m.y); await sleep(600); continue;
@@ -201,11 +200,11 @@ async function openTutorial(page) {
     await tap(page, b.x, b.y); await sleep(800);
     const dlg = await ev(page, () => { const e = document.querySelector('[data-gxt-dlg="restart"]'); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
     if (dlg) { await tap(page, dlg.x, dlg.y); await sleep(600); }
-    for (let i = 0; i < 20; i++) { if (await ev(page, () => typeof GXT !== 'undefined' && GXT.running()) || await coached()) return true; await sleep(250); }
+    for (let i = 0; i < 20; i++) { if (await ev(page, () => typeof GXT !== 'undefined' && GXT.running())) return true; await sleep(250); }
   }
   // fallback: a "Guided"/"Learn" mode chip or story entry, then the Play button
   const pickBy = async rx => { const b = await ev(page, src => { const re = new RegExp(src, 'i'); const e = [...document.querySelectorAll('button,[data-a]')].find(x => window.__qa.vis(x) && re.test((x.innerText || '').trim())); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, rx); if (b) await tap(page, b.x, b.y); return !!b; };
-  if (await pickBy('(guided|learn to|learn in)')) { await sleep(700); await pickBy('^(play|start|begin)'); await sleep(500); await pickBy('^learn'); for (let i = 0; i < 20; i++) { if (await ev(page, () => typeof GXT !== 'undefined' && GXT.running()) || await coached()) return true; await sleep(250); } }
+  if (await pickBy('(guided|learn to|learn in)')) { await sleep(700); await pickBy('^(play|start|begin)'); for (let i = 0; i < 20; i++) { if (await ev(page, () => typeof GXT !== 'undefined' && GXT.running())) return true; await sleep(250); } }
   return false;
 }
 async function driveTutorial(page, ci, P, ms, sumObj) {   // taps through a running gx-tutor tutorial; returns {reached, stuckCount, lastI}
@@ -303,12 +302,6 @@ async function phaseTutorial(browser, url) {
       if (entry) { bug('BLOCKER', P, 'title', 'a tutorial/guided entry is visible but tapping it does not start the gx-tutor tutorial', { shot: await shot(page, 'tut-noopen') }); summary.tutorial.end = false; summary.tutorial.stuck = 'cannot open'; }
       else { bug('MAJOR', P, 'title', 'no tutorial entry on the title screen (no learn/guided/tutorial button): game has no staged tutorial', { shot: await shot(page, 'tut-noentry') }); summary.tutorial.end = null; summary.tutorial.note = 'no tutorial'; }
       return; }
-    if (await ev(page, () => !!(window.UI && UI.cfg && UI.cfg.coached))) {   // coached first game = a real game with free choices: started and Hazel speaks; the play-to-end proof is the game's own tutor-e2e.js
-      await sleep(4500); await staticScan(page, P, 'coached-game'); await drainErrs(page, P, 'coached game');
-      const chip = await ev(page, () => { const e = document.getElementById('hbsay'); return !!(e && (e.classList.contains('on') || (UI.tutLog || []).length)); });
-      if (!chip) bug('BLOCKER', P, 'coached game', 'coached game started but the guide never spoke', { shot: await shot(page, 'tut-nochip') });
-      summary.tutorial.end = chip ? true : false; summary.tutorial.note = 'coached free play; reaching the end is proven by hollowbough/game/tutor-e2e.js'; return;
-    }
     const T0 = Date.now(); const dr = await driveTutorial(page, ci, P, lim(P), summary.tutorial); let { reached, stuckCount, lastI } = dr;
     summary.tutorial.end = reached && stuckCount === 0 ? true : (reached ? 'continued' : false);
     if (!reached) { if (!bugs.some(b => b.phase === P && b.sev === 'BLOCKER' && /STUCK/.test(b.desc))) bug('BLOCKER', P, ci.where(), `tutorial did not reach its end in ${Math.round(lim(P) / 1000)} s (last step ${lastI + 1})`, { shot: await shot(page, 'tut-noend') }); summary.tutorial.stuck = summary.tutorial.stuck || 'timeout ' + ci.where(); summary.tutorial.end = false; }
