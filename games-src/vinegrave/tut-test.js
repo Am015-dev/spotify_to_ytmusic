@@ -3,7 +3,7 @@
 // move, picked in rotation, not a scripted list), its action button, answer questions, use the tabs, pass when nothing glows. The rival
 // is the real computer. Then the score walk-through (Next) and the end card, whose button must start a real game.
 // Asserts: every coverage rule (V.STORY.coach ids = TUTORIAL-COVERAGE.md) was explained in the game or listed on the "meet later" card,
-// at least 12 were explained in play, no console errors. node tut-test.js [shotsDir]   (python3 build.py first). Sizes 390x763, 1440x860.
+// at least 8 were explained in play (the coached game is 1 round), no console errors. node tut-test.js [shotsDir]   (python3 build.py first). Sizes 390x763, 1440x860.
 const { chromium } = require('playwright'), serve = require('./serve.js'), fs = require('fs');
 const OUT = process.argv[2] || null;
 (async () => {
@@ -76,7 +76,7 @@ const OUT = process.argv[2] || null;
       if (!real) { ok = false; console.log(name, 'FAIL end card did not start a real game'); }
     } else if (ok) { ok = false; console.log(name, 'FAIL no end card'); }
     if (!rep || rep.seen.length + rep.later.length !== rep.all.length) { ok = false; console.log(name, 'FAIL coverage report incomplete'); }
-    if (rep && rep.seen.length < 12) { ok = false; console.log(name, 'FAIL only', rep.seen.length, 'rules explained in play'); }
+    if (rep && rep.seen.length < 8) { ok = false; console.log(name, 'FAIL only', rep.seen.length, 'rules explained in play'); }
     console.log(name, ok && !errs.length ? 'PASS' : 'FAIL', `coached tutorial to end: first button "${lbl}", ${forced} forced steps, ${moves} free moves, score walk ${walk} steps, rules explained in play ${rep ? rep.seen.length : '?'}/${rep ? rep.all.length : '?'}, met later: ${rep ? rep.later.join(',') : '?'}, errors ${errs.length}`, errs.slice(0, 2).join(' | '));
     if (!ok || errs.length) fails++;
     await ctx.close();

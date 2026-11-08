@@ -240,7 +240,7 @@
       fear: 'An explorer fled a guardian: a Dread card joins that deck.',
       score: 'The final count adds research, temple tiles, idols, empty shrine slots, guardians and card points, minus Dread.',
       tiebreak: 'A tie goes to whoever reached the temple first, then to research.',
-      rounds: 'A full game lasts 5 rounds. This one was 2.'
+      rounds: 'A full game lasts 5 rounds. This one was 1.'
     },
     coachGood: 'Good move: ', coachTip: 'Tip: ',
     endWin: 'You beat Tamsin to the temple trail. The island is waiting.', endLose: 'Tamsin edged it, but now you know the island. Rematch?',

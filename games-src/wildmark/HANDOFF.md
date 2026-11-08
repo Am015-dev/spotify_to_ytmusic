@@ -90,3 +90,17 @@ conflicts): run it at merge time.
 - Local Playwright: the installed browser is build 1243; 1.56.1 expects 1194 headless shell. I added a local symlink shim
   under /opt/pw-browsers/chromium_headless_shell-1194 (machine only, nothing committed); scripts here use
   executablePath /opt/pw-browsers/chromium.
+
+## W416 (8 Nov): scoring you can see, move verdict, art v2, 6-turn coached game (branch shelf/W416-wildmark, not deployed)
+- `src/score.js` (new, loaded after ui.js): exact previews from the engine's own scoring. "+N" badges on every glowing spot (best turn)
+  and animal target; tap a spot (ghost) or hover = strip above the instruction line ("+2 Elk line, +1 largest peak") and gold rings on
+  the pattern (dashed red = a pattern it breaks). Points pop after each place says why. Market pairs badged "up to +N", best one gold.
+  Score strip: your number (gold) vs the leading rival (rust) on every animal card and habitat ("Land"), green/red underline = ahead/behind.
+- Verdict after each of your turns: good / okay / poor vs the best pair's gain (same estimator as the badges), names the better column
+  and the hint solver's pick when it differs. Keystone acorns count. Rowan's own good/poor lines were dropped (verdict says it once).
+- Coached game 6 turns (campaign.json prologue.turns); lines point at the badges. Rules not met are on the end card.
+- Art v2 (free-art/, render/README.md): KayKit Medieval Hexagon renders (three.js) for terrains, Audubon / PD salmon plates for
+  tokens and cards, walnut table (table-bg now shown, with a vignette). `python3 free-art/install.py --force` copies into games/ at deploy.
+- Gates: build-all --quick PASS; tutorial-end PASS both sizes; smoke + playthrough PASS; qa-bot phone 0 blockers / 0 majors;
+  ui-audit phone-s and pc A-F 0, phone B2 = the menu-walk race on drawer headings ("Speed", "Solo"), also there before W416.
+- Shots: playable-shots/v2-before-*.webp, v2-after-*.webp, CRITIQUE-v2.md (top fixes left listed there).

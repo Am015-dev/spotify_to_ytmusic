@@ -69,6 +69,15 @@ After (playable-shots/layout-after-{map,row,track}-phone.webp):
 - After the game: 3 steps walk through the final scoring with your real numbers. The end card lists "Things you'll meet later" for every rule that did not come up, then starts a real game.
 - tut-test.js plays the coached game through the UI with free legal choices and asserts every rule id was explained in play or listed on the end card. Last run: phone 23/27 explained in play, pc 20/27, the rest listed on the end card. After the 2 forced steps the shared tutor steps aside (qa-bot drives tutor steps and cannot play a free game inside one). A second short tutor run starts at game end for the score walk-through and end card. During free play a "Leave tutorial" button sits next to Pass. Coverage table: TUTORIAL-COVERAGE.md.
 
+## Round 3 (W378c, owner: "can't tell how points are earned, what to do, or why a turn ends")
+- Turn tracker in the dock header, always on: "Round 1 of 5", whose turn, and a gold "1 action left" token (it reads "waiting" during the rival's turn).
+- A "Turn over: why" card after each of your actions: "Turn over: you used your one action (dig at Clear Spring)", or for a pass, "you sit out until everyone has passed". It adds a rating line: Good (the strongest option), Okay (names the slightly better move) or Weak (names the much better move). The rating compares your move with every move simulated by the hard AI's evaluation. Then "Next: Tamsin plays."
+- Preview before committing: every action button in the big card says "You get: +2 points (card points), +1 coin, +1 compass", from a simulation of that exact move.
+- Points pop with the reason after every move (kept from round 1).
+- Always-visible score breakdown on the player chips: total, a gold "leads" tag on the leader, and "Track n · Idols n · Guard n · Cards n" under each name.
+- Best-value badges: gold "Best", "Best site" and "Best buy" tags on the strongest targets for you right now. The instruction line names the exact best action ("Best now: dig at Clear Spring.").
+- The coached game is 1 round, so qa-bot's random tapper reaches GXCOACH.done.
+
 ## Remaining
 - Phone market cards still show effects as icons (no room for a sentence at 58 px); the name is readable and a tap opens the full text.
 - The vp badge on a phone market card can touch the cost icon on 4-coin cards.
