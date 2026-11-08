@@ -99,7 +99,7 @@ function pairsCost(S, me, dist, out) {
   const rAfter = remAdv(S) - 1;
   for (let t = 2; t <= 12; t++) {
     const s = t + w;
-    if (final) { const br = FA.brakeVal(S); tE[t] = (s <= br && br >= 2) ? 0 : W.disaster; }
+    if (final) { const br = FA.brakeVal(S); tE[t] = (s < br && br >= 2) ? 0 : W.disaster; }
     else { const r = advOutcome(S, s); tE[t] = r.ok ? schedCost(dist - r.adv, rAfter, S.pl.aeroB, S.pl.aeroO, w) : W.disaster; }
   }
   const F = { A: (p, c) => tA[c - p], E: (e0, e1) => tE[e0 + e1] };

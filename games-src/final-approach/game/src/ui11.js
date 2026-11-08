@@ -8,7 +8,7 @@ const CK_ICO = {
   speed: '<path d="M4 17a8 8 0 1 1 16 0M12 17l4-6"/><circle cx="12" cy="17" r="1.300"/>',
   planes: '<path d="M12 3l1.800 6 6.200 3v2l-6.200-1.500L13 18l2 1.500V21l-3-.800-3 .800v-1.500l2-1.500-.800-4.500L4 14v-2l6.200-3z"/>'
 };
-const CK_NAME = { axis: 'Plane level', air: 'On the airport', speed: 'Speed within the brakes', planes: 'No planes on the track', gear: 'Landing gear down', flaps: 'Flaps out', intern: 'Trainee trained', ice: 'Icy brakes done' };
+const CK_NAME = { axis: 'Plane level', air: 'On the airport', speed: 'Speed below the brakes', planes: 'No planes on the track', gear: 'Landing gear down', flaps: 'Flaps out', intern: 'Trainee trained', ice: 'Icy brakes done' };
 const CK_TICK = '<svg viewBox="0 0 16 16"><path d="M3 8.500l3.200 3.200L13 4.500" fill="none" stroke="#fff" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const CK_CROSS = '<svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="#fff" stroke-width="2.800" stroke-linecap="round"/></svg>';
 function ckNum(it) { return it.k === 'gear' ? String(it.n) : it.k === 'flaps' ? String(it.n) : it.k === 'planes' ? (it.n ? String(it.n) : '') : it.k === 'speed' ? '≤' + it.n : it.k === 'air' ? (it.n ? String(it.n) : '') : ''; }
@@ -25,13 +25,13 @@ function goalStrip() {
   return h('button.goalb.gstrip.chk', { type: 'button', 'data-a': 'goalopen', 'aria-label': t + '. Landing checklist: ' + FA.checklist(G).map(ckLabel).join(', ') + '. Tap for details.' }, h('span.ckrow', ckChips()), h('i.gi', { 'aria-hidden': 'true' }, 'i'));
 }
 function landList() {
-  const T = { axis: it => 'Plane level (now ' + (G.pl.axis === 0 ? 'level' : Math.abs(G.pl.axis) + (G.pl.axis < 0 ? ' left' : ' right') + ')'), air: it => 'On the airport when the last round starts' + (it.n ? ' (' + it.n + ' to go)' : ''), speed: it => 'Landing speed no more than the brakes (' + it.n + ')', planes: it => 'No planes left on the track (' + it.n + ' to go)', gear: it => 'All landing gear down (' + it.n + '/3)', flaps: it => 'All flaps out (' + it.n + '/4)', intern: it => 'Trainee finished (' + (6 - it.n) + ' tokens left)', ice: it => 'Icy-runway track finished (' + it.n + '/4)' };
+  const T = { axis: it => 'Plane level (now ' + (G.pl.axis === 0 ? 'level' : Math.abs(G.pl.axis) + (G.pl.axis < 0 ? ' left' : ' right') + ')'), air: it => 'On the airport when the last round starts' + (it.n ? ' (' + it.n + ' to go)' : ''), speed: it => 'Landing speed below the brakes (' + it.n + ')', planes: it => 'No planes left on the track (' + it.n + ' to go)', gear: it => 'All landing gear down (' + it.n + '/3)', flaps: it => 'All flaps out (' + it.n + '/4)', intern: it => 'Trainee finished (' + (6 - it.n) + ' tokens left)', ice: it => 'Icy-runway track finished (' + it.n + '/4)' };
   return FA.checklist(G).map(it => [it.ok ? true : (it.k === 'speed' && FA.brakeVal(G) < 2 && G.lad !== 5 && !G.autoBrake ? null : false), T[it.k](it)]);
 }
 function goalFull() {
   const size = trackOf().sp.length, pos = G.pl.pos, last = D.rounds - G.row0, fin = FA.isFinal(G), eng = G.keys.includes('en0');
   const need = size - pos, moves = last - 1 - G.round - (G.slots.en0 && G.slots.en1 ? 1 : 0);
-  const route = !eng ? 'Seven rounds. End the last one with the plane level.' : fin ? 'Landing now: the plane stays put, speed must be within the brakes' : pos >= size ? 'On the airport: hold here until round ' + last : need + ' space' + (need > 1 ? 's' : '') + ' to the airport, ' + Math.max(0, moves) + ' round' + (moves === 1 ? '' : 's') + ' left to fly there';
+  const route = !eng ? 'Seven rounds. End the last one with the plane level.' : fin ? 'Landing now: the plane stays put, speed must be below the brakes' : pos >= size ? 'On the airport: hold here until round ' + last : need + ' space' + (need > 1 ? 's' : '') + ' to the airport, ' + Math.max(0, moves) + ' round' + (moves === 1 ? '' : 's') + ' left to fly there';
   return h('div.goalb', h('span.gr', h('b', fin ? 'Round ' + last + ' · ' : ''), route), h('span.gc', ckChips()), G.keys.includes('lg0') && !fin ? (late => late ? h('span.dg', '⚠ ' + late) : null)(behind()) : null);
 }
 // ---------- the picture: the plane seen from behind, coming in toward the runway ----------
@@ -81,7 +81,7 @@ function sceneHTML(wpx, hpx, stripH, hz) {
   svg = '<svg viewBox="0 0 ' + wpx + ' ' + sh + '" width="' + wpx + '" height="' + sh + '" preserveAspectRatio="none">' + s + '</svg>';
   // the numbers beside the picture: speed against the brakes
   let chips = '';
-  if (eng) { const br = FA.brakeVal(G), sp = G.speed, bad = fin && G.landSpeed >= 0 && G.landSpeed > br; chips = '<div class="pvs" aria-hidden="true">' + (sp >= 0 ? '<span class="sp1' + (bad ? ' bad' : '') + '"><i class="ic"><svg viewBox="0 0 24 24">' + CK_ICO.speed + '</svg></i><b>' + sp + '</b></span>' : '') + (fin || G.lad >= 5 || !G.lad ? '<span class="br1"><i class="ic"><svg viewBox="0 0 24 24">' + ICO.brakes + '</svg></i><b>' + br + '</b></span>' : '') + '</div>'; }
+  if (eng) { const br = FA.brakeVal(G), sp = G.speed, bad = fin && G.landSpeed >= 0 && G.landSpeed >= br; chips = '<div class="pvs" aria-hidden="true">' + (sp >= 0 ? '<span class="sp1' + (bad ? ' bad' : '') + '"><i class="ic"><svg viewBox="0 0 24 24">' + CK_ICO.speed + '</svg></i><b>' + sp + '</b></span>' : '') + (fin || G.lad >= 5 || !G.lad ? '<span class="br1"><i class="ic"><svg viewBox="0 0 24 24">' + ICO.brakes + '</svg></i><b>' + br + '</b></span>' : '') + '</div>'; }
   return '<div class="pv" aria-hidden="true">' + svg + chips + '</div>';
 }
 // ---------- what a die would do: shown on each glowing slot (a short number and word, no sentence) ----------
@@ -89,7 +89,7 @@ function slotPreview(k, v, val) {
   const S = FA.SLOT[k], o = 1 - v, last = FA.isFinal(G), wm = FA.windMod(G);
   switch (S.grp) {
     case 'axis': { const x = G.slots['ax' + o]; if (!x) return { big: String(val), cap: 'first' }; const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); return { big: String(Math.abs(nx)), cap: Math.abs(nx) >= 3 ? 'SPIN' : nx === 0 ? 'level' : nx < 0 ? 'left' : 'right', bad: Math.abs(nx) >= 3 || (last && nx !== 0), good: nx === 0 }; }
-    case 'engines': { const x = G.slots['en' + o]; if (!x) return { big: String(val), cap: 'first' }; const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); return { big: String(sm), cap: sm <= br && br >= 2 ? 'ok' : 'fast', bad: !(sm <= br && br >= 2), good: sm <= br && br >= 2 }; } const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return { big: String(sm), cap: adv ? '+' + adv : 'stay' }; }
+    case 'engines': { const x = G.slots['en' + o]; if (!x) return { big: String(val), cap: 'first' }; const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); return { big: String(sm), cap: sm < br && br >= 2 ? 'ok' : 'fast', bad: !(sm < br && br >= 2), good: sm <= br && br >= 2 }; } const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return { big: String(sm), cap: adv ? '+' + adv : 'stay' }; }
     case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return { big: at === G.planes.length ? 'A' : String(Math.max(1, at)), cap: n ? 'clear' : 'empty', good: !!n }; }
     case 'gear': return G.pl.sw.lg[S.ix] ? { big: '=', cap: 'same' } : { big: '↓', cap: 'down', good: true };
     case 'flaps': return G.pl.sw.fl[S.ix] ? { big: '=', cap: 'same' } : { big: '↓', cap: 'out', good: true };
@@ -104,7 +104,7 @@ function aiChip(m, seat) {
   const S = FA.SLOT[m.to], val = G.dice[seat][m.d].v + (m.c || 0), o = 1 - seat, last = FA.isFinal(G), wm = FA.windMod(G);
   switch (S.grp) {
     case 'axis': { const x = G.slots['ax' + o]; if (!x) return 'Axis die down. Yours decides the tilt.'; const nx = G.pl.axis + (seat === 0 ? x.v - val : val - x.v); return nx === 0 ? 'Keeps the plane level.' : 'Tilt ' + Math.abs(nx) + (nx < 0 ? ' left.' : ' right.') + (Math.abs(nx) >= 2 ? ' Watch it!' : ''); }
-    case 'engines': { const x = G.slots['en' + o]; if (!x) return 'Engine die down. Yours adds to it.'; const sm = val + x.v + wm; if (last) return sm <= FA.brakeVal(G) ? 'Speed ' + sm + '. Slow enough.' : 'Speed ' + sm + '. Too fast!'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Speed ' + sm + (adv ? ': moves ' + adv + (adv > 1 ? ' spaces.' : ' space.') : ': holds position.'); }
+    case 'engines': { const x = G.slots['en' + o]; if (!x) return 'Engine die down. Yours adds to it.'; const sm = val + x.v + wm; if (last) return FA.slowOk(G, sm) ? 'Speed ' + sm + '. Slow enough.' : 'Speed ' + sm + '. Too fast!'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Speed ' + sm + (adv ? ': moves ' + adv + (adv > 1 ? ' spaces.' : ' space.') : ': holds position.'); }
     case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return n ? 'Radio clears the plane ahead.' : 'Radio: nothing to clear.'; }
     case 'gear': return G.pl.sw.lg[S.ix] ? 'Gear already down.' : 'Lowers a landing gear.';
     case 'flaps': return G.pl.sw.fl[S.ix] ? 'Flap already out.' : 'Extends a flap.';
@@ -164,13 +164,13 @@ function previewText(k, v) {
     case 'axis': { const x = G.slots['ax' + o]; if (!x) { t = 'Axis: ' + name(o) + "'s die decides the tilt"; break; }
       const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); t = 'Axis after: ' + (Math.abs(nx) >= 3 ? 'tilt ' + Math.abs(nx) + ': crash' : nx === 0 ? 'level' : 'tilt ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right') + (Math.abs(nx) === 2 ? ' (one more is a spin)' : '')); break; }
     case 'engines': { const x = G.slots['en' + o]; if (!x) { t = 'Speed: ' + val + ' plus ' + name(o) + "'s die"; break; }
-      const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); t = 'Landing speed ' + sm + ' vs brakes ' + br + ': ' + (sm <= br && br >= 2 ? 'slow enough' : 'too fast, the flight ends'); break; }
+      const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); t = 'Landing speed ' + sm + ' vs brakes ' + br + ': ' + (sm < br && br >= 2 ? 'slow enough' : 'too fast, the flight ends'); break; }
       const adv = G.pl.pos >= trackOf().sp.length ? 0 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2, to = G.pl.pos + adv, n = trackOf().sp.length;
       t = 'Speed ' + sm + ': ' + (adv ? 'advance ' + adv + ' (to ' + (to >= n ? 'the airport' : 'space ' + to) + ')' : 'stay on space ' + G.pl.pos) + (to > n ? ', past the airport: crash' : ''); break; }
     case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; t = n ? 'Radio: clears the plane on ' + (at === G.planes.length ? 'the airport' : 'space ' + at) : 'Radio: no plane on ' + (at > G.planes.length ? 'that space' : 'space ' + at) + ', nothing cleared'; break; }
     case 'gear': t = G.pl.sw.lg[S.ix] ? 'Gear ' + (S.ix + 1) + ' is down already: no effect' : 'Gear down: blue marker ' + G.pl.aeroB + ' → ' + Math.min(7, G.pl.aeroB + 1); break;
     case 'flaps': t = G.pl.sw.fl[S.ix] ? 'Flap already out: no effect' : 'Flap out: orange marker ' + G.pl.aeroO + ' → ' + Math.min(12, G.pl.aeroO + 1); break;
-    case 'brakes': t = G.pl.sw.br[S.ix] ? 'Brake already set: no effect' : 'Brakes ' + FA.brakeVal(G) + ' → ' + S.vals[0] + ': landing speed may be up to ' + S.vals[0]; break;
+    case 'brakes': t = G.pl.sw.br[S.ix] ? 'Brake already set: no effect' : 'Brakes ' + FA.brakeVal(G) + ' → ' + S.vals[0] + ': landing speed must be under ' + S.vals[0]; break;
     case 'conc': t = G.coffee >= D.coffeeMax ? 'Coffee: already ' + G.coffee + ' tokens, the die is just spent' : 'Coffee: tokens ' + G.coffee + ' → ' + (G.coffee + 1); break;
     default: t = slotName(k) + ': ' + slotNeedLong(k);
   }
@@ -236,7 +236,7 @@ function roPoll() {
   if (FT.sid !== G.seed + ':' + G.sid) { FT.sid = G.seed + ':' + G.sid; FT.round = G.round; FT.snap = roSnap(); roHide(); if (isPh() && G.round === 0 && G.phase === 'brief' && !(UI.cfg && UI.cfg.tutorial) && !UI.camp && UI.mode === 'vs' && !G.lad && !/[?&]scn=/.test(location.search)) goalShow(); return; }   // ?scn= states skip menus and cards
   if (G.result) { roHide(); FT.round = G.round; return; }
   if (FT.ro && G.phase !== 'brief') roHide();   // the card lives in the briefing only: rolling the dice puts the board first again
-  if (G.round !== FT.round) { const a = FT.snap; FT.round = G.round; if (a && G.round === a.r + 1 && UI.mode !== 'net' && !(UI.fc && !UI.fc.ended)) roShow(a); FT.snap = roSnap(); }
+  if (G.round !== FT.round) { const a = FT.snap; FT.round = G.round; if (a && G.round === a.r + 1 && UI.mode !== 'net' && !(UI.fc && !UI.fc.ended) && !(typeof tutGame === 'function' && tutGame())) roShow(a); FT.snap = roSnap(); }
 }
 setInterval(() => { try { roPoll(); } catch (e) { } }, 300);
 // a locked chapter: a small shake says "not yet" (no floating toast in Play; the lock icon says why)

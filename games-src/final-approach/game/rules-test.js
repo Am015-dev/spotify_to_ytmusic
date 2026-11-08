@@ -160,7 +160,7 @@ t('final round: the plane does not move; speed must be at most the brake value a
   G = T.game('g1', 11); G.planes = [0, 0, 0, 0, 0, 0, 0]; T.toRound(G, 6); G.pl.pos = 7; T.roll(G); T.dice(G, 0, [3, 1, 2, 3]); T.dice(G, 1, [3, 1, 2, 2]); G.pl.sw.br = [1, 0, 0]; T.put(G, 0, 3, 'ax0'); T.put(G, 1, 3, 'ax1'); T.put(G, 0, 2, 'en0'); T.put(G, 1, 2, 'en1'); T.finishRound(G); eq(G.result.why, 'speed', 'speed 4 > brake 2');
   G = T.game('g1', 11); G.planes = [0, 0, 0, 0, 0, 0, 0]; T.toRound(G, 6); G.pl.pos = 7; T.roll(G); T.dice(G, 0, [3, 1, 2, 3]); T.dice(G, 1, [3, 1, 2, 2]); T.put(G, 0, 3, 'ax0'); T.put(G, 1, 3, 'ax1'); T.put(G, 0, 1, 'en0'); T.put(G, 1, 1, 'en1'); T.finishRound(G); eq(G.result.why, 'speed', 'no brakes at all');
 });
-t('final round: the speed is judged at the END of the round, so a brake set AFTER the engine dice still counts (W433 ruling)', () => { const G = T.game('g1', 11); G.planes = [0, 0, 0, 0, 0, 0, 0]; T.toRound(G, 6); G.pl.pos = 7; G.pl.sw.lg = [1, 1, 1]; G.pl.aeroB = 7; G.pl.sw.fl = [1, 1, 1, 1]; G.pl.aeroO = 12; T.roll(G); T.dice(G, 0, [3, 1, 2, 3]); T.dice(G, 1, [3, 1]); T.put(G, 0, 3, 'ax0'); T.put(G, 1, 3, 'ax1'); T.put(G, 0, 1, 'en0'); T.put(G, 1, 1, 'en1'); ok(!G.result, 'not decided yet'); T.put(G, 0, 2, 'br0'); T.put(G, 0, 3, 'co0'); eq(G.result.win, true); });
+t('final round: the speed is judged at the END of the round, so a brake set AFTER the engine dice still counts (W433 ruling)', () => { const G = T.game('g1', 11); G.planes = [0, 0, 0, 0, 0, 0, 0]; T.toRound(G, 6); G.pl.pos = 7; G.pl.sw.lg = [1, 1, 1]; G.pl.aeroB = 7; G.pl.sw.fl = [1, 1, 1, 1]; G.pl.aeroO = 12; T.roll(G); G.pl.sw.br = [1, 0, 0]; T.dice(G, 0, [3, 1, 4, 3]); T.dice(G, 1, [3, 1]); T.put(G, 0, 3, 'ax0'); T.put(G, 1, 3, 'ax1'); T.put(G, 0, 1, 'en0'); T.put(G, 1, 1, 'en1'); ok(!G.result, 'not decided yet'); T.put(G, 0, 4, 'br1'); T.put(G, 0, 3, 'co0'); eq(G.result.win, true); });
 t('landing: all of A (no planes), B (gear+flaps), C (level axis), D (speed) must hold at the end of the last round', () => {
   const mk = () => { const G = T.game('g1', 12); G.planes = [0, 0, 0, 0, 0, 0, 0]; T.toRound(G, 6); G.pl.pos = 7; G.pl.sw.lg = [1, 1, 1]; G.pl.aeroB = 7; G.pl.sw.fl = [1, 1, 1, 1]; G.pl.aeroO = 12; G.pl.sw.br = [1, 1, 0]; T.roll(G); T.dice(G, 0, [3, 1, 2, 3]); T.dice(G, 1, [3, 1, 2, 3]); return G; };
   let G = mk(); T.axisEng(G, 3, 1, 3, 2); T.finishRound(G); eq(G.result.win, true); eq(G.result.why, 'landed');
@@ -170,7 +170,7 @@ t('landing: all of A (no planes), B (gear+flaps), C (level axis), D (speed) must
   G = mk(); T.put(G, 0, 3, 'ax0'); T.put(G, 1, 2, 'en1'); G.dice[1][T.idx(G, 1, 3)].v = 4; T.put(G, 1, 4, 'ax1'); eq(G.pl.axis, 1); T.put(G, 0, 1, 'en0'); T.finishRound(G); eq(G.result.win, false); eq(G.result.checks.axis, false);
 });
 t('landing: the last round still allows radio, gear and flaps to finish the job', () => {
-  const G = T.game('g1', 12); T.toRound(G, 6); G.planes = [0, 0, 0, 0, 0, 0, 1]; G.pl.pos = 7; G.pl.sw.lg = [1, 1, 0]; G.pl.aeroB = 6; G.pl.sw.fl = [1, 1, 1, 1]; G.pl.aeroO = 12; G.pl.sw.br = [1, 0, 0]; T.roll(G); T.dice(G, 0, [3, 1, 5, 2]); T.dice(G, 1, [3, 1, 1, 2]);
+  const G = T.game('g1', 12); T.toRound(G, 6); G.planes = [0, 0, 0, 0, 0, 0, 1]; G.pl.pos = 7; G.pl.sw.lg = [1, 1, 0]; G.pl.aeroB = 6; G.pl.sw.fl = [1, 1, 1, 1]; G.pl.aeroO = 12; G.pl.sw.br = [1, 1, 0]; T.roll(G); T.dice(G, 0, [3, 1, 5, 2]); T.dice(G, 1, [3, 1, 1, 2]);
   T.put(G, 0, 3, 'ax0'); T.put(G, 1, 3, 'ax1'); T.put(G, 0, 1, 'en0'); T.put(G, 1, 1, 'en1'); ok(!G.result); T.put(G, 0, 5, 'lg2'); T.put(G, 1, 1, 'ra1'); eq(G.planes[6], 0, 'a 1 on the radio clears the space the plane stands on'); T.put(G, 0, 2, 'co0'); T.put(G, 1, 2, 'co1'); eq(G.result && G.result.win, true);
 });
 
@@ -361,17 +361,16 @@ t('ladder 2-4: checklist items grow, speed uses auto-brakes 6 before chapter 5',
 t('ladder: checklist matches the engine fields', () => { const G = FA.newGame({ lad: 4, seed: 3 }); G.pl.axis = 1; G.pl.sw.lg = [1, 1, 1]; const c = Object.fromEntries(FA.checklist(G).map(x => [x.k, x])); eq(c.axis.ok, false); eq(c.gear.ok, true); eq(c.gear.n, 3); eq(c.flaps.ok, false); eq(c.planes.n, FA.planesOnTrack(G)); });
 t('ladder: the real game is untouched (no lad): keys, dice, briefing', () => { const G = FA.newGame({ scenario: 'g1', seed: 2 }); eq(G.lad, 0); eq(G.phase, 'brief'); ok(!G.open); eq(G.keys.length, FA.slotKeys(G.mods).length); });
 
-t('tutorial flight: 4 rounds from 3000 ft on the 4-space strip, one plane on space 3; following the coach (round systems only) lands the plane', () => {
-  require('./src/ai.js');
-  const SCRIPT = [[[3, 4, 2, 6], [3, 4, 1, 2]], [[2, 4, 3, 1], [4, 3, 2, 5]], [[2, 4, 5, 3], [3, 4, 1, 2]], [[2, 1, 3, 6], [4, 6, 2, 1]]];
-  const ALLOW = [['axis', 'engines', 'conc'], ['axis', 'engines', 'conc', 'radio', 'gear'], ['axis', 'engines', 'conc', 'radio', 'gear', 'flaps', 'brakes'], null];
-  const G = FA.newGame({ scenario: 'tt', seed: 23, row0: 3, pre: { script: SCRIPT } }); eq(D.rounds - G.row0, 4); eq(G.planes.join(''), '0010'); eq(FA.altRow(G)[0], 3000);
-  let n = 0; while (!G.result && n++ < 300) { const s = FA.pending(G)[0]; let m = null;
-    if (G.phase === 'brief') m = { t: 'ready' }; else { let al = ALLOW[Math.min(G.round, 3)]; if (G.round === 0 && (!G.slots['ax' + s] || !G.slots['en' + s])) al = ['axis', 'engines']; const V = FA.stripView(G, s); let bc = 1e9;
-      if (!G.pend) for (const x of FA.validMoves(V, s)) { if (x.t !== 'place' || x.d === 'p' || (x.c || 0) !== 0 || (al && !al.includes(FA.SLOT[x.to].grp))) continue; const S = FA.cloneLite(V); FA.performMove(S, x, s, true); const c = FA.AI.cost(S, s) - (s === 1 && G.round >= 2 && FA.SLOT[x.to].grp === 'flaps' && !G.pl.sw.fl[FA.SLOT[x.to].ix] ? 5 : 0); if (c < bc) { bc = c; m = x; } }
-      if (!m) m = FA.AI.move(G, s, 'normal', { noMC: true }); }
-    ok(FA.performMove(G, m, s).ok); }
-  ok(G.result && G.result.win, 'tutorial flight should land: ' + JSON.stringify(G.result));
+t('tutorial flight: 4 rounds from 3000 ft on the 4-space strip, one plane on space 3; playing the guided plan (tut-plan.js) move by move lands the plane', () => {
+  const P = require('./tut-plan.js'); const G = FA.newGame(P.setup); eq(D.rounds - G.row0, 4); eq(G.planes.join(''), '0010'); eq(FA.altRow(G)[0], 3000);
+  const idx = [0, 0]; let rr = false; const go = (s, m) => ok(FA.performMove(G, m, s).ok, 'refused ' + JSON.stringify(m) + ' round ' + G.round);
+  for (let n = 0; n < 200 && !G.result; n++) {
+    if (G.phase === 'brief') { for (const s of [0, 1]) if (!G.ready[s]) go(s, { t: 'ready' }); idx[0] = idx[1] = 0; continue; }
+    if (G.pend && G.pend.h === 'rr') { if (!G.pend.d.m[0]) go(0, { t: 'rrpick', m: [0, 1, 2, 3].map(i => i === P.rrDie) }); if (G.pend && !G.pend.d.m[1]) go(1, { t: 'rrpick', m: [false, false, false, false] }); continue; }
+    const s = G.turn; if (s === 0 && G.round === P.rrAt[0] && idx[0] === P.rrAt[1] && !rr) { rr = true; go(0, { t: 'rr' }); continue; }
+    const q = s ? P.cop[G.round][idx[1]++] : P.pil[G.round][idx[0]++]; go(s, { t: 'place', d: q[0], to: q[1], c: q[2] || 0 });
+  }
+  ok(rr, 'the reroll was used'); ok(G.result && G.result.win, 'tutorial flight should land: ' + JSON.stringify(G.result));
 });
 
 console.log('rules-test: ' + pass + ' passed, ' + fail + ' failed');

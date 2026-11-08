@@ -165,10 +165,10 @@ This file is generated from the test: `node game/logic-test.js --md > RULES-CHEC
 | # | Src | Rule |
 |---|---|---|
 | 101 | R | Last round: the plane does not move, whatever the engine sum is. |
-| 102 | U | Last round: the engine speed (sum of the two dice) must be no greater than the brake value; speed 2 with brakes at 2 lands. |
-| 103 | U | Last round: a speed above the brake value is a loss (speed 3 with the brakes at 2). |
-| 104 | U | Brake value 4 allows speed up to 4 and no more; speed 5 fails. |
-| 105 | U | Brake value 6 allows speed up to 6 and no more; speed 7 fails. |
+| 102 | R | Last round: the engine speed (sum of the two dice) must be strictly BELOW the brake value; speed 3 with brakes at 4 lands. |
+| 103 | R | Last round: a speed EQUAL to the brake value is a loss (speed 2 with the brakes at 2). |
+| 104 | R | Brake value 4 allows speed up to 3 and no more; speed 4 fails. |
+| 105 | R | Brake value 6 allows speed up to 5 and no more; speed 6 fails. |
 | 106 | R | Brakes are required: with no brake set, even the lowest speed (2) is a loss. |
 | 107 | R | Landing needs ALL landing gear green: with one gear missing the landing fails. |
 | 108 | R | Landing needs ALL flaps green: with one flap missing the landing fails. |
@@ -231,7 +231,7 @@ This file is generated from the test: `node game/logic-test.js --md > RULES-CHEC
 | 140 | R | Several columns may be finished in one round, in order (2 then 3). |
 | 141 | U | A lone die in a column is wasted at the end of the round: the column is empty again next round. |
 | 142 | R | All four columns must be finished for the landing; with one column missing the landing fails. |
-| 143 | R | With all four columns done the brake value is 5; speed up to 5 lands, 6 fails. |
+| 143 | R | With all four columns done the brake value is 5; speed up to 4 lands, 5 fails. |
 | 144 | R | With only column 1 done the brake value is 2. |
 
 ## Real-time
@@ -271,8 +271,8 @@ This file is generated from the test: `node game/logic-test.js --md > RULES-CHEC
 
 | # | Src | Rule |
 |---|---|---|
-| 163 | R | Landing is judged at the end of the last round, so brakes may be set AFTER the engine dice in the same round (engines first, then brake 2 with speed 2 still lands). |
-| 164 | R | Landing is judged at the end of the last round: a speed above the brakes is only a loss once the round is over (a brake placed later can still fix it: speed 4, brake 4 placed after the engines). |
+| 163 | R | Landing is judged at the end of the last round, so brakes may be set AFTER the engine dice in the same round (engines first, then brake 4 with speed 2 still lands). |
+| 164 | R | Landing is judged at the end of the last round: a speed above the brakes is only a loss once the round is over (a brake placed later can still fix it: speed 4, brake 6 placed after the engines). |
 | 165 | R | A gear die placed before the engine dice raises the blue marker for that round's speed (gear 1 first: speed 5 advances 0). |
 | 166 | R | A gear die placed AFTER the engine dice does not change that round's advance (speed 5 advances 1 this round). |
 | 167 | R | Engine dice placed BEFORE the axis dice use the axis as it still stands: a corridor tab is checked against the old axis. |
