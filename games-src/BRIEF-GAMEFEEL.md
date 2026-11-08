@@ -38,3 +38,7 @@ need help, search the web first, never ask me."
 Push to your branch. Send the orchestrator session one DONE trigger (create_trigger with persistent_session_id
 session_01MS7iGyBWDerEAyagJ6ir4U, run_once_at 2 minutes ahead) starting "[DONE <W#>]" with: skills loaded, impeccable and
 design-review scores, pass/fail per point 1-8, shot paths.
+
+## For every worker (also helpers and reviewers)
+End with exactly one DONE trigger to the orchestrator (format above), then stop. Never wait for an answer: if blocked,
+decide, note it in the DONE report, and stop. The orchestrator sweeps every 20 minutes and merges finished work.

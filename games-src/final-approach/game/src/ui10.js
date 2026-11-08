@@ -158,6 +158,13 @@ function hlpAfter() {
   hlpInit(); if (typeof GXH === 'undefined') return;
   const vis = id => { const e = document.getElementById(id); return !!(e && !e.hidden); };
   const busy = !G || !UI.started || G.result || (typeof tutOn === 'function' && tutOn()) || !!(UI.fc && !UI.fc.ended) || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
-  GXH.phase(busy ? null : hlpPhase());
+  GXH.phase(null);   // Addendum 7: coach bubbles live only in Learn to play (the coached flight, part 12)
 }
 setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
+// ---------------------------------------------------------------- Hints: the bulb in the top bar switches them on and off (off by default)
+function hintsSync() { const b = $('#bulbbtn'); if (!b) return; const on = !!UI.prefs.hints; b.classList.toggle('hon', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', on ? 'Hints on (tap to turn off)' : 'Hints off (tap to turn on)'); b.title = on ? 'Hints on' : 'Hints off'; }
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('#bulbbtn'); if (b) { e.stopPropagation(); e.preventDefault(); UI.prefs.hints = !UI.prefs.hints; savePrefs(); UI.cpt = null; UI.askWhy = null; hintsSync(); if (G && UI.started) render(); return; }
+  const a = e.target.closest && e.target.closest('[data-a=ask]'); if (a) { e.stopPropagation(); e.preventDefault(); const p = hlpPlan(); if (p && p.m) { UI.cpt = p.m.t === 'place' ? { k: p.m.to, d: p.m.d } : null; UI.askWhy = (p.m.t === 'place' ? 'Try your ' + (p.m.d === 'p' ? '' : G.dice[actSeat()][p.m.d].v + ' on ') + slotName(p.m.to) + ': ' : '') + p.why; } else UI.askWhy = 'No clear best move: any glowing space works.'; render(); }
+}, true);
+setTimeout(hintsSync, 300);

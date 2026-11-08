@@ -147,17 +147,17 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'thorn-brute': { name: 'Thorn Brute', hp: [80, 86], pat: [{ str: 2 }, { atk: 14 }, { atk: 8, vuln: 2 }], onSkill: 2, elite: 1, art: 'bark-skinned hulking brute with thorns and a horned skull' },
     'sleeper-statue': { name: 'Sleeper Statue', hp: [78, 84], sleep: 3, pat: [{ atk: 16 }, { atk: 16 }, { weak: 2, vuln: 1 }], elite: 1, art: 'mossy stone statue of a seated giant with one eye opening' },
     'iron-warden': { name: 'Iron Warden', hp: [36, 40], pat: [{ atk: 9 }, { add: ['dazed', 2] }, { atk: 6, blk: 6 }], elite: 1, art: 'tall slim iron sentry with a lantern head' },
-    'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], boss: 1, img: 'iron-warden', art: 'iron sentry captain in spiked plate with a lantern helm' },
+    'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], boss: 1, art: 'iron sentry captain in spiked plate with a lantern helm' },
     'mire-behemoth': { name: 'Mire Behemoth', hp: [132, 140], pat: [{ atk: 9, add: ['slimed', 2] }, { blk: 12, str: 2 }, { atk: 22 }, { atk: 7, hits: 2, all: 1 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
     'ashen-wraith': { name: 'Ashen Wraith', hp: [124, 130], pat: [{ add: ['burn', 1], atk: 6, all: 1 }, { die: [{ blk: 10, str: 2 }, { atk: 5, hits: 2 }, { atk: 6, hits: 3 }] }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
     'gate-colossus': { name: 'Gate Wyrm', hp: [138, 146], pat: [{ atk: 9, hits: 2 }, { blk: 16 }, { atk: 24, vuln: 2 }, { str: 3, blk: 8 }], boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
     // act 2 (Ash Stair) and act 3 (Cinder Gate) encounter decks, act 4 = the optional final act
-    'cinder-hound': { name: 'Cinder Hound', hp: [30, 34], pat: [{ atk: 5, hits: 2 }, { atk: 8, add: ['burn', 1] }, { blk: 6, str: 1 }], act: 2, img: 'gnawer', art: 'lean black hound with ember-cracked skin and smoking jaws' },
-    'ash-wisp': { name: 'Ash Wisp', hp: [20, 24], pat: [{ atk: 4, frail: 2 }, { atk: 7 }, { die: [{ blk: 8 }, { atk: 6, frail: 1 }, { atk: 10 }] }], act: 2, img: 'ash-imp', art: 'floating grey wisp of ash with two coal eyes' },
-    'smoke-hexer': { name: 'Smoke Hexer', hp: [36, 40], pat: [{ atk: 6, weak: 1 }, { str: 2, blk: 6 }, { atk: 12 }], act: 2, img: 'hex-acolyte', art: 'robed hexer exhaling grey smoke shaped like hands' },
+    'cinder-hound': { name: 'Cinder Hound', hp: [30, 34], pat: [{ atk: 5, hits: 2 }, { atk: 8, add: ['burn', 1] }, { blk: 6, str: 1 }], act: 2, art: 'lean black hound with ember-cracked skin and smoking jaws' },
+    'ash-wisp': { name: 'Ash Wisp', hp: [20, 24], pat: [{ atk: 4, frail: 2 }, { atk: 7 }, { die: [{ blk: 8 }, { atk: 6, frail: 1 }, { atk: 10 }] }], act: 2, art: 'floating grey wisp of ash with two coal eyes' },
+    'smoke-hexer': { name: 'Smoke Hexer', hp: [36, 40], pat: [{ atk: 6, weak: 1 }, { str: 2, blk: 6 }, { atk: 12 }], act: 2, art: 'robed hexer exhaling grey smoke shaped like hands' },
     'skyclaw': { name: 'Skyclaw', hp: [90, 96], pat: [{ atk: 6, hits: 3 }, { blk: 12, str: 2 }, { atk: 18, vuln: 1 }], elite: 1, act: 2, art: 'golden winged griffin diving down a stone corridor' },
-    'grave-knight': { name: 'Grave Knight', hp: [44, 48], pat: [{ atk: 10 }, { blk: 12 }, { atk: 7, hits: 2 }], act: 3, img: 'iron-warden', art: 'rusted skeleton knight with a cracked tower shield' },
-    'bone-caller': { name: 'Bone Caller', hp: [30, 34], pat: [{ atk: 6, add: ['wound', 1] }, { die: [{ str: 2 }, { atk: 9 }, { atk: 5, hits: 3 }] }], act: 3, img: 'hex-acolyte', art: 'hunched necromancer rattling a staff of bones' },
+    'grave-knight': { name: 'Grave Knight', hp: [44, 48], pat: [{ atk: 10 }, { blk: 12 }, { atk: 7, hits: 2 }], act: 3, art: 'rusted skeleton knight with a cracked tower shield' },
+    'bone-caller': { name: 'Bone Caller', hp: [30, 34], pat: [{ atk: 6, add: ['wound', 1] }, { die: [{ str: 2 }, { atk: 9 }, { atk: 5, hits: 3 }] }], act: 3, art: 'hunched necromancer rattling a staff of bones' },
     'tomb-king': { name: 'Tomb King', hp: [120, 128], pat: [{ atk: 12, frail: 2 }, { blk: 14, str: 2 }, { atk: 7, hits: 3 }, { atk: 8, add: ['dazed', 2] }], elite: 1, act: 3, art: 'bandaged king rising from a stone sarcophagus in dust' },
     'ember-tyrant': { name: 'Ember Tyrant', hp: [210, 220], pat: [{ atk: 10, all: 1, add: ['burn', 2] }, { str: 3, blk: 20 }, { atk: 8, hits: 3 }, { atk: 30, vuln: 2 }], boss: 1, act: 4, art: 'horned fire demon striding out of a burning archway' }
   };
