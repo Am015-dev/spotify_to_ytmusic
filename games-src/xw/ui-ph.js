@@ -32,7 +32,7 @@ PHN.build=function(){if(PHN.built)return;PHN.built=true;
     let t=0;const R=document.documentElement;const close=()=>{R.classList.remove('camopen');b.setAttribute('aria-expanded','false')};const arm=()=>{clearTimeout(t);t=setTimeout(close,10000)};
     b.addEventListener('click',()=>{if(R.classList.toggle('camopen')){const r=bar.getBoundingClientRect();R.style.setProperty('--cam-top',(r.bottom+4)+'px');b.setAttribute('aria-expanded','true');arm()}else close()});
     document.addEventListener('pointerdown',e=>{if(!R.classList.contains('camopen'))return;if(e.target.closest('#phctl')){arm();return}if(e.target.closest('#phcam'))return;close()},true)}}
-  const bar=document.querySelector('.gx-bar');if(bar&&!$('phchip')){const c=document.createElement('div');c.id='phchip';c.className='ph-chip';c.setAttribute('role','status');bar.insertBefore(c,bar.firstChild)}
+  const bar=document.querySelector('.gx-bar');if(bar&&!$('phchip')){const c=document.createElement('div');c.id='phchip';c.className='ph-chip';c.setAttribute('aria-live','polite');bar.insertBefore(c,bar.firstChild)}
   const dock=document.querySelector('.gx-dock');if(dock){const top=dock.querySelector('.gx-dock-top');
     if(!$('ps')){const e=document.createElement('div');e.id='ps';e.hidden=true;top.after(e)}
     if(!$('ppop')){const e=document.createElement('div');e.id='ppop';e.hidden=true;e.setAttribute('role','dialog');dock.appendChild(e)}
