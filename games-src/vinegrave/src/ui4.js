@@ -33,7 +33,7 @@ const TUT_GAME = 'vinegrave', TUT_SITE = 5;   // the first level-1 ruin (travel:
 const tq = sel => () => { const e = typeof sel === 'function' ? sel() : $(sel); return e && e.getBoundingClientRect().width ? e : null; };
 const tinsp = txt => () => [...document.querySelectorAll('#insp .btn')].find(b => b.textContent.indexOf(txt) === 0) || null;
 const tmine = () => !!(G && UI.mode === 'tutorial' && myTurn() && !UI.busy && $('#fx').hidden);
-function tutAI() { return null; }   /* coached game: Tamsin is the real (easy) computer */
+function tutAI() { if (!GUIDED || UI.coachFree) return null; const L = VG.moves(G); return L.find(m => m.t === 'play') || L.find(m => m.t === 'pass') || null; }   /* guided game: Tamsin only plays cards, then passes; coached play: the real (easy) computer */
 function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up once (TUTORIAL-COVERAGE.md) */
   try { GX.close(); } catch (e) { } closeRes(); UI.fast = false;
   startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 1 });   /* one short round: a newcomer (or a random tapper) reaches the final count quickly */
@@ -112,15 +112,66 @@ function coachScoreStart() {   /* game over in the coached game: a second tutor 
   const steps = tutSteps().filter(x => /^score/.test(x.id)), c = Object.assign({}, TUTCFG, { steps, setup: () => { } });
   TUTCFG = c; GXT.start(c);
 }
+/* W490 guided first game (owner, 8 Nov: gameplay first): every core rule in order, one sentence of 12 words or fewer,
+   one highlighted tap per step, on a real board; then the score walk and a real game. ?tut=coach = the older coached free play. */
+const GUIDED = !/[?&]tut=coach\b/.test(location.search);
+const TOP_UP = r => { const me = G.p[0]; Object.keys(r).forEach(k => { me.res[k] = Math.max(me.res[k], r[k]); }); render(); };
+const tsel = (sel, test) => () => { const e = [...document.querySelectorAll(sel)].find(x => x.getBoundingClientRect().width && (!test || test(x))); return e || null; };
+function guidedSteps() {
+  const step = (id, title, say, target, wait, extra) => Object.assign({ id, title, say, target, wait, ready: () => tmine() }, extra || {});
+  const site = lv => tsel('.site.l' + lv + '.glow');
+  const isSite = lv => a => a.what === 'site' && G.sites[a.x] && G.sites[a.x].lvl === lv;
+  const selSite = () => tq(() => $('.site.sel'));
+  const mine = id => (G.sites.findIndex(x => x.occ === 0 && x.guard) === -1 ? null : $(`.site[data-i="${G.sites.findIndex(x => x.occ === 0 && x.guard)}"]`));
+  const artNoQ = () => {   /* put an artifact whose effect asks nothing in the last market slot, so the next step can follow at once */
+    const ids = [G.row[5]].concat(G.arts || []).filter(Boolean);
+    for (const id of ids) { const H = VG.clone(G); H.row[5] = id; const pp = H.p[0]; pp.res.compass = 9; const m = VG.moves(H).find(x => x.t === 'buy' && x.r === 5); if (!m) continue; VG.apply(H, m); if (!H.q) { const k = G.arts.indexOf(id); if (k >= 0) G.arts[k] = G.row[5]; G.row[5] = id; return V.CARDS[id].cost; } }
+    return 3; };
+  return [
+    step('g-turn', 'One action', 'Each turn: one action, then Tamsin moves.', tq('#opp'), null),
+    step('g-play', 'Play a card', 'Tap Trail Notes in your hand.', tq(() => $('#hand .cd[data-id="trail"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }),
+    step('g-play2', 'Play a card', 'Tap it again to play it: plus 1 compass.', tq(() => $('#hand .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
+      { ready: () => tmine() && !!$('#hand .cd.sel') }),
+    step('g-travel', 'Travel', 'Sites show travel icons. Each card pays one icon.', tq('#map'), null),
+    step('g-dig', 'Dig at a camp', 'Tap a glowing camp site to send an explorer.', site(0), { type: 'tap', match: isSite(0) }, { ready: () => tmine() && !!$('.site.l0.glow') }),
+    step('g-dig2', 'Dig at a camp', 'Tap it again: your card pays, you take its goods.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'dig' }),
+    step('g-disc', 'Discover a ruin', 'Ruins cost 3 compasses plus travel. Tap a glowing ruin.', site(1), { type: 'tap', match: isSite(1) },
+      { onEnter: () => TOP_UP({ compass: 3, coin: 2 }), ready: () => tmine() && !!$('.site.l1.glow') }),
+    step('g-disc2', 'Discover a ruin', 'Tap it again to explore it.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }),
+    step('g-idol', 'Idols', 'You found an idol: 3 points, and a gift now.', tq('#extra'), null),
+    step('g-guard', 'A guardian wakes', 'A guardian woke here. Beat it, or take Dread later.', tq(mine), null),
+    step('g-beat', 'Overcome it', 'Pay its cost to beat it. Tap the guardian site.', tq(mine), { type: 'tap', match: a => a.what === 'site' },
+      { onEnter: () => { const x = G.sites.find(z => z.occ === 0 && z.guard); if (x) TOP_UP(V.GUARD[x.guard].cost); } }),
+    step('g-beat2', 'Overcome it', 'Tap it again: 5 points and a boon.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'beat' }),
+    step('g-boon', 'Boons', 'Your boon: use it once, any turn, for free.', tq('#extra'), null),
+    step('g-shrine', 'Shrines', 'Set an idol in a shrine for a free bonus.', tq('#extra'), null),
+    step('g-item', 'Buy an item', 'Items cost coins. Tap the first market card.', tq('#row .cd[data-r="0"]'), { type: 'tap', match: a => a.what === 'row' && a.x === 0 },
+      { onEnter: () => TOP_UP({ coin: V.CARDS[G.row[0]].cost }) }),
+    step('g-item2', 'Buy an item', 'Tap again: it goes under your deck.', tq(() => $('#row .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }),
+    step('g-art', 'Buy an artifact', 'Artifacts cost compasses and work at once. Tap it.', tq('#row .cd[data-r="5"]'), { type: 'tap', match: a => a.what === 'row' && a.x === 5 },
+      { onEnter: () => { const c = artNoQ(); TOP_UP({ compass: c }); } }),
+    step('g-art2', 'Buy an artifact', 'Tap again to buy it and use it now.', tq(() => $('#row .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }),
+    step('g-res', 'Research', 'Pay to climb the magnifier. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
+      { onEnter: () => TOP_UP(V.TRACK[G.p[0].glass + 1].cost) }),
+    step('g-res2', 'Research', 'Tap again: up one row, take its bonus.', tq(() => $('#gobtn') || $('#track')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' }),
+    step('g-note', 'Notebook', 'The notebook follows, but never passes the magnifier.', tq('#track'), null),
+    step('g-temple', 'Temple', 'At the top, buy temple tiles for big points.', tq('#track'), null),
+    step('g-fear', 'Dread', 'Beside a guardian at round end? Take a Dread card.', tq('#hand'), null),
+    step('g-round', 'Round end', 'Played cards shuffle under your deck. Draw back to 5.', tq('#hand'), null),
+    step('g-pass', 'Pass', 'Five rounds in a game. Tap Pass to end yours.', tq('#passbtn'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' },
+      { ready: () => tmine() && !!$('#passbtn') })
+  ];
+}
 function tutSteps() {
   const sc = () => { const a = VG.score(G, 0), b = VG.score(G, 1); return [a, b]; };
   const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs .rplayers')) || $('#opp');
   return [
-    { id: 'goal', title: 'How to win', say: 'Most points after the last round wins. Score with research, ruins and cards.', target: tq('#opp'), wait: null, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
+    { id: 'goal', title: 'How to win', say: 'Most points after the last round wins.', target: tq('#opp'), wait: null, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
     { id: 'hand', title: 'Your first move', say: 'Each turn you do one thing. Tap Trail Notes in your hand.', target: tq(() => $('#hand .cd[data-id="trail"]')),
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() },
     { id: 'play', title: 'Your first move', say: 'It gives 1 compass. Tap it again, or drag it up.', target: tq(() => $('#hand .cd.sel') || $('#gobtn')),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.sel && UI.sel.k === 'hand' && $('#hand .cd.sel')), onEnter: () => { CO.seen.play = 1; } },
+    ...(GUIDED ? guidedSteps() : []),
     { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
       onEnter: () => { UI.coachFree = true; setTimeout(() => { try { GXT.stop(); } catch (x) { } render(); }, 0); } },   /* the tutor steps aside: free play, Pell coaches */
     { id: 'score1', title: 'The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research: you ${a.research + a.temple}, Tamsin ${b.research + b.temple}. Higher rows score more.`; },
@@ -137,7 +188,7 @@ function tutStart(o) {
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters[0];
   CO.seen = {}; CO.q = []; CO.cur = null; CO.fb = 0; CO.over = false;
   UI.coachFree = false;
-  TUTCFG = { game: TUT_GAME, steps: tutSteps().filter(x => !/^score/.test(x.id)), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+  TUTCFG = { game: TUT_GAME, steps: tutSteps().filter(x => !/^score/.test(x.id) && !(GUIDED && (x.id === 'hand' || x.id === 'play'))), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'Prologue complete', endText: o ? 'Pell: "You played a full expedition. Now the coast awaits."' : 'Pell: "That was one round. A real game has 5."',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start stage 1' }] : null,
     setup: tutSetup,

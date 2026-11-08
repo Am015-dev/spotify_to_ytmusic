@@ -1,3 +1,33 @@
+# W490 (8 Nov 2026): the default tutorial is a GUIDED first game (owner: gameplay first)
+
+Learn to play = a real 1-round game where every core rule is taught in order: one sentence of 12 words or fewer and one highlighted tap
+per step (src/ui4.js `guidedSteps`). Tamsin only plays cards, then passes, so the taught sites stay free. Missing goods are topped up
+just before the step that needs them. Then the score walk, then the end card starts a real game. `?tut=coach` = the older coached free play below.
+Test: `node guided-tut-test.js` (390x844 and 375x667, touch, highlighted taps only): all 28 steps in order, every line 12 words or fewer, end card, 0 errors.
+
+| # | step id | rule taught |
+|---|---|---|
+| 1 | goal | most points after the last round wins |
+| 2 | g-turn | one action a turn, then the rival |
+| 3-4 | g-play, g-play2 | play a card for its effect |
+| 5 | g-travel | travel icons, each card pays one |
+| 6-7 | g-dig, g-dig2 | dig at a camp with an explorer, take its goods |
+| 8-9 | g-disc, g-disc2 | discover a ruin: 3 compasses plus travel |
+| 10 | g-idol | idols: 3 points and a gift |
+| 11 | g-guard | a guardian wakes; beat it or take Dread |
+| 12-13 | g-beat, g-beat2 | overcome it: pay, 5 points and a boon |
+| 14 | g-boon | boons: once, free |
+| 15 | g-shrine | idol into a shrine: free bonus (idol slots) |
+| 16-17 | g-item, g-item2 | buy an item with coins, under the deck |
+| 18-19 | g-art, g-art2 | buy an artifact with compasses, works at once |
+| 20-21 | g-res, g-res2 | research: the magnifier climbs, row bonus |
+| 22 | g-note | the notebook follows, never passes |
+| 23 | g-temple | temple tiles at the top |
+| 24 | g-fear | Dread for an explorer beside a guardian at round end |
+| 25 | g-round | round end: played cards under the deck, draw to 5 |
+| 26 | g-pass | 5 rounds; pass to end your round |
+| 27-29 | score1-3 | final scoring with your real numbers, tie-break, 5 rounds |
+
 # Vinegrave tutorial coverage (W378, ADDENDUM 4: a coached first game)
 
 The tutorial is the story's prologue and a REAL game: 1 round (W378c: short enough that any player, or a random tapper, reaches the final count) against the real computer (Tamsin, easy). There are only 2 forced steps

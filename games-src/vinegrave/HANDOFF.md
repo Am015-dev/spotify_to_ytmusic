@@ -6,6 +6,8 @@
   research = vertical path at the right (temple on top, notebook/magnifier tokens climb), fanned hand, goods as tokens with words.
 - Tests: drag-test PASS (time budget 180 s; disabled "cannot pay" choice no longer tapped), touch-test updated to the tap+Go flow
   (`W=375 H=667`, `FULL=1` plays to the result), `node w490-shots.js` makes playable-shots/w490/. smoke.js still uses old #acts (fails on the old build too).
+- Gameplay first: Learn to play = guided game, every core rule in order (TUTORIAL-COVERAGE.md, `node guided-tut-test.js`); tut-test.js now
+  runs ?tut=coach (stale since W477). rules-test: 2 stale expectations fixed (discover refunds via loot/idol; rival stack 10). No new engine rule gaps.
 
 # W477 (8 Nov 2026): one board, real pieces (REVIEW-FIX R1, COPY-FIX, DESIGN-FIX)
 - Play screen = ONE board at every size: score strip, three site terraces (deep ruins, ruins, camp), research track (rows 0-7 + temple), market;
