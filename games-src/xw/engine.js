@@ -137,7 +137,7 @@ function executeMove(s,m,done){const b=B(s),p0={x:s.x,y:s.y,h:s.h},L=m.s===0?0:t
   if(s.alive)exAfterMove(s,m,bumpedInto,tp);
   done()}
 function afterMove(s,m){if(!s.alive){endActivation(s);return}
-  const white=s.flags.ionMove;s.flags.ionMove=false;const green=m.c==='g'&&!white;
+  const white=s.flags.ionMove;s.flags.ionMove=false;if(white)s.flags.skipAct=true;/* [W445] an ionised ship flies its forced straight 1 and takes no action */const green=m.c==='g'&&!white;
   if(m.c==='r'&&!white){addStress(s);lg(s.side,`${sname(s)} flies a red maneuver and takes a stress token.`);
     if(crit(s,'breach')){const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)}'s hull breach strains: rolls ${f}.`);if(f==='hit')dealDamage(s,1,0,null);if(!s.alive){endActivation(s);return}}}
   if(green){if(s.stress>0){s.stress--;lg(s.side,`${sname(s)} flies a green maneuver and clears a stress token.`)}
@@ -248,8 +248,8 @@ function declare(s,wk,tid){if(G.phase!=='target'||G.cur!==s.id)return false;
   exPreRoll(s,d,w,t,again,P=>rollAttack(s,d,w,t,again,bonus,P));return true}
 function rollAttack(s,d,w,t,again,bonus,P){const WU=w.ui!=null?UPGRADES[s.ups[w.ui].id].wpn:{};if(WU.discard&&(WU.twice?again:!again))s.ups[w.ui].gone=true;// a two-shot missile is discarded after its second attack
   let nAtk=shotDice(s,w,t,d).atk+P.extra;
-  const blind=s.dmg.find(x=>x.up&&DAMAGE[x.c].k==='blinded');if(blind){nAtk=0;blind.up=false;lg(s.side,`${sname(s)} is flash-blinded and rolls no attack dice.`)}
-  G.atk={a:s.id,d:d.id,w:w.k,wn:w.n,rg:t.rg,obs:t.obstructed,bonus:w.bonus,dice:[],def:[],rr:[],rrd:[],step:'amod',ups:w.ui,used:[],ion:!!WU.ion,noEvade:!!WU.noEvade,second:!!again,jammed:-1,lockSpent:P.lockSpent,gun:!!bonus};
+  const blind=s.dmg.find(x=>x.up&&DAMAGE[x.c].k==='blinded');/* [W445] Blinded Pilot: the next attack's dice cannot be modified */
+  G.atk={a:s.id,d:d.id,w:w.k,wn:w.n,rg:t.rg,obs:t.obstructed,bonus:w.bonus,dice:[],def:[],rr:[],rrd:[],step:'amod',ups:w.ui,used:[],ion:!!WU.ion,noEvade:!!WU.noEvade,second:!!again,jammed:-1,lockSpent:P.lockSpent,gun:!!bonus,noMod:!!blind};if(blind){blind.up=false;lg(s.side,`${sname(s)} is flash-blinded and cannot modify its attack dice.`)}
   G.atk.dice=rollN(ATK_FACES,nAtk);if(WU.c2h)G.atk.dice=G.atk.dice.map(f=>f==='crit'?'hit':f);lg(s.side,`${sname(s)} fires ${w.k==='P'?'':w.n+' '}at ${sname(d)} (range ${t.rg}${t.obstructed?', obstructed':''}): ${diceText(G.atk.dice)}.`);
   fx('shot',{a:s.id,d:d.id,p:t.p,q:t.q,w:w.k,ion:G.atk.ion});
   G.phase=exDAMods().length?'damod':'amod';refresh()}
@@ -263,7 +263,7 @@ function pickDice(side,which,title,pool,max,fn,sel){sel=sel||[];const A=G.atk,fa
   return ask(side,'dice',title,`Tick ${max>=pool.length?'any of the':'up to '+max} dice, then confirm. A die can only be rerolled once per attack.`,pool.map(i=>({k:'t'+i,l:(sel.includes(i)?'☑ ':'☐ ')+lab(i)})).concat([{k:'ok',l:`Confirm (${sel.length} chosen)`,pri:1},{k:'x',l:'Cancel'}]),a=>{
     if(a==='x')return fn(null);if(a==='ok')return fn(sel.length?sel:null);const i=+a.slice(1);pickDice(side,which,title,pool,max,fn,sel.includes(i)?sel.filter(j=>j!==i):sel.length<max?sel.concat([i]):sel)})}
 // attacker modification options [R11]
-function atkMods(){const A=G.atk,s=ship(A.a),d=ship(A.d),out=[];const hex=pilotHas(d,'hex');
+function atkMods(){const A=G.atk,s=ship(A.a),d=ship(A.d),out=[];if(A.noMod)return out;const hex=pilotHas(d,'hex');
   if(!hex&&(s.tl===A.d||s.tl2===A.d)&&rerollPool('tl').length)out.push({k:'tl',l:'Spend target lock: reroll',d:'Choose any of your dice and reroll them.'});
   if(A.w!=='P'&&UPGRADES[s.ups[A.ups].id].wpn.f2c&&!A.used.includes('f2c')&&cnt(A.dice,'focus'))out.push({k:'f2c',l:'Torpedo: focus → crit',d:'Change 1 focus result to a crit.'});
   if(s.flags.dead&&!A.used.includes('dead')&&cnt(A.dice,'focus'))out.push({k:'dead',l:'Deadshot focus',d:'Change 1 focus to a crit and the other focus results to hits.'});
