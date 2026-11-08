@@ -182,8 +182,9 @@ function setHints(on) {
   var bl = document.getElementById('bulbbtn'); if (bl) bl.hidden = !hintsOn();
   if (G && G.phase === 'plan' && !UI.busy && !$('#game').hidden && G.cars[UI.seat] && !G.cars[UI.seat].plan) drawPlan(); else tracker();
 }
-/* ---------- scenery (R9: "fill the infield, not a flat grey strip"): grass, trees, stands, run-off sand in the track art's
-   flat style, drawn over the art with the road cut out, so the art's road and kerbs stay on top. One cached layer per track. */
+/* ---------- scenery: painted grass, trees, tents, stands and run-off sand drawn over the track art with the road cut out,
+   so the art's road, kerbs and start line stay on top. Soft gradients, blurred shadows and brush dabs (one painted style).
+   One cached 1000x600 layer per track. */
 var SCENE = {};
 function sceneryLayer(id) {
   if (SCENE[id]) return SCENE[id];
@@ -191,37 +192,64 @@ function sceneryLayer(id) {
   var seed = 7; for (var q = 0; q < id.length; q++) seed = (seed * 31 + id.charCodeAt(q)) >>> 0;
   function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
   function dRoad(x, y) { var m = 1e9; for (var i = 0; i < tk.dense.length; i += 2) { var p = tk.dense[i], d = (p[0] - x) * (p[0] - x) + (p[1] - y) * (p[1] - y); if (d < m) m = d; } return Math.sqrt(m); }
-  /* grass with mowing stripes */
-  g.fillStyle = '#2d6a45'; g.fillRect(0, 0, 2000, 1200);
-  g.fillStyle = '#327550'; for (var sx = -1200; sx < 2000; sx += 120) { g.beginPath(); g.moveTo(sx, 1200); g.lineTo(sx + 60, 1200); g.lineTo(sx + 60 + 1200, 0); g.lineTo(sx + 1200, 0); g.closePath(); g.fill(); }
-  /* run-off sand on the outside of every corner */
+  function shadow(blur, ox, oy, a) { g.shadowColor = 'rgba(8,20,12,' + a + ')'; g.shadowBlur = blur; g.shadowOffsetX = ox; g.shadowOffsetY = oy; }
+  function noShadow() { g.shadowColor = 'transparent'; g.shadowBlur = 0; g.shadowOffsetX = 0; g.shadowOffsetY = 0; }
+  /* grass: lit from the top left, soft mowing bands, then thousands of brush dabs */
+  var gr = g.createLinearGradient(0, 0, 2000, 1200); gr.addColorStop(0, '#3f8a52'); gr.addColorStop(0.55, '#2f7445'); gr.addColorStop(1, '#245d38'); g.fillStyle = gr; g.fillRect(0, 0, 2000, 1200);
+  g.fillStyle = 'rgba(255,255,230,.045)'; for (var sx = -1200; sx < 2000; sx += 140) { g.beginPath(); g.moveTo(sx, 1200); g.lineTo(sx + 70, 1200); g.lineTo(sx + 70 + 1200, 0); g.lineTo(sx + 1200, 0); g.closePath(); g.fill(); }
+  g.lineCap = 'round';
+  for (var n = 0; n < 5200; n++) { var x = rnd() * 2000, y = rnd() * 1200, l = 6 + rnd() * 12, a = -0.9 + rnd() * 0.5, t = rnd();
+    g.strokeStyle = t < 0.5 ? 'rgba(20,60,32,.22)' : t < 0.85 ? 'rgba(110,170,90,.18)' : 'rgba(200,220,140,.16)'; g.lineWidth = 2 + rnd() * 3;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke(); }
+  /* run-off sand on the outside of every corner, raked, with a painted tyre wall behind */
   tk.list.forEach(function (k) {
     var a = tk.at(k.idx * tk.seg), ox = a.x - Math.sin(a.a) * 150, oy = a.y + Math.cos(a.a) * 150;
-    g.save(); g.translate(ox, oy); g.rotate(a.a); g.fillStyle = '#d9c08a'; g.beginPath(); g.ellipse(0, 0, 150, 58, 0, 0, 7); g.fill();
-    g.fillStyle = 'rgba(160,130,80,.35)'; for (var t = 0; t < 14; t++) { g.beginPath(); g.arc((rnd() - .5) * 220, (rnd() - .5) * 70, 3, 0, 7); g.fill(); } g.restore();
-    /* tyre wall behind the sand */
+    g.save(); g.translate(ox, oy); g.rotate(a.a);
+    var sg = g.createRadialGradient(-30, -15, 10, 0, 0, 160); sg.addColorStop(0, '#f0dca6'); sg.addColorStop(0.7, '#d8bd84'); sg.addColorStop(1, '#bfa06a');
+    shadow(14, 0, 4, .35); g.fillStyle = sg; g.beginPath(); g.ellipse(0, 0, 150, 58, 0, 0, 7); g.fill(); noShadow();
+    g.strokeStyle = 'rgba(150,118,70,.35)'; g.lineWidth = 2; for (var r = -3; r <= 3; r++) { g.beginPath(); g.ellipse(0, r * 6, 120 - Math.abs(r) * 12, 6, 0, Math.PI * 0.1, Math.PI * 0.9); g.stroke(); }
+    g.restore();
     var wx = a.x - Math.sin(a.a) * 222, wy = a.y + Math.cos(a.a) * 222;
-    for (var w = -5; w <= 5; w++) { var px = wx + Math.cos(a.a) * w * 22, py = wy + Math.sin(a.a) * w * 22; g.fillStyle = '#1b1e24'; g.beginPath(); g.arc(px, py, 10, 0, 7); g.fill(); g.fillStyle = w % 2 ? '#e8e4d8' : '#d23a2c'; g.beginPath(); g.arc(px, py, 4.5, 0, 7); g.fill(); }
+    for (var w = -5; w <= 5; w++) { var px = wx + Math.cos(a.a) * w * 22, py = wy + Math.sin(a.a) * w * 22;
+      shadow(6, 2, 3, .45); var tg = g.createRadialGradient(px - 3, py - 3, 1, px, py, 11); tg.addColorStop(0, '#4a4f5a'); tg.addColorStop(1, '#14161b'); g.fillStyle = tg; g.beginPath(); g.arc(px, py, 10, 0, 7); g.fill(); noShadow();
+      g.fillStyle = w % 2 ? '#efe9da' : '#d4402f'; g.beginPath(); g.arc(px, py, 4.5, 0, 7); g.fill(); }
   });
-  /* grandstands along the start straight, on the outside */
+  /* grandstands along the start straight, outside: shaded roof, tiers, a painted crowd */
   [-3, -1.6, 1.6].forEach(function (o, n) {
     var a = tk.at(o * tk.seg * 1.4), bx = a.x - Math.sin(a.a) * 205, by = a.y + Math.cos(a.a) * 205;
     if (bx < 90 || bx > 1910 || by < 60 || by > 1140) return;
     g.save(); g.translate(bx, by); g.rotate(a.a);
-    g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(-106, -26, 220, 64); g.fillStyle = '#5a6478'; g.fillRect(-110, -32, 220, 64); g.fillStyle = '#c8352b'; g.fillRect(-110, -38, 220, 10);
+    shadow(18, 6, 10, .5); var bg = g.createLinearGradient(0, -32, 0, 32); bg.addColorStop(0, '#7a8498'); bg.addColorStop(1, '#4a5366'); g.fillStyle = bg; g.fillRect(-110, -32, 220, 64); noShadow();
+    for (var r = 0; r < 3; r++) { g.fillStyle = 'rgba(0,0,0,' + (0.10 + r * 0.05) + ')'; g.fillRect(-110, -24 + r * 17, 220, 2); }
+    var rg = g.createLinearGradient(0, -42, 0, -26); rg.addColorStop(0, '#e2574a'); rg.addColorStop(1, '#a8281c'); g.fillStyle = rg; g.fillRect(-114, -42, 228, 13);
     var cols = ['#ffd24a', '#4a9bff', '#ff6b5a', '#f1f4fa', '#3ec47c', '#c08cff'];
-    for (var r = 0; r < 3; r++) for (var s = 0; s < 18; s++) { g.fillStyle = cols[(r * 7 + s * 3 + n) % cols.length]; g.beginPath(); g.arc(-100 + s * 11.8, -16 + r * 17, 4.6, 0, 7); g.fill(); }
+    for (r = 0; r < 3; r++) for (var s2 = 0; s2 < 18; s2++) { var cx0 = -100 + s2 * 11.8 + (rnd() - .5) * 3, cy0 = -15 + r * 17 + (rnd() - .5) * 2;
+      g.fillStyle = cols[(r * 7 + s2 * 3 + n) % cols.length]; g.beginPath(); g.arc(cx0, cy0, 4.6, 0, 7); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.arc(cx0 - 1.4, cy0 - 1.6, 1.6, 0, 7); g.fill(); }
     g.restore();
   });
-  /* trees and tents wherever there is room (not on or next to the road) */
+  /* trees (layered canopy, light from the top left, soft cast shadow) and a few tents, wherever there is room */
+  function tree(px, py, R) {
+    shadow(16, 10, 12, .45); g.fillStyle = '#1d4e2f'; g.beginPath(); g.arc(px, py, R, 0, 7); g.fill(); noShadow();
+    for (var k = 0; k < 6; k++) { var an = rnd() * 6.28, dd = R * (0.25 + rnd() * 0.45), rr2 = R * (0.42 + rnd() * 0.3), qx = px + Math.cos(an) * dd, qy = py + Math.sin(an) * dd;
+      var cg = g.createRadialGradient(qx - rr2 * .45, qy - rr2 * .45, rr2 * .1, qx, qy, rr2); cg.addColorStop(0, '#6db86a'); cg.addColorStop(0.55, '#357f46'); cg.addColorStop(1, '#1e5432');
+      g.fillStyle = cg; g.beginPath(); g.arc(qx, qy, rr2, 0, 7); g.fill(); }
+    g.fillStyle = 'rgba(210,240,160,.35)'; for (k = 0; k < 4; k++) { g.beginPath(); g.arc(px - R * .35 + rnd() * R * .3, py - R * .4 + rnd() * R * .3, 2 + rnd() * 3, 0, 7); g.fill(); }
+  }
+  function tent(px, py) {
+    var warm = rnd() < .5; shadow(12, 6, 8, .45);
+    var tg = g.createLinearGradient(px - 30, py, px + 30, py); tg.addColorStop(0, warm ? '#ffc766' : '#fbf6ea'); tg.addColorStop(0.5, warm ? '#f2a03a' : '#e6dfcf'); tg.addColorStop(1, warm ? '#c9781e' : '#b9b09c');
+    g.fillStyle = tg; g.beginPath(); g.moveTo(px - 30, py + 18); g.lineTo(px, py - 22); g.lineTo(px + 30, py + 18); g.closePath(); g.fill(); noShadow();
+    g.strokeStyle = warm ? 'rgba(150,70,10,.45)' : 'rgba(120,110,90,.45)'; g.lineWidth = 2; g.beginPath(); g.moveTo(px, py - 22); g.lineTo(px, py + 18); g.stroke();
+  }
   for (var y = 60; y < 1160; y += 64) for (var x = 60; x < 1960; x += 64) {
     var px = x + (rnd() - .5) * 44, py = y + (rnd() - .5) * 44, d = dRoad(px, py), r0 = rnd();
     if (d < 175) continue;
-    if (r0 < 0.3) { var R = 22 + rnd() * 16; g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(px + 7, py + 9, R, 0, 7); g.fill(); g.fillStyle = '#1f5a36'; g.beginPath(); g.arc(px, py, R, 0, 7); g.fill(); g.fillStyle = '#2b7646'; g.beginPath(); g.arc(px - R * .25, py - R * .25, R * .62, 0, 7); g.fill(); }
-    else if (r0 < 0.47 && d < 330) { g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(px - 26, py - 16, 58, 40); var tc = rnd() < .5 ? '#e8e4d8' : '#ffb347'; g.fillStyle = tc; g.beginPath(); g.moveTo(px - 30, py + 18); g.lineTo(px, py - 22); g.lineTo(px + 30, py + 18); g.closePath(); g.fill(); g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.moveTo(px, py - 22); g.lineTo(px + 30, py + 18); g.lineTo(px, py + 18); g.closePath(); g.fill(); }
+    if (r0 < 0.3) tree(px, py, 22 + rnd() * 16);
+    else if (r0 < 0.35 && d < 330) tent(px, py);
   }
   /* cut the road out so the track art's road, kerbs and start line show through */
-  g.globalCompositeOperation = 'destination-out'; g.lineJoin = 'round'; g.lineCap = 'round'; g.lineWidth = 172; g.beginPath();
+  g.globalCompositeOperation = 'destination-out'; g.strokeStyle = '#000'; g.lineJoin = 'round'; g.lineCap = 'round'; g.lineWidth = 172; g.beginPath();
   tk.dense.forEach(function (p, i) { if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.closePath(); g.stroke();
   g.globalCompositeOperation = 'source-over';
   return (SCENE[id] = c);

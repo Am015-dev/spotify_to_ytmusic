@@ -17,13 +17,13 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
     };
     await p.waitForFunction(() => GXT.state().shown, null, { timeout: 10000 });
     const s0 = await p.evaluate(() => GXT.state().id); if (s0 !== 'aim') problems.push('first step ' + s0);   // how you win, then Next
-    await tap('.gxt-next'); await p.waitForFunction(() => GXT.state().shown && GXT.state().id === 'gear', null, { timeout: 10000 });
+    await p.waitForTimeout(700); await tap('.gxt-next'); await p.waitForFunction(() => GXT.state().shown && GXT.state().id === 'gear', null, { timeout: 10000 });
     const s1 = await p.evaluate(() => GXT.state().id); if (s1 !== 'gear') problems.push('second step ' + s1);
-    await tap('.gb[data-g="2"]');
+    await p.waitForTimeout(700); await tap('.gb[data-g="2"]');   // the shell ignores taps in the first 600 ms of a step
     await p.waitForFunction(() => GXT.state().shown && GXT.state().id === 'cards', null, { timeout: 10000 });
-    await tap('#hand .cd:not(.dead):not(.sel)'); await p.waitForTimeout(250);
+    await p.waitForTimeout(700); await tap('#hand .cd:not(.dead):not(.sel)'); await p.waitForTimeout(250);
     await p.waitForFunction(() => GXT.state().shown, null, { timeout: 10000 });
-    await tap('#hand .cd:not(.dead):not(.sel)'); await p.waitForTimeout(600);
+    await p.waitForTimeout(700); await tap('#hand .cd:not(.dead):not(.sel)'); await p.waitForTimeout(600);
     if (!(await p.evaluate(() => !GXT.active()))) problems.push('forced steps did not hand over to free play');
     const t0 = Date.now(); let done = false, bubbles = 0, maxBub = 0, covers = 0;
     while (Date.now() - t0 < 200000 && !done) {
