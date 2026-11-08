@@ -375,18 +375,18 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 #docktitle{flex-wrap:nowrap;overflow:hidden}#docktitle .trk{white-space:nowrap}#docktitle b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body:has(#rs:not([hidden])) #turnover,body:has(.gxt-cell) #turnover,body:has(.gxt-end) #turnover{display:none}
 /* W427 v4: printed-card look (sepia paper, ink frame) + readable phone: big art, icon stats, one focus area at a time */
-:root{--ink:#2a1d0e;--paper:#efe2c0;--paper2:#e4d3a8;--sepia:#8a5a2b;--jungle:#1f3a2a;--gold:#d9a441;--jade:#3fa07a}
+:root{--vg-ink:#2a1d0e;--vg-paper:#efe2c0;--vg-paper2:#e4d3a8;--vg-sepia:#8a5a2b;--vg-jungle:#1f3a2a;--vg-gold:#d9a441;--vg-jade:#3fa07a}
 .op .sbi{display:inline-flex;align-items:center;gap:2px;margin-right:8px;font-weight:800;font-size:14px;color:#f3e6bf}
 .op .sbi svg{width:18px;height:18px;flex:none}
-.cd{background:var(--paper);border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--paper),inset 0 0 0 3px rgba(42,29,14,.45),0 2px 4px rgba(0,0,0,.35)}
-.cd.item{border-color:var(--ink);background:var(--paper)}
+.cd{background:var(--vg-paper);border:2px solid var(--vg-ink);box-shadow:inset 0 0 0 2px var(--vg-paper),inset 0 0 0 3px rgba(42,29,14,.45),0 2px 4px rgba(0,0,0,.35)}
+.cd.item{border-color:var(--vg-ink);background:var(--vg-paper)}
 .cd.art{border-color:#1e3527;background:#dfe6cf}
 .cd.basic{border-color:#3a4a2a;background:#ece2c4}
 .cd.fear{border-color:#1a0a08;background:#3a2420;color:#f6e6e6}
 .cd .pic{background:#cdb98a}.cd.art .pic{background:#2c3a2c}.cd.fear .pic{background:#1a0d0d}.cd.basic .pic{background:#b9b08a}
 .cd .pic::after{inset:0;border:1px solid rgba(42,29,14,.6);border-radius:3px}
 .cd .pic.hasart{background-size:cover!important}
-.site{border:2px solid var(--ink);box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.site{border:2px solid var(--vg-ink);box-shadow:0 2px 4px rgba(0,0,0,.4)}
 .site .pic.hasart{background-size:cover!important}
 @media (max-width:999px){
   /* explorers strip: one line, icon + number chips; tap opens the score sheet that explains them */
@@ -465,3 +465,26 @@ body:has(#rs:not([hidden])) #turnover,body:has(.gxt-cell) #turnover,body:has(.gx
   #opp .op .sbi{margin-right:3px}#opp .op .sbi svg{width:15px;height:15px}
   #opp.n3 .op .sb,#opp.n4 .op .sb{display:none}
 }
+@media (min-width:1000px){
+  #insp{width:min(640px,calc(100vw - 32px))}
+  #insp .big{width:220px}#insp .big .cd{width:220px;height:310px}
+  #insp .big .cd .pic{flex:0 0 auto!important;aspect-ratio:4/3;min-height:0!important}
+  #insp .big .site{width:220px!important;height:165px!important}
+  #insp .por{width:150px!important;height:150px!important}
+}
+@media (max-width:999px){#start{align-items:flex-end}#start .tbox{background:rgba(10,22,15,.9)}}
+/* strip readable on any board art; desktop sizes; short phones (<= 640 px tall) keep everything on screen */
+#opp .op{background:#13221a;color:#f3e6bf}
+.cd.fear .fx{background:#2a1010;border-radius:4px}
+@media (min-width:1000px){.op .sbi{font-size:16px}.op .sbi svg{width:20px;height:20px}#docktitle .trk,#docktitle .tok{font-size:16px}
+  .cd>.ptx{position:relative;z-index:3;background:#fbf3df!important;color:#1f1505!important}.cd .fx{background:#fbf3df;border-radius:4px;margin:0 3px 3px}.cd.fear .fx{background:#2a1010}}
+@media (max-width:999px) and (max-height:640px){
+  #prompt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body[data-vtab="map"] .ter .tl{display:none!important}
+  body[data-vtab="map"] #map{gap:6px!important;padding:4px!important}
+  body[data-vtab="map"] .site{min-height:0!important}
+  #hand .cd .pic{aspect-ratio:2/1!important}
+  #hand .cd .cn{font-size:14px!important;margin:2px 5px 4px!important}
+  #myres{min-height:36px}#acts .btn{min-height:36px}
+}
+@media (max-width:999px){body[data-vtab="map"] .ter{align-items:stretch}body[data-vtab="map"] .site{aspect-ratio:auto!important}}
