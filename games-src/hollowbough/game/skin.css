@@ -84,6 +84,24 @@ html:not(.hints-on) #bulbbtn{display:none!important}
 #trk .tr1{font-size:14px}
 .kv.why span{font-size:14px}
 @media (min-width:1024px){#trk .tr1,#trk .tr1 *{font-size:16px!important}}
+
+/* W509: tutorial bubble text starts below the Next button (never under it) */
+.gxt-bub:not(.gxt-nobtn) .gxh-tt{min-height:30px}
+
+/* W509 polish: the goal is a painted card over the board */
+#pc[data-card="goal"]{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(8,4,10,.55);overflow:hidden}
+#pc[data-card="goal"] .ph-head{display:none}
+#pc[data-card="goal"] .ph-body{flex:0 0 auto;height:auto;width:min(340px,100%);max-height:100%;overflow:auto;box-sizing:border-box;padding:0 0 14px;border-radius:18px;background:#f6ead0;color:#3b2a1c;border:2px solid #c9a35a;box-shadow:0 14px 40px rgba(0,0,0,.55)}
+.hb-goal{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+.hb-goal-art{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:16px 16px 0 0;margin-bottom:6px}
+.hb-goal-k{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7a5a2a}
+.hb-goal-t{margin:0;font-size:22px;line-height:1.15}
+.hb-goal ul.goal{list-style:none;margin:6px 16px 4px;padding:0;font-size:16px;line-height:1.35}
+.hb-goal ul.goal li{margin:4px 0}
+#pc[data-card="goal"] .cbtns{padding:6px 16px 0}
+#pc[data-card="goal"] .cbtns .btn{width:100%;min-height:48px;font-size:18px}
+/* W509 polish: the season change is a slim banner at the top of the board */
+.fxseason{top:8px!important;flex-direction:row!important;gap:8px!important;font-size:18px!important;padding:5px 16px 5px 8px;border-radius:20px;background:rgba(42,31,25,.9);border:1px solid rgba(255,224,138,.5);filter:none!important;white-space:nowrap}
 .gxt-next,.gxh-ok.gxt-next{min-height:44px}
 /* story map header on phones: the story title gets its own full row above Back / Tutorial / stars, words never broken */
 @media (max-width:600px){.gxc-head{flex-wrap:wrap;row-gap:4px}.gxc-htitle{order:-1;flex:1 0 100%;overflow-wrap:normal;word-break:keep-all;font-size:17px}}

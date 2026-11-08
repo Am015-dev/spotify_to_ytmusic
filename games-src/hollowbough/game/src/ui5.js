@@ -36,6 +36,15 @@ function newGame(mode, o) {
   return G;
 }
 function kitNewGame() { GX.undo.clear(); recapSeats(); UI.t0 = Date.now(); UI.resultDone = false; UI.earned = null; }
+// the result breakdown: one column per player, winner first, one row per way to score (zero rows left out)
+function overTable(ov) {
+  const ord = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total || ov.scores[b].left - ov.scores[a].left);
+  const t = h('table.vs.ovt'); t.appendChild(h('tr', h('th', ''), ord.map((s, k) => h('th' + (k === 0 ? '.win' : ''), pawn(s, 20), ' ' + G.players[s].name))));
+  [['Cards in city', 'cards'], ['Purple bonuses', 'bonus'], ['Point tokens', 'tokens'], ['Goals', 'events'], ['Journey', 'journey']].forEach(([k, f]) => { if (ord.some(s => ov.scores[s][f])) t.appendChild(h('tr', h('td', k), ord.map((s, i) => h('td' + (i === 0 ? '.win' : ''), ov.scores[s][f] || 0)))); });
+  t.appendChild(h('tr.tot', h('td', 'Total'), ord.map((s, i) => h('td' + (i === 0 ? '.win' : ''), h('b', ov.scores[s].total)))));
+  if (ov.tie) t.appendChild(h('tr', h('td', 'Goods left (tie-break)'), ord.map(s => h('td', ov.scores[s].left))));
+  return t;
+}
 function render() {
   if (!G || !UI.started) return;
   { const v = viewSeat(); if (v >= 0) GX.recap.view(v); }
@@ -55,6 +64,7 @@ function renderCard() {
   const btns = h('div.cbtns');
   (c.buttons || [{ label: 'Continue', a: 'cont' }]).forEach(x => btns.appendChild(h('button.btn.go' + (x.cls ? '.' + x.cls : ''), Object.assign({ 'data-a': x.a, type: 'button' }, x.at || {}), x.label)));
   body.appendChild(btns); pc.appendChild(body);
+  try { fitNames(pc); } catch (e) { }   // G8: names fit
 }
 function nextCard() { const c = UI.cards.shift(); if (c && c.onDone) c.onDone(); render(); schedule(); }
 function takeDevice() { const c = UI.cards.shift(); UI.holder = c && c.seat != null ? c.seat : HB.actor(G); render(); schedule(); }
@@ -162,15 +172,12 @@ function queueOver() {
   if (!G.grim) UI.cards.push({ kind: 'over-score', title: (() => { const ord = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total), w = ord[0], nm = G.players[w].name;
       if (ov.tie) return 'A tie at ' + ov.scores[w].total + ' points';
       return nm + (nm === 'You' ? ' win, ' : ' wins, ') + (G.np === 2 ? ov.scores[w].total + ' to ' + ov.scores[ord[1]].total : 'with ' + ov.scores[w].total + ' points'); })(),
-    sub: 'Final score', body: () => { const t = h('table.vs'); t.appendChild(h('tr', h('th', ''), G.players.map((p, s) => h('th', pawn(s, 22), ' ' + p.name))));
-      [['Card points', 'cards'], ['Point tokens', 'tokens'], ['Bonus cards', 'bonus'], ['Events', 'events'], ['Journey', 'journey']].forEach(([k, f]) => t.appendChild(h('tr', h('td', k), G.players.map((p, s) => h('td', ov.scores[s][f])))));
-      t.appendChild(h('tr.tot', h('td', 'Total'), G.players.map((p, s) => h('td', h('b', ov.scores[s].total)))));
-      return h('div', h('div.seasonrow', h('img.hero-tree', { src: 'models/ever-tree@512.webp', alt: '', draggable: 'false' })), t); } });
+    sub: 'Final score', body: () => h('div', h('div.seasonrow', h('img.hero-tree', { src: 'models/ever-tree@512.webp', alt: '', draggable: 'false' })), overTable(ov)) });
   if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
   const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
   UI.cards.push({
     kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: (UI.cfg && UI.cfg.tutorial) || G.grim || ov.tie || campOn() ? 'The game is over' : (G.players[ov.winner].ai ? HBS.quick.lose : HBS.quick.win),
-    body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Still tied after events and leftover resources.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
+    body: () => { const t = h('div.score'); if (!G.grim) t.appendChild(overTable(ov)); else order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Still tied after events and leftover resources.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
     buttons: NET.on ? netOverButtons() : campOn() ? [{ label: 'Continue the story', a: 'campfin' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }] : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
   if (!(UI.cfg && UI.cfg.tutorial)) clearSave(); render();

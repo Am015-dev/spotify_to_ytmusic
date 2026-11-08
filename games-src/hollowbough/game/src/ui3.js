@@ -62,7 +62,7 @@ function fxFly(node, from, to, ms, done) {
 function fxFloat(from, kind, txt, to, o) {
   o = o || {}; const L = fxLayer(); if (!L || !ANIM || !from) return;
   const e = h('div.fxp' + (o.neg ? '.neg' : ''), kind ? ic(kind, 22) : null, h('b', txt)); L.appendChild(e);
-  const a = ctr(from), jx = (o.slot || 0) * 22 - (o.n || 1) * 11 + 11, sx = a.x + jx, b = to ? ctr(to) : { x: sx, y: a.y - 70 };
+  const a0 = ctr(from), a = { x: a0.x, y: a0.y + ((o.slot || 0) - ((o.n || 1) - 1) / 2) * 32 }, sx = Math.max(50, Math.min((UI.lay ? UI.lay.W : innerWidth) - 50, a.x)), b = to ? ctr(to) : { x: sx, y: a.y - 70 };   // G8: stacked pills, kept on screen
   const up = o.neg ? 22 : -26;
   const f = [{ transform: `translate(${sx}px,${a.y}px) translate(-50%,-50%) scale(.5)`, opacity: 0 },
     { transform: `translate(${sx}px,${a.y + up}px) translate(-50%,-50%) scale(1.3)`, opacity: 1, offset: .25 },
@@ -99,8 +99,8 @@ function fxPost(pre, m, src) {
   let slot = 0; const n = items.filter(x => x.d > 0).length;
   for (const it of items) {
     if (it.d > 0) {
-      const to = mine ? (it.kind === 'card' ? (UI.lay && UI.lay.hand) : it.kind === 'point' ? seatRect(pre.seat) : frameRect($('.rs[data-res="' + it.kind + '"]'))) : chip;   // points fly to my score chip, never hang over the tabs
-      fxFloat(src, it.kind, '+' + it.d, to, { slot: slot++, n, bump: mine ? () => bump('.rs[data-res="' + it.kind + '"]') : null });
+      const to = it.kind === 'point' ? (seatRect(pre.seat) || chip) : mine ? (it.kind === 'card' ? (UI.lay && UI.lay.hand) : frameRect($('.rs[data-res="' + it.kind + '"]'))) : chip;
+      fxFloat(src, it.kind, '+' + it.d + (it.kind === 'point' ? (it.d === 1 ? ' point' : ' points') : ''), to, { slot: slot++, n, bump: it.kind === 'point' ? () => bump('.chip[data-seat="' + pre.seat + '"]') : mine ? () => bump('.rs[data-res="' + it.kind + '"]') : null });
     } else if (mine && it.kind !== 'point') {
       const at = frameRect($('.rs[data-res="' + it.kind + '"]')); fxFloat(at, it.kind, '\u2212' + (-it.d), null, { neg: true });
     }
@@ -109,11 +109,12 @@ function fxPost(pre, m, src) {
 }
 function ctr0() { const R = UI.lay; return R ? { x: R.W / 2 - 10, y: R.H / 2 - 10, w: 20, h: 20 } : null; }
 function fxSeason(s, mine) {
+  // a brief banner at the top of the board (fades in and out in about 1 s), never a sticker over the cards
   const L = fxLayer(); if (!L || !ANIM || !mine) return;
-  const e = h('div.fxseason', HBKit.season(SEAS[s], 110), h('b', SEASN[s])); L.appendChild(e);
-  const an = animate(e, [{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: .3 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .75 }, { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 0 }], { duration: 1100, fill: 'both' });
+  const e = h('div.fxseason', HBKit.season(SEAS[s], 28), h('b', SEASN[s])); L.appendChild(e);
+  const an = animate(e, [{ opacity: 0, transform: 'translate(-50%,-6px)' }, { opacity: 1, transform: 'translate(-50%,0)', offset: .25 }, { opacity: 1, transform: 'translate(-50%,0)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-6px)' }], { duration: 1000, easing: 'ease-out' });
   if (an) an.onfinish = () => e.remove(); else e.remove();
-  setTimeout(() => e.remove(), 1500);
+  setTimeout(() => e.remove(), 1200);
 }
 // after a move was applied and drawn: pieces land where they went
 function fxLand(m, seat, src, preChip) {

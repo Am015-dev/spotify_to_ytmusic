@@ -252,7 +252,7 @@ html.ph .pcard span,html.ph .pcard b,html.ph .gx-drawer b,html.ph .gx-drawer .sm
 html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!important}
 #bd.pv.wide .pvc-aff{white-space:normal!important;overflow:hidden}
 /* five piles (tokens too) on a phone: the worker count keeps its number and word, the meeple pictures step aside */
-#bd.pv.tall .resrow.r5 .pv-meeple{display:none}#bd.pv.tall .resrow.r5 .pv-wn{margin-left:0}
+#bd.pv.tall .resrow.r5 .pv-meeple:not(:first-child){display:none}#bd.pv.tall .resrow.r5 .pv-wn{margin-left:2px}   /* W509: with point tokens shown, one worker stays visible so it can still be dragged */
 /* W482 round 2: phone Places = the painted tree-stump table (owner art media/table-woodland-phone.webp) with round clearings on it */
 #bd.pv.tall .pv-spots.pv-board{display:block;position:relative;height:100%;padding:0;gap:0;border-radius:18px;overflow:hidden;background:#6b5233 url(media/table-woodland-phone.webp) center/cover no-repeat;box-shadow:inset 0 0 0 2px #3b2a1c}
 #bd.pv.tall .pv-board .pv-cell{position:absolute;width:32%;transform:translate(-50%,-50%);display:block}
@@ -297,6 +297,33 @@ html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!impo
 #bd.pv.tall .pvch-pt{font-size:17px;margin-left:auto;padding-left:3px}#bd.pv.tall .pvch-star{font-size:14px}
 #bd.pv.tall .chip .pawnw{transform:scale(.85);margin:0 -2px}
 #bd.pv.tall .pvsea b{font-size:14px}
+/* G8: the bar prompt is whole: up to 2 lines, light on the dark bar (replaces the W482 one-line clamp) */
+html.ph #prompt,html.ph .gx-bar #prompt{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2!important;white-space:normal!important;overflow:hidden;text-overflow:clip;font-size:14px!important;line-height:1.15!important;min-width:0;color:#f6e7c4!important;font-weight:700}
+html.ph .gx-bar #prompt.mine,html.sk.ph .gx-bar #prompt.mine{color:#ffd77a!important}
+html:not(.ph) .gx-bar #prompt{color:#f6e7c4!important}html:not(.ph) .gx-bar #prompt.mine{color:#ffd77a!important}
+/* G8: choice buttons say the whole thing (wrap, never cut) */
+#acts .tchip b{white-space:normal;line-height:1.1;text-align:center;overflow-wrap:normal;word-break:normal}
+#acts.tray .tchip{min-height:44px;height:auto}
+/* G8: names never cut a word (fitNames() shrinks the font); no mid-word breaks */
+#bd.pv .pvc-name,#bd.pv .pvm-name,#bd.pv .pv-sw b,#bd.pv .hcn{word-break:normal;overflow-wrap:normal;hyphens:none;overflow:hidden}
+/* G8: goals are readable: dark ink on light paper, 14px+ */
+#bd.pv .pv-panel[data-p=goals] .pv-sw b{color:#2a1f19;font-size:15px}
+#bd.pv .pv-panel[data-p=goals] .pv-sw span{color:#3b2a1c;opacity:1;font-size:14px;font-weight:700}
+/* G8: floating gains sit on their own pill, so they never garble over other text */
+.fxp{background:#2a1f19;border:2px solid #f2c45a;border-radius:999px;padding:1px 9px 1px 4px;z-index:40;box-shadow:0 2px 6px rgba(0,0,0,.45)}
+.fxp b{text-shadow:none!important;color:#fff3cf}
+.fxp.neg{border-color:#e08a70}
+/* G8: worker / card landing ring and the flying built card */
+.pv-ring{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:4px solid #fff3cf;box-shadow:0 0 12px #f2c45a;pointer-events:none;z-index:32;animation:pvring .8s ease-out forwards}
+.pv-ring.gold{border-color:#f2c45a}
+@keyframes pvring{from{transform:scale(.4);opacity:1}to{transform:scale(3.2);opacity:0}}
+.pv-ghost.pv-flycard{position:absolute;z-index:31;width:74px}
+@media (prefers-reduced-motion:reduce){.pv-ring{animation:none;display:none}}
+/* G8: result breakdown: winner's column stands out */
+.pcard table.vs.ovt{font-size:15px}
+.pcard table.vs.ovt th.win,.pcard table.vs.ovt td.win{background:rgba(242,196,90,.28)}
+.pcard table.vs.ovt th{white-space:normal}
+#acts.tray.wrap .tchip:not(.tcard):not(.tx){flex:1 1 40%;padding:2px 6px;gap:4px}
 /* W482 R5: every board place is a framed painted space (like a printed board square): its name on a wooden banner at the top,
    the reward plate under it, "shared" as a green badge on the painting, and the worker standing ON the painting */
 #bd.pv.tall .pv-board .tile.pv-place::before{width:100px;height:62px;border-radius:10px;border:3px solid #5b4026;box-shadow:inset 0 0 0 2px rgba(248,237,210,.55),0 4px 0 #3b2a1c,0 6px 8px rgba(0,0,0,.45)}
@@ -341,3 +368,7 @@ html #prompt:empty{display:none!important}
 #bd.pv .strip.hand .scount,#bd.pv.tall .strip.hand .scount{top:2px;line-height:1.25}
 #bd.pv.tall .pv-grid{grid-auto-rows:minmax(58px,1fr);overflow-y:auto;overscroll-behavior:contain}
 #bd.pv .pvc.small .pvc-name{padding-left:2px;padding-right:2px;letter-spacing:-.3px}
+/* R5: the cream prompt label wins over every older bar colour (the old pale-yellow line was ~1.3:1 on cream) */
+html.ph .gx-bar #prompt,html.sk.ph .gx-bar #prompt,html:not(.ph) .gx-bar #prompt,html.sk .gx-bar #prompt{background:#fff4dc;color:#2a1f19!important;text-shadow:none!important}
+html.ph .gx-bar #prompt.mine,html.sk.ph .gx-bar #prompt.mine,html:not(.ph) .gx-bar #prompt.mine,html.sk .gx-bar #prompt.mine{color:#6e3205!important}
+#bd.pv .pv-visit{height:90px}#bd.pv .pv-visit .sc,#bd.pv .strip.city .pv-visit .sc{width:70px;height:86px}
