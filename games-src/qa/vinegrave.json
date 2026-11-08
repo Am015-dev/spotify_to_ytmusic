@@ -2,11 +2,11 @@
  "slug": "vinegrave",
  "size": "phone",
  "seed": 52244,
- "when": "2026-11-07T23:40Z",
+ "when": "2026-11-08T01:20Z",
  "tutorial": {
-  "end": false,
+  "end": true,
   "coached": true,
-  "explained": 13,
+  "explained": 12,
   "explainedIds": [
    "oneaction",
    "setup",
@@ -19,19 +19,18 @@
    "research",
    "buyitem",
    "pass",
-   "buyart",
-   "roundend"
+   "buyart"
   ],
   "bubblesClosed": 0,
-  "clicks": 3096
+  "clicks": 44
  },
  "quick": {
   "result": "cap",
-  "clicks": 940
+  "clicks": 898
  },
  "story": {
   "result": "cap",
-  "clicks": 569
+  "clicks": 590
  },
  "fuzz": {
   "taps": 300
@@ -43,7 +42,7 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#start.ov.hasart \"Vinegrave Dig the ruins.\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases tutorial",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
@@ -51,39 +50,15 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button \"Map\" under div#start.ov.hasart \"Vinegrave Dig the ruins.\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases tutorial",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "overlapping clickables: button.cd.basic \"Patron Letter Gain 1 coi\" / button.cd.item \"4 Camp Gramo­phone 3\"",
+   "desc": "element outside viewport button.cd.basic x1 rect 390,632,501,743: \"Trail Notes\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases tutorial",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-tutorial-board-4.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-board",
-   "desc": "overlapping clickables: button.cd.fear \"Cree­ping Dread No effec\" / button.btn.alt \"See it among all cards\"",
-   "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases tutorial",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-tutorial-board-4.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-board",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#iscrim",
-   "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases tutorial",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-tutorial-board-4.png"
-  },
-  {
-   "sev": "MAJOR",
-   "phase": "tutorial",
-   "where": "tutorial click #3096 (Map)",
-   "desc": "coached game: GXCOACH.done never became true within 720 s (3096 clicks, 13 rules explained)",
-   "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases tutorial",
-   "shot": "/tmp/qa-shots/vinegrave/phone-coach-notdone-6.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-tutorial-board-2.png"
   },
   {
    "sev": "MINOR",
@@ -91,7 +66,7 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#start.ov.hasart \"Vinegrave Dig the ruins.\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases quick",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-title-7.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
@@ -99,55 +74,71 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button \"Map\" under div#start.ov.hasart \"Vinegrave Dig the ruins.\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases quick",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-title-7.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-title-3.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.cd.fear \"Cree­ping Dread No effec\" / button.tsb \"Look at the island\"",
+   "desc": "element outside viewport button.cd.basic x1 rect 390,632,501,743: \"Trail Notes\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases quick",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-quick-board-9.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-quick-board-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.cd.basic \"Trail Notes Gain 1 compa\" / button.tsb \"Title screen\"",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#iscrim",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases quick",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-quick-board-9.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick click #940 (×)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 940 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "where": "quick click #898 (Map)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 898 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases quick",
-   "shot": "/tmp/qa-shots/vinegrave/phone-quick-noresult-12.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-quick-noresult-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "element outside viewport button.cd.fear x1 rect 390,632,501,743: \"Cree­ping Dread\n-1\"",
+   "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-story-map-9.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "overlapping clickables: button.cd.fear \"Cree­ping Dread No effec\" / button.tsb \"Look at the island\"",
+   "desc": "element outside viewport button.cd.basic x1 rect 390,632,501,743: \"Trail Notes\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases story",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-story-board-15.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "overlapping clickables: button.cd.basic \"Patron Letter Gain 1 coi\" / button.tsb \"Look at the island\"",
+   "desc": "overlapping clickables: button.cd.basic.glow \"Patron Letter\" / button.btn.go \"Dig here pays with Creep\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases story",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-story-board-15.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-story-board-11.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "overlapping clickables: button.cd.basic \"Trail Notes Gain 1 compa\" / button.cd.item \"2 Trade Ledger 1 3\"",
+   "desc": "overlapping clickables: button.cd.basic.glow \"Trail Notes\" / button.btn.go \"Dig here pays with Creep\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases story",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-story-board-16.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-story-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn.alt.pass \"Pass\" / button.ix \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-story-board-11.png"
   },
   {
    "sev": "MINOR",
@@ -155,15 +146,23 @@
    "where": "story-board",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#iscrim",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases story",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-story-board-16.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-story-board-11.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story click #569 (Market)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 569 clicks (state kept changing)",
+   "where": "story-board",
+   "desc": "element outside viewport button.cd.fear x1 rect 390,632,501,743: \"Cree­ping Dread\n-1\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases story",
-   "shot": "/tmp/qa-shots/vinegrave/phone-story-noresult-18.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-story-board-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #590 (×)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 590 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-story-noresult-14.png"
   },
   {
    "sev": "MINOR",
@@ -171,7 +170,7 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#start.ov.hasart \"Vinegrave Dig the ruins.\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-title-19.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-title-15.png"
   },
   {
    "sev": "MINOR",
@@ -179,81 +178,73 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button \"Map\" under div#start.ov.hasart \"Vinegrave Dig the ruins.\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-title-19.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-title-15.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.cd.basic.glow \"Trail Notes Gain 1 compa\" / button.cd.basic \"Trail Notes 1\"",
+   "desc": "element outside viewport button.cd.fear x1 rect 390,632,501,743: \"Cree­ping Dread\n-1\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-20.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-fuzz-screen-16.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.cd.fear \"Cree­ping Dread No effec\" / button.btn.alt \"See it among all cards\"",
+   "desc": "overlapping clickables: button.site.l0 \"2\" / button.gx-x \"×\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-20.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-fuzz-screen-17.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.btn.alt \"Pass (end my round)\" / button.btn.go \"Play it\"",
+   "desc": "clickable covered by another element (not tappable): button.site.l2.hid \"6\" under b \"You passed: you sit out \"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-20.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-fuzz-screen-17.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.cd.basic \"Patron Letter Gain 1 coi\" / button.btn.alt \"See it among all cards\"",
+   "desc": "overlapping clickables: button.cd.item \"4 Cipher Code­book Gain \" / button.gx-x \"×\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-fuzz-screen-18.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.btn.alt \"Leave tutorial\" / button.cd.fear \"Cree­ping Dread -1 no ef\"",
+   "desc": "overlapping clickables: button.cd.item \"3 Signal Flares Gain 2 c\" / button.cd.item \"3 Signal Flares 1 2 1\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-fuzz-screen-19.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores and players\" under div#iscrim",
+   "desc": "overlapping clickables: button.cd.art \"5 Old Codex Free researc\" / button.ix \"×\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-fuzz-screen-19.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button#track.hasart \"★ 1 1 7 1 1 6 1 1 5 2 4 \" / button.gx-x \"×\"",
+   "desc": "overlapping clickables: button.cd.basic \"Trail Notes\" / button.btn.alt \"See it among all cards\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-22.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-fuzz-screen-19.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.has \"Research\" / button.gx-x \"×\"",
+   "desc": "overlapping clickables: button.cd.basic \"Patron Letter\" / button.btn.alt \"See it among all cards\"",
    "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-23.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.site.l0.glow \"2\" / button.cx \"×\"",
-   "repro": "node games-src/scripts/qa-bot.js vinegrave --size phone --seed 52244 --phases fuzz",
-   "shot": "/tmp/qa-shots/vinegrave/phone-screen-fuzz-screen-23.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f0a6e49d-5ebe-547c-a65f-0735961a47dd/scratchpad/qa/vinegrave/phone-screen-fuzz-screen-19.png"
   }
  ],
  "tutorialIn": {},
- "secs": 1146
+ "secs": 436
 }

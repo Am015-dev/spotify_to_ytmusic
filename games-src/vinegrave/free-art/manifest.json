@@ -1,0 +1,1554 @@
+{
+ "board-map": {
+  "title": "Map of the islands of Hispaniola and Puerto Rico (1639)",
+  "creator": "Library of Congress, Geography and Map Division (cartographer unknown or historic)",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/item/2003623402/",
+  "src": [
+   "('url', 'https://tile.loc.gov/image-services/iiif/service:gmd:gmd4:g4930:g4930:ct000952/full/pct:25/0/default.jpg', 'Map of the islands of Hispaniola and Puerto Rico (1639)', 'Library of Congress, Geography and Map Division (cartographer unknown or historic)', 'https://www.loc.gov/item/2003623402/')"
+  ],
+  "kind": "mp"
+ },
+ "card-airship": {
+  "title": "British Naval airship",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=British%20Naval%20airship",
+  "src": [
+   "('loc', 'ggbain/09800/09800r.jpg', 'British Naval airship')"
+  ],
+  "kind": "ip"
+ },
+ "card-almanac": {
+  "title": "Incidents of Travel in Central America, Chiapas, and Yucatan",
+  "creator": "John Lloyd Stephens",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/591852",
+  "src": [
+   "('met', 591852, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-ancestor-mask": {
+  "title": "Mask",
+  "creator": "Teotihuacan artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/312736",
+  "src": [
+   "('met', 312736, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-ash-urn": {
+  "title": "Effigy urn",
+  "creator": "Zapotec (Be'ena'a) artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/319468",
+  "src": [
+   "('met', 319468, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-bat-wing-fan": {
+  "title": "Bird Pendant",
+  "creator": "Muisca",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/312719",
+  "src": [
+   "('met', 312719, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-brush": {
+  "title": "Brush",
+  "creator": "European Sculpture and Decorative Arts",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/201367",
+  "src": [
+   "('met', 201367, {})"
+  ],
+  "kind": "io"
+ },
+ "card-camera": {
+  "title": "[Camera Obscura]",
+  "creator": "Unknown",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/631211",
+  "src": [
+   "('met', 631211, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-canteen": {
+  "title": "Pocket canteen (traveling set)",
+  "creator": "Charles Overing",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/205024",
+  "src": [
+   "('met', 205024, {})"
+  ],
+  "kind": "io"
+ },
+ "card-chisel": {
+  "title": "Chisel",
+  "creator": "Guatemala",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/43632",
+  "src": [
+   "('met', 43632, {})"
+  ],
+  "kind": "io"
+ },
+ "card-clay-cup": {
+  "title": "Cylinder Vessel",
+  "creator": "Maya",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/318628",
+  "src": [
+   "('met', 318628, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-codebook": {
+  "title": "Prayer book with case (mahdar)",
+  "creator": "W\u00e4ld\u00e4 Maryam",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307602",
+  "src": [
+   "('met', 307602, {})"
+  ],
+  "kind": "io"
+ },
+ "card-coral-throne": {
+  "title": "Figure seated on a bench",
+  "creator": "Olmec artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313138",
+  "src": [
+   "('met', 313138, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-crate": {
+  "title": "Trunk",
+  "creator": "European Sculpture and Decorative Arts",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/191179",
+  "src": [
+   "('met', 191179, {})"
+  ],
+  "kind": "io"
+ },
+ "card-dinghy": {
+  "title": "Terracotta model of a ship",
+  "creator": "Cypriot",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/241307",
+  "src": [
+   "('met', 241307, {})"
+  ],
+  "kind": "io"
+ },
+ "card-dread": {
+  "title": "Skull Pendant",
+  "creator": "Mexica (Aztec)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307664",
+  "src": [
+   "('met', 307664, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-ember-mask": {
+  "title": "Head-shaped bell",
+  "creator": "Mexica or Mixtec (\u00d1uu Savi) artists",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/309973",
+  "src": [
+   "('met', 309973, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-feather-cloak": {
+  "title": "Headdress Ornament",
+  "creator": "Moche",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313343",
+  "src": [
+   "('met', 313343, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-flares": {
+  "title": "Torch Holder",
+  "creator": "European",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/471625",
+  "src": [
+   "('met', 471625, {})"
+  ],
+  "kind": "io"
+ },
+ "card-gilded-beetle": {
+  "title": "Flying-Fish Pendant",
+  "creator": "Tolima (?)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316686",
+  "src": [
+   "('met', 316686, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-glyph-stone": {
+  "title": "Tlaltecuhtli (earth deity)",
+  "creator": "Mexica artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307636",
+  "src": [
+   "('met', 307636, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-gold-mask": {
+  "title": "Pectoral with face",
+  "creator": "Calima (Yotoco) artist",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/312716",
+  "src": [
+   "('met', 312716, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-gramophone": {
+  "title": "First phonograph",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=First%20phonograph",
+  "src": [
+   "('loc', 'ggbain/50200/50225r.jpg', 'First phonograph')"
+  ],
+  "kind": "ip"
+ },
+ "card-grant": {
+  "title": "[Manuscript Letter from W. H. Fox Talbot to Antonio Bertoloni]",
+  "creator": "William Henry Fox Talbot",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/289191",
+  "src": [
+   "('met', 289191, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-hammock": {
+  "title": "The Hammock",
+  "creator": "James Tissot",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/375939",
+  "src": [
+   "('met', 375939, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-jade-frog": {
+  "title": "Pendant in the Form of a Frog",
+  "creator": "Veraguas",
+  "lic": "CC0",
+  "page": "https://www.artic.edu/artworks/8088",
+  "src": [
+   "('aic', 8088)"
+  ],
+  "kind": "ao"
+ },
+ "card-jeepkey": {
+  "title": "Key",
+  "creator": "European Sculpture and Decorative Arts",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/206349",
+  "src": [
+   "('met', 206349, {})"
+  ],
+  "kind": "io"
+ },
+ "card-journal": {
+  "title": "Two Tropical Landscape Studies (from Sketchbook)",
+  "creator": "John William Casilear",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/16449",
+  "src": [
+   "('met', 16449, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-kettle": {
+  "title": "Kettle",
+  "creator": "Christopher Dresser",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/207823",
+  "src": [
+   "('met', 207823, {})"
+  ],
+  "kind": "io"
+ },
+ "card-lamp": {
+  "title": "Lantern",
+  "creator": "American",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/4741",
+  "src": [
+   "('met', 4741, {})"
+  ],
+  "kind": "io"
+ },
+ "card-lava-blade": {
+  "title": "Blade",
+  "creator": "Mexica (Aztec)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307737",
+  "src": [
+   "('met', 307737, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-ledger": {
+  "title": "Account Book Ledger",
+  "creator": "John Carlin",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/20365",
+  "src": [
+   "('met', 20365, {})"
+  ],
+  "kind": "io"
+ },
+ "card-lockbox": {
+  "title": "Rim lock box",
+  "creator": "European Sculpture and Decorative Arts",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/187132",
+  "src": [
+   "('met', 187132, {})"
+  ],
+  "kind": "io"
+ },
+ "card-machete": {
+  "title": "Copper Knife Blade",
+  "creator": "Peruvian",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/315670",
+  "src": [
+   "('met', 315670, {})"
+  ],
+  "kind": "io"
+ },
+ "card-mapcase": {
+  "title": "Map Case",
+  "creator": "Louis Boudo",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/4942",
+  "src": [
+   "('met', 4942, {})"
+  ],
+  "kind": "io"
+ },
+ "card-moon-comb": {
+  "title": "Makana Rabbit Stick",
+  "creator": "Diegue\u00f1o",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/310499",
+  "src": [
+   "('met', 310499, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-moss-idol": {
+  "title": "Chicomecoatl goddess",
+  "creator": "Mexica artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307633",
+  "src": [
+   "('met', 307633, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-mule": {
+  "title": "Pack mule of U.S. Army Signal Corps",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=Pack%20mule%20of%20U.S.%20Army%20Signal%20Corps",
+  "src": [
+   "('loc', 'ggbain/03300/03315r.jpg', 'Pack mule of U.S. Army Signal Corps')"
+  ],
+  "kind": "ip"
+ },
+ "card-obsidian-mirror": {
+  "title": "Obsidian Mirror",
+  "creator": "Ecuador",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/314189",
+  "src": [
+   "('met', 314189, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-old-codex": {
+  "title": "Vessel with mythological scene",
+  "creator": "Maya artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/662967",
+  "src": [
+   "('met', 662967, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-owl-totem": {
+  "title": "Shield with owl figure",
+  "creator": "Moche artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/315119",
+  "src": [
+   "('met', 315119, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-permit": {
+  "title": "[Manuscript Letter from William-Fox Strangways to Antonio Bertoloni]",
+  "creator": "William Thomas Horner Fox-Strangways",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/289207",
+  "src": [
+   "('met', 289207, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-pickaxe": {
+  "title": "Pickaxe",
+  "creator": "Ancient West Asian Art",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/322851",
+  "src": [
+   "('met', 322851, {})"
+  ],
+  "kind": "io"
+ },
+ "card-quiver": {
+  "title": "Quiver with Eleven Crossbow Bolts",
+  "creator": "Western or Central European; quiver, possibly German",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/34069",
+  "src": [
+   "('met', 34069, {})"
+  ],
+  "kind": "io"
+ },
+ "card-radio": {
+  "title": "Telegraph Instrument",
+  "creator": "The American Wing",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/8484",
+  "src": [
+   "('met', 8484, {})"
+  ],
+  "kind": "io"
+ },
+ "card-rain-drum": {
+  "title": "Drum",
+  "creator": "Paracas artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313290",
+  "src": [
+   "('met', 313290, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-reed-flute": {
+  "title": "Uilacapitztli (Pottery Flute)",
+  "creator": "Aztec",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/502628",
+  "src": [
+   "('met', 502628, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-root-sceptre": {
+  "title": "Scepter with profile figures",
+  "creator": "Maya artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/310644",
+  "src": [
+   "('met', 310644, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-rope": {
+  "title": "Rope",
+  "creator": "Egyptian Art",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/551077",
+  "src": [
+   "('met', 551077, {})"
+  ],
+  "kind": "io"
+ },
+ "card-ropebridge": {
+  "title": "[Hungerford Suspension Bridge]",
+  "creator": "William Henry Fox Talbot",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/283069",
+  "src": [
+   "('met', 283069, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-satchel": {
+  "title": "Satchel",
+  "creator": "American",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/87665",
+  "src": [
+   "('met', 87665, {})"
+  ],
+  "kind": "io"
+ },
+ "card-scale": {
+  "title": "Balance scale",
+  "creator": "Henry N. Hooper and Company",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/629597",
+  "src": [
+   "('met', 629597, {})"
+  ],
+  "kind": "io"
+ },
+ "card-seaplane": {
+  "title": "British seaplane",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=British%20seaplane",
+  "src": [
+   "('loc', 'ggbain/18600/18612r.jpg', 'British seaplane')"
+  ],
+  "kind": "ip"
+ },
+ "card-serpent-ring": {
+  "title": "Feathered serpent ornament",
+  "creator": "Mexica or Mixtec (\u00d1uu Savi) artists",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/310648",
+  "src": [
+   "('met', 310648, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-sextant": {
+  "title": "Astrolabe",
+  "creator": "Regiomontanus",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/923639",
+  "src": [
+   "('met', 923639, {})"
+  ],
+  "kind": "io"
+ },
+ "card-sky-lens": {
+  "title": "Cutout Disk",
+  "creator": "Moche",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/314705",
+  "src": [
+   "('met', 314705, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-spirit-bowl": {
+  "title": "Bowl, Mythological Scene",
+  "creator": "Maya",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/315883",
+  "src": [
+   "('met', 315883, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-spyglass": {
+  "title": "Opera glasses",
+  "creator": "French",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/102501",
+  "src": [
+   "('met', 102501, {})"
+  ],
+  "kind": "io"
+ },
+ "card-star-chart": {
+  "title": "Stamp, Butterfly",
+  "creator": "Mexica (Aztec)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307746",
+  "src": [
+   "('met', 307746, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-stone-heart": {
+  "title": "Ritual Stone (pulidor)",
+  "creator": "Mexica (Aztec)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316290",
+  "src": [
+   "('met', 316290, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-sun-disc": {
+  "title": "Pectoral Disk",
+  "creator": "Panama or Colombia",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/320313",
+  "src": [
+   "('met', 320313, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-tarp": {
+  "title": "Tent Lining Fragment",
+  "creator": "Islamic Art",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/448936",
+  "src": [
+   "('met', 448936, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-tent": {
+  "title": "[The Photographer before his Tent on the Site of the Pyramid of Khafre (Chephren)]",
+  "creator": "George Wilson Bridges",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286361",
+  "src": [
+   "('met', 286361, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-theodolite": {
+  "title": "Semi Circumferenter",
+  "creator": "John Potter",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/8030",
+  "src": [
+   "('met', 8030, {})"
+  ],
+  "kind": "io"
+ },
+ "card-tide-shell": {
+  "title": "Conch Shell",
+  "creator": "Monte Alban",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313132",
+  "src": [
+   "('met', 313132, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-trail": {
+  "title": "View in the Jungle, Bengal",
+  "creator": "Captain R. B. Hill",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/287849",
+  "src": [
+   "('met', 287849, {})"
+  ],
+  "kind": "ip"
+ },
+ "card-tusk-horn": {
+  "title": "Altar Tusk",
+  "creator": "\u00ccgb\u00e8s\u00e0nmw\u00e0 (ivory- and wood- carving guild) artists",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/312459",
+  "src": [
+   "('met', 312459, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-twin-idols": {
+  "title": "Pair of earflare frontals",
+  "creator": "Maya artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316299",
+  "src": [
+   "('met', 316299, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-vine-crown": {
+  "title": "Headdress Ornament",
+  "creator": "Calima (Yotoco)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316700",
+  "src": [
+   "('met', 316700, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-wind-chime": {
+  "title": "Bell",
+  "creator": "West Mexico or Valley of Mexico",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/315672",
+  "src": [
+   "('met', 315672, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-world-seed": {
+  "title": "Celt pendant",
+  "creator": "Greater Nicoya or Central region artitst(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313018",
+  "src": [
+   "('met', 313018, {})"
+  ],
+  "kind": "ao"
+ },
+ "guard-ash-jaguar": {
+  "title": "Stirrup-spout bottle with feline",
+  "creator": "Chim\u00fa artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/308523",
+  "src": [
+   "('met', 308523, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-bone-heron": {
+  "title": "Bird Pendant",
+  "creator": "Muisca",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316728",
+  "src": [
+   "('met', 316728, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-canopy-wyrm": {
+  "title": "Feathered serpent ornament",
+  "creator": "Mexica or Mixtec (\u00d1uu Savi) artists",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313345",
+  "src": [
+   "('met', 313345, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-ember-hound": {
+  "title": "Snarling dog",
+  "creator": "Colima artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/318999",
+  "src": [
+   "('met', 318999, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-glass-moth": {
+  "title": "Flying-Fish Pendant",
+  "creator": "Tolima (?)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316685",
+  "src": [
+   "('met', 316685, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-howl-bat": {
+  "title": "Canine vessel",
+  "creator": "South central Veracruz artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313292",
+  "src": [
+   "('met', 313292, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-mire-crawler": {
+  "title": "Crocodile whistle and rattle",
+  "creator": "Maya artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313335",
+  "src": [
+   "('met', 313335, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-moss-golem": {
+  "title": "Standing figure",
+  "creator": "Mezcala artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/310498",
+  "src": [
+   "('met', 310498, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-old-warden": {
+  "title": "Stela at Cop\u00e1n",
+  "creator": "Frederick Catherwood",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/341061",
+  "src": [
+   "('met', 341061, {'big': True})"
+  ],
+  "kind": "sc"
+ },
+ "guard-rootback-boar": {
+  "title": "Peccary Head Hacha",
+  "creator": "Veracruz",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/317647",
+  "src": [
+   "('met', 317647, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-stone-ape": {
+  "title": "Spider monkey wearing wind god regalia",
+  "creator": "Mexica artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/765334",
+  "src": [
+   "('met', 765334, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-temple-cat": {
+  "title": "",
+  "creator": "Wari",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/503542",
+  "src": [
+   "('met', 503542, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-thunder-toad": {
+  "title": "Frog yoke",
+  "creator": "Classic Veracruz artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/310471",
+  "src": [
+   "('met', 310471, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-tide-serpent": {
+  "title": "Double Spout and Bridge Bottle with Snake",
+  "creator": "Paracas",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/308590",
+  "src": [
+   "('met', 308590, {})"
+  ],
+  "kind": "go"
+ },
+ "guard-vine-widow": {
+  "title": "Spider",
+  "creator": "Moche",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/314477",
+  "src": [
+   "('met', 314477, {})"
+  ],
+  "kind": "go"
+ },
+ "idol-ape": {
+  "title": "Wooden Monkey Figure",
+  "creator": "Chim\u00fa",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/312567",
+  "src": [
+   "('met', 312567, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-bat": {
+  "title": "Double-Bat-Head Figure Pendant",
+  "creator": "Cocl\u00e9 (Parita)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/309419",
+  "src": [
+   "('met', 309419, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-bird": {
+  "title": "Bird pendant",
+  "creator": "Greater Nicoya or Central region artitst(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316783",
+  "src": [
+   "('met', 316783, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-boar": {
+  "title": "Stone Zoomorphic Figure",
+  "creator": "Tiwi (?)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/309559",
+  "src": [
+   "('met', 309559, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-cat": {
+  "title": "Stirrup-spout bottle with feline and snake",
+  "creator": "Cupisnique artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/309519",
+  "src": [
+   "('met', 309519, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-fish": {
+  "title": "Flying-Fish Pendant",
+  "creator": "Tolima (?)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/312960",
+  "src": [
+   "('met', 312960, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-frog": {
+  "title": "Frog Pendant",
+  "creator": "Greater Cocl\u00e9",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313511",
+  "src": [
+   "('met', 313511, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-moon": {
+  "title": "Pectoral Disk",
+  "creator": "Capul\u00ed",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316707",
+  "src": [
+   "('met', 316707, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-owl": {
+  "title": "Figure of an Owl",
+  "creator": "Moche",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/308732",
+  "src": [
+   "('met', 308732, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-snake": {
+  "title": "Coiled serpent",
+  "creator": "Mexica artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307635",
+  "src": [
+   "('met', 307635, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-star": {
+  "title": "Headdress ornament",
+  "creator": "Calima (Yotoco) artist",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/309411",
+  "src": [
+   "('met', 309411, {})"
+  ],
+  "kind": "id"
+ },
+ "idol-sun": {
+  "title": "Pectoral Disk",
+  "creator": "Panama or Colombia",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/320311",
+  "src": [
+   "('met', 320311, {})"
+  ],
+  "kind": "id"
+ },
+ "map-act1": {
+  "title": "Map of Lesser Antilles (1650)",
+  "creator": "Library of Congress, Geography and Map Division (cartographer unknown or historic)",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/item/99443222/",
+  "src": [
+   "('url', 'https://tile.loc.gov/image-services/iiif/service:gmd:gmd5:g5000:g5000:ct000878/full/pct:25/0/default.jpg', 'Map of Lesser Antilles (1650)', 'Library of Congress, Geography and Map Division (cartographer unknown or historic)', 'https://www.loc.gov/item/99443222/')"
+  ],
+  "kind": "mp"
+ },
+ "map-act2": {
+  "title": "Portolan chart of the Pacific coast from Mexico to northern Chile (about 1500)",
+  "creator": "Library of Congress, Geography and Map Division (cartographer unknown or historic)",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/item/2008628167/",
+  "src": [
+   "('url', 'https://tile.loc.gov/image-services/iiif/service:gmd:gmd4:g4412:g4412c:ct002415r/full/pct:12.5/0/default.jpg', 'Portolan chart of the Pacific coast from Mexico to northern Chile (about 1500)', 'Library of Congress, Geography and Map Division (cartographer unknown or historic)', 'https://www.loc.gov/item/2008628167/')"
+  ],
+  "kind": "mp"
+ },
+ "map-act3": {
+  "title": "An accurate map of the West Indies with the adjacent coast (1762)",
+  "creator": "Library of Congress, Geography and Map Division (cartographer unknown or historic)",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/item/2010585586/",
+  "src": [
+   "('url', 'https://tile.loc.gov/image-services/iiif/service:gmd:gmd4:g4390:g4390:ar168000/full/pct:25/0/default.jpg', 'An accurate map of the West Indies with the adjacent coast (1762)', 'Library of Congress, Geography and Map Division (cartographer unknown or historic)', 'https://www.loc.gov/item/2010585586/')"
+  ],
+  "kind": "mp"
+ },
+ "portrait-mira": {
+  "title": "[Self-Portrait]",
+  "creator": "Adrien Tournachon",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/283119",
+  "src": [
+   "('met', 283119, {})"
+  ],
+  "kind": "pt"
+ },
+ "portrait-okoro": {
+  "title": "Capt. Benard, Arctic explorer",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=Capt.%20Benard%2C%20Arctic%20explorer",
+  "src": [
+   "('loc', 'ggbain/00800/00857r.jpg', 'Capt. Benard, Arctic explorer')"
+  ],
+  "kind": "pt"
+ },
+ "portrait-pell": {
+  "title": "[Self-Portrait]",
+  "creator": "Roger Fenton",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286386",
+  "src": [
+   "('met', 286386, {})"
+  ],
+  "kind": "pt"
+ },
+ "portrait-quell": {
+  "title": "Prof. M. Pupin",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=Prof.%20M.%20Pupin",
+  "src": [
+   "('loc', 'ggbain/12200/12229r.jpg', 'Prof. M. Pupin')"
+  ],
+  "kind": "pt"
+ },
+ "portrait-sallow": {
+  "title": "[Portrait of a Seated Gentleman]",
+  "creator": "Horatio Ross",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/288069",
+  "src": [
+   "('met', 288069, {})"
+  ],
+  "kind": "pt"
+ },
+ "portrait-tamsin": {
+  "title": "Lady Mackenzie",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=Lady%20Mackenzie",
+  "src": [
+   "('loc', 'ggbain/19300/19367r.jpg', 'Lady Mackenzie')"
+  ],
+  "kind": "pt"
+ },
+ "portrait-vane": {
+  "title": "Walter Wellman, head-and-shoulders portrait",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=Walter%20Wellman%2C%20head-and-shoulders%20portrait",
+  "src": [
+   "('loc', 'cph/3b00000/3b01000/3b01400/3b01439r.jpg', 'Walter Wellman, head-and-shoulders portrait')"
+  ],
+  "kind": "pt"
+ },
+ "portrait-warden": {
+  "title": "Head of a Water Deity (Chalchiuhtlicue)",
+  "creator": "Mexica (Aztec)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307640",
+  "src": [
+   "('met', 307640, {})"
+  ],
+  "kind": "pt"
+ },
+ "res-arrow": {
+  "title": "Blade",
+  "creator": "Mexica (Aztec)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307737",
+  "src": [
+   "('met', 307737, {})"
+  ],
+  "kind": "ic"
+ },
+ "res-coin": {
+  "title": "Pectoral Disk",
+  "creator": "Capul\u00ed",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/316707",
+  "src": [
+   "('met', 316707, {})"
+  ],
+  "kind": "ic"
+ },
+ "res-compass": {
+  "title": "Surveyor's Compass",
+  "creator": "John Heilig",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/8029",
+  "src": [
+   "('met', 8029, {})"
+  ],
+  "kind": "ic"
+ },
+ "res-jewel": {
+  "title": "Celt pendant",
+  "creator": "Greater Nicoya or Central region artitst(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/313018",
+  "src": [
+   "('met', 313018, {})"
+  ],
+  "kind": "ic"
+ },
+ "res-tablet": {
+  "title": "Tlaltecuhtli (earth deity)",
+  "creator": "Mexica artist(s)",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/307636",
+  "src": [
+   "('met', 307636, {})"
+  ],
+  "kind": "ic"
+ },
+ "result-lose": {
+  "title": "Pugahm Myo: Distant View of Gauda-palen Pagoda",
+  "creator": "Linnaeus Tripe",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/302638",
+  "src": [
+   "('met', 302638, {'big': True})"
+  ],
+  "kind": "sc"
+ },
+ "result-win": {
+  "title": "Fa\u00e7ade Ouest de la Grande Pagode",
+  "creator": "Emile Gsell",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/288198",
+  "src": [
+   "('met', 288198, {'big': True})"
+  ],
+  "kind": "sc"
+ },
+ "site-bone-chapel": {
+  "title": "J\u00e9rusalem, Vall\u00e9e de Josaphat, Grotte s\u00e9pulcrale, 1",
+  "creator": "Auguste Salzmann",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286948",
+  "src": [
+   "('met', 286948, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-broken-arch": {
+  "title": "[Suspension Bridge Over the Hindun River Destroyed by the Rebels in 1857]",
+  "creator": "Unknown",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/287659",
+  "src": [
+   "('met', 287659, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-c-cliff": {
+  "title": "Tropical Scenery, Cliff - Limon Bay",
+  "creator": "John Moran",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286041",
+  "src": [
+   "('met', 286041, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-c-cove": {
+  "title": "Tropical Scenery, Darien Harbor, Chipigana",
+  "creator": "John Moran",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286191",
+  "src": [
+   "('met', 286191, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-c-road": {
+  "title": "The Banyan Tree, Calcutta",
+  "creator": "Unknown",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/264538",
+  "src": [
+   "('met', 264538, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-c-spring": {
+  "title": "[Waterfall]",
+  "creator": "Unknown",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/288554",
+  "src": [
+   "('met', 288554, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-c-wreck": {
+  "title": "Shipwreck on a Rocky Shore",
+  "creator": "Johan Christian Dahl",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/393392",
+  "src": [
+   "('met', 393392, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-crystal-vault": {
+  "title": "[Waterfall, Constantine]",
+  "creator": "John Beasley Greene",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/285438",
+  "src": [
+   "('met', 285438, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-drowned-hall": {
+  "title": "Amerapoora: Shwe-doung-dyk Pagoda",
+  "creator": "Linnaeus Tripe",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/302650",
+  "src": [
+   "('met', 302650, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-echo-pit": {
+  "title": "Crater of Volcano, Quetzaltenango-Guatemala",
+  "creator": "Eadweard Muybridge",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286079",
+  "src": [
+   "('met', 286079, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-fern-steps": {
+  "title": "Grande Pagode - Edicule Nord",
+  "creator": "Emile Gsell",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/288201",
+  "src": [
+   "('met', 288201, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-frog-pool": {
+  "title": "View in the Jungle, Bengal",
+  "creator": "Captain R. B. Hill",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/287844",
+  "src": [
+   "('met', 287844, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-hidden-1": {
+  "title": "[Fontainebleau Forest]",
+  "creator": "Eug\u00e8ne Cuvelier",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/265904",
+  "src": [
+   "('met', 265904, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-hidden-2": {
+  "title": "[Fontainebleau Forest]",
+  "creator": "Eug\u00e8ne Cuvelier",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/265075",
+  "src": [
+   "('met', 265075, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-hollow-tree": {
+  "title": "\"Interior\" View of Banyan Tree, Calcutta",
+  "creator": "Unknown",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/264524",
+  "src": [
+   "('met', 264524, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-jade-court": {
+  "title": "Fa\u00e7ade Ouest de la Grande Pagode",
+  "creator": "Emile Gsell",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/288198",
+  "src": [
+   "('met', 288198, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-lava-stair": {
+  "title": "[Pyramid at Dahsh\u00fbr]",
+  "creator": "Francis Frith",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/260973",
+  "src": [
+   "('met', 260973, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-moth-cave": {
+  "title": "Entrance to Cave from the Lake, from the series, Views in Central Park, New York, Part 2",
+  "creator": "Louis Prang & Co.",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/683200",
+  "src": [
+   "('met', 683200, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-root-gate": {
+  "title": "[Banian Tree]",
+  "creator": "Captain R. B. Hill",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/287851",
+  "src": [
+   "('met', 287851, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-sky-altar": {
+  "title": "Pugahm Myo: Thapinyu Pagoda",
+  "creator": "Linnaeus Tripe",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/302636",
+  "src": [
+   "('met', 302636, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-snake-ford": {
+  "title": "Otuwhakakaireau, Wanganui River",
+  "creator": "unknown photographer",
+  "lic": "Public domain",
+  "page": "https://www.loc.gov/pictures/search/?q=Otuwhakakaireau%2C%20Wanganui%20River",
+  "src": [
+   "('loc', 'cph/3b30000/3b37000/3b37800/3b37806r.jpg', 'Otuwhakakaireau, Wanganui River')"
+  ],
+  "kind": "sc"
+ },
+ "site-star-pool": {
+  "title": "Tropical Scenery, Cascade, Limon River",
+  "creator": "John Moran",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286187",
+  "src": [
+   "('met', 286187, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-statue-row": {
+  "title": "The Jewels of the Pagoda",
+  "creator": "Linnaeus Tripe",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/265917",
+  "src": [
+   "('met', 265917, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-sunken-well": {
+  "title": "Second Palace at Mitla, Mexico.",
+  "creator": "D\u00e9sir\u00e9 Charnay",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/680014",
+  "src": [
+   "('met', 680014, {})"
+  ],
+  "kind": "sc"
+ },
+ "site-thorn-palace": {
+  "title": "La Prison, \u00e0 Chichen-Itza",
+  "creator": "D\u00e9sir\u00e9 Charnay",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286467",
+  "src": [
+   "('met', 286467, {})"
+  ],
+  "kind": "sc"
+ },
+ "temple-11": {
+  "title": "[Pyramid at Dahsh\u00fbr]",
+  "creator": "Francis Frith",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/260973",
+  "src": [
+   "('met', 260973, {})"
+  ],
+  "kind": "md"
+ },
+ "temple-2": {
+  "title": "Grande Pagode - Edicule Nord",
+  "creator": "Emile Gsell",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/288201",
+  "src": [
+   "('met', 288201, {})"
+  ],
+  "kind": "md"
+ },
+ "temple-6": {
+  "title": "Pugahm Myo: Thapinyu Pagoda",
+  "creator": "Linnaeus Tripe",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/302636",
+  "src": [
+   "('met', 302636, {})"
+  ],
+  "kind": "md"
+ },
+ "title-bg": {
+  "title": "La Prison, \u00e0 Chichen-Itza",
+  "creator": "D\u00e9sir\u00e9 Charnay",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/286467",
+  "src": [
+   "('met', 286467, {'big': True})"
+  ],
+  "kind": "ti"
+ },
+ "token-glass": {
+  "title": "Opera glasses",
+  "creator": "French",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/102501",
+  "src": [
+   "('met', 102501, {})"
+  ],
+  "kind": "ic"
+ },
+ "token-notebook": {
+  "title": "Account Book Ledger",
+  "creator": "John Carlin",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/20365",
+  "src": [
+   "('met', 20365, {})"
+  ],
+  "kind": "ic"
+ },
+ "tr-ship": {
+  "title": "Terracotta model of a ship",
+  "creator": "Cypriot",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/241307",
+  "src": [
+   "('met', 241307, {})"
+  ],
+  "kind": "ic"
+ },
+ "track-bg": {
+  "title": "The Mother of the Forest - Calaveras Grove",
+  "creator": "Carleton E. Watkins",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/732750",
+  "src": [
+   "('met', 732750, {'big': True})"
+  ],
+  "kind": "sc"
+ },
+ "card-back": {
+  "title": "procedural card back",
+  "creator": "drawn in vg3.py",
+  "lic": "CC0 (original drawing)",
+  "page": "-",
+  "src": [],
+  "kind": "bk"
+ },
+ "card-frame-art": {
+  "title": "procedural frame",
+  "creator": "drawn in vg3.py",
+  "lic": "CC0 (original drawing)",
+  "page": "-",
+  "src": [],
+  "kind": "fr"
+ },
+ "card-frame-fear": {
+  "title": "procedural frame",
+  "creator": "drawn in vg3.py",
+  "lic": "CC0 (original drawing)",
+  "page": "-",
+  "src": [],
+  "kind": "fr"
+ },
+ "card-frame-item": {
+  "title": "procedural frame",
+  "creator": "drawn in vg3.py",
+  "lic": "CC0 (original drawing)",
+  "page": "-",
+  "src": [],
+  "kind": "fr"
+ },
+ "card-bone-dice": {
+  "title": "Dice",
+  "creator": "Islamic Art",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/449310",
+  "src": [
+   "('met', 449310, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-thorn-key": {
+  "title": "Key",
+  "creator": "German",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/463340",
+  "src": [
+   "('met', 463340, {})"
+  ],
+  "kind": "ao"
+ },
+ "card-storm-horn": {
+  "title": "Trumpet",
+  "creator": "Teotihuacan",
+  "lic": "CC0",
+  "page": "https://www.metmuseum.org/art/collection/search/503544",
+  "src": [
+   "('met', 503544, {})"
+  ],
+  "kind": "ao"
+ }
+}
