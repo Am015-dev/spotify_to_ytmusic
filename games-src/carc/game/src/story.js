@@ -37,7 +37,7 @@ const STORY={
 };
 // ---------- the coached first game (free play; Tamsin = guide, Hob = rival). Each rule is explained once, the first time it matters. t = text or fn(ctx).
 STORY.coach={
-  goal:{who:'guide',t:'Vinemoor has no owner. Build it tile by tile, claim it with followers, and most points wins the deeds.'},
+  goal:{who:'guide',t:'You win with the most points when the last tile is laid. Claim roads and towns, then finish them.'},
   match:{who:'guide',t:'Tap your tile to turn it. It fits only where touching edges match: road to road, town to town, field to field.'},
   banner:{who:'guide',t:'This town tile has a banner. A finished town scores 2 per tile, and each banner adds 2 more.'},
   follower:{who:'guide',t:'Now claim something. A follower on a road, town, priory or field earns its points. You have seven; or skip.'},
