@@ -167,3 +167,4 @@ shots per game before anything goes live. No 20-min sweep loop.
 ## 10:40 OWNER: twin-thrones + hollowbough "unplayable", asked if compared with benchmark (no).
 - New gate for every game: store screenshots of the official phone app (local only, never committed/named), side-by-side vs ours at 390x844, worker plays full game by touch as a new player. No "ready" without vs-benchmark shot + orchestrator playing it by touch.
 - W482 hollowbough, W483 twin, W484 stitchwise (new, session_01RR7mnaHNL8z2uvUgNj528c), W468 shipwreck all briefed 10:40.
+- 10:50 OWNER: emberclimb "extremely simplistic, doubt it is like the original". Benchmark = official phone app of the roguelike deckbuilder it adapts (map with branching paths, enemy intents, card fan, relic bar, card art). Next in queue when a worker slot frees.
