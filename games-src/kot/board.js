@@ -40,11 +40,11 @@ function bfLineText0(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI
   if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn · tap to speed up`}
   if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
     if(G.rolls<=0||!nk)return 'No rolls left: tap SMASH';
-    if(!G.dice.some(d=>d.k))return 'Tap dice to keep them, then Roll';
-    return `Roll the other ${nk}, or tap SMASH`}
+    if(!G.dice.some(d=>d.k))return 'Keep dice, then Roll';
+    return `Roll ${nk} more, or SMASH`}
   if(G.phase==='buy'&&!G.bug&&p.vp>=GOAL())return GOAL()+'★ reached: End turn to win';
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
-    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or End turn':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: End turn'}
+    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or End turn':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to read it':'Not enough ⚡: End turn'}
   return ''}
 function bfLine(){const el=$bf('bline');if(!el)return;const t=BF.flash&&BF.flash.until>bfNow()?BF.flash.t:bfLineText();if(el.textContent!==t)el.textContent=t;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){if(!document.documentElement.classList.contains('pp-hints')||(G&&G.tut))return;ms=Math.max(ms||0,4000+String(t).split(/\s+/).length*100);BF.flash={t,until:bfNow()+ms};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,ms+20)}

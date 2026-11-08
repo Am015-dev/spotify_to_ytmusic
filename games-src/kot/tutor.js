@@ -91,7 +91,7 @@ const nm=i=>mname(P(i));
 // core rule -> the step that teaches it (in play order). tut-walk.js walks the tutorial by touch and checks every one was shown.
 const TUT_RULES=[['goal: 20 stars or last standing','goal'],['keep dice','keep'],['three rolls','roll1'],['three of a kind, pair scores nothing','third'],
   ['energy','energy'],['kept dice can be rerolled','rekeep'],['resolve the dice','done1'],['empty Downtown: move in, +1 star','score1'],
-  ['buy a power card','buy'],['energy is saved, end turn','end1'],['rivals take turns; outside claws hit Downtown','rivals'],['stay when hit','stay'],
+  ['buy a power card','buy'],['card powers: permanent vs one-shot','power'],['energy is saved, end turn','end1'],['rivals take turns; outside claws hit Downtown','rivals'],['stay when hit','stay'],
   ['start in Downtown: +2 stars','bonus'],['Downtown claws hit everyone; stop early','done2'],['0 hearts: knocked out; no healing in Downtown','ko'],
   ['sweep the cards for 2 energy','sweep'],['yield Downtown','yield'],['outside: hearts heal, claws hit Downtown','done3'],
   ['extra matching die adds 1 star','later'],['20 stars win at the end of the turn','win20'],['how the game is won','result']];
@@ -121,6 +121,8 @@ function tutSteps(){
   S.push(
  {id:'buy',title:'Buy it',say:()=>(phone?'Tap it again to buy. ':'Click to buy. ')+'PERMANENT cards stay all game.',target:tShop(0),wait:{type:'tap',match:x=>(x.what==='shopbuy'||x.what==='card')&&x.k===0},
    ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3&&(!phone||BF.sel===0)},
+ {id:'power',title:'Card powers',say:()=>CARDS.cosmic.n+': cards cost 1 ⚡ less. ONE-SHOT cards work once.',target:tMe,wait:null,
+   ready:()=>myBuy()&&P(0).cards.includes('cosmic')},
  {id:'end1',title:'End your turn',say:'Unspent energy is saved. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&P(0).cards.includes('cosmic')},
  {id:'rivals',title:'Rivals play',say:()=>nm(1)+' rolls too. Claws from outside hit Downtown: you.',

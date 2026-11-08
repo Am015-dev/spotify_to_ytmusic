@@ -1,7 +1,7 @@
 # Tutorial coverage: Crown City Smash (W500, 8 Nov 2026) - GUIDED FIRST GAME
 
 Learn to play starts a guided first game (`tutor.js`, `tutStart` -> `tutStartScripted`): you, Squidrik and Shroomhulk, scripted dice, every rule in play
-order, one sentence of 12 words or fewer and one highlighted tap (or Next) per step, played to a real 20-star win; the end card then starts a real game.
+order, one sentence of 12 words or fewer and one highlighted tap (or Next) per step (26 steps, 22 rules), played to a real 20-star win; the end card then starts a real game.
 No "learn later" list. Proof: `node tut-walk.js 390 844` (and 375 667) taps every spotlit target by touch and checks each step's words, the TUT_RULES order,
 the guided win and the real game after it. The coached free-play game (below) is no longer started.
 
@@ -16,6 +16,7 @@ the guided win and the real game after it. The coached free-play game (below) is
 | 7 | resolve | roll2, done1 | One roll left. Tap Roll. / No rolls left. Tap SMASH! to use your dice. |
 | 8 | empty Downtown: move in, +1 ★ | score1 | Downtown was empty, so you moved in: +1 ★. |
 | 9 | buy a power card | shop, buy | Spend energy on power cards. Tap this card to read it. / Tap it again to buy. PERMANENT cards stay all game. |
+| 9b | card powers: permanent vs one-shot | power | Cosmic Gut: cards cost 1 ⚡ less. ONE-SHOT cards work once. |
 | 10 | energy is saved, end turn | end1 | Unspent energy is saved. Tap End turn. |
 | 11 | rivals; outside claws hit Downtown | rivals | Squidrik rolls too. Claws from outside hit Downtown: you. |
 | 12 | stay | stay | Hit in Downtown: stay, or yield and leave. Tap Stay. |
