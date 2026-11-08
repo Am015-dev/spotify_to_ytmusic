@@ -223,3 +223,9 @@ effects match what I remember of the box).
   (green set 3) may be declined when sliding would lose the ruby on the scoring space (otherwise the slide is always better and
   automatic). Ruby moss, Cinder Moth and the other automatic powers have no downside.
 * Bonus die: see guess 1 (unverified).
+
+## Logic audit (W439)
+* `RULES-CHECKLIST.md` numbers every rule (R001 to R144); `logic-test.js` asserts each one against the real engine (`node logic-test.js`).
+* Fixed: a fortune card that names a chip whose book is not out yet (Fork in the Road names the Dusk Sigh) is not turned up; it goes to
+  the bottom of the deck and the next card is drawn (rule R143).
+* Open: R144, the test-tube side of the cauldron, is not built (rewards unconfirmed, see "Not built").

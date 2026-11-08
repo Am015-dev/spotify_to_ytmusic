@@ -84,7 +84,7 @@ function resetSeat(G, p) {
 function startRound(G) {
   G.phase = 'prep'; G.ev = null; G.shopSeat = -1;
   for (const p of G.players) resetSeat(G, p);
-  let id; if (G.force && FORT[G.force]) { id = G.force; const ix = G.fdeck.indexOf(id); if (ix >= 0) G.fdeck.splice(ix, 1); else { const jx = G.fdisc.indexOf(id); if (jx >= 0) G.fdisc.splice(jx, 1); } G.force = null; } else id = G.fdeck.pop();
+  let id; if (G.force && FORT[G.force]) { id = G.force; const ix = G.fdeck.indexOf(id); if (ix >= 0) G.fdeck.splice(ix, 1); else { const jx = G.fdisc.indexOf(id); if (jx >= 0) G.fdisc.splice(jx, 1); } G.force = null; } else { id = G.fdeck.pop(); for (let k = 0; k < 30 && FORT[id].needs && !bookOut(G, FORT[id].needs); k++) { G.fdeck.unshift(id); id = G.fdeck.pop(); } }   // a card that names a chip whose book is not out yet is not turned up: draw again
   G.fcard = id; G.fdisc.push(id);
   const card = FORT[id]; use(G, 'fortune_' + id);
   ev(G, { t: 'round', round: G.round, start: G.start }); ev(G, { t: 'fortune', id });

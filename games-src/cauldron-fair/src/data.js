@@ -90,7 +90,7 @@ var FORTUNE = [
   { id: 'dip', kind: 'purple', name: 'Lucky Dip', text: 'Everyone draws 5 chips. The lowest total takes a blue 2, everyone else takes a ruby. Chips go back.' },
   { id: 'bribe', kind: 'purple', name: 'Rat Bribe', text: 'You may move your rat stone back 1 to 3 spaces and take that many rubies.' },
   { id: 'bounty', kind: 'purple', name: 'Rat Bounty', text: 'Take any 4-chip, or score 1 VP for each rat tail you trail the leader by.' },
-  { id: 'fork', kind: 'purple', name: 'Fork in the Road', text: 'Move your droplet 2 spaces, or take a purple chip.' },
+  { id: 'fork', kind: 'purple', needs: 'P', name: 'Fork in the Road', text: 'Move your droplet 2 spaces, or take a purple chip.' },
   { id: 'dice', kind: 'purple', name: 'Fairground Dice', text: 'Everyone rolls the bonus die once and takes the result.' },
   { id: 'haggle', kind: 'purple', name: 'Haggler\'s Hour', text: 'Draw 4 chips. You may swap one for the next higher chip of its colour; if none can, take a green 1. Chips go back.' }
 ];
