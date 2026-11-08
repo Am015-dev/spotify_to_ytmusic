@@ -27,7 +27,7 @@ function capNow(){return UI.cap&&Date.now()<UI.cap.until?UI.cap.t:''}
 const FEATW={C:'town',R:'road',M:'priory',F:'field'};
 function scoreCap(d,final){const F=G.fd[d.r];const ty=F?FEATW[F.ty]:'feature',n=F&&F.ty!=='M'?(F.tiles||[]).length:0;
   const who=(d.win&&d.win.length?d.win:[d.by||0]).map(i=>seatName(P(i))).join(' & ');
-  const why=F&&F.ty==='F'?`field, ${d.pts/3|0} town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'priory with 8 tiles around it':'unfinished priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
+  const why=F&&F.ty==='F'?`field, ${d.pts/3|0} town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'full priory':'unfinished priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
   return `${who} +${d.pts}: ${why}`}
 // ---------- view: world units are 100 per tile; the world div is translated and scaled ----------
 const boardEl=()=>$('#board');
@@ -158,7 +158,7 @@ function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
     if(me&&c&&UI.cap.intro&&G.step==='place')t=c;
     else if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
     else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap again to place.'}
-    else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Continue the river: tap a glowing square.':(UI.rots&&UI.rots.length>1?'Turn your tile, then tap a glowing square.':'Tap a glowing square to place your tile.');
+    else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
     else if(me)t='Add a follower, or Skip.';
     else t=(c&&!UI.cap.intro?c:'')||`Watch ${p.nm} play a tile.`}
   say(t,tn,'')}
