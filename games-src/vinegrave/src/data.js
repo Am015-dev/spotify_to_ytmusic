@@ -49,7 +49,12 @@
     ['permit', 'Dig Permit', 4, 'plane', 2, [{ b: 'a', o: 2 }]],
     ['mapcase', 'Leather Map Case', 4, 'car', 2, [{ g: { compass: 4 } }]],
     ['gramophone', 'Camp Gramophone', 4, 'boot', 3, [{ x: 1 }, { x: 1 }]],
-    ['airship', 'Survey Airship', 4, 'plane', 3, [{ r: 'n' }, { d: 1 }]]
+    ['airship', 'Survey Airship', 4, 'plane', 3, [{ r: 'n' }, { d: 1 }]],
+    ['whistle', 'Bone Whistle', 1, 'ship', 0, [{ g: { coin: 1, arrow: 1 } }]],
+    ['lantern', 'Storm Lantern', 2, 'ship', 1, [{ g: { tablet: 1, compass: 1 } }]],
+    ['sling', 'Pocket Sling', 2, 'boot', 1, [{ g: { arrow: 1, coin: 1 } }]],
+    ['hatchet', 'Trail Hatchet', 3, 'car', 1, [{ g: { arrow: 1, compass: 2 } }]],
+    ['sledge', 'Rock Sledge', 4, 'car', 2, [{ g: { tablet: 1, arrow: 1, coin: 1 } }]]
   ];
   // ---- artifacts: bought with compasses (the effect fires at once, free); played later from hand they cost 1 tablet. ----
   var A = [
@@ -125,13 +130,14 @@
   ];
   var S2 = [
     ['crystal-vault', 'Crystal Vault', { jewel: 2 }], ['lava-stair', 'Lava Stair', { arrow: 2, jewel: 1 }], ['sky-altar', 'Sky Altar', { tablet: 2, jewel: 1 }], ['drowned-hall', 'Drowned Hall', { jewel: 1, coin: 3 }],
-    ['thorn-palace', 'Thorn Palace', { arrow: 2, tablet: 2 }], ['star-pool', 'Star Pool', { jewel: 1, compass: 3 }], ['bone-chapel', 'Bone Chapel', { tablet: 3, arrow: 1 }], ['jade-court', 'Jade Court', { jewel: 2, coin: 1 }]
+    ['thorn-palace', 'Thorn Palace', { arrow: 2, tablet: 2 }], ['star-pool', 'Star Pool', { jewel: 1, compass: 3 }]
   ];
   // ---- idols: found on a discovered site (immediate gift); 3 points each, also when set in a shrine slot (a one-time boon; each slot once per game). ----
   var ID = [
     ['idol-owl', 'Owl Idol', { coin: 2 }], ['idol-frog', 'Frog Idol', { compass: 2 }], ['idol-sun', 'Sun Idol', { tablet: 1 }], ['idol-snake', 'Snake Idol', { arrow: 1 }],
     ['idol-moon', 'Moon Idol', { coin: 1, compass: 1 }], ['idol-boar', 'Boar Idol', { arrow: 1 }], ['idol-fish', 'Fish Idol', { coin: 2 }], ['idol-bat', 'Bat Idol', { compass: 2 }],
-    ['idol-cat', 'Lynx Idol', { tablet: 1 }], ['idol-bird', 'Heron Idol', { coin: 1, compass: 1 }], ['idol-ape', 'Ape Idol', { arrow: 1 }], ['idol-star', 'Star Idol', { jewel: 1 }]
+    ['idol-cat', 'Lynx Idol', { tablet: 1 }], ['idol-bird', 'Heron Idol', { coin: 1, compass: 1 }], ['idol-ape', 'Ape Idol', { arrow: 1 }], ['idol-star', 'Star Idol', { jewel: 1 }],
+    ['idol-turtle', 'Turtle Idol', { coin: 2 }], ['idol-crane', 'Crane Idol', { compass: 2 }], ['idol-ram', 'Ram Idol', { arrow: 1 }], ['idol-moth', 'Moth Idol', { tablet: 1 }]
   ];
   // shrine slot boons (pick one when you set an idol)
   var SHRINE = [{ id: 'sh-coin', ops: [{ g: { coin: 3 } }], text: '3 coins' }, { id: 'sh-compass', ops: [{ g: { compass: 3 } }], text: '3 compasses' },
@@ -162,9 +168,10 @@
   // ---- rival expedition (solo): one card per turn; each does the first thing it can. ----
   var RIVAL = [
     { id: 'rv-camp', name: 'Pitch camp', text: 'Takes a free camp site.', a: 'camp' }, { id: 'rv-camp2', name: 'Pitch camp', text: 'Takes a free camp site.', a: 'camp' },
-    { id: 'rv-buyi', name: 'Raid the market', text: 'Takes the cheapest item: its points.', a: 'buyi' }, { id: 'rv-buya', name: 'Loot a relic', text: 'Takes the cheapest artifact: its points.', a: 'buya' },
-    { id: 'rv-study', name: 'Study', text: 'Climbs one research row.', a: 'study' }, { id: 'rv-study2', name: 'Study', text: 'Climbs one research row.', a: 'study' },
-    { id: 'rv-scout', name: 'Scout ahead', text: 'Discovers a site: 2 points; a guardian wakes.', a: 'scout' }, { id: 'rv-hunt', name: 'Hunt', text: 'Overcomes a waiting guardian: 4 points.', a: 'hunt' }
+    { id: 'rv-buyi', name: 'Raid the market', text: 'Takes the cheapest item: its points.', a: 'buyi' }, { id: 'rv-study2', name: 'Study', text: 'Climbs one research row.', a: 'study' },
+    { id: 'rv-study', name: 'Study', text: 'Climbs one research row.', a: 'study' }, { id: 'rv-buya', name: 'Loot a relic', text: 'Takes the cheapest artifact: its points.', a: 'buya' },
+    { id: 'rv-scout', name: 'Scout ahead', text: 'Discovers a site: 2 points; a guardian wakes.', a: 'scout' }, { id: 'rv-hunt', name: 'Hunt', text: 'Overcomes a waiting guardian: 4 points.', a: 'hunt' },
+    { id: 'rv-scout2', name: 'Scout ahead', text: 'Discovers a site: 2 points; a guardian wakes.', a: 'scout' }, { id: 'rv-hunt2', name: 'Hunt', text: 'Overcomes a waiting guardian: 4 points.', a: 'hunt' }
   ];
   function mk(arr, t) { var o = {}; arr.forEach(function (r) { o[r[0]] = { id: r[0], t: t, name: r[1], cost: r[2], tr: r[3], vp: r[4], ops: r[5] }; }); return o; }
   var CARDS = Object.assign({}, BASIC, mk(I, 'item'), mk(A, 'art'));
