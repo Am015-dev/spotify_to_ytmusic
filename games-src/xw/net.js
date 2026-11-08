@@ -147,6 +147,7 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers;const r=netRemote();
    ${host?`<p class="small muted">To change factions, size or expansions, close this box (✕), change them on the start screen, then come back.</p><div class="acts"><button class="btn primary" data-a="netstart">Start the battle${r.length?'':'<small>against the computer until a friend joins</small>'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tip">Waiting for the host to start the battle…</p><div class="acts"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
 function onlineBlock(){if(!NET.ready)return '<p class="small muted">Checking online play…</p>';
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return '<p class="small muted">🌐 Online play is hidden while you are offline.</p>';
   if(!netAvail())return '<p class="small muted">🌐 Online play needs a recent browser with WebRTC (any current Chrome, Edge, Firefox or Safari).</p>';
   if(NET.on)return `<div class="online on"><p class="small">You are in online room <b class="code">${esc(NET.code)}</b>.</p><div class="row"><button class="btn primary" data-a="netopen">🌐 Back to the lobby</button><button class="btn" data-a="netleave">Leave the room</button></div></div>`;
   return `<div class="online ${UI.netOpen?'hl':''}" id="onlinebox"><p class="small muted">Free and direct: your browsers connect to each other. Host a battle and send a friend the code or link. You fly the first faction below, your friend the second.</p>
@@ -156,7 +157,7 @@ function netCopy(){const t=NetRoom.inviteLink(NET.code);const sel=()=>{const i=d
 // the modal: the lobby, or "the host left"
 function netModalHTML(){if(!NET.on)return '';if(NET.inLobby&&!NET.lobbyMin)return lobbyHTML();
   if(isClient()&&NET.hostGone&&G&&!G.winner)return `<div class="dlg" role="dialog" aria-modal="true"><h2>The host left. The game is over.</h2><p class="small muted">The host’s page was running the battle, so it can’t go on without it.</p><div class="acts"><button class="btn primary" data-a="netleave">Back to the menu</button></div></div>`;return ''}
-function netClick(a){if(a==='nethost'){netJoin('host',NetRoom.newCode());return true}if(a==='netjoin'){const v=(document.getElementById('joincode')||{}).value;netJoin('client',v);return true}
+function netClick(a){if(a==='nethost'){{const ob=document.getElementById('onlinebox');if(ob&&!ob.querySelector('.netwait'))ob.insertAdjacentHTML('beforeend','<p class="small netwait" role="status">Opening a room… you will get a code to share.</p>')}netJoin('host',NetRoom.newCode());return true}if(a==='netjoin'){const v=(document.getElementById('joincode')||{}).value;netJoin('client',v);return true}
   if(a==='netstart'){netStart();return true}if(a==='netleave'){netLeave();return true}if(a==='netcopy'){netCopy();return true}if(a==='netmin'){NET.lobbyMin=true;render();return true}
   if(a==='netopen'){NET.lobbyMin=false;if(!NET.inLobby)UI.info=false;render();return true}if(a==='netlobby'){netToLobby();return true}return false}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='joincode')UI.joinCode=e.target.value;if(e.target&&e.target.id==='netname'&&typeof NetRoom!=='undefined')NET.myName=NetRoom.setName(e.target.value)});

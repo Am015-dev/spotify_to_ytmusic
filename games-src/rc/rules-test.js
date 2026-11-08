@@ -33,4 +33,7 @@ T('save/load round trip keeps a playable state',`G.stk=[];let s=0;while(!planOpe
 // clarity: every wound from a card names its cause (the event, or the ignored threat)
 T('event wound names its card',`G.stk=[];push({f:'ops',ops:[['wound','all',1]],ctx:{actor:G.first,card:'tempers',half:'ev'}});run();return G.log.slice(0,3).some(l=>/takes 1 wound \\(“Tempers Flare”\\)/.test(l.t))||JSON.stringify(G.log.slice(0,3).map(l=>l.t))`);
 T('ignored threat wound names the threat',`G.stk=[];G.ev.threat=['weary','bicker'];push({f:'fn',k:'placeThreat',card:'tempers'});run();return G.log.slice(0,6).some(l=>/wound \\(ignored threat “Take It Slow”\\)/.test(l.t))||JSON.stringify(G.log.slice(0,6).map(l=>l.t))`);
+// rules check W384 / rulebook: Soldier skill costs (Tracking 2, The Hunt 3, Frenzy 3, Defence plan 4) and Defence plan puts the beast on TOP of the hunting deck
+T('Soldier Fortify costs 3 determination (rulebook: The Hunt)',`return CHARS.soldier.skills.find(s=>s.k==='fortify').c===3&&CHARS.soldier.skills.map(s=>s.c).join()==='2,3,3,4'`);
+T('Soldier Drive the Game puts the top beast card on top of the hunting deck',`const top=G.beast[0];const n=G.hunt.length;useSkill?0:0;G.chars[0].k='soldier';G.chars[0].det=9;G.stk=[];if(typeof useSkill!=='function')return 'no useSkill';G.plan=G.plan||{};useSkill(0,'drive');return G.hunt[0]===top&&G.hunt.length===n+1`);
 console.log(`rules tests: ${pass} pass, ${fail} fail`)

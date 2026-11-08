@@ -41,7 +41,7 @@ function phExtras(c){const mv=UI.moves||[];const cm={};for(const x of mv.filter(
   if(mv.find(m=>m.a==='pass'))h+=`<button class="pb" data-a="pass">Pass</button>`;return h}
 function phTargets(c){const fr=[...new Set(c.pl.map(m=>m.s))];if(fr.length<2)return '';return `<div class="ps-x">${fr.map(s=>`<button class="pb${c.sel&&c.sel.s===s?' on':''}" data-a="target" data-s="${s}">${dot(s)} ${esc(nm(s))}</button>`).join('')}</div>`}
 function phZoomBtn(){const c3=$('#c3');if(!c3||c3.hidden)return '';return `<button class="pb zoom${PH.zoom?' on':''}" data-ph="zoom" aria-pressed="${PH.zoom}" aria-label="Zoom to my ship" title="Zoom to my ship">${PH_ICO.zoom}</button>`}
-function phHint(){if(UI.res&&UI.res.text){const w=String(UI.res.text).split(/\s+/);return esc(w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,;:.]$/,'')+'…')}return ''}
+function phHint(){if(UI.res&&UI.res.text){const w=String(UI.res.text).split(/\s+/);return esc(w.length<=18?w.join(' '):w.slice(0,17).join(' ').replace(/[,;:.]$/,'')+'…')}return ''}
 // ---------- the control strip ----------
 var tipOn=function(){try{return GXH.enabled()&&!GXH.seen('start')}catch(e){return false}};
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
@@ -54,7 +54,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   if(!dh)return `<div class="ps-main"><div class="ps-msg">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-hint">${phHint()}</div>`;
   if(G.q)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
   if(G.phase==='setup'){const best='';
-    return `<div class="ps-main"><div class="ps-msg">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> choose your start mark.':dot(d)+' <b>Choose</b> your start mark.'}</div><div class="ps-ctl">${best}${zb}</div></div>`}
+    return `<div class="ps-main"><div class="ps-msg">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()?'':'<ol class="ps-intro introcard"><li><b>Goal:</b> be the last junk afloat.</li><li><b>Each turn:</b> the dice may wake the leviathans, then you lay one current tile at your bow and sail along it.</li><li><b>You sink</b> off the chart\'s edge, on a leviathan, or sharing a wake with another junk.</li></ol>'}`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
@@ -64,7 +64,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
   const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Pick an option.');
-  return `<div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-hint">${PH.toast?esc(PH.toast):hint}</div>`}
+  return `<div class="ps-banner">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span></div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-hint">${PH.toast?esc(PH.toast):hint}</div>`}
 function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+phFeed()):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}

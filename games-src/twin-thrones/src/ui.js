@@ -14,21 +14,101 @@ var TT_TEST = {};
   function bgSlot(el, stem) { var u = TTA.url(stem); if (u && el) { el.style.backgroundImage = 'url("' + u + '")'; } }
   function delay() { return typeof window.AIDELAY === 'number' ? window.AIDELAY : 850; }
   function isAI(p) { return U.mode === 'watch' ? true : U.mode === 'cpu' ? p === 1 : false; }
-  function name(p) { return U.mode === 'cpu' ? (p === 0 ? 'You' : (U.camp ? U.camp.opponent.name : 'Computer')) : U.mode === 'two' ? 'Player ' + (p + 1) : (p === 0 ? 'Gold' : 'Teal') + ' (' + U.lvl + ')'; }
+  function name(p) { return U.mode === 'cpu' ? (p === 0 ? 'You' : (U.rivalName || (U.camp ? U.camp.opponent.name : 'Rival'))) : U.mode === 'two' ? 'Player ' + (p + 1) : (p === 0 ? 'Gold' : 'Teal') + ' (' + U.lvl + ')'; }
   function toast(t, ms) { var e = $('toast'); e.textContent = ''; e.textContent = t; e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function () { e.style.display = 'none'; }, ms || 1600); }
 
+  // ---------- turn layer: the always-visible instruction line, the turn banner, and step-by-step captions (tap to speed up)
+  function whoTag(p) { return isAI(p) ? name(p) + (U.mode === 'cpu' ? "'s turn" : ' plays') : U.mode === 'two' ? name(p) + "'s turn" : 'Your turn'; }
+  function setInstr(tag, kind, text) { var e = $('instr'); if (!e) return; e.dataset.k = kind; e.querySelector('.tg').textContent = tag; e.querySelector('.tx').textContent = text; }
+  function banner(text, kind, ms) {
+    var b = $('banner'); if (!b) return; ms = ms || Math.max(560, delay() * 1.05); b.className = 'k-' + kind; b.textContent = text; b.style.display = 'block'; b.style.animation = 'none'; void b.offsetWidth; b.style.animation = 'bann ' + ms + 'ms ease forwards';
+    clearTimeout(banner.t); banner.t = setTimeout(function () { b.style.display = 'none'; }, ms + 30);
+  }
+  function stepMs() { return U.fast ? 70 : Math.max(60, delay() * 0.85); }
+  function narrate(items, done) {
+    var i = 0, seq = U.seq; U.narr = true; U.fast = false; clearTimeout(U.nt);
+    function next() {
+      clearTimeout(U.nt); if (seq !== U.seq) { U.narr = false; return; }
+      if (i >= items.length) { U.narr = false; U.skipNarr = null; if (done) done(); return; }
+      var it = items[i++]; setInstr(it.tag, it.kind, it.text); if (it.fn) { try { it.fn(); } catch (e) { console.error(e); } }
+      U.nt = setTimeout(next, stepMs() + (it.extra || 0));
+    }
+    U.skipNarr = function () { U.fast = true; next(); }; next();
+  }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function snapState() { var G = U.G; return { av: E.available(G).map(function (c) { return c.i; }), sc: [E.score(G, 0).total, E.score(G, 1).total], coins: [G.players[0].coins, G.players[1].coins] }; }
+  // the plain sentences of one move, in the order they are shown: what happened, why it scored, what moved, what is free now
+  function moveItems(G, evs, p, snap) {
+    var it = [], tag = function (q) { return q === 0 && U.mode === 'cpu' ? 'You' : name(q); }, kindOf = function (q) { return isAI(q) ? 'rival' : 'you'; };
+    var who = function (q) { return U.mode === 'cpu' && q === 0 ? 'You' : name(q); }, verb = function (q, a, b) { return (U.mode === 'cpu' && q === 0) ? a : b; };
+    evs.forEach(function (ev) {
+      var k = kindOf(ev.p != null ? ev.p : p), tg = who(ev.p != null ? ev.p : p);
+      if (ev.t === 'pick') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.w].nm + ': ' + BY[ev.w].text + '.' });
+      else if (ev.t === 'build') { var c = BY[ev.id]; it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' build ', ' builds ') + c.nm + (ev.paid ? ', paying ' + plural(ev.paid, 'coin') + '.' : ev.chain ? ' free (chain symbol).' : ' free.') + ' ' + cap(describe(c)) + '.' }); }
+      else if (ev.t === 'discard') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' sell ', ' sells ') + BY[ev.id].nm + ' for +' + plural(ev.n, 'coin') + '.' });
+      else if (ev.t === 'wonder') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' raise ', ' raises ') + BY[ev.w].nm + '! ' + BY[ev.w].text + '.' });
+      else if (ev.t === 'token') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.id].nm + ': ' + BY[ev.id].text + '.' });
+      else if (ev.t === 'destroy') it.push({ tag: tg, kind: k, text: BY[ev.id].nm + ' is thrown away from ' + who(ev.p) + (ev.p === 0 && U.mode === 'cpu' ? 'r city.' : "'s city.") });
+      else if (ev.t === 'revive') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' rebuild ', ' rebuilds ') + BY[ev.id].nm + ' for free.' });
+      else if (ev.t === 'first') it.push({ tag: tg, kind: kindOf(ev.who), text: who(ev.who) + verb(ev.who, ' will start ', ' will start ') + 'the new age.' });
+    });
+    if (G.phase === 'play' && snap) {
+      var d = E.score(G, p).total - snap.sc[p], act = evs.filter(function (e) { return e.t === 'build' || e.t === 'wonder' || e.t === 'token'; })[0];
+      if (d > 0 && act) { var nmx = act.t === 'wonder' ? BY[act.w].nm : BY[act.id].nm; it.push({ tag: who(p), kind: kindOf(p), text: '+' + plural(d, 'point') + ' for ' + nmx + '.', fn: function () { popNum('+' + d + ' pts', $('s' + p).querySelector('.pill.vp:not(.who)') || $('s' + p)); } }); }
+      evs.forEach(function (ev) {
+        if (ev.t === 'mil') it.push({ tag: 'Conflict', kind: kindOf(p), text: 'The pawn moves ' + plural(ev.n, 'step') + ' toward ' + (U.mode === 'cpu' ? (ev.p === 0 ? 'the rival city' : 'your city') : name(1 - ev.p) + "'s city") + '.' });
+        if (ev.t === 'loot') it.push({ tag: 'Looted', kind: kindOf(p), text: who(ev.p) + verb(ev.p, ' lose ', ' loses ') + plural(ev.n, 'coin') + ': the pawn passed a marked space.', fn: function () { popNum('-' + ev.n + '$', $('s' + ev.p)); } });
+      });
+      var pdn = G.pend[0]; if (pdn && pdn.type === 'token' && pdn.from !== 'lib') it.push({ tag: who(pdn.pl), kind: kindOf(pdn.pl), text: 'A matching pair of symbols! ' + (isAI(pdn.pl) ? who(pdn.pl) + ' picks' : 'Pick') + ' a progress token.' });
+      if (it.length < 4 && !evs.some(function (e) { return e.t === 'age'; })) {
+        var fresh = E.available(G).filter(function (c) { return snap.av.indexOf(c.i) < 0; }).map(function (c) { return c.i; });
+        if (fresh.length) it.push({ tag: 'Pyramid', kind: 'info', text: 'Now free to take: ' + fresh.slice(0, 3).map(function (i) { return BY[G.pyr[i].id].nm; }).join(', ') + (fresh.length > 3 ? '...' : '') + '.', fn: function () { fresh.forEach(function (i) { var e = $('c' + i); if (e) { e.classList.add('newfree'); setTimeout(function () { e.classList.remove('newfree'); }, 1400); } }); } });
+      }
+    }
+    evs.forEach(function (ev) { if (ev.t === 'age') it.push({ tag: 'Age ' + AGE[ev.age], kind: 'info', text: 'Age ' + AGE[ev.age] + ' begins: a fresh pyramid.', fn: function () { banner('Age ' + AGE[ev.age], 'info'); } }); });
+    if (U.tut && window.TT_TUTOR && TT_TUTOR.takeReaction) { var rx = TT_TUTOR.takeReaction(); if (rx) it.push({ tag: rx.tag, kind: rx.tag === 'Pell' ? 'rival' : 'info', text: rx.text, extra: 500 }); }
+    if (!it.length) it.push({ tag: who(p), kind: kindOf(p), text: '...' });
+    return it;
+  }
+  function cap(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; }
+  // the rival's intention, said before it acts (the card is lifted while this shows)
+  function intentLine(G, p, m) {
+    var tg = name(p);
+    if (m.t === 'pick') return tg + ' eyes ' + BY[m.w].nm + '.';
+    if (m.t === 'first') return tg + ' decides who starts the age.';
+    if (m.t === 'token') return tg + ' studies the progress tokens.';
+    if (m.t === 'destroy') return tg + ' picks one of your cards to throw away.';
+    if (m.t === 'revive') return tg + ' looks through the thrown-away cards.';
+    var c = BY[G.pyr[m.i].id]; return tg + ' takes ' + c.nm + (m.t === 'build' ? ' to build it.' : m.t === 'discard' ? ' to sell it for coins.' : ' to raise a wonder.');
+  }
+
   // ---------- card faces
-  function costHtml(cost) {
-    var h = ''; Object.keys(cost).forEach(function (k) { h += k === 'coin' ? '<span class="chip r-coin">' + slot('coin') + '<b>$' + cost[k] + '</b></span>' : '<span class="chip r-' + k + '">' + slot('res-' + k) + '<span class="l">' + RS[k] + '</span>' + (cost[k] > 1 ? '<b>' + cost[k] + '</b>' : '') + '</span>'; });
+  var RN = { wood: 'wood', clay: 'clay', stone: 'stone', glass: 'glass', papyrus: 'papyrus' };
+  function costHtml(cost, words) {
+    var h = ''; Object.keys(cost).forEach(function (k) { h += k === 'coin' ? '<span class="chip r-coin' + (words ? ' wd' : '') + '" title="coins">' + slot('coin') + '<b>' + cost[k] + (words ? ' coin' + (cost[k] > 1 ? 's' : '') : '') + '</b></span>' : '<span class="chip r-' + k + (words ? ' wd' : '') + '" title="' + RN[k] + '">' + slot('res-' + k) + '<b>' + cost[k] + (words ? ' ' + RN[k] : '') + '</b></span>'; });
     return h || '<span class="chip r-free">free</span>';
+  }
+  function costWords(cost) { var t = []; Object.keys(cost).forEach(function (k) { t.push(cost[k] + ' ' + (k === 'coin' ? 'coin' + (cost[k] > 1 ? 's' : '') : RN[k])); }); return t.join(', ') || 'nothing (free)'; }
+  // one plain line for the middle of a card: the key number and what it does
+  function shortFx(c) {
+    if (c.prod) { var r = Object.keys(c.prod)[0]; return '+' + c.prod[r] + ' ' + r; }
+    if (c.choice) return 'any of ' + c.choice.length;
+    if (c.price) return c.price.length > 1 ? 'cheap trade' : 'cheap ' + c.price[0];
+    if (c.shields) return c.shields + (c.shields > 1 ? ' shields' : ' shield');
+    if (c.sci) return 'science';
+    if (c.coin) return '+' + c.coin + ' coins';
+    if (c.vp) return c.vp + ' points';
+    if (c.perCol || c.perWonder) return 'coins now';
+    if (c.guild) return 'guild';
+    return '';
   }
   function fxHtml(c) {
     var h = '';
-    if (c.prod) for (var r in c.prod) h += '<span class="bdg pr">' + slot('res-' + r) + '<span class="l">' + RS[r] + '</span>' + (c.prod[r] > 1 ? '<b>' + c.prod[r] + '</b>' : '') + '</span>';
-    if (c.choice) h += '<span class="bdg pr">' + c.choice.map(function (r) { return RS[r]; }).join('/') + '</span>';
-    if (c.price) h += '<span class="bdg pr">' + RS[c.price[0]] + ' $1</span>';
+    if (c.prod) for (var r in c.prod) h += '<span class="chip r-' + r + '" title="makes ' + r + '">' + slot('res-' + r) + '<b>+' + c.prod[r] + '</b></span>';
+    if (c.choice) h += c.choice.map(function (r) { return '<span class="chip r-' + r + '" title="' + r + '"><b>+1</b></span>'; }).join('');
+    if (c.price) h += c.price.map(function (r) { return '<span class="chip r-' + r + '" title="trade ' + r + ' for 1 coin"><b>$1</b></span>'; }).join('');
     if (c.shields) h += '<span class="bdg sh">' + slot('icon-shield') + '<b>' + c.shields + '</b></span>';
-    if (c.sci) h += '<span class="bdg sc">' + slot('sci-' + c.sci) + '<span class="l">' + SYM[c.sci] + '</span></span>';
+    if (c.sci) h += '<span class="bdg sc" title="science: ' + c.sci + '">' + slot('sci-' + c.sci) + '<span class="l">' + SYM[c.sci] + '</span></span>';
     if (c.coin) h += '<span class="bdg co">' + slot('coin') + '<b>$' + c.coin + '</b></span>';
     if (c.vp) h += '<span class="bdg vp">' + slot('icon-vp') + '<b>' + c.vp + '</b></span>';
     if (c.guild) h += '<span class="bdg vp">*</span>';
@@ -44,10 +124,10 @@ var TT_TEST = {};
     purple: '<path d="M32 4l8 18 20 2-15 14 5 20-18-10-18 10 5-20L4 24l20-2z"/>'
   };
   function cardHtml(c, cw) {
-    return '<div class="band">' + esc(c.nm) + '</div>' + slot(c.stem) + '<div class="glyph"><svg viewBox="0 0 64 64" fill="' + 'var(--cc)' + '" opacity=".55">' + (GLY[c.col] || '') + '</svg></div><div class="fx">' + fxHtml(c) + '</div><div class="costs">' + costHtml(c.cost) + (c.from ? '<span class="chip r-free" title="chain">&#8734;</span>' : '') + '</div>';
+    return '<div class="band">' + esc(c.nm) + '</div>' + slot(c.stem) + '<div class="glyph"><svg viewBox="0 0 64 64" fill="' + 'var(--cc)' + '" opacity=".3">' + (GLY[c.col] || '') + '</svg><span class="sfx">' + esc(shortFx(c)) + '</span></div><div class="fx">' + fxHtml(c) + '</div><div class="costs">' + costHtml(c.cost) + (c.from ? '<span class="chip r-free" title="chain">&#8734;</span>' : '') + '</div>';
   }
   function cardEl(c, cw) {
-    var d = document.createElement('div'); d.className = 'card'; d.dataset.col = c.col; d.style.setProperty('--cw', cw + 'px'); d.style.setProperty('--cc', 'var(--c-' + c.col + ')'); d.innerHTML = cardHtml(c, cw); fillArt(d); return d;
+    var d = document.createElement('div'); d.className = 'card' + (cw < 100 ? ' sm' : ''); d.dataset.col = c.col; d.style.setProperty('--cw', cw + 'px'); d.style.setProperty('--cc', 'var(--c-' + c.col + ')'); d.innerHTML = cardHtml(c, cw); fillArt(d); return d;
   }
   function describe(c) {
     var t = []; if (c.prod) for (var r in c.prod) t.push('makes ' + c.prod[r] + ' ' + r);
@@ -59,7 +139,7 @@ var TT_TEST = {};
 
   // ---------- board skeleton (built once per game so the pawn can slide)
   function buildBoard() {
-    var bd = $('bd'); bd.innerHTML = '<div class="strip" id="s1"></div><div class="tokrow" id="tokrow"></div><div id="mil"></div><div id="pyr"></div><div class="strip" id="s0"></div>';
+    var bd = $('bd'); bd.innerHTML = '<div id="instr" data-k="you" role="status" aria-live="polite"><span class="tg"></span><span class="tx"></span></div><div class="strip" id="s1"></div><div class="tokrow" id="tokrow"></div><div id="mil"></div><div id="pyr"></div><div class="strip" id="s0"></div>';
     var m = $('mil'), h = '<div class="cells">';
     for (var i = -9; i <= 9; i++) { var a = Math.abs(i); h += '<div class="c ' + (i === 0 ? 'mid' : a <= 2 ? 'z1' : a <= 5 ? 'z2' : a <= 8 ? 'z3' : 'z4') + '"></div>'; }
     h += '</div>'; var pos = function (v) { return (4 + 92 * (v + 9.5) / 19); };
@@ -85,7 +165,7 @@ var TT_TEST = {};
     ['wood', 'clay', 'stone', 'glass', 'papyrus'].forEach(function (r) { var n = fp[r] || 0; if (n) h += '<span class="chip r-' + r + '" style="--cw:90px">' + slot('res-' + r) + '<span class="l">' + RS[r] + '</span><b>' + n + '</b></span>'; });
     if (ch.length) h += '<span class="pill pill-ch vp">+' + ch.length + ' any</span>';
     var sci = E.sciCounts(G, p); Object.keys(sci).forEach(function (s) { h += '<span class="pill vp" style="background:#2d7a52">' + slot('sci-' + s) + '<span class="l">' + SYM[s] + '</span>' + (sci[s] > 1 ? '<b>x' + sci[s] + '</b>' : '') + '</span>'; });
-    P.tokens.forEach(function (t) { h += '<button class="tok mini" data-tok="' + t + '" title="' + esc(BY[t].nm) + '"><span>' + esc(BY[t].nm.slice(0, 2)) + '</span>' + slot(BY[t].stem) + '</button>'; });
+    P.tokens.forEach(function (t) { h += '<button class="tok mini" data-tok="' + t + '" title="' + esc(BY[t].nm) + '"><span>' + esc(BY[t].nm) + '</span>' + slot(BY[t].stem) + '</button>'; });
     h += '<span style="flex:1"></span>'; TT.COLS.forEach(function (c) { var n = E.count(G, p, c); if (n) h += '<span class="pill p-' + c + '" title="' + COLN[c] + '">' + n + '</span>'; });
     h += '<div class="wrow">'; P.wonders.forEach(function (w) {
       var d = BY[w.id]; h += '<button class="wt' + (w.card ? ' built' : G.built >= 7 ? ' dead' : '') + '" data-wonder="' + w.id + '"><span>' + esc(d.nm) + '</span>' + slot(d.stem) + '</button>';
@@ -98,7 +178,7 @@ var TT_TEST = {};
     [[3, 0], [6, 1]].forEach(function (z) { var a = $('tg' + z[0]), b = $('tg' + (-z[0])); if (a) a.style.visibility = G.loot[0][z[1]] ? 'hidden' : 'visible'; if (b) b.style.visibility = G.loot[1][z[1]] ? 'hidden' : 'visible'; });
   }
   function renderTokens() {
-    var h = ''; U.G.tokensUp.forEach(function (t) { var d = BY[t]; h += '<button class="tok" data-tok="' + t + '" title="' + esc(d.nm + ': ' + d.text) + '"><span>' + esc(d.nm.slice(0, 3)) + '</span>' + slot(d.stem) + '</button>'; });
+    var h = ''; U.G.tokensUp.forEach(function (t) { var d = BY[t]; h += '<button class="tok" data-tok="' + t + '" title="' + esc(d.nm + ': ' + d.text) + '"><span>' + esc(d.nm) + '</span>' + slot(d.stem) + '</button>'; });
     $('tokrow').innerHTML = h; fillArt($('tokrow'));
   }
   function renderPyr(flips) {
@@ -107,7 +187,7 @@ var TT_TEST = {};
     if (U.camp && U.camp.hints && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = AI.pick(G, 'normal', function () { return 0.5; }); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
     G.pyr.forEach(function (cell) {
       var c = BY[cell.id], e = document.createElement('div');
-      e.className = 'card'; e.dataset.col = c.col; e.id = 'c' + cell.i; e.style.setProperty('--cw', d.w + 'px'); e.style.setProperty('--cc', 'var(--c-' + c.col + ')');
+      e.className = 'card' + (d.w < 100 ? ' sm' : '') + (d.w < 56 ? ' xs' : ''); e.dataset.col = c.col; e.id = 'c' + cell.i; e.style.setProperty('--cw', d.w + 'px'); e.style.setProperty('--cc', 'var(--c-' + c.col + ')');
       e.style.width = d.w + 'px'; e.style.height = d.h + 'px'; e.style.left = (d.ox + cell.x * d.u - d.w / 2) + 'px'; e.style.top = (d.oy + cell.r * d.step) + 'px'; e.style.zIndex = cell.r + 1;
       if (cell.taken) e.classList.add('taken');
       else if (!cell.up) { e.classList.add('down', 'a' + G.age); e.innerHTML = slot('back-age' + G.age) + '<div class="dn">Age ' + AGE[G.age] + '</div>'; fillArt(e); }
@@ -128,40 +208,42 @@ var TT_TEST = {};
     var G = U.G, P = $('pyr'), human = canAct(); P.innerHTML = '';
     var d = document.createElement('div'); d.id = 'draft';
     G.draft.avail.forEach(function (id) {
-      var w = BY[id], b = document.createElement('button'); b.className = 'wcard'; b.dataset.pick = id; if (!human) b.disabled = true;
-      b.innerHTML = slot(w.stem) + '<b>' + esc(w.nm) + '</b><small>' + esc(w.text) + '</small><div class="costs">' + costHtml(w.cost) + '</div>'; d.appendChild(b);
+      var w = BY[id], b = document.createElement('button'); b.className = 'wcard' + (human ? ' go' : ''); b.dataset.pick = id; if (!human) b.disabled = true;
+      b.innerHTML = slot(w.stem) + '<b>' + esc(w.nm) + '</b><small>' + esc(w.text) + '</small><div class="costs">' + costHtml(w.cost, true) + '</div>'; d.appendChild(b);
     });
     P.appendChild(d); fillArt(d);
   }
   function canAct() { return !U.busy && U.G && !U.G.over && !isAI(E.sideToAct(U.G)); }
   function dock() { dock0(); zoomRender(); }
+  function instr(p, text) { if (U.narr) return; setInstr(whoTag(p), isAI(p) ? 'rival' : 'you', text); }
   function dock0() {
     var G = U.G, p = E.sideToAct(G), msg = $('msg'), sub = $('sub'), acts = $('acts'), dt = $('dt'); acts.innerHTML = ''; sub.textContent = '';
     if (G.over) { dt.textContent = 'Game over'; msg.textContent = 'Final result'; return; }
     var human = canAct(), pd = G.pend[0];
     dt.textContent = human ? (U.mode === 'two' ? name(p) + ': your move' : 'Your move') : isAI(p) ? name(p) + ' thinks' : 'Wait';
-    if (!human) { msg.textContent = isAI(p) ? name(p) + ' is thinking...' : 'Wait...'; return; }
+    if (!human && !U.narr && !isAI(p)) setInstr('Please wait', 'info', 'One moment...');
+    if (!human) { msg.textContent = U.narr ? 'Turn in progress' : isAI(p) ? name(p) + ' is thinking...' : 'Wait...'; return; }
     var M = E.validMoves(G);
     if (pd && pd.type === 'first') {
-      msg.textContent = 'Age ' + AGE[G.age] + ': who starts?';
+      msg.textContent = 'Age ' + AGE[G.age] + ': who starts?'; instr(p, 'Choose who plays first in this age.');
       acts.innerHTML = '<button class="btn" data-first="' + p + '">I start</button><button class="btn alt" data-first="' + (1 - p) + '">Rival starts</button>';
     } else if (pd && pd.type === 'token') {
-      msg.textContent = 'Pick a progress token'; var l = pd.from === 'lib' ? pd.list : G.tokensUp;
+      msg.textContent = 'Progress token'; instr(p, 'Pick a progress token: a bonus you keep for the whole game.'); var l = pd.from === 'lib' ? pd.list : G.tokensUp;
       acts.innerHTML = '<div class="picker">' + l.map(function (t) { var d = BY[t]; return '<button class="tk" data-token="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(d.text) + '</button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'destroy') {
-      msg.textContent = 'Discard a rival card';
+      msg.textContent = 'Discard a rival card'; instr(p, 'Pick one rival card to throw away.');
       acts.innerHTML = '<div class="picker">' + pd.list.map(function (t) { var d = BY[t]; return '<button class="tk" data-destroy="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(COLN[d.col]) + '</button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'revive') {
-      msg.textContent = 'Revive a discarded card';
+      msg.textContent = 'Revive a discarded card'; instr(p, 'Pick a thrown-away card to build for free.');
       acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk" data-revive="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(describe(d)) + '</button>'; }).join('') + '</div>';
     } else if (G.phase === 'draft') {
-      msg.textContent = 'Pick a wonder'; sub.textContent = 'Each of you takes four.';
+      msg.textContent = 'Wonder draft'; sub.textContent = ''; instr(p, 'Pick a wonder for your city. A wonder gives points and a power. You get 4.');
     } else if (U.sel != null) {
       var cell = G.pyr[U.sel], c = BY[cell.id], bi = E.buildInfo(G, p, c), has = function (t, w) { return M.some(function (m) { return m.t === t && m.i === cell.i && (w == null || m.w === w); }); };
       msg.textContent = c.nm; sub.textContent = describe(c) + '. Cost: ' + (bi.chain ? 'free by chain' : bi.coins + ' coin' + (bi.coins === 1 ? '' : 's') + (bi.trade ? ' (' + bi.trade + ' for trade)' : ''));
-      acts.innerHTML = '<span class="hint">Choose in the big card: build, sell or wonder.</span>';
+      instr(p, 'Choose: Build it, Sell it for coins, or use it for a Wonder.');
     } else {
-      msg.textContent = 'Tap a glowing card'; sub.textContent = 'Build it, sell it for coins, or use it for a wonder.';
+      msg.textContent = 'Gold glow = free to take'; sub.textContent = ''; instr(p, 'Tap a glowing card. Glowing cards are free to take.');
     }
   }
   // ---------- zoom: the tapped card big, every detail, and the three ways to use it
@@ -179,10 +261,10 @@ var TT_TEST = {};
     var cost = bi.chain ? 'Free by chain symbol' : 'Build cost: ' + bi.coins + ' coin' + (bi.coins === 1 ? '' : 's') + (bi.trade ? ' (' + bi.trade + ' of it for trade)' : '');
     var h = '<div class="zbox" style="--cc:var(--c-' + c.col + ')"><button class="zx" data-zclose="1" aria-label="Close">&times;</button><div class="zcard" id="zcard"></div><div class="zinfo"><h3>' + esc(c.nm) + '</h3><span class="zt">' + COLN[c.col] + ' card, Age ' + AGE[c.age] + '</span><p>' + esc(describe(c)) + '.</p>';
     chainLines(c).forEach(function (t) { h += '<p>' + esc(t) + '</p>'; });
-    h += '<p class="zc">' + esc(cost) + '</p><p>Sell it for +' + E.discardGain(G, p) + ' coins instead.</p></div><div class="zacts">';
-    h += '<button class="btn" data-a="build"' + (has('build') ? '' : ' disabled') + '>Build' + (bi.chain ? ' free' : ' · ' + bi.coins + '$') + '</button>';
-    h += '<button class="btn alt" data-a="discard">Sell +' + E.discardGain(G, p) + '$</button>';
-    G.players[p].wonders.forEach(function (w) { if (w.card) return; var wi = E.wonderInfo(G, p, w.id); h += '<button class="btn alt" data-a="wonder" data-w="' + w.id + '"' + (has('wonder', w.id) ? '' : ' disabled') + '>Wonder: ' + esc(BY[w.id].nm) + ' · ' + wi.coins + '$</button>'; });
+    h += '<p class="zc">' + esc(cost) + '</p><p>' + (Object.keys(c.cost).length ? 'Needs: ' + esc(costWords(c.cost)) + '. Missing resources are bought with coins.' : 'Needs nothing: this card is free.') + '</p><p>Sell it for +' + E.discardGain(G, p) + ' coins instead.</p></div><div class="zacts">';
+    h += '<button class="btn" data-a="build"' + (has('build') ? '' : ' disabled') + '>Build' + (bi.chain ? ' free' : ' (' + bi.coins + ' coins)') + '</button>';
+    h += '<button class="btn alt" data-a="discard">Sell for +' + E.discardGain(G, p) + ' coins</button>';
+    G.players[p].wonders.forEach(function (w) { if (w.card) return; var wi = E.wonderInfo(G, p, w.id); h += '<button class="btn alt" data-a="wonder" data-w="' + w.id + '"' + (has('wonder', w.id) ? '' : ' disabled') + '>Wonder: ' + esc(BY[w.id].nm) + ' (' + wi.coins + ' coins)</button>'; });
     z.innerHTML = h + '</div></div>'; z.hidden = false; $('zcard').appendChild(cardEl(c, window.innerWidth < 520 ? 124 : 160));
   }
   function liftDust(i) { var u = TTA.url('fx-lift-dust'), e = $('c' + i); if (!u || !e) return; var r = e.getBoundingClientRect(), f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.bottom - 30) + 'px;background-image:url("' + u + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
@@ -190,6 +272,7 @@ var TT_TEST = {};
   function render(flips) {
     var G = U.G; if (!G) return;
     strip(0); strip(1); renderMil(); renderTokens();
+    $('bd').classList.toggle('drafting', G.phase === 'draft');
     if (G.phase === 'draft') renderDraft(); else renderPyr(flips);
     dock(); logRender();
     SND.sync(); if (G.over) showResult();
@@ -227,11 +310,12 @@ var TT_TEST = {};
     return '';
   }
   function doMove(m) {
-    var G = U.G, p = E.sideToAct(G), prevUp = {}, pre = null, preHtml = '';
+    var G = U.G, p = E.sideToAct(G), prevUp = {}, pre = null, preHtml = '', snap = G.phase === 'play' ? snapState() : null;
     if (m.i != null) { pre = rectOf('c' + m.i); var c = BY[G.pyr[m.i].id]; preHtml = cardHtml(c, pre ? pre.width : 60); var ghostCol = c.col; }
     G.pyr.forEach(function (c) { prevUp[c.i] = c.up; });
+    if (U.tut && p === 0 && window.TT_TUTOR && TT_TUTOR.beforePlayerMove) TT_TUTOR.beforePlayerMove(G, m);
     E.apply(G, m); U.sel = null; U.fingerDone = true; U.seq++;
-    var flips = []; G.pyr.forEach(function (c) { if (c.up && !prevUp[c.i] && !c.taken) flips.push(c.i); });
+    U.busy = true; var flips = []; G.pyr.forEach(function (c) { if (c.up && !prevUp[c.i] && !c.taken) flips.push(c.i); });
     G.ev.forEach(function (ev) { var l = lineOf(ev, G); if (l) { U.logs.push(l); G.log.push(l); } });
     render(flips);
     G.ev.forEach(function (ev) {
@@ -243,29 +327,35 @@ var TT_TEST = {};
       else if (ev.t === 'discard') { if (pre) flyCard(pre, preHtml, tgt); popNum('+' + ev.n + '$', tgt); }
       else if (ev.t === 'loot') popNum('-' + ev.n + '$', $('s' + ev.p));
       else if (ev.t === 'mil') { $('pawn').classList.add('slide'); var gu = TTA.url('fx-pawn-glow'); if (gu) { var gl = document.createElement('i'); gl.className = 'pawnglow'; gl.style.backgroundImage = 'url("' + gu + '")'; $('pawn').appendChild(gl); setTimeout(function () { gl.remove(); }, 1000); } setTimeout(function () { $('pawn').classList.remove('slide'); }, 900); }
-      else if (ev.t === 'age') toast('Age ' + AGE[ev.age] + ' begins', 1800);
     });
     if (G.ev.some(function (e) { return e.t === 'age'; })) $('pyr').querySelectorAll('.card').forEach(function (e) { e.classList.add('pop'); });
-    after();
+    if (G.over) return;
+    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
+    narrate(items, function () { U.busy = false; after(); });
   }
+  function dock0Lock() { $('acts').innerHTML = ''; var z = $('zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
   function after() {
     var G = U.G; if (G.over) return;
     var p = E.sideToAct(G); clearTimeout(U.aiTimer);
+    if (G.phase === 'play' && !G.pend.length && U.lastSide !== p) { U.lastSide = p; banner(whoTag(p), isAI(p) ? 'rival' : 'you'); }
+    if (G.phase === 'play' && G.pend.length && U.lastSide !== p) U.lastSide = p;
     if (isAI(p)) {
-      U.busy = true; render0();
+      U.busy = true; render0(); var seq = U.seq;
+      setInstr(whoTag(p), 'rival', name(p) + ' is thinking...');
       U.aiTimer = setTimeout(function () {
-        var seq = U.seq, rng = function () { return E.rnd(G); }, lv = U.mode === 'watch' ? U.lvl : U.lvl, m = (U.tut && window.TT_TUTOR && !G.pend.length && G.phase === 'play') ? TT_TUTOR.aiMove(G) : AI.pick(G, lv, rng);
+        if (seq !== U.seq || U.G !== G) return;
+        var rng = function () { return E.rnd(G); }, lv = U.lvl, m = AI.pick(G, lv, rng);
         if (!m) { U.busy = false; return; }
-        if (m.i != null) { var e = $('c' + m.i); if (e) e.classList.add('aipick'); }
-        setTimeout(function () { if (seq !== U.seq || U.G !== G) return; U.busy = false; doMove(m); }, Math.min(500, delay() * 0.6 + 40));
-      }, delay());
-    } else { U.busy = false; render0(); }
+        narrate([{ tag: whoTag(p), kind: 'rival', text: intentLine(G, p, m), fn: function () { if (m.i != null) { var e = $('c' + m.i); if (e) e.classList.add('aipick'); } else if (m.t === 'pick') { var w = document.querySelector('[data-pick="' + m.w + '"]'); if (w) w.classList.add('aipick'); } } }],
+          function () { if (seq !== U.seq || U.G !== G) return; U.busy = false; doMove(m); });
+      }, stepMs());
+    } else { U.busy = false; render0(); if (U.tut && window.TT_TUTOR && TT_TUTOR.onTurn) TT_TUTOR.onTurn(G); }
   }
   function render0() { dock(); if (U.G.phase !== 'draft') { var P = $('pyr'); P.querySelectorAll('.card.av').forEach(function (e) { e.classList.toggle('dim', !canAct()); }); } else renderDraft(); strip(0); strip(1); }
 
   // ---------- screens
   function showStart() {
-    var s = $('start'); clearTimeout(U.aiTimer); U.busy = true; U.camp = null; $('res').hidden = true; s.hidden = false; bgSlot(s, 'title-bg'); $('zoom').hidden = true;
+    var s = $('start'); if (window.TT_TUTOR && TT_TUTOR.cancel) TT_TUTOR.cancel(); clearTimeout(U.aiTimer); U.busy = true; U.camp = null; $('res').hidden = true; s.hidden = false; bgSlot(s, 'title-bg'); $('zoom').hidden = true;
     var lv = U.lvl, prog = '';
     try { if (window.GXC && window.CAMPAIGN) { var p = GXC.progress(), n = window.CAMPAIGN.chapters.filter(function (c) { return p.ch[c.id] && p.ch[c.id].beaten; }).length; prog = n ? n + ' of ' + window.CAMPAIGN.chapters.length + ' chapters done' : 'The Twin Crowns: 10 chapters'; } } catch (e) { }
     s.innerHTML = '<h1>Twin Thrones</h1><p>Two rival cities, one pyramid of cards. Out-build, out-think, or out-march your rival.</p>' +
@@ -277,23 +367,42 @@ var TT_TEST = {};
   function sndLabel() { return 'Sound: ' + (SND.isOn() ? 'on' : 'off'); }
   function firstTime() { try { return !localStorage.getItem('tt_seen') && !GXT.isDone('twin-thrones'); } catch (e) { return false; } }
   function tutBtn() { return window.GXT ? GXT.menuHTML({ game: 'twin-thrones', first: firstTime(), cls: 'btn alt sm', launch: function () { GX.close && GX.close(); if (window.TT_TUTOR) TT_TUTOR.start(); } }) : ''; }
+  var FLAVOUR = (window.CAMPAIGN && CAMPAIGN.quick && CAMPAIGN.quick.intro) || ['Two thrones stand empty. Draft your wonders, then out-build the rival.'];
   function newGame(mode, seed, camp) {
-    try { localStorage.setItem('tt_seen', '1'); } catch (e) { } U.mode = mode; U.ai = [mode === 'watch', mode !== 'two']; U.G = E.newGame({ seed: seed }); U.camp = camp || null; U.finished = false; U.logs = []; var tw = camp && camp.twist; if (tw) { if (tw.id === 'extra-coins') U.G.players[1].coins += tw.param; if (tw.id === 'head-start') U.G.mil = -tw.param; } U.sel = null; U.fingerDone = false; U.busy = false; U.seq++;
-    $('start').hidden = true; $('res').hidden = true; buildBoard(); toast(camp ? 'Goal: ' + camp.goal.text + (tw ? ' ' + tw.text : '') : 'Draft four wonders each', camp ? 4200 : 1800); render(); after();
+    try { localStorage.setItem('tt_seen', '1'); } catch (e) { } U.mode = mode; U.ai = [mode === 'watch', mode !== 'two']; U.G = E.newGame({ seed: seed }); U.camp = camp || null; U.finished = false; U.logs = []; var tw = camp && camp.twist; if (tw) { if (tw.id === 'extra-coins') U.G.players[1].coins += tw.param; if (tw.id === 'head-start') U.G.mil = -tw.param; } U.sel = null; U.fingerDone = false; U.busy = false; U.seq++; U.narr = false; U.lastSide = null; clearTimeout(U.nt); if (!U.tut) U.rivalName = null;
+    $('start').hidden = true; $('res').hidden = true; buildBoard(); render();
+    var fl = camp ? 'Goal: ' + camp.goal.text + (tw ? ' ' + tw.text : '') : FLAVOUR[Math.floor(Math.random() * FLAVOUR.length)];
+    if (U.tut) { after(); return; }
+    banner(camp ? camp.title : 'The duel begins', 'info', camp ? 1400 : 1100); U.busy = true; narrate([{ tag: 'The duel', kind: 'info', text: fl, extra: camp ? 1500 : 500 }], function () { U.busy = false; after(); });
+  }
+  // the climax: totals count up row by row (tap anywhere on the table to jump to the end)
+  function countUp(r) {
+    var cells = [].slice.call(r.querySelectorAll('.cu')), t0 = performance.now(), dur = Math.max(300, delay() * 1.6), seq = U.seq;
+    function fin() { cells.forEach(function (c) { c.textContent = c.dataset.n; }); }
+    function tick(now) { if (seq !== U.seq) return; var k = Math.min(1, (now - t0) / dur); cells.forEach(function (c) { c.textContent = Math.round(+c.dataset.n * k); }); if (k < 1) requestAnimationFrame(tick); else fin(); }
+    var tb = r.querySelector('table'); if (tb) tb.addEventListener('click', fin); requestAnimationFrame(tick);
+  }
+  function resultLine(G) {
+    var me = U.mode === 'cpu', w = G.winner, who = me ? name(1) : '';
+    if (w < 0) return 'Neither crown falls. The river city and the hill city share the night.';
+    if (!me) return name(w) + ' raises the crown and the other city kneels.';
+    if (G.reason === 'military') return w === 0 ? 'Your banners reach their gate. ' + who + ' hands over the keys.' : 'Their banners reach your gate. The city falls before dawn.';
+    if (G.reason === 'science') return w === 0 ? 'Six symbols, one great discovery. The scholars crown you.' : who + "'s scholars solve what yours could not.";
+    return w === 0 ? 'The crown is yours. ' + who + ' bows to the better builder.' : who + ' wears the crown this time. Build faster next round.';
   }
   function reasonText(G) {
-    return { military: 'Military supremacy: the conflict pawn reached the rival capital.', science: 'Science supremacy: six different symbols.', points: 'Victory on points.', tiebreak: 'Won the tie on civic points.', draw: 'A perfect draw.' }[G.reason] || G.reason;
+    var mine = U.mode === 'cpu' ? G.winner === 0 : true; return { military: mine ? 'Military supremacy: the conflict pawn reached the rival capital.' : 'Military supremacy: the conflict pawn reached your capital.', science: 'Science supremacy: six different symbols.', points: 'Victory on points.', tiebreak: 'Won the tie on civic points.', draw: 'A perfect draw.' }[G.reason] || G.reason;
   }
   function showResult() {
     var G = U.G, r = $('res'); if (!r.hidden) return; clearTimeout(U.aiTimer); U.busy = true;
-    if (U.camp && window.GXC && GXC.active()) { if (!U.finished) { U.finished = true; if (!U.tut) SND.play(G.winner === 0 ? 'win' : 'lose'); setTimeout(function () { try { GXC.finish(G); } catch (e) { console.error(e); } }, 900); } return; }
+    if (U.camp && window.GXC && GXC.active()) { if (!U.finished) { U.finished = true; if (!U.tut) SND.play(G.winner === 0 ? 'win' : 'lose'); var fin = function () { try { GXC.finish(G); } catch (e) { console.error(e); } }, def = U.camp; setTimeout(function () { if (G.winner !== 0 && def.outroLose && GXC.scene) GXC.scene(def.outroLose, { def: def, title: def.title, last: 'Continue' }).then(fin); else fin(); }, 900); } return; }
     r.hidden = false;
     var win = G.winner >= 0 && (U.mode !== 'cpu' || G.winner === 0); bgSlot(r, win ? 'result-victory' : 'result-defeat'); if (!U.tut) SND.play(win ? 'win' : 'lose');
-    var head = G.winner < 0 ? 'A draw' : U.mode === 'cpu' ? (G.winner === 0 ? 'You win!' : 'Computer wins') : name(G.winner) + ' wins!';
-    var h = '<h2>' + esc(head) + '</h2><p>' + esc(reasonText(G)) + '</p>';
+    var head = G.winner < 0 ? 'A draw' : U.mode === 'cpu' ? (G.winner === 0 ? 'You win!' : name(1) + ' wins') : name(G.winner) + ' wins!';
+    var h = '<h2>' + esc(head) + '</h2><p>' + esc(reasonText(G)) + '</p><p class="line">' + esc(resultLine(G)) + '</p>';
     if (G.final) { var a = G.final[0], b = G.final[1]; h += '<table><tr><th></th><th>' + esc(name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
-      [['Civic', 'blue'], ['Science', 'green'], ['Trade', 'yellow'], ['Guilds', 'guild'], ['Wonders', 'wonder'], ['Tokens', 'token'], ['Coins', 'coins'], ['Conflict', 'mil'], ['Total', 'total']].forEach(function (k) { h += '<tr><td>' + k[0] + '</td><td>' + a[k[1]] + '</td><td>' + b[k[1]] + '</td></tr>'; }); h += '</table>'; }
-    h += '<button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button>'; r.innerHTML = h;
+      [['Civic', 'blue'], ['Science', 'green'], ['Trade', 'yellow'], ['Guilds', 'guild'], ['Wonders', 'wonder'], ['Tokens', 'token'], ['Coins', 'coins'], ['Conflict', 'mil'], ['Total', 'total']].forEach(function (k) { h += '<tr><td>' + k[0] + '</td><td class="cu" data-n="' + a[k[1]] + '">0</td><td class="cu" data-n="' + b[k[1]] + '">0</td></tr>'; }); h += '</table>'; }
+    h += '<button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button>'; r.innerHTML = h; countUp(r); if (U.tut && window.TT_TUTOR && TT_TUTOR.onResult) TT_TUTOR.onResult(G);
   }
 
   // ---------- drawers
@@ -305,7 +414,6 @@ var TT_TEST = {};
   }
   // ---------- story mode (shared campaign kit)
   function campStart(def) {
-    if (def.id === 'c1' && window.GXT && !GXT.isDone('twin-thrones') && window.TT_TUTOR) { TT_TUTOR.start({ then: function () { campStart(def); } }); return; }
     U.lvl = def.opponent.aiLevel || 'normal'; U.hints = !!def.hints; var sd = def.setup && def.setup.seed; newGame('cpu', sd == null ? undefined : sd, def);
   }
   function campIsWon(G, def) {
@@ -319,18 +427,19 @@ var TT_TEST = {};
   function campInit() {
     if (!window.GXC || !window.CAMPAIGN) return;
     GXC.init({ game: 'twin-thrones', artBase: 'media/', data: window.CAMPAIGN,
-      headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', function () { GXC.close(); if (window.TT_TUTOR) TT_TUTOR.start(); }); return [b]; },
+      headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'How to play'; b.setAttribute('aria-label', 'How to play and the tutorial'); b.addEventListener('click', function () { GXC.close(); GX.show('rulesd'); }); return [b]; },
       startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
       onExit: function () { U.camp = null; showStart(); },
       scores: function (G) { return [E.score(G, 0).total, E.score(G, 1).total]; },
-      seats: function () { return [{ name: 'You', me: true }, { name: U.camp ? U.camp.opponent.name : 'Computer', ai: U.lvl }]; } });
+      seats: function () { return [{ name: 'You', me: true }, { name: U.camp ? U.camp.opponent.name : 'Rival', ai: U.lvl }]; } });
+    var go0 = GXC.open; GXC.open = function () { try { if (window.TT_TUTOR && TT_TUTOR.cancel) TT_TUTOR.cancel(); if (window.GXT && GXT.running && GXT.running()) { GXT.stop(); U.tut = false; U.rivalName = null; } } catch (e) { } if (U.tut) showStart(); return go0.apply(this, arguments); };
   }
   function menuRender() {
     var b = $('menubody'); if (!b) return;
     b.innerHTML = '<div class="mrow"><button class="btn" data-menu="rules">Rules</button>' + tutBtn() + '<button class="btn alt" data-menu="restart">Restart game</button><button class="btn alt" data-snd="1">' + sndLabel() + '</button>' + (SND.hasMusic() ? '<button class="btn alt" data-menu="music">Music</button>' : '') + '<button class="btn alt" data-menu="title">Back to title</button></div>';
   }
   function rulesRender() {
-    $('rulesbox').innerHTML = '<div class="mrow">' + tutBtn() + '</div><h3>The goal</h3><p>Win by marching the conflict pawn to the rival capital, by collecting six different science symbols, or by having the most points after Age III.</p><h3>Your turn</h3><p>Take one uncovered card from the pyramid. <b>Build</b> it by paying its cost (missing resources are bought from the bank at 2 coins plus what your rival produces), <b>sell</b> it for 2 coins plus 1 per trade card you own, or <b>use it to raise a wonder</b>. Face-down cards flip when nothing covers them.</p><h3>Chains</h3><p>A card with an infinity mark is free when you own the matching symbol.</p><h3>Conflict</h3><p>Shields push the pawn toward your rival. Passing the marked spaces loots coins from them.</p><h3>Science</h3><p>A matching pair of symbols lets you pick a progress token.</p><h3>Wonders</h3><p>Four each, but only seven can ever be built in total.</p>';
+    $('rulesbox').innerHTML = '<div class="mrow">' + tutBtn() + '</div><h3>How a turn works</h3><ol class="turn5"><li>Look for the glowing cards. Only those are free to take.</li><li>Tap one to see it big, with its cost.</li><li>Choose <b>Build</b> (pay its cost), <b>Sell</b> (take coins) or <b>Wonder</b> (tuck it under a wonder).</li><li>Watch what happens: the card moves, points and coins pop up, the pawn may march.</li><li>Then your rival does the same, one step at a time. Tap the board to speed it up.</li></ol><h3>The goal</h3><p>Win by marching the conflict pawn to the rival capital, by collecting six different science symbols, or by having the most points after Age III.</p><h3>Your turn</h3><p>Take one uncovered card from the pyramid. <b>Build</b> it by paying its cost (missing resources are bought from the bank at 2 coins plus what your rival produces), <b>sell</b> it for 2 coins plus 1 per trade card you own, or <b>use it to raise a wonder</b>. Face-down cards flip when nothing covers them.</p><h3>Chains</h3><p>A card with an infinity mark is free when you own the matching symbol.</p><h3>Conflict</h3><p>Shields push the pawn toward your rival. Passing the marked spaces loots coins from them.</p><h3>Science</h3><p>A matching pair of symbols lets you pick a progress token.</p><h3>Wonders</h3><p>Four each, but only seven can ever be built in total.</p>';
   }
   function showCity(p) {
     var G = U.G, b = $('cityd').querySelector('.gx-drawer-body'), h = '<h3>' + esc(name(p)) + '</h3><div class="ref" id="cityref"></div>'; b.innerHTML = h; var c = $('cityref');
@@ -357,14 +466,15 @@ var TT_TEST = {};
       GX.close(); newGame(U.mode); return;
     }
     if (!U.G) return;
+    if (U.narr && U.skipNarr && !q('button') && (q('#instr') || q('#banner') || q('#pyr') || q('#bd'))) { U.skipNarr(); return; }
     if ((b = q('[data-city]'))) { showCity(+b.dataset.city); return; }
     if ((b = q('[data-tok]'))) { var d = BY[b.dataset.tok]; toast(d.nm + ': ' + d.text, 2600); return; }
     if ((b = q('[data-wonder]'))) { var w = BY[b.dataset.wonder]; toast(w.nm + ': ' + w.text, 2800); return; }
-    if ((b = q('[data-pick]'))) { step({ t: 'pick', w: b.dataset.pick }); return; }
-    if ((b = q('[data-first]'))) { step({ t: 'first', who: +b.dataset.first }); return; }
-    if ((b = q('[data-token]'))) { step({ t: 'token', id: b.dataset.token }); return; }
-    if ((b = q('[data-destroy]'))) { step({ t: 'destroy', id: b.dataset.destroy }); return; }
-    if ((b = q('[data-revive]'))) { step({ t: 'revive', id: b.dataset.revive }); return; }
+    if ((b = q('[data-pick]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'pick', id: b.dataset.pick }) === false) return; step({ t: 'pick', w: b.dataset.pick }); return; }
+    if ((b = q('[data-first]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'first' }) === false) return; step({ t: 'first', who: +b.dataset.first }); return; }
+    if ((b = q('[data-token]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'token', id: b.dataset.token }) === false) return; step({ t: 'token', id: b.dataset.token }); return; }
+    if ((b = q('[data-destroy]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'destroy' }) === false) return; step({ t: 'destroy', id: b.dataset.destroy }); return; }
+    if ((b = q('[data-revive]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'revive' }) === false) return; step({ t: 'revive', id: b.dataset.revive }); return; }
     if (q('[data-zclose]') || t.id === 'zoom') { if (window.GXT && GXT.act({ type: 'tap', kind: 'other' }) === false) return; closeZoom(); return; }
     if ((b = q('[data-a]'))) { if (b.disabled || U.sel == null) return; var a = b.dataset.a; if (window.GXT && GXT.act({ type: 'tap', kind: 'act', a: a, w: b.dataset.w || null }) === false) return; step(a === 'wonder' ? { t: 'wonder', i: U.sel, w: b.dataset.w } : { t: a, i: U.sel }); return; }
     if ((b = q('.card.av')) && canAct() && !U.G.pend.length && U.G.phase === 'play') {
@@ -388,7 +498,7 @@ var TT_TEST = {};
     SND.initMusic(function () { var G = U.G; if (!G || !$('start').hidden) return ['menu', 0]; if (G.over) { var win = G.winner >= 0 && (U.mode !== 'cpu' || G.winner === 0); return [win ? 'victory' : 'defeat', 1]; } return ['age' + (G.age || 1), 0]; });
     showStart();
   }
-  window.TT_UI = { campStart: campStart, U: U, E: E, BY: BY, $: $, canAct: canAct, newGame: newGame, renderPyr: renderPyr, dock: dock, render: render, showStart: showStart, closeZoom: closeZoom };
+  window.TT_UI = { after: function () { after(); }, campStart: campStart, U: U, E: E, BY: BY, $: $, canAct: canAct, newGame: newGame, renderPyr: renderPyr, dock: dock, render: render, showStart: showStart, closeZoom: closeZoom };
   TT_TEST.U = U; TT_TEST.E = E;
   TT_TEST.forceEnd = function (seat) { var G = U.G; G.over = true; G.winner = seat; G.reason = 'military'; G.pend = []; render(); };
   TT_TEST.newGame = newGame;
