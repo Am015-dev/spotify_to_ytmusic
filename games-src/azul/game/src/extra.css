@@ -70,3 +70,33 @@ html body .gxc-node.locked .gxc-disc{opacity:1!important;filter:none!important;b
 @media (min-width:1000px){html body .gx-app.gx-dock-min .gx-dock,html body .gx-app.gx-dock-min .gx-dock *{visibility:hidden!important;pointer-events:none!important}}   /* a hidden side panel hides every control in it */
 html.sk body .gxc-node.open .gxc-disc{color:#2b1608!important;text-shadow:none!important}   /* skin art: the open node's copper centre needs a dark digit */
 .gx-dock .gx-dock-head{order:-1}   /* the dock head sits last in the DOM (so a hidden-panel tap cannot orphan the pick list) but first on screen */
+
+/* W466 feel: drag ghost, drop glow, readable word pops, goal bullets */
+#bf .bf-table .bf-t[data-k]{touch-action:none}
+.bf-drag{position:fixed;left:0;top:0;z-index:70;pointer-events:none;margin:calc(var(--cs)*-.9) 0 0 calc(var(--cs)*-.6);display:flex;align-items:center;gap:4px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.55))}
+.bf-drag .bf-t{width:calc(var(--cs)*1.25);height:calc(var(--cs)*1.25);transform:rotate(-6deg) scale(1.08)}
+.bf-drag b{font:900 20px var(--ff);color:#fff;background:#14234d;border:2px solid #e8c36a;border-radius:12px;padding:1px 8px}
+#bf .bf-dov .bf-rack{outline:3px solid #ffe36b;outline-offset:2px;box-shadow:0 0 18px 4px rgba(255,214,90,.75)}
+#bf .bf-dov.bf-dno .bf-rack{outline-color:#ff8a7a;box-shadow:0 0 14px 3px rgba(255,110,90,.6)}
+.bf-pop.wordy{font-size:17px;background:rgba(10,20,50,.92);padding:4px 12px;border-radius:12px;color:#fff;text-shadow:none;box-shadow:0 0 0 2px #c99a3e}
+.bf-ban{top:42%}
+.bf-ban small{font-size:17px}
+.bf-story .bf-aim{margin:6px 4px 12px 22px;padding:0;text-align:left;font:600 16px/1.45 var(--ff);color:#3b2614}
+.bf-story .bf-aim li{margin:3px 0}
+.cg-t{white-space:pre-line}
+/* W466: nothing under 14px on a phone */
+#bf .bf-floor .bf-c span{font-size:max(14px,calc(var(--cs)*.42))}
+#bf .bf-fll{font-size:14px}
+html body .bf-chip .bf-pj{font-size:14px}
+.cg-b{font-size:15px!important;line-height:1.35!important}.cg-b b{font-size:14px!important}
+.bf-story .acts{justify-content:center}
+/* W466: contrast >= 4.5 (audit rule B) */
+.btn.go{background:linear-gradient(180deg,#b9552b,#8c3415)}
+.gxc-node .gxc-lock{background:#2a160c;color:#fff;border-radius:50%;padding:1px 3px;line-height:1.2}
+/* W466 feel gate (d): badges and hints >= 14px */
+#bf .bf-bd{font-size:14px;height:24px;line-height:24px;min-width:24px;border-radius:12px}#bf .bf-bd.rec{font-size:14px}
+#bf .bf-c em{font-size:max(14px,calc(var(--cs)*.42))!important}
+.gxt-endc li,.gxt-endc,.gxt-ex{font-size:max(14px,1em)}
+.gxt-endc li{font-size:15px}
+/* W466 gate (d): small print in the song picker and round-score lines */
+.gxm-list small,h5 small,.gxt-endc small,#bf small,.cg-b small{font-size:14px!important}

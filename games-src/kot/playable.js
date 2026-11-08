@@ -48,7 +48,7 @@
     const g = TUT_STORY.guide;
     el.style.setProperty('--bc', g.color);
     el.innerHTML = `<img src="${g.img}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:'${g.emoji}'}))"><div>${head ? `<b>${esc(head)}</b>` : `<b>${esc(g.name)}</b>`}<span>${esc(text)}</span></div>`;
-    el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(beatT); beatT = setTimeout(() => el.classList.remove('on'), ms || (head ? 4200 : 2400));
+    el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(beatT); const nw = String(text || '').split(/\s+/).length; beatT = setTimeout(() => el.classList.remove('on'), Math.max(ms || 0, 4000 + nw * 100));
   };
   // ---- the coached first game: tips from tut-story.js (COACH_TIPS), one bubble at a time, never blocks input
   const C = window.PPC = { on: false, seen: {}, rules: {}, cur: null, hideT: 0, ended: false };
@@ -60,7 +60,7 @@
     el.style.setProperty('--bc', g.color);
     el.innerHTML = `<img src="${g.img}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:'${g.emoji}'}))"><div><b>${esc(t.head || g.name)}</b><span>${esc(txt)}</span>${t.html || ''}</div><button type="button" data-pp-x aria-label="Dismiss">×</button>`;
     el.classList.add('on'); C.cur = t.id; (t.rules || []).forEach(r => C.rules[r] = 1); C.seen[t.id] = 1;
-    clearTimeout(C.hideT); if (!t.sticky) C.hideT = setTimeout(hideCoach, 8000);
+    clearTimeout(C.hideT); if (!t.sticky) C.hideT = setTimeout(hideCoach, Math.max(t.ms || 8000, 4000 + String(txt).split(/\s+/).length * 100));
   }
   const HELP_ = () => ({ vp: P(0).vp, rival: mname(G.pl.find(p => !p.human) || G.pl[1]) });
   function finalCard() {
@@ -82,7 +82,7 @@
     for (const t of COACH_TIPS) { if (C.seen[t.id]) continue; let ok = false; try { ok = t.when() } catch (e) { } if (ok) { showCoach(t); return } }
   }
   window.ppCoachStart = function () { C.on = true; C.seen = {}; C.rules = {}; C.ended = false; hideCoach();
-    const el = $('ppcoach'); setTimeout(() => { if (C.on && !C.cur && G && G.tut) { const t = COACH_TIPS[0]; if (t.when()) showCoach(Object.assign({}, t, { html: '<span class="pp-row"><button type="button" data-pp-skip>Skip tutorial</button></span>' })) } }, 400) };
+    const el = $('ppcoach'); setTimeout(() => { if (C.on && !C.cur && G && G.tut) { const t = COACH_TIPS[0]; if (t.when()) showCoach(Object.assign({}, t, { html: (t.html || '') + '<span class="pp-row"><button type="button" data-pp-skip>Skip tutorial</button></span>' })) } }, 400) };
   window.ppCoachStop = function () { C.on = false; hideCoach() };
   // for qa-bot: running = the coached game is on; explained = rule ids explained so far (or listed on the final card); done = the final card was shown
   Object.defineProperty(window, 'GXCOACH', { configurable: true, get: () => ({ running: !!(C.on && typeof G !== 'undefined' && G && G.tut && !G.winner), explained: Object.keys(C.rules), done: !!C.ended }) });

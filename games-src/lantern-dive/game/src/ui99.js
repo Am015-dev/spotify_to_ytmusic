@@ -132,7 +132,7 @@ var PADIMG = null;
 (function () {
   const R = document.documentElement;
   function boot() {
-    try { GXSK.init({ sets: { 'sk-tank': ['icon-tank-full', 'icon-tank-empty'], 'sk-heart': ['icon-heart'], 'sk-air': ['icon-air'] } }); } catch (e) { }
+    try { GXSK.init({ map: true, stars: true, sets: { 'sk-tank': ['icon-tank-full', 'icon-tank-empty'], 'sk-heart': ['icon-heart'], 'sk-air': ['icon-air'] } }); } catch (e) { }
     // painted card frames (media/card-face-*.webp): drawn by pxFace on the Pixi table, cropped inside their paper edge; the drawn card stays until each file loaded
     let fr = 0; const faceRefresh = () => { clearTimeout(fr); fr = setTimeout(() => { try { for (const k of Object.keys(PX.tex)) if (k.indexOf('f:') === 0) delete PX.tex[k]; PX.warm = ''; for (const o of PX.objs.values()) if (o.kind === 'card') pxCardTex(o); pxPrewarm(); pxDirty(); } catch (e) { } }, 60); };
     ['coral', 'tide', 'kelp', 'sunstar', 'lantern'].forEach((n, si) => { const i = new Image(); i.onload = () => { try { PX.img['face' + si] = i; if (PX.on) faceRefresh(); } catch (e) { } }; i.src = MEDIA + 'card-face-' + n + '.webp'; });
