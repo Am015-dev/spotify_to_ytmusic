@@ -42,7 +42,7 @@ const SHOT = async (c, n) => { if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: tru
 async function tutorial(browser, W, H, dismissMode) {
   const c = await mk(browser, W, H), { p, tag } = c, T = await p.evaluate(() => window.CAMPAIGN.tutorial);
   const core = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
-  if (!(await tapSel(c, '#start .tbtn.story'))) { note(tag, 'no Play button'); return; }
+  if (!(await tapSel(c, '#start .ttut'))) { note(tag, 'no Learn to play button'); return; }
   await sleep(900);
   const first = await p.evaluate(() => !!document.querySelector('.fa-coach') && !!(UI.fc));
   if (!first) note(tag, 'no coach bubble at the start');
