@@ -32,15 +32,15 @@ function scTracker(){const ln=document.getElementById('line');if(!ln)return;cons
   const s=sideToAct();const who=s<0?'':P(s);const mine=who&&who.human&&G.pl.filter(x=>x.human).length===1;const ph=scPhase();
   const nm=mine?'Your turn':who?plName(who.nm)+"'s turn":'';
   t.innerHTML='<span class="trk-p">'+SC_PH.map((l,i)=>'<i class="'+(i===ph?'on':i<ph?'done':'')+'">'+l+'</i>').join('')+'</span><b class="trk-w '+(mine?'me':'')+'">'+esc(nm)+'</b><b class="trk-r">Round '+G.round+'</b>'}
-function scPreview(){const ln=document.getElementById('line');if(!ln)return;const e=scEl('trk2','trk2',(document.getElementById('trk')||ln).nextSibling);if(!G||G.over||online()||!G.pl[0].human){e.hidden=true;return}
+function scPreview(){const ln=document.getElementById('line');if(!ln)return;const e=scEl('trk2','trk2',(document.getElementById('trk')||ln).nextSibling);if(!G||G.over||online()||G.coach||!G.pl[0].human){e.hidden=true;return}
   let txt='';const p=G.pl[0];
   if(scMine()&&G.step==='move'){scCompute();
-    if(!G.move){if(SC.bestTotal>=0)txt='★ Best start: up to +'+SC.bestTotal+': '+SC.bestLabel}
+    if(!G.move){if(SC.bestTotal>=0)txt='★ Best start: +'+SC.bestTotal+' ('+SC.bestLabel+')'}
     else{const k=G.move.path.length;let best=null;const tg=SC.hov!=null&&stepTargets().includes(SC.hov)?[SC.hov]:stepTargets();const sx=SC.starts[G.move.start];
       if(sx)for(const nx of tg)for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!best||x.total>best.total))best=x;
-      txt=best?(SC.hov!=null?'Here: ':'Best from here: ')+'+'+best.total+': '+scText(best.parts):'Keep walking: the last person must land on its own colour'}}
+      txt=best?(SC.hov!=null?'Here: ':'Best from here: ')+'+'+best.total+': '+scText(best.parts):'Keep walking. The last one must match its colour.'}}
   else if(G.phase==='bid'&&G.bidQueue[0]&&G.bidQueue[0].p===0)txt='Dearer spots play first. Each coin spent is a point lost.';
-  else if(scMine()&&G.act&&(G.step==='tribe'||G.step==='tile'||G.step==='sell')){const a=G.act;txt='You took '+a.n+' '+(a.n>1?MPLUR[a.color]:MNAME[a.color])+' on '+tileName(G.board[a.tile])+'. Finish the tile action, then your turn ends.'}
+  else if(scMine()&&G.act&&(G.step==='tribe'||G.step==='tile'||G.step==='sell')){const a=G.act;txt='You took '+a.n+' '+(a.n>1?MPLUR[a.color]:MNAME[a.color])+' on '+tileName(G.board[a.tile])+'. Finish the tile action to end your turn.'}
   e.hidden=!txt;e.textContent=txt}
 function scBadges(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
   if(!hn||!scMine()||G.step!=='move'||online())return;scCompute();const add=(i,v,star)=>{const el=tileEl(i);if(!el)return;const b=document.createElement('i');b.className='gain'+(star?' star':'');b.textContent=(star?'★':'')+'+'+v;b.setAttribute('data-help','');b.setAttribute('aria-hidden','true');el.appendChild(b)};
@@ -53,8 +53,9 @@ function scSeats(){if(!G||G.over||online()){return}const tot=G.pl.map(p=>shownTo
     const sn=el.querySelector('.sn');if(sn&&i===lead&&!sn.querySelector('.crown'))sn.insertAdjacentHTML('afterbegin','<i class="crown" title="Leader" aria-label="leader">👑</i>');
     if(!el.querySelector('.s4'))el.insertAdjacentHTML('beforeend','<span class="s4" title="Where the points come from">🪙'+s.coins+' 🏜'+(s.tiles+s.palms+s.palaces)+' 👥'+(s.advisors+s.sages)+' 🧺'+s.goods+(s.djinns?' 🧞'+s.djinns:'')+'</span>')})}
 // ---- after your turn: why it ended and a one-line rating against the greedy best ----
-function scCard(text,face,name){const e=scEl('turnover','turnover');e.innerHTML='<i>'+face+'</i><span><b>'+esc(name)+'</b> '+esc(text)+'</span><button type="button" aria-label="Dismiss">✕</button>';e.querySelector('button').onclick=()=>e.classList.remove('on');
-  let bot=0;for(const id of ['line','trk','trk2']){const x=document.getElementById(id);if(x&&!x.hidden){const r=x.getBoundingClientRect();if(r.bottom>bot)bot=r.bottom}}e.style.top=(bot?bot+4:110)+'px';void e.offsetWidth;e.classList.add('on');clearTimeout(SC.cardT);SC.cardT=setTimeout(()=>e.classList.remove('on'),ANIM?9000:400)}
+function scCard(text,face,name){const e=scEl('turnover','turnover');e.innerHTML='<i>'+face+'</i><span><b>'+esc(name)+'</b>'+esc(text)+'</span><button type="button" aria-label="Got it">Got it</button>';e.querySelector('button').onclick=()=>{e.classList.remove('on');try{fit()}catch(x){}};
+  const cc=document.getElementById('coach');if(cc&&cc.classList.contains('on')){e.classList.remove('on');return}
+  const tb=document.getElementById('table');if(tb&&tb.parentNode&&e.parentNode!==tb.parentNode)tb.parentNode.insertBefore(e,tb);e.classList.add('on');try{fit()}catch(x){}clearTimeout(SC.cardT);SC.cardT=setTimeout(()=>{e.classList.remove('on');try{fit()}catch(x){}},ANIM?9000:400)}
 function scTurnEnd(){if(!G||G.over||online())return;
   if(scMine()){if(G.act){SC.pend={e:G.act.tile,c:G.act.color,n:G.act.n,s:G.move?G.move.start:SC.pend&&SC.pend.s,t:G.turn,tot:shownTotal(G.pl[0])}}else if(G.move&&(!SC.pend||SC.pend.t!==G.turn))SC.pend={s:G.move.start,t:G.turn}}
   else if(SC.pend&&SC.pend.e!=null&&G.phase==='turn'||(SC.pend&&G.over)){const d=SC.pend;SC.pend=null;const sx=SC.starts[d.s];let got=null,best=SC.bestTotal;if(sx)for(const x of sx.outs)if(x.o.e===d.e&&x.o.c===d.c&&(!got||x.total>got.total))got=x;
@@ -67,7 +68,7 @@ document.addEventListener('pointerover',e=>{const t=e.target.closest&&e.target.c
 
 // the Hints button in the top bar, the "What should I do?" button, the goal card, and a tap on a score chip opens the score drawer
 function scModeUI(hn){const b=document.getElementById('hintsbtn');if(b){b.setAttribute('aria-pressed',String(!!HINTS.on));b.classList.toggle('on',!!HINTS.on);b.hidden=!!G.coach}
-  const w=document.getElementById('whatbtn');if(w)w.hidden=!hn||!G.pl[0].human||online()||G.over}
+  const w=document.getElementById('whatbtn');if(w)w.hidden=!hn||G.coach||!G.pl[0].human||online()||G.over}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#hintsbtn');if(b){HINTS.on=!HINTS.on;try{localStorage.setItem('soq_hints',HINTS.on?'1':'0')}catch(x){}if(!HINTS.on){try{GXH.hide()}catch(x){}}render();return}
   const c=e.target.closest&&e.target.closest('#seats .sch');if(c&&!c.classList.contains('glow')&&G&&!G.over&&!UI.modal){try{GX.show('plrd');renderPopups()}catch(x){}}});
 (function(){const o=beginGame;beginGame=function(){const r=o.apply(this,arguments);try{if(G&&!G.coach&&!G.tut&&!UI.camp&&!online()&&!G.over){UI.modal='goal';render()}}catch(e){console.error(e)}return r}})();

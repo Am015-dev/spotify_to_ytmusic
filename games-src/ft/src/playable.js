@@ -9,8 +9,8 @@ function plBanner(title,sub,cls){return;   // Addendum 7: no toasts in Play; the
   const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?2200:200)}
 function plPop(i,d,why){const s=typeof seatEl==='function'?seatEl(i):null;if(!s)return;const r=s.getBoundingClientRect();if(!r.width)return;
   const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
-  e.innerHTML='<b>'+(d>0?'+':'−')+Math.abs(d)+'</b>'+(why?'<span>'+esc(why)+'</span>':'');document.body.appendChild(e);
-  const w=e.offsetWidth;e.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+'px';e.style.top=(r.bottom-2+(PL.pops++%3)*28)+'px';setTimeout(()=>{e.remove();PL.pops=Math.max(0,PL.pops-1)},ANIM?2300:100)}
+  e.innerHTML='<b>'+(d>0?'+':'−')+Math.abs(d)+'</b>';document.body.appendChild(e);   // the number only; the instruction line says why
+  const w=e.offsetWidth;e.style.left=Math.max(6,Math.min(innerWidth-w-6,r.right-w-6-(PL.pops++%3)*(w+4)))+'px';e.style.top=(r.top+4)+'px';setTimeout(()=>{e.remove();PL.pops=Math.max(0,PL.pops-1)},ANIM?2300:100)}
 function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
 function plShort(t){return plName(String(t||'')).replace(/^[^\w—]+/,'').replace(/\.$/,'')}
 function plAfter(){if(!G){return}
