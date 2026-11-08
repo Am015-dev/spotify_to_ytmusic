@@ -16,10 +16,10 @@
 /* strip: fuse, finished numbers, wires cut */
 #strip{flex:none;display:flex;align-items:center;gap:8px;padding:4px 8px;height:42px;box-sizing:border-box;background:rgba(10,20,30,.45);border-bottom:2px solid rgba(0,0,0,.35)}
 #fuse{flex:1 1 90px;min-width:70px}
-.fz{display:flex;align-items:center;gap:5px;height:30px}
-.fz .lit{display:grid;place-items:center;color:#ffc928;width:18px;height:18px;flex:none}
+.fz{display:flex;align-items:flex-start;gap:5px;height:38px}
+.fz .lit{display:grid;place-items:center;color:#ffc928;width:18px;height:18px;flex:none;margin-top:10px}
 .fz .lit svg{width:18px;height:18px}
-.rp{position:relative;flex:1;display:flex;gap:3px;height:15px;min-width:0}
+.rp{position:relative;flex:1;display:flex;gap:0;height:20px;margin:3px -14px 0 0;min-width:0}
 .rp i{flex:1;height:100%;border-radius:5px;background:repeating-linear-gradient(60deg,#d99a5b 0 3px,#a8652b 3px 6px);border:1.5px solid #4a2a14;box-sizing:border-box;transition:background .4s}
 .rp i.ash{background:#2b2630;border-color:#15121a;opacity:.9}
 .rp i.next{box-shadow:0 0 6px 1px rgba(255,160,40,.6)}
@@ -28,7 +28,9 @@
 .fz.danger .bm{animation:shk .35s infinite}
 .fz.burn .rp i.next{animation:burn .9s}
 .fz.phew .spark{filter:hue-rotate(160deg)}
-.bm{flex:none;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+.bm{flex:none;width:36px;height:36px;position:relative;z-index:1;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+.fz.burn .bm{animation:shk .12s 4,bmflash .9s}
+@keyframes bmflash{0%,100%{filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}25%{filter:brightness(1.7) drop-shadow(0 0 8px #ff9a3a)}}
 @keyframes flick{from{transform:scale(.8) rotate(-8deg)}to{transform:scale(1.15) rotate(8deg)}}
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
 @keyframes burn{0%{background:#fff;transform:scaleY(1.7)}100%{transform:none}}

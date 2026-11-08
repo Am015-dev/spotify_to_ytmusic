@@ -23,15 +23,15 @@ html.sk .gx-drawer-body{background:#fff6e2;border-radius:5px;padding:6px 8px 12p
 html.sk .gx-drawer-head{border-bottom:0}
 /* ---- fuse: painted rope behind the burning segments, painted spark, painted bomb ---- */
 html.sk-fuse .rp{background:url(media/ui-fuse-track.webp) left center/auto 100% repeat-x;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.6);align-self:center}
-html.sk-fuse .rp i.rope{background:transparent;border-color:rgba(40,20,4,.5)}
-html.sk-fuse .rp i.ash{background:#2b2630;border-color:#15121a;opacity:.92}
+html.sk-fuse .rp i.rope{background:transparent;border-color:rgba(40,20,4,.45)}
+html.sk-fuse .rp i.ash{background:rgba(22,16,26,.78);border-color:rgba(10,8,12,.8);opacity:1;filter:grayscale(1)}
 html.sk-fuse .rp i.next{box-shadow:inset 0 0 6px 1px rgba(255,200,80,.9)}
-html.sk-spark .spark{width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:0;background:url(media/fx-fuse-spark.webp) 0 0/800% 100% no-repeat;animation:sk-spark .5s steps(8,end) infinite}
+html.sk-spark .spark{width:34px;height:34px;margin:-17px 0 0 -17px;filter:drop-shadow(0 0 5px #ffa726) drop-shadow(0 0 2px #fff3b0);border-radius:0;background:url(media/fx-fuse-spark.webp) 0 0/800% 100% no-repeat;animation:sk-spark .5s steps(8,end) infinite}
 html.sk-spark .fz.danger .spark{animation-duration:.25s}
 /* 8 frames in a 800%-wide sheet: frame k sits at k/7 of the travel, so run 0 -> 8/7 (114.2857%) in 8 end-steps. jump-none is not understood by older iOS Safari, which then dropped the whole animation (spark stuck on frame 0). */
 @keyframes sk-spark{from{background-position:0 0}to{background-position:114.2857% 0}}
 html.sk-bomb svg.bm,html.sk-bomb .gx-bar h1 span[data-ico=bomb] svg{background:url(media/icon-bomb.webp) center/contain no-repeat}
-html.sk-bomb svg.bm{width:30px;height:30px}
+html.sk-bomb svg.bm{width:36px;height:36px}
 html.sk-bomb svg.bm *,html.sk-bomb .gx-bar h1 span[data-ico=bomb] svg *{display:none}
 /* ---- player name plates: brass, the seat colour stays as the bottom edge ---- */
 html.sk-plate .plate{height:26px;padding:0 3px 0 0;border-style:solid;border-color:transparent;border-width:0 9px;border-radius:0;border-image:url(media/ui-nameplate-c.webp) 0 20 fill/0 9px stretch;background:none;color:#2a1a08;text-shadow:0 1px 0 rgba(255,235,170,.6);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));position:relative}
