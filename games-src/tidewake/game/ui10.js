@@ -49,12 +49,12 @@ function tutSteps(){const ph=!!PH.on;const S=[
   {id:'draw',say:'After each turn you draw back up to three tiles.',target:()=>ttile(2),tap:1,ready:()=>tmine(4),enter:()=>tsel(0,0)},
   {id:'chain',say:'This tile meets Cobalt\'s tile. Tap Place: you sail through both.',target:tplace,until:()=>G.turn>4||(G.q&&G.q.kind==='cannonDraw'),ready:()=>tmine(4)&&UI.sel&&UI.sel.t===0&&UI.sel.r===0},
   {id:'push',say:'Lay a tile at any junk\'s line end, and it sails too.',target:()=>tship(TS.co),tap:1,ready:()=>tcalm()&&G.q&&G.q.kind==='cannonDraw'},
-  {id:'keep',say:'You drew a Deck Cannon. Keep it for a leviathan.',target:()=>tqbtn('cKeep'),until:()=>!G.q,ready:()=>tcalm()&&G.q&&G.q.kind==='cannonDraw'},
+  {id:'keep',title:'Add-on: Deck Cannon',say:'You drew a Deck Cannon. Keep it for a leviathan.',target:()=>tqbtn('cKeep'),until:()=>!G.q,ready:()=>tcalm()&&G.q&&G.q.kind==='cannonDraw'},
   {id:'collide',say:'Two junks on one line, same way, both sink.',target:()=>tship(TS.co),tap:1,ready:()=>tcalm()&&G.turn===5&&G.cur===TS.co},
-  {id:'wave',say:'A Rogue Wave! It sweeps its whole row each round.',target:()=>G.wave?tcell(G.wave.x,G.wave.y):null,tap:1,run:1,ready:()=>tmine(6)&&!!G.wave},
-  {id:'waveroll',say:'In its row, roll its strength or capsize. Tap Place.',target:tplace,until:()=>G.turn>6,ready:()=>tmine(6),enter:()=>tsel(0,0)},
+  {id:'wave',title:'Add-on: Rogue Wave',say:'A Rogue Wave! It sweeps its whole row each round.',target:()=>G.wave?tcell(G.wave.x,G.wave.y):null,tap:1,run:1,ready:()=>tmine(6)&&!!G.wave},
+  {id:'waveroll',title:'Add-on: Rogue Wave',say:'In its row, roll its strength or capsize. Tap Place.',target:tplace,until:()=>G.turn>6,ready:()=>tmine(6),enter:()=>tsel(0,0)},
   {id:'blocked',say:'A leviathan swam in front of your bow. That sinks you!',target:()=>tmon(4),tap:1,run:1,ready:()=>tcalm()&&G.turn===8&&G.q&&G.q.kind==='doom'},
-  {id:'cannon',say:'Tap Fire. Your Deck Cannon blasts it away.',target:()=>tqbtn('dCannon'),until:()=>!G.q&&!monById(4),ready:()=>tcalm()&&G.q&&G.q.kind==='doom'},
+  {id:'cannon',title:'Add-on: Deck Cannon',say:'Tap Fire. Your Deck Cannon blasts it away.',target:()=>tqbtn('dCannon'),until:()=>!G.q&&!monById(4),ready:()=>tcalm()&&G.q&&G.q.kind==='doom'},
   {id:'offboard',say:'A leviathan pushed off the chart is gone for good.',target:()=>tmon(0),tap:1,ready:()=>tmine(8)},
   {id:'min3',say:'Fewer than three leviathans? The next turn adds new ones.',target:()=>tmon(7),tap:1,ready:()=>tmine(8)},
   {id:'turn2',say:'This tile needs two quarter turns. Tap Turn.',target:trot,until:()=>UI.sel&&UI.sel.r===1,ready:()=>tmine(8),enter:()=>tsel(0,0)},
@@ -64,7 +64,7 @@ function tutSteps(){const ph=!!PH.on;const S=[
   {id:'swap',say:'Sink rivals with your tile, and swap tiles with their hands.',target:()=>tship(TS.me)||document.getElementById('board'),tap:1,ready:()=>tcalm()&&!!G.over&&!(UI.sunk&&UI.sunk.length)},
   {id:'win',say:'Yours is the last junk afloat. You win the lantern!',target:()=>document.getElementById('board'),tap:1,ready:()=>tcalm()&&!!G.over}
  ].filter(Boolean);
- return S.map(s=>({id:s.id,say:s.say,target:s.target,ready:s.ready,pad:4,
+ return S.map(s=>({id:s.id,say:s.say,title:s.title,target:s.target,ready:s.ready,pad:4,
    wait:{type:'event',match:()=>s.tap?TUTG.tap===s.id:!!(s.until&&s.until())},
    onEnter:()=>{TUTG.tap=null;TUTG.cur=s;TUTG.hold=!!s.hold;TUTG.freeze=!s.run;if(s.run)schedule();try{s.enter&&s.enter()}catch(e){console.error(e)}},
    onDone:()=>{TUTG.seen.push(s.id);TUTG.cur=null;TUTG.hold=false;try{s.done&&s.done()}catch(e){console.error(e)}TUTG.freeze=false;schedule();render()}}))}
@@ -90,7 +90,7 @@ function tutStart(o){if(NET.on||typeof GXT==='undefined')return;const pro=!!(o&&
   tutBegin();
   const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,story:false,steps:tutSteps(),live:tutLive,
-    endTitle:'You know the rules',endText:'Now a real game: new tiles, new dice, a computer that plays to win.',
+    endTitle:'You know the rules',endText:'Now a real game against a computer. Add-ons (Rogue Wave, Deck Cannon) are off; switch them on in Setup.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'},{id:'menu',label:'Menu'}]:[{id:'play',label:'Play a real game'},{id:'menu',label:'Menu'}],
     onDone:r=>{const c=r&&r.choice;tutLeave();try{GXT.markDone(TUT_GAME)}catch(e){}
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}else if(c==='play'){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0].h=true;s.seats[1].h=false;startGame(s)}else showStart()},
