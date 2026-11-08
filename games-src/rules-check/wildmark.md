@@ -29,3 +29,8 @@ Tile supply 20 x players + 3 (solo 43); 4 market pairs; four-of-a-kind automatic
 - Whether foxes count as a "different animal" for fox A (code counts them). med.
 - Starter triad composition (assumed one single-terrain tile plus two split tiles).
 - Solo discard/slide direction (see table).
+
+## Status (W416c, 8 Nov)
+- WRONG market slide: fixed (pairs stay in place). MISSING acorn supply 25: built. Solo slide direction: now toward the stacks (left), refill at the right.
+- Card set A: every pattern and table value tested in `wildmark/rules-a-test.js` (46 checks, PASS). B-D are off by default behind "Variant cards (house tables)".
+- Coverage table: `wildmark/RULES-COVERAGE.md`.
