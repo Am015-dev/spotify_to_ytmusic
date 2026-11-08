@@ -2,7 +2,7 @@
  "slug": "short-fuse",
  "size": "phone",
  "seed": 40793,
- "when": "2026-11-08T00:49Z",
+ "when": "2026-11-08T01:30Z",
  "tutorial": {
   "end": true,
   "coached": true,
@@ -19,11 +19,11 @@
  },
  "quick": {
   "result": "cap",
-  "clicks": 522
+  "clicks": 718
  },
  "story": {
   "result": "cap",
-  "clicks": 643
+  "clicks": 649
  },
  "fuzz": {
   "taps": 300
@@ -64,40 +64,8 @@
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick-board",
-   "desc": "text 11.5px (<12px) in span x1: \"Plum\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-quick-board-7.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "overlapping clickables: button.tile.crew.back \"Wire H\" / button.chip.sm \"Twin Probe\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-quick-board-7.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "overlapping clickables: button.tile.crew.back \"Wire I\" / button.chip.sm \"Twin Probe\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-quick-board-7.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "clickable covered by another element (not tappable): button.tile.crew.back \"Wire F\" under div.mh \"You 7 Twin Probe\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-quick-board-7.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick click #522 (Go)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 522 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "where": "quick click #718 (6)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 718 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases quick",
    "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-quick-noresult-8.png"
   },
@@ -128,6 +96,14 @@
   {
    "sev": "MINOR",
    "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.wide \"Learn to play A coached \" / button.gxc-node.a1.open \"1 First Day on the Crew\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-story-map-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
    "where": "story-board",
    "desc": "overlapping clickables: button.btn \"Next job\" / button.gxc-node.a1.locked \"2 Yellow Means Careful\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
@@ -153,6 +129,14 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
+   "desc": "overlapping clickables: button.btn.wide \"Learn to play A coached \" / button.gxc-node.a1.open \"1 First Day on the Crew\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
    "desc": "overlapping clickables: button.gxc-node.a2.boss \"The Weak Link\" / button.gxc-btn.go \"Play\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
    "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-story-board-10.png"
@@ -169,7 +153,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "element outside viewport div.flash.badc x1 rect 2,182,392,208: \"You point at one of Plum\"",
+   "desc": "element outside viewport div.flash.badc x1 rect 2,137,392,163: \"You point at one of Plum\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
    "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-story-board-11.png"
   },
@@ -177,7 +161,15 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "text 11.5px (<12px) in span x1: \"Plum\"",
+   "desc": "text 11.5px (<12px) in span x1: \"Rosa\"",
+   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-story-board-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "text 11.2px (<12px) in i.mkr.y x2: \"1.1\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
    "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-story-board-13.png"
   },
@@ -185,7 +177,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "text 10.6px (<12px) in span.tm x3: \"start of turn\"",
+   "desc": "tap target 28px (<40) div.jc.mk x1: \"1.1\n6.1\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
    "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-story-board-13.png"
   },
@@ -193,15 +185,15 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "text 11.8px (<12px) in div.es x2: \"LOCKED: CUT TWO 9S\"",
+   "desc": "tap target 28px (<40) button.tile.crew x10: \"Wire B\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
    "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-story-board-13.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story click #643 (×)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 643 clicks (state kept changing)",
+   "where": "story click #649 (✕)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 649 clicks (state kept changing)",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases story",
    "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-story-noresult-14.png"
   },
@@ -225,34 +217,10 @@
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.crew.back \"★100%\" / button#gfxbtn.btn.small \"Low graphics off\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.crew.back \"Wire A\" / button.btn.small \"Log\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.crew.back \"Wire B\" / button.btn.small \"Log\"",
-   "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
    "desc": "text 11.5px (<12px) in span x1: \"Plum\"",
    "repro": "node games-src/scripts/qa-bot.js short-fuse --size phone --seed 40793 --phases fuzz",
    "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/f887487c-87e8-56d8-b968-f3b4c891bb80/scratchpad/qa/short-fuse/phone-screen-fuzz-screen-19.png"
   }
  ],
- "secs": 452
+ "secs": 454
 }

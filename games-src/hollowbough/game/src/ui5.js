@@ -1,7 +1,7 @@
 // ===================== part 5: game flow (new game, turn driver, AI, one-card-at-a-time queue, save/load) =====================
 const SAVEKEY = 'hb_save1';
 function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(UI.tt); UI.tt = setTimeout(() => e.classList.remove('on'), 2600); }
-function turnBanner(txt, rv) { const e = document.getElementById('hbturn') || (() => { const d = document.createElement('div'); d.id = 'hbturn'; d.setAttribute('role', 'status'); document.body.appendChild(d); return d; })();
+function turnBanner(txt, rv) { if (!hintsActive()) return; const e = document.getElementById('hbturn') || (() => { const d = document.createElement('div'); d.id = 'hbturn'; d.setAttribute('role', 'status'); document.body.appendChild(d); return d; })();
   e.textContent = txt; e.classList.toggle('rv', !!rv); e.classList.add('on'); clearTimeout(UI.tbt); UI.tbt = setTimeout(() => e.classList.remove('on'), 1100); }
 function setSeed(n) { UI.seed = n >>> 0; }
 function setAiSeed(n) { UI.aiSeed = n; }
@@ -32,7 +32,7 @@ function newGame(mode, o) {
   closePop(); fxClear(); try { GX.close(); } catch (e) { }
   kitNewGame();
   render(); schedule();
-  if (!o.camp && (mode === 'vs' || mode === 'hot') && ANIM) toast(HBS.quick.intro);   // quick game: a one-line flavour intro in the game's voice
+  if (mode !== 'tutorial' && mode !== 'ai' && mode !== 'net' && !/[?&]scn=/.test(location.search) && !UI.noGoal) goalCard();   // Play: a one-card Goal before turn 1
   return G;
 }
 function kitNewGame() { GX.undo.clear(); recapSeats(); UI.t0 = Date.now(); UI.resultDone = false; UI.earned = null; }

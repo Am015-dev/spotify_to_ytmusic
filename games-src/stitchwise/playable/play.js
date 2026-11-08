@@ -58,6 +58,7 @@ let fails = 0, RANDOM = false; const ok = (c, m) => { if (!c) { fails++; console
     await tap('#start [data-a=quick]', 'Quick game'); await pg.waitForTimeout(300);
     const nc = await pg.$('text=Normal computer'); if (nc) await tapEl(nc, 'Normal computer'); await pg.waitForTimeout(300);
     const sg = await pg.$('text=Start the game'); if (sg) await tapEl(sg, 'Start the game');
+    await pg.waitForTimeout(400); ok(!!(await pg.$('#goalcard')), 'Play shows the Goal card before turn 1'); await tap('#goalcard [data-a=goalok]', 'Goal: Start');
     await playToEnd('quick');
   } else {
     await pg.evaluate(() => { try { GXT.markDone('stitchwise'); } catch (e) { } });
