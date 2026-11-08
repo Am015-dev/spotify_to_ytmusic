@@ -247,22 +247,56 @@ async function playEvs(evs) {
     if (tr) {
       UI.holdJobs = new Set(jb.map(j => j.i));      // the stamps land only after the cards have been swept
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
-      render(); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
+      render(); flyIn(pls); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
       UI.fz.win = true; render(); snd('trick');
       try { const me = viewSeat(), wn = tr.w === me ? 'You win' : pname(tr.w) + ' wins', wcs = suitOf(tr.wc); cap(wn + ' the trick with ' + cname(tr.wc), 'good', wcs === 4 ? 'The Lantern beats every colour.' : (tr.plays.some(p => suitOf(p.c) === 4) ? '' : 'Highest card of the led colour wins.')); } catch (e) { }
       await wait(ANIM ? 2400 : 0); if (tok !== UI.seq) return;
       await tutHoldWait(); if (tok !== UI.seq) return;
+      await sweepTo(tr.w); if (tok !== UI.seq) return;
       UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1 trick', 'plus'); await wait(520); if (tok !== UI.seq) return;
-      UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } try { const j = jb.find(x => x.st < 0) || jb[0], d = TASKS[G.tasks[j.i].id], who = G.tasks[j.i].owner; cap((j.st > 0 ? 'Job done: ' : 'Job broken: ') + d.s, j.st > 0 ? 'good' : 'bad', (who === viewSeat() ? 'Your job' : pname(who) + '\'s job') + (j.st < 0 ? ' - the crew must dive again.' : ' - one step closer.')); } catch (e) { } await wait(1300); if (tok !== UI.seq) return; }
+      UI.holdJobs = null; if (jb.length) { render(); jobBeat(jb); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } try { const j = jb.find(x => x.st < 0) || jb[0], d = TASKS[G.tasks[j.i].id], who = G.tasks[j.i].owner; cap((j.st > 0 ? 'Job done: ' : 'Job broken: ') + d.s, j.st > 0 ? 'good' : 'bad', (who === viewSeat() ? 'Your job' : pname(who) + '\'s job') + (j.st < 0 ? ' - the crew must dive again.' : ' - one step closer.')); } catch (e) { } await wait(1300); if (tok !== UI.seq) return; }
     } else {
-      render(); flyJobs(flights); await wait(pls.length ? (pls.some(p => p.s !== viewSeat()) ? 1200 : 420) : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
-      if (jb.length) { for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
+      render(); flyIn(pls); flyJobs(flights); await wait(pls.length ? (pls.some(p => p.s !== viewSeat()) ? 1200 : 420) : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
+      if (jb.length) { jobBeat(jb); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
     }
   } catch (e) { console.error(e); UI.fz = null; }
   UI.busy = false; UI.fz = null; UI.holdJobs = null; UI.fastT = false;
   try { render(); } catch (e) { console.error(e); }
   if (G && G.phase === 'over') { schedule(); drainQ(); return; }
   schedule(); drainQ(); if (NET.on && isHost()) netPush(true);
+}
+// ---- R5 feel: DOM card motion (the Pixi table animates its own copy, so these run only on the DOM table) ----
+const flyOK = () => !!(ANIM && document.body.animate && !(typeof PX !== 'undefined' && PX.on));
+function seatC(s) {
+  const el = s === viewSeat() ? document.querySelector('#mine .me') : document.querySelector('#opp [data-key="seat' + s + '"]') || document.querySelector('#opp .seat[data-seat="' + s + '"]');
+  if (!el) return null; const r = el.getBoundingClientRect(); return r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null;
+}
+// a played card travels from its diver's seat to its slot in the trick (~260 ms); your own cards come from your hand
+function flyIn(pls) {
+  if (!flyOK() || !pls || !pls.length) return;
+  for (const p of pls) {
+    const el = document.querySelector('#slots .tslot[data-seat="' + p.seat + '"] .tc'); if (!el) continue;
+    let a = null; if (p.seat === viewSeat()) { const hr = $('#hand') && $('#hand').getBoundingClientRect(); if (hr) a = { x: hr.left + hr.width / 2, y: hr.top + 30 }; } else a = seatC(p.seat);
+    if (!a) continue; const r = el.getBoundingClientRect(), dx = Math.round(a.x - r.left - r.width / 2), dy = Math.round(a.y - r.top - r.height / 2);
+    el.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.45) rotate(' + (dx < 0 ? -10 : 10) + 'deg)', opacity: .5 }, { transform: 'translate(0,0) scale(1) rotate(0)', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.2,.8,.3,1)' });
+  }
+}
+// the won trick's cards sweep together into the winner's seat
+async function sweepTo(w) {
+  if (!flyOK()) return; const a = seatC(w), els = Array.from(document.querySelectorAll('#slots .tc')); if (!a || !els.length) return;
+  els.forEach((el, i) => { const r = el.getBoundingClientRect(), dx = Math.round(a.x - r.left - r.width / 2), dy = Math.round(a.y - r.top - r.height / 2);
+    el.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.3)', opacity: 0 }], { duration: 380, delay: i * 30, easing: 'cubic-bezier(.5,0,.7,.4)', fill: 'forwards' }); });
+  await wait(380 + els.length * 30);
+}
+// a job done or broken gets its own beat: the chip pops with a ring and a big word rises from its owner
+function jobBeat(jb) {
+  for (const j of jb) {
+    const ok = j.st > 0, own = G.tasks[j.i] && G.tasks[j.i].owner;
+    if (own != null && own >= 0) floatAt(own, ok ? 'Job done!' : 'Job broken', ok ? 'jobok' : 'jobbad');
+    if (!ANIM || !document.body.animate) continue;   // job chips are DOM on both tables
+    document.querySelectorAll('[data-job="' + j.i + '"], [data-a="job"][data-i="' + j.i + '"]').forEach(el => el.animate([{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0,0,0,0)' }, { transform: 'scale(1.35)', boxShadow: '0 0 0 6px ' + (ok ? 'rgba(80,220,140,.85)' : 'rgba(240,80,80,.85)') }, { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0,0,0,0)' }], { duration: 700, easing: 'ease-out' }));
+  }
+  if (ANIM && document.body.animate) { const t = $('#table'); if (t && jb.some(j => j.st < 0)) t.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 300 }); }
 }
 function animatePass() {
   if (!document.body.animate || !ANIM) return;

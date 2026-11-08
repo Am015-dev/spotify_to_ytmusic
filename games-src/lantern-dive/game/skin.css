@@ -169,7 +169,7 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 /* G4 review fix: phone header buttons carry a short word under the icon (44px targets), so nobody opens the Log by accident */
 @media (max-width:1023px){
   html .gx-bar .gx-ibtn[data-gx]{flex-direction:column;gap:1px;padding:2px 3px;min-width:46px;min-height:44px}
-  html .gx-bar .gx-ibtn[data-gx] span{display:block!important;font-size:13px!important;line-height:1;font-weight:800;letter-spacing:.01em}
+  html .gx-bar .gx-ibtn[data-gx] span{display:block!important;font-size:14px!important;line-height:1;font-weight:800;letter-spacing:.01em}
   html .gx-bar .gx-ibtn[data-gx] svg,html .gx-bar .gx-ibtn[data-gx] i[data-ic],html .gx-bar .gx-ibtn[data-gx] .sk-ic{width:20px;height:20px}
   html.sk .gx-bar .gx-ibtn[data-gx] span{color:#1f1408}
 }
@@ -183,3 +183,6 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 #lead.tight span:first-child{display:none}
 #lead.tight{padding:2px 5px;max-width:72px;text-align:center;line-height:1.1}
 #lead.tight span{font-size:13px!important}
+/* R5 feel: a job's own beat */
+.fl.jobok{color:#c9ffe0;text-shadow:0 2px 0 #0b1f3a,0 0 16px #2fd27a}
+.fl.jobbad{color:#ffd6d6;text-shadow:0 2px 0 #0b1f3a,0 0 16px #ff4d4d}
