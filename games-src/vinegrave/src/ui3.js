@@ -12,19 +12,22 @@ function startGame(mode, o) {
   UI.mode = mode; UI.humans = seats.map((s, i) => s.ai ? -1 : i).filter(i => i >= 0); UI.view = UI.humans[0] || 0; UI.camp = o.camp || null;
   UI.prefs.played = UI.prefs.played || mode !== 'tutorial'; savePrefs();
   enterGame();
-  if (UI.camp) toast('Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' ' + UI.camp.twist.text : ''), 3200);
-  else if (mode !== 'tutorial') { const q = V.STORY.quick.intro; toast(q[(G.rng >>> 0) % q.length], 2600); }
+  if (window.GXH) try { GXH.setEnabled(hintsOn()); GXH.hide(); } catch (e) { }
   return G;
 }
 function enterGame() {
   $('#start').hidden = true; $('#rs').hidden = true; $('#pass').hidden = true; UI.started = true;
   try { GX.close(); } catch (e) { }
   if (window.GX && GX.undo) try { GX.undo.clear(); } catch (e) { }
-  render(); musicSync(); UI.bannerFor = null; turnBanner();
+  render(); musicSync(); UI.bannerFor = null;
+  if (!UI.fast && UI.mode !== 'tutorial' && G.round === 1 && !G.log.some(l => /plays|digs|buys|discovers|passes/.test(l.t || ''))) { showGoal(); return; }
+  turnBanner(); goOn();
+}
+function goOn() {
   const s = VG.actor(G); if (!isHuman(s)) schedule(); else if (s !== UI.view && UI.humans.length > 1) showPass(s);
 }
 function showTitle() {
-  clearTimeout(schedule.t); closeInsp(); UI.camp = null; const st = $('#start'), o = UI.opts, sv = hasSave(), first = !UI.prefs.played;
+  clearTimeout(schedule.t); closeInsp(); UI.camp = null; if ($('#goal') && !$('#goal').hidden) { $('#goal').hidden = true; UI.busy = false; } const st = $('#start'), o = UI.opts, sv = hasSave(), first = !UI.prefs.played;
   st.innerHTML = `<div class="tbox">
     <h1 class="logo">Vinegrave</h1><p class="tag2">Dig the ruins. Wake the guardians. Reach the temple.</p>
     ${first ? '<button type="button" class="tbtn primary" data-a="start">Learn to play</button><button type="button" class="tsb" data-a="quick">Start a game<small>skip the guided round</small></button>'
@@ -59,6 +62,15 @@ function campBest(id, sc) {
 }
 UIACT.look = () => closeRes();
 UIACT.iam = () => { UI.view = VG.actor(G); $('#pass').hidden = true; render(); };
+function showGoal() {   /* one card before turn 1: the aim in one sentence, three ways to score; every number's why is in Scores */
+  const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
+  const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
+  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><p class="gk">Goal</p><p class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Have the most points after ' + G.rounds + ' rounds.'}</p>
+    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track: higher rows and the temple score most.</span></li><li>${ic('idol', 'idol')}<span>Discover ruins: idols are 3 points, beaten guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards: many score points; each Dread card costs 1.</span></li></ul>
+    <p class="gf">${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button><p class="gs">Tap Scores any time to see why each number is what it is.</p></div>`;
+  g.hidden = false; UI.busy = true; render();
+}
+UIACT.goalgo = () => { const g = $('#goal'); if (g) g.hidden = true; UI.busy = false; render(); turnBanner(); goOn(); };
 function showPass(s) {
   const p = $('#pass'); p.innerHTML = `<div class="tbox"><h2 class="logo" style="font-size:28px">Pass the device</h2><p class="tag2">Hand it to ${esc(G.p[s].name)}. Your cards stay hidden.</p><button type="button" class="tbtn" data-a="iam">I am ${esc(G.p[s].name)}</button></div>`;
   p.hidden = false;
@@ -88,12 +100,12 @@ function showResult() {
   const sub = def && !cWon ? (G.winner === 0 ? 'You won the game but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again: the stage stays open.' : esc(wn) + margin;
   const btns = def ? (cWon ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="campretry">Try again</button>')
     : '<button type="button" class="tbtn" data-a="again">Play again</button>';
-  r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}" data-art="${G.winner === 0 ? 'result-win' : 'result-lose'}"><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}${t}
+  r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}"><div class="rart" data-art="${G.winner === 0 ? 'result-win' : 'result-lose'}" aria-hidden="true"></div><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}${t}
     <div class="trow2">${btns}</div>
     <div class="trow2"><button type="button" class="tsb" data-a="look">Look at the island</button>${def ? (cWon ? '' : '<button type="button" class="tsb" data-a="campfin">Story map</button>') : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div>`;
   if (!def && UI.mode !== 'tutorial') { const fl = document.createElement('p'); fl.className = 'rquote'; fl.textContent = cWon ? V.STORY.quick.win : V.STORY.quick.lose; const w = r.querySelector('.win'); if (w) w.after(fl); }
   r.querySelectorAll('table tr:last-child b').forEach(b => { const n = +b.textContent; if (!isFinite(n) || UI.fast || reducedMo()) return; const t0 = performance.now(); b.textContent = '0'; const tick = t => { const k = Math.min(1, (t - t0) / 1100); b.textContent = String(Math.round(n * k)); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });   /* the final count climbs */
-  r.hidden = false; $('#toast').classList.remove('on'); musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }
+  r.hidden = false; if (typeof artApply === 'function') artApply(r); $('#toast').classList.remove('on'); musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }
   if (def && m) campBest(def.id, m.score);
   if (!UI.resDone && UI.mode !== 'tutorial' && !camp && window.GNS && GNS.result) { UI.resDone = true; try { GNS.result({ game: 'vinegrave', mode: UI.mode === 'hot' ? 'hot' : UI.mode === 'solo' ? 'solo' : 'vs', level: UI.opts.lvl, seats: G.p.map((p, i) => ({ name: p.name, me: UI.humans.indexOf(i) >= 0, ai: p.ai || undefined })), winner: G.winner, scores: G.p.map((p, i) => VG.score(G, i).total), turns: G.turns }); } catch (e) { } }
 }
@@ -180,7 +192,7 @@ function moveTarget(m) {
 function helpInit() {
   if (!window.GXH) return;
   const P = (t) => () => `<svg viewBox="0 0 24 24" width="48" height="48"><use href="#s-${t}"/></svg>`;
-  GXH.init({ game: 'vinegrave', defaultOn: true,
+  GXH.init({ game: 'vinegrave', defaultOn: false,
     steps: { guard: { target: () => $('.site .gd'), title: 'A guardian wakes', text: 'Overcome it for 5 points, or flee at round end with a Dread card.', pic: P('guard') },
       idol: { target: () => $('#extra [data-a=idol]'), title: 'You found an idol', text: 'Worth 3 points. Set it in a shrine for a boon too.', pic: P('idol') },
       'q-exile': { target: () => $('#qbox'), title: 'Exile a card', text: 'Removing Dread cards makes your deck stronger.', pic: P('exile') } },
@@ -191,7 +203,7 @@ function helpInit() {
       { phase: 'guard', title: 'Overcome', text: 'Pay the guardian\'s cost while your explorer is there: 5 points and a one-time boon.', pic: P('guard') },
       { phase: 'idol', title: 'Shrines', text: 'One idol a turn into a shrine: an instant boon. It still scores 3.', pic: P('idol') }],
     avoid: '.glow,#acts .btn,#qbox .btn,#insp' });
-  GXH.bulb({ el: '#bulbbtn', suggest: () => { if (!myTurn()) return null; const m = VAI.choose(G, 'hard'); const t = moveTarget(m); return t ? { target: () => moveTarget(m), why: VAI.why(G, m) } : null; }, rulesFor: () => helpPhase() });
+  if (0) GXH.bulb({ el: '#bulbbtn', suggest: () => { if (!myTurn()) return null; const m = VAI.choose(G, 'hard'); const t = moveTarget(m); return t ? { target: () => moveTarget(m), why: VAI.why(G, m) } : null; }, rulesFor: () => helpPhase() });
 }
 // ---------------------------------------------------------------- music (silent until files exist in media/music)
 function musicSlot() { if (!G || !$('#start').hidden) return ['tavern', 0]; if (G.phase === 'over') return [G.winner === UI.humans[0] ? 'victory' : 'defeat', 1]; if (UI.camp && UI.camp.boss) return ['fight', 0]; return ['main', 0]; }
