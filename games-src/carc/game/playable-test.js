@@ -30,6 +30,8 @@ async function playToResult(p, tag, limitMs) {
     if (process.env.DEBUG && (Date.now() - t0) % 7 < 3) console.log(JSON.stringify(await p.evaluate(() => ({ t: G.turn, st: G.step, cur: G.cur && G.cur.p, gl: document.querySelectorAll('.glow').length, fg: document.querySelectorAll('.fglow').length, ins: document.querySelector('#status .ins').textContent, modal: document.querySelector('#modal').innerText.slice(0, 40), gl0: (() => { const g = document.querySelector('.glow'); if (!g) return null; const b = g.getBoundingClientRect(); const t = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), t && (t.tagName + '.' + t.className + '#' + t.id), UI.moved, g.style.visibility]; })() }))));
     if (await p.$('.card[aria-label=Result], .gxc-res')) return { ok: true, moves };
     const tip = await p.$('.gxh-bub:not(.gxt-bub) .gxh-ok'); if (tip && await tip.isVisible()) { await tapUI(p, tip, 'tip ok'); await sleep(120); continue; }
+    const gk = await p.$('#goalok'); if (gk && await gk.isVisible() && await tapUI(p, gk, 'Goal start')) { await sleep(200); continue; }
+    const hp = await p.$('#hplace'); if (hp && await hp.isVisible() && await tapUI(p, hp, 'Place here')) { idle = 0; await sleep(230); continue; } // touch: confirm the tapped spot
     const glows = await p.$$('.glow');
     if (glows.length) { let done = false; const order = glows.map((g, i) => i).sort((a, b) => Math.abs(a - glows.length / 2) - Math.abs(b - glows.length / 2));
       for (const i of order) { if (await tapUI(p, glows[i], 'glow')) { done = true; break; } }

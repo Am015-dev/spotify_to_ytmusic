@@ -15,6 +15,9 @@ Data: `campaign.json` (validated with `node -e "console.log(require('../shell/gx
 | 7 | Wraith Stair | Rogue | 6 | Ashen Wraith | Smoking Censer | 110% |
 | 8 | Hall of Gears | Automaton | 8 | Ashen Wraith | Iron Bangle | 105% |
 | 9 | The Cinder Gate (boss) | Monk | 9 | Gate Colossus | Dawnstone | 110% (act 3 boss twist) |
+| 10 | Finale: The Ember Heart (boss) | Warrior + Monk | 6 | Ember Tyrant | Phoenix Ash | 32% (final act, last stand) |
+
+W420: chapters 3-10 now start in their act (startAct) and meet every guardian; full table in RULES-COVERAGE.md.
 
 Twists (menu): `start-relic` (setup.relic), `tough-foes` (setup.hpPct), `short-climb` (setup.floors). Engine options in `src/engine.js` `newGame`: `floors`, `boss`, `relic`, `hpPct`.
 Difficulty curve: act 1 teaches (short climbs, easy bosses), act 2 normal, act 3 long and tough. Bot win rates per chapter (`node camp-cfg.js 100`, a human wins less):

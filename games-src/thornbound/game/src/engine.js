@@ -154,7 +154,24 @@ TB.newGame=function(o){o=o||{};const pls=o.players||[];const np=pls.length;if(np
   G.kdeck=shuffle([...Array(51).keys()].map(x=>x+1));
   for(let i=3;i>=0;i--)G.road[i]=G.kdeck.shift();
   lg('The Thornbound Throne begins: '+np+' players, '+G.rounds+' rounds ('+len+'). Order: '+G.order.map(s=>nm(s)).join(', ')+'.');
+  if(o.advanced){G.adv={deal:G.pl.map(()=>[]),keep:{},occ:{}};   // Advanced Setup (optional variant): 5 face-down Kingdom Cards each
+    for(const P of G.pl)for(let i=0;i<5;i++){const k=G.kdeck.shift();G.adv.deal[P.seat].push(k);G.klimbo.push(k)}
+    later('advMull',{i:0});later('advPick',{i:0});later('advFinish')}
   later('roundStart');flow();return G};
+// ---- Advanced Setup: one optional mulligan, keep 1 of the 5 Kingdom Cards under a Hand card, shuffle the other 4 back, acquire in turn order, redraw
+AG.advMull=d=>{if(d.i>=G.order.length)return;const s=G.order[d.i];now('advMull',{i:d.i+1});
+  askYN(s,'advMull','Advanced Setup: mulligan once? (Your Hand cards except the Heir go into your Deck, which is reshuffled; then you redraw.)','Mulligan','Keep my Hand','advMull',{seat:s})};
+PICKH.advMull=(seat,opt)=>{if(!opt.yes)return;const P=G.pl[seat],heir=seat*100+13;const back=P.hand.filter(id=>id!==heir);P.hand=[heir];P.deck=shuffle(P.deck.concat(back));
+  while(P.hand.length<P.hs&&P.deck.length)P.hand.push(P.deck.shift());lg(nm(seat)+' takes a mulligan.',seat)};
+AG.advPick=d=>{if(d.i>=G.order.length)return;const s=G.order[d.i];now('advPick',{i:d.i+1});
+  askPick(s,'advPick','Advanced Setup: choose the Kingdom Card you keep (the other four are shuffled back).',G.adv.deal[s].map(kc=>({k:'k'+kc,kc,label:kname(kc)+': '+KCD(kc).txt})),'advPick',{seat:s})};
+PICKH.advPick=(seat,opt)=>{G.adv.keep[seat]=opt.kc;
+  askPick(seat,'advOcc','Advanced Setup: choose the Hand card that occupies '+kname(opt.kc)+'.',G.pl[seat].hand.map(id=>({k:'c'+id,id,label:cardLbl(id)})),'advOcc',{seat})};
+PICKH.advOcc=(seat,opt)=>{G.adv.occ[seat]=opt.id};
+AG.advFinish=()=>{const back=[];for(const s of G.order)for(const kc of G.adv.deal[s])if(kc!==G.adv.keep[s]){back.push(kc);removeFrom(G.klimbo,kc)}
+  G.kdeck=shuffle(G.kdeck.concat(back));now('advAcquire',{i:0})};
+AG.advAcquire=d=>{if(d.i>=G.order.length){for(const s of G.order)drawUp(s);return}const s=G.order[d.i];
+  acquireKC(s,G.adv.keep[s],G.adv.occ[s]);now('advAcquire',{i:d.i+1})};
 // ---------------------------------------------------------------- API
 function setG(x){G=x}
 TB.pending=function(Gx){return Gx.q?{seats:Gx.q.seats.slice(),kind:Gx.q.kind,title:Gx.q.title,simul:Gx.q.simul,type:Gx.q.t}:null};

@@ -10,7 +10,7 @@ Two-player card game, three ages. Names, card text and art are original; mechani
 - Military: pawn moves by shields; first crossing of 3 and 6 steps makes the rival lose 2 and 5 coins; 9 steps wins. End scoring 2/5/10 by zone.
 - Science: second copy of a symbol = take a progress token; 6 different symbols (law token counts) = instant win.
 - Wonders: shields, coins, steal, play-again, burn a rival grey/brown card, rebuild from discard, library (pick 1 of 3 tokens), resource choice.
-- Age change: player behind on the track chooses who starts (tie: the player who did not take the last card).
+- Age change: player behind on the track chooses who starts (tie: the player who took the last card).
 - End: points (cards, wonders, tokens, 1 per 3 coins, military zone); tie -> civic points; else shared.
 
 ## Cross-check (R2, W338)
@@ -29,7 +29,7 @@ Structure and rules
 - Architecture: wonders cost 2 resource units less; Masonry: blue cards cost 2 less; Economy: you receive the coins your rival pays for trade; Law counts as a science symbol; Strategy: red cards only (not wonder shields); Theology: wonders play again; Urbanism: 6 coins and +4 when you build by chain; Agriculture 6 coins + 4 points; Philosophy 7 points; Mathematics 3 points per token: VERIFIED.
 - Science: second copy of a symbol = take a token (once per symbol), 6 different symbols (the Law token is the sixth-plus symbol) = instant win: VERIFIED (6 card symbols + law in data.js).
 - Guilds score from the richer of the two cities for the owner, builders 2 points per wonder and no coins, moneylenders 1 point per 3 coins: VERIFIED.
-- Age change: the player behind on the track picks who starts; on a tie the player who did NOT take the last card picks: VERIFIED.
+- Age change: the player behind on the track picks who starts; on a tie the last active player (took the last card) picks: VERIFIED (W435, rulebook text).
 - End scoring (cards, wonders, tokens, 1 per 3 coins, military zone), tie goes to civic (blue) points, else shared: VERIFIED.
 
 Wonders (effects match; costs compared)

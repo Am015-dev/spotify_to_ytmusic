@@ -198,7 +198,7 @@ var TT = (typeof TT !== 'undefined') ? TT : {};
       var k = G.draft.avail.indexOf(m.w); if (k < 0) throw new Error('bad pick');
       G.draft.avail.splice(k, 1); P.wonders.push({ id: m.w, card: null }); G.draft.n++; G.ev.push({ t: 'pick', p: p, w: m.w });
       if (G.draft.n === 4) G.draft.avail = G.draft.pool.slice(4, 8);
-      if (G.draft.n >= 8) { G.phase = 'play'; startAge(G, 1); G.turn = G.firstSeat; }
+      if (G.draft.n >= 8) { G.phase = 'play'; startAge(G, 1); G.turn = DRAFT_ORDER[0]; } // the player who picked the first wonder opens Age I
       return G;
     }
     if (m.t === 'first') { G.turn = m.who; G.pend.shift(); G.ev.push({ t: 'first', who: m.who }); return G; }

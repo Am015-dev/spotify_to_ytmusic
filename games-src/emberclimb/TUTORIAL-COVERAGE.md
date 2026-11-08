@@ -36,6 +36,11 @@ than 2 steps were forced, if the end card is missing, or if any rule below was n
 | [x] elite | first elite fight | "tougher than a normal foe, better loot" |
 | [x] boss | boss fight | "The boss repeats a pattern. On its Spikes turn, attacks hurt you: block instead." |
 | [x] lose | HP under half | "If your HP hits 0, the climb ends." |
+| [x] preview | first card lifted after the energy line (W420) | "Lift a card: each foe shows the exact damage it would take..." |
+| [x] frail | first Frail on the hero (act 2 foes), else on the end card | "Frail: your Block cards give a quarter less" |
+| [x] acts | end card ("Things you will meet later") | "three acts, each with its own foes and guardian, plus a final act" |
+| [x] laststand | end card | "with two heroes in a boss fight, the first to fall stays at 1 HP" |
+| [x] shiv, orbs, stance, scry, retain | end card (other heroes' keywords; the coached climb is Garrick) | one line each |
 
 Reactions: clean kill, double damage on a Vulnerable foe, fully blocked a hit (good); took 8+ damage with no Block, hit by Spikes, ended a
 turn with energy and playable cards left (poor). The finale is the real numbers, one line at a time, then the end card.

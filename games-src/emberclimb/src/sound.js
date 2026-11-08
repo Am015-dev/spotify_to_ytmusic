@@ -22,7 +22,7 @@
     g.gain.value = o.v || .3; s.connect(fl); fl.connect(g); g.connect(SND.bus); s.start(t);
   }
   var SY = {
-    play: function () { tone(520, .09, { type: 'triangle', to: 780, v: .18 }); },
+    play: function () { tone(520, .09, { type: 'triangle', to: 780, v: .18 }); noise(.09, { f: 'bandpass', hz: 1600, v: .08 }); },
     hit: function () { noise(.14, { hz: 2400, v: .35 }); tone(180, .12, { type: 'square', to: 70, v: .2 }); },
     hurt: function () { tone(140, .22, { type: 'sawtooth', to: 55, v: .26 }); noise(.12, { hz: 900, v: .3 }); },
     block: function () { tone(880, .07, { type: 'square', v: .14 }); tone(1320, .1, { type: 'triangle', v: .12, at: .04 }); },
@@ -30,11 +30,17 @@
     heal: function () { tone(600, .14, { v: .15 }); tone(800, .16, { v: .15, at: .1 }); },
     win: function () { [523, 659, 784, 1046].forEach(function (f, i) { tone(f, .22, { type: 'triangle', v: .2, at: i * .12 }); }); },
     lose: function () { [392, 330, 262, 196].forEach(function (f, i) { tone(f, .3, { type: 'sawtooth', v: .16, at: i * .18 }); }); },
-    click: function () { tone(700, .04, { type: 'square', v: .08 }); }
+    click: function () { tone(700, .04, { type: 'square', v: .08 }); },
+    // W420 juice sounds: short and quiet
+    draw: function () { tone(900, .05, { type: 'triangle', to: 1300, v: .06 }); noise(.05, { f: 'highpass', hz: 4000, v: .05 }); },
+    crit: function () { noise(.2, { hz: 3200, v: .38 }); tone(120, .26, { type: 'square', to: 40, v: .22 }); tone(1500, .07, { type: 'triangle', v: .09 }); },
+    fanfare: function () { [523, 659, 784].forEach(function (f, i) { tone(f, .16, { type: 'triangle', v: .16, at: i * .09 }); }); [523, 784, 1046].forEach(function (f) { tone(f, .5, { type: 'triangle', v: .1, at: .3 }); }); },
+    boss: function () { tone(98, .7, { type: 'sawtooth', to: 82, v: .16 }); tone(147, .7, { type: 'sawtooth', to: 123, v: .1, at: .04 }); noise(.6, { hz: 380, v: .22 }); }
   };
   var last = {};
   window.SFX = function (name) {
     if (!SND.on || !SY[name]) return; var now = Date.now(); if (last[name] && now - last[name] < 70) return; last[name] = now;
+    if (name === 'fanfare' || name === 'boss') last.win = now;   // the fanfare replaces the plain win jingle
     try { SY[name](); } catch (e) { }
   };
   SND.toggle = function () { SND.on = !SND.on; SND.music = SND.on; try { localStorage.setItem('ec_snd', SND.on ? '1' : '0'); localStorage.setItem('ec_mus', SND.music ? '1' : '0'); } catch (e) { } if (SND.on) { ctx(); SFX('click'); } try { if (window.GA) { GA.setSfx(SND.on); GA.setMusic(SND.music); } if (window.GXMUS) GXMUS.sync(); } catch (e) { } };
