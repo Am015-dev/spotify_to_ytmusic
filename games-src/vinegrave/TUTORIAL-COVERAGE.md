@@ -1,12 +1,12 @@
 # Vinegrave tutorial coverage (W378, ADDENDUM 4: a coached first game)
 
-The tutorial is the story's prologue and a REAL game: 2 rounds against the real computer (Tamsin, easy). There are only 2 forced steps
+The tutorial is the story's prologue and a REAL game: 1 round (W378c: short enough that any player, or a random tapper, reaches the final count) against the real computer (Tamsin, easy). There are only 2 forced steps
 (tap Trail Notes, then Play it). After that the whole screen is free: every legal move is allowed, and the tutor draws nothing over the
 board. Pell Ardent (guide, code-drawn "P" portrait) speaks just in time, in one non-blocking bubble with a × that also fades by itself:
 - the first time a rule becomes a real option or happens (below);
 - when you make a strong move ("Good move: ...") or a weaker one ("Tip: next time consider this: ..."), using the hard AI's reasoning, for
-  the first 4 moves;
-- when the rival does something worth learning (its first move, its first pass).
+  the first 2 moves (and every real game rates each of your turns good / okay / weak in the Turn over card);
+- after every rival move: a one-line lesson on what it did and why it matters.
 The stacked start (`tutSetup` in src/ui4.js: fixed hand, 1 tablet + 1 jewel, Tin Lamp first in the market, the Glass Moth as the first
 guardian) makes the key cases likely; it does not decide your moves.
 After the last round, 3 steps walk through the final scoring with your real numbers. The end card then lists every rule that did not
@@ -44,6 +44,6 @@ moves through the UI (any glowing thing, in rotation), and asserts that every id
 | Tie-break (tiebreak) | score walk-through step 3 |
 | 5 rounds in a real game (rounds) | score walk-through step 3 and the end card |
 
-Each run lists which rules were explained in play and which went to the end card. Typical runs explain 17 to 22 of the 27 ids in play;
-deep, plane, temple and exile are the usual end-card ones.
+Each run lists which rules were explained in play and which went to the end card. With 1 round, typical runs explain 9 to 15 of the 27 ids in play; round end, fleeing, deep ruins, temple, notebook and
+exile are the usual end-card ones ("Things you'll meet later").
 Leaving and resuming: Skip works at any time. Resuming part-way is not supported, because the shared tutor kit only offers Restart.

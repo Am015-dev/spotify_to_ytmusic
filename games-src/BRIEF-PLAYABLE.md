@@ -47,3 +47,17 @@ Every game needs, before it counts as ready:
 - an always-visible score breakdown, yours vs the rival's, with the leader marked;
 - choice badges in markets and hands showing the best gain;
 - one line after each turn rating the move good, okay or poor, and saying why, compared with the solver's best move.
+- Owner on Vale (8 Nov 00:12): "not easy to understand what I have to do, how I collect points, when my turn ends and why". Add a permanent turn tracker (round x of y, whose turn, actions or dice left shown as spendable tokens), a "Turn over: why" card when the turn ends, and one plain next-step line that names the exact action.
+
+## Addendum 6 (owner, 8 Nov 00:31): all the rules, and a game that feels real
+Owner on Redline Rally and Emberclimb: "not all rules are applied", "not covering anything to make the game real", "looks very boring". Before a game counts as ready:
+- every rule in its rules notes and rules-check is built and tested, listed found -> built in RULES-COVERAGE.md;
+- the full campaign or modes are there;
+- it feels like the real thing, with movement and animation, sound, a clear goal, and a satisfying end screen.
+
+## Addendum 7 (owner, 8 Nov 01:00): three separate modes, and a clean game
+Owner: "I want to play a game. The hints are different and learn to play is different, but it must be a game, meaning not so much distraction. We need a clean understanding of how and why we score, what the aim of the game is, etc. I don't want distractions."
+- LEARN TO PLAY (title button): the coached game. Bubbles, pointing and explanations live only here.
+- PLAY (the default): a clean game screen. Show only the board, your hand or choices, the turn tracker, and one compact score line (you vs rival). Before turn 1, show a one-card "Goal: ..." (win condition in one sentence, plus 3 bullets on how points are earned). After that, no coach bubbles, no ratings and no toasts. Points show as a brief pop with a short reason ("+3 Bear pair"). Every number's "why" opens on tap only, in the score drawer. The end screen walks the scoring.
+- HINTS: a toggle in the top bar, OFF by default in Play. When on, it shows move previews (+N on spots), best-value badges and the good/okay/poor line after each turn. The "What should I do?" button belongs to Hints.
+- Check: a Play screenshot at 390x763 has no more than the board, the hand, the tracker, one score line and the top bar.

@@ -14,7 +14,8 @@ const { chromium } = require('playwright'), serve = require('./serve.js');
     try { await page.evaluate(() => { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } }); } catch (e) { }
     for (let t = 0; t < 3; t++) {
       await page.waitForFunction(() => window.G && typeof myTurn === 'function' && myTurn(), null, { timeout: 20000 });
-      const g = page.locator('.glow').first(); await tap(g); await page.waitForSelector('#insp:not([hidden]) .btn.go', { timeout: 5000 });
+      if (!(await page.locator('.glow').filter({ visible: true }).count())) { const tb = page.locator('#vtabs button.has').filter({ visible: true }); if (await tb.count()) await tap(tb.first()); }   // phone: the target may sit behind a tab
+      const g = page.locator('.glow').filter({ visible: true }).first(); await tap(g); await page.waitForSelector('#insp:not([hidden]) .btn.go', { timeout: 5000 });
       if (t === 0) await page.screenshot({ path: `shots/insp-${name}.png` });
       const before = await page.evaluate(() => G.turns); await tap(page.locator('#insp .btn.go').first());
       if (await page.locator('#qbox:not([hidden])').count()) await tap(page.locator('#qbox .btn').last());
