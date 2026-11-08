@@ -70,7 +70,7 @@ function movesFor(k, x) {
 const B2 = !/[?&]b2=0\b/.test(location.search);
 if (B2) document.body.classList.add('vg-b2');
 const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
-  0: [[15, 73], [33, 85], [51, 73], [69, 85], [87, 73]],
+  0: [[15, 69], [33, 79], [51, 69], [69, 79], [87, 69]],
   1: [[15, 41], [33, 53], [51, 41], [69, 53], [87, 41]],
   2: [[21, 11], [42, 23], [63, 11], [84, 23]]
 };
@@ -82,7 +82,7 @@ function mapB2(gS, S) {
   per[1].forEach((i, k) => { if (k) line(pos[per[1][k - 1]], pos[i]); const up = per[2][Math.min(per[2].length - 1, Math.round(k * (per[2].length - 1) / Math.max(1, per[1].length - 1)))]; if (up != null) line(pos[i], pos[up]); });
   per[2].forEach((i, k) => { if (k) line(pos[per[2][k - 1]], pos[i]); });
   const sign = (t, y) => `<span class="msign" style="top:${y}%">${t}</span>`;
-  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep ruins', 2) + sign('Ruins', 36) + sign('Camp', 69)
+  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep<span class="lx"> ruins</span>', 2) + sign('Ruins', 36) + sign('Camp', 69)
     + G.sites.map((x, i) => siteHTML(x, i, gS[i], S.k === 'site' && S.x === i).replace('<button ', `<button style="left:${pos[i][0]}%;top:${pos[i][1]}%" `)).join('');
 }
 // ---------------------------------------------------------------- render
@@ -132,12 +132,12 @@ function renderTray(L, q, me, actor) {
   // prompt line + the one button that fits now
   let txt, acts = '';
   if (over) { txt = 'The expedition is over.'; acts = '<button type="button" class="btn go" data-a="showres">See the result</button>'; }
-  else if (!mine) txt = actor < 0 ? 'The round is ending.' : who(actor) + ' is choosing. Tap to skip ahead.';
+  else if (!mine) txt = actor < 0 ? 'The round is ending.' : (who(actor) === 'You' ? 'You are' : who(actor) + ' is') + ' choosing. Tap to skip ahead.';
   else if (q) txt = qPrompt(q);
   else if (S) { const d = selInfo(S); txt = d.t; if (d.go) acts += mvBtn(d.go, d.label, 'go', 'gobtn'); if (S.k !== 'pawn') acts += '<button type="button" class="btn alt info" data-a="details" aria-label="Details">Details</button>'; }
   else txt = promptLine(L);
   const ps = L.find(m => m.t === 'pass');
-  if (mine && !q && ps && !S) acts += mvBtn(ps, 'Pass', 'alt pass', 'passbtn');
+  if (mine && !q && ps && !(S && selInfo(S).go)) acts += mvBtn(ps, 'Pass', 'alt pass', 'passbtn');
   if (UI.coachFree && UI.mode === 'tutorial' && !over && !S) acts += '<button type="button" class="btn alt" data-a="tutleave">Leave</button>';
   $('#prompt').textContent = txt; $('#pacts').innerHTML = acts;
   // choices: a pending question, or the research track's options
@@ -170,8 +170,13 @@ function selInfo(S) {
     const pay = payWords(VG.payPlan(G, UI.view, x.cost));
     if (m.t === 'disc') return { t: 'Explore this ruin for ' + V.DISC[x.lvl] + ' compasses. ' + pay + ' A guardian wakes!', go: m, label: 'Explore' };
     return { t: siteName(x) + '. Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' + pay, go: m, label: 'Dig' }; }
-  if (S.k === 'track') { if (!ms.length) return { t: 'Research: you cannot pay the next row yet.' }; return ms.length === 1 ? { t: trackLine(ms[0]) + ' Tap again to climb.', go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
+  if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]) + ' Tap again to climb.', go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
   return { t: '' };
+}
+function trackWhy() {   /* why the research path cannot climb now: the missing goods, in words */
+  const me = G.p[UI.view], miss = c => { const o = {}; Object.keys(c).forEach(k => { if ((me.res[k] || 0) < c[k]) o[k] = c[k] - (me.res[k] || 0); }); return o; };
+  if (me.glass >= V.TOP) { const t = V.TEMPLE.find((x, k) => G.temple[k] > 0); return t ? 'Temple tile: you need ' + resWords(miss(t.cost)) + ' more.' : 'No temple tiles left.'; }
+  return 'Next row costs ' + resWords(V.TRACK[me.glass + 1].cost) + '. You need ' + resWords(miss(V.TRACK[me.glass + 1].cost)) + ' more.';
 }
 function payWords(pl) {
   if (!pl) return ''; const me = G.p[UI.view], cards = pl.cards.map(i => V.CARDS[me.hand[i]].name), list = cards.length > 1 ? cards.slice(0, -1).join(', ') + ' and ' + cards[cards.length - 1] : cards[0];

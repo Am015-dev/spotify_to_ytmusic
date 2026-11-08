@@ -1,3 +1,11 @@
+# FIXED2 (8 Nov 2026, R2 review 5.6): hands-on tutorial, Easy tuned, phone labels
+- Tutorial: every rule done by hand (TUTORIAL-COVERAGE.md top); Skip/finish makes Play the primary button.
+- Easy rival noise 1.6 -> 2.6 (src/ai.js). `node newbie-sim.js` = Easy vs glow-follower / sensible / random new players (headless).
+  Every move's caption adds the points it made ("Tamsin buys a temple tile. +6 points.").
+- Pass stays when the selection has no action; research you cannot pay says the missing goods (src/ui1.js trackWhy). "You are choosing".
+- Phone (style.css FIXED2 block): market 3x2 with effect words, site name labels hidden on phone (the tap line names them), signs and
+  track numbers 14px, Research sign inside the track, short phones get smaller hand art. touch-test FULL prints the final score.
+
 # W490 (8 Nov 2026): reused owner art + board view (flag body.vg-b2, on; ?b2=0 = old terraces)
 - Art: 116 slots now hold owner art copied from shipwreck-isle, sands-of-qamar, emberclimb, rampart-and-vine, thornbound, hollowbough,
   tidewake (`python3 reuse-art.py`; table in ASSETS.md). Guardians renamed to match their new figures (data.js GU names).

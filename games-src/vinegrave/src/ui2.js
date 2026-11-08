@@ -113,12 +113,13 @@ function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode 
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
   if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null;
-  const s = VG.actor(G), b = snapS(s), F = fxBefore(m, s), r = VG.apply(G, m);
+  const s = VG.actor(G), b = snapS(s), F = fxBefore(m, s), sc0 = s >= 0 ? VG.score(G, s).total : 0, r = VG.apply(G, m);
   if (!r.ok) { render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
   const delay = showEvents(s);
   save(); render(); actFx(m, s, F, b); if (best) coachMove(m, best);
-  if (!UI.fast && m.t !== 'ans' && !m.free) $('#prompt').textContent = moveCaption(m, s);
+  const dp = s >= 0 ? VG.score(G, s).total - sc0 : 0;   /* say where points come from, so a rival's jump is never a mystery */
+  if (!UI.fast && m.t !== 'ans' && (!m.free || dp)) $('#prompt').textContent = moveCaption(m, s) + (dp > 0 ? ` +${dp} ${dp === 1 ? 'point' : 'points'}.` : dp < 0 ? ` ${dp} ${dp === -1 ? 'point' : 'points'}.` : '');
   UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(650, Math.min(delay, 1200)));
 }
 function after() {
