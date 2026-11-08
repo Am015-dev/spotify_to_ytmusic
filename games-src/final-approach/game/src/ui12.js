@@ -59,21 +59,23 @@ function tutStart(o) {
   const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 700);
   closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
+  document.querySelectorAll('.fa-skip').forEach(e => e.remove());
+  const sk = h('button.fa-skip', { type: 'button', 'aria-label': 'Skip the guided flight' }, 'Skip tutorial'); sk.addEventListener('click', e => { e.stopPropagation(); const wasPro = UI.fc && UI.fc.pro; tutLeave(); if (wasPro && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); }); document.body.appendChild(sk);
   UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0 }; window.GXCOACH = { running: true, explained: ['intro'], done: false }; UI.fc.seen.intro = true; UI.cpt = null; clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
 }
 // leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
 function tutLeave() {
   if (window.GXCOACH && !window.GXCOACH.done) window.GXCOACH.running = false;
-  clearInterval(UI.fcT); UI.fc = null; UI.cpt = null; document.querySelectorAll('.fa-coach,.fa-fin').forEach(e => e.remove());
+  clearInterval(UI.fcT); UI.fc = null; UI.cpt = null; document.querySelectorAll('.fa-coach,.fa-fin,.fa-skip').forEach(e => e.remove());
   clearTimeout(UI.tm); UI.seq++; UI.started = false; UI.sel = -1; UI.cof = 0; if (UI._aid) { AIDELAY = UI._aid; UI._aid = 0; }
   try { hideRecap(); } catch (e) { } try { GXH.hide(); } catch (e) { } try { if (typeof pxClearEnd === 'function') pxClearEnd(); } catch (e) { }
   $$('#fx .gh,#fx .endb,#fx .pop').forEach(e => e.remove()); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a player with chapter progress goes straight to the chapter map
 function storyGate() {
-  // Addendum 7: Play is a clean game. A new player is asked once: learn in 4 rounds (the coached flight) or just play (the chapter map)
+  // a first-time player's Play starts the coached flight (Learn to play); a clear Skip button leaves it for the chapter map
   if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer() || UI._storyAsked) return false;
-  UI._storyAsked = true; tutOffer(() => GXC.open()); return true;
+  UI._storyAsked = true; tutStart({ prologue: true }); return true;
   if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer()) return false;
   tutStart({ prologue: true }); return true;
 }
@@ -177,7 +179,7 @@ function fcPoll() {
 // the end: the landing check rule by rule with the real numbers, then what did not come up
 function fcEnd() {
   const F = UI.fc, T = TS(); if (!F || !T || !G || !G.result) return; const win = !!G.result.win;
-  clearInterval(UI.fcT); try { GXT.markDone(TUT_GAME); } catch (e) { } window.GXCOACH = Object.assign(window.GXCOACH || { explained: Object.keys(F.seen) }, { running: false, done: true });
+  clearInterval(UI.fcT); document.querySelectorAll('.fa-skip').forEach(e => e.remove()); try { GXT.markDone(TUT_GAME); } catch (e) { } window.GXCOACH = Object.assign(window.GXCOACH || { explained: Object.keys(F.seen) }, { running: false, done: true });
   const later = FC_CORE.filter(k => !F.seen[k]).map(k => tsFill(T.coach[k])).concat(T.later); F.later = later;
   const rows = landList().map(r => h('li.' + (r[0] === true ? 'ok' : 'no'), h('b', r[0] === true ? '✓' : '✗'), h('span', r[1])));
   const btn = (id, label, pri) => { const b = h('button.fb' + (pri ? '.pri' : ''), { type: 'button', 'data-fin': id }, label); return b; };
