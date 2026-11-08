@@ -63,7 +63,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     var cv = document.createElement('canvas'); cv.className = (img.className ? img.className + ' ' : '') + 'gx3d'; cv.setAttribute('aria-hidden', 'true'); cv.setAttribute('data-glb', name);
     cv.style.cssText = img.style.cssText; cv.style.position = 'absolute'; cv.style.margin = '0'; cv.style.maxWidth = cv.style.maxHeight = 'none'; cv.style.boxSizing = 'border-box';
     img.parentNode.insertBefore(cv, img.nextSibling); img.style.visibility = 'hidden';
-    var v = { cv: cv, img: img, ctx: cv.getContext('2d'), model: model, yaw: +(img.getAttribute('data-yaw') || -.35), spin: img.getAttribute('data-spin') === '0' ? 0 : 1, done: 0, t0: performance.now() };
+    var v = { cv: cv, img: img, ctx: cv.getContext('2d'), model: model, yaw: +(img.getAttribute('data-yaw') || -.35), spin: (img.getAttribute('data-spin') === '0' || window.GXGLB_SOFT) ? 0 : 1, done: 0, t0: performance.now() };
     sync(v); draw(v, 0); views.push(v); V.views++; start();
   }
   function upgrade(img) {
