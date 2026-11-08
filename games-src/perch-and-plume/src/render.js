@@ -8,6 +8,8 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function 
 function isHuman(s) { return G && G.pl[s] && G.pl[s].kind === 'human'; }
 function humans() { return G ? G.pl.map(function (p, i) { return p.kind === 'human' ? i : -1; }).filter(function (i) { return i >= 0; }) : []; }
 function myTurn() { if (!G || G.phase === 'over') return false; var s = PP.sideToAct(G); return isHuman(s) && s === UI.view && !UI.busy && !UI.passing; }
+// replace a part only when its HTML really changed: a tap that lands during a re-render keeps its button (never a dead tap)
+function setH(el, h) { if (!el || el._h === h) return; el._h = h; el.innerHTML = h; }
 function q() { return G && G.q; }
 function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
 function aMs(ms) { if (UI.fast) return 0; var sp = UI.speed || 1; try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
@@ -50,8 +52,9 @@ function render() {
   if (!G) return;
   var vs = UI.view, p = G.pl[vs], cur = PP.sideToAct(G);
   $('#barstat').textContent = '';
+  $$('#bd .firing,#bd .landed,#bd .pulse').forEach(function (e) { e.classList.remove('firing', 'landed', 'pulse'); });   // parts are kept when unchanged (setH): clear one-shot effects
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
-  glow();
+  glow(); try { dockToActs(); } catch (e) { }
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
   try { coachState(); } catch (e) { }
@@ -74,14 +77,14 @@ function renderGoalbar() {
   el.setAttribute('aria-label', 'Chapter goal. ' + r.label + ': ' + r.cur + (r.met ? ', met' : ''));
 }
 function renderOpps(cur) {   // the always-visible score breakdown: every player, leader marked
-  $('#opps').innerHTML = hintsOn() ? scoreHTML() : scoreLineHTML();
+  setH($('#opps'), hintsOn() ? scoreHTML() : scoreLineHTML());
 }
 function portraitHTML(face) { var st = 'portrait-' + face; return ART.items[st] ? artHTML(st) : '<span class="art ph">' + placeholder('portrait-' + face) + '</span>'; }
 function renderMid() {
   var f = '';
   for (var i = 0; i < 5; i++) { var d = G.feeder[i]; f += d ? '<button type="button" class="die" data-a="die" data-i="' + i + '" aria-label="' + (d === 'gs' ? 'grub or seed' : d) + ' die">' + foodIcon(d) + '<small>' + (d === 'gs' ? 'either' : d) + '</small></button>' : '<span class="die gone"></span>'; }
-  $('#feeder').innerHTML = f;
-  $('#tray').innerHTML = G.tray.map(function (id, i) { return id ? '<div class="tcard">' + cardHTML(id, 'tray', null, 'data-a="tray" data-i="' + i + '" role="button" tabindex="0"') + '</div>' : '<div class="tcard"></div>'; }).join('');
+  setH($('#feeder'), f);
+  setH($('#tray'), G.tray.map(function (id, i) { return id ? '<div class="tcard">' + cardHTML(id, 'tray', null, 'data-a="tray" data-i="' + i + '" role="button" tabindex="0"') + '</div>' : '<div class="tcard"></div>'; }).join(''));
   $('#deckb').innerHTML = '<span>Deck</span><span>' + G.deck.length + '</span>';
 }
 function rowLabel(p, h) {
@@ -100,30 +103,31 @@ function renderMat(p, vs) {
     }
     h += '</div>';
   }
-  $('#mat').innerHTML = h;
+  setH($('#mat'), h);
 }
 function renderDock(p, vs, cur) {
   var Q = G.q, mine = myTurn();
   var who = G.phase === 'over' ? 'Game over' : isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name + "'s turn" : 'Your turn') : G.pl[cur].name + "'s turn";
   if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = UI.animSeat === UI.view && humans().length === 1 ? 'Your birds are working' : G.pl[UI.animSeat].name + ' is playing';
   $('#dt').textContent = who;
-  $('#trk').innerHTML = trackerHTML();
+  setH($('#trk'), trackerHTML());
   var wb = $('#whatbtn'); if (wb) wb.hidden = !(hintsOn() && UI.mode !== 'tutfree' && mine && !Q);
   hintsBtn();
   if (!mine || Q) UI.pickBird = false;
   var idle = mine && !Q && UI.sel == null && !UI.pend && UI.gsDie == null && !UI.pickBird;
   document.body.classList.toggle('idle4', !!idle);
+  document.body.classList.toggle('deciding', !!(mine && Q));
   document.body.classList.toggle('picking', !!(mine && !Q && (UI.pickBird || UI.sel != null)));
   $('#prompt').textContent = promptText(mine);
-  $('#acts').innerHTML = mine ? (idle ? act4HTML() : actsHTML()) : '';
+  setH($('#acts'), mine ? (idle ? act4HTML() : actsHTML()) : '');
   var have = PP.FOODS.filter(function (f) { return p.food[f]; });
-  $('#foodrow').innerHTML = '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
-    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : '');
+  setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
+    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : ''));
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
   var bp = mine && !Q && hintsOn() ? bestPlay(G, vs) : null;
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
   var order = p.hand.map(function (id, i) { return i; }).sort(function (x, y) { return (ok[y] ? 1 : 0) - (ok[x] ? 1 : 0) || (ok[x] ? B[p.hand[y]].p - B[p.hand[x]].p : 0) || x - y; });   // birds you can play first, best first
-  $('#hand').innerHTML = p.hand.length ? order.map(function (i) {
+  setH($('#hand'), p.hand.length ? order.map(function (i) {
     var id = p.hand[i], b = B[id], st;
     if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
     else if (!mine) st = '';
@@ -132,16 +136,20 @@ function renderDock(p, vs, cur) {
     else st = '';
     var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');
     return bigCardHTML(id, 'data-a="hand" data-i="' + i + '" role="button" tabindex="0"', (bp && bp.i === i ? '<em class="bestb">Best</em>' : '') + st, cls);
-  }).join('') : '<span class="empty">No birds in hand. Use Draw birds to get some.</span>';
+  }).join('') : '<span class="empty">No birds in hand. Use Draw birds to get some.</span>');
   if (UI.hix == null || UI.hix >= p.hand.length) UI.hix = 0;
   handScrollSync(); handPager();
   var hc = $('#hand').querySelectorAll('.bc')[UI.hix]; if (hc) $('#hand').scrollLeft = hc.offsetLeft - $('#hand').offsetLeft - 6;
-  if (mine && (UI.pend || UI.gsDie != null || (Q && $('#acts .btn')))) dockToActs();
+  var sc = $('#hand .bc.sel'); if (sc) $('#hand').scrollLeft = sc.offsetLeft - $('#hand').offsetLeft - 4;
 }
 // keep the step's buttons (Play / Other food / Cancel, Skip, No thanks) just under the sticky prompt, never scrolled out of sight
-function dockToActs() {
-  var db = $('#dockbody'), pr = $('#prompt'), ac = $('#acts'); if (!db || !ac || db.scrollHeight <= db.clientHeight) return;
-  var d = ac.getBoundingClientRect().top - (db.getBoundingClientRect().top + pr.offsetHeight + 6);
+function dockToActs() {   // the step's buttons and what glows in the panel sit just under the sticky prompt, so you never scroll to find them
+  var db = $('#dockbody'), pr = $('#prompt'), ac = $('#acts'); if (!db || !ac || !myTurn() || db.scrollHeight <= db.clientHeight) return;
+  var r = db.getBoundingClientRect(), lim = r.top + (pr && pr.offsetHeight ? pr.offsetHeight + 6 : 0), els = [];
+  if (ac.children.length) els.push(ac);
+  var g = db.querySelector('#hand .glow, #hand .sel, #acts .glow'); if (g) els.push(g); else if (!els.length) return;
+  var top = Math.min.apply(null, els.map(function (e) { return e.getBoundingClientRect().top; })), bot = Math.max.apply(null, els.map(function (e) { return e.getBoundingClientRect().bottom; }));
+  var d = top < lim ? top - lim : bot > r.bottom ? Math.min(bot - r.bottom + 4, top - lim) : 0;
   if (Math.abs(d) > 2) db.scrollTop += d;
 }
 function promptText(mine) {
@@ -196,7 +204,7 @@ function glow() {
   if (UI.pend || UI.gsDie != null) return;
   if (!Q) {
     if (UI.sel != null) { var id = p.hand[UI.sel]; [0, 1, 2].forEach(function (h) { if (PP.playInfo(G, UI.view, id, h)) add('.row[data-h="' + h + '"] .slot.next'); }); return; }
-    if (!UI.pickBird) add('.ract');
+    if (!UI.pickBird) { add('.ract'); add('.a4:not([aria-disabled])'); return; }   // choosing an action: the four actions (and the rows) glow; the hand glows once you pick Play a bird
     PP.playable(G, UI.view).forEach(function (x) { add('#hand .bc[data-i="' + x.i + '"]'); });
     return;
   }

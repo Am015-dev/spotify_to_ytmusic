@@ -50,7 +50,8 @@ function coachWait(s) {
   if (COACH.cur && COACH.cur.dataset.rule === 'wait' && COACH.cur.isConnected) return;
   if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
   var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('role', 'status'); d.dataset.rule = 'wait';
-  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + (COACH.i + 1) + ' of ' + TSTEPS.length + '</b>' + esc(s.res ? 'Watch the round end. The score comes next.' : 'Watch Pip. Your next step comes right after.') + '</span>';
+  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + (COACH.i + 1) + ' of ' + TSTEPS.length + '</b>' + esc(s.res ? 'The round ends. Your score comes next.' : 'Pip plays. Your next step comes right after.') + '</span><em class="skipw">Tap to skip</em>';
+  d.style.cursor = 'pointer'; d.addEventListener('click', function () { UI.speed = 25; $$('.turnban').forEach(function (b) { b.click(); }); });   // the wait never holds you: a tap plays the rest at once
   var host = $('#dockbody'), at = $('#prompt'); if (host && at) at.parentNode.insertBefore(d, at); else return;
   COACH.cur = d;
 }

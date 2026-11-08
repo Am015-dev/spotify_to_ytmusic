@@ -431,5 +431,29 @@ body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 .sctab tr.tot td{font-weight:800;font-size:17px}
 .goalc ul{margin:0 0 8px;padding-left:20px;font-size:16px;line-height:1.4}.goalc p{font-size:15px;margin:0 0 6px}
 @media (min-width:1000px){.sctab,.sctab td small,.goalc p,#bulbbtn .hst,.sline i,.sline .slw{font-size:16px}}
+/* phones: a compact hand strip (picture, name, points, cost); the chosen bird opens full width with its power; any other bird opens big on tap */
+@media (max-width:999px){#trk .tr-why{display:none}body.deciding #trk{display:none}#hpg{display:none}
+#hand{gap:8px;padding:8px 4px 4px;scroll-snap-type:x proximity}
+#hand .bc.big{flex:0 0 128px;flex-direction:column;min-height:0;height:122px;border-width:2px;scroll-snap-align:start}
+#hand .bc.big .bk-pic{flex:0 0 44px;min-height:0;border-radius:6px 6px 0 0}
+#hand .bc.big .bk-body{padding:3px 6px 4px;gap:3px}
+#hand .bc.big .bk-hab,#hand .bc.big .bk-pw,#hand .bc.big .bk-st{display:none}
+#hand .bc.big .bk-hd{gap:4px}
+#hand .bc.big .bk-nm{font-size:14px;line-height:1.1;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+#hand .bc.big .vpb{transform:scale(.8);transform-origin:top right}
+#hand .bc.big .bk-cost{gap:3px;flex-wrap:nowrap}#hand .bc.big .bk-cost .ci{min-width:0}#hand .bc.big .bk-cost .ci small{display:none}#hand .bc.big .bk-cost .ci .fi{width:20px;height:20px}#hand .bc.big .bk-cost .ci.free{font-size:14px}
+#hand .bc.big.sel{flex:0 0 calc(100% - 8px);flex-direction:row;height:auto;min-height:112px}
+#hand .bc.big.sel .bk-pic{flex:0 0 28%;border-radius:6px 0 0 6px}
+#hand .bc.big.sel .bk-pw{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;font-size:14px;line-height:1.25;padding:2px 6px}
+#hand .bc.big .bestb{top:-8px;right:4px}
+#hand .empty{padding:6px}}
+.coachb .skipw{flex:none;align-self:center;font-style:normal;font-weight:800;font-size:14px;background:#4f7a45;color:#fff;border-radius:10px;padding:6px 10px;min-height:32px;display:inline-flex;align-items:center}
+@media (max-width:999px) and (max-height:700px){.a4 .a4t span{font-size:14px;line-height:1.15}.a4{min-height:48px}#act4{gap:5px}#foodrow{min-height:40px}}
+.sline .slw.goal1{text-decoration:none;font-weight:800;color:#ffe3a3;font-size:14px;white-space:nowrap}
+.flyfx{position:fixed;z-index:60;width:32px;height:32px;pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}.flyfx>*,.flyfx .fi,.flyfx svg{width:32px;height:32px;display:block}
+.bump{animation:bump .42s ease-out}@keyframes bump{40%{transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.flyfx{display:none}.bump{animation:none}}
+.ovl p.rnote{font-size:15px!important;line-height:1.4;opacity:1}
+.a4.glow{box-shadow:0 0 0 3px #ffd76a,0 0 12px #ffd76a}
 </style>
 </head>

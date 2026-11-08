@@ -19,3 +19,12 @@ No rule was wrong. The differences were in what a new player can see and do:
 Roster size (120 birds, 18 bonus cards, 26 power types), green-side goals only with a rival, simplified solo rival.
 Not taught as a step: bonus-space trades and feeder rerolls (dice luck); the instruction bar and rules drawer cover them.
 `story-check.js` crashes the same way before and after this change (not touched).
+
+## R6 re-review fixes (6.5 FAIL -> fixer 2)
+| R6 finding | Cause | Fix | Test |
+|---|---|---|---|
+| Dead tap on a glowing "+2 food" row (375x667, round 4) | Every render rebuilt the board/dock with innerHTML; a tap that landed during a re-render lost its button (no click). Taps on rows/spaces/actions while your own birds still animated were also dropped. | `setH()` only replaces a part when its HTML changed; rows, spaces, Play and the 4 actions join the "kept tap" path (applied when the animation ends). `src/render.js`, `src/flow.js` | `tests/touch-game.js` (every glowing target in a full game, both sizes), run by `tests/first-tap.js` |
+| 6-7 dock scrolls a game | Big full-width hand carousel (303 px) and a 2-line round box under the actions. | Phones: compact hand strip (picture, name, points, cost); the chosen bird opens full width with its power; any other bird opens big on tap. Round box one line, hidden while deciding; the panel keeps the step's buttons and glowing cards under the prompt. `src/head.html`, `src/render.js` | `tests/touch-game.js` counts scrolls |
+| Tutorial food/eggs/goalr waits 4-7 s | Pip's turns played at full speed between steps. | In the tutorial Pip plays 6x faster, your own animations 2x; the wait bubble says "Tap to skip" and a tap plays the rest at once. `src/flow.js`, `src/coach.js` | `tests/tutorial-end.js` (all step markers within 2 s) |
+| First 10 s, Feel | Goal not stated on the first screen; actions resolved as number changes. | Score bar says "Goal: most points in 4 rounds" on the first turn; the four actions glow; food flies from the die to your food row, eggs fly to the bird, rows bump. `src/turnui.js`, `src/flow.js` | screenshots |
+| Result note looked under 14 px | | 15 px. `src/screens.js` | |

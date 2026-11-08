@@ -1,6 +1,6 @@
 // First-tap gate (G4 review): every button answers the FIRST tap within 1 s, at real speed (no fast mode), at 390x844 and 375x667.
 // Walks Quick game -> Start -> Keep these -> Play a bird -> a bird -> a glowing space -> Play, then Get food -> a die.
-// Also checks: nothing covers a button when it is tapped; after choosing a space the Play button and the chosen card are on
+// Then a full game by touch (touch-game.js): every glowing target in every round answers its first tap. Also checks: nothing covers a button when it is tapped; after choosing a space the Play button and the chosen card are on
 // screen without scrolling, below the sticky "Your turn" header; the prompt says "Tap Play"; the card no longer says
 // "tap a glowing space"; board spaces are at least 44 px.        node tests/first-tap.js [url]
 const { chromium } = require('playwright');
@@ -53,5 +53,8 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/';
     await ctx.close();
   }
   ok(errs.length === 0, 'console/page errors ' + errs.length + ' ' + errs.slice(0, 2).join(' | '));
-  await b.close(); process.exit(fails ? 1 : 0);
+  await b.close();
+  // R6 review: a glowing "+2 food" row ignored a tap in round 4. Every glowing target in a FULL game must answer its first tap:
+  // tests/touch-game.js plays a whole Quick game by touch at both sizes, following the glow (QUICK=1 skips it).
+  if (!process.env.QUICK) { const r = require('child_process').spawnSync(process.execPath, [require('path').join(__dirname, 'touch-game.js'), URL], { stdio: 'inherit' }); if (r.status !== 0) fails++; } process.exit(fails ? 1 : 0);
 })();

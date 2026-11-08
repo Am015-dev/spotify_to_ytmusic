@@ -184,7 +184,7 @@ function scoreLineHTML() {
   var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), top = Math.max.apply(null, sc), one = sc.filter(function (v) { return v === top; }).length === 1 && top > 0;
   return '<button type="button" class="sline" data-a="mysc" aria-label="Score: ' + esc(G.pl.map(function (p, i) { return (i === UI.view ? 'you' : p.name) + ' ' + sc[i]; }).join(', ')) + '. Tap for how it adds up">' +
     G.pl.map(function (p, i) { return '<span class="sl' + (i === UI.view ? ' me' : '') + '">' + (one && sc[i] === top ? '<em aria-hidden="true">&#9733;</em>' : '') + esc(i === UI.view && humans().length === 1 ? 'You' : p.name) + ' <b>' + sc[i] + '</b></span>'; }).join('<i>vs</i>') +
-    '<span class="slw">why?</span></button>';
+    (G.round === 0 && G.pl[UI.view].cubes === G.cubes[0] && UI.mode !== 'tutfree' ? '<span class="slw goal1">Goal: most points in ' + G.rounds + ' rounds</span>' : '<span class="slw">why?</span>') + '</button>';   // the first screen says the goal in one line
 }
 // the score drawer: every number's why, for every player
 function showScore() {

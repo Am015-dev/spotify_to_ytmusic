@@ -12,8 +12,8 @@ document.addEventListener('click', function (e) {
   if (!G) return;
   var mine = myTurn(), Q = G.q, p = G.pl[UI.view];
   // your choice is pending but your birds are still animating: keep the tap and apply it the moment they finish (never a dead tap)
-  if (!mine && UI.busy && Q && G.phase !== 'over' && !UI.passing && PP.sideToAct(G) === UI.view && isHuman(UI.view) && /^(die|tray|deck|bird|hand|mv)$/.test(a) && !t.closest('#pop')) {
-    var sel = '[data-a="' + a + '"]' + ['i', 'h', 'c', 'm'].map(function (k) { return t.dataset[k] != null ? '[data-' + k + '="' + String(t.dataset[k]).replace(/["\\]/g, '\\$&') + '"]' : ''; }).join(''), n = 0;
+  if (!mine && UI.busy && (Q || /^(ract|slot|playgo|a4|hand)$/.test(a)) && G.phase !== 'over' && !UI.passing && PP.sideToAct(G) === UI.view && isHuman(UI.view) && /^(die|tray|deck|bird|hand|mv|ract|slot|playgo|a4)$/.test(a) && !t.closest('#pop')) {
+    var sel = '[data-a="' + a + '"]' + ['i', 'h', 'c', 'm', 'k'].map(function (k) { return t.dataset[k] != null ? '[data-' + k + '="' + String(t.dataset[k]).replace(/["\\]/g, '\\$&') + '"]' : ''; }).join(''), n = 0;
     t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse');
     (function later() { if (UI.busy && n++ < 60) { setTimeout(later, 80); return; } var x = myTurn() && document.querySelector(sel); if (x) x.click(); })();
     return;
@@ -104,6 +104,16 @@ function popAt(el, txt) {
   var r = el.getBoundingClientRect(), d = document.createElement('div'); d.className = 'popfx'; d.textContent = txt; d.setAttribute('data-volatile', '');
   d.style.left = (r.left + r.width / 2) + 'px'; d.style.top = Math.max(60, r.top + 6) + 'px'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1150);
 }
+// a token (food icon, egg) flies from where it came from to where it lands: the action's beat
+function flyFx(from, to, html) {
+  if (!from || !to || UI.fast || !document.body.animate) return;
+  var a = from.getBoundingClientRect(), b = to.getBoundingClientRect(); if (!a.width || !b.width) return;
+  var d = document.createElement('div'); d.className = 'flyfx'; d.innerHTML = html; d.setAttribute('data-volatile', ''); d.setAttribute('aria-hidden', 'true');
+  d.style.left = (a.left + a.width / 2 - 16) + 'px'; d.style.top = (a.top + a.height / 2 - 16) + 'px'; document.body.appendChild(d);
+  var dx = b.left + Math.min(b.width / 2, 60) - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
+  var an = d.animate([{ transform: 'translate(0,0) scale(1.35)', opacity: 1 }, { transform: 'translate(' + dx * .5 + 'px,' + (dy * .5 - 40) + 'px) scale(1.15)', opacity: 1, offset: .5 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.8)', opacity: .9 }], { duration: Math.max(260, aMs(560)), easing: 'cubic-bezier(.3,.6,.4,1)' });
+  an.onfinish = function () { dropEl(d); to.classList.remove('bump'); void to.offsetWidth; to.classList.add('bump'); };
+}
 function playFx(list, actor) {
   var chain = Promise.resolve(), view = UI.view;
   list.forEach(function (e) {
@@ -140,8 +150,8 @@ function playFx(list, actor) {
           caption(G.pl[e.seat].name + ' plays ' + B[e.id].n + ' in the ' + HABN[e.h] + ' (+' + B[e.id].p + ')');
           return reveal(e.id, G.pl[e.seat].name + ' plays', e.seat);
         }
-        case 'food': if (mine) popAt($('#foodrow'), '+' + (e.n || 1) + ' ' + e.f); else if (e.die != null) caption(G.pl[e.seat].name + ' takes ' + e.f + ' from the feeder'); return wait(aMs(e.die != null ? (mine ? 300 : 650) : 0));
-        case 'egg': if (mine) { popAt(slotEl(e.seat, e.h, e.c), '+1 egg = +1 point'); sfx('egg'); } return wait(aMs(mine ? 300 : 200));
+        case 'food': if (mine) { flyFx((e.die != null && $('.die[data-i="' + e.die + '"]')) || $('#feeder'), $('#foodrow'), foodIcon(e.f)); popAt($('#foodrow'), '+' + (e.n || 1) + ' ' + e.f); } else if (e.die != null) caption(G.pl[e.seat].name + ' takes ' + e.f + ' from the feeder'); return wait(aMs(e.die != null ? (mine ? 300 : 650) : 0));
+        case 'egg': if (mine) { flyFx($('.ract[data-h="1"]'), slotEl(e.seat, e.h, e.c), eggIcon()); popAt(slotEl(e.seat, e.h, e.c), '+1 egg = +1 point'); sfx('egg'); } return wait(aMs(mine ? 300 : 200));
         case 'roll': sfx('dice'); $$('.die').forEach(function (d) { d.classList.add('firing'); }); return wait(aMs(250));
         case 'goal': {
           var res = e.res, txt = 'Round ' + (e.r + 1) + ' goal (' + PP.GOL[res.gid].n + '): ' + res.pts.map(function (v, i) { return G.pl[i].name + ' ' + v; }).join(', ');
@@ -190,7 +200,7 @@ function pump() {
   if (G.phase === 'setup') { if (isHuman(s)) { if (humans().length > 1 && s !== UI.view) { askPass(s, function () { showKeep(s); }); return; } UI.view = s; showKeep(s); return; } apply(PPAI.setup(G, s), s); return; }
   if (!isHuman(s) && G.phase === 'play' && typeof coachHold === 'function' && coachHold()) { UI.pumpT = setTimeout(pump, 250); return; }   // tutorial: the rival waits while a "see" step is shown
   var tk = s + ':' + G.round + ':' + G.pl[s].cubes;
-  if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; if (!isHuman(s)) UI.speed = 1; turnBanner(s); return; }
+  if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; var tut = typeof coachOn === 'function' && coachOn(); UI.speed = !isHuman(s) ? (tut ? 6 : 1) : (tut ? 2 : UI.speed); turnBanner(s); return; }
   if (isHuman(s)) {
     if (s !== UI.view) { if (humans().length > 1) { askPass(s, function () { UI.view = s; render(); }); return; } UI.view = s; }
     render(); try { GX.showDock(); } catch (e) { } return;

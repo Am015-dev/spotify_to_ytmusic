@@ -54,8 +54,8 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
   ok(real, `the last step starts a real 4-round game at its starting hand (${taps} taps)`);
   ok(JSON.stringify(seen) === JSON.stringify(RULES), `every rule step appears, in order (${seen.length}/${RULES.length})` + (seen.length !== RULES.length ? ' missing ' + RULES.filter(r => !seen.includes(r)).join(',') : ''));
   const long = words.filter(w => w[1] > 12), multi = words.filter(w => w[2] !== 1);
-  const slow = ['white', 'cache', 'pink'].filter(k => !(lat[k] <= 2000));   // a "see" step's marker shows within 2 s of the step starting, its power's own animation included (G4 review); goalr waits for Pip's last turn and shows a 'watch' line meanwhile
-  ok(slow.length === 0, 'see-step markers appear within 2 s: ' + ['white', 'cache', 'pink', 'goalr'].map(k => k + ' ' + lat[k] + ' ms').join(', '));
+  const slow = ['white', 'cache', 'pink', 'food', 'eggs', 'cards', 'goalr'].filter(k => !(lat[k] <= 2000));   // a "see" step's marker shows within 2 s of the step starting, its power's own animation included (G4 review); goalr waits for Pip's last turn and shows a 'watch' line meanwhile
+  ok(slow.length === 0, 'step markers appear within 2 s (R6: food, eggs, goalr waited 4-7 s): ' + ['white', 'cache', 'pink', 'food', 'eggs', 'cards', 'goalr'].map(k => k + ' ' + lat[k] + ' ms').join(', '));
   ok(long.length === 0, 'one sentence of 12 words or fewer per step' + (long.length ? ': ' + long.map(w => w[0] + '=' + w[1]).join(',') : ''));
   ok(multi.length === 0, 'exactly one highlighted tap per step' + (multi.length ? ': ' + multi.map(w => w[0] + '=' + w[2]).join(',') : ''));
   ok(blocked === true, 'a tap away from the highlighted target is blocked');
