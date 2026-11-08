@@ -96,3 +96,27 @@ html.sk #pacts .btn .bl{background:rgba(70,20,0,.62);border-radius:8px;padding:0
 #ppstand span.me{border-color:#ffd23f}
 #ppstand span.lead{background:#ffd23f;color:#1a1320;border-color:#fff}
 #ppstand span.ko{opacity:.5;text-decoration:line-through}
+
+/* W386e: portrait phone dice tray = 3 x 2 grid, dice >= 56px, upright, a word under each, kept dice lifted with a lock; the preview line sits above the tray */
+html.ph-p #ob{--dw:clamp(56px,17vw,68px)}
+html.ph-p #ob #dice{display:grid;grid-template-columns:repeat(3,var(--dw));gap:22px 24px;justify-content:center;padding:18px 0 22px}
+html.ph-p #ob .die{transform:none;rotate:0deg}
+html.ph-p #ob .die.kept{transform:translateY(-10px)}
+html.ph-p #ob #dice:has(.die.kept) .die:not(.kept):not([disabled]){transform:none;opacity:.92}
+.die.kept::before{content:'🔒';position:absolute;top:-11px;right:-9px;width:24px;height:24px;border-radius:50%;background:#ffd23f;border:2px solid #1a1320;font:normal 14px/20px sans-serif;text-align:center;z-index:3;pointer-events:none}
+html.ph-p #pppreview{margin:0 4px 6px}
+/* W386e: SMASH! is a real button in the action row next to Roll on portrait phones (it floated over the board, the preview and the dice) */
+html:not(.ph-l) #ob #pacts [data-act="resolve"],html:not(.ph-l) #ob #pacts [data-act="resolve"].pulse{position:static;transform:none;width:auto;height:auto;min-height:58px;flex:1 1 0;border-radius:14px;border-width:3px;animation:none;box-shadow:0 0 0 3px #ffd23f,3px 4px 0 rgba(0,0,0,.5)}
+html:not(.ph-l) #ob #pacts [data-act="resolve"].pulse{animation:obGlow .8s ease-in-out infinite}
+html:not(.ph-l) #ob #pacts [data-act="reroll"]{flex:1 1 0}
+html:not(.ph-l) #ob #pacts [data-act="resolve"]:active{transform:scale(.96)}
+html:not(.ph-l) #ob #pacts [data-act="resolve"] .bl{font-size:22px;max-width:none}
+/* W386e: the turn tracker ("Roll 1 of 3 · Tap dice to keep them") is always at the top, under the score strip, above every bubble */
+html.ph-p #bline,html.ph-p:has(.gxh-bub.on) #bline{display:block;position:fixed;left:50%;top:calc(var(--sat,0px) + var(--ph-bar,52px) + 6px);bottom:auto;transform:translateX(-50%);z-index:2147482000;max-width:calc(100vw - 16px);white-space:normal;text-align:center}
+html.ph-p .gxh-bub{margin-top:30px}
+html.ph-p #bline,html.ph-p:has(.gxh-bub.on) #bline{font:900 14px/1.15 Nunito,sans-serif;padding:4px 10px}
+html.ph-p .gxh-bub{margin-top:36px}
+html.pp-mine-roll #ob #preview,html.pp-mine-roll #preview{display:none}
+html.ph-p.pp-nobub .gxh-bub{display:none}   /* the turn tracker at the top and the preview line already say what to do; one instruction at a time */
+html:not(.ph-l) #ob #pacts:has([data-act="resolve"]){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:100%;box-sizing:border-box}
+html:not(.ph-l) #ob #pacts:has([data-act="resolve"]) .btn{width:auto;min-width:0;box-sizing:border-box;flex:none}

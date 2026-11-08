@@ -112,8 +112,10 @@
   }
   function preview() {
     const dw = $('dicewrap') || $('dice'); if (!dw) return;
-    let el = $('pppreview'); if (!el) { el = document.createElement('div'); el.id = 'pppreview'; el.setAttribute('aria-live', 'polite'); dw.insertBefore(el, dw.firstChild) }
+    let el = $('pppreview'); if (!el) { el = document.createElement('div'); el.id = 'pppreview'; el.setAttribute('aria-live', 'polite'); (dw.parentNode || dw).insertBefore(el, dw) }   // ABOVE the tray, never over the dice
     const show = mine() && G.phase === 'roll' && G.dice.length && !document.querySelector('.gx-dock[data-bf="resolving"]');
+    document.documentElement.classList.toggle('pp-mine-roll', !!show);
+    document.documentElement.classList.toggle('pp-nobub', !!show && !/[?&]scn=/.test(location.search));   // the old text strip under the tray repeats the preview
     if (!show) { el.classList.remove('on'); return }
     const h = `<i>If you smash now:</i> ${pvHTML()}`; if (el.dataset.h !== h) { el.dataset.h = h; el.innerHTML = h } el.classList.add('on');
   }
