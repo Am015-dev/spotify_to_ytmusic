@@ -1,141 +1,14 @@
 {
  "slug": "doorkick-dungeon",
- "when": "2026-11-08T04:38Z",
- "secs": 120,
- "totalSecs": 367,
+ "when": "2026-11-08T08:03Z",
+ "secs": 45,
+ "totalSecs": 181,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 14,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Play your race Tap your Elf, then tap your hero. Races give powers.",
-     "words": 13,
-     "shownMs": 250,
-     "neededMs": 5300,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Wear an item Items go on by themselves and add to your strength. Tap the Bucket, then your hero.",
-     "words": 19,
-     "shownMs": 250,
-     "neededMs": 5900,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Watch the board",
-     "words": 3,
-     "shownMs": 2500,
-     "neededMs": 4300,
-     "cls": "gxt-pill"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Curse a rival Before Morwen kicks, you may curse her. Anyone can curse anyone. Tap Rotten Luck, then Morwen.",
-     "words": 19,
-     "shownMs": 250,
-     "neededMs": 5900,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-top on"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Watch the board",
-     "words": 3,
-     "shownMs": 2500,
-     "neededMs": 4300,
-     "cls": "gxt-pill"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Look for trouble No monster. You may loot a free card, or fight one from your hand: tap Lizards, then the door.",
-     "words": 22,
-     "shownMs": 250,
-     "neededMs": 6200,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-top on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Wear an item Items go on by themselves and add to your strength. Tap the Bucket, then your hero.",
-     "words": 19,
-     "shownMs": 250,
-     "neededMs": 5900,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Wear an item Items go on by themselves and add to your strength. Tap the Bucket, then your hero.",
-     "words": 19,
-     "shownMs": 250,
-     "neededMs": 5900,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Watch the board",
-     "words": 3,
-     "shownMs": 2500,
-     "neededMs": 4300,
-     "cls": "gxt-pill"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "A monster! Fight it Monster 12, you 3. The higher number wins. Tap your potion, then your side.",
-     "words": 18,
-     "shownMs": 250,
-     "neededMs": 5800,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Curse a rival Before Morwen kicks, you may curse her. Anyone can curse anyone. Tap Rotten Luck, then Morwen.",
-     "words": 19,
-     "shownMs": 250,
-     "neededMs": 5900,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-top on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Meddle in her fight Morwen fights alone. Anyone may interfere! Tap Gargantuan, then her monster: +10 for it.",
-     "words": 18,
-     "shownMs": 250,
-     "neededMs": 5800,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Watch the board",
-     "words": 3,
-     "shownMs": 2500,
-     "neededMs": 4300,
-     "cls": "gxt-pill"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Look for trouble No monster. You may loot a free card, or fight one from your hand: tap Lizards, then the door.",
-     "words": 22,
-     "shownMs": 250,
-     "neededMs": 6200,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-left on"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
    "status": "PASS",
@@ -143,317 +16,14 @@
    "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 32,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "You may loot a free card, or fight one from your hand: tap Lizards, then the door.",
-     "words": 17,
-     "at": 29003,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Bad Stuff: Flattens you and eats your hat: lose the headgear you wear.",
-     "words": 13,
-     "at": 14004,
-     "where": "i."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Bad Stuff from Hairy Hat-Muncher: Flattens you and eats your hat: lose the headgear you wear.",
-     "words": 16,
-     "at": 18003,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Bad Stuff from Limping Imp: A whack with its crutch: lose a level.",
-     "words": 13,
-     "at": 23003,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Grub kicks open the door and finds Double Major, which goes to hand.",
-     "words": 13,
-     "at": 24002,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": ": Never attack a Thief (professional courtesy): a Thief may instead swap 2 treasures in hand for 2 new ones.",
-     "words": 20,
-     "at": 30002,
-     "where": "div.tip"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Bad Stuff: An injunction: starting on your left, each player draws a card from your hand; discard the rest.",
-     "words": 19,
-     "at": 30002,
-     "where": "i."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Tap 1 card to give to Morwen: extra cards go to the lowest-level hero.",
-     "words": 14,
-     "at": 33012,
-     "where": "p.say"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Morwen puts Stinky Fish Sandwich into play, carried (your race, class or sex can’t use it).",
-     "words": 16,
-     "at": 37002,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Grub puts Shin-Smasher Hammer into play, carried (your race, class or sex can’t use it).",
-     "words": 15,
-     "at": 43003,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 5 (level 2 + items 3) · · 4 cards in hand (secret)",
-     "words": 14,
-     "at": 43004,
-     "where": "div.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 2 (level 2 + items 0) · · 5 cards in hand (secret)",
-     "words": 14,
-     "at": 43004,
-     "where": "div.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 1 (level 1 + items 0) · · 8 cards in hand (secret)",
-     "words": 14,
-     "at": 43004,
-     "where": "div.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Before Morwen kicks the door, you may play a curse or a level-up (tap it in your hand).",
-     "words": 18,
-     "at": 47002,
-     "where": "p.say"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Before Grub kicks the door, you may play a curse or a level-up (tap it in your hand).",
-     "words": 18,
-     "at": 58003,
-     "where": "p.say"
-    },
-    {
-     "session": "pc/learn",
-     "text": "If you have a race, it is replaced by the first race card in the door discards (or just lost).",
-     "words": 20,
-     "at": 58003,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "2 hands · big · +4 (Humans) · 600 gold · only for Humans",
-     "words": 14,
-     "at": 61003,
-     "where": "p.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Big: you can carry only one Big item (Dwarves and a Porter can carry more).",
-     "words": 15,
-     "at": 61003,
-     "where": "p.when.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Before Tansy kicks the door, you may play a curse or a level-up (tap it in your hand).",
-     "words": 18,
-     "at": 66004,
-     "where": "p.say"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Tansy kicks open the door and finds Mixed Heritage, which goes to hand.",
-     "words": 13,
-     "at": 77020,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 3 (level 3 + items 0) · · 5 cards in hand (secret)",
-     "words": 14,
-     "at": 83003,
-     "where": "div.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 8 (level 2 + items 6) · · 5 cards in hand (secret)",
-     "words": 14,
-     "at": 83003,
-     "where": "div.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 4 (level 1 + items 3) · · 1 card in hand (secret)",
-     "words": 14,
-     "at": 83003,
-     "where": "div.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Bad Stuff from Grave Gnawers: Your level drops to the lowest level at the table.",
-     "words": 15,
-     "at": 84003,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Resurrection: instead of kicking a new door, take the top door discard and discard a card.",
-     "words": 16,
-     "at": 84004,
-     "where": "span.cx"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Shieldmaiden Champion won't fight a woman: she hands over 1 treasure and leaves.",
-     "words": 13,
-     "at": 102003,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 1 (level 1 + items 0) · · 5 cards in hand (secret)",
-     "words": 14,
-     "at": 102003,
-     "where": "div.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 7 (level 1 + items 6) · · 4 cards in hand (secret)",
-     "words": 14,
-     "at": 102003,
-     "where": "div.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Never attacks a woman: a female fighter just gets 1 treasure from her.",
-     "words": 13,
-     "at": 106003,
-     "where": "span.cx"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Level 8 · 2 treasures Bad Stuff: Lose your class(es); with no class, lose 3 levels.",
-     "words": 16,
-     "at": 106003,
-     "where": "p.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "After an empty door on your turn: fight it from your hand (“look for trouble”).",
-     "words": 15,
-     "at": 106003,
-     "where": "p.when.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "strength 8 (level 2 + items 6) · · 3 cards in hand (secret)",
-     "words": 14,
-     "at": 118003,
-     "where": "div.small"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
-   "status": "FAIL",
-   "count": 11,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Elf",
-     "px": 10.7,
-     "at": 4003,
-     "where": "span.cn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "race",
-     "px": 6.2,
-     "at": 4003,
-     "where": "span.kind"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+1 to run away. Go up a…",
-     "px": 7.8,
-     "at": 4003,
-     "where": "span.cx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Brave Bucket",
-     "px": 10.7,
-     "at": 5002,
-     "where": "span.cn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+1",
-     "px": 11.2,
-     "at": 5002,
-     "where": "span.tag"
-    },
-    {
-     "session": "phone/learn",
-     "text": "200",
-     "px": 7.1,
-     "at": 5002,
-     "where": "span.gold"
-    },
-    {
-     "session": "phone/learn",
-     "text": "headgear",
-     "px": 6.2,
-     "at": 5002,
-     "where": "span.kind"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Fizzing Doom Potion",
-     "px": 10.7,
-     "at": 15045,
-     "where": "span.cn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+5",
-     "px": 11.2,
-     "at": 15046,
-     "where": "span.tag"
-    },
-    {
-     "session": "phone/learn",
-     "text": "one-shot",
-     "px": 6.2,
-     "at": 15046,
-     "where": "span.kind"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+5 to either side in any fight.",
-     "px": 7.8,
-     "at": 15046,
-     "where": "span.cx"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
    "status": "PASS",
@@ -466,20 +36,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 120,
-   "turns": 20,
+   "secs": 45,
+   "turns": 32,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 15
+   "messagesSeen": 17
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 120,
-   "turns": 346,
-   "clicks": 537,
+   "secs": 45,
+   "turns": 114,
+   "clicks": 193,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -488,21 +58,21 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 120,
-   "turns": 303,
-   "clicks": 320,
-   "endedBy": "result",
-   "tutorialEnded": 34,
+   "secs": 45,
+   "turns": 31,
+   "clicks": 0,
+   "endedBy": "time",
+   "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 21
+   "messagesSeen": 16
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 6,
-   "turns": 4,
-   "clicks": 6,
-   "endedBy": "result",
+   "secs": 45,
+   "turns": 167,
+   "clicks": 185,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0

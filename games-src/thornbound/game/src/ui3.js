@@ -200,13 +200,13 @@ function rowInfo(s,m){const a=m.a||'',lab=m.label||'';const i=lab.indexOf(':');l
   if(a.startsWith('t:'))cost='Tactic: '+tacUses(s,a.slice(2));
   else if(a.startsWith('fav:'))cost='Favour: '+(G.fav.h===s?G.fav.u+' use'+(G.fav.u>1?'s':'')+' left':'used without the disc');
   else if(a==='journey'){title='Journey with '+cinfo(m.p.id).name;eff='The card goes '+(cinfo(m.p.id).traits.includes('path')?'to your Discard Pile (Pathfinder)':'to the Lost Pile')+'.';cost='the card leaves your hand';gain='+'+cinfo(m.p.id).lore+' Lore'}
-  else if(a==='govern'){title='Govern with '+cinfo(m.p.id).name;eff='Into the '+DD.COUNCIL_NAMES[m.p.c]+': '+CPLAIN[m.p.c];cost='the card leaves your hand';gain=cinfo(m.p.id).votes+' vote'+(cinfo(m.p.id).votes>1?'s':'')}
+  else if(a==='govern'){title='Govern '+cinfo(m.p.id).name+' into the '+DD.COUNCIL_NAMES[m.p.c];eff=CSHORT[m.p.c]||'';cost='the card leaves your hand';gain=cinfo(m.p.id).votes+' vote'+(cinfo(m.p.id).votes===1?'':'s')}
   else if(/then discard this card|discard it\b|discard it and|discard this card/i.test(lab))cost='the Kingdom Card is used up';
   return {title,eff:eff.replace(/^./,c=>c.toUpperCase()),cost,gain}}
 function rowHTML(s,m,day){const I=rowInfo(s,m);const rec=recK()===m.k;let g=I.gain;
   if(day){const r=simCached(m);if(r&&r.P)g='Then '+youFirst(Object.keys(r.P.tot).map(Number)).map(x=>(x===s?'you ':sideName(x)+' ')+r.P.tot[x]).join(' vs ')}
   const conf=m.a==='t:cln_t3';
-  return '<div class="orow'+(rec?' rec':'')+'"><div class="ob"><b>'+gloss(I.title)+'</b>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(I.eff&&I.eff.split(/\s+/).length<=8?'<span class="oe">'+gloss(I.eff)+'</span>':'')+((I.cost||g)?'<small class="oc2">'+(I.cost?'<em>Cost:</em> '+esc(shortT(I.cost)):'')+(I.cost&&g?'. ':'')+(g?'<em>Gain:</em> '+esc(shortT(g)):'')+'</small>':'')+'</div><button class="btn sm" data-a="'+(conf?'confirm':'mv')+'" data-k="'+esc(m.k)+'">Use</button></div>'}
+  return '<div class="orow'+(rec?' rec':'')+'"><div class="ob"><b>'+gloss(I.title)+'</b>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(I.eff&&I.eff.split(/(?<=[.!?])\s+/).every(x=>x.split(/\s+/).length<=12)?'<span class="oe">'+gloss(I.eff)+'</span>':'')+((I.cost||g)?'<small class="oc2">'+(I.cost?'<em>Cost:</em> '+esc(shortT(I.cost)):'')+(I.cost&&g?'. ':'')+(g?'<em>Gain:</em> '+esc(shortT(g)):'')+'</small>':'')+'</div><button class="btn sm" data-a="'+(conf?'confirm':'mv')+'" data-k="'+esc(m.k)+'">Use</button></div>'}
 function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc.n!==G.logN)UI._simc={n:G.logN};if(!(key in UI._simc)){let r=null;try{r=simDay(m)}catch(e){}UI._simc[key]=r}return UI._simc[key]}
 function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'&&m.a!=='supp');
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}

@@ -158,7 +158,8 @@ const bfEl=k=>bfQ(`[data-k="${k}"]`);
 const bfSlot=k=>bfQ(`[data-s="${k}"]`)||bfEl(k);
 function bfR(el){if(!el)return null;const r=el.getBoundingClientRect();return r.width>0?{left:r.left,top:r.top,width:r.width,height:r.height}:null}
 const BFPLATE={u:null};try{GXSPR.use('models/plate',{size:160,pitch:.7}).then(u=>{if(u){BFPLATE.u=u;try{bfDraw()}catch(e){}}})}catch(e){}   // W466: owner bowl model beside the floor: extra tiles break into it
-const BFSUN={u:null};   // owner sun model (models/sun.glb) drawn once to a sprite; the plain sun glyph is the fallback
+const BFSUN={u:null};
+   // owner sun model (models/sun.glb) drawn once to a sprite; the plain sun glyph is the fallback
 try{GXSPR.use('models/sun',{size:192,lie:1,pitch:.85}).then(u=>{if(u){BFSUN.u=u;try{bfDraw()}catch(e){}}})}catch(e){}
 function bfSun(){return BFSUN.u?`<img class="bf-sun" src="${BFSUN.u}" alt="first player" draggable="false">`:'☀'}
 function bfTile(c,key,cls){return `<i class="bf-t${cls?' '+cls:''}${key&&BF.hide.has(key)?' hid':''}"${key?` data-k="${key}"`:''}>${bfUse(c)}</i>`}
@@ -239,7 +240,8 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
   const focus=x.p===bfFocus(),pl=P(x.p);BF.actor=x.p;
   if(!focus||!pl||!pl.human||NET.on){BF.lastRival=1;bfTurn(pl.nm+"'s turn");await bfWait(700)}
-  if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw()}
+  if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw();
+    const se=bfQ(`[data-bfsrc="${x.src}"]`);if(se&&bfAnimOK()){se.classList.add('rv-src');await bfWait(450)}}   // W466: show which kiln the rival takes from
   // 1. the tiles lift (the player's own selection is already up)
   let lifted=false;for(const o of picked){const el=bfEl(o.key);if(el&&!el.classList.contains('up')){el.classList.add('up');lifted=true}}
   for(const o of rest){const el=bfEl(o.key);if(el&&x.src>=0)el.classList.add('nud')}
@@ -256,7 +258,7 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   if(x.src<0)rest.forEach((o,i)=>bfFlip(bfEl('c_'+i),o.r));else ctrOld.forEach((r,k)=>bfFlip(bfEl('c_'+k),r));
   // 3. fly: chosen tiles to the rack (or to a rival's chip), the rest slides to the middle
   const chip=bfChipR(x.p);const fl=[];sfx('take');
-  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,focus&&o.to?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:140),dur:focus?600:760,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to)})));
+  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,focus&&o.to?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:140),dur:focus?600:820,lift:focus?42:90,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to);else if(!focus){const ce=bfQ(`[data-bfchip="${x.p}"]`);if(ce){ce.classList.remove('hit');void ce.offsetWidth;ce.classList.add('hit')}}})));
   rest.forEach((o,i)=>{if(!restTo[i])return;fl.push(bfFly(o.t,o.r,bfR(bfSlot(restTo[i])),{delay:200+i*60,dur:520,lift:12}).then(()=>{bfShow(restTo[i]);const el=bfEl(restTo[i]);if(el&&bfAnimOK())el.animate([{transform:'scale(1.25)'},{transform:'scale(.92)'},{transform:'scale(1)'}],{duration:bfD(260)});sfx('place')}))});
   if(hadSun)fl.push(bfFly(SUN,sunR,focus?bfR(bfSlot(sunKey)):chip,{dur:600,lift:60}).then(()=>bfShow(sunKey)));
   await Promise.all(fl);BF.hide.clear();sfx('place');
@@ -316,7 +318,7 @@ async function bfBonus(){const S=BF.disp;BF.say='End bonuses';
     p.score+=add;bfScore(p.i,p.score);bfChipPop(p.i,'+'+add,'good');await bfWait(300)}}
 // ---------- drawing ----------
 function bfEnsure(){if(BF.root)return BF.root;const r=document.createElement('div');r.id='bf';r.setAttribute('aria-label','The table');
-  r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-line" aria-live="polite"></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
+  r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-line" aria-live="polite" data-fa-skip></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
   document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-line');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');
   r.addEventListener('click',bfClick);r.addEventListener('pointerdown',e=>{bfBanTap();if(BF.busy)bfSpeedUp();else bfDragDown(e)});return r}
 function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I.b;const land=W>H*1.1;document.documentElement.classList.toggle('bf-land',land);
@@ -356,15 +358,15 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
       if(S.ex.gray?(blk.startsWith('mosaic')&&v>=0&&(v<5?v:v-10)===sel.c):c===clashC)cls=' clash';
       if(wq&&wq.r===r&&wq.cells.includes(c)){cls=' pick';inner+=`<em>+${adjPts2(p.wall,r,c)}</em>`}
       wl+=`<b class="bf-c${cls}" data-s="${key}"${cls===' pick'?` data-bfcell="${r},${c}" role="button" aria-label="Row ${r+1}, column ${c+1}"`:''}>${inner}</b>`}
-    h+=`<div class="bf-row${sel?(o?' ok':' dim'):''}${blk.startsWith('holds')?' rclash':''}${wq&&wq.r===r?' wq':''}" data-bfrow="${r}"${o?` role="button" aria-label="Rack ${r+1}"`:''}><div class="bf-rack">${badge}${badge2}${rk}</div><i class="bf-ar"></i><div class="bf-wall">${wl}</div></div>`}
+    h+=`<div class="bf-row${sel?(o?' ok':' dim'):''}${blk.startsWith('holds')?' rclash':''}${wq&&wq.r===r?' wq':''}" data-bfrow="${r}"${o?` role="button" aria-label="Rack ${r+1}"`:''}><div class="bf-rack">${badge}${badge2}${rk}</div><i class="bf-ar"><b class="bf-rn" aria-hidden="true">${r+1}</b></i><div class="bf-wall">${wl}</div></div>`}
   let fl='';for(let k=0;k<7;k++){const key=`x${pi}_${k}`;const t=p.floor[k];fl+=`<b class="bf-c" data-s="${key}">${t!=null?bfTile(t,key,t===SUN?'':'cr'):`<span>${String(FLOOR[k]).replace('-','−')}</span>`}</b>`}
   let fb=p.floor.length&&!sel?`<span class="bf-bd bad fbd">${String(floorPenalty(Math.min(7,p.floor.length))).replace('-','−')}</span>`:'';if(rec===5)fb+='<span class="bf-bd rec fbr">best</span>';if(sel){const m5=movesFor(sel).find(m=>m.line===5);if(m5){try{const pv=preview(m5,pi);fb=`<span class="bf-bd bad fbd">${String(pv.pen).replace('-','−')}</span>`}catch(e){}}}
-  h+=`<div class="bf-floor${sel?' ok':''}" data-bfrow="5"${sel?' role="button" aria-label="Floor: break them"':''}><div class="bf-fl">${fl}</div>${BFPLATE.u?`<img class="bf-bowl" src="${BFPLATE.u}" alt="" aria-hidden="true">`:''}<span class="bf-fll">floor</span>${fb}</div>`;return h}
+  h+=`<div class="bf-floor${sel?' ok':''}" data-bfrow="5"${sel?' role="button" aria-label="Floor: break them"':''}><div class="bf-fl">${fl}</div>${BFPLATE.u?`<img class="bf-bowl" src="${BFPLATE.u}" alt="" aria-hidden="true">`:''}<span class="bf-fll">Broken tiles</span>${fb}</div>`;return h}
 // what each score will be after this round's tiling and breakage, so the round end is never a surprise
 function bfProj(S,p){let pts=0;if(!S.ex.gray){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;pts+=adjPts2(w,r,c);w[r][c]=lc}}
   return Math.max(0,p.score+pts+floorPenalty(Math.min(7,p.floor.length)))}
 function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
-  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em>${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span>${(()=>{if(BF.busy||S.phase!=='offer'||G.over)return '';const v=bfProj(S,p);return v===p.score?'':`<span class="bf-pj ${v<p.score?'dn':'up'}">${v<p.score?'−'+(p.score-v):'+'+(v-p.score)}</span>`})()}</button>`).join('')}</div><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
+  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em>${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span>${(()=>{if(BF.busy||S.phase!=='offer'||G.over)return '';const v=bfProj(S,p);return v===p.score?'':`<span class="bf-pj ${v<p.score?'dn':'up'}">${v<p.score?'−'+(p.score-v):'+'+(v-p.score)}</span>`})()}</button>`).join('')}</div><span class="bf-sack" title="Tiles left in the clay sack" aria-label="${G.bag.length} tiles left in the sack"><i class="sg-back" aria-hidden="true"></i><b>${G.bag.length}</b></span><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
 function bfWinLine(){if(!G.over)return '';const w=G.over.win.map(i=>P(i));const sc=G.over.scores.map(s=>s.s.total);const you=w.some(p=>isYou(p.i));
   return (you?(w.length>1?'You share the win':'You win'):w.map(p=>p.nm).join(' & ')+(w.length>1?' share it':' wins'))+' '+sc.slice(0,2).join(' to ')+'!'}
 function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
@@ -390,7 +392,7 @@ function bfOvHTML(){if(!G)return '';
       <div class="bf-btns">${isClient()?'':'<button class="bf-go" data-a="new">Play again</button>'}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
   return ''}
 function bfDraw(o){o=o||{};if(!BF.on)return;bfEnsure();if(!G||!BF.disp){BF.root.classList.add('empty');BF.top.innerHTML='';BF.tbl.innerHTML='';BF.me.innerHTML='';BF.hint.innerHTML='';BF.ov.hidden=true;bfFinger(null);return}
-  BF.root.classList.remove('empty');bfSizes();const S=BF.disp,live=!BF.busy,hp=live?me():null;const f=bfFocus();const fp=S.pl[f]||S.pl[0];
+  BF.root.classList.remove('empty');if(!BF.busy)BF.root.classList.remove('tapfx');bfSizes();const S=BF.disp,live=!BF.busy,hp=live?me():null;const f=bfFocus();const fp=S.pl[f]||S.pl[0];
   BF.top.innerHTML=bfTopHTML(S);BF.tbl.innerHTML=bfTableHTML(S,hp,o);if(BF.rv&&BF.busy)bfRival();BF.hint.innerHTML=bfHintHTML(S,hp);BF.me.innerHTML=bfBoardHTML(S,fp,hp);
   BF.me.style.setProperty('--pc',PCOL[fp.i]);BF.me.classList.toggle('turn',!!hp);
   const ov=bfOvHTML();BF.ov.innerHTML=ov;BF.ov.hidden=!ov;
@@ -415,11 +417,11 @@ function bfGuide(hp){clearTimeout(BF.idleT);
 function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
 function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return;const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
-  if(BF.busy){bfSpeedUp();return}
+  if(BF.busy){bfSpeedUp();BF.root.classList.toggle('tapfx');return}   // W466: a tap during the rival's move speeds it up (and shows it: the line gets a fast-forward mark)
   if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
   if(t.closest('.bf-ov')){if(G&&G.over){BF.resHide=true;bfDraw()}return}
   const chip=t.closest('[data-bfchip]');if(chip){BF.peek=+chip.dataset.bfchip;sfx('click');bfDraw();return}
-  if(!G||G.over)return;const hp=me();if(!hp)return;BF.fingerOn=false;
+  if(!G||G.over)return;const hp=me();if(!hp){bfShake(BF.hint);return}BF.fingerOn=false;   // W466: not your turn: the line nudges ("Tamsin is choosing")
   if(G.phase==='wall'){const c=t.closest('[data-bfcell]');if(c){const [r,cc]=c.dataset.bfcell.split(',').map(Number);const m=validMoves(hp.i).find(m=>m.r===r&&m.c===cc);if(m)return go(m)}sfx('bad');BF.fingerOn=true;bfDraw();return}
   if(G.phase!=='offer')return;
   let tile=t.closest('[data-k]');
@@ -479,3 +481,5 @@ function sgShortDom(root){if(!root||typeof sgShortS!=='function')return;const tw
   for(const n of ns){const t=n.nodeValue;if(!t||t.trim().split(/\s+/).length<=12)continue;const u=t.split(/(?<=[.!?…])(\s+)/).map(x=>/^\s+$/.test(x)?x:sgShortS(x)).join('');if(u!==t)n.nodeValue=u}}
 {const _rd=renderDock;renderDock=function(){const r=_rd.apply(this,arguments);try{sgShortDom(document.querySelector('.gx-dock'))}catch(e){}return r};
  const _rp=renderPopups;renderPopups=function(){const r=_rp.apply(this,arguments);try{for(const id of ['logbody','plrd','refd','rulesd'])sgShortDom(document.getElementById(id))}catch(e){}return r}}
+// W466: never stuck: if events wait in the queue with nothing on screen to start them (e.g. a cover closed without a redraw), play them
+setInterval(()=>{try{if(BF.on&&G&&!BF.busy&&BF.q.length&&!UI.modal)bfRun()}catch(e){}},400);

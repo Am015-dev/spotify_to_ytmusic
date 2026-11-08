@@ -1,8 +1,8 @@
 {
  "slug": "shipwreck-isle",
- "when": "2026-11-08T05:37Z",
- "secs": 120,
- "totalSecs": 484,
+ "when": "2026-11-08T08:18Z",
+ "secs": 45,
+ "totalSecs": 184,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,20 +36,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 121,
-   "turns": 21,
-   "clicks": 131,
+   "secs": 46,
+   "turns": 16,
+   "clicks": 47,
    "endedBy": "time",
-   "tutorialEnded": 10,
+   "tutorialEnded": 9,
    "hintsOff": true,
-   "messagesSeen": 1
+   "messagesSeen": 3
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 121,
-   "turns": 33,
-   "clicks": 197,
+   "secs": 46,
+   "turns": 15,
+   "clicks": 52,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -58,20 +58,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 121,
-   "turns": 27,
-   "clicks": 110,
+   "secs": 46,
+   "turns": 16,
+   "clicks": 20,
    "endedBy": "time",
-   "tutorialEnded": 12,
+   "tutorialEnded": 16,
    "hintsOff": true,
    "messagesSeen": 4
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 121,
-   "turns": 25,
-   "clicks": 118,
+   "secs": 46,
+   "turns": 11,
+   "clicks": 14,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,

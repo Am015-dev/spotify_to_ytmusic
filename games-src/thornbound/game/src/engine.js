@@ -128,6 +128,7 @@ const cardsOfSeatActive=s=>{const o=[];for(let r=0;r<NREG;r++)for(const id of G.
 const regionName=r=>D.RNAMES[r];
 const locName=l=>D.LOCS[l][1];
 const councilName=c=>D.COUNCIL_NAMES[c];
+const vtxt=n=>n+' vote'+(n===1?'':'s');   // label text: 1 vote, 2 votes
 const votesOf=id=>eff(id).v;
 function cvotes(seat,c){let v=0;for(const id of G.council[c])if(own(id)===seat)v+=votesOf(id);const mk=G.cmk[c][seat];v+=mk[0];if(G.council.relics.concat(G.council.secrets,G.council.oaths).some(id=>own(id)===seat&&cdef(id).fx.includes('whisperer')))v+=mk[1];return v}
 function slotOf(seat,n){return G.pl[seat].ks.findIndex(x=>x&&x.kc===n)}
@@ -300,7 +301,7 @@ AG.siteBuy=d=>{const P=G.pl[d.seat];if(!P.site.length||P.lore<=0)return;const mn
 SELH.siteBuy=(seat,ch)=>{const P=G.pl[seat];for(const id of ch){const c=cdef(id).lc;if(P.lore<c)continue;P.lore-=c;buySite(seat,id,false)}};
 AG.acqGovern=d=>{const P=G.pl[d.seat];if(d.i>=3)return;const c=COUNCILS[d.i];now('acqGovern',{seat:d.seat,id:d.id,i:d.i+1});
   const el=G.lost.concat(P.disc).filter(id=>own(id)===d.seat&&votesOf(id)>=1);if(!el.length)return;
-  askPick(d.seat,'govern3','Govern a Lost or Discard Pile card into the '+councilName(c)+' (or skip).',el.map(id=>({k:'c'+id,id,label:cardLbl(id)+' ('+votesOf(id)+' votes)'})).concat([{k:'skip',skip:1,label:'Skip'}]),'govern3',{seat:d.seat,c})};
+  askPick(d.seat,'govern3','Govern a Lost or Discard Pile card into the '+councilName(c)+' (or skip).',el.map(id=>({k:'c'+id,id,label:cardLbl(id)+' ('+vtxt(votesOf(id))+')'})).concat([{k:'skip',skip:1,label:'Skip'}]),'govern3',{seat:d.seat,c})};
 PICKH.govern3=(seat,opt,d)=>{if(opt.skip)return;toCouncil(seat,opt.id,d.c);stat('acqGovern')};
 function toCouncil(seat,id,c){if(holds(seat,3)&&eff(id).ar==='follower')stat('kc3');detach(id);G.council[c].push(id);lg(nm(seat)+' moves '+cname(id)+' into the '+councilName(c)+'.',seat)}
 // ---------------------------------------------------------------- heralds and face-down cards
@@ -429,7 +430,7 @@ AG.locReward=d=>{const {seat,l}=d;stat('loc'+l);if(!d.noInf)gainInf(seat,D.LOCS[
   locText(seat,l)};
 function locText(seat,l){const P=G.pl[seat];
   if(l===0){const src=P.hand.concat(cardsOfSeatActive(seat)).filter(id=>votesOf(id)>=1);if(!src.length)return;const o=[];
-    for(const id of src)for(const c of COUNCILS)o.push({k:'g'+id+c,id,c,label:'Govern: '+cname(id)+' ('+votesOf(id)+' votes) into the '+councilName(c)+'. Discard every other card there'});
+    for(const id of src)for(const c of COUNCILS)o.push({k:'g'+id+c,id,c,label:'Govern '+cname(id)+', '+vtxt(votesOf(id))+', into the '+councilName(c)+'. Discard the rest.'});
     o.push({k:'skip',skip:1,label:'Skip the Spire Court'});askPick(seat,'castle','Spire Court: Govern with one Active or hand card?',o,'castle',{})}
   else if(l===1){const src=journeySources(seat,true);if(!src.length)return;
     askPick(seat,'wilderness','Thornwild: Journey with one Active or hand card?',src.map(id=>({k:'j'+id,id,label:'Journey with '+cname(id)+' (+'+eff(id).l+' Lore)'})).concat([{k:'skip',skip:1,label:'Skip Thornwild'}]),'wilderness',{})}
@@ -672,7 +673,7 @@ function finishJourney(seat,id,L,pf,deck){if(pf)stat('pathfinder');if(deck)toDec
   const to=deck?'the bottom of their deck':pf?'their Discard Pile (Pathfinder)':'the Lost Pile';
   if(deck)lg(nm(seat)+' Journeys with '+cname(id)+' and gains '+L+' Lore. The card goes to '+to+'.',seat,'big');else rmLog(nm(seat)+' Journeys with '+cname(id)+' and gains '+L+' Lore. The card goes to '+to+'.',seat,[id],pf?'disc':'lost','Journey','big');
   if(pf&&holds(seat,12)){gainInf(seat,1,'Crystal Warrens','Journey with a Pathfinder');L+=1;stat('kc12')}gainLore(seat,L)}
-act('govern','autumn',seat=>{if(usedK(seat,'govern'))return[];const o=[];for(const id of G.pl[seat].hand)if(votesOf(id)>=1)for(const c of COUNCILS)o.push({id:id+c,p:{id,c},label:'Govern: move '+cname(id)+' ('+votesOf(id)+' vote'+(votesOf(id)>1?'s':'')+') into the '+councilName(c)});return o},(seat,p)=>{useK(seat,'govern');toCouncil(seat,p.id,p.c);stat('govern')});
+act('govern','autumn',seat=>{if(usedK(seat,'govern'))return[];const o=[];for(const id of G.pl[seat].hand)if(votesOf(id)>=1)for(const c of COUNCILS)o.push({id:id+c,p:{id,c},label:'Govern '+cname(id)+', '+vtxt(votesOf(id))+', into the '+councilName(c)});return o},(seat,p)=>{useK(seat,'govern');toCouncil(seat,p.id,p.c);stat('govern')});
 act('journey','autumn',seat=>usedK(seat,'journey')?[]:journeySources(seat,false).map(id=>({id,p:{id},label:'Journey: send '+cname(id)+' away for '+eff(id).l+' Lore'+(eff(id).tr.has('path')?' (Pathfinder: it goes to your Discard Pile)':' (it goes to the Lost Pile)')})),(seat,p)=>{useK(seat,'journey');doJourney(seat,p.id)});
 act('cmd:rally','autumn',seat=>{const o=[];for(const id of cardsOfSeatActive(seat)){const e=eff(id),R=e.cm.rally;if(!R||usedK(seat,'a:'+id+':rally'))continue;
     o.push({id,p:{card:id},label:R.self?'Rally (self): '+cname(id)+' returns to your hand':'Rally: return up to '+R.x+' of your Active cards to your hand'})}return o},

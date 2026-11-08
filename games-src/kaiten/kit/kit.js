@@ -20,7 +20,7 @@ const lighten = (c, t) => mix(c, '#ffffff', t), darken = (c, t) => mix(c, '#2a12
 const TYPES = {
   tempura:  { name: 'Crispy Prawn',   l: ['Crispy', 'Prawn'],   c: '#f08a2e', rule: 'pair',   ruleText: 'Pair of Crispy Prawns = 5 points', rim: 'dashes', group: 'tempura' },
   sashimi:  { name: 'Fish Slice',     l: ['Fish', 'Slice'],     c: '#c93a8a', rule: 'set',    ruleText: 'Set of 3 Fish Slices = 10 points', rim: 'waves',  group: 'sashimi' },
-  dumpling: { name: 'Steam Bun',      l: ['Steam', 'Bun'],      c: '#4aaee6', rule: 'ladder', ruleText: '1 / 3 / 6 / 10 / 15 points for 1 to 5 buns', rim: 'dots', group: 'dumpling' },
+  dumpling: { name: 'Steam Bun',      l: ['Steam', 'Bun'],      c: '#4aaee6', rule: 'ladder', ruleText: '1, 3, 6, 10, 15 for 1-5 buns', rim: 'dots', group: 'dumpling' },
   roll1:    { name: 'Seaweed Roll',   l: ['Seaweed', 'Roll'],   c: '#22a699', rule: 'most',   ruleText: 'Most roll icons 6, second most 3', rim: 'stripes', group: 'roll', n: 1 },
   roll2:    { name: 'Seaweed Roll',   l: ['Seaweed', 'Roll'],   c: '#22a699', rule: 'most',   ruleText: 'Most roll icons 6, second most 3', rim: 'stripes', group: 'roll', n: 2 },
   roll3:    { name: 'Seaweed Roll',   l: ['Seaweed', 'Roll'],   c: '#22a699', rule: 'most',   ruleText: 'Most roll icons 6, second most 3', rim: 'stripes', group: 'roll', n: 3 },
@@ -421,7 +421,7 @@ K.foodArt = foodArt; K.nigiri = nigiri; K.maki = maki;
 const K = root.__KK, { INK, CREAM, CREAM2, FONT, TYPES, f1, esc, mix, lighten, darken, rng } = K;
 const doc = typeof document !== 'undefined' ? document : null;
 
-const CAPS = { tempura: 'pair = 5', sashimi: 'set of 3 = 10', dumpling: '1 3 6 10 15', roll1: 'most 6 / 2nd 3', roll2: 'most 6 / 2nd 3', roll3: 'most 6 / 2nd 3', salmon: '2 points', squid: '3 points', egg: '1 point', wasabi: 'next nigiri x3', chop: 'swap for 2 cards', pudding: 'game end +6 / -6' };
+const CAPS = { tempura: 'pair = 5', sashimi: 'set of 3 = 10', dumpling: '1, 3, 6, 10, 15|for 1-5 buns', roll1: 'most 6 / 2nd 3', roll2: 'most 6 / 2nd 3', roll3: 'most 6 / 2nd 3', salmon: '2 points', squid: '3 points', egg: '1 point', wasabi: 'next nigiri x3', chop: 'swap for 2 cards', pudding: 'game end +6 / -6' };
 
 function textLine(txt, x, y, fs, avail, col, weight) {
   const tl = Math.min(avail, txt.length * fs * 0.6);
@@ -471,14 +471,15 @@ function cardSVG(type, o) {
   else s += `<g transform="translate(${f1(Ly.cx)} ${f1(Ly.cy)}) scale(${f1(k)})">${K.plateBase(type)}<g${fx === 'none' ? '' : ` filter="url(#kk-fx-${fx})"`}>${K.foodArt(type, o)}</g></g>`; }
   // name chit
   const cx0 = w * .075, cw = w - 2 * cx0, cr = Math.max(3, w * .035);
-  s += `<g><rect x="${f1(cx0 + 1)}" y="${f1(Ly.y0 + 1.6)}" width="${f1(cw)}" height="${f1(Ly.chH)}" rx="${f1(cr)}" fill="#2a120c" opacity=".28"/>`;
-  s += `<rect x="${f1(cx0)}" y="${f1(Ly.y0)}" width="${f1(cw)}" height="${f1(Ly.chH)}" rx="${f1(cr)}" fill="#fffaf0" stroke="${INK}" stroke-width="${f1(Math.max(1.1, w * .013))}"/>`;
-  s += `<rect x="${f1(cx0 + 2)}" y="${f1(Ly.y0 + 2)}" width="${f1(cw - 4)}" height="${f1(Ly.chH - 4)}" rx="${f1(cr * .7)}" fill="none" stroke="${T.c}" stroke-width="1" opacity=".55"/>`;
+  const capT = Ly.cap ? String(CAPS[type] || '').split('|') : [], capX = capT.length > 1 ? Ly.fs * .82 * 1.1 : 0, cy0 = Ly.y0 - capX, cH = Ly.chH + capX;   // a two-line caption makes the chit a line taller
+  s += `<g><rect x="${f1(cx0 + 1)}" y="${f1(cy0 + 1.6)}" width="${f1(cw)}" height="${f1(cH)}" rx="${f1(cr)}" fill="#2a120c" opacity=".28"/>`;
+  s += `<rect x="${f1(cx0)}" y="${f1(cy0)}" width="${f1(cw)}" height="${f1(cH)}" rx="${f1(cr)}" fill="#fffaf0" stroke="${INK}" stroke-width="${f1(Math.max(1.1, w * .013))}"/>`;
+  s += `<rect x="${f1(cx0 + 2)}" y="${f1(cy0 + 2)}" width="${f1(cw - 4)}" height="${f1(cH - 4)}" rx="${f1(cr * .7)}" fill="none" stroke="${T.c}" stroke-width="1" opacity=".55"/>`;
   const fs = Ly.fs, avail = cw - fs * .7;
-  let ty = Ly.y0 + fs * .3 + fs * .86;
+  let ty = cy0 + fs * .3 + fs * .86;
   if (Ly.lines === 2) { s += textLine(T.l[0], w / 2, ty, fs, avail) + textLine(T.l[1], w / 2, ty + fs * 1.1, fs, avail); ty += fs * 1.1; }
   else s += textLine(T.name, w / 2, ty, fs, avail);
-  if (Ly.cap) s += textLine(CAPS[type] || '', w / 2, ty + fs * .98, fs * .82, avail, darken(T.c, .55), 700);
+  if (Ly.cap) capT.forEach((t, i) => { s += textLine(t, w / 2, ty + fs * .98 + i * fs * .82 * 1.1, fs * .82, avail, darken(T.c, .55), 700); });
   s += '</g>';
   // rule badge
   s += badge(type, Ly.rb + w * .012, Ly.rb + w * .012, Ly.rb);

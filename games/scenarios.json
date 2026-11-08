@@ -375,6 +375,78 @@
    "mut": 3
   },
   {
+   "id": "dk-win-pip",
+   "name": "Pip wins: the 3D hero on the end screen",
+   "ask": "Does Pip stand on the end screen?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "dk-win-morwen",
+   "name": "Morwen wins: the 3D hero on the end screen",
+   "ask": "Does Morwen stand on the end screen?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "dk-win-grub",
+   "name": "Grub wins: the 3D hero on the end screen",
+   "ask": "Does Grub stand on the end screen?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "dk-win-tansy",
+   "name": "Tansy wins: the 3D hero on the end screen",
+   "ask": "Does Tansy stand on the end screen?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "dk-boss-inferno",
+   "name": "Boss clip: inferno",
+   "ask": "Does the inferno boss clip play?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "dk-boss-tentacles",
+   "name": "Boss clip: tentacles",
+   "ask": "Does the tentacles boss clip play?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "dk-boss-pharaoh",
+   "name": "Boss clip: pharaoh",
+   "ask": "Does the pharaoh boss clip play?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "dk-boss-skygrif",
+   "name": "Boss clip: skygrif",
+   "ask": "Does the skygrif boss clip play?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "dk-boss-dread",
+   "name": "Boss clip: dread",
+   "ask": "Does the dread boss clip play?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -1099,6 +1171,22 @@
    "mut": 0
   },
   {
+   "id": "sq-feel",
+   "name": "Plates, words and no overlap on the painted board",
+   "ask": "Can you read the numbers on the tiles and the seat counters?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sq-take",
+   "name": "Buying two goods: the finger moves on to the next card",
+   "ask": "Does the hint stop pointing at a card you already picked?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
    "id": "sq-chips",
    "name": "Bid chips and score chips",
    "ask": "Are the bid numbers big enough?",
@@ -1498,6 +1586,22 @@
    "ask": "Do the menu row and tip tail look painted?",
    "sizes": "all",
    "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "tb-throne",
+   "name": "Kingdom sheet with the 3D throne",
+   "ask": "Is the throne on the Kingdom sheet?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "tb-over",
+   "name": "End card with the 3D crown",
+   "ask": "Is the crown on the end card?",
+   "sizes": "all",
+   "group": "Art",
    "mut": 0
   },
   {

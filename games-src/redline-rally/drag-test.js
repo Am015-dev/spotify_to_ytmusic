@@ -1,4 +1,4 @@
-/* R9 point 5: a card is played by dragging it up out of the hand (touch on a 390x844 phone, mouse on 1440x900), and a tap still works.
+/* Real touch drag (CDP touch events, phone) and real mouse drag (PC): lift + glow + drop zone, snap on drop. R9 point 5: a card is played by dragging it up out of the hand (touch on a 390x844 phone, mouse on 1440x900), and a tap still works.
    Usage: node drag-test.js */
 const path = require('path'), { chromium } = require(process.env.PW || 'playwright'), gx = require('../scripts/gx-serve.js');
 (async () => {
@@ -16,13 +16,15 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
     if (t) {   // touch drag through CDP (Playwright has no touchscreen.drag)
       const s = await c.newCDPSession(p), pt = (yy) => [{ x, y: yy }];
       await s.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: pt(y) });
-      for (let k = 1; k <= 8; k++) { await s.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: pt(y - k * 20) }); if (k === 4) { const z = await p.evaluate(() => [document.querySelector('#hand').classList.contains('dropz'), !!document.querySelector('.cd.lift')]); ok(z[0] && z[1], n + ' card lifts and the drop zone glows while dragging'); } }
+      for (let k = 1; k <= 8; k++) { await s.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: pt(y - k * 20) }); if (k === 4) { const z = await p.evaluate(() => { const l = document.querySelector('.cd.lift'), cs = l && getComputedStyle(l); return [document.querySelector('#hand').classList.contains('dropz'), !!l, !!cs && /scale/.test(l.style.transform) && /255, 194, 58|rgb\(255, 194, 58\)/.test(cs.boxShadow)]; }); ok(z[0] && z[1] && z[2], n + ' card lifts (scaled, follows the pointer) with a gold glow, and the drop zone glows'); } }
       await s.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     } else {
-      await p.mouse.move(x, y); await p.mouse.down(); for (let k = 1; k <= 8; k++) { await p.mouse.move(x, y - k * 20); if (k === 4) { const z = await p.evaluate(() => [document.querySelector('#hand').classList.contains('dropz'), !!document.querySelector('.cd.lift')]); ok(z[0] && z[1], n + ' card lifts and the drop zone glows while dragging'); } } await p.mouse.up();
+      await p.mouse.move(x, y); await p.mouse.down(); for (let k = 1; k <= 8; k++) { await p.mouse.move(x, y - k * 20); if (k === 4) { const z = await p.evaluate(() => { const l = document.querySelector('.cd.lift'), cs = l && getComputedStyle(l); return [document.querySelector('#hand').classList.contains('dropz'), !!l, !!cs && /scale/.test(l.style.transform) && /255, 194, 58|rgb\(255, 194, 58\)/.test(cs.boxShadow)]; }); ok(z[0] && z[1] && z[2], n + ' card lifts (scaled, follows the pointer) with a gold glow, and the drop zone glows'); } } await p.mouse.up();
     }
-    await p.waitForTimeout(300);
-    ok(await p.evaluate(() => UI.sel.length === 1 && !!document.querySelector('#hand .cd.sel')), n + ' drag up plays the card (snaps into the played row)');
+    await p.waitForTimeout(60);
+    ok(await p.evaluate(() => !!document.querySelector('#hand .cd.sel.snap')), n + ' dropped card snaps into the played row (snap animation)');
+    await p.waitForTimeout(240);
+    ok(await p.evaluate(() => UI.sel.length === 1 && !!document.querySelector('#hand .cd.sel')), n + ' drag up plays the card');
     // a tap on another card still works
     bb = await box(); if (t) await p.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); else await p.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
     await p.waitForTimeout(300);

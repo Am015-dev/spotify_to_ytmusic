@@ -149,11 +149,11 @@ function renderModal(){const el=$('modal');let h=typeof netModalHTML==='function
   else if(G&&G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&bothHuman())h=`<div class="dlg pass"><h2>Pass the device to ${esc(sideName(planSide()))}</h2><p>The other side's dials are hidden. Only ${esc(sideName(planSide()))} should look now.</p><div class="acts"><button class="btn primary" data-a="passok">I'm ${esc(sideName(planSide()))}: show my ships</button></div></div>`;
   el.innerHTML=h;el.classList.toggle('hidden',!h)}
 const bothHuman=()=>G&&isHuman(0)&&isHuman(1)&&!(typeof NET!=='undefined'&&NET.on);// online games never show the pass-the-device screen
-function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-a="start" data-start="${UI.mode}">Launch ▶</button>`}</div>${typeof tutBtn==='function'?`<div class="row">${tutBtn('btn'+(tutFirst()?' primary':''))}</div>`:''}<p class="lead">A tactical starfighter duel. Plan every move in secret, then watch them clash.</p>
-  <p class="small">First time? Take the lesson above, or press <b>Launch</b>. The defaults make a good first battle. Options below are optional.</p>
+function startHTML(){if(typeof tutBtn!=='function'||typeof GXC==='undefined'){clearTimeout(UI.titleT);UI.titleT=setTimeout(()=>{try{if(UI.info)render()}catch(e){}},0)}const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true">${titleHero()}<div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-a="start" data-start="${UI.mode}">Launch ▶</button>`}</div>${typeof tutBtn==='function'?`<div class="row">${tutBtn('btn'+(tutFirst()?' primary':''))}</div>`:''}<p class="lead">A tactical starfighter duel. Plan every move in secret, then watch them clash.</p>
+  <p class="small">Or just press <b>Launch</b> to play now.</p>
   ${typeof GXC!=='undefined'&&window.CAMPAIGN&&!NET.on?`<div class="row"><button class="btn${typeof tutFirst==='function'&&tutFirst()?'':' primary'}" data-a="story">📖 Story mode<small>${esc(typeof campLine==='function'?campLine():'')}</small></button></div>`:''}
   ${campOK&&UI.mode==='solo'&&camp.i>0&&camp.i<SORTIES.length?`<div class="row"><button class="btn" data-a="sortie" data-k="${camp.i}">▶ Continue the campaign<small>Sortie ${camp.i+1}: ${esc(SORTIES[camp.i].title)}</small></button></div>`:''}
-  <details class="na-opts" ${UI.optsOpen?'open':''}><summary>Options: mode, online, factions, size, skill</summary>
+  <details class="na-opts" ${UI.optsOpen?'open':''}><summary>More options</summary>
 ${UI.optsOpen?`  <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['hot','Two players, one screen'],['ai','Watch the computer']].map(([k,l])=>`<button class="btn ${UI.mode===k?'on':''}" data-mode="${k}">${l}</button>`).join('')}</div>
   <h3>🌐 Play online</h3>${typeof onlineBlock==='function'?onlineBlock():''}
   <h3>Factions</h3><div class="row">${[0,1].map(k=>`<label>${k?'Opponent':'You'}: <select data-fac="${k}">${FACTIONS.map((f,i)=>`<option value="${i}" ${UI.fac[k]===i?'selected':''} ${f.ex&&!UI.ex[f.ex]?'disabled':''}>${esc(f.n)}</option>`).join('')}</select><small class="bio">${esc(FACTION_BIO[UI.fac[k]]||'')}</small></label>`).join(' ')}</div>
@@ -219,7 +219,7 @@ document.addEventListener('click',e=>{const m=$('more');if(m&&m.classList.contai
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-act],[data-dial],[data-sel],[data-start],[data-mode],[data-size],[data-lvl],[data-exk],[data-ship]');if(!t)return;const ds=t.dataset;if(t.disabled)return;if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'ui',act:ds.act,k:ds.k,a:ds.a,w:ds.w,a2:ds.a2}))return;sfx('click');
   if(ds.mode){UI.mode=ds.mode;render();return}if(ds.size){UI.size=ds.size;saveSetup();render();return}if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
   if(ds.exk){UI.ex[ds.exk]=!UI.ex[ds.exk];FACTIONS.forEach((f,i)=>{if(f.ex&&!UI.ex[f.ex]&&UI.fac.includes(i))UI.fac=UI.fac.map(x=>x===i?(i===UI.fac[0]?0:1):x)});saveSetup();render();return}
-  if(ds.start){if(ds.start==='solo'&&typeof tutOffer==='function'&&tutOffer('solo'))return;startGame(ds.start);return}
+  if(ds.start){startGame(ds.start);return}   // R5: no 'New here?' modal; the title has its own Learn button
   if(ds.a&&/^net/.test(ds.a)&&typeof netClick==='function'&&netClick(ds.a))return;
   if(ds.dial!=null){UI.draft[ds.ship]=+ds.dial;UI.hoverDial=null;const mine=alive().filter(s=>s.side===planSide());const nxt=mine.find(s=>UI.draft[s.id]==null);if(nxt&&ds.ship===UI.sel)UI.sel=nxt.id;render();return}
   if(ds.sel){UI.sel=ds.sel;render();return}
@@ -309,3 +309,6 @@ window.addEventListener('load',()=>{try{soundBtns()}catch(e){}boot3D()});
 
 // the start screen's options stay open or closed across re-renders
 document.addEventListener('toggle',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('na-opts')&&UI.optsOpen!==e.target.open){UI.optsOpen=e.target.open;render()}},true);
+
+// title scene (R5 review): the nebula painting with the cast in campaign-node frames; you, your coach, the rivals, the bosses
+function titleHero(){const ROSTER=[['kael','open-k','You'],['brecken','done-k','Coach'],['drill','open','Rival'],['knife','done','Rival'],['hex','locked','Ace'],['quill','locked-k','Ally'],['sorin','locked','Ace'],['kira','locked-k','Ace'],['hammer','boss','Boss'],['wailer','boss-k','Boss'],['castigan','boss','Boss']];return `<div class="na-hero" aria-hidden="true"><div class="na-roster">${ROSTER.map(([k,f,l],i)=>`<span class="na-pil${i>4?' na-more':''}" style="background-image:url(media/ui-node-${f}.webp)"><img src="media/camp-${k}.webp" alt="" width="40" height="40"></span>`).join('')}</div></div>`}

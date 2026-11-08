@@ -39,7 +39,7 @@ html.ph .pchip em{display:inline-block}
 /* the reroll: dice tumble in and land one by one */
 html.ph .die.bfroll{animation:bfTumble var(--land,.6s) cubic-bezier(.3,.6,.4,1.15) both}
 html.ph .die.bfroll svg{animation:bfFace var(--land,.6s) steps(1,end) both;animation-delay:inherit}
-@keyframes bfTumble{0%{transform:translateY(-120px) rotate(-560deg) scale(.55)}55%{transform:translateY(-30px) rotate(-120deg) scale(1.12)}82%{transform:translateY(3px) rotate(8deg) scale(1.06)}100%{transform:none}}
+@keyframes bfTumble{0%{transform:translateY(-28px) rotate(-560deg) scale(.55)}55%{transform:translateY(-8px) rotate(-120deg) scale(.96)}82%{transform:translateY(2px) rotate(8deg) scale(1)}100%{transform:none}}   /* W467: the tumble stays inside its own cell, so a rolling die never covers its neighbour */
 @keyframes bfFace{0%{opacity:.15}80%{opacity:.15}81%{opacity:1}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){html.ph .die.bfroll,html.ph .die.bfroll svg,html.ph .bm,html.ph .bm.hit{animation:none}}
 /* the ghost finger */
@@ -242,3 +242,18 @@ html.cc-over .bfly,html.cc-over #ob #dicewrap,html.cc-over #ob #pacts,html.cc-ov
 .bfly i.gt{font-style:normal}.bfly i.gt::before{content:attr(data-t)}
 html.ph .dlg.paper h4{font-size:15px}
 html.ph .chip,html.ph span.chip{font-size:max(14px,1em)!important}
+/* W467 polish: on PC the result card sits low on the board, no dark veil, so the winner and the standings stay in view */
+html:not(.ph) #ccres{place-items:end center;background:none;padding:0 16px 22px;pointer-events:none}
+html:not(.ph) #ccres .ccres-card{pointer-events:auto;width:min(560px,100%);display:grid;grid-template-columns:96px 1fr;grid-template-areas:"face h" "face why" "face mine" "acts acts";column-gap:16px;text-align:left;padding:14px 18px}
+html:not(.ph) #ccres .face{grid-area:face;width:96px;height:96px;margin:0;align-self:center}
+html:not(.ph) #ccres h2{grid-area:h;font-size:32px}
+html:not(.ph) #ccres .why{grid-area:why}
+html:not(.ph) #ccres .mine{grid-area:mine;justify-content:flex-start!important}
+html:not(.ph) #ccres .acts{grid-area:acts;grid-template-columns:1fr 1fr;margin-top:10px}
+/* W467 polish: evolution choices show their owner picture */
+#choice .btn img.evopic{display:block;width:100%;height:auto;aspect-ratio:360/220;max-height:140px;object-fit:cover;border-radius:10px;border:2px solid #1a1320;margin:0 0 6px}
+html.ph #choice .btn img.evopic{max-height:110px}
+.btn[data-start="solo"]{min-height:56px}
+html:not(.ph) #pacts .btn{color:#1a1320!important;text-shadow:0 1px 0 rgba(255,255,255,.35)!important}
+html:not(.ph) #pacts .btn .bl,html:not(.ph) #pacts .btn small{color:#fff!important;text-shadow:none!important}
+.gx-dock-head .gx-ibtn{background:#fff7dd!important;border-image-source:none!important}

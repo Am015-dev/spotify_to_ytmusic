@@ -104,6 +104,8 @@ function adviseOrder(s,mv){const me=s,V=UI.V;const known=r=>{let t=0;for(const i
   const rs=[0,1,2].sort((a,b)=>known(b)-known(a));const m=mv.find(x=>x.order&&x.order.join()===rs.join());if(!m)return null;
   return {m,why:'Your strongest region fights first ('+rs.map(r=>REG[r].replace('The ','')+' '+known(r)).join(', then ')+'), so a win there comes before rivals can move cards.'}}
 function tacUses(seat,id){const i=DD.TACTICS[G.pl[seat].fac].findIndex(t=>t.id===id);if(i<0)return '';const def=DD.TACTICS[G.pl[seat].fac][i],t=G.pl[seat].tac[i];return def.mk>0?t.mk+' use'+(t.mk===1?'':'s')+' left, once a round':'once per game'}
+// one short line per Council for the Govern rows (<= 8 words)
+const CSHORT={relics:'Its votes become Influence at a Herald Reward.',secrets:'Its votes place markers that claim location bonuses.',oaths:'Its votes bring Supporters home in Autumn.'};
 const CPLAIN={relics:'claim your Herald Reward to cash in your cards here. You get Influence equal to their votes.',secrets:'in Autumn you place markers on locations. Four on one location claim its bonus.',oaths:'in Autumn you bring Supporters back to your board, one per vote. Get one more for the most votes there.'};
 function adviseMenu(s,mv,ph){const m=suggest(s);if(!m)return null;if(m.t==='act'&&!taught(actKind(m.a)))return null;const a=m.a||'';
   // the last Autumn: only Influence still counts

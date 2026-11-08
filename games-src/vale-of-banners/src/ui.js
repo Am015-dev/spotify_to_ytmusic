@@ -63,9 +63,16 @@ function toast(msg, ms) {   /* toast lane = the dock title row: it never covers 
   var t = $('#toast'), hd = document.querySelector('.gx-dock-head'), r = hd && hd.getBoundingClientRect();
   if (r && r.width) { t.style.left = (r.left + 4) + 'px'; t.style.top = (r.top + 1) + 'px'; t.style.width = (r.width - 8) + 'px'; t.style.height = Math.max(26, r.height - 2) + 'px'; }
   if (typeof G !== 'undefined' && G && !G.over && !isHuman(VB.actor(G))) { setCap(msg); return; }
+  if (typeof G !== 'undefined' && G && !popupsOk()) { lineSay(msg, ms); return; }   /* Play mode: no pop-ups; the instruction line says it */
   var dh = document.querySelector('.gx-dock-head');
-  t.textContent = msg; t.classList.add('on'); dh && dh.classList.add('toasting'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); dh && dh.classList.remove('toasting'); }, ms || 1800);
+  t.textContent = msg; ms = Math.max(ms || 0, readMs(msg)); t.classList.add('on'); dh && dh.classList.add('toasting'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); dh && dh.classList.remove('toasting'); }, ms || 1800);
 }
+function popupsOk() { return !!UI.hintsOn && UI.mode !== 'tutorial' && UI.mode !== 'story'; }   /* pop-ups only with Hints on in a Quick game; Learn uses Odo, Play the line */
+function lineSay(msg, ms) {   /* show a note in the instruction line for a readable time, then go back to the instruction */
+  var pr = $('#prompt'); if (!pr) return; UI.note = msg; pr.textContent = msg; pr.classList.add('note'); clearTimeout(lineSay.t);
+  lineSay.t = setTimeout(function () { UI.note = null; pr.classList.remove('note'); if (G) pr.textContent = promptText(); }, Math.max(ms || 0, readMs(msg)));
+}
+function readMs(txt) { return 4000 + 100 * String(txt || '').split(/\s+/).length; }   /* owner: a message stays 4 s + 1 s per 10 words */
 function countUp(tb) {   /* totals tick up from 0 so the result lands as a beat (instant with fast / reduced motion) */
   if (UI.fast || document.documentElement.classList.contains('gx-reduce')) return;
   [].slice.call(tb.querySelectorAll('td:last-child')).forEach(function (td) { var n = +td.textContent, t0 = Date.now(); td.textContent = '0'; (function f() { var k = Math.min(1, (Date.now() - t0) / 900); td.textContent = String(Math.round(n * k)); if (k < 1) requestAnimationFrame(f); })(); });
@@ -83,7 +90,7 @@ function say(text, who) {   /* a character speaks: code-drawn portrait + one lin
   g.innerHTML = ''; g.appendChild(h('span.gp', { 'aria-hidden': 'true', style: '--pc:' + (c.color || '#7a5c3e'), text: c.initial || (c.name || '?')[0] }));
   g.appendChild(h('span.gt', {}, [h('b', { text: c.name + ' ' }), document.createTextNode(text)]));
   g.appendChild(h('button.gx', { type: 'button', 'aria-label': 'Dismiss', text: '×', onclick: function () { g.classList.remove('on'); clearTimeout(say.t); if (UI.cBusy) { clearTimeout(UI.cT); UI.cBusy = false; coachPump(); } } }));
-  g.classList.remove('on'); void g.offsetWidth; g.classList.add('on'); clearTimeout(say.t); say.t = setTimeout(function () { g.classList.remove('on'); }, UI.mode === 'tutorial' ? 5200 : 3000);
+  g.classList.remove('on'); void g.offsetWidth; g.classList.add('on'); clearTimeout(say.t); var dur = readMs((c.name || '') + ' ' + text) + 600; say.until = Date.now() + dur; say.t = setTimeout(function () { g.classList.remove('on'); }, dur);
 }
 /* ---- coached first game: Odo explains each rule the first time it matters (one bubble at a time, never blocking) ---- */
 function coach(id, text) {
@@ -92,7 +99,7 @@ function coach(id, text) {
 }
 function coachPump() {
   if (UI.cBusy || !UI.cq || !UI.cq.length) return; var t = UI.cq.shift(); if (!t) return coachPump();
-  UI.cBusy = true; say(t); UI.cT = setTimeout(function () { UI.cBusy = false; coachPump(); }, UI.fast ? 0 : 5400);
+  UI.cBusy = true; say(t); UI.cT = setTimeout(function () { UI.cBusy = false; coachPump(); }, UI.fast ? 0 : readMs(VSTORY.guide.name + ' ' + t) + 900);
 }
 function coachCheck(m, s, evs) {   /* after a move (m by seat s, events evs) and at turn starts (m null) */
   if (UI.mode !== 'tutorial' || !G || (typeof GXT !== 'undefined' && GXT.running())) return;
@@ -124,24 +131,24 @@ function coachCheck(m, s, evs) {   /* after a move (m by seat s, events evs) and
 function stepMs() { return UI.fast ? 0 : UI.quick ? 160 : animMs(800); }
 function turnBanner() {
   if (!G || G.over) return; var a = VB.actor(G), hu = G.seats.filter(function (s) { return s.human; }).length;
-  var txt = isHuman(a) ? (hu > 1 ? G.seats[a].name + ': your turn' : 'Your turn') + ': you rolled ' + rolled(G.P[a]) : G.seats[a].name + '\'s turn: rolled ' + rolled(G.P[a]);
+  var txt = isHuman(a) ? (hu > 1 ? G.seats[a].name + ', your turn' : 'Your turn') : G.seats[a].name + '\'s turn';
   var b = $('#tbanner'); if (!b) { b = h('div', { id: 'tbanner', 'aria-hidden': 'true' }); document.body.appendChild(b); }
-  b.textContent = txt; b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
+  b.innerHTML = ''; b.appendChild(h('span', { text: txt })); b.appendChild(h('span.rds', {}, G.P[a].dice.map(function (v) { return h('span.rd', { text: v }); }))); b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
   UI.hold = UI.fast ? 0 : Date.now() + animMs(1000);
-  if (UI.fast || QS.get('scn')) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on');
+  if (UI.fast || QS.get('scn')) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice'); rollDice(b, G.P[a].dice);
 }
 function describe(m, s) {
   var n = G.seats[s].name, p = G.P[s], t;
-  if (m.k === 'take' || m.k === 'grab') { t = G.depots[m.v][m.slot]; return n + ' takes ' + VB.tileName(t) + ' from stall ' + m.v + (m.w ? ' (' + m.w + ' worker' + (m.w > 1 ? 's' : '') + ')' : ''); }
-  if (m.k === 'buy') return n + ' buys ' + VB.tileName(G.black[m.slot]) + ' from the back lane';
-  if (m.k === 'place') return n + ' builds ' + VB.tileName(p.store[m.s]) + (m.die === 'x' ? ' (free build)' : ' with a ' + m.v);
+  if (m.k === 'take' || m.k === 'grab') { t = G.depots[m.v][m.slot]; return n + ' takes ' + aName(t) + ' from stall ' + m.v + (m.w ? ', using ' + m.w + ' worker' + (m.w > 1 ? 's' : '') : ''); }
+  if (m.k === 'buy') return n + ' buys ' + aName(G.black[m.slot]) + ' for silver';
+  if (m.k === 'place') return n + ' builds ' + aName(p.store[m.s]) + (m.die === 'x' ? ' for free' : ' on a ' + m.v);
   if (m.k === 'sell') return n + ' sells goods with a ' + m.v;
-  if (m.k === 'workers') return n + ' takes workers';
+  if (m.k === 'workers') return n + ' hires 2 workers';
   if (m.k === 'ship') return n + ' loads goods from stall ' + m.v;
-  if (m.k === 'discard') return n + ' drops a tile (storage full)';
+  if (m.k === 'discard') return n + ' throws a tile away';
   if (m.k === 'skip') return n + ' skips the free action';
-  if (m.k === 'end') return n + ' ends the turn';
-  return n + ' is choosing...';
+  if (m.k === 'end') return n + ' is done';
+  return n + ' is thinking...';
 }
 function aiPlay(m) {
   var s = VB.actor(G); setCap(describe(m, s)); if (L.tabs && (m.k === 'take' || m.k === 'grab' || m.k === 'buy') && UI.tab !== 'market' && !UI.pinTab) { UI.tab = 'market'; render(); }
@@ -156,29 +163,29 @@ function hints() { return UI.mode === 'tutorial' || !!UI.hintsOn; }   /* PLAY is
 function hintSync() {
   var b = $('#hintT'); if (b) { b.setAttribute('aria-pressed', UI.hintsOn ? 'true' : 'false'); b.classList.toggle('on', !!UI.hintsOn); var sp = b.querySelector('span'); if (sp) sp.textContent = UI.hintsOn ? 'Hints on' : 'Hints'; }
   var bl = $('#bulbbtn'); if (bl) bl.style.display = hints() ? '' : 'none';
-  try { GXH.setEnabled(hints() && UI.mode !== 'story'); } catch (e) { }
+  try { GXH.setEnabled(popupsOk()); } catch (e) { }
 }
 function hintToggle() { UI.hintsOn = !UI.hintsOn; try { localStorage.setItem('vob_hints', UI.hintsOn ? '1' : '0'); } catch (e) { } PV = { key: '' }; hintSync(); if (G) render(); }
 function showGoal() {   /* PLAY: one card before turn 1 with the aim and how points come */
   var tv = $('#tv'); tv.innerHTML = '';
   var c = h('div.card.goal', { role: 'dialog', 'aria-label': 'Goal' });
-  c.appendChild(h('h2', { text: 'Goal: the most points after ' + G.nPhases + ' season' + (G.nPhases > 1 ? 's' : '') }));
-  c.appendChild(h('ul', {}, [h('li', { text: 'Fill a whole region of one colour: size points + a season bonus (bigger early).' }), h('li', { text: 'Sell goods with a matching die: 2 points per crate.' }), h('li', { text: 'Animals in meadows, the beacon tower and lore add more; silver counts at the end.' })]));
-  c.appendChild(h('p.tip', { text: 'Each turn: two dice, one action per die. Tap any score for the why.' }));
-  c.appendChild(h('div.acts', {}, [h('button.btn', { type: 'button', id: 'goalB', text: 'Start', onclick: function () { closeTile(); turnBanner(); } })]));
+  c.appendChild(h('h2', { text: 'Build the best estate in ' + G.nPhases + ' season' + (G.nPhases > 1 ? 's' : '') }));
+  c.appendChild(h('ol', {}, [h('li', { text: 'You roll two dice. Each die does one thing.' }), h('li', { text: 'Drag a die onto the stall with its number. Take a tile.' }), h('li', { text: 'Build it on your estate: same colour, a die\'s number.' }), h('li', { text: 'Fill every space inside an outline to score. Early pays more.' })]));
+  c.appendChild(h('p.tip', { text: 'Stuck? Drag a worker onto a die to change it by one.' }));
+  c.appendChild(h('div.acts', {}, [h('button.btn', { type: 'button', id: 'goalB', text: 'Let\'s play', onclick: function () { closeTile(); turnBanner(); } })]));
   tv.appendChild(c); tv.hidden = false; tv.onclick = null;
 }
 function nRounds() { return G.nRounds || 5; }
 function srcAdd(s, why, n) { G.src = G.src || {}; var o = G.src[s] = G.src[s] || {}; o[why] = (o[why] || 0) + n; }
 function srcLogAdd(ev) {   /* the last few reasons each player scored, for the score chip explanation */
   G.srcLog = G.srcLog || {}; var l = G.srcLog[ev.p] = G.srcLog[ev.p] || [], txt = '+' + ev.n + ' ' + (WHY[ev.why] || 'points');
-  if (ev.why === 'region' && ev.cell != null) { var rg = VB.REGIONS[VB.CELLS[ev.cell].reg], bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; txt += ' (size ' + rg.cells.length + ': ' + (ev.n - bz) + ' + ' + VB.PHASES[Math.min(G.phase, 4)].toLowerCase() + ' bonus ' + bz + ')'; }
-  l.push(txt + ', round ' + (G.round + 1)); if (l.length > 4) l.shift();
+  if (ev.why === 'region' && ev.cell != null) { var rg = VB.REGIONS[VB.CELLS[ev.cell].reg], bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; txt += ' (' + (ev.n - bz) + ' for size, ' + bz + ' early bonus)'; }
+  l.push(txt); if (l.length > 4) l.shift();
 }
 function scoreWhy(s) {
   var p = G.P[s], l = (G.srcLog && G.srcLog[s]) || [], who = s === UI.view && isHuman(s) ? 'You' : G.seats[s].name;
-  if (!p.vp) return who + ': no points yet. Everyone starts at 0.';
-  return who + ': ' + p.vp + ' pts, all earned in play (everyone starts at 0). Latest: ' + (l.length ? l.slice(-2).join('; ') : 'end-of-season silver and lore') + '.';
+  if (!p.vp) return who + ': no points yet.';
+  return who + ': ' + p.vp + ' points. Last: ' + (l.length ? l[l.length - 1].replace(/ \(.*\)/, '') : 'season bonus') + '.';
 }
 function srcOf(s) {
   var o = Object.assign({}, (G.src && G.src[s]) || {}), sum = 0; for (var k in o) sum += o[k];
@@ -190,10 +197,10 @@ function trackerEl() {
   var left = G.over ? 0 : p.used.filter(function (x) { return !x; }).length;
   var kids = [h('span.ttr', { text: 'Round ' + Math.min(G.round + 1, nRounds()) + ' of ' + nRounds() }), h('span.ttw', { text: who, style: G.over ? null : '--sc:' + (VB.SEATCOL[a] || '#c9a24a') })];
   if (!G.over) {
-    kids.push(h('span.ttd', { text: left ? left + (left > 1 ? ' dice left:' : ' die left:') : 'dice used' }));
+    kids.push(h('span.ttd', { text: left ? left + (left > 1 ? ' dice left' : ' die left') : 'no dice left' }));
     p.dice.forEach(function (v, i) { kids.push(h('span.tok' + (p.used[i] ? '.spent' : '') + (isHuman(a) && UI.die === i ? '.sel' : ''), { text: v, 'aria-label': 'Die ' + v + (p.used[i] ? ' spent' : ' left') })); });
   }
-  return h('div', { id: 'tt', role: 'status', 'aria-label': 'Turn tracker' }, kids);
+  return h('div', { id: 'tt', role: 'group', 'aria-label': 'Turn tracker' }, kids);
 }
 function sim(m) { var c = VB.fclone(G), s = VB.actor(G), r = VB.performMove(c, m); return r.ok ? { G: c, ev: r.ev, s: s } : null; }
 function valOf(m, base) { var r = sim(m); return r ? VB.evalSeat(r.G, r.s) - base : -99; }
@@ -224,16 +231,17 @@ function rateBefore(m) {
   if (best - got > R.miss) { R.miss = best - got; R.alt = describe(bm, s).replace(G.seats[s].name + ' ', '').replace(/^(\w+?)s\b/, '$1'); }
 }
 function rateLine() {
-  var R = UI.rate; UI.rate = null; if (!R || R.best <= 0.5) return { k: 'okay', t: 'Okay turn: nothing on the table was worth much.' };
+  var R = UI.rate; UI.rate = null; if (!R || R.best <= 0.5) return { k: 'okay', t: 'Fine. Nothing big was on offer.' };
   var q = R.got / R.best;
-  if (q >= 0.85 || R.miss < 1) return { k: 'good', t: 'Good turn: you picked the strongest moves on the table.' };
-  if (q >= 0.55) return { k: 'okay', t: 'Okay turn. Stronger was: ' + R.alt + '.' };
-  return { k: 'poor', t: 'Poor turn. Much stronger was: ' + R.alt + '.' };
+  if (q >= 0.85 || R.miss < 1) return { k: 'good', t: 'Great turn. Those were the best moves.' };
+  if (q >= 0.55) return { k: 'okay', t: 'Okay. Better was: ' + R.alt + '.' };
+  return { k: 'poor', t: 'Weak turn. Much better was: ' + R.alt + '.' };
 }
 function beat(title, line, cls, ms) { UI.beats = UI.beats || []; UI.beats.push({ title: title, line: line, cls: cls || '', ms: ms }); }
 function beatsRun(then) {   /* show queued beat cards one after another; the next turn waits for them */
-  var q = UI.beats || []; UI.beats = []; if (UI.fast || QS.get('scn') || !q.length) { q.forEach(function (b) { UI.lastBeat = b; }); then && then(); return 0; }
-  var total = 0; q.forEach(function (b) { b.ms = animMs(b.ms || 1700); total += b.ms; });
+  var q = UI.beats || []; UI.beats = []; if (q.length && !popupsOk() && !UI.fast && !QS.get('scn')) { var b0 = q[q.length - 1]; lineSay(b0.title + '. ' + (b0.line || '').split('\n').join(' ')); UI.lastBeat = b0; then && then(); return 0; }
+  if (UI.fast || QS.get('scn') || !q.length) { q.forEach(function (b) { UI.lastBeat = b; }); then && then(); return 0; }
+  var total = 0; q.forEach(function (b) { b.ms = animMs(Math.max(b.ms || 0, readMs(b.title + ' ' + (b.line || '')))); total += b.ms; });
   UI.hold = Date.now() + total + animMs(1000);
   var el = $('#beat'); if (!el) { el = h('div', { id: 'beat', role: 'status', 'aria-live': 'polite' }); document.body.appendChild(el); el.addEventListener('click', function () { UI.beatSkip && UI.beatSkip(); }); }
   var i = 0;
@@ -271,7 +279,7 @@ function pick(list) {
   list.sort(function (a, b) { return (a.w || 0) - (b.w || 0) || ((UI.die === b.die) - (UI.die === a.die)) || ((p.dice[a.die] === a.v ? 0 : 1) - (p.dice[b.die] === b.v ? 0 : 1)); });
   return list[0];
 }
-function movesWhere(f) { return VB.validMoves(G).filter(function (m) { return f(m) && (UI.die == null || m.die === 'x' || m.die == null || m.die === UI.die || (G.P[VB.actor(G)].dice[0] === G.P[VB.actor(G)].dice[1])); }); }
+function movesWhere(f) { return VB.validMoves(G).filter(function (m) { return f(m) && bumpOk(m) && (UI.die == null || m.die === 'x' || m.die == null || m.die === UI.die || (G.P[VB.actor(G)].dice[0] === G.P[VB.actor(G)].dice[1])); }); }
 
 /* ---------------- layout ---------------- */
 var L = {};
@@ -282,8 +290,8 @@ function layout() {
   var mk = $('#mk'), es = $('#es'), opp = $('#opp'); mk.classList.toggle('ph', !wide); if (!UI.tab) UI.tab = 'estate'; if (wide || !phoneTabs()) { L.tabs = false; mk.style.display = ''; es.style.display = ''; var t1 = $('#tabs'); if (t1) t1.remove(); var r1 = $('#rv'); if (r1) r1.style.display = 'none'; mk.classList.remove('big'); } var two = !wide && n > 2; mk.classList.toggle('two', two);
   opp.style.cssText = 'left:' + pad + 'px;top:' + pad + 'px;right:' + pad + 'px;height:' + (oppH - 6) + 'px';
   if (wide) {   /* market as a 2-column block on the left, estate on the right */
-    var mw = Math.min(W * 0.42, 420), cols = 4, rows = 2;
-    var hexM = Math.max(30, Math.min(56, Math.floor((mw - 8 * cols) / cols - 10), Math.floor(((H - oppH - pad * 2) / rows - 60) / (n * 1.18))));
+    var mw = Math.min(W * 0.4, 470), cols = 3, rows = 3;
+    var hexM = Math.max(30, Math.min(84, Math.floor((mw - 8 * cols) / cols - 10), Math.floor(((H - oppH - pad * 2) / rows - 60) / (n * 1.18))));
     mk.style.cssText = 'left:' + pad + 'px;top:' + oppH + 'px;width:' + mw + 'px;grid-template-columns:repeat(' + cols + ',1fr);--hex:' + hexM + 'px';
     var ew = W - mw - pad * 3, eh = H - oppH - pad;
     L.ex = mw + pad * 2; L.ey = oppH; L.ew = ew; L.eh = eh;
@@ -304,7 +312,7 @@ function layout() {
   /* estate hex size: pointy-top, 7 columns, 7 rows => width = 7*sqrt3*s, height = 11*s */
   var s = Math.min(L.ew / (7 * 1.732 + 0.4), L.eh / 11.1);
   L.s = Math.max(14, s);
-  es.style.cssText = 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 - 2) + 'px';
+  es.style.cssText = 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 + 1) + 'px';
 }
 function phoneTabs() { var b = $('#bd'); return b.clientWidth <= 640 && b.clientWidth <= b.clientHeight * 1.15; }
 function ensureTabs(y, pad) {
@@ -327,11 +335,11 @@ function renderRival() {
 }
 function fitEstate() {   /* phone: the estate takes what the market leaves */
   var b = $('#bd'), mk = $('#mk'), W = b.clientWidth, H = b.clientHeight; if (W > H * 1.15) return;
-  if (phoneTabs()) { L.s = Math.max(12, Math.min(L.ew / (7 * 1.732 + 0.4), L.eh / 11.1)); $('#es').style.cssText = (UI.tab === 'estate' ? '' : 'display:none;') + 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 - 2) + 'px'; return; }
+  if (phoneTabs()) { L.s = Math.max(12, Math.min(L.ew / (7 * 1.732 + 0.4), L.eh / 11.1)); $('#es').style.cssText = (UI.tab === 'estate' ? '' : 'display:none;') + 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 + 1) + 'px'; return; }
   L.tabs = false; var t0 = $('#tabs'); if (t0) t0.remove(); var r0 = $('#rv'); if (r0) r0.style.display = 'none'; mk.classList.remove('big'); $('#es').style.display = '';
   L.ey = mk.offsetTop + mk.offsetHeight + 4; L.eh = Math.max(80, H - L.ey - 4);
   L.s = Math.max(12, Math.min(L.ew / (7 * 1.732 + 0.4), L.eh / 11.1));
-  $('#es').style.cssText = 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 - 2) + 'px';
+  $('#es').style.cssText = 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 + 1) + 'px';
 }
 function cellXY(c, s, w, hgt) { var x = s * 1.732 * (c.q + c.r / 2), y = s * 1.5 * c.r; return { x: w / 2 + x, y: hgt / 2 + y }; }
 
@@ -377,7 +385,7 @@ function renderMarket() {
     var tl = h('div.sttiles');
     G.depots[d].forEach(function (t, k) {
       if (!t) { tl.appendChild(h('div.hx.empty', { style: 'background:rgba(255,255,255,.08)', 'aria-hidden': 'true' })); return; }
-      var lg = mt ? legalTakeFor(d, k) : [], b = h('button.tilebtn' + (lg.length ? '.glow' : ''), { type: 'button', id: 'mt-' + d + '-' + k, 'aria-label': VB.tileName(t) + ' in stall ' + d, onclick: function () { tapMarket(d, k); } }, [hexEl(t)]); labelled(b, t);
+      var lg = mt ? legalTakeFor(d, k) : [], b = h('button.tilebtn' + (lg.length ? '.glow' : ''), { type: 'button', id: 'mt-' + d + '-' + k, 'data-drag': lg.length && !pend() ? 'mtile' : null, 'data-idx': d * 10 + k, 'aria-label': VB.tileName(t) + ' in stall ' + d, onclick: function () { tapMarket(d, k); } }, [hexEl(t)]); labelled(b, t);
       var best = pick(lg.slice()); if (best && best.w) b.appendChild(h('span.cost', { text: '' + best.w, title: 'Costs ' + best.w + ' worker' + (best.w > 1 ? 's' : '') }));
       if (lg.length && hints() && takeValues().best === 'mt-' + d + '-' + k) { b.classList.add('bestt'); b.appendChild(h('span.bestb', { text: '★ Best', title: 'Best pick for you right now' })); }
       tl.appendChild(b);
@@ -400,17 +408,19 @@ function renderMarket() {
 }
 function placeTargets() {   /* cells glowing for the selected storage tile */
   if (!myTurn() || (UI.sel == null && (UI.die == null || pend()))) return {};
-  var o = {}; VB.validMoves(G).forEach(function (m) { if (m.k === 'place' && (UI.sel == null ? m.die === UI.die : m.s === UI.sel && (UI.die == null || m.die === 'x' || m.die === UI.die))) { var c = o[m.cell]; if (!c || (m.w || 0) < (c.w || 0) || ((m.w || 0) === (c.w || 0) && UI.sel == null && previewPlace(m).val > previewPlace(c).val)) o[m.cell] = m; } });
+  var o = {}; VB.validMoves(G).forEach(function (m) { if (m.k === 'place' && bumpOk(m) && (UI.sel == null ? m.die === UI.die : m.s === UI.sel && (UI.die == null || m.die === 'x' || m.die === UI.die))) { var c = o[m.cell]; if (!c || (m.w || 0) < (c.w || 0) || ((m.w || 0) === (c.w || 0) && UI.sel == null && previewPlace(m).val > previewPlace(c).val)) o[m.cell] = m; } });
   return o;
 }
 function renderEstate(box, seat, s) {
   var es = box || $('#es'), p = G.P[seat == null ? UI.view : seat], S = s || L.s, W = box ? S * 7 * 1.732 + 4 : L.ew, HH = box ? S * 11 : L.eh;
   es.innerHTML = ''; var tg = box ? {} : placeTargets(), pv = {}, bestC = null;
   if (hints()) Object.keys(tg).forEach(function (ci) { var x = previewPlace(tg[ci]); if (!x) return; x.val -= (tg[ci].w || 0) * 0.6; pv[ci] = x; if (bestC == null || x.val > pv[bestC].val) bestC = ci; });
-  if (box) { es.style.width = W + 'px'; es.style.height = HH + 'px'; es.style.setProperty('--hex', Math.floor(S * 1.732 - 2) + 'px'); }
+  if (box) { es.style.width = W + 'px'; es.style.height = HH + 'px'; es.style.setProperty('--hex', Math.floor(S * 1.732 + 1) + 'px'); }
+  var host = es; if (!box) { host = h('div', { id: 'esin', style: 'width:' + W + 'px;height:' + HH + 'px' }); es.appendChild(host); camClamp(); camApply(host); }
+  var cb = !box && FEEL.combo;
   VB.CELLS.forEach(function (c) {
-    var xy = cellXY(c, S, W, HH), t = p.estate[c.i], m = tg[c.i];
-    var b = h((box ? 'div.cell' : 'button.cell') + (t ? '.built' : '') + (m ? '.glow' : ''), { type: box ? null : 'button', id: box ? null : 'ec-' + c.i, style: 'left:' + xy.x + 'px;top:' + xy.y + 'px', 'aria-label': (t ? VB.tileName(t) : 'Empty ' + VB.COLNAME[c.col] + ' space ' + c.num) + (m ? ', build here' : '') });
+    var xy = cellXY(c, S, W, HH), t = p.estate[c.i], m = tg[c.i] || (cb && cb[c.i]);
+    var b = h((box ? 'div.cell' : 'button.cell') + (t ? '.built' : '') + (m ? '.glow' : ''), { type: box ? null : 'button', id: box ? null : 'ec-' + c.i, 'data-ci': c.i, style: 'left:' + xy.x + 'px;top:' + xy.y + 'px', 'aria-label': (t ? VB.tileName(t) : 'Empty ' + VB.COLNAME[c.col] + ' space ' + c.num) + (m ? ', build here' : '') });
     var hx = t ? hexEl(t) : hexEl(null, { col: c.col });
     if (!t && !m) hx.style.filter = 'saturate(.7) brightness(1.1)';
     b.appendChild(hx); b.appendChild(h('span.num' + (c.col === 'castle' || c.col === 'ship' || c.col === 'mine' ? '.lt' : ''), { text: c.num }));
@@ -419,32 +429,34 @@ function renderEstate(box, seat, s) {
       b.appendChild(h('span.pvb' + (q.n ? '.pts' : ''), { text: q.n ? '+' + q.n : q.f + '/' + q.size, title: q.why.join(', ') || 'region ' + q.f + ' of ' + q.size + ' filled' }));
       b.setAttribute('aria-label', b.getAttribute('aria-label') + ': ' + (q.n ? 'scores +' + q.n + ' (' + q.why.join(', ') + ')' : 'region ' + q.f + ' of ' + q.size + ' filled' + (q.why.length ? ', ' + q.why.join(', ') : '')) + (String(c.i) === String(bestC) ? ', best spot' : '')); }
     if (!box) b.addEventListener('click', function () { tapCell(c.i); });
-    es.appendChild(b);
+    host.appendChild(b);
   });
+  host.insertAdjacentHTML('beforeend', regionSvg(S, W, HH, p));
 }
 function renderDock() {
   var a = VB.actor(G), p = G.over ? me() : G.P[isHuman(a) ? a : UI.view], top = pend(), mt = myTurn();
   if (!G.over && isHuman(a)) UI.view = a;
   var gc = !G.over && goalChips(), dt = $('#docktitle');
   if (gc) { dt.innerHTML = ''; dt.appendChild(gc); dt.classList.add('goals'); } else dt.classList.remove('goals');
-  if (!gc) dt.textContent = G.over ? 'Game over' : isHuman(a) ? 'What to do now' : G.seats[a].name + ' is playing · tap to speed up';
-  $('#prompt').textContent = promptText();
-  var cb = $('#chainb'); if (UI.chain > 1 && mt) { cb.textContent = 'Chain ×' + UI.chain + '! Keep building'; cb.classList.add('on'); } else cb.classList.remove('on');
+  if (!gc) dt.textContent = G.over ? 'Game over' : isHuman(a) ? 'Your move' : G.seats[a].name + '\'s turn · tap to speed up';
+  $('#prompt').textContent = UI.note || promptText();
+  var cb = $('#chainb'); if (UI.chain > 1 && mt) { cb.textContent = 'Chain of ' + UI.chain + '. Build again'; cb.classList.add('on'); } else cb.classList.remove('on');
   /* dice */
   var dr = $('#dicerow'); dr.innerHTML = ''; var theirs = !G.over && !isHuman(a);
   dr.classList.toggle('theirs', theirs);
   if (theirs) { dr.appendChild(h('span.dlab', { text: G.seats[a].name + '\'s dice' })); G.P[a].dice.forEach(function (v, i) { dr.appendChild(h('span.die.rv' + (G.P[a].used[i] ? '.used' : ''), { 'aria-label': G.seats[a].name + ' die ' + v + (G.P[a].used[i] ? ' used' : ''), text: v })); }); }
   else p.dice.forEach(function (v, i) {
-    dr.appendChild(h('button.die' + (p.used[i] ? '.used' : '') + (UI.die === i ? '.sel' : ''), { type: 'button', id: 'die-' + i, 'aria-label': 'Die ' + v + (p.used[i] ? ' used' : ''), 'aria-pressed': UI.die === i ? 'true' : 'false', onclick: function () { tapDie(i); } }, [h('span', { text: v })]));
+    var bk = !p.used[i] && bumpOf(i), ev0 = bk ? wrap6(v + bk) : v;
+    dr.appendChild(h('button.die' + (p.used[i] ? '.used' : '') + (UI.die === i ? '.sel' : '') + (bk ? '.bumped' : ''), { type: 'button', id: 'die-' + i, 'data-drag': p.used[i] || !mt ? null : 'die', 'data-idx': i, 'aria-label': 'Die ' + ev0 + (bk ? ' (rolled ' + v + ', moved by a worker)' : '') + (p.used[i] ? ' used' : ''), 'aria-pressed': UI.die === i ? 'true' : 'false', onclick: function () { tapDie(i); } }, [h('span', { text: ev0 }), bk ? h('span.bk', { text: (bk > 0 ? '+' : '') + bk }) : null]));
   });
-  dr.appendChild(h('span.die.white', { title: 'White die: where this round\'s goods went', 'aria-label': 'White die ' + G.white, text: G.white }));
+  dr.appendChild(h('span.die.white', { title: 'White die: this round\'s goods went to this stall', 'aria-label': 'White die ' + G.white, text: G.white }));
   /* storage */
   var st = $('#store'); st.innerHTML = '';
   for (var i = 0; i < VB.cap(p); i++) (function (i) {
     var t = p.store[i], slot = h('div.slot' + (UI.sel === i ? '.sel' : ''));
     if (t) {
       var ok = mt && storeLegal(i);
-      slot.appendChild(h('button.tilebtn' + (ok ? '.glow' : ''), { type: 'button', id: 'st-' + i, 'aria-label': VB.tileName(t) + ' in storage', onclick: function () { tapStore(i); } }, [hexEl(t)]));
+      slot.appendChild(h('button.tilebtn' + (ok ? '.glow' : ''), { type: 'button', id: 'st-' + i, 'data-drag': ok && !(top && top.t === 'discard') ? 'store' : null, 'data-idx': i, 'aria-label': VB.tileName(t) + ' in storage', onclick: function () { tapStore(i); } }, [hexEl(t)]));
       labelled(slot.lastChild, t);
     }
     st.appendChild(slot);
@@ -452,65 +464,61 @@ function renderDock() {
   if (p.store.length > VB.cap(p)) { var t4 = p.store[VB.cap(p)]; st.appendChild(h('div.slot.sel', {}, [h('button.tilebtn.glow', { type: 'button', id: 'st-' + VB.cap(p), onclick: function () { tapStore(VB.cap(p)); }, 'aria-label': VB.tileName(t4) }, [hexEl(t4)])])); }
   /* goods */
   var gd = $('#goods'); gd.innerHTML = '';
-  var gt = VB.goodsTypes(p); if (!gt.length) gd.appendChild(h('span.tip', { text: 'No goods yet' }));
+  var gt = VB.goodsTypes(p); if (!gt.length) gd.appendChild(h('span.tip', { text: 'No goods' }));
   gt.forEach(function (g) {
     var ok = mt && VB.validMoves(G).some(function (m) { return m.k === 'sell' && m.v === g; });
-    gd.appendChild(h('button.gbtn' + (ok ? '.glow' : ''), { type: 'button', id: 'gd-' + g, 'aria-label': p.goods[g] + ' ' + VB.GOODS[g] + ', needs a ' + g, onclick: function () { tapGoods(g); } }, [h('span.gchip', { text: g, style: 'background-color:' + GCOL[g] }), h('span', { text: '×' + p.goods[g] })]));
+    gd.appendChild(h('button.gbtn' + (ok ? '.glow' : ''), { type: 'button', id: 'gd-' + g, 'aria-label': p.goods[g] + ' ' + VB.GOODS[g] + ', sell with a ' + g, onclick: function () { tapGoods(g); } }, [h('span.gchip', { text: g, style: 'background-color:' + GCOL[g] }), h('span.gw', { text: p.goods[g] + ' ' + VB.GOODS[g] })]));
   });
   /* resources */
   var rr = $('#resrow'); rr.innerHTML = '';
-  var RESTIP = { silver: 'Silver coins: buy from the back lane; each is a point at the end.', workers: 'Workers: spend to bend a die up or down by one.', vp: 'Victory points scored so far.', pos: 'Banner track: barges move your banner along it for bonuses.' };
+  var RESTIP = { silver: 'Silver buys back-lane tiles. 1 point each at the end.', workers: 'Drag a worker onto a die to change it by one.', vp: 'Your points so far.', pos: 'Banner track. Barges move you up and first.' };
   function resTap(k) { return function () { toast(RESTIP[k], 2600); }; }
-  rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'aria-label': RESTIP.silver, onclick: resTap('silver'), 'data-engine': 'silver' }, [h('i', { text: '🪙' }), String(p.silver)]));
-  rr.appendChild(h('span.res', { id: 'r-workers', title: 'Workers', 'aria-label': RESTIP.workers, onclick: resTap('workers') }, [h('i', { text: '👷' }), String(p.workers)]));
-  rr.appendChild(h('span.res', { id: 'r-vp', title: 'Points', 'aria-label': RESTIP.vp, onclick: resTap('vp') }, [h('i', { text: '⭐' }), String(p.vp)]));
-  rr.appendChild(h('span.res', { title: 'Banner track', 'aria-label': RESTIP.pos, onclick: resTap('pos') }, [h('i', { text: '🚩' }), String(p.pos)]));
+  rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'aria-label': RESTIP.silver, onclick: resTap('silver'), 'data-engine': 'silver' }, [h('span.rw', { text: p.silver + ' silver' })]));
+  var wl = p.workers - (mt ? bumpUsed() : 0);
+  rr.appendChild(h('span.res.meep' + (mt && wl > 0 ? '.can' : ''), { id: 'r-workers', title: 'Workers', 'data-drag': mt && wl > 0 ? 'meeple' : null, 'data-idx': 0, 'aria-label': RESTIP.workers + ' You have ' + wl + '.', onclick: resTap('workers') }, [h('i', { html: MEEPLE }), h('span.rw', { text: wl + (wl === 1 ? ' worker' : ' workers') })]));
+  rr.appendChild(h('span.res.vpchip', { id: 'r-vp', title: 'Points', 'aria-label': RESTIP.vp, onclick: resTap('vp') }, [h('span.rw', { text: p.vp + ' pts' })]));
   /* actions */
   var ac = $('#acts'); ac.innerHTML = '';
   if (G.over) { ac.appendChild(h('button.btn', { type: 'button', id: 'resB', text: 'See the result', onclick: showResult })); return; }
   if (!mt) return;
   if (top) {
-    if (top.t !== 'discard') ac.appendChild(h('button.btn.alt', { type: 'button', id: 'skipB', text: top.t === 'castle' ? 'Skip the free action' : 'Skip', onclick: function () { doMove({ k: 'skip' }); } }));
-    if (top.t === 'castle') ac.appendChild(h('button.btn.alt', { type: 'button', id: 'wkxB', text: 'Take workers (free)', onclick: function () { doMove({ k: 'workers', die: 'x', w: 0 }); } }));
+    if (top.t !== 'discard') ac.appendChild(h('button.btn.alt', { type: 'button', id: 'skipB', text: top.t === 'castle' ? 'Skip it' : 'Skip', onclick: function () { doMove({ k: 'skip' }); } }));
+    if (top.t === 'castle') ac.appendChild(h('button.btn.alt', { type: 'button', id: 'wkxB', text: 'Hire 2 workers', onclick: function () { doMove({ k: 'workers', die: 'x', w: 0 }); } }));
     return;
   }
   var seen = {};
-  [0, 1].forEach(function (i) { if (p.used[i] || seen[p.dice[i]]) return; seen[p.dice[i]] = 1; ac.appendChild(h('button.btn.alt', { type: 'button', id: 'wk' + i, text: '👷 +' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers (die ' + p.dice[i] + ')', onclick: function () { doMove(pick(VB.validMoves(G).filter(function (m) { return m.k === 'workers' && m.die === i; }))); } })); });
+  [0, 1].forEach(function (i) { if (p.used[i] || seen[p.dice[i]]) return; seen[p.dice[i]] = 1; ac.appendChild(h('button.btn.alt', { type: 'button', id: 'wk' + i, text: p.dice[i] + ' → ' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers', 'aria-label': 'Swap your ' + p.dice[i] + ' for ' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers', onclick: function () { doMove(pick(VB.validMoves(G).filter(function (m) { return m.k === 'workers' && m.die === i; }))); } })); });
   if (p.used[0] && p.used[1]) ac.appendChild(h('button.btn', { type: 'button', id: 'endB', text: 'End turn', onclick: function () { doMove({ k: 'end' }); } }));
 }
 function storeLegal(i) {
   var top = pend();
   if (top && top.t === 'discard') return true;
-  return VB.validMoves(G).some(function (m) { return m.k === 'place' && m.s === i; });
+  return VB.validMoves(G).some(function (m) { return m.k === 'place' && m.s === i && bumpOk(m); });
 }
 function promptText() {
-  if (G.over) return 'The valley is built. See who flies the highest banner.';
-  var a = VB.actor(G); if (!isHuman(a)) return UI.cap || G.seats[a].name + ' is choosing...';
+  if (G.over) return 'Game over. Let\'s count the points.';
+  var a = VB.actor(G); if (!isHuman(a)) return UI.cap || G.seats[a].name + ' is thinking...';
   var top = pend(), p = G.P[a];
-  if (top) return { castle: 'Keep built! One free action, any number.', hall: 'Moot Hall! Build a stored tile, any number.', grab: 'Pick a glowing tile from the stalls.', store: 'Granary: sell one kind of goods.', ship: 'Barge: load goods from a glowing stall.', discard: 'Storage full: tap a tile to drop.' }[top.t];
-  if (UI.sel != null) { try { coach('preview'); } catch (e) { } return hints() ? 'Tap a glowing space: gold +N = points now, 2/4 = region progress, ★ = best spot.' : 'Tap a glowing space to build there. Tap the tile again to cancel.'; }
-  if (p.used[0] && p.used[1]) return 'Both dice used. Tap End turn' + (VB.validMoves(G).some(function (m) { return m.k === 'buy'; }) ? ' (or buy a back-lane tile for silver).' : '.');
-  var left = [0, 1].filter(function (i) { return !p.used[i]; }).map(function (i) { return p.dice[i]; });
-  var vm = VB.validMoves(G), tk = vm.some(function (m) { return m.k === 'take'; }), bd = vm.some(function (m) { return m.k === 'place'; }), sl = vm.some(function (m) { return m.k === 'sell'; });
-  var di = UI.die != null && !p.used[UI.die] ? UI.die : [0, 1].filter(function (i) { return !p.used[i]; }).sort(function (x, y) { return dieCan(y).length - dieCan(x).length; })[0], can = dieCan(di);
-  var other = [0, 1].filter(function (i) { return !p.used[i] && i !== di; })[0];
-  if (can.length) return 'Use your ' + p.dice[di] + ': ' + can.join(', or ') + '.' + (other != null && p.dice[other] !== p.dice[di] ? ' Or tap your ' + p.dice[other] + '.' : '') + (L.tabs && UI.tab !== 'market' && can[0].indexOf('take') === 0 ? ' (Market tab)' : '');
-  var lead = (left.length > 1 ? 'Your dice: ' + left.join(' and ') : 'One die left: ' + left[0]) + '. ';
-  if (L.tabs && UI.tab !== 'market' && tk && bd) return lead + 'Build a glowing tile from storage, or open Market to take one.';
-  if (L.tabs && UI.tab !== 'market' && tk) return lead + 'Open the Market tab and take a glowing tile.';
-  if (tk && bd) return lead + 'Tap a glowing tile: in the market to take it, or in your storage to build it.';
-  if (tk) return lead + 'Tap a glowing market tile to take it (its stall number matches a die).';
-  if (bd) return lead + 'Tap a glowing tile in your storage to build it.';
-  if (sl) return lead + 'Tap your glowing goods to sell them.';
-  return lead + 'Nothing fits: tap +2 workers.';
+  if (top) return { castle: 'Your keep gives a free action. Any number works.', hall: 'Moot Hall: build one more tile now, any number.', grab: 'Pick any glowing tile. It is free.', store: 'Granary: sell one kind of goods for free.', ship: 'Barge: tap a glowing stall to load its goods.', discard: 'Storage is full. Tap a tile to throw away.' }[top.t];
+  if (UI.sel != null) { try { coach('preview'); } catch (e) { } return hints() ? 'Put it on a glowing space. +N is the points.' : 'Put it on a glowing space. Tap it again to cancel.'; }
+  if (p.used[0] && p.used[1]) return 'Both dice used. Tap End turn.';
+  var di = UI.die != null && !p.used[UI.die] ? UI.die : [0, 1].filter(function (i) { return !p.used[i]; }).sort(function (x, y) { return dieCan(y).length - dieCan(x).length; })[0];
+  var v = effDie(di), vm = VB.validMoves(G).filter(function (m) { return m.die === di && bumpOk(m) && (bumpOf(di) || !m.w); });
+  var tk = vm.some(function (m) { return m.k === 'take'; }), bd = vm.some(function (m) { return m.k === 'place'; }), sl = vm.some(function (m) { return m.k === 'sell'; });
+  if (tk && bd) return 'Drag your ' + v + ' to stall ' + v + ', or to a glowing ' + v + '.';
+  if (tk) return 'Drag your ' + v + ' onto stall ' + v + ' to take a tile.';
+  if (bd) return 'Drag your ' + v + ' onto a glowing ' + v + ' on your estate.';
+  if (sl) return 'Drag your ' + v + ' onto your ' + v + ' goods to sell.';
+  var any = VB.validMoves(G).some(function (m) { return (m.k === 'take' || m.k === 'place' || m.k === 'sell') && m.w > 0 && m.w <= p.workers; });
+  return any ? 'No match. Drag a worker onto a die to change it.' : 'Nothing fits. Swap a die for 2 workers.';
 }
 function renderScores() {
   var b = $('#scorebody'); if (!b) return; b.innerHTML = '';
   var tb = h('table.rtab'); tb.appendChild(h('tr', {}, ['Player', 'Points', 'Silver', 'Workers', 'Land', 'Track'].map(function (x) { return h('th', { text: x }); })));
   G.order.forEach(function (s) { var p = G.P[s]; tb.appendChild(h('tr', {}, [G.seats[s].name, p.vp, p.silver, p.workers, VB.estateFilled(p) + '/37', p.pos].map(function (x) { return h('td', { text: String(x) }); }))); });
   b.appendChild(tb);
-  b.appendChild(h('p.tip', { text: 'Turn order follows the banner track: Barges move you up. Coming goods this season: ' + (G.rg.filter(Boolean).map(function (g) { return VB.GOODS[g]; }).join(', ') || 'none') + '.' }));
-  b.appendChild(h('p.tip', { text: 'Tap a player in the top row to see their estate.' }));
+  b.appendChild(h('p.tip', { text: 'Turn order follows the banner track. Barges move you up. Goods still to come this season: ' + (G.rg.filter(Boolean).map(function (g) { return VB.GOODS[g]; }).join(', ') || 'none') + '.' }));
+  b.appendChild(h('p.tip', { text: 'Tap a name at the top to see that estate.' }));
 }
 
 /* ---------------- big tile view (every tile can be read large) ---------------- */
@@ -518,8 +526,8 @@ function showTile(t, acts, note) {
   var tv = $('#tv'); tv.innerHTML = '';
   var c = h('div.card', { role: 'dialog', 'aria-label': VB.tileName(t) });
   var big = hexEl(t, { size: 110 });
-  c.appendChild(h('div.tbig', {}, [big, h('div', {}, [h('h2', { text: VB.tileName(t) }), h('p', { text: VB.COLNAME[t.t] + ' tile' })])]));
-  c.appendChild(h('p', { text: VB.tileText(t) }));
+  c.appendChild(h('div.tbig', {}, [big, h('div', {}, [h('h2', { text: VB.tileName(t) }), h('p', { text: VB.COLNAME[t.t] })])]));
+  plainText(t).forEach(function (ln) { c.appendChild(h('p', { text: ln })); });
   if (note) c.appendChild(h('p.tip', { text: note }));
   var ac = h('div.acts');
   (acts || []).forEach(function (x) { ac.appendChild(h('button.btn' + (x.alt ? '.alt' : ''), { type: 'button', text: x.label, onclick: function () { closeTile(); x.fn(); } })); });
@@ -528,6 +536,13 @@ function showTile(t, acts, note) {
   tv.onclick = function (e) { if (e.target === tv) closeTile(); };
   try { artApply(tv); } catch (e) { }
 }
+var PLAIN = { 'Take one extra action at once, as if you had a die showing any number you like.': 'Take one extra action now. Any number works.',
+  'Take all goods from one market stall, and move 1 step up the banner track.': 'Take all goods from one stall. Move 1 step up the track.',
+  'Place one more tile from your storage at once, on any free space of its colour next to your land (any number).': 'Build one more stored tile now. Any number works.',
+  'Take a Keep, Mine or Lore tile from a market stall into your storage.': 'Take a Keep, Mine or Lore tile from any stall.',
+  'Take a Barge or Pasture tile from a market stall into your storage.': 'Take a Barge or Pasture tile from any stall.',
+  'A quarter may not hold two of the same Building.': 'No two of the same building in one region.' };
+function plainText(t) { return (VB.tileText(t) || '').split(/(?<=[.!?])\s+(?=[A-Z])/).reduce(function (o, s) { var k = Object.keys(PLAIN).filter(function (x) { return s.indexOf(x) === 0; })[0]; o.push(k ? PLAIN[k] : s); return o; }, []); }
 function closeTile() { $('#tv').hidden = true; render(); schedule(); }
 function dieLabel(m) { return m.die === 'x' ? 'free' : 'die ' + G.P[VB.actor(G)].dice[m.die] + (m.w ? ', ' + m.w + ' worker' + (m.w > 1 ? 's' : '') : ''); }
 function optionsFor(list, verb) {   /* one button per die (cheapest first) */
@@ -535,11 +550,11 @@ function optionsFor(list, verb) {   /* one button per die (cheapest first) */
   return Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return a.w - b.w; }).slice(0, 2).map(function (m) { return { label: verb + ' (' + dieLabel(m) + ')', fn: function () { doMove(m); } }; });
 }
 function needNote(v, kind) {
-  var p = G.P[VB.actor(G)]; if (!isHuman(VB.actor(G))) return 'Wait for your turn.';
+  var p = G.P[VB.actor(G)]; if (!isHuman(VB.actor(G))) return 'Not your turn yet.';
   var free = p.dice.filter(function (x, i) { return !p.used[i]; });
-  if (!free.length) return 'Both dice are used this turn.';
+  if (!free.length) return 'Both dice are used.';
   var c = Math.min.apply(null, free.map(function (x) { return VB.cost(p, x, v, kind); }));
-  return 'Needs a die showing ' + v + '. You would need ' + c + ' worker' + (c === 1 ? '' : 's') + ' (you have ' + p.workers + ').';
+  return 'Needs a ' + v + '. That costs ' + c + ' worker' + (c === 1 ? '' : 's') + ', you have ' + p.workers + '.';
 }
 
 /* ---------------- taps ---------------- */
@@ -548,25 +563,25 @@ function tapMarket(d, k) {
   var t = G.depots[d][k]; if (!t) return;
   if (!tutOk({ what: 'market', d: d, k: k })) return;
   var lg = myTurn() ? legalTakeFor(d, k) : [], top = pend();
-  if (lg.length && top && top.t === 'grab') { showTile(t, [{ label: 'Take it (free)', fn: function () { doMove(lg[0]); } }]); return; }
-  if (lg.length && top && top.t === 'castle') { showTile(t, [{ label: 'Take it (free action)', fn: function () { doMove(lg[0]); } }]); return; }
-  if (lg.length && hints()) { var tvv = takeValues(), me1 = tvv.v['mt-' + d + '-' + k], bb = tvv.v[tvv.best]; return showTile(t, optionsFor(lg, 'Take to storage'), tvv.best === 'mt-' + d + '-' + k ? '★ Best pick for you right now.' : me1 >= bb - 1 ? 'Nearly as good as the ★ best pick.' : 'The ★ pick is worth more to you right now.'); }
-  showTile(t, lg.length ? optionsFor(lg, 'Take to storage') : [], lg.length ? null : (myTurn() && !top ? (G.P[VB.actor(G)].store.length >= VB.cap(G.P[VB.actor(G)]) ? 'Storage is full: you would drop one. ' : '') + needNote(d, 'take') : null));
+  if (lg.length && top && top.t === 'grab') { showTile(t, [{ label: 'Take it, free', fn: function () { doMove(lg[0]); } }]); return; }
+  if (lg.length && top && top.t === 'castle') { showTile(t, [{ label: 'Take it, free', fn: function () { doMove(lg[0]); } }]); return; }
+  if (lg.length && hints()) { var tvv = takeValues(), me1 = tvv.v['mt-' + d + '-' + k], bb = tvv.v[tvv.best]; return showTile(t, optionsFor(lg, 'Take to storage'), tvv.best === 'mt-' + d + '-' + k ? '★ Best pick right now.' : me1 >= bb - 1 ? 'Almost as good as the ★ pick.' : 'The ★ pick is worth more.'); }
+  showTile(t, lg.length ? optionsFor(lg, 'Take to storage') : [], lg.length ? null : (myTurn() && !top ? (G.P[VB.actor(G)].store.length >= VB.cap(G.P[VB.actor(G)]) ? 'Storage is full, so you would throw one away. ' : '') + needNote(d, 'take') : null));
 }
 function tapBlack(k) {
   var t = G.black[k]; if (!t) return; if (!tutOk({ what: 'black', k: k })) return; var ok = myTurn() && !pend() && VB.validMoves(G).some(function (m) { return m.k === 'buy' && m.slot === k; });
   var p = G.P[VB.actor(G)] || me();
-  showTile(t, ok ? [{ label: 'Buy for ' + VB.blackCost(p) + ' silver', fn: function () { doMove({ k: 'buy', slot: k }); } }] : [], ok ? 'The back lane needs no die. Once per turn.' : (p.bought ? 'You already bought this turn.' : 'Costs ' + VB.blackCost(p) + ' silver, once per turn, no die needed.'));
+  showTile(t, ok ? [{ label: 'Buy for ' + VB.blackCost(p) + ' silver', fn: function () { doMove({ k: 'buy', slot: k }); } }] : [], ok ? 'No die needed. Once per turn.' : (p.bought ? 'You already bought one this turn.' : 'Costs ' + VB.blackCost(p) + ' silver. No die needed.'));
 }
 function tapStore(i) {
   var p = G.P[VB.actor(G)], t = p.store[i], top = pend(); if (!t) return;
   if (!tutOk({ what: 'store', s: i })) return;
-  if (myTurn() && top && top.t === 'discard') { showTile(t, [{ label: 'Drop this tile', fn: function () { doMove({ k: 'discard', s: i }); } }]); return; }
+  if (myTurn() && top && top.t === 'discard') { showTile(t, [{ label: 'Throw this away', fn: function () { doMove({ k: 'discard', s: i }); } }]); return; }
   var can = myTurn() && storeLegal(i);
   if (can && (UI.sel === i)) { UI.sel = null; render(); return; }
   if (can) { UI.sel = i; UI.tab = 'estate'; UI.pinTab = null; render(); return; }
   var c = VB.CELLS.filter(function (x) { return x.col === t.t && !p.estate[x.i]; });
-  showTile(t, [], !c.length ? 'No free ' + VB.COLNAME[t.t] + ' space left on your estate.' : VB.placeTargets(p, t, 0).length ? 'Build it on a ' + VB.COLNAME[t.t] + ' space next to your land; the die must show that space\'s number.' : 'No ' + VB.COLNAME[t.t] + ' space touches your land yet.');
+  showTile(t, [], !c.length ? 'No empty ' + VB.COLNAME[t.t] + ' space left.' : VB.placeTargets(p, t, 0).length ? 'Goes on a ' + VB.COLNAME[t.t] + ' space touching your land. Use that space\'s number.' : 'No ' + VB.COLNAME[t.t] + ' space touches your land yet.');
 }
 function tapCell(ci) {
   var p = me(), t = p.estate[ci];
@@ -575,8 +590,8 @@ function tapCell(ci) {
     var list = UI.sel == null ? [tg[ci]] : VB.validMoves(G).filter(function (m) { return m.k === 'place' && m.s === UI.sel && m.cell === ci; });
     UI.sel = null; doMove(pick(list)); return;
   }
-  if (t) showTile(t, [], t.home ? 'Your home keep: build next to it.' : null);
-  else if (UI.sel == null) toast(VB.COLNAME[VB.CELLS[ci].col] + ' space ' + VB.CELLS[ci].num);
+  if (t) showTile(t, [], t.home ? 'Your castle. Build out from here.' : null);
+  else if (UI.sel == null && hints()) toast(VB.COLNAME[VB.CELLS[ci].col] + ' space ' + VB.CELLS[ci].num);
 }
 function tapGoods(g) {
   var lg = myTurn() ? movesWhere(function (m) { return m.k === 'sell' && m.v === g; }) : [];
@@ -585,18 +600,19 @@ function tapGoods(g) {
   var tv = $('#tv'); tv.innerHTML = '';
   var c = h('div.card', { role: 'dialog', 'aria-label': VB.GOODS[g] });
   c.appendChild(h('h2', { text: n + ' × ' + VB.GOODS[g] }));
-  c.appendChild(h('p', { text: 'Sell all of one kind with a die showing ' + g + ': ' + VB.saleVP(G, p, n) + ' points and 1 silver.' }));
+  c.appendChild(h('p', { text: 'Sell them all with a ' + g + ': ' + VB.saleVP(G, p, n) + ' points and 1 silver.' }));
   var ac = h('div.acts');
   optionsFor(lg, 'Sell').forEach(function (x) { ac.appendChild(h('button.btn', { type: 'button', text: x.label, onclick: function () { closeTile(); x.fn(); } })); });
   if (!lg.length) c.appendChild(h('p.tip', { text: needNote(g, 'sell') }));
-  ac.appendChild(h('button.btn.alt', { type: 'button', text: 'Close', onclick: closeTile })); c.appendChild(ac); tv.appendChild(c); tv.hidden = false;
+  ac.appendChild(h('button.btn.alt', { type: 'button', id: 'tvClose', text: 'Close', onclick: closeTile })); c.appendChild(ac); tv.appendChild(c); tv.hidden = false;
   tv.onclick = function (e) { if (e.target === tv) closeTile(); };
 }
-function tapDie(i) { var p = me(); if (p.used[i]) return; UI.die = UI.die === i ? null : i; sfx('take'); render(); }
+function tapDie(i) { var p = me(); if (p.used[i]) return; if (bumpOf(i)) { delete UI.bump[i]; toast('Worker back.'); render(); return; } UI.die = UI.die === i ? null : i; sfx('take'); render(); }
 function showSeat(s) {
   var d = $('#seatbody'); if (!d) return; d.innerHTML = ''; var p = G.P[s];
   d.appendChild(h('p.why', { text: scoreWhy(s) }));
-  d.appendChild(h('p', { text: G.seats[s].name + ': ' + p.vp + ' points · ' + p.silver + ' silver · ' + p.workers + ' workers · goods ' + (VB.goodsTypes(p).map(function (g) { return p.goods[g] + ' ' + VB.GOODS[g]; }).join(', ') || 'none') }));
+  d.appendChild(h('p', { text: p.vp + ' points, ' + p.silver + ' silver, ' + p.workers + (p.workers === 1 ? ' worker.' : ' workers.') }));
+  d.appendChild(h('p', { text: 'Goods: ' + (VB.goodsTypes(p).map(function (g) { return p.goods[g] + ' ' + VB.GOODS[g]; }).join(', ') || 'none') + '.' }));
   d.appendChild(h('p', { text: 'Storage: ' + (p.store.map(VB.tileName).join(', ') || 'empty') }));
   var lore = Object.keys(p.estate).map(function (k) { return p.estate[k]; }).filter(function (t) { return t.t === 'know'; }).map(VB.tileName);
   if (lore.length) d.appendChild(h('p', { text: 'Lore: ' + lore.join(', ') }));
@@ -608,36 +624,37 @@ function showSeat(s) {
 /* ---------------- moves, animation ---------------- */
 function rectOf(id) { var e = document.getElementById(id); if (!e) return null; var r = e.getBoundingClientRect(); return r.width ? r : null; }
 function srcFor(m, s) {
+  if (FEEL.from && isHuman(s)) { var fr = FEEL.from; FEEL.from = null; return fr; }
   if (m.k === 'take' || m.k === 'grab') return rectOf('mt-' + m.v + '-' + m.slot);
   if (m.k === 'buy') return rectOf('bl-' + m.slot);
   if (m.k === 'place') return s === UI.view ? rectOf('st-' + m.s) : null;
   return null;
 }
 function fly(from, toId, tile) {
-  var to = rectOf(toId); var ms = animMs(420); if (!from || !to || !ms) return Promise.resolve();
+  var to = typeof toId === 'string' ? rectOf(toId) : toId; var ms = animMs(420); if (!from || !to || !ms) return Promise.resolve();
   var e = hexEl(tile, { size: Math.round(from.width) }); e.classList.add('fly');
   e.style.left = from.left + 'px'; e.style.top = from.top + 'px'; document.body.appendChild(e);
   var sc = to.width / from.width;
   requestAnimationFrame(function () { e.style.transform = 'translate(' + (to.left - from.left) + 'px,' + (to.top - from.top) + 'px) scale(' + sc + ')'; });
   return wait(ms + 40).then(function () { e.remove(); });
 }
-function popAt(r, txt) { if (!r || UI.fast) return; var e = h('div.popn', { text: txt, style: 'left:' + Math.max(90, Math.min(innerWidth - 90, r.left + r.width / 2)) + 'px;top:' + (r.top) + 'px' }); document.body.appendChild(e); setTimeout(function () { e.remove(); }, 1700); }
+function popAt(r, txt) { if (!r || UI.fast) return; var n = document.querySelectorAll('.popn').length; var e = h('div.popn', { text: txt, style: 'left:' + Math.max(90, Math.min(innerWidth - 90, r.left + r.width / 2)) + 'px;top:' + Math.max(60, r.top - n * 34) + 'px' }); document.body.appendChild(e); setTimeout(function () { e.remove(); }, 4000); }
 function ribbon(a, b) {
   if (!a || !b || UI.fast) return; var x1 = a.left + a.width / 2, y1 = a.top + a.height / 2, x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
   var len = Math.hypot(x2 - x1, y2 - y1), ang = Math.atan2(y2 - y1, x2 - x1);
   var e = h('div.ribbon', { style: 'left:' + x1 + 'px;top:' + y1 + 'px;width:' + len + 'px;--a:' + ang + 'rad' }); document.body.appendChild(e); setTimeout(function () { e.remove(); }, 800);
 }
-var WHY = { region: 'region filled', colour: 'all spaces of a colour', animals: 'animals in the meadow', goods: 'goods sold', tower: 'beacon tower', lore: 'lore bonus' };
+var WHY = { region: 'region full', colour: 'colour finished', animals: 'animals', goods: 'goods sold', tower: 'beacon', lore: 'lore' };
 function doMove(m) {
-  if (!m || UI.busy) return;
+  if (!m || UI.busy) return Promise.resolve();
   var s = VB.actor(G), src = srcFor(m, s), prevCell = UI.lastCell; UI.wasBuild = isHuman(s) && VB.validMoves(G).some(function (x) { return x.k === 'place'; });
   try { if (isHuman(s) && GX.undo) { } } catch (e) { }
   try { if (hints()) rateBefore(m); } catch (e) { }
-  var r = VB.performMove(G, m); if (!r.ok) { sfx('bad'); toast('Not allowed'); render(); return; }
+  var r = VB.performMove(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed.'); render(); return Promise.resolve(); }
   r.ev.forEach(function (ev) { if (ev.e === 'score') { srcAdd(ev.p, ev.why, ev.n); srcLogAdd(ev); } });
-  if (m.k === 'end' && isHuman(s)) { var rl = rateLine(); UI.lastRate = rl; try { coach('turnover'); } catch (e) { } if (hints()) beat('Turn over: you used both dice', rl.t, 'turn ' + rl.k, 2600); else beat('Turn over', 'You used both dice.', 'turn', 1500); }
-  else if (m.k === 'end') beat(G.seats[s].name + '\'s turn is over', 'Both dice used.', 'rv', 1300);
+  if (m.k === 'end' && isHuman(s)) { var rl = UI.mode === 'tutorial' ? { k: 'okay', t: '' } : rateLine(); UI.lastRate = rl; try { coach('turnover'); } catch (e) { } if (hints() && UI.mode !== 'tutorial') beat('Turn over', rl.t, 'turn ' + rl.k); }
   if (UI.die != null && G.P[s].used[UI.die]) UI.die = null;
+  if (UI.bump && typeof m.die === 'number' && G.P[s].used[m.die]) delete UI.bump[m.die]; if (m.k === 'end') UI.bump = {};
   UI.busy = true; UI.sel = null;
   if (m.k === 'place') { UI.chain = m.die === 'x' ? UI.chain + 1 : 1; } else if (m.k === 'end') UI.chain = 0;
   if (L.tabs && isHuman(s) && (m.k === 'take' || m.k === 'buy' || m.k === 'grab') && !(typeof GXT !== 'undefined' && GXT.running())) UI.tab = 'estate';
@@ -647,26 +664,26 @@ function doMove(m) {
   var seq = Promise.resolve();
   r.ev.forEach(function (ev) {
     seq = seq.then(function () {
-      if (ev.e === 'take') { sfx('take'); return fly(src, ev.p === UI.view ? 'st-' + (G.P[ev.p].store.indexOf(ev.tile)) : 'opp', ev.tile); }
+      if (ev.e === 'take') { sfx('take'); return fly(src, ev.p === UI.view ? 'st-' + (G.P[ev.p].store.indexOf(ev.tile)) : (chipRect(ev.p) || 'opp'), ev.tile); }
       if (ev.e === 'place') {
         sfx(ev.chain ? 'chain' : 'place'); UI.lastCell = ev.cell;
-        if (ev.p !== UI.view) { setCap(G.seats[ev.p].name + ' built ' + VB.tileName(ev.tile) + (ev.chain ? ' (chain!)' : '')); return wait(UI.quick ? 80 : animMs(500)); }
+        if (ev.p !== UI.view) { setCap(G.seats[ev.p].name + ' builds ' + aName(ev.tile) + (ev.chain ? ', for free' : '')); return rivalPeek(ev); }
         var dst = 'ec-' + ev.cell, el = document.getElementById(dst); if (el) el.style.visibility = 'hidden';
         if (ev.chain && prevCell != null) ribbon(rectOf('ec-' + prevCell), rectOf(dst));
-        return fly(src, dst, ev.tile).then(function () { if (el) { el.style.visibility = ''; el.animate && el.animate([{ transform: 'translate(-50%,-50%) scale(1.25)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: animMs(260) || 1 }); } if (ev.chain && chainNow > 1) popAt(rectOf(dst), 'Chain ×' + chainNow); });
+        var z0 = FEEL.cam.z; return (L.tabs ? camTo(ev.cell, Math.max(z0, 1.3)) : camTo(ev.cell)).then(function () { if (!src) src = rectOf('st-0'); return fly(src, rectOf(dst), ev.tile); }).then(function () { buzz(10); if (el) { el.style.visibility = ''; el.animate && el.animate([{ transform: 'translate(-50%,-50%) scale(1.25)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: animMs(260) || 1 }); } if (ev.chain && chainNow > 1) popAt(rectOf(dst), 'Chain of ' + chainNow); if (L.tabs && z0 <= 1.01) setTimeout(function () { if (!(FEEL.drag && FEEL.drag.on)) camReset(true); }, animMs(700)); });
       }
-      if (ev.e === 'score') { sfx('score'); var rr = ev.cell != null && ev.p === UI.view ? rectOf('ec-' + ev.cell) : rectOf('r-vp'); if (ev.p !== UI.view) { var oc = document.querySelector('.och[data-seat="' + ev.p + '"]'); rr = oc && oc.getBoundingClientRect(); } var why = '+' + ev.n + ' ' + (WHY[ev.why] || 'points'); if (ev.why === 'region' && ev.cell != null && hints()) { var rg = VB.REGIONS[VB.CELLS[ev.cell].reg], bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; why += ' (size ' + rg.cells.length + ': ' + (ev.n - bz) + ' + ' + VB.PHASES[Math.min(G.phase, 4)].toLowerCase() + ' bonus ' + bz + ')'; } popAt(rr, why); if (ev.p !== UI.view) setCap(G.seats[ev.p].name + ': ' + why); return wait(UI.quick ? 80 : animMs(ev.why === 'region' ? 900 : 550)); }
+      if (ev.e === 'score') { sfx('score'); var rr = ev.cell != null && ev.p === UI.view ? rectOf('ec-' + ev.cell) : rectOf('r-vp'); if (ev.p !== UI.view) { var pc = UI.peekCell && ev.cell != null ? UI.peekCell.getBoundingClientRect() : null, oc = document.querySelector('.och[data-seat="' + ev.p + '"]'); rr = pc || (oc && oc.getBoundingClientRect()); } var why = '+' + ev.n + ' ' + (WHY[ev.why] || 'points'); if (ev.why === 'region' && ev.cell != null && hints()) { var bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; why += ' (' + (ev.n - bz) + ' size + ' + bz + ' early)'; } if (ev.why === 'region' && ev.cell != null) flashRegion(ev.cell, ev.p); popAt(rr, why); if (ev.p !== UI.view) setCap(G.seats[ev.p].name + ': ' + why); return Promise.all([flyPts(rr, scoreEl(ev.p), '+' + ev.n), wait(UI.quick ? 80 : animMs(ev.why === 'region' ? 900 : 550))]).then(function () { renderOpp(); }); }
       if (ev.e === 'sell') { sfx('sell'); return wait(animMs(200)); }
       if (ev.e === 'die') { return null; }
       if (ev.e === 'end') { sfx('end'); return null; }
       return null;
     });
   });
-  seq.then(function () {
-    UI.busy = false;
+  return seq.then(function () {
+    UI.busy = false; peekOff(); if (L.tabs && m.k === 'end') camReset(true);
     if (m.k === 'end') onTurnChange();
     save(); render(); schedule(); try { coachCheck(m, s, r.ev); } catch (e) { }
-    if (G.over) setTimeout(gameOver, animMs(500));
+    if (G.over) setTimeout(gameOver, Math.max(animMs(500), UI.fast ? 0 : (say.until || 0) - Date.now() + 300));
   });
 }
 function onTurnChange() {
@@ -675,12 +692,12 @@ function onTurnChange() {
     sfx('dice'); var gd = G.goodsAt[G.white], crate = gd && gd.length ? gd[gd.length - 1] : 0;
     if (G.round === 0 && G.phase > 0) {
       var mines = G.order.map(function (s) { var n = 0; for (var k in G.P[s].estate) if (G.P[s].estate[k].t === 'mine') n++; return G.seats[s].name + ' +' + n; }).join(', ');
-      beat(VB.PHASES[G.phase - 1] + ' is over', 'Mines paid silver: ' + mines + '.\nNew market. Filled regions now pay +' + VB.PHASE_BONUS[Math.min(4, G.phase)] + ' bonus (was +' + VB.PHASE_BONUS[Math.min(4, G.phase - 1)] + ').', 'round', 3000);
-    } else if (G.round > 0) beat('Round ' + G.round + ' of ' + nRounds() + ' done', 'New dice for everyone.' + (crate ? '\nWhite die ' + G.white + ': a ' + VB.GOODS[crate] + ' crate goes to stall ' + G.white + '.' : ''), 'round', 2300);
+      beat(VB.PHASES[G.phase - 1] + ' is over', 'Mines pay silver: ' + mines + '.\nNew tiles in the market.\nA full region now gets +' + VB.PHASE_BONUS[Math.min(4, G.phase)] + ' extra.', 'round', 3000);
+    } else if (G.round > 0) beat('Round ' + (G.round + 1) + ' of ' + nRounds(), 'Everyone rolls again.' + (crate ? '\nNew ' + VB.GOODS[crate] + ' crate at stall ' + G.white + '.' : ''), 'round', 2000);
   }
   var humans = G.seats.filter(function (s) { return s.human; }).length;
-  if (humans > 1 && isHuman(a) && UI.lastHuman !== a) toast('Pass to ' + G.seats[a].name, 2000);
-  if (isHuman(a)) { UI.lastHuman = a; UI.quick = false; UI.cap = ''; if (L.tabs && !UI.pinTab) UI.tab = 'estate'; if (UI.mode === 'tutorial' && G.round >= 1 && G.round <= 4 && UI.stacked !== G.round) { UI.stacked = G.round; try { tutStack(G.round + 1); } catch (e) { } } }
+  if (humans > 1 && isHuman(a) && UI.lastHuman !== a) toast('Pass the device to ' + G.seats[a].name, 2000);
+  UI.bump = {}; if (isHuman(a)) { UI.lastHuman = a; UI.quick = false; UI.cap = ''; if (L.tabs && !UI.pinTab) UI.tab = 'estate'; if (UI.mode === 'tutorial' && G.round >= 1 && G.round <= 4 && UI.stacked !== G.round) { UI.stacked = G.round; try { tutStack(G.round + 1); } catch (e) { } } }
   beatsRun(turnBanner);
 }
 function schedule() {
@@ -701,7 +718,7 @@ function startGame(o) {
   UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1;
   $('#start').hidden = true; $('#rs').hidden = true; $('#tv').hidden = true;
 
-  UI.quick = false; UI.cap = ''; UI.pinTab = null; UI.tab = 'estate'; save(); render(); musSync(); sfx('dice'); hintSync(); if (UI.mode === 'quick' && !UI.fast && !QS.get('scn')) showGoal(); else { if (UI.mode !== 'quick') toast(VB.PHASES[0] + ' begins: new dice for everyone', 1600); turnBanner(); } schedule();
+  UI.quick = false; UI.cap = ''; UI.pinTab = null; UI.tab = 'estate'; UI.bump = {}; FEEL.cam = { z: 1, x: 0, y: 0 }; save(); render(); musSync(); sfx('dice'); hintSync(); if (UI.mode === 'quick' && !UI.fast && !QS.get('scn')) showGoal(); else { if (UI.mode !== 'quick') toast(VB.PHASES[0] + ' begins', 1600); turnBanner(); } schedule();
 }
 function resume() { try { G = JSON.parse(localStorage.getItem('vob_save')); } catch (e) { G = null; } if (!G) return showTitle(); UI.mode = 'quick'; UI.camp = false; UI.busy = false; $('#start').hidden = true; render(); musSync(); schedule(); }
 function gameOver() { try { localStorage.removeItem('vob_save'); } catch (e) { } musSync(); showResult(); }
@@ -709,17 +726,17 @@ function showResult() {
   var rs = $('#rs'); toastOff(); rs.innerHTML = ''; UI.cq = []; clearTimeout(UI.cT); UI.cBusy = false; var gd0 = $('#guide'); if (gd0) gd0.classList.remove('on'); var c = h('div.card', { role: 'dialog', 'aria-label': 'Result' });
   var w = G.winner, you = G.seats.filter(function (s) { return s.human; }).length === 1, won = G.teams ? w % 2 === 0 : w === 0; c.classList.add(won || !you ? 'rwin' : 'rlose'); setTimeout(function () { sfx(won ? 'score' : 'bad'); }, 150);
   c.appendChild(h('div', { 'data-art': won && you ? 'ui-result-win' : 'ui-result-lose', style: 'height:8px' }));
-  c.appendChild(h('h2', { text: G.solo ? (won ? 'Estate complete: you win!' : 'Estate not complete: ' + G.soloFilled + ' of 37 spaces') : G.teams ? (won ? 'Your team wins ' + G.teamVP[0] + ' to ' + G.teamVP[1] + '!' : G.seats[1].name + ' and ' + G.seats[3].name + ' win ' + G.teamVP[1] + ' to ' + G.teamVP[0]) : you ? (w === 0 ? 'Your banner flies highest!' : G.seats[w].name + ' wins the valley') : G.seats[w].name + ' wins!' }));
-  var tb = h('table'); tb.appendChild(h('tr', {}, ['', 'Board', 'Silver', 'Workers', 'Goods', 'Lore', 'Total'].map(function (x) { return h('th', { text: x }); })));
+  c.appendChild(h('h2', { text: G.solo ? (won ? 'Every space built. You win.' : 'So close: ' + G.soloFilled + ' of 37 spaces') : G.teams ? (won ? 'Your team wins, ' + G.teamVP[0] + ' to ' + G.teamVP[1] : G.seats[1].name + ' and ' + G.seats[3].name + ' win, ' + G.teamVP[1] + ' to ' + G.teamVP[0]) : you ? (w === 0 ? 'You win!' : G.seats[w].name + ' wins this time') : G.seats[w].name + ' wins' }));
+  var tb = h('table'); tb.appendChild(h('tr', {}, ['', 'Built', 'Silver', 'Workers', 'Goods', 'Lore', 'Total'].map(function (x) { return h('th', { text: x }); })));
   G.rank.forEach(function (s) { var p = G.P[s], e = p.end || { silver: 0, workers: 0, goods: 0, lore: 0 }; tb.appendChild(h('tr', {}, [G.seats[s].name, p.vpPlay, e.silver, e.workers, e.goods, e.lore, p.vp].map(function (x) { return h('td', { text: String(x) }); }))); });
   c.appendChild(tb); countUp(tb);
   var p0 = G.P[0]; var pl = function (n, a, b) { return n + ' ' + (n === 1 ? a : b); };
-  c.appendChild(h('p.tip', { text: 'You finished ' + pl(p0.stat.regions, 'region', 'regions') + ', sold ' + pl(p0.stat.sales, 'time', 'times') + ' and chained ' + pl(p0.stat.chain, 'build', 'builds') + '.' }));
+  c.appendChild(h('p.tip', { text: 'You filled ' + pl(p0.stat.regions, 'region', 'regions') + ' and sold ' + pl(p0.stat.sales, 'time', 'times') + '.' }));
   if (UI.mode === 'tutorial') {   /* the final count, rule by rule with your real numbers, then what you have not met yet */
     var e0 = G.P[0].end || {}, ul0 = h('ul.walk');
-    [['Built during the game', G.P[0].vpPlay], ['Silver: 1 point each (' + G.P[0].silver + ')', e0.silver], ['Unsold goods: 1 point per crate', e0.goods], ['Workers: 1 point per 2 (' + G.P[0].workers + ' workers)', e0.workers], ['Lore end scrolls', e0.lore]].forEach(function (x) { ul0.appendChild(h('li', { text: x[0] + ': ' + (x[1] || 0) })); });
-    ul0.appendChild(h('li', { text: 'Total: ' + G.P[0].vp + '. Ties go to the fuller estate, then to the steward further back on the banner track.' }));
-    c.appendChild(h('h3', { text: 'How your score was counted' })); c.appendChild(ul0); UI.seen = UI.seen || {}; UI.seen.final = 1; UI.seen.tie = 1;
+    [['Points during the game', G.P[0].vpPlay], ['Silver, 1 each (' + G.P[0].silver + ')', e0.silver], ['Unsold goods, 1 each', e0.goods], ['Workers, 1 per 2 (' + G.P[0].workers + ')', e0.workers], ['Lore scrolls', e0.lore]].forEach(function (x) { ul0.appendChild(h('li', { text: x[0] + ': ' + (x[1] || 0) })); });
+    ul0.appendChild(h('li', { text: 'Total: ' + G.P[0].vp + '. A tie goes to the fuller estate.' }));
+    c.appendChild(h('h3', { text: 'How your score adds up' })); c.appendChild(ul0); UI.seen = UI.seen || {}; UI.seen.final = 1; UI.seen.tie = 1;
     var lat = Object.keys(VSTORY.coach).filter(function (k) { return !UI.seen[k]; }); UI.later = lat;
     if (lat.length) { c.appendChild(h('h3', { text: VSTORY.laterTitle })); var ul1 = h('ul.walk'); lat.forEach(function (k) { ul1.appendChild(h('li', { text: VSTORY.coach[k].later })); }); c.appendChild(ul1); }
     c.appendChild(h('p.voice', {}, [h('b', { text: VSTORY.guide.name + ': ' }), document.createTextNode(won ? VSTORY.tut.result.win : VSTORY.tut.result.lose)]));
@@ -730,8 +747,8 @@ function showResult() {
   var cd = null; try { cd = UI.camp && GXC.active(); } catch (e) { }
   if (cd) {   /* Story: say which goal decided the chapter and which star goals were met */
     var M = metrics(G), ok0 = false; try { ok0 = !!GXC.isWonNow ? GXC.isWonNow(G, cd) : (M.won && testOk(cd.stars[0].test, M)); } catch (e) { }
-    c.appendChild(h('p', { style: 'font-weight:800;margin:8px 0 2px', text: ok0 ? 'Chapter won: ' + cd.goal.text.replace(/\.$/, '') + ' ✓' : 'Chapter lost: ' + cd.goal.text.replace(/\.$/, '') + ' ✗  (you must win the game; stars count only when you win)' }));
-    var ul = h('ul', { style: 'margin:2px 0;padding-left:20px' }); cd.stars.forEach(function (st, i) { var g = testOk(st.test, M); ul.appendChild(h('li', { text: (g ? '★ ' : '☆ ') + st.text + (g ? ' - met' : ' - not met') + (i === 0 ? ' (the chapter goal)' : '') })); });
+    c.appendChild(h('p', { style: 'font-weight:800;margin:8px 0 2px', text: ok0 ? 'Chapter won: ' + cd.goal.text.replace(/\.$/, '') + ' ✓' : 'Not yet: ' + cd.goal.text.replace(/\.$/, '') + ' ✗ (win the game too)' }));
+    var ul = h('ul', { style: 'margin:2px 0;padding-left:20px' }); cd.stars.forEach(function (st, i) { var g = testOk(st.test, M); ul.appendChild(h('li', { text: (g ? '★ ' : '☆ ') + st.text + (g ? ', done' : ', not yet') + (i === 0 ? ' (main goal)' : '') })); });
     c.appendChild(ul);
     var lo = !ok0 && VSTORY.storyLose[cd.id]; if (lo) { var who = (CAMPAIGN.cast && CAMPAIGN.cast[lo.who]) || {}; c.appendChild(h('p.voice', {}, [h('b', { text: (who.name || 'Odo') + ': ' }), document.createTextNode(lo.text)])); }
   }
@@ -752,11 +769,11 @@ function showTitle() {
   var st = $('#start'); st.innerHTML = ''; st.hidden = false; $('#rs').hidden = true; $('#tv').hidden = true;
   var c = h('div.tcard');
   c.appendChild(h('h1', { text: 'Vale of Banners' }));
-  c.appendChild(h('p.sub', { text: 'Roll two dice, build your estate, raise your banner over the valley.' }));
-  c.appendChild(h('button.big.btn', { type: 'button', id: 'quickB', text: '▶ Play', onclick: showSetup }));
+  c.appendChild(h('p.sub', { text: 'Roll two dice. Grab tiles. Build the best estate.' }));
+  c.appendChild(h('button.big.btn', { type: 'button', id: 'quickB', 'data-a': 'start', text: '▶ Play', onclick: showSetup }));
   c.appendChild(h('button.btn.sec', { type: 'button', id: 'storyB', text: '📖 Story', onclick: storyOpen }));
   if (hasSave()) c.appendChild(h('button.btn.alt', { type: 'button', id: 'resumeB', text: 'Continue saved game', onclick: resume }));
-  c.appendChild(h('button.btn.alt', { type: 'button', id: 'tutB', text: (tutDone() ? 'Learn to play' : 'Learn to play (start here)'), onclick: function () { tutStart(); } }));
+  c.appendChild(h('button.btn.alt', { type: 'button', id: 'tutB', 'data-a': 'tut', text: (tutDone() ? 'Learn to play' : 'New? Learn to play'), onclick: function () { tutStart(); } }));
   c.appendChild(h('button.btn.alt', { type: 'button', id: 'howB', text: 'How to play', onclick: function () { GX.show('rulesd'); } }));
   st.appendChild(c); try { artApply(st); } catch (e) { } musSync();
 }
@@ -770,13 +787,13 @@ function showSetup() {
   }
   c.appendChild(seg('Players', [[1, 'Solo'], [2, '2'], [3, '3'], [4, '4']], SET.n, function (v) { SET.n = v; SET.hot = Math.max(0, Math.min(SET.hot, v - 1)); }));
   if (SET.n > 1) {
-    c.appendChild(seg('Computer stewards', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], SET.ai, function (v) { SET.ai = v; }));
+    c.appendChild(seg('Computer players', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], SET.ai, function (v) { SET.ai = v; }));
     var hs = [[0, 'None']]; for (var i = 1; i < SET.n; i++) hs.push([i, String(i)]);
     c.appendChild(seg('Friends on this device', hs, SET.hot, function (v) { SET.hot = v; }));
     if (SET.n === 4) c.appendChild(seg('Teams', [[0, 'Each alone'], [1, '2 v 2']], SET.teams, function (v) { SET.teams = v; }));
   }
-  c.appendChild(h('p.tip', { text: SET.n === 1 ? 'Solo: 25 rounds. Fill all 37 spaces of your estate to win. No limit on goods kinds.' : SET.n === 4 && SET.teams ? 'You and Saffron against Azure and Violet. Partners share silver, workers and goods; team points add up.' : SET.hot ? 'Pass the device when it says so. Everything on the table is open.' : 'You against ' + (SET.n - 1) + ' computer steward' + (SET.n > 2 ? 's' : '') + '.' }));
-  c.appendChild(h('button.btn.big', { type: 'button', id: 'goB', text: 'Start', onclick: function () {
+  c.appendChild(h('p.tip', { text: SET.n === 1 ? 'Solo: 25 rounds. Fill all 37 spaces to win.' : SET.n === 4 && SET.teams ? 'You and Saffron against Azure and Violet. Partners share everything.' : SET.hot ? 'Pass the device when it tells you to.' : 'You against ' + (SET.n - 1) + ' computer player' + (SET.n > 2 ? 's' : '') + '.' }));
+  c.appendChild(h('button.btn.big', { type: 'button', id: 'goB', 'data-a': 'start', text: 'Start', onclick: function () {
     var hot = {}, names = {}; for (var k = 1; k <= SET.hot; k++) { hot[k] = true; names[k] = 'Friend ' + k; }
     UI.lastOpts = { n: SET.n, ai: SET.ai, hot: hot, names: names, teams: SET.n === 4 && !!SET.teams }; startGame(UI.lastOpts);
   } }));
@@ -786,32 +803,35 @@ function showSetup() {
 
 /* ---------------- rules / scores / menu drawers ---------------- */
 var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn">' +
-  '<li>You get two dice. Each die is one action.</li>' +
-  '<li>Take: tap a glowing market tile whose stall number matches a die.</li>' +
-  '<li>Build: tap a tile in your storage, then a glowing space of its colour next to your land.</li>' +
-  '<li>No good move? Take 2 workers; each worker turns a die up or down by 1.</li>' +
-  '<li>The bar on top shows the round, whose turn it is and the dice left. Glowing spaces show what a build scores (+N) or how full its region gets (2/4).</li>' +
-  '<li>Both dice used? Tap End turn: a card rates your turn. Most points after five seasons wins.</li></ol><h3>All the rules</h3>' +
-  '<p>Five seasons of five rounds. Every round each steward rolls <b>two dice</b>. On your turn use each die for one action:</p>' +
-  '<ul><li><b>Take</b> a tile from the market stall with the die\'s number into your storage (3 spaces).</li>' +
-  '<li><b>Build</b> a stored tile on an empty space of its colour that shows the die\'s number and touches your land.</li>' +
-  '<li><b>Sell</b> all your goods of the die\'s number: points per tile (2/3/4 with 2/3/4 players) and 1 silver.</li>' +
-  '<li><b>Workers</b>: take 2 workers with any die.</li></ul>' +
-  '<p>Each <b>worker</b> turns a die up or down by 1 (6 and 1 are neighbours). Once per turn you may <b>buy</b> a tile from the back lane for 2 silver, with no die.</p>' +
-  '<h3>Tiles</h3><ul><li><b>Keep</b> (dark green): one free extra action with any number.</li><li><b>Mine</b> (grey): 1 silver at the end of every season.</li>' +
-  '<li><b>Lore</b> (yellow): bends one rule for you for the rest of the game (26 kinds).</li>' +
-  '<li><b>Buildings</b> (tan): an instant effect; never two of the same kind in one quarter. The <b>Moot Hall</b> lets you build again at once: chain several tiles in one turn!</li>' +
-  '<li><b>Pasture</b> (light green): score every animal of that kind in that meadow.</li>' +
-  '<li><b>Barge</b> (blue): take all goods from one stall and move up the banner track (turn order).</li></ul>' +
-  '<h3>Scoring</h3><p>Fill a whole region: 1/3/6/10/15/21/28/36 points for 1-8 spaces, plus 10/8/6/4/2 for doing it in season 1-5. First to fill every space of one colour gets 5/6/7 points (2/3/4 players); the second gets 2/3/4. Each round one goods tile goes to the stall shown by the white die.</p>' +
-  '<p>Game end: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, plus Lore scrolls. Most points wins; a tie goes to the fuller estate, then to the steward further back on the banner track.</p>' +
+  '<li>You roll two dice. Each die does one thing.</li>' +
+  '<li><b>Take</b>: drag a die onto the stall with its number.</li>' +
+  '<li><b>Build</b>: drag a stored tile onto a glowing space.</li>' +
+  '<li>The space must match the tile colour and a die.</li>' +
+  '<li>It must also touch land you already built.</li>' +
+  '<li>No match? Drag a worker onto a die: one up or down.</li>' +
+  '<li>Both dice used? Tap End turn.</li></ol>' +
+  '<p>You can also tap instead of dragging. Two fingers zoom the estate.</p>' +
+  '<h3>Other things a die can do</h3>' +
+  '<ul><li><b>Sell</b>: a die sells all your goods with its number. You get points and 1 silver.</li>' +
+  '<li><b>Hire</b>: swap any die for 2 workers.</li>' +
+  '<li><b>Back lane</b>: once a turn, buy a tile there for 2 silver. No die needed.</li></ul>' +
+  '<p>6 and 1 touch. A worker can turn a 6 into a 1.</p>' +
+  '<h3>Tiles</h3><ul><li><b>Keep</b> (dark green): one free action, any number.</li><li><b>Mine</b> (grey): 1 silver after every season.</li>' +
+  '<li><b>Lore</b> (yellow): changes one rule for you, all game.</li>' +
+  '<li><b>Buildings</b> (tan): work as soon as you build them. No two the same inside one outline. The <b>Moot Hall</b> lets you build again straight away.</li>' +
+  '<li><b>Pasture</b> (light green): points for every animal of that kind nearby.</li>' +
+  '<li><b>Barge</b> (blue): take one stall\'s goods. Move up the track.</li></ul>' +
+  '<h3>Points</h3><p>The light outlines on your estate mark regions. Fill every space in one to score it. Bigger regions pay more: 1 space pays 1, 8 spaces pay 36.</p><p>Season 1 adds 10 extra. Later seasons add 8, 6, 4, 2.</p>' +
+  '<p>First to fill every space of one colour gets 5 to 7 points. Second gets 2 to 4.</p>' +
+  '<p>Each round the white die puts new goods on its stall.</p>' +
+  '<p>At the end: +1 per silver, +1 per unsold crate, +1 per 2 workers, plus lore. Most points wins. A tie goes to the fuller estate.</p>' +
   '<h3>Solo and teams</h3>' +
-  '<p><b>Solo</b> (Quick game, 1 player): 1 silver, 2 workers, 3 goods, no limit on goods kinds, 25 rounds; you win only by filling all 37 spaces. <b>Teams</b> (4 players, 2 v 2): partners share silver, workers and goods; the team with more points wins.</p>' +
-  '<h3>Simplified on purpose</h3><ul><li>The estate map and its numbers are our own layout.</li><li>All tiles come from one shuffled pool into the six stalls; tile counts per kind are our own.</li><li>The 26 Lore tiles are our own.</li><li>A fourth kind of goods that does not fit your storage is lost.</li><li>Goods come from one bag for the start and every season.</li></ul></div>';
+  '<p><b>Solo</b>: 25 rounds. You win only if you build all 37 spaces. <b>Teams</b> (4 players): partners share silver, workers and goods.</p>' +
+  '<h3>Our own changes</h3><ul><li>The estate map and its numbers are ours.</li><li>All tiles come from one shuffled pile.</li><li>The 26 lore tiles are ours.</li><li>A fourth kind of goods does not fit and is lost.</li><li>Goods come from one bag.</li></ul></div>';
 function drawers() {
   var r = h('div', { html: RULES_HTML }); GX.drawer('rulesd', 'How to play', r);
-  var tr = h('button.btn.alt', { type: 'button', text: 'Play the tutorial', style: 'margin-top:8px', onclick: function () { GX.close(); tutStart(); } }); r.appendChild(tr);
-  GX.drawer('scored', 'Scores and turn order', h('div', { id: 'scorebody' }));
+  var tr = h('button.btn.alt', { type: 'button', text: 'Play the lesson game', style: 'margin-top:8px', onclick: function () { GX.close(); tutStart(); } }); r.appendChild(tr);
+  GX.drawer('scored', 'Scores', h('div', { id: 'scorebody' }));
   GX.drawer('seatd', 'Estate', h('div', { id: 'seatbody' }), true);
   try {
     GX.settings({
@@ -825,10 +845,10 @@ function drawers() {
       },
       sound: function (S) {
         S.appendChild(GX.row('Sound', GX.onoff(!UI.mute, function (v) { UI.mute = !v; try { localStorage.setItem('vob_mute', UI.mute ? '1' : '0'); } catch (e) { } musSync(); })));
-        S.appendChild(GX.row('Music', [GX.onoff(UI.music, function (v) { UI.music = v; try { localStorage.setItem('vob_music', v ? '1' : '0'); } catch (e) { } musSync(); }), h('button.btn.alt', { type: 'button', text: 'Songs', onclick: function () { try { GXMUS.open(); } catch (e) { } } })], (window.VB_MUSIC || []).length ? null : 'Songs arrive with the next update.'));
+        S.appendChild(GX.row('Music', [GX.onoff(UI.music, function (v) { UI.music = v; try { localStorage.setItem('vob_music', v ? '1' : '0'); } catch (e) { } musSync(); }), h('button.btn.alt', { type: 'button', text: 'Songs', onclick: function () { try { GXMUS.open(); } catch (e) { } } })], (window.VB_MUSIC || []).length ? null : 'Songs come in a later update.'));
       },
       help: function (S) { try { var w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn alt' }); while (w.firstChild) S.appendChild(w.firstChild); } catch (e) { } },
-      about: { name: 'Vale of Banners', version: '1.0', text: 'An original dice-and-tiles estate game. Temporary tile icons: game-icons.net (Delapouite, Lorc, Skoll, Willdabeast), CC BY 3.0.' }
+      about: { name: 'Vale of Banners', version: '1.0', text: 'A dice and tiles estate game. Temporary tile icons: game-icons.net (Delapouite, Lorc, Skoll, Willdabeast), CC BY 3.0.' }
     });
   } catch (e) { console.error(e); }
 }
@@ -838,11 +858,11 @@ function helpPhase() { var t = pend(); if (t) return 'p-' + t.t; if (UI.sel != n
 function helpInit() {
   try {
     GXH.init({ game: 'vale-of-banners', defaultOn: true, avoid: '#acts button,.glow,.och', steps: {
-      end: { target: function () { return $('#endB'); }, title: 'Done', text: 'Both dice used. Buy from the back lane or end your turn.' },
-      'p-castle': { target: function () { return $('#mk'); }, title: 'Free action', text: 'Your Keep gives one free action: any number at all.' },
-      'p-hall': { target: function () { return $('#store'); }, title: 'Chain!', text: 'Moot Hall: pick a stored tile and build it at once.' },
-      'p-ship': { target: function () { return $('#mk'); }, title: 'Barge', text: 'Load all goods from one stall, then sell them with a matching die.' }
-    }, rules: [{ title: 'Dice', text: 'Take, build, sell or take workers.' }, { title: 'Regions', text: 'Fill a region early for big points.' }] });
+      end: { target: function () { return $('#endB'); }, title: 'Done', text: 'Both dice used. Tap End turn.' },
+      'p-castle': { target: function () { return $('#mk'); }, title: 'Free action', text: 'Your keep gives a free action. Any number works.' },
+      'p-hall': { target: function () { return $('#store'); }, title: 'Build again', text: 'Moot Hall: build another stored tile now.' },
+      'p-ship': { target: function () { return $('#mk'); }, title: 'Barge', text: 'Load all goods from one stall.' }
+    }, rules: [{ title: 'Dice', text: 'A die can take, build, sell or hire.' }, { title: 'Regions', text: 'Fill an outlined region. Early pays more.' }] });
     GXH.bulb({ el: '#bulbbtn', suggest: function () {
       if (!myTurn()) return null; var c = VB.fclone(G), m = VB.aiMove(c, 'normal'); if (!m) return null;
       var tgt = m.k === 'take' || m.k === 'grab' ? $('#mt-' + m.v + '-' + m.slot) : m.k === 'place' ? $('#st-' + m.s) : m.k === 'sell' ? $('#gd-' + m.v) : m.k === 'buy' ? $('#bl-' + m.slot) : m.k === 'end' ? $('#endB') : m.k === 'workers' ? $('#acts .btn') : $('#acts');
@@ -988,7 +1008,7 @@ function storyInit() {
 /* ---------------- boot ---------------- */
 function boot() {
   GX.init({ key: 'vob' });
-  drawers(); helpInit(); storyInit(); musicInit();
+  drawers(); helpInit(); storyInit(); musicInit(); feelInit();
   var ht = $('#hintT'); if (ht) ht.addEventListener('click', hintToggle); hintSync();
   GX.onResize(function () { if (G) render(); });
   addEventListener('resize', function () { if (G) render(); });
@@ -998,7 +1018,7 @@ function boot() {
     var n = e.target.closest && e.target.closest('.gxc-node,.gxc-ib'); if (!n) return;
     var lab = n.getAttribute('aria-label') || n.textContent || ''; n.setAttribute('data-tapped', '1');
     setTimeout(function () { var m = [].slice.call(document.querySelectorAll('.gxc-node,.gxc-ib')).filter(function (x) { return x.getAttribute('aria-label') === lab || x.textContent === n.textContent; })[0]; if (m) m.setAttribute('data-tapped', String(Date.now() % 100000)); }, 80);
-    setTimeout(function () { toast(/lock/i.test(lab) || n.disabled || n.classList.contains('locked') ? 'Win the chapter before to open this one' : lab.split(',')[0].trim()); }, 30);
+    setTimeout(function () { toast(/lock/i.test(lab) || n.disabled || n.classList.contains('locked') ? 'Win the previous chapter to open this one' : lab.split(',')[0].trim()); }, 30);
   }, true);
   document.addEventListener('pointerdown', function () { try { GA.unlock(); } catch (e) { } musSync(); }, { once: true });
   document.addEventListener('pointerdown', function () { if (typeof G !== 'undefined' && G && !G.over && !isHuman(VB.actor(G)) && !UI.quick) { UI.quick = true; } }, true);

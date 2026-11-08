@@ -17,9 +17,9 @@ function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it ===
 const hq = s => () => document.querySelector(s);
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const HLP_STEPS = {
-  turn: { target: () => { try { const m = UI.rec && UI.rec.m, e = m && hlpEl(m); if (e && e.getBoundingClientRect().width) return e; } catch (x) { } return hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .btn')(); }, title: 'Your turn', text: 'Tap a glowing spot to send a worker there. Or tap a glowing card to play it.', pic: () => hnode(HP.worker) },
-  prepare: { target: hfirst('#acts .prep'), title: 'Time to prepare', text: 'All workers are out. Tap Prepare: they come home and you gain more.', pic: () => hnode(() => HP.season(1)) },
-  lastCall: { target: hfirst('#acts .pass', '#acts .btn'), title: 'Nothing left to do?', text: 'Play a card if you can. Otherwise tap Pass twice: your city still scores.', pic: () => hnode(HP.tree) },
+  turn: { target: () => { try { const m = UI.rec && UI.rec.m, e = m && hlpEl(m); if (e && e.getBoundingClientRect().width) return e; } catch (x) { } return hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .btn')(); }, title: 'Your turn', text: 'Tap a glowing spot to send a worker. Or tap a glowing card to play it.', pic: () => hnode(HP.worker) },
+  prepare: { target: hfirst('#acts .prep'), title: 'Time to prepare', text: 'All workers are out. Tap Prepare. They come home and you gain more.', pic: () => hnode(() => HP.season(1)) },
+  lastCall: { target: hfirst('#acts .pass', '#acts .btn'), title: 'Nothing left to do?', text: 'Play a card if you can. Otherwise tap Pass twice. Your city still scores.', pic: () => hnode(HP.tree) },
   how: { target: hfirst('#acts .tchip'), title: 'Choose how', text: 'This can be done in several ways. Tap the option you want.', pic: () => hnode(HP.cost) },
   pickCard: { target: hfirst('#bd .glow:not(.tchip)', '#acts .tchip'), title: 'Pick a card', text: 'The power needs a card. Tap one that glows.', pic: () => hnode(HP.card) },
   pickRes: { target: hfirst('#acts .tchip'), title: 'Pick a resource', text: 'Tap the resource you want, in the row below the board.', pic: () => hnode(() => HP.res('berry')) },
@@ -28,30 +28,30 @@ const HLP_STEPS = {
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES = [
-  { title: 'The goal', text: 'Build the best woodland city. When everyone has passed, the highest total of points wins.', pic: () => hpics([[HP.tree, 'City'], '>', [HP.point, 'Points']]) },
-  { title: 'Your turn', text: 'Place a worker, play a card, or Prepare for the next season. Then the next player goes.', pic: () => hpics([[HP.worker, 'Worker'], [HP.back, 'Card'], [() => HP.season(1), 'Prepare']]) },
-  { phase: 'turn', title: 'Place a worker', text: 'Tap a glowing spot. Your worker goes there and its effect happens at once.', pic: () => hpics([[HP.worker, 'Worker'], '>', [() => HP.res('twig'), 'Goods']]) },
-  { phase: 'turn', title: 'Or play a card', text: 'Tap a glowing card in your hand or the meadow, then pay its price in resources.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Price']]) },
-  { phase: 'turn', title: 'Spots fill up', text: 'Most spots hold only one worker, so good ones go fast. Spots marked Shared hold more.', pic: () => hpics([[HP.worker, 'Taken'], [() => HP.res('resin'), 'Shared']]) },
-  { phase: 'turn', title: 'Events and the Long Road', text: 'Flags and stars are events: claim one when your city meets its need. The Long Road opens in Autumn.', pic: () => hpics([[HP.flag, 'Event'], [HP.road, 'Long Road']]) },
-  { phase: 'prepare', title: 'Prepare', text: 'When all your workers are out, tap Prepare. They come home and you gain more workers.', pic: () => hpics([[HP.worker, 'Home'], '>', [() => HP.season(1), 'Spring']]) },
-  { phase: 'prepare', title: 'Production pays', text: 'In Spring and Autumn every green Production card in your city gathers goods again.', pic: () => hpics([[() => HP.res('twig'), 'Twigs'], [() => HP.res('berry'), 'Berries'], [() => HP.res('resin'), 'Resin']]) },
-  { phase: 'prepare', title: 'Your own seasons', text: 'Each player moves through Winter, Spring, Summer and Autumn at their own pace.', pic: () => hpics([[() => HP.season(0)], '>', [() => HP.season(1)], '>', [() => HP.season(2)], '>', [() => HP.season(3)]]) },
-  { phase: 'lastCall', title: 'Nothing left? Pass', text: 'When you have no workers or plays left, tap Pass twice. You take no more turns.', pic: () => hpics([[HP.worker, 'All out'], '>', [HP.tree, 'Done']]) },
-  { phase: 'lastCall', title: 'Your city still scores', text: 'When everyone has passed, your cards, point tokens, events and Long Road workers are scored.', pic: () => hpics([[HP.back, 'Cards'], [HP.point, 'Tokens'], [HP.flag, 'Events']]) },
-  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. A tie goes to the player with more events claimed.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
-  { phase: 'how', title: 'Several ways', text: 'This card or spot can be used in more than one way. Tap the option you want.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Pay']]) },
-  { phase: 'how', title: 'Pay or play free', text: 'Pay the price, or play a critter free into its matching building when that building is open.', pic: () => hpics([[HP.cost, 'Pay'], [HP.star, 'Or free']]) },
-  { phase: 'how', title: 'Cheaper plays', text: 'Some cards you own make a play cheaper. They show up as extra buttons.', pic: () => hpics([[HP.back, 'Card'], '>', [() => HP.res('pebble'), 'Fewer']]) },
+  { title: 'The goal', text: 'Build the best city. When everyone has passed, the highest total wins.', pic: () => hpics([[HP.tree, 'City'], '>', [HP.point, 'Points']]) },
+  { title: 'Your turn', text: 'Place a worker, play a card, or Prepare. Then the next player goes.', pic: () => hpics([[HP.worker, 'Worker'], [HP.back, 'Card'], [() => HP.season(1), 'Prepare']]) },
+  { phase: 'turn', title: 'Place a worker', text: 'Tap a glowing spot. Your worker goes there and you get its reward.', pic: () => hpics([[HP.worker, 'Worker'], '>', [() => HP.res('twig'), 'Goods']]) },
+  { phase: 'turn', title: 'Or play a card', text: 'Tap a glowing card in your hand or the meadow. Then pay its price.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Price']]) },
+  { phase: 'turn', title: 'Spots fill up', text: 'Most spots hold one worker, so good ones go fast. Shared spots hold more.', pic: () => hpics([[HP.worker, 'Taken'], [() => HP.res('resin'), 'Shared']]) },
+  { phase: 'turn', title: 'Events and the Long Road', text: 'Flags and stars are events. Claim one when your city fits it. The Long Road opens in Autumn.', pic: () => hpics([[HP.flag, 'Event'], [HP.road, 'Long Road']]) },
+  { phase: 'prepare', title: 'Prepare', text: 'When all workers are out, tap Prepare. They come home and you gain more.', pic: () => hpics([[HP.worker, 'Home'], '>', [() => HP.season(1), 'Spring']]) },
+  { phase: 'prepare', title: 'Production pays', text: 'In Spring and Autumn, each green Production card pays again.', pic: () => hpics([[() => HP.res('twig'), 'Twigs'], [() => HP.res('berry'), 'Berries'], [() => HP.res('resin'), 'Resin']]) },
+  { phase: 'prepare', title: 'Your own seasons', text: 'Each player goes through Winter, Spring, Summer and Autumn alone.', pic: () => hpics([[() => HP.season(0)], '>', [() => HP.season(1)], '>', [() => HP.season(2)], '>', [() => HP.season(3)]]) },
+  { phase: 'lastCall', title: 'Nothing left? Pass', text: 'With nothing left to do, tap Pass twice. You take no more turns.', pic: () => hpics([[HP.worker, 'All out'], '>', [HP.tree, 'Done']]) },
+  { phase: 'lastCall', title: 'Your city still scores', text: 'When all have passed, cards, tokens, events and Long Road workers score.', pic: () => hpics([[HP.back, 'Cards'], [HP.point, 'Tokens'], [HP.flag, 'Events']]) },
+  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. A tie goes to the player with more events.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
+  { phase: 'how', title: 'Several ways', text: 'This can be used in more than one way. Tap the option you want.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Pay']]) },
+  { phase: 'how', title: 'Pay or play free', text: 'Pay the price. Or play a critter free into its open matching building.', pic: () => hpics([[HP.cost, 'Pay'], [HP.star, 'Or free']]) },
+  { phase: 'how', title: 'Cheaper plays', text: 'Some of your cards make a play cheaper. They show as extra buttons.', pic: () => hpics([[HP.back, 'Card'], '>', [() => HP.res('pebble'), 'Fewer']]) },
   { phase: 'how', title: 'The Long Road', text: 'In Autumn, discard 5, 4, 3 or 2 cards. Your worker stays and scores that many points.', pic: () => hpics([[HP.back, 'Discard'], '>', [HP.road, 'Road'], '>', [HP.point, 'Points']]) },
-  { phase: 'pickCard', title: 'Pick a card', text: 'The power needs a card. Tap one that glows: it may be in your hand, the meadow or your city.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.star, 'Power']]) },
+  { phase: 'pickCard', title: 'Pick a card', text: 'Tap a glowing card. It may be in your hand, the meadow or your city.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.star, 'Power']]) },
   { phase: 'pickCard', title: 'Read it first', text: 'Press and hold any card to read it big before you choose.', pic: () => hpics([[HP.back, 'Hold'], '>', [HP.card, 'Read']]) },
-  { phase: 'pickRes', title: 'Pick a resource', text: 'A power asks for a resource. Tap one of the icons in the row below the board.', pic: () => hpics([[() => HP.res('twig')], [() => HP.res('resin')], [() => HP.res('pebble')], [() => HP.res('berry')]]) },
-  { phase: 'pickRes', title: 'Four resources', text: 'Twigs, resin, pebbles and berries pay for cards. The row under your city shows your stock.', pic: () => hpics([[HP.cost, 'Prices'], '>', [HP.back, 'Cards']]) },
+  { phase: 'pickRes', title: 'Pick a resource', text: 'Tap a resource icon in the row below the board.', pic: () => hpics([[() => HP.res('twig')], [() => HP.res('resin')], [() => HP.res('pebble')], [() => HP.res('berry')]]) },
+  { phase: 'pickRes', title: 'Four resources', text: 'Twigs, resin, pebbles and berries pay for cards. The row under your city shows what you hold.', pic: () => hpics([[HP.cost, 'Prices'], '>', [HP.back, 'Cards']]) },
   { phase: 'pickPlace', title: 'Pick a place', text: 'Tap the glowing place or worker the power should use.', pic: () => hpics([[HP.haven, 'Place'], '>', [HP.worker, 'Worker']]) },
   { phase: 'pickPlace', title: 'Read before you tap', text: 'Press and hold a place to read what it gives.', pic: () => hpics([[HP.haven, 'Hold'], '>', [HP.star, 'Read']]) },
-  { phase: 'pickOption', title: 'Make a choice', text: 'The power gives you options. Tap the one you want in the row below the board.', pic: () => hpics([[HP.star, 'Power'], '>', [HP.cost, 'Options']]) },
-  { phase: 'pickOption', title: 'Read each button', text: 'Each button says what it does. Pick the one that helps your city most.', pic: () => hpics([[HP.back, 'Option'], [HP.back, 'Option']]) }
+  { phase: 'pickOption', title: 'Make a choice', text: 'Tap the option you want in the row below the board.', pic: () => hpics([[HP.star, 'Power'], '>', [HP.cost, 'Options']]) },
+  { phase: 'pickOption', title: 'Read each button', text: 'Each button says what it does. Pick the one that helps most.', pic: () => hpics([[HP.back, 'Option'], [HP.back, 'Option']]) }
 ];
 // ---------------------------------------------------------------- phases
 // the moment the player is deciding in (null when there is nothing to decide on the board)
@@ -81,10 +81,10 @@ function hlpWhy(m, a) {
   if (m.type === 'worker') {
     if (m.k === 'basic') { const b = D.basic[m.i]; t = b.name + ': ' + b.text.replace(/\s*Shared\.?$/, ''); }
     else if (m.k === 'forest') { const f = D.forest[G.forest[m.i]]; t = f.name + ': ' + f.text; }
-    else if (m.k === 'haven') t = 'Barter Burrow turns spare cards into resources: 1 for every 2.';
-    else if (m.k === 'journey') t = 'The Long Road: discard cards, and this worker stays and scores ' + D.journey[m.i].points + ' points.';
-    else if (m.k === 'event') { const e = m.e === 'b' ? D.basicEvents[G.bev[m.i].k] : D.specialEvents[G.sev[m.i].k]; t = 'Your city meets this event: claim it for ' + (e.pts || 'bonus') + ' points.'; }
-    else if (m.k === 'dest') t = (m.o === a ? 'Use ' + cname(m.c) + ' in your city.' : 'Visit ' + cname(m.c) + ': you use its power, its owner gets a point token.');
+    else if (m.k === 'haven') t = 'Barter Burrow turns 2 spare cards into 1 resource.';
+    else if (m.k === 'journey') t = 'The Long Road: discard cards. This worker stays and scores ' + D.journey[m.i].points + ' points.';
+    else if (m.k === 'event') { const e = m.e === 'b' ? D.basicEvents[G.bev[m.i].k] : D.specialEvents[G.sev[m.i].k]; t = 'Your city fits this event. Claim it for ' + (e.pts || 'bonus') + ' points.'; }
+    else if (m.k === 'dest') t = (m.o === a ? 'Use ' + cname(m.c) + ' in your city.' : 'Visit ' + cname(m.c) + ': you use its power. Its owner gets a point token.');
   } else if (m.type === 'play') {
     const nm = cname(m.card), pts = cdef(m.card).pts;
     if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');

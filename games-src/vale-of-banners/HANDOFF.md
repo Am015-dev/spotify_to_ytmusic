@@ -70,3 +70,17 @@ Spending (after fixes): hard ends with 3.8 silver / 3.0 workers, normal 7.9 / 7.
 - Art: all code-drawn placeholders (92 slots, Flow prompts ready: ASSETS.md, ASSET-CHECK 92/92/0). Music files not made (cues ready).
 - Online P2P not built (not in this brief). No undo. Estate on phone is ~36 px hexes (tap OK, could be bigger if the dock collapses).
 - Story score thresholds are estimates; the act-3 chapters vs hard AI are tough (hard averages ~155).
+
+## W458: plain words + play it like a board game (branch shelf/W458-vale, not deployed)
+- New `src/feel.js` (built in before ui.js): drag a die onto a stall and the tile pops onto your finger; glowing estate spaces show where
+  your other die can build it, drop there = take + build in one gesture (drop anywhere else = take only, drop on the dice = cancel).
+  Drag a stored tile or a die onto a glowing space to build, a die onto goods to sell. Workers are meeples (the red figure chip): drag one
+  onto a die, left half -1, right half +1 (tap the die to undo); glows and the prompt follow the moved die. Taps still work everywhere.
+- Snap = vibrate tick + sound; a full region flashes and its points fly to the score. Rival builds show on a peek card with its estate
+  and the tile flying in; the turn banner rolls the dice. Phone: two-finger pinch / drag to pan the estate, "Fit" resets, the camera
+  punches in on each of your placements. Region outlines (cream, gold when full) drawn as SVG over the estate; bigger numbers;
+  hexes touch so outlines read; PC market is 3 columns with 84 px tiles.
+- Copy: every instruction line rewritten short and plain (ui.js, story.js coach lines, rules drawer). Engine untouched.
+- Tests: `node drag-play.js` = a whole game by drag at 390x844 and 1440x900 (checks every drop changed the game). Shots: playable-shots/v4-*.
+- Not done: build-all --quick could not run here (games-src/node_modules/.bin/playwright missing); shared FEEL.md did not exist yet.
+  build-all rewrote games-src/nightrun/MODULES-COMPACT.md as a side effect; left uncommitted (not mine to change).

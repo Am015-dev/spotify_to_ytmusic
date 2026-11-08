@@ -1,8 +1,8 @@
 {
  "slug": "tidewake",
- "when": "2026-11-08T05:54Z",
- "secs": 120,
- "totalSecs": 260,
+ "when": "2026-11-08T07:20Z",
+ "secs": 45,
+ "totalSecs": 111,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,18 +36,18 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 120,
-   "turns": 143,
-   "clicks": 155,
+   "secs": 45,
+   "turns": 55,
+   "clicks": 61,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 14
+   "messagesSeen": 6
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 8,
+   "secs": 9,
    "turns": 4,
    "clicks": 6,
    "endedBy": "result",
@@ -58,13 +58,13 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 121,
-   "turns": 131,
-   "clicks": 148,
+   "secs": 46,
+   "turns": 49,
+   "clicks": 49,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 12
+   "messagesSeen": 6
   },
   {
    "size": "pc",

@@ -117,6 +117,7 @@ function fxSeason(s, mine) {
 }
 // after a move was applied and drawn: pieces land where they went
 function fxLand(m, seat, src, preChip) {
+  if (PV_ON && pvLand(m, seat, src, preChip)) return;
   if (!ANIM || !m) return;
   const mine = seat === viewSeat();
   if (m.type === 'play' && mine) { const el = $('.sc[data-id="' + m.card + '"]'); if (el && src) flipFrom(el, src, 520); }
@@ -134,7 +135,7 @@ function fingerWanted() {
   return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
 }
 // a hand chip outside the sideways-scrolling hand row: bring it into view (the row remembers where it was)
-function hscrollTo(el) { const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
+function hscrollTo(el) { if (PV_ON && pvScrollTo(el)) return; const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
   if (hs.classList.contains('vert')) { if (c < hs.scrollTop) hs.scrollTop = c - 4; else if (d > hs.scrollTop + hs.clientHeight) hs.scrollTop = d - hs.clientHeight + 4; UI.hsy = hs.scrollTop; }
   else { if (a < hs.scrollLeft + 36) hs.scrollLeft = Math.max(0, a - 40); else if (b > hs.scrollLeft + hs.clientWidth) hs.scrollLeft = b - hs.clientWidth + 4; UI.hsx = hs.scrollLeft; } }
 function placeFinger() {
@@ -150,4 +151,68 @@ function placeFinger() {
   const r = frameRect(el); if (!r || r.w < 4) return;
   const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false;
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+}
+// ---- Play view (W457): tab taps, drag a worker meeple onto a place or a hand card up into the city, a tick on every usable tap
+if (PV_ON) {
+  document.addEventListener('click', e => {
+    if (UI.pvDragEnd && Date.now() - UI.pvDragEnd < 450) { e.stopPropagation(); e.preventDefault(); return; }
+    const t = e.target.closest && e.target.closest('[data-a="pvtab"]'); if (t) { e.stopPropagation(); pvSetTab(t.dataset.v); snd('click', { vol: .4 }); }
+    // a board tap while a message card is up (or before the game starts) still answers: a small 'not now' shake
+    const bt = e.target.closest && e.target.closest('#bd.pv [data-a="t"]'); if (bt && (!G || UI.cards.length || !UI.started)) shake(bt);
+  }, true);
+  // ---- drag: a worker meeple onto a place (or a rival's open place), a hand card up into the city
+  (function () {
+    let d = null;
+    const under = (x, y) => { const e = document.elementFromPoint(x, y); return e && e.closest('#bd .pv-panel [data-a="t"]'); };
+    const clear = () => { document.querySelectorAll('#bd .pv-over').forEach(e => e.classList.remove('pv-over')); };
+    document.addEventListener('pointerdown', e => {
+      if (!PV_ON || (e.button != null && e.button > 0)) return;
+      const src = e.target.closest && e.target.closest('#bd.pv .pv-meeple.can, #bd.pv .hc');
+      if (!src || UI.animBusy || UI.cards.length || !G || G.phase === 'over') return;
+      d = { src, x0: e.clientX, y0: e.clientY, on: false, kind: src.classList.contains('hc') ? 'card' : 'worker', pid: e.pointerId };
+    }, true);
+    document.addEventListener('pointermove', e => {
+      if (!d || e.pointerId !== d.pid) return;
+      const dx = e.clientX - d.x0, dy = e.clientY - d.y0;
+      if (d.swipe) { if (d.swipe.hs) d.swipe.hs.scrollLeft = d.swipe.x0 - dx; e.preventDefault(); return; }
+      if (!d.on) {
+        if (Math.hypot(dx, dy) < 10) return;
+        if (d.kind === 'card' && Math.abs(dx) > Math.abs(dy)) { const hs = d.src.closest('.strip.hand'); d.swipe = { hs, x0: hs ? hs.scrollLeft : 0 }; if (hs) hs.style.scrollSnapType = 'none'; d.on = true; UI.lp = false; }   // sideways: swipe the hand row
+        else if (d.kind === 'card' && dy > -4) { d = null; return; }
+        if (d.swipe) { e.preventDefault(); return; }
+        d.on = true; UI.lp = false;
+        const r = d.src.getBoundingClientRect(); d.ox = d.x0 - r.left; d.oy = d.y0 - r.top;
+        const g = d.src.cloneNode(true); g.className = 'pv-ghost ' + d.kind; g.removeAttribute('data-a'); g.style.cssText = `width:${r.width}px;height:${r.height}px`; document.body.appendChild(g); d.g = g;
+        d.src.classList.add('pv-lifted');
+        if (d.kind === 'card') { if (pvTall()) pvSetTab('city', true); $('#bd').classList.add('pv-dragcard'); }
+        else { if (pvTall() && UI.pvTab === 'meadow') pvSetTab('places', true); $('#bd').classList.add('pv-dragw'); }
+      }
+      if (d.g) d.g.style.transform = `translate(${e.clientX - d.ox}px,${e.clientY - d.oy}px) rotate(${d.kind === 'card' ? Math.max(-12, Math.min(12, dx / 12)) : 0}deg) scale(1.08)`;
+      clear();
+      if (d.kind === 'worker') { const t = under(e.clientX, e.clientY); if (t) t.classList.add('pv-over'); }
+      else { const hs = $('#bd .strip.hand'), top = hs ? hs.getBoundingClientRect().top : innerHeight; $('#bd').classList.toggle('pv-armed', e.clientY < top - 10); }
+      e.preventDefault();
+    }, { passive: false });
+    const end = (e, cancel) => {
+      if (!d || (e && e.pointerId !== d.pid)) return; const dd = d; d = null;
+      if (!dd.on) return;
+      if (dd.swipe) { UI.pvDragEnd = Date.now(); if (dd.swipe.hs) { dd.swipe.hs.style.scrollSnapType = ''; UI.hsx = dd.swipe.hs.scrollLeft; } return; }
+      UI.pvDragEnd = Date.now(); clear(); const bd = $('#bd'); bd.classList.remove('pv-dragcard', 'pv-dragw', 'pv-armed');
+      const x = e ? e.clientX : 0, y = e ? e.clientY : 0; let ok = false, tg = null, el = null;
+      if (!cancel && dd.kind === 'worker') { el = under(x, y); tg = el && el.dataset.t; ok = !!tg && /^(w:|d:|q:)/.test(tg); }
+      if (!cancel && dd.kind === 'card') { const hs = $('#bd .strip.hand'), top = hs ? hs.getBoundingClientRect().top : innerHeight; el = dd.src; tg = el.dataset.t; ok = y < top - 10 && !!tg; }
+      const br = $('#board').getBoundingClientRect(), at = { x: x - br.left - 20, y: y - br.top - 20, w: 40, h: 40 };
+      if (dd.g) dd.g.remove(); dd.src.classList.remove('pv-lifted');
+      if (ok && !/^x:/.test(tg)) {
+        PV_FEEL.tick(16);
+        if (dd.kind === 'worker') UI.pvDropAt = at; else { const r = frameRect(dd.src); if (r) dd.src.style.transform = `translate(${at.x + 20 - (r.x + r.w / 2)}px,${at.y + 20 - (r.y + r.h / 2)}px)`; }
+        onTarget(tg, el);
+      } else if (ok || (el && tg && /^x:/.test(tg))) { onTarget(tg, el); if (pvTall() && dd.kind === 'card') pvSetTab(UI.pvMine && availW(G.players[Math.max(0, viewSeat())]) ? 'places' : 'meadow', true); }
+      else if (pvTall() && dd.kind === 'card') render();
+    };
+    document.addEventListener('pointerup', e => end(e, false), true);
+    document.addEventListener('pointercancel', e => end(e, true), true);
+  })();
+  // a tap on a place or card I can use: a short tick, like a drop
+  document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('#bd.pv .glow[data-a="t"]'); if (t) PV_FEEL.tick(10); });
 }

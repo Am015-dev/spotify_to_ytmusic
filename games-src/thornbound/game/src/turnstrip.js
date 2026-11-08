@@ -4,6 +4,8 @@ const ST=()=>window.TBSTORY||{};
 const cast=id=>{const c=(window.CAMPAIGN&&window.CAMPAIGN.cast&&window.CAMPAIGN.cast[id])||{};return {name:(c.name||id||'').split(/[ ,]/).slice(0,2).join(' ').replace(/^Old /,'Old '),emoji:c.emoji||'',color:c.color||'#8e5bb5'}};
 const css=document.createElement('style');css.textContent=`
 #tbturn{grid-area:tb;display:flex;align-items:center;gap:10px;height:72px;box-sizing:border-box;overflow:hidden;padding:6px 12px;background:#1a1024;border-bottom:1px solid rgba(232,200,120,.35);z-index:3;cursor:default}
+#tbturn[hidden]{display:none!important}
+body.in-start #pc,body.in-start #ppop,body.in-start #tbturn{visibility:hidden!important}
 #tbturn .tbt-chip{flex:0 0 auto;font:700 14px/1.1 Cinzel,Georgia,serif;letter-spacing:.04em;text-transform:uppercase;padding:7px 10px;border-radius:8px;background:#f0c860;color:#2a1a05;border:2px solid #f0c860;max-width:132px;text-align:center}
 #tbturn .tbt-chip.rv{background:#1a1024;color:#fff;border-color:var(--c,#c0392b)}
 #tbturn .tbt-chip.wt{background:#2a2036;color:#f6ecd2;border-color:#8a7aa0}
@@ -11,6 +13,8 @@ const css=document.createElement('style');css.textContent=`
 #tbturn .tbt-line.sm{font-size:14px;line-height:1.2}
 html.bf-w #tbturn{height:auto;min-height:72px}
 @media (max-height:620px){html:not(.bf-w) #tbturn{height:54px;padding:4px 10px}#tbturn .tbt-line{max-height:42px;font-size:15px;line-height:1.2}#tbturn .tbt-line.sm{font-size:14px;line-height:1.2}#tbturn .tbt-chip{padding:5px 8px}}
+#tbturn .tbt-term{display:inline;min-height:0;padding:0;margin:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline dotted #f0c860 2px;text-underline-offset:3px;cursor:help}
+#tbturn .tbt-term:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:3px}
 #tbturn .tbt-goal{flex:0 0 auto;min-height:44px;min-width:56px;padding:0 10px;border-radius:8px;border:2px solid #f0c860;background:transparent;color:#f0c860;font:700 14px Cinzel,Georgia,serif}
 #tbgoal{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;background:rgba(10,6,14,.82);padding:16px}
 #tbgoal .gc{max-width:420px;width:100%;background:#24152f;border:2px solid #f0c860;border-radius:14px;padding:22px 20px 18px;color:#f8efd6;font:500 17px/1.4 'EB Garamond',Georgia,serif;box-shadow:0 12px 40px rgba(0,0,0,.6)}
@@ -33,7 +37,7 @@ html.tb-dim .tb-loc:not(.glow){opacity:.45;transition:opacity .25s}
 @media (prefers-reduced-motion:reduce){#tbturn.pulse .tbt-chip{animation:none}}
 `;document.head.appendChild(css);
 let el=null;const strip=()=>{if(el&&el.isConnected)return el;const rv=document.getElementById('rivals');if(!rv)return null;el=document.createElement('div');el.id='tbturn';el.setAttribute('role','status');el.setAttribute('aria-live','polite');rv.parentNode.insertBefore(el,rv.nextSibling);
-  el.addEventListener('click',ev=>{if(ev.target.closest&&ev.target.closest('.tbt-goal')){showGoal(false,true);return}if(ev.target.closest&&ev.target.closest('.tbt-skip')){skipTut();return}if(vNow){nextVoice();return}if(UI._tbHold){UI._tbHold=0;paint();try{pump()}catch(x){}return}speedUp()});return el};
+  el.addEventListener('click',ev=>{const jt=ev.target.closest&&ev.target.closest('.tbt-term');if(jt){showTerm(jt.dataset.tbterm);return}if(ev.target.closest&&ev.target.closest('.tbt-goal')){showGoal(false,true);return}if(ev.target.closest&&ev.target.closest('.tbt-skip')){skipTut();return}if(vNow){nextVoice();return}if(UI._tbHold){UI._tbHold=0;paint();try{pump()}catch(x){}return}speedUp()});return el};
 function skipTut(){try{GXT.markDone('thornbound')}catch(e){}const pro=UI.coachPro;UI.coachOn=0;clearVoice();tutLeave();if(pro&&typeof GXC!=='undefined'){showStart();GXC.open()}else{UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()}}
 function speedUp(){if(!G||UI.card||G.over)return;const w=whoActs();if(w.ai.length&&viewSeatForQ()==null){clearTimeout(_pumpT);aiStep(w);pump()}}
 // read time (owner rule, 8 Nov 2026): a message stays at least 4 s plus 1 s per 10 words; a tap skips. Speed > 1 (player's choice) shortens it.
@@ -46,7 +50,8 @@ function voice(who,text,ms,tag){if(!text)return;const tx=typeof text==='function
 function nextVoice(){clearTimeout(vT);vNow=vq.shift()||null;paint();if(vNow)vT=setTimeout(nextVoice,window.ANIM?vNow.ms:0)}
 function clearVoice(){vq=[];vNow=null;clearTimeout(vT)}
 // ---- what the strip says right now
-function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.card.kind==='over'){e.hidden=true;return}e.hidden=false;
+const covered=()=>{try{const st=document.getElementById('start');return !!(st&&!st.hidden)||!!document.querySelector('.gxc-map-on:not([hidden]),.gxc-scene-on:not([hidden]),#tbcend')}catch(x){return false}};
+function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.card.kind==='over'||covered()){e.hidden=true;return}e.hidden=false;
   let html='',cls='',key='';
   if(vNow){const c=cast(vNow.who);key='v'+vNow.text;cls='voice';e.style.setProperty('--c',c.color);html='<span class="tbt-face" aria-hidden="true">'+esc2(c.emoji)+'</span><span class="tbt-line"><span class="sr">'+esc2(c.name)+': </span>'+esc2(vNow.text)+'</span>'}
   else if(false){const s=UI._tbCap.s;key='c'+UI._tbCap.t;e.style.setProperty('--c',fcol(s));html='<span class="tbt-chip rv">'+esc2(poss(shortName(s)))+' turn</span><span class="tbt-line">'+esc2(UI._tbCap.t)+'</span>'}
@@ -54,19 +59,29 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
   else if(G.over){key='over';html='<span class="tbt-chip">Game over</span><span class="tbt-line">The last round is done.</span>'}
   else if(G.q){const s=viewSeatForQ();
     if(s!=null){const k=G.q.kind;const ask=(ST().ask||{});key='me'+k+(G.q.t||'');const line=(k==='menu'||G.q.t==='menu')?(ask.menu):ask[k];
-      const t=line||(typeof promptText==='function'?promptText(G.q,s)+'.':'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+esc2(t)+'</span>'}
+      const t=line||(typeof promptText==='function'?promptText(G.q,s)+'.':'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+jargon(esc2(t))+'</span>'}
     else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));html='<span class="tbt-chip rv">'+esc2(poss(shortName(a)))+' turn</span><span class="tbt-line">Watch the board.</span>'}
       else{key='w';html='<span class="tbt-chip wt">Wait</span><span class="tbt-line">Waiting for the other players.</span>'}}}
   if(!G.over&&!coachOn())html+='<button class="tbt-goal" data-tbgoal type="button" aria-label="Show the goal">Goal</button>';
   if(coachOn()&&!G.over)html+='<button class="tbt-skip" data-gxt-skip type="button" aria-label="Skip tutorial">Skip tutorial</button>';
   if(e.dataset.key!==key&&/^me/.test(key)&&UI.pop&&UI._popRival){try{closePop(true)}catch(x){}}   // an info card opened during the rival's turn must not cover your own move
   if(cls==='voice')e.removeAttribute('data-fa-skip');else e.setAttribute('data-fa-skip','');
+  if(e.dataset.key!==key)UI._jgKey=key;
   if(e.dataset.key!==key){e.dataset.key=key;e.className=cls+(cls==='voice'?' pulse':'');e.innerHTML=html;try{const ln=e.querySelector('.tbt-line');if(ln&&ln.scrollHeight>ln.clientHeight+1)ln.classList.add('sm')}catch(x){}try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}
   else{try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}}
 // the full text of the message on screen (news, clash, bids, round end): shown whole in the strip, timed by its length
 function cardMsg(c){try{if(c.kind==='news'&&c.items&&c.items.length){if(c.big&&c.items.every(infK))return {t:newsHead(c.items[0],c.items)+'.',s:null};const s0=c.items[0].s;const it=c.items.filter((x,i)=>i===0||x.s!==s0).slice(0,3).map(x=>plain(x.text)).join(' ');return {t:it,s:c.items[0].s}}
   if(c.kind==='event'){const e=c.ev;if(e.t==='bids')return {t:'Bids flip. The highest bid picks first.',s:null};if(e.t==='clash')return {t:UI._clashLine||('The Clash in '+REG[e.r]),s:null};if(e.t==='summary')return {t:e.last?'The last round is over.':'Round '+e.round+' is over.',s:null}}}catch(x){}
   return {t:'Watch the board. Tap to go on.',s:null}}
+// one line per game word, shown when the word is tapped (the first time it appears in a game)
+const JARGON={clash:['Clash','The fight in one region. Highest total Strength wins.'],herald:['Herald','Your envoy. Win its region to score its location, plus 1.'],
+  govern:['Govern','An Autumn action: move a card with votes into a Council.'],council:['Council','Three Councils give a lasting bonus for the votes there.'],
+  favour:['Favour','A disc from the Meadow. It unlocks your faction\u2019s power.']};
+const JRE=/\b(Clash(?:es)?|Heralds?|Govern|Councils?|(?:Kingdom\u2019s |Kingdom's )?Favour)\b/g;
+function jkey(w){w=w.toLowerCase();return w.indexOf('clash')===0?'clash':w.indexOf('herald')===0?'herald':w.indexOf('govern')===0?'govern':w.indexOf('council')===0?'council':'favour'}
+function jargon(h){UI._jg=UI._jg||{};if(UI._jgG!==G){UI._jgG=G;UI._jg={}}const used={};
+  return h.replace(JRE,w=>{const k=jkey(w);if(used[k]||(UI._jg[k]&&UI._jg[k]!==UI._jgKey))return w;used[k]=1;if(!UI._jg[k])UI._jg[k]=UI._jgKey;return '<button type="button" class="tbt-term" data-tbterm="'+k+'">'+w+'</button>'})}
+function showTerm(k){const j=JARGON[k],el=document.getElementById('gdef');if(!j||!el)return;el.innerHTML='<p><b>'+esc2(j[0])+'</b>: '+esc2(j[1])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+(typeof ico==='function'?ico('x'):'x')+'</button>';el.hidden=false;el.setAttribute('role','dialog');try{sfx('tap')}catch(x){}}
 window.tbPaint=paint;
 (function(){const o=openPop;openPop=function(){UI._popRival=!!(G&&G.q&&viewSeatForQ()==null);const r=o.apply(this,arguments);
   // the zoomed card face is a picture: its printed words repeat the readable text beside it (name, effect, suit), so the face is decoration
@@ -129,7 +144,9 @@ function coachCheck(){try{if(!coachOn())return;if(G.over){if(!UI._tbEnd)tbEnd();
   else if(sig==='news')say('score',true);
   else if(sig==='evsummary')say('round');
 }catch(e){}}
-setInterval(coachCheck,220);window.tbCoachCheck=coachCheck;
+setInterval(coachCheck,220);
+// a menu, the chapter map or a story scene on top: the strip (and any coach line) is hidden, never shown under it
+setInterval(()=>{try{const e=el&&el.isConnected?el:null;if(!e)return;const c=covered();if(c&&!e.hidden)e.hidden=true;else if(!c&&e.hidden&&G&&UI.started)paint()}catch(x){}},250);window.tbCoachCheck=coachCheck;
 function tbEnd(){UI._tbEnd=1;if(TBCOACH.seen.indexOf('round')<0)TBCOACH.seen.push('round');try{GXT.markDone('thornbound')}catch(e){}
   const C=(ST().coach)||{};let over='';try{over=overHTML()}catch(e){}
   const box=document.createElement('div');box.id='tbcend';box.style.cssText='position:fixed;inset:0;z-index:9999;background:#140c1a;color:#f6ecd2;overflow:auto;padding:16px;font:600 16px/1.35 "EB Garamond",Georgia,serif';
@@ -161,10 +178,13 @@ window.tbShowGoal=showGoal;
 // ---- the rival's next step waits until its caption has been read (tap the strip to go on)
 (function(){const o=pump;pump=function(){try{if(document.getElementById('tbgoal')&&G&&UI.started&&viewSeatForQ()==null){clearTimeout(_pumpT);_pumpT=setTimeout(pump,250);return}if(window.ANIM&&G&&UI.started&&!UI.card&&UI._tbHold&&UI._tbHold>Date.now()&&viewSeatForQ()==null&&!(typeof NET!=='undefined'&&NET.on)){clearTimeout(_pumpT);if(UI._tbHeldAt!==UI._tbHold){UI._tbHeldAt=UI._tbHold;try{renderAll()}catch(x){}}_pumpT=setTimeout(pump,Math.max(30,UI._tbHold-Date.now()+30));return}}catch(e){}return o.apply(this,arguments)}})();
 // ---- the header status stays steady: it names whose turn it is, never the rival's play-by-play (that is on the board)
-(function(){const o=statusText;statusText=function(){const t=o.apply(this,arguments);try{const c=UI.card;if(G&&!G.over&&c&&(c.kind==='news'||c.kind==='event'))return {text:'Round '+Math.max(1,G.round)+' of '+G.rounds,seat:-1};if(G&&!G.over&&!c&&G.q&&viewSeatForQ()==null){const w=whoActs();if(w.ai&&w.ai.length)return {text:poss(shortName(w.ai[0]))+' turn',seat:w.ai[0]}}}catch(e){}return t}})();
+(function(){const o=statusText;statusText=function(){const t=o.apply(this,arguments);try{if(G&&!G.over&&innerWidth<700&&UI.started)return {text:'Round '+Math.max(1,G.round)+' of '+G.rounds,seat:-1}}catch(e){}try{const c=UI.card;if(G&&!G.over&&c&&(c.kind==='news'||c.kind==='event'))return {text:'Round '+Math.max(1,G.round)+' of '+G.rounds,seat:-1};if(G&&!G.over&&!c&&G.q&&viewSeatForQ()==null){const w=whoActs();if(w.ai&&w.ai.length)return {text:poss(shortName(w.ai[0]))+' turn',seat:w.ai[0]}}}catch(e){}return t}})();
 (function(){const o=renderBar;renderBar=function(){const r=o.apply(this,arguments);try{const b=document.getElementById('barstat');if(b)b.setAttribute('data-fa-skip','')}catch(e){}return r}})();
 // ---- Learn to play is the coached free-play game (no spotlight steps): report it to the shared tutor API as a running tutor whose steps are done
 (function(){if(typeof GXT==='undefined')return;const run=()=>{try{return coachOn()&&!G.over&&!UI._tbEnd}catch(e){return false}};
   const r=GXT.running,st=GXT.state;GXT.running=function(){return r.apply(GXT,arguments)||run()};
   GXT.state=function(){if(!r.call(GXT)&&run())return {active:false,phase:'end',coach:true};return st.apply(GXT,arguments)}})();
+// ---- leaving Learn for the main menu ends the coached game (nothing keeps playing under the title); any real game clears the coach
+(function(){const o=showStart;showStart=function(){try{if(coachOn()||UI.coachOn){UI.coachOn=0;clearVoice();const c=document.getElementById('tbcend');if(c)c.remove();if(UI.cfg&&UI.cfg.tutorial){tutLeave();UI.card=null}}}catch(e){}return o.apply(this,arguments)}})();
+(function(){const o=newGame;newGame=function(mode){if(mode!=='tutorial'){try{UI.coachOn=0;clearVoice();const c=document.getElementById('tbcend');if(c)c.remove()}catch(e){}}return o.apply(this,arguments)}})();
 })();

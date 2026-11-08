@@ -92,10 +92,13 @@ function atkPopHTML(d){const s=ship(G.cur);const rows=[];for(const w of weaponsF
   ${rows.map(o=>`<div class="pp-r${o===best?' rec':''}"><div class="dice-n"><b>${o.sd.atk}</b> attack dice <span class="vs">vs</span> <b>${o.sd.def}</b> defence</div><div class="small muted">${o.w.k==='P'?'Primary weapon':esc(o.w.n)} · expected ≈${o.e.toFixed(1)} damage</div></div>`).join('')}
   <ul class="pp-m">${mods.map(m=>`<li>${m}</li>`).join('')||'<li class="muted">No modifiers right now.</li>'}</ul></div>
   <div class="pp-f">${rows.map(o=>`<button class="btn ${o===best?'primary':''}" data-act="fire" data-w="${o.w.k}" data-t="${d.id}">🎯 Fire${o.w.k!=='P'?' '+esc(o.w.n):''}<small>${o.sd.atk} dice, range ${o.t.rg}</small></button>`).join('')}</div>`}
+// pilot portraits (owner art, media/camp-*.webp) on the ship card
+const PORTRAIT={kael:'kael',knife:'knife',hex:'hex',drill:'drill',slate:'drill',onyx:'hammer',nightjar:'wailer',ember:'sorin',cadet:'kira',brink:'quill'};
+function porHTML(s){const k=PORTRAIT[s.pilot];return k?`<img class="pp-por" src="media/camp-${k}.webp" alt="" width="44" height="44">`:''}
 function infoPopHTML(s){const T=SHIPS[s.type],P=PILOTS[s.pilot];const hp=s.hull-hullDmg(s);const col=FACTIONS[G.fac[s.side]].col;const tok=s.alive?shipTokens(s):'destroyed';
   const crits=s.dmg.filter(x=>x.up).map(x=>`<li><b>${esc(DAMAGE[x.c].n)}</b>: ${esc(critPlain(x.c,s))}</li>`).join('');
   let extra='';if(G.phase==='target'&&humanTurn()&&G.cur&&s.side!==ship(G.cur).side&&!validTarget(s))extra=`<p class="warn small">Can't shoot it: ${esc(whyNot(ship(G.cur),s))}.</p>`;
-  return `<div class="pp-h"><b style="color:var(--c${col})">${nm(s)}</b><span class="pp-n">${esc(T.n)}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
+  return `<div class="pp-h">${porHTML(s)}<b style="color:var(--c${col})">${nm(s)}</b><span class="pp-n">${esc(T.n)}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
   <div class="pp-b"><div class="stats big">${statSpans(s)}</div>
   <div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
   <p class="small">${s.stress?'':'<b>Stress:</b> 0 · '}${tok||'no tokens'}</p>${P.t?`<p class="small"><b>Pilot:</b> ${esc(P.t)}</p>`:''}
@@ -132,7 +135,7 @@ function phRender(){if(!PHN.on)return;PHN.build();const dock=document.querySelec
   const card=play?cardHTML():null;
   R.classList.toggle('ph-card',!!card);if(card||PHN.pop){const dk=document.querySelector('.gx-dock');if(dk&&dk.scrollTop)dk.scrollTop=0}
   if(pc){pc.hidden=!card;if(card){if(pc._k!==card.key||pc._h!==card.h){pc._k=card.key;pc._h=card.h;pc.innerHTML=card.h;pc.scrollTop=0}}else pc._k=null}
-  if(pp){const open=!!PHN.pop&&!card;pp.hidden=!open;R.classList.toggle('ph-pop',open);
+  if(pp){const open=!!PHN.pop&&!card;pp.hidden=!open;R.classList.toggle('ph-pop',open);R.classList.toggle('ph-info',open&&PHN.pop.kind==='info');
     if(open){const s=ship(PHN.pop.id);const k=PHN.pop.kind;if(k==='dial'){UI.sel=s.id;UI.hoverDial=null}
       const h=k==='dial'?dialPopHTML(s):k==='atk'?atkPopHTML(s):infoPopHTML(s);const keep=pp.querySelector('.pp-b');const sc=keep?keep.scrollTop:0;
       if(pp._h!==h){pp._h=h;pp.innerHTML=h;pp.className='pp pp-'+k;const nb=pp.querySelector('.pp-b');if(nb)nb.scrollTop=sc}}
@@ -145,6 +148,9 @@ function phRender(){if(!PHN.on)return;PHN.build();const dock=document.querySelec
   if(PHN.armed){const b=document.querySelector(`#prompt [data-hov="${PHN.armed}"]`);if(b)b.classList.add('armed')}
   // focus follows the decision while it is on; it returns to the whole mat when you are not deciding any more
   if(PHN.focusOn){if(!G||G.winner||!(planSide()>=0||humanTurn())){PHN.focus(false,true)}else{const k=fkey();if(k!==PHN.fkey){PHN.fkey=k;frame(focusPts(),8)}}}
+  // phone portrait (R5 review): with focus off, the camera fits both squads (not the whole mat) and refits after ships move
+  else if(G&&!G.winner&&G.round>=1&&R.classList.contains('ph-p')&&!R.classList.contains('ph-big')&&typeof V3!=='undefined'&&V3.on){const al=G.ships.filter(x=>x.alive);const k=al.map(x=>x.id+':'+Math.round(x.x/20)+','+Math.round(x.y/20)).join('|');
+    if(k!==PHN.akey){PHN.akey=k;const pts=[];for(const x of al){const r=B(x)*1.8;for(const [dx,dy] of [[-r,-r],[r,-r],[r,r],[-r,r]])pts.push(W(x.x+dx,x.y+dy,0))}if(pts.length)frame(pts,10)}}
   syncCtl();const v=typeof V3!=='undefined'&&V3.on;R.classList.toggle('ph-3d',v)}
 const _render=render;render=function(){_render();try{phRender()}catch(e){console.error(e)}};
 // ---- events (capture phase, so they run before the game's own delegated handlers) ----
