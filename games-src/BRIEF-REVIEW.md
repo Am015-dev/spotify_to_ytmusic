@@ -45,3 +45,11 @@ Quick game. Judge item 8 like this: run asset-usage as usual; then for each neve
 references it (grep src). Referenced files must load in Quick play, Story stage 1, or desktop with ?glb=1. Unreferenced
 variant/source duplicates do not count against the game. Item 8 >= 7 when every referenced owner file shows somewhere
 reachable and the board/cards visibly use owner art in one style.
+
+## Owner rejections after PASS (8 Nov, 09:20 and 10:00): read before scoring item 1 and 2
+The owner played Twin Thrones (our PASS, item 1 = 7) and called it "tap tap, a spreadsheet on Excel, not a phone game".
+He called Hollowbough's coached game "unplayable, unknown icons, can't follow". Score item 1 and 2 harder:
+- Spreadsheet test: cover the text. Does the phone screen look like a table with cards, pieces and a painted surface,
+  or like rows/grids of boxes on a flat or wallpaper background? Rows of boxes = item 1 <= 5, whatever else is good.
+- Icon test: any icon or number a first-timer cannot name without help = item 5 and 6 <= 6.
+- Feel test: playing a card/piece must look physical (lift, fly, land on a visible place), not "tap a box, box changes".
