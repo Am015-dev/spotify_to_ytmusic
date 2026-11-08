@@ -710,34 +710,34 @@
   "kind": "ao"
  },
  "guard-ash-jaguar": {
-  "title": "Stirrup-spout bottle with feline",
-  "creator": "Chim\u00fa artist(s)",
-  "lic": "CC0",
-  "page": "https://www.metmuseum.org/art/collection/search/308523",
+  "title": "File:Felis Onca, Linn. The Jaguar. Female.jpg",
+  "creator": "<bdi><a href=\"https://en.wikipedia.org/wiki/en:John_James_Audubon\" class=\"extiw\" title=\"w:en:John James Audubon\"><span title=\"French-American ornithologist, naturalist, and painter (1785\u20131851)\">John James Audubon</span></a></bdi>",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Felis_Onca,_Linn._The_Jaguar._Female.jpg",
   "src": [
-   "('met', 308523, {})"
+   "('wc', 'File:Felis Onca, Linn. The Jaguar. Female.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-bone-heron": {
-  "title": "Bird Pendant",
-  "creator": "Muisca",
+  "title": "File:Audubon Reformatted plate 211 Great blue Heron.jpg",
+  "creator": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:CEKeech&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:CEKeech (page does not exist)\">CEKeech</a>",
   "lic": "CC0",
-  "page": "https://www.metmuseum.org/art/collection/search/316728",
+  "page": "https://commons.wikimedia.org/wiki/File:Audubon_Reformatted_plate_211_Great_blue_Heron.jpg",
   "src": [
-   "('met', 316728, {})"
+   "('wc', 'File:Audubon Reformatted plate 211 Great blue Heron.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-canopy-wyrm": {
-  "title": "Feathered serpent ornament",
-  "creator": "Mexica or Mixtec (\u00d1uu Savi) artists",
-  "lic": "CC0",
-  "page": "https://www.metmuseum.org/art/collection/search/313345",
+  "title": "File:Haeckel Lacertilia.jpg",
+  "creator": "<bdi><a href=\"https://en.wikipedia.org/wiki/en:Ernst_Haeckel\" class=\"extiw\" title=\"w:en:Ernst Haeckel\"><span title=\"German zoologist (1834-1919)\">Ernst Haeckel</span></a></bdi>",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Haeckel_Lacertilia.jpg",
   "src": [
-   "('met', 313345, {})"
+   "('wc', 'File:Haeckel Lacertilia.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-ember-hound": {
   "title": "Snarling dog",
@@ -745,19 +745,19 @@
   "lic": "CC0",
   "page": "https://www.metmuseum.org/art/collection/search/318999",
   "src": [
-   "('met', 318999, {})"
+   "('wc', 'File:Red Texan Wolf (Canis lupus) from the viviparous quadrupeds of North America (1845) illustrated by John Woodhouse Audubon (1812-1862).jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-glass-moth": {
-  "title": "Flying-Fish Pendant",
-  "creator": "Tolima (?)",
-  "lic": "CC0",
-  "page": "https://www.metmuseum.org/art/collection/search/316685",
+  "title": "File:Automeris io Titian Peale 1833.jpg",
+  "creator": "Titian Ramsey Peale (d. 1885)",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Automeris_io_Titian_Peale_1833.jpg",
   "src": [
-   "('met', 316685, {})"
+   "('wc', 'File:Automeris io Titian Peale 1833.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-howl-bat": {
   "title": "Canine vessel",
@@ -765,9 +765,9 @@
   "lic": "CC0",
   "page": "https://www.metmuseum.org/art/collection/search/313292",
   "src": [
-   "('met', 313292, {})"
+   "('wc', 'File:Haeckel Chiroptera Chrotopterus auritus.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-mire-crawler": {
   "title": "Crocodile whistle and rattle",
@@ -775,9 +775,9 @@
   "lic": "CC0",
   "page": "https://www.metmuseum.org/art/collection/search/313335",
   "src": [
-   "('met', 313335, {})"
+   "('wc', 'File:Brehms Tierleben (Plate- Panzerechsen I) (6139675091).jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-moss-golem": {
   "title": "Standing figure",
@@ -805,19 +805,19 @@
   "lic": "CC0",
   "page": "https://www.metmuseum.org/art/collection/search/317647",
   "src": [
-   "('met', 317647, {})"
+   "('wc', 'File:Collared Peccary, Dycoteles Torquatus, F. Cuv. 4-7 Natural Size, Male - DPLA - 0186698b348a7ecb46c1400922575392.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-stone-ape": {
-  "title": "Spider monkey wearing wind god regalia",
-  "creator": "Mexica artist(s)",
-  "lic": "CC0",
-  "page": "https://www.metmuseum.org/art/collection/search/765334",
+  "title": "File:Junger Orang-Utan-drawing.jpg",
+  "creator": "",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Junger_Orang-Utan-drawing.jpg",
   "src": [
-   "('met', 765334, {})"
+   "('wc', 'File:Junger Orang-Utan-drawing.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-temple-cat": {
   "title": "",
@@ -835,19 +835,19 @@
   "lic": "CC0",
   "page": "https://www.metmuseum.org/art/collection/search/310471",
   "src": [
-   "('met', 310471, {})"
+   "('wc', 'File:Haeckel Batrachia L lineatus.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-tide-serpent": {
-  "title": "Double Spout and Bridge Bottle with Snake",
-  "creator": "Paracas",
-  "lic": "CC0",
-  "page": "https://www.metmuseum.org/art/collection/search/308590",
+  "title": "File:Albertus Seba Thesaurus Tab. LXII.jpg",
+  "creator": "Albertus Seba",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Albertus_Seba_Thesaurus_Tab._LXII.jpg",
   "src": [
-   "('met', 308590, {})"
+   "('wc', 'File:Albertus Seba Thesaurus Tab. LXII.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "guard-vine-widow": {
   "title": "Spider",
@@ -855,9 +855,9 @@
   "lic": "CC0",
   "page": "https://www.metmuseum.org/art/collection/search/314477",
   "src": [
-   "('met', 314477, {})"
+   "('wc', 'File:Hahn 1833 Die Arachniden fig. 75 Mygale avicularia.jpg')"
   ],
-  "kind": "go"
+  "kind": "sc"
  },
  "idol-ape": {
   "title": "Wooden Monkey Figure",

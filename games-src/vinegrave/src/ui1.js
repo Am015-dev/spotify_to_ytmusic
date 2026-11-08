@@ -13,7 +13,7 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&am
 const RICON = { coin: 'coin', compass: 'compass', tablet: 'tablet', arrow: 'arrow', jewel: 'jewel' };
 // Free-kit pictures for these slots are the same blank hexagon, less clear than the code-drawn boot / jeep / plane / arrowhead / jewel:
 // keep the code glyph (the slot names stay in assets.json; delete an entry here when its real art arrives).
-const WEAK_ART = { 'tr-boot': 1, 'tr-car': 1, 'tr-plane': 1, 'res-arrow': 1, 'res-jewel': 1 };
+const WEAK_ART = { 'tr-boot': 1, 'tr-car': 1, 'tr-plane': 1, 'tr-ship': 1, 'res-arrow': 1, 'res-jewel': 1, 'res-coin': 1, 'res-compass': 1, 'res-tablet': 1 };   /* W427: photo icons are mud at 20 px; the drawn glyphs stay */
 function ic(k, label) { let art = RICON[k] ? 'res-' + k : (V.TRAVEL.indexOf(k) >= 0 ? 'tr-' + k : ''); if (WEAK_ART[art]) art = ''; return `<i class="ic" ${art ? 'data-art="' + art + '"' : ''} role="img" aria-label="${esc(label || V.RNAME[k] || V.TNAME[k] || k)}"><svg><use href="#s-${k}"/></svg></i>`; }
 function resHTML(r) { return Object.keys(r).map(k => `<span class="chip"><span class="num">${r[k]}</span>${ic(k)}</span>`).join(''); }
 function opsHTML(ops) {

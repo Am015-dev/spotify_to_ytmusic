@@ -230,7 +230,7 @@ def place_object(obj, size, back, fill=.80, shadow=.55, grade_kw=None, dy=0.0, r
     return cv.convert('RGB')
 
 def save(im, path, q=82, maxkb=None):
-    for qq in (q, 76, 70, 62, 55, 48, 40):
+    for qq in (q, 76, 70, 62, 55, 48, 40, 32, 26):
         im.save(path, 'WEBP', quality=qq, method=6)
         if maxkb is None or os.path.getsize(path) <= maxkb * 1024:
             break

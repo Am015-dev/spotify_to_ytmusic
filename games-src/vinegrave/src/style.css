@@ -503,3 +503,9 @@ body:has(#rs:not([hidden])) #turnover,body:has(.gxt-cell) #turnover,body:has(.gx
 .btn.whatdo{display:inline-flex;align-items:center;gap:6px}.btn.whatdo svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;flex:none}
 .site[data-badge]::after{top:auto;bottom:26px;z-index:4}
 @media (max-width:999px){.btn.whatdo{width:44px;min-width:44px;padding:0!important;justify-content:center}.btn.whatdo .wl{display:none}#myres{gap:2px 4px!important}}
+@media (min-width:1000px){
+  #row .cd>.ptx{display:none!important}
+  .cd .fx{position:relative;z-index:3}.cd .fx .chip{background:#fbf3df;color:#1f1505;border-radius:4px}
+  .cd.fear .fx .sm{color:#ffe6e0!important;background:#2a1010;padding:0 4px;border-radius:4px}
+}
+@media (min-width:1000px){.cd.fear .fx{display:none!important}}

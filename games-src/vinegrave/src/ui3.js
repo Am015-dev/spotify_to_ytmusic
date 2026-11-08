@@ -105,7 +105,7 @@ function showResult() {
     <div class="trow2"><button type="button" class="tsb" data-a="look">Look at the island</button>${def ? (cWon ? '' : '<button type="button" class="tsb" data-a="campfin">Story map</button>') : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div>`;
   if (!def && UI.mode !== 'tutorial') { const fl = document.createElement('p'); fl.className = 'rquote'; fl.textContent = cWon ? V.STORY.quick.win : V.STORY.quick.lose; const w = r.querySelector('.win'); if (w) w.after(fl); }
   r.querySelectorAll('table tr:last-child b').forEach(b => { const n = +b.textContent; if (!isFinite(n) || UI.fast || reducedMo()) return; const t0 = performance.now(); b.textContent = '0'; const tick = t => { const k = Math.min(1, (t - t0) / 1100); b.textContent = String(Math.round(n * k)); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });   /* the final count climbs */
-  r.hidden = false; $('#toast').classList.remove('on'); musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }
+  r.hidden = false; if (typeof artApply === 'function') artApply(r); $('#toast').classList.remove('on'); musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }
   if (def && m) campBest(def.id, m.score);
   if (!UI.resDone && UI.mode !== 'tutorial' && !camp && window.GNS && GNS.result) { UI.resDone = true; try { GNS.result({ game: 'vinegrave', mode: UI.mode === 'hot' ? 'hot' : UI.mode === 'solo' ? 'solo' : 'vs', level: UI.opts.lvl, seats: G.p.map((p, i) => ({ name: p.name, me: UI.humans.indexOf(i) >= 0, ai: p.ai || undefined })), winner: G.winner, scores: G.p.map((p, i) => VG.score(G, i).total), turns: G.turns }); } catch (e) { } }
 }
