@@ -84,8 +84,8 @@ function cgInfo(m,s){const a=m.src<0?G.ctr:G.fac[m.src];const n=a.filter(t=>t===
 const cgAfterKey=['open','hint'];
 function cgOpen(){CG.said={};CG.q.length=0;CG.moves=0;CG.lastPraise=-9;cgCss();
   setTimeout(()=>{if(!tutOn()||G.turn>0)return;CG.said.goal=1;CG.said.kilns=1;CG.said.take=1;
-    cgSay(null,'Welcome, apprentice. You and Tamsin tile the Sun King\'s wall; most stars wins. Each kiln holds four tiles. Tap one tile: you take every tile of that colour.')},900);
-  setTimeout(()=>{if(tutOn()&&G.turn===0&&sideToAct()===0)cgSay(null,'Free play from here: any kiln, any row. One hint: the lone Frost completes your top row, your Frost column and all five Frost.')},9500)}
+    cgSay(null,'Goal: have the most stars when a wall row is full.\n• Tap a tile: you take every tile of that colour.\n• Put them on a row. Full rows move to your wall.\n• Touching wall tiles score more. Extras cost points.')},900);
+  setTimeout(()=>{if(tutOn()&&G.turn===0&&sideToAct()===0)cgSay(null,'Your turn: any kiln, any row.\nTip: the lone Frost fills your top row.')},9500)}
 function cgPick(s){if(!UI.sel||UI.sel.src!==s.src||UI.sel.c!==s.c)return;const p=P(0);const nm=cgName(s.c);
   const a=s.src<0?G.ctr:G.fac[s.src];const n=a.filter(t=>t===s.c).length;
   if(s.src<0&&G.markerIn==='ctr')cgSay('middle','The middle: the first player to take from it also takes the Sun token, which costs a floor space. Not always bad, but know it.');

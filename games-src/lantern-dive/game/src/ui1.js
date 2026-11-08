@@ -75,7 +75,19 @@ function diveLabel() {
   if (UI.mode === 'descent' && G.desc && typeof DESC !== 'undefined') { const Z = DESC[G.desc.zi]; return Z.name + ' · ' + (G.boss ? CHAR[G.boss.id].name : 'dive ' + (G.desc.si + 1) + ' of 3') + (G.desc.tryN > 1 ? ' · try ' + G.desc.tryN : ''); }
   const m = G.mission; if (m.kind === 'log') return 'Dive ' + m.id; if (m.kind === 'deep') return 'Deep dive ' + m.d; return m.name;
 }
-function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), readMs(t)); }
+// W479 messages: pop-up text exists only in Hints mode (and Learn bubbles). Everything else is feedback on the table or the one status line.
+const msgOK = () => !!UI.prefs.hints && UI.mode !== 'tutorial' && !document.querySelector('.gxh-bub.on');
+function flashWarn(t) {   // a refused tap: buzz and say it in the status line (no pop-up), held until it can be read
+  try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) { }
+  UI.warn = { t, until: Date.now() + readMs(t) }; const pr = $('#prompt'); if (pr) { pr.textContent = t; pr.classList.add('warn'); }
+  clearTimeout(flashWarn.t); flashWarn.t = setTimeout(() => { UI.warn = null; try { render(); } catch (e) { } }, readMs(t));
+}
+function toast(t, force) {
+  const el = $('#toast'); if (!el) return;
+  if (!force && !msgOK()) { flashWarn(t); return; }
+  const now = Date.now(); if (toast.until > now) return;   // one message at a time; a message is never replaced before it could be read
+  const ms = readMs(t); toast.until = now + ms; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), ms);
+}
 // how long a message stays (BRIEF-GAMEFEEL 3): 4 s plus 1 s per 10 words
 function readMs(t) { return 4000 + 100 * String(t || '').trim().split(/\s+/).length; }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -84,7 +96,15 @@ function loadPrefs() { try { const p = JSON.parse(lsGet('ld_prefs') || '{}'); Ob
 function savePrefs() { lsSet('ld_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
 const wait = ms => ANIM ? new Promise(r => setTimeout(r, UI.fastT ? 60 : ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
 // the caption bar over the table: one plain sentence per step ("Nerea plays Kelp 4"); tap it to speed the step up
-function cap(t, kind, sub) { const el = document.getElementById('cap'); if (!el) return; if (!t) { el.classList.remove('on', 'tap'); return; } el.className = 'on' + (kind ? ' ' + kind : '') + (UI.busy ? ' tap' : ''); el.textContent = t; if (sub) { const s = document.createElement('small'); s.textContent = sub; el.appendChild(s); } }
+function cap(t, kind, sub) {
+  const el = document.getElementById('cap'); if (!el) return;
+  if (!t) return;                                          // a caption is removed only by its own timer or a tap
+  if (!msgOK()) return; const now = Date.now(); if (cap.until > now) return;   // one at a time, never replaced early
+  const ms = readMs(t + ' ' + (sub || '')); cap.until = now + ms;
+  el.className = 'on tap' + (kind ? ' ' + kind : ''); el.textContent = t; if (sub) { const s = document.createElement('small'); s.textContent = sub; el.appendChild(s); }
+  clearTimeout(cap.t); cap.t = setTimeout(() => { cap.until = 0; el.classList.remove('on', 'tap'); }, ms);
+}
+document.addEventListener('click', e => { const c = e.target && e.target.closest && e.target.closest('#cap.on'); if (c) { clearTimeout(cap.t); cap.until = 0; c.classList.remove('on', 'tap'); } }, true);
 document.addEventListener('pointerdown', e => { if (UI.busy && e.target && e.target.closest && e.target.closest('#cap,#felt')) UI.fastT = true; }, true);
 // ---- the logbook: progress saved on this device ----
 const Prog = {

@@ -1,5 +1,5 @@
 {
- "when": "2026-11-08T03:38Z",
+ "when": "2026-11-08T02:39Z",
  "view": "390x844",
  "secs": 180,
  "min": 90,
@@ -542,15 +542,15 @@
    }
   },
   "emberclimb": {
-   "shipped": 229,
-   "loaded": 40,
-   "pct": 17.5,
+   "shipped": 211,
+   "loaded": 23,
+   "pct": 10.9,
    "glbShipped": 0,
    "glbLoaded": 0,
    "anyGlb": false,
-   "playedSecs": 185,
+   "playedSecs": 184,
    "end": "cap",
-   "clicks": 597,
+   "clicks": 614,
    "fail": true,
    "neverLoaded": {
     "media/a*": [
@@ -654,6 +654,27 @@
      "media/w-whirlwind.webp",
      "media/w-wild-swing.webp"
     ],
+    "media/enemy*": [
+     "media/enemy-ash-imp.webp",
+     "media/enemy-ash-wisp.webp",
+     "media/enemy-ashen-wraith.webp",
+     "media/enemy-bile-blob.webp",
+     "media/enemy-bone-caller.webp",
+     "media/enemy-cinder-hound.webp",
+     "media/enemy-ember-tyrant.webp",
+     "media/enemy-gape-grub.webp",
+     "media/enemy-gate-colossus.webp",
+     "media/enemy-grave-knight.webp",
+     "media/enemy-iron-warden.webp",
+     "media/enemy-mire-behemoth.webp",
+     "media/enemy-skyclaw.webp",
+     "media/enemy-sleeper-statue.webp",
+     "media/enemy-smoke-hexer.webp",
+     "media/enemy-snare-vine.webp",
+     "media/enemy-thorn-brute.webp",
+     "media/enemy-tomb-king.webp",
+     "media/enemy-warden-captain.webp"
+    ],
     "media/relic*": [
      "media/relic-bag-of-marbles.webp",
      "media/relic-candle-stub.webp",
@@ -678,36 +699,20 @@
      "media/bg-battle-2.webp",
      "media/bg-battle-3.webp",
      "media/bg-boss-ashen-wraith.webp",
+     "media/bg-boss-ember-tyrant.webp",
      "media/bg-boss-gate-colossus.webp",
      "media/bg-boss-mire-behemoth.webp",
+     "media/bg-boss-skyclaw.webp",
+     "media/bg-boss-tomb-king.webp",
+     "media/bg-boss-warden-captain.webp",
      "media/bg-elite.webp",
      "media/bg-event.webp",
+     "media/bg-map-wide.webp",
      "media/bg-rest.webp",
      "media/bg-reward.webp",
      "media/bg-shop.webp",
+     "media/bg-title-wide.webp",
      "media/bg-victory.webp"
-    ],
-    "media/enemy*": [
-     "media/enemy-ash-imp.webp",
-     "media/enemy-ashen-wraith.webp",
-     "media/enemy-bile-blob.webp",
-     "media/enemy-gate-colossus.webp",
-     "media/enemy-iron-warden.webp",
-     "media/enemy-mire-behemoth.webp",
-     "media/enemy-sleeper-statue.webp",
-     "media/enemy-snare-vine.webp",
-     "media/enemy-thorn-brute.webp"
-    ],
-    "media/intent*": [
-     "media/intent-burn.webp",
-     "media/intent-daze.webp",
-     "media/intent-debuff.webp",
-     "media/intent-frail.webp",
-     "media/intent-poison.webp",
-     "media/intent-sleep.webp",
-     "media/intent-slime.webp",
-     "media/intent-unknown.webp",
-     "media/intent-vuln.webp"
     ],
     "media/pot*": [
      "media/pot-block-brew.webp",
@@ -720,6 +725,14 @@
      "media/pot-swift-draught.webp",
      "media/pot-venom-vial.webp"
     ],
+    "media/boss*": [
+     "media/boss-ashen-wraith.mp4",
+     "media/boss-ember-tyrant.mp4",
+     "media/boss-gate-colossus.mp4",
+     "media/boss-mire-behemoth.mp4",
+     "media/boss-skyclaw.mp4",
+     "media/boss-tomb-king.mp4"
+    ],
     "media/event*": [
      "media/event-back-alley-gambler.webp",
      "media/event-ember-shrine.webp",
@@ -728,42 +741,19 @@
      "media/event-wandering-tinker.webp",
      "media/event-whispering-well.webp"
     ],
+    "media/cast*": [
+     "media/cast-guide.webp",
+     "media/cast-healer.webp",
+     "media/cast-merchant.webp",
+     "media/cast-rival.webp",
+     "media/cast-teller.webp"
+    ],
     "media/n*": [
      "media/n-bandage.webp",
      "media/n-finesse.webp",
      "media/n-good-instincts.webp",
      "media/n-hand-of-greed.webp",
      "media/n-panic-button.webp"
-    ],
-    "media/frame*": [
-     "media/frame-attack.webp",
-     "media/frame-power.webp",
-     "media/frame-skill.webp",
-     "media/frame-status.webp"
-    ],
-    "media/fx*": [
-     "media/fx-heal-sparkle.webp",
-     "media/fx-poison-cloud.webp",
-     "media/fx-slash.webp"
-    ],
-    "media/gem*": [
-     "media/gem-common.webp",
-     "media/gem-rare.webp",
-     "media/gem-uncommon.webp"
-    ],
-    "media/orb*": [
-     "media/orb-D.webp",
-     "media/orb-F.webp",
-     "media/orb-L.webp"
-    ],
-    "media/st*": [
-     "media/st-frail.webp",
-     "media/st-poison.webp",
-     "media/st-vuln.webp"
-    ],
-    "media/stance*": [
-     "media/stance-c.webp",
-     "media/stance-w.webp"
     ],
     "media/burn*": [
      "media/burn.webp"
@@ -779,9 +769,6 @@
     ],
     "media/doubt*": [
      "media/doubt.webp"
-    ],
-    "media/icon*": [
-     "media/icon-remove.webp"
     ],
     "media/injury*": [
      "media/injury.webp"
@@ -807,14 +794,13 @@
    "glbShipped": 2,
    "glbLoaded": 0,
    "anyGlb": false,
-   "playedSecs": 187,
+   "playedSecs": 185,
    "end": "cap",
-   "clicks": 221,
+   "clicks": 387,
    "fail": true,
    "neverLoaded": {
     "media/ui*": [
      "media/ui-altbar.webp",
-     "media/ui-bubble-tail.webp",
      "media/ui-bubble.webp",
      "media/ui-button-cream.webp",
      "media/ui-button-go.webp",
@@ -859,12 +845,13 @@
      "music/defeat-a.mp3",
      "music/defeat-b.mp3"
     ],
+    "music/main*": [
+     "music/main-a.mp3",
+     "music/main-b.mp3"
+    ],
     "music/victory*": [
      "music/victory-a.mp3",
      "music/victory-b.mp3"
-    ],
-    "music/fight*": [
-     "music/fight-a.mp3"
     ],
     "music/tavern*": [
      "music/tavern-b.mp3"

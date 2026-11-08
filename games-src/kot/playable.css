@@ -35,13 +35,13 @@ html.ph #bline{font-size:15px;white-space:normal;line-height:1.2;max-width:calc(
 #ppcoach>div{flex:1;min-width:0}
 #ppcoach b{display:block;font:900 14px/1.1 Nunito,sans-serif;color:#7a2a12}
 #ppcoach span{display:block;margin-top:2px;font:800 14px/1.25 Nunito,sans-serif;color:#1a1320}
-#ppcoach small{display:block;margin-top:4px;font:700 13px/1.25 Nunito,sans-serif;color:#4a3a2a}
+#ppcoach small{display:block;margin-top:4px;font:700 14px/1.25 Nunito,sans-serif;color:#4a3a2a}
 #ppcoach [data-pp-x]{pointer-events:auto;flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:2px solid #1a1320;background:#fff;color:#1a1320;font:900 18px/1 Nunito,sans-serif;cursor:pointer;padding:0}
 #ppcoach.on [data-pp-play],#ppcoach.on [data-pp-story],#ppcoach.on [data-pp-skip]{pointer-events:auto}
 #ppcoach .pp-row{display:flex;gap:8px;margin-top:6px}
 #ppcoach .pp-row button{pointer-events:auto;min-height:36px;padding:4px 12px;border-radius:10px;border:2px solid #1a1320;background:#ff7a21;color:#fff;font:900 14px/1 Nunito,sans-serif;cursor:pointer}
 #ppcoach.on{pointer-events:none}
-html.ph .pchip em,html.ph-p header.gx-bar .pchip span em{font-size:13px}
+html.ph .pchip em,html.ph-p header.gx-bar .pchip span em{font-size:14px}
 
 .pchip{cursor:pointer;font-family:Nunito,sans-serif;-webkit-tap-highlight-color:transparent}
 /* title: the tutorial offer is a secondary button, Play now is the one big primary */
@@ -130,3 +130,8 @@ html:not(.pp-hints) .pp-best::before{display:none}
 #pppop.on{pointer-events:auto}
 #ppwhat{display:none;position:fixed;right:10px;bottom:84px;z-index:2147480000;min-height:40px;padding:6px 14px;border-radius:20px;border:3px solid #1a1320;background:#ffd23f;color:#1a1320;font:900 14px/1.1 Nunito,sans-serif;box-shadow:3px 3px 0 #1a1320;cursor:pointer}
 html.pp-hints header.gx-bar #bulbbtn{box-shadow:0 0 0 3px #ffd23f,0 0 16px 4px rgba(255,210,63,.9)}
+
+/* W467: the aim card (Learn to play, first screen): one sentence + 3 short bullets */
+#ppcoach ul.ppaim{margin:6px 0 2px;padding:0;list-style:none;display:grid;gap:3px}
+#ppcoach ul.ppaim li{position:relative;padding-left:18px;font:700 14px/1.3 Nunito,sans-serif;color:#1a1320}
+#ppcoach ul.ppaim li::before{content:'';position:absolute;left:3px;top:.42em;width:8px;height:8px;border-radius:50%;background:#e8762b;box-shadow:0 0 0 2px #1a1320}
