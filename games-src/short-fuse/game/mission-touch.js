@@ -1,9 +1,9 @@
-// mission-touch.js: a new player plays one full job by touch on a phone (only taps on what glows or on overlay buttons). MODE=new (default): it reads only the screen (the odds badges that are on by default in jobs 1-3); MODE=advisor follows the hint advisor, from the start menu
+// mission-touch.js: a new player plays one full job by touch on a phone (only taps on what glows or on overlay buttons). MODE=new (default): it reads only the screen (info tokens, cut wires, the low-to-high order; no odds on wires since review G6); MODE=advisor follows the hint advisor, from the start menu
 // to the result card. Fails on page errors, a status line over 8 words, or a job that never ends.  node mission-touch.js [WxH=390x844] [job=1] [shotsDir]
 const { chromium } = require('playwright');
 const path = require('path');
 const gx = require('../../scripts/gx-serve.js');
-const MODE = process.env.MODE || 'new';   // new = reads the screen (odds badges); advisor = follows the hint advisor
+const MODE = process.env.MODE || 'new';   // new = reads the screen (tokens + sort order); advisor = follows the hint advisor
 const [W, H] = (process.argv[2] || '390x844').split('x').map(Number), JOB = +(process.argv[3] || 1), SHOTS = process.argv[4] || '';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
@@ -24,12 +24,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     if (G.over) return { k: 'over' };
     const me = UI.V ? UI.V.seat : -1; if (decider() !== me) return { k: 'wait' };
     if (window.__mode === 'advisor') { try { const pl = hlpPlan(), e = pl && hlpEl(pl.to); if (e && vis(e)) return { ...c(e), k: 'tile' }; } catch (x) { } }
-    else {   // a new player who only reads what is on screen: the starred odds badge (hints default on in jobs 1-3), then the number that badge is for
-      const star = [...document.querySelectorAll('#crew .tile.glow .pvb.best,#crew .tile.glow .pvb')].map(b => b.closest('.tile')).find(vis);
-      if (!UI.sel && star) return { ...c(star), k: 'tile' };
-      if (UI.sel && UI.sel.mode === 'dual' && UI.sel.tg.length === 1 && UI.sel.v == null) { try { const V = UI.V, W = wwk(V), t = UI.sel.tg[0]; let best = null;
-        for (const e of document.querySelectorAll('#mine .tile.glow')) { if (!vis(e)) continue; const sl = G.st[+e.dataset.s].w[+e.dataset.k]; const v = cv(sl.id); const pr = scOdds(V, W, t.st, t.k, v); if (pr != null && (!best || pr > best.p)) best = { p: pr, e }; }
-        if (best) return { ...c(best.e), k: 'tile' }; } catch (x) { } }
+    else {   // a new player who only reads what is on screen: free solo cuts first, then the crew wire whose clues (tokens, cut wires, sort order) best fit a number they hold
+      const solo = [...document.querySelectorAll('#mine .tile.glow.g-solo')].find(vis); if (!UI.sel && solo) return { ...c(solo), k: 'tile' };
+      const V = UI.V; const myv = [...new Set(G.st.filter((s, i) => ownerOf(i) === me).flatMap(s => s.w.filter(x => !x.cut).map(x => cv(x.id))).filter(v => typeof v === 'number'))];
+      if (!UI.sel) { let best = null;
+        for (const e of document.querySelectorAll('#crew .tile.glow')) { if (!vis(e)) continue; const st = +e.dataset.s, k = +e.dataset.k, n = G.st[st].w.length;
+          const kn = scKnown(V, st, k); let L = 0, dl = 99, R = 99, dr = 99;
+          for (let j = k - 1; j >= 0; j--) { const x = scKnown(V, st, j); if (typeof x === 'number') { L = x; dl = k - j; break } }
+          for (let j = k + 1; j < n; j++) { const x = scKnown(V, st, j); if (typeof x === 'number') { R = x; dr = j - k; break } }
+          for (const v of myv) { let sc; if (typeof kn === 'number') sc = kn === v ? 0 : 99; else if (v < L || v > R) sc = 99; else if (L === R) sc = .1; else sc = Math.min(v === L ? dl : 99, v === R ? dr : 99, 4 + Math.min(R, 13) - L);
+            if (!best || sc < best.sc) best = { sc, e, v } } }
+        if (best) { window.__want = best.v; return { ...c(best.e), k: 'tile' } } }
+      if (UI.sel && UI.sel.mode === 'dual' && UI.sel.tg.length === 1 && UI.sel.v == null) { const e = [...document.querySelectorAll('#mine .tile.glow')].filter(vis).find(e => cv(G.st[+e.dataset.s].w[+e.dataset.k].id) === window.__want); if (e) return { ...c(e), k: 'tile' } }
     }
     const g = [...document.querySelectorAll('#tb .tile.glow,#tb .plate.glow,#tb .chip.glow')].filter(vis);
     if (!g.length) return { k: 'none' };

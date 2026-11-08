@@ -209,7 +209,7 @@ function tileEl(u){return document.querySelector(`#tb .tile[data-u="${u}"]`)}
 function sparks(el,n,col){const f=document.getElementById('fx'),tb=document.getElementById('tb');if(!el||!f||!tb)return;const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();
   for(let i=0;i<n;i++){const s=document.createElement('i');s.className='sp';const a=Math.random()*Math.PI*2,d=22+Math.random()*34;s.style.cssText=`left:${r.left-b.left+r.width/2}px;top:${r.top-b.top+r.height/2}px;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d-10}px;background:${col||'#ffc928'}`;f.appendChild(s);setTimeout(()=>s.remove(),800)}}
 function pop(el,txt,cls){const f=document.getElementById('fx'),tb=document.getElementById('tb');if(!el||!f||!tb)return;const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();const p=document.createElement('div');p.className='pop '+(cls||'');p.textContent=txt;
-  p.style.left=Math.max(30,Math.min(b.width-30,r.left-b.left+r.width/2))+'px';p.style.top=Math.max(20,r.top-b.top-4)+'px';f.appendChild(p);setTimeout(()=>p.remove(),1100)}
+  p.style.left=Math.max(30,Math.min(b.width-30,r.left-b.left+r.width/2))+'px';p.style.top=Math.max(20,r.top-b.top+r.height/2)+'px';f.appendChild(p);setTimeout(()=>p.remove(),1100)}
 // 3D sprites (rendered from the full-detail models): pliers snip at a cut wire, the bomb wobbles on a miss and swells on the boom
 const SPG={};   // owner bomb/pliers .glb models drawn once to a sprite (gx-glbsprite.js); models/<name>@512.webp stays the fallback
 ['bomb','pliers'].forEach(n=>{try{GXSPR.use('models/'+n,{size:256,pitch:.4}).then(u=>{if(u)SPG[n]=u})}catch(e){}});
@@ -282,7 +282,9 @@ function onMine(si,k){const V=UI.V;const sl=G.st[si].w[k];const me=V.seat;
 // the crew wires: onTile (ui.js) sets the target; a number picked first fires here
 function afterTile(){const V=UI.V;if(UI.sel&&UI.sel.mode==='multi'&&UI.sel.tg.length===UI.sel.n){const m={a:'multi',kind:UI.sel.kind,tg:UI.sel.tg};const err=legal(m,V.seat);if(err){toast(err);UI.sel.tg.pop();refresh();return}act(m,V.seat);return}
   if(UI.sel&&UI.sel.mode==='dual')autoFire();else if(UI.sel&&UI.sel.mode==='choose'&&V&&!nextStep(UI.sel)){const rem=selRemaining(UI.sel);if(rem.length===1)act(rem[0],V.seat)}}
-document.addEventListener('click',e=>{const t=e.target.closest('#tb .tile.glow,#tb .tile.sel,#tb .plate.glow,#tb .chip,#tb .eqk.glow');if(!t){const tb=e.target.closest('#tb');if(tb&&UI.sel&&!e.target.closest('.tile,.chip,.plate,.eqk,button')&&G&&!G.over&&UI.sel.mode!=='choose'){UI.sel=null;refresh()}return}
+document.addEventListener('click',e=>{const t=e.target.closest('#tb .tile.glow,#tb .tile.sel,#tb .plate.glow,#tb .chip,#tb .eqk.glow');if(!t){{const dt=e.target.closest('#tb .tile.crew');const V=UI.V;if(dt&&G&&!G.over&&V&&V.seat>=0&&!UI.brief&&!UI.tut&&!UI.coach){let msg='';   // a tap on a wire that cannot be picked is never silent
+    if(V.q&&V.q.who===V.seat&&V.q.kind==='infoStd')msg='Not theirs: tap one of YOUR wires.';else if(decider()!==V.seat&&decider()>=0)msg='Wait: it is '+nm(decider())+"'s turn.";else if(dt.classList.contains('cut'))msg='That wire is already cut.';
+    if(msg){dt.classList.remove('buzz');void dt.offsetWidth;dt.classList.add('buzz');setTimeout(()=>dt.classList.remove('buzz'),800);toast(msg);return}}}const tb=e.target.closest('#tb');if(tb&&UI.sel&&!e.target.closest('.tile,.chip,.plate,.eqk,button')&&G&&!G.over&&UI.sel.mode!=='choose'){UI.sel=null;refresh()}return}
   if(TBL.dragEnded&&Date.now()-TBL.dragEnded<300){return}
   if(t.classList.contains('tile')){const si=+t.dataset.s,k=+t.dataset.k;if(UI.sel&&UI.sel.mode==='dual'&&!UI.sel.v&&t.classList.contains('sel')&&t.classList.contains('crew')&&UI.sel.tg.length===1&&!UI.sel.tool){UI.sel=null;refresh();return}tapTile(si,k);afterTile();return}
   if(t.classList.contains('plate')){plateTap(+t.dataset.seat);return}

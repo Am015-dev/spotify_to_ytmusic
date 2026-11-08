@@ -13,6 +13,7 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
   const seatsTxt=nh===0?'Watch':nh===1?'You + computers':nh+' players, one phone';
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back</button>':''}</div>
   <div class="st-body"><div class="st-main">
+   <p class="st-goal">A team bomb puzzle: guess your crew's hidden wires from the clues and cut them all before the fuse burns out.</p>
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
    <div class="seg" role="group" aria-label="Crew size"><span class="seglbl">Crew</span>${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
    <div class="seg" role="group" aria-label="Computer level"><span class="seglbl">Computer</span>${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>
@@ -31,7 +32,8 @@ function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
 function startJob(s){if(isClient())return;
   // gentle first jobs: until the player flips the bulb themselves, hints (the odds badges) are on for jobs 1-3 and off from job 4
-  if(lsGet('sf_hints',-1)===-1){UI.hints=(+s.job||1)<=3;try{scBulb()}catch(e){}}
+  if(lsGet('sf_hints',-1)===-1){UI.hints=false;   // hints only behind the bulb (review G6: no help on the wires by default)
+  try{scBulb()}catch(e){}}
   lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
   if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
   if(!plan&&!s.camp)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names});UI.lastSetup=s.camp?UI.lastSetup:s;
