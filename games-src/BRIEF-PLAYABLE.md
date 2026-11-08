@@ -47,3 +47,4 @@ Every game needs, before it counts as ready:
 - an always-visible score breakdown, yours vs the rival's, with the leader marked;
 - choice badges in markets and hands showing the best gain;
 - one line after each turn rating the move good, okay or poor, and saying why, compared with the solver's best move.
+- Owner on Vale (8 Nov 00:12): "not easy to understand what I have to do, how I collect points, when my turn ends and why". Add a permanent turn tracker (round x of y, whose turn, actions or dice left shown as spendable tokens), a "Turn over: why" card when the turn ends, and one plain next-step line that names the exact action.
