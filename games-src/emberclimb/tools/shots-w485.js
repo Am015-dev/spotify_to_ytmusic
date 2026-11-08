@@ -17,7 +17,7 @@ const OUT = path.join(__dirname, '..', 'playable-shots', 'w485');
   await pg.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await pg.mouse.down();
   for (let k = 1; k <= 12; k++) { await pg.mouse.move(a.x + a.width / 2 + (b.x + b.width / 2 - a.x - a.width / 2) * k / 12, a.y + a.height / 2 + (b.y + b.height * .45 - a.y - a.height / 2) * k / 12); await sleep(30); }
   await sleep(250); await shot('phone-3-card-drag.png');
-  await pg.mouse.up(); await sleep(560); await shot('phone-2-combat.png');
+  await pg.mouse.up(); await sleep(400); if (process.env.HOLD_SHOT) await pg.screenshot({ path: process.env.HOLD_SHOT }); await sleep(700); await shot('phone-2-combat.png');
   await sleep(1200);
   // finish the fight by playing attacks (foes set to low HP so the shot run stays short)
   await pg.evaluate(() => { EC.E.G().b.en.forEach(e => { if (!e.dead) e.hp = Math.min(e.hp, 3); }); UI.render(); }); await sleep(300);

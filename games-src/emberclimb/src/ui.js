@@ -125,10 +125,11 @@
     var sx = 0, sy = 0, gh = null, on0 = false, hot = -1;
     function foes() { return [].slice.call(document.querySelectorAll('.en[data-w]')).filter(function (n) { return !n.classList.contains('dead'); }); }
     function under(x, y) { var t = -1; foes().forEach(function (n) { var r = n.getBoundingClientRect(); if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) t = +n.getAttribute('data-w').slice(1); }); return t; }
-    function end() { document.body.classList.remove('ec-dragging'); document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); document.removeEventListener('pointercancel', cancel, true); if (gh) gh.remove(); gh = null; document.querySelectorAll('.en.w4drop,.en.glow').forEach(function (n) { n.classList.remove('w4drop'); }); }
+    function end() { document.body.classList.remove('ec-dragging'); var ar0 = document.getElementById('w485arrow'); if (ar0) ar0.remove(); document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); document.removeEventListener('pointercancel', cancel, true); if (gh) gh.remove(); gh = null; document.querySelectorAll('.en.w4drop,.en.glow').forEach(function (n) { n.classList.remove('w4drop'); }); }
     function mv(ev) {
       if (!on0) { if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 14) return; on0 = true; UI.dragging = 1; UI.sel = i; var g = G(), hh = g.hs[g.b.cur], tg = hh && hh.hand[i] && E.eff(hh.hand[i]).tgt; var r = { width: el.offsetWidth, height: el.offsetHeight }, cw1 = el.parentNode ? getComputedStyle(el.parentNode).getPropertyValue('--cw') : ''; gh = el.cloneNode(true); gh.classList.remove('sel'); gh.classList.add('w4ghost'); render(); document.body.classList.add('ec-dragging'); gh.style.cssText = (cw1 ? '--cw:' + cw1 + ';' : '') + 'position:fixed;z-index:95;pointer-events:none;width:' + r.width + 'px;height:' + r.height + 'px;left:0;top:0;transform:translate(' + (ev.clientX - r.width / 2) + 'px,' + (ev.clientY - r.height * .7) + 'px) rotate(-4deg) scale(1.08)'; document.body.appendChild(gh); if (tg) foes().forEach(function (n) { n.classList.add('glow'); }); }
       if (gh) { var w = parseFloat(gh.style.width), hgt = parseFloat(gh.style.height); gh.style.transform = 'translate(' + (ev.clientX - w / 2) + 'px,' + (ev.clientY - hgt * .7) + 'px) rotate(-4deg) scale(1.08)'; }
+      if (STAGE() && gh) arrowTo(ev.clientX, ev.clientY, hot >= 0, gh);
       var t = under(ev.clientX, ev.clientY); if (t !== hot) { hot = t; foes().forEach(function (n) { n.classList.toggle('w4drop', +n.getAttribute('data-w').slice(1) === t); }); if (t >= 0) { try { navigator.vibrate && navigator.vibrate(10); } catch (e) { } } }
       ev.preventDefault();
     }
@@ -142,6 +143,16 @@
     function cancel() { end(); UI.dragging = 0; UI.sel = -1; render(); }
     el.addEventListener('pointerdown', function (ev) { if (UI.busy || (window.GXT && GXT.active())) return; sx = ev.clientX; sy = ev.clientY; on0 = false; hot = -1; document.addEventListener('pointermove', mv, true); document.addEventListener('pointerup', up, true); document.addEventListener('pointercancel', cancel, true); });
     el.style.touchAction = 'none';
+  }
+  // W485 targeting arrow: a dashed curve with a head from the dragged card's top to the finger, gold over a legal foe
+  function arrowTo(x, y, hit, gh) {
+    var NS = 'http://www.w3.org/2000/svg', sv = document.getElementById('w485arrow');
+    if (!sv) { sv = document.createElementNS(NS, 'svg'); sv.id = 'w485arrow'; sv.setAttribute('aria-hidden', 'true'); sv.innerHTML = '<defs><marker id="w485ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="currentColor"/></marker></defs><path class="w485ap" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 12" marker-end="url(#w485ah)"/>'; document.body.appendChild(sv); }
+    var hd = document.querySelector('.hand.fan'), r = hd ? hd.getBoundingClientRect() : { left: 0, width: innerWidth, top: innerHeight - 160 }, sx = r.left + r.width / 2, sy = r.top + 10;
+    if (Math.abs(y - sy) < 40) { sv.style.display = 'none'; return; } sv.style.display = '';
+    var cx = (sx + x) / 2 + (x - sx) * -.2, cy = Math.min(sy, y) - 60;
+    sv.querySelector('.w485ap').setAttribute('d', 'M' + sx + ' ' + sy + ' Q' + cx + ' ' + cy + ' ' + x + ' ' + (y - 10)); sv.classList.toggle('hit', !!hit);
+    if (gh) gh.style.opacity = '.55';
   }
   function holdPeek(el, c) {
     var t = 0, x0 = 0, y0 = 0;
@@ -283,6 +294,7 @@
     else if (g.scr === 'event') { txt = 'Choose one.'; ttl = 'Event'; }
     else if (g.scr === 'over') { txt = g.won ? 'You won this climb.' : 'This climb is over.'; ttl = 'Result'; }
     m.textContent = txt; t.textContent = ttl; var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
+    if (g.scr === 'map' && STAGE()) { var lg = h('div', 'w485leg'); 'm e r s t v'.split(' ').forEach(function (k) { lg.appendChild(h('span', 'w485lgi t-' + k, null, [nodeIc(k), document.createTextNode(k === 'v' ? 'Event' : NODEL[k])])); }); a.appendChild(lg); }
     if (g.scr !== 'over') a.appendChild(potRow());
     if (g.scr === 'battle' && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
     // PC side panel: the deck you climb with, as small card pictures (R1 polish: fill the panel with something useful)
@@ -536,6 +548,7 @@
     document.body.appendChild(ov); SFX('boss'); tmr = setTimeout(end, 6000);
   };
   function flyCard(ci, ti, done) {
+    if (STAGE()) return flyStage(ci, ti, done);
     var cel = document.querySelector('.hand [data-c="' + ci + '"]'), tel = ti != null ? document.querySelector('[data-w="e' + ti + '"]') : document.querySelector('.mid');
     if (!moOk() || !cel || !tel || !cel.animate) return done();
     var a = cel.getBoundingClientRect(), b = tel.getBoundingClientRect(), f = cel.cloneNode(true); f.classList.remove('sel'); f.classList.add('fly');
@@ -545,6 +558,19 @@
     document.body.appendChild(f);
     var an = f.animate(kf, { duration: 320, easing: 'ease-in' });
     an.onfinish = function () { f.remove(); tel.classList.add('w4impact'); setTimeout(function () { tel.classList.remove('w4impact'); }, 300); done(); }; setTimeout(function () { if (f.parentNode) { f.remove(); } }, 700);
+  }
+  // W485 stage: the played card jumps to the centre big, holds ~400 ms, then flies into its target (a foe, or the hero for skills)
+  function flyStage(ci, ti, done) {
+    var g = G(), cel = document.querySelector('.hand [data-c="' + ci + '"]'), tel = ti != null ? document.querySelector('[data-w="e' + ti + '"]') : document.querySelector('[data-w="h' + (g.b.cur >= 0 ? g.b.cur : 0) + '"]');
+    if (!moOk() || !cel || !tel || !cel.animate) return done();
+    var hd = cel.parentNode, cw = hd ? getComputedStyle(hd).getPropertyValue('--cw') : '', w = cel.offsetWidth, hh = cel.offsetHeight, a = cel.getBoundingClientRect(), b = tel.getBoundingClientRect();
+    var f = cel.cloneNode(true); f.classList.remove('sel'); f.classList.add('fly', 'w485play'); f.style.cssText = (cw ? '--cw:' + cw + ';' : '') + 'position:fixed;z-index:90;margin:0;left:0;top:0;width:' + w + 'px;height:' + hh + 'px;pointer-events:none';
+    var vw = document.documentElement.clientWidth, vh = window.innerHeight, sc = Math.min(1.7, (vw * .5) / w), x0 = a.left + a.width / 2 - w / 2, y0 = a.top + a.height / 2 - hh / 2, xc = vw / 2 - w / 2, yc = vh * .42 - hh / 2, xt = b.left + b.width / 2 - w / 2, yt = b.top + b.height * .4 - hh / 2;
+    var T = function (x, y, s2, r) { return 'translate(' + x + 'px,' + y + 'px) scale(' + s2 + ') rotate(' + (r || 0) + 'deg)'; };
+    document.body.appendChild(f); cel.style.visibility = 'hidden';
+    var an = f.animate([{ transform: T(x0, y0, 1), opacity: 1 }, { transform: T(xc, yc, sc), opacity: 1, offset: .22 }, { transform: T(xc, yc, sc), opacity: 1, offset: .74 }, { transform: T(xt, yt, .45, ti != null ? 16 : 0), opacity: .1 }], { duration: wt(820), easing: 'ease-in-out' });
+    var fin = false, end = function () { if (fin) return; fin = true; f.remove(); tel.classList.add('w4impact'); setTimeout(function () { tel.classList.remove('w4impact'); }, 300); done(); };
+    an.onfinish = end; setTimeout(end, wt(820) + 400);
   }
   function onCard(i) {
     var g = G(); if (g.b.ph !== 'p' || UI.busy) return; var cur = g.hs[g.b.cur], c = cur.hand[i];
