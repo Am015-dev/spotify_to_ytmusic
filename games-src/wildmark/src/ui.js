@@ -15,7 +15,9 @@ function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, j
   var pv = $('#pv'); if (pv && !pv.hidden && pv.offsetHeight) ln = pv;   // above the points strip when it shows
   var r = ln.getBoundingClientRect(); if (r.height && r.top > 200) { e.style.top = 'auto'; e.style.bottom = Math.round(innerHeight - r.top + 8) + 'px'; }
 }
-function toast(t, ms) { if (G && !G.over && !hintsOn() && $('#start').hidden) return; var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
+function coachUp() { var b = document.getElementById('coachb'); return !!(b && !b.hidden); }   // Learn: while Rowan speaks, nothing else talks (one message at a time)
+function readMs(t) { return 4000 + 1000 * Math.ceil(String(t || '').split(/\s+/).filter(Boolean).length / 10); }   // 4 s + 1 s per 10 words
+function toast(t, ms) { if (coachUp()) return; ms = Math.max(ms || 0, readMs(t)); if (G && !G.over && !hintsOn() && $('#start').hidden) return; var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 // ---------------------------------------------------------------- sound (synth; music slots via gx-music when files exist)
 var SND = { ctx: null };
 function hintsOn() { return UI.mode === 'coach' || !!UI.prefs.hints; }   // A7: Play is clean unless the top-bar Hints switch is on
@@ -43,7 +45,7 @@ function tileSvg(tile, x, y, s, rot, opt) {
   }
   out += '<polygon points="' + poly(x, y, s, [0, 1, 2, 3, 4, 5]) + '" fill="none" stroke="' + (tile.key ? '#f2d27a' : 'rgba(20,30,20,.55)') + '" stroke-width="' + (tile.key ? s * 0.09 : s * 0.04) + '"/>';
   var zr = opt.map && UI.pan && UI.pan.z || 0;   // map only: keep portraits readable at phone zoom (36 px placed, 24 px slots), inside the hex
-  if (opt.tok) out += tokenSvg(opt.tok, x, y, zr ? Math.min(s * 0.66, Math.max(s * 0.46, 19 / zr)) : s * 0.46);
+  if (opt.tok) out += tokenSvg(opt.tok, x, y, zr ? Math.min(s * 0.7, Math.max(s * 0.56, 22 / zr)) : s * 0.46);
   else if (!opt.noSlots) {   // the animals this tile accepts: small discs
     var n = tile.a.length, rr = s * (n === 1 ? 0.3 : 0.22), off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.27, 0], [0.27, 0]] : [[-0.27, 0.16], [0.27, 0.16], [0, -0.3]];
     if (opt.big) { rr = s * (n === 1 ? 0.44 : n === 2 ? 0.33 : 0.29); off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.37, 0], [0.37, 0]] : [[-0.34, 0.22], [0.34, 0.22], [0, -0.38]]; }   // market/preview: readable animal icons
@@ -85,7 +87,8 @@ function step() {
   render(); if (typeof tutFix === 'function') tutFix();
 }
 // turn banner: "Your turn" / "<Rival>'s turn", one at a time, fades by itself
-function banner(t) { var e = $('#turnban'); if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); } e.textContent = t; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
+function banner(t) { return; var e = $('#turnban');   // R5: no centre toast over the board; the bottom line says whose turn it is
+  if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); } e.textContent = t; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
 function terrText(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join('/'); }
 // the rival's turn, step by step (take -> place -> settle), each with a caption on the instruction bar; tap anywhere to speed it up
 function aiStep() {
@@ -146,13 +149,14 @@ function act(m) {
   render(); step();
 }
 function pop(c, text, cls) {   // floating points at a map cell (DOM, readable size)
+  if (!hintsOn() || coachUp()) return;   // R5: clean Play shows the why in the one turn line under the board; Learn: one voice at a time
   var b = $('#board').getBoundingClientRect(), p = pix(c), z = UI.pan, x = p[0] * z.z + z.tx, y = p[1] * z.z + z.ty;
   var e = document.createElement('div'); e.className = 'pop ' + (cls || ''); e.textContent = text; e.style.left = Math.max(60, Math.min(b.width - 60, x)) + 'px'; e.style.top = Math.max(30, y - 20) + 'px';
   // never stack unreadably: at most 2 live pops, a new one sits in its own row under the last one
-  var live = [].slice.call($('#board').querySelectorAll('.pop')); while (live.length > 1) live.shift().remove();
+  var live = [].slice.call($('#board').querySelectorAll('.pop')); while (live.length > 0) live.shift().remove();   // one message at a time
   if (live.length) e.style.top = (parseFloat(live[0].style.top) + 40) + 'px';
   $('#board').appendChild(e); var hw = e.offsetWidth / 2 + 6; e.style.left = Math.max(hw, Math.min(b.width - hw, x)) + 'px';   // never half off the board
-  setTimeout(function () { e.remove(); }, 1300);
+  setTimeout(function () { e.remove(); }, readMs(text));
 }
 function tutOK(x) { return typeof tutAct === 'function' ? tutAct(x) : true; }
 function myTurn() { return G && !G.over && !G.seats[G.cur].ai && UI.view === G.cur && $('#pass').hidden; }
@@ -201,7 +205,7 @@ function fitView(now) {
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
   // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
-  var wh = boardWH(), padT = (hintsOn() ? (G.np > 1 ? 156 : 110) : (G.np > 1 ? 62 : 16)) + (UI.mode === 'coach' ? 76 : 0), padB = 118, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
+  var wh = boardWH(), padT = (hintsOn() ? (G.np > 1 ? 156 : 110) : (G.np > 1 ? 62 : 16)) + (UI.mode === 'coach' ? 76 : 0), padB = 118, padL = 8, padR = wh[0] < 600 ? 12 : 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
   var z = Math.max(0.3, Math.min(2.5, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
   var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
   if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
@@ -314,7 +318,7 @@ function renderDock() {
 function lineText() {
   if (!G) return '';
   if (G.over) return 'Season over';
-  if (UI.showAI && UI.view === UI.showAI.seat) return UI.showAI.text;
+  if (UI.showAI && UI.view === UI.showAI.seat) return G.seats[G.seats[G.cur].ai ? G.cur : (G.cur + G.np - 1) % G.np].name + ' is playing';   // the rival who is (or just was) moving
   var s = G.seats[G.cur];
   if (UI.view !== G.cur && !s.ai) return '';
   if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
@@ -343,7 +347,8 @@ function renderTop() {
   var tr = $('#terr'); if (!tr) { tr = document.createElement('button'); tr.type = 'button'; tr.id = 'terr'; tr.className = 'terr'; tr.setAttribute('data-gx', 'scored'); $('#board').appendChild(tr); }
   tr.classList.toggle('solo', G.np < 2);
   tr.setAttribute('aria-label', 'Largest area of each terrain' + (rv ? ', you vs ' + G.seats[ri].name : '') + ': open the score sheet');
-  tr.innerHTML = '<span class="tl">Largest area' + (rv ? '<small><b class="me">' + (UI.view === meSeat() ? 'you' : esc(G.seats[UI.view].name)) + '</b> &middot; <b class="riv">' + (ri === meSeat() ? 'you' : esc(G.seats[ri].name)) + '</b></small>' : '') + '</span>' + th;
+  var land = function (x) { return x.habT + x.bonusT; };   // R5: plain words, not a strip of number pairs
+  tr.innerHTML = '<span class="tl">Land points: ' + (UI.view === meSeat() ? 'you' : esc(G.seats[UI.view].name)) + ' <b class="me">' + land(sc) + '</b>' + (rv ? ', ' + (ri === meSeat() ? 'you' : esc(G.seats[ri].name)) + ' <b class="riv">' + land(rv) + '</b>' : '') + '</span>';
   var turn = Math.min(G.turns, G.seats[G.cur].done + 1);
   $('#barstat').innerHTML = '<span class="pill">Turn <b>' + turn + '/' + G.turns + '</b></span>' + (G.np > 1 ? '' : '<span class="pill">Score <b>' + sc.total + '</b></span>');
   var lt = lineText(), sm = /^Step (\d) of 3: (.*)$/.exec(lt), co = coachText();

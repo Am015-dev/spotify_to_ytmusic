@@ -140,13 +140,34 @@ var WMF = (function () {
   };
   act = window.act;
   var render0 = window.render;
-  window.render = function () { var r = render0.apply(this, arguments); try { F.rollAll($('#board')); } catch (e) { } return r; };
+  window.render = function () { var r = render0.apply(this, arguments); try { F.rollAll($('#board')); var pv = $('#pv'); if (pv && coachUp()) pv.hidden = true; var tl = $('#tline'); if (tl && coachUp()) tl.hidden = true; placeTline(); } catch (e) { } return r; };
   render = window.render;
+  // R5: one turn line under the board after every turn (yours and the rival's): "Bram +9: +6 elk line, +3 river".
+  // It stays until tapped or the next turn's line replaces it (never a timer).
+  function tline() { var e = $('#tline'); if (!e) { e = document.createElement('div'); e.id = 'tline'; e.setAttribute('role', 'status'); e.setAttribute('aria-live', 'polite'); e.hidden = true; e.addEventListener('click', function () { e.hidden = true; }); $('#board').appendChild(e); } return e; }
+  function placeTline() { var e = $('#tline'), ln = $('#line'); if (!e || e.hidden || !ln) return; var b = $('#board').getBoundingClientRect(), r = ln.getBoundingClientRect(); e.style.bottom = Math.round(b.bottom - r.top + 8) + 'px'; }
+  function turnStart() { if (!G || G.over) return null; var s = G.seats[G.cur]; return { key: G.cur + ':' + s.done, seat: G.cur, sc: pvScore(s.env, s.acorns), tot: WM.final(G)[G.cur].total }; }
+  function turnSay(T) {
+    if (!T || !G || UI.mode === 'coach' || UI.mode === 'tutorial') return;   // Learn has Rowan's bubble: one message at a time
+    var s = G.seats[T.seat], d = WM.final(G)[T.seat].total - T.tot, parts = pvParts(T.sc, pvScore(s.env, s.acorns));
+    if (s.acorns > T.sc.acorns) parts.push({ d: s.acorns - T.sc.acorns, a: null, t: null });
+    var nm = T.seat === meSeat() && UI.humans === 1 ? 'You' : s.name, why = parts.length ? pvPop(parts) : '';
+    var e = tline(); e.innerHTML = '<b>' + esc(nm) + (d > 0 ? ' +' + d : d < 0 ? ' ' + d : '') + '</b>' + (d === 0 ? ': no points this turn' : why && !hintsOn() ? ': ' + esc(why.replace(/^[+-]?\d+\s*/, '').replace(/, [+-]?\d+ /g, ', ')) : why ? ': ' + esc(why) : '');
+    e.hidden = false; placeTline();
+  }
   var step0 = window.step;
-  window.step = function () { if (G && G.over && !UI.beatDone) { UI.beatDone = true; F.thump($('#seats') || $('#barstat')); } if (G && !G.over) UI.beatDone = false; return step0.apply(this, arguments); };
+  window.step = function () {
+    if (G && G.over && !UI.beatDone) { UI.beatDone = true; F.thump($('#seats') || $('#barstat')); } if (G && !G.over) UI.beatDone = false;
+    try {   // the turn passed (seat or turn count changed): say what the last turn scored, then remember the new one
+      var k = G && !G.over ? G.cur + ':' + G.seats[G.cur].done : 'over';
+      if (UI.turnT && UI.turnT.key !== k) turnSay(UI.turnT);
+      if (!UI.turnT || UI.turnT.key !== k) UI.turnT = turnStart();
+    } catch (e) { console.error("turn line", e); UI.turnT = null; }
+    var r = step0.apply(this, arguments); placeTline(); return r;
+  };
   step = window.step;
   var newGame0 = window.newGame;
-  window.newGame = function () { F.rollReset(); return newGame0.apply(this, arguments); };
+  window.newGame = function () { F.rollReset(); UI.turnT = null; var t = $('#tline'); if (t) t.hidden = true; return newGame0.apply(this, arguments); };
   newGame = window.newGame;
 
   // ---------------------------------------------------------------- keyboard (PC): 1-4 pick, arrows move, R turn, Enter place, Z back, B return, +/- zoom
