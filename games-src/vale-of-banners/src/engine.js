@@ -34,6 +34,7 @@
     var G = { v: 1, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, n: n, nPhases: o.phases || 5, phase: 0, round: 0,
       seats: [], P: [], depots: {}, goodsAt: {}, black: [], bag: [], gbag: [], rg: [], white: 1, order: [], ti: 0, pend: [], arrc: 0,
       colTaken: {}, over: false, log: [], noBlack: !!o.noBlack, turn: 0, seq: 0, winner: null, solo: n === 1, teams: teams };
+    if (o.rounds && o.rounds < 5) G.nRounds = o.rounds;   /* short coached game: fewer rounds per season */
     G.seed0 = G.rs;
     for (var i = 0; i < n; i++) {
       var s = (o.seats && o.seats[i]) || {};
@@ -282,7 +283,7 @@
     G.turn++; G.ti++;
     if (G.ti < G.n) return;
     G.round++;
-    if (G.round < 5) { startRound(G); return; }
+    if (G.round < (G.nRounds || 5)) { startRound(G); return; }
     /* season end: mines */
     G.P.forEach(function (p) {
       var mines = 0; for (var k in p.estate) if (p.estate[k].t === 'mine') mines++;
