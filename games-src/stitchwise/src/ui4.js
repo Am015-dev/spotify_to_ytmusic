@@ -20,7 +20,7 @@ function tutStart(o) { // W381 ADDENDUM 4: the tutorial is a coached first game 
   try { clearTimeout(toast.t); $('#toast').classList.remove('on'); GX.close(); } catch (e) { }
   if (typeof GXT !== 'undefined' && GXT.active && GXT.active()) try { GXT.stop(); } catch (e) { }
   $('#start').hidden = true; $('#rs').hidden = true;
-  newGame('vs', { seed: 4242, ring: TUT_RING, first: 0, lvl: 'easy', name: 'Marden', save: false, coach: true });
+  newGame('vs', { seed: 4242, ring: TUT_RING, first: 0, lvl: 'easy', name: 'Marden', save: false, coach: true, setup: function (g) { g.pos = [26, 26]; } });   // a short fair: the coached first game starts halfway round the track
   UI.prologue = !!(o && o.prologue); UI.flavor = ''; coachStart(); render();
 }
 window.GXCOACH = { running: false, explained: [], done: false };   // qa-bot / tests: the coached first game's state
