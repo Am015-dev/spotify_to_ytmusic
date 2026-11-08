@@ -9,8 +9,8 @@ function showStart(view) {
   var m = h('div.menu');
   if (hasSave()) m.appendChild(h('button.btn.go', { type: 'button', 'data-a': 'resume' }, 'Continue your game', h('small', 'Pick up where you stopped')));
   if (window.CAMPAIGN && typeof GXC !== 'undefined') m.appendChild(h('button.btn' + (hasSave() ? '' : '.go'), { type: 'button', 'data-a': 'story' }, 'Story: The Quilter’s Year', h('small', camp || 'Three county fairs, ten stages, three champions')));
-  m.appendChild(h('button.btn', { type: 'button', 'data-a': 'quick' }, 'Quick game', h('small', 'Against the computer or a friend on this screen')));
-  m.appendChild(h('button.btn' + (firstTime() ? '.go' : ''), { type: 'button', 'data-a': 'start', 'data-tut': '1' }, 'Learn: your first game', h('small', 'A real game; Aunt Wren coaches you as you play')));
+  m.appendChild(h('button.btn', { type: 'button', 'data-a': 'start' }, 'Quick game', h('small', 'Against the computer or a friend on this screen')));
+  m.appendChild(h('button.btn' + (firstTime() ? '.go' : ''), { type: 'button', 'data-a': 'learn', 'data-tut': '1' }, 'Learn: your first game', h('small', 'A real game; Aunt Wren coaches you as you play')));
   m.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'rules' }, 'How to play'));
   card.appendChild(m); st.innerHTML = ''; st.appendChild(card);
   try { GX.showDock && 0; } catch (e) { }
@@ -28,9 +28,9 @@ function renderSetup(st) {
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return; var a = t.dataset.a;
   if (a === 'offer') selectOffer(+t.dataset.k); else if (a === 'adv') doAdvance(); else if (a === 'rot') rotate(); else if (a === 'flip') flip(); else if (a === 'sew') confirmSew(); else if (a === 'cancel') cancelSel();
-  else if (a === 'strip') { if (G && !UI.coach) { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else if (G) toast('Buttons ' + G.btn[sd] + ' · income ' + G.inc[sd] + ' per spot · ' + swEmpty(G.board[sd]) + ' empty squares'); }
-  else if (a === 'resume') loadGame(); else if (a === 'quick') showStart('setup'); else if (a === 'rules') { GX.show('rulesd'); }
-  else if (a === 'story') storyOpen(); else if (a === 'start') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
+  else if (a === 'strip') { if (G && !UI.coach) { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); } }
+  else if (a === 'resume') loadGame(); else if (a === 'quick' || a === 'start') showStart('setup'); else if (a === 'rules') { GX.show('rulesd'); }
+  else if (a === 'story') storyOpen(); else if (a === 'learn') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
   else if (a === 'campfin') { $('#rs').hidden = true; }
 });
 function showOppQuilt(seat) { var d = $('#oppd .gx-drawer-body') || null; var body = h('div', { style: 'display:flex;flex-direction:column;align-items:center;gap:8px' }); var saved = UI.cs; UI.cs = Math.min(34, Math.floor((Math.min(innerWidth, 420) - 60) / 9)); var q = quiltEl(seat, 'opp'); body.appendChild(q); var sc = swScore(G, seat); body.appendChild(h('div', { html: '<b>' + nameOf(seat) + '</b>: ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ' per spot, ' + sc.empty + ' empty squares' })); UI.cs = saved;

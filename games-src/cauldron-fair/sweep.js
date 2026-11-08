@@ -235,6 +235,8 @@ async function playGame(p, tag, opt) {
     // rotation mid-game
     if (opt.rotate && s.round >= 4 && rot === 0 && s.phase === 'brew') { rot = 1; await p.setViewportSize({ width: 844, height: 390 }); await p.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(700); }
     if (opt.rotate && s.round >= 7 && rot === 1 && s.phase === 'brew') { rot = 2; await p.setViewportSize({ width: size.width, height: size.height }); await p.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(700); }
+    // the Goal card is a modal a player reads, then taps away (W471)
+    { const gc = await ctr(p, '#goalcard .gcok'); if (gc) { await sleep(400); await p.touchscreen.tap(gc[0], gc[1]); await sleep(300); continue; } }
     // invariants (re-checked once after a beat, so a transition frame is not a failure)
     let bad = await p.evaluate(CHECKS); if (bad.length) { await sleep(700); bad = await p.evaluate(CHECKS); }
     for (const [k, d] of bad) await fail(p, tag, k, d);

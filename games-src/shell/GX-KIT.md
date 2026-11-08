@@ -270,3 +270,14 @@ Pilot: Thornbound (`thornbound/game/src/ui12.js`, 19 steps, ~5 minutes).
 8. `GX.offline()` at boot.
 9. Help kit (section 9): bulb, first-time bubbles, Tips switch.
 10. Run the game's click / layout tests and `kit-test.js`; look at the screenshots.
+
+## 11. Shared type scale, toast and Goal card (D0 shell polish)
+
+- **Scale** (tokens in `gx-kit.css`): `--gx-fs-min` 14px floor, `--gx-fs-body` 16px, `--gx-fs-lg` 18, `--gx-fs-h2` 22, `--gx-fs-h1` 28; `--gx-tap` 44px.
+  `gx-menu.css` (injected last) enforces the 14px text floor and 44px touch targets on every shell class, even over a game's own rule.
+- **Toast** `GX.toast(text, {title, kind:'info'|'good'|'warn', at:'bottom'|'top', sticky, ms, onTap})`: one at a time (queued, max 4),
+  stays until tapped or `GX.toastMs(text)` = 4 s + 1 s per 10 words. Nothing shows when `html.gx-play` is set and `html.gx-hints` is not
+  (Play mode, Hints off): the game toggles those two classes. `GX.toastClear()` closes everything.
+- **Goal card** `GX.goalCard({title, goal, bullets:[<=3], go, onGo, pic})` (or `GX.goalHTML(o)` for markup): one plain sentence, at most 3 bullets, one primary button.
+- Panels: the phone dock is capped at 40dvh (34dvh landscape) so the art stays visible. `prefers-reduced-motion` stops every shell loop animation.
+- Proof: `design-shots/` holds before/after shots at 390x844 and 1440x900 for wildmark, sands-of-qamar, hollowbough, short-fuse.
