@@ -119,14 +119,15 @@ function tutStory(steps){const wires=()=>G.st.reduce((a,s)=>a+s.w.length,0);
 // ---------------------------------------------------------------- the kit hooks
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStartOld(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:STORY.tut.endTitle,endText:o?STORY.tut.endText:STORY.tut.endTextPlain,
-    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:[{id:'job1',label:'Play job 1'}],   // the guided job ends in a real one
     setup:tutNew,
     onDone:r=>{tutLeave();const c=r&&r.choice;
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
+      else if(c==='job1'){UI.setup=UI.setup||defaultSetup();startJob({job:1,np:3,seats:['human','ai','ai'],lv:'easy',names:DEFNAMES.slice(),chars:[],captain:0})}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else showStart()},
     onExit:()=>{tutLeave();showStart();if(pro&&typeof GXC!=='undefined')GXC.open()}})}   // skipping the Story prologue opens the chapter map

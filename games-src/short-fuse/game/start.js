@@ -18,7 +18,7 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
    <div class="seg" role="group" aria-label="Computer level"><span class="seglbl">Computer</span>${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>
       <button class="big go" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
    <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small><span class="cast" aria-hidden="true"><i class="c-brix"></i><i class="c-quill"></i><i class="c-mole"></i></span></button>
-   <button class="btn wide" data-a="offeryes">${ico('book')}Learn to play<small>A coached first game</small></button>
+   <button class="btn wide" data-a="offeryes">${ico('book')}Learn to play<small>A guided first job</small></button>
    ${saved?`<button class="btn wide" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
    <details class="more"${more?' open data-full="1"':''}><summary>More: seats, online play, all jobs <span aria-hidden="true">▾</span></summary>${more?`
     <div class="seg"><button class="btn small${seatMode(s)==='solo'?' on':''}" data-a="preset" data-v="solo">${ico('user')}Solo</button><button class="btn small${seatMode(s)==='hot'?' on':''}" data-a="preset" data-v="hot">${ico('four')}One phone</button><button class="btn small${seatMode(s)==='watch'?' on':''}" data-a="preset" data-v="watch">${ico('eye')}Watch</button></div>
