@@ -7,18 +7,20 @@ const PIMG={};
 function pimg(f,cb){if(PIMG[f]!==undefined){if(cb&&PIMG[f]===1)cb();return}PIMG[f]=0;const i=new Image();i.onload=()=>{PIMG[f]=1;if(cb)cb()};i.src=(f.includes('/')?f:MEDIA+f)+'.webp'}
 function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
 // texture name -> [file, size of one repeat in tile units]
-const TEXD={field:60,road:30,river:40,lake:34,garden:20,hedge:20,hub:20,wall:25,mon:40,'town-basilica':50,town:50,roof:24};
+const TEXD={field:100,road:40,river:50,lake:40,garden:20,hedge:24,hub:24,wall:25,mon:50,'town-basilica':60,town:60,roof:24};
 function texDefs(){let d='';for(const k in TEXD){if(PIMG['tex-'+k]!==1)continue;const s=TEXD[k];d+=`<pattern id="tx-${k}" patternUnits="userSpaceOnUse" width="${s}" height="${s}"><image href="${MEDIA}tex-${k}.webp" width="${s}" height="${s}" preserveAspectRatio="none"/></pattern>`}return d}
 function texApply(){TEXSET={};let any=false;
   if(PAINT_ON)for(const k in TEXD)if(PIMG['tex-'+k]===1){TEXSET[k]=1;any=true}
   let el=document.getElementById('txdefs');if(!el){el=document.createElement('div');el.id='txdefs';el.setAttribute('aria-hidden','true');el.style.cssText='position:absolute;width:0;height:0;overflow:hidden';document.body.insertBefore(el,document.body.firstChild)}
-  el.innerHTML=any?`<svg width="0" height="0" style="position:absolute"><defs>${texDefs()}</defs></svg>`:'';
+  el.innerHTML=any?`<svg width="0" height="0" style="position:absolute"><defs>${texDefs()}<radialGradient id="tshade" cx="38%" cy="32%" r="80%"><stop offset="0" stop-color="#fff6d8" stop-opacity=".22"/><stop offset=".55" stop-color="#fff6d8" stop-opacity="0"/><stop offset="1" stop-color="#3a2410" stop-opacity=".28"/></radialGradient></defs></svg>`:'';
   if(typeof G!=='undefined'&&G&&typeof UI!=='undefined'){try{for(const k in UI.tl){const T=G.tiles[k];if(T)UI.tl[k].innerHTML=tileSvg(T.t,T.r)}UI.handKey=null;if(G.cur&&!G.over){renderHand();renderGlows()}}catch(e){}}}
 // pieces: painted figure on a player-coloured disc (seat chips keep the drawn icons: they are tiny and need the colour)
 const PCF={meeple:'models/piece-meeple@512',champ:'models/piece-champ@512',mason:'models/piece-mason@512',hog:'models/piece-hog@512'};   // 3D renders of the follower models (transparent, 3/4 view); the player colour is the disc behind them
+const PCG={};   // owner .glb follower models drawn once to a sprite (gx-glbsprite.js); the @512 render above is the fallback on weak devices
+Object.keys(PCF).forEach(n=>{try{GXSPR.use('models/piece-'+n,{size:256}).then(u=>{if(!u)return;PCG[n]=u;document.querySelectorAll('img[src*="piece-'+n+'@512"]').forEach(i=>{i.src=u})})}catch(e){}});
 const COLN=['red','blue','yellow','green'];   // seats 0-3 have a painted piece in their own colour; seats 4-5 keep the model sprite on a disc
 function pcHtml(n,seat){const pf='piece-'+n+'-'+COLN[seat];if(PAINT_ON&&seat!==undefined&&PIMG[pf]===1)return`<span class="pc pp"><img src="${MEDIA}${pf}.webp" alt="" draggable="false"></span>`;
-  return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${PCF[n]}.webp" alt="" draggable="false"></span>`:ico(n)}
+  return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${PCG[n]||PCF[n]+'.webp'}" alt="" draggable="false"></span>`:ico(n)}
 function fi(n,seat){const pf='piece-'+n+'-'+COLN[seat];return PAINT_ON&&PIMG[pf]===1?`<img class="fi" src="${MEDIA}${pf}.webp" alt="" draggable="false">`:ico(n)}
 const TABLES=['harvest','riverbank','sable-hall'],BACKS=['tavern','raven'];
 function paintApply(){
@@ -33,10 +35,13 @@ function paintBoot(){try{GXSK.init({})}catch(e){}
   const all=Object.keys(TEXD).map(k=>'tex-'+k);let left=all.length;
   all.forEach(f=>pimg(f,()=>{if(--left===0)texApply()}));
   [...Object.keys(PCF).flatMap(n=>COLN.map(c=>'piece-'+n+'-'+c)),'icon-follower','icon-tile','icon-score','ui-score-pill','ui-tray','ui-rotate-btn','ui-ribbon','ui-trophy','title','title-phone','table-default','table-default-phone','back-default','end-win','end-lose',...Object.values(PCF)].forEach(f=>pimg(f,paintApply));
-  ['table-harvest','table-riverbank','table-sable-hall','back-tavern','back-raven'].forEach(f=>pimg(f));paintApply()}
+  ['table-harvest','table-riverbank','table-sable-hall','back-tavern','back-raven'].forEach(f=>pimg(f));paintApply();
+  ['end-win-b','end-win-c','end-lose-b','end-lose-c'].forEach(f=>{if(typeof MEDIA_FILES!=='undefined'&&MEDIA_FILES.includes(f+'.webp'))pimg(f)})}
 function paintToggle(){PAINT_ON=!PAINT_ON;try{localStorage.setItem('rv_paint',PAINT_ON?'1':'0')}catch(x){}texApply();paintApply()}
 // end banner on the result card and on the story result screen
-function endBanner(box,won){if(!box||box.querySelector('.endart')||!PAINT_ON)return;const f=won?'end-win':'end-lose';if(PIMG[f]!==1)return;
+// Wave 7 variants (end-*-b, end-*-c): used at random once their files are in media/ (the owner's inbox lists them; until then only the first painting shows)
+const ENDV=['','-b','-c'];function endPick(won){const k=won?'end-win':'end-lose',ok=ENDV.map(v=>k+v).filter(f=>PIMG[f]===1);return ok.length?ok[Math.floor(Math.random()*ok.length)]:k}
+function endBanner(box,won){if(!box||box.querySelector('.endart')||!PAINT_ON)return;const f=endPick(won);if(PIMG[f]!==1)return;
   const d=document.createElement('div');d.className='endart '+(won?'win':'lose');d.setAttribute('aria-hidden','true');d.style.backgroundImage='url('+MEDIA+f+'.webp)';box.insertBefore(d,box.firstChild)}
 (function(){const sr=showResult;showResult=function(){sr.apply(this,arguments);try{const win=G.over.win,me=G.pl.find(p=>p.human),w=!human()||(me&&win.includes(me.i)&&win.length===1);endBanner($('#modal .card[aria-label=Result]'),w)}catch(e){}}})();
 new MutationObserver(()=>{const r=document.querySelector('.gxc-res-on .gxc-res');if(r&&!r.querySelector('.endart'))endBanner(r,/\bwon\b/.test(r.closest('.gxc-res-on').className))}).observe(document.body,{childList:true,subtree:true});

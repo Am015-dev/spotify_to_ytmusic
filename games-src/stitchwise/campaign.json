@@ -1047,15 +1047,15 @@
   "coach": {
    "start": [
     1,
-    "You win with the most points when time runs out. Buy a glowing patch, or tap Advance."
+    "You win with the most points when time runs out. Score is buttons minus 2 for each empty square. Buy a glowing patch, or tap Advance."
    ],
    "income_me": [
     2,
-    "Pay day! You passed a gold spot: every button printed on your patches paid you {n}."
+    "Pay day! You passed a gold spot. Your patch buttons paid you {n}."
    ],
    "income_zero": [
     2,
-    "A gold spot, but your patches carry no buttons yet, so it paid 0. Buy patches with buttons!"
+    "A gold spot! Your patches have no buttons yet, so it paid 0. Buy patches with buttons!"
    ],
    "income_opp": [
     2,
@@ -1075,7 +1075,7 @@
    ],
    "leather_me": [
     3,
-    "A leather scrap! You passed it first, so it is yours, free: put it on any empty square."
+    "A leather scrap! You passed it first, so it is yours. Put it on any empty square."
    ],
    "leather_opp": [
     3,
@@ -1083,7 +1083,7 @@
    ],
    "bonus": [
     3,
-    "{name} filled a whole 7x7 block: the gold rosette, worth +7 at the judging!"
+    "{name} filled a whole 7x7 block. That is +7 at the judging!"
    ],
    "late": [
     4,
@@ -1103,7 +1103,7 @@
    ],
    "buy_good": [
     1,
-    "Good buy! It carries buttons, so it pays you at every gold spot on the track."
+    "Good buy! It has buttons, so it pays you at every gold spot."
    ],
    "buy_big": [
     1,
@@ -1111,7 +1111,7 @@
    ],
    "buy_cheap": [
     1,
-    "Cheap and quick: your token barely moves, so you may get the next turn too."
+    "Cheap and quick. Your token barely moves, so you may go again."
    ],
    "buy_poor": [
     1,
@@ -1127,20 +1127,20 @@
    ],
    "opp_slow": [
     3,
-    "Marden took a slow patch, so Marden's token jumped ahead: expect a few turns in a row."
+    "Marden took a slow patch and jumped ahead. You may get several turns."
    ]
   },
   "final": {
    "win": "Aunt Wren: Ten years I waited to see Marden lose a ribbon. Empty squares cost 2 each; you left fewer. Welcome to the fair!",
    "lose": "Aunt Wren: Marden wins this one, but you learned every rule. Empty squares cost 2 each; fill more next time.",
    "tie": "Aunt Wren: A dead heat! On a tie, whoever reached the end first takes the ribbon.",
-   "nobonus": "Nobody filled a 7x7 block, so the +7 rosette stayed on the judges' table.",
-   "walk": "Your score: {b} buttons + {x} bonus − {e} empty × 2 = {t}. Marden: {ob} + {ox} − {oe} × 2 = {ot}."
+   "nobonus": "Nobody filled a 7x7 block, so nobody got the +7.",
+   "walk": "You: {b} buttons + {x} bonus − {e} empty × 2 = {t}. Marden: {ob} + {ox} − {oe} × 2 = {ot}."
   },
   "quick": {
    "intro": {
     "easy": "Poppy has brought cake and a sewing basket. Friendly match, ribbon at stake.",
-    "normal": "Marden has won this fair three years running and wants a fourth ribbon.",
+    "normal": "Marden has won this fair three years running. Marden wants four.",
     "hard": "Aurelia, the county champion, never leaves a square empty. Good luck."
    },
    "win": "The judges pin the ribbon on your quilt.",

@@ -1,342 +1,29 @@
 {
  "slug": "tidewake",
- "when": "2026-11-08T02:35Z",
- "secs": 30,
- "totalSecs": 83,
+ "when": "2026-11-08T03:40Z",
+ "secs": 120,
+ "totalSecs": 298,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 4,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Cobalt's turn (computer)",
-     "words": 3,
-     "shownMs": 372,
-     "neededMs": 4300,
-     "cls": "ps-msg"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Vermilion",
-      "The Lantern Race Cobalt swears the Reach is his. L"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Osk Rogue Wave! A junk in its band rolls a die: me",
-      "Vermilion"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Osk The Maelstrom It moves only on calm rolls and ",
-      "Vermilion"
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
-   "status": "FAIL",
-   "count": 1,
-   "detail": [
-    {
-     "session": "phone/play",
-     "text": "Cobalt's turn (computer)",
-     "ms": 402,
-     "cls": "ps-msg",
-     "tag": "div"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 20,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.",
-     "words": 15,
-     "at": 2543,
-     "where": "p.tiny"
-    },
-    {
-     "session": "phone/play",
-     "text": "Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.",
-     "words": 15,
-     "at": 3503,
-     "where": "p.tiny"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.",
-     "words": 15,
-     "at": 3821,
-     "where": "p.tiny"
-    },
-    {
-     "session": "pc/learn",
-     "text": "A portal tile that rescues a junk or flings pieces across the sea.",
-     "words": 13,
-     "at": 3822,
-     "where": "small."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Five cannons in the tile pile: shoot a leviathan about to sink you.",
-     "words": 13,
-     "at": 3822,
-     "where": "small."
-    },
-    {
-     "session": "pc/learn",
-     "text": "It moves only on calm rolls and swallows any tile, junk or leviathan it enters.",
-     "words": 15,
-     "at": 10000,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "If a leviathan blocks your start before you sail, move to another free mark on that edge.",
-     "words": 17,
-     "at": 12280,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "The computers play by themselves; you only act on your turn, in step 2 (Place).",
-     "words": 15,
-     "at": 12280,
-     "where": "p.tiny"
-    },
-    {
-     "session": "pc/learn",
-     "text": "2+6=8: 6, 7 or 8 wakes the leviathans: each swims a square or turns.",
-     "words": 14,
-     "at": 13433,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Your junk sails 1 current and stops at column 1, row 2 (the flag on the board).",
-     "words": 17,
-     "at": 16937,
-     "where": "p."
-    },
-    {
-     "session": "pc/learn",
-     "text": "If the leviathans wake (dice total 6 to 8) and it rolls 4, it moves onto you and you sink (about 7% each turn).",
-     "words": 24,
-     "at": 16937,
-     "where": "span.warn-l.thr"
-    },
-    {
-     "session": "pc/learn",
-     "text": "If the leviathans wake (dice total 6 to 8) and it rolls 1, it moves onto you and you sink (about 7% each turn).",
-     "words": 24,
-     "at": 16937,
-     "where": "span.warn-l.thr"
-    },
-    {
-     "session": "pc/learn",
-     "text": "If your tile sinks Cobalt, you may swap tiles with his hand before you draw.",
-     "words": 15,
-     "at": 28402,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Later you can fire it at a leviathan that is about to sink you, even on someone else's turn.",
-     "words": 19,
-     "at": 29427,
-     "where": "p.tiny"
-    },
-    {
-     "session": "pc/learn",
-     "text": "You may keep it, or show it and discard it to draw a different tile instead.",
-     "words": 16,
-     "at": 29427,
-     "where": "p.tiny"
-    },
-    {
-     "session": "pc/learn",
-     "text": "When a leviathan would sink you, fire it: the beast is gone for good.",
-     "words": 14,
-     "at": 30256,
-     "where": "span."
-    },
-    {
-     "session": "pc/play",
-     "text": "Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.",
-     "words": 15,
-     "at": 2532,
-     "where": "p.tiny"
-    },
-    {
-     "session": "pc/play",
-     "text": "A portal tile that rescues a junk or flings pieces across the sea.",
-     "words": 13,
-     "at": 2533,
-     "where": "small."
-    },
-    {
-     "session": "pc/play",
-     "text": "Five cannons in the tile pile: shoot a leviathan about to sink you.",
-     "words": 13,
-     "at": 2533,
-     "where": "small."
-    },
-    {
-     "session": "pc/play",
-     "text": "The computers play by themselves; you only act on your turn, in step 2 (Place).",
-     "words": 15,
-     "at": 5857,
-     "where": "p.tiny"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
-   "status": "FAIL",
-   "count": 18,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Hint",
-     "px": 13,
-     "at": 2542,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Crews",
-     "px": 13,
-     "at": 2542,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Log",
-     "px": 13,
-     "at": 2542,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Rules",
-     "px": 13,
-     "at": 2542,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Menu",
-     "px": 13,
-     "at": 2542,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "New here? Play one real game against Cobalt; Grandmother Osk",
-     "px": 13.6,
-     "at": 2543,
-     "where": "p.tiny"
-    },
-    {
-     "session": "phone/learn",
-     "text": "You are the first captain; the others are computers.",
-     "px": 13.6,
-     "at": 2543,
-     "where": "p.tiny"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Last junk afloat wins.",
-     "px": 13.6,
-     "at": 2543,
-     "where": "p.tiny"
-    },
-    {
-     "session": "phone/play",
-     "text": "Hint",
-     "px": 13,
-     "at": 3502,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "Crews",
-     "px": 13,
-     "at": 3502,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "Log",
-     "px": 13,
-     "at": 3502,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "Rules",
-     "px": 13,
-     "at": 3502,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "Menu",
-     "px": 13,
-     "at": 3502,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "New here? Play one real game against Cobalt; Grandmother Osk",
-     "px": 13.6,
-     "at": 3503,
-     "where": "p.tiny"
-    },
-    {
-     "session": "phone/play",
-     "text": "You are the first captain; the others are computers.",
-     "px": 13.6,
-     "at": 3503,
-     "where": "p.tiny"
-    },
-    {
-     "session": "phone/play",
-     "text": "Last junk afloat wins.",
-     "px": 13.6,
-     "at": 3503,
-     "where": "p.tiny"
-    },
-    {
-     "session": "phone/play",
-     "text": "One junk, six leviathans. Goal: survive until all ten leviat",
-     "px": 13.6,
-     "at": 8754,
-     "where": "p.tiny"
-    },
-    {
-     "session": "phone/play",
-     "text": "The computers play each other. Sit back.",
-     "px": 13.6,
-     "at": 9785,
-     "where": "p.tiny"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
    "status": "PASS",
@@ -349,42 +36,42 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 4,
-   "clicks": 43,
-   "endedBy": "time",
+   "secs": 120,
+   "turns": 214,
+   "clicks": 241,
+   "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 45
+   "messagesSeen": 16
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 12,
-   "turns": 5,
-   "clicks": 10,
+   "secs": 23,
+   "turns": 37,
+   "clicks": 39,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 1
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 31,
-   "turns": 22,
-   "clicks": 26,
-   "endedBy": "time",
-   "tutorialEnded": 8,
+   "secs": 121,
+   "turns": 164,
+   "clicks": 175,
+   "endedBy": "result",
+   "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 12
+   "messagesSeen": 13
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 10,
-   "turns": 5,
-   "clicks": 6,
+   "secs": 33,
+   "turns": 54,
+   "clicks": 55,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,

@@ -119,3 +119,5 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Reviewers: R1 ..ahe5suP3xNPk5RzuZ (ember re-review) | R2 ..XYmDMDL6qf8uWCwMr (stitchwise) | R3 ..Z5ujJ5BU5ke5G5813 (hollowbough) |
   R4 ..brAaCXvYMQjCAPFvd (shipwreck) | R5 ..XkYd51MsSJRSVN1ec (wildmark) | R6 ..b9b3xUSvbEEN9eA33 (sunglaze)
 - Gates: logic-test, feel-audit.js (a)-(e) 0, Learn by touch no Skip, asset-usage (GX_STAGE=games-src/.staging for staged), reviewer PASS.
+- 04:14: emberclimb live 03:43, R1 3rd review all rows >=7, one blocker (Learn relic toast 250 ms) with W420. Stitchwise with R2,
+  lantern with R6 (re-review). Sands: W480 merging W408f (conflicts in ft/src coach/score/ui). R3/R5 idle.

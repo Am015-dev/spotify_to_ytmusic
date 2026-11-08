@@ -42,7 +42,7 @@ body.three #map{display:none}
 #tags{position:absolute;inset:0;pointer-events:none}
 .tag{position:absolute;left:0;top:0;background:#fffaf0;color:#1a1320;border:2.5px solid #1a1320;border-radius:10px;padding:.1rem .4rem .15rem;box-shadow:3px 3px 0 #1a1320;white-space:nowrap;font-size:.78rem;line-height:1.15;text-align:center;border-top:6px solid var(--mc)}
 .tag b{display:block;font:1rem/1 Bangers,Impact,sans-serif;letter-spacing:.05em}
-.tag b i{font:italic .7rem Nunito,sans-serif;background:#1a1320;color:#ffd23f;padding:0 .25rem;border-radius:4px;margin-left:.15rem}
+.tag b i{font:italic 14px Nunito,sans-serif;background:#1a1320;color:#ffd23f;padding:0 .25rem;border-radius:4px;margin-left:.15rem}
 .tag span{display:flex;gap:.25rem;justify-content:center;font-weight:900}
 .tag em{font-style:normal}.tag .h{color:#e63946}.tag .v{color:#c98500}.tag .e{color:#1f9d5c}.tag .m{color:#b0306f}
 .tag.on{background:var(--yellow);transform-origin:bottom center;box-shadow:0 0 0 3px #fff,4px 4px 0 #1a1320}

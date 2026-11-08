@@ -94,7 +94,7 @@ function oppsFullHTML(me){const ps=G.pl.filter(p=>p.i!==me);const f=UI.oppView;p
    <div class="chips">${races(p).concat(classes(p)).map(r=>`<span class="chip">${esc(TRAITNAME[r]||r)}</span>`).join('')}${p.curse.map(id=>`<span class="chip" style="background:#e9ecef;color:#2b2233">☁ ${esc(cname(id))}</span>`).join('')}</div>
    <div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>cardHTML(id,{size:'xs'})).join('')}${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')||'<span class="small muted">No items yet.</span>'}</div>${phList(p)}</div>`}).join('')}
 function deckHTML(kind,n){const d=Math.min(10,Math.ceil(n/7));const sh=[];for(let i=1;i<=d;i++)sh.push(`${(i*.55).toFixed(1)}px ${(i*1.25).toFixed(1)}px 0 ${i===d?'#1a0d06':i%2?'#e9dab4':'#bfa878'}`);
-  const door=kind==='door';return `<div class="stack ${door?'door':'treas'}" aria-label="${door?'Door':'Treasure'} deck" style="--deck:${sh.join(',')||'0 0 0 transparent'}${n?'':';opacity:.35'}"><span class="back">${typeof cardBack==='function'?cardBack(door?'door':'tr'):''}</span><span class="dn">${door?'DOOR':'TREASURE'}</span><span class="n">${n}</span></div>`}
+  const door=kind==='door';return `<div class="stack ${door?'door':'treas'}" aria-label="${door?'Door':'Treasure'} deck" style="--deck:${sh.join(',')||'0 0 0 transparent'}${n?'':';opacity:.35'}"><span class="back">${typeof cardBack==='function'?cardBack(door?'door':'tr'):''}</span><span class="dn">${door?'Doors':'Treasure'}</span><span class="n">${n}</span></div>`}
 function pilesHTML(){const dk=G.door.length;const ld=G.dd[G.dd.length-1];
   return `<div class="pile pl">${deckHTML('door',dk)}<span class="lbl">discard: ${G.dd.length}</span>${ld!=null?cardHTML(ld,{size:'xs'}):''}</div>`}
 function pileR(){const tk=G.tr.length,lt=G.td[G.td.length-1];return `<div class="pile pr">${deckHTML('tr',tk)}<span class="lbl">discard: ${G.td.length}</span>${lt!=null?cardHTML(lt,{size:'xs'}):''}</div>`}
@@ -293,7 +293,8 @@ function humanTurn(){if(!G||G.winner)return false;const s=sideToAct();return s>=
 try{const ex=JSON.parse(localStorage.getItem('dkd_ex')||'null');if(ex)Object.assign(DEFEX,ex)}catch(e){}
 // ---- board-first shell: popups for the diary, rivals, card details and rules ----
 GX.init({key:'dkd'});
-if(typeof GXSK!=='undefined')GXSK.init({});
+// story map, stars and act banner need media/story-map.webp, ui-star-on/off.webp, ui-act-banner-c.webp for THIS game (none exist yet: 404s); switch each on when its file lands
+if(typeof GXSK!=='undefined')GXSK.init({map:false,stars:false,banner:false});
 GX.drawer('dkLog','Dungeon diary',$('#dkLogBody'));
 GX.drawer('dkOpp','Rivals: gear and cards',$('#dkOppBody'),true);
 GX.drawer('dkCard','Card',$('#dkCardBody'));

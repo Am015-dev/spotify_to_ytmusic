@@ -21,6 +21,8 @@ async function run(b, W, H) {
   const first = await p.evaluate(() => { const bt = document.querySelector('#start [data-gxt-open]'); if (!bt) return null; const r = bt.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2, bt.textContent]; });
   if (!first || !/New here/.test(first[2])) { note(tag, 'first title option is not the tutorial'); await ctx.close(); return; }
   await tap(first[0], first[1]); await sleep(900); await p.evaluate(() => { AIDELAY = 160; });
+  // the Goal card is the first screen of Learn to play: it must say how you win, then close by touch
+  { const gt = await p.evaluate(() => { const g = document.querySelector('#kkgoal.on h2'); return g ? g.textContent : ''; }); if (!/most points/i.test(gt)) note(tag, 'Learn to play does not open on the Goal card'); if (!await tapSel('#kkgoal .kgo')) note(tag, 'Goal card has no Got it button'); await sleep(700); }
   const t0 = Date.now(); let picks = 0, maxBub = 0, lastSig = '', lastT = Date.now(), freeOk = false, fsMin = 99;
   while (Date.now() - t0 < 480000) {
     const g = await p.evaluate(() => window.GXCOACH && { done: GXCOACH.done, running: GXCOACH.running, n: GXCOACH.explained.length, bub: document.querySelectorAll('#kkguide.on').length, fs: (() => { const e = document.querySelector('#kkguide.on .kgt span'); return e ? parseFloat(getComputedStyle(e).fontSize) : null; })(), over: (() => { const e = document.querySelector('#kkguide.on'), h = document.querySelector('#belt'); if (!e || !h) return false; const a = e.getBoundingClientRect(), c = h.getBoundingClientRect(); return a.bottom > c.top + 4 && a.top < c.bottom; })() });

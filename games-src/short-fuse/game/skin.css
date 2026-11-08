@@ -94,16 +94,16 @@ html.sk .btn.gxt-menu{border-image-width:6px 6px}
 
 /* ===== playable.js / story layer (W400): readable instruction line, turn banner, score pop, solid tutorial bubble ===== */
 #say{height:26px;min-height:0;padding:0 10px;white-space:normal;text-align:center;line-height:1.08;font-size:15.5px;text-overflow:clip;overflow:visible;position:relative;z-index:6;background:rgba(8,16,26,.84);box-shadow:0 0 0 4px rgba(8,16,26,.84)}
-#say.flash{color:#ffe066}#say.goodc{color:#b9ff9e}#say.badc{color:#ffb0a0}
+#say.hot{color:#ffe066}#say.goodc{color:#b9ff9e}#say.badc{color:#ffb0a0}
 html.short #say{height:22px;font-size:14.5px;line-height:1.05}
 #turnb{position:absolute;left:50%;top:92px;transform:translate(-50%,-6px) scale(.9);z-index:20;pointer-events:none;opacity:0;padding:8px 22px;border-radius:999px;background:#10202e;border:3px solid var(--bc,#ffd34d);color:var(--bc,#ffd34d);font:900 1.35rem var(--fb);letter-spacing:.3px;box-shadow:0 6px 18px rgba(0,0,0,.5)}
 #turnb.on{animation:plbn 1.1s ease-out both}
 @keyframes plbn{0%{opacity:0;transform:translate(-50%,-10px) scale(.8)}18%{opacity:1;transform:translate(-50%,0) scale(1.06)}30%{transform:translate(-50%,0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,0) scale(1)}}
-#spop{position:absolute;left:50%;top:40%;transform:translate(-50%,0);z-index:21;pointer-events:none;opacity:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 18px;border-radius:16px;background:#10202e;border:3px solid #7ee06b;color:#fff}
-#spop b{font:900 2rem/1 var(--fb);color:#7ee06b}#spop span{font:700 .95rem/1.2 var(--fb);color:#fff}
+#spop{position:absolute;left:50%;top:42%;transform:translate(-50%,0);z-index:21;pointer-events:none;opacity:0;padding:2px 16px;border-radius:999px;background:rgba(8,16,26,.82);color:#fff}
+#spop b{font:900 2.6rem/1.1 var(--fb);color:#7ee06b;text-shadow:0 2px 0 rgba(0,0,0,.5)}
 #spop.bad{border-color:#ff7b6b}#spop.bad b{color:#ff7b6b}
 #spop.on{animation:plpop 1.7s ease-out both}
-@keyframes plpop{0%{opacity:0;transform:translate(-50%,14px) scale(.7)}15%{opacity:1;transform:translate(-50%,0) scale(1.1)}28%{transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,-10px)}100%{opacity:0;transform:translate(-50%,-26px)}}
+@keyframes plpop{0%{opacity:0;transform:translate(-50%,14px) scale(.6)}14%{opacity:1;transform:translate(-50%,0) scale(1.2)}26%{transform:translate(-50%,0) scale(1)}62%{opacity:1;transform:translate(-50%,-30px) scale(1)}100%{opacity:0;transform:translate(-50%,-34vh) scale(.5)}}
 .briefc .bflav{margin:6px 12px 2px;font:700 1rem/1.25 var(--fb);color:#3a2610}.briefc .bgoal{margin:2px 12px 8px;font:800 1rem/1.25 var(--fb);color:#1c1408}
 .end .endline{margin:6px 14px 2px;font:700 1.02rem/1.25 var(--fb);color:#1c1408}.end .endstat{margin:0 14px 8px;font:700 .95rem/1.2 var(--fb);color:#3a2e1a}
 .hturn{background:#fff6dc;color:#1c1408;border:2px solid #d98b2b;border-radius:12px;padding:6px 12px 8px;margin:0 0 12px}.hturn h3{margin:4px 0 4px;font-size:1.1rem}.hturn ol{margin:0;padding-left:0;list-style:none}.hturn li{font-size:1rem;line-height:1.3;margin:3px 0}
@@ -158,6 +158,7 @@ div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
 
 /* coached tutorial: one bubble, never blocks input */
 #coach{position:fixed;left:50%;transform:translateX(-50%);z-index:60;width:min(360px,calc(100vw - 16px));box-sizing:border-box;display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:14px;background:#fff6dc;color:#1c1408;border:2px solid #d98b2b;box-shadow:0 8px 22px rgba(0,0,0,.45);pointer-events:none;animation:gxh-in .2s ease-out both}
+#coach{left:0;right:0;margin:0 auto;transform:none;pointer-events:auto;cursor:pointer}
 #coach .cop{flex:none;width:40px;height:40px;border-radius:50%;border:2px solid #d98b2b;background:#d98b2b url(media/camp-brix.webp) center top/cover}
 #coach.co-quill{border-color:#8e3b5c}#coach.co-quill .cop{border-color:#8e3b5c;background-image:url(media/camp-quill.webp)}
 #coach .cob{flex:1;min-width:0}#coach .cot{font:800 14px/1.2 var(--fb);color:#7a3d00}#coach.co-quill .cot{color:#8e3b5c}#coach .cox{font:650 15px/1.3 var(--fb);color:#1c1408}
@@ -177,3 +178,26 @@ div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
 /* qa-bot minors: readable gear text, 40px+ tap targets */
 .eqk .en,.eqk .nd{font-size:12px!important}
 .chip.sm,.gx-bar .gx-ibtn,.st-main summary{min-height:44px}
+/* W469 readability floor: no text under 14px on the play screen */
+.cc,.cn12,.sch,.en,.nd,.nc,.mkr,.mkr small,#tb .plate b,#tb .plate em,#tb .plate .star{font-size:14px!important}
+.mkr small{line-height:1}
+.eqk .en,.eqk .nd,#tb .eqk .en,#tb .eqk .nd{font-size:14px!important;line-height:1.05!important}
+.tile small,#tb .tile small{font-size:14px!important;line-height:1!important}
+.eqk b,#tb .eqk b{font-size:14px!important}
+@media (min-width:1024px){.sch,#tb .plate b,#tb .plate em,#tb .plate .star{font-size:16px!important}.cc,.cn12,.nc,.mkr,.eqk .en,.eqk .nd,#tb .eqk .en,#tb .eqk .nd,.eqk b,#tb .eqk b{font-size:revert-layer!important}}
+.card2.briefc,.card2.briefc *{pointer-events:auto}
+@media (max-width:1023px){.btn.small,#start small,.btn small,#coach .coz,#coachskip,.tk{font-size:14px!important}}
+.eqk .en,#tb .eqk .en{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-height:1.1em}
+/* W469 feel gate (e): nothing overlaps on a tile or a gear card */
+.tile:has(.coin):not(:has(.nt)) .f{transform:translateY(calc(var(--tw)*-.24))}
+.tile:has(.nt):not(:has(.coin)) .f{transform:translateY(calc(var(--tw)*.14))}
+.tile .coin{height:calc(var(--tw)*.42);min-width:calc(var(--tw)*.42)}
+.eqk.locked .en,#tb .eqk.locked .en{display:none}
+.say span,.pvb,.tile .nt,#tb .tile .nt{font-size:14px!important}
+.tile .coin,.side .coin{font-size:max(14px,calc(var(--tw)*.3))!important}
+.tile:has(.coin):not(:has(.nt)) .f{transform:translateY(calc(var(--tw)*-.34))}
+details:not([open])>:not(summary){display:none!important}
+@media (max-width:1023px){.eqc .ex,.eqc .es,.eqc .tm,span.tm{font-size:14px!important}}
+.tile:has(.nt):has(.coin) .f{font-size:calc(var(--tw)*.4)}
+@media (max-width:1023px){body :is(.lbl,kbd,.gxt-menu span){font-size:14px!important}}
+@media (max-width:1023px){.mw,.mix,.mix b,.tag,.rule p{font-size:14px!important}.mw{width:auto;min-width:20px;padding:0 2px}}

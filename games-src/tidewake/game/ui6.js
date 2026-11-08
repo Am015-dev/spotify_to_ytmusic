@@ -16,7 +16,7 @@ function pw(c,r,p){const w=TWKit.portWorld(c,r,p);return [w[0],w[1]]}
 function routeDesc(A,S){if(!A||!A.steps||!A.steps.length)return null;let pts=[];
   for(const st of A.steps){const a=pw(st.c,st.r,st.from),b=pw(st.c,st.r,st.to),c=sqW(st.c,st.r);const seg=bez(a,c,b,8);if(pts.length)seg.shift();pts.push(...seg)}
   const last=A.steps[A.steps.length-1],dd=DIR[last.to>>1];let stop,label;
-  if(A.st==='ok'&&A.end){stop=pw(A.end[0],A.end[1],MATE[last.to]);label=`Stop: column ${A.end[0]+1}, row ${A.end[1]+1}`}
+  if(A.st==='ok'&&A.end){stop=pw(A.end[0],A.end[1],MATE[last.to]);label='Stop'}
   else if(A.st==='edge'){const b=pw(last.c,last.r,last.to);stop=[b[0]+dd[0]*.4,b[1]+dd[1]*.4];label='Off the edge'}
   else{stop=sqW(last.c+dd[0],last.r+dd[1]);label=A.st==='mon'?`Hits ${levName(A.mon)}`:'Rift Gate'}
   pts.push(stop);
@@ -39,7 +39,7 @@ function threatHTML(K,seat,m,A){const S=K.ships[m?m.s:seat];if(!S||S.x==null&&!S
   const when=A?'where you stop':'you';
   return ids.map(id=>{const mo=K.mons.find(q=>q.id===id&&q.k==='L');if(!mo)return '';const f=monHits(mo,sqs);
     const pc=Math.round(16/36*f.length/6*100);
-    return `<span class="warn-l thr" data-mon="${id}">${esc(levName(id))} is next to ${when}. `+(f.length?`If the leviathans wake (dice total 6 to 8) and it rolls ${f.join(' or ')}, it moves onto you and you sink (about ${pc}% each turn).`:`It cannot move onto you right now (its arrows point elsewhere).`)+`</span>`}).filter(Boolean).join('<br>')}
+    return `<span class="warn-l thr" data-mon="${id}">${esc(levName(id))} is next to ${when}. `+(f.length?`A ${f.join(' or ')} on its roll sinks you. About ${pc}% each turn.`:`It cannot reach you now.`)+`</span>`}).filter(Boolean).join('<br>')}
 // ---------- the Safest-move advisor: the hard computer's own evaluation (ai.js: scoreMove, hypo, safeOpts, drawSafe, mcRisk) plus a 2-turn look-ahead ----------
 // chance (over the tile I will draw) that I can still sail safely this coming turn AND the one after, ignoring leviathan moves: the "am I being trapped" look-ahead
 function surv2(B,seat,after){const S=B.ships[seat];if(!S||!S.alive||S.x==null)return .5;let tot=0;
@@ -77,13 +77,13 @@ function recHTML(K,d,pl,full){const m=recMove(d);if(!m)return '';const a=UI.recA
   return `<div class="rec"><b>Safest move:</b> ${lab}.${full?` <span class="tiny">${why}</span>`:''}${m.a==='place'?` <button class="btn small" data-a="sugg">Show me the safest move</button>`:''}</div>`}
 // ---------- why a junk sank ----------
 function causeOf(why){const w=String(why||'');let m;
-  if(/off the edge|sailing off/.test(w))return {k:'edge',t:'its wake ran off the edge of the chart. A current that points out of the 6 by 6 sea sinks the junk riding it.'};
+  if(/off the edge|sailing off/.test(w))return {k:'edge',t:'its wake ran off the edge of the chart.'};
   if(/collided/.test(w))return {k:'collision',t:'two junks ended on the same wake heading the same way, so both went down together (a head-on collision).'};
   if(/Maelstrom/.test(w))return {k:'maelstrom',t:'the Maelstrom, the whirlpool, moved onto its square and swallowed it.'};
   if(/Rogue Wave|capsized/.test(w)){const ww=G&&G.wave;return {k:'wave',t:`the Rogue Wave caught it: it was in the wave's band and its capsize roll was too low${ww?` (the wave is on ${(ww.r&1)?'column '+(ww.x+1):'row '+(ww.y+1)}, strength ${waveStr()})`:''}.`}}
-  if(m=/blocked in by (.+)$/.exec(w))return {k:'block',t:`${m[1]} sat on the square in front of it when its turn began and nothing could save it.`};
+  if(m=/blocked in by (.+)$/.exec(w))return {k:'block',t:`${m[1]} blocked its path. It had nowhere to go.`};
   if(m=/ran into (.+)$/.exec(w))return {k:'mon',t:`its wake ended in the square of ${m[1]}.`};
-  if(m=/crushed by (.+)$/.exec(w))return {k:'crush',t:`${m[1]} swam onto the square it was on (or its tile) and crushed it.`};
+  if(m=/crushed by (.+)$/.exec(w))return {k:'crush',t:`${m[1]} swam onto it and crushed it.`};
   if(/rift/.test(w))return {k:'rift',t:'the Rift Gate could not find it a safe landing.'};
   return {k:'other',t:w+'.'}}
 const youSeat=()=>{try{return viewSeat()}catch(e){return -1}};
@@ -110,7 +110,7 @@ function mphBuild(evs){let mp=null;
       e.ln=mp.lines.length;mp.lines.push({id:e.id,txt:`rolled ${e.die}: ${txt}`,nm:nmx})}
     else if(mp&&e.t==='arrive'&&(e.spawn||e.k==='M')){const pr=evs[i-1];const txt=pr&&pr.t==='log'?pr.text:(e.k==='M'?'The Maelstrom moves':levName(e.id)+' rises');if(pr&&pr.t==='log')pr.skip=true;
       e.ln=mp.lines.length;mp.lines.push({id:e.id,txt:txt.replace(/\.$/,''),nm:'',plain:1,maelstrom:e.k==='M'})}
-    else if(mp&&mp.lines.length&&e.t==='destroy'){const l=mp.lines[mp.lines.length-1];if(!/smashes/.test(l.txt))l.txt+=` and smashes the tile at column ${e.x+1}, row ${e.y+1}`}
+    else if(mp&&mp.lines.length&&e.t==='destroy'){const l=mp.lines[mp.lines.length-1];if(!/smashes/.test(l.txt))l.txt+=`, smashing a tile`}
     else if(mp&&mp.lines.length&&e.t==='sink'){const l=mp.lines[mp.lines.length-1];l.txt+=`: ${e.seat===youSeat()&&!hotSeat()?'your':nm(e.seat)+"'s"} junk sinks!`;l.bad=1}
     else if(mp&&e.t==='log'&&/^The Maelstrom (churns|drains)/.test(e.text)){e.skip=true;mp.lines.push({id:-1,txt:e.text.replace(/\.$/,''),nm:'',plain:1});e.ln=mp.lines.length-1}}
   return mp}
