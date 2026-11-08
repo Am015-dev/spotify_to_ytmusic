@@ -1,10 +1,12 @@
 # Perch & Plume: tutorial coverage (coached first game)
 
-The tutorial is a real game: 2 rounds (8 then 7 actions) against Pip. Only the very first action is guided (2 spotlight steps:
-the Forest button, then 2 feeder dice). After that, every legal move is yours. The seed and the hand are set so that the needed situations come up:
-- 2 forest birds whose brown powers chain;
-- a bird with a white "when played" power in your hand;
+The tutorial is a short real game: 1 round of 4 turns against Pip. There are no forced steps; every legal move is yours from
+turn 1. Each turn Aunt Ottilie teaches ONE action in one sentence (turn 1 play a bird, 2 get food, 3 lay eggs, 4 draw birds) and
+points at that action's big button; if you pick another action, the skipped lesson comes next turn. The seed and the hand are set so that:
+- the bird in hand can be paid on turn 1 (seed + 1 egg);
+- 2 forest birds whose brown powers chain when you get food;
 - a pink "between turns" bird on Pip's board.
+After each turn a one-line rating (good, okay or poor, with where the points came from) compares your move with the best-value estimate.
 
 Aunt Ottilie, the story's guide (STORY.md), explains each rule the first time it matters. She also gives one line on a good or
 poor move and on what Pip does. The coach bubble sits in the panel above the instruction bar, so it never covers the board. Only
@@ -16,11 +18,11 @@ through the UI. It asserts that each rule below was explained live or listed und
 explained live.
 
 ## Rules -> when Ottilie explains them (rule id = the coach line)
-- [x] rule `welcome`: one action per turn: a row (food, eggs, cards) or a bird; the starting hand was kept for you. When: the first guided step, then marked done.
-- [x] rule `food`: the forest gains food, more birds = more food. When: the first guided step (Forest).
-- [x] rule `feeder`: feeder dice, one die = one food. When: the second guided step (2 dice).
+- [x] rule `welcome`: turn 1 lesson: play a bird (one action per turn). When: your first turn.
+- [x] rule `food`: turn 2 lesson: get food, more forest birds = more food. When: the turn you get food, or as the next lesson.
+- [x] rule `feeder`: feeder dice, one die = one food. When: you first pick dice.
 - [x] rule `feederRoll`: an empty (or all-same) feeder is rolled again. When: the first reroll.
-- [x] rule `chain`: brown powers fire right to left after a row action. When: the second guided step says to watch it, and it plays right after.
+- [x] rule `chain`: brown powers fire right to left after a row action. When: your forest birds first fire.
 - [x] rule `cache`: cached food and tucked cards are 1 point each. When: your bird first caches or tucks.
 - [x] rule `play`: leftmost free space of a row the bird lives in. When: you first pick a bird.
 - [x] rule `pay`: food cost, any 2 for 1, egg cost by column (0, 1, 1, 2, 2). When: the first pay screen.
@@ -36,7 +38,7 @@ explained live.
 - [x] rule `reroll`: you may reroll a feeder whose dice all match. When: the first time it happens on your turn.
 - [x] rule `emptyHand`: draw when your hand is empty. When: your hand first runs out.
 - [x] rule `goal`: the round goal is judged at round end. When: the end of round 1.
-- [x] rule `round`: next round has one fewer action, the tray is replaced, the first player moves on. When: round 2 starts.
+- [x] rule `round`: next round has one fewer action, the tray is replaced, the first player moves on. When: the tutorial has 1 round, so this is listed under "Things you'll meet later".
 - [x] rule `final`: final score = birds + eggs + goals + bonus card + cached food + tucked cards. When: the result walk-through.
 - [x] rule `tie`: tie-break is the most unused food. When: the result walk-through.
 

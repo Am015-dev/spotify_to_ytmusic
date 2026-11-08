@@ -1,0 +1,365 @@
+{
+ "slug": "perch-and-plume",
+ "size": "pc",
+ "seed": 73801,
+ "when": "2026-11-08T01:01Z",
+ "tutorial": {
+  "end": true,
+  "coached": true,
+  "explained": 16,
+  "explainedIds": [
+   "welcome",
+   "play",
+   "feeder",
+   "food",
+   "chain",
+   "cache",
+   "rival",
+   "reroll",
+   "feederRoll",
+   "trade",
+   "eggs",
+   "nest",
+   "pink",
+   "goal",
+   "final",
+   "tie"
+  ],
+  "bubblesClosed": 17,
+  "clicks": 97
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 1073
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 690
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under div.ttl \"Perch & Plume\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under img.art.bgart",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "element outside viewport div.bc.big x1 rect 1276,369,1747,604: \"Wetland\nSaffron Heron\n6\n\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "element outside viewport div.bc.big x1 rect -180,364,292,599: \"Meadow\nAmber Pipit\n4\npoi\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-tutorial-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: button.ract \"+2 food\" / div.bc.big \"Meadow Amber Pipit 4 poi\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-tutorial-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: div.bc.on-board \"2 3\" / div.bc.big \"Meadow Amber Pipit 4 poi\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-tutorial-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: button.ract \"+2 eggs +1 trade\" / div.bc.big \"Meadow Amber Pipit 4 poi\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-tutorial-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: div.bc.on-board \"1 1\" / div.bc.big \"Meadow Amber Pipit 4 poi\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-tutorial-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "clickable covered by another element (not tappable): div.bc.big \"Meadow Amber Pipit 4 poi\" under button.ract \"+2 eggs +1 trade\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-tutorial-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under div.ttl \"Perch & Plume\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-title-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under img.art.bgart",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-title-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button#deckb.deck \"Bird deck\" / button.btn \"4\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button#goalsbtn.gx-ibtn \"Goals\" under div#setup.ovl \"Quick game Players 1 2 3\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#setup.ovl \"Quick game Players 1 2 3\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "text overflows its box (visible) in div.bk-pw.brown x3: \"When its row is used: everyone\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "text overflows its box (visible) in div.bk-pw.pink x2: \"On a rival's turn: when a riva\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bc.mini \"8\" / div.bc.off.big \"Forest Meadow Clover Wax\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bc.mini \"3\" / div.bc.off.big \"Forest Meadow Wetland Sl\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: div.bc.mini \"4\" / div.bc.off.big \"Forest Meadow Wetland Sl\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button#deckb.deck \"Deck 107\" / div.bc.off.big \"Forest Sun Kinglet 1 poi\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-quick-board-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #1073 (Seed Saver Birds that eat seed 2+: 3 pts)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1073 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases quick",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-quick-noresult-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gxc-node.a3.locked \"8 🔒 Wind on the Heath\" / button.gxc-btn.ghost \"Close\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "text overflows its box (visible) in div.bk-pw.brown x5: \"When its row is used: take 1 r\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bc.mini \"4\" / div.bc.off.big \"Meadow Opal Kestrel 6 po\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bc.mini \"4\" / div.bc.off.big \"Wetland Velvet Rail 3 po\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: div.bc.mini \"2\" / div.bc.off.big \"Wetland Velvet Rail 3 po\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#deckb.deck \"Deck 107\" / div.bc.off.big \"Wetland Saffron Rail 1 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button#goalsbtn.gx-ibtn \"Goals\" under div#setup.ovl \"Your starting hand Chapt\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#setup.ovl \"Your starting hand Chapt\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #690 (Hollow Keeper Cavity-nest birds holding )",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 690 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases story",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-story-noresult-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under div.ttl \"Perch & Plume\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-title-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under img.art.bgart",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-title-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text overflows its box (visible) in div.bk-pw.white x1: \"When played: draw 2 cards.\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text overflows its box (visible) in div.bk-pw.brown x4: \"When its row is used: take 1 b\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bc.mini \"5\" / div.bc.off.big \"Meadow Russet Meadowlark\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bc.mini \"7\" / div.bc.on.big \"Forest Meadow Velvet Thr\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bc.mini \"1\" / div.bc.on.big \"Forest Meadow Velvet Thr\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#deckb.deck \"Deck 107\" / div.bc.off.big \"Wetland Pine Tern 7 poin\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button#goalsbtn.gx-ibtn \"Goals\" under div#setup.ovl \"Your starting hand Chapt\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#setup.ovl \"Your starting hand Chapt\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size pc --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/pc-screen-fuzz-screen-15.png"
+  }
+ ],
+ "secs": 447
+}
