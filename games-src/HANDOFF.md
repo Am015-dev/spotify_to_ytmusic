@@ -126,6 +126,7 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Emberclimb https://am015-dev.github.io/spotify_to_ytmusic/emberclimb/ (R1 PASS 04:43, live 04:22, feel-audit live all pass)
 - Rampart and Vine https://am015-dev.github.io/spotify_to_ytmusic/rampart-and-vine/ (R3 PASS 04:43, live 04:52, feel-audit live all pass)
 - Lantern Dive https://am015-dev.github.io/spotify_to_ytmusic/lantern-dive/ (R6 PASS 04:27, live 04:59, feel-audit live all pass)
+- Vinegrave https://am015-dev.github.io/spotify_to_ytmusic/vinegrave/ (R3 PASS 05:16, live 05:20, feel-audit live all pass)
 
 ## 05:03 state
 - Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).

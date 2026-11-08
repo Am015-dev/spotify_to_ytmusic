@@ -1,8 +1,8 @@
 {
  "slug": "vinegrave",
- "when": "2026-11-08T04:40Z",
- "secs": 120,
- "totalSecs": 481,
+ "when": "2026-11-08T05:23Z",
+ "secs": 45,
+ "totalSecs": 181,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,20 +36,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 120,
-   "turns": 396,
-   "clicks": 465,
-   "endedBy": "result",
+   "secs": 45,
+   "turns": 147,
+   "clicks": 168,
+   "endedBy": "time",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 21
+   "messagesSeen": 23
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 120,
-   "turns": 448,
-   "clicks": 497,
+   "secs": 45,
+   "turns": 140,
+   "clicks": 167,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -58,20 +58,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 120,
-   "turns": 417,
-   "clicks": 486,
-   "endedBy": "result",
+   "secs": 45,
+   "turns": 151,
+   "clicks": 177,
+   "endedBy": "time",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 25
+   "messagesSeen": 18
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 120,
-   "turns": 462,
-   "clicks": 516,
+   "secs": 45,
+   "turns": 156,
+   "clicks": 184,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,

@@ -87,7 +87,7 @@ function goalCard(after) {
   const list = h('ul.kgl', ...GOAL.how.map(([k, t]) => h('li', h('span.kgp', cardNode(k, 44)), h('span', t))));
   const go = h('button.btn.kgo', { type: 'button', 'data-a': 'goalok' }, 'Got it');
   const card = h('div.kgc', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'kkgoalt' },
-    h('div.kgk', 'How you win'), h('h2#kkgoalt', GOAL.win), list, go);
+    h('div.kgh', portraitEl(null, 56), h('div', h('div.kgk', 'How you win'), h('h2#kkgoalt', GOAL.win))), list, go);
   o = h('div#kkgoal', card);
   o.addEventListener('click', e => { if (e.target === o || e.target.closest('.kgo')) close(); });
   o.addEventListener('keydown', e => { if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); close(); } });
