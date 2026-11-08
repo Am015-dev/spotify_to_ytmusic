@@ -54,7 +54,7 @@ var TT_TEST = {};
     });
     if (G.phase === 'play' && snap) {
       var d = E.score(G, p).total - snap.sc[p], act = evs.filter(function (e) { return e.t === 'build' || e.t === 'wonder' || e.t === 'token'; })[0];
-      if (d > 0 && act) { var nmx = act.t === 'wonder' ? BY[act.w].nm : BY[act.id].nm; it.push({ tag: who(p), kind: kindOf(p), text: '+' + plural(d, 'point') + ' for ' + nmx + '.', fn: function () { popNum('+' + d + ' pts', $('s' + p).querySelector('.pill.vp:not(.who)') || $('s' + p)); } }); }
+      if (d > 0 && act) { var nmx = act.t === 'wonder' ? BY[act.w].nm : BY[act.id].nm; it.push({ tag: who(p), kind: kindOf(p), text: '+' + plural(d, 'point') + ' for ' + nmx + (act.t === 'wonder' ? ' (wonder)' : act.t === 'token' ? ' (progress token)' : ' (' + COLN[BY[act.id].col].toLowerCase() + ' card)') + '.', fn: function () { popNum('+' + d + ' pts', document.querySelector('#sr' + p + ' .tot') || $('s' + p)); } }); }
       evs.forEach(function (ev) {
         if (ev.t === 'mil') it.push({ tag: 'Conflict', kind: kindOf(p), text: 'The pawn moves ' + plural(ev.n, 'step') + ' toward ' + (U.mode === 'cpu' ? (ev.p === 0 ? 'the rival city' : 'your city') : name(1 - ev.p) + "'s city") + '.' });
         if (ev.t === 'loot') it.push({ tag: 'Looted', kind: kindOf(p), text: who(ev.p) + verb(ev.p, ' lose ', ' loses ') + plural(ev.n, 'coin') + ': the pawn passed a marked space.', fn: function () { popNum('-' + ev.n + '$', $('s' + ev.p)); } });
@@ -139,12 +139,12 @@ var TT_TEST = {};
 
   // ---------- board skeleton (built once per game so the pawn can slide)
   function buildBoard() {
-    var bd = $('bd'); bd.innerHTML = '<div id="instr" data-k="you" role="status" aria-live="polite"><span class="tg"></span><span class="tx"></span></div><div class="strip" id="s1"></div><div class="tokrow" id="tokrow"></div><div id="mil"></div><div id="pyr"></div><div class="strip" id="s0"></div>';
+    var bd = $('bd'); bd.innerHTML = '<div id="instr" data-k="you" role="status" aria-live="polite"><span class="tg"></span><span class="tx"></span><span class="trk" id="trk"></span></div><div class="strip" id="s1"></div><div class="tokrow" id="tokrow"></div><div id="mil"></div><div id="sbar"><div class="srow" id="sr1"></div><div class="srow" id="sr0"></div></div><div id="pyr"></div><div class="strip" id="s0"></div>';
     var m = $('mil'), h = '<div class="cells">';
     for (var i = -9; i <= 9; i++) { var a = Math.abs(i); h += '<div class="c ' + (i === 0 ? 'mid' : a <= 2 ? 'z1' : a <= 5 ? 'z2' : a <= 8 ? 'z3' : 'z4') + '"></div>'; }
     h += '</div>'; var pos = function (v) { return (4 + 92 * (v + 9.5) / 19); };
     [-6, -3, 3, 6].forEach(function (v) { h += '<span class="tg" id="tg' + v + '" style="left:' + pos(v) + '%">' + (Math.abs(v) === 3 ? '2' : '5') + '$</span>'; });
-    h += '<span class="nm" style="left:5%">' + esc(name(1)) + '</span><span class="nm" style="right:5%">' + esc(name(0)) + '</span><div id="pawn" class="art-host">' + slot('military-pawn') + '<i></i></div>';
+    h += '<span class="nm" style="left:1%">' + esc(name(1)) + '</span><span class="nm" style="right:1%">' + esc(name(0)) + '</span><div id="pawn" class="art-host">' + slot('military-pawn') + '<i></i></div>';
     m.innerHTML = h; fillArt(m); bgSlot($('board'), 'table-bg'); bgSlot(m, 'military-board');
   }
   function layoutDims() {
@@ -161,17 +161,62 @@ var TT_TEST = {};
   function strip(p) {
     var G = U.G, P = G.players[p], el = $('s' + p), sc = E.score(G, p), fp = E.fixedProd(G, p), ch = E.choiceProd(G, p), cur = E.sideToAct(G) === p;
     el.classList.toggle('act', cur);
-    var h = '<span class="pt">' + slot('portrait-p' + (p + 1)) + '</span><button class="pill vp who" data-city="' + p + '" style="min-width:0">' + esc(name(p)) + '</button><span class="pill coin">' + slot('coin') + '<b>$' + P.coins + '</b></span><span class="pill vp"><b>' + sc.total + ' pts</b></span>';
+    var h = '<span class="pt">' + slot('portrait-p' + (p + 1)) + '</span><button class="pill vp who" data-city="' + p + '" style="min-width:0">' + esc(name(p)) + '</button><span class="pill coin">' + slot('coin') + '<b>$' + P.coins + '</b></span>';
     ['wood', 'clay', 'stone', 'glass', 'papyrus'].forEach(function (r) { var n = fp[r] || 0; if (n) h += '<span class="chip r-' + r + '" style="--cw:90px">' + slot('res-' + r) + '<span class="l">' + RS[r] + '</span><b>' + n + '</b></span>'; });
     if (ch.length) h += '<span class="pill pill-ch vp">+' + ch.length + ' any</span>';
     var sci = E.sciCounts(G, p); Object.keys(sci).forEach(function (s) { h += '<span class="pill vp" style="background:#2d7a52">' + slot('sci-' + s) + '<span class="l">' + SYM[s] + '</span>' + (sci[s] > 1 ? '<b>x' + sci[s] + '</b>' : '') + '</span>'; });
     P.tokens.forEach(function (t) { h += '<button class="tok mini" data-tok="' + t + '" title="' + esc(BY[t].nm) + '"><span>' + esc(BY[t].nm) + '</span>' + slot(BY[t].stem) + '</button>'; });
-    h += '<span style="flex:1"></span>'; TT.COLS.forEach(function (c) { var n = E.count(G, p, c); if (n) h += '<span class="pill p-' + c + '" title="' + COLN[c] + '">' + n + '</span>'; });
     h += '<div class="wrow">'; P.wonders.forEach(function (w) {
       var d = BY[w.id]; h += '<button class="wt' + (w.card ? ' built' : G.built >= 7 ? ' dead' : '') + '" data-wonder="' + w.id + '"><span>' + esc(d.nm) + '</span>' + slot(d.stem) + '</button>';
     });
     for (var k = P.wonders.length; k < 4; k++) h += '<span class="wt dead" style="opacity:.15"></span>'; h += '</div>';
     el.innerHTML = h; fillArt(el); bgSlot(el, 'city-board-p' + (p + 1));
+  }
+  // ---------- score bar: civic / science / war / wonders / coins for both sides, leader marked, danger line, turn tracker
+  function sbreak(G, p) { var s = E.score(G, p); return { civ: s.blue + s.yellow + s.guild, sci: s.green + s.token, war: s.mil, won: s.wonder, coin: s.coins, tot: s.total }; }
+  function renderScore() {
+    var G = U.G, a = sbreak(G, 0), b = sbreak(G, 1), cats = [['civ', 'Civic'], ['sci', 'Sci'], ['war', 'War'], ['won', 'Won'], ['coin', 'Coin']];
+    [1, 0].forEach(function (p) {
+      var me = p === 0 ? a : b, ot = p === 0 ? b : a, h = '<b class="nm2">' + esc(p === 0 ? (U.mode === 'cpu' ? 'You' : name(0)) : name(1)) + '</b>';
+      cats.forEach(function (c) { h += '<span class="c' + (me[c[0]] > ot[c[0]] ? ' lead' : '') + '" title="' + c[1] + '">' + c[1] + ' <b>' + me[c[0]] + '</b></span>'; });
+      h += '<span class="tot' + (me.tot > ot.tot ? ' lead' : '') + '">' + (me.tot > ot.tot ? '&#9733; ' : '') + '<b>' + me.tot + '</b> pts</span>';
+      $('sr' + p).innerHTML = h;
+    });
+    var age = G.phase === 'draft' ? 'Draft<br>pick ' + Math.min(8, G.draft.n + 1) + ' of 8' : 'Age ' + G.age + ' of 3<br>' + G.pyr.filter(function (c) { return !c.taken; }).length + ' cards left';
+    var d = '', k = '', sc0 = Object.keys(E.sciCounts(G, 0)).length, sc1 = Object.keys(E.sciCounts(G, 1)).length, toLoss = 9 + G.mil, toWin = 9 - G.mil;
+    if (G.phase === 'play' && !G.over) {
+      if (toLoss <= 4) { d = '&#9888; Pawn ' + toLoss + ' step' + (toLoss === 1 ? '' : 's') + '<br>from your city'; k = 'bad'; }
+      else if (sc1 >= 4) { d = '&#9888; Rival has<br>' + sc1 + ' of 6 symbols'; k = 'bad'; }
+      else if (toWin <= 4) { d = '&#9733; Pawn ' + toWin + ' step' + (toWin === 1 ? '' : 's') + '<br>from victory'; k = 'ok'; }
+      else if (sc0 >= 4) { d = '&#9733; You have<br>' + sc0 + ' of 6 symbols'; k = 'ok'; }
+    }
+    var t = $('trk'); t.className = 'trk' + (k ? ' ' + k : ''); t.innerHTML = d || age; $('instr').dataset.d = k;
+  }
+  // what a move would do, computed on a copy of the game: points, coins, pawn steps, science
+  function preview(G, p, m) {
+    var g = E.clone(G); try { E.apply(g, m); } catch (e) { return ''; }
+    var t = [], dp = E.score(g, p).total - E.score(G, p).total, dc = g.players[p].coins - G.players[p].coins, dm = (p === 0 ? g.mil - G.mil : G.mil - g.mil);
+    if (m.t === 'build') { var cc = BY[G.pyr[m.i].id]; if (cc.prod) { var rk = Object.keys(cc.prod)[0]; t.push('+' + cc.prod[rk] + ' ' + rk + ' each turn'); } else if (cc.choice) t.push('1 of ' + cc.choice.join('/') + ' each turn'); else if (cc.price) t.push('cheaper ' + cc.price.join('/')); if (cc.gives) t.push('chain mark'); }
+    if (dp) t.push((dp > 0 ? '+' : '') + dp + ' pts'); if (dc) t.push((dc > 0 ? '+' : '') + dc + ' coins'); if (dm) t.push('pawn ' + (dm > 0 ? '+' : '') + dm);
+    var pd = g.pend[0]; if (pd && pd.type === 'token' && pd.from !== 'lib' && pd.pl === p) t.push('science pair: pick a token');
+    else { var c0 = E.sciCounts(G, p), c1 = E.sciCounts(g, p), nd = Object.keys(c1).length; Object.keys(c1).forEach(function (k) { if ((c1[k] || 0) > (c0[k] || 0)) t.push('science ' + nd + ' of 6' + (c1[k] === 2 ? ' (pair)' : '')); }); }
+    if (g.over && g.winner === p) t.push('wins the game!');
+    return t.length ? t.join(' \u00b7 ') : 'no change';
+  }
+  function moveName(G, m) {
+    if (m.t === 'discard') return 'selling ' + BY[G.pyr[m.i].id].nm; if (m.t === 'build') return 'building ' + BY[G.pyr[m.i].id].nm;
+    if (m.t === 'wonder') return 'raising ' + BY[m.w].nm; return 'that';
+  }
+  // rating of the move just played: rank by the computer's own evaluation of the position after each legal move
+  function rateMove(G, p, m) {
+    try {
+      var M = E.validMoves(G).filter(function (x) { return x.i != null; }), best = null, bv = -1e9, mv = null;
+      M.forEach(function (x) { var g = E.clone(G); try { E.apply(g, x); } catch (e) { return; } var v = AI.ev(g, p); if (v > bv) { bv = v; best = x; } if (x.t === m.t && x.i === m.i && (x.w || null) === (m.w || null)) mv = v; });
+      if (mv == null || best == null) return null; var d = bv - mv, same = best.t === m.t && best.i === m.i && (best.w || null) === (m.w || null);
+      if (same || d <= 1) return { g: 'good', t: 'Good move: ' + (same ? 'the best choice here.' : 'about as good as any.') };
+      if (d <= 3.5) return { g: 'okay', t: 'Okay move: ' + moveName(G, best) + ' was a bit better.' };
+      return { g: 'poor', t: 'Poor move: ' + moveName(G, best) + ' was clearly better.' };
+    } catch (e) { return null; }
   }
   function renderMil() {
     var G = U.G, pw = $('pawn'); pw.style.left = (4 + 92 * (G.mil + 9.5) / 19) + '%';
@@ -184,6 +229,7 @@ var TT_TEST = {};
   function renderPyr(flips) {
     var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = '';
     var av = E.available(G).map(function (c) { return c.i; }), human = canAct(), hintCell = -1;
+    var bestCell = -1; if (human && G.phase === 'play' && !G.pend.length) { try { var bm = AI.pick(G, 'normal', function () { return 0.5; }); if (bm && bm.i != null) bestCell = bm.i; } catch (e) { } }
     if (U.camp && U.camp.hints && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = AI.pick(G, 'normal', function () { return 0.5; }); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
     G.pyr.forEach(function (cell) {
       var c = BY[cell.id], e = document.createElement('div');
@@ -195,6 +241,7 @@ var TT_TEST = {};
       if (!cell.taken && cell.up && E.covered(G, cell)) e.classList.add('cov');
       if (flips && flips.indexOf(cell.i) >= 0) e.classList.add('pop');
       if (U.camp && U.camp.hints && human && !U.tut && hintCell === cell.i) e.classList.add('hint');
+      if (bestCell === cell.i && !cell.taken && cell.up && !E.covered(G, cell)) { e.classList.add('best'); e.insertAdjacentHTML('beforeend', '<i class="bv" title="Best value">&#9733;</i>'); }
       if (!cell.taken && av.indexOf(cell.i) >= 0) {
         if (cell.up || true) { e.classList.add('av'); if (!human) e.classList.add('dim'); e.setAttribute('role', 'button'); e.tabIndex = 0; if (U.sel === cell.i) e.classList.add('sel'); }
       }
@@ -243,7 +290,7 @@ var TT_TEST = {};
       msg.textContent = c.nm; sub.textContent = describe(c) + '. Cost: ' + (bi.chain ? 'free by chain' : bi.coins + ' coin' + (bi.coins === 1 ? '' : 's') + (bi.trade ? ' (' + bi.trade + ' for trade)' : ''));
       instr(p, 'Choose: Build it, Sell it for coins, or use it for a Wonder.');
     } else {
-      msg.textContent = 'Gold glow = free to take'; sub.textContent = ''; instr(p, 'Tap a glowing card. Glowing cards are free to take.');
+      msg.textContent = 'Gold glow = free to take'; sub.textContent = ''; instr(p, 'Tap a glowing card. The star is the best value.');
     }
   }
   // ---------- zoom: the tapped card big, every detail, and the three ways to use it
@@ -262,16 +309,16 @@ var TT_TEST = {};
     var h = '<div class="zbox" style="--cc:var(--c-' + c.col + ')"><button class="zx" data-zclose="1" aria-label="Close">&times;</button><div class="zcard" id="zcard"></div><div class="zinfo"><h3>' + esc(c.nm) + '</h3><span class="zt">' + COLN[c.col] + ' card, Age ' + AGE[c.age] + '</span><p>' + esc(describe(c)) + '.</p>';
     chainLines(c).forEach(function (t) { h += '<p>' + esc(t) + '</p>'; });
     h += '<p class="zc">' + esc(cost) + '</p><p>' + (Object.keys(c.cost).length ? 'Needs: ' + esc(costWords(c.cost)) + '. Missing resources are bought with coins.' : 'Needs nothing: this card is free.') + '</p><p>Sell it for +' + E.discardGain(G, p) + ' coins instead.</p></div><div class="zacts">';
-    h += '<button class="btn" data-a="build"' + (has('build') ? '' : ' disabled') + '>Build' + (bi.chain ? ' free' : ' (' + bi.coins + ' coins)') + '</button>';
-    h += '<button class="btn alt" data-a="discard">Sell for +' + E.discardGain(G, p) + ' coins</button>';
-    G.players[p].wonders.forEach(function (w) { if (w.card) return; var wi = E.wonderInfo(G, p, w.id); h += '<button class="btn alt" data-a="wonder" data-w="' + w.id + '"' + (has('wonder', w.id) ? '' : ' disabled') + '>Wonder: ' + esc(BY[w.id].nm) + ' (' + wi.coins + ' coins)</button>'; });
+    h += '<button class="btn" data-a="build"' + (has('build') ? '' : ' disabled') + '>Build' + (bi.chain ? ' free' : ' (' + bi.coins + ' coins)') + (has('build') ? '<small class="pv">' + esc(preview(G, p, { t: 'build', i: cell.i })) + '</small>' : '') + '</button>';
+    h += '<button class="btn alt" data-a="discard">Sell for +' + E.discardGain(G, p) + ' coins<small class="pv">' + esc(preview(G, p, { t: 'discard', i: cell.i })) + '</small></button>';
+    G.players[p].wonders.forEach(function (w) { if (w.card) return; var wi = E.wonderInfo(G, p, w.id); h += '<button class="btn alt" data-a="wonder" data-w="' + w.id + '"' + (has('wonder', w.id) ? '' : ' disabled') + '>Wonder: ' + esc(BY[w.id].nm) + ' (' + wi.coins + ' coins)' + (has('wonder', w.id) ? '<small class="pv">' + esc(preview(G, p, { t: 'wonder', i: cell.i, w: w.id })) + '</small>' : '') + '</button>'; });
     z.innerHTML = h + '</div></div>'; z.hidden = false; $('zcard').appendChild(cardEl(c, window.innerWidth < 520 ? 124 : 160));
   }
   function liftDust(i) { var u = TTA.url('fx-lift-dust'), e = $('c' + i); if (!u || !e) return; var r = e.getBoundingClientRect(), f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.bottom - 30) + 'px;background-image:url("' + u + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
   function closeZoom() { if (U.sel == null) return; U.sel = null; renderPyr(); dock(); }
   function render(flips) {
     var G = U.G; if (!G) return;
-    strip(0); strip(1); renderMil(); renderTokens();
+    strip(0); strip(1); renderMil(); renderTokens(); renderScore();
     $('bd').classList.toggle('drafting', G.phase === 'draft');
     if (G.phase === 'draft') renderDraft(); else renderPyr(flips);
     dock(); logRender();
@@ -313,6 +360,7 @@ var TT_TEST = {};
     var G = U.G, p = E.sideToAct(G), prevUp = {}, pre = null, preHtml = '', snap = G.phase === 'play' ? snapState() : null;
     if (m.i != null) { pre = rectOf('c' + m.i); var c = BY[G.pyr[m.i].id]; preHtml = cardHtml(c, pre ? pre.width : 60); var ghostCol = c.col; }
     G.pyr.forEach(function (c) { prevUp[c.i] = c.up; });
+    var rated = (U.mode === 'cpu' && p === 0 && G.phase === 'play' && !G.pend.length && m.i != null) ? rateMove(G, p, m) : null;
     if (U.tut && p === 0 && window.TT_TUTOR && TT_TUTOR.beforePlayerMove) TT_TUTOR.beforePlayerMove(G, m);
     E.apply(G, m); U.sel = null; U.fingerDone = true; U.seq++;
     U.busy = true; var flips = []; G.pyr.forEach(function (c) { if (c.up && !prevUp[c.i] && !c.taken) flips.push(c.i); });
@@ -330,7 +378,7 @@ var TT_TEST = {};
     });
     if (G.ev.some(function (e) { return e.t === 'age'; })) $('pyr').querySelectorAll('.card').forEach(function (e) { e.classList.add('pop'); });
     if (G.over) return;
-    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
+    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); if (rated) items.splice(Math.min(items.length, 2), 0, { tag: 'Rating', kind: 'info', text: rated.t, extra: 250 }); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
     narrate(items, function () { U.busy = false; after(); });
   }
   function dock0Lock() { $('acts').innerHTML = ''; var z = $('zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
@@ -351,7 +399,13 @@ var TT_TEST = {};
       }, stepMs());
     } else { U.busy = false; render0(); if (U.tut && window.TT_TUTOR && TT_TUTOR.onTurn) TT_TUTOR.onTurn(G); }
   }
-  function render0() { dock(); if (U.G.phase !== 'draft') { var P = $('pyr'); P.querySelectorAll('.card.av').forEach(function (e) { e.classList.toggle('dim', !canAct()); }); } else renderDraft(); strip(0); strip(1); }
+  // the star on the computer's best pick among the glowing cards (only on your turn)
+  function markBest() {
+    var P = $('pyr'); if (!P) return; P.querySelectorAll('.bv').forEach(function (e) { e.remove(); }); P.querySelectorAll('.card.best').forEach(function (e) { e.classList.remove('best'); });
+    var G = U.G; if (!G || G.phase !== 'play' || G.pend.length || !canAct()) return;
+    try { var bm = AI.pick(G, 'normal', function () { return 0.5; }); if (bm && bm.i != null) { var e = $('c' + bm.i); if (e && e.classList.contains('av')) { e.classList.add('best'); e.insertAdjacentHTML('beforeend', '<i class="bv" title="Best value">&#9733;</i>'); } } } catch (er) { }
+  }
+  function render0() { dock(); renderScore(); markBest(); if (U.G.phase !== 'draft') { var P = $('pyr'); P.querySelectorAll('.card.av').forEach(function (e) { e.classList.toggle('dim', !canAct()); }); } else renderDraft(); strip(0); strip(1); }
 
   // ---------- screens
   function showStart() {
@@ -468,6 +522,7 @@ var TT_TEST = {};
     }
     if (!U.G) return;
     if (U.narr && U.skipNarr && !q('button') && (q('#instr') || q('#banner') || q('#pyr') || q('#bd'))) { U.skipNarr(); return; }
+    if ((b = q('#sbar'))) { var a0 = sbreak(U.G, 0), b0 = sbreak(U.G, 1); toast('Civic = cards, Sci = green cards + tokens, War = pawn zone, Won = wonders, Coin = 1 per 3 coins. You ' + a0.tot + ', ' + name(1) + ' ' + b0.tot + '.', 4200); return; }
     if ((b = q('[data-city]'))) { showCity(+b.dataset.city); return; }
     if ((b = q('[data-tok]'))) { var d = BY[b.dataset.tok]; toast(d.nm + ': ' + d.text, 2600); return; }
     if ((b = q('[data-wonder]'))) { var w = BY[b.dataset.wonder]; toast(w.nm + ': ' + w.text, 2800); return; }

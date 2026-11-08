@@ -96,7 +96,7 @@
     d.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-later]'); if (!b) return; d.remove(); finish(b.dataset.later); });
   }
   function finish(choice) {
-    T.active = false; T.finished = true; shortLayout(false); clearInterval(T.iv); hide(); U.tut = false; U.rivalName = null; try { GXT.markDone(GAME); } catch (e) { }
+    T.active = false; document.body.classList.remove('ttguided'); T.finished = true; shortLayout(false); clearInterval(T.iv); hide(); U.tut = false; U.rivalName = null; try { GXT.markDone(GAME); } catch (e) { }
     $('res').hidden = true; var f = T.then; T.then = null; if (f) { f(); return; }
     if (choice === 'story' && window.GXC && window.CAMPAIGN) { UI.showStart(); GXC.open(); } else UI.newGame('cpu');
   }
@@ -106,7 +106,7 @@
   function begin() {
     var my = RUN;
     U.tut = true; U.rivalName = 'Pell'; shortLayout(true); UI.newGame('cpu', SEED); U.fingerDone = true; stack();
-    T.active = true; T.finished = false; T.walked = false; T.walking = false; T.seen = {}; T.q = []; T.laterShown = []; hide();
+    T.active = true; document.body.classList.add('ttguided'); T.finished = false; T.walked = false; T.walking = false; T.seen = {}; T.q = []; T.laterShown = []; hide();
     clearInterval(T.iv); T.iv = setInterval(function () { if (my !== RUN) return; pump(); }, 600);
     var first = PRO.first || ['Ione', 'Claim the glowing wonder.'];
     GXT.start({ game: GAME, story: false, endTitle: (PRO.playon && PRO.playon.title) || 'Your move, always', endText: (PRO.playon && PRO.playon.text) || '', endButtons: [{ id: 'go', label: 'Play on' }],
@@ -114,7 +114,7 @@
         wait: { type: 'tap', match: function (a) { return a.kind === 'pick'; } }, ready: function () { return !!U.G && !U.busy && !U.narr && E.sideToAct(U.G) === 0 && U.G.phase === 'draft' && !!document.querySelector('.wcard.go'); } }],
       setup: function () { },
       onDone: function () { },
-      onExit: function () { T.active = false; shortLayout(false); clearInterval(T.iv); hide(); U.tut = false; U.rivalName = null; if (T.then) { var f = T.then; T.then = null; f(); } else UI.showStart(); } });
+      onExit: function () { T.active = false; document.body.classList.remove('ttguided'); shortLayout(false); clearInterval(T.iv); hide(); U.tut = false; U.rivalName = null; if (T.then) { var f = T.then; T.then = null; f(); } else UI.showStart(); } });
   }
   function start(o) {
     T.then = (o && o.then) || null; var my = ++RUN; U.lvl = 'easy';
@@ -123,5 +123,5 @@
   }
   function coverage() { return { all: CORE.concat(Object.keys(LATER)).concat(['first']), seen: Object.keys(T.seen), later: T.laterShown.slice() }; }
   Object.defineProperty(window, 'GXCOACH', { configurable: true, get: function () { return { running: !!T.active, explained: Object.keys(T.seen).filter(function (k) { return !/^ch\d/.test(k); }), done: !!T.finished }; } });
-  window.TT_TUTOR = { start: start, cancel: function () { RUN++; T.active = false; shortLayout(false); clearInterval(T.iv); hide(); }, coverage: coverage, beforePlayerMove: beforePlayerMove, afterMove: afterMove, onTurn: onTurn, onResult: onResult, takeReaction: function () { return null; }, steps: [] };
+  window.TT_TUTOR = { start: start, cancel: function () { RUN++; T.active = false; document.body.classList.remove('ttguided'); shortLayout(false); clearInterval(T.iv); hide(); }, coverage: coverage, beforePlayerMove: beforePlayerMove, afterMove: afterMove, onTurn: onTurn, onResult: onResult, takeReaction: function () { return null; }, steps: [] };
 })();

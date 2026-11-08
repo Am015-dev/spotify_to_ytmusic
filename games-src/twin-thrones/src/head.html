@@ -245,4 +245,30 @@ body.gxdrawer .gx-app,body.gxdrawer #start{visibility:hidden}
 #res tr.hl td{background:#f2c230;color:#231a0a;font-weight:800}
 .gxt-endc.later{max-height:84vh;overflow:auto}.gxt-endc.later ul{text-align:left;margin:8px 0;padding-left:20px;font-size:max(14px,var(--fmin));line-height:1.35}
 .card.xs .band{white-space:normal;overflow:visible;text-overflow:clip;display:flex;max-height:none;letter-spacing:-.07em}.card.xs .glyph{display:none}
+/* round 3: score bar + tracker + danger, best-value star, previews on the big card, coaching dims the pills */
+#mil{height:40px}#mil .cells{top:19px}#mil .nm{top:0;font-size:max(13px,var(--fmin))}#pawn{top:12px}
+#sbar{flex:0 0 auto;background:rgba(0,0,0,.3);border-radius:8px;padding:2px 6px;font-size:max(13px,var(--fmin));line-height:1.25;cursor:pointer}
+#sbar .trkl{display:flex;justify-content:space-between;gap:6px;color:#cfe0e3;font-weight:700;min-height:1.25em;white-space:nowrap;overflow:hidden}
+#sbar .trkl #dng{min-width:0;overflow:hidden;text-overflow:ellipsis}#sbar .bad{color:#ff9d8f;font-weight:800}#sbar .ok{color:#9ff0b0;font-weight:800}
+#sbar .srow{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+#sbar .nm2{flex:0 0 3.2em;overflow:hidden;text-overflow:ellipsis}#sbar .c{flex:1 1 auto;min-width:0}#sbar .c b,#sbar .tot b{font-weight:800}
+#sbar .lead{color:#ffd35a}#sbar .c.lead b{text-decoration:underline}#sbar .tot{flex:0 0 auto;font-weight:700;min-width:4.6em;text-align:right}
+.card .bv{position:absolute;right:2px;bottom:34px;z-index:6;width:22px;height:22px;border-radius:50%;background:#f2c230;color:#231a05;font-style:normal;font-weight:900;font-size:14px;line-height:22px;text-align:center;box-shadow:0 0 0 2px #231a05}
+.card.best.av{box-shadow:0 0 0 3px #fff,0 0 0 6px #f2c230,0 2px 4px rgba(0,0,0,.45)}
+.btn .pv{display:block;font-size:max(13px,var(--fmin));font-weight:600;opacity:.95;margin-top:2px;line-height:1.2}
+body.ttguided .tok,body.ttguided .wt,body.ttguided button[data-city],body.ttguided #sbar{opacity:.4;pointer-events:none}
+.card.has-art .glyph{display:flex}.card.has-art .glyph svg{display:none}
+@media (max-height:640px){#sbar .trkl{display:none}#sbar{padding:1px 6px}}
+#instr .trk{flex:0 0 auto;font-size:max(13px,var(--fmin));font-weight:700;line-height:1.15;text-align:right;color:#cfe0e3;white-space:nowrap}
+#instr .trk.bad{color:#ffb0a4;font-weight:800}#instr .trk.ok{color:#9ff0b0;font-weight:800}
+#instr .tx{-webkit-line-clamp:2}
+/* with the painted art installed: text sits on solid plates, never straight on a picture */
+#start p{background:rgba(8,16,20,.78);padding:6px 12px;border-radius:10px}
+.pill.coin b{background:rgba(20,12,0,.82);color:#ffe9a8;padding:0 6px;border-radius:8px;position:relative}
+.wt span{background:rgba(10,18,22,.82);padding:0 4px;border-radius:4px}
+.tok span{background:rgba(10,18,22,.82);padding:0 3px;border-radius:4px}
+.card .costs .chip>b,.card .fx .chip>b{background:rgba(20,14,6,.8);border-radius:6px;padding:0 3px;text-shadow:none;color:#fff}
+#mil .tg{background:rgba(10,18,22,.8);padding:0 3px;border-radius:4px;color:#ffe08a}
+.card .bv{font-size:max(14px,var(--fmin))}
+.card.xs.has-art .glyph{display:none}
 </style></head>
