@@ -1,0 +1,46 @@
+/* gx-feel.css: the shared FEEL layer (see FEEL.md). Lifted pieces, glowing targets, flights, hops, the round beat. */
+#gxf-layer{position:fixed;inset:0;pointer-events:none;z-index:9000;overflow:hidden}
+.gxf-ghost{position:fixed;pointer-events:none;transform-origin:50% 50%;transition:transform .14s cubic-bezier(.2,.9,.3,1.3),filter .14s,opacity .14s;will-change:left,top,transform;z-index:2}
+.gxf-ghost>*{width:100%;height:100%;margin:0!important;box-sizing:border-box}
+.gxf-ghost.up{transform:scale(1.1) rotate(-3deg);filter:drop-shadow(0 14px 14px rgba(0,0,0,.45)) drop-shadow(0 3px 4px rgba(0,0,0,.3))}
+.gxf-ghost.up.on{transform:scale(1.16) rotate(0deg);filter:drop-shadow(0 18px 18px rgba(0,0,0,.4)) drop-shadow(0 0 10px rgba(255,220,120,.9))}
+.gxf-ghost.snap{transition-property:transform,opacity;transition-timing-function:cubic-bezier(.3,1.4,.5,1)}
+.gxf-ghost.back{transition-property:left,top,transform,filter;transition-timing-function:cubic-bezier(.3,1.5,.5,1)}
+.gxf-src{opacity:.35;filter:saturate(.4);transition:opacity .12s}
+html.gxf-dragging,html.gxf-dragging *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
+.gxf-ok{outline:3px solid rgba(255,214,110,.75);outline-offset:-3px;animation:gxf-glow 1.1s ease-in-out infinite alternate}
+.gxf-hov{outline:4px solid #ffe28a!important;outline-offset:-4px;box-shadow:0 0 0 4px rgba(255,226,138,.35),0 0 24px rgba(255,226,138,.75)!important;animation:none}
+svg .gxf-ok{outline:none;stroke:#ffd66e;stroke-width:4;fill:rgba(255,214,110,.28);animation:gxf-glows 1.1s ease-in-out infinite alternate}
+svg .gxf-hov{outline:none!important;box-shadow:none!important;stroke:#fff1b8;stroke-width:6;fill:rgba(255,226,138,.55)}
+@keyframes gxf-glow{from{outline-color:rgba(255,214,110,.35)}to{outline-color:rgba(255,214,110,.95)}}
+@keyframes gxf-glows{from{stroke-opacity:.45}to{stroke-opacity:1}}
+[data-gxf-drag]{cursor:grab;touch-action:none;-webkit-user-drag:none}
+[data-gxf-drag="up"]{touch-action:pan-x}
+@media (hover:hover){[data-gxf-drag]:hover{filter:brightness(1.08);transform:translateY(-2px);transition:transform .12s,filter .12s}}
+.gxf-fly{position:fixed;pointer-events:none;will-change:transform;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35));z-index:3}
+.gxf-fly>*{width:100%;height:100%;margin:0!important;box-sizing:border-box}
+.gxf-pts{display:flex;align-items:center;justify-content:center;font:800 22px/1 system-ui,sans-serif;color:#ffe28a;text-shadow:0 2px 0 #5a3b00,0 0 10px rgba(0,0,0,.6);white-space:nowrap}
+.gxf-pts.neg{color:#ff9a8a;text-shadow:0 2px 0 #4a0f08}
+.gxf-hop{animation:gxf-hop .42s cubic-bezier(.3,1.6,.5,1)}
+@keyframes gxf-hop{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-14px) scale(1.08,.94)}70%{transform:translateY(0) scale(1.06,.9)}100%{transform:none}}
+.gxf-pulse{animation:gxf-pulse .6s ease-out}
+@keyframes gxf-pulse{0%{transform:scale(1)}30%{transform:scale(1.22)}100%{transform:scale(1)}}
+.gxf-shake{animation:gxf-shake .32s ease-in-out}
+@keyframes gxf-shake{0%,100%{transform:none}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.gxf-settle{animation:gxf-settle .36s cubic-bezier(.3,1.6,.5,1)}
+@keyframes gxf-settle{0%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:none}}
+svg g.gxf-hop,svg g.gxf-pulse,svg g.gxf-settle{transform-box:fill-box;transform-origin:50% 50%}
+.gxf-rolling{color:#ffe28a}
+.gxf-beat{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.7);opacity:0;pointer-events:auto;min-width:220px;max-width:86vw;padding:16px 28px;border-radius:18px;text-align:center;
+  background:linear-gradient(180deg,rgba(40,32,18,.94),rgba(20,16,10,.94));color:#fff3cf;box-shadow:0 18px 40px rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,214,110,.6);transition:transform .26s cubic-bezier(.3,1.5,.5,1),opacity .2s}
+.gxf-beat.on{transform:translate(-50%,-50%) scale(1);opacity:1}
+.gxf-beat.out{transform:translate(-50%,-60%) scale(.96);opacity:0}
+.gxf-beat b{display:block;font:800 clamp(24px,6vw,34px)/1.1 Georgia,serif;letter-spacing:.02em}
+.gxf-beat span{display:block;margin-top:6px;font:600 15px/1.3 system-ui,sans-serif;opacity:.9}
+.gxf-vp{overflow:hidden;touch-action:pan-y}
+.gxf-vp.gxf-zoomed{touch-action:none}
+.gxf-vp.gxf-panning{cursor:grabbing}
+.gxf-cam{transform-origin:0 0;will-change:transform}
+.gxf-keyfocus{outline:3px dashed #ffe28a!important;outline-offset:2px}
+html.gx-reduce .gxf-ok,html.gx-noanim .gxf-ok{animation:none}
+@media (prefers-reduced-motion:reduce){.gxf-ok{animation:none}.gxf-ghost{transition:none}}

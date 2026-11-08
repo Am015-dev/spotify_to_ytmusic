@@ -99,7 +99,7 @@ function popAt(el, txt) {
 function playFx(list, actor) {
   var chain = Promise.resolve(), view = UI.view;
   list.forEach(function (e) {
-    chain = chain.then(function () {
+    chain = chain.then(function () { return window.PPF && !UI.fast ? PPF.fx(e, e.seat === view) : 0; }).then(function () {   // feel.js: camera, points, beats
       var mine = e.seat === view;
       try { coachFx(e, mine); } catch (er) { }
       switch (e.k) {
