@@ -116,4 +116,4 @@ conflicts): run it at merge time.
 - Hints (goal chips + point previews) are on by default; acorn counter is a button with a one-line explanation; rival-view line says how
   to go back; the turn banner waits for a score pop; tutorial shows the second acorn power (Replace animals).
 - Gate: `node g5-check.js` (default Play by touch at 390x844 + 375x667 to the result: min spot/target 47 px, result text 14px / 12.9:1, 0 errors).
-- Left: rules-test "salmon D 2 + 1 neighbour" fails (variant card D, already failing before this change); the ghost tile is still ~54 px.
+- r2: rules-test "salmon D" case expected a run of 2 to score; the published card D scores only runs of 3+ (1 per salmon + 1 per adjacent other animal). The engine was right; the test is fixed (+2 cases). rules-test green. Left: the ghost tile is still ~54 px.
