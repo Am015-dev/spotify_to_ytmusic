@@ -12,11 +12,17 @@ Changed (layout, words, motion only; engine untouched, logic-test 146/146, rules
 Not done: desktop dock text (13 px tips, low-contrast "Voltusk (you)"), ui-audit B 32 / C 1 / D 3 / F 1 (shared help-kit tooltip), visual baselines need owner approval.
 Shots: playable-shots/feel/ (mid-game shots are from the previous build of this pass).
 
-## Feel gate (feel-audit.js --secs 120, after merging the base): FAIL
-(a) 15 · (b) 16 · (c) 13 · (d) 41 · (e) 1 (baseline in qa/feel/SUMMARY.md: 13 / 5 / 7 / 28 / n/a; this run drove further, 150 turns vs 30).
-Next steps, in order:
-1. The board flashes ("Squidrik +3★", "Fast forward ⏩", BF.flash in board.js) show in Play with Hints off and last under 1 s. Hide them when Hints is off, or move them into the race line.
-2. The audit finds neither Learn nor Play. Learn is the ppCoach game, not GXT, so GXT.running() is false. "▶ Play now" does not match the audit's play regex. Add data-a hooks the audit knows, and expose a GXT-like running() for the coach.
-3. Coach lines over 12 words: rewrite COACH_TIPS in tut-story.js and the ui.js tips; the aim sentence is 15 words, so split it.
-4. 13px text in the monster/card drawers (div.small.muted, .st2, small).
-5. (e) The ★20 and ⚡0 numbers overlap on the result chip.
+## Round 2 (W467, 8 Nov): feel gate PASS
+`feel-audit.js crown-city-smash --secs 120` after merging the base: (a) 0 · (b) 0 · (c) 0 · (d) 0 · (e) 0, no notes. Learn played to its result by touch on phone and PC, with no skips.
+- Play with Hints off is clean: board flashes and the desktop tips panel show only with Hints on. In Learn, the coach is the only voice.
+- Every coach line, final-card line, desktop tip and result line is 12 words or fewer. Card effects show one clause per line (`cx()` in ui.js).
+- Phone text is at least 14px (drawers, choices, chips, K.O., "you" tags). The number pops no longer scale into each other.
+- Learn is the coached free-play game: `GXT.running()` reports it, and `GXT.state()` is null during free play and `{phase:'end'}` at its result. Play now has `data-a="start"`.
+- Desktop: goal card text is 17-20px, the panel name is cream with a colour underline, the dice preview line is 16px, the panel title has a plate, and secondary button text is 16px.
+- Fixed a skin padding bug that broke the cc-board scenario on the base (the menu row changed size when the skin turned on).
+- ui-audit (phone, phone-s, pc): A 0 · B 22 · C 0 · D 3 · E 1 · F 0.
+  Left:
+  - B: mostly 2D fallback-board labels (no-WebGL browsers), the painted menu rows, and emoji glyphs.
+  - D: the 3D title-city meshes in three3d.js, which W459 is editing.
+  - E: the desktop news button, which opens the log drawer through data-gx; the audit sees no change.
+- Shots: playable-shots/feel/.
