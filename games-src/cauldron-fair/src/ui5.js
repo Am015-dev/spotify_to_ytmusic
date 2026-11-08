@@ -10,7 +10,7 @@ function buildRules() {
     'Stop whenever you like. Your last chip decides your space: the big number is coins, the small brown badge is victory points.',
     'Then the day is counted: spend coins on new chips for your bag, spend rubies, and the next day begins.',
     'After day 9 the most victory points wins.'])), h('p.sm', 'The full rules follow.'));
-  sec('The goal', h('p', 'You are a travelling potion-maker at the village fair. Over nine days you brew in your cauldron, sell what you make and stock your bag with better ingredients. The most victory points after day 9 wins.'));
+  sec('The goal', h('p', h('b', 'Have the most points after 9 days.')), h('ul', [h('li', 'Draw chips from your bag to fill your pot.'), h('li', 'Stop before the white chips add up past 7.'), h('li', 'Your last space pays coins and points.')]));
   sec('How a day goes', h('ol', ...li([
     'The fair\'s seer turns up a fortune card. Purple cards happen at once, blue cards last all day.',
     'From day 2, anyone behind the leader gets a rat stone: your first chip starts one space further for every rat tail between you and the leader on the score track.',

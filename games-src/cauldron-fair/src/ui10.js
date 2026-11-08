@@ -23,7 +23,7 @@ const HLP_STEPS = {
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each); a card without a phase is general
 const HLP_RULES = [
-  { title: 'The goal', text: 'You brew for nine days. Chips earn coins and victory points. The most points after day 9 wins.', pic: () => hpics([['ico', 'bag'], '>', ['ico', 'vp', 'Points'], '>', ['ico', 'check', 'Winner']]) },
+  { title: 'The goal', text: 'Have the most points after 9 days. \u2022 Draw chips to fill your pot. \u2022 Stop before the white chips add past 7. \u2022 Your last space pays coins and points.', pic: () => hpics([['ico', 'bag'], '>', ['ico', 'vp', 'Points'], '>', ['ico', 'check', 'Winner']]) },
   { title: 'One day', text: 'Draw chips one by one and stop when you like. Then count the day, shop, and begin again.', pic: () => hpics([['ico', 'bag', 'Draw'], '>', ['ico', 'coin', 'Count'], '>', ['chip', 'B1', 'Shop']]) },
   { title: 'Explosions', text: 'White chips add up. More than 7 and the cauldron explodes: you must stop and give something up.', pic: () => hpics([['chip', 'W2', '2'], ['chip', 'W3', '3'], ['chip', 'W3', '3'], '>', ['ico', 'boom', '8']]) },
   { phase: 'first', title: 'Pull a chip', text: 'Tap the bag. The chip moves forward along the spiral by its number.', pic: () => hpics([['ico', 'bag'], '>', ['chip', 'G2', 'Moves 2']]) },
@@ -123,11 +123,11 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'cauldron-fair', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoidPad: 10, avoid: '#fortchip,#fort,.ct,#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
+  GXH.init({ game: 'cauldron-fair', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoidPad: 10, avoid: '#fortchip,#fort,.ct,#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
 }
 function hlpAfter() {
   hlpInit(); if (typeof GXH === 'undefined') return;
-  const st = $('#start'), busy = !G || !UI.started || G.phase === 'over' || tutOn() || (st && !st.hidden) || UI.mode === 'ai' || !!GX.open || Date.now() < BF.fxUntil || (UI.rsOpen && UI.rsMode !== 'report');
+  const st = $('#start'), busy = (typeof COACH !== 'undefined' && COACH.on) || !!document.querySelector('#goalcard') || !G || !UI.started || G.phase === 'over' || tutOn() || (st && !st.hidden) || UI.mode === 'ai' || !!GX.open || Date.now() < BF.fxUntil || (UI.rsOpen && UI.rsMode !== 'report');
   GXH.phase(busy ? null : hlpPhase());
 }
