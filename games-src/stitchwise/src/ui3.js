@@ -28,7 +28,7 @@ function renderSetup(st) {
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return; var a = t.dataset.a;
   if (a === 'offer') selectOffer(+t.dataset.k); else if (a === 'adv') doAdvance(); else if (a === 'rot') rotate(); else if (a === 'flip') flip(); else if (a === 'sew') confirmSew(); else if (a === 'cancel') cancelSel();
-  else if (a === 'strip') { if (G) { showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else if (G) toast('Buttons ' + G.btn[sd] + ' · income ' + G.inc[sd] + ' per spot · ' + swEmpty(G.board[sd]) + ' empty squares'); }
+  else if (a === 'strip') { if (G) { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else if (G) toast('Buttons ' + G.btn[sd] + ' · income ' + G.inc[sd] + ' per spot · ' + swEmpty(G.board[sd]) + ' empty squares'); }
   else if (a === 'resume') loadGame(); else if (a === 'quick') showStart('setup'); else if (a === 'rules') { GX.show('rulesd'); }
   else if (a === 'story') storyOpen(); else if (a === 'start') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
   else if (a === 'campfin') { $('#rs').hidden = true; }
