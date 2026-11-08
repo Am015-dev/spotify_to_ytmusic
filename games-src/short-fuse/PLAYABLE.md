@@ -48,3 +48,9 @@ The idle-round guard (four full rounds with no cut explode) is now stated in the
 - The final "climax" is the end card + counters, no animated count-up.
 - Engine rules fixes belong to W391 (merged: only jobs 9, 16 and 36 explode on a stuck hand). The other rules-check items are SIMPLIFIED-ON-PURPOSE or need the card scans (not reachable).
 - Shared kit blocker worked around in this folder: tutorial bubble font/background are set in game/skin.css (the shell CSS keeps 13.5 px); the shell's lint still warns above 20 words per step (all steps are <= 20 except none).
+
+## Addendum 5 (W423, 8 Nov 2026): you must SEE how you score
+- `game/scorecard.js` (new, same code in Quick, Story and the coached game): a permanent tracker (`Job x · Turn n · whose turn · 1 action / or a card`, the token is struck out once spent), an always-visible score breakdown (wires cut by You and by each crewmate, leader starred), ONE strip under it for the "Turn over: why" card (what the turn did, who is next), else the PREVIEW of the move being built (odds of each number on the picked wire, "+2 wires cut", fuse risk), else "Best now". Best-value badges (top three glowing crew wires, best one starred) come from the same solver the computer crew uses. After every turn a one-line Good / Okay / Poor rating compares the played move's odds with the solver's best pick (rivals are rated too).
+- Look-check: `button.btn.wide` plate (`ui-row-c.webp`) was drawn at two aspects (border-image-width 5px 7px on a uniform slice 30); now 6px 6px in `skin.css`.
+- Shots: `playable-shots/a5-390-*.webp`, `a5-1440-*.webp` (coach bubbles hidden in the shots so the tracker is visible).
+- Known: while a coach bubble is open it can sit over the tracker (the shell places it); "Got it" closes it. Odds are exact only for hidden wires the solver can sample (80 samples); known wires show 100% / 0%.
