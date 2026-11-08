@@ -73,12 +73,13 @@ function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode 
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
   if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null;
-  const human = isHuman(VG.actor(G)), evb = human && !m.free && m.t !== 'ans' && m.t !== 'pass' ? evalMoves().slice() : null, main = human && !m.free && m.t !== 'ans'; const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
+  const human = isHuman(VG.actor(G)), evb = human && !m.free && m.t !== 'ans' && m.t !== 'pass' ? evalMoves().slice() : null, main = human && !m.free && m.t !== 'ans';
+  let rating = null, lbl = ''; try { rating = evb ? rateMove(m, evb) : null; lbl = main ? shortLabel(m) : ''; } catch (x) { }   /* before the move: hand indices still match */ const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
   if (!r.ok) { toast('That move is not allowed now.'); render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
   const delay = showEvents(s);
   save(); render(); actFx(m, s, from, html, b); if (best) coachMove(m, best);
-  if (main && !(G.q && myTurn())) turnOver(m, evb ? rateMove(m, evb) : null);
+  if (main && !(G.q && myTurn())) try { turnOver(m, rating, lbl); } catch (x) { }
   if (!UI.fast && m.t !== 'ans' && !m.free) $('#prompt').textContent = moveCaption(m, s);
   UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(650, Math.min(delay, 1200)));
 }
@@ -256,10 +257,10 @@ function rateMove(m, ev) {   /* good / okay / poor, compared with the strongest 
   const gap = i < 0 ? 99 : best.v - ev[i].v;
   return gap <= 2.5 || i === 1 ? { k: 'okay', t: 'Okay move. Slightly better: ' + shortLabel(best.m) + '.' } : { k: 'poor', t: 'Weak move. Much better was: ' + shortLabel(best.m) + '.' };
 }
-function turnOver(m, rating) {   /* "Turn over: why" card, non-blocking */
+function turnOver(m, rating, lbl) {   /* "Turn over: why" card, non-blocking */
   if (UI.fast) return; let e = $('#turnover'); if (!e) { e = document.createElement('div'); e.id = 'turnover'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
-  const why = m.t === 'pass' ? 'You passed: you sit out until everyone has passed and the round ends.' : 'Turn over: you used your one action (' + shortLabel(m) + ').';
-  e.innerHTML = `<b>${esc(why)}</b>${rating ? `<span class="rt ${rating.k}">${esc(rating.t)}</span>` : ''}<span class="nx">${esc(G.phase === 'over' ? 'The expedition is over.' : 'Next: ' + (VG.actor(G) >= 0 && !myTurn() ? G.p[VG.actor(G)].name + ' plays.' : 'your turn again.'))}</span>`;
+  const why = m.t === 'pass' ? 'You passed: you sit out until everyone has passed and the round ends.' : 'Turn over: you used your one action (' + (lbl || 'your move') + ').';
+  e.innerHTML = `<b>${esc(why)}</b>${rating ? `<span class="rt ${rating.k}">${esc(rating.t)}</span>` : ''}<span class="nx">${esc(G.phase === 'over' ? 'The expedition is over.' : 'Next: ' + (VG.actor(G) >= 0 && !myTurn() && G.p[VG.actor(G)] ? G.p[VG.actor(G)].name + ' plays.' : VG.actor(G) === -2 ? 'the rival expedition plays.' : 'your turn again.'))}</span>`;
   try { const d = $('#dock').getBoundingClientRect(), ph = innerWidth < 1000; e.style.top = (ph ? Math.max(60, d.top - e.offsetHeight - 8) : 64) + 'px'; e.style.left = (ph ? innerWidth / 2 : d.left + d.width / 2) + 'px'; } catch (x) { }
   e.className = 'on'; clearTimeout(turnOver.t); turnOver.t = setTimeout(() => { e.className = ''; }, 3600); e.onclick = () => { e.className = ''; };
 }
