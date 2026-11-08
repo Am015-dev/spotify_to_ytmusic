@@ -120,3 +120,13 @@ html.pp-mine-roll #ob #preview,html.pp-mine-roll #preview{display:none}
 html.ph-p.pp-nobub .gxh-bub{display:none}   /* the turn tracker at the top and the preview line already say what to do; one instruction at a time */
 html:not(.ph-l) #ob #pacts:has([data-act="resolve"]){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:100%;box-sizing:border-box}
 html:not(.ph-l) #ob #pacts:has([data-act="resolve"]) .btn{width:auto;min-width:0;box-sizing:border-box;flex:none}
+
+/* W386f: PLAY is clean. Only LEARN (coached game) and HINTS (the bulb) show helpers */
+html:not(.pp-hints) #bmarks,html:not(.pp-hints) #bfinger,html:not(.pp-hints) #ccbanner,html:not(.pp-hints) #pppreview{display:none!important}
+html:not(.pp-hints) .die.sugg,html:not(.pp-hints) .sugg{outline:none!important}
+html:not(.pp-hints) .pp-best::before{display:none}
+#pppop.short{padding:6px 12px;border-width:3px;box-shadow:3px 3px 0 #1a1320;top:40%;width:auto;min-width:150px;pointer-events:auto;cursor:pointer}
+#pppop.short ul{margin:0 0 0 16px;font-size:16px}
+#pppop.on{pointer-events:auto}
+#ppwhat{display:none;position:fixed;right:10px;bottom:84px;z-index:2147480000;min-height:40px;padding:6px 14px;border-radius:20px;border:3px solid #1a1320;background:#ffd23f;color:#1a1320;font:900 14px/1.1 Nunito,sans-serif;box-shadow:3px 3px 0 #1a1320;cursor:pointer}
+html.pp-hints header.gx-bar #bulbbtn{box-shadow:0 0 0 3px #ffd23f,0 0 16px 4px rgba(255,210,63,.9)}

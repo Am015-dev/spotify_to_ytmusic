@@ -1,9 +1,9 @@
-// Addendum 5 check: the player SEES how they score. Plays a game by UI taps and asserts: the live preview shows on the player's roll with real text, the reason pop with a
+// Addendum 5 check (with Hints ON; Play mode must show none of it, see clean.js): the player SEES how they score. Plays a game by UI taps and asserts: the live preview shows on the player's roll with real text, the reason pop with a
 // GOOD/OKAY/POOR line appears after a smash, a leader mark appears on the score strip once someone has stars. Usage: CHR=.. node score.js <url> <w> <h> [shotsDir]
 const L = require('./lib.js'); const [url, W, H, SH] = [process.argv[2], +process.argv[3] || 390, +process.argv[4] || 763, process.argv[5]];
 (async () => {
   const b = await L.launch(), { p } = await L.open(b, W, H, url); const seen = {};
-  await L.tapSel(p, '[data-start="solo"]'); await L.sleep(1500); await p.evaluate(() => { AIDELAY = 250 });
+  await L.tapSel(p, '[data-start="solo"]'); await L.sleep(1500); for (let k = 0; k < 20 && !(await p.evaluate(() => document.documentElement.classList.contains('pp-hints'))); k++) { await L.tapSel(p, '#bulbbtn'); await L.sleep(400); await L.step(p) }   // HINTS on (the bulb); off by default await p.evaluate(() => { AIDELAY = 250 });
   const t0 = Date.now();
   while (Date.now() - t0 < 200000 && !(seen.pv && seen.pop && seen.lead)) {
     const st = await p.evaluate(() => ({ w: !!G.winner, pv: (document.querySelector('#pppreview.on') || {}).textContent || '', pop: (document.querySelector('#pppop.on') || {}).textContent || '', lead: !!document.querySelector('#pchips .pchip.lead, #ppstand span.lead') }));
