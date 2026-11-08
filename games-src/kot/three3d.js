@@ -334,7 +334,7 @@ function buildWorld(){const sc=V3.scene;const TX=V3.tex;
   // Downtown: a stepped display pedestal with painted bands, brass trim, a marble top and a neon ring
   const pl=new THREE.Group();sc.add(pl);V3.platform=pl;
   const band=canvasTex(512,64,(x,w,h)=>{for(let i=0;i<16;i++){x.fillStyle=i%2?'#c8283a':'#ffcb3a';x.fillRect(i*32,0,32,h)}x.fillStyle='rgba(0,0,0,.25)';x.fillRect(0,0,w,5);x.fillRect(0,h-5,w,5);noiseFill(x,w,h,0,16,6,2)},[4,1]);
-  mesh(lathe([[0,0],[3.62,0],[3.62,.16],[3.52,.26],[3.4,.28],[0,.28]],96),std(0x2a1a34,{roughness:.35,metalness:.1}),0,0,0,pl);
+  mesh(lathe([[0,0],[3.62,0],[3.62,.16],[3.52,.26],[3.4,.28],[0,.28]],96),std(0x3a2a48,{roughness:.35,metalness:.1}),0,0,0,pl);
   const drum=mesh(new THREE.CylinderGeometry(3.2,3.3,.72,96,1,true),new THREE.MeshPhysicalMaterial({map:band,roughness:.35,clearcoat:.8,clearcoatRoughness:.2}),0,.64,0,pl);drum.receiveShadow=true;
   mesh(lathe([[3.3,.98],[3.38,1.02],[3.38,1.07],[3.3,1.1],[3.18,1.1]],96),brass,0,0,0,pl);
   mesh(lathe([[3.3,.26],[3.4,.3],[3.3,.34]],96),brass,0,0,0,pl);
@@ -601,7 +601,7 @@ function sync3D(){if(!V3.on)return;if(PH)PH.wake();
     while(o.cults.length<n){const c=mesh(new THREE.IcosahedronGeometry(.26,2),glowMat(0xc08bff,2.6),0,0,0,V3.scene,true);o.cults.push(c)}
     while(o.cults.length>n)V3.scene.remove(o.cults.pop())});
   const hud=document.getElementById('hud');const a=cur();
-  hud.innerHTML=G.winner?`<b>🏆 ${esc(G.winText)}</b>`:`<b>ROUND ${G.turn}</b> · ${esc(mname(a))} ${['','is rolling','resolves','enters the city','is shopping','ends its turn'][G.step]||''}${G.phase==='roll'?` · ${G.rolls} reroll${G.rolls===1?'':'s'} left`:''}`;
+  hud.innerHTML=G.winner?`<b>👑 ${esc((()=>{const q=G.winner==='draw'?null:G.pl[+String(G.winner).slice(1)-1];return q?mname(q)+' wins!':'Nobody wins'})())}</b>`:`<b>ROUND ${G.turn}</b> · ${esc(mname(a))} ${['','is rolling','resolves','enters the city','is shopping','ends its turn'][G.step]||''}${G.phase==='roll'?` · ${G.rolls} reroll${G.rolls===1?'':'s'} left`:''}`;
   V3.hsign.visible=G.bayOn;if(V3.harbor.userData.open!==G.bayOn){V3.harbor.userData.open=G.bayOn;V3.hsign.material.map=G.bayOn?signTex('HARBOR','#43c8ff','#e9fbff'):signTex('CLOSED','#8aa6b5','#ffffff')}
   V3.water.material.color.set(G.bayOn?0x1d6f8a:0x4a5a66);
   if(G.winner&&!V3.won){V3.won=true;const w=G.winner==='draw'?null:+G.winner.slice(1)-1;if(w!==null){for(let i=0;i<40;i++)spawn(i%3?'star':'spark',V3.mons[w].g.position.clone().add(new THREE.Vector3(0,3,0)),1,1.8)}}
