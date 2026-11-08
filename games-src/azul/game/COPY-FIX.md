@@ -104,7 +104,7 @@ Status: fixed. The Goal card (`.gl` in games-src/azul/game/src/ui8.js:100, shown
 | src/body.html:55 | `Measure each graphics level and recommend one` | `Find the best graphics level` |
 | src/body.html:35 | `Tap a glowing tile to pick its glaze, then a glowing rack. Drag to tilt, scroll to zoom, double-click to reset.` | `Tap a glowing tile, then a glowing rack. Drag to tilt.` |
 | src/rules-html.js:3 | `Tap a colour on a kiln (or in the middle): you take every tile of it.` | `Tap a colour to take every tile of it.` |
-| src/rules-html.js:3 | `When every kiln and the middle are empty, each full rack sends one tile to your wall and scores.` | `When all tiles are taken, each full rack sends one tile to your wall.` |
+| src/rules-html.js:3 | `When every kiln and the middle are empty, each full rack sends one tile to your wall and scores.` | `Each full rack sends one tile to your wall.` |
 | src/rules-html.js:4 | `Each round you draft glazed tiles, dry them on your racks and set them into your mosaic.` | `Each round, fill racks with tiles and set them in your mosaic.` |
 | src/rules-html.js:4 | `Points come from tiles that touch other tiles, and from finished rows, columns and glazes at the end.` | `Touching tiles score more. Finished rows, columns and glazes give end bonuses.` |
 | src/rules-html.js:8 | `A rack holds only one glaze. You cannot start a glaze on a rack if that mosaic row already has that glaze.` | `A rack holds one glaze. Its mosaic row must not already have it.` |
@@ -113,7 +113,7 @@ Status: fixed. The Goal card (`.gl` in games-src/azul/game/src/ui8.js:100, shown
 | src/rules-html.js:9 | `drafting ends when every kiln and the courtyard are empty.` | `taking ends when every kiln and the courtyard are empty.` |
 | src/rules-html.js:11 | `otherwise count the unbroken line of tiles it forms left-right (including itself), and the unbroken line up-down, and add both. A tile in both a row and a column line is counted twice.` | `otherwise add its row line and its column line.` |
 | src/rules-html.js:14 | `The game ends after the setting phase of the round in which anyone completes a <b>horizontal row</b> of 5.` | `The game ends after the round when anyone completes a <b>row</b> of 5.` |
-| src/rules-html.js:30 | `Round coaster loaded with 4 tiles each round. 2 players use 5, 3 players use 7, 4 players use 9 (twice the players plus one).` | `Holds 4 tiles. Use 5 kilns for 2 players, 7 for 3, 9 for 4.` |
+| src/rules-html.js:30 | `Round coaster loaded with 4 tiles each round. 2 players use 5, 3 players use 7, 4 players use 9 (twice the players plus one).` | `Holds 4 tiles. 2 players use 5 kilns, 3 use 7, 4 use 9.` |
 | src/rules-html.js:29 | `Wild tile. Take all the prisms from one place, optionally with all of one other glaze there. Joins any rack with one glaze; a prism is what goes to the mosaic from a full rack. Counts for rows and columns, never for the full-glaze bonus.` | `A wild tile. It counts for rows and columns, not glaze bonuses.` |
 | src/rules-html.js:32 | `Starts each round in the courtyard. The first player to take from the courtyard takes it onto their breakage line (it fills a penalty space) and starts the next round.` | `First to take from the courtyard gets it and starts next round.` |
 | src/rules-html.js:33 | `Holds the tiles that are drawn to load the kilns. When empty, the shard box is poured back into it.` | `Holds tiles for loading kilns. When empty, refill it from the shard box.` |
@@ -122,4 +122,4 @@ Status: fixed. The Goal card (`.gl` in games-src/azul/game/src/ui8.js:100, shown
 | src/rules-html.js:37 | `Each round, lose the printed amount for every filled breakage space. A score never drops below 0.` | `Each round, lose points for each filled breakage space.` |
 | src/rules-html.js:39 | `Grey mosaic: set each tile on any empty space of its row, never repeating a glaze in a row or column. A full rack with no legal space drops all its tiles to breakage.` | `Set each tile on any empty space in its row. No glaze repeats.` |
 
-Lines fixed: 109
+Lines fixed: 108
