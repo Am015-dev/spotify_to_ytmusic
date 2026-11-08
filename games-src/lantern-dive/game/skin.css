@@ -132,3 +132,9 @@ html .bdg b,html .bdg span,html .pbtn span,html .seat .bdg b,html .me .bdg b,htm
 @media (max-height:740px){.crew.foes{display:none}.herolan{width:110px;height:110px}}
 @media (max-height:600px){.hero{display:none}}
 #tbub .tg{text-align:center;line-height:1.1}#tbub .tgp{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #c99a35}
+/* W479 ui-audit: wide screens 16px minimum, title text on a dark pill so it reads on the painted water */
+.ttl-in .logo,.ttl-in .tag{background:rgba(3,15,34,.6);padding:3px 14px;border-radius:12px;color:#fff}
+.ttl-in .logo span{color:#ffe9a6}
+@media (min-width:1024px){
+  #start *,.ttl *,.gxt-menu *,.cpic figcaption,.ttl-in .logo span,.ttl-in .tag,.tbtn b,.tbtn span,.tbtn small,.gx-drawer *,.ppop *,#dlg *,.gxh-bub *,.gxt-bub *,#tskip,#tbub *{font-size:max(16px,1em)!important}
+}
