@@ -79,7 +79,7 @@ html.ph .ptile.bcard .art:has(.cpic){width:100%;height:50px;border-radius:6px;ov
 .mc .cthumb{float:left;width:52px;height:32px;margin:0 7px 2px 0;border-radius:5px;border:2px solid #1a1320;box-sizing:border-box;box-shadow:1px 1px 0 var(--shadow)}
 .mc:has(.cthumb)::after{content:"";display:block;clear:both}
 /* stat pick-ups that fly to the chips wear the painted icons (the glyph stays in the DOM, just hidden) */
-.bfly .btok.star{background:url(media/icon-star.webp) center/contain no-repeat;border:0;color:transparent;font-size:0}
+.bfly .btok.star{background:url(media/icon-star.webp) center/contain no-repeat;border:0;color:transparent;font-size:14px;overflow:hidden;text-indent:60px;white-space:nowrap}
 .bfly .btok.en{background:url(media/icon-energy.webp) center/contain no-repeat;border:0;color:transparent;font-size:0}
 .bfly .btok.hp{background:url(media/icon-heart.webp) center/contain no-repeat;border:0;color:transparent;font-size:0}
 
@@ -116,7 +116,7 @@ html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
 html.sk #modal .dlg:not(.paper){border-width:16px;border-image-width:16px;padding:.6rem 12px}
 html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.big,html.sk .btn.primary,html.sk .btn.camp,html.sk .btn.on{border-width:8px 10px;border-image-width:8px 10px;padding:0 4px}
 html.sk .btn.mini,html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-width:6px 9px;border-image-width:6px 9px;padding:0 1px}
-html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:1.5px 4px}
+html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:1.08px 8.6px}
 /* UI-BAR 2/9: text sits inside the painted frame, never on it */
 html.sk header.gx-bar .gx-ibtn.btn{border-image-width:10px 14px;padding-inline:14px}
 html.sk.ph header.gx-bar .gx-ibtn.btn{padding-inline:0}

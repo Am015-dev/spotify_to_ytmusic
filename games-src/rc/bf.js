@@ -13,12 +13,21 @@ const w8=s=>{s=String(s==null?'':s).replace(/\s+/g,' ').trim();const w=s.split('
 const brief=t=>{let s=String(t==null?'':t).replace(/\s+/g,' ').trim();if(s.split(' ').length>8){const c=s.split(/[:;(—.]/)[0].trim();if(c&&c.split(' ').length>=2)s=c}return w8(s)};
 const netOn=()=>typeof NET!=='undefined'&&NET.on;
 const pcol=pid=>{const m=/^c(\d+)_/.exec(pid||'');return m?PCOL[(+m[1])%6]:pid==='fri'?'#f3f3f3':pid==='dog'?'#9b6bd6':'#8d8d8d'};
+// a choice as a short main line plus one small plain line: "Cutlass (+3, you take 1 wound)" -> Cutlass / +3. You take 1 wound.
+// (owner 8 Nov: no brackets, at most 12 words a line)
+const cap1=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+const w12=s=>{const w=String(s).split(' ');return w.length<=12?s:w.slice(0,12).join(' ')+'…'};
+function optHtml(l){l=String(l==null?'':l).replace(/\s+/g,' ').trim();let main=l,sub='';const m=/^(.*?)\s*\(([^()]*)\)(.*)$/.exec(l);
+  if(m){main=(m[1]+m[3]).replace(/\s+:/,':').trim();sub=m[2]}
+  const c=/^([^:]{2,40}):\s+(.+)$/.exec(main);if(c&&!sub){main=c[1];sub=c[2]}else if(c&&sub){main=c[1];sub=c[2]+'. '+sub}
+  sub=sub.split(/;\s*|,\s+(?=[a-z])|\.\s+/).map(x=>cap1(x.trim())).filter(Boolean).join('. ');if(sub&&!/[.!?]$/.test(sub))sub+='.';
+  return `<b class="ol">${E(w12(main))}</b>${sub?`<small class="os">${E(w12(sub))}</small>`:''}`}
 const FINGER='<u class="rg"></u><span class="fg">👆</span>';
 // ---------- one-time DOM: tray, overlay, zoom buttons, ghost finger ----------
 function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q('.gx-board'),view=q('.gx-board .view');if(!app||!board)return;
   const tray=document.createElement('div');tray.id='bf';tray.setAttribute('role','region');tray.setAttribute('aria-label','Your move');app.appendChild(tray);
   const ov=document.createElement('div');ov.id='bfov';ov.innerHTML='<div id="bfglow"></div><div id="bfchips"></div>';(view||board).appendChild(ov);
-  const rs=document.createElement('div');rs.id='bfres';rs.setAttribute('role','status');rs.setAttribute('aria-label','Shared supplies');board.appendChild(rs);const pp=q('#ppop');if(pp)board.appendChild(pp);
+  const rs=document.createElement('div');rs.id='bfres';rs.setAttribute('role','group');rs.setAttribute('aria-label','Shared supplies');board.appendChild(rs);const pp=q('#ppop');if(pp)board.appendChild(pp);
   const pv=q('#phview');const bz=document.createElement('div');bz.id='bfzoom';board.appendChild(bz);if(pv)for(const b of [...pv.querySelectorAll('[data-ph=in],[data-ph=out],[data-ph=camp]')])bz.appendChild(b);
   if(pv&&!pv.querySelector('.bf-i')){const i=document.createElement('button');i.className='gx-ibtn bf-i';i.dataset.bf='info';i.setAttribute('aria-label','Details');i.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/></svg>';pv.appendChild(i)}
   const gh=document.createElement('div');gh.id='bfgh';gh.hidden=true;gh.setAttribute('aria-hidden','true');gh.innerHTML='<div class="f">'+FINGER+'</div>';document.body.appendChild(gh);
@@ -87,15 +96,15 @@ function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you'
 function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
   const c=(bad,t)=>`<span class="${bad?'bad':''}">${t}</span>`;
   return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,`🍖 Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,`🪵 Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,'🏠 Shelter'):c(true,'No shelter'))}
-BF.paint=function(){const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
+BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
 function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=pawnLabel(p);
-  return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:''}</em></span>`}
+  return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"">${(()=>{const k=p.c!=null&&P(p.c)?P(p.c).k:p.f?'friday':null;return k?`<img class="bfpic" src="media/camp-${k}.webp" alt="" onerror="this.remove()">`:''})()}<b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:''}</em></span>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
-    if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${E(o.l)}</button>`).join('')}</div>`}
+    if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${optHtml(o.l)}</button>`).join('')}</div>`}
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
     return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
@@ -164,7 +173,10 @@ BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b
   try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?'⛈️':r?'🌧️'.repeat(Math.min(3,r)):s?'❄️'.repeat(Math.min(3,s)):'☀️';BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
     else if(d.card!=null&&CARD[d.card]){const c=CARD[d.card];const ti=c.icon&&TYICON[c.icon];ic=(CARDICON[k]||'🎴')+(ti?ti:'')}}catch(e){}
   const el=document.createElement('div');el.id='bfcard';el.className='bfcard '+cls;el.setAttribute('role','button');el.setAttribute('aria-label',w8(capFor(i))+' (hold for the full text)');
-  el.innerHTML=`<div class="in"><div class="fr">${(k==='fight'&&d.beast&&artImg('beast',d.beast,'bfart'))||`<span class="bfic">${ic}</span>`}<span class="bftt">${E(w8(capFor(i)))}</span></div></div>`;ov.appendChild(el);
+  let scene='';try{if(k==='weather'){const w=(viewState()||G).lastWx||{};scene=w.storm?'gale':w.snow?'winter':w.rain?'rain':'horizon'}
+    else if(k==='threat'||k==='fight')scene='prowlers';else if(k==='mystery')scene='altar';
+    else{const c=d.card!=null&&CARD[d.card];const t=c&&(c.icon||c.deck||c.type);scene={book:'whisper',build:'log',explore:'shroud',gather:'hunger',wreck:'undertow'}[t]||(k==='adventure'?'shroud':'undertow')}}catch(e){}
+  el.innerHTML=`<div class="in">${scene&&!(k==='fight'&&d.beast)?`<img class="bfscene" src="media/camp-${scene}.webp" alt="">`:''}<div class="fr">${(k==='fight'&&d.beast&&artImg('beast',d.beast,'bfart'))||`<span class="bfic">${ic}</span>`}<span class="bftt">${E(w8(capFor(i)))}</span></div></div>`;ov.appendChild(el);
   // hold to read the full card text; a quick tap moves on
   let t0=0,tm=null,held=false;const cancel=()=>{clearTimeout(tm);tm=null};
   el.addEventListener('pointerdown',e=>{e.stopPropagation();t0=Date.now();held=false;cancel();tm=setTimeout(()=>{held=true;BF.info()},480)});

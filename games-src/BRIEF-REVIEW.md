@@ -37,3 +37,11 @@ the message gives it. Then wait for the next game.
   touch/mouse proof and screenshots. Run phone and PC checks in parallel browser contexts.
 - Only the pop-up timing check runs at real speed, and only for the messages you are timing.
 - A full review should take minutes, not an hour.
+- Before feel-audit or asset-usage on a DEPLOYED game, delete games-src/.staging/<slug> (gx-serve serves staging first). For a staged review, rebuild staging first.
+
+## Art gate decision (orchestrator, 05:37 8 Nov)
+asset-usage counts every file shipped. Story-only art, variant source files and lite/full glb pairs cannot all load in one
+Quick game. Judge item 8 like this: run asset-usage as usual; then for each never-loaded file, check if the game code
+references it (grep src). Referenced files must load in Quick play, Story stage 1, or desktop with ?glb=1. Unreferenced
+variant/source duplicates do not count against the game. Item 8 >= 7 when every referenced owner file shows somewhere
+reachable and the board/cards visibly use owner art in one style.

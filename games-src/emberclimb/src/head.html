@@ -47,6 +47,15 @@ html body .hand .card .cart{height:calc(var(--cw)*.72)!important}html body .hand
 .gxt-cell{box-shadow:0 0 0 1px var(--gxt-dim)}
 /* R1 PC: a bigger fight, End turn beside the hand */
 @media (min-width:1024px){html body .en .art{width:min(100%,calc(var(--cw)*3))!important}html body .en{max-width:260px!important}.ctl{display:flex;align-items:center;justify-content:space-between;gap:16px}.w4endpc{min-width:180px;min-height:56px;font-size:20px!important}}
+/* polish: toasts stay fully visible, fade only in their last 400 ms */
+@keyframes w4tin{from{opacity:0;transform:translateX(-50%) scale(.9)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+.toast{opacity:1}.toast.w4tout{opacity:0;transition:opacity .4s}
+/* polish: the coach bubble sits over the top bar, never over the enemy intent chips */
+html body .ec-say{top:4px!important}
+/* polish: hero select backdrop dimmed */
+#title.pick>.bg{filter:brightness(.42) blur(1px)!important}
+/* PC side panel deck */
+.pcdeck{margin-top:14px}.pcdg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.pcdc{display:flex;flex-direction:column;gap:4px;font-size:16px;color:#f6ead8;line-height:1.15}.pcdc .pcda{width:100%;aspect-ratio:1;border-radius:8px;background-size:cover;border:2px solid #6a4a2a}
 /* end W420 owner art */
 
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}

@@ -188,3 +188,32 @@ div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
 .card2.briefc,.card2.briefc *{pointer-events:auto}
 @media (max-width:1023px){.btn.small,#start small,.btn small,#coach .coz,#coachskip,.tk{font-size:14px!important}}
 .eqk .en,#tb .eqk .en{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-height:1.1em}
+/* W469 feel gate (e): nothing overlaps on a tile or a gear card */
+.tile:has(.coin):not(:has(.nt)) .f{transform:translateY(calc(var(--tw)*-.24))}
+.tile:has(.nt):not(:has(.coin)) .f{transform:translateY(calc(var(--tw)*.14))}
+.tile .coin{height:calc(var(--tw)*.42);min-width:calc(var(--tw)*.42)}
+.eqk.locked .en,#tb .eqk.locked .en{display:none}
+.say span,.pvb,.tile .nt,#tb .tile .nt{font-size:14px!important}
+.tile .coin,.side .coin{font-size:max(14px,calc(var(--tw)*.3))!important}
+.tile:has(.coin):not(:has(.nt)) .f{transform:translateY(calc(var(--tw)*-.34))}
+details:not([open])>:not(summary){display:none!important}
+@media (max-width:1023px){.eqc .ex,.eqc .es,.eqc .tm,span.tm{font-size:14px!important}}
+.tile:has(.nt):has(.coin) .f{font-size:calc(var(--tw)*.4)}
+@media (max-width:1023px){body :is(.lbl,kbd,.gxt-menu span){font-size:14px!important}}
+@media (max-width:1023px){.mw,.mix,.mix b,.tag,.rule p{font-size:14px!important}.mw{width:auto;min-width:20px;padding:0 2px}}
+/* the middle of the table: the owner's rig art + the race */
+#midc{position:absolute;left:0;right:0;z-index:0;display:flex;align-items:center;justify-content:center;gap:14px;pointer-events:none}
+#midc[hidden]{display:none}
+#midc i{flex:none;width:var(--mh);height:var(--mh);max-width:46vw;border-radius:50%;background:url(media/camp-rig.webp) center/cover;box-shadow:0 0 0 4px rgba(8,16,26,.55),0 10px 24px rgba(0,0,0,.45);opacity:.95}
+#midc div{display:flex;flex-direction:column;align-items:flex-start;padding:6px 14px;border-radius:14px;background:rgba(8,16,26,.82)}
+#midc b{font:900 clamp(28px,calc(var(--mh)*.3),56px)/1 var(--fb);color:#ffe066;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+#midc span{font:800 15px/1.2 var(--fb);color:#f3e6bf}
+#midc.bump b{animation:mcb .6s ease-out}
+@keyframes mcb{0%{transform:scale(1)}35%{transform:scale(1.25);color:#b9ff9e}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){#midc.bump b{animation:none}}
+.cn12,#track .cn12{width:auto!important;min-width:18px;height:18px!important;line-height:16px!important;padding:0 2px;font-size:13px}
+@media (max-width:1023px){.cn12,#track .cn12{font-size:14px!important}}
+@media (min-width:1024px){.cn12,#track .cn12{font-size:16px!important;min-width:22px;height:22px!important;line-height:20px!important}}
+.trk{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+@media (max-width:1023px){.trk{display:grid;grid-template-columns:repeat(6,18px);grid-auto-rows:17px;gap:1px 2px}.cn12,#track .cn12{min-width:0;width:18px!important;height:17px!important;line-height:15px!important;padding:0;letter-spacing:-.5px}}
+@media (min-width:1024px){.cc,#cutc .cc{font-size:16px!important}}

@@ -86,10 +86,10 @@ function renderMenu() {
 // ---------- start screens: painted title -> setup (diner cards) / online ----------
 // the four chefs who can join you (you are seat 0 with Mina's portrait). Default level = the character's temper; every level can be changed.
 const DINERS = {
-  1: { lv: 'hard', story: 'Taro cooks noodles on the night shift and eats his supper at the belt long after midnight. He counts every plate that rolls past and remembers exactly who took the last prawn.', enjoy: 'Choose Taro if you enjoy a sharp rival who punishes every loose plate.' },
-  2: { lv: 'normal', story: 'Odile ran a bakery for forty years and still wears her tall hat to dinner. She has never once left without dessert, and she will happily tell you about it.', enjoy: 'Choose Odile if you enjoy a fair, steady race with the custard on the line.' },
-  3: { lv: 'normal', story: 'Kofi drives the number 9 bus and knows every regular by name. He loves a roll race, cheers when he wins it and cheers just as loudly when he loses.', enjoy: 'Choose Kofi if you enjoy a lively table where the seaweed rolls are always fought over.' },
-  4: { lv: 'easy', story: 'Pip saved up pocket money all month for this dinner and wants to try one of everything. Pip picks whichever plate looks the happiest.', enjoy: 'Choose Pip if you enjoy a relaxed first meal with room to try things out.' }
+  1: { lv: 'hard', story: 'Taro cooks noodles at night. He remembers every plate.', enjoy: 'Pick Taro for a sharp rival.' },
+  2: { lv: 'normal', story: 'Odile ran a bakery for forty years. She never skips dessert.', enjoy: 'Pick Odile for a fair, steady race.' },
+  3: { lv: 'normal', story: 'Kofi drives the number 9 bus. He loves a roll race.', enjoy: 'Pick Kofi for a lively table.' },
+  4: { lv: 'easy', story: 'Pip saved up all month to try everything.', enjoy: 'Pick Pip for a relaxed first meal.' }
 };
 const SEAT_ORDER = [2, 3, 1, 4];
 function optObj() { const o = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice(), seats: DEF.seats.slice() }); if (!Array.isArray(o.seats)) o.seats = chefsFor(o.np || 3, o).slice(1); if (!o.lv) o.lv = DEF.lv.slice(); o.np = o.seats.length + 1; return o; }
@@ -129,7 +129,7 @@ function dinerCard(c, o) {
   const d = DINERS[c], on = o.seats.indexOf(c) >= 0, lv = o.lv[c - 1] || 'normal', pc = KIT.PLAYERS[c];
   const card = h('article.dcard' + (on ? '.on' : ''), { 'aria-label': PN[c] + (on ? ', at the table' : ', not at the table') });
   card.style.setProperty('--dc', pc.c);
-  card.append(h('div.dtop', h('div.dimg', { html: avatarC(c, 120) }), h('h3', PN[c], h('small', on ? lv : 'not invited'))), h('div.dtx', h('p.story', d.story), h('p.enjoy', d.enjoy),
+  card.append(h('div.dtop', campPic(h('div.dimg', { html: avatarC(c, 120) }), c), h('h3', PN[c], h('small', on ? lv : 'not invited'))), h('div.dtx', h('p.story', d.story), h('p.enjoy', d.enjoy),
     h('div.drow', h('button.chipb.seatb' + (on ? '.on' : ''), { 'data-a': 'seatchef', 'data-c': c, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, on ? 'At the table ✓' : 'Invite'),
       on ? h('span.lvs', ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (lv === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': c, 'data-v': v, type: 'button', 'aria-pressed': lv === v ? 'true' : 'false', 'aria-label': PN[c] + ' plays ' + v }, v))) : null)));
   return card;
@@ -137,7 +137,7 @@ function dinerCard(c, o) {
 function setupEl() {
   const o = optObj(), ph = isPh(), open = !!UI.cfgOpen;
   const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Who is at the counter?'), h('p.kkflav', KK.STORY.quickIntro));
-  const sum = h('div.ssum', h('div.sfaces', o.seats.map(c => h('span', { html: avatarC(c, 64) }))), h('span.sline', tableLine(o)), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
+  const sum = h('div.ssum', h('div.sfaces', o.seats.map(c => campPic(h('span', { html: avatarC(c, 64) }), c))), h('span.sline', tableLine(o)), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
   const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Configure the table' : null },
     ph ? h('div.cfghead', h('b', 'Configure the table'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
     h('div.seg', h('span.lbl', 'Table for'), [2, 3, 4, 5].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
@@ -226,7 +226,7 @@ function applyPhone() {
 let rzT = 0;
 // ---------- boot ----------
 function boot() {
-  try { GXSK.init({ map: true, stars: true, banner: true, sets: { 'sk-kki': ['icon-cup', 'icon-paste', 'icon-plate', 'icon-star'], 'sk-tags': ['ui-nametag-red', 'ui-nametag-teal', 'ui-nametag-gold', 'ui-nametag-purple', 'ui-nametag-green'] } }); } catch (e) { }
+  try { GXSK.init({ sets: { 'sk-kki': ['icon-cup', 'icon-paste', 'icon-plate', 'icon-star'], 'sk-tags': ['ui-nametag-red', 'ui-nametag-teal', 'ui-nametag-gold', 'ui-nametag-purple', 'ui-nametag-green'] } }); } catch (e) { }
   GX.init({ key: 'kk' });
   GX.drawer('rulesd', 'How to play', buildRules(), true);
   GX.drawer('logd', 'Log', h('div#logbody'));

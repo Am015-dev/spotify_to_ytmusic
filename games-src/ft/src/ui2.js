@@ -52,7 +52,7 @@ function seatPoint(i){const se=seatEl(i);return se?ctr(se.getBoundingClientRect(
 function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;if(!c||!G){el.hidden=true;el.innerHTML='';return}
   el.innerHTML=c.opts.map((o,i)=>`<button class="chb glow" data-chz="${i}">${o.html}</button>`).join('');el.hidden=false;
   const a=c.anchor;const ae=a.tile!=null?tileEl(a.tile):a.seat!=null?seatEl(a.seat):a.dj?document.querySelector(`[data-dj="${a.dj}"],[data-th="${String(a.dj).replace('t:','')}"]`):null;if(!ae){el.hidden=true;return}
-  const r=ae.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(6,Math.min(innerWidth-w-6,x));let y=r.top-h-8;if(y<50)y=r.bottom+8;
+  const r=ae.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(6,Math.min(innerWidth-w-6,x));let minY=50;for(const id of ['line','trk','trk2','coach','turnover']){const q=document.getElementById(id);if(q&&!q.hidden&&q.getClientRects().length){const b=q.getBoundingClientRect().bottom;if(b>minY)minY=b}}minY+=4;let y=r.top-h-8;if(y<minY)y=r.bottom+8;if(y+h>innerHeight-6)y=Math.max(minY,innerHeight-h-6);
   el.style.left=x+'px';el.style.top=y+'px'}
 // ---------- the ghost finger: shows one real, legal move to the new player, and stays away after a few moves ----------
 const FING={n:0,max:10,key:'',t:null};try{FING.n=+localStorage.getItem('soq_fing')||0}catch(e){}
@@ -61,7 +61,7 @@ function fingerEl(m){const q=s=>document.querySelector(s);
   switch(m.act){case 'bid':case 'sell':case 'end':case 'undo':case 'tribe':return [...document.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===JSON.stringify(m))||null;
   case 'start':case 'step':return tileEl(m.tile);
   case 'q':{const o=G.q&&G.q.opts[m.i];const t=o?qBoardTile(o):null;if(t!=null)return tileEl(t);return [...document.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===JSON.stringify(m))||null}
-  case 'tile':if(m.place!=null)return tileEl(m.place)||q('#acts .ab.go');if(m.take)return q(`[data-mk="${m.take[0]}"]`);if(m.dj)return q(`[data-dj="${m.dj}"]`);if(m.thief)return q(`[data-th="${m.thief}"]`);if(m.skip||m.work)return [...document.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===JSON.stringify(m))||null}
+  case 'tile':if(m.place!=null)return tileEl(m.place)||q('#acts .ab.go');if(m.take){const k=m.take.find(j=>!UI.mkSel.includes(j));if(k!=null)return q(`[data-mk="${k}"]`);return [...document.querySelectorAll('[data-mv]')].find(b=>{try{return same(JSON.parse(b.dataset.mv),m)}catch(e){return false}})||q('#acts .ab.go')}if(m.dj)return q(`[data-dj="${m.dj}"]`);if(m.thief)return q(`[data-th="${m.thief}"]`);if(m.skip||m.work)return [...document.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===JSON.stringify(m))||null}
   return null}
 function fingerTarget(){if(!G||G.over||G.tut||(typeof hintsOn==='function'&&!hintsOn())||UI.modal||GX.open||UI.chz||UI.autoOn||FING.n>=FING.max)return null;if(typeof GXH!=='undefined'){const hs=GXH.state();if(!hs.on||hs.cur||hs.rules)return null}const hp=me();if(!hp||online()&&isClient())return null;
   const k=G.seed+'|'+G.logN+'|'+G.phase+'|'+G.step+'|'+(G.q?1:0)+'|'+(G.move?G.move.path.length:0);if(FING.key!==k){FING.key=k;FING.m=null;

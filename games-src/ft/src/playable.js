@@ -8,11 +8,12 @@ function plName(t){if(!G)return t;const hs=G.pl.filter(x=>x.human);if(hs.length=
 function plBanner(title,sub,cls){return;   // Addendum 7: no toasts in Play; the coach and the tracker say it
   const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?2200:200)}
 const PLQ=[];let PLQB=false;
-function plPop(i,d,why){PLQ.push([i,d,why]);while(PLQ.length>3)PLQ.shift();plPopNext()}
-function plPopNext(){if(PLQB||!PLQ.length)return;const [i,d,why]=PLQ.shift();const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
+function plPop(i,d,why){if(G&&G.coach)return;   // in Learn to play the coach explains every change, one message at a time
+  PLQ.push([i,d,why]);while(PLQ.length>3)PLQ.shift();plPopNext()}
+function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,700);return}const [i,d,why]=PLQ.shift();const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
   const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
   e.innerHTML='<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>'+(why?'<span>'+esc(why)+'</span>':'');document.body.appendChild(e);PLQB=true;
-  const w=e.offsetWidth;const tr=document.getElementById('trk');const tb=tr&&!tr.hidden?tr.getBoundingClientRect().bottom:r.bottom;e.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+'px';e.style.top=(tb+4)+'px';const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;setTimeout(()=>{e.remove();PLQB=false;plPopNext()},ms)}
+  const w=e.offsetWidth;const tr=document.getElementById('trk');const tb=tr&&!tr.hidden?tr.getBoundingClientRect().bottom:r.bottom;const land=document.documentElement.classList.contains('land');e.style.left=(land?Math.max(6,Math.min(innerWidth-w-6,r.left)):Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2)))+'px';e.style.top=(land?Math.round(innerHeight*.58):tb+4)+'px';const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;setTimeout(()=>{e.remove();PLQB=false;plPopNext()},ms)}
 function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
 function plShort(t){return plName(String(t||'')).replace(/^[^\w—]+/,'').replace(/\.$/,'')}
 function plAfter(){if(!G){return}

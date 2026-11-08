@@ -50,19 +50,19 @@ function modeOf(){if(NET.on)return NET.mySeat>=0?'solo':'watch';const h=humans()
 function nm(s){return G&&G.seats[s]?G.seats[s].nm:'?'}
 // ---- newcomer-review additions (all new UI strings live here) ----
 const noGear=()=>!!G&&G.mission===1;
-const GLOSSARY=[['Stand','The rack in front of you that holds your wires, sorted from low to high. Only you see the faces of your own stand. With 2 or 3 players some people hold two stands.'],
- ['Foreman','The player marked with a star (★). Starts the job and takes the first turn; the turn then passes clockwise.'],
- ['Info token','A marker placed in front of a wire that tells everyone its number (or, in some jobs, only even/odd or "not this number").'],
- ['Tag','To tag a wire is to put an info token in front of it. Everyone places one opening token at the start; a missed cut tags the wire that was pointed at.'],
- ['Fuse','The bomb timer. Every miss burns one step; when no step is left, the bomb goes off.'],
- ['Dual cut','Point at one wire of a crewmate and say a number you hold. If it matches, both wires are cut. If not, it is a miss.'],
- ['Solo cut','Cut every wire of one value yourself, when you hold all the wires of that value still uncut. It never fails.'],
+const GLOSSARY=[['Stand','The rack in front of you. It holds your wires, sorted low to high. Only you see the faces of your own stand. With 2 or 3 players, some people hold two stands.'],
+ ['Foreman','The player marked with a star (★). Takes the first turn. Then the turn passes clockwise.'],
+ ['Info token','A marker placed in front of a wire. It tells everyone its number. In some jobs it says only even/odd, or "not this number".'],
+ ['Tag','Tagging a wire means putting an info token in front of it. Everyone places one opening token at the start. A missed cut tags the wire that was pointed at.'],
+ ['Fuse','The bomb timer. Every miss burns one step. With no step left, the bomb goes off.'],
+ ['Dual cut','Point at a crewmate\'s wire. Say a number you hold. If it matches, both wires are cut. If not, it is a miss.'],
+ ['Solo cut','Cut every wire of one value yourself. You need to hold all its wires still uncut. It never fails.'],
  ['Equipment (gear)','Cards on the table that unlock when the crew cuts certain numbers. Some jobs have none.'],
- ['Personal tool','A tool on your crew card (for example the Twin Probe) that you can use once per job.'],
- ['Validation token','Goes on the track when all four wires of a value are cut: that value is finished.'],
+ ['Personal tool','A tool on your crew card, like the Twin Probe. You can use it once per job.'],
+ ['Validation token','Goes on the track when a value has all four wires cut. That value is finished.'],
  ['Red wire','Never match a red wire. Pointing at one blows up the bomb. A player holding only reds reveals them and is done.']];
 const GLOSS_HTML='<h3>Glossary</h3><dl class="gloss">'+GLOSSARY.map(g=>`<dt>${g[0]}</dt><dd>${g[1]}</dd>`).join('')+'</dl>';
-function hintify(t){return String(t).replace(/The fuse is lit\./,'Round 1 begins: the foreman (★) takes the first turn.').replace(/(reveals \d+ red wires? and is done\.)/,'$1 (a player who holds only red wires shows them and is finished)').replace(/(validation token (\d+) goes on the track\.)/,'$1 (every wire of value $2 is cut, so $2 is finished)')}
+function hintify(t){return String(t).replace(/The fuse is lit\./,'Round 1 begins: the foreman (★) takes the first turn.').replace(/(reveals \d+ red wires? and is done\.)/,'$1 (a player with only red wires shows them and is finished)').replace(/(validation token (\d+) goes on the track\.)/,'$1 (every wire of value $2 is cut, so $2 is finished)')}
 const DOING={infoStd:'choosing an opening info token',tagPick:'choosing which wire gets the info token',pickMatch:'choosing which wire to cut',swapPick:'choosing a wire to trade',designate:'choosing who must cut',declare:'turning over a number card'};
 function doing(q){return (q&&DOING[q.kind])||'answering a question'}
 function wLabel(u){const f=findU(u);if(!f)return {s:0,k:0,t:'?'};const sl=G.st[f.s].w[f.k];const v=sl&&ownerOf(f.s)===(UI.V&&UI.V.seat)?cv(sl.id):null;return {s:f.s,k:f.k,t:`wire ${LET(f.k)}${v!=null?' ('+VNm(v)+')':''}`}}
@@ -234,7 +234,7 @@ function startChoose(moves,off){const key=moveKey(moves[0]);UI.sel={mode:'choose
 function answer(i){const V=UI.V;act({a:'q',i},V.seat)}
 function sugText(m,V){if(!m)return '';switch(m.a){case 'dual':return `Say ${VNm(m.v)}${m.v2!=null?' or '+VNm(m.v2):''} at ${m.ks.length>1?nm(ownerOf(m.st))+'\'s wires '+m.ks.map(LET).join(', '):wireName(m.st,m.ks[0],V)}${m.tool?' with the '+toolName(m.tool):''}`;case 'solo':return `Solo cut your ${VNm(m.v)}s`;case 'reveal':return 'Reveal your reds';
   case 'eq':return 'Use '+EQUIP[m.id].n;case 'item':return 'Use '+ITEMS[m.k].n;case 'multi':return 'Point at '+m.tg.length+' wires at once';default:return keyName(m)}}
-function toolHelp(t){return ({dd:'Twin Probe (once per job): point at 2 wires on one rack and say one number. A hit if either matches.',pt3:'Triple Probe (once per job): point at 3 wires on one rack and say one number. A hit if any matches.',eq3:'Point at 3 wires on one rack and say one number. A hit if any matches.',eq5:'Point at a whole rack and say one number. A hit if any wire matches.',pt10:'Say two numbers at once: a hit if the wire is either.',eq10:'Say two numbers at once: a hit if the wire is either.'})[t]||''}
+function toolHelp(t){return ({dd:'Twin Probe (once per job). Point at 2 wires on one rack and say one number. A hit if either matches.',pt3:'Triple Probe (once per job). Point at 3 wires on one rack and say one number. A hit if any matches.',eq3:'Point at 3 wires on one rack and say one number. A hit if any matches.',eq5:'Point at a whole rack and say one number. A hit if any wire matches.',pt10:'Say two numbers at once: a hit if the wire is either.',eq10:'Say two numbers at once: a hit if the wire is either.'})[t]||''}
 function toolName(t){return t==='dd'?'Twin Probe':t==='pt3'?'Pocket Triple Probe':t==='pt10'?'Pocket Two-Value Probe':EQUIP[t]?EQUIP[t].n:t}
 // the cached "what we know" for the current position
 function wwk(V){if(V.seat<0)return null;const key=G.logN+':'+V.seat+':'+G.turn;if(UI.wwk&&UI.wwk.key===key)return UI.wwk.W;let W=null;try{W=whatWeKnow(V.seat,ANIM?80:24)}catch(e){console.error(e)}UI.wwk={key,W};return W}
@@ -249,7 +249,7 @@ function ruleChips(n){const M=MISSIONS[n];const out=[];for(const r of M.rules){c
 function renderMission(){const n=G.mission,M=MISSIONS[n],V=UI.V||view();const chips=ruleChips(n);
   let h=`<div class="mcard"><div class="mh"><b>${n}</b><h3>${esc(M.nm)}</h3></div><div class="mb"><p class="flav">${esc(BRIEFS[n]||'')}</p>
   <div class="tags"><span class="tag b">${mixHTML(n,G.np)}</span><span class="tag">${ico('fuse')}Fuse starts at ${fuseStart(n,G.np)}</span><span class="tag e">${ico('gear')}${G.eq.length} gear card${G.eq.length===1?'':'s'}</span>${M.audio||hasRule(n,'timer')?`<span class="tag t">${ico('clock')}Timed</span>`:''}</div>
-  <p>${esc(M.text)}</p>${chips.length?chips.map(c=>`<div class="rule"><span class="ri">${ico(c[0])}</span><div><b>${esc(c[1])}</b><p>${esc(c[2])}</p></div></div>`).join(''):'<div class="rule"><span class="ri">'+ico('check')+'</span><div><b>No special rules</b><p>Just the basic game: dual cuts, solo cuts and the fuse.</p></div></div>'}
+  <p>${esc(M.text)}</p>${chips.length?chips.map(c=>`<div class="rule"><span class="ri">${ico(c[0])}</span><div><b>${esc(c[1])}</b><p>${esc(c[2])}</p></div></div>`).join(''):'<div class="rule"><span class="ri">'+ico('check')+'</span><div><b>No special rules</b><p>Just the basic game. Dual cuts, solo cuts and the fuse.</p></div></div>'}
   ${cardsRow(V)}${jobNow(V)}</div></div>`;$('#missionbody').innerHTML=h}
 function cardsRow(V){const mc=missionCards(V);let h='';if(mc.numbers.length)h+=`<div><div class="lbl">Number cards on the table</div><div class="mix">${mc.numbers.map((c,i)=>`<span class="mw b" style="width:30px;height:40px;font-size:1rem;${c.done?'opacity:.45':''}${mc.sequence&&mc.sequence.at===i?';outline:3px solid #8f5bff':''}">${esc(c.value)}</span>`).join('')}</div></div>`;
   if(mc.constraints.length)h+=`<div><div class="lbl">Restrictions</div>${mc.constraints.map(c=>`<div class="rule"><span class="ri" style="background:#ffd9d4;font:1.3rem var(--fd)">${esc(c.letter)}</span><div><b>${c.seat!=null?esc(nm(G.pos.indexOf(c.seat)))+': ':'Everyone: '}${c.letter==='?'?'hidden':esc(CONSTRAINTS[c.letter].n)}${c.faceDown&&c.letter!=='?'?' (turned down)':''}</b><p>${c.letter==='?'?'Face down.':esc(CONSTRAINTS[c.letter].text)}</p></div></div>`).join('')}</div>`;
@@ -259,7 +259,7 @@ function jobState(V){const ms=V.ms,o=[];const N=s=>nm(s);
   if(ms.gate)o.push(`Order: ${ms.gate.vals.join(' → ')}. ${ms.gate.at>0?'Cleared: '+ms.gate.vals.slice(0,ms.gate.at).join(', ')+'. ':''}${ms.gate.at<ms.gate.vals.length?'Next in the order: '+ms.gate.vals[ms.gate.at]+' (cut '+ms.gate.req+' of it to open the next one).':'All order cards are cleared.'}`);
   if(ms.timer)o.push(`The clock shows ${fmt(ms.timer.show)}.`);if(ms.freeTurns&&ms.freeTurns.last!=null)o.push(`${N(ms.freeTurns.last)} played last and may not claim the next turn.`);
   if(ms.fakeRed&&ms.fakeRed.v!=null)o.push(`Blue ${ms.fakeRed.v} acts as red: never cut it.`);
-  if(ms.eqCover)o.push('Covers: '+G.eq.map((e,i)=>e.cover!=null?`${EQUIP[e.id].n} needs two ${e.cover}s`:null).filter(Boolean).join('; ')+'.');
+  if(ms.eqCover)o.push('Covers: '+G.eq.map((e,i)=>e.cover!=null?`${EQUIP[e.id].n} needs two ${e.cover}s`:null).filter(Boolean).join('. ')+'.');
   if(ms.rookie&&ms.rookie.rookie!=null)o.push(`The rookie is ${N(ms.rookie.rookie)}.`);if(ms.liar&&ms.liar.liar!=null)o.push(`The fibber is ${N(ms.liar.liar)}.`);
   if(ms.eqDeckReveal)o.push(`Shown number: ${ms.eqDeckReveal.face!=null?ms.eqDeckReveal.face:'none'} (${ms.eqDeckReveal.left} cards left).`);
   if(ms.searchlight&&ms.searchlight.v!=null)o.push(`Searchlight on ${ms.searchlight.v}${ms.searchlight.who!=null?`: ${N(ms.searchlight.who)} must cut it`:''}.`);
@@ -287,7 +287,7 @@ function jobState(V){const ms=V.ms,o=[];const N=s=>nm(s);
   if(V.robot)o.push(`The robot holds ${V.robot.n} wire${V.robot.n===1?'':'s'}.`);
   for(const st of V.stands)if(st.side.length)o.push(`Beside ${nm(st.owner)}'s stand: `+st.side.map(t=>(t.mean==='none'?'no ':'')+VNm(t.v)).join(', ')+'.');
   return o}
-function renderGear(){const V=UI.V||view();if(noGear()){$('#gearbody').innerHTML='<p><b>This training job has no equipment cards.</b> Your crew card still has its <b>Twin Probe</b>: once per job, point at two wires of one crewmate and say one value; if either matches, it is a hit. Gear cards appear in later jobs: they unlock when the crew cuts certain numbers, and this drawer will show them.</p>';return}let h='<p class="tiny">The row of cards on the table mat is the crew\'s equipment. A card is <b>locked</b> until the crew cuts the numbers named on it, then it is <b>ready</b> for one use (or every turn, if it says so) and then <b>used</b>. Personal tools sit on each player\'s crew card.</p><div class="eqgrid">';
+function renderGear(){const V=UI.V||view();if(noGear()){$('#gearbody').innerHTML='<p><b>This training job has no equipment cards.</b> Your crew card still has its <b>Twin Probe</b>. Use it once per job. Point at two wires of one crewmate and say one value. If either matches, it is a hit. Gear cards appear in later jobs. They unlock when the crew cuts certain numbers. This drawer will show them.</p>';return}let h='<p class="tiny">The row of cards on the table mat is the crew\'s equipment. A card is <b>locked</b> until the crew cuts its numbers. Then it is <b>ready</b> for one use. Some work every turn. After that it is <b>used</b>. Personal tools sit on each player\'s crew card.</p><div class="eqgrid">';
   V.eq.forEach((e,i)=>{if(e.down||!e.id){h+=`<div class="eqc locked"><div class="et"><b>?</b>Face-down card</div><div class="eqb"><i class="eqp back"></i><div class="ex">It turns up during the job.</div></div><div class="es">face down</div></div>`;return}const E=EQUIP[e.id];
     h+=`<div class="eqc ${e.st}"><div class="et"><b>${E.v==='Y'?'Y':E.v}</b>${esc(E.n)}<span class="tm">${{any:'any time',turn:'your turn',start:'start of turn',instant:'instant'}[E.timing]}</span></div><div class="eqb"><i class="eqp" style="--ai:var(--a-${e.id})"></i><div class="ex">${esc(E.text)}</div></div><div class="es">${e.st==='locked'?`${ico('lock')} locked: cut ${E.need===4?'all four':'two'} ${E.v==='Y'?'yellows':E.v+'s'}${e.cover!=null?' and two '+e.cover+'s':''}`:e.st==='ready'?'ready to use'+(e.perm?' (every turn)':''):'used'}</div></div>`});
   h+='</div><h3>Crew and personal tools</h3><div class="eqgrid">';

@@ -28,6 +28,8 @@ async function playGame(browser,W,H,gi){
   await p.evaluate(([np,seed,gi,mode])=>{try{localStorage.clear()}catch(e){}newGame(mode==='hot'?'hot':mode==='watch'?'ai':'me',{np:mode==='hot'?2:np,seed,length:'short',levels:['normal','normal','easy','hard'].slice(0,np)});UI.speed=8;UI.guide=gi%4===0?'off':'full';if(gi%5===4)GXH.setEnabled(false)},[np,seed,gi,MODE]);
   const tipsOn=gi%5!==4;
   await sleep(300);
+  // the Goal card opens at the start of a quick game: a person reads it and taps its button
+  {const gb=await p.$('#tbgoal button');if(gb){const r=await gb.boundingBox();await p.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);await sleep(200);if(await p.$('#tbgoal'))note(tag,'Goal card did not close on a tap')}}
   let last='',lastT=Date.now(),taps=0,rot=false,rot2=false;const t0=Date.now();
   const state=()=>p.evaluate(()=>({over:!!G.over,k:UI.bf&&UI.bf.kind,q:G.q&&G.q.kind,card:UI.card&&(UI.card.kind+(UI.card.ev?':'+UI.card.ev.t:'')),n:G.logN,r:G.round,
      sig:[UI.nMoves,UI.hintQ,G.logN,G.q&&G.q.kind,G.q&&G.q.title,G.q&&G.q.chosen&&G.q.chosen.length,UI.hand,UI.ord&&UI.ord.join(),UI.pop,UI.sheetOpen,UI.card&&UI.card.kind,G.round,G.pl.map(x=>x.inf).join()].join('|')}));
