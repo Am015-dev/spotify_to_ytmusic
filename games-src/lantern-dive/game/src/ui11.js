@@ -79,7 +79,7 @@ const HLP_RULES = [
 // the phase the player is deciding in (null when there is nothing to decide on the board)
 function hlpPhase() {
   try {
-    if (tutOn() || !G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
+    if (UI.mode === 'tutorial' || !G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
     const st = $('#start'), rs = $('#rs'); if ((st && !st.hidden) || (rs && !rs.hidden)) return null;
     const v = viewSeat(); if (v < 0 || !iMustAct() || !myMoves().length) return null;
     if (hotSeat() && UI.holder < 0 && G.phase !== 'distress') return null;
@@ -142,7 +142,16 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'lantern-dive', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,.pspot,#acts .btn,#opp .dc.can,.tc,#hand .hc,.me,.seat,.jcard,.gx-ibtn' });
+  GXH.init({ game: 'lantern-dive', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,.pspot,#acts .btn,#opp .dc.can,.tc,#hand .hc,.me,.seat,.jcard,.gx-ibtn' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
+  try { GXH.setEnabled(!!UI.prefs.hints); } catch (e) { }
+  applyHints();
 }
-function hlpAfter() { hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(hlpPhase()); }
+// Hints (addendum 7): OFF by default in Play. On: the bulb (what should I do?), the tips and the move bubbles. Never in the coached tutorial.
+function applyHints() {
+  const on = !!UI.prefs.hints, tut = UI.mode === 'tutorial', b = $('#bulbbtn'), t = $('#hintstog');
+  if (b) b.hidden = !on || tut; if (t) { t.hidden = tut; t.setAttribute('aria-pressed', String(on)); t.classList.toggle('on', on); }
+  document.documentElement.classList.toggle('hintsoff', !on);
+}
+function hintsToggle() { UI.prefs.hints = !UI.prefs.hints; savePrefs(); try { GXH.setEnabled(UI.prefs.hints); } catch (e) { } if (UI.coach && UI.mode !== 'tutorial') UI.coach.level = UI.prefs.hints ? 'light' : 'off'; applyHints(); }
+function hlpAfter() { applyHints(); hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(hlpPhase()); }

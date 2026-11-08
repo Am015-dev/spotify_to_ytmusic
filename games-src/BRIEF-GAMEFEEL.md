@@ -47,3 +47,14 @@ decide, note it in the DONE report, and stop. The orchestrator sweeps every 20 m
 - games-src/<dir>/DESIGN-FIX.md (impeccable + design-review audit) and games-src/<dir>/COPY-FIX.md (plain-word rewrites) land
   on the base during your task. Apply every item in them before you report; say in your DONE which ones you skipped and why.
 - The shared shell (games-src/shell) is being polished by D0; don't fight it, build on it.
+
+## Speed (owner): test at machine speed
+Headless, animations off or sped 100x for full-game and touch tests, parallel browser contexts, engine-level simulation for
+rules. Real speed only for pop-up timing and the few screenshots that show motion. Minutes per test round, not hours.
+
+## Feel gate (new, must pass before DONE)
+`node games-src/scripts/feel-audit.js <slug> --secs 120` (results in games-src/qa/feel/<slug>.json; today's numbers in
+games-src/qa/feel/SUMMARY.md). Needed: (a) 0 short or stacked messages, (b) 0 messages in Play with Hints off,
+(c) 0 lines over 12 words, (d) 0 phone text under 14px, (e) 0 overlaps. If the driver cannot find Learn/Play, add
+data-a="learn" / data-a="play" to those buttons. Learn to play must be finishable by touch with no Skip (taps on the
+highlighted target must reach it; spotlight blockers must not cover it).
