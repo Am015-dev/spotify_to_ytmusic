@@ -2,7 +2,7 @@
 // Runs on the staged deal of tutor.js (tutBegin: Marooned, Carpenter + Cook + Friday, kind decks, Chill Rain on day 2).
 // Day 1: goal, death, the six phases, no event yet, morale, production, pawns, explore (1 pawn = dice, 2 = sure), build a shelter,
 // make an invention (Shovel), Start day, weather vs roof, night (eat or 2 wounds, no shelter = 1 wound), wounds.
-// Day 2: event card, adventure token, threat (Dig a Drain needs the Shovel), morale, gather, tidy the camp, rest, hunting, weather cloud, night.
+// Day 2: event card, adventure token, threat (Dig a Drain needs the Shovel), morale, gather, rest, a real hunt (one beast seeded), rain cloud. Day 3: tidy the camp.
 // Then the end card: Keep playing turns it into a normal game. Only the highlighted thing answers while a step shows; scenes nobody explains play by themselves.
 // window.GXGUIDE = {running, step, seen:[ids], rules:[ids], done}.  ?coach=1 keeps the older coached game.
 const GUIDE={on:false,i:0,seen:[],t:0,shown:null,tapped:false,done:false,exp:null,tips:null};
@@ -28,7 +28,7 @@ const GUIDE_STEPS=[
  {id:'phases',day:1,rule:'phases',kind:'info',say:'Every day: event, morale, production, action, weather, night.',tgt:()=>gdq('#phlabel')},
  {id:'event0',day:1,rule:'event',kind:'info',say:'Day 1 has no event card. One comes each day after.',tgt:()=>null},
  {id:'morale0',day:1,rule:'morale',kind:'info',say:'Morale gives or takes determination ✊ each morning.',tgt:()=>null},
- {id:'prod',day:1,rule:'production',beat:'prod',kind:'act',say:'Production: the camp gives 1 food and 1 wood.',tgt:gNext,done:()=>gBeat()!=='prod'},
+ {id:'prod',day:1,rule:'production',kind:'info',say:'Production: the camp gives 1 food and 1 wood.',tgt:()=>gRes(2)},
  {id:'pawns',day:1,rule:'pawns',when:gPlan,kind:'pass',say:'Each castaway has 2 pawns. Tap the Carpenter.',tgt:()=>gPawn('c0_0'),done:()=>gPicked('c0_0')},
  {id:'explore',day:1,rule:'explore',when:gPlan,kind:'act',say:'Tap a glowing unknown place. One pawn there rolls dice.',tgt:()=>gGlow(gExp()),done:()=>gPop()===gExp()||!!gAct('explore')},
  {id:'one',day:1,rule:'dice',when:gPlan,skip:()=>!!gAct('explore'),kind:'act',say:'Explore. One pawn alone rolls the dice.',tgt:()=>gRow('explore'),done:()=>!!gAct('explore')},
@@ -53,23 +53,28 @@ const GUIDE_STEPS=[
  {id:'event',day:2,rule:'event',beat:'event',kind:'act',say:'An event card. Its effect happens right now.',tgt:gNext,done:()=>gBeat()!=='event'},
  {id:'adv',day:2,rule:'adventure',when:()=>gDay()===2&&(!!gBeat()||gPlan()),kind:'info',say:'Its ? token: the next explore draws an adventure card.',tgt:()=>null},
  {id:'threat',day:2,rule:'threat',when:()=>gDay()===2&&(!!gBeat()||gPlan()),kind:'info',say:'Then it waits as a threat. Deal with it, or it strikes.',tgt:()=>null},
- {id:'morale',day:2,rule:'morale',beat:'morning',kind:'act',say:'Morale: high morale gives determination, low takes it.',tgt:gNext,done:()=>gBeat()!=='morning'},
+ {id:'morale',day:2,rule:'morale',when:()=>gDay()===2,kind:'info',say:'Morale: high morale gives determination, low takes it.',tgt:()=>null},
  {id:'t1',day:2,rule:'threat',when:gPlan,kind:'pass',say:'Tap the Carpenter.',tgt:()=>gPawn('c0_0'),done:()=>gPicked('c0_0')},
  {id:'t2',day:2,rule:'threat',when:gPlan,kind:'act',say:'Tap the camp. Threats are handled there.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
  {id:'t3',day:2,rule:'threat',when:gPlan,kind:'act',say:'Dig a Drain with the Shovel. The threat is gone.',tgt:()=>gRow('threat'),done:()=>!!gAct('threat')},
  {id:'g1',day:2,rule:'gather',when:gPlan,kind:'pass',say:'Tap the Cook.',tgt:()=>gPawn('c1_0'),done:()=>gPicked('c1_0')},
  {id:'g2',day:2,rule:'gather',when:gPlan,kind:'act',say:'Tap the land you found yesterday.',tgt:()=>gGlow(gExp()),done:()=>gPop()===gExp()},
  {id:'g3',day:2,rule:'gather',when:gPlan,skip:()=>!!gAct('gather'),kind:'act',say:'Gather fish. Food and wood arrive after all jobs.',tgt:()=>{let f=null;for(const e of document.querySelectorAll('#ppop .bfr[data-place]'))if(/fish|food/i.test(e.textContent)&&/gather/.test(decodeURIComponent(e.dataset.place)))f=f||e;return f||gRow('gather')},done:()=>!!gAct('gather')},
- {id:'c1',day:2,rule:'camp',when:gPlan,kind:'pass',say:'Tap the Carpenter’s second pawn.',tgt:()=>gPawn('c0_1'),done:()=>gPicked('c0_1')},
- {id:'c2',day:2,rule:'camp',when:gPlan,kind:'act',say:'Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
- {id:'c3',day:2,rule:'camp',when:gPlan,kind:'act',say:'Tidy the camp: 2 determination and morale up.',tgt:()=>gRow('camp'),done:()=>!!gAct('camp')},
  {id:'r1',day:2,rule:'rest',when:gPlan,kind:'pass',say:'Tap the Cook’s second pawn.',tgt:()=>gPawn('c1_1'),done:()=>gPicked('c1_1')},
  {id:'r2',day:2,rule:'rest',when:gPlan,kind:'act',say:'Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
  {id:'r3',day:2,rule:'rest',when:gPlan,kind:'act',say:'Rest heals 1 wound.',tgt:()=>gRow('rest'),done:()=>!!gAct('rest')},
- {id:'hunt',day:2,rule:'hunt',when:gPlan,kind:'info',say:'Hunting needs 2 pawns and a beast found by exploring.',tgt:()=>null},
- {id:'go2',day:2,rule:'action',when:gPlan,kind:'act',say:'Friday can stay free. Tap Start day.',tgt:()=>gdq('#bf [data-a=go]'),done:()=>!gPlan()},
+ {id:'h1',day:2,rule:'hunt',when:gPlan,kind:'pass',say:'A beast was spotted. Tap the Carpenter’s second pawn.',tgt:()=>gPawn('c0_1'),done:()=>gPicked('c0_1')},
+ {id:'h2',day:2,rule:'hunt',when:gPlan,kind:'act',say:'Tap the camp. Hunts start there.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
+ {id:'h3',day:2,rule:'hunt',when:gPlan,kind:'act',say:'Hunt. Each point your weapon is short costs a wound.',tgt:()=>gRow('hunt'),done:()=>!!gAct('hunt')||(()=>{try{return G.plan.acts.some(a=>a.type==='hunt'&&a.pw.length)}catch(e){return false}})()},
+ {id:'h4',day:2,rule:'hunt',when:gPlan,kind:'pass',say:'A hunt needs 2 pawns. Tap Friday.',tgt:gFri,done:()=>{const f=gFri();return !!f&&gPicked(f.dataset.pawn)}},
+ {id:'h5',day:2,rule:'hunt',when:gPlan,kind:'act',say:'Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>{const a=gAct('hunt');return gPop()===gCamp()||!!a&&a.pw.length>=2}},
+ {id:'h6',day:2,rule:'hunt',when:gPlan,kind:'act',skip:()=>{const a=gAct('hunt');return !!a&&a.pw.length>=2},say:'Join the hunt. No dice: weapon against strength.',tgt:()=>gRow('hunt'),done:()=>{const a=gAct('hunt');return !!a&&a.pw.length>=2}},
+ {id:'go2',day:2,rule:'action',when:gPlan,kind:'act',say:'Every pawn has a job. Tap Start day.',tgt:()=>gdq('#bf [data-a=go]'),done:()=>!gPlan()},
  {id:'rain',day:2,rule:'roof',beat:'weather',kind:'act',say:'Rain cloud, no roof: lose 1 food and 1 wood.',tgt:gNext,done:()=>gBeat()!=='weather'},
- {id:'end',day:2,rule:'real',beat:'daysum',kind:'info',say:'That is every rule. Now play on for real!',tgt:()=>null}
+ {id:'c1',day:3,rule:'camp',when:gPlan,kind:'pass',say:'Tap the Carpenter’s second pawn.',tgt:()=>gPawn('c0_1'),done:()=>gPicked('c0_1')},
+ {id:'c2',day:3,rule:'camp',when:gPlan,kind:'act',say:'Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
+ {id:'c3',day:3,rule:'camp',when:gPlan,kind:'act',say:'Tidy the camp: 2 determination and morale up.',tgt:()=>gRow('camp'),done:()=>!!gAct('camp')},
+ {id:'end',day:3,rule:'real',when:gPlan,kind:'info',say:'That is every rule. Give the rest jobs and play on!',tgt:()=>null}
 ];
 const GUIDE_RULES=[...new Set(GUIDE_STEPS.map(s=>s.rule))];
 window.GXGUIDE={get running(){return GUIDE.on},get step(){const s=GUIDE_STEPS[GUIDE.i];return s?s.id:null},get seen(){return GUIDE.seen.slice()},rules:GUIDE_RULES,steps:GUIDE_STEPS.map(s=>({id:s.id,rule:s.rule,say:s.say})),get done(){return GUIDE.done}};
@@ -103,6 +108,7 @@ function gShow(s,el){const e=gEl();const r=gRing();e.classList.add('guide');e.hi
 function gTick(){try{
   if(!GUIDE.on)return;if(!G){guideStop();return}
   try{GXH.hide()}catch(e){}
+  try{if(G.round===2&&gPlan()&&!G.hunt.length&&G.beast.length&&!GUIDE.seeded){GUIDE.seeded=1;G.hunt.push(G.beast.shift());refresh()}}catch(e){}
   const s=gCur();if(!s)return;
   if(GUIDE.shown===s.id&&s.done&&(s.kind!=='pass'||GUIDE.tapped)){let d=false;try{d=!!s.done()}catch(e){}if(d){gAdvance();return}}
   if(GUIDE.shown!==s.id&&s.skip&&(()=>{try{return s.skip()}catch(e){return false}})()){GUIDE.i++;setTimeout(gTick,30);return}
@@ -133,7 +139,7 @@ function guideEnd(k){const e=gdq('#coachb');if(e){e.hidden=true;e.classList.remo
   if(k==='keep'){try{delete G.tut;delete G.coach;BF.ghostDone=TUT_KEEP.ghost!=null?TUT_KEEP.ghost:BF.ghostDone;refresh()}catch(err){}return}
   tutLeave();if(k==='new'){try{UI.guide.on=false;UI.cmpDef=null;beginGame()}catch(err){openStart()}}else openStart()}
 function guideStop(){GUIDE.on=false;clearInterval(GUIDE.t);GUIDE.t=0;gHide();const k=gdq('#coachskip');if(k)k.remove();try{if(GUIDE.tips!=null)GXH.setEnabled(GUIDE.tips)}catch(e){}GUIDE.tips=null}
-function guideStart(){GUIDE.on=true;GUIDE.i=0;GUIDE.seen=[];GUIDE.shown=null;GUIDE.done=false;GUIDE.exp=null;
+function guideStart(){GUIDE.on=true;GUIDE.i=0;GUIDE.seen=[];GUIDE.shown=null;GUIDE.done=false;GUIDE.exp=null;GUIDE.seeded=0;
   try{GUIDE.tips=GXH.enabled();GXH.setEnabled(false);GXH.hide()}catch(e){}
   tutBegin();G.coach=1;try{coachMark({open:1,done:0,skipped:0})}catch(e){}
   const sk=coachSkipEl();sk.addEventListener('click',()=>guideStop());

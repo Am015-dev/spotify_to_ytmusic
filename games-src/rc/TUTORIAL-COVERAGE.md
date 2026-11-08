@@ -3,10 +3,10 @@
 ## Learn to play = the guided first game (`guide.js`, W493, default since 8 Nov)
 A real Marooned game on the staged kind deal (`tutDeal`): one sentence of 12 words or fewer and ONE highlighted tap per step (a gold ring
 dims everything else; only the ring, the bubble's Next and Skip answer). Day 1 teaches setup to night, day 2 the event card, threat,
-gather, camp, rest, hunting and the roof. Then "Keep playing" turns it into a normal game (or New game). Scenes no step explains play
+gather, rest, a real hunt (one beast is seeded into the hunting deck) and the roof, day 3 tidying the camp. Then "Keep playing" turns it into a normal game (or New game). Scenes no step explains play
 by themselves. `?coach=1` keeps the older coached game (below); the Story prologue still uses it.
 Proof: `guide-test.js [WxH]` taps only the ring centre: every rule step appears, phase order, words <= 12, a wrong tap is ignored,
-end card, Keep playing continues. PASS at 390x844 and 375x667 (45 of 47 steps shown; `one` and `sure` are skipped when the tap on
+end card, Keep playing continues. PASS at 390x844 and 375x667 (50 of 52 steps shown; `one` and `sure` are skipped when the tap on
 the place already planned the job). Shots: `playable-shots/w493/tut-*.png`.
 
 | # | Day | Rule | Line |
@@ -48,16 +48,21 @@ the place already planned the job). Shots: `playable-shots/w493/tut-*.png`.
 | 35 | 2 | gather | Tap the Cook. |
 | 36 | 2 | gather | Tap the land you found yesterday. |
 | 37 | 2 | gather | Gather fish. Food and wood arrive after all jobs. |
-| 38 | 2 | camp | Tap the Carpenter’s second pawn. |
-| 39 | 2 | camp | Tap the camp. |
-| 40 | 2 | camp | Tidy the camp: 2 determination and morale up. |
-| 41 | 2 | rest | Tap the Cook’s second pawn. |
-| 42 | 2 | rest | Tap the camp. |
-| 43 | 2 | rest | Rest heals 1 wound. |
-| 44 | 2 | hunt | Hunting needs 2 pawns and a beast found by exploring. |
-| 45 | 2 | action | Friday can stay free. Tap Start day. |
-| 46 | 2 | roof | Rain cloud, no roof: lose 1 food and 1 wood. |
-| 47 | 2 | real | That is every rule. Now play on for real! |
+| 38 | 2 | rest | Tap the Cook’s second pawn. |
+| 39 | 2 | rest | Tap the camp. |
+| 40 | 2 | rest | Rest heals 1 wound. |
+| 41 | 2 | hunt | A beast was spotted. Tap the Carpenter’s second pawn. |
+| 42 | 2 | hunt | Tap the camp. Hunts start there. |
+| 43 | 2 | hunt | Hunt. Each point your weapon is short costs a wound. |
+| 44 | 2 | hunt | A hunt needs 2 pawns. Tap Friday. |
+| 45 | 2 | hunt | Tap the camp. |
+| 46 | 2 | hunt | Join the hunt. No dice: weapon against strength. |
+| 47 | 2 | action | Every pawn has a job. Tap Start day. |
+| 48 | 2 | roof | Rain cloud, no roof: lose 1 food and 1 wood. |
+| 49 | 3 | camp | Tap the Carpenter’s second pawn. |
+| 50 | 3 | camp | Tap the camp. |
+| 51 | 3 | camp | Tidy the camp: 2 determination and morale up. |
+| 52 | 3 | real | That is every rule. Give the rest jobs and play on! |
 
 ## Older: the coached first game (`tutor.js` `COACH_RULES`, now behind `?coach=1`)
 

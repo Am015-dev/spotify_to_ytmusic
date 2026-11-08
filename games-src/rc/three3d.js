@@ -364,7 +364,8 @@ function tileMesh(t){const grp=new THREE.Group();const terr=t.down?'down':t.terr
   if(T==='plains'){for(const [x,z] of spots(2))acacia(P,x,gy(x,z),z,R);for(const [x,z] of spots(10,null,.22))tuft(P,x,gy(x,z),z,R,R()<.5?0xb7bb62:0x93ad50);for(const [x,z] of spots(3,null,.3))bush(P,x,gy(x,z),z,R,.7,[0x6d9a3a,0x7fa846,0x5a8a34])}
   if(T==='hills'){for(const [x,z] of spots(4,null,.4))rock(P,x,gy(x,z),z,R,.16+R()*.14);for(const [x,z] of spots(3,null,.5))jtree(P,x,gy(x,z),z,R,.8+R()*.3);for(const [x,z] of spots(4,null,.25))tuft(P,x,gy(x,z),z,R,0x8aa34c)}
   if(T==='mountains'){for(const [x,z] of spots(5,null,.35))rock(P,x,gy(x,z),z,R,.12+R()*.15,0x736d64);for(const [x,z] of spots(2,(x,z)=>sampleH(F,x,z)<.35,.5))jtree(P,x,gy(x,z),z,R,.6,false)}
-  if(T==='unknown'){for(const [x,z] of spots(2,null,.8))rock(P,x,gy(x,z)-.05,z,R,.18+R()*.12,0x3e4642);for(const [x,z] of spots(2,null,.8)){const h=.5+R()*.3;P.add(G_.cyl(),0x2a2622,M(x,gy(x,z),z,(R()-.5)*.3,0,(R()-.5)*.3,.045,h,.045),0,.3);P.add(G_.cyl(),0x2a2622,M(x,gy(x,z)+h*.6,z,0,R()*3,1.1,.025,.3,.025),0,.2)}}
+  // unexplored: no props (rocks and sticks read as rubble); the fog art stays, dimmed, so explored land is the bright part (W493 polish)
+  if(T==='unknown'&&top.color)top.color.setHex(0x7d8590);
   // resource and marker props: wood and food sources, the totem, a natural cave
   const tok=(x,z,col)=>{const y=gy(x,z);P.add(G_.cylS(),col,M(x,y,z,0,0,0,.26,.07,.26),0,.35);return y+.07};
   (t.src||[]).forEach((s,i)=>{const x=-1.1+i*.7,z=-1.15;const y=tok(x,z,s==='food'?0x7a2a22:0x5a3a1c);
