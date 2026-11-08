@@ -35,7 +35,8 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1'
       });
       const onTab = async t => { if (await page.evaluate(() => L.tabs)) return [{ sel: '#tab-' + t }, { wait: 350 }]; return []; };
       let ok = false; const seq0 = await page.evaluate(() => G.seq);
-      if (plan.k === 'combo') { ok = await drag('#die-' + plan.die, [...(await page.evaluate(() => L.tabs && UI.tab !== 'market')) ? [{ sel: '#tab-market' }, { wait: 350 }] : [], { sel: `#mt-${plan.d}-${plan.slot}` }, { wait: 520 }, { sel: '#ec-' + plan.cell }]); if (ok) drags.combo++; }
+      if (plan.k === 'combo' && (drags.combo % 2 === 1)) { if (await page.evaluate(() => L.tabs && UI.tab !== 'market')) { await tapSel(page.locator('#tab-market')); await page.waitForTimeout(150); } ok = await drag(`#mt-${plan.d}-${plan.slot}`, [{ wait: 480 }, { sel: '#ec-' + plan.cell }]); if (ok) { drags.combo++; drags.tileDrag = (drags.tileDrag || 0) + 1; } }
+      else if (plan.k === 'combo') { ok = await drag('#die-' + plan.die, [...(await page.evaluate(() => L.tabs && UI.tab !== 'market')) ? [{ sel: '#tab-market' }, { wait: 350 }] : [], { sel: `#mt-${plan.d}-${plan.slot}` }, { wait: 520 }, { sel: '#ec-' + plan.cell }]); if (ok) drags.combo++; }
       else if (plan.k === 'build') { ok = await drag(Math.random() < .5 ? '#die-' + plan.die : '#st-' + plan.s, [...await onTab('estate'), { sel: '#ec-' + plan.cell }]); if (ok) drags.build++; }
       else if (plan.k === 'sell') { ok = await drag('#die-' + plan.die, [{ sel: '#gd-' + plan.g }]); if (ok) drags.sell++; }
       else if (plan.k === 'take') { ok = await drag('#die-' + plan.die, [...await onTab('market'), { sel: `#mt-${plan.d}-${plan.slot}` }, { sel: '#store' }]); if (ok) drags.take++; }

@@ -6,7 +6,7 @@ window.VSTORY = {
   /* tutorial prologue: step id -> title, say (story reason + what to do, <=2 short lines), react (after the action) */
   tut: {
     hi:     { t: 'Prologue · Spring', say: 'The old lord is gone. Build the best estate by harvest and your banner flies.', react: 'Tobin Reed wants it too. Let us beat him to it.' },
-    take:   { t: 'Win: most points when spring ends', say: 'That stall has your die\'s number. Tap the glowing tile.' },
+    take:   { t: 'Win: most points when spring ends', say: 'Stall numbers match your dice. Tap the glowing tile.' },
     take2:  { t: 'Your first move', say: 'Take it. It waits in your storage until you build it.', react: 'Good. Now build it on your estate.' },
     pick:   { t: 'Prologue · A beacon', say: 'Your Beacon Tower is in storage. Let us build it.' },
     cell:   { t: 'Prologue · A beacon', say: 'Build it on a glowing space that touches your keep.', react: 'A light on the hill! +4, and the valley knows your name.' },
@@ -43,7 +43,7 @@ window.VSTORY = {
   coach: {
     preview: { say: 'Gold +N shows the points. 2/4 shows how full that region gets.', later: 'Glowing spaces show points (+N) or region progress (2/4).' },
     turnover: { say: 'Two dice, two actions. That is a whole turn.', later: 'A turn is two actions, one per die.' },
-    build:   { say: 'Now build it. Same colour, a die\'s number, touching your land.', later: 'Build on a space of the tile\'s colour, with a die\'s number, touching your land.' },
+    build:   { say: 'Now build it on a glowing space next to your land.', later: 'Build on a matching colour and number, next to your land.' },
     end:     { say: 'Both dice used. Tap End turn.', later: 'Tap End turn when both dice are used.' },
     rival:   { say: 'Tobin\'s turn now. Watch what he takes.', later: 'The banner track decides who goes first.' },
     white:   { say: 'The white die puts new goods on its stall.', later: 'The white die puts each round\'s goods on its stall.' },

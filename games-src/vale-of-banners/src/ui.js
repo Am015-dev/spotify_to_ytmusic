@@ -385,7 +385,7 @@ function renderMarket() {
     var tl = h('div.sttiles');
     G.depots[d].forEach(function (t, k) {
       if (!t) { tl.appendChild(h('div.hx.empty', { style: 'background:rgba(255,255,255,.08)', 'aria-hidden': 'true' })); return; }
-      var lg = mt ? legalTakeFor(d, k) : [], b = h('button.tilebtn' + (lg.length ? '.glow' : ''), { type: 'button', id: 'mt-' + d + '-' + k, 'aria-label': VB.tileName(t) + ' in stall ' + d, onclick: function () { tapMarket(d, k); } }, [hexEl(t)]); labelled(b, t);
+      var lg = mt ? legalTakeFor(d, k) : [], b = h('button.tilebtn' + (lg.length ? '.glow' : ''), { type: 'button', id: 'mt-' + d + '-' + k, 'data-drag': lg.length && !pend() ? 'mtile' : null, 'data-idx': d * 10 + k, 'aria-label': VB.tileName(t) + ' in stall ' + d, onclick: function () { tapMarket(d, k); } }, [hexEl(t)]); labelled(b, t);
       var best = pick(lg.slice()); if (best && best.w) b.appendChild(h('span.cost', { text: '' + best.w, title: 'Costs ' + best.w + ' worker' + (best.w > 1 ? 's' : '') }));
       if (lg.length && hints() && takeValues().best === 'mt-' + d + '-' + k) { b.classList.add('bestt'); b.appendChild(h('span.bestb', { text: '★ Best', title: 'Best pick for you right now' })); }
       tl.appendChild(b);
@@ -652,7 +652,7 @@ function doMove(m) {
   try { if (hints()) rateBefore(m); } catch (e) { }
   var r = VB.performMove(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed.'); render(); return Promise.resolve(); }
   r.ev.forEach(function (ev) { if (ev.e === 'score') { srcAdd(ev.p, ev.why, ev.n); srcLogAdd(ev); } });
-  if (m.k === 'end' && isHuman(s)) { var rl = rateLine(); UI.lastRate = rl; try { coach('turnover'); } catch (e) { } if (hints()) beat('Turn over', rl.t, 'turn ' + rl.k); }
+  if (m.k === 'end' && isHuman(s)) { var rl = UI.mode === 'tutorial' ? { k: 'okay', t: '' } : rateLine(); UI.lastRate = rl; try { coach('turnover'); } catch (e) { } if (hints() && UI.mode !== 'tutorial') beat('Turn over', rl.t, 'turn ' + rl.k); }
   if (UI.die != null && G.P[s].used[UI.die]) UI.die = null;
   if (UI.bump && typeof m.die === 'number' && G.P[s].used[m.die]) delete UI.bump[m.die]; if (m.k === 'end') UI.bump = {};
   UI.busy = true; UI.sel = null;
@@ -821,7 +821,7 @@ var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn
   '<li><b>Buildings</b> (tan): work as soon as you build them. No two the same inside one outline. The <b>Moot Hall</b> lets you build again straight away.</li>' +
   '<li><b>Pasture</b> (light green): points for every animal of that kind nearby.</li>' +
   '<li><b>Barge</b> (blue): take one stall\'s goods. Move up the track.</li></ul>' +
-  '<h3>Points</h3><p>The dark outlines on your estate mark regions. Fill every space in one to score it. Size 1 to 8 pays 1, 3, 6, 10, 15, 21, 28 or 36. Early regions pay more: +10 in season 1, then 8, 6, 4, 2.</p>' +
+  '<h3>Points</h3><p>The light outlines on your estate mark regions. Fill every space in one to score it. Bigger regions pay more: 1 space pays 1, 8 spaces pay 36.</p><p>Season 1 adds 10 extra. Later seasons add 8, 6, 4, 2.</p>' +
   '<p>First to fill every space of one colour gets 5 to 7 points. Second gets 2 to 4.</p>' +
   '<p>Each round the white die puts new goods on its stall.</p>' +
   '<p>At the end: +1 per silver, +1 per unsold crate, +1 per 2 workers, plus lore. Most points wins. A tie goes to the fuller estate.</p>' +

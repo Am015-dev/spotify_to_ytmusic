@@ -27,6 +27,11 @@ function dragStart(d) {
     if (L.tabs) { var vm = VB.validMoves(G).filter(function (m) { return m.die === d.idx && bumpOk(m); }); var tk = vm.some(function (m) { return m.k === 'take'; }), bd = vm.some(function (m) { return m.k === 'place'; }); if (tk && !bd) UI.tab = 'market'; else if (bd && !tk) UI.tab = 'estate'; }
   }
   if (d.kind === 'store') { UI.sel = d.idx; UI.tab = 'estate'; }
+  if (d.kind === 'mtile') {   /* pick the tile itself up: it carries the cheapest die that can take it */
+    var dd = Math.floor(d.idx / 10), kk = d.idx % 10, tm = pick(legalTakeFor(dd, kk)); if (!tm) { d.on = false; FEEL.drag = null; document.body.classList.remove('dragging', 'drag-mtile'); return; }
+    d.kind = 'die'; d.idx = tm.die; d.tile = { d: dd, k: kk }; UI.die = tm.die; UI.sel = null; document.body.classList.add('drag-die'); comboFor(d);
+    if (L.tabs && FEEL.combo && Object.keys(FEEL.combo).length) d.tabT = setTimeout(function () { if (FEEL.drag === d) { UI.tab = 'estate'; render(); ghostDraw(d); } }, 350);
+  }
   render(); ghostDraw(d); sfx('take');
 }
 function hitAt(x, y) { var e = document.elementFromPoint(x, y); return e || null; }
@@ -55,7 +60,7 @@ function comboFor(d) {   /* after taking this tile, where could the other die bu
 }
 function dragEnd(d) {
   clearTimeout(d.tabT); var e = hitAt(d.x, d.y), done = null; FEEL.from = d.g ? d.g.getBoundingClientRect() : null;
-  document.body.classList.remove('dragging', 'drag-' + d.kind);
+  document.body.classList.remove('dragging', 'drag-' + d.kind, 'drag-mtile');
   if (e && d.kind === 'die') {
     var cell = e.closest('#es .cell'), ci = cell && +cell.id.replace('ec-', '');
     if (d.tile) {
