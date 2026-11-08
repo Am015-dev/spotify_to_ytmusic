@@ -17,15 +17,15 @@
   },
   "acts": [
     { "act": 1, "title": "Wet Clay", "blurb": "An apprentice at the town atelier. Learn the kilns, the racks and the mosaic." },
-    { "act": 2, "title": "The Guild Kilns", "blurb": "Glaziers of the guild test you: columns, prism tiles and a master's head start." },
+    { "act": 2, "title": "The Guild Kilns", "blurb": "Guild glaziers test you: columns, prism tiles, a master's head start." },
     { "act": 3, "title": "The Sun Palace", "blurb": "The palace mosaic goes to the best glazier alive. The Black Kiln wants it too." }
   ],
   "twists": [
-    { "id": "boss-sun", "where": "setup", "how": "After newGame(), set G.first and G.cur to the boss seat so the boss holds the Sun token and makes the first take of round 1." },
-    { "id": "boss-head-start", "where": "setup", "how": "After newGame(), set the boss seat's score to param (P(boss).score = param) before the first take; the param is shown on the boss card." },
-    { "id": "boss-glazed-start", "where": "setup", "how": "After newGame(), for rows 1..param pull one Cobalt tile out of G.bag and set it on the boss mosaic at wall[r][WALLCOL(0,r)] (the Cobalt diagonal, legal on both mosaics)." },
-    { "id": "boss-column-bonus", "where": "scoring", "how": "In finish(), right after endBonus(), add param extra points to the boss for each complete mosaic column, logged as its own 'Boss rule' line." },
-    { "id": "boss-deep-sight", "where": "ai", "how": "While the chapter runs, set LVL.hard.roll = param and LVL.hard.K = 14 so the boss rolls out more futures per take, and restore {K:10, roll:2} on exit." }
+    { "id": "boss-sun", "where": "setup", "how": "After newGame(), set G.first and G.cur to the boss seat. So the boss holds the Sun token. The boss makes the first take of round 1." },
+    { "id": "boss-head-start", "where": "setup", "how": "After newGame(), set the boss score to param (P(boss).score = param). Do this before the first take. The boss card shows the param." },
+    { "id": "boss-glazed-start", "where": "setup", "how": "After newGame(), for rows 1..param pull one Cobalt tile from G.bag. Set it on the boss mosaic at wall[r][WALLCOL(0,r)]. That is the Cobalt diagonal, legal on both mosaics." },
+    { "id": "boss-column-bonus", "where": "scoring", "how": "In finish(), right after endBonus(), add param points to the boss. Do this for each complete mosaic column. Log it as its own 'Boss rule' line." },
+    { "id": "boss-deep-sight", "where": "ai", "how": "In this chapter, set LVL.hard.roll = param and LVL.hard.K = 14. The boss then rolls out more futures per take. On exit, restore {K:10, roll:2}." }
   ],
   "chapters": [
     {
@@ -40,7 +40,7 @@
         { "who": "guide", "text": "Every full rack set one tile on your mosaic. That is the whole heartbeat of the craft." }
       ],
       "opponent": { "name": "Tamsin Reed", "portrait": "camp-tamsin.webp", "emoji": "🧑‍🎨", "cast": "tamsin",
-        "personality": "Cheerful fellow apprentice who grabs the biggest pile she sees and often slips.",
+        "personality": "Cheerful fellow apprentice who grabs the biggest pile she sees. She often slips.",
         "aiLevel": "easy", "aiStyle": "greedy" },
       "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
       "twist": null,
@@ -84,7 +84,7 @@
       "id": "c3", "act": 1, "title": "The Courtyard Keeper",
       "boss": true,
       "intro": [
-        { "who": "guide", "text": "Tiles that do not fit your racks fall to the breakage line, and each one costs points." },
+        { "who": "guide", "text": "Tiles that do not fit your racks fall to the breakage line. Each one costs points." },
         { "who": "saffra", "text": "The Sun token is mine, child. I start every round, and you clean up my leftovers." },
         { "who": "guide", "text": "Take only what fits. A small take is often better than a big spill." }
       ],
@@ -93,12 +93,12 @@
         { "who": "guide", "text": "Pack your brushes. The guild kilns are next." }
       ],
       "opponent": { "name": "Saffra Vell", "portrait": "camp-saffra.webp", "emoji": "☀️", "cast": "saffra",
-        "personality": "Proud keeper of the courtyard; loves the Sun token and the first pick.",
+        "personality": "Proud keeper of the courtyard. Loves the Sun token and the first pick.",
         "aiLevel": "easy", "aiStyle": "greedy",
         "taunt": "The courtyard always favours the one who holds the sun.",
         "praise": "Fine. Keep the courtyard tidy for me, glazier." },
       "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
-      "twist": { "id": "boss-sun", "param": null, "text": "Boss rule: Saffra holds the Sun token and makes the first take of round 1." },
+      "twist": { "id": "boss-sun", "param": null, "text": "Boss rule: Saffra holds the Sun token. Saffra takes first in round 1." },
       "goal": { "type": "custom", "value": 8, "text": "Win, losing no more than 8 points to breakage." },
       "hints": true,
       "stars": [
@@ -155,7 +155,7 @@
         "personality": "Dreamy glass artist; hoards prisms and finishes racks in one go.",
         "aiLevel": "normal", "aiStyle": "denying" },
       "setup": { "np": 2, "ex": { "gray": false, "prism": true } },
-      "twist": { "id": "boss-glazed-start", "param": 1, "text": "Rival rule: Iris starts with one Cobalt tile already set in mosaic row 1." },
+      "twist": { "id": "boss-glazed-start", "param": 1, "text": "Rival rule: Iris starts with one Cobalt tile set in row 1." },
       "goal": { "type": "score", "value": 30, "text": "Win with at least 30 points." },
       "hints": false,
       "stars": [
@@ -213,7 +213,7 @@
         { "who": "nell", "text": "Clean work. The gate is open; mind the halls." }
       ],
       "opponent": { "name": "Nell Frost", "portrait": "camp-nell.webp", "emoji": "❄️", "cast": "nell",
-        "personality": "Cool, patient gatekeeper; plays out the rest of the round before every take.",
+        "personality": "Cool, patient gatekeeper. Plays out the rest of the round before every take.",
         "aiLevel": "hard", "aiStyle": "lookahead" },
       "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
       "twist": null,
@@ -232,7 +232,7 @@
       "boss": false,
       "intro": [
         { "who": "twins", "text": "Two of us, one of you. Three mosaics, seven kilns, and the courtyard fills fast." },
-        { "who": "guide", "text": "With three at the table, the tile you skip may never come back. Plan for it." }
+        { "who": "guide", "text": "With three at the table, a skipped tile may never return. Plan for it." }
       ],
       "outro": [
         { "who": "twins", "text": "Both of us beaten! We'll tell the halls about you." }
@@ -259,7 +259,7 @@
       "id": "c9", "act": 3, "title": "The Unmarked Wall",
       "boss": false,
       "intro": [
-        { "who": "vesper", "text": "This wall has no painted colours. You choose each space, so no glaze repeats in a row or column." },
+        { "who": "vesper", "text": "This wall has no painted colours. You choose each space. No glaze repeats in a row or column." },
         { "who": "vesper", "text": "And my columns are blessed by the Black Kiln. Each one pays me extra." },
         { "who": "guide", "text": "Vesper serves Lady Umbra. Finish the game before his columns fill." }
       ],
@@ -270,7 +270,7 @@
         "personality": "Quiet, precise servant of the Black Kiln; builds columns and nothing else.",
         "aiLevel": "hard", "aiStyle": "lookahead" },
       "setup": { "np": 2, "ex": { "gray": true, "prism": false } },
-      "twist": { "id": "boss-column-bonus", "param": 3, "text": "Rival rule: Vesper scores 3 extra points for each complete column at the end." },
+      "twist": { "id": "boss-column-bonus", "param": 3, "text": "Rival rule: At the end, Vesper scores 3 extra per complete column." },
       "goal": { "type": "win", "value": null, "text": "Win on the unmarked mosaic." },
       "hints": false,
       "stars": [
@@ -289,7 +289,7 @@
       "boss": true,
       "intro": [
         { "who": "umbra", "text": "The Sun Palace mosaic will be glazed in black. My kiln sees every future." },
-        { "who": "umbra", "text": "I play each take out to the end of the round, again and again. You only guess." },
+        { "who": "umbra", "text": "I play each take out to the end of the round. Again and again. You only guess." },
         { "who": "guide", "text": "She weighs every pile. Give her none worth taking, and keep your breakage clean." }
       ],
       "outro": [
