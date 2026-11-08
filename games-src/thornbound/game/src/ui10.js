@@ -15,7 +15,7 @@ function bfModel(s,mv,rm){const q=G.q,k=q.kind;const M={s,q,mv,rec:rm,kind:'othe
   return M}
 const autOn=()=>!(UI.cfg&&UI.cfg.oldAutumn);
 function autMoves(id){const M=UI.bf;if(!M||!M.aut)return [];return M.mv.filter(m=>m.t==='act'&&(m.a==='govern'||m.a==='journey')&&m.p&&m.p.id===id)}
-function autLabel(m){if(m.a==='journey')return 'Journey: +'+cinfo(m.p.id).lore+' Lore';return 'Govern: '+((D.COUNCIL_NAMES&&D.COUNCIL_NAMES[m.p.c])||m.p.c)}
+function autLabel(m){if(m.a==='journey')return 'Journey: +'+cinfo(m.p.id).lore+' Lore';return 'Govern: '+({relics:'Council of Coin',secrets:'Council of Whispers',oaths:'Council of Pledges'}[m.p.c]||m.p.c)}
 function cardMoves(id){const M=UI.bf;if(!M||!M.mv)return [];const out=[];
   for(const m of M.mv){if(m.id!==id&&!(typeof m.v==='number'&&m.v===id))continue;
     if(M.kind==='bid')out.push({type:'spot',k:m.k});
