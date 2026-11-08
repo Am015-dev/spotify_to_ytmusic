@@ -133,7 +133,7 @@ let aiTimer=null;
 function schedule(){if(aiTimer||!G||G.winner||UI.pause)return;if(G.mode==='net'&&(G.nw||typeof isHost!=='function'||!isHost()))return;const s=sideToAct();if(s<0)return;if(P(s).human)return;if(UI.busy)return;
   // pacing: a rival's own steps wait AIDELAY; bystanders' quick reactions (let it go / let it be) wait a short beat; after a tap on the
   // table during a rival turn (UI.ff) the rest of that turn runs fast until it is your call again
-  const ff=UI.ff===G.turn,side=s!==G.active;const base=ANIM?(ff?60:side?AIDELAY*.3:AIDELAY)/(UI.speed||1):0;const hold=ANIM&&UI.hold&&!ff?UI.hold-Date.now():0;aiTimer=setTimeout(()=>{aiTimer=null;aiStep()},Math.max(base,hold))}
+  const tut=typeof tutOn==='function'&&tutOn();const ff=!tut&&UI.ff===G.turn,side=!tut&&s!==G.active;const base=ANIM?(tut?600:ff?60:side?AIDELAY*.3:AIDELAY)/(UI.speed||1):0;const hold=ANIM&&UI.hold&&!ff?UI.hold-Date.now():0;aiTimer=setTimeout(()=>{aiTimer=null;aiStep()},Math.max(base,hold))}
 function aiStep(){if(!G||G.winner)return;const s=sideToAct();if(s<0||P(s).human)return;const m=aiMove(s);if(!m){console.error('AI has no move in '+G.phase);return}
   const r=performMove(m,s);if(!r.success){console.error('AI move rejected: '+r.error+' '+mvKey(m));const vm=validMoves(s).filter(x=>x.act!=='sell');if(vm.length)performMove(vm[vm.length-1],s)}
   refresh()}

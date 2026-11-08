@@ -264,6 +264,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')dkGoalClose()});
 (function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof tutOn==='function'&&tutOn())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'&&!/[?&]scn=/.test(location.search)){UI.goalGid=G.gid;setTimeout(()=>{if(!G||G.tut||(typeof tutOn==='function'&&tutOn())||(typeof TUTG!=='undefined'&&TUTG))return;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)dkGoal()},600)}}catch(e){}return x}})();
 
 // tap to skip: during a rival's turn a tap on the table (not on a button, card or panel) closes the door reveal and runs the rest of that turn fast
-document.addEventListener('pointerdown',e=>{try{if(typeof G==='undefined'||!G||G.winner||G.mode==='net')return;const me=viewSeat();if(me<0||G.active===me||sideToAct()===me)return;
-  const t=e.target;if(t.closest&&t.closest('button,[data-mv],[data-a],[data-card],[data-opp],.gx-drawer,#modal,.gx-bar,.gxh-bub,.gxh-rules,#dkgoal,.hand'))return;
+document.addEventListener('pointerdown',e=>{try{if(typeof G==='undefined'||!G||G.winner||G.mode==='net'||(typeof tutOn==='function'&&tutOn()))return;const me=viewSeat();if(me<0||G.active===me||sideToAct()===me)return;
+  const t=e.target;if(!t.closest||!t.closest('.gx-board')||t.closest('#phopps,.opps,button,[data-mv],[data-a],[data-card],[data-opp],.gx-drawer,#modal,.gx-bar,.gxh-bub,.gxh-rules,#dkgoal,.hand'))return;
   UI.ff=G.turn;UI.hold=0;if(BF.revClose)BF.revClose();if(typeof aiTimer!=='undefined'&&aiTimer){clearTimeout(aiTimer);aiTimer=null}if(typeof schedule==='function')schedule()}catch(x){}},true);
