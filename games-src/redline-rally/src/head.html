@@ -85,7 +85,7 @@ button.qt{appearance:none;border:0;background:transparent;color:var(--gold);curs
 .stand .pt{width:44px;height:44px;border-radius:50%;background:#394762 center/cover no-repeat;flex:0 0 auto;border:3px solid;display:flex;align-items:center;justify-content:center;font-weight:900}
 .stand small{display:block;color:var(--mute);font-size:13px}
 .stand.you{outline:2px solid var(--gold)}
-.podium{background:#171c28 center/cover no-repeat;border-radius:12px;padding:10px 6px;margin-bottom:8px;text-align:center}
+.podium{background:#171c28 center/cover no-repeat;border-radius:12px;padding:38px 16px 34px;margin-bottom:8px;text-align:center}
 .ic.hud{width:16px;height:16px;vertical-align:-3px;margin-right:4px}
 .ic.f-lap,.ic.f-place,.ic.f-gear,.ic.f-stress,.ic.f-heat{border-radius:50%}
 .ic.f-lap{background-color:#4a9bff}.ic.f-place{background-color:#ffc23a}.ic.f-gear{background-color:#9aa7bd}.ic.f-stress{background-color:#8a52d6}.ic.f-heat{background-color:#ff6a3a}
@@ -150,5 +150,41 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 .walk,.later{margin:6px 0 10px 18px;padding:0;font-size:16px}.walk li,.later li{margin:5px 0}
 @media (min-width:900px){#coach{font-size:16px}#coach button{font-size:16px}.swapb{font-size:16px}}
 @media (max-width:420px){.gx-bar{gap:3px;padding-left:4px;padding-right:4px}.gx-ibtn{min-width:38px;padding:4px 5px}.pill{padding:3px 6px}}
+
+#trk{margin:0 0 4px}
+#trk .trk1{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:13px;color:var(--mute)}
+#trk .trk1 b{color:var(--ink);font-size:14px}
+#trk .trk1 .wx{color:#8ce6ff;font-weight:700}
+#trk .phs{display:flex;gap:3px;list-style:none;margin:0;padding:0}
+#trk .phs li{flex:1;text-align:center;font-size:13px;font-weight:700;padding:1px 0;border-radius:6px;background:var(--panel2);color:var(--mute)}
+#trk .phs li.on{background:var(--gold);color:#1a1405}
+#trk .rate{margin-top:5px;font-size:13px;font-weight:700;padding:4px 8px;border-radius:8px;background:var(--panel2)}
+#trk .rate.good{color:#8cf0b4}#trk .rate.okay{color:#ffd27a}#trk .rate.poor{color:#ff8f7a}
+.pod3{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:8px auto 4px;max-width:320px}
+.pod3 .ps{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:14px;color:#fff}
+.pod3 .pc,.champ .pc{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid #fff;vertical-align:middle;margin-right:4px}
+.pod3 .blk{width:100%;background:linear-gradient(#ffe08a,#c9902a);color:#1a1405;font-weight:900;font-size:22px;text-align:center;border-radius:8px 8px 0 0;padding-top:6px}
+.pod3 .p1 .blk{height:74px}.pod3 .p2 .blk{height:52px;background:linear-gradient(#e9eef5,#9aa7bd)}.pod3 .p3 .blk{height:38px;background:linear-gradient(#f0b78a,#a8642e)}
+table.champ{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+table.champ th,table.champ td{padding:5px 6px;text-align:left;border-bottom:1px solid #2e3a50}
+table.champ tr.you td{color:var(--gold);font-weight:700}
+@media (min-width:900px){#trk .trk1,#trk .phs li,#trk .rate,table.champ,.pod3 .ps{font-size:16px}}
+
+/* W424: card labels sit on a solid chip so they stay readable over any card art */
+.cd .k,.cd .t{left:3px;right:3px;background:rgba(12,15,22,.88);color:#fff!important;border-radius:4px;text-shadow:none}
+.cd .v{text-shadow:none}.cd .v:not(:has(svg)){left:50%;right:auto;transform:translateX(-50%);min-width:1.3em;padding:0 .12em;background:rgba(12,15,22,.88);color:#fff;border-radius:8px;height:1.1em;top:calc(var(--ch)*.28)}
+.gxc-node .gxc-lock{background:#0d1018;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;filter:none;color:#fff}
+#rulesbody b{color:inherit}
+
+#modal .sheet>.row:last-child{position:sticky;bottom:-1px;z-index:2;background:var(--panel);padding:8px 0 4px;margin-bottom:0!important}
+@media (max-width:600px){.pod3 .p1 .blk{height:50px}.pod3 .p2 .blk{height:36px}.pod3 .p3 .blk{height:26px}.pod3 .blk{font-size:18px;padding-top:3px}.stand{padding:4px 6px;margin:4px 0}.stand .pt{width:34px;height:34px}.podium{padding:30px 12px 26px}}
+@media (min-width:1280px){#game{--gx-dock-w:clamp(470px,44vw,620px)}html #game{--cw:68px}}
+body:has(.gx-drawer.on) #gxscn-tag{display:none}   /* the ?scn= test tag must not sit on top of the open rules drawer */
+@media (min-width:1000px){html body .gx-drawer{bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0}}   /* lines scrolled below the drawer end over its own panel, not over the dark page */
+#trk .score{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;min-height:40px;margin:0 0 4px;padding:3px 10px;border-radius:8px;border:1px solid #3b4a68;background:#1d2636;color:var(--ink);font-weight:800;font-size:14px;text-align:left}
+#trk .score i{font-style:normal;font-weight:700;color:var(--gold);font-size:13px}
+#hintT.on{border-color:var(--gold);color:var(--gold)}
+ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;line-height:1.35}.wxl{font-size:15px;color:#8ce6ff}
+@media (min-width:900px){#trk .score,#trk .score i{font-size:16px}}
 </style>
 </head>
