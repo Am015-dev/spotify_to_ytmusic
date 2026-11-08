@@ -158,3 +158,11 @@ R114. Hawks C: 3 points per straight line of sight between two hawks (counted on
 R115. Hawks D: a pair of hawks in sight scores by the number of different animals between them: 4, 7, 9, 11; each hawk is in one pair. _(table recalled)_
 R116. Fox C: each fox scores the number of the most common neighbouring animal (foxes excluded).
 R117. Fox B: each fox scores 3 / 5 / 7 for 1 / 2 / 3 different PAIRS of the same animal around it (foxes excluded). _(table recalled)_
+
+## Rulebook re-read (W507)
+
+R118. No limit on acorns per turn: two replaces in one turn are both allowed, each costs its own acorn.
+R119. A three-token sweep that leaves four alike is wiped again automatically.
+
+Checked and equal in effect, not asserted: the rulebook lets you put the tile and the animal down in either order; the animal can only
+go on a tile that is already in your valley, so tile-then-animal (our order) reaches exactly the same positions.

@@ -81,7 +81,7 @@ function step() {
   if (G.seats[G.cur].ai) { UI.aiT = setTimeout(aiStep, UI.fast ? 30 : AIDELAY); return; }
   if (UI.humans > 1 && UI.passed !== G.cur && G.stage === 'pick') { showPass(); return; }
   UI.lastHuman = G.cur; if (UI.view !== G.cur) { UI.view = G.cur; fitView(); }
-  var bk = G.cur + ':' + G.seats[G.cur].done; if (!UI.fast && G.np > 1 && UI.humans === 1 && UI.mode !== 'tutorial' && G.stage === 'pick' && UI.banKey !== bk) { UI.banKey = bk; banner('Your turn'); }
+  var bk = G.cur + ':' + G.seats[G.cur].done; if (!UI.fast && G.np > 1 && UI.humans === 1 && UI.mode !== 'tutorial' && !UI.tut && G.stage === 'pick' && UI.banKey !== bk) { UI.banKey = bk; banner('Your turn'); }
   render(); if (typeof tutFix === 'function') tutFix();
 }
 // turn banner: "Your turn" / "<Rival>'s turn", one at a time, fades by itself
@@ -95,7 +95,7 @@ function aiStep() {
   var m = WM.AI.choose(G);
   if (G.stage !== 'pick') { WM.apply(G, m); render(); step(); return; }
   var key = seat + ':' + G.seats[seat].done;
-  if (!UI.fast && UI.banKey !== key) { UI.banKey = key; UI.aiQuick = false; $('#toast').classList.remove('on'); var prev = (seat + G.np - 1) % G.np; banner(!G.seats[prev].ai && UI.humans === 1 ? 'Your turn is done: ' + nm + "'s turn" : nm + "'s turn"); }
+  if (!UI.fast && UI.banKey !== key) { UI.banKey = key; UI.aiQuick = false; $('#toast').classList.remove('on'); var prev = (seat + G.np - 1) % G.np; if (!UI.tut) banner(!G.seats[prev].ai && UI.humans === 1 ? 'Your turn is done: ' + nm + "'s turn" : nm + "'s turn"); }
   var col = m.t === 'take' ? [m.i, m.i] : m.t === 'free' ? [m.ti, m.ki] : null;
   if (slow && col) UI.showAI = { seat: UI.view, text: nm + ' takes the ' + terrText(G.market.tiles[col[0]]) + ' tile + ' + WM.ANI_NAME[G.market.toks[col[1]]] + (m.t === 'free' ? ' (acorn)' : '') };
   if (slow) render();
@@ -139,7 +139,7 @@ function act(m) {
       if (!before.ai && tk && tot === 0 && UI.mode !== 'coach') toast(tot > 0 ? WM.ANI_NAME[best.a] + ' +' + tot + ': ' + cinfo(best.a).rule + ta : tot < 0 ? WM.ANI_NAME[tk] + ' ' + tot + ': it broke a pattern.' + ta : WM.ANI_NAME[tk] + ' settled, no points yet. ' + cinfo(tk).rule + ta, 3400);
       if (G.last && G.last.acorn) { setTimeout(function () { pop(m.c, '+1 acorn', 'acorn'); sfx('acorn'); }, 350); }
     } else sfx('tap');
-    if (!before.ai) { pvTurnEnd(); if (!G.over && G.seats[G.cur].ai && UI.humans === 1 && !UI.fast) { UI.banKey = G.cur + ':' + G.seats[G.cur].done; banner('Your turn is done: ' + G.seats[G.cur].name + "'s turn"); } }   // the turn-over beat, right as you finish
+    if (!before.ai) { pvTurnEnd(); if (!G.over && G.seats[G.cur].ai && UI.humans === 1 && !UI.fast && !UI.tut) { UI.banKey = G.cur + ':' + G.seats[G.cur].done; banner('Your turn is done: ' + G.seats[G.cur].name + "'s turn"); } }   // the turn-over beat, right as you finish
     save();
   }
   render(); step();
@@ -157,7 +157,7 @@ function tutOK(x) { return typeof tutAct === 'function' ? tutAct(x) : true; }
 function myTurn() { return G && !G.over && !G.seats[G.cur].ai && UI.view === G.cur && $('#pass').hidden; }
 function onMarket(kind, i) {
   if (myTurn() && G.stage === 'tile' && UI.undo && G.hold && (G.hold.ti === i || G.hold.ki === i)) { undoTake(); return; }   // tapping the slot you took from puts the pair back
-  if (myTurn() && G.stage === 'tile' && UI.undo && !UI.free && !UI.wipe && G.market.tiles[i] && G.market.toks[i]) { G = UI.undo; UI.undo = null; UI.ghost = null; }   // changed your mind: tapping another pair swaps the pick (same as Back + pick)
+  if (myTurn() && G.stage === 'tile' && UI.undo && !UI.free && !UI.wipe && G.market.tiles[i] && G.market.toks[i]) { if (!tutOK({ what: 'swap', i: i })) return; G = UI.undo; UI.undo = null; UI.ghost = null; }   // changed your mind: tapping another pair swaps the pick (same as Back + pick)
   if (!myTurn() || G.stage !== 'pick') return;
   if (UI.wipe) { if (!G.market.toks[i]) return; if (!tutOK({ what: 'wsel', i: i })) return; var j = UI.wipe.indexOf(i); if (j >= 0) UI.wipe.splice(j, 1); else UI.wipe.push(i); sfx('tap'); render(); return; }
   if (UI.free) {
@@ -253,6 +253,7 @@ function drawMap() {
   pvStrip(pv);
   $('#map').setAttribute('viewBox', '0 0 ' + wh[0] + ' ' + wh[1]); applyPan();
   $('#map').classList.toggle('dimtok', mine && G.stage === 'tok' && WM.tokSpots(env, G.hold.tok).length > 0);
+  if (UI.tut && typeof tutDraw === 'function') tutDraw();   // the guided tutorial's glow survives map-only redraws
 }
 function mkTile(t, s) { var w = s * SQ3, h = s * 2; return '<svg viewBox="' + (-w / 2 - 2) + ' ' + (-h / 2 - 2) + ' ' + (w + 4) + ' ' + (h + 4) + '" aria-hidden="true">' + terrainDefs() + tileSvg(t, 0, 0, s, t.t.length > 1 ? 1 : 0, { big: 1 }) + '</svg>'; }
 // pattern picture for an animal card (first set only): a small hex cluster showing a scoring shape, tokens drawn as on the map
@@ -306,7 +307,7 @@ function renderDock() {
     }
   }
   if (G.stage !== 'pick') UI.acornMenu = false;
-  if (myTurn() && hintsOn() && UI.mode !== 'tutorial' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
+  if (myTurn() && hintsOn() && UI.mode !== 'tutorial' && UI.mode !== 'coach' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
   $('#acts').innerHTML = a;
   $('#acorn').innerHTML = '<span class="acn" title="Acorns: 1 point each at the end, or spend one for a free pick or new animals">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></span>';
 }
@@ -415,7 +416,7 @@ function whyLine(sc, me) {   // one short line: why you won or lost (the biggest
     { k: 'acorns', d: a.acorns - b.acorns, t: 'acorns ' + a.acorns + ' vs ' + b.acorns }];
   var win = a.total >= b.total; parts.sort(function (x, y) { return win ? y.d - x.d : x.d - y.d; });
   var p = parts[0]; if (!p.d) return '<p class="why">Neck and neck with ' + esc(nm) + ' in every column.</p>';
-  return '<p class="why">' + (win ? 'You beat ' + esc(nm) + ' on ' : esc(nm) + ' won on ') + p.t + (win ? '.' : ' (yours first).') + '</p>';
+  return '<p class="why">' + (win ? 'You beat ' + esc(nm) + ' most on ' : esc(nm) + ' beat you most on ') + p.t + ' (you first).</p>';
 }
 function showResult() {
   if (!G || !G.over || UI.resultShown === G.seed + ':' + G.logN) return; UI.resultShown = G.seed + ':' + G.logN;
@@ -489,12 +490,12 @@ document.addEventListener('click', function (e) {
     case 'campCont': $('#rs').hidden = true; try { GXC.finish(G); } catch (er) { console.error(er); } break;
     case 'passB': $('#pass').hidden = true; UI.passed = G.cur; UI.view = G.cur; fitView(true); step(); break;
     case 'w3B': if (!tutOK({ what: 'w3' })) break; WM.apply(G, { t: 'wipe3' }); sfx('wipe'); toast('Three tokens swept away.'); render(); break;
-    case 'acornB': UI.acornMenu = true; render(); break;
-    case 'acornX': UI.acornMenu = false; render(); break;
+    case 'acornB': if (!tutOK({ what: 'acorn' })) break; UI.acornMenu = true; render(); break;
+    case 'acornX': if (!tutOK({ what: 'acornX' })) break; UI.acornMenu = false; render(); break;
     case 'freeB': if (!tutOK({ what: 'freeB' })) break; UI.acornMenu = false; UI.free = { ti: null, ki: null }; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
     case 'wipeB': if (!tutOK({ what: 'wipeB' })) break; UI.acornMenu = false; UI.wipe = []; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
     case 'wokB': if (!UI.wipe || !UI.wipe.length || !tutOK({ what: 'wok' })) break; WM.apply(G, { t: 'wipe', idx: UI.wipe.slice() }); UI.wipe = null; sfx('wipe'); render(); break;
-    case 'cancelB': UI.free = null; UI.wipe = null; render(); break;
+    case 'cancelB': if (!tutOK({ what: 'cancel' })) break; UI.free = null; UI.wipe = null; render(); break;
     case 'rotB': rotate(); break;
     case 'okB': confirmPlace(); break;
     case 'undoB': undoTake(); break;

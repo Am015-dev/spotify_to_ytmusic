@@ -147,7 +147,7 @@ function pvBadge(x, y, d, c, spot, ghost) {
 function pvStrip(pv) {
   var e = $('#pv'); if (!e) { e = document.createElement('div'); e.id = 'pv'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); }
   var h = '';
-  if (!hintsOn()) { e.innerHTML = ''; e.hidden = true; return; }
+  if (!hintsOn() || UI.tut) { e.innerHTML = ''; e.hidden = true; return; }   // the guided tutorial keeps one sentence on screen: Rowan's
   if (pv) h = '<div class="vd ' + (pv.d > 0 ? 'good' : pv.d < 0 ? 'poor' : 'okay') + '"><b>' + (pv.d > 0 ? '+' : '') + pv.d + '</b><span>' + esc(pv.what + ': ' + pvText(pv.parts)) + '</span></div>';
   else if (UI.verdict && !G.over && !(myTurn() && G.stage !== 'pick')) h = pvVerdictHTML();
   else if (UI.rivalMsg && !G.over && !myTurn()) h = '<div class="vd okay riv"><span>' + esc(UI.rivalMsg) + '</span></div>';

@@ -24,7 +24,7 @@
   W.AI = {
     plan: function (G, level) {
       W.curCards = G.cards;
-      var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', noise = lv === 'easy' ? 6 : lv === 'normal' ? 0.6 : 0;
+      var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', novice = lv === 'novice'; if (novice) lv = 'easy'; var noise = lv === 'easy' ? 6 : lv === 'normal' ? 0.6 : 0;
       var pot = lv === 'easy' ? 0.15 : lv === 'normal' ? 0.45 : 0.6, rnd = function () { return W.rnd(G); };
       var bagTot = 0; for (var a in G.bag) bagTot += G.bag[a];
       var ctx = { bag: G.bag, bagTot: bagTot }, before = {}; W.TER.forEach(function (t) { before[t] = W.corridor(env, t); });
@@ -66,7 +66,8 @@
       }
       var acornV = endGame ? 1 : (lv === 'hard' ? 3.5 : 2.2);
       for (var i = 0; i < 4; i++) { var t = G.market.tiles[i], k = G.market.toks[i]; if (!t || !k) continue; var e = evalPair(t, k, 0); if (!best || e.v > best.v) best = Object.assign(e, { m: { t: 'take', i: i } }); }
-      if (lv === 'easy' && rnd() < EASY_RANDOM) {   // easy: sometimes just grabs a random pair
+      if (lv === 'easy' && (novice || rnd() < EASY_RANDOM)) {   // novice (the guided tutorial's rival) always grabs a random pair
+          // easy: sometimes just grabs a random pair
         var ok = []; for (var r0 = 0; r0 < 4; r0++) if (G.market.tiles[r0] && G.market.toks[r0]) ok.push(r0);
         var ri = ok[Math.floor(rnd() * ok.length)], er = evalPair(G.market.tiles[ri], G.market.toks[ri], 0); best = Object.assign(er, { m: { t: 'take', i: ri } });
       }

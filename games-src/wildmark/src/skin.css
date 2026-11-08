@@ -350,3 +350,12 @@ html.wm-clean #seats{top:8px}
 #goal{pointer-events:none}#goal .gcard{pointer-events:auto}
 .gone.back{cursor:pointer;border:2px dashed rgba(230,176,79,.7)!important;border-radius:12px;min-width:44px;min-height:44px}
 .gone.back svg{opacity:.45}.gone.back i{font-style:normal}
+/* guided tutorial: the one tap that works glows */
+@keyframes tutp{0%,100%{box-shadow:0 0 0 3px #ffd36b,0 0 14px 4px rgba(255,211,107,.75)}50%{box-shadow:0 0 0 5px #ffd36b,0 0 26px 10px rgba(255,211,107,.35)}}
+@keyframes tuts{0%,100%{stroke-width:4;stroke-opacity:1}50%{stroke-width:8;stroke-opacity:.55}}
+button.tuthl{animation:tutp 1.1s ease-in-out infinite;position:relative;z-index:8}
+#map .tuthl{animation:tuts 1.1s ease-in-out infinite;stroke:#ffd36b!important;fill:rgba(255,211,107,.35)!important}
+#map g.tuthl polygon.ring{stroke:#ffd36b!important;stroke-width:6}
+.tuthl.nudge{outline:3px solid #fff;outline-offset:2px}
+#coachb #tutNext{flex:0 0 auto;min-height:44px;min-width:72px;align-self:center;margin-right:4px}
+#board:has(#coachb:not([hidden])) #line{display:none}   /* guided tutorial: Rowan's one sentence replaces the step line */
