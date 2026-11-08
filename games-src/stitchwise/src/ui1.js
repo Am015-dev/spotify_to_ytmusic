@@ -20,7 +20,7 @@ var SFX = { pick: function () { tone(520, .08, 'triangle'); }, tick: function ()
 SFX.fanfare = function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, .22, 'triangle', .14, i * .12); }); tone(1047, .6, 'sine', .1, .5); tone(1568, .5, 'triangle', .06, .55); };
 SFX.thud = function () { tone(110, .16, 'sine', .2); };
 function sfx(n, a) { try { SFX[n](a); } catch (e) { } }
-function toast(t, ms) { var e = $('#toast'); if (!e) return; if (G && UI.started && !G.over && !hintsOn() && !$('#start:not([hidden])')) return; e.textContent = t; e.classList.add('on'); e.onclick = function () { e.classList.remove('on'); }; clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, Math.max(ms || 0, 4000 + 100 * t.split(/\s+/).length)); } // W470: stays >= 4 s + 1 s per 10 words, tap closes
+function toast(t, ms) { var e = $('#toast'); if (!e) return; if (UI.coach && $('#guide:not([hidden])')) return; /* W470: one message at a time: the coach bubble wins */ if (G && UI.started && !G.over && !hintsOn() && !$('#start:not([hidden])')) return; e.textContent = t; e.classList.add('on'); e.onclick = function () { e.classList.remove('on'); }; clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, Math.max(ms || 0, 4000 + 100 * t.split(/\s+/).length)); } // W470: stays >= 4 s + 1 s per 10 words, tap closes
 function amt(ms) { return GX.animMs ? GX.animMs(ms) : ms; }
 function later(ms, f) { var q = UI.seq; return setTimeout(function () { if (q === UI.seq) f(); }, ms); }
 // ---------- who is who
@@ -78,7 +78,12 @@ function renderTrack() {
 }
 function placeTokens() { var t = $('#track'); if (!t) return; var top = G.stamp[0] > G.stamp[1] ? 0 : 1, last = UI.tokPos || G.pos.slice(); UI.tokPos = G.pos.slice();
   function at(k, cellI, s) { var c = $('.tc[data-i="' + cellI + '"]', t); if (!k || !c) return; var hw = (k.offsetWidth || 20) / 2; k.style.left = (c.offsetLeft + c.offsetWidth / 2 - hw + (G.pos[0] === G.pos[1] ? (s === 0 ? -6 : 6) : 0)) + 'px'; k.style.top = (c.offsetTop + c.offsetHeight / 2 - hw) + 'px'; }
-  [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', t); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (last[s] !== G.pos[s] && amt(1)) { k.style.transition = 'none'; at(k, last[s], s); void k.offsetWidth; k.style.transition = ''; } at(k, G.pos[s], s); }); }
+  // W470: tokens walk space by space (sp(150) per space) instead of jumping
+  var W = UI.walks = UI.walks || {}, now = Date.now(), stp = Math.max(40, sp(150));
+  [0, 1].forEach(function (s) { if (last[s] < G.pos[s] && amt(1)) W[s] = { from: W[s] ? curW(s) : last[s], to: G.pos[s], t0: now }; });
+  function curW(s) { var w = W[s]; if (!w) return G.pos[s]; var n = w.from + Math.floor((Date.now() - w.t0) / stp); if (n >= w.to || w.to !== G.pos[s]) { delete W[s]; return G.pos[s]; } return n; }
+  function tick() { var tt = $('#track'); if (!tt) return; var more = false; [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', tt); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (W[s]) { k.style.transition = 'left .12s, top .12s'; more = true; } at(k, curW(s), s); if (W[s] && !k._st) { k._st = 1; } }); if (more) { clearTimeout(UI.tm.walk); UI.tm.walk = setTimeout(tick, stp); } }
+  tick(); }
 function markLanding() {
   var t = $('#track'); if (!t || !G) return; $$('.tc.land,.tc.next', t).forEach(function (e) { e.classList.remove('land', 'next'); }); var s = swWho(G); if (s < 0) s = 0; var pos = G.pos[s], nx = null;
   SW.BTN_SPOTS.concat(SW.LEATHER_SPOTS.filter(function (l, i) { return G.leather[i] === null; })).forEach(function (b) { if (b > pos && (nx === null || b < nx)) nx = b; });
@@ -145,7 +150,7 @@ function renderDock() {
     var can = hum && !G.pend && aff && fits, val = hintsOn() && hum && !G.pend && aff && fits ? patchValue(s, pid).net : null;
     var b = h('button.offer' + (UI.sel === k ? '.sel' : '') + (hum && !G.pend && (!aff || !fits) ? '.no.cant' : '') + (!hum ? '.no' : '') + (can && UI.sel < 0 ? '.can' : '') + (UI.sel >= 0 && UI.sel !== k ? '.dim' : ''), { type: 'button', 'data-a': 'offer', 'data-k': k, 'data-why': why, 'aria-label': p.name + ': cost ' + p.cost + ' buttons, time ' + p.time + ', earns ' + p.inc + ' per button spot, ' + p.n + ' squares' });
     if (artHas('ui-offer-card')) { artBg(b, 'ui-offer-card'); b.style.backgroundImage = 'linear-gradient(#fffaf0e6,#fffaf0e6),' + b.style.backgroundImage; b.style.backgroundSize = 'cover'; }
-    if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); var bb = bbox(p.cells), sm = document.documentElement.classList.contains('sm'), wd = innerWidth >= 1024; b.appendChild(patchShape(pid, '', Math.max(9, Math.min(sm ? 12 : wd ? 28 : 22, Math.floor((sm ? 60 : wd ? 112 : 100) / bb[0]), Math.floor((sm ? 44 : wd ? 76 : 58) / bb[1]))))); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
+    if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); var bb = bbox(p.cells), sm = document.documentElement.classList.contains('sm'), wd = innerWidth >= 1024; b.appendChild(patchShape(pid, '', Math.max(9, Math.min(sm ? 12 : wd ? 30 : 22, Math.floor((sm ? 60 : wd ? 170 : 100) / bb[0]), Math.floor((sm ? 44 : wd ? 100 : 58) / bb[1]))))); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
   });
   var vs = $$('.offer[data-val]', box); if (vs.length) { var bst = vs.reduce(function (a, b) { return +b.dataset.val > +a.dataset.val ? b : a; }); bst.appendChild(h('span.badge', 'Best ' + sgn(+bst.dataset.val))); }
   if (!off.length) box.appendChild(h('div', 'No patches left.'));

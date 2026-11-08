@@ -47,4 +47,4 @@ async function playEv(e,gen){
 }
 
 // a tap on the board or the caption during a rival's turn skips the current step (the next one still plays)
-document.addEventListener('pointerdown',e=>{if(!UI.busy||!G||UI.curTurn==null||!G.seats[UI.curTurn]||G.seats[UI.curTurn].human)return;const t=e.target;if(t&&t.closest&&t.closest('#board,.ps-hint,.ps-msg,#res'))sleepFlush()},true);
+document.addEventListener('pointerdown',e=>{if(!UI.busy||!G||UI.curTurn==null||!G.seats[UI.curTurn]||G.seats[UI.curTurn].human)return;const t=e.target;if(t&&t.closest&&t.closest('#board,.ps-line,.ps-stat,#res'))sleepFlush()},true);
