@@ -180,6 +180,7 @@ function fcPoll() {
   if (has(/^ra/)) fcSay('radio'); if (has(/^lg/)) fcSay('gear'); if (G.pend && G.pend.h === 'rr' || G.rrHand > 0 && mine) fcSay('reroll');
   if (G.round >= 2) { fcSay('flaps'); fcSay('brakes'); } if (has(/^fl/)) fcSay('flaps'); if (has(/^br/)) fcSay('brakes');
   if (FA.isFinal(G) && G.phase === 'place') fcSay('final');
+  if (F.goal && G.phase !== 'brief') { F.goal = false; document.querySelectorAll('.fa-goal').forEach(e => e.remove()); }
   if (F.goal) { if (!document.querySelector('.fa-goal')) { if (F.goalShown) F.goal = false; else { F.goalShown = true; tutGoal(); } } if (F.goal) return; }
   const R = T.rounds || [], n = Object.keys(sl).length;
   if (G.phase === 'brief') { UI.cpt = null; if (!G.ready[0]) fcShow('b' + G.round, tsFill(R[G.round] || '') + ' Tap Roll.', 'chief'); return; }
