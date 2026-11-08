@@ -68,7 +68,7 @@ function cardFixes(me){const cb=G.cb;const vm=validMoves(me);const seen=new Set(
   return out.sort((a,b)=>(a.r==='win'?0:1)-(b.r==='win'?0:1)||a.v-b.v)}
 function fightAdvice(me){const cb=G.cb,p=P(me);const a=sideStr(cb),b=monStr(cb);const lines=[];let rec=null,why='';
   if(winning(cb)){const boosts=p.hand.filter(id=>cd(id).t==='oneshot'&&cd(id).b&&!cd(id).sp);const rivals=alive().filter(o=>o!==p&&o.hand.length).length;
-    rec={act:'fight'};why=`You win ${a} vs ${b}${a===b?' (Warriors win ties)':''}.`;lines.push(`Press <b>Fight!</b> Before it ends, each rival (${rivals} with cards) gets one chance to boost the monster.`);
+    rec={act:'fight'};why=`You win ${a} vs ${b}${a===b?' (Warriors win ties)':''}.`;lines.push(`Press <b>Fight!</b> Before it ends, each rival with cards (${rivals}) may boost the monster.`);
     if(boosts.length)lines.push(`Keep ${esc(cname(boosts[0]))} (+${cd(boosts[0]).b}) ready in case they do.`);else if(a-b<3&&rivals)lines.push('Your lead is small: a single monster boost could turn it.');
     return {rec,why,lines}}
   const offers=helpOffers(me),fixes=cardFixes(me),odds=runOdds(p,cb);
@@ -78,7 +78,7 @@ function fightAdvice(me){const cb=G.cb,p=P(me);const a=sideStr(cb),b=monStr(cb);
   const deadly=cb.mons.some(m=>isDeadly(mdef(m)))||cb.mons.some(m=>(mdef(m).bad||[]).some(o=>o[0]==='lvl'&&(o[1]==='all'||o[1]>=3)));
   const runTxt=odds.rows.length===1?(odds.rows[0].pr===0?'impossible':odds.rows[0].pr===1?'automatic':`roll ${odds.rows[0].need}+ (${pct(odds.all)})`):`${pct(odds.all)} to get away from all of them`;
   why=`You lose ${a} vs ${b}.`;
-  if(yes.length){const o=yes[0];rec={act:'ask',tgt:o.i,opt:o.yes};why+=` Ask ${esc(P(o.i).nm)}: ${o.str} strength makes ${a+o.str} vs ${b}, and ${P(o.i).sex==='f'?'she':'he'}’ll help for ${o.yes} treasure${plural(o.yes)}.`}
+  if(yes.length){const o=yes[0];rec={act:'ask',tgt:o.i,opt:o.yes};why+=` Ask ${esc(P(o.i).nm)}: ${o.str} strength makes ${a+o.str} vs ${b}. ${P(o.i).sex==='f'?'She':'He'}’ll help for ${o.yes} treasure${plural(o.yes)}.`}
   else if(winFix){rec=winFix.m;why+=` ${moveLabel(winFix.m)}${winFix.m.card!=null?' ('+esc(cname(winFix.m.card))+')':''} wins it.`}
   else if(goneFix&&(deadly||odds.all<.5)){rec=goneFix.m;why+=` ${moveLabel(goneFix.m)}${goneFix.m.card!=null?' ('+esc(cname(goneFix.m.card))+')':''} gets rid of it: safer than running (${pct(odds.all)}).`}
   else{rec={act:'run'};why+=` Nobody will help and no card wins it: run away (${runTxt}).`}
@@ -108,12 +108,12 @@ function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)ret
   if(G.q){const q=G.q;const m=aiSafe(me);r.rec=m;
     if(q.kind==='help'){const f=P(q.from);const g=fightGain(cb);if(f.lvl+g>=R.WIN){r.rec={act:'opt',opt:'no'};r.why=`Refuse! Winning this fight makes ${esc(f.nm)} level ${R.WIN}: ${f.sex==='f'?'she':'he'} would WIN THE GAME.`}
       else{const tot=sideStr(cb)+pStr(p),mb=monStr(cb);const w=tot>mb||(tot===mb&&(isCls(p,'warrior')||isCls(f,'warrior')));const elf=isRace(p,'elf');const ahead=f.lvl-p.lvl;
-        if(!w){r.rec={act:'opt',opt:'no'};r.why=`Refuse: even together you lose ${tot} vs ${mb}, and you would both have to run.`}
-        else if((q.n>=1||elf)&&ahead<3){r.rec={act:'opt',opt:'yes'};r.why=`Say yes: together you win ${tot} vs ${mb}, and you get ${q.n} treasure${plural(q.n)}${elf?' plus a level (you’re an Elf)':''}. ${esc(f.nm)} gains ${g} level${plural(g)}.`}
-        else{r.rec={act:'opt',opt:'no'};r.why=ahead>=3?`Refuse: you’d win together, but ${esc(f.nm)} is already ${ahead} levels ahead of you and would gain ${g} more.`:`Refuse: you’d win together, but there’s no pay and ${esc(f.nm)} gains ${g} level${plural(g)}.`}}}
-    else if(q.kind==='ward')r.why=m&&m.opt==='yes'?'Cancel it: this curse would really hurt.':'Let it happen: it’s a mild one, keep your ring for something worse.';
+        if(!w){r.rec={act:'opt',opt:'no'};r.why=`Refuse: even together you lose ${tot} vs ${mb}. You would both run.`}
+        else if((q.n>=1||elf)&&ahead<3){r.rec={act:'opt',opt:'yes'};r.why=`Say yes: together you win ${tot} vs ${mb}. You get ${q.n} treasure${plural(q.n)}${elf?', plus a level (Elf)':''}. ${esc(f.nm)} gains ${g} level${plural(g)}.`}
+        else{r.rec={act:'opt',opt:'no'};r.why=ahead>=3?`Refuse: you’d win, but ${esc(f.nm)} is ${ahead} levels ahead. They would gain ${g} more.`:`Refuse: you’d win, but there’s no pay. ${esc(f.nm)} gains ${g} level${plural(g)}.`}}}
+    else if(q.kind==='ward')r.why=m&&m.opt==='yes'?'Cancel it: this curse would really hurt.':'Let it happen: it’s mild. Keep your ring for something worse.';
     else if(q.kind==='rescue'){const c=mdef(runMon(cb.runs[q.run]));const ops=c.bad||[];const heavy=ops.some(o=>['death','orcs','dread','race','cls','clsOr','clsOr1','swap','hippo','troll','pixie','lowest','gold','handOr','slugs'].includes(o[0])||(o[0]==='lvl'&&(o[1]==='all'||o[1]>=2))||(o[0]==='item'&&o[2]==='all'));const use=vm0(me).filter(x=>x.act==='use').sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card));
-      if(heavy&&use.length){r.rec=use[0];r.why=`Use ${esc(cname(use[0].card))}: the Bad Stuff (${esc(c.badt||'')}) is worse than losing the card.`}else{r.rec={act:'opt',opt:'no'};r.why=`Take it: “${esc(c.badt||'lose a level')}” is mild, keep your escape card for something worse.`}}
+      if(heavy&&use.length){r.rec=use[0];r.why=`Use ${esc(cname(use[0].card))}: losing the card beats the Bad Stuff.`}else{r.rec={act:'opt',opt:'no'};r.why=`Take it: this Bad Stuff is mild. Keep your escape card.`}}
     else if(q.kind==='pick'&&m){const v=q.opts[m.opt];r.why=typeof v==='number'?`Pick ${esc(cname(v))}.`:''}
     return r}
   const ph=G.phase;
@@ -122,7 +122,7 @@ function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)ret
       // steal the fight: Not-My-Problem on yourself when you would win it
       const tr=validMoves(me).filter(m=>m.act==='play'&&cd(m.card).sp==='transfer'&&m.tgt===me);
       if(tr.length&&cb.who!==me){const x=sim(()=>{apply(norm(tr[0]),me);const c=G.cb;return c&&c.who===me&&winning(c)?{a:sideStr(c),b:monStr(c),lv:fightGain(c),tr:cbTreasure(c),deadly:c.mons.some(m=>isDeadly(mdef(m)))}:null});
-        if(x&&!x.deadly&&x.a-x.b>=1&&p.lvl+x.lv<=R.WIN){r.rec=tr[0];r.card=tr[0].card;r.why=`Steal this fight! With ${esc(cname(tr[0].card))} you take it over: ${x.a} vs ${x.b}, +${x.lv} level${plural(x.lv)}${p.lvl+x.lv>=R.WIN?' and THE WIN':''} and ${x.tr} treasure${plural(x.tr)} for you.`;return r}}
+        if(x&&!x.deadly&&x.a-x.b>=1&&p.lvl+x.lv<=R.WIN){r.rec=tr[0];r.card=tr[0].card;r.why=`Steal this fight! With ${esc(cname(tr[0].card))} you take it over: ${x.a} vs ${x.b}. You get +${x.lv} level${plural(x.lv)}${p.lvl+x.lv>=R.WIN?' and THE WIN':''} and ${x.tr} treasure${plural(x.tr)}.`;return r}}
       if(cb.help===me){r.rec={act:'pass'};r.why=winning(cb)?'You’re helping and winning: let it be.':'You’re helping but losing: a one-shot for the heroes would turn it.';const m=aiSafe(me);if(m)r.rec=m;return r}
       const m=aiSafe(me);r.rec=m||{act:'pass'};if(m&&m.act!=='pass'){r.card=m.card;r.why=`${esc(P(cb.who).nm)} is ${P(cb.who).lvl>=p.lvl+1?'ahead of you':'dangerous'}: ${moveLabel(m)} makes the monster win.`}
       else r.why=winning(cb)?`${esc(P(cb.who).nm)} wins this one. Nothing worth spending on it: let it be.`:`${esc(P(cb.who).nm)} is losing already: let it be.`;return r}}
@@ -131,7 +131,7 @@ function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)ret
     const by=((G.rv||{})[me]||{})[cur.i];if(by&&by.curse>=2&&p.hand.some(id=>cd(id).t==='curse'))r.why+=` ${esc(cur.nm)} has cursed you ${by.curse} times. Payback?`;return r}
   if(['setup','main','after','post'].includes(ph)){const plan=calmPlan(me);if(plan.length){r.rec=plan[0].m;if(plan[0].m.card!=null&&['play','equip','unequip'].includes(plan[0].m.act))r.card=plan[0].m.card;r.plan=plan}
     const lead=alive().filter(o=>o!==p).sort((a,b)=>b.lvl-a.lvl)[0];
-    if(lead&&lead.lvl-p.lvl>=3&&ph!=='setup')r.catchup=`You’re ${lead.lvl-p.lvl} levels behind ${esc(lead.nm)}. Help ${esc(lead.nm)}’s rivals for treasure, curse the leader, and stay out of fights you can’t win.`;
+    if(lead&&lead.lvl-p.lvl>=3&&ph!=='setup')r.catchup=`You’re ${lead.lvl-p.lvl} levels behind ${esc(lead.nm)}. Help ${esc(lead.nm)}’s rivals for treasure. Curse the leader. Skip fights you can’t win.`;
     if(ph==='after'&&p.hand.length<=1)r.low=`You’re down to ${p.hand.length} card${plural(p.hand.length)}: loot the room to refill.`;
     return r}
   return r}
@@ -187,7 +187,7 @@ function sinceTrack(me){if(!G||me<0||!P(me)||!P(me).human||G.mode==='ai'||G.winn
   if(UI.snAct!==k){UI.snAct=k;const sn=UI.snBy[me];UI.since=sn&&sn.gid===G.gid&&G.phase!=='setup'?sinceDiff(me,sn):null}
   UI.snBy[me]={gid:G.gid,ln:G.ln||0,lv:G.pl.map(x=>x.lvl),eq:p.eq.map(e=>e.id),tr:p.race.concat(p.cls),lim:handLimit(p),cu:p.curse.slice()}}
 function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(l=>l.n>sn.ln).reverse();
-  const yo=t=>youify(t,nm);const skip=/^— |kicks open the door and finds|goes looking for trouble|won't chase|agrees to help|refuses to help|asks /;
+  const yo=t=>youify(t,nm);const skip=/^— |kicks open the door and finds|kicks the door and finds|goes looking for trouble|won't chase|agrees to help|refuses to help|asks /;
   const why=(test,max)=>lines.filter(l=>!skip.test(l.t)&&test(l.t)).slice(-max).map(l=>yo(l.t));
   G.pl.forEach(x=>{const a=sn.lv[x.i],b=x.lvl;if(a==null||a===b)return;const who=x.i===me?'You':esc(x.nm);const n=x.nm;
     const r=why(t=>t.includes(n)&&/defeats|level|dies|sells|steals|curse|Bad Stuff/.test(t),1);
@@ -200,7 +200,7 @@ function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(
   const cu=p.curse.filter(id=>!sn.cu.includes(id));if(cu.length)out.push(`<b>Curse on you:</b> ${cu.map(id=>esc(cname(id))+': '+esc(cd(id).x||'')).join(' ')}`);
   return out.length?out:null}
 function sinceHTML(me){if((typeof tutOn==='function'&&tutOn())||!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
-  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,2).map(x=>`<li>${x.replace(/ ?<span class="muted">.*?<\/span>/g,'')}</li>`).join('')}</ul></div>`}
+  return `<div class="since"><b>While you waited</b><ul>${UI.since.slice(0,2).map(x=>`<li>${x.replace(/ ?<span class="muted">.*?<\/span>/g,'')}</li>`).join('')}</ul></div>`}
 // ---- learn as you play: one short idea, the first time it matters (only in a "teach me" game) ----
 const LESSONS={
   setup:'<b>Goal:</b> reach level 10. Tap glowing cards.',
