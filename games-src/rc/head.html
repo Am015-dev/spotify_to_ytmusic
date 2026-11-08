@@ -717,20 +717,20 @@ html.ph .gx-bar .gxh-bulb,.gx-bar .gxh-bulb{min-width:40px}
 #hud .rleg{font-size:13px}
 @media (min-width:1024px){#hud .hk em,#hud .rleg{font-size:16px}}
 .life i{font-size:13px;width:20px;height:20px}
-.tl em{font-size:13px}
+.tl em{font-size:14px}
 body:has(.gx-drawer.on) #modal{visibility:hidden}
 /* round 2 */
 @media (min-width:1024px){.wz-t,.wz-t *,#step *,.mbox:not(.start) *{font-size:max(1em,16px)!important}}
-.daycard .dk,.dk{font-size:13px!important}.wz-s i{font-size:13px!important}
+.daycard .dk,.dk{font-size:14px!important}.wz-s i{font-size:14px!important}
 @media (min-width:1024px){.daycard .dk,.dk,.wz-s i,.wz-s,.goal,.sk{font-size:16px!important}}
-#hud .phases span,#hud .phases *,#hud .hk *,#hud .fc *,.goal,.goal *,.gx-dock .goal{font-size:13px!important}
+#hud .phases span,#hud .phases *,#hud .hk *,#hud .fc *,.goal,.goal *,.gx-dock .goal{font-size:14px!important}
 @media (min-width:1024px){#hud *,.gx-dock *,#panel *{font-size:max(1em,16px)}#hud .phases span,#hud .phases *,#hud .hk *,#hud .fc *,.goal,.goal *{font-size:16px!important}}
 @media (min-width:1024px){.rm-p i,.rm-p.now span,#hud .rtrack span,.hud *{font-size:16px!important}}
-@media (max-width:1023px){#hud .rtrack span,.rm-p i{font-size:13px!important}}
-.gx-dock :is(i,b,small,span,em,u,summary,h3,h4),#panel :is(i,b,small,span,em,u,summary,h3,h4){font-size:max(1em,13px)}
+@media (max-width:1023px){#hud .rtrack span,.rm-p i{font-size:14px!important}}
+.gx-dock :is(i,b,small,span,em,u,summary,h3,h4),#panel :is(i,b,small,span,em,u,summary,h3,h4){font-size:max(1em,14px)}
 @media (min-width:1024px){.gx-dock :is(i,b,small,span,em,u,summary,h3,h4),#panel :is(i,b,small,span,em,u,summary,h3,h4){font-size:max(1em,16px)}}
-sub{font-size:13px!important}@media (min-width:1024px){.gx-dock i,#panel i,.gx-dock b,#panel b{font-size:16px}}
-.wz-s{font-size:13px}.wz-s i{font-size:13px}sub{font-size:13px}.rm-h b{font-size:15px}.rm-p i,.gx-dock i,#panel i{font-size:13px}
+sub{font-size:14px!important}@media (min-width:1024px){.gx-dock i,#panel i,.gx-dock b,#panel b{font-size:16px}}
+.wz-s{font-size:14px}.wz-s i{font-size:14px}sub{font-size:14px}.rm-h b{font-size:15px}.rm-p i,.gx-dock i,#panel i{font-size:14px}
 @media (min-width:1024px){.rm-h b,.wz-s,.wz-s i{font-size:16px}.gx-dock,.gx-dock small,#panel small{font-size:16px}}
 .start .quick{margin:12px 0}.start .qrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0}.start .ql{min-width:92px;font-size:16px;font-weight:700;color:#2a2014}
 .start .seg{display:flex;flex-wrap:wrap;gap:6px}.start .sg{min-height:44px;padding:0 16px;font-size:16px;border-radius:10px;border:2px solid #b99f67;background:#fffaf0;color:#2a2014;cursor:pointer}.start .sg.on{background:#d9a53a;border-color:#7a5413;font-weight:800}
@@ -762,6 +762,9 @@ html.bf .bfa em{font:700 13px/1 var(--sans);white-space:nowrap}
 html.bf .bfa{white-space:nowrap}
 @media (min-width:1024px){html.bf #bfres{font-size:16px;padding:6px 14px}html.bf #bfres b{font-size:18px}html.bf #bfres small{font-size:15px}html.bf #phview #phlabel .bft{font-size:19px}html.bf #phview #phlabel .bfb{font-size:14px}html.ph #labels .tl .pt,html.ph #labels .tl .pn{font-size:15px}.bfpn{font-size:15px;max-width:96px}html.bf .bfa .bfw,html.bf .bfa em{font-size:15px}}
 html.ph.ph-l #bf .pawnrow.bf-pw{flex-wrap:wrap;row-gap:6px}html.ph.ph-l .bfpc{flex:0 1 auto;max-width:none;min-width:58px}html.ph.ph-l .bfpn{max-width:none;white-space:nowrap;font-size:14px}html.bf.ph-l #phview #phlabel{max-height:none;padding:6px 0}html.bf.ph-l #phview #phlabel .bft{font-size:17px}html.bf.ph-l #phview #phlabel .bfb{white-space:nowrap;letter-spacing:0}
+/* feel gate: no phone text under 14px */html.ph #labels .tl .pn,html.ph #labels .tl .pt,html.ph #bfres small,html.ph #bfres span,html.bf #phview #phlabel .bfb,html.ph .bfpn,html.ph .bfpw sub,html.ph .rleg,html.ph .lf,html.ph i.rx,html.ph i.neg,html.ph i.pos,html.ph .now,html.ph span.on,html.ph .rtrack span,html.ph .lives b,html.ph .bfa em,html.ph .bfa .bfw,html.ph .gxt-menu span{font-size:14px!important}
+@media (max-width:600px){#hud,#hud *,#roadmap .rm-p span,#roadmap .rm-p i,#labels .tl .pn,#labels .tl .pt,#bfres small,#bfres span,#phview #phlabel .bfb,.bfpn,.bfpw sub,.gxt-menu span{font-size:14px!important}#roadmap .rm-p span{white-space:normal;overflow-wrap:anywhere;line-height:1.1}#bf .pawnrow.bf-pw{gap:2px}.bfpc{max-width:none!important;flex:1 1 0}.bfpn{letter-spacing:-.02em;white-space:nowrap}}
+#coachb{z-index:42}
 @media (min-width:1024px){#moremenu button,#moremenu span,#moremenu b,#tutset *,#hlpset *{font-size:16px!important}}
 #coachb{position:fixed;left:10px;right:10px;top:142px;z-index:30;max-width:520px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:#fff6dc;color:#2a2014;border:2px solid #c99a3e;box-shadow:0 6px 18px rgba(0,0,0,.45);font:600 15px/1.3 var(--sans);pointer-events:none}
 #coachb[hidden]{display:none}#coachb .cn{font-weight:800;color:#7a3b12}#coachb .ct{flex:1 1 200px}#coachb ul{margin:4px 0 0 18px;padding:0;width:100%;font-weight:500;font-size:14px}
