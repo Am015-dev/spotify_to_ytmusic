@@ -290,6 +290,11 @@ R('base','Tiles in hand are kept hidden from the other players (the app shows ea
 R('base','Teams: teammates may not show each other their tiles (a table courtesy; the app hides hands).',null);
 R('exp-wave','The blue Rogue Wave marker tile sits on the board edge to show where the wave is heading (the app draws the wave directly).',null);
 
+S('L. Turn timing (found in the W498 playthrough)');
+R('base','A ship blocked by a leviathan at the start of its turn rolls first: if the leviathans move it away, the ship survives and plays.',()=>{
+  mk(3);rig({cur:0,tiles:[{x:4,y:3,id:1}],ships:[{x:2,y:0,e:0},{x:4,y:4,e:1,on:[4,3]},{x:5,y:3,e:2}],mons:[{id:0,x:4,y:4},...FILL],fill:false});
+  startTurn(1,[3,4,2,RDIE[7],RDIE[8],RDIE[9]]);eq(pos(mon(0)),[5,4],'the leviathan swam east');eq(ship(1).alive,true,'not sunk');eq([X.G.cur,X.G.step],[1,'act'],'its turn goes on')});
+
 if(process.argv.includes('--md')){
   const out=['# Tidewake rules checklist','','One numbered entry per rule of the original rulebook and its expansion, in our own words and names (current = wake tile, leviathan = monster, Rift Gate, Rogue Wave, Maelstrom, Deck Cannon). Every entry marked TEST has exactly one assertion in `logic-test.js` with the same number (`node logic-test.js`). Written from the rulebook text recorded in `rules-notes.md` and a web search; items the sources disagree on are listed at the end.','',
    'Source tags: base = base game, exp-gate / exp-wave / exp-mael / exp-cannon = the expansion pieces, variant = official variants.',''];

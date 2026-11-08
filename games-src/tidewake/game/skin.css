@@ -167,3 +167,6 @@ html.ph:has(.gxt-bub) #ps{padding-top:190px}
 /* result card: its buttons do not cover the captain list */
 html.ph #pc .row:has(>.btn[data-a=again]),html.ph #pc .row:has(>.btn.pri){position:static;box-shadow:none;margin:8px 0 0}
 @media (min-width:1024px){html.ph .gx-bar .gx-ibtn{flex-direction:row!important;gap:6px;min-height:40px}html.ph .gx-bar .gx-ibtn>span{margin-top:0!important;background:none!important}}
+
+/* the guided tutorial has 30+ steps: keep its progress dots clear of the Skip button */
+.gxt-top .gxt-prog{max-width:calc(100% - 132px);overflow:hidden;white-space:nowrap}
