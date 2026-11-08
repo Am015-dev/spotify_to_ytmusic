@@ -608,7 +608,7 @@ function pvRender() {
     for (let s = 0; s < G.np; s++) c.appendChild(pvChip(s, n)); if (G.grim) c.appendChild(pvChip('G', n));
     const sea = h('span.pvsea', { title: SEASN[me.season] }, seasonIcon(me.season, 30), h('b', SEASN[me.season])); c.appendChild(sea);
     hud.appendChild(c); }
-  { const r = h('div.resrow'), show = v >= 0 || watching();
+  { const r = h('div.resrow' + (me.pts ? '.r5' : '')), show = v >= 0 || watching();
     // each pile says what it is: icon, big number, and the word under it ("3 / twigs")
     for (const k of RESK) { const n = show ? me.res[k] : 0; r.appendChild(h('span.rs' + (show && me.res[k] ? '' : '.zero'), { 'data-res': k, title: rname(k, 2), 'aria-label': (show ? n : 'hidden') + ' ' + rname(k, n === 1 ? 1 : 2) }, ic(k, 24), h('b', show ? n : '?'), h('i.rsw', rname(k, n === 1 ? 1 : 2)))); }
     if (me.pts) r.appendChild(h('span.rs.tok', { 'data-res': 'ptok', title: 'point tokens' }, ic('point', 22), h('b', me.pts), h('i.rsw', me.pts === 1 ? 'token' : 'tokens')));
