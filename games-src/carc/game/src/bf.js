@@ -12,7 +12,7 @@ const human=()=>G&&G.pl.some(p=>p.human);
 const myTurn=step=>{if(!G||G.over||!G.cur)return false;const s=sideToAct();return s>=0&&P(s).human&&(!step||G.step===step)};
 const seatName=p=>p.human&&G.pl.filter(q=>q.human).length===1?'You':p.nm;
 function say(t,tn){const el=$('#status');const p=G&&G.cur&&!G.over?P(G.cur.p):null;el.style.setProperty('--c',p?PCOL[p.i]:'#e0a83a');
-  el.innerHTML=(tn?`<b class="tn"><i class="tdot"></i>${esc(tn)}</b>`:'')+`<span class="ins">${esc(t)}</span>`;el.classList.toggle('mine',myTurn())}
+  el.innerHTML=(tn?`<b class="tn"><i class="tdot"></i>${esc(tn)}</b>`:'')+`<span class="ins">${esc(t)}</span>`;el.classList.toggle('mine',myTurn());if(G)try{keepPops();layoutTags();layoutFlabs()}catch(e){}}
 // rival steps: a short caption per step (what it drew, where it put it, what it claimed, what it scored), shown ~1.4 s each
 function lastFig(){for(const e of G.log.slice(0,8)){const m=e.t.match(/^(.+?) sets a .*on the (\w+)\.$/);if(m)return {nm:m[1],ty:m[2],p:G.pl.findIndex(p=>p.nm===m[1])}}return null}
 function capSet(t,ms,score,intro){UI.capQ=UI.capQ||[];UI.capQ.push({t,ms:Math.round((ms||1500)/(UI.speed||1)),score:!!score,intro:!!intro});if(!UI.capCur)capNext()}
@@ -253,7 +253,7 @@ function layoutFlabs(){const fl=[...document.querySelectorAll('#ov .fglow')];if(
     for(const pos of ['b','t','r','l']){lb.dataset.pos=pos;const r=lb.getBoundingClientRect();if(r.left<bw.left+4||r.right>bw.right-4||r.bottom>bw.bottom-4||r.top<bw.top+4)continue;if(fixed.some(q=>rectHit(r,q,2))||taken.some(q=>rectHit(r,q,2))||spots.some(([o,q])=>o!==f&&rectHit(r,q,0)))continue;taken.push(r);ok=true;break}
     if(!ok){lb.dataset.pos='b';lb.classList.add('off')}}}
 // score pops never sit on the turn strip
-function keepPops(){const st=$('#status');if(!st||!st.offsetHeight)return;const sb0=st.getBoundingClientRect().bottom-boardEl().getBoundingClientRect().top+6;for(const e of $('#ov').querySelectorAll('.pop')){const o=e._o;if(!o)continue;const sb=sb0+e.offsetHeight/2;const [sx,sy]=toScreen(o.wx,o.wy);if(sy+o.dy<sb)e.style.transform=`translate(${sx+o.dx}px,${sb}px) translate(-50%,-50%)`}}
+function keepPops(){const st=$('#status');if(!st||!st.offsetHeight)return;const sb0=st.getBoundingClientRect().bottom-boardEl().getBoundingClientRect().top+6;for(const e of $('#ov').querySelectorAll('.pop')){const o=e._o;if(!o)continue;const sb=sb0+e.offsetHeight/2,hw=e.offsetWidth/2+6,W=boardEl().clientWidth;const [sx,sy]=toScreen(o.wx,o.wy);const x=Math.max(hw,Math.min(W-hw,sx+o.dx)),y=Math.max(sb,sy+o.dy);if(x!==sx+o.dx||y!==sy+o.dy)e.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`}}
 // ---------- boot ----------
 function boot(){UI.reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;initGestures();$('#menubtn').addEventListener('click',openMenu);{const rc=document.createElement('button');rc.id='recentre';rc.type='button';rc.setAttribute('aria-label','Recentre the view');rc.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="currentColor" stroke-width="2.4"/></svg><span>Recentre</span>';rc.addEventListener('click',recentre);boardEl().appendChild(rc)}
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();if((e.key==='r'||e.key==='R')&&myTurn('place'))rotate()});

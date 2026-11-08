@@ -174,7 +174,7 @@ body:has(#modal .scrim) #recentre{display:none}
 #hplace{border:0;border-radius:999px;background:var(--terra,#b5532f);color:#fff8ec;font:800 17px var(--ff);padding:13px 22px;min-height:48px;box-shadow:0 3px 0 #7d3418,0 0 0 3px #ffd99a;white-space:nowrap}
 #hand.hassel .hname{display:none}
 #sheet{position:relative;z-index:8;padding:0}
-#sheet .sbtn{display:flex;width:100%;align-items:center;justify-content:space-between;gap:6px;padding:5px 10px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;flex-wrap:nowrap;overflow:hidden}
+#sheet .sbtn{display:flex;width:100%;min-height:40px;align-items:center;justify-content:space-between;gap:6px;padding:5px 10px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;flex-wrap:nowrap;overflow:hidden}
 #sheet .sc{font-size:14px;gap:3px}
 #sheet .schip{flex:0 0 auto;font:800 14px/1.2 var(--ff);padding:2px 6px;border-radius:7px;border:1.5px solid #8a6a40;color:#ffe2a6;white-space:nowrap}
 #sheet .schip em{font-style:normal;margin-left:3px}
@@ -183,4 +183,6 @@ body:has(#modal .scrim) #recentre{display:none}
 @media(max-width:380px){#sheet .sbtn{padding:5px 8px;gap:4px}#sheet .sc{gap:2px}}
 @media(min-width:1024px){#sheet .sc,#sheet .schip,#sheet .srate,#recentre{font-size:16px}}
 body:has(#menu) #sheet{visibility:hidden}
-body:has(.gxh-bub) #recentre,body:has(#coach .cbub:not([hidden])) #recentre{bottom:auto;top:76px}
+body:has(#coach .cbub:not([hidden])) #recentre{bottom:auto;top:76px}
+body:has(.gxh-bub) #recentre{visibility:hidden}
+@media(max-width:699px){.pop{transition:opacity .85s}}
