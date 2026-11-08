@@ -118,7 +118,7 @@ function hlpWhy(m, v) {
   const val = m.d === 'p' ? G.pend.d.val : G.dice[v][m.d].v, S = FA.SLOT[m.to], o = 1 - v;
   switch (S.grp) {
     case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return n ? 'A ' + val + ' on the radio clears the plane on ' + (at === G.planes.length ? 'the airport' : 'space ' + at) + '.' : 'The radio clears nothing here: this just uses up a spare die.'; }
-    case 'axis': { const x = G.slots['ax' + o]; if (x) { const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); return 'Axis ' + val + ' against ' + x.v + ': the plane ends ' + (nx === 0 ? 'level' : 'tilted ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right')) + '.'; } return 'The Axis goes first: a middle value leaves the most room.'; }
+    case 'axis': { const x = G.slots['ax' + o]; if (x) { const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); return 'Axis ' + val + ' against ' + x.v + ': the plane ends ' + (nx === 0 ? 'level' : 'tilted ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right')) + '.'; } return 'Your partner\'s axis die decides the tilt.'; }
     case 'engines': { const x = G.slots['en' + o]; if (x) { const sm = val + x.v + FA.windMod(G); if (FA.isFinal(G)) return 'Landing speed ' + sm + ' against brakes ' + FA.brakeVal(G) + '.'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Engines total ' + sm + ': the plane ' + (adv ? 'moves ' + adv + (adv > 1 ? ' spaces' : ' space') : 'stays put') + '.'; } return 'Engines: you set half the speed, your partner adds the rest.'; }
     case 'gear': return 'Lowers a landing gear. All three must be down to land.';
     case 'flaps': return 'Extends a flap. All four must be out to land.';
@@ -165,6 +165,6 @@ setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
 function hintsSync() { const b = $('#bulbbtn'); if (!b) return; const on = !!UI.prefs.hints; b.classList.toggle('hon', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', on ? 'Hints on (tap to turn off)' : 'Hints off (tap to turn on)'); b.title = on ? 'Hints on' : 'Hints off'; }
 document.addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('#bulbbtn'); if (b) { e.stopPropagation(); e.preventDefault(); UI.prefs.hints = !UI.prefs.hints; savePrefs(); UI.cpt = null; UI.askWhy = null; hintsSync(); if (G && UI.started) render(); return; }
-  const a = e.target.closest && e.target.closest('[data-a=ask]'); if (a) { e.stopPropagation(); e.preventDefault(); const p = hlpPlan(); if (p && p.m) { UI.cpt = p.m.t === 'place' ? { k: p.m.to, d: p.m.d } : null; UI.askWhy = (p.m.t === 'place' ? 'Try your ' + (p.m.d === 'p' ? '' : G.dice[actSeat()][p.m.d].v + ' on ') + slotName(p.m.to) + ': ' : '') + p.why; } else UI.askWhy = 'No clear best move: any glowing space works.'; render(); }
+  const a = e.target.closest && e.target.closest('[data-a=ask]'); if (a) { e.stopPropagation(); e.preventDefault(); const p = hlpPlan(); if (p && p.m) { UI.cpt = p.m.t === 'place' ? { k: p.m.to, d: p.m.d } : null; UI.askWhy = (p.m.t === 'place' ? 'Try your ' + (p.m.d === 'p' ? '' : G.dice[actSeat()][p.m.d].v + ' on ') + slotName(p.m.to) + ': ' : '') + p.why; } else UI.askWhy = null; render(); }
 }, true);
 setTimeout(hintsSync, 300);
