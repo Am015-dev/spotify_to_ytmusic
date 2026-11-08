@@ -12,22 +12,36 @@ function q() { return G && G.q; }
 function toast(t, ms) { var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
 function aMs(ms) { if (UI.fast) return 0; var sp = UI.speed || 1; try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
 function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodIcon('any'); var p = s.split('|'); return p.length > 1 ? p.map(function (f) { return foodIcon(f); }).join('<i>/</i>') : foodIcon(s); }).join(b.c.some(function (s) { return s.indexOf('|') >= 0; }) ? '' : '<i>+</i>'); }
-// a bird card: size 'slot' (on the board: picture, points, eggs/cache/tuck) | 'hand' (name, cost, habitats) | 'tray'
+// a bird card: size 'slot' (on the board: picture, points, eggs) | 'tray' (picture + points) | 'hand' / 'big' (the readable card:
+// big picture, name, points in large type, habitat band with words, food cost as at most 3 icons with words, power in one sentence)
+function costItems(b) {
+  return b.c.slice(0, 3).map(function (s) {
+    if (s === '*') return '<span class="ci">' + foodIcon('any') + '<small>any</small></span>';
+    var p = s.split('|');
+    return p.length > 1 ? '<span class="ci or">' + p.map(function (f) { return foodIcon(f); }).join('') + '<small>' + p.map(function (f) { return FOODW[f] || f; }).join(' or ') + '</small></span>' : '<span class="ci">' + foodIcon(s) + '<small>' + (FOODW[s] || s) + '</small></span>';
+  }).join('') + (b.c.length > 3 ? '<span class="ci more">+' + (b.c.length - 3) + '</span>' : '');
+}
+function bigCardHTML(id, attrs, extra, cls) {
+  var b = B[id], sp = shortPower(id), habs = b.h.split('');
+  var h = '<div class="bc big ' + (cls || '') + '" ' + (attrs || '') + ' aria-label="' + esc(b.n + ', ' + b.p + ' points, ' + sp.when + ': ' + sp.txt) + '">';
+  h += '<div class="bk-pic">' + artHTML('bird-' + id) + '<span class="vpb"><b>' + b.p + '</b><small>' + (b.p === 1 ? 'point' : 'points') + '</small></span></div>';
+  h += '<div class="bk-body"><div class="bk-hab">' + habs.map(function (x) { return '<span class="hb h' + x + '">' + HABW[x] + '</span>'; }).join('') + '</div>';
+  h += '<div class="bk-nm">' + esc(b.n) + '</div>';
+  h += '<div class="bk-cost">' + (b.c.length ? costItems(b) : '<span class="ci free">Free</span>') + '</div>';
+  h += '<div class="bk-pw ' + (sp.col || 'none') + '">' + (sp.when ? '<b>' + sp.when + ':</b> ' : '') + esc(sp.txt) + '</div>';
+  return h + (extra || '') + '</div></div>';
+}
 function cardHTML(id, size, st, attrs) {
+  if (size === 'hand' || size === 'big') return bigCardHTML(id, attrs);
   var b = B[id], pw = PP.power(id), col = pw.col || 'none';
-  var h = '<div class="bc ' + (size === 'slot' ? 'on-board' : '') + '" ' + (attrs || '') + ' aria-label="' + esc(b.n + ', ' + b.p + ' points') + '">';
-  h += '<div class="pic">' + artHTML('bird-' + id) + '<span class="hband">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + '</span><span class="vp">' + b.p + '</span></div><div class="pwbar ' + col + '"></div>';
-  if (size === 'slot') {
+  var h = '<div class="bc ' + (size === 'slot' ? 'on-board' : 'mini') + '" ' + (attrs || '') + ' aria-label="' + esc(b.n + ', ' + b.p + ' points') + '">';
+  h += '<div class="pic">' + artHTML('bird-' + id) + '<span class="hband">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + '</span><span class="vp">' + b.p + '</span></div>';
+  if (size === 'slot' && st && (st.eggs || st.cache || st.tuck)) {
     h += '<div class="meta">';
-    if (st && st.eggs) h += eggIcon() + '<b>' + st.eggs + '</b>';
-    else h += '<span style="opacity:.6">' + nestIcon(b.nest) + '</span>';
-    if (st && st.cache) h += '<span class="tk" title="cached food">+' + st.cache + '</span>';
-    if (st && st.tuck) h += '<span class="tk" title="tucked cards">' + st.tuck + '▤</span>';
+    if (st.eggs) h += '<span class="mt">' + eggIcon() + '<b>' + st.eggs + '</b></span>';
+    if (st.cache) h += '<span class="mt" title="stored food">' + foodIcon('any') + '<b>' + st.cache + '</b></span>';
+    if (st.tuck) h += '<span class="mt" title="tucked cards">&#9636;<b>' + st.tuck + '</b></span>';
     h += '</div>';
-  } else if (size === 'tray') {
-    h += '';
-  } else {
-    h += '<div class="nm">' + esc(b.n) + '</div><div class="cost">' + costHTML(b) + '</div>' + (size === 'hand' ? '<div class="pwt ' + col + '">' + esc(pw.txt || 'No power.') + '</div>' : '') + '<div class="habs">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + nestIcon(b.nest) + '</div>';
   }
   return h + '</div>';
 }
@@ -35,9 +49,10 @@ function cardHTML(id, size, st, attrs) {
 function render() {
   if (!G) return;
   var vs = UI.view, p = G.pl[vs], cur = PP.sideToAct(G);
-  $('#barstat').textContent = G.phase === 'over' ? 'Final' : 'Round ' + (G.round + 1) + '/' + G.rounds;
+  $('#barstat').textContent = '';
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
   glow();
+  try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
   try { coachState(); } catch (e) { }
 }
@@ -58,15 +73,8 @@ function renderGoalbar() {
   el.innerHTML = '<span class="gk">Goal</span><span class="gt">' + esc(r.label) + ': <b>' + esc(r.cur) + '</b></span><span class="gm">' + (r.met ? '\u2713 met' : '') + '</span>';
   el.setAttribute('aria-label', 'Chapter goal. ' + r.label + ': ' + r.cur + (r.met ? ', met' : ''));
 }
-function renderOpps(cur) {
-  var h = '';
-  G.pl.forEach(function (p, i) {
-    if (i === UI.view) return;
-    var sc = PP.scoreOf(G, i).total;
-    h += '<button type="button" class="opp' + (i === cur && G.phase !== 'over' ? ' cur' : '') + '" data-a="opp" data-s="' + i + '" aria-label="' + esc(p.name) + ': ' + sc + ' points, ' + p.cubes + ' actions left">' +
-      '<span class="pt">' + portraitHTML(p.face || 'p' + i) + '</span><span><b>' + esc(p.name) + '</b> ' + sc + ' pts · ' + p.cubes + ' left</span></button>';
-  });
-  $('#opps').innerHTML = h || '<span style="color:#f6eedb;font-size:var(--fs);align-self:center;opacity:.8">Solo year: beat your best score</span>';
+function renderOpps(cur) {   // the always-visible score breakdown: every player, leader marked
+  $('#opps').innerHTML = scoreHTML();
 }
 function portraitHTML(face) { var st = 'portrait-' + face; return ART.items[st] ? artHTML(st) : '<span class="art ph">' + placeholder('portrait-' + face) + '</span>'; }
 function renderMid() {
@@ -96,15 +104,34 @@ function renderMat(p, vs) {
 }
 function renderDock(p, vs, cur) {
   var Q = G.q, mine = myTurn();
-  var who = G.phase === 'over' ? 'Game over' : 'Round ' + (G.round + 1) + ' of ' + G.rounds + ' · ' + (isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name : 'you') : G.pl[cur].name) + ' · ' + G.pl[cur].cubes + (G.pl[cur].cubes === 1 ? ' action left' : ' actions left');
-  if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = 'Round ' + (G.round + 1) + ' of ' + G.rounds + ' · ' + (UI.animSeat === UI.view && humans().length === 1 ? 'your birds are firing' : G.pl[UI.animSeat].name + ' is playing');
+  var who = G.phase === 'over' ? 'Game over' : isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name + "'s turn" : 'Your turn') : G.pl[cur].name + "'s turn";
+  if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = UI.animSeat === UI.view && humans().length === 1 ? 'Your birds are working' : G.pl[UI.animSeat].name + ' is playing';
   $('#dt').textContent = who;
+  $('#trk').innerHTML = trackerHTML();
+  if (!mine || Q) UI.pickBird = false;
+  var idle = mine && !Q && UI.sel == null && !UI.pend && UI.gsDie == null && !UI.pickBird;
+  document.body.classList.toggle('picking', !!(mine && !Q && (UI.pickBird || UI.sel != null)));
   $('#prompt').textContent = promptText(mine);
-  $('#acts').innerHTML = mine ? actsHTML() : '';
-  $('#foodrow').innerHTML = PP.FOODS.map(function (f) { return '<span class="fd' + (p.food[f] ? '' : ' zero') + '" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<span data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</span><small>' + f + '</small></span>'; }).join('') +
-    '<span class="fd" aria-label="bonus cards">★ ' + p.bonus.length + ' bonus</span>';
-  var ok = {}; if (mine && !Q) PP.playable(G, vs).forEach(function (x) { ok[x.i] = 1; });
-  $('#hand').innerHTML = p.hand.length ? p.hand.map(function (id, i) { return cardHTML(id, 'hand', null, 'data-a="hand" data-i="' + i + '" role="button" tabindex="0"').replace('class="bc ', 'class="bc' + (UI.sel === i ? ' sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + ' '); }).join('') : '<span class="empty">No birds in hand. Draw cards in the wetland.</span>';
+  $('#acts').innerHTML = mine ? (idle ? act4HTML() : actsHTML()) : '';
+  var have = PP.FOODS.filter(function (f) { return p.food[f]; });
+  $('#foodrow').innerHTML = '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
+    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : '');
+  var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
+  var bp = mine && !Q ? bestPlay(G, vs) : null;
+  var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
+  $('#hand').innerHTML = p.hand.length ? p.hand.map(function (id, i) {
+    var b = B[id], st;
+    if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
+    else if (!mine) st = '';
+    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points')) + '</div>';
+    else if (!Q) st = '<div class="bk-st no">' + esc(whyCant(id)) + '</div>';
+    else st = '';
+    var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');
+    return bigCardHTML(id, 'data-a="hand" data-i="' + i + '" role="button" tabindex="0"', (bp && bp.i === i ? '<em class="bestb">Best</em>' : '') + st, cls);
+  }).join('') : '<span class="empty">No birds in hand. Use Draw birds to get some.</span>';
+  if (UI.hix == null || UI.hix >= p.hand.length) UI.hix = 0;
+  handScrollSync(); handPager();
+  var hc = $('#hand').querySelectorAll('.bc')[UI.hix]; if (hc) $('#hand').scrollLeft = hc.offsetLeft - $('#hand').offsetLeft - 6;
 }
 function promptText(mine) {
   if (!G) return '';
@@ -115,7 +142,7 @@ function promptText(mine) {
   var Q = G.q;
   if (UI.pend) return 'Play ' + B[G.pl[UI.view].hand[UI.pend.i]].n + '?';
   if (UI.gsDie != null) return 'Grub or seed?';
-  if (!Q) return UI.sel != null ? 'Tap the glowing space in a row to put this bird there.' : 'Tap a glowing row button (food, eggs or cards), or a glowing bird in your hand.';
+  if (!Q) return UI.sel != null ? 'Tap the glowing space on your board.' : UI.pickBird ? 'Pick a glowing bird below.' : 'Choose one action:';
   var n = Q.d && Q.d.n;
   switch (Q.h) {
     case 'die': return 'Tap a glowing food die in the feeder to take it (' + n + ' left).';
@@ -139,7 +166,7 @@ function actsHTML() {
       (inf.pays.length > 1 ? '<button type="button" class="btn" data-a="paycycle">Other food</button>' : '') + '<button type="button" class="btn" data-a="cancel">Cancel</button>';
   }
   if (UI.gsDie != null) return mvBtn({ t: 'die', i: UI.gsDie, f: 'grub' }, foodIcon('grub') + 'Grub') + mvBtn({ t: 'die', i: UI.gsDie, f: 'seed' }, foodIcon('seed') + 'Seed') + '<button type="button" class="btn" data-a="cancel">Back</button>';
-  if (!Q) return UI.sel != null ? '<button type="button" class="btn" data-a="cancel">Cancel</button><button type="button" class="btn" data-a="zoom" data-i="' + UI.sel + '">Read card</button>' : '';
+  if (!Q) return '<button type="button" class="btn" data-a="cancel">Back</button>' + (UI.sel != null ? '<button type="button" class="btn" data-a="zoom" data-i="' + UI.sel + '">Read card</button>' : '');
   switch (Q.h) {
     case 'die': return PP.allSame(G) ? mvBtn({ t: 'reroll' }, 'Reroll the feeder') : '';
     case 'bonus': return Q.d.kind === 'food' ? PP.FOODS.filter(function (f) { return p.food[f]; }).map(function (f) { return mvBtn({ t: 'bonus', yes: true, f: f }, 'Pay ' + foodIcon(f)); }).join('') + mvBtn({ t: 'bonus', yes: false }, 'No thanks') : mvBtn({ t: 'bonus', yes: false }, 'No thanks');
@@ -158,7 +185,7 @@ function glow() {
   if (UI.pend || UI.gsDie != null) return;
   if (!Q) {
     if (UI.sel != null) { var id = p.hand[UI.sel]; [0, 1, 2].forEach(function (h) { if (PP.playInfo(G, UI.view, id, h)) add('.row[data-h="' + h + '"] .slot.next'); }); return; }
-    add('.ract');
+    if (!UI.pickBird) add('.ract');
     PP.playable(G, UI.view).forEach(function (x) { add('#hand .bc[data-i="' + x.i + '"]'); });
     return;
   }
@@ -177,13 +204,11 @@ function fitMat() {   // slots keep a card-like shape: width from the row height
   var rh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rh')) || 64, rowH = (m.clientHeight - 8) / 3, w = (m.clientWidth - rh - 30) / 5;
   m.style.setProperty('--sw', Math.max(40, Math.floor(Math.min(w, rowH * .78))) + 'px');
 }
-// big card view
+// big card view (tap to inspect): the same readable card, larger, plus nest and egg facts
 function showCard(id, st, extra) { hideHelp();
-  var b = B[id], pw = PP.power(id), el = $('#pop');
-  el.innerHTML = '<div class="card" role="dialog" aria-label="' + esc(b.n) + '"><div class="bigpic">' + artHTML('bird-' + id) + '</div><h3>' + esc(b.n) + '</h3>' +
-    '<div class="facts"><b>' + b.p + ' points</b><span>Cost: ' + costHTML(b) + '</span><span>' + nestIcon(b.nest) + ' ' + b.nest + ' nest, holds ' + b.e + ' eggs</span><span>Wings ' + b.ws + ' cm across</span><span>Lives in: ' + b.h.split('').map(function (x) { return HABN['FGW'.indexOf(x)]; }).join(', ') + '</span></div>' +
-    '<div class="pw ' + (pw.col || 'none') + '"><b>' + (pw.col === 'brown' ? 'When activated (brown): ' : pw.col === 'pink' ? 'Between turns (pink): ' : pw.col === 'white' ? '' : '') + '</b>' + esc(pw.txt) + '</div>' +
-    (st ? '<div class="facts">' + (st.eggs ? st.eggs + ' egg' + (st.eggs > 1 ? 's' : '') + ' · ' : '') + (st.cache ? st.cache + ' cached food · ' : '') + (st.tuck ? st.tuck + ' tucked cards' : '') + '</div>' : '') +
+  var b = B[id], el = $('#pop');
+  var facts = '<div class="facts"><span>' + nestIcon(b.nest) + ' Nest holds ' + b.e + ' eggs</span>' + (st ? '<span>' + (st.eggs || 0) + ' egg' + (st.eggs === 1 ? '' : 's') + ' on it' + (st.cache ? ' · ' + st.cache + ' stored food' : '') + (st.tuck ? ' · ' + st.tuck + ' tucked' : '') + '</span>' : '') + '</div>';
+  el.innerHTML = '<div class="card" role="dialog" aria-label="' + esc(b.n) + '">' + bigCardHTML(id, '', facts, 'insp') +
     '<div class="acts">' + (extra || '') + '<button type="button" class="btn pri" data-a="popx">Close</button></div></div>';
   el.hidden = false;
 }
