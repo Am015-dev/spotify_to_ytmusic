@@ -151,7 +151,7 @@ function schedule(){if(isClient()||UI.aiT||!G||G.over||UI.pause||!UI.started||ai
   UI.aiT=setTimeout(()=>{UI.aiT=null;if(!G||G.over||UI.pause)return;if(UI.sel&&UI.sel.off){schedule();return}
     let st=null;try{st=aiStep()}catch(e){console.error(e);return}if(!st)return;if(isHuman(st.seat))return;
     const go=()=>{UI.aiT=null;if(!G||G.over||UI.pause)return;if(legal(st.m,st.seat)){refresh();return}applyMove(st.m,st.seat)};
-    if(ANIM&&st.m.a==='dual'){try{announce(st.m,st.seat)}catch(e){}UI.aiT=setTimeout(go,620/UI.speed)}else go()},d)}
+    if(ANIM&&st.m.a==='dual'){try{announce(st.m,st.seat)}catch(e){}UI.aiT=setTimeout(go,1000/UI.speed)}else go()},d)}
 // ---------- the real-time clock (timed jobs) ----------
 function timedJob(){return !!(G&&UI.rt)}
 function clockLeft(K){const ms=K.ms;if(ms.timer)return {left:ms.timer.show,real:ms.timer.left,label:'Clock'};if(ms.redTide)return {left:ms.redTide.left,real:ms.redTide.left,label:'Air'};
