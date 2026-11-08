@@ -73,7 +73,7 @@ function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=cur
     if(UI.tileSel!=null)h+=tileFocusHtml(UI.tileSel);
     h+=`<h4>All jobs</h4><div class="cats">${CATS.filter(([kk])=>kk!=='special'||Object.keys(SC().specials||{}).length||G.kept.m_tmap).map(([kk,ic,n])=>{const c=catCount(kk);return `<button class="cat ${UI.cat===kk?'on':''}" data-cat="${kk}" ${c?'':'aria-disabled="true"'}><span class="ai" data-a="${kk}">${ic}</span>${n}<small>${c?c+' possible':'none now'}</small></button>`}).join('')}</div>`;
     if(UI.cat)h+=`<div class="catbody">${catHtml(UI.cat)}</div>`}
-  h+=`<p class="hint">One pawn on a job rolls the dice: it can fail or hurt. A second pawn on the same job makes it certain. Places two steps from camp need one more pawn.</p>`;
+  h+=`<p class="hint">One pawn on a job rolls the dice. It can fail or hurt. A second pawn on the same job makes it certain. Places two steps from camp need one more pawn.</p>`;
   return h+planSoFar()}
 function planSoFar(){if(!G.plan.acts.length)return '';return `<details class="sofar" ${UI.ps.sofar?'open':''}><summary data-a="sofar">The plan so far (${G.plan.acts.length} job${G.plan.acts.length>1?'s':''})</summary><div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div></details>`}
 // ---------- step 3: every job with its risk ----------

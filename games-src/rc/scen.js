@@ -1,11 +1,11 @@
 // ---------- scenarios: goals, book and totem effects, special actions (the rules of scenario sheets 1, 2, 3 and 6) ----------
 // extra scenario data (sheets 3 and 6); 1 and 2 live in data.js
-SCENARIOS.stranded={ref:'scen-3-jenny',n:'Stranded Friend',no:3,rounds:8,x:'Your shipmate Ada is stuck on a rock off the coast. Build the Rescue Raft, row out to bring her back (an explore action), then build the Lifeboat. Do both to win. If Ada dies, you lose.',
+SCENARIOS.stranded={ref:'scen-3-jenny',n:'Stranded Friend',no:3,rounds:8,x:'Your shipmate Ada is stuck on a rock off the coast. Build the Rescue Raft. Row out and bring her back (an explore job). Then build the Lifeboat. Do both to win. If Ada dies, you lose.',
   wx:{5:['animals'],6:['animals'],7:['animals'],8:['animals']},
   finds:[{n:'Soothing Herbs',x:'Heal 1 wound.',ops:[['heal','choose',1]]},{n:'Ruined Hut',x:'Gain 2 wood.',ops:[['res','wood',2]]},{n:'Old Pistol',x:'+3 weapon for one fight.',ops:[['keep','sc_pistol']]},{n:'Tough Vines',x:'Palisade +1.',ops:[['pal',1,'shelter']]}],
-  invs:{jraft:{n:'Rescue Raft',kind:'scen',it:['rope'],r:{wood:2},x:'Lets you row out to rescue Ada (an explore action; a "?" means a wound, not an adventure).'},lifeboat:{n:'Lifeboat',kind:'scen',it:['rope','knife'],r:{wood:6,fur:4},x:'With Ada back in camp, you sail away and win.'}},
+  invs:{jraft:{n:'Rescue Raft',kind:'scen',it:['rope'],r:{wood:2},x:'Lets you row out to rescue Ada (an explore job). A "?" means a wound, not an adventure.'},lifeboat:{n:'Lifeboat',kind:'scen',it:['rope','knife'],r:{wood:6,fur:4},x:'With Ada back in camp, you sail away and win.'}},
   book:'storm',totem:'stranded'};
-SCENARIOS.settlers={ref:'scen-6-settlers',n:'Settlers',no:6,rounds:12,normals:9,x:'No rescue is coming, so make a home. Build a shelter, get roof, palisade and weapon to 1 or more, and make all 9 inventions dealt at the start. Children arrive in rounds 7, 9 and 11: each eats 1 food a night, and if a child goes hungry you lose.',
+SCENARIOS.settlers={ref:'scen-6-settlers',n:'Settlers',no:6,rounds:12,normals:9,x:'No rescue is coming, so make a home. Build a shelter. Get roof, palisade and weapon to 1 or more. Make all 9 starting inventions. Children arrive on days 7, 9 and 11. Each eats 1 food a night. If a child goes hungry, you lose.',
   wx:{3:['rain'],4:['rain'],5:['snow'],6:['snow'],7:['rain','animals'],8:['rain','animals'],9:['snow','animals'],10:['snow','animals'],11:['rain','animals'],12:['rain','animals']},wxFood:{7:1,8:1,9:2,10:2,11:3,12:3},
   finds:[{n:'Gunpowder',x:'Reroll the hungry-animals die once.',ops:[['keep','sc_powder']]},{n:'Seeds',x:'Gain 1 dry food.',ops:[['res','pfood',1]]},{n:'Old Tools',x:'Make Rope, Pot or Knife for free.',ops:[['buildFree',['rope','pot','knife']]]},{n:'Plough',x:'Remove 1 black marker from the island.',ops:[['unexhaust','any']]}],
   invs:{fence:{n:'Fence',kind:'scen',it:['shovel'],x:'Palisade +1.'},garden:{n:'Garden',kind:'scen',it:['shovel'],r:{food:2},x:'Gain 4 food.'}},
@@ -16,7 +16,7 @@ const PILE_CUM=[1,3,6,10,15];
 const SCEN={
  marooned:{
   setup(){G.sc={pile:0,stageRound:0}},
-  goal(){return `Fire ${has('fire')?'✓':'✗'} · signal pile ${G.sc.pile}/15 · rescue possible in rounds 10–12`},
+  goal(){return `Fire ${has('fire')?'✓':'✗'}. Signal pile ${G.sc.pile}/15. Rescue on day 10 to 12.`},
   pileRoom(){if(G.sc.pile>=15||G.sc.stageRound===G.round||G.phase!=='plan')return 0;const s=PILE_CUM.findIndex(c=>c>G.sc.pile);return PILE_CUM[s]-G.sc.pile},
   pileAdd(n){const room=this.pileRoom();const free=G.res.wood-committed().wood;n=Math.min(n,room,free);if(n<=0)return false;G.res.wood-=n;G.sc.pile+=n;if(PILE_CUM.includes(G.sc.pile))G.sc.stageRound=G.round;lg(`${n} wood goes onto the signal pile (${G.sc.pile}/15).`,'good');fx('build');return true},
   pileWood(n){G.sc.pile=Math.min(15,G.sc.pile+n);lg(`+${n} wood straight onto the signal pile (${G.sc.pile}/15).`,'good')},
