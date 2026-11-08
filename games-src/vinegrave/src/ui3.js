@@ -148,12 +148,13 @@ function refInit() {
     { id: 'arts', title: 'Artifacts', items: V.ARTS.map(cardItem) },
     { id: 'basic', title: 'Starting cards', items: ['grant', 'trail', 'dread'].map(cardItem) },
     { id: 'guards', title: 'Guardians', items: V.GUARDS.map(g => ({ id: 'g-' + g, name: V.GUARD[g].name, text: 'Overcome: pay ' + V.resText(V.GUARD[g].cost) + '. ' + V.GUARD[g].text, tags: ['Guardian'], meta: '5 points', pic: { guard: g } })) },
+    { id: 'assistants', title: 'Assistants', items: V.ASST.map(a => ({ id: a.id, name: a.name, text: 'Once a round, free: ' + V.opText(a.s) + '. Gold side: ' + V.opText(a.gd) + '.', tags: ['Research rows ' + V.ASST_ROWS.join(' and ')] })) },
     { id: 'ruins', title: 'Ruins', items: V.S1.concat(V.S2).map(t => ({ id: 's-' + t, name: V.SITE[t].name, text: 'Dig: gain ' + V.resText(V.SITE[t].rew) + '.', tags: ['Level ' + V.SITE[t].lvl], meta: 'Discover for ' + V.DISC[V.SITE[t].lvl] + ' compasses', pic: { site: t } })) },
     { id: 'camp', title: 'Camp sites', items: V.CAMP.map(c => ({ id: 's-' + c.id, name: c.name, text: 'Dig: gain ' + V.resText(c.rew) + '. Travel: ' + c.cost.map(t => V.TNAME[t]).join(' + ') + '.', tags: ['Camp'], meta: 'always open', pic: { site: c.id } })) },
     { id: 'idols', title: 'Idols', items: V.IDOLS.map(i => ({ id: 'i-' + i, name: V.IDOL[i].name, text: 'Found when you discover a ruin: gain ' + V.resText(V.IDOL[i].gift) + '. Worth 3 points.', tags: ['Idol'], meta: '3 points', pic: { idol: i } })) }
   ];
   GX.reference(S, { id: 'refd', title: 'All cards', label: 'Cards', button: false,
-    picture: (it, big) => { const w = big ? 150 : 52, P = it.pic;
+    picture: (it, big) => { const w = big ? 150 : 52, P = it.pic; if (!P) return null;
       if (P.card) return `<div style="width:${w}px;--cw:${w}px">${cardHTML(P.card, {})}</div>`;
       const st = P.guard ? 'guard-' + P.guard : P.site ? 'site-' + P.site : P.idol, sym = P.guard ? 'guard' : P.site ? 'leaf' : 'idol';
       const d = document.createElement('div'); d.style.cssText = `width:${w}px;height:${w}px;border-radius:12px;background:#3c5a3f;display:flex;align-items:center;justify-content:center`; d.setAttribute('data-art', st);
@@ -189,7 +190,7 @@ function helpPhase() {
 function moveTarget(m) {
   if (!m) return null;
   if (m.t === 'play') return $(`#hand .cd[data-i="${m.i}"]`); if (m.s != null) return $(`.site[data-i="${m.s}"]`); if (m.t === 'buy') return $(`#row .cd[data-r="${m.r}"]`);
-  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return $(`#extra [data-a=guard][data-k="${m.k}"]`); if (m.t === 'idol') return $(`#extra [data-a=idol][data-k="${m.k}"]`);
+  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return $(`#extra [data-a=guard][data-k="${m.k}"]`); if (m.t === 'idol') return $(`#extra [data-a=idol][data-k="${m.k}"]`); if (m.t === 'asst') return $(`#extra [data-a=asst][data-k="${m.k}"]`);
   if (m.t === 'ans') { if (G.q.h === 'site' && m.v != null) return $(`.site[data-i="${m.v}"]`); if (G.q.h === 'buy' && m.v != null) return $(`#row .cd[data-r="${m.v}"]`); return $('#qbox'); }
   return null;
 }

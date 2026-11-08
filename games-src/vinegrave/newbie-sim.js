@@ -7,7 +7,7 @@ const N = +process.argv[2] || 200;
 const pri = { beat: 0, disc: 1, dig: 2, play: 3, buy: 4, res: 5, temple: 5 };
 function glow(G) { const ms = VG.moves(G); if (G.q) return ms[0]; for (const t of ['dig', 'disc', 'play', 'buy', 'res', 'temple']) { const m = ms.find(x => x.t === t); if (m) return m; } return ms.find(m => m.t === 'pass'); }
 function sensible(G) { const ms = VG.moves(G); if (G.q) return ms[0]; const p = G.p[VG.actor(G)];
-  const free = ms.find(m => m.t === 'boon' || m.t === 'idol'); if (free) return free;
+  const free = ms.find(m => m.t === 'boon' || m.t === 'idol' || m.t === 'asst'); if (free) return free;
   const main = ms.filter(m => !m.free && m.t !== 'pass');
   if (!main.length) return ms.find(m => m.t === 'pass');
   main.sort((a, b) => (pri[a.t] - pri[b.t]) || (a.t === 'buy' ? V.CARDS[G.row[b.r]].cost - V.CARDS[G.row[a.r]].cost : 0));

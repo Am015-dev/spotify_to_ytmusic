@@ -28,7 +28,12 @@ plane with coins buying planes, fear cards from guardians, idols with slots, res
 of items/artifacts shifting each round, artifacts free when bought and costing a tablet from hand, item to the bottom of the deck.
 Guessed / our own numbers: every card, site, guardian, idol and track value; starting resources; idol slot scoring (3 vs 1);
 temple tile costs; the rival deck. Counts match the box roughly: 35 items, 35 artifacts, 15 guardians, 10 level-1 and 8 level-2 sites.
-Left out: expansions, the alternate board side, assistants on the research track.
+Left out: expansions, the alternate board side.
+Research assistants (FIXED2 r2, logic-test L1-L10): 8 helpers, 3 face up. Your magnifier arriving on row 2 or 5 hires one (silver side);
+your notebook arriving there turns one gold (stronger). Each works once a round as a free action, then rests until round end. At most 2:
+a third hire becomes an upgrade. Our own: the 8 abilities, the rows, the limit of 2 (guessed against the box).
+Still missing from the published base game: free-action (lightning) cards, guardian boons that pay travel, temple bonus tiles, blocking
+tiles, the alternate board side, exile from the play area (H4), and box counts (6 deep ruins, 16 idols, 40 items; we have 8/12/35).
 
 ## Cross-check against the published rulebook (web, 7 Nov 2026)
 Checked against a rulebook summary page found online (no rulebook text or art copied; numbers re-expressed). Fixed to match:
@@ -40,7 +45,7 @@ useful), Dread for each explorer taken back from a guardian's site, guardians 5 
 to the play area with a free use, artifacts from hand cost their tablet, 2 Dread in each starting deck.
 Now built: first-arrival research rewards (only the first magnifier on rows 2, 4, 6, 7; every arrival still gets the row bonus) and the
 19-card Dread supply (exiled Dread returns to it; when empty, a fear tile worth -2). Still our own: exact travel/discover costs, empty-slot
-values, the reward amounts, assistants (left out), and every card's numbers.
+values, the reward amounts, assistant abilities, and every card's numbers.
 No open-source implementation of this game exists (searched GitHub and the web), so no code or data was ported; THIRD-PARTY.md is not needed.
 Sources (facts only, nothing copied): rulespal.com rulebook summary (start resources, idols, temple, market, tie-break, Fear supply).
 Card COUNTS kept at the box's scale (35 items / 35 artifacts / 15 guardians / 16 site tiles split 10+8 here vs the box's mix); our cards,

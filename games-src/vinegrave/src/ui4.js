@@ -43,6 +43,7 @@ function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up o
   tm.hand = ['dread', 'grant', 'dread', 'trail', 'grant']; tm.deck = ['trail'];
   const gi = G.guards.indexOf('glass-moth'); if (gi >= 0) { G.guards.splice(gi, 1); G.guards.push('glass-moth'); }
   const li = G.items.indexOf('lamp'); if (li >= 0) { G.items[li] = G.row[0]; G.row[0] = 'lamp'; } else { const ri = G.row.indexOf('lamp'); if (ri > 0) { G.row[ri] = G.row[0]; G.row[0] = 'lamp'; } }
+  const ao = ['a-map', 'a-purse', 'a-scribe']; G.aPile = G.aPile.concat(G.aOffer).filter(x => ao.indexOf(x) < 0); G.aOffer = ao;   /* the helper you hire first asks nothing */
   G.turn = 0; G.first = 0; render();
 }
 const TS = id => { const t = V.STORY.tut[id]; return { title: t[0], say: t[1] }; };
@@ -159,6 +160,11 @@ function guidedSteps() {
     step('g-res', 'Research', 'Pay to climb the magnifier. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
       { onEnter: () => TOP_UP(V.TRACK[G.p[0].glass + 1].cost) }),
     step('g-res2', 'Research', 'Tap Magnifier: up one row, take its bonus.', choice(/^Magnifier/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'g' }),
+    step('g-asst', 'Assistants', 'Row 2 brings an assistant. Tap the Map Reader.', choice(/^Map Reader/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'ans' },
+      { ready: () => tmine() && !!G.q && G.q.h === 'asst' }),
+    step('g-asst2', 'Assistants', 'Your assistant works once a round, free. Tap it.', tq(() => $('#extra [data-a=asst]')), { type: 'tap', match: a => a.what === 'asst' },
+      { ready: () => tmine() && !!$('#extra [data-a=asst]') }),
+    step('g-asst3', 'Assistants', 'Use it now: plus 1 compass. It rests until next round.', tinsp('Use it'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'asst' }, { ready: inspOpen }),
     step('g-note', 'Notebook', 'Now the notebook. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
       { onEnter: () => TOP_UP(V.TRACK[G.p[0].note + 1].cost) }),
     step('g-note2', 'Notebook', 'Tap Notebook. It follows, never passing the magnifier.', choice(/^Notebook/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'n' }),

@@ -470,3 +470,13 @@ body.vg-guided.vg-pick #map .site.gq,body.vg-guided.vg-pick #row .cd.gq,body.vg-
   body.vg-b2 .tc .tn{width:auto;line-height:14px}
   body.vg-b2 .tc .tm i{width:13px;height:13px}
 }
+/* research assistants */
+.tag.asst .aic{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#c9cfd6;color:#1d2430;font:900 14px/1 var(--gx-font,Georgia,serif)}
+.tag.asst.gold .aic{background:#e8b84a;color:#3a240c}
+.tag.asst{min-height:44px;font-size:14px}
+.tc .tas{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:#c9cfd6;color:#1d2430;font:900 14px/1 var(--gx-font,Georgia,serif);flex:none}
+@media (max-width:999px) and (max-height:760px){
+  body.vg-b2.vg-hasex #row .cd .pic{height:20px}
+  body.vg-b2.vg-hasex #hand .cd .pic{height:14px}
+  body.vg-b2.vg-hasex #extra .tag{min-height:44px;padding-top:0;padding-bottom:0}
+}

@@ -111,7 +111,7 @@ function render() {
   let tr = ''; for (let r = 0; r <= V.TOP; r++) {
     const mk = G.p.map((p, i) => (p.glass === r ? `<i class="mg" style="--pc:${HEX[i]}" title="${esc(p.name)}: magnifier"></i>` : '') + (p.note === r ? `<i class="nb" style="--pc:${HEX[i]}" title="${esc(p.name)}: notebook"></i>` : '')).join('') + (G.rival && Math.min(V.TOP, G.rival.rows) === r ? '<i class="mg" style="--pc:#9a9486"></i>' : '');
     const nx = myTurn() && (L.some(m => m.t === 'res' && m.k === 'g') && me.glass + 1 === r || L.some(m => m.t === 'res' && m.k === 'n') && me.note + 1 === r);
-    tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}</span><span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
+    tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}</span>${V.ASST_ROWS.indexOf(r) >= 0 ? '<span class="tas" aria-label="assistant row">A</span>' : ''}<span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
   }
   const tb = $('#track'); tb.innerHTML = `<span class="tl">Research</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
   // market
@@ -150,7 +150,8 @@ function renderTray(L, q, me, actor) {
   let ex = '';
   me.guards.forEach((g, k) => { ex += `<button type="button" class="tag${g.used ? ' used' : ''}" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}"><span class="ic" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></span><span>${g.used ? 'Used' : 'Boon'}</span></button>`; });
   me.idols.forEach((d, k) => { ex += `<button type="button" class="tag${d.used ? ' used' : ''}" data-a="idol" data-k="${k}" aria-label="${esc(V.IDOL[d.id].name)}${d.used ? ', in a shrine' : ''}"><span class="ic" data-art="${d.id}"><svg><use href="#s-idol"/></svg></span><span>${d.used ? 'Set' : 'Idol'}</span></button>`; });
-  $('#extra').innerHTML = ex; $('#extra').hidden = !ex;
+  (me.asst || []).forEach((a, k) => { const d = V.ASSTBY[a.id]; ex += `<button type="button" class="tag asst${a.ex ? ' used' : ''}${a.gold ? ' gold' : ''}" data-a="asst" data-k="${k}" aria-label="${esc(d.name)}${a.gold ? ' (gold)' : ''}${a.ex ? ', resting until next round' : ', ready'}"><span class="ic aic">A</span><span>${esc(d.name.split(' ')[0])}${a.ex ? ' (rests)' : ''}</span></button>`; });
+  $('#extra').innerHTML = ex; $('#extra').hidden = !ex; document.body.classList.toggle('vg-hasex', !!ex);
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = 1; });
   $('#hand').classList.toggle('many', me.hand.length > 5);
   $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q, sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(i - (me.hand.length - 1) / 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
@@ -194,12 +195,13 @@ function promptLine(L) {
   let best = ''; if (UI.prefs.hints && UI.mode !== 'tutorial') try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) best = ' Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
   return 'Your turn: one main action. Starting cards are free. Tap or drag what glows.' + best;
 }
-function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.' }[q.h] || 'Choose.'; }
+function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.', asst: (G.p[UI.view].apend > 0 ? 'Hire an assistant. Once a round, free.' : 'Upgrade an assistant to gold.') }[q.h] || 'Choose.'; }
 function qHTML(q) {
   const ms = VG.moves(G), p = G.p[UI.view];
   if (q.h === 'exile') return `<div class="qcards">${ms.filter(m => m.v).map(m => { const id = (m.v.z === 'hand' ? p.hand : m.v.z === 'play' ? p.play : p.disc)[m.v.i]; return cardHTML(id, { glow: id === 'dread' }).replace('<button type="button" class="cd', `<button type="button" data-a="mv" data-m="${mvIndex(m)}" class="cd`); }).join('')}</div>${mvBtn({ t: 'ans', v: null }, 'Skip', 'alt')}`;
   if (q.h === 'or') return `<div class="qchoices">${q.d.opts.map((o, i) => { const m = ms.find(x => x.v === i); const t = o.length ? esc(V.opText(o).replace(/^./, c => c.toUpperCase())) : 'Nothing'; return m ? mvBtn(m, t, 'go') : `<button type="button" class="btn" disabled>${t} (cannot pay)</button>`; }).join('')}</div>`;
   if (q.h === 'buy' || q.h === 'site') return mvBtn({ t: 'ans', v: null }, 'Skip', 'alt');
+  if (q.h === 'asst') return `<div class="qchoices">${ms.map(m => { if (m.v.g != null) { const d = V.ASSTBY[G.aOffer[m.v.g]]; return mvBtn(m, esc(d.name + ': ' + V.opText(d.s) + '.'), 'go'); } const a = p.asst[m.v.u], d = V.ASSTBY[a.id]; return mvBtn(m, esc('Gold ' + d.name + ': ' + V.opText(d.gd) + '.'), 'go'); }).join('')}</div>`;
   return '';
 }
 function readMs(t, ms) { return Math.max(ms || 0, 4000 + 100 * String(t || '').split(/\s+/).filter(Boolean).length); }   /* 4 s + 1 s per 10 words, never less */

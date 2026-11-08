@@ -1,5 +1,5 @@
 /* Vinegrave computer explorers: one-step simulation of every legal move scored by a value function (points now + resources + deck + position).
-   easy = noisy (2.6: a sensible new player wins ~half, bench-newplayer.js) · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
+   easy = noisy (4.0 with assistants: a sensible new player wins ~half, newbie-sim.js) · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
 (function (root) {
   var VG = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.VG, V = VG.V;
   var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.6, jewel: 1.3 };
@@ -22,6 +22,7 @@
     p.hand.forEach(function (id) { v += CV[id] * (p.passed ? plays : 0.3 + plays); });
     
     p.guards.forEach(function (g) { if (!g.used) v += opVal(V.GUARD[g.id].boon) * 0.8; });
+    (p.asst || []).forEach(function (a) { var d = V.ASSTBY[a.id], uses = Math.max(0, left - (a.ex ? 1 : 0)); v += opVal(a.gold ? d.gd : d.s) * uses * 0.6; });   /* assistants: what their remaining uses are worth */
     p.idols.forEach(function (d) { if (!d.used && f > 0.5) v += 0.6; });
     G.sites.forEach(function (x) { if (x.occ === s && x.guard) v -= VG.has(p, V.GUARD[x.guard].cost) ? 0.3 : 1.6; });
     if (lvl === 'hard') { v += p.glass * 0.35 * f + (p.glass >= V.TOP ? 1 : 0); v += Math.min(p.res.jewel, 3) * 0.2 * f; }
@@ -57,7 +58,7 @@
         o.d += 0.5 * Math.max(0, value(H2, s, lvl) - v1);
       });
     }
-    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? 2.6 : lvl === 'normal' ? 0.25 : 0;
+    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? 4.0 : lvl === 'normal' ? 0.25 : 0;
     if (!inner && noise) { var rr = function () { return VG.rng(G) - 0.5; }; out.forEach(function (o) { o.d += rr() * noise * 2; }); }
     out.sort(function (a, b) { return b.d - a.d; });
     var top = out[0];
@@ -79,6 +80,7 @@
       case 'res': return 'Climb the research track for points.';
       case 'temple': return 'Claim a temple tile for points.';
       case 'boon': return 'Use your guardian\'s boon now.';
+      case 'asst': return 'Your assistant works once a round, for free.';
       case 'idol': return 'Set an idol in a shrine for its boon.';
       case 'pass': return 'Nothing useful left: pass.';
       default: return 'This is the best choice now.';

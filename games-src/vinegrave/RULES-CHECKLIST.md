@@ -11,7 +11,9 @@ check that the engine applies its own table exactly, not that it equals the prin
 Known open (not fixed, reason): A13/A14/A15 box has 6 level-II sites, 16 idols, 40 items; the game has 8 / 12 / 35 (content and art slots in
 assets.json, needs new cards/pictures). H4 exile from the play area: needs a UI change (the exile picker reads the discard pile, W427 owns UI).
 K3 the rival stack is 8 tiles, not 10 (our own rival design, changing it needs a solo balance sign-off). Also simplified on purpose, no test:
-guardian boons that are travel values, free-action (lightning) cards, assistants, bonus tiles in the temple, blocking tiles, the other board side.
+guardian boons that are travel values, free-action (lightning) cards, bonus tiles in the temple, blocking tiles, the other board side.
+FIXED2 r2: research assistants are now built (section L: offer of 3, hire on rows 2/5 with the magnifier, gold upgrade with the notebook,
+once a round free, max 2; names, abilities, rows and the limit are our own).
 
 ## A. Setup
 
@@ -34,7 +36,7 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 
 ## B. Rounds and turns
 
-- **B1** A turn is exactly one main action (play a card), then play passes to the next explorer.
+- **B1** A turn is exactly one main action (play an item card), then play passes to the next explorer.
 - **B2** Passing is a main action; a passed player is skipped for the rest of the round (3 players: 0 passes, 1 acts, 2 acts, then 1 again).
 - **B3** If everyone else has passed, the last player takes turns one after another.
 - **B4** The round ends when all players have passed: next round starts, explorers return to the board owners.
@@ -111,7 +113,9 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 
 ## H. Play a card
 
-- **H1** Playing a card gives its effect and uses the main action (funding card: +1 coin).
+- **H1** Playing a starting coin card gives its effect as a FREE action: +1 coin, still your turn.
+- **H1b** Playing a starting compass card is free too; you can play both and still take a main action.
+- **H1c** Playing an item card for its effect uses the main action.
 - **H2** Dread cards have no effect and cannot be played.
 - **H3** Exile removes a card from the game for good (hand card exiled, then the rest of the effect).
 - **H4** Exile can also take a card from your PLAY area (including the card just played).
@@ -156,4 +160,17 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 - **K5** Solo: the rival overcoming a guardian scores 5 points.
 - **K6** Solo: the rival discovering a site takes an idol worth 3 points.
 
-TOTAL 110
+## L. Research assistants
+
+- **L1** Setup: three assistants lie face up in the offer; nobody has one.
+- **L2** Magnifier reaching an assistant row: choose one of the offer, it joins silver side up, the offer refills, then the turn ends.
+- **L3** Notebook reaching an assistant row upgrades one of your assistants to its gold side.
+- **L4** Using an assistant is free, once a round: it gives its ability, is exhausted, and the turn does not end.
+- **L5** Exhausted assistants are ready again next round.
+- **L6** The gold side is stronger than the silver side.
+- **L7** At most 2 assistants: a third hire becomes an upgrade instead.
+- **L8** An upgrade with no silver assistant left is lost, and the turn simply ends.
+- **L9** A free research step (boon or card) that reaches an assistant row also hires one.
+- **L10** An assistant that costs goods can only be used when you can pay.
+
+TOTAL 122

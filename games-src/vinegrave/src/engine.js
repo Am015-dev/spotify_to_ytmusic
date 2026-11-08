@@ -15,10 +15,11 @@
     var G = { v: 1, rng: (o.seed == null ? Math.floor(Math.random() * 1e9) : o.seed) >>> 0, np: np, round: 1, rounds: o.rounds || V.ROUNDS, turn: 0, first: 0, phase: 'play', q: null,
       p: [], sites: [], row: [], items: [], arts: [], s1: [], s2: [], guards: [], idols: [], temple: V.TEMPLE.map(function (t) { return t.n; }), log: [], ev: [], winner: null, twist: o.twist || null, planeCost: 2, rival: null, turns: 0 };
     G.seed0 = G.rng; G.dread = V.DREAD_SUPPLY - 2 * np; G.firstTaken = {};
+    G.aPile = (function (a, x) { for (var i = a.length - 1; i > 0; i--) { x = (x * 1103515245 + 12345) >>> 0; var j = x % (i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; })(V.ASST.map(function (a) { return a.id; }), G.seed0 ^ 0x5a5a);   /* own stream: the main shuffles stay as before */ G.aOffer = G.aPile.splice(0, V.ASST_OFFER);
     for (var i = 0; i < np; i++) {
       var st = V.START[i] || V.START[3], sd = seats[i] || {};
       var p = { name: sd.name || (i ? 'Explorer ' + (i + 1) : 'You'), ai: sd.ai || null, res: { coin: st.coin, compass: st.compass, tablet: 0, arrow: 0, jewel: 0 },
-        deck: shuf(G, ['dread', 'dread', 'grant', 'grant', 'trail', 'trail']), hand: [], play: [], disc: [], ex: V.EXPL, note: 0, glass: 0, guards: [], idols: [], temple: [], passed: false, idolTurn: false, exiled: [], fearTiles: 0 };
+        deck: shuf(G, ['dread', 'dread', 'grant', 'grant', 'trail', 'trail']), hand: [], play: [], disc: [], ex: V.EXPL, note: 0, glass: 0, guards: [], idols: [], temple: [], passed: false, idolTurn: false, exiled: [], fearTiles: 0, asst: [], apend: 0, upend: 0 };
       G.p.push(p);
     }
     G.items = shuf(G, V.ITEMS.slice()); G.arts = shuf(G, V.ARTS.slice()); G.s1 = shuf(G, V.S1.slice()); G.s2 = shuf(G, V.S2.slice()); G.guards = shuf(G, V.GUARDS.slice()); G.idols = shuf(G, V.IDOLS.slice());
@@ -100,6 +101,7 @@
     if (G.q) return answers(G, s);
     // free actions
     p.guards.forEach(function (g, k) { if (!g.used) out.push({ t: 'boon', k: k, free: true }); });
+    (p.asst || []).forEach(function (a, k) { if (!a.ex && canOps(p, asstOps(a))) out.push({ t: 'asst', k: k, free: true }); });
     if (p.idols.some(function (d) { return !d.used; }) && p.idols.filter(function (d) { return d.used; }).length < V.SLOTS)
       p.idols.forEach(function (d, k) { if (!d.used) V.SHRINE.forEach(function (sh, j) { out.push({ t: 'idol', k: k, sh: j, free: true }); }); });
     // main actions
@@ -125,8 +127,21 @@
     if (q.h === 'or') q.d.opts.forEach(function (o, i) { if (canOps(p, o)) out.push({ t: 'ans', v: i }); });
     if (q.h === 'buy') { G.row.forEach(function (id, r) { if (!id) return; var c = card(id); if ((q.d.k === 'i') !== (c.t === 'item')) return; var cost = cardCost(id), k = Object.keys(cost)[0], need = {}; need[k] = Math.max(0, cost[k] - q.d.o); if (has(p, need)) out.push({ t: 'ans', v: r }); }); out.push({ t: 'ans', v: null }); }
     if (q.h === 'site') { G.sites.forEach(function (x, i) { if (freeSite(G, s, i)) out.push({ t: 'ans', v: i }); }); out.push({ t: 'ans', v: null }); }
+    if (q.h === 'asst') { if (p.apend > 0) G.aOffer.forEach(function (id, i) { out.push({ t: 'ans', v: { g: i } }); }); else p.asst.forEach(function (a, k) { if (!a.gold) out.push({ t: 'ans', v: { u: k } }); }); }
     return out;
   }
+  // ------------------------------------------------------------ research assistants
+  function asstOps(a) { var d = V.ASSTBY[a.id]; return a.gold ? d.gd : d.s; }
+  /* settle what an assistant reward can still do: a gain with 2 assistants (or an empty offer) becomes an upgrade; an upgrade with nothing
+     left to upgrade is lost. Returns true when the seat must choose. */
+  function asstNext(G, s) {
+    var p = G.p[s]; if (!p.asst) return false;
+    while (p.apend > 0 && (p.asst.length >= V.ASST_MAX || !G.aOffer.length)) { p.apend--; p.upend++; }
+    if (p.apend > 0) return true;
+    if (p.upend > 0 && !p.asst.some(function (a) { return !a.gold; })) p.upend = 0;
+    return p.upend > 0;
+  }
+  function asstAsk(G, s, rest, main) { if (!asstNext(G, s)) return false; G.q = { h: 'asst', seat: s, ops: rest || [], main: main, d: {} }; return true; }
   function canOps(p, ops) { var need = {}; ops.forEach(function (o) { if (o.p) for (var k in o.p) need[k] = (need[k] || 0) + o.p[k]; }); return has(p, need); }
   // ------------------------------------------------------------ effects
   // run ops for seat s; stops at the first op that needs a choice (G.q). main = this is the turn's main action (turn ends when the ops are done)
@@ -137,7 +152,7 @@
       if (o.g) { gain(p, o.g); log(G, s, nm(G, s) + ' gains ' + V.resText(o.g) + '.', { k: 'gain', g: o.g }); }
       else if (o.p) { if (!has(p, o.p)) return finishOps(G, s, main); pay(p, o.p); }
       else if (o.d) { var n = draw(G, p, o.d); log(G, s, nm(G, s) + ' draws ' + n + ' card' + (n === 1 ? '' : 's') + '.'); }
-      else if (o.r) { stepFree(G, s, o.r); }
+      else if (o.r) { stepFree(G, s, o.r); if (asstAsk(G, s, rest, main)) return; }
       else if (o.x) { if (p.hand.length || p.disc.length || p.play.length) { G.q = { h: 'exile', seat: s, ops: rest, main: main, d: {} }; return; } }
       else if (o.or) { G.q = { h: 'or', seat: s, ops: rest, main: main, d: { opts: o.or } }; if (!answers(G, s).length) { G.q = null; continue; } return; }
       else if (o.b) { G.q = { h: 'buy', seat: s, ops: rest, main: main, d: { k: o.b, o: o.o } }; if (answers(G, s).length <= 1) { G.q = null; continue; } return; }
@@ -151,7 +166,7 @@
     if (k === 'g') { if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
     else { if (p.note < p.glass && p.note + 1 < V.TOP) { p.note++; arrive(G, s, p.note, 'notebook'); } else if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
   }
-  function arrive(G, s, row, what) { if (row === V.TOP && what === 'magnifier') { G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(s) < 0) G.templeOrder.push(s); } var b = V.TRACK[row].bonus; gain(G.p[s], b); if (what === 'magnifier' && V.FIRST[row] && !(G.firstTaken || {})[row]) { G.firstTaken = G.firstTaken || {}; G.firstTaken[row] = s + 1; gain(G.p[s], V.FIRST[row]); log(G, s, nm(G, s) + ' is first to row ' + row + ': extra ' + V.resText(V.FIRST[row]) + '.', { k: 'first', row: row }); } log(G, s, nm(G, s) + '\'s ' + what + ' climbs to row ' + row + (row === V.TOP ? ' (the temple)' : '') + ': +' + V.resText(b) + '.', { k: 'research', row: row, what: what }); }
+  function arrive(G, s, row, what) { var pp = G.p[s]; if (pp.asst && V.ASST_ROWS.indexOf(row) >= 0) { if (what === 'magnifier') pp.apend++; else pp.upend++; } if (row === V.TOP && what === 'magnifier') { G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(s) < 0) G.templeOrder.push(s); } var b = V.TRACK[row].bonus; gain(G.p[s], b); if (what === 'magnifier' && V.FIRST[row] && !(G.firstTaken || {})[row]) { G.firstTaken = G.firstTaken || {}; G.firstTaken[row] = s + 1; gain(G.p[s], V.FIRST[row]); log(G, s, nm(G, s) + ' is first to row ' + row + ': extra ' + V.resText(V.FIRST[row]) + '.', { k: 'first', row: row }); } log(G, s, nm(G, s) + '\'s ' + what + ' climbs to row ' + row + (row === V.TOP ? ' (the temple)' : '') + ': +' + V.resText(b) + '.', { k: 'research', row: row, what: what }); }
   function digSite(G, s, i) {
     var x = G.sites[i], p = G.p[s], site = V.SITE[x.tile];
     x.occ = s; p.ex--; gain(p, site.rew);
@@ -164,6 +179,7 @@
     if (!legal) return { ok: false, err: 'illegal move ' + JSON.stringify(m) };
     G.ev = []; var p = G.p[s];
     if (m.t === 'ans') { answer(G, s, m.v); return { ok: true }; }
+    if (m.t === 'asst') { var as = p.asst[m.k]; as.ex = true; log(G, s, nm(G, s) + ' sends the ' + V.ASSTBY[as.id].name + ' to work.', { k: 'asst' }); runOps(G, s, asstOps(as), false); return { ok: true }; }
     if (m.t === 'boon') { var g = p.guards[m.k]; g.used = true; log(G, s, nm(G, s) + ' uses the boon of ' + V.GUARD[g.id].name + '.', { k: 'boon' }); runOps(G, s, V.GUARD[g.id].boon, false); return { ok: true }; }
     if (m.t === 'idol') { var d = p.idols[m.k], sh = V.SHRINE[m.sh]; d.used = true; p.idolTurn = true; log(G, s, nm(G, s) + ' sets the ' + V.IDOL[d.id].name + ' in a shrine: ' + sh.text + '.', { k: 'idol' }); runOps(G, s, sh.ops, false); return { ok: true }; }
     if (m.t === 'play' && card(p.hand[m.i]).t === 'basic') { var bid0 = p.hand.splice(m.i, 1)[0], b0 = card(bid0); p.play.push(bid0); log(G, s, nm(G, s) + ' plays ' + b0.name + ' (free).', { k: 'play', card: bid0, free: true }); runOps(G, s, b0.ops, false); return { ok: true }; }
@@ -192,7 +208,7 @@
       else { p.play.push(bid); log(G, s, nm(G, s) + ' takes the artifact ' + bc.name + ' and uses it at once.', { k: 'buy', card: bid }); runOps(G, s, bc.ops, true); }
       return { ok: true };
     }
-    if (m.t === 'res') { var row = (m.k === 'g' ? p.glass : p.note) + 1; pay(p, V.TRACK[row].cost); if (m.k === 'g') p.glass = row; else p.note = row; arrive(G, s, row, m.k === 'g' ? 'magnifier' : 'notebook'); endTurn(G); return { ok: true }; }
+    if (m.t === 'res') { var row = (m.k === 'g' ? p.glass : p.note) + 1; pay(p, V.TRACK[row].cost); if (m.k === 'g') p.glass = row; else p.note = row; arrive(G, s, row, m.k === 'g' ? 'magnifier' : 'notebook'); if (asstAsk(G, s, [], true)) return { ok: true }; endTurn(G); return { ok: true }; }
     if (m.t === 'temple') { var tt = V.TEMPLE[m.k]; pay(p, tt.cost); G.temple[m.k]--; p.temple.push(tt.vp); log(G, s, nm(G, s) + ' claims a temple tile worth ' + tt.vp + '.', { k: 'temple', vp: tt.vp }); endTurn(G); return { ok: true }; }
     return { ok: false, err: 'unknown move' };
   }
@@ -206,6 +222,11 @@
       else { p.play.push(bid); log(G, s, nm(G, s) + ' takes ' + bc.name + ' cheaper and uses it.', { k: 'buy', card: bid }); return runOps(G, s, bc.ops.concat(rest), main); }
     }
     if (q.h === 'site' && v != null) digSite(G, s, v);
+    if (q.h === 'asst') {
+      if (v && v.g != null) { var aid = G.aOffer.splice(v.g, 1)[0]; p.asst.push({ id: aid, gold: false, ex: false }); p.apend--; if (G.aPile.length) G.aOffer.push(G.aPile.shift()); log(G, s, nm(G, s) + ' hires the ' + V.ASSTBY[aid].name + '.', { k: 'hire', a: aid }); }
+      else if (v && v.u != null) { var ua = p.asst[v.u]; ua.gold = true; p.upend--; log(G, s, nm(G, s) + '\'s ' + V.ASSTBY[ua.id].name + ' turns gold.', { k: 'upgrade', a: ua.id }); }
+      if (asstAsk(G, s, rest, main)) return;
+    }
     runOps(G, s, rest, main);
   }
   function same(a, b) { if (a.t !== b.t) return false; if (a.t === 'ans') return JSON.stringify(a.v) === JSON.stringify(b.v === undefined ? null : b.v); for (var k of ['i', 's', 'r', 'k', 'sh']) if (a[k] !== undefined && a[k] !== b[k]) return false; return true; }
@@ -221,7 +242,7 @@
       if (x.occ >= 0) { var p = G.p[x.occ]; if (x.guard) { var tile = takeDread(G, x.occ, 'play'); log(G, x.occ, nm(G, x.occ) + ' flees ' + V.GUARD[x.guard].name + (tile ? ' and takes a fear tile (-2): no Dread cards left.' : ' and takes a Dread card.'), { k: 'fear' }); } p.ex++; }
       x.occ = -1;
     });
-    G.p.forEach(function (p) { p.deck = p.deck.concat(shuf(G, p.play.concat(p.disc))); p.disc = []; p.play = []; p.passed = false; p.idolTurn = false; });   /* rulebook: the play area is shuffled and put under the deck (items bought this round stay above it) */
+    G.p.forEach(function (p) { p.deck = p.deck.concat(shuf(G, p.play.concat(p.disc))); p.disc = []; p.play = []; p.passed = false; p.idolTurn = false; (p.asst || []).forEach(function (a) { a.ex = false; }); });   /* rulebook: the play area is shuffled and put under the deck (items bought this round stay above it) */
     if (G.round >= G.rounds) return endGame(G);
     // the card row shifts: the last item before the artifacts leaves; an artifact takes its place
     var nItems = Math.max(1, V.ROW - G.round); G.row[nItems - 1] = null; if (nItems < V.ROW) G.row[nItems] = null;
@@ -281,6 +302,7 @@
       var onBoard = G.sites.filter(function (x) { return x.occ === i; }).length; if (onBoard + p.ex !== V.EXPL) errs.push('seat ' + i + ' explorers ' + onBoard + '+' + p.ex);
       if (p.note > p.glass) errs.push('seat ' + i + ' notebook above magnifier');
       if (p.glass > V.TOP) errs.push('seat ' + i + ' glass too high');
+      if ((p.asst || []).length > V.ASST_MAX) errs.push('seat ' + i + ' too many assistants');
       p.deck.concat(p.hand, p.play, p.disc).forEach(function (id) { if (!V.CARDS[id]) errs.push('bad card ' + id); });
     });
     var seen = {}; G.row.concat(G.items, G.arts).forEach(function (id) { if (id && card(id).t !== 'basic' && card(id).t !== 'fear') { if (seen[id]) errs.push('dup ' + id); seen[id] = 1; } });

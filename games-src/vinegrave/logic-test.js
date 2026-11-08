@@ -138,7 +138,7 @@ sec('I. Research track and temple');
 rule('I1', 'Research: pay the row cost, move the magnifier up one row, take the row bonus.', () => { const G = G2(), p = G.p[0]; p.res.tablet = 1; const c = p.res.coin; go(G, { t: 'res', k: 'g' }); return eq([1, 0, c + 1], [p.glass, p.res.tablet, p.res.coin]); });
 rule('I2', 'The notebook may never rise above the magnifier (equal is fine).', () => { const G = G2(); const p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 9); const out = []; [[0, 0], [1, 1], [2, 1]].forEach(([g, n]) => { p.glass = g; p.note = n; out.push(has(G, m => m.t === 'res' && m.k === 'n')); }); return eq([false, false, true], out); });
 rule('I3', 'Each arrival (magnifier or notebook) takes the row bonus.', () => { const G = G2(), p = G.p[0]; p.glass = 1; p.res.tablet = 1; const c = p.res.coin; go(G, { t: 'res', k: 'n' }); return eq([1, c + 1], [p.note, p.res.coin]); });
-rule('I4', 'First-arrival reward: only the first magnifier to a row takes the extra reward; every arrival takes the row bonus.', () => { const G = G2(), p = G.p[0], q = G.p[1]; p.glass = 1; q.glass = 1; p.res.arrow = 1; q.res.arrow = 1; p.res.tablet = 0; q.res.tablet = 0; p.res.compass = 0; q.res.compass = 0; go(G, { t: 'res', k: 'g' }); const a = [p.res.tablet, p.res.compass]; go(G, { t: 'res', k: 'g' }); return eq([[1, 2], [0, 2]], [a, [q.res.tablet, q.res.compass]]); });
+rule('I4', 'First-arrival reward: only the first magnifier to a row takes the extra reward; every arrival takes the row bonus.', () => { const G = G2(), p = G.p[0], q = G.p[1]; p.glass = 1; q.glass = 1; p.res.arrow = 1; q.res.arrow = 1; p.res.tablet = 0; q.res.tablet = 0; p.res.compass = 0; q.res.compass = 0; go(G, { t: 'res', k: 'g' }); go(G, find(G, m => m.t === 'ans')); const a = [p.res.tablet, p.res.compass]; go(G, { t: 'res', k: 'g' }); return eq([[1, 2], [0, 2]], [a, [q.res.tablet, q.res.compass]]); });
 rule('I5', 'Magnifier in the temple (top row) scores by order of arrival: first 10, second 8 (points).', () => { const G = G2(), p = G.p[0], q = G.p[1]; [p, q].forEach(x => { x.glass = 7; x.res.jewel = 1; x.res.tablet = 1; }); go(G, { t: 'res', k: 'g' }); go(G, { t: 'res', k: 'g' }); return eq([10, 8], [VG.score(G, 0).research, VG.score(G, 1).research]); });
 rule('I6', 'The notebook can never enter the temple row.', () => { const G = G2(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 9); p.glass = 8; p.note = 7; return eq(false, has(G, m => m.t === 'res' && m.k === 'n')); });
 rule('I7', 'Magnifier already in the temple: research buys a temple tile instead. A 6-point stack needs two of the three costs, the 11-point stack needs all three.', () => { const G = G2(), p = G.p[0]; p.glass = 8; p.res.tablet = 2; p.res.jewel = 1; p.res.arrow = 0; const a = [has(G, m => m.t === 'temple' && m.k === 0), has(G, m => m.t === 'temple' && m.k === 2)]; p.res.arrow = 2; return eq([true, false, true], a.concat([has(G, m => m.t === 'temple' && m.k === 2)])); });
@@ -170,6 +170,30 @@ rule('K4', 'Solo: the rival keeps playing its tiles after you pass, until all ar
 rule('K5', 'Solo: the rival overcoming a guardian scores 5 points.', () => { const G = SOLO(); G.sites[5].tile = 'moth-cave'; G.sites[5].guard = 'stone-ape'; G.rival.deck = ['rv-hunt']; G.rival.vp = 0; go(G, { t: 'pass' }); return eq(5, G.rival.vp); });
 rule('K6', 'Solo: the rival discovering a site takes an idol worth 3 points.', () => { const G = SOLO(); G.rival.deck = ['rv-scout']; G.rival.vp = 0; go(G, { t: 'pass' }); return eq(3, G.rival.vp); });
 
+sec('L. Research assistants', 'Published structure; names, abilities, rows (2 and 5) and the limit of 2 are our own.');
+const toRow2 = (G, s, k) => { const p = G.p[s]; p.glass = k === 'g' ? 1 : 2; p.note = k === 'n' ? 1 : 0; p.res.arrow = 1; G.turn = s; go(G, { t: 'res', k }); };
+rule('L1', 'Setup: three assistants lie face up in the offer; nobody has one.', () => { const G = G2(); return eq([3, 0, 0], [G.aOffer.length, G.p[0].asst.length, G.p[1].asst.length]); });
+rule('L2', 'Magnifier reaching an assistant row: choose one of the offer, it joins silver side up, the offer refills, then the turn ends.', () => {
+  const G = G2(); toRow2(G, 0, 'g'); const asks = VG.moves(G).length, id = G.aOffer[1]; go(G, { t: 'ans', v: { g: 1 } });
+  return eq([3, id, false, 3, 1], [asks, G.p[0].asst[0].id, G.p[0].asst[0].gold, G.aOffer.length, G.turn]); });
+rule('L3', 'Notebook reaching an assistant row upgrades one of your assistants to its gold side.', () => {
+  const G = G2(); G.p[0].asst = [{ id: 'a-map', gold: false, ex: false }]; toRow2(G, 0, 'n'); go(G, { t: 'ans', v: { u: 0 } }); return eq(true, G.p[0].asst[0].gold); });
+rule('L4', 'Using an assistant is free, once a round: it gives its ability, is exhausted, and the turn does not end.', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-map', gold: false, ex: false }]; const c = p.res.compass; go(G, { t: 'asst', k: 0 });
+  return eq([c + 1, true, 0, false], [p.res.compass, p.asst[0].ex, G.turn, has(G, m => m.t === 'asst')]); });
+rule('L5', 'Exhausted assistants are ready again next round.', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-map', gold: false, ex: true }]; go(G, { t: 'pass' }); go(G, { t: 'pass' }); return eq([2, false], [G.round, p.asst[0].ex]); });
+rule('L6', 'The gold side is stronger than the silver side.', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-purse', gold: true, ex: false }]; const c = p.res.coin; go(G, { t: 'asst', k: 0 }); return eq(c + 2, p.res.coin); });
+rule('L7', 'At most 2 assistants: a third hire becomes an upgrade instead.', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-map', gold: false, ex: false }, { id: 'a-cook', gold: true, ex: false }]; toRow2(G, 0, 'g');
+  const ms = VG.moves(G).map(m => JSON.stringify(m.v)); go(G, { t: 'ans', v: { u: 0 } }); return eq([['{"u":0}'], 2, true], [ms, p.asst.length, p.asst[0].gold]); });
+rule('L8', 'An upgrade with no silver assistant left is lost, and the turn simply ends.', () => {
+  const G = G2(); toRow2(G, 0, 'n'); return eq([null, 1], [G.q, G.turn]); });
+rule('L9', 'A free research step (boon or card) that reaches an assistant row also hires one.', () => {
+  const G = G2(); const p = G.p[0]; p.glass = 1; p.guards = [{ id: 'glass-moth', used: false }]; go(G, { t: 'boon', k: 0 }); return eq(['asst', 0], [G.q && G.q.h, G.q && G.q.seat]); });
+rule('L10', 'An assistant that costs goods can only be used when you can pay.', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-gem', gold: false, ex: false }]; p.res.coin = 1; const a = has(G, m => m.t === 'asst'); p.res.coin = 2; return eq([false, true], [a, has(G, m => m.t === 'asst')]); });
 if (process.argv.includes('--md')) {
   const lines = []; let n = 0; R.forEach(r => { if (r.sec) lines.push('', '## ' + r.sec, ''); else { n++; lines.push('- **' + r.id + '** ' + r.text); } });
   console.log(lines.join('\n') + '\n\nTOTAL ' + n); process.exit(0);
