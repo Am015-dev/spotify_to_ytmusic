@@ -12,7 +12,7 @@
     try { GXH.setEnabled(false); } catch (e) { }
     try { GX.close(); } catch (e) { }
     UI.modal = null; UI.setup.np = 2; UI.setup.seats = ['human', 'ai']; UI.setup.lv = ['normal', 'normal']; AIDELAY = 60;
-    beginGame(); try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
+    beginGame(); try { if (UI.modal === 'goal') { UI.modal = null; render(); schedule(); } } catch (e) { } try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
     return GXS.wait(function () { return G && G.phase === 'bid' && $('#acts .sp-b.glow') && !UI.modal; }, 12000).then(function () { return idle(1200); });
   }
 

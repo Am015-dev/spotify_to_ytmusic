@@ -34,6 +34,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await pg.evaluate(() => { UI.sub = 'quick'; UI.render(); }); await tap('#play'); await sleep(100);
     if (!(await pg.$('#map'))) fail(name + ': no map after Climb');
     await pg.screenshot({ path: `shots/${name}-map.png` });
+    if (await pg.$('#goal-go')) { await tap('#goal-go'); await sleep(200); }   // Addendum 7: the one-card Goal before turn 1
     await tap('.node.glow'); await sleep(200);
     if (!(await pg.$('#stage'))) fail(name + ': no fight after node tap');
     let turns = 0;

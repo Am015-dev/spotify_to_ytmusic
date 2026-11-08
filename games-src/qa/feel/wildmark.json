@@ -1,0 +1,431 @@
+{
+ "slug": "wildmark",
+ "when": "2026-11-08T02:37Z",
+ "secs": 30,
+ "totalSecs": 121,
+ "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
+ "checks": {
+  "a": {
+   "status": "FAIL",
+   "count": 4,
+   "detail": [
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 493,
+     "texts": [
+      "Rowan Salmon score in runs: a chain where each sal",
+      "One terrain: no need to turn it."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "⚠ +1 this turn: river grows to 2 (+1). Poor move.",
+      "Rowan Bram's turn. Watch the caption: he takes, pl"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "⚠ +1 this turn: river grows to 2 (+1). Poor move.",
+      "Best fit for your patterns and habitats. How does "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Rowan Bears score in pairs: groups of exactly 2 to",
+      "One terrain: no need to turn it."
+     ]
+    }
+   ]
+  },
+  "b": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  },
+  "c": {
+   "status": "FAIL",
+   "count": 20,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Foxes: you have no foxes yet = 0 points (1 point per different animal next to each fox)",
+     "words": 18,
+     "at": 9003,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Salmon: you have no runs yet = 0 points (runs of 1-7 = 2, 5, 8, 12, 16, 20, 25)",
+     "words": 20,
+     "at": 12002,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bears: you have no pairs yet = 0 points (pairs 1, 2, 3, 4 = 4, 11, 19, 27)",
+     "words": 19,
+     "at": 16003,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bears: Bram has no pairs yet = 0 points (pairs 1, 2, 3, 4 = 4, 11, 19, 27)",
+     "words": 19,
+     "at": 19002,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Elk: Bram has no elk yet = 0 points (lines of 1, 2, 3, 4 = 2, 5, 9, 13)",
+     "words": 20,
+     "at": 25002,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Hawks: Bram has 1 lone hawk = 2 points (lone hawks 1-8 = 2, 5, 8, 11, 14, 18, 22, 26)",
+     "words": 21,
+     "at": 27001,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Each half counts for its own terrain; edges must match to join a habitat.",
+     "words": 14,
+     "at": 30008,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "score by their card: bears in pairs, elk in lines, salmon in runs, lone hawks, foxes next to different animals.",
+     "words": 20,
+     "at": 2002,
+     "where": "li."
+    },
+    {
+     "session": "phone/play",
+     "text": ": each terrain scores 1 point per tile in your largest joined area, +2 if yours is the biggest.",
+     "words": 19,
+     "at": 2002,
+     "where": "li."
+    },
+    {
+     "session": "phone/play",
+     "text": "Each turn: take a tile with its animal, add the tile, place the animal.",
+     "words": 14,
+     "at": 2002,
+     "where": "p.g2"
+    },
+    {
+     "session": "phone/play",
+     "text": "Each half counts for its own terrain; edges must match to join a habitat.",
+     "words": 14,
+     "at": 5009,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Elk: you have no elk yet = 0 points (lines of 1, 2, 3, 4 = 2, 5, 9, 13)",
+     "words": 20,
+     "at": 14002,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Hawks: you have no lone hawks yet = 0 points (lone hawks 1-8 = 2, 5, 8, 11, 14, 18, 22, 26)",
+     "words": 22,
+     "at": 22006,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Each half counts for its own terrain; edges must match to join a habitat.",
+     "words": 14,
+     "at": 23002,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Salmon: Bram has no runs yet = 0 points (runs of 1-7 = 2, 5, 8, 12, 16, 20, 25)",
+     "words": 20,
+     "at": 25002,
+     "where": "p.wl.me"
+    },
+    {
+     "session": "pc/play",
+     "text": "score by their card: bears in pairs, elk in lines, salmon in runs, lone hawks, foxes next to different animals.",
+     "words": 20,
+     "at": 2002,
+     "where": "li."
+    },
+    {
+     "session": "pc/play",
+     "text": ": each terrain scores 1 point per tile in your largest joined area, +2 if yours is the biggest.",
+     "words": 19,
+     "at": 2002,
+     "where": "li."
+    },
+    {
+     "session": "pc/play",
+     "text": "Each turn: take a tile with its animal, add the tile, place the animal.",
+     "words": 14,
+     "at": 2002,
+     "where": "p.g2"
+    },
+    {
+     "session": "pc/play",
+     "text": "Each half counts for its own terrain; edges must match to join a habitat.",
+     "words": 14,
+     "at": 5001,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Home to a (River Runs: Chains of salmon, each touching at most 2 salmon.)",
+     "words": 14,
+     "at": 8001,
+     "where": "p."
+    }
+   ]
+  },
+  "d": {
+   "status": "FAIL",
+   "count": 24,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Ten chapters",
+     "px": 13,
+     "at": 1003,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "0",
+     "px": 13,
+     "at": 2043,
+     "where": "span.rv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bear",
+     "px": 13,
+     "at": 2043,
+     "where": "i."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Elk",
+     "px": 13,
+     "at": 2043,
+     "where": "i."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Salmon",
+     "px": 13,
+     "at": 2043,
+     "where": "i."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Hawk",
+     "px": 13,
+     "at": 2043,
+     "where": "i."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Fox",
+     "px": 13,
+     "at": 2043,
+     "where": "i."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Largest area",
+     "px": 13,
+     "at": 2043,
+     "where": "span.tl"
+    },
+    {
+     "session": "phone/learn",
+     "text": "you",
+     "px": 13,
+     "at": 2043,
+     "where": "b.me"
+    },
+    {
+     "session": "phone/learn",
+     "text": "·",
+     "px": 13,
+     "at": 2043,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bram",
+     "px": 13,
+     "at": 2043,
+     "where": "b.riv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "1",
+     "px": 13,
+     "at": 2043,
+     "where": "span.rv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "up to +2",
+     "px": 13,
+     "at": 2044,
+     "where": "span.gain"
+    },
+    {
+     "session": "phone/learn",
+     "text": "up to +3",
+     "px": 13,
+     "at": 2044,
+     "where": "span.gain"
+    },
+    {
+     "session": "phone/learn",
+     "text": "up to +4",
+     "px": 13,
+     "at": 2044,
+     "where": "span.gain.best"
+    },
+    {
+     "session": "phone/learn",
+     "text": "2",
+     "px": 13,
+     "at": 19002,
+     "where": "span.rv.lead"
+    },
+    {
+     "session": "phone/learn",
+     "text": "no points",
+     "px": 13,
+     "at": 20004,
+     "where": "span.gain.nil"
+    },
+    {
+     "session": "phone/learn",
+     "text": "up to +1",
+     "px": 13,
+     "at": 20004,
+     "where": "span.gain"
+    },
+    {
+     "session": "phone/learn",
+     "text": "up to +5",
+     "px": 13,
+     "at": 20004,
+     "where": "span.gain.best"
+    },
+    {
+     "session": "phone/play",
+     "text": "Ten chapters",
+     "px": 13,
+     "at": 1002,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "Salmon",
+     "px": 13,
+     "at": 2002,
+     "where": "i."
+    },
+    {
+     "session": "phone/play",
+     "text": "Bear",
+     "px": 13,
+     "at": 2002,
+     "where": "i."
+    },
+    {
+     "session": "phone/play",
+     "text": "Fox",
+     "px": 13,
+     "at": 22001,
+     "where": "i."
+    },
+    {
+     "session": "phone/play",
+     "text": "Elk",
+     "px": 13,
+     "at": 23001,
+     "where": "i."
+    }
+   ]
+  },
+  "e": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  }
+ },
+ "notes": [
+  "phone/learn: Learn to play not found",
+  "pc/learn: Learn to play not found"
+ ],
+ "sessions": [
+  {
+   "size": "phone",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 101,
+   "clicks": 101,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 18
+  },
+  {
+   "size": "phone",
+   "mode": "play",
+   "secs": 30,
+   "turns": 108,
+   "clicks": 115,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 0
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 74,
+   "clicks": 84,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 6
+  },
+  {
+   "size": "pc",
+   "mode": "play",
+   "secs": 30,
+   "turns": 111,
+   "clicks": 125,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 0
+  }
+ ]
+}

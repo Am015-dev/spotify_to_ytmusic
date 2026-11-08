@@ -75,6 +75,7 @@ const tutMyTurn=ph=>!!(G&&BF.on&&G.phase===ph&&G.cur==='s1'&&humanTurn()&&tutIdl
 const tutHoldRes=who=>!!(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&UI.hold.R[who]==='s1');
 const tutIx=n=>{const s=ship('s1');return s?dialIx(s,TUT_ME[n]):-1};
 function tutSteps(){return tutStory([
+ {id:'goal0',title:'How you win',say:'Destroy Slate’s ship before he gets yours.\n• Pick a secret move for your ship.\n• Fly, then shoot enemies in front of you.\n• Hits break shields first, then the hull.',wait:null,target:shipRect('s2'),side:'bottom',ready:()=>tutPlan()&&!!shipRect('s2')()},
  {id:'ship',title:'Plan in secret',say:'Touch your ship to see where it can fly.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
  {id:'dial',title:'Pick a maneuver',say:'Any line you like. Green is easy, red strains the engines.',target:()=>hv('.bfm:not(.set)'),also:tqAll('.bfm:not(.set)'),wait:{type:'tap',match:a=>a.what==='dial'},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm:not(.set)')}
 ])}
@@ -98,12 +99,12 @@ const NCH={shown:{},q:[],cur:null,on:false,o:null,first:null,tm:0};
 // for external checks (qa-bot coached mode): running = the free-play part is on, explained = rule ids spoken so far, done = the result card was shown
 window.GXCOACH={get running(){return !!NCH.on},get explained(){return Object.keys(NCH.shown)},get done(){return !!NCH.finished},get rules(){return Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule)}};
 function coachReset(){NCH.finished=false;NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
-function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{GXT.markDone(TUT_GAME)}catch(e){}coachSay('goal');coachSay('fly0');render()}
+function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{GXT.markDone(TUT_GAME)}catch(e){}NCH.shown.goal=1;coachSay('fly0');render()}
 function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;NCH.q.push(id);coachPump()}
 function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;let e=document.getElementById('na-coach');
   if(!e){e=document.createElement('div');e.id='na-coach';e.setAttribute('data-help','');e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e)}
   e.className=(L.who==='slate'?'na-slate':'');e.innerHTML='<i class="na-por"></i><div class="na-ct"><b>'+L.t+'</b><span>'+L.s+'</span><button type="button" class="na-lv" data-na="leave">Leave lesson</button></div><button type="button" class="na-cx" data-na="dismiss" aria-label="Dismiss">\u2715</button>';e.hidden=false;
-  clearTimeout(NCH.tm);NCH.tm=setTimeout(coachHide,Math.max(5200,L.s.length*70))}
+  clearTimeout(NCH.tm);NCH.tm=setTimeout(coachHide,Math.max(5200,L.s.length*70,4000+(L.t+' '+L.s).split(/\s+/).length*100))}
 function coachHide(){clearTimeout(NCH.tm);NCH.cur=null;const e=document.getElementById('na-coach');if(e)e.hidden=true;setTimeout(coachPump,350)}
 // rules that came up are explained at that moment; this runs after every render
 function coachTick(){if(!NCH.on||!G||!G.tut)return;const me=G.ships.find(x=>x.side===0);if(!me)return;

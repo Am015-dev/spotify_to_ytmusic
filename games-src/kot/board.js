@@ -139,7 +139,8 @@ function bfFinger(){const f=$bf('bfinger');if(!f)return;let el=null;
 // ---- the opening card on a portrait phone: who you are, the goal, one button ----
 {const _ih=introHTML;introHTML=function(){if(!(phOn()&&!PHONE.land))return _ih.apply(this,arguments);const me=meSeat(),q=me>=0?G.pl[me]:null;if(!q)return _ih.apply(this,arguments);
   return `<div class="intro bfintro"><p class="you" style="--mc:${MONS[q.m].c}">${monFace(q.m)}<span>You are <b>${esc(UP(mname(q)))}</b></span>${typeof tutOffer==='function'&&tutOffer()?tutMini():''}</p>
-   <p class="goal">First to <b>20 ★</b> wins.<br>Or be the last monster standing.</p>
+   <div class="goal nocut"><p class="aim">Be first to <b>${GOAL()} ★</b>, or the last monster standing.</p>
+   <ul class="how"><li>Three of a kind scores stars: three 3s = 3 ★.</li><li>Downtown pays: +1 ★ going in, +2 ★ each turn.</li><li>Claws knock hearts off rivals. 0 ♥ is out.</li></ul></div>
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn?'<small>First you pick a secret power</small>':''}</button></div></div>`}}
 // ---- render hook ----
 // the score strip: in the top bar in portrait; landscape keeps its bar buttons and the chips stay in the rail
@@ -152,8 +153,16 @@ function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfS
   // knocked out in a solo game: the rest plays fast, and a new game is one tap away
   const out=bfOut();if(out&&!BF.fast){BF.fast=true;BF.saveDelay=AIDELAY;AIDELAY=Math.min(AIDELAY,140)}
   let ko=$bf('bko');if(out&&!ko&&dk){dk.insertAdjacentHTML('beforeend','<div id="bko"><button class="btn primary" data-a="new">🆕 New game</button></div>');ko=$bf('bko')}if(ko)ko.hidden=!out;
-  bfDice();bfShop();bfLine();bfMarks();bfFinger();
+  bfDice();bfShop();bfLine();bfMarks();bfFinger();bfRace();
   if(G&&BF.cap&&G.phase!=='resolve'&&bfNow()>BF.until)bfEnd()}
+// ---- the race line at the bottom of a portrait phone: the goal and who leads, in big plain words ----
+function bfRace(){const dk=document.querySelector('.gx-dock');if(!dk)return;let el=$bf('bfrace');
+  if(!el){el=document.createElement('div');el.id='bfrace';el.className='nocut';el.setAttribute('aria-live','off');dk.appendChild(el)}
+  if(!G||PHONE.land){el.hidden=true;return}el.hidden=false;
+  const me=meSeat(),live=G.pl.filter(q=>q.alive),top=live.slice().sort((a,b)=>b.vp-a.vp)[0],mine=me>=0?G.pl[me]:null;
+  let who='';const wq=typeof G.winner==='string'&&/^P\d+$/.test(G.winner)?G.pl[+G.winner.slice(1)-1]:null;if(G.winner)who=wq?(wq===mine?'You win!':`${esc(mname(wq))} wins`):'Nobody wins';else if(top&&top.vp>0){const tie=live.filter(q=>q.vp===top.vp).length>1;who=tie?`Tied at ${top.vp} ★`:top===mine?`👑 You lead`:`👑 ${esc(mname(top))} <b>${top.vp} ★</b>`}
+  const html=`<span class="g">Goal <b>${GOAL()} ★</b></span>${mine?`<span class="y">You <b>${mine.vp} ★</b></span>`:''}${who?`<span class="l">${who}</span>`:''}`;
+  if(el.innerHTML!==html)el.innerHTML=html}
 // ---- wiring ----
 {const _pr=phRender;phRender=function(){_pr.apply(this,arguments);try{bfRender()}catch(e){console.error(e)}};
  // the chips hold the old numbers until the dice that change them land
