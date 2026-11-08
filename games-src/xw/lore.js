@@ -38,6 +38,7 @@ const LORE={
 // coached first game (free play): the guide speaks the first time a rule matters. rule:true = counted in TUTORIAL-COVERAGE.md and listed on the end card if it never came up
 LORE.coachIntro={title:'Your move, pilot',text:'From here you fly free: every legal move is yours. Brecken speaks up when a rule matters.',btn:'Fly free'};
 LORE.coachEnd={win:'Convoy saved! Well flown, Varro.',lose:'The convoy is lost, but you learned the ropes.'};
+LORE.laterShort=['Barrel roll and boost: extra sideways moves.','Bumping a ship skips your action.','Flying off the mat destroys your ship.'];
 LORE.laterAlways=['Barrel roll and boost: sideways and bonus moves, in the action ring.','Bumping into a ship stops you short and skips your action.','Flying off the mat destroys your ship.','Torpedoes: spend a target lock for a big shot at range 2-3.','Tied pilot skill: the side with fewer squad points acts first.'];
 LORE.coach={
   goal:{rule:1,t:'Brecken: Your goal',s:'Slate is raiding our convoy. Destroy his ship; yours is at the bottom.'},
