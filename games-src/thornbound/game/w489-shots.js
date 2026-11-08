@@ -14,7 +14,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{p
   const tap=async(x,y)=>{await p.touchscreen.tap(x,y)};
   const lb=await p.evaluate(()=>{const e=document.querySelector('#start [data-gxt-open]');const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});await tap(...lb);await sleep(600);
   await p.evaluate(()=>{UI.speed=3});
-  const shotAt={goal:'tut-1',bid1:'tut-2',autumn2:'tut-3'};const seen=[];let last='',lastT=Date.now();const t0=Date.now();
+  const shotAt={goal:'tut-1',bid1:'tut-2',council:'tut-3'};const seen=[];let last='',lastT=Date.now();const t0=Date.now();
   while(Date.now()-t0<240000){const s=await p.evaluate(()=>GXT.state());
     if(!s||!s.active){break}
     if(s.phase==='end'){await sleep(500);await p.screenshot({path:OUT+'/tut-end.png'});break}
@@ -25,7 +25,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{p
     if(!s.wait){const nx=await p.evaluate(()=>{const e=document.querySelector('.gxt-next');if(!e)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});if(nx){await tap(...nx);await sleep(500)}else await sleep(150);continue}
     const h=s.hole;if(h){await tap(h.cx,h.cy);await sleep(500)}else await sleep(150)}
   const ids=seen.filter(x=>!x.startsWith('w:'));console.log('tutorial steps',ids.length,ids.join(','));
-  for(const need of ['goal','bid1','herald','place1','supp','clash','claim','score','autumn1','autumn2','round','end'])if(!ids.includes(need))note('tutorial never showed step '+need);
+  for(const need of ['goal','tactic','attrition','bid1','kc','favour','herald','cmds','place1','supp','order','clash','claim','score','govern','council','journey','round','end'])if(!ids.includes(need))note('tutorial never showed step '+need);
   if(!fs.existsSync(OUT+'/tut-end.png'))note('tutorial did not reach its end card');
   // the end card hands over a real game
   const pb=await p.evaluate(()=>{const e=document.querySelector('[data-gxt-end=play]');if(!e)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});

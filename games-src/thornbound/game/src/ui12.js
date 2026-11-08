@@ -47,12 +47,15 @@ const myInf=()=>G.pl[0].inf, rivInf=()=>G.pl[1].inf;
 const locOf=m=>m&&m.loc!=null?LOCN[m.loc]:'';
 // one sentence (12 words or fewer) and one glowing thing per step, in the order the table game is learned:
 // goal -> your one action each season (bid, Herald, hidden cards, Supporters) -> the Clash and scoring -> Autumn -> round end -> a real game
-const tutAutCard=()=>{try{const M=UI.bf;if(!M||!M.aut)return null;const ids=[...M.use];const j=ids.find(id=>autMoves(id).some(m=>m.a==='journey'));return j!=null?j:ids[0]}catch(e){return null}};
+const tutAutCard=want=>{try{const M=UI.bf;if(!M||!M.aut)return null;const ids=[...M.use];const j=ids.find(id=>autMoves(id).some(m=>m.a===want));return j!=null?j:null}catch(e){return null}};
+const myCouncil=()=>{try{return ['relics','secrets','oaths'].find(c=>UI.V.council[c].some(id=>ownerOf(id)===0))||null}catch(e){return null}};
 function tutSteps(){
   let p2=null,p3=null,clashSeen=null;
   return [
  {id:'goal',title:'Your goal',say:'Most Influence after the last round wins. This is your score.',target:tq('#rivals'),wait:null,ready:()=>tkind('bid')},
  {id:'map',title:'The kingdom',say:'Win a region’s fight to claim one of its two locations.',target:tq('#mapbox svg'),wait:null,ready:()=>tkind('bid')},
+ {id:'tactic',title:'Tactics',say:'Your four Tactics: special powers, most work once per game.',target:tq('#cstrip .cs-t'),wait:null,ready:()=>tkind('bid')},
+ {id:'attrition',title:'Hand size',say:'Deck empty? Reshuffle your discards, but your hand size drops by one.',target:tq('#rivals .rv.me'),wait:null,ready:()=>tkind('bid')},
  {id:'bid1',title:'Spring: bid',say:()=>'Each round starts with a secret bid. Tap your '+cinfo(tutBidId()).strength+'.',target:()=>tutHandRect(tutBidId()),
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutBidId()},ready:()=>tkind('bid')&&UI.hand==null},
  {id:'bid2',title:'Face down',say:'Tap the crown spot. Nobody sees your bid yet.',target:tq('#bidspot'),from:()=>tutHandRect(tutBidId()),
@@ -62,8 +65,10 @@ function tutSteps(){
    ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='bids'&&UI.card.rank&&UI.card.revN>=UI.card.rank.length)},
  {id:'kc',title:'A Kingdom Card',say:'Take the glowing Kingdom Card. You keep its power.',target:tfirst('#handw .kcb.glow.rg','#handw .kcb.glow'),
    wait:{type:'tap',match:a=>isMove(a,'bidRes')&&a.mv&&a.mv.t==='take'},ready:()=>tkind('bidRes')},
+ {id:'favour',title:'The Favour',say:'Win the Gleaning Meadow to hold the Favour: a power and tiebreaker.',target:tq('#cstrip .cs-f'),wait:null,ready:()=>tkind('herald')},
  {id:'herald',title:'Your Herald',say:()=>'Put your Herald on '+(UI.bf&&UI.bf.rec?locOf(UI.bf.rec):'the glowing location')+'. Win there for a bonus.',target:tutLoc,
    wait:{type:'tap',match:a=>isMove(a,'herald')},ready:()=>tkind('herald')&&!!tutLoc()},
+ {id:'cmds',title:'Card powers',say:'Icons are powers: Day ones act before a fight, Night ones after.',target:()=>{const id=tutPlace()&&tutPlace()[0];return id!=null?tutHandRect(id):null},wait:null,ready:()=>tkind('place')&&tutPlaced()===0&&UI.hand==null},
  {id:'place1',title:'Hide a card',say:()=>'Hide one card at each region. Tap your '+cinfo(tutPlace()[0]).strength+'.',target:()=>tutHandRect(tutPlace()&&tutPlace()[0]),
    wait:{type:'tap',match:a=>a.what==='select'&&tutPlace()&&a.id===tutPlace()[0]},ready:()=>tkind('place')&&tutPlaced()===0&&UI.hand==null},
  {id:'place1b',title:'Where it fights',say:'Tap the Uplands. It stays hidden until the fight.',target:tutReg(0),
@@ -86,14 +91,20 @@ function tutSteps(){
  {id:'score',title:'Scoring',say:()=>'Location, Herald bonus and a steal: you have '+myInf()+' Influence.',target:tq('#rivals'),wait:null,
    hold:c=>c.kind==='news'&&c.big&&c.items.some(infK),onNext:()=>newsOk(),
    ready:()=>!!(UI.card&&UI.card.kind==='news'&&UI.card.big&&UI.card.items.some(infK))},
- {id:'autumn1',title:'Autumn',say:'Autumn: tap a glowing card in your hand.',target:()=>{const id=tutAutCard();return id!=null?tutHandRect(id):null},
-   wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutAutCard()},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&tutAutCard()!=null},
- {id:'autumn2',title:'Journey',say:'Journey trades the card for Lore. Lore buys stronger cards.',target:tfirst('#act .autc [data-aut=journey]','#act .autc .btn'),
-   wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&(a.mv.a==='journey'||a.mv.a==='govern')},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard!=null&&!!document.querySelector('#act .autc .btn')},
+ {id:'autumn1',title:'Autumn',say:'Autumn: tap the glowing card that has votes.',target:()=>{const id=tutAutCard('govern');return id!=null?tutHandRect(id):null},
+   wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutAutCard('govern')},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&tutAutCard('govern')!=null},
+ {id:'govern',title:'Govern',say:'Govern: put it in a Council. Its votes earn Council powers.',target:tfirst('#act .autc [data-aut=govern]'),
+   wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&a.mv.a==='govern'},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard!=null&&!!document.querySelector('#act .autc [data-aut=govern]')},
+ {id:'council',title:'Councils',say:'Your card now sits in that Council, shown on the board here.',target:()=>{const c=myCouncil();return c?document.querySelector('#cstrip [data-c='+c+']'):null},wait:null,
+   ready:()=>!!myCouncil()&&!UI.card},
+ {id:'autumn3',title:'Journey',say:'Now tap your other glowing card.',target:()=>{const id=tutAutCard('journey');return id!=null?tutHandRect(id):null},
+   wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutAutCard('journey')},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&tutAutCard('journey')!=null},
+ {id:'journey',title:'Journey',say:'Journey trades the card for Lore. Lore buys stronger cards.',target:tfirst('#act .autc [data-aut=journey]'),
+   wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&a.mv.a==='journey'},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard!=null&&!!document.querySelector('#act .autc [data-aut=journey]')},
  {id:'round',title:'Winter',say:()=>'Winter: played cards are discarded. You '+myInf()+', the Court '+rivInf()+'.',target:tq('#rivals'),wait:null,
    hold:c=>c.kind==='event'&&c.ev.t==='summary',onNext:()=>evDone(),
    ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='summary')||!!(G&&G.over&&!UI.card)},
- {id:'end',title:'Your game',say:'A real game plays four to six of these rounds. Your turn!',
+ {id:'end',title:'Your game',say:'After the last round, most Influence wins. The Favour breaks ties.',
    target:tq('#rivals'),wait:null,ready:()=>!!(G&&G.over&&!UI.card)}
   ]}
 // ---------------------------------------------------------------- the kit hooks

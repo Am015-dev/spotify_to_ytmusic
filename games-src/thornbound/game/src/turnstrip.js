@@ -31,7 +31,7 @@ html.bf-w #tbturn{height:auto;min-height:72px}
 @keyframes tbtp{0%{transform:scale(.8);opacity:.3}100%{transform:scale(1);opacity:1}}
 html:not(.bf-w) .gx-main{grid-template-rows:auto auto minmax(0,1fr) auto!important;grid-template-areas:"rv" "tb" "bd" "dk"!important}
 html.bf-w .gx-main{grid-template-rows:auto auto minmax(0,1fr)!important;grid-template-areas:"bd rv" "bd tb" "bd dk"!important}
-html:not(.bf-w) #board{margin-bottom:40px!important}
+html:not(.bf-w) #board{margin-bottom:0!important}
 body:has(.gxh-bub.on) #tbturn:not(.voice) .tbt-line{display:none}
 html.tb-dim .tb-loc:not(.glow){opacity:.45;transition:opacity .25s}
 @media (prefers-reduced-motion:reduce){#tbturn.pulse .tbt-chip{animation:none}}
