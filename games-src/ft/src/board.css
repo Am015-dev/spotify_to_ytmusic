@@ -256,3 +256,4 @@ html.sk .gx-drawer-body>button.btn,html.sk .gx-drawer-body>button.btn.go{backgro
 .gx-drawer .btn i.ri{background:#fff6dc!important;background-image:none!important;font-size:18px!important;width:auto;height:auto}
 .gxc-act small{color:#2b1306!important}.gxc-lab{display:inline-block}
 .mcard .mn{display:block;width:calc(100% - 4px);text-align:center;padding:0 1px;line-height:1.15;overflow:hidden}
+.mbox .exsum{width:auto;min-width:0;justify-content:flex-start;gap:8px}
