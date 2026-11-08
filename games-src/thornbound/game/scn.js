@@ -38,12 +38,12 @@
     setup: function () {
       try { GXH.setEnabled(false); } catch (e) { }
       showStart(); storyOpen();   // what the Story button does: first time, the tutorial comes first
-      return GXS.wait(function () { return GXT.active() && document.querySelector('[data-gxt-skip]'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
+      return GXS.wait(function () { return GXCOACH.running && document.querySelector('[data-gxt-skip]'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
     },
     checks: [
-      { kind: 'fn', name: 'the tutorial opened first (not seen yet)', fn: function () { return GXT.active() || 'no tutorial'; } },
+      { kind: 'fn', name: 'the tutorial opened first (not seen yet)', fn: function () { return GXCOACH.running || 'no tutorial'; } },
       { kind: 'text', sel: '[data-gxt-skip]', re: /skip tutorial/i, name: 'Skip tutorial label' },
-      { kind: 'tap', sel: '[data-gxt-skip]', name: 'tap Skip tutorial', state: function () { return { tut: GXT.active(), map: !!document.querySelector('.gxc-map-on .gxc-map'), start: !document.getElementById('start').hidden && !document.querySelector('.gxc-map-on') }; },
+      { kind: 'tap', sel: '[data-gxt-skip]', name: 'tap Skip tutorial', state: function () { return { tut: GXCOACH.running, map: !!document.querySelector('.gxc-map-on .gxc-map'), start: !document.getElementById('start').hidden && !document.querySelector('.gxc-map-on') }; },
         expect: function (a, b) { return (!b.tut && b.map) || (b.tut ? 'tutorial still running' : b.start ? 'went back to the title screen, not the chapter map' : 'blank: no chapter map'); } },
       { kind: 'visible', sel: '.gxc-map-on .gxc-map', name: 'chapter map' },
       { kind: 'fn', name: 'map has chapter 1 to play, and no tutorial strip is left', fn: function () { var n = document.querySelectorAll('.gxc-map-on button, .gxc-map-on [data-ch]').length; return (n >= 2 && !document.querySelector('.gxt-top')) || (n < 2 ? 'chapter map is empty' : 'tutorial strip left over'); } },

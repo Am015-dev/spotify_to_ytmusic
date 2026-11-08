@@ -254,3 +254,83 @@ html body .gx-drawer{transition:none}   /* panels appear at once: no half-slid f
 @media (min-width:1000px){#coachb p,.cfinal p,.cfinal li{font-size:16px}}
 @media (max-width:999px){#acts .ab{padding:6px 8px}#acts{gap:4px}}
 html.wm-title #zoom,html.wm-title .gx-bar .gx-ibtn,html.wm-title .gx-bar h1{visibility:hidden}   /* under the title screen: no board controls peeking through */
+/* W416 scoring you can see: map badges, the preview / verdict strip, market gains, you-vs-rival chips */
+.pvbs{pointer-events:none}
+.pvb rect{fill:#1d3a26;stroke:#f6efdc;stroke-width:1.5}
+.pvb text{fill:#fff;font-size:15px;font-weight:800;font-family:inherit}
+.pvb.up rect{fill:#2f6e3c}.pvb.dn rect{fill:#8a2f25}.pvb.zero rect{fill:#4b4f4a}
+#map .spot.hov{fill:rgba(255,230,150,.35)}
+#map .hx.pvlit polygon:first-of-type,#map .hx.pvlit>polygon{filter:drop-shadow(0 0 6px #ffe08a)}
+#map .hx.pvlit{filter:brightness(1.12) drop-shadow(0 0 5px rgba(255,224,138,.95))}
+#map .hx.pvbrk{filter:saturate(.4) drop-shadow(0 0 5px rgba(255,120,100,.95))}
+#pv{position:absolute;left:8px;right:58px;bottom:76px;z-index:4;pointer-events:none;display:flex;justify-content:center}
+#pv[hidden]{display:none}
+html.wm-coach #pv{bottom:10px}
+.vd{display:flex;align-items:center;gap:10px;max-width:640px;background:rgba(18,32,25,.94);color:#f6efdc;border:2px solid #6c8f6f;border-radius:14px;padding:6px 14px 6px 6px;font-size:15px;line-height:1.25;box-shadow:0 2px 10px rgba(0,0,0,.45)}
+.vd b{flex:0 0 auto;min-width:40px;height:36px;line-height:36px;text-align:center;border-radius:10px;font-size:18px;font-weight:800;background:#2f6e3c;color:#fff}
+.vd.good{border-color:#7fc28a}.vd.okay{border-color:#d9b25a}.vd.okay b{background:#8a6a1e}.vd.poor{border-color:#e07a68}.vd.poor b{background:#8a2f25}
+.pair{position:relative}
+.gain{display:block;font-size:13px;font-weight:800;line-height:1;padding:5px 8px;border-radius:99px;background:#24362b;color:#e9f3df;border:1px solid rgba(255,255,255,.25);white-space:nowrap}
+.gain.best{background:#e6b04f;color:#1d2420;border-color:#fff3c8}
+.gain.nil{background:#3a3d3a;color:#e6e6e0}
+.pair.top{box-shadow:inset 0 0 0 3px #e6b04f}
+.cc .rv{font-size:13px;font-weight:700;color:#c9cfc6;margin-left:1px}
+
+.cc.ahead{box-shadow:inset 0 -3px 0 #7fc28a}.cc.behind{box-shadow:inset 0 -3px 0 #e07a68}
+.terr{display:flex;gap:4px;margin-left:auto}
+.tc{display:flex;align-items:center;gap:3px;background:rgba(18,32,25,.86);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 6px;min-height:40px;font-size:15px}
+.tc .sw{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.4)}
+.tc b{font-size:15px}.tc .rv{font-size:13px;font-weight:700}
+.tc.ahead{box-shadow:inset 0 -3px 0 #7fc28a}.tc.behind{box-shadow:inset 0 -3px 0 #e07a68}
+@media (max-width:999px){.seat{padding:4px 8px}.terr{gap:2px}.tc{padding:2px 4px;gap:2px}.tc .sw{width:9px;height:9px}.vd{font-size:14px}}
+@media (min-width:1000px){.vd{font-size:16px}.gain{font-size:16px}.cc .rv,.tc .rv{font-size:16px!important}.tc,.tc b{font-size:16px}}
+/* colour legend: your numbers gold, the rival's rust (the seat chips carry the same dots) */
+.cc b,.tc b{color:#ffd88a}.cc .rv,.tc .rv{color:#ff9f8a}
+.seat .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:0;background:#888}
+.seat .dot.me{background:#e6b04f;box-shadow:0 0 0 1.5px #1d2420}.seat .dot.riv{background:#e0705a}
+.tc{border-left:5px solid #888;padding-left:4px}
+.seat.on b{color:inherit}
+.terr{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;align-items:center}
+.terr .tl{font-size:13px;font-weight:700;color:#e9efe4;margin-right:2px}
+@media (min-width:1000px){.terr .tl{font-size:16px}}
+.pvring{fill:none;stroke:#ffe08a;stroke-width:4;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,224,138,.9))}
+.pvring.brk{stroke:#ff8a75;stroke-dasharray:8 5}
+/* W416: the wooden table is back (owner: "polished digital board game"); a soft vignette keeps the tiles' rims readable on it */
+.gx-board.hasart{background:radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 35%,rgba(10,6,3,.55) 100%),url(media/table-bg.webp) center/cover #3b2717!important}
+#map .hx polygon:first-child{filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}
+/* W416b: the habitat row is its own labelled strip; the rival's caption rides in the verdict box; the turn-over banner wraps */
+#terr{position:absolute;left:8px;right:72px;top:104px;z-index:3;display:flex;align-items:center;gap:4px;margin:0;flex-wrap:nowrap;background:rgba(18,22,20,.88);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:3px 6px;min-height:40px}
+#terr.solo{top:58px}
+#terr .tl{display:flex;flex-direction:column;line-height:1.05;font-size:13px;font-weight:800;color:#f3ead2;margin-right:4px;white-space:nowrap}
+#terr .tl small{font-size:13px;font-weight:700}#terr .tl .me{color:#ffd88a}#terr .tl .riv{color:#ff9f8a}
+#terr .tc{border:0;background:none;padding:0 3px;min-height:0;gap:3px;flex:1 1 0;justify-content:center}
+#terr .ti{width:18px;height:20px;flex:0 0 auto;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background-size:cover}
+#terr .sep{font-style:normal;color:#c9cfc6;font-size:13px}
+#terr .tc.ahead,#terr .tc.behind{box-shadow:none}#terr .tc.ahead b{text-decoration:underline 2px #7fc28a}#terr .tc.behind .rv{text-decoration:underline 2px #e07a68}
+.vd .rivl{display:block;font-style:normal;font-size:13px;color:#d9dccf;margin-top:2px}
+.vd.riv{border-color:#8f9a8f}
+#turnban{max-width:calc(100% - 32px);white-space:normal;text-align:center;line-height:1.2}
+@media (min-width:1000px){#terr{left:190px;top:122px;right:auto}#terr .tl,#terr .tl small,#terr .sep{font-size:16px}#terr .ti{width:22px;height:24px}.vd .rivl{font-size:16px}#terr .tc{flex:0 0 auto;padding:0 6px}}
+#terr .ti.hasart{background-size:cover!important}
+#turnban.on{animation-duration:1.8s}
+#coachb{top:152px}   /* below the habitat strip */
+@media (min-width:1000px){#coachb{top:150px}#terr{left:440px!important;top:70px!important}}
+
+/* W416c: the why panel (tap an animal chip) and the score sheet with a why under every number */
+#whyp{position:absolute;left:8px;right:8px;top:152px;z-index:8;display:flex;gap:10px;align-items:flex-start;background:#f6efdc;color:#1d2420;border-radius:14px;padding:10px 6px 10px 10px;box-shadow:0 6px 20px rgba(0,0,0,.5);max-width:620px;margin:0 auto}
+#whyp[hidden]{display:none}
+#whyp .wpat{flex:0 0 96px}#whyp .wpat svg{width:96px;height:auto}
+#whyp .wtx{flex:1 1 auto;min-width:0}#whyp h3{margin:0 0 2px;font-size:16px}#whyp p{margin:2px 0;font-size:14px;line-height:1.3}
+#whyp .wl{font-weight:700}#whyp .wl.me{color:#5b3f00}#whyp .wl.riv{color:#8a2f25}#whyp .wh{color:#3c4a40}
+#whyp .ab{margin-top:6px}#whyp .cx{flex:0 0 auto;width:44px;height:44px;border:0;background:none;font-size:24px;color:#1d2420;cursor:pointer}
+.cc.on{box-shadow:0 0 0 3px #e6b04f!important}
+.st.why td{vertical-align:top;white-space:normal}.st.why td.n b{display:block;font-size:17px}.st.why small{display:block;font-size:13px;line-height:1.2;opacity:.85;font-weight:600}
+.st.why td.src{display:flex;align-items:center;gap:6px;text-align:left}.st.why td.src span{display:flex;flex-direction:column}
+.st.why td.best b{color:#2f6e3c}
+@media (min-width:1000px){#whyp{top:180px}#whyp h3{font-size:18px}#whyp p,.st.why small{font-size:16px}}
+/* why panel sits at the bottom so the lit groups on the board stay visible; dark ink for every why in the score sheet */
+#whyp{top:auto!important;bottom:10px;max-height:46%;overflow:auto}
+#whyp .wpat{flex-basis:72px}#whyp .wpat svg{width:72px}
+.st.why small{color:#3d3220!important;opacity:1!important}
+.st.why td.src{display:table-cell}.st.why td.src svg,.st.why td.src .sw{float:left;margin:2px 6px 0 0}
+#whyp{right:64px!important;margin:0!important}@media (min-width:1000px){#whyp{left:50%!important;right:auto!important;transform:translateX(-50%);width:620px}}

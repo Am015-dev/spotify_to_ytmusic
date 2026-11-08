@@ -123,12 +123,13 @@
   };
   function endTurn(G) {
     var s = G.seats[G.cur]; s.done++; G.hold = null; G.used3 = false; G.stage = 'pick';
-    if (G.solo) {   // solo: the rightmost remaining tile and the rightmost remaining token leave the game
+    if (G.solo) {   // solo: the stacks sit at the left (slot 1); the remaining tile and token furthest from them (rightmost) leave the game
       for (var i = 3; i >= 0; i--) if (G.market.tiles[i]) { G.market.tiles[i] = null; break; }
       for (i = 3; i >= 0; i--) if (G.market.toks[i]) { G.bag[G.market.toks[i]]++; G.market.toks[i] = null; break; }
     }
-    // rules: market items never move; the taken tile and token are refilled in place (solo keeps its documented slide toward the far end)
-    if (G.solo) ['tiles', 'toks'].forEach(function (f) { var l = G.market[f].filter(function (x) { return x; }); while (l.length < 4) l.unshift(null); G.market[f] = l; });
+    // rules: market items never move; the taken tile and token are refilled in place, pairs stay as dealt.
+    // solo: the rest slide TOWARD the stacks (left) and the refill enters at the far end (right)
+    if (G.solo) ['tiles', 'toks'].forEach(function (f) { var l = G.market[f].filter(function (x) { return x; }); while (l.length < 4) l.push(null); G.market[f] = l; });
     for (i = 0; i < 4; i++) { if (!G.market.tiles[i]) G.market.tiles[i] = G.supply.length ? G.supply.pop() : null; if (!G.market.toks[i]) G.market.toks[i] = drawTok(G); }
     overpop(G);
     if (G.seats.every(function (x) { return x.done >= G.turns; })) { finish(G); return; }
@@ -163,7 +164,7 @@
         var best = null, bl = 0;
         lines.forEach(function (l) { var run = [], br = []; l.forEach(function (x) { if (used[x]) { if (run.length > br.length) br = run; run = []; } else run.push(x); }); if (run.length > br.length) br = run; if (br.length > bl) { bl = br.length; best = br; } });
         if (!best) break;
-        var take = best.slice(0, 4); take.forEach(function (x) { used[x] = 1; }); v += pts[take.length]; lit = lit.concat(take);
+        var take = best.slice(0, 4); take.forEach(function (x) { used[x] = 1; }); v += pts[take.length]; lit = lit.concat(take); if (info) (info.lines = info.lines || []).push(take.length);
       }
     }
     if (info) info.lit = lit;

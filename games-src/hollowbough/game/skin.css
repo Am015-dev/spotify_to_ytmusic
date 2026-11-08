@@ -58,3 +58,21 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 .online{background:#fbf4e2!important;color:#2a1f19!important}.online .sm{opacity:1!important;color:#2a1f19!important}
 .btn.on span,.btn.on b{color:#2a1f19!important}
 .it img.ri,.its img.ri,img.ri{pointer-events:none!important}
+/* seeing the game: tracker, score, toasts, badges */
+#barprompt{display:flex!important;flex-direction:column;gap:1px}
+#trk{font-size:13px;line-height:1.2;color:#2a1f19!important;font-weight:600}
+#trk .tr1,#trk .tr2{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:center}
+#trk .who.mine{color:#7a3b00;font-weight:800}
+#trk .tk{display:inline-flex;gap:3px;vertical-align:middle}#trk .tk i{width:11px;height:11px;border-radius:50%;border:2px solid #2a1f19;display:inline-block;box-sizing:border-box}#trk .tk i.on{background:#c58f14;border-color:#2a1f19}
+#trk .sp small{font-size:13px;opacity:.9}#trk .sp.lead b{color:#1d5a1d}
+.hbtoast{position:fixed;left:50%;transform:translate(-50%,-6px);width:min(92vw,420px);z-index:9997;background:#fff8e6;color:#2a1f19;border:2px solid #5a3b1f;border-radius:12px;padding:6px 10px;font-size:14px;line-height:1.25;font-weight:600;box-shadow:0 6px 16px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.hbtoast.on{opacity:1;transform:translate(-50%,0)}.hbtoast small{display:block;font-weight:500;font-size:13px;margin-top:2px}.hbtoast em{font-style:normal;color:#1d5a1d;font-weight:800}
+.r-good{color:#1d5a1d}.r-okay{color:#7a5200}.r-poor{color:#8a1d12}
+.hbbest{position:relative}.hbbest::after{content:"\2605 best";position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#ffd24a;color:#2a1f19;font:800 11px/1 sans-serif;padding:2px 5px;border-radius:7px;pointer-events:none;z-index:60;white-space:nowrap}
+@media (min-width:1024px){#trk,#trk .sp small,.hbtoast,.hbtoast small{font-size:16px}}
+.chip.turn{background:#ffe08a!important;box-shadow:0 0 0 2px #fff!important}
+.btn.dis,.btn:disabled{opacity:1!important;background:#5b6b52!important;color:#fff!important;text-shadow:none}.btn.dis span,.btn.dis b{color:#fff!important}
+#barprompt{max-height:100%;overflow:hidden}
+#prompt{color:#2a1f19!important}#prompt.mine{color:#7a3b00!important}
+.hbtoast:not(.on){visibility:hidden;transition:opacity .2s,transform .2s,visibility 0s .2s}
+#hbover{z-index:10050}

@@ -133,3 +133,96 @@ function extrasBoot() {
   const rc = renderCard; renderCard = function () { const r = rc.apply(this, arguments); try { endBanner(); } catch (e) { } return r; };
   const rr = renderRival; renderRival = function () { const r = rr.apply(this, arguments); try { rivalPortrait(); } catch (e) { } return r; };
 })();
+// ===================== see what to do, how points come in, when a turn ends (owner, Addendum 5) =====================
+// 1 turn tracker + always-visible score breakdown in the top bar; 2 "Turn over: why" card; 3 points pop with the reason; 4 best-value badge on the best spot / meadow card / hand card;
+// 5 preview of what a spot or card yields (hover, focus or touch-down); 6 one-line good / okay / poor rating of your move, compared with the computer's evaluation.
+const SEE = { vals: null, key: '', last: null, scores: null, actor: -1, rate: null };
+function seeToast(id, html, ms, top) {
+  let e = document.getElementById(id);
+  if (!e) { e = document.createElement('div'); e.id = id; e.className = 'hbtoast'; e.setAttribute('role', 'status'); e.setAttribute('data-help', ''); document.body.appendChild(e); }
+  e.style.top = top + 'px'; e.innerHTML = html; e.classList.add('on'); clearTimeout(e._t); if (ms) e._t = setTimeout(() => e.classList.remove('on'), ms);
+}
+function seeToastOff(id) { const e = document.getElementById(id); if (e) e.classList.remove('on'); }
+const seeMine = () => !!G && UI.started && G.phase !== 'over' && HB.actor(G) === viewSeat() && viewSeat() >= 0 && !G.players[viewSeat()].ai;
+// ---- values for all my legal moves, once per position
+function seeVals() {
+  if (!seeMine() || G.q) return null;
+  const k = G.logN + ':' + G.turn; if (SEE.key === k) return SEE.vals;
+  SEE.key = k; SEE.vals = null;
+  try { const r = HB.AI.rank(G, viewSeat()); if (r.length > 1) { const mx = Math.max(...r.map(x => x.v)), mn = Math.min(...r.map(x => x.v)); SEE.vals = { r, mx, mn, rng: Math.max(1e-6, mx - mn), seat: viewSeat(), p: G.players[viewSeat()], sc: score(viewSeat()).total }; } } catch (e) { SEE.vals = null; }
+  return SEE.vals;
+}
+// ---- tracker + score breakdown
+function seeTracker() {
+  const bp = $('#barprompt'); if (!bp || !G) return; let t = $('#trk');
+  if (!t) { t = document.createElement('div'); t.id = 'trk'; t.setAttribute('data-help', ''); bp.appendChild(t); }
+  const v = Math.max(0, viewSeat()), me = G.players[v], a = G.phase === 'over' ? -1 : HB.actor(G), sc = G.players.map((_, s) => score(s));
+  const best = Math.max(...sc.map(x => x.total)), lead = sc.filter(x => x.total === best).length === 1 ? sc.findIndex(x => x.total === best) : -1;
+  const free = availW(me), used = me.workers - free;
+  const who = G.phase === 'over' ? 'Game over' : a === v ? 'Your turn' : G.players[a].name + "'s turn";
+  const tok = '<span class="tk" aria-label="' + free + ' of ' + me.workers + ' workers left">' + '<i class="on"></i>'.repeat(free) + '<i></i>'.repeat(Math.max(0, used)) + '</span>';
+  const part = s => { const x = sc[s], nm = s === v ? 'You' : G.players[s].name; return '<span class="sp' + (s === lead ? ' lead' : '') + '"><b>' + nm + ' ' + x.total + (s === lead ? ' ♛' : '') + '</b> <small>cards ' + x.cards + ' · tokens ' + x.tokens + ' · events ' + x.events + (x.bonus ? ' · bonus ' + x.bonus : '') + '</small></span>'; };
+  t.innerHTML = '<div class="tr1"><b>' + SEASN[me.season] + '</b> season ' + (me.season + 1) + ' of 4 · <span class="who' + (a === v ? ' mine' : '') + '">' + who + '</span> ' + (G.phase === 'over' ? '' : tok + ' <span class="fw">workers left</span>') + '</div><div class="tr2">' + G.players.map((_, s) => part(s)).join('') + '</div>';
+  // the points pop: what each player just earned and why
+  const prev = SEE.scores; SEE.scores = sc.map(x => ({ total: x.total, cards: x.cards, tokens: x.tokens, events: x.events, bonus: x.bonus, journey: x.journey }));
+  if (prev && prev.length === sc.length) sc.forEach((x, s) => { const o = prev[s], d = x.total - o.total; if (d <= 0) return;
+    const why = x.events > o.events ? 'event claimed' : x.cards > o.cards ? 'card points' : x.tokens > o.tokens ? 'point tokens' : x.bonus > o.bonus ? 'bonus' : x.journey > o.journey ? 'journey' : 'points';
+    const chip = $('.chip[data-seat="' + s + '"]'); try { if (chip && typeof fxFloat === 'function') fxFloat(frameRect(chip), 'point', '+' + d + ' ' + why, null, { n: 1 }); } catch (e) { }
+    seeToast('hbpop', '<b>+' + d + '</b> ' + (s === v ? 'You' : G.players[s].name) + ': ' + why, 2600, 168); });
+}
+// ---- "Turn over: why"
+function seeTurnOver() {
+  if (!G || !UI.started) return; const v = viewSeat(), a = G.phase === 'over' ? -2 : HB.actor(G);
+  if (SEE.actor === v && a !== v && v >= 0 && !(a === -2)) {
+    const me = G.players[v], free = availW(me), n = G.players[a] ? G.players[a].name : 'The rival';
+    const why = me.passed ? 'You passed, so you are done for the game.' : free === 0 ? 'All your workers are out, so only a card, Prepare or Pass is left.' : 'Each player takes one action, then the turn moves on (' + free + ' worker' + (free === 1 ? '' : 's') + ' left).';
+    seeToast('hbover', '<b>Turn over:</b> ' + why + ' ' + n + ' plays now.', 3600, 214);
+  }
+  SEE.actor = a;
+}
+// ---- badges + preview
+function seeBadges() {
+  document.querySelectorAll('.hbbest').forEach(e => e.classList.remove('hbbest'));
+  const V = seeVals(); if (!V || !UI.tgEls) return;
+  const grp = tg => /^w:(basic|forest)/.test(tg) ? 'spot' : /^p:meadow:/.test(tg) ? 'meadow' : /^p:hand:/.test(tg) ? 'hand' : '';
+  const best = {};
+  for (const x of V.r) { const tg = tgOf(x.m), g = grp(tg); if (!g || !UI.tgEls[tg]) continue; if (!best[g] || x.v > best[g].v) best[g] = { v: x.v, tg }; }
+  for (const g in best) { const n = V.r.filter(x => grp(tgOf(x.m)) === g).length; if (n > 1 && best[g].v > V.mn + 1e-6) { const e = UI.tgEls[best[g].tg]; if (e) e.classList.add('hbbest'); } }
+}
+function seeDelta(x, V) {
+  const q = x.W.players[V.seat], p = V.p, parts = [];
+  for (const k of ['twig', 'resin', 'pebble', 'berry']) { const d = q.res[k] - p.res[k]; if (d) parts.push((d > 0 ? '+' : '') + d + ' ' + k); }
+  const dp = HB.score(x.W, V.seat).total - V.sc; if (dp) parts.push((dp > 0 ? '+' : '') + dp + ' point' + (Math.abs(dp) === 1 ? '' : 's'));
+  const dc = q.hand.length - p.hand.length; if (dc > 0) parts.push('+' + dc + ' card' + (dc > 1 ? 's' : '')); if (q.city.length > p.city.length) parts.push('built');
+  return parts.join(', ') || 'nothing now';
+}
+function seePreview(el) {
+  const V = seeVals(); if (!V) return; const tg = el && el.dataset && el.dataset.t; if (!tg) return;
+  const xs = V.r.filter(x => tgOf(x.m) === tg); if (!xs.length) return; const x = xs.reduce((a, b) => (b.v > a.v ? b : a));
+  let name = '', ab = '';
+  if (x.m.type === 'worker') { const m = /^w:(basic|forest):(\d+)/.exec(tg); if (m) { const t = tileInfo(m[1], +m[2]); name = t.name; ab = t.text || ''; } }
+  else if (/^p:(hand|meadow):/.test(tg)) { const id = +tg.split(':')[2]; try { const sp = spec(id); name = sp.name; ab = sp.text || ''; } catch (e) { } }
+  const tag = V.r.every(y => y.v <= x.v + 1e-9) ? ' <em>best now</em>' : '';
+  seeToast('hbprev', '<b>' + (name || 'This move') + ':</b> ' + seeDelta(x, V) + tag + (ab ? '<small>' + ab + '</small>' : ''), 0, 260);
+}
+document.addEventListener('pointerover', e => { const t = e.target.closest && e.target.closest('[data-t]'); if (t && t.classList.contains('glow')) seePreview(t); else if (!e.target.closest('#hbprev')) seeToastOff('hbprev'); }, true);
+document.addEventListener('focusin', e => { const t = e.target.closest && e.target.closest('[data-t]'); if (t) seePreview(t); }, true);
+document.addEventListener('pointerdown', e => { const t = e.target.closest && e.target.closest('[data-t]'); if (t && t.classList.contains('glow')) seePreview(t); }, true);
+document.addEventListener('pointerup', () => setTimeout(() => seeToastOff('hbprev'), 500), true);
+// ---- rating of my move: good / okay / poor, with the reason, against the computer's evaluation of the same position
+(function () {
+  const o = act;
+  act = function (m) {
+    let rate = null;
+    try { const V = SEE.vals; if (V && seeMine() && G.players[viewSeat()] === V.p && m && m.type !== 'choose' && !(UI.cfg && UI.cfg.tutorial && false)) {
+      const me = V.r.find(x => sameM(x.m, m)); if (me) { const best = V.r.reduce((a, b) => (b.v > a.v ? b : a)), d = (best.v - me.v) / V.rng;
+        const nm = x => x.m.type === 'worker' ? (x.m.label || 'another spot') : x.m.type === 'pass' ? 'passing' : x.m.type === 'prepare' ? 'Prepare' : (x.m.label || 'another move');
+        rate = d <= .12 ? ['good', 'Good: ' + (me === best ? 'the best of ' + V.r.length + ' moves' : 'close to the best') + '. ' + seeDelta(me, V) + '.'] : d <= .4 ? ['okay', 'Okay: ' + nm(best) + ' was a bit better (' + seeDelta(best, V) + ').'] : ['poor', 'Poor: ' + nm(best) + ' was much better (' + seeDelta(best, V) + ').']; } }
+    } catch (e) { rate = null; }
+    seeToastOff('hbprev');
+    const r = o.apply(this, arguments);
+    if (rate) { SEE.rate = rate; if (UI.cfg && UI.cfg.coached) UI.fbQ = [{ t: rate[1], at: Date.now() }]; else seeToast('hbrate', '<b class="r-' + rate[0] + '">' + rate[1] + '</b>', 4200, 168); }
+    return r;
+  };
+})();
+(function () { const o = render; render = function () { const r = o.apply(this, arguments); try { seeTracker(); seeTurnOver(); setTimeout(() => { try { seeBadges(); } catch (e) { } }, 60); } catch (e) { console.warn('see', e); } return r; }; })();
