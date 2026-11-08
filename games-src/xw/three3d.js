@@ -393,6 +393,9 @@ function sync3D(){if(!V3.on||!G)return;if(PH)PH.wake();
   V3.bombs=V3.bombs||{};const live=new Set((G.bombs||[]).map(t=>t.id));for(const id in V3.bombs)if(!live.has(id)){V3.root.remove(V3.bombs[id]);delete V3.bombs[id]}
   for(const t of (G.bombs||[]))if(!V3.bombs[t.id]){V3.bombs[t.id]=bombMesh(t);V3.root.add(V3.bombs[t.id])}
   for(const s of G.ships){let m=V3.ships[s.id];if(!m){m=V3.ships[s.id]=shipMesh(s);V3.root.add(m);m.position.copy(W(s.x,s.y));m.rotation.y=s.h}
+    // phone portrait (R5 review): ships read bigger and brighter on the small board: x1.35 and a soft side-coloured glow under each
+    {const R0=document.documentElement,php=R0.classList.contains('ph-p')&&!R0.classList.contains('ph-big');m.scale.setScalar(php?1.35:1);
+     if(!m.userData.halo){const h=glow(s.side?0xff6070:0x70d8ff,S3(B(s))*2.6,.5);h.position.y=1.2;h.renderOrder=-1;m.add(h);m.userData.halo=h}m.userData.halo.visible=php&&s.alive}
     m.visible=s.alive||(V3.anim[s.id]&&V3.anim[s.id].boom)||false;if(!V3.anim[s.id]){m.position.copy(W(s.x,s.y));m.rotation.y=s.h}}
   drainFx();drawGuides();tags3D()}
 // hits land when the bolt arrives: effects on a ship that was just shot at are delayed until then
