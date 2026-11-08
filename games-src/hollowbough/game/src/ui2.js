@@ -221,6 +221,7 @@ function posStripCard(box, fit, n, i) {
 }
 function placeBox(e, b) { e.style.cssText += `;left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`; return e; }
 function renderBoard() {
+  if (PV_ON) return pvRender();   // W457 Play view (below); ?board=old keeps this board
   const host = $('#board'), bd = $('#bd'); if (!host || !G) return;
   const W = host.clientWidth || 390, H = host.clientHeight || 470;
   const R = boardLayout(W, H); UI.lay = R;
@@ -467,10 +468,288 @@ function promptText() {
   if (G.q) return qShort(G.q);
   const n = availW(p);
   const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
-  return pre + (n > 0 ? 'tap a glowing spot.' : 'play a card, Prepare or Pass.');
+  return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build, Prepare or Pass.' : 'play a card, Prepare or Pass.'));
 }
 // the short line for a pending decision (8 words at most; the long wording stays in the log)
 function qShort(q) {
   const m = ({ discard: 'Tap cards to discard, then Done.', resource: 'Pick a resource.', meadow: 'Tap a meadow card.', production: 'Tap a card to activate next.', ruins: 'Tap a building to raze.', recipient: 'Pick a rival.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Tap the effect to resolve first.', queen: 'Tap a card to play free.', inn: 'Tap a meadow card to play.', university: 'Tap a card to disband.', cemetery: 'Tap a card, or choose.', copy: 'Pick a place to copy.', prisoner: 'Tap a critter to lock up.', clear: 'Tap a meadow card to clear.', recall: 'Tap a worker to recall.', ranger: 'Pick a worker or a place.', tuck: 'Tap a critter to tuck.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove.', teach: 'Tap the card to keep.', pigeon: 'Play a revealed card?', waive: 'Choose what to cut.', judge: 'Choose which resource to swap.', spend: 'Spend for point tokens?', trade: 'Trade resources?', bazaar: 'Play one for 1 less?', scroll: 'Keep it or tuck it?', clock: 'Repeat a place?', mole: 'Pick a card to mimic.', chip: 'Pick a card to re-run.', stock: 'Pick a stack to add.' })[q.kind];
   return m || wordsCap(q.title, 8);
+}
+// ===================== part 14: the Play view (W457): one focus at a time =====================
+// Phone: a top bar (scores, resource piles, worker meeples), ONE focus panel (Places | Meadow | City), a fanned hand, the action row.
+// Wide: the same pieces side by side. Same contract as the old board (src/ui2.js renderBoard, kept behind ?board=old):
+// UI.tgEls + data-a="t"/data-t targets, UI.tiles / UI.cr rects, UI.lay.{W,H,acts,hand}, and the classes the coach, help and tests
+// look for (.tile.t-*, .mc, .sc, .hc, .chip[data-seat], .chips, .rs[data-res], .resrow, .strip.city, .strip.hand).
+// PV_FEEL holds the game-agnostic feel bits (drag to a target, hop, vibrate) so they can move to the shell later.
+const PV_ON = (() => { try { return new URLSearchParams(location.search).get('board') !== 'old'; } catch (e) { return true; } })();
+const PV_FEEL = {
+  tick(ms) { try { if (navigator.vibrate) navigator.vibrate(ms || 14); } catch (e) { } },
+  // el hops in an arc from rect `from` (board coords) to where it is now
+  hop(el, from, ms) {
+    if (!el || !from || !ANIM) return; const to = frameRect(el); if (!to) return;
+    const a = ctr(from), b = ctr(to), dx = a.x - b.x, dy = a.y - b.y, lift = Math.min(90, 40 + Math.hypot(dx, dy) * .18);
+    el.style.zIndex = 70;
+    const an = animate(el, [{ transform: `translate(${dx}px,${dy}px) scale(.85)` }, { transform: `translate(${dx / 2}px,${dy / 2 - lift}px) scale(1.3)`, offset: .5 },
+      { transform: 'translate(0,-6px) scale(1.12,.9)', offset: .86 }, { transform: 'none' }], { duration: ms || 560, easing: 'cubic-bezier(.3,.7,.4,1)' });
+    if (an) an.onfinish = () => { el.style.zIndex = ''; };
+  },
+  // a draggable thing: onStart(), onMove(x,y) -> element under the finger, onDrop(x,y,under) -> true when it landed
+  drag: null
+};
+// ---- plain words for a place
+function pvWord(k, n) {
+  if (RESK.indexOf(k) >= 0) { n = +n || 1; return n + ' ' + rname(k, n); }
+  if (k === 'card') return n === '2ea' ? '2 cards each' : ((+n || 1) + ((+n || 1) === 1 ? ' card' : ' cards'));
+  if (k === 'any') return 'any ' + (n === '' ? 1 : n);
+  if (k === 'point') return (+n || 1) + ((+n || 1) === 1 ? ' point' : ' points');
+  return '';
+}
+const PV_SPECIAL = {
+  forest_rummage_hollow: ['Swap cards', 'draw 2 per discard', 'card'], forest_echoing_meadow: ['Copy a place', '+ 1 card', 'copy'],
+  forest_barter_stump: ['Cards to goods', '1 each, up to 3', 'any'], forest_meadow_bazaar: ['Take 2 meadow', 'play 1 for 1 less', 'meadow']
+};
+function pvSpot(kind, i) {
+  const join = l => { const w = l.map(([k, n]) => pvWord(k, n)).filter(Boolean); return { main: w.slice(0, 2).join(' + '), sub: w.slice(2).join(' + '), ico: l[0] ? l[0][0] : 'any' }; };
+  if (kind === 'basic') { const o = join(basicItems(i)); if (D.basic[i].shared) o.sub = o.sub ? o.sub + ' · shared' : 'shared'; return o; }
+  if (kind === 'forest') { const k = D.forest[G.forest[i]].key; if (PV_SPECIAL[k]) { const s = PV_SPECIAL[k]; return { main: s[0], sub: s[1], ico: s[2] }; } return join(FIC[k] || [['any', '']]); }
+  if (kind === 'haven') return { main: 'Cards to goods', sub: '2 cards = any 1', ico: 'haven' };
+  if (kind === 'journey') return { main: 'Journey', sub: 'Autumn only: points', ico: 'road' };
+  if (kind === 'bev') { const dd = D.basicEvents[G.bev[i].k]; return { main: dd.name, sub: 'Goal · ' + dd.pts + ' points', ico: 'flag' }; }
+  if (kind === 'sev') { const dd = D.specialEvents[G.sev[i].k]; return { main: dd.name, sub: 'Goal · ' + (dd.pts || '?') + ' points', ico: 'star' }; }
+  return { main: '', sub: '', ico: 'any' };
+}
+// ---- card faces: name, painted art, cost as big icons with numbers, points
+function pvArt(sp) { const a = h('div.pvc-art'); const u = HBKit.paintedHref && HBKit.paintedHref(sp.art); if (u) a.style.backgroundImage = 'url("' + u + '")'; else { const g = HBKit.art(sp.art, 200); g.setAttribute('width', '100%'); g.setAttribute('height', '100%'); g.setAttribute('preserveAspectRatio', 'xMidYMid slice'); a.appendChild(g); } return a; }
+function pvCost(cost, px) {
+  const w = h('span.pvc-cost'); let any = false;
+  for (const r of RESK) if (cost && cost[r]) { any = true; w.appendChild(h('span.pvc-ci', { 'data-r': r }, ic(r, px), h('b', cost[r]))); }
+  if (!any) w.appendChild(h('span.pvc-free', 'Free'));
+  return w;
+}
+function pvNeed(cost, res) { const a = []; for (const r of RESK) { const d = (cost && cost[r] || 0) - (res[r] || 0); if (d > 0) a.push(d + ' ' + rname(r, d)); } return a; }
+function pvFace(id, o) {
+  o = o || {}; const sp = spec(id), T = (HBKit.TYPES && HBKit.TYPES[sp.type]) || { c: '#a67c52', d: '#6b4a2a' };
+  const f = h('div.pvc' + (o.small ? '.small' : ''), { style: `--tc:${T.c};--td:${T.d}` });
+  f.appendChild(h('div.pvc-name', sp.name));
+  const art = pvArt(sp); f.appendChild(art);
+  art.appendChild(h('span.pvc-pts', { title: (sp.points || 0) + ' points' }, h('b', sp.points || 0)));
+  if (o.small) art.appendChild(pvCost(sp.cost, 17));
+  else { f.appendChild(h('div.pvc-row', pvCost(sp.cost, 26))); f.appendChild(h('div.pvc-type', (TYPEN[sp.type] || '') + (sp.unique ? ' · unique' : ''))); }
+  if (o.state) f.appendChild(h('div.pvc-aff.' + o.state[0], o.state[1]));
+  return f;
+}
+function pvMini(id, entry) {
+  const sp = spec(id), T = (HBKit.TYPES && HBKit.TYPES[sp.type]) || { c: '#a67c52' };
+  const f = h('div.pvm', { style: `--tc:${T.c}` }); const art = pvArt(sp); f.appendChild(art);
+  f.appendChild(h('span.pvm-pts', h('b', sp.points || 0)));
+  if (entry && (entry.tok || entry.w)) f.appendChild(h('span.pvm-x', (entry.tok ? '+' + entry.tok : '') + (entry.w ? ' ⚑' + entry.w : '')));
+  f.appendChild(h('span.pvm-name', sp.name)); return f;
+}
+// ---- panels (phone: one at a time)
+const PV_TABS = [['places', 'Places'], ['meadow', 'Meadow'], ['city', 'City'], ['goals', 'Goals']];
+function pvTall() { return !!document.querySelector('#bd.pv.tall'); }
+function pvSetTab(v, quiet) {
+  UI.pvTab = v; const bd = $('#bd'); if (!bd || !bd.classList.contains('pv')) return;
+  bd.querySelectorAll('.pv-panel').forEach(p => p.classList.toggle('on', p.dataset.p === v));
+  bd.querySelectorAll('.pv-tab').forEach(t => { const on = t.dataset.v === v; t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
+  if (!quiet) { const p = bd.querySelector('.pv-panel.on'); if (p) { p.classList.remove('pvin'); void p.offsetWidth; p.classList.add('pvin'); } }
+  pvRects(); if (!quiet) { try { placeFinger(); } catch (e) { } }
+}
+// where things are, for the flying pieces (a piece on a hidden panel flies to / from its tab)
+function pvRects() {
+  const bd = $('#bd'); if (!bd || !bd.classList.contains('pv')) return; UI.tiles = {}; UI.cr = {};
+  const tabR = p => frameRect(bd.querySelector('.pv-tab[data-v="' + p + '"]'));
+  const rr = el => { const r = frameRect(el); if (r && r.w > 2) return r; const p = el.closest('.pv-panel'); return (p && tabR(p.dataset.p)) || r; };
+  bd.querySelectorAll('.tile').forEach(e => { UI.tiles[e.dataset.k + ':' + e.dataset.i] = rr(e); });
+  bd.querySelectorAll('.mc[data-id]').forEach(e => { UI.cr['m' + e.dataset.id] = rr(e); });
+  bd.querySelectorAll('.strip.city .sc[data-id]').forEach(e => { UI.cr['c' + e.dataset.id] = rr(e); });
+  bd.querySelectorAll('.hc[data-id]').forEach(e => { UI.cr['h' + e.dataset.id] = rr(e); });
+  if (UI.lay) UI.lay.hand = frameRect(bd.querySelector('.strip.hand'));
+}
+function pvChip(s, n) {
+  const grim = s === 'G', p = grim ? null : G.players[s];
+  const pts = grim ? HB.grimScore(G).total : score(s).total, cards = grim ? G.grim.city.length : HB.cityCount(G, s);
+  const turn = G.phase !== 'over' && !grim && HB.actor(G) === s, me = s === focusSeat();
+  const e = h('button.chip' + (turn ? '.turn' : '') + (s === viewSeat() ? '.me' : ''), { 'data-a': 'chip', 'data-seat': s, type: 'button', 'aria-label': pname(s) + ': ' + pts + ' points, ' + cards + ' of 15 in city' + (grim ? '' : ', ' + availW(p) + ' workers free') });
+  e.style.setProperty('--pc', pcolor(s).c);
+  const nm = s === viewSeat() && humans().length === 1 ? 'You' : pname(s);
+  e.appendChild(pawn(s, 24));
+  e.appendChild(h('span.pvch-t', h('b.pvch-n', n >= 4 ? nm.slice(0, 5) : nm), h('span.pvch-s', (p && p.passed ? 'done · ' : '') + cards + '/15 city')));
+  e.appendChild(h('b.pvch-pt' + (me ? '.rs' : ''), me ? { 'data-res': 'point' } : {}, h('span.pvch-star', '★'), String(pts)));
+  return e;
+}
+// ---- the view
+function pvRender() {
+  const host = $('#board'), bd = $('#bd'); if (!host || !bd || !G) return;
+  const W = host.clientWidth || 390, H = host.clientHeight || 600;
+  const tall = W < H && !document.documentElement.classList.contains('ph-l');
+  bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
+  bd.className = 'pv ' + (tall ? 'tall' : 'wide');
+  UI.tgEls = {}; UI.cr = {}; UI.tiles = {};
+  const mm = myMoves(), mine = mm.length > 0, v = viewSeat(), fs = focusSeat(), me = G.players[fs];
+  const okw = new Set(mm.filter(m => m.type === 'worker').map(tgOf));
+  const okp = new Set(mm.filter(m => m.type === 'play').map(tgOf));
+  const qm = G.q && mine ? mm.filter(m => m.type === 'choose') : [];
+  const qCard = new Map(); qm.forEach(m => { if (m.card !== undefined && !qCard.has(m.card)) qCard.set(m.card, m.i); });
+  const qShown = new Set(), qLoc = new Map();
+  if (qm.length) G.q.opts.forEach((o, i) => { let loc = o.d && o.d.loc; if (!loc && o.d && o.d.j != null && o.d.seat != null && G.players[o.d.seat] && (o.h === 'rangerTo' || o.h === 'recallGo')) loc = G.players[o.d.seat].dep[o.d.j]; const tg = loc ? tgOf(Object.assign({ type: 'worker' }, loc)) : ''; if (tg && !qLoc.has(tg)) qLoc.set(tg, i); });
+  if (UI.sel && (UI.sel.logN !== G.logN || !UI.sel.ms.every(m => mm.some(x => sameM(x, m))))) UI.sel = null;
+  if (UI.cityOpen) { UI.cityOpen = null; UI.pvForce = 'city'; }
+  const regTg = (tg, e) => { if (tg) { e.setAttribute('data-t', tg); e.setAttribute('data-a', 't'); UI.tgEls[tg] = e; } };
+  const actsH = 54, R = { W, H, tall, acts: { x: 6, y: H - actsH, w: W - 12, h: actsH - 4 } }; UI.lay = R;
+  const col = h('div.pv-col'); col.style.height = (H - actsH) + 'px'; bd.appendChild(col);
+  // ---- top bar: scores, then my resource piles and my workers
+  const hud = h('div.pv-hud'); col.appendChild(hud);
+  { const c = h('div.chips'), n = G.np + (G.grim ? 1 : 0); c.setAttribute('data-n', n);
+    for (let s = 0; s < G.np; s++) c.appendChild(pvChip(s, n)); if (G.grim) c.appendChild(pvChip('G', n));
+    const sea = h('span.pvsea', { title: SEASN[me.season] }, seasonIcon(me.season, 30), h('b', SEASN[me.season])); c.appendChild(sea);
+    hud.appendChild(c); }
+  { const r = h('div.resrow'), show = v >= 0 || watching();
+    for (const k of RESK) r.appendChild(h('span.rs' + (show && me.res[k] ? '' : '.zero'), { 'data-res': k, title: rname(k, 2) }, ic(k, 30), h('b', show ? me.res[k] : '?')));
+    if (me.pts) r.appendChild(h('span.rs.tok', { 'data-res': 'ptok', title: 'point tokens' }, ic('point', 24), h('b', me.pts)));
+    const wk = h('span.rs.wk' + (me.workers > 3 ? '.many' : ''), { 'data-res': 'worker' }), free = availW(me), canW = mine && okw.size > 0 && !G.q && !UI.sel;
+    for (let i = 0; i < me.workers; i++) { const m = h('span.pv-meeple' + (i < free ? '' : '.out') + (i < free && canW ? '.can' : ''), { 'aria-hidden': 'true' }, pawn(fs, 30)); wk.appendChild(m); }
+    wk.appendChild(h('b.pv-wn', free + ' left'));
+    if (canW) wk.setAttribute('title', 'Drag a worker to a glowing place');
+    r.appendChild(wk); hud.appendChild(r); }
+  // ---- tabs (phone)
+  const tabs = h('div.pv-tabs', { role: 'tablist' }); if (tall) col.appendChild(tabs);
+  const tabEl = {};
+  for (const [k, l] of PV_TABS) { const t = h('button.pv-tab', { 'data-a': 'pvtab', 'data-v': k, type: 'button', role: 'tab' }, h('span', l), k === 'city' ? h('b.pv-tn', me.city.length + '/15') : k === 'meadow' ? h('b.pv-tn', G.meadow.filter(x => x >= 0).length) : k === 'goals' ? h('b.pv-tn', G.bev.concat(G.sev).filter(x => x.o === -1 || x.o == null).length) : h('b.pv-tn', availW(me))); tabEl[k] = t; tabs.appendChild(t); }
+  const stage = h('div.pv-stage'); col.appendChild(stage);
+  const panel = (k, title) => { const p = h('section.pv-panel', { 'data-p': k, 'aria-label': title }); if (!tall) p.appendChild(h('h2.pv-h', title)); stage.appendChild(p); return p; };
+  // ---- places
+  const pPl = panel('places', 'Places: send a worker'), spots = h('div.pv-spots.pv-scrolly'); pPl.appendChild(spots);
+  const tile = (kind, i, small) => {
+    const info = tileInfo(kind, i), tg = tileTg(kind, i), w = pvSpot(kind, i);
+    const e = h('button.tile.t-' + kind + (small ? '.pv-small' : ''), { 'data-zoom': 'tile:' + kind + ':' + i, 'data-k': kind, 'data-i': i, type: 'button', 'aria-label': (info.name || '') + ': ' + w.main + (w.sub ? ', ' + w.sub : '') });
+    e.appendChild(h('span.pv-tin', h('span.pv-sico', ic(w.ico, small ? 22 : 26)), h('span.pv-sw', h('b', w.main), w.sub ? h('span', w.sub) : null)));
+    const legal = tg && okw.has(tg);
+    if (legal) { e.classList.add('glow'); regTg(tg, e); }
+    else if (tg && qLoc.has(tg)) { e.classList.add('glow'); regTg('q:' + qLoc.get(tg), e); qShown.add(qLoc.get(tg)); }
+    else if (tg) { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:' + tg); if (mine) e.classList.add('no'); }
+    if (UI.sel && UI.sel.tg === tg) e.classList.add('sel');
+    if (kind === 'bev' || kind === 'sev') { const ev = (kind === 'bev' ? G.bev : G.sev)[i]; if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, 22))); } }
+    else { const ws = workersAt(kind, i); if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, 26))); e.appendChild(pw); if (!info.shared && kind !== 'journey' && kind !== 'haven') { e.classList.add('taken'); e.appendChild(h('span.pv-taken', 'Taken')); } } }
+    return e;
+  };
+  const cell = e => spots.appendChild(h('div.pv-cell', e));   // a plain grid cell around each button: rows then size to the words
+  for (let i = 0; i < D.basic.length; i++) cell(tile('basic', i));
+  for (let i = 0; i < G.forest.length; i++) cell(tile('forest', i));
+  cell(tile('haven', 0));
+  // ---- goals (events): their own panel, so Places fits one screen
+  const pGo = panel('goals', 'Goals: first to qualify claims'), gl = h('div.pv-spots.pv-goals.pv-scrolly'); pGo.appendChild(gl);
+  if (tall) gl.appendChild(h('div.pv-sub', 'Goals score points. Have the cards one needs? Send a worker to claim it.'));
+  const gcell = e => gl.appendChild(h('div.pv-cell', e));
+  gcell(tile('journey', 0, true)); G.bev.forEach((x, i) => gcell(tile('bev', i, true))); G.sev.forEach((x, i) => gcell(tile('sev', i, true)));
+  // ---- meadow: a swipeable row of big readable cards
+  const pMe = panel('meadow', 'Meadow: cards anyone can build'), mead = h('div.pv-mead.hscroll'); pMe.appendChild(mead);
+  const blocked = G.grim ? G.grim.mb : [];
+  G.meadow.forEach((id, mi) => {
+    const e = h('button.mc', { type: 'button', 'aria-label': id >= 0 ? 'Meadow card: ' + cname(id) : 'Empty meadow space' });
+    if (id >= 0) {
+      const sp = spec(id), ptg = 'p:meadow:' + id, need = pvNeed(sp.cost, me.res);
+      const st = qCard.has(id) ? ['ok', 'Tap to choose'] : okp.has(ptg) ? ['ok', 'Can build'] : need.length ? ['no', 'Need ' + need.join(', ')] : mine && availW(me) >= 0 && HB.cityCount(G, fs) >= 15 ? ['no', 'City is full'] : ['meh', mine ? 'Not now' : 'Affordable'];
+      e.setAttribute('data-zoom', 'card:' + id); e.setAttribute('data-id', id); e.appendChild(pvFace(id, { state: st }));
+      if (okp.has(ptg)) { e.classList.add('glow'); regTg(ptg, e); }
+      else if (qCard.has(id)) { e.classList.add('glow'); regTg('q:' + qCard.get(id), e); qShown.add(qCard.get(id)); }
+      else { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:m' + id); }
+      if (UI.sel && UI.sel.tg === ptg) e.classList.add('sel');
+    } else e.classList.add('empty');
+    if (blocked.indexOf(mi) >= 0) { e.classList.add('blocked'); e.appendChild(h('span.lock', '⛔')); }
+    mead.appendChild(e);
+  });
+  mead.appendChild(h('div.pv-deck', { role: 'img', 'aria-label': 'Draw pile: ' + G.deck.length + ' cards' }, h('b', G.deck.length + ' left')));
+  mead.addEventListener('scroll', () => { UI.pvMx = mead.scrollLeft; }, { passive: true });
+  // ---- city: 15 slots that fill with the cards' art
+  const pCi = panel('city', 'My city'), vis = visitList();
+  const city = h('div.strip.city'); pCi.appendChild(city);
+  city.appendChild(h('div.pv-ch', h('b', (fs === viewSeat() ? 'My city' : pname(fs) + "'s city")), h('span', me.city.length + ' of 15 · ' + score(fs).total + ' points')));
+  const grid = h('div.pv-grid'); city.appendChild(grid);
+  const cityCard = (b, it) => {
+    const tg = 'd:' + it.id;
+    if (okw.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
+    else if (qLoc.has(tg)) { b.classList.add('glow'); regTg('q:' + qLoc.get(tg), b); qShown.add(qLoc.get(tg)); }
+    else if (qCard.has(it.id)) { b.classList.add('glow'); regTg('q:' + qCard.get(it.id), b); qShown.add(qCard.get(it.id)); }
+    else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:c' + it.id); }
+  };
+  const nSl = Math.max(15, me.city.length);
+  for (let i = 0; i < nSl; i++) {
+    const it = me.city[i];
+    if (!it) { grid.appendChild(h('i.pv-slot', { 'aria-hidden': 'true' }, i === me.city.length ? h('span', '+') : null)); continue; }
+    const b = h('button.sc', { 'data-zoom': 'card:' + it.id, 'data-id': it.id, type: 'button', 'aria-label': cname(it.id) }, pvMini(it.id, it));
+    cityCard(b, { id: it.id }); grid.appendChild(b);
+  }
+  if (vis.length) {
+    const vr = h('div.pv-visit', h('span.pv-sub', 'Visit a rival’s place:')); city.appendChild(vr);
+    vis.forEach(x => { const b = h('button.sc.pv-vc', { 'data-zoom': 'card:' + x.id, 'data-id': x.id, type: 'button', 'aria-label': 'Visit ' + cname(x.id) }, pvMini(x.id), h('span.vb', pawn(x.o, 18))); cityCard(b, x); vr.appendChild(b); });
+  }
+  city.appendChild(h('div.pv-drop', 'Drop here to build'));
+  // ---- my hand: a fan at the bottom; drag a card up to build it, or tap it
+  const hand = v >= 0 ? G.players[v].hand : [], nH = hand.length;
+  const hs = h('div.strip.hand.hscroll'); col.appendChild(hs);
+  // whole cards side by side, never overlapping (every name readable); more than fit -> the row scrolls sideways
+  // phone: when not all fit, a whole number k of cards fills the row exactly (no card half off the edge); the row snaps card by card
+  const gapH = 6, fits = nH * ((tall ? 84 : 118) + gapH) <= W - 16, kFit = Math.max(1, Math.floor((W - 8) / (84 + gapH)));
+  const cw = !tall ? 118 : fits ? 84 : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 92) * 1.36) : Math.round(cw * 1.22);
+  hs.style.height = (ch + (tall ? 22 : 30)) + 'px';
+  hs.appendChild(h('span.scount', v >= 0 ? 'Hand ' + nH + '/8' + (fits ? '' : ' ›') : ''));
+  const x0 = fits ? (W - nH * (cw + gapH) + gapH) / 2 : 8;
+  const hin = h('div.hin'); hin.style.cssText = `position:relative;width:${fits ? W - 4 : x0 * 2 + nH * (cw + gapH)}px;height:100%`; hs.appendChild(hin);
+  hand.forEach((id, i) => {
+    const tg = 'p:hand:' + id, off = i - (nH - 1) / 2;
+    const b = h('button.sc.hc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) + ' (in hand)' }, pvFace(id, { small: true }));
+    b.style.cssText = `left:${x0 + i * (cw + gapH)}px;width:${cw}px;height:${ch}px;--dy:${fits && tall ? Math.round(off * off * 1.6) : 0}px;z-index:${i + 2}`;
+    if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
+    else if (qCard.has(id)) { b.classList.add('glow'); regTg('q:' + qCard.get(id), b); qShown.add(qCard.get(id)); }
+    else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:h' + id); }
+    if (UI.sel && UI.sel.tg === tg) b.classList.add('sel');
+    hin.appendChild(b);
+  });
+  hs.addEventListener('scroll', () => { UI.hsx = hs.scrollLeft; }, { passive: true });
+  if (!nH) hs.appendChild(h('span.sempty', v >= 0 ? 'No cards in hand' : ''));
+  // ---- which panel is in front (phone): my turn starts on Places (or the Meadow when no worker is left); a pending choice shows its panel
+  const glowIn = k => !!stage.querySelector('.pv-panel[data-p="' + k + '"] .glow');
+  const myNow = mine && !G.q && !UI.sel;
+  if (UI.pvCityN != null && fs === UI.pvSeat && me.city.length > UI.pvCityN && fs === viewSeat()) { UI.pvForce = 'city'; UI.pvCityAt = Date.now(); }
+  UI.pvCityN = me.city.length; UI.pvSeat = fs;
+  if (UI.pvForce) { UI.pvTab = UI.pvForce; UI.pvForce = null; }
+  else if (myNow && !UI.pvMine) UI.pvTab = availW(me) > 0 && okw.size ? 'places' : (glowIn('meadow') ? 'meadow' : 'places');
+  else if (mine && (G.q || UI.sel) && !glowIn(UI.pvTab || 'places')) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; }
+  UI.pvMine = myNow;
+  if (!UI.pvTab) UI.pvTab = 'places';
+  for (const [k] of PV_TABS) if (glowIn(k)) tabEl[k].classList.add('hot');
+  // ---- action row / choice tray (shared with the old board)
+  renderActs(mm, qm, qShown);
+  if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
+  pvSetTab(UI.pvTab, true);
+  mead.scrollLeft = UI.pvMx || 0;
+  hs.scrollLeft = fits ? 0 : (UI.hsx || 0); { const g = (UI.rec && UI.rec.m && UI.tgEls[tgOf(UI.rec.m)]) || hs.querySelector('.glow'); if (g && g.closest('.strip.hand') === hs) hscrollTo(g); }
+  renderPrompt(); renderBar(); placeFinger();
+  if (typeof hlpMarks === 'function' && G.phase !== 'over') hlpMarks();
+}
+// ---- hook into the existing game: board renderer, scroll-into-view, flights, rival moves, prompt words
+// Play view part of hscrollTo (src/ui3.js): show the panel holding el, scroll it into view; true when el is in the meadow row (done)
+function pvScrollTo(el) {
+  const p = el && el.closest && el.closest('#bd.pv .pv-panel');
+  if (p && pvTall() && !p.classList.contains('on')) pvSetTab(p.dataset.p, true);
+  const sy = el && el.closest && el.closest('.pv-scrolly');
+  if (sy) { const a = el.offsetTop, b = a + el.offsetHeight; if (a < sy.scrollTop) sy.scrollTop = a - 4; else if (b > sy.scrollTop + sy.clientHeight) sy.scrollTop = b - sy.clientHeight + 4; }
+  const hm = el && el.closest && el.closest('.pv-mead');
+  if (hm) { const a = el.offsetLeft, b = a + el.offsetWidth; if (a < hm.scrollLeft) hm.scrollLeft = Math.max(0, a - 8); else if (b > hm.scrollLeft + hm.clientWidth) hm.scrollLeft = b - hm.clientWidth + 8; UI.pvMx = hm.scrollLeft; return true; }
+  return false;
+}
+// Play view part of fxLand (src/ui3.js): true when it drew the landing
+function pvLand(m, seat, src, preChip) {
+  if (!ANIM || !m || !$('#bd.pv')) return false;
+  if (m.type === 'worker' && m.k !== 'dest') {
+    const sel = '.tile[data-k="' + (m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k) + '"]' + (m.k === 'haven' || m.k === 'journey' ? '' : '[data-i="' + m.i + '"]');
+    const t = $(sel), pw = t && t.querySelectorAll('.pw .pawnw'), mine = seat === viewSeat();
+    const from = (mine && UI.pvDropAt) || (mine && frameRect($('#bd .rs.wk'))) || preChip || seatRect(seat); UI.pvDropAt = null;
+    if (pw && pw.length && from) PV_FEEL.hop(pw[pw.length - 1], from, 600);
+    if (t) { t.classList.add('pv-hit'); setTimeout(() => t.classList.remove('pv-hit'), 700); }
+    return true;
+  }
+  if (m.type === 'play') { const el = $('#bd .strip.city .sc[data-id="' + m.card + '"]'); if (el) { if (src) flipFrom(el, src, 620); el.classList.add('pv-new'); setTimeout(() => el.classList.remove('pv-new'), 1500); } return true; }
+  return false;
 }

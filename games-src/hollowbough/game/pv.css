@@ -1,6 +1,6 @@
-/* ===== W457 Play view (src/ui14.js): one focus at a time. Scoped to #bd.pv so ?board=old keeps the old board. ===== */
+/* ===== W457 Play view (src/ui2.js pvRender; hooks in ui3.js / ui5.js): one focus at a time. Scoped to #bd.pv so ?board=old keeps the old board. ===== */
 #bd.pv{--pv-paper:#f8edd2;--pv-paper2:#efdcb2;--pv-ink:#3b2a1c;--pv-wood:#5a3c22;--pv-gold:#ffd25a;--pv-ok:#2f7d3a;--pv-no:#a2382a;
-  background:linear-gradient(180deg,rgba(52,34,18,.55),rgba(38,24,12,.72) 75%);color:var(--pv-ink);overflow:hidden;font-family:inherit}
+  background:linear-gradient(180deg,rgba(52,34,18,.55),rgba(38,24,12,.72) 75%);color:var(--pv-ink);font-family:inherit}
 #bd.pv *{box-sizing:border-box}
 #bd.pv .pv-col{position:absolute;left:0;top:0;right:0;display:flex;flex-direction:column;gap:6px;padding:6px 8px 0}
 /* ---- top bar */
@@ -71,7 +71,7 @@
 #bd.pv .pv-taken{position:absolute;left:6px;top:-9px;font-size:14px;font-weight:800;background:#3b2a1c;color:#f8edd2;border-radius:6px;padding:0 5px}
 #bd.pv .pv-sub{grid-column:1/-1;color:#f8edd2;font-size:14px;font-weight:700;margin:2px 2px 4px;text-shadow:0 1px 2px #000}
 /* meadow */
-#bd.pv .pv-mead{position:relative;flex:1;min-height:0;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;padding:4px 4px 8px;overscroll-behavior-x:contain;scrollbar-width:thin}
+#bd.pv .pv-mead{position:relative;flex:1;min-height:0;display:flex;gap:10px;overflow:auto;scroll-snap-type:x mandatory;padding:4px 4px 8px;overscroll-behavior-x:contain;scrollbar-width:thin}
 #bd.pv .mc{position:relative;left:auto;top:auto;flex:0 0 min(176px,46%);height:100%;scroll-snap-align:start;border-radius:14px;padding:0;border:0;background:none;cursor:pointer}
 #bd.pv .mc.empty{border:2px dashed rgba(255,255,255,.35)}
 #bd.pv .mc.glow .pvc{box-shadow:0 0 0 3px var(--pv-gold),0 4px 0 rgba(0,0,0,.45),0 0 16px 3px rgba(255,210,90,.75)}
@@ -192,3 +192,21 @@ html[data-bench] #bd.pv .pv-mead{background:url(media/bench.webp) center bottom/
 #bd.pv:has(#acts.tall) .strip.hand{opacity:0;pointer-events:none}
 #bd.pv .pv-sw span{opacity:1;color:#4a3826}
 #bd.pv .pv-slot{color:#fff6dc;background:rgba(20,12,4,.35)}
+/* hand: one row of whole cards; swipe sideways when there are more than fit */
+#bd.pv .strip.hand.hscroll{overflow:auto;scrollbar-width:none;overscroll-behavior-x:contain;padding-top:14px}
+#bd.pv .strip.hand.hscroll::-webkit-scrollbar{display:none}
+#bd.pv .strip.hand .scount{position:absolute;left:10px;top:-2px;display:inline-block;margin:0}
+#bd.pv .strip.hand .hin{position:absolute!important;left:0;top:0;bottom:0}
+#bd.pv .hc{touch-action:none;bottom:8px}
+#bd.pv.wide .pv-mead{overflow:auto}
+#bd.pv .strip.hand.hscroll{scroll-snap-type:x mandatory;scroll-padding-left:8px}
+#bd.pv .hc{scroll-snap-align:start}
+#bd.pv .rs.wk.many .pv-meeple{margin:0 -9px}
+#bd.pv .rs.wk.many .pv-meeple:first-child{margin-left:0}
+#bd.pv .rs.wk.many .pv-wn{margin-left:10px}
+#bd.pv .resrow{gap:2px;padding:3px 6px}
+#bd.pv .pv-meeple{position:relative}#bd.pv .pv-meeple.can{z-index:2}
+#bd.pv .strip.city .pv-visit .sc{width:54px;height:72px;flex:none}
+#bd.pv.wide .pvc-aff{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bd.pv.wide .strip.hand .scount{left:14px}
+#bd.pv.wide .pv-mead{grid-template-columns:repeat(4,minmax(0,1fr))}

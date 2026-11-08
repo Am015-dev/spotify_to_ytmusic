@@ -88,6 +88,10 @@ function aiStep() {
 }
 // the computer's move: a worker flies to its place, a card flies to its city (about 0.6 s), then the move happens
 function aiFly(m, a, done) {
+  if (PV_ON) return pvBeforeFly(m, () => aiFlyGo(m, a, done));
+  aiFlyGo(m, a, done);
+}
+function aiFlyGo(m, a, done) {
   const chip = seatRect(a); if (!chip || !UI.lay) { done(null); return; }
   let from = chip, to = null, node = null, src = chip;
   if (m.type === 'worker' && m.k !== 'dest') {
@@ -99,6 +103,22 @@ function aiFly(m, a, done) {
   }
   if (!to || !node || !from) { done(src); return; }
   fxFly(node, from, to, Math.max(140, Math.min(600, Math.round(AIDELAY * .9))), () => done(src));
+}
+// Play view part of aiFly: the rival's move plays out on its own panel (Places / Meadow), then go() flies it
+function pvBeforeFly(m, go0) {
+  if (!pvTall()) { pvRects(); return go0(); }
+  const want = m.type === 'worker' && m.k !== 'dest' ? 'places' : m.type === 'play' && m.from === 'meadow' ? 'meadow' : null, tok = UI.animTok;
+  const go = () => {
+    if (tok !== UI.animTok) return;
+    if (want) {
+      pvSetTab(want, true);
+      if (m.type === 'play') hscrollTo($('#bd .mc[data-id="' + m.card + '"]'));
+      else { const k = m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k; const t = $('#bd .tile[data-k="' + k + '"]' + (m.k === 'haven' || m.k === 'journey' ? '' : '[data-i="' + m.i + '"]')); if (t) hscrollTo(t); }
+    }
+    pvRects(); go0();
+  };
+  const wait = UI.pvCityAt ? Math.max(0, 1100 - (Date.now() - UI.pvCityAt)) : 0;
+  if (wait) setTimeout(go, wait); else go();
 }
 function aiApply(m, a, src) {
   const n0 = G.logN, pre = sndPre(), fpre = fxPre(a);
