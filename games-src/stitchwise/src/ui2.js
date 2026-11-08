@@ -42,7 +42,7 @@ function cellAt(ev) { var q = $('#quilt'); if (!q) return null; var r = q.getBou
 var DR = { on: false, moved: false };
 function bindQuilt() {
   var bd = $('#bd'); if (bd._b) return; bd._b = 1;
-  bd.addEventListener('pointerdown', function (ev) { var q = ev.target.closest && ev.target.closest('#quilt'); if (!q) return; if (G && G.pend && isHuman(swWho(G)) && !UI.busy) { var c = cellAt(ev); if (c && c[0] >= 0 && c[0] < 9 && c[1] >= 0 && c[1] < 9 && G.board[viewSeat()][c[1] * 9 + c[0]] === -1) doLeather(c[0], c[1]); return; }
+  bd.addEventListener('pointerdown', function (ev) { try { if (UI.coach && UI.coach.line) { UI.coach.line = ''; coachRender(); } } catch (e) { } /* W470: any board touch closes Aunt Wren */ var q = ev.target.closest && ev.target.closest('#quilt'); if (!q) return; if (G && G.pend && isHuman(swWho(G)) && !UI.busy) { var c = cellAt(ev); if (c && c[0] >= 0 && c[0] < 9 && c[1] >= 0 && c[1] < 9 && G.board[viewSeat()][c[1] * 9 + c[0]] === -1) doLeather(c[0], c[1]); return; }
     if (UI.sel < 0 || UI.busy) { var c2 = cellAt(ev), pid = c2 && G.board[viewSeat()][c2[1] * 9 + c2[0]]; if (pid >= 0 && pid < 99) showPatch(pid); return; }
     DR.on = true; DR.moved = false; DR.touch = ev.pointerType === 'touch'; try { q.setPointerCapture(ev.pointerId); } catch (e) { } dragTo(ev); ev.preventDefault(); });
   bd.addEventListener('pointermove', function (ev) { if (!DR.on) return; DR.moved = true; dragTo(ev); });
