@@ -1,8 +1,12 @@
 # R3 gameplay re-review (8 Nov 2026)
 
-Strict re-review by games-src/reviews/GAMEPLAY-RUBRIC.md. Each branch was built with its own build.py, served next to games/<slug>/media and played by touch (Playwright, hasTouch, isMobile) at 390x844 and 375x667.
+Strict re-review by games-src/reviews/GAMEPLAY-RUBRIC.md. Each branch was built with its own build.py, served next to games/<slug>/media and played by touch (Playwright, hasTouch, isMobile) at 390x844 and 375x667: the tutorial to the end, then full default games to the result screen. The fixers' claims were checked by touch, not taken on trust.
 
-(redline-rally section still in progress)
+| Game | First review | R3 total | Result | Lowest rows |
+|---|---|---|---|---|
+| cauldron-fair | 7.0 FAIL | 7.1 | FAIL | Tutorial 6, Turn clarity 6, Phone play 6 |
+| shipwreck-isle | 6.4 FAIL | 6.4 | FAIL | AI and pacing 5; Tutorial, Turn clarity, Phone play, Feel 6 |
+| redline-rally | 4.0 FAIL (stopper) | 6.3 | FAIL (no stopper) | AI and pacing 4, Phone play 5, Feel 6 |
 
 ## cauldron-fair (branch shelf/W503-cauldron-gameplay @ bb5ceb53)
 
@@ -77,3 +81,42 @@ Built with `games-src/rc/build.py` and served next to `games/shipwreck-isle/*`. 
 - **Row 2:** At tutorial step 30, "Then it waits as a threat. Deal with it, or it strikes." The event card it refers to is gone; the screen shows only the board and "Morning: morale 0". Shot: games-src/reviews/R3-shots/shipwreck-04-tut-threat-no-card.png
 - **Row 2:** The tutorial teaches dice ("Dice can fail, wound you, or start an adventure") and the adventure token as info lines only. Its plan uses 2 pawns (a sure success) everywhere, so a player never sees a roll or an adventure card before the real game.
 - **Guide-test 50/52 explained (Row 2, info):** The 2 missing steps are optional branches, not failures. "one" ("Explore. One pawn alone rolls the dice.") is skipped once an explore job exists. "sure" is the other branch of the same step. The run reached "That is every rule. Give the rest jobs and play on!" and Keep playing continued as a normal game. Whichever branch runs, the player never sees a roll.
+
+## redline-rally (branch shelf/W496-redline-gameplay @ 67904230)
+
+Built with `games-src/redline-rally/build.py`, served next to `games/redline-rally/media`. Played by touch only (Playwright, hasTouch, isMobile, `page.touchscreen.tap`): the tutorial to its end card at 390x844 (98 s) and 375x667 (102 s), then 4 full default races (Sunline, 2 laps, 4 rivals, Easy) to the result screen: two as a plain new player (390x844 and 375x667) and two tapping Hints, then Suggest, every round (390x844 and 375x667). Also ran the fixer's own `tut-test.js` and `race-touch.js`, and a 200-race headless sim of the three AI levels. 0 page errors, 0 console errors, 0 stuck states in all runs.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 7 | Fixed: rival cars now commit gear and cards face down at round start, from the same board you saw (`startResolve`), and boost is a react choice after the reveal. The round order matches the rulebook (shift, play, reveal and move leader first, adrenaline, react, slipstream, corner check, discard, refill to 7). Gap: the Brake 0 and Burst 5 starting cards appear in every real race but the rules are never shown for them. |
+| 2 | Tutorial teaches | 7 | 39 steps, all 20 rules in order, one line and one tap each, about 100 s, then a real race. No dead question buttons any more; the spin-out step now shows the Stress card. Points off: the end card says "a real race against two rivals" but the default race has four. The status line at the end says "You lead by -5 over Juno". Brake and Burst cards are not taught. |
+| 3 | First 10 seconds | 7 | Clear 3-bullet goal card ("first across the line after 2 laps", gear = cards, corners burn heat). At 375x667 the start lights now sit top-left and your car is visible. |
+| 4 | Turn clarity | 7 | Phase strip, gear buttons with card count and "-1 heat", corner signs "5 in 13", "You 3rd of 5, Dax leads by 1" line. Brake and Burst card names are not explained anywhere in play. |
+| 5 | Phone play | 5 | At 375x667 the board is a strip of about 260 px and the dashboard (speedo, gears, corner signs) covers its lower third, so near a corner your car sits just above or behind it. "+6 spaces" pops sit on the minimap and a corner badge. Triangle props are drawn over the dashboard. With Hints on, the Menu button runs past the right edge at both 390 and 375 (my scan flagged it on every Hints run). |
+| 6 | AI and pacing | 4 | Pacing is fixed: Go to your next decision is about 8 s (was 20-35 s), rival turns about 1.3 s, a race is 141-178 s for 17-20 decisions. But a new player still cannot win on the default level. Four default Easy races by touch: 5th, 5th, 5th and 3rd, two of them following Suggest every round. The fixer's own race-touch gate also finished 5th on Easy. Easy rivals had 0 spin-outs in every race. The level ladder is broken: in a 200-race mixed sim Normal cars average place 2.54 and Hard cars 2.98, so Hard is easier than Normal. Suggest plans with the Hard settings, so its advice is the weaker planner. |
+| 7 | Feel | 6 | Cars animate, start lights, "+6 spaces" pops, spin message, a podium. But each round still asks 1-2 extra questions (boost, slipstream, discard): 31-36 question taps per race on top of 17-20 real decisions. It still feels like answering prompts. |
+| 8 | Bugs | 7 | 4 races and 2 tutorials: 0 errors, 0 stuck states, 0 dead taps. Soft bugs: Menu off screen with Hints on, the negative "lead by -5" text. |
+| | **Total** | **6.3** | |
+| | **Verdict** | **FAIL** | Rows 5, 6 and 7 are under 7. No stopper. |
+
+### First-review findings
+- **Tutorial boost dead taps (Row 8/2):** FIXED. My touch run printed every question button that was on screen per step; boost, slipstream and discard buttons only show on their own steps (31 slip, 32-33 discard, 38 boost) and take the tap. The fixer's tut-test passes 20/20 rules at both sizes. Shot: `games-src/reviews/R3-shots/redline-04-375-tut-boost.png`
+- **Rivals plan with hindsight (Row 1):** FIXED. `engine.js` `startResolve` commits every computer plan before any car moves; `resolveNext` only plans as a safety net. Boost is decided in `aiBoost` after the reveal.
+- **20 s waits / 6 min race (Row 6/7):** FIXED for speed. Go to next decision 7.9-8.2 s on average (max 12.5 s); races 141-178 s. NOT FIXED for taps: 31-36 question prompts per race. The discard step now keeps all after 5 s if you do nothing.
+- **New player can't win on default (Row 6):** NOT FIXED. Easy is now the default, but I placed 5th, 5th, 5th and 3rd. Shot: `games-src/reviews/R3-shots/redline-10-result-5th-easy.png`
+- **375 start lights hide car (Row 3/5):** FIXED. Shot: `games-src/reviews/R3-shots/redline-01-375-tut-start.png`, `games-src/reviews/R3-shots/redline-07-375-first-turn.png`
+- **375 cramped board (Row 5):** NOT FIXED. The dashboard still covers the lower third of a 260 px board. Shot: `games-src/reviews/R3-shots/redline-08-375-board-covered.png`
+- **Menu past the screen edge (Row 5):** PARTLY FIXED. Fine with Hints off; with Hints on (a second bulb button appears) Menu is cut at the right edge. Shot: `games-src/reviews/R3-shots/redline-09-375-hints-menu-cut.png`
+- **Popups cut off at edges / behind minimap (Row 5/7):** MOSTLY FIXED. "Slipstream +2" now sits inside the board. But "+6 spaces" still lands on the minimap and a corner badge at 375. Shots: `games-src/reviews/R3-shots/redline-03-375-tut-discard-hud.png`, `games-src/reviews/R3-shots/redline-08-375-board-covered.png`
+- **Spin-out with no Stress card (Row 2):** FIXED. The hand shows a Stress card after the spin. Shot: `games-src/reviews/R3-shots/redline-02-375-tut-spin-stress.png`
+- **Dark seam down the board (Row 7):** not seen in any shot this round: FIXED as far as I can tell.
+- **Props drawn over the minimap (Row 7):** NOT FIXED in spirit. They are off the minimap now, but triangle props are still drawn over the dashboard. Shots: `games-src/reviews/R3-shots/redline-04-375-tut-boost.png`, `games-src/reviews/R3-shots/redline-08-375-board-covered.png`
+- **Trophy over winner's name (minor):** FIXED. The name is on a dark plate and the trophy sits beside it. The losing line is place-aware ("You finished 5th. Gear down before corners..."). Shot: `games-src/reviews/R3-shots/redline-10-result-5th-easy.png`
+
+### New findings
+- **Row 6:** I checked the fixer's note that Normal is harder than Hard. A headless sim of 200 races, with one Easy, two Normal and two Hard cars in each, gives average places of Easy 3.96, Normal 2.54 and Hard 2.98. In fields of one level, Hard is also slower than Normal (18.1 rounds against 17.8). The cause: Hard uses zero noise (`aiNoise`), so it is a greedy one-round planner. A little noise helps. So the Hard setting is mislabelled. And `suggest()` plans with `diff = 'hard'`, so the help button gives the weaker plan.
+- **Row 6:** Did: 4 default races by touch. Two as a plain new player (gear up to 3, down near corners, the biggest cards, boost when 4 or more heat is left). Two pressing Hints, then Suggest every round (same boost rule, since Suggest does not answer boost). Happened: 5th, 5th, 5th, 3rd. The Easy rivals never spun out in any race (0 spins, 3-8 heat burned). The player spun 1-2 times per race. The fixer's own `race-touch.js` also finished 5th on Easy. Shot: `games-src/reviews/R3-shots/redline-10-result-5th-easy.png`
+- **Row 4/6:** Suggest is hidden by default. It only appears after you turn on Hints in the top bar, and nothing points a new player to it. Shot: `games-src/reviews/R3-shots/redline-09-375-hints-menu-cut.png`
+- **Row 2/8:** The tutorial end card says "Now a real race against two rivals", and "Play a real game" starts one. But the default race from Play has four rivals. Behind the card the status line reads "You lead by -5 over Juno". Shot: `games-src/reviews/R3-shots/redline-05-tut-end-negative-lead.png`
+- **Row 1/4:** Every real race deals the starting cards Brake (move 0) and Burst (move 5). Neither card is in the tutorial, and the play screen never says what they do beyond the number. Shots: `games-src/reviews/R3-shots/redline-06-goal-card.png`, `games-src/reviews/R3-shots/redline-07-375-first-turn.png`
+- **Row 5:** At 375x667, in round 7 next to a "4 in 1" corner, your car sits right on top of the dashboard edge. "+6 spaces" covers the minimap and a "6" corner badge. Shot: `games-src/reviews/R3-shots/redline-08-375-board-covered.png`
