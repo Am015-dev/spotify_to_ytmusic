@@ -15,7 +15,7 @@ const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));const sleep=ms
  await tapSel('.tutoffer [data-tutoffer=play]');await sleep(2500);
  // story intro beats until planning
  for(let i=0;i<40;i++){const st=await p.evaluate(()=>PHO.st);if(st==='plan'||st==='plan2')break;if(!(await tapSel('.gxh-bub .gxh-ok'))&&!(await tapSel('#bf [data-a=next]'))&&!(await tapSel('#bf .btn.go')))await sleep(400);await sleep(400)}
- await sleep(800);await shot('4-first-turn');
+ await sleep(3000);await shot('4-first-turn');
  await tapSel('[data-bf=info]');await sleep(900);await shot('3-goal');await tapSel('.gx-drawer .gx-x, .drawer .x, [data-a=close]');await p.keyboard.press('Escape');await sleep(500);
  let rival=false,mid=false,overN=0;const t0=Date.now();
  while(Date.now()-t0<300000){const s=await p.evaluate(()=>({st:PHO.st,r:G.round,over:!!G.over,k:(UI.beats&&UI.beats[Math.max(0,UI.shown|0)]||{}).kind}));

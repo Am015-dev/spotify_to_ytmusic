@@ -550,7 +550,7 @@ function fitIsland(){let m=0,cx=0,cz=0;const ts=MAP;for(const t of ts){const p=h
 const TICON={beach:'🏖️',river:'🏞️',plains:'🌾',hills:'⛰️',mountains:'🏔️'};const SICON={wood:'🪵',fish:'🐟',parrot:'🦜'};
 function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};const PHN=!!V3.ph;
   for(const m of G.map){const t=tileAt(m.id);let h='';const reach=!t&&!m.down&&MAP[m.id].adj.some(p=>tileAt(p));
-    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s><s class="pt ${t?'':'unk'}">${m.id===G.camp.pos?'Camp':t?String(TERRN(t.terr)).replace(/^./,c=>c.toUpperCase()):'Not explored\nyet'}</s></b>`:''}
+    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s><s class="pt ${t?'':'unk'}">${m.id===G.camp.pos?'Camp':t?String(TERRN(t.terr)).replace(/^./,c=>c.toUpperCase()):'?'}</s></b>`:''}
     else if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
     else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em>🌫</em>':''}`;
     let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}

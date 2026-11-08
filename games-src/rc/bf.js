@@ -94,8 +94,9 @@ function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you'
     return ['isl','A new day']}
   return ['isl','The island’s turn']}
 function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
-  const c=(bad,t)=>`<span class="${bad?'bad':''}">${t}</span>`;
-  return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,`🍖 Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,`🪵 Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,'🏠 Shelter'):c(true,'No shelter'))}
+  // resources as tokens: the owner's icon, a big number, the name under it (owner 8 Nov: "a spreadsheet")
+  const tk=(bad,ic,n,nm)=>`<span class="tk ${bad?'bad':''}">${ic.length>2?`<img src="media/icon-res-${ic}.webp" alt="">`:`<i>${ic}</i>`}<b>${n}</b><small>${nm}</small></span>`;
+  return tk(false,'📅',o.d+'/'+o.r,'Day')+tk(o.f<o.need,'food',o.f,'Food · eat '+o.need)+tk(false,'wood',o.w,'Wood')+tk(o.low<=3,'❤',o.low,'Life')+tk(!o.sh,'shelter',o.sh?'✓':'✗','Shelter')}
 BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
@@ -202,12 +203,12 @@ function fillInfo(){const d=document.getElementById('detd');if(!d)return;const b
   if(b.dataset.h!==h){b.dataset.h=h;b.innerHTML=h}}
 // ---------- the pop-up for a tapped place: only jobs this pawn can do ----------
 BF.tilePop=function(id){const cur=curPawn();if(!cur)return null;const rec=recPlan().map[cur.id];const rows=legalRows(id,cur);const camp=id===G.camp.pos;let h='';
-  if(camp&&G.scen==='marooned'){let room=0,why=null;try{room=SCEN.marooned.pileRoom();why=pileWhy(1)}catch(e){}if(room>0)h+=`<button class="bfr pile ${why?'no':''}" data-a="pilemax"><span class="t">🔥 Add wood to the signal pile</span><span class="b">+${Math.max(1,Math.min(room,Math.max(0,G.res.wood-committed().wood)))}</span></button>`}
+  if(camp&&G.scen==='marooned'){let room=0,why=null;try{room=SCEN.marooned.pileRoom();why=pileWhy(1)}catch(e){}if(room>0)h+=`<button class="bfr pile ${why?'no':''}" data-a="pilemax"><img class="ai" src="media/icon-res-wood.webp" alt=""><span class="t">🔥 Add wood to the signal pile</span><span class="b">+${Math.max(1,Math.min(room,Math.max(0,G.res.wood-committed().wood)))}</span></button>`}
   const isRec=r=>rec&&rec.type===r.type&&JSON.stringify(rec.tgt)===JSON.stringify(r.tgt)&&(rec.alt||0)===(r.alt||0);
   h+=rows.map(r=>{const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const a=findActAny(r.type,r.tgt,r.alt);const k=(a?a.pw.length:0)+1;const n=actNeed({type:r.type,tgt:r.tgt,alt:r.alt,pw:[]});
       const badge=k<n.need?`needs ${n.need}`:(n.roll&&k<n.max)?'🎲':'✔';const cost=(()=>{try{const c=actCost({type:r.type,tgt:r.tgt,alt:r.alt,pw:[cur.id]});return Object.entries(c).filter(([x,v])=>v).map(([x,v])=>v+RICON[x]).join(' ')}catch(e){return ''}})();
-      return `<button class="bfr ${isRec(r)?'rec':''} ${a?'has':''}" data-place="${key}" ${isRec(r)?'data-rec="1"':''}><span class="t">${isRec(r)?'⭐ ':''}${E(r.title)}</span><span class="b">${cost?E(cost)+' · ':''}${badge}</span></button>`}).join('');
-  if(!h)return null;const t=tileAt(id);return {title:`${pawnLabel(cur).split(' ')[0]} → place ${id+1}${t?' · '+t.terr:''}`,html:`<div class="bfrows">${h}</div>`,cls:'tile bf'}};
+      return `<button class="bfr ${isRec(r)?'rec':''} ${a?'has':''}" data-place="${key}" ${isRec(r)?'data-rec="1"':''}><img class="ai" src="media/icon-act-${['build','gather','explore','hunt','rest','camp','threat'].includes(r.type)?r.type:'camp'}.webp" alt=""><span class="t">${isRec(r)?'⭐ ':''}${E(r.title)}</span><span class="b">${cost?E(cost)+' · ':''}${badge}</span></button>`}).join('');
+  if(!h)return null;const t=tileAt(id);return {title:`${pawnLabel(cur).split(' ')[0]} → place ${id+1} · ${t?t.terr:'not explored yet'}`,html:`<div class="bfrows">${h}</div>`,cls:'tile bf'}};
 // a tap on a place while planning (the old tile handler has already selected it)
 BF.tile=function(id){if(BF.on&&PHO.st==='story'){const o=posQ();if(o){const j=o.findIndex(x=>x.pos===id);if(j>=0){sfx('click');answer(j);return true}BF.say('Tap a glowing space');return true}return false}if(!BF.on||!(PHO.st==='plan2'||PHO.st==='plan'))return false;const cur=curPawn();
   if(!cur){BF.say('Tap a pawn to change its job');PHO.closePop(true);UI.tileSel=null;return true}
