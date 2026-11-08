@@ -1,38 +1,47 @@
 {
  "slug": "cauldron-fair",
- "when": "2026-11-08T02:28Z",
- "secs": 30,
- "totalSecs": 99,
+ "when": "2026-11-08T02:40Z",
+ "secs": 60,
+ "totalSecs": 61,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 3,
+   "count": 4,
    "detail": [
     {
      "kind": "too-short",
      "session": "phone/learn",
      "text": "Watch the board",
      "words": 3,
-     "shownMs": 1250,
+     "shownMs": 1356,
      "neededMs": 4300,
      "cls": "gxt-pill"
     },
     {
      "kind": "too-short",
      "session": "phone/play",
-     "text": "Pull a chip Tap the bag. The chip lands on the spiral, as many spaces on as its number. Got it",
-     "words": 21,
-     "shownMs": 250,
-     "neededMs": 6100,
-     "cls": "gxh-bub gxh-a-bottom on"
+     "text": "✨ Pedlar's Pick · 🐀 Head start +1",
+     "words": 8,
+     "shownMs": 1677,
+     "neededMs": 4800,
+     "cls": "on"
     },
     {
      "kind": "too-short",
      "session": "pc/learn",
      "text": "Watch the board",
      "words": 3,
-     "shownMs": 1076,
+     "shownMs": 3883,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 1383,
      "neededMs": 4300,
      "cls": "gxt-pill"
     }
@@ -40,33 +49,68 @@
   },
   "b": {
    "status": "FAIL",
-   "count": 4,
+   "count": 9,
    "detail": [
     {
      "session": "phone/play",
      "text": "Pull a chip Tap the bag. The chip lands on the spiral, as many spaces on as its number. Got it",
-     "ms": 250,
+     "ms": 2474,
      "cls": "gxh-bub gxh-a-bottom on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Pull a chip Tap the bag. The chip lands on the spiral, as many spaces on as its number. Got it",
-     "ms": 1000,
+     "text": "✨ Pedlar's Pick · 🐀 Head start +1",
+     "ms": 1677,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Fortune card Today's card lets you choose something. Tap the option you want. Got it",
+     "ms": 928,
      "cls": "gxh-bub gxh-a-bottom on",
      "tag": "div"
     },
     {
+     "session": "phone/play",
+     "text": "You take a Scarlet Cap 2 (Pedlar's Pick).",
+     "ms": 3265,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Flask used: the white chip went back into your bag. Rubies can refill the flask after the day.",
+     "ms": 6489,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
      "session": "pc/play",
-     "text": "Fortune card Today's card lets you choose something. Tap the option you want. Got it",
-     "ms": 959,
+     "text": "Pull a chip Tap the bag. The chip lands on the spiral, as many spaces on as its number. Got it",
+     "ms": 250,
      "cls": "gxh-bub gxh-a-top on",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "You move the droplet 2 spaces (Fork in the Road).",
-     "ms": 4518,
+     "text": "2 Draw or stop Draw for more coins and points, or Stop to keep your space. Whites must stay at 7 or less. Got it",
+     "ms": 1324,
+     "cls": "gxh-bub gxh-a-top on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "That is your only white chip. Tap Flask again to put it back.",
+     "ms": 3502,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Flask used: the white chip went back into your bag. Rubies can refill the flask after the day.",
+     "ms": 7956,
      "cls": "on",
      "tag": "div"
     }
@@ -74,475 +118,559 @@
   },
   "c": {
    "status": "FAIL",
-   "count": 6,
+   "count": 18,
    "detail": [
     {
      "session": "phone/play",
      "text": "The chip lands on the spiral, as many spaces on as its number.",
      "words": 13,
-     "at": 3003,
+     "at": 9561,
      "where": "div.gxh-tx"
     },
     {
      "session": "phone/play",
-     "text": "Whoever rolls the bonus die this round rolls it twice and gets both results.",
-     "words": 14,
-     "at": 7048,
-     "where": "div.lpfull"
+     "text": "Your last chip decides your space: the big number is coins, the small brown badge is victory points.",
+     "words": 18,
+     "at": 56950,
+     "where": "li."
+    },
+    {
+     "session": "phone/play",
+     "text": "Then the day is counted: spend coins on new chips for your bag, spend rubies, and the next day begins.",
+     "words": 20,
+     "at": 56950,
+     "where": "li."
+    },
+    {
+     "session": "phone/play",
+     "text": "Over nine days you brew in your cauldron, sell what you make and stock your bag with better ingredients.",
+     "words": 19,
+     "at": 56950,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "From day 2, anyone behind the leader gets a rat stone: your first chip starts one space further for every rat tail between you and the leader on the score track.",
+     "words": 31,
+     "at": 56950,
+     "where": "li."
+    },
+    {
+     "session": "phone/play",
+     "text": "Draw a chip from your bag, it lands on the spiral as many spaces after the last chip as its number.",
+     "words": 21,
+     "at": 56950,
+     "where": "li."
+    },
+    {
+     "session": "phone/play",
+     "text": "When everyone has stopped, the day is counted: the bonus die, chip powers, rubies, points, shopping.",
+     "words": 16,
+     "at": 56950,
+     "where": "li."
     },
     {
      "session": "pc/learn",
      "text": "Wynne grows everything she brews on her own window sill and talks to each plant by name.",
      "words": 17,
-     "at": 27501,
+     "at": 55645,
      "where": "p.story"
     },
     {
      "session": "pc/learn",
      "text": "Odo digs sunroots at dawn and sells them by noon, always with a story about how rare they are.",
      "words": 19,
-     "at": 27502,
+     "at": 55645,
      "where": "p.story"
     },
     {
      "session": "pc/learn",
      "text": "Tamsin reads the fair by the wren feathers that drift past her stall and is right more often than she admits.",
      "words": 21,
-     "at": 27502,
+     "at": 55646,
      "where": "p.story"
     },
     {
      "session": "pc/learn",
      "text": "Mirabel says a pot that never bubbles over is a pot that never tried.",
      "words": 14,
-     "at": 27502,
+     "at": 55646,
      "where": "p.story"
+    },
+    {
+     "session": "pc/play",
+     "text": "The chip lands on the spiral, as many spaces on as its number.",
+     "words": 13,
+     "at": 10780,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "pc/play",
+     "text": "Over nine days you brew in your cauldron, sell what you make and stock your bag with better ingredients.",
+     "words": 19,
+     "at": 54506,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "If the white numbers in your cauldron add up to more than 7, the cauldron explodes.",
+     "words": 16,
+     "at": 54675,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "The last chip stays, you must stop, and you must choose later: take the victory points of your space or shop with its coins, not both.",
+     "words": 26,
+     "at": 54675,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Your flask can put the last white chip back into the bag (not the chip that exploded you), once per day.",
+     "words": 21,
+     "at": 54675,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "In the last day everybody secretly chooses Draw or Stop, and all choices are revealed together (Stir!).",
+     "words": 17,
+     "at": 54675,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "You can also draw at the same moment on every other day: the computers draw while you think.",
+     "words": 18,
+     "at": 54675,
+     "where": "p."
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 81,
+   "count": 106,
    "detail": [
     {
      "session": "phone/learn",
      "text": "Scores",
      "px": 13,
-     "at": 1255,
+     "at": 2278,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "Rules",
      "px": 13,
-     "at": 1255,
+     "at": 2278,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "Menu",
      "px": 13,
-     "at": 1255,
+     "at": 2278,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "Short, one tap at a time, no reading",
      "px": 13.3,
-     "at": 1255,
+     "at": 2278,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "Table for",
      "px": 13.5,
-     "at": 1255,
+     "at": 2278,
      "where": "span.lbl"
     },
     {
      "session": "phone/learn",
      "text": "0 1",
      "px": 13,
-     "at": 3255,
+     "at": 6251,
      "where": "span.tv"
     },
     {
      "session": "phone/learn",
      "text": "waiting",
      "px": 13,
-     "at": 3255,
+     "at": 6252,
      "where": "span.ts"
     },
     {
      "session": "phone/learn",
      "text": "NOW",
      "px": 13,
-     "at": 3255,
+     "at": 6252,
      "where": "span.fk"
     },
     {
      "session": "phone/learn",
      "text": "Pedlar's Pick",
      "px": 13,
-     "at": 3255,
+     "at": 6252,
      "where": "b."
     },
     {
      "session": "phone/learn",
-     "text": "Brew potions for 9 days. The most victory points wins. Your ",
-     "px": 13.5,
-     "at": 3256,
-     "where": "div.gxh-tx"
+     "text": "Fortune: Pedlar's Pick",
+     "px": 13,
+     "at": 6252,
+     "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "0%",
      "px": 13,
-     "at": 4262,
+     "at": 9299,
      "where": "span.mp.lo"
     },
     {
      "session": "phone/learn",
      "text": "9",
      "px": 13,
-     "at": 4262,
+     "at": 9299,
      "where": "span.bagn"
     },
     {
      "session": "phone/learn",
      "text": "8",
      "px": 13,
-     "at": 5262,
-     "where": "span.bagn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "7",
-     "px": 13,
-     "at": 6265,
+     "at": 12363,
      "where": "span.bagn"
     },
     {
      "session": "phone/learn",
      "text": "finished",
      "px": 13,
-     "at": 7254,
+     "at": 14502,
      "where": "span.ts"
+    },
+    {
+     "session": "phone/learn",
+     "text": "It moved 2 spaces: its number. The ring marks the space you ",
+     "px": 13.5,
+     "at": 14503,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "7",
+     "px": 13,
+     "at": 20451,
+     "where": "span.bagn"
     },
     {
      "session": "phone/learn",
      "text": "17%",
      "px": 13,
-     "at": 7254,
+     "at": 24090,
      "where": "span.mp.mid"
     },
     {
      "session": "phone/learn",
      "text": "6",
      "px": 13,
-     "at": 7254,
+     "at": 24090,
      "where": "span.bagn"
     },
     {
      "session": "phone/learn",
      "text": "67%",
      "px": 13,
-     "at": 9257,
+     "at": 29313,
      "where": "span.mp.hi"
     },
     {
      "session": "phone/learn",
      "text": "1 2",
      "px": 13,
-     "at": 11255,
+     "at": 33530,
      "where": "span.tv"
     },
     {
      "session": "phone/learn",
      "text": "Take 1 points or shop",
      "px": 13.5,
-     "at": 11256,
+     "at": 33531,
      "where": "div.mine"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Fortune: Pedlar's Pick",
-     "px": 13,
-     "at": 11256,
-     "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "You",
      "px": 13,
-     "at": 12258,
+     "at": 35105,
      "where": "b.dn"
     },
     {
      "session": "phone/learn",
      "text": "5",
      "px": 13,
-     "at": 12258,
+     "at": 35105,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Wynne",
      "px": 13,
-     "at": 12258,
+     "at": 35105,
      "where": "b.dn"
     },
     {
      "session": "phone/learn",
      "text": "2",
      "px": 13,
-     "at": 12258,
+     "at": 35105,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "2 2",
      "px": 13,
-     "at": 16254,
+     "at": 42449,
      "where": "span.tv"
     },
     {
      "session": "phone/learn",
      "text": "Buy up to 2 chips",
      "px": 13.5,
-     "at": 16254,
+     "at": 42450,
      "where": "div.mine"
     },
     {
      "session": "phone/learn",
      "text": "Marrow",
      "px": 12,
-     "at": 16255,
+     "at": 42450,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Mossback",
      "px": 12,
-     "at": 16255,
+     "at": 42450,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Wren Feather",
      "px": 12,
-     "at": 16255,
+     "at": 42450,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Scarlet Cap",
      "px": 12,
-     "at": 16255,
+     "at": 42450,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Sunroot",
      "px": 12,
-     "at": 16255,
+     "at": 42450,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "day 2",
      "px": 11,
-     "at": 16255,
+     "at": 42450,
      "where": "span.slock"
     },
     {
      "session": "phone/learn",
      "text": "Dusk Sigh",
      "px": 12,
-     "at": 16255,
+     "at": 42450,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "day 3",
      "px": 11,
-     "at": 16255,
+     "at": 42450,
      "where": "span.slock"
     },
     {
      "session": "phone/learn",
      "text": "Cinder Moth",
      "px": 12,
-     "at": 16255,
+     "at": 42450,
      "where": "b."
     },
     {
      "session": "phone/learn",
-     "text": "Wren Feather peeks at extra chips when it lands. Scarlet Cap",
+     "text": "Cinder Moth: most moths win droplet steps. Sunroot opens on ",
      "px": 13.5,
-     "at": 16255,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "You may buy up to two chips of different colours. Tap the Wr",
-     "px": 13.5,
-     "at": 17255,
+     "at": 46515,
      "where": "div.gxh-tx"
     },
     {
      "session": "phone/learn",
      "text": "choosing",
      "px": 13,
-     "at": 20255,
+     "at": 51578,
      "where": "span.ts"
     },
     {
      "session": "phone/learn",
      "text": "Waiting for others...",
      "px": 13.5,
-     "at": 20255,
+     "at": 51580,
      "where": "div."
-    },
-    {
-     "session": "phone/learn",
-     "text": "1",
-     "px": 13,
-     "at": 20255,
-     "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "2 0",
      "px": 13,
-     "at": 21254,
+     "at": 52581,
      "where": "span.tv"
-    },
-    {
-     "session": "phone/learn",
-     "text": "decided",
-     "px": 13,
-     "at": 21254,
-     "where": "span.ts"
     },
     {
      "session": "phone/learn",
      "text": "ALL DAY",
      "px": 13,
-     "at": 21254,
+     "at": 52581,
      "where": "span.fk"
     },
     {
      "session": "phone/learn",
      "text": "Thick Skin",
      "px": 13,
-     "at": 21254,
+     "at": 52581,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "10",
      "px": 13,
-     "at": 21254,
+     "at": 52581,
      "where": "span.bagn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "decided",
+     "px": 13,
+     "at": 54298,
+     "where": "span.ts"
     },
     {
      "session": "phone/learn",
      "text": "You win the fair with 3 points.",
      "px": 13.5,
-     "at": 23255,
+     "at": 57832,
      "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "1",
+     "px": 13,
+     "at": 57832,
+     "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "0",
      "px": 13,
-     "at": 23255,
+     "at": 57832,
      "where": "b."
     },
     {
-     "session": "phone/learn",
-     "text": "Cauldron",
+     "session": "phone/play",
+     "text": "Scores",
      "px": 13,
-     "at": 25254,
-     "where": "th."
-    },
-    {
-     "session": "phone/learn",
-     "text": "D1",
-     "px": 13,
-     "at": 25254,
-     "where": "th."
-    },
-    {
-     "session": "phone/learn",
-     "text": "D2",
-     "px": 13,
-     "at": 25254,
-     "where": "th."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Extra",
-     "px": 13,
-     "at": 25254,
-     "where": "th."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Total",
-     "px": 13,
-     "at": 25254,
-     "where": "th."
-    },
-    {
-     "session": "phone/learn",
-     "text": "3",
-     "px": 13,
-     "at": 25254,
-     "where": "td."
-    },
-    {
-     "session": "phone/learn",
-     "text": "D1 to D2 are the points each day brought (fortune cards incl",
-     "px": 13,
-     "at": 25255,
-     "where": "p.sm"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Done. Tap to play it again.",
-     "px": 13.3,
-     "at": 26254,
+     "at": 2001,
      "where": "span."
     },
     {
-     "session": "phone/learn",
-     "text": "Rat Bribe",
+     "session": "phone/play",
+     "text": "Rules",
      "px": 13,
-     "at": 27288,
+     "at": 2001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Menu",
+     "px": 13,
+     "at": 2002,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Short, one tap at a time, no reading",
+     "px": 13.3,
+     "at": 2002,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Table for",
+     "px": 13.5,
+     "at": 2002,
+     "where": "span.lbl"
+    },
+    {
+     "session": "phone/play",
+     "text": "0 1",
+     "px": 13,
+     "at": 9519,
+     "where": "span.tv"
+    },
+    {
+     "session": "phone/play",
+     "text": "ALL DAY",
+     "px": 13,
+     "at": 9519,
+     "where": "span.fk"
+    },
+    {
+     "session": "phone/play",
+     "text": "Lucky Seven",
+     "px": 13,
+     "at": 9519,
      "where": "b."
     },
     {
-     "session": "phone/learn",
+     "session": "phone/play",
+     "text": "0%",
+     "px": 13,
+     "at": 9561,
+     "where": "span.mp.lo"
+    },
+    {
+     "session": "phone/play",
+     "text": "9",
+     "px": 13,
+     "at": 9561,
+     "where": "span.bagn"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap the bag. The chip lands on the spiral, as many spaces on",
+     "px": 13.5,
+     "at": 9561,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/play",
+     "text": "8",
+     "px": 13,
+     "at": 12152,
+     "where": "span.bagn"
+    },
+    {
+     "session": "phone/play",
      "text": "Draw another, or stop.",
      "px": 13.5,
-     "at": 28264,
+     "at": 14941,
      "where": "div.mine"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Fortune: Rat Bribe",
-     "px": 13,
-     "at": 28264,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Rat back 1 to 3 spaces for rubies.",
-     "px": 13,
-     "at": 28264,
-     "where": "span.fx"
     }
    ]
   },
@@ -557,46 +685,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 35,
-   "clicks": 15,
+   "secs": 60,
+   "turns": 22,
+   "clicks": 0,
    "endedBy": "time",
-   "tutorialEnded": 26,
+   "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 13
+   "messagesSeen": 9
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 8,
-   "turns": 11,
-   "clicks": 11,
+   "secs": 58,
+   "turns": 28,
+   "clicks": 31,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 2
+   "messagesSeen": 5
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 34,
-   "clicks": 14,
+   "secs": 60,
+   "turns": 33,
+   "clicks": 12,
    "endedBy": "time",
-   "tutorialEnded": 27,
+   "tutorialEnded": 56,
    "hintsOff": true,
-   "messagesSeen": 11
+   "messagesSeen": 3
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 62,
-   "clicks": 98,
-   "endedBy": "time",
+   "secs": 56,
+   "turns": 20,
+   "clicks": 28,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 2
+   "messagesSeen": 4
   }
  ]
 }

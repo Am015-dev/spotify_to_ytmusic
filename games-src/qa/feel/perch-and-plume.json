@@ -1,20 +1,20 @@
 {
  "slug": "perch-and-plume",
- "when": "2026-11-08T02:32Z",
- "secs": 30,
- "totalSecs": 121,
+ "when": "2026-11-08T02:41Z",
+ "secs": 60,
+ "totalSecs": 63,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 67,
+   "count": 164,
    "detail": [
     {
      "kind": "too-short",
      "session": "phone/learn",
      "text": "Round 1 of 1 Your turn 4 actions left Game ends when everyone has used all their actions.",
      "words": 18,
-     "shownMs": 1000,
+     "shownMs": 1002,
      "neededMs": 5800,
      "cls": "trk"
     },
@@ -23,7 +23,367 @@
      "session": "phone/learn",
      "text": "Your turn 4 actions left this round",
      "words": 7,
-     "shownMs": 1000,
+     "shownMs": 1002,
+     "neededMs": 4700,
+     "cls": "turnban me"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Your turn 4 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 413,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 3 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Your turn 3 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Your turn 3 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 2 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 757,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 2 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 2 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 488,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 2 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 2 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Your turn 2 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 583,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Your turn 2 actions left this round",
+     "words": 7,
+     "shownMs": 250,
+     "neededMs": 4700,
+     "cls": "turnban me"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 1 action left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 1 action left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 1 Pip's turn 0 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 8 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 8 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 8 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 7 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 7 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 506,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Your turn 6 actions left this round",
+     "words": 7,
+     "shownMs": 250,
+     "neededMs": 4700,
+     "cls": "turnban me"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 5 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 5 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 5 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 5 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 4 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 4 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 4 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 4 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 479,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Round 1 of 1 Your turn 4 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 911,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Your turn 4 actions left this round",
+     "words": 7,
+     "shownMs": 750,
      "neededMs": 4700,
      "cls": "turnban me"
     },
@@ -32,679 +392,313 @@
      "session": "pc/learn",
      "text": "Round 1 of 1 Your turn 4 actions left Game ends when everyone has used all their actions.",
      "words": 18,
-     "shownMs": 1006,
+     "shownMs": 250,
      "neededMs": 5800,
      "cls": "trk"
     },
     {
      "kind": "too-short",
      "session": "pc/learn",
-     "text": "Your turn 4 actions left this round",
+     "text": "Round 1 of 1 Your turn 4 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Round 1 of 1 Pip's turn 3 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Round 1 of 1 Your turn 3 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Your turn 3 actions left this round",
      "words": 7,
-     "shownMs": 756,
+     "shownMs": 250,
      "neededMs": 4700,
      "cls": "turnban me"
     },
     {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1000,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Your turn 4 actions left this round"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 4250,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Aunt Ottilie Turn 1 of 4: play a bird. Birds are y"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1000,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Aunt Ottilie Now tap the glowing space: a bird goe"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1001,
-     "texts": [
-      "Round 1 of 1 Pip's turn 3 actions left Game ends w",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Now tap the glowing space: a bird goe",
-      "Pip's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Pip's turn 3 actions left Game ends w",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Now tap the glowing space: a bird goe"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 750,
-     "texts": [
-      "Round 1 of 1 Your turn 3 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Take a bird you can see in the tray, "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 3 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Draw birds. New cards are the birds y"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 3 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Now Pip takes a turn. Each step is sh",
-      "Your turn 3 actions left this round"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 3 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Now Pip takes a turn. Each step is sh"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Round 1 of 1 Your turn 3 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 751,
-     "texts": [
-      "Round 1 of 1 Pip's turn 2 actions left Game ends w",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Pip's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1753,
-     "texts": [
-      "Round 1 of 1 Pip's turn 2 actions left Game ends w",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 2 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Turn 3 of 4: play a bird: tap \"Play a"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 2 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Turn 3 of 4: play a bird: tap \"Play a",
-      "Your turn 2 actions left this round"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1249,
-     "texts": [
-      "Round 1 of 1 Your turn 2 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie This space offers a trade for one mor"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Round 1 of 1 Your turn 2 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Lay eggs. Every egg is 1 point, so th"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 490,
-     "texts": [
-      "Round 1 of 1 Your turn 2 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 748,
-     "texts": [
-      "Round 1 of 1 Your turn 2 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie Tap a glowing bird to put an egg on i"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 4250,
-     "texts": [
-      "Round 1 of 1 Your turn 2 actions left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Pip's turn 1 action left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie See that? After a row is used, each b"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Pip's turn 1 action left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Pip's turn 1 action left Game ends wh",
-      "! Poor: 0 points. Laying eggs was worth more (+2 p",
-      "Aunt Ottilie A pink power works between turns, whe"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 999,
-     "texts": [
-      "Round 1 of 1 Pip's turn 1 action left Game ends wh",
-      "✓ Good: +3 points, the best move this turn.",
-      "Aunt Ottilie A pink power works between turns, whe",
-      "Pip's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1500,
-     "texts": [
-      "Round 1 of 1 Pip's turn 1 action left Game ends wh",
-      "✓ Good: +3 points, the best move this turn."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 1 action left Game ends whe",
-      "✓ Good: +3 points, the best move this turn.",
-      "Aunt Ottilie Last turn: get food. Birds cost food,"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 1 action left Game ends whe",
-      "✓ Good: +3 points, the best move this turn."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 1 action left Game ends whe",
-      "✓ Good: +3 points, the best move this turn.",
-      "Your turn 1 action left this round"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 1 action left Game ends whe",
-      "✓ Good: +3 points, the best move this turn."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 1 action left Game ends whe",
-      "✓ Good: +3 points, the best move this turn.",
-      "Aunt Ottilie Each die in the feeder is one food. P"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 761,
-     "texts": [
-      "Round 1 of 4 Your turn 8 actions left Round ends w",
-      "Your turn 8 actions left this round"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 1000,
-     "texts": [
-      "Round 1 of 4 Fern's turn 7 actions left Round ends",
-      "Fern's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 500,
-     "texts": [
-      "Round 1 of 4 Rowan's turn 7 actions left Round end",
-      "Rowan's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 995,
-     "texts": [
-      "Round 1 of 4 Hazel's turn 7 actions left Round end",
-      "Hazel's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4 Your turn 7 actions left Round ends w",
-      "Your turn 7 actions left this round"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 500,
-     "texts": [
-      "Round 1 of 4 Fern's turn 6 actions left Round ends",
-      "Fern's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 996,
-     "texts": [
-      "Round 1 of 4 Rowan's turn 6 actions left Round end",
-      "Rowan's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 1000,
-     "texts": [
-      "Round 1 of 4 Hazel's turn 6 actions left Round end",
-      "Hazel's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4 Your turn 6 actions left Round ends w",
-      "Your turn 6 actions left this round"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 1000,
-     "texts": [
-      "Round 1 of 4 Fern's turn 5 actions left Round ends",
-      "Fern's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 999,
-     "texts": [
-      "Round 1 of 4 Rowan's turn 5 actions left Round end",
-      "Rowan's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 1000,
-     "texts": [
-      "Round 1 of 4 Hazel's turn 5 actions left Round end",
-      "Hazel's turn Watch each step. Tap to speed up."
-     ]
-    },
-    {
-     "kind": "two-at-once",
+     "kind": "too-short",
      "session": "pc/learn",
-     "ms": 756,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Your turn 4 actions left this round"
-     ]
+     "text": "Round 1 of 1 Your turn 3 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
+     "kind": "too-short",
      "session": "pc/learn",
-     "ms": 5750,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Aunt Ottilie Turn 1 of 4: play a bird. Birds are y"
-     ]
+     "text": "Round 1 of 1 Pip's turn 2 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 500,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
+     "kind": "too-short",
      "session": "pc/learn",
-     "ms": 1000,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Aunt Ottilie Now tap the glowing space: a bird goe"
-     ]
+     "text": "Round 1 of 1 Your turn 2 actions left Game ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 500,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Aunt Ottilie This space offers a trade for one mor"
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 4 Your turn 8 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Aunt Ottilie Lay eggs. Every egg is 1 point, so th"
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 4 Fern's turn 7 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 1010,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 4 actions left Game ends wh",
-      "Aunt Ottilie Tap a glowing bird to put an egg on i"
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Fern's turn Watch each step. Tap to speed up.",
+     "words": 9,
+     "shownMs": 250,
+     "neededMs": 4900,
+     "cls": "turnban rv"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Pip's turn 3 actions left Game ends w",
-      "Aunt Ottilie See that? After a row is used, each b"
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 4 Fern's turn 7 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1001,
-     "texts": [
-      "Round 1 of 1 Pip's turn 3 actions left Game ends w",
-      "✓ Good: +4 points, the best move this turn.",
-      "Pip's turn Watch each step. Tap to speed up."
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 4 Your turn 7 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1500,
-     "texts": [
-      "Round 1 of 1 Pip's turn 3 actions left Game ends w",
-      "✓ Good: +4 points, the best move this turn."
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 4 Your turn 7 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 3 actions left Game ends wh",
-      "✓ Good: +4 points, the best move this turn.",
-      "Aunt Ottilie Turn 2 of 4: play a bird: tap \"Play a"
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 4 Fern's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Your turn 3 actions left Game ends wh",
-      "✓ Good: +4 points, the best move this turn.",
-      "Aunt Ottilie Turn 2 of 4: play a bird: tap \"Play a",
-      "Your turn 3 actions left this round"
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 4 Fern's turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 7250,
-     "texts": [
-      "Round 1 of 1 Your turn 3 actions left Game ends wh",
-      "✓ Good: +4 points, the best move this turn."
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Your turn 6 actions left this round",
+     "words": 7,
+     "shownMs": 250,
+     "neededMs": 4700,
+     "cls": "turnban me"
     },
     {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 502,
-     "texts": [
-      "Round 1 of 1 Pip's turn 2 actions left Game ends w",
-      "✓ Good: +4 points, the best move this turn."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 1 Pip's turn 2 actions left Game ends w",
-      "✓ Good: +2 points, the best move this turn."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 754,
-     "texts": [
-      "Round 1 of 1 Pip's turn 2 actions left Game ends w",
-      "✓ Good: +2 points, the best move this turn.",
-      "Pip's turn Watch each step. Tap to speed up."
-     ]
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 4 Your turn 6 actions left Round ends when everyone has used all their actions.",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "trk"
     }
    ]
   },
   "b": {
    "status": "FAIL",
-   "count": 102,
+   "count": 161,
    "detail": [
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Your turn 0 actions left Round ends when everyone has used all their actions.",
-     "ms": 2500,
+     "ms": 5494,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 4 Your turn 8 actions left Round ends when everyone has used all their actions.",
-     "ms": 491,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Your turn 8 actions left Round ends when everyone has used all their actions.",
-     "ms": 1004,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Your turn 8 actions left this round",
-     "ms": 761,
-     "cls": "turnban me",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Your turn 8 actions left Round ends when everyone has used all their actions.",
+     "text": "Round 1 of 4 Hazel's turn 8 actions left Round ends when everyone has used all their actions.",
      "ms": 500,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 4 Fern's turn 7 actions left Round ends when everyone has used all their actions.",
+     "text": "Round 1 of 4 Hazel's turn 8 actions left Round ends when everyone has used all their actions.",
      "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Fern's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 1000,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Fern's turn Watch each step. Tap to speed up.",
-     "ms": 1000,
-     "cls": "turnban rv",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Fern's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 500,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 500,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Rowan's turn Watch each step. Tap to speed up.",
-     "ms": 500,
-     "cls": "turnban rv",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 495,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Hazel's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Hazel's turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 995,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Hazel's turn Watch each step. Tap to speed up.",
-     "ms": 995,
+     "ms": 250,
+     "cls": "turnban rv",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 8 actions left Round ends when everyone has used all their actions.",
+     "ms": 250,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 8 actions left Round ends when everyone has used all their actions.",
+     "ms": 473,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 8 actions left Round ends when everyone has used all their actions.",
+     "ms": 250,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 8 actions left Round ends when everyone has used all their actions.",
+     "ms": 250,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 8 actions left Round ends when everyone has used all their actions.",
+     "ms": 1900,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 981,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Fern's turn Watch each step. Tap to speed up.",
+     "ms": 720,
+     "cls": "turnban rv",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 399,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 475,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 999,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Rowan's turn Watch each step. Tap to speed up.",
+     "ms": 750,
+     "cls": "turnban rv",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 501,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 250,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 250,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 250,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 991,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Hazel's turn Watch each step. Tap to speed up.",
+     "ms": 756,
      "cls": "turnban rv",
      "tag": "div"
     },
@@ -717,8 +711,15 @@
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 4 Your turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 501,
+     "text": "Round 1 of 4 Hazel's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 499,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Hazel's turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 250,
      "cls": "trk",
      "tag": "div"
     },
@@ -739,6 +740,20 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Your turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 615,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 7 actions left Round ends when everyone has used all their actions.",
+     "ms": 1739,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 7 actions left Round ends when everyone has used all their actions.",
      "ms": 250,
      "cls": "trk",
      "tag": "div"
@@ -746,21 +761,28 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Your turn 7 actions left Round ends when everyone has used all their actions.",
-     "ms": 1233,
+     "ms": 1423,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Fern's turn 6 actions left Round ends when everyone has used all their actions.",
-     "ms": 745,
+     "ms": 250,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Fern's turn 6 actions left Round ends when everyone has used all their actions.",
+     "ms": 1058,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Fern's turn Watch each step. Tap to speed up.",
-     "ms": 500,
+     "ms": 1058,
      "cls": "turnban rv",
      "tag": "div"
     },
@@ -774,7 +796,7 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Fern's turn 6 actions left Round ends when everyone has used all their actions.",
-     "ms": 495,
+     "ms": 250,
      "cls": "trk",
      "tag": "div"
     },
@@ -788,15 +810,36 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Rowan's turn 6 actions left Round ends when everyone has used all their actions.",
-     "ms": 996,
+     "ms": 250,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 6 actions left Round ends when everyone has used all their actions.",
+     "ms": 991,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Rowan's turn Watch each step. Tap to speed up.",
-     "ms": 996,
+     "ms": 761,
      "cls": "turnban rv",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 6 actions left Round ends when everyone has used all their actions.",
+     "ms": 506,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 4 Rowan's turn 6 actions left Round ends when everyone has used all their actions.",
+     "ms": 250,
+     "cls": "trk",
      "tag": "div"
     },
     {
@@ -809,21 +852,14 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Hazel's turn 6 actions left Round ends when everyone has used all their actions.",
-     "ms": 501,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Hazel's turn 6 actions left Round ends when everyone has used all their actions.",
-     "ms": 1000,
+     "ms": 998,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Hazel's turn Watch each step. Tap to speed up.",
-     "ms": 1000,
+     "ms": 750,
      "cls": "turnban rv",
      "tag": "div"
     },
@@ -844,14 +880,14 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Hazel's turn 6 actions left Round ends when everyone has used all their actions.",
-     "ms": 500,
+     "ms": 250,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Your turn 6 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
+     "ms": 423,
      "cls": "trk",
      "tag": "div"
     },
@@ -865,7 +901,7 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Your turn 6 actions left Round ends when everyone has used all their actions.",
-     "ms": 747,
+     "ms": 2457,
      "cls": "trk",
      "tag": "div"
     },
@@ -878,6 +914,13 @@
     },
     {
      "session": "phone/play",
+     "text": "Round 1 of 4 Your turn 6 actions left Round ends when everyone has used all their actions.",
+     "ms": 6750,
+     "cls": "trk",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
      "text": "Round 1 of 4 Fern's turn 5 actions left Round ends when everyone has used all their actions.",
      "ms": 250,
      "cls": "trk",
@@ -886,14 +929,14 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 4 Fern's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 1000,
+     "ms": 1008,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Fern's turn Watch each step. Tap to speed up.",
-     "ms": 1000,
+     "ms": 1008,
      "cls": "turnban rv",
      "tag": "div"
     },
@@ -920,446 +963,435 @@
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 4 Fern's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Fern's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Fern's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
      "text": "Round 1 of 4 Rowan's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 999,
+     "ms": 1003,
      "cls": "trk",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Rowan's turn Watch each step. Tap to speed up.",
-     "ms": 999,
+     "ms": 753,
      "cls": "turnban rv",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Rowan's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 500,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Hazel's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 1243,
-     "cls": "trk",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Hazel's turn Watch each step. Tap to speed up.",
-     "ms": 1000,
-     "cls": "turnban rv",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 4 Hazel's turn 5 actions left Round ends when everyone has used all their actions.",
-     "ms": 250,
-     "cls": "trk",
      "tag": "div"
     }
    ]
   },
   "c": {
    "status": "FAIL",
-   "count": 21,
+   "count": 32,
    "detail": [
     {
      "session": "phone/learn",
      "text": "Birds are your biggest points, so tap \"Play a bird\" and pick a glowing card.",
      "words": 15,
-     "at": 4010,
+     "at": 7005,
      "where": "span.saytx"
     },
     {
      "session": "phone/learn",
      "text": "Now tap the glowing space: a bird goes in the first free space of its habitat.",
      "words": 16,
-     "at": 12018,
+     "at": 17104,
      "where": "span.saytx"
     },
     {
      "session": "phone/learn",
      "text": "Tap a glowing bird in the tray, or the deck, to take a card (1 left).",
      "words": 16,
-     "at": 12018,
+     "at": 18011,
      "where": "div."
     },
     {
      "session": "phone/learn",
      "text": "Take a bird you can see in the tray, or a surprise from the deck.",
      "words": 15,
-     "at": 14010,
+     "at": 20022,
      "where": "span.saytx"
     },
     {
      "session": "phone/learn",
      "text": "This space offers a trade for one more: say yes if it helps, \"No thanks\" is always fine.",
      "words": 18,
-     "at": 19007,
+     "at": 23005,
      "where": "span.saytx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "so far · 1 cards in hand · 2 actions left · food 0 0 0 0 0",
-     "words": 18,
-     "at": 19011,
-     "where": "p."
     },
     {
      "session": "phone/learn",
      "text": "Tap a glowing bird on your board to lay an egg on it (3 left).",
      "words": 15,
-     "at": 21016,
-     "where": "div."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Tap a glowing bird on your board to lay an egg on it (2 left).",
-     "words": 15,
-     "at": 24005,
+     "at": 25028,
      "where": "div."
     },
     {
      "session": "phone/learn",
      "text": "Tap a glowing bird on your board to lay an egg on it (1 left).",
      "words": 15,
-     "at": 25005,
+     "at": 26015,
      "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "After a row is used, each bird in it uses its power, right to left.",
+     "words": 15,
+     "at": 27254,
+     "where": "span.saytx"
     },
     {
      "session": "phone/learn",
      "text": "A pink power works between turns, when someone else does the thing it names.",
      "words": 14,
-     "at": 27005,
+     "at": 29264,
      "where": "span.saytx"
     },
     {
      "session": "phone/learn",
-     "text": "Birds cost food, and the forest gives it: more forest birds, more food.",
+     "text": "so far · 1 cards in hand · 3 actions left · food 0 0 0 0 0",
+     "words": 18,
+     "at": 30339,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Tap a glowing food die in the feeder to take it (2 left).",
      "words": 13,
-     "at": 29015,
+     "at": 40282,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Tap a glowing food die in the feeder to take it (1 left).",
+     "words": 13,
+     "at": 41300,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "The feeder was empty (or all one face), so all five dice were rolled again.",
+     "words": 15,
+     "at": 46265,
      "where": "span.saytx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Pay the food on the card, plus 1 egg for spaces 2 and 3, and 2 eggs for spaces 4 and 5.",
+     "words": 22,
+     "at": 48273,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Every die shows the same food: you may reroll the whole feeder before taking.",
+     "words": 14,
+     "at": 48273,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "The round is over, so its goal was judged: whoever has the most of it scores most.",
+     "words": 17,
+     "at": 51263,
+     "where": "span.saytx"
+    },
+    {
+     "session": "phone/play",
+     "text": "Birds with wings over 65 cm across 4+: 3 pts, 6+: 7 pts",
+     "words": 13,
+     "at": 9512,
+     "where": "button.bonc.on"
     },
     {
      "session": "phone/play",
      "text": "Tap a glowing food die in the feeder to take it (1 left).",
      "words": 13,
-     "at": 16003,
+     "at": 29004,
      "where": "div."
     },
     {
      "session": "pc/learn",
      "text": "Birds are your biggest points, so tap \"Play a bird\" and pick a glowing card.",
      "words": 15,
-     "at": 4007,
+     "at": 8010,
      "where": "span.saytx"
     },
     {
      "session": "pc/learn",
      "text": "Now tap the glowing space: a bird goes in the first free space of its habitat.",
      "words": 16,
-     "at": 11010,
+     "at": 17293,
      "where": "span.saytx"
+    },
+    {
+     "session": "pc/learn",
+     "text": "so far · 2 cards in hand · 4 actions left · food 1 1 0 0 0",
+     "words": 18,
+     "at": 18291,
+     "where": "p."
     },
     {
      "session": "pc/learn",
      "text": "This space offers a trade for one more: say yes if it helps, \"No thanks\" is always fine.",
      "words": 18,
-     "at": 12008,
+     "at": 21272,
      "where": "span.saytx"
     },
     {
      "session": "pc/learn",
      "text": "Tap a glowing bird on your board to lay an egg on it (3 left).",
      "words": 15,
-     "at": 15019,
+     "at": 21272,
      "where": "div."
     },
     {
      "session": "pc/learn",
      "text": "Tap a glowing bird on your board to lay an egg on it (2 left).",
      "words": 15,
-     "at": 16004,
+     "at": 22301,
      "where": "div."
-    },
-    {
-     "session": "pc/learn",
-     "text": "3+: 3 pts, 5+: 7 pts · now 0 birds = 0 pts",
-     "words": 13,
-     "at": 23030,
-     "where": "small."
     },
     {
      "session": "pc/learn",
      "text": "Tap a glowing bird on your board to lay an egg on it (1 left).",
      "words": 15,
-     "at": 25008,
+     "at": 27319,
+     "where": "div."
+    },
+    {
+     "session": "pc/learn",
+     "text": "A pink power works between turns, when someone else does the thing it names.",
+     "words": 14,
+     "at": 31260,
+     "where": "span.saytx"
+    },
+    {
+     "session": "pc/learn",
+     "text": "so far · 2 cards in hand · 3 actions left · food 1 2 0 0 0",
+     "words": 18,
+     "at": 51280,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Take a bird you can see in the tray, or a surprise from the deck.",
+     "words": 15,
+     "at": 58561,
+     "where": "span.saytx"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Tap a glowing bird in the tray, or the deck, to take a card (1 left).",
+     "words": 16,
+     "at": 58561,
      "where": "div."
     },
     {
      "session": "pc/play",
-     "text": "Tap a glowing bird on your board to lay an egg on it (3 left).",
-     "words": 15,
-     "at": 28005,
+     "text": "Tap a glowing food die in the feeder to take it (1 left).",
+     "words": 13,
+     "at": 12519,
      "where": "div."
     },
     {
      "session": "pc/play",
-     "text": "Tap a glowing bird on your board to lay an egg on it (2 left).",
-     "words": 15,
-     "at": 29008,
+     "text": "Tap a glowing bird in the tray, or the deck, to take a card (1 left).",
+     "words": 16,
+     "at": 19027,
      "where": "div."
+    },
+    {
+     "session": "pc/play",
+     "text": "2+: 3 pts, 4+: 8 pts · now 0 birds = 0 pts",
+     "words": 13,
+     "at": 42769,
+     "where": "small."
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 22,
+   "count": 25,
    "detail": [
     {
      "session": "phone/learn",
      "text": "seed",
      "px": 13.5,
-     "at": 3010,
+     "at": 6009,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "fish",
      "px": 13.5,
-     "at": 3010,
+     "at": 6009,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "berry",
      "px": 13.5,
-     "at": 3010,
+     "at": 6009,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "grub",
      "px": 13.5,
-     "at": 3010,
+     "at": 6009,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "rodent",
      "px": 13.5,
-     "at": 3010,
+     "at": 6009,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "point",
      "px": 13.5,
-     "at": 3011,
+     "at": 6009,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "points",
      "px": 13.5,
-     "at": 13008,
+     "at": 20024,
      "where": "small."
     },
     {
      "session": "phone/learn",
-     "text": "points printed on birds played",
+     "text": "the points printed on your 3 birds",
      "px": 13.5,
-     "at": 25005,
+     "at": 48273,
      "where": "small."
     },
     {
      "session": "phone/learn",
-     "text": "1 point each",
+     "text": "5 eggs, 1 point each",
      "px": 13.5,
-     "at": 25006,
+     "at": 48273,
      "where": "small."
     },
     {
      "session": "phone/learn",
-     "text": "judged at each round end",
+     "text": "from the goal judged at the end of each round",
      "px": 13.5,
-     "at": 25006,
+     "at": 48273,
      "where": "small."
     },
     {
      "session": "phone/learn",
-     "text": "your secret card",
+     "text": "your secret card's condition",
      "px": 13.5,
-     "at": 25006,
+     "at": 48273,
      "where": "small."
     },
     {
-     "session": "phone/play",
-     "text": "seed",
+     "session": "phone/learn",
+     "text": "1 food stored on your birds, 1 point each",
      "px": 13.5,
-     "at": 5003,
+     "at": 48273,
      "where": "small."
     },
     {
-     "session": "phone/play",
-     "text": "berry",
+     "session": "phone/learn",
+     "text": "0 cards tucked behind your birds, 1 point each",
      "px": 13.5,
-     "at": 5003,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "grub",
-     "px": 13.5,
-     "at": 5003,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "fish",
-     "px": 13.5,
-     "at": 5003,
+     "at": 48273,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "either",
      "px": 13.5,
-     "at": 5003,
+     "at": 9511,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "fish",
+     "px": 13.5,
+     "at": 9511,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "rodent",
+     "px": 13.5,
+     "at": 9511,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "berry",
+     "px": 13.5,
+     "at": 9511,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "point",
      "px": 13.5,
-     "at": 5003,
+     "at": 9511,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "points",
      "px": 13.5,
-     "at": 5003,
+     "at": 9511,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "points printed on birds played",
      "px": 13.5,
-     "at": 21006,
+     "at": 41008,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "1 point each",
      "px": 13.5,
-     "at": 21006,
+     "at": 41008,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "judged at each round end",
      "px": 13.5,
-     "at": 21006,
+     "at": 41008,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "your secret card",
      "px": 13.5,
-     "at": 21006,
+     "at": 41008,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "seed",
+     "px": 13.5,
+     "at": 58014,
+     "where": "small."
+    },
+    {
+     "session": "phone/play",
+     "text": "grub",
+     "px": 13.5,
+     "at": 58014,
      "where": "small."
     }
    ]
   },
   "e": {
-   "status": "FAIL",
-   "count": 2,
-   "detail": [
-    {
-     "session": "phone/play",
-     "k": "When its row is used:|3",
-     "at": 6688,
-     "a": "When its row is used:",
-     "b": "3",
-     "ra": [
-      317,
-      306,
-      37,
-      93
-     ],
-     "rb": [
-      341,
-      360,
-      12,
-      28
-     ]
-    },
-    {
-     "session": "phone/play",
-     "k": "When its row is used:|points",
-     "at": 6688,
-     "a": "When its row is used:",
-     "b": "points",
-     "ra": [
-      317,
-      306,
-      37,
-      93
-     ],
-     "rb": [
-      331,
-      387,
-      33,
-      14
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   }
  },
  "notes": [
@@ -1370,46 +1402,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 63,
-   "clicks": 88,
-   "endedBy": "time",
+   "secs": 61,
+   "turns": 46,
+   "clicks": 60,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 59
+   "messagesSeen": 74
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 30,
-   "turns": 86,
-   "clicks": 116,
+   "secs": 60,
+   "turns": 79,
+   "clicks": 106,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 61
+   "messagesSeen": 91
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 71,
-   "clicks": 96,
+   "secs": 60,
+   "turns": 74,
+   "clicks": 98,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 38
+   "messagesSeen": 51
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 82,
-   "clicks": 116,
+   "secs": 61,
+   "turns": 66,
+   "clicks": 109,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 41
+   "messagesSeen": 70
   }
  ]
 }

@@ -1,13 +1,13 @@
 {
  "slug": "thornbound",
- "when": "2026-11-08T02:35Z",
- "secs": 30,
- "totalSecs": 94,
+ "when": "2026-11-08T02:43Z",
+ "secs": 60,
+ "totalSecs": 61,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 73,
+   "count": 124,
    "detail": [
     {
      "kind": "too-short",
@@ -32,17 +32,17 @@
      "session": "phone/learn",
      "text": "Pick a card to bid",
      "words": 5,
-     "shownMs": 250,
+     "shownMs": 527,
      "neededMs": 4500,
      "cls": "st-t"
     },
     {
      "kind": "too-short",
      "session": "phone/learn",
-     "text": "Pick a card to bid",
-     "words": 5,
+     "text": "Tap the bid spot",
+     "words": 4,
      "shownMs": 250,
-     "neededMs": 4500,
+     "neededMs": 4400,
      "cls": "st-t"
     },
     {
@@ -50,8 +50,35 @@
      "session": "phone/learn",
      "text": "Court is deciding",
      "words": 3,
-     "shownMs": 750,
+     "shownMs": 754,
      "neededMs": 4300,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Bids revealed",
+     "words": 2,
+     "shownMs": 1070,
+     "neededMs": 4200,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 1070,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Take a Kingdom Card",
+     "words": 4,
+     "shownMs": 250,
+     "neededMs": 4400,
      "cls": "st-t"
     },
     {
@@ -68,7 +95,16 @@
      "session": "phone/learn",
      "text": "Court is deciding",
      "words": 3,
-     "shownMs": 500,
+     "shownMs": 250,
+     "neededMs": 4300,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Court is deciding",
+     "words": 3,
+     "shownMs": 495,
      "neededMs": 4300,
      "cls": "st-t"
     },
@@ -77,7 +113,7 @@
      "session": "phone/learn",
      "text": "Gilded Court takes Herald of Applause.",
      "words": 6,
-     "shownMs": 1500,
+     "shownMs": 1239,
      "neededMs": 4600,
      "cls": "st-t"
     },
@@ -86,7 +122,7 @@
      "session": "phone/learn",
      "text": "Court is deciding",
      "words": 3,
-     "shownMs": 500,
+     "shownMs": 750,
      "neededMs": 4300,
      "cls": "st-t"
     },
@@ -95,7 +131,7 @@
      "session": "phone/learn",
      "text": "Gilded Court places their Herald at Cairn Field.",
      "words": 8,
-     "shownMs": 750,
+     "shownMs": 743,
      "neededMs": 4800,
      "cls": "st-t"
     },
@@ -104,7 +140,7 @@
      "session": "phone/learn",
      "text": "Watch the board",
      "words": 3,
-     "shownMs": 2500,
+     "shownMs": 2762,
      "neededMs": 4300,
      "cls": "gxt-pill"
     },
@@ -129,6 +165,33 @@
     {
      "kind": "too-short",
      "session": "phone/learn",
+     "text": "Tap the glowing region",
+     "words": 4,
+     "shownMs": 250,
+     "neededMs": 4400,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "card 2 of 3, for The Tablelands",
+     "words": 7,
+     "shownMs": 250,
+     "neededMs": 4700,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Tap the glowing region",
+     "words": 4,
+     "shownMs": 250,
+     "neededMs": 4400,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
      "text": "card 3 of 3, for The Sinks",
      "words": 7,
      "shownMs": 250,
@@ -140,25 +203,7 @@
      "session": "phone/learn",
      "text": "Gilded Court hides a card next to…",
      "words": 7,
-     "shownMs": 749,
-     "neededMs": 4700,
-     "cls": "st-t"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Gilded Court hides a card next to…",
-     "words": 7,
-     "shownMs": 500,
-     "neededMs": 4700,
-     "cls": "st-t"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Gilded Court hides a card next to…",
-     "words": 7,
-     "shownMs": 750,
+     "shownMs": 608,
      "neededMs": 4700,
      "cls": "st-t"
     },
@@ -167,7 +212,7 @@
      "session": "phone/learn",
      "text": "Gilded Court places 1 Supporter in The Tablelands.",
      "words": 8,
-     "shownMs": 750,
+     "shownMs": 925,
      "neededMs": 4800,
      "cls": "st-t"
     },
@@ -176,7 +221,7 @@
      "session": "phone/learn",
      "text": "Court is deciding",
      "words": 3,
-     "shownMs": 504,
+     "shownMs": 498,
      "neededMs": 4300,
      "cls": "st-t"
     },
@@ -185,7 +230,7 @@
      "session": "phone/learn",
      "text": "Gilded Court places 1 Supporter in The Tablelands.",
      "words": 8,
-     "shownMs": 1000,
+     "shownMs": 990,
      "neededMs": 4800,
      "cls": "st-t"
     },
@@ -194,8 +239,26 @@
      "session": "phone/learn",
      "text": "Court is deciding",
      "words": 3,
-     "shownMs": 500,
+     "shownMs": 498,
      "neededMs": 4300,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 3286,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Tap a region to send Supporters",
+     "words": 6,
+     "shownMs": 528,
+     "neededMs": 4600,
      "cls": "st-t"
     },
     {
@@ -212,7 +275,7 @@
      "session": "phone/learn",
      "text": "Tap a region to send Supporters",
      "words": 6,
-     "shownMs": 250,
+     "shownMs": 549,
      "neededMs": 4600,
      "cls": "st-t"
     },
@@ -221,7 +284,7 @@
      "session": "phone/learn",
      "text": "Tap the first Clash",
      "words": 4,
-     "shownMs": 250,
+     "shownMs": 401,
      "neededMs": 4400,
      "cls": "st-t"
     },
@@ -239,7 +302,7 @@
      "session": "phone/learn",
      "text": "Gilded Court wins the Clash in The Uplands.",
      "words": 8,
-     "shownMs": 750,
+     "shownMs": 792,
      "neededMs": 4800,
      "cls": "st-t"
     },
@@ -248,8 +311,26 @@
      "session": "phone/learn",
      "text": "The Clash in The Uplands",
      "words": 5,
-     "shownMs": 2000,
+     "shownMs": 2291,
      "neededMs": 4500,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 2250,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Court wins The Uplands, 9 to 8",
+     "words": 7,
+     "shownMs": 250,
+     "neededMs": 4700,
      "cls": "st-t"
     },
     {
@@ -257,7 +338,7 @@
      "session": "phone/learn",
      "text": "Court is deciding",
      "words": 3,
-     "shownMs": 500,
+     "shownMs": 544,
      "neededMs": 4300,
      "cls": "st-t"
     },
@@ -266,7 +347,7 @@
      "session": "phone/learn",
      "text": "Gilded Court claims Thornwild.",
      "words": 4,
-     "shownMs": 1489,
+     "shownMs": 1419,
      "neededMs": 4400,
      "cls": "st-t"
     },
@@ -275,7 +356,7 @@
      "session": "phone/learn",
      "text": "Court is deciding",
      "words": 3,
-     "shownMs": 500,
+     "shownMs": 497,
      "neededMs": 4300,
      "cls": "st-t"
     },
@@ -284,7 +365,7 @@
      "session": "phone/learn",
      "text": "Gilded Court Journeys with Pasture Lancers and…",
      "words": 7,
-     "shownMs": 750,
+     "shownMs": 856,
      "neededMs": 4700,
      "cls": "st-t"
     },
@@ -293,7 +374,7 @@
      "session": "phone/learn",
      "text": "The Clash in The Tablelands",
      "words": 5,
-     "shownMs": 2000,
+     "shownMs": 1989,
      "neededMs": 4500,
      "cls": "st-t"
     },
@@ -302,17 +383,98 @@
      "session": "phone/learn",
      "text": "You win The Tablelands, 12 to 9",
      "words": 7,
-     "shownMs": 1499,
+     "shownMs": 1516,
      "neededMs": 4700,
      "cls": "st-t"
     },
     {
      "kind": "too-short",
      "session": "phone/learn",
-     "text": "You gain 2 Influence (Cairn Field).",
-     "words": 6,
+     "text": "Gilded Court wins the Clash in The Sinks.",
+     "words": 8,
+     "shownMs": 734,
+     "neededMs": 4800,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "The Clash in The Sinks",
+     "words": 5,
+     "shownMs": 1983,
+     "neededMs": 4500,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Court wins The Sinks, 10 to 7",
+     "words": 7,
+     "shownMs": 1501,
+     "neededMs": 4700,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Court is deciding",
+     "words": 3,
+     "shownMs": 489,
+     "neededMs": 4300,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Gilded Court claims Ossuary.",
+     "words": 4,
+     "shownMs": 1446,
+     "neededMs": 4400,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Court is deciding",
+     "words": 3,
+     "shownMs": 741,
+     "neededMs": 4300,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Court is deciding",
+     "words": 3,
+     "shownMs": 493,
+     "neededMs": 4300,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "The reign is over",
+     "words": 4,
+     "shownMs": 355,
+     "neededMs": 4400,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "The reign is over",
+     "words": 4,
      "shownMs": 250,
-     "neededMs": 4600,
+     "neededMs": 4400,
+     "cls": "st-t"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Lantern Rising bids.",
+     "words": 3,
+     "shownMs": 250,
+     "neededMs": 4300,
      "cls": "st-t"
     },
     {
@@ -338,16 +500,7 @@
      "session": "phone/play",
      "text": "Take a Kingdom Card",
      "words": 4,
-     "shownMs": 250,
-     "neededMs": 4400,
-     "cls": "st-t"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Tap the glowing region",
-     "words": 4,
-     "shownMs": 250,
+     "shownMs": 440,
      "neededMs": 4400,
      "cls": "st-t"
     },
@@ -363,197 +516,44 @@
     {
      "kind": "too-short",
      "session": "phone/play",
-     "text": "Lanterns is deciding",
-     "words": 3,
-     "shownMs": 250,
-     "neededMs": 4300,
-     "cls": "st-t"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Lanterns is deciding",
-     "words": 3,
-     "shownMs": 250,
-     "neededMs": 4300,
-     "cls": "st-t"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Use a power, or Done",
-     "words": 5,
-     "shownMs": 250,
-     "neededMs": 4500,
-     "cls": "st-t"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Pick a card to bid",
-     "words": 5,
-     "shownMs": 429,
-     "neededMs": 4500,
-     "cls": "st-t"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
      "text": "Court is deciding",
      "words": 3,
-     "shownMs": 750,
+     "shownMs": 500,
      "neededMs": 4300,
      "cls": "st-t"
     },
     {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 750,
-     "texts": [
-      "Bids revealed",
-      "Watch the board"
-     ]
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Lantern Rising places Feast of Thorns on…",
+     "words": 7,
+     "shownMs": 250,
+     "neededMs": 4700,
+     "cls": "st-t"
     },
     {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1000,
-     "texts": [
-      "Gilded Court takes Herald of Applause.",
-      "Watch the board"
-     ]
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "card 1 of 3, for The Uplands",
+     "words": 7,
+     "shownMs": 509,
+     "neededMs": 4700,
+     "cls": "st-t"
     },
     {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Court is deciding",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 750,
-     "texts": [
-      "Gilded Court places their Herald at Cairn Field.",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Place your Herald",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1000,
-     "texts": [
-      "Gilded Court hides a card next to…",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 750,
-     "texts": [
-      "Gilded Court places 1 Supporter in The Tablelands.",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 504,
-     "texts": [
-      "Court is deciding",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1000,
-     "texts": [
-      "Gilded Court places 1 Supporter in The Tablelands.",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Court is deciding",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Tap a region to send Supporters",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1750,
-     "texts": [
-      "The Clash in The Uplands",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Court wins The Uplands, 9 to 8",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1006,
-     "texts": [
-      "Gilded Court claims Thornwild.",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Court is deciding",
-      "Watch the board"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 750,
-     "texts": [
-      "Gilded Court Journeys with Pasture Lancers and…",
-      "Watch the board"
-     ]
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Hide a card Tap a card, then tap a region. It stays hidden until the Clash. Got it",
+     "words": 18,
+     "shownMs": 250,
+     "neededMs": 5800,
+     "cls": "gxh-bub gxh-a-bottom on"
     }
    ]
   },
   "b": {
    "status": "FAIL",
-   "count": 79,
+   "count": 110,
    "detail": [
     {
      "session": "phone/play",
@@ -564,10 +564,10 @@
     },
     {
      "session": "phone/play",
-     "text": "Pick a card to bid",
+     "text": "Make a secret bid Tap a card to bid it, then tap the glowing spot. The highest bid picks first. Got it",
      "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
+     "cls": "gxh-bub gxh-a-bottom on",
+     "tag": "div"
     },
     {
      "session": "phone/play",
@@ -579,35 +579,35 @@
     {
      "session": "phone/play",
      "text": "Tap the bid spot",
-     "ms": 413,
+     "ms": 2510,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the bid spot",
-     "ms": 250,
+     "ms": 340,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the bid spot",
-     "ms": 250,
+     "ms": 502,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Court is deciding",
-     "ms": 750,
+     "ms": 537,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Bids revealed",
-     "ms": 250,
+     "ms": 704,
      "cls": "st-t",
      "tag": "span"
     },
@@ -621,6 +621,27 @@
     {
      "session": "phone/play",
      "text": "Take a Kingdom Card",
+     "ms": 813,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Take a Kingdom Card",
+     "ms": 440,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Take a Kingdom Card Tap a glowing Kingdom Card for a lasting power. Or tap Keep my card. Got it",
+     "ms": 250,
+     "cls": "gxh-bub on gxh-compact gxh-a-bottom",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Court is deciding",
      "ms": 250,
      "cls": "st-t",
      "tag": "span"
@@ -628,55 +649,62 @@
     {
      "session": "phone/play",
      "text": "Court is deciding",
-     "ms": 525,
+     "ms": 500,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
-     "text": "Nothing to do with this card right now.",
-     "ms": 250,
-     "cls": "hint",
-     "tag": "p"
-    },
-    {
-     "session": "phone/play",
-     "text": "Gilded Court takes Mirror of Many Faces.",
-     "ms": 250,
+     "text": "Gilded Court takes Dead King's Gaze.",
+     "ms": 1006,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Lanterns is deciding",
-     "ms": 250,
+     "ms": 748,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Nothing to do with this card right now.",
-     "ms": 250,
+     "ms": 516,
      "cls": "hint",
      "tag": "p"
     },
     {
      "session": "phone/play",
+     "text": "Lantern Rising takes Feast of Thorns.",
+     "ms": 490,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
      "text": "Lanterns is deciding",
-     "ms": 250,
+     "ms": 500,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
-     "text": "Lantern Rising takes Concealed Ways.",
-     "ms": 250,
+     "text": "Nothing to do with this card right now.",
+     "ms": 500,
+     "cls": "hint",
+     "tag": "p"
+    },
+    {
+     "session": "phone/play",
+     "text": "Lantern Rising places Feast of Thorns on…",
+     "ms": 750,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
-     "text": "Lantern Rising takes Concealed Ways.",
+     "text": "Lantern Rising places Feast of Thorns on…",
      "ms": 250,
      "cls": "st-t",
      "tag": "span"
@@ -684,7 +712,7 @@
     {
      "session": "phone/play",
      "text": "Court is deciding",
-     "ms": 499,
+     "ms": 723,
      "cls": "st-t",
      "tag": "span"
     },
@@ -697,29 +725,29 @@
     },
     {
      "session": "phone/play",
+     "text": "Lanterns is deciding",
+     "ms": 512,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Lantern Rising places their Herald at Cairn Field.",
+     "ms": 755,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
      "text": "Place your Herald",
-     "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Lanterns is deciding",
-     "ms": 497,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Lanterns is deciding",
-     "ms": 250,
+     "ms": 632,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "card 1 of 3, for The Uplands",
-     "ms": 352,
+     "ms": 509,
      "cls": "st-t",
      "tag": "span"
     },
@@ -733,6 +761,41 @@
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
+     "ms": 434,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap the glowing region",
+     "ms": 494,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap the glowing region",
+     "ms": 760,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap the glowing region",
+     "ms": 730,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "card 1 of 3, for The Uplands",
+     "ms": 319,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "card 1 of 3, for The Uplands",
      "ms": 250,
      "cls": "st-t",
      "tag": "span"
@@ -740,77 +803,49 @@
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
-     "ms": 250,
+     "ms": 510,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
-     "ms": 250,
+     "ms": 1132,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
-     "ms": 250,
+     "ms": 513,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
-     "ms": 250,
+     "ms": 946,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
-     "ms": 500,
+     "ms": 501,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
-     "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap the glowing region",
-     "ms": 497,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap the glowing region",
-     "ms": 525,
+     "ms": 1682,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "card 2 of 3, for The Tablelands",
-     "ms": 746,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "card 2 of 3, for The Tablelands",
-     "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap the glowing region",
-     "ms": 250,
+     "ms": 835,
      "cls": "st-t",
      "tag": "span"
     },
@@ -824,56 +859,56 @@
     {
      "session": "phone/play",
      "text": "card 3 of 3, for The Sinks",
-     "ms": 250,
+     "ms": 651,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
-     "ms": 250,
+     "ms": 419,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Tap the glowing region",
-     "ms": 500,
+     "ms": 472,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Lantern Rising hides a card next to…",
-     "ms": 497,
+     "ms": 570,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Gilded Court places 2 Supporters in The Tablelands.",
-     "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Gilded Court places 2 Supporters in The Tablelands.",
-     "ms": 250,
+     "ms": 489,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Court is deciding",
-     "ms": 506,
+     "ms": 500,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Gilded Court uses the Tactic Doctrine of…",
-     "ms": 250,
+     "ms": 480,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Court is deciding",
+     "ms": 493,
      "cls": "st-t",
      "tag": "span"
     },
@@ -886,50 +921,8 @@
     },
     {
      "session": "phone/play",
-     "text": "Nothing to do with this card right now.",
-     "ms": 250,
-     "cls": "hint",
-     "tag": "p"
-    },
-    {
-     "session": "phone/play",
-     "text": "Court is deciding",
-     "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap a region to send Supporters",
-     "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap a region to send Supporters",
-     "ms": 534,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap a region to send Supporters",
-     "ms": 416,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
      "text": "Lanterns is deciding",
-     "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Lanterns is deciding",
-     "ms": 516,
+     "ms": 489,
      "cls": "st-t",
      "tag": "span"
     },
@@ -943,21 +936,28 @@
     {
      "session": "phone/play",
      "text": "Lantern Rising places 2 Supporters in The Tablelands.",
-     "ms": 250,
-     "cls": "st-t",
-     "tag": "span"
-    },
-    {
-     "session": "phone/play",
-     "text": "Lantern Rising places 2 Supporters in The Tablelands.",
-     "ms": 250,
+     "ms": 498,
      "cls": "st-t",
      "tag": "span"
     },
     {
      "session": "phone/play",
      "text": "Lanterns is deciding",
-     "ms": 500,
+     "ms": 250,
+     "cls": "st-t",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Nothing to do with this card right now.",
+     "ms": 250,
+     "cls": "hint",
+     "tag": "p"
+    },
+    {
+     "session": "phone/play",
+     "text": "Lanterns is deciding",
+     "ms": 250,
      "cls": "st-t",
      "tag": "span"
     },
@@ -971,7 +971,7 @@
     {
      "session": "phone/play",
      "text": "Lanterns is deciding",
-     "ms": 250,
+     "ms": 540,
      "cls": "st-t",
      "tag": "span"
     }
@@ -979,313 +979,530 @@
   },
   "c": {
    "status": "FAIL",
-   "count": 17,
+   "count": 38,
    "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Choose the Heathbound Clans if you enjoy big swings, riders that switch regions and crowds of Supporters.",
+     "words": 17,
+     "at": 48017,
+     "where": "p.ssub"
+    },
+    {
+     "session": "phone/learn",
+     "text": "-effect rider: this Round your Supporters on the Map stay on their and are not moved to the .",
+     "words": 19,
+     "at": 50036,
+     "where": "li.tac"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Opponents may not swap, add or move Faction Cards into that Region during its first this Round.",
+     "words": 17,
+     "at": 50039,
+     "where": "li.tac"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Burn and recall the Lost Pile, markers in Councils, and clashes that favour the small.",
+     "words": 15,
+     "at": 56012,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "If you do, move one of your cards from the Lost Pile to the current Region (it becomes ).",
+     "words": 19,
+     "at": 56012,
+     "where": "li.tac"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Shuffle the Kingdom Discard face-down and look at five random cards from it.",
+     "words": 13,
+     "at": 56012,
+     "where": "li.tac"
+    },
+    {
+     "session": "phone/learn",
+     "text": ": One of the three areas of the map: the Uplands, the Tablelands and the Sinks.",
+     "words": 16,
+     "at": 57258,
+     "where": "p."
+    },
     {
      "session": "phone/play",
      "text": "Choose the Heathbound Clans if you enjoy big swings, riders that switch regions and crowds of Supporters.",
      "words": 17,
-     "at": 2002,
+     "at": 4705,
      "where": "p.ssub"
     },
     {
      "session": "phone/play",
-     "text": "A Tactic that starts with markers (like Open Waterways) works once a round until its markers are used up.",
-     "words": 19,
-     "at": 6005,
+     "text": "Each one you send to a region adds +1 Strength there in its first Clash.",
+     "words": 15,
+     "at": 14775,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "In Winter, Supporters on the map go to the Lost Pile: they are gone unless a Council of Pledges or another power brings them back.",
+     "words": 25,
+     "at": 14775,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "For the rest of the Round, when a is resolved (before rewards) gain 1 influence if you have the most there and 1 lore if you have the most cards there.",
+     "words": 31,
+     "at": 14776,
+     "where": "li.tac"
+    },
+    {
+     "session": "phone/play",
+     "text": "Remove a marker: choose one of your / / in the current ; it gains for the rest of the Round.",
+     "words": 21,
+     "at": 14777,
+     "where": "li.tac"
+    },
+    {
+     "session": "phone/play",
+     "text": ": An Autumn action, once a round: send away a hand card that shows Lore, and gain that much Lore.",
+     "words": 20,
+     "at": 19025,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": ": The end of a round: Heralds go home, Supporters on the map go to the Lost Pile, and played cards go to the discard pile.",
+     "words": 26,
+     "at": 38754,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": ": If this card is Eliminated it goes to your Discard Pile (you get it back later), not the Lost Pile.",
+     "words": 21,
+     "at": 42778,
      "where": "p."
     },
     {
      "session": "phone/play",
      "text": ": if it is used to Journey it goes to your Discard Pile, not the Lost Pile",
      "words": 17,
-     "at": 7286,
+     "at": 42779,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": ": if Eliminated it goes to your Discard Pile instead of the Lost Pile",
      "words": 14,
-     "at": 7286,
+     "at": 42779,
      "where": "li."
     },
     {
      "session": "phone/play",
-     "text": "In a Clash you add up the Strength of your cards there, +1 per Supporter.",
-     "words": 15,
-     "at": 17253,
+     "text": ": If this card is used for a Journey it goes to your Discard Pile instead of the Lost Pile.",
+     "words": 20,
+     "at": 43756,
      "where": "p."
     },
     {
      "session": "phone/play",
      "text": "You gain it with a Journey and spend it on your faction's Site of Power cards: stronger cards and permanent powers.",
      "words": 21,
-     "at": 21256,
+     "at": 47237,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": ": After the Clashes: once each you may Govern and Journey, and use Autumn abilities such as Rally.",
+     "words": 18,
+     "at": 56411,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": ": An Autumn ability: take your cards on the map back into your hand before Winter discards them.",
+     "words": 18,
+     "at": 58272,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "The old court still dresses for dinner in a palace with no king.",
      "words": 13,
-     "at": 2003,
+     "at": 3252,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "Its stewards count every coin and every vote, and they mean to crown one of their own before the frost.",
      "words": 20,
-     "at": 2003,
+     "at": 3252,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "Choose the Gilded Court if you enjoy steady income, sturdy cards and winning the Councils.",
      "words": 15,
-     "at": 2003,
+     "at": 3252,
      "where": "p.enj"
     },
     {
      "session": "pc/play",
      "text": "They move fast, bring many hands, and strike where the valley folk least expect them.",
      "words": 15,
-     "at": 2003,
+     "at": 3252,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "Choose the Heathbound Clans if you enjoy big swings, riders that switch regions and crowds of Supporters.",
      "words": 17,
-     "at": 2003,
+     "at": 3252,
      "where": "p.enj"
     },
     {
      "session": "pc/play",
      "text": "Choose the Lantern Rising if you enjoy bluffs, ambushes and knocking your rivals' cards out of the game.",
      "words": 18,
-     "at": 2003,
+     "at": 3252,
      "where": "p.enj"
     },
     {
      "session": "pc/play",
      "text": "Lost cards return to them, small cards win their fights, and patience is their weapon.",
      "words": 15,
-     "at": 2004,
+     "at": 3253,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "Choose the Pale Choir if you enjoy clever combinations and playing the long game.",
      "words": 14,
-     "at": 2004,
+     "at": 3253,
      "where": "p.enj"
     },
     {
      "session": "pc/play",
-     "text": "For the rest of the Round, whenever any of your cards one or more cards, gain 1 influence and 1 lore.",
+     "text": ": Removed from a Clash before the count: the card goes to the Lost Pile (Resilient cards: to the Discard Pile).",
      "words": 21,
-     "at": 5005,
+     "at": 11844,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Swap a card in your Hand with one of your cards that is in a or a .",
+     "words": 18,
+     "at": 15068,
+     "where": "p.cd-tx"
+    },
+    {
+     "session": "pc/play",
+     "text": "Whispers suit · sits on your board, with a card tucked under it",
+     "words": 13,
+     "at": 15069,
+     "where": "p.cd-stat"
+    },
+    {
+     "session": "pc/play",
+     "text": "A rival can steal the Kingdom Card with a bid stronger than it; then it comes back to your hand.",
+     "words": 20,
+     "at": 16964,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Move any number of your in the current to either another unresolved Region or your (Player Board).",
+     "words": 17,
+     "at": 20789,
+     "where": "p.cd-tx"
+    },
+    {
+     "session": "pc/play",
+     "text": "When acquiring a card from the you may look at the top two face-down cards and treat them as face-up.",
+     "words": 20,
+     "at": 24462,
+     "where": "p.cd-tx"
+    },
+    {
+     "session": "pc/play",
+     "text": "For the rest of the Round, when a is resolved (before rewards) gain 1 influence if you have the most there and 1 lore if you have the most cards there.",
+     "words": 31,
+     "at": 26803,
      "where": "li.tac"
     },
     {
      "session": "pc/play",
-     "text": "Remove one marker: choose one of your cards in the current ; it gains until end of the Clash.",
-     "words": 19,
-     "at": 5005,
+     "text": "Remove a marker: choose one of your / / in the current ; it gains for the rest of the Round.",
+     "words": 21,
+     "at": 26803,
      "where": "li.tac"
     },
     {
      "session": "pc/play",
      "text": "Everyone's hidden cards there are flipped, abilities are used, and the highest total Strength (cards + Supporters) wins the region.",
      "words": 20,
-     "at": 6004,
+     "at": 27761,
      "where": "p."
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 26,
+   "count": 36,
    "detail": [
     {
      "session": "phone/learn",
      "text": "Original art and words. Fonts: Cinzel and EB Garamond (SIL O",
      "px": 13.6,
-     "at": 1004,
+     "at": 1758,
      "where": "p.st-c"
     },
     {
      "session": "phone/learn",
      "text": "You",
      "px": 13.6,
-     "at": 2063,
+     "at": 3024,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Court",
      "px": 13.6,
-     "at": 2063,
+     "at": 3026,
      "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Three regions, two locations each. Every location you claim ",
+     "px": 13.5,
+     "at": 4014,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Influence is your score. After the last round, the most Infl",
+     "px": 13.5,
+     "at": 5260,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bids flip: your 5 beats their 1, so you choose first.",
+     "px": 13.5,
+     "at": 8762,
+     "where": "div.gxh-tx"
     },
     {
      "session": "phone/learn",
      "text": "Siege Workshop",
      "px": 13.3,
-     "at": 6006,
+     "at": 9770,
      "where": "span.kn"
     },
     {
      "session": "phone/learn",
      "text": "Paper Diadems",
      "px": 13.3,
-     "at": 6006,
+     "at": 9771,
      "where": "span.kn"
     },
     {
      "session": "phone/learn",
      "text": "Herald of Applause",
      "px": 13.3,
-     "at": 6006,
+     "at": 9771,
      "where": "span.kn"
     },
     {
      "session": "phone/learn",
      "text": "Counterfeit Amnesties",
      "px": 13.3,
-     "at": 6006,
+     "at": 9771,
      "where": "span.kn"
     },
     {
      "session": "phone/learn",
-     "text": "Tap the Uplands. Your card stays hidden until the Clash.",
+     "text": "Supporters are placed. Tap Done to end Spring.",
      "px": 13.5,
-     "at": 11023,
+     "at": 25056,
      "where": "div.gxh-tx"
     },
     {
      "session": "phone/learn",
-     "text": "Each Supporter adds +1 Strength here this round. Tap the Tab",
+     "text": "You choose which region fights first. Tap the Uplands, then ",
      "px": 13.5,
-     "at": 17006,
+     "at": 26009,
      "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Heathbound Clans vs 2 computers (Normal) · 5 rounds",
+     "px": 13.6,
+     "at": 48017,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "3 people, one device",
+     "px": 13.6,
+     "at": 48017,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "the computers play",
+     "px": 13.6,
+     "at": 48017,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Heathbound Clans vs 3 computers (Normal) · 5 rounds",
+     "px": 13.6,
+     "at": 49049,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "4 people, one device",
+     "px": 13.6,
+     "at": 49049,
+     "where": "span."
     },
     {
      "session": "phone/play",
      "text": "Original art and words. Fonts: Cinzel and EB Garamond (SIL O",
      "px": 13.6,
-     "at": 1003,
+     "at": 1426,
      "where": "p.st-c"
     },
     {
      "session": "phone/play",
      "text": "Heathbound Clans vs 2 computers (Normal) · 5 rounds",
      "px": 13.6,
-     "at": 2002,
+     "at": 4705,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "the rules in short",
      "px": 13.6,
-     "at": 2002,
+     "at": 4705,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "3 people, one device",
      "px": 13.6,
-     "at": 2002,
+     "at": 4705,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "the computers play",
      "px": 13.6,
-     "at": 2002,
+     "at": 4705,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "You",
      "px": 13.6,
-     "at": 4043,
+     "at": 8026,
      "where": "b."
     },
     {
      "session": "phone/play",
      "text": "Court",
      "px": 13.6,
-     "at": 4043,
+     "at": 8026,
      "where": "b."
     },
     {
      "session": "phone/play",
      "text": "Lanterns",
      "px": 13.6,
-     "at": 4043,
+     "at": 8026,
      "where": "b."
     },
     {
      "session": "phone/play",
-     "text": "HEIR",
+     "text": "Dead King's Gaze",
+     "px": 13.3,
+     "at": 14770,
+     "where": "span.kn"
+    },
+    {
+     "session": "phone/play",
+     "text": "Goose-Rider Post",
+     "px": 13.3,
+     "at": 14770,
+     "where": "span.kn"
+    },
+    {
+     "session": "phone/play",
+     "text": "The Ferryman",
+     "px": 13.3,
+     "at": 14770,
+     "where": "span.kn"
+    },
+    {
+     "session": "phone/play",
+     "text": "Feast of Thorns",
+     "px": 13.3,
+     "at": 14770,
+     "where": "span.kn"
+    },
+    {
+     "session": "phone/play",
+     "text": "TRADER",
      "px": 13.5,
-     "at": 7286,
+     "at": 40754,
      "where": "text."
     },
     {
      "session": "phone/play",
-     "text": "1 vote · 1 lore",
+     "text": "2 votes · 2 lore",
      "px": 13,
-     "at": 7286,
+     "at": 40754,
      "where": "text."
     },
     {
      "session": "phone/play",
      "text": "HEATHBOUND CLANS",
      "px": 10,
-     "at": 7286,
+     "at": 40754,
      "where": "text."
-    },
-    {
-     "session": "phone/play",
-     "text": "Cost:",
-     "px": 13.9,
-     "at": 19253,
-     "where": "em."
-    },
-    {
-     "session": "phone/play",
-     "text": "Tactic: once per game",
-     "px": 13.9,
-     "at": 19253,
-     "where": "small.oc2"
     },
     {
      "session": "phone/play",
      "text": "1",
      "px": 13.6,
-     "at": 19253,
+     "at": 42777,
      "where": "b."
     },
     {
      "session": "phone/play",
-     "text": "FOLLOWER",
+     "text": "HEIR",
      "px": 13.5,
-     "at": 25253,
+     "at": 42778,
      "where": "text."
     },
     {
      "session": "phone/play",
-     "text": "1 lore",
+     "text": "1 vote · 1 lore",
      "px": 13,
-     "at": 25253,
+     "at": 42778,
      "where": "text."
     },
     {
      "session": "phone/play",
-     "text": "The cards are face up. Highest total Strength wins. Tap Done",
-     "px": 13,
-     "at": 26254,
+     "text": "Tap the regions in the order they will fight.",
+     "px": 13.5,
+     "at": 45110,
      "where": "div.gxh-tx"
     }
    ]
@@ -1301,46 +1518,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 19,
-   "clicks": 0,
+   "secs": 60,
+   "turns": 47,
+   "clicks": 31,
    "endedBy": "time",
-   "tutorialEnded": null,
+   "tutorialEnded": 48,
    "hintsOff": true,
-   "messagesSeen": 56
+   "messagesSeen": 91
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 27,
+   "secs": 61,
    "turns": 63,
    "clicks": 81,
-   "endedBy": "result",
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 75
+   "messagesSeen": 72
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
+   "secs": 61,
    "turns": 5,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 10
+   "messagesSeen": 14
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 7,
-   "turns": 5,
-   "clicks": 9,
+   "secs": 29,
+   "turns": 33,
+   "clicks": 35,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 4
+   "messagesSeen": 38
   }
  ]
 }

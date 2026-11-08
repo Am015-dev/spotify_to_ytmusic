@@ -1,169 +1,23 @@
 {
  "slug": "crown-city-smash",
- "when": "2026-11-08T02:28Z",
- "secs": 30,
- "totalSecs": 130,
+ "when": "2026-11-08T02:40Z",
+ "secs": 60,
+ "totalSecs": 71,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 13,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Tap the dice",
-     "words": 3,
-     "shownMs": 1206,
-     "neededMs": 4300,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/play",
-     "text": "It may buy power cards or play evolutions. You are Voltusk. Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "words": 27,
-     "shownMs": 250,
-     "neededMs": 6700,
-     "cls": "msg"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 646,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in the suburbs. Downtown is empty, so you ",
-      "3 Tap dice to keep Tap the dice you like. They tur"
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
    "status": "FAIL",
-   "count": 5,
+   "count": 1,
    "detail": [
     {
-     "session": "phone/play",
-     "text": "Meet your monster First to 20 ★ wins. Tap Let’s smash to begin. Got it",
-     "ms": 250,
-     "cls": "gxh-bub gxh-a-bottom on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "2 Roll the rest Press Roll to throw the dice you did not keep. Got it",
-     "ms": 250,
-     "cls": "gxh-bub gxh-a-bottom on",
-     "tag": "div"
-    },
-    {
      "session": "pc/play",
-     "text": "Watch which dice it keeps (they turn yellow). You are Voltusk. Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "ms": 15913,
-     "cls": "msg",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "It may buy power cards or play evolutions. You are Voltusk. Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "ms": 250,
-     "cls": "msg",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "You are in the suburbs. Your claws hit whoever is in the city (Boltbox 👑).",
-     "ms": 3832,
+     "text": "You are in the suburbs. Downtown is empty, so you will move in after resolving (+1 ★) and claws hit nobody this time.",
+     "ms": 10776,
      "cls": "msg",
      "tag": "div"
     }
@@ -171,260 +25,28 @@
   },
   "c": {
    "status": "FAIL",
-   "count": 7,
+   "count": 2,
    "detail": [
-    {
-     "session": "phone/learn",
-     "text": "This short game ends at 6 ★ (real games: 20), or the last monster standing.",
-     "words": 15,
-     "at": 9996,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Each die says what it does: STAR dice score in sets, ENERGY buys cards, HEAL mends you, HIT smashes rivals.",
-     "words": 20,
-     "at": 19915,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Downtown is empty, so you will move in after resolving (+1 ★) and claws hit nobody this time.",
-     "words": 18,
-     "at": 7686,
-     "where": "div.tip"
-    },
-    {
-     "session": "pc/learn",
-     "text": "This short game ends at 6 ★ (real games: 20), or the last monster standing.",
-     "words": 15,
-     "at": 7686,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Each die says what it does: STAR dice score in sets, ENERGY buys cards, HEAL mends you, HIT smashes rivals.",
-     "words": 20,
-     "at": 30004,
-     "where": "span."
-    },
     {
      "session": "pc/play",
      "text": "roll 6 dice up to 3 times, keep what you like, then use them.",
      "words": 14,
-     "at": 16378,
+     "at": 59554,
      "where": "p.goal"
     },
     {
      "session": "pc/play",
-     "text": "Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "words": 16,
-     "at": 16379,
+     "text": "Downtown is empty, so you will move in after resolving (+1 ★) and claws hit nobody this time.",
+     "words": 18,
+     "at": 59554,
      "where": "div.tip"
     }
    ]
   },
   "d": {
-   "status": "FAIL",
-   "count": 28,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Voltusk",
-     "px": 13,
-     "at": 9995,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "♥10",
-     "px": 13,
-     "at": 9995,
-     "where": "em.h"
-    },
-    {
-     "session": "phone/learn",
-     "text": "★0",
-     "px": 13,
-     "at": 9995,
-     "where": "em.v"
-    },
-    {
-     "session": "phone/learn",
-     "text": "⚡0",
-     "px": 13,
-     "at": 9995,
-     "where": "em.e"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Squidrik",
-     "px": 13,
-     "at": 9995,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Shroomhulk",
-     "px": 13,
-     "at": 9996,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "👑",
-     "px": 0,
-     "at": 9996,
-     "where": "i.crn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Tap the dice you like. They turn yellow and stay. Then press",
-     "px": 13.5,
-     "at": 9996,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "♥10/10 ★0 ⚡0 · the suburbs",
-     "px": 13,
-     "at": 23768,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/learn",
-     "text": "One-eyed terror of the storm drains",
-     "px": 13,
-     "at": 23768,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/learn",
-     "text": "No cards.",
-     "px": 13,
-     "at": 23768,
-     "where": "span.muted.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Spore brute from the sewer farms",
-     "px": 13,
-     "at": 25658,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "Voltusk",
-     "px": 13,
-     "at": 12615,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "♥10",
-     "px": 13,
-     "at": 12615,
-     "where": "em.h"
-    },
-    {
-     "session": "phone/play",
-     "text": "★0",
-     "px": 13,
-     "at": 12615,
-     "where": "em.v"
-    },
-    {
-     "session": "phone/play",
-     "text": "⚡0",
-     "px": 13,
-     "at": 12615,
-     "where": "em.e"
-    },
-    {
-     "session": "phone/play",
-     "text": "Glacyx",
-     "px": 13,
-     "at": 12615,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "Shroomh…",
-     "px": 13,
-     "at": 12615,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "Boltbox",
-     "px": 13,
-     "at": 12615,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "You are",
-     "px": 13,
-     "at": 12615,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "New here? Learn in 5 minutes",
-     "px": 12,
-     "at": 12615,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "👑",
-     "px": 0,
-     "at": 19025,
-     "where": "i.crn"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥10/10 ★0 ⚡0 · the suburbs",
-     "px": 13,
-     "at": 21126,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "Walking glacier with a cold heart",
-     "px": 13,
-     "at": 21126,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "No cards.",
-     "px": 13,
-     "at": 21126,
-     "where": "span.muted.small"
-    },
-    {
-     "session": "phone/play",
-     "text": "you",
-     "px": 13,
-     "at": 23108,
-     "where": "i."
-    },
-    {
-     "session": "phone/play",
-     "text": "Thunder-tusked boar of the power grid",
-     "px": 13,
-     "at": 23108,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "Runaway demolition robot",
-     "px": 13,
-     "at": 27947,
-     "where": "div.small.muted"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
    "status": "N/A",
@@ -433,56 +55,59 @@
   }
  },
  "notes": [
-  "phone/learn: Learn to play not found",
-  "phone/play: Play button not found",
-  "pc/learn: Learn to play not found",
+  "phone/learn: page.goto: Timeout 45000ms exceeded.",
+  "phone/play: page.goto: Timeout 45000ms exceeded.",
+  "pc/learn: page.goto: Timeout 45000ms exceeded.",
   "pc/play: Play button not found",
-  "(e) <10 turns reached: phone/learn=8 phone/play=9 pc/learn=3 pc/play=5"
+  "(e) <10 turns reached: phone/learn=0 phone/play=0 pc/learn=0 pc/play=2"
  ],
  "sessions": [
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 31,
-   "turns": 8,
-   "clicks": 8,
+   "secs": 51,
+   "turns": 0,
+   "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 2
+   "error": "page.goto: Timeout 45000ms exceeded.",
+   "messagesSeen": 0
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 32,
-   "turns": 9,
-   "clicks": 10,
+   "secs": 52,
+   "turns": 0,
+   "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 2
+   "error": "page.goto: Timeout 45000ms exceeded.",
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 32,
-   "turns": 3,
-   "clicks": 3,
+   "secs": 48,
+   "turns": 0,
+   "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 2
+   "error": "page.goto: Timeout 45000ms exceeded.",
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 34,
-   "turns": 5,
-   "clicks": 5,
+   "secs": 70,
+   "turns": 2,
+   "clicks": 2,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 3
+   "messagesSeen": 1
   }
  ]
 }

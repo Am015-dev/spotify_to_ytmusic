@@ -1,130 +1,67 @@
 {
  "slug": "final-approach",
- "when": "2026-11-08T02:30Z",
- "secs": 30,
- "totalSecs": 122,
+ "when": "2026-11-08T02:40Z",
+ "secs": 60,
+ "totalSecs": 66,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 32,
+   "count": 25,
    "detail": [
     {
      "kind": "too-short",
      "session": "phone/learn",
-     "text": "Drop on the axis The plane tilts toward the higher die, by the difference. A tilt of 3 is a spin: you lose.",
-     "words": 23,
-     "shownMs": 1911,
-     "neededMs": 6300,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Clear the way A plane waits on space 2: flying through it crashes you. Your 2 on the radio clears it.",
-     "words": 21,
-     "shownMs": 1604,
-     "neededMs": 6100,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
      "text": "Engines set speed Both engine dice add up: 6 + your 5 = 11. Blue 6 stays, orange 10 moves one, more moves two.",
      "words": 24,
-     "shownMs": 1633,
-     "neededMs": 6400,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Set the brake Brakes go 2, then 4, then 6. The 2 is set: place the 4 now.",
-     "words": 18,
-     "shownMs": 250,
-     "neededMs": 5800,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Lower the gear Gear takes 1-2, 3-4 or 5-6, in any order. Your new 5 lowers the last gear.",
-     "words": 19,
-     "shownMs": 941,
-     "neededMs": 5900,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Level for landing The axis is 2 right. Your 5 against Ravi’s 3 tips it back to level.",
-     "words": 18,
-     "shownMs": 1695,
-     "neededMs": 5800,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Drop on the axis The plane tilts toward the higher die, by the difference. A tilt of 3 is a spin: you lose.",
-     "words": 23,
-     "shownMs": 3817,
-     "neededMs": 6300,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Drop on the axis The plane tilts toward the higher die, by the difference. A tilt of 3 is a spin: you lose.",
-     "words": 23,
-     "shownMs": 250,
-     "neededMs": 6300,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Clear the way A plane waits on space 2: flying through it crashes you. Your 2 on the radio clears it.",
-     "words": 21,
-     "shownMs": 3275,
-     "neededMs": 6100,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Clear the way A plane waits on space 2: flying through it crashes you. Your 2 on the radio clears it.",
-     "words": 21,
-     "shownMs": 250,
-     "neededMs": 6100,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Engines set speed Both engine dice add up: 6 + your 5 = 11. Blue 6 stays, orange 10 moves one, more moves two.",
-     "words": 24,
-     "shownMs": 1272,
+     "shownMs": 4581,
      "neededMs": 6400,
      "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
     },
     {
      "kind": "too-short",
      "session": "pc/learn",
-     "text": "Coffee tokens The plane flew two! Spare die? Coffee takes any value and earns a token to nudge a die by one.",
-     "words": 22,
-     "shownMs": 1493,
-     "neededMs": 6200,
+     "text": "Drop on the axis The plane tilts toward the higher die, by the difference. A tilt of 3 is a spin: you lose.",
+     "words": 23,
+     "shownMs": 250,
+     "neededMs": 6300,
      "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
     },
     {
      "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Coffee tokens The plane flew two! Spare die? Coffee takes any value and earns a token to nudge a die by one.",
-     "words": 22,
-     "shownMs": 250,
-     "neededMs": 6200,
-     "cls": "gxh-bub gxt-bub gxt-nobtn gxh-a-bottom on"
+     "session": "pc/play",
+     "text": "Beat chapter 4 first.",
+     "words": 4,
+     "shownMs": 2913,
+     "neededMs": 4400,
+     "cls": "gxc-toast"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Beat chapter 1 first.",
+     "words": 4,
+     "shownMs": 2707,
+     "neededMs": 4400,
+     "cls": "gxc-toast"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Beat chapter 2 first.",
+     "words": 4,
+     "shownMs": 3523,
+     "neededMs": 4400,
+     "cls": "gxc-toast"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Beat chapter 3 first.",
+     "words": 4,
+     "shownMs": 3023,
+     "neededMs": 4400,
+     "cls": "gxc-toast"
     },
     {
      "kind": "two-at-once",
@@ -138,7 +75,7 @@
     {
      "kind": "two-at-once",
      "session": "pc/play",
-     "ms": 750,
+     "ms": 250,
      "texts": [
       "Beat chapter 3 first.",
       "Beat chapter 4 first.",
@@ -150,10 +87,8 @@
      "session": "pc/play",
      "ms": 250,
      "texts": [
-      "Beat chapter 3 first.",
       "Beat chapter 4 first.",
-      "Beat chapter 1 first.",
-      "Beat chapter 6 first."
+      "Beat chapter 1 first."
      ]
     },
     {
@@ -161,9 +96,15 @@
      "session": "pc/play",
      "ms": 250,
      "texts": [
-      "Beat chapter 3 first.",
       "Beat chapter 4 first.",
-      "Beat chapter 1 first.",
+      "Beat chapter 1 first."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/play",
+     "ms": 250,
+     "texts": [
       "Beat chapter 6 first.",
       "Beat chapter 3 first."
      ]
@@ -171,10 +112,18 @@
     {
      "kind": "two-at-once",
      "session": "pc/play",
-     "ms": 525,
+     "ms": 1000,
      "texts": [
-      "Beat chapter 4 first.",
-      "Beat chapter 1 first.",
+      "Beat chapter 6 first.",
+      "Beat chapter 3 first.",
+      "Beat chapter 8 first."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/play",
+     "ms": 283,
+     "texts": [
       "Beat chapter 6 first.",
       "Beat chapter 3 first.",
       "Beat chapter 8 first."
@@ -185,47 +134,9 @@
      "session": "pc/play",
      "ms": 250,
      "texts": [
-      "Beat chapter 4 first.",
-      "Beat chapter 1 first.",
-      "Beat chapter 6 first.",
       "Beat chapter 3 first.",
       "Beat chapter 8 first.",
-      "Beat chapter 3 first."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Beat chapter 1 first.",
-      "Beat chapter 6 first.",
-      "Beat chapter 3 first.",
-      "Beat chapter 8 first.",
-      "Beat chapter 3 first."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 750,
-     "texts": [
-      "Beat chapter 6 first.",
-      "Beat chapter 3 first.",
-      "Beat chapter 8 first.",
-      "Beat chapter 3 first.",
-      "Beat chapter 3 first."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Beat chapter 3 first.",
-      "Beat chapter 8 first.",
-      "Beat chapter 3 first.",
-      "Beat chapter 3 first."
+      "Beat chapter 2 first."
      ]
     },
     {
@@ -234,24 +145,52 @@
      "ms": 250,
      "texts": [
       "Beat chapter 8 first.",
-      "Beat chapter 3 first.",
+      "Beat chapter 2 first."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/play",
+     "ms": 1348,
+     "texts": [
+      "Beat chapter 2 first.",
+      "Beat chapter 5 first."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/play",
+     "ms": 540,
+     "texts": [
+      "Beat chapter 5 first.",
+      "Beat chapter 6 first."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/play",
+     "ms": 497,
+     "texts": [
+      "Beat chapter 5 first.",
+      "Beat chapter 6 first.",
       "Beat chapter 3 first."
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/play",
-     "ms": 501,
+     "ms": 250,
      "texts": [
-      "Beat chapter 3 first.",
+      "Beat chapter 6 first.",
       "Beat chapter 3 first."
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/play",
-     "ms": 524,
+     "ms": 519,
      "texts": [
+      "Beat chapter 6 first.",
       "Beat chapter 3 first.",
       "Beat chapter 2 first."
      ]
@@ -259,55 +198,12 @@
     {
      "kind": "two-at-once",
      "session": "pc/play",
-     "ms": 784,
-     "texts": [
-      "Beat chapter 2 first.",
-      "Beat chapter 7 first."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
      "ms": 250,
      "texts": [
+      "Beat chapter 6 first.",
+      "Beat chapter 3 first.",
       "Beat chapter 2 first.",
-      "Beat chapter 7 first.",
-      "Beat chapter 6 first."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Beat chapter 2 first.",
-      "Beat chapter 7 first.",
-      "Beat chapter 6 first.",
-      "Beat chapter 9 first."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Beat chapter 2 first.",
-      "Beat chapter 7 first.",
-      "Beat chapter 6 first.",
-      "Beat chapter 9 first.",
-      "Beat chapter 6 first."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 750,
-     "texts": [
-      "Beat chapter 7 first.",
-      "Beat chapter 6 first.",
-      "Beat chapter 9 first.",
-      "Beat chapter 6 first.",
-      "Beat chapter 1 first."
+      "Beat chapter 3 first."
      ]
     },
     {
@@ -316,96 +212,71 @@
      "ms": 250,
      "texts": [
       "Beat chapter 6 first.",
-      "Beat chapter 9 first.",
-      "Beat chapter 6 first.",
-      "Beat chapter 1 first."
+      "Beat chapter 3 first.",
+      "Beat chapter 2 first.",
+      "Beat chapter 3 first."
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/play",
-     "ms": 500,
+     "ms": 250,
      "texts": [
-      "Beat chapter 6 first.",
-      "Beat chapter 9 first.",
-      "Beat chapter 6 first.",
-      "Beat chapter 1 first.",
-      "Beat chapter 4 first."
+      "Beat chapter 7 first.",
+      "Beat chapter 3 first."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/play",
+     "ms": 1112,
+     "texts": [
+      "Beat chapter 7 first.",
+      "Beat chapter 3 first.",
+      "Beat chapter 5 first."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/play",
+     "ms": 250,
+     "texts": [
+      "Beat chapter 7 first.",
+      "Beat chapter 3 first.",
+      "Beat chapter 5 first."
      ]
     }
    ]
   },
   "b": {
    "status": "FAIL",
-   "count": 25,
+   "count": 20,
    "detail": [
     {
      "session": "phone/play",
      "text": "Land with the plane level.",
-     "ms": 3176,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 509,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Not your move yet.",
-     "ms": 2770,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Pick a die first.",
-     "ms": 2431,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Land with the plane level.",
-     "ms": 2677,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 2062,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Axis is taken.",
-     "ms": 1940,
+     "ms": 3403,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Beat chapter 3 first.",
-     "ms": 2250,
+     "ms": 2251,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Beat chapter 4 first.",
-     "ms": 2250,
+     "ms": 2913,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Beat chapter 1 first.",
-     "ms": 2250,
+     "ms": 2707,
      "cls": "gxc-toast",
      "tag": "div"
     },
@@ -419,98 +290,105 @@
     {
      "session": "pc/play",
      "text": "Beat chapter 3 first.",
-     "ms": 2275,
+     "ms": 2439,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Beat chapter 8 first.",
-     "ms": 2395,
-     "cls": "gxc-toast",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Beat chapter 3 first.",
-     "ms": 2253,
-     "cls": "gxc-toast",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Beat chapter 3 first.",
-     "ms": 2284,
+     "ms": 2260,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Beat chapter 2 first.",
-     "ms": 1994,
+     "ms": 1909,
+     "cls": "gxc-toast",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Beat chapter 5 first.",
+     "ms": 2250,
+     "cls": "gxc-toast",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Beat chapter 6 first.",
+     "ms": 4741,
+     "cls": "gxc-toast",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Beat chapter 3 first.",
+     "ms": 4270,
+     "cls": "gxc-toast",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Beat chapter 2 first.",
+     "ms": 3523,
+     "cls": "gxc-toast",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Beat chapter 3 first.",
+     "ms": 3023,
+     "cls": "gxc-toast",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Beat chapter 3 first.",
+     "ms": 250,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Beat chapter 7 first.",
-     "ms": 2248,
+     "ms": 3091,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Beat chapter 6 first.",
-     "ms": 2246,
+     "text": "Beat chapter 3 first.",
+     "ms": 2827,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Beat chapter 9 first.",
-     "ms": 2000,
+     "text": "Beat chapter 5 first.",
+     "ms": 2577,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Beat chapter 6 first.",
-     "ms": 1745,
-     "cls": "gxc-toast",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Beat chapter 1 first.",
-     "ms": 1500,
-     "cls": "gxc-toast",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Beat chapter 4 first.",
-     "ms": 500,
+     "text": "Beat chapter 7 first.",
+     "ms": 2320,
      "cls": "gxc-toast",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Land with the plane level.",
-     "ms": 3124,
+     "ms": 5500,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Not your move yet.",
-     "ms": 2173,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Axis is taken.",
-     "ms": 2974,
+     "text": "Pick a die first.",
+     "ms": 250,
      "cls": "on",
      "tag": "div"
     }
@@ -518,306 +396,222 @@
   },
   "c": {
    "status": "FAIL",
-   "count": 8,
+   "count": 4,
    "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Coffee takes any value and earns a token to nudge a die by one.",
-     "words": 14,
-     "at": 16564,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/play",
-     "text": "Seven rounds, and both crew put a die on the axis every round.",
-     "words": 13,
-     "at": 22062,
-     "where": "div.gxh-rx"
-    },
     {
      "session": "phone/play",
      "text": "Ines has flown the night mail for twenty years and still checks every switch twice.",
      "words": 15,
-     "at": 28064,
+     "at": 33318,
      "where": "div.sm"
     },
     {
      "session": "pc/learn",
-     "text": "Coffee takes any value and earns a token to nudge a die by one.",
-     "words": 14,
-     "at": 24152,
+     "text": "To land: no planes ahead, gear and flaps down, axis level, speed within the brakes.",
+     "words": 15,
+     "at": 16752,
      "where": "div.gxh-tx"
     },
     {
      "session": "pc/play",
      "text": "Six lessons, one control at a time: axis, engines, radio, gear and flaps, brakes, coffee.",
      "words": 15,
-     "at": 5252,
+     "at": 16518,
      "where": "small."
     },
     {
      "session": "pc/play",
      "text": "Crew cards, fog, a trainee, the mountain bowl, storms and the valley where only eight crews may land.",
      "words": 18,
-     "at": 5253,
+     "at": 16519,
      "where": "small."
-    },
-    {
-     "session": "pc/play",
-     "text": "Ines has flown the night mail for twenty years and still checks every switch twice.",
-     "words": 15,
-     "at": 27582,
-     "where": "div.sm"
-    },
-    {
-     "session": "pc/play",
-     "text": "Ravi trained on gliders and talks to every tower as if it were an old friend.",
-     "words": 16,
-     "at": 27583,
-     "where": "div.sm"
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 34,
+   "count": 26,
    "detail": [
     {
      "session": "phone/learn",
      "text": "Learn to fly, then four bosses",
      "px": 13.5,
-     "at": 1002,
+     "at": 3319,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "2",
      "px": 13,
-     "at": 3006,
+     "at": 10223,
      "where": "b.nn"
     },
     {
      "session": "phone/learn",
      "text": "≤2",
      "px": 13,
-     "at": 3006,
+     "at": 10223,
      "where": "b.nn"
     },
     {
      "session": "phone/learn",
      "text": "1",
      "px": 13,
-     "at": 3006,
+     "at": 10223,
      "where": "b.nn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "You and Ravi fly one plane. Reach the airport, then land. Yo",
+     "px": 13.5,
+     "at": 14484,
+     "where": "div.gxh-tx"
     },
     {
      "session": "phone/learn",
      "text": "right",
      "px": 13,
-     "at": 7114,
+     "at": 22450,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "first",
      "px": 13,
-     "at": 7114,
+     "at": 22450,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "empty",
      "px": 13,
-     "at": 7114,
+     "at": 22450,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "same",
      "px": 13,
-     "at": 7114,
+     "at": 22450,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "coffee",
      "px": 13,
-     "at": 7115,
+     "at": 22450,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "The plane tilts toward the higher die, by the difference. A ",
      "px": 13.5,
-     "at": 8163,
+     "at": 28282,
      "where": "div.gxh-tx"
     },
     {
      "session": "phone/learn",
      "text": "clear",
      "px": 13,
-     "at": 10095,
+     "at": 42887,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "A plane waits on space 2: flying through it crashes you. You",
      "px": 13.5,
-     "at": 11102,
+     "at": 45691,
      "where": "div.gxh-tx"
     },
     {
      "session": "phone/learn",
      "text": "+2",
      "px": 13,
-     "at": 13307,
+     "at": 59112,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "down",
      "px": 13,
-     "at": 13307,
+     "at": 59112,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "Both engine dice add up: 6 + your 5 = 11. Blue 6 stays, oran",
      "px": 13.5,
-     "at": 14507,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "3",
-     "px": 13,
-     "at": 16560,
-     "where": "b.nn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "The plane flew two! Spare die? Coffee takes any value and ea",
-     "px": 13.5,
-     "at": 16564,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "brake",
-     "px": 13,
-     "at": 21807,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Brakes go 2, then 4, then 6. The 2 is set: place the 4 now.",
-     "px": 13.5,
-     "at": 22792,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "fast",
-     "px": 13,
-     "at": 25293,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "≤4",
-     "px": 13,
-     "at": 25294,
-     "where": "b.nn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Gear takes 1-2, 3-4 or 5-6, in any order. Your new 5 lowers ",
-     "px": 13.5,
-     "at": 26261,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "level",
-     "px": 13,
-     "at": 27296,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "The axis is 2 right. Your 5 against Ravi’s 3 tips it back to",
-     "px": 13.5,
-     "at": 28327,
+     "at": 61256,
      "where": "div.gxh-tx"
     },
     {
      "session": "phone/play",
      "text": "Learn to fly, then four bosses",
      "px": 13.5,
-     "at": 1252,
+     "at": 3284,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "2",
      "px": 13,
-     "at": 4254,
+     "at": 14243,
      "where": "b.nn"
     },
     {
      "session": "phone/play",
      "text": "≤2",
      "px": 13,
-     "at": 4254,
+     "at": 14243,
      "where": "b.nn"
     },
     {
      "session": "phone/play",
      "text": "1",
      "px": 13,
-     "at": 4254,
+     "at": 14243,
      "where": "b.nn"
+    },
+    {
+     "session": "phone/play",
+     "text": "Keep it level",
+     "px": 13,
+     "at": 18018,
+     "where": "div.gxc-sc-title"
     },
     {
      "session": "phone/play",
      "text": "first",
      "px": 13,
-     "at": 6582,
+     "at": 27626,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "Chapter goal:",
      "px": 13,
-     "at": 7802,
+     "at": 33318,
      "where": "b."
     },
     {
      "session": "phone/play",
      "text": "Land with the plane level.",
      "px": 13,
-     "at": 7802,
+     "at": 33318,
      "where": "div.why"
     },
     {
      "session": "phone/play",
      "text": "Only one control today: the axis. Land with the plane level.",
      "px": 13,
-     "at": 7802,
+     "at": 33318,
      "where": "p.sm"
-    },
-    {
-     "session": "phone/play",
-     "text": "Keep it level",
-     "px": 13,
-     "at": 22061,
-     "where": "div.gxc-res-k"
     },
     {
      "session": "phone/play",
      "text": "Ines has flown the night mail for twenty years and still che",
      "px": 13,
-     "at": 28064,
+     "at": 33318,
      "where": "div.sm"
     }
    ]
@@ -837,46 +631,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 20,
+   "secs": 66,
+   "turns": 10,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 15
+   "messagesSeen": 6
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 30,
-   "turns": 42,
-   "clicks": 45,
+   "secs": 63,
+   "turns": 15,
+   "clicks": 15,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 7
+   "messagesSeen": 1
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 17,
+   "secs": 61,
+   "turns": 10,
    "clicks": 1,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 10
+   "messagesSeen": 6
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 59,
-   "clicks": 62,
+   "secs": 63,
+   "turns": 47,
+   "clicks": 48,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 18
+   "messagesSeen": 19
   }
  ]
 }

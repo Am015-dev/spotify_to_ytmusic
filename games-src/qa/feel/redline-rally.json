@@ -1,8 +1,8 @@
 {
  "slug": "redline-rally",
- "when": "2026-11-08T02:32Z",
- "secs": 30,
- "totalSecs": 121,
+ "when": "2026-11-08T02:42Z",
+ "secs": 60,
+ "totalSecs": 62,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -23,188 +23,195 @@
      "session": "phone/play",
      "text": "Pick gear 1-4 and play that many cards; their total is how far you move.",
      "words": 15,
-     "at": 2003,
+     "at": 4023,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": "End next to a car to slipstream; the last car gets +1 (adrenaline).",
      "words": 13,
-     "at": 2003,
+     "at": 4023,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": "Two cars on one space: the one that got there first is ahead.",
      "words": 13,
-     "at": 7002,
+     "at": 9045,
      "where": "p."
     },
     {
      "session": "phone/play",
      "text": "The race ends when every car has crossed the line after 2 laps.",
      "words": 13,
-     "at": 7003,
+     "at": 9045,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "Pick gear 1-4 and play that many cards; their total is how far you move.",
      "words": 15,
-     "at": 2020,
+     "at": 3009,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "End next to a car to slipstream; the last car gets +1 (adrenaline).",
      "words": 13,
-     "at": 2020,
+     "at": 3010,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "Two cars on one space: the one that got there first is ahead.",
      "words": 13,
-     "at": 4008,
+     "at": 6019,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "The race ends when every car has crossed the line after 2 laps.",
      "words": 13,
-     "at": 4008,
+     "at": 6019,
      "where": "p."
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 47,
+   "count": 50,
    "detail": [
     {
      "session": "phone/learn",
      "text": "Short, one tap at a time, no reading",
      "px": 13,
-     "at": 1002,
+     "at": 1009,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "why?",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "i."
     },
     {
      "session": "phone/learn",
      "text": "Shift",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "li.on"
     },
     {
      "session": "phone/learn",
      "text": "Play",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "li."
     },
     {
      "session": "phone/learn",
      "text": "Move",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "li."
     },
     {
      "session": "phone/learn",
      "text": "React",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "li."
     },
     {
      "session": "phone/learn",
      "text": "Discard",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "li."
     },
     {
      "session": "phone/learn",
      "text": "Gear",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "span.gl"
     },
     {
      "session": "phone/learn",
      "text": "Speed",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "span.k"
     },
     {
      "session": "phone/learn",
      "text": "move 1",
      "px": 13,
-     "at": 2001,
+     "at": 4031,
      "where": "span.t"
     },
     {
      "session": "phone/learn",
      "text": "move 3",
      "px": 13,
-     "at": 2001,
+     "at": 4033,
      "where": "span.t"
     },
     {
      "session": "phone/learn",
      "text": "move 2",
      "px": 13,
-     "at": 2001,
+     "at": 4033,
      "where": "span.t"
     },
     {
      "session": "phone/learn",
      "text": "move 4",
      "px": 13,
-     "at": 2001,
+     "at": 4033,
      "where": "span.t"
     },
     {
      "session": "phone/learn",
      "text": "Engine heat",
      "px": 13,
-     "at": 2002,
+     "at": 4040,
      "where": "em."
     },
     {
      "session": "phone/learn",
      "text": "6",
      "px": 13,
-     "at": 2002,
+     "at": 4040,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Dead heat in hand",
      "px": 13,
-     "at": 2002,
+     "at": 4040,
      "where": "em."
     },
     {
      "session": "phone/learn",
      "text": "0",
      "px": 13,
-     "at": 2002,
+     "at": 4040,
      "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Kit Marlow wants your seat. Win one lap. Your gear is how ma",
+     "px": 13.5,
+     "at": 4040,
+     "where": "div.gxh-tx"
     },
     {
      "session": "phone/learn",
      "text": "Tap any two cards. Their numbers add up to your speed.",
      "px": 13.5,
-     "at": 4002,
+     "at": 5012,
      "where": "div.gxh-tx"
     },
     {
@@ -218,196 +225,210 @@
      "session": "phone/play",
      "text": "why?",
      "px": 13,
-     "at": 2002,
+     "at": 4014,
      "where": "i."
     },
     {
      "session": "phone/play",
      "text": "Shift",
      "px": 13,
-     "at": 2002,
+     "at": 4014,
      "where": "li.on"
     },
     {
      "session": "phone/play",
      "text": "Play",
      "px": 13,
-     "at": 2002,
+     "at": 4014,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": "Move",
      "px": 13,
-     "at": 2002,
+     "at": 4014,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": "React",
      "px": 13,
-     "at": 2002,
+     "at": 4014,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": "Discard",
      "px": 13,
-     "at": 2002,
+     "at": 4014,
      "where": "li."
     },
     {
      "session": "phone/play",
      "text": "Gear",
      "px": 13,
-     "at": 2002,
+     "at": 4014,
      "where": "span.gl"
-    },
-    {
-     "session": "phone/play",
-     "text": "Speed",
-     "px": 13,
-     "at": 2002,
-     "where": "span.k"
-    },
-    {
-     "session": "phone/play",
-     "text": "move 1",
-     "px": 13,
-     "at": 2002,
-     "where": "span.t"
     },
     {
      "session": "phone/play",
      "text": "Stress",
      "px": 13,
-     "at": 2002,
+     "at": 4022,
      "where": "span.k"
     },
     {
      "session": "phone/play",
      "text": "random",
      "px": 13,
-     "at": 2002,
+     "at": 4022,
      "where": "span.t"
     },
     {
      "session": "phone/play",
      "text": "Heat",
      "px": 13,
-     "at": 2002,
+     "at": 4022,
      "where": "span.k"
     },
     {
      "session": "phone/play",
      "text": "dead",
      "px": 13,
-     "at": 2002,
+     "at": 4022,
      "where": "span.t"
     },
     {
      "session": "phone/play",
-     "text": "move 2",
+     "text": "Speed",
      "px": 13,
-     "at": 2003,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "Burst",
-     "px": 13,
-     "at": 2003,
+     "at": 4022,
      "where": "span.k"
-    },
-    {
-     "session": "phone/play",
-     "text": "move 5",
-     "px": 13,
-     "at": 2003,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "Total speed",
-     "px": 13,
-     "at": 8001,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "2",
-     "px": 13,
-     "at": 8001,
-     "where": "b."
     },
     {
      "session": "phone/play",
      "text": "move 4",
      "px": 13,
-     "at": 11001,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "8",
-     "px": 13,
-     "at": 11001,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "5",
-     "px": 13,
-     "at": 12001,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "flipped",
-     "px": 13,
-     "at": 14002,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "7",
-     "px": 13,
-     "at": 14002,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "3",
-     "px": 13,
-     "at": 18001,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "Brake",
-     "px": 13,
-     "at": 19001,
-     "where": "span.k"
-    },
-    {
-     "session": "phone/play",
-     "text": "move 0",
-     "px": 13,
-     "at": 19001,
+     "at": 4022,
      "where": "span.t"
     },
     {
      "session": "phone/play",
      "text": "move 3",
      "px": 13,
-     "at": 19001,
+     "at": 4022,
      "where": "span.t"
+    },
+    {
+     "session": "phone/play",
+     "text": "Burst",
+     "px": 13,
+     "at": 4022,
+     "where": "span.k"
+    },
+    {
+     "session": "phone/play",
+     "text": "move 5",
+     "px": 13,
+     "at": 4022,
+     "where": "span.t"
+    },
+    {
+     "session": "phone/play",
+     "text": "Total speed",
+     "px": 13,
+     "at": 13358,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "8",
+     "px": 13,
+     "at": 13358,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "9",
+     "px": 13,
+     "at": 17261,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "3",
+     "px": 13,
+     "at": 19525,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "move 2",
+     "px": 13,
+     "at": 21510,
+     "where": "span.t"
+    },
+    {
+     "session": "phone/play",
+     "text": "10",
+     "px": 13,
+     "at": 21510,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "move 1",
+     "px": 13,
+     "at": 22524,
+     "where": "span.t"
+    },
+    {
+     "session": "phone/play",
+     "text": "5",
+     "px": 13,
+     "at": 25990,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Brake",
+     "px": 13,
+     "at": 28751,
+     "where": "span.k"
+    },
+    {
+     "session": "phone/play",
+     "text": "move 0",
+     "px": 13,
+     "at": 28751,
+     "where": "span.t"
+    },
+    {
+     "session": "phone/play",
+     "text": "4",
+     "px": 13,
+     "at": 28751,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "7",
+     "px": 13,
+     "at": 47763,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "6",
+     "px": 13,
+     "at": 48776,
+     "where": "b."
     },
     {
      "session": "phone/play",
      "text": "1",
      "px": 13,
-     "at": 22001,
+     "at": 51024,
      "where": "b."
     }
    ]
@@ -423,20 +444,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 21,
+   "secs": 61,
+   "turns": 39,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 2
+   "messagesSeen": 3
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 30,
-   "turns": 115,
-   "clicks": 115,
+   "secs": 61,
+   "turns": 88,
+   "clicks": 88,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -445,8 +466,8 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 20,
+   "secs": 61,
+   "turns": 39,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
@@ -456,9 +477,9 @@
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 126,
-   "clicks": 126,
+   "secs": 60,
+   "turns": 103,
+   "clicks": 103,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,

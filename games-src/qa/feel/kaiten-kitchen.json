@@ -1,20 +1,20 @@
 {
  "slug": "kaiten-kitchen",
- "when": "2026-11-08T02:30Z",
- "secs": 30,
- "totalSecs": 101,
+ "when": "2026-11-08T02:41Z",
+ "secs": 60,
+ "totalSecs": 64,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 3,
+   "count": 4,
    "detail": [
     {
      "kind": "too-short",
      "session": "phone/learn",
      "text": "S AUNTIE SUZU Odile bet a custard you cannot win, Mina. Pick any dish you like! ×",
      "words": 17,
-     "shownMs": 5006,
+     "shownMs": 1236,
      "neededMs": 5700,
      "cls": "on"
     },
@@ -23,8 +23,17 @@
      "session": "pc/learn",
      "text": "S AUNTIE SUZU Odile bet a custard you cannot win, Mina. Pick any dish you like! ×",
      "words": 17,
-     "shownMs": 4107,
+     "shownMs": 1530,
      "neededMs": 5700,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "S AUNTIE SUZU Custard Cups pay only at the very end: most +6, fewest -6. ×",
+     "words": 16,
+     "shownMs": 5154,
+     "neededMs": 5600,
      "cls": "on"
     },
     {
@@ -32,7 +41,7 @@
      "session": "pc/learn",
      "text": "S AUNTIE SUZU Odile bet a custard you cannot win, Mina. Pick any dish you like! ×",
      "words": 17,
-     "shownMs": 5289,
+     "shownMs": 3762,
      "neededMs": 5700,
      "cls": "on"
     }
@@ -45,566 +54,482 @@
   },
   "c": {
    "status": "FAIL",
-   "count": 19,
+   "count": 16,
    "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Twin Sticks: keep them, then tap the glowing sticks to take two dishes.",
+     "words": 13,
+     "at": 12776,
+     "where": "span."
+    },
     {
      "session": "phone/learn",
      "text": "Picks flip together, then your leftovers ride the belt to the next diner.",
      "words": 13,
-     "at": 13598,
+     "at": 49329,
      "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Nigiri score 1 to 3 points on their own: Sun 1, Sunset 2, Moon 3.",
-     "words": 15,
-     "at": 14631,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "1 Crispy Prawn: every pair is worth 5 points, one more would make another pair.",
-     "words": 15,
-     "at": 28265,
-     "where": "div.sm"
     },
     {
      "session": "pc/learn",
      "text": "Round 1 of 3 · Turn 1 of 9 · most points after round 3 wins",
      "words": 16,
-     "at": 2662,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Twin Sticks: keep them, then tap the glowing sticks to take two dishes.",
-     "words": 13,
-     "at": 8004,
+     "at": 9518,
      "where": "span."
     },
     {
      "session": "pc/learn",
      "text": "Round 1 of 3 · Turn 2 of 9 · most points after round 3 wins",
      "words": 16,
-     "at": 16803,
+     "at": 49143,
      "where": "span."
     },
     {
      "session": "pc/learn",
      "text": "Picks flip together, then your leftovers ride the belt to the next diner.",
      "words": 13,
-     "at": 25973,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Nigiri score 1 to 3 points on their own: Sun 1, Sunset 2, Moon 3.",
-     "words": 15,
-     "at": 28752,
+     "at": 61589,
      "where": "span."
     },
     {
      "session": "pc/play",
      "text": "Taro cooks noodles on the night shift and eats his supper at the belt long after midnight.",
      "words": 17,
-     "at": 2252,
+     "at": 4501,
      "where": "p.story"
     },
     {
      "session": "pc/play",
      "text": "He counts every plate that rolls past and remembers exactly who took the last prawn.",
      "words": 15,
-     "at": 2252,
+     "at": 4505,
      "where": "p.story"
     },
     {
      "session": "pc/play",
      "text": "Choose Taro if you enjoy a sharp rival who punishes every loose plate.",
      "words": 13,
-     "at": 2252,
+     "at": 4505,
      "where": "p.enjoy"
     },
     {
      "session": "pc/play",
      "text": "Odile ran a bakery for forty years and still wears her tall hat to dinner.",
      "words": 15,
-     "at": 2252,
+     "at": 4505,
      "where": "p.story"
     },
     {
      "session": "pc/play",
      "text": "She has never once left without dessert, and she will happily tell you about it.",
      "words": 15,
-     "at": 2252,
+     "at": 4505,
      "where": "p.story"
     },
     {
      "session": "pc/play",
      "text": "Choose Odile if you enjoy a fair, steady race with the custard on the line.",
      "words": 15,
-     "at": 2252,
+     "at": 4505,
      "where": "p.enjoy"
     },
     {
      "session": "pc/play",
      "text": "He loves a roll race, cheers when he wins it and cheers just as loudly when he loses.",
      "words": 18,
-     "at": 2252,
+     "at": 4505,
      "where": "p.story"
     },
     {
      "session": "pc/play",
      "text": "Choose Kofi if you enjoy a lively table where the seaweed rolls are always fought over.",
      "words": 16,
-     "at": 2252,
+     "at": 4505,
      "where": "p.enjoy"
     },
     {
      "session": "pc/play",
      "text": "Pip saved up pocket money all month for this dinner and wants to try one of everything.",
      "words": 17,
-     "at": 2252,
+     "at": 4505,
      "where": "p.story"
     },
     {
      "session": "pc/play",
      "text": "Choose Pip if you enjoy a relaxed first meal with room to try things out.",
      "words": 15,
-     "at": 2252,
+     "at": 4505,
      "where": "p.enjoy"
     },
     {
      "session": "pc/play",
      "text": "Round 1 of 3 · Turn 1 of 7 · most points after round 3 wins",
      "words": 16,
-     "at": 4752,
+     "at": 8502,
      "where": "span."
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 89,
+   "count": 51,
    "detail": [
     {
      "session": "phone/learn",
      "text": "Short, one tap at a time, no reading",
      "px": 13.3,
-     "at": 1012,
+     "at": 2014,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "against the computer chefs",
      "px": 13.5,
-     "at": 1012,
+     "at": 2014,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "Ten chapters, three bosses",
      "px": 13.5,
-     "at": 1012,
+     "at": 2014,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "with friends, free",
      "px": 13.5,
-     "at": 1012,
+     "at": 2014,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "0",
      "px": 13,
-     "at": 3349,
+     "at": 11848,
      "where": "span.sc"
     },
     {
      "session": "phone/learn",
      "text": "Odile",
      "px": 13,
-     "at": 3349,
+     "at": 11848,
      "where": "span.nm"
     },
     {
      "session": "phone/learn",
      "text": "ready",
      "px": 13,
-     "at": 3349,
+     "at": 11848,
      "where": "span.st.rd"
     },
     {
      "session": "phone/learn",
      "text": "Kofi",
      "px": 13,
-     "at": 3349,
+     "at": 11848,
      "where": "span.nm"
     },
     {
      "session": "phone/learn",
      "text": "You",
      "px": 13,
-     "at": 3349,
+     "at": 11848,
      "where": "span.nm"
     },
     {
      "session": "phone/learn",
      "text": "Your turn",
      "px": 13,
-     "at": 3349,
+     "at": 11848,
      "where": "b.kb"
     },
     {
      "session": "phone/learn",
      "text": "S",
      "px": 9,
-     "at": 3353,
+     "at": 11849,
      "where": "i."
     },
     {
      "session": "phone/learn",
      "text": "Auntie Suzu",
      "px": 13,
-     "at": 3353,
+     "at": 11849,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Picks are in",
      "px": 13,
-     "at": 8451,
+     "at": 34647,
      "where": "b.kb"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Sunset",
-     "px": 13,
-     "at": 8451,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Nigiri",
-     "px": 13,
-     "at": 8457,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Fire",
-     "px": 13,
-     "at": 8457,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Paste",
-     "px": 13,
-     "at": 8457,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Steam",
-     "px": 13,
-     "at": 8457,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Bun",
-     "px": 13,
-     "at": 8457,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Odile's turn",
-     "px": 13,
-     "at": 10503,
-     "where": "b.kb"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Kofi's turn",
-     "px": 13,
-     "at": 11504,
-     "where": "b.kb"
-    },
-    {
-     "session": "phone/learn",
-     "text": "×3",
-     "px": 13,
-     "at": 12645,
-     "where": "span.hn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "1",
-     "px": 13,
-     "at": 12645,
-     "where": "span.sc"
-    },
-    {
-     "session": "phone/learn",
-     "text": "= 1",
-     "px": 13,
-     "at": 12645,
-     "where": "span.hn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "2",
-     "px": 13,
-     "at": 12645,
-     "where": "span.sc"
-    },
-    {
-     "session": "phone/learn",
-     "text": "= 2",
-     "px": 13,
-     "at": 12645,
-     "where": "span.hn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Fish",
-     "px": 13,
-     "at": 12645,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Slice",
-     "px": 13,
-     "at": 12645,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Sun",
-     "px": 13,
-     "at": 12645,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Moon",
-     "px": 13,
-     "at": 12645,
-     "where": "text."
     },
     {
      "session": "phone/learn",
      "text": "Crispy",
      "px": 13,
-     "at": 15506,
+     "at": 34647,
      "where": "text."
     },
     {
      "session": "phone/learn",
      "text": "Prawn",
      "px": 13,
-     "at": 15506,
+     "at": 34647,
      "where": "text."
     },
     {
      "session": "phone/learn",
      "text": "Seaweed",
      "px": 13,
-     "at": 15506,
+     "at": 34647,
      "where": "text."
     },
     {
      "session": "phone/learn",
      "text": "Roll",
      "px": 13,
-     "at": 15506,
+     "at": 34647,
      "where": "text."
     },
     {
      "session": "phone/learn",
-     "text": "O",
-     "px": 9,
-     "at": 15507,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "9",
+     "text": "Kofi's turn",
      "px": 13,
-     "at": 19562,
-     "where": "span.sc"
-    },
-    {
-     "session": "phone/learn",
-     "text": "= 9",
-     "px": 13,
-     "at": 19562,
-     "where": "span.hn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "7",
-     "px": 13,
-     "at": 19562,
-     "where": "span.sc"
+     "at": 43751,
+     "where": "b.kb"
     },
     {
      "session": "phone/learn",
      "text": "3",
      "px": 13,
-     "at": 19562,
-     "where": "span.bg"
+     "at": 45767,
+     "where": "span.sc"
     },
     {
      "session": "phone/learn",
-     "text": "1st +6",
+     "text": "1st +3",
      "px": 13,
-     "at": 19562,
+     "at": 45767,
      "where": "span.hn"
     },
     {
      "session": "phone/learn",
      "text": "need 1",
      "px": 13,
-     "at": 19562,
+     "at": 45767,
      "where": "span.hn"
     },
     {
      "session": "phone/learn",
-     "text": "Hands pass",
-     "px": 13,
-     "at": 19562,
-     "where": "b.kb"
-    },
-    {
-     "session": "phone/learn",
-     "text": "→ Odile",
-     "px": 13,
-     "at": 19562,
-     "where": "div.ptag"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Twin",
-     "px": 13,
-     "at": 19563,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Sticks",
-     "px": 13,
-     "at": 19563,
-     "where": "text."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Kofi →",
-     "px": 13,
-     "at": 19563,
-     "where": "div.ptag.r"
-    },
-    {
-     "session": "phone/learn",
-     "text": "need 2",
-     "px": 13,
-     "at": 25508,
-     "where": "span.hn"
+     "text": "O",
+     "px": 9,
+     "at": 54511,
+     "where": "i."
     },
     {
      "session": "phone/learn",
      "text": "Custard",
      "px": 13,
-     "at": 25509,
+     "at": 60185,
      "where": "text."
     },
     {
      "session": "phone/learn",
      "text": "Cup",
      "px": 13,
-     "at": 25509,
+     "at": 60185,
      "where": "text."
     },
     {
      "session": "phone/play",
      "text": "Short, one tap at a time, no reading",
      "px": 13.3,
-     "at": 1002,
+     "at": 1753,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "against the computer chefs",
      "px": 13.5,
-     "at": 1002,
+     "at": 1753,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "Ten chapters, three bosses",
      "px": 13.5,
-     "at": 1002,
+     "at": 1753,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "with friends, free",
      "px": 13.5,
-     "at": 1002,
+     "at": 1753,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "You against Odile and Kofi",
      "px": 13,
-     "at": 3001,
+     "at": 4757,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "3 people, one device",
      "px": 13,
-     "at": 3001,
+     "at": 4757,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "the chefs play",
      "px": 13,
-     "at": 3001,
+     "at": 4757,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "0",
      "px": 13,
-     "at": 4406,
+     "at": 9523,
      "where": "span.sc"
     },
     {
      "session": "phone/play",
      "text": "Mina",
      "px": 13,
-     "at": 4406,
+     "at": 9523,
      "where": "span.nm"
     },
     {
      "session": "phone/play",
      "text": "Odile",
      "px": 13,
-     "at": 4406,
+     "at": 9523,
      "where": "span.nm"
     },
     {
      "session": "phone/play",
      "text": "Kofi",
      "px": 13,
-     "at": 4406,
+     "at": 9523,
      "where": "span.nm"
+    },
+    {
+     "session": "phone/play",
+     "text": "ready",
+     "px": 13,
+     "at": 31503,
+     "where": "span.st.rd"
+    },
+    {
+     "session": "phone/play",
+     "text": "Diner · is choosing",
+     "px": 13,
+     "at": 38762,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Nothing served yet this round.",
+     "px": 13,
+     "at": 38762,
+     "where": "p.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Picks are in",
+     "px": 13,
+     "at": 43223,
+     "where": "b.kb"
+    },
+    {
+     "session": "phone/play",
+     "text": "Seaweed",
+     "px": 13,
+     "at": 44272,
+     "where": "text."
+    },
+    {
+     "session": "phone/play",
+     "text": "Roll",
+     "px": 13,
+     "at": 44272,
+     "where": "text."
+    },
+    {
+     "session": "phone/play",
+     "text": "Sunset",
+     "px": 13,
+     "at": 44272,
+     "where": "text."
+    },
+    {
+     "session": "phone/play",
+     "text": "Nigiri",
+     "px": 13,
+     "at": 44272,
+     "where": "text."
+    },
+    {
+     "session": "phone/play",
+     "text": "Fire",
+     "px": 13,
+     "at": 44272,
+     "where": "text."
+    },
+    {
+     "session": "phone/play",
+     "text": "Paste",
+     "px": 13,
+     "at": 44272,
+     "where": "text."
+    },
+    {
+     "session": "phone/play",
+     "text": "Mina's turn",
+     "px": 13,
+     "at": 46255,
+     "where": "b.kb"
+    },
+    {
+     "session": "phone/play",
+     "text": "2",
+     "px": 13,
+     "at": 52433,
+     "where": "span.sc"
+    },
+    {
+     "session": "phone/play",
+     "text": "= 2",
+     "px": 13,
+     "at": 52433,
+     "where": "span.hn"
+    },
+    {
+     "session": "phone/play",
+     "text": "×3",
+     "px": 13,
+     "at": 52436,
+     "where": "span.hn"
+    },
+    {
+     "session": "phone/play",
+     "text": "6",
+     "px": 13,
+     "at": 52436,
+     "where": "span.sc"
+    },
+    {
+     "session": "phone/play",
+     "text": "1st +6",
+     "px": 13,
+     "at": 52436,
+     "where": "span.hn"
     }
    ]
   },
@@ -622,9 +547,9 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 45,
-   "clicks": 67,
+   "secs": 61,
+   "turns": 13,
+   "clicks": 16,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -633,9 +558,9 @@
   {
    "size": "phone",
    "mode": "play",
-   "secs": 30,
-   "turns": 62,
-   "clicks": 81,
+   "secs": 60,
+   "turns": 20,
+   "clicks": 23,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -644,18 +569,18 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 14,
-   "clicks": 15,
+   "secs": 63,
+   "turns": 5,
+   "clicks": 8,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 11
+   "messagesSeen": 8
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 10,
+   "secs": 28,
    "turns": 6,
    "clicks": 6,
    "endedBy": "result",

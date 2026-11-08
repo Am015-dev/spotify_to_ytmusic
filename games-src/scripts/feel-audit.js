@@ -281,7 +281,10 @@ async function one(slug) {
   const { chromium } = require(fs.existsSync(path.join(ROOT, 'games-src', 'node_modules', 'playwright')) ? path.join(ROOT, 'games-src', 'node_modules', 'playwright') : 'playwright');
   const gx = require('./gx-serve.js'), url = await gx.url(slug, {}), browser = await chromium.launch();
   const sizes = arg('sizes', 'phone,pc').split(','), modes = arg('modes', 'learn,play').split(','), t0 = Date.now(), sessions = [];
-  for (const size of sizes) for (const mode of modes) { try { sessions.push(await session(browser, url, size, mode, SECS, slug)); } catch (e) { sessions.push({ size, mode, error: e.message, turns: 0, hintsOff: true, data: { msgs: [], two: [], long: [], small: [], over: [] } }); } }
+  // sessions run in parallel browser contexts (owner speed rule); animations stay real so pop-up timing is measured honestly
+  const combos = []; for (const size of sizes) for (const mode of modes) combos.push([size, mode]);
+  const got = await Promise.all(combos.map(([size, mode]) => session(browser, url, size, mode, SECS, slug).catch(e => ({ size, mode, error: e.message, turns: 0, hintsOff: true, data: { msgs: [], two: [], long: [], small: [], over: [] } }))));
+  sessions.push(...got);
   await browser.close();
   const { checks, notes } = judge(sessions);
   const j = { slug, when: new Date().toISOString().slice(0, 16) + 'Z', secs: SECS, totalSecs: Math.round((Date.now() - t0) / 1000), rules: 'message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns', checks, notes,

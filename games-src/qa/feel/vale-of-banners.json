@@ -1,21 +1,165 @@
 {
  "slug": "vale-of-banners",
- "when": "2026-11-08T02:37Z",
- "secs": 30,
- "totalSecs": 121,
+ "when": "2026-11-08T02:44Z",
+ "secs": 60,
+ "totalSecs": 61,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 158,
+   "count": 276,
    "detail": [
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 3 Your turn dice used 4 1",
+     "words": 10,
+     "shownMs": 500,
+     "neededMs": 5000,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 3 Tobin Reed's turn 1 die left: 5 1",
+     "words": 12,
+     "shownMs": 250,
+     "neededMs": 5200,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 2 of 3 Tobin Reed's turn 1 die left: 5 3",
+     "words": 12,
+     "shownMs": 250,
+     "neededMs": 5200,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "O Old Odo The season ends: mines pay out. After the last season comes the final count. ×",
+     "words": 18,
+     "shownMs": 502,
+     "neededMs": 5800,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Round 1 of 5 Azure's turn 1 die left: 3 4",
+     "words": 11,
+     "shownMs": 250,
+     "neededMs": 5100,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn 2 dice left: 3 4",
+     "words": 11,
+     "shownMs": 250,
+     "neededMs": 5100,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn 1 die left: 3 4",
+     "words": 11,
+     "shownMs": 250,
+     "neededMs": 5100,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn dice used 3 4",
+     "words": 10,
+     "shownMs": 250,
+     "neededMs": 5000,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn dice used 3 4",
+     "words": 10,
+     "shownMs": 250,
+     "neededMs": 5000,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 3 of 5 Azure's turn 1 die left: 5 4",
+     "words": 11,
+     "shownMs": 250,
+     "neededMs": 5100,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Round 3 of 5 Azure's turn dice used 5 4",
+     "words": 10,
+     "shownMs": 250,
+     "neededMs": 5000,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Round 1 of 3 Your turn 1 die left: 4 1",
+     "words": 11,
+     "shownMs": 250,
+     "neededMs": 5100,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Round 2 of 3 Tobin Reed's turn dice used 4 1",
+     "words": 11,
+     "shownMs": 250,
+     "neededMs": 5100,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 1 of 5 Azure's turn 1 die left: 2 2",
+     "words": 11,
+     "shownMs": 420,
+     "neededMs": 5100,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Round 3 of 5 Azure's turn 2 dice left: 4 6",
+     "words": 11,
+     "shownMs": 250,
+     "neededMs": 5100,
+     "cls": ""
+    },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 500,
+     "ms": 747,
      "texts": [
       "Round 1 of 3 Your turn 2 dice left: 4 1",
       "Prologue · Timber Your two dice are your two hands"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1 of 3 Your turn 2 dice left: 4 1",
+      "Prologue · Timber Take it home before Tobin does. "
      ]
     },
     {
@@ -30,7 +174,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 571,
      "texts": [
       "Round 1 of 3 Your turn 1 die left: 4 1",
       "O Old Odo You can sell! All crates of one number w"
@@ -39,7 +183,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 500,
      "texts": [
       "Round 1 of 3 Your turn 1 die left: 4 1",
       "O Old Odo Tiles marked with a worker are one pip o"
@@ -48,7 +192,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 749,
      "texts": [
       "Round 1 of 3 Your turn 1 die left: 4 1",
       "O Old Odo Pastures score every animal of that kind"
@@ -57,7 +201,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 482,
+     "ms": 250,
      "texts": [
       "Round 1 of 3 Your turn 1 die left: 4 1",
       "O Old Odo See the numbers on the glowing spaces? G"
@@ -66,7 +210,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 750,
+     "ms": 1388,
      "texts": [
       "Round 1 of 3 Your turn dice used 4 1",
       "O Old Odo See the numbers on the glowing spaces? G"
@@ -75,7 +219,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 380,
      "texts": [
       "Round 1 of 3 Your turn dice used 4 1",
       "O Old Odo Buildings act the moment they land. Neve"
@@ -84,17 +228,45 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 500,
+     "ms": 250,
      "texts": [
       "Round 1 of 3 Your turn dice used 4 1",
-      "Barge space 4",
+      "Barge space 3",
+      "O Old Odo Buildings act the moment they land. Neve"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 497,
+     "texts": [
+      "Round 1 of 3 Your turn dice used 4 1",
+      "Barge space 3",
       "O Old Odo Both dice spent. End your turn (the back"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 1000,
+     "ms": 250,
+     "texts": [
+      "Round 1 of 3 Your turn dice used 4 1",
+      "Barge space 3"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1 of 3 Your turn dice used 4 1",
+      "Pasture space 6"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 986,
      "texts": [
       "Round 1 of 3 Your turn dice used 4 1",
       "Keep space 5"
@@ -114,7 +286,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 502,
+     "ms": 750,
      "texts": [
       "Round 1 of 3 Tobin Reed's turn 2 dice left: 5 1",
       "Keep space 5",
@@ -125,17 +297,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 3 Tobin Reed's turn 2 dice left: 5 1",
-      "Keep space 5",
-      "Turn over: you used both dice Poor turn. Much stro"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1500,
+     "ms": 1497,
      "texts": [
       "Round 1 of 3 Tobin Reed's turn 2 dice left: 5 1",
       "Turn over: you used both dice Poor turn. Much stro"
@@ -144,7 +306,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 750,
+     "ms": 1250,
      "texts": [
       "Round 2 of 3 Tobin Reed's turn 2 dice left: 5 3",
       "Tobin Reed's turn is over Both dice used."
@@ -153,7 +315,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 2007,
+     "ms": 500,
      "texts": [
       "Round 2 of 3 Tobin Reed's turn 2 dice left: 5 3",
       "Round 1 of 3 done New dice for everyone. White die"
@@ -162,9 +324,10 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 1000,
+     "ms": 485,
      "texts": [
       "Round 2 of 3 Your turn 2 dice left: 3 5",
+      "Mine space 3",
       "O Old Odo See the white die? It sent this round's ",
       "Tobin Reed's turn is over Both dice used."
      ]
@@ -172,75 +335,11 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 799,
      "texts": [
       "Round 2 of 3 Your turn 2 dice left: 3 5",
+      "Building space 2",
       "Tobin Reed's turn is over Both dice used."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Building space 5"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Barge space 4"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Pasture space 6"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Building space 5"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Building space 5",
-      "O Old Odo A mine pays you a silver at every season"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 493,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Building space 5",
-      "O Old Odo A whole region filled! Size points plus "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Building space 5"
      ]
     },
     {
@@ -248,52 +347,7 @@
      "session": "phone/learn",
      "ms": 499,
      "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Keep space 5"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Building space 6"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Barge space 3"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 492,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Lore space 6"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Building space 5"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
+      "Round 2 of 3 Your turn 2 dice left: 3 5",
       "Building space 2"
      ]
     },
@@ -303,16 +357,45 @@
      "ms": 250,
      "texts": [
       "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Barge space 3"
+      "Building space 2",
+      "O Old Odo A build was possible there. A tile on th"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 750,
+     "ms": 511,
+     "texts": [
+      "Round 2 of 3 Your turn 1 die left: 3 5",
+      "Building space 2",
+      "O Old Odo Workers! Each one nudges a die up or dow"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 2 of 3 Your turn 1 die left: 3 5",
+      "Keep space 3"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 501,
      "texts": [
       "Round 2 of 3 Your turn 1 die left: 3 5",
       "Lore space 1"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 2 of 3 Your turn 1 die left: 3 5",
+      "Barge space 6"
      ]
     },
     {
@@ -327,10 +410,115 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 1250,
+     "ms": 250,
      "texts": [
-      "Round 2 of 3 Your turn 1 die left: 3 5",
-      "Pasture space 6"
+      "Round 2 of 3 Your turn dice used 3 5",
+      "Pasture space 3"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 504,
+     "texts": [
+      "Round 2 of 3 Your turn dice used 3 5",
+      "Lore space 2"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 2 of 3 Your turn dice used 3 5",
+      "Pasture space 3"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 512,
+     "texts": [
+      "Round 2 of 3 Your turn dice used 3 5",
+      "Barge space 6"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 751,
+     "texts": [
+      "Round 2 of 3 Your turn dice used 3 5",
+      "Barge space 6",
+      "O Old Odo A mine pays you a silver at every season"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 538,
+     "texts": [
+      "Round 3 of 3 Tobin Reed's turn 2 dice left: 2 5",
+      "Barge space 6",
+      "O Old Odo A mine pays you a silver at every season",
+      "Turn over: you used both dice Poor turn. Much stro"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 499,
+     "texts": [
+      "Round 3 of 3 Tobin Reed's turn 2 dice left: 2 5",
+      "O Old Odo A whole region filled! Size points plus ",
+      "Turn over: you used both dice Poor turn. Much stro"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1500,
+     "texts": [
+      "Round 3 of 3 Tobin Reed's turn 2 dice left: 2 5",
+      "Turn over: you used both dice Poor turn. Much stro"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 2500,
+     "texts": [
+      "Round 3 of 3 Tobin Reed's turn 2 dice left: 2 5",
+      "Round 2 of 3 done New dice for everyone. White die"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 997,
+     "texts": [
+      "Round 3 of 3 Tobin Reed's turn 1 die left: 2 5",
+      "O Old Odo Tobin sold goods. Selling also pays a si"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 3 of 3 Tobin Reed's turn dice used 2 5",
+      "O Old Odo Tobin sold goods. Selling also pays a si"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 509,
+     "texts": [
+      "Round 3 of 3 Your turn 2 dice left: 1 3",
+      "Building space 4",
+      "O Old Odo You have 2 silver: the back lane sells a",
+      "Tobin Reed's turn is over Both dice used."
      ]
     },
     {
@@ -338,8 +526,9 @@
      "session": "phone/learn",
      "ms": 500,
      "texts": [
-      "Round 2 of 3 Your turn dice used 3 5",
-      "Pasture space 6"
+      "Round 3 of 3 Your turn 2 dice left: 1 3",
+      "Building space 2",
+      "Tobin Reed's turn is over Both dice used."
      ]
     },
     {
@@ -347,310 +536,81 @@
      "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "Round 2 of 3 Your turn dice used 3 5",
-      "O Old Odo You have 2 silver: the back lane sells a"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
-      "Building space 6"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 1250,
-     "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
-      "Mine space 4"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
-      "Building space 4"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 1000,
-     "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
-      "Barge space 3"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
-      "Pasture space 6"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 500,
-     "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
+      "Round 3 of 3 Your turn 2 dice left: 1 3",
       "Building space 2"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 500,
+     "session": "phone/learn",
+     "ms": 499,
      "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
+      "Round 3 of 3 Your turn 2 dice left: 1 3",
       "Building space 4"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 750,
+     "session": "phone/learn",
+     "ms": 967,
      "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
-      "Barge space 4"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
-      "Pasture space 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 989,
-     "texts": [
-      "Round 1 of 5 Your turn 2 dice left: 4 1",
-      "Lore space 2"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Lore space 2"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Pasture space 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Pasture space 6"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Mine space 3"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Keep space 3"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
+      "Round 3 of 3 Your turn 1 die left: 1 3",
       "Building space 4"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "phone/play",
+     "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Building space 5"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 500,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Lore space 6"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Keep space 3"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Barge space 3"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 1250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Building space 5"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn 1 die left: 4 1",
-      "Lore space 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 5 Your turn dice used 4 1",
-      "Lore space 1"
+      "Round 3 of 3 Your turn 1 die left: 1 3",
+      "Pasture space 3"
      ]
     }
    ]
   },
   "b": {
    "status": "FAIL",
-   "count": 150,
+   "count": 258,
    "detail": [
     {
      "session": "phone/play",
      "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Building space 6",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
-     "ms": 1000,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
-     "ms": 500,
+     "ms": 493,
      "cls": "",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Mine space 4",
-     "ms": 1250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Building space 4",
-     "ms": 250,
+     "ms": 504,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
-     "ms": 750,
+     "ms": 1955,
      "cls": "",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
-     "ms": 500,
+     "ms": 510,
      "cls": "",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Barge space 3",
-     "ms": 1000,
+     "text": "Lore space 5",
+     "ms": 1754,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Pasture space 6",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
-     "ms": 750,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Building space 2",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Building space 4",
+     "text": "Mine space 2",
      "ms": 500,
      "cls": "on",
      "tag": "div"
@@ -658,21 +618,42 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
-     "ms": 1250,
+     "ms": 1651,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
+     "ms": 749,
      "cls": "",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Barge space 4",
-     "ms": 750,
+     "ms": 1751,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Pasture space 1",
-     "ms": 250,
+     "text": "Barge space 3",
+     "ms": 740,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
+     "ms": 999,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Mine space 2",
+     "ms": 499,
      "cls": "on",
      "tag": "div"
     },
@@ -685,23 +666,58 @@
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
-     "ms": 488,
-     "cls": "",
+     "text": "Pasture space 1",
+     "ms": 967,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pasture space 3",
+     "ms": 508,
+     "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Lore space 2",
-     "ms": 1239,
+     "ms": 500,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Pasture space 1",
-     "ms": 250,
+     "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
+     "ms": 2372,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Keep space 3",
+     "ms": 1704,
      "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Your turn 2 dice left: 4 1",
+     "ms": 733,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pasture space 1",
+     "ms": 517,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Your turn 1 die left: 4 1",
+     "ms": 766,
+     "cls": "",
      "tag": "div"
     },
     {
@@ -713,14 +729,7 @@
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 5 Your turn 1 die left: 4 1",
-     "ms": 750,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Mine space 3",
+     "text": "Barge space 4",
      "ms": 250,
      "cls": "on",
      "tag": "div"
@@ -728,7 +737,7 @@
     {
      "session": "phone/play",
      "text": "Keep space 3",
-     "ms": 250,
+     "ms": 501,
      "cls": "on",
      "tag": "div"
     },
@@ -749,55 +758,48 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 5 Your turn 1 die left: 4 1",
-     "ms": 1250,
+     "ms": 1995,
      "cls": "",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Lore space 6",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
      "text": "Keep space 3",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Barge space 3",
-     "ms": 250,
+     "ms": 1002,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Building space 5",
-     "ms": 1250,
+     "ms": 1249,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Building space 2",
+     "ms": 250,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Round 1 of 5 Your turn 1 die left: 4 1",
-     "ms": 2260,
+     "ms": 2262,
      "cls": "",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Lore space 1",
-     "ms": 490,
+     "ms": 481,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Pasture space 5",
+     "text": "Building space 2",
      "ms": 250,
      "cls": "on",
      "tag": "div"
@@ -805,42 +807,21 @@
     {
      "session": "phone/play",
      "text": "Lore space 5",
-     "ms": 250,
+     "ms": 516,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Pasture space 5",
-     "ms": 250,
-     "cls": "on",
+     "text": "Round 1 of 5 Your turn dice used 4 1",
+     "ms": 1251,
+     "cls": "",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Building space 2",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Mine space 2",
-     "ms": 747,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Barge space 3",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Pasture space 1",
-     "ms": 250,
+     "ms": 500,
      "cls": "on",
      "tag": "div"
     },
@@ -854,13 +835,41 @@
     {
      "session": "phone/play",
      "text": "Pasture space 4",
+     "ms": 1007,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Barge space 3",
      "ms": 250,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Building space 2",
+     "text": "Pasture space 3",
+     "ms": 250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Mine space 2",
+     "ms": 504,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pasture space 6",
+     "ms": 250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Mine space 4",
      "ms": 250,
      "cls": "on",
      "tag": "div"
@@ -868,7 +877,7 @@
     {
      "session": "phone/play",
      "text": "Round 1 of 5 Your turn dice used 4 1",
-     "ms": 3500,
+     "ms": 3507,
      "cls": "",
      "tag": "div"
     },
@@ -881,813 +890,960 @@
     },
     {
      "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn 2 dice left: 3 4",
+     "ms": 1000,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn 2 dice left: 3 4",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
      "text": "Pasture space 6",
-     "ms": 1750,
+     "ms": 2013,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 5 Azure's turn 2 dice left: 4 6",
-     "ms": 2500,
+     "text": "Round 1 of 5 Azure's turn 2 dice left: 3 4",
+     "ms": 250,
      "cls": "",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 5 Azure's turn 1 die left: 4 6",
+     "text": "Round 1 of 5 Azure's turn 1 die left: 3 4",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn 1 die left: 3 4",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn 1 die left: 3 4",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn dice used 3 4",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn dice used 3 4",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1 of 5 Azure's turn dice used 3 4",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Lore space 1",
      "ms": 500,
-     "cls": "",
+     "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 5 Azure's turn 1 die left: 4 6",
+     "text": "Barge space 4",
      "ms": 250,
-     "cls": "",
+     "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Round 1 of 5 Azure's turn 1 die left: 4 6",
+     "text": "Barge space 3",
      "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 5 Azure's turn dice used 4 6",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 5 Azure's turn dice used 4 6",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 2 of 5 Your turn 2 dice left: 1 4",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 2 of 5 Your turn 2 dice left: 1 4",
-     "ms": 250,
-     "cls": "",
+     "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Azure's turn is over Both dice used.",
-     "ms": 500,
+     "ms": 1000,
      "cls": "on rv",
      "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Round 2 of 5 Your turn 2 dice left: 1 4",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 1 of 5 done New dice for everyone. White die 4: a Wool crate goes to stall 4.",
-     "ms": 250,
-     "cls": "on round",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 2 of 5 Your turn 2 dice left: 1 4",
-     "ms": 750,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 2 of 5 Your turn 2 dice left: 1 4",
-     "ms": 250,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Round 2 of 5 Your turn 2 dice left: 1 4",
-     "ms": 500,
-     "cls": "",
+     "text": "Pasture space 6",
+     "ms": 753,
+     "cls": "on",
      "tag": "div"
     }
    ]
   },
   "c": {
    "status": "FAIL",
-   "count": 39,
+   "count": 62,
    "detail": [
     {
      "session": "phone/learn",
      "text": "Use your 4: take a tile from stall 4, or build a stored tile on a 4-space, or sell your 4 goods.",
      "words": 22,
-     "at": 2043,
+     "at": 4197,
      "where": "div."
     },
     {
      "session": "phone/learn",
      "text": "Use your 1: take a tile from stall 1, or build a stored tile on a 1-space.",
      "words": 17,
-     "at": 4003,
+     "at": 6002,
      "where": "div."
     },
     {
      "session": "phone/learn",
      "text": "That tile wants a home: same colour, a die's number, touching your land.",
      "words": 13,
-     "at": 4004,
+     "at": 6003,
      "where": "span.gt"
     },
     {
      "session": "phone/learn",
-     "text": "Tap a glowing space: gold +N = points now, 2/4 = region progress, ★ = best spot.",
+     "text": "Tiles marked with a worker are one pip off your dice: spend a worker to take them.",
      "words": 17,
-     "at": 5025,
-     "where": "div."
+     "at": 7025,
+     "where": "span.gt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Pastures score every animal of that kind in the same meadow, this one included.",
+     "words": 14,
+     "at": 8003,
+     "where": "span.gt"
     },
     {
      "session": "phone/learn",
      "text": "Gold +N is what that space scores right now; 2/4 means its region gets closer to full.",
      "words": 17,
-     "at": 5027,
+     "at": 9117,
      "where": "span.gt"
-    },
-    {
-     "session": "phone/learn",
-     "text": "End your turn (the back lane can still sell you a tile for silver).",
-     "words": 14,
-     "at": 7004,
-     "where": "span.gt"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Take a Keep, Mine or Lore tile from a market stall into your storage.",
-     "words": 14,
-     "at": 11003,
-     "where": "p."
     },
     {
      "session": "phone/learn",
      "text": "Sell all of one kind with a die showing 3: 0 points and 1 silver.",
      "words": 15,
-     "at": 14003,
+     "at": 17004,
      "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Take a Keep, Mine or Lore tile from a market stall into your storage.",
+     "words": 14,
+     "at": 18020,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Build it on a Building space next to your land; the die must show that space's number.",
+     "words": 17,
+     "at": 20003,
+     "where": "p.tip"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Take a Barge or Pasture tile from a market stall into your storage.",
+     "words": 13,
+     "at": 21003,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Take one extra action at once, as if you had a die showing any number you like.",
+     "words": 17,
+     "at": 23015,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Build it on a Keep space next to your land; the die must show that space's number.",
+     "words": 17,
+     "at": 23015,
+     "where": "p.tip"
     },
     {
      "session": "phone/learn",
      "text": "Use your 3: take a tile from stall 3, or sell your 3 goods.",
      "words": 14,
-     "at": 20003,
+     "at": 24003,
      "where": "div."
     },
     {
      "session": "phone/learn",
-     "text": "Tap a glowing market tile to take it (its stall number matches a die).",
-     "words": 14,
-     "at": 29003,
+     "text": "Tap a glowing space: gold +N = points now, 2/4 = region progress, ★ = best spot.",
+     "words": 17,
+     "at": 25002,
      "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Latest: +4 beacon tower, round 1; +11 region filled (size 1: 1 + spring bonus 10), round 2.",
+     "words": 18,
+     "at": 35002,
+     "where": "p.why"
+    },
+    {
+     "session": "phone/learn",
+     "text": "You: 15 points · 1 silver · 1 workers · goods 2 Honey, 1 Cider",
+     "words": 15,
+     "at": 38008,
+     "where": "p."
     },
     {
      "session": "phone/learn",
      "text": "Sell all of one kind with a die showing 4: 2 points and 1 silver.",
      "words": 15,
-     "at": 29003,
+     "at": 40032,
      "where": "p."
     },
     {
      "session": "phone/learn",
-     "text": "You have 2 silver: the back lane sells any one tile per turn, no die needed.",
-     "words": 16,
-     "at": 30004,
-     "where": "span.gt"
+     "text": "Fill a whole region of one colour: size points + a season bonus (bigger early).",
+     "words": 15,
+     "at": 49008,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Animals in meadows, the beacon tower and lore add more; silver counts at the end.",
+     "words": 15,
+     "at": 49008,
+     "where": "li."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Use your 6: take a tile from stall 6, or sell your 6 goods.",
+     "words": 14,
+     "at": 52005,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Azure: 0 points · 1 silver · 0 workers · goods 1 Cheese, 1 Linen, 1 Salt",
+     "words": 17,
+     "at": 52006,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Sell all of one kind with a die showing 2: 4 points and 1 silver.",
+     "words": 15,
+     "at": 57003,
+     "where": "p."
     },
     {
      "session": "phone/play",
      "text": "Use your 1: take a tile from stall 1, or sell your 1 goods.",
      "words": 14,
-     "at": 4002,
+     "at": 6510,
      "where": "div."
+    },
+    {
+     "session": "phone/play",
+     "text": "Fill a whole region of one colour: size points + a season bonus (bigger early).",
+     "words": 15,
+     "at": 6510,
+     "where": "li."
+    },
+    {
+     "session": "phone/play",
+     "text": "Animals in meadows, the beacon tower and lore add more; silver counts at the end.",
+     "words": 15,
+     "at": 6510,
+     "where": "li."
     },
     {
      "session": "phone/play",
      "text": "Sell all of one kind with a die showing 1: 2 points and 1 silver.",
      "words": 15,
-     "at": 5002,
+     "at": 12522,
      "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "Azure: 0 points · 1 silver · 2 workers · goods 1 Cheese, 2 Salt",
+     "words": 15,
+     "at": 24509,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "Take all goods from one market stall, and move 1 step up the banner track.",
+     "words": 15,
+     "at": 28511,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "You: 2 points · 2 silver · 2 workers · goods 1 Wool, 1 Honey",
+     "words": 15,
+     "at": 32514,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "Take a Keep, Mine or Lore tile from a market stall into your storage.",
+     "words": 14,
+     "at": 38502,
+     "where": "p."
+    },
+    {
+     "session": "phone/play",
+     "text": "Use your 4: take a tile from stall 4, or build a stored tile on a 4-space.",
+     "words": 17,
+     "at": 59567,
+     "where": "div."
     },
     {
      "session": "pc/learn",
      "text": "Use your 4: take a tile from stall 4, or build a stored tile on a 4-space, or sell your 4 goods.",
      "words": 22,
-     "at": 2003,
+     "at": 5254,
      "where": "div."
     },
     {
      "session": "pc/learn",
      "text": "Use your 1: take a tile from stall 1, or build a stored tile on a 1-space.",
      "words": 17,
-     "at": 4002,
+     "at": 6256,
      "where": "div."
+    },
+    {
+     "session": "pc/learn",
+     "text": "That tile wants a home: same colour, a die's number, touching your land.",
+     "words": 13,
+     "at": 6256,
+     "where": "span.gt"
     },
     {
      "session": "pc/learn",
      "text": "All crates of one number with a matching die: points per crate and a silver.",
      "words": 15,
-     "at": 4003,
+     "at": 7276,
      "where": "span.gt"
     },
     {
      "session": "pc/learn",
-     "text": "Tiles marked with a worker are one pip off your dice: spend a worker to take them.",
-     "words": 17,
-     "at": 5008,
-     "where": "span.gt"
-    },
-    {
-     "session": "pc/learn",
-     "text": "The card tells you how your moves compared with the best ones on the table.",
-     "words": 15,
-     "at": 6002,
-     "where": "span.gt"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Tobin Reed: 0 points · 1 silver · 1 workers · goods 2 Cider, 1 Linen",
-     "words": 16,
-     "at": 12002,
-     "where": "p."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Use your 3: take a tile from stall 3, or sell your 3 goods.",
+     "text": "Pastures score every animal of that kind in the same meadow, this one included.",
      "words": 14,
-     "at": 15002,
+     "at": 10254,
+     "where": "span.gt"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Tap a glowing space: gold +N = points now, 2/4 = region progress, ★ = best spot.",
+     "words": 17,
+     "at": 13277,
      "where": "div."
     },
     {
      "session": "pc/learn",
-     "text": "Take one extra action at once, as if you had a die showing any number you like.",
+     "text": "End your turn (the back lane can still sell you a tile for silver).",
+     "words": 14,
+     "at": 15259,
+     "where": "span.gt"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Tobin Reed: 0 points · 1 silver · 3 workers · goods 2 Cider, 1 Linen",
+     "words": 16,
+     "at": 24259,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Use your 3: take a tile from stall 3, or build a stored tile on a 3-space, or sell your 3 goods.",
+     "words": 22,
+     "at": 27277,
+     "where": "div."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Use your 5: take a tile from stall 5, or build a stored tile on a 5-space.",
      "words": 17,
-     "at": 29002,
+     "at": 28276,
+     "where": "div."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Each one nudges a die up or down by 1, and 6 and 1 touch.",
+     "words": 15,
+     "at": 28277,
+     "where": "span.gt"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Take a Keep, Mine or Lore tile from a market stall into your storage.",
+     "words": 14,
+     "at": 29285,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "Build: tap a tile in your storage, then a glowing space of its colour next to your land.",
      "words": 18,
-     "at": 4004,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "Take 2 workers; each worker turns a die up or down by 1.",
      "words": 13,
-     "at": 4004,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "The bar on top shows the round, whose turn it is and the dice left.",
      "words": 15,
-     "at": 4004,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "Glowing spaces show what a build scores (+N) or how full its region gets (2/4).",
      "words": 15,
-     "at": 4004,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "a tile from the market stall with the die's number into your storage (3 spaces).",
      "words": 15,
-     "at": 4004,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "a stored tile on an empty space of its colour that shows the die's number and touches your land.",
      "words": 19,
-     "at": 4004,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "all your goods of the die's number: points per tile (2/3/4 with 2/3/4 players) and 1 silver.",
      "words": 17,
-     "at": 4005,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "Each turns a die up or down by 1 (6 and 1 are neighbours).",
      "words": 14,
-     "at": 4005,
+     "at": 6003,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "Once per turn you may a tile from the back lane for 2 silver, with no die.",
      "words": 17,
-     "at": 4005,
+     "at": 6003,
      "where": "p."
     },
     {
      "session": "pc/play",
      "text": "(yellow): bends one rule for you for the rest of the game (26 kinds).",
      "words": 14,
-     "at": 4005,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "(tan): an instant effect; never two of the same kind in one quarter.",
      "words": 13,
-     "at": 4005,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
      "text": "The lets you build again at once: chain several tiles in one turn!",
      "words": 13,
-     "at": 4005,
+     "at": 6003,
      "where": "li."
     },
     {
      "session": "pc/play",
-     "text": "Take one extra action at once, as if you had a die showing any number you like.",
-     "words": 17,
-     "at": 5004,
+     "text": "Take all goods from one market stall, and move 1 step up the banner track.",
+     "words": 15,
+     "at": 11028,
      "where": "p."
     },
     {
      "session": "pc/play",
-     "text": "Use your 5: take a tile from stall 5, or sell your 5 goods.",
-     "words": 14,
-     "at": 6003,
+     "text": "Take a Barge or Pasture tile from a market stall into your storage.",
+     "words": 13,
+     "at": 21006,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Use your 1: take a tile from stall 1, or build a stored tile on a 1-space.",
+     "words": 17,
+     "at": 22004,
      "where": "div."
     },
     {
      "session": "pc/play",
-     "text": "Latest: +11 region filled (size 1: 1 + spring bonus 10), round 1.",
-     "words": 13,
-     "at": 8002,
-     "where": "p.why"
-    },
-    {
-     "session": "pc/play",
-     "text": "Azure: 11 points · 1 silver · 0 workers · goods 1 Wool, 1 Honey, 1 Salt",
+     "text": "You: 0 points · 1 silver · 0 workers · goods 1 Honey, 1 Cider, 1 Salt",
      "words": 17,
-     "at": 8002,
+     "at": 24004,
      "where": "p."
     },
     {
      "session": "pc/play",
-     "text": "You: 0 points · 1 silver · 1 workers · goods 1 Cheese, 2 Linen",
+     "text": "Sell all of one kind with a die showing 4: 2 points and 1 silver.",
      "words": 15,
-     "at": 17003,
+     "at": 45006,
      "where": "p."
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 103,
+   "count": 161,
    "detail": [
     {
      "session": "phone/learn",
      "text": "📖 Story",
      "px": 13,
-     "at": 1003,
+     "at": 1005,
      "where": "button.btn.sec"
     },
     {
      "session": "phone/learn",
      "text": "Learn to play (start here)",
      "px": 13,
-     "at": 1003,
+     "at": 1005,
      "where": "button.btn.alt"
     },
     {
      "session": "phone/learn",
      "text": "How to play",
      "px": 13,
-     "at": 1003,
+     "at": 1005,
      "where": "button.btn.alt"
     },
     {
      "session": "phone/learn",
      "text": "Spring · season 1 of 1",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "You",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "0 pts",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.pts"
     },
     {
      "session": "phone/learn",
      "text": "no points yet",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.why"
     },
     {
      "session": "phone/learn",
      "text": "Tobin Reed",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Chapel",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "Keep",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "★ Best",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.bestb"
     },
     {
      "session": "phone/learn",
      "text": "3",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.gchip"
     },
     {
      "session": "phone/learn",
      "text": "4 Sheep",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "1",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.cost"
     },
     {
      "session": "phone/learn",
      "text": "Inn",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "Mine",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "4 Pigs",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "4 Goats",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "Lore",
      "px": 13,
-     "at": 2042,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "4 Geese",
      "px": 13,
-     "at": 2043,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "Mint",
      "px": 13,
-     "at": 2043,
+     "at": 4196,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "🪙2",
      "px": 13,
-     "at": 2043,
+     "at": 4196,
      "where": "div.sth"
     },
     {
      "session": "phone/learn",
      "text": "Fair",
      "px": 13,
-     "at": 2043,
+     "at": 4197,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "Granary",
      "px": 13,
-     "at": 2043,
+     "at": 4197,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "Joiner",
      "px": 13,
-     "at": 2043,
+     "at": 4197,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "Beacon",
      "px": 13,
-     "at": 2043,
+     "at": 4197,
      "where": "span.tlab"
     },
     {
      "session": "phone/learn",
      "text": "×2",
      "px": 13,
-     "at": 2043,
+     "at": 4197,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "4",
      "px": 13,
-     "at": 2043,
+     "at": 4197,
      "where": "span.gchip"
     },
     {
      "session": "phone/learn",
      "text": "×1",
      "px": 13,
-     "at": 2043,
+     "at": 4197,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "1/3",
      "px": 13,
-     "at": 2044,
+     "at": 4198,
      "where": "span.gxt-n"
     },
     {
      "session": "phone/learn",
      "text": "Skip tutorial",
      "px": 13,
-     "at": 2044,
+     "at": 4198,
      "where": "button.gxt-skip"
     },
     {
      "session": "phone/learn",
-     "text": "Mine tile",
-     "px": 13,
-     "at": 3047,
-     "where": "p."
-    },
-    {
-     "session": "phone/learn",
-     "text": "At the end of every season, take 1 silver.",
-     "px": 13,
-     "at": 3047,
-     "where": "p."
-    },
-    {
-     "session": "phone/learn",
-     "text": "The ★ pick is worth more to you right now.",
-     "px": 13,
-     "at": 3047,
-     "where": "p.tip"
-    },
-    {
-     "session": "phone/learn",
-     "text": "2/3",
-     "px": 13,
-     "at": 3048,
-     "where": "span.gxt-n"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+4",
-     "px": 13,
-     "at": 5025,
-     "where": "span.pvb.pts"
+     "text": "Your two dice are your two hands today. That glowing stall m",
+     "px": 13.5,
+     "at": 5015,
+     "where": "div.gxh-tx"
     },
     {
      "session": "phone/learn",
      "text": "4 pts",
      "px": 13,
-     "at": 6003,
+     "at": 9116,
      "where": "span.pts"
     },
     {
      "session": "phone/learn",
      "text": "★ leads",
      "px": 13,
-     "at": 6003,
+     "at": 9116,
      "where": "span.lead"
     },
     {
      "session": "phone/learn",
      "text": "tower 4",
      "px": 13,
-     "at": 6003,
+     "at": 9116,
      "where": "span.why"
     },
     {
      "session": "phone/learn",
-     "text": "Barge space 4",
+     "text": "Barge space 3",
      "px": 13,
-     "at": 7003,
+     "at": 11006,
+     "where": "div.on"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Pasture space 6",
+     "px": 13,
+     "at": 12006,
      "where": "div.on"
     },
     {
      "session": "phone/learn",
      "text": "Keep space 5",
      "px": 13,
-     "at": 8004,
+     "at": 13002,
      "where": "div.on"
     },
     {
      "session": "phone/learn",
      "text": "Tobin Reed's dice",
      "px": 13,
-     "at": 9003,
+     "at": 14002,
      "where": "span.dlab"
-    },
-    {
-     "session": "phone/learn",
-     "text": "×4",
-     "px": 13,
-     "at": 10003,
-     "where": "span.nn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Pasture tile",
-     "px": 13,
-     "at": 10003,
-     "where": "p."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Score the animals of this kind in this meadow (this tile inc",
-     "px": 13,
-     "at": 10003,
-     "where": "p."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Building tile",
-     "px": 13,
-     "at": 11003,
-     "where": "p."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Take a Keep, Mine or Lore tile from a market stall into your",
-     "px": 13,
-     "at": 11003,
-     "where": "p."
-    },
-    {
-     "session": "phone/learn",
-     "text": "2",
-     "px": 13,
-     "at": 14003,
-     "where": "span.gchip"
     },
     {
      "session": "phone/learn",
      "text": "Sell all of one kind with a die showing 3: 0 points and 1 si",
      "px": 13,
-     "at": 14003,
+     "at": 17004,
      "where": "p."
     },
     {
      "session": "phone/learn",
      "text": "Wait for your turn.",
      "px": 13,
-     "at": 14003,
+     "at": 17004,
      "where": "p.tip"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Building tile",
+     "px": 13,
+     "at": 18020,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Take a Keep, Mine or Lore tile from a market stall into your",
+     "px": 13,
+     "at": 18020,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "2",
+     "px": 13,
+     "at": 19001,
+     "where": "span.gchip"
+    },
+    {
+     "session": "phone/learn",
+     "text": "×4",
+     "px": 13,
+     "at": 19002,
+     "where": "span.nn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Pasture tile",
+     "px": 13,
+     "at": 19002,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Score the animals of this kind in this meadow (this tile inc",
+     "px": 13,
+     "at": 19002,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Build it on a Building space next to your land; the die must",
+     "px": 13,
+     "at": 20003,
+     "where": "p.tip"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Take a Barge or Pasture tile from a market stall into your s",
+     "px": 13,
+     "at": 21003,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Costs 2 silver, once per turn, no die needed.",
+     "px": 13,
+     "at": 21003,
+     "where": "p.tip"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Keep tile",
+     "px": 13,
+     "at": 23015,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Take one extra action at once, as if you had a die showing a",
+     "px": 13,
+     "at": 23015,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Build it on a Keep space next to your land; the die must sho",
+     "px": 13,
+     "at": 23015,
+     "where": "p.tip"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Building space 2",
+     "px": 13,
+     "at": 24003,
+     "where": "div.on"
     },
     {
      "session": "phone/learn",
      "text": "+11",
      "px": 13,
-     "at": 21004,
+     "at": 26007,
      "where": "span.pvb.pts"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Barge space 6",
+     "px": 13,
+     "at": 27003,
+     "where": "div.on"
     },
     {
      "session": "phone/learn",
      "text": "15 pts",
      "px": 13,
-     "at": 23003,
+     "at": 28007,
      "where": "span.pts"
     },
     {
      "session": "phone/learn",
      "text": "regions 11 · tower 4",
      "px": 13,
-     "at": 23003,
+     "at": 28007,
      "where": "span.why"
     },
     {
      "session": "phone/learn",
-     "text": "Pasture space 6",
+     "text": "Lore space 2",
      "px": 13,
-     "at": 23003,
+     "at": 28007,
      "where": "div.on"
     },
     {
      "session": "phone/learn",
-     "text": "Building space 5",
+     "text": "6",
      "px": 13,
-     "at": 24004,
-     "where": "div.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Building space 6",
-     "px": 13,
-     "at": 25005,
-     "where": "div.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Lore space 6",
-     "px": 13,
-     "at": 26004,
-     "where": "div.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Lore space 1",
-     "px": 13,
-     "at": 27004,
-     "where": "div.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "17 pts",
-     "px": 13,
-     "at": 30003,
-     "where": "span.pts"
-    },
-    {
-     "session": "phone/learn",
-     "text": "regions 11 · tower 4 · goods 2",
-     "px": 13,
-     "at": 30003,
-     "where": "span.why"
+     "at": 34004,
+     "where": "span.gchip"
     }
    ]
   },
@@ -1705,46 +1861,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 103,
-   "clicks": 115,
-   "endedBy": "time",
-   "tutorialEnded": 5,
+   "secs": 60,
+   "turns": 166,
+   "clicks": 179,
+   "endedBy": "result",
+   "tutorialEnded": 6,
    "hintsOff": true,
-   "messagesSeen": 84
+   "messagesSeen": 151
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 30,
-   "turns": 102,
-   "clicks": 120,
+   "secs": 60,
+   "turns": 171,
+   "clicks": 184,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 77
+   "messagesSeen": 131
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 108,
-   "clicks": 124,
+   "secs": 60,
+   "turns": 170,
+   "clicks": 191,
    "endedBy": "time",
-   "tutorialEnded": 5,
+   "tutorialEnded": 6,
    "hintsOff": true,
-   "messagesSeen": 79
+   "messagesSeen": 115
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 110,
-   "clicks": 118,
+   "secs": 60,
+   "turns": 184,
+   "clicks": 197,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 73
+   "messagesSeen": 127
   }
  ]
 }

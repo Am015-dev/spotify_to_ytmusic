@@ -1,27 +1,18 @@
 {
  "slug": "stitchwise",
- "when": "2026-11-08T02:34Z",
- "secs": 30,
- "totalSecs": 121,
+ "when": "2026-11-08T02:43Z",
+ "secs": 60,
+ "totalSecs": 62,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 6,
+   "count": 3,
    "detail": [
     {
      "kind": "two-at-once",
      "session": "pc/learn",
      "ms": 250,
-     "texts": [
-      "Aunt Wren · Ch. 1 Your first turn Cheap and quick:",
-      "Buttons 3 · income 0 per spot · 78 empty squares"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 751,
      "texts": [
       "Aunt Wren · Ch. 1 Your first turn Whoever is furth",
       "Buttons 3 · income 0 per spot · 78 empty squares"
@@ -30,7 +21,7 @@
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 250,
+     "ms": 506,
      "texts": [
       "Aunt Wren · Ch. 2 Pay day Marden's patches just pa",
       "Buttons 1 · income 0 per spot · 74 empty squares"
@@ -38,69 +29,100 @@
     },
     {
      "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 500,
-     "texts": [
-      "Aunt Wren · Ch. 2 Pay day A gold spot, but your pa",
-      "Buttons 3 · income 0 per spot · 78 empty squares"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
+     "session": "pc/learn",
      "ms": 250,
      "texts": [
-      "Aunt Wren · Ch. 2 Pay day A gold spot, but your pa",
-      "Buttons 4 · income 0 per spot · 78 empty squares"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Aunt Wren · Ch. 1 Your first turn Whoever is furth",
-      "Buttons 4 · income 0 per spot · 78 empty squares"
+      "Aunt Wren · Ch. 3 Fair surprises A leather scrap! ",
+      "You need 3 more buttons for Hook Patch. Advance to"
      ]
     }
    ]
   },
   "b": {
    "status": "FAIL",
-   "count": 14,
+   "count": 16,
    "detail": [
     {
      "session": "phone/play",
      "text": "Aunt Wren · Ch. 1 Your first turn A short fair today: we start halfway round. Marden swears no newcomer wins. Buy a glowing patch, or Advance. ×",
-     "ms": 1481,
+     "ms": 1492,
      "cls": "coach",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Buttons 5 · income 0 per spot · 81 empty squares",
-     "ms": 6000,
+     "ms": 2251,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "phone/play",
      "text": "Buttons 5 · income 0 per spot · 81 empty squares",
-     "ms": 19249,
+     "ms": 3000,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Buttons 5 · income 0 per spot · 81 empty squares",
+     "ms": 6500,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Buttons 5 · income 0 per spot · 81 empty squares",
+     "ms": 2500,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Buttons 5 · income 0 per spot · 81 empty squares",
+     "ms": 8750,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Buttons 5 · income 0 per spot · 81 empty squares",
+     "ms": 4500,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Buttons 5 · income 0 per spot · 81 empty squares",
+     "ms": 11250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Buttons 5 · income 0 per spot · 81 empty squares",
+     "ms": 4417,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Buttons 5 · income 0 per spot · 81 empty squares",
+     "ms": 1254,
      "cls": "on",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Aunt Wren · Ch. 1 Your first turn A short fair today: we start halfway round. Marden swears no newcomer wins. Buy a glowing patch, or Advance. ×",
-     "ms": 1500,
+     "ms": 2000,
      "cls": "coach",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "Aunt Wren · Ch. 1 Your first turn Lay it on your quilt, then Sew it on. Every square left empty costs 2 at the judging. ×",
-     "ms": 250,
+     "ms": 506,
      "cls": "coach",
      "tag": "div"
     },
@@ -113,86 +135,72 @@
     },
     {
      "session": "pc/play",
-     "text": "Buttons 4 · income 0 per spot · 78 empty squares",
-     "ms": 502,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Buttons 3 · income 0 per spot · 78 empty squares",
-     "ms": 1248,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
      "text": "Aunt Wren · Ch. 2 Pay day A gold spot, but your patches carry no buttons yet, so it paid 0. Buy patches with buttons! ×",
-     "ms": 751,
-     "cls": "coach",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Buttons 4 · income 0 per spot · 78 empty squares",
-     "ms": 2249,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Aunt Wren · Ch. 1 Your first turn Whoever is further back on the track moves next. Now that is Marden: watch. ×",
-     "ms": 500,
-     "cls": "coach",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Aunt Wren · Ch. 3 Fair surprises A leather scrap! You passed it first, so it is yours, free: put it on any empty square. ×",
      "ms": 250,
      "cls": "coach",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Buttons 7 · income 0 per spot · 78 empty squares",
-     "ms": 7750,
-     "cls": "on",
+     "text": "Aunt Wren · Ch. 1 Your first turn Whoever is further back on the track moves next. Now that is Marden: watch. ×",
+     "ms": 1015,
+     "cls": "coach",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Buttons 7 · income 0 per spot · 78 empty squares",
-     "ms": 10750,
-     "cls": "on",
+     "text": "Aunt Wren · Ch. 3 Fair surprises Marden is still behind you, so Marden moves again. Big, slow patches give turns away. ×",
+     "ms": 1250,
+     "cls": "coach",
      "tag": "div"
     }
    ]
   },
   "c": {
    "status": "FAIL",
-   "count": 3,
+   "count": 6,
    "detail": [
     {
      "session": "phone/learn",
      "text": "3 squares · cost · income (0×4 gold spots) · time 3 · 7×7 3/49",
      "words": 15,
-     "at": 13006,
+     "at": 22256,
      "where": "div."
+    },
+    {
+     "session": "pc/learn",
+     "text": "3 squares · cost · income (0×5 gold spots) · time 2 · 7×7 3/49",
+     "words": 15,
+     "at": 20003,
+     "where": "div."
+    },
+    {
+     "session": "pc/learn",
+     "text": "You passed it first, so it is yours, free: put it on any empty square.",
+     "words": 15,
+     "at": 36256,
+     "where": "span."
     },
     {
      "session": "pc/play",
      "text": "3 squares · cost · income (0×4 gold spots) · time 3 · 7×7 3/49",
      "words": 15,
-     "at": 4003,
+     "at": 7002,
      "where": "div."
     },
     {
      "session": "pc/play",
-     "text": "Cheap and quick: your token barely moves, so you may get the next turn too.",
+     "text": "3 squares · cost · income (0×4 gold spots) · time 1 · 7×7 6/49",
      "words": 15,
-     "at": 6002,
-     "where": "span."
+     "at": 16303,
+     "where": "div."
+    },
+    {
+     "session": "pc/play",
+     "text": "4 squares · cost · income (0×4 gold spots) · time 2 · 7×7 7/49",
+     "words": 15,
+     "at": 18318,
+     "where": "div."
     }
    ]
   },
@@ -204,259 +212,259 @@
      "session": "phone/learn",
      "text": "Patches",
      "px": 13,
-     "at": 1003,
+     "at": 1004,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "Rules",
      "px": 13,
-     "at": 1003,
+     "at": 1004,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "Menu",
      "px": 13,
-     "at": 1003,
+     "at": 1004,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "5",
      "px": 13,
-     "at": 2002,
+     "at": 5012,
      "where": "span.nb"
     },
     {
      "session": "phone/learn",
      "text": "income",
      "px": 13,
-     "at": 2002,
+     "at": 5012,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "+0",
      "px": 13,
-     "at": 2002,
+     "at": 5012,
      "where": "span.bt"
     },
     {
      "session": "phone/learn",
      "text": "81 gaps",
      "px": 13,
-     "at": 2002,
+     "at": 5012,
      "where": "span.bt.emp"
     },
     {
      "session": "phone/learn",
      "text": "Aunt Wren · Ch. 1 Your first turn",
      "px": 13,
-     "at": 2003,
+     "at": 5012,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "Corner Patch",
      "px": 13,
-     "at": 2003,
+     "at": 5012,
      "where": "span.onm"
     },
     {
      "session": "phone/learn",
      "text": "cost",
      "px": 13,
-     "at": 2003,
+     "at": 5012,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "time",
      "px": 13,
-     "at": 2003,
+     "at": 5012,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "earn",
      "px": 13,
-     "at": 2003,
+     "at": 5012,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "Bias Binding",
      "px": 13,
-     "at": 2003,
+     "at": 5012,
      "where": "span.onm"
     },
     {
      "session": "phone/learn",
      "text": "Long Strip",
      "px": 13,
-     "at": 2003,
+     "at": 5012,
      "where": "span.onm"
     },
     {
      "session": "phone/learn",
      "text": "Best +9",
      "px": 13,
-     "at": 2003,
+     "at": 5012,
      "where": "span.badge"
     },
     {
      "session": "phone/learn",
      "text": "4",
      "px": 13,
-     "at": 14012,
+     "at": 23270,
      "where": "span.nb"
     },
     {
      "session": "phone/learn",
      "text": "78 gaps",
      "px": 13,
-     "at": 14012,
+     "at": 23270,
      "where": "span.bt.emp"
     },
     {
      "session": "phone/learn",
      "text": "Boot Patch",
      "px": 13,
-     "at": 14012,
+     "at": 23270,
      "where": "span.onm"
     },
     {
      "session": "phone/learn",
      "text": "3",
      "px": 13,
-     "at": 16002,
+     "at": 25260,
      "where": "span.nb"
     },
     {
      "session": "phone/learn",
      "text": "1",
      "px": 13,
-     "at": 18001,
+     "at": 27254,
      "where": "span.nb"
     },
     {
      "session": "phone/learn",
      "text": "+1",
      "px": 13,
-     "at": 18001,
+     "at": 27254,
      "where": "span.bt"
     },
     {
      "session": "phone/learn",
      "text": "74 gaps",
      "px": 13,
-     "at": 18001,
+     "at": 27254,
      "where": "span.bt.emp"
     },
     {
      "session": "phone/play",
      "text": "Patches",
      "px": 13,
-     "at": 1003,
+     "at": 1212,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "Rules",
      "px": 13,
-     "at": 1003,
+     "at": 1212,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "Menu",
      "px": 13,
-     "at": 1003,
+     "at": 1212,
      "where": "span."
     },
     {
      "session": "phone/play",
      "text": "5",
      "px": 13,
-     "at": 2032,
+     "at": 4265,
      "where": "span.nb"
     },
     {
      "session": "phone/play",
      "text": "income",
      "px": 13,
-     "at": 2032,
+     "at": 4265,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "+0",
      "px": 13,
-     "at": 2032,
+     "at": 4265,
      "where": "span.bt"
     },
     {
      "session": "phone/play",
      "text": "81 gaps",
      "px": 13,
-     "at": 2032,
+     "at": 4265,
      "where": "span.bt.emp"
     },
     {
      "session": "phone/play",
      "text": "Aunt Wren · Ch. 1 Your first turn",
      "px": 13,
-     "at": 2038,
+     "at": 4265,
      "where": "b."
     },
     {
      "session": "phone/play",
      "text": "Corner Patch",
      "px": 13,
-     "at": 2038,
+     "at": 4265,
      "where": "span.onm"
     },
     {
      "session": "phone/play",
      "text": "cost",
      "px": 13,
-     "at": 2038,
+     "at": 4265,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "time",
      "px": 13,
-     "at": 2038,
+     "at": 4265,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "earn",
      "px": 13,
-     "at": 2038,
+     "at": 4265,
      "where": "small."
     },
     {
      "session": "phone/play",
      "text": "Bias Binding",
      "px": 13,
-     "at": 2038,
+     "at": 4265,
      "where": "span.onm"
     },
     {
      "session": "phone/play",
      "text": "Long Strip",
      "px": 13,
-     "at": 2038,
+     "at": 4265,
      "where": "span.onm"
     },
     {
      "session": "phone/play",
      "text": "Best +9",
      "px": 13,
-     "at": 2039,
+     "at": 4265,
      "where": "span.badge"
     }
    ]
@@ -475,46 +483,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 51,
-   "clicks": 75,
-   "endedBy": "time",
-   "tutorialEnded": null,
-   "hintsOff": true,
-   "messagesSeen": 6
-  },
-  {
-   "size": "phone",
-   "mode": "play",
-   "secs": 30,
-   "turns": 80,
-   "clicks": 119,
-   "endedBy": "time",
-   "tutorialEnded": null,
-   "hintsOff": true,
-   "messagesSeen": 3
-  },
-  {
-   "size": "pc",
-   "mode": "learn",
-   "secs": 30,
-   "turns": 68,
-   "clicks": 80,
-   "endedBy": "time",
-   "tutorialEnded": null,
-   "hintsOff": true,
-   "messagesSeen": 12
-  },
-  {
-   "size": "pc",
-   "mode": "play",
-   "secs": 30,
-   "turns": 99,
+   "secs": 60,
+   "turns": 88,
    "clicks": 126,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 11
+   "messagesSeen": 8
+  },
+  {
+   "size": "phone",
+   "mode": "play",
+   "secs": 60,
+   "turns": 111,
+   "clicks": 158,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 10
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 60,
+   "turns": 119,
+   "clicks": 143,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 20
+  },
+  {
+   "size": "pc",
+   "mode": "play",
+   "secs": 21,
+   "turns": 22,
+   "clicks": 26,
+   "endedBy": "result",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 6
   }
  ]
 }

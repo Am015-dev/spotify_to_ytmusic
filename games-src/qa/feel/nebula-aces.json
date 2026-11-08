@@ -1,345 +1,23 @@
 {
  "slug": "nebula-aces",
- "when": "2026-11-08T02:32Z",
- "secs": 30,
- "totalSecs": 123,
+ "when": "2026-11-08T02:40Z",
+ "secs": 60,
+ "totalSecs": 49,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 33,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "R1 Move",
-     "words": 2,
-     "shownMs": 537,
-     "neededMs": 4200,
-     "cls": "ph-chip"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "R1 Move",
-     "words": 2,
-     "shownMs": 498,
-     "neededMs": 4200,
-     "cls": "ph-chip"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 596,
-     "texts": [
-      "R1 Plan you",
-      "Brecken: Your goal Slate is raiding our convoy. De"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 912,
-     "texts": [
-      "R1 Plan you",
-      "Brecken: Free flight Your move is set. Plan, then "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 511,
-     "texts": [
-      "R1 Plan you",
-      "Brecken: Dials are secret Neither of you can peek."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 537,
-     "texts": [
-      "R1 Move",
-      "Brecken: Who goes first Lowest pilot skill moves f"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 2259,
-     "texts": [
-      "R1 Move you",
-      "Brecken: Who goes first Lowest pilot skill moves f"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1019,
-     "texts": [
-      "R1 Move you",
-      "Brecken: One action After flying, every ship gets "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 476,
-     "texts": [
-      "R1 Move",
-      "Brecken: Target lock A lock lets you reroll attack"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1016,
-     "texts": [
-      "R1 Fire",
-      "Brecken: Target lock A lock lets you reroll attack"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 524,
-     "texts": [
-      "R1 Fire you",
-      "Brecken: Pilot power Kael can turn one focus resul"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 967,
-     "texts": [
-      "R1 Fire you",
-      "Brecken: Pilot power Kael can turn one focus resul",
-      "Defend yourself Spend a token to cancel hits, or t"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1451,
-     "texts": [
-      "R1 Fire",
-      "Brecken: Pilot power Kael can turn one focus resul"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "R1 Fire",
-      "Slate: Got you! Ouch. Keep out of his front arc, o"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "R1 End",
-      "Slate: Got you! Ouch. Keep out of his front arc, o"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "R1 End you",
-      "Brecken: Shields first Damage strips shields befor"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 557,
-     "texts": [
-      "R1 End you",
-      "Brecken: Round end At the end of each round unused",
-      "Plan your move Tap your ship, then choose where it"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 704,
-     "texts": [
-      "R2 Plan you",
-      "Brecken: Red and rocks Red moves strain the engine"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/play",
-     "ms": 250,
-     "texts": [
-      "R1 Plan you",
-      "Plan your move Tap your ship, then choose where it"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 657,
-     "texts": [
-      "R1 Plan you",
-      "Brecken: Your goal Slate is raiding our convoy. De"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "R1 Plan you",
-      "Brecken: Free flight Your move is set. Plan, then "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 654,
-     "texts": [
-      "R1 Move",
-      "Brecken: Free flight Your move is set. Plan, then "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "R1 Move you",
-      "Brecken: Dials are secret Neither of you can peek."
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 2620,
-     "texts": [
-      "R1 Move you",
-      "Brecken: Who goes first Lowest pilot skill moves f"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "R1 Move you",
-      "Brecken: One action After flying, every ship gets "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "R1 Move you",
-      "Brecken: Target lock A lock lets you reroll attack"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "R1 Fire you",
-      "Brecken: Pilot power Kael can turn one focus resul"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "R1 Fire you",
-      "Brecken: Pilot power Kael can turn one focus resul"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 631,
-     "texts": [
-      "R1 Fire you",
-      "Brecken: Pilot power Kael can turn one focus resul",
-      "Defend yourself Spend a token to cancel hits, or t"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1194,
-     "texts": [
-      "R1 Fire you",
-      "Brecken: Pilot power Kael can turn one focus resul"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 553,
-     "texts": [
-      "R1 Fire you",
-      "Brecken: Pilot power Kael can turn one focus resul"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1577,
-     "texts": [
-      "R1 Fire",
-      "Brecken: Pilot power Kael can turn one focus resul"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 732,
-     "texts": [
-      "R1 Fire",
-      "Slate: Got you! Ouch. Keep out of his front arc, o"
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
    "status": "FAIL",
-   "count": 4,
+   "count": 1,
    "detail": [
     {
      "session": "phone/play",
      "text": "Nebula Aces",
-     "ms": 4094,
-     "cls": "ph-chip",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Setup you",
-     "ms": 2868,
-     "cls": "ph-chip",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Plan your move Tap your ship, then choose where it will fly. Got it",
      "ms": 250,
-     "cls": "gxh-bub gxh-a-bottom on",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "R1 Plan you",
-     "ms": 18492,
      "cls": "ph-chip",
      "tag": "div"
     }
@@ -347,650 +25,146 @@
   },
   "c": {
    "status": "FAIL",
-   "count": 23,
+   "count": 5,
    "detail": [
     {
-     "session": "phone/learn",
-     "text": "A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.",
-     "words": 13,
-     "at": 6509,
-     "where": "p.lead"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Take the lesson above, or just press : the defaults are a good first battle.",
-     "words": 15,
-     "at": 6509,
-     "where": "p.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Keep out of his front arc, or use an evade token before he shoots.",
-     "words": 14,
-     "at": 26760,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.",
-     "words": 13,
-     "at": 5519,
-     "where": "p.lead"
-    },
-    {
-     "session": "phone/play",
-     "text": "Take the lesson above, or just press : the defaults are a good first battle.",
-     "words": 15,
-     "at": 5519,
-     "where": "p.small"
-    },
-    {
-     "session": "phone/play",
-     "text": "When defending, you may change 1 of your focus results to an evade result.",
-     "words": 14,
-     "at": 10089,
-     "where": "p.ab"
-    },
-    {
      "session": "pc/learn",
      "text": "A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.",
      "words": 13,
-     "at": 4991,
+     "at": 47070,
      "where": "p.lead"
     },
     {
      "session": "pc/learn",
      "text": "Take the lesson above, or just press : the defaults are a good first battle.",
      "words": 15,
-     "at": 4991,
+     "at": 47070,
      "where": "p.small"
-    },
-    {
-     "session": "pc/learn",
-     "text": "When defending, you may change 1 of your focus results to an evade result.",
-     "words": 14,
-     "at": 15102,
-     "where": "p.ab"
-    },
-    {
-     "session": "pc/learn",
-     "text": "one ship at a time may shoot an enemy inside its arc at range 1-3, .",
-     "words": 16,
-     "at": 21060,
-     "where": "p.roadinfo"
-    },
-    {
-     "session": "pc/learn",
-     "text": "✹ hit = 1 damage · ✸ crit = 1 damage + a damage card · ◉ focus = a…",
-     "words": 20,
-     "at": 23171,
-     "where": "p.dleg.tl"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Keep out of his front arc, or use an evade token before he shoots.",
-     "words": 14,
-     "at": 30682,
-     "where": "span."
     },
     {
      "session": "pc/play",
      "text": "A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.",
      "words": 13,
-     "at": 4802,
+     "at": 2010,
      "where": "p.lead"
     },
     {
      "session": "pc/play",
      "text": "Take the lesson above, or just press : the defaults are a good first battle.",
      "words": 15,
-     "at": 4802,
+     "at": 2010,
      "where": "p.small"
     },
     {
      "session": "pc/play",
-     "text": "The two sides take turns placing 6 asteroids; 3 are already down (the grey rocks).",
-     "words": 15,
-     "at": 9792,
-     "where": "p.small"
-    },
-    {
-     "session": "pc/play",
-     "text": "Asteroids: flying through one damages you and skips your action; shooting past one gives the defender +1 die.",
-     "words": 18,
-     "at": 9792,
-     "where": "p.small"
-    },
-    {
-     "session": "pc/play",
-     "text": "tap an outlined spot on the mat, or pick one below (columns A-E from your left, rows 1-5 from your edge).",
-     "words": 21,
-     "at": 9792,
-     "where": "p.small.muted"
-    },
-    {
-     "session": "pc/play",
-     "text": "★ is suggested: in their half, where it blocks their approach and not yours.",
+     "text": "Needle, Razor, the Longhaul freighter and the Warden gunship; bombs, crew, turrets, rear arcs.",
      "words": 14,
-     "at": 9792,
-     "where": "p.small.muted"
-    },
-    {
-     "session": "pc/play",
-     "text": "The two sides take turns placing 6 asteroids; 5 are already down (the grey rocks).",
-     "words": 15,
-     "at": 10863,
-     "where": "p.small"
-    },
-    {
-     "session": "pc/play",
-     "text": "one ship at a time may shoot an enemy inside its arc at range 1-3, .",
-     "words": 16,
-     "at": 12148,
-     "where": "p.roadinfo"
-    },
-    {
-     "session": "pc/play",
-     "text": "green = easy (clears stress) white = normal red = hard (gives stress)",
-     "words": 13,
-     "at": 12148,
-     "where": "div.dlegend"
-    },
-    {
-     "session": "pc/play",
-     "text": ": closes in but stays out of their arcs: they must come to you, if they stay where they are.",
-     "words": 20,
-     "at": 12155,
-     "where": "div.recbox"
-    },
-    {
-     "session": "pc/play",
-     "text": "Then starts: ships reveal their dials and move one by one, lowest pilot skill first (Slate 3 → Knifepoint 7 → Kael Varro 8).",
-     "words": 24,
-     "at": 13478,
-     "where": "p.now-t"
+     "at": 2010,
+     "where": "small."
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 112,
+   "count": 5,
    "detail": [
     {
-     "session": "phone/learn",
-     "text": "Squads",
-     "px": 0,
-     "at": 6509,
-     "where": "span.icw"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Rules",
-     "px": 0,
-     "at": 6509,
-     "where": "span.icw"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Guide:",
-     "px": 0,
-     "at": 6509,
-     "where": "span.icw"
-    },
-    {
-     "session": "phone/learn",
-     "text": "First time? Take the lesson above, or just press : the defau",
-     "px": 13,
-     "at": 6509,
-     "where": "p.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Launch",
-     "px": 13,
-     "at": 6509,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Ten chapters, three bosses",
-     "px": 13,
-     "at": 6509,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Free and direct: your browsers connect to each other. Host a",
-     "px": 13,
-     "at": 6509,
-     "where": "p.small.muted"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Kael Varro",
-     "px": 13,
-     "at": 9072,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "♥3",
-     "px": 13,
-     "at": 9072,
-     "where": "em.h"
-    },
-    {
-     "session": "phone/learn",
-     "text": "◈2",
-     "px": 13,
-     "at": 9072,
-     "where": "em.sh"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Slate",
-     "px": 13,
-     "at": 9072,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "You ✈ ♥5",
-     "px": 13,
-     "at": 9072,
-     "where": "span.y"
-    },
-    {
-     "session": "phone/learn",
-     "text": "1",
-     "px": 13,
-     "at": 9072,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "vs",
-     "px": 13,
-     "at": 9072,
-     "where": "span.vs"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Enemy ✈ ♥3",
-     "px": 13,
-     "at": 9072,
-     "where": "span.e"
-    },
-    {
-     "session": "phone/learn",
-     "text": "2",
-     "px": 13,
-     "at": 10033,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "!",
-     "px": 11,
-     "at": 10033,
-     "where": "em.rk"
-    },
-    {
-     "session": "phone/learn",
-     "text": "3",
-     "px": 13,
-     "at": 10033,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "4",
-     "px": 13,
-     "at": 10033,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "●",
-     "px": 11.5,
-     "at": 10033,
-     "where": "b.g"
-    },
-    {
-     "session": "phone/learn",
-     "text": "easy hard · 🎯 enemy ahead · rock",
-     "px": 11.5,
-     "at": 10033,
-     "where": "div.bfleg"
-    },
-    {
-     "session": "phone/learn",
-     "text": "!",
-     "px": 11.5,
-     "at": 10033,
-     "where": "b.rk"
-    },
-    {
-     "session": "phone/learn",
-     "text": "you",
-     "px": 13,
-     "at": 11006,
-     "where": "i.you"
-    },
-    {
-     "session": "phone/learn",
-     "text": "↖",
-     "px": 13,
-     "at": 11006,
-     "where": "button.bfm.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "↑",
-     "px": 13,
-     "at": 14057,
-     "where": "button.bfm.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "4",
-     "px": 11,
-     "at": 14058,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "↗",
-     "px": 13,
-     "at": 15098,
-     "where": "button.bfm.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "◉",
-     "px": 13,
-     "at": 16255,
-     "where": "em.f"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Focus",
-     "px": 13,
-     "at": 18626,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Lock",
-     "px": 13,
-     "at": 18626,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Skip",
-     "px": 9,
-     "at": 18626,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Tutorial ✓",
-     "px": 13,
-     "at": 19631,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Log",
+     "session": "phone/play",
+     "text": "🛩 Squads",
      "px": 12.5,
-     "at": 19631,
-     "where": "span.icw"
+     "at": 1103,
+     "where": "button.btn.gx-tb"
     },
     {
-     "session": "phone/learn",
-     "text": "Auto · Low",
-     "px": 13.6,
-     "at": 19631,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Tips",
-     "px": 13.6,
-     "at": 19631,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "On",
+     "session": "phone/play",
+     "text": "❔ Rules",
      "px": 13.1,
-     "at": 19631,
+     "at": 1103,
      "where": "button.btn"
     },
     {
-     "session": "phone/learn",
-     "text": "Off",
+     "session": "phone/play",
+     "text": "⚙",
      "px": 13.1,
-     "at": 19631,
-     "where": "button.btn"
+     "at": 1103,
+     "where": "button.btn.gx-gear"
     },
     {
-     "session": "phone/learn",
-     "text": "Show tips again",
+     "session": "phone/play",
+     "text": "⬒ View",
      "px": 13.6,
-     "at": 19631,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Reset tips",
-     "px": 13.1,
-     "at": 19631,
+     "at": 1103,
      "where": "button.btn"
     },
     {
-     "session": "phone/learn",
-     "text": "shoots",
-     "px": 12,
-     "at": 22752,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "ATTACK",
-     "px": 12,
-     "at": 22752,
-     "where": "span.who"
-    },
-    {
-     "session": "phone/learn",
-     "text": "DODGE",
-     "px": 12,
-     "at": 22752,
-     "where": "span.who"
-    },
-    {
-     "session": "phone/learn",
-     "text": "rolls next",
-     "px": 13.5,
-     "at": 22752,
-     "where": "i.muted"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Spend a token to cancel hits, or tap Done.",
-     "px": 13.5,
-     "at": 23866,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "◈0",
-     "px": 13,
-     "at": 24918,
-     "where": "em.sh"
-    },
-    {
-     "session": "phone/learn",
-     "text": "You ✈ ♥3",
-     "px": 13,
-     "at": 24918,
-     "where": "span.y"
-    },
-    {
-     "session": "phone/learn",
-     "text": "🎯",
-     "px": 13,
-     "at": 30077,
-     "where": "em.tg"
-    },
-    {
      "session": "phone/play",
-     "text": "Squads",
-     "px": 0,
-     "at": 5518,
-     "where": "span.icw"
-    },
-    {
-     "session": "phone/play",
-     "text": "Rules",
-     "px": 0,
-     "at": 5518,
-     "where": "span.icw"
-    },
-    {
-     "session": "phone/play",
-     "text": "Guide:",
-     "px": 0,
-     "at": 5519,
-     "where": "span.icw"
-    },
-    {
-     "session": "phone/play",
-     "text": "First time? Take the lesson above, or just press : the defau",
-     "px": 13,
-     "at": 5519,
-     "where": "p.small"
-    },
-    {
-     "session": "phone/play",
-     "text": "Launch",
-     "px": 13,
-     "at": 5519,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "Ten chapters, three bosses",
-     "px": 13,
-     "at": 5519,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "Free and direct: your browsers connect to each other. Host a",
-     "px": 13,
-     "at": 5519,
-     "where": "p.small.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "you",
-     "px": 13,
-     "at": 10088,
-     "where": "i.you"
-    },
-    {
-     "session": "phone/play",
-     "text": "Kael Varro",
-     "px": 13,
-     "at": 10088,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "♥3",
-     "px": 13,
-     "at": 10088,
-     "where": "em.h"
-    },
-    {
-     "session": "phone/play",
-     "text": "◈2",
-     "px": 13,
-     "at": 10088,
-     "where": "em.sh"
-    },
-    {
-     "session": "phone/play",
-     "text": "Knifepoint",
-     "px": 13,
-     "at": 10088,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "Slate",
-     "px": 13,
-     "at": 10088,
-     "where": "b."
+     "text": "📘 Guide",
+     "px": 12.8,
+     "at": 1103,
+     "where": "button.gx-ibtn.na-guide"
     }
    ]
   },
   "e": {
-   "status": "PASS",
+   "status": "N/A",
    "count": 0,
    "detail": []
   }
  },
  "notes": [
-  "phone/play: Play button not found",
-  "pc/play: Play button not found"
+  "phone/learn: page.goto: Timeout 45000ms exceeded.",
+  "phone/play: page.goto: Timeout 45000ms exceeded.",
+  "pc/learn: page.goto: Timeout 45000ms exceeded.",
+  "pc/play: page.goto: Timeout 45000ms exceeded.",
+  "(e) <10 turns reached: phone/learn=0 phone/play=0 pc/learn=0 pc/play=0"
  ],
  "sessions": [
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 31,
-   "turns": 27,
-   "clicks": 25,
-   "endedBy": "result",
-   "tutorialEnded": 11,
+   "secs": 47,
+   "turns": 0,
+   "clicks": 0,
+   "endedBy": "time",
+   "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 24
+   "error": "page.goto: Timeout 45000ms exceeded.",
+   "messagesSeen": 1
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 31,
-   "turns": 14,
-   "clicks": 17,
+   "secs": 46,
+   "turns": 0,
+   "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 4
+   "error": "page.goto: Timeout 45000ms exceeded.",
+   "messagesSeen": 1
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 31,
-   "turns": 25,
-   "clicks": 23,
-   "endedBy": "result",
-   "tutorialEnded": 9,
+   "secs": 48,
+   "turns": 0,
+   "clicks": 0,
+   "endedBy": "time",
+   "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 17
+   "error": "page.goto: Timeout 45000ms exceeded.",
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 31,
-   "turns": 25,
-   "clicks": 29,
+   "secs": 48,
+   "turns": 0,
+   "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
+   "error": "page.goto: Timeout 45000ms exceeded.",
    "messagesSeen": 0
   }
  ]

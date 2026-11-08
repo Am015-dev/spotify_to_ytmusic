@@ -1,21 +1,48 @@
 {
  "slug": "hollowbough",
- "when": "2026-11-08T02:30Z",
- "secs": 30,
- "totalSecs": 100,
+ "when": "2026-11-08T02:41Z",
+ "secs": 60,
+ "totalSecs": 62,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 35,
+   "count": 47,
    "detail": [
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "🐇 Hazel The thaw is here and the Elderheart Oak needs a steward. Most points when we have both passed wins it. Start anywhere: the Twig Heap is a safe first pi",
+     "words": 32,
+     "shownMs": 6647,
+     "neededMs": 7200,
+     "cls": "on"
+    },
     {
      "kind": "too-short",
      "session": "phone/learn",
      "text": "Resin Pool: +2 resin Gain 2 resin.",
      "words": 7,
-     "shownMs": 250,
+     "shownMs": 760,
      "neededMs": 4700,
+     "cls": "hbtoast"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "🐇 Hazel The thaw is here and the Elderheart Oak needs a steward. Most points when we have both passed wins it. Start anywhere: the Twig Heap is a safe first pi",
+     "words": 32,
+     "shownMs": 6508,
+     "neededMs": 7200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Kindling Glen: +2 twig, +1 card Gain 2 twigs and draw 1 card. Shared.",
+     "words": 14,
+     "shownMs": 569,
+     "neededMs": 5400,
      "cls": "hbtoast"
     },
     {
@@ -23,7 +50,7 @@
      "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
+      "🐇 Hazel Each turn you send one worker to one plac",
       "Resin Pool: +2 resin Gain 2 resin.",
       "Turn over: Each player takes one action, then the "
      ]
@@ -31,16 +58,26 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 742,
+     "ms": 250,
      "texts": [
-      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
+      "🐇 Hazel Each turn you send one worker to one plac",
+      "Resin Pool: +2 resin Gain 2 resin.",
       "Turn over: Each player takes one action, then the "
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 992,
+     "ms": 387,
+     "texts": [
+      "🐇 Hazel Each turn you send one worker to one plac",
+      "Turn over: Each player takes one action, then the "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 939,
      "texts": [
       "🐇 Hazel Twigs, resin, pebbles and berries pay for",
       "Turn over: Each player takes one action, then the ",
@@ -50,7 +87,7 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 526,
+     "ms": 756,
      "texts": [
       "🐇 Hazel Twigs, resin, pebbles and berries pay for",
       "Turn over: Each player takes one action, then the ",
@@ -60,67 +97,54 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 691,
      "texts": [
       "🐇 Hazel Twigs, resin, pebbles and berries pay for",
-      "Turn over: All your workers are out, so only a car",
-      "+1 You: point tokens"
+      "+1 Bramble: card points"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 2269,
+     "ms": 501,
      "texts": [
       "🐇 Hazel Bramble sent a worker. A place without th",
-      "Turn over: All your workers are out, so only a car",
-      "+1 You: point tokens"
+      "+1 Bramble: card points"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 646,
      "texts": [
       "🐇 Hazel Bramble sent a worker. A place without th",
-      "+1 You: point tokens"
+      "+1 Bramble: card points"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 1278,
      "texts": [
-      "🐇 Hazel Your hand holds plans: each shows its pri",
-      "This move: nothing now"
+      "🐇 Hazel Good: the best of 15 moves. +2 twig, +1 c",
+      "Turn over: All your workers are out, so only a car"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 2239,
+     "ms": 391,
      "texts": [
-      "🐇 Hazel The forest pays more goods than the basic",
-      "Turn over: All your workers are out, so only a car",
-      "+1 You: card points"
+      "🐇 Hazel Good: the best of 15 moves. +2 twig, +1 c",
+      "Turn over: All your workers are out, so only a car"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 423,
      "texts": [
-      "🐇 Hazel A building! It stays in your city. Produc",
-      "Turn over: All your workers are out, so only a car",
-      "+1 You: card points"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 755,
-     "texts": [
-      "🐇 Hazel A building! It stays in your city. Produc",
+      "🐇 Hazel Good: the best of 15 moves. +2 twig, +1 c",
       "Turn over: All your workers are out, so only a car"
      ]
     },
@@ -129,7 +153,7 @@
      "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "🐇 Hazel A building! It stays in your city. Produc",
+      "🐇 Hazel Your hand holds plans: each shows its pri",
       "Turn over: All your workers are out, so only a car",
       "+1 You: card points"
      ]
@@ -137,10 +161,58 @@
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 1481,
+     "ms": 2161,
+     "texts": [
+      "🐇 Hazel Your hand holds plans: each shows its pri",
+      "Turn over: All your workers are out, so only a car",
+      "+1 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "🐇 Hazel Your hand holds plans: each shows its pri",
+      "Turn over: All your workers are out, so only a car"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 501,
      "texts": [
       "🐇 Hazel A building! It stays in your city. Produc",
-      "+1 You: card points"
+      "Turn over: All your workers are out, so only a car"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1789,
+     "texts": [
+      "🐇 Hazel Good: Brother Moss is built. It will keep",
+      "Turn over: All your workers are out, so only a car"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 508,
+     "texts": [
+      "🐇 Hazel Good: Brother Moss is built. It will keep",
+      "Turn over: All your workers are out, so only a car",
+      "+2 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "🐇 Hazel Good: Brother Moss is built. It will keep",
+      "Turn over: All your workers are out, so only a car",
+      "+2 You: card points"
      ]
     },
     {
@@ -148,8 +220,101 @@
      "session": "phone/learn",
      "ms": 739,
      "texts": [
-      "🐇 Hazel Good: the best of 7 moves. +1 point, +1 c",
-      "+1 You: card points"
+      "🐇 Hazel Okay: Play Goodman Vole from your hand fr",
+      "Turn over: All your workers are out, so only a car",
+      "+2 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "🐇 Hazel Okay: Play Goodman Vole from your hand fr",
+      "Turn over: All your workers are out, so only a car",
+      "+2 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 479,
+     "texts": [
+      "🐇 Hazel Okay: Play Goodman Vole from your hand fr",
+      "Turn over: All your workers are out, so only a car",
+      "+2 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 751,
+     "texts": [
+      "🐇 Hazel Okay: Play Goodman Vole from your hand fr",
+      "Turn over: All your workers are out, so only a car"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "🐇 Hazel Every worker is out. Prepare for Season: ",
+      "Turn over: Each player takes one action, then the "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "🐇 Hazel A new season! Seasons run Winter, Spring,",
+      "Turn over: Each player takes one action, then the "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 842,
+     "texts": [
+      "🐇 Hazel A new season! Seasons run Winter, Spring,",
+      "Turn over: Each player takes one action, then the "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 576,
+     "texts": [
+      "🐇 Hazel A new season! Seasons run Winter, Spring,",
+      "Turn over: Each player takes one action, then the "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 730,
+     "texts": [
+      "Step undone.",
+      "+3 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 267,
+     "texts": [
+      "Step undone.",
+      "+3 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 416,
+     "texts": [
+      "Step undone.",
+      "+1 Bramble: card points"
      ]
     },
     {
@@ -157,7 +322,6 @@
      "session": "pc/learn",
      "ms": 250,
      "texts": [
-      "🐇 Hazel Each turn you send one worker to one plac",
       "Kindling Glen: +2 twig, +1 card Gain 2 twigs and d",
       "Turn over: Each player takes one action, then the "
      ]
@@ -165,16 +329,17 @@
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 478,
+     "ms": 250,
      "texts": [
-      "🐇 Hazel Each turn you send one worker to one plac",
+      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
+      "Kindling Glen: +2 twig, +1 card Gain 2 twigs and d",
       "Turn over: Each player takes one action, then the "
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 2493,
+     "ms": 1227,
      "texts": [
       "🐇 Hazel Twigs, resin, pebbles and berries pay for",
       "Turn over: Each player takes one action, then the "
@@ -183,10 +348,10 @@
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 1920,
+     "ms": 331,
      "texts": [
-      "🐇 Hazel Your hand holds plans: each shows its pri",
-      "Turn over: All your workers are out, so only a car"
+      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
+      "Turn over: Each player takes one action, then the "
      ]
     },
     {
@@ -194,23 +359,59 @@
      "session": "pc/learn",
      "ms": 250,
      "texts": [
-      "🐇 Hazel Every worker is out. Prepare for Season: ",
-      "Turn over: All your workers are out, so only a car"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 712,
-     "texts": [
-      "🐇 Hazel Every worker is out. Prepare for Season: ",
+      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
       "Turn over: Each player takes one action, then the "
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 2220,
+     "ms": 250,
+     "texts": [
+      "🐇 Hazel Bramble sent a worker. A place without th",
+      "Turn over: Each player takes one action, then the "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "🐇 Hazel Bramble sent a worker. A place without th",
+      "Turn over: Each player takes one action, then the "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "🐇 Hazel Bramble sent a worker. A place without th",
+      "Turn over: Each player takes one action, then the "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 2791,
+     "texts": [
+      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
+      "Turn over: All your workers are out, so only a car"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 767,
+     "texts": [
+      "🐇 Hazel The meadow is open to everyone. Critters ",
+      "Turn over: All your workers are out, so only a car"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 967,
      "texts": [
       "🐇 Hazel A new season! Seasons run Winter, Spring,",
       "Turn over: Each player takes one action, then the "
@@ -219,806 +420,736 @@
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 1000,
+     "ms": 973,
      "texts": [
-      "🐇 Hazel The meadow is open to everyone. Critters ",
+      "Step undone.",
+      "🐇 Hazel A new season! Seasons run Winter, Spring,",
       "Turn over: Each player takes one action, then the "
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 250,
+     "ms": 662,
      "texts": [
-      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
-      "Turn over: Each player takes one action, then the "
+      "Step undone.",
+      "🐇 Hazel A new season! Seasons run Winter, Spring,",
+      "Turn over: All your workers are out, so only a car"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 250,
+     "ms": 982,
      "texts": [
-      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
-      "+1 Bramble: point tokens"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
-      "+1 You: card points"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 742,
-     "texts": [
-      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
-      "Turn over: Each player takes one action, then the ",
-      "+1 You: card points"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Your turn",
-      "Berry Thicket: +2 berry, +1 card Gain 2 berries an",
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 1250,
-     "texts": [
-      "Bramble's turn",
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 847,
-     "texts": [
-      "Your turn",
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 1238,
-     "texts": [
-      "Bramble's turn",
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "+1 Bramble: point tokens",
-      "Turn over: All your workers are out, so only a car",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 509,
-     "texts": [
-      "+1 Bramble: point tokens",
-      "Bramble's turn",
-      "Turn over: All your workers are out, so only a car",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 516,
-     "texts": [
-      "+1 Bramble: point tokens",
-      "Your turn",
-      "Turn over: All your workers are out, so only a car",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
+      "Step undone.",
+      "🐇 Hazel A building! It stays in your city. Produc",
+      "Turn over: All your workers are out, so only a car"
      ]
     }
    ]
   },
   "b": {
    "status": "FAIL",
-   "count": 14,
+   "count": 10,
    "detail": [
     {
-     "session": "pc/play",
+     "session": "phone/play",
+     "text": "+1 You: point tokens",
+     "ms": 3282,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 Bramble: card points",
+     "ms": 3016,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
      "text": "+2 You: card points",
-     "ms": 2867,
+     "ms": 2488,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
-     "session": "pc/play",
-     "text": "Your turn",
-     "ms": 476,
+     "session": "phone/play",
+     "text": "+3 You: card points",
+     "ms": 1230,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Step undone.",
+     "ms": 2849,
      "cls": "on",
      "tag": "div"
     },
     {
-     "session": "pc/play",
-     "text": "Berry Thicket: +2 berry, +1 card Gain 2 berries and draw 1 card.",
-     "ms": 250,
-     "cls": "hbtoast",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Bramble's turn",
-     "ms": 1250,
-     "cls": "on rv",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Turn over: Each player takes one action, then the turn moves on (2 workers left). Bramble plays now.",
-     "ms": 1831,
+     "session": "phone/play",
+     "text": "+1 Bramble: card points",
+     "ms": 3138,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
-     "session": "pc/play",
-     "text": "Your turn",
-     "ms": 847,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Bramble's turn",
-     "ms": 1238,
-     "cls": "on rv",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1 resin and 1 berry. was much better (+1 twig, +1 resin, +1 berry).",
-     "ms": 3750,
+     "session": "phone/play",
+     "text": "+1 Bramble: point tokens",
+     "ms": 2861,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
-     "session": "pc/play",
-     "text": "Turn over: Each player takes one action, then the turn moves on (1 worker left). Bramble plays now.",
-     "ms": 1773,
+     "session": "phone/play",
+     "text": "+2 You: card points",
+     "ms": 1721,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
-     "session": "pc/play",
-     "text": "Bramble's turn",
-     "ms": 509,
-     "cls": "rv on",
+     "session": "phone/play",
+     "text": "+1 You: point tokens",
+     "ms": 750,
+     "cls": "hbtoast on",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "+1 Bramble: point tokens",
-     "ms": 1968,
+     "ms": 3302,
      "cls": "hbtoast on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Turn over: All your workers are out, so only a card, Prepare or Pass is left. Bramble plays now.",
-     "ms": 1161,
-     "cls": "hbtoast on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1 resin and 1 berry. was much better (+1 twig, +1 resin, +1 berry).",
-     "ms": 1161,
-     "cls": "hbtoast on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Your turn",
-     "ms": 516,
-     "cls": "on",
      "tag": "div"
     }
    ]
   },
   "c": {
    "status": "FAIL",
-   "count": 20,
+   "count": 28,
    "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Basic places give goods, the forest gives more, and cards are bought from the meadow.",
+     "words": 15,
+     "at": 12880,
+     "where": "span.tx"
+    },
     {
      "session": "phone/learn",
      "text": "Each player takes one action, then the turn moves on (1 worker left).",
      "words": 13,
-     "at": 8515,
+     "at": 15401,
      "where": "div.hbtoast.on"
     },
     {
      "session": "phone/learn",
      "text": "A place without the Shared mark holds one worker only, so it is closed to you this season.",
      "words": 18,
-     "at": 11513,
+     "at": 18767,
      "where": "span.tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck.",
+     "words": 17,
+     "at": 19853,
+     "where": "div.sm"
     },
     {
      "session": "phone/learn",
      "text": "All your workers are out, so only a card, Prepare or Pass is left.",
      "words": 14,
-     "at": 11513,
+     "at": 23174,
      "where": "div.hbtoast.on"
     },
     {
      "session": "phone/learn",
      "text": "Your hand holds plans: each shows its price, glowing ones you can afford.",
      "words": 13,
-     "at": 14509,
+     "at": 26088,
+     "where": "span.tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Okay: Play Goodman Vole from your hand free (occupy Bramble Allotment) was a bit better (+2 points, built).",
+     "words": 18,
+     "at": 38403,
      "where": "span.tx"
     },
     {
      "session": "phone/learn",
      "text": "Prepare for Season: they all come home, you gain one more, and production pays.",
      "words": 14,
-     "at": 17528,
+     "at": 40544,
      "where": "span.tx"
     },
     {
      "session": "phone/learn",
-     "text": "The forest pays more goods than the basic places, but each spot holds one worker.",
-     "words": 15,
-     "at": 20506,
-     "where": "span.tx"
+     "text": "Each player takes one action, then the turn moves on (3 workers left).",
+     "words": 13,
+     "at": 44683,
+     "where": "div.hbtoast.on"
     },
     {
-     "session": "pc/learn",
-     "text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck.",
-     "words": 17,
-     "at": 8028,
-     "where": "div.sm"
+     "session": "phone/learn",
+     "text": "Flags are events: the first to hold the right buildings claims one for three points.",
+     "words": 15,
+     "at": 58304,
+     "where": "span.tx"
     },
     {
      "session": "pc/learn",
      "text": "Basic places give goods, the forest gives more, and cards are bought from the meadow.",
      "words": 15,
-     "at": 8031,
+     "at": 11659,
      "where": "span.tx"
     },
     {
      "session": "pc/learn",
      "text": "Each player takes one action, then the turn moves on (1 worker left).",
      "words": 13,
-     "at": 10038,
+     "at": 17036,
      "where": "div.hbtoast.on"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck.",
+     "words": 17,
+     "at": 18187,
+     "where": "div.sm"
     },
     {
      "session": "pc/learn",
      "text": "A place without the Shared mark holds one worker only, so it is closed to you this season.",
      "words": 18,
-     "at": 14015,
+     "at": 20313,
      "where": "span.tx"
     },
     {
      "session": "pc/learn",
      "text": "Your hand holds plans: each shows its price, glowing ones you can afford.",
      "words": 13,
-     "at": 18010,
+     "at": 30251,
+     "where": "span.tx"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Poor: Place a worker: Lantern Rest - Send a worker to play a meadow card for 3 fewer resources.",
+     "words": 19,
+     "at": 37257,
      "where": "span.tx"
     },
     {
      "session": "pc/learn",
      "text": "All your workers are out, so only a card, Prepare or Pass is left.",
      "words": 14,
-     "at": 19011,
+     "at": 37257,
      "where": "div.hbtoast.on"
     },
     {
      "session": "pc/learn",
      "text": "Prepare for Season: they all come home, you gain one more, and production pays.",
      "words": 14,
-     "at": 21007,
+     "at": 44177,
+     "where": "span.tx"
+    },
+    {
+     "session": "pc/learn",
+     "text": "The forest pays more goods than the basic places, but each spot holds one worker.",
+     "words": 15,
+     "at": 46797,
      "where": "span.tx"
     },
     {
      "session": "pc/learn",
      "text": "Each player takes one action, then the turn moves on (3 workers left).",
      "words": 13,
-     "at": 23008,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Each player takes one action, then the turn moves on (2 workers left).",
-     "words": 13,
-     "at": 24084,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Poor: Place a worker: Lantern Rest - Send a worker to play a meadow card for 3 fewer resources.",
-     "words": 19,
-     "at": 29014,
-     "where": "span.tx"
-    },
-    {
-     "session": "pc/play",
-     "text": "Each player takes one action, then the turn moves on (2 workers left).",
-     "words": 13,
-     "at": 25085,
+     "at": 57391,
      "where": "div.hbtoast.on"
     },
     {
      "session": "pc/play",
-     "text": "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1 resin and 1 berry.",
+     "text": "The banner says whose turn it is; the line at the top says what to do.",
+     "words": 16,
+     "at": 29312,
+     "where": "li."
+    },
+    {
+     "session": "pc/play",
+     "text": "Tap a glowing place to send a worker, or a glowing card to build it.",
      "words": 15,
-     "at": 25085,
-     "where": "b.r-poor"
+     "at": 29312,
+     "where": "li."
     },
     {
      "session": "pc/play",
-     "text": "Each player takes one action, then the turn moves on (1 worker left).",
-     "words": 13,
-     "at": 27009,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "pc/play",
-     "text": "All your workers are out, so only a card, Prepare or Pass is left.",
+     "text": "The move plays out step by step, then the points or goods pop up.",
      "words": 14,
-     "at": 29119,
-     "where": "div.hbtoast.on"
+     "at": 29312,
+     "where": "li."
+    },
+    {
+     "session": "pc/play",
+     "text": "Each player has a city of up to 15 cards and a few workers.",
+     "words": 14,
+     "at": 29312,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "When every player has passed, you add up points from cards, point tokens, bonuses, events and the Long Road.",
+     "words": 19,
+     "at": 29312,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "(green) are special and take one worker (two players can share in a four-player game).",
+     "words": 15,
+     "at": 29312,
+     "where": "li."
+    },
+    {
+     "session": "pc/play",
+     "text": "turns spare cards into resources: 1 resource for every 2 cards you discard.",
+     "words": 13,
+     "at": 29312,
+     "where": "li."
+    },
+    {
+     "session": "pc/play",
+     "text": "Discard cards equal to the spot (5, 4, 3 or 2); the worker stays and scores that many points.",
+     "words": 19,
+     "at": 29312,
+     "where": "li."
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 66,
+   "count": 105,
    "detail": [
     {
      "session": "phone/learn",
      "text": "Build a woodland city. Outlast the winter.",
      "px": 13,
-     "at": 1254,
+     "at": 2052,
      "where": "small."
     },
     {
      "session": "phone/learn",
      "text": "Free and direct: your browsers connect to each other. Host a",
      "px": 13.5,
-     "at": 1255,
+     "at": 2053,
      "where": "p.sm.muted"
     },
     {
      "session": "phone/learn",
      "text": "Host",
      "px": 13.5,
-     "at": 1255,
+     "at": 2053,
      "where": "button.btn.small"
     },
     {
      "session": "phone/learn",
      "text": "Join",
      "px": 13.5,
-     "at": 1255,
+     "at": 2053,
      "where": "button.btn.small"
     },
     {
      "session": "phone/learn",
      "text": "×3",
      "px": 13,
-     "at": 2569,
+     "at": 4392,
      "where": "b.bd"
     },
     {
      "session": "phone/learn",
      "text": "×2",
      "px": 13,
-     "at": 2569,
+     "at": 4392,
      "where": "b.bd"
     },
     {
      "session": "phone/learn",
      "text": "2-5",
      "px": 13,
-     "at": 2569,
+     "at": 4392,
      "where": "b.bd"
     },
     {
      "session": "phone/learn",
      "text": "101",
      "px": 13,
-     "at": 2569,
+     "at": 4392,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "6",
      "px": 13,
-     "at": 2569,
+     "at": 4392,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "You",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "▢3",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "⚑2",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "Bramble",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "▢0",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "3/15",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "span.scount"
     },
     {
      "session": "phone/learn",
      "text": "▾ 5/8",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "button.scount.htog"
     },
     {
      "session": "phone/learn",
      "text": "Flintpit",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "b.hcn"
     },
     {
      "session": "phone/learn",
      "text": "×1",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "2",
      "px": 13,
-     "at": 2571,
+     "at": 4393,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "⚑1",
      "px": 13,
-     "at": 8512,
+     "at": 15397,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "100",
      "px": 13,
-     "at": 10536,
+     "at": 17798,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "▢1",
      "px": 13,
-     "at": 10537,
+     "at": 17798,
      "where": "span."
     },
     {
      "session": "phone/learn",
-     "text": "98",
+     "text": "Player · Winter",
      "px": 13,
-     "at": 11510,
+     "at": 19852,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "none",
+     "px": 13,
+     "at": 19852,
+     "where": "b.l"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Destination · 2 pt",
+     "px": 13,
+     "at": 19853,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Send a worker to play a meadow card for 3 fewer resources. R",
+     "px": 13,
+     "at": 19853,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Give a rival 2 cards, discard any others you like, then refi",
+     "px": 13,
+     "at": 19853,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Copy any one basic or forest spot, even if it is occupied.",
+     "px": 13,
+     "at": 19853,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "99",
+     "px": 13,
+     "at": 23131,
      "where": "b."
     },
     {
      "session": "phone/learn",
      "text": "⚑0",
      "px": 13,
-     "at": 11511,
+     "at": 23143,
      "where": "span."
     },
     {
      "session": "phone/learn",
-     "text": "▾ 7/8",
+     "text": "▾ 6/8",
      "px": 13,
-     "at": 11511,
+     "at": 23144,
      "where": "button.scount.htog"
     },
     {
      "session": "phone/learn",
-     "text": "Goodman Vole",
+     "text": "98",
      "px": 13,
-     "at": 12504,
-     "where": "b.hcn"
+     "at": 24901,
+     "where": "b."
     },
     {
      "session": "phone/learn",
-     "text": "Hostler Hedgehog",
+     "text": "Amber Still",
      "px": 13,
-     "at": 12504,
+     "at": 24902,
      "where": "b.hcn"
     },
     {
      "session": "phone/learn",
      "text": "1",
      "px": 13,
-     "at": 12504,
+     "at": 24902,
      "where": "b."
     },
     {
      "session": "phone/learn",
-     "text": "Draw pile",
+     "text": "Bramble Allotment",
      "px": 13,
-     "at": 16514,
-     "where": "div.nm"
-    },
-    {
-     "session": "phone/learn",
-     "text": "4",
-     "px": 13,
-     "at": 16515,
-     "where": "span.lt"
-    },
-    {
-     "session": "phone/learn",
-     "text": "3",
-     "px": 13,
-     "at": 16515,
-     "where": "span.lt"
+     "at": 24902,
+     "where": "b.hcn"
     },
     {
      "session": "phone/learn",
      "text": "▢4",
      "px": 13,
-     "at": 20504,
+     "at": 27886,
      "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "4/15",
      "px": 13,
-     "at": 20504,
+     "at": 27886,
      "where": "span.scount"
-    },
-    {
-     "session": "phone/learn",
-     "text": "▾ 6/8",
-     "px": 13,
-     "at": 20504,
-     "where": "button.scount.htog"
     },
     {
      "session": "phone/learn",
      "text": "Goodwife Vole",
      "px": 13,
-     "at": 20504,
+     "at": 27886,
      "where": "b.hcn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "⚑3",
+     "px": 13,
+     "at": 28556,
+     "where": "span."
     },
     {
      "session": "phone/learn",
      "text": "97",
      "px": 13,
-     "at": 22515,
+     "at": 34778,
      "where": "b."
     },
     {
      "session": "phone/learn",
-     "text": "▢2",
+     "text": "▢5",
      "px": 13,
-     "at": 22516,
+     "at": 34789,
      "where": "span."
     },
     {
      "session": "phone/learn",
-     "text": "Bramble Allotment",
+     "text": "5/15",
      "px": 13,
-     "at": 23517,
+     "at": 34789,
+     "where": "span.scount"
+    },
+    {
+     "session": "phone/learn",
+     "text": "96",
+     "px": 13,
+     "at": 36980,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "▢6",
+     "px": 13,
+     "at": 36981,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "6/15",
+     "px": 13,
+     "at": 36981,
+     "where": "span.scount"
+    },
+    {
+     "session": "phone/learn",
+     "text": "▾ 4/8",
+     "px": 13,
+     "at": 36981,
+     "where": "button.scount.htog"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Goodman Vole",
+     "px": 13,
+     "at": 36981,
      "where": "b.hcn"
     },
     {
      "session": "phone/learn",
-     "text": "94",
+     "text": "Computer (easy) · Spring",
      "px": 13,
-     "at": 24504,
-     "where": "b."
+     "at": 38398,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Production · 1 pt",
+     "px": 13,
+     "at": 38398,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gain 2 twigs for every Bramble Allotment in your city.",
+     "px": 13,
+     "at": 38398,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Draw pile",
+     "px": 13,
+     "at": 44671,
+     "where": "div.nm"
     },
     {
      "session": "phone/learn",
      "text": "7",
      "px": 13,
-     "at": 24504,
+     "at": 47013,
      "where": "b."
     },
     {
-     "session": "phone/play",
-     "text": "Build a woodland city. Outlast the winter.",
+     "session": "phone/learn",
+     "text": "9",
      "px": 13,
-     "at": 1254,
-     "where": "small."
+     "at": 48555,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "10",
+     "px": 13,
+     "at": 50267,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "11",
+     "px": 13,
+     "at": 51598,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "12",
+     "px": 13,
+     "at": 52644,
+     "where": "b."
     },
     {
      "session": "phone/play",
      "text": "Free and direct: your browsers connect to each other. Host a",
      "px": 13.5,
-     "at": 1255,
+     "at": 1778,
      "where": "p.sm.muted"
     },
     {
      "session": "phone/play",
      "text": "Host",
      "px": 13.5,
-     "at": 1255,
+     "at": 1778,
      "where": "button.btn.small"
     },
     {
      "session": "phone/play",
      "text": "Join",
      "px": 13.5,
-     "at": 1255,
+     "at": 1778,
      "where": "button.btn.small"
     },
     {
      "session": "phone/play",
-     "text": "×3",
+     "text": "Build a woodland city. Outlast the winter.",
      "px": 13,
-     "at": 4286,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/play",
-     "text": "×2",
-     "px": 13,
-     "at": 4286,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/play",
-     "text": "2-5",
-     "px": 13,
-     "at": 4286,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/play",
-     "text": "109",
-     "px": 13,
-     "at": 4286,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "0",
-     "px": 13,
-     "at": 4286,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "You",
-     "px": 13,
-     "at": 4290,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "▢0",
-     "px": 13,
-     "at": 4290,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "⚑2",
-     "px": 13,
-     "at": 4291,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "Bramble",
-     "px": 13,
-     "at": 4291,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "0/15",
-     "px": 13,
-     "at": 4291,
-     "where": "span.scount"
-    },
-    {
-     "session": "phone/play",
-     "text": "▾ 5/8",
-     "px": 13,
-     "at": 4291,
-     "where": "button.scount.htog"
-    },
-    {
-     "session": "phone/play",
-     "text": "Flintpit",
-     "px": 13,
-     "at": 4291,
-     "where": "b.hcn"
-    },
-    {
-     "session": "phone/play",
-     "text": "×1",
-     "px": 13,
-     "at": 4291,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "2",
-     "px": 13,
-     "at": 4291,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "⚑1",
-     "px": 13,
-     "at": 5260,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "Computer (easy) · Winter",
-     "px": 13,
-     "at": 6254,
-     "where": "div.sm"
+     "at": 2768,
+     "where": "small."
     }
    ]
   },
@@ -1036,46 +1167,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 46,
-   "clicks": 71,
+   "secs": 60,
+   "turns": 38,
+   "clicks": 43,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 18
+   "messagesSeen": 22
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 9,
-   "turns": 12,
-   "clicks": 16,
-   "endedBy": "result",
+   "secs": 60,
+   "turns": 33,
+   "clicks": 50,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 0
+   "messagesSeen": 9
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 57,
-   "clicks": 71,
-   "endedBy": "time",
+   "secs": 61,
+   "turns": 35,
+   "clicks": 43,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 18
+   "messagesSeen": 17
   },
   {
    "size": "pc",
    "mode": "play",
    "secs": 30,
-   "turns": 54,
-   "clicks": 100,
-   "endedBy": "time",
+   "turns": 20,
+   "clicks": 29,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 14
+   "messagesSeen": 1
   }
  ]
 }
