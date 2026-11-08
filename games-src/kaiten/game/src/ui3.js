@@ -32,7 +32,7 @@ function newGame(mode, o) {
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
   placePrompt(); render(); sndMusic(); schedule();
-  if (mode === 'vs' && ANIM && !goalCard.seen && typeof goalCard === 'function') { goalCard.seen = 1; setTimeout(() => { if (G && UI.mode === mode) goalCard(); }, 500); }   // ui10: how you win
+  if (mode === 'vs' && ANIM && !goalCard.seen && !/[?&]scn=/.test(location.search)) { goalCard.seen = 1; setTimeout(() => { if (G && UI.mode === mode) goalCard(); }, 500); }   // ui10: how you win
 }
 // ---------- the turn driver ----------
 function schedule() {

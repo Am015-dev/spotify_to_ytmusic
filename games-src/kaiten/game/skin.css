@@ -154,8 +154,8 @@ html.ph #setbody>div.mrow:has(.gxt-menu){margin-top:40px}
 #kkgoal .kgl{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px}
 #kkgoal .kgl li{display:flex;align-items:center;gap:12px;font-size:16px;line-height:1.3;font-weight:700}
 #kkgoal .kgp{flex:none;width:44px;height:62px;display:block}
-#kkgoal .kgo{width:100%;min-height:52px;font-size:18px;font-weight:900}
-#barstat[role=button]{cursor:pointer;text-decoration:underline dotted rgba(255,240,210,.55);text-underline-offset:3px}
+#kkgoal .kgo{width:100%;min-height:52px;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;text-align:center}
+#barstat[tabindex]{cursor:pointer;text-decoration:underline dotted rgba(255,240,210,.55);text-underline-offset:3px}
 #toast{pointer-events:none;font-size:16px;padding:10px 16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));line-height:1.3;text-align:center}
 #toast.on{pointer-events:auto;cursor:pointer}
 .sh .av .sc,html.ph .sh .av .sc{font-size:20px!important;min-width:34px;height:34px;line-height:28px;border-radius:17px;top:-10px;right:-12px}

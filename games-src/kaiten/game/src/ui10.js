@@ -94,7 +94,7 @@ function goalCard(after) {
   document.body.appendChild(o); void o.offsetWidth; o.classList.add('on'); setTimeout(() => { try { go.focus(); } catch (e) { } }, 60);
 }
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#barstat') && G) goalCard(); });
-{ const b = $('#barstat'); if (b) { b.setAttribute('role', 'button'); b.setAttribute('tabindex', '0'); b.setAttribute('aria-label', 'Show how you win'); b.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && G) { e.preventDefault(); goalCard(); } }); } }
+{ const b = $('#barstat'); if (b) { b.setAttribute('tabindex', '0'); b.title = 'How you win'; b.setAttribute('aria-label', 'Show how you win'); b.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && G) { e.preventDefault(); goalCard(); } }); } }
 // tap a message to close it early
 document.addEventListener('click', e => { const el = $('#toast'); if (el && el.classList.contains('on') && e.target.closest && e.target.closest('#toast')) { clearTimeout(toast.t); el.classList.remove('on'); } });
 // A short vibrate tick when a dish snaps onto your tray, and a softer one when you lift it.
