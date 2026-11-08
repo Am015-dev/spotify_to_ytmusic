@@ -247,5 +247,15 @@ html.sm .offer .ofx{grid-template-columns:1fr;width:auto;background:#fffaf0;bord
 .rvlater{margin:6px auto 0;max-width:420px;background:#fff7e0;border:1px solid #d9b96a;border-radius:10px;padding:6px 10px;text-align:left;font-size:14px;line-height:1.3;color:#3a2a1a}.rvlater b{display:block;margin-bottom:2px}
 .rvban.on.coachban{max-height:420px}
 @media (max-height:700px){.rvlater{font-size:13px}}
+/* W381c: score bar, best badge, preview */
+#scorebar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0;width:100%}
+#scorebar .sb{background:#1d2738;border:1px solid #ffffff22;border-radius:10px;padding:2px 8px;color:#fff8e8;line-height:1.15;min-width:0}
+#scorebar .sb b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#scorebar .sb small{display:block;font-size:13px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#scorebar .sb.lead{border-color:var(--gold,#e0a520);box-shadow:0 0 0 2px #e0a52055}
+#scorebar .sb.lead b{color:#ffd76a}
+.offer .badge{position:absolute;top:-9px;right:-4px;background:#2b6b2b;color:#fff;font-size:13px;font-weight:800;padding:1px 6px;border-radius:8px;box-shadow:0 2px 6px #0004;z-index:2}
+#detail b{color:#2b4a20}
+.gx-dt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>

@@ -11,9 +11,7 @@ const URL = process.env.URL || 'http://localhost:8765/stitchwise/index.html';
   const click = async s => { const e = await pg.$(s); const bb = await e.boundingBox(); if (touch) await pg.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); else await pg.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); };
   await pg.goto(URL); await pg.waitForTimeout(900); await shot('1title'); await click('[data-a=rules]'); await pg.waitForTimeout(600); await shot('1help'); await pg.reload(); await pg.waitForTimeout(700);
   // tutorial
-  const tb = await pg.$('text=Tutorial'); if (tb) { await tb.click(); await pg.waitForTimeout(900); await shot('2tut1');
-    for (let i = 2; i <= 3; i++) { const nx = await pg.$('.gxt-next'); if (nx) { const bb = await nx.boundingBox(); if (bb) { await pg.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); } } await pg.waitForTimeout(700); await shot('2tut' + i); }
-  }
+  const tb = await pg.$("#start [data-a=start]"); if (tb) { await click("#start [data-a=start]"); await pg.waitForTimeout(1500); await shot("2coach1"); const c = await pg.$("#offers .offer.can"); if (c) { await click("#offers .offer.can"); await pg.waitForTimeout(500); await shot("2coach2"); } }
   // quick game
   await pg.goto(URL); await pg.evaluate(() => { localStorage.setItem('sw_seen', '1'); }); await pg.reload(); await pg.waitForTimeout(700);
   await click('[data-a=quick]'); await pg.waitForTimeout(300); const nc = await pg.$('text=Normal computer'); if (nc) { await nc.click(); await pg.waitForTimeout(300); }

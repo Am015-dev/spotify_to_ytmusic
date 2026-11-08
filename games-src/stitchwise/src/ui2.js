@@ -53,7 +53,7 @@ function confirmSew() { if (UI.sel < 0 || UI.busy) return; if (!ghostOk()) { sna
 function doAdvance() { if (UI.busy || G.over || G.pend || !isHuman(swWho(G))) return; if (!tutAct({ what: 'adv' })) return; UI.sel = -1; act({ t: 'adv' }); }
 function doLeather(x, y) { if (UI.busy || !tutAct({ what: 'leather' })) return; act({ t: 'leather', x: x, y: y }); }
 function act(m) {
-  if (!G || G.over) return; if (isHuman(swWho(G))) { UI.flavor = ''; var tb = $('#turnban'); if (tb) tb.classList.remove('on'); } var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
+  if (!G || G.over) return; if (isHuman(swWho(G)) && UI.mode !== 'hot' && (m.t === 'buy' || m.t === 'adv')) { try { UI.rate = rateMove(m); } catch (e) { UI.rate = ''; } } if (isHuman(swWho(G))) { UI.flavor = ''; var tb = $('#turnban'); if (tb) tb.classList.remove('on'); } var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
   var r = swApply(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed (' + r.why + ').'); render(); return; }
   var evs = G.ev.slice(); evs.forEach(function (e) { if (e.k === 'place') e.cells.forEach(function (c) { UI.newCells[e.s + ':' + (c[1] * 9 + c[0])] = 1; }); });
   UI.busy++; saveGame(); render(); playEvents(evs, before, function () { var fin = function () { UI.peek = -1; UI.cap = ''; UI.busy--; afterMove(); }; if (UI.peek >= 0 && amt(1)) later(sp(800), fin); else fin(); });
@@ -62,7 +62,7 @@ function floatText(txt, el, color, wide) { var r = el ? el.getBoundingClientRect
 function playEvents(evs, before, done) {
   var t = 0, step = amt(380), spots = 0; if (!step) { evs.forEach(function (e) { if (e.k === 'bonus') toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!'); }); return done(); }
   evs.forEach(function (e) {
-    if (e.k === 'place') { later(t, function () { sfx('place'); if (e.cost != null) floatText('Sewn on: \u2212' + e.cost + ' button' + (e.cost === 1 ? '' : 's'), $('.pstrip[data-seat="' + e.s + '"]') || $('#quilt'), '#ffe9a0', true); else floatText('Free 1\u00D71 patch', $('#quilt'), '#ffe9a0', true); var q = $('#quilt'), c0 = e.cells[0]; if (q && c0) { var r = q.getBoundingClientRect(); fxImg('fx-stitch', r.left + q.clientLeft + (c0[0] + .5) * UI.cs, r.top + q.clientTop + (c0[1] + .5) * UI.cs, UI.cs * 1.6); } }); t += step * 1.2; }
+    if (e.k === 'place') { later(t, function () { sfx('place'); if (e.cost != null) floatText('+' + (e.cells.length * 2) + ' pts: ' + e.cells.length + ' squares covered, \u2212' + e.cost + ' button' + (e.cost === 1 ? '' : 's'), $('.pstrip[data-seat="' + e.s + '"]') || $('#quilt'), '#ffe9a0', true); else floatText('Free 1\u00D71 patch', $('#quilt'), '#ffe9a0', true); var q = $('#quilt'), c0 = e.cells[0]; if (q && c0) { var r = q.getBoundingClientRect(); fxImg('fx-stitch', r.left + q.clientLeft + (c0[0] + .5) * UI.cs, r.top + q.clientTop + (c0[1] + .5) * UI.cs, UI.cs * 1.6); } }); t += step * 1.2; }
     if (e.k === 'move') {
       var from = e.from, to = e.to; SW.BTN_SPOTS.forEach(function (b) { if (b > from && b <= to) { spots++; var tt = t + step * .6 * spots, seat = e.s, inc = G.inc[seat]; if (inc > 0) later(tt, function () { incomeMoment(seat, b, inc, spots); }); } });
       if (e.gain) later(t, function () { sfx('adv'); floatText('+' + e.gain + ' button' + (e.gain === 1 ? '' : 's') + ' for advancing', $('.pstrip[data-seat="' + e.s + '"]') || null, '#ffe9a0', true); }); t += step * .8 + step * .6 * spots;
@@ -84,9 +84,9 @@ function turnCheck() { // banner + plain line when the turn changes (or stays: t
   if (!G || G.over || G.pend) return; var w = swWho(G), hum = isHuman(w), hot = UI.mode === 'hot', nm = hot ? nameOf(w) + '\u2019s turn' : hum ? 'Your turn' : nameOf(w) + '\u2019s turn', again = w === UI.lastWho, prev = UI.again;
   if (hum) UI.fast = false;
   UI.again = hum && again ? (hot ? nameOf(w) + ' is still behind on the track, so plays again' : 'You are still behind on the track: play again') : '';
-  if (!again) { banner(nm, UI.flavor && !UI.wide && UI.lastWho < 0 ? UI.flavor : '', !hum && !hot); } else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', '', !hum && !hot);
+  if (!again) { banner(nm, UI.flavor && !UI.wide && UI.lastWho < 0 ? UI.flavor : UI.lastWho >= 0 ? (hum ? 'You are behind now' : nameOf(w) + ' is behind now') : '', !hum && !hot); } else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', '', !hum && !hot);
   if (UI.coach) { if (!hum && !hot) coachSay('who_next'); if (UI.again) coachSay('again'); else if (!hum && again && !hot) coachSay('again_opp'); }
-  UI.lastWho = w; if (prev !== UI.again) renderDock();
+  UI.lastWho = w; renderDock();
 }
 function schedule() {
   clearTimeout(UI.tm.ai); if (!G) return; if (G.over) { return later(amt(500), finish); }
@@ -106,7 +106,7 @@ function aiStep() { // the rival's turn, one visible step at a time (caption, fl
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
 // ---------- start / finish
 function newGame(mode, o) {
-  o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lastWho = -1; UI.again = ''; UI.peek = -1; UI.cap = ''; UI.fast = false; UI.coach = null; if (window.GXCOACH && !o.coach) GXCOACH.running = false; var QS = ((window.CAMPAIGN || {}).story || {}).quick; UI.flavor = mode === 'vs' && !o.camp && !o.coach && QS && QS.intro ? QS.intro[o.lvl || UI.lvl] || '' : ''; UI.lvl = o.lvl || UI.lvl;
+  o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lastWho = -1; UI.rate = ''; UI.again = ''; UI.peek = -1; UI.cap = ''; UI.fast = false; UI.coach = null; if (window.GXCOACH && !o.coach) GXCOACH.running = false; var QS = ((window.CAMPAIGN || {}).story || {}).quick; UI.flavor = mode === 'vs' && !o.camp && !o.coach && QS && QS.intro ? QS.intro[o.lvl || UI.lvl] || '' : ''; UI.lvl = o.lvl || UI.lvl;
   var seed = o.seed != null ? o.seed : (Math.random() * 1e9) | 0; rngUI = swRng(seed + 17); UI.seed = seed;
   G = swNew({ seed: seed, first: o.first != null ? o.first : (UI.mode === 'hot' || UI.tutorial || UI.camp ? 0 : seed % 2), ring: o.ring });
   UI.names = UI.mode === 'hot' ? ['Player 1', 'Player 2'] : ['You', UI.camp ? UI.camp.opponent.name : (o.name || ({ easy: 'Poppy', normal: 'Marden', hard: 'Aurelia' }[UI.lvl] || 'Computer'))];
