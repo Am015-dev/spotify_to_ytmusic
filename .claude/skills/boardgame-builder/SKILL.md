@@ -97,3 +97,12 @@ Score honestly against `references/rubric.md`. Reply tersely: what was built, a 
 
 ## Game-type notes
 See "Game families" in `references/architecture.md`: dice-chuckers, map/area control, deck-builders, worker placement, co-ops, hidden information, simultaneous decisions, and co-op deduction (wire-cutting or hidden-hand games), where the AI teammates must reason only from public information.
+
+## Owner verdicts, 8 Nov 2026 (every game was rejected; check each before calling anything done)
+- "A static spreadsheet": tapping text chips is not a game. Drag the real piece, legal spots glow, it snaps with a vibrate tick; cards fly, points fly to the score, the rival's moves play out step by step; pinch-zoom and camera follow on the board.
+- "Unreadable": a 390px phone shows one focus at a time, big art and big numbers, words not icon soup ("2 berries", not a blob with x2).
+- "AI-sloppy language": short plain sentences a friend would say at the table, max ~12 words, no stacked clauses.
+- "Rules not like the original, missing items make it unfair": every component and rule of the rulebook, proven by one logic test per rule (RULES-CHECKLIST.md + logic-test.js), written by someone other than the builder.
+- Owner art (assets-inbox/<game>, generated with Flow) is never replaced or left unwired; prove 100% of owner models and 95%+ of owner pictures load in a played game. Never mix styles in one game (owner art + free packs + pixel art = "extremely ugly mixture").
+- Play mode is clean (Addendum 7): board, hand, tracker, one score line, Goal card; hints only behind a toggle; bubbles only in Learn to play.
+- Real touch: test with page.touchscreen.tap on a 390x844 phone, never only el.click() (a tap-blocking overlay shipped live).
