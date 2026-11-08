@@ -1,8 +1,8 @@
 {
  "slug": "thornbound",
- "when": "2026-11-08T07:51Z",
- "secs": 45,
- "totalSecs": 176,
+ "when": "2026-11-08T08:12Z",
+ "secs": 180,
+ "totalSecs": 453,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,19 +36,19 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 45,
-   "turns": 122,
-   "clicks": 154,
+   "secs": 180,
+   "turns": 506,
+   "clicks": 637,
    "endedBy": "result",
    "tutorialEnded": 3,
    "hintsOff": true,
-   "messagesSeen": 7
+   "messagesSeen": 9
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 40,
-   "turns": 114,
+   "secs": 39,
+   "turns": 104,
    "clicks": 138,
    "endedBy": "result",
    "tutorialEnded": null,
@@ -58,9 +58,9 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 45,
-   "turns": 110,
-   "clicks": 143,
+   "secs": 180,
+   "turns": 424,
+   "clicks": 556,
    "endedBy": "result",
    "tutorialEnded": 3,
    "hintsOff": true,
@@ -69,10 +69,10 @@
   {
    "size": "pc",
    "mode": "play",
-   "secs": 45,
-   "turns": 152,
-   "clicks": 184,
-   "endedBy": "time",
+   "secs": 54,
+   "turns": 186,
+   "clicks": 224,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0
