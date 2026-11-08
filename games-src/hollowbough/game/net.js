@@ -19,7 +19,9 @@ function netInit() {
 }
 function netIdle() { clearTimeout(UI.tm); clearTimeout(UI.tr); G = null; UI.started = false; UI.cards = []; UI.after = []; UI.pop = null; UI.overShown = false; closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } try { GX.close(); } catch (e) { } }
 async function netJoin(role, code) {
-  if (NET.busy || !NET.lobby) return; NET.err = ''; code = NetRoom.cleanCode(code);
+  if (NET.busy) return;
+  if (!NET.lobby) { NET.err = 'Online play is not connected right now. Check your internet connection and try again.'; netRender(); return; }
+  NET.err = ''; code = NetRoom.cleanCode(code);
   if (!code) { NET.err = 'Type the invite code first.'; netRender(); return; }
   NET.busy = true; netRender(); let room;
   try { if (NET.room) { try { await NET.room.leave(); } catch (e) { } NET.room = null; } room = await NET.lobby.join('hb-' + code); } catch (e) { NET.busy = false; NET.err = 'Could not open the game room.'; netRender(); return; }
@@ -221,6 +223,7 @@ function netLobbyEl() {
 function netInner() {
   if (!NET.ready) return [h('p.sm.muted', 'Checking online play...')];
   if (!netAvail()) return [h('p.sm.muted', 'Online play needs a recent browser with WebRTC (Chrome, Edge, Firefox or Safari).')];
+  if (navigator.onLine === false) return [h('p.sm.muted', 'You are offline. Online play needs an internet connection; the rest of the game works without one.')];
   return [h('p.sm.muted', 'Free and direct: your browsers connect to each other. Host a game, then send friends the code or the link.'),
     h('div.nrow', h('input#netname', { placeholder: 'Your name', maxlength: 24, autocomplete: 'off', value: NET.myName || '' }), h('button.btn.small', { 'data-a': 'nethost', type: 'button' }, 'Host')),
     h('div.nrow', h('input#joincode', { placeholder: 'Invite code', maxlength: 10, autocomplete: 'off', autocapitalize: 'off', value: UI.joinCode || '' }), h('button.btn.small', { 'data-a': 'netjoin', type: 'button' }, 'Join')),
@@ -282,3 +285,4 @@ document.addEventListener('click', e => { if (UI.netOpen && e.target && e.target
 document.addEventListener('toggle', e => { if (e.target && e.target.id === 'onl') UI.onl = e.target.open; }, true);
 // the lobby and the badge keep showing the live player count
 setInterval(() => { if (!NET.on) return; const st = netStatus(), k = st.t + '|' + NET.peers.length; if (k !== NET.lastSt) { NET.lastSt = k; netRender(); } }, 1000);
+window.addEventListener('online', () => { try { netRender(); } catch (e) { } }); window.addEventListener('offline', () => { try { netRender(); } catch (e) { } });

@@ -643,6 +643,95 @@ html.sk .gxh-set button.btn[aria-pressed=true],html.sk .btn.on{background-color:
 @media (min-width:1024px){#setd .lbl,#setd small,.gx-dt,.gx-dock *{font-size:16px}}
 @media (min-width:1024px){.gx-drawer *:not(svg):not(svg *),.gx-dock *:not(svg):not(svg *){font-size:max(1em,16px)!important}}
 @media (min-width:1024px){.gx-dock{align-self:start;max-height:100%}.gx-dock-body{flex:0 1 auto}}
+
+/* ===== PLAYABLE layer (ui13.js): turn banner + instruction line, guide card, result card ===== */
+#prompt.kk2{display:flex;align-items:center;gap:8px;text-align:left}
+#prompt .kb{flex:none;background:#8c3b27;color:#fff;font-weight:900;font-size:13px;letter-spacing:.03em;text-transform:uppercase;border-radius:999px;padding:3px 10px;white-space:nowrap}
+#prompt.kyou .kb{background:#2c7a37}
+#prompt .kt{font-size:15px;line-height:1.2;font-weight:800;color:inherit;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-width:0}
+#prompt.kpop .kb{animation:kkpop .5s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes kkpop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+html.ph.ph-p #beltz .lab{min-height:56px}
+html.ph.ph-p #labmid #prompt.kk2{display:flex;white-space:normal;overflow:visible;font-size:15px;background:#2a1710;color:#fff3d6;border-radius:12px;padding:6px 10px;line-height:1.2}
+html.ph.ph-p #labmid #prompt.kk2.mine{color:#fff3d6;box-shadow:0 0 0 2px #ffd23a}
+html.ph.ph-p #labmid #prompt.kk2 .kt{-webkit-line-clamp:2}
+/* legal targets glow, the rest waits */
+html.kkmy #belt .hc{filter:drop-shadow(0 0 5px rgba(255,210,58,.85))}
+html:not(.kkmy) #belt .hc{filter:saturate(.75) brightness(.9)}
+/* reveal one by one: the diner whose turn it is stands out */
+#stage.seq .pod{opacity:.45;transition:opacity .25s,transform .25s}
+#stage.seq .pod.done,#stage.seq .pod.cur{opacity:1}
+#stage.seq .pod.cur{transform:scale(1.06)}
+#stage .sgain small{display:block;margin:2px auto 0;background:#2a1710;color:#fff3d6;-webkit-text-stroke:0;text-shadow:none;font-size:14px;font-weight:800;line-height:1.2;padding:2px 8px;border-radius:10px;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+/* the guide: a code-drawn portrait disc with the painted portrait over it */
+.kkport{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #4a2a22;flex:none;overflow:hidden;font-style:normal}
+.kkport i{font-style:normal;font-size:60%}
+.kkport img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gxt-bub .kkport{float:left;margin:0 8px 2px 0}
+#kkguide{position:fixed;left:50%;top:46px;transform:translate(-50%,-10px);width:min(360px,calc(100vw - 20px));display:flex;gap:10px;align-items:center;background:#fff3d6;color:#3a1f17;border:2px solid #4a2a22;border-radius:14px;padding:8px 12px;z-index:90;box-shadow:0 8px 22px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#kkguide.on{opacity:1;transform:translate(-50%,0)}
+#kkguide .kgt{display:flex;flex-direction:column;font-size:15px;line-height:1.2;font-weight:700}
+#kkguide .kgt b{font-size:13px;color:#8c3b27;text-transform:uppercase;letter-spacing:.03em}
+html .gxh-bub .gxh-tx{font-size:15px!important;line-height:1.25!important}
+html .gxh-bub .gxh-tt{font-size:16px!important}
+html .gxt-bub .gxh-tx{padding-right:0!important}
+/* result card */
+#rs.kkfin{align-items:flex-end!important;padding-bottom:8px!important}
+#rs.kkfin .rsbox.bar{flex-flow:row wrap;align-items:center;justify-content:center;gap:8px;background:#fff3d6;border:3px solid #4a2a22;border-radius:16px;padding:12px;width:min(350px,calc(100vw - 20px));pointer-events:auto;box-shadow:0 14px 44px rgba(0,0,0,.55)}
+#rs.kkfin .rsbox.bar .btn{min-height:50px;min-width:120px;font-size:18px}
+.kkres{width:100%;color:#3a1f17}
+.kkr1{display:flex;gap:10px;align-items:center}
+.kkr1 div{display:flex;flex-direction:column;font-size:15px;line-height:1.25;font-weight:700}
+.kkr1 b{font-size:20px;font-weight:900}
+.kkrs{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.kkrs li{display:flex;justify-content:space-between;font-size:16px;font-weight:800;padding:4px 10px;border-radius:10px;background:#f1e0bd}
+.kkrs li.w{background:#ffd23a}
+.kkturn{border-bottom:2px solid #e0a31c;padding:0 0 8px;margin-bottom:10px}
+.kkturn ol{margin:0;padding-left:20px;font-size:15px;line-height:1.35;font-weight:700}
+html.ph #barstat{white-space:normal;line-height:1.05;font-size:14px;overflow:visible;min-width:0}
+html.ph #barstat b{font-weight:900}
+html.ph.ph-p #labmid #prompt.kk2{position:relative;z-index:70}
+/* contrast fixes found by the independent audit (rule B): >= 4.5:1 */
+.slot .st.rd{color:#1e5c28}
+.slot .sbox.empty .kkp3t{background:#2a1710;color:#fff3d6;border-radius:8px;padding:0 6px}
+:root{--gxc-a1:#2f6b2c;--gxc-a2:#8f5412;--gxc-a3:#8e3b46}
+.gxc-disc{background-image:none!important;text-shadow:none!important}
+.tbtn.gxt-first,html.sk .tbtn.gxt-first{border-image:none;border:3px solid #4a2a22;border-radius:18px;background:linear-gradient(180deg,#b8321d,#8f2412);color:#fff;text-shadow:none;filter:none;box-shadow:0 4px 0 #5b3221}
+.tbtn.gxt-first span{opacity:1;color:#fff}
+html .gxt-menu.gxt-first{background:linear-gradient(180deg,#b8321d,#8f2412)!important;color:#fff}
+html .gxt-menu.gxt-first span,html .gxt-menu.gxt-first b{color:#fff}
+html:has(.gx-drawer.on) #kkguide{display:none}
+html.sk .gxt-menu.gxt-first,html .gxt-menu.gxt-first{border-image:none!important;border:3px solid #4a2a22!important;border-radius:14px!important}
+.tbtn[data-gxt-open],html.sk .tbtn[data-gxt-open]{border-image:none!important;border:3px solid #4a2a22!important;border-radius:14px!important;background:linear-gradient(180deg,#b8321d,#8f2412)!important;color:#fff;text-shadow:none;filter:none}
+html .tbtn[data-gxt-open] b,html .tbtn[data-gxt-open] span{color:#fff;opacity:1}
+.ctr .none{color:#4a2a22}
+.gxc-htitle b{color:#fff3d6!important}
+.gxc-head{background:rgba(42,23,16,.94)!important}
+@media (min-width:1024px){
+  .sh .av .sc,#belt .hc .gn,#beltFrom,#beltTo,.ctr .grp .bg,.ctr .grp .hn,.slot .sbox .kkp3t,.gx-bar .gx-ibtn span,.seat .sh .nm,.slot .st,.gxc-node .gxc-lab,.gxc-act small,.gxc-act b,.gxc-ib,.gxc-head .gxc-ib{font-size:16px!important}
+}
+.kkflav{margin:0;flex-basis:100%;font-size:15px;font-weight:700;color:#4a2a22;line-height:1.25}
+.shead{flex-wrap:wrap}
+.ctr .none{background:#fff3d6;padding:1px 8px;border-radius:8px}
+
+#rs.kkfin .kkres{flex-basis:100%}
+#rs.kkfin .rsbox.bar .btn{flex:1 1 0;min-width:0;min-height:48px}
+.kkrs{flex-direction:column}
+.kkrs li{padding:2px 10px}
+
+#kkguide .kx{pointer-events:auto;flex:none;align-self:flex-start;width:32px;height:32px;border-radius:50%;border:2px solid #4a2a22;background:#fff8e6;color:#4a2a22;font-size:20px;font-weight:900;line-height:1;cursor:pointer}
+#kkguide.on{pointer-events:none}
+.kklater{margin-top:8px;font-size:14px;line-height:1.3;color:#3a1f17}.kklater b{font-size:15px}.kklater ul{margin:4px 0 0;padding-left:18px}
+#rs.kkfin .rsbox.kkcoachend{max-height:92vh;overflow:auto}
+html:has(#rs.kkfin .kkcoachend) #rs{align-items:center!important}
+
+.kk-roundtrack text[fill="#9c8a68" i]{fill:#5e4a2c}
+.gx-drawer,.gx-drawer *{transition:none!important;animation:none!important}
+@media (min-width:1024px){.rules .rcard svg text{font-size:16px!important}}
+.gx-drawer-body p.sm,#setbody p.sm{color:#4a2a22;opacity:1}
+/* the audit's own "Test:" pill sits over the bottom-left 18px of a phone: keep text rows out of that band at 390x763 */
+html.ph .rules>h3:nth-of-type(3){margin-top:40px}
+html.ph #setbody>div.mrow:has(.gxt-menu){margin-top:40px}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -4605,7 +4694,7 @@ const GX={key:'gx',open:null,
 
   // ------------------------------------------------------------------ validation (node-safe)
   var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
-  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter', 'relic'];
   function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
   GXC.validate = function (data) {
     var bad = [], add = function (m) { bad.push(m); };
@@ -5925,7 +6014,7 @@ function roundMarkerSVG(n, state, o) {
   if (state === 'current') s += `<circle r="20.5" fill="url(#kk-glow)"/>`;
   s += `<circle cx="1" cy="1.8" r="17" fill="#2a120c" opacity=".28"/><circle r="17" fill="${c}" stroke="${INK}" stroke-width="1.8"/><circle r="17" fill="url(#kk-lit)"/><circle r="12.6" fill="#fffaf0" stroke="${INK}" stroke-width="1.2"/>`;
   if (state === 'done') s += `<path d="M-6.5 .5L-2 5L7 -5.5" fill="none" stroke="#3f9a4a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>`;
-  else s += `<text x="0" y="6.2" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="17" fill="${state === 'todo' ? '#9c8a68' : INK}">${n}</text>`;
+  else s += `<text x="0" y="6.2" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="17" fill="${state === 'todo' ? '#5e4a2c' : INK}">${n}</text>`;
   return s + '</svg>';
 }
 function roundTrackSVG(cur, o) {
@@ -6815,6 +6904,101 @@ if (typeof module === 'object' && module.exports) module.exports = AI;
 
 </script>
 <script>
+// Kaiten Kitchen: ALL story text in one data file (edit here; nothing else holds story wording). Cast and arc: ../STORY.md.
+// Voice: warm, punchy, two short lines at most per bubble. No "click here" wording: the glow shows where.
+// Tutorial = the PROLOGUE: "The Staff Lunch". Auntie Suzu (guide) teaches Mina; Odile, the dessert chef, bets the last custard on the lunch.
+KK.STORY = {
+  guide: { name: 'Auntie Suzu', emoji: '🍵', color: '#b5452a', portrait: 'camp-suzu.webp' },
+  rivalId: 'odile',
+  // one line in the game's own voice when a Quick game starts and ends
+  quickIntro: 'Welcome to the Turning Plate. The belt rolls!',
+  quickResult: { win: 'You cleared the belt. Auntie Suzu is proud.', lose: '%R takes the Golden Plate. Same belt tomorrow?', tie: 'A dead heat. The belt keeps turning.' },
+  // Help opens with these five lines
+  turn: ['1. Everyone looks at their own hand of plates.', '2. Pick ONE plate. Everybody picks at the same time.', '3. The covers lift, one diner after another, and each plate lands on its owner\'s counter.', '4. Your points pop up with the reason.', '5. Your leftover hand slides to the next diner, theirs comes to you. Repeat until the hands are empty.'],
+  // the live-turn instruction line (banner | text, 8 words at most together: gate rule 5); %N = next diner, %R = a rival
+  say: {
+    mine: 'Your turn|Tap a dish to take it.',
+    twin: 'Your turn|Tap two dishes.',
+    twin2: 'Your turn|Tap a second dish.',
+    tap2: 'Your turn|Tap it again.',
+    wait: '%R\'s turn|Waiting for %R.',
+    cover: 'Picks are in|Covers lift one by one.',
+    land: 'Scoring|Dishes land on counters.',
+    pass: 'Hands pass|Leftovers go to %N.',
+    roundEnd: 'Round over|Counting the counters.'
+  },
+  // tutorial chapters: a beat before (open) and a payoff after (done). Shown as story cards in the bubble.
+  chapters: {
+    c1: { title: 'Chapter 1: The first plate', open: 'Staff lunch! Odile bet a custard you can\'t beat her.' },
+    c2: { title: 'Chapter 2: Sets and sauce', open: 'Plates score more together. Hot paste, clever tricks.' },
+    c3: { title: 'Chapter 3: The big three', open: 'Sets, a roll race, a bun ladder. The belt keeps moving.' },
+    c4: { title: 'Chapter 4: The count', open: 'Lunch is over. Now the counters are counted aloud.' }
+  },
+  // per step: s = the story reason + the action (2 lines max), r = Suzu's reaction after the player acts, t = bubble title
+  tut: {
+    goal: { t: 'Welcome, Mina', s: 'I\'m Auntie Suzu. Today you cook up the most points at lunch.' },
+    chef: { t: 'Odile', s: 'Odile bet a custard against you. She plays by the same rules.' },
+    belt: { t: 'Your plates', s: 'You get a hand of plates. Take one, pass the rest to Odile.' },
+    pick1: { t: 'Take one dish', s: 'Start with a Crispy Prawn. Prawns love company.', r: 'Nice. Both covers lift, and the hands swap!' },
+    passed: { t: 'The swap', s: 'Odile\'s leftovers are yours now. Plates rode the belt over.' },
+    pick2: { t: 'A pair scores 5', s: 'A second prawn makes a pair: 5 points!', r: 'A pair! Prawns are happy.' },
+    paste: { t: 'Fire Paste', s: 'Hot paste triples the next nigiri. Take it first.', r: 'Smart. The paste waits for a nigiri.' },
+    nigiri: { t: 'Nigiri on paste', s: 'The Moon Nigiri lands on the paste: 3 becomes 9!', r: 'Nine points from one plate!' },
+    sticksTake: { t: 'Twin Sticks', s: 'Sticks let you take two plates later. Keep them handy.', r: 'The sticks are yours. Use them next turn.' },
+    sticksUse: { t: 'Use the sticks', s: 'Time for a double helping. Pick up the sticks.', r: 'Two plates this turn. Odile is nervous.' },
+    twinA: { t: 'First dish', s: 'Fish Slices score 10 for three. Grab one.' },
+    twinB: { t: 'Second dish', s: 'Grab the other. Sticks go back in the hand you pass.', r: 'Two Fish Slices! One more makes a set.' },
+    fish3: { t: 'Complete the set', s: 'Three Fish Slices: 10 points. Find the third.', r: 'A full set. 10 points!' },
+    roll: { t: 'Seaweed Rolls', s: 'Rolls race for icons. Most icons wins 6.', r: 'Three icons! Odile has one.' },
+    bun: { t: 'Steam Buns', s: 'Each bun is worth more than the last: 1, 3, 6, 10, 15.', r: 'The first bun: 1 point. More buns, more points.' },
+    custard: { t: 'Custard Cup', s: 'Custard pays at the end of the game. Most cups gets 6.', r: 'Custard saved for the final count.' },
+    scoreSets: { t: 'Sets counted', s: 'Prawn pair, Fish Slice set, and a Steam Bun.' },
+    scoreRoll: { t: 'The roll race', s: 'More icons than Odile: you take the big prize.' },
+    scoreNigiri: { t: 'Nigiri and paste', s: 'Your Moon Nigiri on the paste is the star plate.' },
+    scoreChef: { t: 'Odile\'s tray', s: 'Same rules for her. Her lone Fish Slice scores nothing.' },
+    scoreCustard: { t: 'Custard counts', s: 'Custard only pays at the very end of a meal.' },
+    end: { t: 'The meal ends', s: 'Odile owes you a custard. A real meal lasts three rounds.' }
+  },
+  // chapter payoff lines (shown with the first step of the next chapter)
+  payoff: {
+    c1: 'First plate, first swap. You are a diner now.',
+    c2: 'Paste, nigiri, sticks. A clever kitchen!',
+    c3: 'A set, a race and a ladder. Not bad at all.',
+    c4: 'The count is done. Now you are ready for real meals.'
+  },
+  result: { win: 'The Turning Plate cheers for you.', lose: 'The belt turns on. There is always the next meal.' },
+  // the COACHED first game (replaces the tap-step prologue): Suzu speaks just-in-time, one bubble at a time, never blocking input.
+  // ids = the rules in ../TUTORIAL-COVERAGE.md. %n = a number, %r = the rival. who: s = Suzu, o = the rival.
+  coach: {
+    intro: { w: 's', t: 'Odile bet a custard you cannot win, Mina. Pick any dish you like!' },
+    pass: { w: 's', t: 'Picks flip together, then your leftovers ride the belt to the next diner.' },
+    pair: { w: 's', t: 'Crispy Prawns score 5 per PAIR. You have %n: one more makes a pair.' },
+    pair2: { w: 's', t: 'A pair of prawns: 5 points. Every extra pair scores again.' },
+    fish: { w: 's', t: 'Fish Slices score 10 per SET of three. One or two score nothing.' },
+    bun: { w: 's', t: 'Steam Buns climb: 1, 3, 6, 10, then 15 for five. Stack them!' },
+    roll: { w: 's', t: 'Seaweed Rolls race: most icons this round wins 6, second wins 3.' },
+    nigiri: { w: 's', t: 'Nigiri score 1 to 3 points on their own: Sun 1, Sunset 2, Moon 3.' },
+    paste: { w: 's', t: 'Fire Paste triples the NEXT nigiri you serve. Paste first, nigiri after!' },
+    pasteNigiri: { w: 's', t: 'Nigiri on Fire Paste: tripled! That is the best trick on the belt.' },
+    sticks: { w: 's', t: 'Twin Sticks: keep them, then tap the glowing sticks to take two dishes.' },
+    custard: { w: 's', t: 'Custard Cups pay only at the very end: most +6, fewest -6.' },
+    rival: { w: 'o', t: 'Fire Paste for me. My next nigiri triples. Watch your plates, Mina!' },
+    rival2: { w: 'o', t: 'Rolls are mine this round. You will have to race me!' },
+    good: { w: 's', t: 'Lovely pick! The green +N on a plate is what it scores right now.' },
+    poor: { w: 's', t: 'Hmm. %n was worth more right now. Check the green +N before you pick.' },
+    rounds: { w: 's', t: 'Round 2: a new hand. Custard Cups stay, everything else is cleared.' },
+    round3: { w: 's', t: 'Last round! Custard gets counted right after it.' },
+    walk: { w: 's', t: 'Round scored. Let us count it together, rule by rule.' },
+    makiTie: { w: 's', t: 'A roll tie! Tied for most split 6 (rounded down), nobody gets second.' },
+    custardEnd: { w: 's', t: 'Custard: most cups +6, fewest -6, ties split. Counted once, at the end.' },
+    penalty: { w: 's', t: 'With three diners, the fewest cups LOSES 6. Two diners never lose.' },
+    custardTie: { w: 's', t: 'Custard ties split the points, rounded down.' },
+    tieBreak: { w: 's', t: 'Equal totals? More Custard Cups wins the meal.' }
+  }
+};
+
+</script>
+<script>
 // ---------- online play: what a remote seat may see ----------
 // netStrip(G, seat) builds a NEW state object for ONE seat from a WHITELIST of public fields (nothing is copied by default: a field the engine
 // gains later is absent from the copy until it is listed here, so it cannot leak by accident). It starts from KK.stripView (own hand and own
@@ -7641,6 +7825,11 @@ function newsEl() {
   n.lines.forEach((l, i) => box.appendChild(h('div.nl', i ? null : h('span.nh', n.round !== G.round ? 'Last turn of round ' + n.round + ': ' : 'Last turn: '), h('span.nn', { style: 'color:' + pcol(l.s).c }, pname(l.s)), ' ', h('span.nd' + (l.d > 0 ? '.up' : l.d < 0 ? '.down' : ''), l.d > 0 ? '+' + l.d : l.d < 0 ? '−' + -l.d : '±0'), ' ' + l.served + (l.why.length ? ' · ' + l.why.join(', ') : '') + (l.notes.length ? ' · ' + l.notes.join('; ') : ''))));
   return box;
 }
+// ---- story wording (story.js) used by the turn line
+const ST = KK.STORY;
+const nextNm = () => { const v = viewSeat(); return G ? pname(((v >= 0 ? v : 0) + 1) % G.np) : ''; };
+const rivalNm = () => { if (!G) return ''; const v = viewSeat(), pend = KK.pending(G).filter(s => s !== v); const s = pend.length ? pend[0] : (v === 0 ? 1 : 0); return pname(s % G.np); };
+function sayT(k) { return (ST.say[k] || '').replace(/%N/g, nextNm()).replace(/%R/g, rivalNm()); }
 // ===================== part 2: rendering (table, belt, dock) =====================
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) UI.focus = v; return UI.focus || 0; }
@@ -7658,7 +7847,9 @@ function renderBar() {
   // fz.scoring: the engine has already scored this round and dealt the next, but the last reveal is still on screen
   const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, RN = G.len || D.rounds;
   s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand + (G.len ? '' : ' · most points after round 3 wins'));
+  barTwoLines();
 }
+function barTwoLines() { const s = $('#barstat'); if (s && isPh() && s.textContent.indexOf(' \u00b7 ') > 0 && !s.querySelector('br')) { const a = s.textContent.split(' \u00b7 '); s.replaceChildren(h('b', a[0]), h('br'), a[1].replace('/', ' of ')); } }
 function bankedOf(s) {
   const fzEnd = UI.fz && UI.fz.tables && (UI.fz.roundEnd || UI.fz.scoring);   // that round is already in G.rs: don't count it twice
   const list = fzEnd ? G.rs.slice(0, -1) : G.rs;
@@ -7863,26 +8054,35 @@ function zeroTag(v, ty) {
 }
 // ---------- the dock ----------
 function promptText() {
-  // one short line (8 words at most): the board shows the rest
+  // banner|text: "Your turn|Tap the dish you want." (wording: story.js). The board shows the rest.
   if (!G) return '';
+  if (UI.fz && UI.fz.msg) return UI.fz.msg;   // the step captions of the reveal and the hand pass (ui8)
   if (tutOn()) return '';   // the tutorial bubbles speak
-  if (UI.fz && UI.fz.msg) return UI.fz.msg;
   if (G.phase === 'over' && (!UI.fz || UI.fz.crown)) return winLine();
   const v = viewSeat();
-  if (UI.fz && UI.fz.say) return UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Everyone has chosen…') : UI.fz.roundEnd ? 'Round over!' : 'Hands pass along the belt';
+  if (UI.fz && UI.fz.say) return UI.fz.slots ? sayT('cover') : UI.fz.roundEnd ? sayT('roundEnd') : sayT('pass');
   if (UI.cards.length && UI.cards[0].kind === 'pass') return 'Pass the device to ' + pname(UI.cards[0].seat) + '.';
-  if (UI.busy) return 'Hands pass along the belt';
+  if (UI.busy) return sayT('pass');
   if (watching()) return 'The chefs are choosing…';
   if (hotSeat() && v < 0) return 'Pass the device on.';
-  const pend = KK.pending(G).filter(s => s !== v).map(pname);
-  if (v >= 0 && G.players[v].picked) return pend.length ? 'Waiting for ' + (pend.length > 1 ? pend.length + ' diners' : pend[0]) + '…' : 'Reveal!';
+  if (v >= 0 && G.players[v].picked) return sayT('wait');
   if (v >= 0) {
     const nm = hotSeat() ? pname(v) + ': ' : '';
-    if (UI.twin) return nm + (UI.sel.length ? 'Now tap a second dish' : 'Twin Sticks: tap two dishes');
-    if (UI.sel.length && UI.prefs.grab1 === false) return nm + (UI.prefs.tap2 ? 'Tap it again to serve' : 'Press Serve to grab it');
-    return nm + 'Tap a dish to grab it';
+    if (UI.twin) return nm ? nm + (UI.sel.length ? 'Now tap a second dish' : 'Twin Sticks: tap two dishes') : sayT(UI.sel.length ? 'twin2' : 'twin');
+    if (UI.sel.length && UI.prefs.grab1 === false) return nm ? nm + (UI.prefs.tap2 ? 'Tap it again to serve' : 'Press Serve to grab it') : sayT('tap2');
+    return nm ? nm + 'Tap a dish to grab it' : sayT('mine');
   }
   return '';
+}
+// the banner chip + one instruction line (two lines at most); the hand glows only while it is your turn
+function decoratePrompt() {
+  const pr = $('#prompt'); if (!pr) return; const t = pr.textContent, i = t.indexOf('|');
+  const mine = canPick() && viewSeat() >= 0 && !UI.busy && !(UI.fz && UI.fz.msg);
+  document.documentElement.classList.toggle('kkmy', !!(G && UI.started && mine && !tutOn()));
+  if (i < 0) { pr.classList.remove('kk2'); return; }
+  const b = t.slice(0, i), x = t.slice(i + 1), sig = b + '|' + x;
+  pr.className = (mine ? 'mine ' : '') + 'kk2' + (/^Your/.test(b) ? ' kyou' : ' krival');
+  if (pr.dataset.sig !== sig || !pr.querySelector('.kb')) { pr.dataset.sig = sig; pr.replaceChildren(h('b.kb', b), h('span.kt', x)); if (b !== (decoratePrompt.last || '') && ANIM) { pr.classList.remove('kpop'); void pr.offsetWidth; pr.classList.add('kpop'); } decoratePrompt.last = b; }
 }
 function placePrompt() {
   const p = $('#prompt'); if (!p) return;
@@ -7890,7 +8090,7 @@ function placePrompt() {
   if (tgt && p.parentNode !== tgt) tgt.appendChild(p);
 }
 function renderDock() {
-  const pr = $('#prompt'); if (pr) { const t = promptText(); pr.textContent = t; const v = viewSeat(); pr.className = canPick() && v >= 0 ? 'mine' : ''; }
+  const pr = $('#prompt'); if (pr) { const t = promptText(); pr.textContent = t; const v = viewSeat(); pr.className = canPick() && v >= 0 ? 'mine' : ''; try { decoratePrompt(); } catch (e) { console.error(e); } }
   renderLabActs();
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
   // round track
@@ -8016,6 +8216,7 @@ function flyAI(seat) {
   } catch (e) { }
 }
 function commit(seat, mv) {
+  try { coachPicked(seat, mv); } catch (e) { }
   if (!G || G.phase !== 'pick') return false;
   const v = viewSeat(), preHand = v >= 0 ? G.players[v].hand.slice() : null, wasHolder = UI.holder;
   const r = KK.apply(G, seat, { pick: mv.pick });
@@ -8099,7 +8300,7 @@ const keyOfCard = c => { const k = c.key; return ICONS[k] ? 'roll' : NIG[k] ? (c
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playResolve(q[0], q[1]); } }
 async function playResolve(evs, preHand) {
   if (UI.busy) { UI.rq.push([evs, preHand]); return; }
-  const tok = UI.seq; UI.busy = true; closePop();
+  const tok = UI.seq; UI.busy = true; closePop(); guideHide();
   const rv = evs.find(e => e.t === 'reveal'), ps = evs.find(e => e.t === 'pass'), sc = evs.find(e => e.t === 'score'), ge = evs.find(e => e.t === 'gameEnd');
   const v = viewSeat(), np = G.np, block = !NET.on;
   try {
@@ -8114,6 +8315,8 @@ async function playResolve(evs, preHand) {
     UI.sel = []; UI.twin = false; UI.rec = null;
     UI.fast = false; render(); await wait(300); if (tok !== UI.seq) return;
     // 2: the covers lift together, big, in the middle of the table (ui8: the reveal stage); without it, in the seats
+    try { UI.fz.news0 = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.fz.news0 = null; }
+    UI.fz.msg = sayT('cover'); renderDock(); try { coachMove(); } catch (e) { }
     UI.fz.say = 'Reveal! ' + rv.picks.map(p => pname(p.seat) + ': ' + p.cards.map(c => TY[c.key].name).join(' + ')).join(' · ');
     const gains = (() => { try { const a = liveScores(before), b = liveScores(T); return b.map((x, s) => x.total - a[s].total); } catch (e) { return null; } })();
     if (ANIM && stageOK()) { try { await stageReveal(rv.picks, tok, gains); } catch (e) { console.error(e); stageClear(); } }
@@ -8126,10 +8329,11 @@ async function playResolve(evs, preHand) {
     // 3: plates land on the counters
     const land = new Set(); rv.picks.forEach(p => p.cards.forEach(c => land.add(p.seat + '|' + keyOfCard(c)))); UI.land = land;
     try { UI.news = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.news = null; }
-    UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
+    UI.fz.msg = sayT(sc ? 'roundEnd' : 'land'); UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
     if (sc) { UI.fz.roundEnd = true; UI.fz.hand = []; UI.fz.backN = 0; }
     render(); stageClear(); snd('clink'); try { scorePops(before, T); } catch (e) { } await wait(800); if (tok !== UI.seq) return;
     if (ps) {
+      UI.fz.msg = sayT('pass'); renderDock();
       // 4: every hand moves one seat on, visibly: your dishes ride the belt off to the next diner, the next hand rides in
       if (ANIM) { try { await passAlong(ps.sizes); } catch (e) { console.error(e); } }
       UI.fz = null; UI.enter = v >= 0 ? 'pass' : ''; render(); passDone();
@@ -8176,7 +8380,7 @@ function save() {
   try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
 }
 // autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
-function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over' || UI.mode === 'tutorial') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
+function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over' || UI.mode === 'tutorial' || UI.mode === 'coached') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
 function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;
@@ -8312,7 +8516,7 @@ function showRound(sc, ge) {
   (async () => {
     let done = false; try { done = await runTally(sc, last, tok); } catch (e) { console.error(e); done = true; }
     if (!done || tok !== UI.seq || !UI.rsOpen) return;
-    UI.rsInfo.done = true; F.msg = null;
+    UI.rsInfo.done = true; F.msg = null; try { if (!last) coachWalk(sc); } catch (e) { }
     if (last) {
       F.crown = true; markWinners();
       if (campOn()) { renderDock(); await tw(1500); if (tok === UI.seq && UI.rsOpen) afterRound(ge); }
@@ -8336,6 +8540,16 @@ function showFinal() {
   if (UI.fz) UI.fz.crown = true; UI.overShown = true; renderDock(); markWinners();
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again', cls: 'go' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
   rs.replaceChildren(h('div.rsbox.bar', { role: 'group', 'aria-label': 'Result' }, bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
+  try {
+    if (UI.mode !== 'tutorial' && !UI.camp) {
+      const box = rs.querySelector('.rsbox');
+      const ws2 = G.winners || [], v2 = viewSeat(), win = ws2.indexOf(v2) >= 0, tie = ws2.length > 1, rv = pname(ws2.find(s => s !== v2) != null ? ws2.find(s => s !== v2) : (v2 === 0 ? 1 : 0));
+      const line = tie ? KK.STORY.quickResult.tie : (win ? KK.STORY.quickResult.win : KK.STORY.quickResult.lose).replace(/%R/g, rv);
+      const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => s).sort((a, b) => tot[b] - tot[a]);
+      box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line))),
+        h('ol.kkrs', ...order.map(s => h('li' + (ws2.indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v2 ? ' (you)' : '')), h('span.p', String(tot[s]) + ' pts'))))), box.firstChild); rs.classList.add('kkfin');
+    }
+  } catch (e) { console.error(e); }
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate($('#rs')); } else snd('round', { duck: true });
   if (humans().length || NET.on) lsSet('kk_done', '1');
@@ -8353,15 +8567,10 @@ function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
   sec('The goal', h('p', 'You are a diner at a conveyor-belt sushi bar. Collect plates over three rounds and score points for sets, pairs, ladders and races. The highest total after the third round wins. Ties go to the diner with more Custard Cups.'));
-  sec('How a round goes', h('ol', ...[
-    'Everyone is dealt a hand: 10 plates with 2 diners, 9 with 3, 8 with 4 and 7 with 5.',
-    'All diners secretly pick one plate from their hand at the same time. On your phone or computer: tap a dish on the belt to grab it (or drag it up onto the table). Press and hold a dish to read it first. With "One tap grabs" off in the menu, a tap lifts the dish and Serve confirms it.',
-    'When everyone has chosen, the covers lift together and the plates land on your counters.',
-    'Then every hand moves one seat on, around the table: your dishes ride off the belt to the next diner and the previous diner\'s hand rides in. You pick again from the hand you just received.',
-    'When the hands are empty the round is scored. Everything except Custard is cleared away and a new hand is dealt.'].map(t => h('li', t))));
+  sec('Hands and taps', h('p', 'Hand size: 10 plates with 2 diners, 9 with 3, 8 with 4, 7 with 5. Tap a dish on the belt to grab it, or press and hold to read it first. With "One tap grabs" off in the menu, a tap lifts the dish and Serve confirms it. When the hands are empty the round is scored, everything except Custard is cleared and a new hand is dealt.'));
   sec('Every plate', h('div', ...D.types.map(t => {
     const id = t.id; const rule = { tempura: 'pair', sashimi: 'set', dumpling: 'ladder', roll1: 'most', roll2: 'most', roll3: 'most', salmon: 'v2', squid: 'v3', egg: 'v1', wasabi: 'x3', chop: 'swap', pudding: 'dessert' }[id];
-    return h('div.rcard', cardDiv(id, 64), h('div.rt', h('b', t.name + (t.copies ? ' (' + t.copies + ')' : '')), h('div', t.text)));
+    return h('div.rcard', cardDiv(id, innerWidth >= 1024 ? 90 : 64), h('div.rt', h('b', t.name + (t.copies ? ' (' + t.copies + ')' : '')), h('div', t.text)));
   })));
   sec('Scoring a round', h('ul', ...[
     'Crispy Prawn: 5 points for every pair.', 'Fish Slice: 10 points for every set of three.', 'Steam Bun: 1, 3, 6, 10, 15 points for 1, 2, 3, 4, 5 or more buns.',
@@ -8388,6 +8597,13 @@ function buildRules() {
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
+  root.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are above.'));
+  root.insertBefore(h('div.kkturn', h('h3', 'How a turn works'), h('ol', ...KK.STORY.turn.map(t => h('li', t.replace(/^\d\.\s*/, ''))))), root.firstChild);
+  sec('What we simplified', h('ul', ...[
+    'Twin Sticks: your two dishes are put down in the best order automatically (Fire Paste first, then the best nigiri). You cannot choose the order.',
+    'A nigiri goes on your oldest unused Fire Paste. All pastes triple the same, so the score never changes.',
+    'A tie for fewest Custard Cups splits the 6-point loss, rounded down.',
+    'Story mode adds a twist to some boss meals (a head start or extra roll icons). Quick games never use twists.'].map(t => h('li', t))));
   return root;
 }
 const kkIc = n => { const i = new Image(); i.className = 'kki'; i.alt = ''; i.setAttribute('aria-hidden', 'true'); i.onerror = () => i.remove(); i.src = 'media/icon-' + n + '.webp'; return i; };   // painted counter icon; removes itself when the file is missing
@@ -8427,9 +8643,8 @@ function renderMenu() {
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, 'Pick the songs\u2026'));
   { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
-  if (!NET.on) { const tr = h('div.mrow'); tr.appendChild(tutNode('btn')); b.appendChild(tr); }
+  if (!NET.on) { const tr = h('div.mrow'); tr.appendChild(tutNode('btn', { first: false })); b.appendChild(tr); }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('span.tinyc', { html: sp }));
-  b.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are in How to play.'));
 }
 // ---------- start screens: painted title -> setup (diner cards) / online ----------
 // the four chefs who can join you (you are seat 0 with Mina's portrait). Default level = the character's temper; every level can be changed.
@@ -8469,7 +8684,7 @@ function titleEl() {
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,
       sv ? h('button.tbtn.go', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', (si => si ? 'your meal, round ' + si.round + ' of ' + D.rounds + ' · ' + si.np + ' diners' : 'your saved meal')(saveInfo()))) : null,
-      h('button.tbtn' + (sv || firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : 'Play'), h('span', 'against the computer chefs')),
+      h('button.tbtn' + (sv || firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : firstTime() ? 'Quick game' : 'Play'), h('span', 'against the computer chefs')),
       h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')))));
 }
@@ -8484,7 +8699,7 @@ function dinerCard(c, o) {
 }
 function setupEl() {
   const o = optObj(), ph = isPh(), open = !!UI.cfgOpen;
-  const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Who is at the counter?'));
+  const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Who is at the counter?'), h('p.kkflav', KK.STORY.quickIntro));
   const sum = h('div.ssum', h('div.sfaces', o.seats.map(c => h('span', { html: avatarC(c, 64) }))), h('span.sline', tableLine(o)), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
   const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Configure the table' : null },
     ph ? h('div.cfghead', h('b', 'Configure the table'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
@@ -9176,6 +9391,11 @@ function anim(el, kf, o) { if (!el.animate) return Promise.resolve(); const a = 
 // ---- the reveal stage: every diner's covered dish in a row in the middle of the table, a drum roll, all covers up at once
 function stageOK() { return !!$('#tbl') && !!document.body.animate && !pxRM(); }
 function stageClear() { const s = $('#stage'); if (s) s.remove(); }
+const cap1 = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
+function revealCaption(sd, l) {
+  const me = sd === viewSeat(), nm = me ? 'You' : pname(sd), served = l ? l.served : 'a dish', d = l ? l.d : 0;
+  return (me ? 'Your turn' : pname(sd) + '\'s turn') + '|' + nm + (me ? ' serve ' : ' serves ') + served + '.' + (d > 0 ? ' +' + d : '');
+}
 async function stageReveal(picks, tok, gains) {
   stageClear();
   const bd = $('#bd'), tbl = $('#tbl'), B = bd.getBoundingClientRect(), T = tbl.getBoundingClientRect();
@@ -9210,13 +9430,18 @@ async function stageReveal(picks, tok, gains) {
   for (let k = 0; k < rolls; k++) { snd('tick', { rate: 1 + k * .15, vol: .5 }); await wait(190); if (tok !== UI.seq) return stageClear(); }
   st.classList.remove('wob'); st.classList.add('up'); UI.fz.slots = picks.map(p => ({ mode: 'faces', cards: p.cards })); renderDock(); renderLabActs();
   snd('cloche');
-  await Promise.all(covers.map(c => c.lift({ delay: 0 })));
-  if (tok !== UI.seq) return stageClear();
-  // what each dish just did to its diner's score, big, over the dish (the reveal's payoff)
-  if (gains) { let best = 0; pods.forEach(p => { best = Math.max(best, gains[p.s] || 0); });
-    pods.forEach((p, i) => { const d = gains[p.s] || 0; const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + (d > 0 && d === best ? '.top' : ''), d > 0 ? '+' + d : d < 0 ? '−' + -d : '+0'); g.style.animationDelay = (i * 90) + 'ms'; p.host.appendChild(g); });
-    if (best > 0) snd('coin', { vol: .5 }); }
-  await wait(rolls > 1 ? 800 : 650); if (tok !== UI.seq) return stageClear();
+  // ONE BY ONE: each diner's cover lifts in turn, the dish is named in the caption line, its points pop with the plain reason (tap to hurry)
+  st.classList.add('seq'); const news0 = UI.fz && UI.fz.news0, stp = G.turn <= 3 && G.round === 1 ? 1 : .8;
+  for (let i = 0; i < pods.length; i++) {
+    const p = pods[i], l = news0 && news0.lines.find(x => x.s === p.s), d = gains ? (gains[p.s] || 0) : 0;
+    pods.forEach((q, j) => q.pod.classList.toggle('cur', j === i)); if (UI.fz) UI.fz.msg = revealCaption(p.s, l); renderDock();
+    snd('cloche'); await covers[i].lift({ delay: 0 }); if (tok !== UI.seq) return stageClear();
+    const why = l ? l.why.map(w => w.replace(/^[+\u2212]\d+ /, '')).join(' and ') : '';
+    const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + '.cur', d > 0 ? '+' + d : d < 0 ? '\u2212' + -d : '+0', h('small', d !== 0 && why ? why : 'no points yet'));
+    p.host.appendChild(g); p.pod.classList.add('done'); if (d > 0) snd('coin', { vol: .5 });
+    await wait(1000 * stp); if (tok !== UI.seq) return stageClear();
+  }
+  pods.forEach(q => q.pod.classList.remove('cur')); st.classList.remove('seq');
   // each dish goes home to its diner's counter
   UI.fz.slots = picks.map(() => ({ mode: 'gone' }));
   await Promise.all(pods.map((p, i) => {
@@ -9288,6 +9513,19 @@ function passDone() {
   const b = $('#belt'); if (b) b.style.visibility = '';
   if (UI.passKeep) { const k = UI.passKeep; UI.passKeep = null; setTimeout(() => k.forEach(e => e.remove()), 120); }
 }
+// ---- the guide card: a portrait and two short lines (the tutorial reaction beats, the quick game opening, the result)
+function portraitEl(who, px) {
+  const w = who || ST.guide, el = h('span.kkport', { style: 'width:' + px + 'px;height:' + px + 'px;background:' + w.color }, h('i', w.name.replace(/^Auntie /, '').charAt(0)));
+  const im = new Image(); im.alt = ''; im.src = MEDIA + w.portrait; im.onload = () => { el.appendChild(im); }; return el;
+}
+function guideSay(text, ms, who) {
+  let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
+  clearTimeout(guideSay.t); g.replaceChildren(portraitEl(who, 40), h('div.kgt', h('b', (who || ST.guide).name), h('span', text))); g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
+  guideSay.t = setTimeout(() => g.classList.remove('on'), ms || 3200);
+}
+function guideHide() { const g = $('#kkguide'); if (g) g.classList.remove('on'); }
+// the tutorial bubble gets the guide's portrait (code-drawn disc, painted portrait on top when the file is there)
+new MutationObserver(() => { const b = document.querySelector('.gxt-bub'); if (b && !b.querySelector('.kkport')) b.insertBefore(portraitEl(null, 40), b.firstChild); }).observe(document.body, { childList: true, subtree: true });
 // ===================== part 9: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
 // A chapter is a real 3-round meal against named chefs. Twists exist only here; the normal rules never change.
 UI.camp = null;
@@ -9375,7 +9613,7 @@ function hlpPhase() {
   if (UI.rsOpen) return document.querySelector('#rs [data-a=rsnext]') ? 'tally' : null;
   if (G.phase !== 'pick' || !canPick() || UI.drag) return null;
   if (UI.twin) return 'twin2';
-  return hlpSticks() && G.players[viewSeat()].hand.length >= 2 ? 'twin' : 'pick';
+  return hlpSticks() && G.players[viewSeat()].hand.length >= 2 ? 'twin' : null;   // the plain pick is explained by the always-visible instruction line (ui13)
 }
 const hlpCap = (t, n) => { const w = t.split(/\s+/); return w.length <= n ? t : w.slice(0, n).join(' ').replace(/[,;:]$/, '') + '.'; };
 function hlpWhy(v, mv) {
@@ -9479,7 +9717,7 @@ const trayStarts = k => () => { const s = document.querySelector('#tbl .seat.me'
 const tutDone = () => !!(G && G.phase === 'over' && UI.tutOver && UI.rsInfo && UI.rsInfo.done);
 const RS = seat => G.rs[0][seat];   // round-1 score lines: 0 = you, 1 = the chef
 const pickStep = (id, t, title, say, extra) => Object.assign({ id, title, say, target: () => beltCard(myPick(t)[0])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(t)[0] }, ready: () => turnIs(t) && UI.sel.length === 0 && !UI.twin }, extra || {});
-function tutSteps() {
+function tutStepsRaw() {
   return [
     { id: 'goal', title: 'Your goal', say: 'Collect dishes that score points. After the last round the highest total wins. Today: one short round.', target: tq('#tbl .seat.me .av'), wait: null, ready: () => turnIs(1) },
     { id: 'chef', title: 'The chef', say: () => pname(1) + ' is a computer. They play by the same rules and choose at the same time as you.', target: tq('#tbl .seat:not(.me) .sh'), wait: null, ready: () => turnIs(1) },
@@ -9499,11 +9737,26 @@ function tutSteps() {
     pickStep('custard', 10, 'Custard Cup', 'Custard scores only at the game end. Most cups gets 6. Tap it.'),
     { id: 'scoreSets', title: 'Sets scored', say: () => 'Prawn pair ' + RS(0).tempura + ', Fish Slice set ' + RS(0).sashimi + ', one Steam Bun ' + RS(0).dumpling + '. A lone dish scores nothing.', target: tq('#tbl .seat.me .ctr'), wait: null, ready: tutDone, pending: 'Counting the round' },
     { id: 'scoreRoll', title: 'Roll race', say: () => 'Your ' + RS(0).icons + ' icons beat the chef\'s ' + RS(1).icons + ': you get ' + RS(0).maki + ', they get ' + RS(1).maki + '.', target: myTray('roll'), wait: null, ready: tutDone },
-    { id: 'scoreNigiri', title: 'Nigiri and paste', say: () => 'Nigiri score 1 to 3 points. Your Moon Nigiri on Fire Paste scored ' + (RS(0).nigiri + RS(0).wasabi) + '.', target: trayStarts('pn-'), wait: null, ready: tutDone },
-    { id: 'scoreChef', title: 'The chef scored', say: () => pname(1) + ' got ' + RS(1).total + '. Their lone Fish Slice scored nothing. Same rules for everyone.', target: tq('#tbl .seat:not(.me)'), wait: null, ready: tutDone },
+    { id: 'scoreNigiri', title: 'Nigiri and paste', say: () => 'Your Moon Nigiri on Fire Paste scored ' + (RS(0).nigiri + RS(0).wasabi) + '. Nigiri alone: 1 to 3.', target: trayStarts('pn-'), wait: null, ready: tutDone },
+    { id: 'scoreChef', title: 'The chef scored', say: () => pname(1) + ' got ' + RS(1).total + '. Her lone Fish Slice scored nothing.', target: tq('#tbl .seat:not(.me)'), wait: null, ready: tutDone },
     { id: 'scoreCustard', title: 'Custard counts', say: 'Custard scores once, at the very end: most cups +6, fewest −6 (not with two diners).', target: tq('#tbl .seat.me .grp.shelf'), wait: null, ready: tutDone },
-    { id: 'end', title: 'The meal ends', say: () => 'Real meals last three rounds. Highest total wins; ties go to more Custard Cups. You win ' + G.final.totals[0] + ' to ' + G.final.totals[1] + '!', target: tq('#tbl .seat.me .av'), wait: null, ready: tutDone }
+    { id: 'end', title: 'The meal ends', say: () => 'You win ' + G.final.totals[0] + ' to ' + G.final.totals[1] + '! Real meals last 3 rounds. Ties go to more custard.', target: tq('#tbl .seat.me .av'), wait: null, ready: tutDone }
   ];
+}
+// the story layer: every step is a reason (story.js), then the action; chapters open with a beat and pay off in the next one
+function tutSteps() {
+  const raw = tutStepsRaw(), T = KK.STORY.tut, C = KK.STORY.chapters, P = KK.STORY.payoff, DYN = { scoreSets: 1, scoreRoll: 1, scoreNigiri: 1, scoreChef: 1, end: 1 };
+  raw.forEach(st => { const t = T[st.id]; if (!t) return; st.title = t.t; if (!DYN[st.id]) st.say = t.s; });
+  const beat = (id, before, tgt, pay) => { const nx = raw.find(x => x.id === before); return { id, title: C[id].title, say: C[id].open, target: tgt, wait: null, ready: nx.ready, chapter: true }; };
+  const out = [];
+  raw.forEach(st => {
+    if (st.id === 'goal') out.push(beat('c1', 'goal', tq('#belt')));
+    if (st.id === 'paste') out.push(beat('c2', 'paste', tq('#belt'), 'c1'));
+    if (st.id === 'fish3') out.push(beat('c3', 'fish3', tq('#belt'), 'c2'));
+    if (st.id === 'scoreSets') out.push(beat('c4', 'scoreSets', tq('#tbl .seat.me .ctr'), 'c3'));
+    out.push(st);
+  });
+  return out;
 }
 // ---------------------------------------------------------------- the kit hooks
 function tutLeave() {
@@ -9514,28 +9767,105 @@ function tutLeave() {
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen() { if (typeof GXC === 'undefined' || !window.CAMPAIGN) return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
 function tutStart(o) {
-  if (typeof GXT === 'undefined') return; const pro = !!(o && o.prologue); o = pro ? o : null;
-  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'You know the rules',
-    endText: o ? 'Pick, pass, sets, rolls, paste, sticks and custard. Now the Story begins.' : 'Pick, pass, sets, rolls, paste, sticks and custard. A real meal has three rounds: the lightbulb helps.',
-    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
-    setup: () => { try { GX.close(); } catch (e) { } try { closePop(); } catch (e) { } closeRS(); newGame('tutorial', { np: 2, seats: [2] }); },
-    onDone: r => { tutLeave(); const c = r && r.choice;
-      if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
-      else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); campOpen(); }
-      else { showStart(); UI.sv = 'setup'; renderStart(); } },
-    onExit: () => { tutLeave(); showStart(); if (pro && typeof GXC !== 'undefined') campOpen(); } });
+  const pro = !!(o && o.prologue); const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  try { GX.close(); } catch (e) { } try { closePop(); } catch (e) { } closeRS();
+  newGame('coached', { np: 3, seats: [2, 3], level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'] });
+  coachBegin(pro, first);
+}
+// ================= the COACHED first game: a real 3-round game, free choices from turn 1; Suzu (and the rival) speak just in time =================
+// One bubble at a time, never blocks input (only the x takes taps), dismissible. Rules that never came up are listed on the end card ("Things you'll meet later").
+window.GXCOACH = { running: false, explained: [], later: [], done: false };
+const COACH = { q: [], cur: null, seen: {}, on: false, pro: false, first: null, iv: 0, tm: 0, rounds: {}, poorN: 0, pick: null };
+const COACH_ALL = ['intro', 'pass', 'pair', 'fish', 'bun', 'roll', 'nigiri', 'paste', 'pasteNigiri', 'sticks', 'custard', 'rival', 'rounds', 'walk', 'makiTie', 'custardEnd', 'penalty', 'custardTie', 'tieBreak'];
+const coachOn = () => COACH.on && UI.mode === 'coached' && !!G;
+function coachBegin(pro, first) {
+  clearInterval(COACH.iv); clearTimeout(COACH.tm);
+  Object.assign(COACH, { q: [], cur: null, seen: {}, on: true, pro, first, rounds: {}, poorN: 0, pick: null });
+  Object.assign(window.GXCOACH, { running: true, explained: [], later: [], done: false });
+  COACH.iv = setInterval(coachPoll, 450); coachSay('intro');
+}
+function coachStop() { COACH.on = false; clearInterval(COACH.iv); clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; window.GXCOACH.running = false; guideHide(); }
+function coachSay(id, n) {
+  if (COACH.seen[id] || !KK.STORY.coach[id]) return; COACH.seen[id] = 1; window.GXCOACH.explained.push(id);
+  const c = KK.STORY.coach[id]; COACH.q.push({ id, t: c.t.replace(/%n/g, n == null ? '' : n).replace(/%r/g, rivalName()), w: c.w }); coachPump();
+}
+function rivalName() { return G ? pname(1) : 'Odile'; }
+function coachPump() {
+  if (COACH.cur || !COACH.q.length) return; const m = COACH.q.shift(); COACH.cur = m;
+  let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
+  const who = m.w === 'o' ? { name: pname(1), color: '#e0a31c', portrait: 'camp-odile.webp' } : null;
+  const kx = h('button.kx', { type: 'button', 'aria-label': 'Dismiss' }, '\u00d7'); kx.addEventListener('click', () => coachNext());
+  g.replaceChildren(portraitEl(who, 40), h('div.kgt', h('b', (who || KK.STORY.guide).name), h('span', m.t)), kx); g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
+  clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, Math.max(5200, m.t.length * 75));
+}
+function coachNext() { clearTimeout(COACH.tm); COACH.cur = null; const g = $('#kkguide'); if (g) g.classList.remove('on'); setTimeout(coachPump, 350); }
+// situations: checked every ~0.5 s while nobody is mid-animation
+function coachPoll() {
+  if (!coachOn() || UI.busy || UI.fz || UI.rsOpen || UI.cards.length) return;
+  const v = viewSeat(); if (v < 0) return; const me = G.players[v], C = KK.tableCounts(me.table);
+  const all = G.players.flatMap(p => p.table.map(e => tkey(e.id))), handKeys = me.hand.map(tkey);
+  if (G.round === 1 && G.turn >= 2) coachSay('pass');
+  if (C.tempura >= 1) coachSay('pair', C.tempura % 2 ? C.tempura : 0), C.tempura >= 2 && coachSay('pair2');
+  if (C.sashimi >= 1) coachSay('fish');
+  if (C.dumpling >= 1) coachSay('bun');
+  if (all.some(k => ICONS[k])) coachSay('roll');
+  if (all.some(k => NIG[k])) coachSay('nigiri');
+  if (C.wasabi >= 1 || handKeys.includes('wasabi')) coachSay('paste');
+  if (G.used.wasabiNigiri) coachSay('pasteNigiri');
+  if (C.chop >= 1 || handKeys.includes('chop')) coachSay('sticks');
+  if (all.includes('pudding') || handKeys.includes('pudding')) coachSay('custard');
+  const rv = G.players.filter((p, s) => s !== v);
+  if (rv.some(p => KK.tableCounts(p.table).wasabi >= 1)) coachSay('rival');
+  else if (rv.some(p => KK.tableCounts(p.table).icons >= 3) && C.icons < 3) coachSay('rival2');
+  if (G.round === 2) coachSay('rounds'); if (G.round === 3) coachSay('round3');
+}
+// the player's own pick: remember what the best alternative was (called before the move is applied)
+function coachPicked(seat, mv) {
+  if (!coachOn() || seat !== viewSeat()) return;
+  try { const mine = gainOf(seat, mv.ids); let best = -1, bi = null; for (const m of KK.moves(G, seat)) { if (m.pick.length !== mv.pick.length) continue; const g = gainOf(seat, m.ids); if (g > best) { best = g; bi = m; } } COACH.pick = { mine, best, name: bi ? TY[tkey(bi.ids[0])].name : '' }; } catch (e) { COACH.pick = null; }
+}
+function coachMove() {
+  if (!coachOn() || !COACH.pick) return; const k = COACH.pick; COACH.pick = null;
+  if (k.mine >= 5) coachSay('good'); else if (k.best - k.mine >= 4 && COACH.poorN < 2) { COACH.poorN++; COACH.seen.poor = 0; coachSay('poor', k.name); }
+}
+// after the round tally: Suzu walks the real numbers, one line at a time
+function coachWalk(sc) {
+  if (!coachOn() || !sc) return; const a = sc.seats[viewSeat()], b = sc.seats.find((x, i) => i !== viewSeat()), nm = rivalName();
+  if (!COACH.seen.walk) { coachSay('walk'); KK.STORY.coach.walkL = null; }
+  const lines = ['Prawn pairs +' + a.tempura + ', Fish sets +' + a.sashimi + ', Buns +' + a.dumpling + '.', 'Roll race: your ' + a.icons + ' icons ' + (a.maki ? 'won +' + a.maki : 'won nothing') + '. ' + nm + ' had ' + b.icons + '.', 'Nigiri +' + a.nigiri + (a.wasabi ? ', Fire Paste bonus +' + a.wasabi : '') + '. Round total: ' + a.total + ' (' + nm + ' ' + b.total + ').'];
+  lines.forEach((t, i) => COACH.q.push({ id: 'walk' + i, t, w: 's' })); coachPump();
+  if (G.used.makiTie) coachSay('makiTie');
+}
+function coachEnd() {
+  const F = G.final, v = viewSeat(); coachSay('custardEnd');
+  if (G.np > 2 && Math.min(...F.pudding) !== Math.max(...F.pudding)) coachSay('penalty');
+  { const mx = Math.max(...F.pudding), mn = Math.min(...F.pudding), n = x => F.pudding.filter(c => c === x).length; if (mx > 0 && (n(mx) > 1 || (mn !== mx && n(mn) > 1))) coachSay('custardTie'); }
+  if (G.used.tieBreak) coachSay('tieBreak'); if (G.used.makiTie) coachSay('makiTie');
+  window.GXCOACH.later = COACH_ALL.filter(k => !COACH.seen[k]); window.GXCOACH.done = true; window.GXCOACH.running = false;
+  clearInterval(COACH.iv); try { GXT.markDone(TUT_GAME); lsSet('kk_done', '1'); } catch (e) { }
+  const rs = $('#rs'); rs.hidden = false; UI.rsOpen = true;
+  const win = (G.winners || []).indexOf(v) >= 0, tot = F.totals, order = G.players.map((p, s) => s).sort((x, y) => tot[y] - tot[x]);
+  const lat = window.GXCOACH.later;
+  const btns = [h('button.btn.go', { type: 'button', 'data-a': 'coachplay' }, 'Play a real game')];
+  if (COACH.pro && COACH.first) btns.unshift(h('button.btn.go', { type: 'button', 'data-a': 'coachchapter' }, 'Start chapter 1')); else if (window.CAMPAIGN) btns.push(h('button.btn.alt', { type: 'button', 'data-a': 'coachstory' }, 'Story mode'));
+  rs.replaceChildren(h('div.rsbox.bar.kkcoachend', h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', win ? 'You know the rules, Mina!' : 'You know the rules!'), h('span', win ? 'Odile owes you a custard.' : 'Odile keeps the custard. For now.'))),
+    h('ol.kkrs', ...order.map(s => h('li' + ((G.winners || []).indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v ? ' (you)' : '')), h('span.p', tot[s] + ' pts')))),
+    lat.length ? h('div.kklater', h('b', 'Things you will meet later'), h('ul', ...lat.map(k => h('li', KK.STORY.coach[k].t)))) : null), ...btns));
+  rs.classList.add('kkfin'); rs.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => {
+    coachStop(); rs.hidden = true; rs.innerHTML = ''; rs.classList.remove('kkfin'); UI.rsOpen = false; const a = b.dataset.a;
+    const done = () => { if (a === 'coachchapter' && COACH.first) { showStart(); GXC.play(COACH.first.id); } else if (a === 'coachstory' && typeof GXC !== 'undefined') { showStart(); campOpen(); } else { showStart(); UI.sv = 'setup'; renderStart(); } };
+    UI.started = false; clearTimeout(UI.tm); UI.seq++; G = null; done(); }));
 }
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
 { const o = tapHand; tapHand = function (i) {
-  if (tutOn() && G && canPick()) { const id = G.players[viewSeat()].hand[i]; if (!GXT.act({ type: 'tap', what: 'pick', id, i })) return; }
+  if (tutOn() && G && canPick()) { const id = G.players[viewSeat()].hand[i], sid = GXT.state().id; if (!GXT.act({ type: 'tap', what: 'pick', id, i })) return; const r = KK.STORY.tut[sid] && KK.STORY.tut[sid].r; if (r) setTimeout(() => guideSay(r, 3000), 700); }
   return o.apply(this, arguments); }; }
 { const o = toggleTwin; toggleTwin = function () {
-  if (tutOn() && !UI.twin && !GXT.act({ type: 'tap', what: 'twin' })) return;
+  if (tutOn() && !UI.twin) { const sid = GXT.state().id; if (!GXT.act({ type: 'tap', what: 'twin' })) return; const r = KK.STORY.tut[sid] && KK.STORY.tut[sid].r; if (r) guideSay(r, 2600); }
   return o.apply(this, arguments); }; }
 // the final score pad is not shown in the tutorial: the table stays under the steps, and the end card closes it
 { const o = showFinal; showFinal = function () {
+  if (UI.mode === 'coached') { UI.overShown = true; try { renderDock(); markWinners(); } catch (e) { } coachEnd(); return; }
   if (UI.mode === 'tutorial') { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.overShown = true; UI.tutOver = true; try { renderDock(); markWinners(); } catch (e) { } return; }
   return o.apply(this, arguments); }; }
 // ===================== part 12: painted extras (unlocked card backs and table, end art) and music (per screen + the Music picker) =====================

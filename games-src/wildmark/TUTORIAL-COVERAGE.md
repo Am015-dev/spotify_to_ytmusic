@@ -1,6 +1,6 @@
 # Wildmark tutorial coverage (coached first game)
 
-Owner, 7 Nov: "The tutorial is not a game, it's tap tap." It is now a **coached first game**: a real 8-turn game against Bram (easy) with
+Owner, 7 Nov: "The tutorial is not a game, it's tap tap." It is now a **coached first game**: a real 6-turn game against Bram (easy) with
 free choices from turn 1. There are no forced steps; every legal move is allowed. The market is stacked on turns 1-4 (seed 11,
 `tutFix`) so the key situations come up early. Ward Elder Rowan speaks the first time each rule matters, in one bubble at a time.
 The bubble never blocks a tap (checked by elementFromPoint) and can be dismissed. After the player's own move Rowan gives up to 3
@@ -13,7 +13,7 @@ the result screen and walk-through appear, the tutorial is marked done, no tap w
 
 | Rule (id) | When Rowan explains it | Story beat |
 |---|---|---|
-| goal: 8 turns, out-grow the rival, pick a pair (`goal`) | first pick | Bram wants the valley for timber |
+| goal: 6 turns, out-score the rival, market "up to +N" badges, pick a pair (`goal`) | first pick | Bram wants the valley for timber |
 | place a tile next to your valley (`place`) | first tile step | |
 | habitats: 1 point per tile in the biggest joined group (`habitat`) | first time your habitat score grows | |
 | turn split tiles (`rotate`) | first split tile you hold over a spot | |
