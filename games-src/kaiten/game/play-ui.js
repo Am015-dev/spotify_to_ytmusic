@@ -24,8 +24,9 @@ async function playMeal(p, tag, until) {
   while (Date.now() - t0 < 420000) {
     if (await until()) return { picks, taps };
     const sig = await p.evaluate(() => G ? [G.round, G.turn, G.phase, UI.busy ? 1 : 0, UI.cards.length, !document.querySelector('#rs').hidden ? 1 : 0].join('.') : 'none');
-    if (sig !== lastSig) { lastSig = sig; lastT = Date.now(); } else if (Date.now() - lastT > 20000) { note(tag, 'stuck at ' + sig); return { picks, taps }; }
+    if (sig !== lastSig) { lastSig = sig; lastT = Date.now(); } else if (Date.now() - lastT > 20000) { const top = await p.evaluate(() => { const b = document.querySelector('#belt .hc[data-up="1"]'); if (!b) return 'no glowing dish; canPick=' + canPick() + ' busy=' + UI.busy + ' cards=' + UI.cards.length; const r = b.getBoundingClientRect(), e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return e ? (e.id || String(e.className) || e.tagName) : 'none'; }); note(tag, 'stuck at ' + sig + ' (on top of the hand: ' + top + ')'); return { picks, taps }; }
     // order: step cards / drawers in the way, score pad buttons, then the hand
+    if (await tapSel(p, '#kkgoal .kgo')) { taps++; await sleep(300); continue; }   // the Goal card (how you win) waits for a tap, like any player gives it
     if (await tapSel(p, '#pc [data-a=take],#pc [data-a=cont]')) { taps++; await sleep(250); continue; }
     if (await tapSel(p, '.gxh-bub.on .gxh-x,.gxh-bub.on [data-gxh=ok],.gxh-bub.on button')) { taps++; await sleep(250); continue; }
     if (await tapSel(p, '#rs [data-a=rsnext]')) { taps++; await sleep(350); continue; }
