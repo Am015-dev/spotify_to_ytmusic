@@ -21,7 +21,7 @@ if (!FA.AIW && typeof require === 'function') { try { require('./aiw.js'); } cat
 // ---------- model constants (task success rates per round) ----------
 const W = AI.W = {
   disaster: 7, choice: 2.6,
-  planeS: 0.30, flapQ: 0.333, flapM: 3.0, gearM: 2.6, brakeM: 3.2, brakeP: 0.3, brk2: 0.06, brk4: 0.33, brk6: 0.7, brakeCoffee: 0.30, iceP: 0.30, internP: 0.8,
+  planeS: 0.30, flapQ: 0.333, flapM: 3.0, gearM: 2.6, brakeM: 3.2, brakeP: 0.3, brk2: 0, brk4: 0.15, brk6: 0.5, brakeCoffee: 0.30, iceP: 0.30, internP: 0.8,
   ax0: 0.86, ax1: 0.66, ax2: 0.42, axR: 0.05, axCoffee: 0.05, axis1: 0.15, axis2: 0.5, tab: 0.5, fuelK: 1.1, leakAvg: 2.5, keroAvg: 2.8, eff: 0.8, lag: 1
 };
 const FN = ['pairA_n', 'pairA_f', 'pairE_n', 'pairE_f', 'sched', 'planes', 'imminent', 'flaps', 'gear', 'brake', 'intern', 'axisBal', 'fuel', 'tab', 'overload', 'coffee', 'coffeeLate', 'reroll', 'burn', 'bias'];
@@ -180,8 +180,8 @@ function features(S, me) {
     }
   }
   else {
-    // all three brakes matter: the final engine pair must stay at or under the brake value (2, 4 or 6), and P(sum <= 6) is about twice P(sum <= 4)
-    const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2]; brLeft = Math.max(0, 2 - nb);
+    // all three brakes matter: the final engine pair must stay BELOW the brake value (2, 4 or 6); P(sum <= 5) is about 3x P(sum <= 3), brake 2 never lands
+    const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2]; brLeft = Math.max(0, 3 - nb);
     if (!(final && inPlace)) {
       const R = Math.max(0, Math.round(Rf)), pr = Math.min(0.6, W.brakeP + 0.05 * Math.min(S.coffee, 2) + (S.rrHand ? 0.03 : 0));
       const succ = [0, 0.06, 0.33, 0.55][0], sb = b => b >= 3 ? W.brk6 : b === 2 ? W.brk4 : b === 1 ? W.brk2 : 0;
