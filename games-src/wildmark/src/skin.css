@@ -60,7 +60,7 @@ button{font:inherit;color:inherit}
 .ab{appearance:none;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);border-radius:12px;min-height:44px;padding:6px 12px;cursor:pointer;font-size:16px;font-weight:700}
 .ab.pri{background:var(--wm-gold);color:#2a1c06;border-color:transparent}
 .ab:disabled{opacity:.45}
-.hint1{font-size:16px;opacity:.9}
+.freep{font-size:16px;opacity:.9}
 .held{display:flex;align-items:center;gap:4px}.held svg{height:44px;width:auto}
 /* title / setup / result / pass */
 #start,#rs,#pass{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#35573f,#13201a 80%);padding:16px;overflow:auto}
@@ -111,7 +111,7 @@ button{font:inherit;color:inherit}
   .mt{height:62px}.mt svg{height:58px}
   .mk{width:44px;height:44px}.mk svg{width:40px;height:40px}
   #acts{margin-top:4px;min-height:46px}
-  .ab{font-size:14px;padding:6px 10px}.hint1{font-size:14px}
+  .ab{font-size:14px;padding:6px 10px}.freep{font-size:14px}
   #line{font-size:15px;max-width:calc(100% - 70px)}
   .cc{padding:3px 5px 3px 3px}.cc svg{width:26px;height:26px}.cc b{font-size:15px}
   .seat,.acn,.st,.sum,.lbl,.note{font-size:14px}
@@ -377,3 +377,5 @@ html.gx-reduce #acts .htok{animation:none}
 #terr .tl b{font-size:16px}
 /* R5: the result walk-through reads on the dark panel */
 #rs .st small,#rs .st.why small,#rs .st td.src small{color:#e3e6da!important;opacity:1!important}
+
+.ptn{display:inline-block;margin:0 6px 2px 0;white-space:nowrap}

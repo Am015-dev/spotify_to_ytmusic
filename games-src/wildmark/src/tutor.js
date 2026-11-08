@@ -74,8 +74,8 @@ function coachFinalHTML() {
   window.WM_COACH = { explained: Object.keys(C.seen), shown: C.shown.slice(), later: later };
   window.GXCOACH = { running: false, explained: Object.keys(C.seen), later: later, done: true };
   var h = '<div class="cfinal"><p class="ch"><i class="cface" aria-hidden="true"></i><b>Rowan</b> ' + esc(coachLine('final')) + '</p><ol>';
-  h += '<li>Animals by their cards: ' + WM.ANI.map(function (a) { return WM.ANI_NAME[a] + ' ' + r.ani[a]; }).join(', ') + ' = <b>' + r.aniT + '</b></li>';
-  h += '<li>Biggest joined habitat per terrain: <b>' + hb + '</b>, plus <b>' + tb + '</b> bonus for beating ' + esc(G.seats[1].name) + ' in a terrain (+2, a tie +1).</li>';
+  h += '<li>Animals: <b>' + r.aniT + '</b> <span class="cnums">' + WM.ANI.map(function (a) { return '<span class="ptn">' + WM.ANI_NAME[a] + ' ' + r.ani[a] + '</span>'; }).join(' ') + '</span></li>';
+  h += '<li>Land: <b>' + hb + '</b> from your biggest areas. Bonus <b>' + tb + '</b> for beating ' + esc(G.seats[1].name) + '.</li>';
   h += '<li>' + esc(coachLine('acornsEnd')) + ' You kept <b>' + r.acorns + '</b>.</li>';
   h += '<li>Total <b>' + r.total + '</b> against ' + esc(G.seats[1].name) + ' <b>' + b.total + '</b>. ' + esc(coachLine('tiebreak')) + '</li></ol>';
   if (later.length) h += '<p class="ch2">' + esc(CAMPAIGN.prologue.later || 'Things you will meet later') + '</p><ul>' + later.map(function (id) { return '<li>' + esc(coachLine(id)) + '</li>'; }).join('') + '</ul>';

@@ -1,12 +1,13 @@
 // Plays like a player with real taps: (1) a full 20-turn game to the result screen, (2) the tutorial start to finish, (3) Story chapters 1-2 started
 // and played to the result (chapter 1 solo, chapter 2 vs Pip). Phone 390x763 (touch) and PC 1440x860 (mouse). node playthrough.js [rounds=1]
 const { chromium } = require('playwright'); const { humanTurn, EXE } = require('./smoke.js');
-const URL = 'file://' + __dirname + '/wildmark.html';
+let URL = 'file://' + __dirname + '/wildmark.html';   // replaced by the shared server below, so media loads like the live site
 (async () => {
+  URL = (await require('../scripts/gx-serve.js').url('wildmark', { file: __dirname + '/wildmark.html' })).replace(/[?#].*$/, '').replace(/\/$/, '') + '/';
   const b = await chromium.launch(EXE), rounds = +(process.argv[2] || 1); let fails = 0; const log = (...a) => console.log(...a);
   for (let rr = 0; rr < rounds; rr++) for (const [name, vp, touch] of [['phone', { width: 390, height: 763 }, true], ['pc', { width: 1440, height: 860 }, false]]) {
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }), p = await ctx.newPage(), errs = [];
-    p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
+    p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); }); p.on('response', r => { if (r.status() >= 400) errs.push(r.status() + ' ' + r.url().replace(/^https?:\/\/[^\/]+/, '')); });
     const tap = s => touch ? p.locator(s).first().tap() : p.locator(s).first().click();
     try {
       // 1) full game vs 2 rivals
@@ -18,7 +19,9 @@ const URL = 'file://' + __dirname + '/wildmark.html';
       await tap('#titleB'); await p.waitForSelector('.gxt-menu'); await tap('.gxt-menu');
       await p.waitForFunction(() => UI.mode === 'coach' && G && !G.over, null, { timeout: 10000 });
       let n = 0, stack = 0;
-      while (n < 12 && !(await p.evaluate(() => G.over))) {
+      while (n < 12) {
+        await p.waitForFunction(() => G.over || (!G.seats[G.cur].ai && G.stage === 'pick' && document.getElementById('pass').hidden), null, { timeout: 30000 });
+        if (await p.evaluate(() => G.over)) break;
         stack = Math.max(stack, await p.evaluate(() => ['#coachb', '#toast.on', '.pop', '#turnban.on', '.gxh-tip:not([hidden])'].filter(s => { const e = document.querySelector(s); return e && !e.hidden && e.offsetParent; }).length));
         await humanTurn(p, tap, true); n++;
         if (n === 3) await p.screenshot({ path: `shots/learn-${name}.png` });

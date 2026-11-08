@@ -43,10 +43,10 @@ function pvParts(s0, s1) {
 // one card in words: "Bears: you have 2 pairs = 11 points (pairs 1, 2, 3, 4 = 4, 11, 19, 27)"
 function pvCardLine(a, seat) {
   var s = G.seats[seat], w = pvDesc(s.env, a), v = WM.scoreAnimal(s.env, a, null, G.cards && G.cards[a]), who = seat === meSeat() ? 'you have' : s.name + ' has';
-  return ({ bear: 'Bears', elk: 'Elk', salmon: 'Salmon', hawk: 'Hawks', fox: 'Foxes' })[a] + ': ' + who + ' ' + w.text + ' = ' + pvPl(v, 'point', 'points') + (pvSetA(a) ? ' (' + PV_TABLE[a] + ')' : ' (' + cinfo(a).rule + ')');
+  return ({ bear: 'Bears', elk: 'Elk', salmon: 'Salmon', hawk: 'Hawks', fox: 'Foxes' })[a] + ': ' + who + ' ' + w.text + ' = ' + pvPl(v, 'point', 'points') + '.';
 }
 var PV_SHORT = { bear: 'Bear pair', elk: 'Elk line', salmon: 'Salmon run', hawk: 'lone Hawk', fox: 'Fox neighbours' };
-function pvPop(p) { if (hintsOn()) return pvText(p); return p.slice(0, 2).map(function (x) { return (x.d > 0 ? '+' : '') + x.d + ' ' + (x.a ? (pvSetA(x.a) ? PV_SHORT[x.a] : WM.ANI_NAME[x.a]) : x.t ? WM.TER_NAME[x.t].toLowerCase() : 'acorn'); }).join(', '); }
+function pvPop(p) { return p.slice(0, 2).map(function (x) { return (x.d > 0 ? '+' : '') + x.d + ' ' + (x.a ? (pvSetA(x.a) ? PV_SHORT[x.a] : WM.ANI_NAME[x.a]) : x.t ? WM.TER_NAME[x.t].toLowerCase() : 'acorn'); }).join(', '); }
 function pvSum(p) { return p.reduce(function (n, x) { return n + x.d; }, 0); }
 function pvText(p) { return p.length ? p.map(function (x) { return x.label; }).join(', ') : 'no points now'; }
 // cells to light for a part (the pattern the move completes, or the habitat it grows)
@@ -119,7 +119,7 @@ function pvTurnEnd() {
   var s = G.seats[T.seat], s1 = pvScore(s.env), p = pvParts(T.s0, s1);
   if (s.acorns > T.ac0) p.push({ d: s.acorns - T.ac0, label: 'keystone acorn (+' + (s.acorns - T.ac0) + ')' });
   var got = pvSum(p), best = Math.max(T.best, got), col = function (i) { return 'the ' + T.names[i] + ' column'; };
-  var why = p.length ? pvText(p) : 'nothing scored';
+  var why = p.length ? pvPop(p) : 'nothing scored';
   var tag = got >= best - 0.5 ? 'good' : got >= best - 2 || got >= best * 0.6 ? 'okay' : 'poor';
   var alt = T.bestI >= 0 && T.bestI !== T.chosen ? ' Best was ' + col(T.bestI) + ' for up to +' + T.best + '.' : '';
   var hint = T.sol >= 0 && T.sol !== T.chosen && T.sol !== T.bestI ? ' The hint liked ' + col(T.sol) + ' for later turns.' : '';
@@ -177,10 +177,10 @@ function goalShow() {
   var e = $('#goal'); if (!e) { e = document.createElement('div'); e.id = 'goal'; $('#board').appendChild(e); }
   var riv = G.np > 1 ? G.seats.filter(function (s, i) { return i !== 0; }).map(function (s) { return s.name; }).join(' and ') : '';
   e.innerHTML = '<div class="gcard" role="dialog" aria-label="Goal"><h2>Goal</h2><p class="g1">' + esc(riv ? 'Have more points than ' + riv + ' after ' + G.turns + ' turns.' : 'Score as many points as you can in ' + G.turns + ' turns.') + '</p><ul>' +
-    '<li><b>Animals</b> score by their card: bears in pairs, elk in lines, salmon in runs, lone hawks, foxes next to different animals.</li>' +
-    '<li><b>Land</b>: each terrain scores 1 point per tile in your largest joined area' + (riv ? ', +2 if yours is the biggest.' : ', +2 at 7 or more.') + '</li>' +
+    '<li><b>Animals</b> score by their card. Bears in pairs, elk in lines. Salmon in runs, hawks alone. Foxes like mixed neighbours.</li>' +
+    '<li><b>Land</b>: 1 point per tile in your biggest area of each terrain. ' + (riv ? 'The biggest area of a terrain earns +2.' : 'An area of 7 or more earns +2.') + '</li>' +
     '<li><b>Acorns</b> from gold keystone tiles: 1 point each at the end.</li></ul>' +
-    '<p class="g2">Each turn: take a tile with its animal, add the tile, place the animal. Tap Scores any time to see why.</p><button type="button" class="big" id="goalGo">Start</button></div>';
+    '<p class="g2">Each turn: take a tile and its animal. Place both. Tap Scores to see why.</p><button type="button" class="big" id="goalGo">Start</button></div>';
   e.hidden = false;
 }
 document.addEventListener('pointerdown', function (ev) { var e = $('#goal'); if (!e || e.hidden) return; if (ev.target.closest && ev.target.closest('.gcard') && ev.target.id !== 'goalGo') return; e.hidden = true; }, true);   // never blocks: any tap outside the card (or Start) closes it and still acts

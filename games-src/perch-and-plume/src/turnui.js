@@ -106,7 +106,7 @@ function trackerHTML() {
   var tok = ''; for (var k = 0; k < total; k++) tok += '<i class="cube' + (k < p.cubes ? ' on' : '') + '"></i>';
   var whoT = isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name + "'s turn" : 'Your turn') : G.pl[cur].name + "'s turn";
   var last = G.round + 1 >= G.rounds;
-  return '<div class="trk" role="status" aria-label="Round ' + (G.round + 1) + ' of ' + G.rounds + ', ' + p.cubes + ' actions left">' +
+  return '<div class="trk" aria-label="Round ' + (G.round + 1) + ' of ' + G.rounds + ', ' + p.cubes + ' actions left">' +
     '<span class="tr-r"><b>Round ' + (G.round + 1) + ' of ' + G.rounds + '</b><span class="tr-w' + (isHuman(cur) ? ' me' : '') + '">' + esc(whoT) + '</span></span>' +
     '<span class="tr-c"><span class="cubes" aria-hidden="true">' + tok + '</span><span>' + p.cubes + (p.cubes === 1 ? ' action' : ' actions') + ' left</span></span>' +
     '<span class="tr-why">' + (last ? 'Game ends' : 'Round ends') + ' when everyone has used all their actions.</span></div>';

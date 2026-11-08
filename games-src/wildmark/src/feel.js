@@ -130,7 +130,7 @@ var WMF = (function () {
   }
   // R5: one turn line under the board after every turn (yours and the rival's): "Bram +9: elk line, river".
   // It stays until tapped or the next turn's line replaces it (never a timer).
-  function tline() { var e = $('#tline'); if (!e) { e = document.createElement('div'); e.id = 'tline'; e.setAttribute('role', 'status'); e.setAttribute('aria-live', 'polite'); e.hidden = true; e.addEventListener('click', function () { e.hidden = true; }); $('#board').appendChild(e); } return e; }
+  function tline() { var e = $('#tline'); if (!e) { e = document.createElement('div'); e.id = 'tline'; e.setAttribute('aria-live', 'polite'); e.hidden = true; e.addEventListener('click', function () { e.hidden = true; }); $('#board').appendChild(e); } return e; }
   function placeTline() { var e = $('#tline'), ln = $('#line'); if (!e || e.hidden || !ln) return; var b = $('#board').getBoundingClientRect(), r = ln.getBoundingClientRect(); e.style.bottom = Math.round(b.bottom - r.top + 8) + 'px'; }
   function turnStart() { if (!G || G.over) return null; var s = G.seats[G.cur]; return { key: G.cur + ':' + s.done, seat: G.cur, sc: pvScore(s.env, s.acorns), tot: WM.final(G)[G.cur].total }; }
   function turnSay(T) {

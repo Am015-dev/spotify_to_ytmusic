@@ -9,7 +9,7 @@ function isHuman(s) { return G && G.pl[s] && G.pl[s].kind === 'human'; }
 function humans() { return G ? G.pl.map(function (p, i) { return p.kind === 'human' ? i : -1; }).filter(function (i) { return i >= 0; }) : []; }
 function myTurn() { if (!G || G.phase === 'over') return false; var s = PP.sideToAct(G); return isHuman(s) && s === UI.view && !UI.busy && !UI.passing; }
 function q() { return G && G.q; }
-function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
+function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; while (w.firstChild) w.firstChild.remove(); w.appendChild(d); setTimeout(function () { d.remove(); }, Math.max(ms || 0, 4000 + 1000 * Math.ceil(String(t).split(/\s+/).length / 10))); d.addEventListener('click', function () { d.remove(); }); }   // one at a time; stays 4 s + 1 s per 10 words, or until tapped
 function aMs(ms) { if (UI.fast) return 0; var sp = UI.speed || 1; try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
 function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodIcon('any'); var p = s.split('|'); return p.length > 1 ? p.map(function (f) { return foodIcon(f); }).join('<i>/</i>') : foodIcon(s); }).join(b.c.some(function (s) { return s.indexOf('|') >= 0; }) ? '' : '<i>+</i>'); }
 // a bird card: size 'slot' (on the board: picture, points, eggs) | 'tray' (picture + points) | 'hand' / 'big' (the readable card:

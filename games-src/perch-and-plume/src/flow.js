@@ -157,6 +157,8 @@ function dropEl(x) { if (x && x.parentNode) x.parentNode.removeChild(x); }
 // "Your turn" / "<Rival>'s turn" banner; the turn waits for it (~1 s), a tap skips it
 function turnBanner(s) {
   if (UI.fast) { pump(); return; }
+  // no centre banner over the board: the round tracker already says whose turn it is (one message at a time, nothing flashes)
+  UI.cap = isHuman(s) ? null : G.pl[s].name + ' is choosing an action.'; render(); pump(); return;
   var me = isHuman(s), solo = humans().length <= 1, nm = me ? (solo ? 'Your turn' : G.pl[s].name + "'s turn") : G.pl[s].name + "'s turn";
   $$('.turnban').forEach(dropEl);
   var d = document.createElement('div'); d.className = 'turnban ' + (me ? 'me' : 'rv'); d.setAttribute('data-volatile', ''); d.setAttribute('role', 'status');
