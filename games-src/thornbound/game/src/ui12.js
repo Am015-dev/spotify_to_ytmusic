@@ -121,7 +121,7 @@ function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window
     onDone:r=>{const c=r&&r.choice;tutLeave();
       if(c==='chapter'&&window.CAMPAIGN&&typeof GXC!=='undefined'){showStart();GXC.play(window.CAMPAIGN.chapters[0].id);return}
       if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open();return}
-      UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()},   // Play a real game: the setup screen, one tap from a real game
+      showStart();UI.sv='setup';UI.cfgOpen=false;renderStart()},   // Play a real game: the setup screen, one tap from a real game
     onExit:()=>{tutLeave();showStart()}})}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
