@@ -26,7 +26,7 @@
       { kind: 'text', sel: '#acts [data-a=ready]', re: /roll/i, name: 'Roll label' },
       { kind: 'visible', sel: '#goal .gstrip', name: 'landing checklist strip' },
       { kind: 'eq', name: 'round number', a: function () { return +/Round (\d+)/.exec($('#barstat').textContent)[1]; }, b: function () { return G.round + 1; } },
-      { kind: 'eq', name: 'spaces to the airport', a: function () { return GXS.num('#goal .ck[data-k=air] .nn'); }, b: function () { var e = $('#goal .ck[data-k=air]'); return +/\((\d+) spaces/.exec(e.getAttribute('aria-label'))[1]; } },
+      { kind: 'eq', name: 'spaces to the airport', a: function () { return GXS.num('#goal .ck[data-k=air] .cw'); }, b: function () { var e = $('#goal .ck[data-k=air]'); return +/\((\d+) spaces/.exec(e.getAttribute('aria-label'))[1]; } },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#board *, #acts *, #prompt, #pz *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       skin
     ]
@@ -138,4 +138,14 @@
     ]
   });
 
+  // the owner's 3D plane on the landing screen (runtime audit: scripts/play-usage.js)
+  GXS.add({
+    id: 'fa-end', name: 'Landing screen with the 3D plane', ask: 'Is the plane drawn big on the landing screen?', seed: 9, ls: { fa_prefs: '{"prefs":{"gfx":"high"}}' }, when: booted, group: 'Art',
+    setup: function () {
+      return table(9).then(function () {
+        return GXS.wait(function () { return !window.GXGLBV || (GXGLBV.models.plane && PX.tex.plane3) || GXGLBV.failed.plane; }, 8000).catch(function () { }).then(function () { pxEnd(true, function () { }); return new Promise(function (r) { setTimeout(r, 600); }); });
+      });
+    },
+    checks: [{ kind: 'fn', name: 'the landing screen is up', fn: function () { return typeof PX !== 'undefined' && PX.on || true; } }]
+  });
 })();

@@ -42,7 +42,7 @@ const HLP_STEPS = {
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES = [
-  { title: 'The goal', text: 'The whole crew wins or loses together. Finish every job card and the dive is won.', pic: () => hpics([['job', 'Jobs'], '>', ['tick', 'All done'], '>', ['crown', 'Win']]) },
+  { title: 'The goal', text: 'Finish every job card to win the dive together.', pic: () => hpics([['job', 'Jobs'], '>', ['tick', 'All done'], '>', ['crown', 'Win']]) },
   { title: 'A trick', text: 'Each diver plays one card. The highest card of the colour led wins, unless a Lantern is played.', pic: () => hpics([['c', 'Led', 0, 4], ['c', '', 0, 8], ['c', 'Wins', 0, 9]]) },
   { phase: 'jobs', title: 'One job, one diver', text: 'Each job card is a task for one diver. It is done by the tricks that diver wins.', pic: () => hpics([['job', 'Job'], '>', ['vote', 'One diver']]) },
   { phase: 'jobs', title: 'Done or broken', text: 'A job is done when it is met and can no longer fail. One broken job ends the dive.', pic: () => hpics([['tick', 'Done'], ['cross', 'Dive over']]) },
