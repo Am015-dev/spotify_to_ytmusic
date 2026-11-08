@@ -120,3 +120,4 @@ html .seat .jc{width:auto;max-width:100%}
 .ppop,.ppop *,.pcard,.pcard *,#dlg *,#rs *,#start *,#tbub,#tbub *,#tskip,.gxh-bub *,.gxt-bub *,.gx-drawer *,.spill,.gotb,.hc .gotb,#hand .handnote,.kv span,.kv b,.dbox small{font-size:max(14px,1em)!important}
 .gxh-bub .gxh-tx,.gxt-bub .gxh-tx{font-size:15px!important}
 #tskip{font-family:inherit}
+html .bdg b,html .bdg span,html .pbtn span,html .seat .bdg b,html .me .bdg b,html #mine .bdg b{font-size:14px}
