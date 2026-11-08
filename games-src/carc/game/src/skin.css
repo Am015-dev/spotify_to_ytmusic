@@ -182,5 +182,5 @@ body:has(#modal .scrim) #recentre{display:none}
 #sheet .srate{position:absolute;left:0;right:0;top:100%;margin:0;padding:8px 16px 10px;background:#281b12;border-bottom:2px solid var(--gold,#b5883a);white-space:normal;font-size:14px;box-shadow:0 4px 10px rgba(0,0,0,.4)}
 @media(max-width:380px){#sheet .sbtn{padding:5px 8px;gap:4px}#sheet .sc{gap:2px}}
 @media(min-width:1024px){#sheet .sc,#sheet .schip,#sheet .srate,#recentre{font-size:16px}}
-@media(max-width:420px){html.sk .seat .nm,.seat .nm{display:none}}
+body:has(#menu) #sheet{visibility:hidden}
 body:has(.gxh-bub) #recentre,body:has(#coach .cbub:not([hidden])) #recentre{bottom:auto;top:76px}
