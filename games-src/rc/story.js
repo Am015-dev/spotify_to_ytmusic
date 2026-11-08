@@ -29,7 +29,7 @@ function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines
   let kicker='',title='',story='',card='',extra='',icon=KIND_ICON[b.kind]||'📖';
   switch(b.kind){
   case 'intro':kicker=`Chapter ${SCEN_ORDER.indexOf(G.scen)+1} · ${esc(S.n)}`;title=esc(fs.title||S.n);story=esc(fillCrew(d.text,d.page));if(d.page===d.of-1)extra=`<div class="goalbox"><b>Your goal</b> ${esc(S.x)}</div>`;break;
-  case 'dawn':kicker=`Day ${d.round} of ${G.rounds}`;title=esc((fs.days&&fs.days[d.round])||pickL((F.phase||{}).dawn,b.id)||'A new day');{const wx=S.wx[d.round]||[];extra=`<div class="fore">Weather dice tonight: ${wx.length?wx.map(x=>({rain:'🌧 rain die',snow:'❄️ winter die',animals:'🐾 hungry-animals die'}[x])).join(' · '):'none, calm unless a card adds clouds'}</div>`+threadHtml(d.round)}break;
+  case 'dawn':kicker=`Day ${d.round} of ${G.rounds}`;title=esc((fs.days&&fs.days[d.round])||pickL((F.phase||{}).dawn,b.id)||'A new day');{const wx=wxTab()[d.round]||[];extra=`<div class="fore">Weather dice tonight: ${wx.length?wx.map(x=>({rain:'🌧 rain die',snow:'❄️ winter die',animals:'🐾 hungry-animals die'}[x])).join(' · '):'none, calm unless a card adds clouds'}</div>`+threadHtml(d.round)}break;
   case 'event':case 'threat':{const c=CARD[d.card];const fe=(F.ev||{})[d.card]||(F.adv||{})[d.card]||(F.mys||{})[d.card]||{};
     if(b.kind==='threat'){kicker='Too late';title=esc(c.th?c.th.n:c.n)+' — we never got to it';story=esc(fe.x||'')}
     else if(d.late){kicker='It comes back to haunt us';title=esc(c.ev.n);story=esc(fe.e||'')}
