@@ -7,10 +7,17 @@ async function run(b,W,H){const ctx=await b.newContext({viewport:{width:W,height
   const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
   await p.goto('https://gns.test/');await sleep(500);await p.evaluate(()=>{localStorage.clear();localStorage.setItem('hb_played','1');localStorage.setItem('hb_offer','1');localStorage.setItem('gxt-hollowbough',JSON.stringify({done:1}))});await p.reload();await sleep(1200);
   await p.screenshot({path:`${out}/${W}_1_title.png`});
-  await p.evaluate(()=>{AIDELAY=60;UI.noRec=true;newGame('vs')});await sleep(1500);
+  // Learn to play: first screen
+  await p.evaluate(()=>{try{tutStart()}catch(e){}});await sleep(2500);await p.screenshot({path:`${out}/${W}_1b_learn_first.png`});
+  await p.evaluate(()=>{localStorage.setItem('gxt-hollowbough',JSON.stringify({done:1}))});await p.reload();await sleep(1200);
+  // Play: the Goal card, then the first turn
+  await p.evaluate(()=>{AIDELAY=60;UI.noRec=true;newGame('vs')});await sleep(1500);await p.screenshot({path:`${out}/${W}_1c_goal_card.png`});
   await p.evaluate(()=>{while(UI.cards.length)nextCard()});await sleep(500);
   await p.screenshot({path:`${out}/${W}_2_first_turn.png`});
   await p.evaluate(()=>{pvSetTab('meadow')});await sleep(400);await p.screenshot({path:`${out}/${W}_2b_meadow.png`});
+  // the rival's turn, caught mid-move at readable speed
+  await p.evaluate(()=>{AIDELAY=1400;const ms=HB.moves(G,0);act(ms.find(m=>m.type==='worker')||ms[0])});await sleep(1600);await p.screenshot({path:`${out}/${W}_2c_rival_turn.png`});
+  await p.evaluate(()=>{AIDELAY=60});await sleep(2500);
   // play on by the AI for the human until mid-game / city full / over
   const step=async n=>{for(let i=0;i<n;i++){const st=await p.evaluate(()=>{if(G.phase==='over')return 'over';while(UI.cards.length&&UI.cards[0].kind!=='over')nextCard();if(UI.animBusy)return 'busy';const a=HB.actor(G);if(G.players[a].ai)return 'ai';act(HB.AI.choose(G,a,'normal'));return 'me'}).catch(e=>'err '+e.message);if(st==='over')return 'over';await sleep(st==='me'?250:120)}return 'run'};
   await step(40);await p.evaluate(()=>{while(UI.cards.length&&UI.cards[0].kind!=='over')nextCard()});await sleep(900);await p.screenshot({path:`${out}/${W}_3_mid.png`});

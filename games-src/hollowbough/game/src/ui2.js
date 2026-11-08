@@ -161,7 +161,7 @@ function tileInfo(kind, i) {
     case 'basic': { const b = D.basic[i]; return { name: b.name, text: b.text, shared: b.shared, key: 'basic:' + i }; }
     case 'forest': { const f = D.forest[G.forest[i]]; return { name: f.name, text: f.text, shared: false, key: 'forest:' + i }; }
     case 'haven': return { name: D.haven.name, text: D.haven.text, shared: true, key: 'haven:' };
-    case 'journey': return { name: D.journeyName, text: 'Autumn only. Discard 5, 4, 3 or 2 cards from your hand; that worker stays for the rest of the game and scores the same number of points.', shared: false, key: 'journey:' };
+    case 'journey': return { name: D.journeyName, text: 'Autumn only. Discard 5, 4, 3 or 2 cards. The worker stays and scores that many points.', shared: false, key: 'journey:' };
     case 'bev': { const e = D.basicEvents[G.bev[i].k]; return { name: e.name, text: e.text, key: 'event:b' + i }; }
     case 'sev': { const e = D.specialEvents[G.sev[i].k]; return { name: e.name, text: e.text, key: 'event:s' + i }; }
   }
@@ -472,7 +472,7 @@ function promptText() {
 }
 // the short line for a pending decision (8 words at most; the long wording stays in the log)
 function qShort(q) {
-  const m = ({ discard: 'Tap cards to discard, then Done.', resource: 'Pick a resource.', meadow: 'Tap a meadow card.', production: 'Tap a card to activate next.', ruins: 'Tap a building to raze.', recipient: 'Pick a rival.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Tap the effect to resolve first.', queen: 'Tap a card to play free.', inn: 'Tap a meadow card to play.', university: 'Tap a card to disband.', cemetery: 'Tap a card, or choose.', copy: 'Pick a place to copy.', prisoner: 'Tap a critter to lock up.', clear: 'Tap a meadow card to clear.', recall: 'Tap a worker to recall.', ranger: 'Pick a worker or a place.', tuck: 'Tap a critter to tuck.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove.', teach: 'Tap the card to keep.', pigeon: 'Play a revealed card?', waive: 'Choose what to cut.', judge: 'Choose which resource to swap.', spend: 'Spend for point tokens?', trade: 'Trade resources?', bazaar: 'Play one for 1 less?', scroll: 'Keep it or tuck it?', clock: 'Repeat a place?', mole: 'Pick a card to mimic.', chip: 'Pick a card to re-run.', stock: 'Pick a stack to add.' })[q.kind];
+  const m = ({ discard: 'Tap cards to discard, then Done.', resource: 'Pick a resource.', meadow: 'Tap a meadow card.', production: 'Tap a card to use next.', ruins: 'Tap a building to raze.', recipient: 'Pick a rival.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Tap the effect to use first.', queen: 'Tap a card to play free.', inn: 'Tap a meadow card to play.', university: 'Tap a card to disband.', cemetery: 'Tap a card, or choose.', copy: 'Pick a place to copy.', prisoner: 'Tap a critter to lock up.', clear: 'Tap a meadow card to clear.', recall: 'Tap a worker to recall.', ranger: 'Pick a worker or a place.', tuck: 'Tap a critter to tuck.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove.', teach: 'Tap the card to keep.', pigeon: 'Play a revealed card?', waive: 'Choose what to cut.', judge: 'Choose which resource to swap.', spend: 'Spend for point tokens?', trade: 'Trade resources?', bazaar: 'Play one for 1 less?', scroll: 'Keep it or tuck it?', clock: 'Repeat a place?', mole: 'Pick a card to mimic.', chip: 'Pick a card to re-run.', stock: 'Pick a stack to add.' })[q.kind];
   return m || wordsCap(q.title, 8);
 }
 // ===================== part 14: the Play view (W457): one focus at a time =====================
@@ -519,7 +519,8 @@ function pvSpot(kind, i) {
   return { main: '', sub: '', ico: 'any' };
 }
 // ---- card faces: name, painted art, cost as big icons with numbers, points
-function pvArt(sp) { const a = h('div.pvc-art'); const u = HBKit.paintedHref && HBKit.paintedHref(sp.art); if (u) a.style.backgroundImage = 'url("' + u + '")'; else { const g = HBKit.art(sp.art, 200); g.setAttribute('width', '100%'); g.setAttribute('height', '100%'); g.setAttribute('preserveAspectRatio', 'xMidYMid slice'); a.appendChild(g); } return a; }
+// painted art is keyed by card key (every card has one); the drawn kit art is only a fallback
+function pvArt(sp) { const a = h('div.pvc-art'); const u = HBKit.paintedHref && (HBKit.paintedHref(sp.key) || HBKit.paintedHref(sp.art)); if (u) a.style.backgroundImage = 'url("' + u + '")'; else { const g = HBKit.art(sp.art, 200); g.setAttribute('width', '100%'); g.setAttribute('height', '100%'); g.setAttribute('preserveAspectRatio', 'xMidYMid slice'); a.appendChild(g); } return a; }
 function pvCost(cost, px) {
   const w = h('span.pvc-cost'); let any = false;
   for (const r of RESK) if (cost && cost[r]) { any = true; w.appendChild(h('span.pvc-ci', { 'data-r': r }, ic(r, px), h('b', cost[r]))); }
@@ -608,7 +609,8 @@ function pvRender() {
     for (const k of RESK) r.appendChild(h('span.rs' + (show && me.res[k] ? '' : '.zero'), { 'data-res': k, title: rname(k, 2) }, ic(k, 30), h('b', show ? me.res[k] : '?')));
     if (me.pts) r.appendChild(h('span.rs.tok', { 'data-res': 'ptok', title: 'point tokens' }, ic('point', 24), h('b', me.pts)));
     const wk = h('span.rs.wk' + (me.workers > 3 ? '.many' : ''), { 'data-res': 'worker' }), free = availW(me), canW = mine && okw.size > 0 && !G.q && !UI.sel;
-    for (let i = 0; i < me.workers; i++) { const m = h('span.pv-meeple' + (i < free ? '' : '.out') + (i < free && canW ? '.can' : ''), { 'aria-hidden': 'true' }, pawn(fs, 30)); wk.appendChild(m); }
+    // at most 4 meeples drawn; the count says the rest
+    for (let i = 0; i < Math.min(me.workers, 4); i++) { const m = h('span.pv-meeple' + (i < free ? '' : '.out') + (i < free && canW ? '.can' : ''), { 'aria-hidden': 'true' }, pawn(fs, 30)); wk.appendChild(m); }
     wk.appendChild(h('b.pv-wn', free + ' left'));
     if (canW) wk.setAttribute('title', 'Drag a worker to a glowing place');
     r.appendChild(wk); hud.appendChild(r); }
@@ -623,6 +625,8 @@ function pvRender() {
   const tile = (kind, i, small) => {
     const info = tileInfo(kind, i), tg = tileTg(kind, i), w = pvSpot(kind, i);
     const e = h('button.tile.t-' + kind + (small ? '.pv-small' : ''), { 'data-zoom': 'tile:' + kind + ':' + i, 'data-k': kind, 'data-i': i, type: 'button', 'aria-label': (info.name || '') + ': ' + w.main + (w.sub ? ', ' + w.sub : '') });
+    { const key = kind === 'basic' ? D.basic[i].key : kind === 'forest' ? D.forest[G.forest[i]].key : kind === 'bev' ? D.basicEvents[G.bev[i].k].key : kind === 'sev' ? D.specialEvents[G.sev[i].k].key : kind;
+      const ph = key && HBKit.paintedHref ? HBKit.paintedHref(key) : null; if (ph) { e.style.setProperty('--pa', 'url("' + ph + '")'); e.classList.add('pv-painted'); } }   // the place's own painting
     e.appendChild(h('span.pv-tin', h('span.pv-sico', ic(w.ico, small ? 22 : 26)), h('span.pv-sw', h('b', w.main), w.sub ? h('span', w.sub) : null)));
     const legal = tg && okw.has(tg);
     if (legal) { e.classList.add('glow'); regTg(tg, e); }

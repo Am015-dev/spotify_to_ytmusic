@@ -1,7 +1,7 @@
 // ===================== part 5: game flow (new game, turn driver, AI, one-card-at-a-time queue, save/load) =====================
 const SAVEKEY = 'hb_save1';
 function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(UI.tt); UI.tt = setTimeout(() => e.classList.remove('on'), 4000 + 100 * String(t).split(/\s+/).length); }   // readable: 4 s + 1 s per 10 words
-function turnBanner(txt, rv) { if (!hintsActive()) return; const e = document.getElementById('hbturn') || (() => { const d = document.createElement('div'); d.id = 'hbturn'; d.setAttribute('role', 'status'); document.body.appendChild(d); return d; })();
+function turnBanner(txt, rv) { if (!hintsActive()) return; { const say = document.getElementById('hbsay'); if (say && say.classList.contains('on')) return; }   // one message at a time const e = document.getElementById('hbturn') || (() => { const d = document.createElement('div'); d.id = 'hbturn'; d.setAttribute('role', 'status'); document.body.appendChild(d); return d; })();
   e.textContent = txt; e.classList.toggle('rv', !!rv); e.classList.add('on'); clearTimeout(UI.tbt); UI.tbt = setTimeout(() => e.classList.remove('on'), 1100); }
 function setSeed(n) { UI.seed = n >>> 0; }
 function setAiSeed(n) { UI.aiSeed = n; }
@@ -158,12 +158,19 @@ function queueOver() {
     t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', sc.total)));
     return t;
   };
-  G.players.forEach((p, s) => UI.cards.push({ kind: 'over-score', title: 'Final score: ' + p.name, sub: p.ai ? 'Computer player' : 'Player', body: () => h('div', h('div.seasonrow', pawn(s, 40), h('img.hero-tree', { src: 'models/ever-tree@512.webp', alt: '', draggable: 'false' })), rows(ov.scores[s], p.name, s), h('p.sm', p.workers + ' workers, ' + HB.cityCount(G, s) + ' cards in the city, ' + ov.scores[s].left + ' resources left.')) }));
+  // one result card: who won, both totals side by side, then the breakdown in columns
+  if (!G.grim) UI.cards.push({ kind: 'over-score', title: (() => { const ord = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total), w = ord[0], nm = G.players[w].name;
+      if (ov.tie) return 'A tie at ' + ov.scores[w].total + ' points';
+      return nm + (nm === 'You' ? ' win, ' : ' wins, ') + (G.np === 2 ? ov.scores[w].total + ' to ' + ov.scores[ord[1]].total : 'with ' + ov.scores[w].total + ' points'); })(),
+    sub: 'Final score', body: () => { const t = h('table.vs'); t.appendChild(h('tr', h('th', ''), G.players.map((p, s) => h('th', pawn(s, 22), ' ' + p.name))));
+      [['Card points', 'cards'], ['Point tokens', 'tokens'], ['Bonus cards', 'bonus'], ['Events', 'events'], ['Journey', 'journey']].forEach(([k, f]) => t.appendChild(h('tr', h('td', k), G.players.map((p, s) => h('td', ov.scores[s][f])))));
+      t.appendChild(h('tr.tot', h('td', 'Total'), G.players.map((p, s) => h('td', h('b', ov.scores[s].total)))));
+      return h('div', h('div.seasonrow', h('img.hero-tree', { src: 'models/ever-tree@512.webp', alt: '', draggable: 'false' })), t); } });
   if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
   const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
   UI.cards.push({
     kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: (UI.cfg && UI.cfg.tutorial) || G.grim || ov.tie || campOn() ? 'The game is over' : (G.players[ov.winner].ai ? HBS.quick.lose : HBS.quick.win),
-    body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
+    body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Still tied after events and leftover resources.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
     buttons: NET.on ? netOverButtons() : campOn() ? [{ label: 'Continue the story', a: 'campfin' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }] : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
   if (!(UI.cfg && UI.cfg.tutorial)) clearSave(); render();

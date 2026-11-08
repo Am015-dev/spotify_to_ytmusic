@@ -210,3 +210,14 @@ html[data-bench] #bd.pv .pv-mead{background:url(media/bench.webp) center bottom/
 #bd.pv.wide .pvc-aff{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #bd.pv.wide .strip.hand .scount{left:14px}
 #bd.pv.wide .pv-mead{grid-template-columns:repeat(4,minmax(0,1fr))}
+/* result card: both players side by side, 14px+ */
+.pcard table.vs{width:100%;border-collapse:collapse;font-size:15px;margin:6px 0}
+.pcard table.vs th{text-align:right;font-size:15px;padding:4px 6px;white-space:nowrap}
+.pcard table.vs th:first-child,.pcard table.vs td:first-child{text-align:left}
+.pcard table.vs td{text-align:right;padding:5px 6px;border-bottom:1px dotted rgba(59,42,28,.35)}
+.pcard table.vs tr.tot td{font-size:18px;border-top:2px solid #3b2a1c;border-bottom:0}
+.pcard .score,.pcard p,.pcard li{font-size:max(14px,1em)}
+/* places wear their painting on the right, fading into the paper under the words */
+#bd.pv .tile.pv-painted{background:linear-gradient(90deg,var(--pv-paper) 0%,rgba(248,237,210,.96) 46%,rgba(248,237,210,.25) 78%,rgba(248,237,210,0) 100%),var(--pa) right center/62% auto no-repeat,var(--pv-paper2)}
+#bd.pv .tile.t-forest.pv-painted{background:linear-gradient(90deg,#e6efcf 0%,rgba(230,239,207,.96) 46%,rgba(230,239,207,.25) 78%,rgba(230,239,207,0) 100%),var(--pa) right center/62% auto no-repeat,#cfdfae}
+#bd.pv .tile.pv-painted .pv-sw b,#bd.pv .tile.pv-painted .pv-sw span{text-shadow:0 0 4px #f8edd2,0 0 2px #f8edd2}

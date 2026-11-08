@@ -150,36 +150,37 @@ function tutOffer(go) {
 // "Things you'll meet later" at the end. The final score is walked through with the player's real numbers. Not saved, not counted.
 window.GXCOACH = { running: false, explained: [], done: false };   // read by the QA bot's coached mode
 const COACH = [
-  { id: 'goal', when: () => true, say: () => 'The thaw is here and the Elderheart Oak needs a steward. Most points when we have both passed wins it. Start anywhere: the Twig Heap is a safe first pick.', later: 'Goal: most points when everyone has passed.' },
-  { id: 'places', when: (p, r) => myTurnC() && p.dep.length === 0 && Date.now() - UI.coachT0 > 4000, say: () => 'Each turn you send one worker to one place. Basic places give goods, the forest gives more, and cards are bought from the meadow.', later: 'Each turn: one worker to one place.' },
-  { id: 'stock', when: (p) => p.dep.length >= 1, say: p => 'Twigs, resin, pebbles and berries pay for buildings and critters. You hold ' + p.res.twig + ' twigs, ' + p.res.resin + ' resin, ' + p.res.pebble + ' pebbles and ' + p.res.berry + ' berries.', later: 'Goods pay for cards.' },
-  { id: 'rival', when: (p, r) => r.dep.length >= 1 && p.dep.length >= 1, say: (p, r) => r.name + ' sent a worker. A place without the Shared mark holds one worker only, so it is closed to you this season.', later: 'A place without the Shared mark holds one worker.' },
-  { id: 'hand', when: (p) => myTurnC() && p.hand.length > 0 && p.dep.length >= 1, say: () => 'Your hand holds plans: each shows its price, glowing ones you can afford. Build one by paying its price. Your city holds 15 buildings and your hand 8 cards.', later: 'Hand limit 8, city limit 15; glowing cards are affordable.' },
-  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Production buildings pay again every season.', later: 'Buildings stay in your city; production pays each season.' },
-  { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'wife') && p.city.some(e => HB.cardKey(e.id) === 'farm') && myTurnC(), say: () => 'The Goodwife loves your Allotment: a critter moves into its matching building for free. Try her from your hand.', later: 'A critter moves into its matching building free.' },
-  { id: 'meadow', when: (p) => myTurnC() && p.dep.length >= 2 && p.res.berry >= 1, say: () => 'The meadow is open to everyone. Critters cost berries; bought cards join your hand and the meadow refills.', later: 'The meadow of 8 is open to everyone; critters cost berries.' },
-  { id: 'event', when: (p) => myTurnC() && p.season >= 1, say: () => 'Flags are events: the first to hold the right buildings claims one for three points. Only one claimer, so be quick.', later: 'Events: right buildings, first to claim, 3 points.' },
-  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: () => 'Every worker is out. Prepare for Season: they all come home, you gain one more, and production pays.', later: 'Prepare for Season: workers home, +1 worker, production.' },
-  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! Seasons run Winter, Spring, Summer, Autumn. You have ' + p.workers + ' workers now. Summer draws cards, Autumn brings bonus workers.', later: 'Seasons: Winter, Spring, Summer (draw), Autumn (bonus workers).' },
-  { id: 'shared', when: (p) => myTurnC() && p.season >= 1, say: () => 'Shared places take many workers: even rivals share the Berry Patch.', later: 'Shared places take many workers.' },
-  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => 'The forest pays more goods than the basic places, but each spot holds one worker.', later: 'Forest places pay more.' },
-  { id: 'pass', when: (p) => !p.passed && myTurnC() && (p.season >= 2 || (p.season >= 1 && p.workers - p.dep.length === 0)), say: () => 'When you are done, Pass. The game ends when everyone has passed, and workers left unused are wasted points.', later: 'Pass ends your game; unused workers are wasted.' }
+  { id: 'goal', when: () => true, say: () => 'Most points when everyone has passed wins. Start with the 3 twigs place.', later: 'Goal: most points when everyone has passed.' },
+  { id: 'places', when: (p, r) => myTurnC() && p.dep.length === 0 && Date.now() - UI.coachT0 > 4000, say: () => 'Each turn, send one worker to one place. Basic places give goods. The forest gives more.', later: 'Each turn: one worker to one place.' },
+  { id: 'stock', when: (p) => p.dep.length >= 1, say: p => 'Twigs, resin, pebbles and berries pay for cards. You hold ' + p.res.twig + ' twigs, ' + p.res.resin + ' resin, ' + p.res.pebble + ' pebbles and ' + p.res.berry + ' berries.', later: 'Goods pay for cards.' },
+  { id: 'rival', when: (p, r) => r.dep.length >= 1 && p.dep.length >= 1, say: (p, r) => r.name + ' sent a worker. A place without the Shared mark holds one worker. It is closed to you.', later: 'A place without the Shared mark holds one worker.' },
+  { id: 'hand', when: (p) => myTurnC() && p.hand.length > 0 && p.dep.length >= 1, say: () => 'Your hand holds plans. Glowing ones are affordable. Pay the price to build. City holds 15, hand holds 8.', later: 'Hand holds 8, city holds 15. Glowing cards are affordable.' },
+  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Production cards pay again each season.', later: 'Buildings stay in your city. Production pays each season.' },
+  { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'wife') && p.city.some(e => HB.cardKey(e.id) === 'farm') && myTurnC(), say: () => 'The Goodwife fits your Allotment. She moves in free. Play her from your hand.', later: 'A critter moves into its matching building free.' },
+  { id: 'meadow', when: (p) => myTurnC() && p.dep.length >= 2 && p.res.berry >= 1, say: () => 'Anyone can buy from the meadow. Critters cost berries. The meadow refills.', later: 'The meadow holds 8 cards for anyone. Critters cost berries.' },
+  { id: 'event', when: (p) => myTurnC() && p.season >= 1, say: () => 'Flags are events. Build what one needs, then claim it for three points. Only one player can.', later: 'Events: build what they need, claim first, 3 points.' },
+  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: () => 'All workers are out. Prepare: they come home, you gain one, production pays.', later: 'Prepare: workers come home, +1 worker, production pays.' },
+  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! You have ' + p.workers + ' workers. Summer draws cards. Autumn brings extra workers.', later: 'Seasons: Winter, Spring, Summer (draw cards), Autumn (extra workers).' },
+  { id: 'shared', when: (p) => myTurnC() && p.season >= 1, say: () => 'Shared places take many workers. Rivals share the Berry Patch.', later: 'Shared places take many workers.' },
+  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => 'The forest pays more goods. Each spot holds one worker.', later: 'Forest places pay more.' },
+  { id: 'pass', when: (p) => !p.passed && myTurnC() && (p.season >= 2 || (p.season >= 1 && p.workers - p.dep.length === 0)), say: () => 'When you are done, Pass. The game ends when all have passed. Unused workers are wasted.', later: 'Pass ends your game. Unused workers are wasted.' }
 ];
 // rules that need a situation we cannot count on: told at the end
 const COACH_TALE = 14;   // the first game is a short tale: after this many of your own actions Hazel passes for you
 const COACH_LATER = [
-  { id: 'inn', later: 'The Inn and Post Office are open places: you play the rival\'s open card and they get a point.' },
-  { id: 'haven', later: 'The Haven turns two discarded cards into one good.' },
-  { id: 'longroad', later: 'The Long Road is a journey for Autumn only.' },
-  { id: 'special', later: 'Special events need particular buildings and cost goods.' },
-  { id: 'tie', later: 'Tie-break: most events, then most leftover goods.' }
+  { id: 'inn', later: 'The Inn and Post Office are open. You play a rival\'s open card. They get a point.' },
+  { id: 'haven', later: 'The Haven turns two discarded cards into one resource.' },
+  { id: 'longroad', later: 'The Long Road opens in Autumn only.' },
+  { id: 'special', later: 'Special events need certain buildings and cost goods.' },
+  { id: 'tie', later: 'Ties go to most events, then most leftover goods.' }
 ];
 const myTurnC = () => !!G && UI.started && G.phase !== 'over' && !UI.cards.length && !UI.animBusy && HB.actor(G) === 0;
 function coachChip(txt, ms) {
   let e = document.getElementById('hbsay');
   if (!e) { e = document.createElement('div'); e.id = 'hbsay'; e.setAttribute('role', 'status'); e.setAttribute('data-help', ''); document.body.appendChild(e); }
   e.innerHTML = '<span class="pt" style="background:' + HBS.guide.color + '">' + HBS.guide.emoji + '</span><span class="tx"><b>' + HBS.guide.name + '</b> ' + txt + '</span>';
-    UI.coachShown = Date.now(); e.classList.add('on'); UI.coachUntil = Date.now() + ms; clearTimeout(UI.coachTm); UI.coachTm = setTimeout(() => { e.classList.remove('on'); }, ms);
+    const words = String(txt).replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean).length, read = 4000 + 100 * words; ms = Math.max(ms || 0, read);   // readable: 4 s + 1 s per 10 words
+    UI.coachShown = Date.now(); UI.coachRead = Date.now() + read; e.classList.add('on'); UI.coachUntil = Date.now() + ms; clearTimeout(UI.coachTm); UI.coachTm = setTimeout(() => { e.classList.remove('on'); }, ms);
 }
 function coachSay(id, txt, ms) { UI.tutLog = UI.tutLog || []; if (!UI.tutLog.includes(id)) UI.tutLog.push(id); window.GXCOACH.explained = UI.tutLog.slice(); coachChip(txt, ms || 6500); }
 // good / poor move feedback: one line, with the reason, after what the player just did (compared with the board before it)
@@ -187,12 +188,12 @@ function coachFeedback(p) {
   const tot = q => q.res.twig + q.res.resin + q.res.pebble + q.res.berry, snap = { city: p.city.length, hand: p.hand.length, pts: p.pts, res: tot(p), dep: p.dep.length, passed: !!p.passed, un: p.workers - p.dep.length, season: p.season }, b = UI.coachSnap; UI.coachSnap = snap;
   if (!b || b.season !== snap.season && snap.dep === 0) return null;
   const say = (k, t) => { const L = UI.fbLog = UI.fbLog || []; if (L.filter(x => x === k).length >= 2) return null; L.push(k); return t; };
-  if (snap.passed && !b.passed) return snap.un > 0 ? say('poor:pass', 'Poor: you passed with ' + snap.un + ' worker' + (snap.un > 1 ? 's' : '') + ' still home. Each one was a free action lost.') : say('good:pass', 'Good: every worker worked before you passed. Nothing wasted.');
+  if (snap.passed && !b.passed) return snap.un > 0 ? say('poor:pass', 'You passed with ' + snap.un + ' worker' + (snap.un > 1 ? 's' : '') + ' still home. Each was a lost action.') : say('good:pass', 'Good: every worker was used before you passed.');
   if (snap.city > b.city) { const e = p.city[p.city.length - 1], sp = e && spec(e.id); return say('good:build', 'Good: ' + (sp ? sp.name : 'a building') + ' is built' + (sp && sp.points ? ', worth ' + sp.points + ' point' + (sp.points > 1 ? 's' : '') + ' for good.' : '. It will keep paying every season.')); }
-  if (snap.pts >= b.pts + 3) return say('good:points', 'Good: +' + (snap.pts - b.pts) + ' points in one move. Races for events and big cards pay best.');
-  if (snap.hand >= 8 && b.hand < 8) return say('poor:hand', 'Careful: your hand is full at 8. Extra cards are lost, so build or play one soon.');
-  if (snap.dep > b.dep && snap.res <= b.res && snap.hand <= b.hand && snap.pts <= b.pts) return say('poor:empty', 'Poor: that worker brought nothing new. Check what glows before you send one.');
-  if (snap.res >= b.res + 3 && snap.dep > b.dep) return say('good:goods', 'Good: ' + (snap.res - b.res) + ' goods in one go. Goods turn into buildings.');
+  if (snap.pts >= b.pts + 3) return say('good:points', 'Good: +' + (snap.pts - b.pts) + ' points in one move. Events and big cards pay best.');
+  if (snap.hand >= 8 && b.hand < 8) return say('poor:hand', 'Careful: your hand is full at 8. Extra cards are lost. Play one soon.');
+  if (snap.dep > b.dep && snap.res <= b.res && snap.hand <= b.hand && snap.pts <= b.pts) return say('poor:empty', 'That worker gained nothing. Check what glows before you send one.');
+  if (snap.res >= b.res + 3 && snap.dep > b.dep) return say('good:goods', 'Good: ' + (snap.res - b.res) + ' goods at once. Goods pay for buildings.');
   return null;
 }
 function coachTick() {
@@ -203,13 +204,12 @@ function coachTick() {
     // the end: walk through the score with the real numbers, one chip per score card, then the "later" card
     if (G.phase === 'over' && G.over) {
       const t = UI.cards.length ? UI.cards[0] : null, s0 = G.over.scores[0], s1 = G.over.scores[1];
-      if (t && t.kind === 'over-score' && /^Final score: You/.test(t.title) && !cd.score) { cd.score = 1; coachSay('score', 'The count: cards ' + (s0.cards != null ? s0.cards : '?') + ', tokens ' + (s0.tokens != null ? s0.tokens : '?') + ', events ' + (s0.events != null ? s0.events : '?') + (s0.bonus != null ? ', bonuses ' + s0.bonus : '') + '. You score ' + s0.total + '. Every point is a home.', 9000); }
-      else if (t && t.kind === 'over-score' && !/^Final score: You/.test(t.title) && !cd.rscore) { cd.rscore = 1; coachSay('rscore', r.name + ' scores ' + s1.total + ' the same way. The higher total wins; a tie goes to most events, then most leftover goods.', 9000); }
+      if (t && t.kind === 'over-score' && !cd.score) { cd.score = 1; cd.rscore = 1; coachSay('score', 'You score ' + s0.total + ' and ' + r.name + ' scores ' + s1.total + '. Card points, tokens and events all count.', 9000); UI.tutLog.push('rscore'); window.GXCOACH.explained = UI.tutLog.slice(); }
       else if (t && t.kind === 'over' && !cd.end) { cd.end = 1; coachSay('end', G.over.winner === 0 ? 'The Oak bows to you, ' + s0.total + ' to ' + s1.total + '. A real game plays all four seasons.' : 'The Oak picks the higher total. A real game plays all four seasons.', 9000); setTimeout(coachLater, 2600); }
       return;
     }
     const ck = p.season * 100 + p.dep.length; if (ck > (UI.coachKey || 0)) { UI.coachActs = (UI.coachActs || 0) + 1; } UI.coachKey = ck;
-    if ((UI.coachActs || 0) >= COACH_TALE && !p.passed && !UI.coachEnd && myTurnC()) { UI.coachEnd = 1; coachSay('tale', 'A full first tale! Let us pass here and count the Oak\'s points. A real game plays on until you choose to pass.', 4500); setTimeout(() => { try { const m = HB.moves(G, 0).find(x => x.type === 'pass'); if (m && G && !G.over) act(m); } catch (e) { console.warn('coach end', e); } }, 2400); return; }
+    if ((UI.coachActs || 0) >= COACH_TALE && !p.passed && !UI.coachEnd && myTurnC()) { UI.coachEnd = 1; coachSay('tale', 'Nice first game! Let us pass here and count points. Real games run longer.', 4500); setTimeout(() => { try { const m = HB.moves(G, 0).find(x => x.type === 'pass'); if (m && G && !G.over) act(m); } catch (e) { console.warn('coach end', e); } }, 2400); return; }
     const fb = coachFeedback(p); if (fb) UI.fbQ = [{ t: fb, at: now }];   // the board snapshot always moves on; only the newest line waits, and only 8 s
     if (now < (UI.coachUntil || 0) + 400) return;   // one chip at a time
     for (const c of COACH) { if (cd[c.id] || !c.when(p, r)) continue; cd[c.id] = 1; coachSay(c.id, c.say(p, r)); UI.fbQ = []; return; }   // a rule to explain beats a move comment
@@ -228,6 +228,6 @@ function coachLater() {
   document.body.appendChild(d);
 }
 // the chip never takes a tap (it must not cover a target); any tap on the board dismisses it after 2.5 s
-document.addEventListener('pointerdown', () => { const e = document.getElementById('hbsay'); if (e && e.classList.contains('on') && Date.now() > (UI.coachShown || 0) + 2500) { e.classList.remove('on'); UI.coachUntil = 0; } }, true);
+document.addEventListener('pointerdown', () => { const e = document.getElementById('hbsay'); if (e && e.classList.contains('on') && Date.now() > (UI.coachRead || 0)) { e.classList.remove('on'); UI.coachUntil = 0; } }, true);
 (function () { const o = render; render = function () { const r = o.apply(this, arguments); coachTick(); return r; }; })();
 setInterval(() => { try { coachTick(); } catch (e) { } }, 800);
