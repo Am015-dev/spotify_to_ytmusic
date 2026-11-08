@@ -25,7 +25,7 @@ function coNext(){const c=UI.coach;if(!c)return;clearTimeout(CO.t);const old=doc
   const txt=typeof d[2]==='function'?d[2]():d[2];
   const b=document.createElement('div');b.id='coach';b.className='coachcard co-'+d[0];b.setAttribute('data-help','');b.dataset.step=id;
   b.innerHTML='<div class="cop"></div><div class="cob"><div class="cot">'+esc(who+' · '+d[1])+'</div><div class="cox">'+esc(txt)+'</div></div><button type="button" class="coz" aria-label="Got it">Got it</button>';
-  document.body.appendChild(b);b.dataset.pass='1';b.addEventListener('click',e=>{if(e.target.closest('.coz')){coNext();return}b.style.visibility='hidden';const u=document.elementFromPoint(e.clientX,e.clientY);coNext();if(u&&u!==b&&u.click)u.click()});coPlace();
+  document.body.appendChild(b);try{scPaint()}catch(e){}b.dataset.pass='1';b.addEventListener('click',e=>{if(e.target.closest('.coz')){coNext();return}b.style.visibility='hidden';const u=document.elementFromPoint(e.clientX,e.clientY);coNext();if(u&&u!==b&&u.click)u.click()});coPlace();
   CO.t=setTimeout(coNext,(typeof plRead==='function'?plRead(txt):4000+Math.ceil(txt.split(/\s+/).length/10)*1000)+2000)}
 function coPlace(){const b=document.getElementById('coach');const m=document.getElementById('mine');if(!b)return;const r=m?m.getBoundingClientRect():null;const h=b.offsetHeight;
   const top=r?Math.max(96,r.top-h-26):96;b.style.top=top+'px'}

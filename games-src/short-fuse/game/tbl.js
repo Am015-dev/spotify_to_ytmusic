@@ -131,7 +131,7 @@ function sayText(V){if(!G)return '';if(G.over)return G.over.win?'Defused!':'BOOM
     return 'Tap a glowing wire'}
   if(s>=0&&s!==me)return isHuman(s)?nm(s)+"'s turn":nm(s)+(G.q?' is choosing':' is thinking');
   if(G.step==='claim')return 'Claim the turn!';if(G.step==='snip')return 'Call it?';return 'Wait a moment'}
-function setSay(t,hold){const el=document.getElementById('say');if(!el)return;if(hold){TBL.sayT=Date.now()+hold;el.textContent=t;el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),hold);return}if(Date.now()<TBL.sayT)return;el.textContent=t}
+function setSay(t,hold){const el=document.getElementById('say');if(!el)return;if(hold){TBL.sayT=Date.now()+hold;el.textContent=t;el.classList.add('hot');setTimeout(()=>el.classList.remove('hot'),hold);return}if(Date.now()<TBL.sayT)return;el.textContent=t}
 function toast(t){const w=String(t).split(/\s+/).slice(0,8).join(' ');setSay(w,typeof plRead==='function'?plRead(w):4000);if(typeof plWait==='function')plWait();const l=document.getElementById('live');if(l)l.textContent=t}
 // ---------- the whole table ----------
 function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!tb)return;

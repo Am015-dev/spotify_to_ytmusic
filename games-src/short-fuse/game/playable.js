@@ -18,7 +18,7 @@ function plRead(t){const w=String(t||'').trim().split(/\s+/).filter(Boolean).len
 function plTick(ms){try{if(navigator.vibrate)navigator.vibrate(ms||12)}catch(e){}}
 function plWait(){if(!ANIM||!TBL.sayT)return;UI.aiNotBefore=Math.max(UI.aiNotBefore||0,TBL.sayT);clearTimeout(PL.rt);PL.rt=setTimeout(()=>{try{if(Date.now()>=TBL.sayT)refresh()}catch(e){}},TBL.sayT-Date.now()+40);
   if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null;schedule()}}
-function plSkip(){if(!TBL.sayT||Date.now()>=TBL.sayT)return false;TBL.sayT=0;UI.aiNotBefore=0;const el=document.getElementById('say');if(el)el.classList.remove('flash','badc','goodc');
+function plSkip(){if(!TBL.sayT||Date.now()>=TBL.sayT)return false;TBL.sayT=0;UI.aiNotBefore=0;const el=document.getElementById('say');if(el)el.classList.remove('hot','badc','goodc');
   const s=decider();if(s>=0&&isHuman(s))return true;   // your own turn: the tap goes on to the wire; the next refresh shows the instruction
   if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null}try{refresh();schedule()}catch(e){}return true}
 // a short vibrate tick when you pick up or drop a piece (phones that support it)
