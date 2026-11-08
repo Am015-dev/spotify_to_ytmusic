@@ -51,7 +51,8 @@ function swSettle(G) { // after a move: leather placement pending? else who goes
 }
 function swApply(G, m) { // returns {ok, why}. Mutates G.
   if (G.over) return { ok: false, why: 'over' }; var s = swWho(G); G.ev = []; G.turns++;
-  if (m.t === 'leather') { if (!G.pend) return { ok: false, why: 'no leather' }; if (m.skip) { G.pend = null; swSettle(G); return { ok: true }; } if (G.board[s][m.y * 9 + m.x] !== -1) return { ok: false, why: 'taken' };
+  if (m.t === 'leather') { if (!G.pend) return { ok: false, why: 'no leather' }; if (m.skip) { if (G.board[s].some(function (c) { return c === -1; })) return { ok: false, why: 'must place' }; G.pend = null; swSettle(G); return { ok: true }; }
+    if (!(m.x >= 0 && m.x <= 8 && m.y >= 0 && m.y <= 8 && m.x % 1 === 0 && m.y % 1 === 0) || G.board[s][m.y * 9 + m.x] !== -1) return { ok: false, why: 'taken' };
     G.board[s][m.y * 9 + m.x] = 100; G.ev.push({ k: 'place', s: s, pid: 100, cells: [[m.x, m.y]] }); swBonus(G, s); G.pend = null; swSettle(G); return { ok: true }; }
   if (G.pend) return { ok: false, why: 'leather first' };
   if (m.t === 'adv') { var st = swAdvSteps(G, s); var to = G.pos[s] + st; var before = G.btn[s]; swMoveTok(G, s, to); G.btn[s] += st; G.ev[0].gain = st; G.log.push([s, 'adv', st]); swSettle(G); return { ok: true }; }
