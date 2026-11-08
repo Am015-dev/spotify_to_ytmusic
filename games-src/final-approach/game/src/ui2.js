@@ -23,6 +23,7 @@ const icoEl = grp => h('i.ic', { 'aria-hidden': 'true', html: '<svg viewBox="0 0
 // mandatory spaces of seat a that are still empty, and how many dice it has left: warn before a missing Axis / Engine die loses the flight
 function mandInfo(a) { if (!G || typeof a !== 'number' || a < 0 || G.phase !== 'place' || G.result) return null; const need = ['ax' + a, 'en' + a].filter(k => G.keys.includes(k) && !G.slots[k]), left = FA.unusedDice(G, a).length; return { need, left, tight: need.length > 0 && left > 0 && left <= need.length, lost: need.length > left }; }
 const needNames = need => need.map(k => FA.SLOT[k].grp === 'axis' ? 'Axis' : 'Engines').join(' and ');
+const SLOTWORD = { axis: 'Axis', engines: 'Speed', radio: 'Radio', gear: 'Gear', flaps: 'Flap', brakes: 'Brake', conc: 'Coffee', kero: 'Fuel', intern: 'Trainee', ice: 'Ice' };   // the word on each empty slot
 const SLOTLAB = k => { const S = FA.SLOT[k]; if (S.grp === 'gear' || S.grp === 'flaps') return S.vals.join('-'); if (S.grp === 'brakes' || S.grp === 'ice') return String(S.vals[0]); return ''; };
 function selectedLegal() {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) return [];
@@ -92,7 +93,7 @@ function render() {
     const b = css(h('button.' + cls.replace(/ /g, '.'), { type: 'button', 'data-a': 'slot', 'data-slot': k, 'aria-label': slotName(k) + (dead[k] ? ' (this die here ends the flight)' : '') + ', ' + (d ? 'holds a ' + d.v : slotNeed(k) + (S.s === 0 ? ', pilot' : S.s === 1 ? ', co-pilot' : ', either crew')) }), q);
     b.style.setProperty('--u', Math.round(q.w) + 'px');
     if (d) b.appendChild(dvEl(d.v, d.k === 'i' ? 't' : d.k === 'x' ? 'k' : (d.s === 0 ? 'b' : 'o'))); else {
-      const pvw = hintsMode() && legal.includes(k) && typeof act === 'number' && act >= 0 && typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && G.dice[act][UI.sel] ? slotPreview(k, act, G.dice[act][UI.sel].v + UI.cof) : null; if (pvw) b.classList.add('pvw'); const lab = SLOTLAB(k); b.classList.add(lab ? 'hasv' : 'nov'); b.appendChild(h('span.r1', icoEl(S.grp))); if (lab) b.appendChild(h('span.sl', lab)); if (pvw) b.appendChild(h('span.pw' + (pvw.bad ? '.bad' : pvw.good ? '.good' : ''), h('b', pvw.big), h('small', pvw.cap))); }
+      const pvw = hintsMode() && legal.includes(k) && typeof act === 'number' && act >= 0 && typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && G.dice[act][UI.sel] ? slotPreview(k, act, G.dice[act][UI.sel].v + UI.cof) : null; if (pvw) b.classList.add('pvw'); const lab = SLOTLAB(k); b.classList.add(lab ? 'hasv' : 'nov'); b.appendChild(h('span.r1', icoEl(S.grp))); b.appendChild(h('span.sword', SLOTWORD[S.grp] || '')); if (lab) b.appendChild(h('span.sl', lab)); if (pvw) b.appendChild(h('span.pw' + (pvw.bad ? '.bad' : pvw.good ? '.good' : ''), h('b', pvw.big), h('small', pvw.cap))); }
     const swOn = S.grp === 'gear' && G.pl.sw.lg[S.ix] || S.grp === 'flaps' && G.pl.sw.fl[S.ix] || S.grp === 'brakes' && G.pl.sw.br[S.ix];
     if (swOn) { b.appendChild(h('i.sw.on')); if (!d) { b.classList.add('done'); b.appendChild(h('i.dn', { 'aria-hidden': 'true' }, '✓')); b.setAttribute('aria-label', b.getAttribute('aria-label') + ', done'); } } else if (['gear', 'flaps', 'brakes'].includes(S.grp)) b.appendChild(h('i.sw'));
     pz.appendChild(b);

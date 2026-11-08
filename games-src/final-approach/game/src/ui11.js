@@ -13,9 +13,11 @@ const CK_TICK = '<svg viewBox="0 0 16 16"><path d="M3 8.500l3.200 3.200L13 4.500
 const CK_CROSS = '<svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="#fff" stroke-width="2.800" stroke-linecap="round"/></svg>';
 function ckNum(it) { return it.k === 'gear' ? String(it.n) : it.k === 'flaps' ? String(it.n) : it.k === 'planes' ? (it.n ? String(it.n) : '') : it.k === 'speed' ? '≤' + it.n : it.k === 'air' ? (it.n ? String(it.n) : '') : ''; }
 function ckLabel(it) { return CK_NAME[it.k] + ': ' + (it.ok ? 'yes' : 'not yet') + (it.k === 'speed' ? ' (brakes ' + it.n + ')' : it.k === 'planes' && it.n ? ' (' + it.n + ' left)' : it.k === 'air' && it.n ? ' (' + it.n + ' spaces to go)' : it.k === 'gear' || it.k === 'flaps' ? ' (' + it.n + ')' : ''); }
+const CK_WORD = it => it.k === 'axis' ? 'Level' : it.k === 'gear' ? 'Gear ' + it.n + '/3' : it.k === 'flaps' ? 'Flaps ' + it.n + '/4' : it.k === 'planes' ? (it.n ? it.n + ' plane' + (it.n > 1 ? 's' : '') : 'No planes') : it.k === 'speed' ? 'Speed ≤' + it.n : it.k === 'air' ? (it.n ? it.n + ' to go' : 'At airport') : it.k === 'intern' ? 'Trainee' : it.k === 'ice' ? 'Ice ' + it.n + '/4' : '';
 function ckChips() {
-  return FA.checklist(G).map(it => h('span.ck.' + (it.ok ? 'ok' : 'no'), { 'data-k': it.k, 'aria-label': ckLabel(it), title: ckLabel(it) },
-    h('i.ic', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24">' + (CK_ICO[it.k] || '') + '</svg>' }), ckNum(it) ? h('b.nn', ckNum(it)) : null, h('i.mk', { 'aria-hidden': 'true', html: it.ok ? CK_TICK : CK_CROSS })));
+  // phones: the landing-speed chip waits for the landing round (it cannot be met before), so the words fit on one row
+  return FA.checklist(G).filter(it => !(it.k === 'speed' && isPh() && !FA.isFinal(G))).map(it => h('span.ck.' + (it.ok ? 'ok' : 'no'), { 'data-k': it.k, 'aria-label': ckLabel(it), title: ckLabel(it) },
+    h('b.cw', CK_WORD(it)), h('i.mk', { 'aria-hidden': 'true', html: it.ok ? CK_TICK : CK_CROSS })));
 }
 // the dock strip: the checklist and one info button (the board is the screen; this is the one place to look to know if you are winning)
 function goalStrip() {
@@ -262,6 +264,9 @@ document.addEventListener('pointerover', e => { if (!hintsMode()) return; const 
     'html.ph #ftrk{display:none!important}.altdots.ftk{gap:2px}.altdots .dk{width:10px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6);opacity:.4}.altdots .dk.p.on{background:#3d7fe0;opacity:1}.altdots .dk.c.on{background:#f08a24;opacity:1}.altdots .dsep{width:4px}html.ph #fprev{font-size:14px;padding:4px 8px;margin:2px 0}' +
     '.fa-goal{border-color:#1d4f9a}.fa-goal b,.fa-goal h3{display:block;font-size:17px;line-height:1.3;margin:0 0 6px}.fa-goal ul{margin:6px 0 10px}.fgoal ul{padding-left:18px}.fgoal li{margin:3px 0}.stbox .fgoal{background:#e8f0fb;color:#10223a;border-radius:12px;padding:10px 14px;margin:0 0 10px}' +
     '#acts .btn.ask{background:#fff4d6;color:#3a2a00;border:2px solid #c98a12}.gxh-bulb.hon{box-shadow:0 0 0 3px #ffd46b,0 0 14px #ffd46b}' +
+    '#pz .slot .sword{display:block;font-size:14px;line-height:1.05;font-weight:800;letter-spacing:-.3px;color:#fff;text-shadow:0 1px 2px #000;white-space:nowrap}html.ph #pz .slot .r1{display:none}html.ph #pz .slot.hasv .sl{font-size:14px;line-height:1.05}' +
+    '.ck .cw{font-size:14px;font-weight:800;white-space:nowrap;padding:0 3px}html.ph .gstrip.chk .ckrow{gap:5px;flex-wrap:nowrap;padding-right:0}html.ph .ck{padding:0 1px}html.ph .gstrip.chk .gi{display:none}html.ph .gstrip.chk{padding:2px 4px}'+
+    '@media (min-width:1024px){#pz .slot .sword,.ck .cw{font-size:16px}}' +
     '#pz .slot.nofit{filter:grayscale(.85) brightness(.75)}#pz .slot.cpt{outline:4px solid #6dffb0;outline-offset:3px;box-shadow:0 0 0 7px rgba(109,255,176,.35);animation:fa-cpt 1.1s ease-in-out infinite}#pz .die.cpt{outline:4px dashed #6dffb0;outline-offset:3px}' +
     '@keyframes fa-cpt{50%{outline-color:rgba(109,255,176,.35)}}' +
     '.fa-ro{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9970;width:min(380px,calc(100vw - 24px));padding:14px 16px;border-radius:16px;background:#f3ead4;color:#1f1a12;border:3px solid #2e8b45;box-shadow:0 12px 32px rgba(0,0,0,.55);font-size:15px;line-height:1.35;animation:fa-roin .25s ease-out both}' +
