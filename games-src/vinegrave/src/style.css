@@ -500,3 +500,6 @@ body:has(#rs:not([hidden])) #turnover,body:has(.gxt-cell) #turnover,body:has(.gx
 .gbox .gu{list-style:none;margin:4px 0;padding:0;display:flex;flex-direction:column;gap:8px}
 .gbox .gu li{display:flex;gap:10px;align-items:flex-start;font-size:16px;line-height:1.3}.gbox .gu .ic{flex:none;width:28px;height:28px}
 .gbox .gf{margin:0;font-style:italic;font-size:15px;color:#c9c2a8}.gbox .gs{margin:0;font-size:14px;color:#c9c2a8}
+.btn.whatdo{display:inline-flex;align-items:center;gap:6px}.btn.whatdo svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;flex:none}
+.site[data-badge]::after{top:auto;bottom:26px;z-index:4}
+@media (max-width:999px){.btn.whatdo{width:44px;min-width:44px;padding:0!important;justify-content:center}.btn.whatdo .wl{display:none}#myres{gap:2px 4px!important}}
