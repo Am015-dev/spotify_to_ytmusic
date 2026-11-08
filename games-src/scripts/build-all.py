@@ -289,6 +289,13 @@ def main():
     else:
         for s in ok: status[s] = "PASS" if a.no_check else status[s]
 
+    if a.quick and os.environ.get("FEEL_GATE") == "1" and not a.no_check:  # 3d. feel audit (BRIEF-GAMEFEEL points 3-5): FEEL_GATE=1, FEEL_SECS per session (default 60)
+        for s in [x for x in ok if status[x] == "PASS"]:
+            r = subprocess.run(["node", str(SCRIPTS / "feel-audit.js"), s, "--gate", "--secs", os.environ.get("FEEL_SECS", "60")], env=dict(env, NODE_PATH=env.get("NODE_PATH", "/opt/node-tools/node_modules")), capture_output=True, text=True)
+            lines = [l for l in r.stdout.splitlines() if l.startswith(("PASS", "FAIL", "N/A"))]
+            for l in lines: print("[feel] " + l, flush=True)
+            if r.returncode != 0: status[s], why[s] = "FAIL", "feel-audit: " + "; ".join(l.split(" ", 2)[2][:40] for l in lines if l.startswith("FAIL"))[:160] if lines else "feel-audit crashed"
+
     if a.deploy and not a.no_look:  # 3b. look check + axe: only NEW severe findings block. "New" = not in look-known/<slug>.json (committed, rewritten on every successful deploy; no live re-measurement)
         env = dict(os.environ); env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
         mode = "all" if a.full else "phone"

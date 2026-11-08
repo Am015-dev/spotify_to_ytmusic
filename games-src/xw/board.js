@@ -82,7 +82,11 @@ function release(){const w=BF.wave;BF.wave=null;slowDown();if(!w)return;const id
 function maybeRelease(){if(!BF.wave)return;if(!stepTwo()||humanTurn()||performance.now()-BF.wave.t0>7000)release()}
 // ---- one-line text, banners, pops ----
 function setHint(t){if(hint&&hint.innerHTML!==t)hint.innerHTML=t}
-function banner(h,ms){if(!ban)return;ban.innerHTML=h;ban.hidden=false;ban.classList.remove('go');void ban.offsetWidth;ban.classList.add('go');clearTimeout(BF.banT);BF.banT=setTimeout(()=>{ban.hidden=true},ms||1400)}
+// owner rule (8 Nov): a message stays at least 4 s plus 1 s per 10 words; one at a time; a newer one waits its turn (latest 2 kept)
+function readMs(h){const w=String(h).replace(/<[^>]+>/g,' ').trim().split(/\s+/).filter(Boolean).length;return 4000+w*100}
+function banner(h,ms){if(!ban)return;const now=performance.now();if(!ban.hidden&&BF.banUntil&&now<BF.banUntil&&ms<1e9&&BF.banMs<1e9){BF.banQ=(BF.banQ||[]).concat([[h,ms]]).slice(-2);return}
+  ms=ms>=1e9?ms:Math.max(ms||0,readMs(h));BF.banMs=ms;BF.banUntil=now+Math.min(ms,readMs(h));ban.innerHTML=h;ban.hidden=false;ban.classList.remove('go');void ban.offsetWidth;ban.classList.add('go');clearTimeout(BF.banT);
+  BF.banT=setTimeout(()=>{ban.hidden=true;BF.banUntil=0;const n=(BF.banQ||[]).shift();if(n)setTimeout(()=>banner(n[0],n[1]),250)},ms)}
 function mvLabel(m){if(!m)return '';if(m.s===0)return '■';const a=ARROW[m.t]||['↑','↑'];return (m.d>0?a[1]:a[0])+'<b>'+m.s+'</b>'}
 function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;const col=c.m?(exColor(s,c.m).c):'w';const el=document.createElement('div');el.className='bfchip '+col+' s'+s.side;el.innerHTML=c.roll&&!c.m?'⇆':mvLabel(c.m);lay.appendChild(el);
     const it={el,ship:s.id,dy:-1.25,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},ms+400)}}
@@ -101,7 +105,7 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} can only shoot forward. Pick a 🎯 move.</span>`,1500);BF.noshotT=1}}}
   // the round summary between rounds is a board banner here, not a page of text
   if(sumPending()){UI.sumSeen=G.round-1;banner(`<b>Round ${G.round}</b>`,1100)}
-  const k=ctx();if(BF.noshotT&&ban&&['dice','res','target','plan'].includes(k)){ban.hidden=true;BF.noshotT=0}
+  const k=ctx();if(BF.noshotT&&ban&&['dice','res','target','plan'].includes(k)&&performance.now()>=(BF.banUntil||0)){ban.hidden=true;BF.noshotT=0}
   turnBanner(k);
   if(k!=='plan')BF.sel=null;if(k!=='sub'&&k!=='action')BF.sub=null;
   if(k==='res'||k==='note')autoHold(k);
@@ -126,7 +130,7 @@ function topLine(k){if(!G||G.round<1){top.innerHTML='';top._h='';return}const k0
 // ---- the guided first game: a ghost finger shows the one thing to tap ----
 function finger(el){BF.fing=guided()&&el?el:null}
 // ---- screens ----
-function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length;setHint('');banner(`<b>Destroy ${foe===1?'the enemy ship':foe===2?'both enemy ships':'all '+foe+' enemy ships'}</b><span>${LORE.quick.intro} Your ship${G.ships.filter(s=>s.side===k0).length>1?'s are':' is'} at the bottom.</span>`,1e9);
+function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length;setHint('');banner(`<div data-keep><b class="na-gt">Goal: destroy ${foe===1?'the enemy ship':'every enemy ship'} before they get yours.</b><ul class="na-goal"><li>Pick a secret move for each ship.</li><li>Fly, then shoot enemies in front of you.</li><li>Hits break shields first, then the hull.</li></ul><span>Yours ${G.ships.filter(s=>s.side===k0).length>1?'are':'is'} at the bottom. Theirs at the top.</span></div>`,1e9);
   setBtns(`<button class="btn" data-bf="briefset" aria-label="Place the asteroids and your ship yourself">Set up myself</button><button class="btn primary big" data-bf="brief">Start ▶</button>`);finger(btns.querySelector('.primary'))}
 function setupUI(){const q=G.q;const rock=q.key==='rock';setHint(rock?'Tap a square to place a rock':'Tap a spot for your ship');
   const rk=recOpt(q).o.k;q.opts.forEach((o,i)=>{if(!o.p)return;const it=item(rock?'':'✈','bfspot'+(o.k===rk?' rec':''),{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true});if(o.k===rk)finger(it.el)});
@@ -199,13 +203,13 @@ function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for 
   setHint(t);setBtns(UI.paused?`<button class="btn primary" data-a="pause">▶ Resume</button>`:'')}
 // ---- taps ----
 function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
-  if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();banner('<b>Asteroids placed</b>',900)}else bfRender();return}
+  if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();bfRender()}else bfRender();return}
   if(ds.bf==='auto'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));BF.sel=null;render();return}
-  if(ds.bf==='fly'){const ps=planSide();if(ps<0)return;const my=alive().filter(s=>s.side===ps);if(!my.every(s=>UI.draft[s.id]!=null))return;BF.sel=null;speedUp();banner('<b>Dials revealed…</b>',900);const b=document.querySelector('[data-a="lock"]');lockIn();return}
+  if(ds.bf==='fly'){const ps=planSide();if(ps<0)return;const my=alive().filter(s=>s.side===ps);if(!my.every(s=>UI.draft[s.id]!=null))return;BF.sel=null;speedUp();try{GX.buzz(18)}catch(e){}const b=document.querySelector('[data-a="lock"]');lockIn();return}
   if(ds.bf==='stats'){BF.wantStats=true;UI.stats=true;render();return}
   if(ds.bf==='back'){BF.sub=null;render();return}
-  if(ds.bfship!=null){selShip(ds.bfship);return}
-  if(ds.bfm!=null){const s=ship(BF.sel);if(!s)return;UI.draft[s.id]=+ds.bfm;UI.sel=s.id;BF.selAt=performance.now();sfx('token');const my=alive().filter(x=>x.side===s.side);const nx=my.find(x=>UI.draft[x.id]==null);BF.sel=nx?nx.id:null;render();return}
+  if(ds.bfship!=null){try{GX.buzz(8)}catch(e){}selShip(ds.bfship);return}
+  if(ds.bfm!=null){const s=ship(BF.sel);if(!s)return;UI.draft[s.id]=+ds.bfm;UI.sel=s.id;BF.selAt=performance.now();sfx('token');try{GX.buzz(12)}catch(e){}const my=alive().filter(x=>x.side===s.side);const nx=my.find(x=>UI.draft[x.id]==null);BF.sel=nx?nx.id:null;render();return}
   if(ds.bfa!=null){const s=ship(G.cur);if(!s)return;if(ds.bfa==='skip'){uiAct({act:'action',a2:'skip'});return}const a=actionsFor(s).find(x=>x.a===ds.bfa);if(!a)return;
     if(a.targets&&a.targets.length===1){uiAct({act:'action',a2:a.a,arg:a.targets[0]});return}
     if(a.targets||a.opts){BF.sub={a:a.a,targets:a.targets,opts:a.opts};BF.key='';render();return}
@@ -250,5 +254,5 @@ const _tap=PHN.tap;PHN.tap=function(e){if(BF.on)return PHN.tapBF(e)||(G&&G.phase
 document.addEventListener('pointerdown',e=>{if(!BF.on||!UI.hold||!G)return;if(typeof tutOn==='function'&&tutOn())return;if(e.target.closest('.gx-bar,#more,#modal,.gx-dock'))return;if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}setTimeout(()=>{if(UI.hold)releaseHold()},0)},true);
 const _rs=resize3D;resize3D=function(){const w=V3.w,h=V3.h;const r=_rs.apply(this,arguments);if(BF.on&&(V3.w!==w||V3.h!==h)){BF.fkey='';BF.key='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
 const _cv=camView;camView=function(){const r=_cv.apply(this,arguments);if(BF.on){BF.fkey='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
-BF.render=bfRender;BF.fit=fit;BF.release=release;BF.hideBan=()=>{if(ban)ban.hidden=true};BF.px=px;BF.shipR=shipR;BF.shownXY=shownXY;
+BF.render=bfRender;BF.fit=fit;BF.release=release;BF.hideBan=()=>{if(ban){ban.hidden=true;BF.banUntil=0;BF.banQ=[]}};BF.px=px;BF.shipR=shipR;BF.shownXY=shownXY;
 })();

@@ -132,4 +132,15 @@
     ]
   });
 
+  // owner 3D models (throne, crown) at the moments they show: the Kingdom sheet and the end card (runtime audit: scripts/play-usage.js)
+  GXS.add({
+    id: 'tb-throne', name: 'Kingdom sheet with the 3D throne', ask: 'Is the throne on the Kingdom sheet?', seed: 7, when: booted, group: 'Art',
+    setup: function () { return table(7).then(function () { openPop('kingdom'); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },
+    checks: [{ kind: 'fn', name: 'the throne is on the sheet (3D canvas or the @512 picture)', fn: function () { return !!document.querySelector('.thr3') || 'no throne on the Kingdom sheet'; } }]
+  });
+  GXS.add({
+    id: 'tb-over', name: 'End card with the 3D crown', ask: 'Is the crown on the end card?', seed: 8, when: booted, group: 'Art',
+    setup: function () { return table(8).then(function () { G.over = { winner: 0, ranking: G.pl.map(function (q) { return q.seat; }), scores: G.pl.map(function (q) { return q.inf; }), bonus: {}, tieBreak: null }; showOver(); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },
+    checks: [{ kind: 'fn', name: 'the crown is on the end card (3D canvas or the @512 picture)', fn: function () { return !!document.querySelector('.crown3') || 'no crown on the end card'; } }]
+  });
 })();

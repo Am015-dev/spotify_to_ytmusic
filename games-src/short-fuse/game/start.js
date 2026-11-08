@@ -64,7 +64,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'xray':UI.xray=!UI.xray;refresh();return;
   case 'briefok':UI.brief=null;sfx('click');refresh();return;
   case 'next':startJob(Object.assign({},UI.lastSetup,{job:G.mission+1,captain:(G.captain+1)%G.np}));return;
-  case 'again':if(UI.camp){return}startJob(Object.assign({},UI.lastSetup,{captain:G.captain}));return;
+  case 'again':if(UI.camp){return}startJob(Object.assign({},UI.lastSetup,{captain:(G.captain+1)%G.np}));return;
   case 'board':showStart();return;
   case 'snd':toggleSound();renderSettings();return;
   case 'mus':toggleMusic();renderSettings();return;
