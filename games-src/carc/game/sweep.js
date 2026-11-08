@@ -172,7 +172,7 @@ async function playGame(b, W, H, variant, tag, opt) {
     }
     const o = await probe(p); stat.games++;
     if (!o.over) await fail(p, tag, 'unfinished', 'game did not end');
-    else { await sleep(9000); /* final score pops run up to 8 s before the result card */ const res = await p.evaluate(() => !!document.querySelector('#modal .card .rescore') || !!document.querySelector('.gxc')); if (res) stat.results++; else await fail(p, tag, 'result', 'no result card after the game'); const sc = await p.evaluate(() => G.pl.map(q => q.score).join('-')); console.log('  game', tag, 'done', steps, 'steps, score', sc, 'maxStuck', maxStuck + 'ms'); }
+    else { await sleep(4500); /* the end count runs about 3.5 s before the result card */ const res = await p.evaluate(() => !!document.querySelector('#modal .card .restab') || !!document.querySelector('.gxc')); if (res) stat.results++; else await fail(p, tag, 'result', 'no result card after the game'); const sc = await p.evaluate(() => G.pl.map(q => q.score).join('-')); console.log('  game', tag, 'done', steps, 'steps, score', sc, 'maxStuck', maxStuck + 'ms'); }
     if (shotN < 14 && opt.shot) await p.screenshot({ path: path.join(SHOTS, opt.shot) });
   } catch (e) { await fail(p, tag, 'crash', e.message); }
   await p.context().close();
