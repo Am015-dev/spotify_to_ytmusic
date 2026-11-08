@@ -85,7 +85,7 @@ button.qt{appearance:none;border:0;background:transparent;color:var(--gold);curs
 .stand .pt{width:44px;height:44px;border-radius:50%;background:#394762 center/cover no-repeat;flex:0 0 auto;border:3px solid;display:flex;align-items:center;justify-content:center;font-weight:900}
 .stand small{display:block;color:var(--mute);font-size:13px}
 .stand.you{outline:2px solid var(--gold)}
-.podium{background:#171c28 center/cover no-repeat;border-radius:12px;padding:10px 6px;margin-bottom:8px;text-align:center}
+.podium{background:#171c28 center/cover no-repeat;border-radius:12px;padding:38px 16px 34px;margin-bottom:8px;text-align:center}
 .ic.hud{width:16px;height:16px;vertical-align:-3px;margin-right:4px}
 .ic.f-lap,.ic.f-place,.ic.f-gear,.ic.f-stress,.ic.f-heat{border-radius:50%}
 .ic.f-lap{background-color:#4a9bff}.ic.f-place{background-color:#ffc23a}.ic.f-gear{background-color:#9aa7bd}.ic.f-stress{background-color:#8a52d6}.ic.f-heat{background-color:#ff6a3a}
@@ -106,6 +106,86 @@ button.qt{appearance:none;border:0;background:transparent;color:var(--gold);curs
 @media (min-width:900px){:root{--cw:66px}#hand{gap:6px}.lbl,small,.pill,.pill b,.chips,.chips b,.chips span,.gl,.gb i,.cd .t,.cd.U .t,.tray span,.opt small,.logo small,.upc small,.gxt-menu span,.stand small,.stand .n{font-size:16px}html body :is(.ghostb span,.gx-ibtn span,.gxt-menu span,.gxc-lab,.gxc-act b,.gxc-act small,.gxc-sh-t,.gxc-tag){font-size:16px!important}}
 html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}html body .gxc-node .gxc-lock{filter:grayscale(1) brightness(3);opacity:1!important}
 @media (max-height:600px){#msg{padding:3px 8px;min-height:26px;font-size:14px}.gb{min-height:38px}#acts button{min-height:40px}}
+
+/* ---- playable pass (W395): turn banner, readable cards, glow/dim, engine pips ---- */
+#banner{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:5;display:none;align-items:center;gap:8px;max-width:calc(100% - 16px);padding:7px 16px;border-radius:999px;background:#121826;border:2px solid var(--bc,#ffc23a);color:#fff;font-weight:900;font-size:17px;line-height:1.2;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.55)}
+#banner.on{display:flex;animation:bnIn .3s ease-out}
+#banner i{width:14px;height:14px;border-radius:50%;background:var(--bc,#ffc23a);flex:0 0 auto}
+#banner.round i{display:none}
+@keyframes bnIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
+#msg{font-size:16px;line-height:1.3;min-height:44px;display:flex;align-items:center;justify-content:center;padding:6px 12px;max-height:3.3em;overflow:hidden}
+#gears .gl{font-size:13px;line-height:1.1;max-width:46px;font-weight:800}
+.gb{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;padding:2px 0}
+.gb b{font-size:21px}.gb small{font-size:13px;font-weight:700;color:#c9d3e6;margin-top:2px}.gb.on small{color:#ffe6a0}.gb.glow{box-shadow:0 0 0 2px #ffc23a}
+:root{--ch:calc(var(--cw)*1.55)}
+#hand{min-height:var(--ch)}
+.cd{height:var(--ch)}
+.cd .k{position:absolute;left:0;right:0;top:2px;font-size:13px;line-height:1.1;text-align:center;font-weight:800}
+.cd .v{top:calc(var(--ch)*.24);display:flex;align-items:center;justify-content:center;font-size:calc(var(--cw)*.62)}
+.cd .t{bottom:2px;font-size:13px;line-height:1.1;font-weight:700}
+.cd.H .t,.cd.X .t{color:#e8dcff}
+.cd.glow{animation:cdGlow 1.4s ease-in-out infinite}
+@keyframes cdGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,194,58,0)}50%{box-shadow:0 0 0 3px rgba(255,194,58,.85)}}
+.cd.dim{opacity:.5;filter:saturate(.6)}
+.cd.flip{animation:cdFlip .38s ease-out}
+@keyframes cdFlip{from{transform:rotateY(90deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
+#acts .go.glow{animation:goGlow 1.2s ease-in-out infinite}
+@keyframes goGlow{0%,100%{box-shadow:0 3px 0 #6e1209,0 0 0 0 rgba(255,194,58,0)}50%{box-shadow:0 3px 0 #6e1209,0 0 0 5px rgba(255,194,58,.8)}}
+.reveal{min-height:var(--ch)}
+.who{text-align:center;font-weight:900;font-size:16px;margin:2px 0 4px}
+.tray .eng{gap:6px}.tray em{font-style:normal;color:#d5deee}
+.pips{display:inline-flex;gap:3px}.pip{width:12px;height:12px;border-radius:50%;border:2px solid #ff9b5a;background:transparent}.pip.on{background:#ff7a3a}
+.turn5{margin:4px 0 10px 20px;padding:0}.turn5 li{margin:4px 0;font-size:16px}
+.podium .rl{margin:6px 8px 0;font-size:16px;line-height:1.35;color:#f1f4fa}
+@media (prefers-reduced-motion:reduce){.cd.glow,#acts .go.glow{animation:none}.cd.glow{box-shadow:0 0 0 2px #ffc23a}}
+.gxt-n{display:none}.gxt-dots i{width:5px;height:5px}
+@media (max-width:600px){#panel{min-height:0}}
+@media (max-width:999px) and (max-height:520px){html .gx-main{grid-template-columns:minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important}html .gx-dock{max-height:none!important;border-radius:0!important}html .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0!important}}
+@media (min-width:900px){:root{--cw:72px}#gears .gl,.cd .k,.cd .t,.gb small,.tray em,.who,#banner,.turn5 li{font-size:16px}#msg{font-size:18px}}
+#coach{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:#f3e9cf;color:#1b1710;border:2px solid #c9a24a;box-shadow:0 4px 14px rgba(0,0,0,.55);font-size:15px;line-height:1.3}
+#coach.on{display:flex;animation:bnIn2 .3s ease-out}@keyframes bnIn2{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#coach .pt{flex:0 0 36px;height:36px;border-radius:50%;background:#3b7a8c;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:18px}
+#coach .tx{flex:1}#coach button{min-height:44px;min-width:44px;border-radius:10px;border:2px solid #8a6a22;background:#fff7dd;color:#1b1710;font-weight:800;font-size:14px;padding:0 8px}
+.swapb{min-height:44px;border-radius:10px;border:2px solid #3b4a68;background:#1d2636;font-weight:800;padding:0 10px;font-size:14px}
+.walk,.later{margin:6px 0 10px 18px;padding:0;font-size:16px}.walk li,.later li{margin:5px 0}
+@media (min-width:900px){#coach{font-size:16px}#coach button{font-size:16px}.swapb{font-size:16px}}
+@media (max-width:420px){.gx-bar{gap:3px;padding-left:4px;padding-right:4px}.gx-ibtn{min-width:38px;padding:4px 5px}.pill{padding:3px 6px}}
+
+#trk{margin:0 0 4px}
+#trk .trk1{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:13px;color:var(--mute)}
+#trk .trk1 b{color:var(--ink);font-size:14px}
+#trk .trk1 .wx{color:#8ce6ff;font-weight:700}
+#trk .phs{display:flex;gap:3px;list-style:none;margin:0;padding:0}
+#trk .phs li{flex:1;text-align:center;font-size:13px;font-weight:700;padding:1px 0;border-radius:6px;background:var(--panel2);color:var(--mute)}
+#trk .phs li.on{background:var(--gold);color:#1a1405}
+#trk .rate{margin-top:5px;font-size:13px;font-weight:700;padding:4px 8px;border-radius:8px;background:var(--panel2)}
+#trk .rate.good{color:#8cf0b4}#trk .rate.okay{color:#ffd27a}#trk .rate.poor{color:#ff8f7a}
+.pod3{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:8px auto 4px;max-width:320px}
+.pod3 .ps{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:14px;color:#fff}
+.pod3 .pc,.champ .pc{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid #fff;vertical-align:middle;margin-right:4px}
+.pod3 .blk{width:100%;background:linear-gradient(#ffe08a,#c9902a);color:#1a1405;font-weight:900;font-size:22px;text-align:center;border-radius:8px 8px 0 0;padding-top:6px}
+.pod3 .p1 .blk{height:74px}.pod3 .p2 .blk{height:52px;background:linear-gradient(#e9eef5,#9aa7bd)}.pod3 .p3 .blk{height:38px;background:linear-gradient(#f0b78a,#a8642e)}
+table.champ{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+table.champ th,table.champ td{padding:5px 6px;text-align:left;border-bottom:1px solid #2e3a50}
+table.champ tr.you td{color:var(--gold);font-weight:700}
+@media (min-width:900px){#trk .trk1,#trk .phs li,#trk .rate,table.champ,.pod3 .ps{font-size:16px}}
+
+/* W424: card labels sit on a solid chip so they stay readable over any card art */
+.cd .k,.cd .t{left:3px;right:3px;background:rgba(12,15,22,.88);color:#fff!important;border-radius:4px;text-shadow:none}
+.cd .v{text-shadow:none}.cd .v:not(:has(svg)){left:50%;right:auto;transform:translateX(-50%);min-width:1.3em;padding:0 .12em;background:rgba(12,15,22,.88);color:#fff;border-radius:8px;height:1.1em;top:calc(var(--ch)*.28)}
+.gxc-node .gxc-lock{background:#0d1018;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;filter:none;color:#fff}
+#rulesbody b{color:inherit}
+
+#modal .sheet>.row:last-child{position:sticky;bottom:-1px;z-index:2;background:var(--panel);padding:8px 0 4px;margin-bottom:0!important}
+@media (max-width:600px){.pod3 .p1 .blk{height:50px}.pod3 .p2 .blk{height:36px}.pod3 .p3 .blk{height:26px}.pod3 .blk{font-size:18px;padding-top:3px}.stand{padding:4px 6px;margin:4px 0}.stand .pt{width:34px;height:34px}.podium{padding:30px 12px 26px}}
+@media (min-width:1280px){#game{--gx-dock-w:clamp(470px,44vw,620px)}html #game{--cw:68px}}
+body:has(.gx-drawer.on) #gxscn-tag{display:none}   /* the ?scn= test tag must not sit on top of the open rules drawer */
+@media (min-width:1000px){html body .gx-drawer{bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0}}   /* lines scrolled below the drawer end over its own panel, not over the dark page */
+#trk .score{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;min-height:40px;margin:0 0 4px;padding:3px 10px;border-radius:8px;border:1px solid #3b4a68;background:#1d2636;color:var(--ink);font-weight:800;font-size:14px;text-align:left}
+#trk .score i{font-style:normal;font-weight:700;color:var(--gold);font-size:13px}
+#hintT.on{border-color:var(--gold);color:var(--gold)}
+ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;line-height:1.35}.wxl{font-size:15px;color:#8ce6ff}
+@media (min-width:900px){#trk .score,#trk .score i{font-size:16px}}
 /* ===== Board-first shell (shared by every game on the shelf) =====
    The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
    everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
@@ -421,6 +501,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     <p class="lede">Brake and keep your heat, or push and burn it.</p>
     <button class="big" id="playB">Play &#9654;</button>
     <button class="ghostb" id="storyB">Story chapters<span id="storyLine"></span></button>
+    <button class="ghostb" id="champB">Championship<span>Three tracks, points for every place</span></button>
     <div id="tutSlot"></div>
     <div class="quick" id="quick"><button type="button" class="qh qt" id="quickT" aria-expanded="false">Quick game options</button><div id="quickBody" hidden>
     <div class="lbl">Track</div>
@@ -433,6 +514,10 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     <div class="row" id="s-hum"></div>
     <div class="lbl">Upgrades</div>
     <div class="row" id="s-upg"></div>
+    <div class="lbl">Weather</div>
+    <div class="row" id="s-wx"></div>
+    <div class="lbl">Starting upgrades</div>
+    <div class="row" id="s-sup"></div>
     <div class="lbl">Rival skill</div>
     <div class="row" id="s-diff"></div>
     </div></div>
@@ -444,13 +529,14 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     <h1>Redline Rally</h1>
     <span class="pill"><i class="ic hud f-lap" data-art="icon-lap"></i>Lap <b id="tLap">1/2</b></span><span class="pill"><i class="ic hud f-place" data-art="icon-place"></i>Place <b id="tPos">1/5</b></span><span class="pill" id="tTrk"></span>
     <span class="gx-sp"></span>
+    <button class="gx-ibtn" id="hintT" type="button" aria-pressed="false" title="Hints: move preview, ratings and What should I do?"><span>Hints</span></button>
     <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
     <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="Rules"><span>Rules</span></button>
     <button class="gx-ibtn" id="sndB" data-snd aria-label="Sound"></button>
     <button class="gx-ibtn" id="menuB" aria-label="Menu"><span>Menu</span></button>
   </header>
   <div class="gx-main">
-    <main class="gx-board"><div id="cvw"><canvas id="cv"></canvas></div></main>
+    <main class="gx-board"><div id="cvw"><canvas id="cv"></canvas><div id="banner" aria-live="polite"></div></div></main>
     <aside class="gx-dock" aria-label="What to do now">
       <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Your move</span></div>
       <div class="gx-dock-body"><div id="msg" aria-live="polite"></div><div id="panel"></div></div>
@@ -1984,7 +2070,7 @@ const GX={key:'gx',open:null,
 
   // ------------------------------------------------------------------ validation (node-safe)
   var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
-  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter', 'relic'];
   function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
   GXC.validate = function (data) {
     var bad = [], add = function (m) { bad.push(m); };
@@ -2442,7 +2528,7 @@ window.CAMPAIGN = {"game":"redline-rally","title":"The Redline Season","version"
     id: 'rr-corner', name: 'Corner: brake or push', ask: 'Does the corner warning show?', seed: 9, when: booted,
     setup: function () {
       begin({ track: 'hairpin', laps: 1, opp: 3, hum: 1, diff: 'normal', seed: 9 });
-      var c = G.cars[0]; c.pos = 7; c.hand = ['4', '4', '3', '4', '2', '1', '3']; c.gear = 2; UI.gear = 3; UI.sel = [0, 1, 3]; drawPlan();
+      UI.hints = true; var c = G.cars[0]; c.pos = 7; c.hand = ['4', '4', '3', '4', '2', '1', '3']; c.gear = 2; UI.gear = 3; UI.sel = [0, 1, 3]; drawPlan();
       return new Promise(function (r) { setTimeout(r, 400); });
     },
     checks: [
@@ -2459,11 +2545,110 @@ window.CAMPAIGN = {"game":"redline-rally","title":"The Redline Season","version"
       { kind: 'visible', sel: '.stand', name: 'standings' }
     ]
   });
+  GXS.add({
+    id: 'rr-play', name: 'Play: clean screen', ask: 'Only board, hand, tracker, one score line and the top bar?', seed: 5, when: booted,
+    setup: function () { UI.hints = false; begin({ track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'normal', seed: 5 }); return new Promise(function (r) { setTimeout(r, 400); }); },
+    checks: [
+      { kind: 'visible', sel: '#scoreL', name: 'score line' },
+      { kind: 'fn', name: 'no hint clutter', fn: function () { return (!document.querySelector('#sugB') && !document.querySelector('#tray') && !document.querySelector('#coach') && document.getElementById('bulbbtn').hidden) || 'hint UI visible in Play'; } }
+    ]
+  });
+  GXS.add({
+    id: 'rr-lights', name: 'Start lights', ask: 'Do the start lights show?', seed: 5, when: booted,
+    setup: function () { begin({ track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'normal', seed: 5 }); RACE.lights = { t0: 0, freeze: 1600 }; return new Promise(function (r) { setTimeout(r, 300); }); },
+    checks: [{ kind: 'fn', name: 'lights on', fn: function () { return !!RACE.lights || 'no lights'; } }, { kind: 'visible', sel: '#trk', name: 'turn tracker' }]
+  });
+  GXS.add({
+    id: 'rr-preview', name: 'Preview before Go', ask: 'Do you see where you land and what the corner costs?', seed: 9, when: booted,
+    setup: function () {
+      begin({ track: 'hairpin', laps: 1, opp: 3, hum: 1, diff: 'normal', seed: 9 }); G.round = 4; RACE.rate = 'Good: 7 spaces for 0 heat.'; RACE.rateK = 'good'; RACE.rateShow = 1;
+      UI.hints = true; var c = G.cars[0]; c.pos = 7; c.hand = ['4', '4', '3', '4', '2', '1', '3']; c.gear = 2; c.eng = 4; G.cars[1].pos = 15; UI.gear = 3; UI.sel = [0, 2, 4]; UI.touchedGear = 1; drawPlan();
+      return new Promise(function (r) { setTimeout(r, 400); });
+    },
+    checks: [
+      { kind: 'fn', name: 'preview set', fn: function () { return !!RACE.prev || 'no preview'; } },
+      { kind: 'fn', name: 'phase Play lit', fn: function () { var o = document.querySelector('#trk .phs li.on'); return (o && o.textContent === 'Play') || 'phase ' + (o && o.textContent); } },
+      { kind: 'fn', name: 'round rating', fn: function () { return /Good/.test(document.getElementById('banner').textContent) || 'banner ' + document.getElementById('banner').textContent; } }
+    ]
+  });
+  GXS.add({
+    id: 'rr-spin', name: 'Spin out', ask: 'Is the spin-out loud and clear?', seed: 11, when: booted,
+    setup: function () {
+      begin({ track: 'hairpin', laps: 1, opp: 3, hum: 1, diff: 'normal', seed: 11 }); var c = G.cars[0], k = T(G).list[1]; c.pos = k.idx - 1; c.eng = 0; c.gear = 1; UI.vis[0].p = c.pos; UI.focus = 0;
+      RACE.spdT = RACE.spd = 11; raceSpin({ car: 0, to: c.pos }); RACE.flashHold = 1; UI.pops.push({ txt: 'SPIN: 11 in a ' + climit(G, k.limit), p: c.pos, t: performance.now(), col: '#ff4d3a', stem: 'fx-spinout-smoke', hold: 1 });
+      drawPlan(); hud(); setMsg('You spin out: not enough heat.', 'warn'); setPhase('react'); snapCam(); var sb = function () { banner('You spin out: lose all heat, back to gear 1', 0, 'turn'); }; sb(); setTimeout(sb, 900); setTimeout(sb, 2400);
+      return new Promise(function (r) { setTimeout(r, 400); });
+    },
+    checks: [{ kind: 'fn', name: 'skid marks', fn: function () { return RACE.skids.length > 0 || 'no skids'; } }]
+  });
 })();
 
 </script>
 <script>
-window.RR_MUSIC=[];window.RR_ASSETS={"items":[{"stem":"bg-title","kind":"bg","w":1080,"h":1920,"ratio":"9:16","alpha":false,"wave":1},{"stem":"track-sunline","kind":"board","w":2000,"h":1200,"ratio":"5:3","alpha":false,"wave":1},{"stem":"track-hairpin","kind":"board","w":2000,"h":1200,"ratio":"5:3","alpha":false,"wave":1},{"stem":"car-crimson","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-azure","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-jade","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-amber","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-violet","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-graphite","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"card-back","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-speed-1","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-speed-2","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-speed-3","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-speed-4","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-heat","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-stress","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"ui-gear-dial","kind":"ui","w":512,"h":160,"ratio":"16:5","alpha":true,"wave":1},{"stem":"portrait-kit","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":1},{"stem":"portrait-juno","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"portrait-dax","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"portrait-pia","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"portrait-oto","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"portrait-bex","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"ui-engine-tray","kind":"ui","w":512,"h":192,"ratio":"8:3","alpha":true,"wave":3},{"stem":"icon-heat","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":2},{"stem":"icon-stress","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":3},{"stem":"icon-gear","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":3},{"stem":"ui-corner-sign","kind":"ui","w":256,"h":256,"ratio":"1:1","alpha":true,"wave":2},{"stem":"bg-podium","kind":"bg","w":1080,"h":1920,"ratio":"9:16","alpha":false,"wave":3},{"stem":"ui-trophy","kind":"ui","w":512,"h":512,"ratio":"1:1","alpha":true,"wave":3},{"stem":"ui-flag-checkered","kind":"ui","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"fx-heat-flame","kind":"fx","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"fx-spinout-smoke","kind":"fx","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"fx-slipstream-streaks","kind":"fx","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"fx-boost-flare","kind":"fx","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"icon-lap","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":3},{"stem":"icon-place","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":3},{"stem":"card-upgrade-coolant","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-pit","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-grip","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-brakes","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-rocket","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-tuned","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2}]};window.RR_HAVE=[];
+/* Redline Rally story text: every line the player reads outside the rules lives here (tutorial prologue, quick-game flavour, turn captions).
+   Story-mode chapter intros/outros live in campaign.json (same cast). Edit text here; no logic. Original names only. */
+var STORY = {
+  guide: 'Coach Mara',
+  rival: 'Kit Marlow',
+  /* the five lines at the top of Help */
+  turn: ['1. Pick a gear: it is how many cards you play.', '2. Tap that many cards. Their numbers add up to your speed.', '3. Press Go. Your car drives that many spaces.', '4. Corners have a speed limit. Go over it and you burn engine heat.', '5. Then every rival takes a turn, one car at a time.'],
+  /* quick game */
+  quickIntro: ['Lights out. Brake smart, burn little, cross first.', 'Rain is coming. One clean lap wins.', 'Heat is fuel. Spend it where it counts.'],
+  quickWin: ['You took the flag with fuel to spare.', 'Chequered flag, and it is yours.'],
+  quickLose: ['Not today. Brake earlier next time.', 'They got you at the line. Run it back?'],
+  /* turn banner + plain instructions */
+  yourTurn: 'Your turn',
+  planGear: 'Pick a gear, then tap cards.',
+  planCards: function (n) { return 'Tap ' + n + ' card' + (n > 1 ? 's' : '') + ': they add up to speed.'; },
+  planGo: 'Press Go!',
+  /* tutorial: Prologue "The Sunline Seat". Each step: t = who speaks, s = the story reason + what to do (no "click"), r = the reaction shown next */
+  tutTitle: 'Prologue: The Sunline Seat',
+  chapters: ['Chapter 1: Your first turn', 'Chapter 2: The wet corner', 'Chapter 3: Heat is fuel', 'Chapter 4: Cool down, catch up', 'Chapter 5: Tuck in behind Kit', 'Chapter 6: The line'],
+  tut: {
+    meet: { s: 'Rookie, I am Coach Mara. Kit Marlow wants your seat at Sunline. Win one lap and it stays yours.' },
+    gear: { s: 'First lesson. Your gear is how many cards you play. Take gear 2.' },
+    cards: { s: 'Two cards, two numbers: the sum is your speed. Play the 3 and the 2.' },
+    go1: { s: 'Speed 5 puts you five spaces up the road. Floor it!' },
+    watch1: { s: 'Smooth launch! Kit, Juno and you each drive in turn. That is every round.' },
+    corner: { s: 'Rain on the corner ahead: the speed limit is 5. Every point over burns a heat from your engine.' },
+    push: { s: 'Try it the bold way. Play the 4 and the 3.' },
+    read: { s: 'Speed 7 is 2 over the limit: two heat burned. Too pricey right now.' },
+    brake: { s: 'Brake instead. Play the two 2s: speed 4 stays under the limit.' },
+    go2: { s: 'Speed 4 sails through clean. Hit Go.' },
+    watch2: { s: 'Clean corner, full engine. That is how you save fuel.' },
+    gamble: { s: 'Kit is pulling away. Corner limit 4 ahead. Spend one heat to catch him: play the 3 and the 2.' },
+    go3: { s: 'Speed 5, one over the limit. One heat is a fair price. Go!' },
+    watch3: { s: 'Caught him! One heat spent. Watch the engine dots: that is your fuel.' },
+    deadcards: { s: 'Spent heat comes back later as dead Heat cards in your hand. They cannot be played.' },
+    gear1: { s: 'Gear 1 cools your engine: heat cards go back to the engine. Take gear 1.' },
+    stress: { s: 'The purple card is Stress: a mystery speed, flipped from your deck. Play it.' },
+    adr: { s: 'You are last, so you get adrenaline: one extra space and one extra cool-down. Free help.' },
+    go4: { s: 'Stress card, mystery speed, plus adrenaline. Go!' },
+    watch4: { s: 'Heat back in the engine and the pack in sight. Good work.' },
+    tuck: { s: 'Kit is just ahead. Stop right behind him and you can slipstream: two free spaces.' },
+    gear3: { s: 'Shifting two gears costs one heat. Worth it: take gear 3.' },
+    cards3: { s: 'Three cards this time: play the two 2s and the 1.' },
+    go5: { s: 'Speed 5 should tuck you right behind Kit. Go!' },
+    slip: { s: 'You are on his bumper! Take the slipstream: two free spaces.' },
+    watch5: { s: 'Slingshot! Kit never saw it coming.' },
+    finale: { s: 'The line is close. Gear 2, then boost: one heat for an extra flipped card.' },
+    gear2: { s: 'Take gear 2.' },
+    cards2: { s: 'Play the 2 and the 1.' },
+    boost: { s: 'Now boost: it pays one heat and flips an extra speed card.' },
+    go6: { s: 'Everything you have. Go!' },
+    result: { s: 'First over the line wins. Finishing order is by distance, ties go to whoever arrived first.' }
+  },
+  tutEndTitle: 'The seat is yours',
+  tutEndText: 'Gear, cards, corners, heat, slipstream, boost. Kit wants a rematch.',
+  /* result lines in the game's voice (Quick game) */
+  resultWin: 'Flag! Sunline is yours.',
+  resultLose: function (n) { return n + ' takes the flag.'; }
+};
+function pickLine(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+</script>
+<script>
+window.RR_MUSIC=[];window.RR_ASSETS={"items":[{"stem":"bg-title","kind":"bg","w":1080,"h":1920,"ratio":"9:16","alpha":false,"wave":1},{"stem":"track-sunline","kind":"board","w":2000,"h":1200,"ratio":"5:3","alpha":false,"wave":1},{"stem":"track-hairpin","kind":"board","w":2000,"h":1200,"ratio":"5:3","alpha":false,"wave":1},{"stem":"car-crimson","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-azure","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-jade","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-amber","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-violet","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"car-graphite","kind":"token","w":256,"h":128,"ratio":"2:1","alpha":true,"wave":1},{"stem":"card-back","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-speed-1","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-speed-2","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-speed-3","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-speed-4","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-heat","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"card-stress","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":1},{"stem":"ui-gear-dial","kind":"ui","w":512,"h":160,"ratio":"16:5","alpha":true,"wave":1},{"stem":"portrait-kit","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":1},{"stem":"portrait-juno","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"portrait-dax","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"portrait-pia","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"portrait-oto","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"portrait-bex","kind":"portrait","w":512,"h":512,"ratio":"1:1","alpha":false,"wave":2},{"stem":"ui-engine-tray","kind":"ui","w":512,"h":192,"ratio":"8:3","alpha":true,"wave":3},{"stem":"icon-heat","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":2},{"stem":"icon-stress","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":3},{"stem":"icon-gear","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":3},{"stem":"ui-corner-sign","kind":"ui","w":256,"h":256,"ratio":"1:1","alpha":true,"wave":2},{"stem":"bg-podium","kind":"bg","w":1080,"h":1920,"ratio":"9:16","alpha":false,"wave":3},{"stem":"ui-trophy","kind":"ui","w":512,"h":512,"ratio":"1:1","alpha":true,"wave":3},{"stem":"ui-flag-checkered","kind":"ui","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"fx-heat-flame","kind":"fx","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"fx-spinout-smoke","kind":"fx","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"fx-slipstream-streaks","kind":"fx","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"fx-boost-flare","kind":"fx","w":512,"h":384,"ratio":"4:3","alpha":true,"wave":3},{"stem":"icon-lap","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":3},{"stem":"icon-place","kind":"icon","w":128,"h":128,"ratio":"1:1","alpha":true,"wave":3},{"stem":"card-upgrade-coolant","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-pit","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-grip","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-brakes","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-rocket","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2},{"stem":"card-upgrade-tuned","kind":"card","w":500,"h":700,"ratio":"5:7","alpha":false,"wave":2}]};window.RR_HAVE=["bg-podium", "bg-title", "car-amber", "car-azure", "car-crimson", "car-graphite", "car-jade", "car-violet", "card-back", "card-heat", "card-speed-1", "card-speed-2", "card-speed-3", "card-speed-4", "card-stress", "card-upgrade-brakes", "card-upgrade-coolant", "card-upgrade-grip", "card-upgrade-pit", "card-upgrade-rocket", "card-upgrade-tuned", "fx-boost-flare", "fx-heat-flame", "fx-slipstream-streaks", "fx-spinout-smoke", "icon-gear", "icon-heat", "icon-lap", "icon-place", "icon-stress", "portrait-bex", "portrait-dax", "portrait-juno", "portrait-kit", "portrait-oto", "portrait-pia", "track-hairpin", "track-sunline", "ui-corner-sign", "ui-engine-tray", "ui-flag-checkered", "ui-gear-dial", "ui-trophy"];
 /* Redline Rally data: drivers, tracks (waypoints in a 2000x1200 world; third number = corner speed limit), card rules. */
 var COLS = [
   { id: 'crimson', hex: '#d83a3a' }, { id: 'azure', hex: '#2f7be0' }, { id: 'jade', hex: '#2ea86b' },
@@ -2487,6 +2672,8 @@ var TRACKDEFS = {
     pts: [[500, 1040], [1000, 1060], [1450, 1030], [1750, 900, 4], [1800, 720, 3], [1500, 620, 2], [1100, 700], [900, 820], [650, 760, 3], [450, 640], [600, 480, 2], [1000, 420], [1400, 380], [1700, 260, 3], [1500, 140, 2], [900, 130], [400, 200], [220, 400, 3], [200, 700], [250, 900, 3]]
   }
 };
+TRACKDEFS.harbour = { name: 'Harbour Ring', blurb: 'Medium. One long straight, a tight chicane.', N: 56, pts: [[450, 1050], [1000, 1070], [1550, 1050], [1800, 900, 4], [1750, 650, 5], [1450, 560], [1250, 640, 3], [1050, 520, 3], [1300, 350], [1650, 230, 5], [1300, 120], [700, 140], [350, 260, 4], [200, 550], [260, 860, 5]] };
+TRACKDEFS.practice = { name: 'Practice Loop', blurb: 'Short loop for learning.', N: 30, hidden: true, pts: [[500, 1000], [1000, 1010], [1500, 990], [1780, 850, 5], [1800, 500], [1500, 300, 4], [1000, 250], [500, 300], [250, 500], [250, 800]] };
 var HAND = 7, GEARS = 4, ENGINE0 = 6;
 var COOL = { 1: 3, 2: 1, 3: 0, 4: 0 };   /* heat cards returned from hand to engine when you play in this gear */
 
@@ -2500,6 +2687,21 @@ var UPG = {
   rocket: { sn: 'Rocket', name: 'Rocket Pack', sp: 5, cool: 0, lim: 0, stress: 1, txt: 'Speed 5. Adds a stress card to your discard.' },
   tuned: { sn: 'Tuned', name: 'Tuned Engine', sp: 3, cool: 1, lim: 0, stress: 0, txt: 'Speed 3. Cools 1 heat.' }
 };
+/* Starting upgrades (rulebook: every car shuffles 3 starting upgrade cards into its deck). The booklet gives no values: HOUSE VALUES here.
+   zero = speed 0 (a safe brake card for corners), five = speed 5 (a burst), plus one heat card in the draw deck. They are not speed cards for a stress flip. */
+UPG.zero = { sn: 'Brake', name: 'Brake card', sp: 0, cool: 0, lim: 0, stress: 0, start: 1, txt: 'Speed 0. A safe card for corners (starting upgrade).' };
+UPG.five = { sn: 'Burst', name: 'Burst card', sp: 5, cool: 0, lim: 0, stress: 0, start: 1, txt: 'Speed 5. A big burst (starting upgrade).' };
+var START_UPG = ['zero', 'five'], START_HEAT = 1;
+/* Weather (optional module, HOUSE RULES, own design): one condition for the whole race. */
+var WEATHER = {
+  dry: { name: 'Dry', txt: 'Normal grip.', cl: 0, slip: 2, eng: 0 },
+  rain: { name: 'Rain', txt: 'Wet road: corner limits 1 lower (never below 2).', cl: -1, slip: 2, eng: 0 },
+  heat: { name: 'Heatwave', txt: 'Hot engines: every car starts with 1 heat card already in its discard.', cl: 0, slip: 2, eng: -1 },
+  wind: { name: 'Tailwind', txt: 'Slipstream carries you 3 spaces instead of 2.', cl: 0, slip: 3, eng: 0 }
+};
+var WX_IDS = ['dry', 'rain', 'heat', 'wind'];
+/* Championship (HOUSE VALUES): points per finishing place, tracks in order */
+var CHAMP_PTS = [9, 6, 4, 3, 2, 1], CHAMP_TRACKS = ['sunline', 'hairpin', 'harbour'];
 var UPG_IDS = ['coolant', 'pit', 'grip', 'brakes', 'rocket', 'tuned'], DRAFT_PICKS = 3, UPG_COPIES = 4;
 function upgId(x) { return x && x.charAt(1) === ':' && x.charAt(0) === 'u' ? x.slice(2) : null; }
 
@@ -2550,13 +2752,14 @@ function isSpeed(c) { return c >= '1' && c <= '4'; }
 
 function newGame(o) {
   o = o || {}; var trk = TK[o.track || 'sunline'], n = Math.max(2, Math.min(6, o.n || 5));
-  var G = { v: 1, track: trk.id, laps: o.laps || 2, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, cars: [], round: 1, phase: 'plan', pend: null, order: [], ri: 0, adr: [], tick: 0, over: false, rank: [], diff: o.diff || 'normal', hot: o.humans > 1, upg: !!o.upg, drafting: false, pool: null, cl: o.climit || 0, cmp: o.cmp || null };
+  var G = { v: 1, track: trk.id, laps: o.laps || 2, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, cars: [], round: 1, phase: 'plan', pend: null, order: [], ri: 0, adr: [], tick: 0, over: false, rank: [], finN: 0, diff: o.diff || 'normal', hot: o.humans > 1, upg: !!o.upg, drafting: false, pool: null, cl: o.climit || 0, cmp: o.cmp || null, wx: WEATHER[o.wx] ? o.wx : 'dry', sup: !!o.sup };
   var humans = Math.max(0, Math.min(n, o.humans == null ? 1 : o.humans));
   var di = []; for (var d = 0; d < DRIVERS.length; d++) di.push(d); shuffle(G, di);
   for (var i = 0; i < n; i++) {
     var deck = []; for (var v = 1; v <= 4; v++) for (var k = 0; k < 3; k++) deck.push(String(v)); deck.push('X', 'X', 'X');
     var dr = DRIVERS[i < humans ? i : di[i % 6]];
-    var c = { i: i, col: i, upg: [], name: dr.name, drv: dr.id, human: i < humans, deck: shuffle(G, deck), hand: [], disc: [], played: [], eng: ENGINE0, gear: 1, pos: 0, plan: null, tie: 0, stats: { heat: 0, spins: 0, slips: 0, boosts: 0 } };
+    if (G.sup) { START_UPG.forEach(function (id) { deck.push('u:' + id); }); for (var sh = 0; sh < START_HEAT; sh++) deck.push('H'); }
+    var c = { i: i, col: i, upg: [], sup: G.sup ? START_UPG.slice() : [], xh: G.sup ? START_HEAT : 0, name: dr.name, drv: dr.id, human: i < humans, deck: shuffle(G, deck), hand: [], disc: [], played: [], eng: ENGINE0, gear: 1, pos: 0, plan: null, tie: 0, stats: { heat: 0, spins: 0, slips: 0, boosts: 0 } };
     G.cars.push(c);
   }
   /* grid: two cars per row, pole at the front. Humans start mid-pack-ish: seat order is the grid order shuffled. */
@@ -2564,6 +2767,7 @@ function newGame(o) {
   grid.forEach(function (ci, k) { G.cars[ci].pos = Math.ceil(n / 2) - 1 - Math.floor(k / 2); G.cars[ci].tie = k; });
   G.tick = n;
   if (o.lowheat) G.cars.forEach(function (c) { if (c.human) { c.eng = ENGINE0 - 2; c.disc.push('H', 'H'); } });   /* campaign twist: you start with 4 heat, 2 heat cards already in the discard */
+  if (WEATHER[G.wx].eng) G.cars.forEach(function (c) { for (var w = 0; w < -WEATHER[G.wx].eng && c.eng > 0; w++) { c.eng--; c.disc.push('H'); } });   /* heatwave */
   if (G.upg) {   /* upgrade draft: humans pick first (the UI calls draftPick / draftDone), then the computer drivers, then the decks are shuffled and dealt */
     G.pool = {}; UPG_IDS.forEach(function (id) { G.pool[id] = UPG_COPIES; });
     if (humans > 0) { G.drafting = true; return G; }
@@ -2589,7 +2793,8 @@ function draftDone(G) {   /* computer picks, then every deck gets its upgrades, 
   G.cars.forEach(function (c) { c.deck = shuffle(G, c.deck.concat(c.upg.map(function (id) { return 'u:' + id; }))); c.hand = []; draw(G, c, HAND); });
 }
 function T(G) { return TK[G.track]; }
-function climit(G, l) { return Math.max(1, l + (G.cl || 0)); }   /* campaign twist: corner limits shifted for the whole chapter */
+function climit(G, l) { var w = G.wx ? WEATHER[G.wx].cl : 0; return Math.max(1, l + (G.cl || 0) + (l > 2 ? w : 0)); }   /* campaign twist + weather (rain never takes a corner below 2) */   /* campaign twist: corner limits shifted for the whole chapter */
+function slipN(G) { return WEATHER[G.wx || 'dry'].slip; }
 function total(G) { return G.laps * T(G).N; }
 
 /* ---- deck handling ---- */
@@ -2613,11 +2818,23 @@ function avgSpeed(c) { var s = 0, n = 0; c.deck.concat(c.disc).forEach(function 
 function occ(G, p, except) { var N = T(G).N, k = 0; G.cars.forEach(function (c) { if (c !== except && c.pos % N === p % N) k++; }); return k; }
 function landing(G, c, target) { var t = target; while (t > c.pos && occ(G, t, c) >= 2) t--; return t; }
 function cornersIn(G, a, b) {   /* corner lines crossed moving from space a to space b */
-  var tk = T(G), out = []; for (var p = a + 1; p <= b; p++) { var lim = tk.corners[p % tk.N]; if (lim) out.push({ p: p, idx: p % tk.N, limit: climit(G, lim) }); } return out;
+  var tk = T(G), out = []; for (var p = a + 1; p <= b && p <= total(G); p++) { var lim = tk.corners[p % tk.N]; if (lim) out.push({ p: p, idx: p % tk.N, limit: climit(G, lim) }); } return out;
 }
 function cornerCost(G, a, b, speed, lim) { var s = 0; cornersIn(G, a, b).forEach(function (k) { s += Math.max(0, speed - k.limit - (lim || 0)); }); return s; }
-function rankList(G) {   /* car ids, leader first */
-  return G.cars.map(function (c) { return c.i; }).sort(function (a, b) { var A = G.cars[a], B = G.cars[b]; return (B.pos - A.pos) || (A.tie - B.tie); });
+function rankList(G) {   /* car ids, best first: finishers in finishing order (same round: furthest past the line), then the rest by distance */
+  return G.cars.map(function (c) { return c.i; }).sort(function (a, b) { var A = G.cars[a], B = G.cars[b];
+    if (!!A.fin !== !!B.fin) return A.fin ? -1 : 1;
+    if (A.fin) return (A.fin - B.fin) || (B.pos - A.pos) || (A.tie - B.tie);
+    return (B.pos - A.pos) || (A.tie - B.tie); });
+}
+function racing(G) { return rankList(G).filter(function (i) { return !G.cars[i].fin; }); }
+function adrenalineFor(G) {   /* last car to move each round gets it; the last two when 5+ cars started (rulebook: counted from starting cars) */
+  var r = racing(G), k = G.cars.length >= 5 ? 2 : 1; return r.slice(Math.max(0, r.length - k));
+}
+function discardOptional(G, ci, idxs) {   /* replenish step: discard chosen non-heat, non-stress cards face up, then draw back to a full hand. Plan phase, once per round, before the plan */
+  var c = G.cars[ci]; if (G.phase !== 'plan' || c.plan || c.dsc === G.round) return 'phase';
+  var seen = {}; for (var i = 0; i < idxs.length; i++) { var j = idxs[i], x = c.hand[j]; if (x === undefined || seen[j] || x === 'H' || x === 'X') return 'card'; seen[j] = 1; }
+  c.dsc = G.round; c.disc = c.disc.concat(c.hand.filter(function (x, j) { return seen[j]; })); c.hand = c.hand.filter(function (x, j) { return !seen[j]; }); draw(G, c, HAND); return '';
 }
 function gearOpts(c) { var o = []; for (var g = 1; g <= GEARS; g++) { var d = Math.abs(g - c.gear); if (d <= 2 && (d < 2 || c.eng >= 1)) o.push({ g: g, cost: d === 2 ? 1 : 0 }); } return o; }
 function needCards(c, g) { var k = 0; c.hand.forEach(function (x) { if (x !== 'H') k++; }); return Math.min(g, k); }
@@ -2635,12 +2852,12 @@ function submitPlan(G, ci, plan) {
   c.hand = c.hand.filter(function (x, j) { return plan.idx.indexOf(j) < 0; });
   c.plan = { gear: plan.gear, cards: cards, boost: !!plan.boost }; return '';
 }
-function needPlans(G) { return G.cars.filter(function (c) { return c.human && !c.plan; }).map(function (c) { return c.i; }); }
+function needPlans(G) { return G.cars.filter(function (c) { return c.human && !c.plan && !c.fin; }).map(function (c) { return c.i; }); }
 
 /* ---- resolving a round ---- */
 function startResolve(G) {
-  G.phase = 'resolve'; G.order = rankList(G); G.ri = 0; G.adr = [];
-  if (G.cars.length >= 3) { var last = G.order[G.order.length - 1], lp = G.cars[last].pos; if (G.cars[G.order[0]].pos - lp >= 2) G.adr = [last]; }
+  G.cars.forEach(function (c) { if (c.fin && c.plan) { c.hand = c.hand.concat(c.plan.cards); c.plan = null; } });   /* a finished car does not play */
+  G.phase = 'resolve'; G.order = racing(G); G.ri = 0; G.adr = adrenalineFor(G);
 }
 function curCar(G) { return G.phase === 'resolve' && G.ri < G.order.length ? G.cars[G.order[G.ri]] : null; }
 
@@ -2652,26 +2869,30 @@ function resolveNext(G) {
   var c = G.cars[G.order[G.ri]];
   if (!c.plan) c.plan = aiPlan(G, c);
   var pl = c.plan, from = c.pos, cost;
+  if (pl.cards.length < pl.gear) {   /* not enough playable cards: play them all, fill with heat from the hand, do not move, back to gear 1 */
+    var fill = 0; for (var q = c.hand.length - 1; q >= 0 && pl.cards.length + fill < pl.gear; q--) if (c.hand[q] === 'H') { c.hand.splice(q, 1); c.disc.push('H'); fill++; }
+    c.disc = c.disc.concat(pl.cards); c.gear = 1; c.plan = null; c.pl2 = null; c.played = []; draw(G, c, HAND);
+    ev.push({ t: 'stall', car: c.i, cards: pl.cards.length, heat: fill }, { t: 'done', car: c.i }); G.ri++; return ev;
+  }
   /* 1 shift */
   if (pl.gear !== c.gear) { cost = Math.abs(pl.gear - c.gear) === 2 ? 1 : 0; c.eng -= cost; for (var i = 0; i < cost; i++) c.disc.push('H'); c.stats.heat += cost; ev.push({ t: 'shift', car: c.i, from: c.gear, to: pl.gear, cost: cost }); c.gear = pl.gear; }
-  /* 2 cooldown: heat cards in hand go back to the engine */
-  var cool = COOL[c.gear] + (G.adr.indexOf(c.i) >= 0 ? 1 : 0), moved = 0;
-  for (var j = c.hand.length - 1; j >= 0 && moved < cool; j--) if (c.hand[j] === 'H') { c.hand.splice(j, 1); c.eng++; moved++; }
-  if (moved) ev.push({ t: 'cool', car: c.i, n: moved });
   /* 3 play the cards */
   var speed = 0, shown = [], lim = 0, coolX = 0, addX = 0;
   pl.cards.forEach(function (x) { var u = upgId(x); if (u) { var ud = UPG[u]; speed += ud.sp; lim += ud.lim; coolX += ud.cool; addX += ud.stress; shown.push({ card: x, v: ud.sp, upg: u }); } else if (x === 'X') { var fl = []; var v = flipSpeed(G, c, fl); speed += v; shown.push({ card: 'X', flips: fl, v: v }); } else { speed += +x; shown.push({ card: x, v: +x }); } });
   ev.push({ t: 'play', car: c.i, cards: shown, speed: speed });
-  c.disc = c.disc.concat(pl.cards);
-  for (var sx = 0; sx < addX; sx++) c.disc.push('X');
   if (coolX) { var m2 = 0; for (var j2 = c.hand.length - 1; j2 >= 0 && m2 < coolX; j2--) if (c.hand[j2] === 'H') { c.hand.splice(j2, 1); c.eng++; m2++; } if (m2) ev.push({ t: 'cool', car: c.i, n: m2 }); }
-  /* 4 boost */
+  /* 4 react: cooldown (heat cards in hand go back to the engine), then boost */
+  var cool = COOL[c.gear] + (G.adr.indexOf(c.i) >= 0 ? 1 : 0), moved = 0;
+  for (var j = c.hand.length - 1; j >= 0 && moved < cool; j--) if (c.hand[j] === 'H') { c.hand.splice(j, 1); c.eng++; moved++; }
+  if (moved) ev.push({ t: 'cool', car: c.i, n: moved });
   if (pl.boost && c.eng >= 1) { c.eng--; c.disc.push('H'); c.stats.heat++; c.stats.boosts++; var fb = []; var bv = flipSpeed(G, c, fb); speed += bv; ev.push({ t: 'boost', car: c.i, flips: fb, add: bv, speed: speed }); }
+  c.disc = c.disc.concat(pl.cards);   /* played cards reach the discard only now: a boost flip must not reshuffle them into the deck */
+  for (var sx = 0; sx < addX; sx++) c.disc.push('X');
   var adr = G.adr.indexOf(c.i) >= 0 ? 1 : 0; if (adr) ev.push({ t: 'adr', car: c.i });
   var move = speed + adr, L0 = landing(G, c, from + move);
   c.pl2 = { speed: speed, from: from, L0: L0, lim: lim };
   /* 5 slipstream offer */
-  var L1 = landing(G, c, L0 + 2), N = T(G).N;
+  var L1 = L0 + slipN(G) >= total(G) ? L0 : landing(G, c, L0 + slipN(G)), N = T(G).N;   /* slipstream may not carry a car across the finish line */
   var near = L1 > L0 && G.cars.some(function (o) { return o !== c && (o.pos % N === L0 % N || o.pos % N === (L0 + 1) % N); });
   ev.push({ t: 'move', car: c.i, from: from, to: L0 });
   if (near) {
@@ -2685,14 +2906,16 @@ function slipChoice(G, use) {
 }
 function finishMove(G, c, slip, evSoFar) {
   var ev = [], q = c.pl2, from = q.from, speed = q.speed, L = q.L0;
-  if (slip) { L = landing(G, c, q.L0 + 2); ev.push({ t: 'slip', car: c.i, from: q.L0, to: L }); c.stats.slips++; }
+  if (slip) { L = landing(G, c, q.L0 + slipN(G)); ev.push({ t: 'slip', car: c.i, from: q.L0, to: L }); c.stats.slips++; }
   /* corners crossed on the way, in order */
   var ks = cornersIn(G, from, L), spun = false;
   for (var i = 0; i < ks.length && !spun; i++) {
     var k = ks[i], need = Math.max(0, speed - k.limit - (q.lim || 0));
     if (need > c.eng) {   /* spin out: stop behind this corner line, gear 1, stress card */
       var stop = k.p - 1; while (stop > from && occ(G, stop, c) >= 2) stop--; if (stop < from) stop = from;
-      c.pos = stop; c.gear = 1; c.hand.push('X'); c.stats.spins++; spun = true; c.tie = G.tick++;
+      var nst = c.gear >= 3 ? 2 : 1; for (var sk = 0; sk < nst; sk++) c.hand.push('X');
+      if (c.eng) { for (var hh = 0; hh < c.eng; hh++) c.disc.push('H'); c.stats.heat += c.eng; c.eng = 0; }   /* spin out pays ALL engine heat */
+      c.pos = stop; c.gear = 1; c.stats.spins++; spun = true; c.tie = G.tick++;
       ev.push({ t: 'spin', car: c.i, idx: k.idx, limit: k.limit, speed: speed, to: stop, from: L }); break;
     }
     if (need) { c.eng -= need; for (var h = 0; h < need; h++) c.disc.push('H'); c.stats.heat += need; }
@@ -2701,12 +2924,12 @@ function finishMove(G, c, slip, evSoFar) {
   if (!spun) { c.pos = L; if (L !== from) c.tie = G.tick++; }
   c.plan = null; c.pl2 = null; c.played = [];
   draw(G, c, HAND);
-  if (c.pos >= total(G)) ev.push({ t: 'finish', car: c.i });
+  if (c.pos >= total(G)) { G.finN++; c.fin = G.round;   /* finishing round: cars finishing in the same round rank by distance past the line (rankList) */ ev.push({ t: 'finish', car: c.i }); }
   ev.push({ t: 'done', car: c.i }); G.ri++;
   return ev;
 }
 function endRound(G, ev) {
-  var fin = G.cars.some(function (c) { return c.pos >= total(G); });
+  var fin = G.cars.some(function (c) { return c.fin; });   /* the round in which the first car crosses is played to the end, then the race is over */
   G.cars.forEach(function (c) { c.plan = null; });
   if (fin) { G.phase = 'over'; G.over = true; G.rank = rankList(G); ev.push({ t: 'over', rank: G.rank }); }
   else { G.round++; G.phase = 'plan'; G.order = []; G.ri = 0; ev.push({ t: 'round', round: G.round }); }
@@ -2718,11 +2941,11 @@ function checkInvariants(G) {
   G.cars.forEach(function (c) {
     var cnt = c.deck.length + c.disc.length + c.hand.length + (c.plan ? c.plan.cards.length : 0);
     var heatCards = c.deck.concat(c.disc, c.hand).filter(function (x) { return x === 'H'; }).length;
-    if (c.eng + heatCards !== ENGINE0) bad.push('heat not conserved car ' + c.i + ' eng ' + c.eng + ' cards ' + heatCards);
+    if (c.eng + heatCards !== ENGINE0 + (c.xh || 0)) bad.push('heat not conserved car ' + c.i + ' eng ' + c.eng + ' cards ' + heatCards);
     if (c.eng < 0) bad.push('engine negative'); if (c.gear < 1 || c.gear > GEARS) bad.push('gear');
     var spd = c.deck.concat(c.disc, c.hand, c.plan ? c.plan.cards : []).filter(isSpeed).length; if (spd !== 12) bad.push('speed cards ' + spd + ' car ' + c.i);
     if (c.hand.length > HAND + 3) bad.push('hand too big');
-    if (!G.drafting) { var ups = c.deck.concat(c.disc, c.hand, c.plan ? c.plan.cards : []).filter(function (x) { return upgId(x); }).length; if (ups !== c.upg.length) bad.push('upgrade cards ' + ups + ' car ' + c.i); }
+    if (!G.drafting) { var ups = c.deck.concat(c.disc, c.hand, c.plan ? c.plan.cards : []).filter(function (x) { return upgId(x); }).length; if (ups !== c.upg.length + (c.sup ? c.sup.length : 0)) bad.push('upgrade cards ' + ups + ' car ' + c.i); }
   });
   var per = {}; G.cars.forEach(function (c) { var k = c.pos % N; per[k] = (per[k] || 0) + 1; if (per[k] > 2) bad.push('3 cars on space ' + k); });
   return bad;
@@ -2731,6 +2954,15 @@ function validMoves(G, ci) {   /* every legal (gear, boost) with the playable ca
   var c = G.cars[ci], out = []; gearOpts(c).forEach(function (o) { [false, true].forEach(function (b) { var pl = { gear: o.g, boost: b, idx: [] }; if (planCost(c, pl) <= c.eng) out.push({ gear: o.g, boost: b, n: needCards(c, o.g) }); }); }); return out;
 }
 function sideToAct(G) { if (G.phase === 'plan') return needPlans(G)[0]; if (G.pend) return G.pend.car; var c = curCar(G); return c ? c.i : -1; }
+
+/* ---- championship (HOUSE VALUES: CHAMP_PTS per place; ties on points: more wins, then the better place in the last race) ---- */
+function champNew(names) { return { race: 0, tracks: CHAMP_TRACKS.slice(), rows: names.map(function (n, i) { return { i: i, name: n, pts: 0, wins: 0, last: 99, res: [] }; }) }; }
+function champAward(ch, rank) {   /* rank = car ids best first (G.rank); car id = row index */
+  rank.forEach(function (ci, k) { var r = ch.rows[ci]; if (!r) return; r.pts += CHAMP_PTS[k] || 0; if (k === 0) r.wins++; r.last = k + 1; r.res.push(k + 1); });
+  ch.race++; return champTable(ch);
+}
+function champTable(ch) { return ch.rows.slice().sort(function (a, b) { return (b.pts - a.pts) || (b.wins - a.wins) || (a.last - b.last) || (a.i - b.i); }); }
+function champOver(ch) { return ch.race >= ch.tracks.length; }
 
 </script>
 <script>
@@ -2841,6 +3073,11 @@ var SFX = {
   clean: function () { tone(740, 0.08, { type: 'triangle', v: 0.1 }); tone(990, 0.1, { type: 'triangle', v: 0.1, at: 0.07 }); },
   spin: function () { tone(1100, 0.7, { type: 'sawtooth', v: 0.14, to: 160 }); noise(0.7, { f: 3500, fto: 600, q: 3, v: 0.18 }); },
   boost: function () { tone(300, 0.35, { type: 'sawtooth', v: 0.16, to: 1100 }); noise(0.3, { f: 800, fto: 4000, v: 0.14 }); },
+  beep: function () { tone(440, 0.18, { type: 'square', v: 0.12 }); },
+  lightsgo: function () { tone(880, 0.4, { type: 'square', v: 0.14 }); tone(70, 0.8, { type: 'sawtooth', v: 0.16, to: 260, at: 0.05 }); },
+  engine: function () { tone(85, 0.7, { type: 'sawtooth', v: 0.13, to: 240 }); tone(170, 0.6, { type: 'square', v: 0.04, to: 420 }); },
+  tick: function () { tone(1400, 0.02, { type: 'square', v: 0.03 }); },
+  skid: function () { noise(0.9, { f: 4200, fto: 1400, q: 6, v: 0.22 }); tone(900, 0.6, { type: 'triangle', v: 0.06, to: 500 }); },
   slip: function () { noise(0.4, { f: 600, fto: 3500, q: 1.5, v: 0.2 }); },
   win: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.28, { type: 'triangle', v: 0.2, at: i * 0.11 }); }); tone(1047, 0.7, { type: 'sine', v: 0.15, at: 0.5 }); },
   lose: function () { [392, 330, 262, 196].forEach(function (f, i) { tone(f, 0.3, { type: 'triangle', v: 0.18, at: i * 0.16 }); }); }
@@ -2877,11 +3114,14 @@ function soundBoot() {
 <script>
 /* Redline Rally UI: title, canvas track (follow camera, animated cars), hand/gear panel, hot-seat, result. */
 var G = null;
-var UI = { sel: [], gear: 1, boost: false, busy: false, seat: 0, cam: { x: 0, y: 0, s: 0.4 }, vis: [], pops: [], focus: 0, fast: /[?&]fast=1/.test(location.search), flash: null, tipShown: false, set: { track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'normal', upg: false } };
+var UI = { sel: [], gear: 1, boost: false, busy: false, seat: 0, cam: { x: 0, y: 0, s: 0.4 }, vis: [], pops: [], focus: 0, fast: /[?&]fast=1/.test(location.search), flash: null, tipShown: false, set: { track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'normal', upg: false, wx: 'dry', sup: true } };
+UI.hints = lsGet0('rr_hints') === '1';
+function lsGet0(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function hintsOn() { return !!UI.hints || UI.mode === 'tutorial'; }
 window.ANIM = true; window.AIDELAY = 1;
 var $ = function (s) { return document.querySelector(s); };
 function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
-function wait(ms) { return new Promise(function (r) { setTimeout(r, (UI.fast || window.ANIM === false) ? Math.min(ms, 8) : ms * (window.AIDELAY || 1)); }); }
+function wait(ms) { return new Promise(function (r) { setTimeout(r, (UI.fast || window.ANIM === false) ? Math.min(ms, 8) : ms * (window.AIDELAY || 1) * (UI.pace || 1) * (UI.skipStep ? 0.12 : 1)); }); }
 function setSeed(n) { if (G) G.rs = n >>> 0; }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
@@ -2895,11 +3135,13 @@ function chooser(id, items, key, fmt) {
 }
 function drawSetup() {
   var s = UI.set; if (s.hum + s.opp > 6) s.opp = 6 - s.hum; if (s.hum + s.opp < 2) s.opp = 2 - s.hum;
-  chooser('#s-track', Object.keys(TRACKDEFS).map(function (k) { return { v: k, h: esc(TRACKDEFS[k].name) + '<small>' + esc(TRACKDEFS[k].blurb) + '</small>' }; }), 'track');
+  chooser('#s-track', Object.keys(TRACKDEFS).filter(function (k) { return !TRACKDEFS[k].hidden; }).map(function (k) { return { v: k, h: esc(TRACKDEFS[k].name) + '<small>' + esc(TRACKDEFS[k].blurb) + '</small>' }; }), 'track');
   chooser('#s-laps', [1, 2, 3].map(function (n) { return { v: n, h: n + (n > 1 ? ' laps' : ' lap') }; }), 'laps');
   chooser('#s-opp', [1, 2, 3, 4, 5].filter(function (n) { return n + s.hum <= 6 && n + s.hum >= 2; }).map(function (n) { return { v: n, h: String(n) }; }), 'opp');
   chooser('#s-hum', [1, 2, 3].map(function (n) { return { v: n, h: n === 1 ? '1 (you)' : n + ' (pass-and-play)' }; }), 'hum');
   chooser('#s-upg', [{ v: false, h: 'Off' }, { v: true, h: 'On<small>Draft 3 upgrade cards first</small>' }], 'upg');
+  chooser('#s-wx', WX_IDS.concat(['random']).map(function (w) { return { v: w, h: w === 'random' ? 'Random' : esc(WEATHER[w].name) }; }), 'wx');
+  chooser('#s-sup', [{ v: true, h: 'On' }, { v: false, h: 'Off' }], 'sup');
   chooser('#s-diff', ['easy', 'normal', 'hard'].map(function (d) { return { v: d, h: d[0].toUpperCase() + d.slice(1) }; }), 'diff');
   var qt = $('#quickT'); if (qt && !qt._set) { qt._set = 1; var op = innerHeight >= 880; $('#quickBody').hidden = !op; qt.setAttribute('aria-expanded', op ? 'true' : 'false'); qt.onclick = function () { var h = !$('#quickBody').hidden; $('#quickBody').hidden = h; qt.setAttribute('aria-expanded', h ? 'false' : 'true'); }; } $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#storyLine').innerHTML = typeof campLine === 'function' ? campLine() : ''; $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title'));
 }
@@ -2908,26 +3150,36 @@ function modal(html) { var m = $('#modal'); m.innerHTML = '<div class="sheet"><b
 function closeModal() { var m = $('#modal'); m.hidden = true; m.innerHTML = ''; m.onclick = null; }
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('#modal').hidden && !UI.lockModal) closeModal(); });
 function rulesFill() {
-  var h = ('<p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
-    '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. No heat left? You spin out: back behind the corner, gear 1, plus a stress card.</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces. It does not count as speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b>: gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the car in last place gets +1 move and +1 cooldown.</li></ul>' +
+  var h = ('<h3>How a turn works</h3><p>The strip in the side panel lights your phase: <b>Shift</b> (pick a gear), <b>Play</b> (pick the cards), <b>Move</b>, <b>React</b> (cooldown, boost, slipstream, corners), <b>Discard</b> (draw back to 7). Before you press Go, the track shows where you will land and what the corner costs.</p><ol class="turn5">' + STORY.turn.map(function (l) { return '<li>' + esc(l.replace(/^\d\. /, '')) + '</li>'; }).join('') + '</ol><h3>The rules in full</h3><p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
+    '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. Not enough heat? You spin out: all your engine heat is lost, you stop behind the corner in gear 1, and get 1 stress card (2 if you were in gear 3 or 4).</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces. It does not count as speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b> (after your cards are shown): gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the last car to move each round gets +1 move and +1 cooldown (the last two cars when 5 or more started).</li><li><b>Too few cards</b>: if your hand has fewer playable cards than your gear, you play them all, pay heat cards for the rest, do not move and drop to gear 1.</li><li><b>The finish</b>: no slipstream past the line. The race goes on until every car has finished; finishers are placed in the order they cross. Cars crossing in the same round: the one furthest past the line is ahead; on the same space, the one that got there first.</li></ul>' +
     '<h3>Cards</h3><ul><li>Speed 1, 2, 3, 4: three of each.</li><li>Stress (3): when played, flip your deck until a speed card shows and use it.</li><li>Heat (6 start in your engine): paying sends them to your discard pile. They clog your hand later and cannot be played.</li></ul>' +
     '<h3>Upgrades (optional)</h3><ul><li>Switch Upgrades on in setup. Before the race you pick 3 upgrade cards; they join your deck and are played like speed cards, each with a bonus (more cooling, higher corner limits, a big speed jump).</li></ul>' +
-    '<p>Brake and keep your heat, or push and burn it. Heat comes back around.</p><div id="howTut">' + tutBtn('ghostb', { launch: function () { GX.close(); closeModal(); tutStart(); } }) + '</div>');
+    '<h3>Starting upgrades (house values)</h3><ul><li>Every car shuffles a <b>Brake card</b> (speed 0), a <b>Burst card</b> (speed 5) and 1 extra heat card into its deck. The printed rules give no numbers for these, so these are this game\'s own fair values. A stress flip skips them. Switch off in setup.</li></ul>' +
+    '<h3>Weather (optional, house rules)</h3><ul><li><b>Rain</b>: corner limits 1 lower (never below 2).</li><li><b>Heatwave</b>: every car starts with 1 heat card in its discard.</li><li><b>Tailwind</b>: slipstream carries you 3 spaces.</li></ul>' +
+    '<h3>Championship (house values)</h3><ul><li>Three tracks in a row with the same drivers. Points per place: 9, 6, 4, 3, 2, 1. Ties: more wins, then the better place in the last race.</li></ul>' +
+    '<h3>Simplified on purpose</h3><ul><li>Stress and heat cards never run out (the printed game has a limited reserve).</li><li>Three original tracks.</li></ul><p>Brake and keep your heat, or push and burn it. Heat comes back around.</p><div id="howTut">' + tutBtn('ghostb', { launch: function () { GX.close(); closeModal(); tutStart(); } }) + '</div>');
   var d = $('#rulesbody'); d.innerHTML = h; artApply(d);
 }
 function howTo() { rulesFill(); GX.show('rulesd'); }
 
 /* ================= game start ================= */
 function startGame(o) {
-  var s = o || UI.set; UI.mode = o && o.tut ? 'tutorial' : ''; if (!(o && o.cmp)) UI.cmpDef = null; if (!(o && o.tut)) lsSet('rr_seen', '1');
-  G = newGame({ track: s.track, laps: s.laps, n: s.hum + s.opp, humans: s.hum, diff: s.diff, seed: o && o.seed, upg: !!s.upg, climit: s.climit, lowheat: s.lowheat, cmp: s.cmp });
+  var s = o || UI.set; UI.mode = o && o.tut ? 'tutorial' : ''; if (!(o && o.champ)) UI.champ = null;
+  var wx = s.wx || 'dry'; if (wx === 'random') wx = WX_IDS[Math.floor(Math.random() * WX_IDS.length)]; if (!(o && o.cmp)) UI.cmpDef = null; if (!(o && o.tut)) lsSet('rr_seen', '1');
+  G = newGame({ track: s.track, laps: s.laps, n: s.hum + s.opp, humans: s.hum, diff: s.diff, seed: o && o.seed, upg: !!s.upg, climit: s.climit, lowheat: s.lowheat, cmp: s.cmp, wx: o && (o.tut || o.cmp) ? 'dry' : wx, sup: !(o && o.tut) && s.sup !== false });
+  if (s.hum === 1) { G.cars[0].name = 'You'; G.cars[0].drv = ''; }   /* the player is "You", never a named driver (the story's rival Kit must be someone else) */
+  if (o && o.tut) { [['kit', 'Kit Marlow'], ['juno', 'Juno Vega']].forEach(function (d, k) { G.cars[k + 1].drv = d[0]; G.cars[k + 1].name = d[1]; }); }
   window.G = G; UI.seat = 0; UI.sel = []; UI.boost = false; UI.busy = false; UI.pops = [];
   UI.vis = G.cars.map(function (c) { return { p: c.pos, rot: 0, glow: 0 }; });
-  UI.focus = 0; $('#title').hidden = true; $('#game').hidden = false; closeModal();
+  UI.focus = 0; var blb = $('#bulbbtn'); if (blb) blb.hidden = !hintsOn(); $('#title').hidden = true; $('#game').hidden = false; closeModal();
   $('#tTrk').textContent = TK[G.track].name;
   sizeCanvas(); var f = UI.vis[0]; snapCam(); UI.redraw();
+  RACE.start = null; RACE.best = null; RACE.rate = ''; RACE.rateKeep = 0; RACE.rateShow = 0; RACE.flashHold = 0; RACE.lights = null; RACE.skids = []; RACE.spd = RACE.spdT = 0; RACE.prev = null; RACE.ph = 'shift';
+  if (!UI.fast && window.ANIM !== false && !(o && (o.tut || o.cmp)) && !G.drafting) goalCard(function () { lightsStart(); sfx('go'); }); else { lightsStart(); sfx('go'); }
+  if (G.wx !== 'dry' && hintsOn()) setTimeout(function () { if (G && G.round === 1) banner(WEATHER[G.wx].name + ': ' + WEATHER[G.wx].txt, null, 'round'); }, 2600);
   if (o && o.tut) stageTutorial();
   if (G.drafting) { $('#panel').innerHTML = ''; setMsg('Pick your upgrade cards'); return runDraft(function () { UI.lockModal = false; closeModal(); planFor(needPlans(G)[0]); }); }
+  if (hintsOn() && (!o || !(o.cmp || o.tut))) { var g0 = G; setTimeout(function () { if (G === g0 && G.round === 1 && G.phase === 'plan') { banner(pickLine(STORY.quickIntro.filter(function (l) { return G.wx === 'rain' || !/rain/i.test(l); })), 0, 'plan'); setTimeout(function () { if (G === g0 && G.phase === 'plan') banner(STORY.yourTurn, 0, 'plan'); }, 2200); } }, 0); }
   planFor(needPlans(G)[0]);
 }
 /* Upgrade draft: each human picks DRAFT_PICKS cards one at a time from what is left in the shared pool; then the computer drivers pick and decks are dealt. */
@@ -2960,7 +3212,7 @@ function planFor(ci) {
 function curveInfo() {   /* what the selected cards would do at the next corner */
   var c = you(), sp = 0, nx = 0, ul = 0; UI.sel.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { sp += UPG[u].sp; ul += UPG[u].lim; } else if (x === 'X') nx++; else sp += +x; });
   var avg = avgSpeed(c), spEst = sp + nx * avg + (UI.boost ? avg : 0), shown = Math.round(spEst);
-  var adr = G.cars.length >= 3 && rankList(G)[G.cars.length - 1] === c.i && G.cars[rankList(G)[0]].pos - c.pos >= 2 ? 1 : 0;
+  var adr = adrenalineFor(G).indexOf(c.i) >= 0 ? 1 : 0;
   var L = c.pos + shown + adr, ks = cornersIn(G, c.pos, L), cost = (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) + (UI.boost ? 1 : 0);
   var burn = 0; ks.forEach(function (k) { burn += Math.max(0, shown - k.limit - ul); });
   return { sp: shown, uncertain: nx > 0 || UI.boost, burn: burn, spin: burn > c.eng - cost, ks: ks, cost: cost, next: nextCorner(c.pos), adr: adr };
@@ -2973,30 +3225,58 @@ function drawPlan() {
   var c = you(), p = $('#panel'), need = needCards(c, UI.gear), go = gearOpts(c);
   if (UI.sel.length > need) UI.sel = UI.sel.slice(0, need);
   var h = '<div id="gears" data-art="ui-gear-dial"><span class="gl"><i class="ic hud f-gear" data-art="icon-gear"></i>Gear</span>';
-  for (var g = 1; g <= GEARS; g++) { var o = go.filter(function (x) { return x.g === g; })[0]; h += '<button class="gb' + (UI.gear === g ? ' on' : '') + (o ? '' : ' off') + '" data-g="' + g + '" ' + (o ? '' : 'disabled') + ' aria-label="Gear ' + g + '">' + g + (o && o.cost ? '<i>-1</i>' : '') + '</button>'; }
+  for (var g = 1; g <= GEARS; g++) { var o = go.filter(function (x) { return x.g === g; })[0]; h += '<button class="gb' + (UI.gear === g ? ' on' : '') + (o ? '' : ' off') + '" data-g="' + g + '" ' + (o ? '' : 'disabled') + ' aria-label="Gear ' + g + ': play ' + g + ' card' + (g > 1 ? 's' : '') + (o && o.cost ? ', costs 1 heat' : '') + '"><b>' + g + '</b><small>' + (o && o.cost ? '-1 heat' : g + (g > 1 ? ' cards' : ' card')) + '</small></button>'; }
   h += '</div><div id="hand">';
-  c.hand.forEach(function (x, j) { h += cardHtml(x, UI.sel.indexOf(j) >= 0, x === 'H', j); });
-  h += '</div><div id="acts"><button class="bo' + (UI.boost ? ' on' : '') + '" id="boostB"' + (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1 ? ' disabled' : '') + '>Boost -1</button><button id="sugB">Suggest</button><button class="go" id="goB">Go!</button></div>';
-  h += '<div class="chips tray" id="tray" data-art="ui-engine-tray"><span><i class="ic f-heat" data-art="icon-heat"></i>Engine <b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span><i class="ic f-heat" data-art="icon-heat"></i>In hand <b>' + c.hand.filter(function (x) { return x === 'H'; }).length + '</b></span><span><i class="ic f-stress" data-art="icon-stress"></i>Stress in hand <b>' + c.hand.filter(function (x) { return x === 'X'; }).length + '</b></span><span>Deck <b>' + c.deck.length + '</b></span><span>Discard <b>' + c.disc.length + '</b></span></div>';
+  var needNow = needCards(c, UI.gear), full = UI.sel.length >= needNow;
+  c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() ? '' : 'glow'); });
+  h += '</div><div id="acts"><button class="bo' + (UI.boost ? ' on' : '') + '" id="boostB"' + (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1 ? ' disabled' : '') + '>Boost -1</button>' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + (G.phase === 'plan' && c.dsc !== G.round && !G.hot && !tutOn() ? '<button type="button" id="swapB" class="swapb" title="Throw away cards you do not want and draw back to 7 (once a round)">' + (UI.swap ? 'Cancel' : 'Swap') + '</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
+  var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
+  if (hintsOn()) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
-  p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.gear = +b.getAttribute('data-g'); UI.sel = UI.sel.slice(0, needCards(c, UI.gear)); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
+  p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.touchedGear = 1; UI.gear = +b.getAttribute('data-g'); UI.sel = UI.sel.slice(0, needCards(c, UI.gear)); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
     if (tutOn()) { if (k >= 0 || !GXT.act({ type: 'tap', what: 'card', i: j })) return; }
     sfx('card'); UI.note = upgId(c.hand[j]) ? UPG[upgId(c.hand[j])].name + ': ' + UPG[upgId(c.hand[j])].txt : ''; if (k >= 0) UI.sel.splice(k, 1); else { if (UI.sel.length >= needCards(c, UI.gear)) UI.sel.shift(); UI.sel.push(j); } drawPlan(); }; });
   $('#boostB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); UI.boost = !UI.boost; drawPlan(); };
-  $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
-  var ready = UI.sel.length === need; $('#goB').disabled = !ready;
-  if (!ready) setMsg(need === 0 ? 'No playable cards: tap Go.' : 'Pick ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : ''));
-  else { var ci = curveInfo(); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0] + ')'; setMsg(ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': corner is safe' : ci.next ? sp + ': clear road, corner in ' + ci.next.d : sp + ': clear road', ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
+  if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
+  var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
+  if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? 'Pick a gear, then tap ' + need + ' card' + (need > 1 ? 's' : '') + '.' : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
+  else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); setMsg('Speed ' + cq.sp + (cq.uncertain ? '?' : '') + '. Press Go.', ''); }
+  else { var ci = previewSet(curveInfo()); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0] + ')'; setMsg((ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.slip && !ci.spin ? ', slipstream likely' : '') + (ci.spin ? '' : '. ' + STORY.planGo), ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
+  if (!ready) previewSet(null);
+  RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = ready && RACE.prev ? RACE.prev.sp : 0;
   if (!ready && need === 0) $('#goB').disabled = false;
-  var dt = $('#dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · gear ' + UI.gear + ' · ' + UI.sel.length + '/' + need + ' cards';
-  hud();
+  var dt = $('#dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · your turn'; if (RACE.rateShow && !G.hot && hintsOn()) { RACE.rateShow = 0; RACE.rateKeep = 1; banner(RACE.rate, RACE.rateK === 'good' ? 2 : RACE.rateK === 'poor' ? 0 : 3, 'plan rate'); } else if (!RACE.rateKeep) banner(G.hot ? c.name.split(' ')[0] + "'s turn" : STORY.yourTurn, c.col, 'plan');
+  if (UI.swap && c.dsc !== G.round) swapMode(c);
+  else if (UI.mode === 'tutorial') coachPlan(c, ready ? curveInfo() : null);
+  var sw = $('#swapB'); if (sw) sw.onclick = function () { UI.swap = !UI.swap; UI.sel = []; drawPlan(); };
+  hud(); tracker();
 }
-function cardHtml(x, sel, dead, j) {
-  var u = upgId(x), stem = u ? 'card-upgrade-' + u : x === 'H' ? 'card-heat' : x === 'X' ? 'card-stress' : 'card-speed-' + x, lbl = u ? UPG[u].name : x === 'H' ? 'Heat' : x === 'X' ? 'Stress' : 'Speed';
-  var val = u ? String(UPG[u].sp) : x === 'H' ? '' : x === 'X' ? '?' : x;
-  if (u) return '<button class="cd U' + (sel ? ' sel' : '') + '" data-art="' + stem + '" data-i="' + j + '" aria-label="' + esc(UPG[u].name + ' speed ' + val + '. ' + UPG[u].txt) + '" title="' + esc(UPG[u].txt) + '"><span class="v">' + val + '</span><span class="t">' + esc(UPG[u].sn) + '</span></button>';
-  return '<button class="cd ' + (x === 'H' ? 'H' : x === 'X' ? 'X' : 's' + x) + (sel ? ' sel' : '') + (dead ? ' dead' : '') + '" data-art="' + stem + '" data-i="' + j + '" aria-label="' + lbl + ' ' + (val || '') + '"><span class="v">' + val + '</span><span class="t">' + (x === 'H' ? 'Heat' : x === 'X' ? 'Stress' : '') + '</span></button>';
+var FLAME = '<svg viewBox="0 0 24 28" width="22" height="26" aria-hidden="true"><path d="M12 1C13 7 20 10 20 18a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 4 2 5 0-5 0-9 2-14z" fill="#ff7a3a" stroke="#ffd0a0" stroke-width="1.5"/></svg>';
+function cardFace(x, big) {   /* one card face: type label (top), the key number or shape (middle), a one-line plain effect (bottom) */
+  var u = upgId(x);
+  if (u) return '<span class="k">' + esc(UPG[u].sn) + '</span><span class="v">' + UPG[u].sp + '</span><span class="t">move ' + UPG[u].sp + '</span>';
+  if (x === 'H') return '<span class="k">Heat</span><span class="v">' + FLAME + '</span><span class="t">dead</span>';
+  if (x === 'X') return '<span class="k">Stress</span><span class="v">?</span><span class="t">random</span>';
+  return '<span class="k">Speed</span><span class="v">' + x + '</span><span class="t">move ' + x + '</span>';
+}
+function cardText(x) {
+  var u = upgId(x); if (u) return UPG[u].name + ': ' + UPG[u].txt;
+  if (x === 'H') return 'Heat card: a dead card, it cannot be played.';
+  if (x === 'X') return 'Stress card: flips a random speed card from your deck.';
+  return 'Speed ' + x + ': moves you ' + x + ' spaces.';
+}
+function swapMode(c) {   /* optional rulebook step: throw away speed cards you do not want (once per round), then draw back to a full hand */
+  var n = UI.sel.length; setMsg(n ? 'Throw away ' + n + ' card' + (n > 1 ? 's' : '') + '?' : 'Tap the cards to throw away.');
+  var g = $('#goB'); g.textContent = n ? 'Swap ' + n : 'Swap none'; g.disabled = !n; g.classList.toggle('glow', !!n);
+  document.querySelectorAll('.gb').forEach(function (b) { b.disabled = true; });
+  document.querySelectorAll('#hand .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () { if (c.hand[j] === 'H' || c.hand[j] === 'X') { setMsg('Heat and Stress cards stay in your hand.', 'warn'); return; } var k = UI.sel.indexOf(j); if (k >= 0) UI.sel.splice(k, 1); else UI.sel.push(j); drawPlan(); }; });
+  g.onclick = function () { var e = discardOptional(G, c.i, UI.sel.slice()); UI.swap = false; UI.sel = []; if (e) setMsg('Cannot swap: ' + e, 'warn'); drawPlan(); };
+}
+function cardHtml(x, sel, dead, j, cls) {
+  var u = upgId(x), stem = u ? 'card-upgrade-' + u : x === 'H' ? 'card-heat' : x === 'X' ? 'card-stress' : 'card-speed-' + x;
+  var kind = u ? 'U' : x === 'H' ? 'H' : x === 'X' ? 'X' : 's' + x;
+  return '<button class="cd ' + kind + (sel ? ' sel' : '') + (dead ? ' dead' : '') + (cls ? ' ' + cls : '') + '" data-art="' + stem + '" data-i="' + j + '" aria-label="' + esc(cardText(x)) + '" title="' + esc(cardText(x)) + '">' + cardFace(x) + '</button>';
 }
 function suggest() {
   var c = you(), g2 = JSON.parse(JSON.stringify(G)), p = aiPlan(g2, g2.cars[c.i]);
@@ -3004,12 +3284,12 @@ function suggest() {
 }
 function commit() {
   if (tutOn() && !GXT.act({ type: 'tap', what: 'go' })) return; sfx('go');
-  var c = you(), plan = { gear: UI.gear, idx: UI.sel.slice(), boost: UI.boost }, e = submitPlan(G, c.i, plan);
-  if (e) { setMsg('Not allowed: ' + e, 'warn'); return; }
+  var c = you(); if (!G.hot) rateStart(c); var plan = { gear: UI.gear, idx: UI.sel.slice(), boost: UI.boost }, e = submitPlan(G, c.i, plan);
+  if (e) { setMsg('Not allowed: ' + e, 'warn'); return; } RACE.prev = null; RACE.rateKeep = 0;
   $('#panel').innerHTML = '<div class="reveal"><div class="cd back" data-art="card-back"></div><div class="cd back" data-art="card-back"></div></div>'; artApply($('#panel'));
   var nx = needPlans(G)[0]; if (nx != null) planFor(nx); else startRound();
 }
-function startRound() { UI.busy = true; startResolve(G); runResolve(); }
+function startRound() { UI.busy = true; UI.skipStep = false; UI.pace = G.round > 2 && UI.mode !== 'tutorial' ? 0.6 : 1; startResolve(G); runResolve(); }
 
 /* ================= resolving, with animation ================= */
 function setMsg(t, cls) { var m = $('#msg'); m.textContent = t; m.className = cls || ''; }
@@ -3018,66 +3298,89 @@ function hud() {
   var lap = Math.min(G.laps, Math.floor(me.pos / T(G).N) + 1);
   $('#tLap').textContent = lap + '/' + G.laps; $('#tPos').textContent = (order.indexOf(me.i) + 1) + '/' + G.cars.length;
 }
+function banner(txt, col, kind) {
+  var b = $('#banner'); if (!b) return; if (!txt) { b.className = ''; b.textContent = ''; return; }
+  b.className = 'on ' + (kind || ''); b.style.setProperty('--bc', col != null && COLS[col] ? COLS[col].hex : '#ffc23a'); b.innerHTML = '<i></i><span></span>'; b.lastChild.textContent = txt;
+}
 async function runResolve() {
-  hud();
+  var g0 = G; hud(); UI.lastCar = -1; UI.skipStep = false;
+  banner('Everyone has chosen', null, 'round'); setMsg('One car at a time. Tap: faster.'); await wait(900);
   while (G.phase === 'resolve') {
-    var ev = resolveNext(G); await playEvents(ev);
-    if (G.pend) { var use = await askSlip(); ev = slipChoice(G, use); await playEvents(ev); }
+    var ev = resolveNext(G); await playEvents(ev); if (G !== g0) return;
+    if (G.pend) { var use = await askSlip(); if (G !== g0) return; ev = slipChoice(G, use); await playEvents(ev); if (G !== g0) return; }
   }
-  UI.busy = false; UI.pops = [];
-  if (G.over) { setMsg('Chequered flag!', 'good'); await wait(900); return showResult(); }
+  UI.busy = false; UI.pops = []; banner(''); RACE.spdT = 0; rateRound();
+  if (G.over) { banner('Chequered flag!', null, 'round'); setMsg('Chequered flag!', 'good'); await wait(1100); banner(''); return showResult(); }
   if (window.__noPlan) return;
-  UI.sel = []; var nx = needPlans(G)[0]; setMsg('Round ' + G.round); if (nx != null) planFor(nx); else startRound();
+  UI.sel = []; UI.touchedGear = 0; RACE.ph = 'shift'; if (UI.mode === 'tutorial') tutStageRound(G.round); var nx = needPlans(G)[0]; setMsg('Round ' + G.round); if (nx != null) planFor(nx); else startRound();
 }
 function carName(i) { return G.cars[i].human ? G.cars[i].name.split(' ')[0] : G.cars[i].name.split(' ')[0]; }
 function tween(i, to, ms) {
   var v = UI.vis[i], from = v.p; if (window.ANIM === false || UI.fast || ms <= 0 || from === to) { v.p = to; return Promise.resolve(); }
-  return new Promise(function (res) { var t0 = performance.now(); (function f(now) { var k = Math.min(1, (now - t0) / ms), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; v.p = from + (to - from) * e; if (k < 1) requestAnimationFrame(f); else res(); })(t0); });
+  ms = ms * (window.AIDELAY || 1) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
+  return new Promise(function (res) { var t0 = performance.now(); (function f(now) {   /* space by space: each space eases in and out, a tick on every space */
+    var k = Math.min(1, (now - t0) / ms), x = k * n, i = Math.floor(x), fr = x - i, e = fr < .5 ? 2 * fr * fr : 1 - Math.pow(-2 * fr + 2, 2) / 2; if (i >= n) { i = n; e = 0; }
+    if (i > last) { last = i; if (G.cars[UI.focus] && G.cars[UI.focus].human) sfx('tick'); }
+    v.p = from + dir * Math.min(Math.abs(to - from), i + e); if (k < 1) requestAnimationFrame(f); else { v.p = to; res(); } })(t0); });
 }
 function pop(txt, at, col, stem) { UI.pops.push({ txt: txt, p: at, t: performance.now(), col: col || '#fff', stem: stem }); setTimeout(function () { UI.pops.shift(); }, 1500); }
+function ord(n) { return n + (n % 10 === 1 && n !== 11 ? 'st' : n % 10 === 2 && n !== 12 ? 'nd' : n % 10 === 3 && n !== 13 ? 'rd' : 'th'); }
 async function playEvents(ev) {
+  var gP = G;
   for (var k = 0; k < ev.length; k++) {
-    var e = ev[k], c = G.cars[e.car], nm = e.car != null ? carName(e.car) : '';
+    if (G !== gP) return;
+    var e = ev[k], c = G.cars[e.car]; if (e.car != null && !c) return; var
+      _x = 0, nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
-    if (e.t === 'shift') setMsg(nm + ' shifts to gear ' + e.to + (e.cost ? ' (-1 heat)' : ''));
-    else if (e.t === 'cool') { setMsg(nm + ' cools ' + e.n + ' heat'); }
-    else if (e.t === 'play') { showPlayed(e); sfx('card'); setMsg(nm + ' plays speed ' + e.speed); await wait(c.human ? 750 : 520); }
-    else if (e.t === 'boost') { sfx('boost'); setMsg(nm + ' boosts +' + e.add); pop('Boost +' + e.add, UI.vis[e.car].p, '#ffd24a', 'fx-boost-flare'); await wait(400); }
-    else if (e.t === 'adr') setMsg(nm + ': adrenaline +1');
-    else if (e.t === 'move') { var d = Math.abs(e.to - e.from); await tween(e.car, e.to, Math.min(1500, 170 * d + 200)); }
-    else if (e.t === 'slip') { sfx('slip'); setMsg(nm + ' slipstreams +2'); pop('Slipstream', UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 450); }
-    else if (e.t === 'corner') { if (e.cost) { if (c.human) sfx('burn'); setMsg(nm + ' burns ' + e.cost + ' heat in the corner'); pop('-' + e.cost + ' heat', UI.vis[e.car].p, '#ff6a3a', 'fx-heat-flame'); await wait(650); } else if (c.human) { sfx('clean'); setMsg(nm + ' takes the corner clean'); } }
-    else if (e.t === 'spin') { sfx('spin'); setMsg(nm + ' spins out!', 'warn'); pop('SPIN OUT', e.to, '#ff4d3a', 'fx-spinout-smoke'); var v = UI.vis[e.car]; v.rot = 1; await tween(e.car, e.to, 500); await wait(500); v.rot = 0; }
-    else if (e.t === 'finish') { setMsg(nm + ' crosses the line!', 'good'); await wait(500); }
+    if (UI.mode === 'tutorial') coachEvent(e, you);
+    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'is up') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : nm + ' is up.'); await wait(750); }
+    if (you && !G.hot) { var ph = { shift: 'shift', play: 'play', move: 'move', cool: 'react', boost: 'react', slip: 'react', corner: 'react', spin: 'react', done: 'discard', stall: 'discard' }[e.t]; if (ph) RACE.ph = ph; } tracker();
+    if (e.t === 'play') RACE.spdT = e.speed; else if (e.t === 'boost') RACE.spdT = e.speed; else if (e.t === 'done') RACE.spdT = 0;
+    if (e.t === 'shift') { setMsg(who + (who === 'You' ? ' shift' : ' shifts') + ' to gear ' + e.to + (e.cost ? ' (-1 heat)' : '') + '.'); await wait(700); }
+    else if (e.t === 'cool') { setMsg(who + ' cool' + (who === 'You' ? '' : 's') + ' ' + e.n + ' heat back into the engine.'); pop('+' + e.n + ' engine', UI.vis[e.car].p, '#8ce6ff'); await wait(750); }
+    else if (e.t === 'play') { showPlayed(e); sfx('card'); setMsg(who + (who === 'You' ? ' play' : ' plays') + ': speed ' + e.speed + '.'); await wait(you ? 1000 : 950); }
+    else if (e.t === 'boost') { sfx('boost'); setMsg(who + ' boost' + (who === 'You' ? '' : 's') + ': +' + e.add + ' from a flipped card.'); pop('Boost +' + e.add, UI.vis[e.car].p, '#ffd24a', 'fx-boost-flare'); await wait(800); }
+    else if (e.t === 'adr') { setMsg(who + ' get' + (who === 'You' ? '' : 's') + ' adrenaline for being last: +1.'); pop('Adrenaline +1', UI.vis[e.car].p, '#ffd24a'); await wait(800); }
+    else if (e.t === 'move') { var d = Math.abs(e.to - e.from); setMsg(who + ' drive' + (who === 'You' ? '' : 's') + ' ' + d + ' space' + (d === 1 ? '' : 's') + '.'); if (d) sfx('engine'); await tween(e.car, e.to, Math.min(1500, 170 * d + 250)); if (d) { pop('+' + d + ' spaces', UI.vis[e.car].p, '#fff'); await wait(450); } }
+    else if (e.t === 'slip') { sfx('slip'); setMsg(who + ' slipstream' + (who === 'You' ? '' : 's') + ' +' + (e.to - e.from) + ': free spaces.'); pop('Slipstream +' + (e.to - e.from), UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 500); await wait(450); }
+    else if (e.t === 'corner') { if (e.cost) { if (you) sfx('burn'); setMsg(who + ' burn' + (who === 'You' ? '' : 's') + ' ' + e.cost + ' heat: over the limit.', 'warn'); pop('-' + e.cost + ' heat: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#ff6a3a', 'fx-heat-flame'); await wait(900); } else { if (you) sfx('clean'); setMsg(who + ' took the corner clean.', 'good'); pop('Clean: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#8cf0b4'); await wait(750); } }
+    else if (e.t === 'spin') { sfx('spin'); setMsg(nm + ' spins out: not enough heat.', 'warn'); pop('SPIN: ' + e.speed + ' in a ' + e.limit, e.to, '#ff4d3a', 'fx-spinout-smoke'); raceSpin(e); var v = UI.vis[e.car]; v.rot = 1; await tween(e.car, e.to, 500); await wait(700); v.rot = 0; }
+    else if (e.t === 'finish') { setMsg(nm + ' crosses the line!', 'good'); banner(nm + ' crosses the line!', c.col, 'turn'); await wait(800); }
+    else if (e.t === 'stall') { setMsg(nm + ' has only heat cards: no move, gear 1.', 'warn'); pop('No move', UI.vis[e.car].p, '#ff8f7a'); await wait(1000); }
+    else if (e.t === 'done') { var pl = rankList(G).indexOf(e.car) + 1; setMsg(nm + ' is now ' + ord(pl) + '.'); await wait(450); }
     hud();
   }
   UI.redraw();
 }
 function showPlayed(e) {
-  var h = '<div class="reveal">'; e.cards.forEach(function (x) {
+  var h = '<div class="who" style="color:' + COLS[G.cars[e.car].col].hex + '">' + esc(carName(e.car) === 'You' ? 'You play' : carName(e.car) + ' plays') + '</div><div class="reveal">'; e.cards.forEach(function (x) {
     var stem = x.upg ? 'card-upgrade-' + x.upg : x.card === 'X' ? 'card-stress' : 'card-speed-' + x.card, v = x.v;
-    h += '<div class="cd ' + (x.upg ? 'U' : x.card === 'X' ? 'X' : 's' + x.card) + '" data-art="' + stem + '"><span class="v">' + (x.card === 'X' ? '+' + v : x.upg ? v : x.card) + '</span><span class="t">' + (x.upg ? esc(UPG[x.upg].sn) : x.card === 'X' ? 'Stress' : '') + '</span></div>';
+    h += '<div class="cd flip ' + (x.upg ? 'U' : x.card === 'X' ? 'X' : 's' + x.card) + '" data-art="' + stem + '"><span class="k">' + (x.upg ? esc(UPG[x.upg].sn) : x.card === 'X' ? 'Stress' : 'Speed') + '</span><span class="v">' + v + '</span><span class="t">' + (x.card === 'X' ? 'flipped' : 'move ' + v) + '</span></div>';
   });
   h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
 }
 function askSlip() {
+  if (UI.mode === 'tutorial') coachSay('slip');
   var p = G.pend, c = G.cars[p.car], cost = cornerCost(G, p.from, p.L1, p.speed, p.lim) - cornerCost(G, p.from, p.L0, p.speed, p.lim);
   var spin = cornerCost(G, p.from, p.L1, p.speed, p.lim) > c.eng;
-  setMsg(cost ? 'Slipstream +2 costs ' + cost + ' more heat' : 'Slipstream: glide 2 spaces free');
-  $('#panel').innerHTML = '<div class="slipq"><button id="slipN">Stay</button><button class="y" id="slipY">Slipstream +2' + (cost ? ' (-' + cost + ' heat)' : '') + '</button></div>';
-  return new Promise(function (res) { $('#slipY').onclick = function () { res(true); }; $('#slipN').onclick = function () { res(false); }; if (UI.fast) setTimeout(function () { res(!spin && cost === 0); }, 10); });
+  var sn = p.L1 - p.L0; setPhase('react'); setMsg(spin ? 'Slipstream +' + sn + ' would spin you out' : cost ? 'Slipstream +' + sn + ' costs ' + cost + ' more heat' : 'Slipstream: ' + sn + ' free spaces');
+  $('#panel').innerHTML = '<div class="slipq"><button id="slipN">Stay</button><button class="y" id="slipY">Slipstream +' + sn + (spin ? ' (spin!)' : '') + (cost ? ' (-' + cost + ' heat)' : '') + '</button></div>';
+  return new Promise(function (res) { $('#slipY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slip' })) return; res(true); }; $('#slipN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slipno' })) return; res(false); }; if (UI.fast) setTimeout(function () { res(!spin && cost === 0); }, 10); if (tutOn() && GXT.current() && GXT.current().id !== 'slip') { setMsg('No slipstream now: keep your heat.'); setTimeout(function () { res(false); }, 1400 * (window.AIDELAY || 1)); } });
 }
 
 /* ================= result ================= */
 function showResult() {
   if (typeof GXC !== 'undefined' && GXC.active && GXC.active() && UI.cmpDef) { var wc = G.cars[G.rank[0]]; sfx(wc.human ? 'win' : 'lose'); return GXC.finish(G); }
+  if (UI.mode === 'tutorial') return coachFinish();
+  if (UI.champ) return champResult();
   UI.lockModal = true; var rows = '', me = G.cars.filter(function (c) { return c.human; });
   G.rank.forEach(function (ci, k) {
     var c = G.cars[ci], col = COLS[c.col].hex;
-    rows += '<div class="stand' + (c.human ? ' you' : '') + '"><span class="n">' + (k + 1) + '</span><span class="pt" style="border-color:' + col + '" data-art="portrait-' + c.drv + '">' + (c.drv ? c.name[0] : '') + '</span><div style="flex:1"><b>' + esc(c.name) + (c.human ? ' (you)' : '') + '</b><small>Heat burned ' + c.stats.heat + ' · spin-outs ' + c.stats.spins + ' · slipstreams ' + c.stats.slips + '</small></div></div>';
+    rows += '<div class="stand' + (c.human ? ' you' : '') + '"><span class="n">' + (k + 1) + '</span><span class="pt" style="border-color:' + col + '" data-art="portrait-' + c.drv + '">' + (c.drv ? c.name[0] : '★') + '</span><div style="flex:1"><b>' + esc(c.name) + '</b><small>Heat burned ' + c.stats.heat + ' · spin-outs ' + c.stats.spins + ' · slipstreams ' + c.stats.slips + '</small></div></div>';
   });
   var w = G.cars[G.rank[0]]; sfx(w.human ? 'win' : 'lose');
-  modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i></div>' + rows + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
+  var line = UI.mode === 'tutorial' ? (w.human ? 'You beat Kit to the line. Coach Mara is grinning: the Sunline seat is yours.' : 'Kit took the flag, but you learned every trick. Coach Mara: "Again. You are close."') : w.human ? STORY.resultWin + ' ' + pickLine(STORY.quickWin) : STORY.resultLose(w.name.split(' ')[0]) + ' ' + pickLine(STORY.quickLose);
+  modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i>' + podiumHtml(G.rank) + '<p class="rl">' + esc(line) + '</p></div>' + rows + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
   $('#mx').hidden = true; $('#again').onclick = function () { UI.lockModal = false; startGame(); }; $('#home').onclick = function () { UI.lockModal = false; showTitle(); };
 }
 
@@ -3087,8 +3390,11 @@ function sizeCanvas() {
   cv = cv || $('#cv'); cx = cx || cv.getContext('2d'); var r = $('#cvw').getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1);
   cv.width = Math.max(2, Math.round(r.width * dpr)); cv.height = Math.max(2, Math.round(r.height * dpr)); UI.W = r.width; UI.H = r.height;
   UI.cam.s = Math.max(0.28, Math.min(0.62, Math.min(UI.W, UI.H * 1.15) / 880));
+  UI.cam.s = Math.max(UI.cam.s, UI.W / 2000, UI.H / 1200);   /* never show beyond the 2000x1200 board */
 }
-window.addEventListener('resize', function () { if (G) { sizeCanvas(); } });
+function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1)) sizeCanvas(); } }
+window.addEventListener('resize', cvFit); window.addEventListener('orientationchange', function () { setTimeout(cvFit, 120); });
+if (window.ResizeObserver) { var cvRO = new ResizeObserver(cvFit); document.addEventListener('DOMContentLoaded', function () { var w = $('#cvw'); if (w) cvRO.observe(w); }); if (document.readyState !== 'loading') { var w0 = $('#cvw'); if (w0) cvRO.observe(w0); } }
 function carXY(i, p) {
   var tk = T(G), v = UI.vis[i]; var c = G.cars[i];
   var lane = laneOf(i); var q = tk.space(p, lane); return q;
@@ -3126,10 +3432,10 @@ function drawCar(c, p, ang, rot, hi) {
 function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
 function frame(now) {
   requestAnimationFrame(frame); if (!G || $('#game').hidden || !cx) return;
-  var W = UI.W, H = UI.H, cam = UI.cam, tk = T(G); UI.spinT = (now % 600) / 600;
-  var tgt = carXY(UI.focus, UI.vis[UI.focus].p), k = (UI.fast || window.ANIM === false) ? 1 : 0.12; cam.x += (tgt.x - cam.x) * k; cam.y += (tgt.y - cam.y) * k;
+  cvFit(); var W = UI.W, H = UI.H, cam = UI.cam, tk = T(G); UI.spinT = (now % 600) / 600;
+  var tgt = RACE.prev && G.phase === 'plan' ? T(G).space((G.cars[RACE.prev.car].pos + RACE.prev.L) / 2, 0) : carXY(UI.focus, UI.vis[UI.focus].p), k = (UI.fast || window.ANIM === false) ? 1 : 0.12; cam.x += (tgt.x - cam.x) * k; cam.y += (tgt.y - cam.y) * k; cam.x = Math.max(W / 2 / cam.s, Math.min(2000 - W / 2 / cam.s, cam.x)); cam.y = Math.max(H / 2 / cam.s, Math.min(1200 - H / 2 / cam.s, cam.y));
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.fillStyle = '#245c37'; cx.fillRect(0, 0, W, H);
-  cx.save(); cx.translate(W / 2, H / 2); cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
+  var shk = camShake(now); cx.save(); cx.translate(W / 2 + shk, H / 2 + shk * 0.5); cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
   if (!artDraw(cx, 'track-' + G.track, 0, 0, 2000, 1200, 'cover')) cx.drawImage(trackLayer(G.track), 0, 0, 2000, 1200);
   /* corner signs */
   tk.list.forEach(function (kk) {
@@ -3138,6 +3444,7 @@ function frame(now) {
     cx.fillStyle = '#111'; cx.font = '900 38px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(climit(G, kk.limit), sx, sy + 2);
   });
   artDraw(cx, 'ui-flag-checkered', tk.at(0).x - 40, tk.at(0).y - 150, 80, 60, 'contain');
+  raceWorld(now);
   /* cars: back to front */
   var ord = G.cars.map(function (c) { return c.i; }).sort(function (a, b) { return UI.vis[a].p - UI.vis[b].p; });
   ord.forEach(function (i) {
@@ -3147,7 +3454,7 @@ function frame(now) {
   });
   /* pops */
   UI.pops.forEach(function (o) {
-    var age = (now - o.t) / 1500; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0); cx.globalAlpha = 1 - age * age; var y = q.y - 50 - age * 60;
+    var age = o.hold ? 0.15 : (now - o.t) / 1500; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0); cx.globalAlpha = 1 - age * age; var y = q.y - 50 - age * 60;
     if (o.stem) artDraw(cx, o.stem, q.x - 50, y - 70, 100, 70, 'contain');
     cx.fillStyle = o.col; cx.font = '900 34px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.strokeStyle = '#000'; cx.lineWidth = 7; cx.strokeText(o.txt, q.x, y); cx.fillText(o.txt, q.x, y); cx.globalAlpha = 1;
   });
@@ -3157,6 +3464,7 @@ function frame(now) {
   cx.fillStyle = 'rgba(8,12,20,.6)'; rr(mx - 3, my - 3, mw + 6, mh + 6, 8); cx.fill();
   cx.beginPath(); tk.dense.forEach(function (p, i) { if (i) cx.lineTo(mx + p[0] * sc, my + p[1] * sc); else cx.moveTo(mx + p[0] * sc, my + p[1] * sc); }); cx.closePath(); cx.strokeStyle = '#8b97ad'; cx.lineWidth = 3; cx.stroke();
   G.cars.forEach(function (c) { var q = tk.space(UI.vis[c.i].p, 0); cx.fillStyle = COLS[c.col].hex; cx.beginPath(); cx.arc(mx + q.x * sc, my + q.y * sc, c.human ? 3.6 : 2.6, 0, 7); cx.fill(); if (c.human) { cx.strokeStyle = '#fff'; cx.lineWidth = 1.2; cx.stroke(); } });
+  raceHud(now, W, H);
 }
 UI.redraw = function () { };
 requestAnimationFrame(frame);
@@ -3168,10 +3476,11 @@ function boot() {
   GX.init({ key: 'rr' }); GX.drawer('rulesd', 'How to play', (function () { var d = document.createElement('div'); d.id = 'rulesbody'; return d; })());
   GX.onShow = function (id) { if (id === 'rulesd') rulesFill(); }; rulesFill();
   GX.onResize(function () { if (G && !$('#game').hidden) sizeCanvas(); });
-  $('#playB').onclick = function () { startGame(); }; $('#howB').onclick = howTo; $('#storyB').onclick = function () { campOpen(); }; soundBoot(); if (typeof helpBoot === 'function') helpBoot();
-  $('#menuB').onclick = function () { modal('<h2>Menu</h2><div style="display:flex;flex-direction:column;gap:8px"><button class="ghostb" id="m1">How to play</button><button class="ghostb" id="m4">Guide: learn by doing</button><button class="ghostb" data-snd id="m5"></button><button class="ghostb" id="m2">Quit to title</button><button class="big" id="m3">Keep racing</button></div>'); $('#m1').onclick = howTo; $('#m4').onclick = function () { closeModal(); tutStart(); }; $('#m2').onclick = function () { showTitle(); }; $('#m3').onclick = closeModal; $('#m5').textContent = sndLabel(); $('#m5').onclick = function () { setSound(!SND.on); }; };
+  $('#playB').onclick = function () { startGame(); }; $('#howB').onclick = howTo; $('#storyB').onclick = function () { campOpen(); }; $('#champB').onclick = function () { champStart(false); }; $('#hintT').onclick = function () { sfx('tap'); setHints(!UI.hints); }; setHints(UI.hints); soundBoot(); if (typeof helpBoot === 'function') helpBoot();
+  $('#menuB').onclick = function () { modal('<h2>Menu</h2><div style="display:flex;flex-direction:column;gap:8px"><button class="ghostb" id="m1">How to play</button><button class="ghostb" id="m4">Guide: learn by doing</button><button class="ghostb" data-snd id="m5"></button><button class="ghostb" id="m2">Quit to title</button><button class="big" id="m3">Keep racing</button></div>'); $('#m1').onclick = howTo; $('#m4').onclick = function () { closeModal(); chapterMenu(); }; $('#m2').onclick = function () { showTitle(); }; $('#m3').onclick = closeModal; $('#m5').textContent = sndLabel(); $('#m5').onclick = function () { setSound(!SND.on); }; };
   var q = new URLSearchParams(location.search); if (q.get('seed')) UI.seedArg = +q.get('seed');
   artLoad(); showTitle();
+  document.addEventListener('pointerdown', function () { if (UI.busy) UI.skipStep = true; }, true);
 }
 /* test hooks */
 UI.sim = function (n) { for (var i = 0; i < (n || 1); i++) { if (!G || G.over) return; if (G.phase === 'plan') { G.cars.forEach(function (c) { if (!c.plan) c.plan = aiPlan(G, c); }); startResolve(G); } while (G.phase === 'resolve') { if (G.pend) slipChoice(G, true); else resolveNext(G); } } };
@@ -3182,41 +3491,343 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 
 </script>
 <script>
-/* Redline Rally first-game guide (shared tutor games-src/shell/gx-tutor.js, see GX-KIT.md section 10): one staged round that teaches the core decision
-   (push through a corner and burn heat, or brake and keep it) by doing it. Fixed hand, car parked 3 spaces before the first corner (limit 5). Never saved. */
+/* Redline Rally race feel: start lights, dashboard (speedometer, gear lever, heat gauge), live leaderboard, spin-out flash and skids,
+   move preview on the track, turn tracker (round, phase, cards left), one-line round rating, podium and the championship. Loaded after ui.js. */
+var RACE = { lights: null, spd: 0, spdT: 0, flash: 0, shake: 0, skids: [], ph: 'shift', rate: '', best: null, start: null };
+var PHASES = [['shift', 'Shift'], ['play', 'Play'], ['move', 'Move'], ['react', 'React'], ['discard', 'Discard']];
+
+/* ---------- start lights: five reds come on one by one, then all go out = GO. Never blocks input. ---------- */
+function lightsStart() {
+  if (UI.fast || window.ANIM === false) { RACE.lights = null; return; }
+  RACE.lights = { t0: performance.now() };
+  for (var k = 0; k < 5; k++) (function (k) { setTimeout(function () { sfx('beep'); }, 420 * k + 200); })(k);
+  setTimeout(function () { sfx('lightsgo'); }, 420 * 5 + 300);
+  setTimeout(function () { RACE.lights = null; }, 420 * 5 + 1300);
+}
+function lightsDraw(now, W) {
+  var L = RACE.lights; if (!L) return; var t = L.freeze != null ? L.freeze : now - L.t0, on = Math.min(5, Math.floor((t - 200) / 420) + 1), out = t > 420 * 5 + 300;
+  var r = Math.max(9, Math.min(18, W / 26)), gap = r * 2.6, w = gap * 5 + 16, x0 = W / 2 - w / 2, y0 = W < 500 ? 104 : 64;
+  cx.fillStyle = 'rgba(10,12,18,.92)'; rr(x0, y0, w, r * 2 + 18, 12); cx.fill(); cx.strokeStyle = '#3a4152'; cx.lineWidth = 2; cx.stroke();
+  for (var i = 0; i < 5; i++) {
+    var lit = !out && i < on; cx.beginPath(); cx.arc(x0 + 8 + gap * i + gap / 2, y0 + 9 + r, r, 0, 7);
+    cx.fillStyle = out ? '#2fd36b' : lit ? '#ff2a2a' : '#3b1416'; cx.shadowColor = lit ? '#ff2a2a' : out ? '#2fd36b' : 'transparent'; cx.shadowBlur = lit || out ? 16 : 0; cx.fill(); cx.shadowBlur = 0;
+  }
+  cx.font = '900 ' + Math.round(r * 1.1) + 'px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'top'; cx.fillStyle = out ? '#2fd36b' : '#fff';
+  cx.strokeStyle = '#000'; cx.lineWidth = 4; var tx = out ? 'GO!' : 'Lights...'; cx.strokeText(tx, W / 2, y0 + r * 2 + 24); cx.fillText(tx, W / 2, y0 + r * 2 + 24);
+}
+
+/* ---------- world layer (inside the camera transform): skid marks, move preview ---------- */
+function raceWorld(now) {
+  var tk = T(G);
+  RACE.skids = RACE.skids.filter(function (s) { return now - s.t < 9000; });
+  RACE.skids.forEach(function (s) {
+    var a = 1 - (now - s.t) / 9000; cx.strokeStyle = 'rgba(15,15,15,' + (0.7 * a).toFixed(2) + ')'; cx.lineWidth = 7; cx.lineCap = 'round';
+    for (var o = -1; o <= 1; o += 2) { cx.beginPath(); for (var k = 0; k <= 10; k++) { var q = tk.space(s.p - 1.4 + k * 0.14, s.lane), w = Math.sin(k * 0.9) * 10 + o * 12; var x = q.x - Math.sin(q.a) * w, y = q.y + Math.cos(q.a) * w; if (k) cx.lineTo(x, y); else cx.moveTo(x, y); } cx.stroke(); }
+  });
+  var pv = RACE.prev; if (!pv || !G || G.phase !== 'plan') return;
+  /* corners crossed: green = safe, orange = burns heat, red = spin */
+  pv.ks.forEach(function (k) {
+    var q = tk.at(k.p * tk.seg), col = pv.spin ? '#ff3b30' : (pv.sp - k.limit - pv.ul > 0) ? '#ff9a2e' : '#3ddc84';
+    cx.strokeStyle = col; cx.lineWidth = 14; cx.setLineDash([]); cx.beginPath(); cx.moveTo(q.x + Math.sin(q.a) * 66, q.y - Math.cos(q.a) * 66); cx.lineTo(q.x - Math.sin(q.a) * 66, q.y + Math.cos(q.a) * 66); cx.stroke();
+  });
+  /* path dots and ghost car at the landing space */
+  var c = G.cars[pv.car]; cx.fillStyle = 'rgba(255,255,255,.75)';
+  for (var p = c.pos + 1; p <= pv.L; p++) { var q2 = tk.space(p, 0); cx.beginPath(); cx.arc(q2.x, q2.y, 7, 0, 7); cx.fill(); }
+  var g = tk.space(pv.spin ? pv.stop : pv.L, 0); cx.save(); cx.globalAlpha = 0.5 + 0.25 * Math.sin(now / 180); cx.translate(g.x, g.y); cx.rotate(g.a);
+  cx.strokeStyle = pv.spin ? '#ff3b30' : '#fff'; cx.lineWidth = 5; cx.setLineDash([10, 8]); rr(-40, -20, 80, 40, 9); cx.stroke(); cx.setLineDash([]); cx.restore();
+  var lb = pv.spin ? 'SPIN' : pv.burn ? '-' + pv.burn + ' heat' : 'safe';
+  cx.font = '900 30px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.lineWidth = 7; cx.strokeStyle = '#000'; cx.fillStyle = pv.spin ? '#ff5a4a' : pv.burn ? '#ffb347' : '#8cf0b4';
+  cx.strokeText(lb, g.x, g.y - 34); cx.fillText(lb, g.x, g.y - 34);
+  if (pv.slip) { cx.font = '800 24px sans-serif'; cx.fillStyle = '#8ce6ff'; cx.strokeText('slipstream +' + slipN(G) + '?', g.x, g.y + 62); cx.fillText('slipstream +' + slipN(G) + '?', g.x, g.y + 62); }
+}
+
+/* ---------- screen layer: dashboard, leaderboard, flash, lights ---------- */
+function raceHud(now, W, H) {
+  if (!G) return; var c = G.cars[UI.focus] || G.cars[0];
+  RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.08);
+  /* leaderboard, top-left */
+  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn();
+  if (showLb) { rh = fs + 7, bw = W < 500 ? 104 : 150, n = rk.length;
+  var lx = W - bw - 6, ly = H - (rh * n + 10) - 6; if (H < 260) ly = 6; cx.fillStyle = 'rgba(8,12,20,.78)'; rr(lx, ly, bw, rh * n + 10, 8); cx.fill();
+  cx.font = '800 ' + fs + 'px sans-serif'; cx.textBaseline = 'middle';
+  rk.forEach(function (ci, k) {
+    var o = G.cars[ci], y = ly + 5 + rh * k + rh / 2; cx.fillStyle = COLS[o.col].hex; cx.fillRect(lx + 4, y - rh / 2 + 3, 5, rh - 6);
+    cx.textAlign = 'left'; cx.fillStyle = o.human ? '#ffd24a' : '#fff'; var nm = (k + 1) + ' ' + (o.human && !G.hot ? 'You' : o.name.split(' ')[0]); cx.fillText(nm, lx + 14, y);
+    cx.textAlign = 'right'; cx.fillStyle = '#c9d2e3'; cx.fillText(o.fin ? 'FIN' : 'L' + Math.min(G.laps, Math.floor(o.pos / T(G).N) + 1), lx + bw - 5, y);
+  });
+  }
+  /* dashboard, bottom-left: speedometer, gear lever, heat gauge */
+  var R = W < 500 ? 30 : 42, bx = 8, by = H - R * 2 - 18, dw = R * 2 + R * 1.3 + R * 0.9 + 34;
+  if (H > 240) {
+    cx.fillStyle = 'rgba(8,12,20,.8)'; rr(bx, by, dw, R * 2 + 12, 12); cx.fill();
+    var ox = bx + 6 + R, oy = by + 6 + R, a0 = Math.PI * 0.8, a1 = Math.PI * 2.2, max = 20, f = Math.min(1, RACE.spd / max);
+    cx.lineWidth = R * 0.18; cx.lineCap = 'butt'; cx.strokeStyle = '#2a3140'; cx.beginPath(); cx.arc(ox, oy, R * 0.86, a0, a1); cx.stroke();
+    cx.strokeStyle = f > 0.7 ? '#ff4d3a' : f > 0.45 ? '#ffb347' : '#3ddc84'; cx.beginPath(); cx.arc(ox, oy, R * 0.86, a0, a0 + (a1 - a0) * f); cx.stroke();
+    var na = a0 + (a1 - a0) * f; cx.strokeStyle = '#fff'; cx.lineWidth = 3; cx.lineCap = 'round'; cx.beginPath(); cx.moveTo(ox, oy); cx.lineTo(ox + Math.cos(na) * R * 0.7, oy + Math.sin(na) * R * 0.7); cx.stroke();
+    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(R * 0.5) + 'px sans-serif'; cx.fillText(String(Math.round(RACE.spd)), ox, oy + R * 0.42);
+    cx.font = '700 ' + Math.max(10, Math.round(R * 0.28)) + 'px sans-serif'; cx.fillStyle = '#9aa6bb'; cx.fillText('SPEED', ox, oy - R * 0.28);
+    /* gear lever: H-gate 1-2 / 3-4, the knob sits in the current gear */
+    var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 8 + R * 0.26, gh = R * 2 - 4 - R * 0.52, gear = c.gear;
+    cx.strokeStyle = '#59627a'; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(gx, gy); cx.lineTo(gx, gy + gh); cx.moveTo(gx + gw, gy); cx.lineTo(gx + gw, gy + gh); cx.moveTo(gx, gy + gh / 2); cx.lineTo(gx + gw, gy + gh / 2); cx.stroke();
+    var kx = gx + (gear >= 3 ? gw : 0), ky = gy + (gear % 2 ? 0 : gh); cx.fillStyle = '#ffd24a'; cx.beginPath(); cx.arc(kx, ky, R * 0.26, 0, 7); cx.fill();
+    cx.fillStyle = '#111'; cx.font = '900 ' + Math.round(R * 0.32) + 'px sans-serif'; cx.fillText(String(gear), kx, ky + 1);
+    /* heat gauge: fills as engine heat is burned; red = close to a spin */
+    var cap = ENGINE0 + (c.xh || 0), used = cap - c.eng, hx = gx + gw + 18, hw = R * 0.5, hy = by + 8, hh = R * 2 - 4, hf = Math.max(0, Math.min(1, used / cap));
+    cx.fillStyle = '#2a3140'; rr(hx, hy, hw, hh, 5); cx.fill();
+    cx.fillStyle = c.eng <= 1 ? '#ff3b30' : c.eng <= 3 ? '#ff9a2e' : '#ffcf4a'; rr(hx, hy + hh * (1 - hf), hw, hh * hf, 5); cx.fill();
+    cx.fillStyle = '#fff'; cx.font = '900 ' + Math.max(11, Math.round(R * 0.3)) + 'px sans-serif'; cx.fillText(String(c.eng), hx + hw / 2, hy + hh / 2);
+  }
+  if (RACE.flash) { var fa = RACE.flashHold ? 0.7 : 1 - (now - RACE.flash) / 700; if (fa > 0) { cx.fillStyle = 'rgba(255,30,20,' + (0.45 * fa).toFixed(2) + ')'; cx.fillRect(0, 0, W, H); } else RACE.flash = 0; }
+  lightsDraw(now, W);
+}
+function camShake(now) { if (!RACE.shake || RACE.flashHold) return 0; var a = 1 - (now - RACE.shake) / 500; if (a <= 0) { RACE.shake = 0; return 0; } return Math.sin(now / 18) * 10 * a; }
+function raceSpin(e) { RACE.flash = performance.now(); RACE.shake = RACE.flash; RACE.skids.push({ p: e.to + 1, lane: laneOf(e.car), t: RACE.flash }); sfx('skid'); }
+
+/* ---------- move preview (plan phase): landing, corner cost, spin, slipstream ---------- */
+function previewSet(ci) {
+  if (ci == null) { RACE.prev = null; return ci; } var c = G.cars[UI.seat]; if (!c || G.phase !== 'plan' || UI.sel.length !== needCards(c, UI.gear)) { RACE.prev = null; return ci; }
+  var ul = 0; UI.sel.forEach(function (j) { var u = upgId(c.hand[j]); if (u) ul += UPG[u].lim; });
+  var L = landing(G, c, c.pos + ci.sp + ci.adr), N = T(G).N, stop = L;
+  if (ci.spin) { var bad = null, left = c.eng - ci.cost; ci.ks.forEach(function (k) { if (bad) return; var need = Math.max(0, ci.sp - k.limit - ul); if (need > left) bad = k; else left -= need; }); stop = bad ? Math.max(c.pos, bad.p - 1) : L; }
+  var slip = L < total(G) && G.cars.some(function (o) { return o !== c && (o.pos % N === L % N || o.pos % N === (L + 1) % N); });
+  RACE.prev = { car: c.i, L: L, stop: stop, ks: cornersIn(G, c.pos, L), sp: ci.sp, ul: ul, burn: ci.burn, spin: ci.spin, slip: slip };
+  ci.slip = slip; return ci;
+}
+
+/* ---------- turn tracker: round, lap, phase, cards left; plus the last round's rating ---------- */
+function setPhase(ph) { RACE.ph = ph; tracker(); }
+function tracker() {
+  var d = document.getElementById('trk'); if (!d) { var body = document.querySelector('.gx-dock-body'); if (!body) return; d = document.createElement('div'); d.id = 'trk'; body.insertBefore(d, body.firstChild); }
+  if (!G) return; var me = G.cars[UI.seat] || G.cars[0], lap = Math.min(G.laps, Math.floor(me.pos / T(G).N) + 1);
+  var mine = G.phase === 'plan' || (curCar(G) && curCar(G).i === me.i) || G.pend;
+  var dt = document.getElementById('dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · Lap ' + lap + '/' + G.laps + ' · Deck ' + me.deck.length + ' · Discard ' + me.disc.length + (G.wx && G.wx !== 'dry' ? ' · ' + WEATHER[G.wx].name : '');
+  var rk = rankList(G), pl = rk.indexOf(me.i) + 1, ld = G.cars[rk[0]], gap = ld.pos - me.pos, nm = function (c) { return c.human && !G.hot ? 'You' : c.name.split(' ')[0]; };
+  var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 ? ' by ' + lead2 + ' over ' + nm(G.cars[rk[1]]) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap ? nm(ld) + ' leads by ' + gap : 'level with ' + nm(ld));
+  var h = '<button type="button" class="score" id="scoreL" title="Race order: tap for why">' + esc(sc) + '<i>why?</i></button><ol class="phs" aria-label="Your turn phases">';
+  PHASES.forEach(function (p) { h += '<li class="' + (mine && RACE.ph === p[0] ? 'on' : '') + '">' + p[1] + '</li>'; });
+  h += '</ol>';
+  d.innerHTML = h; var sb = document.getElementById('scoreL'); if (sb) sb.onclick = scoreWhy;
+}
+/* the computer's best plan for this hand, as a yardstick for the round rating */
+function rateStart(c) {
+  try { var g2 = JSON.parse(JSON.stringify(G)), p = aiPlan(g2, g2.cars[c.i]), sp = 0, avg = avgSpeed(c); p.cards.forEach(function (x) { var u = upgId(x); sp += u ? UPG[u].sp : x === 'X' ? avg : +x; }); if (p.boost) sp += avg; RACE.best = { sp: Math.round(sp) }; } catch (e) { RACE.best = null; }
+  RACE.start = { pos: c.pos, heat: c.stats.heat, spins: c.stats.spins, ci: c.i };
+}
+function rateRound() {
+  var s = RACE.start; if (!s || !G || !G.cars[s.ci]) { RACE.start = null; return; } var c = G.cars[s.ci], d = c.pos - s.pos, ht = c.stats.heat - s.heat, sp = c.stats.spins > s.spins, b = RACE.best ? RACE.best.sp : d, k, t;
+  if (sp) { k = 'poor'; t = 'Poor: you spun out. Use a lower gear or smaller cards before a corner.'; }
+  else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' spaces for ' + ht + ' heat.'; }
+  else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' spaces. The best play went about ' + b + '.'; }
+  else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' spaces, ' + ht + ' heat burned.'; }
+  RACE.rate = t; RACE.rateK = k; RACE.start = null; RACE.rateShow = 1; tracker();
+}
+
+/* ---------- podium (result screen) ---------- */
+function podiumHtml(rank) {
+  var top = rank.slice(0, 3), order = [1, 0, 2], h = '<div class="pod3">';
+  order.forEach(function (k) { var ci = top[k]; if (ci == null) return; var c = G.cars[ci]; h += '<div class="ps p' + (k + 1) + '"><span class="pc" style="background:' + COLS[c.col].hex + '"></span><b>' + esc(c.human && !G.hot ? 'You' : c.name.split(' ')[0]) + '</b><div class="blk">' + (k + 1) + '</div></div>'; });
+  return h + '</div>';
+}
+
+/* ---------- championship: three tracks, points per place (house values), the same drivers every race ---------- */
+function champLoad() { try { return JSON.parse(lsGet('rr_champ') || 'null'); } catch (e) { return null; } }
+function champSave(ch) { lsSet('rr_champ', ch ? JSON.stringify(ch) : ''); }
+function champStart(fresh) {
+  var ch = fresh ? null : champLoad(); if (ch && champOver(ch)) ch = null;
+  var s = UI.set, o = { track: CHAMP_TRACKS[ch ? ch.race : 0], laps: s.laps, opp: s.opp, hum: 1, diff: s.diff, upg: false, wx: s.wx, sup: s.sup, champ: true };
+  if (ch) o.opp = ch.rows.length - 1;
+  startGame(o);
+  if (!ch) { ch = champNew(G.cars.map(function (c) { return c.name; })); ch.rows.forEach(function (r, i) { r.drv = G.cars[i].drv; }); champSave(ch); }
+  else { G.cars.forEach(function (c, i) { var r = ch.rows[i]; if (r) { c.name = r.name; c.drv = r.drv; } }); }
+  UI.champ = ch; banner('Championship race ' + (ch.race + 1) + ' of ' + ch.tracks.length + ': ' + TK[G.track].name, null, 'round'); tracker();
+}
+function champResult() {
+  var ch = UI.champ; champAward(ch, G.rank); champSave(ch); var t = champTable(ch), over = champOver(ch), me = G.cars.filter(function (c) { return c.human; })[0];
+  var rows = t.map(function (r, k) { var c = G.cars[r.i]; return '<tr class="' + (c && c.human ? 'you' : '') + '"><td>' + (k + 1) + '</td><td><i class="pc" style="background:' + COLS[c ? c.col : 0].hex + '"></i>' + esc(r.name) + '</td><td>' + r.res.join(' · ') + '</td><td><b>' + r.pts + '</b></td></tr>'; }).join('');
+  var champ = t[0], youWon = me && champ.i === me.i;
+  var head = over ? '<h2>' + (youWon ? 'You are the champion!' : esc(champ.name) + ' is the champion') + '</h2>' : '<h2>Championship: after race ' + ch.race + ' of ' + ch.tracks.length + '</h2>';
+  UI.lockModal = true; sfx(over && youWon ? 'win' : 'card');
+  modal(head + podiumHtml(G.rank) + '<p class="rl">Points per place: ' + CHAMP_PTS.join(', ') + '. Ties: more wins, then the better last race.</p><table class="champ"><thead><tr><th>#</th><th>Driver</th><th>Places</th><th>Pts</th></tr></thead><tbody>' + rows + '</tbody></table><div class="row" style="margin-top:10px">' +
+    (over ? '<button class="big" id="cNew">New championship</button>' : '<button class="big" id="cNext">Next race: ' + esc(TK[ch.tracks[ch.race]].name) + '</button>') + '<button class="ghostb" id="home">Title</button></div>');
+  $('#mx').hidden = true;
+  if (over) { champSave(null); $('#cNew').onclick = function () { UI.lockModal = false; champStart(true); }; } else $('#cNext').onclick = function () { UI.lockModal = false; champStart(false); };
+  $('#home').onclick = function () { UI.lockModal = false; UI.champ = null; showTitle(); };
+}
+
+/* ---------- Play mode: the "why" of the race order opens on tap only ---------- */
+function scoreWhy() {
+  var rk = rankList(G), N = T(G).N, rows = rk.map(function (ci, k) { var c = G.cars[ci]; return '<tr class="' + (c.human ? 'you' : '') + '"><td>' + (k + 1) + '</td><td><i class="pc" style="background:' + COLS[c.col].hex + '"></i>' + esc(c.human && !G.hot ? 'You' : c.name) + '</td><td>' + (c.fin ? 'finished ' + ord(c.fin) : 'lap ' + Math.min(G.laps, Math.floor(c.pos / N) + 1) + ', ' + (total(G) - c.pos) + ' to go') + '</td><td>heat ' + c.eng + '</td></tr>'; }).join('');
+  modal('<h2>Race order</h2><p>The car furthest round the track is ahead. Two cars on one space: the one that got there first is ahead. The race ends when every car has crossed the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '.</p><table class="champ"><tbody>' + rows + '</tbody></table>');
+}
+/* ---------- Play mode: one "Goal" card before turn 1 ---------- */
+function goalCard(then) {
+  UI.lockModal = true;
+  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Pick gear 1-4 and play that many cards; their total is how far you move.</li><li><b>Corners burn heat.</b> Each point over a corner\'s limit costs 1 engine heat. No heat left: you spin out.</li><li><b>Free spaces.</b> End next to a car to slipstream; the last car gets +1 (adrenaline).</li></ul>' +
+    (G.wx && G.wx !== 'dry' ? '<p class="wxl"><b>' + esc(WEATHER[G.wx].name) + ':</b> ' + esc(WEATHER[G.wx].txt) + '</p>' : '') + '<button class="big" id="goalB" style="width:100%">Start the race</button>');
+  $('#mx').hidden = true; $('#goalB').onclick = function () { UI.lockModal = false; closeModal(); then(); };
+}
+function setHints(on) {
+  UI.hints = !!on; lsSet('rr_hints', on ? '1' : '0');
+  var b = document.getElementById('hintT'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.firstChild.textContent = on ? 'Hints ✓' : 'Hints'; b.setAttribute('aria-label', 'Hints ' + (on ? 'on' : 'off')); b.classList.toggle('on', !!on); }
+  var bl = document.getElementById('bulbbtn'); if (bl) bl.hidden = !hintsOn();
+  if (G && G.phase === 'plan' && !UI.busy && !$('#game').hidden && G.cars[UI.seat] && !G.cars[UI.seat].plan) drawPlan(); else tracker();
+}
+
+</script>
+<script>
+/* (W395 addendum 4: now a COACHED game: 2 forced first steps, then free play with just-in-time coach bubbles, see the coach section below.)
+   Redline Rally tutorial = Prologue "The Sunline Seat": ONE real short game (30-space Practice Loop, 1 lap, you + Kit Marlow + Juno) played to the result screen with the real AI,
+   in 6 chapters (one round each). Hands, deck tops and the rivals' start spaces are stacked each round so every rule comes up once. Text: story.js (STORY.tut).
+   Chapter start states are absolute (space, gear, engine), so a chapter can be started on its own (Help > Guide chapters). Never saved except done/skipped in gxt-redline-rally. */
 var TUT_GAME = 'redline-rally';
 function tutOn() { return typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial'; }
 function firstTime() { return !lsGet('rr_seen') && !(typeof GXT !== 'undefined' && GXT.isDone(TUT_GAME)); }
 function tutBtn(cls, o) { return typeof GXT === 'undefined' ? '' : GXT.menuHTML(Object.assign({ game: TUT_GAME, first: firstTime(), cls: cls, launch: function () { tutStart(); } }, o || {})); }
-function stageTutorial() {   /* fixed hand 1 2 2 3 4 3 1; the rest of the deck stays valid so the engine invariants hold */
-  var c = G.cars[0], want = ['1', '2', '2', '3', '4', '3', '1'], rest = c.deck.concat(c.hand, c.disc);
-  want.forEach(function (w) { var k = rest.indexOf(w); if (k >= 0) rest.splice(k, 1); });
-  c.hand = want.slice(); c.deck = rest; c.disc = []; c.pos = 11; c.gear = 1; UI.gear = 1; UI.vis[0].p = 11; UI.focus = 0; snapCam(); UI.redraw();
+/* stack a car's cards: `want` = the hand (in order), `top` = next cards that will be flipped (first flipped first). Conserves every card (pool = deck + hand + discard). */
+function stackCards(c, want, top) {
+  var pool = c.deck.concat(c.hand, c.disc), take = function (w) { var k = pool.indexOf(w); if (k >= 0) pool.splice(k, 1); return k >= 0; };
+  var hand = want.filter(take), tp = (top || []).filter(take);
+  shuffle(G, pool); c.deck = pool.concat(tp.slice().reverse()); c.hand = hand; c.disc = [];
+  while (c.hand.length < HAND && c.deck.length) c.hand.push(c.deck.shift());
 }
-function tutSteps() {
-  var isCard = function (a, ids) { return a.what === 'card' && ids.indexOf(a.i) >= 0; };
+/* chapter start states: me = {pos, gear, eng (heat in the engine; the rest sits as heat cards in the discard)}, hand, top of deck, and where the rivals start */
+var TUT_CH = [
+  { round: 1, pos: 3, gear: 1, eng: 6, hand: ['1', '3', '2', '4', '1', '2', '3'], kit: 4, juno: 2 },
+  { round: 2, pos: 8, gear: 2, eng: 6, hand: ['4', '3', '2', '2', '1', '1', '3'], kit: 10, juno: 5 },
+  { round: 3, pos: 12, gear: 2, eng: 6, hand: ['3', '2', '1', '4', '1', '2', '3'], kit: 15, juno: 9 },
+  { round: 4, pos: 17, gear: 2, eng: 5, hand: ['H', 'X', '4', '3', '2', '1', '1'], top: ['3'], kit: 21, juno: 20 },
+  { round: 5, pos: 21, gear: 1, eng: 6, hand: ['2', '2', '1', '4', '3', '3', '4'], kit: 'slip', juno: -3 },
+  { round: 6, pos: 28, gear: 3, eng: 5, hand: ['2', '1', '4', '4', '3', '3', '1'], top: ['3'], kit: -8, juno: -10 }
+];
+function tutStageRound(r) {   /* round r's plan is about to be shown (tutorial only): stack the hand so the needed cases come up; the rivals sit near the player. Player choices stay free. */
+  var ch = TUT_CH[r - 1]; if (!ch || !G || G.cars[0].fin) return;
+  var c = G.cars[0], kit = G.cars[1], jn = G.cars[2];
+  var pool = c.deck.concat(c.hand, c.disc).filter(function (x) { return x !== 'H'; }), heatCards = ENGINE0 - ch.eng;
+  if (r === 1 || r === 4) { c.eng = ch.eng; c.deck = pool.concat(Array(heatCards).fill('H')); c.hand = []; c.disc = []; if (c.plan) c.plan = null; stackCards(c, ch.hand, ch.top); }
+  else { var hh = c.deck.concat(c.hand, c.disc).filter(function (x) { return x === 'H'; }).length; c.deck = pool.concat(Array(hh).fill('H')); c.hand = []; c.disc = []; c.plan = null; stackCards(c, ch.hand, ch.top); }
+  if (r === 1) { c.pos = ch.pos; c.gear = 1; }
+  UI.gear = c.gear; UI.sel = []; UI.touchedGear = 0; UI.boost = false;
+  var KO = [0, 2, 3, 4, 2, -8];
+  kit.pos = r === 1 ? 4 : Math.max(0, c.pos + KO[r - 1]); jn.pos = r === 1 ? 2 : Math.max(0, c.pos + (r === 4 ? 3 : r === 6 ? -10 : -3));
+  if (r === 4) { kit.pos = c.pos + 4; }
+  var KP = { 1: ['2', '2'], 2: ['3', '2'], 3: ['3', '2'], 4: ['2', '2'], 5: ['2', '2'], 6: ['2', '1'] };
+  [kit, jn].forEach(function (x, n) {
+    var cards = n === 0 ? KP[r] : ['2', '1']; x.gear = 2; x.plan = null; x.eng = ENGINE0 - x.deck.concat(x.hand, x.disc).filter(function (q) { return q === 'H'; }).length; stackCards(x, cards.concat(['3', '4', '3', '4', '1']));
+    var e2 = submitPlan(G, x.i, { gear: 2, idx: [0, 1], boost: false }); if (e2) console.warn('tut rival plan', e2);
+  });
+  G.cars.forEach(function (x, i) { UI.vis[i].p = x.pos; x.tie = i === 0 ? 2 : i === 1 ? 0 : 1; });
+  UI.focus = 0; snapCam(); UI.redraw();
+}
+function stageTutorial() { tutStageRound(1); }
+
+/* ============ the coach: just-in-time bubbles, one at a time, never blocking input, dismissable ============ */
+var COACH_RULES = ['goal', 'gear', 'cards', 'shift2', 'corner', 'burn', 'heatcards', 'stress', 'cooldown', 'rivals', 'adrenaline', 'slip', 'boost', 'finish'];
+var COACH_LATER = {
+  spin: 'Spin out: not enough heat for a corner means you stop behind it, lose ALL engine heat, take 1 stress card (2 from gear 3 or 4).',
+  pushback: 'Two cars fit on a space. If the space you aim for is full, you stop on the first free space behind.',
+  stall: 'Too few playable cards for your gear? You play them all, pay heat cards for the rest, do not move and drop to gear 1.',
+  swap: 'Swap cards (before you pick): throw away speed cards you do not want and draw back to 7, once per round.',
+  upgrades: 'Upgrades mode: draft 3 bonus cards before the race. They play like speed cards with a bonus.',
+  tie: 'Ties on the finish: the car that arrived first wins. The race goes on until every car has finished.',
+  sup: 'Starting upgrades: in a normal race your deck also holds a Brake card (speed 0), a Burst card (speed 5) and 1 extra heat card.',
+  weather: 'Weather (optional): rain lowers corner limits, a heatwave starts you hotter, a tailwind makes slipstream 3 spaces.',
+  champ: 'Championship: three tracks in a row, points for every place (9, 6, 4, 3, 2, 1).'
+};
+var COACH = { on: false, seen: {}, q: [], cur: null, timer: 0 };
+var COACH_TXT = {
+  goal: ['Coach Mara', 'Rookie, Kit Marlow wants your seat at Sunline. Win one lap and it stays yours.'],
+  gear: ['Coach Mara', 'Your gear is how many cards you play. Pick one, then tap that many cards.'],
+  cards: ['Coach Mara', 'The numbers on your cards add up to your speed. Speed is how many spaces you drive.'],
+  shift2: ['Coach Mara', 'Shifting two gears at once costs 1 heat. One gear up or down is free.'],
+  corner: ['Coach Mara', 'Corner ahead. Its sign is the speed limit. Faster than the limit burns engine heat.'],
+  burn: ['Coach Mara', 'You are over the limit: each point over burns 1 heat from your engine. Brake or pay?'],
+  heatcards: ['Coach Mara', 'Dark Heat cards are dead weight in your hand. Gear 1 or 2 cools them back into the engine.'],
+  stress: ['Coach Mara', 'Purple Stress card: when played, it flips a random speed card from your deck.'],
+  cooldown: ['Coach Mara', 'Cooled! Heat cards from your hand went back into the engine. Fuel restored.'],
+  rivals: ['Coach Mara', 'Now every rival drives in turn, leader first. Watch how Kit and Juno handle the corners.'],
+  adrenaline: ['Coach Mara', 'Adrenaline: the last car to move gets +1 space and +1 cool-down. Free help.'],
+  slip: ['Coach Mara', 'You are next to or right behind a car: slipstream gives 2 free spaces. Usually take it.'],
+  boost: ['Coach Mara', 'Boost: pay 1 heat, flip an extra speed card and add it. Use it when the line is near.'],
+  finish: ['Coach Mara', 'Over the line! Finishers are placed in the order they cross.']
+};
+function coachSay(id, text, force) {
+  if (!COACH.on || (COACH.seen[id] && !force)) return; COACH.seen[id] = (COACH.seen[id] || 0) + 1;
+  var t = text || COACH_TXT[id][1]; if (COACH.q.some(function (x) { return x.id === id; })) return;
+  COACH.q.push({ id: id, t: t }); if (!COACH.cur) coachNext();
+}
+function coachNext() {
+  clearTimeout(COACH.timer); var b = $('#coach'); COACH.cur = COACH.q.shift() || null;
+  if (!b) { b = document.createElement('div'); b.id = 'coach'; b.setAttribute('role', 'status'); b.setAttribute('data-help', ''); $('#cvw').appendChild(b); }
+  if (!COACH.cur) { b.className = ''; b.innerHTML = ''; return; }
+  b.className = 'on'; b.innerHTML = '<span class="pt">M</span><span class="tx"></span><button type="button" id="coachX" aria-label="Dismiss">Got it</button><button type="button" id="coachSkip" aria-label="Skip tutorial">Skip</button>';
+  b.querySelector('.tx').textContent = COACH.cur.t;
+  $('#coachX').onclick = coachNext; $('#coachSkip').onclick = function () { tutLeave(true); };
+  COACH.timer = setTimeout(coachNext, 9000 * (window.AIDELAY || 1));
+}
+function coachPlan(c, ci) {   /* called from drawPlan */
+  if (!COACH.on) return;
+  if (G.round === 1) { coachSay('goal'); coachSay('gear'); coachSay('cards'); }
+  if (Math.abs(UI.gear - c.gear) === 2) coachSay('shift2');
+  var nc = nextCorner(c.pos); if (nc && nc.d <= 8) coachSay('corner', 'Corner ahead in ' + nc.d + ' spaces, limit ' + nc.limit + '. Faster than that burns engine heat.');
+  if (ci && ci.burn > 0) coachSay('burn', 'Speed ' + ci.sp + ' is over the limit: it burns ' + ci.burn + ' of your ' + c.eng + ' heat. Brake or pay?');
+  if (c.hand.indexOf('H') >= 0) coachSay('heatcards');
+  if (c.hand.indexOf('X') >= 0) coachSay('stress');
+  if (UI.boost) coachSay('boost');
+  else if (G.round >= 5 && c.eng >= 3) coachSay('boost');
+}
+function coachEvent(e, you) {   /* called from playEvents */
+  if (!COACH.on) return;
+  if (!you && (e.t === 'play')) coachSay('rivals');
+  if (you && e.t === 'cool') coachSay('cooldown');
+  if (you && e.t === 'adr') coachSay('adrenaline');
+  if (you && e.t === 'boost') coachSay('boost');
+  if (e.t === 'slip' && you) coachSay('slip');
+  if (you && e.t === 'corner') { if (e.cost) coachSay('burn' + e.idx, 'Good lesson: ' + e.cost + ' heat burned over a limit of ' + e.limit + '. Brake earlier to save fuel.', 1); else coachSay('clean' + e.idx, 'Clean corner: you stayed under the limit of ' + e.limit + '. That is how you save fuel.', 1); }
+  if (you && e.t === 'spin') { COACH.seen.spin = 1; coachSay('spin', 'Spin out! No heat left for that corner: you lose all engine heat and take stress cards.', 1); }
+  if (you && e.t === 'stall') { COACH.seen.stall = 1; coachSay('stall', COACH_LATER.stall, 1); }
+  if (e.t === 'finish' && you) coachSay('finish');
+}
+function coachFinish() {   /* result screen of the tutorial: score rule by rule with the player's numbers, then "things you'll meet later" */
+  var me = G.cars[0], place = G.rank.indexOf(0) + 1, st = me.stats;
+  COACH.later = COACH_RULES.concat(Object.keys(COACH_LATER)).filter(function (k) { return !COACH.seen[k]; });
+  var rows = '<ol class="walk"><li><b>Finish:</b> you came ' + ord(place) + ' of ' + G.cars.length + '. Finishers rank by crossing order; the rest by distance. Ties go to whoever arrived first.</li><li><b>Heat burned:</b> ' + st.heat + ' in corners, shifts and boosts. Less heat spent means more left for the next push.</li><li><b>Spin-outs:</b> ' + st.spins + '. A spin-out loses all your heat.</li><li><b>Slipstreams:</b> ' + st.slips + ' (' + (st.slips ? 'free spaces' : 'none this time') + ').</li><li><b>Boosts:</b> ' + st.boosts + '.</li></ol>';
+  UI.lockModal = true;
+  modal('<div class="podium"><h2>' + (place === 1 ? 'You win the seat!' : 'Race over') + '</h2><p class="rl">' + (place === 1 ? 'Coach Mara: "That is how you beat Kit. The Sunline seat is yours."' : 'Coach Mara: "Not first, but you now know every trick. Again?"') + '</p></div><h3>Your score, rule by rule</h3>' + rows + '<div class="row"><button class="big" id="walkN">Next</button></div>');
+  $('#mx').hidden = true;
+  $('#walkN').onclick = function () {
+    var l = COACH.later.map(function (k) { return '<li data-rule="' + k + '">' + esc(COACH_LATER[k] || COACH_TXT[k][1]) + '</li>'; }).join('');
+    modal('<h2>Things you will meet later</h2>' + (l ? '<ul class="later">' + l + '</ul>' : '<p>You met every rule in this game.</p>') + '<div class="row"><button class="big" id="tq">Play a Quick game</button><button class="ghostb" id="ts">Story: chapter 1</button></div>');
+    $('#mx').hidden = true; COACH.laterShown = true;
+    var end = function (to) { UI.lockModal = false; tutLeave(false); if (to === 'quick') startGame(); else if (typeof GXC !== 'undefined') GXC.open(); };
+    $('#tq').onclick = function () { end('quick'); }; $('#ts').onclick = function () { end('story'); };
+  };
+}
+function tutLeave(skipped) {
+  COACH.on = false; clearTimeout(COACH.timer); var b = $('#coach'); if (b) b.remove(); UI.mode = ''; UI.lockModal = false; lsSet('rr_seen', '1');
+  try { if (GXT.running()) GXT.skip(); } catch (e) { }
+  try { GXT.markDone(TUT_GAME); } catch (e) { }
+  closeModal(); if (skipped) showTitle();
+}
+function tutSteps() {   /* only the very first action is forced (2 steps); the rest is free play with the coach */
+  var gearT = function () { return document.querySelector('.gb[data-g="2"]'); };
   return [
-    { id: 'goal', title: 'Win the race', say: 'First across the line wins. Each round pick a gear, play that many cards, and the total is your speed.', target: function () { return $('#cvw'); }, wait: null, side: 'bottom' },
-    { id: 'gear', title: 'Pick a gear', say: 'Gear 2 means you play two cards. Tap gear 2.', target: function () { return document.querySelector('.gb[data-g="2"]'); }, wait: { type: 'tap', match: function (a) { return a.what === 'gear' && a.g === 2; } }, wrong: 'Tap gear 2.', side: 'top' },
-    { id: 'push', title: 'Push hard', say: 'A corner is ahead with limit 5. Go fast: tap the 4 and the 3.', target: function () { return $('#hand'); }, wait: { type: 'tap', times: 2, match: function (a) { return isCard(a, [3, 4]); } }, wrong: 'Tap the 4 and the 3.', side: 'top' },
-    { id: 'burn', title: 'The cost', say: 'Over the limit, every point burns one heat from your engine. No heat left means a spin out.', target: function () { return $('#msg'); }, wait: null, side: 'top' },
-    { id: 'brake', title: 'Or brake', say: 'Safer: tap the two 2s instead. Speed 4 stays under the limit.', target: function () { return $('#hand'); }, wait: { type: 'tap', times: 2, match: function (a) { return isCard(a, [1, 2]); } }, wrong: 'Tap the two 2s.', side: 'top' },
-    { id: 'go', title: 'Go!', say: 'Speed 4 is safe, no heat burned. Tap Go!', target: function () { return $('#goB'); }, ready: function () { return UI.sel.length === 2 && UI.sel.indexOf(1) >= 0 && UI.sel.indexOf(2) >= 0 && !$('#goB').disabled; }, wait: { type: 'tap', match: function (a) { return a.what === 'go'; } }, side: 'top' },
-    { id: 'heat', title: 'Heat is your fuel', say: 'Brake and keep heat, or push and burn it. Gears 1 and 2 cool heat back. That is the game.', target: function () { return $('#tray'); }, ready: function () { return G && G.round >= 2 && !UI.busy && !!$('#tray'); }, wait: null, side: 'top' }
+    { id: 'gear', title: 'Coach Mara', say: 'Kit Marlow wants your seat. Win one lap. Your gear is how many cards you play: take gear 2.', target: gearT, ready: function () { return G && G.phase === 'plan' && !UI.busy && !!document.querySelector('.gb[data-g="2"]'); }, wait: { type: 'tap', match: function (a) { return a.what === 'gear' && a.g === 2; } }, wrong: 'Take gear 2.', side: 'top' },
+    { id: 'cards', title: 'Coach Mara', say: 'Tap any two cards. Their numbers add up to your speed.', target: function () { return $('#hand'); }, wait: { type: 'tap', times: 2, match: function (a) { return a.what === 'card'; } }, wrong: 'Tap two cards.', side: 'top', onDone: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } COACH.on = true; coachPlan(you(), null); drawPlan(); }, 30); } }
   ];
 }
 function tutStart(o) {
-  closeModal(); UI.cmpDef = null; var after = o && o.then;
+  closeModal(); UI.cmpDef = null; o = o || {}; COACH.seen = {}; COACH.q = []; COACH.cur = null; COACH.later = null; COACH.laterShown = false;
   GXT.start({
-    game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'sunline', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },
-    steps: tutSteps(), story: false, endTitle: 'You can race', endText: 'Brake to keep heat, push when it pays. See you on the grid.',
-    onDone: function () { UI.mode = ''; lsSet('rr_seen', '1'); showTitle(); if (after) after(); }, onExit: function () { UI.mode = ''; lsSet('rr_seen', '1'); showTitle(); }
+    game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'practice', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },
+    steps: tutSteps(), story: false, onDone: function () { }, onExit: function () { tutLeave(true); }
   });
 }
+function chapterMenu() { tutStart(); }
 /* help drawer: rules cards through the shared help kit (lightbulb in the top bar: suggested move, "How does this work?" opens the cards) */
 function helpBoot() {
   if (typeof GXH === 'undefined') return;
   var R = [
+    { title: 'How a turn works', text: 'Pick a gear (cards to play). Tap that many cards: they add up to your speed. Press Go. Mind the corner limits. Then each rival drives in turn.' },
     { title: 'Gear and cards', text: 'Your gear is how many cards you play. Shift one gear free, or two gears for 1 heat. The cards add up to your speed.' },
     { title: 'Corners', text: 'Each corner has a speed limit. Every point you go over costs 1 heat from your engine. No heat left means a spin-out.' },
     { title: 'Heat', text: 'Heat you pay goes to your discard pile and comes back as dead cards in your hand. Gears 1 and 2 send heat back to the engine.' },
