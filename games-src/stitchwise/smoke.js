@@ -37,7 +37,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
   }
   await pg.goto(base); await pg.waitForTimeout(500);
   if (!TUT && !STORY && !STORY2) {
-    await tapSel('[data-a=quick]'); await pg.waitForTimeout(150); await pg.click('text=Normal computer'); await pg.waitForTimeout(300); const gk = await pg.$('#goalcard [data-a=goalok]'); if (gk) { await tap(gk); await pg.waitForTimeout(200); }
+    await tapSel('[data-a=start]'); await pg.waitForTimeout(150); await pg.click('text=Normal computer'); await pg.waitForTimeout(300); const gk = await pg.$('#goalcard [data-a=goalok]'); if (gk) { await tap(gk); await pg.waitForTimeout(200); }
     ok(await pg.evaluate(() => !!G && UI.started), 'game started from the title');
     const kinds = []; let n = 0;
     while (n < (FULL ? 200 : 3)) { const k = await turn(); if (k === 'over') break; kinds.push(k); n++; const e = await pg.evaluate(() => swCheck(G)); if (e) { ok(false, 'invariant ' + e); break; } if (n === 2) await pg.screenshot({ path: path.join(OUT, tag + '-mid.png') }); }
@@ -50,7 +50,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
     await pg.evaluate(() => { GX.show('rulesd'); }); await pg.waitForTimeout(250); ok(await pg.evaluate(() => document.querySelector('#rulesd').classList.contains('on')), 'rules drawer opens'); await pg.keyboard.press('Escape');
   }
   if (TUT) {   // the tutorial is a coached first game (playable/play.js tut plays it to the end)
-    await tapSel('#start [data-a=start]'); await pg.waitForTimeout(600);
+    await tapSel('#start [data-a=learn]'); await pg.waitForTimeout(600);
     ok(await pg.evaluate(() => !!G && !!UI.coach && !G.over), 'tutorial starts a coached game');
     for (let i = 0; i < 3; i++) { const k = await turn(); if (k === 'over') break; }
     ok(await pg.evaluate(() => UI.coach.shown.length >= 3), 'Aunt Wren explained at least 3 things in 3 turns');

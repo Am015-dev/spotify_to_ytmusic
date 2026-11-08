@@ -47,7 +47,10 @@
   var TONE = { w: '#a8431f', s: '#2f7a46', a: '#2f6fa8', m: '#a8861c', n: '#777', z: '#555' };
   // ---------- helpers
   function G() { return E.G(); }
-  function toast(t, ms) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var d = h('div', 'toast', t); if (ms) d.style.animationDuration = ms + 'ms'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, ms || 1400); }
+  // owner brief (8 Nov): a message stays at least 4 s + 1 s per 10 words, one at a time, and a tap closes it
+  function readMs(t, ms) { var w = String(t || '').split(/\s+/).filter(Boolean).length; return Math.max(ms || 0, 4000 + 1000 * Math.ceil(w / 10)); }
+  UI.readMs = readMs;
+  function toast(t, ms) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animationDuration = dur + 'ms'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
@@ -387,7 +390,7 @@
       var H = D.H[hh.k], p = h('div', 'heropan' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : ''));
       p.setAttribute('data-w', 'h' + i);
       p.appendChild(A('hero-' + hh.k, H.name.split(' ')[0], { ph: TONE[hh.k] }));
-      var inf = h('div', 'inf'); var nmr = h('div', 'nm', H.name.split(' ')[0] + (hh.blk ? '  🛡 ' + hh.blk : '') + (hh.stance !== 'n' ? '  ' + (hh.stance === 'w' ? 'Wrath' : 'Calm') : '')); if (hh.stance !== 'n') nmr.appendChild(A('stance-' + hh.stance, '', { noph: 1, cls: 'stanceart' })); inf.appendChild(nmr);
+      var inf = h('div', 'inf'); var nmr = h('div', 'nm', H.name.split(' ')[0] + (hh.stance !== 'n' ? '  ' + (hh.stance === 'w' ? 'Wrath' : 'Calm') : '')); if (hh.blk) nmr.appendChild(h('span', 'w4blk', '🛡 ' + hh.blk + ' Block')); if (hh.stance !== 'n') nmr.appendChild(A('stance-' + hh.stance, '', { noph: 1, cls: 'stanceart' })); inf.appendChild(nmr);
       inf.appendChild(h('div', 'bar', null, [h('i'), h('b', '', hh.hp + '/' + hh.mhp)])); inf.querySelector('.bar i').style.width = (100 * hh.hp / hh.mhp) + '%';
       inf.appendChild(stChips(hh));
       var inc = incoming(g, i); if (inc > 0 && !hh.dead) { var net = Math.max(0, inc - hh.blk); inf.appendChild(h('div', 'w4inc' + (net > 0 ? ' cut' : ''), net > 0 ? 'Incoming ' + net : 'Incoming ' + inc + ', blocked')); }
@@ -462,7 +465,7 @@
     });
   }
   function bossOf(b) { var x = b && b.en.filter(function (e) { return D.ENEMIES[e.id] && D.ENEMIES[e.id].boss; })[0]; return x ? x.id : null; }
-  function beginBattleUI() { UI.sel = -1; render(); var g = G(), bid = g && g.b && g.b.kind === 'b' && bossOf(g.b); if (bid && UI.bossIntro) UI.bossIntro(bid, function () { banner('Your turn', 'you'); }); else banner('Your turn', 'you'); }
+  function beginBattleUI() { UI.sel = -1; render(); var g = G(), bid = g && g.b && g.b.kind === 'b' && bossOf(g.b); if (bid && UI.bossIntro) UI.bossIntro(bid, function () { }); }   // no 'Your turn' flash: the dock line says whose turn it is and stays
   // W420 boss intro: video (when media/boss-<id>.mp4 is listed in window.MEDIA_VIDEO) or a zooming still, name + act line, Skip; ends on video end or after 6 s
   UI.bossIntro = function (bossId, done) {
     done = done || function () { };
@@ -535,8 +538,8 @@
     if (!window.ANIM) { E.settle(); render(); return; }
     UI.busy = true; UI.fast = false; UI.cap = ''; UI.actor = -1;
     var spd = function () { UI.fast = true; }; document.addEventListener('pointerdown', spd, true);
-    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); try { var gq = G(), hq = gq.hs[0]; if (UI.coachReact && gq.scr === 'battle' && UI.hp0 != null) { var lost = UI.hp0 - hq.hp; if (lost >= 8 && UI.bk0 === 0) UI.coachReact('poor', 'hurt'); else if (lost === 0 && UI.bk0 > 0) UI.coachReact('good', 'blocked'); } } catch (e) { } var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') banner('Your turn', 'you'); };
-    banner('Enemy turn', 'foe'); UI.cap = 'Enemy turn: watch what each enemy does.'; render();
+    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); try { var gq = G(), hq = gq.hs[0]; if (UI.coachReact && gq.scr === 'battle' && UI.hp0 != null) { var lost = UI.hp0 - hq.hp; if (lost >= 8 && UI.bk0 === 0) UI.coachReact('poor', 'hurt'); else if (lost === 0 && UI.bk0 > 0) UI.coachReact('good', 'blocked'); } } catch (e) { } var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') 0; };
+    UI.cap = 'Enemy turn: watch what each enemy does.'; render();
     (function loop() {
       var g = G(); if (!g || g.scr !== 'battle' || !g.b || g.b.ph !== 'e') return done();
       var ei = g.b.ei, e = g.b.en[ei];

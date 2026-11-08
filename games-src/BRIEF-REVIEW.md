@@ -22,7 +22,7 @@ A game goes live only if you pass it.
 8 Owner art used, one style (`node games-src/scripts/asset-usage.js <slug>`: 95%+ owner pictures, all glb)
 9 impeccable critique score
 10 design-review score
-Rules: `node games-src/<dir>/logic-test.js` must pass.
+Rules: `node games-src/<dir>/logic-test.js` must pass. Feel: `node games-src/scripts/feel-audit.js <slug> --secs 120` (a)-(e) all 0, and Learn finishes by touch without Skip.
 
 ## Verdict
 PASS only if every score is 7 or more and the rules pass. Send the orchestrator (session_01MS7iGyBWDerEAyagJ6ir4U) one

@@ -9,6 +9,9 @@ function drawGhost() { try { markLanding(); } catch (e) { }
   var cs = UI.cs, g = h('div#ghost.' + (ok ? 'ok' : 'bad'), { style: 'left:' + UI.gx * cs + 'px;top:' + UI.gy * cs + 'px;grid-template-columns:repeat(' + b[0] + ',' + cs + 'px);grid-template-rows:repeat(' + b[1] + ',' + cs + 'px);--pc:' + pcol(p.id), 'aria-hidden': 'true' });
   for (var y = 0; y < b[1]; y++) for (var x = 0; x < b[0]; x++) g.appendChild(h('div.gc' + (set[x + ',' + y] ? '' : '.hid')));
   q.appendChild(g); var sew = $('[data-a=sew]'); if (sew) sew.disabled = !ok;
+  // W470: legal squares glow (every square some legal spot of this turn of the patch would cover)
+  var bd = G.board[viewSeat()], lg = {}; for (var yy = 0; yy + b[1] <= 9; yy++) for (var xx = 0; xx + b[0] <= 9; xx++) if (swFits(bd, c, xx, yy)) c.forEach(function (q2) { lg[(yy + q2[1]) * 9 + xx + q2[0]] = 1; });
+  Array.prototype.forEach.call(q.querySelectorAll('.qc'), function (e, i) { e.classList.toggle('lg', !!lg[i]); });
 }
 function bestPlacement(pid, seat) { return aiBestPlace(G.board[seat], PATCHES[pid]); }
 function selectOffer(k) { if (UI.coach) setTimeout(function () { if (UI.sel >= 0) coachSay('pick', null, true); }, 0);
@@ -43,7 +46,7 @@ function bindQuilt() {
     if (UI.sel < 0 || UI.busy) { var c2 = cellAt(ev), pid = c2 && G.board[viewSeat()][c2[1] * 9 + c2[0]]; if (pid >= 0 && pid < 99) showPatch(pid); return; }
     DR.on = true; DR.moved = false; DR.touch = ev.pointerType === 'touch'; try { q.setPointerCapture(ev.pointerId); } catch (e) { } dragTo(ev); ev.preventDefault(); });
   bd.addEventListener('pointermove', function (ev) { if (!DR.on) return; DR.moved = true; dragTo(ev); });
-  var up = function (ev) { if (!DR.on) return; DR.on = false; var ok = ghostOk(); if (!ok) { snapNear(false); drawGhost(); } tutAct({ what: 'drop', valid: ghostOk() }); renderDockLight(); sfx('tick'); };
+  var up = function (ev) { if (!DR.on) return; DR.on = false; var ok = ghostOk(); if (!ok) { snapNear(false); drawGhost(); } tutAct({ what: 'drop', valid: ghostOk() }); renderDockLight(); sfx('tick'); try { if (ghostOk() && navigator.vibrate) navigator.vibrate(12); } catch (e) { } };
   bd.addEventListener('pointerup', up); bd.addEventListener('pointercancel', up);
 }
 function dragTo(ev) { var c = cellAt(ev), cc = curCells(); if (!c || !cc) return; var b = bbox(cc); UI.gx = c[0] - Math.floor(b[0] / 2); UI.gy = c[1] - Math.floor(b[1] / 2) - (DR.touch ? 2 : 0); clampG(); var g = $('#ghost'); if (g) { var cs = UI.cs; g.style.left = UI.gx * cs + 'px'; g.style.top = UI.gy * cs + 'px'; var ok = ghostOk(); g.classList.toggle('ok', ok); g.classList.toggle('bad', !ok); } renderDockLight(); }
@@ -58,7 +61,7 @@ function act(m) {
   var evs = G.ev.slice(); evs.forEach(function (e) { if (e.k === 'place') e.cells.forEach(function (c) { UI.newCells[e.s + ':' + (c[1] * 9 + c[0])] = 1; }); });
   UI.busy++; saveGame(); render(); playEvents(evs, before, function () { var fin = function () { UI.peek = -1; UI.cap = ''; UI.busy--; afterMove(); }; if (UI.peek >= 0 && amt(1)) later(sp(800), fin); else fin(); });
 }
-function floatText(txt, el, color, wide) { var r = el ? el.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 }; var f = h('div.flt' + (wide ? '.r' : ''), txt); f.style.left = (wide ? Math.max(120, Math.min(innerWidth - 120, r.left + r.width / 2)) : r.left + r.width / 2 - 18) + 'px'; f.style.top = (r.top) + 'px'; if (color) f.style.color = color; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1200); }
+function floatText(txt, el, color, wide) { var mm = String(txt).match(/^[+\u2212-]?\d+(?: pts| buttons?)?/); if (!mm) return; txt = mm[0]; /* W470: only a short number flies */ var r = el ? el.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 }; var f = h('div.flt' + (wide ? '.r' : ''), txt); f.style.left = (wide ? Math.max(120, Math.min(innerWidth - 120, r.left + r.width / 2)) : r.left + r.width / 2 - 18) + 'px'; f.style.top = (r.top) + 'px'; if (color) f.style.color = color; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1800); }
 function playEvents(evs, before, done) {
   var t = 0, step = amt(380), spots = 0; if (!step) { evs.forEach(function (e) { if (e.k === 'bonus') toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!'); }); return done(); }
   evs.forEach(function (e) {
@@ -79,7 +82,7 @@ function incomeMoment(seat, spot, inc, i) { // coins fly from the button spot to
 function fxImg(stem, x, y, size) { var i = artImg(stem, 'fx'); if (!i) return; i.style.cssText = 'position:fixed;z-index:60;pointer-events:none;width:' + size + 'px;height:' + size + 'px;left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;animation:flt 1s ease-out forwards'; document.body.appendChild(i); setTimeout(function () { i.remove(); }, 1100); }
 function afterMove() { if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
 function sp(ms) { return amt(UI.fast ? ms * .3 : ms); }
-function banner(txt, sub, opp) { var b = $('#turnban'); if (!b) { b = h('div#turnban'); document.body.appendChild(b); } var ms = amt(sub ? 2600 : 1100); if (!ms) return; b.className = opp ? 'opp' : ''; b.textContent = txt; if (sub) b.appendChild(h('small', sub)); void b.offsetWidth; b.classList.add('on'); clearTimeout(banner.t); banner.t = setTimeout(function () { b.classList.remove('on'); }, UI.fast ? 400 : ms); }
+function banner(txt, sub, opp) { var b = $('#turnban'); if (!b) { b = h('div#turnban'); document.body.appendChild(b); } return; var ms = amt(4000); if (!ms) return; b.className = opp ? 'opp' : ''; b.textContent = txt; if (sub) b.appendChild(h('small', sub)); void b.offsetWidth; b.classList.add('on'); clearTimeout(banner.t); banner.t = setTimeout(function () { b.classList.remove('on'); }, ms); }
 function turnCheck() { // banner + plain line when the turn changes (or stays: the player further back plays again)
   if (!G || G.over || G.pend) return; var w = swWho(G), hum = isHuman(w), hot = UI.mode === 'hot', nm = hot ? nameOf(w) + '\u2019s turn' : hum ? 'Your turn' : nameOf(w) + '\u2019s turn', again = w === UI.lastWho, prev = UI.again;
   if (hum) UI.fast = false;
@@ -95,13 +98,13 @@ function schedule() {
   if (UI.goal) return; UI.tm.ai = later(Math.max(120, AIDELAY, sp(1100)), aiStep);
 }
 function aiStep() { // the rival's turn, one visible step at a time (caption, flash, then the move on their quilt)
-  if (!G || G.over || UI.busy) return; var s = swWho(G); if (isHuman(s)) return; var m = aiMove(G, UI.tutorial ? 'simple' : lvlOf(s), rngUI), nm = nameOf(s);
+  if (!G || G.over || UI.busy || UI.goal) return; var s = swWho(G); if (isHuman(s)) return; var m = aiMove(G, UI.tutorial ? 'simple' : lvlOf(s), rngUI), nm = nameOf(s);
   if (!amt(1)) return act(m);
   var pl = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
   if (m.t === 'buy') { var p = PATCHES[swOffer(G)[m.k]]; UI.cap = nm + ' buys ' + p.name + ' for ' + pl(p.cost, 'button'); renderDock(); var o = $$('#offers .offer')[m.k]; if (o) o.classList.add('flash'); sfx('pick'); UI.busy++;
-    later(sp(1000), function () { UI.peek = s; UI.cap = nm + ' sews it on and moves ' + pl(p.time, 'space'); UI.busy--; act(m); }); }
-  else if (m.t === 'adv') { var st = swAdvSteps(G, s); UI.cap = nm + ' advances ' + pl(st, 'space') + ' and takes ' + pl(st, 'button'); renderDock(); UI.busy++; later(sp(900), function () { UI.busy--; act(m); }); }
-  else { UI.peek = s; UI.cap = nm + ' sews a free 1\u00D71 patch'; render(); UI.busy++; later(sp(800), function () { UI.busy--; act(m); }); }
+    later(sp(1900), function () { UI.peek = s; UI.cap = nm + ' sews it on and moves ' + pl(p.time, 'space'); UI.busy--; act(m); }); }
+  else if (m.t === 'adv') { var st = swAdvSteps(G, s); UI.cap = nm + ' advances ' + pl(st, 'space') + ' and takes ' + pl(st, 'button'); renderDock(); UI.busy++; later(sp(1700), function () { UI.busy--; act(m); }); }
+  else { UI.peek = s; UI.cap = nm + ' sews a free 1\u00D71 patch'; render(); UI.busy++; later(sp(1500), function () { UI.busy--; act(m); }); }
 }
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
 // ---------- start / finish

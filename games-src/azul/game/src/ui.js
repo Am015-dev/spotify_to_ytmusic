@@ -1,7 +1,7 @@
 // ---------- UI: the table fills the screen; the dock says what to do now (and coaches); everything else is a popup ----------
 const $=s=>document.querySelector(s);const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 UI.sel=null;UI.tgt=null;UI.adv=null;UI.recap=[];UI.fxSeen=0;UI.hover=null;UI.lastHuman=null;UI.hl={};UI.story=false;
-try{UI.coach=localStorage.getItem('sgz_coach')!=='0'}catch(e){UI.coach=true}
+try{UI.coach=localStorage.getItem('sgz_coach')==='1'}catch(e){UI.coach=false}  // W466: play mode is clean; hints only when turned on
 const CHAPTERS=['The king’s first commission: the north wall','Morning light on the fountain court','The king inspects the east wall','Dust and glaze in the south arcade','The west wall catches the sunset','The whole court gathers to watch','Lanterns over the throne-room gallery','One last wall before the feast'];
 const chapter=r=>`Round ${r}: ${CHAPTERS[Math.min(r,CHAPTERS.length)-1]}`;
 function refresh(){if(G&&!NET.on&&!UI.tut){try{if(!G.over&&G.pl.some(p=>p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
@@ -121,7 +121,7 @@ function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='star
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   const lvAll=o.lv[1]||'normal';
   const seats=Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('');
-  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Draft glazed tiles and set them into the palace mosaic.</p>
+  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, tile your wall. Most stars wins.</p>
    <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>
    ${saved&&!NET.on?`<div class="acts"><button class="btn" data-ui="continue">Continue saved game</button></div>`:''}
    <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>
@@ -138,9 +138,8 @@ function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,4
   <rect width="600" height="330" fill="url(#sky)"/><circle cx="470" cy="70" r="40" fill="#fff1b8"/><circle cx="470" cy="70" r="28" fill="#ffd66b"/><rect x="0" y="120" width="600" height="190" fill="#e9c99a"/><rect x="0" y="120" width="600" height="14" fill="#c98e5a"/>
   ${tiles.join('')}${arch(40)}${arch(245)}${arch(450)}<rect x="0" y="300" width="600" height="30" fill="#c9794a"/><ellipse cx="300" cy="306" rx="80" ry="12" fill="#2f6f8a"/><path d="M300 300q-8-40 0-60q8 20 0 60" fill="#9fd3e6" opacity=".8"/>
   <rect x="190" y="248" width="16" height="52" fill="#7a4a2a"/><circle cx="198" cy="238" r="12" fill="#e0674a"/><rect x="204" y="262" width="30" height="8" rx="2" fill="#1d4aa3"/></svg>`}
-function storyHtml(){const names=G?G.pl.filter(p=>p.human).map(p=>p.nm):[];return `<div class="mbox story">${storyPic()}<p class="q">The Sun King has come home to his summer palace, and its courtyard walls stand bare.</p>
-  <p>He has summoned the finest glaziers${names.length?`, ${esc(names.join(' and '))} among them,`:''} to tile its walls.</p>
-  <ul class="win"><li><b>Most ★ wins.</b> The game ends after a round in which someone completes a mosaic row.</li><li>Each tile you set scores 1 for every tile in the lines it joins.</li><li>At the end: full row <b>+2</b>, full column <b>+7</b>, all 5 tiles of one glaze <b>+10</b>.</li><li>Broken tiles cost points.</li></ul>
+function storyHtml(){return `<div class="mbox story">${storyPic()}<p class="q"><b>Win with the most ★ when a wall row is full.</b></p>
+  <ul class="win"><li>Take every tile of one colour from a kiln.</li><li>Fill a row: one tile moves to your wall and scores.</li><li>Touching tiles score more. Extra tiles cost points.</li></ul>
   <div class="acts"><button class="btn go" data-ui="story-ok">Enter the courtyard ▶</button></div></div>`}
 // ---------- input ----------
 function on3DPick(h){const p=me();if(!p||!G||G.over)return;if(!h&&!PHN.on)return;
@@ -161,7 +160,7 @@ function camFocus(){if(!V3.on||!V3.L||PHN.on)return;const p=me();const z=p&&(UI.
 function go(m){const s=sideToAct();if(PHN.on)PHN.src=null;if(NET.on&&(s<0||s!==NET.mySeat)&&P(s)&&P(s).human)return;
   if(isClient()){if(!me())return;if(NET.pend&&NET.pend.k===G.logN&&Date.now()-NET.pend.t<2500)return;NET.pend={k:G.logN,t:Date.now()};UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;netSend(Object.assign({},m));sfx('place');upd();return}
   const keep=[UI.sel,UI.tgt,UI.adv];UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;const r=performMove(m,s);if(!r.success){[UI.sel,UI.tgt,UI.adv]=keep;toast('That move isn’t allowed now.');console.error(r.error);return}sfx('place')}
-function toast(t){if(!t)return;const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3000)}
+function toast(t){if(!t)return;const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,4400+Math.ceil(t.split(/\s+/).length/10)*1000)}  // W466: time to read
 // the advisor: the move the normal computer would make, with a reason in plain words
 function advise(){const p=me();if(!p)return;if(isClient()){if(!UI.advWait){UI.advWait=true;netSend({act:'advise'})}return}const a=adviceFor(p.i);if(a)showAdvice(a)}
 function showAdvice(a){const m=a.m;if(m.act==='take'){UI.sel={src:m.src,c:m.c,j:m.j};UI.tgt=m.line}UI.adv={m,why:esc(a.why)};upd()}
