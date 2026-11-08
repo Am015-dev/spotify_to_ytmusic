@@ -210,9 +210,11 @@
         if (p.know['wkSil']) { p.silver++; ev.push({ e: 'silver', p: s, n: 1 }); }
         break;
       case 'ship':
-        G.pend.pop(); var got = G.goodsAt[m.v].splice(0), lost = 0;
-        got.forEach(function (g) { if (!addGoods(p, g)) lost++; });
-        ev.push({ e: 'goods', p: s, from: m.v, goods: got, lost: lost });
+        /* a goods tile that does not fit (a 4th kind) stays on the stall, as in the published rules */
+        G.pend.pop(); var all = G.goodsAt[m.v].splice(0), got = [], left = [];
+        all.forEach(function (g) { if (addGoods(p, g)) got.push(g); else left.push(g); });
+        G.goodsAt[m.v] = left;
+        ev.push({ e: 'goods', p: s, from: m.v, goods: got, lost: 0, left: left.length });
         break;
       case 'skip': break;
       case 'end': endTurn(G); ev.push({ e: 'end', p: s }); break;

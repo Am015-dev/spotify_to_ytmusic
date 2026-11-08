@@ -23,7 +23,7 @@
 - Sale points: (players + 1) per tile.
 - Estate layout: our own map in the standard 37-space hexagon (keep 3, mine 3, lore 6, buildings 11, pasture 8, water 6).
 - Lore names and effects are our own set of 26 (16 rule-benders, 10 end-game scrolls).
-- A fourth goods kind arriving on a full goods shelf is lost.
+- A fourth goods kind that does not fit stays on the stall it came from (published rule; fixed in W437).
 
 ## Cross-check against the published rulebook (7 Nov 2026)
 Checked against a rules summary of the official rulebook (rulespal.com rulebook page, officialgamerules.org) and fixed:
