@@ -1,24 +1,14 @@
 {
  "slug": "doorkick-dungeon",
- "when": "2026-11-08T07:33Z",
- "secs": 60,
- "totalSecs": 241,
+ "when": "2026-11-08T08:03Z",
+ "secs": 45,
+ "totalSecs": 181,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 1,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Play your race Tap your Elf, then tap your hero. Races give powers.",
-     "words": 13,
-     "shownMs": 685,
-     "neededMs": 5300,
-     "cls": "gxh-bub gxt-bub gxt-nobtn on gxh-a-top"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
    "status": "PASS",
@@ -46,20 +36,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 60,
-   "turns": 44,
+   "secs": 45,
+   "turns": 32,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 23
+   "messagesSeen": 17
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 60,
-   "turns": 136,
-   "clicks": 223,
+   "secs": 45,
+   "turns": 114,
+   "clicks": 193,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -68,20 +58,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 60,
-   "turns": 41,
+   "secs": 45,
+   "turns": 31,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 22
+   "messagesSeen": 16
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 60,
-   "turns": 207,
-   "clicks": 247,
+   "secs": 45,
+   "turns": 167,
+   "clicks": 185,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,

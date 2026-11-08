@@ -135,6 +135,7 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Crown City Smash https://am015-dev.github.io/spotify_to_ytmusic/crown-city-smash/ (R6 PASS 06:54, live 07:05, feel-audit live all pass)
 - Sunglaze https://am015-dev.github.io/spotify_to_ytmusic/sunglaze/ (R9 PASS 07:23, live 07:29, feel-audit live all pass)
 - Thornbound https://am015-dev.github.io/spotify_to_ytmusic/thornbound/ (R4 PASS 07:36, live 07:48, feel-audit live all pass)
+- Doorkick Dungeon https://am015-dev.github.io/spotify_to_ytmusic/doorkick-dungeon/ (R7 PASS 07:47, live 08:00, feel-audit live all pass)
 
 ## 05:03 state
 - Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).
