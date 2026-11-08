@@ -13,8 +13,8 @@ function analyse(K,seat,m){const S=K.ships[m.s],tile=K.hands[seat][m.t];const si
 function outcomeHTML(K,seat,m,A){const S=K.ships[m.s],who=m.s===seat?'Your junk':nm(m.s)+"'s junk";const o=[];
   if(A.st==='edge')o.push(`<span class="warn-l">This tile sends ${who.toLowerCase()==='your junk'?'you':nm(m.s)} off the edge: ${who} would sink.</span>`);
   else if(A.st==='mon')o.push(`<span class="warn-l">This current runs into ${levName(A.mon)}: ${who} would sink.</span>`);
-  else if(A.st==='gate')o.push(`${who} sails into the Rift Gate and is thrown to a rolled square.`);
-  else o.push(`${who} sails ${A.n} current${A.n>1?'s':''} and stops at column ${A.end[0]+1}, row ${A.end[1]+1} (the flag on the board).`);
+  else if(A.st==='gate')o.push(`${who} enters the Rift Gate. It throws the junk far.`);
+  else o.push(`${who} sails ${A.n} current${A.n>1?'s':''} and stops at the flag.`);
   if(A.coll)o.push(`<span class="warn-l">Two junks would end on one wake: both sink.</span>`);
   for(const x of A.others)o.push(x.coll?`<span class="warn-l">${nm(x.i)} also sails here and would crash.</span>`:x.st==='edge'||x.st==='mon'?`${nm(x.i)} also sails and would sink.`:`${nm(x.i)} also sails on.`);
   return o.join('<br>')}
@@ -31,17 +31,18 @@ function viewSeat(){if(!G)return -1;if(NET.on)return NET.mySeat;const h=humans()
 function mustPass(d){if(NET.on)return !!G.seats[d].human&&d!==NET.mySeat;return hotSeat()&&G.seats[d].human&&UI.holder!==d}
 function handStrip(vs,interactive,sel,rot){if(vs<0||!G.ships[vs].alive&&!G.hands[vs].length)return '';const hd=G.hands[vs];if(!hd.length)return '';
   return `<div class="hand" data-hand="${vs}">${hd.map((c,t)=>cardBtn(c,t,{up:true,owner:vs,sel:interactive&&sel&&sel.t===t,rot})).join('')}</div>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-startlist]');if(b){e.stopPropagation();UI.startList=!UI.startList;render()}},true);
 function startHTML(d){const info=startInfo(d),K=knowledge(d),adv=startAdvice(K,d,info);const by={};for(const o of info)(by[o.edge+o.idx]=by[o.edge+o.idx]||[]).push(o);
   let g='';for(const ed of EDGES){const hor=ed==='top'||ed==='bottom';g+=`<span>${ed[0].toUpperCase()+ed.slice(1)}</span>`;for(let i=1;i<=6;i++){const l=by[ed+i]||[];
     g+=`<span style="display:flex;gap:2px">${[0,1].map(k=>{const o=l[k],lab=i+(hor?'LR':'UD')[k];return o?`<button class="btn small" style="min-width:0;flex:1" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}" aria-label="${ed} ${i}, ${o.sideWord} mark">${lab}</button>`:`<button class="btn small" style="min-width:0;flex:1" disabled>${lab}</button>`}).join('')}</span>`}}
   const you=d===viewSeat()||humans().length===1;
   return `<div class="prompt">
-  <details><summary class="tiny">All marks as a list</summary><div class="startpick" style="grid-template-columns:auto repeat(6,1fr)">${g}</div></details></div>`}
+  ${adv&&you?`<button class="btn pri" data-a="startmark" data-x="${adv.o.m.x}" data-y="${adv.o.m.y}" data-e="${adv.o.m.e}">Safe start for me</button> `:''}<button type="button" class="btn small" data-startlist aria-expanded="${UI.startList?'true':'false'}">${UI.startList?'Hide the list':'All marks as a list'}</button>${UI.startList?`<div class="startpick" style="grid-template-columns:auto repeat(6,1fr);margin-top:6px">${g}</div>`:''}</div>`}
 function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||humans().length===1;
   if(q.kind==='bonus'&&G.cur===d&&G.pool.length)extra=`<p class="tiny">Sunken crews' tiles (numbered):</p><div class="hand">${G.pool.map((c,j)=>isCur(c)?`<span class="hc"><span class="n">${j+1}</span><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'pl'+j,size:96})}"></span>`:`<span class="hc sp"><span class="n">${j+1}</span>${isGate(c)?gateArt():cannonArt()}</span>`).join('')}</div>`;
   const timed=UI.qTime>0&&q.kind==='doom'||NET.on&&q.kind==='doom';
   let title=String(q.title).replace(/^You drew/,(you?'You':nm(d))+' drew');
-  if(q.kind==='cannonDraw'){const n=G.hands[d].filter(isCannon).length;extra=`<p class="tiny">A <b>Deck Cannon</b> is an optional tile you can hold (two at most). Later you can fire it at a leviathan that is about to sink you, even on someone else's turn. You may keep it, or show it and discard it to draw a different tile instead${n?` (you already hold ${n})`:''}.</p>`}
+  if(q.kind==='cannonDraw'){const n=G.hands[d].filter(isCannon).length;extra=`<p class="tiny">A <b>Deck Cannon</b> shoots a leviathan that would sink you. Keep it, or swap it for a new tile.${n?` You hold ${n}.`:''}</p>`}
   if(q.kind==='doom')extra=`<p class="warn-l">If you do nothing, your junk sinks. Pick a rescue below, or accept.</p>`+extra;
   return `<div class="prompt ${q.kind==='doom'?'alert':'ask'}" data-qkind="${q.kind}"><h4>${q.kind==='doom'?'Quick: '+(you?'your':esc(nm(d))+"'s")+' junk is in danger!':q.kind==='cannonDraw'?(you?'You':esc(nm(d)))+' drew a Deck Cannon':'Choose'}</h4><p>${esc(title)}</p>${extra}<div class="opts">${q.opts.map((o,i)=>`<button class="btn${/Accept/.test(o.l)?' warn':''}" data-a="q" data-i="${i}">${esc(o.l)}</button>`).join('')}</div>${timed?`<div class="qtimer" title="Time left"><i id="qbar"></i></div><p class="cd" id="qtxt">${UI.qTime>0?UI.qTime:25} s to decide, then the computer's best advice is used.</p>`:''}</div>`}
 function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='place'),gts=mv.filter(m=>m.a==='gate'),cns=mv.filter(m=>m.a==='cannon'),pas=mv.find(m=>m.a==='pass');
@@ -60,10 +61,10 @@ function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='plac
   const thr=threatHTML(K,d,m,A);
   const rot=pl.length?`<div class="hacts"><button class="btn small" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">&#10226; Left</button><span class="rotl">turned ${(sel.r||0)*90}&deg;</span><button class="btn small" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">&#10227; Right</button></div>`:'';
   const nT=hand.length;
-  UI.pinH=`<div class="pinbox"><div class="hl"><b>${multi?esc(nm(d))+"'s":'Your'} ${nT} tile${nT===1?'':'s'}</b> <span class="tiny">${pl.length?'tap a tile, turn it, then Place':'choose what to do'}</span></div><div class="hand" data-hand="${d}">${hand.map((c,t)=>cardBtn(c,t,{up:true,owner:d,sel:sel&&sel.t===t,rot:sel&&sel.r})).join('')}${rot}</div><div class="row">${btn}${pas?`<button class="btn" data-a="pass">Nothing to play: pass</button>`:''}</div></div>`;
+  UI.pinH=`<div class="pinbox"><div class="hl"><b>${multi?esc(nm(d))+"'s":'Your'} ${nT} tile${nT===1?'':'s'}</b> <span class="tiny">${pl.length?'drag one onto your junk, or turn it and Place':'choose what to do'}</span></div><div class="hand" data-hand="${d}">${hand.map((c,t)=>cardBtn(c,t,{up:true,owner:d,sel:sel&&sel.t===t,rot:sel&&sel.r})).join('')}${rot}</div><div class="row">${btn}${pas?`<button class="btn" data-a="pass">Nothing to play: pass</button>`:''}</div></div>`;
   let h=`<div class="prompt"><h4>${multi?esc(nm(d))+': lay a current':'Your turn: lay a current'}</h4>${fr}`;
   if(outcome)h+=`<p style="margin:6px 0 4px">${outcome}</p>`;if(thr)h+=`<p style="margin:2px 0">${thr}</p>`;
-  if(err&&A&&A.bad)h+=`<p class="warn-l" style="margin:4px 0">Not allowed: another tile is safer. The rule: you may not pick a placement that sinks you while any other placement does not. Tap the bulb for the safest move.</p>`;
+  if(err&&A&&A.bad)h+=`<p class="warn-l" style="margin:4px 0">Not allowed: another tile is safer. You may not sink yourself while a safe move exists. Tap the bulb for the safest move.</p>`;
   const cm={};for(const c of cns){const k=c.m+':'+c.s;if(!cm[k])cm[k]=c}const nc=hand.filter(isCannon).length;
   if(Object.keys(cm).length)h+=`<div class="optrow"><div class="tiny"><b>Deck Cannon</b> (optional, instead of laying a tile; you hold ${nc}):</div><div class="row">${Object.values(cm).map(c=>`<button class="btn warn" data-a="cannon" data-t="${c.t}" data-m="${c.m}" data-s="${c.s}">Fire at ${esc(levName(c.m))}${nc>1?' (x'+nc+' held)':''}</button>`).join('')}</div></div>`;
   else if(nc&&full)h+=`<p class="tiny">You hold a Deck Cannon. It can be fired when a leviathan is next to your front square or about to sink you.</p>`;
@@ -89,10 +90,10 @@ function overHTML(){const o=G.over,w=o.win||[];const me=viewSeat();const hs=huma
   else h+=`<div class="row">${!meWin&&!watch&&!multi&&UI.snap&&!NET.on?'<button class="btn pri" data-a="rewind">Rewind to my last move</button>':''}${UI.guided&&!meWin&&!watch?'<button class="btn" data-a="guided">Try the guided game again</button>':''}<button class="btn${meWin||watch||multi||!UI.snap?' pri':''}" data-a="again">Play again</button><button class="btn" data-a="newgame">New game</button><button class="btn" data-gx="rulesd">Rules</button></div>`;
   return h+'</div>'}
 function oppHTML(d){const now=UI.busy&&UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;
-  return `<div class="prompt opp"><h4>Opponents</h4><p class="tiny">${now>=0?dot(now)+' <b>'+esc(nm(now))+'</b> is playing':'The sea moves'}. The computers play by themselves; you only act on your turn, in step 2 (Place).</p><div class="row">${UI.busy?'<button class="btn small" data-a="skip">Skip animation</button>':''}${humans().length===0?`<button class="btn small" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}</div></div>`}
+  return `<div class="prompt opp"><h4>Opponents</h4><p class="tiny">${now>=0?dot(now)+' <b>'+esc(nm(now))+'</b> is playing':'The sea moves'}. The computers play by themselves.</p><div class="row">${UI.busy?'<button class="btn small" data-a="skip">Skip animation</button>':''}${humans().length===0?`<button class="btn small" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}</div></div>`}
 function goalHTML(){if(!G)return '';const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length;
   if(G.variant==='solo')return `<div class="goal"><b>Goal:</b> outlast every leviathan. ${toRise} still to rise, ${L} on the board; you win when none are left.</div>`;
-  if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return `<div class="goal" data-goal role="button" tabindex="0"><b>Goal:</b> be the last junk still afloat. <u>How?</u></div>`}
+  if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return `<div class="goal" data-goal role="button" tabindex="0"><b>Goal:</b> last junk afloat wins. <u>How?</u></div>`}
 function mainHTML(){const gh=goalHTML();const h=mainHTML0();return G.over&&!UI.busy||!h?h:gh+h}
 function mainHTML0(){
   if(G.over&&!UI.busy)return overHTML();const d=sideToAct(),vs=viewSeat();

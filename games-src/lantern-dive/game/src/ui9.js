@@ -26,7 +26,7 @@ function campStart(def) {
   newGame('vs', o);
   UI.camp = def;
   UI.coach.level = def.hints ? 'full' : 'off'; render();
-  try { toast('Goal: ' + def.goal.text); } catch (e) { }
+  try { toast('Goal: ' + def.goal.text); } catch (e) { }   // only shown with Hints on
 }
 function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
 // Story starts with the staged tutorial (Chapter 0) until it has been finished once; then it goes straight to the chapter map
@@ -36,7 +36,7 @@ function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.activ
 function campResult(box, ok) {
   const def = UI.camp, won = campIsWon(G, def), dead = campDead(G, def), bt = h('div.cbtns');
   if (def.twist && def.twist.text) box.append(h('p.sm', def.twist.text));
-  if (ok && !won) box.append(h('p', 'The boss rule was broken, so the chapter is not won.'));
+  if (ok && !won) box.append(h('p', 'The boss rule was broken. The chapter is not won.'));
   if (!won && !dead) bt.append(h('button.btn.go', { 'data-a': 'retrysame', type: 'button' }, 'Try again (same jobs)'));
   bt.append(h('button.btn' + (won || dead ? '.go' : '.alt'), { 'data-a': 'campfin', type: 'button' }, won ? 'Continue the story' : 'Leave the dive'));
   bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));

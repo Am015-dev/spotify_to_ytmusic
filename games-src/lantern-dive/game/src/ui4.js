@@ -1,14 +1,14 @@
 // ===================== part 4: guide tips, pop-ups (job, diver, last trick) and the result card =====================
 // ---------- tips: one at a time, never stacked; each tip once per device ----------
 const TIPS = [
-  { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, the strongest card, so you pick a job first and lead the first trick.' : pname(G.cap) + ' holds Lantern 4, so picks a job first and leads the first trick.') + ' The gold badge on an avatar marks the Commander.' },
-  { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card, then "Take this job". Pick one your cards can do.' },
-  { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'Distress flare (optional)', body: 'Light it and everyone passes one card to a neighbour. It costs one extra attempt in the logbook. "No flare" is fine.' },
-  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signal (optional)', body: 'Once per dive you may show the team one card: your highest, lowest or only card of a colour. Or skip.' },
-  { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'You must play the colour that was led if you have it (dim cards are not allowed). You never have to win.' },
-  { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'None of that colour', body: 'Play anything. Another colour never wins; a Lantern always does.' },
-  { id: 'trump', when: () => G.phase === 'play' && G.trick.plays.some(p => suitOf(p.c) === 4) || (UI.fz && UI.fz.plays.some(p => suitOf(p.c) === 4)), title: 'Lanterns are trumps', body: 'A Lantern beats every colour. With several Lanterns the highest wins.' },
-  { id: 'jobdone', when: () => G.phase === 'play' && G.tasks.some((t, i) => jobSt(i) > 0) && !UI.busy, title: 'A job is done', body: 'Green tick = done for good. A red cross would end the dive.' }
+  { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, so you pick a job first. You also lead the first trick.' : pname(G.cap) + ' holds Lantern 4, so picks a job first and leads the first trick.') + ' The gold badge on an avatar marks the Commander.' },
+  { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card, then Take this job. Pick one your cards can do.' },
+  { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'Distress flare (optional)', body: 'Light it and everyone passes one card to a neighbour. It adds one attempt to the logbook. You can skip it.' },
+  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signal (optional)', body: 'Once per dive, show one card: your highest, lowest or only card of a colour. Or skip.' },
+  { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'Play the led colour if you have it. Dim cards are blocked. You never have to win.' },
+  { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'None of that colour', body: 'Play anything. Other colours never win. A Lantern does.' },
+  { id: 'trump', when: () => G.phase === 'play' && G.trick.plays.some(p => suitOf(p.c) === 4) || (UI.fz && UI.fz.plays.some(p => suitOf(p.c) === 4)), title: 'Lanterns are trumps', body: 'A Lantern beats every colour. The highest Lantern wins.' },
+  { id: 'jobdone', when: () => G.phase === 'play' && G.tasks.some((t, i) => jobSt(i) > 0) && !UI.busy, title: 'A job is done', body: 'A green tick means done. A red cross ends the attempt.' }
 ];
 function seen(id) { return !!UI.coach.seen[id]; }
 function markSeen(id) { UI.coach.seen[id] = 1; if (UI.coach.level !== 'full') { try { const s = JSON.parse(lsGet('ld_tips') || '{}'); s[id] = 1; lsSet('ld_tips', JSON.stringify(s)); } catch (e) { } } }
@@ -44,24 +44,26 @@ function openJob(i) {
   kids.push(h('div.kv', h('span', 'Difficulty (' + G.np + ' divers)'), h('b', jobDiff(i))));
   kids.push(h('div.kv', h('span', 'State'), h('b', st > 0 ? 'Done' : st < 0 ? 'Failed' : 'Open')));
   if (d.k === 'pred' && t.pn >= 0) kids.push(h('div.kv', h('span', 'Prediction'), h('b', d.open || G.phase === 'over' || ctlSeat(t.owner) === viewSeat() ? (t.pn === -2 ? 'secret' : t.pn) : 'secret')));
-  if (!d.cap) kids.push(h('p.sm', 'The Commander may not take this job.'));
+  if (!d.cap) kids.push(h('p.sm', 'The Commander cannot take this job.'));
   kids.push(h('p.sm', hintFor(d)));
   openPop(d.s, 'Job card', kids);
 }
 function hintFor(d) {
   const k = d.k;
-  if (k === 'cmp') return 'Count the tricks each diver wins. Ties do not count as more or fewer.';
-  if (k === 'cards') return 'You win a card by winning the trick it is in.';
-  if (k === 'with') return 'The card you play to win the trick has to be a colour card of that number.';
-  if (k === 'pos') return 'The first trick is the first one played; the last is the final one of the dive.';
-  if (k === 'pred') return 'Aim for exactly your number of tricks at the end.';
-  if (k === 'subx') return 'Lanterns you win count: every Lantern in a trick you win.';
-  if (k === 'avoidc' || k === 'avoidv' || k === 'avoidsub') return 'Cards in tricks you win count as won, even the ones other divers played.';
-  return 'All cards in the tricks you win count as won by you.';
+  if (k === 'cmp') return 'Count each diver\'s tricks. A tie is neither more nor fewer.';
+  if (k === 'cards') return 'You win a card by winning its trick.';
+  if (k === 'with') return 'The card that wins the trick must be a colour card of that number.';
+  if (k === 'pos') return 'The first trick is the first one played. The last is the final one.';
+  if (k === 'pred') return 'Win exactly your number of tricks.';
+  if (k === 'subx') return 'Every Lantern in a trick you win counts.';
+  if (k === 'avoidc' || k === 'avoidv' || k === 'avoidsub') return 'Every card in a trick you win is yours, even other divers\' cards.';
+  return 'Every card in a trick you win is yours.';
 }
+const CAMP_BY_NAME = { Nerea: 'nerea', Bram: 'bram', Sumi: 'sumi', Dag: 'dag', Echo: 'echo' };
+function campPortrait(s, p) { const k = CAMP_BY_NAME[p.helper ? 'Echo' : p.name]; return k ? '<img src="media/camp-' + k + '.webp" alt="" width="56" height="56" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)">' : ''; }
 function openSeat(s) {
   if (!G) return; const p = G.players[s], kids = [];
-  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span.av56', { style: 'width:56px;height:56px;flex:0 0 56px;display:block', html: avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Commander)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
+  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span.av56', { style: 'width:56px;height:56px;flex:0 0 56px;display:block', html: campPortrait(s, p) || avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Commander)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
   kids.push(h('div.kv', h('span', 'Cards in hand'), h('b', p.hand.length)));
   kids.push(h('div.kv', h('span', 'Tricks won'), h('b', tricksWon()[s])));
   if (!p.helper) kids.push(h('div.kv', h('span', 'Ping'), h('b', G.comm === 'none' ? 'No signalling in this dive' : G.comm === 'narc' ? 'Shared pool: ' + G.pool + ' left' : (p.pingUsed ? 'Used' : 'Ready'))));
@@ -74,7 +76,7 @@ function openLast() {
   if (!G || !G.tricks.length) return; const k = G.tricks[G.tricks.length - 1];
   const row = h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center' });
   k.plays.forEach(p => row.append(h('div', { style: 'display:flex;flex-direction:column;align-items:center;gap:3px;font-size:13px;font-weight:800' }, h('div', { style: 'width:62px;height:87px', html: cardS(p.c, 62) }), pname(p.s) + (p.s === k.w ? ' ★' : ''))));
-  openPop('Last trick', 'Trick ' + (k.n + 1), [row, h('p', pname(k.w) + ' won it with ' + cname(k.wc) + '.'), h('p.sm', 'Only the most recent trick can be looked at again.')]);
+  openPop('Last trick', 'Trick ' + (k.n + 1), [row, h('p', pname(k.w) + ' won it with ' + cname(k.wc) + '.'), h('p.sm', 'You can only look at the last trick.')]);
 }
 // ---------- the result card ----------
 function showResult() {
@@ -86,18 +88,18 @@ function showResult() {
   const R = G.result, ok = R.ok, m = G.mission, p = Prog.load();
   const box = h('div.rsbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': ok ? 'Dive complete' : 'Dive failed' });
   box.append(ok ? h('div.win', h('span', { html: KIT.iconSVG('star', 34) }), h('span', 'Dive complete!')) : h('div.lose', h('span', { html: KIT.iconSVG('cross', 30) }), h('span', 'The dive failed.')));
-  if (!ok && R.why) box.append(h('p', R.why));
-  if (ok && G.tricks.length < G.ntr && G.mission.id !== 27) box.append(h('p.sm', 'Every job was done after trick ' + G.tricks.length + ', so the dive ended at once. Cards still in hand do not matter.'));
+  if (!ok && R.why) { const wp = String(R.why).split(/:\s+/); wp.forEach((x, i) => box.append(h('p', i < wp.length - 1 ? x + '.' : x))); }   // short lines: the cause, then the job
+  if (ok && G.tricks.length < G.ntr && G.mission.id !== 27) box.append(h('p.sm', 'Every job was done after trick ' + G.tricks.length + '. The dive ended at once. Cards in hand do not matter.'));
   box.append(h('p.sm', diveLabel() + (UI.mode === 'descent' ? '' : ' · attempt ' + G.att) + (G.distress ? ' · distress flare lit (+1)' : '')));
   // done = tick; broken = cross + which trick, card and diver broke it; never broken (the dive stopped for another reason) = "not finished"
   G.tasks.forEach((t, i) => {
-    const st = R.tasks[i], det = R.det && R.det[i], nb = ok || st > 0 ? '' : st < 0 ? (det || 'It could not be met by the end of the dive.') : 'Not finished: the dive ended first.';
+    const st = R.tasks[i], det = R.det && R.det[i], nb = ok || st > 0 ? '' : st < 0 ? (det || 'It could not be met before the dive ended.') : 'Not finished. The dive ended first.';
     box.append(h('div.rjob' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '.open'), h('span.mk', { html: st > 0 ? KIT.iconSVG('tick', 24) : st < 0 ? KIT.iconSVG('cross', 24) : '<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 12H18"/></svg>' }), h('span', h('b', pname(t.owner) + ': '), jobText(i), nb ? h('small.why', nb) : null)));
   });
-  if (!ok) box.append(h('p.sm', 'Tip: the red cross marks the job that broke the dive. Grey jobs were still open.'));
+  if (!ok) box.append(h('p.sm', 'The red cross marks the job that broke. Grey jobs were still open.'));
   if (m.kind === 'log') {
-    if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged in your logbook: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
-    else box.append(h('p.sm', 'Attempts so far on this dive: ' + (p.tries[m.id] || 0) + '. If the jobs could not be done from the start, try with new jobs.'));
+    if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
+    else box.append(h('p.sm', 'Attempts on this dive: ' + (p.tries[m.id] || 0) + '. Stuck from the start? Try new jobs.'));
   } else if (m.kind === 'deep' && ok) box.append(h('p', 'Deep dive ' + m.d + ' complete. The next one is difficulty ' + (m.d + 1) + '.'));
   if (UI.camp && typeof GXC !== 'undefined' && GXC.active()) { campResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }
   if (UI.mode === 'descent') { descResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }

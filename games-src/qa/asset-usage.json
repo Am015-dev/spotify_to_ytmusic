@@ -1,5 +1,5 @@
 {
- "when": "2026-11-08T02:39Z",
+ "when": "2026-11-08T05:15Z",
  "view": "390x844",
  "secs": 180,
  "min": 90,
@@ -1255,80 +1255,16 @@
   },
   "rampart-and-vine": {
    "shipped": 113,
-   "loaded": 66,
-   "pct": 58.4,
+   "loaded": 113,
+   "pct": 100,
    "glbShipped": 8,
-   "glbLoaded": 0,
-   "anyGlb": false,
-   "playedSecs": 185,
+   "glbLoaded": 8,
+   "anyGlb": true,
+   "playedSecs": 189,
    "end": "cap",
-   "clicks": 121,
-   "fail": true,
-   "neverLoaded": {
-    "media/camp*": [
-     "media/camp-baron.webp",
-     "media/camp-corvin.webp",
-     "media/camp-dulcie.webp",
-     "media/camp-ferro.webp",
-     "media/camp-garnet.webp",
-     "media/camp-hob.webp",
-     "media/camp-isolde.webp",
-     "media/camp-mabry.webp",
-     "media/camp-ostrand.webp",
-     "media/camp-quill.webp",
-     "media/camp-tamsin.webp",
-     "media/camp-wren.webp"
-    ],
-    "models/piece*": [
-     "models/piece-champ-lite.glb",
-     "models/piece-champ.glb",
-     "models/piece-champ.webp",
-     "models/piece-hog-lite.glb",
-     "models/piece-hog.glb",
-     "models/piece-hog.webp",
-     "models/piece-mason-lite.glb",
-     "models/piece-mason.glb",
-     "models/piece-mason.webp",
-     "models/piece-meeple-lite.glb",
-     "models/piece-meeple.glb",
-     "models/piece-meeple.webp"
-    ],
-    "media/ui*": [
-     "media/ui-bubble-c.webp",
-     "media/ui-bubble.webp",
-     "media/ui-button-cream.webp",
-     "media/ui-button-go.webp",
-     "media/ui-button-power.webp",
-     "media/ui-node-boss.webp",
-     "media/ui-node-done.webp",
-     "media/ui-node-locked.webp",
-     "media/ui-panel.webp",
-     "media/ui-row-c.webp",
-     "media/ui-row.webp"
-    ],
-    "media/piece*": [
-     "media/piece-champ.webp",
-     "media/piece-hog.webp",
-     "media/piece-mason.webp",
-     "media/piece-meeple.webp"
-    ],
-    "music/tavern*": [
-     "music/tavern-a.mp3",
-     "music/tavern-b.mp3",
-     "music/tavern-short-a.mp3",
-     "music/tavern-short-b.mp3"
-    ],
-    "music/victory*": [
-     "music/victory-a.mp3",
-     "music/victory-b.mp3"
-    ],
-    "music/defeat*": [
-     "music/defeat-b.mp3"
-    ],
-    "music/main*": [
-     "music/main-a.mp3"
-    ]
-   }
+   "clicks": 904,
+   "fail": false,
+   "neverLoaded": {}
   },
   "sands-of-qamar": {
    "shipped": 202,
@@ -1967,6 +1903,36 @@
    "clicks": 847,
    "fail": false,
    "neverLoaded": {}
+  },
+  "stitchwise": {
+   "shipped": 63,
+   "loaded": 57,
+   "pct": 90.5,
+   "glbShipped": 0,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 184,
+   "end": "cap",
+   "clicks": 948,
+   "fail": false,
+   "neverLoaded": {
+    "media/result*": [
+     "media/result-lose.webp",
+     "media/result-win.webp"
+    ],
+    "media/icon*": [
+     "media/icon-bonus.webp"
+    ],
+    "media/patch*": [
+     "media/patch-leather.webp"
+    ],
+    "media/quilt*": [
+     "media/quilt-frame.webp"
+    ],
+    "media/torn*": [
+     "media/torn-square.webp"
+    ]
+   }
   }
  }
 }

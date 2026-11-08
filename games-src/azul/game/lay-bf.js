@@ -17,7 +17,7 @@ for(const [w,h] of SIZES){const t=`${CFG.np||2}p${CFG.ex&&CFG.ex.gray?'g':''}_${
       const D=document.documentElement;if(D.scrollHeight>vh+1||D.scrollWidth>vw+1)o.issues.push(`page scrolls ${D.scrollWidth}x${D.scrollHeight}`);
       const inV=(e,n)=>{const r=R(e);if(r.w<1)return;if(r.l<-1||r.t<-1||r.r>vw+1||r.b>vh+1)o.issues.push(n+' off screen '+JSON.stringify(r))};
       const tb=R(document.querySelector('#bf .bf-table'));const ks=[...document.querySelectorAll('#bf .bf-k')].map(R);const pool=R(document.querySelector('#bf .bf-pool'));
-      for(const [n,e] of [['top','.bf-top'],['hint','.bf-hint'],['board','.bf-me'],['table','.bf-table']])inV(document.querySelector('#bf '+n.replace(/.*/,e)),n);
+      for(const [n,e] of [['top','.bf-top'],['hint','.bf-line'],['board','.bf-me'],['table','.bf-table']])inV(document.querySelector('#bf '+n.replace(/.*/,e)),n);
       ks.forEach((k,i)=>{if(k.l<tb.l-2||k.t<tb.t-2||k.r>tb.r+2||k.b>tb.b+2)o.issues.push('kiln '+i+' outside the table');if(k.w/2<22)o.issues.push('kiln quadrant '+(k.w/2|0)+'px')});
       const ov=(a,b2)=>Math.max(0,Math.min(a.r,b2.r)-Math.max(a.l,b2.l))*Math.max(0,Math.min(a.b,b2.b)-Math.max(a.t,b2.t));
       for(let i=0;i<ks.length;i++)for(let j=i+1;j<ks.length;j++)if(ov(ks[i],ks[j])>.12*ks[i].w*ks[i].h)o.issues.push(`kilns ${i}/${j} overlap`);

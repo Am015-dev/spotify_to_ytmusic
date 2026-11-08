@@ -1,11 +1,12 @@
 // ===================== Tidewake: our own texts =====================
 const RULES_HTML=`
 <h3>How a round goes</h3>
-<ol><li><b>Choose a start mark.</b> Before any tile is laid, each captain in turn puts their junk on a gold mark on the outer edge. Numbers 1 to 6 run along the edges; each number has two marks.</li>
-<li><b>Roll.</b> At the start of your turn two dice are rolled and added together. A total of <b>6, 7 or 8</b> wakes every leviathan (see below). Any other total does nothing, except that the Maelstrom, if it is in play, stirs.</li>
-<li><b>Place.</b> Pick one of your three tiles, turn it any of four ways and lay it on the empty square in front of your junk. A gold line on the board shows the exact route your junk will sail, with a flag where it stops (the line turns red if it sinks you).</li>
-<li><b>Sail.</b> Your junk follows the wake through the new tile and on through every tile already connected, until it reaches an empty square. Any other junk waiting at the same square sails too.</li>
-<li><b>Draw</b> back up to three tiles. The turn passes clockwise.</li></ol>
+<p><b>Last junk afloat wins the lantern.</b></p>
+<ol><li><b>Start:</b> put your junk on a gold mark at the edge.</li>
+<li><b>Roll:</b> two dice. A 6, 7 or 8 wakes the leviathans.</li>
+<li><b>Place:</b> lay one tile in front of your junk. Drag it, or tap Place.</li>
+<li><b>Sail:</b> your junk follows the new line to its end.</li>
+<li><b>Draw</b> back to three tiles. Next captain.</li></ol>
 <h3>The idea</h3>
 <p>Every captain steers one junk across a 6 by 6 sea chart. You never steer directly: you lay <b>current tiles</b>, and your junk is carried along the wake lines printed on them. Hazards: the edge of the chart, other junks, and <b>leviathans</b> that wander the board. <b>The last junk afloat wins.</b></p>
 <h3>What sinks a junk</h3>
@@ -50,24 +51,24 @@ function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='
 // {me} {riv} {n} {why} are filled in from the real game. The ids are the rule ids in TUTORIAL-COVERAGE.md.
 const OSK_TEXT={
  goal:['The Lantern Race','Cobalt swears the Reach is his. Last junk afloat keeps the lantern. Pick a gold mark.'],
- reloc:['Your berth','If a leviathan blocks your start before you sail, move to another free mark on that edge.'],
+ reloc:['Your berth','A leviathan blocks your start? Move to another free mark there.'],
  roll:['Dice at dawn','Each turn starts with two dice. {n}: {wake}'],
  lay:['Lay a current','Pick a tile, Turn it, Place it at your bow. SAFE floats; SINKS means off the chart.'],
- sail:['Well sailed!','Your junk rode the current to its end. Now you draw back up to three tiles.'],
- chain:['Cobalt moves','{riv} laid a current. You may ride his tiles too, joined to yours.'],
- collide:['Mind his wake','Never end on the same line as another junk: two junks on one wake both sink.'],
- levmove:['The deep stirs','A leviathan swims one square along an arrow, or turns. Arrows show where it can go.'],
- levsink:['Leviathans bite','A leviathan entering your square sinks you. Keep your bow away from its arrows.'],
- cannon:['A Deck Cannon!','Keep it. When a leviathan would sink you, fire it: the beast is gone for good.'],
- wave:['Rogue Wave!','A junk in its band rolls a die: meet its strength or capsize. It grows as it rolls.'],
- gate:['A Rift Gate','The violet tile is a Rift Gate. Lay it, or keep it to escape to a rolled square when you would sink.'],
- mael:['The Maelstrom','It moves only on calm rolls and swallows any tile, junk or leviathan it enters.'],
- swap:['Sink him, gain tiles','If your tile sinks Cobalt, you may swap tiles with his hand before you draw.'],
+ sail:['Well sailed!','Your junk rode the current to its end. Now draw back to three.'],
+ chain:['Cobalt moves','{riv} laid a current. His tiles join yours. You can ride them.'],
+ collide:['Mind his wake','Never stop on another junk\'s line. Two junks on one wake both sink.'],
+ levmove:['The deep stirs','A leviathan swims one square along an arrow, or turns.'],
+ levsink:['Leviathans bite','A leviathan entering your square sinks you. Stay clear of its arrows.'],
+ cannon:['A Deck Cannon!','Keep it. If a leviathan would sink you, fire. It is gone.'],
+ wave:['Rogue Wave!','Junks in its row roll a die. Roll low and you capsize.'],
+ gate:['A Rift Gate','The violet tile is a Rift Gate. Keep it to escape a sinking.'],
+ mael:['The Maelstrom','It moves on calm rolls. It swallows whatever it enters.'],
+ swap:['Sink him, gain tiles','Sink Cobalt with your tile, and you may swap hands.'],
  good:['Good move!','{why}'],
  poor:['Careful','{why}'],
  end:['The lantern','{why}'],
- tie:['A shared fate','If the last junks sink together, nobody wins: it is a draw.'],
- more:['Teams and solo','Bigger games add captains, teams that share a win, and a solo race.']
+ tie:['A shared fate','If the last junks sink together, it is a draw.'],
+ more:['Teams and solo','Bigger games add more captains, teams, and a solo race.']
 };
 // rival comments (Osk on Cobalt's moves), picked in turn; {riv} {n}
 const OSK_RIVAL=['{riv} sailed {n} square(s). Watch where his line ends: never end on it.','{riv} hugs the middle: leviathans have fewer arrows to reach him there.','{riv} is getting bold. A tile that sinks him wins you the lantern.','{riv} turned his tile to dodge the edge. Turn yours too when you see SINKS.'];

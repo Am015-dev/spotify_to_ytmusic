@@ -72,3 +72,9 @@ The idle-round guard (four full rounds with no cut explode) is now stated in the
 - Coach bubble fixed: it was half off-screen at 390 (transform overridden by its entry animation); now centred, tap it to dismiss, the tap passes through.
 - Text floor 14px on phone (16px on desktop) for plates, chips, gear names, tile corner values.
 - Shots: playable-shots/feel/ (390x844, 375x667, 1440x900). Script: game/feel-shots.js.
+- Feel gate (8 Nov, 03:30 decision): the instruction line is steady (data-fa-skip, no flash, no rival play-by-play; rival moves show on the
+  board as the pointer bubble, cut motion and number pop). Copy pass: every player-facing sentence 12 words or fewer. Learn to play is a
+  coached free game; coach.js tells GXT-based tools it is running with its staged part over. feel-audit --secs 120: (a)-(e) all 0.
+- Round 2: COPY-FIX.md applied (35 lines left to apply). The middle of the table shows the owner's rig art and the race ("12 / 24 wires cut") in the
+  biggest gap between the stands (phone: between the crew racks; desktop: between crew row and your rack); hidden when there is no room.
+  Header number track no longer overlaps on desktop (flex row) and stays a 6x2 grid at 14px on phone.

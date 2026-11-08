@@ -4,17 +4,17 @@
 const CHAR = {
   mara: { name: 'Mara', role: 'your old dive instructor', col: '#e9b44c' },
   eel: { name: 'Snapjaw the Eel', role: 'boss of the Sunlit Reef', col: '#6fbf73',
-    intro: 'Sssso… fresh divers in MY reef. I bite when you least expect it. Every second trick I twist the rules!',
-    hit: ['Ow! My tail!', 'Grrr… lucky trick.', 'Sssstop that!'], win: 'Hah! Back to the surface with you!', lose: 'Nooo… my reef… take it, then.' },
+    intro: 'Fresh divers in my reef! I twist the rules every second trick.',
+    hit: ['Ow! My tail!', 'Grrr… lucky trick.', 'Sssstop that!'], win: 'Ha! Back to the surface!', lose: 'No! My reef! Fine, take it.' },
   witch: { name: 'The Kelp Witch', role: 'boss of the Kelp Forest', col: '#b27fd6',
-    intro: 'Welcome to my garden, little lights. I put Lanterns to sleep and turn the tides upside down.',
-    hit: ['You cut my kelp!', 'Hmph. A clever trick.', 'My garden… withers!'], win: 'Tangled at last. Swim home, little lights.', lose: 'My spells… unravelled. Pass, then.' },
+    intro: 'Welcome to my garden. I put Lanterns to sleep and flip the tides.',
+    hit: ['You cut my kelp!', 'Hmph. A clever trick.', 'My garden… withers!'], win: 'Tangled at last. Swim home!', lose: 'My spells fell apart. Pass, then.' },
   angler: { name: 'The Gloom Angler', role: 'boss of the Twilight Trench', col: '#5fa8d9',
-    intro: 'Follow my little light… In my trench every colour bites, Lanterns doze, and the low ones rise.',
-    hit: ['My lure! You dimmed it!', 'Ghhh… sharper than you look.', 'The dark remembers this!'], win: 'Into the dark you go. Forever.', lose: 'My light… goes out…' },
+    intro: 'Follow my light. In my trench every colour bites, Lanterns doze, and low cards win.',
+    hit: ['My lure! You dimmed it!', 'Ghhh… sharper than you look.', 'The dark remembers this!'], win: 'Into the dark you go.', lose: 'My light is out.' },
   leviathan: { name: 'The Leviathan', role: 'the deep itself', col: '#e05a5a',
-    intro: 'I AM THE ABYSS. EVERY TRICK, MY CURSE. FINISH YOUR JOBS… IF YOU CAN.',
-    hit: ['THE DEEP… TREMBLES.', 'YOU… WOUND ME?', 'IMPOSSIBLE!'], win: 'THE ABYSS KEEPS WHAT IT TAKES.', lose: 'THE LANTERNS… REACH… THE BOTTOM. YOU HAVE WON.' }
+    intro: 'I AM THE ABYSS. EVERY TRICK HAS A CURSE. FINISH YOUR JOBS IF YOU CAN.',
+    hit: ['THE DEEP TREMBLES.', 'YOU HURT ME?', 'IMPOSSIBLE!'], win: 'THE ABYSS KEEPS WHAT IT TAKES.', lose: 'THE LANTERNS REACH THE BOTTOM. YOU WIN.' }
 };
 function portraitSVG(id, size) {
   const s = size || 96, w = (b) => '<svg viewBox="0 0 100 100" width="' + s + '" height="' + s + '" aria-hidden="true">' + b + '</svg>';
@@ -43,9 +43,9 @@ function portraitSVG(id, size) {
     '<path d="M18 50 q4 -8 8 0 q4 -8 8 0" stroke="#4b3470" stroke-width="2" fill="none"/>');
 }
 const CURSE = {
-  low: { name: 'Undertow', text: 'The LOWEST card of the led colour wins the trick. Lanterns still beat colours (the highest Lantern wins as usual).', short: 'Lowest wins' },
-  sleep: { name: 'Lantern Sleep', text: 'Lanterns sleep this trick: a Lantern played on a colour wins nothing.', short: 'Lanterns sleep' },
-  any: { name: 'Riptide', text: 'Every colour counts: the highest number wins, whatever its colour. Lanterns still beat colours.', short: 'Any colour wins' }
+  low: { name: 'Undertow', text: 'The lowest card of the led colour wins. Lanterns still beat colours.', short: 'Lowest wins' },
+  sleep: { name: 'Lantern Sleep', text: 'Lanterns do not win this trick.', short: 'Lanterns sleep' },
+  any: { name: 'Riptide', text: 'Every colour counts. The highest number wins. Lanterns still beat colours.', short: 'Any colour wins' }
 };
 // ---------- the Descent: 4 zones x (3 dives + a boss), 3 oxygen tanks per zone ----------
 const DESC = [   // difficulty tuned with desc-gauntlet.js (all-computer crew, first-try wins: about 70% / 55% / 35% / 25% per zone)
@@ -63,7 +63,7 @@ function descStage(p) { p = p || Desc.load(); const Z = DESC[Math.min(p.z, DESC.
 function descentEl() {
   const p = Desc.load(), cur = descStage(p);
   const box = h('div.setup.scard.desc', h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'The Descent')));
-  box.append(h('div.dmara', h('span.dpt', { html: portraitSVG('mara', 56) }), h('p', p.z >= DESC.length ? 'You reached the bottom of the sea. Legendary! Start again any time.' : cur.boss ? 'Boss ahead: ' + CHAR[cur.bossDef.id].name + '. Every finished job hits it. Watch its curses!' : 'Each zone: 3 dives, then a boss. A failed dive costs one oxygen tank. Out of air = back to the top of the zone.')));
+  box.append(h('div.dmara', h('span.dpt', { html: portraitSVG('mara', 56) }), h('p', p.z >= DESC.length ? 'You reached the sea floor! Start again any time.' : cur.boss ? 'Boss ahead: ' + CHAR[cur.bossDef.id].name + '. Every finished job hits it. Watch its curses!' : 'Each zone has 3 dives, then a boss. A failed dive costs one oxygen tank. No tanks left sends you to the zone start.')));
   const o2 = h('div.o2', h('b', 'Oxygen'), ...Array.from({ length: O2MAX }, (_, i) => h('span.tank' + (i < p.o2 ? '.full' : ''), { 'aria-hidden': 'true' })), h('span.sr', p.o2 + ' of ' + O2MAX + ' tanks'));
   box.append(o2);
   const goSlot = h('div.dgo'); box.append(goSlot);
@@ -108,12 +108,12 @@ function descResult(box, ok) {
     else { p.fail[key] = 1; p.o2--; if (p.o2 <= 0) { p.s = 0; p.o2 = O2MAX; G.descOut = 1; } }
     Desc.save(p);
   }
-  if (B && ok) box.prepend(h('div.bdef', h('span.dpt', { html: portraitSVG(G.boss.id, 64) }), h('div', h('b', B.name + ' defeated!'), h('span', 'Every job hit home. ' + (DESC[p.z] ? DESC[p.z].name + ' is open, tanks refilled.' : 'The sea is yours.')))));
+  if (B && ok) box.prepend(h('div.bdef', h('span.dpt', { html: portraitSVG(G.boss.id, 64) }), h('div', h('b', B.name + ' defeated!'), h('span', 'Every job done. ' + (DESC[p.z] ? DESC[p.z].name + ' is open, tanks refilled.' : 'You cleared the sea.')))));
   const say = (who, txt) => box.append(h('div.say', h('span.dpt', { html: portraitSVG(who, 52) }), h('p', h('b', CHAR[who].name + ': '), txt)));
   if (B) say(G.boss.id, ok ? B.lose : B.win);
-  if (ok) say('mara', st.boss ? 'You beat ' + B.name + '! Fresh tanks — on to ' + (DESC[p.z] ? DESC[p.z].name : 'the surface, legends') + '.' : 'Well dived! ' + (p.stars[st.zi + ':' + st.si] ? 'First try — that is a star. ' : '') + 'Next: ' + (descStage(p).boss ? 'the boss of this zone.' : 'dive ' + (descStage(p).si + 1) + '.'));
-  else if (G.descOut) say('mara', 'Out of air! Back up to the start of ' + st.Z.name + ' with full tanks. You know the waters now.');
-  else say('mara', 'That cost one oxygen tank (' + p.o2 + ' left). Read the red cross: that job broke. Try the dive again.');
+  if (ok) say('mara', st.boss ? 'You beat ' + B.name + '! Fresh tanks. On to ' + (DESC[p.z] ? DESC[p.z].name : 'the surface') + '.' : 'Well dived! ' + (p.stars[st.zi + ':' + st.si] ? 'First try. That earns a star. ' : '') + 'Next: ' + (descStage(p).boss ? 'the boss of this zone.' : 'dive ' + (descStage(p).si + 1) + '.'));
+  else if (G.descOut) say('mara', 'No tanks left. Back to the start of ' + st.Z.name + ' with full tanks.');
+  else say('mara', 'You lost one oxygen tank (' + p.o2 + ' left). The red cross shows the job that broke. Try again.');
   const bt = h('div.cbtns');
   bt.append(h('button.btn.go', { 'data-a': 'descgo', type: 'button' }, ok ? (p.z >= DESC.length ? 'See the map' : 'Next dive') : 'Dive again'));
   bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));
@@ -142,13 +142,13 @@ function storyCheck() {
   if (UI.mode === 'descent') {
     const st = descStage(), p = Desc.load(), B = bossChar();
     if (G.tricks.length === 0 && G.phase === 'assign') {
-      if (!p.met.intro && once('intro', { who: 'mara', title: 'The Descent', body: 'Four zones, deeper and harder. Each zone: three dives, then a boss. A failed dive costs one oxygen tank (you have ' + O2MAX + '). Do every job to clear a dive. Ready?', btn: 'Let\'s dive', then: () => { const q = Desc.load(); q.met.intro = 1; Desc.save(q); } })) return true;
+      if (!p.met.intro && once('intro', { who: 'mara', title: 'The Descent', body: 'Four zones, each harder. Each has three dives, then a boss. A failed dive costs one oxygen tank. You have ' + O2MAX + '). Finish every job to clear a dive. Ready?', btn: 'Let\'s dive', then: () => { const q = Desc.load(); q.met.intro = 1; Desc.save(q); } })) return true;
       if (B && once('boss' + G.att, { who: G.boss.id, title: G.att === 1 ? B.name + ' appears!' : B.name + ' is waiting', body: B.intro + ' Curses: ' + G.boss.pool.map(c => CURSE[c].name + ' (' + CURSE[c].short.toLowerCase() + ')').join(', ') + '. Each job you finish hits me.', btn: 'Bring it on' })) return true;
-      if (!B && st.si === 0 && G.att === 1 && once('zone', { who: 'mara', title: st.Z.name + ' · ' + st.Z.depth, body: st.zi === 0 ? 'Shallow and bright. Pick jobs your cards can do, and help the others with theirs.' : st.zi === 1 ? 'Murky water ahead: in some dives a shown card does not tell if it is the highest or lowest.' : st.zi === 2 ? 'The trench is dark and the jobs are many. Use your signal early.' : 'The Abyss. The Leviathan curses EVERY trick. Good luck, diver.', btn: 'Dive' })) return true;
+      if (!B && st.si === 0 && G.att === 1 && once('zone', { who: 'mara', title: st.Z.name + ' · ' + st.Z.depth, body: st.zi === 0 ? 'Shallow and bright. Pick jobs your cards can do. Help the others.' : st.zi === 1 ? 'Murky water ahead. In some dives, a shown card has no mark.' : st.zi === 2 ? 'The trench is dark with many jobs. Signal early.' : 'The Abyss. The Leviathan curses EVERY trick. Good luck, diver.', btn: 'Dive' })) return true;
     }
     if (B && G.phase === 'play' && G.trick && G.trick.plays.length === 0 && G.trick.cu) {
       const C = CURSE[G.trick.cu], n = G.tricks.length, nx = G.boss.sched.findIndex((c, i) => i > n && c);
-      const tail = ' This trick only' + (nx >= 0 ? '; the next curse comes on trick ' + (nx + 1) + '.' : '.');
+      const tail = ' This trick only' + (nx >= 0 ? '; the next curse is on trick ' + (nx + 1) + '.' : '.');
       // the full pop-up only the first time a curse appears in a fight; later it is a line in the dock and the red tag on the boss bar
       if (!UI.said['cut' + G.att + G.trick.cu]) { UI.said['cut' + G.att + G.trick.cu] = 1; UI.said['cu' + G.att + ':' + n] = 1; showDlg({ who: G.boss.id, curse: 1, title: B.name + ' casts ' + C.name + '!', body: C.text + tail, btn: 'Brace!' }); return true; }
       if (!UI.said['cu' + G.att + ':' + n]) { UI.said['cu' + G.att + ':' + n] = 1; UI.hitAt = Date.now(); UI.news = (UI.news || []).concat(['\u2620 Trick ' + (n + 1) + ': ' + B.name + ' casts ' + C.name + ' \u2014 ' + C.short.toLowerCase() + '.']).slice(-3); render(); }
@@ -167,5 +167,5 @@ function bossBar() {
   bb.innerHTML = '';
   const nx = G.boss.sched.findIndex((c, i) => i > G.tricks.length && c);
   bb.append(h('span.bpt', { html: portraitSVG(G.boss.id, 34) }), h('div.bmid', h('b', B.name), h('div.hp', { 'aria-label': 'Boss health ' + (n - done) + ' of ' + n }, ...Array.from({ length: n }, (_, i) => h('i' + (i < n - done ? '.on' : ''))))),
-    cu ? h('span.bcu', { title: CURSE[cu].text }, '☠ ' + CURSE[cu].short) : h('span.bcu.calm', nx >= 0 ? 'Curse on trick ' + (nx + 1) : 'No curse'));
+    cu ? h('span.bcu', { title: CURSE[cu].text }, '☠ ' + CURSE[cu].short) : h('span.bcu.calm', nx >= 0 ? 'Next curse: trick ' + (nx + 1) : 'No curse'));
 }
