@@ -125,6 +125,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>${NET.on?'':'<div class="acts"><button class="btn" data-a="tutorial">Learn to play</button></div>'}
    ${saved&&!NET.on?`<div class="acts"><button class="btn" data-ui="continue">Continue saved game</button></div>`:''}
    <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>
+   ${(()=>{const RO=sgRoster();if(!RO.length||NET.on)return '';const cur=o.rival||'tamsin';return `<div class="qrow sg-rvrow"><span>Rival</span><div class="sg-rivals" role="radiogroup" aria-label="Rival">${RO.map(r=>`<button class="sg-rv${r.id===cur?' on':''}" data-rival="${r.id}" role="radio" aria-checked="${r.id===cur}" aria-label="${esc(r.nm)}" title="${esc(r.nm)}"><img src="media/${r.pic}" alt="" loading="eager"></button>`).join('')}</div></div><div class="sg-rvname">${esc((RO.find(r=>r.id===cur)||RO[0]).nm)}</div>`})()}
    <div class="qrow"><span>Computer</span><div class="seg">${['easy','normal','hard'].map(l=>`<button class="${lvAll===l?'on':''}" data-alv="${l}">${l}</button>`).join('')}</div></div>
    ${NET.on||typeof campOpen!=='function'||!window.CAMPAIGN?'':'<div class="acts"><button class="btn" data-ui="story-map">★ Story</button></div>'}
    <details class="more"><summary>More options</summary>
@@ -194,7 +195,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slo
   if(d.slot){return on3DPick({k:'tile',sl:d.slot})}
   if(d.kiln!=null)return on3DPick({k:'kiln',i:+d.kiln});if(d.ctr!=null)return on3DPick({k:'ctr'});
   if(d.np||d.alv){const same=b.classList.contains('on');if(same){b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash');sfx('click');return}}   // tapping the chosen option still answers: a short press flash
-  if(d.np){UI.setup.np=+d.np;render();return}if(d.seat!=null){const i=+d.seat;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';render();return}
+  if(d.rival){UI.setup.rival=d.rival;sfx('click');render();return}if(d.np){UI.setup.np=+d.np;render();return}if(d.seat!=null){const i=+d.seat;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';render();return}
   if(d.alv){for(let i=0;i<4;i++)UI.setup.lv[i]=d.alv;render();return}
   if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
   if(d.ex&&b.type==='checkbox'){UI.setup.ex[d.ex]=b.checked;return}if(d.coach&&b.type==='checkbox'){setCoach(b.checked);return}
@@ -209,8 +210,12 @@ function uiAct(a){switch(a){case 'start':if(typeof tutOffer==='function'&&tutOff
   case 'advise':advise();return;case 'noadv':UI.adv=null;upd();return}}
 document.addEventListener('keydown',e=>{if(GX.open||UI.modal||!me())return;if(e.key==='Escape'&&UI.sel){UI.sel=null;UI.tgt=null;upd()}else if(e.key==='Enter'&&UI.sel&&UI.tgt!=null){const m=movesFor(UI.sel).find(m=>m.line===UI.tgt);if(m){e.preventDefault();go(m)}}});
 function openStart(){UI.modal='start';render()}
+// W466: rivals are the story cast (owner portraits media/camp-*.webp); quick play lets you pick who you face
+function sgRoster(){try{const c=(window.CAMPAIGN||{}).cast||{};return Object.keys(c).filter(k=>k!=='guide').map(k=>({id:k,nm:String(c[k].name||k).replace(/^(Master|The) /,'').split(/[ ,]/)[0],pic:c[k].portrait||('camp-'+k+'.webp')}))}catch(e){return []}}
+function sgPicOf(nm){const r=sgRoster().find(x=>x.nm===nm);return r?r.pic:null}
 function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;const seats=o.seats.slice(0,o.np);
-  UI.modal=null;newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex),mode:seats.every(s=>s==='ai')?'ai':'x'});UI.modal='story';resetScene();refresh()}
+  UI.modal=null;const RO=sgRoster();const ri=Math.max(0,RO.findIndex(r=>r.id===(o.rival||'tamsin')));let k=0;const names=seats.map((s,i)=>s==='ai'&&RO.length?RO[(ri+(k++))%RO.length].nm:PNAMES[i]);
+  newGame({np:o.np,seats,names,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex),mode:seats.every(s=>s==='ai')?'ai':'x'});UI.modal='story';resetScene();refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh();if(g.campId&&typeof campResume==='function')campResume()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
