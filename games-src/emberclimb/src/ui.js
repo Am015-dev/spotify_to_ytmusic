@@ -37,7 +37,7 @@
   function goalCard(done) {
     var o = h('div', 'ec-goal'); o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Goal');
     var c = h('div', 'ec-goalc', null, [h('h2', '', 'Goal'), h('p', 'lead', 'Reach the top of the tower and defeat its guardian.'),
-      h('ul', '', null, [h('li', '', 'Spend energy on cards: attacks cut enemy HP, Block stops their hits.'), h('li', '', 'Each won fight adds a card, gold or a relic to your climb.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
+      h('ul', '', null, [h('li', '', 'Cards cost energy. Attacks cut HP. Block stops hits.'), h('li', '', 'Win fights to earn cards, gold and relics.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
     var b = on(h('button', 'btn', 'Climb'), function () { o.remove(); if (done) done(); }); b.id = 'goal-go'; c.appendChild(b); o.appendChild(c); document.body.appendChild(o);
   }
   UI.goalCard = goalCard;
@@ -50,7 +50,8 @@
   // owner brief (8 Nov): a message stays at least 4 s + 1 s per 10 words, one at a time, and a tap closes it
   function readMs(t, ms) { var w = String(t || '').split(/\s+/).filter(Boolean).length; return Math.max(ms || 0, 4000 + 1000 * Math.ceil(w / 10)); }
   UI.readMs = readMs;
-  function toast(t, ms) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animationDuration = dur + 'ms'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
+  function toast(t, ms, tries) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var t0 = document.querySelector('.toast'); if (document.querySelector('.ec-say') || (t0 && Date.now() < (+t0.getAttribute('data-until') || 0))) { if ((tries || 0) < 30) setTimeout(function () { toast(t, ms, (tries || 0) + 1); }, 500); return; }   // wait for the coach bubble: one message at a time
+    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animationDuration = dur + 'ms'; d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
@@ -273,7 +274,7 @@
       else if (UI.sel >= 0) txt = 'Tap ' + E.eff(ch.hand[UI.sel]).name + ' again to play it.';
       else if (anyOk) txt = 'Tap a glowing card to pick it. You have ' + ch.en + ' energy.';
       else txt = 'No more cards you can play. Tap End turn.';
-      if (b.ph === 'p' && UI.endBtn) a.appendChild(UI.endBtn);
+      if (b.ph === 'p' && UI.endBtn && window.innerWidth < 1024) a.appendChild(UI.endBtn);   // PC: End turn stays by the hand (R1)
     }
     else if (g.scr === 'reward') { txt = 'Pick a card to add, or skip.'; ttl = 'Reward'; }
     else if (g.scr === 'rest') { txt = 'Rest, or smith a card.'; ttl = 'Campfire'; }
@@ -406,7 +407,7 @@
     var ctl = h('div', 'ctl');
     if (b.ph === 'p') {
       ctl.appendChild(h('div', 'piles', null, [(function (dc) { dc.id = 'drawpile'; return dc; })(on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'draw'; render(); })), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
-      var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
+      var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; if (window.innerWidth >= 1024) { eb.classList.add('w4endpc'); ctl.appendChild(eb); } try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
     }
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
@@ -505,7 +506,8 @@
   function playIt(ci, ti) {
     var g = G(), mv = { t: 'play', h: g.b.cur, c: ci }; if (ti != null) mv.e = ti;
     var hc0 = g.hs[g.b.cur], cc0 = hc0.hand[ci]; UI.lastName = whyOf(hc0, cc0, ti != null ? g.b.en[ti] : null); SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
-      UI.busy = false; UI.sel = -1; var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead;
+      UI.busy = false; UI.sel = -1; g = G(); if (!g || !g.b || g.scr !== 'battle') { render(); return; }   // R1: the fight can end while the card flies
+      var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead;
       try { var pv = E.previewPlay && E.previewPlay(g.b.cur, ci, ti); if (pv && UI.fs) pv.en.forEach(function (x) { UI.fs.over += x ? x.over : 0; }); } catch (x) { }
       E.performMove(mv); render(); UI.lastName = ''; afterMove();
       try { if (UI.coachReact && tg) { if (!wasD && tg.dead) UI.coachReact('good', 'kill'); else if (wasV) UI.coachReact('good', 'double'); } } catch (e) { }
@@ -547,6 +549,7 @@
       var nm = D.ENEMIES[e.id].name, P = intentParts(e), hh = g.hs[(e.intent && e.intent.tg) || 0] || g.hs[0], hp0 = hh.hp, bk0 = hh.blk;
       UI.actor = ei; UI.cap = nm + ' ' + P.map(function (p) { return p.cap || p.t; }).join(' and ') + '.'; render();
       setTimeout(function () {
+        var g1 = G(); if (!g1 || !g1.b || g1.scr !== 'battle') return done();   // R1: guard delayed callbacks
         E.step(); var g2 = G(); render();
         var lost = hp0 - hh.hp, soak = Math.max(0, Math.min(bk0, bk0 - hh.blk));
         if (g2.scr === 'battle' && (lost > 0 || soak > 0)) { UI.cap = (lost > 0 ? 'You lost ' + lost + ' HP' : 'No damage') + (soak > 0 ? ' (' + soak + ' blocked by your Block).' : '.'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = UI.cap; }
@@ -640,7 +643,8 @@
   // ---------- result screens (defeat + victory): cause, floors, deck (tap = large card), relics, Story stars; used for Quick and Story
   function bigCard(c) { var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); pk.addEventListener('pointerdown', function (e) { e.stopPropagation(); pk.remove(); }); pk.addEventListener('click', function () { pk.remove(); }); document.body.appendChild(pk); }
   function resultScr(r, done) {
-    var g = G(), s = h('div', 'over res'); s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
+    var g = G(); try { hud(); } catch (e) { }   // R1: the top-bar HP must match the result (0 when fallen)
+    var s = h('div', 'over res'); s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
     s.appendChild(h('h1', '', g.won ? ((g.F || 9) >= 9 ? 'SUMMIT!' : 'CLIMB WON!') : 'FALLEN'));
     var bossId = g.boss, kid = g.won ? bossId : g.killer, kd = kid && D.ENEMIES[kid];
     var cause = h('div', 'cause');
@@ -658,7 +662,7 @@
       (r.unlocks || []).forEach(function (u) { s.appendChild(h('div', 'runl', 'Unlocked: ' + u.text)); });
     }
     var dk = h('div', 'rsec'); dk.appendChild(h('b', '', 'Final deck (tap a card)'));
-    var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
+    var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [A(o.c.id, '', { cls: 'rart', kind: 'card', noph: 1 }), h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
     dk.appendChild(gr); s.appendChild(dk);
     var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics (tap for text)'));
     var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { toast(D.RELICS[id].name + ': ' + D.RELICS[id].t, 3200); }); t.setAttribute('aria-label', D.RELICS[id].name); rr.appendChild(t); });
