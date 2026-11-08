@@ -38,8 +38,8 @@ mk.stance = 'w'; t0 = G.b.en[0]; playId(G, 'm-strike', 0); ok(t0.hp === 200 - 6 
 G.b.en[0].intent = { atk: 10, tg: 0 }; ok(E.previewHit(0, 0) === 10, 'R06 wrath does not raise damage taken (previewHit)');
 mk.hand = []; const hpw = mk.hp; E.performMove({ t: 'end' }); ok(mk.hp === hpw - SC, 'R06 ending the turn in wrath costs ' + SC + ' HP');
 // R07 monk relic: Miracles, no calm start, no calm spark
-G = fresh(['m'], 14); mk = G.hs[0]; ok(mk.mir === 2 && !mk.hand.some(c => c.id === 'calm-spark') && mk.stance === 'n', 'R07 monk relic: Miracle tokens, no Calm, no Calm Spark');
-mk.en = 6; ok(E.validMoves().some(m => m.t === 'mir'), 'R07 mir move offered'); E.performMove({ t: 'mir' }); ok(mk.en === 7 && mk.mir === 1, 'R07 miracle: +1 energy, may pass the cap');
+G = fresh(['m'], 14); mk = G.hs[0]; ok(mk.mir === 1 && !mk.hand.some(c => c.id === 'calm-spark') && mk.stance === 'n', 'R07 monk relic: Miracle tokens, no Calm, no Calm Spark');
+mk.en = 6; ok(E.validMoves().some(m => m.t === 'mir'), 'R07 mir move offered'); E.performMove({ t: 'mir' }); ok(mk.en === 7 && mk.mir === 0, 'R07 miracle: +1 energy, may pass the cap');
 // R18 energy cap 6
 mk.en = 6; mk.stance = 'c'; playId(G, 'm-empty-fist', 0); ok(mk.en === 6, 'R18 energy cap 6 (calm exit +2 capped)');
 mk.en = 3; mk.stance = 'c'; mk.hand.push(E.mk('m-empty-fist')); E.performMove({ t: 'play', h: 0, c: mk.hand.length - 1, e: 0 }); ok(mk.en === 4, 'R06 calm exit still gives 2 energy');
@@ -110,7 +110,7 @@ E.newGame({ heroes: ['w'], seed: 36, boss: 'mire-behemoth' }); G = E.G(); E.debu
 // R23 merchant: 3 cards per hero, 3 relics + 3 potions, first relic/potion one step cheaper
 E.newGame({ heroes: ['w', 'm'], seed: 28 }); E.debug.shop(); G = E.G(); const its = G.shop.items, rel = its.filter(x => x.t === 'relic'), pts = its.filter(x => x.t === 'pot');
 ok(its.filter(x => x.t === 'card' && D.CARDS[x.id].hero === 'w').length === 3 && its.filter(x => x.t === 'card' && D.CARDS[x.id].hero === 'm').length === 3 && rel.length === 3 && pts.length === 3, 'R23 merchant: 3 cards per hero, 3 relics, 3 potions');
-ok(pts[0].p === pts[1].p - 15 && rel[0].p === (D.RELICS[rel[0].id].rar === 'u' ? 205 : 135), 'R23 merchant: first relic and potion 15 cheaper');
+ok(pts[0].p === pts[1].p - 25 && rel[0].p === (D.RELICS[rel[0].id].rar === 'u' ? 195 : 125), 'R23 merchant: first relic and potion 25 (one gold unit) cheaper');
 // UI contract: plain-word keyword lines
 const ln = id => E.lines(E.eff({ id, u: 0 })).join(' ');
 ok(/Retain/.test(ln('m-judgment')) && /Scry 3/.test(ln('m-third-eye')) && /Miracle/.test(ln('m-zen-burst')) && /Shivs \(3-damage/.test(ln('s-blade-fan')), 'lines: Retain, Scry, Miracle, Shiv described');

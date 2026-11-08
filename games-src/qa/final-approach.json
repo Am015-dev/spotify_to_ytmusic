@@ -2,22 +2,37 @@
  "slug": "final-approach",
  "size": "phone",
  "seed": 48774,
- "when": "2026-11-07T23:23Z",
+ "when": "2026-11-08T01:18Z",
  "tutorial": {
-  "end": null,
-  "note": "no tutorial"
+  "end": true,
+  "coached": true,
+  "explained": 13,
+  "explainedIds": [
+   "intro",
+   "seats",
+   "goal",
+   "turns",
+   "engines",
+   "axis",
+   "coffee",
+   "gear",
+   "rounds",
+   "radio",
+   "reroll",
+   "flaps",
+   "brakes"
+  ],
+  "bubblesClosed": 41,
+  "clicks": 202
  },
  "quick": {
   "result": "cap",
-  "clicks": 527
+  "clicks": 17
  },
  "story": {
-  "result": null,
-  "note": "no Story button on the title"
+  "result": null
  },
- "fuzz": {
-  "taps": 210
- },
+ "fuzz": {},
  "bugs": [
   {
    "sev": "MINOR",
@@ -28,12 +43,68 @@
    "shot": "/tmp/qa-shots/final-approach/phone-screen-title-1.png"
   },
   {
-   "sev": "MAJOR",
+   "sev": "MINOR",
    "phase": "tutorial",
-   "where": "title",
-   "desc": "no tutorial entry on the title screen (no learn/guided/tutorial button): game has no staged tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 28px (<40) div.w.altw x1: \"R1/4 · 3000 ft\nRavi firs\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/qa-shots/final-approach/phone-tut-noentry-2.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 27px (<40) span.ck.ok x1: \"Plane level: yes\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 30px (<40) span.ck.no x5: \"3\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 28px (<40) div.w.altw x1: \"R1/4 · 3000 ft\nYour turn\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 28px (<40) div.w.altw x1: \"R2/4 · 2000 ft\nYour turn\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 27px (<40) span.ck.no x6: \"Plane level: not yet\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 27px (<40) span.ck.no x5: \"Plane level: not yet\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 27px (<40) span.ck.ok x1: \"No planes on the track: \"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
   },
   {
    "sev": "MINOR",
@@ -41,120 +112,54 @@
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight briefing\" under div.ttl-in \"Final Approach Two seats\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-title-3.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-title-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 28px (<40) div.w.altw x1: \"1000 ft\nRavi first\"",
+   "desc": "tap target 28px (<40) div.w.altw x1: \"R1/4 · 3000 ft\nRavi firs\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-4.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-7.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 27px (<40) span.ck.ok x2: \"Plane level: yes\"",
+   "desc": "tap target 27px (<40) span.ck.ok x1: \"Plane level: yes\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-4.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-7.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 30px (<40) span.ck.no x4: \"2\"",
+   "desc": "tap target 30px (<40) span.ck.no x5: \"3\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-4.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-7.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 27px (<40) span.ck.ok x3: \"Plane level: yes\"",
+   "where": "quick click #17 (×)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 17 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-5.png"
+   "shot": ""
   },
   {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 30px (<40) span.ck.no x3: \"2\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-5.png"
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "bot",
+   "desc": "phase crashed: browser.newContext: Target page, context or browser has been closed",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases story"
   },
   {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 27px (<40) span.ck.ok x5: \"Plane level: yes\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-6.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 30px (<40) span.ck.no x1: \"2\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-quick-board-6.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick click #527 (1)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 527 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases quick",
-   "shot": "/tmp/qa-shots/final-approach/phone-quick-noresult-8.png"
-  },
-  {
-   "sev": "MINOR",
+   "sev": "MAJOR",
    "phase": "fuzz",
-   "where": "title",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight briefing\" under div.ttl-in \"Final Approach Two seats\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-title-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 28px (<40) div.w.altw x1: \"1000 ft\nRavi first\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 27px (<40) span.ck.ok x2: \"Plane level: yes\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 30px (<40) span.ck.no x4: \"2\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 27px (<40) span.ck.ok x3: \"Plane level: yes\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-11.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 30px (<40) span.ck.no x3: \"2\"",
-   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-fuzz-screen-11.png"
+   "where": "bot",
+   "desc": "phase crashed: browser.newContext: Target page, context or browser has been closed",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases fuzz"
   }
  ],
- "secs": 297
+ "secs": 324
 }

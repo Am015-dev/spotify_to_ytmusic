@@ -361,5 +361,18 @@ t('ladder 2-4: checklist items grow, speed uses auto-brakes 6 before chapter 5',
 t('ladder: checklist matches the engine fields', () => { const G = FA.newGame({ lad: 4, seed: 3 }); G.pl.axis = 1; G.pl.sw.lg = [1, 1, 1]; const c = Object.fromEntries(FA.checklist(G).map(x => [x.k, x])); eq(c.axis.ok, false); eq(c.gear.ok, true); eq(c.gear.n, 3); eq(c.flaps.ok, false); eq(c.planes.n, FA.planesOnTrack(G)); });
 t('ladder: the real game is untouched (no lad): keys, dice, briefing', () => { const G = FA.newGame({ scenario: 'g1', seed: 2 }); eq(G.lad, 0); eq(G.phase, 'brief'); ok(!G.open); eq(G.keys.length, FA.slotKeys(G.mods).length); });
 
+t('tutorial flight: 4 rounds from 3000 ft on the 4-space strip, one plane on space 3; following the coach (round systems only) lands the plane', () => {
+  require('./src/ai.js');
+  const SCRIPT = [[[3, 4, 2, 6], [3, 4, 1, 2]], [[2, 4, 3, 1], [4, 3, 2, 5]], [[2, 4, 5, 3], [3, 4, 1, 2]], [[2, 3, 6, 1], [2, 4, 5, 1]]];
+  const ALLOW = [['axis', 'engines', 'conc'], ['axis', 'engines', 'conc', 'radio', 'gear'], ['axis', 'engines', 'conc', 'radio', 'gear', 'flaps', 'brakes'], null];
+  const G = FA.newGame({ scenario: 'tt', seed: 23, row0: 3, pre: { script: SCRIPT } }); eq(D.rounds - G.row0, 4); eq(G.planes.join(''), '0010'); eq(FA.altRow(G)[0], 3000);
+  let n = 0; while (!G.result && n++ < 300) { const s = FA.pending(G)[0]; let m = null;
+    if (G.phase === 'brief') m = { t: 'ready' }; else { const al = ALLOW[Math.min(G.round, 3)], V = FA.stripView(G, s); let bc = 1e9;
+      if (!G.pend) for (const x of FA.validMoves(V, s)) { if (x.t !== 'place' || x.d === 'p' || (al && !al.includes(FA.SLOT[x.to].grp))) continue; const S = FA.cloneLite(V); FA.performMove(S, x, s, true); const c = FA.AI.cost(S, s) + Math.abs(x.c || 0) * 0.02; if (c < bc) { bc = c; m = x; } }
+      if (!m) m = FA.AI.move(G, s, 'normal', { noMC: true }); }
+    ok(FA.performMove(G, m, s).ok); }
+  ok(G.result && G.result.win, 'tutorial flight should land: ' + JSON.stringify(G.result));
+});
+
 console.log('rules-test: ' + pass + ' passed, ' + fail + ' failed');
 if (fail) { console.log(failed.join('\n')); process.exit(1); }
