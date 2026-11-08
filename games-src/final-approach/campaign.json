@@ -1674,20 +1674,20 @@
    ]
   },
   "coach": {
-   "intro": "Check ride, Captain. We win or crash together. Plan aloud, never say numbers.",
-   "seats": "Your dice are hidden from {rival}, his from you. Blue spaces are yours, orange his, grey anyone's.",
-   "goal": "To land: runway clear, gear and flaps down, wings level, speed in the brakes.",
-   "turns": "One die each, taking turns. Axis and engines must both be filled every round, or we lose.",
-   "axis": "Axis: the plane tips toward the higher die by the difference. A tilt of 3 is a spin and Pell wins.",
-   "radio": "A plane on the track is a collision. Radio clears the plane that many spaces ahead: yours counts from 1, {rival}'s from 2.",
-   "engines": "Engines: both dice add up. Past blue {aeroB} the plane moves one space, past orange {aeroO} two. It must end on the airport, not past it.",
-   "gear": "Landing gear takes 1-2, 3-4 or 5-6 in any order. Each gear lifts the blue marker.",
-   "flaps": "Flaps are {rival}'s: 1-2, 2-3, 4-5, 5-6 in order. Each flap lifts the orange marker.",
-   "brakes": "Brakes need exactly 2, then 4, then 6, in order. They count only in the last round.",
-   "coffee": "Coffee: any die earns a token. Spend tokens with the + and - buttons to nudge a die by one.",
-   "reroll": "A reroll token: either of you may spend it, even on the other's turn. Pick the dice to roll again, or keep them.",
-   "rounds": "Each round we drop 1000 ft. Reach the airport before the last round.",
-   "final": "Landing round. No flying now: engine speed within the brake value, gear and flaps down, wings level."
+   "intro": "We win or crash together. Never say dice numbers.",
+   "seats": "Blue spaces are yours, orange are {rival}'s, grey are anyone's.",
+   "goal": "To land: clear runway, gear and flaps down, wings level.",
+   "turns": "One die each in turn. Fill axis and engines every round.",
+   "axis": "Axis tips toward the higher die. A tilt of 3 crashes.",
+   "radio": "A plane on our path is a crash. Radio clears it.",
+   "engines": "Engines add both dice. Past a marker, we move closer.",
+   "gear": "Gear takes 1-2, 3-4 or 5-6. All three must drop.",
+   "flaps": "{rival}'s flaps go in order: 1-2, 2-3, 4-5, 5-6.",
+   "brakes": "Brakes need exactly 2, then 4, then 6.",
+   "coffee": "Coffee earns a token. A token nudges a die by one.",
+   "reroll": "A reroll token lets both of us roll again.",
+   "rounds": "We drop 1000 ft each round. Reach the airport first.",
+   "final": "Landing round: speed must not beat the brakes."
   },
   "later": [
    "Traffic die: some airports add planes each round (Story chapter 7).",
@@ -1702,10 +1702,10 @@
    "lose": "Pell smiles thinly: \"Not this time.\" Voss: \"Again, Captain. Everyone crashes once.\""
   },
   "rounds": [
-   "Round 1 of 4: axis and engines. Each of us fills both. Spare dice earn coffee.",
-   "Round 2: radio and gear. A plane sits on space 3. Clear it before we fly in.",
-   "Round 3: flaps and brakes. Ravi's flaps go in order. Brakes need exactly 2, then 4.",
-   "Round 4: landing. The plane stops. Speed must not beat the brakes."
+   "Round 1 of 4: axis and engines.",
+   "Round 2: radio and gear.",
+   "Round 3: flaps and brakes.",
+   "Round 4: the landing."
   ]
  }
 }

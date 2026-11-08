@@ -160,3 +160,12 @@ function renderMap(){const svg=document.getElementById('map');if(!G){svg.innerHT
   svg.innerHTML=s;
   // halo: every board label gets an outline of the opposite lightness, so it reads over any picture (fallback 2D board)
   svg.querySelectorAll('text').forEach(t=>{if(t.getAttribute('stroke'))return;const f=(t.getAttribute('fill')||'').toLowerCase();const light=/^#(f|e|d)[0-9a-f]{5}$|^#f{3}$|white|^url/.test(f);t.setAttribute('stroke',light?'#1a1320':'#fffaf0');t.setAttribute('stroke-width','3');t.setAttribute('paint-order','stroke');t.setAttribute('stroke-linejoin','round');try{let bb=null;try{bb=t.getBBox()}catch(e){}if(!bb||bb.width<2){const fs=+t.getAttribute('font-size')||14,n=(t.textContent||'').length,w=+t.getAttribute('textLength')||n*fs*.6,an=t.getAttribute('text-anchor'),x=+t.getAttribute('x')||0,y=+t.getAttribute('y')||0;bb={x:an==='middle'?x-w/2:an==='end'?x-w:x,y:y-fs*.85,width:w,height:fs*1.1}}if(bb.width>2){const r=document.createElementNS('http://www.w3.org/2000/svg','rect');r.setAttribute('x',bb.x-3);r.setAttribute('y',bb.y-1);r.setAttribute('width',bb.width+6);r.setAttribute('height',bb.height+2);r.setAttribute('rx',3);r.setAttribute('fill',light?'#1a1320':'#fffaf0');r.setAttribute('opacity','.9');r.setAttribute('pointer-events','none');t.parentNode.insertBefore(r,t)}}catch(e){}})}
+
+// W467: every label on the 2D board sits on a plate that contrasts with its own colour (the painted map behind is too busy to read on)
+function mapPlates(svg){if(!svg||!svg.getBBox)return;const lum=c=>{const m=String(c).match(/\d+(\.\d+)?/g);if(!m)return 0;const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(+m[0])+.7152*f(+m[1])+.0722*f(+m[2])};
+  svg.querySelectorAll('rect.wplate').forEach(r=>r.remove());
+  for(const t of svg.querySelectorAll('text')){let b;try{b=t.getBBox()}catch(e){continue}if(!b||b.width<2||b.height<2)continue;
+    const light=lum(getComputedStyle(t).fill)>.4,r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('class','wplate');r.setAttribute('x',b.x-4);r.setAttribute('y',b.y-2);r.setAttribute('width',b.width+8);r.setAttribute('height',b.height+4);r.setAttribute('rx',4);
+    r.setAttribute('fill',light?'#1a1320':'#fffaf0');const tr=t.getAttribute('transform');if(tr)r.setAttribute('transform',tr);t.parentNode.insertBefore(r,t)}}
+{const _rm=renderMap;renderMap=function(){_rm.apply(this,arguments);try{const svg=document.getElementById('map');if(svg&&getComputedStyle(svg).display!=='none')mapPlates(svg)}catch(e){}}}

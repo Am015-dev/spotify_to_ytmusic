@@ -51,6 +51,7 @@ async function game(b, gi, [W, H]) {
     let c = await ev(`__sw.btn('[data-a=play]')`); if (!c) { fail('no Play button'); throw 0; } await tap(c.x, c.y); await p.waitForTimeout(400);
     const np = 3 + Math.floor(R() * 2); await p.evaluate(n => { UI.opt = UI.opt || {}; UI.opt.np = n; setNp(n); renderStart(); }, np);
     c = await ev(`__sw.btn('[data-start=vs]')`); if (!c) { fail('no vs button'); throw 0; } await tap(c.x, c.y); await p.waitForTimeout(900);
+    c = await ev(`__sw.btn('#kkgoal .kgo')`); if (c) { await tap(c.x, c.y); await p.waitForTimeout(400); }   // the Goal card (how you win) opens the first game
     await p.evaluate(LIB);
 
     // ---- help kit checks: tips ON from a fresh profile in 4 of 5 games (each first-time bubble once, short, pointing at its target, never covering the target or
@@ -58,7 +59,7 @@ async function game(b, gi, [W, H]) {
     const tipsOn = gi % 5 !== 4, seenPh = new Set(); let bulbN = 0;
     await p.evaluate(on => { GXH.reset(); GXH.setEnabled(on); }, tipsOn);
     const wc = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
-    const neutral = async () => (await p.evaluate(() => { const e = document.querySelector('#barstat'); const r = e && e.getBoundingClientRect(); return r && r.width > 8 ? [r.left + r.width / 2, r.top + r.height / 2] : [innerWidth / 2, 4]; }));
+    const neutral = async () => (await p.evaluate(() => { const e = document.querySelector('.gx-bar h1 .ic'); const r = e && e.getBoundingClientRect(); return r && r.width > 8 ? [r.left + r.width / 2, r.top + r.height / 2] : [innerWidth / 2, 4]; }));
     const bubbleInfo = ph => p.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(), tq = te && te.getBoundingClientRect(); const r = e.getBoundingClientRect();
       const av = [...document.querySelectorAll('#belt .hc.rec,#tbl .grp.usable,#rs .btn')].filter(x => x.getBoundingClientRect().width).map(x => { const q = x.getBoundingClientRect(); return { l: q.left + q.width / 2 - 14, r: q.left + q.width / 2 + 14, t: q.top + q.height / 2 - 14, b: q.top + q.height / 2 + 14 }; });
       return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), T: tq && { l: tq.left, t: tq.top, r: tq.right, b: tq.bottom }, B: { l: r.left, t: r.top, r: r.right, b: r.bottom }, av, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; }, ph);

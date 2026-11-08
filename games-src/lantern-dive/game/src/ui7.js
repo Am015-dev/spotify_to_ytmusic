@@ -108,7 +108,7 @@ function pxFace(id, w) {
   const corner = rot => { x.save(); if (rot) { x.translate(w / 2, H / 2); x.rotate(Math.PI); x.translate(-w / 2, -H / 2); }
     x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = dk ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = dk ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
     if (im) framed(w * .1, w * .41, w * .2, false); x.restore(); };
-  corner(false); corner(true);
+  corner(false);
   const tex = PIXI.Texture.from(c); PX.tex['f:' + key] = tex; return tex;
 }
 function pxBack(w) {

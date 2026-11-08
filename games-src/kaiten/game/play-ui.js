@@ -41,6 +41,7 @@ async function playMeal(p, tag, until) {
   { const tag = 'quick'; const { ctx, p, errs } = await mk(b, true);
     if (!await tapSel(p, '#start .ttl [data-a=play]')) note(tag, 'no Play on the title'); await sleep(500);
     if (!await tapSel(p, '#start [data-start=vs]')) note(tag, 'no Normal game button'); await sleep(1200);
+    if (!await tapSel(p, '#kkgoal .kgo')) note(tag, 'no Goal card at the start'); await sleep(400);
     const r = await playMeal(p, tag, async () => p.evaluate(() => !!G && G.phase === 'over' && !!document.querySelector('#rs .kkres')));
     const res = await p.evaluate(() => { const c = document.querySelector('#rs .kkres'); return c && { t: c.innerText, again: !!document.querySelector('#rs [data-a=again]') }; });
     if (!res) note(tag, 'no result card'); else if (!res.again) note(tag, 'no Play again button');
