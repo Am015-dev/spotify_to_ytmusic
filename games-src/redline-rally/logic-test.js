@@ -32,9 +32,13 @@ function play(G, plan, o) {                              // resolve car 0 alone 
   o = o || {}; const c = G.cars[0];
   c.plan = { gear: plan.gear, cards: plan.cards, boost: !!plan.boost };
   G.phase = 'resolve'; G.order = [0]; G.ri = 0; G.adr = o.adr || [];
-  let ev = X.resolveNext(G); const asked = !!G.pend;
-  if (G.pend) ev = ev.concat(X.slipChoice(G, !!o.slip));
-  return { ev, asked };
+  let ev = X.resolveNext(G), asked = false, askedBoost = false, askedDisc = false;
+  for (let k = 0; k < 4 && G.pend; k++) {                // answer the human's questions in step order: boost (react), slipstream, discard
+    if (G.pend.t === 'boost') { askedBoost = true; ev = ev.concat(X.boostChoice(G, !!plan.boost)); }
+    else if (G.pend.t === 'slip') { asked = true; ev = ev.concat(X.slipChoice(G, !!o.slip)); }
+    else { askedDisc = true; const r = X.discardChoice(G, 0, o.disc || []); if (typeof r === 'string') return { ev, asked, err: r }; ev = ev.concat(r); }
+  }
+  return { ev, asked, askedBoost, askedDisc };
 }
 const evOf = (r, t) => r.ev.filter(e => e.t === t);
 
@@ -114,8 +118,8 @@ R[52] = () => { const G = mk(3); const c = G.cars[0]; cfg(c, { hand: filler(5), 
 
 /* ---- Replenish ---- */
 R[53] = () => { const G = mk(2); const c = G.cars[0]; cfg(c, { hand: filler(5), deck: filler(10), gear: 2, pos: 3 }); play(G, { gear: 2, cards: ['2', '2'] }); return eq(7, c.hand.length); };
-R[54] = () => { const G = mk(2); const c = G.cars[0]; cfg(c, { hand: ['1', '2', '3', '4', '1', '2', '3'], deck: filler(10) }); const a = X.discardOptional(G, 0, [0, 1]), b = X.discardOptional(G, 0, [2]); return eq(['', 'phase', 7, 2], [a, b, c.hand.length, c.disc.length]); };
-R[55] = () => { const G = mk(2); const c = G.cars[0]; cfg(c, { hand: ['1', '2', 'H', 'X', '4', '1', '2'], deck: filler(10), eng: 5 }); return eq(['card', 'card'], [X.discardOptional(G, 0, [2]), X.discardOptional(G, 0, [3])]); };
+R[54] = () => { const G = mk(2); const c = G.cars[0]; cfg(c, { hand: ['2', '3', '4', '1', '2', '3'], deck: filler(10), gear: 1, pos: 3 }); const r = play(G, { gear: 1, cards: ['1'] }, { disc: [0, 1] }); /* discard step right after moving, then draw back to 7 */ const i = r.ev.findIndex(e => e.t === 'discard'), mv = r.ev.findIndex(e => e.t === 'move'); return eq([true, true, 7, ['1', '2', '3']], [r.askedDisc, mv >= 0 && i > mv, c.hand.length, c.disc.slice().sort()]); };
+R[55] = () => { const G = mk(2); const c = G.cars[0]; cfg(c, { hand: ['1', 'H', 'X', '4', '1', '2'], deck: filler(10), eng: 5, gear: 3, pos: 3 }); const a = play(G, { gear: 3, cards: ['2', '1', '1'] }, { disc: [1] }).err, b = X.discardChoice(G, 0, [2]), d = G.pend && G.pend.t; return eq(['card', 'card', 'disc'], [a, b, d]); };
 R[56] = () => { const G = mk(2); const c = G.cars[0]; cfg(c, { hand: [], deck: [], disc: ['2', '3', '4'] }); X.draw(G, c, 7); return eq([['2', '3', '4'], 0, 0], [c.hand.slice().sort(), c.deck.length, c.disc.length]); };
 
 /* ---- Stall ---- */
@@ -129,6 +133,7 @@ R[61] = () => { const G = mk(3, { laps: 1 }); const a = G.cars[0], b = G.cars[1]
 R[62] = () => { const G = mk(4); G.cars[0].fin = 1; G.cars[0].pos = 100; G.cars[1].pos = 10; G.cars[2].pos = 30; G.cars[3].pos = 20; return eq([0, 2, 3, 1], X.rankList(G)); };
 R[63] = () => { const G = mk(3); G.cars[1].pos = 30; G.cars[2].pos = 30; G.cars[1].tie = 5; G.cars[2].tie = 2; G.cars[0].pos = 5; return eq([2, 1, 0], X.rankList(G)); };
 R[68] = () => { const G = mk(3); G.cars[1].fin = 1; G.cars[1].pos = 12; G.cars[2].fin = 1; G.cars[2].pos = 12; G.round = 2; /* two finishers left the track last round: space 12 is free again */ return eq([12, 0], [X.landing(G, G.cars[0], 12), X.occ(G, 12, G.cars[0])]); };
+R[69] = () => { const G = mk(2); const c = G.cars[0]; cfg(c, { hand: filler(6), deck: ['3', '2'], gear: 1, pos: 3 }); c.plan = { gear: 1, cards: ['X'], boost: false }; G.phase = 'resolve'; G.order = [0]; G.ri = 0; G.adr = []; const ev = X.resolveNext(G); /* boost is asked after the reveal: the stress flip already showed speed 2 */ const a = [ev.some(e => e.t === 'play' && e.speed === 2), G.pend && G.pend.t, G.pend && G.pend.speed]; X.boostChoice(G, true); if (G.pend && G.pend.t === 'disc') X.discardChoice(G, 0, []); return eq([[true, 'boost', 2], 8, 5], [a, c.pos, c.eng]); };
 
 /* ---- Legends (option legends:k, house design of the module) ---- */
 const legendTurn = (G, li, pos, pace) => { const L = G.cars[li]; L.pos = pos; L.pace = [pace]; G.cars.forEach(c => { if (c !== L) c.pos = 30 + c.i * 3; }); G.phase = 'resolve'; G.order = [li]; G.ri = 0; G.adr = []; X.resolveNext(G); return L; };

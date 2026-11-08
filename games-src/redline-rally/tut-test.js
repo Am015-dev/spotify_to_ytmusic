@@ -1,6 +1,6 @@
 /* Guided tutorial walked to the end by real touch (W496). Every step: wait for the spotlight, tap the centre of the highlighted hole with
    page.touchscreen.tap (Next button on info steps). Asserts: each step is one sentence of 12 words or fewer, every rule in TUT_RULES appears in
-   order, the tutorial race ends with the finish step, the end card starts a real race, 0 console errors. Shots: TUT_SHOTS=dir saves tut-<n>.png.
+   order, a real spin out, stall, slipstream and boost happen, the tutorial race ends with the finish step, the end card starts a real race, 0 console errors. Shots: TUT_SHOTS=dir saves tut-<n>.png.
    Usage: PW=playwright node tut-test.js   (phone 390x844 and 375x667) */
 const path = require('path'), fs = require('fs'), { chromium } = require(process.env.PW || 'playwright'), gx = require('../scripts/gx-serve.js');
 (async () => {
@@ -35,6 +35,8 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
     const ruleSeq = seen.filter(s => s.rule).map(s => s.rule);
     if (JSON.stringify(ruleSeq) !== JSON.stringify(rulesAll)) problems.push('rules in order: got ' + ruleSeq.join(','));
     if (seen.length !== total) problems.push('steps shown ' + seen.length + ' of ' + total);
+    const real = await p.evaluate(() => { const s = G.cars[0].stats; return { spins: s.spins, stalls: s.stalls || 0, boosts: s.boosts, slips: s.slips }; });
+    if (real.spins !== 1 || real.stalls !== 1 || real.boosts !== 1 || real.slips !== 1) problems.push('played moves ' + JSON.stringify(real));   // spin out, stall, boost, slipstream really happened
     if (!ended) problems.push('end card not reached');
     else {
       const eb = await p.$('.gxt-end [data-gxt-end="play"]'); const q = await eb.boundingBox(); await p.touchscreen.tap(q.x + q.width / 2, q.y + q.height / 2); await p.waitForTimeout(800);

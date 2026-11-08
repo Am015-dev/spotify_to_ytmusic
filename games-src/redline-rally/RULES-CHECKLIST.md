@@ -28,6 +28,7 @@ Tags: [CORE] must match the original. [EXT] house extension, not in the original
 17. [CORE] If the deck runs out while flipping, the discard pile is shuffled into a new deck.
 
 ## Turn 3: reveal, boost
+18b. [CORE] Boost is decided in the react step, after the cards are revealed (W496: a question after the reveal; test R69).
 18. [CORE] Boost costs 1 heat (engine to discard) and needs at least 1 heat in the engine.
 19. [CORE] Boost: flip until a speed card shows and add its value to the speed.
 20. [CORE] The boost value counts as speed for corner checks.
@@ -76,7 +77,7 @@ Tags: [CORE] must match the original. [EXT] house extension, not in the original
 
 ## Replenish
 53. [CORE] After moving, draw back to 7 cards.
-54. [CORE] Before drawing you may discard non-heat, non-stress cards, once per turn.
+54. [CORE] Right after moving (discard step, before drawing) you may discard non-heat, non-stress cards (W496: moved from the next plan to its real place).
 55. [CORE] Heat and stress cards cannot be discarded this way.
 56. [CORE] Empty deck: the discard pile is shuffled to make a new deck.
 

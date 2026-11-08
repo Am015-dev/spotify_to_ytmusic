@@ -16,10 +16,12 @@ function stackCards(c, want, top) {
    previous round exactly, so nothing jumps (corners: space 10 limit 5, space 15 limit 4; finish at 30). */
 var TUT_CH = [
   { pos: 0, gear: 1, eng: 6, hand: ['1', '3', '2', '4', '1', '2', '3'], kit: [3, ['2', '2']], juno: [2, ['2', '1']] },   /* you start last: adrenaline */
-  { pos: 6, gear: 2, eng: 6, hand: ['1', '4', '2', '3', '1', '2', '3'], kit: [7, ['3', '2']], juno: [5, ['2', '1']] },   /* 4+3 = 7 in a limit-5 corner: burn 2 */
-  { pos: 13, gear: 2, eng: 4, hand: ['H', '1', 'X', '3', 'H', '4', '2'], top: ['2'], kit: [12, ['2', '2']], juno: [9, ['2', '1']] },   /* gear 1 + stress, cool 2 */
-  { pos: 15, gear: 1, eng: 6, hand: ['2', '4', '2', '3', '1', '4', '3'], kit: [16, ['2', '3']], juno: [13, ['2', '1']] },   /* gear 1 -> 3 for 1 heat, land behind Kit: slipstream */
-  { pos: 22, gear: 3, eng: 5, hand: ['1', '4', '3', '1', '2', '3', '4'], top: ['2', '3'], kit: [21, ['3', '2']], juno: [17, ['2', '1']] }   /* swap a 1, 4+2+1 + boost 3: finish */
+  { pos: 6, gear: 2, eng: 6, hand: ['1', '4', '2', '4', '1', '2', '3'], kit: [7, ['3', '2']], juno: [5, ['2', '1']] },   /* 4+4 = 8 in a limit-5 corner: burn 3 */
+  { pos: 14, gear: 2, eng: 3, hand: ['1', '4', '2', '4', '2', '1', '3'], kit: [12, ['2', '2']], juno: [9, ['1', '1']] },   /* 4+4 into the limit-4 corner with 3 heat: spin out */
+  { pos: 14, gear: 1, eng: 0, hand: ['H', 'H', 'H', 'H', 'H', 'H', '3'], kit: [16, ['2', '3']], juno: [12, ['2', '1']] },   /* one playable card in gear 2: stall */
+  { pos: 14, gear: 1, eng: 0, hand: ['H', 'X', 'H', 'H', 'H', 'H', '2'], top: ['2'], kit: [21, ['1', '1']], juno: [16, ['2', '1']] },   /* gear 1 + stress: cool down, adrenaline */
+  { pos: 17, gear: 1, eng: 4, hand: ['2', '4', '1', '3', '1', '4', '3'], kit: [23, ['1', '1']], juno: [19, ['2', '1']] },   /* gear 1 -> 3 for 1 heat, beside Juno: slipstream, then discard */
+  { pos: 24, gear: 3, eng: 3, hand: ['1', '4', '3', '1', '2', '3', '4'], top: ['3'], kit: [25, ['1', '1']], juno: [22, ['2', '1']] }   /* 4+2+1, boost after the reveal: finish */
 ];
 function tutStageRound(r) {
   var ch = TUT_CH[r - 1]; if (!ch || !G || G.cars[0].fin) return;
@@ -56,13 +58,14 @@ function tutCardV(v) {   /* the first not-yet-picked card of value v in your han
 function tutPlan(r) { return function () { return !!G && G.phase === 'plan' && G.round === r && !UI.busy && !G.pend && !!$('#goB'); }; }
 function tutIsCard(v) { return function (a) { var c = G.cars[UI.seat]; return a.what === 'card' && c.hand[a.i] === v; }; }
 /* one rule per step, in turn order. rule = the rule id the tutorial test checks; every step is one short sentence and one tap */
-var TUT_RULES = ['goal', 'gear', 'speed', 'reveal', 'order', 'adrenaline', 'space', 'corner', 'engine', 'burn', 'heatcards', 'stall', 'spin', 'cooldown', 'stress', 'shift2', 'slip', 'swap', 'boost', 'finish'];
+var TUT_RULES = ['goal', 'gear', 'speed', 'reveal', 'order', 'adrenaline', 'space', 'corner', 'engine', 'burn', 'spin', 'heatcards', 'stall', 'cooldown', 'stress', 'shift2', 'slip', 'discard', 'boost', 'finish'];
 function tutSteps() {
   var cv = function () { return $('#cvw'); }, eng = function () { return $('#tray .eng') || $('#tray'); };
-  var card = function (id, r, v, say, rule) { return { id: id, rule: rule, title: '', say: say, target: function () { return tutCardV(v); }, ready: tutPlan(r), wait: { type: 'tap', match: tutIsCard(v) }, wrong: 'Tap the glowing card.', side: 'top' }; };
+  var card = function (id, r, v, say, rule) { return { id: id, rule: rule, say: say, target: function () { return tutCardV(v); }, ready: tutPlan(r), wait: { type: 'tap', match: tutIsCard(v) }, wrong: 'Tap the glowing card.', side: 'top' }; };
   var gear = function (id, r, g, say, rule) { return { id: id, rule: rule, say: say, target: function () { return document.querySelector('.gb[data-g="' + g + '"]'); }, ready: tutPlan(r), wait: { type: 'tap', match: function (a) { return a.what === 'gear' && a.g === g; } }, wrong: 'Tap gear ' + g + '.', side: 'top' }; };
   var go = function (id, r, say, rule) { return { id: id, rule: rule, say: say, target: function () { var b = $('#goB'); return b && !b.disabled ? b : null; }, ready: tutPlan(r), wait: { type: 'tap', match: function (a) { return a.what === 'go'; } }, side: 'top' }; };
   var info = function (id, r, say, rule, tg) { return { id: id, rule: rule, say: say, target: tg || cv, ready: tutPlan(r), wait: null, side: 'bottom' }; };
+  var pend = function (t) { return function () { return !!G && !!G.pend && G.pend.t === t; }; };
   return [
     info('goal', 1, 'Race one lap; the first car over the line wins.', 'goal'),
     gear('gear', 1, 2, 'Your gear is how many cards you play, so tap gear 2.', 'gear'),
@@ -74,30 +77,34 @@ function tutSteps() {
     info('space', 2, 'Two cars fit per space, so a full space stops you behind.', 'space'),
     info('corner', 2, 'The corner sign ahead is its speed limit: 5.', 'corner'),
     info('engine', 2, 'Your engine holds 6 heat, and speeding through corners burns it.', 'engine', eng),
-    card('c24', 2, '4', 'Tap the 4.'),
-    card('c23', 2, '3', 'Tap the 3 for speed 7, two over the limit.'),
+    card('c24', 2, '4', 'Tap a 4.'),
+    card('c24b', 2, '4', 'Tap the other 4 for speed 8, three over the limit.'),
     go('go2', 2, 'Tap Go: each point over the limit burns 1 heat.', 'burn'),
-    { id: 'heatcard', rule: 'heatcards', say: 'Burned heat returns as dead cards you cannot play.', target: function () { return tutCardV('H'); }, ready: tutPlan(3), wait: null, side: 'top' },
-    info('stall', 3, 'With only heat cards, you stay put and drop to gear 1.', 'stall', function () { return $('#hand'); }),
-    info('spin', 3, 'Too little heat at a corner spins you out with stress cards.', 'spin'),
-    gear('gear1', 3, 1, 'Tap gear 1, which cools up to 3 heat cards.', 'cooldown'),
-    card('c3x', 3, 'X', 'Tap the Stress card: it flips a random speed card.', 'stress'),
-    go('go3', 3, 'Tap Go and watch your heat cards cool down.'),
-    info('cooled', 4, 'Gear 1 cooled your heat; gear 2 cools just 1.', null, eng),
-    gear('gear3', 4, 3, 'Shifting two gears costs 1 heat, so tap gear 3.', 'shift2'),
-    card('c42a', 4, '2', 'Tap a 2.'),
-    card('c42b', 4, '2', 'Tap the other 2.'),
-    card('c41', 4, '1', 'Tap the 1 for speed 5.'),
-    go('go4', 4, 'Tap Go to land right behind Kit.'),
-    { id: 'slip', rule: 'slip', say: 'Right behind a car, slipstream gives 2 free spaces: tap it.', target: function () { return $('#slipY'); }, ready: function () { return !!G && !!G.pend && !!$('#slipY'); }, wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top' },
-    { id: 'swap', rule: 'swap', say: 'Swap throws away cards you do not want: tap Swap.', target: function () { return $('#swapB'); }, ready: tutPlan(5), wait: { type: 'tap', match: function (a) { return a.what === 'swap'; } }, side: 'top' },
-    { id: 'swapc', say: 'Tap a 1 to throw it away.', target: function () { return tutCardV('1'); }, ready: function () { return tutPlan(5)() && !!UI.swap; }, wait: { type: 'tap', match: tutIsCard('1') }, side: 'top' },
-    { id: 'swapgo', say: 'Tap Swap 1 to draw a new card.', target: function () { var b = $('#goB'); return b && !b.disabled ? b : null; }, ready: function () { return tutPlan(5)() && !!UI.swap && UI.sel.length === 1; }, wait: { type: 'tap', match: function (a) { return a.what === 'swapgo'; } }, side: 'top' },
-    card('c54', 5, '4', 'Tap the 4.'),
-    card('c52', 5, '2', 'Tap the 2.'),
-    card('c51', 5, '1', 'Tap the 1 for speed 7.'),
-    { id: 'boost', rule: 'boost', say: 'Boost pays 1 heat to flip a card and add its speed.', target: function () { var b = $('#boostB'); return b && !b.disabled ? b : null; }, ready: tutPlan(5), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top' },
-    go('go5', 5, 'Tap Go and race for the line!'),
+    card('c34', 3, '4', 'Tap a 4.'),
+    card('c34b', 3, '4', 'Tap the other 4: speed 8 into a limit-4 corner.'),
+    go('go3', 3, 'Tap Go: with too little heat to pay, you spin out.', 'spin'),
+    info('spun', 4, 'Spun out: stopped before the corner, gear 1, a stress card.', null),
+    { id: 'heatcard', rule: 'heatcards', say: 'Burned heat returns as dead cards you cannot play.', target: function () { return tutCardV('H'); }, ready: tutPlan(4), wait: null, side: 'top' },
+    gear('g42', 4, 2, 'Tap gear 2, though you hold just one playable card.', 'stall'),
+    card('c43', 4, '3', 'Tap the 3, your only card that is not heat.'),
+    go('go4', 4, 'Tap Go: too few cards means a stall, no move.'),
+    gear('gear1', 5, 1, 'Stay in gear 1: it cools up to 3 heat cards.', 'cooldown'),
+    card('c5x', 5, 'X', 'Tap the Stress card: it flips a random speed card.', 'stress'),
+    go('go5', 5, 'Tap Go and watch your heat cards cool down.'),
+    info('cooled', 6, 'Cooled: heat went back into your engine.', null, eng),
+    gear('gear3', 6, 3, 'Shifting two gears costs 1 heat, so tap gear 3.', 'shift2'),
+    card('c62', 6, '2', 'Tap the 2.'),
+    card('c61', 6, '1', 'Tap a 1.'),
+    card('c61b', 6, '1', 'Tap the other 1: speed 4, plus 1 for adrenaline.'),
+    go('go6', 6, 'Tap Go to pull up right beside Juno.'),
+    { id: 'slip', rule: 'slip', say: 'Next to a car, slipstream gives 2 free spaces: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top' },
+    { id: 'disc', rule: 'discard', say: 'After moving you may discard: tap a 3 you do not want.', target: function () { var c = G.cars[UI.seat]; for (var j = 0; j < c.hand.length; j++) if (c.hand[j] === '3') return document.querySelector('#panel .cd[data-i="' + j + '"]'); return null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'dcard' && G.cars[UI.seat].hand[a.i] === '3'; } }, side: 'top' },
+    { id: 'discgo', say: 'Tap Discard 1, then you draw back to 7.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top' },
+    card('c74', 7, '4', 'Tap the 4.'),
+    card('c72', 7, '2', 'Tap the 2.'),
+    card('c71', 7, '1', 'Tap the 1 for speed 7.'),
+    go('go7', 7, 'Tap Go: your cards show first, then you may boost.'),
+    { id: 'boost', rule: 'boost', say: 'Boost pays 1 heat to flip a card and add it.', target: function () { return $('#boostY'); }, ready: pend('boost'), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top' },
     { id: 'finish', rule: 'finish', say: 'You won, and the others race on until all finish.', target: cv, ready: function () { return !!UI.tutOver; }, wait: null, side: 'bottom' }
   ];
 }

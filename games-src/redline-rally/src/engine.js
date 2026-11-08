@@ -156,7 +156,7 @@ function resolveNext(G) {
   var pl = c.plan, from = c.pos, cost;
   if (pl.cards.length < pl.gear) {   /* not enough playable cards: play them all, fill with heat from the hand, do not move, back to gear 1 */
     var fill = 0; for (var q = c.hand.length - 1; q >= 0 && pl.cards.length + fill < pl.gear; q--) if (c.hand[q] === 'H') { c.hand.splice(q, 1); c.disc.push('H'); fill++; }
-    c.disc = c.disc.concat(pl.cards); c.gear = 1; c.plan = null; c.pl2 = null; c.played = []; draw(G, c, HAND);
+    c.disc = c.disc.concat(pl.cards); c.gear = 1; c.plan = null; c.stats.stalls = (c.stats.stalls || 0) + 1; c.pl2 = null; c.played = []; draw(G, c, HAND);
     ev.push({ t: 'stall', car: c.i, cards: pl.cards.length, heat: fill }, { t: 'done', car: c.i }); G.ri++; return ev;
   }
   /* 1 shift */
@@ -170,7 +170,15 @@ function resolveNext(G) {
   var cool = COOL[c.gear] + (G.adr.indexOf(c.i) >= 0 ? 1 : 0), moved = 0;
   for (var j = c.hand.length - 1; j >= 0 && moved < cool; j--) if (c.hand[j] === 'H') { c.hand.splice(j, 1); c.eng++; moved++; }
   if (moved) ev.push({ t: 'cool', car: c.i, n: moved });
-  if (pl.boost && c.eng >= 1) { c.eng--; c.disc.push('H'); c.stats.heat++; c.stats.boosts++; var fb = []; var bv = flipSpeed(G, c, fb); speed += bv; ev.push({ t: 'boost', car: c.i, flips: fb, add: bv, speed: speed }); }
+  c.pl2 = { speed: speed, from: from, lim: lim, addX: addX };
+  /* boost is decided in the react step, after the cards are revealed: a human is asked now (G.pend boost -> boostChoice) */
+  if (c.human && c.eng >= 1) { G.pend = { t: 'boost', car: c.i, speed: speed }; return ev; }
+  return ev.concat(afterReact(G, c, !!pl.boost));
+}
+function boostChoice(G, use) { var p = G.pend; if (!p || p.t !== 'boost') return []; G.pend = null; return afterReact(G, G.cars[p.car], !!use); }
+function afterReact(G, c, boost) {   /* boost, then adrenaline speed, move, slipstream offer */
+  var ev = [], pl = c.plan, q = c.pl2, speed = q.speed, from = q.from, lim = q.lim, addX = q.addX;
+  if (boost && c.eng >= 1) { c.eng--; c.disc.push('H'); c.stats.heat++; c.stats.boosts++; var fb = []; var bv = flipSpeed(G, c, fb); speed += bv; ev.push({ t: 'boost', car: c.i, flips: fb, add: bv, speed: speed }); }
   c.disc = c.disc.concat(pl.cards);   /* played cards reach the discard only now: a boost flip must not reshuffle them into the deck */
   for (var sx = 0; sx < addX; sx++) c.disc.push('X');
   var adr = 0;
@@ -204,8 +212,10 @@ function legendTurn(G, c) {   /* a Legend's whole turn: next pace card, brake fo
   if (near) ev.push({ t: 'slipq', car: c.i, use: use });
   return ev.concat(finishMove(G, c, use, ev));
 }
-function slipChoice(G, use) {
-  var p = G.pend; if (!p) return []; G.pend = null; var c = G.cars[p.car]; return finishMove(G, c, !!use, []);
+function slipChoice(G, use) {   /* answers a slipstream question; any other pending question gets its default (no boost, keep every card) */
+  var p = G.pend; if (!p) return [];
+  if (p.t === 'boost') return boostChoice(G, false);
+  if (p.t === 'disc') return discardChoice(G, p.car, []); G.pend = null; var c = G.cars[p.car]; return finishMove(G, c, !!use, []);
 }
 function finishMove(G, c, slip, evSoFar) {
   var ev = [], q = c.pl2, from = q.from, speed = q.speed, L = q.L0;
@@ -226,6 +236,20 @@ function finishMove(G, c, slip, evSoFar) {
   }
   if (!spun) { c.pos = L; if (L !== from) c.tie = G.tick++; }
   c.plan = null; c.pl2 = null; c.played = [];
+  /* discard step (rulebook step 8): a human may throw away speed cards right after moving, before drawing back to 7 */
+  if (c.human && c.pos < total(G) && c.hand.some(function (x) { return x !== 'H' && x !== 'X'; })) { G.pend = { t: 'disc', car: c.i }; return ev; }
+  return ev.concat(endTurn(G, c));
+}
+function discardChoice(G, ci, idxs) {   /* the discard step: chosen non-heat, non-stress cards go to the discard pile, then draw back to 7 */
+  var p = G.pend; if (!p || p.t !== 'disc' || p.car !== ci) return 'phase';
+  var c = G.cars[ci], seen = {}; idxs = idxs || [];
+  for (var i = 0; i < idxs.length; i++) { var j = idxs[i], x = c.hand[j]; if (x === undefined || seen[j] || x === 'H' || x === 'X') return 'card'; seen[j] = 1; }
+  G.pend = null; var thrown = c.hand.filter(function (x, j) { return seen[j]; });
+  c.disc = c.disc.concat(thrown); c.hand = c.hand.filter(function (x, j) { return !seen[j]; });
+  return [{ t: 'discard', car: ci, n: thrown.length }].concat(endTurn(G, c));
+}
+function endTurn(G, c) {
+  var ev = [];
   draw(G, c, HAND);
   if (c.pos >= total(G)) { G.finN++; c.fin = G.round;   /* finishing round: cars finishing in the same round rank by distance past the line (rankList) */ ev.push({ t: 'finish', car: c.i }); }
   ev.push({ t: 'done', car: c.i }); G.ri++;

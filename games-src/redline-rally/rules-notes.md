@@ -56,4 +56,4 @@ Weather and legends modules, online play, campaign. Tracks are 2; a track editor
 - CHANGED: the race runs until every car has finished; finishers leave the track at the end of their round. Was: stop after the first finisher's round.
 - CHANGED to CORE: too few playable cards = fill with heat from the hand (to the discard), no move, gear 1, skip cooldown and boost (already built that way).
 - VERIFIED: spin out pays all engine heat, 1 stress (gear 1-2) or 2 (gear 3-4), gear 1, back behind the corner; slipstream 2, not speed, never across the line; boost once, 1 heat, counts at corners; cooldown 3/1/0/0.
-- STILL DIFFERENT: boost is chosen with the cards before the reveal (the rulebook decides it in the react step after the reveal); the optional discard is done at the start of your next plan instead of right after moving (same cards, one turn later).
+- CHANGED (round 2): boost is asked in the react step after the reveal; the discard step comes right after moving, before drawing back to 7. No known rule differences left in the base game.

@@ -16,6 +16,8 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
     while (Date.now() - t0 < 280000) {
       if (await p.evaluate(() => !!G && G.over && !document.querySelector('#modal').hidden)) { done = true; break; }
       if (await p.locator('#slipY').count()) { await tap('#slipY'); await p.waitForTimeout(100); continue; }
+      if (await p.locator('#boostN').count()) { const near = await p.evaluate(() => G.pend && G.pend.t === 'boost' && you().eng >= 4); await tap(near ? '#boostY' : '#boostN'); await p.waitForTimeout(100); continue; }
+      if (await p.locator('#discN').count()) { await tap('#discN'); await p.waitForTimeout(100); continue; }
       const plan = await p.evaluate(() => !!document.querySelector('#goB') && !UI.busy && G.phase === 'plan' && !G.over);
       if (plan) {
         if (!rounds && shots) { await p.waitForTimeout(500); await p.screenshot({ path: path.join(shots, 'first-turn.png') }); }
