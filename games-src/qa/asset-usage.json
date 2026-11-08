@@ -1,5 +1,5 @@
 {
- "when": "2026-11-08T06:26Z",
+ "when": "2026-11-08T09:45Z",
  "view": "390x844",
  "secs": 180,
  "min": 90,
@@ -1899,9 +1899,9 @@
    "glbShipped": 0,
    "glbLoaded": 0,
    "anyGlb": false,
-   "playedSecs": 188,
+   "playedSecs": 185,
    "end": "cap",
-   "clicks": 937,
+   "clicks": 942,
    "fail": false,
    "neverLoaded": {}
   }
