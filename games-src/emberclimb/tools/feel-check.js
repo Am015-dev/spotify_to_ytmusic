@@ -7,11 +7,11 @@ const ROOT = path.join(__dirname, '..'), OUT = path.join(ROOT, 'playable-shots',
 const MT = { '.html': 'text/html', '.webp': 'image/webp', '.mp4': 'video/mp4', '.json': 'application/json', '.mp3': 'audio/mpeg' };
 const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]); let p = path.join(ROOT, u); if (u === '/' || !fs.existsSync(p) || fs.statSync(p).isDirectory()) p = u === '/' || u === '/emberclimb.html' ? path.join(ROOT, 'emberclimb.html') : path.join(ROOT, '..', '..', 'games', 'emberclimb', u); fs.readFile(p, (e, d) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'Content-Type': MT[path.extname(p)] || 'application/octet-stream' }); r.end(d); }); });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const SMALL = (min) => { const out = []; document.querySelectorAll('body *').forEach(n => { if (!n.childNodes.length) return; const own = [...n.childNodes].some(c => c.nodeType === 3 && c.textContent.trim()); if (!own) return; const cs = getComputedStyle(n), r = n.getBoundingClientRect(); if (cs.visibility === 'hidden' || cs.display === 'none' || r.width < 2 || r.height < 2 || +cs.opacity === 0) return; if (n.closest('[hidden],.gx-scn-badge,#gxs-badge,.gxs-badge')) return; if (r.bottom < 0 || r.top > innerHeight) return; if (parseFloat(cs.fontSize) < min) out.push(n.className + ':' + parseFloat(cs.fontSize) + ':' + n.textContent.trim().slice(0, 18)); }); return out; };
+const SMALL = (min) => { const out = []; document.querySelectorAll('body *').forEach(n => { if (!n.childNodes.length) return; const own = [...n.childNodes].some(c => c.nodeType === 3 && c.textContent.trim()); if (!own) return; const cs = getComputedStyle(n), r = n.getBoundingClientRect(); if (cs.visibility === 'hidden' || cs.display === 'none' || r.width < 2 || r.height < 2 || +cs.opacity === 0) return; if (n.closest('[hidden],.gx-scn-badge,#gxs-badge,.gxs-badge')) return; if (r.bottom < 0 || r.top > innerHeight) return; if (parseFloat(cs.fontSize) < min) out.push((n.className || n.tagName + '<' + (n.parentNode.className || n.parentNode.tagName)) + ':' + parseFloat(cs.fontSize) + ':' + n.textContent.trim().slice(0, 18)); }); return out; };
 (async () => {
   await new Promise(r => srv.listen(0, r)); const base = 'http://127.0.0.1:' + srv.address().port + '/emberclimb.html';
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] }); let bad = 0;
-  for (const [name, vp, touch, shots] of [['phone', { width: 390, height: 844 }, true, 1], ['phone-s', { width: 375, height: 667 }, true, 0], ['pc', { width: 1440, height: 900 }, false, 1]]) {
+  for (const [name, vp, touch, shots] of [['phone', { width: 390, height: 844 }, true, 1], ['phone-s', { width: 375, height: 667 }, true, 0], ['pc', { width: 1440, height: 900 }, false, 1]].filter(x => !process.env.ONLY || x[0] === process.env.ONLY)) {
     const ctx = await br.newContext({ viewport: vp, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1 }); const pg = await ctx.newPage(), errs = [];
     pg.on('pageerror', e => errs.push(e.message)); const min = vp.width >= 1024 ? 16 : 14, small = {};
     const tapAt = async el => { const b = await el.boundingBox(); if (!b) return; const x = b.x + b.width / 2, y = b.y + b.height / 2; if (touch) await pg.touchscreen.tap(x, y); else await pg.mouse.click(x, y); };
@@ -27,7 +27,7 @@ const SMALL = (min) => { const out = []; document.querySelectorAll('body *').for
     const nd = await pg.$('.node.glow'); if (nd) await tapAt(nd); await sleep(1500);
     for (let k = 0; k < 3; k++) { const x = await pg.$('.gxh-ok'); if (!x) break; await tapAt(x); await sleep(300); }
     await check('first-turn'); await shot('first-turn');
-    let turns = 0, rival = false, mid = false, done = false;
+    let turns = 0, rival = false, mid = false, done = !!process.env.QUICK;
     for (let step = 0; step < 900 && !done; step++) {
       const s = await pg.evaluate(() => { const g = EC.E.G(); return g ? { scr: g.scr, ph: g.b && g.b.ph, busy: !!UI.busy, turn: g.b && g.b.turn, fl: g.floor } : {}; });
       if (s.scr === 'over') { await sleep(800); await check('result'); await shot('result'); done = true; break; }
