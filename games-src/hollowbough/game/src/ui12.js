@@ -80,7 +80,7 @@ function tutSteps() {
     { id: 'hand', title: S.hand.title, say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
     { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('farm')), wait: tapIs(() => 'p:hand:' + tutId('farm')),
       ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
-    { id: 'city', title: S.city.title, say: () => tsay('city', G.players[0].city.length), target: tq('#bd .strip.city'), wait: null,
+    { id: 'city', title: S.city.title, say: () => tsay('city', HB.cityCount(G, 0)), target: tq('#bd .strip.city'), wait: null,
       ready: () => !!G && G.players[0].city.some(e => HB.cardKey(e.id) === 'farm') && !UI.cards.length },
     { id: 'prep', title: S.prep.title, say: tsay('prep'), target: tgEl('prep'), wait: tapIs('prep'),
       ready: () => myTurn() && !!tgEl('prep')() },

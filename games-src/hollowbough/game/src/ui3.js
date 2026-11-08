@@ -99,7 +99,7 @@ function fxPost(pre, m, src) {
   let slot = 0; const n = items.filter(x => x.d > 0).length;
   for (const it of items) {
     if (it.d > 0) {
-      const to = mine ? (it.kind === 'card' ? (UI.lay && UI.lay.hand) : frameRect($('.rs[data-res="' + it.kind + '"]'))) : chip;
+      const to = mine ? (it.kind === 'card' ? (UI.lay && UI.lay.hand) : it.kind === 'point' ? seatRect(pre.seat) : frameRect($('.rs[data-res="' + it.kind + '"]'))) : chip;   // points fly to my score chip, never hang over the tabs
       fxFloat(src, it.kind, '+' + it.d, to, { slot: slot++, n, bump: mine ? () => bump('.rs[data-res="' + it.kind + '"]') : null });
     } else if (mine && it.kind !== 'point') {
       const at = frameRect($('.rs[data-res="' + it.kind + '"]')); fxFloat(at, it.kind, '\u2212' + (-it.d), null, { neg: true });

@@ -1,5 +1,5 @@
 /* ===== W457 Play view (src/ui2.js pvRender; hooks in ui3.js / ui5.js): one focus at a time. Scoped to #bd.pv so ?board=old keeps the old board. ===== */
-#bd.pv{--pv-paper:#f8edd2;--pv-paper2:#efdcb2;--pv-ink:#3b2a1c;--pv-wood:#5a3c22;--pv-gold:#ffd25a;--pv-ok:#2f7d3a;--pv-no:#a2382a;
+#bd.pv{--pv-paper:#f8edd2;--pv-paper2:#efdcb2;--pv-ink:#3b2a1c;--pv-wood:#5a3c22;--pv-gold:#ffd25a;--pv-ok:#1f6a2b;--pv-no:#a2382a;
   background:linear-gradient(180deg,rgba(52,34,18,.55),rgba(38,24,12,.72) 75%);color:var(--pv-ink);font-family:inherit}
 #bd.pv *{box-sizing:border-box}
 #bd.pv .pv-col{position:absolute;left:0;top:0;right:0;display:flex;flex-direction:column;gap:6px;padding:6px 8px 0}
@@ -297,3 +297,47 @@ html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!impo
 #bd.pv.tall .pvch-pt{font-size:17px;margin-left:auto;padding-left:3px}#bd.pv.tall .pvch-star{font-size:14px}
 #bd.pv.tall .chip .pawnw{transform:scale(.85);margin:0 -2px}
 #bd.pv.tall .pvsea b{font-size:14px}
+/* W482 R5: every board place is a framed painted space (like a printed board square): its name on a wooden banner at the top,
+   the reward plate under it, "shared" as a green badge on the painting, and the worker standing ON the painting */
+#bd.pv.tall .pv-board .tile.pv-place::before{width:100px;height:62px;border-radius:10px;border:3px solid #5b4026;box-shadow:inset 0 0 0 2px rgba(248,237,210,.55),0 4px 0 #3b2a1c,0 6px 8px rgba(0,0,0,.45)}
+#bd.pv.tall .pv-board .tile.pv-place.t-forest::before{border-color:#3f6a2a;box-shadow:inset 0 0 0 2px rgba(220,240,200,.5),0 4px 0 #24401a,0 6px 8px rgba(0,0,0,.45)}
+#bd.pv.tall .pv-board .tile.pv-place.glow::before{box-shadow:0 0 0 3px #ffd24a,0 4px 0 #3b2a1c,0 0 16px 6px rgba(255,214,90,.85)}
+#bd.pv.tall .pv-board .tile.pv-place .pv-tin{margin-top:-2px!important}
+#bd.pv.tall .pv-board .pv-nm{position:absolute;top:3px;left:50%;transform:translateX(-50%);width:92px;box-sizing:border-box;z-index:2;background:rgba(43,30,19,.88);color:#fbf1d8;font-size:12px;font-weight:800;line-height:1.08;padding:1px 3px 2px;border-radius:0 0 7px 7px;text-align:center;white-space:normal;overflow-wrap:normal;word-break:keep-all;pointer-events:none}
+#bd.pv.tall .pv-board .tile.pv-place .pv-shtag{top:40px;left:calc(50% - 47px);transform:none;font-size:12px;padding:2px 5px;border-radius:7px;border:1.5px solid #f8edd2}
+#bd.pv.tall .pv-board .tile.pv-place .pw{top:26px;right:auto;left:calc(50% + 4px);bottom:auto;transform:none;z-index:3;filter:drop-shadow(0 3px 2px rgba(0,0,0,.7))}
+#bd.pv.tall .pv-board .tile.pv-place .pv-taken{display:none}
+#bd.pv.tall .pv-board .tile.pv-place.taken::before{filter:grayscale(.5) brightness(.8)}
+#bd.pv.tall .pv-board-s .tile.pv-place::before{width:80px;height:50px;border-width:2px;border-radius:8px}
+#bd.pv.tall .pv-board-s .pv-nm{width:74px;font-size:11px;top:2px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-shtag{top:31px;left:calc(50% - 38px);font-size:11px;padding:1px 4px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pw{top:20px;left:calc(50% + 2px)}
+#bd.pv.tall .pv-board-s .tile.pv-place .pw .pawnw{--pw:24px!important}
+/* the instruction line: dark ink on its own cream label, whatever the bar behind it is (contrast >= 4.5:1 always) */
+html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.ph .gx-bar #prompt{background:#fff4dc;color:#2a1f19!important;border:1.5px solid #5a3b1f;border-radius:9px;padding:2px 8px;text-shadow:none!important;white-space:normal!important;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2!important;overflow:hidden;text-overflow:clip!important;font-size:13px;line-height:1.15;max-width:100%;box-sizing:border-box}
+html #prompt.mine,html .gx-bar #prompt.mine,html.sk .gx-bar #prompt.mine{color:#6e3205!important}
+html #prompt:empty{display:none!important}
+#bd.pv.tall .pv-board .pv-cell{transform:translate(-50%,0)}
+#bd.pv.tall .pv-board-s .tile.pv-place::before{height:44px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-shtag{top:27px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pw{top:16px}
+#bd.pv.tall .pv-board-s .pv-sw b,#bd.pv.tall .pv-board-s .pv-sw span{font-size:12px}
+/* phone Goals: two roomy columns on cream, full names that wrap at spaces, and what each goal needs */
+#bd.pv.tall .pv-goals{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#bd.pv.tall .pv-goals .pv-sub{grid-column:1/-1;color:#fbf1d8}
+#bd.pv.tall .pv-goals .tile.pv-small{background:linear-gradient(180deg,#fbf1d8,#efdfb9)!important;opacity:1!important;filter:none!important;padding:5px 6px}
+#bd.pv.tall .pv-goals .tile.done{background:linear-gradient(180deg,#d9d2c2,#c4baa4)!important}
+#bd.pv.tall .pv-goals .pv-tin{align-items:flex-start}
+#bd.pv.tall .pv-goals .pv-sw b{white-space:normal;overflow:visible;word-break:keep-all;overflow-wrap:normal;font-size:14px;color:#2a1f19;display:block}
+#bd.pv.tall .pv-goals .pv-sw span{white-space:normal;overflow:visible;font-size:13px;color:#3b2a1c;opacity:1;display:block}
+#bd.pv.tall .pv-goals .pv-sico{width:24px;height:24px}
+/* phone city: 4 across so every card name fits; empty hand line readable and whole */
+#bd.pv.tall .pv-grid{grid-template-columns:repeat(4,1fr)}
+#bd.pv .sempty,#bd.pv.tall .sempty{width:auto;height:auto;margin:0;left:0;right:0;top:40%;opacity:1;white-space:nowrap;overflow:visible;color:#fbf1d8;text-shadow:0 1px 2px #000}
+#bd.pv.tall .pvch-s{font-size:12px;letter-spacing:-.2px}
+#bd.pv .strip.hand .scount,#bd.pv.tall .strip.hand .scount{top:0}
+@media (max-width:380px){#bd.pv.tall .pvch-s{font-size:11px;letter-spacing:-.25px}}
+#bd.pv.tall .pv-grid .pvm-name{padding:1px 1px;letter-spacing:-.35px}
+#bd.pv .strip.hand .scount,#bd.pv.tall .strip.hand .scount{top:2px;line-height:1.25}
+#bd.pv.tall .pv-grid{grid-auto-rows:minmax(58px,1fr);overflow-y:auto;overscroll-behavior:contain}
+#bd.pv .pvc.small .pvc-name{padding-left:2px;padding-right:2px;letter-spacing:-.3px}
