@@ -21,7 +21,7 @@ rules-logic test, asset gate (>=90% of shipped art loads) and phone look all pas
 | kaiten-kitchen | - | W443 | W410 | old build |
 | lantern-dive | W409 (resumed) | W444 | W410 | old build |
 | nebula-aces | - | W445 | W410 | old build |
-| deep-signal | - | W446 | W410 | old build |
+| deep-signal | STOPPED 02:20: same game as lantern-dive (owner) | - | - | old build stays |
 | rampart-and-vine | W426 | W447 | W410 | old build |
 | shipwreck-isle | - | W448 | W410 | old build |
 | short-fuse | W423 | W449 | W410 | old build |
