@@ -43,3 +43,5 @@ R3 session_01RR7mnZ5ujJ5BU5ke5G5813, R4 session_01RR7mnbrAaCXvYMQjCAPFvd. Each D
 PASS -> orchestrator deploys; FAIL -> fix list straight to the game worker.
 Helpers 02:22: S1 feel-audit gate (sonnet) session_01RR7mnYfss3qN7ubbKnuCzp; C1/C2 copy audits (sonnet) 01RR7mnXkXtACfC68PcbYX6b,
 01RR7mnbKHhtz3Y3eieafdZv; H1-H4 status sweeps (haiku); R5 01RR7mnXkYd51MsSJRSVN1ec, R6 01RR7mnb9b3xUSvbEEN9eA33 pre-screen reviewers.
+Design 02:23 (sonnet): D0 shell design system 01RR7mnaYG31yxpo8B8jpNu2; D1-D6 per-game impeccable + design-review audits ->
+games-src/<dir>/DESIGN-FIX.md for the game-feel workers to apply.
