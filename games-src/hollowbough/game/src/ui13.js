@@ -141,10 +141,12 @@ try { UI.hints = localStorage.getItem('hb_hints') === '1'; } catch (e) { UI.hint
 function hintsActive() { return !!(UI.hints || (UI.cfg && UI.cfg.coached)); }
 function goalCard() {
   const D2 = (t) => h('li', t);
-  UI.cards.unshift({ kind: 'goal', title: 'Goal', sub: 'Win the Elderheart Oak', body: () => h('div', h('p', 'Have the most points when everyone has passed.'), h('ul.goal', D2('Buildings and critters you build score the points printed on them.'), D2('Point tokens, flags (events) you claim and bonus cards add more.'), D2('Pass when your workers are used up: the highest total wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
+  UI.cards.unshift({ kind: 'goal', title: 'Goal', sub: 'Win the Elderheart Oak', body: () => h('div', h('p', 'Have the most points when everyone has passed.'), h('ul.goal', D2('Buildings and critters you build score the points printed on them.'), D2('Point tokens, claimed events and bonus cards add more.'), D2('Pass when you are done. The highest total wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
 }
 const SEE = { vals: null, key: '', last: null, scores: null, actor: -1, rate: null };
 function seeToast(id, html, ms, top) {
+  const say = document.getElementById('hbsay'); if (say && say.classList.contains('on') && id !== 'hbsay') return;   // one message at a time
+  if (id === 'hbpop' && G && G.phase === 'over') return;   // the result card says the score
   let e = document.getElementById(id);
   if (!e) { e = document.createElement('div'); e.id = id; e.className = 'hbtoast'; e.setAttribute('role', 'status'); e.setAttribute('data-help', ''); document.body.appendChild(e); }
   e.style.top = top + 'px'; e.innerHTML = html; e.classList.add('on'); clearTimeout(e._t); if (ms) e._t = setTimeout(() => e.classList.remove('on'), ms);
@@ -175,7 +177,7 @@ function seeTracker() {
   if (prev && prev.length === sc.length) sc.forEach((x, s) => { const o = prev[s], d = x.total - o.total; if (d <= 0) return;
     const why = x.events > o.events ? 'event claimed' : x.cards > o.cards ? 'card points' : x.tokens > o.tokens ? 'point tokens' : x.bonus > o.bonus ? 'bonus' : x.journey > o.journey ? 'journey' : 'points';
     const chip = $('.chip[data-seat="' + s + '"]'); try { if (chip && typeof fxFloat === 'function') fxFloat(frameRect(chip), 'point', '+' + d + ' ' + why, null, { n: 1 }); } catch (e) { }
-    seeToast('hbpop', '<b>+' + d + '</b> ' + (s === v ? 'You' : G.players[s].name) + ': ' + why, 2600, 168); });
+    seeToast('hbpop', '<b>+' + d + '</b> ' + (s === v ? 'You' : G.players[s].name) + ': ' + why, 4600, 168); });
 }
 // ---- "Turn over: why"
 function seeTurnOver() {
@@ -183,7 +185,7 @@ function seeTurnOver() {
   if (!hintsActive()) { SEE.actor = a; return; }
   if (SEE.actor === v && a !== v && v >= 0 && !(a === -2)) {
     const me = G.players[v], free = availW(me), n = G.players[a] ? G.players[a].name : 'The rival';
-    const why = me.passed ? 'You passed, so you are done for the game.' : free === 0 ? 'All your workers are out, so only a card, Prepare or Pass is left.' : 'Each player takes one action, then the turn moves on (' + free + ' worker' + (free === 1 ? '' : 's') + ' left).';
+    const why = me.passed ? 'You passed. You take no more turns.' : free === 0 ? 'All workers are out. You can play a card, Prepare or Pass.' : 'Each player takes one action, then the turn moves on (' + free + ' worker' + (free === 1 ? '' : 's') + ' left).';
     seeToast('hbover', '<b>Turn over:</b> ' + why + ' ' + n + ' plays now.', 3600, 214);
   }
   SEE.actor = a;
@@ -226,8 +228,8 @@ document.addEventListener('pointerup', () => setTimeout(() => seeToastOff('hbpre
     let rate = null;
     try { if (!hintsActive()) throw 0; const V = SEE.vals; if (V && seeMine() && G.players[viewSeat()] === V.p && m && m.type !== 'choose' && !(UI.cfg && UI.cfg.tutorial && false)) {
       const me = V.r.find(x => sameM(x.m, m)); if (me) { const best = V.r.reduce((a, b) => (b.v > a.v ? b : a)), d = (best.v - me.v) / V.rng;
-        const nm = x => x.m.type === 'worker' ? (x.m.label || 'another spot') : x.m.type === 'pass' ? 'passing' : x.m.type === 'prepare' ? 'Prepare' : (x.m.label || 'another move');
-        rate = d <= .12 ? ['good', 'Good: ' + (me === best ? 'the best of ' + V.r.length + ' moves' : 'close to the best') + '. ' + seeDelta(me, V) + '.'] : d <= .4 ? ['okay', 'Okay: ' + nm(best) + ' was a bit better (' + seeDelta(best, V) + ').'] : ['poor', 'Poor: ' + nm(best) + ' was much better (' + seeDelta(best, V) + ').']; } }
+        const nm = x => { const m = x.m; if (m.type === 'worker') { if (m.k === 'basic' || m.k === 'forest') return 'the "' + pvSpot(m.k, m.i).main + '" place'; if (m.k === 'dest') return cname(m.c); if (m.k === 'event') return 'a goal'; return m.k === 'haven' ? 'Cards to goods' : 'the Journey'; } return m.type === 'pass' ? 'passing' : m.type === 'prepare' ? 'Prepare' : m.type === 'play' ? 'building ' + cname(m.card) : 'another move'; };
+        rate = d <= .12 ? ['good', (me === best ? 'Great move, the best one.' : 'Good move.')] : d <= .4 ? ['okay', 'Fine. ' + nm(best) + ' was a bit better.'] : ['poor', 'Hmm. ' + nm(best) + ' was much better.']; } }
     } catch (e) { rate = null; }
     seeToastOff('hbprev');
     const r = o.apply(this, arguments);

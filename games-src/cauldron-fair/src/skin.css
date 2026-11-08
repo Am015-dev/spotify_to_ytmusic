@@ -207,3 +207,5 @@ html:not(.ph) #goalcard .gck{font-size:16px}
   .stg .ds .dn,.stg .ds .dtot,.stg .ds .drb{font-size:18px;color:#fff6df}
   .stg .ds .dp.dim{opacity:.6;filter:grayscale(.5)}
 }
+#goalcard .gck,#goalcard h3{padding:0 8px}#goalcard ul{padding-left:28px;padding-right:8px}
+html.ph{--gx-bar-h:48px}html.ph .gx-bar{height:48px;min-height:48px;overflow:visible}html.ph .gx-bar .gx-ibtn{box-sizing:border-box;height:44px;min-height:44px}

@@ -19,7 +19,7 @@
     D.cards.forEach(function (c, i) {
       var tags = [TYPE[c.type], c.kind === 'critter' ? 'Critter' : 'Construction', c.unique ? 'Unique' : 'Common'];
       var pair;
-      if (c.kind === 'critter') { var l = c.linked === 'any' ? null : find(c.linked); pair = c.linked === 'any' ? 'Free with any construction that has an open slot' : l ? 'Free if you own ' + l.name + ' with no token on it' : ''; }
+      if (c.kind === 'critter') { var l = c.linked === 'any' ? null : find(c.linked); pair = c.linked === 'any' ? 'Free with any building that has an open slot' : l ? 'Free if you own ' + l.name + ' with no token on it' : ''; }
       else { var crit = D.cards.filter(function (x) { return x.kind === 'critter' && (norm(x.linked) === norm(c.key)); }).map(function (x) { return x.name; }); pair = c.linked === 'any' ? 'Lets you play any one critter for free (once)' : crit.length ? 'Lets you play ' + crit.join(' or ') + ' for free (once)' : ''; }
       cards.push({ id: 'c' + i, name: c.name, count: c.copies, text: c.text, tags: tags,
         meta: 'Costs ' + cost(c.cost) + ' · ' + c.pts + ' point' + (c.pts === 1 ? '' : 's') + ' · ' + COLOUR[c.type],
@@ -28,7 +28,7 @@
     });
     var places = [];
     D.basic.forEach(function (b, i) { places.push({ id: 'b' + i, name: b.name, count: 1, text: b.text.replace(/ Shared\.$/, ''), tags: ['Basic place', b.shared ? 'Shared' : 'One worker'], meta: b.shared ? 'Any number of workers' : 'One worker only', pic: { place: 'basic', i: i } }); });
-    D.forest.forEach(function (f, i) { places.push({ id: 'f' + i, name: f.name, count: 1, text: f.text, tags: ['Forest place', 'One worker'], meta: 'Forest card: 3 are dealt in a 2-player game, 4 with 3 or 4 players. One worker (two in a 4-player game).', pic: { place: 'forest', i: i } }); });
+    D.forest.forEach(function (f, i) { places.push({ id: 'f' + i, name: f.name, count: 1, text: f.text, tags: ['Forest place', 'One worker'], meta: 'Forest card: 3 in a 2-player game, 4 with 3 or 4 players. One worker, or two in a 4-player game.', pic: { place: 'forest', i: i } }); });
     places.push({ id: 'haven', name: D.haven.name, count: 1, text: D.haven.text.replace(/ Shared\.$/, ''), tags: ['Basic place', 'Shared'], meta: 'Any number of workers', pic: { place: 'haven' } });
     places.push({ id: 'road', name: D.journeyName, count: D.journey.length, text: 'Autumn only. Discard ' + D.journey.map(function (j) { return j.discard; }).join(', ') + ' cards from your hand; that worker stays for the rest of the game and scores the same number of points. Only the 2-point spot takes more than one worker.', tags: ['Basic place', 'Autumn'], meta: D.journey.length + ' spots: ' + D.journey.map(function (j) { return j.points + ' pts'; }).join(', '), pic: { place: 'journey' } });
     var events = [];
@@ -43,7 +43,7 @@
     RES.forEach(function (r) { if (R[r]) box.push({ id: 'x-' + r, name: r === 'berry' ? 'Berries' : r === 'resin' ? 'Resin' : r[0].toUpperCase() + r.slice(1) + 's', count: R[r], text: 'A resource used to pay for cards.', tags: ['Box', 'Resource'], pic: { res: r } }); });
     var pt = C.point_tokens || {};
     box.push({ id: 'x-points', name: 'Point tokens', count: (pt['1pt'] || 0) + (pt['3pt'] || 0), text: (pt['1pt'] || 0) + ' worth 1 point and ' + (pt['3pt'] || 0) + ' worth 3 points.', tags: ['Box'], pic: { point: 1 } });
-    box.push({ id: 'x-occ', name: 'Occupied tokens', count: C.occupied_tokens || 20, text: 'Mark a construction whose free critter slot has been used.', tags: ['Box'], pic: { occ: 1 } });
+    box.push({ id: 'x-occ', name: 'Occupied tokens', count: C.occupied_tokens || 20, text: 'Marks a building whose free critter slot is used.', tags: ['Box'], pic: { occ: 1 } });
     box.push({ id: 'x-die', name: 'Solo die', count: 1, text: 'An eight-sided die that tells ' + (D.soloName || 'the solo rival') + ' which meadow card to take.', tags: ['Box', 'Solo'] });
     return [
       { id: 'cards', title: 'Cards', items: cards },
