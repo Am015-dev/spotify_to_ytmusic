@@ -50,7 +50,8 @@
   // owner brief (8 Nov): a message stays at least 4 s + 1 s per 10 words, one at a time, and a tap closes it
   function readMs(t, ms) { var w = String(t || '').split(/\s+/).filter(Boolean).length; return Math.max(ms || 0, 4000 + 1000 * Math.ceil(w / 10)); }
   UI.readMs = readMs;
-  function toast(t, ms) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animationDuration = dur + 'ms'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
+  function toast(t, ms, tries) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var t0 = document.querySelector('.toast'); if (document.querySelector('.ec-say') || (t0 && Date.now() < (+t0.getAttribute('data-until') || 0))) { if ((tries || 0) < 30) setTimeout(function () { toast(t, ms, (tries || 0) + 1); }, 500); return; }   // wait for the coach bubble: one message at a time
+    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animationDuration = dur + 'ms'; d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
