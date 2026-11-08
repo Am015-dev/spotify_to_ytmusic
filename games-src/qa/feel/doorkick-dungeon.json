@@ -1,8 +1,8 @@
 {
  "slug": "doorkick-dungeon",
- "when": "2026-11-08T07:07Z",
- "secs": 120,
- "totalSecs": 377,
+ "when": "2026-11-08T08:03Z",
+ "secs": 45,
+ "totalSecs": 181,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,20 +36,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 120,
-   "turns": 205,
-   "clicks": 252,
+   "secs": 45,
+   "turns": 32,
+   "clicks": 0,
    "endedBy": "time",
-   "tutorialEnded": 64,
+   "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 24
+   "messagesSeen": 17
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 120,
-   "turns": 348,
-   "clicks": 539,
+   "secs": 45,
+   "turns": 114,
+   "clicks": 193,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -58,21 +58,21 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 120,
-   "turns": 188,
-   "clicks": 156,
-   "endedBy": "result",
-   "tutorialEnded": 63,
+   "secs": 45,
+   "turns": 31,
+   "clicks": 0,
+   "endedBy": "time",
+   "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 24
+   "messagesSeen": 16
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 16,
-   "turns": 51,
-   "clicks": 55,
-   "endedBy": "result",
+   "secs": 45,
+   "turns": 167,
+   "clicks": 185,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0

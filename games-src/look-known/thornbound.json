@@ -1,7 +1,14 @@
 {
 "phone": {
 "look": [],
-"axe": [],
+"axe": [
+[
+"tb-over-phone.json",
+"color-contrast",
+"button[data-a=\"menu\"]",
+"Main menu"
+]
+],
 "axe_pages": [
 "menu-phone.json",
 "story-scene-phone.json",
@@ -9,8 +16,10 @@
 "tb-board-phone.json",
 "tb-buttons-phone.json",
 "tb-help-phone.json",
+"tb-over-phone.json",
 "tb-rivals-phone.json",
 "tb-story-start-phone.json",
+"tb-throne-phone.json",
 "tb-zoom-phone.json"
 ]
 }

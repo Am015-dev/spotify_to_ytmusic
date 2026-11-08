@@ -40,3 +40,11 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - Title: Quick game options collapsed everywhere; bg-title scaled 6% past cover so its white side bars fall off (titleBg).
 - Phone: bigger cards (13.8vw, slight overlap), Go is the big button, Boost/Swap small beside it.
 - Drag a card up to play it (lift, glow, drop zone, snap); tap still works. drag-test.js covers touch and mouse.
+
+## W475 polish (shelf/W475-redline-polish)
+- Scenery repainted (race.js sceneryLayer): lit grass with brush dabs, layered tree canopies with soft cast shadows,
+  gradient tents, shaded stands, raked sand and tyre walls. No owner art exists for this game (assets-inbox has none).
+  Road cut-out now uses an opaque stroke (a translucent stroke left the road tinted).
+- PC gears: disabled gears stay readable (dashed, #9aa7bd); name tag is a dark pill ahead of the car in its lane, drawn last.
+- drag-test.js: real CDP touch drag + real mouse drag; asserts lift (scale), gold glow, drop zone, snap class, play; tap works.
+- tut-test.js: waits 700 ms before forced-step taps (the shell now ignores taps in a step's first 600 ms).

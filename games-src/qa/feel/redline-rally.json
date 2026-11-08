@@ -1,6 +1,6 @@
 {
  "slug": "redline-rally",
- "when": "2026-11-08T06:50Z",
+ "when": "2026-11-08T08:09Z",
  "secs": 45,
  "totalSecs": 181,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
@@ -16,9 +16,17 @@
    "detail": []
   },
   "c": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
+   "status": "FAIL",
+   "count": 1,
+   "detail": [
+    {
+     "session": "pc/learn",
+     "text": "Speed 8 is over the limit: it burns 3 of your 6 heat.",
+     "words": 13,
+     "at": 12003,
+     "where": "span.tx"
+    }
+   ]
   },
   "d": {
    "status": "PASS",
@@ -37,19 +45,19 @@
    "size": "phone",
    "mode": "learn",
    "secs": 45,
-   "turns": 164,
-   "clicks": 161,
+   "turns": 161,
+   "clicks": 155,
    "endedBy": "result",
-   "tutorialEnded": 5,
+   "tutorialEnded": 9,
    "hintsOff": true,
-   "messagesSeen": 7
+   "messagesSeen": 9
   },
   {
    "size": "phone",
    "mode": "play",
    "secs": 45,
-   "turns": 181,
-   "clicks": 182,
+   "turns": 180,
+   "clicks": 183,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -59,19 +67,19 @@
    "size": "pc",
    "mode": "learn",
    "secs": 45,
-   "turns": 186,
-   "clicks": 182,
+   "turns": 164,
+   "clicks": 157,
    "endedBy": "result",
-   "tutorialEnded": 5,
+   "tutorialEnded": 8,
    "hintsOff": true,
-   "messagesSeen": 14
+   "messagesSeen": 17
   },
   {
    "size": "pc",
    "mode": "play",
    "secs": 45,
-   "turns": 197,
-   "clicks": 199,
+   "turns": 190,
+   "clicks": 191,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
