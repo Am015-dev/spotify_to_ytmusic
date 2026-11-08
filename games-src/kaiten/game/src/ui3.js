@@ -154,7 +154,7 @@ const keyOfCard = c => { const k = c.key; return ICONS[k] ? 'roll' : NIG[k] ? (c
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playResolve(q[0], q[1]); } }
 async function playResolve(evs, preHand) {
   if (UI.busy) { UI.rq.push([evs, preHand]); return; }
-  const tok = UI.seq; UI.busy = true; closePop(); guideHide();
+  const tok = UI.seq; UI.busy = true; closePop(); if (UI.mode !== 'coached') guideHide();   // Suzu's coach bubble ends on its own clock or its x, never mid-sentence
   const rv = evs.find(e => e.t === 'reveal'), ps = evs.find(e => e.t === 'pass'), sc = evs.find(e => e.t === 'score'), ge = evs.find(e => e.t === 'gameEnd');
   const v = viewSeat(), np = G.np, block = !NET.on;
   try {

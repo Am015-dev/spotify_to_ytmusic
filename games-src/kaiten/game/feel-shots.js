@@ -23,12 +23,13 @@ const [W, H] = (process.argv[2] || '390x844').split('x').map(Number); const PH =
   await tap('#kkgoal .kgo'); await p.waitForTimeout(900); await sh('2b-learn-suzu');
   // Quick game: back to the title, start a game against two computer chefs
   await p.evaluate(() => { UI.started = false; G = null; coachStop(); showStart(); goalCard.seen = 0; });
-  await p.waitForTimeout(400); await tap('[data-a=play]'); await p.waitForTimeout(400);
+  await p.waitForTimeout(400); await tap('[data-a=play]'); await p.waitForTimeout(400); await p.waitForTimeout(500); await sh('2c-setup');
   await p.evaluate(() => { UI.seed = 7; UI.opt.np = 3; setNp(3); renderStart(); }); await p.waitForTimeout(300); await tap('[data-start=vs]'); await p.waitForTimeout(1300);
   await sh('3-goal-card'); await tap('#kkgoal .kgo'); await p.waitForTimeout(500);
   await idle(); await p.waitForTimeout(300); await sh('4-first-turn');
   await tap('#belt .hc[data-up="1"]'); await p.waitForTimeout(250);
   for (let k = 0; k < 60; k++) { if (await p.evaluate(() => !!document.querySelector('.kk-cloche.kk-lift'))) break; await p.waitForTimeout(60); } await p.waitForTimeout(350); await sh('5-rival-turn');
+  for (let k = 0; k < 40; k++) { if (await p.evaluate(() => !!document.querySelector('#stage .sgain'))) break; await p.waitForTimeout(80); } await p.waitForTimeout(200); await sh('5b-reveal-score');
   for (let t = 0; t < 5; t++) { if (!await idle()) break; await tap('#belt .hc[data-up="1"]'); await p.waitForTimeout(300); }
   await idle(); await p.waitForTimeout(500); await sh('6-mid-game');
   // play out the game by taps (fast), then the result
