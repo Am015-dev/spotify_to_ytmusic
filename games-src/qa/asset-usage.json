@@ -1,19 +1,19 @@
 {
- "when": "2026-11-08T01:33Z",
+ "when": "2026-11-08T02:59Z",
  "view": "390x844",
  "secs": 180,
  "min": 90,
  "games": {
   "cauldron-fair": {
    "shipped": 100,
-   "loaded": 41,
-   "pct": 41,
+   "loaded": 46,
+   "pct": 46,
    "glbShipped": 4,
    "glbLoaded": 0,
    "anyGlb": false,
-   "playedSecs": 187,
+   "playedSecs": 185,
    "end": "cap",
-   "clicks": 493,
+   "clicks": 609,
    "fail": true,
    "neverLoaded": {
     "media/ui*": [
@@ -37,23 +37,21 @@
     ],
     "media/fortune*": [
      "media/fortune-alms.webp",
-     "media/fortune-bribe.webp",
+     "media/fortune-bounty.webp",
      "media/fortune-clear.webp",
-     "media/fortune-dice.webp",
-     "media/fortune-dip.webp",
+     "media/fortune-doover.webp",
      "media/fortune-fork.webp",
-     "media/fortune-froth.webp",
-     "media/fortune-haggle.webp",
+     "media/fortune-glint.webp",
      "media/fortune-lucky7.webp",
      "media/fortune-peek.webp",
-     "media/fortune-pick.webp",
+     "media/fortune-slide.webp",
      "media/fortune-spark.webp",
      "media/fortune-spilled.webp",
      "media/fortune-swap.webp",
-     "media/fortune-thick.webp"
+     "media/fortune-twice.webp",
+     "media/fortune-underdog.webp"
     ],
     "media/camp*": [
-     "media/camp-hask.webp",
      "media/camp-mirabel.webp",
      "media/camp-odo.webp",
      "media/camp-tamsin.webp",
@@ -82,17 +80,9 @@
      "music/defeat-a.mp3",
      "music/defeat-b.mp3"
     ],
-    "music/main*": [
-     "music/main-a.mp3",
-     "music/main-b.mp3"
-    ],
-    "music/tavern*": [
-     "music/tavern-short-a.mp3",
-     "music/tavern-short-b.mp3"
-    ],
-    "music/victory*": [
-     "music/victory-a.mp3",
-     "music/victory-b.mp3"
+    "music/fight*": [
+     "music/fight-a.mp3",
+     "music/fight-b.mp3"
     ],
     "media/awning*": [
      "media/awning.webp"
@@ -100,8 +90,11 @@
     "media/btn*": [
      "media/btn-draw.webp"
     ],
-    "music/fight*": [
-     "music/fight-a.mp3"
+    "music/main*": [
+     "music/main-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-b.mp3"
     ]
    }
   },
