@@ -136,7 +136,7 @@ function titleEl() {
   return h('div.ttl', bg, h('div.ttl-in',
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
-      firstTime() ? tutNode('tbtn') : null,
+      firstTime() ? tutNode('tbtn go') : null,   // W471: on a first visit Learn to play is the one big primary button
       h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
       h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
       h('div.tsec',

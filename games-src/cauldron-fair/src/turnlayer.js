@@ -163,8 +163,10 @@ tutStart = function (o) {
 };
 
 // ---- W471 Goal card: one plain sentence and three bullets. Opens on day 1 of a Quick game and from the Day chip; stays until tapped.
-function goalCard() {
+function goalCard(force) {
   let e = $('#goalcard'); if (e) e.remove(); if (!G) return;
+  if (!force && (/[?&]scn=/.test(location.search) || (typeof GXS !== 'undefined' && GXS.running && GXS.running()))) return;   // scenario runs drive the board directly
+
   const n = LASTD();
   e = h('div#goalcard', { role: 'dialog', 'aria-label': 'The goal' });
   e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the white chips pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
@@ -172,7 +174,7 @@ function goalCard() {
   document.body.appendChild(e);
 }
 window.goalCard = goalCard;
-document.addEventListener('click', ev => { const d = ev.target.closest && ev.target.closest('#barstat .dayn'); if (d && !UI.camp) goalCard(); });
+document.addEventListener('click', ev => { const d = ev.target.closest && ev.target.closest('#barstat .dayn'); if (d && !UI.camp) goalCard(true); });
 
 // W471: the coached first game is free play, not a GXT spotlight script; report it as a running tutor so shared drivers find it
 (function () { if (typeof GXT === 'undefined') return; const r = GXT.running, s = GXT.state; GXT.running = function () { return !!COACH.on || r.apply(this, arguments); }; GXT.state = function () { return COACH.on && !r.call(GXT) ? null : s.apply(this, arguments); }; })();
