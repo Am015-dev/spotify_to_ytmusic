@@ -21,7 +21,7 @@ function tship(i){const s=G&&G.ships[i];return s&&s.x!=null?tcell(s.x,s.y):null}
 function ttile(i){return tvis(`[data-a=card][data-t="${i}"],[data-ph=pcard][data-t="${i}"]`)}
 function trot(){return tvis('[data-a=rot][data-d="1"]')}
 function tplace(){return tvis('[data-a=place]:not([disabled])')}
-function tmph(){return tvis('#pc .mph,#res .mph')}
+function tmph(){const m=tvis('#pc .mph,#res .mph');const w=m&&m.closest('#pc .pc-in');return w&&w.querySelector('[data-ph=dismiss]')?w:m}   // on a phone the card AND its Continue: either tap counts
 function tqbtn(h){if(!G||!G.q)return null;const i=G.q.opts.findIndex(o=>o.h===h);return i<0?null:tvis(`[data-a=q][data-i="${i}"]`)||[...document.querySelectorAll('[data-a=q]')].filter(e=>!e.closest('[hidden]'))[i]||null}
 function tcalm(){return !!G&&UI.started&&!UI.busy}
 function tmine(turn){return tcalm()&&G.turn===turn&&G.cur===TS.me&&G.step==='act'&&!G.q}
@@ -61,10 +61,12 @@ function tutSteps(){const ph=!!PH.on;const S=[
   {id:'swap',say:'Sink rivals with your tile, and swap tiles with their hands.',target:()=>tship(TS.me)||document.getElementById('board'),tap:1,ready:()=>tcalm()&&!!G.over&&!(UI.sunk&&UI.sunk.length)},
   {id:'win',say:'Yours is the last junk afloat. You win the lantern!',target:()=>document.getElementById('board'),tap:1,ready:()=>tcalm()&&!!G.over}
  ].filter(Boolean);
- return S.map(s=>({id:s.id,say:s.say,target:s.target,ready:s.ready,pad:4,
+ return S.map(s=>({id:s.id,say:s.say,title:s.title,target:s.target,ready:s.ready,pad:4,
    wait:{type:'event',match:()=>s.tap?TUTG.tap===s.id:!!(s.until&&s.until())},
    onEnter:()=>{TUTG.tap=null;TUTG.cur=s;TUTG.hold=!!s.hold;TUTG.freeze=!s.run;if(s.run)schedule();try{s.enter&&s.enter()}catch(e){console.error(e)}},
    onDone:()=>{TUTG.seen.push(s.id);TUTG.cur=null;TUTG.hold=false;try{s.done&&s.done()}catch(e){console.error(e)}TUTG.freeze=false;schedule();render()}}))}
+// between steps the game's own Continue / Skip buttons stay live holes in the tutor layer (a visible button never eats taps)
+function tutLive(){return [...document.querySelectorAll('#pc [data-ph=dismiss],[data-a=skip]')].filter(e=>!e.closest('[hidden]')&&e.offsetWidth>0)}
 function tmphHide(){try{PH.mphHide=UI.mph;phAfter()}catch(e){}}
 // a tap on the highlight of a "tap" step: swallowed (the game never sees it) and counted
 function tutTapIn(e){const s=TUTG.on&&TUTG.cur;if(!s||!s.tap||typeof GXT==='undefined')return false;const st=GXT.state();if(!st.shown||st.id!==s.id)return false;
@@ -75,6 +77,7 @@ for(const ev of ['pointerdown','pointerup','mousedown','mouseup','touchstart','t
 // the "until" steps finish when the game reaches their state (polled)
 // while a step is on screen nothing else moves (Cobalt, the 25 s answer timer); a "run" step lets the game go on until its moment comes
 setInterval(()=>{try{const s=TUTG.on&&TUTG.cur;if(!s||typeof GXT==='undefined')return;const sh=GXT.state().shown;
+  {const want=sh?TUTG.base:Math.max(TUTG.base||1,2);if(want&&UI.speed!==want){UI.speed=want;try{TWKit.setSpeed(want)}catch(x){}}}
   if(sh&&!TUTG.freeze){TUTG.freeze=true}else if(!sh&&s.run&&TUTG.freeze){TUTG.freeze=false;schedule()}
   if(TUTG.freeze&&UI.qKey)UI.qT0=Date.now()
   if(sh&&!s.tap&&s.until&&s.until())GXT.act({type:'event',k:'poll'})}catch(e){}},150);
@@ -83,18 +86,18 @@ function tutStart(o){if(NET.on||typeof GXT==='undefined')return;const pro=!!(o&&
   try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
   tutBegin();
   const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
-  GXT.start({game:TUT_GAME,story:false,steps:tutSteps(),
-    endTitle:'You know the rules',endText:'Now a real game: new tiles, new dice, a computer that plays to win.',
+  GXT.start({game:TUT_GAME,story:false,steps:tutSteps(),live:tutLive,
+    endTitle:'You know the rules',endText:'Now a real game against a computer. Add-ons are off; tick one in Setup to see how it works.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'},{id:'menu',label:'Menu'}]:[{id:'play',label:'Play a real game'},{id:'menu',label:'Menu'}],
     onDone:r=>{const c=r&&r.choice;tutLeave();try{GXT.markDone(TUT_GAME)}catch(e){}
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}else if(c==='play'){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0].h=true;s.seats[1].h=false;startGame(s)}else showStart()},
     onExit:()=>{tutLeave();showStart()}})}
 function tutBegin(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};
   s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};
-  TS.on=true;TUT=tutDice;UI.tut=1;TUTG.on=true;TUTG.starting=1;try{setSeed(TS.seed);setAiSeed(3)}catch(e){}
+  TUTG.base=UI.speed||1;TS.on=true;TUT=tutDice;UI.tut=1;TUTG.on=true;TUTG.starting=1;try{setSeed(TS.seed);setAiSeed(3)}catch(e){}
   try{startGame(s,{tutorial:true,first:TS.co,seed:TS.seed,names:['Vermilion','Cobalt']})}finally{TUTG.starting=0}
   TUTG.freeze=true;UI.guide='light';UI.confirm=null;try{GXH.hide()}catch(e){}render()}
-function tutLeave(){TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
+function tutLeave(){if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
   try{GXH.hide()}catch(e){}try{kitReset()}catch(e){}try{PH.pop=null;PH.pd=null;PH.cur=null;phAfter()}catch(e){}}
 // Story is preceded by the guided game (the prologue) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!NET.on&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}
