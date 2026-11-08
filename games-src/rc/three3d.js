@@ -311,7 +311,7 @@ function terrainField(terr,seed){const R=seeded(seed*31+11);const ox=R()*40,oz=R
 // painted hex art (media/hex-*.webp, flat-top, opaque): turned a quarter so it fits the pointy hex, sampled in paintTile in place of the flat colours (the sculpted light is kept, softer)
 const HEXART={n:0,done:0,img:{},px:{},started:0,t0:0};
 function hexArtLoad(){if(HEXART.started)return;HEXART.started=1;HEXART.t0=performance.now();['beach','plains','river','hills','mountains','fog-a','fog-b','fog-c'].forEach(k=>{const i=new Image();i.onload=()=>{HEXART.img[k]=i;HEXART.n++;HEXART.done++};i.onerror=()=>{HEXART.done++};i.src='media/hex-'+k+'.webp'})}
-function hexArtPx(k,S){const key=k+S;if(HEXART.px[key])return HEXART.px[key];const im=HEXART.img[k];if(!im)return null;const c=cvs(S),x=c.getContext('2d');x.translate(S/2,S/2);x.rotate(Math.PI/2);const f=S/512*1.04;x.scale(f,f);x.drawImage(im,-256,-222);try{return HEXART.px[key]=x.getImageData(0,0,S,S).data}catch(e){HEXART.img[k]=null;return null}}   // a page opened from a file: taints the canvas: keep the drawn tile
+function hexArtPx(k,S){const key=k+S;if(HEXART.px[key])return HEXART.px[key];const im=HEXART.img[k];if(!im)return null;const c=cvs(S),x=c.getContext('2d');if(/^fog-/.test(k))x.filter='blur('+Math.max(2,S/40)+'px) saturate(.25) sepia(.5) brightness(1.4) contrast(.45)';x.translate(S/2,S/2);x.rotate(Math.PI/2);const f=S/512*1.04;x.scale(f,f);x.drawImage(im,-256,-222);try{return HEXART.px[key]=x.getImageData(0,0,S,S).data}catch(e){HEXART.img[k]=null;return null}}   // a page opened from a file: taints the canvas: keep the drawn tile
 // paint the top of a tile from its height field: colour, soft baked light, wet sand, snow, riverbanks
 function paintTile(F,S){const c=cvs(S),x=c.getContext('2d'),id=x.createImageData(S,S),D=id.data;const rc=cvs(S/2),rx=rc.getContext('2d'),rid=rx.createImageData(S/2,S/2),RD=rid.data;
   const G1=S+1,H=new Float32Array(G1*G1);for(let j=0;j<G1;j++)for(let i=0;i<G1;i++){H[j*G1+i]=F.h((i/S*2-1)*HR0,(j/S*2-1)*HR0)}F.H=H;F.S=S;
@@ -420,12 +420,12 @@ function wreckMesh(){const g=new THREE.Group();const wood=V3.lite?gq('wreckL',()
 // ---------- the mist of the unexplored island: stacked shader layers that read a mask of the tiles nobody has seen ----------
 function buildMist(){if(V3.mistL)return;const b=V3.box;V3.mistC=cvs(128);V3.mistC2=cvs(128);V3.mistT=tex(V3.mistC2,false);V3.mistT.anisotropy=1;V3.mistT.flipY=false;
   V3.mistL=[];for(let i=0;i<3;i++){const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,fog:false,
-    uniforms:{uTime:V3.U.time,uMask:{value:V3.mistT},uBox:{value:new THREE.Vector4(b.x0,b.z0,1/b.L,0)},uLayer:{value:i},uCol:{value:new THREE.Color(.78,.82,.84)},uFlash:{value:0},uNight:{value:0}},
+    uniforms:{uTime:V3.U.time,uMask:{value:V3.mistT},uBox:{value:new THREE.Vector4(b.x0,b.z0,1/b.L,0)},uLayer:{value:i},uCol:{value:new THREE.Color(.92,.88,.78)},uFlash:{value:0},uNight:{value:0}},
     vertexShader:'varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
     fragmentShader:GLN+`uniform sampler2D uMask;uniform vec4 uBox;uniform float uTime,uLayer,uFlash,uNight;uniform vec3 uCol;varying vec3 vW;
 void main(){vec4 mk=texture2D(uMask,(vW.xz-uBox.xy)*uBox.z);float m=mk.r;if(m<.01)discard;
- vec2 p=vW.xz*(.28+uLayer*.07)+vec2(uTime*.07,uTime*.04)*(1.+uLayer*.5)+uLayer*7.3;float n=fbm(p)+.45*fbm(p*2.4-vec2(uTime*.05,0.));
- float w=smoothstep(.58,1.12,n);float a=m*(.09+w*.58)*(1.-uLayer*.2);
+ vec2 p=vW.xz*(.28+uLayer*.07)+vec2(uTime*.02,uTime*.012)*(1.+uLayer*.3)+uLayer*7.3;float n=fbm(p)+.45*fbm(p*2.4-vec2(uTime*.05,0.));
+ float w=smoothstep(.58,1.12,n);float a=m*(.05+w*.22)*(1.-uLayer*.25);
  vec3 c=mix(uCol*vec3(.5,.52,.6),uCol*1.05,w)+vec3(.3,.2,.5)*mk.g*.1;c+=vec3(.6,.65,.8)*uFlash*.6;
  gl_FragColor=vec4(c,a);`+GLEND+'}'});
     const pl=new THREE.Mesh(gq('mistG',()=>{const g=new THREE.PlaneGeometry(1,1);g.rotateX(-Math.PI/2);return g}),m);pl.scale.set(b.L,1,b.L);pl.position.set(b.x0+b.L/2,TOPY+.5+i*.32,b.z0+b.L/2);pl.renderOrder=4+i;pl.frustumCulled=false;V3.scene.add(pl);V3.mistL.push(pl)}
@@ -550,7 +550,7 @@ function fitIsland(){let m=0,cx=0,cz=0;const ts=MAP;for(const t of ts){const p=h
 const TICON={beach:'🏖️',river:'🏞️',plains:'🌾',hills:'⛰️',mountains:'🏔️'};const SICON={wood:'🪵',fish:'🐟',parrot:'🦜'};
 function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};const PHN=!!V3.ph;
   for(const m of G.map){const t=tileAt(m.id);let h='';const reach=!t&&!m.down&&MAP[m.id].adj.some(p=>tileAt(p));
-    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s><s class="pt ${t?'':'unk'}">${m.id===G.camp.pos?'Camp':t?String(TERRN(t.terr)).replace(/^./,c=>c.toUpperCase()):'Unknown'}</s></b>`:''}
+    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s><s class="pt ${t?'':'unk'}">${m.id===G.camp.pos?'Camp':t?String(TERRN(t.terr)).replace(/^./,c=>c.toUpperCase()):'Not explored\nyet'}</s></b>`:''}
     else if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
     else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em>🌫</em>':''}`;
     let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}
