@@ -12,7 +12,8 @@
   "clicks": 1801
  },
  "quick": {
-  "result": null
+  "result": "cap",
+  "clicks": 93
  },
  "story": {
   "result": null
@@ -50,7 +51,53 @@
    "desc": "coached game: GXCOACH.done never became true within 720 s (1801 clicks, 0 rules explained)",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size pc --seed 48774 --phases tutorial",
    "shot": "/tmp/qa-shots/final-approach/pc-coach-notdone-6.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight\" under div.ttl-in \"Final Approach Two seats\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size pc --seed 48774 --phases quick",
+   "shot": "/tmp/qa-shots/final-approach/pc-screen-title-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.gx-ibtn \"Flight\" / button.gxc-ib.gxc-score \"★ 0/45\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size pc --seed 48774 --phases quick",
+   "shot": "/tmp/qa-shots/final-approach/pc-screen-quick-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.qseg \"Computer\" / button.gxc-node.a2.locked \"8 Eyes on the Gauge\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size pc --seed 48774 --phases quick",
+   "shot": "/tmp/qa-shots/final-approach/pc-screen-quick-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #93 (6)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 93 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size pc --seed 48774 --phases quick",
+   "shot": ""
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "story",
+   "where": "bot",
+   "desc": "phase crashed: browser.newContext: Target page, context or browser has been closed",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size pc --seed 48774 --phases story"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "fuzz",
+   "where": "bot",
+   "desc": "phase crashed: browser.newContext: Target page, context or browser has been closed",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size pc --seed 48774 --phases fuzz"
   }
  ],
- "secs": 725
+ "secs": 949
 }
