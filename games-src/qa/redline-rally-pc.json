@@ -1,0 +1,57 @@
+{
+ "slug": "redline-rally",
+ "size": "pc",
+ "seed": 73371,
+ "when": "2026-11-08T01:38Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 0
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 1270
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 787
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button#hintT.gx-ibtn \"Hints: Off\" under div#modal \"Goal: first across the l\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size pc --seed 73371 --phases quick",
+   "shot": "/tmp/qa-shots/redline-rally/pc-screen-quick-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Rules\" under div#modal \"Goal: first across the l\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size pc --seed 73371 --phases quick",
+   "shot": "/tmp/qa-shots/redline-rally/pc-screen-quick-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #1270 (You 2nd of 5 · Juno leads by 9 why?)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1270 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size pc --seed 73371 --phases quick",
+   "shot": "/tmp/qa-shots/redline-rally/pc-quick-noresult-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #787 (You 6th of 6 · Pia leads by 13 why?)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 787 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size pc --seed 73371 --phases story",
+   "shot": "/tmp/qa-shots/redline-rally/pc-story-noresult-13.png"
+  }
+ ],
+ "secs": 418,
+ "tutorialIn": {}
+}
