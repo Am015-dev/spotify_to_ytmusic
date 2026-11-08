@@ -223,6 +223,7 @@ function netLobbyEl() {
 function netInner() {
   if (!NET.ready) return [h('p.sm.muted', 'Checking online play...')];
   if (!netAvail()) return [h('p.sm.muted', 'Online play needs a recent browser with WebRTC (Chrome, Edge, Firefox or Safari).')];
+  if (navigator.onLine === false) return [h('p.sm.muted', 'You are offline. Online play needs an internet connection; the rest of the game works without one.')];
   return [h('p.sm.muted', 'Free and direct: your browsers connect to each other. Host a game, then send friends the code or the link.'),
     h('div.nrow', h('input#netname', { placeholder: 'Your name', maxlength: 24, autocomplete: 'off', value: NET.myName || '' }), h('button.btn.small', { 'data-a': 'nethost', type: 'button' }, 'Host')),
     h('div.nrow', h('input#joincode', { placeholder: 'Invite code', maxlength: 10, autocomplete: 'off', autocapitalize: 'off', value: UI.joinCode || '' }), h('button.btn.small', { 'data-a': 'netjoin', type: 'button' }, 'Join')),
@@ -284,3 +285,4 @@ document.addEventListener('click', e => { if (UI.netOpen && e.target && e.target
 document.addEventListener('toggle', e => { if (e.target && e.target.id === 'onl') UI.onl = e.target.open; }, true);
 // the lobby and the badge keep showing the live player count
 setInterval(() => { if (!NET.on) return; const st = netStatus(), k = st.t + '|' + NET.peers.length; if (k !== NET.lastSt) { NET.lastSt = k; netRender(); } }, 1000);
+window.addEventListener('online', () => { try { netRender(); } catch (e) { } }); window.addEventListener('offline', () => { try { netRender(); } catch (e) { } });

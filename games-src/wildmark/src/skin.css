@@ -298,3 +298,20 @@ html.wm-coach #pv{bottom:10px}
 /* W416: the wooden table is back (owner: "polished digital board game"); a soft vignette keeps the tiles' rims readable on it */
 .gx-board.hasart{background:radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 35%,rgba(10,6,3,.55) 100%),url(media/table-bg.webp) center/cover #3b2717!important}
 #map .hx polygon:first-child{filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}
+/* W416b: the habitat row is its own labelled strip; the rival's caption rides in the verdict box; the turn-over banner wraps */
+#terr{position:absolute;left:8px;right:72px;top:104px;z-index:3;display:flex;align-items:center;gap:4px;margin:0;flex-wrap:nowrap;background:rgba(18,22,20,.88);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:3px 6px;min-height:40px}
+#terr.solo{top:58px}
+#terr .tl{display:flex;flex-direction:column;line-height:1.05;font-size:13px;font-weight:800;color:#f3ead2;margin-right:4px;white-space:nowrap}
+#terr .tl small{font-size:13px;font-weight:700}#terr .tl .me{color:#ffd88a}#terr .tl .riv{color:#ff9f8a}
+#terr .tc{border:0;background:none;padding:0 3px;min-height:0;gap:3px;flex:1 1 0;justify-content:center}
+#terr .ti{width:18px;height:20px;flex:0 0 auto;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background-size:cover}
+#terr .sep{font-style:normal;color:#c9cfc6;font-size:13px}
+#terr .tc.ahead,#terr .tc.behind{box-shadow:none}#terr .tc.ahead b{text-decoration:underline 2px #7fc28a}#terr .tc.behind .rv{text-decoration:underline 2px #e07a68}
+.vd .rivl{display:block;font-style:normal;font-size:13px;color:#d9dccf;margin-top:2px}
+.vd.riv{border-color:#8f9a8f}
+#turnban{max-width:calc(100% - 32px);white-space:normal;text-align:center;line-height:1.2}
+@media (min-width:1000px){#terr{left:190px;top:122px;right:auto}#terr .tl,#terr .tl small,#terr .sep{font-size:16px}#terr .ti{width:22px;height:24px}.vd .rivl{font-size:16px}#terr .tc{flex:0 0 auto;padding:0 6px}}
+#terr .ti.hasart{background-size:cover!important}
+#turnban.on{animation-duration:1.8s}
+#coachb{top:152px}   /* below the habitat strip */
+@media (min-width:1000px){#coachb{top:150px}#terr{left:440px!important;top:70px!important}}
