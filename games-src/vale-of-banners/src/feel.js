@@ -171,7 +171,7 @@ function scoreEl(seat) { return seat === UI.view ? ($('.och[data-seat="' + seat 
 function rivalPeek(ev) {   /* a card with the rival's estate; the tile flies onto its space */
   if (UI.fast || QS.get('scn')) return Promise.resolve();
   var old = $('#peek'); if (old) old.remove(); var s = ev.p, n = G.seats[s].name;
-  var pk = h('div', { id: 'peek', role: 'status', 'aria-live': 'polite' }); pk.appendChild(h('div.pkh', {}, [h('span.ban', { style: 'background:' + VB.SEATCOL[s] }), h('b', { text: n + ' builds ' + aName(ev.tile) })]));
+  var pk = h('div', { id: 'peek', 'aria-live': 'polite' }); pk.appendChild(h('div.pkh', {}, [h('span.ban', { style: 'background:' + VB.SEATCOL[s] }), h('b', { text: n + ' builds ' + aName(ev.tile) })]));
   var box = h('div.minies'); pk.appendChild(box); document.body.appendChild(pk);
   var w = Math.min(330, innerWidth - 40), S = w / (7 * 1.732 + 0.4); renderEstate(box, s, S);
   var cell = box.querySelector('[data-ci="' + ev.cell + '"]'); if (cell) cell.style.visibility = 'hidden';
