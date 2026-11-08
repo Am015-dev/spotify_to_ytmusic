@@ -100,7 +100,7 @@
     var tap = function (id) { return { type: 'tap', times: 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
     return [
       { id: 'intent', title: 'Warden Ashgrove', target: function () { return $('.en .intent'); }, side: 'bottom', say: 'Goal: reach the top and beat its guardian.\nThis rat shows its next move: a bite for 4.', wait: null, ready: battleP },
-      { id: 'attack', title: 'Your first card', target: function () { return cardEl('w-hammer'); }, say: 'Crack its hide with Anvil Blow: lift it, then play it.\nAfter that, the climb is yours.', wait: tap('w-hammer'), ready: battleP },
+      { id: 'attack', title: 'Your first card', target: function () { return cardEl('w-hammer'); }, say: 'Lift Anvil Blow, then tap the rat.\nAfter that, the climb is yours.', wait: { type: 'tap', times: 1, match: function (a) { return a.w === 'card' && a.id === 'w-hammer'; } }, ready: battleP },   // lifting the card ends the guided part, so the spotlight never blocks the enemy tap
       { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
         onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; C.seen.intent = 1; C.seen.vuln = 1; speak('free', 'It is Vulnerable now: your next hit lands double. Play on your own; I speak up when something new matters.', 4600); UI.render(); }, 60); } }
     ];

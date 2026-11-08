@@ -57,3 +57,18 @@ the dock is now compact (track hint hidden in Story on phone, 1-line prompts), s
 - The coached first game uses the same preview, badge and rating.
 - Shots: playable-shots/score-preview-phone.webp, score-rating-phone.webp, score-preview-pc.webp, score-coach-phone.webp.
 - Story on phone keeps the detail line hidden (the goal line needs the room); there the prompt still shows "worth +N".
+
+## Game feel pass (W470, 8 Nov, branch shelf/W470-stitchwise-feel)
+- Offer cards: the patch shape is big and clear on a calm cream panel (busy card fabric kept as a faint frame); cells outlined.
+- Legal squares glow while you place a patch; a vibrate tick when the ghost snaps to a legal spot.
+- No fast pop-ups: the 1-second turn banner is gone (hot-seat hand-over card stays 4 s); pops are short numbers only
+  ("+12 pts"); toasts stay 4 s + 1 s per 10 words and close on tap, under any open panel.
+- Goal card: "Win with the most points when time runs out." + 3 short bullets; the rival waits until you tap Start.
+- Learn to play opens with the same aim sentence. Player pills: name, big score, "5 buttons · 81 gaps".
+- Rival turn slower (1.9 s caption, then the sew on their quilt). Result: the long sum line is gone (the table shows it).
+- 375x667 uses the compact dock so the quilt stays big; top bar fits at 375 px.
+- Shots: playable-shots/feel/ (390x844 and 1440x900). `node playable/feel-shots.js WxH` plays a full game by touch / mouse.
+- Feel gate (W470b): `feel-audit.js stitchwise --secs 120` (a)-(e) all 0 (baseline 6/14/3/37/0). Learn button is `data-a="learn"`,
+  Quick game is `data-a="start"`; the coached Learn game reports as a running tutorial (GXT.running) so drivers find it.
+  Coach lines and value detail cut to <= 12 words per sentence; phone text >= 14px; pill tap in Learn shows no toast;
+  no turn banner at all. Learn to play finishes by touch, no Skip: `playable/play.js 390x844 tut` and `1440x900 tut` PASS.

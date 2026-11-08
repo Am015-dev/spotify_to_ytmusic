@@ -84,7 +84,7 @@ const tpick=key=>()=>myId(key);
 // ---------------------------------------------------------------- the steps
 function tutSteps(){
   return [
- {id:'goal',title:'Race to level 10',say:'Be first to reach level 10. The final level can only come from killing a monster.',target:tq('.bfbig','.mine .top'),wait:null,
+ {id:'goal',title:'Race to level 10',say:'Be the first hero to reach level 10. Beat monsters or sell gear to go up. Level 10 only comes from a monster.',target:tq('.bfbig','.mine .top'),wait:null,
    ready:()=>G.phase==='setup'&&tmine()&&!!document.querySelector('.bfbig')},
  {id:'elf',title:'Play your race',say:'Tap your Elf, then tap your hero. Races give powers.',target:tq('.bfbig'),also:()=>tcard('elf'),pick:tpick('elf'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='elf'},from:()=>tcard('elf'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('elf')&&!!document.querySelector('.bfbig')},

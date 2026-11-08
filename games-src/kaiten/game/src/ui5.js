@@ -226,7 +226,7 @@ function applyPhone() {
 let rzT = 0;
 // ---------- boot ----------
 function boot() {
-  try { GXSK.init({ sets: { 'sk-kki': ['icon-cup', 'icon-paste', 'icon-plate', 'icon-star'], 'sk-tags': ['ui-nametag-red', 'ui-nametag-teal', 'ui-nametag-gold', 'ui-nametag-purple', 'ui-nametag-green'] } }); } catch (e) { }
+  try { GXSK.init({ map: true, stars: true, banner: true, sets: { 'sk-kki': ['icon-cup', 'icon-paste', 'icon-plate', 'icon-star'], 'sk-tags': ['ui-nametag-red', 'ui-nametag-teal', 'ui-nametag-gold', 'ui-nametag-purple', 'ui-nametag-green'] } }); } catch (e) { }
   GX.init({ key: 'kk' });
   GX.drawer('rulesd', 'How to play', buildRules(), true);
   GX.drawer('logd', 'Log', h('div#logbody'));
