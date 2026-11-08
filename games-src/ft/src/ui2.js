@@ -18,7 +18,7 @@ function flyEl(inner,cls,from,to,o){o=o||{};const fx=$('#fx');if(!fx||!ANIM)retu
     a.onfinish=fin;setTimeout(fin,dur+(o.delay||0)/spd()+400)}catch(e){fin()}return el}
 function tileEl(i){return document.querySelector(`#grid [data-tile="${i}"]`)}
 function seatEl(i){return document.querySelector(`#seats [data-seat="${i}"]`)}
-function floatText(txt,at,cls){const fx=$('#fx');if(!fx||!ANIM)return;const el=document.createElement('div');el.className='ft '+(cls||'');el.textContent=txt;el.style.left=at.x+'px';el.style.top=at.y+'px';fx.appendChild(el);setTimeout(()=>el.remove(),1500/spd())}
+function floatText(txt,at,cls){const fx=$('#fx');if(!fx||!ANIM||(G&&G.over))return;const el=document.createElement('div');el.className='ft '+(cls||'');el.textContent=txt;el.style.left=at.x+'px';el.style.top=at.y+'px';fx.appendChild(el);setTimeout(()=>el.remove(),1500/spd())}
 function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)return;const flights=[];const gains={},loss={};
   for(let i=0;i<cur.tiles.length;i++){const a=prev.tiles[i],b=cur.tiles[i];if(!a||!b)continue;const ca={},cb={};for(const c of a.m.concat(a.hand))ca[c]=(ca[c]||0)+1;for(const c of b.m.concat(b.hand))cb[c]=(cb[c]||0)+1;
     for(const c of new Set([...Object.keys(ca),...Object.keys(cb)])){const d=(cb[c]||0)-(ca[c]||0);for(let k=0;k<Math.abs(d);k++)(d>0?(gains[c]=gains[c]||[]):(loss[c]=loss[c]||[])).push(i)}}

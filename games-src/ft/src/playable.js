@@ -10,7 +10,7 @@ function plBanner(title,sub,cls){return;   // Addendum 7: no toasts in Play; the
 const PLQ=[];let PLQB=false;
 function plPop(i,d,why){if(G&&G.coach)return;   // in Learn to play the coach explains every change, one message at a time
   PLQ.push([i,d,why]);while(PLQ.length>3)PLQ.shift();plPopNext()}
-function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,700);return}const [i,d,why]=PLQ.shift();const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
+function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,700);return}if(!G||G.over){PLQ.length=0;return}const [i,d,why]=PLQ.shift();const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
   const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
   e.innerHTML='<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>'+(why?'<span>'+esc(why)+'</span>':'');document.body.appendChild(e);PLQB=true;
   const w=e.offsetWidth;const tr=document.getElementById('trk');const tb=tr&&!tr.hidden?tr.getBoundingClientRect().bottom:r.bottom;const land=document.documentElement.classList.contains('land');e.style.left=(land?Math.max(6,Math.min(innerWidth-w-6,r.left)):Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2)))+'px';e.style.top=(land?Math.round(innerHeight*.58):tb+4)+'px';const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;setTimeout(()=>{e.remove();PLQB=false;plPopNext()},ms)}
@@ -21,7 +21,7 @@ function plAfter(){if(!G){return}
   else if(G.logN>PL.logN){const fresh=G.log.filter(e=>e.i>PL.logN).reverse();PL.logN=G.logN;if(!G.tut&&!G.coach&&!G.over)for(const e of fresh){
     if(e.c==='turn'){const m=/— (.+)'s turn —/.exec(e.t);const nm=m?m[1]:'';const mine=G.pl.some(p=>p.nm===nm&&p.human)&&G.pl.filter(p=>p.human).length===1;plBanner(mine?LORE.turn.you:nm+"'s turn",mine?'Tap a glowing tile to start':'Watch each step. Tap the board to speed up.',mine?'mine':'rival')}
     else if(e.c==='round'&&G.round>1)plBanner(LORE.turn.bid,'Dearer spots play earlier','')}}
-  const tot=G.pl.map(p=>shownTotal(p));if(PL.tot&&PL.tot.length===tot.length&&!G.over)tot.forEach((v,i)=>{const d=v-PL.tot[i];if(d&&G.phase!=='bid'&&!(G.log[0]&&/ bids? /.test(G.log[0].t))){const e=G.log[0];plPop(i,d,e&&e.c!=='turn'?plShort(e.t):'')}});PL.tot=tot;
+  const tot=G.pl.map(p=>shownTotal(p));if(PL.tot&&PL.tot.length===tot.length&&!G.over)tot.forEach((v,i)=>{const d=v-PL.tot[i];if(d&&G.phase!=='bid'&&!(G.log[0]&&/ bids? /.test(G.log[0].t))){const e=G.log[0];plPop(i,d,(e&&e.c!=='turn'?plShort(e.t):'')||(plName(G.pl[i].nm)+(d>0?' scores':' loses')+' points'))}});PL.tot=tot;
   if(typeof tutOn==='function'&&tutOn()){const st=GXT.state();if(st&&st.shown&&st.id!==PL.lastId){const prev=PL.lastId;PL.lastId=st.id;const L=LORE.tut[prev];if(L&&L.react){const t=typeof L.react==='function'?L.react():L.react;const who=['sages','advisors'].includes(prev)?LORE.rival:LORE.guide;plSay(prev==='tribes'||prev==='sages'||prev==='advisors'?LORE.rival:LORE.guide,t)}}}
   else PL.lastId=null}
 (function(){const o=render;render=function(){o.apply(this,arguments);try{plAfter()}catch(e){console.error(e)}}})();
@@ -32,7 +32,7 @@ function plAfter(){if(!G){return}
   if(!me()&&G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for|tutorial/.test(e.t))return plShort(e.t)}
   return t}})();
 // the result speaks in the game's voice
-(function(){const o=overHtml;overHtml=function(){let h=o();try{const mp=viewP();const won=mp&&G.over.win.includes(mp.i);const a=won?LORE.win:LORE.lose;const t=a[Math.abs(parseInt(G.seed,10)||G.logN||0)%a.length];h=h.replace('</h2>','</h2><p class="voice">'+esc(t)+'</p>');if(mp&&G.pl.filter(x=>x.human).length===1)h=h.split(mp.nm).join('You')}catch(e){}return h}})();
+(function(){const o=overHtml;overHtml=function(){let h=o();try{const mp=viewP();const won=mp&&G.over.win.includes(mp.i);const tops=G.pl.map(x=>shownTotal(x)),gap=mp?Math.max(...tops)-shownTotal(mp):0,rel=gap/Math.max(1,Math.max(...tops));const a=won?LORE.win:(gap<=10||rel<=0.08)?LORE.loseClose:(rel>=0.35?LORE.loseFar:LORE.lose);const t=a[Math.abs(parseInt(G.seed,10)||G.logN||0)%a.length];h=h.replace('</h2>','</h2><p class="voice">'+esc(t)+'</p>');if(mp&&G.pl.filter(x=>x.human).length===1)h=h.split(mp.nm).join('You')}catch(e){}return h}})();
 // the tutorial as the prologue: the guide's and the rival's words replace the plain lessons (same ids, same targets, same waits)
 function tutStory(steps){return steps.map(s=>{const L=LORE.tut[s.id];if(!L)return s;const ch=LORE.chapters[s.id];const rival=['order','sages','advisors'].includes(s.id);const who=rival?LORE.rival:LORE.guide;
   const say=()=>{const v=L.say;if(typeof v!=='function')return v;
@@ -40,3 +40,10 @@ function tutStory(steps){return steps.map(s=>{const L=LORE.tut[s.id];if(!L)retur
     if(s.id==='masons')return v(bluesAround(TUT_ME.t2.path[2][0]).length);
     if(s.id==='score'){const sc=G.over?G.over.scores:[];const a=sc.find(x=>x.p===0),b=sc.find(x=>x.p===1);return v(a?a.s.total:0,b?b.s.total:0)}return ''};
   return Object.assign({},s,{title:()=>ch?'Ch.'+ch.n+' '+ch.t:who.face+' '+who.name,say})})}
+
+// ---- W497: a visible Skip button while the computer plays (a tap on the table still works too) ----
+(function(){const r=render;render=function(){r.apply(this,arguments);try{let b=document.getElementById('skipai');
+  const on=!!(G&&!G.over&&!UI.modal&&G.pl.some(p=>p.human)&&sideToAct()>=0&&!P(sideToAct()).human&&!online()&&!tutHeld()&&!UI.hurry);
+  if(!b&&on){b=document.createElement('button');b.id='skipai';b.type='button';b.textContent='Skip \u25B6\u25B6';b.setAttribute('aria-label','Skip the rival turn');
+    b.addEventListener('click',e=>{e.stopPropagation();UI.hurry=true;b.hidden=true;if(aiTimer){clearTimeout(aiTimer);aiTimer=null;schedule()}});document.body.appendChild(b)}
+  if(b){b.hidden=!on;const l=document.getElementById('line');if(on&&l){const q=l.getBoundingClientRect();if(q.height)b.style.top=Math.round(q.top+q.height/2-22)+'px'}}}catch(e){}}})();

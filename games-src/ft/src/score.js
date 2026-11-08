@@ -42,7 +42,9 @@ function scPreview(){const ln=document.getElementById('line');if(!ln)return;cons
   else if(G.phase==='bid'&&G.bidQueue[0]&&G.bidQueue[0].p===0)txt='Dearer spots play first. Each coin spent is a point lost.';
   else if(scMine()&&G.act&&(G.step==='tribe'||G.step==='tile'||G.step==='sell')){const a=G.act;txt='You took '+a.n+' '+(a.n>1?MPLUR[a.color]:MNAME[a.color])+' on '+tileName(G.board[a.tile])+'. Finish the tile action to end your turn.'}
   e.hidden=!txt;e.textContent=txt}
-function scBadges(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
+function scKey(){let k=document.getElementById('gainkey');const n=document.querySelectorAll('#grid .gain').length;if(!n){if(k)k.hidden=true;return}if(!k){k=document.createElement('div');k.id='gainkey';k.setAttribute('aria-hidden','true');k.setAttribute('data-help','');document.body.appendChild(k)}k.textContent='+N on a tile = points that walk can score · ★ = best';const g=document.getElementById('grid');if(g){const r=g.getBoundingClientRect();k.style.top=Math.round(r.bottom+2)+'px'}k.hidden=false}
+function scBadges(hn){try{scBadgesIn(hn)}finally{scKey()}}
+function scBadgesIn(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
   if(!hn||!scMine()||G.step!=='move'||online())return;scCompute();const add=(i,v,star)=>{const el=tileEl(i);if(!el)return;const b=document.createElement('i');b.className='gain'+(star?' star':'');b.textContent=(star?'★':'')+'+'+v;b.setAttribute('data-help','');b.setAttribute('aria-hidden','true');el.appendChild(b)};
   if(!G.move){const top=SC.bestTotal;for(const s in SC.starts){const x=SC.starts[s].best;if(x)add(+s,x.total,x.total>=top&&top>0)}}
   else{const sx=SC.starts[G.move.start];if(!sx)return;let top=-1;const res={};for(const nx of stepTargets()){let b=null;for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!b||x.total>b.total))b=x;if(b){res[nx]=b;top=Math.max(top,b.total)}}

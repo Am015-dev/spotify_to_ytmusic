@@ -57,6 +57,7 @@ function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.i
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
+function mgHtml(m){const n={};for(const c of m)n[c]=(n[c]||0)+1;return Object.keys(n).map(c=>`<span class="mg" title="${n[c]} ${esc(n[c]>1?MPLUR[c]:MNAME[c])}"><i class="mp" data-c="${c}"></i><b>${n[c]}</b></span>`).join('')}
 function mpHtml(c,h){return `<i class="mp${h?' h':''}" data-c="${c}"></i>`}
 function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   if(t.block)return `<div class="tile blk k-${t.k}" data-tile="${i}" aria-label="${esc(d.n)}"><i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span></div>`;
@@ -64,7 +65,7 @@ function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   const cls=['tile',t.blue?'blue':'red','k-'+t.k,glow?'glow':'',cur?'cur':'',own!=null?'owned':''].filter(Boolean).join(' ');
   return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]:''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
-   <div class="ms">${t.m.map(c=>mpHtml(c)).join('')}${hand.map(c=>mpHtml(c,1)).join('')}</div>
+   <div class="ms">${mgHtml(t.m)}${hand.map(c=>mpHtml(c,1)).join('')}</div>
    <div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" data-p="${own}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
 function renderGrid(){const g=$('#grid');if(!g)return;g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
@@ -201,5 +202,5 @@ function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!
 // ---------- the computer: one step at a time, about 0.6 s a drop; tap the table to hurry ----------
 const modalStops=()=>UI.modal&&UI.modal!=='lobby';
 let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops()||tutHeld())return;const s=sideToAct();if(s<0||P(s).human)return;
-  const drop=G.step==='move'&&G.move;const base=drop?900:1100;/* W480: readable rival pace */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
+  const drop=G.step==='move'&&G.move;const base=drop?320:420;/* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||tutHeld()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}
