@@ -65,7 +65,7 @@ function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who=
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
   o.innerHTML=`<div class="bfburst"></div><div class="bfd3"><img src="models/door${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()"><i class="bfdust" style="--dx:-90px;--dy:-10px"></i><i class="bfdust" style="--dx:90px;--dy:-24px"></i><i class="bfdust" style="--dx:-50px;--dy:-60px"></i><i class="bfdust" style="--dx:60px;--dy:-70px"></i><i class="bfdust" style="--dx:0px;--dy:-96px"></i></div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
-  document.body.appendChild(o);const dur=mine?1700:1000;let opened=false;
+  document.body.appendChild(o);const dur=4200;let opened=false;
   const E=BF.ev=BF.ev||{door0:0,door1:0,card:0};const dimg=o.querySelector('.bfd3 img');
   const open=()=>{if(opened||!o.isConnected)return;opened=true;E.door1=E.door1||performance.now();E.card=performance.now();o.classList.add('open');
     if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click');
@@ -113,7 +113,7 @@ function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||!BF.moti
       // the clip has its own roar: duck the music under it and skip the synth one; muted clip (sfx off) = silence, rejected unmuted play() = muted + synth roar
       loud=!v.muted;if(loud){try{if(window.GA)GA.duckTo(.25,.3)}catch(e){}}
       try{if(typeof sfx==='function'){if(!mine)sfx('door');if(!loud)setTimeout(()=>{try{sfx('roar')}catch(e){}},mine?0:200)}}catch(e){}
-      t3=setTimeout(()=>nm.classList.add('on'),900);setTimeout(()=>nm.classList.remove('on'),2500);
+      t3=setTimeout(()=>nm.classList.add('on'),900);
       t2=setTimeout(end,6200);UI.hold=Date.now()+6600});
     t1=setTimeout(bail,700);
     document.addEventListener('keydown',key,true);document.addEventListener('pointerdown',tap,true);document.addEventListener('click',eat,true);
@@ -124,8 +124,10 @@ function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createEle
   const w=64,sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-45,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-45;
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:620,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
 function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=(r.top+r.height/3)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1500)}
-function bfBubble(s,txt){const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),2600)}
-function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),3600)}
+function bfRead(t){return 4000+Math.ceil(String(t).split(/\s+/).length/10)*1000}
+function bfOne(){document.querySelectorAll('.bfbub').forEach(x=>x.remove())}
+function bfBubble(s,txt){if(!UI.hints&&!(typeof tutOn==='function'&&tutOn()))return;const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';bfOne();document.body.appendChild(b);setTimeout(()=>b.remove(),bfRead(txt))}
+function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';bfOne();document.body.appendChild(b);b.addEventListener('click',()=>b.remove());setTimeout(()=>b.remove(),bfRead(txt))}
 function bfSnap(){if(!G)return null;const cb=G.cb;const me=viewSeat();const mp=me>=0&&G.pl[me]?P(me):null;return {gid:G.gid,turn:G.turn,kick:G.kicked,me,eq:mp?mp.eq.map(e=>e.id+':'+(e.on?1:0)):[],lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
   cb:cb?{k:G.turn+':'+cb.who,enh:cb.mons.map(m=>m.enh.length),n:cb.mons.length,os:cb.os.length,help:cb.help,a:sideStr(cb),b:monStr(cb)}:null,ln:G.ln}}
 function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const actor=G.log[0]?G.log[0].s:-1;const chip=s=>document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);
@@ -245,3 +247,15 @@ autoNoteHTML=function(){const a=UI.autoNote;if(!a||!G)return '';if(!a.at)a.at=Da
 (function(){const _dt=dockTitle;dockTitle=function(me){const cb=G&&G.cb;const s=G?sideToAct():-1;if(cb&&!G.winner&&s===me&&me>=0&&cb.who!==me&&cb.help!==me)return P(cb.who).nm+'’s fight: meddle?';if(G&&!G.winner&&G.phase==='window'&&s===me&&G.active!==me)return curPl().nm+'’s door: curse?';return _dt(me)}})();
 // the first game with "teach me" starts against Easy computers (still changeable on the start screen)
 (function(){if(UI.lvl||/jsdom/i.test(navigator.userAgent||''))return;let first=true;try{first=!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')}catch(e){}if(first){UI.lvl='easy';if(!G)render()}})();
+// ---------------------------------------------------------------- the Goal card: one sentence on how to win, three on how to climb.
+// Opens at the start of the first game on this device and whenever the level strip at the top is tapped. Any tap closes it (it never times out).
+const GOAL_TXT={win:'Be the first hero to reach level 10.',pts:['Beat a monster: go up a level (big ones give 2).','Sell 1,000 gold of items: go up a level.','Level 10 only comes from beating a monster.']};
+function dkGoal(){if(document.getElementById('dkgoal'))return;const o=document.createElement('div');o.id='dkgoal';o.setAttribute('role','dialog');o.setAttribute('aria-label','How to win');
+  const me=typeof viewSeat==='function'&&G?viewSeat():-1;const lv=me>=0&&G.pl[me]?G.pl[me].lvl:1;
+  o.innerHTML=`<div class="dkg paper"><p class="dkgk">How to win</p><p class="dkgw">${GOAL_TXT.win}</p><ul>${GOAL_TXT.pts.map(t=>`<li>${t}</li>`).join('')}</ul><p class="dkgy">You are level <b>${lv}</b> of 10</p><button class="btn primary" type="button">Got it</button></div>`;
+  document.body.appendChild(o);UI.goalAt=Date.now()}
+function dkGoalClose(){const o=document.getElementById('dkgoal');if(o)o.remove()}
+document.addEventListener('pointerdown',e=>{const o=document.getElementById('dkgoal');if(o&&Date.now()-(UI.goalAt||0)>250){e.preventDefault();e.stopPropagation();setTimeout(dkGoalClose,0);return}
+  if(e.target.closest&&e.target.closest('#phchip,#docktitle')&&typeof G!=='undefined'&&G)dkGoal()},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')dkGoalClose()});
+(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof tutOn==='function'&&tutOn())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'){UI.goalGid=G.gid;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)setTimeout(dkGoal,400)}}catch(e){}return x}})();

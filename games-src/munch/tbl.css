@@ -252,3 +252,18 @@ html:not(.ph) .arena .fbtns{position:sticky;bottom:0;z-index:3}
 /* 9+ cards: slices under 44px, so a card's price tag hides and its name ends in an ellipsis instead of running under the next card */
 html.ph .mine .hand.tight .card:not(:last-child) :is(.gold,.aw){display:none}
 html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
+/* portrait phone, 5+ cards: whole cards in a sideways row (tbl.js tbFan), every word and number at 14px or more */
+html.ph-p .mine .hand.row{--hw:100px}
+html.ph-p .mine .hand.row .card{rotate:0deg;translate:0 -4px}
+html.ph-p .mine .hand.row .card.play,html.ph-p .mine .hand.row .card.sug{translate:0 -12px}
+html.ph-p .mine .hand.row .card .cn{width:auto;max-width:none;font-size:14px!important;line-height:1.05;letter-spacing:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph-p .mine .hand.row .card .tag{font-size:15px;font-weight:800}
+html.ph-p .mine .hand.row .card .tag small{display:none}
+html.ph-p .mine .hand.row .card .gold{font-size:14px}
+html.ph-p .opps .seat .snm{font-size:15px}
+html.ph-p .opps .seat .sw{font-size:15px}
+html.ph-p .opps .seat .lb{font-size:14px}
+html.ph-p .opps .seat .sg{display:none}
+html.ph .pile .stack .dn{font-size:14px;letter-spacing:0}
+html.ph .pile .stack .n{font-size:15px}
+html.ph-p .mine .hand.row .card .kind,html.ph-p .mine .hand.row .card .cx{display:none}
