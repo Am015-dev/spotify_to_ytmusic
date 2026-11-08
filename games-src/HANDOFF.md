@@ -184,3 +184,4 @@ Passed, waiting owner yes (branch/PR): stitchwise W491 PR262, thornbound W489 PR
 Running: hollowbough W509 (session_01RR7mnaDzgd2f6tQ2xrJQ97) on shelf/W482-hollowbough PR254 (old W482 sat waiting for "go" 12:03-15:32; never let workers ask).
 Shared shell fix committed (tutor dots under Skip): ships with the next build of each game; deploy all approved games in ONE build-all call.
 Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
+- 18:10 OWNER "run strict reviewers on gameplay and score them": 8 Opus reviewers G1-G8 (review/G<n>-gameplay, rubric games-src/reviews/GAMEPLAY-RUBRIC.md), 23 games. Sessions: G1 ..XKkNsmqtMGRReDni1, G2 ..Ysx9Tw5deqp7qSojW, G3 ..ZmgedzzG91eed3N7N, G4 ..bm4kTbhEYwiQpXzaT, G5 ..Z6d9Pp8CXwGzrvk1u, G6 ..ZXYLxq5J7mweiNUXg, G7 ..YsFyM6u5HYDCGgj8r, G8 ..YqFBKektxQacoKyHn (prefix session_01RR7mn). Compile a score table for the owner; FAILs go back to a fixer worker.
