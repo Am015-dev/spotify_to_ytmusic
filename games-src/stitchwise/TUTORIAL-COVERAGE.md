@@ -1,3 +1,9 @@
+# W491 review fixes (8 Nov)
+- Step 1 lights all 3 for-sale patches and every one of them works ("Tap one"). Patches a step does not accept are never lit or glowing.
+- No silent jumps: before each staged rule a "Skipping ahead: you go to 9, Marden to 14." line with a Skip ahead button; tokens walk
+  there. Before the 7x7 step: "Skipping ahead to space 30. Both quilts get patches, sewn for you." (Marden's quilt is filled too).
+- tut-walk now checks every highlighted target responds to a real tap, skip lines say they skip, and runs at 390x844 and 375x667.
+
 # Stitchwise tutorial coverage (W491: guided first game, replaces the coached half-game below)
 
 "Learn: your first game" is now a guided first game (`tutStart` in `src/ui4.js`). Every step is one line of 12 words or fewer and

@@ -163,12 +163,21 @@ function t2Allow(kind, k) {
   var st = t2Step(); if (!st) return true; if (kind === 'cancel') return false;
   var ok = st.allow ? st.allow(kind, k) : false; if (!ok) { t2Nudge(); } return ok;
 }
-function t2Nudge() { var t = t2Target(); if (t) { t.classList.remove('t2-hl'); void t.offsetWidth; t.classList.add('t2-hl'); } var b = $('#tutb'); if (b) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } sfx('bad'); }
-function t2Target() { var st = t2Step(); try { return st && st.target ? st.target() : null; } catch (e) { return null; } }
+function t2Nudge() { t2Targets().forEach(function (t) { t.classList.remove('t2-hl'); void t.offsetWidth; t.classList.add('t2-hl'); }); var b = $('#tutb'); if (b) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } sfx('bad'); }
+function t2Target() { return t2Targets()[0] || null; }
+function t2Targets() { var st = t2Step(), t = null; try { t = st && st.target ? st.target() : null; } catch (e) { } return !t ? [] : Array.isArray(t) ? t : [t]; }
 function t2Offer(k) { return function () { return $$('#offers .offer:not(.up)')[k]; }; }
+function t2CanBuy(k) { var pid = swOffer(G)[k], p = PATCHES[pid]; return !!p && G.btn[0] >= p.cost && swPlacements(G.board[0], p).length > 0; }
+function t2Offers() { return $$('#offers .offer:not(.up)').filter(function (e, k) { return k < 3 && t2CanBuy(k); }); }
+function t2OfferOk(k) { var st = t2Step(); return !st || !!(st.allow && st.allow('offer', k)); }   // only light up patches the current step accepts
+function t2Skip(rule, me, opp, stage, say) { // W491 fix: never jump silently. One line says what is skipped, the tokens walk there, then the next rule
+  return { id: 'skip-' + rule, rule: rule, skip: true, say: say || ('Skipping ahead: you go to ' + me + ', Marden to ' + opp + '.'), btn: 'Skip ahead', target: function () { return $('#tutb .t2b'); },
+    onBtn: function () { var last = G.pos.slice(); if (stage) stage(); else t2Stage(me, opp); UI.tokPos = last; var far = Math.max(G.pos[0] - last[0], G.pos[1] - last[1], 0); T2.until = Date.now() + (amt(1) ? Math.min(2600, far * Math.max(40, sp(150)) + 400) : 500); render(); },
+    done: function () { return T2.pressed && Date.now() > (T2.until || 0); } };
+}
 function t2Mine() { return G && !G.over && !UI.busy && isHuman(swWho(G)); }
 function t2Stage(me, opp) { // jump the fair ahead (both tokens set; you are behind, so you play)
-  G.pos = [me, opp]; G.stamp = [G.tick + 1, G.tick + 2]; G.tick += 2; G.cur = 0; G.pend = null; G.pendQ = 0; UI.sel = -1; UI.tokPos = null;
+  G.pos = [me, opp]; G.stamp = [G.tick + 1, G.tick + 2]; G.tick += 2; G.cur = 0; G.pend = null; G.pendQ = 0; UI.sel = -1;
 }
 function t2BonusStage() { // a quilt with a nearly full 7x7 block: one gap shaped like the first patch on sale
   var s = 0; t2Stage(30, 34);
@@ -183,23 +192,30 @@ function t2BonusStage() { // a quilt with a nearly full 7x7 block: one gap shape
       c.forEach(function (q) { G.board[s][(y + q[1]) * 9 + x + q[0]] = pid; }); G.owned[s].push(pid); G.inc[s] += p.inc; G.ring.splice(G.ring.indexOf(pid), 1); return; } });
   for (var yy = 0; yy < 7; yy++) for (var xx = 0; xx < 7; xx++) if (G.board[s][yy * 9 + xx] === -1) G.board[s][yy * 9 + xx] = 100;
   hole.forEach(function (q) { G.board[s][q[1] * 9 + q[0]] = -1; });
+  var cov = G.board[1].filter(function (v) { return v !== -1; }).length;   // Marden sewed patches in the skipped turns too (said on screen)
+  G.ring.filter(function (pid) { return off.indexOf(pid) < 0; }).sort(function (a, b) { return PATCHES[b].n - PATCHES[a].n; }).forEach(function (pid) { if (cov >= 44) return; var p = PATCHES[pid], pl = swPlacements(G.board[1], p)[0]; if (!pl) return;
+    p.or[pl[0]].forEach(function (q) { G.board[1][(pl[2] + q[1]) * 9 + pl[1] + q[0]] = pid; }); cov += p.n; G.owned[1].push(pid); G.inc[1] += p.inc; G.ring.splice(G.ring.indexOf(pid), 1); });
   G.start = G.ring.indexOf(pid0); G.btn[s] = Math.max(G.btn[s], p0.cost + 2); T2.hole = hole; T2.pid0 = pid0;
 }
 function t2Ghost() { var p = PATCHES[T2.pid0]; if (!p) return; UI.o = 0; UI.gx = 2; UI.gy = 2; render(); }
 function t2Steps() {
   var adv = function () { return $('[data-a=adv]'); }, sew = function () { return $('[data-a=sew]'); };
   return [
-    { id: 'buy', rule: 'buy', say: 'Only the 3 patches after the spool are for sale. Tap this.', target: t2Offer(2), allow: function (a, k) { return a === 'offer' && k === 2; }, done: function () { return UI.sel === 2; } },
+    { id: 'buy', rule: 'buy', say: 'Only the 3 patches after the spool are for sale. Tap one.', target: t2Offers, allow: function (a, k) { return a === 'offer' && k >= 0 && k < 3 && t2CanBuy(k); }, done: function () { return UI.sel >= 0; } },
     { id: 'pay', rule: 'pay', say: 'Drag it onto your quilt. Sew it on to pay buttons.', target: sew, allow: function (a) { return a === 'sew'; }, done: function () { return G.owned[0].length >= 1; } },
     { id: 'time', rule: 'time', say: 'Your token moved by its time. Furthest behind plays next.', btn: 'Watch Marden', target: function () { return $('#tutb .t2b'); },
       onBtn: function () { UI.tutAi = true; schedule(); }, done: function () { return T2.pressed && t2Mine(); }, leave: function () { UI.tutAi = false; } },
     { id: 'advance', rule: 'advance', say: 'Or Advance: jump past Marden, 1 button per space.', target: adv, allow: function (a) { return a === 'adv'; }, done: function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }); } },
-    { id: 'income', rule: 'income', enter: function () { t2Stage(9, 14); }, say: 'Pass a gold spot: earn 1 button per quilt button.', target: adv, allow: function (a) { return a === 'adv'; }, done: function () { return G.pos[0] > 11; } },
-    { id: 'leather', rule: 'leather', enter: function () { t2Stage(18, 22); }, say: 'First past the leather square sews it. Tap Advance.', target: adv, allow: function (a) { return a === 'adv'; }, done: function () { return !!G.pend; } },
+    t2Skip('income', 9, 14),
+    { id: 'income', rule: 'income', say: 'Pass a gold spot: earn 1 button per quilt button.', target: adv, allow: function (a) { return a === 'adv'; }, done: function () { return G.pos[0] > 11; } },
+    t2Skip('leather', 18, 22),
+    { id: 'leather', rule: 'leather', say: 'First past the leather square sews it. Tap Advance.', target: adv, allow: function (a) { return a === 'adv'; }, done: function () { return !!G.pend; } },
     { id: 'leather2', rule: 'leather', say: 'Tap any empty square to sew your free patch.', target: function () { return $('#quilt'); }, allow: function (a) { return a === 'leather'; }, done: function () { return !G.pend && G.board[0].indexOf(100) >= 0; } },
-    { id: 'bonus', rule: 'bonus', enter: t2BonusStage, say: 'Fill a 7x7 square first: +7 points. Tap this patch.', target: t2Offer(0), allow: function (a, k) { return a === 'offer' && k === 0; }, done: function () { return UI.sel === 0; } },
+    t2Skip('bonus', 30, 34, t2BonusStage, 'Skipping ahead to space 30. Both quilts get patches, sewn for you.'),
+    { id: 'bonus', rule: 'bonus', say: 'Fill a 7x7 square first: +7 points. Tap this patch.', target: t2Offer(0), allow: function (a, k) { return a === 'offer' && k === 0; }, done: function () { return UI.sel === 0; } },
     { id: 'bonus2', rule: 'bonus', enter: function () { t2Ghost(); }, say: 'Drop it in the gap, then tap Sew it on.', target: sew, allow: function (a) { if (a !== 'sew') return false; var c = curCells() || []; return c.every(function (q) { return T2.hole.some(function (hq) { return hq[0] === UI.gx + q[0] && hq[1] === UI.gy + q[1]; }); }); }, done: function () { return G.bonus === 0; } },
-    { id: 'end', rule: 'end', enter: function () { t2Stage(50, 53); }, say: 'Game ends when both reach the end. Tap Advance.', target: adv, allow: function (a) { return a === 'adv'; }, done: function () { return G.over; } }
+    t2Skip('end', 50, 53),
+    { id: 'end', rule: 'end', say: 'Game ends when both reach the end. Tap Advance.', target: adv, allow: function (a) { return a === 'adv'; }, done: function () { return G.over; } }
   ];
 }
 function tutStart(o) { // replaces the coached half-game: a guided first game, then a real one
@@ -218,13 +234,13 @@ function t2Tick() {
   t2Show();
 }
 function t2Show() {
-  var st = t2Step(); if (!st) return; var db = $('#dockbody'); if (!db) return; var b = $('#tutb');
+  var st = t2Step(); if (!st || $('#tutfin')) return; var db = $('#dockbody'); if (!db) return; var b = $('#tutb');
   if (!b) { b = h('div#tutb', { role: 'status', 'aria-live': 'polite' }); } if (b.parentNode !== db || db.firstChild !== b) db.insertBefore(b, db.firstChild);
   var n = T2.seen.length, key = st.id + ':' + T2.pressed;
   if (b.dataset.key !== key) { b.dataset.key = key; b.dataset.rule = st.rule; b.dataset.step = st.id; b.innerHTML = '';
     b.appendChild(h('span.t2n', n + '/8')); b.appendChild(h('span.t2t', st.say));
     if (st.btn) { var bt = h('button.btn.go.sm.t2b', { type: 'button', 'data-a': 't2next' }, T2.pressed ? 'Watching…' : st.btn); bt.disabled = !!T2.pressed; b.appendChild(bt); } }
-  var t = t2Target(); $$('.t2-hl').forEach(function (e) { if (e !== t) e.classList.remove('t2-hl'); }); if (t && !UI.busy && !(st.btn && T2.pressed)) t.classList.add('t2-hl');
+  var ts = t2Targets(), on = !UI.busy && !(st.btn && T2.pressed); $$('.t2-hl').forEach(function (e) { if (!on || ts.indexOf(e) < 0) e.classList.remove('t2-hl'); }); if (on) ts.forEach(function (t) { t.classList.add('t2-hl'); });
   var pr = $('#prompt'); if (pr) pr.classList.add('t2hide');
 }
 function t2Clear() { clearInterval(UI.t2iv); T2 = null; window.GXT2 = null; var b = $('#tutb'); if (b) b.remove(); var f = $('#tutfin'); if (f) f.remove(); $$('.t2-hl').forEach(function (e) { e.classList.remove('t2-hl'); }); var pr = $('#prompt'); if (pr) pr.classList.remove('t2hide'); }

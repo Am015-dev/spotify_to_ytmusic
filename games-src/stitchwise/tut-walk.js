@@ -25,13 +25,20 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
     if (seen[seen.length - 1] !== st.rule) { seen.push(st.rule); if (SH && WANT.indexOf(st.rule) >= 0 && st.id !== 'end') { shotN++; await pg.waitForTimeout(250); await pg.screenshot({ path: path.join(SH, 'tut-' + shotN + '.png') }); } }
     if (st.id === 'score' && SH) { shotN++; await pg.screenshot({ path: path.join(SH, 'tut-' + shotN + '.png') }); }
     ok(st.say.trim().split(/\s+/).length <= 12, 'step ' + st.id + ' line <= 12 words: ' + st.say);
-    const hl = await pg.$$('.t2-hl'); ok(hl.length === 1, 'step ' + st.id + ': exactly one highlighted target (' + hl.length + ')');
+    const hl = await pg.$$('.t2-hl'); ok(hl.length >= 1 && (hl.length === 1 || st.id === 'buy'), 'step ' + st.id + ': highlighted target(s) (' + hl.length + ')');
+    // W491 fix: every highlighted target must respond to a tap (the reviewer's dead tap: 3 lit patches, only 1 worked)
+    if (st.id === 'buy') { ok(hl.length === 3, 'buy: all 3 for-sale patches lit (' + hl.length + ')');
+      for (let k = 0; k < hl.length; k++) { const r = await pg.evaluate(k => { const e = document.querySelectorAll('.t2-hl')[k], kk = +e.dataset.k; return { kk, ok: GXT2.steps[GXT2.i].allow('offer', kk) }; }, k); ok(r.ok, 'buy: lit patch ' + r.kk + ' is accepted'); } }
     // a wrong tap is refused (the step does not move on)
-    if (st.id === 'buy') { const o = await pg.$$('#offers .offer:not(.up)'); await tap(o[0]); ok(await pg.evaluate(() => UI.sel) === -1, 'wrong patch refused'); }
+    if (st.id === 'buy') { const up = await pg.$('#offers .offer.up'); const bb = up && await up.boundingBox(); if (bb) { await tapXY(bb.x + Math.min(bb.width / 2, 20), bb.y + bb.height / 2); ok(await pg.evaluate(() => UI.sel) === -1, 'not-for-sale patch refused'); } }
     if (st.id === 'pay') { const q = await (await pg.$('#quilt')).boundingBox(); const g = await (await pg.$('#ghost')).boundingBox(); await drag(g.x + 10, g.y + 10, q.x + q.width * .6, q.y + q.height * .6); }
     if (st.id === 'score') { const r = await pg.$('#tutfin [data-a=t2real]'); await tap(r); await pg.waitForTimeout(600); break; }
     if (st.id === 'leather2') { const i = await pg.evaluate(() => G.board[0].findIndex(v => v === -1)); const cells = await pg.$$('#quilt .qc'); const cb = await cells[i].boundingBox(); ok(cb.width >= 34, 'quilt square >= 34px'); await tapXY(cb.x + cb.width / 2, cb.y + cb.height / 2); await pg.waitForTimeout(400); continue; }
-    await tap(hl[0]); await pg.waitForTimeout(400); if (process.env.DBG) console.log(st.id, JSON.stringify(await pg.evaluate(() => ({ i: GXT2 && GXT2.i, pr: GXT2 && GXT2.pressed, pos: G.pos, who: swWho(G), busy: UI.busy }))));
+    const snap = () => pg.evaluate(() => JSON.stringify([GXT2 && GXT2.i, GXT2 && GXT2.pressed, UI.sel, G.pos, G.owned.map(o => o.length), !!G.pend, G.over, G.btn]));
+    const before = await snap(); await tap(hl[0]); await pg.waitForTimeout(300);
+    let moved = false; for (let w = 0; w < 10 && !moved; w++) { moved = (await snap()) !== before || !!(await pg.$('#tutfin')); if (!moved) await pg.waitForTimeout(200); }
+    ok(moved, 'step ' + st.id + ': tapping the highlighted target did something');
+    if (st.id.startsWith('skip-')) ok(/^Skipping ahead/.test(st.say), 'skip step says it skips: ' + st.say); if (process.env.DBG) console.log(st.id, JSON.stringify(await pg.evaluate(() => ({ i: GXT2 && GXT2.i, pr: GXT2 && GXT2.pressed, pos: G.pos, who: swWho(G), busy: UI.busy }))));
   }
   ok(JSON.stringify(seen) === JSON.stringify(WANT), 'rules in order: ' + seen.join(', '));
   const real = await pg.evaluate(() => ({ g: !!G && !G.over, tut: UI.tutorial, t2: !!window.GXT2, pos: G && G.pos, offers: document.querySelectorAll('#offers .offer:not(.up)').length }));

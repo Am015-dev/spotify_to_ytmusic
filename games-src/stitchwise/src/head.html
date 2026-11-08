@@ -401,5 +401,18 @@ html:not(.sm) .gx-dock-head .gx-dt{font-size:15px!important;color:#2a1d10}}
 #tutfin .t2sc p{margin:4px 0;font-size:16px}
 #tutfin .t2sub{margin:0;font-size:15px}
 #tutfin .btn{min-height:52px;font-size:18px}
+
+/* W491 fix: short phones (html.sm, e.g. 375x667): picture on top, three numbers below, so the picture never covers the cost/time/income */
+html.sm .offer{flex-direction:column!important;justify-content:flex-start;min-height:0!important;padding:4px 3px!important;gap:3px!important}
+html.sm .offer .ofx{display:grid!important;grid-template-columns:repeat(3,auto)!important;justify-content:center;width:100%!important;background:none!important;padding:0!important;gap:3px!important}
+html.sm .offer .of{flex-direction:column!important;align-items:center;padding:1px 4px!important;gap:0!important;background:#f4ead6!important}
+html.sm .offer .of small{display:none!important}
+html.sm .offer .of b{font-size:15px!important}
+html.sm .offer .of img.ic,html.sm .offer .of svg{width:16px!important;height:16px!important}
+html.sm .offer .shape{margin:0!important;padding:3px!important}
+/* W491 fix: a patch that does not fit is striped, not just red (red patches looked "wrong" while fine) */
+#ghost.bad .gc{background:repeating-linear-gradient(45deg,#c22 0 5px,#fff 5px 9px)!important;opacity:.85}
+/* W491 fix: the rival's quilt stays on screen on phones (a live thumbnail on their plate; tap it for the big view) */
+@media (max-width:600px){.pstrip[data-seat="1"] .thumb{display:block!important;width:34px!important;height:34px!important;border-radius:4px;flex:none;box-shadow:0 0 0 1px #0004}.pstrip[data-seat="1"]{gap:6px!important;padding-left:6px!important}}
 </style>
 </head>
