@@ -8,15 +8,15 @@ const CK_ICO = {
   speed: '<path d="M4 17a8 8 0 1 1 16 0M12 17l4-6"/><circle cx="12" cy="17" r="1.300"/>',
   planes: '<path d="M12 3l1.800 6 6.200 3v2l-6.200-1.500L13 18l2 1.500V21l-3-.800-3 .800v-1.500l2-1.500-.800-4.500L4 14v-2l6.200-3z"/>'
 };
-const CK_NAME = { axis: 'Plane level', air: 'On the airport', speed: 'Speed below the brakes', planes: 'No planes on the track', gear: 'Landing gear down', flaps: 'Flaps out', intern: 'Trainee trained', ice: 'Icy brakes done' };
+const CK_NAME = { axis: 'Plane level', air: 'On the airport', speed: 'Speed within the brakes', planes: 'No planes on the track', gear: 'Landing gear down', flaps: 'Flaps out', intern: 'Trainee trained', ice: 'Icy brakes done' };
 const CK_TICK = '<svg viewBox="0 0 16 16"><path d="M3 8.500l3.200 3.200L13 4.500" fill="none" stroke="#fff" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const CK_CROSS = '<svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="#fff" stroke-width="2.800" stroke-linecap="round"/></svg>';
 function ckNum(it) { return it.k === 'gear' ? String(it.n) : it.k === 'flaps' ? String(it.n) : it.k === 'planes' ? (it.n ? String(it.n) : '') : it.k === 'speed' ? '≤' + it.n : it.k === 'air' ? (it.n ? String(it.n) : '') : ''; }
 function ckLabel(it) { return CK_NAME[it.k] + ': ' + (it.ok ? 'yes' : 'not yet') + (it.k === 'speed' ? ' (brakes ' + it.n + ')' : it.k === 'planes' && it.n ? ' (' + it.n + ' left)' : it.k === 'air' && it.n ? ' (' + it.n + ' spaces to go)' : it.k === 'gear' || it.k === 'flaps' ? ' (' + it.n + ')' : ''); }
-const CK_WORD = it => it.k === 'axis' ? 'Level' : it.k === 'gear' ? 'Gear ' + it.n + '/3' : it.k === 'flaps' ? 'Flaps ' + it.n + '/4' : it.k === 'planes' ? (it.n ? it.n + ' plane' + (it.n > 1 ? 's' : '') : 'No planes') : it.k === 'speed' ? 'Speed ≤' + it.n : it.k === 'air' ? (it.n ? it.n + ' to go' : 'At airport') : it.k === 'intern' ? 'Trainee' : it.k === 'ice' ? 'Ice ' + it.n + '/4' : '';
+const CK_WORD = it => it.k === 'axis' ? 'Level' : it.k === 'gear' ? (it.ok ? 'Gear' : 'Gear ' + it.n + '/3') : it.k === 'flaps' ? (it.ok ? 'Flaps' : 'Flaps ' + it.n + '/4') : it.k === 'planes' ? (it.n ? it.n + ' plane' + (it.n > 1 ? 's' : '') : 'Clear') : it.k === 'speed' ? 'Speed ≤' + it.n : it.k === 'air' ? (it.n ? it.n + ' to go' : 'At airport') : it.k === 'intern' ? 'Trainee' : it.k === 'ice' ? 'Ice ' + it.n + '/4' : '';
 function ckChips() {
-  // phones: the landing-speed chip waits for the landing round (it cannot be met before), so the words fit on one row
-  return FA.checklist(G).filter(it => !(it.k === 'speed' && isPh() && !FA.isFinal(G))).map(it => h('span.ck.' + (it.ok ? 'ok' : 'no'), { 'data-k': it.k, 'aria-label': ckLabel(it), title: ckLabel(it) },
+  // phones: the landing-speed chip waits for the landing round (it cannot be met before) and the airport chip leaves once the landing round starts (it is met by then), so the words fit on one row
+  return FA.checklist(G).filter(it => !(it.k === 'speed' && isPh() && !FA.isFinal(G)) && !(it.k === 'air' && it.ok && isPh() && FA.isFinal(G))).map(it => h('span.ck.' + (it.ok ? 'ok' : 'no'), { 'data-k': it.k, 'aria-label': ckLabel(it), title: ckLabel(it) },
     h('b.cw', CK_WORD(it)), h('i.mk', { 'aria-hidden': 'true', html: it.ok ? CK_TICK : CK_CROSS })));
 }
 // the dock strip: the checklist and one info button (the board is the screen; this is the one place to look to know if you are winning)
@@ -25,13 +25,13 @@ function goalStrip() {
   return h('button.goalb.gstrip.chk', { type: 'button', 'data-a': 'goalopen', 'aria-label': t + '. Landing checklist: ' + FA.checklist(G).map(ckLabel).join(', ') + '. Tap for details.' }, h('span.ckrow', ckChips()), h('i.gi', { 'aria-hidden': 'true' }, 'i'));
 }
 function landList() {
-  const T = { axis: it => 'Plane level (now ' + (G.pl.axis === 0 ? 'level' : Math.abs(G.pl.axis) + (G.pl.axis < 0 ? ' left' : ' right') + ')'), air: it => 'On the airport when the last round starts' + (it.n ? ' (' + it.n + ' to go)' : ''), speed: it => 'Landing speed below the brakes (' + it.n + ')', planes: it => 'No planes left on the track (' + it.n + ' to go)', gear: it => 'All landing gear down (' + it.n + '/3)', flaps: it => 'All flaps out (' + it.n + '/4)', intern: it => 'Trainee finished (' + (6 - it.n) + ' tokens left)', ice: it => 'Icy-runway track finished (' + it.n + '/4)' };
+  const T = { axis: it => 'Plane level (now ' + (G.pl.axis === 0 ? 'level' : Math.abs(G.pl.axis) + (G.pl.axis < 0 ? ' left' : ' right') + ')'), air: it => 'On the airport when the last round starts' + (it.n ? ' (' + it.n + ' to go)' : ''), speed: it => 'Landing speed no more than the brakes (' + it.n + ')', planes: it => 'No planes left on the track (' + it.n + ' to go)', gear: it => 'All landing gear down (' + it.n + '/3)', flaps: it => 'All flaps out (' + it.n + '/4)', intern: it => 'Trainee finished (' + (6 - it.n) + ' tokens left)', ice: it => 'Icy-runway track finished (' + it.n + '/4)' };
   return FA.checklist(G).map(it => [it.ok ? true : (it.k === 'speed' && FA.brakeVal(G) < 2 && G.lad !== 5 && !G.autoBrake ? null : false), T[it.k](it)]);
 }
 function goalFull() {
   const size = trackOf().sp.length, pos = G.pl.pos, last = D.rounds - G.row0, fin = FA.isFinal(G), eng = G.keys.includes('en0');
   const need = size - pos, moves = last - 1 - G.round - (G.slots.en0 && G.slots.en1 ? 1 : 0);
-  const route = !eng ? 'Seven rounds. End the last one with the plane level.' : fin ? 'Landing now: the plane stays put, speed must be below the brakes' : pos >= size ? 'On the airport: hold here until round ' + last : need + ' space' + (need > 1 ? 's' : '') + ' to the airport, ' + Math.max(0, moves) + ' round' + (moves === 1 ? '' : 's') + ' left to fly there';
+  const route = !eng ? 'Seven rounds. End the last one with the plane level.' : fin ? 'Landing now: the plane stays put, speed must be no more than the brakes' : pos >= size ? 'On the airport: hold here until round ' + last : need + ' space' + (need > 1 ? 's' : '') + ' to the airport, ' + Math.max(0, moves) + ' round' + (moves === 1 ? '' : 's') + ' left to fly there';
   return h('div.goalb', h('span.gr', h('b', fin ? 'Round ' + last + ' · ' : ''), route), h('span.gc', ckChips()), G.keys.includes('lg0') && !fin ? (late => late ? h('span.dg', '⚠ ' + late) : null)(behind()) : null);
 }
 // ---------- the picture: the plane seen from behind, coming in toward the runway ----------
@@ -81,7 +81,7 @@ function sceneHTML(wpx, hpx, stripH, hz) {
   svg = '<svg viewBox="0 0 ' + wpx + ' ' + sh + '" width="' + wpx + '" height="' + sh + '" preserveAspectRatio="none">' + s + '</svg>';
   // the numbers beside the picture: speed against the brakes
   let chips = '';
-  if (eng) { const br = FA.brakeVal(G), sp = G.speed, bad = fin && G.landSpeed >= 0 && G.landSpeed >= br; chips = '<div class="pvs" aria-hidden="true">' + (sp >= 0 ? '<span class="sp1' + (bad ? ' bad' : '') + '"><i class="ic"><svg viewBox="0 0 24 24">' + CK_ICO.speed + '</svg></i><b>' + sp + '</b></span>' : '') + (fin || G.lad >= 5 || !G.lad ? '<span class="br1"><i class="ic"><svg viewBox="0 0 24 24">' + ICO.brakes + '</svg></i><b>' + br + '</b></span>' : '') + '</div>'; }
+  if (eng) { const br = FA.brakeVal(G), sp = G.speed, bad = fin && G.landSpeed >= 0 && !FA.slowOk(G, G.landSpeed); chips = '<div class="pvs" aria-hidden="true">' + (sp >= 0 ? '<span class="sp1' + (bad ? ' bad' : '') + '"><i class="ic"><svg viewBox="0 0 24 24">' + CK_ICO.speed + '</svg></i><b>' + sp + '</b></span>' : '') + (fin || G.lad >= 5 || !G.lad ? '<span class="br1"><i class="ic"><svg viewBox="0 0 24 24">' + ICO.brakes + '</svg></i><b>' + br + '</b></span>' : '') + '</div>'; }
   return '<div class="pv" aria-hidden="true">' + svg + chips + '</div>';
 }
 // ---------- what a die would do: shown on each glowing slot (a short number and word, no sentence) ----------
@@ -89,7 +89,7 @@ function slotPreview(k, v, val) {
   const S = FA.SLOT[k], o = 1 - v, last = FA.isFinal(G), wm = FA.windMod(G);
   switch (S.grp) {
     case 'axis': { const x = G.slots['ax' + o]; if (!x) return { big: String(val), cap: 'first' }; const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); return { big: String(Math.abs(nx)), cap: Math.abs(nx) >= 3 ? 'SPIN' : nx === 0 ? 'level' : nx < 0 ? 'left' : 'right', bad: Math.abs(nx) >= 3 || (last && nx !== 0), good: nx === 0 }; }
-    case 'engines': { const x = G.slots['en' + o]; if (!x) return { big: String(val), cap: 'first' }; const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); return { big: String(sm), cap: sm < br && br >= 2 ? 'ok' : 'fast', bad: !(sm < br && br >= 2), good: sm <= br && br >= 2 }; } const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return { big: String(sm), cap: adv ? '+' + adv : 'stay' }; }
+    case 'engines': { const x = G.slots['en' + o]; if (!x) return { big: String(val), cap: 'first' }; const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); return { big: String(sm), cap: sm <= br && br >= 2 ? 'ok' : 'fast', bad: !(sm <= br && br >= 2), good: sm <= br && br >= 2 }; } const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return { big: String(sm), cap: adv ? '+' + adv : 'stay' }; }
     case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return { big: at === G.planes.length ? 'A' : String(Math.max(1, at)), cap: n ? 'clear' : 'empty', good: !!n }; }
     case 'gear': return G.pl.sw.lg[S.ix] ? { big: '=', cap: 'same' } : { big: '↓', cap: 'down', good: true };
     case 'flaps': return G.pl.sw.fl[S.ix] ? { big: '=', cap: 'same' } : { big: '↓', cap: 'out', good: true };
@@ -164,13 +164,13 @@ function previewText(k, v) {
     case 'axis': { const x = G.slots['ax' + o]; if (!x) { t = 'Axis: ' + name(o) + "'s die decides the tilt"; break; }
       const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); t = 'Axis after: ' + (Math.abs(nx) >= 3 ? 'tilt ' + Math.abs(nx) + ': crash' : nx === 0 ? 'level' : 'tilt ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right') + (Math.abs(nx) === 2 ? ' (one more is a spin)' : '')); break; }
     case 'engines': { const x = G.slots['en' + o]; if (!x) { t = 'Speed: ' + val + ' plus ' + name(o) + "'s die"; break; }
-      const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); t = 'Landing speed ' + sm + ' vs brakes ' + br + ': ' + (sm < br && br >= 2 ? 'slow enough' : 'too fast, the flight ends'); break; }
+      const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); t = 'Landing speed ' + sm + ' vs brakes ' + br + ': ' + (sm <= br && br >= 2 ? 'slow enough' : 'too fast, the flight ends'); break; }
       const adv = G.pl.pos >= trackOf().sp.length ? 0 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2, to = G.pl.pos + adv, n = trackOf().sp.length;
       t = 'Speed ' + sm + ': ' + (adv ? 'advance ' + adv + ' (to ' + (to >= n ? 'the airport' : 'space ' + to) + ')' : 'stay on space ' + G.pl.pos) + (to > n ? ', past the airport: crash' : ''); break; }
     case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; t = n ? 'Radio: clears the plane on ' + (at === G.planes.length ? 'the airport' : 'space ' + at) : 'Radio: no plane on ' + (at > G.planes.length ? 'that space' : 'space ' + at) + ', nothing cleared'; break; }
     case 'gear': t = G.pl.sw.lg[S.ix] ? 'Gear ' + (S.ix + 1) + ' is down already: no effect' : 'Gear down: blue marker ' + G.pl.aeroB + ' → ' + Math.min(7, G.pl.aeroB + 1); break;
     case 'flaps': t = G.pl.sw.fl[S.ix] ? 'Flap already out: no effect' : 'Flap out: orange marker ' + G.pl.aeroO + ' → ' + Math.min(12, G.pl.aeroO + 1); break;
-    case 'brakes': t = G.pl.sw.br[S.ix] ? 'Brake already set: no effect' : 'Brakes ' + FA.brakeVal(G) + ' → ' + S.vals[0] + ': landing speed must be under ' + S.vals[0]; break;
+    case 'brakes': t = G.pl.sw.br[S.ix] ? 'Brake already set: no effect' : 'Brakes ' + FA.brakeVal(G) + ' → ' + S.vals[0] + ': landing speed may be up to ' + S.vals[0]; break;
     case 'conc': t = G.coffee >= D.coffeeMax ? 'Coffee: already ' + G.coffee + ' tokens, the die is just spent' : 'Coffee: tokens ' + G.coffee + ' → ' + (G.coffee + 1); break;
     default: t = slotName(k) + ': ' + slotNeedLong(k);
   }
@@ -219,10 +219,13 @@ function roShow(a) {
 // ---------- the Goal, one card before turn 1 (Addendum 7): the win condition in one sentence and three bullets on how you get there ----------
 function goalCard(inStory) {
   const n = D.rounds - G.row0, mods = scenOf().mods.map(m => D.mods[m] && D.mods[m].name).filter(Boolean);
-  return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Goal: land together in round ' + n + '.'),
-    h('ul', h('li', 'Axis: both dice close, or the plane tilts. Tilt 3 crashes.'),
-      h('li', 'Engines: your two dice add up. Fast enough moves you closer.'),
-      h('li', 'Spare dice: clear planes, gear, flaps, brakes.'), h('li', 'The checklist shows what is left.')),
+  // a short visual checklist: the landing conditions, each with its icon and an empty tick box that the in-game checklist fills
+  const rows = [['air', 'At the airport'], ['planes', 'No planes ahead'], ['gear', 'Gear 3 down'], ['flaps', 'Flaps 4 out'], ['axis', 'Wings level'], ['speed', 'Speed ≤ brakes']];
+  if (scenOf().mods.includes('intern')) rows.push(['intern', 'Trainee done']); if (scenOf().mods.includes('ice')) rows.push(['ice', 'Icy brakes done']);
+  const ico = k => h('i.gci', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (CK_ICO[k] || '') + '</svg>' });
+  return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Land together in round ' + n),
+    h('ul.gcl', { 'aria-label': 'To land you need' }, ...rows.map(([k, t]) => h('li', { 'data-k': k }, h('span.gbx', { 'aria-hidden': 'true', html: CK_TICK }), ico(k), h('span', t)))),
+    h('p.gcr', 'Every round: fill both Axis and Engines.'),
     (ap => ap ? h('p.fwx', wxImg('wx-' + ap.wx, ap.wx), wxImg('time-' + ap.tod, ap.tod), ap.name + ': ' + ap.wx + ', ' + ap.tod + '.') : null)(D.airports[scenOf().ap]),
     mods.length ? h('p', 'Today also: ' + mods.join(', ') + '.') : null);
 }
@@ -248,6 +251,10 @@ function ftAfter() {
   const db = $('#dockbody'); if (db) { const old = $('#ftrk'); const t = trackerEl(); if (old) old.replaceWith(t); else db.insertBefore(t, db.firstChild); }
   const v = actSeat(), sel = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.result && (UI.sel === 'p' || (typeof UI.sel === 'number' && UI.sel >= 0));
   let pv = $('#fprev'); if (!pv && db) { pv = h('div#fprev', { 'aria-live': 'polite' }); const pd = $('#promptDock'); if (pd && pd.nextSibling) db.insertBefore(pv, pd.nextSibling); else db.appendChild(pv); }
+  // the prompt never cuts off with "...": it shrinks to 15 / 14 px, then wraps onto two 16 px lines inside the same 32 px row
+  { const pr = $('#prompt'); if (pr && isPh()) { pr.classList.remove('p2'); pr.style.fontSize = ''; const over = () => pr.scrollWidth > pr.clientWidth + 1; if (over()) { pr.style.fontSize = '15px'; if (over()) { pr.style.fontSize = ''; pr.classList.add('p2'); } } } }
+  // the checklist never clips: if the chips do not fit on one row (narrow phones, final round), they wrap to a second row
+  document.querySelectorAll('#goal .ckrow, .goalb .gc').forEach(r => { r.classList.remove('ckwrap'); if (r.scrollWidth > r.clientWidth + 1 || [...r.children].some(c => c.getBoundingClientRect().right > r.getBoundingClientRect().right + 1)) r.classList.add('ckwrap'); });
   if (pv) { const k = sel && hintsMode() ? previewKey(v) : null; pv.hidden = !k && !UI.askWhy; pv.textContent = k ? previewText(k, v) : UI.askWhy || ''; pv.classList.toggle('bad', !!k && /crash|ends|spin|too fast/i.test(pv.textContent)); }
   // the "What should I do?" button joins the actions on every turn of yours (R6: always, not only with Hints on)
   const ac = $('#acts'), mineNow = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.result && (G.pend ? G.pend.h === 'rr' && !G.pend.d.m[v] : G.turn === v);
@@ -255,6 +262,7 @@ function ftAfter() {
   $$('#pz .slot[data-slot]').forEach(e => { const k = e.dataset.slot; if (!FA.SLOT[k]) return; const why = sel && !e.classList.contains('legal') ? whyNot(k, v) : '';
     e.title = why || slotNeedLong(k); e.classList.toggle('nofit', !!why); e.classList.toggle('cpt', !!(UI.cpt && UI.cpt.k === k)); });
   $$('#pz .die[data-s="0"]').forEach(e => e.classList.toggle('cpt', !!(UI.cpt && String(UI.cpt.d) === e.dataset.d && UI.sel !== UI.cpt.d)));
+  $$('[data-a=cof]').forEach(e => e.classList.toggle('cpt', !!(UI.cpt && UI.cpt.c && UI.sel === UI.cpt.d && (UI.cof || 0) !== UI.cpt.c && e.getAttribute('aria-label') === (UI.cpt.c > 0 ? 'One more' : 'One less'))));
 }
 document.addEventListener('pointerover', e => { if (!hintsMode()) return; const s = e.target.closest && e.target.closest('#pz .slot[data-slot]'); const k = s ? s.dataset.slot : null; if (k !== FT.hover) { FT.hover = k; try { const v = actSeat(); const pv = $('#fprev'); if (pv && k && typeof v === 'number' && v >= 0 && (UI.sel === 'p' || UI.sel >= 0)) { const why = whyNot(k, v); if (why) { pv.hidden = false; pv.textContent = why; pv.classList.add('bad'); } else if (selectedLegal().includes(k)) { pv.hidden = false; pv.textContent = previewText(k, v); pv.classList.toggle('bad', /crash|ends|spin|too fast/i.test(pv.textContent)); } } } catch (er) { } } });
 (function () {
@@ -265,15 +273,15 @@ document.addEventListener('pointerover', e => { if (!hintsMode()) return; const 
     '#ftrk .ftd.p i.on{background:#3d7fe0;border-color:#cfe0ff;opacity:1}#ftrk .ftd.c i.on{background:#f08a24;border-color:#ffe0c0;opacity:1}' +
     '#fprev{margin:4px 0;padding:6px 10px;border-radius:10px;background:#e9f6ea;color:#0d2a12;border:2px solid #2e8b45;font-size:15px;line-height:1.3;font-weight:700}#fprev.bad{background:#fde9e6;color:#5c0f08;border-color:#c0392b}' +
     'html.ph #ftrk{display:none!important}.altdots.ftk{gap:2px}.altdots .dk{width:10px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6);opacity:.4}.altdots .dk.p.on{background:#3d7fe0;opacity:1}.altdots .dk.c.on{background:#f08a24;opacity:1}.altdots .dsep{width:4px}html.ph #fprev{font-size:14px;padding:4px 8px;margin:2px 0}' +
-    '.fa-goal{border-color:#1d4f9a}.fa-goal b,.fa-goal h3{display:block;font-size:17px;line-height:1.3;margin:0 0 6px}.fa-goal ul{margin:6px 0 10px}.fgoal ul{padding-left:18px}.fgoal li{margin:3px 0}.stbox .fgoal{background:#e8f0fb;color:#10223a;border-radius:12px;padding:10px 14px;margin:0 0 10px}' +
+    '.gcl{list-style:none;padding:0!important;margin:8px 0!important;display:grid;grid-template-columns:1fr 1fr;gap:6px}.gcl li{display:flex;align-items:center;gap:6px;margin:0!important;min-height:36px;padding:4px 6px;border-radius:10px;background:rgba(29,79,154,.10);font-size:15px;font-weight:800;line-height:1.15}.gcl .gbx{flex:0 0 20px;height:20px;border-radius:6px;background:#2e9b5b;display:grid;place-items:center}.gcl .gbx svg{width:14px;height:14px}.gcl .gci{flex:0 0 22px;height:22px;color:#1d4f9a}.gcl .gci svg{width:22px;height:22px}.gcr{margin:4px 0 6px;font-size:15px;font-weight:700}' + '.fa-goal{border-color:#1d4f9a}.fa-goal b,.fa-goal h3{display:block;font-size:17px;line-height:1.3;margin:0 0 6px}.fa-goal ul{margin:6px 0 10px}.fgoal ul{padding-left:18px}.fgoal li{margin:3px 0}.stbox .fgoal{background:#e8f0fb;color:#10223a;border-radius:12px;padding:10px 14px;margin:0 0 10px}' +
     '#acts .btn.ask{background:#fff4d6;color:#3a2a00;border:2px solid #c98a12}.gxh-bulb.hon{box-shadow:0 0 0 3px #ffd46b,0 0 14px #ffd46b}' +
-    '#pz .slot .sword{display:block;font-size:14px;line-height:1.1;font-weight:800;letter-spacing:-.3px;color:#fff;background:rgba(10,18,30,.9);border-radius:5px;padding:0 3px;white-space:nowrap}html.ph #pz .slot.hasv .sl{background:rgba(10,18,30,.9);border-radius:5px;padding:0 3px;color:#fff}html.ph #pz .slot .r1{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.4;pointer-events:none;z-index:0}html.ph #pz .slot .sword,html.ph #pz .slot .sl{position:relative;z-index:1}html.ph #pz .slot.hasv .sl{font-size:14px;line-height:1.05}' +
-    '.ck .cw{font-size:14px;font-weight:800;white-space:nowrap;padding:0 3px}html.ph .gstrip.chk .ckrow{gap:5px;flex-wrap:nowrap;padding-right:0}html.ph .ck{padding:0 1px}html.ph .gstrip.chk .gi{display:none}html.ph .gstrip.chk{padding:2px 4px}'+
+    '#pz .slot .sword{display:block;font-size:15px;line-height:1.1;font-weight:800;letter-spacing:-.3px;color:#fff;background:rgba(10,18,30,.9);border-radius:5px;padding:0 3px;white-space:nowrap}html.ph #pz .slot.hasv .sl{background:rgba(10,18,30,.9);border-radius:5px;padding:0 3px;color:#fff}html.ph #pz .slot .r1{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.4;pointer-events:none;z-index:0}html.ph #pz .slot .sword,html.ph #pz .slot .sl{position:relative;z-index:1}html.ph #pz .slot.hasv .sl{font-size:15px;line-height:1.05}' +
+    '#pz .trayhit{position:absolute;inset:0;min-height:44px;background:transparent;border:0;padding:0;margin:0;z-index:3;cursor:help}#pz .tray .die.cover{pointer-events:none}#pz .slot[data-slot^=co] .sword{letter-spacing:-.8px;padding:0 1px}#acts .btn[data-a=rr]:not(.go){flex:0 0 auto;width:auto;min-width:0;margin:0 0 0 auto;padding:0 18px;font-size:15px}.ck .cw{font-size:14px;font-weight:800;white-space:nowrap;padding:0 3px}html.ph .gstrip.chk .ckrow{gap:5px;flex-wrap:nowrap;padding-right:0}html.ph .ck{padding:0 1px}html.ph .ckrow:has(.ck:nth-child(6)) .ck .cw{letter-spacing:-.5px;padding:0 1px}html.ph .ckrow:has(.ck:nth-child(6)){gap:3px}html.ph .gstrip.chk .gi{display:none}html.ph .gstrip.chk{padding:2px 4px}html.ph .gstrip.chk .ckrow.ckwrap,.ckwrap{flex-wrap:wrap!important;row-gap:4px;justify-content:center}html.ph .gstrip.chk:has(.ckwrap){height:auto!important;min-height:44px}'+
     '@media (min-width:1024px){#pz .slot .sword,.ck .cw{font-size:16px}}' +
     '.fa-skip{position:fixed;right:10px;bottom:calc(var(--fa-skipb,150px));z-index:9981;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #fff;background:#1b2230;color:#fff;font-size:15px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.45)}html:not(.ph) .fa-skip{top:64px;bottom:auto;right:auto;left:16px;font-size:16px}html.ph .fa-skip{top:auto;bottom:auto;top:52px;right:8px;min-height:36px;font-size:14px;padding:0 12px}html.ph body:has(.fa-skip) .fa-coach{top:94px}' +
     'html.ph #pz .slot .pw small,html.ph #pz .slot .pw b,html.ph .tbtn span,html.ph .ttut span,html.ph .gxc-sheet *,html.ph .gxc-head *,html.ph .gxc-path *,html.ph #says *,html.ph .rsbox *,html.ph .fa-ro *,html.ph .gx-drawer *{font-size:max(14px,1em)!important}' +
     '.gx-drawer:not(.on){display:none!important}.gxc-node.locked.nudge{animation:fa-nudge .35s}@keyframes fa-nudge{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}html.ph [class*=gxc-sc]{font-size:max(14px,1em)!important}#pz .slot.pvw .sword,#pz .slot.pvw .r1,#pz .slot.pvw .sl{display:none!important}.fa-fin .why{font-size:15px!important}@media (min-width:1024px){.gx-bar .gx-ibtn span{font-size:16px!important}}#pz .slot.done .dn{position:absolute!important;top:-7px!important;right:-7px!important;left:auto!important;bottom:auto!important;width:20px;height:20px;line-height:20px;font-size:14px!important;border-radius:50%;background:#1e7a3a;color:#fff;text-align:center;z-index:2}#pz .slot.done .sl,#pz .slot.done .pw{display:none!important}.fwx{display:flex;align-items:center;gap:6px;margin:6px 0 0}.fwx .wxi{width:28px;height:28px}#barstat{display:none!important}html.ph #fprev{display:none!important}' +
-    '#pz .slot.nofit{filter:grayscale(.85) brightness(.75)}#pz .slot.cpt{outline:4px solid #6dffb0;outline-offset:3px;box-shadow:0 0 0 7px rgba(109,255,176,.35);animation:fa-cpt 1.1s ease-in-out infinite}#pz .die.cpt{outline:4px dashed #6dffb0;outline-offset:3px}' +
+    '#pz .slot.nofit{filter:grayscale(.85) brightness(.75)}#pz .slot.cpt{outline:4px solid #6dffb0;outline-offset:3px;box-shadow:0 0 0 7px rgba(109,255,176,.35);animation:fa-cpt 1.1s ease-in-out infinite}#pz .die.cpt{outline:4px dashed #6dffb0;outline-offset:3px}[data-a=cof].cpt{outline:3px solid #6dffb0;outline-offset:2px}' +
     '@keyframes fa-cpt{50%{outline-color:rgba(109,255,176,.35)}}' +
     '.fa-ro{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9970;width:min(380px,calc(100vw - 24px));padding:14px 16px;border-radius:16px;background:#f3ead4;color:#1f1a12;border:3px solid #2e8b45;box-shadow:0 12px 32px rgba(0,0,0,.55);font-size:15px;line-height:1.35;animation:fa-roin .25s ease-out both}' +
     '.fa-ro.okay{border-color:#c98a12}.fa-ro.poor{border-color:#b3261e}.fa-ro.out{opacity:0;transition:opacity .2s}.fa-ro .rh b{display:block;font-size:20px}.fa-ro .rh span{display:block;font-size:14px;color:#4a3d27}' +

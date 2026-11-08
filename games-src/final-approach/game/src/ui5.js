@@ -64,6 +64,7 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'die': dieTap(+d.s, d.d === 'p' ? 'p' : +d.d); break;
+    case 'hidtap': toast(name(+d.s) + '’s dice stay hidden until placed. Watch the board.'); break;
     case 'slot': slotTap(d.slot); break;
     case 'ready': case 'say': case 'rr': case 'rrpick': case 'antic': case 'adapt': case 'wt': case 'toss': case 'cof': doAction(a, t); break;
     case 'unsel': UI.sel = -1; UI.cof = 0; UI.warnK = null; render(); break;

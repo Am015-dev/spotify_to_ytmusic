@@ -5,7 +5,7 @@ function phPrompt() {
   if (UI.flash && UI.flash.until > Date.now()) return UI.flash.t;
   if (G.result) return document.querySelector('#fx .endb') ? '' : endWords();   // the end banner already says it: say it once
   const v = actSeat(), pend = FA.pending(G), mine = typeof v === 'number' && v >= 0 && mayAct(v);
-  if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : 'Tap Roll to start.') : 'Crew getting ready.';
+  if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : (crewPlan(v) || 'Tap Roll to start.')) : 'Crew getting ready.';
   if (G.pend) {
     const p = G.pend, me = mine && pend.includes(v);
     if (p.h === 'rr') return me && !p.d.m[v] ? 'Tap dice to reroll, or keep.' : 'Waiting for the reroll.';
@@ -220,3 +220,14 @@ document.addEventListener('pointerdown', e => {
     const a = AIDELAY; AIDELAY = 60; try { schedule(); } finally { AIDELAY = a; }
   } catch (er) { }
 }, true);
+// the computer crewmate's plan for this round, said in the briefing (public facts only, the same advice its briefing phrases use): "Ravi: Move one space, then gear next. Tap Roll."
+const PLANW = { adv0: 'hold position', adv1: 'move one space', adv2: 'move two spaces', plane: 'clear the traffic', level: 'level the axis', gear: 'gear next', flaps: 'flaps next', brakes: 'brakes before engines', coffee: 'save coffee', slow: 'keep the speed low', fuel: 'watch the fuel', trainee: 'train the trainee', first: 'I go first', ok: 'all good' };
+function crewPlan(v) {
+  try {
+    const o = 1 - v; if (!G || !G.ai || !G.ai[o] || G.lad === 1 || UI.mode === 'net') return '';
+    const k = G.seed + ':' + G.round + ':' + v; if (UI._plan && UI._plan.k === k) return UI._plan.t;
+    const c = FA.AI.say(G, o).filter(x => PLANW[x]).slice(0, 2); let t = '';
+    if (c.length) { const a = PLANW[c[0]]; t = name(o) + ': ' + a[0].toUpperCase() + a.slice(1) + (c[1] ? ', then ' + PLANW[c[1]] : '') + '.'; }
+    UI._plan = { k, t }; return t;
+  } catch (e) { return ''; }
+}

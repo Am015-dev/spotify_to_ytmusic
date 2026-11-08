@@ -89,6 +89,38 @@ function expMin(costs, k) {
 }
 function faceCosts(costFn, coffee) { const o = []; for (let v = 1; v <= 6; v++) { let b = 1e9; for (let c = -Math.min(coffee, v - 1); c <= Math.min(coffee, 6 - v); c++) { const x = costFn(v + c) + Math.abs(c) * 0.12; if (x < b) b = x; } o.push(b); } return o; }
 
+// ---------- last round: can the brakes still be raised to stop a landing speed s? (brakes only count if set BEFORE the second engine die) ----------
+// returns the probability (1 = already slow enough, 0 = impossible). The pilot sets the brakes; seen from the pilot its own dice are known exactly.
+function brakeFix(S, me, s) {
+  if (S.landBrake >= 0) return FA.slowOk(S, s) ? 1 : 0;   // engines already down: the brake value was frozen then (published timing)
+  const br = FA.brakeVal(S); if (br >= 2 && s <= br) return 1;
+  if (S.mods.ice || S.autoBrake || !hasBrakes(S)) return 0;
+  const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2], need = [];
+  for (let i = nb; i < 3; i++) { need.push(D.brakes[i]); if (D.brakes[i] >= s && D.brakes[i] >= 2) break; }
+  if (!need.length || need[need.length - 1] < s) return 0;
+  const mand = (S.slots.ax0 ? 0 : 1) + (hasEng(S) && !S.slots.en0 ? 1 : 0);
+  if (me === 0) {
+    const dv = FA.unusedDice(S, 0).map(i => S.dice[0][i].v);
+    if (dv.length - mand < need.length) return 0;
+    // exact: pick distinct dice for each needed value, coffee spent as |die - value| (shared pool)
+    const rec = (k, used, cof) => { if (k === need.length) return true; for (let i = 0; i < dv.length; i++) { if ((used >> i) & 1) continue; const c = Math.abs(dv[i] - need[k]); if (c <= cof && rec(k + 1, used | (1 << i), cof - c)) return true; } return false; };
+    return rec(0, 0, S.coffee) ? 0.97 : 0;
+  }
+  const k = unplaced(S, 0) - mand; if (k < need.length) return 0;
+  const q = Math.min(0.9, (1 + 2 * Math.min(S.coffee, 2)) / 6); let p = 1;
+  for (let i = 0; i < need.length; i++) p *= 1 - Math.pow(1 - q, k - i);
+  return p;
+}
+// a move that leaves the flight lost for sure (or already lost): the partner never plays one while a safe move exists
+function doomed(S, me) {
+  if (S.result) return !S.result.win;
+  if (S.phase !== 'place') return false;
+  for (let s = 0; s < 2; s++) { const need = (S.slots['ax' + s] ? 0 : 1) + (hasEng(S) && !S.slots['en' + s] ? 1 : 0); if (unplaced(S, s) < need) return true; }
+  if (!FA.isFinal(S)) return false;
+  if (axisDone(S) && S.pl.axis !== 0) return true;
+  if (hasEng(S) && enginesDone(S) && S.landSpeed >= 0 && brakeFix(S, me, S.landSpeed) <= 0) return true;
+  return false;
+}
 // ---------- pending mandatory pairs: expected nats of finishing axis and engines (my dice known, partner's k unknown) ----------
 function pairsCost(S, me, dist, out) {
   const o = 1 - me, final = FA.isFinal(S), w = wm(S), a0 = S.pl.axis, kp = unplaced(S, o), coffee = S.coffee;
@@ -99,7 +131,7 @@ function pairsCost(S, me, dist, out) {
   const rAfter = remAdv(S) - 1;
   for (let t = 2; t <= 12; t++) {
     const s = t + w;
-    if (final) { const br = FA.brakeVal(S); tE[t] = (s < br && br >= 2) ? 0 : W.disaster; }
+    if (final) { const p = brakeFix(S, me, s); tE[t] = p >= 1 ? 0 : p <= 0 ? W.disaster : Math.min(W.disaster, nats(p)); }
     else { const r = advOutcome(S, s); tE[t] = r.ok ? schedCost(dist - r.adv, rAfter, S.pl.aeroB, S.pl.aeroO, w) : W.disaster; }
   }
   const F = { A: (p, c) => tA[c - p], E: (e0, e1) => tE[e0 + e1] };
@@ -180,9 +212,10 @@ function features(S, me) {
     }
   }
   else {
-    // all three brakes matter: the final engine pair must stay BELOW the brake value (2, 4 or 6); P(sum <= 5) is about 3x P(sum <= 3), brake 2 never lands
+    // all three brakes matter: the final engine pair must be no more than the brake value (2, 4 or 6)
     const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2]; brLeft = Math.max(0, 3 - nb);
-    if (!(final && inPlace)) {
+    if (final && inPlace && hasEng(S) && enginesDone(S) && S.landSpeed >= 0) { const p = brakeFix(S, me, S.landSpeed); f.brake = p >= 1 ? 0 : p <= 0 ? W.disaster : Math.min(W.disaster, nats(p)); }
+    else if (!(final && inPlace)) {
       const R = Math.max(0, Math.round(Rf)), pr = Math.min(0.6, W.brakeP + 0.05 * Math.min(S.coffee, 2) + (S.rrHand ? 0.03 : 0));
       const succ = [0, 0.06, 0.33, 0.55][0], sb = b => b >= 3 ? W.brk6 : b === 2 ? W.brk4 : b === 1 ? W.brk2 : 0;
       let e = 0, ways = [1]; const need = 3 - nb;
@@ -287,7 +320,7 @@ function sayCodes(G, seat) {
   const near = V.planes.slice(pos - 1, pos + 1).reduce((s, x) => s + x, 0); if (near > 0) out.push('plane');
   if (Math.abs(V.pl.axis) >= 1) out.push('level');
   const rem = D.rounds - V.row0 - V.round;
-  if (FA.isFinal(V)) { out.push('brakes'); out.push('slow'); }
+  if (FA.isFinal(V)) { if (!V.mods.ice && !V.autoBrake && V.pl.sw.br.some(x => !x)) out.push('brakes'); out.push('slow'); }
   else if (rem <= 3) { if (V.pl.sw.fl.some(x => !x)) out.push('flaps'); if (V.pl.sw.lg.some(x => !x)) out.push('gear'); if (V.pl.sw.br[0] + V.pl.sw.br[1] === 0 && !V.mods.ice) out.push('brakes'); }
   if (V.mods.intern && V.intern.length > rem * 1.5) out.push('trainee');
   if (V.mods.kero || V.mods.leak) if (V.pl.kero < 10) out.push('fuel');
@@ -329,8 +362,8 @@ function move(G0, seat, level, opt) {
     const rr = all.find(m => m.t === 'rrpick'); if (rr) return rrMask(G, seat, level, rand);
     const w2 = all.filter(m => m.t === 'wt2'); if (w2.length) return wtPick(G, seat, w2);
     const base = cost(G, seat);
-    const sc = distinct(all, G, seat).filter(m => m.t !== 'timeout').map(m => ({ m, s: base - cost(afterMove(G, m, seat), seat) }));
-    sc.sort((a, b) => b.s - a.s);
+    let sc = distinct(all, G, seat).filter(m => m.t !== 'timeout').map(m => { const S = afterMove(G, m, seat); return { m, s: base - cost(S, seat), x: doomed(S, seat) }; });
+    sc.sort((a, b) => b.s - a.s); if (sc.some(x => !x.x)) sc = sc.filter(x => !x.x);
     if (level === 'easy' && rand() < 0.2) { const top = sc[0].s, pool = sc.filter(x => x.s > top - 2.5); return pool[Math.floor(rand() * Math.min(pool.length, 3))].m; }
     return sc[0].m;
   }
@@ -341,8 +374,9 @@ function move(G0, seat, level, opt) {
     const needN = (G.slots['ax' + seat] ? 0 : 1) + (G.keys.includes('en0') && !G.slots['en' + seat] ? 1 : 0), un = FA.unusedDice(G, seat).length;
     if (needN && un <= needN) { const keep = cand.filter(m => m.t !== 'place' || m.d === 'p' || /^(ax|en)/.test(m.to)); if (keep.length) cand2 = keep; }
   }
-  const scored = cand2.filter(m => m.t === 'place' || m.t === 'toss').map(m => ({ m, s: base - cost(afterMove(G, m, seat), seat) }));
+  let scored = cand2.filter(m => m.t === 'place' || m.t === 'toss').map(m => { const S = afterMove(G, m, seat); return { m, s: base - cost(S, seat), x: doomed(S, seat) }; });
   scored.sort((a, b) => b.s - a.s);
+  if (scored.some(x => !x.x)) scored = scored.filter(x => !x.x);   // never a placement that loses for sure while a safe one exists
   if (level !== 'easy' || rand() < 0.6) { const free = freeAction(G, seat, cand, base); if (free) return free; }
   if (opt.eps && rand() < opt.eps && scored.length > 1) return scored[Math.min(scored.length - 1, 1 + Math.floor(rand() * 2))].m;   // exploration for training data
   if (level === 'easy') {
@@ -418,6 +452,7 @@ function monteCarlo(G, seat, scored, rand, opt) {
 
 AI.NMC = AI.NMC || { top: 3, samples: 3, ms: 250 };   // normal: a small Monte Carlo over the partner's unknown dice
 AI.HMC = AI.HMC || { top: 5, samples: 10, ms: 450 };   // hard: a bigger one
+AI.doomed = doomed; AI.brakeFix = brakeFix;
 AI.move = move; AI.say = (G, seat) => sayCodes(G, seat); AI.cost = cost; AI.features = features; AI.schedCost = schedCost; AI.score = cost;
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -68,8 +68,11 @@ const scen = id => D.scenarios.find(s => s.id === id) || (D.tutorials || []).fin
 const track = G => D.tracks[G.tk];
 const altRow = G => D.alt[G.alt][G.round + G.row0];
 const isFinal = G => G.round >= D.rounds - 1 - G.row0;
-// the landing speed must be strictly BELOW the brake marker (equal is too fast), and a brake must be set
-const slowOk = (G, s) => brakeVal(G) >= 2 && s < brakeVal(G);
+// the red brake marker sits just past the last brake number (after the 4 it stands between 4 and 5), and the speed must be below the marker:
+// so a speed EQUAL to the last brake value lands; with no brake set the marker is left of the 2 and nothing can stop the plane
+// TIMING (published rule): the speed is compared with the brakes WHEN THE SECOND ENGINE DIE IS PLACED, so a brake set after the engines
+// no longer helps. landBrake freezes the brake value at that moment; before it, the live brake value is used.
+const slowOk = (G, s, br = G.landBrake >= 0 ? G.landBrake : brakeVal(G)) => br >= 2 && s <= br;
 const brakeVal = G => G.autoBrake ? G.autoBrake : G.mods.ice ? [0].concat(D.iceBrakes)[G.pl.ice] : (G.pl.sw.br[2] ? 6 : G.pl.sw.br[1] ? 4 : G.pl.sw.br[0] ? 2 : 0);
 const windMod = G => G.mods.wind ? D.windMod[G.pl.wind] : 0;
 const planesOnTrack = G => { let n = 0; for (const x of G.planes) n += x; return n; };
@@ -95,7 +98,7 @@ function newGame(o) {
     pl: { axis: 0, aeroB: 4, aeroO: 8, pos: 1, kero: D.keroStart, wind: D.windStart, ice: 0, sw: { lg: [0, 0, 0], fl: [0, 0, 0, 0], br: [0, 0, 0] } },
     planes: tr.sp.map(s => s[0]), coffee: 0, rrHand: 0, rrTaken: -1,
     dice: [[], []], slots: {}, keys: lad ? ladKeys(lad, mods) : slotKeys(mods), pend: null, fl: { antic: false, sync: false, wt: false, keroUsed: false }, adaptUsed: [false, false],
-    intern: [], internUsed: 0, speed: -1, landSpeed: -1, result: null, log: [], logN: 0, events: [], evN: 0, used: {}, nolog: false };
+    intern: [], internUsed: 0, speed: -1, landSpeed: -1, landBrake: -1, result: null, log: [], logN: 0, events: [], evN: 0, used: {}, nolog: false };
   // the staged tutorial flight (UI part 12): a short flight cut from the end of the real game, with some switches already set, a reroll token in hand,
   // made-up dice (G.script) and made-up reroll results (G.rrScript) so that every control has a die to teach with
   if (!lad && o.pre) {
@@ -181,7 +184,7 @@ function endRound(G) {
   ev(G, { t: 'endround' });
   if (isFinal(G)) {
     const c = landingChecks(G), ok = Object.values(c).every(Boolean);
-    const br = brakeVal(G), why = ok ? 'landed' : !c.speed ? 'speed' : 'checks', msg = ok ? 'Landed! The passengers applaud.' : !c.speed ? (br < 2 ? 'No brakes were set: the plane cannot stop.' : 'Too fast: speed ' + G.landSpeed + ' is not below the brakes (' + br + ').') : 'The landing failed.';
+    const br = brakeVal(G), why = ok ? 'landed' : !c.speed ? 'speed' : 'checks', msg = ok ? 'Landed! The passengers applaud.' : !c.speed ? (br < 2 ? 'No brakes were set: the plane cannot stop.' : 'Too fast: speed ' + G.landSpeed + ' is above the brakes (' + (G.landBrake >= 0 ? G.landBrake : br) + ').') : 'The landing failed.';
     G.result = { win: ok, why, msg, checks: c }; G.phase = 'over';
     ev(G, { t: ok ? 'win' : 'lose', why: G.result.why, msg: G.result.msg, checks: c }); lg(G, ok ? 'LANDED.' : 'LOST: the landing failed (' + Object.keys(c).filter(k => !c[k]).join(', ') + ').'); use(G, ok ? 'win' : why === 'speed' ? 'lose_speed' : 'lose_checks');
     return;
@@ -233,7 +236,9 @@ function afterEngines(G) {
   if (isFinal(G)) {
     G.landSpeed = s; const br = brakeVal(G);
     ev(G, { t: 'engine', sum, wm, s, final: true, brake: br }); lg(G, 'Landing speed ' + s + (wm ? ' (wind ' + (wm > 0 ? '+' : '') + wm + ')' : '') + ' against brakes ' + br + '.');
-    return true;   // speed against the brakes is judged at the END of the round (landingChecks), so brakes may still be set after the engine dice
+    G.landBrake = br;   // frozen now: the published rule compares speed and brakes when the engine dice are placed
+    if (!slowOk(G, s)) { lose(G, 'speed', br < 2 ? 'No brakes were set when the engines went down: the plane cannot stop.' : 'Too fast: speed ' + s + ' is above the brakes (' + br + ') when the engines went down.'); return false; }
+    return true;
   }
   const adv = s <= G.pl.aeroB ? 0 : s <= G.pl.aeroO ? 1 : 2;
   ev(G, { t: 'engine', sum, wm, s, adv, final: false }); lg(G, 'Speed ' + s + (wm ? ' (wind ' + (wm > 0 ? '+' : '') + wm + ')' : '') + ': the plane advances ' + adv + ' space' + (adv === 1 ? '' : 's') + '.');
@@ -466,7 +471,7 @@ function checklist(G) {
   const size = track(G).sp.length, br = brakeVal(G), fin = isFinal(G), out = [], eng = G.keys.includes('en0');
   out.push({ k: 'axis', ok: G.pl.axis === 0, n: G.pl.axis });
   if (eng) out.push({ k: 'air', ok: G.pl.pos >= size, n: size - G.pl.pos });
-  if (eng) out.push({ k: 'speed', ok: br >= 2 && !(fin && G.landSpeed >= 0 && G.landSpeed >= br), n: br });
+  if (eng) { const lb = fin && G.landBrake >= 0 ? G.landBrake : br; out.push({ k: 'speed', ok: lb >= 2 && !(fin && G.landSpeed >= 0 && !slowOk(G, G.landSpeed)), n: lb }); }
   out.push({ k: 'planes', ok: planesOnTrack(G) === 0, n: planesOnTrack(G) });
   out.push({ k: 'gear', ok: G.pl.sw.lg.every(x => x), n: G.pl.sw.lg.reduce((a, x) => a + x, 0) });
   out.push({ k: 'flaps', ok: G.pl.sw.fl.every(x => x), n: G.pl.sw.fl.reduce((a, x) => a + x, 0) });
