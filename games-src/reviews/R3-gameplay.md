@@ -2,7 +2,7 @@
 
 Strict re-review by games-src/reviews/GAMEPLAY-RUBRIC.md. Each branch was built with its own build.py, served next to games/<slug>/media and played by touch (Playwright, hasTouch, isMobile) at 390x844 and 375x667.
 
-(shipwreck-isle and redline-rally sections are still in progress)
+(redline-rally section still in progress)
 
 ## cauldron-fair (branch shelf/W503-cauldron-gameplay @ bb5ceb53)
 
@@ -40,3 +40,40 @@ Built with `games-src/cauldron-fair/build.py` and served next to `games/cauldron
 - **Row 5:** Tutorial step 10 at 375x667. The "The flask" bubble is drawn dimmed and overlaps the fortune strip right above the flask it points at. Shot: games-src/reviews/R3-shots/cauldron-09-375-tut-flask-bubble.png
 - **Row 8 / 2:** The last tutorial step at 390x844 rings the result picture. Tapping the glowing picture does nothing except change the bubble to "Tap Next.", and there is no Next, only "Finish". Nine taps on the ring changed nothing. Shot: games-src/reviews/R3-shots/cauldron-10-tut-finish-says-tap-next.png
 - **Row 6 (good):** The normal rival scored 52 against a cautious player's 30, so the picker gives a real step up. The easy rival scores only about 28-30 in 9 days, so experienced players should switch to normal soon.
+
+## shipwreck-isle (branch shelf/W468-shipwreck-lean @ 5c88c45a)
+
+Built with `games-src/rc/build.py` and served next to `games/shipwreck-isle/*`. Played by touch only (Playwright, hasTouch, isMobile, touchscreen.tap). I played the guided tutorial to its end card with the game's own touch guide-test at 390x844 (PASS on the third run, 50 of 52 steps, 25 of 25 rules; the first run timed out on a loaded machine) and checked step 1 by hand. Then I played two full default games (Marooned, 2 players, Easy island, 4 food and 4 wood) to the result screen. Game A at 390x844 tapped ✨ Plan it for me every day and always took the advisor's ✨ choice. Game B at 375x667 tapped ✨ to plan and took the first option on every question, like a new player. Both games had 0 page errors, 0 console errors, 0 failed requests and 0 stuck states. **Both games were lost.** The machine was heavily loaded, so times are slow.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 7 | The six phases, 1 pawn rolls 3 dice / 2 pawns are a sure success, night food or 2 wounds, sleeping outside, roof against rain, threats, hunts, the fire plus 15-wood goal. The adventure cards now really fire: 1 in game A, 5 in game B, with a keep-or-shuffle choice. Mystery cards exist in the engine but I drew none in two games. |
+| 2 | Tutorial teaches | 6 | 52 steps: one short line and one tap each, in phase order, and Next/Continue now both work. But dice, adventure and rain are info-only lines: you never see a die roll or an adventure card. The threat step talks about a card that is no longer on screen. |
+| 3 | First 10 seconds | 7 | The menu is clean. The first pop-up now gives the real goal: "Light a fire and stack 15 wood by day 12, and keep everyone alive". You still open on a 'Continue' chain, not on a board you touch. |
+| 4 | Turn clarity | 6 | The phase banner, sure/risky tags and the new ✨ on the advisor's pick help. A new line under the pawns explains Hammer and Dog. But the game still never tells you why you are losing until the result screen ("pile 9 of 15"), and option text like "Lose half the roof 0." is unclear. |
+| 5 | Phone play | 6 | Pawn names now show in full. At 375x667 the board is a strip about 330px tall. The pawn row's portraits are cut off at the top, the Threat chip sits on the top edge, and the "+1" chip sits on a tile. The result screen's "What went wrong" is hidden under four big buttons. In the tutorial the camp pop-up cuts off its bottom row (Arrange camp / Rest). |
+| 6 | AI and pacing | 5 | This is a co-op, so the island is the opponent. The fixer made Easy harder. Now following ✨ plus the advisor's pick on every choice LOST (day 12, pile 10 of 15). Playing like a new player also lost (pile 9 of 15). A stranger is unlikely to win their first default game, and nothing during play warns them the pile is behind. Each game is 12 days and about 160-200 taps. |
+| 7 | Feel | 6 | Floating +1/-1, night darkening, rain, a beast card, adventure cards and an illustrated result. But a day is still 5-17 Continue taps (about 12 on average: 141 in game A, 155 in game B). The fixer's "fewer Continue taps" is not visible. It feels like clicking through a log. |
+| 8 | Bugs | 8 | Two full games: 0 errors, 0 stuck states, 0 dead taps, and no 404 (the beast-birds picture now loads or is no longer asked for). Step 1 Continue now moves the tutorial on. |
+| | **Total** | **6.4** | |
+| | **Verdict** | **FAIL** | Rows 2, 4, 5, 6 and 7 are below 7. No stopper. |
+
+### First-review findings
+- **Tutorial step 1/2 Continue was a dead tap: FIXED.** I tapped Continue on step 1 ("goal") and it moved to step 2 ("death"). A Next button now sits in the bubble too. Shot: games-src/reviews/R3-shots/shipwreck-02-tut-step1-next.png
+- **Coach bubble covering the camp pop-up rows: FIXED, but a new clip.** On step 19 the bubble now sits above the pop-up header. The pop-up's bottom row (Arrange the camp / Rest) is cut off by the bottom bar. Shot: games-src/reviews/R3-shots/shipwreck-03-tut-camp-popup.png
+- **Pawn names cut off ("Carpen…", "Hamm…"): FIXED.** Shown in full at 375 ("Carpenter", "Hammer", "Dog"), with a help line under them. Shot: games-src/reviews/R3-shots/shipwreck-05-375-plan-crowded.png
+- **375x667 chips overlapping chips and labels: PARTLY FIXED.** Labels no longer collide. But the Threat chip is clipped at the top edge, the "+1" chip still sits on a tile, and the pawn portraits are cut off at the top. Same shot as above.
+- **No adventure or mystery cards: PARTLY FIXED.** Adventure cards now fire (1 in game A, 5 in game B, plus "Gain 2 fur, the card goes into the event deck" choices). No mystery card in two games.
+- **Too easy with ✨: OVER-CORRECTED.** Following ✨ and the advisor's pick on every choice now loses: day 12, fire built, pile 10 of 15, "Time ran out: no ship came." Shot: games-src/reviews/R3-shots/shipwreck-06-sparkle-day12-lost.png
+- **First pop-up goal mismatch: FIXED.** "Light a fire and stack 15 wood by day 12, and keep everyone alive." Shot: games-src/reviews/R3-shots/shipwreck-01-offer-goal.png
+- **404 for art/beast-birds.webp: FIXED** (none in two games, network log).
+- **Long Continue chains (about 13 per day): NOT FIXED.** I counted 5-17 Continue taps per day, 141 and 155 per game.
+- **"Hammer and Nails" / Dog not explained: FIXED.** "Hammer: an extra pawn for one build · Dog: helps hunt or explore, no wounds."
+
+### New findings
+- **Row 6:** Played game A at 390x844 doing exactly what the game recommends: ✨ every day and the ✨ option on all 8 questions. Lost on day 12 with the pile at 10 of 15. Shot: games-src/reviews/R3-shots/shipwreck-06-sparkle-day12-lost.png
+- **Row 6 / Row 4:** Played game B at 375x667 like a new player (✨ plan, first option on 24 questions). Lost: pile 9 of 15, life 9 of 13. The only explanation comes on the result screen. During play there is no "pile is behind" warning. Shot: games-src/reviews/R3-shots/shipwreck-07-375-result-lost.png
+- **Row 5:** On the result screen at 375x667, "What went wrong" is mostly hidden under the four buttons (Try again, Try it on Easier, New game, Look at the island). "Try it on Easier" shows even though the default is already Easy. Same shot.
+- **Row 2:** At tutorial step 30, "Then it waits as a threat. Deal with it, or it strikes." The event card it refers to is gone; the screen shows only the board and "Morning: morale 0". Shot: games-src/reviews/R3-shots/shipwreck-04-tut-threat-no-card.png
+- **Row 2:** The tutorial teaches dice ("Dice can fail, wound you, or start an adventure") and the adventure token as info lines only. Its plan uses 2 pawns (a sure success) everywhere, so a player never sees a roll or an adventure card before the real game.
+- **Guide-test 50/52 explained (Row 2, info):** The 2 missing steps are optional branches, not failures. "one" ("Explore. One pawn alone rolls the dice.") is skipped once an explore job exists. "sure" is the other branch of the same step. The run reached "That is every rule. Give the rest jobs and play on!" and Keep playing continued as a normal game. Whichever branch runs, the player never sees a roll.
