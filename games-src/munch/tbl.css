@@ -253,17 +253,54 @@ html:not(.ph) .arena .fbtns{position:sticky;bottom:0;z-index:3}
 html.ph .mine .hand.tight .card:not(:last-child) :is(.gold,.aw){display:none}
 html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
 /* portrait phone, 5+ cards: whole cards in a sideways row (tbl.js tbFan), every word and number at 14px or more */
-html.ph-p .mine .hand.row{--hw:100px}
+html.ph-p .mine .hand.row{--hw:100px;flex-wrap:nowrap}
+html.ph-p .mine .hand.row.scrolls{justify-content:flex-start;overflow-x:auto;overflow-y:hidden}
 html.ph-p .mine .hand.row .card{rotate:0deg;translate:0 -4px}
 html.ph-p .mine .hand.row .card.play,html.ph-p .mine .hand.row .card.sug{translate:0 -12px}
-html.ph-p .mine .hand.row .card .cn{width:auto;max-width:none;font-size:14px!important;line-height:1.05;letter-spacing:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
-html.ph-p .mine .hand.row .card .tag{font-size:15px;font-weight:800}
-html.ph-p .mine .hand.row .card .tag small{display:none}
-html.ph-p .mine .hand.row .card .gold{font-size:14px}
+html.ph-p .mine .hand .card .cn{width:auto;max-width:none;font-size:14px!important;line-height:1.05;letter-spacing:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph-p .mine .hand .card .tag{font-size:15px;font-weight:800}
+html.ph-p .mine .hand .card .tag small{display:none}
+html.ph-p .mine .hand .card .gold{font-size:14px}
 html.ph-p .opps .seat .snm{font-size:14px;letter-spacing:0}
 html.ph-p .opps .seat .sw{font-size:15px}
 html.ph-p .opps .seat .lb{font-size:14px}
 html.ph-p .opps .seat .sg{display:none}
-html.ph .pile .stack .dn{font-size:14px;letter-spacing:0}
+html.ph .pile .stack .dn{font-size:14px;letter-spacing:0;font-variant:normal;font-variant-caps:normal;text-transform:capitalize;white-space:nowrap}
 html.ph .pile .stack .n{font-size:15px}
-html.ph-p .mine .hand.row .card .kind,html.ph-p .mine .hand.row .card .cx{display:none}
+html.ph-p .mine .hand .card .kind,html.ph-p .mine .hand .card .cx{display:none}
+/* feel gate: phone text 14px+ (icon placeholders keep their text, hidden by colour instead of a 0px font) */
+html.dk-lv .mine .lv small,html.dk-slot .gchip .gi,html.dk-curse .gi[data-s=curse],html.dk-gi .opp.seat .gi[data-s=gear],html.dk-slot .mine .slots i{font-size:14px;color:transparent;overflow:hidden;line-height:1;text-indent:0;white-space:nowrap}
+html.ph .gchip,html.ph .gchip b{font-size:14px}
+html.ph .zoom .card .kind,html.ph .zoom .card .gold{font-size:14px}
+html.ph .gxt-n{font-size:14px}
+html.ph .gxh-tx{font-size:14px}
+html.ph .bfrev .bfrc .card .cn{font-size:16px!important}
+html.ph .bfrev .bfrc .card :is(.kind,.gold,.cx){font-size:14px!important}
+html.ph .bfrev .bfrc .card .tag{font-size:18px!important}
+html.ph .card .tag small{display:none!important}
+html.ph .sline .sl1 i{font-size:14px}
+html.ph .arena :is(.sd,.sl,.chip){font-size:14px}
+html.dk-lv .mine .lv small{font-size:14px!important}
+html.ph .arena .card .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph .arena .card :is(.kind,.cx){display:none!important}
+html.ph .arena .card .gold{font-size:14px!important}
+html.ph .arena .card .tag{font-size:16px!important}
+/* the discard piles on a phone are thumbnails: art only (the card is readable when tapped) */
+html.ph .pile :is(.pr,.pl) .card :is(.cn,.kind,.cx,.gold,.tag){display:none!important}
+html.ph .pile.pr .card :is(.cn,.kind,.cx,.gold,.tag),html.ph .pile.pl .card :is(.cn,.kind,.cx,.gold,.tag){display:none!important}
+/* PC: tutorial and help bubbles at 16px+ (game override; the shell stays as it is) */
+html:not(.ph) .gxh-bub{max-width:min(380px,calc(100vw - 16px))}
+html:not(.ph) .gxh-bub .gxh-tt{font-size:17px}
+html:not(.ph) .gxh-bub .gxh-tx{font-size:16px;line-height:1.35}
+html:not(.ph) .gxh-bub .gxh-ok{font-size:16px}
+html:not(.ph) .gxt-n,html:not(.ph) .gxt-pill{font-size:16px}
+@media (max-height:600px){html.ph-p .mine .hand.row{--hw:84px}}
+/* phone: cards in motion and small card views show the name and art only, names at 14px */
+html.ph :is(.bffly,.bfstage,.tableau,.empty+.row) .card :is(.kind,.cx){display:none!important}
+html.ph :is(.bffly,.bfstage,.tableau,.empty+.row) .card .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph :is(.bffly,.bfstage,.tableau,.empty+.row) .card :is(.gold,.tag){font-size:14px!important}
+html.ph .sl,html.ph .small{font-size:14px}
+html.ph .card.bfghost :is(.kind,.cx){display:none!important}
+html.ph .card.bfghost .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph .card.bfghost :is(.gold,.tag){font-size:14px!important}
+html.ph .sl,html.ph span.small,html.ph .small{font-size:14px!important}

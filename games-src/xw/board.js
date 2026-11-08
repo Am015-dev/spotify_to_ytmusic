@@ -196,7 +196,7 @@ function resUI(){const R=UI.hold.R;{const el=document.createElement('div');el.cl
   const d=ship(R.d);if(d&&R.dmg)sfx(R.dead?'boom':'hull')}
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
 function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(typeof tutHold==='function'&&tutHold(k))return;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
-function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(G.seed|0)%a.length];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)} (round ${G.round}). Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span>`,1e9)};setHint('');
+function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(G.seed|0)%a.length];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<div data-keep><b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)}</span><span>Round ${G.round}. Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span></div>`,1e9)};setHint('');
   setBtns(`<button class="btn" data-bf="stats">Debrief</button><button class="btn primary big" data-a="new">Play again</button>`)}
 function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach((o,i)=>{if(!o.p)return;any=true;item('◎','bfm w',{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true})});setBtns('')}
 function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Rival’s turn: ${esc(shortName(s))} takes aim`:`⏳ Rival’s turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
@@ -256,3 +256,11 @@ const _rs=resize3D;resize3D=function(){const w=V3.w,h=V3.h;const r=_rs.apply(thi
 const _cv=camView;camView=function(){const r=_cv.apply(this,arguments);if(BF.on){BF.fkey='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
 BF.render=bfRender;BF.fit=fit;BF.release=release;BF.hideBan=()=>{if(ban){ban.hidden=true;BF.banUntil=0;BF.banQ=[]}};BF.px=px;BF.shipR=shipR;BF.shownXY=shownXY;
 })();
+// the open "More" menu sits on a dim backdrop: the page behind reads as covered, a tap on the backdrop closes the menu
+{const o=toggleMenu;toggleMenu=function(open){const r=o.apply(this,arguments);try{const m=document.getElementById('more');if(!m)return r;let bk=document.getElementById('na-moreback');
+  if(m.classList.contains('open')){let z=parseInt(getComputedStyle(m).zIndex,10);if(!(z>1)){z=60;m.style.zIndex=z}
+    if(!bk){bk=document.createElement('div');bk.id='na-moreback';bk.setAttribute('aria-hidden','true');bk.addEventListener('click',e=>{e.stopPropagation();toggleMenu(false)});document.body.appendChild(bk)}
+    bk.style.cssText='position:fixed;inset:0;background:rgba(4,4,14,.55);z-index:'+(z-1);if(m.parentElement&&getComputedStyle(m.parentElement).zIndex!=='auto'){const pz=parseInt(getComputedStyle(m.parentElement).zIndex,10);bk.style.zIndex=String(Math.max(0,pz-1))}bk.hidden=false}
+  else if(bk)bk.hidden=true}catch(e){}return r}}
+// a timed banner closes on the player's first tap (owner rule: "stays until tapped, or 4 s + 1 s per 10 words"), so it never hides the moves
+document.addEventListener('pointerdown',()=>{const b=document.getElementById('bfban');if(b&&!b.hidden&&BF.banMs<1e9){clearTimeout(BF.banT);b.hidden=true;BF.banUntil=0;BF.banQ=[]}},true);

@@ -50,7 +50,7 @@ function obTapCard(k,el){const p=cur();if(!phShopOK())return;
 bfTapCard=obTapCard;
 // ---- hold to read: the big card ----
 function obShowCard(id,extra){const C=CARDS[base(id)];if(!C)return;const v=$ob('obcard');if(!v)return;const p=cur(),c=costOf(p,id);
-  v.innerHTML=`<div class="obbig ${C.t}"><span class="cost">${c}</span><div class="bart">${cardIcon(id)}</div><h3>${esc(C.n)}</h3><p class="ty">${chipOf(C)}${C.kw?' · '+esc(C.kw.toUpperCase()):''}</p><p>${esc(C.x)}</p>${extra?`<p class="ex">${esc(extra)}</p>`:''}</div>`;
+  v.innerHTML=`<div class="obbig ${C.t}"><span class="cost">${c}</span><div class="bart">${cardIcon(id)}</div><h3>${esc(C.n)}</h3><p class="ty">${chipOf(C)}${C.kw?' · '+esc(C.kw.toUpperCase()):''}</p><p>${cx(C.x)}</p>${extra?`<p class="ex">${esc(extra)}</p>`:''}</div>`;
   v.classList.add('on');v.setAttribute('aria-hidden','false');OB.shown=String(id)}
 function obHideCard(){const v=$ob('obcard');if(v){v.classList.remove('on');v.setAttribute('aria-hidden','true')}OB.shown=''}
 function obCardOf(t){const s=t.closest&&t.closest('#ob [data-shop]');if(s&&G&&G.market[+s.dataset.shop]!==undefined){const id=G.market[+s.dataset.shop];const p=cur();return {id,extra:canBuy(p,+s.dataset.shop)?'':(whyNot(p,id)||'')}}

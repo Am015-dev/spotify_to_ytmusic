@@ -49,26 +49,25 @@ function renderNews(){const n=document.getElementById('news'),m=document.getElem
 // the resolve banner, with the reason things happened
 function storyBanner(R){const p=R.p;const out=[...R.out];
   if(R.forced==='city'||(R.yielders.length&&R.forced))out.push(`moves into Downtown 👑 +1★`);else if(R.forced==='bay')out.push('moves into the Harbor ⚓ +1★');
-  let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}: ${out.length?esc(out.join(' · ')):'nothing useful'}`;const why=[];
+  let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}${out.length?out.map(o=>`<div class="bo">${esc(o)}</div>`).join(''):'<div class="bo">nothing useful</div>'}`;const why=[];
   if(R.out.some(o=>/^smashes /.test(o)))why.push(R.inT?'from the city, claws hit every monster outside':`claws from outside hit whoever holds the city${G.city>=0&&G.city!==p.i&&!R.yielders.length?` (${mname(P(G.city))} 👑)`:''}`);
   if(R.out.includes('claws hit nobody'))why.push('nobody was in the city to hit');
   if(R.out.some(o=>/hearts wasted/.test(o)))why.push('hearts cannot heal you inside the city');
   if(R.yielders.length)why.push(`${R.yielders.map(mname).join(' and ')} yielded, so ${mname(p)} ${R.forced?'moved in: +1 ★':'got to stay out'}`);
-  else if(R.forced==='city')why.push(`Downtown was empty, so ${mname(p)} had to move in: +1 ★ (👑 = the monster in Downtown)`);
-  else if(R.forced==='bay')why.push(`Downtown was taken and the Harbor was empty, so ${mname(p)} moved into the Harbor: +1 ★`);
-  if(why.length)h+=`<div class="because">Why: ${esc(why.join('. '))}.</div>`;return h}
+  else if(R.forced==='city')why.push(`${mname(p)} moved into empty Downtown: +1 ★`);
+  else if(R.forced==='bay')why.push(`${mname(p)} moved into the empty Harbor: +1 ★`);
+  if(why.length)h+=why.map(w=>`<div class="because">${esc(w.charAt(0).toUpperCase()+w.slice(1))}.</div>`).join('');return h}
 // first game: keep the human's only Brainjack token on weak rolls before their first own turn
 function mbHold(q){if(!(UI.firstGame&&G.mode==='solo'&&!UI.hadTurn))return false;lg(q.i,`${mname(q)} keeps its Brainjack token for a better roll.`);return true}
 
 // ---------- the opening story card ----------
 function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.map(x=>mname(x));
   const cast=names.slice(0,-1).join(', ')+' and '+names[names.length-1];
-  return `<div class="intro"><h2>📰 Dawn over Crown City</h2><p>The portal over Crown City cracked open at dawn. ${G.pl.length} monsters rose: ${esc(cast)}. Whoever reaches <b>20 ★</b>, or is the <b>last one standing</b>, becomes the city's new King.</p>
-   ${q?`<p class="you" style="--mc:${MONS[q.m].c}">${monFace(q.m)}<span>You are <b>${esc(UP(mname(q)))}</b>, ${esc(MONS[q.m].d.charAt(0).toLowerCase()+MONS[q.m].d.slice(1))}.</span></p>`:G.mode==='hot'?'<p>Everyone shares this screen: pass it to the monster whose turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
-
-   <p class="goal"><b>Your turn:</b> roll 6 dice up to 3 times, keep what you like, then use them. <b>Three of a kind</b> scores stars, claws hit, hearts heal, ⚡ buys cards.</p>
-   <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn&&q?'<small>First you pick a secret power</small>':''}</button>${typeof tutOffer==='function'&&tutOffer()?tutMini():''}</div>
-   <ul class="small"><li>The <b>glowing plate</b> on the board shows whose turn it is.</li><li><b>👑</b> marks the monster in Downtown: it scores stars but everyone hits it.</li><li>Stuck? <b>🧭 What now?</b> at the top of this panel says what to do and why.</li></ul></div>`}
+  return `<div class="intro"><h2>📰 Dawn over Crown City</h2>
+   ${q?`<p class="you" style="--mc:${MONS[q.m].c}">${monFace(q.m)}<span>You are <b>${esc(UP(mname(q)))}</b></span></p>`:G.mode==='hot'?'<p>Pass the screen to whoever’s turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
+   <div class="goal nocut"><p class="aim">Be first to <b>${GOAL()} ★</b>, or the last monster standing.</p>
+   <ul class="how"><li>Three of a kind scores stars: three 3s = 3 ★.</li><li>Downtown pays: +1 ★ going in, +2 ★ each turn.</li><li>Claws knock hearts off rivals. 0 ♥ is out.</li></ul></div>
+   <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn&&q?'<small>First you pick a secret power</small>':''}</button>${typeof tutOffer==='function'&&tutOffer()?tutMini():''}</div></div>`}
 
 // ---------- tips: the help kit (hlp.js) shows each first-time bubble; the old four-tip tour is retired ----------
 function startTour(){if(window.GXH)GXH.reset();render()}
@@ -119,7 +118,7 @@ function statsHTML(){const {order,me,w}=placeOf();const W=w>=0?G.pl[w]:null;cons
   return `<div class="dlg paper" role="dialog" aria-modal="true"><div class="mast"><span>Round ${G.turn}</span><b>THE CROWN CITY CLARION</b><span>Late edition</span></div>
   <h2 class="hl1">${esc(head)}</h2><p class="deck">${esc(G.winText)}</p>
   <div class="cols">${me>=0?`<div><h4>Your result</h4><p><b>${myPlace?ord(myPlace):''} of ${G.pl.length}</b> as ${esc(mname(G.pl[me]))}.${myPlace===1?' The city is yours!':G.pl[me].alive?' You survived the rampage.':' You went down fighting.'}</p></div>`:''}
-   <div><h4>${me>=0?'Your best moment':'Headline of the day'}</h4><p>${esc(me>=0?(UI.best?UI.best.h+' (round '+UI.best.r+')':'You kept your head down this time.'):((UI.news||[]).filter(x=>/💥|☠/.test(x)).pop()||'A quiet day, by monster standards.'))}</p></div>
+   <div><h4>${me>=0?'Your best moment'+(UI.best?' · round '+UI.best.r:''):'Headline of the day'}</h4><p>${esc(me>=0?(UI.best?UI.best.h:'You kept your head down this time.'):((UI.news||[]).filter(x=>/💥|☠/.test(x)).pop()||'A quiet day, by monster standards.'))}</p></div>
    ${nem&&nem[1]>0?`<div><h4>Your nemesis</h4><p>${esc(mname(G.pl[nem[0]]))} smashed you for ${plu(nem[1],'heart')}.</p></div>`:''}</div>
   <table class="stats"><tr><th></th><th>Monster</th><th>Hearts</th><th>Stars</th><th>Claw damage</th><th>K.O.s</th><th>Cards</th><th>Turns in city</th></tr>${rows}</table>
   <div class="acts"><button class="btn primary" data-a="new">Play again</button><button class="btn" data-a="closestats">Look at the city</button></div></div>`}

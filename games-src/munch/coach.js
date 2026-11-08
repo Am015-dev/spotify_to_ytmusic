@@ -199,7 +199,7 @@ function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(
   const lim=handLimit(p);if(lim!==sn.lim)out.push(`Your hand limit is now <b>${lim}</b> (it was ${sn.lim}).`);
   const cu=p.curse.filter(id=>!sn.cu.includes(id));if(cu.length)out.push(`<b>Curse on you:</b> ${cu.map(id=>esc(cname(id))+': '+esc(cd(id).x||'')).join(' ')}`);
   return out.length?out:null}
-function sinceHTML(me){if(!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
+function sinceHTML(me){if((typeof tutOn==='function'&&tutOn())||!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
   return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,2).map(x=>`<li>${x.replace(/ ?<span class="muted">.*?<\/span>/g,'')}</li>`).join('')}</ul></div>`}
 // ---- learn as you play: one short idea, the first time it matters (only in a "teach me" game) ----
 const LESSONS={

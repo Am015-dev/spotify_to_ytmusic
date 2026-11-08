@@ -109,5 +109,5 @@ function prologueCard(){const g=STORY.guide;
 // first-time players who tap Play are offered the tutorial once
 function tutOffer(){return !UI.offered&&tutFirst()}
 function showOffer(){UI.offered=true;
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="New here"><h2>New here?</h2><p class="sub">Learn the rules in 5 minutes, one tap at a time.</p><button class="btn big" data-a="learn">Learn in 5 minutes</button><button class="btn alt" data-a="go">Play now</button></div></div>`;
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="New here"><h2>New here?</h2><p class="sub">Learn the rules in 5 minutes.</p><button class="btn big" data-a="learn">Learn in 5 minutes</button><button class="btn alt" data-a="go">Play now</button></div></div>`;
   const m=$('#modal');m.querySelector('[data-a=learn]').onclick=()=>tutStart();m.querySelector('[data-a=go]').onclick=()=>beginGame()}

@@ -111,7 +111,7 @@ const hrect=e=>{const r=e.getBoundingClientRect();return {left:r.left,top:r.top,
 function hslice(e){const r=e.getBoundingClientRect();let right=r.right;
   if(e.closest('.mine .hand')){for(const o of e.closest('.mine .hand').querySelectorAll('.card')){if(o===e)continue;const q=o.getBoundingClientRect();if(q.left>r.left+4&&q.left<right)right=q.left}}
   return {left:r.left,top:r.top,width:Math.max(24,right-r.left),height:r.height}}
-function hlpPlan(m,me){const p=hlpPlan0(m,me);if(!p)return null;p.toR=hrect(p.toE);if(p.fromE)p.fromR=hslice(p.fromE);return p}
+function hlpPlan(m,me){const p=hlpPlan0(m,me);if(!p)return null;if(p.fromE&&p.fromE.closest('.mine .hand')){const r=p.fromE.getBoundingClientRect();if(r.left<4||r.right>innerWidth-4)try{dkReveal(p.fromE)}catch(e){}}p.toR=hrect(p.toE);if(p.fromE)p.fromR=hslice(p.fromE);return p}
 function hlpPlan0(m,me){if(!m||me<0)return null;
   if(m.act==='kick'){const d=document.querySelector('.bfdoor')||hlpBtn(m);return hvis(d)?{toE:d}:null}
   if(m.act==='ask'){const am=document.querySelector('.fbtns [data-a="askmenu"]');if(!hvis(am))return null;
@@ -160,7 +160,7 @@ function hlpSuggest(){try{
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'doorkick-dungeon',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opps .opp,.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
+  GXH.init({game:'doorkick-dungeon',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opps .opp,.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});if(typeof syncMenu==='function')syncMenu()}
 function hlpClean(){try{const c=GXH.state().cur;if(!(c&&c.kind==='bulb'))document.querySelectorAll('[data-gxh-avoid]').forEach(x=>x.removeAttribute('data-gxh-avoid'))}catch(e){}}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;hlpClean();

@@ -11,3 +11,18 @@ Changed (layout, words, motion only; engine untouched, logic-test 146/146, rules
 
 Not done: desktop dock text (13 px tips, low-contrast "Voltusk (you)"), ui-audit B 32 / C 1 / D 3 / F 1 (shared help-kit tooltip), visual baselines need owner approval.
 Shots: playable-shots/feel/ (mid-game shots are from the previous build of this pass).
+
+## Round 2 (W467, 8 Nov): feel gate PASS
+`feel-audit.js crown-city-smash --secs 120` after merging the base: (a) 0 · (b) 0 · (c) 0 · (d) 0 · (e) 0, no notes. Learn played to its result by touch on phone and PC, with no skips.
+- Play with Hints off is clean: board flashes and the desktop tips panel show only with Hints on. In Learn, the coach is the only voice.
+- Every coach line, final-card line, desktop tip and result line is 12 words or fewer. Card effects show one clause per line (`cx()` in ui.js).
+- Phone text is at least 14px (drawers, choices, chips, K.O., "you" tags). The number pops no longer scale into each other.
+- Learn is the coached free-play game: `GXT.running()` reports it, and `GXT.state()` is null during free play and `{phase:'end'}` at its result. Play now has `data-a="start"`.
+- Desktop: goal card text is 17-20px, the panel name is cream with a colour underline, the dice preview line is 16px, the panel title has a plate, and secondary button text is 16px.
+- Fixed a skin padding bug that broke the cc-board scenario on the base (the menu row changed size when the skin turned on).
+- ui-audit (phone, phone-s, pc): A 0 · B 22 · C 0 · D 3 · E 1 · F 0.
+  Left:
+  - B: mostly 2D fallback-board labels (no-WebGL browsers), the painted menu rows, and emoji glyphs.
+  - D: the 3D title-city meshes in three3d.js, which W459 is editing.
+  - E: the desktop news button, which opens the log drawer through data-gx; the audit sees no change.
+- Shots: playable-shots/feel/.

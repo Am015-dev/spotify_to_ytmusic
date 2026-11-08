@@ -233,13 +233,13 @@
         },
         {
           "who": "guide",
-          "text": "Put a warden in a small town and close it fast. A 2-tile town is 4 points."
+          "text": "Put a follower in a small town and finish it fast. A 2-tile town scores 4."
         }
       ],
       "outro": [
         {
           "who": "guide",
-          "text": "Small towns closed quickly bring your wardens home for the next one."
+          "text": "Finish small towns fast and your followers come home."
         },
         {
           "who": "wren",
@@ -327,7 +327,7 @@
         },
         {
           "who": "guide",
-          "text": "At the end, each field pays 3 points for every finished town it touches."
+          "text": "At the end, each field scores 3 per finished town it touches."
         },
         {
           "who": "guide",
@@ -341,7 +341,7 @@
         },
         {
           "who": "guide",
-          "text": "Fields are the quiet points. Many games are won in the last count."
+          "text": "Fields are quiet points. Many games are won at the end."
         }
       ],
       "opponent": {
@@ -436,7 +436,7 @@
         },
         {
           "who": "guide",
-          "text": "A priory surrounded by 8 tiles is worth 9. Unfinished, it pays 1 per tile around it."
+          "text": "A priory with 8 tiles around it scores 9. Unfinished, it scores 1 plus 1 per neighbour."
         },
         {
           "who": "guide",
@@ -446,11 +446,11 @@
       "outro": [
         {
           "who": "quill",
-          "text": "Your roads, towns, fields and priories... the valley speaks for you."
+          "text": "You built roads, towns, fields and priories. Well done."
         },
         {
           "who": "guide",
-          "text": "Word travels downriver. Merchants will come now, and harder rivals."
+          "text": "Merchants are coming, and harder rivals."
         }
       ],
       "opponent": {
@@ -518,7 +518,7 @@
         "twist": null,
         "setup": {},
         "maxStars": 2,
-        "text": "Just win; any score will do."
+        "text": "Just win. Any score will do."
       },
       "unlock": [
         {
@@ -554,13 +554,13 @@
         },
         {
           "who": "guide",
-          "text": "Ferro plays properly now: he finishes what he starts. Watch his followers."
+          "text": "Ferro plays properly now. He finishes what he starts."
         }
       ],
       "outro": [
         {
           "who": "ferro",
-          "text": "You crossed well. Keep the ferry fee, you earned it."
+          "text": "You crossed well. Keep the ferry fee."
         }
       ],
       "opponent": {
@@ -647,7 +647,7 @@
         },
         {
           "who": "guide",
-          "text": "Careful: a road with a tavern or a town with a basilica pays nothing if unfinished."
+          "text": "Careful. A tavern road or basilica town scores nothing if unfinished."
         },
         {
           "who": "guide",
@@ -746,11 +746,11 @@
         },
         {
           "who": "guide",
-          "text": "Whoever closes a town takes its goods. The most wine, grain or cloth is worth 10 each."
+          "text": "Finish a town to take its goods. The most of each good scores 10."
         },
         {
           "who": "guide",
-          "text": "Your mason gives an extra turn when you grow its feature; your hog fattens a field."
+          "text": "Your mason gives an extra turn when you grow its feature; your hog makes a field score more."
         },
         {
           "who": "ostrand",
@@ -864,11 +864,11 @@
         },
         {
           "who": "guide",
-          "text": "She plays the best game you have faced: she counts the tiles still in the bag."
+          "text": "She plays the best game yet. She counts the tiles left."
         },
         {
           "who": "guide",
-          "text": "No tricks this time. Just the base valley, and the river."
+          "text": "No extras this time. Just the base game and the river."
         }
       ],
       "outro": [
@@ -1055,7 +1055,7 @@
         },
         {
           "who": "guide",
-          "text": "All three expansions, his best play, and a head start. This is the last deed."
+          "text": "All three extras, his best play, and a head start. This is the last deed."
         },
         {
           "who": "guide",
@@ -1107,7 +1107,7 @@
       "goal": {
         "type": "win",
         "value": null,
-        "text": "Win the game against the Baron's 15-point head start."
+        "text": "Win, even with the Baron's 15-point head start."
       },
       "hints": false,
       "stars": [

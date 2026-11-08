@@ -47,7 +47,7 @@ function campStart(def) {
 }
 function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
 function campOpen() { if (typeof GXC === 'undefined') return; GXC.open(); }
-function campGoalToast() { const d = UI.camp; if (d) toast('Goal: ' + d.goal.text + (d.twist ? ' ' + d.twist.text : '')); }
+function campGoalToast() { const d = UI.camp; if (d) say('Goal: ' + d.goal.text + (d.twist ? ' ' + d.twist.text : '')); }
 function campLine() {
   try {
     if (typeof GXC === 'undefined' || !window.CAMPAIGN) return '';
