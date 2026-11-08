@@ -92,7 +92,7 @@ function coachPlan(c, ci) {   /* called from drawPlan */
   if (G.round === 1) { coachSay('goal'); coachSay('gear'); coachSay('cards'); }
   if (Math.abs(UI.gear - c.gear) === 2) coachSay('shift2');
   var nc = nextCorner(c.pos); if (nc && nc.d <= 8) coachSay('corner', 'Corner ahead in ' + nc.d + ' spaces, limit ' + nc.limit + '. Faster than that burns engine heat.');
-  if (ci && ci.burn > 0) coachSay('burn', 'Speed ' + ci.sp + ' is over the limit: it burns ' + ci.burn + ' of your ' + c.eng + ' heat. Brake or pay?');
+  if (ci && ci.burn > 0) coachSay('burn', 'Speed ' + ci.sp + ' is too fast: it burns ' + ci.burn + ' of ' + c.eng + ' heat. Brake or pay?');
   if (c.hand.indexOf('H') >= 0) coachSay('heatcards');
   if (c.hand.indexOf('X') >= 0) coachSay('stress');
   if (UI.boost) coachSay('boost');
