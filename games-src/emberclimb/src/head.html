@@ -4,6 +4,14 @@
 <meta name="theme-color" content="#14100e">
 <title>Emberclimb</title>
 <style>
+/* W420 owner art */
+.host{display:flex;align-items:center;gap:12px;max-width:560px;margin:0 auto 10px;padding:10px 16px;background:rgba(20,14,10,.78);border:1px solid rgba(242,135,43,.45);border-radius:14px}
+.host .hostpic{width:64px;height:64px;flex:0 0 64px;border-radius:50%;background-size:cover;border:2px solid var(--ember2,#f2872b);box-shadow:0 2px 10px rgba(0,0,0,.5)}
+.host p{margin:0;font-size:15px;line-height:1.35;color:#f6ead8}
+@media (min-width:1024px){.host p{font-size:17px}.host .hostpic{width:80px;height:80px;flex-basis:80px}}
+.art.has[data-stem="enemy-mire-behemoth"],.art.has[data-stem="enemy-ashen-wraith"],.art.has[data-stem="enemy-gate-colossus"],.art.has[data-stem="enemy-ember-tyrant"],.art.has[data-stem="enemy-tomb-king"],.art.has[data-stem="enemy-skyclaw"]{background-size:cover;border:3px solid #c9a227;box-shadow:0 0 0 2px rgba(0,0,0,.6),0 6px 22px rgba(0,0,0,.65),0 0 26px rgba(242,135,43,.35)}
+/* end W420 owner art */
+
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Alegreya Sans',Georgia,serif;touch-action:manipulation}
@@ -290,4 +298,54 @@ html body .hand .card.sel{transform:translate(var(--sx,0px),calc(var(--cw)*-1.7)
 .pop{background:rgba(20,8,4,.92);border-radius:8px;padding:2px 8px;font-size:18px!important;white-space:nowrap;text-shadow:none!important}.pop.dmg{color:#ff9d8c!important}.pop.blk{color:#9cd0ff!important}.pop.heal{color:#9dffb0!important}
 @media (min-width:1024px){.intent,.en .nm,.stc span,.spkchip{font-size:17px!important}.energy .enl{font-size:16px;bottom:-22px}}
 .gxh-rules .gxh-pic{min-height:64px;max-height:22dvh}.gxh-rules .gxh-card{padding-bottom:18px}
+/* W420 juice */
+.w4num{position:fixed;z-index:72;pointer-events:none;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,0);white-space:nowrap}
+.w4num b{font:900 var(--fs,26px)/1 Cinzel,serif;text-shadow:0 2px 0 #000,0 0 10px #000}
+.w4num i{font:700 13px/1.25 'Alegreya Sans',sans-serif;font-style:normal;background:rgba(20,8,4,.92);color:#fff;border-radius:6px;padding:1px 7px;margin-top:2px}
+.w4num.k-dmg b{color:#ff5a46}.w4num.k-blk b{color:#6fb6ff}.w4num.k-poison b{color:#5fe06a}.w4num.k-heal b{color:#eaffe4;text-shadow:0 0 10px #4fd060,0 2px 0 #000}
+.w4num.still{animation:w4fade 1.15s forwards}@keyframes w4fade{0%,70%{opacity:1}100%{opacity:0}}
+.w4stop{filter:brightness(2.3) saturate(.3)!important;transform:scale(1.06);transition:none!important;animation:none!important}
+#stage.w4quake{animation:w4quake .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes w4quake{10%{transform:translate(-9px,4px)}25%{transform:translate(10px,-6px)}40%{transform:translate(-8px,5px)}55%{transform:translate(6px,-3px)}70%{transform:translate(-4px,2px)}85%{transform:translate(2px,-1px)}}
+.fly.w4trail{opacity:.35;filter:blur(2px) brightness(1.5);z-index:59}
+.w4impact{animation:w4imp .3s}@keyframes w4imp{40%{filter:brightness(1.9)}}
+.intent.w4hot{border-color:#ff5a46!important;box-shadow:0 0 0 2px rgba(255,90,70,.5)}
+.intent.w4atk{animation:w4pulse 1.2s ease-in-out infinite}.intent.w4danger{animation:w4pulse2 .9s ease-in-out infinite}
+@keyframes w4pulse{50%{box-shadow:0 0 0 3px rgba(255,90,70,.4),0 0 12px rgba(255,90,70,.55)}}
+@keyframes w4pulse2{50%{transform:scale(1.1);box-shadow:0 0 0 5px rgba(255,60,40,.6),0 0 22px rgba(255,60,40,.85)}}
+.turnban.win b{border-color:#f2c230;color:#fff4d6;box-shadow:0 0 40px rgba(242,194,48,.55),0 8px 30px #000a}.turnban.boss b{font-size:clamp(30px,8vw,56px)}
+.w4emb{position:fixed;inset:0;pointer-events:none;z-index:91;overflow:hidden}
+.w4emb i{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff6c8 0,#ffb340 45%,#ff5a1a 75%,transparent 100%);box-shadow:0 0 8px #ff8a2a}
+.w4pv{position:absolute;left:50%;top:46px;transform:translateX(-50%);z-index:4;pointer-events:none;display:flex;flex-direction:column;align-items:center;background:rgba(26,8,4,.94);border:2px solid #ff5a46;border-radius:10px;padding:2px 10px;color:#fff;white-space:nowrap;box-shadow:0 4px 14px #000b}
+.w4pv b{font:900 22px/1.05 Cinzel,serif;color:#ff8a76}.w4pv i{font:700 13px/1.2 'Alegreya Sans',sans-serif;font-style:normal;color:#ffd9d2}
+.w4pv.kill{border-color:#f2c230;background:rgba(40,22,2,.95)}.w4pv.kill b{color:#ffd36a}.w4pv.kill i{color:#ffe9a8;text-transform:uppercase;letter-spacing:.06em}
+.heropan{position:relative}
+.w4hb{position:absolute;right:6px;top:-14px;z-index:4;pointer-events:none;background:#0d2238;border:2px solid #6fb6ff;color:#cfe6ff;border-radius:999px;padding:1px 10px;font:800 14px/1.3 'Alegreya Sans',sans-serif;white-space:nowrap}
+.w4hbf{position:fixed;z-index:30;pointer-events:none;background:#0d2238;border:2px solid #6fb6ff;color:#cfe6ff;border-radius:10px;padding:3px 10px;font:800 15px/1.3 'Alegreya Sans',sans-serif;white-space:nowrap;box-shadow:0 4px 14px #000b}
+.w4inc{align-self:flex-start;font:700 13px/1.3 'Alegreya Sans',sans-serif;color:#cdbfae;background:rgba(0,0,0,.45);border-radius:6px;padding:0 6px;white-space:nowrap}
+.w4inc.cut{color:#fff;background:#8f1e12;border:1px solid #ff5a46}
+.w4ntag{position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);z-index:2;pointer-events:none;background:rgba(20,12,8,.92);border:1px solid #6b5040;color:#f1e3cc;border-radius:6px;padding:0 5px;font:700 13px/1.3 'Alegreya Sans',sans-serif;white-space:nowrap}
+.w4ntag.hot{border-color:#c93a3a;color:#ffd0c4}
+.w4rate{font:700 15px/1.3 'Alegreya Sans',sans-serif;padding:4px 12px;border-radius:10px;max-width:min(560px,calc(100vw - 32px));text-align:center;position:relative}
+.w4rate.good{background:#143a1c;border:1px solid #5fe06a;color:#dfffe2}.w4rate.poor{background:#3d140c;border:1px solid #ff6a55;color:#ffe0d8}
+.picks .card.w4rw{box-shadow:0 0 0 2px rgba(255,240,220,.35) inset,0 0 14px rgba(255,240,220,.3)}
+.picks .card.w4rw.unc{box-shadow:0 0 0 2px #8ec1ff inset,0 0 18px rgba(110,170,255,.65)}
+.picks .card.w4rw.rare{box-shadow:0 0 0 2px #f2c230 inset,0 0 24px rgba(242,194,48,.75)}
+.picks .card.w4rw.rare::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;background:linear-gradient(115deg,transparent 35%,rgba(255,236,160,.5) 50%,transparent 65%);background-size:260% 100%;animation:w4sheen 2.6s linear infinite}
+@keyframes w4sheen{0%{background-position:130% 0}100%{background-position:-130% 0}}
+.w4vt{position:absolute;top:3px;right:3px;z-index:4;background:rgba(20,10,4,.88);color:#ffe7c2;border-radius:6px;padding:0 6px;font:800 13px/1.35 'Alegreya Sans',sans-serif;pointer-events:none}
+.w4boss{position:fixed;inset:0;z-index:300;background:radial-gradient(circle at 50% 40%,#3a1208,#070302 70%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;padding:16px 16px max(24px,env(safe-area-inset-bottom));overflow:hidden;animation:w4bin .35s ease-out}
+.w4boss.out{opacity:0;transition:opacity .25s}
+@keyframes w4bin{from{opacity:0}to{opacity:1}}
+.w4boss .w4bv,.w4boss .w4bimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background-size:cover;background-position:center 30%}
+.w4boss .w4bimg .ph{display:none}.w4boss .w4bimg.zoom{animation:w4zoom 6s ease-out forwards}
+@keyframes w4zoom{from{transform:scale(1.25)}to{transform:scale(1)}}
+.w4boss::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.85));pointer-events:none}
+.w4bt{position:relative;z-index:1;text-align:center}
+.w4bt h1{font:700 clamp(34px,9vw,72px)/1.05 Cinzel,serif;color:#ffe2b0;text-shadow:0 0 24px #ff6a1a,0 3px 0 #000;margin:0}
+.w4bt p{font:700 16px/1.3 'Alegreya Sans',sans-serif;color:#f1d7b8;letter-spacing:.12em;text-transform:uppercase;margin:6px 0 0}
+#boss-skip{position:relative;z-index:1;min-width:160px}
+@media (min-width:1024px){.w4num i,.w4pv i,.w4inc,.w4ntag,.w4vt{font-size:16px}.w4pv b{font-size:26px}.w4hb,.w4hbf{font-size:16px}.w4rate{font-size:18px}.w4bt p{font-size:20px}}
+@media (prefers-reduced-motion:reduce){.intent.w4atk,.intent.w4danger,#stage.w4quake,.w4impact,.picks .card.w4rw.rare::after,.w4boss,.w4boss .w4bimg.zoom{animation:none!important}}
+/* end W420 juice */
 </style></head>

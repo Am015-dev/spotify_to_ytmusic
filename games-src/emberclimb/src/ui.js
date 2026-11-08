@@ -25,6 +25,10 @@
     return e;
   }
   window.EC_A = A;
+  // owner art has landscape versions (<stem>-wide) for wide screens; phones keep the portrait picture
+  function BG(stem) { var w = window.innerWidth > window.innerHeight * 1.1 && (window.MEDIA_PRESENT || []).indexOf(stem + '-wide') >= 0; return A(w ? stem + '-wide' : stem, '', { cls: 'bg', kind: 'bg' }); }
+  // the room's host (owner portraits): a face and one line of speech under the room title
+  function host(stem, line) { var d = h('div', 'host'); d.appendChild(A(stem, '', { noph: 1, cls: 'hostpic', kind: 'portrait' })); d.appendChild(h('p', '', line)); return d; }
   var GLY = { atk: '⚔', def: '🛡', buf: '✦', deb: '☠', sleep: '💤', big: '⚔' };
   var TONE = { w: '#a8431f', s: '#2f7a46', a: '#2f6fa8', m: '#a8861c', n: '#777', z: '#555' };
   // ---------- helpers
@@ -37,16 +41,44 @@
     document.body.appendChild(d); setTimeout(function () { d.remove(); }, 950);
   }
   function fxAt(w, stem) { if (!window.ANIM) return; var r = rectOf(w); if (!r) return; var d = A(stem, '', { noph: 1, cls: 'fxs' }); d.style.cssText = 'position:fixed;z-index:68;pointer-events:none;width:' + Math.min(110, r.width) + 'px;height:' + Math.min(110, r.width) + 'px;left:' + (r.left + r.width / 2 - Math.min(110, r.width) / 2) + 'px;top:' + (r.top + r.height * .25) + 'px;animation:fxfade .6s forwards'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 650); }
+  // W420 juice helpers: motion gate, flying numbers, hit-stop + stage quake, ember bursts, fanfare
+  function moOk() { try { return !!window.ANIM && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return !!window.ANIM; } }
+  function numAt(w, n, kind, label) {
+    if (!window.ANIM) return; var r = rectOf(w); if (!r) return; n = Math.max(0, n | 0);
+    var d = h('div', 'w4num k-' + kind, null, [h('b', '', (kind === 'blk' || kind === 'heal' ? '+' : '-') + n)]); if (label) d.appendChild(h('i', '', label));
+    d.style.setProperty('--fs', Math.round(Math.min(48, 20 + Math.sqrt(Math.max(1, n)) * 5)) + 'px'); d.style.top = (r.top + r.height * 0.28) + 'px'; d.style.left = '0px'; document.body.appendChild(d);
+    var vw = document.documentElement.clientWidth, ww = d.offsetWidth, cx = Math.max(ww / 2 + 8, Math.min(vw - ww / 2 - 8, r.left + r.width / 2)); d.style.left = cx + 'px';
+    if (moOk() && d.animate) {
+      var room = Math.max(0, Math.min(cx - ww / 2 - 8, vw - 8 - cx - ww / 2)), dir = Math.random() < .5 ? -1 : 1, dx = dir * Math.min(room, 24 + Math.random() * 40);
+      d.animate([{ transform: 'translate(-50%,0) scale(.4)', opacity: 0 }, { transform: 'translate(calc(-50% + ' + (dx * .3) + 'px),-44px) scale(1.25)', opacity: 1, offset: .2 }, { transform: 'translate(calc(-50% + ' + (dx * .75) + 'px),-66px) scale(1)', opacity: 1, offset: .65 }, { transform: 'translate(calc(-50% + ' + dx + 'px),-28px) scale(.9)', opacity: 0 }], { duration: 1150, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' });
+    } else d.classList.add('still');
+    setTimeout(function () { d.remove(); }, 1200);
+  }
+  function shakeEl(el, ms) { if (!el || !window.ANIM) return; setTimeout(function () { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); }, ms || 0); }
+  function bigHit(el) {
+    if (!moOk()) return; if (el) el.classList.add('w4stop');
+    setTimeout(function () { if (el) el.classList.remove('w4stop'); var st = document.getElementById('stage'); if (st) { st.classList.remove('w4quake'); void st.offsetWidth; st.classList.add('w4quake'); setTimeout(function () { st.classList.remove('w4quake'); }, 420); } }, 90);
+  }
+  function embers(n, big) {
+    if (!moOk()) return; var wr = h('div', 'w4emb'), W = document.documentElement.clientWidth, H = window.innerHeight; document.body.appendChild(wr);
+    for (var i = 0; i < n; i++) { var p = h('i'), sz = 4 + Math.random() * (big ? 9 : 6); p.style.left = (W / 2 + (Math.random() - .5) * W * .25) + 'px'; p.style.top = (H * .38) + 'px'; p.style.width = p.style.height = sz + 'px'; wr.appendChild(p); if (p.animate) p.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + ((Math.random() - .5) * W * .8) + 'px,' + (-(Math.random() * H * .4) - 30) + 'px) scale(.2)', opacity: 0 }], { duration: 900 + Math.random() * 900, easing: 'cubic-bezier(.1,.8,.3,1)', fill: 'forwards' }); }
+    setTimeout(function () { wr.remove(); }, 2000);
+  }
+  function fanfare(boss) {
+    SFX('fanfare'); if (boss) SFX('boss'); if (!window.ANIM) return; var o = document.querySelector('.turnban'); if (o) o.remove();
+    var d = h('div', 'turnban win' + (boss ? ' boss' : ''), null, [h('b', '', boss ? 'Guardian slain!' : 'Victory!')]); d.setAttribute('role', 'status'); document.body.appendChild(d);
+    setTimeout(function () { if (d.parentNode) d.remove(); }, boss ? 1800 : 1200); embers(boss ? 70 : 34, boss);
+  }
   function drain() {
-    var g = G(); if (!g) return; var q = g.q; g.q = [];
+    var g = G(); if (!g) return; var q = g.q; g.q = []; var bossF = !!(g.b ? g.b.kind === 'b' : UI.fs && UI.fs.kind === 'b');
     q.forEach(function (f) {
       var el = document.querySelector('[data-w="' + f.w + '"]');
       switch (f.k) {
-        case 'dmg': fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hit'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n + (f.x === 'poison' ? ' poison' : UI.lastName ? ' ' + UI.lastName : ''), 'dmg'); if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
-        case 'hitme': if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : 'hurt'); popAt(f.w, f.x === 'blocked' ? 'Blocked' : '-' + f.n + (f.x === 'spikes' ? ' spikes' : f.x === 'burn' ? ' burn' : ''), 'dmg'); if (f.x === 'spikes') { toast('Spikes! Attacking it cost you ' + f.n + ' HP'); try { UI.coachReact && UI.coachReact('poor', 'spikes'); } catch (e) { } } if (el && window.ANIM) { el.classList.add('shake'); setTimeout(function () { el.classList.remove('shake'); }, 360); } break;
+        case 'dmg': var bg = f.x !== 'blocked' && f.x !== 'poison' && f.n >= 12; fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : bg ? 'crit' : 'hit'); if (f.x === 'blocked') popAt(f.w, 'Blocked', 'dmg'); else numAt(f.w, f.n, f.x === 'poison' ? 'poison' : 'dmg', f.x === 'poison' ? 'poison' : (UI.lastName || '')); if (bg) bigHit(el); shakeEl(el, bg ? 95 : 0); break;
+        case 'hitme': var bh = f.x !== 'blocked' && (f.n >= 12 || bossF); if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : bh ? 'crit' : 'hurt'); if (f.x === 'blocked') popAt(f.w, 'Blocked', 'dmg'); else numAt(f.w, f.n, 'dmg', f.x === 'spikes' ? 'spikes' : f.x === 'burn' ? 'burn' : ''); if (f.x === 'spikes') { toast('Spikes! Attacking it cost you ' + f.n + ' HP'); try { UI.coachReact && UI.coachReact('poor', 'spikes'); } catch (e) { } } if (bh) bigHit(el); shakeEl(el, bh ? 95 : 0); break;
         case 'hp': break;
-        case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); popAt(f.w, '+' + f.n + ' Blk', 'blk'); break;
-        case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); popAt(f.w, '+' + f.n, 'heal'); break;
+        case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); numAt(f.w, f.n, 'blk', 'Block'); break;
+        case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); numAt(f.w, f.n, 'heal', 'HP'); break;
         case 'buff': if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX('buff'); popAt(f.w, f.x === 'str' ? '+' + f.n + ' Strength' : f.x === 'spikes' ? 'Spikes ' + f.n : f.x === 'nrg' ? '+' + f.n + ' Energy' : 'Power!', 'buf'); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
         case 'die': if (window.ANIM) { var d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
@@ -118,7 +150,7 @@
   function title() {
     if (UI.sub === 'quick') return quick();
     var s = h('div'); s.id = 'title';
-    s.appendChild(A('bg-title', '', { cls: 'bg', kind: 'bg' }));
+    s.appendChild(BG('bg-title'));
     s.appendChild(h('div', '', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Climb the tower. Build your deck.')]));
     var first = false; try { first = !GXT.status('emberclimb').seen && !localStorage.getItem('emberclimb.save'); } catch (e) { }
     var main = h('div', 'tmain'), row = h('div', 'trow');
@@ -149,7 +181,7 @@
   var ng0 = E.newGame; E.newGame = function (o) { E.lock(lockedRelics()); return ng0.call(E, o); };
   function quick() {
     var s = h('div'); s.id = 'title';
-    s.appendChild(A('bg-title', '', { cls: 'bg', kind: 'bg' }));
+    s.appendChild(BG('bg-title'));
     var t = h('div', '', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Climb the tower. Build your deck.')]); s.appendChild(t);
     var hs = h('div', 'heroes');
     ['w', 's', 'a', 'm'].forEach(function (k) {
@@ -160,19 +192,24 @@
     });
     var mid = h('div', '', null, [hs, h('div', 'refline', D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
+    // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
+    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
+    [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
+    mid.appendChild(seg);
     var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
     var wrap = h('div', '', null, [h('div', 'refline', UI.duo ? 'Two heroes, shared map. Pass the screen. Tap to pick both.' : 'Tap a hero to pick them. Use + Second hero to play together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
     s.appendChild(wrap); tscr.appendChild(s);
   }
-  UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }); E.clear(); E.newGame({ heroes: hs }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
+  UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
   UI.leave = function () { if (UI.camp) { UI.camp = null; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; render(); try { GXC.open(); } catch (e) { } } else { UI.mode = 'title'; UI.sub = ''; render(); } };
-  function start() { E.newGame({ heroes: UI.pick.slice() }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); }
+  function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); }
   function resume() { var g = G(); if (g && g.scr === 'battle' && g.b.ph === 'e') enemyPhase(); }
   // hero HP + gold go in the shell bar (chips, not buttons); potions and the End turn button live in the dock
   function hud() {
     var g = G(), t = document.getElementById('hud'); t.innerHTML = '';
     g.hs.forEach(function (x) { t.appendChild(h('span', 'chip', '♥ ' + ((x.dead || x.hp <= 0 || (g.scr === 'over' && !g.won)) ? 0 : x.hp) + '/' + x.mhp)); });
     t.appendChild(h('span', 'chip', '● ' + g.gold));
+    if ((g.acts || 1) > 1) t.appendChild(h('span', 'chip', 'Act ' + g.act + '/' + g.acts));
   }
   function potRow() {
     var g = G(), p = h('div', 'pots');
@@ -209,9 +246,10 @@
     UI.endBtn = null;
   }
   var NODEG = { m: '⚔', e: '💀', r: '🔥', s: '🛒', v: '?', t: '🎁', b: '👑' }, NODEN = { m: 'node-monster', e: 'node-elite', r: 'node-rest', s: 'node-shop', v: 'node-event', t: 'node-treasure', b: 'node-boss' };
+  var NODEHINT = { m: function () { return 'fight: card'; }, e: function () { return 'high risk: relic'; }, r: function () { return 'heal ' + (3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0)); }, s: function () { return 'shop ● ' + G().gold; }, v: function () { return 'event'; }, t: function () { return 'free relic'; }, b: function () { return 'boss'; } };   // W420
   function mapScr() {
     var g = G(); hud();
-    var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); m.appendChild(A('bg-map', '', { cls: 'bg', kind: 'bg' }));
+    var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); m.appendChild(BG('bg-map'));
     function pos(n) { return { x: (n.c + 0.5) / 4 * 100, y: 100 - (n.f - 0.5) / ((G().F || 9) + 1.5) * 100 }; }
     var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('preserveAspectRatio', 'none');
     g.map.forEach(function (n) { n.nx.forEach(function (k) { var a = pos(n), b = pos(g.map[k]), l = document.createElementNS(NS, 'line'); l.setAttribute('x1', a.x); l.setAttribute('y1', a.y); l.setAttribute('x2', b.x); l.setAttribute('y2', b.y); l.setAttribute('stroke', n.vis ? '#f2872b' : '#6b5040'); l.setAttribute('stroke-width', '2'); l.setAttribute('vector-effect', 'non-scaling-stroke'); l.setAttribute('stroke-dasharray', n.vis ? '' : '4 4'); svg.appendChild(l); }); });
@@ -220,7 +258,7 @@
     g.map.forEach(function (n) {
       var p = pos(n), ok = rc.indexOf(n.id) >= 0;
       var b = h('button', 'node t-' + n.t + (ok ? ' glow' : '') + (n.vis ? ' vis' : '') + (g.at === n.id ? ' here' : ''), null, [A(NODEN[n.t], NODEG[n.t], { ph: '#3a2a20' })]);
-      b.style.left = p.x + '%'; b.style.top = p.y + '%'; b.setAttribute('aria-label', D.NODES[n.t]);
+      b.style.left = p.x + '%'; b.style.top = p.y + '%'; b.setAttribute('aria-label', D.NODES[n.t]); if (ok && NODEHINT[n.t]) b.appendChild(h('span', 'w4ntag' + (n.t === 'e' || n.t === 'b' ? ' hot' : ''), NODEHINT[n.t]()));   // W420 value hint
       if (ok) on(b, function () { var go = function () { E.performMove({ t: 'go', n: n.id }); UI.sel = -1; render(); if (G().scr === 'battle') beginBattleUI(); }; if (n.t === 'b' && UI.camp && UI.bossLine && !(window.GXT && GXT.active())) UI.bossLine('pre').then(go); else go(); });
       else b.disabled = true;
       m.appendChild(b);
@@ -268,6 +306,7 @@
   function intentBox(e) {
     var P = intentParts(e), main = P[0].k, cls = main === 'atk' ? 'atk' : main === 'blk' ? 'def' : (main === 'str' || main === 'sleep' || main === 'unk') ? 'buf' : 'deb';
     var b = h('button', 'intent ' + cls); b.type = 'button'; b.setAttribute('aria-label', 'Enemy intent: ' + P.map(function (p) { return p.say; }).join(' '));
+    if (main === 'atk') { try { var it = e.intent, g = G(), tg = it.all ? g.hs : [g.hs[it.tg] || g.hs[0]], d0 = E.previewHit(g.b.en.indexOf(e), g.hs.indexOf(tg[0])) * (it.hits || 1), hot = tg.some(function (t) { return t && !t.dead && d0 >= t.hp * .25; }); if (hot) b.classList.add('w4hot'); if (moOk()) b.classList.add(hot ? 'w4danger' : 'w4atk'); } catch (x) { } }   // W420 pulse
     P.forEach(function (p) { b.appendChild(IA(p.s, p.k)); if (p.t) b.appendChild(h('span', '', p.t)); });
     on(b, function () { UI.explain(P); });
     return b;
@@ -288,7 +327,8 @@
     var g = G(), b = g.b, cur = g.hs[b.cur >= 0 ? b.cur : 0];
     hud();
     var st = h('div'); st.id = 'stage'; st.setAttribute('data-board', '1'); st.appendChild(A(b.kind === 'b' ? 'bg-boss-' + g.boss : b.kind === 'e' ? 'bg-elite' : 'bg-battle-' + (1 + ((g.floor - 1) % 3)), '', { cls: 'bg', kind: 'bg' }));
-    var en = h('div', 'enemies'), tgtMode = b.ph === 'p' && UI.sel >= 0 && needTarget();
+    var en = h('div', 'enemies'), tgtMode = b.ph === 'p' && UI.sel >= 0 && needTarget(), PV = previewSel(g, b);
+    var fk = g.act + ':' + g.floor + ':' + g.at; if (!UI.fs || UI.fs.key !== fk) UI.fs = { key: fk, kind: b.kind, hp0: g.hs.reduce(function (a, x) { return a + x.hp; }, 0), mhp: g.hs.reduce(function (a, x) { return a + x.mhp; }, 0), waste: 0, turns: 1, over: 0 }; UI.fs.turns = Math.max(UI.fs.turns, b.turn || 1);
     b.en.forEach(function (e, i) {
       var d = D.ENEMIES[e.id];
       var x = h('div', 'en' + (e.dead ? ' dead' : '') + (tgtMode && !e.dead ? ' glow' : ''));
@@ -300,7 +340,7 @@
       x.appendChild(h('div', 'nm', d.name));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
       x.appendChild(stChips(e));
-      if (!e.dead) on(x, function () { onEnemy(i); });
+      var pv = PV && PV.en[i]; if (pv && !e.dead && (pv.dmg > 0 || pv.kill)) x.appendChild(h('div', 'w4pv' + (pv.kill ? ' kill' : ''), null, [h('b', '', (PV.rnd ? '~' : '') + '-' + (pv.kill ? pv.dmg : pv.hpLoss)), h('i', '', pv.kill ? 'kills' : pv.stripped ? pv.stripped + ' block off' : (whyMods(cur, cur.hand[UI.sel], e) || 'HP'))]));   // W420 value preview
       en.appendChild(x);
     });
     st.appendChild(en);
@@ -312,6 +352,8 @@
       var inf = h('div', 'inf'); var nmr = h('div', 'nm', H.name.split(' ')[0] + (hh.blk ? '  🛡 ' + hh.blk : '') + (hh.stance !== 'n' ? '  ' + (hh.stance === 'w' ? 'Wrath' : 'Calm') : '')); if (hh.stance !== 'n') nmr.appendChild(A('stance-' + hh.stance, '', { noph: 1, cls: 'stanceart' })); inf.appendChild(nmr);
       inf.appendChild(h('div', 'bar', null, [h('i'), h('b', '', hh.hp + '/' + hh.mhp)])); inf.querySelector('.bar i').style.width = (100 * hh.hp / hh.mhp) + '%';
       inf.appendChild(stChips(hh));
+      var inc = incoming(g, i); if (inc > 0 && !hh.dead) { var net = Math.max(0, inc - hh.blk); inf.appendChild(h('div', 'w4inc' + (net > 0 ? ' cut' : ''), net > 0 ? 'Incoming ' + net : 'Incoming ' + inc + ', blocked')); }
+      if (PV && (PV.blk[i] > 0 || PV.heal[i] > 0)) p.appendChild(h('div', 'w4hb', PV.blk[i] > 0 ? '+' + PV.blk[i] + ' block' : '+' + PV.heal[i] + ' HP'));   // W420
       if (hh.k === 'a') { var ob = h('div', 'orbs'); hh.orbs.forEach(function (o) { var ox = h('div', 'orb ' + o.k, o.k === 'D' ? String(o.v) : ''); ox.appendChild(A('orb-' + o.k, '', { noph: 1, cls: 'orbart' })); ob.appendChild(ox); }); inf.appendChild(ob); }
       var pw = Object.keys(hh.pw); if (pw.length) inf.appendChild(h('div', 'stc', null, pw.map(function (k) { return h('span', '', k + ' ' + hh.pw[k]); })));
       p.appendChild(inf); mid.appendChild(p);
@@ -322,7 +364,7 @@
     var anyOk0 = (b.ph === 'p' ? cur.hand : []).some(function (c) { return E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'); });
     var ctl = h('div', 'ctl');
     if (b.ph === 'p') {
-      ctl.appendChild(h('div', 'piles', null, [on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { UI.ov = 'draw'; render(); }), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
+      ctl.appendChild(h('div', 'piles', null, [(function (dc) { dc.id = 'drawpile'; return dc; })(on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { UI.ov = 'draw'; render(); })), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
       var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
     }
     st.appendChild(ctl);
@@ -343,16 +385,71 @@
       st.appendChild(so);
     }
     app.appendChild(st);
+    var dk = b.turn + ':' + b.cur; if (b.ph === 'p' && UI.drawKey !== dk && !b.scry) { UI.drawKey = dk; dealIn(hand); }   // W420 draw animation
+    if (PV && sl0()) { var bt = [], rr0 = sl0().getBoundingClientRect(), vw0 = document.documentElement.clientWidth; g.hs.forEach(function (x, k) { if (PV.blk[k] > 0) bt.push('+' + PV.blk[k] + ' block' + (g.hs.length > 1 ? ' ' + D.H[x.k].name.split(' ')[0] : '')); if (PV.heal[k] > 0) bt.push('+' + PV.heal[k] + ' HP'); });
+      if (bt.length) { var fb = h('div', 'w4hbf', bt.join(', ')); st.appendChild(fb); var fw = fb.offsetWidth, rx = rr0.right + 8; if (rx + fw > vw0 - 8) rx = Math.max(8, rr0.left - 8 - fw); fb.style.left = rx + 'px'; fb.style.top = Math.max(8, rr0.top + 10) + 'px'; } }   // W420 block preview beside the lifted card
+    function sl0() { return hand.querySelector('.card.sel'); }
     var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }
   }
-  function beginBattleUI() { UI.sel = -1; render(); banner('Your turn', 'you'); }
+  // W420: value preview of the selected card (dry run in the engine on a copy), incoming damage per hero, why-text, draw animation
+  function playable(h0, c) { return c && E.canPlay(h0, c) && (E.eff(c).cost === 'X' || E.cost(h0, c) <= h0.en); }
+  function previewSel(g, b) {
+    if (b.ph !== 'p' || UI.sel < 0 || UI.busy || !E.previewPlay) return null; var cur = g.hs[b.cur], c = cur && cur.hand[UI.sel]; if (!playable(cur, c)) return null;
+    var e = E.eff(c), out = { en: [], blk: [], heal: [], rnd: false }, take = function (p) { if (!p) return; out.blk = p.blk; out.heal = p.heal; out.rnd = p.rnd; };
+    try {
+      if (e.tgt) b.en.forEach(function (en, i) { if (en.dead) return; var p = E.previewPlay(b.cur, UI.sel, i); if (p) { out.en[i] = p.en[i]; take(p); } });
+      else { var p = E.previewPlay(b.cur, UI.sel); if (p) { out.en = p.en; take(p); } }
+    } catch (x) { return null; }
+    return out;
+  }
+  function incoming(g, hi) {
+    var t = 0; if (!g.b) return 0;
+    g.b.en.forEach(function (e, ei) { var it = e.intent; if (e.dead || !it || !it.atk || it.sleep) return; var tgi = g.hs[it.tg] ? it.tg : 0; if (!it.all && tgi !== hi) return; var d = 0; try { d = E.previewHit(ei, hi); } catch (x) { d = it.atk; } t += (d || 0) * (it.hits || 1); });
+    return t;
+  }
+  function whyMods(h0, c, tg) {
+    var e = c && E.eff(c), s = [], str = (h0.st && h0.st.str) || 0, wk = h0.st && h0.st.weak > 0, vu = tg && tg.st && tg.st.vuln > 0, SC = D.SCALE || 3;
+    if (!e || e.type !== 'A') return '';
+    if (str) s.push((str > 0 ? '+' : '') + str + ' Str'); if (h0.stance === 'w') s.push('Wrath +' + SC);
+    if (wk && !vu) s.push('Weak -' + SC); if (vu && !wk) s.push('x2 Vuln');
+    return s.join(', ');
+  }
+  function whyOf(h0, c, tg) { var m = whyMods(h0, c, tg); return E.eff(c).name + (m ? ' ' + m.replace('x2 Vuln', 'x2 Vulnerable') : ''); }
+  function dealIn(hand) {
+    var cs = hand.querySelectorAll('.card'); if (!cs.length) return; SFX('draw'); if (!moOk()) return;
+    var dp = document.getElementById('drawpile'), pr = dp && dp.getBoundingClientRect();
+    [].forEach.call(cs, function (c, i) {
+      if (!c.animate) return; var r = c.getBoundingClientRect(), dx = pr ? pr.left + pr.width / 2 - (r.left + r.width / 2) : -160, dy = pr ? pr.top + pr.height / 2 - (r.top + r.height / 2) : 0;
+      c.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.3) rotate(-14deg)', opacity: 0, offset: 0 }], { duration: 360, delay: i * 70, easing: 'cubic-bezier(.2,.8,.3,1.15)', fill: 'backwards' });
+    });
+  }
+  function bossOf(b) { var x = b && b.en.filter(function (e) { return D.ENEMIES[e.id] && D.ENEMIES[e.id].boss; })[0]; return x ? x.id : null; }
+  function beginBattleUI() { UI.sel = -1; render(); var g = G(), bid = g && g.b && g.b.kind === 'b' && bossOf(g.b); if (bid && UI.bossIntro) UI.bossIntro(bid, function () { banner('Your turn', 'you'); }); else banner('Your turn', 'you'); }
+  // W420 boss intro: video (when media/boss-<id>.mp4 is listed in window.MEDIA_VIDEO) or a zooming still, name + act line, Skip; ends on video end or after 6 s
+  UI.bossIntro = function (bossId, done) {
+    done = done || function () { };
+    try { if ((window.GXT && GXT.active()) || (/[?&]scn=/.test(location.search) && !/[?&]scn=bossintro(&|$)/.test(location.search))) return done(); } catch (e) { }
+    var d = D.ENEMIES[bossId]; if (!d) return done();
+    var g = G(), vids = window.MEDIA_VIDEO || [], ov = h('div', 'w4boss'), fin = false, tmr = 0; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', d.name + ' intro');
+    function end() { if (fin) return; fin = true; clearTimeout(tmr); if (moOk()) { ov.classList.add('out'); setTimeout(function () { ov.remove(); }, 250); } else ov.remove(); done(); }
+    if (vids.indexOf('boss-' + bossId) >= 0) {
+      var v = document.createElement('video'); v.muted = true; v.setAttribute('muted', ''); v.playsInline = true; v.setAttribute('playsinline', ''); v.autoplay = true; v.setAttribute('autoplay', ''); v.className = 'w4bv'; v.src = 'media/boss-' + bossId + '.mp4';
+      v.addEventListener('ended', end); ov.appendChild(v); try { var pp = v.play(); if (pp && pp.catch) pp.catch(function () { }); } catch (e) { }
+    } else ov.appendChild(A('enemy-' + (d.img || bossId), '', { ph: '#3a160c', cls: 'w4bimg' + (moOk() ? ' zoom' : ''), kind: 'bg' }));
+    ov.appendChild(h('div', 'w4bt', null, [h('h1', '', d.name), h('p', '', 'Act ' + ((g && g.act) || 1) + ' guardian')]));
+    var sk = on(h('button', 'btn primary', 'Skip'), end); sk.id = 'boss-skip'; ov.appendChild(sk);
+    document.body.appendChild(ov); SFX('boss'); tmr = setTimeout(end, 6000);
+  };
   function flyCard(ci, ti, done) {
     var cel = document.querySelector('.hand [data-c="' + ci + '"]'), tel = ti != null ? document.querySelector('[data-w="e' + ti + '"]') : document.querySelector('.mid');
-    if (!window.ANIM || !cel || !tel || !cel.animate) return done();
+    if (!moOk() || !cel || !tel || !cel.animate) return done();
     var a = cel.getBoundingClientRect(), b = tel.getBoundingClientRect(), f = cel.cloneNode(true); f.classList.remove('sel'); f.classList.add('fly');
-    f.style.left = a.left + 'px'; f.style.top = a.top + 'px'; f.style.margin = '0'; document.body.appendChild(f);
-    var an = f.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + (b.left + b.width / 2 - a.left - a.width / 2) + 'px,' + (b.top + b.height / 2 - a.top - a.height / 2) + 'px) scale(.5) rotate(18deg)', opacity: .15 }], { duration: 260, easing: 'ease-in' });
-    an.onfinish = function () { f.remove(); done(); }; setTimeout(function () { if (f.parentNode) { f.remove(); } }, 600);
+    f.style.left = a.left + 'px'; f.style.top = a.top + 'px'; f.style.margin = '0';
+    var kf = [{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(0,-16px) scale(1.18)', opacity: 1, offset: .25 }, { transform: 'translate(' + (b.left + b.width / 2 - a.left - a.width / 2) + 'px,' + (b.top + b.height / 2 - a.top - a.height / 2) + 'px) scale(.5) rotate(18deg)', opacity: .15 }];
+    [2, 1].forEach(function (k) { var t = f.cloneNode(true); t.classList.add('w4trail'); document.body.appendChild(t); var ta = t.animate(kf, { duration: 320, delay: k * 35, easing: 'ease-in', fill: 'backwards' }); ta.onfinish = function () { t.remove(); }; setTimeout(function () { if (t.parentNode) t.remove(); }, 700); });
+    document.body.appendChild(f);
+    var an = f.animate(kf, { duration: 320, easing: 'ease-in' });
+    an.onfinish = function () { f.remove(); tel.classList.add('w4impact'); setTimeout(function () { tel.classList.remove('w4impact'); }, 300); done(); }; setTimeout(function () { if (f.parentNode) { f.remove(); } }, 700);
   }
   function onCard(i) {
     var g = G(); if (g.b.ph !== 'p' || UI.busy) return; var cur = g.hs[g.b.cur], c = cur.hand[i];
@@ -366,8 +463,10 @@
   function onEnemy(i) { var g = G(); if (g.b.ph === 'p' && UI.sel >= 0 && needTarget()) playIt(UI.sel, i); }
   function playIt(ci, ti) {
     var g = G(), mv = { t: 'play', h: g.b.cur, c: ci }; if (ti != null) mv.e = ti;
-    UI.lastName = E.eff(g.hs[g.b.cur].hand[ci]).name; SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
-      UI.busy = false; UI.sel = -1; var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead; E.performMove(mv); render(); afterMove();
+    var hc0 = g.hs[g.b.cur], cc0 = hc0.hand[ci]; UI.lastName = whyOf(hc0, cc0, ti != null ? g.b.en[ti] : null); SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
+      UI.busy = false; UI.sel = -1; var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead;
+      try { var pv = E.previewPlay && E.previewPlay(g.b.cur, ci, ti); if (pv && UI.fs) pv.en.forEach(function (x) { UI.fs.over += x ? x.over : 0; }); } catch (x) { }
+      E.performMove(mv); render(); UI.lastName = ''; afterMove();
       try { if (UI.coachReact && tg) { if (!wasD && tg.dead) UI.coachReact('good', 'kill'); else if (wasV) UI.coachReact('good', 'double'); } } catch (e) { }
     });
   }
@@ -381,7 +480,7 @@
   }
   function endTurn() {
     var g = G(); if (g.scr !== 'battle' || g.b.ph !== 'p' || UI.busy) return; if (!tutOk({ type: 'tap', w: 'end' })) return; UI.sel = -1;
-    try { var hh0 = g.hs[g.b.cur]; if (UI.coachReact && hh0 && hh0.en > 0 && hh0.hand.some(function (c) { return E.canPlay(hh0, c) && E.cost(hh0, c) <= hh0.en && E.eff(c).type !== 'X'; })) UI.coachReact('poor', 'leftover'); UI.hp0 = hh0.hp; UI.bk0 = hh0.blk; } catch (e) { }
+    try { var hh0 = g.hs[g.b.cur]; if (UI.coachReact && hh0 && hh0.en > 0 && hh0.hand.some(function (c) { return E.canPlay(hh0, c) && E.cost(hh0, c) <= hh0.en && E.eff(c).type !== 'X'; })) UI.coachReact('poor', 'leftover'); UI.hp0 = hh0.hp; UI.bk0 = hh0.blk; if (UI.fs && hh0.en > 0 && hh0.hand.some(function (c) { return playable(hh0, c) && E.eff(c).type !== 'X'; })) UI.fs.waste += hh0.en; } catch (e) { }
     E.performMove({ t: 'end' }); render();
     if (G().scr === 'battle' && G().b.ph === 'e') enemyPhase(); else render();
   }
@@ -419,17 +518,35 @@
     var g = G(), r = g.rw, s = h('div', 'reward');
     s.appendChild(A('bg-reward', '', { cls: 'bg', kind: 'bg' }));
     s.appendChild(h('h2', '', r.treasure ? 'Treasure!' : 'Victory!'));
+    var rk = g.act + ':' + g.floor + ':' + g.at, wasB = g.map[g.at] && g.map[g.at].t === 'b';
+    if (!r.treasure && UI.fanKey !== rk) { UI.fanKey = rk; fanfare(wasB); }
+    if (!r.treasure && UI.fs && UI.fs.key === rk) s.appendChild(rateLine(g, UI.fs));   // W420 fight rating
     s.appendChild(h('div', 'chip', '● +' + r.gold + ' gold'));
     if (r.pot && !r.took.pot) { var pb = on(h('button', 'item', null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', D.POTIONS[r.pot].name)]), function () { E.performMove({ t: 'takepot' }); render(); }); pb.style.width = '140px'; s.appendChild(pb); }
     if (r.relics && !r.took.relic) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id || r.took['r' + i]) return; var b = on(h('button', 'item', null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', D.RELICS[id].name), h('span', '', D.RELICS[id].t)]), function () { E.performMove({ t: 'relic', i: i }); render(); }); b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
     Object.keys(r.cards).forEach(function (hi) {
       if (r.took['c' + hi]) return; if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
       else s.appendChild(h('div', 'sub', 'Add one card to your deck'));
-      var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
+      var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); c.classList.add('w4rw'); (c.querySelector('.cart') || c).appendChild(h('span', 'w4vt', valTag(id))); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
       s.appendChild(on(h('button', 'btn alt', 'Skip'), function () { E.performMove({ t: 'skip', h: +hi }); render(); }));
     });
     var lv = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); lv.id = 'leave'; s.appendChild(lv);
     hud(); app.appendChild(s);
+  }
+  // W420: one-line fight rating + reward value tags
+  function rateLine(g, f) {
+    var lost = Math.max(0, f.hp0 - g.hs.reduce(function (a, x) { return a + x.hp; }, 0)), good = lost <= Math.max(6, Math.round(f.mhp * .12)) && f.waste <= 1;
+    var t = good ? 'Good fight: lost ' + lost + ' HP' + (f.waste ? ', ' + f.waste + ' energy unspent' : ', no wasted energy') : 'Poor fight: took ' + lost + ' HP' + (f.waste ? ', ' + f.waste + ' energy unspent over ' + f.turns + ' turn' + (f.turns === 1 ? '' : 's') : lost > 0 ? ', block more before big hits' : '');
+    if (f.over >= 10) t += ', ' + f.over + ' overkill';
+    return h('div', 'w4rate ' + (good ? 'good' : 'poor'), t);
+  }
+  function valTag(id) {
+    var e = E.eff({ id: id, u: 0 }), s = JSON.stringify(e.ops);
+    if (e.type === 'P' || /"(str|dblStr|focus|power)"/.test(s)) return 'scales';
+    if (/"(dmg|hit|all|dmgx|bodyslam|chan|chanX|evoke2|evokeX|shiv|poison|poisonAll|dblPoison)"/.test(s)) return '+dmg';
+    if (/"blk"/.test(s)) return 'block';
+    if (/"(draw|nrg|scry|mir)"/.test(s)) return 'draw';
+    return 'utility';
   }
   function deckPicker(title, hi, filter, cb) {
     var g = G(), ov = h('div', 'ov'); ov.appendChild(h('h2', '', title, [on(h('button', 'x', '✕'), function () { UI.ov = null; render(); })]));
@@ -439,7 +556,7 @@
   function rest() {
     var g = G(), s = h('div', 'reward'); s.appendChild(A('bg-rest', '', { cls: 'bg', kind: 'bg' }));
     var hi = g.rest.todo[0], hh = g.hs[hi], H = D.H[hh.k];
-    s.appendChild(h('h2', '', 'Campfire'));
+    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Heal ' + (9 + (E.has('healing-moss') ? 10 : 0)) + ' HP, or sharpen one card.'));
     if (g.hs.length > 1) s.appendChild(h('div', 'chip', H.name));
     var amt = 3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0);
     var b1 = on(h('button', 'btn', 'Rest: heal ' + amt), function () { E.performMove({ t: 'heal', h: hi }); UI.ov = null; render(); }); b1.id = 'rest-heal';
@@ -448,7 +565,7 @@
   }
   function shop() {
     var g = G(), s = h('div', 'reward'); s.appendChild(A('bg-shop', '', { cls: 'bg', kind: 'bg' }));
-    s.appendChild(h('h2', '', 'Wayside Market'));
+    s.appendChild(h('h2', '', 'Wayside Market')); s.appendChild(host('cast-merchant', 'The first relic and potion are cheaper today.'));
     var it = h('div', 'items');
     g.shop.items.forEach(function (x, i) {
       var nm = x.t === 'card' ? D.CARDS[x.id].name : x.t === 'relic' ? D.RELICS[x.id].name : D.POTIONS[x.id].name;
@@ -471,7 +588,7 @@
   }
   function event() {
     var g = G(), ev = D.EVENTS[g.evn.id], s = h('div', 'reward'); s.appendChild(A('bg-event', '', { cls: 'bg', kind: 'bg' }));
-    s.appendChild(h('h2', '', ev.name)); s.appendChild(A('event-' + g.evn.id, ev.name, { cls: 'evart', ph: '#4a3a5a', kind: 'card' }));
+    s.appendChild(h('h2', '', ev.name)); s.appendChild(host('cast-teller', ev.q)); s.appendChild(A('event-' + g.evn.id, ev.name, { cls: 'evart', ph: '#4a3a5a', kind: 'card' }));
     if (g.evn.res) { s.appendChild(h('div', 'sub', g.evn.res)); var evl = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); evl.id = 'ev-leave'; s.appendChild(evl); }
     else {
       s.appendChild(h('div', 'sub', ev.q)); var o = h('div', 'opts');
