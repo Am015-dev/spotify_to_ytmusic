@@ -47,6 +47,17 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     else { bad++; console.log('FAIL', name, 'never tried a target card'); }
     if (!won) { bad++; console.log('FAIL', name, 'fight not won by ' + (touch ? 'touch' : 'mouse')); } else console.log('PASS', name, 'fight won by ' + (touch ? 'touch' : 'mouse'));
     if (errs.length) { bad++; console.log('FAIL', name, 'page errors', errs.slice(0, 2).join(' | ')); }
+    // drag the real card onto a foe (mouse on PC; touch drag via CDP on phone)
+    await pg.evaluate(() => { EC.E.newGame({ heroes: ['w'], seed: 99 }); EC.E.performMove({ t: 'go', n: EC.E.validMoves()[0].n }); UI.mode = 'game'; UI.sel = -1; UI.busy = false; UI.render(); document.querySelectorAll('.gxh-card,.ec-goal').forEach(n => n.remove()); }); await sleep(900);
+    const dc = await pg.evaluateHandle(() => [...document.querySelectorAll('.hand .card.ok')].find(n => { const g = EC.E.G(), h = g.hs[g.b.cur]; return EC.E.eff(h.hand[+n.getAttribute('data-c')]).tgt; }));
+    const de = await pg.$('.en:not(.dead)'); const hpA = await pg.evaluate(() => EC.E.G().b.en.map(e => e.hp + e.blk).join(','));
+    if (dc && de) {
+      const a = await dc.asElement().boundingBox(), b = await de.boundingBox(), ax = a.x + a.width / 2, ay = a.y + a.height / 2, bx = b.x + b.width / 2, by = b.y + b.height / 2;
+      if (touch) { const cdp = await ctx.newCDPSession(pg); const T = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] }); await T('touchStart', ax, ay); for (let k = 1; k <= 10; k++) { await T('touchMove', ax + (bx - ax) * k / 10, ay + (by - ay) * k / 10); await sleep(30); } await T('touchEnd'); }
+      else { await pg.mouse.move(ax, ay); await pg.mouse.down(); for (let k = 1; k <= 10; k++) { await pg.mouse.move(ax + (bx - ax) * k / 10, ay + (by - ay) * k / 10); await sleep(30); } await pg.mouse.up(); }
+      await sleep(1500); const hpB = await pg.evaluate(() => { const g = EC.E.G(); return g.b ? g.b.en.map(e => e.hp + e.blk).join(',') : 'done'; });
+      if (hpB !== hpA) console.log('PASS', name, 'drag a card onto a foe by ' + (touch ? 'touch' : 'mouse')); else { bad++; console.log('FAIL', name, 'drag a card onto a foe did nothing'); }
+    } else { bad++; console.log('FAIL', name, 'no target card to drag'); }
     await pg.screenshot({ path: '/tmp/claude-0/tap-' + name + '.png' }); await ctx.close();
   }
   await br.close(); srv.close(); console.log(bad ? 'TAP-ENEMY FAIL' : 'TAP-ENEMY PASS'); process.exit(bad ? 1 : 0);

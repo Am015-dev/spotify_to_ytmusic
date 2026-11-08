@@ -116,6 +116,29 @@
     return null;
   }
   // tap-hold on a hand card (about 0.45 s) shows the whole card big; the click that follows is swallowed
+  // drag the real card (owner verdict 8 Nov): pick it up, legal foes glow, drop on a foe (or above the hand for a skill) to play; a tap still works
+  function dragPlay(el, i) {
+    var sx = 0, sy = 0, gh = null, on0 = false, hot = -1;
+    function foes() { return [].slice.call(document.querySelectorAll('.en[data-w]')).filter(function (n) { return !n.classList.contains('dead'); }); }
+    function under(x, y) { var t = -1; foes().forEach(function (n) { var r = n.getBoundingClientRect(); if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) t = +n.getAttribute('data-w').slice(1); }); return t; }
+    function end() { document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); document.removeEventListener('pointercancel', cancel, true); if (gh) gh.remove(); gh = null; document.querySelectorAll('.en.w4drop,.en.glow').forEach(function (n) { n.classList.remove('w4drop'); }); }
+    function mv(ev) {
+      if (!on0) { if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 14) return; on0 = true; UI.dragging = 1; UI.sel = i; var g = G(), hh = g.hs[g.b.cur], tg = hh && hh.hand[i] && E.eff(hh.hand[i]).tgt; render(); gh = el.cloneNode(true); gh.className = el.className + ' w4ghost'; var r = el.getBoundingClientRect(); gh.style.cssText = 'position:fixed;z-index:95;pointer-events:none;width:' + r.width + 'px;height:' + r.height + 'px;left:0;top:0;transform:translate(' + (ev.clientX - r.width / 2) + 'px,' + (ev.clientY - r.height * .7) + 'px) rotate(-4deg) scale(1.08)'; document.body.appendChild(gh); if (tg) foes().forEach(function (n) { n.classList.add('glow'); }); }
+      if (gh) { var w = parseFloat(gh.style.width), hgt = parseFloat(gh.style.height); gh.style.transform = 'translate(' + (ev.clientX - w / 2) + 'px,' + (ev.clientY - hgt * .7) + 'px) rotate(-4deg) scale(1.08)'; }
+      var t = under(ev.clientX, ev.clientY); if (t !== hot) { hot = t; foes().forEach(function (n) { n.classList.toggle('w4drop', +n.getAttribute('data-w').slice(1) === t); }); if (t >= 0) { try { navigator.vibrate && navigator.vibrate(10); } catch (e) { } } }
+      ev.preventDefault();
+    }
+    function up(ev) {
+      var was = on0; end(); if (!was) return; UI.dragging = 0; UI.peeked = Date.now(); var g = G(); if (!g || !g.b || g.b.ph !== 'p' || UI.busy) { render(); return; }
+      var hh = g.hs[g.b.cur], c = hh.hand[i], tg = c && E.eff(c).tgt, t = under(ev.clientX, ev.clientY), hr = document.querySelector('.hand'), above = hr && ev.clientY < hr.getBoundingClientRect().top - 10;
+      if (tg && t >= 0) { try { navigator.vibrate && navigator.vibrate(18); } catch (e) { } playIt(i, t); }
+      else if (!tg && above) { try { navigator.vibrate && navigator.vibrate(18); } catch (e) { } playIt(i); }
+      else { UI.sel = -1; render(); }
+    }
+    function cancel() { end(); UI.dragging = 0; UI.sel = -1; render(); }
+    el.addEventListener('pointerdown', function (ev) { if (UI.busy || (window.GXT && GXT.active())) return; sx = ev.clientX; sy = ev.clientY; on0 = false; hot = -1; document.addEventListener('pointermove', mv, true); document.addEventListener('pointerup', up, true); document.addEventListener('pointercancel', cancel, true); });
+    el.style.touchAction = 'none';
+  }
   function holdPeek(el, c) {
     var t = 0, x0 = 0, y0 = 0;
     function stop() { if (t) { clearTimeout(t); t = 0; } }
@@ -387,7 +410,7 @@
     if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), el = cardEl(c); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
-      el.setAttribute('data-c', i); holdPeek(el, c); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
+      el.setAttribute('data-c', i); holdPeek(el, c); if (ok) dragPlay(el, i); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
     });
     if (UI.sel >= 0) hand.classList.add('hassel');
     st.appendChild(hand);
