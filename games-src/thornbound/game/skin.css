@@ -51,3 +51,9 @@ html.sk .gx-drawer{background-color:#e9d7a8}
 /* UI bar 1: >= 16px text on wide screens (bars, chips, rivals, log lines) */
 @media (min-width:1024px){#barstat,#barstat *,#rivals,#rivals *,.gx-drawer small,.gx-drawer .small,.gxh-bub .gxh-tx{font-size:max(1em,16px)}#rivals *{font-size:16px}}
 @media (min-width:1024px){.gxh-bub .gxh-tx,.gxh-bub .gxh-tt,#boardd .gx-drawer-body *,#boardd .gx-drawer-body{font-size:max(1em,16px)!important}}
+@media (min-width:1024px){.tbtn span{font-size:1rem}#start .st-c{font-size:1rem}}
+@media (min-width:1024px){#tbturn .tbt-chip,#tbturn .tbt-skip{font-size:16px}#tbturn .tbt-line{font-size:17px}}
+.rules details>summary{background:#2a1838;color:#f6ecd2;padding:8px 10px;border-radius:8px}
+#setbody .mrow>button.btn>span{background:#f6ecd2;color:#2a1808;padding:0 6px;border-radius:4px}
+#setbody p.small{background:#2a1838;color:#f6ecd2;padding:6px 8px;border-radius:6px}
+.rules .quick p{background:#2a1838;color:#f6ecd2;padding:6px 8px;border-radius:6px}
