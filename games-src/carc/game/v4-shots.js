@@ -36,6 +36,7 @@ async function tapEl(p, el) { const r = await el.evaluate(e => { const b = e.get
     for (let t = 1; t <= TURNS; t++) {
       for (let k = 0; k < 80; k++) { const ok = await p.evaluate(() => typeof myTurn === 'function' && myTurn('place') && !!document.querySelector('.glow')); if (ok) break; if (await p.$('.card[aria-label=Result]')) break; const tip = await p.$('.gxh-bub .gxh-ok'); if (tip && await tip.isVisible()) await tapEl(p, tip); await sleep(300); }
       if (await p.$('.card[aria-label=Result]')) break;
+      if (t === 1 && await p.$('#goalok')) { await shot(0, 'goal'); await tapEl(p, await p.$('#goalok')); }
       await shot(t, '1-pick');
       const ht = await p.$('#htile'); if (ht) await tapEl(p, ht);
       await shot(t, '2-aim');
