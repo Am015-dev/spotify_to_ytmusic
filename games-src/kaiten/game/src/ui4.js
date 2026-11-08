@@ -151,7 +151,7 @@ function showFinal() {
   const ws = G.winners || [], me = viewSeat(), iWin = me >= 0 && ws.includes(me);
   if (UI.fz) UI.fz.crown = true; UI.overShown = true; renderDock(); markWinners();
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again', cls: 'go' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
-  rs.replaceChildren(h('div.rsbox.bar', { role: 'group', 'aria-label': 'Result' }, bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
+  rs.replaceChildren(h('div.rsbox.bar', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Result' }, bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
   try {
     if (UI.mode !== 'tutorial' && !UI.camp) {
       const box = rs.querySelector('.rsbox');
