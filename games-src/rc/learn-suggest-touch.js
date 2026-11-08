@@ -16,6 +16,7 @@ const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));const sleep=ms
  while(Date.now()-t0<(+process.env.MAXMS||1000000)){
    const st=await p.evaluate(()=>({over:G&&G.over,st:PHO.st,round:G&&G.round,bub:!!document.querySelector('#coachb:not([hidden])')}));
    if(st.over&&!(await centre('#modal button')))break;
+   if(await tap('#coachb [data-coach=keep]')){await sleep(400);continue}
    if(st.bub)await tap('#coachb [data-coach=x]');
    if((st.st==='plan'||st.st==='plan2')&&sug!==st.round){if(await tap('#bf [data-a=suggest]')){sug=st.round;sugTaps++;await sleep(500);continue}}
    let did=false;
