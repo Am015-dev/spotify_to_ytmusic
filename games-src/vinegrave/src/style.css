@@ -488,3 +488,7 @@ body:has(#rs:not([hidden])) #turnover,body:has(.gxt-cell) #turnover,body:has(.gx
   #myres{min-height:36px}#acts .btn{min-height:36px}
 }
 @media (max-width:999px){body[data-vtab="map"] .ter{align-items:stretch}body[data-vtab="map"] .site{aspect-ratio:auto!important}}
+/* result: the win / lose picture as a printed banner above the scores (never behind text) */
+.rbox .rart{height:clamp(90px,20vh,170px);margin:-18px -18px 4px;border-radius:17px 17px 0 0;background:#2a1f14;border-bottom:3px solid #d9a441;flex:none}
+.rbox .rart.hasart{background-size:cover!important;background-position:center 40%!important}
+@media (max-height:640px){.rbox .rart{display:none}}
