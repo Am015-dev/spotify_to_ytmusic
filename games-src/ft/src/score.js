@@ -1,6 +1,9 @@
 // ===================== SEE how you score (BRIEF-PLAYABLE Addendum 5): turn tracker, move preview, gain badges, score breakdown, turn rating =====================
 // Reads the game only (G, outcomes() from ai.js, validMoves via stepTargets) and draws small overlays; it never plays or changes a move.
 // gain = real points a finished walk adds now (tile number, palace/palm, Sages x2, Advisors x1 +10 per rival passed, Masons' coins, goods sets). The best gain over all walks is the "greedy best".
+// ---- three modes (Addendum 7): Learn to play = the coached game (bubbles); Play = clean; Hints = a top-bar toggle, off by default: previews, badges, ratings, What should I do? ----
+const HINTS={on:false};try{HINTS.on=localStorage.getItem('soq_hints')==='1'}catch(e){}
+function hintsOn(){return !!G&&!!(G.coach||HINTS.on)}
 const SC={key:'',starts:{},bestTotal:0,bestLabel:'',pend:null,hov:null,card:null,cardT:0};
 const scMine=()=>!!G&&!G.over&&G.phase==='turn'&&G.cur===0&&G.pl[0]&&G.pl[0].human;
 function scParts(p,o){const t=G.board[o.e],parts=[];
@@ -39,8 +42,8 @@ function scPreview(){const ln=document.getElementById('line');if(!ln)return;cons
   else if(G.phase==='bid'&&G.bidQueue[0]&&G.bidQueue[0].p===0)txt='Dearer spots play first. Each coin spent is a point lost.';
   else if(scMine()&&G.act&&(G.step==='tribe'||G.step==='tile'||G.step==='sell')){const a=G.act;txt='You took '+a.n+' '+(a.n>1?MPLUR[a.color]:MNAME[a.color])+' on '+tileName(G.board[a.tile])+'. Finish the tile action, then your turn ends.'}
   e.hidden=!txt;e.textContent=txt}
-function scBadges(){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
-  if(!scMine()||G.step!=='move'||online())return;scCompute();const add=(i,v,star)=>{const el=tileEl(i);if(!el)return;const b=document.createElement('i');b.className='gain'+(star?' star':'');b.textContent=(star?'★':'')+'+'+v;b.setAttribute('data-help','');b.setAttribute('aria-hidden','true');el.appendChild(b)};
+function scBadges(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
+  if(!hn||!scMine()||G.step!=='move'||online())return;scCompute();const add=(i,v,star)=>{const el=tileEl(i);if(!el)return;const b=document.createElement('i');b.className='gain'+(star?' star':'');b.textContent=(star?'★':'')+'+'+v;b.setAttribute('data-help','');b.setAttribute('aria-hidden','true');el.appendChild(b)};
   if(!G.move){const top=SC.bestTotal;for(const s in SC.starts){const x=SC.starts[s].best;if(x)add(+s,x.total,x.total>=top&&top>0)}}
   else{const sx=SC.starts[G.move.start];if(!sx)return;let top=-1;const res={};for(const nx of stepTargets()){let b=null;for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!b||x.total>b.total))b=x;if(b){res[nx]=b;top=Math.max(top,b.total)}}
     for(const nx in res)add(+nx,res[nx].total,res[nx].total>=top&&top>0)}}
@@ -59,5 +62,12 @@ function scTurnEnd(){if(!G||G.over||online())return;
     const why=r==='Good'?'that was the best or close to it.':'the best walk was +'+bt+' ('+SC.bestLabel+').';
     const g=LORE.guide;scCard('Turn over: you took '+d.n+' '+(d.n>1?MPLUR[d.c]:MNAME[d.c])+' (+'+a+'). '+r+': '+why,typeof COACH!=='undefined'&&G.coach?g.face:'📋',typeof COACH!=='undefined'&&G.coach?g.name:'Your turn')}
 }
-(function(){const o=render;render=function(){o.apply(this,arguments);try{if(G){scTurnEnd();scTracker();scPreview();scBadges();scSeats();if(typeof fit==='function')fit()}else{const t=document.getElementById('trk');if(t)t.hidden=true;const t2=document.getElementById('trk2');if(t2)t2.hidden=true}}catch(e){console.error(e)}}})();
+(function(){const o=render;render=function(){o.apply(this,arguments);try{if(G){const hn=hintsOn();const hh=document.documentElement.classList;hh.toggle('m-play',!G.coach);hh.toggle('m-hints',hn);scModeUI(hn);scTracker();if(hn){scTurnEnd();scPreview()}else{const t2=document.getElementById('trk2');if(t2)t2.hidden=true;SC.pend=null}scBadges(hn);scSeats();if(typeof fit==='function')fit()}else{const t=document.getElementById('trk');if(t)t.hidden=true;const t2=document.getElementById('trk2');if(t2)t2.hidden=true}}catch(e){console.error(e)}}})();
 document.addEventListener('pointerover',e=>{const t=e.target.closest&&e.target.closest('#grid [data-tile]');const i=t?+t.dataset.tile:null;if(i!==SC.hov){SC.hov=i;if(G&&scMine()&&G.move)try{scPreview()}catch(x){}}});
+
+// the Hints button in the top bar, the "What should I do?" button, the goal card, and a tap on a score chip opens the score drawer
+function scModeUI(hn){const b=document.getElementById('hintsbtn');if(b){b.setAttribute('aria-pressed',String(!!HINTS.on));b.classList.toggle('on',!!HINTS.on);b.hidden=!!G.coach}
+  const w=document.getElementById('whatbtn');if(w)w.hidden=!hn||!G.pl[0].human||online()||G.over}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#hintsbtn');if(b){HINTS.on=!HINTS.on;try{localStorage.setItem('soq_hints',HINTS.on?'1':'0')}catch(x){}if(!HINTS.on){try{GXH.hide()}catch(x){}}render();return}
+  const c=e.target.closest&&e.target.closest('#seats .sch');if(c&&!c.classList.contains('glow')&&G&&!G.over&&!UI.modal){try{GX.show('plrd');renderPopups()}catch(x){}}});
+(function(){const o=beginGame;beginGame=function(){const r=o.apply(this,arguments);try{if(G&&!G.coach&&!G.tut&&!UI.camp&&!online()&&!G.over){UI.modal='goal';render()}}catch(e){console.error(e)}return r}})();

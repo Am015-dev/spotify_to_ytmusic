@@ -164,8 +164,8 @@ function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice()
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'sands-of-qamar',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,#acts .ab,#acts .sp-b,#mine .gchip,#finger'});
-  GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
+  GXH.init({game:'sands-of-qamar',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,#acts .ab,#acts .sp-b,#mine .gchip,#finger'});
+  GXH.bulb({el:'#whatbtn',suggest:hlpSuggest,rulesFor:hlpPhase});try{GXH.setEnabled(false)}catch(e){}   // bubbles live only in Learn to play; the bulb is the Hints button "What should I do?"
   const hm=document.getElementById('gxhmenu');if(hm)hm.innerHTML=GXH.settingsHTML({rowClass:'',btnClass:'btn sm'});
   // a tap that lands on a bubble only dismisses it (the board under it must not act)
   let sw=0;document.addEventListener('pointerdown',e=>{sw=0;const b=document.querySelector('.gxh-bub.on:not(.gxt-bub)');if(!b||(e.target.closest&&e.target.closest('.gxh-link')))return;const r=b.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)sw=Date.now()},true);

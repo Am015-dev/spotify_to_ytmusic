@@ -272,9 +272,32 @@ html.short .trk2,html.short .sch .s4{display:none}html.short .trk{padding:0 8px}
 html.short .sch .s4{display:block}html.short .sch .s3{display:none}
 .plban{top:42%}
 .trk-p{margin-left:0}.trk .trk-r{margin-left:auto}
-.trk,.trk2{position:relative;z-index:2147483600}
 .trk .trk-w.me{color:#3b1c0e;text-decoration:underline;text-underline-offset:3px}
 .trk .trk-p{margin-left:auto}.trk .trk-r{margin-left:0}html.short .trk .trk-r{display:none}
 .trk .trk-p{margin-left:0}.trk .trk-r{margin-left:auto}
 html.land .gx-board{grid-template-rows:auto auto auto auto minmax(0,1fr) auto;grid-template-areas:"gw mkt seats" "gw mkt line" "gw mkt trk" "gw mkt trk2" "gw mkt ." "gw mine acts"}
 html.land #trk{grid-area:trk;flex-wrap:wrap;align-self:start}html.land #trk2{grid-area:trk2;white-space:normal;align-self:start}
+/* Addendum 7: Play is clean (board, hand, tracker, one score line, top bar); the extras belong to Hints and Learn to play */
+html.m-play .sch .s3,html.m-play .sch .s4{display:none}
+html.m-play:not(.m-hints) .trk2{display:none}
+#hintsbtn[aria-pressed="true"]{background:#ffd75a;color:#3b1c0e;border-radius:10px}#hintsbtn[hidden],#whatbtn[hidden]{display:none}
+#whatbtn{align-self:flex-start;margin:2px 0}html.land #whatbtn{grid-area:what;align-self:start}
+html.land .gx-board{grid-template-rows:auto auto auto auto auto minmax(0,1fr) auto;grid-template-areas:"gw mkt seats" "gw mkt line" "gw mkt trk" "gw mkt trk2" "gw mkt what" "gw mkt ." "gw mine acts"}
+.mbox.goal .goal-l{margin:6px 0 0;padding-left:18px;font-size:15px}.mbox.goal .goal-l li{margin:5px 0}
+.gx-ibtn .hint-ic{font-style:normal;font-size:20px;line-height:1}
+/* urgent asset wiring: deck piles, gallery, 3D turntables, thief/expansion chips, sparkle on point pops, painted seat chips, bigger goods */
+.deckback{display:flex;align-items:center;gap:4px;justify-content:center;min-height:34px;font:800 13px/1 var(--ff-b,system-ui);color:#3b1c0e}.deckback i{width:26px;height:34px;border-radius:4px;background:center/cover no-repeat;border:1px solid #8a5a18;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.drow .deckback{flex:0 0 auto;padding:0 4px}
+.asgal h4{margin:10px 0 4px}.asrow{display:flex;flex-wrap:wrap;gap:8px}.asrow figure{margin:0;text-align:center;font:700 13px/1.2 var(--ff-b,system-ui);width:64px}.asrow img{width:56px;height:70px;object-fit:contain;display:block;margin:0 auto 2px}.asrow.show3 figure{width:96px}.asrow canvas.t3d{width:96px;height:96px;display:block}
+.hero3d{position:relative;height:0}.hero3d canvas.t3d{position:absolute;right:4px;top:-8px;width:88px;height:88px;z-index:2;pointer-events:none}
+.chk-ic{width:22px;height:22px;object-fit:contain;vertical-align:middle;margin:0 4px}
+.plpop.up::before{content:'';display:inline-block;width:18px;height:18px;margin-right:4px;vertical-align:middle;background:url(media/fx-sparkle.webp) center/contain no-repeat}
+html.g3d .tok.palm{--sp:var(--g3-palm)}html.g3d .tok.pal{--sp:var(--g3-palace)}
+html.g3d .own.cam{background:var(--pc) var(--g3-camel) center 55%/34px no-repeat}
+html:not(.land) .mcard:not(.empty) .mi{height:26px!important}html:not(.land) .mcard:not(.empty),html:not(.land):not(.short) .mcard:not(.empty){height:46px}
+html.ti .mbox.start canvas.t3d,.mbox canvas.t3d{display:block;width:88px;height:88px;max-height:none;border-radius:0;object-fit:contain}
+.hero3d canvas.t3d{position:absolute;right:4px;top:-8px}
+.tipart{display:block;width:180px;max-width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:4px}
+/* painted art everywhere now: numbers and names sit on solid chips */
+.deckback b{background:#fff6dc;color:#3b1c0e;border-radius:8px;padding:1px 5px}@media (min-width:1024px){.deckback b{font-size:16px}}
+.spot small.ord{background:#fff6dc!important;color:#3b1c0e!important}
