@@ -46,7 +46,9 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   // scores pop up where they are earned
   const tf=cur.act&&cur.act.tile!=null?tileEl(cur.act.tile):null;
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}
-    const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):ctr(se.getBoundingClientRect());floatText((d>0?'+':'−')+Math.abs(d),at,d>0?'up':'dn');if(tf&&i===actor){const p2=ctr(se.getBoundingClientRect());if(Math.hypot(p2.x-at.x,p2.y-at.y)>40)floatText((d>0?'+':'−')+Math.abs(d),p2,d>0?'up':'dn')}})}
+    if(G&&G.over)return;   // no score chips over the result card
+    const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+' pts';   // every chip says whose points and that they are points
+    const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):ctr(se.getBoundingClientRect());floatText(lab,at,d>0?'up':'dn')})}
 function seatPoint(i){const se=seatEl(i);return se?ctr(se.getBoundingClientRect()):{x:innerWidth/2,y:20}}
 // ---------- the pop-over for a choice on a tile, a seat or a card ----------
 function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;if(!c||!G){el.hidden=true;el.innerHTML='';return}
