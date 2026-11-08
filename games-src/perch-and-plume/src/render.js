@@ -24,9 +24,9 @@ function costItems(b) {
 function bigCardHTML(id, attrs, extra, cls) {
   var b = B[id], sp = shortPower(id), habs = b.h.split('');
   var h = '<div class="bc big ' + (cls || '') + '" ' + (attrs || '') + ' aria-label="' + esc(b.n + ', ' + b.p + ' points, ' + sp.when + ': ' + sp.txt) + '">';
-  h += '<div class="bk-pic">' + artHTML('bird-' + id) + '<span class="vpb"><b>' + b.p + '</b><small>' + (b.p === 1 ? 'point' : 'points') + '</small></span></div>';
+  h += '<div class="bk-pic">' + artHTML('bird-' + id) + '</div>';
   h += '<div class="bk-body"><div class="bk-hab">' + habs.map(function (x) { return '<span class="hb h' + x + '">' + HABW[x] + '</span>'; }).join('') + '</div>';
-  h += '<div class="bk-nm">' + esc(b.n) + '</div>';
+  h += '<div class="bk-hd"><span class="bk-nm">' + esc(b.n) + '</span><span class="vpb"><b>' + b.p + '</b><small>' + (b.p === 1 ? 'point' : 'points') + '</small></span></div>';
   h += '<div class="bk-cost">' + (b.c.length ? costItems(b) : '<span class="ci free">Free</span>') + '</div>';
   h += '<div class="bk-pw ' + (sp.col || 'none') + '">' + (sp.when ? '<b>' + sp.when + ':</b> ' : '') + esc(sp.txt) + '</div>';
   return h + (extra || '') + '</div></div>';
@@ -96,7 +96,7 @@ function renderMat(p, vs) {
     for (var c = 0; c < 5; c++) {
       var s = p.board[r][c];
       if (s) h += '<div class="slot">' + cardHTML(s.id, 'slot', s, 'data-a="bird" data-h="' + r + '" data-c="' + c + '" role="button" tabindex="0"') + '</div>';
-      else h += '<div class="slot' + (c === p.board[r].length ? ' next' : '') + '" data-a="slot" data-h="' + r + '" data-c="' + c + '">' + (c === p.board[r].length ? '<span class="ec">' + (PP.EGGCOST[c] ? eggIcon() + PP.EGGCOST[c] : 'free') + '</span>' : '') + '</div>';
+      else h += '<div class="slot' + (c === p.board[r].length ? ' next' : '') + '" data-a="slot" data-h="' + r + '" data-c="' + c + '">' + (c === p.board[r].length ? '<span class="ec">' + (PP.EGGCOST[c] ? eggIcon() + PP.EGGCOST[c] + (PP.EGGCOST[c] === 1 ? ' egg' : ' eggs') : 'free') + '</span>' : '') + '</div>';
     }
     h += '</div>';
   }
@@ -119,8 +119,9 @@ function renderDock(p, vs, cur) {
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
   var bp = mine && !Q ? bestPlay(G, vs) : null;
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
-  $('#hand').innerHTML = p.hand.length ? p.hand.map(function (id, i) {
-    var b = B[id], st;
+  var order = p.hand.map(function (id, i) { return i; }).sort(function (x, y) { return (ok[y] ? 1 : 0) - (ok[x] ? 1 : 0) || (ok[x] ? B[p.hand[y]].p - B[p.hand[x]].p : 0) || x - y; });   // birds you can play first, best first
+  $('#hand').innerHTML = p.hand.length ? order.map(function (i) {
+    var id = p.hand[i], b = B[id], st;
     if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
     else if (!mine) st = '';
     else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points')) + '</div>';

@@ -74,7 +74,7 @@ document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="a4"]'); if (!t || !G || !myTurn() || G.q) return;
   var k = t.dataset.k, inf = actInfo(G, UI.view)[k];
   if (!inf.ok) { toast(inf.why); return; }
-  if (k === 'play') { UI.pickBird = true; var bp = bestPlay(G, UI.view); UI.hix = bp ? bp.i : 0; render(); handGo(UI.hix); toast('Swipe your birds. Tap a glowing one to play it.'); return; }
+  if (k === 'play') { UI.pickBird = true; UI.hix = 0; render(); handGo(0); toast('Swipe your birds. Tap a glowing one to play it.'); return; }
   if (!tutGate({ type: 'tap', what: 'ract', h: inf.h })) return;
   UI.sel = null; UI.pickBird = false; human({ t: 'act', a: k });
 });
@@ -96,7 +96,7 @@ document.addEventListener('click', function (e) {
 }, true);
 function handScrollSync() {
   var h = $('#hand'); if (!h || h.dataset.sync) return; h.dataset.sync = '1';
-  h.addEventListener('scroll', function () { clearTimeout(h._t); h._t = setTimeout(function () { var cs = h.querySelectorAll('.bc'); if (!cs.length) return; var w = cs[0].offsetWidth + 8; var i = Math.round(h.scrollLeft / w); if (i !== UI.hix) { UI.hix = i; handPager(); } }, 80); }, { passive: true });
+  h.addEventListener('scroll', function () { clearTimeout(h._t); h._t = setTimeout(function () { var cs = h.querySelectorAll('.bc'); if (!cs.length) return; var w = cs[0].offsetWidth + 16; var i = Math.round(h.scrollLeft / w); if (i !== UI.hix) { UI.hix = i; handPager(); } }, 80); }, { passive: true });
 }
 // ---------------- turn tracker + score breakdown (top of the board)
 function trackerHTML() {
@@ -118,7 +118,7 @@ function scoreHTML() {
     var s = sc[i], oth = s.goals + s.bonus + s.cache + s.tuck + s.lead, me = i === UI.view, L = lead && s.total === top;
     return '<button type="button" class="sr' + (me ? ' me' : '') + (L ? ' lead' : '') + '" data-a="' + (me ? 'mysc' : 'opp') + '" data-s="' + i + '" data-br="' + pl(s.birds, 'bird pt') + ' + ' + pl(s.eggs, 'egg') + ' + ' + oth + ' other" aria-label="' + esc((me ? 'You' : p.name) + ': ' + s.total + ' points' + (L ? ', leading' : '')) + '">' +
       '<span class="sn">' + (L ? '<em class="crown" aria-hidden="true">&#9733;</em>' : '') + esc(me && humans().length === 1 ? 'You' : p.name) + '</span>' +
-      '<span class="sp"><b>' + s.birds + '</b><small>birds</small></span><span class="sp"><b>' + s.eggs + '</b><small>eggs</small></span><span class="sp"><b>' + oth + '</b><small>other</small></span>' +
+      '<span class="sp"><b>' + s.birds + '</b><small>bird pts</small></span><span class="sp"><b>' + s.eggs + '</b><small>eggs</small></span><span class="sp"><b>' + oth + '</b><small>other</small></span>' +
       '<span class="st"><b>' + s.total + '</b><small>' + (L ? 'leads' : 'pts') + '</small></span></button>';
   }).join('');
   return '<div class="scb" role="group" aria-label="Score">' + rows + '</div>';

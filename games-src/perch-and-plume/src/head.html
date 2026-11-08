@@ -297,7 +297,7 @@ p.voice{font-size:16px;font-style:italic;margin:6px 0 10px}
 .later li{margin:4px 0;font-size:14px}
 
 #barstat:empty{display:none}
-@media (max-width:999px){:root{--gx-sheet-h:52dvh}.ract .bon{display:none}}
+@media (max-width:999px){:root{--gx-sheet-h:50dvh}.ract .bon{display:none}}
 body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 /* ===== v3 readable phone UI (turnui.js): tracker, 4 big actions, one big card at a time, score breakdown ===== */
 #trk .trk{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:6px 10px;border-radius:12px;background:#23412f;color:#fff6e0;font-size:15px}
@@ -336,8 +336,9 @@ body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 #foodrow .fd.bon{appearance:none;border:1px solid #8a6f2e;border-radius:10px;background:#fff3d6;min-height:44px;padding:0 10px;cursor:pointer;color:#2a2116;font-weight:700}
 #foodrow .fd.none{font-weight:400}
 /* the hand: one big readable card at a time */
-#hand{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px 6px 4px;min-height:0;scrollbar-width:none}
-#hand .bc.big{flex:0 0 calc(100% - 28px);width:auto;height:auto;scroll-snap-align:center}
+#hand{flex:0 0 auto;display:flex;gap:16px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;padding:12px 6px 6px;min-height:0;scrollbar-width:none}
+#hand .bc.big{flex:0 0 100%;width:auto;height:auto;scroll-snap-align:start}
+#hpg,#foodrow,#acts,#trk,#prompt{flex:0 0 auto}
 #hpg{display:flex;align-items:center;justify-content:center;gap:12px;font-size:15px;font-weight:700}
 #hpg:empty{display:none}
 .hpb{appearance:none;width:48px;height:44px;border-radius:12px;border:1px solid rgba(0,0,0,.3);background:#fffaf0;font-size:26px;line-height:1;cursor:pointer;color:#2a2116}
@@ -346,7 +347,8 @@ body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 .bc.big .bk-pic{position:relative;flex:0 0 38%;border-radius:6px 0 0 6px;overflow:hidden;background:#ddd;min-height:170px}
 .bc.big .bk-pic .art{position:absolute;inset:0;width:100%;height:100%;display:block}
 .bc.big .bk-pic .art img,.bc.big .bk-pic .art svg{width:100%;height:100%;object-fit:cover}
-.vpb{position:absolute;left:6px;top:6px;display:flex;flex-direction:column;align-items:center;min-width:46px;padding:2px 6px;border-radius:12px;background:#23412f;color:#fff;line-height:1}
+.bk-hd{display:flex;align-items:flex-start;gap:8px;justify-content:space-between}
+.vpb{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;min-width:46px;padding:2px 6px;border-radius:12px;background:#23412f;color:#fff;line-height:1}
 .vpb b{font-size:28px}
 .vpb small{font-size:14px}
 .bc.big .bk-body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:5px;padding:7px 9px 8px}
@@ -393,6 +395,6 @@ body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 .sr .st{justify-self:end}.sr .st b{font-size:22px;color:#ffe2a0}
 @media (max-width:640px){.sr{grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:0 6px}.sr .sp{display:none}.sr .sn{grid-column:1}.sr .st{grid-row:1/3;grid-column:2}
 .sr::after{content:attr(data-br);grid-column:1;font-size:14px;opacity:.95;white-space:nowrap}}
-@media (min-width:1000px){#hand{flex-wrap:nowrap;overflow-x:auto}#hand .bc.big{flex:0 0 calc(100% - 40px);height:auto}.bc.big .bk-pic{flex-basis:40%;min-height:220px}.bk-nm{font-size:20px}.bk-pw,.bk-st{font-size:16px}#trk .trk{font-size:16px}#trk .tr-why{font-size:16px}.a4{font-size:16px}.a4 .a4t b{font-size:18px}.sr,.sr .sp small,.sr .st small{font-size:16px}.rate{font-size:16px}#foodrow .fd small{font-size:16px}.bk-cost .ci small{font-size:16px}.bk-hab .hb{font-size:16px}.vpb small{font-size:16px}#foodrow .fl,#foodrow .fd,#hpg{font-size:16px}.bestb,.a4.tutpoint::after{font-size:16px}}
+@media (min-width:1000px){#hand{flex-wrap:nowrap;overflow-x:auto}#hand .bc.big{flex:0 0 100%;height:auto}.bc.big .bk-pic{flex-basis:40%;min-height:220px}.bk-nm{font-size:20px}.bk-pw,.bk-st{font-size:16px}#trk .trk{font-size:16px}#trk .tr-why{font-size:16px}.a4{font-size:16px}.a4 .a4t b{font-size:18px}.sr,.sr .sp small,.sr .st small{font-size:16px}.rate{font-size:16px}#foodrow .fd small{font-size:16px}.bk-cost .ci small{font-size:16px}.bk-hab .hb{font-size:16px}.vpb small{font-size:16px}#foodrow .fl,#foodrow .fd,#hpg{font-size:16px}.bestb,.a4.tutpoint::after{font-size:16px}}
 </style>
 </head>
