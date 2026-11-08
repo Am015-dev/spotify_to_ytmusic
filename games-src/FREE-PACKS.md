@@ -56,6 +56,25 @@ Per-game rows (two picks, download link, licence quote, coverage, sheet) are in 
 | tidewake | KayKit Medieval Hexagon (no ships or monsters; 2nd: Quaternius Card Kit) | CC0 | ~33% | free-packs/tidewake-sheet.webp |
 | twin-thrones | KayKit Medieval Hexagon + Board Game Bits (2nd: Quaternius Card Kit) | CC0 | ~33% | free-packs/twin-thrones-sheet.webp |
 
+## Status 8 Nov 2026: temporary library installed (W410)
+
+Rule from the owner: never replace, overwrite or unwire owner art; one art style per game; emberclimb uses owner art only. `games-src/free-library/_tools/install_library.py SLUG`
+refuses every game with owner art (the 15 in `assets-inbox/` plus emberclimb). Per-slot sources and licences: `games-src/free-library/<slug>/_MAP.tsv` and `_CREDITS.md`.
+
+| Game | Real slots | Fallback | Main sources | Notes |
+|---|---|---|---|---|
+| wildmark | 46 of 47 | 1 (acorn token) | Audubon plates (PD), 16th-century salmon watercolours, Met and NGA landscapes (CC0) | goat portrait is a soft crop; two elk cards are crops of one plate |
+| perch-and-plume | 185 of 186 | 1 (ui-tray) | NGA open data bird plates (CC0), Audubon (PD), game-icons.net icons (CC BY 3.0: Lorc, Delapouite, Skoll, Sbed) | 120 birds matched by species from about 420 plates; rare caption slivers possible |
+| vinegrave | 133 of 170 | 37 | Met Open Access objects (CC0), Catherwood engravings (PD) | 30 camp-gear cards use generic artefacts; pale cutout shadows on some idols |
+| stitchwise | 56 of 63 | 7 | Met quilts, textiles and paintings (CC0) | fabrics not guaranteed seamless |
+| vale-of-banners | 91 of 92 | 1 | KayKit Medieval Hexagon renders (CC0), Met tapestries and manuscripts (CC0) | low-poly 3D tiles; some lore crops similar |
+| deep-signal | 35 of 47 | 12 | Haeckel plates (PD, Internet Archive), game-icons.net (CC BY 3.0) | portraits keep the older art |
+| redline-rally | 22 of 43 | 21 | game-icons.net glyph cards (CC BY 3.0) | tracks, cars, portraits keep the older art |
+| twin-thrones | 126 of 126 | 0 | KayKit Medieval Hexagon renders (CC0), game-icons.net (CC BY 3.0) | 3D-render style |
+
+Not touched (owner art): the 15 `assets-inbox/` games and emberclimb. Credit lines for CC BY packs must be shown in the game credits when each game is deployed.
+deep-signal and redline-rally still mix new art with older Kenney art in their fallback slots; drop or finish them if the owner wants one style per game.
+
 ## Needs an owner decision
 
 - **Pixel Frog "Tiny Swords" (picked for rampart-and-vine):** licence allows personal and commercial use but says "You may not redistribute, resell, or repackage". The games ship as public files, so it needs a yes before use. The CC0 alternative is Kenney Tiny Town (same flat style the owner rejected).

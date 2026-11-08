@@ -186,13 +186,20 @@ function bfShow(k){const el=bfEl(k);if(el)el.classList.remove('hid');BF.hide.del
 function bfPop(txt,at,cls,big){if(!at||!BF.fl)return;const d=document.createElement('div');d.className='bf-pop '+(cls||'');if(big)d.classList.add('big');d.textContent=txt;
   d.style.left=(at.left+at.width/2)+'px';d.style.top=(at.top+at.height/2)+'px';BF.fl.appendChild(d);
   if(!bfAnimOK()){setTimeout(()=>d.remove(),10);return}
+  const wordy=/[a-z]{2}/i.test(txt);if(wordy){d.classList.add('wordy');d.animate([{transform:'translate(-50%,-50%) scale(.6)',opacity:0},{transform:'translate(-50%,-90%) scale(1)',opacity:1,offset:.06},{transform:'translate(-50%,-100%) scale(1)',opacity:1,offset:.92},{transform:'translate(-50%,-110%) scale(1)',opacity:0}],{duration:bfReadMs(txt),easing:'ease-out',fill:'forwards'}).finished.then(()=>d.remove(),()=>d.remove());return}
   bfTrack(d.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-80%) scale(1.25)',opacity:1,offset:.25},{transform:'translate(-50%,-160%) scale(1)',opacity:0}],{duration:bfD(big?1500:1150),easing:'ease-out',fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
 function bfChipR(i){return bfR(bfQ(`[data-bfchip="${i}"]`))}
 function bfChipPop(i,txt,cls){const el=bfQ(`[data-bfchip="${i}"]`);if(!el)return;const r=bfR(el);if(r)r.top+=r.height*.9;bfPop(txt,r,(cls||'')+' chip');el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}
 function bfScore(i,v){const el=bfQ(`[data-bfsc="${i}"]`);if(el)el.textContent='★'+v}
-function bfBanner(t,sub){const tb=BF.tbl;if(!tb)return;const d=document.createElement('div');d.className='bf-ban';d.innerHTML=`<b>${esc(t)}</b>${sub?`<small>${esc(sub)}</small>`:''}`;tb.appendChild(d);
-  if(!bfAnimOK()){d.remove();return}
-  bfTrack(d.animate([{opacity:0,transform:'translateY(-50%) scale(.7)'},{opacity:1,transform:'translateY(-50%) scale(1.05)',offset:.18},{opacity:1,transform:'translateY(-50%) scale(1)',offset:.8},{opacity:0,transform:'translateY(-50%) scale(1)'}],{duration:bfD(1500),fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
+// W466: a message stays until tapped or for 4 s + 1 s per 10 words; one at a time (a newer one waits its turn)
+function bfReadMs(t){const n=String(t||'').trim().split(/\s+/).filter(Boolean).length;return 4000+Math.ceil(n/10)*1000+400}
+function bfBanner(t,sub){const tb=BF.tbl;if(!tb)return;if(!bfAnimOK())return;BF.banQ=BF.banQ||[];BF.banQ.push([t,sub]);if(!BF.banOn)bfBanNext()}
+function bfBanNext(){const tb=BF.tbl;const n=BF.banQ&&BF.banQ.shift();if(!n||!tb){BF.banOn=null;return}const [t,sub]=n;
+  if(BF.banOn)BF.banOn.remove();const d=document.createElement('div');d.className='bf-ban';d.innerHTML=`<b>${esc(t)}</b>${sub?`<small>${esc(sub)}</small>`:''}`;tb.appendChild(d);BF.banOn=d;
+  d.animate([{opacity:0,transform:'translateY(-50%) scale(.8)'},{opacity:1,transform:'translateY(-50%) scale(1)'}],{duration:260,easing:'ease-out',fill:'forwards'});
+  const end=()=>{if(BF.banOn!==d)return;clearTimeout(BF.banT);BF.banOn=null;d.animate([{opacity:1},{opacity:0}],{duration:240,fill:'forwards'}).finished.then(()=>d.remove(),()=>d.remove());setTimeout(bfBanNext,260)};
+  d.__end=end;clearTimeout(BF.banT);BF.banT=setTimeout(end,bfReadMs(t+' '+(sub||'')))}
+function bfBanTap(){const d=BF.banOn;if(d&&d.__end&&Date.now()-(d.__t0||0)>0)d.__end()}
 // W388: the instruction line says whose turn it is, before every rival move
 function bfTurn(t){BF.say=t;try{bfDraw()}catch(e){}}   // the instruction line announces the turn (a floating pill failed the text-topmost check and covered the score chips)
 // one idea at a time, in two short lines at most, above the action (guided game only, each once)
@@ -202,7 +209,7 @@ const BF_TIPS={nofit:'Red ✗ colours fit no row.',slide:'Leftovers slid to the 
 function bfTipSeen(k){try{return (localStorage.getItem('sgz_tips')||'').split(',').includes(k)}catch(e){return false}}
 function bfTipMark(k){try{const a=(localStorage.getItem('sgz_tips')||'').split(',').filter(Boolean);if(!a.includes(k)){a.push(k);localStorage.setItem('sgz_tips',a.join(','))}}catch(e){}}
 function bfTip(k,force){if(UI.tut)return;if(!force&&(!UI.coach||(typeof GXH!=='undefined'&&!GXH.enabled())||bfTipSeen(k)))return;if(BF.seen['tip_'+k])return;BF.seen['tip_'+k]=1;if(!force)bfTipMark(k);BF.tip=BF_TIPS[k];bfHintSet();
-  clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},4200)}
+  clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},bfReadMs(BF.tip))}
 function bfHintSet(){if(!BF.hint||!BF.disp||!G)return;BF.hint.innerHTML=bfHintHTML(BF.disp,BF.busy?null:me());if(typeof hlpAfter==='function')hlpAfter()}
 // ---------- the engine's events go into a queue; each is played on the board in turn ----------
 function bfSync(){if(!G)return false;const gk=G.seed+':'+(G.gid||'');if(gk!==BF.gk){BF.gk=gk;BF.q.length=0;BF.disp=bfClone(G);BF.seen={};BF.resHide=false;BF.menu=false;BF.peek=null;BF.lastWarn=0;BF.adv=null;BF.advK='';BF.fingerOn=false;BF.deal=true;return true}return false}
@@ -216,7 +223,7 @@ async function bfRun(){if(BF.busy)return;BF.busy=true;const gk=BF.gk;clearTimeou
   finally{BF.busy=false;BF.rv=null;BF.fast=false;BF.say='';BF.actor=-1;BF.hide.clear();if(BF.fl)BF.fl.innerHTML='';BF.anims.length=0;if(G&&BF.gk===gk)BF.disp=bfClone(G);bfDraw();try{schedule()}catch(e){}}}
 async function bfStep(e){const S=BF.disp;
   if(e.t==='take')return bfTake(e.x);
-  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
+  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
   if(e.t==='wall')return bfWall(e.x);
   if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length)){if(UI.tut)await tutPause('floor');await bfFloors();}
     S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
@@ -276,7 +283,7 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
   const run=bfRun1(p.wall,x.r,x.c);const step=run.length>1?260:0;
   for(let i=0;i<run.length;i++){const [r,c]=run[i];const el=bfSlot(`w${x.p}_${r}_${c}`);if(el){el.style.setProperty('--d','0ms');el.classList.add('lit')}
     const v=Math.max(1,Math.round((i+1)*x.pts/run.length));if(run.length>1&&i<run.length-1)bfPop('+'+v,bfR(el),'good cnt');sfx('wall',Math.min(8,i+1));if(i<run.length-1)await bfWait(step)}
-  bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3){bfBanner(x.pts>=6?'Great chain! +'+x.pts:'Chain +'+x.pts,'');const me=bfQ('.bf-me');if(me){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
+  bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3){if(x.pts>=6)bfBanner('Great chain! +'+x.pts,'');const me=bfQ('.bf-me');if(me){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
   await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
   if(UI.tut)await tutPause('wall'+x.r,x);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
@@ -307,7 +314,7 @@ async function bfBonus(){const S=BF.disp;BF.say='End bonuses';
 function bfEnsure(){if(BF.root)return BF.root;const r=document.createElement('div');r.id='bf';r.setAttribute('aria-label','The table');
   r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-hint" role="status" aria-live="polite"></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
   document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-hint');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');
-  r.addEventListener('click',bfClick);r.addEventListener('pointerdown',()=>{if(BF.busy)bfSpeedUp()});return r}
+  r.addEventListener('click',bfClick);r.addEventListener('pointerdown',e=>{bfBanTap();if(BF.busy)bfSpeedUp();else bfDragDown(e)});return r}
 function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I.b;const land=W>H*1.1;document.documentElement.classList.toggle('bf-land',land);
   let cs=land?Math.min((H-44-44-24)/6.5,(W*.52-60)/10.45,46):Math.min((W-52)/10.45,(H-44-44)*.43/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');
   const tb=BF.tbl;BF.tw=tb.clientWidth||(land?W*.5:W);BF.th=tb.clientHeight||(land?H-44:H-44-38-6.5*cs-40)}
@@ -401,7 +408,7 @@ function bfGuide(hp){clearTimeout(BF.idleT);
     if(G.markerIn==='ctr'&&G.ctr.length&&BF.seen.took)bfTip('sun');else if(BF.seen.took&&BF.tbl&&BF.tbl.querySelector('.nofit'))bfTip('nofit')}}
 // ---------- input: everything is a tap on the thing itself ----------
 function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
-function bfClick(e){const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
+function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return;const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
   if(BF.busy){bfSpeedUp();return}
   if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
@@ -427,7 +434,7 @@ function bfAct(a){switch(a){
   case 'boss':BF.boss=!BF.boss;BF.menu=false;BF.peek=null;sfx('click');bfDraw();return;
   case 'close':BF.menu=false;BF.peek=null;BF.boss=false;if(G&&G.over)BF.resHide=true;bfDraw();return;
   case 'res':BF.resHide=false;bfDraw();return;
-  case 'hint':if(isClient()&&G.phase==='offer'){advise()}BF.fingerOn=true;sfx('select');bfDraw();try{const hp=me();if(hp&&!isClient()&&!bfAdvice(hp)){BF.tip='No clear best move: your call';bfHintSet();clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},3000)}}catch(e){}return;
+  case 'hint':if(isClient()&&G.phase==='offer'){advise()}BF.fingerOn=true;sfx('select');bfDraw();try{const hp=me();if(hp&&!isClient()&&!bfAdvice(hp)){BF.tip='No clear best move: your call';bfHintSet();clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},bfReadMs(BF.tip))}}catch(e){}return;
   case 'prism':uiAct('prism');return}}
 // ---------- wiring into the rest of the page ----------
 function bfApply(){const on=PHN.on&&bfWanted();const was=BF.on;BF.on=on;document.documentElement.classList.toggle('bf',on);if(on){bfEnsure();if(G&&!BF.busy){bfSync();BF.disp=bfClone(G)}bfDraw()}else if(was&&BF.root)BF.root.hidden=true;if(on&&BF.root)BF.root.hidden=false}
@@ -437,10 +444,27 @@ BF.on=PHN.on&&bfWanted();document.documentElement.classList.toggle('bf',BF.on);
  const _pr=phRender;phRender=function(){if(BF.on)return bfRender();return _pr.apply(this,arguments)};
  const _pf=phFx;phFx=function(f){if(BF.on)return bfFx(f);return _pf.apply(this,arguments)};
  const _mp=renderMap2D;renderMap2D=function(){if(BF.on){const el=document.getElementById('map2d');if(el)el.hidden=true;return}return _mp.apply(this,arguments)};
- const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q">Tile the king’s palace wall.<br><b>Most ★ wins.</b></p><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
+ const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q"><b>Win with the most ★ when a wall row is full.</b></p><ul class="bf-aim"><li>Take every tile of one colour from a kiln.</li><li>Fill a row: one tile moves to your wall and scores.</li><li>Touching tiles score more. Extra tiles cost points.</li></ul><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
  const _sh=startHtml;startHtml=function(){let h=_sh.apply(this,arguments);if(!BF.on)return h;const i=h.indexOf('<h3>Variants</h3>'),j=h.indexOf('</div>',h.indexOf('class="exs"'));if(i<0||j<0)return h;return h.slice(0,i)+'<details class="bf-more" ontoggle="var x=this.querySelector(\'.exs\');if(x)x.hidden=!this.open"><summary>Options</summary>'+h.slice(i+17,j+6).replace('class="exs"','class="exs" hidden')+'</details>'+h.slice(j+6)};
  const _to=toast;toast=function(t){if(!BF.on)return _to.apply(this,arguments)}}
 function bfRender(){if(!BF.on)return;bfEnsure();if(!G){BF.disp=null;bfDraw();return}const fresh=bfSync();
   if(BF.q.length&&!BF.busy&&!UI.modal){bfRun();return}
   if(!BF.busy){BF.disp=bfClone(G);bfDraw(fresh&&G.turn===0?{deal:true}:{})}}
 function bfResize(){const was=BF.on;bfApply();if(was&&!BF.on&&G)render()}
+
+// ---------- W466: drag the real tile onto a row (tap still works); legal rows glow; a vibrate tick when it snaps ----------
+function bfTick(ms){try{if(navigator.vibrate)navigator.vibrate(ms||14)}catch(e){}}
+function bfDragDown(e){if(!BF.on||!G||G.over||G.phase!=='offer'||BF.menu||BF.peek!=null)return;const t=e.target.closest&&e.target.closest('.bf-table [data-k]');if(!t)return;const k=t.dataset.k;if(!k||!(k[0]==='f'||k[0]==='c')||k==='sun')return;
+  if(!me())return;BF.dg={k,x:e.clientX,y:e.clientY,id:e.pointerId,on:false,el:t};}
+function bfDragMove(e){const d=BF.dg;if(!d||e.pointerId!==d.id)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;
+  if(!d.on){if(Math.hypot(dx,dy)<12)return;d.on=true;const el=bfEl(d.k)||d.el;const s=slotSel(d.k);if(!s){BF.dg=null;return}
+    if(!(UI.sel&&UI.sel.src===s.src&&UI.sel.c===s.c))bfClick({target:el,clientX:d.x,clientY:d.y,preventDefault(){},__bfdrag:1});
+    if(!UI.sel){BF.dg=null;return}const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src]||[];const n=a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length;
+    const g=document.createElement('div');g.className='bf-drag';g.innerHTML=`<i class="bf-t">${bfUse(UI.sel.c)}</i>${n>1?`<b>×${n}</b>`:''}`;g.style.setProperty('--cs',BF.cs+'px');BF.fl.appendChild(g);d.g=g;bfTick(8)}
+  e.preventDefault();d.g.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;
+  const u=document.elementFromPoint(e.clientX,e.clientY);const row=u&&u.closest&&u.closest('[data-bfrow]');const r=row?+row.dataset.bfrow:null;
+  if(r!==d.over){BF.root.querySelectorAll('.bf-dov').forEach(x=>x.classList.remove('bf-dov'));d.over=r;if(row){const ok=movesFor(UI.sel).some(m=>m.line===r);row.classList.add('bf-dov');row.classList.toggle('bf-dno',!ok);if(ok)bfTick(6)}}}
+function bfDragUp(e){const d=BF.dg;if(!d||e.pointerId!==d.id)return;BF.dg=null;if(!d.on)return;BF.dragEnd=Date.now();if(d.g)d.g.remove();BF.root.querySelectorAll('.bf-dov').forEach(x=>x.classList.remove('bf-dov','bf-dno'));
+  const u=document.elementFromPoint(e.clientX,e.clientY);const row=u&&u.closest&&u.closest('[data-bfrow]');if(row&&UI.sel)bfClick({target:row,clientX:e.clientX,clientY:e.clientY,preventDefault(){},__bfdrag:1})}
+document.addEventListener('pointermove',bfDragMove,{passive:false});document.addEventListener('pointerup',bfDragUp);document.addEventListener('pointercancel',e=>{const d=BF.dg;if(d&&d.g)d.g.remove();BF.dg=null});
+{const _g=go;go=function(m){const r=_g.apply(this,arguments);if(BF.on&&m&&(m.act==='take'||m.act==='wall'))bfTick(m.line===5?[10,40,10]:16);return r}}

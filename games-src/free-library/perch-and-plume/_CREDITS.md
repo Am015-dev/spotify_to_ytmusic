@@ -53,7 +53,7 @@ Sources are public domain, CC0 or CC BY 3.0 (attribution below). Slots marked FA
 - NGA 32352 Great blue Heron (Havell after Audubon, 1834) | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.32352.html
 - NGA 32262 Snowy Owl (Havell after Audubon, 1831) | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.32262.html
 - NGA 32358 Piping Plover (Havell after Audubon, 1834) | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.32358.html
-- NGA 32213 Swallow-tailed Hawk (Havell after Audubon, 1829) | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.32213.html
+- NGA 32563 Rough-legged Falcon (Havell after Audubon, 1838) | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.32563.html
 - NGA 32451 Spotted Sandpiper (Havell after Audubon, 1836) | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.32451.html
 - NGA 32300 Cardinal Grosbeak (Havell after Audubon, 1833) | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.32300.html
 - NGA 32554 Californian Partridge (Havell after Audubon, 1838) | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.32554.html
@@ -171,5 +171,5 @@ Sources are public domain, CC0 or CC BY 3.0 (attribution below). Slots marked FA
 
 ## Icon authors (game-icons.net, CC BY 3.0)
 
-Icons by Lorc, Delapouite and others, see https://game-icons.net . Authors used: lorc (grapes, owl, dove, swan, egg-clutch, cubes, explosion-rays, sunbeams, star-swirl), delapouite (caterpillar, grain-bundle, rat, seedling, nest-eggs, tree-door, reed, nest-birds, star-medal, cube, bird-house, trophy-cup), skoll (fruit-bowl), sbed (egg-pod). Licence: https://creativecommons.org/licenses/by/3.0/
+Icons by Lorc, Delapouite, Skoll and Sbed, see https://game-icons.net . Licence: https://creativecommons.org/licenses/by/3.0/
 Art plates: National Gallery of Art open data (CC0).

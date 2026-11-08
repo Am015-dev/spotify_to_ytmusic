@@ -18,10 +18,12 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{i
  await shot('title');
  await tapEl('#modal [data-coach-entry]');await sleep(900);
  if(await p.evaluate(()=>!G||!G.coach))note('the coached game did not start from the title menu');
+ let cards=[],trkOk=0,badgeOk=0,prevOk=0;
  let last='',lastT=Date.now(),shots={},turns=0,sawRival=false,startedChapter=false;
  for(let g=0;g<4000;g++){
   const st=await p.evaluate(()=>({over:!!(G&&G.over),g:!!G&&!G.over,modal:UI.modal,me:!!(G&&me()),ph:G&&G.phase+'/'+G.step,t:G&&G.turnIdx,gxc:!!document.querySelector('.gxc-ov,.gxc-scene,.gxc-map,[class*=gxc]:not(style)')}));
   if(st.over){await sleep(900);break}
+  {const x=await p.evaluate(()=>{const c=document.getElementById('turnover');const t=document.getElementById('trk');const pv=document.getElementById('trk2');return {card:c&&c.classList.contains('on')?c.innerText:'',trk:!!t&&!t.hidden&&/Round \d/.test(t.innerText)&&/Bid/.test(t.innerText),gain:document.querySelectorAll('#grid .gain').length,prev:!!pv&&!pv.hidden&&/\+\d/.test(pv.textContent)}});if(x.card&&!cards.includes(x.card))cards.push(x.card);if(x.trk)trkOk++;if(x.gain)badgeOk++;if(x.prev)prevOk++}
   const sig=JSON.stringify(st)+(await p.evaluate(()=>G?G.logN:0));if(sig!==last){last=sig;lastT=Date.now()}else if(Date.now()-lastT>9000){note('stuck 9 s '+sig+' '+JSON.stringify(await p.evaluate(()=>{let m=null;try{m=hlpAdvice()}catch(e){m='ERR '+e.message}return {adv:m,mv:[...document.querySelectorAll('[data-mv]')].map(b=>b.dataset.mv+'|'+b.textContent.trim()),vm:G.pl&&validMoves(me()?me().i:0).slice(0,6)}})));await shot('stuck');break}
   if(!st.g){ // story overlays: tap any visible primary button
     if(await p.evaluate(()=>!!document.querySelector('.gxc-node.next')&&!document.querySelector('.gxc-sheet'))){await sleep(600);await tapEl('.gxc-node.next .gxc-disc');await sleep(700);continue}
@@ -31,12 +33,12 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{i
   if(!startedChapter){startedChapter=true;await sleep(500);await shot('first')}
   if(!st.me){if(!sawRival&&st.ph.startsWith('turn')&&!shots.r){sawRival=true}await sleep(250);if(!shots.r&&await p.evaluate(()=>G.phase==='turn'&&!me())){shots.r=1;await sleep(500);await shot('rival')}continue}
   if(st.modal&&st.modal!=='over'){const h=await p.evaluate(()=>{const e=document.querySelector('#modal .btn.go,#modal .btn');if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}});if(h){await p.touchscreen.tap(h.x,h.y);await sleep(300)}else await sleep(200);continue}
+  for(let w=0;w<20&&await p.evaluate(()=>{const e=document.getElementById('coach');return !!e&&e.classList.contains('on')});w++){lastT=Date.now();await sleep(500)}   // a player reads the bubble until it goes (4 s + 1 s per 10 words)
   const tgt=await p.evaluate(()=>{let el=null;try{const m=hlpAdvice();if(UI.chz){const i=UI.chz.opts.findIndex(o=>same(o.m,m));el=document.querySelector('#chz [data-chz="'+(i<0?0:i)+'"]')}else if(m)el=fingerEl(m)}catch(e){}
     if(!el)el=document.querySelector('#chz .chb')||[...document.querySelectorAll('#acts [data-mv]')].find(b=>!/"act":"undo"/.test(b.dataset.mv))||document.querySelector('#grid .glow')||document.querySelector('.sp-b.glow')||[...document.querySelectorAll('#acts button')].find(b=>/skip|done|end|sell/i.test(b.textContent)&&!b.disabled)||document.querySelector('#mkt .glow');
     if(!el)return null;el.scrollIntoView({block:'nearest'});const r=el.getBoundingClientRect();const x=r.left+r.width/2,y=r.top+r.height/2;const t=document.elementFromPoint(x,y);return {x,y,ok:!!t&&(t===el||el.contains(t)||t.contains(el)),what:el.id||el.className}});
   if(!tgt){await sleep(250);continue}
   if(!tgt.ok){note('hint target covered '+tgt.what);}
-  if(await p.evaluate(()=>{const e=document.getElementById('coach');return e&&e.classList.contains('on')&&Date.now()-COACH.shownAt<2700}))await sleep(2700);   // a player reads the bubble
   await p.touchscreen.tap(tgt.x,tgt.y);turns++;await sleep(220);
   if(turns===30&&!shots.s){shots.s=1;await shot('mid')}
  }
@@ -51,6 +53,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{i
  if(fin.seen.length<14)note('only '+fin.seen.length+' rules explained in play: '+fin.seen.join(','));
  if(fin.later<unseen.length)note('later card lists '+fin.later+' < '+unseen.length+' unseen rules');
  for(const n of fin.scores||[])if(!alltxt.includes(String(n)))note('final total '+n+' not shown');
+ if(!trkOk)note('turn tracker never shown');if(!badgeOk)note('no gain badges on tiles');if(!prevOk)note('no points preview line');if(!cards.some(c=>/^.{0,4}\s?(Hadiya|Your turn)?\s*(Good|Okay|Poor):/.test(c.replace(/\n/g,' '))||/(Good|Okay|Poor): /.test(c)))note('no turn-over rating card: '+JSON.stringify(cards));
+ console.log('score layer: tracker',trkOk,'badges',badgeOk,'preview',prevOk,'cards',JSON.stringify(cards.map(c=>c.replace(/\n/g,' ').slice(0,110))));
  if(pages.length<5)note('count walked in only '+pages.length+' pages');
  // finish: Play a real game must leave the coached game
  if(pages.length){await tapEl('#coachend [data-ce=play]');await sleep(600);const e=await p.evaluate(()=>({g:!!G,modal:UI.modal,done:GXT.isDone('sands-of-qamar'),end:!!document.getElementById('coachend')}));if(e.g||e.end||e.modal!=='start'||!e.done)note('Play a real game did not return to the menu: '+JSON.stringify(e))}

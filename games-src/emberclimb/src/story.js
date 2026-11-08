@@ -61,7 +61,7 @@ window.EC_STORY = {
   },
   // coached first climb (the tutorial): one line the first time each rule matters; keys are the rules in TUTORIAL-COVERAGE.md
   coach: {
-    start: 'The summit ember is fading and the Gatekeeper wants it sealed. Climb, Garrick. I will talk when it matters.',
+    start: 'Goal: climb to the top and beat its guardian. Attacks cut HP. Block stops hits.',
     rules: {
       energy: 'You hold 3 energy a turn. A card costs the number in its corner.',
       intent: 'Above each enemy: its next move. Plan around it.',
