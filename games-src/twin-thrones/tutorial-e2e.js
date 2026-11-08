@@ -50,7 +50,7 @@ const which = process.argv[2]||'p';
     const st = await pg.evaluate(()=>{const s=GXT.state(); return {a:s.active,shown:s.shown,hole:s.hole,wait:s.wait,id:s.id};});
     const endBtn = pg.locator('.gxt-end [data-gxt-end]');
     if (await endBtn.count()) { log.push('endcard'); await LIB.T(pg,touch,endBtn.first()); await pg.waitForTimeout(300); continue; }
-    if (st.a && st.shown) { if (st.wait) { forced++; if(touch) await pg.touchscreen.tap(st.hole.cx,st.hole.cy); else await pg.mouse.click(st.hole.cx,st.hole.cy); } await pg.waitForTimeout(250); continue; }
+    if (st.a && st.shown) { if (st.wait) { forced++; if(touch) await pg.touchscreen.tap(st.hole.cx,st.hole.cy); else await pg.mouse.click(st.hole.cx,st.hole.cy); } else { const nb=pg.locator('.gxt-next:visible'); if (await nb.count()) await LIB.T(pg,touch,nb.first()); } await pg.waitForTimeout(250); continue; }
     if (st.a) { await pg.waitForTimeout(150); continue; }
     if (await pg.locator('#laterCard').count()) { log.push('later'); over=true; break; }
     if (await pg.locator('#coach [data-cn]').count()) { log.push('walk'); await LIB.T(pg,touch,pg.locator('#coach [data-cn]').first()); await pg.waitForTimeout(200); continue; }
