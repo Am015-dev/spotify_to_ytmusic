@@ -61,7 +61,7 @@ function startGame(o) {
   if (G.wx !== 'dry') setTimeout(function () { if (G && G.round === 1) banner(WEATHER[G.wx].name + ': ' + WEATHER[G.wx].txt, null, 'round'); }, 2600);
   if (o && o.tut) stageTutorial();
   if (G.drafting) { $('#panel').innerHTML = ''; setMsg('Pick your upgrade cards'); return runDraft(function () { UI.lockModal = false; closeModal(); planFor(needPlans(G)[0]); }); }
-  if (!o || !(o.cmp || o.tut)) { var g0 = G; setTimeout(function () { if (G === g0 && G.round === 1 && G.phase === 'plan') { banner(pickLine(STORY.quickIntro), 0, 'plan'); setTimeout(function () { if (G === g0 && G.phase === 'plan') banner(STORY.yourTurn, 0, 'plan'); }, 2200); } }, 0); }
+  if (!o || !(o.cmp || o.tut)) { var g0 = G; setTimeout(function () { if (G === g0 && G.round === 1 && G.phase === 'plan') { banner(pickLine(STORY.quickIntro.filter(function (l) { return G.wx === 'rain' || !/rain/i.test(l); })), 0, 'plan'); setTimeout(function () { if (G === g0 && G.phase === 'plan') banner(STORY.yourTurn, 0, 'plan'); }, 2200); } }, 0); }
   planFor(needPlans(G)[0]);
 }
 /* Upgrade draft: each human picks DRAFT_PICKS cards one at a time from what is left in the shared pool; then the computer drivers pick and decks are dealt. */
