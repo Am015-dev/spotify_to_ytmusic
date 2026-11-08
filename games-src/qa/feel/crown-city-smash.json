@@ -1,735 +1,81 @@
 {
  "slug": "crown-city-smash",
- "when": "2026-11-08T03:14Z",
+ "when": "2026-11-08T04:23Z",
  "secs": 120,
- "totalSecs": 382,
+ "totalSecs": 385,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 15,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Shroomhulk hits you −1♥",
-     "words": 4,
-     "shownMs": 250,
-     "neededMs": 4400,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Squidrik +3★",
-     "words": 2,
-     "shownMs": 250,
-     "neededMs": 4200,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Fast forward ⏩",
-     "words": 3,
-     "shownMs": 904,
-     "neededMs": 4300,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Magmaw +1★",
-     "words": 2,
-     "shownMs": 687,
-     "neededMs": 4200,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Squidrik +3★",
-     "words": 2,
-     "shownMs": 819,
-     "neededMs": 4200,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Fast forward ⏩",
-     "words": 3,
-     "shownMs": 880,
-     "neededMs": 4300,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Squidrik is close to 20★!",
-     "words": 5,
-     "shownMs": 450,
-     "neededMs": 4500,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Squidrik +3★",
-     "words": 2,
-     "shownMs": 481,
-     "neededMs": 4200,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/play",
-     "text": "Squidrik +4★",
-     "words": 2,
-     "shownMs": 1625,
-     "neededMs": 4200,
-     "cls": "flash"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Watch which dice it keeps (they turn yellow). You are Voltusk. Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "words": 27,
-     "shownMs": 1620,
-     "neededMs": 6700,
-     "cls": "msg"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "It may buy power cards or play evolutions. You are Voltusk. Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "words": 27,
-     "shownMs": 250,
-     "neededMs": 6700,
-     "cls": "msg"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "It may buy power cards or play evolutions. You are Voltusk. Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "words": 27,
-     "shownMs": 250,
-     "neededMs": 6700,
-     "cls": "msg"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "You are in Downtown. Your claws hit everyone outsi",
-      "Squidrik ♥10/10 ★1 ⚡0 · the suburbs One-eyed terro"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 893,
-     "texts": [
-      "You are in Downtown. Your claws hit everyone outsi",
-      "Squidrik ♥10/10 ★1 ⚡0 · the suburbs One-eyed terro"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1513,
-     "texts": [
-      "You are in Downtown. Your claws hit everyone outsi",
-      "Squidrik ♥10/10 ★1 ⚡0 · the suburbs One-eyed terro"
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
-   "status": "FAIL",
-   "count": 16,
-   "detail": [
-    {
-     "session": "phone/play",
-     "text": "Squidrik +3★",
-     "ms": 250,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Squidrik +1★",
-     "ms": 694,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Fast forward ⏩",
-     "ms": 904,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Magmaw +1★",
-     "ms": 687,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Squidrik +2★",
-     "ms": 1212,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Squidrik +3★",
-     "ms": 819,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap a card",
-     "ms": 1180,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Squidrik hits you −1♥",
-     "ms": 1588,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Fast forward ⏩",
-     "ms": 880,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Squidrik is close to 20★!",
-     "ms": 450,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Squidrik +3★",
-     "ms": 481,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Squidrik hits you −1♥",
-     "ms": 250,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Squidrik +4★",
-     "ms": 1625,
-     "cls": "flash",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Watch which dice it keeps (they turn yellow). You are Voltusk. Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "ms": 6429,
-     "cls": "msg",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "It may buy power cards or play evolutions. You are Voltusk. Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "ms": 1681,
-     "cls": "msg",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "You are in the suburbs. Your claws hit whoever is in the city (Squidrik 👑).",
-     "ms": 2941,
-     "cls": "msg",
-     "tag": "div"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 13,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Be first to 6 ★ (20 in a real game), or the last one standing.",
-     "words": 15,
-     "at": 7642,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Each die says what it does: STAR dice score in sets, ENERGY buys cards, HEAL mends you, HIT smashes rivals.",
-     "words": 20,
-     "at": 18869,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Downtown is empty, so you will move in after resolving (+1 ★) and claws hit nobody this time.",
-     "words": 18,
-     "at": 9002,
-     "where": "div.tip"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Be first to 6 ★ (20 in a real game), or the last one standing.",
-     "words": 15,
-     "at": 9003,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Each die says what it does: STAR dice score in sets, ENERGY buys cards, HEAL mends you, HIT smashes rivals.",
-     "words": 20,
-     "at": 20841,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Downtown was empty, so Voltusk had to move in: +1 ★ (👑 = the monster in Downtown).",
-     "words": 17,
-     "at": 29236,
-     "where": "div.because"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "words": 16,
-     "at": 36204,
-     "where": "div.tip"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Stay and keep earning 2 ★ a turn, or yield: you leave, and the attacker moves in.",
-     "words": 17,
-     "at": 40725,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "You: 6 ★, 5 ♥, 0 cards · Squidrik: 1 ★, 10 ♥, 0 cards · Shroomhulk: 0 ★, 10 ♥, 0 cards.",
-     "words": 23,
-     "at": 116019,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Not met in this game (see Help): a pair scores nothing; three of a kind scores; three of a kind scores its number in ★; four of a kind adds 1 ★ per extra die; claws hit the other zone; Harbor: with 5-",
-     "words": 69,
-     "at": 116019,
-     "where": "small."
-    },
-    {
-     "session": "pc/play",
-     "text": "roll 6 dice up to 3 times, keep what you like, then use them.",
-     "words": 14,
-     "at": 8826,
-     "where": "p.goal"
-    },
-    {
-     "session": "pc/play",
-     "text": "Nothing to do right now: you will get a pop-up if you can yield the city.",
-     "words": 16,
-     "at": 8827,
-     "where": "div.tip"
-    },
-    {
-     "session": "pc/play",
-     "text": "Why: Downtown was empty, so Squidrik had to move in: +1 ★ (👑 = the monster in Downtown).",
-     "words": 18,
-     "at": 15076,
-     "where": "div.because"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
-   "status": "FAIL",
-   "count": 41,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "♥10/10 ★0 ⚡0 · the suburbs",
-     "px": 13,
-     "at": 23659,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/learn",
-     "text": "One-eyed terror of the storm drains",
-     "px": 13,
-     "at": 23659,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/learn",
-     "text": "No cards.",
-     "px": 13,
-     "at": 23659,
-     "where": "span.muted.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "👑",
-     "px": 0,
-     "at": 25187,
-     "where": "i.crn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Spore brute from the sewer farms",
-     "px": 13,
-     "at": 26657,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/learn",
-     "text": "save your ⚡",
-     "px": 13,
-     "at": 63399,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "new · 2⚡",
-     "px": 12,
-     "at": 63399,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "👑",
-     "px": 13,
-     "at": 65285,
-     "where": "i.crn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "you",
-     "px": 13,
-     "at": 65285,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "♥10/10 ★1 ⚡1 · Downtown",
-     "px": 13,
-     "at": 65285,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Thunder-tusked boar of the power grid",
-     "px": 13,
-     "at": 65285,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Shroomhulk hit you for 1: 9 hearts left.",
-     "px": 13,
-     "at": 78144,
-     "where": "p."
-    },
-    {
-     "session": "phone/learn",
-     "text": "+2 ★ next turn, but you keep getting hit. Recommended.",
-     "px": 13,
-     "at": 78144,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Safe outside; Shroomhulk moves in.",
-     "px": 13,
-     "at": 78144,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "♥10/10 ★1 ⚡1 · the suburbs",
-     "px": 13,
-     "at": 99303,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/learn",
-     "text": "♥9/10 ★5 ⚡2 · Downtown",
-     "px": 13,
-     "at": 104752,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥10/10 ★0 ⚡0 · the suburbs",
-     "px": 13,
-     "at": 14564,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "Lava crab with molten pincers",
-     "px": 13,
-     "at": 14564,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "No cards.",
-     "px": 13,
-     "at": 14564,
-     "where": "span.muted.small"
-    },
-    {
-     "session": "phone/play",
-     "text": "👑",
-     "px": 13,
-     "at": 20864,
-     "where": "i.crn"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥10/10 ★4 ⚡0 · Downtown",
-     "px": 13,
-     "at": 20864,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "One-eyed terror of the storm drains",
-     "px": 13,
-     "at": 20864,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥9/10 ★4 ⚡0 · Downtown",
-     "px": 13,
-     "at": 22988,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "save your ⚡",
-     "px": 13,
-     "at": 34041,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "new · 2⚡",
-     "px": 12,
-     "at": 34041,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "Walking glacier with a cold heart",
-     "px": 13,
-     "at": 34041,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "Rubber Limbs Before resolving, you may pay 2…",
-     "px": 13,
-     "at": 34041,
-     "where": "div.mc.K"
-    },
-    {
-     "session": "phone/play",
-     "text": "you",
-     "px": 13,
-     "at": 47933,
-     "where": "i."
-    },
-    {
-     "session": "phone/play",
-     "text": "♥10/10 ★0 ⚡1 · the suburbs",
-     "px": 13,
-     "at": 47933,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "Thunder-tusked boar of the power grid",
-     "px": 13,
-     "at": 47933,
-     "where": "div.small.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥10/10 ★1 ⚡1 · the suburbs",
-     "px": 13,
-     "at": 53975,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥10/10 ★1 ⚡0 · the suburbs",
-     "px": 13,
-     "at": 82252,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "Battery Belly At the end of your…",
-     "px": 13,
-     "at": 82252,
-     "where": "div.mc.K"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥6/10 ★11 ⚡2 · Downtown",
-     "px": 13,
-     "at": 89101,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "Bargain Hunter Whenever a new power card is…",
-     "px": 13,
-     "at": 89101,
-     "where": "div.mc.K"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥9/10 ★0 ⚡1 · the suburbs",
-     "px": 13,
-     "at": 91101,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥5/10 ★11 ⚡2 · Downtown",
-     "px": 13,
-     "at": 95292,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥10/10 ★0 ⚡3 · the suburbs",
-     "px": 13,
-     "at": 107811,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥4/10 ★16 ⚡4 · Downtown",
-     "px": 13,
-     "at": 113296,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "♥9/10 ★0 ⚡2 · the suburbs",
-     "px": 13,
-     "at": 116838,
-     "where": "div.st2"
-    },
-    {
-     "session": "phone/play",
-     "text": "Thick Skin Whenever you lose 2 or more…",
-     "px": 13,
-     "at": 116838,
-     "where": "div.mc.K"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
-   "status": "FAIL",
-   "count": 1,
-   "detail": [
-    {
-     "session": "phone/play",
-     "k": "★20|⚡0",
-     "at": 117570,
-     "a": "★20",
-     "b": "⚡0",
-     "ra": [
-      62,
-      21,
-      44,
-      27
-     ],
-     "rb": [
-      97,
-      26,
-      23,
-      16
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   }
  },
- "notes": [
-  "phone/learn: Learn to play not found",
-  "phone/play: Play button not found",
-  "pc/learn: Learn to play not found",
-  "pc/play: Play button not found"
- ],
+ "notes": [],
  "sessions": [
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 122,
-   "turns": 51,
-   "clicks": 66,
+   "secs": 121,
+   "turns": 49,
+   "clicks": 68,
    "endedBy": "result",
-   "tutorialEnded": null,
+   "tutorialEnded": 7,
    "hintsOff": true,
-   "messagesSeen": 6
+   "messagesSeen": 0
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 118,
-   "turns": 63,
-   "clicks": 67,
-   "endedBy": "result",
+   "secs": 121,
+   "turns": 77,
+   "clicks": 81,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 13
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 122,
-   "turns": 30,
-   "clicks": 39,
+   "secs": 121,
+   "turns": 39,
+   "clicks": 46,
    "endedBy": "result",
-   "tutorialEnded": null,
+   "tutorialEnded": 9,
    "hintsOff": true,
-   "messagesSeen": 13
+   "messagesSeen": 1
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 20,
+   "secs": 21,
    "turns": 6,
    "clicks": 6,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 3
+   "messagesSeen": 0
   }
  ]
 }
