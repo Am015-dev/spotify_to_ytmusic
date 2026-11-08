@@ -1,6 +1,6 @@
 /* ================= Crown City Smash engine ================= */
 let G=null;
-const UI={choice:null,roll:null,pick:null,busy:false,info:true,coach:-1,fx:{},banner:'',pending:false,n:DEFN,mon:0,xp:DEFX,evo:DEFEVO,rollAnim:0,speed:1,ex:{},lvl:'normal',hints:true,paused:false,stats:false};
+const UI={choice:null,roll:null,pick:null,busy:false,info:true,coach:-1,fx:{},banner:'',pending:false,n:DEFN,mon:0,xp:DEFX,evo:DEFEVO,rollAnim:0,speed:1,ex:{},lvl:'normal',hints:true,paused:false,stats:false,order:'auto'};
 /* effect counters for coverage tests (not part of the synced state) */
 const COV={};function cov(k){COV[k]=(COV[k]||0)+1}
 const _mathRandom=Math.random;
@@ -317,7 +317,12 @@ function resolveCore(p){
   steps.push(next=>{const woundedCity=R.hitList.some(h=>h.lost>0);if(inHand(p,43)>=0&&woundedCity&&!inCity(p.i)&&!bug)ask(p.i,evoName(43),'You wounded the city and did not move in. Play it to take another turn after this one?',[{k:'y',l:'Play it'},{k:'n',l:'Keep it'}],()=>'y',k=>{if(k==='y'){p.hand.splice(p.hand.indexOf(43),1);p.edisc.push(43);G.tf.jungle=true;cov('evo:43')}next()});else next()});
   steps.push(next=>exAfterResolve(p,R,next));
   steps.push(next=>{if(curseOn('k_false')){const n=new Set(G.dice.filter(d=>!d.t).map(d=>d.f)).size;if(n){hitSync(p,n,null,'fx');cov('curse:false');out.push(`poisoned gift: −${n}♥`)}}next()});
-  seq(steps,(f,next)=>{if(G.winner){next();return}f(next)},()=>finishResolve(R))}
+  const go=()=>seq(steps,(f,next)=>{if(G.winner){next();return}f(next)},()=>finishResolve(R));
+  // rulebook: "you can resolve your dice in any order". The order that changes play is hearts versus claws (heal first, or heal what a claw hit costs you):
+  // automatic (hearts, then claws) unless the player switched Dice order to Ask in the menu
+  if(!bug&&p.human&&UI.order==='ask'&&c.H>0&&c.C>0&&canHealDice(p)&&steps.length>=5)
+    ask(p.i,'Dice order','The rules let you resolve dice in any order. Which first?',[{k:'h',l:'♥ Hearts, then claws'},{k:'c',l:'Claws, then hearts'}],()=>'h',k=>{if(k==='c')steps.unshift(steps.splice(4,1)[0]);go()});
+  else go()}
 function finishResolve(R){const p=R.p;deaths();
   UI.banner=typeof storyBanner==='function'?storyBanner(R):`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (Brainjack)':''}: ${R.out.length?esc(R.out.join(' · ')):'nothing useful'}`;
   if(R.out.length)lg(p.i,`${mname(p)} resolves${R.bug?' the stolen dice':''}: ${R.out.join(', ')}.`);
@@ -497,13 +502,14 @@ function deaths(){G.pl.forEach(q=>{if(q.alive&&q.hp>maxhp(q))q.hp=maxhp(q)});let
   if(G.bayOn&&alive().length<=4){G.bayOn=false;lg(-1,'Only four monsters remain: the Harbor closes.');
     if(G.bay>=0){const b=G.bay;G.bay=-1;if(G.city===-1){G.city=b;lg(b,`${mname(P(b))} moves from the Harbor to Downtown.`)}else{lg(b,`${mname(P(b))} is washed out of the Harbor.`);const q=P(b);G.bay=b;leaveCity(q,'close')}}}
   checkWin(false)}
-const winAt=p=>has(p,'c_astro')?17:20;
+const GOAL=()=>(typeof G!=='undefined'&&G&&G.goal)||20;   // the coached tutorial game is a short one (G.goal=10)
+const winAt=p=>has(p,'c_astro')?Math.min(17,GOAL()):GOAL();
 function checkWin(final){
   if(G.winner)return true;const a=alive();
   if(a.length===0){G.winner='draw';G.winText='Everyone falls: the city wins, nobody is crowned.';G.phase='over';lg(-1,G.winText);return true}
   if(a.length===1){G.winner='P'+(a[0].i+1);G.winText=`Last standing: ${mname(a[0])} is the only monster left and takes the crown!`;G.phase='over';lg(a[0].i,G.winText);return true}
   const ast=a.find(p=>has(p,'c_astro')&&p.vp>=17);if(ast){G.winner='P'+(ast.i+1);G.winText=`Space Helmet: ${mname(ast)} reaches ${ast.vp} stars (only 17 needed) and is crowned!`;G.phase='over';cov('cost:astro');lg(ast.i,G.winText);return true}
-  if(final){const w=a.filter(p=>p.vp>=20);if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`${mname(w[0])} reaches ${w[0].vp} stars (20 needed) and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
+  if(final){const w=a.filter(p=>p.vp>=GOAL());if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`${mname(w[0])} reaches ${w[0].vp} stars (${GOAL()} needed) and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
   return false}
 
 /* ---------- Curses: the Omen Die ---------- */
