@@ -44,3 +44,9 @@ Setup screen "Upgrades: Off / On". On: before the race each human drafts 3 upgra
 
 ## Left out (next)
 Weather and legends modules, online play, campaign. Tracks are 2; a track editor is not planned.
+
+## W424 additions (house values, see RULES-COVERAGE.md)
+- Starting upgrades: every car's deck adds a Brake card (speed 0), a Burst card (speed 5) and 1 heat card (18 cards). Not speed cards for a stress flip.
+- Cooldown happens in the React step (after the cards are played), then boost.
+- Weather (optional): Dry; Rain = corner limits -1, never below 2; Heatwave = 1 engine heat starts in the discard; Tailwind = slipstream 3.
+- Championship: Sunline, Hairpin Hill, Harbour Ring (new track); points 9-6-4-3-2-1; ties: more wins, then the better last race.
