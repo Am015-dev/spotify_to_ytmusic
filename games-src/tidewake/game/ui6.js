@@ -80,7 +80,7 @@ function causeOf(why){const w=String(why||'');let m;
   if(/off the edge|sailing off/.test(w))return {k:'edge',t:'its wake ran off the edge of the chart.'};
   if(/collided/.test(w))return {k:'collision',t:'two junks ended on the same wake heading the same way, so both went down together (a head-on collision).'};
   if(/Maelstrom/.test(w))return {k:'maelstrom',t:'the Maelstrom, the whirlpool, moved onto its square and swallowed it.'};
-  if(/Rogue Wave|capsized/.test(w)){const ww=G&&G.wave;return {k:'wave',t:`the Rogue Wave caught it: it was in the wave's band and its capsize roll was too low${ww?` (the wave is on ${(ww.r&1)?'column '+(ww.x+1):'row '+(ww.y+1)}, strength ${waveStr()})`:''}.`}}
+  if(/Rogue Wave|capsized/.test(w)){const ww=G&&G.wave;return {k:'wave',t:`the Rogue Wave caught it. Its capsize roll was too low.`}}
   if(m=/blocked in by (.+)$/.exec(w))return {k:'block',t:`${m[1]} blocked its path. It had nowhere to go.`};
   if(m=/ran into (.+)$/.exec(w))return {k:'mon',t:`its wake ended in the square of ${m[1]}.`};
   if(m=/crushed by (.+)$/.exec(w))return {k:'crush',t:`${m[1]} swam onto it and crushed it.`};
@@ -132,7 +132,8 @@ function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];
   if(!busy)for(const s of G.ships){const p=shipPos(s);if(!p)continue;const w=p.port!=null?pw(p.c,p.r,p.port):sqW(p.c,p.r);const mine=s.i===me&&me>=0;
     if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail});
     if(mine&&myTurn&&G.phase==='play')D.push({k:'ring',id:'r'+s.i,wx:w[0],wz:w[1]})}
-  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);for(const o of info)D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e,wx:o.w[0],wz:o.w[1],t:o.lab})}
+  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);let bm=null;if(UI.tut){if(!UI.tutBest||UI.tutBest.g!==G.sp){let m=null;try{m=aiMove(d,'hard')}catch(e){}UI.tutBest={g:G.sp,m}}bm=UI.tutBest.m}
+    for(const o of info){const best=!!(bm&&bm.x===o.m.x&&bm.y===o.m.y&&bm.e===o.m.e);D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e+(bm?(best?'b':'d'):''),wx:o.w[0],wz:o.w[1],t:o.lab,best,dim:!!bm&&!best})}}
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
   if(UI.arrow)D.push({k:'arrow',id:'ar',a:UI.arrow.a,b:UI.arrow.b});
   for(const m of UI.marks||[])D.push({k:'mark',id:'mk'+m.id+m.seat,wx:m.at[0],wz:m.at[1],t:nm(m.seat)+' sunk'});
@@ -151,7 +152,7 @@ function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length
     else{const e=document.createElement('div');
       if(ds.k==='tag'){e.className='otag '+ds.cls;e.textContent=ds.t;if(ds.sail){const i=document.createElement('i');i.style.background=ds.sail;e.prepend(i)}if(ds.mon!=null)e.dataset.mon=ds.mon}
       else if(ds.k==='ring')e.className='oring';
-      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'');e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
+      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
       else if(ds.k==='mark'){e.className='omark';e.innerHTML=`<b>&#10006;</b><span>${esc(ds.t)}</span>`}
       root.appendChild(e);it.el=e}
     OV.items.push(it)}
