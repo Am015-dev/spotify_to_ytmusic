@@ -9,7 +9,9 @@ const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (be
 // the staged deal: called by newGame before the first scene. Day 1 has no event card; day 2 turns over Chill Rain (a rain cloud and a threat).
 // Learn to play is a gentler island (same rules, kinder deal): the mountains for Fire come second, the mildest event cards, weak beasts first,
 // a little more food and wood, and no weather dice (Chill Rain still brings a cloud on day 2 to teach the roof). A player who follows ✨ Suggest wins.
-function tutDeal(){G.tut=1;G.learn=1;G.res.food=3;G.res.wood=3;G.tileDeck=[4,5,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
+// "Easy island" (the default first real game, and Easy afterwards): the same kind deal, without the coach. Normal keeps the full rules.
+function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;const t=G.tut;tutDeal();if(!t)delete G.tut}
+function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);if(G.scen==='marooned')G.tileDeck=[4,5,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
   const harm=k=>{try{return opsValue(CARD[k].ev||[])+opsValue(CARD[k].te||[])}catch(e){return 0}};const mild=[...new Set(EVENTS.map(e=>e.k))].filter(k=>k!=='chillrain').sort((a,b)=>harm(b)-harm(a)).slice(0,14);
   G.ev.deck=['chillrain'].concat(shuffle(mild)).slice(0,G.ev.deck.length);G.beast.sort((a,b)=>BEAST[a].str-BEAST[b].str)}
 // ---------------------------------------------------------------- the staged game starts and stops
@@ -80,7 +82,7 @@ function coachFinal(){COACH.finished=true;const over=!!G.over,w=!!(G.over&&G.ove
   const fire=has('fire'),pile=(G.sc&&G.sc.pile)||0;
   const walk=[['Goal: fire',fire?'✓ lit':'✗ not lit'],['Goal: wood pile',pile+' of 15'],['Rescue window','days 10 to 12 (you ended on day '+G.round+')'],['Everyone alive',alive+' of '+tot+(alive<tot?': a death loses':'')],['Shelter',hasShelter()?'built (no night wounds)':'none (a wound each night)'],['Roof and palisade',G.camp.roof+' and '+G.camp.pal],['Food and wood left',food()+' and '+G.res.wood]];
   const e=coachEl();COACH.cur='later';e.hidden=false;e.dataset.rule='later';e.dataset.kind='final';
-  const btns=(COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':(over?'':'<button type="button" class="cb" data-coach="keep">Keep playing</button>')+'<button type="button" class="cb" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>');
+  const btns=(COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':(over?'':'<button type="button" class="cb pri" data-coach="keep">Keep playing</button>')+'<button type="button" class="cb'+(over?' pri':'')+'" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>');
   const lines=[fire?'Fire: lit ✓':'Fire: not lit',`Wood pile: ${pile} of 15`,`Alive: ${alive} of ${tot}`];
   e.innerHTML='<b class="cn">'+(over?(w?'Rescued!':'We did not make it.'):'You have the hang of it.')+'</b><ul class="walk">'+lines.map(x=>'<li>'+x+'</li>').join('')+'</ul><div class="cbs">'+btns+'</div>';document.body.classList.add('coachfin');
   coachMark({done:1,open:0,step:0})}

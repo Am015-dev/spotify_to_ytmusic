@@ -53,7 +53,7 @@ function goalCard(){if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom')return camp
     const fw=Math.max(0,G.res.wood-committed().wood);btn=room?`<button class="btn sm pileb" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${Math.max(1,Math.min(room,fw))} wood to the pile${fw<room&&fw>0?` (${room} finish today’s stage)`:''}</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
   else how=esc(S.x);
   const win=G.scen==='marooned'?'You win if a ship sees your signal fire and everyone is alive.':'You win if you meet this goal and everyone is alive.';
-  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b class="gw">${win}</b><div class="gs">${esc(SC().goal?SC().goal():S.x)}</div>${G.scen==='marooned'?how:`<p>${how}</p>`}${btn?`<div class="gb">${btn}</div>`:''}</div>`}
+  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b class="gw">${win}</b>${G.learn&&!G.tut?'<div class="gs">Easy island: milder events, no weather dice. Normal has the full rules.</div>':''}<div class="gs">${esc(SC().goal?SC().goal():S.x)}</div>${G.scen==='marooned'?how:`<p>${how}</p>`}${btn?`<div class="gb">${btn}</div>`:''}</div>`}
 // ---------- step 2: one pawn at a time ----------
 function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=curPawn();
   const row=`<div class="pawnrow">${list.map((p,k)=>{const a=G.plan.acts.find(x=>x.pw.includes(p.id));const on=cur&&cur.id===p.id;const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';
