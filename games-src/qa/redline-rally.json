@@ -2,18 +2,18 @@
  "slug": "redline-rally",
  "size": "phone",
  "seed": 73371,
- "when": "2026-11-08T01:31Z",
+ "when": "2026-11-08T01:47Z",
  "tutorial": {
   "end": true,
   "endButtons": 0
  },
  "quick": {
   "result": "cap",
-  "clicks": 1144
+  "clicks": 1109
  },
  "story": {
   "result": "cap",
-  "clicks": 682
+  "clicks": 677
  },
  "fuzz": {
   "taps": 300
@@ -31,7 +31,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 30px (<40) button.score x1: \"You 3rd of 5 · Pia leads\"",
+   "desc": "overlapping clickables: button#scoreL.score \"You 5th of 5 · Pia leads\" / button#goalB.big \"Start the race\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
    "shot": "/tmp/qa-shots/redline-rally/phone-screen-quick-board-3.png"
   },
@@ -39,15 +39,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button#scoreL.score \"You 3rd of 5 · Pia leads\" / button#goalB.big \"Start the race\"",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-quick-board-3.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "clickable covered by another element (not tappable): button#hintT.gx-ibtn \"Hints: Off\" under div#modal \"Goal: first across the l\"",
+   "desc": "clickable covered by another element (not tappable): button#hintT.gx-ibtn \"Hints\" under div#modal \"Goal: first across the l\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
    "shot": "/tmp/qa-shots/redline-rally/phone-screen-quick-board-3.png"
   },
@@ -62,42 +54,10 @@
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 30px (<40) button.score x1: \"You 5th of 5 · Juno lead\"",
+   "where": "quick click #1109 (You 5th of 5 · Pia leads by 47 why?)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1109 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-quick-board-4.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "text overflows its box (visible) in span.t x3: \"random\"",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-quick-board-5.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 30px (<40) button.score x1: \"You 5th of 5 · Dax leads\"",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-quick-board-5.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 30px (<40) button.score x1: \"You 4th of 5 · Kit leads\"",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-quick-board-6.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick click #1144 (You 5th of 5 · Pia leads by 12 why?)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 1144 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases quick",
-   "shot": "/tmp/qa-shots/redline-rally/phone-quick-noresult-7.png"
+   "shot": "/tmp/qa-shots/redline-rally/phone-quick-noresult-6.png"
   },
   {
    "sev": "MINOR",
@@ -105,15 +65,7 @@
    "where": "story-map",
    "desc": "element outside viewport button.gx-ibtn x1 rect 389,4,433,48: \"Menu\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-map-8.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-map",
-   "desc": "tap target 30px (<40) button.score x1: \"You 2nd of 3 · Kit leads\"",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-map-8.png"
+   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-map-7.png"
   },
   {
    "sev": "MINOR",
@@ -121,15 +73,7 @@
    "where": "story-board",
    "desc": "element outside viewport button.gx-ibtn x1 rect 389,4,433,48: \"Menu\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-board-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 30px (<40) button.score x1: \"You 2nd of 3 · Kit leads\"",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-board-9.png"
+   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-board-8.png"
   },
   {
    "sev": "MINOR",
@@ -137,21 +81,13 @@
    "where": "story-board",
    "desc": "element outside viewport button.gx-ibtn x1 rect 388,4,432,48: \"Menu\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-board-11.png"
+   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 30px (<40) button.score x1: \"You lead by -12 over Kit\"",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-board-11.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "clickable covered by another element (not tappable): button#hintT.gx-ibtn \"Hints: Off\" under div#modal \"✕ Race order The car fur\"",
+   "desc": "clickable covered by another element (not tappable): button#hintT.gx-ibtn \"Hints\" under div#modal \"✕ Race order The car fur\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
    "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-board-11.png"
   },
@@ -166,18 +102,10 @@
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 30px (<40) button.score x1: \"You 5th of 5 · Pia leads\"",
+   "where": "story click #677 (You 5th of 5 · Dax leads by 27 why?)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 677 clicks (state kept changing)",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
-   "shot": "/tmp/qa-shots/redline-rally/phone-screen-story-board-12.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story click #682 (You 5th of 5 · Dax leads by 22 why?)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 682 clicks (state kept changing)",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases story",
-   "shot": "/tmp/qa-shots/redline-rally/phone-story-noresult-13.png"
+   "shot": "/tmp/qa-shots/redline-rally/phone-story-noresult-12.png"
   },
   {
    "sev": "MINOR",
@@ -185,32 +113,49 @@
    "where": "fuzz-screen",
    "desc": "element outside viewport button.gx-ibtn x1 rect 389,4,433,48: \"Menu\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
+   "shot": "/tmp/qa-shots/redline-rally/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text overflows its box (visible) in span.t x1: \"random\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
    "shot": "/tmp/qa-shots/redline-rally/phone-screen-fuzz-screen-16.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 30px (<40) button.score x1: \"You 2nd of 3 · Kit leads\"",
+   "desc": "overlapping clickables: button#scoreL.score \"You lead, level with Oto\" / button#goalB.big \"Start the race\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
    "shot": "/tmp/qa-shots/redline-rally/phone-screen-fuzz-screen-16.png"
   },
   {
-   "sev": "BLOCKER",
+   "sev": "MINOR",
    "phase": "fuzz",
-   "where": "fuzz tap #153",
-   "desc": "JS error: Cannot read properties of undefined (reading 'human')",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button#hintT.gx-ibtn \"Hints\" under div#modal \"Goal: first across the l\"",
    "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
-   "stack": "TypeError: Cannot read properties of undefined (reading 'human') |     at carName (http://127.0.0.1:35641/redline-rally/:3317:40) |     at playEvents (http://127.0.0.1:35641/redline-rally/:3330:60)"
+   "shot": "/tmp/qa-shots/redline-rally/phone-screen-fuzz-screen-16.png"
   },
   {
-   "sev": "BLOCKER",
+   "sev": "MINOR",
    "phase": "fuzz",
-   "where": "fuzz tap #155 (button.gb.on \"2 2 cards\")",
-   "desc": "JS error: unhandledrejection: TypeError: Cannot read properties of undefined (reading 'human')",
-   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz"
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Rules\" under div#modal \"Goal: first across the l\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
+   "shot": "/tmp/qa-shots/redline-rally/phone-screen-fuzz-screen-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#scoreL.score \"You lead by 7 over Oto w\" / button#m3.big \"Keep racing\"",
+   "repro": "node games-src/scripts/qa-bot.js redline-rally --size phone --seed 73371 --phases fuzz",
+   "shot": "/tmp/qa-shots/redline-rally/phone-screen-fuzz-screen-17.png"
   }
  ],
- "secs": 426,
+ "secs": 427,
  "tutorialIn": {}
 }

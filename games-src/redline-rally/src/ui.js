@@ -60,7 +60,7 @@ function startGame(o) {
   UI.focus = 0; var blb = $('#bulbbtn'); if (blb) blb.hidden = !hintsOn(); $('#title').hidden = true; $('#game').hidden = false; closeModal();
   $('#tTrk').textContent = TK[G.track].name;
   sizeCanvas(); var f = UI.vis[0]; snapCam(); UI.redraw();
-  RACE.rate = ''; RACE.rateKeep = 0; RACE.rateShow = 0; RACE.flashHold = 0; RACE.lights = null; RACE.skids = []; RACE.spd = RACE.spdT = 0; RACE.prev = null; RACE.ph = 'shift';
+  RACE.start = null; RACE.best = null; RACE.rate = ''; RACE.rateKeep = 0; RACE.rateShow = 0; RACE.flashHold = 0; RACE.lights = null; RACE.skids = []; RACE.spd = RACE.spdT = 0; RACE.prev = null; RACE.ph = 'shift';
   if (!UI.fast && window.ANIM !== false && !(o && (o.tut || o.cmp)) && !G.drafting) goalCard(function () { lightsStart(); sfx('go'); }); else { lightsStart(); sfx('go'); }
   if (G.wx !== 'dry' && hintsOn()) setTimeout(function () { if (G && G.round === 1) banner(WEATHER[G.wx].name + ': ' + WEATHER[G.wx].txt, null, 'round'); }, 2600);
   if (o && o.tut) stageTutorial();
@@ -189,11 +189,11 @@ function banner(txt, col, kind) {
   b.className = 'on ' + (kind || ''); b.style.setProperty('--bc', col != null && COLS[col] ? COLS[col].hex : '#ffc23a'); b.innerHTML = '<i></i><span></span>'; b.lastChild.textContent = txt;
 }
 async function runResolve() {
-  hud(); UI.lastCar = -1; UI.skipStep = false;
+  var g0 = G; hud(); UI.lastCar = -1; UI.skipStep = false;
   banner('Everyone has chosen', null, 'round'); setMsg('One car at a time. Tap: faster.'); await wait(900);
   while (G.phase === 'resolve') {
-    var ev = resolveNext(G); await playEvents(ev);
-    if (G.pend) { var use = await askSlip(); ev = slipChoice(G, use); await playEvents(ev); }
+    var ev = resolveNext(G); await playEvents(ev); if (G !== g0) return;
+    if (G.pend) { var use = await askSlip(); if (G !== g0) return; ev = slipChoice(G, use); await playEvents(ev); if (G !== g0) return; }
   }
   UI.busy = false; UI.pops = []; banner(''); RACE.spdT = 0; rateRound();
   if (G.over) { banner('Chequered flag!', null, 'round'); setMsg('Chequered flag!', 'good'); await wait(1100); banner(''); return showResult(); }
@@ -212,8 +212,11 @@ function tween(i, to, ms) {
 function pop(txt, at, col, stem) { UI.pops.push({ txt: txt, p: at, t: performance.now(), col: col || '#fff', stem: stem }); setTimeout(function () { UI.pops.shift(); }, 1500); }
 function ord(n) { return n + (n % 10 === 1 && n !== 11 ? 'st' : n % 10 === 2 && n !== 12 ? 'nd' : n % 10 === 3 && n !== 13 ? 'rd' : 'th'); }
 async function playEvents(ev) {
+  var gP = G;
   for (var k = 0; k < ev.length; k++) {
-    var e = ev[k], c = G.cars[e.car], nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
+    if (G !== gP) return;
+    var e = ev[k], c = G.cars[e.car]; if (e.car != null && !c) return; var
+      _x = 0, nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
     if (UI.mode === 'tutorial') coachEvent(e, you);
     if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'is up') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : nm + ' is up.'); await wait(750); }

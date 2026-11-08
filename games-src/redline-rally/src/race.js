@@ -121,7 +121,7 @@ function rateStart(c) {
   RACE.start = { pos: c.pos, heat: c.stats.heat, spins: c.stats.spins, ci: c.i };
 }
 function rateRound() {
-  var s = RACE.start; if (!s || !G) return; var c = G.cars[s.ci], d = c.pos - s.pos, ht = c.stats.heat - s.heat, sp = c.stats.spins > s.spins, b = RACE.best ? RACE.best.sp : d, k, t;
+  var s = RACE.start; if (!s || !G || !G.cars[s.ci]) { RACE.start = null; return; } var c = G.cars[s.ci], d = c.pos - s.pos, ht = c.stats.heat - s.heat, sp = c.stats.spins > s.spins, b = RACE.best ? RACE.best.sp : d, k, t;
   if (sp) { k = 'poor'; t = 'Poor: you spun out. Use a lower gear or smaller cards before a corner.'; }
   else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' spaces for ' + ht + ' heat.'; }
   else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' spaces. The best play went about ' + b + '.'; }
@@ -175,7 +175,7 @@ function goalCard(then) {
 }
 function setHints(on) {
   UI.hints = !!on; lsSet('rr_hints', on ? '1' : '0');
-  var b = document.getElementById('hintT'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.firstChild.textContent = 'Hints: ' + (on ? 'On' : 'Off'); b.classList.toggle('on', !!on); }
+  var b = document.getElementById('hintT'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.firstChild.textContent = on ? 'Hints ✓' : 'Hints'; b.setAttribute('aria-label', 'Hints ' + (on ? 'on' : 'off')); b.classList.toggle('on', !!on); }
   var bl = document.getElementById('bulbbtn'); if (bl) bl.hidden = !hintsOn();
   if (G && G.phase === 'plan' && !UI.busy && !$('#game').hidden && G.cars[UI.seat] && !G.cars[UI.seat].plan) drawPlan(); else tracker();
 }
