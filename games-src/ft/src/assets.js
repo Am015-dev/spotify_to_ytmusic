@@ -3,7 +3,7 @@
 // Where each family shows: goods (market row, 13px names) | djinn portraits (row + tap + drawer) | thieves (Cutpurse chip, thieves row, Card list) | card backs (deck piles by the rows, Card list)
 // table-* (a different table each game, or the one unlocked in Story) | ui-* skins (seat chips, top bar, bubbles, buttons, panels) | end-win/end-lose (result card) | fx-sparkle (point pops) | camp-*, story-map, ui-node-*, ui-star-* (Story map) | glyph/icon/item/token/tile/meeple (board, hand, drawers)
 const AS={n:0,done:false};
-function assetsPreload(){const L=ASSET_FILES.slice();const next=()=>{const part=L.splice(0,6);part.forEach(f=>{const i=new Image();i.decoding='async';i.onload=i.onerror=()=>{AS.n++};i.src='media/'+f});if(L.length)setTimeout(next,140);else AS.done=true};next()}
+function assetsPreload(){const L=ASSET_FILES.map(f=>'media/'+f).concat(ASSET_MODEL_IMG.map(f=>'models/'+f));const next=()=>{const part=L.splice(0,6);part.forEach(f=>{const i=new Image();i.decoding='async';i.onload=i.onerror=()=>{AS.n++};i.src=f});if(L.length)setTimeout(next,140);else{AS.done=true;setTimeout(()=>{try{['fight-a','fight-b','defeat-a','defeat-b'].forEach(n=>GA.preload(n))}catch(e){}},2500)}};next()}   // the last-round and defeat tracks are fetched early so the music never stalls
 if(document.readyState==='complete')setTimeout(assetsPreload,900);else addEventListener('load',()=>setTimeout(assetsPreload,900));
 // a different table each game (the Story unlock still wins)
 const TABLE_SET=['default','court','night','palace','workshop'];

@@ -398,6 +398,59 @@
     b.setAttribute('role', 'status'); doc.body.appendChild(b);
   };
 
+  // ---- one toast / bubble component (owner brief: stays until tapped or 4 s + 1 s per 10 words, one at a time, none in Play with Hints off)
+  // GX.toast(text, {title, ms, sticky, kind:'info'|'good'|'warn', at:'bottom'|'top', onTap}) -> {close()} | null (when suppressed)
+  // Play mode is the class html.gx-play; the Hints toggle is html.gx-hints. A game sets them; with gx-play and no gx-hints nothing shows.
+  // Messages queue and show one after the other (max 4 waiting, the oldest dropped). A tap closes the current one.
+  var TQ = [], TCUR = null, TTIMER = 0;
+  GX.toastMs = function (text) { var w = String(text || '').trim().split(/\s+/).filter(Boolean).length; return 4000 + Math.ceil(w / 10) * 1000; };
+  GX.toastAllowed = function () { var c = doc && doc.documentElement.classList; return !(c && c.contains('gx-play') && !c.contains('gx-hints')); };
+  function toastNext() {
+    if (TCUR || !TQ.length || !doc) return;
+    var o = TQ.shift(), el = doc.createElement('div');
+    el.className = 'gx-toast' + (o.kind ? ' ' + o.kind : '') + (o.at === 'top' ? ' top' : '');
+    el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite'); el.tabIndex = 0;
+    if (o.title) { var t = doc.createElement('b'); t.className = 'gx-toast-t'; t.textContent = o.title; el.appendChild(t); }
+    var p = doc.createElement('span'); p.className = 'gx-toast-x'; p.textContent = o.text; el.appendChild(p);
+    var hint = doc.createElement('small'); hint.className = 'gx-toast-h'; hint.textContent = 'Tap to close'; el.appendChild(hint);
+    var done = function () {
+      if (TCUR !== h) return; clearTimeout(TTIMER); TCUR = null;
+      el.classList.add('out'); setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); toastNext(); }, GX.reduced() ? 0 : 160);
+    };
+    var h = { el: el, close: done, text: o.text };
+    el.addEventListener('click', function () { try { if (o.onTap) o.onTap(); } catch (e) { } done(); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); done(); } });
+    doc.body.appendChild(el); TCUR = h;
+    if (!o.sticky) TTIMER = setTimeout(done, o.ms || GX.toastMs(o.text));
+  }
+  GX.toast = function (text, o) {
+    o = o || {}; text = String(text == null ? '' : text); if (!doc || !text || !GX.toastAllowed()) return null;
+    if (TCUR && TCUR.text === text) return TCUR;
+    var item = { text: text, title: o.title, ms: o.ms, sticky: o.sticky, kind: o.kind, at: o.at, onTap: o.onTap };
+    TQ.push(item); if (TQ.length > 4) TQ.shift(); toastNext();
+    return { close: function () { var i = TQ.indexOf(item); if (i >= 0) TQ.splice(i, 1); else if (TCUR) TCUR.close(); } };
+  };
+  GX.toastClear = function () { TQ.length = 0; if (TCUR) TCUR.close(); };
+
+  // ---- Goal card: the one plain sentence that says how you win, plus at most 3 short score bullets.
+  // GX.goalCard({title, goal, bullets:[...], go:'Got it', onGo, pic:<html or Node>}) -> element (shown as a modal card). GX.goalHTML(o) -> markup only.
+  GX.goalHTML = function (o) {
+    o = o || {}; var esc = function (x) { return String(x == null ? '' : x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var b = (o.bullets || []).slice(0, 3).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('');
+    return '<div class="gx-goal-k">' + esc(o.kicker || 'Your goal') + '</div>' + (o.title ? '<h2 class="gx-goal-t">' + esc(o.title) + '</h2>' : '') +
+      '<p class="gx-goal-g">' + esc(o.goal) + '</p>' + (b ? '<ul class="gx-goal-b">' + b + '</ul>' : '');
+  };
+  GX.goalCard = function (o) {
+    o = o || {}; if (!doc) return null;
+    var old = doc.querySelector('.gx-goal-wrap'); if (old && old.parentNode) old.parentNode.removeChild(old);
+    var w = doc.createElement('div'); w.className = 'gx-goal-wrap'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true');
+    var c = doc.createElement('div'); c.className = 'gx-goal'; c.innerHTML = GX.goalHTML(o);
+    if (o.pic) { var pc = doc.createElement('div'); pc.className = 'gx-goal-p'; if (typeof o.pic === 'string') pc.innerHTML = o.pic; else pc.appendChild(o.pic); c.insertBefore(pc, c.querySelector('.gx-goal-g')); }
+    var g = btn('gx-goal-go', o.go || 'Got it', function () { if (w.parentNode) w.parentNode.removeChild(w); try { if (o.onGo) o.onGo(); } catch (e) { } });
+    c.appendChild(g); w.appendChild(c); doc.body.appendChild(w); try { g.focus(); } catch (e) { }
+    return w;
+  };
+
   try { GX.applyPrefs(); } catch (e) { }
   if (root.matchMedia) { try { root.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', GX.applyPrefs); } catch (e) { } }
 })(typeof window !== 'undefined' ? window : this, typeof GX !== 'undefined' ? GX : null);
