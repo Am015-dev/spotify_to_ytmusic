@@ -125,4 +125,9 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 ## MORNING LIST (passed independent review + verified live)
 - Emberclimb https://am015-dev.github.io/spotify_to_ytmusic/emberclimb/ (R1 PASS 04:43, live 04:22, feel-audit live all pass)
 - Rampart and Vine https://am015-dev.github.io/spotify_to_ytmusic/rampart-and-vine/ (R3 PASS 04:43, live 04:52, feel-audit live all pass)
-- Lantern Dive: R6 PASS 04:27, deploy waits on build scenario fix (W479).
+- Lantern Dive https://am015-dev.github.io/spotify_to_ytmusic/lantern-dive/ (R6 PASS 04:27, live 04:59, feel-audit live all pass)
+
+## 05:03 state
+- Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).
+- New reviewers: R7 sands session_01RR7mnYY2bAJ5s4vAQTcBiG, R8 stitchwise session_01RR7mnXUpq2ard1J7RVsJoL, R9 redline session_01RR7mnY315Vk28t5BMK1BXb.
+- R3 vinegrave, R5 nebula, R4 shipwreck, R6 crown, R1 short-fuse. W464 tidewake round 4 sent. W463 kaiten fixes sent.
