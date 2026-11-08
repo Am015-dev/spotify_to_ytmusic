@@ -27,7 +27,7 @@ Sources are public domain, CC0 or CC BY 3.0 (attribution below). Slots marked FA
 - metp_g/06.jpg Portrait of a Gentleman | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/14522
 - metp_g/07.jpg Portrait of a Gentleman | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/15207
 - metp_l/00.jpg Portrait of a Lady | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/17447
-- metp_l/01.jpg Portrait of a Lady | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/15177
+- NGA 69784 Plate 3: Camel, Ibex, and Goat (Hoefnagel), goat crop | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.69784.html
 - metp_l/03.jpg Portrait of a Lady | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/334861
 - metp_l/04.jpg Portrait of a lady | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/193696
 - NGA 125748 Harvest Scene in the Delaware Valley (Inness), dusk grade | CC0 (NGA Open Data) | https://www.nga.gov/collection/art-object-page.125748.html

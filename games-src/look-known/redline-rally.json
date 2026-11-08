@@ -6,7 +6,11 @@
 "menu-phone.json",
 "rr-board-phone.json",
 "rr-corner-phone.json",
+"rr-lights-phone.json",
+"rr-play-phone.json",
+"rr-preview-phone.json",
 "rr-result-phone.json",
+"rr-spin-phone.json",
 "story-scene-phone.json"
 ]
 }
