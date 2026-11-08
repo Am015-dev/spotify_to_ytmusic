@@ -186,5 +186,7 @@ body:has(.gx-drawer.on) #gxscn-tag{display:none}   /* the ?scn= test tag must no
 #hintT.on{border-color:var(--gold);color:var(--gold)}
 ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;line-height:1.35}.wxl{font-size:15px;color:#8ce6ff}
 @media (min-width:900px){#trk .score,#trk .score i{font-size:16px}}
+/* portrait phone: the dock fits its content (gears, hand, Go) so Go never drops below the screen; the board keeps the rest */
+@media (max-width:999px) and (orientation:portrait){html #game .gx-dock{max-height:62dvh}}
 </style>
 </head>

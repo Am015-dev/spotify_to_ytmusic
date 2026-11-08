@@ -13,8 +13,8 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
     await p.click('#tutSlot button');
     await p.waitForSelector('#tutGo', { timeout: 5000 }); await p.click('#tutGo');   // Learn to play first screen: how you win
     const tap = async (sel) => {
-      const r = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e || !e.getClientRects().length || e.disabled) return null; const q = e.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, h = document.elementFromPoint(x, y); return { x, y, hit: !!(h && (h === e || e.contains(h))) }; }, sel);
-      if (!r) return false; if (!r.hit) { problems.push('covered ' + sel); return false; } await p.mouse.click(r.x, r.y); return true;
+      const r = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e || !e.getClientRects().length || e.disabled) return null; const q = e.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, h = document.elementFromPoint(x, y); return { x, y, hit: !!(h && (h === e || e.contains(h))), by: h ? (h.id || h.className || h.tagName) : "" }; }, sel);
+      if (!r) return false; if (!r.hit) { problems.push("covered " + sel + " by " + r.by); return false; } await p.mouse.click(r.x, r.y); return true;
     };
     await p.waitForFunction(() => GXT.state().shown, null, { timeout: 10000 });
     const s1 = await p.evaluate(() => GXT.state().id); if (s1 !== 'gear') problems.push('first step ' + s1);

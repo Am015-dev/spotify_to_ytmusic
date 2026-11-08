@@ -25,5 +25,7 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - New Learn-to-play first screen: "Win: cross the line first after one lap." + 3 bullets, then the coached game.
 - shoot-feel.js: whole race by touch (390x844) and mouse (1440x900), shots in playable-shots/feel/, small-text check after 10 turns.
 - r2-test.js guide check expects the old 7-step tutorial (replaced in 3154a433): stale before W475, left as is.
+- Phone dock: the merged shell capped it at 44dvh, which pushed Go below the screen in Learn to play at 390x763; the dock now
+  takes up to 62dvh in portrait (head.html).
 - Still open: visual baselines need the owner's --approve-visual; cars are small on phone (camera zoom), lights overlay sits on
   the board while turn 1 is already playable.
