@@ -259,8 +259,8 @@ function deadlySlots(v, legal) {
 function effectLine(v, val) {
   const o = 1 - v, ax = G.slots['ax' + o], en = G.slots['en' + o];
   const parts = [], last = FA.isFinal(G);
-  // the last round: the plane does not move, the engine sum is the landing speed and must be below the brakes
-  if (last && !G.slots['en' + v]) { const bv = FA.brakeVal(G), wm = FA.windMod(G); parts.push('Landing speed: ' + val + (en ? ' + ' + en.v + (wm ? ' + wind ' + wm : '') + ' = ' + (val + en.v + wm) + (val + en.v + wm < bv ? ', within' : ', above') + ' the brakes ' + bv : ' + ?' + (wm ? ' + wind ' + wm : '') + ' must be no more than the brakes ' + bv)); }
+  // the last round: the plane does not move, the engine sum is the landing speed and must be no more than the brakes
+  if (last && !G.slots['en' + v]) { const bv = FA.brakeVal(G), wm = FA.windMod(G); parts.push('Landing speed: ' + val + (en ? ' + ' + en.v + (wm ? ' + wind ' + wm : '') + ' = ' + (val + en.v + wm) + (val + en.v + wm <= bv ? ', within' : ', above') + ' the brakes ' + bv : ' + ?' + (wm ? ' + wind ' + wm : '') + ' must be no more than the brakes ' + bv)); }
   else if (!G.slots['en' + v]) { const sm = en ? val + en.v + FA.windMod(G) : 0, adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2;
     parts.push('Engines: ' + val + (en ? ' + ' + en.v + ' = ' + sm + (FA.windMod(G) ? ' with wind' : '') + ': the plane ' + (adv ? 'moves ' + adv + ' space' + (adv > 1 ? 's' : '') + ' right away' : 'stays put') : ' + ' + name(o) + ': ≤' + G.pl.aeroB + ' stays, ≤' + G.pl.aeroO + ' moves 1, more moves 2')); }
   if (legalHas(v, val, 'radio')) { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0, air = at === G.planes.length; parts.push('Radio: reaches ' + (val === 1 ? 'your space' : air ? 'the airport' : 'space ' + at) + (n ? ', clears a plane' : ', no plane there') + (!(G.slots.en0 && G.slots.en1) && !FA.isFinal(G) ? ' (from here, before the engines move you)' : '')); }
@@ -282,7 +282,7 @@ function actions(v) {
   if (G.pend) return f;
   const selD = typeof UI.sel === 'number' && UI.sel >= 0;
   // free actions (any time, also on the partner's turn)
-  if (has('rr').length) b(UI.rrAsk ? 'Spend 1 of ' + G.rrHand + ' rerolls?' : 'Reroll (' + G.rrHand + ')', 'rr', UI.rrAsk ? 'go' : 'alt', { title: 'Spend a reroll token: both crew may reroll any unplaced dice once' });
+  if (has('rr').length) b(UI.rrAsk ? 'Spend 1 of ' + G.rrHand + ' rerolls?' : 'Reroll token: ' + G.rrHand, 'rr', UI.rrAsk ? 'go' : 'alt', { title: 'Spend a reroll token: both crew may reroll any unplaced dice once' });
   if (has('adapt').length && selD) b('Flip this die', 'adapt', 'alt');
   if (has('wt').length && selD) b('Hand-over with this die', 'wt', 'alt');
   if (G.turn !== v) return f;

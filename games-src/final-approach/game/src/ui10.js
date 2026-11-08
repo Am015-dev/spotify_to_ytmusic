@@ -50,7 +50,7 @@ Object.assign(HLP_STEPS, {
   'sys-engines': { target: hq('#pz .gau'), title: 'Engines set speed', text: 'The two engine dice add up to your speed. Low holds, medium moves one space, high two.', pic: () => HP.gauge() },
   'sys-radio': { target: hfirst('#pz .slot[data-slot=ra0]'), title: 'Clear the way', text: 'The radio clears a plane ahead. A 1 clears your space, a 2 the next one, and so on.', pic: () => HP.radio() },
   'sys-gear': { target: hfirst('#pz .slot[data-slot=lg0]'), title: 'Wheels and flaps', text: 'Gear takes 1-2, 3-4, 5-6; flaps go in order. Land with all of them down.', pic: () => HP.gear() },
-  'sys-brakes': { target: hfirst('#pz .badge.brk', '#pz .slot[data-slot=br0]'), title: 'Brakes', text: 'Brakes set how fast you may land. Place 2, then 4, then 6. Landing speed must be below them.', pic: () => HP.brake(4) },
+  'sys-brakes': { target: hfirst('#pz .badge.brk', '#pz .slot[data-slot=br0]'), title: 'Brakes', text: 'Brakes set how fast you may land. Place 2, then 4, then 6. Landing speed must be no more than the last one.', pic: () => HP.brake(4) },
   'sys-conc': { target: hfirst('#pz .slot[data-slot=co0]', '#pz .chipr'), title: 'Coffee and rerolls', text: 'A die on a coffee space earns a token to nudge a later die by one. Rerolls redo your dice.', pic: () => HP.cup() }
 });
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each): every cockpit slot, in plain words
@@ -68,7 +68,7 @@ const HLP_RULES = [
   { phase: 'sys-gear', title: 'Flaps in order', text: 'Four flap spaces take 1-2, 2-3, 4-5, 5-6, top to bottom. Co-pilot only.', pic: () => hpics([['flap', 'Co-pilot: flaps']]) },
   { phase: 'sys-gear', title: 'All down to land', text: 'Each gear and flap raises a speed marker. Every one must be down at the landing.', pic: () => hpics([['gear', 'Gear'], ['flap', 'Flaps'], '>', ['air', 'Land']]) },
   { phase: 'sys-brakes', title: 'Set the brakes', text: 'Brake spaces take exactly 2, then 4, then 6, in that order. Only the pilot uses them.', pic: () => hpics([['brake', 'First', 2], ['brake', 'Then', 4], ['brake', 'Last', 6]]) },
-  { phase: 'sys-brakes', title: 'Speed below the brakes', text: 'In the last round the plane stops: the engine total must be below the brakes.', pic: () => hpics([['gauge', 'Speed'], '>', ['brake', 'Brakes', 4]]) },
+  { phase: 'sys-brakes', title: 'Speed within the brakes', text: 'In the last round the plane stops: the engine total must be no more than the brakes.', pic: () => hpics([['gauge', 'Speed'], '>', ['brake', 'Brakes', 4]]) },
   { phase: 'sys-conc', title: 'Coffee tokens', text: 'A die on a coffee space earns a token. Spend one to change a die by one.', pic: () => hpics([['die', 'Spare', 2], '>', ['cup', 'Coffee'], '>', ['plus', '+1 / -1']]) },
   { phase: 'sys-conc', title: 'Reroll tokens', text: 'A reroll token lets both crew roll their unplaced dice again, once.', pic: () => hpics([['reroll', 'Token'], '>', ['dice2', 'New dice']]) },
   { phase: 'sys-conc', title: 'Now the full game', text: 'You know every control. Later flights hide each crew’s dice and add fuel, wind and more.', pic: () => hpics([['plane', 'Full game']]) },
@@ -122,7 +122,7 @@ function hlpWhy(m, v) {
     case 'engines': { const x = G.slots['en' + o]; if (x) { const sm = val + x.v + FA.windMod(G); if (FA.isFinal(G)) return 'Landing speed ' + sm + ' against brakes ' + FA.brakeVal(G) + '.'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Engines total ' + sm + ': the plane ' + (adv ? 'moves ' + adv + (adv > 1 ? ' spaces' : ' space') : 'stays put') + '.'; } return 'Engines: you set half the speed, your partner adds the rest.'; }
     case 'gear': return 'Lowers a landing gear. All three must be down to land.';
     case 'flaps': return 'Extends a flap. All four must be out to land.';
-    case 'brakes': case 'ice': return 'Sets a brake. The last-round speed must be below it.';
+    case 'brakes': case 'ice': return 'Sets a brake. The last-round speed must stay within it.';
     case 'conc': return 'A spare die on Coffee earns a token to bend a later die by one.';
     case 'kero': return 'Fuel space: this burns ' + val + ', skipping it burns ' + D.keroSkip + '.';
     case 'intern': return 'This trains the trainee: place the next token too.';
