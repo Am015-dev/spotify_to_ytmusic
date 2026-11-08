@@ -446,7 +446,7 @@ function renderActs(mm, qm, qShown) {
   if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
   if (mine) {
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
-    else a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare (workers still out)' }, seasonIcon(Math.min(3, p.season + 1), 26), h('span', 'Prepare')));
+    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span', n > 0 ? 'Prepare after ' + n + ' more worker' + (n > 1 ? 's' : '') : 'Prepare'))); }   // says why it is off
     if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
@@ -468,9 +468,10 @@ function promptText() {
   if (p.ai) return UI.aiCap || p.name + ' is playing…';
   if (G.q) return qShort(G.q);
   const n = availW(p);
-  if (isPh() && !hotSeat() && humans().length <= 1) return n > 0 ? 'Place a worker' : 'Build, Prepare or Pass';   // phone: one short line
+  if (isPh() && !hotSeat() && humans().length <= 1) return n > 0 ? 'Place a worker' : p.season < 3 ? 'Build or Prepare' : 'Build or Pass';   // phone: one short line (Pass only in Autumn)
   const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
-  return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build, Prepare or Pass.' : 'play a card, Prepare or Pass.'));
+  const last = p.season < 3 ? 'Prepare' : 'Pass';
+  return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build or ' + last + '.' : 'play a card or ' + last + '.'));
 }
 // the short line for a pending decision (8 words at most; the long wording stays in the log)
 function qShort(q) {

@@ -245,7 +245,8 @@ function genMoves(seat) {
   if (availW(p) > 0) for (const l of locOpts(seat)) { const m = { type: 'worker' }; for (const k in l) if (k !== 'label') m[k] = l[k]; m.label = 'Place a worker: ' + l.label; out.push(m); }
   for (const m of playMoves(seat)) out.push(m);
   if (availW(p) === 0 && p.season < 3) out.push({ type: 'prepare', label: 'Prepare for ' + SEASONS[p.season + 1] + ' (recall workers' + (p.season === 0 ? ', +1 worker, run production' : p.season === 1 ? ', +1 worker, draw from the meadow' : ', +2 workers, run production') + ')' });
-  out.push({ type: 'pass', label: 'Pass (you are done for the game)' });
+  // you pass only once you are in Autumn (the last season); before that the year goes on. G.tale: the tutorial's short year may end early.
+  if (p.season >= 3 || G.tale || !out.length) out.push({ type: 'pass', label: 'Pass (you are done for the game)' });
   return out;
 }
 function occCount(k, i) {

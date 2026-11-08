@@ -252,7 +252,7 @@ html.ph .pcard span,html.ph .pcard b,html.ph .gx-drawer b,html.ph .gx-drawer .sm
 html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!important}
 #bd.pv.wide .pvc-aff{white-space:normal!important;overflow:hidden}
 /* five piles (tokens too) on a phone: the worker count keeps its number and word, the meeple pictures step aside */
-#bd.pv.tall .resrow.r5 .pv-meeple{display:none}#bd.pv.tall .resrow.r5 .pv-wn{margin-left:0}
+#bd.pv.tall .resrow.r5 .pv-meeple:not(:first-child){display:none}#bd.pv.tall .resrow.r5 .pv-wn{margin-left:2px}   /* W509: with point tokens shown, one worker stays visible so it can still be dragged */
 /* W482 round 2: phone Places = the painted tree-stump table (owner art media/table-woodland-phone.webp) with round clearings on it */
 #bd.pv.tall .pv-spots.pv-board{display:block;position:relative;height:100%;padding:0;gap:0;border-radius:18px;overflow:hidden;background:#6b5233 url(media/table-woodland-phone.webp) center/cover no-repeat;box-shadow:inset 0 0 0 2px #3b2a1c}
 #bd.pv.tall .pv-board .pv-cell{position:absolute;width:32%;transform:translate(-50%,-50%);display:block}

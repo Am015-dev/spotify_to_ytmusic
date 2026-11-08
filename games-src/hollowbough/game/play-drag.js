@@ -3,7 +3,8 @@
 // Based on play-ui.js (tap version).   node play-drag.js [touch]   (touch = real touch events at 390x844, isMobile)
 // Where to tap comes from the game's own hint (UI.rec -> the element the ghost finger points at) and the visible buttons of cards/dialogs;
 // no engine calls make moves. Only the AI pause is shortened (Speed: Fast). Prints only PASS/FAIL.   node play-ui.js [quick|story|both]
-const PW=require('/home/user/spotify_to_ytmusic/games-src/node_modules/playwright');
+const PW=(()=>{try{return require('playwright')}catch(e){return require('/home/user/spotify_to_ytmusic/games-src/node_modules/playwright')}})();
+const SD=process.env.SHOTDIR;
 const fs=require('fs');const html=fs.readFileSync(__dirname+'/hollowbough.html');
 const which='quick',TOUCH=process.argv[2]==='touch';const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function game(b,kind){const probs=[];const t0=Date.now();
@@ -19,7 +20,8 @@ async function game(b,kind){const probs=[];const t0=Date.now();
   await p.evaluate(()=>{AIDELAY=120});
   if(kind==='quick'){await tapEl('[data-a="opt"][data-k="mode"][data-v="vs"], .chipb:has-text("vs computer")').catch(()=>{});await tapEl('[data-start="play"], .sbtn.big');}
   else{await p.touchscreen.tap(...(await p.evaluate(()=>{const e=[...document.querySelectorAll('.chipb')].find(x=>/Story/.test(x.textContent));const r=e.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]})));await sleep(300);await tapEl('.sbtn.big');await sleep(900);await tapEl('.gxc-node.open');await sleep(600);}
-  await sleep(1200);let idle=0,taps=0,drags=0,over=false;
+  await sleep(1200);let idle=0,taps=0,drags=0,over=false,mid=false;
+  if(SD&&TOUCH)await p.screenshot({path:SD+'/first-turn.png'});
   while(Date.now()-t0<280000){
     const s=await p.evaluate(()=>{
       const vis=e=>{if(!e)return false;const r=e.getBoundingClientRect();return r.width>4&&r.height>4&&!e.closest('[hidden]')&&getComputedStyle(e).visibility!=='hidden'};
@@ -43,6 +45,7 @@ async function game(b,kind){const probs=[];const t0=Date.now();
       if(!q)return Object.assign(out,{kind:'move',q:{x:b0.left+b0.width/2,y:b0.top+b0.height/2},cov:false,tg});
       return Object.assign(out,{kind:'move',q,cov:true,tg});
     }).catch(e=>({kind:'err',e:e.message}));
+    if(SD&&TOUCH&&!mid&&s.kind==='move'&&await p.evaluate(()=>G.players[0].season>=2&&!UI.cards.length)){mid=true;await p.screenshot({path:SD+'/mid-game.png'})}
     if(s.kind==='done'||(s.over&&s.kind==='wait')){over=true;break}
     if(s.kind==='btn'&&s.cov===false)probs.push('button covered: '+s.txt);
     if(s.kind==='btn'||s.kind==='move'){idle=0;if(s.cov===false&&s.kind==='move'){probs.push('target covered '+s.tg)}
@@ -50,11 +53,12 @@ async function game(b,kind){const probs=[];const t0=Date.now();
       if(dg){const tx=s.tg[0]==='w'?s.q.x:dg.x,ty=s.tg[0]==='w'?s.q.y:dg.ty;
         if(s.tg[0]==='w'){await p.evaluate(()=>pvSetTab('places',true));const q2=await p.evaluate(tg=>{const e=UI.tgEls[tg];if(!e)return null;hscrollTo(e);const r=e.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}},s.tg);if(q2){s.q=q2}}
         await down(dg.x,dg.y);let lx=dg.x,ly=dg.y;for(let k=1;k<=8;k++){lx=dg.x+((s.tg[0]==='w'?s.q.x:tx)-dg.x)*k/8;ly=dg.y+((s.tg[0]==='w'?s.q.y:ty)-dg.y)*k/8;await mv(dg.x+((s.tg[0]==='w'?s.q.x:tx)-dg.x)*k/8,dg.y+((s.tg[0]==='w'?s.q.y:ty)-dg.y)*k/8);await sleep(16)}await up(lx,ly);drags++;}
-      else await tapAt(s.q.x,s.q.y);taps++;if(process.env.DBG&&taps%15===0){console.error(taps,JSON.stringify(await p.evaluate(()=>({n:G.logN,t:G.turn,ph:G.phase,q:G.q&&G.q.kind,seat:HB.actor(G),pc:UI.cards[0]&&UI.cards[0].kind,sel:!!UI.sel,res:G.players[0].res,w:G.players[0].workers,dep:G.players[0].dep.length,se:G.players[0].season,rec:UI.rec&&UI.rec.m&&UI.rec.m.label}))))}await sleep(s.kind==='btn'?350:550);}
+      else await tapAt(s.q.x,s.q.y);taps++;if(process.env.DBG&&taps%40===0)await p.screenshot({path:'/tmp/claude-0/drag-dbg.png'});if(process.env.DBG&&taps%15===0){console.error(taps,JSON.stringify(await p.evaluate(()=>({n:G.logN,t:G.turn,ph:G.phase,q:G.q&&G.q.kind,seat:HB.actor(G),pc:UI.cards[0]&&UI.cards[0].kind,sel:!!UI.sel,res:G.players[0].res,w:G.players[0].workers,dep:G.players[0].dep.length,se:G.players[0].season,rec:UI.rec&&UI.rec.m&&UI.rec.m.label}))))}await sleep(s.kind==='btn'?350:550);}
     else{idle++;await sleep(300);if(idle>60){probs.push('stuck: '+JSON.stringify(s).slice(0,120));break}}
   }
   const fin=await p.evaluate(()=>({over:!!(G&&G.phase==='over'),res:G&&G.over?G.over.scores.map(x=>x.total):null,camp:!!UI.camp}));
   if(!over&&!fin.over)probs.push('no result screen');if(drags<10)probs.push('too few drags '+drags);
+  if(SD&&TOUCH)await p.screenshot({path:SD+'/result.png'});
   await p.screenshot({path:__dirname+'/../playtest/drag'+(TOUCH?'-touch-':'-')+kind+'-end.png'});
   console.log((probs.length?'FAIL ':'PASS ')+kind+' game by '+(TOUCH?'touch drag 390x844':'mouse drag 390x763')+' drags='+drags+' taps='+taps+' scores='+JSON.stringify(fin.res)+' '+Math.round((Date.now()-t0)/1000)+'s '+probs.slice(0,4).join(' | '));
   await ctx.close();return probs.length}

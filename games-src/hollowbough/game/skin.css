@@ -84,3 +84,6 @@ html:not(.hints-on) #bulbbtn{display:none!important}
 #trk .tr1{font-size:14px}
 .kv.why span{font-size:14px}
 @media (min-width:1024px){#trk .tr1,#trk .tr1 *{font-size:16px!important}}
+
+/* W509: tutorial bubble text starts below the Next button (never under it) */
+.gxt-bub:not(.gxt-nobtn) .gxh-tt{min-height:30px}
