@@ -1,21 +1,93 @@
 {
  "slug": "wildmark",
- "when": "2026-11-08T09:37Z",
+ "when": "2026-11-08T09:51Z",
  "secs": 180,
  "totalSecs": 722,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 1,
+   "count": 9,
    "detail": [
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "⚠ No points this turn. Poor move. Best was the Elk column for up to +4. The hint liked the Salmon column for later turns.",
+     "words": 25,
+     "shownMs": 250,
+     "neededMs": 6500,
+     "cls": "vd poor"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "⚠ No points this turn. Poor move. Best was the Elk column for up to +4. The hint liked the Salmon column for later turns.",
+     "words": 25,
+     "shownMs": 250,
+     "neededMs": 6500,
+     "cls": "vd poor"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "● +3 this turn: +2 Fox neighbours, +1 marsh. Okay move. Best was the Salmon column for up to +5.",
+     "words": 20,
+     "shownMs": 250,
+     "neededMs": 6000,
+     "cls": "vd okay"
+    },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "● +1 this turn: +1 Fox neighbours. Okay move. Best",
-      "Rowan Four alike: the market clears them by itself"
+      "⚠ +1 this turn: +1 forest. Poor move. Best was the",
+      "Best fit for your patterns and habitats. How does "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1250,
+     "texts": [
+      "⚠ +1 this turn: +1 forest. Poor move. Best was the",
+      "Three tokens swept away."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Three tokens swept away.",
+      "Joins matching edges and leaves good animal spots."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Rowan A fox scores 1 point for each different anim",
+      "Three tokens swept away."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1750,
+     "texts": [
+      "● +1 this turn: +1 river. Okay move. Best was the ",
+      "Three tokens swept away."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 448,
+     "texts": [
+      "Rowan Four alike: the market clears them by itself",
+      "Three tokens swept away."
      ]
     }
    ]
@@ -26,17 +98,9 @@
    "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 1,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Foxes: you have 2 foxes next to 2 + 0 kinds = 2 points.",
-     "words": 14,
-     "at": 122002,
-     "where": "p.wl.riv"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
    "status": "PASS",
@@ -58,19 +122,19 @@
    "size": "phone",
    "mode": "learn",
    "secs": 180,
-   "turns": 700,
-   "clicks": 749,
+   "turns": 691,
+   "clicks": 745,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 48
+   "messagesSeen": 56
   },
   {
    "size": "phone",
    "mode": "play",
    "secs": 180,
-   "turns": 686,
-   "clicks": 760,
+   "turns": 709,
+   "clicks": 767,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -80,19 +144,19 @@
    "size": "pc",
    "mode": "learn",
    "secs": 180,
-   "turns": 717,
-   "clicks": 767,
+   "turns": 722,
+   "clicks": 773,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 49
+   "messagesSeen": 52
   },
   {
    "size": "pc",
    "mode": "play",
    "secs": 180,
-   "turns": 707,
-   "clicks": 807,
+   "turns": 722,
+   "clicks": 821,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
