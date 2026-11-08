@@ -320,3 +320,22 @@ html.sk .menu .opt,.menu .opt{min-height:44px}
 @media(max-width:480px){#seats:has(.seat:nth-child(4)) .seat:not(.cur) .nm{display:none!important}}
 #left small,html.sk #left small{font-size:14px}
 .mp.gone.homing{opacity:1}
+/* result table (R4): winner first, points per kind */
+.restab{width:100%;border-collapse:collapse;font:700 16px/1.2 var(--ff);color:var(--ink);background:#fff8e8;border-radius:12px;overflow:hidden}
+.restab th,.restab td{padding:7px 8px;text-align:right}
+.restab tbody th,.restab tfoot th{text-align:left;font-weight:700;color:var(--mut)}
+.restab thead th{font-size:16px;color:var(--ink);white-space:nowrap}
+.restab thead th i{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:-1px;border:1.5px solid #fff8e8;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.restab thead th:nth-child(2),.restab td:nth-child(2){background:rgba(224,168,58,.18)}
+.restab tbody tr+tr{border-top:1px solid rgba(45,32,22,.1)}
+.restab tfoot{border-top:2px solid rgba(45,32,22,.35)}
+.restab tfoot td,.restab tfoot th{font-size:20px;font-weight:800;color:var(--ink)}
+/* R4: counters readable on a phone (14px floor) */
+html.sk .seat .fl,html.sk .seat .fl small{font-size:15px!important;font-weight:800}
+html.sk .seat .fl .ic{width:16px;height:16px}
+html.sk #top #left b{font-size:16px!important}
+html.sk #top #left small,#left small{font-size:14px!important}
+/* R4: end-count plate, centred and readable; the whole screen skips */
+#endplate{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 26px;border-radius:16px;background:rgba(40,27,18,.9);border:2px solid var(--gold);color:#fff3dc;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:endIn .25s ease-out}
+#endplate b{font:800 24px/1.1 var(--ff-h,var(--ff))}#endplate small{font:700 15px/1 var(--ff);opacity:.85}
+@keyframes endIn{from{opacity:0;transform:translate(-50%,12px)}}

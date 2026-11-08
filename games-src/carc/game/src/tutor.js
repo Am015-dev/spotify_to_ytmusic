@@ -53,7 +53,7 @@ const tutP=(n,st)=>!!G&&G.turn===n&&myTurn(st);
 const tutAfter=(n,pts)=>!!G&&G.turn===n&&G.step==='place'&&G.cur.p===1&&P(0).score===pts;
 // ---------------------------------------------------------------- the steps
 function tutSteps(){return tutStory(tutSteps0())}
-function tutStory(L){tutStyle();return L.map(st=>{const t=STORY.tut[st.id];if(t){st.title=t.title;if(t.say!=null)st.say=t.say}return st})}
+function tutStory(L){tutStyle();return L.map(st=>{if(st.wait&&st.wait.match&&st.onEnter&&!st.wrong&&/tOn\(\)/.test(String(st.onEnter)))st.wrong='Tap the lit tile.';const t=STORY.tut[st.id];if(t){st.title=t.title;if(t.say!=null)st.say=t.say}return st})}
 function tutStyle(){if(document.getElementById('tutcast'))return;const o=[];let lastCh=0;
   for(const id in STORY.tut){const t=STORY.tut[id],c=STORY[t.who];const sel=`.gxt-bub[data-step="${id}"]`;
     o.push(`${sel} .gxh-bd::before{background-image:url(${c.img});border-color:${c.col}}`);
@@ -96,7 +96,7 @@ function tutSteps0(){
  {id:'priory_done',title:'Priory scored',say:'Eight tiles around it: 9 points! Your follower comes home.',target:tutCellsFn(RING),wait:null,onEnter:()=>{UI.user=false;refit(true)},ready:()=>!!G&&G.over&&P(0).sc.priory===9},
  {id:'final',title:'Final scoring',say:'Valley full! Your farmer scores 3 for the finished town. Unfinished roads and towns score 1 per tile.',target:tutCellsFn(['-2,-1']),also:tutCellsFn(['0,-1']),wait:null,
    onEnter:()=>tutFinalPops(),ready:()=>!!G&&G.over},
- {id:'winner',title:'Most points wins',say:()=>(P(0).score>=P(1).score?'You win ':'Hob wins ')+Math.max(P(0).score,P(1).score)+' to '+Math.min(P(0).score,P(1).score)+'. Most points wins!',target:()=>UI.tl['0,0'],wait:null,ready:()=>!!G&&G.over}
+ {id:'winner',title:'Most points wins',say:()=>(P(0).score>=P(1).score?'You win ':'Hob wins ')+Math.max(P(0).score,P(1).score)+' to '+Math.min(P(0).score,P(1).score)+'. Most points wins!',target:()=>UI.tl['0,0'],wait:null,wrong:'Tap Finish.',ready:()=>!!G&&G.over}
   ]}
 (function(){const hook=()=>{const b=document.getElementById('board');if(!b||b._tt)return;b._tt=1;b.addEventListener('click',e=>{if(!UI.tut||!UI.tutTile||UI.moved)return;if(typeof GXT!=='undefined'&&GXT.active())GXT.act({type:'tap',what:'tile'})})};if(document.readyState!=='loading')hook();else document.addEventListener('DOMContentLoaded',hook);setInterval(hook,1500)})();
 // ---------------------------------------------------------------- start, leave

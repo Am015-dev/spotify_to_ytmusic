@@ -37,11 +37,11 @@ function prevCalc(x, y, r) {
 function prevFig(l) {
   const T = G.tiles[G.cur.k], id = find(T.s0 + +l), F = G.fd[id]; if (!F) return '';
   const nm = PV_TY[F.ty];
-  if (F.ty === 'F') return 'field: 3 per finished town';
-  if (F.ty === 'M') return 'priory: 9 with 8 tiles around';
+  if (F.ty === 'F') return 'farmer';
+  if (F.ty === 'M') return 'priory 9';
   const done = F.oe && F.oe.length === 0;
   if (done) return nm + ' +' + featPoints(F, true) + ' now';
-  return nm + ' +' + featPoints(F, true) + ' when finished';
+  return nm + ' +' + featPoints(F, true);
 }
 // highlight a feature's tiles while a spot is held or hovered
 function pvHighlight(keys) { for (const e of document.querySelectorAll('#world .pvhl')) e.classList.remove('pvhl'); if (keys) for (const k of keys) { const e = UI.tl[k]; if (e) e.classList.add('pvhl'); } }

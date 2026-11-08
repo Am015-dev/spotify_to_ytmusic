@@ -21,7 +21,7 @@ async function tapUI(p, el, what) {
 const seen = { cap: new Set(), pop: new Set(), banner: new Set() };
 async function watch(p) {
   const s = await p.evaluate(() => { const st = document.querySelector('#status'); return st ? { tn: (st.querySelector('.tn') || {}).textContent || '', ins: (st.querySelector('.ins') || {}).textContent || '' } : null; });
-  if (s) { if (s.tn) seen.banner.add(s.tn.replace(/^\S+ ?/, '').length ? s.tn : s.tn); if (/draws a tile|lays it|puts a|is choosing|is drawing/.test(s.ins)) seen.cap.add(s.ins.replace(/[:“”].*$/, '').slice(0, 30)); if (/\+\d+: /.test(s.ins)) seen.pop.add(s.ins.replace(/^.*?\+\d+: /, '').replace(/\d+/g, 'N')); }
+  if (s) { if (s.tn) seen.banner.add(s.tn.replace(/^\S+ ?/, '').length ? s.tn : s.tn); if (/draws a tile|lays it|puts a|placed a|is choosing|is drawing/.test(s.ins)) seen.cap.add(s.ins.replace(/[:“”].*$/, '').slice(0, 30)); if (/\+\d+: /.test(s.ins)) seen.pop.add(s.ins.replace(/^.*?\+\d+: /, '').replace(/\d+/g, 'N')); }
 }
 async function playToResult(p, tag, limitMs) {
   const t0 = Date.now(); let idle = 0, moves = 0;
