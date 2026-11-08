@@ -1,14 +1,24 @@
 {
  "slug": "tidewake",
- "when": "2026-11-08T03:40Z",
+ "when": "2026-11-08T04:35Z",
  "secs": 120,
- "totalSecs": 298,
+ "totalSecs": 260,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
+   "status": "FAIL",
+   "count": 1,
+   "detail": [
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Osk Cobalt moves Cobalt laid a current. His tiles join yours. You can ride them. ×",
+     "words": 16,
+     "shownMs": 250,
+     "neededMs": 5600,
+     "cls": "osk-card riv"
+    }
+   ]
   },
   "b": {
    "status": "PASS",
@@ -37,19 +47,19 @@
    "size": "phone",
    "mode": "learn",
    "secs": 120,
-   "turns": 214,
-   "clicks": 241,
+   "turns": 136,
+   "clicks": 139,
    "endedBy": "result",
-   "tutorialEnded": 5,
+   "tutorialEnded": 6,
    "hintsOff": true,
-   "messagesSeen": 16
+   "messagesSeen": 20
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 23,
-   "turns": 37,
-   "clicks": 39,
+   "secs": 8,
+   "turns": 3,
+   "clicks": 6,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -58,20 +68,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 121,
-   "turns": 164,
-   "clicks": 175,
+   "secs": 120,
+   "turns": 120,
+   "clicks": 136,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 13
+   "messagesSeen": 10
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 33,
-   "turns": 54,
-   "clicks": 55,
+   "secs": 11,
+   "turns": 7,
+   "clicks": 7,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,

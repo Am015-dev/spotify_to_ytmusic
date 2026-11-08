@@ -117,7 +117,7 @@ async function playGame(browser, size, gi, rep) {
     await page.evaluate(() => { const b = document.querySelector('#modal [data-set="n"][data-v="' + UI.n + '"]'); b && b.click(); const l = document.querySelector('#modal [data-a="learnon"]'); if (UI.learn && !(UI.learn === true && l && /✓/.test(l.textContent))) { } });
     await page.click('#modal [data-start="F"]'); await sleep(500);
     await page.evaluate(([learn]) => { G.learn = !!learn; render(); }, [learn]);
-    const tipsOn = gi % 5 !== 3; if (!tipsOn) { await page.evaluate(() => GXH.setEnabled(false)); TOT.tipsOff++; }
+    const tipsOn = gi % 5 !== 3; await page.evaluate(on => GXH.setEnabled(on), tipsOn); if (!tipsOn) TOT.tipsOff++;   // tips are off by default; the sweep turns them on to test them
     const t0 = Date.now(); let lastDragFail = null, lastNothing = null, last = '', lastAt = Date.now(), steps = 0, audits = 0, rotated = false;
     // ---- help kit checks: each bubble once, never over the target or a glow, dismisses on a tap; the bulb finger == the advisor's move; rules cards
     const seenPh = new Set(); let bulbN = 0; const NEUTRAL = [50, 14];
@@ -188,6 +188,8 @@ async function playGame(browser, size, gi, rep) {
     for (; ;) {
       steps++;
       if (Date.now() - t0 > MAXMIN * 60000) { issues.add('game ran over ' + MAXMIN + ' min (turn ' + (await page.evaluate(() => G.turn)) + ')'); break; }
+      // a player taps the door reveal away once they have seen it (it stays 4.2 s otherwise): a real tap on the dark backdrop corner
+      if (await page.evaluate(() => { const o = document.getElementById('bfrev'); if (!o) { window.__revAt = 0; return false; } window.__revAt = window.__revAt || Date.now(); return Date.now() - window.__revAt > 1200; })) { await tapAt(page, W - 6, Math.round(H * 0.5)); await sleep(80); }
       const st = await page.evaluate(() => __sw.st());
       if (st.win) break;
       const sig = await page.evaluate(() => __sw.sig());

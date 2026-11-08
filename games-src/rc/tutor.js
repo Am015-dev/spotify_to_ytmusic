@@ -34,7 +34,7 @@ const ccard=k=>{try{return CARD[k].n}catch(e){return 'the card'}};
 const cwx=()=>{try{return (viewState()||G).lastWx||{}}catch(e){return {}}};
 // kind: 'rule' (first time it matters), 'move' (a good or poor choice, one line why), 'rival' (what the island just did to us)
 const COACH_RULES=[
- {id:'goal',when:()=>cplan()&&G.round===1,say:"Our ship is gone. Light a fire and stack 15 wood by day 12: a ship will see it. Pick a pawn, then a glowing place."},
+ {id:'goal',when:()=>cplan()&&G.round===1,say:"Our ship is gone. Build a fire and stack 15 wood. A ship will see it by day 12. Pick a pawn, then a glowing place."},
  {id:'pawns',when:()=>cplan()&&G.round===1&&G.plan.acts.some(a=>a.pw.length),say:"Each pawn does one job. I cook and heal, the Carpenter builds, Friday helps."},
  {id:'dice',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length===1&&actNeed(a).roll),say:"One pawn alone rolls dice and can fail or get hurt. A second pawn makes it sure."},
  {id:'sure',kind:'move',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length>=2),say:"Good move: two pawns, no dice. A sure thing."},
@@ -120,3 +120,7 @@ function tutOffer(){if(!tutFirst()||document.querySelector('.tutoffer'))return f
     try{localStorage.setItem('swi_tutoffer','1')}catch(err){}
     if(b.dataset.tutoffer==='learn')tutStart();else{UI.guide.on=false;UI.cmpDef=null;beginGame()}});
   return true}
+// Learn to play here is a coached real game (not a gx-tutor step list): GXT.running() also reports it, so shared tools
+// (feel-audit, qa-bot) can tell that Learn to play started. GXT.state() stays null for it, so they play it like a normal game.
+if(typeof GXT!=='undefined'&&GXT.running){const r0=GXT.running;const coachOn=()=>!!(typeof G!=='undefined'&&G&&G.coach&&!G.over);GXT.running=function(){return r0.apply(this,arguments)||coachOn()};
+  const s0=GXT.state;GXT.state=function(){const s=s0.apply(this,arguments);return s&&s.active===false&&coachOn()?null:s}}

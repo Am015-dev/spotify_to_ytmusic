@@ -79,3 +79,4 @@ the dock is now compact (track hint hidden in Story on phone, 1-line prompts), s
   under the track (one table scene); result drops the per-square -2 chips; owner/free art now loads in a played game: cast
   portraits on the title, bg-map behind Quick game setup, result-win/lose banner, bonus rosette on the Goal card.
   feel-audit a-e 0; ui-audit phone B1 (shared kit Vibration text, came with the base shell update), pc E1 (a player pill).
+- W470d: tokens walk the track space by space; PC dock holds three big patch cards (art first, 24 px icons + 22 px numbers), pills no longer clip; in Learn a toast never stacks on the coach bubble. feel-audit a-e 0; Learn tut PASS both sizes.

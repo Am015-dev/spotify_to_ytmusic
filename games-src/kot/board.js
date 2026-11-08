@@ -47,7 +47,7 @@ function bfLineText0(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI
     const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or End turn':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: End turn'}
   return ''}
 function bfLine(){const el=$bf('bline');if(!el)return;const t=BF.flash&&BF.flash.until>bfNow()?BF.flash.t:bfLineText();if(el.textContent!==t)el.textContent=t;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
-function bfFlash(t,ms){BF.flash={t,until:bfNow()+(ms||2200)};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,(ms||2200)+20)}
+function bfFlash(t,ms){if(!document.documentElement.classList.contains('pp-hints')||(G&&G.tut))return;ms=Math.max(ms||0,4000+String(t).split(/\s+/).length*100);BF.flash={t,until:bfNow()+ms};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,ms+20)}
 // ---- what the dice would do, shown on the board ----
 function bfMarks(){const el=$bf('bmarks');if(!el)return;
   if(!G||G.winner||G.phase!=='roll'||!G.dice.length||UI.intro||(BF.spin&&bfNow()<BF.spin.end)){if(el.innerHTML){el.innerHTML='';BF.marks=''}return}
@@ -116,12 +116,12 @@ function bfShop(){const el=$bf('pshop');if(!el||!G)return;if(!phShopOK()||!G.mar
   el.innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)],c=costOf(p,id),ok=canBuy(p,k);
     return `<button class="ptile bcard ${C.t} ${k===sg?'sugg':''} ${ok?'ok':'no'} ${k===BF.sel?'sel':''}" data-shop="${k}" aria-label="${esc(C.n)}, costs ${c} energy${ok?'':', not affordable'}. ${esc(C.x)} ${k===BF.sel&&ok?'Tap to buy.':'Tap to see it.'}">
       <span class="cost">${c}</span>${k===sg?'<i class="star">★</i>':''}<span class="art" aria-hidden="true">${cardIcon(id)}</span><b>${esc(C.n)}</b>${ok&&k===(BF.sel>=0?BF.sel:sg)?'<em class="go">BUY</em>':''}</button>`}).join('');
-  const tip=$bf('btip');if(tip&&BF.tipHold&&BF.tipHold.until>bfNow()){if(tip.innerHTML!==BF.tipHold.html)tip.innerHTML=BF.tipHold.html}else if(tip){const fk=BF.sel>=0?BF.sel:sg>=0?sg:G.market.findIndex((_,j)=>canBuy(p,j));const id=fk>=0?G.market[fk]:undefined;tip.innerHTML=id===undefined?'':`<b>${esc(CARDS[base(id)].n)}</b> ${chipOf(CARDS[base(id)])}<p>${esc(CARDS[base(id)].x)}</p>`}}
+  const tip=$bf('btip');if(tip&&BF.tipHold&&BF.tipHold.until>bfNow()){if(tip.innerHTML!==BF.tipHold.html)tip.innerHTML=BF.tipHold.html}else if(tip){const fk=BF.sel>=0?BF.sel:sg>=0?sg:G.market.findIndex((_,j)=>canBuy(p,j));const id=fk>=0?G.market[fk]:undefined;tip.innerHTML=id===undefined?'':`<b>${esc(CARDS[base(id)].n)}</b> ${chipOf(CARDS[base(id)])}<p>${cx(CARDS[base(id)].x)}</p>`}}
 function bfTapCard(k,el){const p=cur();if(!phShopOK())return;
   if(!canBuy(p,k)){BF.sel=k;phRender();const t=document.querySelector(`#pshop [data-shop="${k}"]`);if(t){t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}if(typeof sfx==='function')sfx('click');bfFlash(whyNot(p,G.market[k])||'You can’t buy this one',1600);return}
   const fk=BF.sel>=0?BF.sel:suggestCard(p);if(fk!==k){BF.sel=k;phRender();if(typeof sfx==='function')sfx('click');bfFlash('Tap it again to buy',1400);return}
   const from=el?bfCenter(el):null,to=bfChipXY(meSeat()>=0?meSeat():G.active),html=`<div class="bcard-fly">${cardIcon(G.market[k])}</div>`,nm=CARDS[base(G.market[k])].n;
-  BF.sel=-1;bfTut('buy',1);BF.tipHold={html:`<b>${esc(nm)}</b> ${chipOf(CARDS[base(G.market[k])])}<p>${esc(CARDS[base(G.market[k])].x)}</p>`,until:bfNow()+3200};setTimeout(()=>{bfShop()},3300);bfFly(html,from,to,{dur:620,end:.4,spin:0,size:64,burst:'star',arc:-70});uiAct({card:String(k)});bfFlash(`Bought ${nm}!`,1400)}
+  BF.sel=-1;bfTut('buy',1);BF.tipHold={html:`<b>${esc(nm)}</b> ${chipOf(CARDS[base(G.market[k])])}<p>${cx(CARDS[base(G.market[k])].x)}</p>`,until:bfNow()+3200};setTimeout(()=>{bfShop()},3300);bfFly(html,from,to,{dur:620,end:.4,spin:0,size:64,burst:'star',arc:-70});uiAct({card:String(k)});bfFlash(`Bought ${nm}!`,1400)}
 // ---- the computer's turn: a tap on the board speeds it up until your next turn ----
 function bfSpeed(){if(BF.fast||!G||humanTurn())return;BF.fast=true;BF.saveDelay=AIDELAY;AIDELAY=Math.min(AIDELAY,140);bfFlash('Fast forward ⏩',900)}
 function bfSlowAgain(){if(BF.fast&&(!G||humanTurn()||G.winner)){BF.fast=false;if(BF.saveDelay)AIDELAY=BF.saveDelay}}

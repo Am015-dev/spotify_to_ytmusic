@@ -103,3 +103,27 @@ html.ph .omark b{font-size:14px!important}
 .gx-drawer .seg button.on,.gx-drawer .btn.on{background:#1d6f78!important;color:#fff!important}
 #rulesbody{background:#f6ecd0;color:#1c140a}
 @media (min-width:1024px){.gxc-act small{font-size:17px!important}}
+/* drag-to-place */
+[data-a=card]{touch-action:none}
+[data-a=card].dragsrc{opacity:.35}
+.drgghost{position:fixed;z-index:60;pointer-events:none;translate:-50% -50%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55));transition:scale .12s ease-out;scale:1.08}
+.drgghost.snap{scale:1;transition:left .08s ease-out,top .08s ease-out,scale .12s ease-out}
+.drgghost>img,.drgghost>svg{width:100%;height:100%;display:block;border-radius:10px}
+.drgtgt{position:fixed;z-index:59;pointer-events:none;translate:-50% -50%;border-radius:12px;border:3px solid #ffd24a;box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 18px 6px rgba(255,210,74,.65);animation:drgpulse 1s ease-in-out infinite}
+.drgtgt.hot{border-color:#fff;box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 26px 10px rgba(255,240,170,.9);animation:none}
+@keyframes drgpulse{50%{box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 8px 2px rgba(255,210,74,.4)}}
+@media (prefers-reduced-motion:reduce){.drgtgt{animation:none}.drgghost{transition:none}}
+[data-a=card] img,[data-a=card] svg{-webkit-user-drag:none;user-select:none;pointer-events:none}
+
+/* phone top bar: Hint and Menu only; How to play, Crews and Log live in Menu */
+html.ph .gx-bar [data-gx=crewd],html.ph .gx-bar [data-gx=logd],html.ph .gx-bar [data-gx=rulesd]{display:none!important}
+html:not(.ph) .phonly{display:none}
+/* selected toggles: darker teal for contrast */
+.seg button.on,#start .seg button.on,.gx-drawer .btn.on,.gx-drawer .seg button.on{background:#12606b!important;color:#fff!important}
+/* desktop board-first: a narrower side panel, so the board gets the screen */
+@media (min-width:1024px){:root{--gx-dock-w:clamp(300px,24vw,360px)}}
+.mph .mh .tiny{display:block;margin-top:2px}
+html body .gxc-path .gxc-act small{font-size:16px!important}
+.gx-drawer .btn:not(.pri) b,.gx-drawer .btn:not(.pri) span,.gx-drawer .btn:not(.pri) small{color:#10262d!important;text-shadow:none!important}
+.gx-drawer .lbl{color:#3a2a12!important}
+#rulesbody p,#rulesbody li,#rulesbody h3{background:#f6ecd0}

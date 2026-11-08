@@ -79,11 +79,11 @@ function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const c
   if(risk)return '<b>!</b> A leviathan may reach you.';
   try{hand.forEach((c,t)=>{if(!isCur(c))return;if(!analyse(K,d,{a:'place',t,r:sel.r,s:sel.s}).bad)safeNow++;else if([0,1,2,3].some(r=>!analyse(K,d,{a:'place',t,r,s:sel.s}).bad))safeTurn++})}catch(e){}
   try{const A=analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s});const hit=(A.others||[]).filter(o=>o.coll||o.st==='edge'||o.st==='mon');if(!A.bad&&hit.length)return '<b>Good move:</b> it sinks a rival!'}catch(e){}
-  if(safeNow)return 'Pick, turn, then Place.';
+  if(safeNow)return 'Drag a tile onto your junk.';
   if(safeTurn)return 'Press Turn to find a safe route.';
   return 'Every tile sinks you.'}
 // the goal in one sentence + 3 bullets (Learn to play first screen, Goal card, title)
-const TW_GOAL=['Be the last junk still afloat.','Lay a tile, sail its line.','Edge or leviathan sinks you.','Two junks meet: both sink.'];
+const TW_GOAL=['Last junk afloat wins the lantern.','Lay a tile, sail its line.','Edge or leviathan sinks you.','Two junks meet: both sink.'];
 function goalCardHTML(){return `<div class="gxt-endc twgoal"><div class="gxt-et">${TW_GOAL[0]}</div><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul><div class="gxt-eb"><button type="button" class="gxt-b pri" data-goalok>Got it</button></div></div>`}
 function openGoal(){const o=document.getElementById('twgoal');if(o){o.remove();return}const d=document.createElement('div');d.id='twgoal';d.className='gxt-end';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Goal');d.innerHTML=goalCardHTML();document.body.appendChild(d);
   const close=()=>{d.remove();document.removeEventListener('keydown',k)},k=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',k);
@@ -218,3 +218,27 @@ document.addEventListener('keydown',e=>{if(!PH.on||e.key!=='Escape'||GX.open)ret
  document.addEventListener('pointerup',e=>{if(!down)return;down=false;if(!PH.on||PH.pop!=='tiles'||!UI.sel||UI.busy)return;const dx=e.clientX-sx,dy=e.clientY-sy;
    if(Math.abs(dx)>=36&&Math.abs(dx)>Math.abs(dy)*1.5&&Date.now()-st<900){PH.swipeT=Date.now();UI.sel.r=(UI.sel.r+(dx>0?1:3))%4;sfx('tile_rotate');render()}})}
 {let gxv1=true;const phRelayout=()=>{if(gxv1){gxv1=false;return}if(!G&&!PH.on&&!phDetect())return;const was=PH.on;phApply();if(PH.on||was){PH.zk='?';PH.strip='';PH.pop_h='';try{if(G&&UI.started)render();else phAfter()}catch(e){}}};if(window.GXV)GXV.watch(phRelayout);else window.addEventListener('resize',phRelayout)}
+// ---------- drag a hand tile onto your junk's bow square (phone and PC): the square glows, the tile snaps there, a vibrate tick, then it is laid ----------
+const DRG={on:false,t:-1,el:null,gh:null,tg:null,x0:0,y0:0,hot:false,eat:0};
+function drgTarget(){const c=phPlaceCtx?phPlaceCtx():null;if(!c||!UI.sel)return null;const S=G.ships[UI.sel.s];if(!S||S.x==null)return null;
+  const a=hproj(S.x-2.5,S.y-2.5),b=hproj(S.x-1.5,S.y-2.5);if(!a||!b)return null;return {x:a.x,y:a.y,sq:Math.max(28,Math.hypot(b.x-a.x,b.y-a.y))}}
+function drgEnd(){if(DRG.gh)DRG.gh.remove();if(DRG.tg)DRG.tg.remove();if(DRG.el)DRG.el.classList.remove('dragsrc');Object.assign(DRG,{on:false,el:null,gh:null,tg:null,hot:false,t:-1})}
+document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('[data-a=card]');if(!b||UI.busy||!UI.sel||e.button>0)return;
+  DRG.t=+b.dataset.t;DRG.el=b;DRG.x0=e.clientX;DRG.y0=e.clientY;DRG.on=false},true);
+document.addEventListener('pointermove',e=>{if(DRG.t<0||!DRG.el)return;const dx=e.clientX-DRG.x0,dy=e.clientY-DRG.y0;
+  if(!DRG.on){if(Math.hypot(dx,dy)<12)return;const T=drgTarget();if(!T){DRG.t=-1;return}DRG.on=true;DRG.T=T;
+    const src=DRG.el.querySelector('img,svg');const g=document.createElement('div');g.className='drgghost';g.setAttribute('aria-hidden','true');
+    const sz=Math.round(T.sq*1.05);g.style.width=g.style.height=sz+'px';if(src)g.appendChild(src.cloneNode(true));document.body.appendChild(g);DRG.gh=g;
+    const tg=document.createElement('div');tg.className='drgtgt';tg.setAttribute('aria-hidden','true');tg.style.width=tg.style.height=Math.round(T.sq)+'px';tg.style.left=T.x+'px';tg.style.top=T.y+'px';document.body.appendChild(tg);DRG.tg=tg;
+    DRG.el.classList.add('dragsrc');if(UI.sel.t!==DRG.t){try{phSelTile(DRG.t)}catch(x){UI.sel.t=DRG.t}}}
+  e.preventDefault();const T=DRG.T,d=Math.hypot(e.clientX-T.x,e.clientY-T.y),hot=d<T.sq*.9;
+  if(hot!==DRG.hot){DRG.hot=hot;DRG.tg.classList.toggle('hot',hot);if(hot){try{navigator.vibrate&&navigator.vibrate(8)}catch(x){}}}
+  const px=hot?T.x:e.clientX,py=hot?T.y:e.clientY;DRG.gh.style.left=px+'px';DRG.gh.style.top=py+'px';DRG.gh.classList.toggle('snap',hot)},{capture:true,passive:false});
+document.addEventListener('pointerup',e=>{if(DRG.t<0)return;if(!DRG.on){DRG.t=-1;return}DRG.eat=Date.now();const hot=DRG.hot,t=DRG.t;drgEnd();
+  if(!hot){render();return}const d=sideToAct();UI.sel.t=t;const card=G.hands[d]&&G.hands[d][t];
+  if(isCur(card)){UI.sel.r=UI.sel.r||0;const m={a:'place',t,r:UI.sel.r,s:UI.sel.s};const er=legal(m,d);
+    if(er){sfx('error');PH.toast='That way sinks you. Turn it, then drop.';render();setTimeout(()=>{PH.toast='';render()},4500);return}
+    try{navigator.vibrate&&navigator.vibrate(18)}catch(x){}doPlace()}else render()},true);
+document.addEventListener('pointercancel',()=>{if(DRG.t>=0){drgEnd();render()}},true);
+// the click that ends a drag must not also select or turn the tile
+document.addEventListener('click',e=>{if(DRG.eat&&Date.now()-DRG.eat<400&&e.target.closest&&e.target.closest('[data-a=card]')){e.stopPropagation();e.preventDefault()}},true);

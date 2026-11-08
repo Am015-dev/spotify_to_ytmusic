@@ -21,7 +21,7 @@ const WHAT = process.argv[2] || 'both', [W, H] = (process.argv[3] || '390x763').
   const playToResult = async label => {
     const t0 = Date.now(); let turns = 0, stuck = 0;
     while (Date.now() - t0 < 600000) {
-      if (await vis('#rs table').count()) break;
+      if (await vis('#rs .rplayers').count()) break;
       const st = await page.evaluate(() => ({ mine: !!(window.G && myTurn() && !UI.busy), over: !!(window.G && G.phase === 'over'), fx: !document.querySelector('#fx').hidden, pass: !document.querySelector('#pass').hidden }));
       if (st.fx) { await tapEl(vis('#fx .fxcard').first()); await page.waitForTimeout(150); continue; }
       if (st.over) { const sr = vis('#acts .btn.go'); if (await sr.count()) await tapEl(sr.first()); await page.waitForTimeout(400); continue; }
@@ -40,7 +40,7 @@ const WHAT = process.argv[2] || 'both', [W, H] = (process.argv[3] || '390x763').
       if (done) { turns++; stuck = 0; } else if (++stuck > 20) { console.log(label, 'FAIL stuck'); await page.screenshot({ path: '/tmp/claude-0/sh/stuck.png' }); return false; }
       await page.waitForTimeout(300);
     }
-    const ok = await vis('#rs table').count() > 0; const txt = ok ? (await page.locator('#rs .win').textContent()) : '';
+    const ok = await vis('#rs .rplayers').count() > 0; const txt = ok ? (await page.locator('#rs .win').textContent()) : '';
     console.log(label, ok ? 'PASS reached the result' : 'FAIL no result', 'after', turns, 'of my turns,', Math.round((Date.now() - t0) / 1000), 's:', txt.trim()); return ok;
   };
   await page.goto(S.url, { waitUntil: 'load' }); await vis('#start .tbtn').first().waitFor();
@@ -56,7 +56,7 @@ const WHAT = process.argv[2] || 'both', [W, H] = (process.argv[3] || '390x763').
     await tapEl(vis('#rs [data-a="title"]').first()); await page.waitForTimeout(600);
   }
   if (WHAT !== 'quick') {
-    if (await vis('#rs table').count()) { await tapEl(vis('#rs [data-a="title"]').first()); await page.waitForTimeout(500); }
+    if (await vis('#rs .rplayers').count()) { await tapEl(vis('#rs [data-a="title"]').first()); await page.waitForTimeout(500); }
     if (await page.evaluate(() => !!(window.G && G.phase === 'play'))) { await page.reload({ waitUntil: 'load' }); }
     await vis('#start .tbtn').first().waitFor({ timeout: 10000 });
     const story = vis('#start [data-a="story"]'); await tapEl(story.first()); await page.waitForTimeout(900);

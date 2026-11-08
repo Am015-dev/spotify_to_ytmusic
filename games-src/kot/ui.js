@@ -1,3 +1,7 @@
+// W467: card effect text in short lines (a clause per line, never over 12 words), for the readable-text rule
+function cx(t){const w=s=>s.split(/\s+/).filter(Boolean).length;const parts=String(t).split(/(?<=[.;:,])\s+/);const out=[];
+  for(const p of parts){const l=out.length-1;if(l>=0&&w(out[l])+w(p)<=12)out[l]+=' '+p;else out.push(p)}
+  return out.map(p=>{if(w(p)<=12)return `<span class="cl">${esc(p)}</span>`;const ws=p.split(/\s+/),h=Math.ceil(ws.length/2);return `<span class="cl">${esc(ws.slice(0,h).join(' '))}</span><span class="cl">${esc(ws.slice(h).join(' '))}</span>`}).join(' ')}
 // ---------- panel ----------
 function humanTurn(){return G&&!G.winner&&isHuman(G.active)&&(!NET.on||G.active===NET.mySeat)}
 function uiAct(ds){if(isClient()){netSend(ds);return}gameAct(ds,NET.on?NET.mySeat:undefined)}
@@ -20,11 +24,11 @@ function renderPanel(){
   else if(!humanTurn()){
     head=G.step===1?`Step 1 · ${esc(mname(p))} is rolling`:G.step<=3?`Step 2 · ${esc(mname(p))} resolves its dice`:`Step 4 · ${esc(mname(p))} is shopping`;
     msg=G.step===1?'Watch which dice it keeps (they turn yellow).':G.step===4?'It may buy power cards or play evolutions.':'';if(G.bug&&P(G.bug.by))msg+=`<div class="tip bug">🧠 ${esc(mname(P(G.bug.by)))} stole ${esc(mname(P(G.bug.v)))}'s roll with a Brainjack token. ${esc(mname(P(G.bug.v)))} rolls again afterwards.</div>`;
-    if(me){msg+=`<div class="tip">You are <b>${esc(mname(me))}</b>. Nothing to do right now: you will get a pop-up if you can ${mbOn()&&me.mb?'use your <b>Brainjack</b> or ':''}yield the city.</div>`}}
+    if(me){msg+=`<div class="tip">You are <b>${esc(mname(me))}</b>. Nothing to do now. A pop-up asks if you can ${mbOn()&&me.mb?'Brainjack or ':''}yield.</div>`}}
   else if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
     head='Step 1 · Roll the dice';
     msg=!(UI.coach>=0)&&((UI.myTurns||0)<=2||!UI.hadTurn)?`<ol class="how"><li>Tap the dice you want to <b>keep</b> (here, or right in the city). They turn yellow.${UI.hints?' A <span class="bdash">blue dashed outline</span> marks our suggestion.':''}</li><li>Press <b>Reroll</b> to throw the others again (${G.rolls} left).</li><li>Happy with the result? Press <b>Resolve</b>.</li></ol>`:'';
-    msg+=`<div class="tip">You are in <b>${where(p.i)}</b>. ${inCity(p.i)?'Your claws hit everyone outside. Hearts do nothing here.':G.city===-1?'Downtown is empty, so you will move in after resolving (+1 ★) and claws hit nobody this time.':`Your claws hit whoever is in the city (${esc(mname(P(G.city)))} 👑).`}</div>`;
+    msg+=`<div class="tip">You are in <b>${where(p.i)}</b>. ${inCity(p.i)?'Your claws hit everyone outside. Hearts do nothing here.':G.city===-1?'Downtown is empty: you move in for +1 ★.':`Your claws hit whoever is in the city (${esc(mname(P(G.city)))} 👑).`}</div>`;
     acts=btn('reroll',`Reroll ${nk} ${nk===1?'die':'dice'}`,G.rolls<=0||!nk,G.rolls<=0?'no rerolls left':`${G.rolls} left`,G.rolls>0&&nk?'primary':'')+btn('resolve','Resolve dice','','go to step 2',G.rolls<=0||!nk?'primary':'');
   }else if(G.phase==='buy'){const sg=suggestCard(p);
     head=`Step 4 · Buy power cards (optional)${G.bug?' · borrowed turn':''}`;
@@ -47,15 +51,15 @@ function renderPanel(){
   ro.innerHTML=G.phase==='roll'?`Rerolls left: ${Array.from({length:Math.max(G.rolls,rerollsOf(p))},(_,k)=>`<span class="pip ${k<G.rolls?'':'used'}"></span>`).join('')}`:'<span class="muted small">Dice resolved.</span>';
   pv.innerHTML=G.phase==='roll'&&G.dice.length?`<b>${humanTurn()?'If you resolve now':'These dice give'}:</b> ${esc(scoreDice(p,G.dice).text)}.${humanTurn()?pairNote(G.dice):''}`:'';
   const buyPh=humanTurn()&&G.phase==="buy";const sg=buyPh?suggestCard(p):-1;
-  document.getElementById('market').innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);return `<div class="pc ${C.t} ${k===sg?'sugg':''}"><div class="hd"><span class="nm">${esc(C.n)}</span><span class="cost" aria-label="costs ${c} energy">${c}</span></div><div class="art" aria-hidden="true">${cardIcon(id)}</div><span class="ty">${chipOf(C)}${C.kw?' · '+C.kw.toUpperCase():''}</span><p>${esc(C.x)}</p>${buyPh?`<button class="btn buy ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'}>${esc(buyLabel(p,k))}</button>`:''}</div>`}).join('')+`<p class="small muted" style="grid-column:1/-1;margin:.2rem 0 0"><i class="cc-back" aria-hidden="true"></i>${G.deck.length} cards in the deck. <b>ONE-SHOT</b> cards happen at once. <b>PERMANENT</b> cards stay with you. <b>SAVE FOR LATER</b> cards wait until their moment (you get a pop-up).</p>`;
+  document.getElementById('market').innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);return `<div class="pc ${C.t} ${k===sg?'sugg':''}"><div class="hd"><span class="nm">${esc(C.n)}</span><span class="cost" aria-label="costs ${c} energy">${c}</span></div><div class="art" aria-hidden="true">${cardIcon(id)}</div><span class="ty">${chipOf(C)}${C.kw?' · '+C.kw.toUpperCase():''}</span><p>${cx(C.x)}</p>${buyPh?`<button class="btn buy ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'}>${esc(buyLabel(p,k))}</button>`:''}</div>`}).join('')+`<p class="small muted" style="grid-column:1/-1;margin:.2rem 0 0"><i class="cc-back" aria-hidden="true"></i>${G.deck.length} cards in the deck. <b>ONE-SHOT</b> cards happen at once. <b>PERMANENT</b> cards stay with you. <b>SAVE FOR LATER</b> cards wait until their moment (you get a pop-up).</p>`;
   renderBuyMini(p,buyPh,sg);
   const who2=me||p;
-  const tk=who2.tok||{};const list=[...who2.cards.map(id=>{const C=CARDS[base(id)];const b=base(id);return `<div class="mc ${C.t}">${cardPic(id,'cthumb')}<b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}${b==='smoke'?` (${tk.smoke} puffs)`:''}${b==='cell'?` (${tk.cell} energy on it)`:''}${b==='mimic'&&tk.mim?` (copying ${esc(CN(tk.mim.id))})`:''}${(tk.ufo||[]).includes(id)?' 🐚':''}<br>${esc(C.x)}</div>`}),
+  const tk=who2.tok||{};const list=[...who2.cards.map(id=>{const C=CARDS[base(id)];const b=base(id);return `<div class="mc ${C.t}">${cardPic(id,'cthumb')}<b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}${b==='smoke'?` (${tk.smoke} puffs)`:''}${b==='cell'?` (${tk.cell} energy on it)`:''}${b==='mimic'&&tk.mim?` (copying ${esc(CN(tk.mim.id))})`:''}${(tk.ufo||[]).includes(id)?' 🐚':''}<br>${cx(C.x)}</div>`}),
     ...who2.evo.map(e=>`<div class="mc E">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>${EVO[e].t==='P'?'permanent':'temporary'} evolution in play</i>${e===18&&tk.icy?` (copying ${esc(evoName(tk.icy.e))})`:''}${e===24?` (${tk.adapt} tokens)`:''}<br>${esc(evoText(e))}</div>`),
     ...(who2===me||!me||G.mode==='hot'||G.mode==='ai'?who2.hand.map(e=>`<div class="mc E hand">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>in hand (${EVO[e].t==='P'?'permanent':'temporary'}${EVO[e].kw?', '+EVO[e].kw:''})</i><br>${esc(evoText(e))}</div>`):[])];
   if(tk.poison||tk.shrink)list.unshift(`<div class="mc B"><b>${tk.poison?'☠ Poison tokens: '+tk.poison+' ':''}${tk.shrink?'🔻 Shrink tokens: '+tk.shrink:''}</b><br>Poison: lose 1 heart per token at the end of your turn. Shrink: roll 1 die fewer per token. A heart die outside the city can remove one token.</div>`);
   if(G.frz&&G.frz.t===who2.i)list.unshift(`<div class="mc E"><b>❄ ${esc(evoName(11))}</b> from ${esc(mname(P(G.frz.o)))}${G.tf&&G.tf.void&&G.active===who2.i?`: your ${esc(fname(G.tf.void))} faces do nothing this turn`:''}</div>`);
-  if(exOn('curse'))list.unshift(`<div class="mc K"><b>𓂀 Curse: ${esc(CURSES[G.curse].n)}</b><br>${esc(CURSES[G.curse].x)}<br><i>Ankh: ${esc(CURSES[G.curse].a)} Snake: ${esc(CURSES[G.curse].s)}</i><br>🪲 Brass Beetle: <b>${scarab()>=0?esc(mname(P(scarab()))):'nobody'}</b></div>`);
+  if(exOn('curse'))list.unshift(`<div class="mc K"><b>𓂀 Curse: ${esc(CURSES[G.curse].n)}</b><br>${cx(CURSES[G.curse].x)}<br><i>Ankh: ${esc(CURSES[G.curse].a)} Snake: ${esc(CURSES[G.curse].s)}</i><br>🪲 Brass Beetle: <b>${scarab()>=0?esc(mname(P(scarab()))):'nobody'}</b></div>`);
   if(exOn('tower'))list.unshift(`<div class="mc T"><b>🗼 Crown Spire levels: ${G.tower.map((o,l)=>`${l+1}: ${o<0?'free':esc(mname(P(o)))}`).join(' · ')}</b><br>Already in the city, resolve four 1s to climb one level. Reaching level 3 wins.</div>`);
   if(exOn('wick'))list.unshift(`<div class="mc W"><b>😈 Menace: ${who2.wk}/10</b> (tiles at 3, 6 and 10)</div>`);
   if(exOn('bers')&&who2.tok.berserk)list.unshift(`<div class="mc B"><b>😡 RAMPAGE!</b><br>You roll the rampage die. Heal with hearts to calm down.</div>`);
@@ -64,16 +68,16 @@ function renderPanel(){
   document.getElementById('mine').innerHTML=list.length?list.join(''):'<span class="muted small">No cards yet. Buy them with energy after rolling.</span>';
   const dm=document.getElementById('dr-mine');if(dm)dm.querySelector('h2').textContent=me?`Your cards (${mname(me)})`:`${mname(who2)}'s cards`;
   const yb=document.getElementById('youbox');yb.classList.remove('hidden');
-  yb.innerHTML=`<b class="t" style="color:${MONS[who2.m].c};-webkit-text-stroke:.8px #1a1320">${esc(mname(who2))}</b> ${me?'(you)':''} <b>♥${who2.hp} ★${who2.vp} ⚡${who2.en}${mbOn()?' 🧠'+who2.mb:''}</b>${exIcons(who2)} · ${who2.cards.length} card${who2.cards.length===1?'':'s'}${who2.evo.length||who2.hand.length?` · 🧬 ${who2.evo.length} in play, ${who2.hand.length} in hand`:''}<button class="btn" data-gx="dr-mine">🎴 Details</button>`;
+  yb.innerHTML=`<b class="t" style="color:#fff7dd;border-bottom:3px solid ${MONS[who2.m].c}">${esc(mname(who2))}</b> ${me?'(you)':''} <b>♥${who2.hp} ★${who2.vp} ⚡${who2.en}${mbOn()?' 🧠'+who2.mb:''}</b>${exIcons(who2)} · ${who2.cards.length} card${who2.cards.length===1?'':'s'}${who2.evo.length||who2.hand.length?` · 🧬 ${who2.evo.length} in play, ${who2.hand.length} in hand`:''}<button class="btn" data-gx="dr-mine">🎴 Details</button>`;
   const L=document.getElementById('log');L.innerHTML=G.log.slice(0,80).map(l=>{const h=headline(l);return `<li class="${l.s>=0&&G.pl[l.s]&&G.pl[l.s].human&&G.mode==='solo'?'me':''}${h?' news':''}">${h?`<b>${esc(h)}</b><small>${esc(l.t)}</small>`:esc(l.t)}</li>`}).join('');
 }
 function renderBuyMini(p,buyPh,sg){const el=document.getElementById('buymini');
   if(!G||G.winner||G.phase!=='buy'||!G.market.length){el.classList.add('hidden');el.innerHTML='';return}el.classList.remove('hidden');
   el.innerHTML=`<h3>Cards for sale <button class="btn" data-gx="dr-market">🃏 Full view</button></h3>`+G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);
-    return `<div class="bm ${C.t} ${k===sg?'sugg':''}"><span class="cost">${c}</span><span class="nm">${esc(C.n)} ${chipOf(C)}${C.kw?`<i>${esc(C.kw)}</i>`:''}</span>${buyPh?`<button class="btn ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'} aria-label="Buy ${esc(C.n)}">${esc(buyLabel(p,k))}</button>`:'<span></span>'}<p>${esc(C.x)}</p></div>`}).join('')}
+    return `<div class="bm ${C.t} ${k===sg?'sugg':''}"><span class="cost">${c}</span><span class="nm">${esc(C.n)} ${chipOf(C)}${C.kw?`<i>${esc(C.kw)}</i>`:''}</span>${buyPh?`<button class="btn ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'} aria-label="Buy ${esc(C.n)}">${esc(buyLabel(p,k))}</button>`:'<span></span>'}<p>${cx(C.x)}</p></div>`}).join('')}
 // every monster's details (popup); the plates on the board show the short version
 function monDetail(p){const k=p.i;const hidden=(G.mode==='solo'||G.mode==='net')&&!(NET.on?k===NET.mySeat:p.human);
-  const cards=p.cards.map(id=>{const C=CARDS[base(id)];return `<div class="mc ${C.t}">${cardPic(id,'cthumb')}<b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}<br>${esc(C.x)}</div>`});
+  const cards=p.cards.map(id=>{const C=CARDS[base(id)];return `<div class="mc ${C.t}">${cardPic(id,'cthumb')}<b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}<br>${cx(C.x)}</div>`});
   const evo=p.evo.map(e=>`<div class="mc E">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>evolution in play</i><br>${esc(evoText(e))}</div>`);
   const hand=p.hand.length?(hidden?[`<div class="mc E hand"><b>🧬 ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand</b> <i>hidden</i></div>`]:p.hand.map(e=>`<div class="mc E hand">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>in hand</i><br>${esc(evoText(e))}</div>`)):[];
   const all=[...cards,...evo,...hand];
@@ -110,7 +114,7 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
    <p class="lede">Giant monsters brawl for Crown City. First to <b>20 ★</b> wins.</p>
    <div class="acts" style="margin:.5rem 0">
     ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn'):''}
-    <button class="btn primary big" data-start="solo"><span>▶ Play now (recommended)</span><small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
+    <button class="btn primary big" data-start="solo" data-a="start"><span>▶ Play now (recommended)</span><small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
     ${typeof campStartBtn==='function'?campStartBtn():''}
     ${typeof tutBtn==='function'&&!tutFirst()?tutBtn('btn'):''}
     ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}
@@ -215,7 +219,7 @@ function saveSetup(){try{localStorage.setItem('ccs_setup',JSON.stringify({ex:UI.
 try{const st=JSON.parse(localStorage.getItem('ccs_setup')||'null');if(st){Object.assign(UI.ex,st.ex||{});if(st.evo!==undefined)UI.evo=st.evo;if(st.lvl)UI.lvl=st.lvl;if(st.xp)UI.xp=st.xp;if(st.n)UI.n=st.n;if(Number.isInteger(st.mon))UI.mon=st.mon}}catch(e){}
 function suggestMask(p){const key=G.rollId+':'+G.rolls+':'+G.dice.map(d=>d.f).join('');if(UI.sugKey===key)return UI.sugMask;const saved=G.dice.map(d=>d.k);aiMarkHard0(p);const m=G.dice.map(d=>d.k);G.dice.forEach((d,k)=>d.k=saved[k]);UI.sugKey=key;UI.sugMask=m;return m}
 // a pair of numbers scores nothing: say so while there is still a reroll to chase the third
-function pairNote(dice){if(G.rolls<=0)return '';const c=countsOf(dice.filter(d=>!d.t));const pr=['1','2','3'].filter(f=>c[f]===2);if(!pr.length||['1','2','3'].some(f=>c[f]>=3))return '';return ` <span class="pairnote">A pair of ${pr.join('s or ')}s scores nothing: numbers need three of a kind.</span>`}
+function pairNote(dice){if(G.rolls<=0)return '';const c=countsOf(dice.filter(d=>!d.t));const pr=['1','2','3'].filter(f=>c[f]===2);if(!pr.length||['1','2','3'].some(f=>c[f]>=3))return '';return ` <span class="pairnote">A pair scores nothing. You need three of a kind.</span>`}
 function exIcons(p){let s='';if(p.tok&&p.tok.poison)s+=' ☠'+p.tok.poison;if(p.tok&&p.tok.shrink)s+=' 🔻'+p.tok.shrink;if(exOn('curse')&&scarab()===p.i)s+=' 🪲';if(exOn('cult')&&p.cult)s+=' 🕯'+p.cult;if(exOn('wick'))s+=' 😈'+p.wk;if(exOn('tower')){const t=G.tower.filter(o=>o===p.i).length;if(t)s+=' 🗼'+t}if(p.tok&&p.tok.berserk)s+=' 😡';return s}
 try{const sp=localStorage.getItem('ccs_speed');if(sp!==null)setSpeed(+sp)}catch(e){}
 function seatInfo(k){if(!G||UI.info)return;renderScore();GX.show('dr-mons');const el=document.getElementById('mon-'+k);if(el){el.scrollIntoView({block:'nearest'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
