@@ -1,3 +1,5 @@
+// a playwright version that doesn't match the machine's browser falls back to the pre-installed Chromium (else no scenario runs)
+const PW_EXE = (() => { try { const fs = require('fs'), { chromium } = require('playwright'); if (!fs.existsSync(chromium.executablePath()) && fs.existsSync('/opt/pw-browsers/chromium')) return '/opt/pw-browsers/chromium'; } catch (e) { } return undefined; })();
 // Standard Playwright Test config for the ?scn= scenario tests (scripts/scenarios.spec.js) and the axe look check (scripts/look.spec.js).
 //   node_modules/.bin/playwright test [--project phone|phone-s|pc] [--grep <scn-id>]      env: SCN_SLUGS=a,b (games), GX_URL (build-all sets it), JOBS (workers)
 // "phone" (390x763) is the fast gate; "phone-s" (375x553), "tablet" (768x1024), "pc" (1366x768), "wide" (1920x1080) run with --full or --project (build-all passes --project accordingly).
@@ -17,7 +19,7 @@ module.exports = defineConfig({
   timeout: 90000, expect: { timeout: 5000 },
   // visual.spec.js baselines: games-src/.baselines/<slug>/<step>-<project>.png (git-ignored; orphan branch ui-baselines via scripts/baselines.sh); a missing one fails, only --update-snapshots records
   snapshotPathTemplate: path.join(__dirname, '.baselines', '{arg}-{projectName}{ext}'), updateSnapshots: 'none',
-  use: { serviceWorkers: 'block', launchOptions: { args: ['--no-sandbox', '--force-color-profile=srgb'] } },
+  use: { serviceWorkers: 'block', launchOptions: { args: ['--no-sandbox', '--force-color-profile=srgb'], executablePath: PW_EXE } },
   projects: [
     { name: 'phone', use: phone(390, 763) },
     { name: 'phone-s', use: phone(375, 553) },
