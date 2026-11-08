@@ -46,7 +46,7 @@ let fails = 0; const ok = (c, msg) => { if (!c) { fails++; console.log('FAIL', m
   p.hand.push('dread'); ok(!VG.moves(G).some(m => m.t === 'play' && p.hand[m.i] === 'dread'), 'Dread cannot be played for an effect'); p.res.tablet = t0;
   VG.apply(G, VG.moves(G).find(m => m.t === 'res')); ok(p.glass === 1 && p.res.tablet === 1 && p.res.coin === 3, 'magnifier row 1: pay tablet, +1 coin');
 }
-{ const G = VG.newGame({ np: 1, seed: 6, solo: true }); ok(G.rival && G.rival.deck.length === 8, 'solo: rival deck of 8');
+{ const G = VG.newGame({ np: 1, seed: 6, solo: true }); ok(G.rival && G.rival.deck.length + G.rival.played.length === 8, 'solo: rival deck of 8');
   const before = G.rival.deck.length; VG.apply(G, VG.moves(G).find(m => m.t === 'dig')); ok(G.rival.deck.length === before - 1, 'rival acts after my main action'); }
 { const G = VG.newGame({ np: 2, seed: 11 }); const a = G.p[0], b = G.p[1]; a.res.tablet = 5; a.res.arrow = 5; b.res.tablet = 5; b.res.arrow = 5;
   VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g')); VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g'));

@@ -81,7 +81,7 @@ function targetWhy(type,tgt,alt,forC){
   switch(type){
   case 'threat':{const k=G.ev.threat[tgt];if(!k)return 'no card there';if(G.plan.acts.some(a=>a.type==='threat'&&a.tgt===tgt))return 'already planned';const r=CARD[k].th.req||{};const o=r.alt?r.alt[alt||0]:r;
     for(const it of o.items||[])if(!has(it)||G.itemsAway)return `needs ${INVENTIONS[it].n}`;if(o.weapon&&G.weapon<o.weapon)return `needs weapon ${o.weapon}`;return null}
-  case 'hunt':return G.hunt.length?(G.plan.acts.filter(a=>a.type==='hunt').length>=G.hunt.length?'no more beasts to hunt':null):'no beasts in the hunting grounds yet';
+  case 'hunt':return G.hunt.length?(G.plan.acts.filter(a=>a.type==='hunt'&&a.pw.length>=2).length>=G.hunt.length?'no more beasts to hunt':null):'no beasts in the hunting grounds yet';
   case 'build':{const t=tgt.k;if(t==='shelter')return hasShelter()?(G.camp.shelter?'already built':'this tile already gives shelter'):null;
     if(t==='roof'||t==='pal')return hasShelter()||G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='shelter')?null:'needs a shelter first';
     if(t==='weapon')return null;if(t==='cross'){if(tgt.cross==null)return 'pick a tile';if(!tileAt(tgt.cross))return 'not an explored tile';if(G.sc.crosses&&G.sc.crosses.includes(tgt.cross))return 'this tile already has a cross';if(G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross'&&a.tgt.cross===tgt.cross))return 'already planned';}
@@ -173,7 +173,7 @@ function advCtx(a){if(a.type==='gather'){const s=srcs(a.tgt.pos).find(x=>x.i===a
 FN.success=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);const ctx=fr.ctx;const c=ctx.actor>=0?P(ctx.actor):null;
   if(a.type==='build'){const cost=actCost(a);for(const r in cost)if(cost[r])pay(r,cost[r],(ctx.pay||[]).map(P),false);if(G.tok.build.wood&&cost.wood)delete G.tok.build.wood;
     const t=a.tgt.k;if(t==='shelter'){G.camp.shelter=true;lg('🏠 A shelter is built!','big');fx('build')}else if(t==='roof')roofPal('roof',1);else if(t==='pal')roofPal('pal',1);else if(t==='weapon')weapon(1);
-    else if(t==='cross')SC().built&&SC().built('cross',ctx.actor,a.tgt.cross);else completeInv(t,ctx.actor);return}
+    else if(t==='cross')SC().built&&SC().built('cross',ctx.actor,a.tgt.cross);else completeInv(t,ctx.actor,false,true);return}
   if(a.type==='gather'){const s=srcs(a.tgt.pos).find(x=>x.i===a.tgt.i);if(!s)return;const r=s.s==='wood'?'wood':'food';let n=1;const m=G.map[a.tgt.pos];if(m.tok[r]&&s.s!=='parrot'||(r==='food'&&m.tok.food&&!s.tok))n++;
     for(const it of ['basket','sack'])if(has(it)&&!G.plan.used[it]){G.plan.used[it]=1;n++}
     lg(`${c?c.nm:'Friday'} gathers ${n} ${r}.`,'good');gain(r,n,ctx);return}
@@ -194,7 +194,7 @@ FN.adventure=fr=>{const deck=fr.deck;if(!G.adv[deck].length){G.adv[deck]=shuffle
 function advDecideLabel(c,i){const o=c.decide[i];if(i===0)return o.length?`${opsText(o)} (then the card is gone)`:'Leave it (discard the card)';return `${opsText(o)||'Keep it'} (the card goes into the event deck: “${c.ev.n}” may strike later)`}
 FN.advDiscard=fr=>{G.advDisc.push(fr.card)};
 FN.advShuffle=fr=>{G.ev.deck.push(fr.card);shuffle(G.ev.deck);lg('The card is shuffled into the event deck.')};
-FN.endActions=fr=>{const haul=RES.filter(r=>G.fut[r]).map(r=>`+${G.fut[r]} ${RNAME[r]}`);const finds=G.own.some(o=>o.k==='fallentree'||o.k==='larvae');if(haul.length||finds){beat('finds',{});if(haul.length)lg(`The day’s haul reaches camp: ${haul.join(', ')}.`,'good')}
+FN.endActions=fr=>{for(const q of (G.inv.pending||[])){G.inv.built[q.k]=1;doInv(q.k)}G.inv.pending=[];const haul=RES.filter(r=>G.fut[r]).map(r=>`+${G.fut[r]} ${RNAME[r]}`);const finds=G.own.some(o=>o.k==='fallentree'||o.k==='larvae');if(haul.length||finds){beat('finds',{});if(haul.length)lg(`The day’s haul reaches camp: ${haul.join(', ')}.`,'good')}
   for(const r of RES){if(G.fut[r]){G.res[r]+=G.fut[r];G.fut[r]=0}}for(const o of G.own)o.fut=false;
   // trade-in-now finds
   for(let i=G.own.length-1;i>=0;i--){const k=G.own[i].k;if(k==='fallentree'||k==='larvae')useDisc(i,true)}

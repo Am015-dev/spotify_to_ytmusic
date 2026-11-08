@@ -28,7 +28,7 @@ const UPGRADES={
 // ---- damage deck (33 cards). k is the engine hook, tr the trait (Ship / Pilot), fix = repair action roll that flips it facedown ----
 const DAMAGE={
   rupture:{n:'Hull Rupture',tr:'Ship',k:'direct',t:'This card counts as 2 damage against your hull.',x:7},
-  flash:{n:'Flash Blindness',tr:'Pilot',k:'blinded',t:'The next time you attack, roll no attack dice. Then flip this card facedown.',x:2},
+  flash:{n:'Flash Blindness',tr:'Pilot',k:'blinded',t:'The next time you attack, you cannot modify your attack dice. Then flip this card facedown.',x:2},
   cfire:{n:'Cockpit Fire',tr:'Ship',k:'fire',t:'At the start of each combat phase, roll 1 attack die: on a hit, suffer 1 damage. Action: flip this card facedown.',x:2,fix:'any'},
   canopy:{n:'Shattered Canopy',tr:'Pilot',k:'cockpit',t:'After the round you receive this card, your pilot skill counts as 0.',x:2},
   stutter:{n:'Engine Stutter',tr:'Ship',k:'engine',t:'All your turn maneuvers count as red maneuvers.',x:2},
