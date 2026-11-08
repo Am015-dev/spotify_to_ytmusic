@@ -1,6 +1,37 @@
 # G5 gameplay review (8 Nov 2026)
 
-Strict review by games-src/reviews/GAMEPLAY-RUBRIC.md. Each game was built from its own branch and played by touch at 390x844 and 375x667. Status: wildmark and final-approach done; redline-rally still being played.
+Strict review by games-src/reviews/GAMEPLAY-RUBRIC.md. Each game was built from its own branch and played by touch at 390x844 and 375x667: the tutorial to the end, then full games to the result screen.
+
+| Game | Total | Result | Lowest rows |
+|---|---|---|---|
+| redline-rally | 4.0 (capped; average 5.6) | FAIL | AI and pacing 4, Phone play 5 |
+| wildmark | 6.3 | FAIL | Phone play 5, AI and pacing 5 |
+| final-approach | 4.0 (capped; average 6.0) | FAIL | Rules fidelity 4, AI and pacing 5 |
+
+## redline-rally
+Built from branch shelf/W496-redline-gameplay at ad4e9f98. Played at 390x844 and 375x667, touch.
+| # | Row | Score | Why (one line) |
+|---|-----|-------|----------------|
+| 1 | Rules fidelity | 6 | The turn steps, numbers, spin-out, cluttered hand and finish order all match. But rivals plan only when it is their turn to move: they see where the cars ahead ended up and choose boost before the reveal. |
+| 2 | Tutorial teaches | 6 | All 20 rules come in order, one line and one tap each. But a boost question nobody explains pops up every round and won't take taps. The spin-out step mentions a stress card that never shows in the hand. |
+| 3 | First 10 seconds | 6 | The title and 3-bullet goal card are clear. At 375x667 the opening step hides your car behind the start lights, on a board strip about 230px tall. |
+| 4 | Turn clarity | 7 | The phase strip, gear buttons showing "-1 heat", corner signs reading "5 in 12" and slipstream "(spin!)" warnings make each choice and cost readable. |
+| 5 | Phone play | 5 | Targets are 44px+ and text 14px+. But at 375x667 the board is about 180px with the dashboard over half of it, Menu sticks 7px past the screen, and popups get cut off at the edges. |
+| 6 | AI and pacing | 4 | You wait about 20 s after every Go, and the default 5-car, 2-lap race takes about 6 min with 17-20 decisions. Three default games finished 5th, 5th and 4th, the last one playing the game's own suggested plan. |
+| 7 | Feel | 6 | Cars animate, there are start lights, a speedometer, spin smoke and "+6 spaces" pops. But mostly you watch, plus two extra taps every round (boost, then Keep all). |
+| 8 | Bugs | 5 | The real games had 0 console errors, 0 stuck states and 0 dead taps. The tutorial has dead taps: the boost buttons show but the overlay eats every tap. |
+**Total: 4.0 — FAIL** (stopper: yes, dead taps in the tutorial: visible "No boost / Boost" buttons ignore taps in rounds 1-6; raw average 5.6, capped at 4)
+
+### Findings
+- **Row 8 / Row 2** — Did: played the tutorial by touch, then tapped "No boost" when the boost question showed after each Go. Happened: rounds 1-6 put "Speed N. Boost: 1 heat for a flipped card?" with two big buttons on screen and no tutorial bubble. The tutorial's dim layer (`gxt-cell`) sits on top, so the tap does nothing (the buttons were still there 600 ms later) and the tutorial answers for you. Boost is only explained in round 7. Shot: `games-src/reviews/G5-shots/redline-rally-01-tut-boost-unguided.png`
+- **Row 6** — Did: played 3 full default races (Sunline, 2 laps, 4 rivals, Normal) by touch: two with a plain new-player strategy, one tapping exactly the gear and cards the game's own AI planner picked. Happened: finished 5th, 5th and 4th. The rivals ended with 0-1 spin-outs each and 4-7 slipstreams. A stranger is unlikely to win on the default level. Shot: `games-src/reviews/G5-shots/redline-rally-02-result-4th-following-ai-plan.png`
+- **Row 6 / Row 7** — Did: timed Go to my next decision. Happened: rounds 1-2 took 29-35 s and later rounds about 20 s each (4 rival moves at about 5 s each), so a race is about 6 min (356-377 s) for 17-20 decisions. On top of that, every round adds a boost question and a discard step that both need a tap (16-18 discard prompts per race). It feels like watching more than racing. The tutorial loses about 14 s per round the same way (whole tutorial 2 min 16 s).
+- **Row 1** — Did: compared the engine with the published rulebook. Happened: rival cars choose gear, cards and boost (`aiPlan` in `resolveNext`) only when their turn comes. By then the cars ahead have moved and the human's cards are face up. The rulebook has everyone shift and commit cards face down at the same time, and boost is a react choice after the reveal. This gives the rivals better information than the player and probably explains their spotless results. Other rules match: 12 speed cards, 3 stress, 0/5/heat starting upgrades, 6 heat, hand of 7, shift 2 for 1 heat, cooldown 3/1/0/0, adrenaline for the last car (last two with 5+ cars), slipstream 2 that is not speed and can't cross the line, spin out (all heat, 1 or 2 stress, gear 1), cluttered hand, the race runs until all cars finish.
+- **Row 5 / Row 3** — Did: played the tutorial and a race at 375x667. Happened: the board is a strip of about 180-230 px and the dashboard and corner sign cover half of it. On the first tutorial step the start lights hide your car completely. The Menu button runs to x=382 on a 375 screen, and the "Clean:" popup is cut off at the left edge. Shots: `games-src/reviews/G5-shots/redline-rally-05-375-tut-start-car-hidden.png`, `games-src/reviews/G5-shots/redline-rally-03-375-board-cramped.png`, `games-src/reviews/G5-shots/redline-rally-04-375-clipped-menu-popup.png`
+- **Row 2** — Did: the spin-out step. Happened: the bubble says "Spun out: stopped before the corner, gear 1, a stress card." But the hand shows 6 heat cards and a 3, no stress card, and the burned heat went straight into the hand rather than the discard pile. The tutorial stacks the round to match its script, so what it says and what the screen shows disagree. Shot: `games-src/reviews/G5-shots/redline-rally-06-tut-spin-no-stress-card.png`
+- **Row 7 / Row 5** — Did: watched the board during the tutorial discard step and the first race turn. Happened: the "Slipstream" popup is cut off behind the minimap, a dark vertical seam runs down the board, and orange triangle props are drawn over the minimap. Shots: `games-src/reviews/G5-shots/redline-rally-07-tut-popup-text-cut.png`, `games-src/reviews/G5-shots/redline-rally-08-plan1-art-on-minimap.png`
+- **Row 4 (good)** — The slipstream offer warns "Slipstream +2 (spin!) (-1 heat)" before you commit, the gear buttons show what a shift costs, and the corner signs show limit and distance. Shot: `games-src/reviews/G5-shots/redline-rally-09-slip-prompt.png`
+- **Minor** — Losing in 5th place gives the line "They got you at the line. Run it back?". The trophy figure covers the winner's name on the podium card. Shots of the title and tutorial end for context: `games-src/reviews/G5-shots/redline-rally-10-title.png`, `games-src/reviews/G5-shots/redline-rally-11-tut-finish.png`
 
 ## wildmark
 Built from branch shelf/W507-wildmark-gameplay at ae923929. Played at 390x844 and 375x667, touch.
