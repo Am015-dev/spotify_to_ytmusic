@@ -54,6 +54,8 @@ async function pxTextures() {
   if (gfxLevel() !== 'low') pxLoadImg('models/plane' + (innerWidth < 700 ? '@512' : '') + '.webp').then(im => { PX.tex.plane3 = PIXI.Texture.from(im); }).catch(() => { });
   // the owner's 3D plane (models/plane[-lite].glb) rendered once to a transparent still; the @512 picture above stays the fallback
   if (gfxLevel() !== 'low' && window.GXGLBQ) window.GXGLBQ.push(V => { V.snapshot('plane', { size: 512, yaw: -.6 }).then(cv => { if (cv) PX.tex.plane3 = PIXI.Texture.from(cv); }).catch(() => { }); });
+  // the plane is rendered ONCE to a still, so a wide screen loads the 3D bundle for that snapshot even where the shared boot skips live models (software GL)
+  if (gfxLevel() !== 'low' && innerWidth >= 700 && !/[?&]glb=0/.test(location.search)) setTimeout(() => { if (window.GXGLBV || document.querySelector('script[src="models/gx3d.js"]')) return; const sc = document.createElement('script'); sc.src = 'models/gx3d.js'; sc.async = true; sc.onerror = () => { }; document.head.appendChild(sc); }, 2500);
   await Promise.all(Object.keys(ART).map(async k => { try { const im = await pxLoadImg(ART[k]); PX.img[k] = im; PX.tex[k] = PIXI.Texture.from(im); } catch (e) { } }));
   const cut = (id, name) => { const at = FA_ATLAS[id], im = PX.img[id]; if (!at || !im) return; const i = at.names.indexOf(name); if (i < 0) return; const c = at.cols, x = (i % c) * at.cw, y = Math.floor(i / c) * at.ch; PX.tex[id + ':' + name] = new PIXI.Texture({ source: PX.tex[id].source, frame: new PIXI.Rectangle(x, y, at.cw, at.ch) }); };
   for (const id of ['dice', 'tokens', 'icons']) if (FA_ATLAS[id]) for (const n of FA_ATLAS[id].names) cut(id, n);

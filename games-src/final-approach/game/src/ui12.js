@@ -128,9 +128,10 @@ function tsReact(text, who) {
 const FC_CORE = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
 // one bubble only: [a rule that just became relevant] + [what to do now and why]. It never blocks input; x hides it until the situation changes.
 function fcSay(id) { const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || F.seen[id]) return; F.seen[id] = true; try { window.GXCOACH.explained.push(id); } catch (e) { } F.queue.push(tsFill(T.coach[id])); }
-function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } try { render(); } catch (e) { } }, 250); }
+function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; F.shut = c.key; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } try { render(); } catch (e) { } }, 250); }
 function fcShow(key, txt, who, ms) {
-  const F = UI.fc; if (!F || F.ended) return; if (F.cur && F.cur.key === key) return; if (F.cur) { const c = F.cur; F.cur = null; clearTimeout(c.t); try { c.el.remove(); } catch (e) { } }
+  const F = UI.fc; if (!F || F.ended) return; if (F.cur && F.cur.key === key) return; if (F.cur && F.shut !== F.cur.key && Date.now() - F.cur.at < F.cur.need) return;   // the line on screen gets its reading time first
+  if (F.cur) { const c = F.cur; F.cur = null; clearTimeout(c.t); } document.querySelectorAll('.fa-coach').forEach(e => e.remove());
   if (F.shut === key || !txt) return;
   const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); F.shut = key; fcHide(); });
   const el = h('div.fa-coach', { role: 'status', 'data-coach': F.lastId || key }, tsPortrait(who || 'chief'), h('span.t', txt), x); document.body.appendChild(el);
@@ -192,6 +193,8 @@ function fcPoll() {
       let m = tutAdvise(G, 0); if (sel != null && m && m.t === 'place' && m.d !== sel) { const m2 = tutAdvise(G, 0, sel); if (m2 && m2.t === 'place' && m2.d === sel) m = m2; }
       UI.cpt = m && m.t === 'place' ? { k: m.to, d: m.d } : null; F.lastId = 'turn'; fcShow(key, fcLine(m), 'chief'); render();
     }
+    const ik = G.round + ':' + n; if (!F.idle || F.idle.k !== ik) F.idle = { k: ik, t: Date.now() };
+    else if (Date.now() - F.idle.t > 15000) { F.idle.t = Date.now() + 60000; const m = tutAdvise(G, 0); if (m && m.t === 'place') { UI.sel = -1; try { commit(0, m); } catch (e) { } } }
     return;
   }
   UI.cpt = null;
@@ -206,7 +209,7 @@ function fcEnd() {
   const btn = (id, label, pri) => { const b = h('button.fb' + (pri ? '.pri' : ''), { type: 'button', 'data-fin': id }, label); return b; };
   const el = h('div.fa-fin', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Check ride result' },
     h('div.fc', tsPortrait(win ? 'chief' : 'pell'), h('h2', win ? 'Check ride passed' : 'Not this time'), h('p', T.endText[win ? 'win' : 'lose']),
-      h('h3', 'Your final check'), h('ul.fchk', ...rows), win ? null : h('p.why', lossText(G.result)),
+      h('h3', 'Your final check'), h('ul.fchk', ...rows), win ? null : h('p.why', (t => t.split(/\s+/).length <= 12 ? t : 'The flight ended. The checklist shows why.')(lossText(G.result))),
       h('div.fr', win && F.pro && F.first ? btn('chapter', 'Start chapter 1', 1) : btn(win ? 'menu' : 'again', win ? 'Back to menu' : 'Try again', 1), win ? btn('again', 'Fly it again') : btn('menu', 'Back to menu')),
       h('h3', 'Things you will meet later'), h('ul.flat', ...later.map(t => h('li', t)))));
   el.addEventListener('click', e => {
