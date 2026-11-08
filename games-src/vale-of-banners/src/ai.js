@@ -73,6 +73,8 @@
     if (lvl === 'random') return M[Math.floor(V.rnd(G) * M.length)];
     var sc = M.map(function (m) { var c = apply(G, m); return { m: m, c: c, v: V.evalSeat(c, s) }; });
     if (lvl === 'easy') { sc.forEach(function (x) { x.v += noise(G) * 6; }); }
+    /* gentle = first-game rival: wide noise, so a sensible new player wins about half the time */
+    if (lvl === 'gentle') { var gn = 14; sc.forEach(function (x) { x.v += noise(G) * gn; }); }
     sc.sort(function (a, b) { return b.v - a.v; });
     if (lvl === 'hard') {
       var best = sc[0], bv = -1e9;
