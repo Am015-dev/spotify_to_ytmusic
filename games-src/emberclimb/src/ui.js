@@ -125,9 +125,9 @@
     var sx = 0, sy = 0, gh = null, on0 = false, hot = -1;
     function foes() { return [].slice.call(document.querySelectorAll('.en[data-w]')).filter(function (n) { return !n.classList.contains('dead'); }); }
     function under(x, y) { var t = -1; foes().forEach(function (n) { var r = n.getBoundingClientRect(); if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) t = +n.getAttribute('data-w').slice(1); }); return t; }
-    function end() { document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); document.removeEventListener('pointercancel', cancel, true); if (gh) gh.remove(); gh = null; document.querySelectorAll('.en.w4drop,.en.glow').forEach(function (n) { n.classList.remove('w4drop'); }); }
+    function end() { document.body.classList.remove('ec-dragging'); document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); document.removeEventListener('pointercancel', cancel, true); if (gh) gh.remove(); gh = null; document.querySelectorAll('.en.w4drop,.en.glow').forEach(function (n) { n.classList.remove('w4drop'); }); }
     function mv(ev) {
-      if (!on0) { if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 14) return; on0 = true; UI.dragging = 1; UI.sel = i; var g = G(), hh = g.hs[g.b.cur], tg = hh && hh.hand[i] && E.eff(hh.hand[i]).tgt; render(); gh = el.cloneNode(true); gh.className = el.className + ' w4ghost'; var r = el.getBoundingClientRect(); gh.style.cssText = 'position:fixed;z-index:95;pointer-events:none;width:' + r.width + 'px;height:' + r.height + 'px;left:0;top:0;transform:translate(' + (ev.clientX - r.width / 2) + 'px,' + (ev.clientY - r.height * .7) + 'px) rotate(-4deg) scale(1.08)'; document.body.appendChild(gh); if (tg) foes().forEach(function (n) { n.classList.add('glow'); }); }
+      if (!on0) { if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 14) return; on0 = true; UI.dragging = 1; UI.sel = i; var g = G(), hh = g.hs[g.b.cur], tg = hh && hh.hand[i] && E.eff(hh.hand[i]).tgt; var r = { width: el.offsetWidth, height: el.offsetHeight }, cw1 = el.parentNode ? getComputedStyle(el.parentNode).getPropertyValue('--cw') : ''; gh = el.cloneNode(true); gh.classList.remove('sel'); gh.classList.add('w4ghost'); render(); document.body.classList.add('ec-dragging'); gh.style.cssText = (cw1 ? '--cw:' + cw1 + ';' : '') + 'position:fixed;z-index:95;pointer-events:none;width:' + r.width + 'px;height:' + r.height + 'px;left:0;top:0;transform:translate(' + (ev.clientX - r.width / 2) + 'px,' + (ev.clientY - r.height * .7) + 'px) rotate(-4deg) scale(1.08)'; document.body.appendChild(gh); if (tg) foes().forEach(function (n) { n.classList.add('glow'); }); }
       if (gh) { var w = parseFloat(gh.style.width), hgt = parseFloat(gh.style.height); gh.style.transform = 'translate(' + (ev.clientX - w / 2) + 'px,' + (ev.clientY - hgt * .7) + 'px) rotate(-4deg) scale(1.08)'; }
       var t = under(ev.clientX, ev.clientY); if (t !== hot) { hot = t; foes().forEach(function (n) { n.classList.toggle('w4drop', +n.getAttribute('data-w').slice(1) === t); }); if (t >= 0) { try { navigator.vibrate && navigator.vibrate(10); } catch (e) { } } }
       ev.preventDefault();
@@ -168,6 +168,7 @@
     var g = G(); app.innerHTML = ''; tscr.innerHTML = ''; modeCls();
     if (UI.mode === 'title' || !g) { gameEl.hidden = true; tscr.hidden = false; try { GX.close(); } catch (e) { } try { GXH.hide(); } catch (e) { } return title(); }
     tscr.hidden = true; gameEl.hidden = false;
+    document.body.classList.toggle('ec-stage', g.scr === 'battle' && STAGE()); document.body.classList.toggle('ec-stagemap', g.scr === 'map' && STAGE());
     if (g.scr !== 'battle') { var tb0 = document.querySelector('.turnban'); if (tb0) tb0.remove(); }
     if (g.scr === 'map') mapScr(); else if (g.scr === 'battle') battle(); else if (g.scr === 'reward') reward();
     else if (g.scr === 'rest') rest(); else if (g.scr === 'shop') shop(); else if (g.scr === 'event') event(); else if (g.scr === 'over') over();
@@ -292,7 +293,9 @@
   var NODEHINT = { m: function () { return 'fight: card'; }, e: function () { return 'high risk: relic'; }, r: function () { return 'heal ' + (3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0)); }, s: function () { return 'shop ● ' + G().gold; }, v: function () { return 'event'; }, t: function () { return 'free relic'; }, b: function () { return 'boss'; } };   // W420
   function mapScr() {
     var g = G(); hud();
-    var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); m.appendChild(BG('bg-map'));
+    var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); var SGM = STAGE(), mroot = m;
+    if (SGM) { app.appendChild(relicBar(g)); var mi = h('div', 'w485mapin'); mi.style.height = Math.max(560, ((g.F || 9) + 2) * 86) + 'px'; m.appendChild(mi); m.appendChild(h('div', 'w485mapsp')); mroot = m; m = mi; }
+    m.appendChild(BG('bg-map'));
     function pos(n) { return { x: (n.c + 0.5) / 4 * 100, y: 100 - (n.f - 0.5) / ((G().F || 9) + 1.5) * 100 }; }
     var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('preserveAspectRatio', 'none');
     g.map.forEach(function (n) { n.nx.forEach(function (k) { var a = pos(n), b = pos(g.map[k]), l = document.createElementNS(NS, 'line'); l.setAttribute('x1', a.x); l.setAttribute('y1', a.y); l.setAttribute('x2', b.x); l.setAttribute('y2', b.y); l.setAttribute('stroke', n.vis ? '#f2872b' : '#6b5040'); l.setAttribute('stroke-width', '2'); l.setAttribute('vector-effect', 'non-scaling-stroke'); l.setAttribute('stroke-dasharray', n.vis ? '' : '4 4'); svg.appendChild(l); }); });
@@ -301,14 +304,25 @@
     g.map.forEach(function (n) {
       var p = pos(n), ok = rc.indexOf(n.id) >= 0;
       var b = h('button', 'node t-' + n.t + (ok ? ' glow' : '') + (n.vis ? ' vis' : '') + (g.at === n.id ? ' here' : ''), null, [A(NODEN[n.t], NODEG[n.t], { ph: '#3a2a20' })]);
+      if (SGM) { b.appendChild(nodeIc(n.t)); if (ok) b.appendChild(h('span', 'w485nl', NODEL[n.t])); }
       b.style.left = p.x + '%'; b.style.top = p.y + '%'; b.setAttribute('aria-label', D.NODES[n.t]); if (ok && NODEHINT[n.t]) b.appendChild(h('span', 'w4ntag' + (n.t === 'e' || n.t === 'b' ? ' hot' : ''), NODEHINT[n.t]()));   // W420 value hint
       if (ok) on(b, function () { var go = function () { E.performMove({ t: 'go', n: n.id }); UI.sel = -1; render(); if (G().scr === 'battle') beginBattleUI(); }; if (n.t === 'b' && UI.camp && UI.bossLine && !(window.GXT && GXT.active())) UI.bossLine('pre').then(go); else go(); });
       else b.disabled = true;
       m.appendChild(b);
     });
     var QI = (window.EC_STORY || {}).quick; if (QI && UI.hints && !UI.camp && g.at < 0 && !(window.GXT && GXT.active()) && UI.qIntro !== g.seed && UI.say) { UI.qIntro = g.seed; setTimeout(function () { UI.say(QI.intro[Math.abs(g.seed | 0) % QI.intro.length], 4200); }, 200); }
-    app.appendChild(m);
+    app.appendChild(mroot);
+    if (SGM) { var fy = null; g.map.forEach(function (n) { if (rc.indexOf(n.id) >= 0) { var y = pos(n).y; fy = fy == null ? y : Math.max(fy, y); } }); var sy = UI.mapY != null && UI.mapAt === g.at ? UI.mapY : (fy == null ? 1e6 : m.offsetHeight * fy / 100 - mroot.clientHeight * .7); mroot.scrollTop = sy; mroot.addEventListener('scroll', function () { UI.mapY = mroot.scrollTop; UI.mapAt = g.at; }); }
   }
+  var NODEL = { m: 'Fight', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Chest', b: 'Boss' };
+  var NODEI = { m: '<path d="M3 19 15 7l1.6 1.6L4.6 20.6zM14 4.5l5.5-1-1 5.5-2.2-1.1zM21 19 9 7 7.4 8.6l12 12zM10 4.5 4.5 3.5l1 5.5 2.2-1.1z"/>',
+    e: '<path fill-rule="evenodd" d="M12 4c-4.6 0-7.5 2.8-7.5 6.6 0 2.4 1.3 3.7 2.1 4.6V18h2v2h2v-2h2.8v2h2v-2h2v-2.8c.8-.9 2.1-2.2 2.1-4.6C19.5 6.8 16.6 4 12 4zm-3 6.2a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8zm6 0a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8zM2 3l4 4-1.4.8zm20 0-4 4 1.4.8z"/>',
+    r: '<path d="M12 2c1 4 7 6 7 12a7 7 0 0 1-14 0c0-3 1-5 3-7 0 2 1 3 2 3 0-3 1-6 2-8zM4 21h16v2H4z"/>',
+    s: '<path fill-rule="evenodd" d="M6 8h12l1.5 13h-15zM9 8V7a3 3 0 0 1 6 0v1h-1.6V7a1.4 1.4 0 0 0-2.8 0v1z"/>',
+    v: '<path d="M9 8c0-4 7-4 7 0 0 3-4 3-4 6h-2.2c0-4 4-4 4-6s-2.6-2-2.6 0zM10 17h3v3h-3z"/>',
+    t: '<path fill-rule="evenodd" d="M3 10h18v10H3zm7.5 2v3h3v-3zM5 5h14l2 4H3z"/>',
+    b: '<path d="M3 18 2 7l5.2 4L12 4l4.8 7L22 7l-1 11zM3 19.5h18V22H3z"/>' };
+  function nodeIc(t) { var d = document.createElement('span'); d.className = 'w485ni'; d.innerHTML = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true">' + (NODEI[t] || NODEI.v) + '</svg>'; return d; }
   // ---------- battle
   // intent icons: one code-drawn picture per intent / debuff kind (named stems in assets.json so art can replace them); tap an intent to read it
   var ICO = {
@@ -350,7 +364,7 @@
     var P = intentParts(e), main = P[0].k, cls = main === 'atk' ? 'atk' : main === 'blk' ? 'def' : (main === 'str' || main === 'sleep' || main === 'unk') ? 'buf' : 'deb';
     var b = h('button', 'intent ' + cls); b.type = 'button'; b.setAttribute('aria-label', 'Enemy intent: ' + P.map(function (p) { return p.say; }).join(' '));
     if (main === 'atk') { try { var it = e.intent, g = G(), tg = it.all ? g.hs : [g.hs[it.tg] || g.hs[0]], d0 = E.previewHit(g.b.en.indexOf(e), g.hs.indexOf(tg[0])) * (it.hits || 1), hot = tg.some(function (t) { return t && !t.dead && d0 >= t.hp * .25; }); if (hot) b.classList.add('w4hot'); if (moOk()) b.classList.add(hot ? 'w4danger' : 'w4atk'); } catch (x) { } }   // W420 pulse
-    P.forEach(function (p) { b.appendChild(IA(p.s, p.k)); if (p.t) b.appendChild(h('span', '', p.t)); });
+    var sg0 = STAGE(); P.forEach(function (p, k) { if (sg0 && k > 1) return; b.appendChild(IA(p.s, p.k)); if (p.t) b.appendChild(h('span', '', sg0 ? p.t.replace(/^Hits /, '').replace(/^(Block|Strength|Weak|Vulnerable|Frail|Poison|Spikes) \+?/, function (m, w) { return w === 'Strength' ? '+' : ''; }) : p.t)); });
     on(b, function () { UI.explain(P); });
     return b;
   }
@@ -365,11 +379,38 @@
     var w = h('div', 'stc'); [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { if (o.st[p[0]]) w.appendChild(h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + o.st[p[0]])])); });
     return w;
   }
+  // W485 stage layout (phone): heroes left, foes right on one floor, fanned hand, orb / piles / End turn in the corners. ?stage=0 = the old layout
+  function STAGE() { return !/[?&]stage=0/.test(Q) && window.innerWidth < 1024; }
+  UI.STAGE = STAGE;
+  function relicBar(g) {
+    var r = h('div', 'w485top');
+    var rl = h('div', 'w485rel'); (g.relics || []).forEach(function (id) { var R = D.RELICS[id]; if (!R) return; var b = h('button', 'w485r', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]); b.type = 'button'; b.setAttribute('aria-label', R.name + ': ' + R.t); on(b, function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: R.name + ': ' + R.t }]); }); rl.appendChild(b); });
+    if (!(g.relics || []).length) rl.appendChild(h('span', 'w485none', 'No relics yet'));
+    r.appendChild(rl);
+    r.appendChild(h('span', 'w485fl', (g.acts > 1 ? 'Act ' + g.act + ' · ' : '') + 'Floor ' + Math.max(1, g.floor || 0) + '/' + ((g.F || 9) + 1)));
+    if (g.scr === 'battle') r.appendChild(potRow());
+    return r;
+  }
+  // stage hero: the figure on the floor, HP bar under it, block as a shield badge, statuses and powers under the bar
+  function heroFig(g, b, hh, i, PV) {
+    var H = D.H[hh.k], p = h('div', 'hfig' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : '')); p.setAttribute('data-w', 'h' + i);
+    var fg = h('div', 'w485fig'); fg.appendChild(A('hero-' + hh.k, H.name.split(' ')[0], { ph: TONE[hh.k] })); p.appendChild(fg);
+    if (hh.stance !== 'n') p.appendChild(h('div', 'w485stance s-' + hh.stance, hh.stance === 'w' ? 'Wrath' : 'Calm'));
+    if (hh.k === 'a' && hh.orbs.length) { var ob = h('div', 'orbs'); hh.orbs.forEach(function (o) { var ox = h('div', 'orb ' + o.k, o.k === 'D' ? String(o.v) : ''); ox.appendChild(A('orb-' + o.k, '', { noph: 1, cls: 'orbart' })); ob.appendChild(ox); }); p.appendChild(ob); }
+    var bar = h('div', 'bar', null, [h('i'), h('b', '', hh.hp + '/' + hh.mhp)]); bar.querySelector('i').style.width = (100 * Math.max(0, hh.hp) / hh.mhp) + '%';
+    if (hh.blk) bar.appendChild(h('span', 'w485shield', String(hh.blk)));
+    p.appendChild(h('div', 'nm', H.name.split(' ')[0])); p.appendChild(bar); p.appendChild(stChips(hh));
+    var pw = Object.keys(hh.pw); if (pw.length) p.appendChild(h('div', 'stc', null, pw.map(function (k) { return h('span', '', k + ' ' + hh.pw[k]); })));
+    var inc = incoming(g, i); if (inc > 0 && !hh.dead) { var net = Math.max(0, inc - hh.blk); p.appendChild(h('div', 'w4inc' + (net > 0 ? ' cut' : ''), net > 0 ? 'Incoming ' + net : 'All blocked')); }
+    if (PV && (PV.blk[i] > 0 || PV.heal[i] > 0)) p.appendChild(h('div', 'w4hb', PV.blk[i] > 0 ? '+' + PV.blk[i] + ' block' : '+' + PV.heal[i] + ' HP'));
+    return p;
+  }
   function needTarget() { var g = G(), h0 = g.hs[g.b.cur], c = h0.hand[UI.sel]; return c && E.eff(c).tgt; }
   function battle() {
     var g = G(), b = g.b, cur = g.hs[b.cur >= 0 ? b.cur : 0];
     hud();
     var st = h('div'); st.id = 'stage'; st.setAttribute('data-board', '1'); st.appendChild(A(b.kind === 'b' ? 'bg-boss-' + g.boss : b.kind === 'e' ? 'bg-elite' : 'bg-battle-' + (1 + ((g.floor - 1) % 3)), '', { cls: 'bg', kind: 'bg' }));
+    var SG = STAGE(); if (SG) st.appendChild(relicBar(g));
     var en = h('div', 'enemies'), tgtMode = b.ph === 'p' && UI.sel >= 0 && needTarget(), PV = previewSel(g, b);
     var fk = g.act + ':' + g.floor + ':' + g.at; if (!UI.fs || UI.fs.key !== fk) UI.fs = { key: fk, kind: b.kind, hp0: g.hs.reduce(function (a, x) { return a + x.hp; }, 0), mhp: g.hs.reduce(function (a, x) { return a + x.mhp; }, 0), waste: 0, turns: 1, over: 0 }; UI.fs.turns = Math.max(UI.fs.turns, b.turn || 1);
     b.en.forEach(function (e, i) {
@@ -382,14 +423,17 @@
       if (e.blk) x.appendChild(h('div', 'blkchip', '🛡' + e.blk));
       x.appendChild(h('div', 'nm', d.name));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
+      if (SG && e.blk) x.querySelector('.bar').appendChild(h('span', 'w485shield', String(e.blk)));
       x.appendChild(stChips(e));
       if (!e.dead) on(x, function () { onEnemy(i); });   // tap the enemy to play the lifted attack on it (restored: lost in the W420 rewrite; tools/tap-enemy.js guards it)
       var pv = PV && PV.en[i]; if (pv && !e.dead && (pv.dmg > 0 || pv.kill)) x.appendChild(h('div', 'w4pv' + (pv.kill ? ' kill' : ''), null, [h('b', '', (PV.rnd ? '~' : '') + '-' + (pv.kill ? pv.dmg : pv.hpLoss)), h('i', '', pv.kill ? 'kills' : pv.stripped ? pv.stripped + ' block off' : (whyMods(cur, cur.hand[UI.sel], e) || 'HP'))]));   // W420 value preview
       en.appendChild(x);
     });
-    st.appendChild(en);
+    if (SG) en.style.setProperty('--n', b.en.length);
     var mid = h('div', 'mid');
+    if (SG) { var ar = h('div', 'arena'), hsd = h('div', 'hside'); hsd.style.setProperty('--n', g.hs.length); ar.appendChild(hsd); ar.appendChild(en); st.appendChild(ar); mid = hsd; } else st.appendChild(en);
     g.hs.forEach(function (hh, i) {
+      if (SG) { mid.appendChild(heroFig(g, b, hh, i, PV)); return; }
       var H = D.H[hh.k], p = h('div', 'heropan' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : ''));
       p.setAttribute('data-w', 'h' + i);
       p.appendChild(A('hero-' + hh.k, H.name.split(' ')[0], { ph: TONE[hh.k] }));
@@ -402,20 +446,27 @@
       var pw = Object.keys(hh.pw); if (pw.length) inf.appendChild(h('div', 'stc', null, pw.map(function (k) { return h('span', '', k + ' ' + hh.pw[k]); })));
       p.appendChild(inf); mid.appendChild(p);
     });
-    var en0 = h('div', 'energy', null, [A('icon-energy', '', { noph: 1 }), h('span', '', String(b.ph === 'p' ? cur.en : 0)), h('em', 'enl', 'Energy')]); en0.setAttribute('aria-label', 'Energy'); mid.appendChild(en0);
-    st.appendChild(mid);
+    var emax = Math.max(cur.en, 3 + (E.has('dawnstone') ? 1 : 0) + ((cur.pw && cur.pw.deva) || 0));
+    var en0 = h('div', 'energy', null, [A('icon-energy', '', { noph: 1 }), h('span', '', String(b.ph === 'p' ? cur.en : 0) + (SG ? '/' + emax : '')), h('em', 'enl', 'Energy')]); en0.setAttribute('aria-label', 'Energy ' + (b.ph === 'p' ? cur.en : 0) + ' of ' + emax);
+    if (SG) st.appendChild(en0); else { mid.appendChild(en0); st.appendChild(mid); }
     // controls row (piles left, end turn right), then the hand
     var anyOk0 = (b.ph === 'p' ? cur.hand : []).some(function (c) { return E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'); });
     var ctl = h('div', 'ctl');
-    if (b.ph === 'p') {
+    if (SG) {
+      var pile = function (id, cls, n, lab, ov) { var pb = on(h('button', 'w485pile ' + cls, null, [h('i', 'w485pc'), h('b', '', String(n))]), function () { if (Date.now() < (UI.dealT || 0) || b.ph !== 'p') return; UI.ov = ov; render(); }); pb.id = id; pb.type = 'button'; pb.setAttribute('aria-label', lab + ': ' + n + ' cards'); return pb; };
+      st.appendChild(pile('drawpile', 'draw', cur.draw.length, 'Draw pile', 'draw')); st.appendChild(pile('discpile', 'disc', cur.disc.length, 'Discard pile', 'disc'));
+      if (b.ph === 'p') { var ebs = on(h('button', 'btn w485end' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); ebs.id = 'end'; ebs.type = 'button'; try { if (window.GXT && GXT.active() && !UI.tutFree()) ebs.disabled = true; } catch (e) { } st.appendChild(ebs); }
+      else st.appendChild(h('div', 'w485end w485wait', 'Enemy turn'));
+    } else if (b.ph === 'p') {
       ctl.appendChild(h('div', 'piles', null, [(function (dc) { dc.id = 'drawpile'; return dc; })(on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'draw'; render(); })), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
       var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; if (window.innerWidth >= 1024) { eb.classList.add('w4endpc'); ctl.appendChild(eb); } try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
     }
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
-    if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
+    if (SG) { hand.classList.add('fan'); var cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), el = cardEl(c); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
+      if (SG) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
       el.setAttribute('data-c', i); holdPeek(el, c); if (ok) dragPlay(el, i); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
     });
     if (UI.sel >= 0) hand.classList.add('hassel');
