@@ -45,7 +45,7 @@ const CORE=['goal','bid','markers','order','lift','drop','noback','lastcolour','
   if(!pg)break;pages.push(pg.t);if(pg.next){await tapSel('#coachend [data-ce=next]','next page');await sleep(400);continue}
   await shot('result');if(!pg.play)note('last count page has no Play a real game');if(/later/i.test(pg.t+pg.txt))note('a learn-later list is shown');
   await tapSel('#coachend [data-ce=play]','play a real game');await sleep(800);break}
- for(const t of ['Coins and land','Palms and palaces','People','Djinns and goods','The count'])if(!pages.includes(t))note('count page missing: '+t);
+ for(const t of ['Land and coins','People, djinns and goods','The count'])if(!pages.includes(t))note('count page missing: '+t);
  if(await p.evaluate(()=>!(UI.modal==='start'&&!G)))note('Play a real game did not open the start screen');
  console.log(`guide ${W}x${H}: steps ${seen.length} (${seen.join(',')}) count pages ${pages.length} problems ${probs.length}`);
  for(const x of probs)console.log('  - '+x);console.log(probs.length?'FAIL':'PASS');await b.close();process.exit(probs.length?1:0)})();
