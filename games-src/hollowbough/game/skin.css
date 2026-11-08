@@ -88,9 +88,6 @@ html:not(.hints-on) #bulbbtn{display:none!important}
 /* W509: tutorial bubble text starts below the Next button (never under it) */
 .gxt-bub:not(.gxt-nobtn) .gxh-tt{min-height:30px}
 
-/* W509 polish: ONE spotlight (a box-shadow around the ring) instead of tiled dim cells, so no 1px seams cross the screen */
-body:has(#hbspot) .gxt-cell{background:transparent}
-#hbspot{position:fixed;z-index:var(--gxt-z,90);pointer-events:none;border-radius:14px;box-shadow:0 0 0 200vmax var(--gxt-dim,rgba(8,4,10,.62))}
 /* W509 polish: the goal is a painted card over the board */
 #pc[data-card="goal"]{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(8,4,10,.55);overflow:hidden}
 #pc[data-card="goal"] .ph-head{display:none}

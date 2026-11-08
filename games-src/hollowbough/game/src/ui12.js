@@ -131,14 +131,6 @@ function tutLook(id, target, isIt) {
   const S = HBS.steps;
   return { id, title: S[id].title, say: tsay(id), target, look: isIt, wait: tapIs('look:' + id), ready: () => myTurn() && !!target() };
 }
-// one spotlight: a single box-shadow hole that follows the kit's ring (the kit's tiled dim cells leave 1px seams on phones)
-(function spot() {
-  requestAnimationFrame(spot);
-  let s = document.getElementById('hbspot'); const r = typeof GXT !== 'undefined' && GXT.running() && document.querySelector('.gxt-cell') ? document.querySelector('.gxt-ring') : null;
-  if (!r) { if (s) s.remove(); return; }
-  if (!s) { s = document.createElement('div'); s.id = 'hbspot'; s.setAttribute('aria-hidden', 'true'); document.body.appendChild(s); }
-  const k = r.style.left + r.style.top + r.style.width + r.style.height; if (s._k !== k) { s._k = k; s.style.left = r.style.left; s.style.top = r.style.top; s.style.width = r.style.width; s.style.height = r.style.height; }
-})();
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c) { if (typeof GXT === 'undefined' || !GXT.active()) return false; const st = GXT.current(); return !!(st && st.hold && st.hold(c)); }
 function storyOpen() { if (typeof GXC === 'undefined') return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
