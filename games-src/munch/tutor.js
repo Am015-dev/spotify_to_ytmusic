@@ -81,6 +81,9 @@ const tclear=()=>!document.getElementById('bfrev')&&!BF.kicking&&UI.pass==null&&
 const tmine=()=>!!G&&!G.winner&&sideToAct()===0&&!G.q&&tclear();
 const nowStr=()=>{const cb=G.cb;return cb?[sideStr(cb),monStr(cb)]:[0,0]};
 const tpick=key=>()=>myId(key);
+// asking for help is possible right now (no rival window pending); the Help step waits for it, the next step reopens the ask mode if a race closed it
+const tcanAsk=()=>sideToAct()===0&&validMoves(0).some(m=>m.act==='ask');
+function tAskOpen(){if(BF.ask||!G.cb||G.cb.help>=0||!tcanAsk()||!tclear())return;BF.pick=null;BF.ask=true;try{bfMark()}catch(e){}}
 // ---------------------------------------------------------------- the steps
 function tutSteps(){
   return [
@@ -121,13 +124,13 @@ function tutSteps(){
    ready:()=>G.active===2&&!G.winner},
  {id:'kick2',title:'Your turn again',say:'Kick the door. Not every door hides a monster.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
- {id:'trouble',title:'Look for trouble',say:'No monster. You may loot a free card, or fight one from your hand: tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
+ {id:'trouble',title:'Look for trouble',say:'No monster. Loot a free card, or fight one from your hand. Tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='lizards'},from:()=>tcard('lizards'),
    ready:()=>G.phase==='after'&&tmine()&&BF.pick==null&&!!tcard('lizards')},
  {id:'help',title:'Ask for help',say:()=>{const [a,b]=nowStr();return 'Lizards '+b+', you '+a+': you lose. Ask a rival to join you. Tap Help.'},target:tq('.fbtns .helpb'),
-   wait:{type:'tap',match:a=>a.what==='askmenu'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&G.cb.help<0&&tmine()&&!!document.querySelector('.fbtns .helpb')},
- {id:'who',title:'Pick a helper',say:'Morwen is an Elf, so she helps for free. Others want treasure. Tap Morwen.',target:tchip(1),
-   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ask'&&a.m.tgt===1},ready:()=>!!BF.ask&&!!tchip(1)()},
+   wait:{type:'tap',match:a=>a.what==='askmenu'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&G.cb.help<0&&tmine()&&tcanAsk()&&!!document.querySelector('.fbtns .helpb')},
+ {id:'who',title:'Pick a helper',say:'Morwen is an Elf, so she helps for free. Others want treasure. Tap Morwen.',target:()=>{tAskOpen();return tchip(1)()},
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ask'&&a.m.tgt===1},ready:()=>{tAskOpen();return !!BF.ask&&!!tchip(1)()}},
  {id:'fight',title:'Fight!',say:()=>{const [a,b]=nowStr();return 'Together you have '+a+' against '+b+'. Higher wins, ties go to the monster. Tap Fight!'},target:tstable('.fbtns .fightb'),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='fight'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.help===1&&tmine()&&!!document.querySelector('.fbtns .fightb')},
  {id:'win',title:'Victory!',say:'You beat it: +1 level, and you drew the treasure. A Treasure Pile gave 3 more cards. Tap End turn.',target:tq(mv('end')),
