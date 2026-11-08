@@ -125,7 +125,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
   if(k==='dismiss')coachHide();
   else if(k==='leave'){tutLeave();lsPlayed();UI.info=true;render()}
   else if(k==='play'||k==='story'||k==='chapter'){const o=NCH.first;coachReset();tutLeave();lsPlayed();
-    if(k==='chapter'&&o){GXC.play(o.id)}else if(k==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}else startGame('solo')}},true);
+    if(k==='chapter'&&o){GXC.play(o.id)}else if(k==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}else{try{BF.seenBrief=null;PHN.briefSeen=null}catch(e){}startGame('solo')}}},true);
 // the end: the real numbers walked through, then what did not come up
 function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.finished=true;
   const mine=G.ships.filter(x=>x.side===0),foe=G.ships.filter(x=>x.side===1),won=G.winner==='P1';
@@ -133,7 +133,7 @@ function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NC
   const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t.replace(/^[A-Z][a-z]+: /,'')+'. '+LORE.coach[k].s));
   const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
   d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
-    +'<div class="gxt-ex"><b>Things you will meet later</b><ul class="na-later">'+later.map(t=>'<li>'+t+'</li>').join('')+'</ul></div>'
+    +'<div class="gxt-ex"><b>Coming up later</b><ul class="na-later">'+LORE.laterShort.map(t=>'<li>'+t+'</li>').join('')+'</ul>The rest is in Rules.</div>'
     +'<div class="gxt-eb">'+(NCH.o&&NCH.first?'<button type="button" class="gxt-b pri" data-na="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-na="play">Play a real game</button><button type="button" class="gxt-b" data-na="story">Story mode</button>')+'</div></div>';
   document.body.appendChild(d);TUT.coach=false}
 // leave the staged game: nothing of it is saved, the dice script and the pauses are cleared
@@ -158,3 +158,7 @@ try{tutMenu()}catch(e){}
 
 // press feedback on every button (a short flash): the player sees the tap landed, even when the effect is on the 3D board
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(!b)return;b.classList.add('na-tap');setTimeout(()=>b.classList.remove('na-tap'),350)},true);
+
+// R3: the title is first drawn while ui.js boots, before this file and camp.js exist; draw it again now that Learn and Story are known
+try{if(typeof UI!=='undefined'&&UI.info&&typeof render==='function')render()}catch(e){}
+addEventListener('load',()=>{try{if(UI.info)render()}catch(e){}});
