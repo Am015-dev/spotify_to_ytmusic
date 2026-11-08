@@ -26,7 +26,7 @@
       { kind: 'text', sel: '#acts [data-a=ready]', re: /roll/i, name: 'Roll label' },
       { kind: 'visible', sel: '#goal .gstrip', name: 'landing checklist strip' },
       { kind: 'eq', name: 'round number', a: function () { return +/Round (\d+)/.exec($('#barstat').textContent)[1]; }, b: function () { return G.round + 1; } },
-      { kind: 'eq', name: 'spaces to the airport', a: function () { return GXS.num('#goal .ck[data-k=air] .nn'); }, b: function () { var e = $('#goal .ck[data-k=air]'); return +/\((\d+) spaces/.exec(e.getAttribute('aria-label'))[1]; } },
+      { kind: 'eq', name: 'spaces to the airport', a: function () { return GXS.num('#goal .ck[data-k=air] .cw'); }, b: function () { var e = $('#goal .ck[data-k=air]'); return +/\((\d+) spaces/.exec(e.getAttribute('aria-label'))[1]; } },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#board *, #acts *, #prompt, #pz *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       skin
     ]

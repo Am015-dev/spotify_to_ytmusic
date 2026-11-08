@@ -37,3 +37,4 @@ the message gives it. Then wait for the next game.
   touch/mouse proof and screenshots. Run phone and PC checks in parallel browser contexts.
 - Only the pop-up timing check runs at real speed, and only for the messages you are timing.
 - A full review should take minutes, not an hour.
+- Before feel-audit or asset-usage on a DEPLOYED game, delete games-src/.staging/<slug> (gx-serve serves staging first). For a staged review, rebuild staging first.
