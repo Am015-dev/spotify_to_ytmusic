@@ -21,22 +21,23 @@ def get(url, binary=False):
     return d if binary else json.loads(d)
 
 def search(q):
-    r = get(API.replace('v1/', 'v1.1/') + 'search?hasImages=true&isPublicDomain=true&limit=40&q=' + urllib.parse.quote(q))
+    r = get(API.replace('v1/', 'v1.1/') + 'search?hasImages=true&isPublicDomain=true&limit=100&q=' + urllib.parse.quote(q))
     return (r or {}).get('objectIDs') or []
 
 USED = set()
 def fetch_img(queries, minside=900, skip=0, aspect=None):
     k = 0
     for q in queries:
-        for oid in search(q)[:40]:
-            if oid in USED: continue
-            o = get(API + 'objects/%d' % oid)
+        ids = [i for i in search(q) if i not in USED]
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(8) as ex: objs = list(ex.map(lambda i: get(API + 'objects/%d' % i), ids))
+        for oid, o in zip(ids, objs):
             if not o or not o.get('isPublicDomain') or not o.get('primaryImage'): continue
             if o.get('classification', '') and any(b in o['classification'] for b in ('Photograph',)): pass
-            d = get(o['primaryImage'].replace('original', 'web-large'), True) or get(o['primaryImage'], True)
+            d = get(o['primaryImage'], True)
             if not d: continue
             try:
-                import io; im = Image.open(io.BytesIO(d)); im.load()
+                import io; im = Image.open(io.BytesIO(d)); im.draft('RGB', (2400, 2400)); im.load()
             except Exception: continue
             if max(im.size) < minside: continue
             if aspect:
