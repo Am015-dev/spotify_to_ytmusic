@@ -398,5 +398,22 @@ body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 @media (max-width:640px){.sr{grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:0 6px;padding:3px 8px}.sr .sp{display:none}.sr .sn{grid-column:1}.sr .st{grid-row:1;grid-column:2;flex-direction:row;gap:4px;align-items:baseline}.sr .st b{font-size:20px}
 .sr::after{content:attr(data-br);grid-column:1/-1;font-size:14px;opacity:.95;line-height:1.2}}
 @media (min-width:1000px){#hand{flex-wrap:nowrap;overflow-x:auto}#hand .bc.big{flex:0 0 100%;height:auto}.bc.big .bk-pic{flex-basis:40%;min-height:220px}.bk-nm{font-size:20px}.bk-pw,.bk-st{font-size:16px}#trk .trk{font-size:16px}#trk .tr-why{font-size:16px}.a4{font-size:16px}.a4 .a4t b{font-size:18px}.sr,.sr .sp small,.sr .st small{font-size:16px}.rate{font-size:16px}#foodrow .fd small{font-size:16px}.bk-cost .ci small{font-size:16px}.bk-hab .hb{font-size:16px}.vpb small{font-size:16px}#foodrow .fl,#foodrow .fd,#hpg{font-size:16px}.bestb,.a4.tutpoint::after{font-size:16px}.bc .vp,.sr .sp b,.sr .sn{font-size:16px}}
+
+/* Addendum 7: clean Play */
+.sline{appearance:none;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:4px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.35);color:#fff6e0;font-size:16px;cursor:pointer}
+.sline .sl b{font-size:20px;color:#ffe2a0}.sline .sl.me{font-weight:700}.sline em{font-style:normal;color:#e0a948;margin-right:3px}.sline i{font-style:normal;opacity:.85;font-size:14px}
+.sline .slw{margin-left:auto;font-size:14px;text-decoration:underline;opacity:.95}
+#bulbbtn .hst{font-size:14px;font-weight:700;margin-left:2px}
+#bulbbtn.on{background:#e0a948;color:#2a2116;border-color:#e0a948}
+#bulbbtn svg{fill:none;stroke:currentColor;stroke-width:1.8}
+@media (max-width:640px){#bulbbtn span{display:none}}
+#whatbtn{align-self:flex-start}
+.pop .card.scored h3,.pop .card.goalc h3{margin:0 0 8px;font-size:19px;line-height:1.25}
+.sctab{width:100%;border-collapse:collapse;font-size:15px}
+.sctab th,.sctab td{padding:5px 4px;border-bottom:1px solid #e3d6b8;text-align:center}
+.sctab td:first-child{text-align:left}.sctab td small{display:block;font-size:14px;color:#4d4536}
+.sctab tr.tot td{font-weight:800;font-size:17px}
+.goalc ul{margin:0 0 8px;padding-left:20px;font-size:16px;line-height:1.4}.goalc p{font-size:15px;margin:0 0 6px}
+@media (min-width:1000px){.sctab,.sctab td small,.goalc p,#bulbbtn .hst,.sline i,.sline .slw{font-size:16px}}
 </style>
 </head>

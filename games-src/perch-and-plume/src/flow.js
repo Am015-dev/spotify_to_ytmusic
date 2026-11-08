@@ -13,8 +13,8 @@ document.addEventListener('click', function (e) {
   var mine = myTurn(), Q = G.q, p = G.pl[UI.view];
   sfx('tap');
   if (a === 'zoom') { showCard(p.hand[i]); return; }
-  if (a === 'die' && !(mine && Q && Q.h === 'die')) { toast('Feeder: ' + (G.feeder[i] === 'gs' ? 'grub or seed' : G.feeder[i]) + ' die. Your forest takes food from here.'); return; }
-  if (a === 'deck' && !(mine && Q && Q.h === 'draw')) { toast('Deck: ' + G.deck.length + ' birds. Your wetland draws from here or the tray.'); return; }
+  if (a === 'die' && !(mine && Q && Q.h === 'die')) { toast('Feeder: ' + (G.feeder[i] === 'gs' ? 'grub or seed' : G.feeder[i]) + ' die. Get food takes dice from here.', 0, 1); return; }
+  if (a === 'deck' && !(mine && Q && Q.h === 'draw')) { toast('Deck: ' + G.deck.length + ' birds. Draw birds takes from here or the tray.', 0, 1); return; }
   if (a === 'tray' && G.tray[i] && !(mine && Q && Q.h === 'draw')) { showCard(G.tray[i]); return; }
   if (!mine) {   // not deciding: taps just show the card
     if (a === 'bird') showCard(p.board[h][c].id, p.board[h][c]);
@@ -79,7 +79,7 @@ function setSlot(h, c, st) {   // redraw one bird on the shown board (used to re
 function apply(m, s) {
   var pre = PP.clone(G.pl[UI.view].board);
   var r = PP.performMove(G, m, s);
-  if (!r.ok) { toast('Not allowed: ' + r.err); render(); return false; }
+  if (!r.ok) { toast('Not allowed: ' + r.err, 0, 1); render(); return false; }
   var fx = G.fx.slice(); G.fx = [];
   if (isHuman(s)) UI.lastHuman = s;
   save(); render();
