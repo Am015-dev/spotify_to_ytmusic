@@ -1,0 +1,659 @@
+{
+ "slug": "twin-thrones",
+ "when": "2026-11-08T02:35Z",
+ "secs": 30,
+ "totalSecs": 71,
+ "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
+ "checks": {
+  "a": {
+   "status": "FAIL",
+   "count": 14,
+   "detail": [
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 753,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 508,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 500,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 750,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 748,
+     "texts": [
+      "Draft four wonders each",
+      "The pyramid Only glowing cards are free to take. A"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 475,
+     "texts": [
+      "Choose in the big card: build, sell or wonder.",
+      "Draft four wonders each"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Choose in the big card: build, sell or wonder.",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Choose in the big card: build, sell or wonder.",
+      "Sell for coins This card holds one above it. Take "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Choose in the big card: build, sell or wonder.",
+      "Raise a wonder This card can also raise a wonder. "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 750,
+     "texts": [
+      "Draft four wonders each",
+      "The pyramid Only glowing cards are free to take. A"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Choose in the big card: build, sell or wonder.",
+      "Draft four wonders each"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Choose in the big card: build, sell or wonder.",
+      "Draft four wonders each",
+      "Build it Build adds it to your city. It gives you "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Choose in the big card: build, sell or wonder.",
+      "Raise an army The red Pony Pen has a shield. Build"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Choose in the big card: build, sell or wonder.",
+      "Raise a wonder This card can also raise a wonder. "
+     ]
+    }
+   ]
+  },
+  "b": {
+   "status": "FAIL",
+   "count": 4,
+   "detail": [
+    {
+     "session": "phone/play",
+     "text": "Draft four wonders each",
+     "ms": 1750,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Draft four wonders each",
+     "ms": 1750,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Fertile Fields: 6 coins now, 4 points",
+     "ms": 510,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Sacred Rites: Your wonders all let you play again",
+     "ms": 1250,
+     "cls": "",
+     "tag": "div"
+    }
+   ]
+  },
+  "c": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  },
+  "d": {
+   "status": "FAIL",
+   "count": 100,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "The Twin Crowns: 10 chapters",
+     "px": 13,
+     "at": 1008,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Short, one tap at a time, no reading",
+     "px": 13,
+     "at": 1008,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Computer",
+     "px": 13,
+     "at": 2005,
+     "where": "button.pill.vp"
+    },
+    {
+     "session": "phone/learn",
+     "text": "$12",
+     "px": 13,
+     "at": 2005,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "4 pts",
+     "px": 13,
+     "at": 2005,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Terraced Orchard",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Merchant Road",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bronze Titan",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Stone Riddle",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Cit",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Dee",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Ope",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Sac",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Fin",
+     "px": 13,
+     "at": 2005,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "5$",
+     "px": 13,
+     "at": 2005,
+     "where": "span.tg"
+    },
+    {
+     "session": "phone/learn",
+     "text": "2$",
+     "px": 13,
+     "at": 2005,
+     "where": "span.tg"
+    },
+    {
+     "session": "phone/learn",
+     "text": "You",
+     "px": 13,
+     "at": 2005,
+     "where": "span.nm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Stake Fence",
+     "px": 13,
+     "at": 2005,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Open Stage",
+     "px": 13,
+     "at": 2005,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Age I",
+     "px": 13,
+     "at": 2005,
+     "where": "div.dn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Stone Depot",
+     "px": 13,
+     "at": 2005,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Scribe Room",
+     "px": 13,
+     "at": 2005,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Weights Hall",
+     "px": 13,
+     "at": 2005,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Clay Depot",
+     "px": 13,
+     "at": 2006,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Timber Stand",
+     "px": 13,
+     "at": 2006,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "W",
+     "px": 13,
+     "at": 2006,
+     "where": "span.l"
+    },
+    {
+     "session": "phone/learn",
+     "text": "free",
+     "px": 13,
+     "at": 2006,
+     "where": "span.chip.r-free"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Roadside Inn",
+     "px": 13,
+     "at": 2006,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "$4",
+     "px": 13,
+     "at": 2006,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Pony Pen",
+     "px": 13,
+     "at": 2006,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "1",
+     "px": 13,
+     "at": 2006,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Mud Basin",
+     "px": 13,
+     "at": 2006,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "C",
+     "px": 13,
+     "at": 2006,
+     "where": "span.l"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Rock Face",
+     "px": 13,
+     "at": 2006,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "S",
+     "px": 13,
+     "at": 2006,
+     "where": "span.l"
+    },
+    {
+     "session": "phone/learn",
+     "text": "$40",
+     "px": 13,
+     "at": 2006,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "13 pts",
+     "px": 13,
+     "at": 2006,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Sky Tomb",
+     "px": 13,
+     "at": 2006,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Beacon Isle",
+     "px": 13,
+     "at": 2006,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Thunder Idol",
+     "px": 13,
+     "at": 2006,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Archive of Dust",
+     "px": 13,
+     "at": 2006,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Build it, sell it for coins, or use it for a wonder.",
+     "px": 13,
+     "at": 2006,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Only glowing cards are free to take. A card under another on",
+     "px": 13.5,
+     "at": 2006,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Raw card, Age I",
+     "px": 13,
+     "at": 3032,
+     "where": "span.zt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Build · 0$",
+     "px": 13.6,
+     "at": 3032,
+     "where": "button.btn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Sell +2$",
+     "px": 13.6,
+     "at": 3032,
+     "where": "button.btn.alt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wonder: Sky Tomb · 10$",
+     "px": 13.6,
+     "at": 3032,
+     "where": "button.btn.alt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wonder: Beacon Isle · 8$",
+     "px": 13.6,
+     "at": 3032,
+     "where": "button.btn.alt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wonder: Thunder Idol · 8$",
+     "px": 13.6,
+     "at": 3032,
+     "where": "button.btn.alt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wonder: Archive of Dust · 10$",
+     "px": 13.6,
+     "at": 3032,
+     "where": "button.btn.alt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "makes 1 wood. Cost: 0 coins",
+     "px": 13,
+     "at": 3032,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "$14",
+     "px": 13,
+     "at": 5002,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Hewing Camp",
+     "px": 13,
+     "at": 5002,
+     "where": "div.band"
+    },
+    {
+     "session": "phone/learn",
+     "text": "$1",
+     "px": 13,
+     "at": 5002,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Trade card, Age I",
+     "px": 13,
+     "at": 5002,
+     "where": "span.zt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wonder: Thunder Idol · 6$",
+     "px": 13.6,
+     "at": 5003,
+     "where": "button.btn.alt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wonder: Archive of Dust · 8$",
+     "px": 13.6,
+     "at": 5003,
+     "where": "button.btn.alt"
+    },
+    {
+     "session": "phone/learn",
+     "text": "+4 coins. Cost: 0 coins",
+     "px": 13,
+     "at": 5003,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "This card holds one above it. Take it and your rival may gra",
+     "px": 13.5,
+     "at": 5003,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wayside Shrine",
+     "px": 13,
+     "at": 6001,
+     "where": "div.band"
+    }
+   ]
+  },
+  "e": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  }
+ },
+ "notes": [],
+ "sessions": [
+  {
+   "size": "phone",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 39,
+   "clicks": 44,
+   "endedBy": "result",
+   "tutorialEnded": 10,
+   "hintsOff": true,
+   "messagesSeen": 25
+  },
+  {
+   "size": "phone",
+   "mode": "play",
+   "secs": 5,
+   "turns": 3,
+   "clicks": 6,
+   "endedBy": "result",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 1
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 32,
+   "clicks": 29,
+   "endedBy": "result",
+   "tutorialEnded": 10,
+   "hintsOff": true,
+   "messagesSeen": 23
+  },
+  {
+   "size": "pc",
+   "mode": "play",
+   "secs": 5,
+   "turns": 5,
+   "clicks": 6,
+   "endedBy": "result",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 3
+  }
+ ]
+}
