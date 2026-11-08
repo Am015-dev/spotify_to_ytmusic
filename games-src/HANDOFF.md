@@ -198,3 +198,12 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Lesson: fixers' sim/bot claims (taps, win rates) were wrong twice; demand touch-measured numbers.
 - Running reviewers: R2 (vinegrave, thornbound, wildmark) session_01RR7mnYeN67c3gxAPrhaNx1; R4 (hollowbough, rampart, final-approach) session_01RR7mnXTEKxqpPJVQtBoHJc; R5 (tidewake, sands, lantern) session_01RR7mnaA15Nj5vtwBiWPHpw.
 - Waiting for a reviewer: sunglaze. First-round fixers still running: crown, kaiten, twin, nebula, perch; r2: doorkick, emberclimb.
+- 20:04: perch fixed (stopper gone), waits with sunglaze for a reviewer. NOTE: shelf/W508-perch-gameplay merge commit 9d8868f0 has the container default author; when integrating perch, squash it (never force-push).
+
+## 20:41 UTC update
+- R2: vinegrave 5.6, thornbound 4.0 (stopper, dead taps). F2: thornbound session_01RR7mnaCnm2BxASv5LYf5bp, vinegrave session_01RR7mnaK3J3MR4wBDnaNAX7. R2 still scoring wildmark (session_01RR7mnYeN67c3gxAPrhaNx1).
+- R4: hollowbough 6.5, rampart 6.9, final-approach 4.0. F2: hollowbough session_01RR7mnZtXQUadm8SabpwQCd, rampart session_01RR7mnborBQnkrcUNcWGJiw; final-approach fixed (brake frozen at 2nd engine die, rule quoted) -> R6.
+- R5: tidewake 7.0, sands 6.5, lantern 6.9. F2: tidewake session_01RR7mnYyABfvTarj4FQBF8T, sands session_01RR7mnY6FJi6HojBs7QXSWp, lantern session_01RR7mnZmYxdcCW9TuxCFZW5.
+- R6 (sunglaze, perch, final-approach) session_01RR7mnY9XjyFfPRsVjbpyUq. R7 (stitchwise, crown, emberclimb) session_01RR7mnXtR9eqWMsfjpryuzW.
+- Other fixers: F2 cauldron/shipwreck/redline (redline on r2), F2 vale, F2 short-fuse, doorkick r2, kaiten, twin, nebula.
+- No game has passed a re-review yet (12 re-reviewed).
