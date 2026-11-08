@@ -53,7 +53,7 @@ function cardArt(kind,name,o){o=o||{};if(o.img&&typeof PAINT_ON!=='undefined'&&P
 function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='offer'&&typeof offerHtml==='function'?offerHtml():UI.modal==='start'?startHtml():UI.modal==='over'&&G&&G.over?overHtml():UI.modal==='lobby'&&online()?lobbyHtml():UI.modal==='goal'?goalHtml():'';m.hidden=!h;if(m.dataset.h!==h){
   const a=document.activeElement,id=a&&m.contains(a)&&a.id,sel=id&&a.selectionStart!=null?[a.selectionStart,a.selectionEnd]:null;const det=[...m.querySelectorAll('details')].map(d=>d.open);
   m.innerHTML=h;m.dataset.h=h;if(UI.modal==='start')paintOpening();[...m.querySelectorAll('details')].forEach((d,i)=>{if(det[i]!=null)d.open=det[i]});if(id){const e=document.getElementById(id);if(e){e.focus({preventScroll:true});if(sel)try{e.setSelectionRange(sel[0],sel[1])}catch(x){}}}}}
-UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal','normal','normal','normal','normal'],ex:{artisans:false,sultan:false,thieves:false,promos:false}};
+UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal','easy','easy','easy','easy'],ex:{artisans:false,sultan:false,thieves:false,promos:false}};
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox start"><canvas id="opencv" width="640" height="220" aria-hidden="true"></canvas><h2>Sands of Qamar</h2><p class="lede">Collect tribes. Claim land. Win the bazaar.</p>
    <div class="seg qrow">${[2,3,4,5].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n} players</button>`).join('')}</div>

@@ -1,6 +1,6 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-const LVL={easy:{noise:4,depth:3000},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
+const LVL={easy:{noise:6,depth:3000,rand:.8,half:.55},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
 function aiNoise(p){return (LVL[p.lv]||LVL.normal).noise}
 // every legal outcome of picking up tile s: {s,e,c,n,path}
 function outcomes(s,cap){const t=G.board[s];const hand=t.m.slice();const saved=t.m;t.m=[];const hc=handCounts(hand);const L=hand.length;const res={};let nodes=0;
@@ -34,7 +34,10 @@ function evalOutcome(p,o){const t=G.board[o.e];let v=0;
   if(G.boss&&G.boss.seat===p.i&&o.c===G.boss.favour)v+=6;// campaign boss rule: this boss prefers one tribe
   return v+(Math.random()-.5)*aiNoise(p)*6}
 function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||scoreOf(q).total<=s)}
-function planTurn(p){const cap=(LVL[p.lv]||LVL.normal).depth;let best=null,bv=-1e9;for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);if(v>bv){bv=v;best=o}}return best&&Object.assign(best,{v:bv})}
+function planTurn(p){const L_=LVL[p.lv]||LVL.normal,cap=L_.depth;let best=null,bv=-1e9;const all=L_.rand?[]:null;for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);if(all)all.push([o,v]);if(v>bv){bv=v;best=o}}
+  // gentle levels: some turns take a decent but not the best walk (a random one from the better half), like a new player would
+  if(all&&all.length>1&&Math.random()<L_.rand){all.sort((x,y)=>y[1]-x[1]);const k=all[Math.floor(Math.random()*Math.max(1,Math.ceil(all.length*(L_.half||.5))))];return Object.assign(k[0],{v:k[1]})}
+  return best&&Object.assign(best,{v:bv})}
 function bestTurnValue(p){const b=planTurn(Object.assign({},p,{lv:'hard'}));return b?b.v:0}
 // the next concrete move for side s
 function aiMove(s){if(G&&G.tut&&typeof tutAIMove==='function'){const tm=tutAIMove(s);if(tm)return tm}
