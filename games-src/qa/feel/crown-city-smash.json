@@ -1,8 +1,8 @@
 {
  "slug": "crown-city-smash",
- "when": "2026-11-08T07:40Z",
- "secs": 120,
- "totalSecs": 386,
+ "when": "2026-11-08T08:06Z",
+ "secs": 45,
+ "totalSecs": 166,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,9 +36,9 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 121,
-   "turns": 68,
-   "clicks": 82,
+   "secs": 46,
+   "turns": 19,
+   "clicks": 28,
    "endedBy": "time",
    "tutorialEnded": 8,
    "hintsOff": true,
@@ -47,9 +47,9 @@
   {
    "size": "phone",
    "mode": "play",
-   "secs": 122,
-   "turns": 76,
-   "clicks": 82,
+   "secs": 47,
+   "turns": 27,
+   "clicks": 27,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -58,18 +58,18 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 120,
-   "turns": 31,
-   "clicks": 40,
+   "secs": 47,
+   "turns": 10,
+   "clicks": 13,
    "endedBy": "result",
    "tutorialEnded": 9,
    "hintsOff": true,
-   "messagesSeen": 3
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 22,
+   "secs": 26,
    "turns": 6,
    "clicks": 6,
    "endedBy": "result",

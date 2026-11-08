@@ -4,7 +4,7 @@ UI.sel=null;UI.tgt=null;UI.adv=null;UI.recap=[];UI.fxSeen=0;UI.hover=null;UI.las
 try{UI.coach=localStorage.getItem('sgz_coach')==='1'}catch(e){UI.coach=false}  // W466: play mode is clean; hints only when turned on
 const CHAPTERS=['The king’s first commission: the north wall','Morning light on the fountain court','The king inspects the east wall','Dust and glaze in the south arcade','The west wall catches the sunset','The whole court gathers to watch','Lanterns over the throne-room gallery','One last wall before the feast'];
 const chapter=r=>`Round ${r}: ${CHAPTERS[Math.min(r,CHAPTERS.length)-1]}`;
-function refresh(){if(G&&!NET.on&&!UI.tut){try{if(!G.over&&G.pl.some(p=>p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
+function refresh(){if(G&&!NET.on&&!UI.tut){try{if(!G.over&&G.pl.some(p=>p.human)&&G.turn>0)localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){render();return}const h=me();if(h&&UI.lastHuman!==h.i){UI.lastHuman=h.i;if(V3.on)relayout()}
   playFx();computeHL();render();try{sync3D();camFocus()}catch(e){console.error(e)}schedule();netAfter()}
 const me=()=>{if(!G||G.over)return null;const s=sideToAct();if(NET.on&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
