@@ -509,3 +509,5 @@ body:has(#rs:not([hidden])) #turnover,body:has(.gxt-cell) #turnover,body:has(.gx
   .cd.fear .fx .sm{color:#ffe6e0!important;background:#2a1010;padding:0 4px;border-radius:4px}
 }
 @media (min-width:1000px){.cd.fear .fx{display:none!important}}
+/* brief GAMEFEEL 3: no fast messages over the board; whose turn lives in the dock tracker */
+#tbanner{display:none!important}

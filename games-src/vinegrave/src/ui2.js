@@ -186,8 +186,8 @@ function showEvents(s) {
   ev.forEach(e => {
     if (typeof coachEvent === 'function') coachEvent(e, s);
     if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); const who = e.s === -2 ? G.rival.name : G.p[e.s].name; setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('burst'); }, 60); note(who + (who === 'You' ? ' discover ' : ' discovers ') + V.SITE[e.tile].name + '!', 1800); }
-    if (e.k === 'guardian') { wait = Math.max(wait, 2700); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', 'Overcome it for 5 points and a boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
-    if (e.k === 'beat') { wait = Math.max(wait, 2300); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, 'Overcome!', w + (w === 'You' ? ' tame ' : ' tames ') + V.GUARD[e.guard].name + ': +5 points and a boon.', true); }
+    if (e.k === 'guardian') { wait = Math.max(wait, 4800); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', 'Overcome it for 5 points and a boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
+    if (e.k === 'beat') { wait = Math.max(wait, 4800); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, 'Overcome!', w + (w === 'You' ? ' tame ' : ' tames ') + V.GUARD[e.guard].name + ': +5 points and a boon.', true); }
     if (e.k === 'idolfind') { sfx.play('coin'); }
     if (e.k === 'fear') { sfx.play('fear'); note(G.log.filter(l => /Dread/.test(l.t)).slice(-1)[0].t, 2400); wait = Math.max(wait, 900); }
     if (e.k === 'round') { note('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
@@ -201,7 +201,8 @@ function fxCard(kind, id, title, text, good) {
   if (UI.fast) return; const f = $('#fx'); f.hidden = false; f.className = good ? 'good' : 'bad';
   f.innerHTML = `<div class="fxcard${good ? ' good' : ''}" data-help><div class="rays" aria-hidden="true"></div><div class="por" data-art="guard-${id}"><svg><use href="#s-guard"/></svg></div><b>${esc(title)}</b><span>${esc(text)}</span><small class="sm">Tap to close</small></div>`;
   if (typeof artApply === 'function') artApply(f);
-  f.onclick = fxHide; clearTimeout(fxCard.t); fxCard.t = setTimeout(fxHide, 1800);   /* gone before the next turn starts (R3 bug 4); a tap closes it sooner */
+  f.onclick = fxHide; clearTimeout(fxCard.t); fxCard.t = setTimeout(fxHide, readMs(title + ' ' + text));   /* readable: 4 s + 1 s per 10 words; a tap closes it sooner */
+  try { $('#toast').classList.remove('on'); } catch (e) { }   /* gone before the next turn starts (R3 bug 4); a tap closes it sooner */
 }
 function fxHide() { const f = $('#fx'); if (!f) return; clearTimeout(fxCard.t); f.hidden = true; f.innerHTML = ''; f.className = ''; }
 function shake() { const b = $('#bd'); if (!b || document.documentElement.classList.contains('gx-reduce')) return; b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 600); }
@@ -264,5 +265,5 @@ function turnOver(m, rating, lbl) {   /* "Turn over: why" card, non-blocking */
   const why = m.t === 'pass' ? 'You passed: you sit out until everyone has passed and the round ends.' : 'Turn over: you used your one action (' + (lbl || 'your move') + ').';
   e.innerHTML = `<b>${esc(why)}</b>${rating ? `<span class="rt ${rating.k}">${esc(rating.t)}</span>` : ''}<span class="nx">${esc(G.phase === 'over' ? 'The expedition is over.' : 'Next: ' + (VG.actor(G) >= 0 && !myTurn() && G.p[VG.actor(G)] ? G.p[VG.actor(G)].name + ' plays.' : VG.actor(G) === -2 ? 'the rival expedition plays.' : 'your turn again.'))}</span>`;
   try { const d = $('#dock').getBoundingClientRect(), ph = innerWidth < 1000; e.style.top = (ph ? Math.max(60, d.top - e.offsetHeight - 8) : 64) + 'px'; e.style.left = (ph ? innerWidth / 2 : d.left + d.width / 2) + 'px'; } catch (x) { }
-  e.className = 'on'; clearTimeout(turnOver.t); turnOver.t = setTimeout(() => { e.className = ''; }, 3600); e.onclick = () => { e.className = ''; };
+  e.className = 'on'; clearTimeout(turnOver.t); turnOver.t = setTimeout(() => { e.className = ''; }, readMs(e.textContent)); e.onclick = () => { e.className = ''; };
 }

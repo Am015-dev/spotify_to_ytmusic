@@ -136,4 +136,5 @@ function qHTML(q) {
   if (q.h === 'site') return `<b>Dig without travel</b><span class="sm">Tap a glowing site on the map.</span>${mvBtn({ t: 'ans', v: null }, 'Skip', 'alt')}`;
   return '';
 }
-function toast(t, ms) { const e = $('#toast'); e.textContent = t; try { const d = $('#dock').getBoundingClientRect(); if (d.width > 0) { e.style.top = Math.max(60, d.top - (e.offsetHeight || 40) - 6) + 'px'; e.style.left = (d.left + d.width / 2) + 'px'; e.style.maxWidth = Math.max(200, d.width - 24) + 'px'; } } catch (x) { } toast.n = (toast.n || 0) + 1; e.className = 'on t' + toast.n; clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2200); }
+function readMs(t, ms) { return Math.max(ms || 0, 4000 + 100 * String(t || '').split(/\s+/).filter(Boolean).length); }   /* brief: 4 s + 1 s per 10 words, never less */
+function toast(t, ms) { ms = readMs(t, ms); const e = $('#toast'); e.textContent = t; try { const d = $('#dock').getBoundingClientRect(); if (d.width > 0) { e.style.top = Math.max(60, d.top - (e.offsetHeight || 40) - 6) + 'px'; e.style.left = (d.left + d.width / 2) + 'px'; e.style.maxWidth = Math.max(200, d.width - 24) + 'px'; } } catch (x) { } toast.n = (toast.n || 0) + 1; e.className = 'on t' + toast.n; clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2200); }
