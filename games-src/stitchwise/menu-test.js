@@ -10,7 +10,7 @@ let fails = 0, n = 0; const ok = (c, m) => { n++; if (!c) { fails++; console.log
   const tapSel = async s => { const el = await pg.$(s); if (!el) throw new Error('missing ' + s); await tap(el); };
   const tapText = async (scope, t) => { const el = await pg.$(scope + ' button:has-text("' + t + '")'); if (!el) throw new Error('missing button ' + t); await tap(el); };
   await pg.goto(process.env.URL || 'http://localhost:8731/index.html'); await pg.waitForTimeout(600);
-  await tapSel('[data-a=quick]'); await tapText('#start', 'Normal'); await pg.waitForFunction(() => !!G && UI.started, null, { timeout: 5000 });
+  await tapSel('[data-a=start]'); await tapText('#start', 'Normal'); await pg.waitForFunction(() => !!G && UI.started, null, { timeout: 5000 });
   const openMenu = async () => { await tapSel('[data-gx=setd]'); await pg.waitForTimeout(300); };
   await openMenu();
   const chips = await pg.evaluate(() => [...document.querySelectorAll('#setd .gx-chip')].map(e => { const r = e.getBoundingClientRect(); return { t: e.textContent.trim(), x: r.x, y: r.y, w: r.width, h: r.height, sw: e.scrollWidth, cw: e.clientWidth }; }));

@@ -84,7 +84,7 @@ setInterval(() => { try { rfScan(); instrBar(); turnBanner(); } catch (e) { } },
 })();
 // ---- Quick game: a flavour line on day 1 and one in the result
 (function () {
-  const ng = newGame; newGame = function (mode) { const r = ng.apply(this, arguments); try { if (mode === 'ai' || mode === 'vs' || mode === undefined) setTimeout(() => { if (G && G.round === 1 && UI.started && !UI.camp && !tutOn()) toast(STORY.quickIntro[Math.abs(parseInt(G.seed, 10) || 0) % STORY.quickIntro.length]); }, 600); } catch (e) { } return r; };
+  const ng = newGame; newGame = function (mode) { const r = ng.apply(this, arguments); try { if (mode === 'ai' || mode === 'vs' || mode === undefined) setTimeout(() => { if (G && G.round === 1 && UI.started && !UI.camp && !tutOn() && UI.mode !== 'tutorial') goalCard(); }, 600); } catch (e) { } return r; };
 })();
 // ---- Quick game result: one line in the game's voice under the winner
 (function () {
@@ -97,7 +97,7 @@ const COACH = window.COACH = { on: false, shown: [], later: [], q: [], cur: null
 const coachBox = () => { let e = $('#coach'); if (!e) { e = h('div#coach.coach', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(e); e.addEventListener('click', ev => { if (ev.target.closest('[data-cx=ok]')) coachNext(); else if (ev.target.closest('[data-cx=leave]')) coachLeave(); }); } return e; };
 const cMe = () => G && G.players[0];
 const COACH_RULES = [
-  ['goal', () => G.phase !== 'over' && G.round === 1, 'The goal', 'Granny Hask: "Brew two practice days against Wynne. Most victory points wins. Play any move you like."'],
+  ['goal', () => G.phase !== 'over' && G.round === 1, 'How you win', 'Have the most points after two days. \u2022 Tap the bag to drop chips in your pot. \u2022 Stop before the white chips pass 7. \u2022 Your last space pays coins and points.'],
   ['fortune', () => cMe().q && cMe().q.h === 'pick', 'Fortune card', 'Hask: "Each day the fair draws a fortune. Purple happens now: pick whichever reward you fancy."'],
   ['draw', () => G.phase === 'brew' && cMe().st === 'draw' && !cMe().q && cMe().pot.length === 0 && G.round === 1, 'Your bag', 'Hask: "Tap the bag to pull a chip. It walks as many spaces along the spiral as its number."'],
   ['spiral', () => G.phase === 'brew' && cMe().pot.length >= 1 && G.round === 1, 'The spiral', () => 'Hask: "Your chip stands on space ' + cMe().pot[cMe().pot.length - 1].pos + '. Stop now and you keep that space\'s coins and points."'],
@@ -121,8 +121,9 @@ COACH.ids = COACH_RULES.map(r => r[0]).concat(['end']);
 const COACH_LATER = [['The purple book (days 3+) and the black chips', 'purple'], ['The other 22 fortune cards', 'cards'], ['Rat tails: trailing players start the stone ahead', 'rat'], ['Nine days, and ties go to the furthest last chip', 'ties']];
 function coachShow(id, title, text) {
   const b = coachBox(), t = typeof text === 'function' ? text() : text;
-  b.innerHTML = '<img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><div class="cxb"><b>' + title.replace(/</g, '&lt;') + '</b><span>' + t.replace(/</g, '&lt;') + '</span></div><div class="cxr"><button type="button" data-cx="ok">Got it</button><button type="button" data-cx="leave" class="lv">Leave tutorial</button></div>';
-  b.className = 'on' + (UI.rsOpen ? ' top' : ''); COACH.cur = id; COACH.shown.push(id); clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, 9000);
+  const tp = t.replace(/</g, '&lt;').split(' \u2022 '), body = '<span>' + tp[0] + '</span>' + (tp.length > 1 ? '<ul class="cxl">' + tp.slice(1).map(x => '<li>' + x + '</li>').join('') + '</ul>' : '');
+  b.innerHTML = '<img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><div class="cxb"><b>' + title.replace(/</g, '&lt;') + '</b>' + body + '</div><div class="cxr"><button type="button" data-cx="ok">Got it</button><button type="button" data-cx="leave" class="lv">Leave tutorial</button></div>';
+  b.className = 'on' + (UI.rsOpen ? ' top' : ''); COACH.cur = id; COACH.shown.push(id); clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, Math.max(9000, 4000 + 1000 * Math.ceil(t.split(/\s+/).length / 10)));   // reading time: at least 4 s + 1 s per 10 words
 }
 function coachNext() { clearTimeout(COACH.tm); const b = coachBox(); COACH.cur = null; b.className = ''; let n = COACH.q.shift(); while (n && !(() => { try { return n[3](); } catch (e) { return false; } })()) n = COACH.q.shift(); if (n) setTimeout(() => { if (COACH.on && !COACH.cur) coachShow(n[0], n[1], n[2]); }, 250); }
 function coachTick() {
@@ -156,3 +157,15 @@ tutStart = function (o) {
   coachClean(); try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false;
   newGame('tutorial'); Object.assign(COACH, { on: true, finished: 0, shown: [], later: [], q: [], cur: null, prologue: !!(o && o.prologue) });
 };
+
+// ---- W471 Goal card: one plain sentence and three bullets. Opens on day 1 of a Quick game and from the Day chip; stays until tapped.
+function goalCard() {
+  let e = $('#goalcard'); if (e) e.remove(); if (!G) return;
+  const n = LASTD();
+  e = h('div#goalcard', { role: 'dialog', 'aria-label': 'How you win' });
+  e.innerHTML = '<div class="gc"><div class="gck">How you win</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Tap the bag. Each chip moves along your pot.</li><li>Stop before the white chips pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
+  e.addEventListener('click', () => { e.remove(); });
+  document.body.appendChild(e);
+}
+window.goalCard = goalCard;
+document.addEventListener('click', ev => { const d = ev.target.closest && ev.target.closest('#barstat .dayn'); if (d && !UI.camp) goalCard(); });

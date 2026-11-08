@@ -1,0 +1,81 @@
+{
+ "slug": "stitchwise",
+ "when": "2026-11-08T03:27Z",
+ "secs": 120,
+ "totalSecs": 277,
+ "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
+ "checks": {
+  "a": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  },
+  "b": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  },
+  "c": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  },
+  "d": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  },
+  "e": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  }
+ },
+ "notes": [],
+ "sessions": [
+  {
+   "size": "phone",
+   "mode": "learn",
+   "secs": 120,
+   "turns": 301,
+   "clicks": 509,
+   "endedBy": "time",
+   "tutorialEnded": 5,
+   "hintsOff": true,
+   "messagesSeen": 2
+  },
+  {
+   "size": "phone",
+   "mode": "play",
+   "secs": 6,
+   "turns": 4,
+   "clicks": 7,
+   "endedBy": "result",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 0
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 120,
+   "turns": 467,
+   "clicks": 576,
+   "endedBy": "time",
+   "tutorialEnded": 5,
+   "hintsOff": true,
+   "messagesSeen": 6
+  },
+  {
+   "size": "pc",
+   "mode": "play",
+   "secs": 30,
+   "turns": 93,
+   "clicks": 129,
+   "endedBy": "result",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 0
+  }
+ ]
+}

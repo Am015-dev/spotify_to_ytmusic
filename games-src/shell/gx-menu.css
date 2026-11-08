@@ -4,5 +4,23 @@
 html body,html body *{font-family:var(--gx-body)!important}
 html body :is(h1,h2,h3,h4,.gx-title,.title,.logo,.ttl,.gxc-htitle,.gxc-htitle *,.gxc-title,.gxt-et){font-family:var(--gx-title)!important;font-weight:700;letter-spacing:.02em}
 /* menu text floor: the small print under a button and labels never go under 13 px */
-html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(13px,1em)}
-html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(13px,.9em)}
+html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(14px,1em)}
+html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(14px,.9em)!important}
+/* ===== D0: shared floors for every game (loaded last) ===== */
+/* type scale: 16 body on phones, nothing under 14; touch targets 44; calm motion */
+html:root body :is(.gx-ibtn,.gx-sb,.gx-tg,.gxc-btn,.gxc-ib,.gxh-set button,.gxt-b,.gx-goal-go,.gx-bar .gx-ibtn){min-height:44px;min-width:44px}
+html body :is(.gxc-lab,.gxc-st,.gxh-pics figcaption,.gxt-n,.gxt-skip,.gxt-pill){font-size:max(14px,1em)}
+html body :is(.gx-drawer-body p,.gx-drawer-body li,.gx-dock-body p,.gx-dock-body li){font-size:max(14px,1em)}
+html body :is(.gxc-sheet,.gxc-scene,.gxc-res,.gx-drawer) :is(p,li,small){color:inherit}
+/* text over painted art: a soft dark halo keeps 4.5:1 when the art is busy */
+html.sk .gx-bar .gx-ibtn,html.sk .gx-bar{text-shadow:0 1px 2px rgba(0,0,0,.75)}
+html.sk .gxc-act b,html.sk .gxc-act small{text-shadow:0 1px 3px rgba(0,0,0,.9)}
+/* panels never swallow the art on phones: docks are capped, sheets slide not fade */
+@media (max-width:999px) and (orientation:portrait){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),44dvh)}}
+@media (max-width:999px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+/* calm motion: no looping pulses for people who asked for less, nothing flashes faster than ~1 Hz */
+@media (prefers-reduced-motion:reduce){
+  html body :is(.gxh-ring,.gxt-ring,.gxc-node.next .gxc-disc,.gxh-bub,.gxt-bub){animation:none!important}
+  html body *{scroll-behavior:auto!important}
+}
+html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}

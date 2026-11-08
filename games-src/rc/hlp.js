@@ -138,7 +138,7 @@ function hlpSuggest(){try{const ph=hlpPhase();if(!ph||typeof UI==='undefined')re
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'shipwreck-isle',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.bfgl,#bf .bfpw,#bf .btn,#bf .opt,.bfa,.bfcard,#ppop .bfr,#bfzoom .gx-ibtn'});
+  GXH.init({game:'shipwreck-isle',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.bfgl,#bf .bfpw,#bf .btn,#bf .opt,.bfa,.bfcard,#ppop .bfr,#bfzoom .gx-ibtn'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpRulesPhase});
   for(const [sel,pos] of [['#hlpset',null],['#rulesd .gx-drawer-head','afterend']]){const e=document.querySelector(sel);if(!e)continue;
     if(!pos)e.innerHTML=GXH.settingsHTML();else{const d=document.createElement('div');d.className='hlp-rules-set';d.innerHTML=GXH.settingsHTML();e.insertAdjacentElement(pos,d)}}}

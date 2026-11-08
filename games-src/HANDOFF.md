@@ -106,3 +106,16 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - A game goes live only after: reviewer PASS (all 10 >= 7), logic-test PASS, asset-usage gate, build PASS, live 0 errors,
   and the orchestrator has looked at the phone shots and played it once by touch at machine speed.
 - Morning report: one short list of games ready to play (link each), and what is still not ready and why.
+
+## State 03:10 UTC 8 Nov (orchestrator session_01MS7iGyBWDerEAyagJ6ir4U)
+- Live and verified: emberclimb (03:03, Learn fix, tap-enemy PASS on live). Awaiting R1 re-review. Nothing else passed review yet.
+- Reviews FAIL so far: emberclimb(1st), sands, lantern, vinegrave, rampart, final-approach, vale. Fix lists: games-src/<dir>/REVIEW-FIX.md or sent to worker.
+- Workers: W477 vinegrave session_01RR7mnbC2eAF3Froz84Y5tc | W478 rampart session_01RR7mnaV6nRE7HFaTqHCHdm | W479 lantern session_01RR7mnYPRQekdKMHKn9umMJ |
+  W480 sands session_01RR7mna4oXxfbNMo4EouMwX | W420 ember session_01RR7mnb81J4KpMvkWKZiA2c | W425 final-approach session_01RR7mnZw9AeEUv2ZGWFUkN5 |
+  W458 vale session_01RR7mnYiVPZmmftRdCBkeYb | W457 hollowbough session_01RR7mnbHzKtnzEnTQm1z1kP | W429 twin session_01RR7mnbCd7G7qEgnoWs1NhQ |
+  W463 kaiten ..bCL16bpkp3mmhN4yL | W464 tidewake ..YrgkRXfWs1GTNipCV | W465 nebula ..XscHovEqGb4axFxwr | W466 sunglaze ..YZ3rNtNFz5QQD1Wit |
+  W467 crown ..XTLYC98CCyjALcNb2 | W468 shipwreck ..ZYvCXRST3NWV3JDyT | W469 short-fuse ..Y1NrnWnmDbhwsFkeD | W470 stitchwise ..a9tsug8Dc85RCXmJs |
+  W471 cauldron ..YjAZ89FUTGZfCssoC | W472 doorkick ..buUWe1n9i6yaSjZWG | W473 thornbound ..X79M6gpitmraXkVVx | W475 redline ..ZyBCpgirGmHqhH14K (all session_01RR7mn...)
+- Reviewers: R1 ..ahe5suP3xNPk5RzuZ (ember re-review) | R2 ..XYmDMDL6qf8uWCwMr (stitchwise) | R3 ..Z5ujJ5BU5ke5G5813 (hollowbough) |
+  R4 ..brAaCXvYMQjCAPFvd (shipwreck) | R5 ..XkYd51MsSJRSVN1ec (wildmark) | R6 ..b9b3xUSvbEEN9eA33 (sunglaze)
+- Gates: logic-test, feel-audit.js (a)-(e) 0, Learn by touch no Skip, asset-usage (GX_STAGE=games-src/.staging for staged), reviewer PASS.
