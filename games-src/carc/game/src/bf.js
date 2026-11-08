@@ -181,7 +181,7 @@ function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
     if(me&&c&&UI.cap.intro&&G.step==='place')t=c;
     else if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
-    else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap again to place.'}
+    else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap Place here to confirm, or your tile to turn it.'}
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
     else if(me)t='Add a follower, or Skip.';
     else t=(c&&!UI.cap.intro?c:'')||'Watch their tile go down.'}

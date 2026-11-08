@@ -63,6 +63,8 @@ function tutSteps0(){
   const placeW=n=>({type:'tap',match:a=>a.what==='place'&&a.x===tutT(n)[1]&&a.y===tutT(n)[2]});
   const figW=n=>({type:'tap',match:a=>a.what==='fig'&&a.k==='f'&&a.l===tutSegOf(n)});
   const hold=()=>{UI.tutHold=true},release=()=>{UI.tutHold=false;schedAI()};
+  // a rule shown on the board: tap any tile of the lit group to go on (no Next button)
+  const tileW={type:'tap',match:a=>a.what==='tile'},tOn=()=>{UI.tutTile=true},tOff=()=>{UI.tutTile=false};
   const RING=['-2,-1','-1,-1','0,-1','-2,0','-1,0','0,0','-2,1','-1,1','0,1'];
   return [
  {id:'goal',title:'Build the valley',say:'This is where your valley starts. Add tiles, claim roads and towns with followers. Most points wins.',target:()=>UI.tl['0,0'],wait:null,
@@ -72,21 +74,21 @@ function tutSteps0(){
    wait:{type:'tap',match:a=>a.what==='rotate'},ready:()=>tutP(1,'place')&&!!document.querySelector('#htile')},
  {id:'place1',title:'Match the edges',say:'Road meets road: edges must match. Tap the glowing square to lay your tile.',target:tutGlow(1),wait:placeW(1),ready:()=>tutP(1,'place')&&tutRot(0)},
  {id:'fig_road',title:'Claim the road',say:'Tap the glowing circle to put a follower on the road. You start with seven.',target:tutFig(1),wait:figW(1),ready:()=>tutP(1,'fig')},
- {id:'computer',title:'The computer plays',say:'It lays a tile and may claim. A road, town or field with a follower is taken.',target:()=>UI.tl['1,1'],also:tutMp(1),wait:null,ready:()=>tutP(3,'place')&&!!tutMp(1)()},
- {id:'claimed',title:'One owner',say:'',target:()=>UI.tl['1,1'],also:tutMp(1),wait:null,ready:()=>tutP(3,'place')},
+ {id:'computer',title:'The computer plays',say:'It lays a tile and may claim. A road, town or field with a follower is taken.',target:()=>UI.tl['1,1'],also:tutMp(1),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(3,'place')&&!!tutMp(1)()},
+ {id:'claimed',title:'One owner',say:'',target:()=>UI.tl['1,1'],also:tutMp(1),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(3,'place')},
  {id:'place2',title:'End the road',say:'This tile closes your road on the left. Tap the glowing square.',target:tutGlow(3),wait:placeW(3),ready:()=>tutP(3,'place')&&tutRot(3)},
  {id:'fig_priory',title:'Claim the priory',say:'A priory scores 9 when eight tiles surround it. Tap the circle to claim it.',target:tutFig(3),wait:figW(3),ready:()=>tutP(3,'fig')},
- {id:'road_done',title:'Road finished',say:'A finished road scores 1 point per tile: 4 for you. Your follower comes home.',target:tutCellsFn(['0,0','1,0','1,1','-1,0']),wait:null,
-   onEnter:hold,onNext:release,hold:true,ready:()=>tutAfter(4,4)},
+ {id:'road_done',title:'Road finished',say:'A finished road scores 1 point per tile: 4 for you. Your follower comes home.',target:tutCellsFn(['0,0','1,0','1,1','-1,0']),wait:tileW,
+   onEnter:()=>{hold();tOn()},onDone:()=>{tOff();release()},hold:true,ready:()=>tutAfter(4,4)},
  {id:'place3',title:'Make a town',say:'Town meets town. This edge closes the town above. Tap the glowing square.',target:tutGlow(5),wait:placeW(5),ready:()=>tutP(5,'place')&&tutRot(2)},
  {id:'fig_town',title:'Claim the town',say:'Claim it before it closes. A finished town scores 2 per tile.',target:tutFig(5),wait:figW(5),ready:()=>tutP(5,'fig')},
- {id:'town_done',title:'Town finished',say:'',target:tutCellsFn(['0,0','0,-1']),wait:null,
-   onEnter:hold,hold:true,ready:()=>tutAfter(6,8)},
- {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,0','0,-1']),wait:null,onNext:release,hold:true,ready:()=>tutAfter(6,8)},
+ {id:'town_done',title:'Town finished',say:'',target:tutCellsFn(['0,0','0,-1']),wait:tileW,
+   onEnter:()=>{hold();tOn()},onDone:tOff,hold:true,ready:()=>tutAfter(6,8)},
+ {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,0','0,-1']),wait:tileW,onEnter:tOn,onDone:()=>{tOff();release()},hold:true,ready:()=>tutAfter(6,8)},
  {id:'place4',title:'Fill the ring',say:'A priory needs all eight neighbours. This is the fourth. Tap the glowing square.',target:tutGlow(7),wait:placeW(7),ready:()=>tutP(7,'place')&&tutRot(0)},
  {id:'fig_farmer',title:'Send a farmer',say:'A follower in a field is a farmer. At game end it scores 3 per finished town beside it.',target:tutFig(7),wait:figW(7),ready:()=>tutP(7,'fig')},
- {id:'majority',title:'Most followers',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:null,ready:()=>tutP(9,'place')},
- {id:'tie',title:'Ties',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:null,ready:()=>tutP(9,'place')},
+ {id:'majority',title:'Most followers',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(9,'place')},
+ {id:'tie',title:'Ties',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(9,'place')},
  {id:'place5',title:'Keep building',say:'Six of eight neighbours are down. No follower needed here.',target:tutGlow(9),wait:placeW(9),ready:()=>tutP(9,'place')&&tutRot(1)},
  {id:'discard',title:'No fit',say:'',target:()=>document.querySelector('#htile'),wait:null,ready:()=>tutP(11,'place')},
  {id:'place6',title:'The last tile',say:'This completes the ring around your priory. Tap the glowing square.',target:tutGlow(11),wait:placeW(11),ready:()=>tutP(11,'place')&&tutRot(3)},
@@ -96,6 +98,7 @@ function tutSteps0(){
    onEnter:()=>tutFinalPops(),ready:()=>!!G&&G.over},
  {id:'winner',title:'Most points wins',say:()=>(P(0).score>=P(1).score?'You win ':'Hob wins ')+Math.max(P(0).score,P(1).score)+' to '+Math.min(P(0).score,P(1).score)+'. Most points wins!',target:()=>UI.tl['0,0'],wait:null,ready:()=>!!G&&G.over}
   ]}
+(function(){const hook=()=>{const b=document.getElementById('board');if(!b||b._tt)return;b._tt=1;b.addEventListener('click',e=>{if(!UI.tut||!UI.tutTile||UI.moved)return;if(typeof GXT!=='undefined'&&GXT.active())GXT.act({type:'tap',what:'tile'})})};if(document.readyState!=='loading')hook();else document.addEventListener('DOMContentLoaded',hook);setInterval(hook,1500)})();
 // ---------------------------------------------------------------- start, leave
 function tutSetup(){try{GXC.close()}catch(e){}closeMenu();UI.camp=null;UI.tut=true;UI.tutHold=false;UI.tutAuto=0;
   beginGame({np:2,seats:['human','ai'],lv:['normal','normal'],ex:{},seed:7,stack:TUT_TURNS.map(t=>t[0])});if(G&&G.pl[1]){G.pl[1].nm=STORY.rival.name;render()}}
