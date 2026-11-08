@@ -1,8 +1,8 @@
 {
  "slug": "sunglaze",
- "when": "2026-11-08T03:28Z",
+ "when": "2026-11-08T03:46Z",
  "secs": 120,
- "totalSecs": 347,
+ "totalSecs": 374,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -37,18 +37,18 @@
    "size": "phone",
    "mode": "learn",
    "secs": 120,
-   "turns": 158,
-   "clicks": 166,
+   "turns": 171,
+   "clicks": 214,
    "endedBy": "result",
-   "tutorialEnded": 23,
+   "tutorialEnded": 22,
    "hintsOff": true,
-   "messagesSeen": 37
+   "messagesSeen": 32
   },
   {
    "size": "phone",
    "mode": "play",
    "secs": 11,
-   "turns": 17,
+   "turns": 13,
    "clicks": 31,
    "endedBy": "result",
    "tutorialEnded": null,
@@ -59,20 +59,20 @@
    "size": "pc",
    "mode": "learn",
    "secs": 122,
-   "turns": 68,
-   "clicks": 60,
+   "turns": 57,
+   "clicks": 46,
    "endedBy": "result",
    "tutorialEnded": 47,
    "hintsOff": true,
-   "messagesSeen": 12
+   "messagesSeen": 11
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 94,
-   "turns": 53,
-   "clicks": 57,
-   "endedBy": "result",
+   "secs": 121,
+   "turns": 82,
+   "clicks": 86,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0
