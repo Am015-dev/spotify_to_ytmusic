@@ -278,7 +278,7 @@ html.short .sch .s4{display:block}html.short .sch .s3{display:none}
 html.land .gx-board{grid-template-rows:auto auto auto auto minmax(0,1fr) auto;grid-template-areas:"gw mkt seats" "gw mkt line" "gw mkt trk" "gw mkt trk2" "gw mkt ." "gw mine acts"}
 html.land #trk{grid-area:trk;flex-wrap:wrap;align-self:start}html.land #trk2{grid-area:trk2;white-space:normal;align-self:start}
 /* Addendum 7: Play is clean (board, hand, tracker, one score line, top bar); the extras belong to Hints and Learn to play */
-html.m-play .sch .s3,html.m-play .sch .s4{display:none}
+html.m-play .sch .s3{display:none}html.m-play .sch .s4{display:block}
 html.m-play:not(.m-hints) .trk2{display:none}
 #hintsbtn[aria-pressed="true"]{background:#ffd75a;color:#3b1c0e;border-radius:10px}#hintsbtn[hidden],#whatbtn[hidden]{display:none}
 #whatbtn{align-self:flex-start;margin:2px 0}html.land #whatbtn{grid-area:what;align-self:start}
@@ -305,3 +305,19 @@ html.ti .mbox.start canvas.t3d,.mbox canvas.t3d{display:block;width:88px;height:
 @media (min-width:1024px){.trk,.trk2,.sch .s4,.tile .gain,.deckback,.deckback b,.mcard .mn,.turnover,.coach{font-size:16px}}
 @keyframes plin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .plpop{animation:plin .3s ease both!important}
+
+/* R6 review fixes: plates and outlines on the painted board, buttons without a square behind, no see-through tiles, title room, bid glow */
+html.sk .mbox .btn,html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn.ghost{background-color:transparent!important}
+#grid.dim .tile:not(.glow):not(.blk){opacity:1!important;filter:saturate(.7) brightness(.82)}
+.tile .tv,html.sk-pl .tile .tv{min-width:24px;height:24px;font-size:14px!important;line-height:20px!important;padding:0 4px;border-radius:12px;background:#2a1500;color:#fff3c8;border:2px solid #f4c04a;top:3px;right:3px}
+html .tile .mp:not(.sm){filter:drop-shadow(1.5px 0 0 #fff8e0) drop-shadow(-1.5px 0 0 #fff8e0) drop-shadow(0 1.5px 0 #fff8e0) drop-shadow(0 -1.5px 0 #fff8e0) drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+html.m-bid #grid .tile.glow{animation:none!important;box-shadow:none!important;outline:0!important}
+@media (max-width:480px){#pchip{display:none}.gx-bar h1{font-size:18px;white-space:nowrap}}
+.sch .s2{font-size:14px}
+.tile .tn{max-width:calc(100% - 30px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html .tile .tn{box-sizing:border-box;max-width:calc(100% - 34px)}
+/* name at the bottom of the tile, cost plate top right, hint gain top left: nothing under anything */
+html .tile .tn{order:9;margin-top:auto;max-width:100%}
+.tile .gain{top:3px;bottom:auto}
+html .tile .tn{max-width:100%!important;margin-top:auto!important;width:auto}
+@media (min-width:1024px){.tile .tv,html.sk-pl .tile .tv{font-size:16px!important;min-width:28px;height:28px;line-height:24px!important}.sch .s2,.sch .s2 .st{font-size:16px}}

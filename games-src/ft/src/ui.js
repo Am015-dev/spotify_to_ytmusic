@@ -9,8 +9,8 @@ Object.assign(UI,{pendDj:null,pendItem:null,chz:null,mkSel:[],sellSel:[],fxSeen:
 function refresh(){if(G&&!G.tut&&!G.coach&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G)return;playFx();try{render()}catch(e){console.error(e)}schedule();if(typeof NET!=='undefined'&&NET.on){if(isHost())netPush();netTurnCheck()}}
 // the summoning moment: the brass lamp turns (24-frame strip rendered from the 3D model) and the djinn's name rises out of the smoke
-function showSummon(k){const d=DJ[k];const hc=document.documentElement.classList;if(!d||!(hc.contains('sp3')||hc.contains('sk-dj')))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('role','status');
-  o.innerHTML=`<i class="sm-smoke"></i>${hc.contains('sk-dj')?`<img class="sm-art" src="media/djinn-${k}.webp" alt="">`:'<i class="sm-lamp"></i>'}<b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(()=>{o.classList.add('out');setTimeout(()=>o.remove(),300)},1700)}
+function showSummon(k,tries){tries=tries||0;if(tries<12&&((typeof PLQB!=='undefined'&&PLQB)||(document.getElementById('coach')||{classList:{contains:()=>false}}).classList.contains('on'))){setTimeout(()=>showSummon(k,tries+1),700);return}const d=DJ[k];const hc=document.documentElement.classList;if(!d||!(hc.contains('sp3')||hc.contains('sk-dj')))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('role','status');
+  o.innerHTML=`<i class="sm-smoke"></i>${hc.contains('sk-dj')?`<img class="sm-art" src="media/djinn-${k}.webp" alt="">`:'<i class="sm-lamp"></i>'}<b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(()=>{o.classList.add('out');setTimeout(()=>o.remove(),300)},4200)}
 function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='summon')try{showSummon(f.x)}catch(e){}const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
 const online=()=>typeof NET!=='undefined'&&NET.on;
 const me=()=>{if(!G)return null;const s=sideToAct();if(online()&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
@@ -53,7 +53,7 @@ function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
-   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}</span><span class="st">${E2('🐪','camel')}${p.camels}</span>${p.tent?'<span class="st">⛺</span>':''}</span>
+   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins} coins</span><span class="st">${E2('🐪','camel')}${p.camels} camels</span>${p.tent?'<span class="st">⛺</span>':''}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
