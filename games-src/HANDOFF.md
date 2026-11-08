@@ -198,3 +198,4 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Lesson: fixers' sim/bot claims (taps, win rates) were wrong twice; demand touch-measured numbers.
 - Running reviewers: R2 (vinegrave, thornbound, wildmark) session_01RR7mnYeN67c3gxAPrhaNx1; R4 (hollowbough, rampart, final-approach) session_01RR7mnXTEKxqpPJVQtBoHJc; R5 (tidewake, sands, lantern) session_01RR7mnaA15Nj5vtwBiWPHpw.
 - Waiting for a reviewer: sunglaze. First-round fixers still running: crown, kaiten, twin, nebula, perch; r2: doorkick, emberclimb.
+- 20:04: perch fixed (stopper gone), waits with sunglaze for a reviewer. NOTE: shelf/W508-perch-gameplay merge commit 9d8868f0 has the container default author; when integrating perch, squash it (never force-push).
