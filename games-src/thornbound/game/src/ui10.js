@@ -79,7 +79,7 @@ function bfPopAt(rect,txt,col,seat,cb){const fx=$('#fx');if(!fx||!ANIM||!rect)re
   const sp=Math.max(1,Math.min(UI.speed||1,4));const done=()=>{if(e.parentNode)e.remove()};
   const chip=seat!=null?document.querySelector('#rivals .rv[data-s="'+seat+'"] .rv-n'):null;
   try{const a=e.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-90%) scale(1.25)',opacity:1,offset:.35},{transform:'translate(-50%,-90%) scale(1.15)',opacity:1,offset:.6},
-      chip?{transform:'translate('+(chip.getBoundingClientRect().left+chip.getBoundingClientRect().width/2-(rect.left+rect.width/2)-0)+'px,'+(chip.getBoundingClientRect().top+8-(rect.top+rect.height/2))+'px) scale(.5)',opacity:.15}:{transform:'translate(-50%,-150%) scale(.8)',opacity:0}],{duration:1150/sp,easing:'ease-in-out'});
+      chip?{transform:'translate('+(chip.getBoundingClientRect().left+chip.getBoundingClientRect().width/2-(rect.left+rect.width/2)-chip.getBoundingClientRect().width-18)+'px,'+(chip.getBoundingClientRect().top+8-(rect.top+rect.height/2))+'px) scale(.45)',opacity:0}:{transform:'translate(-50%,-150%) scale(.8)',opacity:0}],{duration:1150/sp,easing:'ease-in-out'});
     a.onfinish=()=>{done();if(chip){chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump')}}}catch(x){}
   setTimeout(done,1400/sp)}
 function locRect(l){try{const p=MAP.m.locPos(LOCID[l]);const c=mapToClient(p.x,p.y);return {left:c.x-10,top:c.y-10,width:20,height:20}}catch(e){return null}}

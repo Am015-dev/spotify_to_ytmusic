@@ -41,7 +41,13 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     if(st.phase==='end')break;
     const sig=[st.i,st.phase,st.count,st.shown].join('|');
     if(sig!==lastSig){lastSig=sig;lastT=Date.now()}else if(Date.now()-lastT>8000){note(tag,'stuck for 8 s at step '+st.i+' '+st.id+' phase '+st.phase+' '+JSON.stringify(await p.evaluate(()=>({q:G.q&&G.q.kind,card:UI.card&&UI.card.kind,ev:UI.card&&UI.card.ev&&UI.card.ev.t,bf:UI.bf&&UI.bf.kind,hand:UI.hand}))));await p.screenshot({path:'/tmp/claude-0/tutor_stuck_'+W+'_'+mode+'.png'}).catch(()=>{});break}
-    if(!st.shown){await sleep(60);continue}
+    if(!st.shown){
+      // "Watch the board. Tap to go on": one finger tap (on the board) goes on within 1 s, never a wait for the timer
+      const go=await p.evaluate(()=>{const l=document.querySelector('#tbturn:not([hidden]) .tbt-line');if(!l||!/Tap to go on/.test(l.textContent)||!UI.card)return null;window.__tbGo=UI.card;
+        const b=document.getElementById('board').getBoundingClientRect();return {x:b.left+b.width/2,y:b.top+b.height*0.62,id:GXT.state().id,kind:UI.card.kind+(UI.card.ev?':'+UI.card.ev.t:'')}});
+      if(go){const t0=Date.now();await p.touchscreen.tap(go.x,go.y);let ok=false;while(Date.now()-t0<1000){if(await p.evaluate(()=>UI.card!==window.__tbGo)){ok=true;break}await sleep(40)}
+        totals.goTaps=(totals.goTaps||0)+1;if(!ok)note(tag,'"Tap to go on" before step '+go.id+' ('+go.kind+'): one tap did not go on within 1 s');continue}
+      await sleep(60);continue}
     // ---- a step is on screen
     if(!seenIds.includes(st.id)){seenIds.push(st.id)}
     const info=await p.evaluate(()=>{const s=GXT.state(),v={w:innerWidth,h:innerHeight};
@@ -190,5 +196,6 @@ const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(
   const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);
   for(const j of jobs){guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();
-  console.log('steps checked',totals.steps,'wrong taps',totals.wrong,'step ids',totals.ids.join(','));
+  if(!totals.goTaps)note('all','no "Tap to go on" moment was tested');
+  console.log('steps checked',totals.steps,'wrong taps',totals.wrong,'"tap to go on" taps',totals.goTaps||0,'step ids',totals.ids.join(','));
   console.log(probs.length?'PROBLEMS '+probs.length+'\n  '+probs.join('\n  '):'PROBLEMS 0');process.exit(probs.length?1:0)})();

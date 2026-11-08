@@ -14,7 +14,10 @@ const STEP_HELP=[
  'Winter. Heralds go home and Supporters are lost. Played cards go to the discard pile. The next round starts. Running out of deck shrinks your hand size (Attrition).'];
 const KIND_NAME={bid:'Choose your bid',bidRes:'Use your bid',herald:'Place your Herald',place:'Hide your cards',clashOrder:'Order the Clashes',location:'Claim a location',tie:'A tie!'};
 // ---------------------------------------------------------------- top bar status chip
-function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=Math.max(1,G.round);
+// the one round number the header and the board both show (a round-end summary still shows the round that just ended)
+function shownRound(){try{const c=UI.card;if(c&&c.kind==='event'&&c.ev&&c.ev.round)return c.ev.round;if(c&&c.kind==='news'&&c.items&&c.items[0]&&c.items[0].round)return c.items[0].round}catch(e){}return Math.max(1,G.round)}
+function syncRound(){try{if(MAP.m&&G){const r=shownRound();if(MAP._rn!==r+'/'+G.rounds){MAP._rn=r+'/'+G.rounds;MAP.m.setRound(r,G.rounds)}}}catch(e){}}
+function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=shownRound();syncRound();
   el.innerHTML='<span class="st-r" aria-hidden="true">R'+r+'/'+G.rounds+'</span>'+(t.seat>=0&&G.pl[t.seat]?'<i class="st-d" style="background:'+fcol(t.seat)+'"></i>':'')+'<span class="st-t" role="status" aria-label="'+esc(t.text)+'">'+esc(t.text)+'</span>'}
 // the one status line (8 words or fewer): what to do now, or what the computer just did
 function words8(x){const w=String(x||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'\u2026'}
