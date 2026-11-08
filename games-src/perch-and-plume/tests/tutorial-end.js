@@ -1,66 +1,63 @@
-// The coached first game, played to the end: start the tutorial from fresh storage, then play it by choosing legal moves through
-// the UI (Ottilie's pointed button when there is one, else whatever glows, at random; not a tap list), checking each tap target is uncovered. Asserts: no forced steps, the coach
-// bubble never sits on a glowing target, every rule in TUTORIAL-COVERAGE.md was explained during the game or listed in "Things you'll
-// meet later", the core rules were explained live, and the result screen walks the score rule by rule.   node tests/tutorial-end.js [phone|pc] [url]
+// The guided first game, walked by touch to the end: fresh storage, tap "Play the tutorial", then tap ONLY the highlighted target
+// (.tutpoint) of each step, checked uncovered with elementFromPoint. Asserts: every step of TUTORIAL-COVERAGE.md appears, in order,
+// each with one sentence of 12 words or fewer and exactly one highlighted target; a tap elsewhere is blocked; no "learn later"
+// list; the last step starts a real game. Shots: tut-<n>.png per step (SHOTS=dir).   node tests/tutorial-end.js [phone|small|pc] [url]
 const { chromium } = require('playwright'); const fs = require('fs'), path = require('path');
 const SIZE = process.argv[2] || 'phone', URL = process.argv[3] || 'http://127.0.0.1:8765/perch-and-plume/';
-const VP = SIZE === 'pc' ? { width: 1440, height: 860 } : { width: 390, height: 763 }, TOUCH = SIZE !== 'pc';
+const VP = SIZE === 'pc' ? { width: 1440, height: 860 } : SIZE === 'small' ? { width: 375, height: 667 } : { width: 390, height: 844 }, TOUCH = SIZE !== 'pc';
+const SHOTS = process.env.SHOTS || '';
 const COVER = fs.readFileSync(path.join(__dirname, '..', 'TUTORIAL-COVERAGE.md'), 'utf8');
-const RULES = [...new Set([...COVER.matchAll(/rule `([a-zA-Z]+)`/g)].map(m => m[1]))];
-const CORE = ['welcome', 'food', 'feeder', 'chain', 'play', 'pay', 'eggs', 'nest', 'cards', 'tray', 'rival', 'goal', 'final', 'tie'];
+const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
 (async () => {
-  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: VP, hasTouch: TOUCH, isMobile: TOUCH });
-  const p = await ctx.newPage(); const errs = []; let fails = 0, taps = 0, overlap = 0;
+  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: VP, hasTouch: TOUCH, isMobile: TOUCH, deviceScaleFactor: SHOTS ? 2 : 1 });
+  const p = await ctx.newPage(); const errs = []; let fails = 0, taps = 0;
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
   const ok = (c, m) => { if (!c) fails++; console.log((c ? 'PASS ' : 'FAIL ') + SIZE + ' ' + m); };
   const tapXY = async (x, y) => TOUCH ? p.touchscreen.tap(x, y) : p.mouse.click(x, y);
+  if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
   await p.goto(URL); await p.waitForTimeout(1000);
   const open = await p.$('[data-gxt-open]'); ok(!!open, 'tutorial button on the title (fresh storage)');
-  const r0 = await open.boundingBox(); await tapXY(r0.x + r0.width / 2, r0.y + r0.height / 2); await p.waitForTimeout(1200);
-  // no forced steps: the coached game starts at once, with the tracker, the 4 big buttons and Ottilie pointing at one of them
-  await p.waitForFunction(() => typeof myTurn === 'function' && myTurn() && document.querySelector('#act4'), null, { timeout: 15000 }).catch(() => { });
-  const t1s = await p.evaluate(() => ({ gxt: typeof GXT !== 'undefined' && GXT.active && GXT.active(), mode: UI.mode, on: COACH.on, trk: !!document.querySelector('#trk .trk'), a4: document.querySelectorAll('#act4 .a4').length, point: (document.querySelector('.a4.tutpoint') || { dataset: {} }).dataset.k, bub: (document.querySelector('.coachb') || {}).textContent || '', rounds: G.rounds, cubes: G.pl[0].cubes }));
-  ok(!t1s.gxt && t1s.mode === 'tutfree' && t1s.on, 'the coached game runs at once, no forced spotlight steps');
-  ok(t1s.rounds === 1 && t1s.cubes === 4, `a short guided game: 1 round, 4 turns (${t1s.rounds} round, ${t1s.cubes} turns)`);
-  ok(t1s.trk && t1s.a4 === 4, 'turn tracker and the 4 big action buttons are on screen');
-  ok(t1s.point === 'play' && /Turn 1 of 4/.test(t1s.bub), 'turn 1: Ottilie says what to do and points at "Play a bird" (' + t1s.point + ')');
-  let res = false, idle = Date.now(); const t1 = Date.now();
-  while (Date.now() - t1 < 300000) {
-    const h = await p.evaluateHandle(() => {
-      const vis = e => { if (!e || e.hidden) return false; for (let x = e; x; x = x.parentElement) { if (x.hidden || getComputedStyle(x).display === 'none') return false; } return e.getBoundingClientRect().width > 0; };
-      const q = s => [...document.querySelectorAll(s)].filter(vis);
-      if (vis(document.getElementById('result'))) return 'result';
-      if (q('.turnban,.reveal').length) return null;
-      const pop = document.getElementById('pop'); if (vis(pop)) return pop.querySelector('[data-a="popx"]');
-      const acts = q('#acts button'); const pg = acts.find(b => b.dataset.a === 'playgo'); if (pg) return pg;
-      const tp = q('.a4.tutpoint')[0]; if (tp) return tp;
-      const a4 = q('.a4:not([aria-disabled])'); if (a4.length && Math.random() < .5) return a4[Math.floor(Math.random() * a4.length)];
-      const g = q('.glow'); if (g.length) { const sl = g.find(e => e.matches('.slot')); if (sl) return sl; return g[Math.floor(Math.random() * g.length)]; }
-      const mv = acts.filter(b => b.dataset.a === 'mv'); if (mv.length) return mv[Math.floor(Math.random() * mv.length)];
-      return q('.bonc')[0] || null;
+  await open.scrollIntoViewIfNeeded(); const r0 = await open.boundingBox(); await tapXY(r0.x + r0.width / 2, r0.y + r0.height / 2);
+  const seen = [], words = []; let pinkEgg = 0, tucked = 0, blocked = null, idle = Date.now(), real = false, later = false;
+  while (Date.now() - idle < 30000) {
+    const st = await p.evaluate(() => {
+      if (typeof UI === 'undefined' || !G) return { wait: 1 };
+      if (UI.mode !== 'tutfree') return { mode: UI.mode };
+      const b = document.querySelector('.coachb'), t = [...document.querySelectorAll('.tutpoint')];
+      return { step: window.GXCOACH && GXCOACH.step, bub: b ? b.dataset.rule : null, txt: b ? b.querySelector('.saytx').childNodes[1].textContent : '', n: t.length, later: !!document.querySelector('.later') };
     });
-    const v = await h.jsonValue().catch(() => undefined); if (v === 'result') { res = true; break; }
-    overlap += await p.evaluate(() => { if (!document.querySelector('.coachb')) return 0; return [...document.querySelectorAll('.glow')].some(e => { const r = e.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > innerHeight) return false; const t = document.elementFromPoint(r.left + r.width / 2, Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2))); return !!(t && t.closest('.coachb')); }) ? 1 : 0; });
-    const el = h.asElement();
-    if (el) { await el.scrollIntoViewIfNeeded().catch(() => { }); const r = await el.boundingBox(); if (r) { const x = r.x + r.width / 2, y = r.y + Math.min(r.height / 2, 30);
-      if (await el.evaluate((e, [x, y]) => { const t = document.elementFromPoint(x, y); return e.isConnected && !!t && (t === e || e.contains(t)); }, [x, y])) { await tapXY(x, y); taps++; idle = Date.now(); await p.waitForTimeout(150); continue; } } }
-    if (Date.now() - idle > 25000) break;
-    await p.waitForTimeout(200);
+    if (st.mode) { real = ['solo', 'vs', 'hot'].includes(st.mode) && await p.evaluate(() => G.rounds === 4 && !!document.querySelector('#keepgo')); break; }
+    if (st.later) later = true;
+    if (st.wait || !st.bub || st.n === 0 || st.bub !== st.step) { await p.waitForTimeout(200); continue; }
+    if (seen[seen.length - 1] !== st.step) {
+      seen.push(st.step); words.push([st.step, st.txt.trim().split(/\s+/).length, st.n]);
+      if (st.step === 'pink') pinkEgg = await p.evaluate(() => G.pl[1].board.flat().filter(b => b.id === TUT.ids.pk).reduce((a, b) => a + b.eggs, 0));
+      if (st.step === 'cache') tucked = await p.evaluate(() => G.pl[0].board[0].reduce((a, b) => a + b.tuck + b.cache, 0));
+      if (SHOTS) { await p.waitForTimeout(250); await p.screenshot({ path: path.join(SHOTS, 'tut-' + seen.length + '.png') }); }
+    }
+    const el = await p.$('.tutpoint'); if (!el) { await p.waitForTimeout(200); continue; } await el.scrollIntoViewIfNeeded().catch(() => { });
+    const r = await el.boundingBox(); if (!r) { await p.waitForTimeout(200); continue; }
+    const x = r.x + r.width / 2, y = r.y + Math.min(r.height / 2, 30);
+    if (blocked === null && st.step === 'play') {   // a tap somewhere else must do nothing
+      const before = await p.evaluate(() => GXCOACH.step + '|' + UI.pickBird + '|' + G.pl[0].cubes);
+      const o = await p.$('.a4[data-k="cards"]'); const ro = o && await o.boundingBox();
+      if (ro) { await tapXY(ro.x + ro.width / 2, ro.y + ro.height / 2); await p.waitForTimeout(300); }
+      blocked = (await p.evaluate(() => GXCOACH.step + '|' + UI.pickBird + '|' + G.pl[0].cubes)) === before;
+    }
+    const top = await el.evaluate((e, [x, y]) => { const t = document.elementFromPoint(x, y); return !!t && (t === e || e.contains(t)); }, [x, y]);
+    if (!top) { await p.screenshot({ path: 'shots/tut-covered.png' }); console.log('     covered target at step ' + st.step + ' by ' + await el.evaluate((e, [x, y]) => { const t = document.elementFromPoint(x, y); return t ? (t.id || t.className || t.tagName) + ' in ' + ((t.parentElement || {}).className || '') : 'none'; }, [x, y])); await p.waitForTimeout(300); continue; }
+    await tapXY(x, y); taps++; idle = Date.now(); await p.waitForTimeout(350);
   }
-  if (!res) console.log('     stuck at: ' + await p.evaluate(() => JSON.stringify({ prompt: document.getElementById('prompt').textContent, q: G.q && G.q.h, sel: UI.sel, pick: UI.pickBird, busy: UI.busy, glow: document.querySelectorAll('.glow').length, acts: document.getElementById('acts').textContent.slice(0, 80) })));
-  ok(res, `the coached game was played to the result screen by ${taps} free UI taps`);
-  ok(overlap === 0, 'the coach bubble never sat on a glowing target (' + overlap + ' samples)');
-  const lessons = await p.evaluate(() => Object.keys(COACH.learned || {}));
-  ok(['play', 'food', 'eggs', 'cards'].every(k => lessons.includes(k)), 'one concept per turn: play a bird, food, eggs, draw were all taught (' + lessons.join(',') + ')');
-  const st = await p.evaluate(() => ({ done: Object.keys(COACH.done), later: (document.querySelector('.later') || { dataset: {} }).dataset.later || '', walk: document.querySelectorAll('.walk li').length, all: coachRules() }));
-  const later = st.later ? st.later.split(',') : [];
-  const miss = RULES.filter(r => st.done.indexOf(r) < 0 && later.indexOf(r) < 0);
-  ok(RULES.length >= 20 && miss.length === 0, `every coverage rule explained in play or listed under "Things you'll meet later" (${RULES.length} rules; live ${st.done.filter(r => RULES.includes(r)).length}, later ${later.length}${miss.length ? '; missing ' + miss.join(',') : ''})`);
-  const coreMiss = CORE.filter(r => st.done.indexOf(r) < 0); ok(coreMiss.length === 0, 'core rules explained live' + (coreMiss.length ? ': missing ' + coreMiss.join(',') : ''));
-  ok(RULES.every(r => st.all.includes(r)) && st.all.every(r => RULES.includes(r)), 'TUTORIAL-COVERAGE.md and the coach rule list match');
-  ok(st.walk >= 7, 'the result screen walks the score rule by rule (' + st.walk + ' lines)');
-  if (later.length) console.log('     later: ' + later.join(','));
-  if (res) await p.screenshot({ path: `shots/tutorial-${SIZE}-result.png`, fullPage: true });
+  console.log('     steps: ' + seen.join(' > '));
+  ok(real, `the last step starts a real 4-round game at its starting hand (${taps} taps)`);
+  ok(JSON.stringify(seen) === JSON.stringify(RULES), `every rule step appears, in order (${seen.length}/${RULES.length})` + (seen.length !== RULES.length ? ' missing ' + RULES.filter(r => !seen.includes(r)).join(',') : ''));
+  const long = words.filter(w => w[1] > 12), multi = words.filter(w => w[2] !== 1);
+  ok(long.length === 0, 'one sentence of 12 words or fewer per step' + (long.length ? ': ' + long.map(w => w[0] + '=' + w[1]).join(',') : ''));
+  ok(multi.length === 0, 'exactly one highlighted tap per step' + (multi.length ? ': ' + multi.map(w => w[0] + '=' + w[2]).join(',') : ''));
+  ok(blocked === true, 'a tap away from the highlighted target is blocked');
+  ok(!later, 'no "learn later" list');
+  ok(pinkEgg > 0, "Pip's pink bird really laid an egg on your lay-eggs turn (" + pinkEgg + ')');
+  ok(tucked >= 2, 'the forest chain really tucked a card and stored food (' + tucked + ')');
   ok(errs.length === 0, 'console errors ' + errs.length + ' ' + errs.slice(0, 2).join(' | '));
   await b.close(); process.exit(fails ? 1 : 0);
 })();

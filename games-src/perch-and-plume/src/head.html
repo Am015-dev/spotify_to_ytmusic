@@ -185,6 +185,17 @@ body:has(#title:not([hidden])) #barstat{display:none}
 .keepgrid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0}
 .keepgrid .bc{width:104px;height:150px}
 .keepgrid .bc .pic{flex:0 0 58px}
+/* starting hand: each bird is one full-width row (picture, name, cost, power in 2 lines), so 5 birds fit a 375x667 phone */
+.keepgrid .bc.big{flex:0 0 100%;width:auto;height:auto;min-height:0;overflow:hidden;border-width:2px}
+.keepgrid .bc.big .bk-pic{flex:0 0 74px;min-height:0;border-radius:6px 0 0 6px}
+.keepgrid .bc.big .bk-body{gap:2px;padding:4px 8px}
+.keepgrid .bc.big .bk-hab{display:flex;gap:4px}.keepgrid .bc.big .bk-hab .hb{font-size:12px;padding:0 6px}
+.keepgrid .bc.big .vpb{min-width:0;padding:2px 6px;flex-direction:row;gap:3px;align-items:baseline;border-radius:9px}.keepgrid .bc.big .vpb b{font-size:18px}.keepgrid .bc.big .vpb small{font-size:12px}
+.keepgrid .bc.big .bk-cost{gap:8px}.keepgrid .bc.big .bk-cost .ci{flex-direction:row;gap:2px;min-width:0}.keepgrid .bc.big .bk-cost .ci .fi{width:20px;height:20px}.keepgrid .bc.big .bk-cost .ci small{font-size:13px}
+.keepgrid .bc.big .bk-nm{font-size:16px}
+.keepgrid .bc.big .bk-pw{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.keepgrid .bc.big.off{opacity:.5}
+#setup .tmenu:last-child{position:sticky;bottom:0;padding:8px 0;margin-top:4px}
 .keepgrid .bc.off{opacity:.45;filter:grayscale(.6)}
 .keepgrid .fbtn{appearance:none;width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.3);background:rgba(0,0,0,.2);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .keepgrid .fbtn .fi{width:44px;height:44px}
@@ -328,6 +339,9 @@ body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 .a4[aria-disabled="true"] .a4i{filter:grayscale(1);opacity:.55}
 .a4.best{border-color:#7a4a06;box-shadow:0 0 0 2px #e0a948}
 .bestb{position:absolute;top:-8px;right:8px;font-style:normal;font-weight:800;font-size:14px;background:#7a4a06;color:#fff;border-radius:9px;padding:0 8px;line-height:20px}
+.tutpoint{outline:4px solid #e0a948!important;outline-offset:2px;animation:tutp 1.2s ease-in-out infinite}
+.tutpulse{animation:tutpz .45s ease-out 2}
+@keyframes tutpz{50%{transform:scale(1.06)}}
 .a4.tutpoint{outline:4px solid #e0a948;outline-offset:2px;animation:tutp 1.2s ease-in-out infinite}
 .a4.tutpoint::after{content:"\25B6  Ottilie";position:absolute;left:-4px;top:-12px;background:#4f7a45;color:#fff;font-size:14px;font-weight:700;border-radius:9px;padding:0 7px;line-height:20px}
 @keyframes tutp{50%{outline-color:#fff}}
