@@ -207,3 +207,13 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - R6 (sunglaze, perch, final-approach) session_01RR7mnY9XjyFfPRsVjbpyUq. R7 (stitchwise, crown, emberclimb) session_01RR7mnXtR9eqWMsfjpryuzW.
 - Other fixers: F2 cauldron/shipwreck/redline (redline on r2), F2 vale, F2 short-fuse, doorkick r2, kaiten, twin, nebula.
 - No game has passed a re-review yet (12 re-reviewed).
+
+## 21:23 UTC update
+- PASS: sunglaze 7.9 (R6). Awaiting owner yes before deploy.
+- R6: perch 6.5 -> F2 done (waiting reviewer); final-approach 4.0 (tutorial stuck at 27/27) -> F3 session_01RR7mnYdcSckU54JmryfewK.
+- R2 wildmark 7.1 -> F2 session_01RR7mnbdQ8QMtWED5pJRDCw.
+- R8: short-fuse 7.4, cauldron 7.4, shipwreck 6.5. F3: short-fuse session_01RR7mnXWDfUEtVvAkFm1qGq, cauldron session_01RR7mnZPWu53Cxvm34NEWui, shipwreck session_01RR7mnYtTuPeGioq6qaXqFT.
+- Running reviewers: R7 (stitchwise, crown, emberclimb) session_01RR7mnXtR9eqWMsfjpryuzW; R9 (doorkick, rampart, redline) session_01RR7mnYXu9gtAcDbJHWwJ2c; R10 (sands, vale, hollowbough) session_01RR7mnZjsGBCGZ8NtDWxAHq.
+- Fixers: F2 thornbound, F2 tidewake (r2: board size check), F2 lantern (r2 feel), F2 vinegrave (r2 assistants), kaiten, twin, nebula (first round, no report yet).
+- Waiting reviewer: perch.
+- Shared shell note: gx-tutor.js ignores taps for 600 ms after a bubble shows (deliberate debounce); consider 350 ms later.
