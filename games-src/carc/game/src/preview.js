@@ -29,7 +29,7 @@ function prevCalc(x, y, r) {
     else if (best.k === 'close') out = { badge: nm(best.rv[0]) + ' +' + best.pts, line: 'Finishes ' + nm(best.rv[0]) + '’s ' + best.name + ': +' + best.pts + ' for them.', hl, pts: -best.pts, kind: 'bad' };
     else if (best.k === 'closefree') out = { badge: 'closes', line: 'Closes a ' + best.name + ' nobody holds: no points.', hl, pts: 0 };
     else if (best.k === 'grow') out = { badge: 'grows', line: 'Grows your ' + best.name + ' to ' + best.n + ' tiles: +' + best.pts + ' when finished.', hl, pts: 0, kind: 'good' };
-    else out = { badge: 'feeds', line: 'Grows ' + nm(best.rv[0]) + '’s ' + best.name + ' to ' + best.n + ' tiles.', hl, pts: 0, kind: 'bad' };
+    else out = { badge: 'helps them', line: 'Grows ' + nm(best.rv[0]) + '’s ' + best.name + ' to ' + best.n + ' tiles.', hl, pts: 0, kind: 'bad' };
   }
   UI.pvc[ck] = out; return out;
 }
@@ -37,11 +37,11 @@ function prevCalc(x, y, r) {
 function prevFig(l) {
   const T = G.tiles[G.cur.k], id = find(T.s0 + +l), F = G.fd[id]; if (!F) return '';
   const nm = PV_TY[F.ty];
-  if (F.ty === 'F') return 'field: 3 per town at end';
-  if (F.ty === 'M') return 'priory: 9 when ringed';
+  if (F.ty === 'F') return 'field: 3 per finished town';
+  if (F.ty === 'M') return 'priory: 9 with 8 tiles around';
   const done = F.oe && F.oe.length === 0;
   if (done) return nm + ' +' + featPoints(F, true) + ' now';
-  return nm + ' +' + featPoints(F, true) + ' if closed';
+  return nm + ' +' + featPoints(F, true) + ' when finished';
 }
 // highlight a feature's tiles while a spot is held or hovered
 function pvHighlight(keys) { for (const e of document.querySelectorAll('#world .pvhl')) e.classList.remove('pvhl'); if (keys) for (const k of keys) { const e = UI.tl[k]; if (e) e.classList.add('pvhl'); } }
@@ -79,7 +79,7 @@ function ratingEnd() {
   let word = diff <= 0.6 ? 'Good' : diff <= 2.6 ? 'Okay' : 'Poor', text;
   if (word === 'Good') text = 'the best score available.';
   else { const w = (q.best.why || [])[0]; const nm = w && w.ty ? PV_TY[w.ty] : '';
-    text = w ? (w.k === 'close' ? 'finishing the ' + nm + ' was better.' : w.k === 'grow' ? 'growing the ' + nm + ' was better.' : w.k === 'priory' ? 'the priory was a better spot.' : 'a stronger spot was open.') : 'a stronger spot was open.'; }
+    text = w ? (w.k === 'close' ? 'finishing the ' + nm + ' was better.' : w.k === 'grow' ? 'growing the ' + nm + ' was better.' : w.k === 'priory' ? 'the priory was a better spot.' : 'a better spot was open.') : 'a stronger spot was open.'; }
   UI.rating = { word, text, turn: q.turn }; renderSheet();
   if (UI.coach && typeof coachSay === 'function') coachSay('rate_' + word.toLowerCase());
 }

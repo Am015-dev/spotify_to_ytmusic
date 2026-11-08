@@ -1,8 +1,8 @@
 {
  "slug": "lantern-dive",
- "when": "2026-11-08T03:34Z",
- "secs": 50,
- "totalSecs": 136,
+ "when": "2026-11-08T03:59Z",
+ "secs": 120,
+ "totalSecs": 285,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -16,9 +16,24 @@
    "detail": []
   },
   "c": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
+   "status": "FAIL",
+   "count": 2,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "A job cannot be done any more: Never lead a trick with Coral or Kelp.",
+     "words": 15,
+     "at": 58047,
+     "where": "p."
+    },
+    {
+     "session": "phone/learn",
+     "text": "If the jobs could not be done from the start, try with new jobs.",
+     "words": 14,
+     "at": 58047,
+     "where": "p.sm"
+    }
+   ]
   },
   "d": {
    "status": "PASS",
@@ -39,20 +54,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 50,
-   "turns": 97,
-   "clicks": 139,
+   "secs": 120,
+   "turns": 246,
+   "clicks": 245,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 3
+   "messagesSeen": 4
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 15,
-   "turns": 28,
-   "clicks": 35,
+   "secs": 19,
+   "turns": 36,
+   "clicks": 37,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -61,8 +76,8 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 50,
-   "turns": 34,
+   "secs": 120,
+   "turns": 82,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
@@ -72,9 +87,9 @@
   {
    "size": "pc",
    "mode": "play",
-   "secs": 21,
-   "turns": 38,
-   "clicks": 55,
+   "secs": 25,
+   "turns": 35,
+   "clicks": 36,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,

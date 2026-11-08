@@ -121,3 +121,20 @@ html .seat .jc{width:auto;max-width:100%}
 .gxh-bub .gxh-tx,.gxt-bub .gxh-tx{font-size:15px!important}
 #tskip{font-family:inherit}
 html .bdg b,html .bdg span,html .pbtn span,html .seat .bdg b,html .me .bdg b,html #mine .bdg b{font-size:14px}
+/* W479: title hero (3D lantern + painted crew), Brack's face on the guide bubble */
+.hero{display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0}
+.herolan{width:150px;height:150px;position:relative;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.crew{display:flex;gap:6px;justify-content:center}
+.cpic{margin:0;width:52px;text-align:center}
+.cpic img{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);display:block;margin:0 auto}
+.cpic figcaption{font:800 14px/1.2 var(--font);color:#fff;text-shadow:0 1px 4px #000;margin-top:2px}
+.crew.foes .cpic img{border-color:#9aa8bd;filter:saturate(.8)}
+@media (max-height:740px){.crew.foes{display:none}.herolan{width:110px;height:110px}}
+@media (max-height:600px){.hero{display:none}}
+#tbub .tg{text-align:center;line-height:1.1}#tbub .tgp{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #c99a35}
+/* W479 ui-audit: wide screens 16px minimum, title text on a dark pill so it reads on the painted water */
+.ttl-in .logo,.ttl-in .tag{background:rgba(3,15,34,.6);padding:3px 14px;border-radius:12px;color:#fff}
+.ttl-in .logo span{color:#ffe9a6}
+@media (min-width:1024px){
+  #start *,.ttl *,.gxt-menu *,.cpic figcaption,.ttl-in .logo span,.ttl-in .tag,.tbtn b,.tbtn span,.tbtn small,.gx-drawer *,.ppop *,#dlg *,.gxh-bub *,.gxt-bub *,#tskip,#tbub *{font-size:max(16px,1em)!important}
+}
