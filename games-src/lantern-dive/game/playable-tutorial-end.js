@@ -5,7 +5,7 @@
 const PW = (() => { try { return require('playwright'); } catch (e) { return require('/opt/node-tools/node_modules/playwright'); } })();
 const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(process.env.HTML || path.join(__dirname, 'lantern-dive.html'));
-const SIZES = (process.argv[2] || '390x763,1440x860').split(',').map(s => s.split('x').map(Number));
+const SIZES = (process.argv[2] || '390x844,390x763,1440x860').split(',').map(s => s.split('x').map(Number));
 let seed = +(process.argv[3] || 7); const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
 const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = [];
 const RULES = ['jobs', 'flare', 'ping', 'readping', 'lead', 'follow', 'void', 'win', 'trump', 'last'];

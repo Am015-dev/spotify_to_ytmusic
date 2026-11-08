@@ -22,7 +22,7 @@ const tutBox = sel => () => {
 // the only forced step: take a job (any job). Then the kit is stopped (a trailing never-ready step keeps it from showing its own end card).
 function tutSteps() {
   return [
-    { id: 'take', title: 'Saltmere Bay', say: 'Brack: "The bay nets are tangled. You, Dag and Sumi dive as one crew. Lantern 4 makes you Captain, so you choose first. Lantern 3 is safe for you; Dag wants the first trick." Tap a job.',
+    { id: 'take', title: 'Saltmere Bay', say: 'The nets are tangled; the crew dives as one. Lantern 4 makes you Captain: pick a job first. Tap one.',
       target: tutBox('#pool .jcard'), wait: { type: 'tap', match: a => a.mv && a.mv.t === 'take' },
       ready: () => G && G.phase === 'assign' && iMustAct() && !UI.busy && !!document.querySelector('#pool .jcard'),
       onDone: () => setTimeout(() => { try { GXT.stop(); } catch (e) { } tutBegin(); }, 0) },
@@ -44,25 +44,25 @@ function tutTips() {   // id, when(), say() (one or two plain lines), until() ke
   const led = () => T().plays.length ? suitOf(T().plays[0].c) : -1;
   return [
     { id: 'jobs', when: () => G.phase !== 'assign' && G.tasks.every(t => t.owner >= 0), until: () => G.phase !== 'play' || G.tricks.length === 0,
-      say: () => 'Each job is one diver\'s task, met by the tricks that diver wins. Every job must be done, or the whole crew loses.', later: 'A job is one diver\'s task; all jobs done wins the dive.' },
+      say: () => 'Each job belongs to one diver. Win its tricks to meet it. Every job must be done.', later: 'A job is one diver\'s task; all jobs done wins the dive.' },
     { id: 'flare', when: () => G.phase === 'distress' && iMustAct() && !UI.busy, until: () => G.phase === 'distress',
-      say: () => 'The distress flare passes a card after a failed dive and costs an extra attempt. Skip it today.', later: 'Distress flare: pass a card, costs an extra attempt.' },
+      say: () => 'The flare lets the crew pass a card after a loss. Skip it today.', later: 'Distress flare: pass a card, costs an extra attempt.' },
     { id: 'ping', when: () => G.phase === 'signal' && iMustAct() && !UI.busy, until: () => G.phase === 'signal',
-      say: () => 'No talking down here. Once per dive you may ping: show your highest, lowest or only card of a colour. Or skip.', later: 'Signals: one ping per dive, between tricks.' },
+      say: () => 'No talking down here. Once per dive, show one card with a ping. Or skip.', later: 'Signals: one ping per dive, between tricks.' },
     { id: 'readping', when: () => G.pings.some(p => p.seat !== viewSeat()) && !UI.busy && !UI.fz, until: () => true,
-      say: () => { const p = G.pings.find(p => p.seat !== viewSeat()); return pname(p.seat) + ' shows ' + cname(p.c) + '. The token says if it is their highest, lowest or only card of that colour.'; }, later: 'Reading a crewmate\'s ping token.' },
+      say: () => { const p = G.pings.find(p => p.seat !== viewSeat()); return pname(p.seat) + ' shows ' + cname(p.c) + '. Its token says highest, lowest or only of that colour.'; }, later: 'Reading a crewmate\'s ping token.' },
     { id: 'lead', when: () => myTurn() && T().plays.length === 0, until: () => G.phase === 'play' && T().plays.length === 0 && iMustAct(),
-      say: () => (G.tricks.length === 0 ? 'The Captain leads the first trick. ' : 'You won the last trick, so you lead. ') + 'Play any card; its colour is the colour the others must follow.', later: 'The leader plays any card; the winner leads next.' },
+      say: () => (G.tricks.length === 0 ? 'The Captain leads. ' : 'You won, so you lead. ') + 'Play any card. Others must follow its colour.', later: 'The leader plays any card; the winner leads next.' },
     { id: 'follow', when: () => myTurn() && T().plays.length > 0 && led() < 4 && G.players[viewSeat()].hand.some(c => suitOf(c) === led()), until: () => myTurn() && T().plays.length > 0,
-      say: () => pname(T().plays[0].s) + ' led ' + ['Coral', 'Tide', 'Kelp', 'Sunstar'][led()] + '. You hold some, so you must follow: the dimmed cards are not allowed. You never have to win, though.', later: 'Follow the colour led if you can; never forced to win.' },
+      say: () => pname(T().plays[0].s) + ' led ' + ['Coral', 'Tide', 'Kelp', 'Sunstar'][led()] + '. Follow it: dim cards are blocked. You need not win.', later: 'Follow the colour led if you can; never forced to win.' },
     { id: 'void', when: () => myTurn() && T().plays.length > 0 && !G.players[viewSeat()].hand.some(c => suitOf(c) === led()), until: () => myTurn() && T().plays.length > 0,
-      say: () => 'You have none of that colour: play anything. Another colour can never win, but a Lantern beats every colour.', later: 'No card of the colour led: play anything; Lanterns are trumps.' },
+      say: () => 'No card of that colour: play anything. Only a Lantern can win.', later: 'No card of the colour led: play anything; Lanterns are trumps.' },
     { id: 'win', when: () => G.tricks.length > 0 && !UI.busy && !UI.fz, until: () => true,
-      say: () => { const k = G.tricks[G.tricks.length - 1]; return pname(k.w) + ' won with ' + cname(k.wc) + ': the highest card of the colour led' + (suitOf(k.wc) === 4 ? ', or a Lantern, which beats every colour' : '') + '. The winner leads next.'; }, later: 'Highest card of the colour led wins the trick.' },
+      say: () => { const k = G.tricks[G.tricks.length - 1]; return pname(k.w) + ' wins with ' + cname(k.wc) + (suitOf(k.wc) === 4 ? ': a Lantern beats every colour. ' : ', the highest of the colour led. ') + 'The winner leads next.'; }, later: 'Highest card of the colour led wins the trick.' },
     { id: 'trump', when: () => G.tricks.some(k => suitOf(k.wc) === 4 && suitOf(k.plays[0].c) !== 4) && !UI.busy && !UI.fz, until: () => true,
-      say: () => 'A Lantern is a trump: it beat a whole colour. With two Lanterns, the higher one wins.', later: 'Lanterns are trumps and beat every colour.' },
+      say: () => 'A Lantern beats every colour. Two Lanterns? The higher wins.', later: 'Lanterns are trumps and beat every colour.' },
     { id: 'last', when: () => myTurn() && G.tricks.length > 0 && T().plays.length > 0, until: () => myTurn(),
-      say: () => 'Forgot the last trick? Tap Last to look at it again. Only the latest trick is kept.', later: 'The Last button shows the previous trick.' }
+      say: () => 'Forgot the last trick? Tap Last to look again.', later: 'The Last button shows the previous trick.' }
   ];
 }
 function tutBegin() {
@@ -96,8 +96,8 @@ function tutTick() {
     const e = G.events[C.evi++];
     if (e.t === 'job' && e.st) {
       const own = G.tasks[e.i].owner;
-      if (e.st > 0) C.q.push({ id: 'jd' + e.i + '_' + e.n, good: 1, text: 'Job done: ' + tutWho(e.i).replace(/^your$/, 'your') + ' "' + tutJ(e.i) + '". Green tick: it can no longer fail.' });
-      else C.q.push({ id: 'jb' + e.i + '_' + e.n, poor: 1, text: 'Poor luck: ' + tutWho(e.i) + ' job "' + tutJ(e.i) + '" can no longer be met. One broken job sinks the whole crew: dive again and try another plan.' });
+      if (e.st > 0) C.q.push({ id: 'jd' + e.i + '_' + e.n, good: 1, text: 'Job done: ' + tutWho(e.i).replace(/^your$/, 'your') + ' "' + tutJ(e.i) + '". Green tick: it cannot fail now.' });
+      else C.q.push({ id: 'jb' + e.i + '_' + e.n, poor: 1, text: 'Poor luck: ' + tutWho(e.i) + ' job "' + tutJ(e.i) + '" cannot be met now. One broken job loses the dive.' });
     }
   }
   if (!UI.busy && !UI.fz && G.phase !== 'over') for (const t of tutTips()) { if (!C.seen[t.id] && t.when()) { C.seen[t.id] = 1; C.q.push({ id: t.id, text: t.say(), until: t.until }); } }
@@ -118,7 +118,7 @@ function tutEnd() {
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0], pro = !!(UI.tc.prologue && first);
   const c = document.createElement('div'); c.className = 'gxt-end'; c.id = 'tend'; c.setAttribute('role', 'dialog'); c.setAttribute('aria-modal', 'true'); c.setAttribute('aria-label', 'Tutorial finished');
   c.innerHTML = '<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">' + (ok ? '✓' : '✗') + '</div><div class="gxt-et">' + (ok ? 'Nets free! Dive won' : 'The dive failed') + '</div>' +
-    '<div class="gxt-ex">' + (ok ? 'Both jobs were done' + (G.tricks.length < G.ntr ? ' after trick ' + G.tricks.length + ', so the dive ended at once; cards left in hand do not matter.' : '.') : (R.why || 'A job could not be met.')) + ' You won ' + mine + ' of ' + G.tricks.length + ' tricks. There are no points: the crew wins together or loses together.</div>' +
+    '<div class="gxt-ex">' + (ok ? 'Both jobs were done' + (G.tricks.length < G.ntr ? ' after trick ' + G.tricks.length + ', so the dive ended at once. Cards left in hand do not matter.' : '.') : (R.why || 'A job could not be met.')) + ' You won ' + mine + ' of ' + G.tricks.length + ' tricks. There are no points: the crew wins together or loses together.</div>' +
     '<ul class="tjobs">' + rows + '</ul>' +
     '<details class="tlater"><summary>Things you\'ll meet later</summary><ul>' + UI.tc.later.map(x => '<li>' + x + '</li>').join('') + '</ul></details>' +
     '<div class="gxt-eb">' + (ok ? (pro ? '<button type="button" class="gxt-b pri" data-te="chapter">Start chapter 1</button>' : '<button type="button" class="gxt-b pri" data-te="play">Play a real game</button><button type="button" class="gxt-b" data-te="story">Story mode</button>') : '<button type="button" class="gxt-b pri" data-te="again">Dive again</button><button type="button" class="gxt-b" data-te="play">Finish tutorial</button>') + '</div></div>';
