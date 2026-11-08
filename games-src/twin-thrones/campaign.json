@@ -1198,15 +1198,15 @@
   "intro": [
    {
     "who": "guide",
-    "text": "The old king is dead. Two thrones stand empty, and the greater city wears both crowns."
-   },
-   {
-    "who": "pell",
-    "text": "I am only the apprentice, but I want that crown. Let us see who builds better."
+    "text": "You win with the most points after 3 ages. Or win early by war or science."
    },
    {
     "who": "guide",
-    "text": "This is a real duel, and every move is yours. I will speak up when something new matters."
+    "text": "Cards and wonders give points. Shields push the pawn. Science symbols collect."
+   },
+   {
+    "who": "pell",
+    "text": "I'm only the apprentice, but I want that crown."
    }
   ],
   "first": [

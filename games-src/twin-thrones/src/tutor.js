@@ -102,7 +102,7 @@
   }
   // ---------------------------------------------------------------- start
   var RUN = 0;
-  function scene(lines, my) { return ((window.GXC && GXC.scene) ? GXC.scene(lines || [], { title: '', last: 'Start the duel' }) : Promise.resolve()).then(function () { if (my !== RUN) return false; try { if (window.GXC) GXC.close(); } catch (e) { } return true; }); }
+  function scene(lines, my) { return ((window.GXC && GXC.scene) ? GXC.scene(lines || [], { title: 'How to win', last: 'Start the duel' }) : Promise.resolve()).then(function () { if (my !== RUN) return false; try { if (window.GXC) GXC.close(); } catch (e) { } return true; }); }
   function begin() {
     var my = RUN;
     U.tut = true; U.rivalName = 'Pell'; shortLayout(true); UI.newGame('cpu', SEED); U.fingerDone = true; stack();

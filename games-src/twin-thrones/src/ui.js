@@ -31,10 +31,11 @@ var TT_TEST = {};
       clearTimeout(U.nt); if (seq !== U.seq) { U.narr = false; return; }
       if (i >= items.length) { U.narr = false; U.skipNarr = null; if (done) done(); return; }
       var it = items[i++]; setInstr(it.tag, it.kind, it.text); if (it.fn) { try { it.fn(); } catch (e) { console.error(e); } }
-      U.nt = setTimeout(next, stepMs() + (it.extra || 0));
+      U.nt = setTimeout(next, U.fast ? 70 : delay() >= 300 ? readMs(it.text) : stepMs() + (it.extra || 0));
     }
     U.skipNarr = function () { U.fast = true; next(); }; next();
   }
+  function readMs(t) { var w = String(t || '').split(/\s+/).length; return 4000 + 1000 * Math.ceil(w / 10); }
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
   function snapState() { var G = U.G; return { av: E.available(G).map(function (c) { return c.i; }), sc: [E.score(G, 0).total, E.score(G, 1).total], coins: [G.players[0].coins, G.players[1].coins] }; }
   // the plain sentences of one move, in the order they are shown: what happened, why it scored, what moved, what is free now
@@ -128,11 +129,11 @@ var TT_TEST = {};
     if (c.prod) for (var r in c.prod) h += ic('res-' + r, '+' + c.prod[r]);
     else if (c.choice) h += c.choice.map(function (r) { return ic('res-' + r, null, 'sm'); }).join('<i class="or">/</i>');
     else if (c.price) h += c.price.map(function (r) { return ic('res-' + r, null, 'sm'); }).join('') + '<b class="tx">1$</b>';
-    if (c.shields) h += ic('icon-shield', c.shields, 'sh');
+    if (c.shields) h += '<span class="e1 sh"><svg viewBox="0 0 20 22" width="18" height="20" aria-hidden="true"><path d="M10 1l8 3v7c0 5-4 8.5-8 10C6 19.5 2 16 2 11V4z" fill="#fff"/><path d="M10 4l5 2v5c0 3.4-2.6 5.8-5 7z" fill="#c9463a"/></svg><b>' + c.shields + '</b></span>';
     if (c.sci) h += ic('sci-' + c.sci, null, 'sc');
     if (c.coin) h += ic('coin', '+' + c.coin);
     if (c.perCol || c.perWonder) h += ic('coin', '+');
-    if (c.vp) h += ic('icon-vp', c.vp, 'vp');
+    if (c.vp) h += '<span class="e1 vp"><b>' + c.vp + (c.sci ? '' : c.vp === 1 ? ' pt' : ' pts') + '</b></span>';
     if (c.guild && !c.vp) h += '<b class="tx">guild</b>';
     return h;
   }
@@ -179,7 +180,7 @@ var TT_TEST = {};
   function layoutDims() {
     var P = $('pyr'), W = P.clientWidth, H = P.clientHeight, rows = TT.LAYOUT[U.G.age] || TT.LAYOUT[1], n = rows.length, xm = 0;
     rows.forEach(function (r) { r.xs.forEach(function (x) { xm = Math.max(xm, Math.abs(x)); }); });
-    var span = 2 * xm + 1.9, w = Math.min(1.9 * W / span, 124), h = Math.min(1.95 * w, 186), ms = Math.max(62, 0.5 * h);
+    var span = 2 * xm + 1.9, w = Math.min(1.9 * W / span, 124), h = Math.min(1.95 * w, 186), ms = Math.max(70, 0.5 * h);
     if (h + (n - 1) * ms > H) { h = Math.max(1.3 * w * 0 + 40, H - (n - 1) * ms); if (h < 1.4 * w) { h = H / (1 + 0.5 * (n - 1)); ms = 0.5 * h; w = Math.min(w, h / 1.4); } }
     var step = Math.max(ms, Math.min(0.8 * h, (H - h) / Math.max(1, n - 1))), u = w / 1.9;
     return { u: u, w: w, h: h, step: step, W: W, H: H, n: n, ox: W / 2, oy: Math.max(0, (H - (h + (n - 1) * step)) / 2) };
@@ -247,7 +248,7 @@ var TT_TEST = {};
     $('tokrow').innerHTML = '<span class="tl">Science pair bonus</span>' + h; fillArt($('tokrow'));
   }
   function renderPyr(flips) {
-    var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = '';
+    var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; P.classList.toggle('tight', d.step < 68); P.classList.toggle('vtight', d.step < 44);
     var av = E.available(G).map(function (c) { return c.i; }), human = canAct(), hintCell = -1;
     var bestCell = -1; if (U.hintsOn && human && G.phase === 'play' && !G.pend.length) { try { var bm = AI.pick(G, 'normal', function () { return 0.5; }); if (bm && bm.i != null) bestCell = bm.i; } catch (e) { } }
     if (U.camp && U.camp.hints && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = AI.pick(G, 'normal', function () { return 0.5; }); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
@@ -358,7 +359,7 @@ var TT_TEST = {};
   }
   function popNum(txt, near, kind) {
     var r = near.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop-n' + (kind ? ' ' + kind : ''); e.textContent = txt; document.body.appendChild(e);
-    e.style.left = Math.max(4, Math.min(innerWidth - e.offsetWidth - 4, r.left + r.width / 2 - e.offsetWidth / 2)) + 'px'; e.style.top = Math.max(4, r.top - (kind ? 6 : 0)) + 'px'; setTimeout(function () { e.remove(); }, kind ? 1900 : 1000);
+    e.style.left = Math.max(4, Math.min(innerWidth - e.offsetWidth - 4, r.left + r.width / 2 - e.offsetWidth / 2)) + 'px'; e.style.top = Math.max(4, r.top - (kind ? 6 : 0)) + 'px'; setTimeout(function () { e.remove(); }, kind ? 4200 : 1000);
     var fu = TTA.url('fx-coin-burst'); if (fu) { var f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.top - 10) + 'px;background-image:url("' + fu + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
   }
   function lineOf(ev, G) {
@@ -401,7 +402,7 @@ var TT_TEST = {};
     });
     if (G.ev.some(function (e) { return e.t === 'age'; })) $('pyr').querySelectorAll('.card').forEach(function (e) { e.classList.add('pop'); });
     if (G.over) return;
-    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); if (rated) items.splice(Math.min(items.length, 2), 0, { tag: 'Rating', kind: 'info', text: rated.t, extra: 250 }); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
+    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); if (!U.tut) { if (!isAI(p) && U.mode !== 'two') { var key = items.filter(function (x) { return /point|coin|pawn|Age|token/i.test(x.tag + ' ' + x.text) && x.tag !== 'Pyramid'; }); items = (key.length ? key : items).slice(0, 2); } else items = items.filter(function (x) { return x.tag !== 'Pyramid'; }).slice(0, 3); } if (rated) items.splice(Math.min(items.length, 2), 0, { tag: 'Rating', kind: 'info', text: rated.t, extra: 250 }); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
     narrate(items, function () { U.busy = false; after(); });
   }
   function dock0Lock() { $('acts').innerHTML = ''; var z = $('zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
@@ -451,7 +452,8 @@ var TT_TEST = {};
     $('start').hidden = true; $('res').hidden = true; buildBoard(); render();
     var fl = camp ? 'Goal: ' + camp.goal.text + (tw ? ' ' + tw.text : '') : FLAVOUR[Math.floor(Math.random() * FLAVOUR.length)];
     if (U.tut) { after(); return; }
-    banner(camp ? camp.title : 'The duel begins', 'info', camp ? 1400 : 1100); U.busy = true; narrate([{ tag: 'The duel', kind: 'info', text: fl, extra: camp ? 1500 : 500 }], function () { U.busy = false; after(); });
+    if (!camp && delay() >= 300) { U.busy = true; peek(goalHtml() + '<button class="btn" data-goalgo="1">Start the duel</button>', true); return; }
+    banner(camp ? camp.title : 'The duel begins', 'info', camp ? 4000 : 1100); U.busy = true; narrate([{ tag: 'The duel', kind: 'info', text: fl, extra: camp ? 1500 : 500 }], function () { U.busy = false; after(); });
   }
   // the climax: totals count up row by row (tap anywhere on the table to jump to the end)
   function countUp(r) {
@@ -527,7 +529,8 @@ var TT_TEST = {};
     if (!c.children.length) c.textContent = 'No cards yet.'; GX.show('cityd');
   }
 
-  function peek(html) { var b = $('peek'); if (!b) { b = document.createElement('div'); b.id = 'peek'; document.body.appendChild(b); } b.innerHTML = '<div class="pk" role="dialog" aria-modal="true">' + html + '<button class="btn pkx" data-peekx="1">Close</button></div>'; b.hidden = false; fillArt(b); }
+  function goalHtml() { return '<h3>How to win</h3><p class="gl">Have the most points after 3 ages.</p><ul class="gb"><li>Cards and wonders give points.</li><li>Shields push the pawn. Reach their city: you win.</li><li>Collect 6 science symbols: you win.</li></ul>'; }
+  function peek(html, noX) { var b = $('peek'); if (!b) { b = document.createElement('div'); b.id = 'peek'; document.body.appendChild(b); } b.innerHTML = '<div class="pk" role="dialog" aria-modal="true">' + html + (noX ? '' : '<button class="btn pkx" data-peekx="1">Close</button>') + '</div>'; b.hidden = false; fillArt(b); }
   function peekScore() {
     var G = U.G, a = sbreak(G, 0), b = sbreak(G, 1), rows = [['Civic and trade cards, guilds', 'civ'], ['Science cards and tokens', 'sci'], ['War: pawn on their side', 'war'], ['Wonders', 'won'], ['Coins (1 point per 3)', 'coin']];
     var h = '<h3>How the points add up</h3><table class="pkt"><tr><th></th><th>' + esc(U.mode === 'cpu' ? 'You' : name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
@@ -562,8 +565,9 @@ var TT_TEST = {};
     }
     if (!U.G) return;
     if (U.narr && U.skipNarr && !q('button') && (q('#instr') || q('#banner') || q('#pyr') || q('#bd'))) { U.skipNarr(); return; }
-    if (q('[data-peekx]') || t.id === 'peek') { $('peek').hidden = true; return; }
-    if (q('[data-goal]')) { peek('<h3>How to win</h3><p><b>Points:</b> after Age III the most points wins. Cards, wonders, science, war and coins all score.</p><p><b>War:</b> shields push the pawn. Reach the rival capital and you win at once.</p><p><b>Science:</b> collect 6 different science symbols and you win at once.</p>'); return; }
+    if (q('[data-goalgo]')) { $('peek').hidden = true; U.busy = false; after(); return; }
+    if ((q('[data-peekx]') || t.id === 'peek') && !$('peek').querySelector('[data-goalgo]')) { $('peek').hidden = true; return; }
+    if (q('[data-goal]')) { peek(goalHtml()); return; }
     if ((b = q('[data-score]'))) { peekScore(); return; }
     if ((b = q('#sbar'))) { var a0 = sbreak(U.G, 0), b0 = sbreak(U.G, 1); toast('Civic = cards, Sci = green cards + tokens, War = pawn zone, Won = wonders, Coin = 1 per 3 coins. You ' + a0.tot + ', ' + name(1) + ' ' + b0.tot + '.', 4200); return; }
     if ((b = q('[data-city]'))) { showCity(+b.dataset.city); return; }
@@ -617,6 +621,7 @@ var TT_TEST = {};
   }
   document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
   document.addEventListener('click', function (ev) { if (U.dragJust && Date.now() - U.dragJust < 400) { ev.stopPropagation(); ev.preventDefault(); } }, true);
+  document.addEventListener('keydown', function (e) { var pk = $('peek'); if (e.key === 'Escape' && pk && !pk.hidden) { if (pk.querySelector('[data-goalgo]')) { pk.hidden = true; U.busy = false; after(); } else pk.hidden = true; } });
   document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card') && e.target.classList.contains('av')) { e.preventDefault(); e.target.click(); } });
   window.addEventListener('resize', function () { if (U.G && U.G.phase !== 'draft' && !U.G.over) renderPyr(); });
   if (window.GX) GX.onResize(function () { if (U.G && U.G.phase !== 'draft' && $('pyr').children.length) renderPyr(); });

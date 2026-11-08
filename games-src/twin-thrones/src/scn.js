@@ -12,7 +12,7 @@
       { kind: 'visible', sel: '#pyr .card.av', name: 'a takeable card' },
       { kind: 'visible', sel: '#mil', name: 'conflict track' },
       { kind: 'visible', sel: '#s0', name: 'your city' },
-      { kind: 'visible', sel: '#msg', name: 'status line' }
+      { kind: 'visible', sel: '#instr', name: 'status line' }
     ]
   });
   GXS.add({
@@ -21,7 +21,7 @@
     checks: [
       { kind: 'visible', sel: '[data-a="discard"]', name: 'Sell button' },
       { kind: 'visible', sel: '[data-a="build"]', name: 'Build button' },
-      { kind: 'visible', sel: '#sub', name: 'cost line' }
+      { kind: 'visible', sel: '#zoom .zc', name: 'cost line' }
     ]
   });
   GXS.add({
