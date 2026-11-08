@@ -87,7 +87,16 @@ window.EC_STORY = {
       event: 'A ? room: a choice with a price or a prize.',
       elite: 'An elite: tougher than a normal foe, better loot.',
       boss: 'The boss repeats a pattern. On its Spikes turn, attacks hurt you: block instead.',
-      lose: 'If your HP hits 0, the climb ends.'
+      lose: 'If your HP hits 0, the climb ends.',
+      preview: 'Lift a card: each foe shows the exact damage it would take, and you see the Block you would gain.',
+      frail: 'Frail: your Block cards give a quarter less while it lasts.',
+      acts: 'A full climb has three acts, each with its own foes and guardian, plus a final act. Each new act heals you fully.',
+      laststand: 'Last Stand: with two heroes in a boss fight, the first to fall stays at 1 HP. The second fall ends the climb.',
+      shiv: 'Shivs: 0-cost knives that hit for 3. At most 5 in hand.',
+      orbs: 'Orbs: Lightning zaps, Frost blocks, Dark grows. A full row fires the oldest.',
+      stance: 'Stances: Wrath adds 3 per hit but costs 3 HP at turn end; leaving Calm gives 2 energy.',
+      scry: 'Scry: look at the top cards of your draw pile and discard the ones you do not want.',
+      retain: 'Retain: this card stays in your hand when the turn ends.'
     },
     good: { kill: 'Clean kill!', double: 'Double damage on a Vulnerable foe. Nicely done.', blocked: 'Fully blocked. That is how a warden fights.' },
     poor: { hurt: 'Ouch. A Block card would have soaked some of that.', spikes: 'Spikes bit you. On its Spikes turn, block instead.', leftover: 'You ended with energy left. Spend it all next time.' },
