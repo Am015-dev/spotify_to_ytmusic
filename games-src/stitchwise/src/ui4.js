@@ -163,9 +163,11 @@ function t2Allow(kind, k) {
   var st = t2Step(); if (!st) return true; if (kind === 'cancel') return false;
   var ok = st.allow ? st.allow(kind, k) : false; if (!ok) { t2Nudge(); } return ok;
 }
-function t2Nudge() { var t = t2Target(); if (t) { t.classList.remove('t2-hl'); void t.offsetWidth; t.classList.add('t2-hl'); } var b = $('#tutb'); if (b) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } sfx('bad'); }
-function t2Target() { var st = t2Step(); try { return st && st.target ? st.target() : null; } catch (e) { return null; } }
+function t2Nudge() { t2Targets().forEach(function (t) { t.classList.remove('t2-hl'); void t.offsetWidth; t.classList.add('t2-hl'); }); var b = $('#tutb'); if (b) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } sfx('bad'); }
+function t2Target() { return t2Targets()[0] || null; }
+function t2Targets() { var st = t2Step(), t = null; try { t = st && st.target ? st.target() : null; } catch (e) { } return !t ? [] : Array.isArray(t) ? t : [t]; }
 function t2Offer(k) { return function () { return $$('#offers .offer:not(.up)')[k]; }; }
+function t2OfferOk(k) { var st = t2Step(); return !st || !!(st.allow && st.allow('offer', k)); }   // only light up patches the current step accepts
 function t2Mine() { return G && !G.over && !UI.busy && isHuman(swWho(G)); }
 function t2Shape(pid, f) { return swNorm(PATCHES[pid].cells.map(f)); }
 function t2OrIdx(pid, cells) { var k = JSON.stringify(cells), r = -1; PATCHES[pid].or.forEach(function (o, i) { if (JSON.stringify(o) === k) r = i; }); return r; }
@@ -216,7 +218,7 @@ function t2Tick() {
   t2Show();
 }
 function t2Show() {
-  var st = t2Step(); if (!st) return; var db = $('#dockbody'); if (!db) return; var b = $('#tutb');
+  var st = t2Step(); if (!st || $('#tutfin')) return; var db = $('#dockbody'); if (!db) return; var b = $('#tutb');
   if (!b) { b = h('div#tutb', { role: 'status', 'aria-live': 'polite' }); } if (b.parentNode !== db || db.firstChild !== b) db.insertBefore(b, db.firstChild);
   var n = T2.seen.length, key = st.id + ':' + T2.pressed;
   if (b.dataset.key !== key) { b.dataset.key = key; b.dataset.rule = st.rule; b.dataset.step = st.id; b.innerHTML = '';

@@ -414,5 +414,11 @@ html.sm #offers.ring>.offer:not(.up) .of b{min-width:0!important;font-size:15px!
 html.sm #offers.ring>.offer:not(.up){padding:4px 3px!important;min-height:0!important;height:auto!important}
 html.sm #offers.ring>.offer:not(.up) canvas,html.sm #offers.ring>.offer:not(.up) .pshape,html.sm #offers.ring>.offer:not(.up)>div:first-child{max-height:34px}
 html.sm #offers.ring>.offer:not(.up) .of small{letter-spacing:-.4px}
+
+/* W491 fix: a patch that does not fit is striped, not just red (red patches looked "wrong" while fine) */
+#ghost.bad .gc{background:repeating-linear-gradient(45deg,#c22 0 5px,#fff 5px 9px)!important;opacity:.85}
+/* W491 fix: the rival's quilt stays on screen on phones (a live thumbnail on their plate; tap it for the big view) */
+@media (max-width:600px){.pstrip[data-seat="1"] .thumb{display:block!important;width:34px!important;height:34px!important;border-radius:4px;flex:none;box-shadow:0 0 0 1px #0004}.pstrip[data-seat="1"]{gap:6px!important;padding-left:6px!important}}
+
 </style>
 </head>

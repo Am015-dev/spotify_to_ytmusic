@@ -7,7 +7,8 @@ function clampG() { var c = curCells(); if (!c) return; var b = bbox(c); UI.gx =
 function drawGhost() { try { markLanding(); } catch (e) { }
   var old = $('#ghost'); if (old) old.remove(); var q = $('#quilt'), p = curPatch(); if (!q || !p || G.over || G.pend) return; clampG(); var c = curCells(), b = bbox(c), ok = ghostOk(), set = {}; c.forEach(function (x) { set[x[0] + ',' + x[1]] = 1; });
   var cs = UI.cs, g = h('div#ghost.' + (ok ? 'ok' : 'bad'), { style: 'left:' + UI.gx * cs + 'px;top:' + UI.gy * cs + 'px;grid-template-columns:repeat(' + b[0] + ',' + cs + 'px);grid-template-rows:repeat(' + b[1] + ',' + cs + 'px);--pc:' + pcol(p.id), 'aria-hidden': 'true' });
-  for (var y = 0; y < b[1]; y++) for (var x = 0; x < b[0]; x++) g.appendChild(h('div.gc' + (set[x + ',' + y] ? '' : '.hid')));
+  var fab = artHas(fabricStem(p.id)) ? 'url(media/' + fabricStem(p.id) + '.webp)' : '', fsz = Math.max(b[0], b[1]) * cs;   // W491 fix: the ghost shows the patch's fabric, not a flat block
+  for (var y = 0; y < b[1]; y++) for (var x = 0; x < b[0]; x++) { var gc = h('div.gc' + (set[x + ',' + y] ? '' : '.hid')); if (fab && set[x + ',' + y]) { gc.style.backgroundImage = fab; gc.style.backgroundSize = fsz + 'px ' + fsz + 'px'; gc.style.backgroundPosition = (-x * cs) + 'px ' + (-y * cs) + 'px'; } g.appendChild(gc); }
   q.appendChild(g); var sew = $('[data-a=sew]'); if (sew) sew.disabled = !ok;
   // W470: legal squares glow (every square some legal spot of this turn of the patch would cover)
   var bd = G.board[viewSeat()], lg = {}; for (var yy = 0; yy + b[1] <= 9; yy++) for (var xx = 0; xx + b[0] <= 9; xx++) if (swFits(bd, c, xx, yy)) c.forEach(function (q2) { lg[(yy + q2[1]) * 9 + xx + q2[0]] = 1; });
