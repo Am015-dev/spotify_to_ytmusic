@@ -74,9 +74,12 @@ function raceHud(now, W, H) {
     cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(R * 0.5) + 'px sans-serif'; cx.fillText(String(Math.round(RACE.spd)), ox, oy + R * 0.42);
     cx.font = '700 ' + Math.max(10, Math.round(R * 0.28)) + 'px sans-serif'; cx.fillStyle = '#9aa6bb'; cx.fillText('SPEED', ox, oy - R * 0.28);
     /* gear lever: H-gate 1-2 / 3-4, the knob sits in the current gear */
-    var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 8 + R * 0.26, gh = R * 2 - 4 - R * 0.52, gear = c.gear;
+    var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 8 + R * 0.26, gh = R * 2 - 4 - R * 0.52, gear = (G.phase === 'plan' && c.i === UI.seat && !c.plan && !UI.busy) ? UI.gear : c.gear;   /* lever follows the gear you pick */
+    RACE.gk = RACE.gk == null || UI.fast || window.ANIM === false ? gear : RACE.gk + (gear - RACE.gk) * 0.25; if (Math.abs(RACE.gk - gear) < 0.02) RACE.gk = gear;
     cx.strokeStyle = '#59627a'; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(gx, gy); cx.lineTo(gx, gy + gh); cx.moveTo(gx + gw, gy); cx.lineTo(gx + gw, gy + gh); cx.moveTo(gx, gy + gh / 2); cx.lineTo(gx + gw, gy + gh / 2); cx.stroke();
-    var kx = gx + (gear >= 3 ? gw : 0), ky = gy + (gear % 2 ? 0 : gh); cx.fillStyle = '#ffd24a'; cx.beginPath(); cx.arc(kx, ky, R * 0.26, 0, 7); cx.fill();
+    var gpos = function (g) { return [gx + (g >= 3 ? gw : 0), gy + (g % 2 ? 0 : gh)]; }, gf = Math.floor(RACE.gk), gt = Math.min(4, gf + 1), gq = RACE.gk - gf, pa = gpos(gf), pb = gpos(gt), kx, ky;
+    /* knob path through the H-gate: out to the middle bar, across, then in */
+    if (gq === 0) { kx = pa[0]; ky = pa[1]; } else { var mid = gy + gh / 2; if (gq < 0.33) { kx = pa[0]; ky = pa[1] + (mid - pa[1]) * gq / 0.33; } else if (gq < 0.66) { kx = pa[0] + (pb[0] - pa[0]) * (gq - 0.33) / 0.33; ky = mid; } else { kx = pb[0]; ky = mid + (pb[1] - mid) * (gq - 0.66) / 0.34; } } cx.fillStyle = '#ffd24a'; cx.beginPath(); cx.arc(kx, ky, R * 0.26, 0, 7); cx.fill();
     cx.fillStyle = '#111'; cx.font = '900 ' + Math.round(R * 0.32) + 'px sans-serif'; cx.fillText(String(gear), kx, ky + 1);
     /* heat gauge: fills as engine heat is burned; red = close to a spin */
     var cap = ENGINE0 + (c.xh || 0), used = cap - c.eng, hx = gx + gw + 18, hw = R * 0.5, hy = by + 8, hh = R * 2 - 4, hf = Math.max(0, Math.min(1, used / cap));
