@@ -3728,6 +3728,21 @@ function raceHud(now, W, H) {
     cx.fillStyle = '#2a3140'; rr(hx, hy, hw, hh, 5); cx.fill();
     cx.fillStyle = c.eng <= 1 ? '#ff3b30' : c.eng <= 3 ? '#ff9a2e' : '#ffcf4a'; rr(hx, hy + hh * (1 - hf), hw, hh * hf, 5); cx.fill();
     cx.fillStyle = '#fff'; cx.font = '900 ' + Math.max(11, Math.round(R * 0.3)) + 'px sans-serif'; cx.fillText(String(c.eng), hx + hw / 2, hy + hh / 2);
+    /* next corners: road-sign speed limits that are always on screen (the close camera hides the track's own signs) */
+    var nks = [], np0 = c.pos, tkN = T(G).N;
+    for (var dd = 1; dd <= tkN && nks.length < 2; dd++) { var lm = T(G).corners[(np0 + dd) % tkN]; if (lm) nks.push({ d: dd, limit: climit(G, lm) }); }
+    var sx0 = hx + hw + 12, sw = R * 1.5, pv = RACE.prev;
+    if (nks.length) {
+      cx.fillStyle = 'rgba(8,12,20,.8)'; rr(sx0, by, sw * nks.length + 10, R * 2 + 12, 12); cx.fill();
+      nks.forEach(function (k, i) {
+        var scx = sx0 + 5 + sw * i + sw / 2, scy = by + 6 + R * 0.78, sr = R * 0.62, over = pv && pv.sp != null && k.d <= pv.sp && pv.sp - k.limit - (pv.ul || 0) > 0;
+        cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(scx, scy, sr, 0, Math.PI * 2); cx.fill();
+        cx.lineWidth = sr * 0.22; cx.strokeStyle = over ? '#ff3b30' : '#d62020'; cx.beginPath(); cx.arc(scx, scy, sr * 0.88, 0, Math.PI * 2); cx.stroke();
+        cx.fillStyle = '#111'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(sr * 0.95) + 'px sans-serif'; cx.fillText(String(k.limit), scx, scy + 1);
+        cx.font = '700 ' + Math.max(14, Math.round(R * 0.36)) + 'px sans-serif'; cx.fillStyle = over ? '#ff8a7a' : '#c9d2e3';
+        cx.fillText(over ? '+' + (pv.sp - k.limit - (pv.ul || 0)) + ' heat' : 'in ' + k.d, scx, by + R * 2 + 1);
+      });
+    }
   }
   if (RACE.flash) { var fa = RACE.flashHold ? 0.7 : 1 - (now - RACE.flash) / 700; if (fa > 0) { cx.fillStyle = 'rgba(255,30,20,' + (0.45 * fa).toFixed(2) + ')'; cx.fillRect(0, 0, W, H); } else RACE.flash = 0; }
   lightsDraw(now, W);

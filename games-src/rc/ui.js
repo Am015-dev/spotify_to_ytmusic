@@ -158,7 +158,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <div class="quick"><h3>Quick game</h3>
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
    ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
-   ${seg('Difficulty',[['easy','Easy'],['standard','Standard'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</div>
+   ${seg('Difficulty',[['easy','Easy island'],['standard','Normal'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</div>
    <details class="morep" open><summary>More ways to play</summary>${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
 function cardsHtml(){const t=UI.ctab||'events';const q=(UI.cq||'').toLowerCase();const tabs=[['events','Events'],['adv','Adventures'],['mys','Mysteries'],['beasts','Beasts'],['inv','Inventions'],['items','Items'],['tokens','Discovery tokens'],['tiles','Island tiles'],['scen','Scenarios']];
   let list=[];
@@ -266,9 +266,11 @@ document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.clo
 document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(t)pulsePos(+t.dataset.pos)});
 // ---------- game start ----------
 UI.setup={scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:false,items:2,diff:'standard'};
+// the first real game is on the Easy island (owner 8 Nov: following ✨ lost on day 5-7 on the full deal); Normal afterwards
+try{if(!localStorage.getItem('swi_real1'))Object.assign(UI.setup,{diff:'easy',items:4,dog:true})}catch(e){}
 function openStart(){UI.modal='start';UI.overSeen=false;render();const m=$('#modal');m.hidden=false;m.innerHTML=startHtml();m.dataset.h=''}
 function beginGame(){const s=UI.setup;resetPlanSteps();UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
-  const all=s.chars.every(k=>s.ai[k]);UI.cmpDone=false;newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff,cmp:UI.cmpDef?{id:UI.cmpDef.id,goal:UI.cmpDef.goal,twist:UI.cmpDef.twist}:null,noIntro:!!UI.cmpDef});UI.reportMark=G.logN;V3.layout=null;
+  const all=s.chars.every(k=>s.ai[k]);UI.cmpDone=false;newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff,cmp:UI.cmpDef?{id:UI.cmpDef.id,goal:UI.cmpDef.goal,twist:UI.cmpDef.twist}:null,noIntro:!!UI.cmpDef});if(s.diff==='easy'&&!UI.cmpDef&&typeof easyDeal==='function')easyDeal();try{localStorage.setItem('swi_real1','1')}catch(e){}UI.reportMark=G.logN;V3.layout=null;
   for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;resetPlanSteps();UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
 function boot(){GX.init({key:'swi'});try{GXSK.init({sets:{'sk-acts':['build','camp','explore','gather','hunt','rest','threat'].map(k=>'icon-act-'+k),'sk-res':['food','pfood','wood','fur','shelter','roof','palisade','weapon'].map(k=>'icon-res-'+k)}})}catch(e){}if(typeof PHO!=='undefined')PHO.boot();GX.onClose=id=>{if(id==='rulesd'&&UI.backToStart){UI.backToStart=false;openStart()}};GX.onShow=id=>{if(!G&&id!=='rulesd'&&id!=='cardsd'){GX.close();return}if(id==='cardsd')renderCards();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(G)render()};paintIcons();try{init3D()}catch(e){console.error(e)}gfxBtn();soundBtns&&soundBtns();openStart()}
