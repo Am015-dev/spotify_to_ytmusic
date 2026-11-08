@@ -1,80 +1,57 @@
 {
  "slug": "hollowbough",
- "when": "2026-11-08T02:30Z",
- "secs": 30,
- "totalSecs": 100,
+ "when": "2026-11-08T09:16Z",
+ "secs": 90,
+ "totalSecs": 361,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 35,
+   "count": 31,
    "detail": [
     {
      "kind": "too-short",
      "session": "phone/learn",
-     "text": "Resin Pool: +2 resin Gain 2 resin.",
-     "words": 7,
+     "text": "Foragers Crossing: +2 pebble Gain any 2 resources (twig/resin/pebble/berry, mix allowed).",
+     "words": 11,
      "shownMs": 250,
-     "neededMs": 4700,
+     "neededMs": 5100,
      "cls": "hbtoast"
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 250,
+     "ms": 2990,
      "texts": [
-      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
-      "Resin Pool: +2 resin Gain 2 resin.",
-      "Turn over: Each player takes one action, then the "
+      "Step undone.",
+      "🐇 Hazel Bramble sent a worker. A place without th"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 742,
+     "ms": 1260,
      "texts": [
-      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
-      "Turn over: Each player takes one action, then the "
+      "Step undone.",
+      "🐇 Hazel Great move, the best one."
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 992,
+     "ms": 750,
      "texts": [
-      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
-      "Turn over: Each player takes one action, then the ",
-      "+1 You: point tokens"
+      "Step undone.",
+      "🐇 Hazel Anyone can buy from the meadow. Critters "
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 526,
+     "ms": 3491,
      "texts": [
-      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
-      "Turn over: Each player takes one action, then the ",
-      "+1 Bramble: card points"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
-      "Turn over: All your workers are out, so only a car",
-      "+1 You: point tokens"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 2269,
-     "texts": [
-      "🐇 Hazel Bramble sent a worker. A place without th",
-      "Turn over: All your workers are out, so only a car",
-      "+1 You: point tokens"
+      "Step undone.",
+      "🐇 Hazel A new season! You have 4 workers. Summer "
      ]
     },
     {
@@ -82,8 +59,8 @@
      "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "🐇 Hazel Bramble sent a worker. A place without th",
-      "+1 You: point tokens"
+      "🐇 Hazel Flags are events. Build what one needs, t",
+      "Foragers Crossing: +2 pebble Gain any 2 resources "
      ]
     },
     {
@@ -91,64 +68,97 @@
      "session": "phone/learn",
      "ms": 250,
      "texts": [
-      "🐇 Hazel Your hand holds plans: each shows its pri",
-      "This move: nothing now"
+      "🐇 Hazel All workers are out. Prepare: they come h",
+      "Hostler Hedgehog: +1 point, built When you play a "
      ]
     },
     {
      "kind": "two-at-once",
      "session": "phone/learn",
-     "ms": 2239,
+     "ms": 2000,
      "texts": [
-      "🐇 Hazel The forest pays more goods than the basic",
-      "Turn over: All your workers are out, so only a car",
+      "Step undone.",
+      "🐇 Hazel Shared places take many workers. Rivals s"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 5250,
+     "texts": [
+      "Step undone.",
+      "🐇 Hazel The forest pays more goods. Each spot hol"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 4750,
+     "texts": [
+      "Step undone.",
       "+1 You: card points"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "phone/learn",
+     "session": "phone/play",
+     "ms": 4250,
+     "texts": [
+      "Step undone.",
+      "+1 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 4250,
+     "texts": [
+      "Step undone.",
+      "+1 You: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 4250,
+     "texts": [
+      "Step undone.",
+      "+5 Bramble: card points"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 2259,
+     "texts": [
+      "Step undone.",
+      "🐇 Hazel Fine. Lantern Rest was a bit better."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 1998,
+     "texts": [
+      "Step undone.",
+      "🐇 Hazel Hmm. Lantern Rest was much better."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 4275,
+     "texts": [
+      "Step undone.",
+      "🐇 Hazel Careful: your hand is full at 8. Extra ca"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
      "ms": 250,
      "texts": [
-      "🐇 Hazel A building! It stays in your city. Produc",
-      "Turn over: All your workers are out, so only a car",
-      "+1 You: card points"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 755,
-     "texts": [
-      "🐇 Hazel A building! It stays in your city. Produc",
-      "Turn over: All your workers are out, so only a car"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "🐇 Hazel A building! It stays in your city. Produc",
-      "Turn over: All your workers are out, so only a car",
-      "+1 You: card points"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1481,
-     "texts": [
-      "🐇 Hazel A building! It stays in your city. Produc",
-      "+1 You: card points"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 739,
-     "texts": [
-      "🐇 Hazel Good: the best of 7 moves. +1 point, +1 c",
+      "🐇 Hazel Nice first game! Let us pass here and cou",
       "+1 You: card points"
      ]
     },
@@ -157,109 +167,98 @@
      "session": "pc/learn",
      "ms": 250,
      "texts": [
-      "🐇 Hazel Each turn you send one worker to one plac",
       "Kindling Glen: +2 twig, +1 card Gain 2 twigs and d",
-      "Turn over: Each player takes one action, then the "
+      "+1 You: card points"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/learn",
-     "ms": 478,
+     "ms": 4250,
      "texts": [
-      "🐇 Hazel Each turn you send one worker to one plac",
-      "Turn over: Each player takes one action, then the "
+      "🐇 Hazel Your hand holds plans. Glowing ones are a",
+      "+1 You: card points"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 2493,
+     "session": "pc/play",
+     "ms": 2000,
      "texts": [
-      "🐇 Hazel Twigs, resin, pebbles and berries pay for",
-      "Turn over: Each player takes one action, then the "
+      "Step undone.",
+      "+1 You: card points"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1920,
+     "session": "pc/play",
+     "ms": 2490,
      "texts": [
-      "🐇 Hazel Your hand holds plans: each shows its pri",
-      "Turn over: All your workers are out, so only a car"
+      "Step undone.",
+      "+1 You: point tokens"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
+     "session": "pc/play",
+     "ms": 500,
      "texts": [
-      "🐇 Hazel Every worker is out. Prepare for Season: ",
-      "Turn over: All your workers are out, so only a car"
+      "Step undone.",
+      "+4 Bramble: card points"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 712,
+     "session": "pc/play",
+     "ms": 1212,
      "texts": [
-      "🐇 Hazel Every worker is out. Prepare for Season: ",
-      "Turn over: Each player takes one action, then the "
+      "Step undone.",
+      "+2 You: card points"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 2220,
+     "session": "pc/play",
+     "ms": 2019,
      "texts": [
-      "🐇 Hazel A new season! Seasons run Winter, Spring,",
-      "Turn over: Each player takes one action, then the "
+      "Step undone.",
+      "+2 Bramble: card points"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1000,
+     "session": "pc/play",
+     "ms": 1501,
      "texts": [
-      "🐇 Hazel The meadow is open to everyone. Critters ",
-      "Turn over: Each player takes one action, then the "
+      "Step undone.",
+      "+1 You: point tokens"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
+     "session": "pc/play",
+     "ms": 1755,
      "texts": [
-      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
-      "Turn over: Each player takes one action, then the "
+      "Step undone.",
+      "+2 You: card points"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
+     "session": "pc/play",
+     "ms": 2250,
      "texts": [
-      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
+      "Step undone.",
       "+1 Bramble: point tokens"
      ]
     },
     {
      "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
+     "session": "pc/play",
+     "ms": 3250,
      "texts": [
-      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
-      "+1 You: card points"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 742,
-     "texts": [
-      "🐇 Hazel Poor: Place a worker: Lantern Rest - Send",
-      "Turn over: Each player takes one action, then the ",
-      "+1 You: card points"
+      "Step undone.",
+      "+1 You: point tokens"
      ]
     },
     {
@@ -267,765 +266,1037 @@
      "session": "pc/play",
      "ms": 250,
      "texts": [
-      "Your turn",
-      "Berry Thicket: +2 berry, +1 card Gain 2 berries an",
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
+      "Step undone.",
+      "+2 Bramble: card points"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/play",
-     "ms": 1250,
+     "ms": 4233,
      "texts": [
-      "Bramble's turn",
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
+      "Step undone.",
+      "+1 Bramble: point tokens"
      ]
     },
     {
      "kind": "two-at-once",
      "session": "pc/play",
-     "ms": 847,
+     "ms": 511,
      "texts": [
-      "Your turn",
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 1238,
-     "texts": [
-      "Bramble's turn",
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Turn over: Each player takes one action, then the ",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "+1 Bramble: point tokens",
-      "Turn over: All your workers are out, so only a car",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 509,
-     "texts": [
-      "+1 Bramble: point tokens",
-      "Bramble's turn",
-      "Turn over: All your workers are out, so only a car",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 516,
-     "texts": [
-      "+1 Bramble: point tokens",
-      "Your turn",
-      "Turn over: All your workers are out, so only a car",
-      "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1"
+      "Step undone.",
+      "+2 Bramble: card points"
      ]
     }
    ]
   },
   "b": {
    "status": "FAIL",
-   "count": 14,
+   "count": 48,
    "detail": [
     {
-     "session": "pc/play",
+     "session": "phone/play",
+     "text": "Step undone.",
+     "ms": 5000,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 You: card points",
+     "ms": 4750,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Step undone.",
+     "ms": 4250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 Bramble: card points",
+     "ms": 2237,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 You: card points",
+     "ms": 3230,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
      "text": "+2 You: card points",
-     "ms": 2867,
-     "cls": "hbtoast on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Your turn",
-     "ms": 476,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Berry Thicket: +2 berry, +1 card Gain 2 berries and draw 1 card.",
-     "ms": 250,
-     "cls": "hbtoast",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Bramble's turn",
-     "ms": 1250,
-     "cls": "on rv",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Turn over: Each player takes one action, then the turn moves on (2 workers left). Bramble plays now.",
-     "ms": 1831,
-     "cls": "hbtoast on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Your turn",
-     "ms": 847,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Bramble's turn",
-     "ms": 1238,
-     "cls": "on rv",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1 resin and 1 berry. was much better (+1 twig, +1 resin, +1 berry).",
      "ms": 3750,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
+     "session": "phone/play",
+     "text": "Step undone.",
+     "ms": 4250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 You: card points",
+     "ms": 4750,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Step undone.",
+     "ms": 4250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 You: card points",
+     "ms": 4500,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 Bramble: point tokens",
+     "ms": 1757,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 You: card points",
+     "ms": 3000,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+2 You: card points",
+     "ms": 1750,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+2 Bramble: journey",
+     "ms": 3738,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 Bramble: point tokens",
+     "ms": 4500,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+1 You: card points",
+     "ms": 4750,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+2 Bramble: card points",
+     "ms": 1500,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+3 Bramble: journey",
+     "ms": 4000,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+2 Bramble: card points",
+     "ms": 1512,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "+5 Bramble: card points",
+     "ms": 4739,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Step undone.",
+     "ms": 6500,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
      "session": "pc/play",
-     "text": "Turn over: Each player takes one action, then the turn moves on (1 worker left). Bramble plays now.",
-     "ms": 1773,
+     "text": "+1 You: point tokens",
+     "ms": 4750,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Bramble's turn",
-     "ms": 509,
-     "cls": "rv on",
+     "text": "Step undone.",
+     "ms": 4249,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 You: card points",
+     "ms": 4000,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 Bramble: card points",
+     "ms": 2998,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 You: point tokens",
+     "ms": 4754,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+2 Bramble: card points",
+     "ms": 758,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 You: point tokens",
+     "ms": 2490,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+4 Bramble: card points",
+     "ms": 500,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Step undone.",
+     "ms": 4240,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+2 You: card points",
+     "ms": 4712,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 You: card points",
+     "ms": 1250,
+     "cls": "hbtoast on",
      "tag": "div"
     },
     {
      "session": "pc/play",
      "text": "+1 Bramble: point tokens",
-     "ms": 1968,
+     "ms": 4966,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Turn over: All your workers are out, so only a card, Prepare or Pass is left. Bramble plays now.",
-     "ms": 1161,
+     "text": "+2 You: card points",
+     "ms": 1500,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1 resin and 1 berry. was much better (+1 twig, +1 resin, +1 berry).",
-     "ms": 1161,
+     "text": "+2 Bramble: card points",
+     "ms": 2980,
      "cls": "hbtoast on",
      "tag": "div"
     },
     {
      "session": "pc/play",
-     "text": "Your turn",
-     "ms": 516,
+     "text": "+1 You: point tokens",
+     "ms": 1501,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+2 You: card points",
+     "ms": 1755,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Step undone.",
+     "ms": 7500,
      "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 Bramble: point tokens",
+     "ms": 4758,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+3 You: point tokens",
+     "ms": 2250,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 You: point tokens",
+     "ms": 1495,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 Bramble: card points",
+     "ms": 1489,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 You: point tokens",
+     "ms": 3250,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+2 Bramble: card points",
+     "ms": 250,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 Bramble: point tokens",
+     "ms": 4233,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Step undone.",
+     "ms": 8261,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+2 Bramble: card points",
+     "ms": 750,
+     "cls": "hbtoast on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "+1 Bramble: point tokens",
+     "ms": 1230,
+     "cls": "hbtoast on",
      "tag": "div"
     }
    ]
   },
   "c": {
    "status": "FAIL",
-   "count": 20,
+   "count": 19,
    "detail": [
     {
      "session": "phone/learn",
-     "text": "Each player takes one action, then the turn moves on (1 worker left).",
+     "text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck.",
+     "words": 17,
+     "at": 8030,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bramble: Give 1 berry to You and take 2 point tokens (2 left)",
      "words": 13,
-     "at": 8515,
-     "where": "div.hbtoast.on"
+     "at": 33015,
+     "where": "div."
     },
     {
      "session": "phone/learn",
-     "text": "A place without the Shared mark holds one worker only, so it is closed to you this season.",
-     "words": 18,
-     "at": 11513,
-     "where": "span.tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "All your workers are out, so only a card, Prepare or Pass is left.",
-     "words": 14,
-     "at": 11513,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Your hand holds plans: each shows its price, glowing ones you can afford.",
-     "words": 13,
-     "at": 14509,
-     "where": "span.tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Prepare for Season: they all come home, you gain one more, and production pays.",
-     "words": 14,
-     "at": 17528,
-     "where": "span.tx"
-    },
-    {
-     "session": "phone/learn",
-     "text": "The forest pays more goods than the basic places, but each spot holds one worker.",
+     "text": "Bramble: Play Goodman Vole from the meadow (send away Hostler Hedgehog to cut 3 berries)",
      "words": 15,
-     "at": 20506,
-     "where": "span.tx"
+     "at": 43004,
+     "where": "div."
+    },
+    {
+     "session": "phone/learn",
+     "text": "When you play a Critter you may send this hedgehog away to cut 3 berries off its price.",
+     "words": 18,
+     "at": 54009,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Give up to 2 berries to a rival and take 2 point tokens for each.",
+     "words": 15,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "If paired and you own an Allotment, gain any 1 resource on play and every production.",
+     "words": 16,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Plant this prankster in a rival village; it takes one of their spaces and costs them 2 points.",
+     "words": 18,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bramble: Play Midsummer Green from the meadow (pay 1 twig, 2 resin, 1 pebble)",
+     "words": 14,
+     "at": 67005,
+     "where": "div."
+    },
+    {
+     "session": "phone/play",
+     "text": "Shares a space with a Goodman; if paired, worth 3 extra points at the end.",
+     "words": 15,
+     "at": 32004,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "A worker settles here forever; reveal 4 cards from deck or discard pile and play one free, discarding the rest.",
+     "words": 20,
+     "at": 32005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bramble: Play Flintpit from your hand (pay 1 twig, 1 resin, 1 pebble)",
+     "words": 13,
+     "at": 73005,
+     "where": "div."
+    },
+    {
+     "session": "phone/play",
+     "text": "Each production adds a stack (3 twigs, 2 resin, 1 pebble or 2 berries) to this card; send a worker to haul it all away.",
+     "words": 25,
+     "at": 90005,
+     "where": "div.sm"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Bramble: Play Midsummer Green from the meadow (dismantle Pulley Lift to cut 3 resources)",
+     "words": 14,
+     "at": 58015,
+     "where": "div."
     },
     {
      "session": "pc/learn",
      "text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck.",
      "words": 17,
-     "at": 8028,
+     "at": 65005,
      "where": "div.sm"
     },
     {
-     "session": "pc/learn",
-     "text": "Basic places give goods, the forest gives more, and cards are bought from the meadow.",
+     "session": "pc/play",
+     "text": "Bramble: Swap up to 2 of your resources for any 2 resources from the supply.",
      "words": 15,
-     "at": 8031,
-     "where": "span.tx"
+     "at": 21005,
+     "where": "div."
     },
     {
-     "session": "pc/learn",
-     "text": "Each player takes one action, then the turn moves on (1 worker left).",
-     "words": 13,
-     "at": 10038,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "pc/learn",
-     "text": "A place without the Shared mark holds one worker only, so it is closed to you this season.",
-     "words": 18,
-     "at": 14015,
-     "where": "span.tx"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Your hand holds plans: each shows its price, glowing ones you can afford.",
-     "words": 13,
-     "at": 18010,
-     "where": "span.tx"
-    },
-    {
-     "session": "pc/learn",
-     "text": "All your workers are out, so only a card, Prepare or Pass is left.",
+     "session": "pc/play",
+     "text": "Mimic any one production card in a rival village, as though it were theirs.",
      "words": 14,
-     "at": 19011,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Prepare for Season: they all come home, you gain one more, and production pays.",
-     "words": 14,
-     "at": 21007,
-     "where": "span.tx"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Each player takes one action, then the turn moves on (3 workers left).",
-     "words": 13,
-     "at": 23008,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Each player takes one action, then the turn moves on (2 workers left).",
-     "words": 13,
-     "at": 24084,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Poor: Place a worker: Lantern Rest - Send a worker to play a meadow card for 3 fewer resources.",
-     "words": 19,
-     "at": 29014,
-     "where": "span.tx"
+     "at": 22006,
+     "where": "div.sm"
     },
     {
      "session": "pc/play",
-     "text": "Each player takes one action, then the turn moves on (2 workers left).",
+     "text": "Bramble: Draw 2 cards, keep one, and hand the other to a rival.",
      "words": 13,
-     "at": 25085,
-     "where": "div.hbtoast.on"
+     "at": 61009,
+     "where": "div."
     },
     {
      "session": "pc/play",
-     "text": "Poor: Place a worker: Mixed Glade - Gain 1 twig, 1 resin and 1 berry.",
-     "words": 15,
-     "at": 25085,
-     "where": "b.r-poor"
+     "text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck.",
+     "words": 17,
+     "at": 81008,
+     "where": "div.sm"
     },
     {
      "session": "pc/play",
-     "text": "Each player takes one action, then the turn moves on (1 worker left).",
-     "words": 13,
-     "at": 27009,
-     "where": "div.hbtoast.on"
-    },
-    {
-     "session": "pc/play",
-     "text": "All your workers are out, so only a card, Prepare or Pass is left.",
-     "words": 14,
-     "at": 29119,
-     "where": "div.hbtoast.on"
+     "text": "Reveal 2 cards; you may play one worth up to 3 base points free; discard the other.",
+     "words": 17,
+     "at": 81008,
+     "where": "div.sm"
     }
    ]
   },
   "d": {
    "status": "FAIL",
-   "count": 66,
+   "count": 60,
    "detail": [
     {
      "session": "phone/learn",
-     "text": "Build a woodland city. Outlast the winter.",
+     "text": "Hand 5/8 ›",
      "px": 13,
-     "at": 1254,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Free and direct: your browsers connect to each other. Host a",
-     "px": 13.5,
-     "at": 1255,
-     "where": "p.sm.muted"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Host",
-     "px": 13.5,
-     "at": 1255,
-     "where": "button.btn.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Join",
-     "px": 13.5,
-     "at": 1255,
-     "where": "button.btn.small"
-    },
-    {
-     "session": "phone/learn",
-     "text": "×3",
-     "px": 13,
-     "at": 2569,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/learn",
-     "text": "×2",
-     "px": 13,
-     "at": 2569,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/learn",
-     "text": "2-5",
-     "px": 13,
-     "at": 2569,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/learn",
-     "text": "101",
-     "px": 13,
-     "at": 2569,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "6",
-     "px": 13,
-     "at": 2569,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "You",
-     "px": 13,
-     "at": 2571,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "▢3",
-     "px": 13,
-     "at": 2571,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "⚑2",
-     "px": 13,
-     "at": 2571,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Bramble",
-     "px": 13,
-     "at": 2571,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "▢0",
-     "px": 13,
-     "at": 2571,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "3/15",
-     "px": 13,
-     "at": 2571,
+     "at": 2130,
      "where": "span.scount"
     },
     {
      "session": "phone/learn",
-     "text": "▾ 5/8",
+     "text": "Player · Winter",
      "px": 13,
-     "at": 2571,
-     "where": "button.scount.htog"
+     "at": 8029,
+     "where": "div.sm"
     },
     {
      "session": "phone/learn",
-     "text": "Flintpit",
+     "text": "none",
      "px": 13,
-     "at": 2571,
-     "where": "b.hcn"
+     "at": 8030,
+     "where": "b.l"
     },
     {
      "session": "phone/learn",
-     "text": "×1",
+     "text": "Destination · 2 pt",
      "px": 13,
-     "at": 2571,
-     "where": "b."
+     "at": 8030,
+     "where": "div.sm"
     },
     {
      "session": "phone/learn",
-     "text": "2",
+     "text": "Send a worker to play a meadow card for 3 fewer resources. R",
      "px": 13,
-     "at": 2571,
-     "where": "b."
+     "at": 8030,
+     "where": "div.sm"
     },
     {
      "session": "phone/learn",
-     "text": "⚑1",
+     "text": "Give a rival 2 cards, discard any others you like, then refi",
      "px": 13,
-     "at": 8512,
-     "where": "span."
+     "at": 8030,
+     "where": "div.sm"
     },
     {
      "session": "phone/learn",
-     "text": "100",
+     "text": "Copy any one basic or forest spot, even if it is occupied.",
      "px": 13,
-     "at": 10536,
-     "where": "b."
+     "at": 8030,
+     "where": "div.sm"
     },
     {
      "session": "phone/learn",
-     "text": "▢1",
+     "text": "Hand 7/8 ›",
      "px": 13,
-     "at": 10537,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "98",
-     "px": 13,
-     "at": 11510,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "⚑0",
-     "px": 13,
-     "at": 11511,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "▾ 7/8",
-     "px": 13,
-     "at": 11511,
-     "where": "button.scount.htog"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Goodman Vole",
-     "px": 13,
-     "at": 12504,
-     "where": "b.hcn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Hostler Hedgehog",
-     "px": 13,
-     "at": 12504,
-     "where": "b.hcn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "1",
-     "px": 13,
-     "at": 12504,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Draw pile",
-     "px": 13,
-     "at": 16514,
-     "where": "div.nm"
-    },
-    {
-     "session": "phone/learn",
-     "text": "4",
-     "px": 13,
-     "at": 16515,
-     "where": "span.lt"
-    },
-    {
-     "session": "phone/learn",
-     "text": "3",
-     "px": 13,
-     "at": 16515,
-     "where": "span.lt"
-    },
-    {
-     "session": "phone/learn",
-     "text": "▢4",
-     "px": 13,
-     "at": 20504,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "4/15",
-     "px": 13,
-     "at": 20504,
+     "at": 13003,
      "where": "span.scount"
     },
     {
      "session": "phone/learn",
-     "text": "▾ 6/8",
+     "text": "Hand 4/8",
      "px": 13,
-     "at": 20504,
-     "where": "button.scount.htog"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Goodwife Vole",
-     "px": 13,
-     "at": 20504,
-     "where": "b.hcn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "97",
-     "px": 13,
-     "at": 22515,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "▢2",
-     "px": 13,
-     "at": 22516,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Bramble Allotment",
-     "px": 13,
-     "at": 23517,
-     "where": "b.hcn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "94",
-     "px": 13,
-     "at": 24504,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "7",
-     "px": 13,
-     "at": 24504,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "Build a woodland city. Outlast the winter.",
-     "px": 13,
-     "at": 1254,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "Free and direct: your browsers connect to each other. Host a",
-     "px": 13.5,
-     "at": 1255,
-     "where": "p.sm.muted"
-    },
-    {
-     "session": "phone/play",
-     "text": "Host",
-     "px": 13.5,
-     "at": 1255,
-     "where": "button.btn.small"
-    },
-    {
-     "session": "phone/play",
-     "text": "Join",
-     "px": 13.5,
-     "at": 1255,
-     "where": "button.btn.small"
-    },
-    {
-     "session": "phone/play",
-     "text": "×3",
-     "px": 13,
-     "at": 4286,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/play",
-     "text": "×2",
-     "px": 13,
-     "at": 4286,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/play",
-     "text": "2-5",
-     "px": 13,
-     "at": 4286,
-     "where": "b.bd"
-    },
-    {
-     "session": "phone/play",
-     "text": "109",
-     "px": 13,
-     "at": 4286,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "0",
-     "px": 13,
-     "at": 4286,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "You",
-     "px": 13,
-     "at": 4290,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "▢0",
-     "px": 13,
-     "at": 4290,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "⚑2",
-     "px": 13,
-     "at": 4291,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "Bramble",
-     "px": 13,
-     "at": 4291,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "0/15",
-     "px": 13,
-     "at": 4291,
+     "at": 25003,
      "where": "span.scount"
     },
     {
-     "session": "phone/play",
-     "text": "▾ 5/8",
+     "session": "phone/learn",
+     "text": "Hand 3/8",
      "px": 13,
-     "at": 4291,
-     "where": "button.scount.htog"
+     "at": 31006,
+     "where": "span.scount"
     },
     {
-     "session": "phone/play",
-     "text": "Flintpit",
+     "session": "phone/learn",
+     "text": "Hand 2/8",
      "px": 13,
-     "at": 4291,
-     "where": "b.hcn"
+     "at": 38004,
+     "where": "span.scount"
     },
     {
-     "session": "phone/play",
-     "text": "×1",
+     "session": "phone/learn",
+     "text": "Computer (easy) · Summer",
      "px": 13,
-     "at": 4291,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Production · 1 pt",
+     "px": 13,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gain 2 twigs for every Bramble Allotment in your city.",
+     "px": 13,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Production · 0 pt",
+     "px": 13,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Give up to 2 berries to a rival and take 2 point tokens for ",
+     "px": 13,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Production · 2 pt",
+     "px": 13,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Shares a space with one Goodwife. If paired and you own an A",
+     "px": 13,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Traveler · -2 pt",
+     "px": 13,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Plant this prankster in a rival village; it takes one of the",
+     "px": 13,
+     "at": 57005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Player · Summer",
+     "px": 13,
+     "at": 63004,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Destination · 2 pt · occupied",
+     "px": 13,
+     "at": 63005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Do not trade",
+     "px": 13,
+     "at": 64006,
      "where": "b."
     },
     {
-     "session": "phone/play",
-     "text": "2",
+     "session": "phone/learn",
+     "text": "Computer (easy) · Autumn",
      "px": 13,
-     "at": 4291,
-     "where": "b."
+     "at": 73006,
+     "where": "div.sm"
     },
     {
-     "session": "phone/play",
-     "text": "⚑1",
+     "session": "phone/learn",
+     "text": "Final score",
      "px": 13,
-     "at": 5260,
+     "at": 87004,
      "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "The game is over",
+     "px": 13,
+     "at": 88004,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Hand 8/8 ›",
+     "px": 13,
+     "at": 4031,
+     "where": "span.scount"
     },
     {
      "session": "phone/play",
      "text": "Computer (easy) · Winter",
      "px": 13,
-     "at": 6254,
+     "at": 8007,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "none",
+     "px": 13,
+     "at": 8008,
+     "where": "b.l"
+    },
+    {
+     "session": "phone/play",
+     "text": "Hand 7/8 ›",
+     "px": 13,
+     "at": 9005,
+     "where": "span.scount"
+    },
+    {
+     "session": "phone/play",
+     "text": "Hand 6/8 ›",
+     "px": 13,
+     "at": 11004,
+     "where": "span.scount"
+    },
+    {
+     "session": "phone/play",
+     "text": "Hand 5/8 ›",
+     "px": 13,
+     "at": 12005,
+     "where": "span.scount"
+    },
+    {
+     "session": "phone/play",
+     "text": "Hand 2/8",
+     "px": 13,
+     "at": 21005,
+     "where": "span.scount"
+    },
+    {
+     "session": "phone/play",
+     "text": "Player · Spring",
+     "px": 13,
+     "at": 24006,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Computer (easy) · Spring",
+     "px": 13,
+     "at": 29016,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Traveler · 1 pt",
+     "px": 13,
+     "at": 29016,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Draw 3 cards. Does not use up a city space.",
+     "px": 13,
+     "at": 29016,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Hand 4/8",
+     "px": 13,
+     "at": 30018,
+     "where": "span.scount"
+    },
+    {
+     "session": "phone/play",
+     "text": "Hand 3/8",
+     "px": 13,
+     "at": 32004,
+     "where": "span.scount"
+    },
+    {
+     "session": "phone/play",
+     "text": "Prosperity · 2 pt",
+     "px": 13,
+     "at": 32004,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Shares a space with a Goodman; if paired, worth 3 extra poin",
+     "px": 13,
+     "at": 32005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Destination · 0 pt",
+     "px": 13,
+     "at": 32005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "A worker settles here forever; reveal 4 cards from deck or d",
+     "px": 13,
+     "at": 32005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Add 3 twigs",
+     "px": 13,
+     "at": 58005,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Add 2 resin",
+     "px": 13,
+     "at": 58005,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Add 1 pebble",
+     "px": 13,
+     "at": 58005,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Add 2 berries",
+     "px": 13,
+     "at": 58005,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Computer (easy) · Autumn",
+     "px": 13,
+     "at": 61015,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "5",
+     "px": 13,
+     "at": 85004,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "4",
+     "px": 13,
+     "at": 85004,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "3",
+     "px": 13,
+     "at": 85004,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "2",
+     "px": 13,
+     "at": 85004,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "×",
+     "px": 13,
+     "at": 85004,
+     "where": "button.tchip.tx"
+    },
+    {
+     "session": "phone/play",
+     "text": "Player · Autumn",
+     "px": 13,
+     "at": 90005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "▣4",
+     "px": 13,
+     "at": 90005,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Production · 2 pt",
+     "px": 13,
+     "at": 90005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Each production adds a stack (3 twigs, 2 resin, 1 pebble or ",
+     "px": 13,
+     "at": 90005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "▣3",
+     "px": 13,
+     "at": 90005,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Production · 1 pt",
+     "px": 13,
+     "at": 90005,
+     "where": "div.sm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Gain 2 twigs.",
+     "px": 13,
+     "at": 90005,
      "where": "div.sm"
     }
    ]
   },
   "e": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
+   "status": "FAIL",
+   "count": 5,
+   "detail": [
+    {
+     "session": "pc/learn",
+     "k": "Need 1 twig, 1 resin, 1 pebble|Need 2 pebbles",
+     "at": 12817,
+     "a": "Need 1 twig, 1 resin, 1 pebble",
+     "b": "Need 2 pebbles",
+     "ra": [
+      477,
+      630,
+      178,
+      16
+     ],
+     "rb": [
+      617,
+      630,
+      97,
+      16
+     ]
+    },
+    {
+     "session": "pc/play",
+     "k": "Need 2 twigs, 3 resin, 2 pebbles|Need 1 twig, 2 resin",
+     "at": 6861,
+     "a": "Need 2 twigs, 3 resin, 2 pebbles",
+     "b": "Need 1 twig, 2 resin",
+     "ra": [
+      477,
+      383,
+      195,
+      16
+     ],
+     "rb": [
+      617,
+      383,
+      122,
+      16
+     ]
+    },
+    {
+     "session": "pc/play",
+     "k": "Need 1 twig, 2 resin, 2 pebbles|Need 1 resin",
+     "at": 12854,
+     "a": "Need 1 twig, 2 resin, 2 pebbles",
+     "b": "Need 1 resin",
+     "ra": [
+      477,
+      383,
+      188,
+      16
+     ],
+     "rb": [
+      617,
+      383,
+      77,
+      16
+     ]
+    },
+    {
+     "session": "pc/play",
+     "k": "Need 1 twig, 3 resin, 2 pebbles|Need 2 resin",
+     "at": 19089,
+     "a": "Need 1 twig, 3 resin, 2 pebbles",
+     "b": "Need 2 resin",
+     "ra": [
+      477,
+      383,
+      187,
+      16
+     ],
+     "rb": [
+      617,
+      383,
+      79,
+      16
+     ]
+    },
+    {
+     "session": "pc/play",
+     "k": "Need 2 twigs, 3 resin, 3 pebbles|Need 2 berries",
+     "at": 90113,
+     "a": "Need 2 twigs, 3 resin, 3 pebbles",
+     "b": "Need 2 berries",
+     "ra": [
+      477,
+      383,
+      194,
+      16
+     ],
+     "rb": [
+      617,
+      383,
+      92,
+      16
+     ]
+    }
+   ]
   }
  },
  "notes": [
@@ -1036,46 +1307,46 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 46,
-   "clicks": 71,
-   "endedBy": "time",
+   "secs": 90,
+   "turns": 241,
+   "clicks": 329,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 18
+   "messagesSeen": 23
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 9,
-   "turns": 12,
-   "clicks": 16,
-   "endedBy": "result",
+   "secs": 90,
+   "turns": 249,
+   "clicks": 353,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 0
+   "messagesSeen": 21
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 57,
-   "clicks": 71,
+   "secs": 90,
+   "turns": 190,
+   "clicks": 352,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 18
+   "messagesSeen": 20
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 54,
-   "clicks": 100,
+   "secs": 90,
+   "turns": 219,
+   "clicks": 377,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 14
+   "messagesSeen": 27
   }
  ]
 }
