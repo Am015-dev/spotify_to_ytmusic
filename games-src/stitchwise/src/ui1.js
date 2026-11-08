@@ -60,7 +60,7 @@ function strip(seat) {
   var sc = swScore(G, seat), w = (UI.peek >= 0 ? UI.peek : swWho(G)) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'If it ended now: ' + sc.total + ' points', 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
     h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), thumb(seat), h('b', nameOf(seat)), /* W484: no running score on the plate (it read -157 at the start); the score is in the result and the score drawer */
-    h('span.st', h('span.bt', { html: '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span> buttons', title: 'Buttons' }), false ? h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }) : null, h('span.bt.emp', { title: 'Empty squares, -2 each', html: (artHas('torn-square') ? '<img class="ic torn" alt="" src="' + artUrl('torn-square') + '">' : '') + sc.empty + ' empty' }), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
+    h('span.st', h('span.bt', { html: '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span> button' + (G.btn[seat] === 1 ? '' : 's'), title: 'Buttons' }), false ? h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }) : null, h('span.bt.emp', { title: 'Empty squares, -2 each', html: (artHas('torn-square') ? '<img class="ic torn" alt="" src="' + artUrl('torn-square') + '">' : '') + sc.empty + ' empty' }), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
 }
 // ---------- track
 function trackCols() { return UI.wide ? 9 : 18; }
@@ -185,6 +185,7 @@ function renderDock() {
     dt.textContent = hintsOn() && (UI.wide || !UI.camp) ? UI.rate || trackInfo() : '';
     if (UI.hints && !UI.coach) ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'whatdo' }, 'What should I do?'));
   }
+  try { ringStrip(); } catch (e) { console.error(e); }   // W491: the whole ring, clockwise from the spool
 }
 
 // score drawer: every number's why, on tap only

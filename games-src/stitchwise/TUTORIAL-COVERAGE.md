@@ -1,3 +1,15 @@
+# Stitchwise tutorial coverage (W491: guided first game, replaces the coached half-game below)
+
+"Learn: your first game" is now a guided first game (`tutStart` in `src/ui4.js`). Every step is one line of 12 words or fewer and
+exactly one highlighted thing to tap; wrong taps are refused with a shake. Steps, in order (8 rules):
+1 buy (only the 3 after the spool) - 2 pay (drag, Sew it on) - 3 time and who goes next (watch Marden play) - 4 advance (1 button per space)
+- 5 income (pass a gold spot) - 6 leather (first past it sews it, tap a square) - 7 the 7x7 bonus (fill the gap) - 8 end and scoring
+(score card with your real numbers). "Play a real game" then starts a fresh full game. Later steps jump the fair ahead so each rule
+comes up on cue. Proof: `node tut-walk.js 390x844 [--full] [--shots DIR]` (real touch; asserts order, word count, one highlight,
+a refused wrong tap, the hand-over, and with --full a whole real game to the result).
+
+---
+
 # Stitchwise tutorial coverage (W381, ADDENDUM 4: a coached first game)
 
 The tutorial is the story's prologue and a **real game with free choices from turn 1** against Marden (fixed seed 4242 and patch ring

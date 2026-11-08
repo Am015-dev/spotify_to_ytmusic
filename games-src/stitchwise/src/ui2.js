@@ -14,7 +14,7 @@ function drawGhost() { try { markLanding(); } catch (e) { }
   Array.prototype.forEach.call(q.querySelectorAll('.qc'), function (e, i) { e.classList.toggle('lg', !!lg[i]); });
 }
 function bestPlacement(pid, seat) { return aiBestPlace(G.board[seat], PATCHES[pid]); }
-function selectOffer(k) { if (UI.cdAt && Date.now() - UI.cdAt < 500) return; /* W484: the click that ends a card drag */ if (UI.coach) setTimeout(function () { if (UI.sel >= 0) coachSay('pick', null, true); }, 0);
+function selectOffer(k) { if (!t2Allow('offer', k)) return; if (UI.cdAt && Date.now() - UI.cdAt < 500) return; /* W484: the click that ends a card drag */ if (UI.coach) setTimeout(function () { if (UI.sel >= 0) coachSay('pick', null, true); }, 0);
   var s = swWho(G); if (G.over || UI.busy || !isHuman(s) || G.pend) return; var pid = swOffer(G)[k], p = PATCHES[pid]; if (pid == null) return;
   if (!tutAct({ what: 'offer', k: k })) return;
   if (UI.sel === k) { showPatch(pid); return; }
@@ -25,7 +25,7 @@ function selectOffer(k) { if (UI.cdAt && Date.now() - UI.cdAt < 500) return; /* 
   render();
 }
 function showPatchSoft(pid, k) { var dt = $('#detail'); var p = PATCHES[pid]; if (dt) dt.innerHTML = '<b>' + p.name + '</b>: tap again to read it.'; UI.softK = k; }
-function cancelSel() { UI.sel = -1; render(); }
+function cancelSel() { if (!t2Allow('cancel')) return; UI.sel = -1; render(); }
 function xform(f) { var p = curPatch(), c = curCells(); if (!p) return; var b0 = bbox(c), cx = UI.gx + b0[0] / 2, cy = UI.gy + b0[1] / 2, n = swNorm(c.map(f)), k = JSON.stringify(n), idx = -1; p.or.forEach(function (o, i) { if (JSON.stringify(o) === k) idx = i; }); if (idx < 0) return; UI.o = idx; var b = bbox(n); UI.gx = Math.round(cx - b[0] / 2); UI.gy = Math.round(cy - b[1] / 2); clampG(); sfx('rot'); }
 function rotate() { if (!tutAct({ what: 'rot' })) return; xform(function (q) { return [-q[1], q[0]]; }); snapNear(true); drawGhost(); renderDockLight(); }
 function flip() { if (!tutAct({ what: 'flip' })) return; xform(function (q) { return [-q[0], q[1]]; }); snapNear(true); drawGhost(); renderDockLight(); }
@@ -58,9 +58,9 @@ document.addEventListener('pointerup', cdUp); document.addEventListener('pointer
 function dragTo(ev) { var c = cellAt(ev), cc = curCells(); if (!c || !cc) return; var b = bbox(cc); UI.gx = c[0] - Math.floor(b[0] / 2); UI.gy = c[1] - Math.floor(b[1] / 2) - (DR.touch ? 2 : 0); clampG(); var g = $('#ghost'); if (g) { var cs = UI.cs; g.style.left = UI.gx * cs + 'px'; g.style.top = UI.gy * cs + 'px'; var ok = ghostOk(); g.classList.toggle('ok', ok); g.classList.toggle('bad', !ok); } renderDockLight(); }
 document.addEventListener('keydown', function (e) { if (!G || UI.sel < 0 || GX.open || !UI.started) return; var k = e.key; if (k === 'r' || k === 'R') { rotate(); e.preventDefault(); } else if (k === 'f' || k === 'F') { flip(); e.preventDefault(); } else if (k === 'Enter') { confirmSew(); e.preventDefault(); } else if (k === 'Escape') { cancelSel(); } else if (k.indexOf('Arrow') === 0) { UI.gx += k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0; UI.gy += k === 'ArrowDown' ? 1 : k === 'ArrowUp' ? -1 : 0; clampG(); drawGhost(); e.preventDefault(); } });
 // ---------- moves
-function confirmSew() { if (UI.sel < 0 || UI.busy) return; if (!ghostOk()) { snapNear(false); drawGhost(); if (!ghostOk()) { sfx('bad'); return; } } if (!tutAct({ what: 'buy', k: UI.sel })) return; var m = { t: 'buy', k: UI.sel, o: UI.o, x: UI.gx, y: UI.gy }; UI.sel = -1; act(m); }
-function doAdvance() { if (UI.busy || G.over || G.pend || !isHuman(swWho(G))) return; if (!tutAct({ what: 'adv' })) return; UI.sel = -1; act({ t: 'adv' }); }
-function doLeather(x, y) { if (UI.busy || !tutAct({ what: 'leather' })) return; act({ t: 'leather', x: x, y: y }); }
+function confirmSew() { if (UI.sel < 0 || UI.busy) return; if (!t2Allow('sew')) return; if (!ghostOk()) { snapNear(false); drawGhost(); if (!ghostOk()) { sfx('bad'); return; } } if (!tutAct({ what: 'buy', k: UI.sel })) return; var m = { t: 'buy', k: UI.sel, o: UI.o, x: UI.gx, y: UI.gy }; UI.sel = -1; act(m); }
+function doAdvance() { if (UI.busy || G.over || G.pend || !isHuman(swWho(G))) return; if (!t2Allow('adv')) return; if (!tutAct({ what: 'adv' })) return; UI.sel = -1; act({ t: 'adv' }); }
+function doLeather(x, y) { if (UI.busy || !t2Allow('leather') || !tutAct({ what: 'leather' })) return; act({ t: 'leather', x: x, y: y }); }
 function act(m) {
   if (!G || G.over) return; if (isHuman(swWho(G)) && UI.mode !== 'hot' && (m.t === 'buy' || m.t === 'adv')) { try { UI.rate = rateMove(m); } catch (e) { UI.rate = ''; } } if (isHuman(swWho(G))) { UI.flavor = ''; var tb = $('#turnban'); if (tb) tb.classList.remove('on'); } var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
   var r = swApply(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed (' + r.why + ').'); render(); return; }
@@ -114,7 +114,7 @@ function aiStep() { // the rival's turn, one visible step at a time (caption, fl
 }
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
 // ---------- start / finish
-function newGame(mode, o) { try { ['result-win', 'result-lose'].forEach(function (k) { if (artHas(k)) artImg(k); }); } catch (e) { }
+function newGame(mode, o) { if (mode !== 'tutorial' && T2) t2Clear(); try { ['result-win', 'result-lose'].forEach(function (k) { if (artHas(k)) artImg(k); }); } catch (e) { }
   o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lastWho = -1; UI.rate = ''; UI.again = ''; UI.peek = -1; UI.cap = ''; UI.fast = false; UI.coach = null; if (window.GXCOACH && !o.coach) GXCOACH.running = false; var QS = ((window.CAMPAIGN || {}).story || {}).quick; UI.flavor = mode === 'vs' && !o.camp && !o.coach && QS && QS.intro ? QS.intro[o.lvl || UI.lvl] || '' : ''; UI.lvl = o.lvl || UI.lvl;
   var seed = o.seed != null ? o.seed : (Math.random() * 1e9) | 0; rngUI = swRng(seed + 17); UI.seed = seed;
   G = swNew({ seed: seed, first: o.first != null ? o.first : (UI.mode === 'hot' || UI.tutorial || UI.camp ? 0 : seed % 2), ring: o.ring });
@@ -134,6 +134,7 @@ function loadGame() { try { var s = JSON.parse(localStorage.getItem('sw_save'));
 function hasSave() { try { var s = JSON.parse(localStorage.getItem('sw_save')); return !!(s && s.G && !s.G.over); } catch (e) { return false; } }
 function metrics(g) { var a = swScore(g, 0), b = swScore(g, 1); return { won: swWinner(g) === 0, score: a.total, margin: a.total - b.total, empty: a.empty, bonus: g.bonus === 0 ? 1 : 0, income: g.inc[0], turns: g.turns }; }
 function finish() {
+  if (T2 && G && G.over) return t2Final();   // W491: the guided first game ends on its own score card
   if (!G || !G.over || UI.finished === G) return; UI.finished = G; try { localStorage.removeItem('sw_save'); if (window.GNS && GNS.saved) GNS.saved('stitchwise', false); } catch (e) { }
   var w = swWinner(G);
   if (UI.camp && typeof GXC !== 'undefined') { var g0 = G; showResult({ after: function () { $('#rs').hidden = true; try { campBest(g0); GXC.finish(g0); campResultNote(g0); } catch (e) { console.error(e); } } }); return; }
