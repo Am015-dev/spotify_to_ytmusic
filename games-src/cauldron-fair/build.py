@@ -6,7 +6,7 @@ SP = os.path.abspath(os.path.join(D, '..'))   # games-src
 def rd(p): return open(p, encoding='utf-8').read()
 S = os.path.join(D, 'src')
 parts = sorted((f for f in os.listdir(S) if re.match(r'ui\d+\.js$', f)), key=lambda f: int(re.findall(r'\d+', f)[0]))
-ui = ''.join(rd(os.path.join(S, f)) for f in parts)
+ui = rd(os.path.join(S, 'story-data.js')) + ''.join(rd(os.path.join(S, f)) for f in parts) + rd(os.path.join(S, 'turnlayer.js'))
 open(os.path.join(D, 'ui.js'), 'w', encoding='utf-8').write(ui)
 AUD = os.path.join(D, 'audio')
 SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'gx-viewport.js': os.path.join(SP, 'shell', 'gx-viewport.js'), 'gx-help.js': os.path.join(SP, 'shell', 'gx-help.js'), 'gx-tutor.js': os.path.join(SP, 'shell', 'gx-tutor.js'), 'perfhud.js': os.path.join(SP, 'perf', 'perfhud.js'), 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),

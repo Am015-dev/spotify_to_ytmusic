@@ -42,3 +42,8 @@ for the human's own result was not added. Monster names are not drawn over the 3
 - Best-value badge on the card the advisor picks in the buy step (`BEST VALUE`; off inside the coached game, where the advisor is quiet).
 - Proof: `playable/score.js` PASS at 390x763 and 1440x860 (preview text, pop with rating line, leader mark). Shots: `playable-shots/score-*.webp`.
 - Not measured: the best-value badge was not seen in a shot (needs an affordable good card at a buy step); the rating is a simple value model (2 per star, 1 per energy or heal, 1.5 per damage when it can hit), not a solver.
+
+## W386e: dice tray layout
+- Portrait phones: the six dice sit in a 3 x 2 grid inside the green tray, 64-68px, upright, a word under each face; kept dice are lifted with a gold lock badge. The preview line is above the tray (never over the dice). SMASH! is a real button next to Roll (it used to float over the board, the preview and a die); on desktop too. The turn tracker ("Roll 1 of 3 · ...") is fixed at the top under the score strip, above every bubble; the first-time help bubbles are hidden during the player's roll on phones so only one instruction shows.
+- Checked as a first-time player at 390x763, 375x553 and 1440x860: `playable-shots/layout-*.webp`. On desktop the dice stay in one row of 57px dice (the tray is wide), SMASH sits next to Reroll.
+- Gates: quick build PASS; coached PASS at 390x763 and 1440x860; score.js PASS both sizes; qa-bot story+quick phases: 0 blockers 0 majors, both still hit their time caps without a result (random bot).

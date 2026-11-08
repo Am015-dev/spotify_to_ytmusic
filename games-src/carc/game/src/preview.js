@@ -48,14 +48,18 @@ function pvHighlight(keys) { for (const e of document.querySelectorAll('#world .
 function pvShow(g, x, y) {
   try { const pv = prevCalc(x, y, UI.rot); UI.prev = { t: pv.line }; pvHighlight(pv.hl); if (G && G.cur) renderStatus(); } catch (e) { }
 }
-function pvHide() { UI.prev = null; pvHighlight(null); if (G && G.cur) try { renderStatus(); } catch (e) { } }
+function pvRank(pv) { if (!pv || !pv.badge) return 0; return pv.kind === 'good' && pv.pts > 0 ? 100 + pv.pts : pv.kind === 'bad' && pv.pts < 0 ? 80 - pv.pts : pv.badge === 'grows' ? 30 : pv.badge === 'feeds' ? 20 : 10; }
+function pvHide() { UI.prev = null; let hl = null; if (UI.sel) try { hl = prevCalc(UI.sel.x, UI.sel.y, UI.sel.r).hl; } catch (e) { } pvHighlight(hl); if (G && G.cur) try { renderStatus(); } catch (e) { } }
 // ---------- always-visible score sheet ----------
-function renderSheet() {
+function renderSheet() {   // one compact row; tap it to open the rating line (W426: the sheet never covers the board)
   const el = document.getElementById('sheet'); if (!el || !G) return;
-  const cat = [['road', 'Roads'], ['town', 'Towns'], ['priory', 'Priories'], ['field', 'Fields']];
+  const cat = [['road', 'Road'], ['town', 'Town'], ['priory', 'Priory'], ['field', 'Field']];
   const cell = ([k, nm]) => '<span class="sc"><i>' + nm + '</i>' + G.pl.map(p => '<b style="--c:' + PCOL[p.i] + '">' + (p.sc[k] + p.end[k]) + '</b>').join('<u>–</u>') + '</span>';
-  const r = UI.rating ? '<div class="srate ' + UI.rating.word.toLowerCase() + '"><b>' + UI.rating.word + ':</b> ' + esc(UI.rating.text) + '</div>' : '<div class="srate">Your move is rated here after each turn.</div>';
-  el.innerHTML = '<div class="srow">' + cat.map(cell).join('') + '</div>' + r;
+  const rt = UI.rating, w = rt ? rt.word.toLowerCase() : '';
+  const chip = '<span class="schip ' + w + '">' + (rt ? rt.word : 'Rating') + '<em aria-hidden="true">' + (UI.sheetOpen ? '▴' : '▾') + '</em></span>';
+  const drawer = UI.sheetOpen ? '<div class="srate ' + w + '">' + (rt ? '<b>' + rt.word + ':</b> ' + esc(rt.text) : 'Your move is rated here after each turn.') + '</div>' : '';
+  el.innerHTML = '<button type="button" class="sbtn" aria-expanded="' + !!UI.sheetOpen + '" aria-label="Score by feature and your last move rating">' + cat.map(cell).join('') + chip + '</button>' + drawer;
+  el.firstChild.onclick = () => { UI.sheetOpen = !UI.sheetOpen; clearTimeout(UI.sheetT); if (UI.sheetOpen) UI.sheetT = setTimeout(() => { UI.sheetOpen = false; renderSheet(); }, 5000); renderSheet(); };
 }
 // ---------- rating the move ----------
 function ratingBegin(x, y, r) {   // just before the human places: the computer's best plan and the value of this placement

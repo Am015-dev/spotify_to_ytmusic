@@ -41,11 +41,11 @@
     id: 'pp-play', name: 'Play a bird from hand', ask: 'Tap a bird, a space, then Play.', seed: 11, ls: NOTIPS, when: booted,
     setup: function () {
       begin(11, function (Gx) { var me = Gx.pl[0], b = PP.DATA.birds.find(function (x) { return x.h.indexOf('F') >= 0 && x.c.length === 1 && x.c[0] === 'seed'; }); take(Gx, b.id); me.hand.unshift(b.id); me.food = { grub: 0, seed: 1, fish: 0, berry: 0, rodent: 0 }; });
-      return GXS.wait(function () { return document.querySelector('#hand .bc.glow'); });
+      return GXS.wait(function () { return document.querySelector('#act4 .a4-play'); });
     },
     mut: [{ name: 'food not paid', js: 'var _p=PP.performMove;PP.performMove=function(G2,m,s){var f=JSON.stringify(G2.pl[s].food),r=_p.apply(this,arguments);if(m.t==="play")G2.pl[s].food=JSON.parse(f);return r}' }],
     checks: [{ kind: 'play', name: 'bird moves to the forest and food is paid', snap: function () { return { hand: G.pl[0].hand.length, forest: G.pl[0].board[0].length, food: PP.foodN(G.pl[0]) }; },
-      steps: [{ sel: '#hand .bc.glow' }, { sel: '.slot.next.glow' }, { sel: '#acts [data-a="playgo"]' }],
+      steps: [{ sel: '#act4 .a4-play' }, { sel: '#hand .bc.glow' }, { sel: '.slot.next.glow' }, { sel: '#acts [data-a="playgo"]' }],
       idle: settled, verify: function (b, a) { return (a.hand === b.hand - 1 && a.forest === b.forest + 1 && a.food === b.food - 1) || JSON.stringify([b, a]); } }]
   });
   GXS.add({
