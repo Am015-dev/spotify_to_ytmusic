@@ -175,7 +175,7 @@ function seeTracker() {
   if (prev && prev.length === sc.length) sc.forEach((x, s) => { const o = prev[s], d = x.total - o.total; if (d <= 0) return;
     const why = x.events > o.events ? 'event claimed' : x.cards > o.cards ? 'card points' : x.tokens > o.tokens ? 'point tokens' : x.bonus > o.bonus ? 'bonus' : x.journey > o.journey ? 'journey' : 'points';
     const chip = $('.chip[data-seat="' + s + '"]'); try { if (chip && typeof fxFloat === 'function') fxFloat(frameRect(chip), 'point', '+' + d + ' ' + why, null, { n: 1 }); } catch (e) { }
-    seeToast('hbpop', '<b>+' + d + '</b> ' + (s === v ? 'You' : G.players[s].name) + ': ' + why, 2600, 168); });
+    seeToast('hbpop', '<b>+' + d + '</b> ' + (s === v ? 'You' : G.players[s].name) + ': ' + why, 4600, 168); });
 }
 // ---- "Turn over: why"
 function seeTurnOver() {
