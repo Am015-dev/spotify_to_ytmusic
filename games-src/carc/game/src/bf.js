@@ -6,7 +6,7 @@ const MINC=30,MAXC=118;// cell size in screen pixels
 const FIGICON={f:'meeple',big:'champ',bld:'mason',pig:'hog'};
 AIDELAY=Math.max(AIDELAY,950);   // rival steps are shown one at a time with a caption; tap the board to speed up
 Object.assign(UI,{rot:0,deg:0,turn:-1,stepKey:'',user:false,hint:null,aiT:0,tl:{},mp:{},fxSeen:0,view:{s:.4,x:0,y:0},camp:null,first:false,moved:false,
-  legal:[],rots:[],figs:[],ov:[],setup:{rivals:1,lv:'normal',river:false,ic:false,tb:false},tween:0,overT:0,lastKey:null,humanTurns:0});
+  legal:[],rots:[],figs:[],ov:[],setup:{rivals:1,lv:'easy',river:false,ic:false,tb:false},tween:0,overT:0,lastKey:null,humanTurns:0});
 try{UI.first=localStorage.getItem('rv_seen')!=='1';UI.speed=localStorage.getItem('rv_fast')==='1'?3:1}catch(e){}
 const human=()=>G&&G.pl.some(p=>p.human);
 // Addendum 7: PLAY is clean; HINTS (top-bar toggle, off by default) turns on previews, badges, ratings and the bulb; the coached game always teaches
@@ -113,8 +113,8 @@ function spotWorld(k,l){const T=G.tiles[k],[x,y]=unkey(k),sp=rotP(buildGeo(T.t).
 function renderMeeples(){const live={};
   for(const f of G.figs){const id=f.s+f.k+f.p;live[id]=f;if(UI.mp[id])continue;const k=G.sk[f.s],l=G.sl[f.s],[wx,wy]=spotWorld(k,l);
     const e=document.createElement('div');e.className='mp';e.style.setProperty('--c',PCOL[f.p]);e.innerHTML=pcHtml(FIGICON[f.k],f.p);
-    addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
-  for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];e.classList.add('gone');setTimeout(()=>e.remove(),520)}
+    e._p=f.p;addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
+  for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];flyHome(e)}
   placeOverlay()}
 function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.contains('fglow'))e.remove();
   UI.figs=[];if(!myTurn('fig'))return;const p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
@@ -143,6 +143,14 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
     return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="sl1"><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b></span><span class="sl2"><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}<small> left</small></span>${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</span></div>`}).join('');
   $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span class="lt"><b>${tilesLeft()}</b><small>tiles</small></span>`}
+// feedback: a tile lands with a thud + dust ring; a follower pops, then hops home to its owner's chip
+function thud(k){const e=UI.tl[k];if(!e||UI.reduce)return;const [x,y]=unkey(k),w=$('#world');
+  const d=document.createElement('div');d.className='dust';d.style.left=x*100+'px';d.style.top=y*100+'px';w.appendChild(d);setTimeout(()=>d.remove(),700);
+  const b=boardEl();b.classList.remove('thud');void b.offsetWidth;b.classList.add('thud');setTimeout(()=>b.classList.remove('thud'),260)}
+function flyHome(e){const chip=document.querySelector(`.seat[data-i="${e._p}"]`);if(!chip||UI.reduce||UI.sim||!e.isConnected){e.classList.add('gone');setTimeout(()=>e.remove(),520);return}
+  e.classList.add('homepop','gone','homing');setTimeout(()=>{if(!e.isConnected)return;const b=boardEl().getBoundingClientRect(),c=chip.getBoundingClientRect();e._o=null;
+    e.style.transition='transform .55s cubic-bezier(.5,0,.7,.4),opacity .55s';e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.5)`;e.style.opacity='.15';
+    setTimeout(()=>{bumpSeat(e._p);e.remove()},560)},300)}
 function bumpSeat(i){const e=document.querySelector(`.seat[data-i="${i}"]`);if(e){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
 function hname(t,p){const mine=P(p).human;return `<div class="hname"><b>${mine?'Your tile':esc(P(p).nm)+'’s tile'}</b><span>${esc(TT[t].n)}</span></div>`}
 function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
@@ -220,7 +228,7 @@ function aiNow(){if(UI.capQ&&UI.capQ.length)UI.capQ.length=0;if(UI.aiT){clearTim
 function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n=0;
   for(const f of list){if(UI.coach)try{coachFx(f)}catch(e){console.error(e)}if(f.t==='fig'){const lf=lastFig();if(lf&&lf.p>=0&&!P(lf.p).human)UI.recap=`${lf.nm} took a ${lf.ty}.`}else if(f.t==='turn'&&!P(f.x).human)UI.recap=''}
 
-  for(const f of list){if(f.t==='place')sfx('place');else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
+  for(const f of list){if(f.t==='place'){sfx('place');try{thud(f.x)}catch(e){}buzz(18)}else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
     else if(f.t==='score'){const d=f.x,delay=n++*520;try{capSet(scoreCap(d,false),1500,true)}catch(e){}setTimeout(()=>scorePop(d),delay)}}}
 function featCells(r){const F=G.fd[r];if(!F)return [];if(F.ty==='M')return [[F.x,F.y]];return (F.tiles||[]).map(unkey)}
 function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.length)return;sfx('score');
@@ -229,7 +237,7 @@ function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.len
   const w=d.win.length?d.win:[d.by||0];
   w.forEach((i,j)=>{const e=document.createElement('div');e.className='pop';e.style.setProperty('--c',PCOL[i]);{const F=G.fd[d.r];e.innerHTML='+'+d.pts+'<small>'+(F?FEATW[F.ty]:'')+'</small>'}let dy=-j*30;{const [px,py]=toScreen(cx*100,cy*100);for(let k=0;k<8;k++){const hit=[...$('#ov').querySelectorAll('.pop')].some(o=>{if(!o._o)return false;const [ox,oy]=toScreen(o._o.wx,o._o.wy);return Math.abs(ox+o._o.dx-px)<70&&Math.abs(oy+o._o.dy-(py+dy))<44});if(!hit)break;dy-=46}}addOv(e,cx*100,cy*100,{dy});placeOverlay();
     const chip=document.querySelector(`.seat[data-i="${i}"]`),b=boardEl().getBoundingClientRect();
-    setTimeout(()=>{const o=e._o;if(chip&&!PHONE()){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
+    setTimeout(()=>{const o=e._o;if(chip){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
     setTimeout(()=>{e.remove();try{placeOverlay()}catch(x){}},final?1900:1700)})}
 // ---------- the end: unfinished features score one by one, then the result ----------
 function finalPops(){const fs=finalScores();let n=0;const dets=fs.det.filter(d=>d.ty==='F'?d.n:true).slice(0,10);
