@@ -65,7 +65,7 @@ function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who=
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
   o.innerHTML=`<div class="bfburst"></div><div class="bfd3"><img src="models/door${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()"><i class="bfdust" style="--dx:-90px;--dy:-10px"></i><i class="bfdust" style="--dx:90px;--dy:-24px"></i><i class="bfdust" style="--dx:-50px;--dy:-60px"></i><i class="bfdust" style="--dx:60px;--dy:-70px"></i><i class="bfdust" style="--dx:0px;--dy:-96px"></i></div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
-  document.body.appendChild(o);const dur=4200;let opened=false;
+  document.body.appendChild(o);const tut=typeof tutOn==='function'&&tutOn();const dur=tut?(mine?1700:1000):4200;let opened=false;
   const E=BF.ev=BF.ev||{door0:0,door1:0,card:0};const dimg=o.querySelector('.bfd3 img');
   const open=()=>{if(opened||!o.isConnected)return;opened=true;E.door1=E.door1||performance.now();E.card=performance.now();o.classList.add('open');
     if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click');
