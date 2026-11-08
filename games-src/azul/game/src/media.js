@@ -42,4 +42,8 @@ function boot(){
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin()}catch(e){}},800)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+// idle preload: story-map, help-bubble, cast and alternate-table art is fetched a few seconds after the board shows, so it never pops in later
+(function(){const L=["back-default", "back-guild-seal", "back-lamplight", "camp-bram", "camp-cobb", "camp-garnet", "camp-iris", "camp-nell", "camp-ochre", "camp-saffra", "camp-tamsin", "camp-twins", "camp-umbra", "camp-vesper", "end-lose", "end-win", "table-default", "table-default-phone", "table-prism-light", "table-sun-palace", "table-unmarked-slate", "title-phone", "ui-bubble", "ui-bubble-c", "ui-bubble-tail", "ui-button-cream", "ui-button-cream-c", "ui-button-go", "ui-button-go-c", "ui-button-power", "ui-button-power-c", "ui-drawer-head", "ui-floor-cell", "ui-iconbtn", "ui-iconbtn-k", "ui-node-boss", "ui-node-boss-k", "ui-node-done", "ui-node-done-k", "ui-node-locked", "ui-node-locked-k", "ui-node-open", "ui-node-open-k", "ui-panel", "ui-panel-c", "ui-rack-cell", "ui-rack-frame", "ui-rack-frame-c", "ui-row", "ui-row-c", "ui-topbar", "ui-wall-cell"];
+  const go=()=>{try{if(navigator.connection&&navigator.connection.saveData)return;if(typeof GXSPR!=='undefined'&&GXSPR.weak())return}catch(e){}let i=0;(function nx(){if(i>=L.length)return;pre(L[i++]);setTimeout(nx,60)})()};
+  setTimeout(()=>{(window.requestIdleCallback?(f=>window.requestIdleCallback(f,{timeout:2500})):(f=>setTimeout(f,300)))(go)},4000)})();
 })();
