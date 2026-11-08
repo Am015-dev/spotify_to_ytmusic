@@ -57,9 +57,10 @@ html.ph-p header.gx-bar .gx-ibtn.btn:not([data-gx="dr-menu"]){display:none}
 html.ph-p header.gx-bar [data-gx="dr-menu"]{width:44px;min-width:44px;height:44px;min-height:44px;margin-left:auto}
 html.ph-p header.gx-bar #pchips{display:grid;flex:1;min-width:0;grid-template-columns:repeat(var(--cc,4),minmax(0,1fr));gap:3px;align-self:stretch}
 html.ph-p header.gx-bar .pchip{min-height:0;height:100%;padding:0 3px 1px;border-width:2px;border-top-width:5px;border-radius:7px;box-shadow:none;justify-content:center;overflow:hidden}
-html.ph-p header.gx-bar .pchip b{font-size:13px;line-height:1.05}
+html.ph-p header.gx-bar .pchip b{font-size:14px;line-height:1.05}
 html.ph-p header.gx-bar .pchip.hasn b{padding-right:0}
-html.ph-p header.gx-bar .pchip span{font-size:13px;gap:2px;letter-spacing:-.6px}
+html.ph-p header.gx-bar .pchip span{font-size:14px;font-weight:900;gap:0;letter-spacing:-1.1px;white-space:nowrap}html.ph-p header.gx-bar .pchip{padding-left:2px;padding-right:2px}
+@media (max-width:379px){html.ph-p header.gx-bar .pchip{padding:0 1px 1px}html.ph-p header.gx-bar .pchip span{letter-spacing:-1.1px;gap:0}}
 html.ph-p header.gx-bar .pchip .pn{display:none}
 html.ph-p header.gx-bar .pchip u{top:0;bottom:auto;right:0;font:400 13px/1 Bangers,Impact,sans-serif;padding:1px 3px 0;border-radius:5px 0 4px 0}
 html.ph-p header.gx-bar #pchips[style*="--cc: 5"] .pchip u,html.ph-p header.gx-bar #pchips[style*="--cc: 6"] .pchip u{display:none}
@@ -114,7 +115,12 @@ html.ph #bko .btn{width:100%;min-height:56px;font:400 24px/1 Bangers,Impact,sans
 html.ph .bfintro .you{display:flex;align-items:center;gap:10px;margin:0;font-size:20px}
 html.ph .bfintro .you svg{width:64px;height:64px;flex:none}
 html.ph .bfintro .you b{font:400 28px/1 Bangers,Impact,sans-serif;letter-spacing:.04em;color:var(--mc);-webkit-text-stroke:1.2px #1a1320}
-html.ph #choice .bfintro .goal{font-size:18px;line-height:1.3;margin:6px 0}
+html.ph #choice .bfintro .goal{font-size:16px;line-height:1.3;margin:8px 0 4px}
+html.ph #choice .bfintro .goal .aim{font-size:19px;font-weight:800;margin:0 0 6px;line-height:1.25}
+html.ph #choice .bfintro .goal .how{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+html.ph #choice .bfintro .goal .how li{position:relative;padding-left:20px;font-size:16px;line-height:1.3}
+html.ph #choice .bfintro .goal .how li::before{content:'';position:absolute;left:4px;top:.45em;width:9px;height:9px;border-radius:50%;background:var(--mc,#ffd23f);box-shadow:0 0 0 2px #1a1320}
+html.ph .bfintro .you span{font-size:16px}
 html.ph-p header.gx-bar .pchip.me b{padding-right:24px}
 html.ph #choice.bfpoke{animation:bfPoke .5s}
 @keyframes bfPoke{0%,100%{transform:none}30%{transform:translateY(-8px)}60%{transform:translateY(2px)}}
@@ -148,8 +154,25 @@ html.gxt-on.ph-l .gx-dock[data-bf="buy"] #pacts{grid-template-columns:minmax(0,3
 .gxt-menu{text-align:left}
 .gxt-menu b{display:block}
 .gxt-menu span{display:block;margin-top:2px;font-size:.74em;font-weight:600;opacity:.85;line-height:1.2}
-html.ph .bfintro .you .gxt-menu.tutmini{margin:0 0 0 auto;width:auto;max-width:132px;min-height:36px;padding:3px 8px;border-radius:10px;font-size:12px;line-height:1.1;text-align:center;flex:none}
-html.ph .bfintro .you .gxt-menu.tutmini b{font:800 12px/1.1 Nunito,sans-serif;letter-spacing:0;-webkit-text-stroke:0;color:inherit}
+html.ph .bfintro .you .gxt-menu.tutmini{margin:0 0 0 auto;width:auto;max-width:132px;min-height:44px;padding:3px 8px;border-radius:10px;font-size:14px;line-height:1.1;text-align:center;flex:none}
+html.ph .bfintro .you .gxt-menu.tutmini b{font:800 14px/1.1 Nunito,sans-serif;letter-spacing:0;-webkit-text-stroke:0;color:inherit}
 /* menu test v2: one instruction line at a time (the coach bubble replaces the board line); the chip's YOU tag sat on the name */
 html.ph:has(.gxh-bub.on) #bline{display:none}
 html.ph .pchip u{display:none}
+
+/* W467: race line in the thin strip under the board (portrait phone): the goal, your score and the leader at 15-17px */
+#bfrace{display:none}
+html.ph-p .gx-dock[data-bf] #bfrace:not([hidden]),html.ph-p .gx-dock #bfrace:not([hidden]){display:flex;position:absolute;left:0;right:0;top:0;bottom:var(--sab,0px);align-items:center;justify-content:space-between;gap:8px;padding:0 12px;font:800 15px/1.1 Nunito,sans-serif;color:#fff7dd;white-space:nowrap;overflow:hidden;pointer-events:none}
+html.ph-p #bfrace b{font:400 19px/1 Bangers,Impact,sans-serif;letter-spacing:.04em;color:#ffd23f}
+html.ph-p #bfrace b.h{color:#ff8a8a}
+html.ph-p #bfrace .l{color:#c9f0ff;overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media (max-width:379px){html.ph-p #bfrace{font-size:14px;gap:6px;padding:0 8px}html.ph-p #bfrace b{font-size:17px}}
+/* W467: result table on a phone: four columns at 15px, names in ink with a colour dot (coloured names on cream were unreadable) */
+@media (max-width:560px){
+  html .dlg.paper table.stats{font-size:15px}
+  html .dlg.paper table.stats th{font-size:14px}
+  html .dlg.paper table.stats th:nth-child(n+5),html .dlg.paper table.stats td:nth-child(n+5){display:none}
+  html .dlg.paper table.stats td b{color:#1a1320!important;-webkit-text-stroke:0!important}
+  html .dlg.paper .mast span,html .dlg.paper .cols p{font-size:14px}
+}
+html.ph-p header.gx-bar .pchip span em::first-letter{font-size:11px;letter-spacing:0}
