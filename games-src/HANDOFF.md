@@ -185,3 +185,9 @@ Running: hollowbough W509 (session_01RR7mnaDzgd2f6tQ2xrJQ97) on shelf/W482-hollo
 Shared shell fix committed (tutor dots under Skip): ships with the next build of each game; deploy all approved games in ONE build-all call.
 Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - 18:10 OWNER "run strict reviewers on gameplay and score them": 8 Opus reviewers G1-G8 (review/G<n>-gameplay, rubric games-src/reviews/GAMEPLAY-RUBRIC.md), 23 games. Sessions: G1 ..XKkNsmqtMGRReDni1, G2 ..Ysx9Tw5deqp7qSojW, G3 ..ZmgedzzG91eed3N7N, G4 ..bm4kTbhEYwiQpXzaT, G5 ..Z6d9Pp8CXwGzrvk1u, G6 ..ZXYLxq5J7mweiNUXg, G7 ..YsFyM6u5HYDCGgj8r, G8 ..YqFBKektxQacoKyHn (prefix session_01RR7mn). Compile a score table for the owner; FAILs go back to a fixer worker.
+
+## 19:20 UTC update
+- G4: perch 4.0 (stopper), sands 6.5, lantern 7.0, all FAIL. Fixers: F-perch session_01RR7mnYuasbfM6BQnvnc28o, F-sands session_01RR7mnYd3DLgPyALbQAynK8, F-lantern session_01RR7mnYW9jTP3TVUbFP2gwm.
+- Fixed and archived: stitchwise, vale, short-fuse. R1 re-review (those 3): session_01RR7mnXrTLHozUcvFKKnXVN, branch review/R1-gameplay.
+- Round 2 sent: tidewake (hand at 375, replay speed, Rogue Wave/Deck Cannon), wildmark (salmon D rules case).
+- Next: batch fixed games 3 per fresh re-reviewer (R2, R3...), same rubric; only PASS games go to the owner.
