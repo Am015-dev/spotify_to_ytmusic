@@ -25,7 +25,7 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
     }
     if (st && st.me && !st.choice && st.ph === 'buy' && buys < 40) {
       const k = await p.evaluate(() => { const q = G.pl[G.active]; for (let i = 0; i < G.market.length; i++) if (canBuy(q, i)) return i; return -1 });
-      if (k >= 0 && await L.tapSel(p, `#pshop [data-shop="${k}"], #buymini [data-card="${k}"]`)) { await L.sleep(400); await L.tapSel(p, `#pshop [data-shop="${k}"], #buymini [data-card="${k}"]`); buys++; taps += 2; await L.sleep(900); continue }
+      if (k >= 0 && await L.tapSel(p, `#pshop [data-shop="${k}"], #buymini [data-card="${k}"]`)) { await L.sleep(400); await L.tapSel(p, `#obcard.on [data-obbuy="${k}"], #pshop [data-shop="${k}"], #buymini [data-card="${k}"]`); buys++; taps += 2; await L.sleep(900); continue }
       buys = 99;
     }
     if (st && st.me && st.ph === 'roll' && st.rolls === 2) buys = 0;

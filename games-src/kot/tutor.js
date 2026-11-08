@@ -119,8 +119,8 @@ function tutSteps(){
   if(phone)S.push({id:'shop',title:'Power cards',say:'Spend energy on power cards. Tap this card to read it.',target:tShop(0),wait:{type:'tap',match:x=>x.what==='shopsel'&&x.k===0},
     ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3});
   S.push(
- {id:'buy',title:'Buy it',say:()=>(phone?'Tap it again to buy. ':'Click to buy. ')+'PERMANENT cards stay all game.',target:tShop(0),wait:{type:'tap',match:x=>(x.what==='shopbuy'||x.what==='card')&&x.k===0},
-   ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3&&(!phone||BF.sel===0)},
+ {id:'buy',title:'Buy it',say:()=>phone?'It reads: cards cost 1 ⚡ less. PERMANENT: it stays. Tap Buy.':'Click to buy. PERMANENT cards stay all game.',target:()=>phone&&document.querySelector('#obcard.on [data-obbuy="0"]')||tShop(0)(),wait:{type:'tap',match:x=>(x.what==='shopbuy'||x.what==='card')&&x.k===0},
+   ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3&&(!phone||OB.pinK===0)},
  {id:'power',title:'Card powers',say:()=>CARDS.cosmic.n+': cards cost 1 ⚡ less. ONE-SHOT cards work once.',target:tMe,wait:null,
    ready:()=>myBuy()&&P(0).cards.includes('cosmic')},
  {id:'end1',title:'End your turn',say:'Unspent energy is saved. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
@@ -196,7 +196,7 @@ function storyOpen(){if(typeof GXC==='undefined')return;
   return _ga.apply(this,arguments)}})();
 (function(){const _bt=bfTapCard;bfTapCard=function(k,el){
   if(tutOn()&&!UI._tutIn){const p=cur();if(!phShopOK())return;
-    const what=!canBuy(p,k)?'shopno':obTwo()&&(BF.sel>=0?BF.sel:suggestCard(p))!==k?'shopsel':'shopbuy';
+    const what=!canBuy(p,k)?'shopno':!obWillBuy(k)?'shopsel':'shopbuy';
     if(!GXT.act({type:'tap',what,k}))return;
     UI._tutIn=1;try{return _bt.apply(this,arguments)}finally{UI._tutIn=0}}
   return _bt.apply(this,arguments)}})();

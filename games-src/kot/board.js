@@ -44,7 +44,7 @@ function bfLineText0(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI
     return `Roll ${nk} more, or SMASH`}
   if(G.phase==='buy'&&!G.bug&&p.vp>=GOAL())return GOAL()+'★ reached: End turn to win';
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
-    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or End turn':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to read it':'Not enough ⚡: End turn'}
+    const fk=typeof OB!=='undefined'&&OB.pinK>=0?OB.pinK:-1;return fk>=0&&canBuy(p,fk)?'Tap Buy, or Not now':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to read it':'Not enough ⚡: End turn'}
   return ''}
 function bfLine(){const el=$bf('bline');if(!el)return;const t=BF.flash&&BF.flash.until>bfNow()?BF.flash.t:bfLineText();if(el.textContent!==t)el.textContent=t;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){if(!document.documentElement.classList.contains('pp-hints')||(G&&G.tut))return;ms=Math.max(ms||0,4000+String(t).split(/\s+/).length*100);BF.flash={t,until:bfNow()+ms};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,ms+20)}
@@ -146,7 +146,17 @@ function bfFinger(){const f=$bf('bfinger');if(!f)return;let el=null;
 // the score strip: in the top bar in portrait; landscape keeps its bar buttons and the chips stay in the rail
 function bfPlaceChips(){const bar=document.querySelector('header.gx-bar'),ch=$bf('pchips'),dk=document.querySelector('.gx-dock');if(!bar||!ch||!dk)return;
   if(!PHONE.land){if(ch.parentNode!==bar)bar.insertBefore(ch,bar.querySelector('[data-gx="dr-menu"]'))}else if(ch.parentNode!==dk)dk.insertBefore(ch,$bf('pfeed'))}
-function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfSlowAgain();if(BF.sel>=0&&!phShopOK())BF.sel=-1;
+// G7: when the dice tray sits over Downtown (short phones), a tag above the tray still says who holds the city
+function bfCityTag(){const bd=document.querySelector('.gx-board');if(!bd)return;let el=$bf('bcity');if(!el){el=document.createElement('div');el.id='bcity';el.setAttribute('aria-live','polite');bd.appendChild(el)}
+  const tr=document.querySelector('#dicewrap');let show=false;
+  if(G&&!G.winner&&tr&&tr.offsetParent){const r=tr.getBoundingClientRect(),c=bfCityXY();if(c&&r.width&&c.x>r.left-20&&c.x<r.right+20&&c.y>r.top-30&&c.y<r.bottom+20){show=true;const br=bd.getBoundingClientRect();el.style.top=Math.max(4,r.top-br.top-34)+'px'}}
+  if(!show){el.classList.remove('on');return}
+  const nm=i=>{const q=G.pl[i];return q?(q.i===meSeat()?'You':mname(q)):''};
+  const t=G.city>=0?`👑 Downtown: ${nm(G.city)}${G.bayOn&&G.bay>=0?' + '+nm(G.bay):''}`:'👑 Downtown is empty';
+  if(el.textContent!==t)el.textContent=t;el.classList.add('on')}
+function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();try{bfCityTag()}catch(e){}
+  // G7: the chip tap is taught once, on the first rival turn of a game
+  if(G&&!G.winner&&!G.tut&&G.mode==='solo'&&!humanTurn()&&BF.chipTip!==G.gid&&G.turn>0){BF.chipTip=G.gid;setTimeout(()=>bfFlash('Tip: tap a chip up top to see that monster’s cards',2600),400)}bfRollWatch();bfSlowAgain();if(BF.sel>=0&&!phShopOK())BF.sel=-1;
   const dk=document.querySelector('.gx-dock');const hold=!!(BF.cap&&bfNow()<BF.until);
   if(hold){clearTimeout(BF.holdT);BF.holdT=setTimeout(phRender,BF.until-bfNow()+40)}
   if(dk)dk.dataset.bf=G&&!G.winner?(hold?'resolving':humanTurn()?G.phase:'watch'):'';
@@ -169,7 +179,12 @@ function bfRace(){const dk=document.querySelector('.gx-dock');if(!dk)return;let 
  const _pc=phChips;phChips=function(){_pc.apply(this,arguments);const el=$bf('pchips');if(el&&G&&el.parentNode&&el.parentNode.matches&&el.parentNode.matches('header.gx-bar'))el.style.setProperty('--cc',G.pl.length);if(G&&!G.winner){const me=meSeat();G.pl.forEach(q=>{const c=document.querySelector(`#pchips .pchip[data-pm="${q.i}"]`);const hot=q.alive&&q.vp>=15&&q.i!==me;if(c)c.classList.toggle('hot',hot);
      if(hot&&me>=0&&!(BF.warned||(BF.warned={}))[q.i+':'+G.gid]){BF.warned[q.i+':'+G.gid]=1;setTimeout(()=>bfFlash(`${mname(q)} is close to 20★!`,2200),50)}})}
    // names that do not fit are trimmed (never clipped)
-   document.querySelectorAll('header.gx-bar .pchip b').forEach(b=>{if(b.scrollWidth<=b.clientWidth+1)return;const full=b.textContent;let n=full.length;while(n>2&&b.scrollWidth>b.clientWidth+1){n--;b.textContent=full.slice(0,n)+'…'}});
+   document.querySelectorAll('header.gx-bar .pchip b').forEach(b=>{if(b.scrollWidth<=b.clientWidth+1)return;
+     // a long name is condensed (same font size), and only trimmed if it would have to shrink below 70 %
+     const old=b.querySelector('.nmfit');const t=old?old.textContent:[...b.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('');if(old)old.remove();[...b.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});
+     const nm=document.createElement('var');nm.className='nmfit';nm.textContent=t;b.appendChild(nm);const r=b.clientWidth/nm.offsetWidth;
+     if(r>=.7){nm.style.transform=`scaleX(${Math.min(1,r-.06).toFixed(3)})`;b.classList.add('fit');return}
+     nm.remove();b.appendChild(document.createTextNode(t));const full=t;let n=full.length;while(n>2&&b.scrollWidth>b.clientWidth+1){n--;b.lastChild.textContent=full.slice(0,n)+'…'}});
    if(!BF.snap)return;
    document.querySelectorAll('#pchips .pchip').forEach(c=>{const k=+c.dataset.pm,s=BF.snap[k];if(!s)return;[['h','♥'],['v','★'],['e','⚡']].forEach(([f,sym])=>{if(BF.rel[k+f])return;const em=c.querySelector('em.'+f);if(em)em.textContent=sym+s[f]})})};
  // the tray labels: big words, pips for the rolls left
