@@ -6,11 +6,24 @@ const path = require('path'), fs = require('fs');
 const SIZE = process.argv[2] || 'phone', WHAT = process.argv[3] || 'all';
 const URL = process.argv[4] || 'file://' + path.join(__dirname, 'perch-and-plume.html');
 const VP = SIZE === 'pc' ? { width: 1440, height: 860 } : SIZE === 'land' ? { width: 844, height: 390 } : { width: 390, height: 763 }, TOUCH = SIZE !== 'pc';
-let fails = 0; const log = (ok, m) => { if (!ok) fails++; console.log((ok ? 'PASS ' : 'FAIL ') + SIZE + ' ' + m); };
+const DRAG = !!process.env.DRAG;   // DRAG=1: every move that has a target is DRAGGED (hand -> row, die -> food, tray/deck -> hand, egg -> bird); taps only for choices without a target
+let fails = 0, CDP = null, DRAGS = 0; const log = (ok, m) => { if (!ok) fails++; console.log((ok ? 'PASS ' : 'FAIL ') + SIZE + ' ' + m); };
 async function tap(p, sel) {
   const el = typeof sel === 'string' ? await p.$(sel) : sel; if (!el) throw new Error('no element ' + sel);
   if (!(await el.evaluate(e => !!e.closest('.gxc')).catch(() => false))) await el.scrollIntoViewIfNeeded().catch(() => { });   // story sheets are not scrolled: a real player taps what is on screen
-  if (TOUCH) await el.tap({ timeout: 5000 }); else await el.click({ timeout: 5000 });
+  try { if (TOUCH) await el.tap({ timeout: 5000 }); else await el.click({ timeout: 5000 }); } catch (e) { throw new Error((typeof sel === 'string' ? sel : 'element') + ': ' + e.message.split('\n')[0]); }
+}
+async function drag(p, fromSel, toSel) {
+  const a0 = await p.$(fromSel), b0 = await p.$(toSel); if (!a0 || !b0) throw new Error('no drag element ' + fromSel + ' -> ' + toSel);
+  await a0.scrollIntoViewIfNeeded().catch(() => { }); await p.waitForTimeout(80);
+  const a = await a0.boundingBox(), b = await b0.boundingBox(); if (!a || !b) throw new Error('drag element not visible ' + fromSel);
+  const x0 = a.x + a.width / 2, y0 = a.y + Math.min(a.height / 2, 60), x1 = b.x + b.width / 2, y1 = b.y + b.height / 2 + (TOUCH ? 28 : 6), n = 12;
+  if (TOUCH) {
+    if (!CDP) CDP = await p.context().newCDPSession(p);
+    await CDP.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y: y0 }] });
+    for (let k = 1; k <= n; k++) { await CDP.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 + (x1 - x0) * k / n, y: y0 + (y1 - y0) * k / n }] }); await p.waitForTimeout(10); }
+    await CDP.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  } else { await p.mouse.move(x0, y0); await p.mouse.down(); for (let k = 1; k <= n; k++) { await p.mouse.move(x0 + (x1 - x0) * k / n, y0 + (y1 - y0) * k / n); await p.waitForTimeout(10); } await p.mouse.up(); }
 }
 // one step of the human: returns 'done' | 'wait' | 'acted'
 async function step(p) {
@@ -18,6 +31,7 @@ async function step(p) {
     const vis = s => { const e = document.querySelector(s); return e && !e.hidden && e.getBoundingClientRect().width > 0; };
     if (vis('#result')) return { k: 'result' };
     if (vis('#pass')) return { k: 'pass' };
+    if (vis('#pop') && document.querySelector('#pop .goalc [data-a="popx"]')) return { k: 'sel', s: '#pop [data-a="popx"]' };   // the Goal card before turn 1
     if (vis('#setup') && document.getElementById('keepgo')) return { k: 'keep' };
     if (document.querySelector('.gxc') && getComputedStyle(document.querySelector('.gxc')).display !== 'none' && document.querySelector('.gxc').offsetParent !== null) return { k: 'gxc' };
     if (!G || G.phase === 'over') return { k: 'wait' };
@@ -26,6 +40,14 @@ async function step(p) {
     if (UI.gsDie != null) return { k: 'sel', s: '#acts [data-a="mv"]' };
     const m = PPAI.choose(G, UI.view, 'normal'); if (!m) return { k: 'stuck', why: 'no move q=' + (G.q && G.q.h) };
     const J = s => '[data-m=\'' + JSON.stringify(s) + '\']';
+    if (window.__DRAG) {
+      if (m.t === 'play' && !G.q) return { k: 'drag', a: '#hand .bc[data-i="' + m.i + '"]', b: '.row[data-h="' + m.h + '"] .slot.next' };
+      if (m.t === 'play') return { k: 'drag', a: '#hand .bc[data-i="' + m.i + '"]', b: '.row[data-h="' + m.h + '"] .slot.next' };
+      if (m.t === 'die') return { k: 'drag', a: '.die[data-i="' + m.i + '"]', b: '#foodrow' };
+      if (m.t === 'tray') return { k: 'drag', a: '.bc[data-a="tray"][data-i="' + m.i + '"]', b: '#hand' };
+      if (m.t === 'deck') return { k: 'drag', a: '#deckb', b: '#hand' };
+      if (m.t === 'egg') return { k: 'drag', a: '.ract[data-h="1"]', b: '.bc[data-a="bird"][data-h="' + m.h + '"][data-c="' + m.c + '"]' };
+    }
     if (m.t === 'act') return { k: 'sel', s: '.ract[data-h="' + ['food', 'eggs', 'cards'].indexOf(m.a) + '"]' };
     if (m.t === 'play') { if (UI.sel !== m.i) return { k: 'sel', s: '#hand .bc[data-i="' + m.i + '"]' }; return { k: 'sel', s: '.row[data-h="' + m.h + '"] .slot.next' }; }
     if (m.t === 'die') return { k: 'sel', s: '.die[data-i="' + m.i + '"]' };
@@ -42,6 +64,7 @@ async function step(p) {
   if (st.k === 'pass') { await tap(p, '#passgo'); return 'acted'; }
   if (st.k === 'keep') { await tap(p, '#keepgo'); return 'acted'; }
   if (st.k === 'gxc') return 'gxc';
+  if (st.k === 'drag') { await drag(p, st.a, st.b); DRAGS++; return 'acted'; }
   if (st.k === 'mv') {
     const h = await p.evaluateHandle(m => [...document.querySelectorAll('#acts [data-a="mv"]')].find(b => { const x = JSON.parse(b.dataset.m); return Object.keys(m).every(k => JSON.stringify(x[k]) === JSON.stringify(m[k])); }) || null, st.m);
     const el = h.asElement(); if (!el) throw new Error('no button for ' + JSON.stringify(st.m)); await tap(p, el); return 'acted';
@@ -52,7 +75,7 @@ async function playOut(p, label, maxMs) {
   const t0 = Date.now(); let last = '', since = Date.now(), n = 0;
   while (Date.now() - t0 < maxMs) {
     let r; try { r = await step(p); } catch (e) { log(false, label + ': ' + e.message.split('\n')[0]); return false; }
-    if (r === 'done') { log(true, label + ': reached the result screen after ' + n + ' taps, ' + Math.round((Date.now() - t0) / 1000) + ' s'); return true; }
+    if (r === 'done') { log(true, label + (DRAG ? ' (drag: ' + DRAGS + ' drags)' : '') + ': reached the result screen after ' + n + ' actions, ' + Math.round((Date.now() - t0) / 1000) + ' s'); return true; }
     if (r === 'gxc') return 'gxc';
     if (r === 'acted') n++;
     const fp = await p.evaluate(() => G ? G.turn + ':' + JSON.stringify(G.q && G.q.h) + ':' + G.log.length + ':' + UI.busy : '-');
@@ -66,6 +89,7 @@ async function playOut(p, label, maxMs) {
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: VP, hasTouch: TOUCH, isMobile: TOUCH });
   await ctx.addInitScript(() => { try { localStorage.setItem('gns-prefs', JSON.stringify({ anim: 'fast', ai: 'fast' })); } catch (e) { } });
+  if (DRAG) await ctx.addInitScript(() => { window.__DRAG = 1; });
   const p = await ctx.newPage(); const errs = [];
   p.on('pageerror', e => errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('console ' + m.text()); });
   if (WHAT === 'game' || WHAT === 'all') {
