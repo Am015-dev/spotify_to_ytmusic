@@ -1,3 +1,12 @@
+# W490 (8 Nov 2026): reused owner art + board view (flag body.vg-b2, on; ?b2=0 = old terraces)
+- Art: 116 slots now hold owner art copied from shipwreck-isle, sands-of-qamar, emberclimb, rampart-and-vine, thornbound, hollowbough,
+  tidewake (`python3 reuse-art.py`; table in ASSETS.md). Guardians renamed to match their new figures (data.js GU names).
+- Board (src/ui1.js `mapB2`, style.css W490 block): one painted map (temple floor), sites = round painted places on dotted trails
+  (camp bottom, ruins middle, deep ruins top), guardians stand on their site as big figures, explorer figures stand on sites,
+  research = vertical path at the right (temple on top, notebook/magnifier tokens climb), fanned hand, goods as tokens with words.
+- Tests: drag-test PASS (time budget 180 s; disabled "cannot pay" choice no longer tapped), touch-test updated to the tap+Go flow
+  (`W=375 H=667`, `FULL=1` plays to the result), `node w490-shots.js` makes playable-shots/w490/. smoke.js still uses old #acts (fails on the old build too).
+
 # W477 (8 Nov 2026): one board, real pieces (REVIEW-FIX R1, COPY-FIX, DESIGN-FIX)
 - Play screen = ONE board at every size: score strip, three site terraces (deep ruins, ruins, camp), research track (rows 0-7 + temple), market;
   your tray below (prompt + one button, explorer pawns, goods as "2 coins", hand). No Map/Market/Research tabs, no bottom sheet as the main way.

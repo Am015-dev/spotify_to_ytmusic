@@ -56,12 +56,12 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.waitForFunction(() => myTurn() && !UI.busy, null, { timeout: 30000 });
     let n = 0, t1 = Date.now();
     await p.evaluate(() => { UI.fast = true; });
-    while (Date.now() - t1 < 90000) {
+    while (Date.now() - t1 < 180000)   /* 90 s was flaky on a loaded machine (old build failed too) */ {
       if (await p.evaluate(() => G.phase === 'over')) break;
       const st = await p.evaluate(() => myTurn() ? (G.q ? 'pass' : document.querySelector('.site.glow,#row .cd.glow,#hand .cd.glow') ? 'go' : document.querySelector('#track.glow') ? 'track' : 'pass') : 'wait');
       if (st === 'go') { const c = await ctr('.site.glow') || await ctr('#row .cd.glow') || await ctr('#hand .cd.glow'); await tap(c.x, c.y); await sleep(60); await tap(c.x, c.y); n++; }
       else if (st === 'track') { await tapEl('#track'); await sleep(60); if (!(await tapEl('#gobtn'))) await tapEl('#qbox .btn.go'); n++; }
-      else if (st === 'pass') { if (!(await tapEl('#passbtn'))) await tapEl('#qbox .btn'); }
+      else if (st === 'pass') { if (!(await tapEl('#passbtn'))) await tapEl('#qbox .btn:not([disabled])'); }
       await sleep(60);
     }
     await sleep(800);

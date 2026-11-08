@@ -363,3 +363,78 @@ html.gx-reduce .site .gd,html.gx-reduce .pawn.glow,html.gx-reduce #map.pawnsel .
 
 .rbtns{position:sticky;bottom:-18px;margin:0 -18px -18px;padding:10px 18px 18px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(rgba(10,22,15,0),rgba(10,22,15,.96) 22%);z-index:2}
 .rbox.many .rart{display:none}
+/* ================= W490 board view (body.vg-b2; ?b2=0 = old terraces) =================
+   one painted map with sites as places on trails, a vertical research path, guardians as big figures, a fanned hand */
+body.vg-b2 #bd{grid-template-columns:minmax(0,1fr) 54px;grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"opp opp" "row row" "map track";gap:5px 4px;padding:5px 6px 6px}
+body.vg-b2 #bd.hasart{background-size:cover!important;background-position:center!important;background-blend-mode:normal}
+body.vg-b2 #bd::before{background:radial-gradient(ellipse at 50% 55%,rgba(255,240,200,.05),rgba(10,16,10,.45))}
+body.vg-b2 #map{display:block;position:relative;min-height:250px;border-radius:16px;
+  background:radial-gradient(ellipse at 50% 50%,rgba(250,236,196,.0),rgba(60,40,10,.18));overflow:visible}
+body.vg-b2 #map .trails{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+body.vg-b2 #map .trails path{fill:none;stroke:#6a4318;stroke-width:1.1;stroke-dasharray:1.6 1.8;stroke-linecap:round;vector-effect:non-scaling-stroke;stroke-width:3;opacity:.75}
+body.vg-b2 .msign{position:absolute;left:-4px;writing-mode:vertical-rl;transform:rotate(180deg);font:800 11px/1 var(--gx-font,Georgia,serif);color:#3a240c;background:rgba(246,232,196,.92);border:1.5px solid #6a4318;border-radius:4px 10px 10px 4px;padding:6px 2px;letter-spacing:.03em;pointer-events:none;z-index:1;box-shadow:0 2px 3px rgba(0,0,0,.35)}
+/* a site = a painted round place, its name on a banner, travel cost and loot as tokens */
+body.vg-b2 .site{--sd:56px;position:absolute;width:var(--sd);height:var(--sd);max-width:none;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #f4e6c0;padding:0;overflow:visible;background:#3c5a3f;
+  box-shadow:0 0 0 2px #5a3a14,0 6px 10px rgba(0,0,0,.55);flex:none;z-index:2}
+body.vg-b2 .site .pic{inset:0;border-radius:50%}
+body.vg-b2 .site.l0{--sd:54px}
+body.vg-b2 .site.l2{--sd:58px}
+body.vg-b2 .site .cost{left:-8px;top:-6px;bottom:auto;transform:none;flex-direction:column;padding:1px 3px;border-radius:9px;border:1px solid #6a4318;z-index:3}
+body.vg-b2 .site .cost .ic{width:14px;height:14px}
+body.vg-b2 .site .rew{left:auto;right:-10px;top:-8px;bottom:auto;width:auto;flex-wrap:nowrap;border-radius:10px;padding:0 4px;line-height:18px;background:#2a1a08;border:1.5px solid #f4e6c0;z-index:3}
+body.vg-b2 .site .rew b{font-size:14px}.body.vg-b2 .site .rew .ic{width:14px;height:14px}
+body.vg-b2 .site .nm{display:block;position:absolute;left:50%;top:calc(100% + 1px);transform:translateX(-50%);white-space:normal;text-align:center;width:max-content;font:800 11px/1.1 var(--gx-font,Georgia,serif);color:#3a240c;background:#f4e6c0;border:1px solid #6a4318;border-radius:3px;padding:0 5px;z-index:3;max-width:74px}
+body.vg-b2 .site.hid .nm{display:none}
+body.vg-b2 .site.hid .rew{right:auto;left:50%;transform:translateX(-50%);top:auto;bottom:-9px}
+body.vg-b2 .site .occ{right:-14px;left:auto;top:auto;bottom:4px;width:30px;height:38px;z-index:4;filter:drop-shadow(0 3px 2px rgba(0,0,0,.6))}
+body.vg-b2 .site .occ.hasart{background-size:contain!important;background-position:center bottom!important}
+body.vg-b2 .site .occ.hasart .meep{opacity:0}
+/* guardian: a big figure standing on the site */
+body.vg-b2 .site .gd{left:calc(var(--sd) * -.11);top:auto;right:auto;bottom:34%;width:calc(var(--sd) * 1.22);height:calc(var(--sd) * 1.22);transform-origin:50% 100%;border-radius:50%;border:3px solid #ff8a4a;background:#3a120a;box-shadow:0 0 0 2px #5a1a08,0 0 16px 4px rgba(255,90,40,.7);z-index:3}
+body.vg-b2 .site .gd.hasart{background-size:cover!important}
+body.vg-b2 .site.glow{box-shadow:0 0 0 3px var(--glow),0 0 18px 6px rgba(255,211,106,.8)}
+body.vg-b2 .site.sel{transform:translate(-50%,-50%) scale(1.12);z-index:6}
+body.vg-b2 .site.drophover{transform:translate(-50%,-50%) scale(1.18);z-index:6}
+body.vg-b2.vg-pick #map .site:not(.glow){filter:saturate(.7) brightness(.8)}
+/* research: a vertical path, the temple at the top, your notebook and magnifier climb it */
+body.vg-b2 #track{flex-direction:column;padding:4px 3px;border-radius:14px;background:linear-gradient(rgba(30,22,10,.55),rgba(30,22,10,.55)),url(media/track-bg.webp) center/cover;border:2px solid #c9a35a;gap:2px}
+body.vg-b2 #track .tl{display:block;font-size:11px;padding:0 2px;letter-spacing:0;background:none}
+body.vg-b2 #track .tcs{display:flex;flex-direction:column-reverse;gap:2px;flex:1}
+body.vg-b2 .tc{flex:1;min-height:0;border-radius:8px;background:rgba(244,230,192,.16);padding:1px 0;justify-content:center;flex-direction:row;flex-wrap:wrap;gap:1px}
+body.vg-b2 .tc .tn{font-size:13px;line-height:15px;width:100%}
+body.vg-b2 .tc .tm{min-height:0}
+body.vg-b2 .tc .tm i{width:15px;height:15px;border-radius:50%;border:2px solid var(--pc);background:#f4e6c0 url(media/token-notebook.webp) center/90% no-repeat}
+body.vg-b2 .tc .tm i.mg{background-image:url(media/token-glass.webp)}
+body.vg-b2 .tc.top{background:rgba(217,164,65,.5)}
+/* market: cards laid on the table */
+body.vg-b2 #row .tl{display:none}
+body.vg-b2 #row .cards{gap:4px}
+body.vg-b2 #row .cd{transform:rotate(calc((var(--r,0) - 2.5) * .6deg))}
+:root{--mpic:clamp(34px,6vh,64px)}
+/* tray: explorers as figures, goods as tokens with words, a fanned hand */
+body.vg-b2 .pawn{position:relative}
+body.vg-b2 .pawn .pa{position:absolute;inset:0}
+body.vg-b2 .pawn .pa.hasart{background-size:contain!important;background-position:center bottom!important}
+body.vg-b2 .pawn .pa.hasart+.meep{opacity:0}
+body.vg-b2 .rc .rv .ic{width:24px;height:24px;border-radius:50%}
+body.vg-b2 .rc .rv .ic.hasart svg{display:none}
+body.vg-b2 #hand{gap:0;padding-top:6px}
+body.vg-b2 #hand .cd{margin:0 -5px;transform:rotate(calc(var(--k,0) * 4deg)) translateY(calc(var(--k,0) * var(--k,0) * 2.5px));transform-origin:50% 120%}
+body.vg-b2 #hand .cd.sel{transform:translateY(-16px) scale(1.08);z-index:5}
+@media (max-height:720px) and (max-width:999px){
+  body.vg-b2 #map{min-height:220px}
+  body.vg-b2 .site{--sd:52px}body.vg-b2 .site.l0{--sd:48px}body.vg-b2 .site.l2{--sd:54px}
+  body.vg-b2 .site .nm{font-size:11px}
+  body.vg-b2 #track .tc{min-height:0}body.vg-b2 #track .tl{display:none!important}
+}
+@media (min-width:1000px){
+  body.vg-b2 #bd{grid-template-columns:minmax(0,1fr) 84px minmax(300px,26vw);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"opp opp opp" "map track row";padding:10px 16px;gap:10px 14px}
+  body.vg-b2 .site{--sd:min(110px,11vh)}body.vg-b2 .site.l0{--sd:min(100px,10vh)}body.vg-b2 .site.l2{--sd:min(118px,12vh)}
+  body.vg-b2 .site .nm{font-size:15px;max-width:160px}
+  body.vg-b2 .site .cost .ic,body.vg-b2 .site .rew .ic{width:18px;height:18px}
+  body.vg-b2 .site .occ{width:44px;height:56px;left:-20px}
+  body.vg-b2 .msign{font-size:15px}
+  body.vg-b2 #track .tl{font-size:14px}
+  body.vg-b2 .tc .tn{font-size:16px}body.vg-b2 .tc .tm i{width:20px;height:20px}
+  body.vg-b2 #row .tl{display:block}
+}

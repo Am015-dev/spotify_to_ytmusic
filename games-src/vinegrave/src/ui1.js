@@ -11,7 +11,7 @@ function note(t, ms) { if (UI.mode !== 'tutorial' && UI.prefs.hints) toast(t, ms
 function savePrefs() { try { localStorage.setItem(PREFKEY, JSON.stringify(UI.prefs)); } catch (e) { } document.body.classList.toggle('hints-on', !!UI.prefs.hints); }
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const RICON = { coin: 'coin', compass: 'compass', tablet: 'tablet', arrow: 'arrow', jewel: 'jewel' };
-const WEAK_ART = { 'tr-boot': 1, 'tr-car': 1, 'tr-plane': 1, 'tr-ship': 1, 'res-arrow': 1, 'res-jewel': 1, 'res-coin': 1, 'res-compass': 1, 'res-tablet': 1 };   /* photo icons are mud at 20 px; the drawn glyphs stay */
+const WEAK_ART = { 'tr-boot': 1, 'tr-car': 1, 'tr-plane': 1, 'tr-ship': 1, 'res-arrow': 1, 'res-tablet': 1 };   /* W490: coin, compass, jewel are clear owner-art tokens now */   /* photo icons are mud at 20 px; the drawn glyphs stay */
 function ic(k, label) { let art = RICON[k] ? 'res-' + k : (V.TRAVEL.indexOf(k) >= 0 ? 'tr-' + k : ''); if (WEAK_ART[art]) art = ''; return `<i class="ic" ${art ? 'data-art="' + art + '"' : ''} role="img" aria-label="${esc(label || V.RNAME[k] || V.TNAME[k] || k)}"><svg><use href="#s-${k}"/></svg></i>`; }
 const PL = { coin: 'coins', compass: 'compasses', tablet: 'tablets', arrow: 'arrowheads', jewel: 'jewels' };
 const rw = (k, n) => n === 1 ? V.RNAME[k] : PL[k];
@@ -45,7 +45,7 @@ function siteHTML(x, i, glow, sel) {
     <span class="cost">${x.cost.map(t => ic(t)).join('')}</span>
     <span class="nm">${esc(nm)}</span>
     ${x.guard ? `<span class="gd" data-art="guard-${x.guard}"><svg aria-hidden="true"><use href="#s-guard"/></svg></span>` : ''}
-    ${occ ? `<span class="occ">${pawnSVG(x.occ)}</span>` : ''}
+    ${occ ? `<span class="occ"${x.occ >= 0 ? ` data-art="explorer-${x.occ}"` : ''}>${pawnSVG(x.occ)}</span>` : ''}
     <span class="rew">${rew}</span></button>`;
 }
 // ---------------------------------------------------------------- legal moves for the human who acts now
@@ -64,6 +64,26 @@ function movesFor(k, x) {
   if (k === 'track') return L.filter(m => m.t === 'res' || m.t === 'temple');
   if (k === 'pawn') return L.filter(m => m.t === 'dig' || m.t === 'disc');
   return [];
+}
+// ---------------------------------------------------------------- W490 board view (flag: on by default, ?b2=0 = old terraces)
+/* one painted map: camp at the bottom, ruins in the middle, deep ruins at the top; sites are painted places joined by trails */
+const B2 = !/[?&]b2=0\b/.test(location.search);
+if (B2) document.body.classList.add('vg-b2');
+const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
+  0: [[15, 73], [33, 85], [51, 73], [69, 85], [87, 73]],
+  1: [[15, 41], [33, 53], [51, 41], [69, 53], [87, 41]],
+  2: [[21, 11], [42, 23], [63, 11], [84, 23]]
+};
+function mapB2(gS, S) {
+  const per = { 0: [], 1: [], 2: [] }; G.sites.forEach((x, i) => per[x.lvl].push(i));
+  const pos = {}; [0, 1, 2].forEach(lv => per[lv].forEach((i, k) => { pos[i] = (B2POS[lv][k] || [50, 50]); }));
+  let path = ''; const line = (a, b) => { path += `M${a[0]} ${a[1]}L${b[0]} ${b[1]}`; };
+  per[0].forEach((i, k) => { if (k) line(pos[per[0][k - 1]], pos[i]); const up = per[1][k]; if (up != null) line(pos[i], pos[up]); });
+  per[1].forEach((i, k) => { if (k) line(pos[per[1][k - 1]], pos[i]); const up = per[2][Math.min(per[2].length - 1, Math.round(k * (per[2].length - 1) / Math.max(1, per[1].length - 1)))]; if (up != null) line(pos[i], pos[up]); });
+  per[2].forEach((i, k) => { if (k) line(pos[per[2][k - 1]], pos[i]); });
+  const sign = (t, y) => `<span class="msign" style="top:${y}%">${t}</span>`;
+  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep ruins', 2) + sign('Ruins', 36) + sign('Camp', 69)
+    + G.sites.map((x, i) => siteHTML(x, i, gS[i], S.k === 'site' && S.x === i).replace('<button ', `<button style="left:${pos[i][0]}%;top:${pos[i][1]}%" `)).join('');
 }
 // ---------------------------------------------------------------- render
 function render() {
@@ -84,7 +104,7 @@ function render() {
   const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = 1; });
   if (q && q.h === 'site') VG.moves(G).forEach(m => { if (m.v != null) gS[m.v] = 1; });
   const ter = (lv, label) => `<div class="ter t${lv}"><span class="tl">${label}</span><div class="tiles">${G.sites.map((x, i) => x.lvl === lv ? siteHTML(x, i, gS[i], S.k === 'site' && S.x === i) : '').join('')}</div></div>`;
-  $('#map').innerHTML = ter(2, `Deep ruins · ${V.DISC[2]} compasses to explore`) + ter(1, `Ruins · ${V.DISC[1]} compasses to explore`) + ter(0, 'Camp · dig here for goods');
+  if (B2) $('#map').innerHTML = mapB2(gS, S); else $('#map').innerHTML = ter(2, `Deep ruins · ${V.DISC[2]} compasses to explore`) + ter(1, `Ruins · ${V.DISC[1]} compasses to explore`) + ter(0, 'Camp · dig here for goods');
   $('#map').classList.toggle('pawnsel', S.k === 'pawn');
   // research track: rows 0..8 left to right, the temple last
   const trG = L.some(m => m.t === 'res' || m.t === 'temple');
@@ -125,7 +145,7 @@ function renderTray(L, q, me, actor) {
   qb.hidden = !qh; qb.innerHTML = qh;
   // your explorers (drag one onto a glowing site), then your goods in words
   const canGo = mine && !q && L.some(m => m.t === 'dig' || m.t === 'disc');
-  $('#pawns').innerHTML = [0, 1].map(k => k < me.ex ? `<button type="button" class="pawn mine${canGo ? ' glow' : ''}${S && S.k === 'pawn' && k === me.ex - 1 ? ' sel' : ''}" data-a="pawn" aria-label="Your explorer: drag it to a glowing site">${pawnSVG(UI.view)}</button>` : `<span class="pawn gone" aria-label="Explorer out on the island">${pawnSVG(UI.view, 'out')}</span>`).join('');
+  $('#pawns').innerHTML = [0, 1].map(k => k < me.ex ? `<button type="button" class="pawn mine${canGo ? ' glow' : ''}${S && S.k === 'pawn' && k === me.ex - 1 ? ' sel' : ''}" data-a="pawn" aria-label="Your explorer: drag it to a glowing site"><span class="pa" data-art="explorer-${UI.view}"></span>${pawnSVG(UI.view)}</button>` : `<span class="pawn gone" aria-label="Explorer out on the island">${pawnSVG(UI.view, 'out')}</span>`).join('');
   $('#myres').innerHTML = V.RES.map(k => `<span class="rc${me.res[k] ? '' : ' zero'}"><span class="rv">${ic(k)}<b>${me.res[k]}</b></span><span class="rl">${rw(k, me.res[k] === 1 ? 1 : 2).replace('arrowheads', 'arrows').replace('arrowhead', 'arrow')}</span></span>`).join('');
   let ex = '';
   me.guards.forEach((g, k) => { ex += `<button type="button" class="tag${g.used ? ' used' : ''}" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}"><span class="ic" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></span><span>${g.used ? 'Used' : 'Boon'}</span></button>`; });
@@ -133,7 +153,7 @@ function renderTray(L, q, me, actor) {
   $('#extra').innerHTML = ex; $('#extra').hidden = !ex;
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = 1; });
   $('#hand').classList.toggle('many', me.hand.length > 5);
-  $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q, sel: S && S.k === 'hand' && S.x === i })).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
+  $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q, sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(i - (me.hand.length - 1) / 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
 }
 /* what the selected thing does, in one or two short lines, plus the move a second tap makes */
 function selInfo(S) {
