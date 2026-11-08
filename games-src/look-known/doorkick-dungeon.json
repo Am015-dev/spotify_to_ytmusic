@@ -5,7 +5,12 @@
 "axe_pages": [
 "dk-art-phone.json",
 "dk-board-phone.json",
+"dk-boss-dread-phone.json",
+"dk-boss-inferno-phone.json",
+"dk-boss-pharaoh-phone.json",
 "dk-boss-reveal-phone.json",
+"dk-boss-skygrif-phone.json",
+"dk-boss-tentacles-phone.json",
 "dk-diary-phone.json",
 "dk-fight-bonus-phone.json",
 "dk-gear-up-phone.json",
@@ -15,6 +20,10 @@
 "dk-status-line-phone.json",
 "dk-tips-phone.json",
 "dk-tut-help-phone.json",
+"dk-win-grub-phone.json",
+"dk-win-morwen-phone.json",
+"dk-win-pip-phone.json",
+"dk-win-tansy-phone.json",
 "dk-zoom-phone.json",
 "menu-phone.json",
 "story-scene-phone.json"

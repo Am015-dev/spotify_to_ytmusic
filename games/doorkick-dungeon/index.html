@@ -28,7 +28,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 
 .gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:44px;min-height:44px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
 .gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
-.gx-ibtn .gx-n{font-size:.72rem;opacity:.8}
+.gx-ibtn .gx-n{font-size:.875rem;opacity:.8}
 .gx-ibtn.gx-reopen{position:absolute;right:10px;top:10px;z-index:5;display:none}
 .gx-app.gx-dock-min .gx-ibtn.gx-reopen{display:inline-flex}
 /* popups */
@@ -39,13 +39,13 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
 .gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
 .gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
-.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:40px;min-height:40px;border-radius:10px}
+.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}
 .gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
 /* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
 @media (max-width:999px){
   .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
-  .gx-dock{max-height:var(--gx-sheet-h,46dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-dock{max-height:var(--gx-sheet-h,40dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
   .gx-app.gx-sheet-full .gx-dock{max-height:78dvh}
   .gx-app.gx-dock-min .gx-dock{visibility:visible;max-height:none}
   .gx-app.gx-dock-min .gx-dock-body{display:none}
@@ -701,9 +701,9 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 /* flying cards, floating numbers, rival bubbles, the ghost finger */
 .bffly{position:fixed;left:0;top:0;z-index:105;pointer-events:none}
 .bffly .card{--w:64px;margin:0}
-.bffloat{position:fixed;z-index:106;pointer-events:none;translate:-50% -50%;font:900 26px/1 var(--title);color:#7dffb2;text-shadow:0 2px 0 #000,0 0 10px rgba(0,0,0,.8);animation:bfRise 1.4s ease-out forwards}
+.bffloat{position:fixed;z-index:106;pointer-events:none;translate:-50% -50%;font:900 26px/1 var(--title);color:#7dffb2;text-shadow:0 2px 0 #000,0 0 10px rgba(0,0,0,.8);animation:bfRise 4s ease-out forwards}
 .bffloat.down,.bffloat.bad{color:#ff8a7a}
-@keyframes bfRise{0%{transform:scale(.4);opacity:0}15%{transform:scale(1.3);opacity:1}30%{transform:scale(1)}100%{transform:translateY(-56px);opacity:0}}
+@keyframes bfRise{0%{transform:scale(.4);opacity:0}5%{transform:scale(1.3);opacity:1}10%{transform:scale(1)}85%{transform:translateY(-24px);opacity:1}100%{transform:translateY(-40px);opacity:0}}
 .bfbub{position:fixed;z-index:104;pointer-events:none;max-width:200px;font:700 14px/1.2 var(--ui,system-ui);color:#1a0d06;background:#fff6dc;border:2px solid var(--c);border-radius:12px;padding:5px 10px;box-shadow:0 4px 12px rgba(0,0,0,.5);animation:bfPop .3s cubic-bezier(.2,1.6,.4,1)}
 @keyframes bfPop{from{transform:scale(.3);opacity:0}}
 #bffing{position:fixed;left:0;top:0;z-index:107;pointer-events:none;opacity:0}
@@ -806,6 +806,16 @@ html.bf-clipping .arena .row.mons .mon{visibility:hidden}
 
 /* kick order: board copy of the drawn card hidden until the door has opened */
 html.bf-rev .bfstage .row,html.bf-rev .bfstage .bfcap,html.bf-rev .arena .row.mons{visibility:hidden}
+/* Goal card (bf.js dkGoal) */
+#dkgoal{position:fixed;inset:0;z-index:140;display:grid;place-items:center;padding:16px;background:rgba(10,5,2,.62);animation:bfIn .2s ease-out}
+#dkgoal .dkg{max-width:340px;width:100%;padding:20px 22px 18px;border-radius:14px;color:#2a1a0e;box-shadow:0 18px 50px rgba(0,0,0,.55);text-align:left}
+#dkgoal .dkgk{margin:0 0 4px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#7a2f1c;font-weight:700}
+#dkgoal .dkgw{margin:0 0 12px;font-size:22px;line-height:1.25;font-weight:700}
+#dkgoal ul{margin:0 0 12px;padding-left:20px;font-size:16px;line-height:1.4}
+#dkgoal li{margin:4px 0}
+#dkgoal .dkgy{margin:0 0 14px;font-size:16px}
+#dkgoal .btn{width:100%;min-height:48px;font-size:17px;justify-content:center;text-align:center}
+#phchip,#docktitle{cursor:pointer}
 
 /* ===== the dungeon table: one surface holds the rival seats, the door / fight, your hero + gear and your fanned hand ===== */
 .tbl{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:6px;position:relative}
@@ -1061,6 +1071,74 @@ html:not(.ph) .arena .fbtns{position:sticky;bottom:0;z-index:3}
 /* 9+ cards: slices under 44px, so a card's price tag hides and its name ends in an ellipsis instead of running under the next card */
 html.ph .mine .hand.tight .card:not(:last-child) :is(.gold,.aw){display:none}
 html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
+/* portrait phone, 5+ cards: whole cards in a sideways row (tbl.js tbFan), every word and number at 14px or more */
+html.ph-p .mine .hand.row{--hw:100px;flex-wrap:nowrap}
+html.ph-p .mine .hand.row.scrolls{justify-content:flex-start;overflow-x:auto;overflow-y:hidden}
+html.ph-p .mine .hand.row .card{rotate:0deg;translate:0 -4px}
+html.ph-p .mine .hand.row .card.play,html.ph-p .mine .hand.row .card.sug{translate:0 -12px}
+html.ph-p .mine .hand .card .cn{width:auto;max-width:none;font-size:14px!important;line-height:1.05;letter-spacing:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph-p .mine .hand .card .tag{font-size:15px;font-weight:800}
+html.ph-p .mine .hand .card .tag small{display:none}
+html.ph-p .mine .hand .card .gold{font-size:14px}
+html.ph-p .opps .seat .snm{font-size:14px;letter-spacing:0}
+html.ph-p .opps .seat .sw{font-size:15px}
+html.ph-p .opps .seat .lb{font-size:14px}
+html.ph-p .opps .seat .sg{display:none}
+html.ph .pile .stack .dn{font-size:14px;letter-spacing:0;font-variant:normal;font-variant-caps:normal;text-transform:capitalize;white-space:nowrap}
+html.ph .pile .stack .n{font-size:15px}
+html.ph-p .mine .hand .card .kind,html.ph-p .mine .hand .card .cx{display:none}
+/* feel gate: phone text 14px+ (icon placeholders keep their text, hidden by colour instead of a 0px font) */
+html.dk-lv .mine .lv small,html.dk-slot .gchip .gi,html.dk-curse .gi[data-s=curse],html.dk-gi .opp.seat .gi[data-s=gear],html.dk-slot .mine .slots i{font-size:14px;color:transparent;overflow:hidden;line-height:1;text-indent:0;white-space:nowrap}
+html.ph .gchip,html.ph .gchip b{font-size:14px}
+html.ph .zoom .card .kind,html.ph .zoom .card .gold{font-size:14px}
+html.ph .gxt-n{font-size:14px}
+html.ph .gxh-tx{font-size:14px}
+html.ph .bfrev .bfrc .card .cn{font-size:16px!important}
+html.ph .bfrev .bfrc .card :is(.kind,.gold,.cx){font-size:14px!important}
+html.ph .bfrev .bfrc .card .tag{font-size:18px!important}
+html.ph .card .tag small{display:none!important}
+html.ph .sline .sl1 i{font-size:14px}
+html.ph .arena :is(.sd,.sl,.chip){font-size:14px}
+html.dk-lv .mine .lv small{font-size:14px!important}
+html.ph .arena .card .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph .arena .card :is(.kind,.cx){display:none!important}
+html.ph .arena .card .gold{font-size:14px!important}
+html.ph .arena .card .tag{font-size:16px!important}
+/* the discard piles on a phone are thumbnails: art only (the card is readable when tapped) */
+html.ph .pile :is(.pr,.pl) .card :is(.cn,.kind,.cx,.gold,.tag){display:none!important}
+html.ph .pile.pr .card :is(.cn,.kind,.cx,.gold,.tag),html.ph .pile.pl .card :is(.cn,.kind,.cx,.gold,.tag){display:none!important}
+/* PC: tutorial and help bubbles at 16px+ (game override; the shell stays as it is) */
+html:not(.ph) .gxh-bub{max-width:min(380px,calc(100vw - 16px))}
+html:not(.ph) .gxh-bub .gxh-tt{font-size:17px}
+html:not(.ph) .gxh-bub .gxh-tx{font-size:16px;line-height:1.35}
+html:not(.ph) .gxh-bub .gxh-ok{font-size:16px}
+html:not(.ph) .gxt-n,html:not(.ph) .gxt-pill{font-size:16px}
+@media (max-height:600px){html.ph-p .mine .hand.row{--hw:84px}}
+/* phone: cards in motion and small card views show the name and art only, names at 14px */
+html.ph :is(.bffly,.bfstage,.tableau,.empty+.row) .card :is(.kind,.cx){display:none!important}
+html.ph :is(.bffly,.bfstage,.tableau,.empty+.row) .card .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph :is(.bffly,.bfstage,.tableau,.empty+.row) .card :is(.gold,.tag){font-size:14px!important}
+html.ph .sl,html.ph .small{font-size:14px}
+html.ph .card.bfghost :is(.kind,.cx){display:none!important}
+html.ph .card.bfghost .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph .card.bfghost :is(.gold,.tag){font-size:14px!important}
+html.ph .sl,html.ph span.small,html.ph .small{font-size:14px!important}
+/* phone: cards flying in from the decks (gfx.js .ghost) */
+html.ph .ghost .card :is(.kind,.cx){display:none!important}
+html.ph .ghost .card .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph .ghost .card :is(.gold,.tag){font-size:14px!important}
+/* PC: the kind line never runs under the price tag in the art's corner */
+html:not(.ph) .card .kind{box-sizing:border-box;padding-right:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html:not(.ph) .card .cx{margin-top:8px}
+/* phone fight row: a bonus card's +N is already on the score line; a monster keeps its level gem with a one-line name */
+html.ph .arena .card:not(.t-monster) .tag{display:none!important}
+html.ph .arena .card.t-monster .cn{-webkit-line-clamp:1!important}
+/* portrait phone, 6+ cards: the overlapping fan; a covered card shows its art and number, the top card shows everything */
+html.ph-p .mine .hand:not(.row) .card:not(:last-child) :is(.cn,.gold){display:none!important}
+/* PC: the price tag sits clear of the kind line */
+html:not(.ph) .card .aw .gold{translate:0 -8px}
+/* phone hand names: up to 3 lines, long words break, so no name is cut */
+html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:anywhere;hyphens:auto}
 
 </style>
 <style>
@@ -1078,7 +1156,7 @@ html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
 .gxc-screen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;width:100%;max-width:560px;margin:0 auto}
 .gxc-map-on .gxc-screen{justify-content:flex-start;padding:0;max-width:640px}
 .gxc-dim{color:var(--gxc-dim)}
-.gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
+.gxc-small{font-size:14px;margin:6px 0 0;text-align:center}
 .gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
 .gxc-row.wrap{flex-wrap:wrap}
 .gxc-btn{min-height:46px;min-width:88px;padding:8px 21px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
@@ -1087,7 +1165,7 @@ html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
 .gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
 .gxc-btn.ghost{background:rgba(255,255,255,.22)}
 .gxc-ib{min-height:44px;min-width:44px;padding:4px 21px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap;flex:0 0 auto}
-.gxc-tag{display:inline-block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
+.gxc-tag{display:inline-block;font-size:14px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
 /* portraits: image or emoji badge in a painted ring */
 .gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 55%),var(--gxc-ptc);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.5),0 6px 16px rgba(0,0,0,.3)}
@@ -1114,7 +1192,7 @@ html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
 .gxc-act{position:absolute;left:12px;right:12px;height:38px;margin-top:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:linear-gradient(90deg,transparent,rgba(60,38,14,.82) 15%,rgba(60,38,14,.82) 85%,transparent);color:#fbefd6;z-index:2;text-align:center;line-height:1.1}
 .gxc-act b{font-size:14px;letter-spacing:.04em}
-.gxc-act small{font-size:13px;line-height:1.25;opacity:.85;white-space:normal;max-width:100%;padding:0 18px}
+.gxc-act small{font-size:14px;line-height:1.25;opacity:.85;white-space:normal;max-width:100%;padding:0 18px}
 .gxc-node{position:absolute;transform:translateX(-50%);width:64px;height:64px;padding:0;border:0;background:none;z-index:3;display:flex;flex-direction:column;align-items:center}
 .gxc-disc{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff8ec;
   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%),var(--gxc-a1);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.55),0 5px 10px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5)}
@@ -1129,8 +1207,8 @@ html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
 .gxc-node.next .gxc-disc{animation:gxc-pulse 1.6s ease-in-out infinite}
 @keyframes gxc-pulse{0%,100%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 0 rgba(242,185,59,.7)}50%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 10px rgba(242,185,59,0)}}
 .gxc-node .gxc-stars{position:absolute;top:50px;left:50%;transform:translateX(-50%);gap:0;padding:0 4px;border-radius:99px;background:rgba(60,38,14,.75)}
-.gxc-node .gxc-st{font-size:13px}
-.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:13.5px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
+.gxc-node .gxc-st{font-size:14px}
+.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:14px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
   background:rgba(246,230,194,.88);padding:3px 8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .gxc-node.lab-l .gxc-lab{left:auto;right:66px;text-align:right}
 .gxc-node.locked .gxc-lab{opacity:.65}
@@ -1148,11 +1226,11 @@ html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
 @keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
 .gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
 .gxc-sh-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
-.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
+.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
 .gxc-goal,.gxc-twist{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;margin:6px 0;text-align:left;width:100%;font-size:15px;line-height:1.3}
 .gxc-goal{background:rgba(79,138,75,.16);border:1px solid rgba(79,138,75,.45)}
 .gxc-twist{background:rgba(142,59,70,.12);border:1px solid rgba(142,59,70,.5)}
-.gxc-goal b,.gxc-twist b{font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+.gxc-goal b,.gxc-twist b{font-size:14px;text-transform:uppercase;letter-spacing:.07em}
 .gxc-twist b{color:var(--gxc-a3)}
 .gxc-twist.big{font-size:16px;border-width:2px}
 .gxc-slist{list-style:none;margin:8px 0 0;padding:0;width:100%;text-align:left;font-size:14.5px}
@@ -1164,7 +1242,7 @@ html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
 /* ---- story scene ---- */
 .gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
   background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;max-width:100%}
-.gxc-sc-title{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
+.gxc-sc-title{font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
 .gxc-sc-who{margin-bottom:8px}
 .gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
 .gxc-sc-text{font-size:18px;line-height:1.4;margin:10px 0 12px;min-height:3.2em;max-width:30em;cursor:pointer}
@@ -1176,19 +1254,19 @@ html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}
 .gxc-boss-on.a1{background:radial-gradient(100% 60% at 50% 30%,#2d5a2c 0%,#0f1a0e 75%)}
 .gxc-boss-on.a2{background:radial-gradient(100% 60% at 50% 30%,#6a4318 0%,#1a120a 75%)}
 .gxc-boss{border:3px solid var(--gxc-gold);position:relative;padding-top:14px}
-.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:13px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:14px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
 .gxc-boss .gxc-pt{border-color:var(--gxc-gold)}
 .gxc-boss h2{margin:12px 0 2px;font-family:var(--gxc-head);font-size:26px;line-height:1.1}
 .gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
 /* ---- result ---- */
 .gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
 .gxc-res-on.has-art{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.72)),var(--gxc-art) center/cover no-repeat}
-.gxc-res-k{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
+.gxc-res-k{font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
 .gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
 .gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
-.gxc-quote b{font-size:13px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
+.gxc-quote b{font-size:14px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
 .gxc-unl{width:100%;margin-top:10px;text-align:left;padding:10px 12px;border-radius:12px;border:2px dashed #c9a14a;background:rgba(242,185,59,.14)}
-.gxc-unl>b{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.gxc-unl>b{display:block;font-size:14px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
 .gxc-unl-i{padding:3px 0;font-size:15px}
 /* short phones (375x553): tighter scene, smaller portraits */
 @media (max-height:600px){
@@ -1207,20 +1285,20 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 /* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
    Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
 :root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
-.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(300px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
 .gxh-bub.on{visibility:visible}
 .gxh-bub *{box-sizing:border-box}
 .gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
-.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:14px}
 .gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
 .gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
 .gxh-bub .gxh-sp svg{width:100%;height:100%}
 .gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
-.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 14px/1 var(--gxh-font);min-height:44px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
 .gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
 /* 44 px tap box, same 32 px look: the extra 6 px is a transparent border pulled back with negative margin */
 .gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px;margin-right:-6px}
-.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:44px;display:inline-flex;align-items:center}
 .gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
 .gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
 .gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
@@ -1239,7 +1317,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
 .gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
 .gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
-.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-x{position:absolute;right:4px;top:4px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
 .gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
 .gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
 .gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
@@ -1254,22 +1332,22 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
 .gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
 .gxh-pics svg{width:64px;height:64px}
-.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics figcaption{font:800 14px/1.1 var(--gxh-font);text-align:center;max-width:76px}
 .gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
 .gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
 .gxh-set>span{flex:1 0 90px;font-weight:700}
-.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button{min-height:44px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
 .gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
 @keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
 @media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
-@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:14px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
-.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:14px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
@@ -1289,15 +1367,15 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bub.gxt-bub{z-index:calc(var(--gxt-z) + 4);animation:gxh-in .18s ease-out both}
 .gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
 .gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
-.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
+.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
 .gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
 .gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
 .gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
 .gxt-dots i.done{background:#c99a35}
 .gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
 .gxt-n{opacity:.85;white-space:nowrap}
-.gxt-skip{flex:0 0 auto;min-height:28px;padding:0 10px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);cursor:pointer}
-.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 13px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
+.gxt-skip{flex:0 0 auto;min-height:44px;padding:0 12px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 14px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
 .gxt-end{position:fixed;inset:0;z-index:calc(var(--gxt-z) + 10);display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,6,.7);box-sizing:border-box}
 .gxt-endc{box-sizing:border-box;width:min(340px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;padding:18px 16px 16px;border-radius:18px;background:var(--gxh-bg,#f3e6bf);color:var(--gxh-ink,#231a10);border:3px solid var(--gxh-accent,#c99a35);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font,inherit)}
 .gxt-ek{align-self:center;width:46px;height:46px;border-radius:50%;background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc);font:800 28px/46px var(--gxh-font,inherit)}
@@ -1309,7 +1387,13 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @keyframes gxt-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.025);opacity:.75}}
 @keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
-@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{height:30px}}
+@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{min-height:44px}}
+/* the between-steps wait: three pulsing dots, no words (gx-tutor.js tick) */
+.gxt-pill.gxt-wait{display:flex;gap:6px;align-items:center;padding:9px 14px}
+.gxt-pill.gxt-wait i{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.35;animation:gxtDot 1s infinite ease-in-out}
+.gxt-pill.gxt-wait i:nth-child(2){animation-delay:.15s}.gxt-pill.gxt-wait i:nth-child(3){animation-delay:.3s}
+@keyframes gxtDot{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+@media (prefers-reduced-motion:reduce){.gxt-pill.gxt-wait i{animation:none;opacity:.8}}
 
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
@@ -1563,8 +1647,26 @@ html:not(.ph) #prompt .tip{font-size:16px}
 html body,html body *{font-family:var(--gx-body)!important}
 html body :is(h1,h2,h3,h4,.gx-title,.title,.logo,.ttl,.gxc-htitle,.gxc-htitle *,.gxc-title,.gxt-et){font-family:var(--gx-title)!important;font-weight:700;letter-spacing:.02em}
 /* menu text floor: the small print under a button and labels never go under 13 px */
-html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(13px,1em)}
-html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(13px,.9em)}
+html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(14px,1em)}
+html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(14px,.9em)!important}
+/* ===== D0: shared floors for every game (loaded last) ===== */
+/* type scale: 16 body on phones, nothing under 14; touch targets 44; calm motion */
+html:root body :is(.gx-ibtn,.gx-sb,.gx-tg,.gxc-btn,.gxc-ib,.gxh-set button,.gxt-b,.gx-goal-go,.gx-bar .gx-ibtn){min-height:44px;min-width:44px}
+html body :is(.gxc-lab,.gxc-st,.gxh-pics figcaption,.gxt-n,.gxt-skip,.gxt-pill){font-size:max(14px,1em)}
+html body :is(.gx-drawer-body p,.gx-drawer-body li,.gx-dock-body p,.gx-dock-body li){font-size:max(14px,1em)}
+html body :is(.gxc-sheet,.gxc-scene,.gxc-res,.gx-drawer) :is(p,li,small){color:inherit}
+/* text over painted art: a soft dark halo keeps 4.5:1 when the art is busy */
+html.sk .gx-bar .gx-ibtn,html.sk .gx-bar{text-shadow:0 1px 2px rgba(0,0,0,.75)}
+html.sk .gxc-act b,html.sk .gxc-act small{text-shadow:0 1px 3px rgba(0,0,0,.9)}
+/* panels never swallow the art on phones: docks are capped, sheets slide not fade */
+@media (max-width:999px) and (orientation:portrait){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),44dvh)}}
+@media (max-width:999px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+/* calm motion: no looping pulses for people who asked for less, nothing flashes faster than ~1 Hz */
+@media (prefers-reduced-motion:reduce){
+  html body :is(.gxh-ring,.gxt-ring,.gxc-node.next .gxc-disc,.gxh-bub,.gxt-bub){animation:none!important}
+  html body *{scroll-behavior:auto!important}
+}
+html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
 </style>
 </head>
 <body>
@@ -2433,6 +2535,29 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'fn', name: 'hand count line keeps its words (>= 12 px)', fn: function () { var e = document.querySelector('.mine .str'); return !e || parseFloat(getComputedStyle(e).fontSize) >= 12 || 'strength line ' + getComputedStyle(e).fontSize; } }
     ]
   });
+
+  // owner media that only shows at the end of a game or on a boss: one scenario each, so the runtime audit (scripts/play-usage.js) and the owner can open them
+  ['Pip', 'Morwen', 'Grub', 'Tansy'].forEach(function (hero, i) {
+    GXS.add({
+      id: 'dk-win-' + hero.toLowerCase(), name: hero + ' wins: the 3D hero on the end screen', ask: 'Does ' + hero + ' stand on the end screen?', ls: { dkd_offer: '1' }, seed: 60 + i, when: booted, group: 'Art',
+      setup: function () {
+        table(60 + i); P(0).nm = hero; P(0).lvl = 10; G.winner = 'P1'; G.winText = hero + ' reaches level 10!'; UI.pause = true; render();
+        return new Promise(function (r) { setTimeout(r, 900); });
+      },
+      checks: [{ kind: 'fn', name: hero + ' is on the end dialog (3D canvas or the @512 picture)', fn: function () { return !!document.querySelector('#modal .win3d') || 'no hero on the end dialog'; } }]
+    });
+  });
+  ['inferno', 'tentacles', 'pharaoh', 'skygrif', 'dread'].forEach(function (k, i) {
+    GXS.add({
+      id: 'dk-boss-' + k, name: 'Boss clip: ' + k, ask: 'Does the ' + k + ' boss clip play?', ls: { dkd_offer: '1' }, seed: 70 + i, when: booted, group: 'Art',
+      setup: function () {
+        table(70 + i); P(0).lvl = 3; UI.pause = false; try { GXH.setEnabled(false); } catch (e) { }
+        var boss = idOf(k); pull(boss); G.door.push(boss); G.phase = 'main'; G.active = 0; UI.pause = true; render();
+        return new Promise(function (r) { setTimeout(function () { var d = document.querySelector('.bfdoor'); if (d) d.click(); setTimeout(r, 500); }, 300); });
+      },
+      checks: [{ kind: 'fn', name: 'the ' + k + ' clip element is there', fn: function () { return !!document.getElementById('bfclip') || document.querySelector('.arena .row.mons .card') ? true : 'neither clip nor monster card'; } }]
+    });
+  });
 })();
 
 </script>
@@ -2993,7 +3118,11 @@ const GX={key:'gx',open:null,
   }
   // ------------------------------------------------------------------ one step: wait for it, show it, advance on the right action
   function draw() {   // (re)build the visible pieces for the current step at the current layout
-    var st = S.step, hs = holesOf(st); clearVisuals();
+    var st = S.step, hs = holesOf(st);
+    // a redraw for the same step keeps its bubble element (it only moves): a rebuilt bubble reads as a message that vanished unread
+    var keep = hs && S.bub && S.bub.dataset.step === String(st.id || S.i) && S.say === stepText(st, 'say') ? S.bub : null;
+    if (keep) S.vis = (S.vis || []).filter(function (e) { return e !== keep; });
+    clearVisuals();
     var v = vp();
     if (!hs) { S.phase = 'pend'; S.key = ''; drawWaiting(); return false; }
     var H = hs.map(function (r) { return inflate(r, st.pad != null ? st.pad : 6, v); });
@@ -3006,6 +3135,7 @@ const GX={key:'gx',open:null,
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
     }
     var say = stepText(st, 'say'), title = stepText(st, 'title');
+    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side); return true; }
     var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
     b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
       (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
@@ -3031,7 +3161,7 @@ const GX={key:'gx',open:null,
     if (S.phase === 'pend') {
       var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
       var hs = rdy ? holesOf(st) : null;
-      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill', esc(st.pending || 'Watch the board'))); S.pill.setAttribute('role', 'status'); } return; }
+      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill gxt-wait', '<i></i><i></i><i></i>')); S.pill.setAttribute('role', 'status'); S.pill.setAttribute('aria-label', st.pending || 'Watch the board'); /* no words: a short wait must not be text that vanishes unread */ } return; }
       if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
       if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
       return;
@@ -3049,6 +3179,7 @@ const GX={key:'gx',open:null,
   }
   function next() {
     if (!S || S.phase !== 'show' || S.step.wait) return;
+    if (S.shownAt && Date.now() - S.shownAt < 600) return;   // the tail of the previous gesture, not a tap on Next
     try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
     advance();
   }
@@ -3066,6 +3197,8 @@ const GX={key:'gx',open:null,
     if (!S || S.phase === 'end') return true;
     a = a || {};
     if (S.phase !== 'show') return a.type === 'event' ? true : false;
+    // a tap within 600 ms of a new bubble is the tail of the previous gesture (its click landing on a button that just appeared): ignore it
+    if (a.type !== 'event' && S.shownAt && Date.now() - S.shownAt < 600) return false;
     var st = S.step, w = st.wait;
     if (a.type === 'event') {
       if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
@@ -3229,6 +3362,27 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+/* gx-glb-boot.js (inlined in the game): after the page has loaded, fetch models/gx3d.js (three + gx-glb + gx-glb-view, built by
+   scripts/make-gx3d.py) and let it swap the 3D render pictures for the real GLB models. Skipped on weak devices / no WebGL: the
+   @512 pictures stay (also on a software GL such as SwiftShader). ?glb=0 turns it off, ?glb=1 forces it past every check. */
+window.GXGLBQ = window.GXGLBQ || [];
+(function () {
+  var u = location.search; if (/[?&]glb=0/.test(u)) return;
+  try {
+    var n = navigator, weak = (n.deviceMemory && n.deviceMemory <= 2) || (n.hardwareConcurrency && n.hardwareConcurrency <= 2) || (n.connection && n.connection.saveData);
+    if (weak && !/[?&]glb=1/.test(u)) return;
+    var c = document.createElement('canvas'), gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return;
+    var di = gl.getExtension('WEBGL_debug_renderer_info'), rn = di ? String(gl.getParameter(di.UNMASKED_RENDERER_WEBGL)) : '';
+    var soft = /swiftshader|llvmpipe|software|basic render/i.test(rn);   // a software rasteriser would make the live models slow: keep the pictures
+    var x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext();
+    if (soft && !/[?&]glb=1/.test(u)) return;
+  } catch (e) { return; }
+  function go() { var s = document.createElement('script'); s.src = 'models/gx3d.js'; s.async = true; s.onerror = function () { }; document.head.appendChild(s); }
+  if (document.readyState === 'complete') setTimeout(go, 300); else addEventListener('load', function () { setTimeout(go, 300); });
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
@@ -3253,7 +3407,7 @@ const GX={key:'gx',open:null,
 
   // ------------------------------------------------------------------ validation (node-safe)
   var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
-  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter', 'relic'];
   function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
   GXC.validate = function (data) {
     var bad = [], add = function (m) { bad.push(m); };
@@ -5129,77 +5283,77 @@ const L=(ref,n,x,o)=>Object.assign({ref,d:'tr',t:'level',n,x:x||'Go up a level. 
 const CARDS=[
 // ---- classes and races (generic fantasy archetypes keep their plain names) ----
 {ref:'dk-warrior',k:'warrior',d:'door',t:'class',cls:'warrior',n:'Warrior',art:'warrior',cp:3,x:'Berserk: in a fight, discard up to 3 cards, +1 each. You win ties.'},
-{ref:'dk-wizard',k:'wizard',d:'door',t:'class',cls:'wizard',n:'Wizard',art:'wizard',cp:3,x:'Flight: discard up to 3 cards, +1 each to run away. Charm: discard your whole hand to send one lone monster away and take its treasure (no level).'},
-{ref:'dk-thief',k:'thief',d:'door',t:'class',cls:'thief',n:'Thief',art:'thief',cp:3,x:'Backstab: discard a card to give a fighter -2 (once per victim per fight). Steal: discard a card to try for a small item: roll 4+, or lose a level.'},
-{ref:'dk-cleric',k:'cleric',d:'door',t:'class',cls:'cleric',n:'Cleric',art:'cleric',cp:3,x:'Resurrection: instead of kicking a new door, take the top door discard and discard a card. Turning: discard up to 3 cards against undead, +3 each.'},
+{ref:'dk-wizard',k:'wizard',d:'door',t:'class',cls:'wizard',n:'Wizard',art:'wizard',cp:3,x:'Flight: discard up to 3 cards, +1 each to run away. Charm: discard your whole hand (3+ cards). One monster leaves. Take its treasure, no level.'},
+{ref:'dk-thief',k:'thief',d:'door',t:'class',cls:'thief',n:'Thief',art:'thief',cp:3,x:'Backstab: discard a card to give a fighter -2. Once per victim per fight. Steal: discard a card to try for a small item. Roll 4+, or lose a level.'},
+{ref:'dk-cleric',k:'cleric',d:'door',t:'class',cls:'cleric',n:'Cleric',art:'cleric',cp:3,x:'Resurrection: take the top door discard instead of kicking. Then discard a card. Turning: discard up to 3 cards against undead, +3 each.'},
 {ref:'dk-elf',k:'elf',d:'door',t:'race',race:'elf',n:'Elf',art:'elf',cp:3,x:'+1 to run away. Go up a level for each monster you help someone kill.'},
 {ref:'dk-dwarf',k:'dwarf',d:'door',t:'race',race:'dwarf',n:'Dwarf',art:'dwarf',cp:3,x:'Carry any number of Big items. Hold up to 6 cards.'},
 {ref:'dk-halfling',k:'halfling',d:'door',t:'race',race:'halfling',n:'Halfling',art:'half',cp:3,x:'-1 to run away. Once per turn, sell one item for double its price.'},
 {ref:'dk-mixed',k:'mixed',d:'door',t:'special',sp:'half',n:'Mixed Heritage',cp:2,x:'You may have two races. With one race, you get its perks and none of its drawbacks.'},
 {ref:'dk-double',k:'double',d:'door',t:'special',sp:'super',n:'Double Major',cp:2,x:'You may have two classes. With one class, you get its perks and none of its drawbacks.'},
 // ---- monsters (37) ----
-M('dk-horde','The Endless Goblin Horde',10,3,'+6 against Dwarves (it is a long story).','Roll a die: 1–2 and you are trampled to death, otherwise lose that many levels.',[['orcs']],{vs:[{race:'dwarf',b:6}],k:'horde'}),
-M('dk-amazon','Shieldmaiden Champion',8,2,'Never attacks a woman: a female fighter just gets 1 treasure from her.','Lose your class(es); with no class, lose 3 levels.',[['clsOr',3]],{sp:'amazon',k:'amazon'}),
-M('dk-hatmuncher','Hairy Hat-Muncher',12,3,'+3 against Dwarves and Halflings.','Flattens you and eats your hat: lose the headgear you wear.',[['item','headW']],{vs:[{race:'dwarf',b:3},{race:'halfling',b:3}],k:'hatmuncher'}),
+M('dk-horde','The Endless Goblin Horde',10,3,'+6 against Dwarves (it is a long story).','Roll a die. On 1–2 you are trampled to death. Otherwise lose that many levels.',[['orcs']],{vs:[{race:'dwarf',b:6}],k:'horde'}),
+M('dk-amazon','Shieldmaiden Champion',8,2,'Never attacks a woman. A female fighter just gets 1 treasure.','Lose your class(es); with no class, lose 3 levels.',[['clsOr',3]],{sp:'amazon',k:'amazon'}),
+M('dk-hatmuncher','Hairy Hat-Muncher',12,3,'+3 against Dwarves and Halflings.','Flattens you and eats your hat. Lose the headgear you wear.',[['item','headW']],{vs:[{race:'dwarf',b:3},{race:'halfling',b:3}],k:'hatmuncher'}),
 M('dk-inferno','Horned Inferno',18,5,'Won’t chase anyone of level 4 or lower.','You are toasted to a crisp. Dead.',[['death']],{lv:2,nop:4,k:'inferno'}),
 M('dk-mites','Pinch Mites',1,1,'You can’t run away from them.','Lose your armor and everything worn below the waist.',[['item','armor','all'],['item','below','all']],{sp:'noescape',k:'mites'}),
 M('dk-slurper','Sock Slurper',1,1,'+4 against Elves.','Lose the footgear you wear; with none, lose a level.',[['itemOr','footW',1]],{vs:[{race:'elf',b:4}],k:'slurper'}),
-M('dk-leech','Kissy Leech',8,2,'+6 against Elves.','It kisses your face off, hat and all: lose all headgear and a level.',[['item','head','all'],['lvl',1]],{vs:[{race:'elf',b:6}],k:'leech'}),
-M('dk-sniffer','Hovering Sniffer',10,3,'Bribe it with an item worth 200 gold or more to make it leave. A garlic gargle kills it outright.','You can’t escape it, nothing helps: lose 3 levels.',[['lvl',3]],{sp:'nose',k:'sniffer'}),
+M('dk-leech','Kissy Leech',8,2,'+6 against Elves.','It kisses your face off, hat and all. Lose all headgear and a level.',[['item','head','all'],['lvl',1]],{vs:[{race:'elf',b:6}],k:'leech'}),
+M('dk-sniffer','Hovering Sniffer',10,3,'Bribe it with an item worth 200+ gold. Then it leaves. A garlic gargle kills it outright.','You can’t escape it, nothing helps: lose 3 levels.',[['lvl',3]],{sp:'nose',k:'sniffer'}),
 M('dk-toads','Kamikaze Toads',2,1,'-1 to run away.','They bite: lose 2 levels.',[['lvl',2]],{runm:-1,k:'toads'}),
 M('dk-pergola','Menacing Pergola',8,2,'Nobody can help you against it.','Lose 3 levels.',[['lvl',3]],{sp:'nohelp',k:'pergola'}),
 M('dk-pyramid','Jiggling Pyramid',2,1,'+1 to run away.','Drop all your Big items.',[['item','big','all']],{runm:1,k:'pyramid'}),
 M('dk-gnawers','Grave Gnawers',8,2,'No items or bonuses count against them: fight with your level alone.','Your level drops to the lowest level at the table.',[['lowest']],{sp:'lvlonly',k:'gnawers'}),
 M('dk-sirens','Off-Key Sirens',4,2,'+5 against Wizards.','Their singing is awful: lose 2 levels.',[['lvl',2]],{vs:[{cls:'wizard',b:5}],k:'sirens'}),
-M('dk-skygrif','Stampeding Skygrif',16,4,'Won’t chase anyone of level 3 or lower.','You drop things as you flee: each other player takes one treasure card from your table or hand.',[['hippo']],{lv:2,nop:3,k:'skygrif'}),
-M('dk-pitchman','Timeshare Pitchman',14,4,'Your level doesn’t count: fight him with bonuses only.','You sign up: lose 1,000 gold worth of items, or all of them.',[['gold',1000]],{sp:'bonusonly',k:'pitchman'}),
-M('dk-pharaoh','Pharaoh Wrappington',16,4,'Undead. Won’t chase level 3 or lower; anyone higher who flees loses 2 levels even when they get away.','Lose all your items and your whole hand.',[['item','any','all'],['hand','all']],{lv:2,nop:3,undead:true,sp:'escape2',k:'pharaoh'}),
+M('dk-skygrif','Stampeding Skygrif',16,4,'Won’t chase anyone of level 3 or lower.','You drop things as you flee. Each rival takes one of your treasure cards.',[['hippo']],{lv:2,nop:3,k:'skygrif'}),
+M('dk-pitchman','Timeshare Pitchman',14,4,'Your level doesn’t count: fight him with bonuses only.','You sign up. Lose 1,000 gold worth of items, or all of them.',[['gold',1000]],{sp:'bonusonly',k:'pitchman'}),
+M('dk-pharaoh','Pharaoh Wrappington',16,4,'Undead. Won’t chase level 3 or lower. Anyone higher who flees loses 2 levels, even if they escape.','Lose all your items and your whole hand.',[['item','any','all'],['hand','all']],{lv:2,nop:3,undead:true,sp:'escape2',k:'pharaoh'}),
 M('dk-imp','Limping Imp',1,1,'+1 to run away.','A whack with its crutch: lose a level.',[['lvl',1]],{runm:1,k:'imp'}),
 M('dk-rooster','Furious Rooster',2,1,'Beat it with fire or flame and gain an extra level.','Painful pecking: lose a level.',[['lvl',1]],{sp:'fire',k:'rooster'}),
-M('dk-lizards','Litigation Lizards',6,2,'Never attack a Thief (professional courtesy): a Thief may instead swap 2 treasures in hand for 2 new ones.','An injunction: starting on your left, each player draws a card from your hand; discard the rest.',[['lawyer']],{sp:'lawyer',k:'lizards'}),
-M('dk-pixie','Pickpocket Pixie',4,2,'+5 against Elves.','Takes 2 of your items: the players on either side each pick one.',[['pixie']],{vs:[{race:'elf',b:5}],k:'pixie'}),
+M('dk-lizards','Litigation Lizards',6,2,'Never attack a Thief. A Thief may swap 2 hand treasures for 2 new ones.','An injunction. From your left, each player draws a card from your hand. Discard the rest.',[['lawyer']],{sp:'lawyer',k:'lizards'}),
+M('dk-pixie','Pickpocket Pixie',4,2,'+5 against Elves.','Takes 2 of your items. The players on either side each pick one.',[['pixie']],{vs:[{race:'elf',b:5}],k:'pixie'}),
 M('dk-hellmouse','Hellmouse',1,1,'+3 against Clerics.','A nasty nip: lose a level.',[['lvl',1]],{vs:[{cls:'cleric',b:3}],k:'hellmouse'}),
 M('dk-rattle','Rattlebones',2,1,'Undead. If you flee, lose a level even if you get away.','A bony touch: lose 2 levels.',[['lvl',2]],{undead:true,sp:'escape1',k:'rattle'}),
 M('dk-troll','Forum Troll',10,3,'No special powers, and very upset about it.','The highest-level player(s) each take one item from you.',[['troll']],{k:'troll'}),
-M('dk-hound','Snappy Hound',2,1,'If you can’t win, drop a pole or staff to distract it: you get away automatically.','Bite marks: lose 2 levels.',[['lvl',2]],{sp:'fetch',k:'hound'}),
+M('dk-hound','Snappy Hound',2,1,'Can’t win? Drop a pole or staff to distract it. You get away.','Bite marks: lose 2 levels.',[['lvl',2]],{sp:'fetch',k:'hound'}),
 M('dk-duckbill','Duck-Billed Terror',6,2,'+6 against Wizards.','Discard your whole hand, or lose 2 levels.',[['handOr',2]],{vs:[{cls:'wizard',b:6}],k:'duckbill'}),
 M('dk-wyrm','Uranium Wyrm',20,5,'Won’t chase anyone of level 5 or lower.','Roasted and eaten. Dead.',[['death']],{lv:2,nop:5,k:'wyrm'}),
 M('dk-ficus','Ficus of Menace',1,1,'An Elf who beats it draws an extra treasure.','None: you always get away.',[],{sp:'plant',k:'ficus'}),
-M('dk-barfabunny','Barfabunny',6,2,'Beat it with no help and no bonuses at all and gain an extra level.','Projectile sick: discard your whole hand.',[['hand','all']],{sp:'pure',k:'barfabunny'}),
+M('dk-barfabunny','Barfabunny',6,2,'Beat it alone with no bonuses at all. Gain an extra level.','Projectile sick: discard your whole hand.',[['hand','all']],{sp:'pure',k:'barfabunny'}),
 M('dk-nerd','Nitpicking Nerd',6,2,'+6 against Warriors.','You become a plain Human: lose your races and classes.',[['race','all'],['cls','all']],{vs:[{cls:'warrior',b:6}],k:'nerd'}),
-M('dk-slugs','Turbo Slugs',4,2,'-2 to run away.','Roll a die: lose that many items or cards from your hand, your pick.',[['slugs']],{runm:-2,k:'slugs'}),
+M('dk-slugs','Turbo Slugs',4,2,'-2 to run away.','Roll a die. Lose that many items or hand cards, your pick.',[['slugs']],{runm:-2,k:'slugs'}),
 M('dk-tentacles','Tentaclopolis',18,4,'+4 against Elves. Won’t chase anyone of level 4 or lower, except Elves.','Grabbed, slimed and gobbled. Dead.',[['death']],{lv:2,nop:4,vs:[{race:'elf',b:4}],sp:'nopNotElf',k:'tentacles'}),
-M('dk-boulder','Sleepy Boulderman',14,4,'You may simply walk past him and skip the fight (Halflings look tasty and must fight).','He gets the munchies and eats you. Dead.',[['death']],{sp:'golem',k:'boulder'}),
+M('dk-boulder','Sleepy Boulderman',14,4,'You may walk past him and skip the fight. Halflings look tasty and must fight.','He gets the munchies and eats you. Dead.',[['death']],{sp:'golem',k:'boulder'}),
 M('dk-slobber','Slobber Fiend',12,3,'+4 against Clerics. Before the fight, discard one item of your choice.','A revolting kiss: lose 2 levels (3 for Elves).',[['lvlIf',{race:'elf'},3,2]],{vs:[{cls:'cleric',b:4}],sp:'tongue',k:'slobber'}),
 M('dk-pony','Zombie Pony',4,2,'Undead. +5 against Dwarves.','Kicks, bites and smells: lose 2 levels.',[['lvl',2]],{undead:true,vs:[{race:'dwarf',b:5}],k:'pony'}),
 M('dk-dread','The Nameless Dread',14,4,'+4 against Warriors.','Unspeakable death for anyone but a Wizard. A Wizard just loses the Wizard card.',[['dread']],{vs:[{cls:'warrior',b:4}],k:'dread'}),
-M('dk-poser','Bat-Cape Poser',12,3,'A Cleric can shoo him off without a fight and take all his treasure (no level).','He blocks the door and tells you his backstory: lose 3 levels.',[['lvl',3]],{sp:'vamp',k:'poser'}),
-M('dk-twins','The Grave Twins',16,4,'Undead. Won’t chase level 3 or lower; anyone higher who flees loses 2 levels even when they get away.','Back to level 1.',[['lvl','all']],{lv:2,nop:3,undead:true,sp:'escape2',k:'twins'}),
+M('dk-poser','Bat-Cape Poser',12,3,'A Cleric can shoo him off without a fight. The Cleric takes all his treasure, no level.','He blocks the door and tells his backstory. Lose 3 levels.',[['lvl',3]],{sp:'vamp',k:'poser'}),
+M('dk-twins','The Grave Twins',16,4,'Undead. Won’t chase level 3 or lower. Anyone higher who flees loses 2 levels, even if they escape.','Back to level 1.',[['lvl','all']],{lv:2,nop:3,undead:true,sp:'escape2',k:'twins'}),
 // ---- monster boosts ----
 {ref:'dk-primordial',k:'primordial',d:'door',t:'enh',n:'Primordial',b:10,trb:2,x:'+10 to a monster. If it is beaten, 2 more treasures.'},
 {ref:'dk-gargantuan',k:'gargantuan',d:'door',t:'enh',n:'Gargantuan',b:10,trb:2,x:'+10 to a monster. If it is beaten, 2 more treasures.'},
 {ref:'dk-furious',k:'furious',d:'door',t:'enh',n:'Furious',b:5,trb:1,x:'+5 to a monster. If it is beaten, 1 more treasure.'},
 {ref:'dk-genius',k:'genius',d:'door',t:'enh',n:'Genius',b:5,trb:1,x:'+5 to a monster. If it is beaten, 1 more treasure.'},
 {ref:'dk-tiny',k:'tiny',d:'door',t:'enh',n:'Tiny',b:-5,trb:-1,x:'-5 to a monster (never below level 1). If it is beaten, 1 less treasure (never below 1).'},
-{ref:'dk-plusone',k:'plusone',d:'door',t:'enh',sp:'mate',n:'Plus-One',b:0,x:'The monster brings a date: an identical second monster with the same boosts. Beat both for double levels and treasure.'},
+{ref:'dk-plusone',k:'plusone',d:'door',t:'enh',sp:'mate',n:'Plus-One',b:0,x:'The monster brings a date. An identical second monster, same boosts. Beat both for double levels and treasure.'},
 // ---- other door cards ----
-{ref:'dk-uninvited',k:'uninvited',d:'door',t:'special',sp:'wander',n:'Uninvited Guest',cp:2,x:'Play with a monster from your hand during any fight: it joins in.'},
+{ref:'dk-uninvited',k:'uninvited',d:'door',t:'special',sp:'wander',n:'Uninvited Guest',cp:2,x:'Play with a monster from your hand in any fight. It joins in.'},
 {ref:'dk-loophole',k:'loophole',d:'door',t:'special',sp:'cheat',n:'Loophole',x:'Wear one item the rules would not allow (any restriction or slot). Lose this card when you lose that item.'},
-{ref:'dk-favor',k:'favor',d:'door',t:'special',sp:'divine',n:'Heavenly Favor',x:'However it is drawn, every Cleric goes up a level at once, even to win.'},
-{ref:'dk-borrow',k:'borrow',d:'door',t:'special',sp:'borrow',n:'Mind If I Borrow That?',x:'In your own fight, take one item from another player, if it turns your loss into a win.'},
-{ref:'dk-mirrors',k:'mirrors',d:'door',t:'special',sp:'illusion',n:'Smoke and Mirrors',x:'In any fight, swap one monster (and its boosts) for a monster from your hand.'},
+{ref:'dk-favor',k:'favor',d:'door',t:'special',sp:'divine',n:'Heavenly Favor',x:'However it is drawn, every Cleric goes up a level. This can even win.'},
+{ref:'dk-borrow',k:'borrow',d:'door',t:'special',sp:'borrow',n:'Mind If I Borrow That?',x:'In your own fight, take one item from another player. Only if it turns your loss into a win.'},
+{ref:'dk-mirrors',k:'mirrors',d:'door',t:'special',sp:'illusion',n:'Smoke and Mirrors',x:'In any fight, swap one monster and its boosts. Use a monster from your hand.'},
 {ref:'dk-fishing',k:'fishing',d:'door',t:'special',sp:'lunch',n:'Gone Fishing',x:'In any fight, all the monsters leave; the fighter draws 2 treasures.'},
 // ---- curses (19 copies) ----
-C('dk-hexcls','Career Change Hex','If you have a class, it is replaced by the first class card in the door discards (or just lost).',[['swap','cls']],{k:'hexcls'}),
-C('dk-hexrace','Family Tree Hex','If you have a race, it is replaced by the first race card in the door discards (or just lost).',[['swap','race']],{k:'hexrace'}),
-C('dk-hexsex','Gender Swap Hex','Your sex changes for good, and you are at -5 in your next fight while you get used to it.',[['sex']],{k:'hexsex'}),
-C('dk-hexhen','Hen Hat Hex','A hen roosts on your head: -1 to all your die rolls, until something takes your headgear.',[['pers']],{pers:{die:-1},k:'hexhen'}),
+C('dk-hexcls','Career Change Hex','Lose your class. Take the first class card in the door discards, if any.',[['swap','cls']],{k:'hexcls'}),
+C('dk-hexrace','Family Tree Hex','Lose your race. Take the first race card in the door discards, if any.',[['swap','race']],{k:'hexrace'}),
+C('dk-hexsex','Gender Swap Hex','Your sex changes for good. You are at -5 in your next fight.',[['sex']],{k:'hexsex'}),
+C('dk-hexhen','Hen Hat Hex','A hen roosts on your head: -1 to your die rolls. It stays until your headgear is lost.',[['pers']],{pers:{die:-1},k:'hexhen'}),
 C('dk-hexgoose','Goose of Gloom','You picked up a goose in a dungeon. Lose 2 levels.',[['lvl',2]],{k:'hexgoose'}),
-C('dk-hextax','Tax Collector','Discard an item of your choice. Everyone else must discard items worth at least as much, or discard all their items and lose a level.',[['tax']],{k:'hextax'}),
+C('dk-hextax','Tax Collector','Discard an item of your choice. Everyone else discards items worth at least as much. Or they discard all items and lose a level.',[['tax']],{k:'hextax'}),
 C('dk-hexbig','Butterfingers','Discard one Big item of your choice.',[['pick','big']],{k:'hexbig'}),
 C('dk-hexlvl','Rotten Luck','Lose a level.',[['lvl',1]],{cp:2,k:'hexlvl'}),
 C('dk-hexsmall','Light-Fingered Gremlin','Discard one small item of your choice.',[['pick','small']],{cp:2,k:'hexsmall'}),
-C('dk-hexgrab','Grabby Neighbours','The player on your left takes a random card from your hand, then the player on your right does.',[['grab']],{k:'hexgrab'}),
+C('dk-hexgrab','Grabby Neighbours','The player on your left takes a random card from your hand. Then the player on your right does.',[['grab']],{k:'hexgrab'}),
 C('dk-hexcrisis','Career Crisis','Discard a class (your choice if you have two). With no class, lose a level.',[['clsOr1']],{k:'hexcrisis'}),
 C('dk-hexid','Identity Crisis','Discard your race cards and become a plain Human.',[['race','all']],{k:'hexid'}),
 C('dk-hexrust','Rust Storm','Lose the armor you are wearing.',[['item','armorW']],{k:'hexrust'}),
@@ -5210,12 +5364,12 @@ C('dk-hexrotten','Utterly Rotten Hex','Lose the item that gives you your biggest
 // ---- go up a level (9) and other treasures ----
 L('dk-l1','Windfall of Coins',null,{k:'l1'}),L('dk-l2','Squash a Beetle Colony',null,{k:'l2'}),L('dk-l3','Snacks for the Referee',null,{k:'l3'}),
 L('dk-l4','Creative Arithmetic',null,{k:'l4'}),L('dk-l5','Obscure Footnote',null,{k:'l5'}),L('dk-l6','Tonic of Pure Swagger',null,{k:'l6'}),
-L('dk-l7','Fire the Porter','Go up a level, only if a Porter is in play (anyone’s): the Porter is discarded.',{sp:'killhire',k:'l7'}),
+L('dk-l7','Fire the Porter','Go up a level, only if any Porter is in play. That Porter is discarded.',{sp:'killhire',k:'l7'}),
 L('dk-l8','Loot the Leftovers','Go up a level. Only right after a fight (anyone’s).',{sp:'after',k:'l8'}),
 L('dk-l9','Complain Loudly','Go up a level. Not if you are the highest level, or tied for it.',{sp:'whine',k:'l9'}),
 {ref:'dk-porter',k:'porter',d:'tr',t:'special',sp:'hire',n:'Porter',x:'Play any time. Carries one extra Big item for you. Won’t fight.'},
 {ref:'dk-pile',k:'pile',d:'tr',t:'special',sp:'hoard',n:'Treasure Pile!',x:'When you get this card, draw 3 more treasures at once.'},
-{ref:'dk-heist',k:'heist',d:'tr',t:'special',sp:'steal',n:'Level Heist',x:'Pick a player: they go down a level and you go up one (never to win).'},
+{ref:'dk-heist',k:'heist',d:'tr',t:'special',sp:'steal',n:'Level Heist',x:'Pick a player. They go down a level, you go up one. Never to win.'},
 // ---- items (38) ----
 I('dk-headband','Tough-Guy Headband','head',3,400,'Humans only.',{req:'human',k:'headband'}),
 I('dk-stompy','Stompy Boots','foot',2,400,'',{k:'stompy'}),
@@ -5242,7 +5396,7 @@ I('dk-moonsilver','Moonsilver Plate','armor',3,600,'Not for Wizards.',{big:true,
 I('dk-leggings','Leggings of Mighty Might','-',3,600,'Not for Warriors.',{req:'!warrior',tags:['below'],k:'leggings',art:'legs'}),
 I('dk-zaphat','Tall Hat of Zap','head',3,400,'Wizards only.',{req:'wizard',k:'zaphat'}),
 I('dk-rapier','Cheater’s Rapier','1h',3,600,'Elves only.',{req:'elf',k:'rapier'}),
-I('dk-snackstick','Snack on a Stick','1h',0,0,'Discard it to get away automatically from any monster of level 8 or lower.',{sp:'ratstick',k:'snackstick'}),
+I('dk-snackstick','Snack on a Stick','1h',0,0,'Discard it to escape any monster of level 8 or lower.',{sp:'ratstick',k:'snackstick'}),
 I('dk-title','Very Fancy Title','-',3,0,'No value.',{k:'title',art:'scroll'}),
 I('dk-flipflops','Lucky Flip-Flops','foot',0,700,'Curses you draw when you kick open a door don’t affect you.',{sp:'sandals',k:'flipflops'}),
 I('dk-wallshield','Wall-Sized Shield','1h',4,600,'Warriors only.',{big:true,req:'warrior',k:'wallshield'}),
@@ -5262,7 +5416,7 @@ O('dk-hotsauce','Hot Sauce Potion',3,100,'+3 to either side in any fight. Fire a
 O('dk-frosty','Frosty Bang Potion',3,100,'+3 to either side in any fight.',{k:'frosty'}),
 O('dk-dart','Zappy Dart',5,300,'+5 to either side in any fight.',{k:'dart'}),
 O('dk-sour','Sour Energy Drink',2,200,'+2 to either side in any fight.',{k:'sour'}),
-O('dk-garlic','Garlic Gargle',2,100,'+2 to either side in any fight, or kill a Hovering Sniffer outright.',{sp:'garlic',k:'garlic'}),
+O('dk-garlic','Garlic Gargle',2,100,'+2 to either side in any fight. Or kill a Hovering Sniffer outright.',{sp:'garlic',k:'garlic'}),
 O('dk-courage','Liquid Courage',2,100,'+2 to either side in any fight.',{k:'courage'}),
 O('dk-balloons','Shiny Balloons',5,0,'+5 to either side in any fight. No value.',{k:'balloons'}),
 O('dk-snooze','Snooze Syrup',2,100,'+2 to either side in any fight.',{k:'snooze'}),
@@ -5274,8 +5428,8 @@ O('dk-wall','Pop-Up Wall',0,300,'When running away, you (and your helper) get aw
 O('dk-vanish','Vanishing Tonic',0,200,'When you fail to run away, you get away after all.',{sp:'invis',k:'vanish'}),
 O('dk-weighted','Weighted Die',0,300,'After your own roll, change it to any number.',{sp:'die',k:'weighted'}),
 O('dk-lantern','Wishing Lantern',0,500,'On your own turn, one monster vanishes, even after it caught you. If it was your only monster, take its treasure (no level).',{sp:'lamp',cp:2,k:'lantern'}),
-O('dk-parrot','Parrotify Potion',0,1300,'In any fight, one monster turns into a parrot and flies off, leaving its treasure (no level).',{sp:'poly',k:'parrot'}),
-O('dk-notmine','Not-My-Problem Potion',0,300,'In any fight, another player of your choice takes over the fight, with its rewards. The first player may still loot the room.',{sp:'transfer',k:'notmine'}),
+O('dk-parrot','Parrotify Potion',0,1300,'In any fight, one monster turns into a parrot and flies off. It leaves its treasure, no level.',{sp:'poly',k:'parrot'}),
+O('dk-notmine','Not-My-Problem Potion',0,300,'In any fight, another player of your choice takes over. They get its rewards. The first player may still loot the room.',{sp:'transfer',k:'notmine'}),
 O('dk-undoring','Ring of Undoing',0,500,'Cancel a curse, any time (including one already on you).',{sp:'ward',cp:2,k:'undoring'}),
 O('dk-rod','Rummaging Rod',0,1100,'Take any one card you want from the discard piles.',{sp:'dowse',k:'rod'})
 ];
@@ -5951,7 +6105,7 @@ const GFX=(function(){
     // the big scoreline: a +N flies into the total and the number counts up to it
     [['.sy',a,prev.a],['.sm',b,prev.b]].forEach(([sel,to,from])=>{const d=to-from;if(!d)return;const s=v.parentNode.querySelector('.sline '+sel);if(!s)return;const n=s.querySelector('.n');if(!n)return;
       n.textContent=from;const f=document.createElement('span');f.className='fxfly '+(d>0?'up':'dn');f.textContent=(d>0?'+':'−')+Math.abs(d);s.appendChild(f);
-      f.animate([{transform:'translate(-50%,70px) scale(1.7)',opacity:0},{transform:'translate(-50%,30px) scale(1.7)',opacity:1,offset:.25},{transform:'translate(-50%,-4px) scale(.9)',opacity:1,offset:.85},{transform:'translate(-50%,-4px) scale(.6)',opacity:0}],{duration:760,easing:'ease-in'}).onfinish=()=>f.remove();
+      f.animate([{transform:'translate(-50%,-70px) scale(1.7)',opacity:0},{transform:'translate(-50%,-48px) scale(1.5)',opacity:1,offset:.25},{transform:'translate(-50%,-30px) scale(1)',opacity:1,offset:.85},{transform:'translate(-50%,-26px) scale(.7)',opacity:0}],{duration:760,easing:'ease-in'}).onfinish=()=>f.remove();
       const t0=performance.now(),T=420,D=520;const step=t=>{const q=Math.min(1,Math.max(0,(t-t0-D)/T));n.textContent=Math.round(from+(to-from)*q);if(q<1)requestAnimationFrame(step);else n.animate([{transform:'scale(1)'},{transform:'scale(1.35)',offset:.4},{transform:'scale(1)'}],{duration:380,easing:'cubic-bezier(.2,1.8,.4,1)'})};requestAnimationFrame(step)})}
   function init(){if(!HAS_DOM)return;textures();apply(load());
     perf();
@@ -5964,7 +6118,7 @@ const GFX=(function(){
 // ---------- Doorkick Dungeon engine: all rules live here. State is G (plain JSON); every move goes through gameAct(ds, seat). ----------
 // Rule ids [R..]/[H..] refer to rules-notes.md.
 var ANIM=1, AIDELAY=600, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
-const R={WIN:10,HAND:5,DWARF_HAND:6,START:4,RUN:5,SELL:1000,BERSERK:3,TURN:3,TURN_B:3,FLIGHT:3,CAP:400,THEFT:4,MAXTURN:600};
+const R={WIN:10,HAND:5,DWARF_HAND:6,START:4,RUN:5,SELL:1000,BERSERK:3,TURN:3,TURN_B:3,FLIGHT:3,CHARM_MIN:3,CAP:400,THEFT:4,MAXTURN:600};
 const SAVE='dkd_save2',TOUR='dkd_tour1';
 let G=null;const UI={menu:null,zoom:null,info:true,rules:false,fx:[],busy:false,pause:false,hints:true,speed:1,pass:null,lastSeat:-1,sell:null};
 // ---- random ----
@@ -5984,7 +6138,7 @@ function discard(id){if(id==null)return;const c=cd(id);(c.d==='door'?G.dd:G.td).
 // a card arriving in a hand; some cards act the moment you get them [R: Treasure Pile!, Heavenly Favor]
 function gain(p,id){if(id==null)return;const c=cd(id);
   if(c.sp==='hoard'){lg(p.i,`${p.nm} finds ${c.n} and draws 3 more treasures!`);discard(id);for(let i=0;i<3;i++)gain(p,drawOne('treasure'));return}
-  if(c.sp==='divine'){discard(id);lg(p.i,`${p.nm} reveals ${c.n}: every Cleric goes up a level!`);for(const o of alive())if(isCls(o,'cleric'))gainLv(o,1,c.n,true);return}
+  if(c.sp==='divine'){discard(id);lg(p.i,`${p.nm} reveals ${c.n}. Every Cleric goes up a level!`);for(const o of alive())if(isCls(o,'cleric'))gainLv(o,1,c.n,true);return}
   p.hand.push(id)}
 function drawTo(p,deck,n){for(let i=0;i<n;i++){const id=drawOne(deck);if(id==null)break;gain(p,id)}}
 // ---- player helpers ----
@@ -6043,7 +6197,7 @@ function newGame(mode,n){n=n||DEFN;const seed=DEFSEED!=null?DEFSEED:Math.floor(M
 const HERO_NAMES=['Pip','Morwen','Grub','Tansy','Bodkin','Wrenna'];
 // ---- levels and victory [R §12] ----
 function gainLv(p,n,why,canWin){if(n<=0||p.dead)return 0;const cap=canWin?R.WIN:R.WIN-1;const before=p.lvl;p.lvl=Math.max(before,Math.min(cap,p.lvl+n));const got=p.lvl-before;if(got>0){p.st.levels+=got;fx('lvl',p.i)}
-  if(got<n&&!canWin&&p.lvl===R.WIN-1)lg(p.i,`${p.nm} stays at level ${R.WIN-1}: the last level only comes from killing a monster.`);
+  if(got<n&&!canWin&&p.lvl===R.WIN-1)lg(p.i,`${p.nm} stays at level ${R.WIN-1}. The last level needs a monster kill.`);
   if(p.lvl>=R.WIN&&!G.winner){G.winner='P'+(p.i+1);G.winText=`${p.nm} reaches level ${R.WIN} by ${why}!`;lg(p.i,G.winText);fx('win',p.i)}return got}
 function loseLv(p,n){const b=p.lvl;p.lvl=Math.max(1,p.lvl-n);return b-p.lvl}
 // ---- choices: anything a player must decide mid-effect becomes G.q (humans answer through validMoves, the AI through aiPick) ----
@@ -6115,7 +6269,7 @@ function slugNext(){const s=G.slug;if(!s)return;const p=P(s.p);while(s.left>0&&(
 // Tax Collector [R card]
 function taxStart(p,src){const pool=p.eq.map(e=>e.id);if(!pool.length){lg(p.i,`${p.nm} has no items, so nobody pays tax.`);return}choose(p.i,'taxpay',pool,{k:'tax0',p:p.i},'Choose an item to discard for the tax.')}
 function taxOthers(v,val){for(const o of alive()){if(o.i===v)continue;const pool=o.eq.map(e=>e.id);const tot=pool.reduce((a,id)=>a+(cd(id).g||0),0);
-  if(tot<val){pool.forEach(id=>loseCard(o,id,'tax'));if(val>0){const l=loseLv(o,1);lg(o.i,`${o.nm} can't pay ${val} gold of tax: loses all items${l?' and a level':''}.`)}continue}
+  if(tot<val){pool.forEach(id=>loseCard(o,id,'tax'));if(val>0){const l=loseLv(o,1);lg(o.i,`${o.nm} can't pay ${val} gold of tax. Loses all items${l?' and a level':''}.`)}continue}
   let need=val;const by=pool.slice().sort((x,y)=>itemWorth(o,x)/((cd(x).g||1))-itemWorth(o,y)/((cd(y).g||1)));for(const id of by){if(need<=0)break;if(!cd(id).g)continue;need-=cd(id).g;loseCard(o,id,'tax')}}}
 const CONT={
   lose:(c,v)=>{if(v!=null)loseCard(P(c.p),v)},
@@ -6175,9 +6329,9 @@ function startCombat(who,id,how){G.cb=newCb(who,how);G.phase='combat';G.fought=t
   enterMonster(id,who,true)}
 // a monster joins the fight; "will not attack" and "before combat" effects [R §5.4]
 function enterMonster(id,by,first){const cb=G.cb;const c=cd(id);const f=P(cb.who);cb.mons.push({id,enh:[]});
-  if(c.sp==='amazon'&&fighters(cb).some(x=>x.sex==='f')){cb.mons.pop();lg(cb.who,`${c.n} won't fight a woman: she hands over 1 treasure and leaves.`);gain(f,drawOne('treasure'));discard(id);return checkEmpty()}
+  if(c.sp==='amazon'&&fighters(cb).some(x=>x.sex==='f')){cb.mons.pop();lg(cb.who,`${c.n} won't fight a woman. She hands over 1 treasure.`);gain(f,drawOne('treasure'));discard(id);return checkEmpty()}
   if(c.sp==='lawyer'&&isCls(f,'thief')){cb.mons.pop();discard(id);lg(cb.who,`${c.n} won't sue a fellow Thief and walk away.`);const tr=f.hand.filter(x=>cd(x).d==='tr');if(tr.length>=2&&f.human){G.q={who:f.i,kind:'lawyer'};return}if(tr.length>=2&&aiLawyerSwap(f))lawyerSwap(f);return checkEmpty()}
-  if(c.sp==='nohelp'&&cb.help>=0){lg(cb.help,`${P(cb.help).nm} has to leave: nobody can help against ${c.n}.`);cb.help=-1;cb.offer=0}
+  if(c.sp==='nohelp'&&cb.help>=0){lg(cb.help,`${P(cb.help).nm} has to leave. Nobody can help against ${c.n}.`);cb.help=-1;cb.offer=0}
   if(c.sp==='nohelp')cb.nohelp=true;
   if(c.sp==='tongue'&&first){const pool=f.eq.map(e=>e.id);if(pool.length){lg(cb.who,`${c.n} demands an item before the fight.`);choose(f.i,'lose',pool,{k:'tongue',p:f.i},'Discard one item before fighting the Slobber Fiend.')}}}
 function lawyerSwap(f){const tr=f.hand.filter(x=>cd(x).d==='tr').sort((a,b)=>cardValue(f,a)-cardValue(f,b)).slice(0,2);tr.forEach(x=>{f.hand.splice(f.hand.indexOf(x),1);discard(x)});drawTo(f,'treasure',2);lg(f.i,`${f.nm} swaps 2 treasures for 2 new ones.`)}
@@ -6214,7 +6368,7 @@ function nextRun(){const cb=G.cb;if(!cb)return;const r=cb.runs.find(x=>!x.done);
   // fleeing costs levels even when it works [card: Pharaoh, Grave Twins, Rattlebones]
   if(!r.pen){r.pen=true;if(c.sp==='escape2'&&p.lvl>3){const l=loseLv(p,2);if(l)lg(p.i,`${p.nm} loses ${l} levels just for fleeing ${c.n}.`)}if(c.sp==='escape1'){const l=loseLv(p,1);if(l)lg(p.i,`${p.nm} loses a level fleeing ${c.n}.`)}}
   if(c.sp==='noescape'){r.ok=false;lg(r.w,`Nobody gets away from ${c.n}!`);return finishRun(r)}
-  if(c.nop&&p.lvl<=c.nop&&!(c.sp==='nopNotElf'&&isRace(p,'elf'))){r.ok=true;lg(r.w,`${c.n} won't chase anyone of level ${c.nop} or lower: ${p.nm} walks away.`);return finishRun(r)}
+  if(c.nop&&p.lvl<=c.nop&&!(c.sp==='nopNotElf'&&isRace(p,'elf'))){r.ok=true;lg(r.w,`${c.n} won't chase level ${c.nop} or lower. ${p.nm} walks away.`);return finishRun(r)}
   if(r.auto){r.ok=true;lg(r.w,`${p.nm} gets away from ${c.n}.`);return finishRun(r)}
   if(c.sp==='fetch'&&!r.fetchAsked){r.fetchAsked=true;const pole=p.eq.find(e=>tagged(e.id,'pole'));if(pole){if(p.human){G.q={who:p.i,kind:'fetch',run:cb.runs.indexOf(r),card:pole.id};return}loseCard(p,pole.id,'thrown for the hound');r.ok=true;lg(p.i,`${c.n} chases the stick instead.`);return finishRun(r)}}
   roll(r)}
@@ -6227,9 +6381,9 @@ function rescueOpts(p,r){const c=mdef(runMon(r));const o=[];for(const id of p.ha
 // after a successful escape, a holder of Sticky Paste may force a reroll
 function finishRun(r){const cb=G.cb;
   if(r.ok&&!r.glued){const holders=alive().filter(o=>o.i!==r.w&&o.hand.some(id=>cd(id).sp==='glue'));for(const o of holders){if(o.human){G.q={who:o.i,kind:'glue',run:cb.runs.indexOf(r)};return}if(aiGlue(o,r)){useGlue(o,r);return}}}
-  r.done=true;if(!r.ok){const p=P(r.w),c=mdef(runMon(r));lg(p.i,`Bad Stuff from ${c.n}: ${c.badt}`);fx('bad',p.i);queue(p,c.bad||[],runMon(r).id);G.then='run';runOps();return}
+  r.done=true;if(!r.ok){const p=P(r.w),c=mdef(runMon(r));lg(p.i,`Bad Stuff from ${c.n}. ${c.badt}`);fx('bad',p.i);queue(p,c.bad||[],runMon(r).id);G.then='run';runOps();return}
   nextRun()}
-function useGlue(o,r){const id=o.hand.find(x=>cd(x).sp==='glue');o.hand.splice(o.hand.indexOf(id),1);discard(id);r.glued=true;r.auto=false;lg(o.i,`${o.nm} throws ${cd(id).n}: ${P(r.w).nm} is stuck and must roll again!`);roll(r)}
+function useGlue(o,r){const id=o.hand.find(x=>cd(x).sp==='glue');o.hand.splice(o.hand.indexOf(id),1);discard(id);r.glued=true;r.auto=false;lg(o.i,`${o.nm} throws ${cd(id).n}. ${P(r.w).nm} is stuck and must roll again!`);roll(r)}
 // ---- turn flow [R §4] ----
 function curPl(){return P(G.active)}
 function nextTurn(){const n=G.pl.length;let i=G.active;do{i=(i+1)%n}while(P(i).gone&&i!==G.active);G.active=i;G.turn++;const p=curPl();
@@ -6244,7 +6398,7 @@ function takeKicked(p,id,res){const kv=res?'reaches into the discards':'kicks op
   if(c.t==='monster'){startCombat(p.i,id,'kick');return}
   if(c.t==='curse'){lg(p.i,`${p.nm} ${kv}… a curse!`);G.phase='after';applyCurse(p,id,p.i,true);return}
   if(c.sp==='divine'){lg(p.i,`${p.nm} ${kv}…`);G.phase='after';gain(p,id);G.kicked=null;return}
-  lg(p.i,`${p.nm} ${res?'takes back':'kicks open the door and finds'} ${c.n}, which goes to hand.`);p.hand.push(id);G.phase='after'}
+  lg(p.i,`${p.nm} ${res?'takes back':'kicks the door and finds'} ${c.n}. It goes to hand.`);p.hand.push(id);G.phase='after'}
 function lootRoom(){const p=curPl();const id=drawOne('door');if(id!=null){gain(p,id);lg(p.i,`${p.nm} loots the room and draws a face-down door card.`)}G.phase='post'}
 function endTurn(){const p=curPl();if(p.hand.length>handLimit(p)&&!p.dead){G.phase='charity';return}afterEnd()}
 function afterEnd(){if(G.winner)return;nextTurn()}
@@ -6336,7 +6490,7 @@ function sellValue(p,ids){let t=ids.reduce((a,id)=>a+(cd(id).g||0),0);if(isRace(
 function abilityMoves(s){const p=P(s),cb=G.cb,mv=[];if(!p.hand.length)return mv;const inFight=s===cb.who||s===cb.help;
   if(isCls(p,'warrior')&&inFight&&(cb.used['b'+s]||0)<R.BERSERK&&!special(cb,'lvlonly'))for(const id of p.hand)mv.push({act:'berserk',card:id});
   if(isCls(p,'cleric')&&inFight&&(cb.used['t'+s]||0)<R.TURN&&cb.mons.some(m=>mdef(m).undead))for(const id of p.hand)mv.push({act:'turn',card:id});
-  if(isCls(p,'wizard')&&inFight&&!cb.used['c'+s])cb.mons.forEach((m,j)=>mv.push({act:'charm',tgt:j}));
+  if(isCls(p,'wizard')&&inFight&&!cb.used['c'+s]&&p.hand.length>=R.CHARM_MIN)cb.mons.forEach((m,j)=>mv.push({act:'charm',tgt:j}));
   if(isCls(p,'wizard')&&inFight&&!winning(cb)&&(cb.used['f'+s]||0)<R.FLIGHT)for(const id of p.hand)mv.push({act:'flight',card:id});
   if(isCls(p,'thief'))for(const t of fighters(cb))if(t.i!==s&&!cb.used['s'+s+'_'+t.i])for(const id of p.hand)mv.push({act:'backstab',card:id,tgt:t.i});
   return mv}
@@ -6364,7 +6518,7 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   switch(m.act){
   case 'ready':G.setupI++;if(G.setupI>=G.setupOrd.length){G.phase='main';lg(G.active,`— ${curPl().nm}'s turn (level ${curPl().lvl}) —`);openWindow()}break;
   case 'kick':kick();break;
-  case 'resurrect':{const id=G.dd.pop();spend(p,m.card);lg(s,`${p.nm} resurrects ${cname(id)} from the door discards instead of kicking a new door.`);takeKicked(p,id,1);break}
+  case 'resurrect':{const id=G.dd.pop();spend(p,m.card);lg(s,`${p.nm} resurrects ${cname(id)} from the door discards. No new door.`);takeKicked(p,id,1);break}
   case 'loot':lootRoom();break;
   case 'trouble':p.hand.splice(p.hand.indexOf(m.card),1);startCombat(s,m.card,'trouble');break;
   case 'end':endTurn();break;
@@ -6375,7 +6529,7 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   case 'join':p.hand.splice(p.hand.indexOf(m.card),1);lg(s,`${p.nm} adds undead ${cname(m.card)} to the fight.`);enterMonster(m.card,s,false);reopen();break;
   case 'give':{p.hand.splice(p.hand.indexOf(m.card),1);P(m.tgt).hand.push(m.card);lg(s,`${p.nm} gives a card to ${P(m.tgt).nm} (charity).`);if(p.hand.length<=handLimit(p))afterEnd();break}
   case 'toss':{p.hand.splice(p.hand.indexOf(m.card),1);discard(m.card);lg(s,`${p.nm} discards ${cname(m.card)} (charity).`);if(p.hand.length<=handLimit(p))afterEnd();break}
-  case 'ask':{cb.asked.push(m.tgt);const allure=eqItems(p).some(x=>cd(x).sp==='allure');lg(s,`${p.nm} asks ${P(m.tgt).nm} for help${allure?' (the Charming Kneepads leave no choice)':`, offering ${m.opt} treasure${m.opt===1?'':'s'}`}.`);
+  case 'ask':{cb.asked.push(m.tgt);const allure=eqItems(p).some(x=>cd(x).sp==='allure');lg(s,`${p.nm} asks ${P(m.tgt).nm} for help${allure?' (Charming Kneepads: no choice)':`, offering ${m.opt} treasure${m.opt===1?'':'s'}`}.`);
     if(allure){cb.help=m.tgt;cb.offer=0;reopen();break}G.q={who:m.tgt,kind:'help',from:s,n:m.opt};break}
   case 'opt':answer(m.opt,s);break;
   case 'pick':{const q=G.q;G.q=null;resume(q.cont,q.opts[m.opt]);break}
@@ -6391,10 +6545,10 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   case 'turn':spend(p,m.card);cb.used['t'+s]=(cb.used['t'+s]||0)+1;cb.turnB+=R.TURN_B;lg(s,`${p.nm} turns the undead (+${R.TURN_B}).`);after(s);break;
   case 'flight':spend(p,m.card);cb.used['f'+s]=(cb.used['f'+s]||0)+1;lg(s,`${p.nm} readies a flight spell (+1 to run away).`);after(s);break;
   case 'charm':{const n=p.hand.length;while(p.hand.length)discard(p.hand.pop());const mm=cb.mons.splice(m.tgt,1)[0];cb.used['c'+s]=1;cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});
-    lg(s,`${p.nm} discards ${n} card${n===1?'':'s'} and charms ${cname(mm.id)}: it wanders off and leaves its treasure.`);if(!checkEmpty())reopen();break}
+    lg(s,`${p.nm} discards ${n} card${n===1?'':'s'} and charms ${cname(mm.id)}. It wanders off and leaves its treasure.`);if(!checkEmpty())reopen();break}
   case 'backstab':spend(p,m.card);note(m.tgt,s,'stab');cb.used['s'+s+'_'+m.tgt]=1;cb.pb-=2;lg(s,`${p.nm} backstabs ${P(m.tgt).nm} (-2).`);after(s);break;
   case 'steal':{spend(p,p.hand.slice().sort((a,b)=>cardValue(p,a)-cardValue(p,b))[0]);const v=P(m.tgt);const r=d6()+persMod(p,'die');G.stole=true;G.lastRoll={v:r,mod:0,need:R.THEFT,who:s,ok:r>=R.THEFT,id:(G.lastRoll?G.lastRoll.id:0)+1,what:'steal'};
-    if(r>=R.THEFT){const e=v.eq.find(e=>e.id===m.card);v.eq.splice(v.eq.indexOf(e),1);if(e.cheat!=null)discard(e.cheat);p.eq.push({id:m.card,on:false});lg(s,`${p.nm} rolls ${r} and steals ${cname(m.card)} from ${v.nm}!`);fixBig(p)}else{loseLv(p,1);lg(s,`${p.nm} rolls ${r}, gets caught stealing from ${v.nm} and is whacked down a level.`)}break}
+    if(r>=R.THEFT){const e=v.eq.find(e=>e.id===m.card);v.eq.splice(v.eq.indexOf(e),1);if(e.cheat!=null)discard(e.cheat);p.eq.push({id:m.card,on:false});lg(s,`${p.nm} rolls ${r} and steals ${cname(m.card)} from ${v.nm}!`);fixBig(p)}else{loseLv(p,1);lg(s,`${p.nm} rolls ${r} and gets caught stealing from ${v.nm}. Down a level.`)}break}
   }
   checkEnd()}
 function after(s){const cb=G.cb;if(cb&&s!==cb.who&&cb.stage==='others')reopen()}
@@ -6429,13 +6583,13 @@ function playCard(p,id,tgt,opt){const c=cd(id);const cb=G.cb;const s=p.i;
     gainLv(t,1,c.n,false);lg(s,`${p.nm} plays ${c.n}: ${t===p?'':t.nm+' '}go${t===p?'':'es'} up a level.`);if(cb)reopen();break}
   case 'enh':{const m=cb.mons[tgt];if(c.sp==='mate'){cb.mons.push({id,enh:[],like:m.like!=null?m.like:m.id,src:m.id,snap:m.enh.slice()});lg(s,`${p.nm} plays ${c.n}: ${cname(m.like!=null?m.like:m.id)} brings a date!`);fx('monster',id)}
     else{m.enh.push(id);if(c.b>0&&s!==cb.who&&s!==cb.help)note(cb.who,s,'boost');lg(s,`${p.nm} makes ${mdef(m).n} ${c.b>0?'tougher':'weaker'} with ${c.n} (${c.b>0?'+':''}${c.b}).`)}reopen();break}
-  case 'item':{const e={id,on:false};p.eq.push(e);if(!equipWhy(p,id)){e.on=true;lg(s,`${p.nm} puts on ${c.n}.`)}else lg(s,`${p.nm} puts ${c.n} into play, carried (${equipWhy(p,id)}).`);fixBig(p);break}
+  case 'item':{const e={id,on:false};p.eq.push(e);if(!equipWhy(p,id)){e.on=true;lg(s,`${p.nm} puts on ${c.n}.`)}else lg(s,`${p.nm} carries ${c.n}. Not worn: ${equipWhy(p,id)}.`);fixBig(p);break}
   case 'oneshot':playOneShot(p,id,c,tgt);break;
   case 'special':
     switch(c.sp){
     case 'half':p.half=id;lg(s,`${p.nm} plays ${c.n}: two races allowed.`);revalidate(p);break;
     case 'super':p.sup=id;lg(s,`${p.nm} plays ${c.n}: two classes allowed.`);revalidate(p);break;
-    case 'wander':{discard(id);p.hand.splice(p.hand.indexOf(tgt),1);lg(s,`${p.nm} sends in ${cname(tgt)} (level ${cd(tgt).lvl}) as an uninvited guest!`);fx('monster',tgt);enterMonster(tgt,s,false);reopen();break}
+    case 'wander':{discard(id);p.hand.splice(p.hand.indexOf(tgt),1);lg(s,`${p.nm} sends in ${cname(tgt)}, level ${cd(tgt).lvl}. An uninvited guest!`);fx('monster',tgt);enterMonster(tgt,s,false);reopen();break}
     case 'cheat':{const e=p.eq.find(e=>e.id===tgt);e.cheat=id;e.on=true;lg(s,`${p.nm} finds a loophole: ${cname(tgt)} is worn against the rules.`);break}
     case 'illusion':{discard(id);const mm=cb.mons[tgt];discard(mm.id);mm.enh.forEach(discard);p.hand.splice(p.hand.indexOf(opt),1);cb.mons.splice(tgt,1);lg(s,`${p.nm}: smoke and mirrors! ${cname(mm.id)} becomes ${cname(opt)}.`);enterMonster(opt,s,false);reopen();break}
     case 'lunch':{discard(id);lg(s,`${p.nm} plays ${c.n}: the monsters leave. ${P(cb.who).nm} draws 2 treasures.`);const f=P(cb.who);for(const m of cb.mons){discard(m.id);m.enh.forEach(discard)}cb.mons=[];drawTo(f,'treasure',2);endCombat();break}
@@ -6453,7 +6607,7 @@ function playOneShot(p,id,c,tgt){const cb=G.cb;const s=p.i;
   case 'dbl':cb.dbl++;cb.os.push({id,side:'p'});lg(s,`${p.nm} uses ${c.n}: their strength is doubled.`);after(s);return;
   case 'wall':cb.os.push({id,side:'p'});cb.wall=true;lg(s,`${p.nm} throws up ${c.n}!`);startRun();return;
   case 'elfwater':cb.water++;cb.os.push({id,side:'p'});lg(s,`${p.nm} pours ${c.n}: +2 for each Elf.`);after(s);return;
-  case 'poly':{discard(id);const mm=cb.mons.splice(tgt,1)[0];cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});lg(s,`${p.nm} throws ${c.n}: ${mdef(mm).n} becomes a parrot and flies off, leaving its treasure.`);if(!checkEmpty())reopen();return}
+  case 'poly':{discard(id);const mm=cb.mons.splice(tgt,1)[0];cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});lg(s,`${p.nm} throws ${c.n}. ${mdef(mm).n} becomes a parrot and flies off. It leaves its treasure.`);if(!checkEmpty())reopen();return}
   case 'lamp':{discard(id);const only=cb.mons.length===1&&!cb.killed.length;const mm=cb.mons.splice(tgt,1)[0];if(only)cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});else{discard(mm.id);mm.enh.forEach(discard)}lg(s,`${p.nm} rubs ${c.n}: ${mdef(mm).n} vanishes${only?', leaving its treasure':''}!`);if(!checkEmpty())reopen();return}
   case 'transfer':{discard(id);const t=P(tgt);cb.thief=t.i===s?s:-1;lg(s,`${p.nm} uses ${c.n}: ${t.nm} now has to fight!`);cb.who=t.i;cb.help=-1;cb.offer=0;cb.asked=[];cb.transfer=true;cb.used={};cb.bers=0;cb.turnB=0;cb.dbl=0;reopen();return}
   case 'garlic':if(typeof tgt==='number'){discard(id);const mm=cb.mons.splice(tgt,1)[0];cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:true});lg(s,`${p.nm} gargles garlic: ${mdef(mm).n} keels over!`);if(!checkEmpty())reopen();return}break;
@@ -6461,11 +6615,11 @@ function playOneShot(p,id,c,tgt){const cb=G.cb;const s=p.i;
   const b=c.b||0;if(tgt==='p')cb.pb+=b;else{cb.mb+=b;if(b>0&&s!==cb.who&&s!==cb.help)note(cb.who,s,'boost')}cb.os.push({id,side:tgt});if(tgt==='p'&&tagged(id,'fire'))cb.fire=true;
   lg(s,`${p.nm} throws ${c.n}: +${b} for ${tgt==='p'?'the heroes':'the monsters'}.`);fx('shot',s);
   if(s!==cb.who||tgt==='m')reopen()}
-function revalidate(p){for(const e of p.eq)if(e.on&&e.cheat==null&&!reqOK(p,cd(e.id))){e.on=false;lg(p.i,`${p.nm} can no longer use ${cd(e.id).n} and carries it instead.`)}fixBig(p)}
+function revalidate(p){for(const e of p.eq)if(e.on&&e.cheat==null&&!reqOK(p,cd(e.id))){e.on=false;lg(p.i,`${p.nm} can no longer use ${cd(e.id).n}. It is carried instead.`)}fixBig(p)}
 function doSell(p,ids){let g=sellValue(p,ids);const half=isRace(p,'halfling')&&!p.halfT;if(half)p.halfT=true;
   ids.forEach(id=>{const e=p.eq.findIndex(x=>x.id===id);if(e>=0){const x=p.eq.splice(e,1)[0];if(x.cheat!=null)discard(x.cheat)}else p.hand.splice(p.hand.indexOf(id),1);discard(id)});
   const lv=Math.floor(g/R.SELL);const got=gainLv(p,lv,'selling',false);p.soldT=true;fixBig(p);
-  lg(p.i,`${p.nm} sells ${ids.map(cname).join(', ')} for ${g} gold${half?' (Halfling: one item at double price)':''}: +${got} level${got===1?'':'s'}.`)}
+  lg(p.i,`${p.nm} sells ${ids.length===1?cname(ids[0]):ids.length+' items'} for ${g} gold${half?' (Halfling double price)':''}. +${got} level${got===1?'':'s'}.`)}
 // ---- invariants and test hooks ----
 function checkInvariants(){if(!G)return[];const v=[];const seen={};const note=(id,z)=>{if(seen[id]!==undefined)v.push(`card ${id} in ${z} and ${seen[id]}`);seen[id]=z};
   G.door.forEach(i=>note(i,'door'));G.tr.forEach(i=>note(i,'tr'));G.dd.forEach(i=>note(i,'dd'));G.td.forEach(i=>note(i,'td'));
@@ -7153,7 +7307,7 @@ function cardFixes(me){const cb=G.cb;const vm=validMoves(me);const seen=new Set(
   return out.sort((a,b)=>(a.r==='win'?0:1)-(b.r==='win'?0:1)||a.v-b.v)}
 function fightAdvice(me){const cb=G.cb,p=P(me);const a=sideStr(cb),b=monStr(cb);const lines=[];let rec=null,why='';
   if(winning(cb)){const boosts=p.hand.filter(id=>cd(id).t==='oneshot'&&cd(id).b&&!cd(id).sp);const rivals=alive().filter(o=>o!==p&&o.hand.length).length;
-    rec={act:'fight'};why=`You win ${a} vs ${b}${a===b?' (Warriors win ties)':''}.`;lines.push(`Press <b>Fight!</b> Before it ends, each rival (${rivals} with cards) gets one chance to boost the monster.`);
+    rec={act:'fight'};why=`You win ${a} vs ${b}${a===b?' (Warriors win ties)':''}.`;lines.push(`Press <b>Fight!</b> Before it ends, each rival with cards (${rivals}) may boost the monster.`);
     if(boosts.length)lines.push(`Keep ${esc(cname(boosts[0]))} (+${cd(boosts[0]).b}) ready in case they do.`);else if(a-b<3&&rivals)lines.push('Your lead is small: a single monster boost could turn it.');
     return {rec,why,lines}}
   const offers=helpOffers(me),fixes=cardFixes(me),odds=runOdds(p,cb);
@@ -7163,7 +7317,7 @@ function fightAdvice(me){const cb=G.cb,p=P(me);const a=sideStr(cb),b=monStr(cb);
   const deadly=cb.mons.some(m=>isDeadly(mdef(m)))||cb.mons.some(m=>(mdef(m).bad||[]).some(o=>o[0]==='lvl'&&(o[1]==='all'||o[1]>=3)));
   const runTxt=odds.rows.length===1?(odds.rows[0].pr===0?'impossible':odds.rows[0].pr===1?'automatic':`roll ${odds.rows[0].need}+ (${pct(odds.all)})`):`${pct(odds.all)} to get away from all of them`;
   why=`You lose ${a} vs ${b}.`;
-  if(yes.length){const o=yes[0];rec={act:'ask',tgt:o.i,opt:o.yes};why+=` Ask ${esc(P(o.i).nm)}: ${o.str} strength makes ${a+o.str} vs ${b}, and ${P(o.i).sex==='f'?'she':'he'}’ll help for ${o.yes} treasure${plural(o.yes)}.`}
+  if(yes.length){const o=yes[0];rec={act:'ask',tgt:o.i,opt:o.yes};why+=` Ask ${esc(P(o.i).nm)}: ${o.str} strength makes ${a+o.str} vs ${b}. ${P(o.i).sex==='f'?'She':'He'}’ll help for ${o.yes} treasure${plural(o.yes)}.`}
   else if(winFix){rec=winFix.m;why+=` ${moveLabel(winFix.m)}${winFix.m.card!=null?' ('+esc(cname(winFix.m.card))+')':''} wins it.`}
   else if(goneFix&&(deadly||odds.all<.5)){rec=goneFix.m;why+=` ${moveLabel(goneFix.m)}${goneFix.m.card!=null?' ('+esc(cname(goneFix.m.card))+')':''} gets rid of it: safer than running (${pct(odds.all)}).`}
   else{rec={act:'run'};why+=` Nobody will help and no card wins it: run away (${runTxt}).`}
@@ -7193,12 +7347,12 @@ function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)ret
   if(G.q){const q=G.q;const m=aiSafe(me);r.rec=m;
     if(q.kind==='help'){const f=P(q.from);const g=fightGain(cb);if(f.lvl+g>=R.WIN){r.rec={act:'opt',opt:'no'};r.why=`Refuse! Winning this fight makes ${esc(f.nm)} level ${R.WIN}: ${f.sex==='f'?'she':'he'} would WIN THE GAME.`}
       else{const tot=sideStr(cb)+pStr(p),mb=monStr(cb);const w=tot>mb||(tot===mb&&(isCls(p,'warrior')||isCls(f,'warrior')));const elf=isRace(p,'elf');const ahead=f.lvl-p.lvl;
-        if(!w){r.rec={act:'opt',opt:'no'};r.why=`Refuse: even together you lose ${tot} vs ${mb}, and you would both have to run.`}
-        else if((q.n>=1||elf)&&ahead<3){r.rec={act:'opt',opt:'yes'};r.why=`Say yes: together you win ${tot} vs ${mb}, and you get ${q.n} treasure${plural(q.n)}${elf?' plus a level (you’re an Elf)':''}. ${esc(f.nm)} gains ${g} level${plural(g)}.`}
-        else{r.rec={act:'opt',opt:'no'};r.why=ahead>=3?`Refuse: you’d win together, but ${esc(f.nm)} is already ${ahead} levels ahead of you and would gain ${g} more.`:`Refuse: you’d win together, but there’s no pay and ${esc(f.nm)} gains ${g} level${plural(g)}.`}}}
-    else if(q.kind==='ward')r.why=m&&m.opt==='yes'?'Cancel it: this curse would really hurt.':'Let it happen: it’s a mild one, keep your ring for something worse.';
+        if(!w){r.rec={act:'opt',opt:'no'};r.why=`Refuse: even together you lose ${tot} vs ${mb}. You would both run.`}
+        else if((q.n>=1||elf)&&ahead<3){r.rec={act:'opt',opt:'yes'};r.why=`Say yes: together you win ${tot} vs ${mb}. You get ${q.n} treasure${plural(q.n)}${elf?', plus a level (Elf)':''}. ${esc(f.nm)} gains ${g} level${plural(g)}.`}
+        else{r.rec={act:'opt',opt:'no'};r.why=ahead>=3?`Refuse: you’d win, but ${esc(f.nm)} is ${ahead} levels ahead. They would gain ${g} more.`:`Refuse: you’d win, but there’s no pay. ${esc(f.nm)} gains ${g} level${plural(g)}.`}}}
+    else if(q.kind==='ward')r.why=m&&m.opt==='yes'?'Cancel it: this curse would really hurt.':'Let it happen: it’s mild. Keep your ring for something worse.';
     else if(q.kind==='rescue'){const c=mdef(runMon(cb.runs[q.run]));const ops=c.bad||[];const heavy=ops.some(o=>['death','orcs','dread','race','cls','clsOr','clsOr1','swap','hippo','troll','pixie','lowest','gold','handOr','slugs'].includes(o[0])||(o[0]==='lvl'&&(o[1]==='all'||o[1]>=2))||(o[0]==='item'&&o[2]==='all'));const use=vm0(me).filter(x=>x.act==='use').sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card));
-      if(heavy&&use.length){r.rec=use[0];r.why=`Use ${esc(cname(use[0].card))}: the Bad Stuff (${esc(c.badt||'')}) is worse than losing the card.`}else{r.rec={act:'opt',opt:'no'};r.why=`Take it: “${esc(c.badt||'lose a level')}” is mild, keep your escape card for something worse.`}}
+      if(heavy&&use.length){r.rec=use[0];r.why=`Use ${esc(cname(use[0].card))}: losing the card beats the Bad Stuff.`}else{r.rec={act:'opt',opt:'no'};r.why=`Take it: this Bad Stuff is mild. Keep your escape card.`}}
     else if(q.kind==='pick'&&m){const v=q.opts[m.opt];r.why=typeof v==='number'?`Pick ${esc(cname(v))}.`:''}
     return r}
   const ph=G.phase;
@@ -7207,7 +7361,7 @@ function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)ret
       // steal the fight: Not-My-Problem on yourself when you would win it
       const tr=validMoves(me).filter(m=>m.act==='play'&&cd(m.card).sp==='transfer'&&m.tgt===me);
       if(tr.length&&cb.who!==me){const x=sim(()=>{apply(norm(tr[0]),me);const c=G.cb;return c&&c.who===me&&winning(c)?{a:sideStr(c),b:monStr(c),lv:fightGain(c),tr:cbTreasure(c),deadly:c.mons.some(m=>isDeadly(mdef(m)))}:null});
-        if(x&&!x.deadly&&x.a-x.b>=1&&p.lvl+x.lv<=R.WIN){r.rec=tr[0];r.card=tr[0].card;r.why=`Steal this fight! With ${esc(cname(tr[0].card))} you take it over: ${x.a} vs ${x.b}, +${x.lv} level${plural(x.lv)}${p.lvl+x.lv>=R.WIN?' and THE WIN':''} and ${x.tr} treasure${plural(x.tr)} for you.`;return r}}
+        if(x&&!x.deadly&&x.a-x.b>=1&&p.lvl+x.lv<=R.WIN){r.rec=tr[0];r.card=tr[0].card;r.why=`Steal this fight! With ${esc(cname(tr[0].card))} you take it over: ${x.a} vs ${x.b}. You get +${x.lv} level${plural(x.lv)}${p.lvl+x.lv>=R.WIN?' and THE WIN':''} and ${x.tr} treasure${plural(x.tr)}.`;return r}}
       if(cb.help===me){r.rec={act:'pass'};r.why=winning(cb)?'You’re helping and winning: let it be.':'You’re helping but losing: a one-shot for the heroes would turn it.';const m=aiSafe(me);if(m)r.rec=m;return r}
       const m=aiSafe(me);r.rec=m||{act:'pass'};if(m&&m.act!=='pass'){r.card=m.card;r.why=`${esc(P(cb.who).nm)} is ${P(cb.who).lvl>=p.lvl+1?'ahead of you':'dangerous'}: ${moveLabel(m)} makes the monster win.`}
       else r.why=winning(cb)?`${esc(P(cb.who).nm)} wins this one. Nothing worth spending on it: let it be.`:`${esc(P(cb.who).nm)} is losing already: let it be.`;return r}}
@@ -7216,7 +7370,7 @@ function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)ret
     const by=((G.rv||{})[me]||{})[cur.i];if(by&&by.curse>=2&&p.hand.some(id=>cd(id).t==='curse'))r.why+=` ${esc(cur.nm)} has cursed you ${by.curse} times. Payback?`;return r}
   if(['setup','main','after','post'].includes(ph)){const plan=calmPlan(me);if(plan.length){r.rec=plan[0].m;if(plan[0].m.card!=null&&['play','equip','unequip'].includes(plan[0].m.act))r.card=plan[0].m.card;r.plan=plan}
     const lead=alive().filter(o=>o!==p).sort((a,b)=>b.lvl-a.lvl)[0];
-    if(lead&&lead.lvl-p.lvl>=3&&ph!=='setup')r.catchup=`You’re ${lead.lvl-p.lvl} levels behind ${esc(lead.nm)}. Help ${esc(lead.nm)}’s rivals for treasure, curse the leader, and stay out of fights you can’t win.`;
+    if(lead&&lead.lvl-p.lvl>=3&&ph!=='setup')r.catchup=`You’re ${lead.lvl-p.lvl} levels behind ${esc(lead.nm)}. Help ${esc(lead.nm)}’s rivals for treasure. Curse the leader. Skip fights you can’t win.`;
     if(ph==='after'&&p.hand.length<=1)r.low=`You’re down to ${p.hand.length} card${plural(p.hand.length)}: loot the room to refill.`;
     return r}
   return r}
@@ -7272,7 +7426,7 @@ function sinceTrack(me){if(!G||me<0||!P(me)||!P(me).human||G.mode==='ai'||G.winn
   if(UI.snAct!==k){UI.snAct=k;const sn=UI.snBy[me];UI.since=sn&&sn.gid===G.gid&&G.phase!=='setup'?sinceDiff(me,sn):null}
   UI.snBy[me]={gid:G.gid,ln:G.ln||0,lv:G.pl.map(x=>x.lvl),eq:p.eq.map(e=>e.id),tr:p.race.concat(p.cls),lim:handLimit(p),cu:p.curse.slice()}}
 function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(l=>l.n>sn.ln).reverse();
-  const yo=t=>youify(t,nm);const skip=/^— |kicks open the door and finds|goes looking for trouble|won't chase|agrees to help|refuses to help|asks /;
+  const yo=t=>youify(t,nm);const skip=/^— |kicks open the door and finds|kicks the door and finds|goes looking for trouble|won't chase|agrees to help|refuses to help|asks /;
   const why=(test,max)=>lines.filter(l=>!skip.test(l.t)&&test(l.t)).slice(-max).map(l=>yo(l.t));
   G.pl.forEach(x=>{const a=sn.lv[x.i],b=x.lvl;if(a==null||a===b)return;const who=x.i===me?'You':esc(x.nm);const n=x.nm;
     const r=why(t=>t.includes(n)&&/defeats|level|dies|sells|steals|curse|Bad Stuff/.test(t),1);
@@ -7284,8 +7438,8 @@ function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(
   const lim=handLimit(p);if(lim!==sn.lim)out.push(`Your hand limit is now <b>${lim}</b> (it was ${sn.lim}).`);
   const cu=p.curse.filter(id=>!sn.cu.includes(id));if(cu.length)out.push(`<b>Curse on you:</b> ${cu.map(id=>esc(cname(id))+': '+esc(cd(id).x||'')).join(' ')}`);
   return out.length?out:null}
-function sinceHTML(me){if(!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
-  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,2).map(x=>`<li>${x.replace(/ ?<span class="muted">.*?<\/span>/g,'')}</li>`).join('')}</ul></div>`}
+function sinceHTML(me){if((typeof tutOn==='function'&&tutOn())||!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
+  return `<div class="since"><b>While you waited</b><ul>${UI.since.slice(0,2).map(x=>`<li>${x.replace(/ ?<span class="muted">.*?<\/span>/g,'')}</li>`).join('')}</ul></div>`}
 // ---- learn as you play: one short idea, the first time it matters (only in a "teach me" game) ----
 const LESSONS={
   setup:'<b>Goal:</b> reach level 10. Tap glowing cards.',
@@ -7527,8 +7681,8 @@ function tagOf(c){if(c.t==='monster')return `Lv ${c.lvl}`;if(c.t==='enh')return 
   const nq=[].concat(c.req||[]).filter(r=>r[0]==='!');if(nq.length)return `+${c.b} <small>(not ${nq.map(r=>TRAITS[r.slice(1)]||r).join(', ')})</small>`;return `+${c.b}`}
 function whenText(c){switch(c.t){
   case 'race':case 'class':return 'On your own turn, outside a fight (or during setup). It replaces the one you have.';
-  case 'item':return 'On your own turn, outside a fight. It goes on automatically if you can use it.'+(c.big?' Big: you can carry only one Big item (Dwarves and a Porter can carry more).':'');
-  case 'monster':return 'After an empty door on your turn: fight it from your hand (“look for trouble”).'+(c.undead?' Undead can also join any fight against undead.':'');
+  case 'item':return 'On your own turn, outside a fight. It goes on automatically if you can use it.'+(c.big?' Big: you can carry only one Big item. Dwarves and a Porter can carry more.':'');
+  case 'monster':return 'After an empty door on your turn. Fight it from your hand.'+(c.undead?' Undead can also join any fight against undead.':'');
   case 'curse':return 'Any time, on anyone, even on someone else’s turn. It hits at once.';
   case 'level':return (c.sp==='whine'?'Only if you are not the highest level. ':c.sp==='after'?'Only right after you win a fight. ':c.sp==='killhire'?'Only while someone has a Porter. ':'')+'Any time, on anyone, but never for the winning level.';
   case 'enh':return 'During any fight: put it on a monster.';
@@ -7592,11 +7746,11 @@ function phList(p){const ids=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[
 function oppsFullHTML(me){const ps=G.pl.filter(p=>p.i!==me);const f=UI.oppView;ps.sort((a,b)=>(b.i===f)-(a.i===f));if(!ps.length)return '<p class="muted">No rivals.</p>';
   return ps.map(p=>{const act=p.i===G.active;return `<div class="oppfull paper ${act?'active':''}"><span class="lv" aria-label="level">${p.lvl}</span>
    <div class="nm">${ptok(p.i)} ${esc(heroTitle(p))} ${p.human?'':'<span class="small muted">(computer'+(p.lv!=='normal'?' · '+p.lv:'')+')</span>'}${act?' <span class="chip" style="background:#ffd43b;color:#2b2233">their turn</span>':''}</div>
-   <div class="small">⚔ strength ${pStr(p)} (level ${p.lvl} + items ${itemBonus(p)}) · ${p.sex==='m'?'♂':'♀'} · ${handIc()} ${p.hand.length} card${p.hand.length===1?'':'s'} in hand (secret)${p.dead?' · 💀 dead':''}</div>${PERSONA[p.nm]?`<div class="small muted">${esc(PERSONA[p.nm][1])}.</div>`:''}${(()=>{const me=viewSeat();const rv=me>=0&&me!==p.i&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]):null;return rv&&(rv.curse+rv.boost+rv.stab)?`<div class="small warn">Against you so far: ${rv.curse} curse${plural(rv.curse)}, ${rv.boost} monster boost${plural(rv.boost)}, ${rv.stab} backstab${plural(rv.stab)}.${rv.curse>=2?' Payback?':''}</div>`:''})()}
+   <div class="small">⚔ strength ${pStr(p)} (level ${p.lvl} + items ${itemBonus(p)}). ${p.sex==='m'?'♂':'♀'} · ${handIc()} ${p.hand.length} card${p.hand.length===1?'':'s'} in hand${p.dead?' · 💀 dead':''}</div>${PERSONA[p.nm]?`<div class="small muted">${esc(PERSONA[p.nm][1])}.</div>`:''}${(()=>{const me=viewSeat();const rv=me>=0&&me!==p.i&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]):null;return rv&&(rv.curse+rv.boost+rv.stab)?`<div class="small warn">Against you so far: ${rv.curse} curse${plural(rv.curse)}, ${rv.boost} monster boost${plural(rv.boost)}, ${rv.stab} backstab${plural(rv.stab)}.${rv.curse>=2?' Payback?':''}</div>`:''})()}
    <div class="chips">${races(p).concat(classes(p)).map(r=>`<span class="chip">${esc(TRAITNAME[r]||r)}</span>`).join('')}${p.curse.map(id=>`<span class="chip" style="background:#e9ecef;color:#2b2233">☁ ${esc(cname(id))}</span>`).join('')}</div>
    <div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>cardHTML(id,{size:'xs'})).join('')}${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')||'<span class="small muted">No items yet.</span>'}</div>${phList(p)}</div>`}).join('')}
 function deckHTML(kind,n){const d=Math.min(10,Math.ceil(n/7));const sh=[];for(let i=1;i<=d;i++)sh.push(`${(i*.55).toFixed(1)}px ${(i*1.25).toFixed(1)}px 0 ${i===d?'#1a0d06':i%2?'#e9dab4':'#bfa878'}`);
-  const door=kind==='door';return `<div class="stack ${door?'door':'treas'}" aria-label="${door?'Door':'Treasure'} deck" style="--deck:${sh.join(',')||'0 0 0 transparent'}${n?'':';opacity:.35'}"><span class="back">${typeof cardBack==='function'?cardBack(door?'door':'tr'):''}</span><span class="dn">${door?'DOOR':'TREASURE'}</span><span class="n">${n}</span></div>`}
+  const door=kind==='door';return `<div class="stack ${door?'door':'treas'}" aria-label="${door?'Door':'Treasure'} deck" style="--deck:${sh.join(',')||'0 0 0 transparent'}${n?'':';opacity:.35'}"><span class="back">${typeof cardBack==='function'?cardBack(door?'door':'tr'):''}</span><span class="dn">${door?'Doors':'Treasure'}</span><span class="n">${n}</span></div>`}
 function pilesHTML(){const dk=G.door.length;const ld=G.dd[G.dd.length-1];
   return `<div class="pile pl">${deckHTML('door',dk)}<span class="lbl">discard: ${G.dd.length}</span>${ld!=null?cardHTML(ld,{size:'xs'}):''}</div>`}
 function pileR(){const tk=G.tr.length,lt=G.td[G.td.length-1];return `<div class="pile pr">${deckHTML('tr',tk)}<span class="lbl">discard: ${G.td.length}</span>${lt!=null?cardHTML(lt,{size:'xs'}):''}</div>`}
@@ -7633,7 +7787,7 @@ function rollHTML(){const r=G.lastRoll;if(!r)return '';UI.rollAt=UI.rollAt||{};c
   const anim=UI.rolled!==r.id;UI.rolled=r.id;UI.arRes+=46;return `<div class="rollbox" aria-label="Last roll"><div class="dwrap">${anim?`<img class="die3sp" src="models/die${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()">`:''}<div class="die3 ${anim?'roll':''}">${faces.map(v=>`<i>${face(v)}</i>`).join('')}</div></div><span class="small">${nmY(r.who)} rolled ${r.v}${r.mod?` ${r.mod>0?'+':'−'} ${Math.abs(r.mod)} = ${tot}`:''}${r.what==='slugs'?'':`: ${r.ok?'✓ made it':'✗ failed'} (needed ${r.need}+)`}</span></div>`}
 function gchipHTML(id,cls){const c=cd(id);const ic=c.t==='race'?'🧬':c.t==='class'?'🎓':c.t==='curse'?'☁':c.slot==='head'?'🪖':c.slot==='foot'?'👢':c.slot==='armor'?'🛡':c.hands?'🗡':c.t==='item'?'🎒':'✦';const gs=c.t==='race'?'race':c.t==='class'?'class':c.t==='curse'?'curse':c.slot==='head'?'head':c.slot==='foot'?'feet':c.slot==='armor'?'body':c.hands?'hands':'';
   return `<button class="gchip ${c.d==='door'?'door':'tr'} ${c.t==='curse'?'curse ':''}${cls||''}" data-card="${id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${/eqoff/.test(cls||'')?' (carried, not worn)':''}"><span class="gi" data-s="${gs}" aria-hidden="true">${ic}</span>${esc(c.n)}${c.t==='item'&&c.b?` <b>+${c.b}</b>`:''}</button>`}
-function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><div class="empty">Watching the computer play. Press ⏸ to pause at any moment; tap a rival for their cards.</div></div>`;
+function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><div class="empty">Watching the computer play. Press ⏸ to pause any time. Tap a rival for their cards.</div></div>`;
   const p=P(me);const vm=myMoves(me);const playable=new Set(vm.filter(m=>m.card!==undefined).map(m=>m.card));const sellSet=UI.sell?new Set(UI.sell):null;const selc=id=>sellSet?(sellSet.has(id)?'sel ':sellable(p).includes(id)?'play ':'dim '):'';
   const co=p.human?coach(me):{};const sug=UI.hints&&co.card!=null?co.card:null;const badge=co.disc?(G.phase==='charity'&&charityTargets(p).length?'Suggested give-away':'Suggested discard'):'Suggested play';
   const gear=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).map(id=>gchipHTML(id,'')).join('')+(p.hire!=null?gchipHTML(p.hire,''):'')+p.eq.map(e=>gchipHTML(e.id,(e.on?'':'eqoff ')+(sellSet?selc(e.id):playable.has(e.id)?'play':'')+(sug===e.id?' sug':''))).join('')+p.curse.map(id=>gchipHTML(id,'')).join('');
@@ -7661,7 +7815,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   const cb=G.cb;const by=a=>vm.filter(m=>m.act===a);const btn=(m,label,cl)=>`<button class="btn ${cl||''}${recK&&mvKey(m)===recK?' rec':''}" data-mv='${esc(JSON.stringify(m))}'>${label}</button>`;
   let say='',ol=[],tip='',acts='',extra=[];
   if(G.q){const q=G.q;
-    if(q.kind==='help'){const f=P(q.from);say=`${esc(f.nm)} asks you to help against ${cb.mons.map(m=>esc(cname(m.id))).join(' and ')}, offering ${q.n} treasure${q.n===1?'':'s'}.`;tip=`With you: ${sideStr(cb)+pStr(P(me))} vs ${monStr(cb)}. If you lose, you both run away.`;acts=btn({act:'opt',opt:'yes'},'Help','good')+btn({act:'opt',opt:'no'},'Refuse')}
+    if(q.kind==='help'){const f=P(q.from);say=`${esc(f.nm)} asks for your help against ${cb.mons.map(m=>esc(cname(m.id))).join(' and ')}. The offer: ${q.n} treasure${q.n===1?'':'s'}.`;tip=`With you: ${sideStr(cb)+pStr(P(me))} vs ${monStr(cb)}. If you lose, you both run away.`;acts=btn({act:'opt',opt:'yes'},'Help','good')+btn({act:'opt',opt:'no'},'Refuse')}
     if(q.kind==='rescue'){say='Caught! You can still get away.';ol=['Use an escape card, or take the Bad Stuff.'];acts=by('use').map(m=>btn(m,'Use '+esc(cname(m.card)),'good')).join('')+btn({act:'opt',opt:'no'},'Take the Bad Stuff','danger')}
     if(q.kind==='pick'){say=q.text||'Choose one.';acts=q.opts.map((v,i)=>v==='hand'?btn({act:'pick',opt:i},'A random card from their hand'):v==='lvl'?btn({act:'pick',opt:i},'Lose the levels'):typeof v==='number'&&document.documentElement.classList.contains('ph')?btn({act:'pick',opt:i},esc(cname(v))+(cd(v).b?` ${cd(v).b>0?'+':''}${cd(v).b}`:''),'pickchip'):typeof v==='number'?`<button class="btn opt${recK&&mvKey({act:'pick',opt:i})===recK?' rec':''}" data-mv='${esc(JSON.stringify({act:'pick',opt:i}))}' style="padding:2px">${cardHTML(v,{size:'xs',attr:'tabindex="-1"',notitle:1}).replace('<button','<span').replace(' data-card=',' data-pcard=').replace(/<\/button>$/,'</span>')}</button>`:btn({act:'pick',opt:i},v==='hand'?'Discard my hand':esc(v))).join('');if(q.why==='handOr')acts=btn({act:'pick',opt:0},'Discard my whole hand')+btn({act:'pick',opt:1},'Lose '+q.cont.n+' levels')}
     if(q.kind==='ward'){say=`A curse is coming: ${esc(cname(q.curse))}. ${esc(cd(q.curse).x)}`;ol=['Cancel it with your '+esc(cname(q.ring))+'?'];acts=btn({act:'opt',opt:'yes'},'Cancel the curse','good')+btn({act:'opt',opt:'no'},'Let it happen')}
@@ -7670,18 +7824,18 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
     if(q.kind==='fetch'){say=`Throw your ${esc(cname(q.card))} for the hound to escape automatically?`;acts=btn({act:'opt',opt:'yes'},'Throw it','good')+btn({act:'opt',opt:'no'},'Roll instead')}}
   else switch(G.phase){
   case 'setup':say='Set up your hero before the first door.';acts=autoBtn(me,co)+btn({act:'ready'},'Ready',autoN(me,co)?'':'primary pulse');break;
-  case 'window':say=`Before ${esc(curPl().nm)} kicks the door, you may play a curse or a level-up (tap it in your hand).`;acts=btn({act:'pass'},`Let ${esc(curPl().nm)} go on`,'primary');break;
-  case 'main':say='Get ready, then kick open the door.';acts=autoBtn(me,co)+btn({act:'kick'},'🚪 Kick open the door',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);tip=by('resurrect').length?'As a Cleric you can instead take the top door discard: tap a card to discard for it.':'';break;
+  case 'window':say=`Before ${esc(curPl().nm)} kicks, you may curse or level up. Tap the card in your hand.`;acts=btn({act:'pass'},`Let ${esc(curPl().nm)} go on`,'primary');break;
+  case 'main':say='Get ready, then kick open the door.';acts=autoBtn(me,co)+btn({act:'kick'},'🚪 Kick open the door',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);tip=by('resurrect').length?'As a Cleric, you may take the top door discard. Tap a card to pay for it.':'';break;
   case 'after':say='No monster behind the door.';ol=['Look for trouble: fight a monster from your hand, or','Loot the room: draw a face-down door card.'];acts=btn({act:'loot'},'Loot the room (free card)','primary')+by('trouble').filter(m=>!riskyCard(me,m.card)).slice(0,1).map(m=>btn(m,`⚔ Fight ${esc(cname(m.card))} (Lv ${cd(m.card).lvl})`,'good')).join('')+sellBtn(vm,me);extra.push(co.low);break;
   case 'post':{const over=P(me).hand.length-handLimit(P(me));say='Tidy up, then end your turn.'+(over>0?` You hold ${over} card${plural(over)} too many and will give ${over===1?'it':'them'} away.`:'');acts=autoBtn(me,co)+btn({act:'end'},'End turn',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);break}
-  case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards but may keep only ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}: extra cards go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null&&UI.hints?`<button class="btn primary pulse" data-a="autocharity">✨ Give away the suggested card${ex>1?'s':''} (${ex})</button>`:'';break}
+  case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards. You may keep ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}. Extras go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null&&UI.hints?`<button class="btn primary pulse" data-a="autocharity">✨ Give away the suggested card${ex>1?'s':''} (${ex})</button>`:'';break}
   case 'combat':{const win=winning(cb);
     if(cb.stage==='act'){say=win?`You are winning, ${sideStr(cb)} to ${monStr(cb)}.`:`You are losing, ${sideStr(cb)} to ${monStr(cb)}.`;
       ol=win?['Add more one-shots for safety, or','Fight: others get one last chance to interfere.']:['Play one-shots or powers, ask someone to help, or','Run away: roll 5 or more on a die for each monster.'];
       const askRec=UI.hints&&co.rec&&co.rec.act==='ask';
       acts=(by('fight').length?btn({act:'fight'},'⚔ Fight!','primary pulse'):'')+(by('run').length?btn({act:'run'},'🏃 Run away'+runLabel(me,cb),co.rec&&co.rec.act==='run'?'primary':''):'')+(by('ask').length?`<button class="btn${askRec?' rec primary':''}" data-a="askmenu">🙋 Ask for help</button>`:'')+abilityBtns(vm,recK);
       tip=monTips(cb)}
-    else{say=`${nmY(cb.who)} is fighting (${sideStr(cb)} vs ${monStr(cb)}). Anything to play?`;ol=['Tap a monster boost or one-shot in your hand to change the fight,','or let it be.'];acts=btn({act:'pass'},'Let it be',co.threat&&co.rec&&co.rec.act!=='pass'?'':'primary')+abilityBtns(vm,recK)}
+    else{say=`${nmY(cb.who)} is fighting (${sideStr(cb)} vs ${monStr(cb)}). Anything to play?`;ol=['Tap a monster boost or one-shot to change the fight.','Or let it be.'];acts=btn({act:'pass'},'Let it be',co.threat&&co.rec&&co.rec.act!=='pass'?'':'primary')+abilityBtns(vm,recK)}
     break}}
   if(co.plan&&co.plan.length&&UI.hints){const pl=co.plan.map(x=>`<b>${x.label}</b>${x.why?` <span class="muted">(${x.why})</span>`:''}`);co.why=co.why||(co.plan.length>1?'Suggested: '+pl.join(' → '):'Suggested: '+pl[0])}
   if(co.catchup)extra.push('📉 '+co.catchup);
@@ -7717,15 +7871,15 @@ function moveLabel(m){const c=m.card!=null?cd(m.card):null;const me=viewSeat();c
   case 'ask':return `Ask ${nmY(m.tgt)} for help (offer ${m.opt})`;case 'ready':return 'Ready';case 'kick':return 'Kick open the door';case 'loot':return 'Loot the room';case 'end':return 'End your turn';case 'fight':return 'Fight!';case 'run':return 'Run away';case 'pass':return 'Let it be';
   default:return m.act}}
 function askHTML(me){const cb=G.cb;const opts=validMoves(me).filter(m=>m.act==='ask');const who=[...new Set(opts.map(m=>m.tgt))];const co=coach(me);const recK=UI.hints&&co.rec?mvKey(co.rec):null;const offs=UI.hints?helpOffers(me):[];
-    return `<div class="asks" role="group" aria-label="Ask for help"><b>Ask for help</b><span class="small">Pick a helper and how many of the ${cbTreasure(cb)} treasures you offer. They add their strength; if you still lose, you both run.</span>${who.map(i=>{const o=offs.find(x=>x.i===i);return `<div><b>${esc(P(i).nm)}</b> <span class="small">(strength ${pStr(P(i))}${pStr(P(i))+sideStr(cb)>monStr(cb)?', enough to win':', not enough'}${o&&o.yes!=null?`; will say yes for ${o.yes}`:o&&o.wins&&!o.human?'; will say no':''})</span><div class="acts" style="margin:.2rem 0">${opts.filter(m=>m.tgt===i).map(m=>`<button class="btn${recK&&mvKey(m)===recK?' rec':''}" data-mv='${esc(JSON.stringify(m))}'>offer ${m.opt}</button>`).join('')}</div></div>`}).join('')}<div><button class="btn" data-a="close">Cancel</button></div></div>`}
-function infoHTML(c){return `${c.t==='monster'?`<p class="small">Level ${c.lvl} · ${c.tr} treasure${c.tr===1?'':'s'}${(c.lv||1)>1?` · worth ${c.lv} levels`:''}<br>Bad Stuff: ${esc(c.badt||'lose a level')}</p>`:''}${c.t==='item'?`<p class="small">${kindLabel(c)} · ${tagOf(c).replace(/<[^>]+>/g,'')||'+0'} · ${c.g||0} gold${c.req?` · ${[].concat(c.req).map(r=>r[0]==='!'?'not for '+(TRAITS[r.slice(1)]||r.slice(1)):'only for '+(TRAITS[r]||r)).join(', ')}`:''}</p>`:''}<p class="when small"><b>When you can play it:</b> ${esc(whenText(c))}</p>`}
+    return `<div class="asks" role="group" aria-label="Ask for help"><b>Ask for help</b><span class="small">Pick a helper and your offer, out of ${cbTreasure(cb)} treasures. They add their strength. If you still lose, you both run.</span>${who.map(i=>{const o=offs.find(x=>x.i===i);return `<div><b>${esc(P(i).nm)}</b> <span class="small">(strength ${pStr(P(i))}${pStr(P(i))+sideStr(cb)>monStr(cb)?', enough to win':', not enough'}${o&&o.yes!=null?`; will say yes for ${o.yes}`:o&&o.wins&&!o.human?'; will say no':''})</span><div class="acts" style="margin:.2rem 0">${opts.filter(m=>m.tgt===i).map(m=>`<button class="btn${recK&&mvKey(m)===recK?' rec':''}" data-mv='${esc(JSON.stringify(m))}'>offer ${m.opt}</button>`).join('')}</div></div>`}).join('')}<div><button class="btn" data-a="close">Cancel</button></div></div>`}
+function infoHTML(c){return `${c.t==='monster'?`<p class="small">Level ${c.lvl} · ${c.tr} treasure${c.tr===1?'':'s'}${(c.lv||1)>1?` · worth ${c.lv} levels`:''}.<br>Bad Stuff: ${esc(c.badt||'lose a level')}</p>`:''}${c.t==='item'?`<p class="small">${kindLabel(c)}. ${tagOf(c).replace(/<[^>]+>/g,'')||'+0'}. ${c.g||0} gold${c.req?`. ${[].concat(c.req).map(r=>r[0]==='!'?'not for '+(TRAITS[r.slice(1)]||r.slice(1)):'only for '+(TRAITS[r]||r)).join(', ')}`:''}</p>`:''}<p class="when small"><b>When you can play it:</b> ${esc(whenText(c))}</p>`}
 function menuHTML(me){const u=UI.menu;
   const id=u.card;const ms=cardMoves(me,id);const c=cd(id);const co=coach(me);const recK=UI.hints&&co.rec?mvKey(co.rec):null;const rk=riskyCard(me,id);
   return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${rk?`<p class="warn">⚠ ${esc(rk)}.</p>`:''}${UI.hints&&co.card===id&&co.why?`<p class="why">💡 ${co.why}</p>`:''}
     <div class="opts">${ms.map(m=>`<button class="btn opt ${recK&&recK===mvKey(m)?'rec':''}" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`).join('')||'<p class="small muted">You can\'t use this card right now.</p>'}${me>=0&&validMoves(me).some(m=>m.act==='sell')&&sellable(P(me)).includes(id)?`<button class="btn opt sellone" data-a="sellone" data-id="${id}">Sell it (${cd(id).g||0} gold)</button>`:''}</div>
     <div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function zoomHTML(){const id=UI.zoom;const c=cd(id);const me=viewSeat();const mineCard=me>=0&&P(me).hand.includes(id);return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${mineCard?'<p class="small muted">You can’t use this card right now.</p>':''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
-function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away: ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
+function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away. ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
   return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?(dkHero3d(w.nm,'win3d')||dkPortrait(w.nm,'winp')):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
@@ -7737,7 +7891,7 @@ function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.ge
    <button class="btn qrow${open?' on':''}" data-a="quick" aria-expanded="${open}">Quick game ${open?'▴':'▾'}</button>
    ${open?`<div class="qopts"><h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${(UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
-   ${online||UI.mode==='ai'?'':`<div class="seg"><button class="btn tgl ${UI.learn===true?'on':''}" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Teach me as I play</button></div>`}
+   ${online||UI.mode==='ai'?'':`<div class="seg"><button class="btn tgl ${UI.learn===true?'on':''}" id="hintsBlearn" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Hints while I play</button></div>`}
    ${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>`}</div>`:''}
    ${typeof tutBtn==='function'?tutBtn('btn'):''}${!net&&typeof onlineBlock==='function'&&!online?onlineBlock():''}</div>`}
 function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
@@ -7795,7 +7949,8 @@ function humanTurn(){if(!G||G.winner)return false;const s=sideToAct();return s>=
 try{const ex=JSON.parse(localStorage.getItem('dkd_ex')||'null');if(ex)Object.assign(DEFEX,ex)}catch(e){}
 // ---- board-first shell: popups for the diary, rivals, card details and rules ----
 GX.init({key:'dkd'});
-if(typeof GXSK!=='undefined')GXSK.init({});
+// story map, stars and act banner need media/story-map.webp, ui-star-on/off.webp, ui-act-banner-c.webp for THIS game (none exist yet: 404s); switch each on when its file lands
+if(typeof GXSK!=='undefined')GXSK.init({map:false,stars:false,banner:false});
 GX.drawer('dkLog','Dungeon diary',$('#dkLogBody'));
 GX.drawer('dkOpp','Rivals: gear and cards',$('#dkOppBody'),true);
 GX.drawer('dkCard','Card',$('#dkCardBody'));
@@ -7923,7 +8078,7 @@ function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who=
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
   o.innerHTML=`<div class="bfburst"></div><div class="bfd3"><img src="models/door${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()"><i class="bfdust" style="--dx:-90px;--dy:-10px"></i><i class="bfdust" style="--dx:90px;--dy:-24px"></i><i class="bfdust" style="--dx:-50px;--dy:-60px"></i><i class="bfdust" style="--dx:60px;--dy:-70px"></i><i class="bfdust" style="--dx:0px;--dy:-96px"></i></div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
-  document.body.appendChild(o);const dur=mine?1700:1000;let opened=false;
+  document.body.appendChild(o);const tut=typeof tutOn==='function'&&tutOn();const dur=tut?(mine?1700:1000):4200;let opened=false;
   const E=BF.ev=BF.ev||{door0:0,door1:0,card:0};const dimg=o.querySelector('.bfd3 img');
   const open=()=>{if(opened||!o.isConnected)return;opened=true;E.door1=E.door1||performance.now();E.card=performance.now();o.classList.add('open');
     if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click');
@@ -7971,7 +8126,7 @@ function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||!BF.moti
       // the clip has its own roar: duck the music under it and skip the synth one; muted clip (sfx off) = silence, rejected unmuted play() = muted + synth roar
       loud=!v.muted;if(loud){try{if(window.GA)GA.duckTo(.25,.3)}catch(e){}}
       try{if(typeof sfx==='function'){if(!mine)sfx('door');if(!loud)setTimeout(()=>{try{sfx('roar')}catch(e){}},mine?0:200)}}catch(e){}
-      t3=setTimeout(()=>nm.classList.add('on'),900);setTimeout(()=>nm.classList.remove('on'),2500);
+      t3=setTimeout(()=>nm.classList.add('on'),900);
       t2=setTimeout(end,6200);UI.hold=Date.now()+6600});
     t1=setTimeout(bail,700);
     document.addEventListener('keydown',key,true);document.addEventListener('pointerdown',tap,true);document.addEventListener('click',eat,true);
@@ -7981,9 +8136,11 @@ function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||!BF.moti
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
   const w=64,sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-45,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-45;
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:620,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
-function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=(r.top+r.height/3)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1500)}
-function bfBubble(s,txt){const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),2600)}
-function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),3600)}
+function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=Math.max(24,r.top-16)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),4100)}
+function bfRead(t){return 4000+Math.ceil(String(t).split(/\s+/).length/10)*1000}
+function bfOne(){document.querySelectorAll('.bfbub').forEach(x=>x.remove())}
+function bfBubble(s,txt){if(!UI.hints&&!(typeof tutOn==='function'&&tutOn()))return;const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';bfOne();document.body.appendChild(b);setTimeout(()=>b.remove(),bfRead(txt))}
+function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';bfOne();document.body.appendChild(b);b.addEventListener('click',()=>b.remove());setTimeout(()=>b.remove(),bfRead(txt))}
 function bfSnap(){if(!G)return null;const cb=G.cb;const me=viewSeat();const mp=me>=0&&G.pl[me]?P(me):null;return {gid:G.gid,turn:G.turn,kick:G.kicked,me,eq:mp?mp.eq.map(e=>e.id+':'+(e.on?1:0)):[],lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
   cb:cb?{k:G.turn+':'+cb.who,enh:cb.mons.map(m=>m.enh.length),n:cb.mons.length,os:cb.os.length,help:cb.help,a:sideStr(cb),b:monStr(cb)}:null,ln:G.ln}}
 function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const actor=G.log[0]?G.log[0].s:-1;const chip=s=>document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);
@@ -8103,6 +8260,18 @@ autoNoteHTML=function(){const a=UI.autoNote;if(!a||!G)return '';if(!a.at)a.at=Da
 (function(){const _dt=dockTitle;dockTitle=function(me){const cb=G&&G.cb;const s=G?sideToAct():-1;if(cb&&!G.winner&&s===me&&me>=0&&cb.who!==me&&cb.help!==me)return P(cb.who).nm+'’s fight: meddle?';if(G&&!G.winner&&G.phase==='window'&&s===me&&G.active!==me)return curPl().nm+'’s door: curse?';return _dt(me)}})();
 // the first game with "teach me" starts against Easy computers (still changeable on the start screen)
 (function(){if(UI.lvl||/jsdom/i.test(navigator.userAgent||''))return;let first=true;try{first=!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')}catch(e){}if(first){UI.lvl='easy';if(!G)render()}})();
+// ---------------------------------------------------------------- the Goal card: one sentence on how to win, three on how to climb.
+// Opens at the start of the first game on this device and whenever the level strip at the top is tapped. Any tap closes it (it never times out).
+const GOAL_TXT={win:'Be the first hero to reach level 10.',pts:['Beat a monster: go up a level (big ones give 2).','Sell 1,000 gold of items: go up a level.','Level 10 only comes from beating a monster.']};
+function dkGoal(){if(document.getElementById('dkgoal'))return;const o=document.createElement('div');o.id='dkgoal';o.setAttribute('role','dialog');o.setAttribute('aria-label','How to win');
+  const me=typeof viewSeat==='function'&&G?viewSeat():-1;const lv=me>=0&&G.pl[me]?G.pl[me].lvl:1;
+  o.innerHTML=`<div class="dkg paper"><p class="dkgk">How to win</p><p class="dkgw">${GOAL_TXT.win}</p><ul>${GOAL_TXT.pts.map(t=>`<li>${t}</li>`).join('')}</ul><p class="dkgy">You are level <b>${lv}</b> of 10</p><button class="btn primary" type="button">Got it</button></div>`;
+  document.body.appendChild(o);UI.goalAt=Date.now()}
+function dkGoalClose(){const o=document.getElementById('dkgoal');if(o)o.remove()}
+document.addEventListener('pointerdown',e=>{const o=document.getElementById('dkgoal');if(o&&Date.now()-(UI.goalAt||0)>250){e.preventDefault();e.stopPropagation();setTimeout(dkGoalClose,0);return}
+  if(e.target.closest&&e.target.closest(document.documentElement.classList.contains('ph')?'#phchip':'#phchip,#docktitle')&&!document.querySelector('.gxh-bub,.gxh-card,#bfrev')&&typeof G!=='undefined'&&G)dkGoal()},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')dkGoalClose()});
+(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof tutOn==='function'&&tutOn())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'&&!/[?&]scn=/.test(location.search)){UI.goalGid=G.gid;setTimeout(()=>{if(!G||G.tut||(typeof tutOn==='function'&&tutOn())||(typeof TUTG!=='undefined'&&TUTG))return;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)dkGoal()},600)}}catch(e){}return x}})();
 
 </script>
 <script>
@@ -8111,8 +8280,13 @@ autoNoteHTML=function(){const a=UI.autoNote;if(!a||!G)return '';if(!a.at)a.at=Da
 const TB={lp:null,lpAt:0,fan:0};
 // the hand is a fan: overlap so every card shows a slice and nothing scrolls (scroll only when ~10+ cards would be too thin)
 function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
-  const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
+  hd.classList.remove('row');const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
   const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0)return;
+  // portrait phone, 5+ cards: a fan hides every name, so the hand becomes a row of whole, readable cards that scrolls sideways
+  if(document.documentElement.classList.contains('ph-p')&&n<=5){const gap=6;hd.style.setProperty('--ov',gap+'px');hd.style.setProperty('--vis','100%');
+    // up to 5 cards always fit: shrink them a little instead of scrolling (names stay 14px); 6+ use the overlapping fan below
+    const room=hd.clientWidth-8;{const fw=Math.floor((room-gap*(n-1))/n);if(fw<100)hd.style.setProperty('--hw',Math.max(64,fw)+'px')}
+    hd.classList.add('row');const wN=parseFloat(hd.style.getPropertyValue('--hw'))||100;hd.classList.toggle('scrolls',n*wN+(n-1)*gap>room);hd.classList.remove('tight');cs.forEach(c=>{const m=c.querySelector('.cn');if(m)m.style.fontSize=''});return}
   // keep every card's visible slice >= 44 px (a finger): shrink the cards a little when the hand is big, scroll when it still does not fit
   let w=w0;if(n>1){const fit=avail-MS*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
   const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<MS,step=sc?MS:Math.min(w*.8,need);
@@ -8247,12 +8421,12 @@ const hfirst=(...sels)=>()=>{for(const s of sels){for(const e of document.queryS
 const hmv=act=>`#prompt [data-mv*='"act":"${act}"'],.fbtns [data-mv*='"act":"${act}"']`;
 const HLP_STEPS={
  main:{target:hfirst('.bfdoor','.pile.pl'),title:'Kick the door',text:'Play cards to gear up, then tap the door.',pic:()=>HP.door()},
- after:{target:hfirst(hmv('loot'),'#prompt .acts button'),title:'An empty room',text:'No monster this time. Tap Loot for a free card, or fight a monster from your hand.',pic:()=>HP.back()},
+ after:{target:hfirst(hmv('loot'),'#prompt .acts button'),title:'An empty room',text:'No monster this time. Tap Loot for a free card. Or fight a monster from your hand.',pic:()=>HP.back()},
  post:{target:hfirst(hmv('end'),'#prompt .acts button'),title:'Tidy up',text:'Wear new items and sell spares for a level. Then tap End turn.',pic:()=>HP.coin('+1')},
  charity:{target:hfirst('.mine .hand .card.play','.mine .hand'),title:'Too many cards',text:'You hold more cards than the limit. Tap a glowing card and give it away.',pic:()=>HP.hand()},
  window:{target:hfirst('#prompt .acts button','.arena'),title:'A rival’s door',text:'They are about to kick. Curse them with a glowing card, or let them go on.',pic:()=>HP.curse()},
  fight:{target:hfirst('.fbtns .fightb','.fbtns button','.arena .vs'),title:'The fight',text:'The bigger number wins. Tap Fight if you lead. Otherwise add cards, get help or run.',pic:()=>HP.swords()},
- meddle:{target:hfirst('.arena .vs','#prompt .acts button'),title:'A rival fights',text:'You may play a glowing card to change their fight, or tap Let it be.',pic:()=>HP.monster()},
+ meddle:{target:hfirst('.arena .vs','#prompt .acts button'),title:'A rival fights',text:'Play a glowing card to change their fight. Or tap Let it be.',pic:()=>HP.monster()},
  qHelp:{target:hfirst('#prompt .acts button'),title:'Asked for help',text:'A rival offers treasure to team up. Tap Help to join, or Refuse.',pic:()=>HP.help()},
  qWard:{target:hfirst('#prompt .acts button'),title:'A curse is coming',text:'Your ring can cancel it. Tap Cancel the curse, or let it happen.',pic:()=>HP.ward()},
  qRescue:{target:hfirst('#prompt .acts button'),title:'Caught!',text:'Use an escape card to dodge the Bad Stuff, or take it.',pic:()=>HP.run()},
@@ -8265,13 +8439,13 @@ const HLP_STEPS={
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
  {title:'The goal',text:'Be first to reach level 10. The last level can only come from killing a monster.',pic:()=>hpics([['hero','You'],'>',['level','Level 10']])},
- {title:'Your turn',text:'Gear up, kick open a door, fight or loot, tidy up, then end your turn.',pic:()=>hpics([['door','Kick'],'>',['swords','Fight'],'>',['chest','Loot']])},
+ {title:'Your turn',text:'Gear up and kick open a door. Fight or loot, then end your turn.',pic:()=>hpics([['door','Kick'],'>',['swords','Fight'],'>',['chest','Loot']])},
  {phase:'setup',title:'Set up your hero',text:'Play race, class and item cards from your hand. Items go on if you can use them.',pic:()=>hpics([['card','Race'],['card','Item'],'>',['hero','Hero']])},
  {phase:'setup',title:'Strength is your power',text:'Your strength is your level plus your items. Bigger strength beats bigger monsters.',pic:()=>hpics([['hero','Level 1',1],['coin','+ items','+3'],'>',['swords','Strength 4']])},
  {phase:'main',title:'Kick open the door',text:'Draw a door card face up. A monster starts a fight. A curse hits you at once.',pic:()=>hpics([['door','Kick'],'>',['monster','Fight'],['curse','Curse']])},
- {phase:'main',title:'Gear up first',text:'Before kicking, play items, races and classes, or sell spares: 1,000 gold buys a level.',pic:()=>hpics([['card','Gear'],'>',['coin','1000'],'>',['level','Level']])},
+ {phase:'main',title:'Gear up first',text:'Before kicking, play items, races and classes. 1,000 gold of sales buys a level.',pic:()=>hpics([['card','Gear'],'>',['coin','1000'],'>',['level','Level']])},
  {phase:'main',title:'Nothing behind it?',text:'Any other card goes to your hand. Then you may loot the room or fight from your hand.',pic:()=>hpics([['door','Door'],'>',['hand','Your hand']])},
- {phase:'after',title:'Loot the room',text:'With no monster to fight, draw a free face-down door card into your hand.',pic:()=>hpics([['back','Draw'],'>',['hand','Hand']])},
+ {phase:'after',title:'Loot the room',text:'No monster to fight? Draw a free face-down door card.',pic:()=>hpics([['back','Draw'],'>',['hand','Hand']])},
  {phase:'after',title:'Look for trouble',text:'Or play a monster from your hand and fight it. Only do this if you can win.',pic:()=>hpics([['hand','Hand'],'>',['monster','Fight']])},
  {phase:'post',title:'Tidy up',text:'Wear new items, sell spares, then tap End turn. Your turn passes to the next hero.',pic:()=>hpics([['card','Wear'],['coin','Sell'],'>',['pass','End']])},
  {phase:'post',title:'Selling for levels',text:'Items worth 1,000 gold sell for one level. You can never sell your way to level 10.',pic:()=>hpics([['coin','1000'],'>',['level','Level']])},
@@ -8283,7 +8457,7 @@ const HLP_RULES=[
  {phase:'fight',title:'Win the fight',text:'You gain levels and draw the monster’s treasure. Rivals get one last chance to boost it.',pic:()=>hpics([['monster','Beaten'],'>',['level','Level'],['chest','Treasure']])},
  {phase:'fight',title:'Losing? Three ways out',text:'Play a one-shot card, ask a rival for help, or run away.',pic:()=>hpics([['card','Card'],['help','Help'],['run','Run']])},
  {phase:'fight',title:'Running away',text:'Roll a die for each monster: 5 or more escapes. Fail and the Bad Stuff happens.',pic:()=>hpics([['run','Run'],'>',['die','5+',5]])},
- {phase:'meddle',title:'Meddle in a fight',text:'Any hero may add a monster boost, a one-shot or a curse while a fight is on.',pic:()=>hpics([['card','Card'],'>',['monster','Monster']])},
+ {phase:'meddle',title:'Meddle in a fight',text:'During a fight, any hero may add a boost, one-shot or curse.',pic:()=>hpics([['card','Card'],'>',['monster','Monster']])},
  {phase:'meddle',title:'Stop a winner',text:'If this fight would win the game, spend anything to stop it. Otherwise let it be.',pic:()=>hpics([['hero','Winning'],'>',['pass','Stop it']])},
  {phase:'qHelp',title:'Help a rival?',text:'Join the fight and your strengths add up. If you win together, you share the treasure.',pic:()=>hpics([['hero','Rival'],['help','+'],['hero','You']])},
  {phase:'qHelp',title:'Careful',text:'Only the fighter gains levels. Never help a rival who is one level from winning.',pic:()=>hpics([['level','Level 9'],'>',['pass','Refuse']])},
@@ -8327,7 +8501,7 @@ const hrect=e=>{const r=e.getBoundingClientRect();return {left:r.left,top:r.top,
 function hslice(e){const r=e.getBoundingClientRect();let right=r.right;
   if(e.closest('.mine .hand')){for(const o of e.closest('.mine .hand').querySelectorAll('.card')){if(o===e)continue;const q=o.getBoundingClientRect();if(q.left>r.left+4&&q.left<right)right=q.left}}
   return {left:r.left,top:r.top,width:Math.max(24,right-r.left),height:r.height}}
-function hlpPlan(m,me){const p=hlpPlan0(m,me);if(!p)return null;p.toR=hrect(p.toE);if(p.fromE)p.fromR=hslice(p.fromE);return p}
+function hlpPlan(m,me){const p=hlpPlan0(m,me);if(!p)return null;if(p.fromE&&p.fromE.closest('.mine .hand')){const r=p.fromE.getBoundingClientRect();if(r.left<4||r.right>innerWidth-4)try{dkReveal(p.fromE)}catch(e){}}p.toR=hrect(p.toE);if(p.fromE)p.fromR=hslice(p.fromE);return p}
 function hlpPlan0(m,me){if(!m||me<0)return null;
   if(m.act==='kick'){const d=document.querySelector('.bfdoor')||hlpBtn(m);return hvis(d)?{toE:d}:null}
   if(m.act==='ask'){const am=document.querySelector('.fbtns [data-a="askmenu"]');if(!hvis(am))return null;
@@ -8376,7 +8550,7 @@ function hlpSuggest(){try{
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'doorkick-dungeon',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opps .opp,.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
+  GXH.init({game:'doorkick-dungeon',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opps .opp,.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});if(typeof syncMenu==='function')syncMenu()}
 function hlpClean(){try{const c=GXH.state().cur;if(!(c&&c.kind==='bulb'))document.querySelectorAll('[data-gxh-avoid]').forEach(x=>x.removeAttribute('data-gxh-avoid'))}catch(e){}}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;hlpClean();
@@ -8474,14 +8648,17 @@ const tclear=()=>!document.getElementById('bfrev')&&!BF.kicking&&UI.pass==null&&
 const tmine=()=>!!G&&!G.winner&&sideToAct()===0&&!G.q&&tclear();
 const nowStr=()=>{const cb=G.cb;return cb?[sideStr(cb),monStr(cb)]:[0,0]};
 const tpick=key=>()=>myId(key);
+// asking for help is possible right now (no rival window pending); the Help step waits for it, the next step reopens the ask mode if a race closed it
+const tcanAsk=()=>sideToAct()===0&&validMoves(0).some(m=>m.act==='ask');
+function tAskOpen(){if(BF.ask||!G.cb||G.cb.help>=0||!tcanAsk()||!tclear())return;BF.pick=null;BF.ask=true;try{bfMark()}catch(e){}}
 // ---------------------------------------------------------------- the steps
 function tutSteps(){
   return [
- {id:'goal',title:'Race to level 10',say:'Be first to reach level 10. The final level can only come from killing a monster.',target:tq('.bfbig','.mine .top'),wait:null,
+ {id:'goal',title:'Race to level 10',say:'Be the first hero to reach level 10. Beat monsters or sell gear to go up. Level 10 only comes from a monster.',target:tq('.bfbig','.mine .top'),wait:null,
    ready:()=>G.phase==='setup'&&tmine()&&!!document.querySelector('.bfbig')},
  {id:'elf',title:'Play your race',say:'Tap your Elf, then tap your hero. Races give powers.',target:tq('.bfbig'),also:()=>tcard('elf'),pick:tpick('elf'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='elf'},from:()=>tcard('elf'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('elf')&&!!document.querySelector('.bfbig')},
- {id:'powers',title:'Races and classes',say:'Your Elf runs better. Classes add powers too: Warriors win ties, Wizards flee, Thieves stab, Clerics fight undead.',target:tq('.mine .gear'),wait:null,
+ {id:'powers',title:'Races and classes',say:'Your Elf runs away better. Classes add powers too.',target:tq('.mine .gear'),wait:null,
    ready:()=>G.phase==='setup'&&tmine()&&P(0).race.length>0},
  {id:'bucket',title:'Wear an item',say:()=>'Items go on by themselves and add to your strength. Tap the Bucket, then your hero.',target:tq('.bfbig'),also:()=>tcard('bucket'),pick:tpick('bucket'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='bucket'},from:()=>tcard('bucket'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('bucket')&&!!document.querySelector('.bfbig')},
@@ -8510,17 +8687,17 @@ function tutSteps(){
  {id:'meddle',title:'Meddle in her fight',say:'Morwen fights alone. Anyone may interfere! Tap Gargantuan, then her monster: +10 for it.',target:tq('.arena .row.mons .mon'),also:()=>tcard('gargantuan'),pick:tpick('gargantuan'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='gargantuan'},from:()=>tcard('gargantuan'),
    ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
- {id:'rivals',title:'The computer plays too',say:'Morwen and Grub follow the same rules: they kick doors, fight, run, curse and ask for help.',target:tq('#phopps','#app .opps'),wait:null,
+ {id:'rivals',title:'The computer plays too',say:'Morwen and Grub play by the same rules as you.',target:tq('#phopps','#app .opps'),wait:null,
    ready:()=>G.active===2&&!G.winner},
  {id:'kick2',title:'Your turn again',say:'Kick the door. Not every door hides a monster.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
- {id:'trouble',title:'Look for trouble',say:'No monster. You may loot a free card, or fight one from your hand: tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
+ {id:'trouble',title:'Look for trouble',say:'No monster. Loot a free card, or fight one from your hand. Tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='lizards'},from:()=>tcard('lizards'),
    ready:()=>G.phase==='after'&&tmine()&&BF.pick==null&&!!tcard('lizards')},
  {id:'help',title:'Ask for help',say:()=>{const [a,b]=nowStr();return 'Lizards '+b+', you '+a+': you lose. Ask a rival to join you. Tap Help.'},target:tq('.fbtns .helpb'),
-   wait:{type:'tap',match:a=>a.what==='askmenu'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&G.cb.help<0&&tmine()&&!!document.querySelector('.fbtns .helpb')},
- {id:'who',title:'Pick a helper',say:'Morwen is an Elf, so she helps for free. Others want treasure. Tap Morwen.',target:tchip(1),
-   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ask'&&a.m.tgt===1},ready:()=>!!BF.ask&&!!tchip(1)()},
+   wait:{type:'tap',match:a=>a.what==='askmenu'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&G.cb.help<0&&tmine()&&tcanAsk()&&!!document.querySelector('.fbtns .helpb')},
+ {id:'who',title:'Pick a helper',say:'Morwen is an Elf, so she helps for free. Others want treasure. Tap Morwen.',target:()=>{tAskOpen();return tchip(1)()},
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ask'&&a.m.tgt===1},ready:()=>{tAskOpen();return !!BF.ask&&!!tchip(1)()}},
  {id:'fight',title:'Fight!',say:()=>{const [a,b]=nowStr();return 'Together you have '+a+' against '+b+'. Higher wins, ties go to the monster. Tap Fight!'},target:tstable('.fbtns .fightb'),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='fight'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.help===1&&tmine()&&!!document.querySelector('.fbtns .fightb')},
  {id:'win',title:'Victory!',say:'You beat it: +1 level, and you drew the treasure. A Treasure Pile gave 3 more cards. Tap End turn.',target:tq(mv('end')),
@@ -8528,8 +8705,8 @@ function tutSteps(){
  {id:'charity',title:'Too many cards',say:'You may keep 5 cards. Give the extras to the lowest-level hero: tap the Halfling, then Morwen.',target:tchip(1),also:()=>tcard('halfling'),pick:tpick('halfling'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='halfling'&&a.z==='p1'},from:()=>tcard('halfling'),
    ready:()=>G.phase==='charity'&&tmine()&&BF.pick==null&&!!tcard('halfling')&&!!tchip(1)()},
- {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins, and the last level needs a monster kill. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .top'),wait:null,
-   ready:()=>G.active!==0&&!G.winner}
+ {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins. The last level needs a monster. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .top'),wait:null,
+   ready:()=>!G.winner&&(G.active!==0||tclear())}
   ]}
 // ---------------------------------------------------------------- the kit hooks
 function tutSetup(){try{GX.close()}catch(e){}
