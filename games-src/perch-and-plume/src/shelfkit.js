@@ -66,7 +66,7 @@ function helpInit() {
           { phase: 'die', title: 'Food dice', text: 'The food your birds in hand need is the best food.' },
           { phase: 'egg', title: 'Nests', text: 'Each bird holds as many eggs as its nest shows.' },
           { phase: 'draw', title: 'The tray', text: 'The tray refills at the end of your turn.' }]) });
-    GXH.bulb({ el: '#bulbbtn', rulesFor: function () { return helpPhase() || 'act'; },
+    GXH.bulb({ el: '#whatbtn', rulesFor: function () { return helpPhase() || 'act'; },
       suggest: function () { if (!myTurn()) return null; var m = PPAI.choose(G, UI.view, 'hard'); if (!m) return null; var el = moveTarget(m); if (!el) return null; return { target: function () { return moveTarget(m); }, why: PPAI.why(G, UI.view, m) }; } });
   } catch (e) { }
 }

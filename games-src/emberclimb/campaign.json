@@ -30,7 +30,7 @@
   {
    "act": 3,
    "title": "The Cinder Gate",
-   "blurb": "Everything you know, against the strongest guardians."
+   "blurb": "Tombs, the Gate and the final climb."
   }
  ],
  "twists": [
@@ -241,7 +241,7 @@
    ],
    "hints": true,
    "opponent": {
-    "name": "Thorn Brute",
+    "name": "Mire Behemoth",
     "emoji": "💀",
     "cast": "rival",
     "personality": "A guardian of the tower.",
@@ -255,14 +255,15 @@
      "s"
     ],
     "floors": 3,
-    "boss": "thorn-brute",
-    "relic": "bag-of-marbles"
+    "boss": "mire-behemoth",
+    "relic": "bag-of-marbles",
+    "hpPct": 70
    },
    "twist": null,
    "goal": {
     "type": "win",
     "value": null,
-    "text": "Reach the top and defeat the Thorn Brute with Sable."
+    "text": "Reach the top and defeat the Mire Behemoth with Sable."
    },
    "stars": [
     {
@@ -333,7 +334,7 @@
    ],
    "hints": false,
    "opponent": {
-    "name": "Sleeper Statue",
+    "name": "Skyclaw",
     "emoji": "👹",
     "cast": "guide",
     "personality": "A guardian of the tower.",
@@ -345,14 +346,16 @@
      "a"
     ],
     "floors": 4,
-    "boss": "sleeper-statue",
-    "relic": "candle-stub"
+    "boss": "skyclaw",
+    "relic": "candle-stub",
+    "startAct": 2,
+    "hpPct": 53
    },
    "twist": null,
    "goal": {
     "type": "win",
     "value": null,
-    "text": "Reach the top and defeat the Sleeper Statue with Cog-9."
+    "text": "Reach the top and defeat the Skyclaw with Cog-9."
    },
    "stars": [
     {
@@ -437,13 +440,10 @@
     "floors": 5,
     "boss": "sleeper-statue",
     "relic": "lantern",
-    "hpPct": 110
+    "hpPct": 86,
+    "startAct": 2
    },
-   "twist": {
-    "id": "tough-foes",
-    "param": 110,
-    "text": "Boss rule: foes have 110% of their normal HP."
-   },
+   "twist": null,
    "goal": {
     "type": "win",
     "value": null,
@@ -513,7 +513,7 @@
    ],
    "hints": false,
    "opponent": {
-    "name": "Mire Behemoth",
+    "name": "Ashen Wraith",
     "emoji": "💀",
     "cast": "rival",
     "personality": "A guardian of the tower.",
@@ -527,15 +527,16 @@
      "w"
     ],
     "floors": 6,
-    "boss": "mire-behemoth",
+    "boss": "ashen-wraith",
     "relic": "tin-flute",
-    "hpPct": 85
+    "hpPct": 75,
+    "startAct": 2
    },
    "twist": null,
    "goal": {
     "type": "win",
     "value": null,
-    "text": "Reach the top and defeat the Mire Behemoth with Garrick."
+    "text": "Reach the top and defeat the Ashen Wraith with Garrick."
    },
    "stars": [
     {
@@ -601,7 +602,7 @@
    ],
    "hints": false,
    "opponent": {
-    "name": "Ashen Wraith",
+    "name": "Tomb King",
     "emoji": "👹",
     "cast": "guide",
     "personality": "A guardian of the tower.",
@@ -613,19 +614,16 @@
      "s"
     ],
     "floors": 6,
-    "boss": "ashen-wraith",
+    "boss": "tomb-king",
     "relic": "smoking-censer",
-    "hpPct": 110
+    "hpPct": 49,
+    "startAct": 3
    },
-   "twist": {
-    "id": "tough-foes",
-    "param": 110,
-    "text": "Boss rule: foes have 110% of their normal HP."
-   },
+   "twist": null,
    "goal": {
     "type": "win",
     "value": null,
-    "text": "Reach the top and defeat the Ashen Wraith with Sable."
+    "text": "Reach the top and defeat the Tomb King with Sable."
    },
    "stars": [
     {
@@ -691,7 +689,7 @@
    ],
    "hints": false,
    "opponent": {
-    "name": "Ashen Wraith",
+    "name": "Thorn Brute",
     "emoji": "👹",
     "cast": "guide",
     "personality": "A guardian of the tower.",
@@ -703,19 +701,16 @@
      "a"
     ],
     "floors": 8,
-    "boss": "ashen-wraith",
+    "boss": "thorn-brute",
     "relic": "iron-bangle",
-    "hpPct": 105
+    "hpPct": 42,
+    "startAct": 3
    },
-   "twist": {
-    "id": "tough-foes",
-    "param": 105,
-    "text": "Boss rule: foes have 105% of their normal HP."
-   },
+   "twist": null,
    "goal": {
     "type": "win",
     "value": null,
-    "text": "Reach the top and defeat the Ashen Wraith with Cog-9."
+    "text": "Reach the top and defeat the Thorn Brute with Cog-9."
    },
    "stars": [
     {
@@ -781,7 +776,7 @@
    ],
    "hints": false,
    "opponent": {
-    "name": "Gate Colossus",
+    "name": "Gate Wyrm",
     "emoji": "💀",
     "cast": "rival",
     "personality": "A guardian of the tower.",
@@ -797,17 +792,18 @@
     "floors": 9,
     "boss": "gate-colossus",
     "relic": "dawnstone",
-    "hpPct": 110
+    "hpPct": 47,
+    "startAct": 3
    },
    "twist": {
-    "id": "tough-foes",
-    "param": 110,
-    "text": "Boss rule: foes have 110% of their normal HP."
+    "id": "start-relic",
+    "param": "dawnstone",
+    "text": "Boss rule: you start with the Dawnstone relic."
    },
    "goal": {
     "type": "win",
     "value": null,
-    "text": "Reach the top and defeat the Gate Colossus with Ione."
+    "text": "Reach the top and defeat the Gate Wyrm with Ione."
    },
    "stars": [
     {
@@ -849,6 +845,94 @@
      "text": "Phoenix Ash can now turn up in any climb"
     }
    ]
+  },
+  {
+   "id": "c10",
+   "act": 3,
+   "title": "Finale: The Ember Heart",
+   "boss": true,
+   "intro": [
+    {
+     "who": "rival",
+     "text": "None climb the Cinder Gate. Show me your best deck, Ione."
+    },
+    {
+     "who": "rival",
+     "text": "One climb. One boss. No second chance."
+    }
+   ],
+   "outro": [
+    {
+     "who": "rival",
+     "text": "The Gate opens. You climbed it all."
+    }
+   ],
+   "hints": false,
+   "opponent": {
+    "name": "Ember Tyrant",
+    "emoji": "💀",
+    "cast": "rival",
+    "personality": "A guardian of the tower.",
+    "aiLevel": "hard",
+    "aiStyle": "intents",
+    "taunt": "You will not pass.",
+    "praise": "Well climbed."
+   },
+   "setup": {
+    "heroes": [
+     "w",
+     "m"
+    ],
+    "floors": 6,
+    "boss": "ember-tyrant",
+    "startAct": 4,
+    "relic": "phoenix-ash",
+    "hpPct": 32
+   },
+   "twist": {
+    "id": "start-relic",
+    "param": "phoenix-ash",
+    "text": "Boss rule: you start with the Phoenix Ash relic."
+   },
+   "goal": {
+    "type": "win",
+    "value": null,
+    "text": "Reach the top and defeat the Ember Tyrant with Garrick and Ione."
+   },
+   "stars": [
+    {
+     "text": "Win",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Finish with half your HP or more",
+     "test": {
+      "k": "hpPct",
+      "op": ">=",
+      "v": 50
+     }
+    },
+    {
+     "text": "Finish with 100 gold or more",
+     "test": {
+      "k": "gold",
+      "op": ">=",
+      "v": 100
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "twist": null,
+    "setup": {
+     "hpPct": 80
+    },
+    "maxStars": 2,
+    "text": "Enemies have less HP and the boss rule is off."
+   },
+   "unlock": []
   }
  ]
 }

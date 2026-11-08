@@ -53,3 +53,21 @@ All numbers come from the engine's own `probe()` and `featPoints()` (`game/src/p
 - **Move rating:** after every turn of yours one line in the sheet: "Good: the best score available." / "Okay: finishing the road was better." / "Poor: ...", from the computer's own best plan versus what you played (placement + follower).
 - **Coached game:** same previews and sheet; Tamsin adds `preview` (what the tags mean) and `rate_good/okay/poor` the first time each applies.
 - Shots (phone): `playable-shots/preview-hold.webp`, `fig-spot-points.webp`, `score-sheet-rating.webp`.
+
+## Round 4 (W426, 8 Nov 01:20 UTC): phone clarity and camera follow
+Owner on a phone: "lot of sloppiness with overlapping text ... very difficult to see maybe with camera following when we aim to place".
+Method: `game/v4-shots.js` plays 10 turns at 390x763 and 375x553 through taps and lists every pair of overlapping text boxes and any text under 14px, every step.
+- **Overlaps found (before, 6 turns):** 14 overlap pairs: follower-spot labels on each other ("field" x "field"), score pops on the turn strip, point tags under the
+  turn strip; tags shrank with the zoom to 6-13 px (they lived inside the scaled board); follower labels pulsed to 35% opacity; the score sheet took 2 rows; rival
+  names cut to one letter in the top bar. **After (10 turns, both sizes): 0 overlaps, no text under 14 px.**
+- **Fixes:** tags stay 14 px on screen at any zoom, solid backing; on phones at most 3 tags (the best by points; the chosen spot's always), lower-ranked tags that
+  would collide with another tag, the strip, a pop, a coach bubble or Recentre are dropped. Follower labels try below / above / right / left of their spot and the
+  lowest-priority label is dropped if none is free; labels no longer pulse. Pops never sit on the strip and fade in place on phones. Score sheet = one row
+  (Road / Town / Priory / Field + a rating chip); tap it for the rating line (closes after 5 s). Seat names hidden under 420 px (the strip names whose turn it is).
+- **Camera follow:** picking up / turning the tile frames the legal spots near the last tile (plus the best-scoring spot), below the strip, cells >= 62 px on phones.
+  Touch: the first tap on a glow centres and zooms that spot (solid large tile preview, its tag, the line "Grows your town ... Tap again to place.") and a
+  "Place here" button replaces the tile name; a second tap or the button places. Mouse keeps one-click placing (hover previews). After the follower step the camera
+  eases out to the area; the rival's placement pans to where it happens, your next turn frames back. Drag / pinch still work (they stop auto-follow until Recentre);
+  a plain tap no longer freezes a camera move halfway. "Recentre" button always on the board (moves to the top while a coach bubble is open).
+- Tests: playable-test and coach-test confirm a tapped spot with "Place here" (touch bots).
+- Shots: `playable-shots/v4-{before,after}-{390x763,375x553}-{1-pick,2-aim,3-tapspot,4-follower,5-rival}.webp`.

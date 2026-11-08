@@ -50,6 +50,7 @@
     }
     if (al.some(function (e) { return e.st.vuln > 0; })) rule('vuln');
     if (al.some(function (e) { return e.st.weak > 0; }) || h.st.weak > 0) rule('weak');
+    if (h.st.frail > 0) rule('frail'); if (UI.sel >= 0 && C.seen.energy) rule('preview');
     if (al.some(function (e) { return e.st.poison > 0; })) rule('poison');
     if (h.st.str > 0) rule('strength');
     if (h.hp < h.mhp * 0.5) rule('lose');
@@ -122,5 +123,6 @@
     try { if (GXT.active()) UI.render(); } catch (e) { }
   };
   UI.tutFree = function () { return false; };
+  UI.coachOn = function () { return !!C.on; };   // Addendum 7: bubbles only in Learn to play
   window.EC_TUT_STEPS = steps;
 })();
