@@ -13,12 +13,12 @@ music = sorted(os.path.basename(f) for f in glob.glob(os.path.join(REPO, 'games'
 pre = ('window.PP_ASSETS=' + json.dumps({'items': [{k: i[k] for k in ('stem', 'kind', 'w', 'h', 'ratio', 'alpha', 'wave')} for i in man['items']]}, separators=(',', ':'))
        + ';window.PP_HAVE=' + json.dumps(have) + ';window.PP_MUSIC=' + json.dumps(music) + ';\n')
 camp = 'window.CAMPAIGN=' + json.dumps(json.load(open(os.path.join(D, 'campaign.json'), encoding='utf-8')), separators=(',', ':'), ensure_ascii=False) + ';\n'
-UI = ['render.js', 'turnui.js', 'story.js', 'coach.js', 'flow.js', 'screens.js', 'shelfkit.js', 'tutor.js', 'feel.js']   # the game's own UI, in load order
-SRC = [('gx-scenario.js', os.path.join(SH, 'gx-scenario.js')), ('scn.js', os.path.join(S, 'scn.js')), ('shell.js', os.path.join(SH, 'shell.js')), ('gx-kit.js', os.path.join(SH, 'gx-kit.js')), ('gx-feel.js', os.path.join(SH, 'gx-feel.js')),
+UI = ['render.js', 'turnui.js', 'story.js', 'coach.js', 'flow.js', 'screens.js', 'shelfkit.js', 'tutor.js']   # the game's own UI, in load order
+SRC = [('gx-scenario.js', os.path.join(SH, 'gx-scenario.js')), ('scn.js', os.path.join(S, 'scn.js')), ('shell.js', os.path.join(SH, 'shell.js')), ('gx-kit.js', os.path.join(SH, 'gx-kit.js')),
        ('gx-viewport.js', os.path.join(SH, 'gx-viewport.js')), ('gx-help.js', os.path.join(SH, 'gx-help.js')), ('gx-tutor.js', os.path.join(SH, 'gx-tutor.js')), ('gx-campaign.js', os.path.join(SH, 'gx-campaign.js')),
        ('gameaudio.js', os.path.join(SP, 'audio', 'gameaudio.js')), ('gx-music.js', os.path.join(SH, 'gx-music.js')),
        ('data.js', os.path.join(S, 'data.js')), ('engine.js', os.path.join(S, 'engine.js')), ('ai.js', os.path.join(S, 'ai.js')), ('art.js', os.path.join(S, 'art.js'))] + [(f, os.path.join(S, f)) for f in UI]
-css = '\n'.join(rd(os.path.join(SH, f)) for f in ('shell.css', 'gx-kit.css', 'gx-feel.css', 'gx-help.css', 'gx-tutor.css', 'gx-campaign.css')) + '\n' + rd(os.path.join(S, 'feel.css'))
+css = '\n'.join(rd(os.path.join(SH, f)) for f in ('shell.css', 'gx-kit.css', 'gx-help.css', 'gx-tutor.css', 'gx-campaign.css'))
 h = rd(os.path.join(S, 'head.html')).replace('/*SHELL_CSS*/', css)
 body = rd(os.path.join(S, 'body.html'))
 js = []

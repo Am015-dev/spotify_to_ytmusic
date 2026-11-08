@@ -127,7 +127,7 @@ function renderDock(p, vs, cur) {
     var id = p.hand[i], b = B[id], st;
     if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
     else if (!mine) st = '';
-    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : hintsOn() ? 'Drag to a row or tap: +' + b.p : 'Drag to your board or tap') + '</div>';
+    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : hintsOn() ? 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points') : 'Tap to play this bird') + '</div>';
     else if (!Q) st = '<div class="bk-st no">' + esc(whyCant(id)) + '</div>';
     else st = '';
     var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');
