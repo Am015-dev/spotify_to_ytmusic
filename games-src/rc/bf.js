@@ -177,7 +177,7 @@ BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b
   let scene='';try{if(k==='weather'){const w=(viewState()||G).lastWx||{};scene=w.storm?'gale':w.snow?'winter':w.rain?'rain':'horizon'}
     else if(k==='threat'||k==='fight')scene='prowlers';else if(k==='mystery')scene='altar';
     else{const c=d.card!=null&&CARD[d.card];const t=c&&(c.icon||c.deck||c.type);scene={book:'whisper',build:'log',explore:'shroud',gather:'hunger',wreck:'undertow'}[t]||(k==='adventure'?'shroud':'undertow')}}catch(e){}
-  el.innerHTML=`<div class="in">${scene&&!(k==='fight'&&d.beast)?`<img class="bfscene" src="media/camp-${scene}.webp" alt="">`:''}<div class="fr">${(k==='fight'&&d.beast&&artImg('beast',d.beast,'bfart'))||`<span class="bfic">${ic}</span>`}<span class="bftt">${E(w8(capFor(i)))}</span></div></div>`;ov.appendChild(el);
+  el.innerHTML=`<div class="in">${scene&&!(k==='fight'&&d.beast)?`<img class="bfscene" src="media/camp-${scene}.webp" alt="">`:''}<div class="fr">${(k==='fight'&&d.beast&&artImg('beast',d.beast,'bfart'))||`<span class="bfic">${ic}</span>`}<span class="bftt">${E(w8(capFor(i)))}</span>${(()=>{try{const c=d.card!=null&&CARD[d.card];if(!c)return '';const t=(k==='event'?opsText(c.ev):k==='threat'&&c.th?opsText(c.th.rw||c.th.pen||[]):opsText(c.ops))||'';return t?`<span class="bfeff">${E(w12(t.replace(/;.*$/,'.')))}</span>`:''}catch(e){return ''}})()}</div></div>`;ov.appendChild(el);
   // hold to read the full card text; a quick tap moves on
   let t0=0,tm=null,held=false;const cancel=()=>{clearTimeout(tm);tm=null};
   el.addEventListener('pointerdown',e=>{e.stopPropagation();t0=Date.now();held=false;cancel();tm=setTimeout(()=>{held=true;BF.info()},480)});
