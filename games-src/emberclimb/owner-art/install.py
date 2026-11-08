@@ -40,8 +40,8 @@ CARD = {
     'enemy-gate-colossus': 'wyrm', 'enemy-cinder-hound': 'hound', 'enemy-ash-wisp': 'cloak', 'enemy-smoke-hexer': 'wizard', 'enemy-skyclaw': 'skygrif',
     'enemy-grave-knight': 'rattle', 'enemy-bone-caller': 'gnawers', 'enemy-tomb-king': 'pharaoh', 'enemy-ember-tyrant': 'inferno',
     # warrior cards
-    'w-strike': 'tapsword', 'w-defend': 'wallshield', 'w-hammer': 'shinhammer', 'w-cleave': 'halberd', 'w-twin-slash': 'rapier', 'w-warm-up': 'hotsauce',
-    'w-bulwark-bash': 'wall', 'w-sunder': 'buzzsaw', 'w-iron-skin': 'kneecaps', 'w-skull-rap': 'cudgel', 'w-roar': 'l9', 'w-wild-swing': 'weighted',
+    'w-strike': 'rapier', 'w-defend': 'kneecaps', 'w-hammer': 'shinhammer', 'w-cleave': 'halberd', 'w-twin-slash': 'tapsword', 'w-warm-up': 'hotsauce',
+    'w-bulwark-bash': 'wall', 'w-sunder': 'buzzsaw', 'w-iron-skin': 'wallshield', 'w-skull-rap': 'cudgel', 'w-roar': 'l9', 'w-wild-swing': 'weighted',
     'w-whirlwind': 'hexgust', 'w-kindle': 'wildfire', 'w-slow-burn': 'blazing', 'w-body-check': 'stompy', 'w-second-wind': 'water', 'w-berserk-roll': 'furious',
     'w-reapers-edge': 'rascal', 'w-plate-up': 'jerkin', 'w-pyre-heart': 'gargantuan', 'w-colossus-slam': 'boulder', 'w-double-down': 'twin', 'w-final-gambit': 'amazon',
     # rogue cards
