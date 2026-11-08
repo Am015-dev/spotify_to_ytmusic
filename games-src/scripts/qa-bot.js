@@ -277,7 +277,7 @@ async function driveTutorial(page, ci, P, ms, sumObj) {   // taps through a runn
 }
 async function phaseCoached(page, ci, P) {   // coached free-play first game (window.GXCOACH = {running, explained:[ids], done}); real taps only
   console.log('  coached game detected (GXCOACH)'); summary.tutorial.coached = true; const T = lim('coach');
-  const started = await ev(page, () => { const e = document.querySelector('[data-a=start]'); if (!e || !window.__qa.vis(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+  const started = await ev(page, () => { const e = (document.querySelector('[data-a=offeryes]')||document.querySelector('[data-a=start]')); if (!e || !window.__qa.vis(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   if (started) await tap(page, started.x, started.y); else if (!(await ev(page, () => window.GXCOACH && window.GXCOACH.running))) await goTo(page, '^(learn|new here|first game|coached|guided|vs\\.?\\s*(the\\s*)?(computer|cpu|ai|bot)|solo|single|1 player|play|start|begin|new game|new run|quick|battle|deal|enter)');
   await sleep(1500);
   const b0 = bugs.length, opt = { minClicks: 4, coach: true, prefer: '^(start|play|begin|new game|deal|vs|quick)' };

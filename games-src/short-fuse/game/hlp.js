@@ -110,5 +110,5 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'short-fuse',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,.sel,#tray .chip,#mine .chip,#over .big,#cover .big'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
-  const st=document.getElementById('start');const busy=!G||!UI.started||G.over||(st&&!st.hidden)||UI.brief||UI.pause||UI.tut||UI.coach;
+  const st=document.getElementById('start');const busy=!G||!UI.started||G.over||(st&&!st.hidden)||UI.brief||UI.pause||UI.tut||UI.coach||!hintsOn();
   GXH.phase(busy?null:hlpPhase())}
