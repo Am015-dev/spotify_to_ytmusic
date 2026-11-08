@@ -98,10 +98,16 @@ function pvMarket() {
 }
 function pvBestCol(v) { var b = -1; v.forEach(function (x, i) { if (x != null && (b < 0 || x > v[b])) b = i; }); return b; }
 // ---- the turn verdict: remembered at the pick, told after the animal step
+// the move rating runs one task later on a snapshot (it can plan the best move: a long task on slow phones); it only reads the
+// state and writes PV.turn, which is read when the turn ends
 function pvTurnStart(m) {
-  if (!G || G.seats[G.cur].ai) return;
+  if (!G || G.seats[G.cur].ai) return; UI.rivalMsg = null;
+  var snap = WM.clone(G), mm = Object.assign({}, m);
+  setTimeout(function () { var live = G; G = snap; try { pvTurnRate(mm); } catch (e) { } finally { G = live; } }, 0);
+}
+function pvTurnRate(m) {
   var v = pvMarket().slice(), b = pvBestCol(v), s = G.seats[G.cur], sol = -1;
-  try { var pl = WM.AI.plan(WM.clone(G), 'hard'); sol = pl.pick.t === 'take' ? pl.pick.i : pl.pick.ti; } catch (e) { }
+  if (hintsOn()) try { var pl = WM.AI.plan(WM.clone(G), 'hard'); sol = pl.pick.t === 'take' ? pl.pick.i : pl.pick.ti; } catch (e) { }   // only the Hints verdict uses it (a long task on slow phones)
   var ci = m.t === 'take' ? m.i : m.ti;
   var names = G.market.toks.map(function (k) { return k ? WM.ANI_NAME[k] : ''; });
   UI.rivalMsg = null;

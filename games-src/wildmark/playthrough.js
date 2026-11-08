@@ -14,25 +14,19 @@ const URL = 'file://' + __dirname + '/wildmark.html';
       for (let t = 0; t < 20; t++) await humanTurn(p, tap);
       await p.waitForSelector('#againB', { timeout: 30000 }); await p.screenshot({ path: `shots/full-${name}.png` });
       log(name, 'PASS full game', await p.evaluate(() => G.res.map(r => r.total).join('/')));
-      // 2) tutorial
+      // 2) Learn to play = the coached first game (tutor.js): a real 6-turn game vs Bram, Rowan's bubbles never block, no Skip pressed
       await tap('#titleB'); await p.waitForSelector('.gxt-menu'); await tap('.gxt-menu');
-      let n = 0;
-      for (; n < 80; n++) {
-        const st = await p.evaluate(() => window.GXT ? GXT.state() : { active: false });
-        if (!st.active) break;
-        if (st.phase === 'end') break;
-        if (st.phase !== 'show') { await p.waitForTimeout(250); continue; }
-        if (!st.wait) { const nb = p.locator('.gxt-b.pri, .gxt-next').first(); if (await nb.count()) { touch ? await nb.tap() : await nb.click(); } await p.waitForTimeout(250); continue; }
-        const hole = st.hole; if (!hole) { await p.waitForTimeout(250); continue; }
-        if (touch) await p.touchscreen.tap(hole.cx, hole.cy); else await p.mouse.click(hole.cx, hole.cy);
-        await p.waitForTimeout(300);
-        if (n === 9) await p.screenshot({ path: `shots/tut-${name}.png` });
+      await p.waitForFunction(() => UI.mode === 'coach' && G && !G.over, null, { timeout: 10000 });
+      let n = 0, stack = 0;
+      while (n < 12 && !(await p.evaluate(() => G.over))) {
+        stack = Math.max(stack, await p.evaluate(() => ['#coachb', '#toast.on', '.pop', '#turnban.on', '.gxh-tip:not([hidden])'].filter(s => { const e = document.querySelector(s); return e && !e.hidden && e.offsetParent; }).length));
+        await humanTurn(p, tap, true); n++;
+        if (n === 3) await p.screenshot({ path: `shots/learn-${name}.png` });
       }
-      const ts = await p.evaluate(() => GXT.state());
+      await p.waitForSelector('#rs:not([hidden])', { timeout: 30000 });
+      const co = await p.evaluate(() => ({ done: !!(window.GXT && GXT.isDone && GXT.isDone('wildmark')), explained: (window.GXCOACH && GXCOACH.explained || []).length, mode: UI.mode }));
       await p.screenshot({ path: `shots/tutend-${name}.png` });
-      if (ts.phase === 'end' || !ts.active) log(name, 'PASS tutorial', n, 'actions'); else { fails++; log(name, 'FAIL tutorial stuck at', ts.id, ts.phase); }
-      // leave the tutorial end screen with its first button (Play / Story)
-      const eb = p.locator('.gxt-end .gxt-b').first(); if (await eb.count()) { touch ? await eb.tap() : await eb.click(); }
+      if (co.done && co.explained >= 5 && stack <= 1) log(name, 'PASS learn', n, 'turns by touch,', co.explained, 'rules explained, max', stack, 'message at once'); else { fails++; log(name, 'FAIL learn', JSON.stringify(co), 'turns', n, 'max messages at once', stack); }
       // 3) story chapters 1 and 2
       for (const id of ['c1', 'c2']) {
         await p.evaluate(() => { UI.sv = 'title'; showTitle(); });
