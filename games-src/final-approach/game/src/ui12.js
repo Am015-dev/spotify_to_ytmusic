@@ -66,7 +66,9 @@ function tutStart(o) {
 // leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
 function tutLeave() {
   if (window.GXCOACH && !window.GXCOACH.done) window.GXCOACH.running = false;
-  clearInterval(UI.fcT); UI.fc = null; UI.cpt = null; document.querySelectorAll('.fa-coach,.fa-fin,.fa-skip').forEach(e => e.remove());
+  const lc = UI.fc && UI.fc.cur, left = lc ? Math.max(0, lc.need - (Date.now() - lc.at)) : 0;   // a line still being read fades after its reading time
+  clearInterval(UI.fcT); UI.fc = null; UI.cpt = null; document.querySelectorAll('.fa-fin,.fa-skip' + (left ? '' : ',.fa-coach')).forEach(e => e.remove());
+  if (left) setTimeout(() => document.querySelectorAll('.fa-coach').forEach(e => { if (!UI.fc) e.remove(); }), left);
   clearTimeout(UI.tm); UI.seq++; UI.started = false; UI.sel = -1; UI.cof = 0; if (UI._aid) { AIDELAY = UI._aid; UI._aid = 0; }
   try { hideRecap(); } catch (e) { } try { GXH.hide(); } catch (e) { } try { if (typeof pxClearEnd === 'function') pxClearEnd(); } catch (e) { }
   $$('#fx .gh,#fx .endb,#fx .pop').forEach(e => e.remove()); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
