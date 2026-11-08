@@ -14,6 +14,7 @@ async function toMyMove(p) {
 }
 async function run(kind, url, b) {
   const phone = kind === 'touch';
+  const click = kind === 'click';   // a plain mouse click (no movement) must lift and drop as before
   const ctx = await b.newContext(phone ? { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } : { viewport: { width: 1440, height: 900 } });
   const p = await ctx.newPage(); p.on('pageerror', e => note(kind + ' PAGE ERROR ' + e.message));
   await p.goto(url); await p.waitForTimeout(1500);
@@ -25,6 +26,14 @@ async function run(kind, url, b) {
   await p.evaluate(() => render()); await p.waitForTimeout(200);
   const start = await p.evaluate(() => UI.pick[0]);
   const s = await ctr(p, `#grid [data-tile="${start}"]`);
+  if (click) {
+    await p.mouse.click(s.x, s.y); await p.waitForTimeout(300);
+    const lifted = await p.evaluate(() => !!G.move); if (!lifted) note('click: a plain mouse click on a glowing start tile did not lift (pointer capture eats the click?)');
+    const j = await p.evaluate(() => UI.pick[0]); const t2 = j == null ? null : await ctr(p, `#grid [data-tile="${j}"]`);
+    if (t2) { await p.mouse.click(t2.x, t2.y); await p.waitForTimeout(300); if (await p.evaluate(() => !!UI.chz)) { const c = await ctr(p, '#chz [data-chz="0"]'); if (c) { await p.mouse.click(c.x, c.y); await p.waitForTimeout(300); } } }
+    const d = await p.evaluate(() => G.move ? G.move.drops.length : -1); if (!(d >= 1)) note('click: the second click did not drop a person (' + d + ')');
+    console.log('drag-test click lifted ' + lifted + ' drops ' + d); await ctx.close(); return;
+  }
   const drag = async (from, toSel) => {
     if (phone) {   // real touch events through CDP
       const c = await ctx.newCDPSession(p);
@@ -62,7 +71,7 @@ async function run(kind, url, b) {
 }
 (async () => {
   const url = await gx.url('sands-of-qamar', {}); const b = await PW.chromium.launch();
-  await run('mouse', url, b); await run('touch', url, b);
+  await run('click', url, b); await run('mouse', url, b); await run('touch', url, b);
   console.log('drag-test ' + (probs.length ? 'PROBLEMS' : 'PASS')); probs.forEach(x => console.log(' - ' + x));
   await b.close(); process.exit(probs.length ? 1 : 0);
 })();
